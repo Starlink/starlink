@@ -1,9 +1,9 @@
-<![ ignore [
+<![ IGNORE [
   This is the Starlink General DTD.  It should not be used
   independently, but invoked from another DTD via:
 
-    <!entity % Starlink.general
-	public "-//Starlink//DTD Starlink General 0.6//EN">
+    <!ENTITY % Starlink.general
+	PUBLIC "-//Starlink//DTD Starlink General 0.6//EN">
     %Starlink.general;
 
   The DTD should define the following parameter entities:
@@ -24,7 +24,7 @@
   Copyright 1999, Particle Physics and Astronomy Research Council.
 ]]>
 
-<!entity % DTD.General.Version "DTD Starlink General 0.6">
+<!ENTITY % DTD.General.Version "DTD Starlink General 0.6">
 
 
 <!--========== Architectures ==========-->
@@ -63,7 +63,7 @@
      NDATA is specifically for data the parser isn't supposed to examine.
      -->
 <!ENTITY HyTime.DTD 
-	public 'ISO/IEC 10744:1997//DTD AFDR Meta-DTD
+	PUBLIC 'ISO/IEC 10744:1997//DTD AFDR Meta-DTD
                 Hypermedia/Time-based Structuring Language (HyTime)//EN'
 	CDATA AFDRMeta
 	>
@@ -75,19 +75,19 @@
 	ArcNamrA	NAME	HyNames
 	ArcSuprA	NAME	sHyTime
 	ArcIgnDA	NAME	HyIgnD
-	ArcDocF		NAME	#fixed	HyDoc
+	ArcDocF		NAME	#FIXED	HyDoc
 	ArcDTD		CDATA	"HyTime.DTD"
-	ArcQuant	CDATA	#fixed	"NAMELEN 9 LITLEN 2048"
+	ArcQuant	CDATA	#FIXED	"NAMELEN 9 LITLEN 2048"
 		-- rflocatt entity is longer than 1024 --
-	ArcDataF	NAME	#fixed	HyBridN
-	ArcBridF	name	#fixed	HyBrid
+	ArcDataF	NAME	#FIXED	HyBridN
+	ArcBridF	NAME	#FIXED	HyBrid
 	ArcAuto		(ArcAuto|nArcAuto)	nArcAuto
 	ArcOptSA	NAMES	"GenArc base links locs"
 
 	-- Support attributes for HyTime only --
 	hyqcnt		NUMBER	32
 	locs		CDATA	"refloc"
-	links		CDATA	#fixed	"clink"
+	links		CDATA	#FIXED	"clink"
 	exrefs		NAME	exrefs
 	manyanch	NUMBER	2
 	>
@@ -104,19 +104,19 @@
 		   International Standard ISO/IEC 10744. --
 	SYSTEM ''>
 <!ENTITY documentsummary.dtd
-	public "-//Starlink//DTD Document Summary 0.2//EN"
-	cdata AFDRMeta
+	PUBLIC "-//Starlink//DTD Document Summary 0.2//EN"
+	CDATA AFDRMeta
 	>
 <!ATTLIST #NOTATION documentsummary
 	ArcFormA
-		name
+		NAME
 		documentsummary
 	ArcDTD
-		cdata
+		CDATA
 		"documentsummary.dtd"
 	ArcNamrA
-		cdata
-		#fixed "docsumma"
+		CDATA
+		#FIXED "docsumma"
 	>
 
 <!--========== Notations ==========-->
@@ -134,10 +134,10 @@
      The subset defines the entity %notations-read to be IGNORE, so that
      the subset can't be read twice.
      -->
-<!entity % notations-read "INCLUDE">
+<!ENTITY % notations-read "INCLUDE">
 <![ %notations-read [
 
-<!entity % notations-subset 
+<!ENTITY % notations-subset 
   PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN">
 %notations-subset;
 
@@ -157,7 +157,7 @@
 
 
 <!--========== Parameter entities for configuration ==========-->
-<!entity % DocClass "SUN">
+<!ENTITY % DocClass "SUN">
 
 <!--=========== Feature Switches ==========-->
 
@@ -168,8 +168,8 @@
      this DTD.  Note that it is possible for some document instances to
      be invalid unless one of these is defined.
      -->
-<!entity % Only.paper	"IGNORE">
-<!entity % Only.web	"IGNORE">
+<!ENTITY % Only.paper	"IGNORE">
+<!ENTITY % Only.web	"IGNORE">
 
 <!-- Use %Feature.Everything to switch on _all_ the features.  Note that
      this is here purely for documentation purposes, and should not be
@@ -177,63 +177,63 @@
      %Feature.versioning and %Internal.Feature.dateonly, it isn't even
      fully consistent.
      -->
-<!entity % Feature.Everything		'ignore'>
+<!ENTITY % Feature.Everything		'IGNORE'>
 <![ %Feature.Everything [
-  <!entity % Feature.Abstract		'include'>
-  <!entity % Feature.Versioning		'include'>
-  <!entity % Internal.Feature.Dateonly	'include'>
-  <!entity % Feature.Docnumber		'include'>
-  <!entity % Feature.Routinelist	'include'>
-  <!entity % Feature.EnforceLinkPolicy	'include'>
+  <!ENTITY % Feature.Abstract		'INCLUDE'>
+  <!ENTITY % Feature.Versioning		'INCLUDE'>
+  <!ENTITY % Internal.Feature.Dateonly	'INCLUDE'>
+  <!ENTITY % Feature.Docnumber		'INCLUDE'>
+  <!ENTITY % Feature.Routinelist	'INCLUDE'>
+  <!ENTITY % Feature.EnforceLinkPolicy	'INCLUDE'>
 ]]>
 
-<!-- If %Feature.Abstract is 'include', then an abstract is required.  If
-     it is 'ignore' then the abstract is optional.  It would be possible
+<!-- If %Feature.Abstract is 'INCLUDE', then an abstract is required.  If
+     it is 'IGNORE' then the abstract is optional.  It would be possible
      to forbid an abstract by predefining %req.abstract to "", but that
      is discouraged.
 
      Default: required.
      -->
-<!entity % Feature.Abstract 'include'>
+<!ENTITY % Feature.Abstract 'INCLUDE'>
 
 <!-- The entity %Feature.Versioning controls whether the HISTORY and UPDATE
      elements are permitted in the document.  It may be turned off by
-     declaring it as 'ignore' in the including DTD or possibly by the
+     declaring it as 'IGNORE' in the including DTD or possibly by the
      document instance in a declaration subset (though the latter should
      probably be discouraged other than for MUDs).
 
      Default: absent
      -->
-<!entity % Feature.Versioning	'ignore'>
+<!ENTITY % Feature.Versioning	'IGNORE'>
 
 <!-- The entity %Internal.Feature.Dateonly controls whether we have a
      simple DATE element in place of the HISTORY one.  It is NOT intended
      to be set outside this DTD - if you want this, then set
-     %Feature.Versioning to be 'ignore'.  
+     %Feature.Versioning to be 'IGNORE'.  
 
      ONE OR THE OTHER, BUT NOT BOTH, of %Feature.Versioning and
-     %Internal.Feature.Dateonly must be set to include.  If both are set, chaos
+     %Internal.Feature.Dateonly must be set to INCLUDE.  If both are set, chaos
      will probably ensue, but I can't work out how to report such an
      error from the DTD.
      -->
 <![ %Feature.Versioning [
-  <!entity % Internal.Feature.Dateonly 'ignore'>
+  <!ENTITY % Internal.Feature.Dateonly 'IGNORE'>
 ]]>
-<!entity % Internal.Feature.Dateonly	'include'>
+<!ENTITY % Internal.Feature.Dateonly	'INCLUDE'>
 
 <!-- The entity %Feature.Docnumber controls whether the DOCNUMBER element
      is required in the head, or forbidden
 
      Default: absent
      -->
-<!entity % Feature.Docnumber	'ignore'>
+<!ENTITY % Feature.Docnumber	'IGNORE'>
 
 <!-- The entity %Feature.Routinelist controls whether the ROUTINELIST
      element is permitted in the backmatter.
 
      Default: absent
      -->
-<!entity % Feature.Routinelist 'ignore'>
+<!ENTITY % Feature.Routinelist 'IGNORE'>
 
 <!-- The entity %Feature.EnforceLinkPolicy controls whether the link
      policy described below is enforced by the DTD.  Set this to IGNORE
@@ -241,14 +241,14 @@
 
      Default: enforced
      -->
-<!entity % Feature.EnforceLinkPolicy 'include'>
+<!ENTITY % Feature.EnforceLinkPolicy 'INCLUDE'>
 
 
 <!--========== Entities for special symbols ==========-->
 <!-- There's a feature here I don't understand.  I had thought that the
      appropriate way to switch between entity sets (for LaTeX or HTML
      output) was to use SDATA entities.  However, when I do that - doing
-     something like <!entity copy SDATA "(c)">, what emerges from the
+     something like <!ENTITY copy SDATA "(c)">, what emerges from the
      Jade Transform back-end is what looks like a multibyte character
      reference &#65533, independently of what I have in the actual SDATA
      entity declaration.  The LaTeX-Transform back-end I wrote emits
@@ -257,24 +257,24 @@
      using CDATA character entities.  
      -->
 
-<!entity % LaTeX.entities 'IGNORE'>
-<!entity % HTML.entities 'IGNORE'>
+<!ENTITY % LaTeX.entities 'IGNORE'>
+<!ENTITY % HTML.entities 'IGNORE'>
 
 <![ %LaTeX.entities [
-<!entity % Additional.Char.Ents
-	public "-//Starlink//ENTITIES Additional entities//EN//LATEX">
-<!entity % ISOents
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//LATEX">
+<!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX">
 ]]>
 <![ %HTML.entities [
-<!entity % Additional.Char.Ents
-	public "-//Starlink//ENTITIES Additional entities//EN//HTML">
-<!entity % ISOents
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//HTML">
+<!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML">
 ]]>
-<!entity % Additional.Char.Ents
-	public "-//Starlink//ENTITIES Additional entities//EN//PLAIN">
-<!entity % ISOents
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//PLAIN">
+<!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN">
 
 %Additional.Char.Ents;
@@ -286,16 +286,16 @@
      separate shortref for emdash.  This way, we could switch between
      endash and emdash by changing this declaration. 
      -->
-<!shortref textabbrevsmap	"--"	endash
+<!SHORTREF textabbrevsmap	"--"	endash
 				"_"	underscore
 				"~"	nbsp>
 <!-- Enable this map in the following elements.  This means it's
      enabled in all of %body.content, plus miscellaneous other places
      like the abstract, plus section and other titles
      -->
-<!usemap textabbrevsmap (p | px | table | figure | title)>
+<!USEMAP textabbrevsmap (p | px | table | figure | title)>
 <!-- ...but suspend it where it's liable to cause trouble (thanks Mark!) -->
-<!usemap #empty (m|mequation|meqnarray|verbatim|code|kbd)>
+<!USEMAP #EMPTY (m|mequation|meqnarray|verbatim|code|kbd)>
 
 <!--========== Abbreviations ==========-->
 
@@ -304,14 +304,14 @@
 
 <!--========== Overall document structure ==========-->
 
-<!entity % DTD.Version 'Unknown' -- Include so that this DTD is valid
+<!ENTITY % DTD.Version 'Unknown' -- Include so that this DTD is valid
 				    on its own (for the benefit of
 				    DTD-documenting tools) -->
-<!entity % gversion.attr "generalversion cdata #fixed '%DTD.General.Version;'">
-<!entity % version.attr "version cdata #fixed '%DTD.Version;'">
+<!ENTITY % gversion.attr "generalversion CDATA #FIXED '%DTD.General.Version;'">
+<!ENTITY % version.attr "version CDATA #FIXED '%DTD.Version;'">
 
-<!element %DocClass o o (docinfo, docbody)>
-<!attlist %DocClass
+<!ELEMENT %DocClass O O (docinfo, docbody)>
+<!ATTLIST %DocClass
 	%gversion.attr;
 	%version.attr;
 	urllinkpolicy		-- Declare the URL policy for the
@@ -322,28 +322,28 @@
 				   generated automatically.  See the
 				   DocumentSummary architecture DTD
 				   for discussion.  --
-		cdata
-		#fixed automatic
+		CDATA
+		#FIXED automatic
 	>
 
 <!--========== Document head parameterisation ==========-->
 <![ %Feature.Everything [
-    <!entity % history ',history,docdate'>
+    <!ENTITY % history ',history,docdate'>
 ]]>
 <![ %Feature.Versioning [
-    <!entity % history ',history'>
-    <!entity % update 'update*,'>
-    <!entity % update.pc ',update*'  -- hacky, but update with prec. comma -->
+    <!ENTITY % history ',history'>
+    <!ENTITY % update 'update*,'>
+    <!ENTITY % update.pc ',update*'  -- hacky, but update with prec. comma -->
 ]]>
-<!entity % history ',docdate'>
-<!entity % update ''>
-<!entity % update.pc ''>
+<!ENTITY % history ',docdate'>
+<!ENTITY % update ''>
+<!ENTITY % update.pc ''>
 <!-- either HISTORY or DOCDATE elements will be present in DTD -->
 
 <![ %Feature.Docnumber [
-    <!entity % docnumber ',docnumber'>
+    <!ENTITY % docnumber ',docnumber'>
 ]]>
-<!entity % docnumber ''>
+<!ENTITY % docnumber ''>
 
 
 <!--========== Paragraph/body-content elements ==========-->
@@ -351,12 +351,12 @@
      These need to be after the declaration of the %update entity
      -->
 
-<!entity % additional.special "| index | note | draftnote">
-<!entity % additional.structuring "| tabular">
-<!entity % additional.references  "| citation">
+<!ENTITY % additional.special "| index | note | draftnote">
+<!ENTITY % additional.structuring "| tabular">
+<!ENTITY % additional.references  "| citation">
 
-<!entity % paragraph.elements 
-	public "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN">
+<!ENTITY % paragraph.elements 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN">
 %paragraph.elements;
 
 <!--========== Other body-content elements ==========-->
@@ -365,19 +365,19 @@
      the paragraph.elements inclusion.
      -->
 
-<!element CITATION - - (#pcdata)	-- bibliography reference -->
-<!attlist citation
-	noref	(noref)	#implied
+<!ELEMENT citation - - (#PCDATA)	-- bibliography reference -->
+<!ATTLIST citation
+	noref	(noref)	#IMPLIED
 		-- noref means don't make any reference in the text:
 		   just include an entry in the bibliography --
 	>
 
-<!element NOTE - - (px)+		-- foot/endnotes -->
-<!element DRAFTNOTE - - (#pcdata)	-- Notes during drafting -->
+<!ELEMENT note - - (px)+		-- foot/endnotes -->
+<!ELEMENT draftnote - - (#PCDATA)	-- Notes during drafting -->
 
-<!element INDEX - - (#pcdata)>
-<!attlist index
-	key	cdata	#implied	-- key, if not element contents --
+<!ELEMENT index - - (#PCDATA)>
+<!ATTLIST index
+	key	CDATA	#IMPLIED	-- key, if not element contents --
 	>
 
 
@@ -391,10 +391,11 @@
      having the order fixed means that the AUTHORLIST start tag can be
      made omissable.
      -->
-<!entity % docinfo.model 
-	'title , authorlist , keyword* %docnumber %history ,
+<!ENTITY % docinfo.model 
+	'title , authorlist , keyword*, manualtype?, softwareversion?
+	%docnumber %history ,
 	coverimage?, copyright?'>
-<!element DOCINFO o o (%docinfo.model)>
+<!ELEMENT docinfo O O (%docinfo.model)>
 
 <!-- The TITLE element contains the document title, or the section title
      if it's used within a subhead element.  In that latter context, it
@@ -417,7 +418,7 @@
      unlikely to be any need for cross references within titles, and this
      can add significant complication.
      -->
-<!element TITLE		o o (%simpletext)+
+<!ELEMENT title		O O (%simpletext)+
 			-- contains document title.  The opening and
 			   closing tags are marked as omissable: they
 			   typically won't be omitted, in the
@@ -426,47 +427,60 @@
 			   both have to be omissable if we're to be
 			   able to write section headings as
 			   `<sect>title...' -->
-<![ ignore [
-<!element DISPLAYTITLE	- o (%simpletext | %references | %special)+
+<![ IGNORE [
+<!ELEMENT displaytitle	- O (%simpletext | %references | %special)+
 					-- displayable alternative title -->
 ]]>
 
-<!element AUTHORLIST	o o (author+, otherauthors?, editors?)
+<!ELEMENT authorlist	O O (author+, otherauthors?, editors?)
 					-- contains author names -->
-<!element (OTHERAUTHORS | EDITORS)
-			- o (author+)	-- other contributors -->
-<!element AUTHOR	- o (#pcdata)	-- contains author's name -->
-<!element KEYWORD	- o (#pcdata)	-- contains a keyword for document -->
+<!ELEMENT (otherauthors | editors)
+			- O (author+)	-- other contributors -->
+<!ELEMENT author	- O (#PCDATA)	-- contains author's name -->
+<!ELEMENT keyword	- O (#PCDATA)	-- contains a keyword for document -->
 
-<!attlist author
+<!ELEMENT manualtype	- O (#PCDATA)	-- type of manual -->
+<!ELEMENT softwareversion - O (#PCDATA)	
+			-- free text indicating program version this
+			   document corresponds to (as opposed to
+			   document version) -->
+
+<!ATTLIST author
 	email		-- author's email address	--
-		cdata	#implied
+		CDATA	#IMPLIED
 	webpage		-- author's home page		--
-		cdata	#implied
+		CDATA	#IMPLIED
 	affiliation	-- author's physical address/affiliation, etc --
-		cdata	#implied
+		CDATA	#IMPLIED
 	role		-- editor, maintainer, etc	--
-		cdata	#implied	
+		CDATA	#IMPLIED	
 	id		-- eg, initials, referred to in element UPDATE --
-		id	#required
+		ID	#REQUIRED
+	>
+<!ATTLIST manualtype
+	type	-- what type of manual is this? --
+		(users|programmers|programmers.c|programmers.fortran|other)
+		#REQUIRED
 	>
 
+
+
 <![ %Feature.Docnumber [
-    <!element DOCNUMBER - o (#pcdata)	-- document number in series -->
-    <!attlist docnumber
+    <!ELEMENT docnumber - O (#PCDATA)	-- document number in series -->
+    <!ATTLIST docnumber
 	unassigned	-- indicates that no number has (yet?) been assigned
 			   to this document, and so that any content should be
 			   ignored --
 		(unassigned)
-		#implied
+		#IMPLIED
 	documenttype	-- Declare the type of the document element.
 			   This is redundant for processing of _this_
 			   DTD (but might make it more convenient),
 			   but is needed for the DocumentSummary 
 			   DTD, which doesn't otherwise know what the
 			   original document type was. --
-		cdata
-		#fixed %DocClass
+		CDATA
+		#FIXED %DocClass
 	-- Remap the DOCUMENTTYPE attribute to the
 			   TYPE element of the DocumentSummary's
 			   DOCNUMBER element --
@@ -474,8 +488,8 @@
 	   of the same name on its DOCNUMBER element --
 --
 	docsumma
-		cdata
-		#fixed "type documenttype"
+		CDATA
+		#FIXED "type documenttype"
 --
 	>
 ]]>	<!-- %Feature.Docnumber -->
@@ -491,12 +505,12 @@
      versionid attribute.  The update elements are scattered throughout
      the document, and mark the location of some change; they are optional.
      -->
-<!element HISTORY	- o (version, (version | distribution | change)*)>
-<!element (VERSION | DISTRIBUTION | CHANGE)
-			- o (px+)
+<!ELEMENT history	- O (version, (version | distribution | change)*)>
+<!ELEMENT (version | distribution | change)
+			- O (px+)
 			-- contain free-text notes on the release or change -->
 
-<!attlist version
+<!ATTLIST version
 	number		-- Identifies the version.  This will
 			   typically be something like '1' or '2'.
 			   These numbers are not generated
@@ -505,8 +519,8 @@
 			   numbers, but the expectation is that
 			   successive version elements will increment
 			   this number. --
-		number
-		#required
+		NUMBER
+		#REQUIRED
 	date		-- Date the version was made/released.  If this is
 			   omitted, then the date proffered on the
 			   output will be taken from the last
@@ -515,48 +529,48 @@
 			   to do if this is omitted but there's _no_
 			   later distribution or change.  Format:
 			   dd-MMM-yyyy --
-		cdata
-		#required
+		CDATA
+		#REQUIRED
 	author		-- Who approved the release of this version? --
-		idref
-		#required
+		IDREF
+		#REQUIRED
 	>
-<!attlist distribution
+<!ATTLIST distribution
 	string		-- Identifies the distribution.  This will
 			   typically be something like '1' or '2', but
 			   could be 'draft' or something
 			   descriptive. Perhaps I should make this a
 			   NAME declared value, to forbid spaces. --
-		cdata
-		#required
+		CDATA
+		#REQUIRED
 	date		-- The date this distribution was
 			   made. Format: dd-MMM-yyyy --
-		cdata
-		#required	
+		CDATA
+		#REQUIRED	
 	author		-- Whom the release is attributable to.  This
 			   links to one of the author elements. --
-		idref
-		#required
+		IDREF
+		#REQUIRED
 	versionid	-- An id to allow UPDATE elements to refer to a
 			   specific version.  It can be anything, but a
 			   sensible format is v10-5, for example (it can't
 			   start with a number) --
-		id
-		#implied
+		ID
+		#IMPLIED
 	>
-<!attlist change
+<!ATTLIST change
 	date		-- Date the change was made. Format: dd-MMM-yyyy --
-		cdata
-		#required
+		CDATA
+		#REQUIRED
 	author		-- Who made the change.  This links to one of
 			   the author elements. --
-		idref
-		#current
+		IDREF
+		#CURRENT
 	versionid	-- An id to allow UPDATE elements to refer to a
 			   specific version.  See the `distribution'
 			   element --
-		id
-		#implied
+		ID
+		#IMPLIED
 	>
 	
 ]]>	<!-- %Feature.Versioning -->
@@ -565,29 +579,29 @@
 <!-- Instead of the elaborate history mechanism, we can have just a
      plain document date
      -->
-<!element DOCDATE - o (#pcdata)>
+<!ELEMENT docdate - O (#PCDATA)>
 ]]>	<!-- %Internal.Feature.Dateonly -->
 
-<!element COVERIMAGE - o (figurecontent*, px*)
+<!ELEMENT coverimage - O (figurecontent*, px*)
 			-- Display the image on the coverpage.
 			   See the discussion of `figurecontent' below. -->
-<!attlist coverimage
+<!ATTLIST coverimage
 	alt		-- Alternate text for image --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	>
 
-<!element COPYRIGHT - o (p+)
+<!ELEMENT copyright - O (p+)
 			-- Replace the copyright boilerplate with this
 			   text. -->
 
 <!--========== Document body ==========-->
 <![ %Feature.Routinelist [
-  <!entity % body.content '(routinelist | (p | table | figure)*)'>
+  <!ENTITY % body.content '(routinelist | (p | table | figure)*)'>
 ]]>
-<!entity % body.content '(p | table | figure)*'>
+<!ENTITY % body.content '(p | table | figure)*'>
 
-<!entity % appendix.content "sect+">
+<!ENTITY % appendix.content "sect+">
 
 <!-- Express a link policy on certain elements.  Those elements which
      have %export.id.required have both the ID element and the EXPORT as
@@ -600,25 +614,25 @@
      may specify an ID, and it may export it, but neither is required.
      -->
 <![ %Feature.EnforceLinkPolicy [
-  <!entity % export.id.required "
-	id id #required
-	export (export) #required">
+  <!ENTITY % export.id.required "
+	id ID #REQUIRED
+	export (export) #REQUIRED">
 ]]>
 <!-- If %Feature.EnforceLinkPolicy is IGNORE, then make all the
      attributes implied
      -->
-<!entity % export.id.required "
-	id id #implied
-	export (export) #implied">
-<!entity % export.id.optional "
-	id id #implied
-	export (export) #implied">
+<!ENTITY % export.id.required "
+	id ID #IMPLIED
+	export (export) #IMPLIED">
+<!ENTITY % export.id.optional "
+	id ID #IMPLIED
+	export (export) #IMPLIED">
 
 <!-- Is the abstract required or optional? -->
 <![ %Feature.Abstract [
-<!entity % req.abstract "abstract,"	-- required abstract -->
+<!ENTITY % req.abstract "abstract,"	-- required abstract -->
 ]]>
-<!entity % req.abstract "abstract?,"	-- optional abstract -->
+<!ENTITY % req.abstract "abstract?,"	-- optional abstract -->
 
 <!-- Content model for element DOCBODY.  
 
@@ -628,9 +642,9 @@
      of SECTs or a sequence of PARTs, but I don't see the need for
      this extra complication right now.
 
-     As for appendices, I considered <!element appendix - o (...)> with
-     the same content model as for SECT, but this way (with <!element
-     appendices - o (sect+)> ) we have the same structure within
+     As for appendices, I considered <!ELEMENT appendix - O (...)> with
+     the same content model as for SECT, but this way (with <!ELEMENT
+     appendices - O (sect+)> ) we have the same structure within
      appendices as outside, and it seems simply neater.  The only
      drawback is that we no longer have `<appendix>appendix title'
      reminding us we're in an appendix, and searching for something in an
@@ -638,53 +652,53 @@
      will need a further level of qualification.  But these both seem
      disposable.
      -->
-<!entity % docbody.model 
+<!ENTITY % docbody.model 
 	       '%req.abstract 
 		%body.content,
 		sect*,
 		appendices?,
 		backmatter?'>
 
-<!element DOCBODY o o (%docbody.model)>
+<!ELEMENT docbody O O (%docbody.model)>
 
 <!--========== Sectioning ==========-->
 
 <!--
-<!element PART          - o (subhead, %body.content, sect*)>
+<!ELEMENT part          - O (subhead, %body.content, sect*)>
 ...and add `part|' to the %section list
 -->
-<!element SECT          - o (subhead, %body.content, subsect*)>
-<!element SUBSECT       - o (subhead, %body.content, subsubsect*)>
-<!element SUBSUBSECT    - o (subhead, %body.content, subsubsubsect*)>
-<!element SUBSUBSUBSECT - o (subhead, %body.content)>
+<!ELEMENT sect          - O (subhead, %body.content, subsect*)>
+<!ELEMENT subsect       - O (subhead, %body.content, subsubsect*)>
+<!ELEMENT subsubsect    - O (subhead, %body.content, subsubsubsect*)>
+<!ELEMENT subsubsubsect - O (subhead, %body.content)>
 
-<!element APPENDICES	- o (%appendix.content;)>
+<!ELEMENT appendices	- O (%appendix.content;)>
 
-<!attlist (sect | subsect)
+<!ATTLIST (sect | subsect)
 	%export.id.required;
 	indexkey 		-- contains the text of an index entry
 				   which points to this section -- 
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	>
-<!attlist (subsubsect | subsubsubsect)	
+<!ATTLIST (subsubsect | subsubsubsect)	
 	%export.id.optional;
 	indexkey 		-- contains the text of an index entry
 				   which points to this section -- 
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	>
 
-<!element BACKMATTER    - o empty>
-<!attlist BACKMATTER
+<!ELEMENT backmatter    - O EMPTY>
+<!ATTLIST backmatter
 	bibliography		-- bibliography name --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	>
 
 <!-- Subhead and title are the header and title for (sub*)sections -->
-<!entity % subhead.model 'title %update.pc'>
-<!element SUBHEAD o o (%subhead.model;)>
+<!ENTITY % subhead.model 'title %update.pc'>
+<!ELEMENT subhead O O (%subhead.model;)>
 
 <!-- UPDATE elements can appear in several places.  They are intended to
      tie in closely with the releases appearing in the HISTORY element,
@@ -692,43 +706,43 @@
      -->
 
 <![ %Feature.Versioning [
-<!element UPDATE - o (px+)>
+<!ELEMENT update - O (px+)>
 
 <!-- It might be worth including a modification-type attribute, such
      as `added', `deleted' or `changed'.  Or is that becoming unduly
      cumbersome?
      -->
-<!attlist update
+<!ATTLIST update
 	versionid
-		idref	#required
+		IDREF	#REQUIRED
 		-- version/release when the alteration was made --
-		-- id matches one DISTRIBUTION or CHANGE element --
+		-- ID matches one DISTRIBUTION or CHANGE element --
 
 	-- remove author attribute.  The idea was that this could
 	   override the author attribute in the distribution or
 	   change element this refers to, but this is probably a bad idea.
 	author
-		idref	#implied
+		IDREF	#IMPLIED
 	--
   	>
 ]]>	<!-- %Feature.Versioning -->
 
-<!element ABSTRACT - - (px)+>
+<!ELEMENT abstract - - (px)+>
 
 <!--========== Routine list ==========-->
 <![ %Feature.Routinelist [
 
-<!element ROUTINELIST		- o (p*, codecollection+)>
-<!element CODECOLLECTION	- o EMPTY>
-<!attlist CODECOLLECTION
+<!ELEMENT routinelist		- O (p*, codecollection+)>
+<!ELEMENT codecollection	- O EMPTY>
+<!ATTLIST codecollection
 	doc		-- document with source marked up in one of
 			   the clients of the programcode architecture --
-		entity
-		#required
+		ENTITY
+		#REQUIRED
 	ids		-- if this attribute is present, then only the
 			   elements with these ids should be processed --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	>
 ]]>	<!-- %Feature.Routinelist -->
 
@@ -742,21 +756,21 @@
 
      Also rename the table element to `tabular'.  This fits in well with
      the LaTeX model folk will be familiar with, and allows us to
-     separate the floating plus captioning plus id stuff from the
+     separate the floating plus captioning plus ID stuff from the
      lining-it-up-in-columns of tabular layouts.
      -->
-<!entity % table.model '%update caption, tabular'>
-<!element TABLE - - (%table.model)>
-<!attlist table
-	float (float|nofloat) #implied
+<!ENTITY % table.model '%update caption, tabular'>
+<!ELEMENT table - - (%table.model)>
+<!ATTLIST table
+	float (float|nofloat) #IMPLIED
 	%export.id.optional;
 	>
 
-<!entity % tbl.table.name 'TABULAR'>
-<!entity % tbl.table-titles.mdl ''>
-<!entity % tbl.entry.mdl '(%phrase)*'>
-<!entity % calstbls 
-	public "-//OASIS//DTD Exchange Table Model 19960430//EN">
+<!ENTITY % tbl.table.name 'tabular'>
+<!ENTITY % tbl.table-titles.mdl ''>
+<!ENTITY % tbl.entry.mdl '(%phrase)*'>
+<!ENTITY % calstbls 
+	PUBLIC "-//OASIS//DTD Exchange Table Model 19960430//EN">
 %calstbls;
 
 
@@ -773,7 +787,7 @@
      necessarily if the notation is a non-text format, the content of the
      element may be specified in an external entity.  It would be good
      practice for such an entity declaration to hava a data content
-     notation (8879, 10.6.5) (for example <!entity figure.test system
+     notation (8879, 10.6.5) (for example <!ENTITY figure.test system
      "file.eps" ndata eps>); the implementation should warn if the
      (required) notation on the element conflicts with that for the
      entity, but should let the latter prevail.
@@ -786,31 +800,31 @@
      At some point, I should make a HyTime declaration of the
      transclusion element FIGURECONTENT.
      -->
-<!entity % figure.model '%update caption, figurecontent*, px*'>
-<!element FIGURE - - (%figure.model)>
-<!element FIGURECONTENT - o (#pcdata)>
+<!ENTITY % figure.model '%update caption, figurecontent*, px*'>
+<!ELEMENT figure - - (%figure.model)>
+<!ELEMENT figurecontent - O (#PCDATA)>
 
-<!attlist FIGURE
+<!ATTLIST figure
 	float		-- may it be unanchored from its position? --
 		(float|nofloat)
 		nofloat
 	alt		-- descriptive alternative text --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	%export.id.optional;
 	>
-<!attlist FIGURECONTENT	
+<!ATTLIST figurecontent	
 	image		-- entity for figure content --
-		entity
-		#conref
+		ENTITY
+		#CONREF
 	notation	-- notation for figure content.
 			   If the `image' attribute is present, then
 			   this attribute must not be; the application
 			   should report an error if neither is present.
 			   Non-text notations must be specified in
 			   entity declaration. --
-		notation(%text.figure.notations;)
-		#implied
+		NOTATION(%text.figure.notations;)
+		#IMPLIED
 	>
 
-<!element CAPTION - o (px+)	-- common to table and figure -->
+<!ELEMENT caption - O (px+)	-- common to table and figure -->

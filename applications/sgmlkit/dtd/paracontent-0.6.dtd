@@ -8,7 +8,7 @@
 
      Usage:
 
-       <!entity % paragraph.elements 
+       <!ENTITY % paragraph.elements 
 	 public "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN">
        %paragraph.elements;
 
@@ -23,7 +23,7 @@
      -->
 
 <!-- can predifine %usage to more useful content -->
-<!entity % update ''>
+<!ENTITY % update ''>
 
 <!--========== Features ==========-->
 <!-- Use %Feature.Paracontent.References to include the reference
@@ -31,7 +31,7 @@
      elements in the %references entity, you can define
      %additional.references (which is ignored if this feature is not set).
      -->
-<!entity % Feature.Paracontent.References 'include'>
+<!ENTITY % Feature.Paracontent.References 'INCLUDE'>
 
 
 <!-- The lists below can be added to by declaring these entities.  You
@@ -42,9 +42,9 @@
      %additional.special: miscellanea.  The main distinction is that
      %additional.special aren't allowed in PX.
      -->
-<!entity % additional.special		""	-- in P model -->
-<!entity % additional.structuring	"">
-<!entity % additional.simplephrase	"">
+<!ENTITY % additional.special		""	-- in P model -->
+<!ENTITY % additional.structuring	"">
+<!ENTITY % additional.simplephrase	"">
 <!-- also %additional.references: see Feature.Bodycontent.References below -->
 
 <!--========== Element classes ==========-->
@@ -61,19 +61,19 @@
      -->
 
 <![ %Feature.Paracontent.References [
-  <!entity % additional.references	"">
-  <!entity % references	"| ref | docxref | webref | url 
+  <!ENTITY % additional.references	"">
+  <!ENTITY % references	"| ref | docxref | webref | url 
 			%additional.references;">
 ]]>
-<!entity % references	"">
+<!ENTITY % references	"">
 
-<!entity % simplephrase	"| em | strong | quote | code | kbd | cite | m
+<!ENTITY % simplephrase	"| em | strong | quote | code | kbd | cite | m
 			%additional.simplephrase;">
-<!entity % structuring	"| blockquote | dl | ul | ol | verbatim | linespecific 
+<!ENTITY % structuring	"| blockquote | dl | ul | ol | verbatim | linespecific 
 			%additional.structuring;">
-<!entity % maths	"| mequation | meqnarray">
-<!entity % simpletext	"#pcdata %simplephrase">
-<!entity % phrase	"%simpletext %references %maths">
+<!ENTITY % maths	"| mequation | meqnarray">
+<!ENTITY % simpletext	"#PCDATA %simplephrase">
+<!ENTITY % phrase	"%simpletext %references %maths">
 
 
 <!--========== Paragraphs, and the flow of text ==========-->
@@ -86,11 +86,11 @@
 
      The id attribute is a bit of a pain to implement, but useful.
      -->
-<!entity % p.model 
+<!ENTITY % p.model 
     '%update (%phrase %structuring %additional.special )*'>
-<!element P o o (%p.model)>
-<!attlist p
-	id	id	#implied	-- id for this paragraph --
+<!ELEMENT p O O (%p.model)>
+<!ATTLIST p
+	id	ID	#IMPLIED	-- id for this paragraph --
 	>
 
 <!-- The PX element is identical to the P paragraph (and should probably
@@ -98,10 +98,10 @@
      and so can be used within NOTEs, for example, without clumsy
      exclusions.  It'll also help find `missing end tag' errors.
      -->
-<!entity % px.model '%update (%phrase %structuring)*'>
-<!element PX o o (%px.model)>
+<!ENTITY % px.model '%update (%phrase %structuring)*'>
+<!ELEMENT px O O (%px.model)>
 
-<!element (EM | STRONG | CITE) - - (%phrase)*>
+<!ELEMENT (em | strong | cite) - - (%phrase)*>
 
 <!-- CODE is part of %phrase markup, and is for inline text such as
      pathnames which needs to be shown in a distinctive font.  KBD is
@@ -110,13 +110,13 @@
 
      Allow %references within CODE: see verbatim below.
      -->
-<!entity % code.model '(#pcdata %references;)*'>
-<!element (CODE|KBD) - - (%code.model;)	-- literal text -->
-<!attlist CODE
+<!ENTITY % code.model '(#PCDATA %references;)*'>
+<!ELEMENT (code|kbd) - - (%code.model;)	-- literal text -->
+<!ATTLIST code
 	type			-- what type of thing is it?  Used for
 				   formatting hints. --
 		(fspath)	-- fspath: filesystem path --
-		#implied
+		#IMPLIED
 	>
 
 <!-- VERBATIM is part of %structuring, and is for extended blocks of verbatim
@@ -132,19 +132,19 @@
      to display examples, but there might be legitimate applications of
      the other elements, too.
      -->
-<!entity % verbatim.model '(#pcdata %simplephrase %references)*'>
-<!element VERBATIM - - (%verbatim.model;)
+<!ENTITY % verbatim.model '(#PCDATA %simplephrase %references)*'>
+<!ELEMENT verbatim - - (%verbatim.model;)
 					-- verbatim text -->
-<!element BLOCKQUOTE - - (attribution?, px+)	-- extended quotation -->
-<!element QUOTE - - (attribution?, (%phrase)+)	
+<!ELEMENT blockquote - - (attribution?, px+)	-- extended quotation -->
+<!ELEMENT quote - - (attribution?, (%phrase)+)	
 					-- simple quotation  -->
-<!element ATTRIBUTION - - ((%phrase)+)	-- source of quotation -->
+<!ELEMENT attribution - - ((%phrase)+)	-- source of quotation -->
 
-<!element LINESPECIFIC - - (line+)
+<!ELEMENT linespecific - - (line+)
 		-- sequence of lines which should have line-breaks
 		   recognised (the name comes from the similarly-named
 		   notation in the DocBook DTD -->
-<!element LINE - o (%phrase)*>
+<!ELEMENT line - O (%phrase)*>
 
 <!--========== Maths ==========-->
 <!-- The M element corresponds to $...$ in TeX.  MEQUATION in text
@@ -176,21 +176,21 @@
      a list of ways to get round that in one of the postings at that URL,
      but the simplest seem to be either AT&amp;T or <![cdata[ AT&T ]]>.
      -->
-<!element MEQNARRAY	- - (mline+)>
-<!element (MLINE | MEQUATION)
-			- o (#pcdata, (mlabel, #pcdata)?)>
-<!element MLABEL	- o EMPTY>
-<!attlist mlabel
+<!ELEMENT meqnarray	- - (mline+)>
+<!ELEMENT (mline | mequation)
+			- O (#PCDATA, (mlabel, #PCDATA)?)>
+<!ELEMENT mlabel	- O EMPTY>
+<!ATTLIST mlabel
 	id		-- unique ID for this equation --
-		id
-		#implied
+		ID
+		#IMPLIED
 	>	
 
-<!element M		- - (#pcdata)>
-<!attlist (m | mline | mequation)
+<!ELEMENT m		- - (#PCDATA)>
+<!ATTLIST (m | mline | mequation)
 	notation	-- the notation: fixed as LaTeX --
-		notation(latexmaths) 
-		#fixed latexmaths
+		NOTATION(latexmaths) 
+		#FIXED latexmaths
 	>
 
 
@@ -202,18 +202,18 @@
   There are several distinct types of links:
 
   * Internal to the document
-    Element REF: empty.  Can refer to sections, tables, and possibly
+    Element REF: EMPTY.  Can refer to sections, tables, and possibly
     to paragraphs.
 
   * To other Starlink documents
-    Element DOCXREF: empty.
+    Element DOCXREF: EMPTY.
 
   * To URLs
     Element WEBREF: contains self anchor, just like HTML A element.
     Also element URL, containing URL.
 -->
 
-<![ ignore [
+<![ IGNORE [
 <!-- declared elsewhere -->
 <!--
   First declare the DSSSL notation, so we can refer to SDQL queries.
@@ -228,13 +228,13 @@
 ]]>
 
 
-<![ ignore [
+<![ IGNORE [
 <!-- Also define the XPointer notation -->
 <!NOTATION XPointer SYSTEM "http://www.w3.org/TR/WD-xptr" >
 ]]>
 
 
-<!-- REF element is for internal cross-references.  It's empty.
+<!-- REF element is for internal cross-references.  It's EMPTY.
      For a detailed discussion of how to implement this, see Eliot
      Kimber's 9 March 1998 posting to comp.text.sgml.
 
@@ -244,24 +244,24 @@
      guarantee that this is precisely what the stylesheets do (check
      them), but this at least documents the intent.
      -->
-<!element REF - o empty 
+<!ELEMENT ref - O EMPTY 
 				-- Internal cross reference, with
 				   effective content to be title of
 				   target -- 
 > 
-<!attlist REF
+<!ATTLIST ref
 	id			-- internal target of link --
-		idref
-		#required
+		IDREF
+		#REQUIRED
 
 	text			-- optional overriding link text --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 
 	-- following are HyTime attributes --
 	ref-title		-- pointer to title of reference target --
-		cdata
-		#fixed
+		CDATA
+		#FIXED
 		'(case (gi)
 		   (("table" "figure")
 		      (select-elements (children (current-node))
@@ -269,25 +269,25 @@
 		   (else (select-elements (descendants (current-node))
 					  (list "subhead" "title")))) '
 	loctype			-- declare addressing method --
-		cdata
-		#fixed "ref-title queryloc DSSSL"
+		CDATA
+		#FIXED "ref-title queryloc DSSSL"
 	rflocsrc		-- bind the ref-title attribute to the
 				   ID attribute, which specifies the
 				   source of the ref-title query --
-		cdata
-		#fixed
+		CDATA
+		#FIXED
 		"ref-title id"
 	valueref		-- make the effective content of this
 				   element the resource pointed to by
 				   ref-title --
-		cdata
-		#fixed "#CONTENT ref-title"
+		CDATA
+		#FIXED "#CONTENT ref-title"
 	HyTime			-- bind to HyTime clink form --
-		name
-		#fixed "clink"
+		NAME
+		#FIXED "clink"
 	HyNames			-- bind id attribute to clink's linkend --
-		cdata
-		#fixed "linkend id"
+		CDATA
+		#FIXED "linkend id"
 	>
 
 
@@ -327,55 +327,55 @@
      The link's effective content should be whatever corresponds to
      the title of the object addressed by LOC.  
      -->
-<!element DOCXREF - O empty
+<!ELEMENT docxref - O EMPTY
 				-- References to elements and data within other
 				   Starlink documents -- 
 	>
-<!attlist DOCXREF
+<!ATTLIST docxref
 	doc			-- Starlink document which holds the target --
-		entity
-		#required
+		ENTITY
+		#REQUIRED
 	loc			-- location within document, or whole document
 				   if this is missing --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 
 	text			-- optional overriding link text.  I'm
 				   slightly, concerned about this, as
 				   it seems to open up the possibility
 				   of abuse, but as long as authors
 				   are sensible.... --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 
 	-- following are the HyTime attributes --
 	loctype			-- declare addressing method --
-		cdata
-		#fixed
+		CDATA
+		#FIXED
 		"loc idloc ref-title queryloc DSSSL"
 	ref-title		-- pointer to title of reference
 				   target: extract first child (TITLE)
 				   of element --
-		cdata
-		#fixed
+		CDATA
+		#FIXED
 		'(node-list-first (children (current-node)))'
 	rflocsrc		-- declare that the LOC is a reference
 				   relative to the document addressed by
 				   DOC --
-		cdata
-		#fixed
+		CDATA
+		#FIXED
 		"loc doc ref-title loc"
 	valueref		-- make the effective content of this
 				   element the resource pointed to by
 				   ref-title --
-		cdata
-		#fixed "#CONTENT ref-title"
+		CDATA
+		#FIXED "#CONTENT ref-title"
 	HyTime			-- bind to HyTime clink form --
-		name
-		#fixed "clink"
+		NAME
+		#FIXED "clink"
 	HyNames			-- bind id attribute to clink's linkend --
-		cdata
-		#fixed "linkend loc"
+		CDATA
+		#FIXED "linkend loc"
 	>
 
 <!-- WEBREFs.  The WEBREF is just like the HTML A element, and
@@ -383,31 +383,31 @@
      note 177.  Note, however, that there's no NAME defined here, and the
      URL is required.
      -->
-<!notation URL 
-	public '-//IETF/RFC1738//NOTATION Uniform Resource Locator//EN'
+<!NOTATION URL 
+	PUBLIC '-//IETF/RFC1738//NOTATION Uniform Resource Locator//EN'
 	-- see also RFC1808, Relative URLs --
 	>
 
-<!element WEBREF - - (%simpletext)+>
-<!attlist WEBREF
+<!ELEMENT webref - - (%simpletext)+>
+<!ATTLIST webref
 	url		-- URL --
-		cdata	#required
+		CDATA	#REQUIRED
 
 	-- following are HyTime declarations --
 	HyTime
-		name	#fixed clink
+		NAME	#FIXED clink
 	HyNames		-- make the clink linkend the url --
-		cdata	#fixed "linkend url"
+		CDATA	#FIXED "linkend url"
 	anchcstr	-- this element is a source anchor, and the
 			   target anchor URL must be specified --
-		names	#fixed "self required"
+		NAMES	#FIXED "self required"
 	linktrav	-- link traversal options: we can do anything at the
 			   current anchor, but traversal is one-way (as far as
 			   this declarations is concerned; browsers, of
 			   course, can and do support other behaviour) --
-		names	#fixed "A D"
+		NAMES	#FIXED "A D"
 	loctype		-- declare that URL is a URL query --
-		cdata	#fixed "url QUERYLOC URL"
+		CDATA	#FIXED "url QUERYLOC URL"
 	>
 
 
@@ -420,46 +420,46 @@
      expect that an element named URL would contain something you
      could just type into a web browser.
      -->
-<!element URL - - (#pcdata)>
-<!attlist URL
+<!ELEMENT url - - (#PCDATA)>
+<!ATTLIST url
 	nolink		-- suppress actually making the URL `live': if this
 			   attribute is present, the URL is presented, but not
 			   made active as a link --
-		(nolink)	#implied
+		(nolink)	#IMPLIED
 
 	-- following are HyTime attributes --
 	HyTime
-		name
-		#fixed "clink"
+		NAME
+		#FIXED "clink"
 	HyNames		-- the linkend attribute is given as the content of
 			   the element (see HyTime A.3.5.2) --
-		cdata
-		#fixed "linkend #content"
+		CDATA
+		#FIXED "linkend #CONTENT"
 	anchcstr
-		names
-		#fixed "self required"
+		NAMES
+		#FIXED "self required"
 	linktrav
-		names
-		#fixed "A D"
+		NAMES
+		#FIXED "A D"
 	loctype
-		cdata
-		#fixed "#content QUERYLOC URL"
+		CDATA
+		#FIXED "#CONTENT QUERYLOC URL"
 	>
 ]]>	<!-- %Feature.Paracontent.References -->
 
 <!--========== Lists ==========-->
-<!entity % dl.model '%update (dt,dd)+'>
-<!element DL - - (%dl.model)>
-<!element DT - o (%phrase)+>
-<!element DD - o (p)+>
+<!ENTITY % dl.model '%update (dt,dd)+'>
+<!ELEMENT dl - - (%dl.model)>
+<!ELEMENT dt - O (%phrase)+>
+<!ELEMENT dd - O (p)+>
 
-<!entity % oul.model '%update (li)+'>
-<!element (OL|UL) - - (%oul.model)>
-<!element LI - o (p)+>
+<!ENTITY % oul.model '%update (li)+'>
+<!ELEMENT (ol|ul) - - (%oul.model)>
+<!ELEMENT li - O (p)+>
 
-<!attlist (dl | ol | ul)
+<!ATTLIST (dl | ol | ul)
 	compact		-- contents would benefit from a more compact
 			   representation (formatting hint) --
 		(compact)
-		#implied
+		#IMPLIED
 	>

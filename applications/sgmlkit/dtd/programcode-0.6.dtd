@@ -1,11 +1,11 @@
-<![ ignore [
+<![ IGNORE [
   DTD for program source code structure.
 
   This DTD was not designed to be used on its own, but instead
-  included at the end of a language-specific DTD, which defines a
+  INCLUDEd at the end of a language-specific DTD, which defines a
   notation, and sets up shortref maps to make inputting the source
   file easier - for example, the Fortran DTD makes `^*+' a shortref
-  for the CODEPROLOGUE start tag, and ignores `^*' within the
+  for the CODEPROLOGUE start tag, and IGNOREs `^*' within the
   CODEPROLOGUE.  However, since it _is_ intended to be used as an
   architecture, it _could_ be used on its own, if you have an
   application which can benefit from that.  I would recommend not
@@ -15,20 +15,20 @@
   requirements, and which features might need to be restricted or expanded.
 
   Additions to the list of supported languages requires at least
-  modifying the %notationlist entity, and adding appropriate notation
+  modifying the %notationlist ENTITY, and adding appropriate notation
   definitions.
 
   Invoke with something like:
 
-    <!entity % DTD.Version "DTD Starlink Fortrancode 0.6">
-    <!entity % language.attr	-- language name --
-	 "language notation (FORTRAN77) #fixed FORTRAN77">
-    <!entity % generalcode.dtd
-	public "-//Starlink//DTD Program Source Code 0.6//EN">
+    <!ENTITY % DTD.Version "DTD Starlink Fortrancode 0.6">
+    <!ENTITY % language.attr	-- language name --
+	 "language NOTATION (fortran77) #FIXED fortran77">
+    <!ENTITY % generalcode.dtd
+	PUBLIC "-//Starlink//DTD Program Source Code 0.6//EN">
     %generalcode.dtd;
 
-  The definition of the %language.attr entity is required.
-  The %direction.attr entity may also be predefined, and if the DTD
+  The definition of the %language.attr ENTITY is required.
+  The %direction.attr ENTITY may also be predefined, and if the DTD
   which calls this one wishes to do other architectural remapping
   (only the DSSSL one does at present), then it can define further
   attributes as noted below.
@@ -45,8 +45,8 @@
   $Id$
 ]]>
 
-<!entity % DTD.Programcode.Version "DTD Programcode 0.6">
-<!entity % DTD.Version "UNKNOWN"	-- client DTD should specify this -->
+<!ENTITY % DTD.Programcode.Version "DTD Programcode 0.6">
+<!ENTITY % DTD.Version "UNKNOWN"	-- client DTD should specify this -->
 
 
 <!--============================== Entities ==============================
@@ -54,35 +54,35 @@
   invoking DTD.
 -->
 
-<!-- The %direction.attr entity is attached to function arguments, and
+<!-- The %direction.attr ENTITY is attached to function arguments, and
      indicates which direction the argument is moving.  Calling DTDs may
      modify this as appropriate, as long as the modified version is a
      subset of this list.
      -->
-<!entity % direction.attr 
-	"direction (given|returned|givenandreturned) #required"
+<!ENTITY % direction.attr 
+	"direction (given|returned|givenandreturned) #REQUIRED"
 	-- input or output to function -->
 
-<!-- %language.attr entity must be declared by the DTD which includes
-     this one.  That DTD should declare the entity as something like
+<!-- %language.attr ENTITY must be declared by the DTD which includes
+     this one.  That DTD should declare the ENTITY as something like
 
-       <!entity % language.attr
-	 "language notation (fortran77) #fixed fortran77">
+       <!ENTITY % language.attr
+	 "language NOTATION (fortran77) #FIXED fortran77">
 
      using one of the notations declared here.
      -->
-<!entity % notationlist "fortran77 | dsssl">
-<!entity % language.attr
-        "language notation (%notationlist;) #required">
+<!ENTITY % notationlist "fortran77 | DSSSL">
+<!ENTITY % language.attr
+        "language NOTATION (%notationlist;) #REQUIRED">
 
-<!-- Just for convenience, also define a LT entity -->
-<!entity lt "<">
+<!-- Just for convenience, also define a LT ENTITY -->
+<!ENTITY lt "<">
 
-<!-- Language notations are declared here.  The DTDs which include
+<!-- Language notations are declared here.  The DTDs which INCLUDE
      this one may declare attributes to these notations (for example, the
      DSSSLCODE DTD uses the DSSSL notation to declare the DSSSL DTD as an
      architecture).  See ``ISO/IEC JTC1/WG4 N1958, Information technology
-     - Text and office systems - Using SGML Public Identifiers for
+     - Text and office SYSTEMs - Using SGML Public Identifiers for
      Specifying Data Notations''
      <http://www.ornl.gov/sgml/wg4/document/1958.htm>.
 
@@ -92,33 +92,33 @@
      Note also that I've changed the name of the Fortran notation to
      Fortran77, to support a future distinction of this from Fortran 90.
      -->
-<!notation dsssl      public 
+<!NOTATION DSSSL      PUBLIC 
                       "ISO/IEC 10179:1996//NOTATION
                          DSSSL Architecture Definition Document//EN"
                       -- A document architecture conforming to the
                          Architectural Form Definition Requirements of
                          ISO/IEC 10744.     --
 	>
-<!NOTATION FORTRAN77  PUBLIC 
+<!NOTATION fortran77  PUBLIC 
                       "ISO/IEC 1539:1991//NOTATION
                          Information technology - Programming languages -
                          FORTRAN//EN"
 	>
-<!NOTATION C		PUBLIC 
+<!NOTATION c		PUBLIC 
 			"ISO/IEC 9899:1990//NOTATION
                          Programming languages - C//EN"
 	>
 
 <!--==================== Element structure ====================-->
-<!element programcode	o o (docblock, (codegroup | codereference)+)
+<!ELEMENT programcode	O O (docblock, (codegroup | codereference)+)
 		-- Document element -->
-<!element codegroup	- o (docblock, routine+)
+<!ELEMENT codegroup	- O (docblock, routine+)
 		-- A codegroup is a collection of functions or other
 		   code which can sensibly be grouped together.
 		   There's no particular semantics implied by the
 		   grouping, as far as this DTD is (currently)
 		   concerned. -->
-<!element codereference	- o (docblock)
+<!ELEMENT codereference	- O (docblock)
 		-- A codereference is a rather vague thing, at
 		   present.  It's intended to document some
 		   relationship with code in another document.  The
@@ -126,16 +126,16 @@
 		   DSSSLCODE DTD make this architectural, and map to
 		   the EXTERNAL-SPECIFICATION element in DSSSL.
 		   However, it could sensibly also document the fact
-		   that a fortran file might depend on an include
+		   that a fortran file might depend on an INCLUDE
 		   file.
 
 		   The document referred to should be marked up using
 		   the programcode DTD. -->
 
-<!element docblock	o o (title, description?, authorlist?,
+<!ELEMENT docblock	O O (title, description?, authorlist?,
 			     copyright?, history?)>
 
-<!element routine	o o (codeopener, routineprologue, codebody)
+<!ELEMENT routine	O O (codeopener?, routineprologue, codebody)
 		-- The specification of one function, or procedure or
 		   other code.  At one time, we distinguished
 		   functions from `miscellaneous' code, but the only
@@ -143,78 +143,85 @@
 		   of required elements, while the `misccode' element
 		   didn't.  Now that most of these elements are
 		   optional, the distinction is unnecessary. -->
-<![ ignore [
-<!element misccode	o o (miscprologue, codebody)
+<![ IGNORE [
+<!ELEMENT misccode	O O (miscprologue, codebody)
 		-- Other code, not reasonably
 		   categorised as a function -->
 ]]>
-<!element codeopener	o o (#pcdata)
+<!ELEMENT codeopener	O O (#PCDATA)
 		-- Contains any program code between the <routine>
 		   start-tag and the routineprologue.  This
 		   accomodates the usual Starlink way of laying out
 		   source files, with a one-line function declaration
 		   preceding the function documentation, which in turn
 		   precedes the function body. -->
-<!element codebody	o o (#pcdata)
+<!ELEMENT codebody	O O (#PCDATA)
 		-- The actual code -->
 
-<!entity % gversion.attr 
-	"generalversion cdata #fixed '%DTD.Programcode.Version;'">
-<!entity % version.attr
-	"version cdata #fixed '%DTD.Version;'">
+<!ENTITY % gversion.attr 
+	"generalversion CDATA #FIXED '%DTD.Programcode.Version;'">
+<!ENTITY % version.attr
+	"version CDATA #FIXED '%DTD.Version;'">
 
-<!attlist programcode
-	%gversion.attr;
-	%version.attr;
-	>
-
-<!-- Attributes for codegroup and codebody.  Add architectural control
-     attributes here.  If they are defined before this, both
-     %funcbody.arch.atts and %codebody.arch.atts must be set to something
-     sensible.  This isn't terribly flexible as it stands, but that's OK,
-     since it's really only used by the DSSSL programcode DTD.
+<!-- Attributes for programcode codegroup and codebody.  Add
+     architectural control attributes here.  If they are defined
+     before this, the %....arch.atts must be set to something
+     sensible.  This isn't terribly flexible as it stands, but that's
+     OK, since it's really only used by the DSSSL programcode DTD.
      -->
 
-<!entity % codegroup.arch.atts '' >
-<!entity % codebody.arch.atts '' >
-<!entity % codereference.arch.atts ''>
-<!attlist codegroup
+<!ENTITY % codegroup.arch.atts '' >
+<!ENTITY % codebody.arch.atts '' >
+<!ENTITY % codereference.arch.atts ''>
+<!ENTITY % programcode.arch.atts ''>
+
+<!ATTLIST programcode
+	%gversion.attr;
+	%version.attr;
+	%programcode.arch.atts;
+	>
+
+<!ATTLIST codegroup
 	%language.attr;
 	%codegroup.arch.atts;
 	>
-<!attlist codereference
+<!ATTLIST codereference
 	doc	 	-- the document containing the code being
 			   referred to --
-		entity #required
-	docid		-- an id within the above document, if needed
+		ENTITY #REQUIRED
+	docid		-- an ID within the above document, if needed
 			   to further distinguish the target --
-		name #implied
+		NAME #IMPLIED
 	%codereference.arch.atts;
 	>
-<!attlist codebody
-	empty		-- Is element empty?  The application
-			   _currently_ ignores the element content,
+<!ATTLIST codebody
+	EMPTY		-- Is element empty?  The application
+			   _currently_ IGNOREs the element content,
 			   but if something generates a document
 			   conforming to this DTD directly (as opposed
 			   to one of its clients), then this attribute
 			   should be present (for neatness if nothing
 			   else) if the body doesn't actually contain
 			   anything. --
-		(empty) #implied
+		(empty) #IMPLIED
 	%codebody.arch.atts;
 	>
 
 <!--========== Paragraph content ==========-->
 <!-- This inclusion declares the P and PX elements, and their content.
-     We don't want any cross-references.
+     We do want cross-references, but only the WEBREF and URL ones,
+     and not the DOCXREF or REF ones.  So set this feature to IGNORE,
+     copy the declarations of URL and WEBREF from the paracontent DTD,
+     and add them to the simplephrase entity.
      -->
-<!entity % Feature.Paracontent.References 'ignore'>
+<!ENTITY % Feature.Paracontent.References 'IGNORE'>
+<!ENTITY % additional.simplephrase '| funcname | webref | url'>
 
-<!entity % paragraph.elements 
-	public "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN">
+<!ENTITY % paragraph.elements 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN">
 %paragraph.elements;
 
-<![ ignore [
+<![ IGNORE [
 <!-- The elements in %para.markup are as follows
        code     : verbatim program code
        em       : emphasis
@@ -224,11 +231,11 @@
                   here, if there's some clever way of finding the
                   referenced function.
      -->
-<!entity % para.markup 'code | em | url | funcname'>
-<!entity % para.content '(#pcdata | %para.markup | ul)*'>
+<!ENTITY % para.markup 'code | em | url | funcname'>
+<!ENTITY % para.content '(#PCDATA | %para.markup | ul)*'>
 ]]>
 
-<!entity % paralist 'p, (p | tabular)*'>
+<!ENTITY % paralist 'p, (p | tabular)*'>
 
 <!-- The code prologue is the documentation of the routine.  I'd consider
      making the connectors here into `&'; that can be done in future if
@@ -256,58 +263,65 @@
 	implementationstatus	sstimplementationstatus
 	bugs	sstbugs
      -->
-<!element routineprologue o o (routinename & purpose? & description & 
+<!ELEMENT routineprologue O O (routinename? & purpose? & description & 
 				returnvalue? & argumentlist? &
 				parameterlist? & authorlist? & history? &
 				usage? & invocation? & examplelist? &
 				notelist? & implementationstatus? & bugs?)>
-<![ ignore [
-<!element miscprologue	o o (description, history?)
+<![ IGNORE [
+<!ELEMENT miscprologue	O O (description, history?)
 				-- content model needs future expansion? -->
 ]]>
 
-<!element routinename	o o (name, othernames?)
+<!ELEMENT routinename	O O (name, othernames?)
 				-- some routines have a generic name
 				   like `proc_<type>', plus other
 				   names like `proc_real'. -->
-<!element name		o o (#pcdata)>
-<!element othernames	- o (name+)>
+<!ELEMENT name		O O (#PCDATA)>
+<!ELEMENT othernames	- O (name+)>
 
-<!element purpose	- o (%p.model)
+<!ELEMENT purpose	- O (%p.model)
 				-- brief (one line?) description -->
-<!element title		o o (#pcdata)>
-<!element description	- o (%paralist;)
+<!ELEMENT title		O O (#PCDATA)>
+<!ELEMENT description	- O (%paralist;)
 				-- longer discursive description -->
-<!element returnvalue	- o (%paralist;)
+<!ELEMENT returnvalue	- O (%paralist;)
 				-- If there's no return value, there
 				   needn't be any explanatory text -->
-<!element (argumentlist | parameterlist)
-			o o (parameter*)
+<!ELEMENT (argumentlist | parameterlist)
+			O O (parameter*)
 				-- In Starlink usage, `arguments' are
 				   the things passed to functions, and are
 				   distinct from `parameters', which
 				   are the arguments for ADAM
 				   applications. -->
-<!element examplelist	o o (example,description)+>
-<!element example	- o (#pcdata) 
+<!ELEMENT examplelist	O O ((example,description)+)>
+<!ELEMENT example	- O (#PCDATA) 
 				-- text of the example, set in tt font -->
+<!ELEMENT funcname - - (#PCDATA)
+			-- funcname : the name of a function,
+			   presumably in the same broad collection of
+			   code.  The stylesheet may make a link here,
+			   if there's some clever way of finding the
+			   referenced function. -->
 
 
-<!attlist argumentlist
+
+<!ATTLIST argumentlist
 	none		-- Attribute present if there are no
 			   arguments.  There shouldn't be any
 			   PARAMETER content in this case. --
 		(none)
-		#implied
+		#IMPLIED
 	>
-<!attlist returnvalue
+<!ATTLIST returnvalue
 	none		-- Attribute present if there is no
 			   return value. --
 		(none)
-		#implied
+		#IMPLIED
 	type		-- Type of returned value --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	>
 
 <!-- The AUTHOR element includes full details about an author and has
@@ -323,64 +337,64 @@
      AUTHORREF element have some content, so that a suitable note can go
      in the source-code file, to make it more nearly standalone.
      -->
-<!element authorlist	o o ((author+ | authorref+), otherauthors?)>
-<!element otherauthors	- o (author+ | authorref+)
+<!ELEMENT authorlist	O O ((author+ | authorref+), otherauthors?)>
+<!ELEMENT otherauthors	- O (author+ | authorref+)
 				-- other authors who have contributed -->
-<!element history	o o (change+)
+<!ELEMENT history	O O (change+)
 				-- the changes should be in
 				   chronological order, with newest last -->
-<!element copyright	- o (%paralist;)
+<!ELEMENT copyright	- O (%paralist;)
 				-- Copyright message -->
 
-<!element type		- o (#pcdata)>
-<!element author	- o (name, authornote?)
+<!ELEMENT author	- O (name, authornote?)
 				-- name child contains the author name -->
-<!element authornote	- o (%paralist;)
+<!ELEMENT authornote	- O (%paralist;)
 				-- Other information/notes about this
 				   author -->
-<!element authorref	- o EMPTY>
-<!element change	- o (%paralist;)>
-<!element parameter	- o (name, type, description)>
+<!ELEMENT authorref	- O EMPTY>
+<!ELEMENT change	- O (%paralist;)>
+<!ELEMENT parameter	- O (name, type, description)>
+<!ELEMENT type		- O (#PCDATA)>
 
-<!element (usage | invocation | examples | implementationstatus | bugs)
-			- o (%paralist;)>
-<!element notelist	o o (othernote+)>
-<!element othernote	- o (title, %paralist;)>
+<!ELEMENT (usage | invocation | implementationstatus | bugs)
+			- O (%paralist;)>
+<!ELEMENT notelist	O O (othernote+)>
+<!ELEMENT othernote	- O (title, %paralist;)>
 
 
-<!attlist parameter
+<!ATTLIST parameter
 	optional 	-- is the parameter optional?  Optional means that
 			   the parameter will be defaulted if omitted,
 			   and keyword means that the parameter is
 			   specified with a keyword.  Both mechanisms
 			   are used in both DSSSL and IDL (for
 			   example). --
-		(optional|keyword) #implied
+		(optional|keyword) #IMPLIED
 	default		-- The default value of an optional parameter,
 			   if omitted --
-		cdata #implied
+		CDATA #IMPLIED
 	%direction.attr;
 	>
 
-<!attlist author
+<!ATTLIST author
 	id		-- identify author --
-		id
-		#required
+		ID
+		#REQUIRED
 	affiliation	-- where based --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	email		-- author's email address --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	webpage		-- author's URL --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	-- etc... add further author details --
 	>
-<!attlist authorref
+<!ATTLIST authorref
 	id		-- refer to author --
-		idref
-		#required
+		IDREF
+		#REQUIRED
 	note		-- Author ref's content can be any
 			   note giving further information.
 			   For example, ISO10179 was listed as
@@ -389,16 +403,40 @@
 			   authorref note attribute was used to list
 			   the section where the code was
 			   listed there. --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	>
-<!attlist change
+<!ATTLIST change
 	author		-- who made this mod? --
-		idref
-		#required
+		IDREF
+		#REQUIRED
 	date		-- ... and when? --
-		cdata
-		#required
+		CDATA
+		#REQUIRED
+	>
+
+<!-- Copy the declarations of the WEBREF and URL elements from the
+     paracontent DTD.  See note above with `paragraph content', and
+     see the paracontent DTD for documentation.
+     -->
+<!NOTATION URL PUBLIC '-//IETF/RFC1738//NOTATION Uniform Resource Locator//EN'>
+<!ELEMENT webref - - (%simpletext)+>
+<!ATTLIST webref
+	url		CDATA	#REQUIRED
+	HyTime		NAME	#FIXED clink
+	HyNames		CDATA	#FIXED "linkend url"
+	anchcstr	NAMES	#FIXED "self required"
+	linktrav	NAMES	#FIXED "A D"
+	loctype		CDATA	#FIXED "url QUERYLOC URL"
+	>
+<!ELEMENT url - - (#PCDATA)>
+<!ATTLIST url
+	nolink		(nolink)	#IMPLIED
+	HyTime		NAME	#FIXED "clink"
+	HyNames		CDATA	#FIXED "linkend #CONTENT"
+	anchcstr	NAMES	#FIXED "self required"
+	linktrav	NAMES	#FIXED "A D"
+	loctype		CDATA	#FIXED "#CONTENT QUERYLOC URL"
 	>
 
 
@@ -406,22 +444,22 @@
 <!--========== Tables ==========-->
 <!-- Use the OASIS Exchange Table Model subset of the CALS table model.
      See http://www.oasis-open.org/html/a503.htm for discussion, and
-     http://www.oasis-open.org/html/publtext.htm for public texts.
+     http://www.oasis-open.org/html/publtext.htm for PUBLIC texts.
 
      The Exchange Table Model can be customised.  Adjust the table entry
-     model, and remove the %titles entity
+     model, and remove the %titles ENTITY
 
      Also rename the table element to `tabular'.  This fits in well with
      the LaTeX model folk will be familiar with, and allows us to
-     separate the floating plus captioning plus id stuff from the
+     separate the floating plus captioning plus ID stuff from the
      lining-it-up-in-columns of tabular layouts.
 
      This Programcode DTD uses the same TABULAR element as the General
      DTD, but does not use the TABLE element.
      -->
-<!entity % tbl.table.name 'TABULAR'>
-<!entity % tbl.table-titles.mdl ''>
-<!entity % tbl.entry.mdl '(%phrase)*'>
-<!entity % calstbls 
-	public "-//OASIS//DTD Exchange Table Model 19960430//EN">
+<!ENTITY % tbl.table.name 'tabular'>
+<!ENTITY % tbl.table-titles.mdl ''>
+<!ENTITY % tbl.entry.mdl '(%phrase)*'>
+<!ENTITY % calstbls 
+	PUBLIC "-//OASIS//DTD Exchange Table Model 19960430//EN">
 %calstbls;

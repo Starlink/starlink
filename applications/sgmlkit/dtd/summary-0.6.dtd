@@ -21,7 +21,7 @@
 -->
 <?IS10744 ArcBase HyTime>
 
-<!entity % DTD.Summary.Version 'DTD Document Summary 0.6'>
+<!ENTITY % DTD.Summary.Version 'DTD Document Summary 0.6'>
 
 <!-- Define the AFDRMeta notation -->
 <!NOTATION AFDRMeta PUBLIC 
@@ -37,7 +37,7 @@
 	>
 
 <!ENTITY HyTime.DTD 
-	public 'ISO/IEC 10744:1997//DTD AFDR Meta-DTD
+	PUBLIC 'ISO/IEC 10744:1997//DTD AFDR Meta-DTD
                 Hypermedia/Time-based Structuring Language (HyTime)//EN'
 	NDATA AFDRMeta
 >
@@ -59,7 +59,7 @@
 
 	-- Support attributes for HyTime only --
 	hyqcnt		NUMBER	32
-	GenArc		CDATA	"altreps included superdcn"
+	GenArc		CDATA	"altreps INCLUDEd superdcn"
 	base		CDATA	"bos"
 	locs		CDATA	
 			"nmsploc multloc refctl referatt refloc queryloc"
@@ -76,15 +76,15 @@
   that text, and the routine which generates it should suppress any
   it finds.  
 
-  In version 0.1 of this DTD, I included the %simplephrase elements
+  In version 0.1 of this DTD, I INCLUDEd the %simplephrase elements
   from the Starlink General DTD.  However I've removed these, since
   (a) we don't really need the abstract at all, much less any markup
   within it, and (b) the presence of these here makes the elements
   architectural, so they show up in the body text when you extract an
   architectural instance from a General document.
 -->
-<![ ignore [
-<!entity % simplephrase	"em | strong | quote | code | kbd | cite">
+<![ IGNORE [
+<!ENTITY % simplephrase	"em | strong | quote | code | kbd | cite">
 
 <!-- Define all the simple markup elements -->
 <!element (%simplephrase) - - (#pcdata)>
@@ -97,24 +97,24 @@
   (could LPDs define them?).  It's important that they're defined,
   less so that they're defined perfectly correctly.
 -->
-<!entity % LaTeX.entities 'IGNORE'>
-<!entity % HTML.entities 'IGNORE'>
+<!ENTITY % LaTeX.entities 'IGNORE'>
+<!ENTITY % HTML.entities 'IGNORE'>
 
 <![ %LaTeX.entities [
-<!entity % Additional.Char.Ents
-	public "-//Starlink//ENTITIES Additional entities//EN//LATEX">
-<!entity % ISOents
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//LATEX">
+<!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX">
 ]]>
 <![ %HTML.entities [
-<!entity % Additional.Char.Ents
-	public "-//Starlink//ENTITIES Additional entities//EN//HTML">
-<!entity % ISOents
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//HTML">
+<!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML">
 ]]>
-<!entity % Additional.Char.Ents
-	public "-//Starlink//ENTITIES Additional entities//EN//PLAIN">
-<!entity % ISOents
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//PLAIN">
+<!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN">
 
 %Additional.Char.Ents;
@@ -139,7 +139,7 @@
   link to elements which have the EXPORT attribute present; if it has
   the value "ALL", then we may link to all elements.
 -->
-<!entity % version.attr "version cdata #fixed '%DTD.Summary.Version;'">
+<!ENTITY % version.attr "version cdata #fixed '%DTD.Summary.Version;'">
 <!attlist DocumentSummary
 	urllinkpolicy		-- how do we link to targets described
 				   in this summary? --
@@ -179,8 +179,8 @@
 <!--
   The content of the DOCNUMBER element is supposed to be the document
   number without version or release numbers, as in the General DTD.
-  However, at present, the HISTORY element isn't included in this
-  summary DTD, so it's legitimate to include that here.  This DTD is
+  However, at present, the HISTORY element isn't INCLUDEd in this
+  summary DTD, so it's legitimate to INCLUDE that here.  This DTD is
   intended purely as a transmitter of information, rather than an
   archive source.
 -->
@@ -195,7 +195,7 @@
 		#implied
 		-- indicates that no number has (yet?) been assigned
 		   to this document, and so that any content should be
-		   ignored --
+		   IGNOREd --
 	>
 
 <!attlist author
@@ -218,7 +218,7 @@
 
 
 <!--
-  I don't need to include routinelist in this content model, since my
+  I don't need to INCLUDE routinelist in this content model, since my
   focus right now is on this DTD as a summary of links into the document,
   and routinelists aren't currently linkable in the General DTD.
 -->
@@ -227,7 +227,7 @@
 <!element DOCBODY 	o o ((docxref | label)*,
 				abstract?, sect*, appendices?)>
 
-<![ ignore [ <!element ABSTRACT	- - ((#pcdata | %simplephrase)*)> ]]>
+<![ IGNORE [ <!element ABSTRACT	- - ((#pcdata | %simplephrase)*)> ]]>
 <!element ABSTRACT	- - (#pcdata)>
 <!element SECT          - o (subhead, (docxref | label)*, subsect*)>
 <!element SUBSECT       - o (subhead, (docxref | label)*, subsubsect*)>
@@ -268,7 +268,7 @@
 	>
 <!attlist DOCXREF
 	doc			-- Starlink document which holds the target --
-		entity
+		ENTITY
 		#required
 	loc			-- location within document, or whole document
 				   if this is missing --

@@ -1,30 +1,30 @@
 <!--
 	Starlink SC DTD
 
-	Use with doctype declaration:
+	Use with DOCTYPE declaration:
 
-	<!doctype sc public '-//Starlink//DTD Starlink SC 0.6//EN'>
+	<!DOCTYPE sc PUBLIC '-//Starlink//DTD Starlink SC 0.6//EN'>
 
 	$Id$
 -->
 
-<!entity % DTD.Version		"DTD Starlink SC 0.6">
+<!ENTITY % DTD.Version		"DTD Starlink SC 0.6">
 
-<!entity % DocClass "SC">
+<!ENTITY % DocClass "sc">
 
 <!-- 
   Features: require support for versioning, and allow a list of
   routine descriptions amongst the backmatter.
 -->
-<!entity % Feature.Abstract	'include'
+<!ENTITY % Feature.Abstract	'INCLUDE'
 		-- Require an abstract -->
-<!entity % Feature.Versioning	'include'
+<!ENTITY % Feature.Versioning	'INCLUDE'
 		-- Require version tracking in document -->
-<!entity % Feature.Routinelist	'ignore'
+<!ENTITY % Feature.Routinelist	'IGNORE'
 		-- No support for routine descriptions -->
-<!entity % Feature.Docnumber	'include'
+<!ENTITY % Feature.Docnumber	'INCLUDE'
 		-- require DOCNUMBER in head -->
 
-<!entity % Starlink.general
-	public "-//Starlink//DTD Starlink General 0.6//EN">
+<!ENTITY % Starlink.general
+	PUBLIC "-//Starlink//DTD Starlink General 0.6//EN">
 %Starlink.general;

@@ -8,23 +8,23 @@
 	$Id$
 -->
 
-<!entity % DTD.Version		"DTD Starlink SSN 0.6">
+<!ENTITY % DTD.Version		"DTD Starlink SSN 0.6">
 
-<!entity % DocClass "SSN">
+<!ENTITY % DocClass "ssn">
 
 <!-- 
   Features: require support for versioning, but forbid a list of
   routine descriptions amongst the backmatter.
 -->
-<!entity % Feature.Abstract	'include'
+<!ENTITY % Feature.Abstract	'INCLUDE'
 		-- Require an abstract -->
-<!entity % Feature.Versioning	'include'
+<!ENTITY % Feature.Versioning	'INCLUDE'
 		-- Require version tracking in document -->
-<!entity % Feature.Routinelist	'ignore'
+<!ENTITY % Feature.Routinelist	'IGNORE'
 		-- Don't support routine descriptions -->
-<!entity % Feature.Docnumber	'include'
+<!ENTITY % Feature.Docnumber	'INCLUDE'
 		-- require DOCNUMBER in head -->
 
-<!entity % Starlink.general
-	public "-//Starlink//DTD Starlink General 0.6//EN">
+<!ENTITY % Starlink.general
+	PUBLIC "-//Starlink//DTD Starlink General 0.6//EN">
 %Starlink.general;

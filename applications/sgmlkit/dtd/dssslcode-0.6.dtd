@@ -1,4 +1,4 @@
-<![ ignore [
+<![ IGNORE [
   DTD for DSSSL code.  This is based on the programcode DTD, but uses
   the DSSSL Architecture.
 
@@ -6,7 +6,7 @@
 
   Invoke with
 
-    <!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.6//EN">
+    <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN">
 
   Author: 
     NG: Norman Gray (Glasgow)
@@ -19,100 +19,152 @@
   $Id$
 ]]>
 
-<!entity % DTD.Version "DTD Starlink DSSSLcode 0.6">
+<!ENTITY % DTD.Version "DTD Starlink DSSSLcode 0.6">
 
-<!--============================== Architectures ==============================
-  Declare the use of the DSSSL architecture.  Jade extracts the DSSSL
-  architectural instance from the style-sheet it is given, so we can
-  mark the code up in this programcode DTD, and still let Jade use
-  it as long as the DSSSL architecture is declared and implemented
-  properly.  
+<!--========== Architectures ==========
 
-  The DSSSL notation declaration is in the generic PROGRAMCODE DTD -
-  only the notation's attribute list is here.
+    Declare the use of the DSSSL architecture.  Jade extracts the DSSSL
+    architectural instance from the style-sheet it is given, so we can
+    mark the code up in this programcode DTD, and still let Jade use
+    it as long as the DSSSL architecture is declared and implemented
+    properly.  
+
+    The DSSSL notation declaration is in the generic PROGRAMCODE DTD -
+    only the notation's attribute list is here.
+    -->
+<?IS10744 ArcBase DSSSL>
+<!--
+<!NOTATION SGML PUBLIC "ISO 8879:1986//NOTATION Standard Generalised Markup Language//EN">
 -->
-<?IS10744 ArcBase DSSSL programcode>
-<!notation sgml public "ISO 8879:1986//NOTATION Standard Generalised Markup Language//EN">
 
-<!ENTITY DSSSLDTD PUBLIC "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN"
-	cdata sgml>
+<!ENTITY dsssldtd PUBLIC "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN"
+	--CDATA SGML-->
 <!-- The DSSSL notation is in the PROGRAMCODE DTD.  Its use here is... --
 	-- A base architecture used in conformance with the
 	   Architectural Form Definition Requirements of
 	   International Standard ISO/IEC 10744 --
 	>
-<!attlist #notation dsssl
+<!ATTLIST #NOTATION DSSSL
 	ArcDocF
-		name #fixed dsssl-specification
+		NAME #FIXED dsssl-specification
 	ArcDTD
-		cdata "DSSSLDTD"
+		CDATA "dsssldtd"
 	ArcFormA
-		name #fixed dsssl
+		NAME #FIXED dsssl
 	ArcNamrA
-		name #fixed dsssla
+		NAME #FIXED dsssla
 	ArcQuant
-		cdata "namelen 64"
+		CDATA "NAMELEN 64"
 	ArcAuto		-- is automatic architecture mapping on?
 			   There's little need for this, really, since
 			   there's little overlap between the
 			   programcode DTD elements and the DSSSL
 			   ones, but it seems best to be explicit. --
-		(ArcAuto|nArcAuto) #fixed nArcAuto	-- off --
+		-- (ArcAuto|nArcAuto) #FIXED nArcAuto	 --
+		-- HyTime DTD declares these (Clause A.3.4.2) to be
+		   (ArcAuto|nArcAuto), but Jade barfs on the mixed
+		   case one when I use an SGML declaration which turns
+		   off case-folding --
+		(ARCAUTO|NARCAUTO) #FIXED NARCAUTO	
+		-- off --
 	ArcIgnDA
-		cdata #fixed dssslignd
+		CDATA #FIXED dssslignd
 	>
 
-<!--
-  Make the mappings: codegroup to style-specification, codebody to
-  style-specification-body, and codereference to
-  external-specification.  Add the appropriate attributes to each
-  element, to make it correspond to the architectural form.
--->
-<!entity % codegroup.arch.atts 
-	'dsssl name #fixed style-specification
-	 id  id #implied
-	 use idrefs #implied'>
-<!entity % codereference.arch.atts
-	'dsssl name #fixed external-specification
-	 id id #required
-	 dsssla cdata #fixed "document doc specid docid"'>
-<!entity % codebody.arch.atts 
-	'dsssl name #fixed style-specification-body'
-	--'dssslignd name #fixed narcignd'-->
+<!-- Make the mappings: codegroup to style-specification, codebody to
+     style-specification-body, and codereference to
+     external-specification.  Add the appropriate attributes to each
+     element, to make it correspond to the architectural form.
+     -->
+<!ENTITY % programcode.arch.atts
+	'dsssl CDATA #FIXED dsssl-specification
+	 dsssla CDATA #FIXED "version #DEFAULT"'
+		-- The `version' attribute on the programcode element
+		   is not to be mapped to the `version' attribute on
+		   the dsssl-specification architectural document
+		   element (see 10744 clause A.3.5.2).  The
+		   dsssl mapping is redundant: this is the document 
+		   element, so mapping to architectural document is
+		   automatic. -->
+<!ENTITY % codegroup.arch.atts 
+	'dsssl NAME #FIXED style-specification
+	 id  ID #IMPLIED
+	 use IDREFS #IMPLIED'>
+<!ENTITY % codereference.arch.atts
+	'dsssl NAME #FIXED external-specification
+	 id ID #REQUIRED
+	 dsssla CDATA #FIXED "document doc specid docid"'>
+<!ENTITY % codebody.arch.atts 
+	'dsssl NAME #FIXED style-specification-body'
+	--'dssslignd NAME #FIXED narcignd'-->
 
-<!--
-  Declare the PROGRAMCODE DTD to be an architecture.
+<!ENTITY % generalcode.dtd
+	PUBLIC "-//Starlink//DTD Program Source Code 0.6//EN">
 
-  This doesn't have a huge impact, but as well as being The Right HyTime
-  Thing To Do, it allows us to impose the PROGRAMCODE structure even
-  on (admittedly rare) files which do whizzy things in their internal
-  DTD subset.
--->
-<!notation 
+<![IGNORE[
+<!-- No, don't declare the programcode DTD to be an architecture.
+
+     I really don't understand this, but if I include the following
+     declarations, and then try to extract either the DSSSL _or_ the
+     programcode architecture with `nsgmls -A DSSSL ...', then I get
+
+nsgmls:blah.dsl:9:0:E: value of fixed attribute "version" not equal to default
+nsgmls:/home/norman/s/src/sgml/w/sgml/dtd/programcode-0.6.dtd:187:16:E: "DSSSL" is not a notation name
+
+     The first one is related to the fact that both the programcode
+     and DSSSL style-sheet DTDs have a `version' attribute on the
+     document element.  This is dealt with by the architectural
+     remapping in programcode.arch.atts above.  This _does_ seem to
+     work as it should, as long as this declaration isn't here.  The
+     second error message makes no sense at all, especially since
+     declaring the DSSSL notation in the programcode DTD (correctly)
+     results in the thing objecting to a duplicate declaration.
+
+     The odd thing is that this did used to work, and it only
+     stopped at the same time as I changed the declaration to include
+     NAMECASE GENERAL NO (though it's not a result of that, as I tried
+     doing all of this with the SGML declaration for HTML).  I cannot
+     see what's wrong, and I'm puzzled, as I wouldn't imagine that
+     the parser would have any reason to look at the DTD mentioned in
+     the notation attlist declaration.
+
+     Ah well, it's fortunate that this declaration was somewhat
+     unnecessary.  I wish I knew what was wrong, though....
+
+     4 October 1999
+     -->
+
+<!-- Declare the PROGRAMCODE DTD to be an architecture.
+
+     This doesn't have a huge impact, but as well as being The Right HyTime
+     Thing To Do, it allows us to impose the PROGRAMCODE structure even
+     on (admittedly rare) files which do whizzy things in their internal
+     DTD subset.
+     -->
+<!NOTATION 
 	programcode
 		-- A base architecture used in conformance with the
 		   Architectural Form Definition Requirements of
 		   International Standard ISO/IEC 10744 --
-	system ''>
-<!entity % generalcode.dtd
-	public "-//Starlink//DTD Program Source Code 0.6//EN">
-<!attlist #notation programcode
+	SYSTEM ''>
+<!ATTLIST #NOTATION programcode
 	ArcFormA
-		name #fixed programcode
+		NAME #FIXED programcode
 	ArcDTD
-		cdata "%generalcode.dtd"
+		CDATA "%generalcode.dtd"
 	ArcDocF
-		cdata #fixed programcode
+		CDATA #FIXED programcode
 	>
+]]>
 
 <!--============================== Entities ==============================
-  Declare or specialise the required entities
--->
-<!entity % language.attr	-- language attribute declaration --
-	 "language notation (dsssl) #fixed dsssl">
+     Declare or specialise the required entities
+     -->
+<!ENTITY % language.attr	-- language attribute declaration --
+	 "language NOTATION (DSSSL) #FIXED DSSSL">
 
-<!entity % direction.attr 
-	"direction (given) #fixed given"
+<!ENTITY % direction.attr 
+	"direction (given) #FIXED given"
 	-- input or output to function -->
 
 <!--============================== DTD Body ==============================

@@ -1,12 +1,12 @@
-<![ ignore [
+<![ IGNORE [
   DTD for fortran code.
 
   Calls general programcode DTD (qv)
 
   Invoke with
 
-    <!doctype programcode 
-	public "-//Starlink//DTD Fortran Source Code 0.6//EN">
+    <!DOCTYPE programcode 
+	PUBLIC "-//Starlink//DTD Fortran Source Code 0.6//EN">
 
   Author: 
     NG: Norman Gray (Glasgow)
@@ -19,14 +19,14 @@
   $Id$
 ]]>
 
-<!entity % DTD.Version "DTD Starlink Fortrancode 0.6">
+<!ENTITY % DTD.Version "DTD Starlink Fortrancode 0.6">
 
 <!--============================== Notation ==============================
   The Fortran notation is declared in the PROGRAMCODE DTD which this
-  includes at the end.
+  INCLUDEs at the end.
 -->
-<!entity % language.attr	-- language attribute declaration --
-	 "language notation (fortran77) #fixed fortran77">
+<!ENTITY % language.attr	-- language attribute declaration --
+	 "language NOTATION (fortran77) #FIXED fortran77">
 
 <!--============================== Architectures ==============================
 
@@ -38,21 +38,21 @@
   DTD subset.
 -->
 <?IS10744 ArcBase programcode>
-<!notation 
+<!NOTATION 
 	programcode
 		-- A base architecture used in conformance with the
 		   Architectural Form Definition Requirements of
 		   International Standard ISO/IEC 10744 --
-	system ''>
-<!entity % generalcode.dtd
-	public "-//Starlink//DTD Program Source Code 0.6//EN">
-<!attlist #notation programcode
+	SYSTEM ''>
+<!ENTITY % generalcode.dtd
+	PUBLIC "-//Starlink//DTD Program Source Code 0.6//EN">
+<!ATTLIST #NOTATION programcode
 	ArcFormA
-		name #fixed programcode
+		NAME #FIXED programcode
 	ArcDTD
-		cdata "%generalcode.dtd"
+		CDATA "%generalcode.dtd"
 	ArcDocF
-		cdata #fixed programcode
+		CDATA #FIXED programcode
 	>
 
 
@@ -63,17 +63,17 @@
   Collect a suitable set of starttag and cdata entities.
 
   First, arrange that ^*+ and ^*- begin and end the prologue, and that
-  ^* is ignored while within the prologue.
+  ^* is IGNOREd while within the prologue.
 -->
-<!entity startprologue.ref	starttag "routineprologue">
-<!entity endprologue.ref	starttag "codebody">
-<!entity nullentity.ref		cdata "">
-<!entity partype.ref		starttag "type"	>
-<!entity pardesc.ref		starttag "description">
+<!ENTITY startprologue.ref	STARTTAG "routineprologue">
+<!ENTITY endprologue.ref	STARTTAG "codebody">
+<!ENTITY nullentity.ref		CDATA "">
+<!ENTITY partype.ref		STARTTAG "type"	>
+<!ENTITY pardesc.ref		STARTTAG "description">
 
-<!shortref	generalmap	"&#RS;*+"	startprologue.ref
+<!SHORTREF	generalmap	"&#RS;*+"	startprologue.ref
 						>
-<!shortref	prologuemap	"&#RS;*+"	startprologue.ref
+<!SHORTREF	prologuemap	"&#RS;*+"	startprologue.ref
 				"&#RS;*-"	endprologue.ref
 				"&#RS;*"	nullentity.ref
 						>
@@ -82,7 +82,7 @@
   Now some tricksier stuff for documenting routine parameters.
   Structure is
 
-     <!element parameter - o (name, type, description)>
+     <!ELEMENT parameter - O (name, type, description)>
 
   Within PARAMETER element, have `=' be a shortref for TYPE (don't
   have it within NAME, since that element is also used within the
@@ -104,24 +104,24 @@
       This is a variable
 
 -->
-<!shortref	parametermap	"="		partype.ref
+<!SHORTREF	parametermap	"="		partype.ref
 				"&#RS;*"	nullentity.ref
 						>
-<!shortref	descriptionmap	"&#RS;*"	nullentity.ref
+<!SHORTREF	descriptionmap	"&#RS;*"	nullentity.ref
 						>
-<!shortref	partypemap	"&#RE;"		pardesc.ref
+<!SHORTREF	partypemap	"&#RE;"		pardesc.ref
 				":"		pardesc.ref
 						>
-<!usemap	generalmap	programcode	>
-<!usemap	prologuemap	routine		>
-<!usemap	parametermap	parameter	>
-<!usemap	descriptionmap	description	>
-<!usemap	partypemap	type		>
+<!USEMAP	generalmap	programcode	>
+<!USEMAP	prologuemap	routine		>
+<!USEMAP	parametermap	parameter	>
+<!USEMAP	descriptionmap	description	>
+<!USEMAP	partypemap	type		>
 
 
 
 <!--============================== DTD Body ==============================
 
-  Finally, include the text of the general DTD
+  Finally, INCLUDE the text of the general DTD
 -->
 %generalcode.dtd;
