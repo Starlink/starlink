@@ -951,7 +951,7 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         LOGICAL LOFOUND,HIFOUND
         LOGICAL INCLUDE		! whether donor bin to be included
 *-
-
+	integer i
 
 *      Status check
       IF (STATUS.NE.SAI__OK) RETURN
