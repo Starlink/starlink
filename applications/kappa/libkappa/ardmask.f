@@ -194,6 +194,23 @@
       IGRP = GRP__NOID
       CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
 
+*  Allocate the memory needed for the logical mask array.
+      CALL NDF_SIZE( INDF1, EL, STATUS )
+      CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
+      
+*  Get the WCS FrameSet from the NDF and use it to establish the WCS
+*  information used by the following cal to ARD_WORK.
+      CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
+      CALL ARD_WCS( IWCS, STATUS )
+
+*  Create the mask.  Value 2 should be used to represent pixels
+*  specified by the first keyword in the ARD description. TRCOEF is
+*  ignored because we have previously called ARD_WCS.
+      REGVAL = 2
+      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE., REGVAL,
+     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :               STATUS )
+       
 *  Propagate the bits of the source NDF required.
       CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS', 
      :               'OUT', INDF2, STATUS )
@@ -205,22 +222,6 @@
       CALL NDF_MAP( INDF2, 'Data', TYPE, 'UPDATE', IPIN, EL,
      :              STATUS )
 
-*  Allocate the memory needed for the logical mask array.
-      CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
-      
-*  Get the WCS FrameSet from the NDF and use it to establish the WCS
-*  information used by the following cal to ARD_WORK.
-      CALL KPG1_GTWCS( INDF2, IWCS, STATUS )
-      CALL ARD_WCS( IWCS, STATUS )
-
-*  Create the mask.  Value 2 should be used to represent pixels
-*  specified by the first keyword in the ARD description. TRCOEF is
-*  ignored because we have previously called ARD_WCS.
-      REGVAL = 2
-      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
-     :               STATUS )
-       
 *  Correct the output image to have bad pixels where indicated on the
 *  mask.  Call the appropriate routine for the data type.
       IF( TYPE .EQ. '_REAL' ) THEN
