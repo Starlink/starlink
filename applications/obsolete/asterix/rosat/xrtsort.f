@@ -3358,6 +3358,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
               ENDIF
             ENDIF
 *
+	write(6,'(1x,a)') 'xxx'
+        call flush(6)
 *  Calculate the other elements
             EL3=INT((XDEV-SRT.MIN_XD)/XDWID) + 1
             EL4=INT((YDEV-SRT.MIN_YD)/YDWID) + 1
@@ -3365,11 +3367,13 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
             EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
 
+	write(6,'(1x,7i4)') el1,el2,el3,el4,el5,el6,el7
+        call flush(6)
 
             SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &         SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
 
-	print *,ix
+	write(6,'(1x,i8)') ix
 	call flush(6)
 
           ENDIF
