@@ -1,0 +1,196 @@
+ Begin FrameSet 	# Set of inter-related coordinate systems
+    ID = "FITSID ISEQ 1" 	# Object identification string
+ IsA Object 	# AST Object
+    Nframe = 2 	# Number of Frames in FrameSet
+    Currnt = 2 	# Index of current Frame
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "PIXEL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "Alignment on focal plane of mosaic camera" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "FOCAL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+             End Axis
+       End Frame
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+       IsA Mapping 	# Mapping between coordinate systems
+          InvA = 1 	# First Mapping used in inverse direction
+          MapA = 	# First component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+                Invert = 1 	# Mapping inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = -0.5 	# Shift for axis 1
+                Sft2 = -0.5 	# Shift for axis 2
+             End WinMap
+          MapB = 	# Second component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = 0.5 	# Shift for axis 1
+                Sft2 = 100.5 	# Shift for axis 2
+             End WinMap
+       End CmpMap
+ End FrameSet
+ Begin FrameSet 	# Set of inter-related coordinate systems
+    ID = "FITSID ISEQ 2" 	# Object identification string
+ IsA Object 	# AST Object
+    Nframe = 2 	# Number of Frames in FrameSet
+    Currnt = 2 	# Index of current Frame
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "PIXEL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "Alignment on focal plane of mosaic camera" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "FOCAL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+             End Axis
+       End Frame
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+       IsA Mapping 	# Mapping between coordinate systems
+          InvA = 1 	# First Mapping used in inverse direction
+          MapA = 	# First component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+                Invert = 1 	# Mapping inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = -0.5 	# Shift for axis 1
+                Sft2 = -0.5 	# Shift for axis 2
+             End WinMap
+          MapB = 	# Second component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = 68.5 	# Shift for axis 1
+                Sft2 = 100.5 	# Shift for axis 2
+             End WinMap
+       End CmpMap
+ End FrameSet
+ Begin FrameSet 	# Set of inter-related coordinate systems
+    ID = "FITSID ISEQ 3" 	# Object identification string
+ IsA Object 	# AST Object
+    Nframe = 2 	# Number of Frames in FrameSet
+    Currnt = 2 	# Index of current Frame
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "PIXEL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "Alignment on focal plane of mosaic camera" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "FOCAL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+             End Axis
+       End Frame
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+       IsA Mapping 	# Mapping between coordinate systems
+          InvA = 1 	# First Mapping used in inverse direction
+          MapA = 	# First component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+                Invert = 1 	# Mapping inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = -0.5 	# Shift for axis 1
+                Sft2 = -0.5 	# Shift for axis 2
+             End WinMap
+          MapB = 	# Second component Mapping
+             Begin CmpMap 	# Compound Mapping
+                Nin = 2 	# Number of input coordinates
+             IsA Mapping 	# Mapping between coordinate systems
+                InvB = 1 	# Second Mapping used in inverse direction
+                MapA = 	# First component Mapping
+                   Begin WinMap 	# Map one window on to another
+                      Nin = 2 	# Number of input coordinates
+                   IsA Mapping 	# Mapping between coordinate systems
+                      Sft1 = -297.5 	# Shift for axis 1
+                      Sft2 = 0.5 	# Shift for axis 2
+                   End WinMap
+                MapB = 	# Second component Mapping
+                   Begin MatrixMap 	# Matrix transformation
+                      Nin = 2 	# Number of input coordinates
+                   IsA Mapping 	# Mapping between coordinate systems
+                      M0 = -1.83690953073357e-16 	# Forward matrix value
+                      M1 = -1 	# Forward matrix value
+                      M2 = 1 	# Forward matrix value
+                      M3 = -1.83690953073357e-16 	# Forward matrix value
+                      Form = "Full" 	# Matrix storage form
+                   End MatrixMap
+             End CmpMap
+       End CmpMap
+ End FrameSet
