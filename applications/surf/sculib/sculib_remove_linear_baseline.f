@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_REMOVE_LINEAR_BASELINE(N_EXPOSURES,
+      SUBROUTINE SCULIB_REMOVE_LINEAR_BASELINE(DORLB, N_EXPOSURES,
      :     N_INTEGRATIONS, N_MEASUREMENTS, DEMOD_POINTER, N_BOL, N_POS,
      :     IN_DATA, IN_VARIANCE, IN_QUALITY, NSTART, NEND,
      :     OUT_DATA, OUT_VARIANCE, OUT_QUALITY, BADBIT, STATUS)
@@ -10,7 +10,7 @@
 *     Remove linear baseline from each exposure.
 
 *  Invocation:
-*     CALL SCULIB_REMOVE_LINEAR_BASELINE(N_EXPOSURES,
+*     CALL SCULIB_REMOVE_LINEAR_BASELINE(DORLB, N_EXPOSURES,
 *    :     N_INTEGRATIONS, N_MEASUREMENTS, DEM_PNTR, N_BOL, N_POS,
 *    :     IN_DATA, IN_QUALITY, SAMPLE_DX, CHOP_THROW, OUT_DATA,
 *    :     OUT_QUALITY, BADBIT, STATUS)
@@ -21,6 +21,9 @@
 *     (should be no source at the ends of a scan)
 
 *  Arguments:
+*     DORLB                       = LOGICAL (Given)
+*           control whether we are subtracting the baseline (TRUE)
+*           or storing the basline (FALSE)
 *     N_EXPOSURES                 = INTEGER (Given)
 *           maximum number of exposures per integration
 *     N_INTEGRATIONS              = INTEGER (Given)
@@ -82,6 +85,7 @@
 
 *  Arguments Given:
       BYTE    BADBIT
+      LOGICAL DORLB
       INTEGER N_BOL
       INTEGER N_EXPOSURES
       INTEGER N_INTEGRATIONS
@@ -322,23 +326,37 @@
      :                                   YFIT, YP, %VAL(A_PTR), STATUS)
 
 *     Simply remove this value (write out even if quality is bad)
-                                    IF (IN_DATA(BOL,POS) .NE. VAL__BADR) 
-     :                                   THEN
+*     if that is required else just store the fit
+
+                                    IF (DORLB) THEN
+
+                                       IF (IN_DATA(BOL,POS) .NE. 
+     :                                      VAL__BADR) THEN
                                        
-                                       OUT_DATA(BOL,POS) = 
-     :                                      IN_DATA(BOL,POS) - 
-     :                                      REAL(YFIT)
+                                          OUT_DATA(BOL,POS) = 
+     :                                         IN_DATA(BOL,POS) - 
+     :                                         REAL(YFIT)
                                        
+                                       ELSE
+                                          OUT_DATA(BOL,POS) = 
+     :                                         IN_DATA(BOL,POS)
+                                       END IF
+                                    
+                                       OUT_QUALITY(BOL, POS) = 
+     :                                      IN_QUALITY(BOL, POS)
+                                       OUT_VARIANCE(BOL, POS) = 
+     :                                      IN_VARIANCE(BOL,POS)
+                                    
+*     Store the fit
                                     ELSE
-                                       OUT_DATA(BOL,POS) = 
-     :                                      IN_DATA(BOL,POS)
+
+                                       OUT_DATA(BOL, POS) =
+     :                                      REAL(YFIT)
+                                       OUT_VARIANCE(BOL,POS) = 0.0
+                                       OUT_QUALITY(BOL,POS) = 0
+
                                     END IF
-                                    
-                                    OUT_QUALITY(BOL, POS) = 
-     :                                   IN_QUALITY(BOL, POS)
-                                    OUT_VARIANCE(BOL, POS) = 
-     :                                   IN_VARIANCE(BOL,POS)
-                                    
+
                                  END DO
                               END IF
                            
