@@ -15,7 +15,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 
 dnl    Other options here, such as
-dnl STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [cnf sae mers subpar gks gns idi agi ast cat ndg hds chr fio grp ndf prm par psx tclsys])
