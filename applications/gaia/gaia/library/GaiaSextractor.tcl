@@ -59,6 +59,8 @@
 #  History:
 #     25-AUG-1998 (PDRAPER):
 #        Original version.
+#     25-MAY-1999 (PDRAPER):
+#        Added BACK_TYPE, BACK_VALUE and THRESH_TYPE.
 #     {enter_further_changes_here}
 
 #-
@@ -200,9 +202,10 @@ itcl::class gaia::GaiaSextractor {
       set values_($this,draw_circles) 0
 
       #  Allow selection of the detection image.
+      set lwidth 18
       itk_component add detname {
          LabelFileChooser $w_.detname \
-            -labelwidth 22 \
+            -labelwidth $lwidth \
             -text "Detection image:" \
             -textvariable [scope values_($this,detname)] \
             -filter_types $itk_option(-filter_types)
@@ -215,7 +218,7 @@ itcl::class gaia::GaiaSextractor {
       #  Add fields for setting the catalogue name and type(!).
       itk_component add catname {
          LabelEntry $w_.catname \
-            -labelwidth 22 \
+            -labelwidth $lwidth \
             -text "Catalogue name:" \
             -textvariable [scope values_($this,catname)] \
             -command [code $this set_catname_ to]
@@ -226,7 +229,7 @@ itcl::class gaia::GaiaSextractor {
 
       itk_component add cattype {
          LabelMenu $w_.cattype \
-            -labelwidth 22 \
+            -labelwidth $lwidth \
             -text "Catalogue type:" \
             -variable [scope values_($this,cattype)]
       }
@@ -245,7 +248,7 @@ itcl::class gaia::GaiaSextractor {
       #  parameters file.
       itk_component add conpar {
          LabelEntry $w_.conpar \
-            -labelwidth 22 \
+            -labelwidth $lwidth \
             -text "Config parameters:" \
             -textvariable [scope values_($this,conpar)]
       }
@@ -255,7 +258,7 @@ itcl::class gaia::GaiaSextractor {
 
       itk_component add catpar {
          LabelEntry $w_.catpar \
-            -labelwidth 22 \
+            -labelwidth $lwidth \
             -text "Catalogue parameters:" \
             -textvariable [scope values_($this,catpar)]
       }
@@ -266,7 +269,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Create the tab notebook for containing each page of options.
       itk_component add notebook {
-         ::iwidgets::tabnotebook $w_.notebook -tabpos w -width 450 -height 300
+         ::iwidgets::tabnotebook $w_.notebook -tabpos w -width 410 -height 300
       }
       pack $itk_component(notebook) -side top -fill both -expand 1 \
          -ipadx 1m -ipady 1m
@@ -706,6 +709,27 @@ itcl::class gaia::GaiaSextractor {
       add_short_help $itk_component(minsize) \
          {Minimum number of pixels above detection threshold}
 
+      #  The type of threshold. This can be either relative or
+      #  absolute.
+      #  Type of background estimate used for detections.
+      itk_component add threshtype {
+         LabelMenu $parent.threshtype \
+            -text "Threshold type:" \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,threshtype)]
+      }
+      pack $itk_component(threshtype) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(threshtype) \
+         {Type of values in given in threshold}
+      foreach {longname shortname} \
+         "{Background RMS} RELATIVE {Data units} ABSOLUTE" {
+         $itk_component(threshtype) add \
+            -label $longname \
+            -value $shortname \
+            -command [code $this toggle_threshtype_ $shortname]
+      }
+      set values_($this,threshtype) $values_($this,threshtype)
+
       #  The detection threshold. Either a number of standard
       #  deviations, or a surface brightness and zero point.
       itk_component add detthresh {
@@ -720,8 +744,6 @@ itcl::class gaia::GaiaSextractor {
             -command [code $this set_values_ detthresh]
       }
       pack $itk_component(detthresh) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(detthresh) \
-         {Standard deviations above background, or surface brightness, zero point}
 
       #  Analysis threshold.
       itk_component add analthresh {
@@ -736,8 +758,7 @@ itcl::class gaia::GaiaSextractor {
             -command [code $this set_values_ analthresh]
       }
       pack $itk_component(analthresh) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(analthresh) \
-         {Standard deviations above background, or surface brightness, zero point}
+      toggle_threshtype_ $values_($this,threshtype)
 
       #  Detection filter. Either NONE or some known filename. Note
       #  the use of full path names.
@@ -846,6 +867,19 @@ itcl::class gaia::GaiaSextractor {
       } else {
          $itk_component(deteffic) configure -state disabled
       }
+   }
+
+   #  Method to toggle the short help for the threshold field.
+   private method toggle_threshtype_ {value} {
+      set values_($this,threshtype) $value
+      if { $value == "RELATIVE" } {
+         set help \
+            {Standard deviations above background, or surface brightness, zero point}
+      } else {
+         set help {Data units above background}
+      }
+      add_short_help $itk_component(analthresh) "$help"
+      add_short_help $itk_component(detthresh) "$help"
    }
 
    #  Method translate SExtractor native filter options to local
@@ -980,13 +1014,13 @@ itcl::class gaia::GaiaSextractor {
 
    #  Add controls for all the photometry parameters.
    protected method add_photometry_selections_ {parent} {
-      set lwidth 18
+      set lwidth 13
       set vwidth 5
 
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add photframe {
-         scrolledframe $parent.photframe -width 100 -height 400
+         scrolledframe $parent.photframe -width 75 -height 400
       }
       pack $itk_component(photframe) -fill both -expand 1
       set childsite [$itk_component(photframe) childsite]
@@ -1005,7 +1039,8 @@ itcl::class gaia::GaiaSextractor {
       add_short_help $itk_component(photzero) \
          {Zero point for magnitudes}
 
-      #  Number and size of apertures for photometry.
+      #  Number and size of apertures for photometry. XXX only 1 works
+      #  in SExtractor 2.0.19, so removed for now.
       itk_component add photnum {
          LabelEntryScale $childsite.photnum \
             -text "Number of apertures:" \
@@ -1023,13 +1058,13 @@ itcl::class gaia::GaiaSextractor {
             -value $values_($this,photnum) \
             -command [code $this set_photnum_]
       }
-      pack $itk_component(photnum) -side top -fill x -ipadx 1m -ipady 1m
+      #  pack $itk_component(photnum) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(photnum) \
          {Number of fixed sized apertures to use (1 to 32)}
 
       itk_component add photapps {
          ManyLabelEntry $childsite.photapp \
-            -text "Aperture sizes:" \
+            -text "Aperture size:" \
             -labelwidth $lwidth \
             -nentry $values_($this,photnum) \
             -anchor w \
@@ -1038,8 +1073,10 @@ itcl::class gaia::GaiaSextractor {
       }
       eval $itk_component(photapps) setvals $values_($this,photapps)
       pack $itk_component(photapps) -side top -fill x -ipadx 1m -ipady 1m
+      #add_short_help $itk_component(photapps) \
+      #   {Aperture sizes (in pixels, up to 32 values)}
       add_short_help $itk_component(photapps) \
-         {Aperture sizes (in pixels, up to 32 values)}
+         {Aperture size, in pixels}
 
       #  Kron photometry. Get the Kron factor and the minimum radius
       #  for objects analysed this way.
@@ -1364,6 +1401,39 @@ itcl::class gaia::GaiaSextractor {
       set lwidth 15
       set vwidth 5
 
+      #  Type of background estimate used for detections.
+      itk_component add backtype {
+         LabelMenu $parent.backtype \
+            -text "Background type:" \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,backtype)]
+      }
+      pack $itk_component(backtype) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(backtype) \
+         {Type of background estimated used during detection}
+      foreach {longname shortname} \
+         "{Mesh based} AUTO {Constant} MANUAL" {
+         $itk_component(backtype) add \
+            -label $longname \
+            -value $shortname \
+            -command [code $this toggle_backvalue_ $shortname]
+      }
+      set values_($this,backtype) $values_($this,backtype)
+
+      #  Value of background (if backtype is MANUAL).
+      itk_component add backvalue {
+         LabelEntry $parent.backvalue \
+            -text "Background value:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -validate real \
+            -value $values_($this,backvalue) \
+            -command [code $this set_values_ backvalue]
+      }
+      pack $itk_component(backvalue) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(backvalue) \
+         {Value to be used as image background}
+
       #  Background mesh size.
       itk_component add backmesh {
          ManyLabelEntry $parent.backmesh \
@@ -1397,23 +1467,23 @@ itcl::class gaia::GaiaSextractor {
          {Size of local median filter (size or width,height) max=7}
 
       #  Type of background estimates used when estimate magnitudes.
-      itk_component add backtype {
-         LabelMenu $parent.backtype \
+      itk_component add backphot {
+         LabelMenu $parent.backphot \
             -text "Photometry type:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,backtype)]
+            -variable [scope values_($this,backphot)]
       }
-      pack $itk_component(backtype) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(backtype) \
+      pack $itk_component(backphot) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(backphot) \
          {Type of background estimated used in photometry}
       foreach {longname shortname} \
          "{Background map} GLOBAL {Rectangular annulus} LOCAL" {
-         $itk_component(backtype) add \
+         $itk_component(backphot) add \
             -label $longname \
             -value $shortname \
             -command [code $this toggle_annulus_ $shortname]
       }
-      set values_($this,backtype) $values_($this,backtype)
+      set values_($this,backphot) $values_($this,backphot)
 
       #  Thickness of background annulus.
       itk_component add backthick {
@@ -1436,12 +1506,13 @@ itcl::class gaia::GaiaSextractor {
       pack $itk_component(backthick) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(backthick) \
          {Thickness (in pixels) of the background annulus}
-      toggle_annulus_ $values_($this,backtype)
+      toggle_annulus_ $values_($this,backphot)
+      toggle_backvalue_ $values_($this,backtype)
    }
 
    #  Method to toggle state of annulus parameter.
    private method toggle_annulus_ {value} {
-      set values_($this,backtype) $value
+      set values_($this,backphot) $value
       if { "$value" == "LOCAL" } {
          $itk_component(backthick) configure -state normal
       } else {
@@ -1449,12 +1520,29 @@ itcl::class gaia::GaiaSextractor {
       }
    }
 
+   #  Method to toggle state of back ground value parameter.
+   private method toggle_backvalue_ {value} {
+      set values_($this,backtype) $value
+      if { "$value" == "MANUAL" } {
+         $itk_component(backvalue) configure -state normal
+         $itk_component(backmesh) configure -state disabled
+         $itk_component(backfilter) configure -state disabled
+      } else {
+         $itk_component(backvalue) configure -state disabled
+         $itk_component(backmesh) configure -state normal
+         $itk_component(backfilter) configure -state normal
+      }
+   }
+
    #  Reset all the background selections to their builtin defaults.
    protected method reset_background_ {} {
       $itk_component(backmesh) configure -value $defaults_(backmesh)
       $itk_component(backfilter) configure -value $defaults_(backfilter)
+      $itk_component(backvalue) configure -value $defaults_(backvalue)
       $itk_component(backtype) configure -value $defaults_(backtype)
-      toggle_annulus_ $defaults_(backtype)
+      toggle_backvalue_ $defaults_(backtype)
+      $itk_component(backphot) configure -value $defaults_(backphot)
+      toggle_annulus_ $defaults_(backphot)
       $itk_component(backthick) configure -value $defaults_(backthick)
    }
 
@@ -1506,7 +1594,7 @@ itcl::class gaia::GaiaSextractor {
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add catframe {
-         scrolledframe $parent.catframe -width 100 -height 400
+         scrolledframe $parent.catframe -width 75 -height 400
       }
       pack $itk_component(catframe) -fill both -expand 1
       set colparent_ [$itk_component(catframe) childsite]
@@ -1582,6 +1670,10 @@ itcl::class gaia::GaiaSextractor {
       #  Size of images.
       set from_(DETECT_MINAREA) minsize
       set to_(minsize) DETECT_MINAREA
+
+      #  Type of threshold value.
+      set from_(THRESH_TYPE) threshtype
+      set to_(threshtype) THRESH_TYPE
 
       #  Detection threshold.
       set from_(DETECT_THRESH) detthresh
@@ -1678,8 +1770,16 @@ itcl::class gaia::GaiaSextractor {
       set to_(backfilter) BACK_FILTERSIZE
 
       #  Type of background in photometry.
-      set from_(BACKPHOTO_TYPE) backtype
-      set to_(backtype) BACKPHOTO_TYPE
+      set from_(BACKPHOTO_TYPE) backphot
+      set to_(backphot) BACKPHOTO_TYPE
+
+      #  Type of background used during detection.
+      set from_(BACK_TYPE) backtype
+      set to_(backtype) BACK_TYPE
+
+      #  Value of background used during detection (manual).
+      set from_(BACK_VALUE) backvalue
+      set to_(backvalue) BACK_VALUE
 
       #  Background annulus thickness.
       set from_(BACKPHOTO_THICK) backthick
@@ -1718,6 +1818,7 @@ itcl::class gaia::GaiaSextractor {
       set values_($this,catpar) "default.param"
       set values_($this,cattype) "ASCII_SKYCAT"
       set values_($this,minsize) 5
+      set values_($this,threshtype) "RELATIVE"
       set values_($this,detthresh) {{1.5} {}}
       set values_($this,analthresh) {{1.5} {}}
       set values_($this,detfilter) "${config_dir_}/default.conv"
@@ -1740,7 +1841,9 @@ itcl::class gaia::GaiaSextractor {
       set values_($this,nettable) "${config_dir_}/default.nnw"
       set values_($this,backmesh) {{64} {}}
       set values_($this,backfilter) {{3} {}}
-      set values_($this,backtype) "GLOBAL"
+      set values_($this,backtype) "AUTO"
+      set values_($this,backvalue) 0.0
+      set values_($this,backphot) "GLOBAL"
       set values_($this,backthick) 24
       set values_($this,checktype) "NONE"
       set values_($this,checkimage) "check.fits"
@@ -1755,15 +1858,16 @@ itcl::class gaia::GaiaSextractor {
       #  default.sex file.
       set values_($this,verbose_type) "NORMAL"
 
-      #  Set list of parameter names (this is so we can order then in
+      #  Set list of parameter names (this is so we can order them in
       #  a specific format -- useful for human readable output).
       set valuenames_ {
-         catname catpar cattype minsize detthresh analthresh detfilter
-         debthresh debcontrast detclean deteffic photzero photnum
-         photapps kronfact kronmin photmask dettype imagescale photsat
-         photgain photgamma fwhm nettable backmesh backfilter backtype
-         backthick checktype checkimage
-         memory_objstack memory_pixstack memory_bufsize verbose_type
+         catname catpar cattype minsize threshtype detthresh
+         analthresh detfilter debthresh debcontrast detclean deteffic
+         photzero photnum photapps kronfact kronmin photmask dettype
+         imagescale photsat photgain photgamma fwhm nettable backmesh
+         backfilter backtype backvalue backphot backthick checktype
+         checkimage memory_objstack memory_pixstack memory_bufsize
+         verbose_type
       }
 
       #  Record defaults so they can be restored.
@@ -2322,8 +2426,6 @@ itcl::class gaia::GaiaSextractor {
       {ISO6} {Isophotal area at level 6}
       {ISO7} {Isophotal area at level 7}
       {FLAGS} {Extraction flags}
-      {IMAFLAGS_ISO} {FLAG-image flags OR'ed over the iso. profile}
-      {NIMAFLAGS_ISO} {Number of flagged pixels entering IMAFLAGS_ISO}
       {FWHM_IMAGE} {FWHM assuming a gaussian core}
       {FWHM_WORLD} {FWHM assuming a gaussian core}
       {ELONGATION} {A_IMAGE/B_IMAGE}
@@ -2331,6 +2433,8 @@ itcl::class gaia::GaiaSextractor {
       {CLASS_STAR} {S/G classifier output}
       {VIGNET} {Pixel data around detection}
    }
+#      {IMAFLAGS_ISO} {FLAG-image flags OR'ed over the iso. profile}
+#      {NIMAFLAGS_ISO} {Number of flagged pixels entering IMAFLAGS_ISO}
 #      {X_IMAGE_DBL} {Object position along x (double precision)}
 #      {Y_IMAGE_DBL} {Object position along y (double precision)}
 #      {X_MAMA} {Barycenter position along MAMA x axis}
@@ -2421,7 +2525,9 @@ itcl::class gaia::GaiaSextractor {
 
    #  Names of default catalogue parameters.
    protected variable defcolumns_ {
-      X_WORLD Y_WORLD MAG_ISO MAGERR_ISO MAG_AUTO MAGERR_AUTO FLAGS
+      FLUX_ISO FLUXERR_ISO FLUX_AUTO FLUXERR_AUTO FLUX_MAX
+      ISOAREA_IMAGE CXX_IMAGE CYY_IMAGE CXY_IMAGE B_IMAGE
+      THETA_IMAGE KRON_RADIUS ELLIPTICITY ELONGATION FLAGS
    }
 
    #  Names and descriptions of check image types.
