@@ -2028,7 +2028,7 @@ c        SRT.ELBMAX=Y_HWIDTH
       CALL USI_GET0C('RANGES',RANGES,STATUS)
 *
 *   Use default ranges if zero or a null (!) has been entered
-      IF (RANGES.EQ.0.OR.STATUS.EQ.PAR__NULL) CALL ERR_ANNUL(STATUS)
+      IF (RANGES.EQ.'0'.OR.STATUS.EQ.PAR__NULL) CALL ERR_ANNUL(STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
