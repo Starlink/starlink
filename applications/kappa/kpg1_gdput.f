@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_GDPUT( IPIC, WDOM, DDOM, IPLOT, STATUS ) 
 *+ 
-* Name: *
-      KPG1_GDPUT
+* Name: 
+*     KPG1_GDPUT
 
 *  Purpose:
 *     Save an AST Plot with a graphics database picture.
