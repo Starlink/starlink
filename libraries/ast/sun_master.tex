@@ -2348,6 +2348,112 @@ that may be used for for celestial coordinates, see
 \secref{ss:unformattingskyaxisvalues}.
 f-
 
+\subsection{\label{ss:howtocreatenewwcs}\ldots Create a New WCS Calibration}
+
+This section describes how to add a WCS calibration to a data set which you 
+are creating from scratch, rather than modifying an existing data set. 
+
+In most common cases, the simplest way to create a new WCS calibration
+from scratch is probably to create a set of strings describing the
+required calibration in terms of the keywords used by the FITS WCS
+standard, and then convert these strings into an AST FrameSet describing
+the calibration. This FrameSet can then be used for many other purposes, or
+simply stored in the data set. 
+
+The full FITS-WCS standard is quite involved, currently running to four
+separate papers, but the basic kernel is quite simple, involving the
+following keywords (all of which end with an integer axis index,
+indicated below by $<i>$):
+
+\begin{description}
+\item[CRPIX<i>]\mbox{}\\
+hold the pixel coordinates at a reference point 
+\item[CRVAL<i>]\mbox{}\\
+hold the corresponding WCS coordinates at the reference point 
+\item[CTYPE<i>]\mbox{}\\
+name the quantity represented by the WCS axes, together with the
+projection algorithm used to convert the scaled and rotated pixel coordinates 
+to WCS coordinates.
+\item[CD<i>\_<j>]\mbox{}\\
+a set of keywords which specify the elements of a matrix. This matrix scales
+pixel offsets from the reference point into the offsets required as input
+by the projection algorithm specified by the CTYPE keywords. This matrix 
+specifies the scale and rotation of the image. If there is no rotation
+the off-diagonal elements of the matrix (\emph{e.g.} CD1\_2 and
+CD2\_1) can be omitted. 
+\end{description}
+
+As an example consider the common case of a simple 2D image of the sky in 
+which north is parallel to the second pixel axis and east parallel to the 
+(negative) first pixel axis. The image scale is 1.2 arc-seconds per pixel
+on both axes, and the image is presumed to have been obtained with a
+tangent plane projection. Furthermore, it is known that pixel coordinates
+(100.5,98.4) correspond to an RA of 11:00:10 and a Dec. of  -23:26:02.
+A suitable set of FITS-WCS header cards could be:
+
+\begin{quote}
+\small
+\begin{verbatim}
+CTYPE1  = 'RA---TAN'       / Axis 1 represents RA with a tan projection
+CTYPE2  = 'DEC--TAN'       / Axis 2 represents Dec with a tan projection
+CRPIX1  = 100.5            / Pixel coordinates of reference point
+CRPIX2  = 98.4             / Pixel coordinates of reference point
+CRVAL1  = 165.04167        / Degrees equivalent of "11:00:10" hours
+CRVAL2  = -23.433889       / Decimal equivalent of "-23:26:02" degrees
+CD1_1   = -0.0003333333    / Decimal degrees equivalent of -1.2 arc-seconds
+CD2_2   = 0.0003333333     / Decimal degrees equivalent of 1.2 arc-seconds
+\end{verbatim}
+\normalsize
+\end{quote}
+
+Notes:
+\begin{itemize}
+\item a FITS header card begins with the keyword name starting at column 1, 
+has an equals sign in column 9, and the keyword value in columns 11 to 80.
+\item string values must be enclosed in single quotes.
+\item celestial longitude and latitude must both be specified in decimal degrees.
+\item the CD1\_1 value is negative to indicate that RA increases as the
+first pixel axis decreases.
+\item the (RA,Dec) coordinates will be taken as ICRS coordinates. For FK5
+you should add:
+
+\begin{quote}
+\small
+\begin{verbatim}
+RADESYS = 'FK5'           
+EQUINOX = 2005.6 
+\end{verbatim}
+\normalsize
+\end{quote}
+
+The EQUINOX value defaults to J2000.0 if omitted. FK4 can also be used in
+place of FK5, in which case EQUINOX defaults to B1950.0. 
+
+\end{itemize}
+
+Once you have created these FITS-WCS header card strings, you should
+store them in a FitsChan and then read the corresponding FrameSet from the
+FitsChan. How to do this is described in \secref{ss:howtoreadwcs}.
+
+Having created the WCS calibration, you may want to store it in a data
+file. How to do this is described in \secref{ss:howtowritewcs}).\footnote{If 
+you are writing the WCS calibration to a FITS file you obviously
+have the choice of storing the FITS-WCS cards directly.}
+
+If the required WCS calibration cannot be described as a set of FITS-WCS 
+headers, then a different approach is necessary. In this case, you should
+first create a Frame describing pixel coordinates, and store this Frame
+in a new FrameSet. You should then create a new Frame describing the
+world coordinate system. This Frame may be a specific subclass of Frame such
+as a SkyFrame for celestial coordinates, or a SpecFrame for spectral
+coordinates, or a CmpFrame for a combination of different coordinates.
+You also need to create a suitable Mapping which transforms pixel
+coordinates into world coordinates. AST provides many different types of
+Mappings, all of which can be combined together in arbitrary fashions to
+create more complicated Mappings. The WCS Frame should then be added into
+the FrameSet, using the Mapping to connect the WCS Frame with the pixel
+Frame.
+
 \subsection{\label{ss:howtomodifywcs}\ldots Modify a WCS Calibration}
 
 The usual reason for wishing to modify the WCS calibration associated
@@ -2568,7 +2674,7 @@ see \secref{ss:remapframe}. Also see \secref{ss:wcsprocessingexample}
 for a similar example to the above, applicable to the case of reducing
 the size of an image by binning.
 
-\subsection{\ldots Write a Modified WCS Calibration to a Dataset}
+\subsection{\label{ss:howtowritewcs}\ldots Write a Modified WCS Calibration to a Dataset}
 
 If you have modified the WCS calibration associated with a dataset,
 such as in the example above (\secref{ss:howtomodifywcs}), then you
