@@ -89,11 +89,6 @@
       INTEGER               SSDUMP_FN
       LOGICAL               CHR_INSET
 *
-*    Local constants :
-*
-      INTEGER               MXCOL                     ! Max columns of data
-        PARAMETER           ( MXCOL = 20 )
-*
 *    Local variables :
 *
 c     RECORD /FIELD/        FLD(MXCOL)                ! Field display info
@@ -275,7 +270,7 @@ c           FLD(NFLDF) = FLD(I)					! What to do!
             DO J = I + 1, NFLD
               FIELD_COL(J) = FIELD_COL(J) - CDIF
               IF ( DOERR .AND. FIELD_ETHERE(I) ) THEN
-                FIELD_ECO(J)L = FIELD_ECOL(J) - CDIF
+                FIELD_ECOL(J) = FIELD_ECOL(J) - CDIF
               END IF
             END DO
             CCOL = CCOL - CDIF
@@ -557,7 +552,7 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
       LOGICAL               FIRST_CEL                 ! First of RA,DEC
       LOGICAL               FOUND                     ! Found last field on page
 
-      COMMON /ADATUM/       DATUM_DVAL, DATAUM_RVAL, DATAUM_IVAL
+      COMMON /ADATUM/       DATUM_DVAL, DATUM_RVAL, DATUM_IVAL
 *
 *    Local data :
 *
@@ -582,7 +577,7 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
         FOUND = .FALSE.
         DO WHILE ( (JFLD.LE.NFLD) .AND. .NOT. FOUND )
           IF ( JFLD .GT. 1 ) THEN
-            IF ( FIELD_COL(JLFD) .GT. FIELD_COL(JFLD-1) ) THEN
+            IF ( FIELD_COL(JFLD) .GT. FIELD_COL(JFLD-1) ) THEN
               JFLD = JFLD + 1
             ELSE
               FOUND = .TRUE.
