@@ -5,7 +5,7 @@
 *
 *     Opens a FIT system menu file for read access. The name of the menu file
 *     for a fit genus GENUS is stored in an environment variable <GENUS>_MENU
-*     on both VMS and ULTRIX systems.
+*     on both VMS and UNIX systems.
 *
 *    Method :
 *    Deficiencies :
@@ -15,6 +15,7 @@
 *    History :
 *
 *     14 Sep 92 : Original adapted from FIT_MENU (DJA)
+*     11 Nov 94 : Use AIO for input (DJA)
 *
 *    Type definitions :
 *
@@ -27,23 +28,23 @@
 *
 *    Import :
 *
-      CHARACTER*4        GENUS			! Model genus
+      CHARACTER*(*)		GENUS			! Model genus
 *
 *    Export :
 *
-      INTEGER            MFD                    ! FIO menu file descriptor
+      INTEGER            	MFD                    	! AIO input descriptor
 *
 *    Status :
 *
-      INTEGER            STATUS
+      INTEGER            	STATUS
 *
 *    Function declarations :
 *
-      INTEGER            CHR_LEN
+      INTEGER            	CHR_LEN
 *
 *    Local variables :
 *
-      CHARACTER*132      MFILE                  ! Menu file name
+      CHARACTER*132      	MFILE                  ! Menu file name
 *-
 
 *    Status check
@@ -57,17 +58,21 @@
         GOTO 99
       END IF
 
-*    Access menu file
-      CALL FIO_OPEN( MFILE, 'READ', 'LIST', 0, MFD, STATUS )
+*    Set up AIO for input. Use the AST_MENU_PATH path variable, and
+*    a default extension of '.mnu'
+      CALL AIO_SETPATH( 'AST_MENU_PATH', STATUS )
+      CALL AIO_SETDEXT( '.mnu', STATUS )
+
+*    Access menu file for nested read access
+      CALL AIO_OPEN( MFILE, 'NREAD', MFD, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_SETC( 'MFILE', MFILE )
         CALL ERR_REP( ' ', 'Menu file ^MFILE not found', STATUS )
-        GOTO 99
       END IF
 
 *    Exit
  99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from FIT_MEN_OPEN', STATUS )
+        CALL AST_REXIT( 'FIT_MEN_OPEN', STATUS )
       END IF
 
       END
