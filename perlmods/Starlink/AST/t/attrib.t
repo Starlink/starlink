@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 20;
+use Test::More tests => 22;
 
 require_ok("Starlink::AST");
 {
@@ -51,13 +51,16 @@ $pcdmap->SetD("PcdCen", 100.0);
 is( $pcdmap->GetD("PcdCen(1)"), 100.0, "PcdCen attribute of pcdmap after setting both axes at once (axis 1)");
 is( $pcdmap->GetD("PcdCen(2)"), 100.0, "PcdCen attribute of pcdmap after setting both axes at once (axis 2)");
 
-$pcdmap->Set("PcdCen(1)" => 25,
-             "PcdCen(2)" => 50,
-            );
+$pcdmap->Set("PcdCen(1)" => 25, "PcdCen(2)" => 50 );
 my %attribs = $pcdmap->Get("PcdCen", "Disco");
 is( $attribs{'Disco'}, 1, "Disco attribute of pcdmap through hash");
-is( $attribs{'PcdCen'}, 25, "PcdCen attribute of pcdmap through hash");
-
+is( $attribs{'PcdCen'}, 25, "PcdCen(1) attribute of pcdmap through hash");
+      
 my $disco = $pcdmap->Get("Disco");
-is( $disco, 1, "Disco attribute of pcdmap through scalar context");
+is( $disco, 1, "Disco attribute of pcdmap through scalar context");      
+            
+my %attribs2 = $pcdmap->Get("PcdCen(1)", "PcdCen(2)");
+is( $attribs2{'PcdCen(1)'}, 25, "PcdCen(1) attribute of pcdmap through hash");
+is( $attribs2{'PcdCen(2)'}, 50, "PcdCen(2) attribute of pcdmap through hash");
+
 }
