@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ifd">
+  <version>1.2-8</version>
+  <path>applications/ifd</path>
+  <description>Interface Definition Files</description>
+  <abstract>
+    <p>Interface Definition Files (IFDs) provide a generic method of 
+    defining the interface between Starlink (ADAM) applications and
+    various software environments. Software is described which enables
+    developers to create IFDs and use them to create files required
+    by the Starlink or IRAF environments.</p>
+  </abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan Chipperfield</name>
+    </person>
+  </developers>
+  <!-- <documentation> ssn68</documentation> -->
+  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
