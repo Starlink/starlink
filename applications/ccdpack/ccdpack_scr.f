@@ -104,8 +104,8 @@
       ELSE IF ( ACTION .EQ. 'REDUCE' ) THEN
          CALL REDUCE( PID, STATUS )
 
-      ELSE IF ( ACTION .EQ. 'RUNXREDUCE' ) THEN
-         CALL RUNXREDUCE( PID, STATUS )
+      ELSE IF ( ACTION .EQ. 'XREDUCE' ) THEN
+         CALL XREDUCE( PID, STATUS )
 
 *  If the action name is not recognised, then report an error.
       ELSE
