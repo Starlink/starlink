@@ -55,6 +55,12 @@
 
         I_GUI=(STATUS.EQ.SAI__OK)
 
+*  update noticeboard with current GCB
+      ELSEIF (ACTION.EQ.'UPDATE') THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,'GCB',GCBID,STATUS)
+        CALL GCB_FILLSHADOW(GCBID,STATUS)
+
       ENDIF
 
       CALL USI_CLOSE()
