@@ -604,7 +604,7 @@ kpg1_thrsub.f kpg1_thrsuw.f kpg1_thrsw.f kpg1_trald.f kpg1_trbod.f \
 kpg1_trlib.f kpg1_trlid.f kpg1_trlii.f kpg1_trlir.f kpg1_trliub.f \
 kpg1_trliuw.f kpg1_trliw.f kpg1_trpid.f kpg1_trpir.f kpg1_unz2r.f \
 kpg1_vasvb.f kpg1_vasvd.f kpg1_vasvi.f kpg1_vasvr.f kpg1_vasvub.f \
-kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_verb.f \
+kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_verb.f kpg1_debug.f \
 kpg1_wgndf.f kpg1_wmodr.f kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f \
 kpg1_wrlst.f kpg1_wwrt.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
@@ -2198,6 +2198,7 @@ kpg1_vasvuw.o:	 SAE_PAR PRM_PAR
 kpg1_vasvw.o:	 SAE_PAR PRM_PAR
 kpg1_vec2n.o:	 SAE_PAR NDF_PAR
 kpg1_vect.o:	 SAE_PAR
+kpg1_debug.o:	 SAE_PAR PSX_ERR
 kpg1_verb.o:	 SAE_PAR PSX_ERR
 kpg1_wcatw.o:    SAE_PAR DAT_PAR CAT_PAR GRP_PAR AST_PAR KPG_AST
 kpg1_wgndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR

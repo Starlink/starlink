@@ -19,7 +19,7 @@ ctm_com
 
 # Generic source files needed for kpg_source.tar:
 KPG_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \
-kpg1_hsta.gen kpg1_hstf.gen kpg1_thrs.gen kpg1_bl1d.gen
+kpg1_hsta.gen kpg1_hstf.gen kpg1_thrs.gen kpg1_bl1d.gen kpg1_stat.gen
 
 # Non-generic source files needed for kpg_source.tar:
 KPG_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
@@ -66,9 +66,8 @@ kpg1_ghstw.f kpg1_gilst.f kpg1_gkeyb.f kpg1_gkeyd.f kpg1_gkeyi.f \
 kpg1_gkeyr.f kpg1_gkeyub.f kpg1_gkeyuw.f kpg1_gkeyw.f kpg1_gnlbu.f \
 kpg1_gntit.f kpg1_gpcol.f kpg1_gtndf.f kpg1_hcond.f kpg1_hconr.f \
 kpg1_hmltd.f kpg1_hmltr.f kpg1_hmsg.f kpg1_hrcpr.f \
-kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f kpg1_hstab.f \
-kpg1_hstad.f kpg1_hstai.f kpg1_hstar.f kpg1_hstaub.f kpg1_hstauw.f \
-kpg1_hstaw.f kpg1_hstlo.f kpg1_hstqb.f kpg1_reprt.f \
+kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f \
+kpg1_hstlo.f kpg1_hstqb.f kpg1_reprt.f \
 kpg1_hstqd.f kpg1_hstqi.f kpg1_hstqr.f kpg1_hstqub.f kpg1_hstquw.f \
 kpg1_hstqw.f kpg1_iderr.f kpg1_imprg.f kpg1_incod.f kpg1_incor.f \
 kpg1_isclb.f kpg1_iscld.f kpg1_iscli.f kpg1_isclr.f kpg1_isclw.f \
@@ -109,8 +108,7 @@ kpg1_rmapub.f kpg1_rmapuw.f kpg1_rmapw.f kpg1_satkc.f kpg1_satkd.f \
 kpg1_sclof.f kpg1_scrsz.f kpg1_sdimp.f kpg1_sdtrn.f kpg1_secsh.f \
 kpg1_seed.f kpg1_sgdim.f kpg1_sgdig.f kpg1_slice.f kpg1_solin.f \
 kpg1_sqsud.f kpg1_sqsui.f kpg1_sqsur.f kpg1_ssazd.f kpg1_ssazr.f \
-kpg1_sscof.f kpg1_statb.f kpg1_statd.f kpg1_stati.f kpg1_statr.f \
-kpg1_statub.f kpg1_statuw.f kpg1_statw.f kpg1_stdsd.f kpg1_stdsr.f \
+kpg1_sscof.f kpg1_stdsd.f kpg1_stdsr.f \
 kpg1_stfld.f kpg1_stflr.f kpg1_storb.f kpg1_stord.f kpg1_stori.f \
 kpg1_storr.f kpg1_storub.f kpg1_storuw.f kpg1_storw.f kpg1_tdlib.f \
 kpg1_tdlid.f kpg1_tdlii.f kpg1_tdlir.f kpg1_tdliub.f kpg1_tdliuw.f \
@@ -144,7 +142,7 @@ kpg1_plotp.f kpg1_plots.f kpg1_pltln.f kpg1_pqvid.f kpg1_prnth.f \
 kpg1_rdast.f kpg1_rdlst.f kpg1_short.f kpg1_verb.f kpg1_fit1d.f \
 kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f kpg1_wrlst.f kpg1_wwrt.f \
 kpg1_tkast.c kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f \
-kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f \
+kpg1_debug.f kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f \
 kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f kpg1_mkpos.f \
 kpg1_graph.f kpg1_ndfnm.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
@@ -169,7 +167,8 @@ kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
 kpg1_hstaub.f kpg1_hstauw.f kpg1_hstfd.f kpg1_hstfr.f kpg1_thrsb.f \
 kpg1_thrsd.f kpg1_thrsi.f kpg1_thrsr.f kpg1_thrsub.f kpg1_thrsuw.f \
 kpg1_thrsw.f kpg1_bl1dr.f kpg1_bl1dd.f kpg1_bl1di.f kpg1_bl1dw.f \
-kpg1_bl1db.f kpg1_bl1dub.f kpg1_bl1duw.f 
+kpg1_bl1db.f kpg1_bl1dub.f kpg1_bl1duw.f kpg1_statb.f kpg1_statd.f \
+kpg1_stati.f kpg1_statr.f kpg1_statub.f kpg1_statuw.f kpg1_statw.f 
 
 # The contents of the fts_source.tar file:
 FTS_SOURCE = fts_par fts1_axis.f fts1_blcar.f fts1_bswap.f fts1_comnt.f fts1_crndf.f \
