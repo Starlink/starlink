@@ -140,13 +140,13 @@
 #  used as part of the file filtering mechanisms (note this isn't 
 #  therefore set by any values in .ccdpack, it's important that
 #  the conversion filters are actually setup).
-   set CCDimagefilters {{NDF "*.sdf"}}
+set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
    if { [info exists env(NDF_FORMATS_IN)] } { 
       set new_types [split $env(NDF_FORMATS_IN) ","]
       foreach pair $new_types { 
          regexp {([^\(]*).([^\)]*)} $pair dummy name type
-         if { $name != "FITS" && $name != "NDF" && $name != "FIT" } { 
-            lappend CCDimagefilters [list $name *${type}]
+         if { $name != "NDF" } { 
+            lappend CCDimagefilters [list $name\(${type}\) *${type}]
          }
       }
    }
