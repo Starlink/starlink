@@ -30,7 +30,7 @@ AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_FC_LIBRARY_LDFLAGS
+AC_FC_LIBRARY_LDFLAGS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae ems cnf])

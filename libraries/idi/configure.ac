@@ -25,7 +25,7 @@ AC_PATH_XTRA
 AC_PROG_LIBTOOL
 
 
-STAR_FC_LIBRARY_LDFLAGS
+AC_FC_LIBRARY_LDFLAGS
 
 dnl    make check requires starlink monolith
 STAR_MONOLITHS
