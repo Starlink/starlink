@@ -161,7 +161,7 @@ c     :                         %VAL(VPTR), STATUS )
 
 *    Simple object
         ELSE
-          CALL ADI_NEW( ID, 'CHAR', NDIM, DIMS, STATUS )
+          CALL ADI_NEW( 'CHAR', NDIM, DIMS, ID, STATUS )
           IF ( NDIM .EQ. 0 ) THEN
             CALL ADI_PUT0C( ID, VALUE(:CLEN), STATUS )
           ELSE
