@@ -85,7 +85,9 @@ it produces an <funcname/error/.
 	 (xreftarget (and xrefid
 			  (node-list-or-false (element-with-id xrefid docelem))))
 	 (xrefurl (and xreftarget
-		       (get-link-policy-target xreftarget))))
+		       (get-link-policy-target xreftarget)))
+	 (linktext (attribute-string (normalize "text")
+				     (current-node))))
     (if (string=? (gi docelem)
 		  (normalize "documentsummary")) ; sanity check...
 	(if xrefent
@@ -95,11 +97,15 @@ it produces an <funcname/error/.
 		    (make element gi: "A"
 			  attributes: (list (list "HREF"
 						  (cdr xrefurl)))
-			  (with-mode mk-docxref
-			    (process-node-list (document-element xreftarget)))
-			  (literal ": ")
-			  (with-mode section-reference
-			    (process-node-list xreftarget))))
+			  (if linktext
+			      (literal linktext)
+			      (make sequence
+				(with-mode mk-docxref
+				  (process-node-list (document-element
+						      xreftarget)))
+				(literal ": ")
+				(with-mode section-reference
+				  (process-node-list xreftarget))))))
 		(make element gi: "A"	; link to whole document
 		      attributes:
 		      (list (list "HREF"
@@ -109,8 +115,10 @@ it produces an <funcname/error/.
 					(string-append %starlink-document-server%
 						       url)
 					(href-to docelem reffrag: #f)))))
-		      (with-mode mk-docxref
-			(process-node-list docelem))))
+		      (if linktext
+			  (literal linktext)
+			  (with-mode mk-docxref
+			    (process-node-list docelem)))))
 	    (error "No value for docxref's DOC attribute"))
 	(error (string-append "DOCXREF target " xrefent
 			      " has document type " (gi docelem)
