@@ -118,6 +118,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.12  1998/01/15 19:36:41  timj
+*     Return immediately if N_MEASUREMENTS is 0
+*
 *     Revision 1.11  1998/01/12 20:32:12  timj
 *     Return the reduced chi square
 *
@@ -248,6 +251,11 @@
          STATUS = SAI__ERROR
          CALL ERR_REP (' ','SCULIB_FIT_SKYDIP: Too many data points.',
      :        STATUS)
+         RETURN
+      ELSE IF (N_MEASUREMENTS .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP(' ','SCULIB_FIT_SKYDIP: There are no points '//
+     :        'available for fitting', STATUS)
          RETURN
       END IF
 
