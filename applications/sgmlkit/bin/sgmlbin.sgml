@@ -14,29 +14,18 @@
 
 <title>Supporting programs</title>
 
-<userkeywords>This and that
 
-<history>
-<change author=ng date='01-jan-2000'>Created
-</history>
-
-<!--
 <authorlist>
-
 <author id=ng affiliation='Starlink, Glasgow'
-email='norman@astro.gla.ac.uk'
-webpage='http://www.astro.gla.ac.uk/users/norman/'>
-Norman Gray
+	email='norman@astro.gla.ac.uk'
+	webpage='http://www.astro.gla.ac.uk/users/norman/'>
+	Norman Gray
 <author id=mbt affiliation='Starlink, Institute of Astronomy, Cambridge'
 	email='mbt@ast.cam.ac.uk'>
-Mark Taylor
-<codegroup>Supporting programs
--->
+	Mark Taylor
 
 &sgml2docs;
 
 &sgml2xml;
-
-<codegroup>Help programs
 
 &sgml2hlp;
