@@ -469,7 +469,7 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
     // passed to ImageData via which any further control is made.
     const char* type = fileSuffix( filename );
     ImageIO imio;
-    
+
     //  ALLAN: fileSuffix(filename) might return "fits.Z" or "fits.gz"
     //  for a compressed FITS file.
     char* p = (char *) strchr( filename, '.' );
@@ -477,10 +477,10 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
     if ( p && ! strstr( p, ".fit" ) ) {
         isfits = 0;
     }
-    
+
     if ( ( !isfits && isNDFtype( type ) ) || slice || path ) {
         if ( slice || path || fitsext ) {
-            
+
             //  Construct a complete name, including the slice, FITS
             //  extension and or path name. Note if a HDS path is
             //  given then we must avoid including the file extension.
@@ -496,18 +496,18 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
             }
             if ( fitsext ) strcat( fullname, fitsext );
             if ( slice ) strcat( fullname, slice );
-            
+
             //  Open image.
             imio = NDFIO::read( fullname, component() );
             delete fullname;
-            
+
         } else {
-            
+
             //  Plain name so just open image.
             imio = NDFIO::read( filename, component() );
         }
     }  else {
-        
+
         //  Note: Use special FITS class so that we can use AST for
         //  dealing with astrometry.
         imio = StarFitsIO::read( filename, Mem::FILE_PRIVATE | Mem::FILE_RDWR );
@@ -515,7 +515,7 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
     if ( imio.status() != 0 ) {
         return (ImageData *) NULL;
     }
-    
+
     //  Return the new image.
     return makeImage( imio );
 }
@@ -917,28 +917,28 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::foreignCmd" << endl;
 #endif
-    
+
     // Stop if no image loaded.
     if ( !image_ ) {
         return TCL_OK;
     }
-    
+
     // Check number of arguments.
     if ( argc != 2 ) {
         set_result( "number of arguments wrong, require 2: command qualifiers" );
         return TCL_ERROR;
     }
-    
+
     // Now check for its existence and invoke it.
     for ( unsigned int i = 0; i < sizeof( foreigncmds_ ) / sizeof( *foreigncmds_); i++ ) {
         StarRtdForeignCmds *t = &foreigncmds_[i];
         if ( strcmp( t->name, argv[0] ) == 0 ) {
-            
+
             //  Matched a command so construct the necessary image
             //  information structure and invoke the command.
             StarImageInfo *info = new StarImageInfo;
             ImageIO imio = image_->image();
-            
+
             //  Look for NDF identifier.
             char *id = imio.get( "NDFID" );
             if ( id ) {
@@ -951,12 +951,12 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
             info->nx = (int) image_->width();
             info->ny = (int) image_->height();
             info->interp = interp_;
-            
+
             //  If the image representation is byte swapped (i.e. FITS on
             //  some architectures) then inform foreign method that it
             //  needs to deal with this.
             info->swap = swapNeeded();
-            
+
             //  Invoke foreign command.
             char *errStr;
             int result = ( *t->fptr )( info, argv[1], &errStr );
@@ -971,7 +971,7 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
             }
         }
     }
-    
+
     // Foreign command not found.
     return error( "unknown foreign command");
 }
@@ -3343,12 +3343,12 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::contourCmd" << endl;
 #endif
-    
+
     int inerror = 0;
     if ( !image_ ) {
         return error("no image loaded");
     }
-    
+
     // Do the initial split of the input lists.
     char **levelsArgv;
     int nlevels = 0;
@@ -3361,7 +3361,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             error( "sorry: failed to decode the contour levels (check format)" );
             inerror = 1;
         }
-        
+
         //  Convert these into doubles.
         levels = new double[nlevels];
         for ( int index = 0; index < nlevels; index++ ) {
@@ -3373,7 +3373,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             }
         }
     }
-    
+
     //  Get the rtdimage that contains the image we want to contour
     //  really.
     StarRtdImage *rtdimage = (StarRtdImage *) NULL;
@@ -3386,7 +3386,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             }
         }
     }
-    
+
     //  Get whether plotting is careful, or fast.
     int careful = 1;
     if ( argc >= 3 ) {
@@ -3395,7 +3395,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             inerror = 1;
         }
     }
-    
+
     //  Get whether using smooth polylines (must be fast).
     int smooth = 0;
     if ( argc >= 4 ) {
@@ -3404,7 +3404,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             inerror = 1;
         }
     }
-    
+
     //  Get the preferences, if given
     char **prefs;
     int nprefs = 0;
@@ -3415,7 +3415,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             inerror = 1;
         }
     }
-    
+
     //  Get the region coordinates. Note just use Contour native
     //  facilities for this, not the plot (this is potentially much
     //  more efficient). These may be given as "" in which case they are
@@ -3443,11 +3443,11 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
                             break;
                         }
                     }
-                    
+
                     //  Transform these positions into image coordinates.
                     canvasToImageCoords( region[0], region[1], 0 );
                     canvasToImageCoords( region[2], region[3], 0 );
-                    
+
                     //  Correct for any flips etc. by re-picking the bounds.
                     double temp[4];
                     temp[0] = region[0];
@@ -3462,7 +3462,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             }
         }
     }
-    
+
     //  Now see if a copy of the current WCS frameset is available (we
     //  use a copy so we can  modify without changing any other elements).
     StarWCS* wcsp = getStarWCSPtr();
@@ -3471,13 +3471,13 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     }
     AstFrameSet *wcs = wcsp->astWCSCopy();
     if ( wcs == (AstFrameSet *) NULL ) {
-        
+
         //  If no WCS is available then we need to create a suitable AST
         //  frameset. This just maps GRID coordinates to themselves, or to
         //  pixel coordinates.
         wcs = makeGridWCS();
     }
-    
+
     //  See if another image is to be used for contouring. If so then
     //  this is related to the image displayed by some AST based
     //  transformation (which may be pixel coordinates or a sky-based
@@ -3486,7 +3486,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     ImageIO imageIO = image_->image();
     AstFrameSet *farwcs = NULL;
     if ( rtdimage != (StarRtdImage *) NULL ) {
-        
+
         //  OK, attempt to locate a WCS for this image.
         ImageData *farimagedata = rtdimage->image();
         imageIO = farimagedata->image();
@@ -3496,7 +3496,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
         }
         farwcs = wcsp->astWCSCopy();
         if ( farwcs == (AstFrameSet *) NULL ) {
-            
+
             //  If no WCS is available then we need to create a suitable AST
             //  frameset. This just maps GRID coordinates to themselves, or to
             //  pixel coordinates.
@@ -3504,64 +3504,64 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
         }
     }
     if ( ! inerror && wcs != (AstFrameSet *) NULL ) {
-        
+
         //  Current frame is the GRID coordinates of the image to be
         //  contoured.
         astSetI( wcs, "Current", AST__BASE );
-        
+
         //  Create an AstPlot that incorporates an additional FrameSet
         //  that describes an system we want to add.
         AstPlot *plot = createPlot( wcs, (AstFrameSet *) farwcs, 1, 1, region );
         inerror = ( inerror || plot == (AstPlot *) NULL );
-        
+
         //  Initialise the interpreter and canvas name for the Tk plotting
         //  routines.
         astTk_Init( interp_, canvasName_ );
-        
+
         //  We want to draw polylines, not line segments. Polylines may be
         //  smooth.
         astTk_LineType( 0, smooth );
-        
+
         //  Define a tag for all items created in the plot.
         astTk_Tag( ast_tag() );
-        
+
         if ( astOK && !inerror ) {
-            
+
             //  Create a contour object, setting the contour levels, and
             //  line attributes.
             Contour contour( imageIO, plot, levels, nlevels,
                              (const char **) prefs, nprefs );
-            
+
             //  Establish if plotting is careful or fast.
             contour.setCareful( careful );
-            
+
             //  Tell the contour object if it needs to byte swap the image
             //  data. This is only necessary if the image is FITS on a non
             //  bigendian machine.
             contour.setSwap( swapNeeded() );
-            
+
             //  Set the region of image to contour (tuned to match grid plots).
             if ( ncoords > 0 ) {
                 contour.setRegion( (int)(region[0] + 1), (int)(region[1] + 1),
                                    (int)(region[2] - region[0] + 1 ),
                                    (int)(region[3] - region[1] + 1 ) );
             }
-            
+
             //  Draw the contour. Only result in drawn or not.
             int ndrawn = contour.drawContours();
             set_result( ndrawn );
         }
-        
+
         //  Free the plot.
         plot = (AstPlot *) astAnnul( plot );
-        
+
         //  Reset the tag associated with AST grid items.
         astTk_Tag( NULL );
-        
+
         //  Switch line type back to default.
         astTk_LineType( 1, 0 );
     }
-    
+
     //  Free the lists.
     if ( ncoords > 0 ) {
         Tcl_Free( (char *) coordArgv );
@@ -3572,15 +3572,15 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     if ( nlevels > 0 ) {
         Tcl_Free( (char *) levelsArgv );
     }
-    
+
     //  Free the WCS copy.
     wcs = (AstFrameSet *) astAnnul( wcs );
-    
+
     //  Free the contours.
     if ( nlevels > 0 ) {
         delete [] levels;
     }
-    
+
     //  Tidy up.
     if ( inerror || ! astOK ) {
         if ( !astOK ) {
@@ -4552,7 +4552,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
     *path = new char[namelen];
     *fitsext = new char[namelen];
     strcpy( *fullname, imagename );
-    
+
     //  Look for a slice at the end of the file name. This needs to be
     //  removed while we do other tests.
     char *left = strrchr( *fullname, '(');
@@ -4563,7 +4563,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
         *left = '\0';
         haveslice = 1;
     }
-    
+
     //  Look for a FITS extension, this should be before the slice,
     //  but after the file type (probably .fits).
     left = strrchr( *fullname, '[');
@@ -4578,7 +4578,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
     //  See if fullname is now just an existing file known to NDF.
     const char* type = fileSuffix( *fullname );
     if ( isNDFtype( type ) ) {
-        
+
         //  Check that name is a file, if so nothing to do except to check
         //  that it is a regular file.
         if ( ! fileExists( *fullname ) ) {
@@ -4603,11 +4603,11 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
             return TCL_OK;
         }
     } else {
-        
+
         //  Could be FITS file. No funny possibilities for these names.
         char* p = strchr( *fullname, '.' );
         if ( p && strstr( p, ".fit" ) != (char *) NULL ) {
-            
+
             //  Is a FITS name, does file exist? If not assume might
             //  be NDF component and pass on. Note a slice is valid,
             //  but ultimately means this will be accessed as an NDF.
@@ -4626,7 +4626,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
             }
         }
     }
-    
+
     //  OK. File as given doesn't correspond to a disk file. Either the
     //  name is wrong, or we may have a path to a HDS component. Look
     //  for a component name which should be after the ".sdf" string,
@@ -4638,7 +4638,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
         if ( *sdf == '.' ) {
             strcpy( *path, sdf );
             *sdf = '\0';
-            
+
             //  OK fullname should be a filename.
             found = fileExists( *fullname );
         }
@@ -4875,46 +4875,48 @@ int StarRtdImage::remoteCmd( int argc, char *argv[] )
 //   Purpose:
 //      Implement the "readonly" command. This allows a readonly
 //      displayed NDF to be switched to writable mode and the current
-//      readonly status of the image to be determined. FITS images are
-//      always (XXX) mapped as read-write.
+//      readonly status of the image to be determined.
+//
+//      FITS images are always fixed readonly or readwrite so the
+//      result is just readonly status.
 //
 //-
 int StarRtdImage::readonlyCmd( int argc, char *argv[] )
 {
-   int readonly = 1;
-   int isndf = 0;
-   NDFIO *ndf;
-   ImageIO imio = image_->image();
+    int readonly = 1;
+    int isndf = 0;
+    NDFIO *ndf;
+    StarFitsIO *fits;
+    ImageIO imio = image_->image();
 
-   //  Inquire image readonly status.
-   if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
-      ndf = (NDFIO *) imio.rep();
-      readonly = ndf->getReadonly();
-      isndf = 1;
-   } else {
+    //  Inquire image readonly status.
+    if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
+        ndf = (NDFIO *) imio.rep();
+        readonly = ndf->getReadonly();
+        isndf = 1;
+    } else {
+        fits = (StarFitsIO *) imio.rep();
+        readonly = fits->getReadonly();
+        isndf = 0;
+    }
 
-      //  FITS images are writable.
-      readonly = 0;
-      isndf = 0;
-   }
+    //  If just inquiring or this is a FITS image then return value.
+    if ( argc == 0 || ! isndf ) {
+        return set_result( readonly );
+    }
 
-   //  If just inquiring then return value.
-   if ( argc == 0 ) {
-      return set_result( readonly );
-   }
+    //  Get new value.
+    int value;
+    if ( Tcl_GetInt( interp_, argv[0], &value ) != TCL_OK ) {
+        return error( argv[0], " is not an integer");
+    }
 
-   //  Get new value.
-   int value;
-   if ( Tcl_GetInt( interp_, argv[0], &value ) != TCL_OK ) {
-      return error( argv[0], " is not an integer");
-   }
-
-   //  If readonly status changed then re-read image.
-   if ( value != readonly && isndf ) {
-      ndf->setReadonly( value );
-      ndf->resetDisplayable();
-   }
-   return set_result( value );
+    //  If readonly status changed then re-read image.
+    if ( value != readonly && isndf ) {
+        ndf->setReadonly( value );
+        ndf->resetDisplayable();
+    }
+    return set_result( value );
 }
 
 //+
@@ -5174,7 +5176,7 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
       delete [] newdec;
       return error( "failed to transform positions" );
    }
-   
+
    //  Construct a return list of the values. Note we want the
    //  formatting to match the base frame (where we're going).
    int base = astGetI( wcs, "Base" );
@@ -5184,7 +5186,7 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
    double point[2];
    for (i = 0; i < npoints; i++) {
 
-      //  Normalize and format the ra,dec position arguments using the 
+      //  Normalize and format the ra,dec position arguments using the
       //  base frame default formatting.
       point[0] = newra[i];
       point[1] = newdec[i];
@@ -5210,7 +5212,7 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
 //   StarRtdImage::astwarningsCmd
 //
 //   Purpose:
-//      Return the contents of any ASTWARN cards 
+//      Return the contents of any ASTWARN cards
 //
 //   Arguments:
 //      None.
@@ -5273,7 +5275,7 @@ int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
 //                 profile data values.
 //
 //   Return:
-//      A list of two values, the number of positions written to the X 
+//      A list of two values, the number of positions written to the X
 //      and Y profiles.
 //-
 
@@ -5306,7 +5308,7 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
    double* ycoords = new double[h];
    double* yvalues = new double[h*2];
 
-   //  And get the profile information. Do this by creating a suitable 
+   //  And get the profile information. Do this by creating a suitable
    //  profiling object and passing it a reference to the image data
    //  values.
    ImageIO imageIO = image_->image();
@@ -5331,8 +5333,8 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
        //  Transfer X index and data value array into two BLT vectors.
        status = Blt_GraphElement( interp_, argv[0], argv[2],
                                   numValues[0]*2, xvalues, argv[9],
-                                  argv[10] ); 
-       
+                                  argv[10] );
+
        //  Transfer X coordinates into BLT vector.
        if ( status == TCL_OK ) {
            status = resetBltVector( numValues[0], xcoords, argv[8] );
@@ -5342,9 +5344,9 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
        if ( status == TCL_OK ) {
            status = Blt_GraphElement( interp_, argv[1], argv[2],
                                       numValues[1]*2, yvalues,
-                                      argv[12], argv[13] ); 
+                                      argv[12], argv[13] );
        }
-       
+
        //  Transfer X coordinates into BLT vector.
        if ( status == TCL_OK ) {
            status = resetBltVector( numValues[1], ycoords, argv[11] );
@@ -5374,12 +5376,12 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
 //
 //     vecName = name of BLT vector to modify.
 //-
-int StarRtdImage::resetBltVector( const int num, const double *valueArr, 
-                                  char *vecName ) 
+int StarRtdImage::resetBltVector( const int num, const double *valueArr,
+                                  char *vecName )
 {
     int i;
     int nbytes = sizeof(double) * num;
-    
+
     /*  Note: Blt_Vector::arraySize is the number of bytes! */
     Blt_Vector *vecPtr;
     double *vecArray;
@@ -5406,8 +5408,8 @@ int StarRtdImage::resetBltVector( const int num, const double *valueArr,
     for ( i = 0; i < num; i++ ) {
         vecArray[i] = valueArr[i];
     }
-    
-    if ( Blt_ResetVector( vecPtr, vecArray, num, nbytes, TCL_DYNAMIC ) 
+
+    if ( Blt_ResetVector( vecPtr, vecArray, num, nbytes, TCL_DYNAMIC )
          != TCL_OK ) {
         return TCL_ERROR;
     }
@@ -5423,13 +5425,13 @@ int StarRtdImage::resetBltVector( const int num, const double *valueArr,
 //   Return:
 //      1 if swap is need, 0 otherwise.
 //-
-int StarRtdImage::swapNeeded() 
+int StarRtdImage::swapNeeded()
 {
     int swap = 0;
     ImageIO imio = image_->image();
     ImageIO *imptr = &imio;
 
-    //  Check the ImageIO format. If this is "native" then the data is 
+    //  Check the ImageIO format. If this is "native" then the data is
     //  in the machine format already (NDF).
     if ( imptr->nativeByteOrder() ) {
         swap = 0;

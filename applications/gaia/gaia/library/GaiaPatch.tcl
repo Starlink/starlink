@@ -94,6 +94,8 @@
 #        Converted to itcl2.0.
 #     07-FEB-2000 (PWD):
 #        Changed to work with readonly status of NDFs.
+#     14-AUG-2000 (PWD):
+#        FITS images can be readonly too (and must remain this).
 #     {enter_further_changes_here}
 
 #-
@@ -387,25 +389,30 @@ itcl::class gaia::GaiaPatch {
             }
             if { $backok } {
 
-               #  Make sure that displayed image is modifiable.
-               $itk_option(-rtdimage) readonly 0
+               #  Make sure that displayed image is modifiable, if not 
+               #  possible then issue an error.
+               set readonly [$itk_option(-rtdimage) readonly 0]
+               if { !$readonly } {
 
-               #  Combine the bounding boxes to derive the extent of the
-               #  image that needs to be processed (saves time over
-               #  processing whole).
-               lassign $fit_region xb1 yb1 xb2 yb2
-               lassign $replace_region xk1 yk1 xk2 yk2
-               set region "[min $xb1 $xb2 $xk1 $xk2] [min $yb1 $yb2 $yk1 $yk2] \
+                  #  Combine the bounding boxes to derive the extent of the
+                  #  image that needs to be processed (saves time over
+                  #  processing whole).
+                  lassign $fit_region xb1 yb1 xb2 yb2
+                  lassign $replace_region xk1 yk1 xk2 yk2
+                  set region "[min $xb1 $xb2 $xk1 $xk2] [min $yb1 $yb2 $yk1 $yk2] \
                   [max $xb1 $xb2 $xk1 $xk2] [max $yb1 $yb2 $yk1 $yk2]"
-
-               #  Run patch command.
-               $itk_option(-rtdimage) foreign patch \
-                  "-new GaiaPatchNew.ard -fit GaiaPatchFit.ard \
+                  
+                  #  Run patch command.
+                  $itk_option(-rtdimage) foreign patch \
+                     "-new GaiaPatchNew.ard -fit GaiaPatchFit.ard \
                    -keep $replace_region -region $region \
                    -order $itk_option(-order) \
                    -scale $itk_option(-noise_factor) \
                    -usevar $variance_($this)"
-               set modified_ 1
+                  set modified_ 1
+               } else {
+                  error_dialog "Sorry this image cannot be modified (file is readonly)."
+               }
             } else {
                error_dialog "No background regions available."
             }

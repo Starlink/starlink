@@ -4,17 +4,21 @@
  * "@(#) $Id$"
  *
  * StarFitsIO.C - method definitions for class StarFitsIO, for operating on
- *                Fits files. This class redefines class FitsIO to keep the
- *                image data byte swapped, if needed, for the Starlink image
- *                processing routines.
+ *                Fits files. This class redefines class FitsIO to use
+ *                the Starlink AST library. It also forces the use of 
+ *                readonly access, if that is all that is available
  *
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  24/03/95  Created
  * Peter W. Draper 11/01/00  Rewrite, only purpose now is to
  *                           initialise WCS using StarWCS object.
- * Peter W. Draper 25/01/00  Now merges primary FITS headers with
+ *                 25/01/00  Now merges primary FITS headers with
  *                           extension headers, if reading an extension.
+ *                 14/08/00  Changed readonly access behaviour. This
+ *                           is now used when only mechanism possible,
+ *                           rather then throwing an error. The
+ *                           readonly status should be queried after opening.
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -67,53 +71,67 @@ StarFitsIO::StarFitsIO(int width, int height, int bitpix, double bzero,
 {}
 
 /*
- * Read a FITS file and return an initialized StarFitsIO object for it,
- * or NULL if there are errors.
+ *  Read a FITS file and return an initialized StarFitsIO object for it,
+ *  or NULL if there are errors.
  *
- * If filename is "-", stdin is read into a temp image file and used
+ *  If filename is "-", stdin is read into a temp image file and used
  *  as the input.
  *
- * The Mem class is used to speed up loading the file. The optional
- * mem_options control whether the memory is mapped read-only or
- * read/write (see class Mem).
+ *  The Mem class is used to speed up loading the file. The optional
+ *  mem_options control whether the memory is mapped read-only or
+ *  read/write (see class Mem).
  *
  *  Note this is copy of FitsIO::read member so that we can return a
- *  StarFitsIO object, rather than a FitsIO one.
+ *  StarFitsIO object, rather than a FitsIO one, the only
+ *  modifications are related to using a copy of the file when
+ *  readonly access is just available.
  */
-StarFitsIO* StarFitsIO::read(const char* filename, int mem_options)
+StarFitsIO* StarFitsIO::read( const char* filename, int mem_options )
 {
-    char  tmpfile[1024];
+    char tmpfile[1024];
     int istemp = 0;
 
     tmpfile[0] = '\0';
-    if (strcmp(filename, "-") == 0) { // use stdin
+    if ( strcmp( filename, "-" ) == 0 ) { // use stdin
+
         // we have to use seek later, so copy to a temp file first
-        filename =  getFromStdin(tmpfile);
-        if (filename == NULL)
+        filename = getFromStdin( tmpfile );
+        if ( filename == NULL ) {
             return NULL;
+        }
         istemp++;
     }
 
-    // check the file extension for recognized compression types
-    filename = check_compress(filename, tmpfile, sizeof(tmpfile), istemp, 1, 0);
-    if (filename == NULL) {
-        if (istemp)
-            unlink(tmpfile);
+    //  Check the file extension for recognized compression types.
+    filename = check_compress(filename, tmpfile, sizeof(tmpfile),
+                              istemp, 1, 0);
+    if ( filename == NULL ) {
+        if ( istemp )
+            unlink( tmpfile );
         return NULL;
     }
 
-    // map image file to memory to speed up image loading
-    if (mem_options == 0 && access(filename, W_OK) == 0)
+    //  If the file is read-only and read-write access was requested,
+    //  then just use readonly.
+    if ( mem_options && Mem::FILE_RDWR && access( filename, W_OK ) != 0) {
+	mem_options = 0;
+
+    } else if ( mem_options == 0 && access( filename, W_OK ) == 0 ) {
+
+        //  FitsIO behaviour. Map image file to memory to speed up
+        //  image loading
         mem_options = Mem::FILE_RDWR;
+    }
 
-    Mem header(filename, mem_options, 0);
-    if (header.status() != 0)
+    Mem header( filename, mem_options, 0 );
+    if ( header.status() != 0 ) {
         return NULL;
+    }
 
-    if (istemp)
+    if ( istemp ) {
         unlink(filename);       // will be deleted by the OS later
-
-    return initialize(header);
+    }
+    return initialize( header );
 }
 
 /*
@@ -154,6 +172,7 @@ StarFitsIO* StarFitsIO::initialize(Mem& header)
 
     return initialize(header, data, fitsio);
 }
+
 /*
  *  This static method returns an allocated FitsIO object, given the cfitsio
  *  handle.
@@ -202,3 +221,14 @@ int StarFitsIO::wcsinit()
     return wcs_.status();
 }
 
+/*
+ *  Return if the data is mapped readonly (this may happen even if
+ *  readwrite access was initially specified).
+ */
+int StarFitsIO::getReadonly() {
+    if ( header_.options() && Mem::FILE_RDWR ) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
