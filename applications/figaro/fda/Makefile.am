@@ -6,11 +6,13 @@ AM_FCFLAGS = -I../include
 lib_LTLIBRARIES = libfda.la
 
 libfda_la_SOURCES = \
-     $(PRIVATE_INCLUDES) \
-     $(F_ROUTINES)
+        $(PRIVATE_INCLUDES) \
+        $(BLOCK_DATA_FILES) \
+        $(F_ROUTINES)
 
-PRIIVATE_INCLUDES = DSA_COMMON DSA_STRUCTURE DSA_TYPES
+PRIVATE_INCLUDES = DSA_COMMON DSA_STRUCTURE DSA_TYPES
 
+BLOCK_DATA_FILES = dsa_block.f
 
 F_ROUTINES = \
 dyn_element.f dyn_increm.f dsa_open.f dsa_close.f dsa_dump_cmn.f \

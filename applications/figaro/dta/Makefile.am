@@ -6,11 +6,14 @@ AM_FCFLAGS = -I../include
 lib_LTLIBRARIES = libdta.la
 
 libdta_la_SOURCES = \
-     $(PRIVATE_INCLUDES) \
-     $(F_ROUTINES)
+        $(PRIVATE_INCLUDES) \
+        $(BLOCK_DATA_FILES) \
+        $(F_ROUTINES)
 
-PRIIVATE_INCLUDES = \
+PRIVATE_INCLUDES = \
 DTACACHE DTACODES DTAMAP DTAPROBE DTASDEF DTATCON DTATYPES HDSCODES
+
+BLOCK_DATA_FILES = dta_block.f
 
 F_ROUTINES = \
 dta_asfnam.f dta_cachel.f dta_cachen.f dta_cacheo.f dta_cacher.f \
