@@ -956,11 +956,11 @@ c                              ! axis units
       IF ( LRADEC_1 ) THEN
 
 *    Calculate base values of the output axes
-        CALL BDI_AXGET1R( OFID, 1, 'SpacedData', 2, SPARR, IDUM,
-     :                    STATUS )
+        CALL BDI_AXGET1R( IFID(FIRSTG), 1, 'SpacedData', 2, SPARR,
+     :                    IDUM, STATUS )
         XSTART = SPARR(1) + MINX * XPIX_1
-        CALL BDI_AXGET1R( OFID, 2, 'SpacedData', 2, SPARR, IDUM,
-     :                    STATUS )
+        CALL BDI_AXGET1R( IFID(FIRSTG), 2, 'SpacedData', 2, SPARR,
+     :                    IDUM, STATUS )
         YSTART = SPARR(1) + MINY * YPIX_1
 
 *    Write values axes

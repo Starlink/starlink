@@ -180,7 +180,7 @@
       CALL MSG_PRNT( VERSION )
 
 *    Get dataset
-      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', IFID, STATUS )
 
 *    Locate ASTERIX structure
       CALL ADI1_LOCAST( IFID, .FALSE., ALOC, STATUS )
@@ -200,7 +200,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get intrinsic source profile dataset
-      CALL USI_TASSOCI( 'SOURCE', '*', 'READ', SFID, STATUS )
+      CALL USI_ASSOC( 'SOURCE', 'BinDS|Array', 'READ', SFID, STATUS )
 
 *    Introduce to the psf system
       CALL PSF_GETSLOT( SFID, IPSF, STATUS )
@@ -219,8 +219,9 @@
         GOTO 99
       END IF
 
-*    Get intrinsic profile dimensions
-      CALL BDI_CHKDATA( SFID, OK, SNDIM, SDIMS, STATUS )
+*  Get intrinsic profile dimensions
+      CALL BDI_CHK( SFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( SFID, 2, SDIMS, SNDIM, STATUS )
 
 *    Check source model is pixel centred
       IF ( (((SDIMS(1)/2)*2).EQ.SDIMS(1)) .OR.
@@ -232,7 +233,7 @@
       END IF
 
 *    Map source profile data
-      CALL BDI_MAPDATA( SFID, 'READ', SDPTR, STATUS )
+      CALL BDI_MAPR( SFID, 'Data', 'READ', SDPTR, STATUS )
 
 *    Get expanded response dimensions
       CALL CMP_GET1I( RLOC, 'DIMS', 5, RDIMS, RNDIM, STATUS )
@@ -364,7 +365,7 @@
       NRDIMS(1) = XSMAX*2 + 1
       NRDIMS(2) = YSMAX*2 + 1
 
-*    Write the expanded dimensions
+*  Write the expanded dimensions
       CALL HDX_PUTI( RLOC, 'DIMS', RNDIM, NRDIMS, STATUS )
 
 *    Report compression factor
@@ -377,20 +378,18 @@
 *    Write compressed data to file
       CALL HDX_PUTR( RLOC, 'DATA_ARRAY', NUSED, %VAL(NRDPTR), STATUS )
 
-*    Unmap the index
+*  Unmap the index
       CALL CMP_UNMAP( RLOC, 'INDEX', STATUS )
 
-*    Add a bit of history
+*  Add a bit of history
       CALL HSI_ADD( IFID, VERSION, STATUS )
       HTXT(1) = 'Convolved with : {SOURCE}'
       NLINE = MXHLINE
       CALL USI_TEXT( 1, HTXT, NLINE, STATUS )
       CALL HSI_PTXT( IFID, NLINE, HTXT, STATUS )
 
-*    Release response
-      CALL BDI_RELEASE( SFID, STATUS )
+*  Release response
       CALL DAT_ANNUL( RLOC, STATUS )
-      CALL BDI_RELEASE( IFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
