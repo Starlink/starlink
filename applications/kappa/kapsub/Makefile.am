@@ -91,21 +91,21 @@ SUFFIXES = .gen .gdr .gr .gbdirw .f
 
 #  Run generic to get numeric types.
 .gen.f:
-	$(GENERIC)  -t n $<
+	$(FGENERIC)  -t n $<
 
 .gdr.f:
 	cp $< $(<:.gdr=.gen)
-	$(GENERIC)  -t dr $(<:.gdr=.gen)
+	$(FGENERIC)  -t dr $(<:.gdr=.gen)
 	rm $(<:.gdr=.gen)
 
 .gr.f:
 	cp $< $(<:.gr=.gen)
-	$(GENERIC)  -t r $(<:.gr=.gen)
+	$(FGENERIC)  -t r $(<:.gr=.gen)
 	rm $(<:.gr=.gen)
 
 .gbdirw.f:
 	cp $< $(<:.gbdirw=.gen)
-	$(GENERIC)  -t bdirw $(<:.gbdirw=.gen)
+	$(FGENERIC)  -t bdirw $(<:.gbdirw=.gen)
 	rm $(<:.gbdirw=.gen)
 
 AM_FCFLAGS = @TCL_CFLAGS@ @TK_CFLAGS@
