@@ -3379,6 +3379,38 @@ DOUBLE PRECISION Description :
       RETURN
       END
 
+
+*+RAT_GETEVE - slice and map range of data
+      SUBROUTINE RAT_GETEVE(PTRA, NELEM, T1, T2, T3, T4,
+     :                                T5, T6, T7, STATUS)
+*    Description :
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global parameters
+*    Status :
+      INTEGER STATUS
+*    Structures :
+*    Import :
+      INTEGER PTRA(7)                    ! pointers to mapped data
+      INTEGER NELEM                      ! number of elements mapped
+*    Export :
+      INTEGER T1(*),T2(*),T3(*),T4(*),T5(*),T6(*),T7(*)
+*    Local variables :
+
+      CALL ARR_COP1I(NELEM,%val(PTRA(1)),T1,STATUS)
+      CALL ARR_COP1I(NELEM,%val(PTRA(2)),T2,STATUS)
+      CALL ARR_COP1I(NELEM,%val(PTRA(3)),T3,STATUS)
+      CALL ARR_COP1I(NELEM,%val(PTRA(4)),T4,STATUS)
+      CALL ARR_COP1I(NELEM,%val(PTRA(5)),T5,STATUS)
+      CALL ARR_COP1I(NELEM,%val(PTRA(6)),T6,STATUS)
+      CALL ARR_COP1I(NELEM,%val(PTRA(7)),T7,STATUS)
+
+      END
+
 *+RAT_UNMAPEVE - unmap and annul sliced data locators
       SUBROUTINE RAT_UNMAPEVE(SLOCA, STATUS)
 *    Description :
