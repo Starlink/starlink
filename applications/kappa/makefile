@@ -1982,7 +1982,7 @@ do_deinstall:
         done
 #
 #  Remove the package version file in the installation directory.
-        - if test -n "version"; then \
+	- if test -n "version"; then \
              rm -f $(INSTALL_BIN)/version ;\
            else :; 
 #
