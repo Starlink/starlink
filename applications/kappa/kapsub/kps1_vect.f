@@ -1,4 +1,5 @@
-      SUBROUTINE KPS1_VECT( X, Y, JUST, VECLEN, VECANG, AHSIZE, STATUS )
+      SUBROUTINE KPS1_VECT( INK, X, Y, JUST, VECLEN, VECANG, AHSIZE, 
+     :                      X1, X2, Y1, Y2, STATUS )
 *+
 *  Name:
 *     KPS1_VECT
@@ -10,14 +11,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_VECT( X, Y, JUST, VECLEN, VECANG, AHSIZE, STATUS )
+*     CALL KPS1_VECT( INK, X, Y, JUST, VECLEN, VECANG, AHSIZE, X1, X2, 
+*                     Y1, Y2, STATUS )
 
 *  Description:
 *     This routine draws a vector, either with or without an arrowhead
 *     at the end.  The vector may be drawn centred on the supplied
-*     position, or starting at the supplied position.
+*     position, or starting at the supplied position. A supplied bounding
+*     box is extended to include the drawn vector.
 
 *  Arguments:
+*     INK = LOGICAL (Given)
+*        If .FALSE., nothing is draw but the bounding box is still
+*        returned.
 *     X = REAL (Given)
 *        The x component of the vectors reference position, in the
 *        current PGPLOT window.
@@ -44,6 +50,18 @@
 *        end of the vector, in the world co-ordinate system of the
 *        current PGPLOT window.  No arrowhead is drawn if a zero or negative
 *        value is supplied.
+*     X1 = REAL (Given and Returned)
+*        The lowest X value in the bounding box. Modified on exit to include 
+*        the drawn vector.
+*     X2 = REAL (Given and Returned)
+*        The highest X value in the bounding box. Modified on exit to include 
+*        the drawn vector.
+*     Y1 = REAL (Given and Returned)
+*        The lowest Y value in the bounding box. Modified on exit to include 
+*        the drawn vector.
+*     Y2 = REAL (Given and Returned)
+*        The highest Y value in the bounding box. Modified on exit to include 
+*        the drawn vector.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -57,6 +75,8 @@
 *  History:
 *     4-OCT-1999 (DSB):
 *        Original version.
+*     13-AUG-2002 (DSB):
+*        Added args INK, X1, X2, Y1 and Y2.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,12 +91,19 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
+      LOGICAL INK
       REAL X
       REAL Y
       CHARACTER * ( * ) JUST
       REAL VECLEN
       REAL VECANG
       REAL AHSIZE
+
+*  Arguments Given and Returned:
+      REAL X1
+      REAL X2
+      REAL Y1
+      REAL Y2
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -89,13 +116,18 @@
       PARAMETER ( SINA = 0.5 )
 
 *  Local Variables:
-      REAL AX         ! X co-ordinate of arrow point
-      REAL AY         ! Y co-ordinate of arrow point
+      REAL AX0        ! X co-ordinate of arrow end point
+      REAL AX1        ! X co-ordinate of arrow start point
+      REAL AX2        ! X co-ordinate of first arrow head point
+      REAL AX3        ! X co-ordinate of second arrow head point
+      REAL AY0        ! Y co-ordinate of arrow end point
+      REAL AY1        ! Y co-ordinate of arrow start point
+      REAL AY2        ! Y co-ordinate of first arrow head point
+      REAL AY3        ! Y co-ordinate of second arrow head point
       REAL COSANG     ! COS of vector orientation
       REAL SINANG     ! SIN of vector orientation
       REAL VECX       ! X component of vector
       REAL VECY       ! Y component of vector
-      REAL FINISH( 2 )! Finishing point of a line
 *.
 
 *  Check the inherited global status.
@@ -111,41 +143,56 @@
 
 *  Note the position of the point of the arrowhead.
       IF ( JUST .EQ. 'CENTRE' ) THEN
-         AX = X + 0.5 * VECX
-         AY = Y + 0.5 * VECY 
+         AX0 = X + 0.5 * VECX
+         AY0 = Y + 0.5 * VECY 
       ELSE IF ( JUST .EQ. 'START' ) THEN
-         AX = X + VECX
-         AY = Y + VECY
+         AX0 = X + VECX
+         AY0 = Y + VECY
       ELSE
-         AX = X
-         AY = Y
+         AX0 = X
+         AY0 = Y
       END IF
 
 *  Now draw the line which represents the vector.
-      CALL PGMOVE( AX, AY )
-      CALL PGDRAW( AX - VECX, AY - VECY )
+      AX1 = AX0 - VECX
+      AY1 = AY0 - VECY
+      CALL PGMOVE( AX0, AY0 )
+      IF( INK ) CALL PGDRAW( AX1, AY1 )
+
+*  Update the bounding box.
+      X1 = MIN( X1, MIN( AX0, AX1 ) )
+      Y1 = MIN( Y1, MIN( AY0, AY1 ) )
+      X2 = MAX( X2, MAX( AX0, AX1 ) )
+      Y2 = MAX( Y2, MAX( AY0, AY1 ) )
 
 *  Now draw an arrowhead if required.
       IF ( AHSIZE .NE. 0.0 )  THEN
 
 *  Calculate the co-ordinates of the end of the first arrow stroke by
 *  multiplying by the rotation matrix.
-         FINISH( 1 ) = AX + AHSIZE * ( SINANG * COSA - COSANG * SINA )
-         FINISH( 2 ) = AY - AHSIZE * ( SINANG * SINA + COSANG * COSA ) 
+         AX2 = AX0 + AHSIZE * ( SINANG * COSA - COSANG * SINA )
+         AY2 = AY0 - AHSIZE * ( SINANG * SINA + COSANG * COSA ) 
 
 *  Draw the first arrow stroke.
-         CALL PGMOVE( AX, AY )
-         CALL PGDRAW( FINISH( 1 ), FINISH( 2 ) )
+         CALL PGMOVE( AX0, AY0 )
+         IF( INK ) CALL PGDRAW( AX2, AY2 )
 
 *  Calculate the co-ordinates of the end of the second arrow stroke by
 *  multiplying by the rotation matrix.
-         FINISH( 1 ) = AX + AHSIZE * ( SINANG * COSA + COSANG * SINA ) 
-         FINISH( 2 ) = AY - AHSIZE * ( -SINANG * SINA + COSANG * COSA ) 
+         AX3 = AX0 + AHSIZE * ( SINANG * COSA + COSANG * SINA ) 
+         AY3 = AY0 - AHSIZE * ( -SINANG * SINA + COSANG * COSA ) 
 
 *  Draw the second arrow stroke.
-         CALL PGMOVE( AX, AY )
-         CALL PGDRAW( FINISH( 1 ), FINISH( 2 ) )
+         CALL PGMOVE( AX0, AY0 )
+         IF( INK ) CALL PGDRAW( AX3, AY3 )
+
+*  Update the bounding box.
+         X1 = MIN( X1, MIN( AX2, AX3 ) )
+         Y1 = MIN( Y1, MIN( AY2, AY3 ) )
+         X2 = MAX( X2, MAX( AX2, AX3 ) )
+         Y2 = MAX( Y2, MAX( AY2, AY3 ) )
 
       END IF
+
 
       END

@@ -83,6 +83,8 @@
 *        are short and made allowance for proportionally spaced text.
 *     5-MAR-1998 (DSB):
 *        Modified for use with PGPLOT.
+*     13-AUG-2002 (DSB):
+*        Modified to include bounding box args and INK for KPS1_VECT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -153,7 +155,7 @@
       REAL Y2                    ! Upper y bound of key picture
       REAL YC                    ! Y coord. of centre of key object
       REAL YM                    ! Y extent of key picture, in metres
-
+      REAL DX1, DX2, DY1, DY2    ! Bounding box (unused)
 *.
 
 *  Check the inherited global status.
@@ -308,11 +310,13 @@
       RADIUS = MIN( 0.1 * KEYLEN, ( X2 - X1 ) * CIRAD )
 
       IF ( JUST .EQ. 'START' ) THEN
-         CALL KPS1_VECT( XL + 0.5 * KEYLEN + RADIUS, YC, 'CENTRE',
-     :                   KEYLEN, -90.0 * DTOR, AHSIZE, STATUS )
+         CALL KPS1_VECT( .TRUE., XL + 0.5 * KEYLEN + RADIUS, YC,
+     :                   'CENTRE', KEYLEN, -90.0 * DTOR, AHSIZE, DX1, 
+     :                   DX2, DY1, DY2, STATUS )
       ELSE
-         CALL KPS1_VECT( XL + 0.5 * KEYLEN, YC, 'CENTRE', KEYLEN,
-     :                   -90.0 * DTOR, AHSIZE, STATUS )
+         CALL KPS1_VECT( .TRUE., XL + 0.5 * KEYLEN, YC, 'CENTRE', 
+     :                   KEYLEN, -90.0 * DTOR, AHSIZE, DX1, DX2, DY1, 
+     :                   DY2, STATUS )
       END IF
 
 *  Draw a hollow circle to mark the vector reference position.

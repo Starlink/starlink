@@ -92,6 +92,8 @@
 *  History:
 *     4-OCT-1999 (DSB):
 *        Original PGPLOT/AST version.
+*     13-AUG-2002 (DSB):
+*        Modified to include bounding box args and INK for KPS1_VECT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -151,6 +153,7 @@
       INTEGER NPLOT              ! No. of vectors plotted
       REAL VECANG                ! Vector position angle in radians
       REAL VECLEN                ! Vector length in pixels
+      REAL DX1, DX2, DY1, DY2    ! Bounding box (unused)
 *.
 
 *  Check inherited global status.
@@ -205,8 +208,9 @@
                VECANG = ANGFAC * VECORN( I, J ) + ANGROT
 
 *  Plot the vector.      
-               CALL KPS1_VECT( REAL( GX ), REAL( GY ), JUST, 
-     :                         VECLEN, VECANG, AHSIZE, STATUS )
+               CALL KPS1_VECT( .TRUE., REAL( GX ), REAL( GY ), JUST, 
+     :                         VECLEN, VECANG, AHSIZE, DX1, DX2, DY1, 
+     :                         DY2, STATUS )
 
 *  Abort if an error has occurred.
                IF ( STATUS .NE. SAI__OK ) GO TO 999

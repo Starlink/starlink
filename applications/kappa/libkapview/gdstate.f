@@ -208,6 +208,9 @@
 *        Big changes for the first AST/PGPLOT version.
 *     21-FEB-2002 (DSB):
 *        Added a listing of the Frame Domains contained in the Plot.
+*     19-AUG-2002 (DSB):
+*        Modify plotting of outline to use bounds of picture rather than
+*        bounds of Plot.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -239,6 +242,7 @@
       CHARACTER SYM*30           ! Buffer for an axis symbol string
       CHARACTER TEXT*256         ! Buffer for a line of output text
       CHARACTER UFMT*80          ! Buffer for formatted upper axis value
+      DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
       DOUBLE PRECISION GLBND     ! Lower axis bound in requested Frame
       DOUBLE PRECISION GUBND     ! Upper axis bound in requested Frame
       DOUBLE PRECISION LBNDG( 2 )! Lower bounds of picture in GRAPHICS Frame
@@ -251,7 +255,8 @@
       INTEGER ICURR              ! Index of original current Frame
       INTEGER IPIC               ! AGI current picture ID
       INTEGER IPICB              ! AGI BASE picture ID
-      INTEGER IPLOT              ! Pointer to picture's AST Plot
+      INTEGER IPLOT              ! Pointer to current picture's AST Plot
+      INTEGER IPLOTB             ! Pointer to BASE picture's AST Plot
       INTEGER JAT                ! Used length of ATTR string
       INTEGER MAP                ! Pointer to Mapping from Base to Current
       INTEGER NCREF              ! Number of characters in reference
@@ -329,9 +334,23 @@
 *  Get an AGI identifier for the BASE picture.
          CALL AGI_IBASE( IPICB, STATUS )
 
-*  Draw the outline, temporarily making the BASE picture current to avoid
-*  PGPLOT clipping.
-         CALL KPG1_ASGRD( IPLOT, IPICB, .FALSE., STATUS )
+*  Set up the PGPLOT viewport and window so that it corresponds to
+*  GRAPHICS coords in the BASE picture.
+         CALL KPG1_GDGET( IPICB, AST__NULL, .FALSE., IPLOTB, STATUS )
+
+*  Set the appearance of lines drawn using PGPLOT so that they mimic 
+*  the border produced by AST_BORDER using the original Plot.
+         CALL KPG1_PGSTY( IPLOT, 'BORDER', .TRUE., ATTRS, STATUS )
+
+*  Draw the outline of the picture.
+         CALL PGSFS( 2 )
+         CALL PGRECT( X1, X2, Y1, Y2 )
+
+*  Re-instate the previous PGPLOT attributes.
+         CALL KPG1_PGSTY( IPLOT, 'BORDER', .FALSE., ATTRS, STATUS )
+
+*  Re-instate the previous picture.
+         CALL AGI_SELP( IPIC, STATUS )
 
 *  Annul the AGI identifier for the BASE picture.
          CALL AGI_ANNUL( IPICB, STATUS )
