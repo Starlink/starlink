@@ -521,9 +521,9 @@
 
 *  Map the QUALITY array of the input and output NDFs. Note, QUALITY
 *  arrays should always be mapped as _UBYTE.
-         CALL NDF_MAP( NDFI, 'DATA', '_UBYTE', 'READ', IPQUAI, ELI, 
+         CALL NDF_MAP( NDFI, 'QUALITY', '_UBYTE', 'READ', IPQUAI, ELI, 
      :                 STATUS )
-         CALL NDF_MAP( NDFO, 'DATA', '_UBYTE', 'WRITE', IPQUAO, ELO,
+         CALL NDF_MAP( NDFO, 'QUALITY', '_UBYTE', 'WRITE', IPQUAO, ELO,
      :                 STATUS )
 
 *  Do the resampling.

@@ -34,7 +34,7 @@
 *        A group of up to 10 quality names to be removed from the input
 *        NDF. The group may be supplied as a comma separated list, or
 *        within a text file (in which case the name of the text file should
-*        be given, preceded by a "^" character.) If more than 10 names are
+*        be given, preceeded by a "^" character.) If more than 10 names are
 *        supplied, only the first 10 are used. If any of the supplied
 *        quality names are not defined in the NDF, then warning
 *        messages are given but the application continues to remove any
@@ -48,9 +48,6 @@
 *     remqual "m51*" any
 *        This example will remove all defined quality names from all
 *        NDFs with names starting with the string "m51".
-
-*  Related Applications
-*     KAPPA: QUALTOBAD, SHOWQUAL, SETQUAL.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -175,6 +172,14 @@
 *  information is found, then an error is reported.
       CALL IRQ_FIND( NDFIN, LOCS, XNAME, STATUS )
 
+*  Annul any error, and indicate no names should be deleted.
+      IF( STATUS .NE. SAI__OK ) THEN 
+         CALL IRQ_RLSE( LOCS, STATUS )
+         CALL ERR_ANNUL( STATUS )
+         LOCS( 1 ) = ' '
+         NNAMES = 0
+      END IF      
+
 *  Loop round to remove each specified quality name.
       DO INAME = 1, NNAMES
 
@@ -213,8 +218,16 @@
 
       END DO
 
-*  Release the quality name information.
-      CALL IRQ_RLSE( LOCS, STATUS )
+*  If any quality information was found in the NDF, note the number of 
+*  remaining quality names, and release the quality name information.
+      IF( LOCS( 1 ) .NE. ' ' ) THEN 
+         CALL IRQ_NUMQN( LOCS, NNAMES, STATUS )
+         CALL IRQ_RLSE( LOCS, STATUS )
+
+*  If no quality names are left, delete the NDF extension.
+         IF( NNAMES .EQ. 0 ) CALL NDF_XDEL( NDFIN, XNAME, STATUS )
+
+      END IF
 
 *  Delete the group which holds the quality names.
  999  CONTINUE
