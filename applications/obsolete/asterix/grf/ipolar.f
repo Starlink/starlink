@@ -358,7 +358,7 @@ C        CALL DAT_RETYP( OFID, 'PROFILE_SET', STATUS )
 *    Make sure even axis scaling switched off
       CALL GCB_ATTACH('LOCAL',STATUS)
       CALL GCB_SETL('AXES_SCALING',.FALSE.,STATUS)
-      CALL GCB_SAVE(OFID,STATUS)
+      CALL GCB_FSAVE(OFID,STATUS)
       CALL GCB_DETACH(STATUS)
 
 *    Create axis structure. Either one axis or two.
@@ -420,10 +420,7 @@ C        CALL DAT_RETYP( OFID, 'PROFILE_SET', STATUS )
       IF ( NRBIN .NE. 1 ) THEN
 
 *      Write axis label and units
-        CALL BDI_PUTAXLABEL( OFID, RAX, 'Radius', STATUS )
-
-*      Put output input axis units
-        CALL BDI_PUTAXUNITS( OFID, RAX, AUNITS(1), STATUS )
+        CALL BDI_PUTAXTEXT( OFID, RAX, 'Radius', AUNITS(1), STATUS )
 
 *      Create and map axis array
         CALL BDI_CREAXVAL( OFID, RAX, .TRUE., NRBIN, STATUS )
@@ -435,8 +432,7 @@ C        CALL DAT_RETYP( OFID, 'PROFILE_SET', STATUS )
       IF ( NABIN .NE. 1 ) THEN
 
 *      Write axis label and units
-        CALL BDI_PUTAXLABEL( OFID, AZAX, 'Azimuth', STATUS )
-        CALL BDI_PUTAXUNITS( OFID, AZAX, 'degrees', STATUS )
+        CALL BDI_PUTAXTEXT( OFID, AZAX, 'Azimuth', 'degrees', STATUS )
 
 *      Create and map axis array
         CALL BDI_CREAXVAL( OFID, AZAX, .TRUE., NABIN, STATUS )
