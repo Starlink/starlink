@@ -2,15 +2,15 @@
 
   New to this release:
 
-    - A number of new catalogues and image servers are now available. 
+    - A number of new catalogues and image servers are now available.
       When GAIA starts for the first time it will ask for permission
       to update your configuration, unless you have a very customised
       ~/.skycat/skycat.cfg file, you should just say yes. Some
-      highlights are 2MASS, USNO B1.0 and GSC II. 
+      highlights are 2MASS, USNO B1.0 and GSC II.
 
     - A new configuration option "-extended_precision" has been
       added. This makes GAIA work at approximately milli-arcsecond
-      resolution. This option can be switched on using the new 
+      resolution. This option can be switched on using the new
       "File"->"Startup options" window.
 
     - The pixel table now highlights the maximum and minimum values and
@@ -20,7 +20,7 @@
     - The command-line options of GAIA can now be configured using the
       new "File"->"Startup options" window. The set of options
       selected are used whenever GAIA starts up (this removes the
-      tedious need to either specify these on the command-line, or 
+      tedious need to either specify these on the command-line, or
       add them to your X resources).
 
     - A new configuration option "-show_hdu_chooser" has been
@@ -28,23 +28,23 @@
       more than one image the HDU chooser appears so that you can select
       between the images. On some occasions (mainly when running GAIA
       under remote control) this behaviour is unwanted and the chooser
-      should remain inactive. This option can be controlled using the new 
+      should remain inactive. This option can be controlled using the new
       "File"->"Startup options" window.
 
     - When North and East are interchanged the "Show all coordinates"
       displayed the wrong coordinates in the left and right columns,
-      and incorrectly formatted RA as DD:MM:SS and Dec as HH:MM:SS. 
+      and incorrectly formatted RA as DD:MM:SS and Dec as HH:MM:SS.
       These problems are now fixed.
 
-    - The direction arrows shown in the pan window could be displayed 
-      at the wrong size, again when North and East were interchanged. 
+    - The direction arrows shown in the pan window could be displayed
+      at the wrong size, again when North and East were interchanged.
       This problem is now fixed.
 
     - Fixed shape ellipses in the aperture photometry toolbox were
       actually created using an inverted zoom factor correction (so
       either shrank or expanded in the wrong sense). This now works
-      correctly. 
- 
+      correctly.
+
 
   To try out GAIA for yourself type the following command:
 
@@ -62,7 +62,7 @@
 
 
 
-  NDF Chooser now allows the variance component to be displayed as 
+  NDF Chooser now allows the variance component to be displayed as
       expected.
 
   A new default percentage autocut option has been added.
@@ -98,16 +98,22 @@
   of the same kind as normal (this includes GAIA extensions to the Skycat
   defaults).
 
-  The -catalog command-line option now accepts a list of catalogues to 
+  The -catalog command-line option now accepts a list of catalogues to
   display immediately.
 
   SIRTF distortions are now accomodated (need AST3).
 
   The polarimetry toolbox now correctly processes selection expressions
-  when column names are short forms of other names (i.e. when P and PI, 
+  when column names are short forms of other names (i.e. when P and PI,
   DP and DPI etc. are used). Previously an attempt to interpret $PI as
   $P would be made and subsequently fail.
 
   Making name queries using the RedHat 9 build of GAIA failed
-  completely, sometimes causing a core dump from a child process. 
+  completely, sometimes causing a core dump from a child process.
   This problem has now been resolved.
+
+  The interpretation of FITS -CAR projections is now a configuration
+  option. Previously this was fixed at assuming that all cartesian
+  projections are simple linear mappings (this remains the default),
+  ignoring the possibility of spherical rotations. Refer to the CarLin
+  attribute of the AST (SUN/211) library for more about this change.
