@@ -7,7 +7,7 @@
 *     Locate projector routine for a named projection
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL WCI1_LOCPRJ( NAME, PTR, STATUS )
@@ -67,7 +67,7 @@
 *     {routine_references}...
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:wci, usage:private
 
 *  Copyright:
 *     {routine_copyright}
@@ -105,6 +105,8 @@
       EXTERNAL			WCI1_XPARC		! Zenithal equidistant
       EXTERNAL			WCI1_XPAZP		! Zenithal perspective
       EXTERNAL			WCI1_XPCAR		! Cartesian
+      EXTERNAL			WCI1_XPSIN		! Orthographic
+      EXTERNAL			WCI1_XPSTG		! Stereoraphic
       EXTERNAL			WCI1_XPTAN		! Tan/Gnomonic
 
       EXTERNAL			UTIL_PLOC		! Portable %LOC
@@ -123,6 +125,12 @@
 
       ELSE IF ( NAME .EQ. 'AZP' ) THEN
         PTR = UTIL_PLOC( WCI1_XPAZP )
+
+      ELSE IF ( NAME .EQ. 'SIN' ) THEN
+        PTR = UTIL_PLOC( WCI1_XPSIN )
+
+      ELSE IF ( NAME .EQ. 'STG' ) THEN
+        PTR = UTIL_PLOC( WCI1_XPSTG )
 
       ELSE IF ( NAME .EQ. 'ARC' ) THEN
         PTR = UTIL_PLOC( WCI1_XPARC )
