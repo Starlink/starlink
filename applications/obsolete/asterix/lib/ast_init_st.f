@@ -19,7 +19,4 @@
 *    Initialize DYN_CMN
       CALL DYN_INIT()
 
-*    Initialize BDA_CMN
-      CALL BDA_INIT()
-
       END

@@ -76,9 +76,6 @@
 
 *.
 
-*  File system
-      CALL BDA_CLOSE()
-
 *  User interface
       CALL USI_CLOSE()
 
