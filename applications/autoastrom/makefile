@@ -736,6 +736,20 @@ install:
 	rm $(DATE_STAMP)
 	$(LINK) $(INSTALL_DATES)/$(DATE_STAMP) $(DATE_STAMP)
 
+# Very simple install, used for testing and development ONLY.
+# Insist that AUTOASTROM_DIR be defined, and that the directory it
+# points to exists.  Only ever used by the developer, so it's brutish 
+# when it fails.
+test-install:
+	test -n "$$AUTOASTROM_DIR" && test -d "$$AUTOASTROM_DIR"
+	for f in $(BUILT_FILES) $(PUBLIC_SCRIPTS) $(LIBRARY_FILES); do \
+		DEST=$$AUTOASTROM_DIR/`echo $$f|sed s+.*/++`; \
+		if test -n "$$f"; then \
+			cp -p $$f $$DEST; \
+			chmod 755 $$DEST; \
+		else :; fi; \
+	done
+
 #  deinstall: Deinstall the package.
 #  --------------------------------
 #
