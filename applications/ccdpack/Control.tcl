@@ -84,10 +84,11 @@
 #  Constructor.
 ########################################################################
       constructor { args } {
-         itk_component add controlchildsite {
-            frame $itk_interior.childsite
+         itk_component add controlframe {
+            frame $itk_interior.controlframe
          }
-         pack $itk_component(controlchildsite)
+         set control $itk_component(controlframe)
+         pack $control -fill y -expand 1
          eval itk_initialize $args
       }
 
@@ -99,7 +100,7 @@
 #-----------------------------------------------------------------------
       public method childsite { } {
 #-----------------------------------------------------------------------
-         return $itk_component(controlchildsite)
+         return $control
       }
 
 ########################################################################
@@ -139,12 +140,10 @@
 #-----------------------------------------------------------------------
       public variable hidden {0} {
 #-----------------------------------------------------------------------
-         if { $hidden && \
-             ! [ catch { pack info $itk_component(controlchildsite) } ] } {
-            pack forget $itk_component(controlchildsite)
-         } elseif { ! $hidden && \
-                    [ catch { pack info $itk_component(controlchildsite) } ] } {
-            pack $itk_component(controlchildsite)
+         if { $hidden && ! [ catch { pack info $control } ] } {
+            pack forget $control
+         } elseif { ! $hidden && [ catch { pack info $control } ] } {
+            pack $control
          }
       }
 
@@ -222,6 +221,7 @@
 ########################################################################
 #  Private variables.                                                  #
 ########################################################################
+      private variable control          ;# Pathname of the control widget
       private variable valuecmd ""      ;# Command to execute on value change
       private variable valuevarname     ;# Scoped name of value variable
 
