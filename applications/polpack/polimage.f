@@ -169,6 +169,8 @@
 *        the AXIS structures of the output NDF.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     7-MAR-2005 (DSB):
+*        Corrected use of CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -214,14 +216,20 @@
       DOUBLE PRECISION AOUT( 3 ) ! COLX,COLY co-ords at point A
       DOUBLE PRECISION BIN( 3 )  ! GRID co-ords at point B
       DOUBLE PRECISION BOUT( 3 ) ! COLX,COLY co-ords at point B
+      INTEGER AXFRM              ! The AXIS Frame
+      INTEGER AXMAP              ! PIXEL -> AXIS Mapping
       INTEGER BFRM               ! Pointer to WCS Base Frame
       INTEGER CI                 ! CAT identifier for input catalogue
       INTEGER CLEN               ! Used length of a string
       INTEGER CMAP               ! Pointer to an AST Mapping
       INTEGER DID                ! Index of data column in GI array
+      INTEGER DOFF               ! Offset to i/p data values
+      INTEGER FRM                ! Frame pointer
       INTEGER FS                 ! FrameSet connecting GRID and AXIS Frames
       INTEGER GI( MAXID )        ! CAT identifiers for columns to be read
       INTEGER GTTL               ! CAT identifier for TITLE parameter
+      INTEGER I                  ! Loop index
+      INTEGER IAXIS              ! Index of AXIS Frame
       INTEGER IDTYPD             ! CAT component type for COLDAT
       INTEGER IDTYPX             ! CAT component type for COLX
       INTEGER IDTYPY             ! CAT component type for COLY
@@ -233,22 +241,18 @@
       INTEGER IPAX3              ! Pointer to AXIS 3 centre array
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
       INTEGER IPCOV              ! Pointer to workspace
-      INTEGER IPD                ! Pointer to i/p data values
       INTEGER IPDST              ! Pointer to stacked i/p data values
+      INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPNCON             ! Pointer to workspace
       INTEGER IPPNT              ! Pointer to workspace
       INTEGER IPPP               ! Pointer to workspace
       INTEGER IPUSED             ! Pointer to workspace
-      INTEGER IPV                ! Pointer to i/p variance values
       INTEGER IPVAR              ! Pointer to dummy line variances
       INTEGER IPVBIN             ! Pointer to binned variances
       INTEGER IPVST              ! Pointer to stacked i/p variances
       INTEGER IPW1               ! Pointer to workspace
       INTEGER IPWRK1             ! Pointer to workspace
       INTEGER IPWRK2             ! Pointer to workspace
-      INTEGER IPX                ! Pointer to i/p X values
-      INTEGER IPY                ! Pointer to i/p Y values
-      INTEGER IPZ                ! Pointer to i/p Z values
       INTEGER IROW               ! Row index
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
       INTEGER IWCSO              ! Pointer to AST FrameSet for o/p NDF
@@ -271,10 +275,14 @@
       INTEGER TMAP               ! Pointer to an AST Mapping
       INTEGER UBND( 3 )          ! O/p NDF upper pixel bounds
       INTEGER VID                ! Index of error column in GI array
+      INTEGER VOFF               ! Offset to i/p variance values
       INTEGER WINMAP             ! Pointer to an AST WinMap
       INTEGER XID                ! Index of X column in GI array
+      INTEGER XOFF               ! Offset to i/p X values
       INTEGER YID                ! Index of Y column in GI array
+      INTEGER YOFF               ! Offset to i/p Y values
       INTEGER ZID                ! Index of Z column in GI array
+      INTEGER ZOFF               ! Offset to i/p Z values
       LOGICAL GOTZ               ! Has a Z axis been specified?
       LOGICAL SHAPE              ! Does output NDF have shape?
       LOGICAL VAR                ! Producing variances?
@@ -293,12 +301,6 @@
       REAL X0                    ! X at bottom left of bottom left cell
       REAL Y0                    ! Y at bottom left of bottom left cell
       REAL Z0                    ! Z at bottom left of bottom left cell
-      INTEGER IAXIS              ! Index of AXIS Frame
-      INTEGER IPIX               ! Index of PIXEL Frame
-      INTEGER AXMAP              ! PIXEL -> AXIS Mapping
-      INTEGER AXFRM              ! The AXIS Frame
-      INTEGER I                  ! Loop index
-      INTEGER FRM                ! Frame pointer
 *.
 
 *  Check the inherited global status.
@@ -475,12 +477,12 @@
 *  Allocate work space to hold the data from the required columns.
          CALL PSX_CALLOC( NCIN*NCOL, '_REAL', IP, STATUS )
 
-*  Store pointers to the start of the data from each individual column.
-         IPX = IP + NCIN*VAL__NBR*( XID - 1 )
-         IPY = IP + NCIN*VAL__NBR*( YID - 1 )
-         IF( GOTZ ) IPZ = IP + NCIN*VAL__NBR*( ZID - 1 )
-         IPD = IP + NCIN*VAL__NBR*( DID - 1 )
-         IF( VAR ) IPV = IP + NCIN*VAL__NBR*( VID - 1 )
+*  Store byte offsets to the start of the data from each individual column.
+         XOFF = NCIN*VAL__NBR*( XID - 1 )
+         YOFF = NCIN*VAL__NBR*( YID - 1 )
+         IF( GOTZ ) ZOFF = NCIN*VAL__NBR*( ZID - 1 )
+         DOFF = NCIN*VAL__NBR*( DID - 1 )
+         IF( VAR ) VOFF = NCIN*VAL__NBR*( VID - 1 )
 
 *  Check the pointers can be used.
          IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -508,18 +510,18 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find the maximum and minimum COLX value.
-         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPX ) ), 
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + XOFF ), 
      :                    NBAD, SXHI,
      :                     SXLO, MAXPOS, MINPOS, STATUS )
 
 *  Find the maximum and minimum COLY value.
-         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPY ) ), 
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + YOFF ), 
      :                    NBAD, SYHI,
      :                     SYLO, MAXPOS, MINPOS, STATUS )
 
 *  If supplied find the maximum and minimum COLZ value.
          IF( GOTZ ) THEN 
-            CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IPZ ) ), 
+            CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( CNF_PVAL( IP ) + ZOFF), 
      :                       NBAD, SZHI,
      :                       SZLO, MAXPOS, MINPOS, STATUS )
          ELSE
@@ -671,9 +673,9 @@
 
 *  Count the number of input catalogue positions contained in each output
 *  cell. The largest number in any one cell is returned.
-         CALL POL1_CLCNT( NCIN, GOTZ, %VAL( CNF_PVAL( IPX ) ), 
-     :                    %VAL( CNF_PVAL( IPY ) ),
-     :                    %VAL( CNF_PVAL( IPZ ) ), 
+         CALL POL1_CLCNT( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + XOFF ), 
+     :                    %VAL( CNF_PVAL( IP ) + YOFF ),
+     :                    %VAL( CNF_PVAL( IP ) + ZOFF ), 
      :                    TR, NXBIN, NYBIN, NZBIN,
      :                    %VAL( CNF_PVAL( IPW1 ) ), MXCNT, STATUS )
 
@@ -690,11 +692,11 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the data values from the input catalogue to the work array.
-         CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IPD ) ), 
-     :                   %VAL( CNF_PVAL( IPX ) ),
-     :                   %VAL( CNF_PVAL( IPY ) ), 
-     :                   %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN, NZBIN,
-     :                   MXCNT, TR, %VAL( CNF_PVAL( IPDST ) ), 
+         CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + DOFF ), 
+     :                   %VAL( CNF_PVAL( IP ) + XOFF ),
+     :                   %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                   %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN, 
+     :                   NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPDST ) ), 
      :                   %VAL( CNF_PVAL( IPW1 ) ),
      :                   STATUS )
 
@@ -703,10 +705,10 @@
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
    
-            CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IPV ) ), 
-     :                      %VAL( CNF_PVAL( IPX ) ),
-     :                      %VAL( CNF_PVAL( IPY ) ), 
-     :                      %VAL( CNF_PVAL( IPZ ) ), NXBIN, NYBIN,
+            CALL POL1_STK2( NCIN, GOTZ, %VAL( CNF_PVAL( IP ) + VOFF ), 
+     :                      %VAL( CNF_PVAL( IP ) + XOFF ),
+     :                      %VAL( CNF_PVAL( IP ) + YOFF ), 
+     :                      %VAL( CNF_PVAL( IP ) + ZOFF ), NXBIN, NYBIN,
      :                      NZBIN, MXCNT, TR, %VAL( CNF_PVAL( IPVST ) ),
      :                      %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
