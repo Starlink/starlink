@@ -19,10 +19,10 @@ jpeglib-stamp:
 # This means we must expand into explicit lines so that automake see them
 # (previously these three were a macro, plus target)
 clean-local:
-	cd src; $(MAKE) clean
+	- cd src; $(MAKE) clean
 
 distclean-local:
-	cd src; $(MAKE) distclean
+	- cd src; $(MAKE) distclean
 
 check:
-	cd src; $(MAKE) check
+	- cd src; $(MAKE) check
