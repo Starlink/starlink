@@ -13,10 +13,12 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (RB)
 *
 *    History :
 *
 *     18 Jun 92 : Original (DJA)
+*     13 Mar 97 : Correct NAG arguments (RB)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -56,6 +58,6 @@
 
 *    Get deviate
       IFAIL = 0
-      DEVIATE = G01FCF( PROB, REAL(NDOF), IFAIL )
+      DEVIATE = G01FCF( PROB, DBLE(NDOF), IFAIL )
 
       END

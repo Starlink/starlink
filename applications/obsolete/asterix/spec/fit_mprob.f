@@ -14,12 +14,14 @@
 *
 *     Trevor Ponman (BHVAD::TJP)
 *     David J. Allan (JET-X, University of Birmingham)
+*     Richard Beard (ROSAT, UNiversity of Birminghma)
 *
 *    History :
 *
 *     30 Aug 94 : Original (DJA)
 *     14 Jun 95 : Iteration scheme changed to stabilise expectation value
 *                 calculation, and Gaussian limit simplification added (DJA)
+*     13 Mar 97 : Correct NAG arguments (RB)
 *
 *    Type definitions :
 *
@@ -29,11 +31,11 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'FIT_PAR'
+      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/FIT_PAR'
 *
 *    Structure declarations :
 *
-      INCLUDE 'FIT_STRUC'
+      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/FIT_STRUC'
 *
 *    Import :
 *
@@ -78,7 +80,7 @@
 
 *      Get probability from NAG routine
         NAGSTAT = 0
-        FPROB = G01ECF( 'Lower-tail', STATMIN, REAL(SSCALE), NAGSTAT )
+        FPROB = G01ECF( 'Lower-tail', STATMIN, DBLE(SSCALE), NAGSTAT )
 
 *    Likelihood
       ELSE IF ( FSTAT .EQ. FIT__LOGL ) THEN
@@ -98,7 +100,6 @@
      :                     LFPDV, LFPT, STATUS )
 
         END DO
-	print *,lfpm, lfpd,sqrt(lfpdv),lfpt
 
 *      Fit probability given
         NAGSTAT = 0
@@ -147,7 +148,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'MATH_PAR'
+      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/MATH_PAR'
 *
 *    Import :
 *
@@ -540,7 +541,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'MATH_PAR'
+      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/MATH_PAR'
 *
 *    Import :
 *
