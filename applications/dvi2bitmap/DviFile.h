@@ -35,23 +35,24 @@ private:
 	PosState(int h, int v, int w, int x, int y, int z)
 	    : h(h),v(v),w(w),x(x),y(x),z(z) { }
     };
-    stack<PosState*> posStack_;
-    /*
-      class PosStateStack {
-	// this is ultra-cruddy, but I'm doing something wrong the way
-	// I use the STL stack, so this is to experiment with.
+    //stack<PosState*> posStack_;
+    class PosStateStack {
+	// It seems wrong to implement a stack rather than using the standard
+	// one, but either I'm doing something wrong the way
+	// I use the STL stack, or else it's (horrors!) buggy.  In any case,
+	// it's reasonable to use a non-extendable stack, since the DVI
+	// postamble specifies the maximum stack size required.
     public:
-	void push(PosState *p);
-	PosState *pop();
-	bool empty() { return i == 0; }
-	PosStateStack();
+	void push(const PosState *p);
+	const PosState *pop();
+	bool empty() const { return i == 0; }
+	void clear();
+	PosStateStack(int size);
     private:
-	int size;
-        PosState **s;
-	int i;
+	unsigned int size, i;
+        const PosState **s;
     };
-    PosStateStack posStack_;
-    */
+    PosStateStack *posStack_;
     static bool debug_;
 };
 
