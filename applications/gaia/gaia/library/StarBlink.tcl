@@ -384,7 +384,7 @@ itcl::class gaia::StarBlink {
 	 #  Make <Return> cycle through the images.
          bind $canvas <Return>  [code $this view_next]
 
-         #  <1> on canvas gives it focus.
+         #  <1> in canvas area gives it focus.
          bind $canvas <1> [code focus $canvas]
 
          #  Set canvas movements to change scrollbars.
