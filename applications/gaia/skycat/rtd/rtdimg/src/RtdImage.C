@@ -60,6 +60,10 @@
  * Peter W. Draper 28/04/03  Added PIXTAB_MINX, MAXX, MINY and MAXY to report
  *                           the positions that the minimum and maximum values
  *                           are found in a table of values.
+ * Peter W. Draper 21/10/03  Modified processMotionEvent to pass through
+ *                           long thin images of 2 pixels or less in
+ *                           either height or width. A blank image is
+ *                           2x2, not nx2 or 2xn.
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.69 1999/03/22 21:41:42 abrighto Exp $";
 
@@ -2762,7 +2766,8 @@ void RtdImage::motionProc(ClientData clientData)
  */
 void RtdImage::processMotionEvent()
 {
-    if (image_ && xImage_ && xImage_->data() && image_->width() > 2 && image_->height() > 2) {
+    if (image_ && xImage_ && xImage_->data() && 
+        ! ( image_->width() <= 2 && image_->height() <= 2 ) ) {
 	double x = motionX_, y = motionY_;
 
         timeInc(&GENtime_);
