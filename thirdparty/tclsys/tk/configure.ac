@@ -29,7 +29,7 @@ dnl    it's allowed to play there, too.
 STAR_SPECIAL_INSTALL_COMMAND([cd unix;
     $(MAKE) INSTALL_ROOT=$$DESTDIR install])
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml make.config])
 
 AC_OUTPUT
 

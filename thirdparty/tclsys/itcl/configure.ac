@@ -60,6 +60,6 @@ STAR_SPECIAL_INSTALL_COMMAND([
            ( cd $$d; $(MAKE) INSTALL_ROOT=$$DESTDIR install );
         done])
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml make.config])
 
 AC_OUTPUT
