@@ -34,7 +34,6 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL GCB_SETDEF(STATUS)
 
 *  see if log axes
         CALL GCB_GETL('XAXIS_LOG',OK,XLOG,STATUS)
