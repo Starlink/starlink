@@ -1,13 +1,13 @@
-      SUBROUTINE REDS_WRITE_PHOTOM (FD, PARABOLA, MAX_BEAM,
+      SUBROUTINE SURF_WRITE_PHOTOM (FD, PARABOLA, MAX_BEAM,
      :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, N_INTEGRATIONS, 
      :  PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
      :  MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
      :  MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
 *+
 *  Name:
-*     REDS_WRITE_PHOTOM 
+*     SURF_WRITE_PHOTOM 
 
-*  Description:
+*  Purpose:
 *     Routine to output ASCII results of PHOTOM reduction
 
 *    Description :
@@ -29,7 +29,7 @@
 *
 
 *    Invocation :
-*      CALL REDS_WRITE_PHOTOM (FD, MAX_BEAM, 
+*      CALL SURF_WRITE_PHOTOM (FD, MAX_BEAM, 
 *     :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, N_INTEGRATIONS, 
 *     :  PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
 *     :  MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,

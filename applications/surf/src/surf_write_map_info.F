@@ -1,15 +1,15 @@
-      SUBROUTINE REDS_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
+      SUBROUTINE SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
      :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
      :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, STATUS)
 *+
 *  Name:
-*     REDS_WRITE_MAP_INFO
+*     SURF_WRITE_MAP_INFO
 
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL REDS_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
+*     CALL SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
 *    :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
 *    :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT,
 *    :     STATUS )
@@ -72,7 +72,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'REDS_SYS'         ! REDS constants
+      INCLUDE 'SURF_PAR'         ! REDS constants
 
 *  Arguments Given:
       INTEGER          NFILE
