@@ -139,6 +139,8 @@
       ELSE IF ( NAME .EQ. 'POLVEC' ) THEN
          CALL POLVEC( STATUS )
 
+      ELSE IF ( NAME .EQ. 'VERSION' ) THEN
+         CALL VERSION( STATUS )
 
       ELSE
 

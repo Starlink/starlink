@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.3}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {13th May 1999}
+\newcommand{\stardocdate}      {3rd November 1999}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 2.0}
+\newcommand{\stardocversion}   {Version 2.0-13}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
 reducing imaging polarimetry data. They cover registration, sky subtraction, 
@@ -5348,6 +5348,95 @@ for NDF applications.
       Copyright (C) 1999 Central Laboratory of the Research Councils
    }
 }
+
+\sstroutine{
+   VERSION
+}{
+   Checks the package version number
+}{
+   \sstdescription{
+      This application will display the installed package version number,
+      or compare the version number of the installed package against a
+      specified version number, reporting whether the installed package
+      is older, or younger, or equal to the specified version.
+   }
+   \sstusage{
+      version [compare]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMPARE = LITERAL (Read)
+      }{
+         A string specifying the version number to be compared to the
+         version of the installed package. If a null (!) value is supplied,
+         the version string of the installed package is displayed, but no
+         comparison takes place. If a non-null value is supplied, the
+         version of the installed package is not displayed.
+
+         The supplied string should be in the format {\tt "}V$<$ddd$>$.$<$ddd$>$-$<$ddd$>$,
+         where {\tt "}$<$ddd$>${\tt "} represents a set of digits. The leading {\tt "}V{\tt "} can be
+         omitted, as can any number of trailing fields (missing trailing
+         fields default to zero). {\tt [!]}
+      }
+      \sstsubsection{
+         RESULT = INTEGER (Write)
+      }{
+         If a value is given for the COMPARE parameter, then RESULT is
+         set to one of the following values:
+
+         \sstitemlist{
+
+            \sstitem
+            1 -- The installed package is older than the version number
+            specified by the COMPARE parameter.
+
+            \sstitem
+            0 -- The version of the installed package is equal to the
+            version specified by the COMPARE parameter.
+
+            \sstitem
+            -1 -- The installed package is younger than the version number
+            specified by the COMPARE parameter.
+
+         }
+         The same value is also written to standard output.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         version
+      }{
+         Displays the version number of the installed package.
+      }
+      \sstexamplesubsection{
+         version compare={\tt "}V2.3{\tt "}
+      }{
+         Compares the version of the installed package with the version
+         {\tt "}V2.3{\tt "}, and sets the RESULT parameter appropriately. For
+         instance, if the installed package was {\tt "}V2.2{\tt "} then RESULT
+         would be set to -1. If the installed package was {\tt "}V2.3{\tt "},
+         RESULT would be set to 0. If the installed package was {\tt "}V2.4{\tt "}
+         RESULT would be set to $+$1.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The package version number is obtained from the {\tt "}version{\tt "} file
+         in the directory containing the package{\tt '}s installed executable files.
+         This file is created when the package is installed using the {\tt "}mk
+         install{\tt "} command. An error will be reported if this file cannot be
+         found.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1999 Central Laboratory of the Research Councils
+   }
+}
+
 \newpage
 \markboth{\stardocname}{\stardocname}
 \section{\label{APP:POL}\xlabel{calculatingthepolarization}Calculating the Polarization for Dual-beam Data}
@@ -6192,6 +6281,25 @@ The allowed items within the POLPACK extension.}
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
+\subsection{V2.0-13}
+
+\begin{itemize}
+
+\item A new command \htmlref{VERSION}{VERSION} has been added to check
+the version number of the installed package.
+
+\item The names of catalogues provided in response to parameter prompts 
+can now contain shell meta-characters (\emph{e.g.} \verb+$HOME/mycat+, 
+\verb+~/mycat+, \emph{etc.}).
+
+\item The output cube created by POLCAL in dual-beam mode now covers the
+union of the input frames, rather than the intersection.
+
+\item A bug has been fixed which could cause the masks displayed by POLKA 
+in dual-beam mode to jump around as different images were selected.
+
+\end{itemize}
+
 \subsection{V2.0}
 
 \begin{itemize}
