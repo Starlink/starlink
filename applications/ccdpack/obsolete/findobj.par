@@ -12,3 +12,6 @@ nsigma,r,h,5.0,,,"Standard deviations above detection threshold"
 touch,b,h,n,,,"May pixel groups touch the edges of array"
 logto,s,q,"Both",,,"Write log to (Logfile,Terminal,Neither,Both) [G]"
 logfile,s,q,"CCDPACK.LOG",,,"Logfile name [G]"
+counts,struct,h,,,,"Private output parameter"
+
+
