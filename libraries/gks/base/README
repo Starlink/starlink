@@ -21,7 +21,7 @@ normal libgks library by the parent directory.
 Note that in the original RAL GKS distribution optimization for gkclip.f
 was disabled on sun3 and sun4 platforms.
 
-Files also added from the machine specific directories:
+Files also added from the machine specific system directories:
 
  gkan1.f - was not machine specific in any meaningful sense
  gkaton.f - "   "
@@ -30,5 +30,40 @@ Files also added from the machine specific directories:
         + Some use 1900 offset
         + disabled on RS6000
         + MIPS uses IDATE(MONTH,DAY,YEAR)
-        + Cray uses DATE() function
+        + Cray uses DATE() function which returns different format
+          to g77 DATE() builtin
   GKS does not want the 4 digit year!
+  Now runs with autoconf
+
+ gkdfop.f - Add READONLY check to open. Use .fpp
+
+ gkfobo.f - no system specific interface
+
+ gkfoco.f - Some versions use GKBUG, others just set the error
+            Use the GKBUG version
+
+ gkiobi.fpp
+ gkiobo.fpp
+ gkioco.fpp
+ gkioci.fpp  - Check for FPUTC/FGETC intrinsics
+               Also check for presence of FLUSH
+ 
+ gkiocl.f    - Most systems identical (give or take a tweak
+               that was not really required and only worked for Suns).
+               Special code for cray and indigo currently
+               ignored. [which were themselves identical]
+
+ gkiofi.f    - no system specific code
+
+ gkiofo.fpp  - Need to switch on LSHIFT vs SHIFTL vs ISHFT
+                                 RSHIFT vs SHIFTR vs ISHFT
+                                 AND vs IAND and OR vs IOR
+               Include RS6000 tweak
+
+ gkioop.     - Very different on different platforms.
+               Use most current (solaris, alpha, linux) version as root
+	       Older versions do not use GKDFOP routine
+               Solaris version seems to be the same as linux and
+               alpha versions except that Solaris uses UNIT=(A+B) syntax
+               Note that CSSFN is disabled on Linux.
+	       Presumably because SCRATCH files do not need a filename.

@@ -6,7 +6,11 @@
 
 noinst_LTLIBRARIES = libgks_base.la
 
-libgks_base_la_SOURCES = $(F_ROUTINES)
+libgks_base_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES)
+
+# These are the old "sources" files and the "fortran" files.
+# plus the "machines" files that do not actually need to be
+# machines specific.
 
 F_ROUTINES = \
 gkbug.f gkcasm.f gkcctg.f gkcctm.f gkcela.f gkceli.f gkcell.f gkcelt.f \
@@ -47,4 +51,12 @@ gktzsw.f gktztp.f gktzvp.f gkupc.f gkupi.f gkupr.f gkupsi.f gkurec.f \
 gkurei.f gkvers.f gkwcld.f gkwddl.f gkwkc4.f gkwspb.f gkxbcl.f gkxcge.f \
 gkxcpu.f gkxdcs.f gkxdwc.f gkxdwo.f gkxfd.f gkxlin.f gkxof.f gkxon.f \
 gkxpal.f gkxpat.f gkxpcc.f gkxpcx.f gkxpxc.f gkxpxo.f gkxqxc.f gkxqxo.f \
-gkxss.f gkxtfb.f gkxtfp.f gkxthw.f gkxxf.f
+gkxss.f gkxtfb.f gkxtfp.f gkxthw.f gkxxf.f gkan1.f gkaton.f gkfobo.f \
+gkfoco.f gkiocl.f gkiofi.f
+
+
+# These are the routines that were in the machines directory but
+# require CPP processing and configure checks
+
+FPP_ROUTINES = gkdate.fpp gkdfop.fpp gkiobi.fpp gkiobo.fpp \
+	gkioci.fpp gkioco.fpp gkiofo.fpp

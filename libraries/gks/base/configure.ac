@@ -21,11 +21,19 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
-dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
+AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_CHECK_INTRINSICS([IDATE DATE GETENV FGETC FPUTC FLUSH GETPID])
+AC_FC_CHECK_INTRINSICS([LSHIFT SHIFTL RSHIFT SHIFTR ISHFT])
+AC_FC_CHECK_INTRINSICS([AND IAND OR IOR])
+
+
+dnl    Use config.h
+AM_CONFIG_HEADER(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
