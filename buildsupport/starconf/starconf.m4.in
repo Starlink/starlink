@@ -370,8 +370,8 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 ])# STAR_LATEX_DOCUMENTATION
 
 
-# STAR_CHECK_PROGS(progs-to-check-for)
-# ------------------------------------
+# STAR_CHECK_PROGS(progs-to-check-for, [package=''])
+# --------------------------------------------------
 #
 # For each of the programs in PROGS-TO-CHECK-FOR, define a variable
 # whose name is the upcased version of the program name, and whose
@@ -383,12 +383,24 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # program outside of the set of alphanumerics and underscores are
 # normalised to underscores.
 #
+# The optional second argument gives the name of the package containing
+# the program in question.  Some packages install their binaries in
+# package-specific directories, and this argument allows this macro to
+# look there as well.
+#
 # For example:
 #     STAR_CHECK_PROGS(messgen)
 # would define the variable MESSGEN to have the full path to the
 # messgen application.
 #
 # Calls AC_SUBST and AC_ARG_VAR on the generated variable name.
+#
+# The behaviour described below, for the result when the required program
+# is not found, is not final, and may change.  The documentation below is
+# contradictory, and should be regarded merely as a rather confused
+# discussion of the issues.  The current behaviour is that when the progam
+# is not found, the variable is defined to be the program's name without
+# any path at all.
 #
 # This is the analogue of AC_CHECK_PROG, except that: (1) the variable
 # name defaults to the program name, (2) the variable value if the
@@ -399,7 +411,7 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # before they have been installed (in this case we are presumably
 # doing a top-level configure of the Starlink tree, and the Makefile
 # will ensure that the required files are installed before the current
-# package actually uses it.
+# package actually uses it.  NB: (2) is not true at present.
 #
 # The current value of the PATH variable is augmented by the location
 # of the binary installation directory, using the current default
@@ -434,33 +446,21 @@ AC_DEFUN([STAR_CHECK_PROGS],
                       AC_PATH_PROG(star_prog,
                                    ProgramName,
                                    ProgramName,
-                                   [$default_bindir:$STARLINK/bin:$PATH])
-#                      if test -z "$star_prog"; then
-#                          if test -x $STARLINK/bin/starconf-finder; then
-#                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
-#                          else
-#                              star_prog=ProgramName
-#                          fi
-#                      fi
+                                   [$default_bindir:]m4_ifval([$2],
+                                                              [$default_bindir/$2:],
+                                   )[$STARLINK/bin:]m4_ifval([$2],
+                                                              [$STARLINK/bin/$2:],
+                                   )[$PATH])
+##                      if test -z "$star_prog"; then
+##                          if test -x $STARLINK/bin/starconf-finder; then
+##                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
+##                          else
+##                              star_prog=ProgramName
+##                          fi
+##                      fi
                       AC_ARG_VAR(star_prog,
                                  [Location of the ]ProgramName[ application])])
 ])# STAR_CHECK_PROGS
-
-## NOTAC_DEFUN([STAR_CHECK_PROGS],
-####         [eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
-##          AC_FOREACH([ProgramName], [$1],
-##                     [AC_PATH_PROG(_STAR_UPCASE(m4_bpatsubst(ProgramName,
-##                                                             [[^0-9a-zA-Z_]], 
-##                                                             [_])),
-##                                   ProgramName,
-##                                   [$STARLINK/bin/starconf-finder ProgramName],
-##                                   [$default_bindir:$STARLINK/bin:$PATH])
-##                      AC_ARG_VAR(_STAR_UPCASE(m4_bpatsubst(ProgramName,
-##                                                           [[^0-9a-zA-Z_]], 
-##                                                           [_])),
-##                                 [Location of the ]ProgramName[ application])])
-##])# STAR_CHECK_PROGS
-          
 
 
 # STAR_MONOLITHS
