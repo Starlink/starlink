@@ -50,7 +50,8 @@
    This is defined by default when the compiler is invoked with
    `-std strict_ansi', but that's a little harder to arrange in
    here. */
-#undef __USE_STD_IOSTREAM
+/* Now redundant, since this part has been rewritten in configure.in */
+/* #undef __USE_STD_IOSTREAM */
 
 /* Define as 1 if you have <sstream> (as opposed to older
    <strstream>).  Define as 0 otherwise. */

@@ -118,16 +118,45 @@ AC_CHECK_FUNC(gethostbyname,,
 AC_CHECK_FUNC(socket,,
   AC_CHECK_LIB(socket, socket,,,-lnsl))
 
-dnl   What type of system are we on?
-dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
-dnl   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
-dnl   streams library.  See Digital C++ v6.0 manual, section 7.1.2.
-dnl   This is defined by default when the compiler is invoked with
-dnl   `-std strict_ansi', but that's a little harder to arrange in here.
-AC_CANONICAL_HOST
-case "$host" in
-  alpha*) test "$CXX" = "cxx" && AC_DEFINE(__USE_STD_IOSTREAM) ;;
-esac
+dnl   Do we have to add any platform-specific compiler flags.  We
+dnl   could do this by using AC_CANONICAL_HOST to detect the platform
+dnl   and add things that way, but it's rather error-prone, since it
+dnl   depends on config.guess being up-to-date, and possibly on
+dnl   compilers not changing.  Try compiling with a sequence of added
+dnl   CXXFLAGS and go with the first one that works.  The streams
+dnl   support is the only one that appears to matter -- others may be
+dnl   added here in future.
+dnl
+dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with
+dnl   `-std strict_ansi' (or with __USE_STD_IOSTREAM defined), so that
+dnl   it uses a standards-conforming streams library.  See Digital C++
+dnl   v6.0 manual, section 7.1.2, at eg,
+dnl   <http://h30097.www3.hp.com/cplus/ugu.htm>
+dnl
+dnl   XXX This _doesn't_ work on cxx V6.5 at least:
+dnl   catlib-install/include/cat/CatalogInfo.h includes iostream.h,
+dnl   which includes iostream.hxx (the old library interface), which
+dnl   has an explicit check for __NO_USE_STD_IOSTREAM (should be
+dnl   exclusive with __USE_STD_IOSTREAM) and refuses to load unless
+dnl   it's defined.  That's a bigger problem to deal with....
+AC_MSG_CHECKING(extra compiler flags for streams support)
+orig_CXXFLAGS="$CXXFLAGS"
+flagschecked=no
+for flags in "" "-std strict_ansi"; do
+    CXXFLAGS="$orig_CXXFLAGS $flags"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+                #include <iostream>
+                using std::ostream;
+            ]])],
+            [AC_MSG_RESULT(ok $flags)
+             flagschecked=ok
+             break])
+done
+if test $flagschecked = no; then
+    AC_MSG_RESULT([unknown!])
+    AC_MSG_ERROR([Can't work out how to compile programs with streams support])
+fi
+dnl echo "CXXFLAGS=$CXXFLAGS"
 
 dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
 AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
