@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_DULBM( IGRP, IVAR, ILEVEL, DBEAM, STATUS )
+      SUBROUTINE POL1_DULBM( IGRP, IVAR, ILEVEL, STATUS )
 *+
 *  Name:
 *     POL1_DULBM
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_DULBM( IGRP1, IVAR, ILEVEL, DBEAM, STATUS )
+*     CALL POL1_DULBM( IGRP1, IVAR, ILEVEL, STATUS )
 
 *  Description:
 *     This routine creates a 3D NDF holding Stokes vectors calculated from 
@@ -27,16 +27,6 @@
 *        if and only if all the input NDFs have variances.
 *     ILEVEL = INTEGER (Given)
 *        The amount of information to display on the screen.
-*     DBEAM = INTEGER (Given and Returned)
-*        If greater than zero, then an error is reported if any of the
-*        supplied NDFs do not contain dual-beam data. Otherwise, no error
-*        is reported if any of the
-*        supplied NDFs do not contain dual-beam data. , the routine returns immediately.
-
-*        will be reported if variances cannot be created. If less than zero
-*        then output variances are not required, and any input variances
-*        will be ignored. If zero, then output variances will be created
-*        if and only if all the input NDFs have variances.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -134,9 +124,6 @@
       INTEGER IGRP
       INTEGER IVAR
       INTEGER ILEVEL
-
-*  Arguments Given and Returned:
-      INTEGER DBEAM
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -335,13 +322,6 @@
 
             ELSE IF( RAY( IVAL ) .NE. 'O' .AND. 
      :               RAY( IVAL ) .NE. 'E' ) THEN
-
-
-               IF( DBEAM .LE. 0 ) THEN
-                  DBEAM = -1
-                  GO TO 99
-               END IF
-
                DESCOK = .FALSE.
                CALL MSG_SETC( 'I', 'RAY' )
                CALL MSG_SETC( 'V', RAY( IVAL ) )
@@ -423,9 +403,6 @@
      :        'NDFs have valid POLPACK extensions.' , STATUS )
          GO TO 99
       ENDIF
-
-*  Indicate we are doing dual-beam polarimetry.
-      DBEAM = 1
 
 *  Find out whether we are doing linear or circular polarimetry. In
 *  circular polarimetry mode there are 2 waveplate positions and in
