@@ -304,6 +304,103 @@ nbs_get_shape(id, maxdims, dims, actdims, status)
   actdims
   status
 
+
+########################## -- NBS definition -- ###########################
+
+void
+nbs_begin_definition(sid, status)
+  int sid = NO_INIT
+  int status
+ CODE:
+  nbc_begin_definition(&sid, &status);
+ OUTPUT:
+  sid
+  status
+
+void
+nbs_define_structure(envsid, name, type, sid, status)
+  int envsid
+  char * name
+  char * type
+  int sid = NO_INIT
+  int status
+ CODE:
+  nbc_define_structure(envsid, name, type, &sid, &status);
+ OUTPUT:
+  sid
+  status
+
+void
+nbs_define_primitive(envsid, name, type, maxdims, maxbytes, sid, status)
+  int envsid
+  char * name
+  char * type
+  int maxdims
+  int maxbytes
+  int sid = NO_INIT
+  int status
+ CODE:
+  nbc_define_primitive(envsid, name, type, maxdims, maxbytes, &sid, &status);
+ OUTPUT:
+  sid
+  status
+
+void
+nbs_define_shape(sid, ndims, dims, status)
+  int sid
+  int ndims
+  int * dims
+  int status
+ PROTOTYPE: $$\@$
+ CODE:
+  nbc_define_shape(sid, ndims, dims, &status);
+ OUTPUT:
+  status
+
+
+void
+nbs_end_definition(name, option, status)
+  char * name
+  char * option
+  int status
+ CODE:
+  nbc_end_definition(name, option, &status);
+ OUTPUT:
+  status
+
+void
+nbs_restore_definition(name, save_name, status)
+  char * name
+  char * save_name
+  int status
+ CODE:
+  nbc_restore_definition(name, save_name, &status);
+ OUTPUT:
+  status
+
+
+void
+nbs_restore_noticeboard(name, save_name, status)
+  char * name
+  char * save_name
+  int status
+ CODE:
+  nbc_restore_noticeboard(name, save_name, &status);
+ OUTPUT:
+  status
+
+
+void
+nbs_save_noticeboard(id, status)
+  int id
+  int status
+ CODE:
+  nbc_save_noticeboard(id, &status);
+ OUTPUT:
+  status
+
+
+
 ########################### -- P  U  T  S -- #############################
 
 # Put a character variable
