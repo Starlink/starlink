@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL CCDALIGN( STATUS )
+*     CALL CCDALIGN( PID, STATUS )
 
 *  Arguments:
 *     PID = CHARACTER * ( * ) (Given)
@@ -29,14 +29,13 @@
 *     are almost registered (frames which have not been moved on the
 *     sky) saving effort in re-identification of image features.
 *
-*     The basic method used is to access groups of NDFs (or a series
-*     of single NDFs if all are moved between exposures) and an
-*     optional reference NDF. The first NDF of the first group or the
-*     reference NDF is initially displayed and you are invited to mark
+*     The basic method used is to supply a list of NDFs and an
+*     optional reference NDF.  The first NDF or the reference
+*     NDF is initially displayed and you are invited to mark
 *     the positions of centroidable image features on it using a 
 *     graphical interface.  This window then remains on the screen for 
 *     reference while you identify the same features on each of the 
-*     other sets of images in the same way.
+*     other images in the same way.
 *
 *     After centroiding you are then given the option to stop. If
 *     you decide to, then you will have labelled position lists to use
@@ -54,12 +53,19 @@
 *     labelled positions, and attached coordinate systems which may be
 *     used to transform other position lists or when resampling the data.
 *
+*     If the EXTRAS parameter is true you may also enter, for each of
+*     the original images, a group of images which is almost registered
+*     with it (within the capabilities of centroiding, i.e. a few pixels).
+*     In this way similar registration processes can be performed
+*     on many almost-aligned images without additional work from the
+*     user.
+*
 *     The graphical interface used for marking features on the image
 *     should be fairly self-explanatory.  The image can be scrolled using
 *     the scrollbars, the window can be resized, and there are controls
 *     for zooming the image in or out, changing the style of display and 
-*     altering the percentile cutoff limits.  The numbers of any 
-*     identified features on each image must match those of the 
+*     altering the percentile cutoff limits.  The displayed index numbers
+*     of any identified features on each image must match those on the 
 *     reference image (though it is not necessary to identify all of 
 *     the features from the reference image on each one), and there is 
 *     also a control for selecting the number of the next point to mark.
@@ -72,7 +78,7 @@
 *     one.
 
 *  Usage:
-*     ccdalign
+*     ccdalign in
 
 *  ADAM Parameters:
 *     CONTINUE = _LOGICAL (Read)
@@ -80,6 +86,16 @@
 *        out the registrations of your images. Note that this is
 *        only possible if you are intending to use linear
 *        transformations (this is the usual case).
+*        [FALSE]
+*     EXTRAS = _LOGICAL (Read)
+*        If this parameter is true, then for each NDF (or Set of 
+*        NDFs, if USESET is true) from the IN list you will be
+*        prompted to enter a group of corresponding names which
+*        represent more files of the same type pointing at (almost)
+*        the same sky position as the one in the IN list.  CCDALIGN
+*        will then centroid the marked objects in all the images
+*        in the same group so that multiple similar registrations
+*        can be done at the same time.
 *        [FALSE]
 *     FITTYPE = _INTEGER (Read)
 *        The type of fit which should be used when determining the
@@ -94,10 +110,9 @@
 *
 *        [5]
 *     IN = LITERAL (Read)
-*        A list of NDF names suitable to the current stage in
-*        processing. The NDF names should be separated by commas
+*        A list of the NDFs to be displayed in the GUI for interactive
+*        marking of features.  The names should be separated by commas
 *        and may include wildcards.
-*        [!]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -151,6 +166,17 @@
 *        the program attempting to display an enormous viewing region.
 *        If set to zero, then no limit is in effect.
 *        [1280]
+*     MORE = LITERAL (Read)
+*        If EXTRAS is true, this parameter is used to get a list of
+*        images corresponding to each one which is named by the IN 
+*        parameter.  These lists are always got interactively; MORE
+*        values cannot be given on the command line.  For any given
+*        response the null value (!) may be supplied, indicating that
+*        there are no similarly aligned images.  If the original image
+*        is included again in the supplied MORE value, it will be 
+*        ignored, since it already forms part of the group being 
+*        considered.
+*        [!]
 *     PERCENTILES( 2 ) = _DOUBLE (Read)
 *        The initial low and high percentiles of the data range to use
 *        when displaying the images; any pixels with a value lower than
@@ -159,6 +185,34 @@
 *        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        This can be changed from within the GUI.
 *        [2,98]
+*     REFNDF = LITERAL (Read)
+*        The name of an additional reference image (or Set); this is the
+*        first image displayed and the one which will be visible while
+*        you are marking points on all the others.  If the null value 
+*        (!) is supplied then no additional reference image will be
+*        used, and the first one in the IN list will be the first
+*        displayed.
+*        [!]
+*     USESET = _LOGICAL (Read)
+*        This parameter determines whether Set header information will
+*        be used.  If USESET is true, then CCDALIGN will try to
+*        group images according to their Set Name attribute before
+*        displaying them, rather than treating them one by one.
+*        All images in the IN list which share the same (non-blank)
+*        Set Name attribute, and which have a CCD_SET attached 
+*        coordinate system, will be shown together as a single
+*        image in the viewer for object marking, plotted in their
+*        CCD_SET coordinates.
+*
+*        If USESET is false, then regardless of Set headers, each 
+*        individual NDF will be displayed for marking separately.
+*        If the input images have no Set headers, or if they have 
+*        no CCD_SET coordinates in their WCS components, the value
+*        of this parameter will make no difference.
+*
+*        If a global value for this parameter has been set using 
+*        CCDSETUP than that value will be used.
+*        [TRUE]
 *     WINX = INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
@@ -183,8 +237,23 @@
 *        [1]
 
 *  Examples:
-*     ccdalign
-*        This runs the ccdalign program.
+*     ccdalign * continue=no
+*        This will display all the images in the current directory and
+*        invite you to mark corresponding image features on each one
+*        in turn.  When you have done this, the centroids will be
+*        calculated and you will be left with a position list with
+*        the extension `.acc' associated with each one.
+*
+*     ccdalign "x1008,x1009,x1010" refndf=xmos extras=yes continue
+*        Here the EXTRAS parameter is true, so for each of the named
+*        images you will be prompted for a list of other images 
+*        which were taken pointing in the same direction.
+*        The file `xmos' is being used as the reference image,
+*        so that will be presented first for marking features.
+*        When you have marked features on all four images, the 
+*        program will go on to match them all up and produce a 
+*        global registration, attaching a new coordinate system in
+*        which they are all registered to each file.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The
@@ -192,17 +261,18 @@
 *     application. If the application has not been run then the
 *     'intrinsic' defaults, as shown in the parameter help, apply.
 *
-*     As this application is a script some of the parameters are used
-*     repeatedly and cannot be sensibly set on the command-line, indeed
-*     it is not designed for this use and in general all parameters
-*     should be responded to interactively.
-*
-*     Certain parameters (LOGTO and LOGFILE) have global values. These
-*     global values will always take precedence, except when an
+*     Certain parameters (LOGTO, LOGFILE and USESET) have global values.
+*     These global values will always take precedence, except when an
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
-
-*     Note - test it with NDFs in different directories.
+*
+*     Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM,
+*     MARKSTYLE) give initial values for quantities which can be modified
+*     while the program is running.  Although these may be specified on
+*     the command line, it is normally easier to start the program up and
+*     modify them using the graphical user interface.  If the program
+*     exits normally, their values at the end of the run will be used
+*     as defaults next time the program starts up.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -368,6 +438,12 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise some GRP identifiers to harmless values.
+      SNAMGR = GRP__NOID
+      RNAMGR = GRP__NOID
+      LDRGR = GRP__NOID
+      REFGR = GRP__NOID
 
 *  Find out the environment we're running under. If it's IRAF then
 *  INDEF is used instead of ! as a NULL symbol. 
@@ -580,50 +656,6 @@
             CALL GRP_PUT( GRGR( NSET + 1 ), 1, NDFNAM, 0, STATUS )
          END DO
 
-*  If requested, get the extra members of the reference group.
-         IF ( EXTRAS ) THEN
-
-*  Inform the user what we want.
-            CALL MSG_OUT( ' ', ' ', STATUS )
-            CALL MSG_OUT( ' ', 
-     :'Enter extra NDFs in the same sky position as the reference NDF',
-     :                    STATUS )
-
-*  Get the user to input extra NDFs for the group via the MORE parameter.
-            CALL PAR_CANCL( 'MORE', STATUS )
-            IF ( STATUS .NE. SAI__OK ) GO TO 99
-            CALL CCD1_NDFGL( 'MORE', 0, CCD1__MXNDF - NREF, MORGR, NMOR,
-     :                       STATUS )
-
-*  If NULL response was given, annul the error and assume taht there are
-*  no extra NDFs in this group.
-            IF ( STATUS .EQ. PAR__NULL ) THEN
-               CALL ERR_ANNUL( STATUS )
-               NMOR = 0
-            ELSE
-
-*  If we do have extra NDFs, write them out to the list file and store in
-*  the group.  If any are the same as group leader NDFs, don't bother
-*  to write them again.
-               DO J = 1, NMOR
-                  CALL GRP_GET( MORGR, J, 1, NDFNAM, STATUS )
-                  DONE = .FALSE.
-                  DO K = 1, NREF
-                     DONE = DONE .OR. NDFNAM .EQ. NDFNMS( K )
-                  END DO
-                  IF ( .NOT. DONE ) THEN
-                     CALL FIO_WRITE( FD, NDFNAM( : CHR_LEN( NDFNAM ) ),
-     :                               STATUS )
-                     CALL GRP_PUT( GRGR( NSET + 1 ), 1, NDFNAM, 0,
-     :                             STATUS )
-                  END IF
-               END DO
-            END IF
-
-*  Annul the group used to get the values from the MORE parameter.
-            CALL CCD1_GRDEL( MORGR, STATUS )
-         END IF
-
 *  Close the list file.
          CALL FIO_CLOSE( FD, STATUS )
       END IF
@@ -636,7 +668,11 @@
 *  ordering are updated accordingly.
       IF ( HAVREF ) THEN
          NSET = NSET + 1
-         CALL GRP_GET( RNAMGR, 1, 1, SNAME, STATUS )
+         IF ( USESET ) THEN
+            CALL GRP_GET( RNAMGR, 1, 1, SNAME, STATUS )
+         ELSE
+            SNAME = ' '
+         END IF
          CALL GRP_PUT( SNAMGR, 1, SNAME, NSET, STATUS )
          DO I = 1, NREF
             NNDF = NNDF + 1
@@ -669,9 +705,8 @@
 *  Call the routine which will do the graphical user interaction to
 *  obtain the position lists for each group of NDFs.
       CALL CCD1_ALGN( LDRGR, NNDF, NSET, LMEM, LMEMOF, SNAMGR,
-     :                REFSET, PERCNT, ZOOM, 
-     :                MAXCNV, WINDIM, MSTYLE, NPOINT, IPXPOS,
-     :                IPYPOS, IPIND, STATUS )
+     :                REFSET, PERCNT, ZOOM, MAXCNV, WINDIM, MSTYLE,
+     :                NPOINT, IPXPOS, IPYPOS, IPIND, STATUS )
 
 *  Write display preference parameters back to the parameter system.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -681,6 +716,9 @@
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_PUT1D( 'PERCENTILES', 2, PERCNT, STATUS )
       CALL PAR_PUT0C( 'MARKSTYLE', MSTYLE, STATUS )
+
+*  We are no longer interested in the reference NDF.
+      IF ( HAVREF ) NSET = NSET - 1
 
 *  Start up the CCDPACK_REG monolith which is used later in this task.
       CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
@@ -701,13 +739,8 @@
 
 *  Get the name of the position list file and of the file containing
 *  all the NDFs in this group.
-         IF ( HAVREF .AND. I .EQ. NSET ) THEN
-            CALL MSG_SETC( 'LISTID', 'ref' )
-            CALL MSG_LOAD( ' ', '^LISTID', LISTID, LENG, STATUS )
-         ELSE
-            CALL MSG_SETI( 'LISTID', I )
-            CALL MSG_LOAD( ' ', 'ndf^LISTID', LISTID, LENG, STATUS )
-         END IF
+         CALL MSG_SETI( 'LISTID', I )
+         CALL MSG_LOAD( ' ', 'ndf^LISTID', LISTID, LENG, STATUS )
          NAMLST = 'ccdalign_' // LISTID( :LENG ) // '.list'
 
 *  If this group does not represent a Set (i.e. it has only one member), 
@@ -844,10 +877,10 @@
       CALL MSG_BLANK( STATUS )
       DO I = 1, NSET
          IF ( STATUS .NE. SAI__OK ) GO TO 99
-         CALL MSG_SETI( 'NGROUP', I ) 
-         CALL MSG_LOAD( ' ', 'ccdalign_ndf^NGROUP.list', NAMLST,
-     :                  OPLEN, STATUS )
-         CMD = 'in=^'//NAMLST( :OPLEN )//' '//
+         CALL MSG_SETI( 'LISTID', I )
+         CALL MSG_LOAD( ' ', 'ccdalign_ndf^LISTID.list', NAMLST, LENG,
+     :                  STATUS )
+         CMD = 'in=^'//NAMLST( :LENG )//' '//
      :         'ndfnames=true '//
      :         'outlist=*.acc '//
      :         'autoscale=true accept'
@@ -1004,6 +1037,10 @@
       DO I = 1, NSET
          CALL CCD1_GRDEL( GRGR( I ), STATUS )
       END DO
+      CALL CCD1_GRDEL( SNAMGR, STATUS )
+      CALL CCD1_GRDEL( RNAMGR, STATUS )
+      CALL CCD1_GRDEL( LDRGR, STATUS )
+      CALL CCD1_GRDEL( REFGR, STATUS )
 
 *  Free any memory which somehow has not been freed already.
       CALL CCD1_MFREE( -1, STATUS )
