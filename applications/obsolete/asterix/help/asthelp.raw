@@ -198,16 +198,20 @@
  <dd> Convert spectrum from ASTERIX to Xspec format
  <dt> (EVBIN            
  <dd> Creates a binned dataset from an event dataset.)
- <dt> AST2TEXT            
+ <dt> AST2TXT
  <dd> Outputs one or more datasets to text file
  <dt> HDS2TEXT          
  <dd> Convert HDS objects to text (opposite of TEXT2HDS)
- <dt> TEXT2AST            
+ <dt> TXT2AST
  <dd> Reads a text file into an ASTERIX binned dataset
  <dt> TEXT2HDS          
  <dd> Convert text file to HDS
  <dt> FITS2HDS          
  <dd> Convert FITS file to HDS
+ <dt> IMPORT
+ <dd> This command has been renamed TXT2AST
+ <dt> EXPORT
+ <dd> This command has been renamed AST2TXT
  </dl>
 
  <li> Display Commands
@@ -2097,9 +2101,9 @@
  <dt> STATISTIX
  <dd> Optionally (via the USEGRP parameter) displays statistics on 
       the groups rather than the pixels in a grouped dataset
- <dt> TEXT2AST/AST2TEXT
- <dd> TEXT2AST will import a column with the header identifier GROUP 
-      into the grouping array, and AST2TEXT will write it out
+ <dt> TXT2AST/AST2TXT
+ <dd> TXT2AST will import a column with the header identifier GROUP
+      into the grouping array, and AST2TXT will write it out
  <dt> BINSUBSET
  <dd> Correctly subsets a grouping array. This will usually leave
       some group numbers with no member pixels, but ASTERIX programs
@@ -2875,7 +2879,7 @@
  particularly useful for datasets with large numbers of points
  where it would be impractical to type in the bin bounds at the
  prompt.  Instead the axis values and widths could be put into
- a text file and then TEXT2ASTed to a dummy dataset that REBIN
+ a text file and then TXT2ASTed to a dummy dataset that REBIN
  could then clone the output axes from.  Data normalisation with 
  respect to each axis remains unchanged between input and output.
  For datasets of dimension &gt 1 the user has the option of selecting
@@ -4694,7 +4698,7 @@
  define a mode!<p>
 
 3 Spatial_files
- It is possible to use a spatial file (as produced by REGIONS or WELLARD)
+ It   is possible to   use a spatial  file (as  produced by REGIONS or WELLARD (now XRTARD))
  to define a 2-d region on an n-d datafile. This file may be used to
  set the QUALITY of the pixels in the region by setting FSEL=YES on
  the QUALITY command line. A shortform command, ARDQUAL, is available 
@@ -4931,10 +4935,10 @@
  See the ASTHELP entry for EvBin under Event_Dataset_Commands for
  full details.<p>
 
-2 AST2TEXT
+2 AST2TXT
  Converts a binned dataset to ascii file containing all axis, data,
  quality and error information. A header is written which enables
- the ascii file to be converted back to ASTERIX format using -<TEXT2AST>-
+ the ascii file to be converted back to ASTERIX format using -<TXT2AST>-
  directly, although this feature can be turned off.<p>
  
 3 Input_Output   
@@ -4949,7 +4953,7 @@
    <- GLOBAL.BINDS (Default binned dataset)
  OUT         2   CHARACTER Filename for output. Default extension
                            is .DAT.
- IMPREAD     -   LOGICAL   Write an TEXT2AST compatible header?
+ IMPREAD     -   LOGICAL   Write an TXT2AST compatible header?
    Hidden default Y
 
 2 HDS2TEXT
@@ -4977,12 +4981,12 @@
  FMT - Output format /'1PG11.6'/ >
  </exam>
 
-2 TEXT2AST
+2 TXT2AST
  Converts data in a ASCII file into an ASTERIX binned dataset.  It
  is designed to permit users to import data into ASTERIX making as
  few changes as possible to their input text files.<p>
 
- TEXT2AST is a very flexible program - a full description is rather
+ TXT2AST is a very flexible program - a full description is rather
  long, so read the "Quick_Guide" section below before attempting
  to use it.<p>
 
@@ -4990,11 +4994,11 @@
  for both 1 and 2 dimensional files.<p>
 
 3 Quick_Guide
- This section describes TEXT2AST working on the following example data file, a
+ This section describes TXT2AST working on the following example data file, a
  copy can be made from $AST_ROOT/demo/import_1d.dat<p>
 
  <exam>
-   ; TEXT2AST demo file - 1 dimensional
+   ; TXT2AST demo file - 1 dimensional
    ;
    TOPLEVEL TITLE "Fitted Fe abundance" ~
    TYPE "Radial_Profile"
@@ -5007,7 +5011,7 @@
  </exam>
 
  The file can be divided into two parts, the header part and the
- data part; the former describes how TEXT2AST is to interpret the
+ data part; the former describes how TXT2AST is to interpret the
  latter. The numbers in the data part are in columns, separated
  by spaces, but are not required to be aligned or any particular
  format. The header above is now described.<p>
@@ -5015,17 +5019,17 @@
  The first 2 lines are comments - all text from the semicolon to
  to the end of the line is ignored.<p>
 
- The 3rd line contains the word TOPLEVEL. This informs TEXT2AST to
+ The 3rd line contains the word TOPLEVEL. This informs TXT2AST to
  create certain named components in the output dataset. Those
  components allowed are TITLE and TYPE.Their contents follow the
  name of the component - if the case of the text is important
  then enclose it in double quotes. The 3rd line demonstrates the
  use of the continuation character <code>~</code> to continue the information
  on the next line of the text file. The TOPLEVEL information is
- optional - TEXT2AST will use defaults if it is not present.<p>
+ optional - TXT2AST will use defaults if it is not present.<p>
 
  The next line ( the 5th ) contains the word AXIS. This word is
- a column descriptor - ie. it indicates to TEXT2AST the nature of
+ a column descriptor - ie. it indicates to TXT2AST the nature of
  a column in the data part of the file. Like TOPLEVEL, AXIS can
  optionally be followed by several keywords. See under the
  section on "Header_Part" for their meaning.<p>
@@ -5034,9 +5038,9 @@
  The order of the descriptors is the same as the columns.<p>
 
  Once all the descriptors have been specified then the data
- begins. TEXT2AST reads in the data lines and constructs the dataset.<p>
+ begins. TXT2AST reads in the data lines and constructs the dataset.<p>
 
- Note that the data is sorted by TEXT2AST, so there is no need to
+ Note that the data is sorted by TXT2AST, so there is no need to
  arrange the data in the correct order. This feature can be
  disabled using the SORT keyword - useful for scattered data,
  such as phase plots.<p>
@@ -5059,7 +5063,7 @@
  other subtopics in this help.<p>
 
 3 Asymmetric_Errors
- TEXT2AST currently provides the only means of getting asymmetric
+ TXT2AST currently provides the only means of getting asymmetric
  axis and data errors into ASTERIX applications. This is achieved
  using the LO/UPWIDTH and/or LO/UPERROR descriptors to describe
  the axis and data error bars respectively. See the "Asymmetric 
@@ -5069,7 +5073,7 @@
  An alternate pair of descriptors for settings lower and upper
  data errors is LOLIM/UPLIM. Here the data columns should specify
  the lower and upper error bounds, rather than the sizes of the
- errors themselves. TEXT2AST converts the bounds to errors using the
+ errors themselves. TXT2AST converts the bounds to errors using the
  value of the corresponding DATA element.<p>
 
 3 Data_Part
@@ -5081,7 +5085,7 @@
  combination (see Quality subtopic for more information).<p>
 
 3 File_Format
- At all points in TEXT2AST input files, the following characters
+ At all points in TXT2AST input files, the following characters
  have special significance.<p>
 
    ; ! *    Comment characters. All text on a line after one of
@@ -5093,7 +5097,7 @@
  Blank lines are always ignored, as are superfluous spaces and
  tab characters.<p>
 
- TEXT2AST is not case sensitive - if case is required to be
+ TXT2AST is not case sensitive - if case is required to be
  preserved, for example in keyword data, then the text should
  be enclosed in double quotes.<p>
 
@@ -5108,14 +5112,14 @@
   If present, this line must be the first significant text
   in the input file.<p>
 
-  The data descriptors supported by TEXT2AST are, with their
+  The data descriptors supported by TXT2AST are, with their
   keywords:
 
    AXIS <label> <units> <scalar_width> <norm> <decreasing>
               Creates an axis component in output. Up to seven
               axis descriptors may be specified. Label and units
               can be set for each, the normalisation and a scalar
-              width value. If NORM is not specified, then TEXT2AST
+              width value. If NORM is not specified, then TXT2AST
               assumes the data to be un-normalised about that axis.
               If non-scalar widths are required, use the WIDTH
               descriptor. If DECREASING is specified, axis values
@@ -5137,7 +5141,7 @@
               Specifies the data for the DATA_ARRAY component of
               the output dataset. Label and units can be specified
 
-   IGNORE     Use the descriptor to force TEXT2AST to ignore the
+   IGNORE     Use the descriptor to force TXT2AST to ignore the
               corresponding column of data.
 
    QUALITY <mask>
@@ -5193,13 +5197,13 @@
 3 Examples
 
 4 1D_dataset
- The first TEXT2AST demo file,<p>
+ The first TXT2AST demo file,<p>
 
  <exam>
- ICL> TEXT2AST AST_DEMO:IMPORT_1D OUTPUT         ; 
+ ICL> TXT2AST AST_DEMO:IMPORT_1D OUTPUT         ;
 
   ;--------------------------------------------------
-  ;|       TEXT2AST demo file - 1 dimensional         |
+  ;|       TXT2AST demo file - 1 dimensional         |
   ;--------------------------------------------------
   TOPLEVEL TYPE "Profile"
   AXIS LABEL "Radius" UNITS "Arcmin" SCALAR_WIDTH 6.0
@@ -5215,7 +5219,7 @@
 
 4 2D_dataset
  <exam>
- ICL> TEXT2AST test.dat output
+ ICL> TXT2AST test.dat output
 
    TOPLEVEL TITLE "Test" TYPE "Image" LABEL ~  ; Continuation   
      "Flux" +                                  ; And another one
@@ -5225,7 +5229,7 @@
    AXIS UNITS "miles" LABEL "Y_COORD"          ; 2nd axis
    DATA                                        ; data array
    *
-   2 2 7    ; Note data values are jumbled - TEXT2AST still places
+   2 2 7    ; Note data values are jumbled - TXT2AST still places
    1 2 4    ; them correctly.
    3 3 45
    1 1 3
@@ -5260,7 +5264,7 @@
 
  <exam>
   ;--------------------------------------------------
-  ;         TEXT2AST demo file - 1 dimensional  
+  ;         TXT2AST demo file - 1 dimensional
   ;           with x-axis asymmetric errors
   ;--------------------------------------------------
   TOPLEVEL TYPE "Profile"             
@@ -5280,7 +5284,7 @@
 
  <exam>
   ;--------------------------------------------------
-  ;         TEXT2AST demo file - 1 dimensional  
+  ;         TXT2AST demo file - 1 dimensional
   ;        with x and y-axis asymmetric errors
   ;--------------------------------------------------
   TOPLEVEL TYPE "Profile"             
@@ -5336,7 +5340,7 @@
  lengths of upto 512 characters.<p>
 
  Note: If you want to produce a standard ASTERIX binned dataset containing
- a data array and axes use TEXT2AST. This program simply produces an
+ a data array and axes use TXT2AST. This program simply produces an
  HDS file containing a number of primitive HDS arrays or an ASTERIX
  EVENT dataset.<p>
 
@@ -6148,7 +6152,7 @@
 
 3 D_Diagnostic_Mode
   This special mode enables several sets of numbers of to be extracted
-  from PSS into external data files (usually TEXT2AST compatible). It is
+  from PSS into external data files (usually TXT2AST compatible). It is
   intended as a tool for use by experienced users and the author to
   help in diagnosing problems. Use the DIAG keyword to switch it on.
   The options available are,
@@ -7738,7 +7742,7 @@
  The spatial descriptor (or ARD) file has been introduced into ASTERIX
  as a method of defining complex areas on a 2-d surface. These files
  are simple text files and may be created with an editor or by running 
- the REGIONS application (or an ICL procedure such as WELLARD). They
+ the REGIONS application (or an ICL procedure such as WELLARD (now XRTARD)). They
  may then be used in the QUALITY program (to set pixels BAD or GOOD) or
  in the future, they will be used to define regions to sort data within
  in e.g. XSORT. For a full description of the file format see the Starlink
@@ -7834,11 +7838,14 @@
   END COMPOSITE
 
 2 SETBAD*
- An ICL procedure which wraps up the WELLARD command and the quality
+ An ICL procedure which wraps up the WELLARD (now XRTARD) command and the quality
  setting command. It sets the quality of a complicated area on an image
  to BAD.<p>
 
-2 WELLARD*
+2 WELLARD (now XRTARD)*
+
+ Note - The program WELLARD has been renamed and is now called XRTARD
+
  This is an ICL procedure which allows a user to interactively select a
  region on an image and write it into a spatial descriptor (ARD) text file.
  It makes extensive use of the MENU system and hence needs to be used
@@ -7855,11 +7862,11 @@
  e.g. XSORT, to define an area within which to sort data.<P>
 
 3 Method
- WELLARD lets the user specify a region on an image by selecting a shape
+ WELLARD (now XRTARD) lets the user specify a region on an image by selecting a shape
  from a menu and setting its extent using the cursor. A textfile
  containing the shapes selected is produced. You may select as many shapes
  as you like, however, you should heed the WARNING item. 
- The initial menu displayed by WELLARD, contains the simple shapes, box, 
+ The initial menu displayed by WELLARD (now XRTARD), contains the simple shapes, box,
  circle and annulus, a QUIT button (which means exit and save the ARD file),
  and an XRT button.<p>
 
@@ -14979,7 +14986,7 @@
  by the PSPC support structure and will doubtless include 
  several bright sources. One solution is to sort all the data 
  into a spectral image or temporal_image and than set the quality of 
- bright sources and the ribs bad using a combination of WELLARD and 
+ bright sources and the ribs bad using a combination of WELLARD (now XRTARD) and
  ARDQUAL (and possibly IGNORE, CIGNORE and CRESTORE). The program will 
  then correctly calculate the area of the background region. NB: This 
  technique minimises the effect of gradients in the background, 
@@ -15021,7 +15028,7 @@
      <ol>
      <li> Set the whole file bad using IGNORE
      <li> Set all pixels within the outer radius GOOD using CRESTORE
-     <li> Use WELLARD to define an ARD file containing a description
+     <li> Use WELLARD (now XRTARD) to define an ARD file containing a description
           of the PSPC ribs, the sources that fall within the bckgnd
           annulus and a circle centred on 0,0 with a radius of 0.5
           degrees. You can toggle the IMODE button to define the
@@ -15037,8 +15044,9 @@
  <li> subtract the two files using XRTSUB. 
 
  <li> You can then set pixels in the subtracted image, bad, by
-      using WELLARD and ARDQUAL as before. 
+      using WELLARD (now XRTARD) and ARDQUAL as before.
  </ol>
+
 
 4 Error_messages
  The message "Warning: energy of channel n out of bounds" ,
