@@ -358,6 +358,9 @@ AR_OUT = ar -x
 SHARE = .so
 BLD_SHR = :
 
+# Force-delete
+RMF = rm -f
+
 #------------------------------------------------------------------------------
 ###############################################################################
 #
@@ -389,10 +392,10 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.2
+PKG_VERS = 0.3
 
-# XXX fix location of catlib distribution
-# Originally from ftp://ftp.eso.org/pub/archive/skycat/README.html
+#  Catlib distribution is originally from
+#  ftp://ftp.eso.org/pub/archive/skycat/README.html  
 #  If this is a path, it must be relative to the unpacked source directory.
 CATLIB_DISTRIBUTION = catlib.tar.gz
 
@@ -401,7 +404,7 @@ CATLIB_DISTRIBUTION = catlib.tar.gz
 #  package from source (including this makefile, the associated mk
 #  script and any documentation files).
 
-# XXX fix up
+#  List of the source files bundled into the export_source distribution
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk \
 		$(CATLIB_DISTRIBUTION) VERSION $(DOCUMENTATION)
 
@@ -409,23 +412,13 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk \
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
-PUBLIC_SCRIPTS = autoastrom.pl autoastrom.pm
+PUBLIC_SCRIPTS = autoastrom autoastrom.pm
 
 #  List of other library files which will be installed.
 LIBRARY_FILES = moggy/Moggy.pm misc/extractor.config
 
-#  Lists of Latex and hypertext documents.
-# XXX fix up
-#LATEX_DOCS = sun83.tex
-
-
-HYPERTEXT_DOCS = 
-
 #  List of documentation files.
-
-# XXX fix up
-#DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
-DOCUMENTATION = $(PKG_NAME).news
+DOCUMENTATION = $(PKG_NAME).news sun242.tar-htx sun242.tar-tex sun242.xml
 
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -503,7 +496,7 @@ $(INSTALL_DIRS):
 #  --------------------------------------------------------
 
 
-# XXX
+# XXX Not clear if this still works
 check:
 	@ echo
 	@ echo \
@@ -686,7 +679,7 @@ install:
 		if test -n "$$f"; then \
 			cp -p $$f $$DEST; \
 			chmod 755 $$DEST; \
-			rm -f $$f; \
+			$(RMF) $$f; \
 			$(LINK) $$DEST $$f; \
 		else :; fi; \
 	done
@@ -799,14 +792,14 @@ deinstall:
 do_deinstall:
 #
 #  Note the package will need to be tested again.
-	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
+	@- if test -f .TESTED_$(SYSTEM); then $(RMF) .TESTED_$(SYSTEM); else :; fi
 #  Deinstall the executables and library files.
 	for f in $(BUILT_FILES) $(PUBLIC_SCRIPTS) $(LIBRARY_FILES) ""; do \
 		DEST=$(INSTALL_BIN)/`echo $$f|sed s+.*/++`; \
 		if test -n "$$f"; then \
-			rm -f $$f; \
+			$(RMF) $$f; \
 			cp -p $$DEST $$f; \
-			rm -f $$DEST; \
+			$(RMF) $$DEST; \
 		else :; fi; \
 	done
 #
@@ -815,7 +808,7 @@ do_deinstall:
 #  then ensure that the original exists.
 #	- if test -n "$(STARTUP_SCRIPT)"; then \
 #           if test -f $(INSTALL_BIN)/$(STARTUP_SCRIPT); then\
-#              rm -f $(INSTALL_BIN)/$(STARTUP_SCRIPT);\
+#              $(RMF) $(INSTALL_BIN)/$(STARTUP_SCRIPT);\
 #           else :; fi ;\
 #           $(MAKE) $(STARTUP_SCRIPT);\
 #        else :; fi
@@ -823,7 +816,7 @@ do_deinstall:
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
-              rm -f $(INSTALL_DOCS)/$$f;\
+              $(RMF) $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
 #
@@ -831,7 +824,7 @@ do_deinstall:
 	- if test -n "$(HYPERTEXT_DOCS)"; then \
            for f in $(HYPERTEXT_DOCS) ""; do \
               if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
-                 rm -f -r $(INSTALL_DOCS)/$$f;\
+                 $(RMF) -r $(INSTALL_DOCS)/$$f;\
               else :; fi;\
            done;\
            HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
@@ -851,7 +844,7 @@ do_deinstall:
 #  Note the system is no longer installed.  Re-create .BUILT, since we have
 #  returned the built files to the source directory but an unbuild may have
 #  been done.
-	@- rm -f .INSTALLED_$(SYSTEM) 1>/dev/null 2>/dev/null
+	@- $(RMF) .INSTALLED_$(SYSTEM) 1>/dev/null 2>/dev/null
 	@ echo '$(SYSTEM)' > .BUILT
 
 #  test: Perform an installation test.
@@ -888,7 +881,7 @@ test:
 do_test: $(EXTERNAL_INCLUDES)
 #
 #  Note the test has not yet succeeded.
-	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
+	@- if test -f .TESTED_$(SYSTEM); then $(RMF) .TESTED_$(SYSTEM); else :; fi
 	@ echo "Testing moggy"
 	cd moggy && make test
 	@ echo "There is not yet an installed AUTOASTROM test."
@@ -928,7 +921,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  Remove any pre-existing tar files before creating new ones.
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+           $(RMF) $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 
@@ -963,7 +956,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  Remove any pre-existing tar files before creating new ones.
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
+           $(RMF) $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
            $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
@@ -988,7 +981,7 @@ export_source: $(EXPORT)/$(PKG_NAME).tar.Z
 $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  Remove any pre-existing tar files before creating new ones.
 	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z || \
-		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
+		$(RMF) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 #	# Compress can return 2 if the `compressed' file is larger
 #	# than the input.  Don't fail in this case; only fail if the
 #	# return status is 1.
@@ -996,19 +989,28 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 		| compress -v >  $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z; \
 		test $$? != 1
 	test ! -f $(EXPORT)/$(PKG_NAME).tar.Z || \
-		rm -f $(EXPORT)/$(PKG_NAME).tar.Z
+		$(RMF) $(EXPORT)/$(PKG_NAME).tar.Z
 	$(LINK) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z \
 		$(EXPORT)/$(PKG_NAME).tar.Z
 
-#  Make the source tarball, making sure that the source directories
-#  are properly clean first.  When cleaning out moggy, check that
-#  there is indeed a Makefile (there won't be, if the directory is
-#  already clean).  Also ensure that the moggy configure script is present.
+# Make the source tarball, making sure that the source directories
+# are properly clean first.  When cleaning out moggy, check that
+# there is indeed a Makefile (there won't be, if the directory is
+# already clean).  Also ensure that the moggy configure script is
+# present (this isn't a repository source file, but it is a source
+# file for this purpose).
+#
+# It looks as if this should depend on `$(PUBLIC_SCRIPTS) astrom moggy
+# misc', but it shouldn't, since astrom and moggy in turn depend on
+# autoastrom_source.tar (so they can be unpacked correctly).  Since
+# this is a target which is invoked only during bundling for
+# distribution, we can tolerate this missing dependency, and simply
+# remember to delete autoastrom_source.tar when it's no longer needed.
 $(PKG_NAME)_source.tar:
 	cd astrom && ./mk unbuild
 	cd moggy && test ! -f Makefile || make distclean
 	cd moggy && make -f Makefile.in configure
-	test ! -f $(PKG_NAME)_source.tar || rm -f $(PKG_NAME)_source.tar
+	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc
 
 #  clean: Clean up the source directory.
@@ -1016,11 +1018,10 @@ $(PKG_NAME)_source.tar:
 #
 #  Remove all intermediate files.  Do not remove built files.
 clean:
-	rm -f *~ core
+	$(RMF) *~ core
 	-cd astrom && ./mk clean
 	-cd moggy && make -f Makefile.in tidy
-#	@- rm -rf source 1>/dev/null 2>/dev/null
-#	@- rm -f $(F_ROUTINES) $(OBJECT_FILES) 1>/dev/null 2>/dev/null
+	-cd doc && make tidy
 	@ echo
 	@ echo '*** Intermediate files removed'
 	@ echo
@@ -1028,14 +1029,29 @@ clean:
 #  unbuild: Reverse the build process.
 #  ----------------------------------
 #
-#  Remove all intermediate files and all built files, and note that the
-#  package is no longer built or tested.
+#  Remove all intermediate files and all built files, and note that
+#  the package is no longer built or tested.  The `clean' target in
+#  doc removes the documentation tarballs, which are regarded as part
+#  of the source distribution for the purposes of this makefile;
+#  therefore we shouldn't make that as part of this target.
 unbuild: clean
 	-cd astrom && ./mk unbuild
 	-cd moggy && make -f Makefile.in clean
-	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
+	-cd doc && make unbuild
+	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
+
+#------------------------------------------------------------------------------
+#
+# Documentation
+sun242.tar-htx sun242.tar-tex: doc/sun242.xml
+	cd doc; make
+	$(RMF) $@
+	$(LINK) doc/$@ $@
+
+sun242.xml: doc/sun242.xml
+	$(LINK) doc/$@ $@
 
 #------------------------------------------------------------------------------
 #
@@ -1044,10 +1060,16 @@ unbuild: clean
 # package, and the version of astrom in the directory astrom is merely 
 # a modification of the standard Starlink ASTROM package, which may be 
 # folded back into the main distribution.
+#
+# When we configure SkyCat (within the configuration of moggy) and
+# when we use the resulting Makefiles, we need to avoid the INSTALL
+# environment variable (indicating an installation directory) being
+# confused with the conventional meaning of that variable (indicating
+# an installation program).
 
 # First configure and build the moggy package.
 moggy/moggy: moggy/Makefile
-	cd moggy && make
+	cd moggy && unset INSTALL && make
 
 moggy/Makefile: moggy
 	@ if test ! -r $(CATLIB_DISTRIBUTION); then \
@@ -1055,7 +1077,7 @@ moggy/Makefile: moggy
 		echo "    (expected in $(CATLIB_DISTRIBUTION))"; \
 		false; \
 	fi
-	cd moggy && ./configure --with-catlib=../$(CATLIB_DISTRIBUTION)
+	cd moggy && unset INSTALL && ./configure --with-catlib=../$(CATLIB_DISTRIBUTION)
 
 astrom/astrom.x: astrom
 	cd astrom && ./mk build
