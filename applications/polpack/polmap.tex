@@ -1,0 +1,626 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {}
+\newcommand{\stardocinitials}  {}
+\newcommand{\stardocsource}    {}
+\newcommand{\stardocnumber}    {}
+\newcommand{\stardocauthors}   {fred}
+\newcommand{\stardocdate}      {now}
+\newcommand{\stardoctitle}     {POLMAP \\ [1ex]
+                                Display of Polarisation Maps}
+\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocmanual}    {On-line Manual}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+\newcommand{\mylabel}[1] {\xlabel{#1}\label{#1}}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents.
+%  ================================
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
+  \label{stardoccontents}
+  \begin{rawhtml}
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+
+
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+% ? End of document
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section {\mylabel{POLMAP_OVERVIEW}Introduction}
+PolMap is an interactive tool for ...
+
+\section {\mylabel{POLMAP_TUTORIAL}Tutorial}
+This is a click-by-click introduction to the use of PolMap, which aims to
+get you going with the minimum delay. It does not cover all possibilities,
+and assumes you have a relatively simple problem to solve. 
+
+\section {\mylabel{POLMAP_CONTROLS}A Tour of the Graphical User Interface}
+This section gives detailed descriptions of each control in the PolMap 
+Graphical User Interface. 
+
+\subsection {\mylabel{POLMAP_FILE_MENU}The {\em File} Menu}
+The {\em File} menu provides access to commands which control
+termination of PolMap, and the creation of the output files. They are:
+
+\subsubsection {\mylabel{POLMAP_SAVE}{\em Save}} 
+
+\subsubsection {\mylabel{POLMAP_EXIT}{\em Exit}} 
+
+\subsubsection {\mylabel{POLMAP_QUIT}{\em Quit}} 
+
+\subsection {\mylabel{POLMAP_EDIT_MENU}The {\em Edit} Menu}
+The {\em Edit} menu provides access to commands which relate to
+the changing of information stored within PolMap. They are:
+
+\subsection {\mylabel{POLMAP_OPTIONS_MENU}The {\em Options} Menu}
+The {\em Options} menu provides access to commands which control the
+various options which are available to customise the operation of PolMap.
+These options may also be set on the command line used to activate 
+{\tt polmap}. The menu items are:
+
+\subsubsection {\mylabel{POLMAP_COLOURS}{\em Colours}} 
+This allows control of the colours used to represent various objects in
+the PolMap GUI. Upon selection, a menu of objects appear including:
+
+\begin{description}
+
+\item [{\em Cross-hair}] - This sets the colour of the cross-hair which
+is used within the \htmlref{image display area}{POLMAP_IMAGE_DISPLAY} if
+the \htmlref{{\em Use Cross-hair}}{POLMAP_USE_CROSS_HAIR} option is
+selected. It defaults to yellow.
+
+\item [{\em Missing Pixels}] -  This sets the colour used to represent
+missing data in the \htmlref{image display area}{POLMAP_IMAGE_DISPLAY}.
+It defaults to cyan.
+
+\item [{\em Polygon Outlines}] - This sets the colour of any polygons drawn
+over the image. It defaults to red.
+
+\item [{\em Selection Box}] - This sets the colour of the box
+which indicates an area of the image to be zoomed, or from which objects
+are to be deleted. It defaults to red. \hyperref{Go here}{See
+section }{}{POLMAP_AREA_SELECTION} for instructions on selecting areas.
+
+\end{description}
+
+When one of these items is selected, a menu of colours appears from which
+a selection may be made. The available colours are red, blue, green,
+cyan, magenta, yellow, black.
+
+\subsubsection {\mylabel{POLMAP_STATUS_ITEMS}{\em Status Items}} This is used to
+customise the contents of the \htmlref{status area}{POLMAP_STATUS_AREA}
+shown below the image display area. Selecting this item will result in the 
+\htmlref{{\em Select status items}}{POLMAP_STATUS_ITEMS_DIALOG} dialog
+box appearing.
+
+\subsubsection {\mylabel{POLMAP_USE_CROSS_HAIR}{\em Use Cross-hair}}
+If this button is selected then a cross-hair will be used instead of a
+pointer within the \htmlref{image display area}{POLMAP_IMAGE_DISPLAY}.
+The default is to use a cross-hair.
+
+\subsubsection {\mylabel{POLMAP_DISPLAY_HELP_AREA}{\em Display Help Area}} 
+If this button is selected, then the PolMap GUI will include a
+\htmlref{help area}{POLMAP_HELP_AREA} in which dynamic help information
+on the control under the pointer is displayed. Otherwise, the help area
+is not displayed.
+
+\subsubsection {\mylabel{POLMAP_DISPLAY_STATUS_AREA}{\em Display Status Area}} 
+If this button is selected, then the PolMap GUI will include a
+\htmlref{status area}{POLMAP_HELP_AREA} in which information
+describing the current state (such as image names, options values, 
+pointer co-ordinates, etc) is displayed. Otherwise, the
+status area is not displayed. The contents of this area may be customised
+using the \htmlref{{\em Status Items}}{POLMAP_STATUS_ITEMS} entry in the
+\htmlref{{\em Options}}{POLMAP_OPTIONS_MENU} menu.
+
+\subsubsection {\mylabel{POLMAP_SAVE_OPTIONS}{\em Save Options}} 
+If this menu item is selected, the current option values (together with
+the values shown in the \htmlref{{\em \% not white}}{POLMAP_NOT_WHITE}
+and \htmlref{{\em \% black}}{POLMAP_BLACK} controls) will be saved so that
+they become the default values for future invocations of
+PolMap.\footnote{The current values are passed back to the {\tt polmap} A-task 
+upon completion, and they are then stored in the A-tasks parameter file.}
+
+\subsection {\mylabel{POLMAP_HELP_MENU}The {\em Help} Menu}
+This menu provides access to the PolMap hyper-text help information. 
+\hyperref{Go here}{See section }{}{POLMAP_USING_HELP} for more information
+on selecting which browser is to be used. This menu provides several preset
+access points for the help information. The {\em Pointer} item allows the 
+required help to be specified by pointing at a control on the GUI using the 
+mouse, and then pressing the left mouse button. A similar effect can be
+produced without using this option by positioning the pointer and then
+pressing the {\tt F1} button on the keyboard.
+
+\subsection {\mylabel{POLMAP_IMAGE_DISPLAY}The Image Display Area}
+The image is displayed in a square area to the right of the
+screen using a monochrome colour table. Various aspects of the display
+such as the image scale, the data values corresponding to black and
+white, the pixel coordinates at the centre of the display, etc, can be
+adjusted using the controls in the \htmlref{{\em Display
+Controls}}{POLMAP_DISPLAY_CONTROLS} box, to the left of the image
+display. 
+
+The user can interact with the image in various ways using the mouse. The
+details of these interactions depend on the current state of the other
+controls, and fall into one of several different ``modes''. A description of 
+the current mode is displayed above the image, and the dynamic help
+information shown in the \htmlref{{\em Help Area}}{POLMAP_HELP_AREA}
+describes the interactions available in the current mode. The available
+modes are:
+
+\begin{description}
+
+\item [\mylabel{POLMAP_MODE_0} ????] - This is the default
+mode in which the user... The available interactions in
+this mode are:
+
+\begin{itemize}
+
+\item Click and drag to select an area of the image. \hyperref{Go here}{See
+section }{}{POLMAP_AREA_SELECTION} for instructions on selecting areas.
+
+\end{itemize}
+
+\item [\mylabel{POLMAP_MODE_1} Edit or create a polygon] - In this mode
+the user either modifies an existing mask polygon or creates a new
+polygon. The available interactions in this mode are:
+
+\begin{itemize}
+
+\item To move a vertex of an existing polygon, position the pointer over
+the vertex, press and hold the left mouse button, and then move the
+pointer. The vertex and connecting edges will be moved with the pointer
+until the mouse button is released.
+
+\item To add another vertex to an existing polygon, position the pointer 
+over the edge where the new vertex is required, and click the left mouse
+button. 
+
+\item To commence the definition of a new polygon, position the pointer
+away from any existing vertices or edges, and click the left mouse button.
+The first vertex of the new polygon will be placed at the selected
+position, and the display area will then enter ``\htmlref{Complete a
+Polygon}{POLMAP_MODE_2}'' mode.
+
+\item Click anywhere else and drag to select an area. \hyperref{Go here}{See
+section }{}{POLMAP_AREA_SELECTION} for instructions on selecting areas.
+
+\end{itemize}
+
+\item [\mylabel{POLMAP_MODE_2} Complete a polygon] - In this mode, the
+user completes the definition of a polygon started in ``\htmlref{Edit or
+create a polygon}{POLMAP_MODE_1}'' mode. Adjacent vertices around the
+polygon are supplied by positioning the pointer and clicking the left
+mouse button. The polygon is closed when a vertex is given close to the
+first vertex, and the display area then reverts to ``\htmlref{Edit or
+create a polygon}{POLMAP_MODE_1}'' mode. The available interactions in 
+this mode are:
+
+\begin{itemize}
+\item Click on the first vertex to close the polygon.
+\item Click anywhere else to add another vertex to the polygon.
+\item Click anywhere else and drag to select an area. \hyperref{Go here}{See
+section }{}{POLMAP_AREA_SELECTION} for instructions on selecting areas.
+\end{itemize}
+
+\item [\mylabel{POLMAP_MODE_3} ??????????] - This mode is not yet used.
+
+\item [\mylabel{POLMAP_MODE_4} Identify a new centre] - This mode is
+entered when the \htmlref{{\em Centre}}{POLMAP_CENTRE} button is pressed.
+The cursor changes to a circle to indicate the change of mode. The cursor
+should then be positioned over the image, and the left mouse button
+pressed. The image will then be re-displayed with the same scale factor,
+but with the selected image position in the centre of the display window.
+
+The available interactions in this mode are:
+\begin{itemize}
+\item Click to re-display the image centred on the pointer position.
+\end{itemize}
+
+\end{description}
+
+\subsection {\mylabel{POLMAP_DISPLAY_CONTROLS}The ``{\em Display Controls}'' Box}
+This box is situated to the left of the \htmlref{image display
+area}{POLMAP_IMAGE_DISPLAY} and contains controls related to the image
+display.
+
+\subsubsection {\mylabel{POLMAP_ZOOM}The {\em Zoom} Button}
+This button is enabled when an area of the image is selected by clicking
+and dragging over the image. Pressing the {\em Zoom} button will then
+result in the selected area of the image being re-displayed so that it
+fills the display window in at least one dimension. The button will then
+be disabled until another image area is selected. Several zoom operations
+may be applied in sequence, and may be undone in reverse sequence by
+repeated use of the \htmlref{{\em Unzoom}}{POLMAP_UNZOOM} button. 
+
+\subsubsection {\mylabel{POLMAP_UNZOOM}The {\em Unzoom} Button}
+This button is enabled when one or more zoom or centre operations have 
+been applied to the image. Single clicking on this button will undo the
+most recent zoom or centre operation, and double clicking will undo
+all zoom and centre operations.
+
+\subsubsection {\mylabel{POLMAP_CENTRE}The {\em Centre} Button}
+This button is used to re-display the current image putting a specified
+position at the centre of the display window. When the button is pressed 
+the pointer or cross-hair will change to a circle within the image display 
+area. Position this circular cursor at the position which is to be
+located at the centre of the display window, and press the left mouse
+button. The image will be re-displayed, and the circular cursor will
+revert to its previous form.
+
+\subsubsection {\mylabel{POLMAP_DELETE}The {\em Delete} Button}
+This button is used to delete polygon vertices. First
+select an area by clicking and dragging over the image, and then press
+the {\em Delete} button. Any polygon vertices within the box will be deleted.
+
+\subsubsection {\mylabel{POLMAP_CANCEL}The {\em Cancel} Button}
+Pressing this button will cancel the most recent operation on the display
+in the following order:
+
+\begin{itemize}
+\item If the \htmlref{{\em Centre}}{POLMAP_CENTRE} button has been
+pressed, then the re-centring operation will be canceled.
+
+\item Otherwise, if an area has been selected by clicking and dragging
+over the image, then the area selection is canceled.
+
+\item Otherwise, if the user is in the process of 
+\htmlref{supplying a mask polygon}{POLMAP_MODE_2} then the incomplete
+polygon is deleted, and the interaction mode within the display window
+reverts to ``\htmlref{Edit or create a polygon}{POLMAP_MODE_1}''.
+\end{itemize}
+
+\subsubsection {\mylabel{POLMAP_NOT_WHITE}The ``{\em \% not white}'' Button}
+This control specifies the percentage of the pixels within the displayed
+part of the image which should be shown as black or grey. Thus, the
+difference between $100.0$ and the displayed figure gives the percentage
+of the image pixels which are shown as pure white. To enter a new value,
+position the pointer over the entry box and type the new value.
+Alternatively, the ``up'' and ``down'' arrows at either end of the data
+entry box can be pressed, in which case the displayed value will
+automatically be incremented or decremented until the arrow is released.
+If the {\tt return} key on the keyboard is pressed while the pointer is
+over the data entry box, then the image will be re-displayed immediately
+with the new value. Otherwise, the image will be re-displayed 2.5 seconds
+after the value has changed (unless a new value is entered for the ``{\em
+\% not white}'' or ``\htmlref{{\em \% black}}{POLMAP_BLACK}'' control in
+the mean-time). This delay allows a new value to be entered in the ``{\em
+\% black}'' control before the image is re-displayed.
+
+The current value of this control is saved along with the current options
+values when the \htmlref{{\em Save Options}}{POLMAP_SAVE_OPTIONS} item in
+the \htmlref{{\em Options}}{POLMAP_OPTIONS_MENU} menu is selected.
+
+\subsubsection {\mylabel{POLMAP_BLACK}The ``{\em \% black}'' Button}
+This control specifies the percentage of the pixels within the displayed
+part of the image which should be shown as pure black. To enter a new value,
+position the pointer over the entry box and type the new value.
+Alternatively, the ``up'' and ``down'' arrows at either end of the data
+entry box can be pressed, in which case the displayed value will
+automatically be incremented or decremented until the arrow is released.
+If the {\tt return} key on the keyboard is pressed while the pointer is
+over the data entry box, then the image will be re-displayed immediately
+with the new value. Otherwise, the image will be re-displayed 2.5 seconds
+after the value has changed (unless a new value is entered for the ``{\em
+\% not white}'' or ``\htmlref{{\em \% black}}{POLMAP_BLACK}'' control in
+the mean-time). This delay allows a new value to be entered in the ``{\em
+\% not white}'' control before the image is re-displayed.
+
+The current value of this control is saved along with the current options
+values when the \htmlref{{\em Save Options}}{POLMAP_SAVE_OPTIONS} item in
+the \htmlref{{\em Options}}{POLMAP_OPTIONS_MENU} menu is selected.
+
+\subsubsection {\mylabel{POLMAP_LOCK_SCALING}The {\em Lock Scaling} Button}
+The pixel values shown as pure black and pure white in the displayed
+image are specified indirectly as percentage points in the histogram of
+displayed pixel values (see the ``\htmlref{{\em \% not
+white}}{POLMAP_WHITE}'' and ``\htmlref{{\em \% black}}{POLMAP_BLACK}''
+controls). This means that the grey scale will, in general, change when a
+different section of the image is displayed (for instance, when using the
+\htmlref{{\em Zoom}}{POLMAP_ZOOM} button). To prevent this happening, the
+{\em Lock Scaling} button can be selected. The current data values
+implied by the ``\htmlref{{\em \% not white}}{POLMAP_WHITE}'' and
+``\htmlref{{\em \% black}}{POLMAP_BLACK}'' values will then be used
+directly for all subsequent image displays until the {\em Lock Scaling}
+button is de-selected. Any changes made to the ``\htmlref{{\em \% not
+white}}{POLMAP_WHITE}'' and ``\htmlref{{\em \% black}}{POLMAP_BLACK}''
+values will be ignored until the {\em Lock Scaling} button is
+de-selected.
+
+\subsection {\mylabel{POLMAP_STATUS_AREA}The Status Area}
+This is the area underneath the displayed image and is used to display
+various items of information about the current state of the program. The
+exact contents of this area can be customised using the \htmlref{{\em
+Status Items}}{POLMAP_STATUS_ITEMS} entry in the \htmlref{{\em
+Options}}{POLMAP_OPTIONS_MENU} menu. It can also be removed entirely from
+the GUI by de-selecting the \htmlref{{\em Display Status
+Area}}{POLMAP_DISPLAY_STATUS_AREA} button in the \htmlref{{\em
+Options}}{POLMAP_OPTIONS_MENU} menu.
+
+\subsection {\mylabel{POLMAP_HELP_AREA}The Help Area}
+This is an area at the bottom of the GUI in which is displayed brief help
+information on the control currently under the pointer. It is updated
+dynamically as the pointer is moved around the GUI. More detailed help
+can be obtained using the \htmlref{{\em Help}}{POLMAP_HELP_MENU} menu.
+This area can be removed entirely from the GUI by de-selecting the
+\htmlref{{\em Display Help Area}}{POLMAP_DISPLAY_HELP_AREA} button in the
+\htmlref{{\em Options}}{POLMAP_OPTIONS_MENU} menu.
+
+\subsection {\mylabel{POLMAP_STATUS_ITEMS_DIALOG}The ``{\em Select status items}'' Dialog Box}
+To be written.
+
+\section {\mylabel{POLMAP_HOW_DO_I}How do I...}
+This section provides instructions for performing some common tasks
+within the PolMap Graphical User Interface.
+
+\subsection {\mylabel{POLMAP_USING_HELP}Using the Help System}
+Information on the use and state of the PolMap GUI are available on-line
+in various ways:
+
+\begin{itemize}
+
+\item An indication of what is happening, or what the user should
+probably be doing, is displayed above the displayed image. This is a very
+broad indication, primarily intended to indicate what is going on during
+any long pauses (for instance, while the output images are being
+created).
+
+\item The \htmlref{status area}{POLMAP_STATUS_AREA} situated below
+the image display, displays various items of information describing the
+current option values, pointer position, etc. The
+contents of this area can be customised using the \htmlref{{\em Status
+Items}}{POLMAP_STATUS_ITEMS} entry in the \htmlref{{\em
+Options}}{POLMAP_OPTIONS_MENU} menu.
+
+\item A brief description of the control, or controls, currently under the
+pointer is displayed in the \htmlref{help area}{POLMAP_HELP_AREA} at the
+bottom of the GUI (under the status area). This information is
+dynamically updated as the pointer is moved around the screen.
+
+\item More detailed hyper-text help information is also available, and a
+separate hyper-text browser will automatically be created to display it
+when required. Either {\tt netscape} or {\tt Mosaic} can be used by
+assigning the name of the required browser to the {\tt HTX\_BROWSER}
+environment variable. If {\tt HTX\_BROWSER} is not defined, then ``{\tt
+netscape}'' is used.
+
+This hyper-text help information may be accessed in several ways:
+
+\begin{enumerate}
+
+\item The \htmlref{{\em Help}}{POLMAP_HELP_MENU} menu, situated at the
+far right of the menu bar can be used to access various preset points in
+the help text.
+
+\item A description of a specific control in the GUI can be obtained by 
+positioning the pointer over the control, and pressing the {\tt F1}
+button on the keyboard.
+
+\item A description of a specific control may also be obtained by clicking 
+on the {\em Pointer...} entry in the \htmlref{{\em
+Help}}{POLMAP_HELP_MENU} menu, positioning the cursor over the control,
+and clicking the left mouse button. 
+
+\end{enumerate}
+
+\end{itemize}
+
+\subsection {\mylabel{POLMAP_IMAGE_SCALING}Selecting the Displayed Data Range}
+To be written.
+
+\subsection {\mylabel{POLMAP_AREA_SELECTION}Selecting an Area of the Image}
+To be written.
+
+\end{document}
