@@ -19,6 +19,7 @@ STAR_MONOLITHS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
+AC_PROG_LN_S
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_CHECK_PROGS([hlib])
