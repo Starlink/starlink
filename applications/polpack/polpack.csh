@@ -82,8 +82,12 @@ if ( $?NDF_XTN ) then
 else
    setenv NDF_XTN POLPACK
 endif
+#
 setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp in=^ndf quiet=y'
 setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp in=^ndf quiet=y'
+#
+setenv NDF_IMP_POLPACK_COMPRESSED ' '
+setenv NDF_EXP_POLPACK_COMPRESSED ' '
 #
 #
 # Tell the user that POLPACK commands are now available.
