@@ -1081,7 +1081,7 @@ $(PKG_NAME)_source.tar: unbuild
 	cd moggy && make -f Makefile.in configure
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
-	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib
+	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib t
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
