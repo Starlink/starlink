@@ -1,5 +1,5 @@
 package jcmtdr {
-   version 1.2-2
+   version @VERSION@
    prefix  jcmt
 
    executable jcmtdr {
@@ -407,8 +407,7 @@ package jcmtdr {
 
    display {
  
-      ------------ Initialised for JCMTDR ------------
-                Version 1.2-2  20 March 2003
+      JCMTDR commands are now available -- (Version @VERSION@)
   
               Type "jcmt_help jcmtdr" for help
            or "showme sc1" or "showme sun192" for

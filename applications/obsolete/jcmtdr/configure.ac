@@ -36,6 +36,6 @@ dnl STAR_LATEX_DOCUMENTATION(sun95 sun221)
 
 AC_CONFIG_SUBDIRS([subs applic])
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml jcmtdr.ifd)
 
 AC_OUTPUT

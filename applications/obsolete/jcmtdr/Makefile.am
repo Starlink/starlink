@@ -4,9 +4,9 @@ SUBDIRS = @subdirs@
 
 bin_SCRIPTS = $(DYNSCRIPTS)
 
-bin_PROGRAMS = jcmthelp
-jcmthelp_SOURCES = helpc.c helpm.c
-jcmthelp_LDADD = `hlp_link` `fio_link` `cnf_link` @FCLIBS@
+bin_PROGRAMS = jcmt_help
+jcmt_help_SOURCES = helpc.c helpm.c
+jcmt_help_LDADD = `hlp_link` `fio_link` `cnf_link` @FCLIBS@
 
 bin_MONOLITHS = jcmtdr
 

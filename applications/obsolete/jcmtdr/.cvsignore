@@ -11,7 +11,7 @@ Makefile
 autom4te.cache
 jcmtdr.csh
 jcmtdr.shl
-jcmthelp
+jcmt_help
 libtool
 starconf.status
 
