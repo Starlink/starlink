@@ -21,26 +21,26 @@
 #   v = new version number (post-checkin)
 #
 # For example:
-##DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
+##DEFAULT (echo ""; id; echo %1s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
-##DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
+##DEFAULT (echo ""; id; echo %1{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 #
 #
 # These regexps match the directory being committed
 #
 # Commits to the top-level and buildsupport directories are sent to stardev
-^\.*$			mail -s "[CVS top level] "%s stardev@jiscmail.ac.uk
-^buildsupport/starconf	mail -s "[CVS buildsupport] "%s stardev@jiscmail.ac.uk
+^\.*$			mail -s "[CVS top level] "%1s stardev@jiscmail.ac.uk
+^buildsupport/starconf	mail -s "[CVS buildsupport] "%1s stardev@jiscmail.ac.uk
 # Toby White is working on autoconf, too
-^thirdparty/fsf/autoconf	mail -s "[CVS autotools] "%s stardev@jiscmail.ac.uk, tow21@cam.ac.uk
-^thirdparty/fsf		mail -s "[CVS autotools] "%s stardev@jiscmail.ac.uk
+^thirdparty/fsf/autoconf	mail -s "[CVS autotools] "%1s stardev@jiscmail.ac.uk, tow21@cam.ac.uk
+^thirdparty/fsf		mail -s "[CVS autotools] "%1s stardev@jiscmail.ac.uk
 #
-^java/source/hdx	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
-^java/source/ndx	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/hds	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/util	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
-^java/source/ast	mail -s %s M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
-^java			mail -s %s ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
-^applications/autoastrom	mail -s %s norman@astro.gla.ac.uk p.w.draper@durham.ac.uk
-^applications/sgmlkit	mail -s %s norman@astro.gla.ac.uk
-^libraries/ast		mail -s %s dsb@ast.man.ac.uk norman@astro.gla.ac.uk
+^java/source/hdx	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
+^java/source/ndx	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/hds	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/util	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
+^java/source/ast	mail -s %1s M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
+^java			mail -s %1s ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
+^applications/autoastrom	mail -s %1s norman@astro.gla.ac.uk p.w.draper@durham.ac.uk
+^applications/sgmlkit	mail -s %1s norman@astro.gla.ac.uk
+^libraries/ast		mail -s %1s dsb@ast.man.ac.uk norman@astro.gla.ac.uk
