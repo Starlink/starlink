@@ -5,12 +5,12 @@ input boxes;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 beginfig(4);
 
-defaultfont:="cmr10";
+defaultfont:="cmr12";
 save gap, u;
 
-w = 12bp;
-h = 10bp;
-u = 4bp;
+w = 14bp;
+h = 12bp;
+u = 4.5bp;
 gap = 1/2u;
 frac = 1/3;
 pair origin;
@@ -43,21 +43,28 @@ def straight(expr a,patha,b,pathb)=bend(a,patha,b,pathb,1,-90); enddef;
 % enddef;
 
 
-boxit.astimp("ASTIMP");
-boxit.wcsedit("WCSEDIT");
+% boxit.astimp("ASTIMP");
+% boxit.wcsedit("WCSEDIT");
 boxit.findobj("FINDOBJ");
 boxit.findoff("FINDOFF");
 boxit.pairndf("PAIRNDF");
 boxit.ccdalign("CCDALIGN");
 boxit.register("REGISTER");
 boxit.wcsreg("WCSREG");
-boxit.astexp("ASTEXP");
+% boxit.astexp("ASTEXP");
 boxit.tranndf("TRANNDF");
 boxit.drizzle("DRIZZLE");
 boxit.makemos("MAKEMOS");
 
-def allboxes = astimp, wcsedit, findobj, findoff, pairndf, ccdalign,
-               register, wcsreg, astexp, tranndf, drizzle, makemos   
+% def allboxes = astimp, wcsedit, findobj, findoff, pairndf, ccdalign,
+%                register, wcsreg, astexp, tranndf, drizzle, makemos   
+% enddef;
+% def toprow = findobj, pairndf, ccdalign, wcsedit, astimp
+% enddef;
+def allboxes = findobj, findoff, pairndf, ccdalign,
+               register, tranndf, drizzle, makemos
+enddef;
+def toprow = findobj, pairndf, ccdalign
 enddef;
 
 forsuffixes t = allboxes:
@@ -69,82 +76,84 @@ endfor;
 
 findobj.c - findoff.c = (-1w, 4h);
 pairndf.c - register.c = (0, 10h);
-register.c - z1 = (-9w, 5h);
-astimp.w - wcsedit.e = wcsedit.w - ccdalign.e = (2w, 0);
+% register.c - z1 = (-9w, 5h);
+% astimp.w - wcsedit.e = wcsedit.w - ccdalign.e = (2w, 0);
+register.c - .5[makemos.c, drizzle.c] = (0, 9h);
 ccdalign.w - pairndf.e = pairndf.w - findobj.e = (1w, 0);
 z1 - z2 = (0, 9h);
 
-wcsreg.c = 1/2[z1, z2] - (6w, 0);
-astexp.c = z2 + (9w, 0);
+% wcsreg.c = 1/2[z1, z2] - (6w, 0);
+% astexp.c = z2 + (9w, 0);
 
 drizzle.c - makemos.c = (10w, 0);
 1/2[drizzle.c, makemos.c] = z2 - (0, 9h);
 tranndf.c = ( .6[x2, xpart makemos.c], 1/2[y2, ypart makemos.c] );
 
-forsuffixes t=findobj, pairndf, ccdalign, wcsedit, astimp:
+forsuffixes t = toprow:
    pair t.desc;
    t.desc = t.n + (0, h);
 endfor;
 
 pair over, object.grp, geom.grp;
 over = (0,h);
-object.grp - pairndf.desc =
-geom.grp - 1/2[astimp.desc, wcsedit.desc] = 3over;
+% geom.grp - 1/2[astimp.desc, wcsedit.desc] 
+object.grp - pairndf.desc
+= 3over;
 
-defaultfont := "cmss10";
-defaultscale := 0.8textsize;
+defaultfont := "cmss12";
+defaultscale := 1.0textsize;
 
 label("automatic", findobj.desc);
 label("semi-automatic", pairndf.desc);
 label("manual", ccdalign.desc);
-label("imported", astimp.desc);
-label("manual", wcsedit.desc);
+% label("imported", astimp.desc);
+% label("manual", wcsedit.desc);
 
 label("Object matching", object.grp);
-label("Geometry information", geom.grp);
+% label("Geometry information", geom.grp);
 
 drawoptions(withpen pencircle scaled 1bp);
 draw (findobj.desc -- ccdalign.desc) shifted 2over;
-draw (wcsedit.desc -- astimp.desc) shifted 2over;
-% draw ((0,0) -- -over) shifted object.grp;
-% draw ((0,0) -- -over) shifted geom.grp;
-forsuffixes t=findobj, pairndf, ccdalign, wcsedit, astimp:
+% draw (wcsedit.desc -- astimp.desc) shifted 2over;
+forsuffixes t = toprow:
    draw t.desc + over -- t.desc + 2over;
 endfor;
 drawoptions();
 
 
-path dot[], dot[].out;
-dot1 = fullcircle scaled 1u shifted z1;
-dot1.out = fullcircle scaled 2u shifted z1;
-dot2 = fullcircle scaled 1u shifted z2;
-dot2.out = fullcircle scaled 2u shifted z2;
-fill dot1;
-fill dot2;
+% path dot[], dot[].out;
+% dot1 = fullcircle scaled 1u shifted z1;
+% dot1.out = fullcircle scaled 2u shifted z1;
+% dot2 = fullcircle scaled 1u shifted z2;
+% dot2.out = fullcircle scaled 2u shifted z2;
+% fill dot1;
+% fill dot2;
 
 
-bendy( astimp.c, bpath astimp, z1, dot1.out );
-bendy( wcsedit.c, bpath wcsedit, z1, dot1.out );
+% bendy( astimp.c, bpath astimp, z1, dot1.out );
+% bendy( wcsedit.c, bpath wcsedit, z1, dot1.out );
 bendy( findobj.c, bpath findobj, findoff.c, bpath findoff );
 bendy( findoff.c, bpath findoff, register.c, bpath register );
 bendy( pairndf.c, bpath pairndf, register.c, bpath register );
 bendy( ccdalign.c, bpath ccdalign, register.c, bpath register );
-bendy( register.c, bpath register, z1, dot1.out );
+% bendy( register.c, bpath register, z1, dot1.out );
 
-bend( z1, dot1.out, z2, dot2.out, 1-1/2frac, 0 );
+% bend( z1, dot1.out, z2, dot2.out, 1-1/2frac, 0 );
 
-bendo( z1, dot1.out, wcsreg.c, bpath wcsreg );
-bendy( wcsreg.c, bpath wcsreg, z2, dot2.out );
-
-
-straight( z2, dot2.out, astexp.c, bpath astexp );
-drawoptions(dashed evenly scaled 3);
-bend( astexp.c, bpath astexp, astimp.c, bpath astimp, 1+frac, 90 );
-drawoptions(); 
+% bendo( z1, dot1.out, wcsreg.c, bpath wcsreg );
+% bendy( wcsreg.c, bpath wcsreg, z2, dot2.out );
 
 
-bendo( z2, dot2.out, tranndf.c, bpath tranndf );
-bendo( z2, dot2.out, drizzle.c, bpath drizzle );
+% straight( z2, dot2.out, astexp.c, bpath astexp );
+% drawoptions(dashed evenly scaled 3);
+% bend( astexp.c, bpath astexp, astimp.c, bpath astimp, 1+frac, 90 );
+% drawoptions(); 
+
+
+% bendo( z2, dot2.out, tranndf.c, bpath tranndf );
+% bendo( z2, dot2.out, drizzle.c, bpath drizzle );
+bendo( register.c, bpath register, tranndf.c, bpath tranndf);
+bendo( register.c, bpath register, drizzle.c, bpath drizzle);
 bendo( tranndf.c, bpath tranndf, makemos.c, bpath makemos );
 
 
@@ -160,7 +169,7 @@ endfig;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 beginfig(3); 
 
-defaultfont:="cmtt10";
+defaultfont:="cmtt12";
 defaultscale:=1.6;
 
 path ccd[]a, ccd[]b, ccd[]c;
