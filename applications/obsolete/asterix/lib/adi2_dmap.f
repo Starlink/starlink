@@ -130,9 +130,11 @@
 
       LOGICAL			THERE			! Object exists?
 
+      CHARACTER*1		AXIS
       INTEGER			IAX, I
       INTEGER			AXID, AXPTR
       REAL			BASE, DELTA
+      REAL			PLTSCL, PIXSIZ
       LOGICAL			ISAXDAT, ISAXWID
 *.
 
@@ -181,16 +183,48 @@
 *  object. Map that data if it exists, otherwise read it from the file
       IF ( ISAXDAT ) THEN
         CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
+        CALL ADI2_GKEY0I( FITID, ' ', 'NAXIS'//ITEM(6:6), .FALSE.,
+     :                    .FALSE., DIMS(IAX), ' ', STATUS )
+
+*    Try for the axis base
         CALL ADI2_GKEY0R( FITID, ' ', 'CRPIX'//ITEM(6:6), .FALSE.,
      :                    .FALSE., BASE, ' ', STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-          BASE = 0.0
+          BASE = DIMS(IAX) / 2.0 + 0.5
         END IF
+
+*    Try for the axis delta
         CALL ADI2_GKEY0R( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
      :                    .FALSE., DELTA, ' ', STATUS )
-        CALL ADI2_GKEY0I( FITID, ' ', 'NAXIS'//ITEM(6:6), .FALSE.,	! try for img_check
-     :                    .FALSE., DIMS(IAX), ' ', STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          CALL ADI2_GKEY0R( FITID, ' ', 'CD'//ITEM(6:6)//'_'//ITEM(6:6),
+     :                      .FALSE., .FALSE., DELTA, ' ', STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IF ( ITEM(6:6) .EQ. '1' ) THEN
+              AXIS = 'X'
+            ELSE
+              AXIS = 'Y'
+            END IF
+            CALL ADI2_GKEY0R( FITID, ' ', 'PLTSCALE',
+     :                        .FALSE., .FALSE., PLTSCL, ' ', STATUS )
+            CALL ADI2_GKEY0R( FITID, ' ', AXIS//'PIXELSZ',
+     :                        .FALSE., .FALSE., PIXSIZ, ' ', STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+              CALL ERR_ANNUL( STATUS )
+              DELTA = 1.0
+            ELSE
+              DELTA = (PLTSCL * PIXSIZ) / (1000.0 * 3600.0)
+              IF ( AXIS .EQ. 'X' ) THEN
+                DELTA = -1.0 * DELTA
+              END IF
+            END IF
+          END IF
+        END IF
+
+*    Now construct the axis data array
         CALL ADI_NEW( TYPE, 1, DIMS(IAX), AXID, STATUS )
         CALL ADI_MAP( AXID, TYPE, 'WRITE', AXPTR, STATUS )
         CALL ADI2_DMAP_AXINV ( BASE, DELTA, DIMS(IAX), %VAL(AXPTR),

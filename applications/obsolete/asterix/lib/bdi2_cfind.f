@@ -128,6 +128,8 @@
         LOGICAL			CHR_INSET
       EXTERNAL			CHR_LEN
 	INTEGER			CHR_LEN
+      EXTERNAL			STR_SUB
+        LOGICAL			STR_SUB
 
 *  Local Variables:
       CHARACTER*1		CAX			! Axis digit character
@@ -359,19 +361,19 @@
               CALL ADI_THERE( CACHEID, 'Comment', THERE, STATUS)
               IF ( THERE ) THEN
                 CALL ADI_CGET0C( CACHEID, 'Comment', UNITS, STATUS )
-                IF ( INDEX( UNITS, 'deg' ) .GT. 0 ) THEN
+                IF ( STR_SUB( 'deg', UNITS ) ) THEN
                   UNITS = 'degrees'
-                ELSE IF ( INDEX( UNITS, 'arcm' ) .GT. 0 ) THEN
+                ELSE IF ( STR_SUB( 'arcm', UNITS ) ) THEN
                   UNITS = 'arcminutes'
-                ELSE IF ( INDEX( UNITS, 'arcs' ) .GT. 0 ) THEN
+                ELSE IF ( STR_SUB( 'arcs', UNITS ) ) THEN
                   UNITS = 'arcseconds'
-                ELSE IF ( INDEX( UNITS, 'pix' ) .GT. 0 ) THEN
+                ELSE IF ( STR_SUB( 'pix', UNITS ) ) THEN
                   UNITS = 'pixels'
                 ELSE
                   UNITS = 'degrees'
                 END IF
               ELSE
-                UNITS = 'pixels'
+                UNITS = 'degrees'
               END IF
 
 *        Erase old value and add new character string
@@ -379,13 +381,22 @@
               CALL ADI_CNEWV0C( CACHEID, 'Value', UNITS, STATUS )
             ELSE
 
-*        Need a new cache object for units string
-              CALL ADI2_CFIND( FITID, ' ', '.BITPIX', ' ', CREATE,
-     :                         DELETE, 'INTEGER', 0, 0, DIDCRE, CACHEID,
+*        Try for a plate type object
+              CALL ADI2_CFIND( FITID, ' ', '.PLTSCALE', ' ', CREATE,
+     :                         DELETE, 'REAL', 0, 0, DIDCRE, CACHEID,
      :                         STATUS )
-              UNITS = 'pixels'
-              CALL ADI_CERASE( CACHEID, 'Value', STATUS )
-              CALL ADI_CNEWV0C( CACHEID, 'Value', UNITS, STATUS )
+              IF ( CACHEID .NE. ADI__NULLID ) THEN
+                CALL ADI_CERASE( CACHEID, 'Value', STATUS )
+                CALL ADI_CNEWV0C( CACHEID, 'Value', 'degrees', STATUS )
+              ELSE
+
+*        Need a new cache object for default units string
+                CALL ADI2_CFIND( FITID, ' ', '.BITPIX', ' ', CREATE,
+     :                           DELETE, 'INTEGER', 0, 0, DIDCRE,
+     :                           CACHEID, STATUS )
+                CALL ADI_CERASE( CACHEID, 'Value', STATUS )
+                CALL ADI_CNEWV0C( CACHEID, 'Value', 'pixels', STATUS )
+              END IF
             END IF
           END IF
 
@@ -415,8 +426,18 @@
 
 *      Access keyword
           CALL ADI2_CFIND( FITID, ' ', '.CDELT'//CAX, ' ', CREATE,
-     :                     DELETE, RTYPE, 0, 0, DIDCRE, CACHEID,
+     :                     DELETE, 'REAL', 0, 0, DIDCRE, CACHEID,
      :                     STATUS )
+          IF ( CACHEID .EQ. ADI__NULLID ) THEN
+            CALL ADI2_CFIND( FITID, ' ', '.CD'//CAX//'_'//CAX, ' ',
+     :                       CREATE, DELETE, 'REAL', 0, 0, DIDCRE,
+     :                       CACHEID, STATUS )
+          END IF
+          IF ( CACHEID .EQ. ADI__NULLID ) THEN
+            CALL ADI2_CFIND( FITID, ' ', '.PLTSCALE', ' ',
+     :                       CREATE, DELETE, 'REAL', 0, 0, DIDCRE,
+     :                       CACHEID, STATUS )
+          END IF
 
 *      Add extra info if we created the keyword
           IF ( DIDCRE ) THEN
