@@ -108,14 +108,14 @@
 
 	IF( POSTYPE .EQ. 'POSITIVE') THEN
 	  XRADS = ( RAPOS - RAH - RAM/60.0 - RAS/3600.0)*36000.0
-          type *, 'rads = ', rads
+D          print *, 'rads = ', rads
 	  RADS = IFIX( RADS/10.0 + 0.5)
 	ELSE
 	  XRADS = ( RAPOS - RAH - RAM/60.0 - RAS/3600.0)*36000.0
-          type *, 'rads = ', rads
+D          print *, 'rads = ', rads
 	  RADS = IFIX( RADS/10.0 + 0.5)
 	END IF
-	type *, 'rah,ram,ras,rads = ', rah, ram, ras, rads
+D	print *, 'rah,ram,ras,rads = ', rah, ram, ras, rads
 
 *      Test if the dsecs are full secs and correct if it is
 
