@@ -32,11 +32,13 @@ test -n "$DEFAULT_STARLINK" || DEFAULT_STARLINK=$STARLINK
 dnl Find working install and ln programs
 AC_PROG_INSTALL
 AC_PROG_LN_S
+AC_PATH_PROG(PERL, perl)
 
 dnl   Note that the make-starconf.in file is _not_ to be
 dnl   substituted by this command -- since it involves the
 dnl   installation directory variables, it should have them replaced
 dnl   at `make' time, not configure time.  See Makefile.am for details.
-AC_CONFIG_FILES(Makefile starconf.m4)
+AC_CONFIG_FILES(Makefile starconf.m4 Makefile.starconf)
+AC_CONFIG_FILES(starconf-validate, [chmod +x starconf-validate])
 
 AC_OUTPUT
