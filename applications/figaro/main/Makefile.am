@@ -43,7 +43,7 @@ plot_data.f plot_datatn.f plot_dcurv.f plot_flux.f plot_line.f \
 plot_linrat.f plot_old_fit.f plot_opts.f plot_order.f plot_sdist.f \
 plot_teeth.f plot_trams.f plotall.f plotvel.f print_tols.f \
 profile_fit.f prvel.f prvel_sub.f quick_plot.f range_in.f rangeblk.f \
-\ rchn2rx.f rdcinf.f rdids.f rdinf.f read_coeffs.f \
+rchn2rx.f rdcinf.f rdids.f rdinf.f read_coeffs.f \
 read_defaults.f redo_all_fits.f refine_res.f reject_data.f \
 reject_teeth.f remove_sky.f resid_v_ht.f resid_v_width.f rms.f \
 rv.f rv_correct.f save_cheby.f search.f seek_order.f seek_order2.f \
@@ -58,5 +58,5 @@ transfer.f two_open.f underscore.f unmap_res.f updtmsk.f wave2vel.f \
 wft.f window_limits.f window_scan.f window_width.f windplot.f \
 wrtab.f 
 
-# Not called. Require iraf I/O library (eg from convert)
-IRAF_ROUTINES = rdiraf.f cophdr2iraf.f irafemess.f
+# Not called.  Require IRAF I/O library, e.g. from CONVERT.
+IRAF_ROUTINES = cophdr2iraf.f irafemess.f rdiraf.f
