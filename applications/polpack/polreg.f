@@ -412,7 +412,7 @@
       CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
 
 *  Get a group holding the name of the output cube to hold Stokes parameters.
-      CALL WRNDF( 'OUT_S', GRP__NOID, 0, 1, ' ', IGRP4, SIZEO,
+      CALL WRNDF( 'OUT_S', GRP__NOID, 1, 0, ' ', IGRP4, SIZEO,
      :             STATUS )
 
 * If we are producing Stokes parameters, check that all of the input
