@@ -262,7 +262,7 @@
       DATA ATTRS /15*0.0D0/
 
 *  Log this call.
-c      WRITE(*,*) 'REG_GATTR: ', ATT, VAL, OLDVAL, PRIM
+      WRITE(*,*) 'REG_GATTR: ', ATT, VAL, OLDVAL, PRIM
 
 *  Identify the required element.
       IF( ATT .EQ. GRF__STYLE ) THEN
