@@ -73,7 +73,7 @@
 *     ascii2ndf ngc253.dat ngc253 shape=[100,60]
 *        This copies a data array from the text file ngc253.dat to the
 *        NDF called ngc253.  The input file does not contain a header
-         section.  The NDF is two-dimensional: 100 elements in x by 60
+*        section.  The NDF is two-dimensional: 100 elements in x by 60
 *        in y.  Its data array has type _REAL.
 *     ascii2ndf ngc253q.dat ngc253 q shape=[100,60]
 *        This copies a quality array from the text file ngc253q.dat to
