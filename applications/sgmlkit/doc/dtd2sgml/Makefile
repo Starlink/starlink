@@ -13,9 +13,8 @@ DECL=$(STARLINK_SGML_DIR)/dtd/starlink.decl
 %.dtdsummary: $(DTDDIR)/%.dtd
 	SGML_SEARCH_PATH=$(DTDDIR) \
 	perl -I $(PERLSGML_DIR) dtd2sgml.pl $< >$@ 
-#2>/dev/null
 
-%.sgmltext: %.description
+%.sgmltext: %.description %.dtdsummary
 	jade -t sgml -d dtd2sgml.dsl $(DECL) $< >$@
 
 # Handy target for producing a skeleton description of a DTD, to
@@ -41,9 +40,10 @@ starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 	SGML_SEARCH_PATH=$(DTDDIR) \
 	perl -I $(PERLSGML_DIR) dtd2sgml.pl \
 		$< >$@
-#2>/dev/null
 
-programcode-0.6.sgmltext: programcode-0.6.description programcode-0.6.dtdsummary
+clean:
+	rm -f *.sgmltext *.dtdsummary sgmltext.stamp
+
 
 # The way that I produce the documetation changed during the
 # preparations for release 0.6, and these following targets will
@@ -83,8 +83,3 @@ programcode-0.6.sgmltext: programcode-0.6.description programcode-0.6.dtdsummary
 #starlink-0.5.sgmltext: starlink-0.5.dtdsummary starlink-0.5.description
 #
 # programcode-0.2.sgmltext: programcode-0.2.description programcode-0.2.dtdsummary
-
-#test.html.stamp: test.sgml programcode-0.2.sgmltext
-
-#clean:
-#	rm -f *.sgmltext *.dtdsummary sgmltext.stamp
