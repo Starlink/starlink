@@ -730,18 +730,31 @@ sub solve {
 # so set up an FK5 template and see if one of those exists in the WCS
 # returned via ndfGtwcs.
       my $STATUS = 0;
-      ndf_find( &NDF::DAT__ROOT, $self->ndf, my $access, $STATUS );
+
+      err_begin( $STATUS );
+      ndf_begin();
+      ndf_find( &NDF::DAT__ROOT, $self->ndf, my $ndf_id, $STATUS );
+      my $wcs = ndfGtwcs( $ndf_id, $STATUS );
+      ndf_annul( $ndf_id, $STATUS );
+      ndf_end( $STATUS );
+
+      # Handle errors.
       if( $STATUS != &NDF::SAI__OK ) {
-        croak "Could not find NDF. Starlink error code $STATUS returned";
+        my ( $oplen, @errs );
+        do {
+          err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+          push @errs, $opstr;
+        } until ( $oplen == 1 );
+        err_annul( $STATUS );
+        err_end( $STATUS );
+        croak "Error retrieving WCS from NDF:\n" . join "\n", @errs;
       }
+      err_end( $STATUS );
+
       my $template = new Starlink::AST::SkyFrame( "System=FK5" );
-      my $wcs = ndfGtwcs( $access, $STATUS );
-      if( $STATUS != &NDF::SAI__OK ) {
-        croak "Error retrieving the AST WCS from the NDF. Starlink error code $STATUS returned";
-      }
       $frameset = $wcs->FindFrame( $template, "" );
       if( defined( $frameset ) ) {
-        print "Using WCS information from AST.\n";
+        print "WCS information from AST.\n" if $self->verbose;
         print STDERR "WCS information from AST.\n" if $self->verbose;
 
 # Determine the central coordinates and radius of search from information
@@ -756,7 +769,8 @@ sub solve {
 
         last;
       } else {
-        print "AST WCS information doesn't have a SKY frame.\n";
+        print STDERR "AST WCS information doesn't have a SKY frame.\n" if $self->verbose;
+        print "AST WCS information doesn't have a SKY frame.\n" if $self->verbose;
       }
 
     } elsif( $wcssource =~ /FITS/ ) {
@@ -767,7 +781,7 @@ sub solve {
       my $template = new Starlink::AST::SkyFrame( "System=FK5" );
       $frameset = $wcs->FindFrame( $template, "" );
       if( defined( $frameset ) ) {
-        print "Using WCS information from FITS headers.\n";
+        print "Using WCS information from FITS headers.\n" if $self->verbose;
         print STDERR "WCS information from FITS headers.\n" if $self->verbose;
 
 # Determine the central coordinates and radius of search from information
@@ -783,21 +797,21 @@ sub solve {
 
         last;
       } else {
-        print "FITS headers have no useable WCS information.\n";
+        print "FITS headers have no useable WCS information.\n" if $self->verbose;
       }
 
     } elsif( $wcssource =~ /USER/ ) {
 
 # We need, at a bare minimum, the RA and Dec.
       if( ! defined( $self->obsdata->{RA} ) ) {
-        print "RA not supplied for USER WCS, not using USER-supplied WCS.\n";
+        print "RA not supplied for USER WCS, not using USER-supplied WCS.\n" if $self->verbose;
         next;
       }
       if( ! defined( $self->obsdata->{DEC} ) ) {
         print "Dec not supplied for USER WCS, not using USER-supplied WCS.\n" if $self->verbose;
         next;
       }
-      print "Using WCS information from USER-supplied coordinates\n";
+      print "Using WCS information from USER-supplied coordinates\n" if $self->verbose;
 
 # Determine the central coordinates and radius of search from information
 # contained in the obsdata information and the NDF.
@@ -814,23 +828,23 @@ sub solve {
     }
   }
 
-  print sprintf( "Central coordinates: $cencoords\nSearch radius: %.4f arcminutes\n", $radius );
+  print sprintf( "Central coordinates: $cencoords\nSearch radius: %.4f arcminutes\n", $radius ) if $self->verbose;
 
 # If we have a user-supplied catalogue, use that. Otherwise, use
 # Starlink::Extractor to extract objects from the NDF.
   my $ndfcat;
   if( defined( $self->ccdcatalogue ) ) {
-    print "Using " . $self->ccdcatalogue . " as input catalogue for sources in frame.\n";
+    print "Using " . $self->ccdcatalogue . " as input catalogue for sources in frame.\n" if $self->verbose;
     $ndfcat = new Astro::Catalog( Format => 'SExtractor',
                                   File => $self->ccdcatalogue );
   } else {
-    print "Extracting objects in " . $self->ndf . " at 5.0 sigma or higher...";
+    print "Extracting objects in " . $self->ndf . " at 5.0 sigma or higher..." if $self->verbose;
     my $filter = new Astro::WaveBand( Filter => 'unknown' );
     my $ext = new Starlink::Extractor;
     $ext->detect_thresh( 5.0 );
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $filter );
-    print "done.\n";
+    print "done.\n" if $self->verbose;
   }
 
 # We cannot do automated astrometry corrections if we have fewer
@@ -850,14 +864,14 @@ sub solve {
   $racen =~ s/^\s+//;
   $deccen =~ s/^\s+//;
 
-  print "Querying " . $self->catalogue . "...";
+  print "Querying " . $self->catalogue . "..." if $self->verbose;
   my $query = new Astro::Catalog::Query::SkyCat( catalog => $self->catalogue,
                                                  RA => "$racen",
                                                  Dec => "$deccen",
                                                  Radius => $radius,
                                                );
   my $querycat = $query->querydb();
-  print "done.\n";
+  print "done.\n" if $self->verbose;
 
 # Again, croak if we have fewer than 4 objects.
   if( $querycat->sizeof < 4 ) {
@@ -907,20 +921,30 @@ sub solve {
   my $newwcs = $astrom->solve;
 
 # Stick the WCS into the NDF.
-  my $STATUS = 0;
-  ndf_find( &NDF::DAT__ROOT, $self->ndf, my $access, $STATUS );
+  my $STATUS = &NDF::SAI__OK;
+  err_begin($STATUS);
+  ndf_begin();
+  ndf_open( &NDF::DAT__ROOT(), $self->ndf, 'UPDATE', 'OLD', my $ndf_id, my $place, $STATUS );
+  ndfPtwcs( $newwcs, $ndf_id, $STATUS );
+  ndf_annul( $ndf_id, $STATUS );
+
+  # extract error messages and annul error status
+
+  ndf_end($STATUS);
   if( $STATUS != &NDF::SAI__OK ) {
-    croak "Could not find NDF. Starlink error code $STATUS returned";
+    my ( $oplen, @errs );
+    do {
+      err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+      push @errs, $opstr;
+    } until ( $oplen == 1 );
+    err_annul( $STATUS );
+    err_end( $STATUS );
+    croak "Error writing new WCS to NDF:\n" . join "\n", @errs;
   }
-  ndf_open( &NDF::DAT__ROOT(), $self->ndf, 'UPDATE', 'OLD', $access, my $place, $STATUS );
-  if( $STATUS != &NDF::SAI__OK ) {
-    croak "Could not open NDF to write WCS. Starlink error code $STATUS returned";
-  }
-  ndfPtwcs( $newwcs, $access, $STATUS );
-  if( $STATUS != &NDF::SAI__OK ) {
-    croak "Could not add WCS to NDF. Starlink error code $STATUS returned";
-  }
-print "WCS updated in " . $self->ndf . "\n";
+
+  err_end( $STATUS );
+
+  print "WCS updated in " . $self->ndf . "\n" if $self->verbose;
 }
 
 =back
@@ -1036,14 +1060,25 @@ sub central_coordinates {
   my $ndf = shift;
 
   my $STATUS = 0;
-  ndf_find( &NDF::DAT__ROOT(), $ndf, my $access, $STATUS );
-  if( $STATUS != &NDF::SAI__OK ) {
-    croak "Could not find NDF. Starlink error code $STATUS returned";
+  err_begin( $STATUS );
+  ndf_begin();
+  ndf_find( &NDF::DAT__ROOT(), $ndf, my $ndf_id, $STATUS );
+  ndf_bound( $ndf_id, 2, my @lbnd, my @ubnd, my $ndim, $STATUS );
+  ndf_annul( $ndf_id, $STATUS );
+  ndf_end( $STATUS );
+
+  # Handle errors
+  if ( $STATUS != &NDF::SAI__OK ) {
+    my ( $oplen, @errs );
+    do {
+      err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+      push @errs, $opstr;
+    } until ( $oplen == 1 );
+    err_annul( $STATUS );
+    err_end( $STATUS );
+    croak "Error determining central coordinates of NDF:\n" . join "\n", @errs;
   }
-  ndf_bound( $access, 2, my @lbnd, my @ubnd, my $ndim, $STATUS );
-  if( $STATUS != &NDF::SAI__OK ) {
-    croak "Could not determine NDF bounds. Starlink error code $STATUS returned";
-  }
+  err_end( $STATUS );
 
   my $xcen = ( $lbnd[0] + $ubnd[0] ) / 2;
   my $ycen = ( $lbnd[1] + $ubnd[1] ) / 2;
@@ -1100,14 +1135,25 @@ sub _determine_search_params {
 
 # Determine the bounds of the NDF.
   my $STATUS = 0;
-  ndf_find( &NDF::DAT__ROOT(), $ndf, my $access, $STATUS );
+  err_begin( $STATUS );
+  ndf_begin();
+  ndf_find( &NDF::DAT__ROOT(), $ndf, my $ndf_id, $STATUS );
+  ndf_bound( $ndf_id, 2, my @lbnd, my @ubnd, my $ndim, $STATUS );
+  ndf_annul( $ndf_id, $STATUS );
+  ndf_end( $STATUS );
+
+# Handle errors.
   if( $STATUS != &NDF::SAI__OK ) {
-    croak "Could not find NDF. Starlink error code $STATUS returned";
+    my ( $oplen, @errs );
+    do {
+      err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+      push @errs, $opstr;
+    } until ( $oplen == 1 );
+    err_annul( $STATUS );
+    err_end( $STATUS );
+    croak "Error determining NDF pixel bounds:\n" . join "\n", @errs;
   }
-  ndf_bound( $access, 2, my @lbnd, my @ubnd, my $ndim, $STATUS );
-  if( $STATUS != &NDF::SAI__OK ) {
-    croak "Could not determine NDF bounds. Starlink error code $STATUS returned";
-  }
+  err_end( $STATUS );
 
   my $xcen = ( $lbnd[0] + $ubnd[0] ) / 2;
   my $ycen = ( $lbnd[1] + $ubnd[1] ) / 2;
