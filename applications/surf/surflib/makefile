@@ -27,7 +27,7 @@ FSOURCES= surflib_diff_despike.f surflib_calc_output_grid.f \
 	surflib_read_ipfile.f surflib_fill_wplate.f \
 	surflib_process_bols.f surflib_remove_ip.f \
 	surflib_calc_polpack_angrot.f \
-	surflib_fill_polpack_angles.f
+	surflib_fill_polpack_angles.f surflib_trim_image.f
 
 CSOURCES = 
 
@@ -100,3 +100,4 @@ surflib_remove_ip.o: SAE_PAR PRM_PAR
 surflib_process_bols.o: SAE_PAR PRM_PAR
 surflib_calc_polpack_angrot.o: SAE_PAR PRM_PAR
 surflib_fill_polpack_angles.o: SAE_PAR PRM_PAR
+surflib_trim_image.o:  SAE_PAR NDF_FUNC
