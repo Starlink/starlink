@@ -3304,10 +3304,10 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
           ENDIF
 
-	print *,ix
-	call flush(6)
 
           IF (SOK) THEN
+	print *,ix
+	call flush(6)
 
 *  Calculate position of data in array
 *  The first two dimensions of the array can be either
