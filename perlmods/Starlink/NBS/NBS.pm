@@ -105,17 +105,30 @@ Starlink::NBS - Perl extension for accessing NBS noticeboards
 
   use Starlink::NBS;
   
-  $id = new Starlink::NBS($nbs_name);
+  $nbs_name = "p57321_plotnb";
 
+  $nbs = new Starlink::NBS($nbs_name);
+  $fmax_item = $nbs->find(".port_0.fmax");
+
+  ($status, $value) = $fmax_item->get;
+
+  $status = $fmax_item->put(3500);
+
+  tie %top, ref($nbs), $nbs;
+
+  use Data::Dumper;
+  print Dumper(\%top);
 
 =head1 DESCRIPTION
 
-This module provides an OO interface to the NBS system.
-
+This module provides an interface to the NBS system. Object-oriented
+and function interfaces are provided. Additionally, it is possible
+to tie the noticeboard to a perl variable allowing the notice board
+to be manipulated using normal perl commands.
 
 =head1 METHODS
 
-The available methods are
+=head2 Constructors
 
 =over 4
 
@@ -130,6 +143,8 @@ Create a new instance of a Starlink::NBS object.
 Only used directly to access the top level of the noticeboard
 
    $nbs_id  = new Starlink::NBS("nbsname");
+
+The loadnbs() method is invoked with the supplied argument.
 
 =cut
 
@@ -147,6 +162,7 @@ sub new {
   $nbs->{RootID} = undef; # ID of the actual noticeboard
   $nbs->{Nchilds} = undef;    # Number of children
   $nbs->{Pos}   = 0;      # Position in structure
+  $nbs->{Debug} = 0;
    
   # Bless task into class
   bless($nbs, $class);
@@ -160,16 +176,22 @@ sub new {
 
 }
 
-=item General access methods
+=back
 
-These methods are for accessing the "instance" data:
-    name, path, id, top, status, nchilds, debug
+=head2 Accessor Methods
 
-With args they set the values.
-Without args they retrieve the values
+These methods are for accessing the "instance" data.
+With arguments they set the value, without arguments they
+retrieve the current value.
+
+=over 4
+
+=item path
+
+Full path (name) to the item associated with this object
+including the name of the noticeboard.
 
 =cut
-
 
 # Methods to access "instance" data"
 sub path {
@@ -178,11 +200,23 @@ sub path {
   return $self->{Path};
 }
 
+=item id
+
+ID of the shared memory area.
+
+=cut
+
 sub id {
   my $self = shift;
   if (@_) { $self->{ID} = shift; }
   return $self->{ID};
 }
+
+=item pos
+
+Position in structure.
+
+=cut
 
 sub pos {
   my $self = shift;
@@ -190,11 +224,23 @@ sub pos {
   return $self->{Pos};
 }
 
+=item rootid
+
+ID of the actual noticeboard.
+
+=cut
+
 sub rootid {
   my $self = shift;
   if (@_) { $self->{RootID} = shift; }
   return $self->{RootID};
 }
+
+=item top
+
+True if this is a top-level object. False otherwise.
+
+=cut
 
 sub top {
   my $self = shift;
@@ -209,17 +255,40 @@ sub top {
   return $self->{Top};
 }
 
+=item status
+
+Contains the current status associated with the object. Status from
+each method call is placed in here (and usually returned with each
+command). Methods will not do anything if the stored status is not
+good. This behaves as an inherited status without having to pass
+the status into the methods explicitly.
+
+=cut
+
 sub status {
   my $self = shift;
   if (@_) { $self->{Status} = shift; }
   return $self->{Status};
 }
 
+=item debug
+
+Turns debugging on or off. Default is off.
+
+=cut
+
 sub debug {
   my $self = shift;
   if (@_) { $self->{Debug} = shift; }
   return $self->{Debug};
 }
+
+=item nchilds
+
+Returns the number of children associated with the current object.
+Can not be set externally.
+
+=cut
 
 sub nchilds {
   # This routine calculates the number of children
@@ -241,6 +310,11 @@ sub nchilds {
   return $self->{Nchilds};
 }
 
+=back
+
+=head2 General Methods
+
+=over 4
 
 =item isokay
 
@@ -294,8 +368,8 @@ sub loadnbs {
 
 Find the storage type of an object
 
-    Arguments: None (but uses the current status of the object)
-    Returns:  ($type, $status)
+ Arguments: None (but uses the current status of the object)
+ Returns:  ($type, $status)
 
 =cut
 
@@ -361,10 +435,10 @@ sub name {
 
 Find the size of the item
 
-    Arguments: None (but uses the current status of the object)
-    Returns: ($size, $maxsize, $status)
+ Arguments: None (but uses the current status of the object)
+ Returns: ($size, $maxsize, $status)
 
-Returns status = NBS__NOPRIMITIVE if the object is not a primitive.
+Returns status = NBS__NOTPRIMITIVE if the object is not a primitive.
 Returns status = NBS__NILID  if the object is not defined
 
 The returned size is the number of entries that can be contained.
@@ -423,8 +497,9 @@ sub size {
 =item nth_name(num)
 
 Return the name of the nth component in the objects structure.
-Arguments: number
-Return:    name
+
+ Arguments: number
+ Return:    name
 
 =cut
 
@@ -464,7 +539,7 @@ The item must exist below the current object.
              An object relative to the current object can be
              given if it starts with a '.'
 
-Returns an object blessed into Starlink::NBS
+Returns an object blessed into C<Starlink::NBS> class.
 
 =cut
 
@@ -761,6 +836,20 @@ For example, for
 
 %new will not be tied even though %hash was.
 
+It is possible to tie a hash to the top-level noticeboard structure
+and to access lower levels of the noticeboard entirely using the
+tie. For example, a simple way to list the noticeboard contents
+is to tie a hash to the top level and then use Data::Dumper to
+list the hash.
+
+  use Starlink::NBS;
+  use Data::Dumper;
+
+  $nbs = new Starlink::NBS($nbsname);
+  tie %hash, ref($nbs), $nbs;
+
+  print Dumper(\%hash);  
+
 A method is supplied for tieing NBS objects to variables:
 
 =over 4
@@ -771,6 +860,8 @@ Tie a Starlink::NBS object to a perl variable. No arguments.  If the
 object points to a structure a reference to a perl hash is returned.
 If the object points to a primitive a reference to a perl scalar is
 returned.
+
+=back
 
 =cut
 
@@ -1055,24 +1146,6 @@ sub NEXTKEY {
 # Autoload methods go after =cut, and are processed by the autosplit program.
 1;
 __END__
-
-
-
-
-=head1 EXAMPLES
-
-  use Starlink::NBS;
-  $nbs_name = "p57321_plotnb";
-
-  $nbs = new Starlink::NBS("$nbs_name");
-  $fmax_item = $nbs->find(".port_0.fmax");
-
-  ($status, $value) = $fmax_item->get;
-
-  $status = $fmax_item->put(3500);
-
-
-
 
 =head1 NON-METHODS
 
