@@ -1,0 +1,78 @@
+## DREAM2SURF - Convert DREAM data to SURF format
+
+#+
+#  Name:
+#     DREAM2SURF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     Tim Jenness (TIMJ@JACH)
+
+
+#  History:
+#     1998 May 8 (TIMJ)
+#	 Original Version
+#     {enter_further_changes_here}
+
+#-
+
+   INTERFACE DREAM2SURF
+
+      PARAMETER COORDS
+         TYPE '_CHAR'
+         PROMPT 'Coordinate frame of tracking centre'
+      ENDPARAMETER
+
+      PARAMETER FSCYCLE
+         POSITION 3
+         TYPE     '_INTEGER'
+         PROMPT   'First cycle to read from file'
+      ENDPARAMETER
+
+
+      PARAMETER IN
+         POSITION 1
+         TYPE     'FILE'
+         PPATH    'Current'
+         PROMPT   'Name of DREAM input file'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+
+      PARAMETER NRCYCLE
+         POSITION 4
+         TYPE     '_INTEGER'
+         PROMPT   'Number of cycles to read from file'
+      ENDPARAMETER
+
+      PARAMETER 'OUT'
+         POSITION 2
+         TYPE     'NDF'
+	 ACCESS   'WRITE'
+         PPATH   'Dynamic,Current'
+	 VPATH    'PROMPT'
+	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         PROMPT   'Name of SURF output file'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER FLATFILE
+         POSITION 5
+         TYPE   '_CHAR'
+	 PPATH 'Current'
+         PROMPT 'The name of the file containing the flat-field'
+        HELPKEY '*'
+      ENDPARAMETER
+
+
+
+   ENDINTERFACE

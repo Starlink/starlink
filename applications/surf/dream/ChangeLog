@@ -1,0 +1,19 @@
+1998-06-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* dream2surf.f (DREAM2SURF): Finally get jiggle pattern to work
+	with new format sol files.
+
+1998-05-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* dream2surf.f (DREAM2SURF): Add default output filename plus
+	print current RA/DEC
+
+1998-05-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* dream2surf.f (DREAM2SURF): Modify for new header format (UT date 
+	rather than LST)
+
+1998-05-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* dream2surf.f (DREAM2SURF): Create.
+
