@@ -85,7 +85,7 @@ defined ($infile) || Usage();
 ($filenameroot = $infile) =~ s/\..*$//;
 
 %eqtypes = ( 'start-inline' => '$',
-	     'end-inline' => '$\special{dvi2bitmap crop all 0}',
+	     'end-inline' => '$\special{dvi2bitmap crop all 0}\DBstrut',
 	     'start-equation' => '\begin{equation}',
 	     'end-equation' => '\end{equation}',
 	     'start-eqnarray' => '\begin{eqnarray}',
@@ -188,6 +188,9 @@ sub LaTeXHeader {
        \@latex@error{Too many columns in eqnarray environment}\@ehc\fi
      \reserved@a \if@SetEqnNum\@eqnnum\global\@SetEqnNumfalse\fi
      \global\@eqcnt\z@\cr}
+% Put a dvi2bitmap strut into the output, of the same size as a \strut
+{\catcode`p=12 \catcode`t=12 \gdef\DB@PT#1pt{#1}}
+\def\DBstrut{\strut\special{dvi2bitmap strut 0 0 \expandafter\DB@PT\the\ht\strutbox\space\expandafter\DB@PT\the\dp\strutbox}}
 \makeatother
 \begin{document}
 \special{dvi2bitmap default crop all 10 absolute crop left 0}
