@@ -448,7 +448,8 @@ STARTUP_SCRIPT = $(PKG_NAME)_dev
 
 IRA_PUBLIC_INCLUDES = ira_err ira_par
 CTG_PUBLIC_INCLUDES = ctg_err 
-PUBLIC_INCLUDES = $(IRA_PUBLIC_INCLUDES) $(CTG_PUBLIC_INCLUDES) 
+KPG_PUBLIC_INCLUDES = ctm_par
+PUBLIC_INCLUDES = $(IRA_PUBLIC_INCLUDES) $(CTG_PUBLIC_INCLUDES) $(KPG_PUBLIC_INCLUDES) 
 
 #  List of private include files.  These are additional include files
 #  which form part of the package and are required in order to build
@@ -458,7 +459,7 @@ IRA_PRIVATE_INCLUDES = ira_com
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
-KPG_PRIVATE_INCLUDES = kpg_ast kpg_par hlpcmd ctm_par ctm_com
+KPG_PRIVATE_INCLUDES = kpg_ast kpg_par hlpcmd ctm_com
 GRF_PRIVATE_INCLUDES = grf.h
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
                    $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
@@ -791,7 +792,8 @@ $(CTG_F_ROUTINES) $(CTG_C_ROUTINES):
 	@ if test -f $@; then :;\
            else echo $@ is not in ctg_source.tar; exit 1; fi
 
-$(KPG_BLOCK_DATA) $(KPG_PRIVATE_INCLUDES) $(KPG_F_ROUTINES) $(KPG_C_ROUTINES):
+$(KPG_PUBLIC_INCLUDES) $(KPG_BLOCK_DATA) $(KPG_PRIVATE_INCLUDES) \
+$(KPG_F_ROUTINES) $(KPG_C_ROUTINES):
 	$(TAR_OUT) kpg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in kpg_source.tar; exit 1; fi

@@ -503,7 +503,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
                     NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_PAR \
                     PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR AST_PAR PSX_ERR \
                     AST_ERR AGI_PAR CAT_PAR CAT_ERR NDG_ERR \
-                    IRA_PAR IRA_ERR CTG_ERR 
+                    IRA_PAR IRA_ERR CTG_ERR CTM_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -882,8 +882,8 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(MEMTASKS) \
 #  files whose names do not exactly match the names used in the source
 #  code.
 
-INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM SFT_COM IRA_PAR \
-                IRA_ERR CTG_ERR CCD1_PAR 
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM SFT_COM \
+                CCD1_PAR 
 
 #
 #  Rules to set up links to locate each of the above include files.
@@ -907,15 +907,16 @@ GRP_ERR:     $(STAR_INC)/grp_err;     $(LINK) $? $@
 GRP_PAR:     $(STAR_INC)/grp_par;     $(LINK) $? $@
 IDI_ERR:     $(STAR_INC)/idi_err;     $(LINK) $? $@
 IDI_PAR:     $(STAR_INC)/idi_par;     $(LINK) $? $@
-IRA_ERR:     ira_err;                 $(LINK) $? $@
-IRA_PAR:     ira_par;                 $(LINK) $? $@
+IRA_ERR:     $(STAR_INC)/ira_err;     $(LINK) $? $@
+IRA_PAR:     $(STAR_INC)/ira_par;     $(LINK) $? $@
+CTM_PAR:     $(STAR_INC)/ctm_par;     $(LINK) $? $@
 MAG_ERR:     $(STAR_INC)/mag_err;     $(LINK) $? $@
 ME_COM:      me_com;                  $(LINK) $? $@
 MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
 NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
 NDG_ERR:     $(STAR_INC)/ndg_err;     $(LINK) $? $@
-CTG_ERR:     ctg_err;                 $(LINK) $? $@
+CTG_ERR:     $(STAR_INC)/ctg_err;     $(LINK) $? $@
 NUM_CMN:     $(STAR_INC)/num_cmn;     $(LINK) $? $@
 NUM_DEC:     $(STAR_INC)/num_dec;     $(LINK) $? $@
 NUM_DEC_B:   $(STAR_INC)/num_dec_B;   $(LINK) $? $@
