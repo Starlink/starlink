@@ -22,6 +22,8 @@
  *                           classes can add new options more easily.
  * Peter W. Draper 13/01/99  Added changes to support non 8 bit
  *                           colors (colorUpdate).
+ *                           Made displayImageEvent virtual (need for UKIRT
+ *                           quick look updates).
  */
 
 #include "TkImage.h"
@@ -355,7 +357,7 @@ public:
     static void motionProc(ClientData clientData);
 
     // called from the Camera class to display image from shared memory
-    int displayImageEvent(const rtdIMAGE_INFO&, const Mem& data);
+    virtual int displayImageEvent(const rtdIMAGE_INFO&, const Mem& data);
     
     // utility Tcl command proc to set colormap for popup windows
     static int rtd_set_cmap(ClientData, Tcl_Interp* interp, int argc, char** argv);

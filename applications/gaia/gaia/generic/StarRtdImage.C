@@ -176,6 +176,7 @@
 #include "StarRtdImage.h"
 #include "Contour.h"
 #include "XYProfile.h"
+#include "RegionStats.h"
 #include "HTTP.h"
 #include "ast.h"
 #include "grf_tkcan.h"
@@ -283,7 +284,7 @@ static Tk_ImageType starRtdImageType = {
 // image "configure" subcommand. (ALLAN)
 //-
 static Tk_ConfigSpec configSpecs_[] = {
-    GAIA_OPTIONS,              // See Gaia.h: defines option list
+    GAIA_OPTIONS,              // See StarRtdImage.h: defines option list
     {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
 };
 
@@ -5685,3 +5686,97 @@ int StarRtdImage::astdomainsCmd( int argc, char *argv[] )
     return TCL_OK;
 }
 
+//  ==================================
+//  UKIRT quick look member functions.
+//  ==================================
+
+/*
+ * This method is called from the RtdImageCamera class to display the
+ * image from shared memory.  "info" contains all we need to know
+ * about the image and "data" gives access to the shared memory for
+ * the image.
+ *
+ * This is re-implemented so that we can retain the UKIRT quick look
+ * statistics region. The mapping of this extra information is:
+ *
+ *    Lower X coordinate: ql_x0 = info.reserved[0]
+ *    Lower Y coordinate: ql_y0 = info.reserved[1]
+ *    Upper X coordinate: ql_x1 = info.reserved[2]
+ *    Upper Y coordinate: ql_y1 = info.reserved[3]
+ *    Rowcut (?):         ql_rowcut = info.reserved[4]
+ *
+ * Which makes use of 5 of the 9 reserved integers in the
+ * rtdIMAGE_INFO structure.
+ */
+int StarRtdImage::displayImageEvent( const rtdIMAGE_INFO& info,
+                                     const Mem& data )
+{
+    //  Extract the UKIRT quick look region. These are passed in the
+    //  reserved region so that we can retain the rtdIMAGE_INFO size
+    //  at the current values.
+    if ( ukirt_ql() ) {
+        ql_x0 = info.reserved[0];
+        ql_y0 = info.reserved[1];
+        ql_x1 = info.reserved[2];
+        ql_y1 = info.reserved[3];
+        ql_rowcut = info.reserved[4];
+    }
+    return RtdImage::displayImageEvent( info, data );
+}
+
+/*
+ * This virtual method is called for motion events to update the zoom
+ * window and set trace variables based on the current mouse position.
+ * We need to re-implement so that the UKIRT look quick statistics can
+ * be made available as global variables.
+ */
+void StarRtdImage::processMotionEvent()
+{
+    RtdImage::processMotionEvent();
+    if ( ukirt_ql() ) {
+        //  Need the UKIRT quick look statistics box updates. These
+        //  are originally by Min Tan (mt@roe.ac.uk).
+        if( ( ql_x1 - ql_x0 ) > 1024 || ( ql_y1 - ql_x0 ) > 1024 ||
+            ( ql_x1 - ql_x0 ) < 0 || ( ql_y1 - ql_y0 ) < 0 ) {
+            //  Do nothing, if out of bounds?
+        }
+        else {
+            //  Write out the data limits.
+            char *var = ( viewMaster_ ? viewMaster_->name() : instname_ );//XXX change here
+            char buffer[36];
+            sprintf( buffer, "%d, %d", ql_x0, ql_y0 );
+            Tcl_SetVar2( interp_, var, "XY1", buffer, TCL_GLOBAL_ONLY );
+
+            sprintf( buffer, "%d, %d", ql_x1, ql_y1 );
+            Tcl_SetVar2( interp_, var, "XY2", buffer, TCL_GLOBAL_ONLY );
+
+            sprintf( buffer, "%d", ql_rowcut );
+            Tcl_SetVar2( interp_, var, "ROWCUT", buffer, TCL_GLOBAL_ONLY );
+
+            //  Derive the stats for our current data type.
+            RegionStats sBox( image_->image() );
+            sBox.setSwap( swapNeeded() );
+            sBox.setRegion( ql_x0, ql_y0, ql_x1, ql_y1 );
+            sBox.calc();
+
+            //  Export the statistical values as TCL global variables.
+            sprintf( buffer, "%ld", (long) sBox.getArea() );
+            Tcl_SetVar2( interp_, var, "PIXELS", buffer, TCL_GLOBAL_ONLY );
+
+            sprintf( buffer, "%d", (int) sBox.getMin() );
+            Tcl_SetVar2( interp_, var, "SMIN", buffer, TCL_GLOBAL_ONLY );
+
+            sprintf( buffer, "%d", (int) sBox.getMax() );
+            Tcl_SetVar2( interp_, var, "SMAX", buffer, TCL_GLOBAL_ONLY );
+
+            sprintf( buffer, "%ld", (long) sBox.getTotal() );
+            Tcl_SetVar2( interp_, var, "TOTAL", buffer, TCL_GLOBAL_ONLY );
+
+            sprintf( buffer, "%f", (float) sBox.getMean() );
+            Tcl_SetVar2( interp_, var, "MEAN", buffer, TCL_GLOBAL_ONLY );
+
+            sprintf( buffer, "%f", (float) sBox.getStd() );
+            Tcl_SetVar2( interp_, var, "STD", buffer, TCL_GLOBAL_ONLY );
+	}
+    }
+}

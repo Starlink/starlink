@@ -8,6 +8,8 @@
 * T.Herlin  08/02/95  Created
 * P.W. Draper 16/12/97  Modified to use fd_set as a type rather than
 *                       struct.
+*             12/09/01 Added UKIRT Quick Look member initialisations, should
+*                      be harmless to other uses.
 */
 static const char* const rcsId="@(#) $Id: rtdCubeDisplay.c,v 1.7 1998/06/25 08:29:55 abrighto Exp $";
 
@@ -298,6 +300,13 @@ main(int argc, char *argv[])
 	    imageInfo.shmId = shmId;
 	    imageInfo.xPixels  = shmWidth;
 	    imageInfo.yPixels  = shmHeight;
+
+            /* Fill in UKIRT Quick Look members */
+	    imageInfo.reserved[0] = 0;
+	    imageInfo.reserved[1] = 0;
+	    imageInfo.reserved[2] = shmWidth;
+	    imageInfo.reserved[3] = shmHeight;
+	    imageInfo.reserved[4] = 1024;
 
 	    if (bscale != 0)
 		{

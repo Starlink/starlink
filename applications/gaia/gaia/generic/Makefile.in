@@ -32,7 +32,8 @@ X_INCLUDE     	= @XINCSW@
 # ------------------------------------------------------------------------
 CPPSRCS =  \
  GaiaSkySearch.C StarRtdImage.C Gaia.C NDFIO.C StarWCS.C GaiaLocalCatalog.C  \
- StarFitsIO.C bitmaps.C Contour.C colormaps.C GaiaRtdRemote.C XYProfile.C
+ StarFitsIO.C bitmaps.C Contour.C colormaps.C GaiaRtdRemote.C \
+ XYProfile.C RegionStats.C
 
 CSRCS =  \
  ast_tclerr.c patch.c gaiaNDF.c writeslice.c centroid.c rotated.c \
@@ -228,6 +229,7 @@ tab2asc.o: CAT_PAR SAE_PAR
 tab2cat.o: CAT_PAR SAE_PAR
 Contour.o: ContourTemplates.C
 XYProfile.o: XYProfileTemplates.C
+RegionStats.o: RegionStatsTemplates.C
 
 LINKS = SAE_PAR PRM_PAR DAT_PAR NDF_PAR GRP_PAR FIO_ERR NUM_DEC_CVT \
         NUM_DEF_CVT MSG_PAR AST_PAR CAT_PAR PSX_ERR PAR_ERR

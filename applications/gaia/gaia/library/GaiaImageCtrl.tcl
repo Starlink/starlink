@@ -58,6 +58,8 @@
 #        Added selected_area method as SkyCatCtrl version assumed
 #        images could have no dimension greater than width (tall
 #        2000x4000 break with this arrangement).
+#     23-JUL-2001 (PWD):
+#        Added UKIRT quick look facility changes.
 #     {enter_changes_here}
 
 #-
@@ -128,6 +130,9 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Clicking in main window gives it focus.
       $canvas_ bind $image_ <1> +[code $this focus_ in]
+
+      #  Pass on UKIRT quick look config.
+      $image_ configure -ukirt_ql $itk_option(-ukirt_ql)
    }
 
    #  Make the panel info subwindow. Override to use GaiaImagePanel,
@@ -144,7 +149,8 @@ itcl::class gaia::GaiaImageCtrl {
             -min_scale $itk_option(-min_scale) \
             -max_scale $itk_option(-max_scale) \
             -shorthelpwin $itk_option(-shorthelpwin) \
-            -borderwidth 3 -relief groove
+            -borderwidth 3 -relief groove \
+            -ukirt_ql $itk_option(-ukirt_ql)
       }
       if { $itk_option(-float_panel) } {
          set side bottom
@@ -323,15 +329,15 @@ itcl::class gaia::GaiaImageCtrl {
         set app [lindex [winfo name .] 0]
         set date [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
         utilReUseWidget gaia::GaiaImagePrint $w_.print \
-            -image $this \
-            -show_footer 1 \
-            -whole_canvas 0 \
-            -transient 1 \
-            -pagewidth 8.1i \
-            -top_left  "GAIA::Skycat\n$object" \
-            -top_right "$file\n$center" \
-            -bot_left  "$user" \
-            -bot_right "$date"
+           -image $this \
+           -show_footer 1 \
+           -whole_canvas 0 \
+           -transient 1 \
+           -pagewidth 8.1i \
+           -top_left  "${itk_option(-appname)}\n$object" \
+           -top_right "$file\n$center" \
+           -bot_left  "$user" \
+           -bot_right "$date"
    }
 
    #  Create a graph to display the image data values along the line
@@ -384,7 +390,7 @@ itcl::class gaia::GaiaImageCtrl {
    public method update_title {} {
       set file "[file tail [$image_ fullname]]"
       set w [winfo toplevel $w_]
-      wm title $w "GAIA::Skycat: $file ([$w cget -number])"
+      wm title $w "$itk_option(-appname): $file ([$w cget -number])"
       wm iconname $w $file
    }
 
@@ -665,7 +671,7 @@ itcl::class gaia::GaiaImageCtrl {
             set d [DialogWidget .#auto \
                       -title {Temporary image} \
                       -text "The image ($last_file_) that was displayed in \
-                             window GAIA::Skycat: ($clone) is marked \
+                             window $itk_option(appname): ($clone) is marked \
                              temporary.\n\Are you sure you want to delete it?"\
                       -buttons [list Yes No]]
             set answer [$d activate]
@@ -930,6 +936,13 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Define the HDU initially displayed from each FITS file that is loaded.
    itk_option define -hdu hdu Hdu 0
+
+   #  Whether to enable the UKIRT quick look parts of the interface.
+   itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0
+
+   #  The application name as used in window titles (can be changed
+   #  for UKIRT mods). 
+   itk_option define -appname appname AppName GAIA::Skycat
 
    #  Protected variables:
    #  ====================
