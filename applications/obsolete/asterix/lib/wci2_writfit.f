@@ -152,9 +152,6 @@
       PRJID = ARGS(3)
       SYSID = ARGS(4)
 
-*  Extract the logical unit
-      CALL ADI2_GETLUN( ID, LUN, STATUS )
-
 *  Get coordinate system details
       IF ( SYSID .NE. ADI__NULLID ) THEN
         CALL ADI_CGET0C( SYSID, 'NAME', SYS, STATUS )
