@@ -100,7 +100,7 @@
       CHARACTER*200             FSPEC
       CHARACTER*6               MODE
 
-      INTEGER			EP			! Character position
+      INTEGER			DP, EP			! Character positions
       INTEGER			FLEN			! Length of FSPEC
 *.
 
@@ -122,11 +122,21 @@
       END DO
       IF ( EP .NE. 0 ) FLEN = EP - 1
 
-*    Check if slice or subcomponent delimiters present
-      EP = INDEX( FSPEC, '.' )
+*    Check if slice or subcomponent delimiters present. Look for period
+*    after the last slash in the file name
+      EP = FLEN
+      DO WHILE ( (EP.GT.0) .AND. (FSPEC(EP:EP).NE.'/') )
+        EP = EP - 1
+      END DO
+      IF ( EP .GT. 0 ) THEN
+        DP = INDEX( FSPEC(EP:), '.' )
+        IF ( DP .GT. 0 ) DP = DP + EP
+      ELSE
+        DP = 0
+      END IF
 
 *    Simple HDS file name?
-      IF ( EP .EQ. 0 ) THEN
+      IF ( DP .EQ. 0 ) THEN
 
 *      Try to open top level file
         CALL HDS_OPEN( FSPEC(:FLEN), MODE, FLOC, STATUS )
@@ -135,7 +145,7 @@
       ELSE
 
 *      Try to open top level file
-        CALL HDS_OPEN( FSPEC(:EP-1), MODE, TLOC, STATUS )
+        CALL HDS_OPEN( FSPEC(:DP-1), MODE, TLOC, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Locate sub-component
