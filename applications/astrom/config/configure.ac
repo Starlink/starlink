@@ -1,7 +1,7 @@
 dnl  Autoconf file for ASTROM
 dnl  $Id$
 
-AC_INIT(astrom, 3.7, ussc@starlink.ac.uk)
+AC_INIT(astrom, 3.7-1, ussc@starlink.ac.uk)
 
 dnl  By default, we want to be installed into /star (this option has
 dnl  no effect at present, since this is not how we currently
