@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+#+
+#  Name:
+#     make_regtest
+
+#  Purpose:
+#     Creates Fortran code defining a set of FITS headers for inclusion
+#     in regression.f.
+
+#  Language:
+#     Perl
+
+#  Description:
+#     This script should be used to add a new FITS header test to the
+#     AST regression test. It reads the given file containing FITS headers 
+#     and creates a Fortran code snippet which can be included in the 
+#     REG_SOURCE function within the regression.f file. The output code 
+#     contains the token "xxx" which should be replaced by the index of the
+#     new test (i.e. one more than the number of tests already in 
+#     regression.f. The code is written to standard output.
+
+#  Usage:
+#     make_regtest <fits header file>
+
+#  Parameters:
+#     fits header file
+#        A text file containing 80 character FITS cards.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-JAN-2002 (DSB):
+#        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+      
+# Open the input file
+   if( ! $ARGV[0] ) {
+      print "Usage: make_regtest [header file] > [output file]\n";
+      exit
+   } 
+   open(INFIL,$ARGV[0]) or die "Cannot access $ARGV[0]";
+
+# Print out the header.
+   $now = localtime;
+   print "\n";
+   print "*  FITS headers from $ARGV[0] ($now)\n";
+   print "      ELSE IF( REG_TEST .EQ. xxx ) THEN\n";
+
+# Read in wach line from standard input.
+   $n = 0;
+   while( <INFIL> ) {
+      $n++;
+
+# Remove any trailing whitespace (including newline characters).
+      s/\s+$//;
+
+# Double up any single quotes so that they will be OK within a
+# Fortran string.
+      s/'/''/g;
+
+# Print out the control code.
+      if( $n == 1 ) {
+         print "         IF( REG_LINE .EQ. 1 ) THEN\n";
+      } else {
+         print "         ELSE IF( REG_LINE .EQ. $n ) THEN\n";
+      }
+
+# Print the line out. If this is a long string split it over two lines.
+# The whole header string cannot be longer than 80 characters (plus
+# a few extra for the double up single quotes added above) so two 
+# lines should always be sufficient.
+      if( length > 50 ) {
+         print "            CARD = '",substr($_,0,50),"' //\n";
+         print "     :             '",substr($_,50),"'\n";
+      } else {
+         print "            CARD = '$_'\n";
+      }
+   }
+
+# Print out the footer.
+   print "         ELSE\n";
+   print "            REG_SOURCE = 0\n";
+   print "         END IF\n";
+
+   close INFIL;
+
