@@ -32,15 +32,11 @@
 *     The basic method used is to access groups of NDFs (or a series
 *     of single NDFs if all are moved between exposures) and an
 *     optional reference NDF. The first NDF of the first group or the
-*     reference NDF is then displayed and a cursor application is used
-*     to record the positions of centroidable image features. The
-*     first NDFs of all the other groups are then displayed and you
-*     are invited to identify the image features in the order which
-*     corresponds to that used for the reference NDF. Missing image
-*     features are identified as off the currently displayed image (so
-*     the centroid routine will fail to find them). The reference set
-*     of image features may be extended by identification after the
-*     last reference feature has been marked.
+*     reference NDF is then displayed and you are invited to mark the
+*     positions of centroidable image features on it using a graphical
+*     user interface.  This window then remains on the screen for 
+*     reference while you identify the same features on each of the 
+*     other sets of images in the same way.
 *
 *     After centroiding you are then given the option to stop. If
 *     you decide to then you will have labelled position lists to use
@@ -57,6 +53,20 @@
 *     is performed. The resultant NDFs then have associated lists of
 *     labelled positions and TRANSFORM structures which may be used to
 *     transform other position lists or when resampling the data.
+*
+*     The graphical interface used for marking features on the image
+*     should be fairly self-explanatory.  The image can be scrolled using
+*     the scrollbars, the window can be resized, and there are controls
+*     for zooming the image in or out, changing the style of display and 
+*     altering the percentile cutoff limits.  The numbers of any 
+*     identified features on each image must match those of the 
+*     reference image (though it is not necessary to identify all of 
+*     the features from the reference image on each one), and there is 
+*     also a control for selecting the number of the next point to mark.
+*     Points are added by clicking mouse button 1 (usually the left one) 
+*     and may be removed by clicking mouse button 3 (usually the right one).
+*     When you have selected all the points you wish to on a given image,
+*     click the 'Done' button and you will be presented with the next one.
 
 *  Usage:
 *     ccdalign
@@ -68,6 +78,18 @@
 *        only possible if you are intending to use linear
 *        transformations (this is the usual case).
 *        [FALSE]
+*     FITTYPE = _INTEGER (Read)
+*        The type of fit which should be used when determining the
+*        transformation between the input positions lists. This may take
+*        the values
+*           - 1 -- shift of origin
+*           - 2 -- shift of origin and rotation
+*           - 3 -- shift of origin and magnification
+*           - 4 -- shift of origin, rotation and magnification (solid body)
+*           - 5 -- a full six parameter fit
+*           - 6 -- self defined function
+*
+*        [5]
 *     IN = LITERAL (Read)
 *        A list of NDF names suitable to the current stage in
 *        processing. The NDF names should be separated by commas
@@ -112,11 +134,12 @@
 *        If set to zero, then no limit is in effect.
 *        [1280]
 *     PERCENTILES( 2 ) = _DOUBLE (Read)
-*        The low and high percentiles of the data range to use when
-*        displaying the images; any pixels with a value lower than
+*        The initial low and high percentiles of the data range to use
+*        when displaying the images; any pixels with a value lower than
 *        the first value will have the same colour, and any with a value
 *        higher than the second will have the same colour.  Must be in
 *        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
+*        This can be changed from within the GUI.
 *        [2,98]
 *     WINX = INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
@@ -143,7 +166,7 @@
 
 *  Examples:
 *     ccdalign
-*        This starts the CCDALIGN script.
+*        This runs the ccdalign program.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The

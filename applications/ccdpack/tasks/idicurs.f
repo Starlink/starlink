@@ -20,9 +20,23 @@
 *        The global status.
 
 *  Description:
-*     This routine reports and records positions selected from an 
-*     X display device.  IDICURS allows displayed images and graphics 
-*     to be zoomed and scrolled during the location operation.
+*     This program displays an image on the screen and provides a 
+*     graphical user interface for marking points on it, which are then
+*     written out to a file as a position list.
+*
+*     The graphical interface used for marking features on the image
+*     should be fairly self-explanatory.  The image can be scrolled
+*     using the scrollbars, the window can be resized, and there are 
+*     controls for zooming the image in or out, changing the style of 
+*     display, and altering the percentile cutoff limits.  The position 
+*     of the cursor is reported below the display using the coordinates 
+*     of the Current coordinate frame for information, but the position 
+*     list written out is always written in Pixel coordinates, since 
+*     that is how all CCDPACK applications expect to find it written.
+*     Points are marked on the image by clicking mouse button 1 
+*     (usually the left one) and may be removed using mouse button 3
+*     (usually the right one).  When you have marked all the points
+*     that you wish to, click the 'Done' button.
 
 *  Usage:
 *     idicurs in outlist
@@ -30,6 +44,9 @@
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
 *        Gives the name of the NDF to display and get coordinates from.
+*        If multiple NDFs are using wildcards or separating their names
+*        with commas, you will be invited to mark points on each one
+*        in turn.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -70,9 +87,10 @@
 *        [1280]
 *     OUTLIST = FILENAME (Write)
 *        The name of the file which is to contain the selected
-*        positions. The positions are written using the
-*        standard format in CCDPACK which is described in the notes
-*        section.
+*        positions. The positions are written using the standard 
+*        format in CCDPACK which is described in the notes section.
+*        This list will become associated with the named NDF, and
+*        may use modifications of the input NDF name.
 *        [*.lis]
 *     PERCENTILES( 2 ) = _DOUBLE (Read and Write)
 *        The low and high percentiles of the data range to use when 
@@ -121,6 +139,9 @@
 *       considered as the same point. Comments may be included in the
 *       file using the characters # and !. Columns may be separated by
 *       the use of commas or spaces.
+*
+*       In all cases, the coordinates in position lists are pixel 
+*       coordinates.
 *
 *     - NDF extension items. 
 *

@@ -71,6 +71,12 @@
 *     if at least one of each pair has been aligned with another
 *     image before these images are indicated by a highlighting mark 
 *     in their chooser tabs.
+*
+*     When the images are plotted in the aligner window, they are 
+*     resampled into their Current coordinate frame.  It will only be
+*     possible to align them if their Current coordinates are related
+*     to each other by a simple offset (translation) in the X and Y 
+*     directions.
 
 *  Usage:
 *     pairndf in outlist percentiles
@@ -156,11 +162,14 @@
 *        names as the correspondence between these may be confusing.
 *        [*.DAT]
 *     PERCENTILES( 2 ) = _DOUBLE (Read)
-*        The low and high percentiles of the data range to use when 
-*        displaying the images; any pixels with a value lower than 
+*        The default low and high percentiles of the data range to use
+*        when displaying the images; any pixels with a value lower than 
 *        the first value will have the same colour, and any with a value
-*        higher than the second will have the same colour.  Must be in
-*        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
+*        higher than the second will have the same colour.  This only
+*        gives the default value - the percentile settings can be set
+*        for each image individually from within the GUI to accomodate
+*        the situation where images have different brightnesses.
+*        In the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
 *     WINX = INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
@@ -223,9 +232,6 @@
 
 *  Implementation Status:
 *     - Supports Bad pixel values and all non-complex data types.
-
-*  Implementation Deficiencies:
-*     - No support for coordinate systems other than pixel coordinates.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The
