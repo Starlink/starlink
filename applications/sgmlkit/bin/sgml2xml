@@ -1,56 +1,336 @@
 #! /usr/bin/perl -w
 #
-# $Id$
+#
+#+
+#  Name:
+#    sgml2xml
+#
+#  Type of module:
+#    Perl script.
+#
+#  Purpose:
+#    Convert an SGML file to XML, using sx for the body, but
+#    additionally converting entity declarations in the original
+#    file's declaration subset.
+#
+#  Description:
+#
+#    Output to stdout.
+#
+#    No parsing of any declaration -- uses RCS only.
+#
+#    Limited error recovery (the input is supposed to be valid already),
+#    so most errors are fatal.
+#
+#    Only processes entity declarations in subset -- element
+#    declarations, etc, are discarded with warnings.
+#
+#    No automatic rewriting of public identifiers -- if the input
+#    document is a valid instance of the given DTD, the output document
+#    will be, also.
+#
+#    Generates system identifiers for external entities which have only
+#    public ones.  At present, this generates a reference to the
+#    catalogue server -- should it try to do a catalogue lookup and
+#    replace it by what it finds there?
+#
+#    Entities which can't be easily translated are discarded with warnings.
+#
+#    It's not clear what one should do with SUBDOC entities.  This
+#    translates them to `NDATA XML' entities, and warns that it's done
+#    this, but the referenced document might well be SGML rather than XML.
+#
+#  Arguments:
+#    SGML file to be processed (required)
+#
+#  Options:
+#
+#    --pubid public-identifier
+#        Specify the public identifier which is to be used to identify
+#        the DTD in the output XML file.  If not specified, the public
+#        identifier in the input file is reused.
+#
+#    --sysid system-identifier
+#        Specify the system identifier which is to be used to identify
+#        the DTD in the output XML file.  If not specified, either the
+#        input file's system identifier is reused, if one exists, or
+#        else the public identifier in the input file is converted to
+#        a system identifier, and that is used.
+#
+#    --declaration decl
+#        The declaration which is appropriate to the input file.  Note
+#        that this is specified for the benefit of sx -- this script
+#        pays no attention to it.
+#
+#  Environment:
+#    If the environment variable SX is defined, then this is used as
+#    the command to invoke sx, otherwise a default value is used.
+#
+#  Author:
+#    NG: Norman Gray (Starlink, Glasgow)
+#
+#  History:
+#    26-APR-2000 (NG):
+#       Initial version. 
+#
+#  Notes:
+#
+#    References to `productions' are to the productions of the SGML standard.
+#    See http://www.tiac.net/users/bingham/sgmlsyn/sgmlsyn.htm for a
+#    well-linked version, or
+#    http://www.oreilly.com/people/staff/crism/sgmldefs.html, or
+#    ftp://ftp.ifi.uio.no/pub/SGML/productions.
+#
+#  RCS:
+#    $Id$
+#-
 
-$SX = 'sx';
+$infile = undef;		# input file
+$docpubid = undef;		# overriding publicid for output document
+$docsysid = undef;		# overriding systemid for output document
+$docdecl  = undef;		# SGML declaration to be passed to sx
+
+
+
+$SX = defined($ENV{SX}) ? $ENV{SX} : 'sx -xempty -xcomment';
+
 $catalogue_server = 'http://goedel.astro.gla.ac.uk/catalogue/public';
 $found_subdoc = 0;		# used/set in parse_entitydef
 
-#  Following parsing of doctype declaration line will get confused unless
-#  (a) a simple declaration is on a single line;
-#  (b) any declaration subset starts on the same line as the declaration; 
-#  (c) the declaration subset does not have the pair `]>' in any
-#  comment or string.
-while (defined($line = <>)) {
-    if ($line =~ /<!DOCTYPE/i) {
-	if ($line =~ /\[/) {	# there's a declaration subset
-	    while ($line !~ /\]>/) {
-	        $line .= <>;	# gobble the whole declaration subset
-	    }
-	    $line =~ /\[(.*)\]/s;
-	    $subset = $1;
-	    while ($subset =~ /<!(\B(?=--)|[A-Za-z]*) *(('.*?'|".*?"|--.*?--|.)+?)>/sg) {
-		($dectype,$decvalue) = ($1,$2);
-		if ($dectype =~ /entity/i) {
-		    # split the value into tokens
-		    @tokens = ($decvalue =~ /('.*?'|".*?"|--.*?--|\S+)\s*/sg);
-		    parse_entitydef (@tokens);
-		} elsif ($dectype eq '') {
-		    # It's a comment declaration -- collapse possibly
-		    # multiple included comments into one.
-		    $decvalue =~ s/--(\s*)--/$1/sg;
-		    print "<!$decvalue>\n";
-		} else {
-		    print STDERR "declaration $dectype discarded\n";
+$declaration_subset = 0;	# flag: in declaration subset
+$at_end_of_declaration = 0;	# flag: finished declaration -- exit loop
+
+$token_line = '';		# used by subroutine gettoken
+$token_lineno = 0;
+@token_array = ();
+@comment_buffer = ();
+
+
+while ($#ARGV >= 0) {
+    if ($ARGV[0] eq '--pubid') {
+	shift (@ARGV);
+	$#ARGV >= 0 || Usage();
+	$docpubid = $ARGV[0];
+    } elsif ($ARGV[0] eq '--sysid') {
+	shift (@ARGV);
+	$#ARGV >= 0 || Usage();
+	$docsysid = $ARGV[0];
+    } elsif ($ARGV[0] eq '--declaration') {
+	shift (@ARGV);
+	$#ARGV >= 0 || Usage();
+	$docdecl = $ARGV[0];
+    } elsif ($ARGV[0] =~ /^-/) {
+	Usage();
+    } else {
+	if (defined($infile)) {
+	    Usage();
+	} else {
+	    $infile = $ARGV[0];
+	}
+    }
+    shift (@ARGV);
+}
+
+# Open the input file.
+defined ($infile) || Usage();
+
+open (INFILE, $infile) || die "Can't open file $infile to read\n";
+
+
+# Read the doctype declaration, including any internal declaration subset
+while (!$at_end_of_declaration && defined($token = gettoken())) {
+
+    #print ": $token\n";
+
+    if ($token eq '<!') {
+	if ($declaration_subset) {
+	    $token = gettoken();
+	    if ($token =~ /entity/i) { # entity declaration
+		# process it...
+		parse_entitydef();
+	    } elsif ($token eq '>') { # empty declaration -- ie, comment
+		# do nothing -- comments swept up at end
+	    } else {
+		print STDERR "Warning:$token_lineno: declaration of $token discarded\n";
+		# flush tokens to the end of the declaration
+		while ($token ne '>') {
+		    $token = gettoken();
 		}
 	    }
 	} else {
-	    print "simple doctype ($line)\n";
+	    # the next token had better be `doctype'.  See production [110].
+	    $token = gettoken();
+	    if ($token !~ /doctype/i) {
+		print STDERR "Error:$token_lineno: instance doesn't start with `<!DOCTYPE'\n";
+		exit 1;		# BOMB OUT
+	    }
+
+	    # whew...
+	    print "<?xml version=\"1.0\"?>\n<!DOCTYPE " . gettoken();
+
+	    # Is this an `external identifier[73]'?
+	    $token = gettoken();
+	    if ($token =~ /public|system/i) {
+		my $pubid;
+		my $sysid;
+		ungettoken ($token);
+		($pubid,$sysid) =
+		    process_external_identifier ($docpubid, $docsysid);
+		if (defined($pubid)) {
+		    print "\n\tPUBLIC '$pubid'";
+		} else {
+		    print "\n\tSYSTEM";
+		}
+		print "\n\t'$sysid' " if (defined($sysid));
+	    }
 	}
-	last;
+    } elsif ($token eq '[') {
+	if ($declaration_subset) {
+	    # this shouldn't happen
+	    print STDERR "Error:$token_lineno: unexpected token '['\n";
+	    exit 1;		# BOMB OUT
+	} else {
+	    $declaration_subset = 1;
+	    print "\n\t[\n";
+	}
+    } elsif ($token eq ']') {
+	if ($declaration_subset) {
+	    $declaration_subset = 0;
+	    print "\n]";
+	} else {
+	    # this shouldn't happen
+	    print STDERR "Error:$token_lineno: unexpected token ']'\n";
+	    exit 1;		# BOMB OUT
+	}
+    } elsif ($token eq '>') {
+	if ($declaration_subset) {
+	    # this shouldn't happen
+	    print STDERR "Error:$token_lineno: unexpected token '>'\n";
+	    exit 1;		# BOMB OUT
+	} else {
+	    print ">\n";
+	    $at_end_of_declaration = 1;
+	}
     } else {
-	print $line;
+	print STDERR "Warning:$token_lineno: unexpected token $token (ignored)\n";
+    }
+
+    # Process any left-over comments
+    while ($#comment_buffer >= 0) {
+	print "<!" . shift(@comment_buffer) . ">\n";
     }
 }
 
-exit 0;
+# flush output before exec
+$| = 1;
+print "\n";
 
+# Now exec sx with the original input file, and discaring all its
+# various warnings.  Remove the <?xml?> PI from the sx output, since
+# we've already output such a PI above.
+
+if (defined($docdecl)) {
+    $infile = "$docdecl $infile";
+}
+exec "$SX $infile 2>/dev/null | sed '/<\?xml/d'";
+
+exit 1;
+
+
+
+
+# Tokenise stdin, and return one token per call.
+#
+# This isn't exactly the same as the tokenisation which a real SGML parser
+# would do, but it's close enough for our purposes.
+sub gettoken {
+    # siphon off any leading comments into @comment_buffer
+    while ($#token_array >= 0 && $token_array[0] =~ /^--/) {
+	push (@comment_buffer, shift(@token_array));
+    }
+
+    while ($#token_array < 0) {
+	#my @t;
+	# [A-Za-z] are the characters in production `name start character[53]',
+	# and [A-Za-z0-9.-] the characters in production `name character[52]'
+	# (in the SGML RCS).  Also recognise tokens starting with RNI (`#').
+	# Also add PERO (`%').
+	while ($token_line !~ /<!|[\[\]>%]|#?[A-Za-z][A-Za-z0-9.-]*|'.*?'|".*?"|--.*?--/s) {
+	    my $l = <INFILE>;
+	    $token_lineno++;
+	    if (defined($l)) {
+		$token_line .= $l;
+	    } else {
+		# this logic will fail if a syntactically correct file 
+		# does not have a final newline.
+		return $l;	# return undefined -- EOF
+	    }
+	}
+	push (@token_array,
+	      ($token_line =~ /\s*(<!|[\[\]>%]|#?[A-Za-z][A-Za-z0-9.-]*|'.*?'|".*?"|--.*?--)\s*/sg));
+	$token_line = '';
+#	@t = ($token_line =~ /\s*(<!|[\[\]>%]|#?[A-Za-z][A-Za-z0-9.-]*|'.*?'|".*?"|--.*?--)\s*/sg);
+#	$token_line = '';
+#	push (@token_array, @t);
+
+	# again siphon off any leading comments into @comment_buffer
+	while ($#token_array >= 0 && $token_array[0] =~ /^--/) {
+	    push (@comment_buffer, shift(@token_array));
+	}
+    }
+
+    #print "($token_array[0])\n";
+
+    return shift(@token_array);
+}
+
+# Push a token back on the input.  No attempt to maintain token_lineno here,
+# so this could be off if you push back the last token on the previous line.
+sub ungettoken {
+    unshift (@token_array, $_[0]);
+}
+
+
+# Process an `external identifier[73]', returning a public and a
+# system id as a two-element array.  Takes two optional arguments.  If
+# these are defined, they are respectively an overriding public and
+# system identifier.
+sub process_external_identifier {
+    my $pubid;
+    my $sysid;
+    my $t = gettoken ();
+    if ($t =~ /^public/i) {
+	$t = gettoken();
+	($pubid = $t) =~ s/[\'\"]//g;
+    }
+    $t = gettoken();		# system identifier
+    if ($t =~ /^[\'\"]/) {	# system id
+	($sysid = $t) =~ s/[\'\"]//g;
+    } else {
+	ungettoken ($t);	# it wasn't a sysid -- put it back
+    }
+
+    if ($#_ >= 0 && defined($_[0])) {
+	$pubid = $_[0];
+    }
+
+    if ($#_ >= 1 && defined($_[1])) {
+	$sysid = $_[1];
+    }
+
+    if (defined($pubid) && !defined($sysid)) {
+	$sysid = $catalogue_server . '/' . $pubid;
+	$sysid =~ s/ /%20/g;
+    }
+    return ($pubid,$sysid);
+}
+
+
+#  Parse an entity definition, reading tokens using gettoken().
+#  Gobbles the entire entity declaration.
 sub parse_entitydef {
-    #  Parse an entity definition, given the arguments, tokenised in an array
+    #
     #  A selection of relevant productions are as follows
-    #  (see http://www.tiac.net/users/bingham/sgmlsyn/sgmlsyn.htm, or
-    #  http://www.oreilly.com/people/staff/crism/sgmldefs.html, or
-    #  ftp://ftp.ifi.uio.no/pub/SGML/productions).
     #
     #  What we want to do here is to parse the entity, and reexpress
     #  it in an XML-conformant fashion.  See James Clark's SGML-XML
@@ -140,98 +420,95 @@ sub parse_entitydef {
     #              notation name [41],
     #              ?data attribute specification [149.2] ) )
 
+    my $token;
 
-    my @tokens = ();
-    my @comments = ();
-    foreach $t (@_) {
-	if ($t =~ /^--/) {
-	    push (@comments, $t);
-	} else {
-	    push (@tokens, $t);
-	}
-    }
-
-    $name = shift (@tokens);
+    my $name = gettoken();
     if ($name eq '%') {
-	$name = "% " . shift (@tokens);
+	$name = "% " . gettoken();
     }
+
+    $token = gettoken();
 
     if ($name =~ /#default/i) {
 	# default entity[103]
-	print STDERR "No #DEFAULT entity in XML (ignored)\n";
+	print STDERR "Warning:$token_lineno: no #DEFAULT entity in XML (ignored)\n";
 
-    } elsif ($tokens[0] =~ /^[\'\"]/) {
+    } elsif ($token =~ /^[\'\"]/) {
 	# parameter literal[66]
-	print "<!ENTITY $name $tokens[0]>\n";
+	print "<!ENTITY $name $token>\n";
+	$token = gettoken();
+	if ($token ne '>') {
+	    print STDERR "Warning:$token_lineno: extra tokens in entity declaration (ignored)\n";
+	}
 
-    } elsif ($tokens[0] =~ /^(cdata|sdata|pi)/i) {
+    } elsif ($token =~ /^(cdata|sdata|pi)/i) {
 	# data text[106]
-	print STDERR "No data entities in XML (ignored)\n";
+	print STDERR "Warning:$token_lineno: no data entities in XML (ignored)\n";
 
-    } elsif ($tokens[0] =~ /^(starttag|endtag|ms|md)/i) {
+    } elsif ($token =~ /^(starttag|endtag|ms|md)/i) {
 	# bracketed text[107]
-	print STDERR "No bracketed text entities in XML (ignored)\n";
+	print STDERR "Warning:$token_lineno: no bracketed text entities in XML (ignored)\n";
 
-    } elsif ($tokens[0] =~ /^(public|system)/i) {
+    } elsif ($token =~ /^(public|system)/i) {
 	# external entity specification[108]
 	# is...
 	# external identifier[73]
-	my $pubid = '';
-	my $sysid = '';
-	my $entitytype = '';
-	if ($tokens[0] =~ /^public/i) {
-	    shift (@tokens);
-	    ($pubid = $tokens[0]) =~ s/[\'\"]//g;
-	}
-	shift (@tokens);
-	if ($tokens[0] =~ /^[\'\"]/) { # system id
-	    ($sysid = $tokens[0]) =~ s/[\'\"]//g;
-	    shift (@tokens);
-	}
-	if ($pubid ne '' && $sysid eq '') {
-	    $sysid = $catalogue_server . '/' . $pubid;
-	    $sysid =~ s/ /%20/g;
-	}
-	if ($#tokens >= 0) {
+	my $pubid;
+	my $sysid;
+	ungettoken ($token);
+	($pubid,$sysid) = process_external_identifier();
+	$token = gettoken();
+	if ($token ne '>') {
 	    # ...followed by entity type[109]
-	    if ($tokens[0] =~ /^subdoc/i) {
+	    if ($token =~ /^subdoc/i) {
 		if (! $found_subdoc) {
 		    print "<!NOTATION XML 'http://www.w3.org/TR/1998/REC-xml-19980210'>\n";
 		    $found_subdoc = 1;
 		}
 		$entitytype = 'NDATA XML';
-		shift (@tokens);
-		if ($#tokens >= 0) {
-		    print STDERR "Malformed entity (extra text '@tokens' ignored)\n";
+		$token = gettoken();
+		if ($token ne '>') {
+		    print STDERR "Warning:$token_lineno: extra tokens after SUBDOC (ignored)\n";
 		}
-		shift(@tokens);
+		print STDERR "Warning:$token_lineno: redeclaring SUBDOC $name as NDATA XML\n";
 	    } else {
-		if ($tokens[0] =~ /^[cs]data/i) {
-		    print STDERR "External CDATA and SDATA entities not allowed in XML (taken to be NDATA)\n";
+		if ($token =~ /^[cs]data/i) {
+		    print STDERR "Warning:$token_lineno: external CDATA and SDATA entities not allowed in XML (taken to be NDATA)\n";
 		}
-		shift (@tokens);
-		$entitytype = "NDATA $tokens[0]";
-		shift (@tokens);
-		if ($#tokens >= 0) {
+		$token = gettoken();
+		$entitytype = "NDATA $token";
+		$token = gettoken();
+		if ($token eq '[') {
 		    # data attribute specification[149.2]
-		    print STDERR "No data attribute specifications in XML (ignored)\n";
+		    print STDERR "Warning:$token_lineno: no data attribute specifications in XML (ignored)\n";
 		}
 	    }
 	}
 	print "<!ENTITY $name ";
-	if ($pubid ne '') {
-	    print "PUBLIC '$pubid' '$sysid'";
+	if (defined($pubid)) {
+	    print "\n\tPUBLIC '$pubid'";
 	} else {
-	    print "SYSTEM '$sysid'";
+	    print "\n\tSYSTEM ";
 	}
-	print " $entitytype" if ($entitytype ne '');
+	print "\n\t'$sysid'\n\t" if (defined($sysid));
+	print "$entitytype\n\t" if ($entitytype ne '');
 	print ">\n";
     } else {
-	print STDERR "Unrecognised entity declaration '@tokens'\n";
+	print STDERR "Warning:$token_lineno: unrecognised entity declaration\n";
     }
-    if ($#comments >= 0) {
-	$commentstring = join ("\n", @comments);
-	$commentstring =~ s/--//g;
-	print "<!--$commentstring-->\n";
+
+    # Read to end of declaration (necessary only if there's been
+    # some error warned about above).
+    while ($token ne '>') {
+	$token = gettoken();
     }
 }	
+
+
+
+
+sub Usage {
+    print STDERR "$0 [--pubid public-identifier] [--sysid system-identifier] [--declaration decl] filename\n";
+    exit 1;
+}
+
