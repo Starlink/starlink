@@ -184,7 +184,7 @@
             GOTO 999
          ENDIF
 *
-
+	print *,1
 *
          CALL XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM(1), SDIM(2),
      &          SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
@@ -194,12 +194,16 @@
      &          %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
      &          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
 *
-         IF (STATUS .NE. SAI__OK) GOTO 999
+	print *,2
 *
          CALL DYN_UNMAP(SMPTR,STATUS)
          IF (SRT.BCKGND) THEN
            CALL DYN_UNMAP(BMPTR,STATUS)
          ENDIF
+         CALL DYN_UNMAP(WPNTR1,STATUS)
+         CALL DYN_UNMAP(WPNTR2,STATUS)
+
+         IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *  Sorting to an Event data set
       ELSEIF (SRT.DTYPE .EQ. 'EventDS') THEN
@@ -286,9 +290,9 @@ c         CALL XRTSORT_WRISORT(BID, VERSION,  BSRT, STATUS)
 999   CONTINUE
 *
 *   Tidy up
-      CALL USI_ANNUL('SRCFILE',STATUS)
+c      CALL USI_ANNUL('SRCFILE',STATUS)
       IF (SRT.BCKGND) THEN
-         CALL USI_ANNUL('BCKFILE',STATUS)
+c         CALL USI_ANNUL('BCKFILE',STATUS)
       ENDIF
       CALL AST_CLOSE()
 *
