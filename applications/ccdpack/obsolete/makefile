@@ -449,8 +449,7 @@ SOURCE_FILES = makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = $(SHELL_SCRIPTS) $(TCL_SCRIPTS) $(ICL_SCRIPTS) \
-                 $(CONFIG_SCRIPTS)
+PUBLIC_SCRIPTS = $(SHELL_SCRIPTS) $(ICL_SCRIPTS) $(CONFIG_SCRIPTS)
 
 SHELL_SCRIPTS = ccdfork ccdexercise wcsexercise ccdpack_back xreduce \
  ccdexecute ccdwww geometry ccdpack_ex1.csh ccdpack_ex2.csh \
@@ -492,7 +491,7 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  Control.tcl Gwmview.tcl Marknumcontrol.tcl Ndfalign.tcl Ndfchoose.tcl \
  Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl Vectordialog.tcl \
  Zoomcontrol.tcl \
- tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl
+ taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl
 
 
 TCL_SUPPORT_BIN = atclsh
@@ -505,9 +504,10 @@ TCL_SUPPORT_TK = bgerror.tcl button.tcl clrpick.tcl comdlg.tcl console.tcl \
  obsolete.tcl optMenu.tcl palette.tcl safetk.tcl scale.tcl scrlbar.tcl \
  tearoff.tcl text.tcl tk.tcl tkfbox.tcl xmfbox.tcl
 
-TCL_SUPPORT_STARTCL = adamMessageRelay adamtask.tcl colourDialog.tcl \
- dialogShow.tcl dialogStart.tcl gwmWithScroll.tcl jpegDialog.tcl \
- printDialog.tcl
+TCL_SUPPORT_STARTCL = adamtask.tcl colourDialog.tcl dialogShow.tcl \
+ dialogStart.tcl gwmWithScroll.tcl jpegDialog.tcl printDialog.tcl
+
+TCL_SUPPORT_MSGRLY = adamMessageRelay
 
 TCL_SUPPORT_ITCL = itcl.tcl
 
@@ -530,9 +530,11 @@ TCL_SUPPORT_IWIDGETS = buttonbox.itk calendar.itk canvasprintbox.itk \
 
 TCL_INDEX = tclIndex
 
-TCL_SUPPORT = $(TCL_SUPPORT_BIN) $(TCL_SUPPORT_TCL) $(TCL_SUPPORT_TK) \
-              $(TCL_SUPPORT_STARTCL) $(TCL_SUPPORT_ITCL) $(TCL_SUPPORT_ITK) \
-              $(TCL_SUPPORT_IWIDGETS)
+TCL_SUPPORT_EXE = $(TCL_SUPPORT_BIN)
+
+TCL_SUPPORT_NOEXE = $(TCL_SCRIPTS) $(TCL_SUPPORT_TCL) $(TCL_SUPPORT_TK) \
+ $(TCL_SUPPORT_STARTCL) $(TCL_SUPPORT_ITCL) $(TCL_SUPPORT_ITK) \
+ $(TCL_SUPPORT_IWIDGETS)
 
 
 CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
@@ -620,8 +622,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_clcor.f ccd1_cmul.f ccd1_cmult.f ccd1_cnvgr.f ccd1_copy.f \
  ccd1_cosub.f ccd1_crdat.f ccd1_crgr.f ccd1_crgr2.f \
  ccd1_dcen.f ccd1_dcon.f ccd1_debia.f ccd1_decl2.f \
- ccd1_decl3.f ccd1_decl4.f ccd1_disp.f ccd1_dlcat.f ccd1_dmprg.f ccd1_docmp.f \
- ccd1_domos.f ccd1_drawi.f ccd1_drawp.f ccd1_dtrn.f \
+ ccd1_decl3.f ccd1_decl4.f ccd1_dlcat.f ccd1_dmprg.f ccd1_docmp.f \
+ ccd1_domos.f ccd1_drawp.f ccd1_dtrn.f \
  ccd1_duesc.f ccd1_dxy12.f ccd1_end.f ccd1_estm.f ccd1_ffcl.f \
  ccd1_ffcor.f ccd1_filas.f ccd1_fiohd.f ccd1_fitg.f \
  ccd1_fitlm.f ccd1_flnms.f ccd1_fra.f ccd1_frdm.f ccd1_frtmp.f \
@@ -650,17 +652,17 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_prune.f \
  ccd1_ptbad.f ccd1_pthmp.f ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
  ccd1_rccr.f ccd1_rdbi.f ccd1_rdlin.f ccd1_redtr.f \
- ccd1_rend.f ccd1_reov.f ccd1_repc.f ccd1_rexp.f \
+ ccd1_rend.f ccd1_repc.f ccd1_rexp.f \
  ccd1_rfcr.f ccd1_rflt.f ccd1_rglo.f ccd1_rmcom.f \
  ccd1_rmsd.f ccd1_rmsk.f ccd1_rmulo.f ccd1_rnorm.f \
  ccd1_rsetu.f ccd1_rtran.f ccd1_save.f \
- ccd1_sched.f ccd1_scrch.f ccd1_sngl.f ccd1_soff.f ccd1_spair.f \
+ ccd1_sched.f ccd1_scrch.f ccd1_sngl.f ccd1_soff.f \
  ccd1_stao.f ccd1_start.f ccd1_strgr.f \
  ccd1_stsat.f ccd1_stvb.f ccd1_subcs.f ccd1_szlsf.f \
  ccd1_szlsm.f ccd1_szprd.f ccd1_szslv.f ccd1_tfun.f \
  ccd1_tmpnm.f ccd1_trout.f ccd1_tstb.f ccd1_untmp.f ccd1_vlin.f \
  ccd1_wdpc.f ccd1_wedge.f ccd1_wffc.f \
- ccd1_wgtrn.f ccd1_winad.f ccd1_windr.f ccd1_wlis.f \
+ ccd1_wgtrn.f ccd1_winad.f ccd1_wlis.f \
  ccd1_wltrn.f ccd1_wmmc.f ccd1_wrgra.f ccd1_wrixy.f \
  ccd1_wrxyp.f ccd1_xadd.f ccd1_xyfmt.f fio1_cllog.f fio1_errep.f \
  fio1_msg.f fio1_msgl.f fio1_oplog.f fio1_silev.f \
@@ -824,6 +826,7 @@ WISH_SOURCE = $(WISH).c
 
 DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
  c1.xbm c2.xbm c3.xbm c4.xbm c5.xbm c6.xbm c7.xbm c8.xbm \
+ arrow_left.xbm arrow_right.xbm \
  ccdbitmap ccdbitmap64 import.table export.table
 
 #  Lists of Latex and hypertext documents.
@@ -859,11 +862,11 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
- $(PUBLIC_SCRIPTS) $(TCL_SUPPORT) $(TCL_INDEX) $(OBJECT_LIBRARIES) \
- $(MONOLITHS) \
+BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PUBLIC_SCRIPTS) \
+ $(TCL_SUPPORT_EXE) $(TCL_SUPPORT_NOEXE) $(TCL_SUPPORT_MSGRLY) \
+ $(WISH) $(TCL_INDEX) $(OBJECT_LIBRARIES) $(MONOLITHS) \
  $(IFC_FILES) $(HELP_FILES) $(ICL_STARTUP_SCRIPT) $(STARTUP_SCRIPT) \
- $(IRAF_STARTUP_SCRIPT) $(HELPTASK) $(WISH) \
+ $(IRAF_STARTUP_SCRIPT) $(HELPTASK) \
  $(IRAF_SCRIPTS) $(MONO_TCL) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 
 #  List of links used to access include files during compilation.  This
@@ -935,7 +938,8 @@ $(PRIVATE_INCLUDES) $(HELP_SOURCES) $(MONO_SOURCE) $(WISH_SOURCE) $(IFD_FILES):
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
-$(PUBLIC_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) :
+$(PUBLIC_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
+$(TCL_SCRIPTS) :
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	chmod 755 $@
 	@ if test -f $@; then :;\
@@ -1004,14 +1008,17 @@ $(TCL_SUPPORT_TK):
 	cp $(STAR_LIB)/tk$(TCL_VERS)/$@ $@
 $(TCL_SUPPORT_STARTCL):
 	cp $(STAR_LIB)/startcl/$@ $@
+$(TCL_SUPPORT_MSGRLY):
+	cp $(STAR_LIB)/startcl/$@ $@
 $(TCL_SUPPORT_ITCL):
 	cp $(STAR_LIB)/itcl$(ITCL_VERS)/$@ $@
 $(TCL_SUPPORT_ITK):
 	cp $(STAR_LIB)/itk$(ITCL_VERS)/$@ $@
 $(TCL_SUPPORT_IWIDGETS):
 	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERS)/scripts/$@ $@
-$(TCL_INDEX): $(TCL_SUPPORT) $(WISH)
-	echo 'auto_mkindex . *.tcl *.tk *.itcl *.itk; exit' | $(WISH)
+$(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) $(WISH)
+	TCLLIBPATH=$(STAR_LIB); export TCLLIBPATH; \
+        echo 'auto_mkindex . *.tcl *.tk *.itcl *.itk; exit' | $(WISH)
 
 
 #  Personal rules for building source code archives from RCS and
@@ -1025,7 +1032,7 @@ CCDPACK_HOME = /mbt/support/ccdpack
 
 RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
            $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) $(HELP_SOURCES) \
-           $(WISH_SOURCE) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
+           $(WISH_SOURCE) $(IFD_FILES) $(PUBLIC_SCRIPTS) $(TCL_SCRIPTS) \
            $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
            $(SUBSRC) $(CSUBSRC) $(DGENSRC) $(GENSRC) $(GENRDSRC) \
            $(GENLRDICSRC) $(GENLRDISRC) $(TASKSRC) \
@@ -1072,17 +1079,21 @@ $(PKG_NAME)_source.tar :
 	chmod 644 $(HELP_SOURCES) $(MONO_SOURCE) $(WISH_SOURCE) \
                   $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(IFD_FILES)
 	co $(PUBLIC_SCRIPTS)
+	co $(TCL_SCRIPTS)
 	co $(LINK_SCRIPT1)
 	co $(LINK_SCRIPT2)
 	chmod 700 $(LINK_SCRIPT1) $(LINK_SCRIPT2)
 	chmod 755 $(PUBLIC_SCRIPTS)
+	chmod 644 $(TCL_SCRIPTS)
 	co $(PRIVATE_SCRIPTS)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PRIVATE_INCLUDES) $(PKG_INCLUDE) \
 	   $(MONO_SOURCE) $(WISH_SOURCE) $(HELP_SOURCES) $(IFD_FILES) \
-           $(PUBLIC_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS)
+           $(PUBLIC_SCRIPTS) $(TCL_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
+           $(PRIVATE_SCRIPTS)
 	@- $(RM) $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) \
                 $(WISH_SOURCE) $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
-		$(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS)
+		$(TCL_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
+                $(PRIVATE_SCRIPTS)
 
 $(PKG_NAME)_tasks.tar:
 	co $(TASKSRC)
@@ -1286,7 +1297,7 @@ TCL_LIBRARIES = -litcl$(ITCL_VERS) -litk$(ITCL_VERS) \
 #  Location of object files for linking to Startcl.
 
 STARTCL_OBJ = $(STAR_LIB)/tkGwm.o $(STAR_LIB)/tkGwmCanv.o \
-              $(STAR_LIB)/tkGwmPrint.o $(STAR_LIB)/tclAdam.o -ljpeg
+              $(STAR_LIB)/tkGwmPrint.o $(STAR_LIB)/tclAdam.o
 
 #  Rule for building the Tcl shell.
 
@@ -1294,6 +1305,7 @@ $(WISH): $(OBJECT_LIBRARIES) $(WISH).o
 	$(FC) $(FFLAGS) -o $(WISH) $(WISH).o \
               -L$(STAR_LIB) $(ADDLIBS) $(OBJECT_LIBRARIES) \
               $(STARTCL_OBJ) $(TCL_LIBRARIES) $(LDFLAGS) \
+              -lcpgplot `agp_link_adam` \
               `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
               $(OBJECT_LIBRARIES) \
               -lpar_adam `dtask_link_adam`
@@ -1566,12 +1578,32 @@ install:
 	   else :; fi;\
 	done
 #
-#  Install the tcl binaries and support scripts, giving them world execute 
-#  permission.
-	for f in $(WISH) $(TCL_SUPPORT) $(TCL_INDEX) ""; do \
+#  Install the tcl binaries and executable support scripts, giving them 
+#  world execute permission.
+	for f in $(WISH) $(TCL_SUPPORT_EXE) ""; do \
 	   if test -n "$$f"; then \
 	      $(CP) $$f $(INSTALL_BIN);\
 	      chmod 755 $(INSTALL_BIN)/$$f;\
+	      $(RM) $$f;\
+	      $(LINK) $(INSTALL_BIN)/$$f $$f;\
+	   else :; fi;\
+	done
+#
+#  Install the Adam Message Relay script.  The first line of this must
+#  be edited to contain the location of the installed atclsh binary.
+	for f in $(TCL_SUPPORT_MSGRLY) ""; do \
+           if test -n "$$f"; then \
+              sed -e '1s%.*%#!$(INSTALL_BIN)/atclsh%' $$f >$(INSTALL_BIN)/$$f ;\
+              chmod 755 $(INSTALL_BIN)/$$f ;\
+           else :; fi;\
+        done
+#
+#  Install the tcl non-executable support files, giving them world read 
+#  permission.
+	for f in $(TCL_SUPPORT_NOEXE) $(TCL_INDEX) ""; do \
+	   if test -n "$$f"; then \
+	      $(CP) $$f $(INSTALL_BIN);\
+	      chmod 644 $(INSTALL_BIN)/$$f;\
 	      $(RM) $$f;\
 	      $(LINK) $(INSTALL_BIN)/$$f $$f;\
 	   else :; fi;\
@@ -1811,8 +1843,25 @@ do_deinstall:
            else :; fi;\
         done
 #
-#  Deinstall the tcl binaries and support scripts, if installed versions exist.
-	- for f in $(WISH) $(TCL_SUPPORT) $(TCL_INDEX) ""; do \
+#  Deinstall the tcl binaries and executable support scripts, if installed 
+#  versions exist.
+	- for f in $(WISH) $(TCL_SUPPORT_EXE) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+              $(RM) $$f;\
+              $(CP) $(INSTALL_BIN)/$$f .;\
+              $(RM) $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the Adam Message Relay script, if an installed version exists.
+	- for f in $(TCL_SUPPORT_MSGRLY) ""; do \
+           if test -n "$$f"; then \
+              $(RM) $(INSTALL_BIN)/$$f;\
+           else :; fi ;\
+        done
+#
+#  Deinstall the tcl no-executable support files, if installed versions exist.
+	- for f in $(TCL_SUPPORT_NOEXE) $(TCL_INDEX) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               $(RM) $$f;\
               $(CP) $(INSTALL_BIN)/$$f .;\
@@ -2226,14 +2275,12 @@ ccd1_debia.o: DAT_PAR SAE_PAR
 ccd1_decl2.o: SAE_PAR
 ccd1_decl3.o: SAE_PAR
 ccd1_decl4.o: SAE_PAR
-ccd1_disp.o: IDI_ERR IDI_PAR SAE_PAR
 ccd1_dlcat.o: SAE_PAR
 ccd1_dmprg.o: AST_PAR SAE_PAR
 ccd1_docmd.o: SAE_PAR
 ccd1_docmp.o: DAT_PAR NDF_PAR SAE_PAR USER_ERR
 ccd1_domos.o: NDF_PAR SAE_PAR
 ccd1_dqeds.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
-ccd1_drawi.o: IDI_ERR SAE_PAR
 ccd1_drawp.o: PRM_PAR SAE_PAR
 ccd1_dtrn.o: SAE_PAR
 ccd1_duesc.o: MSG_PAR SAE_PAR
@@ -2372,7 +2419,6 @@ ccd1_rdbi.o: MSG_PAR SAE_PAR
 ccd1_rdlin.o: FIO_ERR SAE_PAR
 ccd1_redtr.o: MSG_PAR PRM_PAR SAE_PAR
 ccd1_rend.o: MSG_PAR SAE_PAR
-ccd1_reov.o: IDI_ERR IDI_PAR SAE_PAR
 ccd1_repc.o: SAE_PAR
 ccd1_resta.o: SAE_PAR GRP_PAR
 ccd1_rexp.o: MSG_PAR SAE_PAR
@@ -2394,7 +2440,6 @@ ccd1_sgare.o: SAE_PAR
 ccd1_slice.o: SAE_PAR
 ccd1_sngl.o: PRM_PAR SAE_PAR
 ccd1_soff.o: PRM_PAR SAE_PAR
-ccd1_spair.o: IDI_ERR IDI_PAR NDF_PAR SAE_PAR
 ccd1_stao.o: SAE_PAR
 ccd1_start.o: CCD1_MEMCM CCD1_PAR CCD1_TMPCM DAT_PAR SAE_PAR
 ccd1_strgr.o: PAR_ERR SAE_PAR
@@ -2416,7 +2461,6 @@ ccd1_wedge.o: SAE_PAR
 ccd1_wffc.o: FIO_PAR MSG_PAR SAE_PAR GRP_PAR
 ccd1_wgtrn.o: CCD1_PAR DAT_PAR PRM_PAR SAE_PAR TRN_PAR
 ccd1_winad.o: SAE_PAR
-ccd1_windr.o: IDI_ERR
 ccd1_wlis.o: PRM_PAR SAE_PAR
 ccd1_wltrn.o: CCD1_PAR DAT_PAR SAE_PAR TRN_PAR
 ccd1_wmmc.o: FIO_PAR MSG_PAR SAE_PAR GRP_PAR
@@ -2426,7 +2470,7 @@ ccd1_wrtpa.o: MSG_PAR SAE_PAR
 ccd1_wrxyp.o: PRM_PAR SAE_PAR
 ccd1_xadd.o: PAR_ERR SAE_PAR
 ccd1_xyfmt.o: AST_PAR SAE_PAR
-ccdalign.o: FIO_ERR MSG_PAR PSX_ERR SAE_PAR
+ccdalign.o: FIO_PAR FIO_ERR PSX_ERR SAE_PAR GRP_PAR
 ccdclear.o: DAT_ERR DAT_PAR SAE_PAR GRP_PAR
 ccdedit.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR
 ccdexp.o: CCD1_PAR FIO_ERR PRM_PAR SAE_PAR
@@ -2572,7 +2616,7 @@ fts1_gkey.o: SAE_PAR
 fts1_gkeyc.o: DAT_PAR PAR_PAR SAE_PAR
 gethlp.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
 gthlpi.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
-idicurs.o: CCD1_PAR DAT_PAR FIO_PAR IDI_ERR IDI_PAR PAR_ERR SAE_PAR
+idicurs.o: CCD1_PAR GRP_PAR PAR_ERR SAE_PAR
 import.o: DAT_PAR FIO_PAR SAE_PAR
 ira1_chscs.o: DAT_PAR IRA_ERR IRA_PAR PRM_PAR SAE_PAR
 ira_iscs.o: DAT_PAR IRA_ERR IRA_PAR SAE_PAR
@@ -2604,7 +2648,7 @@ makebias.o: CCD1_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 makecal.o: CCD1_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 makeflat.o: CCD1_PAR DAT_PAR NDF_PAR SAE_PAR
 makemos.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR FIO_ERR FIO_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
-pairndf.o: CCD1_PAR DAT_PAR IDI_ERR IDI_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
+pairndf.o: CCD1_PAR MSG_PAR AST_PAR SAE_PAR
 picinfo.o: SAE_PAR
 plotlist.o: CCD1_PAR FIO_PAR SAE_PAR
 present.o: CCD1_PAR PAR_ERR SAE_PAR GRP_PAR
