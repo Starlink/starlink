@@ -53,8 +53,13 @@
 *- */
 
 /* Global Constants: */
-#include <sys/termio.h>
+#include <termios.h>
+#ifndef TIOCGWINSZ
+#include <sys/ioctl.h>
+#endif
+#include <unistd.h>
 #include "f77.h"
+#include "ems.h"
 
 /*
 *.  */
@@ -62,21 +67,24 @@
 F77_INTEGER_FUNCTION(irm1_trmsz)(INTEGER(width),INTEGER(height))
 {
 
-/* Pointers to Arguments:						    */
+  int retval = 0;
+/* Pointers to Arguments:
+*/
    GENPTR_INTEGER(width)
    GENPTR_INTEGER(height)
 
-#ifdef TIOCGWINSZ
-	struct winsize s;
+        struct winsize s;
 
-/* this 1 is the file descriptor eqivalent of 'SYS$OUTPUT' on VMS.	    */
-	if (ioctl (1, TIOCGWINSZ, &s))
-		return 0;
-	*height = s.ws_row;
-	*width = s.ws_col;
-	
-	return 1;
-#else
-	return 0;
-#endif
+    if (ioctl (STDOUT_FILENO, TIOCGWINSZ, (char *) &s) < 0) {
+      retval = 1;
+        *height = 80;
+        *width = 0;
+    } else {
+      retval = 0;
+            *height = s.ws_row;
+            *width = s.ws_col;
+    }
+
+        return retval;
 }
+
