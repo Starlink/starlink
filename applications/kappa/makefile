@@ -934,7 +934,7 @@ kappa_display_keystyle.def sty0 sty1 sty2 sty3
 #  Define the package demo files for use with stardemo.tcl
 
 DEMO_FILES = kappa.demo v0.14-5.demo v0.15-9.demo v0.16-3.demo
-TEST_DEMO = v0.16-3.demo
+TEST_DEMO = v0.16-3
 
 #  List of TK/TCL object libraries.
 
@@ -2250,7 +2250,7 @@ do_deinstall:
 #  so, it causes the do_test target to be made, which performs the
 #  installation test.
 
-test: $(INSTALL_BIN)/$(TEST_DEMO)
+test: $(INSTALL_BIN)/$(TEST_DEMO).demo
 	@ if test ! -f .INSTALLED_$(SYSTEM); then \
            echo;\
            echo '*** The $(PACK_NAME) package is not currently installed';\
@@ -2279,7 +2279,7 @@ do_test:
 	@ echo
 	KAPPA_DIR='$(INSTALL_BIN)';export KAPPA_DIR; \
            mkdir kappa-test; cd kappa-test; \
-           $(INSTALL_BIN)/stardemo.tcl v$(PKG_VERS); \
+           $(INSTALL_BIN)/stardemo.tcl $(TEST_DEMO); \
            cd ..; rm -rf kappa-test 
 	@ echo
 #
