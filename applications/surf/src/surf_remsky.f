@@ -447,7 +447,6 @@
 
          CALL PAR_GET1C ('BOLOMETERS', MAX__BOL, SKYBOLC,
      :        N_SKYBOLS, STATUS)
-         CALL PAR_CANCL ('BOLOMETERS', STATUS)
 
          N_GOODBOLS = 0
          DO B = 1, N_SKYBOLS
