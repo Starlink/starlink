@@ -47,6 +47,8 @@
 *      7 Jan 94 : SLICE_DEF and SLICE arguments added. No uses NPAR and only
 *                 has access to its own parameters. (DJA)
 *     31 Jul 95 : Added GENUS parameter to SPEC_CF (DJA)
+*     23 Apr 1996 (DJA):
+*        Added MK and MDM models
 *
 *    Type definitions :
 *
@@ -156,6 +158,9 @@
 	    CALL SPEC_CS(NMDAT,MLBOUND,MUBOUND,PARAM,PRED,STATUS)
 	  ELSE IF(KEY.EQ.'RZ')THEN
 	    CALL SPEC_RZ(GENUS,ND,NMDAT,MLBOUND,MUBOUND,PARAM,PRED,
+     :                   STATUS)
+	  ELSE IF(KEY.EQ.'MDM')THEN
+	    CALL SPEC_MDM(GENUS,ND,NMDAT,MLBOUND,MUBOUND,PARAM,PRED,
      :                   STATUS)
 	  ELSE IF(KEY.EQ.'DM')THEN
 	    CALL SPEC_DM(GENUS,ND,NMDAT,MLBOUND,MUBOUND,PARAM,PRED,
