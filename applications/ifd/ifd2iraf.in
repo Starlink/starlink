@@ -1,4 +1,4 @@
-#!TCLSH
+#! @TCLSH@
 #
 # This script converts an interface definition (ifd) file to the parameter
 # files and cl scripts needed to run ADAM applications from the IRAF cl.
@@ -67,7 +67,7 @@ global Date
 global Ifd
 global Universe
 
-source INSTALL_BIN/ifd_front.tcl
+source @bindir@/ifd_front.tcl
 
 proc adampar2iraf {par} {
     set lcase [string tolower $par]

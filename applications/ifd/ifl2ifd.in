@@ -1,4 +1,4 @@
-#!TCLSH
+#! @TCLSH@
 
 #  Each keyword in the interface file is defined as a tcl procedure so that
 #  the ifl file can be executed as a tcl script. However, some processing

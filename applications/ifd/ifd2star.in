@@ -1,4 +1,4 @@
-#!TCLSH
+#! @TCLSH@
 #
 # This script converts an interface definition (ifd) file to one or more
 #  ADAM interface (ifl) files.
@@ -42,7 +42,7 @@
 #       Escape harmfull characters (like (), quotes and comma) in
 #       command-print and command-obsolete messages
 
-source INSTALL_BIN/ifd_front.tcl
+source @bindir@/ifd_front.tcl
 
 global Date
 global Ifd

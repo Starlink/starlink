@@ -1,4 +1,4 @@
-#!TCLSH
+#! @TCLSH@
 #
 #  This script tries to generate the help files for an Starlink/IRAF
 #  package from the (Starlink) <package>.hlp file.

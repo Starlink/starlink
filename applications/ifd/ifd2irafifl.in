@@ -1,4 +1,4 @@
-#!TCLSH
+#! @TCLSH@
 #
 # This script converts an interface definition (ifd) file to produce monolithic
 # ADAM interface (ifl) files for use when running from IRAF.
