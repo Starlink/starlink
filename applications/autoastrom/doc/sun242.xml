@@ -34,6 +34,9 @@
       <distribution string="v0-5-1" date="20-Feb-2003" author="ng">
         <px>Release of v0.5-1</px>
       </distribution>
+      <distribution string="v0-5-2" date="08-Apr-2003" author="ng">
+        <px>Bugfix release</px>
+      </distribution>
     </history>
   </docinfo>
 

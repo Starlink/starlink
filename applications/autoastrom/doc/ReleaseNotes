@@ -1,6 +1,20 @@
 <!-- $Id$ -->
 
 
+<subsect id="release-0.5-2" export="export">
+<subhead><title>Version 0.5-2</title></subhead>
+
+<p>Changes since version 0.5-1:
+<ul>
+  <li><p>Fixed sexagesimal-to-decimal bug, so that negative Decs are
+    now converted correctly (thanks to Peter Draper for diagnosing
+    this).</p></li>
+  <li><p>More adjustments to configuration code, to make it more robust
+    against potential version-skew (it now builds correctly on RH8).</p></li>
+</ul>
+</p>
+</subsect>
+
 <subsect id="release-0.5-1" export="export">
 <subhead><title>Version 0.5-1</title></subhead>
 
