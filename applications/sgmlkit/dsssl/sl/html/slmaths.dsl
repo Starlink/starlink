@@ -156,7 +156,8 @@ appropriate arguments
     (if sid
 	(make empty-element gi: "img"
 	      attributes: (append sid
-				  '(("align" "middle"))))
+				  '(("align" "middle"))
+				  `(("alt" ,(data (current-node))))))
 	(make element gi: "em"
 	      (literal "Equation not found")))))
 
@@ -169,7 +170,8 @@ appropriate arguments
 	  (make element gi: "a"
 		attributes: (list (list "name" ref))
 		(make empty-element gi: "img"
-		      attributes: sid))
+		      attributes: (append sid
+					  `(("alt" ,(data (current-node)))))))
 	  (make empty-element gi: "br"))
 	(make element gi: "em"
 	      (literal "Equation not found")))))
@@ -184,7 +186,8 @@ appropriate arguments
 	  (make element gi: "a"
 		attributes: (list (list "name" ref))
 		(make empty-element gi: "img"
-		      attributes: sid))
+		      attributes: (append sid
+					  `(("alt" ,(data (current-node)))))))
 	  (make empty-element gi: "br"))
 	(make element gi: "em"
 	      (literal "Equation not found")))))
