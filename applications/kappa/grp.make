@@ -7,7 +7,7 @@
 
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kappa_ifls kappa_source kappa_sub kapsub_sub \
-kapview_sub kapgks_sub ndfpack_sub kappa_iraf kappa_ccdpack kappa_data
+kapview_sub ndfpack_sub kappa_iraf kappa_ccdpack kappa_data
 
 # The contents of the kappa_ccdpack.tar file:
 KAPPA_CCDPACK = ccd1_orvar.f ccd1_par ccg1_bmd1d.f ccg1_bmd3d.f \
@@ -31,7 +31,7 @@ KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com grecom.inc grerr kappa_ardplot_style.def \
-sft_com kappa.hlp kappa_mon.f kapgks_mon.f kapview_mon.f ndfpack_mon.f \
+sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f \
 kappa_style.def tkast.tcl kappa_contour_keystyle.def \
 kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \
 kappa_linplot_keystyle.def kappa_vecplot_keystyle.def stardemo.tcl \
@@ -56,10 +56,10 @@ fitslist.par fitsmod.par fitstext.par fitsurface.par fitsval.par \
 fitswrite.par flip.par fourier.par gausmooth.par gdclear.par gdnames.par \
 gdset.par gdstate.par glitch.par globals.par hiscom.par \
 hislist.par hisset.par histat.par histeq.par histogram.par idclear.par \
-idinvisible.par idpazo.par idset.par idstate.par div.par \
+idset.par idstate.par div.par \
 log10.par pow.par kappa.par kstest.par laplace.par permaxes.par \
-linplot.par logar.par loge.par look.par lucy.par lutable.par lutflip.par \
-luthilite.par lutread.par lutrot.par lutsave.par luttweak.par lutview.par \
+linplot.par logar.par loge.par look.par lucy.par lutable.par \
+lutread.par lutsave.par lutview.par \
 makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
 ardplot.par mstats.par mult.par native.par ndfcopy.par ndftrace.par \
 noglobals.par nomagic.par normalize.par numb.par outset.par ovclear.par \
@@ -73,7 +73,7 @@ settype.par setunits.par setvar.par shadow.par slide.par \
 sqorst.par stats.par sub.par substitute.par surfit.par thresh.par \
 trandat.par traninvert.par tranjoin.par tranmake.par transformer.par \
 trantrace.par trig.par vecplot.par wiener.par zaplin.par \
-kappa_mon.tcl kapview_mon.tcl kapgks_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
+kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
 _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
 wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par \
@@ -96,12 +96,12 @@ fitswrite.hlp flip.hlp fourier.hlp gausmooth.hlp gdclear.hlp gdnames.hlp \
 gdset.hlp gdstate.hlp glitch.hlp getting_started.hlp globals.hlp \
 graphics_database.hlp hints.hlp hds_data_types.hlp colcomp.hlp \
 hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
-ardplot.hlp idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp \
+ardplot.hlp idclear.hlp idset.hlp idstate.hlp \
 interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
 linplot.hlp log10.hlp logar.hlp loge.hlp look.hlp lucy.hlp lutable.hlp \
-lutbgyrw.hlp lutwarm.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutflip.hlp lutgrey.hlp \
-lutheat.hlp luthilite.hlp lutikon.hlp lutneg.hlp lutramps.hlp lutread.hlp \
-lutrot.hlp lutsave.hlp lutspec.hlp lutview.hlp luttweak.hlp lutzebra.hlp \
+lutbgyrw.hlp lutwarm.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutgrey.hlp \
+lutheat.hlp lutikon.hlp lutneg.hlp lutramps.hlp lutread.hlp \
+lutsave.hlp lutspec.hlp lutview.hlp lutzebra.hlp \
 makesurface.hlp manic.hlp maths.hlp median.hlp mem2d.hlp mlinplot.hlp \
 mstats.hlp mult.hlp native.hlp ndfcopy.hlp ndftrace.hlp \
 ndf_history.hlp ndf_sections.hlp noglobals.hlp nomagic.hlp normalize.hlp \
@@ -148,9 +148,9 @@ sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
 tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl cursor.ifl \
 drawsig.ifl lutedit.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
-gdstate.ifl idclear.ifl idinvisible.ifl idpazo.ifl idset.ifl \
-idstate.ifl ardplot.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
-lutrot.ifl lutsave.ifl luttweak.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
+gdstate.ifl idclear.ifl idset.ifl \
+idstate.ifl ardplot.ifl linplot.ifl lutable.ifl \
+lutsave.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
 ovset.ifl paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
 picdef.ifl picempty.ifl picentire.ifl picin.ifl piclabel.ifl piclist.ifl \
 picsel.ifl pictrans.ifl picvis.ifl vecplot.ifl \
@@ -162,7 +162,7 @@ setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
 reshape.ifl copybad.ifl wcstran.ifl scatter.ifl kappa_mon.ifl \
-kapview_mon.ifl kapgks_mon.ifl ndfpack_mon.ifl mem2d.ifl kapversion.ifl
+kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl kapversion.ifl
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
@@ -284,10 +284,6 @@ ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
 picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
 pictrans.f picvis.f scatter.f vecplot.f colcomp.f
 
-# The contents of the kapgks_sub.tar file:
-KAPGKS_SUB = idinvisible.f idpazo.f \
-lutflip.f luthilite.f lutrot.f luttweak.f 
-
 # The contents of the ndfpack_sub.tar file:
 NDFPACK_SUB = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexp.f \
 fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f hiscom.f hislist.f \
@@ -310,7 +306,7 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
 $(KAPPA_SOURCE) $(KAPPA_DATA) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SOURCES) \
-$(KAPPA_CCDPACK) $(KAPVIEW_SUB) $(KAPGKS_SUB) $(NDFPACK_SUB) 
+$(KAPPA_CCDPACK) $(KAPVIEW_SUB) $(NDFPACK_SUB) 
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_gd1.eps \
@@ -319,7 +315,7 @@ sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps sun95_ardwork.eps sun95.htx_tar \
 sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps kappa.news \
 kappa_sub.tar \
 kapsub_sub.tar kappa_ccdpack.tar \
-kapview_sub.tar kapgks_sub.tar ndfpack_sub.tar kappa_ifls.tar \
+kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data.tar sun221.tex sun221.htx_tar kappa_iraf.tar
 
 #  Target for use by the grp command.
