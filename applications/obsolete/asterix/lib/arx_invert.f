@@ -81,7 +81,7 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL GRP_SIZE(ARDID,NL,STATUS)
+        CALL GRP_GRPSZ(ARDID,NL,STATUS)
         NCIRC=0
         NELL=0
         NBOX=0
