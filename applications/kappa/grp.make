@@ -300,13 +300,14 @@ wcsremove.f wcsshow.f chain.f reshape.f
 GENERIC_SOURCES = $(KAPSUB_GEN) 
 
 #  The help files for sripts and alias commands
-OTHER_HELPS = exp10.help fitsval.help lutcol.help lutheat.help \
-lutspec.helppicdata.help expe.help fitswrite.help lutcold.help \
-lutikon.help lutwarm.helppicframe.help fitsedit.help log10.help \
-lutcont.help lutneg.help lutzebra.help picgrid.help \
-fitsexist.help loge.help lutfc.help lutramps.help \
-outline.helppiclast.help fitshead.help lutbgyrw.help \
-lutgrey.help lutread.help picbase.helppicxy.help
+
+OTHER_HELPS = exp10.help expe.help fitsedit.help fitsexist.help \
+fitshead.help fitsval.help fitswrite.help log10.help loge.help \
+lutbgyrw.help lutcol.help lutcold.help lutcont.help lutfc.help \
+lutgrey.help lutheat.help lutikon.help lutneg.help lutramps.help \
+lutread.help lutspec.help lutwarm.help lutzebra.help outline.help \
+picbase.help picdata.help picframe.help picgrid.help piclast.help \
+picxy.help
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kappa.tar.
