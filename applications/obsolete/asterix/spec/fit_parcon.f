@@ -1,8 +1,9 @@
 *+  FIT_PARCON - Evaluates confidence intervals for some model parameters
       SUBROUTINE FIT_PARCON( NDS, OBDAT, INSTR, MODEL, SOFF, OPCHAN,
-     :    NEPAR, EPAR,
-     :    NITMAX,MINSLO,NPAR,LB,UB,FROZEN,SSCALE,DPAR,FSTAT,PREDICTOR,
-     :    PREDDAT,STATMIN,PARAM,PEGGED,LE,UE,PEGCODE,STATUS)
+     :                       NEPAR, EPAR, NITMAX, MINSLO, NPAR, LB,
+     :                       UB, FROZEN, SSCALE, DPAR, FSTAT, PREDICTOR,
+     :                       PREDDAT, STATMIN, PARAM, PEGGED, LE, UE,
+     :                       PEGCODE, STATUS )
 *
 *    Description :
 *
@@ -68,6 +69,7 @@
 *         SOFF = chi-squared with NPAR d.o.f.( n% conf)
 *      for a safe upper bound on the n% confidence limit. For large NPAR this
 *      will be way above the linear approximation result.
+*
 *    Deficiencies :
 *    Bugs :
 *    Authors :
@@ -89,6 +91,7 @@
 *     18 Aug 92 : Statistic now double precision (DJA)
 *     13 Jan 93 : NEPAR and EPAR arrays allows error calculation to be
 *                 restricted to specific parameters (DJA)
+*     19 May 94 : Updated to handle constrained fitting (DJA)
 *
 *    Type definitions :
 *
@@ -160,6 +163,7 @@
       LOGICAL             FFROZEN(NPAMAX)	! Frozen flags for fitting
       LOGICAL             FINISHED		! Minimum found
       LOGICAL             INITIALISE		! Initialise FIT_MIN?
+      LOGICAL             LFROZEN(NPAMAX)	! Frozen flags with constraints
 *
 *    Local data :
 *
@@ -169,12 +173,15 @@
 *    Status check
       IF ( STATUS.NE.SAI__OK ) RETURN
 
+*    Local frozen array
+      CALL FIT1_LOCFRO( MODEL, NPAR, FROZEN, LFROZEN, STATUS )
+
 *    Initialise
       NUNFROZEN=0
       DO J=1,NPAR
 	FPEGGED(J) = PEGGED(J)
-	FFROZEN(J) = FROZEN(J)
-	IF ( .NOT. FROZEN(J) ) NUNFROZEN = NUNFROZEN + 1
+	FFROZEN(J) = LFROZEN(J)
+	IF ( .NOT. LFROZEN(J) ) NUNFROZEN = NUNFROZEN + 1
 	FPAR(J) = PARAM(J)
       END DO
 
@@ -195,41 +202,51 @@
 *      Get parameter number for error
         J = LEPAR(EJ)
 
-*      Only errors for free parameters
-	IF ( .NOT. FROZEN(J) ) THEN
+*      Only errors for free and unconstrained parameters
+	IF ( .NOT. LFROZEN(J) ) THEN
 
 *        Freeze parameter to test statistic at offsets
 	  FFROZEN(J)=.TRUE.
 
-*     Lower error
-	    IF(OPCHAN.GT.0)THEN
-	      WRITE(OPCHAN,*) '- Lower bound for parameter ',J
-	    ENDIF
+*        Lower error
+	  IF ( OPCHAN .GT. 0 ) THEN
+	    WRITE(OPCHAN,*) '- Lower bound for parameter ',J
+	  END IF
+
 *        Check LE
-	    IF ( LE(J) .EQ. 0.0 ) THEN
-	      STATUS=SAI__ERROR
-	      CALL ERR_REP( ' ', 'Lower error of zero entered', STATUS )
-	      GOTO 9000
-	    ELSE IF(LE(J).LT.0.0)THEN
-	      LE(J)=-LE(J)		! Flip sign back to get +ve offset
-	    ENDIF
- 100	    FPAR(J)=PARAM(J)-LE(J)
+	  IF ( LE(J) .EQ. 0.0 ) THEN
+	    STATUS = SAI__ERROR
+	    CALL ERR_REP( ' ', 'Lower error of zero entered', STATUS )
+	    GOTO 9000
+	  ELSE IF ( LE(J) .LT. 0.0 ) THEN
+	    LE(J) = -LE(J)		! Flip sign back to get +ve offset
+	  ENDIF
+ 100	  FPAR(J) = PARAM(J) - LE(J)
+
 *        Check against bound
-	    IF(PARAM(J).EQ.LB(J))THEN
-	      LE(J)=-LE(J)		! No error available - flip sign to flag
-	      IF(OPCHAN.GT.0)THEN
-	        WRITE(OPCHAN,*) '  Parameter on bound'
-	      ENDIF
-	    ELSE
-	      IF(FPAR(J).LT.LB(J))THEN
-	        FPAR(J)=LB(J)		! Set at lower boundary
-	        LE(J)=PARAM(J)-LB(J)
-	      ENDIF
-*        Get initial chi-squared value
-	      CALL FIT_STAT(NDS,OBDAT,INSTR,MODEL,FPAR,FSTAT,
-     :                          PREDICTOR,PREDDAT,STAT,STATUS)
-*        Catch case where there is only one parameter (no minimisation needed)
-	      IF(NUNFROZEN.EQ.1)THEN
+	  IF ( PARAM(J) .EQ. LB(J) ) THEN
+	    LE(J) = -LE(J)		! No error available - flip sign to flag
+	    IF ( OPCHAN .GT. 0 ) THEN
+	      WRITE(OPCHAN,*) '  Parameter on bound'
+	    END IF
+
+	  ELSE
+
+*          Check if on lower bound - if it is adjuts both the value and error
+	    IF ( FPAR(J) .LT. LB(J) ) THEN
+	      FPAR(J) = LB(J)
+	      LE(J) = PARAM(J) - LB(J)
+	    END IF
+
+*          Ensure dependencies are up to date
+            CALL FIT1_COPDEP( MODEL, FPAR, STATUS )
+
+*          Get initial chi-squared value
+	    CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, FPAR, FSTAT,
+     :                         PREDICTOR, PREDDAT, STAT, STATUS )
+
+*          Catch case where there is only one parameter (no minimisation needed)
+	    IF ( NUNFROZEN .EQ. 1 ) THEN
 	        IF(OPCHAN.GT.0)THEN
 	          WRITE(OPCHAN,*) '  No parameters to optimise'
 	        ENDIF
@@ -252,6 +269,7 @@
      :          ' of iterations'
 	      ENDIF
 	      IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
+
 *        If new minimum is <STATMIN then update params etc & return bad STATUS
  1000	      IF(STAT.LT.STATMIN)THEN
 	        STATMIN=STAT
@@ -277,7 +295,7 @@ D	      print *,'new le: ',le(j)
 *        Check for change in parameter pegging and set flag if necessary
 	      PEGCODE(J)=0
 	      DO K=1,NPAR
-	        IF((.NOT.FROZEN(K)).AND.(K.NE.J))THEN
+	        IF((.NOT.LFROZEN(K)).AND.(K.NE.J))THEN
 	          IF((.NOT.PEGGED(K)).AND.FPEGGED(K))THEN
 	            PEGCODE(J)=1
 	          ELSE IF(PEGGED(K).AND.(.NOT.FPEGGED(K)))THEN
@@ -287,14 +305,14 @@ D	      print *,'new le: ',le(j)
 	      ENDDO
 	    ENDIF
 
-*     Upper error
-	    IF(OPCHAN.GT.0)THEN
-	      WRITE(OPCHAN,*) '- Upper bound for parameter ',J
-	    ENDIF
+*        Upper error
+	  IF ( OPCHAN .GT. 0 ) THEN
+	    WRITE(OPCHAN,*) '- Upper bound for parameter ', J
+	  END IF
+
 *        Reset FPAR
-	    DO K=1,NPAR
-	      FPAR(K)=PARAM(K)
-	    ENDDO
+          CALL ARR_COP1R( NPAR, PARAM, FPAR, STATUS )
+
 *        Check UE
 	    IF(UE(J).EQ.0.0)THEN
 	      STATUS = SAI__ERROR
@@ -315,9 +333,14 @@ D	      print *,'new le: ',le(j)
 	        FPAR(J)=UB(J)		! Set at upper boundary
 	        UE(J)=UB(J)-PARAM(J)
 	      ENDIF
+
+*            Ensure dependencies are up to date
+              CALL FIT1_COPDEP( MODEL, FPAR, STATUS )
+
 *        Get initial chi-squared value
 	      CALL FIT_STAT(NDS,OBDAT,INSTR,MODEL,FPAR,FSTAT,
      :                          PREDICTOR,PREDDAT,STAT,STATUS)
+
 *        Catch case where there is only one parameter (no minimisation needed)
 	      IF(NUNFROZEN.EQ.1)THEN
 	        IF(OPCHAN.GT.0)THEN
@@ -360,13 +383,13 @@ D	      print *,'new le: ',le(j)
 	        ENDIF
 	        GO TO 1100
 	      ENDIF
+
 *        Evaluate parameter 'error' for confidence SOFF (parabolic assumption)
-D	      print *,'ue,soff,stat,statmin: ',ue(j),soff,stat,statmin
 	      UE(J)=UE(J)*SQRT(SOFF/(STAT-STATMIN))
-D	      print *,'new ue: ',ue(j)
+
 *        Check for change in parameter pegging and set flag if necessary
 	      DO K=1,NPAR
-	        IF((.NOT.FROZEN(K)).AND.(K.NE.J))THEN
+	        IF((.NOT.LFROZEN(K)).AND.(K.NE.J))THEN
 	          IF(PEGCODE(K).EQ.0)THEN
 	            IF((.NOT.PEGGED(K)).AND.FPEGGED(K))THEN
 	              PEGCODE(K)=3
@@ -390,15 +413,23 @@ D	      print *,'new ue: ',ue(j)
 	      ENDDO
 	    ENDIF
 
-*     Reset for next pass through loop
-	    FFROZEN(J)=FROZEN(J)
-	    FPAR(J)=PARAM(J)
-	  ENDIF
-	ENDDO
+*        Reset for next pass through loop
+	  FFROZEN(J)=LFROZEN(J)
+	  FPAR(J)=PARAM(J)
+
+*      End of frozen check
+	END IF
+
+*    Next parameter whose error to be found
+      END DO
+
+*    Ensure dependent parameters are set up
+      CALL FIT1_COPDEP( MODEL, LE, STATUS )
+      CALL FIT1_COPDEP( MODEL, UE, STATUS )
 
 *    Exit
  9000 IF ( (STATUS.NE.SAI__OK) .AND. (STATUS.NE.USER__001) ) THEN
-        CALL ERR_REP( ' ', '...from FIT_PARCON', STATUS )
+        CALL AST_REXIT( 'FIT_PARCON', STATUS )
       END IF
 
       END
