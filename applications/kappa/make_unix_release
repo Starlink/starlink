@@ -49,7 +49,7 @@
 #  be replaced by equivalent LPG routines (to allow multiple invocations to 
 #  process groups of NDFs).
       set n = `grep -il "PAR_STATE\|NDF_ASSOC\|NDF_PROP\|NDF_CREAT\|NDF_CREP" *.f`
-      if( "$a" != "" ) then
+      if( "$n" != "" ) then
          echo "The following files contain references to NDF parameter routines or"
          echo "to PAR_STATE. Shouldn't these be replaced by equivalent LPG routines??
          echo $n
