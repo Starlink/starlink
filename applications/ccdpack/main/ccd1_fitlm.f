@@ -1,6 +1,6 @@
-      SUBROUTINE CCD1_FITLM( X, Y, ID, OK, NXY, NIM, NALN, LISTID, IFIT,
-     :                       RELTOL, TR, XOUT, YOUT, IDOUT, XW, YW, IDW,
-     :                       NOUT, RMS, STATUS )
+      SUBROUTINE CCD1_FITLM( X, Y, ID, OK, NXY, NIM, NALN, IFIT,
+     :                       RELTOL, TR, XOUT, YOUT, IDOUT, XW, YW, 
+     :                       IDW, NOUT, RMS, STATUS )
 *+
 *  Name:
 *     CCD1_FITLM
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_FITLM ( X, Y, ID, OK, NXY, NIM, NALN, IMGID, IFIT, TR,
-*                       RELTOL, XOUT, YOUT, IDOUT, XW, YW, IDW, NOUT,
+*     CALL CCD1_FITLM ( X, Y, ID, OK, NXY, NIM, NALN, IFIT, TR,
+*                       RELTOL, TR, XOUT, YOUT, IDOUT, XW, YW, IDW, NOUT,
 *                       RMS, STATUS )
 
 *  Description:
@@ -68,9 +68,6 @@
 *        the lists 1 -> NIM or a separate reference list. In the
 *        latter case positions corresponding to the reference list
 *        should appear in the position lists after those to be aligned.
-*     LISTID( * ) = CHARACTER * ( * ) (Given)
-*        The name of the input list from which the values have been
-*        derived. This is used in messages output to the user.
 *     IFIT = INTEGER (Given and Returned)
 *        An integer specifying the type of linear transformation
 *        required to fit the data.
@@ -149,6 +146,8 @@
 *        Changed LIB$ calls to NUM_.
 *     1-NOV-1999 (MBT):
 *        Removed output part (now done elsewhere).
+*     22-FEB-2001 (MBT):
+*        Removed LISTID parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -169,7 +168,6 @@
       INTEGER NIM
       INTEGER NALN
       INTEGER NXY( * )
-      CHARACTER * ( * ) LISTID( * )
       DOUBLE PRECISION RELTOL
 
 *  Arguments Given and Returned:
@@ -416,9 +414,9 @@
             IF ( I .GE. 2 ) IP = IP + NXY( I - 3 ) + NXY( I - 2 )
             IF ( .NOT. OK( IP ) ) THEN
                STATUS = SAI__ERROR
-               CALL MSG_SETC( 'LISTID', LISTID( I ) ) 
-               CALL ERR_REP( 'CCD1_FILLM_FAIL', '  Could not '//
-     :         'align list ^LISTID', STATUS )
+               CALL MSG_SETI( 'LISTID', I ) 
+               CALL ERR_REP( 'CCD1_FITLM_FAIL', '  Could not '//
+     :         'align list ^LISTID)', STATUS )
                GO TO 15
             ENDIF
  14      CONTINUE
