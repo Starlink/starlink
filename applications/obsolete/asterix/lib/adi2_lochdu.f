@@ -106,11 +106,15 @@
 *  Local Variables:
       INTEGER			EID			! EXTENSIONS identifier
 
+      LOGICAL			CREATED			! Did we create object?
       LOGICAL			THERE			! Object exists
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      CREATED = .FALSE.
 
 *  Locate the approriate place depending on the HDU value. Blank means
 *  primary HDU
@@ -118,6 +122,7 @@
         CALL ADI_THERE( FID, 'PRIMARY', THERE, STATUS )
         IF ( .NOT. THERE ) THEN
           CALL ADI_CNEW0( FID, 'PRIMARY', 'STRUC', STATUS )
+          CREATED = .TRUE.
         END IF
         CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
 
@@ -131,12 +136,19 @@
         CALL ADI_THERE( EID, HDU, THERE, STATUS )
         IF ( .NOT. THERE ) THEN
           CALL ADI_CNEW0( EID, HDU, 'STRUC', STATUS )
+          CREATED = .TRUE.
         END IF
         CALL ADI_FIND( EID, HDU, ID, STATUS )
 
 *  Remove temporary
         CALL ADI_ERASE( EID, STATUS )
 
+      END IF
+
+*  Did we create the structure?
+      IF ( CREATED ) THEN
+        CALL ADI_CPUT0L( ID, '.DEF_START', .FALSE., STATUS )
+        CALL ADI_CPUT0L( ID, '.DEF_END', .FALSE., STATUS )
       END IF
 
 *  Report any errors
