@@ -233,7 +233,6 @@ webstart:
 
 dist:
      [copy] Copying 284 files to /apps/cvsbuild/java/source/diva/docs/diva
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/diva
@@ -886,7 +885,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Oct 28, 2004 5:17:03 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Oct 29, 2004 5:16:48 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -902,4 +901,4 @@ docs:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/topcat/build.xml:1118: Fatal error during transformation
 
-Total time: 3 minutes 42 seconds
+Total time: 3 minutes 28 seconds
