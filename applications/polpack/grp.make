@@ -29,7 +29,7 @@ ccd1_iscom.f ccd1_mall.f ccd1_mfree.f ccd1_nxwrd.f ccd1_rdlin.f \
 ccd1_rmcom.f pol1_chkex.f pol1_imfit.f pol1_knext.f pol1_deftb.f \
 pol1_lnam.f polimp.ifl polimp.f ccd1_par ccd1_memcm polexp.f polexp.ifl \
 pol1_setft.f polimp.tab ndg_wild polimp.csh polexp.csh polvec.f polvec.ifl \
-pol1_plvec.f pol1_prwcs.f ccd1_orvar.f
+pol1_plvec.f pol1_prwcs.f ccd1_orvar.f pol1_stats.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
