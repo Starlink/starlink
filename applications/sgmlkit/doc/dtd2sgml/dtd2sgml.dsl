@@ -26,6 +26,13 @@
 (root
     (process-children))
 
+;; Most of the elements which are not specific to this DTD are
+;; equivalent to the corresponding element in the target DTD, so make
+;; the default action echo that.
+(default
+  (make element
+    (process-children)))
+
 ;; top-level element
 (element dtddescription
   (let* ((summ (node-list-first (children (current-node)))) ;dtdsummary element
@@ -205,25 +212,18 @@
     (literal "Example:")
     (make element gi: "verbatim"
 	  (process-children))))
-(element p
-  (make element gi: "p"
-    (process-children)))
-(element em
-  (make element gi: "em"
-    (process-children)))
-(element code
-  (make element gi: "code"
-    (process-children)))
 
-;; webref and url: just copy to output
+;; Elements p, em, code, verbatim, dl, dt, dd, ul, ol, li, url map
+;; directly to the same-named element in the target DTD, so let the
+;; default action cope with them.
+
+
+;; webref: just copy to output, copying the attribute
 (element webref
   (let ((url (attribute-string (normalize "url"))))
     (make element gi: "webref"
 	  attributes: `(("url" ,url))
 	  (process-children))))
-(element url
-  (make element gi: "url"
-	(process-children)))
 
 ;; commentary element -- discard
 (element commentary
