@@ -88,7 +88,7 @@
       }
 
 #  Add more control groups.
-      addgroup style Display
+      addgroup style WCS
       addgroup cutoff Cutoff
 
 #  Construct additional control widgets.
@@ -97,6 +97,11 @@
          stylecontrol $panel.dstyle \
             -value "drawaxes=0,grid=0,numlab=0" \
             -valuevar displaystyle
+      }
+      itk_component add wcsframe {
+         wcsframecontrol $panel.wcsframe \
+            -value CURRENT \
+            -valuevar wcsframe
       }
       itk_component add percut {
          percentilecontrol $panel.percut \
@@ -108,6 +113,7 @@
       }
 
 #  Add new control widgets to the panel.
+      addcontrol $itk_component(wcsframe) style
       addcontrol $itk_component(dstyle) style
       addcontrol $itk_component(percut) cutoff
       pack [ groupwin style ] -before [ groupwin action ] -side left -fill y
@@ -151,6 +157,9 @@
 #  Get the NDF name and make a shortened version.
          set ndfname [ $ndf name ]
          regsub {.*[./]} $ndfname {} ndfshort
+
+#  Configure the WCS frame widget.
+         $itk_component(wcsframe) configure -ndf $ndf
 
 #  Set useful geometry values.
          set xbase [ expr [ lindex [ lindex $bounds 0 ] 0 ] - 1 ]
@@ -258,7 +267,8 @@
               $displayed(ndfname) == $ndfname && \
               $displayed(percentiles) == $percentiles && \
               $displayed(zoomfactor) == $zoomfactor && \
-              $displayed(displaystyle) == $displaystyle } {
+              $displayed(displaystyle) == $displaystyle &&
+              $displayed(wcsframe) == $wcsframe } {
             return
          }
 
@@ -279,6 +289,7 @@
          set displayed(percentiles) $percentiles
          set displayed(zoomfactor) $zoomfactor
          set displayed(displaystyle) $displaystyle
+         set displayed(wcsframe) $wcsframe
 
 #  Clear the canvas (it may contain markers as well as the GWM item).
          $canvas delete all
@@ -294,17 +305,23 @@
                                          [ lindex $percentiles 1 ] ]
 
 #  Display the NDF into the GWM item.
-         taskrun display " \
-               in=$ndfname \
-               device=[ devname ] \
-               scale=true \
-               mode=scale \
-               low=[ lindex $scalevals 0 ] \
-               high=[ lindex $scalevals 1 ] \
-               margin=0 \
-               style=\"tickall=1,drawtitle=0,$displaystyle\" \
-               reset \
-            "
+         set options {labelling=interior border=1 \
+                      colour=3 colour(numlab)=1 colour(border)=4}
+         lappend options $displaystyle
+         $ndf display "[ gwmname ]/GWM" \
+                      [ lindex $scalevals 0 ] [ lindex $scalevals 1 ] \
+                      $wcsframe [ join $options "," ]
+       # taskrun display " \
+       #       in=$ndfname \
+       #       device=[ devname ] \
+       #       scale=true \
+       #       mode=scale \
+       #       low=[ lindex $scalevals 0 ] \
+       #       high=[ lindex $scalevals 1 ] \
+       #       margin=0 \
+       #       style=\"tickall=1,drawtitle=0,$displaystyle\" \
+       #       reset \
+       #    "
 
 #  Draw any points which have already been selected onto the new display.
          refreshpoints
@@ -355,7 +372,7 @@
                set viewpos [ canv2view [ $canvas canvasx $x ] \
                                        [ $canvas canvasy $y ] ]
                set wcspos [ lindex [ $ndf wcstran -format \
-                                     pixel CURRENT $viewpos ] 0 ]
+                                     pixel $wcsframe $viewpos ] 0 ]
                set text $trackposition
                regsub -all %x $text [ lindex $viewpos 0 ] text
                regsub -all %y $text [ lindex $viewpos 1 ] text
@@ -431,6 +448,13 @@
             $canvas bind gwmitem <Leave> [ code $this trackpos "" "" ]
             pack $itk_component(tracker) -fill x -expand 0
          }
+      }
+
+
+#-----------------------------------------------------------------------
+      public variable wcsframe "" {
+#-----------------------------------------------------------------------
+         display
       }
 
 
