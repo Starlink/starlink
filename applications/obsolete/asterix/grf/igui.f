@@ -61,6 +61,11 @@
         CALL NBS_FIND_ITEM(I_NBID,'GCB',GCBID,STATUS)
         CALL GCB_FILLSHADOW(GCBID,STATUS)
 
+*  update noticeboard with current coord transformation
+      ELSEIF (ACTION.EQ.'TRANSFORM') THEN
+
+        CALL IGUI_TRANSFORM(STATUS)
+
       ENDIF
 
       CALL USI_CLOSE()
@@ -106,6 +111,14 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'MAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'XMIN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'XMAX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'YMIN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'YMAX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
 
 *  create shadow of GCB
         CALL NBS_DEFINE_STRUCTURE(ID,'GCB','GCB',GCBID,STATUS)
@@ -127,6 +140,49 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'MAX',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+
+      ENDIF
+
+      END
+
+
+
+
+*+  IGUI_TRANSFORM
+      SUBROUTINE IGUI_TRANSFORM(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*        rjv@star.sr.bham.ac.uk
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'PRM_PAR'
+*    Import :
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      INTEGER ITEMID
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,'XMIN',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,I_X1,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'XMAX',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,I_X2,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YMIN',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,I_Y1,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YMAX',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,I_Y2,STATUS)
 
       ENDIF
 

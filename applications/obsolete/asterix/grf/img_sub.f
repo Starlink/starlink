@@ -1313,6 +1313,7 @@
           ENDIF
         ENDIF
 
+
       ENDIF
       END
 
@@ -1350,7 +1351,9 @@
           ENDIF
         ENDIF
 
+
       ENDIF
+
       END
 
 
@@ -5263,6 +5266,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
           CALL ARR_RANG1RM(NVAL,%val(I_DPTR),I_DMIN,I_DMAX,STATUS)
 
         ENDIF
+
 
 *  being run from a GUI so update noticeboard
         IF (I_GUI) THEN
