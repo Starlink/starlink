@@ -11,6 +11,8 @@
  * Peter W. Draper 23 Jan 97 Added cast to MAP_FAILED comparison (OSF/1).
  *                 21 Nov 97 Added fix for OSF/1 problems with statvfs
  *                           include.
+ *                 23 Oct 00 Expanded error messages to be a little
+ *                           more informative to an end user.
  */
 static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $";
 
@@ -93,7 +95,7 @@ Mem_Map::map_it(int handle,
   long file_len = ::fstat(this->handle_, &sb) < 0 ? -1 : sb.st_size;
 
   if (file_len == -1) {
-    sys_error("fstat failed for: ", filename_);	// allan: added error report
+    sys_error("get file status (fstat) failed for: ", filename_);	// allan: added error report
     return -1;
   }
 
@@ -113,14 +115,14 @@ Mem_Map::map_it(int handle,
     // allan: make sure there is enough space on the filesystem
     struct statvfs vfs;
     if (fstatvfs(handle, &vfs) != 0) {
-      sys_error("fstatvfs failed for: ", filename_);
+      sys_error("get file system information (fstatvfs) failed for: ", filename_);
       return -1;
     }
     if (vfs.f_frsize > 0) {  // NOTE: must calculate in blocks to avoid 32bit overflow
 	unsigned long need = (len_request - file_len + vfs.f_frsize)/vfs.f_frsize;
 	unsigned long have = vfs.f_bavail;
 	if (have < need) {
-	    error("DISK FULL: can't create mmap file: ", filename_);
+	    error("DISK FULL: cannot create a sufficiently large map file: ", filename_);
 	    return -1;
 	}
     }
@@ -132,13 +134,13 @@ Mem_Map::map_it(int handle,
 		 SEEK_SET) == -1
 	|| ::write (this->handle_, "", 1) != 1
 	|| ::lseek (this->handle_, 0, SEEK_SET) == -1) {
-      sys_error("write/seek failed for: ", filename_);	// allan: added error report
+      sys_error("write or seek failed for: ", filename_);	// allan: added error report
       return -1;
     }
   }
 
   if (this->length_ <= 0) {
-      error("can't map zero length file: ", filename_);
+      error("cannot map zero length file: ", filename_);
       return -1;
   }
 
@@ -150,7 +152,8 @@ Mem_Map::map_it(int handle,
 			     off_t (round_to_pagesize (pos)));
 
   if (this->base_addr_ == (void*)MAP_FAILED) {
-      sys_error("mmap failed for: ", filename_);	// allan: added error report
+      // allan: added error report
+      sys_error("failed to map file (insufficient VM?): ", filename_);
       return -1;
   }
 
