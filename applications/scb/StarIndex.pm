@@ -109,7 +109,7 @@ package StarIndex;
 
 #-
 
-use Scb;
+use Scb qw/:DEFAULT error/;
 use Fcntl;
 use NDBM_File;
 
@@ -175,7 +175,7 @@ sub new {
 
    my %locate;
    tie %locate, NDBM_File, $indexfile, $fmode{$access}, 0644
-      or die "Failed to open dbm file $indexfile - may be corrupted.\n";
+      or error "Failed to open dbm file $indexfile - may be corrupted.\n";
 
 #  Return the object blessed into this class.
 
