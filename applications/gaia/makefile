@@ -417,8 +417,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_skycat.tar \
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = gaia.csh gaiadisp.csh gaiadispmany.csh \
-                 tabbedgaia.csh .gaFilters
+PUBLIC_SCRIPTS = gaia.csh gaiadisp.csh tabbedgaia.csh .gaFilters
 
 #  List of IRAF script files. These will be installed in
 #  $(INSTALL_BIN_IRAF). This also includes any other miscellaneous
@@ -543,7 +542,7 @@ LICENCE = COPYING README TODO $(PACK_NAME)_CONDITIONS
 GAIA_LIB_FILES =  \
    skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaia.sh gaiadisp.sh \
    gaiaremote.sh adamMessageRelay displaycat gaiacut zoomcutandflip \
-   gaiadispmany.sh tabbedgaia.sh
+   tabbedgaia.sh
 
 GAIA_BIN_FILES = \
  gaia_swish gaia_stcl gaiaMon gaiaMon.ifc ardstat.ifc autocrop.ifc \
@@ -570,7 +569,7 @@ RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer \
 #  Names of scripts that will need 755 protections.
 RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
                   displaycat gaiacut zoomcutandflip gaiawcs2tab \
-                  pix2wcs wcs2pix gaiadispmany.sh tabbedgaia.sh
+                  pix2wcs wcs2pix tabbedgaia.sh
 
 ################################################################################
 #-------------------------------------------------------------------------------

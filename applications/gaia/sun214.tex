@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.13}
+\newcommand{\stardocnumber}    {214.14}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {6th May 2003}
+\newcommand{\stardocdate}      {15th April 2004}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
-\newcommand{\stardocversion}   {2.9}
+\newcommand{\stardocversion}   {2.10}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -236,10 +236,10 @@ the ability to query on-line (WWW) catalogues.}
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents.
 %  ================================
@@ -283,12 +283,11 @@ the ability to query on-line (WWW) catalogues.}
 
 \section{Introduction\xlabel{introduction}\label{introduction}}
 
-GAIA is an image display tool (\textit{c.f.} \xref{SAOimage}{sun166}{}), 
-but with the additional capability of being extendable to integrate
-other programs.  At present extensions are provided that cover the
-astronomically interesting areas of aperture \& optimal photometry,
-automatic source detection, surface photometry, contouring, arbitrary
-region analysis, celestial coordinate readout, calibration and
+GAIA is an image display tool but with the additional capability of being
+extendable to integrate other programs.  At present extensions are provided
+that cover the astronomically interesting areas of aperture \& optimal
+photometry, automatic source detection, surface photometry, contouring,
+arbitrary region analysis, celestial coordinate readout, calibration and
 modification, grid overlays, blink comparison, image defect patching, 
 polarization vector plotting and the ability to connect to resources
 available in on-line (WWW) catalogues and archives.
@@ -305,12 +304,13 @@ free software under the terms of the GNU copyright.
 The following two sections describe the absolute basics of how to
 startup GAIA and how to display images using it. 
 
-%TODO: cookbook not finished for this release.
-%If you need help beyond this, and are new to GAIA, then you should
-%probably read the `The GAIA CookBook' (\xref{SC/17}{sc17}{}). In
-%addition to the usual introductory text this also contains several
-%recipes for achieving specific tasks (such as measuring instrumental
-%magnitudes and making use of celestial coordinate information).
+If you need help beyond this, and are new to GAIA, then you should probably
+read the `The GAIA CookBook' (\xref{SC/17}{sc17}{}). In addition to the usual
+introductory text this also contains several recipes for achieving specific
+tasks (such as measuring instrumental magnitudes and making use of celestial
+coordinate information, although at the time of writing the astrometric
+calibration sections are now out of date with the arrival of the new toolboxes
+based on AUTOASTROM).
 
 The other main source of information about GAIA is the on-line
 system. This can only be accessed after starting GAIA (just select the
@@ -324,8 +324,8 @@ any suggestions for improvements), then send an email message to:
 \begin{quote}
 \htmladdnormallink{\mytt{gaia@star.rl.ac.uk}}{mailto:gaia@star.rl.ac.uk}.
 \end{quote}
-The GAIA home page (which should have a current list of known bugs and
-work arounds) is at:
+The GAIA home page (which should have a current list of known bugs,
+work arounds and other useful information) is at:
 \begin{quote}
 \htmladdnormallink{\mytt{http://www.starlink.rl.ac.uk/gaia/}}{http://www.starlink.rl.ac.uk/gaia/}.
 \end{quote}
@@ -350,6 +350,12 @@ You can also write to a specific window using the clone number:
 \end{quote}
 This displays into the window with title \mytt{GAIA::SkyCat (2)}. If
 this window doesn't exist it will be created.
+
+A list of images can be displayed in GAIA using the command:
+\begin{quote}
+\mytt{\% gaiadispmany image\_name1 image\_name2 image\_name3 ...}
+\end{quote}
+These will be displayed in separate clones.
 
 \subsection{\xlabel{using_gaia_from_irafcl}Using GAIA from IRAF/CL}
 
