@@ -581,7 +581,7 @@
         SIGNIF=.FALSE.
         QUAL=.FALSE.
         ISCALE=0
-
+	print *,1
 *  locate noticeboard items
         CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'Y',YID,STATUS)
@@ -589,6 +589,7 @@
         CALL NBS_FIND_ITEM(I_NBID,'YP',YPID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
+	print *,2
         NAME='DATA'
         DO I=1,NX
           DO J=1,NY
@@ -605,19 +606,24 @@
             CALL NBS_FIND_ITEM(I_NBID,NAME,DID(I,J),STATUS)
           ENDDO
         ENDDO
+	print *,3
         CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
+	print *,4
 
 *  get device size
         CALL NBS_GET_VALUE(XPMID,0,VAL__NBI,IXPMAX,STATUS)
         CALL NBS_GET_VALUE(YPMID,0,VAL__NBI,IYPMAX,STATUS)
+	print *,5
 
 *  get plot window parameters
         CALL PGQVP(3,XP1,XP2,YP1,YP2)
         CALL PGQWIN(XW1,XW2,YW1,YW2)
+	print *,6
 
         XSCALE=(XW2-XW1)/(XP2-XP1)
         YSCALE=(YW2-YW1)/(YP2-YP1)
+	print *,7
 
         FLAG=0
         DO WHILE (FLAG.EQ.0)
@@ -625,10 +631,12 @@
 *  get current cursor position in device coords
           CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,STATUS)
           CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,STATUS)
+	print *,8
 
 *  convert to world coords
           XW=XW1+(REAL(IXP)-XP1)*XSCALE
           YW=YW1+(REAL(IYP)-YP1)*YSCALE
+	print *,9
 
 *  convert to other frames
           CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
@@ -651,6 +659,7 @@
 
 *  write data values to noticeboard
           STRING=' '
+	print *,10
 
           DO J=J2,J1,-1
 
@@ -702,10 +711,12 @@ c              CALL NBS_PUT_CVALUE(DID(I,J),0,STRING,STATUS)
             ENDDO
 
           ENDDO
+	print *,11
 
           CALL NBS_PUT_VALUE(XID,0,VAL__NBR,XW,STATUS)
           CALL NBS_PUT_VALUE(YID,0,VAL__NBR,YW,STATUS)
           CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,STATUS)
+	print *,12
 
         ENDDO
 
