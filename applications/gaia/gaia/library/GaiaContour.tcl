@@ -169,10 +169,16 @@ itcl::class gaia::GaiaContour {
       pack $itk_component(draw) -side left -expand 1 -pady 3 -padx 3
 
 
-      #  Set the canvas level tags.
+      #  Set the canvas level tags and record no contours are drawn.
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
          set leveltags_($i) cont[incr unique_]
+         set drawn_($i) 0
       }
+
+      #  Initialise the key tag.
+      set keytag_ "ckey[incr unique_]"
+      set texttag_ "ckey[incr unique_]"
+
    }
 
    #  Destructor:
@@ -446,77 +452,70 @@ itcl::class gaia::GaiaContour {
          set rtdimage [get_rtdimage_]
 
          #  Clear existing contours.
-         if { $drawn_ && $all } {
+         if { $all } {
             remove_contours_
             update
-         } elseif { ! $all } { 
+         } elseif { ! $all } {
             remove_contour_ $index
             update
          }
 
          #  Get the levels.
-         if { $all } { 
+         if { $all } {
             set levels [get_levels_]
          } else {
             set levels [$itk_component(value$index) get]
          }
 
          #  Get the attributes.
-         if { $all } { 
-            set atts [get_attributes_]
+         if { $all } {
+            set atts [get_ast_atts_]
          } else {
-            set atts [get_attribute_ $index]
+            set atts [get_ast_att_ $index]
          }
 
          #  If requested just display over the visible canvas +/- a little.
-         set frac 0.80
-         set xf [expr 0.5*(1.0-$frac)]
-         set yf [expr 0.5*(1.0-$frac)]
-         set w [winfo width $itk_option(-canvas)]
-         set h [winfo height $itk_option(-canvas)]
-         set x0 [$itk_option(-canvas) canvasx 0]
-         set y0 [$itk_option(-canvas) canvasy 0]
-         set dw [expr $w*$xf]
-         set dh [expr $h*$yf]
-         set x1 [expr $x0+$w-$dw]
-         set y1 [expr $y0+$h-$dh]
-         set x0 [expr $x0+$dw]
-         set y0 [expr $y0+$dh]
-         set bounds [list $x0 $y0 $x1 $y1]
-
+         set bounds [calc_bounds_]
 
          #  Draw the contours. Do this one at a time so that we can
          #  update the interface.
-         set drawn_ 1
-         if { $all } { 
+         if { $all } {
             set ncont 0
-            foreach value "$levels" { 
+            foreach value "$levels" {
                set att [lindex $atts $ncont]
                incr ncont
-               
+
                #  Set the tag used to control clear etc.
                $itk_option(-rtdimage) configure -ast_tag \
                   "$itk_option(-contour_tag) $leveltags_($ncont)"
-               
-               #  Draw the contour.
-               $itk_option(-rtdimage) contour \
-                  $value $rtdimage $careful_ $att $bounds
+
+               #  Draw the contour (return value is number of points).
+               set drawn_($ncont) \
+                  [$itk_option(-rtdimage) contour \
+                      $value $rtdimage $careful_ \
+                      $att $bounds]
+
+               #  Add/update the key.
+               draw_key_
                update idletasks
             }
-            #  XXX This code draws contours all at once.
-            #   $itk_option(-rtdimage) contour \
-               #      $levels $rtdimage $careful_ $atts $bounds
          } else {
-            
             #  Set the tag used to control clear etc.
             $itk_option(-rtdimage) configure -ast_tag \
                "$itk_option(-contour_tag) $leveltags_($index)"
-            
+
             #  Draw the contour.
-            $itk_option(-rtdimage) contour \
-               $levels $rtdimage $careful_ $atts $bounds
+            puts "time = [time {
+               set drawn_($index) \
+                  [$itk_option(-rtdimage) contour \
+                      $levels $rtdimage $careful_ \
+                      $atts $bounds] }]"
+
+            #  Add/update the key.
+            draw_key_
             update idletasks
          }
+
       }
    }
 
@@ -538,7 +537,7 @@ itcl::class gaia::GaiaContour {
    }
 
    #  Get the attributes from the colour and width widgets.
-   protected method get_attributes_ {} {
+   protected method get_ast_atts_ {} {
       set atts {}
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
          set value [$itk_component(value$i) get]
@@ -554,7 +553,7 @@ itcl::class gaia::GaiaContour {
 
    #  Get the attributes from the colour and width widgets for a
    #  single contour.
-   protected method get_attribute_ {index} {
+   protected method get_ast_att_ {index} {
       set atts {}
       set value [$itk_component(value$index) get]
       if { $value != {} } {
@@ -566,14 +565,44 @@ itcl::class gaia::GaiaContour {
       return $atts
    }
 
+   #  Get the plain attributes for a contour (without AST formatting).
+   protected method get_att_ {index} {
+      set atts {}
+      set value [$itk_component(value$index) get]
+      if { $value != {} } {
+         set colour [$itk_component(colour$index) get]
+         set width [$itk_component(width$index) get]
+         set atts "$colour $width"
+      }
+      return $atts
+   }
+
+   #  Calculate the bounds of the visible image (canvas coordinates).
+   protected method calc_bounds_ {} {
+      set frac 0.80
+      set xf [expr 0.5*(1.0-$frac)]
+      set yf [expr 0.5*(1.0-$frac)]
+      set w [winfo width $itk_option(-canvas)]
+      set h [winfo height $itk_option(-canvas)]
+      set x0 [$itk_option(-canvas) canvasx 0]
+      set y0 [$itk_option(-canvas) canvasy 0]
+      set dw [expr $w*$xf]
+      set dh [expr $h*$yf]
+      set x1 [expr $x0+$w-$dw]
+      set y1 [expr $y0+$h-$dh]
+      set x0 [expr $x0+$dw]
+      set y0 [expr $y0+$dh]
+      return [list $x0 $y0 $x1 $y1]
+   }
+
    #  Clear the contours levels and attributes, or just the levels.
    public method clear_contours { {all 1} } {
-      if { $all } { 
+      if { $all } {
          for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
             $itk_component(value$i) configure -value {}
             $itk_component(colour$i) configure -value $coldefault_($i)
             $itk_component(width$i) configure -value 1
-         } 
+         }
       } else {
          for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
             $itk_component(value$i) configure -value {}
@@ -610,18 +639,26 @@ itcl::class gaia::GaiaContour {
       return $rtdimage
    }
 
-   #  Remove all contours. Do it one-by-one so we don't interfere with 
+   #  Remove all contours. Do it one-by-one so we don't interfere with
    #  other contour objects.
    protected method remove_contours_ {} {
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
          $itk_option(-canvas) delete $leveltags_($i)
+         set drawn_($i) 0
       }
-      set drawn_ 0
+
+      #  Remove the key.
+      $itk_option(-canvas) delete $keytag_
    }
 
    #  Remove a contour by index.
    protected method remove_contour_ {index} {
       $itk_option(-canvas) delete $leveltags_($index)
+      set drawn_($index) 0
+
+      #  Delete key and redraw it.
+      $itk_option(-canvas) delete $keytag_
+      draw_key_
    }
 
    #  Level generation commands. XXX Just use simple generation commands,
@@ -712,18 +749,18 @@ itcl::class gaia::GaiaContour {
       set method [$itk_component(ctype) get]
       set start [$itk_component(start) get]
       set incre [$itk_component(incre) get]
-      if { $method != "automatic" && ( $start == {} || $incre == {} ) } { 
+      if { $method != "automatic" && ( $start == {} || $incre == {} ) } {
          info_dialog "Please enter values for all generation fields"
          return
       }
       clear_contours 0
-      if { $method == "magnitude" } { 
-         for {set i 1} {$i <= $ncont} {incr i} { 
+      if { $method == "magnitude" } {
+         for {set i 1} {$i <= $ncont} {incr i} {
             $itk_component(value$i) configure -value \
                [expr $start*pow(10.0,-0.4*($i-1)*$incre)]
          }
       } elseif { $method == "linear" } {
-         for {set i 1} {$i <= $ncont} {incr i} { 
+         for {set i 1} {$i <= $ncont} {incr i} {
             $itk_component(value$i) configure -value \
                [expr $start+($i-1)*$incre]
          }
@@ -732,23 +769,90 @@ itcl::class gaia::GaiaContour {
          set max [$itk_option(-rtdimage) max]
          set incre [expr double($max-$min)/double($ncont)]
          set start [expr $min+$incre*0.5]
-         for {set i 1} {$i <= $ncont} {incr i} { 
+         for {set i 1} {$i <= $ncont} {incr i} {
             $itk_component(value$i) configure -value \
                [expr $start+($i-1)*$incre]
          }
       }
    }
-   
+
    #  Set the colour of a contour (if it is drawn).
-   protected method set_colour_ {index} { 
+   protected method set_colour_ {index} {
       set colour [$itk_component(colour$index) get]
       $itk_option(-canvas) itemconfigure $leveltags_($index) -fill $colour
    }
 
    #  Set the width of a contour (if it is drawn).
-   protected method set_width_ {index} { 
+   protected method set_width_ {index} {
       set width [$itk_component(width$index) get]
       $itk_option(-canvas) itemconfigure $leveltags_($index) -width $width
+
+      #  Text of key is special case, keep width 0.
+      $itk_option(-canvas) itemconfigure $texttag_ -width 0
+   }
+
+   #  Add a level key to the image. The key consists of the level and
+   #  a coloured line.
+   protected method draw_key_ {} {
+
+      #  Delete the current key.
+      $itk_option(-canvas) delete $keytag_
+
+      #  Get current levels.
+      set levels [get_levels_]
+
+      #  Get the bounds of the displayed contours and work out a
+      #  suitable position for the key.
+      set bounds [calc_bounds_]
+      set x [lindex $bounds 2]
+      set y [lindex $bounds 1]
+      set dx 15.0
+      set dy 15.0
+
+      #  Draw the key.
+      
+      #  First the title.
+      lassign [get_att_ 1] colour width
+      $itk_option(-canvas) create text [expr $x+$dx+5] $y \
+         -text "Contour key" \
+         -anchor c \
+         -fill $colour \
+         -tags "$keytag_ $texttag_" \
+         -width 0
+      set y [expr $y+$dy]
+
+      #  Now each line and level.
+      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+         if { $drawn_($i) } {
+            set value [lindex $levels [expr $i-1]]
+            lassign [get_att_ $i] colour width
+            $itk_option(-canvas) create line $x $y [expr $x+$dx] $y \
+               -fill $colour \
+               -width $width \
+               -tags "$keytag_ $leveltags_($i)"
+            $itk_option(-canvas) create text [expr $x+$dx+5] $y \
+               -text "$value" \
+               -anchor w \
+               -fill $colour \
+               -tags "$keytag_ $leveltags_($i) $texttag_" \
+               -width 0
+            set y [expr $y+$dy]
+         }
+      }
+      update
+
+      #  Finally add the surround box (also used as control for
+      #  repositioning whole of key).
+      set bbox [$itk_option(-canvas) bbox $keytag_]
+      if { $bbox != {} } {
+         set x0 [expr [lindex $bbox 0] -5.0]
+         set y0 [expr [lindex $bbox 1] -5.0]
+         set x1 [expr [lindex $bbox 2] +5.0]
+         set y1 [expr [lindex $bbox 3] +5.0]
+         set keyid_ [$itk_option(-canvas) create rectangle $x0 $y0 $x1 $y1\
+                        -outline white -tags "$keytag_" -width 1 \
+                        -fill {}]
+      }
    }
 
    #  Configuration options: (public variables)
@@ -782,7 +886,7 @@ itcl::class gaia::GaiaContour {
       set careful_ $itk_option(-careful)
    }
 
-   #  Global canvas tag used to control redraws etc. Individual 
+   #  Global canvas tag used to control redraws etc. Individual
    #  tags are used within this class.
    itk_option define -contour_tag contour_tag Contour_Tag {} {
       if { $itk_option(-contour_tag) == {} } {
@@ -805,8 +909,9 @@ itcl::class gaia::GaiaContour {
    protected variable target_ {}
    protected variable imagefile_ {}
 
-   #  Whether contours have been drawn already.
-   protected variable drawn_ 0
+   #  Which contours are drawn (needed to keep key free of undrawn
+   #  levels).
+   protected variable drawn_
 
    #  Names of the possible colours and their AST index equivalents.
    protected variable colourmap_ {
@@ -821,12 +926,17 @@ itcl::class gaia::GaiaContour {
    #  Tags used for configuring each contour levels.
    protected variable leveltags_
 
+   #  Tags for elements of key (needs to be unique for each object).
+   #  Text is different as need to disable width attributes.
+   protected variable keytag_
+   protected variable texttag_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
    #  Number of potential contours drawn.
    common unique_ 0
 
-   
+
 #  End of class definition.
 }
