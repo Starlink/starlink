@@ -33,6 +33,7 @@
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     DLT:  D.L. Terrett (Starlink, RAL)
 #     BKM:  B.K. McIlwrath (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -42,6 +43,8 @@
 #        Changed pgplot_link to pgp_link for Starlink-PGPLOT.
 #     14-DEC-1999 (BKM):
 #        Derive agp_link from agi_link (change AGI->AGP, PGP->PGPLOT).
+#     14-JUL-2004 (TIMJ):
+#        Use new -star option to pgplot
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -49,7 +52,7 @@
 
 #-
 
-      echo -lagp `gns_link` `ref_link` `trn_link` `pgplot_link`  \
+      echo -lagp `gns_link` `ref_link` `trn_link` `pgplot_link -star`  \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
