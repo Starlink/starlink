@@ -79,6 +79,10 @@
         P_GOTAX(SLOT) = .FALSE.
         P_FID(SLOT) = FID
 
+*    Create psf object
+        CALL ADI_NEW0( 'PsfDescription', P_PSID(SLOT), STATUS )
+        CALL ADI_CPUT0I( P_PSID(SLOT), 'Slot', SLOT, STATUS )
+
 *      Mark slot in use
         P_USED(SLOT) = .TRUE.
 

@@ -57,4 +57,7 @@
 *    Psf system now initialised
       PSFINIT = .TRUE.
 
+*    Load the ADI package
+      CALL ADI_REQPKG( 'psf', STATUS )
+
       END
