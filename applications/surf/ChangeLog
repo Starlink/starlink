@@ -1,3 +1,8 @@
+2002-06-27  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_calc_bol_coords.f: AZ jiggle offsets were only
+	ever being applied if we had pointing corrections!!
+
 2002-03-11  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Fix the

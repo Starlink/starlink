@@ -279,7 +279,11 @@
       END IF
 
 *  calculate the pointing offset for the time of the measurement
+*  initialize the offsets even if we have no pointing corrections
+*  since we use them later anyway
 
+      P_DAZ = 0.0D0
+      P_DEL = 0.0D0
       IF (STATUS .EQ. SAI__OK) THEN
          IF (N_POINT .GT. 0) THEN
             IF (LST .LE. POINT_LST(1)) THEN
@@ -371,14 +375,12 @@
 
 *  add any AZ offset and the pointing offset (assuming pointing corrections 
 *  are tangent plane alt-az offsets with the azimuth value refering to the 
-*  error at zero elevation)
+*  error at zero elevation). This has to be applied even if we have
+*  no pointing corrections
 
-               IF (N_POINT .GT. 0) THEN
-                  DAZ = DAZ + (P_DAZ * COS (DEL) - AZ_OFFSET) * 
+               DAZ = DAZ + (P_DAZ * COS (DEL) - AZ_OFFSET) * 
      :              ARCSEC2RAD
-                  DEL = DEL + (P_DEL - EL_OFFSET) * ARCSEC2RAD
-               END IF
-
+               DEL = DEL + (P_DEL - EL_OFFSET) * ARCSEC2RAD
 
                IF (OUT_COORDS .EQ. 'RA') THEN
 *     now rotate the offset to apparent RA,dec
