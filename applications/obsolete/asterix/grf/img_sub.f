@@ -3118,7 +3118,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+ IMG_SETARD
-	SUBROUTINE IMG_SETARD(MASK,I1,I2,J1,J2,EXCLUDE,STATUS)
+	SUBROUTINE IMG_SETARD(MASK,EXCLUDE,STATUS)
 
         IMPLICIT NONE
 
@@ -3129,13 +3129,13 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         INCLUDE 'IMG_CMN'
 *  Import :
         INTEGER MASK(I_NX,I_NY)
-        INTEGER I1,I2,J1,J2
         LOGICAL EXCLUDE
 *  Export :
 *  Status :
         INTEGER STATUS
 *  Local constants :
 *  Local variables :
+      INTEGER I1,I2,J1,J2
       BYTE FLAG
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -3147,6 +3147,10 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         ENDIF
 
 *  set region mask
+        I1=1
+        I2=I_NX
+        J1=1
+        J2=I_NY
         CALL IMG_SETARD_SUB(MASK,I1,I2,J1,J2,FLAG,%val(I_REG_PTR))
 
         I_REG_TYPE='COMPLEX'
