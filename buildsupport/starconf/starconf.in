@@ -213,7 +213,7 @@ if test $# -gt 0 -a `expr x$1 : x-` -gt 0; then
                 done
             else
                 if expr " $showvars " : ".* $1 " >/dev/null; then
-                    eval echo "$1=\${v_$1}"
+                    eval echo "\${v_$1}"
                 else
                     echo "Unrecognised variable $1"
                     exit 1
