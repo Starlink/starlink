@@ -49,6 +49,8 @@
 *        of KAPPA.
 *     23-AUG-1999 (DSB):
 *        V0.14 - Added SCATTER.
+*     30-AUG-1999 (DSB):
+*        Added multiple invocation of applications using NDG looping.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -65,8 +67,12 @@
 *  Status:
       INTEGER  STATUS
 
+*  External References:
+      LOGICAL NDG_AGAIN           ! Invoke the application again?
+
 *  Local Variables:
       CHARACTER NAME * ( 15 )     ! Task name from the command
+      LOGICAL VERB                ! Run in verbose mode?
 
 *.
 
@@ -85,220 +91,228 @@
 *  is contructed.
       CALL NDF_HAPPN( NAME // ' (KAPPA PKG_VERS)', STATUS )
 
+*  See if we are running in verbose mode.
+      CALL KPG1_VERB( VERB, STATUS )
+
+*  Initialise the common blocks used to control multiple invokation of
+*  applications to process lists of NDFs.
+      CALL NDG_START( VERB, STATUS )
+
+*  Loop round invoking the task for each set of NDFs specified by the user.
+      DO WHILE( NDG_AGAIN( STATUS ) )
+
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
 
-*  Draws a perspective-histogram representatation of a 2-d NDF.
-*      ELSE IF ( NAME .EQ. 'COLUMNAR' ) THEN
-*         CALL COLUMNAR ( STATUS )
-
 *  Contours a 2-d NDF.
-      IF ( NAME .EQ. 'CONTOUR' ) THEN
-         CALL CONTOUR ( STATUS )
+         IF ( NAME .EQ. 'CONTOUR' ) THEN
+            CALL CONTOUR ( STATUS )
 
 *  Contours a 2-d NDF overlaid on an image displayed previously.
-      ELSE IF ( NAME .EQ. 'CONTOVER' ) THEN
-         CALL CONTOVER ( STATUS )
+         ELSE IF ( NAME .EQ. 'CONTOVER' ) THEN
+            CALL CONTOVER ( STATUS )
 
 *  Creates or manipulates an image-display lookup table using a palette.
-      ELSE IF ( NAME .EQ. 'CRELUT' ) THEN
-         CALL CRELUT ( STATUS )
+         ELSE IF ( NAME .EQ. 'CRELUT' ) THEN
+            CALL CRELUT ( STATUS )
 
 *  Reports the co-ordinates of points selected using the
 *  cursor and selects the current picture.
-      ELSE IF ( NAME .EQ. 'CURSOR' ) THEN
-         CALL CURSOR ( STATUS )
+         ELSE IF ( NAME .EQ. 'CURSOR' ) THEN
+            CALL CURSOR ( STATUS )
 
 *  Displays a 2-d NDF.
-      ELSE IF ( NAME .EQ. 'DISPLAY' ) THEN
-         CALL DISPLAY( STATUS )
+         ELSE IF ( NAME .EQ. 'DISPLAY' ) THEN
+            CALL DISPLAY( STATUS )
 
 *  Draws +/-n standard-deviation lines on a line plot.
-      ELSE IF ( NAME .EQ. 'DRAWSIG' ) THEN
-         CALL DRAWSIG( STATUS )
+         ELSE IF ( NAME .EQ. 'DRAWSIG' ) THEN
+            CALL DRAWSIG( STATUS )
 
 *  Creates a radial or azimuthal profile of a 2-dimensional image.
-      ELSE IF ( NAME .EQ. 'ELPROF' ) THEN
-         CALL ELPROF ( STATUS )
+         ELSE IF ( NAME .EQ. 'ELPROF' ) THEN
+            CALL ELPROF ( STATUS )
 
 *  Clears a graphics device and purges its database entries.
-      ELSE IF ( NAME .EQ. 'GDCLEAR' ) THEN
-         CALL GDCLEAR( STATUS )
+         ELSE IF ( NAME .EQ. 'GDCLEAR' ) THEN
+            CALL GDCLEAR( STATUS )
 
 *  Shows which graphics devices are available.
-      ELSE IF ( NAME .EQ. 'GDNAMES' ) THEN
-         CALL GDNAMES ( STATUS )
+         ELSE IF ( NAME .EQ. 'GDNAMES' ) THEN
+            CALL GDNAMES ( STATUS )
 
 *  Selects a current graphics device.
-      ELSE IF ( NAME .EQ. 'GDSET' ) THEN
-         CALL GDSET ( STATUS )
+         ELSE IF ( NAME .EQ. 'GDSET' ) THEN
+            CALL GDSET ( STATUS )
 
 *  Shows the current status of a graphics device.
-      ELSE IF ( NAME .EQ. 'GDSTATE' ) THEN
-         CALL GDSTATE( STATUS )
+         ELSE IF ( NAME .EQ. 'GDSTATE' ) THEN
+            CALL GDSTATE( STATUS )
 
 *  Produces a greyscale plot of a 2-d NDF.
-      ELSE IF ( NAME .EQ. 'GREYPLOT' ) THEN
-         CALL GREYPLOT ( STATUS )
+         ELSE IF ( NAME .EQ. 'GREYPLOT' ) THEN
+            CALL GREYPLOT ( STATUS )
 
 *  Draws a perspective plot of a two-dimensional NDF.
-*      ELSE IF ( NAME .EQ. 'HIDE' ) THEN
-*         CALL HIDE ( STATUS )
+*         ELSE IF ( NAME .EQ. 'HIDE' ) THEN
+*            CALL HIDE ( STATUS )
 
 *  Clears an image display and purges its database entries.
-      ELSE IF ( NAME .EQ. 'IDCLEAR' ) THEN
-         CALL GDCLEAR( STATUS )
+         ELSE IF ( NAME .EQ. 'IDCLEAR' ) THEN
+            CALL GDCLEAR( STATUS )
 
 *  Makes memory planes of an image-display device invisible.
-      ELSE IF ( NAME .EQ. 'IDINVISIBLE' ) THEN
-         CALL IDINVISIBLE ( STATUS )
+         ELSE IF ( NAME .EQ. 'IDINVISIBLE' ) THEN
+            CALL IDINVISIBLE ( STATUS )
 
 *  Pans and zooms an image-display device.
-      ELSE IF ( NAME .EQ. 'IDPAZO' ) THEN
-         CALL IDPAZO ( STATUS )
+         ELSE IF ( NAME .EQ. 'IDPAZO' ) THEN
+            CALL IDPAZO ( STATUS )
 
 *  Selects a current image-display device.
-      ELSE IF ( NAME .EQ. 'IDSET' ) THEN
-         CALL IDSET ( STATUS )
+         ELSE IF ( NAME .EQ. 'IDSET' ) THEN
+            CALL IDSET ( STATUS )
 
 *   Shows the current status of an image display.
-      ELSE IF ( NAME .EQ. 'IDSTATE' ) THEN
-         CALL IDSTATE( STATUS )
+         ELSE IF ( NAME .EQ. 'IDSTATE' ) THEN
+            CALL IDSTATE( STATUS )
 
 *  Inspects a 2-d NDF in a variety of ways.
-      ELSE IF ( NAME .EQ. 'INSPECT' ) THEN
-         CALL INSPECT ( STATUS )
+         ELSE IF ( NAME .EQ. 'INSPECT' ) THEN
+            CALL INSPECT ( STATUS )
 
 *  Draws a line plot of a 1-d NDF's data values against their axis
 *  co-ordinates.
-      ELSE IF ( NAME .EQ. 'LINPLOT' ) THEN
-         CALL LINPLOT ( STATUS )
+         ELSE IF ( NAME .EQ. 'LINPLOT' ) THEN
+            CALL LINPLOT ( STATUS )
 
 *  Manipulates an image-display colour table.
-      ELSE IF ( NAME .EQ. 'LUTABLE' ) THEN
-         CALL LUTABLE ( STATUS )
+         ELSE IF ( NAME .EQ. 'LUTABLE' ) THEN
+            CALL LUTABLE ( STATUS )
 
 *  Flips the colour table of an image-display device.
-      ELSE IF ( NAME .EQ. 'LUTFLIP' ) THEN
-         CALL LUTFLIP ( STATUS )
+         ELSE IF ( NAME .EQ. 'LUTFLIP' ) THEN
+            CALL LUTFLIP ( STATUS )
 
 *  Highlights a colour table of image-display device.
-      ELSE IF ( NAME .EQ. 'LUTHILITE' ) THEN
-         CALL LUTHILITE ( STATUS )
+         ELSE IF ( NAME .EQ. 'LUTHILITE' ) THEN
+            CALL LUTHILITE ( STATUS )
 
 *  Rotates a colour table of image-display device.
-      ELSE IF ( NAME .EQ. 'LUTROT' ) THEN
-         CALL LUTROT ( STATUS )
+         ELSE IF ( NAME .EQ. 'LUTROT' ) THEN
+            CALL LUTROT ( STATUS )
 
 *  Saves the current colour table of an image-display device in an NDF.
-      ELSE IF ( NAME .EQ. 'LUTSAVE' ) THEN
-         CALL LUTSAVE ( STATUS )
+         ELSE IF ( NAME .EQ. 'LUTSAVE' ) THEN
+            CALL LUTSAVE ( STATUS )
 
 *  Tweaks a colour table of an image display.
-      ELSE IF ( NAME .EQ. 'LUTTWEAK' ) THEN
-         CALL LUTTWEAK ( STATUS )
+         ELSE IF ( NAME .EQ. 'LUTTWEAK' ) THEN
+            CALL LUTTWEAK ( STATUS )
 
 *   Draws a colour-table key.
-      ELSE IF ( NAME .EQ. 'LUTVIEW' ) THEN
-         CALL LUTVIEW ( STATUS )
+         ELSE IF ( NAME .EQ. 'LUTVIEW' ) THEN
+            CALL LUTVIEW ( STATUS )
 
 *  Draws a multi-line plot of a 2-d NDF's data values against their axis
 *  co-ordinates.
-      ELSE IF ( NAME .EQ. 'MLINPLOT' ) THEN
-         CALL MLINPLOT ( STATUS )
+         ELSE IF ( NAME .EQ. 'MLINPLOT' ) THEN
+            CALL MLINPLOT ( STATUS )
 
 *  Clears an image-overlay device.
-      ELSE IF ( NAME .EQ. 'OVCLEAR' ) THEN
-         CALL OVCLEAR ( STATUS )
+         ELSE IF ( NAME .EQ. 'OVCLEAR' ) THEN
+            CALL OVCLEAR ( STATUS )
 
 *  Selects a current image-display overlay.
-      ELSE IF ( NAME .EQ. 'OVSET' ) THEN
-         CALL OVSET ( STATUS )
+         ELSE IF ( NAME .EQ. 'OVSET' ) THEN
+            CALL OVSET ( STATUS )
 
 *  Loads the default palette to a colour table.
-      ELSE IF ( NAME .EQ. 'PALDEF' ) THEN
-         CALL PALDEF( STATUS )
+         ELSE IF ( NAME .EQ. 'PALDEF' ) THEN
+            CALL PALDEF( STATUS )
 
 *  Enters a colour into an image display's palette.
-      ELSE IF ( NAME .EQ. 'PALENTRY' ) THEN
-         CALL PALENTRY( STATUS )
+         ELSE IF ( NAME .EQ. 'PALENTRY' ) THEN
+            CALL PALENTRY( STATUS )
 
 *  Fills the reserved palette of a colour table from an NDF.
-      ELSE IF ( NAME .EQ. 'PALREAD' ) THEN
-         CALL PALREAD( STATUS )
+         ELSE IF ( NAME .EQ. 'PALREAD' ) THEN
+            CALL PALREAD( STATUS )
 
 *  Saves the current reserved portion of a colour table to an NDF.
-      ELSE IF ( NAME .EQ. 'PALSAVE' ) THEN
-         CALL PALSAVE( STATUS )
+         ELSE IF ( NAME .EQ. 'PALSAVE' ) THEN
+            CALL PALSAVE( STATUS )
 
 *  Uses a cursor to select the current picture and to report the
 *  co-ordinates of points.
-      ELSE IF ( NAME .EQ. 'PICCUR' ) THEN
-         CALL PICCUR( STATUS )
+         ELSE IF ( NAME .EQ. 'PICCUR' ) THEN
+            CALL PICCUR( STATUS )
 
 *  Defines a new graphics-database picture or an array of pictures.
-      ELSE IF ( NAME .EQ. 'PICDEF' ) THEN
-         CALL PICDEF( STATUS )
+         ELSE IF ( NAME .EQ. 'PICDEF' ) THEN
+            CALL PICDEF( STATUS )
 
 *  Finds the first empty FRAME picture in the graphics database.
-      ELSE IF ( NAME .EQ. 'PICEMPTY' ) THEN
-         CALL PICEMPTY( STATUS )
+         ELSE IF ( NAME .EQ. 'PICEMPTY' ) THEN
+            CALL PICEMPTY( STATUS )
 
 *  Finds the first unobscured and unoscuring FRAME picture in the
 *  graphics database.
-      ELSE IF ( NAME .EQ. 'PICENTIRE' ) THEN
-         CALL PICENTIRE( STATUS )
+         ELSE IF ( NAME .EQ. 'PICENTIRE' ) THEN
+            CALL PICENTIRE( STATUS )
 
 *  Finds the attributes of a picture interior to the current picture.
-      ELSE IF ( NAME .EQ. 'PICIN' ) THEN
-         CALL PICIN( STATUS )
+         ELSE IF ( NAME .EQ. 'PICIN' ) THEN
+            CALL PICIN( STATUS )
 
 *  Labels the current graphics-database picture.
-      ELSE IF ( NAME .EQ. 'PICLABEL' ) THEN
-         CALL PICLABEL ( STATUS )
+         ELSE IF ( NAME .EQ. 'PICLABEL' ) THEN
+            CALL PICLABEL ( STATUS )
 
 *  Lists the pictures in the graphics database for a device.
-      ELSE IF ( NAME .EQ. 'PICLIST' ) THEN
-         CALL PICLIST ( STATUS )
+         ELSE IF ( NAME .EQ. 'PICLIST' ) THEN
+            CALL PICLIST ( STATUS )
 
 *  Selects a graphics-database picture by its label.
-      ELSE IF ( NAME .EQ. 'PICSEL' ) THEN
-         CALL PICSEL ( STATUS )
+         ELSE IF ( NAME .EQ. 'PICSEL' ) THEN
+            CALL PICSEL ( STATUS )
 
 *  Transforms co-ordinates between the current and base pictures.
-      ELSE IF ( NAME .EQ. 'PICTRANS' ) THEN
-         CALL PICTRANS ( STATUS )
+         ELSE IF ( NAME .EQ. 'PICTRANS' ) THEN
+            CALL PICTRANS ( STATUS )
 
 *  Finds the first unobscured FRAME picture in the graphics database.
-      ELSE IF ( NAME .EQ. 'PICVIS' ) THEN
-         CALL PICVIS( STATUS )
+         ELSE IF ( NAME .EQ. 'PICVIS' ) THEN
+            CALL PICVIS( STATUS )
 
 *  Produces a scatter plot between 2 N-d NDFs.
-      ELSE IF ( NAME .EQ. 'SCATTER' ) THEN
-         CALL SCATTER( STATUS )
+         ELSE IF ( NAME .EQ. 'SCATTER' ) THEN
+            CALL SCATTER( STATUS )
 
 *  Dumps an image-display memory to a graphics hardcopy and optionally
 *  to an NDF.
-      ELSE IF ( NAME .EQ. 'SNAPSHOT' ) THEN
-         CALL SNAPSHOT ( STATUS )
+         ELSE IF ( NAME .EQ. 'SNAPSHOT' ) THEN
+            CALL SNAPSHOT ( STATUS )
 
 *  Contours a 2-d NDF quickly.
-      ELSE IF ( NAME .EQ. 'TURBOCONT' ) THEN
-         CALL TURBOCONT ( STATUS )
+         ELSE IF ( NAME .EQ. 'TURBOCONT' ) THEN
+            CALL TURBOCONT ( STATUS )
 
 *  Plots a 2-dimensional vector map.
-      ELSE IF ( NAME .EQ. 'VECPLOT' ) THEN
-         CALL VECPLOT ( STATUS )
+         ELSE IF ( NAME .EQ. 'VECPLOT' ) THEN
+            CALL VECPLOT ( STATUS )
 
-      ELSE
+         ELSE
 
 *  No such option exists.
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'CMD', NAME )
-         CALL ERR_REP( 'KAPVIEW_MON_NOCOM',
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'CMD', NAME )
+            CALL ERR_REP( 'KAPVIEW_MON_NOCOM',
      :     'KAPVIEW: No such option ^CMD.', STATUS )
 
-      END IF
+         END IF
+
+      END DO
 
 *  End and return.
 
