@@ -50,5 +50,12 @@ zb:
   path=zb \
   --
 
-buildsupport:
+
+# Buildsupport tools -- building and cleaning
+BUILDSUPPORT_MANIFESTS =
   za
+EXTRA_BUILDSUPPORT_MANIFESTS =
+
+buildsupport: $(BUILDSUPPORT_MANIFESTS)
+clean-buildsupport:
+	rm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)
