@@ -86,6 +86,9 @@
 *     6-JAN-1995: Original version
 *    24-JUL-1996: modified to use correct function (JFL).
 *    $Log$
+*    Revision 1.4  2001/03/30 20:22:38  timj
+*    Use T_AMB rather than 273 for X_G
+*
 *    Revision 1.3  1999/08/19 03:37:16  timj
 *    Header tweaks to ease production of SSN72 documentation.
 *
@@ -187,7 +190,7 @@
 
          IF (ABS(TAUZ * AIRMASS) .LT. 15.0) THEN
             X_G = 1.0 - 2.0 * 6.5 * EXP (-TAUZ * AIRMASS / 3.669383) /
-     :        273.0
+     :        T_AMB
             J_ATM = J_AMB * X_G 
             J_THEORETICAL = (1.0 - ETA_TEL) * J_TEL + ETA_TEL * J_ATM *
      :        (1.0 - B * EXP (-TAUZ * AIRMASS))

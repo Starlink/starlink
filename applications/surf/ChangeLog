@@ -1,3 +1,8 @@
+2001-03-30  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_j_theoretical.f (SCULIB_J_THEORETICAL): X_G is
+	meant to use T_AMB rather than hard-wired 273
+
 2001-03-21  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* scripts/sculog: Was an errror with skysum because we are not
