@@ -5,15 +5,6 @@
 *    Description :
 *    Method :
 *
-*    Authors :
-*
-*     Richard Saxton, David J. Allan ( BHVAD::DJA )
-*
-*
-*    History :
-*
-*     7-Jun-90    original
-*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -1305,9 +1296,10 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOCIN               ! Locator to input file
       CHARACTER*(DAT__SZLOC) ILOC,HLOC
-      LOGICAL NEW
-      INTEGER NTIM                        	 ! Number of sets of time windows
-      INTEGER LP
+      CHARACTER*20 SNAME
+      INTEGER NREC
+      INTEGER SELID,SID,SIID
+      INTEGER ICMP,NCMP
       INTEGER MDATE                       	 ! MJD of the observation
       INTEGER MSWITCH                    	 ! MJD of 26th Jan 1991
 
@@ -1468,6 +1460,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       INTEGER STATUS
 
       INTEGER BPTR,EPTR
+      INTEGER I
 *-
 
       IF (STATUS.NE.SAI__OK) RETURN
