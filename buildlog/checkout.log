@@ -8283,6 +8283,7 @@ cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/data
 U java/source/splat/src/main/uk/ac/starlink/splat/data/AbstractEditableSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/AbstractSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/AnalyticSpectrum.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/CollapsedSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/DataLimits.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/EditableSpecData.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/EditableSpecDataImpl.java
@@ -9489,6 +9490,7 @@ U java/source/util/src/main/uk/ac/starlink/util/images/update.gif
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/text
 U java/source/util/src/main/uk/ac/starlink/util/text/VOTable.dtd
 U java/source/util/src/main/uk/ac/starlink/util/text/VOTable.xsd
+U java/source/util/src/main/uk/ac/starlink/util/text/VOTable1.1.xsd
 U java/source/util/src/main/uk/ac/starlink/util/text/astrores.dtd
 U java/source/util/src/main/uk/ac/starlink/util/text/helpset_1_0.dtd
 U java/source/util/src/main/uk/ac/starlink/util/text/map_1_0.dtd
@@ -9586,10 +9588,13 @@ cvs checkout: Updating java/source/votable/src/testcases/uk
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink/votable
+U java/source/votable/src/testcases/uk/ac/starlink/votable/DOMTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/FitsPlusTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/ParameterTest.java
+U java/source/votable/src/testcases/uk/ac/starlink/votable/ReferenceTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/SerializerTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/VOTableTest.java
+U java/source/votable/src/testcases/uk/ac/starlink/votable/animals.xml
 U java/source/votable/src/testcases/uk/ac/starlink/votable/docexample.xml
 cvs checkout: Updating java/uk
 cvs checkout: Updating java/uk/ac

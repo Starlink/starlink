@@ -622,40 +622,326 @@ prepare:
 check_packages:
 
 build:
-    [javac] Compiling 23 source files to /apps/cvsbuild/java/source/votable/build/classes
-    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:91: cannot resolve symbol
-    [javac] symbol  : constructor FieldElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
-    [javac] location: class uk.ac.starlink.votable.FieldElement
-    [javac]             return new FieldElement( node, this );
-    [javac]                    ^
-    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:94: cannot resolve symbol
-    [javac] symbol  : constructor LinkElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
-    [javac] location: class uk.ac.starlink.votable.LinkElement
-    [javac]             return new LinkElement( node, this );
-    [javac]                    ^
-    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:97: cannot resolve symbol
-    [javac] symbol  : constructor ParamElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
-    [javac] location: class uk.ac.starlink.votable.ParamElement
-    [javac]             return new ParamElement( node, this );
-    [javac]                    ^
-    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:100: cannot resolve symbol
-    [javac] symbol  : constructor TableElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
-    [javac] location: class uk.ac.starlink.votable.TableElement
-    [javac]             return new TableElement( node, this );
-    [javac]                    ^
-    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:103: cannot resolve symbol
-    [javac] symbol  : constructor ValuesElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
-    [javac] location: class uk.ac.starlink.votable.ValuesElement
-    [javac]             return new ValuesElement( node, this );
-    [javac]                    ^
-    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:106: cannot resolve symbol
-    [javac] symbol  : constructor VOElement (org.w3c.dom.Element,uk.ac.starlink.votable.VODocument)
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/votable-2.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/votable/votable-2.0.tar
+     [gzip] Building: /apps/cvsbuild/export/votable-2.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/votable-2.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/votable/votable-2.0.tar
+     [echo] Executing JAIUtil target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/jaiutil-1.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.1.tar
+     [gzip] Building: /apps/cvsbuild/export/jaiutil-1.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jaiutil-1.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.1.tar
+     [echo] Executing SOAPSERVER target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/soapserver-0.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/soapserver/soapserver-0.2.tar
+     [gzip] Building: /apps/cvsbuild/export/soapserver-0.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/soapserver-0.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.2.tar
+     [echo] Executing JPCS target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build_classes:
+
+assemble_jni:
+
+build_jni:
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e shared
+     [exec] make: Nothing to be done for `shared'.
+
+build:
+
+jars:
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/jpcs-0.1-Linux.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
+     [gzip] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
+     [echo] Executing SOG target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/sog-0.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/sog/sog-0.2.tar
+     [gzip] Building: /apps/cvsbuild/export/sog-0.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/sog-0.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/sog/sog-0.2.tar
+     [echo] Executing SPLAT target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/splat/build/classes
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] make: Nothing to be done for `build'.
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_colt.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_help.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jdom.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_wavelet.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_core.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/bsh-1.2b7.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/splat-2.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/splat/splat-2.2.tar
+     [gzip] Building: /apps/cvsbuild/export/splat-2.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/splat-2.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/splat/splat-2.2.tar
+     [echo] Executing Mirage target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/mirage-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/mirage/mirage-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/mirage-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/mirage-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/mirage/mirage-0.1.tar
+     [echo] Executing TOPCAT target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build_demo:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
+
+build:
+
+docs_check:
+
+docs:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/epsgraphics_classes.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/acme_encoding.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/topcat-1.3.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-1.3.tar
+     [gzip] Building: /apps/cvsbuild/export/topcat-1.3.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/topcat-1.3.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-1.3.tar
+     [echo] Executing Treeview target: export
+
+export:
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build_demo:
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
+
+build:
+    [javac] Compiling 12 source files to /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:76: cannot resolve symbol
+    [javac] symbol  : method getElement ()
     [javac] location: class uk.ac.starlink.votable.VOElement
-    [javac]             return new VOElement( node, this );
-    [javac]                    ^
-    [javac] 6 errors
+    [javac]         parentObj = new DOMSource( vocel.getElement().getParentNode(),
+    [javac]                                         ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:138: cannot resolve symbol
+    [javac] symbol  : method getSource ()
+    [javac] location: class uk.ac.starlink.votable.VOElement
+    [javac]             Source xsrc = ((VOElement) it.next()).getSource();
+    [javac]                           ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:170: cannot resolve symbol
+    [javac] symbol  : method getDescendantsByName (java.lang.String)
+    [javac] location: class uk.ac.starlink.votable.VOElement
+    [javac]             VOElement[] tableEls = vocel.getDescendantsByName( "TABLE" );
+    [javac]                                         ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:208: cannot resolve symbol
+    [javac] symbol  : method getElement ()
+    [javac] location: class uk.ac.starlink.votable.VOElement
+    [javac]         for ( Node child = voel.getElement().getFirstChild(); child != null;
+    [javac]                                ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:231: cannot resolve symbol
+    [javac] symbol  : constructor ParamElement (org.w3c.dom.Element,java.lang.String,uk.ac.starlink.votable.VOElementFactory)
+    [javac] location: class uk.ac.starlink.votable.ParamElement
+    [javac]                     params.add( new ParamElement( childEl, systemId, vofact ) );
+    [javac]                                 ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:267: cannot resolve symbol
+    [javac] symbol  : method getTextContent ()
+    [javac] location: class uk.ac.starlink.votable.VOElement
+    [javac]             String text = coosys.getTextContent().trim();
+    [javac]                                 ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:310: cannot resolve symbol
+    [javac] symbol  : method getSource ()
+    [javac] location: class uk.ac.starlink.votable.VOElement
+    [javac]                 return new TextViewer( voel.getSource() );
+    [javac]                                            ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableDataNode.java:68: cannot resolve symbol
+    [javac] symbol  : method getSource ()
+    [javac] location: class uk.ac.starlink.votable.VOElement
+    [javac]                 Source xsrc = ((VOElement) it.next()).getSource();
+    [javac]                               ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableTableDataNode.java:34: cannot resolve symbol
+    [javac] symbol  : method getRowCount ()
+    [javac] location: class uk.ac.starlink.votable.TableElement
+    [javac]         long nrows = votable.getRowCount();
+    [javac]                             ^
+    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableTableDataNode.java:36: cannot resolve symbol
+    [javac] symbol  : method getColumnCount ()
+    [javac] location: class uk.ac.starlink.votable.TableElement
+    [javac]              + votable.getColumnCount() 
+    [javac]                       ^
+    [javac] 10 errors
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/votable/build.xml:362: Compile failed; see the compiler error output for details.
+file:/apps/cvsbuild/java/source/treeview/build.xml:551: Compile failed; see the compiler error output for details.
 
-Total time: 9 minutes 31 seconds
+Total time: 21 minutes 48 seconds

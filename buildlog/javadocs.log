@@ -1708,9 +1708,6 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/dom/package.html: warning - Tag @link: reference not found: DelegateDocument
-  [javadoc] Generating /apps/cvsbuild/java/source/votable/docs/votable/javadocs/stylesheet.css...
-  [javadoc] 1 warning
      [echo] Executing JAIUtil target: javadocs
 
 prepare:
@@ -1805,58 +1802,6 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.sog...
   [javadoc] Loading source files for package uk.ac.starlink.sog.photom...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:52: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.HDXCodec;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:53: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.HDXImage;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:54: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.HDXImage;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:55: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.HDXImageProcessor;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:87: cannot resolve symbol
-  [javadoc] symbol  : class HDXImage 
-  [javadoc] location: class uk.ac.starlink.sog.SOGNavigatorImageDisplay
-  [javadoc]     protected HDXImage hdxImage = null;
-  [javadoc]               ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:293: cannot resolve symbol
-  [javadoc] symbol  : class HDXImage 
-  [javadoc] location: class uk.ac.starlink.sog.SOGNavigatorImageDisplay
-  [javadoc]     public void setHDXImage( HDXImage hdxImage )
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:405: cannot resolve symbol
-  [javadoc] symbol  : class HDXImage 
-  [javadoc] location: class uk.ac.starlink.sog.SOGNavigatorImageDisplay
-  [javadoc]     protected void initHDXImage( HDXImage hdxImage)
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGRemoteControl.java:32: package uk.ac.starlink.soap does not exist
-  [javadoc] import uk.ac.starlink.soap.AppHttpSOAPServer;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGRemoteControl.java:33: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.HDXImage;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGRemoteControl.java:52: cannot resolve symbol
-  [javadoc] symbol  : class AppHttpSOAPServer 
-  [javadoc] location: class uk.ac.starlink.sog.SOGRemoteControl
-  [javadoc]     private AppHttpSOAPServer _server = null;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGTransferHandler.java:24: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.HDXImage;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/PhotomWS.java:28: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.HDXImage;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/PhotomWS.java:31: package uk.ac.starlink.soap does not exist
-  [javadoc] import uk.ac.starlink.soap.AppHttpSOAPServer;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/PhotomWS.java:44: cannot resolve symbol
-  [javadoc] symbol  : class AppHttpSOAPServer 
-  [javadoc] location: class uk.ac.starlink.sog.photom.PhotomWS
-  [javadoc]     private AppHttpSOAPServer server = null;
-  [javadoc]             ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -1930,7 +1875,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getDescription
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getSpecificDescription
   [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/stylesheet.css...
-  [javadoc] 33 warnings
+  [javadoc] 19 warnings
      [echo] Executing SPLAT target: javadocs
 
 prepare:
@@ -1970,66 +1915,6 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.topcat.join...
   [javadoc] Loading source files for package uk.ac.starlink.topcat.plot...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:15: package uk.ac.starlink.sog does not exist
-  [javadoc] import uk.ac.starlink.sog.SOG;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:16: package uk.ac.starlink.sog does not exist
-  [javadoc] import uk.ac.starlink.sog.SOGNavigatorImageDisplay;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:17: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecData;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:18: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecDataComp;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:19: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecDataFactory;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:20: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.PlotControlFrame;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:21: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.SplatBrowser;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:22: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.SplatBrowserMain;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:23: package uk.ac.starlink.splat.plot does not exist
-  [javadoc] import uk.ac.starlink.splat.plot.PlotControl;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:24: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:34: cannot resolve symbol
-  [javadoc] symbol  : class SOG 
-  [javadoc] location: class uk.ac.starlink.topcat.func.Display
-  [javadoc]     private static SOG sog_;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:36: cannot resolve symbol
-  [javadoc] symbol  : class SplatBrowser 
-  [javadoc] location: class uk.ac.starlink.topcat.func.Display
-  [javadoc]     private static SplatBrowser splat_;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:38: cannot resolve symbol
-  [javadoc] symbol  : class PlotControlFrame 
-  [javadoc] location: class uk.ac.starlink.topcat.func.Display
-  [javadoc]     private static PlotControlFrame splatPlotFrame_;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:39: cannot resolve symbol
-  [javadoc] symbol  : class PlotControl 
-  [javadoc] location: class uk.ac.starlink.topcat.func.Display
-  [javadoc]     private static PlotControl splatPlot_;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:131: cannot resolve symbol
-  [javadoc] symbol  : class SOGNavigatorImageDisplay 
-  [javadoc] location: class uk.ac.starlink.topcat.func.Display
-  [javadoc]     private static SOGNavigatorImageDisplay[] getSoggers( int nsog ) {
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java:285: cannot resolve symbol
-  [javadoc] symbol  : class SplatBrowser 
-  [javadoc] location: class uk.ac.starlink.topcat.func.Display
-  [javadoc]     private static SplatBrowser getSplat() {
-  [javadoc]                    ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -2037,7 +1922,6 @@ javadocs:
   [javadoc] Building index for all classes...
   [javadoc] Generating /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs/stylesheet.css...
   [javadoc] Note: Custom tags that could override future standard tags:  @example. To avoid potential overrides, use at least one period character (.) in custom tag names.
-  [javadoc] 16 warnings
      [echo] Executing Treeview target: javadocs
 
 prepare:
@@ -2051,210 +1935,21 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.treeview...
   [javadoc] Loading source files for package uk.ac.starlink.treeview.splat...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/HDSDataNode.java:23: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:14: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecData;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:15: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecDataComp;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:16: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.AbstractSpecDataImpl;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:17: package uk.ac.starlink.splat.plot does not exist
-  [javadoc] import uk.ac.starlink.splat.plot.DivaPlot;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:18: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:32: cannot resolve symbol
-  [javadoc] symbol  : class DivaPlot 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer
-  [javadoc] public class GraphViewer extends DivaPlot {
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:36: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer
-  [javadoc]     public GraphViewer( Ndx ndx ) throws SplatException, IOException {
-  [javadoc]                                          ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:90: cannot resolve symbol
-  [javadoc] symbol  : class AbstractSpecDataImpl 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer.NdxSpecDataImpl
-  [javadoc]     private static class NdxSpecDataImpl extends AbstractSpecDataImpl {
-  [javadoc]                                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:101: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer.NdxSpecDataImpl
-  [javadoc]         public NdxSpecDataImpl( Ndx ndx ) throws IOException, SplatException {
-  [javadoc]                                                               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:163: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer.NdxSpecDataImpl
-  [javadoc]         public void save() throws SplatException {
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ImageHDUDataNode.java:30: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/StarTableDataNode.java:30: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.ControlWindow;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/StarTableDataNode.java:33: cannot resolve symbol
-  [javadoc] symbol  : class VOTableWriter 
-  [javadoc] location: package votable
-  [javadoc] import uk.ac.starlink.votable.VOTableWriter;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayDataNode.java:16: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayImage.java:25: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.SimpleRenderedImage;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayImage.java:31: cannot resolve symbol
-  [javadoc] symbol  : class SimpleRenderedImage 
-  [javadoc] location: class uk.ac.starlink.treeview.NDArrayImage
-  [javadoc] public class NDArrayImage extends SimpleRenderedImage {
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NdxDataNode.java:43: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SogNdxDisplayer.java:4: package uk.ac.starlink.jaiutil does not exist
-  [javadoc] import uk.ac.starlink.jaiutil.HDXImage;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SogNdxDisplayer.java:6: package uk.ac.starlink.sog does not exist
-  [javadoc] import uk.ac.starlink.sog.SOG;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SogNdxDisplayer.java:7: package uk.ac.starlink.sog does not exist
-  [javadoc] import uk.ac.starlink.sog.SOGNavigatorImageDisplay;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SogNdxDisplayer.java:8: package uk.ac.starlink.sog does not exist
-  [javadoc] import uk.ac.starlink.sog.SOGNavigatorImageDisplayFrame;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SogNdxDisplayer.java:17: cannot resolve symbol
-  [javadoc] symbol  : class SOG 
-  [javadoc] location: class uk.ac.starlink.treeview.SogNdxDisplayer
-  [javadoc]     private SOG sog;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SogNdxDisplayer.java:51: cannot resolve symbol
-  [javadoc] symbol  : class SOGNavigatorImageDisplay 
-  [javadoc] location: class uk.ac.starlink.treeview.SogNdxDisplayer
-  [javadoc]     private synchronized SOGNavigatorImageDisplay 
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:4: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecData;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:5: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.NDXSpecDataImpl;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:6: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.SplatBrowser;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:7: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.SplatBrowserMain;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:8: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:17: cannot resolve symbol
-  [javadoc] symbol  : class SplatBrowser 
-  [javadoc] location: class uk.ac.starlink.treeview.SplatNdxDisplayer
-  [javadoc]     private SplatBrowser browser;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:45: cannot resolve symbol
-  [javadoc] symbol  : class SplatBrowser 
-  [javadoc] location: class uk.ac.starlink.treeview.SplatNdxDisplayer
-  [javadoc]     private synchronized SplatBrowser getBrowser( boolean embedded ) {
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:30: cannot resolve symbol
-  [javadoc] symbol  : class VOStarTable 
-  [javadoc] location: package votable
-  [javadoc] import uk.ac.starlink.votable.VOStarTable;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableTableDataNode.java:17: cannot resolve symbol
-  [javadoc] symbol  : class VOStarTable 
-  [javadoc] location: package votable
-  [javadoc] import uk.ac.starlink.votable.VOStarTable;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:22: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecData;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:23: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecDataFactory;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:24: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:57: cannot resolve symbol
-  [javadoc] symbol  : class SpecDataFactory 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]     private static SpecDataFactory specFactory = SpecDataFactory.getInstance();
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:157: cannot resolve symbol
-  [javadoc] symbol  : class SpecData 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]     public SpecData choose( Component parent, String buttonText, String title )
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:184: cannot resolve symbol
-  [javadoc] symbol  : class SpecData 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]     public SpecData choose( Component parent )
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:197: cannot resolve symbol
-  [javadoc] symbol  : class SpecData 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]     public SpecData makeSpecData( DataNode node )
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:198: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]         throws IOException, SplatException
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: cannot resolve symbol
-  [javadoc] symbol  : class SpecData 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]     protected SpecData makeSpecDataFromTable( DataNode node )
-  [javadoc]               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:264: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]         throws IOException, SplatException
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: cannot resolve symbol
-  [javadoc] symbol  : class SpecData 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]     protected SpecData makeSpecDataFromNdx( DataNode node )
-  [javadoc]               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:289: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.splat.SplatNodeChooser
-  [javadoc]         throws IOException, SplatException
-  [javadoc]                             ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:197: warning - Tag @link: reference not found: SpecData
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: SpecData
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: SpecData
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:197: warning - Tag @link: reference not found: SpecData
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: SpecData
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: SpecData
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:157: warning - Tag @link: reference not found: SpecData
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:197: warning - Tag @link: reference not found: SpecData
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: SpecData
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: SpecData
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
   [javadoc] Generating /apps/cvsbuild/java/source/treeview/docs/treeview/javadocs/stylesheet.css...
-  [javadoc] 63 warnings
+  [javadoc] 8 warnings
      [echo] Executing Coco target: javadocs
 
 prepare:
@@ -2311,28 +2006,6 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.frog.plot...
   [javadoc] Loading source files for package uk.ac.starlink.frog.util...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:25: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.ControlWindow;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:23: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.ControlWindow;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogSOAPServer.java:14: package uk.ac.starlink.soap does not exist
-  [javadoc] import uk.ac.starlink.soap.AppHttpSOAPServer;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogSOAPServer.java:48: cannot resolve symbol
-  [javadoc] symbol  : class AppHttpSOAPServer 
-  [javadoc] location: class uk.ac.starlink.frog.util.FrogSOAPServer
-  [javadoc]     private AppHttpSOAPServer server = null;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteServer.java:10: package bsh does not exist
-  [javadoc] import bsh.Interpreter;
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteServer.java:85: cannot resolve symbol
-  [javadoc] symbol  : class Interpreter 
-  [javadoc] location: class uk.ac.starlink.frog.util.RemoteServer
-  [javadoc]     protected Interpreter interp = null;
-  [javadoc]               ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -3100,7 +2773,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogSOAPServer.java:71: warning - Tag @link: can't find setFrogBrowser in uk.ac.starlink.frog.util.FrogSOAPServer
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/Percentile.java:17: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/stylesheet.css...
-  [javadoc] 210 warnings
+  [javadoc] 204 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 10 seconds
+Total time: 3 minutes 12 seconds
