@@ -22,11 +22,11 @@
 *  Description:
 *     This routine reads in a list of user specified files and concatenates
 *     their data, variance and quality arrays so that KAPPA routines like
-*     stats and kstest can analyse a complete set of photometry observations.
+*     STATS and KSTEST can analyse a complete set of photometry observations.
 *     Data for each individual bolometer is written to a different file.
 *     If a file contained data for H7 and H9 then two output files would
 *     be created (eg test_h7 and test_h9 - if the OUT parameter was set to
-*     'test'). For each new bolometer a new file is created (existing
+*     `test'). For each new bolometer a new file is created (existing
 *     files are overwritten) and data is appended to these files when
 *     more data for these bolometers is supplied.
 *
@@ -86,6 +86,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.20  1997/06/27 23:16:39  timj
+*     Tweak the header.
+*
 *     Revision 1.19  1997/06/13 00:10:44  timj
 *     Use SURF_PAR and change name
 *
