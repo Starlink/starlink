@@ -316,9 +316,9 @@ $!
 $!  Documentation.
 $!  ==============
 $!
-$!  Fetch the paper documentation.
+$!  Fetch the paper documentation and news item.
 $!
-$    CMS FETCH'CF' DOC
+$    CMS FETCH'CF' SUN55.TEX,CONVERT.NEWS
 $!
 $!  Installation Test.
 $!  ==================
