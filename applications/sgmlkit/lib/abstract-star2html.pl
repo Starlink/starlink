@@ -61,6 +61,14 @@
 # better than this, since that would essentially require the sophistication
 # of a full document conversion.
 #
+# <p>Because folk can do arbitrarily clever things with newcommands, I've had
+# to dumb down the parsing of them.  The code here will successfully extract
+# document number, author, etc, as long as the corresponding newcommand is
+# all on one line.  I've had to do the same with \(sub)*section parsing.
+# This will fail sometimes, but the result will be a
+# thin but <em/valid/ SGML document, and will not cause this code to spin
+# its wheels indefinitely.
+#
 #<returnvalue none>
 #<parameter>input-file-name<type>Star2HTML file
 #  <description>A file marked up using the Star2HTML extensions to LaTeX2HTML
@@ -118,7 +126,7 @@ if (defined $outputfile) {
 # This should be redirected by the caller.
 # This script produces so many warnings that a bit of excess chatter 
 # won't matter.
-print STDERR "### Processing $inputfile...\n";
+print STDERR "### Processing $inputfilename...\n";
 
 while (defined($idxline = <IDX>))
 {
@@ -160,21 +168,22 @@ while (defined($line = <TF>))
 
 
     $line =~ /(\\(sub)*section.*)/ && do { 
-	    # Append new lines as long as the line-so-far doesn't match
-	    # the following regexp, which matches only lines with 
-	    # A SINGLE LEVEL of balanced braces
-	    while ($line !~ /\\(sub)*section{([^{]*{[^{}]*})*[^{}]*}/) {
-		$newline = <TF>;
-		defined ($newline) || die "Unexpected EOF";
-		$line .= $newline;
-		# compress spaces, also replacing newlines
-		$line =~ s/\s+/ /g;
-	    }
-	    # Re-match the line, so we can use $1.  We can't just bracket
-	    # the appropriate bit of the !~ regexp - $1 isn't set, and I'm
-	    # not quite sure why (something to do with the test failing?)
-	    $line =~ /(\\(sub)*section{([^{]*{[^{}]*})*[^{}]*})/;
-	    my $ptitle = parse_section ($1);
+	#    # Append new lines as long as the line-so-far doesn't match
+	#    # the following regexp, which matches only lines with 
+	#    # A SINGLE LEVEL of balanced braces
+	#    while ($line !~ /\\(sub)*section{([^{]*{[^{}]*})*[^{}]*}/) {
+	#	$newline = <TF>;
+	#	defined ($newline) || die "Unexpected EOF";
+	#	$line .= $newline;
+	#	# compress spaces, also replacing newlines
+	#	$line =~ s/\s+/ /g;
+	#    }
+	#    # Re-match the line, so we can use $1.  We can't just bracket
+	#    # the appropriate bit of the !~ regexp - $1 isn't set, and I'm
+	#    # not quite sure why (something to do with the test failing?)
+	#    $line =~ /(\\(sub)*section{([^{]*{[^{}]*})*[^{}]*})/;
+	#    my $ptitle = parse_section ($1);
+	    my $ptitle = parse_section ($line);
 	    check_markup ('section title', $ptitle);
 	    print OUTFILE $ptitle;
 	    next;
@@ -192,15 +201,25 @@ while (defined($line = <TF>))
 
     # Header lines
     $line =~ /newcommand/ && do {
+	# Don't even attempt to do anything clever with newcommands - 
+	# nothing short of magic will do here, so dumb it down to make it
+	# more robust.  The following will only
+	# work if \newcommand{\stardocnumber}{...} is all on one line.
+	# This'll fail miserably for the abstract, but I DON'T CARE!
+
 	# As above...
-	while ($line !~ /\\newcommand\s*{([^}]*)}\s*{(([^{]*{[^{}]*})*[^{}]*)}/) {
-	    $newline = <TF>;
-	    defined ($newline) || die "Unexpected EOF";
-	    $line .= $newline;
-	    $line =~ s/\s+/ /g;
-	}
-	my ($cmd,$arg) = 
-	    ($line =~ /\\newcommand\s*{([^}]*)}\s*{(([^{]*{[^{}]*})*[^{}]*)}/);
+	#while ($line !~ /\\newcommand\s*{([^}]*)}\s*{(([^{]*{[^{}]*})*[^{}]*)}/) {
+	#    $newline = <TF>;
+	#    defined ($newline) || die "Unexpected EOF";
+	#    $line .= $newline;
+	#    $line =~ s/\s+/ /g;
+	#    print STDERR "$line";
+	#}
+	#my ($cmd,$arg) = 
+	#    ($line =~ /\\newcommand\s*{([^}]*)}\s*{(([^{]*{[^{}]*})*[^{}]*)}/);
+
+	my ($cmd,$arg) = ($line =~ /\\newcommand\s*{(.*?)}(.*)$/);
+	$arg =~ s/(^\s+|\s+$|{|})//g;
 
 	#print STDERR "Warning: markup in $cmd $arg\n"
 	#	if ($arg =~ /(\\|~)/ && $cmd !~ /\\stardoc(authors|abstract)/);
@@ -272,12 +291,13 @@ exit 0;
 # (assumed on one line).  Return a string 
 # "<(sub*)sect><title>blah blah blah</title>" if \xlabel is empty
 # including ID, EXPORT and URL attributes if \xlabel is specified.
+# Dumbed-down version: don't assume braces match
 sub parse_section {
     $sectheading = shift;
     my ($level, $dummy, $secttitle, @xlabel, $nextxlabel);
 
     ($level, $dummy, $secttitle) = 
-	($sectheading =~ /^\\((sub)*sect)ion{(.*)}$/);
+	($sectheading =~ /^\\((sub)*sect)ion{(.*)$/);
 
     # discard \label commands
     $secttitle =~ s/\\label{[^}]*}//g;
@@ -289,8 +309,9 @@ sub parse_section {
     #print "#sectheading=<$sectheading>\n";
     #print "#level=<$level>  secttitle=<$secttitle>  xlabel=<@xlabel>\n";
 
-    # Trim leading and trailing whitespace from section title
-    $secttitle =~ s/(^ +)|( +$)//g;
+    # Trim leading and trailing whitespace, and remaining {} from section title
+    #$secttitle =~ s/(^ +)|( +$)//g;
+    $secttitle =~ s/(^\s+|\s+$|{|})//g;
 
     $nextxlabel = shift (@xlabel);
     if (! defined($nextxlabel))
