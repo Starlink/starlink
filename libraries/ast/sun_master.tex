@@ -9977,7 +9977,7 @@ c-
 f+
 \small
 \begin{verbatim}
-      CALL AST_CONVERT( FRAMESETA, FRAMESETB, 'SKY,PIXEL,GRID', STATUS )
+      CVT = AST_CONVERT( FRAMESETA, FRAMESETB, 'SKY,PIXEL,GRID', STATUS )
       IF ( CVT .EQ. AST__NULL ) THEN
          <no conversion was possible>
       ELSE

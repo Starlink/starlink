@@ -5985,7 +5985,7 @@ two images to be registered:
 
 \small
 \begin{verbatim}
-      CALL AST_CONVERT( FRAMESETA, FRAMESETB, 'SKY,PIXEL,GRID', STATUS )
+      CVT = AST_CONVERT( FRAMESETA, FRAMESETB, 'SKY,PIXEL,GRID', STATUS )
       IF ( CVT .EQ. AST__NULL ) THEN
          <no conversion was possible>
       ELSE
@@ -11615,7 +11615,7 @@ Object            - Base class for all AST Objects
    }
    \sstexamples{
       \sstexamplesubsection{
-         RESULT = AST\_FINDFRAME( TARGET, \htmlref{AST\_FRAME}{AST_FRAME}( 3, ' ' ), ' ', STATUS )
+         RESULT = AST\_FINDFRAME( TARGET, \htmlref{AST\_FRAME}{AST_FRAME}( 3, ' ', STATUS ), ' ', STATUS )
       }{
          Searches for a 3-dimensional coordinate system in the target
          Frame (or FrameSet). No attributes have been set in the
@@ -11625,7 +11625,7 @@ Object            - Base class for all AST Objects
          found will be returned as part of the RESULT FrameSet.
       }
       \sstexamplesubsection{
-         RESULT = AST\_FINDFRAME( TARGET, \htmlref{AST\_SKYFRAME}{AST_SKYFRAME}( ' ' ), ' ', STATUS )
+         RESULT = AST\_FINDFRAME( TARGET, \htmlref{AST\_SKYFRAME}{AST_SKYFRAME}( ' ', STATUS ), ' ', STATUS )
       }{
          Searches for a celestial coordinate system in the target
          Frame (or FrameSet). The type of celestial coordinate system
@@ -11638,7 +11638,7 @@ Object            - Base class for all AST Objects
          AST\_\_NULL will be returned without error.
       }
       \sstexamplesubsection{
-         RESULT = AST\_FINDFRAME( TARGET, AST\_SKYFRAME( '\htmlref{System}{System}=FK5' ), ' ', STATUS )
+         RESULT = AST\_FINDFRAME( TARGET, AST\_SKYFRAME( '\htmlref{System}{System}=FK5', STATUS ), ' ', STATUS )
       }{
          Searches for an equatorial (FK5) coordinate system in the
          target. The \htmlref{Equinox}{Equinox} value for the coordinate system has not
@@ -11647,7 +11647,7 @@ Object            - Base class for all AST Objects
          to indicate which SkyFrame was used to obtain this value.
       }
       \sstexamplesubsection{
-         RESULT = AST\_FINDFRAME( TARGET, AST\_FRAME( 2, ' ' ), 'SKY,PIXEL,', STATUS )
+         RESULT = AST\_FINDFRAME( TARGET, AST\_FRAME( 2, ' ', STATUS ), 'SKY,PIXEL,', STATUS )
       }{
          Searches for a 2-dimensional coordinate system in the
          target. Initially, a search is made for a suitable coordinate
@@ -11662,20 +11662,20 @@ Object            - Base class for all AST Objects
          target will a value of AST\_\_NULL be returned.
       }
       \sstexamplesubsection{
-         RESULT = AST\_FINDFRAME( TARGET, AST\_FRAME( 1, 'Domain=WAVELENGTH' ),' ',STATUS)
+         RESULT = AST\_FINDFRAME( TARGET, AST\_FRAME( 1, 'Domain=WAVELENGTH', STATUS ),' ',STATUS)
       }{
          Searches for any 1-dimensional coordinate system in the
          target which has the domain {\tt{"}}WAVELENGTH{\tt{"}}.
       }
       \sstexamplesubsection{
-         RESULT = AST\_FINDFRAME( TARGET, AST\_FRAME( 1, ' ' ), 'WAVELENGTH', STATUS )
+         RESULT = AST\_FINDFRAME( TARGET, AST\_FRAME( 1, ' ', STATUS ), 'WAVELENGTH', STATUS )
       }{
          This example has exactly the same effect as that above. It
          illustrates the equivalence of the template's Domain attribute
          and the fields in the DOMAINLIST string.
       }
       \sstexamplesubsection{
-         RESULT = AST\_FINDFRAME( TARGET, AST\_FRAME( 1, '\htmlref{MaxAxes}{MaxAxes}=3' ), ' ', STATUS )
+         RESULT = AST\_FINDFRAME( TARGET, AST\_FRAME( 1, '\htmlref{MaxAxes}{MaxAxes}=3', STATUS ), ' ', STATUS )
       }{
          This is a more advanced example which will search for any
          coordinate system in the target having 1, 2 or 3
@@ -11689,7 +11689,7 @@ Object            - Base class for all AST Objects
          \htmlref{PreserveAxes}{PreserveAxes} attribute to a non-zero value in the template.
       }
       \sstexamplesubsection{
-         RESULT = AST\_FINDFRAME( TARGET, AST\_SKYFRAME( '\htmlref{Permute}{Permute}=0' ), ' ', STATUS )
+         RESULT = AST\_FINDFRAME( TARGET, AST\_SKYFRAME( '\htmlref{Permute}{Permute}=0', STATUS ), ' ', STATUS )
       }{
          Searches for any celestial coordinate system in the target,
          but only finds one if its axes are in the conventional
