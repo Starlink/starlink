@@ -139,6 +139,10 @@ to need explanation or elaboration.
   (make element
     (process-children)))
 
+(element foreign
+  (make element gi: "i"
+	(process-children)))
+
 (element kbd
   (make element gi: "code"
 	(make element gi: "u"
@@ -324,3 +328,47 @@ to need explanation or elaboration.
     (literal "Draft Note:")
     (process-children)))
 
+
+(element angle
+  (let ((ishours (and (attribute-string (normalize "unit"))
+		      (string=? (attribute-string (normalize "unit"))
+				"hours")))
+	(angle (attribute-string (normalize "angle")))
+	(minutes (attribute-string (normalize "minutes")))
+	(seconds (attribute-string (normalize "seconds")))
+	(fraction (attribute-string (normalize "fraction"))))
+      (if ishours
+	  (make sequence
+	    (if angle
+		(make formatting-instruction
+		  data: (string-append angle "&lt;sup>h&lt;/sup>"))
+		(empty-sosofo))
+	    (if minutes
+		(make formatting-instruction
+		  data: (string-append " " minutes "&lt;sup>m&lt;/sup>"))
+		(empty-sosofo))
+	    (if seconds
+		(make formatting-instruction
+		  data: (string-append " " seconds "&lt;sup>s&lt;/sup>"))
+		(empty-sosofo))
+	    (if fraction
+		(make formatting-instruction
+		  data: (string-append "." fraction))
+		(empty-sosofo)))
+	  (make sequence
+	    (if angle
+		(make formatting-instruction
+		  data: (string-append angle "&lt;sup>o&lt;/sup>"))
+		(empty-sosofo))
+	    (if minutes
+		(make formatting-instruction
+		  data: (string-append " " minutes "'"))
+		(empty-sosofo))
+	    (if seconds
+		(make formatting-instruction
+		  data: (string-append " "seconds "''"))
+		(empty-sosofo))
+	    (if fraction
+		(make formatting-instruction
+		  data: (string-append "." fraction))
+		(empty-sosofo))))))
