@@ -77,8 +77,8 @@ proc connect_to_gaia {} {
       if { $needed && $tries == 0 } {
          puts stderr "Failed to connect to GAIA, starting new instance..."
          set created_instance 1
-         exec $env(GAIA_DIR)/gaia.sh &
-         #exec $env(GAIA_DIR)/tgaia &
+         #exec $env(GAIA_DIR)/gaia.sh &
+         exec $env(GAIA_DIR)/tgaia &
       }
 
       #  Now either wait and try again or give up if waited too long.

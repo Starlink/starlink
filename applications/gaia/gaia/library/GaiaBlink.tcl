@@ -91,7 +91,7 @@ itcl::class gaia::GaiaBlink {
 
       #  Close down of window needs to stop animation.
       wm protocol $w_ WM_DELETE_WINDOW [code $this close]
-      wm title $w_ "GAIA: Blink displayed images ($itk_option(-number))"
+      wm title $w_ "GAIA: Blink compare images ($itk_option(-number))"
 
       #  Create menubar and add File menu.
       add_menubar
@@ -609,7 +609,7 @@ itcl::class gaia::GaiaBlink {
    }
 
    #  Get the region occupied by an image on the canvas.
-   protected method get_image_area_ { n } {
+   protected method get_image_area_ { n originc } {
       $image_($n) convert coords 1 1 image x0 y0 canvas
 
       $image_($n) convert coords \
@@ -622,12 +622,13 @@ itcl::class gaia::GaiaBlink {
       set cy1 [expr int(max($y0,$y1))]
 
       #  Correct for canvas origin.
-      lassign [$canvas_ coords $image_($n)] ccx0 ccy0
-      set cx0 [expr int($cx0+$ccx0)]
-      set cy0 [expr int($cy0+$ccy0)]
-      set cx1 [expr int($cx1+$ccx0)]
-      set cy1 [expr int($cy1+$ccy0)]
-
+      if { $originc } {
+         lassign [$canvas_ coords $image_($n)] ccx0 ccy0
+         set cx0 [expr int($cx0+$ccx0)]
+         set cy0 [expr int($cy0+$ccy0)]
+         set cx1 [expr int($cx1+$ccx0)]
+         set cy1 [expr int($cy1+$ccy0)]
+      }
       return "$cx0 $cy0 $cx1 $cy1"
    }
 
@@ -651,15 +652,14 @@ itcl::class gaia::GaiaBlink {
    #  Return the offsets of an image WRT the mobile image. Image
    #  coordinates.
    protected method get_offsets_ { n } {
-      lassign [get_image_area_ $n] tx0 ty0 tx1 ty1
-      lassign [get_image_area_ $mobile_] mx0 my0 mx1 my1
+      lassign [get_image_area_ $n 1] tx0 ty0 tx1 ty1
+      lassign [get_image_area_ $mobile_ 1] mx0 my0 mx1 my1
 
       $image_($n) convert dist \
          [expr $tx0-$mx0+1] [expr $my1-$ty1+1] canvas x0 y0 image
 
       return "$x0 $y0"
    }
-
 
    #  Shift the current image to a new position.
    protected method place_image_ {dir new} {
@@ -674,7 +674,7 @@ itcl::class gaia::GaiaBlink {
       lassign [$canvas_ coords $image_($mobile_)] mx0 my0
 
       #  And current position of image.
-      lassign [get_image_area_ $index] x0 y0 x1 y1
+      lassign [get_image_area_ $index 1] x0 y0 x1 y1
 
       if { $dir == "x" } {
 
@@ -804,56 +804,6 @@ itcl::class gaia::GaiaBlink {
       }
    }
 
-   protected method set_wcs_origins_ {} {
-      catch {
-         if { [info exists clones_(0)] } {
-
-            #  Place mobile image at 0 0.
-            $canvas_ coords $image_($mobile_) 0 0
-            set_scroll_region_
-
-            #  Record orientation of the mobile image. This is also
-            #  after any orientation changes.???
-
-            #  Loop over other images asking for the grid coordinates of
-            #  the mobile image that correspond to the WCS coordinates of
-            #  the upper left corner.
-            for { set i 0 } { $i < $n_ } { incr i } {
-
-               #  Orient images.
-               match_orientation_ $mobile_ $i
-
-               #  Origin of upper left of this image (grid coordinates).
-               set xo 0.0
-               set yo [expr [$image_($i) height]-1.0]
-
-               #  Convert to WCS.
-               lassign [pix2wcs_ $image_($i) $xo $yo] wcs1 wcs2
-
-               #  Back to pixels, but of mobile image.
-               lassign [$image_($mobile_) astcur2pix $wcs1 $wcs2 0] xo yo
-
-               # Pixel shift from mobile image upper left to this one.
-               set dx $xo
-               set dy [expr [$image_($mobile_) height]-1.0-$yo]
-
-               # Equivalent canvas shift.
-               $image_($mobile_) convert dist $dx $dy image dx dy canvas
-
-               #  Apply shift
-               $canvas_ coords $image_($i) 0 0
-               $canvas_ move $image_($i) $dx $dy
-            }
-
-            #  Final scrollregion encompasses positions of all images.
-            set_scroll_region_
-         }
-      } msg
-      if { $msg != {} } {
-         info_dialog $msg
-      }
-   }
-
    #  Set the origins for FITS using CRPIX values.
    protected method set_fits_origins_ { {crpix 1} } {
       catch {
@@ -920,6 +870,58 @@ itcl::class gaia::GaiaBlink {
       return "$wcs1 $wcs2"
    }
 
+   #  Set the relative positions of any images using WCS information.
+   #  This attempts to "orient" images (as in flip x, y or
+   #  interchange), so that they can be more easily compared (or
+   #  positioned in the case of the INT CCD Mosaic). Clearly fraction 
+   #  scale and arbitrary orientations are not supported.
+   protected method set_wcs_origins_ {} {
+      catch {
+         if { [info exists clones_(0)] } {
+
+            #  Place mobile image at 0 0.
+            $canvas_ coords $image_($mobile_) 0 0
+            set_scroll_region_
+
+            for { set i 0 } { $i < $n_ } { incr i } {
+               #if { $i == $mobile_ } continue
+
+               #  Roughly orient images.
+               match_orientation_ $mobile_ $i
+
+               #  Origin of upper left of this image (grid coordinates).
+               lassign [get_image_area_ $i 0] cx0 cy0 cx1 cy1
+               set cxl [expr min($cx0,$cx1)]
+               set cyl [expr min($cy0,$cy1)]
+               $image_($i) convert coords $cxl $cyl canvas xo yo image
+
+               #  Convert to WCS.
+               lassign [pix2wcs_ $image_($i) $xo $yo] wcs1 wcs2
+
+               #  Back to pixels, but of mobile image.
+               lassign [$image_($mobile_) astcur2pix $wcs1 $wcs2 1] xo yo
+
+               # Pixel shift from mobile image upper left to this one.
+               set dx $xo
+               set dy [expr [$image_($mobile_) height]-1.0-$yo]
+
+               # Equivalent canvas shift.
+               $image_($mobile_) convert dist $dx $dy image dx dy canvas
+
+               #  Apply shift
+               $canvas_ coords $image_($i) 0 0
+               $canvas_ move $image_($i) $dx $dy
+            }
+
+            #  Final scrollregion encompasses positions of all images.
+            set_scroll_region_
+         }
+      } msg
+      if { $msg != {} } {
+         info_dialog $msg
+      }
+   }
+
    #  Determine the directions that the axes of the WCS increase
    #  (different from image axes, which are always left and up).
    #  The return is a pair of values from "top", "down", "left" and
@@ -982,21 +984,18 @@ itcl::class gaia::GaiaBlink {
             set ymoves "down"
          }
       }
-      puts "moves = $xmoves $ymoves"
       return "$xmoves $ymoves"
    }
 
    #  Match the orientation of one image to another. Identify images
    #  by index.
    protected method match_orientation_ {ref target} {
-      
+
       set refimage $image_($ref)
       set targetimage $image_($target)
-      
+
       lassign [get_axis_moves_ $refimage] xrefori yrefori
       lassign [get_axis_moves_ $targetimage] xtarori ytarori
-      puts "reference ori: $xrefori $yrefori"
-      puts "target ori: $xtarori $ytarori"
 
       set ops ""
       set x 0
@@ -1062,7 +1061,6 @@ itcl::class gaia::GaiaBlink {
             }
          }
       }
-      puts "reorient action: $ops"
 
       #  Gather orientation of reference image. This is applied to the
       #  image after the changes above. XXX could work in canvas coords?
@@ -1075,7 +1073,6 @@ itcl::class gaia::GaiaBlink {
       if { [$refimage rotate] } {
          append ops "x "
       }
-      puts "final reorient action: $ops"
 
       #  Remove any current orientation.
       set rtdimage $target_($target)
@@ -1089,8 +1086,8 @@ itcl::class gaia::GaiaBlink {
       $rtdimage flip x 0
       $rtdimage flip y 0
       $clones_($target).panel.info.trans update_trans
-      
-      #  Apply the new orientation. Repeats undo the any previous 
+
+      #  Apply the new orientation. Repeats undo the any previous
       #  switches in that state.
       if { $ops != {} } {
          foreach op $ops {
@@ -1105,7 +1102,7 @@ itcl::class gaia::GaiaBlink {
                }
                "lrf" {
                   set state [$rtdimage flip x]
-                  if { $state } { 
+                  if { $state } {
                      $rtdimage flip x 0
                   } else {
                      $rtdimage flip x 1
@@ -1121,11 +1118,9 @@ itcl::class gaia::GaiaBlink {
                }
             }
          }
-         
+
          #  Nasty hack... to get panel buttons updated.
          $clones_($target).panel.info.trans update_trans
-      } else {
-         puts "No orientation changes required"
       }
    }
 
