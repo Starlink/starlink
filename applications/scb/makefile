@@ -417,16 +417,16 @@ $(PERL_MODULES):
 #  substitute makefile macros for some of the variables in the scripts.
 
 VAR_SUBST = sed \
-            -e's%"$$STARLINK"%"$(STARLINK)"%' \
-            -e's%"$$SCB_INDEX"%"$(SCB_INDEX)"%' \
-            -e's%"$$SCB_SOURCES"%"$(SCB_SOURCES)"%' \
-            -e's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
-            -e's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
-            -e's%"$$HTXSERVER_URL"%"$(HTXSERVER_URL)"%' \
-            -e's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
+            -e 's%"$$STARLINK"%"$(STARLINK)"%' \
+            -e 's%"$$SCB_INDEX"%"$(SCB_INDEX)"%' \
+            -e 's%"$$SCB_SOURCES"%"$(SCB_SOURCES)"%' \
+            -e 's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
+            -e 's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
+            -e 's%"$$HTXSERVER_URL"%"$(HTXSERVER_URL)"%' \
+            -e 's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
 
 VARLIB_SUBST = $(VAR_SUBST) \
-            -e'1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5) -I$(PERL_MOD_DIR)%'
+            -e '1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5) -I$(PERL_MOD_DIR)%'
 
 #  Name of the date stamp file. This is used to record the time of the
 #  most recent build for use in subsequent operations that require it.
