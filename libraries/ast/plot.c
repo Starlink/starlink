@@ -106,6 +106,7 @@ f     following routines may also be applied to all Plots:
 c     - astBorder: Draw a border around valid regions of a Plot
 c     - astClip: Set up or remove clipping for a Plot
 c     - astCurve: Draw a geodesic curve
+c     - astGrfFun: Register a graphics routine for use by the Plot class
 c     - astGrid: Draw a set of labelled coordinate axes
 c     - astGridLine: Draw a grid line (or axis) for a Plot
 c     - astMark: Draw a set of markers for a Plot
@@ -114,6 +115,7 @@ c     - astText: Draw a text string for a Plot
 f     - AST_BORDER: Draw a border around valid regions of a Plot
 f     - AST_CLIP: Set up or remove clipping for a Plot
 f     - AST_CURVE: Draw a geodesic curve
+f     - AST_GRFFUN: Register a graphics routine for use by the Plot class
 f     - AST_GRID: Draw a set of labelled coordinate axes
 f     - AST_GRIDLINE: Draw a grid line (or axis) for a Plot
 f     - AST_MARK: Draw a set of markers for a Plot
@@ -12046,12 +12048,12 @@ f        names are:
 *        
 *        The string is case insensitive. For details of the interface 
 *        required for each, see the sections below.
-*     fun
-*     FUN = INTEGER FUNCTION (Given)
+c     fun
+f     FUN = INTEGER FUNCTION (Given)
 c        A Pointer to the function to be used to provide the
 c        functionality indicated by parameter name.
 f        The name of the routine to be used to provide the
-f        functionality indicated by parameter name (the name
+f        functionality indicated by parameter NAME (the name
 f        should also appear in a Fortran EXTERNAL statement in the
 f        routine which invokes AST_GRFFUN). 
 *
@@ -12087,13 +12089,11 @@ c     - attr - An integer value identifying the required attribute.
 c       The following symbolic values are defined in grf.h:
 f     - ATT = INTEGER (Given) - An integer identifying the required attribute. 
 f       The following symbolic values are defined in GRF_PAR:
-*
-*       - GRF__STYLE  - Line style.
-*       - GRF__WIDTH  - Line width.
-*       - GRF__SIZE   - Character and marker size scale factor.
-*       - GRF__FONT   - Character font.
-*       - GRF__COLOUR - Colour index.
-*
+*       GRF__STYLE (Line style),
+*       GRF__WIDTH (Line width),
+*       GRF__SIZE (Character and marker size scale factor),
+*       GRF__FONT (Character font),
+*       GRF__COLOUR (Colour index).
 c     - value - 
 f     - VAL = DOUBLE PRECISION (Given) - 
 c       A new value to store for the attribute. If this is AST__BAD
@@ -12104,26 +12104,23 @@ f     - OLDVAL = DOUBLE PRECISION (Returned) - Returned holding
 c       If this is NULL, no value is returned.
 c     - prim -
 f     - PRIM = INTEGER (Given) -
-*        The sort of graphics primitive to be drawn with the new attribute.
-c        Identified by the following values defined in grf.h:
-f        Identified by the following values defined in GRF_PAR:
-*
-*        - GRF__LINE
-*        - GRF__MARK
-*        - GRF__TEXT
+*       The sort of graphics primitive to be drawn with the new attribute.
+c       Identified by the following values defined in grf.h:
+f       Identified by the following values defined in GRF_PAR:
+*       GRF__LINE,
+*       GRF__MARK,
+*       GRF__TEXT.
 *
 *  AxScale:
 *     The "AxScale" function returns two values (one for each axis) which 
 *     scale increments on the corresponding axis into a "normal" coordinate
-*     system in which:
-*     - The axes have equal scale in terms of (for instance) millimetres 
-*       per unit distance.
-*     - X values increase from left to right.
-*     - Y values increase from bottom to top.
-*     It requires the following interface:
+*     system in which; 1) the axes have equal scale in terms of (for instance) 
+*     millimetres per unit distance, 2) X values increase from left to
+*     right, and 3) Y values increase from bottom to top. It requires the 
+*     following interface:
 *
-*     int AxScale( float *alpha, float *beta )
-*     INTEGER FUNCTION AXSCALE( ALPHA, BETA )
+c     int AxScale( float *alpha, float *beta )
+f     INTEGER FUNCTION AXSCALE( ALPHA, BETA )
 *
 c     - alpha - A pointer to the location at which to return the scale for the
 f     - ALPHA = REAL (Returned) - Returned holding the scale for the
@@ -12176,8 +12173,8 @@ f       the type of marker symbol required.
 *     The "Qch" function returns the heights of characters drawn vertically 
 *     and horizontally. It requires the following interface:
 *
-*     int Qch( float *chv, float *chh )
-*     int QCH( CHV, CHH )
+c     int Qch( float *chv, float *chh )
+f     INTEGER FUNCTION QCH( CHV, CHH )
 *
 c     - chv- A pointer to the double which is to receive the height of
 f     - CHV = REAL (Returned) - Returned holding the height of
