@@ -72,7 +72,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Validate the line number.
-      IF ( LINENO .LE. 1 .AND. LINENO .LE. EL ) THEN
+      IF ( LINENO .GE. 1 .AND. LINENO .LE. EL ) THEN
 
 *  Initialise CARD.
          CARDAR( LINENO ) = ' '
