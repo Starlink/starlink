@@ -185,6 +185,7 @@
          ENDIF
 *
 	print *,1
+	call flush(6)
 *
          CALL XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM(1), SDIM(2),
      &          SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
@@ -195,6 +196,7 @@
      &          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
 *
 	print *,11
+	call flush(6)
 *
          CALL DYN_UNMAP(SMPTR,STATUS)
          IF (SRT.BCKGND) THEN
@@ -2861,6 +2863,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
          IF (STATUS.NE.SAI__OK) GOTO 999
 
 	print *,2
+	call flush(6)
+
 ***      Check them against the sort parameters
          CALL XRTSORT_DOIT_BIN(HEAD,SRT,BSRT,%val(PTRA(1)),
      &      %val(PTRA(2)),%val(PTRA(3)), %val(PTRA(4)),
@@ -2873,6 +2877,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
      &      BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
 	print *,22
+	call flush(6)
 
 
 ***      unmap the arrays & memory
@@ -3158,6 +3163,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
         BSPHI = BSRT.SINPHI
       ENDIF
 	print *,3
+	call flush(6)
 
 ***   Loop over each element in arrays
       DO IX = 1,NELEMS
@@ -3300,14 +3306,11 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
           IF (SOK) THEN
 
-	print *,4
-*
 *  Calculate position of data in array
 *  The first two dimensions of the array can be either
 *  X and Y pixel or RADIAL and AZIMUTHAL bin, depending on
 *  the user selection.
             IF (SRT.IMAGE) THEN
-	print *,5
 *
 *  X,Y bins:
               EL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
@@ -3356,7 +3359,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
             EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
 *
-	print *,EL1,EL2,EL3,EL4,EL5,EL6,EL7
             SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &         SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
 *
@@ -3399,6 +3401,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       ENDDO
 *
 	print *,10
+        call flush(6)
+
 999   CONTINUE
 *
       SRT.MIN_Y = SAVE_YMIN
