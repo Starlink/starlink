@@ -340,6 +340,9 @@
       CALL FIO_OPEN( FNAME, 'READ', 'LIST', DEFAULT, IFD, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
+*  Create the output file
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+
 *  Get the first input line
       CALL IMPORT_NEXTLINE( OFID, IFD, CLINE, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -389,19 +392,6 @@
 
       END IF
 
-*  Associate the output file with the type specified and then open it
-      IF ( TYPE_OK ) THEN
-        IF ( CHR_INSET( 'REAL,INTEGER,DOUBLE', TYPE_DATA ) THEN
-          PRIM = .TRUE.
-        ELSE
-          PRIM = .FALSE.
-          CALL USI_TASSOCO( 'OUT', TYPE_DATA, OFID, STATUS )
-        END IF
-      ELSE
-        CALL USI_TASSOCO( 'OUT', 'UNKNOWN', OFID, STATUS )
-        PRIM = .FALSE.
-      END IF
-
 *  Create history
       CALL FIO_FNAME( IFD, FILE_NAME, STATUS )
       IF ( .NOT. PRIM ) THEN
@@ -418,26 +408,6 @@
         END IF
         CMT_BUF = .FALSE.
 
-      END IF
-
-*  If we've got a data title then create it
-      IF ( TITLE_OK ) THEN
-        IF ( PRIM ) THEN
-          CALL MSG_PRNT( 'Cannot write TITLE to primitive output' )
-        ELSE
-          CALL BDI_PUT0C( OFID, 'Title', TITLE_DATA, STATUS )
-        END IF
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*  If we've got data variant then warn the user that we can't do anything
-*  with it yet.
-      IF ( VRNT_OK ) THEN
-        IF ( PRIM ) THEN
-          CALL MSG_PRNT( 'Cannot write VARIANT to primitive output' )
-        ELSE
-          CALL MSG_PRNT( 'WARNING : VARIANT field not supported.' )
-        END IF
       END IF
 
 *  Right. Thats the top level components out the way. Try to get the
@@ -764,39 +734,6 @@
         GOTO 99
       END IF
 
-*  Output not primitive?
-      IF ( .NOT. PRIM ) THEN
-
-*    If we've got a data label then create it
-        IF ( LABEL_OK ) THEN
-          CALL BDI_PUT0C( OFID, 'Label', LABEL_DATA, STATUS )
-        END IF
-
-*    If we've got data units then create it
-        IF ( UNITS_OK ) THEN
-          CALL BDI_PUT0C( OFID, 'Units', UNITS_DATA, STATUS )
-        END IF
-        IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    Set 'easy' axis components
-        DO N = 1, NAXES
-          IF ( AX_LABEL_OK(N) ) THEN
-            CALL BDI_AXPUT0C( OFID, N, 'Label', AX_LABEL(N), STATUS )
-          END IF
-          IF ( AX_UNITS_OK(N) ) THEN
-            CALL BDI_AXPUT0C( OFID, N, 'Units', AX_UNITS(N), STATUS )
-          END IF
-          IF ( AX_NORM(N) ) THEN
-            CALL BDI_AXPUT0L( OFID, N, 'Normalised', .TRUE., STATUS )
-          END IF
-          IF ( AX_SCALAR(N) ) THEN
-            CALL BDI_AXPUT0R( OFID, N, 'ScalarWidth', AX_SCADAT(N),
-     :                        STATUS )
-          END IF
-        END DO
-
-      END IF
-
 *  The data lines are now read in. We do not know the size of any of the
 *  axes until we've finished reading in all the data and sorted it. Only
 *  in the case where no axis structures were requested can we output the
@@ -1060,13 +997,56 @@
       CALL MSG_PRNT( '^NREC data records read in from ^FILE' )
 
 *  Process the data
-      CALL IMPORT_CRUNCH( OFID, TYPE_DATA, prim, NAXES, NELM, NDIM,
+      CALL IMPORT_CRUNCH( OFID, TYPE_DATA, PRIM, NAXES, NELM, NDIM,
      :                    DIMS, AX_WOK, AX_DECR, AX_SYMWID, AX_SCALAR,
      :                    QMASK_OK, QMASK, ERROR_TO_VAR,
      :                    %VAL(MASTER_PTR),
      :                    %VAL(ORIG_PTR), NUM_DESCS, %VAL(WPTR),
      :                    %VAL(WPTRW), MAX(1,NAXES),
      :                    %VAL(WPTR2),%VAL(WPTR3), STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Output not primitive?
+      IF ( .NOT. PRIM ) THEN
+
+*    If we've got a data label then create it
+        IF ( LABEL_OK ) THEN
+          CALL BDI_PUT0C( OFID, 'Label', LABEL_DATA, STATUS )
+        END IF
+
+*    If we've got data units then create it
+        IF ( UNITS_OK ) THEN
+          CALL BDI_PUT0C( OFID, 'Units', UNITS_DATA, STATUS )
+        END IF
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*    Set 'easy' axis components
+        DO N = 1, NAXES
+          IF ( AX_LABEL_OK(N) ) THEN
+            CALL BDI_AXPUT0C( OFID, N, 'Label', AX_LABEL(N), STATUS )
+          END IF
+          IF ( AX_UNITS_OK(N) ) THEN
+            CALL BDI_AXPUT0C( OFID, N, 'Units', AX_UNITS(N), STATUS )
+          END IF
+          IF ( AX_NORM(N) ) THEN
+            CALL BDI_AXPUT0L( OFID, N, 'Normalised', .TRUE., STATUS )
+          END IF
+          IF ( AX_SCALAR(N) ) THEN
+            CALL BDI_AXPUT0R( OFID, N, 'ScalarWidth', AX_SCADAT(N),
+     :                        STATUS )
+          END IF
+        END DO
+
+      END IF
+
+*  If we've got a data title then create it
+      IF ( TITLE_OK ) THEN
+        IF ( PRIM ) THEN
+          CALL MSG_PRNT( 'Cannot write TITLE to primitive output' )
+        ELSE
+          CALL BDI_PUT0C( OFID, 'Title', TITLE_DATA, STATUS )
+        END IF
+      END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Close input file
@@ -1613,7 +1593,6 @@
 *
       CHARACTER*(DAT__SZLOC)	OLOC			!
 
-      REAL                BASE, SCALE            ! Regular axis parameters
       REAL                DVAL                   ! Two data values
       REAL                RQUAL                  ! Quality value
 
