@@ -3608,7 +3608,7 @@ dtask_main.o: dtask_main.f
 install-exec-local: dtask_main.o
 	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
 	if test -n "$$MANIFEST_FD"; then \
-	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >&$$MANIFEST_FD; \
+	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >&$${MANIFEST_FD-0}; \
 	fi
 </verbatim>
                 This uses the <code>$(INSTALL_PROGRAM)</code> command to
@@ -3624,7 +3624,10 @@ install-exec-local: dtask_main.o
                 a staged installation.  Finally, the location of the
                 installed file is written to the file-descriptor in the
                 environment variable <code>$MANIFEST_FD</code>,
-                <em>if</em> that variable is non-empty.  This is a
+                <em>if</em> that variable is non-empty (note that the
+                ampersand in the redirection operator must
+                syntactically be followed by a number, and the given
+                reference to the environment variable ensures this).  This is a
                 Starlink extension, and is how the manifest file is
                 built up.  Each of these features is important if this
                 hand-made install rule is to behave the same way as
@@ -4680,6 +4683,16 @@ file.f: file.$(FPP_SRC_EXT)
             code to create and install a manifest of all the files
             installed.</p>
 
+          <p>If you set this variable at installation time:
+<verbatim>
+make STAR_MANIFEST_DIR=/my/special/manifest install
+</verbatim>
+            then this overrides the manifest location defaulted at
+            configure time.  If the variable is set to be null
+            (<code>make STAR_MANIFEST_DIR= install</code>)
+            then you will suppress the creation and installation of
+            the manifest.</p>
+
           <p>You define it as follows:
 <verbatim>
 : ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
@@ -4699,7 +4712,9 @@ AC_SUBST(STAR_MANIFEST_DIR)
             described in <ref id="importing-thirdparty"/>).  In that
             case, you do not want to specify <code>STAR_DEFAULTS</code> in the
             <code>configure.ac</code>, but you do need to install a
-            manifest.</p>
+            manifest.  If there is more than one
+            <code>configure.ac</code> file in the tree, you will have
+            to add this for each one.</p>
 
           <p>See also <ref id="variable-special-install-command"/>.</p>
         </subsect>
