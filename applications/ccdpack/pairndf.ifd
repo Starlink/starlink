@@ -27,6 +27,8 @@
 #        Upgraded for use with Sets.
 #     11-JUL-2001 (MBT):
 #        Added TOLER parameter.
+#     18-JUL-2001 (MBT):
+#        Replaced MARKSTYLE by MARKSTYLE1 and MARKSTYLE2.
 #     {enter_changes_here}
 
 #-
@@ -204,17 +206,27 @@
             helpkey *
          }
 
-         parameter markstyle {
-                           # Plot marker type
+         parameter markstyle1 {
+                           # Plot marker type 1
             type LITERAL
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default {}
-            prompt {String giving style of markers to plot}
+            default {shape=plus}
+            prompt {String giving style of markers to plot on left image}
             helpkey *
          }
 
+         parameter markstyle2 {
+                           # Plot marker type 2
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default {shape=circle}
+            prompt {String giving style of markers to plot on right image}
+            helpkey *
+         }
 
       }
 
