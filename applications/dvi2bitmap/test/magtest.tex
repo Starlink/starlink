@@ -1,12 +1,30 @@
 % This TeX file allows us to check that dvi2bitmap's handling of DVI
 % and PK file magnification is correct.
+%
+% We display a sentence in cmr10 with two different scalings (to check
+% that DVI per-font scaling is working OK), as well as with cmr7 and
+% cmr12, to check that different fonts are having their design size
+% interpreted correctly.  Finally, the whole file has a
+% \magnification, so that everything is magnified except the cmr10
+% used at 10 true pt.  If all this looks like its maker intended, I
+% think I can claim that I've got fonts licked.
 
 \nopagenumbers
 \magnification \magstep1
-\font\cmrxx=cmr10 at 10 true pt
+
+%\font\cmcscx=cmcsc10
+\font\cmrvii=cmr7
 \font\cmrx=cmr10
-\font\cmrxbig=cmr10 scaled\magstep1
-\cmrxx cmr10 at 10 true pt;
-\cmrx cmr10;
-\cmrxbig cmr10 scaled magstep1.
+\font\cmrxreal=cmr10 at 10 true pt
+\font\cmrxbig=cmr10 scaled \magstep1
+\font\cmrxii=cmr12
+
+\halign{\hfil #\quad&{# the quick brown fox jumps over the lazy dog}\hfil\cr
+cmr7			&\cmrvii	\cr
+cmr10			&\cmrx		\cr
+cmr10 at 10 true pt	&\cmrxreal	\cr
+cmr10 scaled magstep1	&\cmrxbig	\cr
+cmr12			&\cmrxii	\cr
+}
 \bye
+
