@@ -25,12 +25,14 @@
 *    Authors :
 *
 *     Trevor Ponman  (BHVAD::TJP)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
 *     13 Sep 85 : Original (TJP)
 *     27 Apr 88 : Lower and upper energy bounds passed in separate arrays (TJP)
 *     13 Jan 93 : Converted to D.P. NAG routine (DJA)
+*     23 Jun 97 : Replace NAG with ASTPDA (RB)
 *
 *    Type definitions :
 *
@@ -67,7 +69,7 @@ c       DOUBLE PRECISION S15ABF
 *    Local variables :
 *
 	INTEGER I
-	INTEGER IFAIL			! NAG fail flag
+	INTEGER IFAIL			! PDA fail flag
 	REAL EL				! Line energy
 	REAL W				! Line width (sigma)
 	DOUBLE PRECISION Z		! Unit normal variate
@@ -112,13 +114,11 @@ c       DOUBLE PRECISION S15ABF
       IF(Z.LT.-SIGMAX)THEN
 	CUM1=0.0D0
       ELSE
-        CUM1=0.0D0
-c       CUM1=S15ABF(Z,IFAIL)
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S15ABF' )
+        CUM1=PDA_CNDFPX(Z,IFAIL)
       END IF
       IF(IFAIL.NE.0)THEN
 	STATUS=SAI__ERROR
-	CALL ERR_REP(' ','Bad IFAIL from NAG routine S15ABF',STATUS)
+	CALL ERR_REP(' ','Bad IFAIL from PDA routine PDA_CNDFPX',STATUS)
 	GOTO 9000
       END IF
 
@@ -128,12 +128,10 @@ c       CUM1=S15ABF(Z,IFAIL)
 	IF(Z.LT.-SIGMAX)THEN
 	  FLUX(I)=0.0
         ELSE
-          CUM2=0.0D0
-c 	  CUM2=S15ABF(Z,IFAIL)
-          CALL MSG_PRNT( '*** WARNING: no PDA replacement for S15ABF')
+	  CUM2=PDA_CNDFPX(Z,IFAIL)
 	  IF(IFAIL.NE.0)THEN
 	    STATUS=SAI__ERROR
-	    CALL ERR_REP(' ','Bad IFAIL from NAG routine S15ABF',STATUS)
+	    CALL ERR_REP(' ','Bad IFAIL from PDA routine PDA_CNDFPX',STATUS)
 	    GOTO 9000
 	  END IF
 	  FLUX(I)=PARAM(1)*(CUM2-CUM1)

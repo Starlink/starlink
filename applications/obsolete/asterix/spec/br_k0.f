@@ -7,11 +7,13 @@
 *    Authors :
 *
 *     Andy Pollock (BHVAD::AMTP)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
 *     20 Aug 85 : Original
 *     13 Jan 93 : Remembers last value, and converted to D.P. (DJA)
+*     23 Jun 97 : Replace NAG with ASTPDA (RB)
 *
 *    Type definitions :
 *
@@ -31,13 +33,13 @@
 *
 *    Function declarations :
 *
-c     DOUBLE PRECISION S18ACF                    ! NAG subroutine
+      DOUBLE PRECISION PDA_MBESK0
 *
 *    Local variables :
 *
       DOUBLE PRECISION LAST_A		! Last argument
       DOUBLE PRECISION LAST_K0         	! Last K0 in this routine
-      INTEGER FAIL                   	! NAG failure code
+      INTEGER FAIL                   	! PDA failure code
 *
 *    Local data :
 *
@@ -56,14 +58,12 @@ c     DOUBLE PRECISION S18ACF                    ! NAG subroutine
 
         LAST_A = A
         FAIL=0
-        LAST_K0 = 0.0D0
-c       LAST_K0 = S18ACF(A,FAIL)
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S18ACF' )
+        LAST_K0 = PDA_MBESK0(A,FAIL)
         IF ( FAIL .NE. 0 ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ',
-     :                'IFAIL non-zero on exit from NAG routine S18ACF',
-     :                 STATUS )
+     :         'IFAIL non-zero on exit from PDA routine PDA_MBESK0',
+     :         STATUS )
         END IF
       END IF
 
