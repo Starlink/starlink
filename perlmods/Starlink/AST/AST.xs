@@ -25,7 +25,7 @@ extern "C" {
 #include "EXTERN.h"   /* std perl include */
 #include "perl.h"     /* std perl include */
 #include "XSUB.h"     /* XSUB include */
-#include "ppport.h"
+  /* #include "ppport.h" */
 #ifdef __cplusplus
 }
 #endif
@@ -78,6 +78,12 @@ typedef void AstShiftMap;
 #define HASXMLCHAN
 #else
 typedef void AstXmlChan;
+#endif
+
+#if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 2) || AST_MAJOR_VERS >= 4 )
+#define HASTRANMAP
+#else
+typedef void AstTranMap;
 #endif
 
 /* Helper functions */
@@ -527,7 +533,7 @@ _new( class, has_source, has_sink, options )
    if (astOK) setPerlAstObject( RETVAL, (AstObject*)fitschan );
   } else if (strstr( class, "XmlChan") != NULL ) {
 #ifndef HASXMLCHAN   
-   Perl_croak(aTHX_ "XmlChan: Please upgrade to AST V3.x or greater");
+   Perl_croak(aTHX_ "XmlChan: Please upgrade to AST V3.1 or greater");
 #else
    ASTCALL(
     xmlchan = astXmlChanFor( (const char *(*)()) source, sourceWrap,
@@ -856,6 +862,26 @@ new( class, nin, flags, options )
 #else
   ASTCALL(
    RETVAL = astSpecMap( nin, flags, options );
+  )
+#endif
+ OUTPUT:
+  RETVAL
+
+
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::TranMap
+
+AstTranMap *
+new( class, map1, map2, options )
+  char * class
+  AstMapping * map1
+  AstMapping * map2
+  char * options
+ CODE:
+#ifndef HASTRANMAP
+   Perl_croak(aTHX_ "TranMap: Please upgrade to AST V3.2 or greater");
+#else
+  ASTCALL(
+   RETVAL = astSpecMap( map1, map2, options );
   )
 #endif
  OUTPUT:
