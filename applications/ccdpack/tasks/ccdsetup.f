@@ -39,7 +39,7 @@
 *
 *     The routine also initialises the CCDPACK logging system.
 *
-*     All parameters may be returned as ! (the parameter-system null
+*     All parameters may be supplied as ! (the parameter-system null
 *     value) this indicates that the current value is to be left
 *     unchanged if one exists (this will be shown as the default and
 *     can also be accepted by pressing return) or that a value is not
@@ -47,12 +47,24 @@
 *     assigned it will be defaulted or prompted as appropriate when
 *     other CCDPACK applications are run.
 *
+*     If you are using CCDPACK Sets, then some of the parameters 
+*     describing device characteristics may differ according to
+*     which member of each Set is being described.  By setting the
+*     BYSET parameter to true, and supplying a value for the INDEX
+*     parameter, you can indicate that the global values you supply 
+*     apply to the members of each Set with that Set Index.  
+*     In this case it will be necessary to run CCDSETUP once
+*     for each Set Index to be used (for instance, once for each
+*     chip in a mosaic camera), giving a different INDEX value each
+*     time.  This applies to the global parameters ADC, BOUNDS, 
+*     DEFERRED, DIRECTION, EXTENT, MASK, RNOISE and SATURATION.
+*
 *     The removal of global parameters is performed by the CCDCLEAR
 *     application.
 
 *  Usage:
-*     ccdsetup logto=? logfile=? adc=? bounds=? rnoise=? mask=?
-*              direction=? deferred=? extent=? preserve=? genvar=?
+*     ccdsetup byset=? index=? logto=? logfile=? adc=? bounds=? rnoise=? 
+*              mask=?  direction=? deferred=? extent=? preserve=? genvar=?
 *              ndfnames=? useset=?
 
 *  ADAM Parameters:
@@ -81,6 +93,16 @@
 *        the bias frame is to be directly subtracted from the data
 *        without offsetting.
 *        [!]
+*     BYSET = _LOGICAL (Read)
+*        This parameter does not give the value of a global parameter
+*        to be set up, but affects the behaviour of CCDSETUP.
+*        If true, a value for the INDEX parameter will be solicited, 
+*        and all the global values supplied will apply to 
+*        the processing of images with that Set Index.  In this way,
+*        you can provide different values of certain global parameters
+*        for different members of each Set (e.g. images read from
+*        different chips).
+*        [FALSE]
 *     DEFERRED = _DOUBLE (Read and Write)
 *        The deferred charge value. Often known as the "fat" or "skinny"
 *        zero (just for confusion). This is actually the charge which is
@@ -112,6 +134,12 @@
 *        Normally variances should be generated, even though disk and
 *        process-time savings can be made by their omission.
 *        [TRUE]
+*     INDEX = _INTEGER (Read)
+*        This parameter does not give the value of a global parameter
+*        to be set up, but affects the behaviour of CCDSETUP.
+*        It indicates which Set Index value (i.e. which member of each
+*        Set) the supplied values will apply to.  Only used if BYSET
+*        is true.
 *     LOGFILE = FILENAME (Read and Write)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -259,7 +287,28 @@
 *        data formats) it may be more efficient to set this parameter
 *        false.  You should also set it false if you wanted CCDPACK 
 *        programs to ignore existing Set information for some reason.
+*
+*        If BYSET is true, this parameter will default to true also.
 *        [TRUE]
+
+*  Examples:
+*     ccdsetup
+*        This will prompt you to enter all the global variables.  You
+*        can accept defaults or enter the null value for any which 
+*        you do not need to set.
+*
+*     ccdsetup byset index=1
+*        In this case you will be prompted to enter values which apply
+*        to that member of each CCDPACK Set of images which has a 
+*        Set Index of 1.
+*
+*     ccdsetup byset index=2 adc=1.5 mask=badpix2 accept
+*        This will fix the ADC value to 1.5 and the mask image to the
+*        file badpix2 only for those Set members with a Set Index of 2.
+*        No other values will be prompted for.  If this command is 
+*        issued directly after the last example, then all the other
+*        global parameters will take the same values as were entered
+*        for index=1.
 
 *  Notes:
 *     - Pixel indices. The bounds supplied to DEBIAS should be given as
@@ -306,15 +355,20 @@
 *          NDFNAMES = TRUE  ! Position lists associated with NDFs
 *          LOGTO = BOTH  ! Log file information to
 *          LOGFILE = CCDPACK.LOG  ! Name of logfile
+*
+*       Note that if you are using CCDPACK Sets, you will need to use
+*       a separate restoration file for each INDEX value.
 
 *  Behaviour of parameters:
 *     All parameters values are obtained by prompting. The suggested
 *     values (defaults) are either the current global values, if they
 *     exist, or the application current values (from the last time that
-*     the application was run). If the application has not been run
-*     then the "intrinsic" defaults are shown. The intrinsic defaults
-*     may be obtained at any time (in the absence of global values) by
-*     using the RESET keyword on the command line.
+*     the application was run).  Global values corresponding to the 
+*     INDEX parameter will be used as defaults if they exist.  If the 
+*     application has not been run then the "intrinsic" defaults are 
+*     shown. The intrinsic defaults may be obtained at any time 
+*     (in the absence of global values) by using the RESET keyword on
+*     the command line.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
@@ -340,6 +394,9 @@
 *        environment (INDEF for IRAF).
 *     26-MAR-2001 (MBT):
 *        Added USESET parameter.
+*     10-MAY-2001 (MBT):
+*        Added the INDEX parameter, allowing parameters to be accessed
+*        keyed by their Set Index value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -367,8 +424,8 @@
 *  Local Variables:
       CHARACTER * ( 8 ) LOGTO    ! Where logfile information goes to
       CHARACTER * ( FIO__SZFNM ) LOGNAM ! Logfile name
-      CHARACTER LINE * ( CCD1__BLEN ) ! Line buffer for reading restoration files
-      CHARACTER MSKNAM * ( MSG__SZMSG ) ! Name of mask file or ARD expression
+      CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer
+      CHARACTER * ( MSG__SZMSG ) MSKNAM ! Name of mask file or ARD expression
       CHARACTER * ( 5 ) NULL     ! System NULL expression
       DOUBLE PRECISION ADC       ! ADC factor
       DOUBLE PRECISION DEFER     ! Deferred charge value
@@ -386,6 +443,8 @@
       INTEGER LINNUM             ! Current line number of restoration file
       INTEGER NBOUND             ! Number of bounds
       INTEGER NCHAR              ! Number of characters in input line
+      INTEGER SINDEX             ! Set Index value to which these values apply
+      LOGICAL BYSET              ! Whether values are Set Index specific
       LOGICAL DUMMY              ! Dummy variable
       LOGICAL EOF                ! End_of_file flag
       LOGICAL GENVAR             ! Whether variances are generated
@@ -436,6 +495,15 @@
       SOPEN = .FALSE.
       ROPEN = .FALSE.
 
+*  First of all determine whether we are soliciting values specific
+*  to a given Set Index value.
+      CALL PAR_GET0L( 'BYSET', BYSET, STATUS )
+
+*  If so, find what Set Index this run applies to.
+      SINDEX = CCD1__BADSI
+      IF ( BYSET ) CALL PAR_GET0I( 'INDEX', SINDEX, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+
 *  Before any form of genuine action see if we want to use a
 *  restoration file (this may contain information about the log system
 *  setup so this must come first for this application).
@@ -474,11 +542,25 @@
 *  Now initialise Logfile system. This uses the parameters LOGTO and
 *  LOGFILE. The values of these parameters are obtained later.
       CALL CCD1_START( 'CCDSETUP.............................', STATUS )
+      CALL CCD1_MSG( ' ', ' ', STATUS )
+
+*  Having called CCD1_START (which initialises the keyed parameter 
+*  information) we can load in the index-specific values into the
+*  parameter database if we are keying parameters by Set Index.
+      IF ( BYSET ) THEN
+         CALL CCD1_KPLD( 'ADC', SINDEX, STATUS )
+         CALL CCD1_KPLD( 'BOUNDS', SINDEX, STATUS )
+         CALL CCD1_KPLD( 'DEFERRED', SINDEX, STATUS )
+         CALL CCD1_KPLD( 'DIRECTION', SINDEX, STATUS )
+         CALL CCD1_KPLD( 'EXTENT', SINDEX, STATUS )
+         CALL CCD1_KPLD( 'MASK', SINDEX, STATUS )
+         CALL CCD1_KPLD( 'RNOISE', SINDEX, STATUS )
+         CALL CCD1_KPLD( 'SATURATION', SINDEX, STATUS )
+      END IF
 
 *  Now that the log system is up and running we can say if a restoration
 *  file was used (to set the suggested defaults).
       IF ( RESTOR ) THEN
-         CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ',
      :   '  Suggested defaults restored from file:', STATUS )
          LINE = ' '
@@ -486,6 +568,14 @@
          CALL MSG_SETC( 'FNAME', LINE )
          CALL CCD1_MSG( ' ',
      :   '    ^FNAME', STATUS )
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+      END IF
+
+*  Indicate whether we are setting up Set Index specific values.
+      IF ( BYSET ) THEN
+         CALL MSG_SETI( 'INDEX', SINDEX )
+         CALL CCD1_MSG( ' ',
+     :   '  Some values are specific to Set Index ^INDEX', STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
       END IF
 
@@ -671,7 +761,10 @@
          GOTNAM = .TRUE.
       END IF
 
-*  Will we seek CCDPACK Set headers?
+*  Will we seek CCDPACK Set headers?  If BYSET is true, then set the
+*  dynamic default to true, since if you are messing around with Sets 
+*  in this program you almost certainly want to be in others.
+      IF ( BYSET ) CALL PAR_DEF0L( 'USESET', BYSET, STATUS )
       CALL PAR_GET0L( 'USESET', USESET, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -682,9 +775,14 @@
 
 *  Report setup as of now.
       CALL CCD1_MSG( ' ', ' ', STATUS )
-      CALL CCD1_MSG( ' ', '  Listing of the current '//
-     :                    'CCDPACK global parameters:',
-     :                    STATUS )
+      IF ( BYSET ) THEN
+         CALL MSG_SETI( 'SINDEX', SINDEX )
+         CALL CCD1_MSG( ' ', '  Listing of the current CCDPACK global'//
+     :                  ' parameters (Set Index ^SINDEX)', STATUS )
+      ELSE
+         CALL CCD1_MSG( ' ', '  Listing of the current CCDPACK global'//
+     :                  ' parameters', STATUS )
+      END IF
       CALL CCD1_MSG( ' ', ' ', STATUS )
       CALL CCD1_RSETU( GOTLG2, LOGTO, GOTLGN, LOGNAM, GOTADC, ADC,
      :                 GOTNOI, RNOISE, GOTEXT, EXTENT, GOTBDS,
@@ -693,6 +791,18 @@
      :                 GOTSVL, SATVAL, GOTPRE, PRESER, GOTGEN, GENVAR,
      :                 GOTNAM, NDFS, GOTSET, USESET, STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
+
+*  Save index-keyed values to Set Index-specific location if necessary.
+      IF ( BYSET ) THEN
+         IF ( GOTADC ) CALL CCD1_KPSV( 'ADC', SINDEX, STATUS )
+         IF ( GOTBDS ) CALL CCD1_KPSV( 'BOUNDS', SINDEX, STATUS )
+         IF ( GOTDEF ) CALL CCD1_KPSV( 'DEFERRED', SINDEX, STATUS )
+         IF ( GOTDIR ) CALL CCD1_KPSV( 'DIRECTION', SINDEX, STATUS )
+         IF ( GOTEXT ) CALL CCD1_KPSV( 'EXTENT', SINDEX, STATUS )
+         IF ( GOTMSK ) CALL CCD1_KPSV( 'MASK', SINDEX, STATUS )
+         IF ( GOTNOI ) CALL CCD1_KPSV( 'RNOISE', SINDEX, STATUS )
+         IF ( GOTSVL ) CALL CCD1_KPSV( 'SATURATION', SINDEX, STATUS )
+      END IF
 
 *  Find out if the user wants to save the setup for future restorations.
       CALL PAR_GET0L( 'SAVE', SAVE, STATUS )
@@ -719,6 +829,9 @@
          CALL MSG_SETC( 'FNAME', LINE )
          CALL CCD1_MSG( ' ', '    ^FNAME', STATUS )
       END IF
+
+*  Error exit label.
+ 99   CONTINUE
 
 *  Close any restoration files.
       IF ( ROPEN ) CALL FIO_CLOSE( FDR, STATUS )

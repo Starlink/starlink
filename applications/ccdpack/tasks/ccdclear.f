@@ -105,8 +105,7 @@
 *     using the CCDSETUP command.
 
 *  Deficiencies:
-*     - Relies on subpar routine call to get global file. Uses direct
-*       HDS calls to erase components.
+*     - Uses direct HDS calls to erase GLOBAL parameter file components.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
@@ -128,6 +127,8 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     26-MAR-2001 (MBT):
 *        Added USESET parameter.
+*     10-MAY-2001 (MBT):
+*        Modified to access parameter values keyed by Set Index values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -141,7 +142,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
-      INCLUDE 'DAT_ERR'          ! HDS and DAT error codes
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Status:
@@ -156,13 +156,11 @@
       PARAMETER ( MAXNAM = 19 )
 
 *  Local Variables:
-      CHARACTER * ( 80 ) FILE    ! Name of global file
-      CHARACTER * ( DAT__SZNAM ) ANAMES( MAXNAM ) ! Actual names of parameters
-      CHARACTER * ( DAT__SZNAM ) ONAMES( MAXNAM ) ! Official names of parameters
+      CHARACTER * ( DAT__SZNAM ) GNAME ! Name of global parameter
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to global file
-      CHARACTER * ( DAT__SZLOC ) NEWLOC ! Locator to object
       CHARACTER * ( DAT__SZNAM ) NAME ! Name of object
-      INTEGER INDEX              ! Index of current object
+      CHARACTER * ( DAT__SZNAM ) PNAMES( MAXNAM ) ! Names of parameters
+      CHARACTER * ( DAT__SZLOC ) SLOC ! Locator to keyed parameters structure
       INTEGER NAMGRP             ! Group of parameter NAMES
       INTEGER I                  ! Loop variable
       INTEGER NMATCH             ! Number of matched characters
@@ -171,28 +169,20 @@
       INTEGER J                  ! Loop variable
       INTEGER K                  ! Loop variable
       INTEGER NCLEAR             ! Number of cleared parameters
+      INTEGER NCOMP              ! Number of components in structure
       INTEGER NNAMES             ! Number of names to clear
-      INTEGER LENFIL             ! Length of ADAM_USER directory
       INTEGER THSMAT             ! Number of matched character this time
       INTEGER NAMLEN             ! Length of name string
       LOGICAL BYNAME             ! If true only named parameters are cleared
       LOGICAL DELET( MAXNAM )    ! Delete parameter ?
-      LOGICAL OK                 ! Flag to control locating loop
-      LOGICAL OPEN               ! Globals file is open
+      LOGICAL ERASED             ! Successfully erased this parameter?
+      LOGICAL THERE              ! Does HDS component exist?
 
 *  Local Data:
-      DATA ONAMES / 'ADC', 'BOUNDS', 'RNOISE', 'MASK', 'DIRECTION',
+      DATA PNAMES / 'ADC', 'BOUNDS', 'RNOISE', 'MASK', 'DIRECTION',
      :              'DEFERRED', 'EXTENT', 'PRESERVE', 'GENVAR',
      :              'NDFNAMES', 'USESET', 'LOGTO', 'LOGFILE', 'FLAT',
      :              'BIAS', 'CAL', 'SATURATE', 'SATURATION', 'SETSAT' /
-      DATA ANAMES / 'CCDPACK_ADC', 'CCDPACK_BOUNDS', 'CCDPACK_RNOISE',
-     :              'CCDPACK_MASK', 'CCDPACK_DIRECT', 'CCDPACK_DEFER',
-     :              'CCDPACK_EXTENT', 'CCDPACK_PRESER',
-     :              'CCDPACK_GENVAR', 'CCDPACK_NDFNAM', 
-     :              'CCDPACK_USESET', 'CCDPACK_LOGTO',
-     :              'CCDPACK_LOGFILE', 'CCDPACK_FLAT',
-     :              'CCDPACK_BIAS', 'CCDPACK_CAL', 'CCDPACK_SATUR',
-     :              'CCDPACK_SATVAL', 'CCDPACK_SETSAT' /
 
 *.
 
@@ -235,7 +225,7 @@
             DO 4 J = 1, MAXNAM
                THSMAT = 0
                DO 5 K = 1, NAMLEN
-                  IF ( NAME( K:K ) .EQ. ONAMES( J )( K:K ) .AND.
+                  IF ( NAME( K:K ) .EQ. PNAMES( J )( K:K ) .AND.
      :                 NAME( K:K ) .NE. ' ' ) THEN
                      THSMAT = THSMAT + 1
                   END IF
@@ -284,104 +274,56 @@
  9       CONTINUE
       END IF
 
-*  Access the name of the global file. Use a SUBPAR call to get the name
-*  of the directory which is defined as ADAM_USER, then append the
-*  GLOBAL name to.
-      OPEN = .FALSE.
-      FILE = ' '
-      CALL SUBPAR_ADMUS( FILE, LENFIL, STATUS )
-      CALL CHR_APPND( 'GLOBAL', FILE, LENFIL )
+*  Get locators for the global parameter file and the keyed parameter
+*  structure.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Initialisation clear of the locators.
-      LOC = ' '
-      NEWLOC = ' '
-
+      CALL CCD1_GPARF( 'UPDATE', .FALSE., LOC, SLOC, STATUS )
+    
 *  Check that it exists.
-      CALL ERR_MARK
-      CALL HDS_OPEN( FILE, 'UPDATE', LOC, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL MSG_SETC( 'FILE', FILE )
+      IF ( LOC .EQ. DAT__NOLOC ) THEN
          CALL CCD1_MSG( ' ',
-     :'  Sorry unable to locate a global parameters file (^FILE)', 
-     :               STATUS )
-         CALL CCD1_MSG( ' ',
-     :'  No parameters cleared', STATUS )
-         CALL ERR_RLSE
+     :'  Sorry unable to locate the GLOBAL parameters file', STATUS )
+         CALL CCD1_MSG( ' ', '  No parameters cleared', STATUS )
          GO TO 99
       END IF
-      CALL ERR_RLSE
-      OPEN = .TRUE.
 
 *  Set number of parameters cleared.
       NCLEAR = 0
 
-*  Loop Locating all objects with name CCDPACK_ something in the
-*  globals file.
-      OK = .TRUE.
-      INDEX = 1
- 2    CONTINUE                   ! Start of 'DO WHILE' loop
-      IF ( OK ) THEN
+*  Loop over parameters which we are to delete.
+      DO I = 1, MAXNAM
+         ERASED = .FALSE.
+         IF ( DELET( I ) ) THEN
 
-*  Find out if an object with this index exists. If so get its name.
-         CALL DAT_INDEX( LOC, INDEX, NEWLOC, STATUS )
-         IF ( STATUS .EQ. DAT__OBJNF ) THEN
-            CALL ERR_ANNUL( STATUS )
-            OK = .FALSE.
-         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+*  Get the name of the corresponding global parameter.
+            CALL CCD1_GPNAM( PNAMES( I ), GNAME, STATUS )
 
-*  Things are still ok get the object name.
-            NAME = ' '
-            CALL DAT_NAME( NEWLOC, NAME, STATUS )
-            NAMLEN = CHR_LEN( NAME )
+*  Erase the global variable if it exists.
+            CALL DAT_THERE( LOC, GNAME, THERE, STATUS )
+            IF ( THERE ) THEN
+               CALL DAT_ERASE( LOC, GNAME, STATUS )
+               ERASED = .TRUE.
+            END IF
 
-*  Can release the locator in preparation for deletion now.
-            CALL DAT_ANNUL( NEWLOC, STATUS )
-            NEWLOC = ' '
-
-*  Check this name against the official list.
-            THSMAT = 0
-            DO 7 I = 1, MAXNAM
-               IF ( NAME( :NAMLEN ) .EQ. ANAMES( I ) ) THEN
-
-*  Ok this is a name we may erase. Are we allowed?
-                  IF ( DELET( I ) ) THEN
-                     THSMAT = I
-                     GO TO 8
-                  END IF
+*  Erase the corresponding variable in the keyed parameters structure if
+*  it exists.
+            IF ( SLOC .NE. DAT__NOLOC ) THEN
+               CALL DAT_THERE( SLOC, PNAMES( I ), THERE, STATUS )
+               IF ( THERE ) THEN
+                  CALL DAT_ERASE( SLOC, PNAMES( I ), STATUS )
+                  ERASED = .TRUE.
                END IF
- 7          CONTINUE
- 8          CONTINUE
+            END IF
 
-*  Only continue is this is a genuine name which we may delete.
-            IF ( THSMAT .NE. 0 ) THEN
-
-*  Erase it. Note that it is erased below the parent object, which is
-*  the file locator in this case.
-               CALL DAT_ERASE( LOC, NAME( :NAMLEN ), STATUS )
-
-*  Issue message showing that this object has been erased.
-               CALL MSG_SETC( 'NAME', ONAMES( THSMAT ) )
+*  Record that this object has been erased.
+            IF ( ERASED .AND. STATUS .EQ. SAI__OK ) THEN
+               CALL MSG_SETC( 'NAME', PNAMES( I ) )
                CALL CCD1_MSG( ' ', '  Parameter ^NAME has been cleared',
      :                        STATUS )
-
-*  Increment count of object cleared.
-               IF ( STATUS .EQ. SAI__OK ) NCLEAR = NCLEAR + 1
-            ELSE
-
-*  Increment for next object. Note that increment only occurs if the
-*  last object has not been deleted. The objects move up the list
-*  if previous ones have been deleted.
-               INDEX = INDEX + 1
+               NCLEAR = NCLEAR + 1
             END IF
-         ELSE
-
-*  Unidentified error - get out.
-            GO TO 99
          END IF
-         GO TO 2
-      END IF
+      END DO
 
 *  If failed to clear any parameters comment on this.
       IF ( NCLEAR .EQ. 0 ) THEN
@@ -390,14 +332,32 @@
      :                       'CCDSHOW to examine their values', STATUS )
       END IF
 
+*  Finally for the sake of tidiness, if the keyed parameters structure
+*  now contains nothing, try to erase it.
+      IF ( SLOC .NE. DAT__NOLOC .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL DAT_NCOMP( SLOC, NCOMP, STATUS )
+         IF ( NCOMP .EQ. 0 ) THEN
+            CALL DAT_ANNUL( SLOC, STATUS )
+            CALL DAT_ERASE( LOC, 'CCDPACK_KEYPARS', STATUS )
+         END IF
+
+*  Any error here is not very important and can be ignored.
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+         END IF
+      END IF
+
 *  Close down section
 99    CONTINUE
 
 *  Release the GRP group of names.
       CALL CCD1_GRDEL( NAMGRP, STATUS )
 
+*  Release the locator for the keyed parameters structure.
+      IF ( SLOC .NE. DAT__NOLOC ) CALL DAT_ANNUL( SLOC, STATUS )
+
 *  Close the globals file.
-      IF ( OPEN ) CALL HDS_CLOSE( LOC, STATUS )
+      IF ( LOC .NE. DAT__NOLOC ) CALL HDS_CLOSE( LOC, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

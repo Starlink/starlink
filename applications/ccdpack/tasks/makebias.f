@@ -185,7 +185,9 @@
 *        will the value associated with this parameter be used.
 *
 *        If a global value has been set up using CCDSETUP this value
-*        will be used, and will be shown as the default.
+*        will be used, and will be shown as the default.  If USESET
+*        is true, a global value specific to each image's Set Index
+*        value will be sought.
 *        [Dynamically derived value]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Used for
@@ -210,6 +212,7 @@
 *     USESET = _LOGICAL (Read)
 *        Whether to use Set header information or not.  If USESET is
 *        false then any Set header information will be ignored.
+*
 *        If USESET is true, then input files will be considered in
 *        groups; a separate master bias frame will be constructed for
 *        each group of corresponding input frames (i.e. those sharing
@@ -280,7 +283,9 @@
 *     USESET) have global values. These global values will always take
 *     precedence, except when an assignment is made on the command line.
 *     Global values may be set and reset using the CCDSETUP and
-*     CCDCLEAR commands.
+*     CCDCLEAR commands.  If USESET is true then a global value
+*     of RNOISE specific to the Set Index of each image will be used
+*     if one is available.
 *
 *     The parameter RNOISE will not be used if the USEEXT parameter is
 *     set TRUE. In this case values will be obtained from the input NDFs
@@ -700,6 +705,10 @@
                END IF
             END IF
             IF ( .NOT. USEEXT ) THEN
+
+*  If we are dealing with a specific Set Index, load the appropriately
+*  keyed value of the global parameter into the GLOBAL parameter file.
+               IF ( USESET ) CALL CCD1_KPLD( 'RNOISE', SINDEX, STATUS )
 
 *  Get a readout noise estimate from the environment. This supercedes
 *  all extension items.

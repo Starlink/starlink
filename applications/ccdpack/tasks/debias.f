@@ -69,7 +69,8 @@
 *        will not be used.
 *
 *        If a global value for this parameter has been set using
-*        CCDSETUP then this will be used.
+*        CCDSETUP then this will be used.  If USESET is true then a
+*        value specific to the Set Index of each image will be sought.
 *        [1.0]
 *     BADBITS = _INTEGER (Read)
 *        If the first input NDF has no quality component, and you have
@@ -103,7 +104,9 @@
 *        which includes any origin offsets within the input NDFs.
 *
 *        If global values for these bounds have been set using
-*        CCDSETUP then those values will be used.
+*        CCDSETUP then those values will be used.  If USESET is true
+*        then a value specific to the Set Index of each image will
+*        be sought.
 *     BOXSIZE( 2 ) = _INTEGER (Read)
 *        The sizes of the sides of the box to be used when smoothing the
 *        bias strips. Only used when CMODE="BOX".
@@ -124,7 +127,8 @@
 *        subtracted from the data.
 *
 *        If a global value for this parameter has been set using
-*        CCDSETUP then this will be used.
+*        CCDSETUP then this will be used.  If USESET is true then a
+*        value specific to the Set Index of each image will be sought.
 *        [0.0]
 *     DIRECTION = LITERAL (Read)
 *        The readout direction of the CCD. This parameter can take
@@ -134,7 +138,8 @@
 *        along the readout direction.
 *
 *        If a global value for this parameter has been set using
-*        CCDSETUP then this will be used.
+*        CCDSETUP then this will be used.  If USESET is true then a
+*        value specific to the Set Index of each image will be sought.
 *        [X]
 *     EXPAND = _LOGICAL (Read)
 *        This value controls whether or not the output data should be
@@ -161,7 +166,8 @@
 *        flatfields whose normalisation could be adversely biased.
 *
 *        If global values for these bounds have been set using
-*        CCDSETUP then those values will be used.
+*        CCDSETUP then those values will be used.  If USESET is true then a
+*        value specific to the Set Index of each image will be sought.
 *     FIXORIGIN = _LOGICAL (Read)
 *        Whether to fix the origins of the output NDFs to 1,1, rather 
 *        than the lower corner as defined by the EXTENT parameter. 
@@ -265,7 +271,8 @@
 *        that no mask is to be applied.
 *
 *        If a global value for this parameter has been set using
-*        CCDSETUP then this will be used.
+*        CCDSETUP then this will be used.   If USESET is true then a
+*        value specific to the Set Index of each image will be sought.
 *
 *        The name of this file may be specified using indirection
 *        through a file.
@@ -330,7 +337,8 @@
 *        estimates.
 *
 *        If a global value has been set using CCDSETUP then this will
-*        be used.
+*        be used.   If USESET is true then a value specific to the 
+*        Set Index of each image will be sought.
 *        [Dynamic default or 1.0]
 *     SATURATE = _LOGICAL (Read)
 *        This parameter controls whether the data are to be processed to
@@ -339,6 +347,10 @@
 *        [FALSE]
 *     SATURATION = _DOUBLE (Read)
 *        The data saturation value. Only used if SATURATE is TRUE.
+*
+*        If a global value has been set using CCDSETUP then this will
+*        be used.   If USESET is true then a value specific to the 
+*        Set Index of each image will be sought.
 *        [1.0D6]
 *     SETBAD = _LOGICAL (Read)
 *        If TRUE then the quality information will be transferred
@@ -514,13 +526,6 @@
 *       NDF are set to ADUs or electrons depending on whether data
 *       expansion has occurred or not. Processing is supported for all
 *       HDS (non-complex) numeric types.
-*
-*     - The MASK parameter, when it refers to an NDF, ought really to
-*       be sensitive to Set header information if USESET is true.
-*       This is currently not implemented because of difficulties
-*       arising from the fact that MASK parameter can be interpreted
-*       as an ARD file, an ARD description or an NDF according to
-*       its value.
 
 *  Notes:
 *     - If the input NDFs have variance components and no variances
@@ -556,9 +561,13 @@
 *     EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
 *     SATURATION, SETSAT and USESET) have global values. These global values
 *     will always take precedence, except when an assignment is made on
-*     the command line.  In general global values may be set and reset
-*     using the CCDSETUP and CCDCLEAR commands, however, the BIAS
-*     parameter may only be set by a run of the application MAKEBIAS.
+*     the command line.  If USESET is true, then global values of some 
+*     of these parameters (ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT,
+*     MASK, RNOISE, SATURATION) specific to the Set Index of each image
+*     will be used if available.  In general global values may be set 
+*     and reset using the CCDSETUP and CCDCLEAR commands, however, 
+*     the BIAS parameter may only be set by a run of the application 
+*     MAKEBIAS.
 *
 *     If the parameter USEEXT is TRUE then the following parameters
 *     are not used: ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT, RNOISE,
@@ -597,6 +606,8 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     14-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
+*     15-MAY-2001 (MBT):
+*        Added Set-specific global parameter values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -632,6 +643,7 @@
       CHARACTER * ( NDF__SZFTP ) DTYPE  ! Full type of input data.
       CHARACTER * ( NDF__SZTYP ) ITYPE  ! Numeric type for processing data.
       CHARACTER * ( NDF__SZTYP ) ITYPEL ! Numeric type for processing data - last loop.
+      CHARACTER * ( GRP__SZNAM ) NAME ! Name from a group
       DOUBLE PRECISION ADC       ! ADC factor
       DOUBLE PRECISION DEFER     ! Deferred zero level
       DOUBLE PRECISION SATVAL    ! Saturation value.
@@ -662,6 +674,7 @@
       INTEGER IPQUAL             ! Pointer to Quality component
       INTEGER IPWRK              ! Pointer to workspace
       INTEGER ISUB               ! Subgroup loop index
+      INTEGER ITOT               ! Total number of NDFs done
       INTEGER IVAL               ! Dummy variable
       INTEGER KEYGRP             ! GRP identifier for subgroup Index values
       INTEGER LBND( 2 )          ! Bounds of Data (lower) input NDF
@@ -682,6 +695,7 @@
       INTEGER PLACE1             ! Place holder for workspace IDOUT.
       INTEGER PLACE2             ! Place holder for workspace
       INTEGER SHIFT( 2 )         ! Shifts to apply to fix origin
+      INTEGER SINDEX             ! Current Set Index value
       INTEGER SUBGRP( CCD1__MXNDF ) ! NDG identifiers for input subgroups
       INTEGER UBND( 2 )          ! Bounds of Data (upper) input NDF
       INTEGER UBNDB( 2 )         ! Bounds of Data (upper) BIAS
@@ -812,6 +826,7 @@
 ************************************************************************
 *  Loop over subgroups performing calculations separately for each one
 ************************************************************************
+      ITOT = 0
       DO ISUB = 1, NSUB
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -819,6 +834,22 @@
          IF ( NSUB .GT. 1 ) THEN
             CALL CCD1_SETHD( KEYGRP, ISUB, 'Debiassing', 'Index',
      :                       STATUS )
+         END IF
+
+*  Get the Set Index value common to this subgroup.
+         IF ( USESET ) THEN
+            CALL GRP_GET( KEYGRP, ISUB, 1, NAME, STATUS )
+            CALL CHR_CTOI( NAME, SINDEX, STATUS )
+
+*  Load in parameter values specific to this subgroup, if they exist.
+            CALL CCD1_KPLD( 'ADC', SINDEX, STATUS )
+            CALL CCD1_KPLD( 'BOUNDS', SINDEX, STATUS )
+            CALL CCD1_KPLD( 'DEFERRED', SINDEX, STATUS )
+            CALL CCD1_KPLD( 'DIRECTION', SINDEX, STATUS )
+            CALL CCD1_KPLD( 'EXTENT', SINDEX, STATUS )
+            CALL CCD1_KPLD( 'MASK', SINDEX, STATUS )
+            CALL CCD1_KPLD( 'RNOISE', SINDEX, STATUS )
+            CALL CCD1_KPLD( 'SATURATION', SINDEX, STATUS )
          END IF
 
 *  Set up the group of input NDFs for this subgroup.
@@ -907,6 +938,9 @@
 *  environment for a parameter value will return the same value.
          DO 99999 INDEX = 1, NNDF
 
+*  Increment the number of NDFs tackled in total so far.
+            ITOT = ITOT + 1
+
 *  Get the identifier of the input NDF.
             CALL NDG_NDFAS( GIDIN, INDEX, 'READ', IDIN, STATUS )
 
@@ -915,8 +949,8 @@
             CALL NDF_MSG( 'CURRENT_NDF', IDIN )
             CALL CCD1_MSG( ' ', '  +++ Processing NDF: ^CURRENT_NDF',
      :                     STATUS )
-            CALL MSG_SETI( 'CURRENT_NUM', INDEX )
-            CALL MSG_SETI( 'MAX_NUM', NNDF )
+            CALL MSG_SETI( 'CURRENT_NUM', ITOT )
+            CALL MSG_SETI( 'MAX_NUM', NTOT )
             CALL CCD1_MSG( ' ', '  (Number ^CURRENT_NUM of ^MAX_NUM)',
      :                     STATUS )
 
@@ -1199,10 +1233,10 @@
 *  processed correctly according to whether it has been zeroed or not.
              CALL CCD1_DEBIA( ITYPE, BAD, GENVAR, USEEXT, IDIN, EL,
      :                        IPIN, IDIM( 1 ), IDIM( 2 ), LBNDC( 1 ),
-     :                        LBNDC( 2 ), IPOUT, GOTBIA, ZEROED,
-     :                        ZEROCK, IPBIAS, HAVBV, IPBVAR, HAVIV,
-     :                        IPOVAR, IPWRK, PRESER, DTYPE,
-     :                        IDSO( NBIAS), ADC, STATUS )
+     :                        LBNDC( 2 ), IPOUT, GOTBIA, ZEROED, 
+     :                        ZEROCK, IPBIAS, HAVBV, IPBVAR, HAVIV, 
+     :                        IPOVAR, IPWRK, PRESER, DTYPE, 
+     :                        IDSO( NBIAS ), ADC, STATUS )
 
 *  Write out the data units, must be ADUs at this stage (unless the user
 *  was perverse enough to scale all the data before passing to CCDPACK).
@@ -1379,7 +1413,7 @@
 *  TRIM SECTION
 ************************************************************************
 *  Get the section extents for the useful output area.
-            CALL CCD1_GTSEC( USEEXT, IDIN, LBND, UBND, LBNDS, UBNDS,
+            CALL CCD1_GTSEC( USEEXT, IDIN, LBND, UBND, LBNDS, UBNDS, 
      :                       EXTSEC, STATUS )
 
 *  Unmap everything in the current output NDF. Some form of conflict

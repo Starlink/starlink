@@ -121,13 +121,10 @@
 *        by these values is drawn.  If TRIM is false, this parameter 
 *        is ignored.
 *
-*        If USEEXT is set, then these values will be sought from the
-*        .MORE.CCDPACK.EXTENT extension of each NDF; this will only
-*        succeed if they have been placed there by running the IMPORT
-*        or PRESENT programs.  If USEEXT is false or there is no
-*        suitable CCDPACK extension then if global values for these
-*        bounds have been set using CCDSETUP those values will be 
-*        used.  Otherwise, they may be given on the command line.
+*        If a global value for this parameter has been set using 
+*        CCDSETUP then that value will be used.  If USESET is true
+*        then a value specific to the Set Index of each image will
+*        be sought.
 *     IN = LITERAL (Read)
 *        A list of the NDFs to be displayed.
 *     IMAGE = _LOGICAL (Read)
@@ -275,9 +272,11 @@
 *     USESET = _LOGICAL (Read)
 *        If the pen colour is being rotated because PENROT is true,
 *        USESET determines whether a new colour is used for each 
-*        individual NDF or each Set.  This parameter is ignored if
-*        PENROT is false, and has no effect if the input NDFs have
-*        no Set header information.
+*        individual NDF or each Set.  If TRIM is true, it allows 
+*        Set-Index-specific values of the EXTENT parameter to be 
+*        used.  This parameter is ignored if PENROT and TRIM are 
+*        false, and has no effect if the input NDFs have no Set header 
+*        information.
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.
@@ -370,8 +369,10 @@
 *     Certain parameters (LOGTO, LOGFILE, USESET and EXTENT) have global
 *     values. These global values will always take precedence, except
 *     when an assignment is made on the command line, or in the case
-*     of EXTENT, if USEEXT is true. Global values may be set and 
-*     reset using the CCDSETUP and CCDCLEAR commands.
+*     of EXTENT, if USEEXT is true.  If USESET is true, a global value
+*     for EXTENT corresponding to the Set Index of each image will be
+*     sought.  Global values may be set and reset using the CCDSETUP 
+*     and CCDCLEAR commands.
 *
 *     The DEVICE parameter also has a global association. This is not
 *     controlled by the usual CCDPACK mechanisms, instead it works in
@@ -440,6 +441,7 @@
       INTEGER FRM                ! AST identifier for a frame
       INTEGER FSET               ! AST identifier for global frameset
       INTEGER GID                ! NDG group identifier for input NDFs
+      INTEGER GOTSEC( CCD1__MXNDF ) ! Set Indices for which we have param values
       INTEGER HICOL              ! Highest colour index available
       INTEGER I                  ! Loop variable
       INTEGER ID                 ! NDF identifier
@@ -450,7 +452,6 @@
       INTEGER IPEN               ! Current pen index
       INTEGER IPIM               ! Pointer to image pixel array
       INTEGER ISET( CCD1__MXNDF ) ! Index of Set for each NDF
-      INTEGER IX                 ! Group search index
       INTEGER IWCS               ! AST identifier for WCS frameset
       INTEGER J                  ! Loop variable
       INTEGER JCOM               ! Index of common frame in global FSET
@@ -463,16 +464,14 @@
       INTEGER LBGCOL             ! Label text background colour
       INTEGER LBND( 2 )          ! Lower bounds of NDF
       INTEGER LBNDS( 2 )         ! Lower bounds of NDF section
-      INTEGER LMGID              ! Labelling mode option GRP identifier
       INTEGER LOCOL              ! Lowest colour index available
-      INTEGER LW                 ! Normal plotting line width
       INTEGER MAP                ! AST identifier for a mapping
       INTEGER MAPICK             ! AST identifier for picked frames mapping
       INTEGER MAPU               ! AST identifier for unit mapping
       INTEGER NAXES              ! Number of axes (dimensions) in a frame
       INTEGER NDIM               ! Number of returned dimensions
       INTEGER NFRM               ! Number of frames in frameset
-      INTEGER NLAB               ! Number of labelling options
+      INTEGER NGOT               ! Number of Set Index values seen
       INTEGER NNDF               ! Number of input NDFs in group
       INTEGER NPEN               ! Number of distinct pens for rotation
       INTEGER NSET               ! Number of distinct Sets in input NDFs
@@ -561,7 +560,6 @@
       DOUBLE PRECISION YPT       ! Y coordinate of text anchor position
       CHARACTER * ( 2 ) JUST     ! Justification for text placement
       CHARACTER * ( 2 ) LABPOS   ! Label positioning
-      CHARACTER * ( 16 ) LABOPT( MAXLAB ) ! Labelling mode strings
       CHARACTER * ( 16 ) LFMT    ! Format string for text labels
       CHARACTER * ( 80 ) BUFFER  ! Line buffer for output
       CHARACTER * ( AST__SZCHR ) DMN ! Current domain for this NDF
@@ -689,7 +687,7 @@
       CALL PAR_GET0L( 'PENROT', PENROT, STATUS )
 
 *  Determine whether we will be rotating pens by Set or by image.
-      IF ( PENROT ) CALL PAR_GET0L( 'USESET', USESET, STATUS )
+      IF ( PENROT .OR. TRIM ) CALL PAR_GET0L( 'USESET', USESET, STATUS )
 
 *  Determine whether we should clear the display device before plotting.
       IF ( IMAGE ) THEN
@@ -705,12 +703,45 @@
 *  display to the defined EXTENT of each NDF, then make sure that
 *  the identifiers only refer to an appropriate NDF section.
       SECTS = .FALSE.
+      NGOT = 0
       DO I = 1, NNDF
+
+*  Get the NDF identifier.
          CALL NDG_NDFAS( GID, I, 'READ', ID, STATUS )
          IF ( TRIM ) THEN 
+
+*  Get the bounds of the NDF.
             CALL NDF_BOUND( ID, 2, LBND, UBND, NDIM, STATUS )
-            CALL CCD1_GTSEC( USEEXT, ID, LBND, UBND, LBNDS, UBNDS,
+
+*  If using Sets, we may have to set up the parameter system to retrieve
+*  the value of the EXTENT parameter keyed to the Set Index value of
+*  this NDF (using CCD1_KPLD).  Ensure however that we only do this 
+*  the first time we try to get the value for each Set Index.
+            IF ( USESET ) THEN
+               CALL CCD1_SETRD( ID, AST__NULL, SNAME, SINDEX, JSET,
+     :                          STATUS )
+               DO J = 1, NGOT
+                  IF ( GOTSEC( J ) .EQ. SINDEX ) GO TO 1
+               END DO
+               CALL CCD1_KPLD( 'EXTENT', SINDEX, STATUS )
+               NGOT = NGOT + 1
+               IF ( NGOT .GT. CCD1__MXNDF ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( 'DRAWNDF_MAXMEMB', 
+     :'DRAWNDF: Too many distinct Set Index values', STATUS )
+                  GO TO 99
+               END IF
+               GOTSEC( NGOT ) = SINDEX
+ 1             CONTINUE
+            END IF
+
+*  Get the value of the EXTENT.
+            CALL CCD1_GTSEC( USEEXT, ID, LBND, UBND, LBNDS, UBNDS, 
      :                       EXTSEC, STATUS )
+
+*  If this represents a non-complete subset of the NDF, then get an
+*  identifier for the indicated NDF Section, and discard the identifier
+*  for the complete NDF.
             IF ( LBND( 1 ) .NE. LBNDS( 1 ) .OR. 
      :           LBND( 2 ) .NE. LBNDS( 2 ) .OR.
      :           UBND( 1 ) .NE. UBNDS( 1 ) .OR.
@@ -718,6 +749,8 @@
                SECTS = .TRUE.
                CALL NDF_SECT( ID, 2, LBNDS, UBNDS, INDFS( I ), STATUS )
                CALL NDF_ANNUL( ID, STATUS )
+
+*  Otherwise we can just use the NDF identifier itself.
             ELSE
                INDFS( I ) = ID
             END IF
