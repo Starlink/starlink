@@ -44,9 +44,10 @@ class InputByteStreamError : public DviError {
 class InputByteStream {
  public:
     InputByteStream (string& s, bool preload=false, string tryext="");
+    InputByteStream(int fileno);
     ~InputByteStream();
     bool eof();
-    Byte getByte(int n=1);
+    Byte getByte(void);
     signed int getSIU(int);
     signed int getSIS(int);
     unsigned int getUIU(int);
@@ -74,6 +75,7 @@ class InputByteStream {
     Byte *eob_;			// end of buffer
     bool eof_;
     const bool preloaded_;
+    const bool seekable_;
     void read_buf_(void);
 
     static verbosities verbosity_;
