@@ -1919,6 +1919,8 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] Generating /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs/stylesheet.css...
+  [javadoc] Note: Custom tags that could override future standard tags:  @example. To avoid potential overrides, use at least one period character (.) in custom tag names.
      [echo] Executing Treeview target: javadocs
 
 prepare:
@@ -2773,4 +2775,4 @@ javadocs:
   [javadoc] 204 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 16 seconds
+Total time: 3 minutes 15 seconds

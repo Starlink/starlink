@@ -8727,11 +8727,13 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/JDBCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/join
+U java/source/table/src/main/uk/ac/starlink/table/join/AbstractCartesianMatchEngine.java
+U java/source/table/src/main/uk/ac/starlink/table/join/AnisotropicCartesianMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/BinContents.java
-U java/source/table/src/main/uk/ac/starlink/table/join/CartesianMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/CombinedMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/EqualsMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/HTMMatchEngine.java
+U java/source/table/src/main/uk/ac/starlink/table/join/IsotropicCartesianMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/MatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/MatchStarTables.java
 U java/source/table/src/main/uk/ac/starlink/table/join/NullProgressIndicator.java
@@ -9030,6 +9032,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/DocNames.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/Heading.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/HtmlDoclet.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/MemberDoclet.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/XmlDoclet.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/func
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Arithmetic.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Conversions.java
@@ -9038,6 +9041,9 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Maths.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Output.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sdss.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Strings.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/TwoQZ.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/package.html
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/InterMatchSpec.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/IntraMatchSpec.java
@@ -9048,6 +9054,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/join/OutputRequirements.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterEditor.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterPanel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/TupleSelector.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ValueConverter.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/plot
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/BlobPanel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/DumbPlotSurface.java
@@ -9147,6 +9154,8 @@ U java/source/topcat/src/testcases/uk/ac/starlink/topcat/HelpTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/LinkChecker.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/MethodDocTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/ResourceTest.java
+cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink/topcat/func
+U java/source/topcat/src/testcases/uk/ac/starlink/topcat/func/FuncTest.java
 cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink/topcat/plot
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/plot/MarkerTest.java
 cvs checkout: Updating java/source/treeview
