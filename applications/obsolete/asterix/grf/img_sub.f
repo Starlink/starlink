@@ -4238,20 +4238,30 @@ c        REAL XX,XP,YP
           CALL MSG_PRNT(' ')
           XC=I_X
           YC=I_Y
-          CALL MSG_SETR('XC',XC)
-          CALL MSG_SETR('YC',YC)
-          CALL MSG_PRNT('Select centre/^XC,^YC/...')
-          CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
-          IF (CH.EQ.CHAR(13)) THEN
-            XC=I_X
-            YC=I_Y
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select centre...')
+            CALL IMG_GUICURS(XC,YC,STATUS)
+          ELSE
+            CALL MSG_SETR('XC',XC)
+            CALL MSG_SETR('YC',YC)
+            CALL MSG_PRNT('Select centre/^XC,^YC/...')
+            CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
+            IF (CH.EQ.CHAR(13)) THEN
+              XC=I_X
+              YC=I_Y
+            ENDIF
           ENDIF
+
           CALL PGPOINT(1,XC,YC,2)
 
           CALL MSG_PRNT('Select any corner...')
           XCORN=XC
           YCORN=YC
-          CALL GFX_CURS(XCORN,YCORN,LEFT,RIGHT,CH,STATUS)
+          IF (I_GUI) THEN
+            CALL IMG_GUICURS(XCORN,YCORN,STATUS)
+          ELSE
+            CALL GFX_CURS(XCORN,YCORN,LEFT,RIGHT,CH,STATUS)
+          ENDIF
 
 *  calculate box half-widths
           DX=ABS(XCORN-XC)
@@ -4333,14 +4343,20 @@ c      REAL HWID
           CALL MSG_PRNT(' ')
           XCENT=I_X
           YCENT=I_Y
-          CALL MSG_SETR('X',XCENT)
-          CALL MSG_SETR('Y',YCENT)
-          CALL MSG_PRNT('Select centre/^X,^Y/...')
-          CALL GFX_CURS(XCENT,YCENT,LEFT,RIGHT,CH,STATUS)
-          IF (CH.EQ.CHAR(13).OR.RIGHT) THEN
-            XCENT=I_X
-            YCENT=I_Y
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select centre...')
+            CALL IMG_GUICURS(XCENT,YCENT,STATUS)
+          ELSE
+            CALL MSG_SETR('X',XCENT)
+            CALL MSG_SETR('Y',YCENT)
+            CALL MSG_PRNT('Select centre/^X,^Y/...')
+            CALL GFX_CURS(XCENT,YCENT,LEFT,RIGHT,CH,STATUS)
+            IF (CH.EQ.CHAR(13).OR.RIGHT) THEN
+              XCENT=I_X
+              YCENT=I_Y
+            ENDIF
           ENDIF
+
           CALL PGPOINT(1,XCENT,YCENT,2)
           CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
 
@@ -4348,7 +4364,12 @@ c      REAL HWID
           CALL MSG_PRNT('Select end...')
           XEND=XCENT
           YEND=YCENT
-          CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
+          IF (I_GUI) THEN
+            CALL IMG_GUICURS(STATUS)
+          ELSE
+            CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
+          ENDIF
+
           CALL PGPOINT(1,XEND,YEND,2)
           CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
 
@@ -4366,7 +4387,12 @@ c      REAL HWID
           CALL MSG_PRNT('Select width...')
           XWID=XCENT
           YWID=YCENT
-          CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
+          IF (I_GUI) THEN
+            CALL IMG_GUICURS(XWID,YWID,STATUS)
+          ELSE
+            CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
+          ENDIF
+
           CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
 
 *  calc length
@@ -4659,26 +4685,39 @@ c      REAL HWID
           XC=I_X
           YC=I_Y
           CALL MSG_PRNT(' ')
-          CALL MSG_SETR('XC',XC)
-          CALL MSG_SETR('YC',YC)
-          CALL MSG_PRNT('Select centre/^XC,^YC/...')
-          CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
-          IF (CH.EQ.CHAR(13)) THEN
-            XC=I_X
-            YC=I_Y
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select centre...')
+            CALL IMG_GUICURS(XC,YC,STATUS)
+          ELSE
+            CALL MSG_SETR('XC',XC)
+            CALL MSG_SETR('YC',YC)
+            CALL MSG_PRNT('Select centre/^XC,^YC/...')
+            CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
+            IF (CH.EQ.CHAR(13)) THEN
+              XC=I_X
+              YC=I_Y
+            ENDIF
           ENDIF
+
           CALL PGPOINT(1,XC,YC,2)
 
 *  get radius
-          CALL MSG_SETR('RAD',I_R)
-          CALL MSG_PRNT('Select radius/^RAD/...')
           XR=XC
           YR=YC
-          CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
-          IF (CH.EQ.CHAR(13)) THEN
-            RAD=I_R
-          ELSE
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select radius...')
+            CALL IMG_GUICURS(XR,YR,STATUS)
             RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+          ELSE
+            CALL MSG_SETR('RAD',I_R)
+            CALL MSG_PRNT('Select radius/^RAD/...')
+            CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
+            IF (CH.EQ.CHAR(13)) THEN
+              RAD=I_R
+            ELSE
+              RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+            ENDIF
+
           ENDIF
 
 *  keyboard mode
@@ -4737,40 +4776,60 @@ c      REAL HWID
 *  get centre
           XC=I_X
           YC=I_Y
-          CALL MSG_PRNT(' ')
-          CALL MSG_SETR('XC',XC)
-          CALL MSG_SETR('YC',YC)
-          CALL MSG_PRNT('Select centre/^XC,^YC/...')
-          CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
-          IF (CH.EQ.CHAR(13)) THEN
-            XC=I_X
-            YC=I_Y
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select centre...')
+            CALL IMG_GUICURS(XC,YC,STATUS)
+          ELSE
+            CALL MSG_PRNT(' ')
+            CALL MSG_SETR('XC',XC)
+            CALL MSG_SETR('YC',YC)
+            CALL MSG_PRNT('Select centre/^XC,^YC/...')
+            CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
+            IF (CH.EQ.CHAR(13)) THEN
+              XC=I_X
+              YC=I_Y
+            ENDIF
           ENDIF
+
           CALL PGPOINT(1,XC,YC,2)
 
 *  get radii
-          CALL MSG_SETR('RAD',I_R)
-          CALL MSG_PRNT('Select inner radius/^RAD/...')
-          XR=XC
-          YR=YC
-          CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
-          IF (CH.EQ.CHAR(13)) THEN
-            IRAD=I_R
-          ELSE
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select inner radius...')
+            CALL IMG_GUICURS(XR,YR,STATUS)
             IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+          ELSE
+            CALL MSG_SETR('RAD',I_R)
+            CALL MSG_PRNT('Select inner radius/^RAD/...')
+            XR=XC
+            YR=YC
+            CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
+            IF (CH.EQ.CHAR(13)) THEN
+              IRAD=I_R
+            ELSE
+              IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+            ENDIF
           ENDIF
+
           CALL IMG_CIRCLE(XC,YC,IRAD,STATUS)
 
-          CALL MSG_SETR('RAD',I_R)
-          CALL MSG_PRNT('Select outer radius/^RAD/...')
-          XR=XC
-          YR=YC
-          CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
-          IF (CH.EQ.CHAR(13)) THEN
-            ORAD=I_R
-          ELSE
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select outer radius...')
+            CALL IMG_GUICURS(XR,YR,STATUS)
             ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+          ELSE
+            CALL MSG_SETR('RAD',I_R)
+            CALL MSG_PRNT('Select outer radius/^RAD/...')
+            XR=XC
+            YR=YC
+            CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
+            IF (CH.EQ.CHAR(13)) THEN
+              ORAD=I_R
+            ELSE
+              ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+            ENDIF
           ENDIF
+
           CALL IMG_CIRCLE(XC,YC,ORAD,STATUS)
 
 *  keyboard mode
