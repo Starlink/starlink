@@ -1,3 +1,5 @@
+// $Id$
+
 #include <string>
 #include "BitmapImage.h"
 #include "GIFBitmap.h"
