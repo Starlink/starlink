@@ -257,8 +257,6 @@
           END IF
         END IF
 
-        END IF
-
       END IF
 
 *  Default dead time correction
