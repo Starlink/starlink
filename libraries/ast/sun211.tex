@@ -14950,7 +14950,7 @@ Object            - Base class for all AST Objects
          for which resampled values should be produced. This region
          should lie wholly within the extent of the output grid (as
          defined by the {\tt{"}}lbnd\_out{\tt{"}} and {\tt{"}}ubnd\_out{\tt{"}} arrays). Regions of
-         the output grid lying ouside this region will not be
+         the output grid lying outside this region will not be
          modified.
       }
       \sstsubsection{
@@ -15156,7 +15156,32 @@ Object            - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
-         AST\_\_SINC:
+         AST\_\_SINC: This scheme uses the sinc(x) kernel, which
+         sometimes features as an {\tt{"}}optimal{\tt{"}} interpolation kernel in books
+         on image processing. Its supposed optimality depends on the
+         assumption that the data are band-limited (i.e. have no spatial
+         frequencies above a certain value) and adequately sampled. In
+         practice, astronomical data rarely meet these requirements. In
+         addition, high spatial frequencies are often present due to
+         (e.g.) image defects and cosmic ray events. Consequently,
+         substantial ringing can be experienced with this kernel. The
+         sinc(x) function also decays slowly with distance, so that many
+         surrounding pixels are required, causing poor performance.
+         Abruptly truncating the kernel (by using only a few neighbouring
+         pixels) improves performance and may reduce ringing, but a more
+         gradual truncation (as implemented by other kernels) is
+         generally to be preferred. This kernel is provided mainly so
+         that you can convince yourself not to use it!
+
+         \sstitem
+         AST\_\_SINCSINC: This scheme uses a rather better kernel, of the
+         form sinc(x).sinc(x/2) and uses only two neighbouring pixels on
+         each side of the interpolation point (the {\tt{"}}params{\tt{"}} array is
+         therefore not used).  This is sometimes known as the Lanczos
+         kernel. It is a good general-purpose scheme, intermediate in its
+         visual effect on images between the AST\_\_NEAREST and AST\_\_LINEAR
+         cases. Although the kernel is slightly oscillatory, ringing
+         is adequately suppressed if the data are well sampled.
 
       }
       Finally, supplying the following values for {\tt{"}}interp{\tt{"}} allows you
@@ -16771,7 +16796,7 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          value
       }{
-         Pointer to a double to receive the calculated kernal value,
+         Pointer to a double to receive the calculated kernel value,
          which may be positive or negative.
       }
    }
