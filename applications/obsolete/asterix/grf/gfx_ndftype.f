@@ -1,5 +1,5 @@
 *+  GFX_NDFTYPE - determines type of graph data in HDS/NDF form
-      SUBROUTINE GFX_NDFTYPE(LOC,STATUS)
+      SUBROUTINE GFX_NDFTYPE(ID,STATUS)
 
 *    Description :
 *    Parameters :
@@ -14,9 +14,10 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER			ID
 *    Import-export :
 *    Export :
 *    Status :
@@ -25,13 +26,13 @@
       INCLUDE 'GFX_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZTYP) TYPE       ! object type
-      INTEGER DIMS(DAT__MXDIM)          ! dimensions
-      INTEGER NDIM                      ! dimensionality
-      LOGICAL DOK			! DATA_ARRAY has values
-      LOGICAL OK
-*    Internal References :
-*    Local data :
+      CHARACTER*20		TYPE       		! Dataset type
+
+      INTEGER 			DIMS(ADI__MXDIM)        ! Dimensions
+      INTEGER 			NDIM                    ! Dimensionality
+
+      LOGICAL 			DOK			! Primary data is ok?
+      LOGICAL 			OK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -49,7 +50,8 @@
         OK=.FALSE.
 
 *  see what kind of NDF
-        CALL BDA_CHKDATA(LOC,DOK,NDIM,DIMS,STATUS)
+        CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
+        CALL BDI_CHK( ID, 'Data', DOK, STATUS )
 
         IF (DOK) THEN
           IF (NDIM.EQ.1) THEN
@@ -58,18 +60,22 @@
             OK=.TRUE.
           ELSEIF (NDIM.EQ.2) THEN
 *  see if 1D set stored in 2D array
-            CALL DAT_TYPE(LOC,TYPE,STATUS)
-            IF (INDEX(TYPE,'_SET').NE.0.OR.
+            CALL ADI_CGET0C( ID, 'DatasetType', TYPE, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+              CALL ERR_ANNUL( STATUS )
+              G_NDF2=.TRUE.
+              OK=.TRUE.
+            ELSE IF (INDEX(TYPE,'_SET').NE.0.OR.
      :            INDEX(TYPE,'_SERIES').NE.0) THEN
               G_1DSET=.TRUE.
               OK=.TRUE.
-            ELSEIF (TYPE.EQ.'COLOUR_INDEX') THEN
+            ELSE IF (TYPE.EQ.'COLOUR_INDEX') THEN
               G_CINDEX=.TRUE.
               OK=.TRUE.
             ELSE
               G_NDF2=.TRUE.
               OK=.TRUE.
-            ENDIF
+            END IF
           ELSE
             CALL MSG_PRNT(
      :       'AST_ERR:data have dimensions >2 and cannot be drawn')
@@ -87,9 +93,8 @@
           STATUS=SAI__OK
         ENDIF
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_NDFTYPE',STATUS)
+          CALL AST_REXIT('GFX_NDFTYPE',STATUS)
         ENDIF
 
       ENDIF
