@@ -1,3 +1,9 @@
+2001-04-09  Tim Jenness  <timj@jach.hawaii.edu>
+
+	********** V1.6-7 ***************
+	
+	* starlink/makefile: Version now 1.6-7
+
 2001-03-30  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* sculib/sculib_j_theoretical.f (SCULIB_J_THEORETICAL): X_G is
