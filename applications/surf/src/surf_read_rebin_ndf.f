@@ -1,7 +1,7 @@
       SUBROUTINE SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
      :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
      :     N_BOL, N_POS, N_INTS, N_BEAMS, MJD_STANDARD, IN_UT1,
-     :     OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
+     :     OUT_RA_CEN, OUT_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -20,7 +20,7 @@
 *      CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
 *     :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
 *     :     N_BOL, N_POS, N_INTS, N_BEAMS, MJD_STANDARD, IN_UT1,
-*     :     OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
+*     :     OUT_RA_CEN, OUT_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
 *     :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -73,6 +73,10 @@
 *        RA of centre
 *     IN_DEC_CEN = DOUBLE (Returned)
 *        Dec of centre
+*     FITS ( SCUBA_MAX_FITS ) = CHARACTER *80 (Returned)
+*        FITS header entries
+*     N_FITS = INTEGER (Returned)
+*        Number of FITS entries
 *     WAVELENGTH = REAL (Given & Returned)
 *        Wavelength of map
 *     SUB_INSTRUMENT = CHAR (Given & Returned)
@@ -134,6 +138,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.15  1998/04/28 20:03:12  timj
+*     Return the FITS array.
+*
 *     Revision 1.14  1998/04/28 02:22:24  timj
 *     Add BOLWT
 *
@@ -196,11 +203,13 @@
       REAL             BOLWT( SCUBA__NUM_CHAN * SCUBA__NUM_ADC )
       INTEGER          DATA_END
       INTEGER          DATA_PTR
+      CHARACTER*(80)   FITS (SCUBA__MAX_FITS)
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
       DOUBLE PRECISION IN_UT1
       INTEGER          LST_PTR( 2 )
       INTEGER          N_BOL
       INTEGER          N_FILE
+      INTEGER          N_FITS
       INTEGER          N_INTS
       INTEGER          N_POS
       DOUBLE PRECISION OUT_RA_CEN
@@ -241,8 +250,6 @@
       INTEGER          FILE_QUALITY_PTR ! pointer to quality array in input file
       INTEGER          FILE_VARIANCE_PTR
                                        ! pointer to variance array in input file
-      CHARACTER*80     FITS (SCUBA__MAX_FITS) 
-                                       ! FITS array
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
       INTEGER          I               ! DO loop index
@@ -316,7 +323,6 @@
                                        ! file
       INTEGER          N_EXPOSURES     ! number of exposures per integration
                                        ! in input file
-      INTEGER          N_FITS          ! number of items in FITS array
       INTEGER          N_INTEGRATIONS  ! number of integrations per measurement
                                        ! in input file
       INTEGER          N_MEASUREMENTS  ! number of measurements in input file
