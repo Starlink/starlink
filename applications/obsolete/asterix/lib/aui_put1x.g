@@ -128,6 +128,10 @@
 *  Invoke method
       CALL ADI_EXEC( 'WriteAux', 3, ARGS, OARG, STATUS )
 
+*  Destroy temporary objects
+      CALL ADI_ERASE( ARGS(2), STATUS )
+      CALL ADI_ERASE( ARGS(3), STATUS )
+
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'AUI_PUT0<T>', STATUS )
 
