@@ -3,8 +3,8 @@
 # grfont.dat and rgb.txt are not actually programs but they still need to
 # go into bin/
 
-noinst_LIBRARIES = libpgplot_drivers.a
-libpgplot_drivers_a_SOURCES = $(F_ROUTINES) $C(ROUTINES)
+noinst_LTLIBRARIES = libpgplot_drivers.la
+libpgplot_drivers_la_SOURCES = $(F_ROUTINES) $C(ROUTINES)
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
