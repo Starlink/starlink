@@ -509,8 +509,7 @@ typedef struct
 /*----- customize */
   double	mama_corflex;
   int		fitsunsigned_flag;			/* Force unsign FITS */
-
-  double        mu_rad[3];                              /* Radii threshold*/
+  double        mu_rad[NRAD];
   }	prefstruct;
 
 

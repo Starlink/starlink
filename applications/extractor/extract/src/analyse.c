@@ -62,6 +62,7 @@ Ex:
 compute_myparams(obj); 
 
 */
+  userradii(field, dfield, obj, objlist->plist);
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 

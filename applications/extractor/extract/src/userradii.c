@@ -14,6 +14,11 @@
  *        Original version.
  *- 
  */
+
+#include <math.h>
+#include "define.h"
+#include "globals.h"
+#include "plist.h"
 #include "userradii.h"
 
 void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
@@ -24,9 +29,10 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
    PIXTYPE      threshs[NRAD];
    double       dval;
    float        *mu_rad;
+   int          i;
 
    /*  If these measurements are required */
-   if ( FLAG(obj.mu_rad[0]) ) {
+   /*if ( FLAG(obj.mu_rad[0]) ) {*/
  
       /*  Measurement and detection images may be same */
       if ( ! dfield ) {
@@ -35,13 +41,13 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
       for ( i=0; i < NRAD; i++ ) {
 
          /*  Correct for zero point of surface brightness */
-         dval = prefs.radthresh[0] - prefs.radthresh[1];
+         dval = prefs.mu_rad[0] - prefs.mu_rad[1];
          
          /*  And generate threshold intensities */
          for( i = 0; i < NRAD; i++ ) {
             threshs[i] = dfield->pixscale * dfield->pixscale * 
                pow( 10.0, -0.4 * dval );
-            dval += prefs.radthresh[2]; /*  Increment to next
+            dval += prefs.mu_rad[2]; /*  Increment to next
                                             threshold */
             fprintf( stdout, "Threshold(%d) = %f\n", i, threshs[i] );
          }
@@ -50,7 +56,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
       /*  If image intensities are photographic */
       if ( prefs.detect_type == PHOTO ) {
          for( i = 0; i < NRAD; i++ ) {
-            threshs[i] = exp( threshs[i] / ngamma );
+            threshs[i] = exp( threshs[i] / field->ngamma );
             fprintf( stdout, "Photo threshold(%d) = %f\n", i, threshs[i] );
          }
       }
@@ -69,8 +75,8 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
 
       /*  Convert counts into radii */
       for( i = 0, mu_rad = obj->mu_rad; i < NRAD; i++ ) {
-         mu_rad = sqrt( mu_rad / PI );
+         *mu_rad = sqrt( *mu_rad / PI );
          mu_rad++;
       }      
-   }
+      /*}*/
 }
