@@ -57,11 +57,16 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     2-APR-1998 (DSB):
 *        Original version.
+*     5-MAY-1999 (TDCA):
+*        If an attempt is made to remove the Base Frame, WCSREMOVE now 
+*        refuses and continues to remove any other specified frames,
+*        rather than simply reporting an error.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -143,34 +148,32 @@
 *  Check each index in this range.
          DO IFRM = FIRST, LAST
 
-*  Report an error if an attempt is made to remove the Base (GRID) Frame.
+*  Politely refuse if an attempt is made to remove the Base (GRID) Frame.
             IF( IFRM .EQ. IBASE ) THEN
-               IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI( 'BASE', IBASE ) 
-                  CALL ERR_REP( 'WCSREMOVE_1', 'Cannot remove the '//
-     :                          'Base Frame (Frame ^BASE) from an NDF.',
-     :                          STATUS )
-               END IF
-               GO TO 999
-            END IF
-
+               CALL MSG_BLANK( STATUS )
+               CALL NDF_MSG( 'NDF', INDF )
+               CALL MSG_OUT( 'WCSREMOVE_1', '   Attempt to remove '//
+     :                       'Base Frame of ''^NDF'' ignored.', STATUS )
+            ELSE
+            
 *  Add the Frame index into a list of indices. Report an error if the
 *  list is full.
-            NGIVE = NGIVE + 1
-            IF( NGIVE .LE. MXGIVE ) THEN
-               GIVEN( NGIVE ) = IFRM
+               NGIVE = NGIVE + 1
+               IF( NGIVE .LE. MXGIVE ) THEN
+                  GIVEN( NGIVE ) = IFRM
 
-            ELSE 
+               ELSE 
 
-               IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI( 'N', MXGIVE ) 
-                  CALL ERR_REP( 'WCSREMOVE_2', 'Too many Frame '//
+                  IF( STATUS .EQ. SAI__OK ) THEN
+                     STATUS = SAI__ERROR
+                     CALL MSG_SETI( 'N', MXGIVE ) 
+                     CALL ERR_REP( 'WCSREMOVE_2', 'Too many Frame '//
      :                          'indices given. Can only handle up '//
      :                          'to ^N.', STATUS )
+                  END IF
+                  GO TO 999
+
                END IF
-               GO TO 999
 
             END IF
 
@@ -179,7 +182,8 @@
       END DO
 
 *  Sort the Frame indices into ascending order.
-      CALL KPG1_QSRTI( NGIVE, 1, NGIVE, GIVEN, STATUS )
+      IF( NGIVE .GT. 1 ) CALL KPG1_QSRTI( NGIVE, 1, NGIVE, GIVEN, 
+     :                                    STATUS )
 
 *  Initialise the number of Frames removed so far.
       NGONE = 0
@@ -213,17 +217,22 @@
       END DO
 
 *  Save a copy of the modified FrameSet in the NDF's WCS  component.
-      CALL NDF_PTWCS( IWCS, INDF, STATUS )
+      IF( NGONE .GT. 0 ) CALL NDF_PTWCS( IWCS, INDF, STATUS )
 
 *  Report how many Frames were removed.
       CALL MSG_BLANK( STATUS )
       CALL NDF_MSG( 'NDF', INDF )
-      IF ( NGONE .EQ. 1 ) THEN
-         CALL MSG_OUT( 'WCSREMOVE_3', '   One WCS Frame has been '//
+      IF ( NGONE .EQ. 0 ) THEN
+         CALL MSG_OUT( 'WCSREMOVE_3', '   No WCS Frames have been '//
      :                 'removed from ''^NDF''.', STATUS )
+
+      ELSE IF ( NGONE .EQ. 1 ) THEN
+         CALL MSG_OUT( 'WCSREMOVE_4', '   One WCS Frame has been '//
+     :                 'removed from ''^NDF''.', STATUS )
+
       ELSE
          CALL MSG_SETI( 'NGONE', NGONE )
-         CALL MSG_OUT( 'WCSREMOVE_4', '   ^NGONE WCS Frames have been'//
+         CALL MSG_OUT( 'WCSREMOVE_5', '   ^NGONE WCS Frames have been'//
      :                 ' removed from ''^NDF''.', STATUS )
       END IF
       CALL MSG_BLANK( STATUS )
