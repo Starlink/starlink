@@ -2,29 +2,42 @@
 
 test -n "$PERLBIN" || exit 1
 
-# This Perl script writes its output to a temporary file `t6report',
+# This Perl script writes its output to a temporary file,
 # which we cat to stdout at the end.  A more obvious thing to do is to 
 # simply have the script writing to stdout, but this fails in a
 # bizarre fashion: the script below works OK when stdout is a
 # terminal, but stdout is redirected, the output from the first query
 # (down to the definition of $puss) is _duplicated_ on stdout. 
-# I don't understand this one bit.
+# I don't understand this one tiny bit.
 
-export AUTOASTROM_DIR=$PWD/..
+AUTOASTROM_DIR=`cd ..; echo $PWD`;	export AUTOASTROM_DIR
+TESTDIR=$PWD;				export TESTDIR
+# Name the report file t<number>*.tmp, so it's deleted by the driver at the end
+REPORTFILE=t6.report.tmp;		export REPORTFILE
+
 
 $PERLBIN -w <<'EOD'
 use lib '..';
 use Moggy;
 
-open (REPORT, '>t6report') || die "Can't open REPORT";
+$TestDir = $ENV{TESTDIR};
+$ReportFile = $ENV{REPORTFILE};
+print STDERR "TestDir=$TestDir  ReportFile=$ReportFile\n";
 
-$cat = Moggy->new('dummy@home',
-  'file:///home/norman/s/src/astrom/w/autoastrom/moggy/test/local.config');
+open (REPORT, ">$ReportFile") || die "Can't open file $ReportFile to write";
+
+
+$cat = Moggy->new('dummy@home', "file://$TestDir/local.config");
 $cat->radius("10");
 $cat->maxrow('10');
 $cat->point('17:27:9.5',     ' 74 : 20 : 8');
 
-$cat->status_ok() || die "Calling new and setting parameters failed";
+unless ($cat->status_ok()) {
+    print STDERR "(cat) Calling new and setting parameters failed\n";
+    print STDERR "    Failed command: " . $cat->failed_command() . "\n";
+    print STDERR "    Message: " . $cat->current_statusmessage() . "\n";
+    exit 1;
+}
 
 print REPORT "Moggy catname: ", $cat->catname(), "\n";
 print REPORT "  Point      : ";
@@ -56,6 +69,7 @@ for ($i = 0; $i<$nrows; $i++) {
     print REPORT "\n";
 }
 
+
 $puss = $cat->new('usno@eso');
 #$puss = Moggy->new('usno@eso');
 #$puss = Moggy->new('dummy@home',
@@ -64,8 +78,14 @@ $puss->point(' 17 ',' 27 ',' 9.5 ','     74','20','8');
 $puss->otherpoint('17:37:9.5', "74: 20 : 8");
 $puss->searchtype('box');
 $puss->maxrow('20');
+$puss->columns('ALL');
 
-$puss->status_ok() || die "Calling new and setting parameters failed";
+unless ($puss->status_ok()) {
+    print STDERR "(puss) Calling new and setting parameters failed\n";
+    print STDERR "    Failed command: " . $puss->failed_command() . "\n";
+    print STDERR "    Message: " . $puss->current_statusmessage() . "\n";
+    exit 1;
+}
 
 print REPORT "\n\nMoggy catname: ", $puss->catname(), "\n";
 print REPORT "  Point      : ";
@@ -102,14 +122,254 @@ for ($i = 0; $i<$nrows; $i++) {
 }
 
 
+$felix = Moggy->new ('dummy@home', "file://$TestDir/local.config");
+#$felix->debug("asthandler moggy");
+@felixframeset = (
+    "Begin FrameSet",
+    "Nframe = 4",
+    "Currnt = 4",
+    "Nnode = 5",
+    "Nod1 = 3",
+    "Nod2 = 4",
+    "Nod3 = 5",
+    "Nod4 = 2",
+    "Lnk2 = 1",
+    "Lnk3 = 1",
+    "Lnk4 = 1",
+    "Lnk5 = 1",
+    "Frm1 =",
+    "Begin Frame",
+    "Title = \"Data grid indices; first pixel at (1,1)\"",
+    "Naxes = 2",
+    "Domain = \"GRID\"",
+    "Ax1 =",
+    "Begin Axis",
+    "Label = \"Data grid index 1\"",
+    "Symbol = \"g1\"",
+    "Unit = \"pixel\"",
+    "Format = \"%3.1f\"",
+    "End Axis",
+    "Ax2 =",
+    "Begin Axis",
+    "Label = \"Data grid index 2\"",
+    "Symbol = \"g2\"",
+    "Unit = \"pixel\"",
+    "Format = \"%3.1f\"",
+    "End Axis",
+    "End Frame",
+    "Frm2 =",
+    "Begin Frame",
+    "Title = \"Pixel coordinates; first pixel at (0.5,0.5)\"",
+    "Naxes = 2",
+    "Domain = \"PIXEL\"",
+    "Ax1 =",
+    "Begin Axis",
+    "Label = \"Pixel coordinate 1\"",
+    "Symbol = \"p1\"",
+    "Unit = \"pixel\"",
+    "Format = \"%3.1f\"",
+    "End Axis",
+    "Ax2 =",
+    "Begin Axis",
+    "Label = \"Pixel coordinate 2\"",
+    "Symbol = \"p2\"",
+    "Unit = \"pixel\"",
+    "Format = \"%3.1f\"",
+    "End Axis",
+    "End Frame",
+    "Frm3 =",
+    "Begin Frame",
+    "Title = \"Axis coordinates; first pixel at (0.5,0.5)\"",
+    "Naxes = 2",
+    "Domain = \"AXIS\"",
+    "Ax1 =",
+    "Begin Axis",
+    "Label = \"Axis 1\"",
+    "Symbol = \"a1\"",
+    "End Axis",
+    "Ax2 =",
+    "Begin Axis",
+    "Label = \"Axis 2\"",
+    "Symbol = \"a2\"",
+    "End Axis",
+    "End Frame",
+    "Frm4 =",
+    "Begin SkyFrame",
+    "Naxes = 2",
+    "Ax1 =",
+    "Begin SkyAxis",
+    "End SkyAxis",
+    "Ax2 =",
+    "Begin SkyAxis",
+    "End SkyAxis",
+    "IsA Frame",
+    "System = \"FK5\"",
+    "Proj = \"gnomonic\"",
+    "Epoch = 1998.4684933755",
+    "Eqnox = 2000",
+    "End SkyFrame",
+    "Map2 =",
+    "Begin CmpMap",
+    "Nin = 2",
+    "IsA Mapping",
+    "MapA =",
+    "Begin WinMap",
+    "Nin = 2",
+    "Invert = 0",
+    "IsA Mapping",
+    "Sft1 = -1024.22102864457",
+    "Sft2 = -2047.18474689165",
+    "End WinMap",
+    "MapB =",
+    "Begin CmpMap",
+    "Nin = 2",
+    "IsA Mapping",
+    "MapA =",
+    "Begin MatrixMap",
+    "Nin = 2",
+    "Invert = 0",
+    "IsA Mapping",
+    "M0 = -2.13692146915945e-08",
+    "M1 = -1.61602841387441e-06",
+    "M2 = -1.62596215645097e-06",
+    "M3 = 3.90485948055518e-08",
+    "Form = \"Full\"",
+    "End MatrixMap",
+    "MapB =",
+    "Begin CmpMap",
+    "Nin = 2",
+    "IsA Mapping",
+    "InvA = 1",
+    "MapA =",
+    "Begin WcsMap",
+    "Nin = 2",
+    "Invert = 1",
+    "IsA Mapping",
+    "Type = \"TAN\"",
+    "End WcsMap",
+    "MapB =",
+    "Begin CmpMap",
+    "Nin = 2",
+    "IsA Mapping",
+    "InvA = 1",
+    "MapA =",
+    "Begin SphMap",
+    "Nin = 3",
+    "Nout = 2",
+    "Invert = 0",
+    "IsA Mapping",
+    "UntRd = 1",
+    "End SphMap",
+    "MapB =",
+    "Begin CmpMap",
+    "Nin = 3",
+    "Nout = 2",
+    "IsA Mapping",
+    "MapA =",
+    "Begin MatrixMap",
+    "Nin = 3",
+    "Invert = 0",
+    "IsA Mapping",
+    "M0 = -0.137497914785465",
+    "M1 = 0.989751322387744",
+    "M2 = -0.0385570131281203",
+    "M3 = -0.952991189702839",
+    "M4 = -0.142801680073145",
+    "M5 = -0.267236734969305",
+    "M6 = -0.270003918079751",
+    "M7 = 0",
+    "M8 = 0.962859223470172",
+    "Form = \"Full\"",
+    "End MatrixMap",
+    "MapB =",
+    "Begin SphMap",
+    "Nin = 3",
+    "Nout = 2",
+    "Invert = 0",
+    "IsA Mapping",
+    "UntRd = 1",
+    "End SphMap",
+    "End CmpMap",
+    "End CmpMap",
+    "End CmpMap",
+    "End CmpMap",
+    "End CmpMap",
+    "Map3 =",
+    "Begin UnitMap",
+    "Nin = 2",
+    "IsA Mapping",
+    "End UnitMap",
+    "Map4 =",
+    "Begin WinMap",
+    "Nin = 2",
+    "IsA Mapping",
+    "Sft1 = -0.5",
+    "Sft2 = -0.5",
+    "End WinMap",
+    "Map5 =",
+    "Begin WinMap",
+    "Nin = 2",
+    "IsA Mapping",
+    "Sft1 = -0.5",
+    "Sft2 = -0.5",
+    "End WinMap",
+    "End FrameSet"
+);
+$felix->astinformation ('pixel', @felixframeset);
+print STDERR "astinformation: ", $felix->status_ok(), "\n";
+$felix->searchtype('box');
+$felix->maxrow(10);
+$felix->point(1,1);
+$felix->otherpoint(2048,4097);
+
+unless ($felix->status_ok()) {
+    print STDERR "(felix) Calling new and setting parameters failed\n";
+    print STDERR "    Failed command: " . $felix->failed_command() . "\n";
+    print STDERR "    Message: " . $felix->current_statusmessage() . "\n";
+    exit 1;
+}
+
+print REPORT "\n\nMoggy catname: ", $felix->catname(), "\n";
+print REPORT "  Point      : ";
+foreach $num (@{$felix->point()}) {
+    print REPORT " <$num> ";
+}
+print REPORT "\n";
+print REPORT "  Otherpoint : ";
+foreach $num (@{$felix->otherpoint()}) {
+    print REPORT " <$num> ";
+}
+print REPORT "\n";
+print REPORT "  AST domain : ", $felix->astdomain(), "\n";
+print REPORT "  Searchtype : ", $felix->searchtype(), "\n";
+print REPORT "  MaxRows    : ", $felix->maxrow(), "\n";
+print REPORT "  Status     : ", ($felix->status_ok() ? "OK" : "BAD"), "\n";
+
+$felix->query() || die "Query to dummy\@home failed";
+
+$colref = $felix->resultcolumns();
+$resref = $felix->result();
+
+$ncols = $felix->resultncols();
+$nrows = $felix->resultnrows();
+print REPORT "  $nrows x $ncols:";
+for ($i = 0; $i<=$#{$colref}; $i++) {
+    print REPORT " <${$colref}[$i]>";
+}
+print REPORT "\n";
+for ($i = 0; $i<$nrows; $i++) {
+    for ($j=0; $j<$ncols; $j++) {
+	print REPORT "    ", $resref->[$i]->[$j];
+    }
+    print REPORT "\n";
+}
+
+
 exit 0;
 EOD
 
 perlrval=$?
 
-if [ $perlrval = 0 ]; then
-    cat t6report
-    rm -f t6report
-fi
-    
+test -f $REPORTFILE && cat $REPORTFILE
+
 exit $perlrval;

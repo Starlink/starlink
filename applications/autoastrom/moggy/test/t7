@@ -1,0 +1,205 @@
+# Test AST functionality
+test -n "$MOGGY" || MOGGY=../moggy
+
+$MOGGY <<EOD
+ast frameset pixel
+    Begin FrameSet
+    Nframe = 4
+    Currnt = 4
+    Nnode = 5
+    Nod1 = 3
+    Nod2 = 4
+    Nod3 = 5
+    Nod4 = 2
+    Lnk2 = 1
+    Lnk3 = 1
+    Lnk4 = 1
+    Lnk5 = 1
+    Frm1 =
+    Begin Frame
+    Title = "Data grid indices; first pixel at (1,1)"
+    Naxes = 2
+    Domain = "GRID"
+    Ax1 =
+    Begin Axis
+    Label = "Data grid index 1"
+    Symbol = "g1"
+    Unit = "pixel"
+    Format = "%3.1f"
+    End Axis
+    Ax2 =
+    Begin Axis
+    Label = "Data grid index 2"
+    Symbol = "g2"
+    Unit = "pixel"
+    Format = "%3.1f"
+    End Axis
+    End Frame
+    Frm2 =
+    Begin Frame
+    Title = "Pixel coordinates; first pixel at (0.5,0.5)"
+    Naxes = 2
+    Domain = "PIXEL"
+    Ax1 =
+    Begin Axis
+    Label = "Pixel coordinate 1"
+    Symbol = "p1"
+    Unit = "pixel"
+    Format = "%3.1f"
+    End Axis
+    Ax2 =
+    Begin Axis
+    Label = "Pixel coordinate 2"
+    Symbol = "p2"
+    Unit = "pixel"
+    Format = "%3.1f"
+    End Axis
+    End Frame
+    Frm3 =
+    Begin Frame
+    Title = "Axis coordinates; first pixel at (0.5,0.5)"
+    Naxes = 2
+    Domain = "AXIS"
+    Ax1 =
+    Begin Axis
+    Label = "Axis 1"
+    Symbol = "a1"
+    End Axis
+    Ax2 =
+    Begin Axis
+    Label = "Axis 2"
+    Symbol = "a2"
+    End Axis
+    End Frame
+    Frm4 =
+    Begin SkyFrame
+    Naxes = 2
+    Ax1 =
+    Begin SkyAxis
+    End SkyAxis
+    Ax2 =
+    Begin SkyAxis
+    End SkyAxis
+    IsA Frame
+    System = "FK5"
+    Proj = "gnomonic"
+    Epoch = 1998.4684933755
+    Eqnox = 2000
+    End SkyFrame
+    Map2 =
+    Begin CmpMap
+    Nin = 2
+    IsA Mapping
+    MapA =
+    Begin WinMap
+    Nin = 2
+    Invert = 0
+    IsA Mapping
+    Sft1 = -1024.22102864457
+    Sft2 = -2047.18474689165
+    End WinMap
+    MapB =
+    Begin CmpMap
+    Nin = 2
+    IsA Mapping
+    MapA =
+    Begin MatrixMap
+    Nin = 2
+    Invert = 0
+    IsA Mapping
+    M0 = -2.13692146915945e-08
+    M1 = -1.61602841387441e-06
+    M2 = -1.62596215645097e-06
+    M3 = 3.90485948055518e-08
+    Form = "Full"
+    End MatrixMap
+    MapB =
+    Begin CmpMap
+    Nin = 2
+    IsA Mapping
+    InvA = 1
+    MapA =
+    Begin WcsMap
+    Nin = 2
+    Invert = 1
+    IsA Mapping
+    Type = "TAN"
+    End WcsMap
+    MapB =
+    Begin CmpMap
+    Nin = 2
+    IsA Mapping
+    InvA = 1
+    MapA =
+    Begin SphMap
+    Nin = 3
+    Nout = 2
+    Invert = 0
+    IsA Mapping
+    UntRd = 1
+    End SphMap
+    MapB =
+    Begin CmpMap
+    Nin = 3
+    Nout = 2
+    IsA Mapping
+    MapA =
+    Begin MatrixMap
+    Nin = 3
+    Invert = 0
+    IsA Mapping
+    M0 = -0.137497914785465
+    M1 = 0.989751322387744
+    M2 = -0.0385570131281203
+    M3 = -0.952991189702839
+    M4 = -0.142801680073145
+    M5 = -0.267236734969305
+    M6 = -0.270003918079751
+    M7 = 0
+    M8 = 0.962859223470172
+    Form = "Full"
+    End MatrixMap
+    MapB =
+    Begin SphMap
+    Nin = 3
+    Nout = 2
+    Invert = 0
+    IsA Mapping
+    UntRd = 1
+    End SphMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    End CmpMap
+    Map3 =
+    Begin UnitMap
+    Nin = 2
+    IsA Mapping
+    End UnitMap
+    Map4 =
+    Begin WinMap
+    Nin = 2
+    IsA Mapping
+    Sft1 = -0.5
+    Sft2 = -0.5
+    End WinMap
+    Map5 =
+    Begin WinMap
+    Nin = 2
+    IsA Mapping
+    Sft1 = -0.5
+    Sft2 = -0.5
+    End WinMap
+    End FrameSet
+.
+coord1 1 1
+coord2 2048 4097
+catconfig file://$PWD/local.config
+type box
+nrow 10
+name dummy@home
+columns all
+search
+quit
+EOD

@@ -17,4 +17,4 @@ t3.run: t3.C ../util.o
 	$(CXX) $(CXXFLAGS) -o $@ t3.C ../util.o
 
 clean:
-	rm -f *~ *.run *.stderr *.stdout
+	rm -f *~ *.run *.stderr *.stdout *.tmp

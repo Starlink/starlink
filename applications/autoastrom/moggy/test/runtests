@@ -7,8 +7,21 @@
 # output diffed against `t<number>.correct'.  Exit status is the
 # number of failures.
 #
-# Run without an argument, this runs all the tests in the directory;
-# run with an argument, it runs only the specified tests.
+# The tests should consist of scripts (or programs) which write their
+# results to stdout, write any debugging information to stderr, and
+# put any temporary files in filenames matching the pattern
+# `t<number>*.tmp' but not delete them (for debugging).  All these
+# files are deleted on successful completion, unless the --keep flag
+# is present.
+#
+# Run without an argument, and if there is no file runtests.filelist,
+# this runs all the tests in the directory; run with an argument, it
+# runs only the specified tests.
+#
+# If there is no argument, but a file runtests.filelist exists, use
+# that file's contents as the list of tests to run.  This means that
+# we can make it easy to do a subset of the tests repeatedly while
+# testing.
 #
 # If the option --keep is present, then it doesn't delete temporary files.
 
@@ -32,9 +45,7 @@ while [ $# -gt 0 ]; do
 done
 
 # If filelist is null, and a file runtests.filelist exists, use that
-# file's contents as the value of filelist.  This is somewhat hacky,
-# but means that we can make it easy to do a subset of the tests
-# repeatedly while testing.
+# file's contents as the value of filelist.
 if [ -z "$filelist" -a -f runtests.filelist ]; then
     echo "Reading filelist from runtests.filelist"
     filelist=`cat runtests.filelist`
@@ -58,7 +69,7 @@ do
 	if [ $testval != 0 ]; then
 	    echo "failed (exited with error status $testval)"
 	    nfailures=`expr $nfailures + 1`
-	    $deletetemp && rm $name.stdout $name.stderr
+	    $deletetemp && rm -f $name.stdout $name.stderr $name*.tmp
 	elif [ -r "$name.correct" ]; then
 	    diff $name.correct $name.stdout >$name.diff
 	    rval=$?
@@ -67,13 +78,13 @@ do
 		nfailures=`expr $nfailures + 1`
 	    else
 		echo "ok"
-		$deletetemp && rm $name.diff $name.stdout $name.stderr
+		$deletetemp && rm -f $name.diff $name.stdout $name.stderr $name*.tmp
 	    fi
 	else
 		echo "apparently OK, but no correct results to compare"
 		mv $name.stdout $name.correct
 		echo "    (now in $name.correct)"
-		$deletetemp && rm $name.stderr
+		$deletetemp && rm -f $name.stderr $name*.tmp
 	fi
 done
 
