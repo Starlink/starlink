@@ -1464,6 +1464,10 @@ esp1_pr2s.o: AST_PAR SAE_PAR
 esp1_s2pr.o: AST_PAR SAE_PAR
 esp1_xyfmt.o: AST_PAR SAE_PAR
 esp1_farr.o: SAE_PAR FIO_ERR
+elp1_cato.o: SAE_PAR CAT_PAR elp_par NDF_PAR
+elp1_texto.o: SAE_PAR MSG_PAR elp_par NDF_PAR
+elp1_filer.o: SAE_PAR FIO_ERR elp_par NDF_PAR
+elp1_aif_asfio.o: SAE_PAR PAR_ERR
 esp_mon.o:  PAR_PAR SAE_PAR
 esphelp.o:  DAT_PAR PAR_ERR PAR_PAR SAE_PAR hlpcmd.inc
 fastmed.o:  NDF_PAR PRM_PAR SAE_PAR fas_par
