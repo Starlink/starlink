@@ -206,6 +206,8 @@
 *        Added output parameters and REPORT parameter.
 *     7-JAN-2000 (DSB):
 *        Big changes for the first AST/PGPLOT version.
+*     21-FEB-2002 (DSB):
+*        Added a listing of the Frame Domains contained in the Plot.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -227,8 +229,10 @@
 *  Local Variables:
       CHARACTER ATTR*10          ! Buffer for attribute name
       CHARACTER COM*80           ! Picture comment
+      CHARACTER DOM*30           ! Frame Domain
       CHARACTER DOM0*30          ! Original Current Frame Domain
       CHARACTER LABEL*( DAT__SZNAM ) ! Picture label
+      CHARACTER LINE*60          ! One line of text
       CHARACTER LFMT*80          ! Buffer for formatted lower axis value
       CHARACTER NAME*( DAT__SZNAM ) ! Picture name
       CHARACTER REFNAM*132       ! Reference object's name 
@@ -241,6 +245,7 @@
       DOUBLE PRECISION UBNDG( 2 )! Upper bounds of picture in GRAPHICS Frame
       DOUBLE PRECISION XL        ! Position of low bound in GRAPHICS Frame
       DOUBLE PRECISION XU        ! Position of high bound in GRAPHICS Frame
+      INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of TEXT string
       INTEGER IAXIS              ! Axis index
       INTEGER ICURR              ! Index of original current Frame
@@ -526,6 +531,30 @@
 
 *  Add a blank line to the report.
       IF( REPORT ) CALL MSG_BLANK( STATUS )
+
+*  Produce a list of the available Domain names.
+      IF( REPORT ) THEN
+         TEXT = ' '
+         IAT = 0
+         CALL CHR_APPND( '   The following Frames are available:', TEXT,
+     :                   IAT )
+         DO I = 1, AST_GETI( IPLOT, 'NFRAME', STATUS )
+            DOM = AST_GETC( AST_GETFRAME( IPLOT, I, STATUS ), 'Domain',
+     :                      STATUS )
+            IF( DOM .NE. ' ' ) THEN
+               IAT = IAT + 1
+               CALL CHR_APPND( DOM, TEXT, IAT )
+            END IF
+         END DO
+
+         IAT = 1
+         DO WHILE( IAT .GT. 0 ) 
+           CALL CHR_LINBR( TEXT, IAT, LINE ) 
+           CALL MSG_SETC( 'L', LINE )
+           CALL MSG_OUT( 'GDSTATE_MSG10', '   ^L', STATUS )
+         END DO
+
+      END IF
 
 *  Tidy up.
  999  CONTINUE
