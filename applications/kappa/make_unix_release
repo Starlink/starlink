@@ -125,7 +125,7 @@
       tar -cvh -f ${TEMPDIR}/kappa.tar `grp unix_total` 
       rm `grp unix_total` 
       mv ${TEMPDIR}/kappa.tar ${REL_DIR}
-      rm -rf doc
+      rm -rf doc kappa.ifd
 
 #  Compress it.
       compress kappa.tar

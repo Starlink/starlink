@@ -189,7 +189,8 @@ kpg1_logaub.f kpg1_logauw.f kpg1_logaw.f kpg1_cpbdr.f kpg1_pgclr.f \
 kpg1_pgcls.f kpg1_pgopn.f 
 
 # The contents of the kappa_iraf.tar file:
-KAPPA_IRAF = doc fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
+KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl \
+fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
 lutcol.cl lutcont.cl lutfc.cl lutgrey.cl lutheat.cl lutikon.cl lutneg.cl \
 lutramps.cl lutread.cl lutspec.cl lutzebra.cl picbase.cl picdata.cl \
 picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
@@ -203,8 +204,8 @@ fitslist.par fitsmod.par fitstext.par fitsurface.par fitsval.par \
 fitswrite.par flip.par fourier.par gausmooth.par gdclear.par gdnames.par \
 gdset.par gdstate.par glitch.par globals.par greyplot.par hiscom.par \
 hislist.par hisset.par histat.par histeq.par histogram.par idclear.par \
-idinvisible.par idpazo.par idset.par idstate.par inspect.par kap_div.par \
-kap_log10.par kap_pow.par kaphelp.par kappa.par kstest.par laplace.par \
+idinvisible.par idpazo.par idset.par idstate.par inspect.par div.par \
+log10.par pow.par kaphelp.par kappa.par kstest.par laplace.par \
 linplot.par logar.par loge.par look.par lucy.par lutable.par lutflip.par \
 luthilite.par lutread.par lutrot.par lutsave.par luttweak.par lutview.par \
 makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
@@ -295,13 +296,13 @@ m31.sdf.sun4_Solaris iras.sdf.sun4_Solaris grey_lut.sdf.sun4_Solaris
 KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl \
 cadd.ifl calc.ifl calpol.ifl cdiv.ifl centroid.ifl chpix.ifl cmult.ifl \
 compadd.ifl compave.ifl compick.ifl convolve.ifl creframe.ifl csub.ifl \
-kap_div.ifl errclip.ifl exp10.ifl expe.ifl expon.ifl ffclean.ifl \
+div.ifl errclip.ifl exp10.ifl expe.ifl expon.ifl ffclean.ifl \
 fillbad.ifl fitsurface.ifl flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
 globals.ifl histat.ifl histeq.ifl histogram.ifl kaphelp.ifl laplace.ifl \
-kap_log10.ifl kstest.ifl logar.ifl loge.ifl look.ifl lucy.ifl manic.ifl \
+log10.ifl kstest.ifl logar.ifl loge.ifl look.ifl lucy.ifl manic.ifl \
 makesurface.ifl maths.ifl median.ifl mosaic.ifl mstats.ifl mult.ifl \
 noglobals.ifl nomagic.ifl normalize.ifl numb.ifl outset.ifl parget.ifl \
-paste.ifl pixdupe.ifl kap_pow.ifl psf.ifl quilt.ifl rift.ifl rotate.ifl \
+paste.ifl pixdupe.ifl pow.ifl psf.ifl quilt.ifl rift.ifl rotate.ifl \
 segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
 sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
 tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl \
@@ -326,10 +327,10 @@ kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
 calpol.f cdiv.f centroid.f chpix.f cmult.f compadd.f compave.f compick.f \
-convolve.f creframe.f csub.f kap_div.f errclip.f exp10.f expe.f expon.f \
+convolve.f creframe.f csub.f kap_div.f errclip.f expon.f \
 ffclean.f fillbad.f fitsurface.f flip.f fourier.f gausmooth.f glitch.f \
-globals.f histat.f histeq.f histogram.f kaphelp.f laplace.f kap_log10.f \
-kstest.f logar.f loge.f look.f lucy.f manic.f makesurface.f maths.f \
+globals.f histat.f histeq.f histogram.f kaphelp.f laplace.f \
+kstest.f logar.f look.f lucy.f manic.f makesurface.f maths.f \
 median.f mosaic.f mstats.f mult.f noglobals.f nomagic.f normalize.f \
 numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f quilt.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
