@@ -1,50 +1,94 @@
-1 GAIA update
+1 GAIA major update
 
-  New to this release:
+  This is a major release of GAIA incorporating two new automated astrometry
+  toolboxes, a major re-write of the blink comparison toolbox and many
+  changes and fixes.
 
-    - A number of new catalogues and image servers are now available.
-      When GAIA starts for the first time it will ask for permission
-      to update your configuration, unless you have a very customised
-      ~/.skycat/skycat.cfg file, you should just say yes. Some
-      highlights are 2MASS, USNO B1.0 and GSC II.
+  GAIA now offers two new toolboxes based on the Starlink AUTOASTROM
+  program. These make it possible to provide a minimum of positional
+  information (image centre and scale) and then fit an astrometric
+  solution. They also make it possible, for the first time, to fit optical
+  distortions. The new toolboxes are available at: 
+ 
+     Image-Analysis->Astrometry Calibration->Automatic position matching
 
-    - A new configuration option "-extended_precision" has been
-      added. This makes GAIA work at approximately milli-arcsecond
-      resolution. This option can be switched on using the new
-      "File"->"Startup options" window.
+  One is for simple use and the other for advanced use.
 
-    - The pixel table now highlights the maximum and minimum values and
-      the orientation of the Y-axis has been flipped so that the
-      sense of the values is the same as that in the image.
+  The blink comparison toolbox has been substantially upgraded in this
+  release. New features are options to alignment to NDF origins or FITS CRPIX
+  values. This gives much better behaviour when comparing images of different
+  dimensions. Better performance (less flickering artifacts). The ability to
+  drag images and enter image coordinate offsets. All images can now be viewed
+  together or one-by-one as before. Images should now always scroll and the
+  "Refresh" button has been removed.
 
-    - The command-line options of GAIA can now be configured using the
-      new "File"->"Startup options" window. The set of options
-      selected are used whenever GAIA starts up (this removes the
-      tedious need to either specify these on the command-line, or
-      add them to your X resources).
+  Other changes in this release:
 
-    - A new configuration option "-show_hdu_chooser" has been
-      added. By default when you open a FITS or HDS file that contains
-      more than one image the HDU chooser appears so that you can select
-      between the images. On some occasions (mainly when running GAIA
-      under remote control) this behaviour is unwanted and the chooser
-      should remain inactive. This option can be controlled using the new
-      "File"->"Startup options" window.
+     - Spitzer/SIRTF FITS headers, including the optical distortion,
+       are now handled.
 
-    - When North and East are interchanged the "Show all coordinates"
-      displayed the wrong coordinates in the left and right columns,
-      and incorrectly formatted RA as DD:MM:SS and Dec as HH:MM:SS.
-      These problems are now fixed.
+     - The NDF component chooser now allows the variance component to be
+       displayed as expected.
 
-    - The direction arrows shown in the pan window could be displayed
-      at the wrong size, again when North and East were interchanged.
-      This problem is now fixed.
+     - A new default percentage autocut option has been added.
 
-    - Fixed shape ellipses in the aperture photometry toolbox were
-      actually created using an inverted zoom factor correction (so
-      either shrank or expanded in the wrong sense). This now works
-      correctly.
+     - Shared memory segments under Solaris should now be better behaved.
 
+     - The handling of byte images is changed so FITS BITPIX=8 are correctly
+       interpreted as unsigned byte, not signed byte. This change mostly
+       effects the XY profile and contouring toolboxes.
+
+     - An attempt to clear old WCS information from images before saving
+       is now made.
+
+     - A new "gaiadispmany" command has been introduced to load a list of
+       images into GAIA from the command-line.
+
+     - An experimental tabbed interface has been produced to make it
+       easier to view FITS MEF files. To try this out use the command:
+
+          $GAIA_DIR/tabbedgaia
+
+     - Long thin or tall images (2 pixels or more) now display a readout of
+       positions.
+
+     - The "$GAIA_DIR/pix2wcs" and "$GAIA_DIR/wcs2pix" scripts should be
+       working again. 
+
+     - The "$GAIA_DIR/displaycat" command now creates fully functional
+       catalogue windows (previous these did not include any GAIA specific
+       changes). 
+
+     - The "-catalog" command-line option now accepts a list of catalogues to
+       display immediately.
+
+     - The polarimetry toolbox now correctly processes selection expressions
+       when column names are short forms of other names (i.e. when P and PI,
+       DP and DPI etc. are used). Previously an attempt to interpret $PI as
+       $P would be made and subsequently fail.
+
+     - Making name queries using the RedHat 9 build of GAIA failed
+       completely, sometimes causing a core dump from a child process.
+       This problem has now been resolved.
+
+     - The interpretation of FITS -CAR projections is now a configuration
+       option. Previously this was fixed at assuming that all Cartesian
+       projections are simple linear mappings (this remains the default),
+       ignoring the possibility of spherical rotations. Refer to the CarLin
+       attribute of the AST (SUN/211) library for more about this change.
+
+     - Various changes to grid overlays have been implemented.
+       This now supports AST 3.2 super-script and sub-script, font and colour
+       changes within a string. Fonts drawn on the overlay grid can now be
+       scaled with image. Better matching of postscript font size to displayed
+       size has also been implemented. A long term memory leak has been cured 
+       (only seen when drawing overlays). 
+
+     - A new configuration option "always_merge" controls if the primary header
+       of any FITS files are merged with those of extension being viewed to
+       create a full set of headers for creating a world coordinate system. By
+       default this merging no longer occurs when the primary HDU contains a
+       non dummy image. 
 
   To try out GAIA for yourself type the following command:
 
@@ -56,73 +100,9 @@
 
       gaia@star.rl.ac.uk
 
-  Peter W. Draper (p.w.draper@durham.ac.uk) and
+  Peter W. Draper (p.w.draper@durham.ac.uk)
 
-  15th April 2003
+  15th April 2004
 
 
 
-  NDF Chooser now allows the variance component to be displayed as
-      expected.
-
-  A new default percentage autocut option has been added.
-  Shared memory segments that leak should now be better behaved
-  (Solaris default setup).
-
-  The blink toolbox has been substantially upgraded. New features are
-  alignment to NDF origins or FITS CRPIX values, much better behaviour
-  when comparing images of different dimensions, better performance
-  (less flickering artifacts), the ability to drag images and enter
-  image coordinate offsets. All images can now be viewed together or
-  one-by-one as before. Images should now always scroll and the "Refresh"
-  button has been removed.
-
-  Byte images are changed so FITS BITPIX=8 are correctly interpreted
-  as unsigned byte, not signed byte.
-
-  Effects the XY profile and Contouring toolboxes.
-
-  An attempt to clear any old WCS information from a saved image is now made.
-
-  New "gaiadispmany" command to load a list of images into GAIA from the
-  command-line.
-
-  Experimental tabbed interface.
-
-  Long (2 pixels) thin or tall images now display readout of positions.
-
-  The pix2wcs and wcs2pix scripts should be working again.
-
-  The displaycat command now creates fully functional catalogue windows
-  of the same kind as normal (this includes GAIA extensions to the Skycat
-  defaults).
-
-  The -catalog command-line option now accepts a list of catalogues to
-  display immediately.
-
-  SIRTF distortions are now accomodated (need AST3).
-
-  The polarimetry toolbox now correctly processes selection expressions
-  when column names are short forms of other names (i.e. when P and PI,
-  DP and DPI etc. are used). Previously an attempt to interpret $PI as
-  $P would be made and subsequently fail.
-
-  Making name queries using the RedHat 9 build of GAIA failed
-  completely, sometimes causing a core dump from a child process.
-  This problem has now been resolved.
-
-  The interpretation of FITS -CAR projections is now a configuration
-  option. Previously this was fixed at assuming that all cartesian
-  projections are simple linear mappings (this remains the default),
-  ignoring the possibility of spherical rotations. Refer to the CarLin
-  attribute of the AST (SUN/211) library for more about this change.
-
-  AST 3.2 changes. Super-script and sub-script, font and colour 
-  changes within a string. Fonts drawn as overlay grid can now be
-  scaled with image. Better matching of postscript font size to displayed
-  size. Long term memory leak cured (when drawing overlays).
-
-  New configuration option "always_merge" controls if the primary header
-  are merged with those of extension to create a full set of headers for
-  creating a world coordinate system. By default this merging no longer
-  occurs when the primary HDU contains an image.
