@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {210.3}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {12th November 1998}
+\newcommand{\stardocdate}      {19th November 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21254,6 +21254,14 @@ interim solution to the problem of storing coordinate system
 information in FITS headers, until the proposed new FITS-WCS standard
 becomes stable.
 
+\item When a \htmlref{FrameSet}{FrameSet} is created from a set of FITS header cards (by
+reading from a FitsChan using a ``foreign'' encoding), the base \htmlref{Frame}{Frame}
+of the resulting FrameSet now has its \htmlref{Domain}{Domain} attribute set to
+``GRID''. This reflects the fact that this Frame represents FITS data
+grid coordinates (equivalent to FITS pixel coordinates---see
+(\secref{ss:domainconventions}). Previously, this Domain value was not
+set.
+
 \item \htmlref{AST\_FINDFITS}{AST_FINDFITS} now ignores trailing spaces in its keyword template.
 
 \item The FitsChan class is now more tolerant of common minor
@@ -21281,7 +21289,7 @@ projections which involve half the celestial sphere to produce valid
 coordinates for the other (unprojected) half of the sphere as well.
 
 \item A bug has been fixed which could occasionally cause \htmlref{AST\_CONVERT}{AST_CONVERT}
-to think that conversion between a \htmlref{CmpFrame}{CmpFrame} and another \htmlref{Frame}{Frame} was
+to think that conversion between a \htmlref{CmpFrame}{CmpFrame} and another Frame was
 possible when, in fact, it wasn't.
 \end{enumerate}
 
