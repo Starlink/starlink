@@ -112,6 +112,9 @@
 #        Adapted prologue for document extraction.
 #     28-SEP-1998 (RFWS):
 #        Distinguish between -pgp and -pgplot options.
+#     12-JAN-2001 (DSB):
+#        Move terminating "}" in function "find" onto a new line to
+#        avoid error when run under bash 2.04.11(1) (redhat 7).
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -130,7 +133,8 @@
 #  file name to standard output. Otherwise, it outputs nothing.
       find() { IFS=':'; for d in $PATH; do f="${d:=.}/${1}"
                   test -x "${f}" -a ! -d "${f}" && echo "${f}" && break
-               done }
+               done 
+             }
 
 #  Initialise linking options.
       err=''
