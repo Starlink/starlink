@@ -20,7 +20,7 @@ if ( -e @bindir@/news ) then
    alias news @bindir@/news
 endif
 alias sman "man -P @mandir@"
-alias xdisplay 'setenv DISPLAY `@staretcdir@/xdisplay \!\!`;echo DISPLAY set to $DISPLAY'
+alias xdisplay 'setenv DISPLAY `@bindir@/xdisplay \!\!`;echo DISPLAY set to $DISPLAY'
 
 #
 # Option Set items 
