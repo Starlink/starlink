@@ -47,6 +47,8 @@
 #        Added entry for WCSREG.
 #     27-APR-1999 (MBT):
 #        Added entry for wcsexercise script.
+#     24-OCT-2000 (MBT):
+#        Added entry for ccdwish binary.
 #     {enter_changes_here}
 #
 #-
@@ -94,6 +96,9 @@
 #
       alias ccdshow '$CCDPACK_DIR/ccdshow'
       alias ccd_ccdshow '$CCDPACK_DIR/ccdshow'
+#
+      alias ccdwish '$CCDPACK_DIR/ccdwish'
+      alias ccd_ccdwish '$CCDPACK_DIR/ccdwish'
 #
       alias debias '$CCDPACK_DIR/debias'
       alias ccd_debias '$CCDPACK_DIR/debias'
