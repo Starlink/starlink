@@ -31,18 +31,15 @@
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
 *        The name of the ARD file containing a description of the parts
-*        of the image to be masked out, i.e. set to bad. The suggested
-*        default is the current value or ardfile.dat if there is no
-*        current value. The co-ordinate system in which positions within
-*        this file are given should be indicated by including suitable
-*        COFRAME or WCS statements within the file (see SUN/183). For
-*        instance, starting the file with a line containing the text
-*        "COFRAME(PIXEL)" will indicate that positions are specified in
-*        pixel co-ordinates. The statement "COFRAME(SKY,System=FK5)" would
-*        indicate that positions are specified in RA/DEC (FK5,J2000). If
-*        no such statements are included, then it is assumed that
-*        positions are given within the current co-ordinate system of the
-*        input NDF.
+*        of the image to be masked out, i.e. set to bad. The co-ordinate 
+*        system in which positions within this file are given should be 
+*        indicated by including suitable COFRAME or WCS statements within 
+*        the file (see SUN/183), but will default to pixel co-ordinates
+*        in the absence of any such statements. For instance, starting the 
+*        file with a line containing the text "COFRAME(SKY,System=FK5)" would
+*        indicate that positions are specified in RA/DEC (FK5,J2000). The
+*        statement "COFRAME(PIXEL)" indicates explicitly that positions are 
+*        specified in pixel co-ordinates. 
 *     IN = NDF (Read)
 *        The name of the source NDF.
 *     OUT = NDF (Write)
@@ -69,8 +66,7 @@
 *     latter case consult SUN/183 for full details of the ARD
 *     descriptors and syntax; however, much may be learnt from looking
 *     at the ARD files created by ARDGEN and the ARDGEN documentation.
-*     There is also a summary with examples in the main body of SUN/95
-*     and the online help.
+*     There is also a summary with examples in the main body of SUN/95.
 
 *  Implementation Status:
 *     -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
@@ -82,7 +78,7 @@
 *     -  All non-complex numeric data types can be handled.
 
 *  Related Applications:
-*     KAPPA: ARDGEN.
+*     KAPPA: ARDGEN, ARDPLOT, LOOK.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
@@ -112,6 +108,9 @@
 *        Added propagation of the WCS component.
 *     20-AUG-2001 (DSB):
 *        Converted to ARD V2 by removing COSYS parameter.
+*     25-OCT-2001 (DSB):
+*        Modified to make pixel coords the default coord system for ard
+*        files.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,6 +139,7 @@
       INTEGER FD                 ! File descriptor
       INTEGER I                  ! Loop counter
       INTEGER IGRP               ! Group identifier
+      INTEGER IPIX               ! Index of PIXEL Frame within IWCS
       INTEGER J                  ! Loop counter
       INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index  
       INTEGER LBNDE( NDF__MXDIM )! Lower bounds of a box encompassing all external array elements
@@ -200,8 +200,12 @@
       CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
       
 *  Get the WCS FrameSet from the NDF and use it to establish the WCS
-*  information used by the following cal to ARD_WORK.
+*  information used by the following cal to ARD_WORK. Select PIXEL
+*  coords as the current Frame first (this means that the default 
+*  cord system in the ard file will be pixel coords).
       CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
+      CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+      CALL AST_SETI( IWCS, 'CURRENT', IPIX, STATUS )
       CALL ARD_WCS( IWCS, ' ', STATUS )
 
 *  Create the mask.  Value 2 should be used to represent pixels
