@@ -97,7 +97,7 @@
 *.
 
 *  Locate the axis
-      CALL ADI_CCEL( PSID, 'Axes', 1, AX, AXID, STATUS )
+      CALL ADI_CCELL( PSID, 'Axes', 1, AX, AXID, STATUS )
 
 *  Extract the datum
       CALL ADI_CGET0L( AXID, 'Ok', OK, STATUS )

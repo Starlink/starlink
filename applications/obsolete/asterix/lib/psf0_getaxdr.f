@@ -25,7 +25,7 @@
 
 *  Returned Value:
 *     PSF0_GETAXDR = REAL
-*        The axis basic width
+*        The axis basic width in radians
 
 *  Examples:
 *     {routine_example_text}
@@ -91,7 +91,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      REAL			SCALE			! Axis datum
+      REAL			DR			! Axis datum
+
       INTEGER			AXID			! Axis identifier
 *.
 
@@ -99,7 +100,7 @@
       CALL ADI_CCELL( PSID, 'Axes', 1, AX, AXID, STATUS )
 
 *  Extract the datum
-      CALL ADI_CGET0R( AXID, 'Scale', SCALE, STATUS )
+      CALL ADI_CGET0R( AXID, 'Dr', DR, STATUS )
 
 *  Release the axis
       CALL ADI_ERASE( AXID, STATUS )

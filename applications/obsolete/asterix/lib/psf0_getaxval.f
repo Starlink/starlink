@@ -116,7 +116,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Locate the axis
-      CALL ADI_CCEL( PSID, 'Axes', 1, AX, AXID, STATUS )
+      CALL ADI_CCELL( PSID, 'Axes', 1, AX, AXID, STATUS )
 
 *  Extract the data
       CALL ADI_CGET0I( AXID, 'Dim', DIM, STATUS )
