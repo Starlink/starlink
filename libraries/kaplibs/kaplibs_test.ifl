@@ -1,2 +1,26 @@
 interface kaplibs_test
+   parameter CLEAR
+      type _LOGICAL
+      vpath 'DEFAULT'
+      prompt 'Is the current picture to be cleared before plotting?'
+      default TRUE
+   endparameter
+   parameter DEVICE
+      ptype 'DEVICE'
+      vpath 'DEFAULT'
+      prompt 'Name of graphics device'
+      default 'xw'
+   endparameter
+   parameter FILL
+      type _LOGICAL
+      vpath 'DEFAULT'
+      prompt 'Fill the plotting area?'
+      default TRUE
+   endparameter
+   parameter STYLE
+      type LITERAL
+      vpath 'DEFAULT'
+      prompt 'Plotting style for the annotated axes and vectors'
+      default 'grid=1,colour(curve)=red'
+   endparameter
 endinterface
