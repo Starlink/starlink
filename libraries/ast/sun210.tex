@@ -12597,209 +12597,6 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
-   AST\_INTERPOLATE\sstlabel{AST_INTERPOLATE}
-}{
-   Perform sub-pixel interpolation on a grid of data
-}{
-   \sstdescription{
-      This is a dummy function, which does not actually
-      exist. Instead, this description forms a template so that you
-      may implement a function with this interface for yourself (and
-      give it any name you wish). Such a function may be
-      passed as the UINTERP argument to the \htmlref{AST\_RESAMPLE$<$X$>$}{AST_RESAMPLEX} functions
-      (q.v.) in order to perform sub-pixel interpolation during
-      resampling of gridded data. This allows you to use your own
-      interpolation algorithms in addition to those which are
-      pre-defined.
-
-      The function interpolates an input grid of data (and,
-      optionally, processes associated statistical variance estimates)
-      at a specified set of points.
-   }
-   \sstinvocation{
-      RESULT = AST\_INTERPOLATE( NDIM\_IN, LBND\_IN, UBND\_IN,
-                                IN, IN\_VAR, NPOINT, OFFSET, COORDS, PARAMS,
-                                FLAGS, BADVAL, OUT, OUT\_VAR, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NDIM\_IN = INTEGER (Given)
-      }{
-         The number of dimensions in the input grid. This will be at
-         least one.
-      }
-      \sstsubsection{
-         LBND\_IN( NDIM\_IN ) = INTEGER (Given)
-      }{
-         An array
-         containing the coordinates of the centre of the first pixel
-         in the input grid along each dimension.
-      }
-      \sstsubsection{
-         UBND\_IN( NDIM\_IN ) = INTEGER (Given)
-      }{
-         An array
-         containing the coordinates of the centre of the last pixel in
-         the input grid along each dimension.
-
-         Note that LBND\_IN and UBND\_IN together define the shape,
-         size and coordinate system of the input grid in the same
-         way as they do in AST\_RESAMPLE$<$X$>$.
-      }
-      \sstsubsection{
-         IN( $*$ ) = $<$Xtype$>$ (Given)
-      }{
-         An array, with one element for each pixel in the
-         input grid, containing the input data. This will be the same
-         array as was passed to AST\_RESAMPLE$<$X$>$ via the IN argument.
-         The numerical type of this array should match that of the
-         data being processed.
-      }
-      \sstsubsection{
-         IN\_VAR( $*$ ) = INTEGER (Given)
-      }{
-         An optional second array with the same size and type as the
-         IN array. This will only be given if the AST\_\_USEVAR flag is
-         set via the FLAGS argument (below). If given, it will contain
-         the set of variance values associated with the input data and
-         will be the same array as was passed to AST\_RESAMPLE$<$X$>$ via
-         the IN\_VAR argument.
-
-         If the AST\_\_USEVAR flag is not set, then no variance values
-         are being processed. In this case, this array of variance
-         values may be a dummy (e.g. one-element) array and should not
-         be used.
-      }
-      \sstsubsection{
-         NPOINT = INTEGER (Given)
-      }{
-         The number of points at which the input grid is to be
-         interpolated. This will be at least one.
-      }
-      \sstsubsection{
-         OFFSET( NPOINT ) = INTEGER (Given)
-      }{
-         For each interpolation point, this array will contain the
-         offset from the start of the OUT (and OUT\_VAR) array(s) at
-         which the interpolated value (and its variance, if required)
-         should be stored. For example, the interpolated value for
-         point number POINT should be stored in OUT(1$+$OFFSET(POINT)).
-      }
-      \sstsubsection{
-         COORDS( NPOINT, NDIM\_IN ) = DOUBLE PRECISION (Given)
-      }{
-         A 2-dimensional array containing the coordinates of the
-         points at which interpolation should be performed. These will
-         be stored so that coordinate number COORD for interpolation
-         point number POINT is found in element COORDS(POINT,COORD).
-
-         If any interpolation point has any of its coordinates equal
-         to the value AST\_\_BAD (as defined in the AST\_PAR include
-         file), then the corresponding output data (and variance)
-         should be set to the value given by BADVAL (see below).
-      }
-      \sstsubsection{
-         PARAMS( $*$ ) = DOUBLE PRECISION (Given)
-      }{
-         The array given for the PARAMS argument of
-         AST\_RESAMPLE$<$X$>$. You may use this to pass any
-         additional parameter values required by your interpolation
-         algorithm.
-      }
-      \sstsubsection{
-         FLAGS = INTEGER (Given)
-      }{
-         The value given for the FLAGS argument of
-         AST\_RESAMPLE$<$X$>$. You may test this value in order to provide
-         detailed control over the operation of your resampling
-         algorithm. Note that the special flag values AST\_\_UINTERP1,
-         2, 3 \& 4 are reserved for you to use for your own purposes
-         (see AST\_RESAMPLE$<$X$>$).
-      }
-      \sstsubsection{
-         BADVAL = $<$Xtype$>$ (Given)
-      }{
-         The value given for the BADVAL argument of AST\_RESAMPLE$<$X$>$.
-         This will have the same numerical type as the data being
-         processed (i.e. as elements of the IN array).  It should be
-         used to test for bad pixels in the input grid (but only if
-         the AST\_\_USEBAD flag is set via the FLAGS argument) and for
-         identifying bad output values in the OUT (and OUT\_VAR)
-         array(s).
-      }
-      \sstsubsection{
-         OUT( $*$ ) = $<$Xtype$>$ (Returned)
-      }{
-         An array with the same numerical type as the IN
-         array, into which the interpolated data values should be
-         returned.  Note that details of the storage order and number
-         of dimensions of this array are not required, since the
-         OFFSET array contains all necessary information about where
-         each returned value should be stored.
-
-         In general, not all elements of this array (or the OUT\_VAR
-         array below) may be used in any particular invocation of the
-         function. Those which are not used should be returned
-         unchanged.
-      }
-      \sstsubsection{
-         OUT\_VAR( $*$ ) = $<$Xtype$>$ (Returned)
-      }{
-         An optional array with the same type and size as the OUT
-         array, into which variance estimates for the resampled values
-         should be returned. This array will only be given if the
-         AST\_\_USEVAR flag is set via the FLAGS argument.
-
-         If given, it is addressed in exactly the same way (via the
-         OFFSET array) as the OUT array. The values returned should be
-         estimates of the statistical variance of the corresponding
-         values in the OUT array, on the assumption that all errors in
-         input data values are statistically independent and that
-         their variance estimates may simply be summed (with
-         appropriate weighting factors).
-
-         If the AST\_\_USEVAR flag is not set, then variance values are
-         not being processed.  In this case, this array may be a dummy
-         (e.g. one-element) array and should not be used.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstreturnedvalue{
-      \sstsubsection{
-         AST\_INTERPOLATE = INTEGER
-      }{
-         The number of interpolation points at which an output data
-         value (and/or a variance value if relevant) equal to BADVAL
-         has been assigned because no valid interpolated value could be
-         obtained.  The maximum value that should be returned is
-         NPOINT, and the minimum is zero (indicating that all output
-         values were successfully obtained).
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The data type $<$Xtype$>$ indicates the numerical type of the data
-         being processed, as for AST\_RESAMPLE$<$X$>$.
-
-         \sstitem
-         This function will typically be invoked more than once for each
-         invocation of AST\_RESAMPLE$<$X$>$.
-
-         \sstitem
-         If an error occurs within this function, it should set the
-         STATUS argument to an error value and return a function result
-         of zero. This action will cause an immediate return from
-         AST\_RESAMPLE$<$X$>$.
-      }
-   }
-}
-\sstroutine{
    AST\_INTRAMAP\sstlabel{AST_INTRAMAP}
 }{
    Create an IntraMap
@@ -14543,7 +14340,7 @@ Object            - Base class for all AST Objects
       pixels. This produces a resampled value which is then assigned
       to the output pixel. A choice of sub-pixel interpolation
       algorithms is provided, but you may also supply a function which
-      implements your own (see \htmlref{AST\_INTERPOLATE}{AST_INTERPOLATE} as an example).
+      implements your own (see AST\_INTERPOLATE as an example).
 
       Output pixel coordinates are transformed into the coordinate
       system of the input grid using the inverse transformation of the
@@ -14708,6 +14505,15 @@ Object            - Base class for all AST Objects
          used. A dummy (e.g. one-element) array may then be supplied.
       }
       \sstsubsection{
+         FLAGS = INTEGER (Given)
+      }{
+         The sum of a set of flag values which provide
+         additional control over the resampling operation. See the
+         {\tt{"}}Control Flags{\tt{"}} section below for a description of the
+         options available.  If no flag values are to be set, a value
+         of zero should be given.
+      }
+      \sstsubsection{
          TOL = DOUBLE PRECISION (Given)
       }{
          The maximum tolerable geometrical distortion which may be
@@ -14749,15 +14555,6 @@ Object            - Base class for all AST Objects
          inhibiting linear approximation altogether (equivalent to
          setting TOL to zero). Although this may degrade
          performance, accurate results will still be obtained.
-      }
-      \sstsubsection{
-         FLAGS = INTEGER (Given)
-      }{
-         The sum of a set of flag values which provide
-         additional control over the resampling operation. See the
-         {\tt{"}}Control Flags{\tt{"}} section below for a description of the
-         options available.  If no flag values are to be set, a value
-         of zero should be given.
       }
       \sstsubsection{
          BADVAL = $<$Xtype$>$ (Given)
@@ -14910,16 +14707,19 @@ Object            - Base class for all AST Objects
          I: INTEGER
 
          \sstitem
+         UI: INTEGER (treated as unsigned)
+
+         \sstitem
          S: INTEGER$*$2 (short integer)
 
          \sstitem
          US: INTEGER$*$2 (short integer, treated as unsigned)
 
          \sstitem
-         B: BYTE (signed)
+         B: BYTE (treated as signed)
 
          \sstitem
-         UB: (BYTE (unsigned)
+         UB: BYTE (treated as unsigned)
 
       }
       For example, AST\_RESAMPLED would be used to process DOUBLE
@@ -14980,7 +14780,7 @@ Object            - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
-         AST\_\_UINTERP1, 2, 3 \& 4: A set of four flags which are
+         AST\_\_URESAMP1, 2, 3 \& 4: A set of four flags which are
          reserved for your own use. They may be used to pass private
          information to any sub-pixel interpolation algorithm which you
          implement yourself. They are ignored by all the pre-defined
@@ -15021,12 +14821,20 @@ Object            - Base class for all AST Objects
          pixel. In this context, an input pixel is considered bad if its
          data value is equal to BADVAL and the AST\_\_USEBAD flag is
          set in the FLAGS argument.
+         (Positions which have half-integral coordinate values, and
+         therefore lie on a pixel boundary, are regarded as lying within
+         the neighbouring pixel which has the larger, i.e. more positive,
+         index in the affected dimension.)
 
          \sstitem
          The set of neighbouring input pixels (excluding those which
          are bad) is unsuitable for calculating an interpolated
          value. Whether this is true may depend on the sub-pixel
          interpolation algorithm in use.
+
+         \sstitem
+         The interpolated value lies outside the range which can be
+         represented using the data type of the OUT array.
 
       }
       In addition, associated output variance estimates (if
@@ -15046,6 +14854,16 @@ Object            - Base class for all AST Objects
          estimate may be regarded as bad either because it has the value
          BADVAL (and the AST\_\_USEBAD flag is set), or because it is
          negative.
+
+         \sstitem
+         The set of neighbouring input pixels for which valid variance
+         valuies are available is unsuitable for calculating an overall
+         variance value. Whether this is true may depend on the sub-pixel
+         interpolation algorithm in use.
+
+         \sstitem
+         The variance value lies outside the range which can be
+         represented using the data type of the OUT\_VAR array.
       }
    }
 }
@@ -16100,6 +15918,301 @@ Object            - Base class for all AST Objects
          attribute and the value of NCOORD\_OUT for its \htmlref{Nout}{Nout} attribute. If
          the inverse transformation is being applied, these values should
          be reversed.
+      }
+   }
+}
+\sstroutine{
+   AST\_UINTERP\sstlabel{AST_UINTERP}
+}{
+   Perform sub-pixel interpolation on a grid of data
+}{
+   \sstdescription{
+      This is a fictitious routine which does not actually
+      exist. Instead, this description constitutes a template so that
+      you may implement a routine with this interface for yourself
+      (and give it any name you wish). Such a routine
+      may be passed via the FINTERP argument of the \htmlref{AST\_RESAMPLE$<$X$>$}{AST_RESAMPLEX}
+      functions (q.v.) in order to perform sub-pixel interpolation
+      during resampling of gridded data (you must also set the
+      INTERP argument of AST\_RESAMPLE$<$X$>$ to the value
+      AST\_\_UINTERP). This allows you to use your own interpolation
+      algorithm in addition to those which are pre-defined.
+
+      The routine interpolates an input grid of data (and,
+      optionally, processes associated statistical variance estimates)
+      at a specified set of points.
+   }
+   \sstinvocation{
+      CALL AST\_UINTERP( NDIM\_IN, LBND\_IN, UBND\_IN, IN, IN\_VAR,
+                        NPOINT, OFFSET, COORDS, PARAMS, FLAGS, BADVAL,
+                        OUT, OUT\_VAR, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NDIM\_IN = INTEGER (Given)
+      }{
+         The number of dimensions in the input grid. This will be at
+         least one.
+      }
+      \sstsubsection{
+         LBND\_IN( NDIM\_IN ) = INTEGER (Given)
+      }{
+         An array
+         containing the coordinates of the centre of the first pixel
+         in the input grid along each dimension.
+      }
+      \sstsubsection{
+         UBND\_IN( NDIM\_IN ) = INTEGER (Given)
+      }{
+         An array
+         containing the coordinates of the centre of the last pixel in
+         the input grid along each dimension.
+
+         Note that LBND\_IN and UBND\_IN together define the shape,
+         size and coordinate system of the input grid in the same
+         way as they do in AST\_RESAMPLE$<$X$>$.
+      }
+      \sstsubsection{
+         IN( $*$ ) = $<$Xtype$>$ (Given)
+      }{
+         An array, with one element for each pixel in the
+         input grid, containing the input data. This will be the same
+         array as was passed to AST\_RESAMPLE$<$X$>$ via the IN argument.
+         The numerical type of this array should match that of the
+         data being processed.
+      }
+      \sstsubsection{
+         IN\_VAR( $*$ ) = $<$Xtype$>$ (Given)
+      }{
+         An optional second array with the same size and type as the
+         IN array. This will only be given if the AST\_\_USEVAR flag is
+         set via the FLAGS argument (below). If given, it will contain
+         the set of variance values associated with the input data and
+         will be the same array as was passed to AST\_RESAMPLE$<$X$>$ via
+         the IN\_VAR argument.
+
+         If the AST\_\_USEVAR flag is not set, then no variance values
+         are being processed. In this case, this array of variance
+         values may be a dummy (e.g. one-element) array and should not
+         be used.
+      }
+      \sstsubsection{
+         NPOINT = INTEGER (Given)
+      }{
+         The number of points at which the input grid is to be
+         interpolated. This will be at least one.
+      }
+      \sstsubsection{
+         OFFSET( NPOINT ) = INTEGER (Given)
+      }{
+         For each interpolation point, this array will contain the
+         offset from the start of the OUT (and OUT\_VAR) array(s) at
+         which the interpolated value (and its variance, if required)
+         should be stored. For example, the interpolated value for
+         point number POINT should be stored in OUT(1$+$OFFSET(POINT)).
+      }
+      \sstsubsection{
+         COORDS( NPOINT, NDIM\_IN ) = DOUBLE PRECISION (Given)
+      }{
+         A 2-dimensional array containing the coordinates of the
+         points at which interpolation should be performed. These will
+         be stored so that coordinate number COORD for interpolation
+         point number POINT is found in element COORDS(POINT,COORD).
+
+         If any interpolation point has any of its coordinates equal
+         to the value AST\_\_BAD (as defined in the AST\_PAR include
+         file), then the corresponding output data (and variance)
+         should be set to the value given by BADVAL (see below).
+      }
+      \sstsubsection{
+         PARAMS( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         This will be the same array as was given via the
+         PARAMS argument of AST\_RESAMPLE$<$X$>$. You may use this to
+         pass any additional parameter values required by your
+         interpolation algorithm.
+      }
+      \sstsubsection{
+         FLAGS = INTEGER (Given)
+      }{
+         This will be the same value as was given via the FLAGS
+         argument of AST\_RESAMPLE$<$X$>$. You may test this value to
+         provide additional control over the operation of your
+         resampling algorithm. Note that the special flag values
+         AST\_\_URESAMP1, 2, 3 \& 4 are reserved for you to use for your
+         own purposes and will not clash with other pre-defined flag
+         values (see AST\_RESAMPLE$<$X$>$).
+      }
+      \sstsubsection{
+         BADVAL = $<$Xtype$>$ (Given)
+      }{
+         This will be the same value as was given for the BADVAL
+         argument of AST\_RESAMPLE$<$X$>$, and will have the same numerical
+         type as the data being processed (i.e. as elements of the IN
+         array).  It should be used to test for bad pixels in the
+         input grid (but only if the AST\_\_USEBAD flag is set via the
+         FLAGS argument) and for identifying bad output values in the
+         OUT (and OUT\_VAR) array(s).
+      }
+      \sstsubsection{
+         OUT( $*$ ) = $<$Xtype$>$ (Returned)
+      }{
+         An array with the same numerical type as the IN
+         array, into which the interpolated data values should be
+         returned.  Note that details of the storage order and number
+         of dimensions of this array are not required, since the
+         OFFSET array contains all necessary information about where
+         each returned value should be stored.
+
+         In general, not all elements of this array (or the OUT\_VAR
+         array below) may be used in any particular invocation of the
+         routine. Those which are not used should be returned
+         unchanged.
+      }
+      \sstsubsection{
+         OUT\_VAR( $*$ ) = $<$Xtype$>$ (Returned)
+      }{
+         An optional array with the same type and size as the OUT
+         array, into which variance estimates for the resampled values
+         should be returned. This array will only be given if the
+         AST\_\_USEVAR flag is set via the FLAGS argument.
+
+         If given, it is addressed in exactly the same way (via the
+         OFFSET array) as the OUT array. The values returned should be
+         estimates of the statistical variance of the corresponding
+         values in the OUT array, on the assumption that all errors in
+         input data values are statistically independent and that
+         their variance estimates may simply be summed (with
+         appropriate weighting factors).
+
+         If the AST\_\_USEVAR flag is not set, then variance values are
+         not being processed.  In this case, this array may be a dummy
+         (e.g. one-element) array and should not be used.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         This should return the number of interpolation points at
+         which an output data value (and/or a variance value if
+         relevant) equal to BADVAL has been assigned because no
+         valid interpolated value could be obtained.  The maximum
+         value that should be returned is NPOINT, and the minimum is
+         zero (indicating that all output values were successfully
+         obtained).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The data type $<$Xtype$>$ indicates the numerical type of the data
+         being processed, as for AST\_RESAMPLE$<$X$>$.
+
+         \sstitem
+         This routine will typically be invoked more than once for each
+         invocation of AST\_RESAMPLE$<$X$>$.
+
+         \sstitem
+         If an error occurs within this routine, it should set the
+         STATUS argument to an error value before returning. This will
+         cause an immediate return from AST\_RESAMPLE$<$X$>$.
+      }
+   }
+}
+\sstroutine{
+   AST\_UKERN1\sstlabel{AST_UKERN1}
+}{
+   1-dimensional sub-pixel interpolation kernel
+}{
+   \sstdescription{
+      This is a fictitious routine which does not actually
+      exist. Instead, this description constitutes a template so that
+      you may implement a routine with this interface for yourself
+      (and give it any name you wish). Such a routine
+      may be passed via the FINTERP argument of the \htmlref{AST\_RESAMPLE$<$X$>$}{AST_RESAMPLEX}
+      functions (q.v.) in order to supply a 1-dimensional
+      interpolation kernel to the algorithm which performs sub-pixel
+      interpolation during resampling of gridded data (you must also
+      set the INTERP argument of AST\_RESAMPLE$<$X$>$ to the value
+      AST\_\_UKERN1). This allows you to use your own interpolation
+      kernel in addition to those which are pre-defined.
+
+      The routine calculates the value of a 1-dimensional sub-pixel
+      interpolation kernel. This determines how the weight given to
+      neighbouring pixels in calculating an interpolated value depends
+      on the pixel's offset from the interpolation point. In more than
+      one dimension, the weight assigned to a pixel is formed by
+      evaluating this 1-dimensional kernel using the offset along each
+      dimension in turn. The product of the returned values is then
+      used as the pixel weight.
+   }
+   \sstinvocation{
+      CALL AST\_UKERN1( OFFSET, PARAMS, FLAGS, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         OFFSET = DOUBLE PRECISION (Given)
+      }{
+         This will be the offset of the pixel from the interpolation
+         point, measured in pixels. This value may be positive or
+         negative, but for most practical interpolation schemes its
+         sign should be ignored.
+      }
+      \sstsubsection{
+         PARAMS( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         This will be the same array as was given via the
+         PARAMS argument of AST\_RESAMPLE$<$X$>$. You may use this to
+         pass any additional parameter values required by your kernel,
+         but note that PARAMS(1) will already have been used to specify
+         the number of neighbouring pixels which contribute to the
+         interpolated value.
+      }
+      \sstsubsection{
+         FLAGS = INTEGER (Given)
+      }{
+         This will be the same value as was given via the FLAGS
+         argument of AST\_RESAMPLE$<$X$>$. You may test this value to
+         provide additional control over the operation of your
+         routine. Note that the special flag values AST\_\_URESAMP1, 2,
+         3 \& 4 are reserved for you to use for your own purposes and
+         will not clash with other pre-defined flag
+         values (see AST\_RESAMPLE$<$X$>$).
+      }
+      \sstsubsection{
+         VALUE = DOUBLE PRECISION (Returned)
+      }{
+         The calculated kernal value,
+         which may be positive or negative.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Not all functions make good interpolation kernels. In general,
+         acceptable kernels tend to be symmetrical about zero, to have a
+         positive peak (usually unity) at zero, and to evaluate to zero
+         whenever the pixel offset has any other integral value (this
+         last property ensures that the interpolated values pass through
+         the original data). An interpolation kernel may or may not have
+         regions with negative values. You should consult a good book on
+         image processing for more details.
+
+         \sstitem
+         If an error occurs within this routine, it should set the
+         STATUS argument to an error value before returning. This will
+         cause an immediate return from AST\_RESAMPLE$<$X$>$.
       }
    }
 }
