@@ -7,6 +7,7 @@
   <!ENTITY autoconfhtml "&autoconfman;/html_node">
   <!ENTITY automakeman "http://www.gnu.org/software/automake/manual">
   <!ENTITY automakehtml "&automakeman;/html_node">
+  <!ENTITY libtoolman "http://www.gnu.org/software/libtool/manual.html">
   <!ENTITY fig-autoheader-png SYSTEM "ssn78-1.png" NDATA png>
   <!ENTITY fig-autoheader-gif SYSTEM "ssn78-1.gif" NDATA gif89a>
   <!ENTITY fig-autoheader-eps SYSTEM "ssn78-1.eps" NDATA eps>
@@ -504,7 +505,7 @@
               <p><url>&automakeman;/</url></p>
             </li>
             <li>
-              <p><url>http://www.gnu.org/software/libtool/manual.html</url></p>
+              <p><url>&libtoolman;</url></p>
             </li>
           </ul>
           The autoconf manual is relatively clear, once you have a
@@ -755,8 +756,15 @@ AC_CHECK_FUNCS([strchr])
 
           <p>Line 7: Another Starlink extension.  It
             declares that this package has a set of ERR messages in
-            the given file, and that autoconf and automake should
-            prepare to handle them.</p>
+            the given file, and that autoconf should check the
+            location of the messgen application.  The argument is in
+            fact optional (it merely causes the files to be declared
+            as pre-distribution files -- see <ref
+            id="macro-predist-sources" />); this line should be
+            partnered by a declaration of the variable
+            <code>include_MESSAGES</code> in the corresponding
+            <code>Makefile.am</code>.  See <ref id="macro-messgen" />
+            for fuller details.</p>
 
           <p>Line 8: This is the macro that makes cpp configuration
             information available, by editing the header file
@@ -1004,6 +1012,16 @@ BUILT_SOURCES = PAR_ERR par_err.h
               >Program and Library Variables</webref> of the automake
             documentation.</p>
 
+          <p>By default, libtool builds both static and shared
+            libraries<index>shared libraries</index>.  You can control
+            this if necessary with the <code>--enable-shared</code>
+            and <code>--disable-shared</code>
+            options to <code>./configure</code>, and with the
+            <code>AC_DISABLE_SHARED</code> autoconf variable.  For
+            further details see the
+            documentation for <code>AC_PROG_LIBTOOL</code> in the
+            <webref url="&libtoolman;" >Libtool manual</webref>.</p>
+
           <p>If we only wanted to build static libraries, we would
             replace this line with <code>lib_LIBRARIES =
               libpar_adam.a</code>, and the given library would be
@@ -1217,8 +1235,8 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             (see <ref
               id="macro-defaults"/>) which,
             amongst a couple of other magic features, causes the
-            variable <code>bin_DATA</code><index>bin_DATA</index> to
-            become legal.</p>
+            variable <code>bin_DATA</code><index>DATA
+            primary!bin_DATA</index> to become legal.</p>
 
           <p>This is a rather special case, and you should not have to
             do this sort of semi-licensed hacking very often.  In
@@ -1871,7 +1889,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             url="http://www.gnu.org/software/libtool/manual.html#SEC35">section
             `Updating library version information'</webref> of the
           libtool manual, but the explanation is repeated and
-          elaborated below.</p>
+          elaborated below.<index>shared libraries!version numbers</index></p>
 
         <p>The crucial thing to remember is that the versioning
           information encoded in this <code>-version-info</code>
@@ -2747,9 +2765,17 @@ autoconf (GNU Autoconf) 2.59
 
         <p>Along with the <code>bin_MONOLITHS</code> variable, a
           Makefile must also declare a set of tasks using the
-          <code>TASKS</code><index>tasks</index> primary, and this set
-          will be empty if
-          the monolith is an ATASK.</p>
+          <code>TASKS</code><index>monoliths!and tasks</index>
+          primary, and this set will be empty if the monolith is an
+          ATASK.  If a monolith <code>foo</code> has a set of tasks
+          <code>a</code> and <code>b</code>, then this declaration
+          will look like this:
+<verbatim>
+bin_MONOLITHS = foo
+foo_TASKS = a b
+</verbatim>
+          That is, the tasks are listed without any <code>.ifl</code>
+          extension.</p>
 
         <p>The <code>foo_TASKS</code> primary indicates to automake
           that there will be <code>.ifl</code> files in the local
@@ -2757,13 +2783,16 @@ autoconf (GNU Autoconf) 2.59
           monolith, that these <code>.ifl</code> files should be
           distributed, and that the appropriate extra links should
           be made, in the binary directory, when the monolith is
-          installed.  The tasks variable is also used in the
+          installed.  The tasks variable might also be used in the
           <code>foo_SOURCES</code> variable to declare the
           dependence of the monolith on the Fortran files
           corresponding to the tasks (it would be possible to
           automake to have inferred this last step, but it seems
           clearer overall to have this dependency at least made
-          explicit).</p>
+          explicit).  Automake permits the usual Makefile variable
+          rewritings, so that if you have a Fortran file corresponding
+          to each task, then this set is
+          <code>$(foo_TASKS:=.f)</code>, which might be useful.</p>
 
         <p>The generated <code>Makefile.in</code> will install each of
           the task <code>.ifc</code> files, plus the monolith
@@ -2774,26 +2803,25 @@ autoconf (GNU Autoconf) 2.59
           generated <code>.ifl</code> file should not be included in
           the repository or the distribution.</p>
 
-        <p>If you are building an ATASK<index>atasks</index>, then the
-          task is the same name as the program, so you should simply
-          declare the <code>..._TASKS</code> variable to be empty:
+        <p>If you are building an ATASK<index>ATASKs</index>, then the
+          task is the same name as the program.  Indicate this by
+          <em>omitting</em> the <code>..._TASKS</code> variable:
 <verbatim>
-foo_TASKS =
+bin_MONOLITHS = foo
+# no variable foo_TASKS, since foo is an ATASK
 </verbatim>
-          In this case, the only <code>.ifl</code> file is that for
-          the ATASK, and automake checks that this file either exists
-          in the current directory (in which case the
-          <code>.ifl</code> file should be checked in and
-          distributed), or else it is explicitly listed in
-          <code>BUILT_SOURCES</code>, in the case where it is a
-          generated file; in this second case it is not enough that a
-          rule for the <code>.ifl</code> file exists.</p>
+          (the extra comment is useful to help document the slightly
+          non-obvious construction here).  In this case, the only
+          <code>.ifl</code> file is that for the ATASK.  The makefile
+          makes sure that this <code>.ifl</code> file is distributed,
+          so the file should either exist, or have a rule in the
+          <code>Makefile.am</code>.</p>
 
         <p>The <code>MONOLITH</code> primary allows the prefixes
           <code>bin</code>, <code>check</code> and
           <code>noinst</code>, rather like <code>PROGRAMS</code>.</p>
         
-        <p>In order to use the monolith support, you must to request
+        <p>In order to use the monolith support, you must request
           this by including the declaration
           <code>STAR_MONOLITHS</code> in the <code>configure.ac</code>
           file, most rationally near the <code>AC_PROG_CC</code>-style
@@ -3935,6 +3963,7 @@ STAR_LATEX_DOCUMENTATION(sun227)
 AC_CONFIG_FILES([Makefile component.xml])
 AC_OUTPUT
 </verbatim>
+            <index>starconf!macros!STAR_LATEX_DOCUMENTATION</index>
             Note that we must use <code>STAR_DEFAULTS</code>, and we
             must not use <code>AC_CONFIG_SUBDIRS</code>, for the reason
             described in the comments above, even though configuring
@@ -3957,6 +3986,8 @@ cfitsio_libcfitsio_a_SOURCES =
 
 include_HEADERS = cfitsio/fitsio.h cfitsio/longnam.h \
     cfitsio/fitsio2.h cfitsio/drvrsmem.h
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 EXAMPLE_SOURCES = cfitsio/cookbook.c cfitsio/cookbook.f
 
@@ -4294,33 +4325,46 @@ M Makefile.dependencies
 <verbatim>
 dtask_main.o: dtask_main.f
 install-exec-local: dtask_main.o
+        $(mkdir_p) $(DESTDIR)$(libdir)
 	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
 	if test -n "$$MANIFEST_FD"; then \
 	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >&$${MANIFEST_FD-0}; \
 	fi
 </verbatim>
-                This uses the <code>$(INSTALL_PROGRAM)</code> command to
-                install the object file in the library directory (you'd
-                use <code>$(INSTALL_DATA)</code> command for a data
+                This first creates the library directory if necessary.
+                The rules then use the <code>$(INSTALL_PROGRAM)</code>
+                command to install the object file in the library
+                directory (you'd use <code>$(INSTALL_DATA)</code>
+                command for a data
                 target)<index>installation!MANIFEST_FD</index><index>manifests!special
-                installation targets</index>.  The installation location is
-                <code>$(libdir)</code>, which is a location which
-                includes the <code>$(prefix)</code> variable, so that
-                this install rule behaves as other such rules do.
-                Also, it prefixes the installation location with
-                <code>$(DESTDIR)</code>: this is usually the empty
-                string, but it can be set to something else to perform
-                a staged installation.  Finally, the location of the
-                installed file is written to the file-descriptor in the
-                environment variable <code>$MANIFEST_FD</code>,
-                <em>if</em> that variable is non-empty (note that the
-                ampersand in the redirection operator must
-                syntactically be followed by a number, and the given
-                reference to the environment variable ensures this).  This is a
-                Starlink extension, and is how the manifest file is
-                built up.  Each of these features is important if this
-                hand-made install rule is to behave the same way as
-                the automatically-generated rules.</p>
+                installation targets</index>.  The installation
+                location is <code>$(libdir)</code>, which is a
+                location which includes the <code>$(prefix)</code>
+                variable, so that this install rule behaves as other
+                such rules do.  Also, it prefixes the installation
+                location with <code>$(DESTDIR)</code>: this is usually
+                the empty string, but it can be set to something else
+                to perform a staged installation.  Finally, the
+                location of the installed file is written to the
+                file-descriptor in the environment variable
+                <code>$MANIFEST_FD</code>, <em>if</em> that variable
+                is non-empty (note that the ampersand in the
+                redirection operator must syntactically be followed by
+                a number, and the given reference to the environment
+                variable ensures this).  This is a Starlink extension,
+                and is how the manifest file is built up.</p>
+
+              <p>Yes, this is a fuss, but it's the consequence of
+                using the <code>install-xxx-local</code> back door.
+                Each of these features is important if this hand-made
+                install rule is to behave the same way as the
+                automatically-generated rules.  This technique is also
+                inherently precarious, since if there were ever some
+                reason to modify the installation conventions (for
+                example to modify the way the manifests were built
+                up), then each such back-door would have to be
+                adjusted by hand.  That is, don't use this mechanism
+                unless you really have to.</p>
 
               <p>You often need to create links in this
                 situation<index>symlinks</index>.  To 
@@ -4682,20 +4726,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           maintainer to have the documentation changed, and the
           behaviour thus fixed.</p>
 
-        <subsect id="macro-ac-f77-have-open-readonly" export="export">
-          <subhead>
-            <title>AC_F77_HAVE_OPEN_READONLY</title>
-          </subhead>
-
-          <p><strong>AC_F77_HAVE_OPEN_READONLY</strong></p>
-
-          <p>Obsolete -- use <ref id="macro-ac-fc-open-specifiers"
-              ><code>AC_FC_OPEN_SPECIFIERS</code></ref> instead</p>
-
-        </subsect>
-
         <subsect id="macro-ac-fc-check-intrinsics" export="export"
-        indexkey="autoconf!macros!AC_FC_CHECK_INTRINSICS"> 
+          indexkey="autoconf!macros!AC_FC_CHECK_INTRINSICS"> 
           <subhead>
             <title>AC_FC_CHECK_INTRINSICS</title>
           </subhead>
@@ -5287,7 +5319,7 @@ file.f: file.$(FPP_SRC_EXT)
             code).  This triggers mild changes in the behaviour of the
             <code>STAR_DEFAULTS</code> macro which should make
             configuration somewhat faster in this case.  Certain other
-            macros, such as <code>STAR_MESSGEN</code>, are disabled.</p>
+            macros, such as <code>STAR_MESSGEN</code><index>starconf!macros!STAR_MESSGEN</index>, are disabled.</p>
 
           <p>As part of its initialisation, this macro does the following:
             <ul>
@@ -5340,61 +5372,6 @@ file.f: file.$(FPP_SRC_EXT)
 
         </subsect>
 
-        <subsect id="macro-special-dirs" export="export">
-          <subhead>
-            <title>STAR_DOCS_FILES and friends: special installation directories</title>
-          </subhead>
-
-          <p>There are several macros and makefile variables which
-            help you install files in special
-            directories<index>documentation</index><index>directories!special</index>.
-            These are 
-            the macros <code>STAR_</code><em>X</em><code>_FILES</code>
-            for <em>X</em> in <code>DOCS</code>, <code>ETC</code>,
-            <code>EXAMPLES</code>, and <code>HELP</code>, and the
-            automake variables <code>stardocs</code>,
-            <code>staretc</code>, <code>starexamples</code> and
-            <code>starhelp</code>.  In the <code>configure.ac</code>
-            file, the macros take as argument a list of files to be
-            installed in the corresponding directory (currently
-            <code>/star/docs</code> and so on), and in the
-            <code>Makefile.am</code> the variable has as value a list
-            of files to be installed as data in the corresponding
-            place.</p>
-
-          <p>For more general customisation of such installation
-            directories, note the `<code>foodir</code>' mechanism
-            mentioned in <ref id="automakeoverview"/>, and described
-            in section <webref url="&automakehtml;/Uniform.html" >The
-            Uniform Naming Scheme</webref> of the automake manual.</p>
-        </subsect>
-
-        <subsect id="macro-fc-library-ldflags" export="export"
-          indexkey="starconf!macros!STAR_FC_LIBRARY_LDFLAGS (obsolete)">
-          <subhead>
-            <title>STAR_FC_LIBRARY_LDFLAGS</title>
-          </subhead>
-
-          <p><strong><code>STAR_FC_LIBRARY_LDFLAGS</code></strong></p>
-
-          <p>Obsolete: use standard <code>AC_FC_LIBRARY_LDFLAGS</code>
-            instead -- the extra functionality which this macro added
-            to the standard one is now handled automatically.</p>
-        </subsect>
-
-        <subsect id='macro-have-fc-open-readonly' export='export'
-          indexkey="starconf!macros!STAR_HAVE_FC_OPEN_READONLY (obsolete)">
-          <subhead>
-            <title>STAR_HAVE_FC_OPEN_READONLY</title>
-          </subhead>
-
-          <p><strong><code>STAR_HAVE_FC_OPEN_READONLY</code></strong></p>
-
-          <p>Obsolete -- use <ref id="macro-ac-fc-open-specifiers"
-              ><code>AC_FC_OPEN_SPECIFIERS(readonly)</code></ref> instead.</p>
-
-        </subsect>
-
         <subsect id='macro-latex-documentation' export='export'
           indexkey="starconf!macros!STAR_LATEX_DOCUMENTATION">
           <subhead>
@@ -5421,12 +5398,20 @@ file.f: file.$(FPP_SRC_EXT)
             should use this second argument and provide rules for
             satisfying the given targets.</p>
 
-          <p>In the latter case, the <code>.tex -> htx_tar</code>
-            rule is still emitted, so you can use it, but it requires
-            the substitution variable @STAR2HTML@, and so if you _do_
-            use it, you will have to make that available, either
-            through <code>STAR_CHECK_PROGS(star2html)</code> or
-            otherwise (see <ref id="macro-check-progs"/>).</p>
+          <p>In the latter case, the <code>.tex -> htx_tar</code> rule
+            is still emitted, so you can use it, but it requires the
+            substitution variable <code>@STAR2HTML@</code>, and so if
+            you <em>do</em> use it, you will have to make that
+            available, either through
+            <code>STAR_CHECK_PROGS(star2html)</code> or otherwise (see
+            <ref id="macro-check-progs"/>).</p>
+
+          <p>This macro defines the substitution variable
+            <code>@STAR_LATEX_DOCUMENTATION@</code> to be the second
+            macro argument if that is present, or the default file
+            list if not.  This variable must therefore be used as a value
+            for the <code>stardocs_DATA</code> Makefile variable (see
+            <ref id="variable-starxxxdata"/>).</p>
 
         </subsect>
 
@@ -5541,50 +5526,87 @@ AC_SUBST(STAR_MANIFEST_DIR)
             <title>STAR_MESSGEN</title>
           </subhead>
 
-          <p><strong><code>STAR_MESSGEN(msgfile-list)</code></strong></p>
+          <p><strong><code>STAR_MESSGEN([msgfile-list])</code></strong></p>
 
-          <p>Handle generating message, error, and facility
-            files.<index>messgen</index></p>
+          <p>Handle generating message, error, and facility files.</p>
 
-          <p>The argument is a space-separated list of files, each
-            of which has a set of message declarations in it, in the
-            format prescribed by the messgen utility.  There is no
-            default, though the usual name for this file is
-            <code>${PACKAGE}_err.msg</code>.  The macro may be called
-            more than once if you have more than one <code>.msg</code>
-            file in the directory.</p>
+          <p>Declare that we will need to use the messgen utility.
+            This macro does not by itself cause the messgen rules to
+            be included in the makefile -- that is done by automake,
+            when it sees a <code>include_MESSAGES</code> variable.</p>
 
-          <p>This causes automake to add makefile rules to create
-            the appropriate <code>_err</code>, <code>_ERR</code>,
-            <code>_err.h</code> and <code>fac_nnn_err</code> files,
-            and handles installing the latter file to the help
-            directory, and including it in the distribution.</p>
+          <p>In the <code>Makefile.am</code> you declare the
+            <code>include_MESSAGES</code><index>include_MESSAGES</index>
+            or <code>noinst_MESSAGES</code>
+            variable to have as value each of the error files you
+            require from the <code>.msg</code> file.  For example, you
+            might write:
+<verbatim>
+include_MESSAGES = ast_err.h AST_ERR
+</verbatim>
+            to generate, install and distribute the C and Fortran
+            error message files.  You may
+            include a <code>_SOURCES</code> declaration to indicate
+            the name of the <code>.msg</code> file, but the default
+            value (<code>ast_err.msg</code> in this case) is usually
+            correct.  The files thus listed are installed in the same
+            include directory as other header files.  You should not
+            list a file in both <code>include_MESSAGES</code> and
+            <code>include_HEADER</code>.</p>
+
+          <p>If you need to work with an error file which is not
+            public, you can declare it with
+            <index>installation!noinst prefix</index>
+<verbatim>
+noinst_MESSAGES = dat_err.h
+</verbatim>
+            Such a file is generated but not installed.  In order that
+            it be distributed, you should include
+            <code>$(noinst_MESSAGES)</code> in the <code>_SOURCES</code>
+            declaration of the program which includes it.</p>
+
+          <p>Although it's difficult to see why you'd want to, you can
+            include the <code>nodist_</code> prefix with this
+            primary.<index>distribution!nodist prefix</index></p>
+
+          <p>You do not need to mention the <code>fac_xxx_err</code>
+            file which messgen also generates -- this is generated and
+            installed automatically.</p>
+
+          <p>The optional argument is a space-separated list of files,
+            each of which has a set of message declarations in it, in
+            the format prescribed by the messgen utility.  If this is
+            present, then the named files are declared as
+            pre-distribution files (the macro calls <ref
+            id="macro-predist-sources"
+            >STAR_PREDIST_SOURCES</ref><index>starconf!macros!STAR_PREDIST_SOURCES</index>
+            on them), and so the resulting configure script should
+            expect not to find them in an unpacked distribution.  This
+            is useful as documentation or as a shortcut for calling
+            the latter macro, but recall that it is the presence of
+            the automake <code>include_MESSAGES</code> variable which
+            does the work.</p>
+
+          <p>The macro may be called more than once if you have more
+            than one <code>.msg</code> file in the directory.</p>
 
           <p>The files which this generates should be declared as
             sources in the Makefile.am if they are to be used in code,
-            or are to be installed.  If they are used in building the
-            package, you will probably need to declare them
-            additionally as <code>BUILT_SOURCES</code>.  The package
-            also implicitly declares a `sourceset' dependency on the
-            messgen package (see <ref
-              id="macro-declare-dependencies"/>).</p>
+            or are to be installed.  For example:
+<verbatim>
+bin_PROGRAMS = foo
+foo_SOURCES = foo.c $(include_MESSAGES)
 
-          <p>This macro also declares that the .msg files are
-            pre-distribution files (it calls <ref
-              id="macro-predist-sources"
-              ><code>STAR_PREDIST_SOURCES</code></ref><index>starconf!macros!STAR_PREDIST_SOURCES</index>)
-            on them, and so 
-            the resulting configure script should expect not to find
-            them in an unpacked distribution.</p>
-          
-          <p>This macro leaves the discovered facility code in the
-            shell variable <code>star_facilitycode</code> (this
-            corresponds to the last message file, if there is more
-            than one), from where it may be scavenged by the calling
-            configure script.  No component should <em>need</em> to
-            use this number -- it is present for historical reasons,
-            and is potentially useful if a component needs an integer
-            which is guaranteed unique to that component.</p>
+include_MESSAGES = foo_err.h
+
+BUILT_SOURCES = $(include_MESSAGES)
+</verbatim>
+            If they are used in building the package, you will
+            probably need to declare them additionally as
+            <code>BUILT_SOURCES</code><index>BUILT_SOURCES</index>.</p>
+
+          <p>The macro also implicitly declares a `sourceset'
+            dependency on the messgen package.</p>
 
         </subsect>
 
@@ -5757,6 +5779,97 @@ AC_SUBST(STAR_MANIFEST_DIR)
           <p>For examples of use, see <ref id="autodistrib"/></p>
 
         </subsect>
+
+        <subsect id="variable-starxxxdata" export="export"
+          indexkey="starconf!variables!starxxx_DATA">
+          <subhead>
+            <title>starxxx_DATA -- special installation directories</title>
+          </subhead>
+
+          <p>There are several makefile variables which help you
+            install files in special
+            directories<index>documentation</index><index>directories!special</index>.
+            These are the variables <code>stardocs_DATA</code>,
+            <code>staretc_DATA</code>, <code>starexamples_DATA</code>
+            and <code>starhelp_DATA</code>.  In the
+            <code>Makefile.am</code> the variable has as value a list
+            of files to be installed as data in the corresponding
+            place.</p>
+
+          <p>Since the list of documentation files is not necessarily
+            known in advance (since the macro <ref
+              id="macro-latex-documentation"
+            >STAR_LATEX_DOCUMENTATION</ref> has a default list of
+            targets it will generate, you can give the value of the
+            <code>stardocs_DATA</code> as a substitution variable:
+<verbatim>
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+</verbatim>
+            (plus any other documentation files you require).</p>
+
+        </subsect>
+
+        <subsect id="macro-obsolete" export="export">
+          <subhead>
+            <title>Obsolete macros</title>
+          </subhead>
+          
+          <subsubsect id="macro-ac-f77-have-open-readonly" export="export">
+            <subhead>
+              <title>AC_F77_HAVE_OPEN_READONLY</title>
+            </subhead>
+          
+            <p><strong>AC_F77_HAVE_OPEN_READONLY</strong></p>
+          
+            <p><strong>Obsolete</strong>:
+              use <ref id="macro-ac-fc-open-specifiers"
+                ><code>AC_FC_OPEN_SPECIFIERS</code></ref> instead</p>
+
+          </subsubsect>
+
+          <subsubsect id="macro-special-dirs" export="export">
+            <subhead>
+              <title>STAR_DOCS_FILES and friends</title>
+            </subhead>
+
+            <p><strong>Obsolete</strong>:
+              The <code>STAR_X_FILES</code> macros (for X in
+              <code>DOCS</code>, <code>ETC</code>, <code>EXAMPLES</code>
+              and <code>HELP</code>) are now obsolete, and you should
+              use the corresponding makefile variables instead -- see
+              <ref id="variable-starxxxdata"/>.</p>
+
+          </subsubsect>
+
+          <subsubsect id="macro-fc-library-ldflags" export="export"
+            indexkey="starconf!macros!STAR_FC_LIBRARY_LDFLAGS (obsolete)">
+            <subhead>
+              <title>STAR_FC_LIBRARY_LDFLAGS</title>
+            </subhead>
+
+            <p><strong><code>STAR_FC_LIBRARY_LDFLAGS</code></strong></p>
+
+            <p><strong>Obsolete</strong>:
+              use standard <code>AC_FC_LIBRARY_LDFLAGS</code>
+              instead -- the extra functionality which this macro added
+              to the standard one is now handled automatically.</p>
+          </subsubsect>
+
+          <subsubsect id='macro-have-fc-open-readonly' export='export'
+            indexkey="starconf!macros!STAR_HAVE_FC_OPEN_READONLY (obsolete)">
+            <subhead>
+              <title>STAR_HAVE_FC_OPEN_READONLY</title>
+            </subhead>
+
+            <p><strong><code>STAR_HAVE_FC_OPEN_READONLY</code></strong></p>
+
+            <p><strong>Obsolete</strong>:
+              use <ref id="macro-ac-fc-open-specifiers"
+                ><code>AC_FC_OPEN_SPECIFIERS(readonly)</code></ref> instead.</p>
+
+          </subsubsect>
+        </subsect>
+
       </sect>
 
       <sect id="gnutools" export="export"
