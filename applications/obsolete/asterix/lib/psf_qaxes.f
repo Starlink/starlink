@@ -1,5 +1,5 @@
 *+  PSF_QAXES - Return axis id's
-      SUBROUTINE PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
+      SUBROUTINE PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 *
 *    Authors :
 *

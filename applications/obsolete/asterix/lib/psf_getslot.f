@@ -103,10 +103,6 @@
         LOGICAL			AST_QPKGI
       EXTERNAL			PSF_BLK
 
-*  Local Constants:
-      CHARACTER*4		PROP
-        PARAMETER		( PROP = '.PSFID' )
-
 *  Local Variables:
       LOGICAL			THERE			! Already exists?
 *.
@@ -118,9 +114,9 @@
       IF ( .NOT. AST_QPKGI( PSF__PKG ) ) CALL PSF_INIT( STATUS )
 
 *  Property already exists?
-      CALL ADI_THERE( FID, PROP, THERE, STATUS )
+      CALL ADI_THERE( FID, PSF__PROP, THERE, STATUS )
       IF ( THERE ) THEN
-        CALL ADI_CGET0I( FID, PROP, PSID, STATUS )
+        CALL ADI_CGET0I( FID, PSF__PROP, PSID, STATUS )
 
 *  New psf
       ELSE
@@ -132,7 +128,7 @@
         CALL ADI_CPUT0I( PSID, 'FileID', FID, STATUS )
 
 *    Store psf identifier
-        CALL ADI_CPUT0I( FID, PROP, PSID, STATUS )
+        CALL ADI_CPUT0I( FID, PSF__PROP, PSID, STATUS )
 
       END IF
 
