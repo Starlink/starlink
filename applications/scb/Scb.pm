@@ -60,6 +60,8 @@ require Exporter;
              $func_indexfile $file_indexfile $taskfile
              %tagger/;
 
+@EXPORT_OK = qw/error/;
+
 #  Map error handler routine to that from the main:: namespace.
 
 sub error { &main::error (@_) }
