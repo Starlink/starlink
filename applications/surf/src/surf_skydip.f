@@ -116,6 +116,10 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.23  1998/01/07 20:21:35  timj
+*     Make sure that Model airmass range matches the airmass range of the
+*     data.
+*
 *     Revision 1.22  1998/01/07 00:31:35  timj
 *     Add the CVAR parameter for controlling whether a constant variance is used.
 *
@@ -668,7 +672,7 @@ c
      :        REAL(N_MEASUREMENTS - 1)
          DO I = 1, N_MEASUREMENTS
             AIRMASST(I) = AIRMASS_START + AIRSTEP * REAL(I-1)
- 
+
 *  Calculate the error Delta A = (TAN / SIN) Delta EL
 *     TAN = 1/SQRT((AIR-1)(AIR+1))
             AIRMASS_TVAR(I) = 2.0 * ARCSEC * AIRMASST(I) / ! 2 arcsec error
@@ -949,11 +953,11 @@ c
             DREF = %LOC(J_THEORETICAL)   ! Reference to data
             AREF = %LOC(AIR_MODEL)       ! Reference to axis
 
-            AIRSTEP = (AIRMASST(N_MEASUREMENTS) - AIRMASST(1)) /
+            AIRSTEP = (AIRMASS(NKEPT) - AIRMASS(1)) /
      :           (N_MODEL - 1)
 
             DO I = 1, N_MODEL
-               AIR_MODEL(I) = AIRMASST(1) + AIRSTEP * (I - 1)
+               AIR_MODEL(I) = AIRMASS(1) + AIRSTEP * (I - 1)
                CALL SCULIB_J_THEORETICAL (TAUZ_FIT, AIR_MODEL(I), T_TEL,
      :              T_AMB, WAVE, ETA_TEL_FIT, B_FIT, J_THEORETICAL(I),
      :              STATUS)
