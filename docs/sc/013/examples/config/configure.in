@@ -40,7 +40,7 @@ AC_ARG_ENABLE(nounderscore,
   NOUNDERSCORES=$enableval)
 
 AC_ARG_ENABLE(nan,
-[  --enable-nan=opt       Compiler switch to suppress trap on IEEE exceptions],
+[  --enable-nan=opt       C-compiler switch to suppress trap on IEEE exceptions],
   ENABLENAN=$enableval)
 
 
