@@ -196,10 +196,13 @@
       LOGICAL			ARD			! ARD file mode?
       LOGICAL			AXMODE			! Axis mode?
       LOGICAL			CANCEL			! Cancel mode?
+      LOGICAL			DUMP			! Dump file mode?
       LOGICAL       		OK			! Object is ok?
       LOGICAL			POLAR			! Polar mode?
+      LOGICAL       		QOK			! Input quality ok?
       LOGICAL			REG			! Regular radial bins?
       LOGICAL			UPDATE			! Update mode?
+      LOGICAL       		VOK			! Input variance ok?
 *.
 
 *  Check inherited global status.
