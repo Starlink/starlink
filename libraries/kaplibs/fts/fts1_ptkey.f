@@ -67,6 +67,7 @@
 *  Authors:
 *     WG: Wei Gong (IPMAF)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +79,8 @@
 *     1994 September 22 (MJC):
 *        Calls a dummy subroutine to pass the character arguments in the
 *        order needed for UNIX operation.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,6 +123,7 @@
 *  Local Data:
       INCLUDE 'FTS_PAR'          ! FTS package constants and some
                                  ! declarations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
@@ -179,9 +183,11 @@
 *  arrays must appear before the unmapped arrays because we must pass
 *  the lengths explicitly for the former as the compilers pass the
 *  lengths of the latter as appended arguments .
-      CALL FTS1_INKEY_C1( OLDSIZ, NKEY, %VAL( FTSPNT( 1 ) ),
-     :                    %VAL( CPNTR( 1 ) ), NAMES, PSTNS, ACTNUM,
-     :                    %VAL( IPNTR1( 1 ) ), %VAL( IPNTR2( 1 ) ),
+      CALL FTS1_INKEY_C1( OLDSIZ, NKEY, %VAL( CNF_PVAL( FTSPNT( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( CPNTR( 1 ) ) ), 
+     :                    NAMES, PSTNS, ACTNUM,
+     :                    %VAL( CNF_PVAL( IPNTR1( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPNTR2( 1 ) ) ),
      :                    STATUS, %VAL( FITSLN ), %VAL( FITSLN ) )
 
 *  Unmap the FITS array.

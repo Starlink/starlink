@@ -103,6 +103,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     RDS: Richard D. Saxton (STARLINK, Leicester)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -122,6 +123,8 @@
 *        Inquire the operating system in order to find the file name.
 *     1992 April 23 (MJC):
 *        Allow a null table file, skipping over it.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,6 +139,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER
@@ -386,10 +390,13 @@
 *       length argument after the status is needed for passing the
 *       mapped character array on UNIX platforms.  It is ignored on VMS.
 
-         CALL FTS1_RSTAB( %VAL( WKPNTR( 1 ) ), MEDIUM, MD, PNTAB,
+         CALL FTS1_RSTAB( %VAL( CNF_PVAL( WKPNTR( 1 ) ) ), 
+     :                    MEDIUM, MD, PNTAB,
      :                    TABNAM, AUTO, DIMS( 1 ), DIMS( 2 ), BLKSIZ,
-     :                    ACTSIZ, %VAL( BFPNTR ), OFFSET, CURREC,
-     :                    %VAL( RCPNTR ), STATUS, %VAL( DIMS( 1 )+1 ) )
+     :                    ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                    OFFSET, CURREC,
+     :                    %VAL( CNF_PVAL( RCPNTR ) ), STATUS, 
+     :                    %VAL( DIMS( 1 )+1 ) )
 
 *       Check for option not to create file.
 
@@ -406,8 +413,9 @@
 *          per value, a GCOUNT of 1, and PCOUNT of 0.
 
             CALL FTS1_SKIP( MEDIUM, MD, DIMS( 1 ) * DIMS( 2 ), 1, 1, 0,
-     :                      BLKSIZ, ACTSIZ, %VAL( BFPNTR ), OFFSET,
-     :                      %VAL( RCPNTR ), RDISP, STATUS )
+     :                      BLKSIZ, ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                      OFFSET,
+     :                      %VAL( CNF_PVAL( RCPNTR ) ), RDISP, STATUS )
 
 *          Release the error context.
 

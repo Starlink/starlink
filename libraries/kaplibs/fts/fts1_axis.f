@@ -46,6 +46,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *        Selects appropriate precision of the AXIS arrays.
 *     1996 November 24 (MJC):
 *        Modern style.  Revised FTS1_GKEYx calls.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,6 +77,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NCARD
@@ -201,7 +205,8 @@
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL KPG1_SSAZR( EL, DELT, OFFSET,
-     :                             %VAL( PNTR( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                             STATUS )
                
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
@@ -220,7 +225,8 @@
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL KPG1_SSAZD( EL, DELT, OFFSET,
-     :                             %VAL( PNTR( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                             STATUS )
 
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )

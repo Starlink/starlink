@@ -185,6 +185,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     RDS: Richard D. Saxton (STARLINK, Leicester)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -212,6 +213,8 @@
 *        Added support for NDF WCS component.
 *     8-OCT-1998 (DSB):
 *        KPG1_CHVAx changed to FTS1_CHVAx so that they can be in libfits.a.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -227,6 +230,7 @@
       INCLUDE 'DAT_PAR'        ! Data-system constants
       INCLUDE 'PAR_ERR'        ! Parameter-system error definitions
       INCLUDE 'PRM_PAR'        ! Bad-pixel definitions
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER
@@ -433,8 +437,10 @@
 
             IF ( GEXTND ) THEN
                CALL FTS1_SKIP( MEDIUM, MD, SIZE, BPV, GCOUNT, PCOUNT,
-     :                         BLKSIZ, ACTSIZ, %VAL( BFPNTR ), OFFSET,
-     :                         %VAL( RCPNTR ), RDISP, STATUS )
+     :                         BLKSIZ, ACTSIZ, 
+     :                         %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
+     :                         %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                         RDISP, STATUS )
             END IF
 
 *          Ask calling application to go on to the next sub-file or
@@ -549,9 +555,11 @@
 *             parameters.  Only byte swap on VMS integer data.
 
                CALL FTS1_RGRDA( MEDIUM, MD, SIZE, BPV, SWAPBY, PCOUNT,
-     :                          BLKSIZ, ACTSIZ, %VAL( BFPNTR ), OFFSET,
-     :                          %VAL( RCPNTR ), RDISP, PARAMS,
-     :                          %VAL( PNTR( 1 ) ), STATUS )
+     :                          BLKSIZ, ACTSIZ, 
+     :                          %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
+     :                          %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                          RDISP, PARAMS,
+     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
 *             Tidy up after an error.
 
@@ -589,9 +597,10 @@
 *             integer data.
 
                CALL FTS1_RDATA( MEDIUM, MD, SIZE, BPV, SWAPBY, BLKSIZ,
-     :                          ACTSIZ, %VAL( BFPNTR ), OFFSET,
-     :                          %VAL( RCPNTR ), RDISP,
-     :                          %VAL( PNTR( 1 ) ), STATUS )
+     :                          ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                          OFFSET,
+     :                          %VAL( CNF_PVAL( RCPNTR ) ), RDISP,
+     :                          %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
 *             Tidy up after an error.
 
@@ -611,18 +620,24 @@
 *             the FITS array.
 
                IF ( FMTIN .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOR( .FALSE., SIZE, %VAL( WKPNTR( 1 ) ),
-     :                           %VAL( DAPNTR( 1 ) ), IERR, NBAD,
+                  CALL VEC_ITOR( .FALSE., SIZE, 
+     :                           %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
+     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                           IERR, NBAD,
      :                           STATUS )
 
                ELSE IF ( FMTIN .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOR( .FALSE., SIZE, %VAL( WKPNTR( 1 ) ),
-     :                           %VAL( DAPNTR( 1 ) ), IERR, NBAD,
+                  CALL VEC_WTOR( .FALSE., SIZE, 
+     :                           %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
+     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                           IERR, NBAD,
      :                           STATUS )
 
                ELSE IF ( FMTIN .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOR( .FALSE., SIZE, %VAL( WKPNTR( 1 ) ),
-     :                           %VAL( DAPNTR( 1 ) ), IERR, NBAD,
+                  CALL VEC_UBTOR( .FALSE., SIZE, 
+     :                            %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
+     :                           %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                           IERR, NBAD,
      :                           STATUS )
                END IF
 
@@ -634,7 +649,8 @@
 *             pixels to the standard bad value.
 
                CALL FTS1_SCOFB( BSCALE, BZERO, BADPIX, BLANK, SIZE,
-     :                          %VAL( DAPNTR( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                          STATUS )
 
 *          Process data blank.
 *          ===================
@@ -649,18 +665,22 @@
 *             the IEEE numbers.
 
                IF ( BPV .EQ. 1 ) THEN
-                  CALL FTS1_CHVAUB( EL, %VAL( WKPNTR( 1 ) ),
+                  CALL FTS1_CHVAUB( EL, %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
      :                              VAL_ITOUB( .FALSE., BLANK, STATUS ),
-     :                              VAL__BADUB, %VAL( DAPNTR( 1 ) ),
+     :                              VAL__BADUB, 
+     :                              %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                              NBAD, STATUS )
                ELSE IF ( BPV .EQ. 2 ) THEN
-                  CALL FTS1_CHVAW( EL, %VAL( WKPNTR( 1 ) ),
+                  CALL FTS1_CHVAW( EL, %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
      :                             VAL_ITOW( .FALSE., BLANK, STATUS ),
-     :                             VAL__BADW, %VAL( DAPNTR( 1 ) ),
+     :                             VAL__BADW, 
+     :                             %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                             NBAD, STATUS )
                ELSE IF ( BPV .EQ. 4 ) THEN
-                  CALL FTS1_CHVAI( EL, %VAL( WKPNTR( 1 ) ), BLANK,
-     :                             VAL__BADI, %VAL( DAPNTR( 1 ) ),
+                  CALL FTS1_CHVAI( EL, %VAL( CNF_PVAL( WKPNTR( 1 ) ) ), 
+     :                             BLANK,
+     :                             VAL__BADI, 
+     :                             %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                             NBAD, STATUS )
                END IF
 
@@ -711,14 +731,16 @@
 *          32-bit reals.
 
             IF ( BPV .EQ. 4 ) THEN
-               CALL FTS1_I2VXR( BSWAP, WSWAP, EL, %VAL( DAPNTR( 1 ) ),
+               CALL FTS1_I2VXR( BSWAP, WSWAP, EL, 
+     :                          %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                          STATUS )
 
 *          64-bit double precision.  Here word swap also swaps
 *          longwords, so in effect all the bytes are reversed.
 
             ELSE IF ( BPV .EQ. 8 ) THEN
-               CALL FTS1_I2VXD( .TRUE., EL, %VAL( DAPNTR( 1 ) ),
+               CALL FTS1_I2VXD( .TRUE., EL, 
+     :                          %VAL( CNF_PVAL( DAPNTR( 1 ) ) ),
      :                          STATUS )
             END IF
 
@@ -733,12 +755,14 @@
 *          32-bit reals.
 
             IF ( BPV .EQ. 4 ) THEN
-               CALL FTS1_RNANR( EL, %VAL( DAPNTR( 1 ) ), STATUS )
+               CALL FTS1_RNANR( EL, %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                          STATUS )
 
 *          64-bit reals.
 
             ELSE IF ( BPV .EQ. 8 ) THEN
-               CALL FTS1_RNAND( EL, %VAL( DAPNTR( 1 ) ), STATUS )
+               CALL FTS1_RNAND( EL, %VAL( CNF_PVAL( DAPNTR( 1 ) ) ), 
+     :                          STATUS )
 
             END IF
 

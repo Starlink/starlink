@@ -154,6 +154,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -161,6 +162,8 @@
 *        Original version based upon FTS1_PTKEY.
 *     22-SEP-1999 (DSB):
 *        Added argument THERE.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -212,6 +215,7 @@
 *  Local Data:
       INCLUDE 'FTS_PAR'          ! FTS package constants and some
                                  ! declarations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
@@ -272,10 +276,13 @@
 *  the lengths explicitly for the former as the compilers pass the
 *  lengths of the latter as appended arguments .
       CALL FTS1_EDKEY_C1( OLDSIZ, NKEY, NEWSIZ( 1 ),
-     :                    %VAL( FTSPNT( 1 ) ), %VAL( CPNTR( 1 ) ),
+     :                    %VAL( CNF_PVAL( FTSPNT( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( CPNTR( 1 ) ) ),
      :                    EDITS, NAMES, PSTNS, KOCCUR, POCCUR, VALUES,
-     :                    COMNTS, TYPES, ACTNUM, %VAL( IPNTR1( 1 ) ),
-     :                    %VAL( IPNTR2( 1 ) ), THERE, STATUS, 
+     :                    COMNTS, TYPES, ACTNUM, 
+     :                    %VAL( CNF_PVAL( IPNTR1( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( IPNTR2( 1 ) ) ), 
+     :                    THERE, STATUS,
      :                    %VAL( FITSLN ), %VAL( FITSLN ) )
 
 *  Unmap the FITS array.

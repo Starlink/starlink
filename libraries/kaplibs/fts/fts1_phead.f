@@ -161,6 +161,7 @@
 *     PMA: Peter Allan  (Manchester University)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     RDS: Richard D. Saxton (STARLINK, Leicester)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -209,6 +210,8 @@
 *        is column 30.
 *     1996 November 24 (MJC):
 *        Revised FTS1_GKEYx calls.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 *     
 *  Bugs:
@@ -222,6 +225,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER BFPNTR             ! Pointers to the buffer area
@@ -334,13 +338,16 @@
 
 *  Read the tape.
          IF ( TAPE ) THEN
-            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, %VAL( BFPNTR ), OFFSET,
-     :                       %VAL( RCPNTR ), STATUS )
+            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, 
+     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
+     :                       %VAL( CNF_PVAL( RCPNTR ) ), STATUS )
 
 *  Read the disk file.
          ELSE
-            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .TRUE., %VAL( BFPNTR ),
-     :                       OFFSET, %VAL( RCPNTR ), STATUS )
+            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .TRUE., 
+     :                       %VAL( CNF_PVAL( BFPNTR ) ),
+     :                       OFFSET, %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                       STATUS )
          END IF
 
 *  Error reading the FITS file.  Report context and abort.
@@ -420,13 +427,16 @@
 
 *  Read the tape.
             IF ( TAPE ) THEN
-               CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, %VAL( BFPNTR ),
-     :                          OFFSET, %VAL( RCPNTR ), STATUS )
+               CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, 
+     :                          %VAL( CNF_PVAL( BFPNTR ) ),
+     :                          OFFSET, %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                          STATUS )
 
 *  Read the disk file.
             ELSE
                CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., 
-     :                          %VAL( BFPNTR ), OFFSET, %VAL( RCPNTR ),
+     :                          %VAL( CNF_PVAL( BFPNTR ) ), OFFSET, 
+     :                          %VAL( CNF_PVAL( RCPNTR ) ),
      :                          STATUS )
             END IF
 
@@ -452,13 +462,15 @@
 
 *  Read the tape.
          IF ( TAPE ) THEN
-            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, %VAL( BFPNTR ), OFFSET,
-     :                       %VAL( RCPNTR ), STATUS )
+            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, 
+     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
+     :                       %VAL( CNF_PVAL( RCPNTR ) ), STATUS )
 
 *  Read the disk file.
          ELSE
             CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
-     :                       %VAL( BFPNTR ), OFFSET, %VAL( RCPNTR ),
+     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET, 
+     :                       %VAL( CNF_PVAL( RCPNTR ) ),
      :                       STATUS )
          END IF
 
@@ -541,14 +553,18 @@
 *  Read the tape.
                   IF ( TAPE ) THEN
                      CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
-     :                                %VAL( BFPNTR ), OFFSET,
-     :                                %VAL( RCPNTR ), STATUS )
+     :                                %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                                OFFSET,
+     :                                %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                                STATUS )
 
 *  Read the disk file.
                   ELSE
                      CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., 
-     :                                %VAL( BFPNTR ), OFFSET,
-     :                                %VAL( RCPNTR ), STATUS )
+     :                                %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                                OFFSET,
+     :                                %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                                STATUS )
                   END IF
 
 *  Error reading the FITS file.  Report context and abort.
