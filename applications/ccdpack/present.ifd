@@ -1,10 +1,13 @@
       action present {
 #+
 #  Name:
-#     PRESENT.IFD
+#     present.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -48,7 +51,7 @@
 
          parameter in {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default *
@@ -68,7 +71,7 @@
 
          parameter bias {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -78,7 +81,7 @@
 
          parameter target {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -88,7 +91,7 @@
 
          parameter dark {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -98,7 +101,7 @@
 
          parameter flash {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -108,7 +111,7 @@
 
          parameter flat {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -118,7 +121,7 @@
 
          parameter masterbias {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -128,7 +131,7 @@
 
          parameter masterdark {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -138,7 +141,7 @@
 
          parameter masterflash {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -148,7 +151,7 @@
 
          parameter masterflat {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default !
@@ -179,7 +182,7 @@
          parameter ftype {
                           # Frame type parameter
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT
             ppath DYNAMIC CURRENT
             prompt {Frame type}
@@ -189,7 +192,7 @@
          parameter filter {
                            # Frame type parameter
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT
             ppath DYNAMIC CURRENT
             prompt {Filter type}
@@ -319,7 +322,7 @@
          parameter logto {
                           # Log output to ?
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto
@@ -342,7 +345,7 @@
 
          parameter namelist {
             type LITERAL
-            access WRITE
+            access READ
             vpath DEFAULT
             ppath DEFAULT
             default !

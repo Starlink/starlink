@@ -1,10 +1,13 @@
       action schedule {
 #+
 #  Name:
-#     SCHEDULE.IFD
+#     schedule.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -219,7 +222,7 @@
          parameter logto {
                           # Log output to ?
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

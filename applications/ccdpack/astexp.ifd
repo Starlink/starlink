@@ -1,10 +1,13 @@
       action astexp {
 #+
 #  Name:
-#     ASTEXP.IFD
+#     astexp.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
@@ -67,6 +70,7 @@
 
          parameter baseepoch {
             type _DOUBLE
+            access READ
             vpath PROMPT
             ppath DYNAMIC CURRENT
             prompt {Base frame epoch of observation}
@@ -117,7 +121,7 @@
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

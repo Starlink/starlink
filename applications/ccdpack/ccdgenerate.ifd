@@ -1,10 +1,13 @@
       action ccdgenerate {
 #+
 #  Name:
-#     CCDGENERATE.IFD
+#     ccdgenerate.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -38,6 +41,7 @@
                          # Number of test sequences to create
             position 2
             type _INTEGER
+            access READ
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default 5
@@ -47,6 +51,7 @@
 
          parameter angles {
             type _DOUBLE
+            access READ
             vpath PROMPT
             ppath CURRENT DEFAULT
             prompt {Angle of each output sequence (degrees anticlockwise)}
@@ -56,6 +61,7 @@
 
          parameter origins {
             type _DOUBLE
+            access READ
             vpath PROMPT
             ppath CURRENT
             prompt {Origin of each output sequence (X,Y,...)}
@@ -64,6 +70,7 @@
 
          parameter pixels {
             type _INTEGER
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT
             prompt {Size in pixels for the output NDFs (X,Y)}
@@ -72,6 +79,7 @@
 
          parameter reduced {
             type _LOGICAL
+            access READ
             vpath PROMPT
             ppath CURRENT DEFAULT
             prompt {Reduced data, or unreduced with bias and flats?}
@@ -80,6 +88,7 @@
 
          parameter type {
             type _CHAR
+            access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default .sdf
@@ -89,7 +98,7 @@
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

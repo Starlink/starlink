@@ -1,10 +1,13 @@
       action tranlist {
 #+
 #  Name:
-#     TRANLIST.IFD
+#     tranlist.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -38,7 +41,7 @@
          parameter outlist {
             position 2
             type LITERAL
-            access WRITE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT
             prompt {Names for output lists}
@@ -48,7 +51,7 @@
          parameter trtype {
             position 3
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default COEFF
@@ -79,7 +82,7 @@
 
          parameter namelist {
             type LITERAL
-            access WRITE
+            access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default TRANLIST.LIS
@@ -164,22 +167,28 @@
 
          parameter epochin {
             type _DOUBLE
+            access READ
+            vpath PROMPT
             ppath DYNAMIC CURRENT
             prompt {Source frame epoch of observation}
+            dynamic yes
             helpkey *
           }
 
          parameter epochout {
             type _DOUBLE
+            access READ
+            vpath PROMPT
             ppath DYNAMIC CURRENT
             prompt {Destination frame epoch of observation}
+            dynamic yes
             helpkey *
           }
 
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

@@ -1,10 +1,13 @@
       action findoff {
 #+
 #  Name:
-#     FINDOFF.IFD
+#     findoff.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -53,10 +56,11 @@
          parameter outlist {
             position 3
             type LITERAL
-            access WRITE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT
             prompt {Names for output position lists}
+            repeated
             helpkey *
           }
 
@@ -93,7 +97,7 @@
 
          parameter namelist {
             type LITERAL
-            access WRITE
+            access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default FINDOFF.LIS
@@ -104,7 +108,7 @@
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

@@ -1,10 +1,13 @@
       action makecal {
 #+
 #  Name:
-#     MAKECAL.IFD
+#     makecal.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -55,7 +58,7 @@
                         # OUTPUT NDF
             position 3
             type LITERAL
-            access WRITE
+            access READ
             vpath PROMPT CURRENT
             ppath CURRENT
             association ->global.ccdpack_cal
@@ -67,8 +70,7 @@
                            # Combination mode
             position 4
             type LITERAL
-            access UPDATE
-                         # written to by AIF_CHOIC routine
+            access READ
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default MEDIAN
@@ -104,7 +106,7 @@
          parameter type {
                          # Frame types of input NDFs
             type LITERAL
-            access UPDATE
+            access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default NONE
@@ -190,7 +192,7 @@
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

@@ -1,10 +1,13 @@
       action nagmakemos {
 #+
 #  Name:
-#     NAGMAKEMOS.IFD
+#     nagmakemos.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -92,7 +95,7 @@
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto
@@ -125,8 +128,7 @@
          parameter method {
                            # Data combination method
             type LITERAL
-            access UPDATE
-                         # Written to by AIF_CHOIC routine (naughty)
+            access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default MEDIAN
@@ -170,7 +172,7 @@
                         # Output mosaic NDF
             position 2
             type NDF
-            access WRITE
+            access READ
             vpath PROMPT
             association ->global.data_array
             prompt {Output mosaic NDF}

@@ -1,10 +1,13 @@
       action picinfo {
 #+
 #  Name:
-#     PICINFO.IFD
+#     picinfo.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)

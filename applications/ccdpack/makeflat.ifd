@@ -1,10 +1,13 @@
       action makeflat {
 #+
 #  Name:
-#     MAKEFLAT.IFD
+#     makeflat.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -46,7 +49,7 @@
                         # Output NDF
             position 2
             type LITERAL
-            access WRITE
+            access READ
             vpath PROMPT
             ppath CURRENT
             prompt {Output NDF name }
@@ -58,8 +61,7 @@
                            # Combination mode
             position 3
             type LITERAL
-            access UPDATE
-                         # written to by AIF_CHOIC routine
+            access READ
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default MEDIAN
@@ -157,7 +159,7 @@
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

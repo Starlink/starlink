@@ -1,10 +1,13 @@
       action xreduce {
 #+
 #  Name:
-#     XREDUCE.IFD
+#     xreduce.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)

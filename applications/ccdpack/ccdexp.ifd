@@ -1,10 +1,13 @@
       action ccdexp {
 #+
 #  Name:
-#     CCDEXP.IFD
+#     ccdexp.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -22,7 +25,7 @@
                        # NDF to be modified
             position 1
             type NDF
-            access UPDATE
+            access READ
             vpath PROMPT
             ppath GLOBAL CURRENT
             prompt {Image data}

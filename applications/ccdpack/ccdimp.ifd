@@ -1,10 +1,13 @@
       action ccdimp {
 #+
 #  Name:
-#     CCDIMP.IFD
+#     ccdimp.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -23,7 +26,7 @@
                        # NDF to be modified
             position 1
             type NDF
-            access UPDATE
+            access READ
             vpath PROMPT
             ppath CURRENT
             prompt {Data structure to modify}

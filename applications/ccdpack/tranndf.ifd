@@ -1,10 +1,13 @@
       action tranndf {
 #+
 #  Name:
-#     TRANNDF.IFD
+#     tranndf.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     MJC: Malcolm J. Currie (STARLINK)
@@ -31,6 +34,7 @@
          parameter conserve {
                              # Conserve flux
             type _LOGICAL
+            access READ
             ppath CURRENT DEFAULT
             vpath CURRENT DEFAULT
             prompt {Conserve flux?}
@@ -54,7 +58,7 @@
                         # Output NDF
             position 2
             type LITERAL
-            access WRITE
+            access READ
             vpath PROMPt CURRENT
             ppath CURRENT
             association ->global.data_array
@@ -66,6 +70,7 @@
                            # Resampling method
             position 3
             type LITERAL
+            access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             prompt {Re-sampling method}
@@ -76,7 +81,7 @@
          parameter shape {
                           # How to shape output NDFs
             type LITERAL
-            access UPDATE
+            access READ
             ppath CURRENT DEFAULT
             vpath CURRENT DEFAULT
             default AUTO
@@ -98,6 +103,7 @@
          parameter lbound {
                            # Lower bounds of output NDFs
             type _DOUBLE
+            access READ
             vpath PROMPT DYNAMIC CURRENT DEFAULT
             ppath DYNAMIC CURRENT DEFAULT
             prompt {Lower bounds of the output NDFs}
@@ -109,6 +115,7 @@
          parameter ubound {
                            # Upper bound of output NDFs
             type _DOUBLE
+            access READ
             vpath PROMPT DYNAMIC CURRENT DEFAULT
             ppath DYNAMIC CURRENT DEFAULT
             prompt {Upper bounds of the output NDFs}
@@ -130,7 +137,7 @@
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

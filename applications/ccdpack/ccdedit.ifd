@@ -1,10 +1,13 @@
       action ccdedit {
 #+
 #  Name:
-#     CCDEDIT.IFD
+#     ccdedit.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -25,7 +28,7 @@
          parameter mode {
             position 1
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default ALIST
@@ -56,7 +59,7 @@
 
          parameter trtype {
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default COEFF
@@ -164,7 +167,7 @@
          parameter logto {
                           # Logging system interaction level
             type LITERAL
-            access UPDATE
+            access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto

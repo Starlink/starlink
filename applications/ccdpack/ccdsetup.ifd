@@ -1,10 +1,13 @@
       action ccdsetup {
 #+
 #  Name:
-#     CCDSETUP.IFD
+#     ccdsetup.ifd
 
 #  Type of Module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -155,7 +158,7 @@
          parameter logto {
                           # Log output to ?
             type LITERAL
-            access UPDATE
+            access READ
             vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
             ppath DYNAMIC GLOBAL CURRENT DEFAULT
             association <->global.ccdpack_logto
@@ -227,11 +230,12 @@
          parameter savefile {
                              # Name of the file to save parameters
             type LITERAL
-            access WRITE
+            access READ
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default CCDPACK_SETUP.DAT
             prompt {File to store CCD parameters}
+            repeated
             helpkey *
           }
 

@@ -1,10 +1,13 @@
       action ccdhelp {
 #+
 #  Name:
-#     CCDHELP.IFD
+#     ccdhelp.ifd
 
 #  Type of module:
-#     ADAM A-task parameter interface.
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
 
 #  Author:
 #     MJC: Malcolm J. Currie (STARLINK)
