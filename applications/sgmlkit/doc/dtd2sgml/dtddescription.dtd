@@ -1,0 +1,43 @@
+<!--
+  DTD for documenting DTDs
+
+  This provides descriptive text for the elements
+  See dtd2sgml.dsl.
+
+  $Id$
+-->
+
+<!element dtddescription - o (element+)>
+<!element element - o (p+, attribute*)>
+<!element attribute - o (p+)>
+<!element p - o (#pcdata | elemref | example | code | em)+>
+<!element elemref - o empty>
+<!element (example|code|em) - - (#pcdata)>
+
+<!attlist dtddescription
+    elementlist	-- DTD marked up with elementlist.dtd --
+	entity #required
+    prefix	-- prefix to disambiguate element cross-references --
+	cdata #required
+    >
+<!attlist element
+    gi		-- GI of this element --
+	id #required
+    >
+<!attlist attribute
+    name	-- attribute name --
+	cdata #required
+    >
+<!attlist elemref
+    gi		-- GI of element we're referring to --
+	idref #required
+    self	-- if present, then we're referring to the same
+		   element we're documenting.  Format the element name
+		   as usual, but don't include any sort of link. --
+	(self)
+	#implied
+    >
+
+<!entity amp cdata '&'>
+<!entity lt  cdata '<'>
+<!entity gt  cdata '>'>

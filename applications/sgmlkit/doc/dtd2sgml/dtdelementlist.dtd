@@ -1,0 +1,24 @@
+<!-- 
+  DTD for documenting DTDs.  
+  The output of dtd2sgml.pl consists of a representation of a DTD's
+  structure, marked up using the elements here.
+
+  $Id$
+-->
+<!element dtdelementlist - - (dtdelement+)>
+<!element dtdelement - - (dtdparents, dtdcontent, dtdtree?, dtdattribute*)>
+<!element dtdparents - - (dtdelemref*)>
+<!element dtdcontent - - (#pcdata | dtdelemref)*>
+<!element dtdtree - - (#pcdata)>
+<!element dtdattribute - - (#pcdata)>
+<!element dtdelemref - o empty>
+<!attlist dtdelementlist 
+  sysid cdata #required
+  top cdata #required
+  >
+<!attlist dtdelement gi id #required>
+<!attlist dtdattribute 
+  name cdata #required
+  default cdata #required
+  type cdata #implied>
+<!attlist dtdelemref gi idref #required>
