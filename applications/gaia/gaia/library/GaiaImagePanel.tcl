@@ -350,7 +350,177 @@ itcl::class gaia::GaiaImagePanel {
          blt::table $w_ \
             $itk_component(trans)   5,0 -fill x -anchor w -columnspan 2
       }
+      if { $itk_option(-ukirt_ql) } {
+         add_ukirt_panel_
+      }
       blt::table configure $w_ c2 -padx 1m
+   }
+
+
+   #  Add UKIRT Quick Look statistics panel. This code by mt@roe.ac.uk.
+   protected method add_ukirt_panel_ {} {
+
+      #  The StarRtdImage code sets this array for us to speed up the panel
+      #  update by using the -textvariable option
+      set var $image_
+      global ::$var
+      
+      # XY1 and XY2
+      if { $itk_option(-showxy) } {
+         itk_component add xy1 {
+            util::LabelValue $w_.xy1 \
+               -text "X1, Y1:" \
+               -textvariable ${var}(X) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth $itk_option(-labelwidth) \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         itk_component add xy2 {
+            util::LabelValue $w_.xy2 \
+               -text "X2, Y2:" \
+               -textvariable ${var}(Y) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth $itk_option(-labelwidth) \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         
+         itk_component add pixels {
+            util::LabelValue $w_.pixels \
+               -text "Pixels:" \
+               -textvariable ${var}(PIXELS) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth 6 \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         blt::table $w_ \
+            $itk_component(xy1)       6,0 -fill x -anchor w \
+            $itk_component(xy2)       6,1 -fill x -anchor w \
+            $itk_component(pixels)   6,2 -fill x -anchor w
+         
+         #  Workaround for bug in itcl2.0.
+         $itk_component(xy1) config -textvariable ${var}(XY1)
+         $itk_component(xy2) config -textvariable ${var}(XY2)
+         $itk_component(pixels) config -textvariable ${var}(PIXELS)
+         
+         add_short_help $itk_component(xy1) {Top left position for the Statistic box}
+         add_short_help $itk_component(xy2) {Bottom right position for the Statistic box}
+         add_short_help $itk_component(pixels) {Number of pixels for the statistic box}
+         
+      }
+      
+      #  Smin, smax and total.
+      if {$itk_option(-showxy)} {
+         itk_component add smin {
+            util::LabelValue $w_.smin \
+               -text "S_Min:" \
+               -textvariable ${var}(SMIN) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth $itk_option(-labelwidth) \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         itk_component add smax {
+            util::LabelValue $w_.smax \
+               -text "S_Max:" \
+               -textvariable ${var}(SMAX) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth $itk_option(-labelwidth) \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         
+         itk_component add total {
+            util::LabelValue $w_.total \
+               -text "Total:" \
+               -textvariable ${var}(TOTAL) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth 6 \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         blt::table $w_ \
+            $itk_component(smin)       7,0 -fill x -anchor w \
+            $itk_component(smax)       7,1 -fill x -anchor w \
+            $itk_component(total)   7,2 -fill x -anchor w
+         
+         #  Workaround for bug in itcl2.0.
+         $itk_component(smin) config -textvariable ${var}(SMIN)
+         $itk_component(smax) config -textvariable ${var}(SMAX)
+         $itk_component(total) config -textvariable ${var}(TOTAL)
+         
+         add_short_help $itk_component(smin) {The minmium value in  the Statistic box}
+         add_short_help $itk_component(smax) {The maxmium value in  the Statistic box}
+         add_short_help $itk_component(total) {The total value  of for all pixels in  the statistic box}
+         
+      }
+
+      #  Mean and std.
+      if {$itk_option(-showxy)} {
+         itk_component add mean {
+            util::LabelValue $w_.mean \
+               -text "Mean:" \
+               -textvariable ${var}(MEAN) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth $itk_option(-labelwidth) \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         itk_component add std {
+            util::LabelValue $w_.std \
+               -text "Std:" \
+               -textvariable ${var}(STD) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth $itk_option(-labelwidth) \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         
+         itk_component add sid {
+            util::LabelValue $w_.sid \
+               -text "RowCut:" \
+               -textvariable ${var}(ROWCUT) \
+               -labelfont $itk_option(-labelfont) \
+               -valuefont $itk_option(-valuefont) \
+               -labelwidth 6 \
+               -valuewidth $itk_option(-valuewidth) \
+               -relief groove \
+               -anchor e
+         }
+         
+         blt::table $w_ \
+            $itk_component(mean)       8,0 -fill x -anchor w \
+            $itk_component(std)       8,1 -fill x -anchor w \
+            $itk_component(sid)   8,2 -fill x -anchor w
+         
+         #  Workaround for bug in itcl2.0.
+         $itk_component(mean) config -textvariable ${var}(MEAN)
+         $itk_component(std) config -textvariable ${var}(STD)
+         $itk_component(sid) config -textvariable ${var}(ROWCUT)
+
+         add_short_help $itk_component(mean) {The mean of all values for the Statistic box}
+         add_short_help $itk_component(std) {The std of all values from the mean  for the Statistic box}
+         add_short_help $itk_component(sid) { Number for the row-cut}
+
+      }
    }
 
    #  Set the cut levels using a given percentage cut...
@@ -431,6 +601,10 @@ itcl::class gaia::GaiaImagePanel {
    #   all Linux systems.
    itk_option define -labelfont labelFont LabelFont -adobe-helvetica-bold-r-normal-*-12*
    itk_option define -valuefont valueFont ValueFont -adobe-helvetica-medium-r-normal-*-12*
+
+   #  Define whether we need to show the UKIRT quick look part of the
+   #  panel. 
+   itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0
 
    #   Protected variable.
    protected variable make_now_ 0

@@ -40,6 +40,9 @@
 //       Added contour command and related changes.
 //    04-APR-2001 (PWD):
 //       Added the astaddcolourCmd member.
+//    16-JUL-2001 (PWD):
+//       Added UKIRT quick look code. Also needed processMotionEvent.
+//       The quick look is off by default.
 //
 //-
 
@@ -59,10 +62,11 @@ class StarRtdImageOptions : public RtdImageOptions {
    char *component;        // NDF component to display
    int plot_wcs;           // Scale and orient plot symbols using WCS
                            // system if available
+   int ukirt_ql;           // Whether ukirt quick look stats are enabled.
 
    StarRtdImageOptions()
-      : ast_tag(NULL), component(NULL), plot_wcs(1)
-      {}
+       : ast_tag(NULL), component(NULL), plot_wcs(1), ukirt_ql(0)
+       {}
 };
 
 //  Define the Tk config options here so that derived classes can add
@@ -73,7 +77,8 @@ class StarRtdImageOptions : public RtdImageOptions {
   RTD_OPTIONS, \
     {TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag), 0}, \
     {TK_CONFIG_STRING, "-component", NULL, NULL, "data", GAIA_OPTION(component), 0}, \
-    {TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1", GAIA_OPTION(plot_wcs), 0}
+    {TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1", GAIA_OPTION(plot_wcs), 0}, \
+    {TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0", GAIA_OPTION(ukirt_ql), 0}
 
 class StarRtdImage : public Skycat {
 
@@ -273,6 +278,9 @@ class StarRtdImage : public Skycat {
    //  Return whether to scale and orient plotting symbols using the WCS
    int plot_wcs() const { return staroptionsPtr_->plot_wcs; }
 
+   //  Return whether UKIRT quick look statistics are available.
+   int ukirt_ql() const { return staroptionsPtr_->ukirt_ql; }
+
    //  Test if file extension is known to NDF.
    int isNDFtype( const char *);
 
@@ -355,6 +363,22 @@ class StarRtdImage : public Skycat {
 
    //  Whether an image has byte swapped data.
    int swapNeeded( ImageIO imio );
+
+   //  UKIRT quick look members.
+   //  Deal with motion event in main window. Updates trace variables
+   //  for real-time readouts.
+   void processMotionEvent();
+
+   //  Called from the Camera class to display image from shared memory
+   virtual int displayImageEvent( const rtdIMAGE_INFO&,
+                                  const Mem& data );
+
+   //  UKIRT Quick Look parameters.
+   int ql_x0;
+   int ql_y0;
+   int ql_x1;
+   int ql_y1;
+   int ql_rowcut;
 
   private:
 

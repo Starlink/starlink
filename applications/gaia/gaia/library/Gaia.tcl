@@ -73,6 +73,8 @@
 #     22-MAR-2001 (PWD):
 #        Added Polarimetry toolbox.
 #        Revealed ramp printing option.
+#     23-JUL-2001 (PWD):
+#        Added UKIRT quick look option.
 #     {enter_changes_here}
 
 #-
@@ -81,8 +83,8 @@
 set gaia_version [gaia_version]
 
 #  Make a local copy of about_skycat so we can divert bug reports.
-set about_gaia "\
-
+set about_skycat ""
+set about_gaia "
 GAIA version $gaia_version
 
 Copyright (C) 1997-2001 Central Laboratory of the Research Councils (U.K.)
@@ -101,12 +103,24 @@ Thomas Herlin (therlin@eso.org)
 Miguel Albrecht (malbrech@eso.org)
 Daniel Durand (durand@dao.nrc.ca)
 Peter Biereichel (pbiereic@eso.org)
-
-Bug reports and suggestions to: gaia@star.rl.ac.uk
-
 "
 
-set about_skycat ""
+#  Set the modification to about for the UKIRT quick look facility.
+set about_ukirt_ql {
+A modified GAIA for UKIRT quick look display
+
+by Min Tan, Alan Bridger, Alan Pickup, Len Lawrance at UK ATC
+
+based on:
+}
+
+#  Where to send bugs.
+set gaia_bugs {
+Bug reports and suggestions to: gaia@star.rl.ac.uk
+}
+set ukirt_ql_bugs {
+Bug reports and suggestions to: ab@roe.ac.uk
+}
 
 set gaia_usage {
 Usage: gaia ?NDF/fitsFile? ?-option value ...?
@@ -139,6 +153,7 @@ Options:
  -with_pan_window <bool>  - Display the pan window (default).
  -with_warp <bool>        - add bindings to move mouse ptr with arrow keys (default: 1).
  -with_zoom_window <bool> - Display the zoom window (default).
+ -ukirt_ql <bool>         - Show UKIRT Quick Look Facilities.
  -zoom_factor <n>         - zooming factor (default: 4).
 }
 
@@ -161,8 +176,13 @@ itcl::class gaia::Gaia {
       eval itk_initialize $args
 
       #  Override about_skycat message.
-      global about_skycat about_gaia
-      set about_skycat $about_gaia
+      global ::about_skycat ::about_gaia ::gaia_bugs
+      global ::about_ukirt_ql ::ukirt_ql_bugs
+      if { ! $itk_option(-ukirt_ql) } {
+         set about_skycat "$about_gaia $gaia_bugs"
+      } else {
+         set about_skycat "$about_ukirt_ql $about_gaia $ukirt_ql_bugs"
+      }
    }
 
    #  Destructor:
@@ -270,7 +290,7 @@ itcl::class gaia::Gaia {
       global ::about_skycat ::gaia_dir
       set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
       rtd_set_cmap $w
-      wm title $w "GAIA::SkyCat loading..."
+      wm title $w "$appname_ loading..."
       wm withdraw $w_
       if { ! $plain } {
          set gaia_logo [image create pixmap -id gaia_logo]
@@ -301,7 +321,7 @@ itcl::class gaia::Gaia {
       set m [add_help_button index "Help topics index..." \
                 {Display the main help window and index}]
 
-      add_menuitem $m command "About GAIA::SkyCat..." \
+      add_menuitem $m command "About ${appname_}..." \
          {Display a window with information about this GAIA/SkyCat version} \
          -command [code $itk_component(image) about]
 
@@ -361,7 +381,9 @@ itcl::class gaia::Gaia {
             -min_scale $itk_option(-min_scale) \
             -max_scale $itk_option(-max_scale) \
             -pickobjectorient $itk_option(-pickobjectorient) \
-            -hdu $itk_option(-hdu)
+            -hdu $itk_option(-hdu) \
+            -ukirt_ql $itk_option(-ukirt_ql) \
+            -appname $appname_
       }
 
       #  Keep a list of SkyCat/GAIA instances.
@@ -466,6 +488,11 @@ itcl::class gaia::Gaia {
             -value $colour \
             -label {    } \
             -command [code $this set_background_ $colour]
+      }
+
+      #  UKIRT quick look likes to attach to camera immediately.
+      if { $itk_option(-ukirt_ql) } {
+         attach_camera
       }
    }
 
@@ -1489,7 +1516,19 @@ itcl::class gaia::Gaia {
    #  Set the HDU that is displayed initially.
    itk_option define -hdu hdu Hdu 0
 
+   #  Whether to enable the UKIRT quick look parts of the interface.
+   itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0 {
+      if { $itk_option(-ukirt_ql) } {
+         configure -rtd 1
+         configure -subsample 0
+         set appname_ "UKIRT::Quick Look"
+      }
+   }
+
    # -- Protected variables --
+
+   #  Application name.
+   protected variable appname_ "GAIA::Skycat"
 
    #  Clone number of this window.
    protected variable clone_ 0
