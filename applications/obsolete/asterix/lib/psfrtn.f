@@ -2960,7 +2960,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       REAL			SPARR(2)
       REAL			TOR			! Dataset radian factor
 
-      INTEGER			BDID
       INTEGER			DAX			! Dataset axis no.
       INTEGER		      	DIM			! Size of response axis
       INTEGER			FSTAT			! i/o status code
@@ -3008,9 +3007,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :                STATUS )
 
 *  Link the response object to a BinDS so we can access its axis info
-      CALL BDI_NEW( 'BinDS', 1, 1, 'REAL', BDID, STATUS )
-      CALL ADI_SETLNK( BDID, SID, STATUS )
-      CALL BDI_SETSHP( BDID, RF_NDIM(SLOT), RF_DIMS(1,SLOT), STATUS )
+      CALL BDI_LINK( 'BinDS', 1, 1, 'REAL', SID, STATUS )
+      CALL BDI_SETSHP( SID, RF_NDIM(SLOT), RF_DIMS(1,SLOT), STATUS )
 
 *  Map the index
       CALL CMP_MAPV( SLOC, 'INDEX', '_INTEGER', 'READ',
@@ -3055,7 +3053,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           END IF
 
 *      Get response axis attributes
-          CALL BDI_AXGET1R( BDID, IAX, 'SpacedData', 2, SPARR, DIM,
+          CALL BDI_AXGET1R( SID, IAX, 'SpacedData', 2, SPARR, DIM,
      :                      STATUS )
           R_BASE = SPARR(1)
           R_SCALE = SPARR(2)
@@ -3083,14 +3081,14 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Get axis info
       IF ( RF_RADIAL(SLOT) ) THEN
         DO IAX = 3, 4
-          CALL BDI_AXGET1R( BDID, IAX, 'SpacedData', 2, SPARR, DIM,
+          CALL BDI_AXGET1R( SID, IAX, 'SpacedData', 2, SPARR, DIM,
      :                      STATUS )
           RF_BASE(IAX,SLOT) = SPARR(1)
           RF_SCALE(IAX,SLOT) = SPARR(2)
         END DO
       ELSE
         DO IAX = 3, 5
-          CALL BDI_AXGET1R( BDID, IAX, 'SpacedData', 2, SPARR, DIM,
+          CALL BDI_AXGET1R( SID, IAX, 'SpacedData', 2, SPARR, DIM,
      :                      STATUS )
           RF_BASE(IAX,SLOT) = SPARR(1)
           RF_SCALE(IAX,SLOT) = SPARR(2)
@@ -3104,7 +3102,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :                     .NOT. RF_PHA_DEF(SLOT) ) THEN
 
 *      Construct prompt
-        CALL BDI_AXGET0C( BDID, RF_NDIM(SLOT), 'Units', EUNITS, STATUS )
+        CALL BDI_AXGET0C( SID, RF_NDIM(SLOT), 'Units', EUNITS, STATUS )
         CALL MSG_SETC( 'UNITS', EUNITS )
         CALL MSG_MAKE( 'Mean photon energy in ^UNITS', TEXT, TLEN )
         CALL USI_PROMT( 'AUX', TEXT(:TLEN), STATUS )
@@ -5079,7 +5077,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       INTEGER                 IDUM,CDIMS(3)          ! XRT pf cube dimensions
 
-      LOGICAL                 OK, UNIF          !
+      LOGICAL                 OK			!
 *-
 
 *    Check status
