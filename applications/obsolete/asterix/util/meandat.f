@@ -116,7 +116,7 @@
          CALL CHR_ITOC(LP, CNUM, IDUM)
          PARAM='FILE'//CNUM
 *
-         CALL USI_TASSOCI( PARAM, 'READ', IFID(LP), STATUS)
+         CALL USI_TASSOCI( PARAM, '*', 'READ', IFID(LP), STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 99
 *
