@@ -180,14 +180,15 @@
 	PARAMETER	     	( PROB_REPLY = 99 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SGRID Version 2.2-0' )
+        PARAMETER		( VERSION = 'SGRID Version 2.2-1' )
 
 *  Local Variables:
-      RECORD /GRID_AXIS/     	GAX(ADI__MXDIM)    	! Grid axes
-      RECORD /INSTR_RESP/    	INSTR(NDSMAX)      	! Instrument responses
-      RECORD /MODEL_SPEC/    	MODEL              	! Model specification
-      RECORD /DATASET/       	OBDAT(NDSMAX)      	! Observed datasets
-      RECORD /PREDICTION/    	PREDDAT(NDSMAX)    	! Data predicted by model
+c     RECORD /GRID_AXIS/     	GAX(ADI__MXDIM)    	! Grid axes
+c     RECORD /INSTR_RESP/    	INSTR(NDSMAX)      	! Instrument responses
+c     RECORD /MODEL_SPEC/    	MODEL              	! Model specification
+c     RECORD /DATASET/       	OBDAT(NDSMAX)      	! Observed datasets
+c     RECORD /PREDICTION/    	PREDDAT(NDSMAX)    	! Data predicted by model
+      INTEGER			IMOD
 
       CHARACTER*132          	HBUF(7)            	! History buffer
       CHARACTER*40           	LABEL              	! Grid label
@@ -260,7 +261,8 @@
       CALL MSG_PRNT( VERSION )
 
 *  Set up genus in MODEL structure
-      MODEL.GENUS = 'SPEC'
+      IMOD = 1
+      MODEL_SPEC_GENUS(IMOD) = 'SPEC'
 
 *  Initialise ASTERIX
       CALL AST_INIT()
@@ -279,30 +281,29 @@
       CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
       WORKSPACE = .TRUE.
       CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', FSTAT, WORKSPACE,
-     :                 CHISTAT, NDS,
-     :                OBDAT, NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
+     :                 CHISTAT, NDS, NGOOD, SSCALE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Look for redshift
       CALL SFIT_GETZ( Z, STATUS )
 
 *  Apply red-shift and check data structures
-      CALL SFIT_PRECHK( NDS, Z, PREDDAT, STATUS )
+      CALL SFIT_PRECHK( NDS, Z, STATUS )
 
 *  Get model specification
       CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', MFID, STATUS )
-      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+      CALL FIT_MODGET( MFID, IMOD, NPAR, PARAM, LB, UB, LE, UE,
      :                                          FROZEN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Number of degrees of freedom for chi-squared
       IF ( CHISTAT ) THEN
-        CALL FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
+        CALL FIT1_NDOF( NGOOD, IMOD, FROZEN, NDOF, STATUS )
 	SSCALE = NDOF
       END IF
 
 *  Allocate space for model stack
-      CALL SFIT_MAPMODSTK( NDS, PREDDAT, MODEL.STACKPTR, STATUS )
+      CALL SFIT_MAPMODSTK( NDS, MODEL_SPEC_STACKPTR(IMOD), STATUS )
 
 *  List parameters
       CALL SEDIT_LISTPAR( MFID, NPAR, PCOMP, PPAR, 6, STATUS )
@@ -352,7 +353,7 @@
 
 *    Already selected as a grid axis?
         DO J = 1, I-1
-          IF ( GAX(J).PAR .EQ. GPS(I) ) THEN
+          IF ( GRID_AXIS_PAR(J) .EQ. GPS(I) ) THEN
             CALL MSG_SETI( 'AX', J )
             CALL MSG_PRNT( '! WARNING : Already using this '/
      :                        /'parameter in grid axis ^AX' )
@@ -371,9 +372,9 @@
         CALL USI_DEF0C( 'AXIS'//PC, TEXT(:TLEN), STATUS )
 
 *    Remind user of units
-        IF ( MODEL.UNITS(GPS(I)) .GT. ' ' ) THEN
-          CALL MSG_SETC( 'PAR', MODEL.PARNAME(GPS(I)) )
-          CALL MSG_SETC( 'UNIT', MODEL.UNITS(GPS(I)) )
+        IF ( MODEL_SPEC_UNITS(IMOD,GPS(I)) .GT. ' ' ) THEN
+          CALL MSG_SETC( 'PAR', MODEL_SPEC_PARNAME(IMOD,GPS(I)) )
+          CALL MSG_SETC( 'UNIT', MODEL_SPEC_UNITS(IMOD,GPS(I)) )
           CALL MSG_PRNT( 'Enter ^PAR values in units of ^UNIT' )
         END IF
 
@@ -437,7 +438,7 @@
 
 *    Define the grid axis
         CALL FIT_DEFREGRID( GPS(I), GDIMS(I), LOGARITHMIC, BASE,
-     :                                   SCALE, GAX(I), STATUS )
+     :                                   SCALE, I, STATUS )
 
 *    Adjust SSCALE
         IF ( CHISTAT ) SSCALE = SSCALE + 1
@@ -453,7 +454,7 @@
         PFLAG(I) = (.NOT.FROZEN(I))
       END DO
       DO I = 1, NGRIDAX
-        PFLAG(GAX(I).PAR) = .FALSE.
+        PFLAG(GRID_AXIS_PAR(I)) = .FALSE.
       END DO
       OPTIMISING = .FALSE.
       DO I = 1, NPAR
@@ -527,14 +528,16 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Create grid axes
-        CALL FIT_CREGRIDAX( GFID(I), NGRIDAX, GAX, STATUS )
+        CALL FIT_CREGRIDAX( GFID(I), NGRIDAX, STATUS )
 
 *    Write axis labels and units
         DO J = 1, NGRIDAX
           CALL BDI_AXPUT0C( GFID(I), J, 'Label',
-     :                      MODEL.PARNAME(GAX(J).PAR), STATUS )
+     :                      MODEL_SPEC_PARNAME(IMOD,GRID_AXIS_PAR(J)),
+     :                      STATUS )
           CALL BDI_AXPUT0C( GFID(I), J, 'Units',
-     :                      MODEL.UNITS(GAX(J).PAR), STATUS )
+     :                      MODEL_SPEC_UNITS(IMOD,GRID_AXIS_PAR(J)),
+     :                      STATUS )
         END DO
 
 *    Title and units for this grid
@@ -547,7 +550,7 @@
         ELSE IF ( GPARS(I) .EQ. PROB_REPLY ) THEN
           LABEL = 'Fit probability'
         ELSE
-          LABEL = MODEL.PARNAME(GPARS(I))
+          LABEL = MODEL_SPEC_PARNAME(IMOD,GPARS(I))
         END IF
 
 *    Write as axis label for 1-d, otherwise title
@@ -559,14 +562,15 @@
 
 *    Grid units
         IF ( (GPARS(I) .NE. 0) .AND. (GPARS(I).NE.PROB_REPLY) ) THEN
-          IF ( MODEL.UNITS(GPARS(I)) .GT. ' ' ) THEN
+          IF ( MODEL_SPEC_UNITS(IMOD,GPARS(I)) .GT. ' ' ) THEN
             IF ( NGRIDAX .GT. 1 ) THEN
               CALL BDI_PUT0C( GFID(I), 'Title', LABEL(:CHR_LEN(LABEL))//
-     :                               ' ('//MODEL.UNITS(GPARS(I))(:
-     :              CHR_LEN(MODEL.UNITS(GPARS(I))))//')', STATUS )
+     :              ' ('//MODEL_SPEC_UNITS(IMOD,GPARS(I))(:
+     :              CHR_LEN(MODEL_SPEC_UNITS(IMOD,GPARS(I))))//')',
+     :              STATUS )
             ELSE
-              CALL BDI_PUT0C( GFID(I), 'Units', MODEL.UNITS(GPARS(I)),
-     :                                                  STATUS )
+              CALL BDI_PUT0C( GFID(I), 'Units',
+     :                        MODEL_SPEC_UNITS(IMOD,GPARS(I)), STATUS )
             END IF
           END IF
         END IF
@@ -606,7 +610,7 @@
      :                   TEXT, TLEN )
         ELSE
           CALL MSG_SETI( 'P', GPARS(I) )
-          CALL MSG_SETC( 'TAG', MODEL.PARNAME(GPARS(I)) )
+          CALL MSG_SETC( 'TAG', MODEL_SPEC_PARNAME(IMOD,GPARS(I)) )
           CALL MSG_MAKE( 'Gridded values are parameter ^P, ^TAG',
      :                                               TEXT, TLEN )
         END IF
@@ -632,9 +636,9 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Evaluate grid
-      CALL FIT_GRID( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN, NGRIDAX,
-     :               GAX, NGRID, GPARS, NPAR, LB, UB, FROZEN, SSCALE,
-     :               FSTAT, FIT_PREDDAT, PREDDAT, PARAM,
+      CALL FIT_GRID( NDS, IMOD, MCTRL, OPCHAN, NGRIDAX,
+     :               NGRID, GPARS, NPAR, LB, UB, FROZEN, SSCALE,
+     :               FSTAT, FIT_PREDDAT, PARAM,
      :               STATMIN, GDPTR, %VAL(GQPTR), GQMASK, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -654,8 +658,8 @@
       IF ( UP ) THEN
         CALL MSG_PRNT( '** Updating model spec - do not exit'/
      :                                /' until completed **' )
-        CALL FIT_MODUP( MFID, MODEL.NCOMP, NPAR, PARAM, LE, UE,
-     :                                          -99.0, STATUS )
+        CALL FIT_MODUP( MFID, MODEL_SPEC_NCOMP(IMOD), NPAR, PARAM,
+     :                  LE, UE, -99.0, STATUS )
         CALL MSG_PRNT( '** Model dataset updated **' )
       END IF
 
