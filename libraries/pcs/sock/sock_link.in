@@ -2,28 +2,25 @@
 #  N.B. the previous line should be blank.
 #+
 #  Name:
-#     sock_link_adam
+#     sock_link
 
 #  Purpose:
-#     Generate linker (ld) arguments for linking against adam SOCK.
+#     Generate linker (ld) arguments for linking against standalone SOCK.
 
 #  Type of Module:
 #     Shell script.
 
 #  Description:
-#     This script should be invoked by those building ADAM applications
-#     which use SOCK in order to generate the correct arguments for the 
-#     compiler (or ld) command. The arguments generated are written to 
-#     the standard output.
+#     This script should be invoked by those building standalone
+#     applications which use SOCK in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
 
 #  Invocation:
 #     The script is normally invoked as part of a compiler command line,
 #     such as:
 #
-#        alink program.f -L/star/lib `sock_link_adam`
-
-#     although the ADAM "alink" command will normally link against SOCK
-#     anyway.
+#        f77 -o program -L/star/lib `sock_link` program.f
 
 #  Copyright:
 #     Copyright (C) 1995 Rutherford Appleton Laboratory
@@ -32,6 +29,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     AJC:  A.J. Chipperfield (Starlink, RAL)
+#     PWD:  P.W. Draper (Starlink, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -43,14 +41,15 @@
 #        Generic version.
 #     14-SEP-1995 (AJC):
 #        Modified for SOCK
+#     24-SEP-2004 (PWD):
+#        Added @LIBS@ for autoconf determined socket libraries.
 #     {enter_further_changes_here}
 
 #  Bugs:
 #     {note_any_bugs_here}
 
 #-
-
-      echo -lsock \
+      echo -lsock @LIBS@ \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
