@@ -32,11 +32,16 @@ ALL_TARGETS = \
 	$(MANIFEST)/cnf \
 	$(MANIFEST)/coco \
 	$(MANIFEST)/convert \
+	$(MANIFEST)/daophot \
 	$(MANIFEST)/docfind \
+	$(MANIFEST)/dipso \
 	$(MANIFEST)/dtask \
+	$(MANIFEST)/echomop \
 	$(MANIFEST)/ems \
+	$(MANIFEST)/esp \
+	$(MANIFEST)/extractor \
 	$(MANIFEST)/fio \
-        $(MANIFEST)/figaro \
+	$(MANIFEST)/figaro \
         $(MANIFEST)/findcoords \
 	$(MANIFEST)/gaia \
 	$(MANIFEST)/gks \
@@ -47,7 +52,10 @@ ALL_TARGETS = \
 	$(MANIFEST)/gwm \
 	$(MANIFEST)/hds \
 	$(MANIFEST)/hdspar \
+	$(MANIFEST)/hdstools \
+	$(MANIFEST)/hdstrace \
 	$(MANIFEST)/hlp \
+	$(MANIFEST)/icl \
 	$(MANIFEST)/idi \
 	$(MANIFEST)/img \
 	$(MANIFEST)/info \
@@ -55,6 +63,7 @@ ALL_TARGETS = \
         $(MANIFEST)/itcl \
 	$(MANIFEST)/jpl \
 	$(MANIFEST)/kappa \
+	$(MANIFEST)/kaprh \
 	$(MANIFEST)/lex \
 	$(MANIFEST)/mag \
 	$(MANIFEST)/mers \
@@ -71,10 +80,14 @@ ALL_TARGETS = \
 	$(MANIFEST)/parsecon \
 	$(MANIFEST)/pda \
 	$(MANIFEST)/pgp \
+	$(MANIFEST)/photom \
+	$(MANIFEST)/pisa \
 	$(MANIFEST)/polpack \
 	$(MANIFEST)/prm \
+	$(MANIFEST)/psmerge \
 	$(MANIFEST)/psx \
 	$(MANIFEST)/ref \
+	$(MANIFEST)/rv \
 	$(MANIFEST)/sae \
 	$(MANIFEST)/sgs \
 	$(MANIFEST)/shl \
