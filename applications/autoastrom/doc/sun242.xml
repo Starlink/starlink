@@ -419,6 +419,28 @@
 
     </sect>
 
+    <sect id="build" export="export">
+      <subhead>
+	<title>Building the software</title>
+      </subhead>
+
+      <p>Build the software by unpacking the distribution tar archive, 
+	and using the standard <code>./mk build</code> to build it,
+	then <code>./mk install</code> to install it.</p>
+
+      <p>If you wish to use a non-default Starlink tree to build the
+	software (that is, not the standard <code>/star</code>), then
+	you can specify this by setting the environment variable
+	<code>STARLINK</code>: for example <code>setenv STARLINK
+	  /stardev</code>.  If you need to use more than one Starlink
+	tree (perhaps because you have installed updated versions of 
+	some software outside the main tree; specifically, note that
+	autoastrom requires AST version 1.8-1 or better), then use the
+	<code>STARLINKS</code> variable, setting it to a
+	colon-separated list of directories: for example <code>setenv
+	  STARLINKS /path/to/my/star:/star</code>.</p>
+    </sect>
+
     <sect id="helpers" export="export">
       <subhead>
 	<title>Auxiliary software</title>
@@ -440,6 +462,16 @@
       <p>The WCS information is largely handled by ATOOLS.  This does
 	not have a SUN yet.   Need ATOOLS 1.3 or better.</p>
 
+      <p>Autoastrom requires AST 1.8-1 or better to build.  Depending
+	on precisely which earlier version of AST you have, the moggy
+	tool will fail to compile, or if it compiles, fail to link.
+	If you have AST installed in a non-standard place, you should
+	use the <code>STARLINKS</code> environment variable at build
+	time (see <ref id="build"/>), to tell the build script where
+	to find it.</p>
+
+      <p>It also needs StarPerl (see SUN/228).</p>
+
       <!--
       <p>NDFPACK and KAPPA: Ref to KAPPA docs.</p>
       -->
@@ -456,10 +488,6 @@
 	and the documentation is available at Starlink sites as MUD/165
 	(Postscript only).</p>
 
-      <!--
-      <p>StarPerl: SUN/228</p>
-      -->
-
       <p>If you need to supply the initial astrometry which this
 	script requires, you can do that using GAIA.  This is
 	documented in SUN/214, but it's very easy to use, and you
@@ -467,6 +495,25 @@
 	<code>gaia image_name</code>, presuming you have already done
 	the initialisation to use Starlink software) and experiment.
 	<!-- Give some help with this. --></p>
+
+      <subsect id="environment" export="export">
+	<subhead>
+	  <title>Environment</title>
+	</subhead>
+
+	<p>If you need to use a proxy to get to the web, then you
+	  should define the environment variable
+	  <code>http_proxy</code> to the appropriate value for your
+	  site.</p>
+
+	<p>The program moggy uses the ESO SkyCat library for its
+	  catalogue access.  However, note that, for the sake of
+	  consistency, it does <em>not</em> honour the SkyCat
+	  <code>CATCONFIG</code> variable directly.  If you need to
+	  specify an alternative SkyCat configuration file, you should 
+	  do that with the <code>--skycatconfig</code> option instead
+	  (see <ref id="opt.skycatconfig"/>).</p>
+      </subsect>
       
     </sect>
 
