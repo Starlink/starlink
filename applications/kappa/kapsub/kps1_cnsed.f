@@ -240,6 +240,9 @@
  
 *.
  
+*  Initialise.
+      NCONT = 0
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
  
