@@ -64,6 +64,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/05/15 01:46:30  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*
 *     Revision 1.1  1999/02/27 04:59:34  timj
 *     First version
 *
@@ -147,13 +150,11 @@
       CHARACTER*132 FNAME       ! Name of input file
       INTEGER I                 ! counter
       INTEGER IERR              ! position of error in VEC copy
-      INTEGER IN_DATA_PTR       ! pointer to input data
       INTEGER IN_DEM_PNTR_PTR   ! Pointer to DEM_PNTR array
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC ! locator to input FITS extension
       INTEGER IN_NDF            ! Input NDF identifier
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC ! locator to input SCUBA extension
       CHARACTER*(DAT__SZLOC) IN_SCUCDX_LOC ! locator to input SCUCD extension
-      INTEGER IN_QUALITY_PTR    ! Pointer to input quality
       INTEGER ITEMP             ! Scratch integer
       INTEGER JIGGLE_COUNT      ! number of jiggles in pattern
       INTEGER JIGGLE_P_SWITCH   ! number of jiggles per switch
@@ -188,8 +189,6 @@
       DOUBLE PRECISION MJD2     ! modified Julian day at which object
                                 ! was at LAT2,LONG2 for PLANET centre
                                 ! coordinate system
-      DOUBLE PRECISION MEAN     ! Mean of bolometer
-      DOUBLE PRECISION MEDIAN   ! Median of bolometer
       INTEGER NDIM              ! Actual number of dimensions in NDF
       INTEGER NERR              ! Number of errors from VEC copy
       INTEGER NREC              ! Number of history records
@@ -218,8 +217,6 @@
                                 ! elevation pointing corrections (arcsec)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                 ! LST of pointing corrections (radians)
-      INTEGER QSORT_END         ! End of sorted data
-      INTEGER QSORT_PTR         ! Start of sorted data
       DOUBLE PRECISION RA_CENTRE ! apparent RA of map centre (radians)
       INTEGER RA1_PTR           ! pointer to .SCUCD.RA1
       INTEGER RA2_PTR           ! pointer to .SCUCD.RA2
@@ -232,17 +229,10 @@
       INTEGER RUN_NUMBER        ! run number of input file
       CHARACTER*15     SAMPLE_COORDS ! coordinate system of sample offsets
       CHARACTER*15     SAMPLE_MODE ! SAMPLE_MODE of observation
-      INTEGER SCRATCH_END       ! End of scratch array
-      INTEGER SCRATCH_PTR       ! Start of scratch array
-      INTEGER SCRATCHQ_END      ! End of scratch quality array
-      INTEGER SCRATCHQ_PTR      ! Start of scratch quality array
       INTEGER SCUCD_WPLATE_PTR  ! pntr to WPLATE array in SCUCD extension
       CHARACTER * 40 STATE      ! State of observation at end
-      DOUBLE PRECISION STDEV    ! Standard deviation of bolometer data
       CHARACTER * 80 STEMP      ! Temporary string
       CHARACTER * 15 SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! file Suffices
-      DOUBLE PRECISION SUM      ! Sum of bolometer data
-      DOUBLE PRECISION SUMSQ    ! sum of squares of bolometer data
       LOGICAL THERE             ! Is a component there?
       INTEGER UBND(2)           ! Upper bounds of an NDF
       LOGICAL USE_WP            ! Use the WPLATE array in SCUCD extension?
@@ -333,9 +323,9 @@
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', I, STEMP,
      :           STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
-               ELSE IF (STEMP .EQ. 'REMIP') THEN
+               ELSE IF (STEMP(:5) .EQ. 'REMIP') THEN
                   REMIP = .TRUE.
                END IF
             END DO
@@ -434,7 +424,8 @@
       CALL NDF_DIM ( IN_NDF, MAXDIM, DIM, NDIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
             IF ((NDIM .NE. 3)                  .OR.
      :          (DIM(1) .NE. N_BOLS)         .OR.
      :          (DIM(2) .LT. 1)                .OR.
@@ -733,18 +724,6 @@
      :     %VAL(WPLATE_PTR), BOL_IP_DATA,
      :     STATUS)
 
-*     Write the fast axis information to the REDS extension
-      IF (N_SUB .EQ. 1) THEN
-         CALL NDF_XPT0R(FAST_AXIS(1), OUT_NDF, 'REDS','FAST_AXIS',
-     :        STATUS)
-      ELSE
-*     Create the FAST_AXIS array and copy the data
-         CALL CMP_MOD(OUT_REDSX_LOC, 'FAST_AXIS', '_REAL', 1,
-     :        N_SUB, STATUS)
-         CALL CMP_PUT1R(OUT_REDSX_LOC, 'FAST_AXIS', N_SUB,
-     :        FAST_AXIS, STATUS)
-      END IF
-
 *     Now that the data (and variance) have been corrected for
 *     instrumental polarisation we can write the Waveplate positions
 *     out to the output file in a DEM_PNTR style array
@@ -778,6 +757,20 @@
          CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
      :        0, 0, OUT_REDSX_LOC, STATUS)
       END IF
+
+*     Write the fast axis information to the REDS extension
+      IF (N_SUB .EQ. 1) THEN
+         CALL NDF_XPT0R(FAST_AXIS(1), OUT_NDF, 'REDS','FAST_AXIS',
+     :        STATUS)
+      ELSE
+
+*     Create the FAST_AXIS array and copy the data
+         CALL CMP_MOD(OUT_REDSX_LOC, 'FAST_AXIS', '_REAL', 1,
+     :        N_SUB, STATUS)
+         CALL CMP_PUT1R(OUT_REDSX_LOC, 'FAST_AXIS', N_SUB,
+     :        FAST_AXIS, STATUS)
+      END IF
+
 
 *     Create the output extension for the HWP angle
       
