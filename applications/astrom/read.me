@@ -1,0 +1,51 @@
+Revision Date 5 November 1997
+
+Starlink ASTROM utility
+-----------------------
+
+Version 3.6
+
+To import a new version from VAX to PC, copy all the files and execute
+the command procedure PC.BAT.
+
+To rebuild both the VAX and the Unix releases, execute the CREATE.COM
+command procedure.  This ends with instructions on what to do from
+the Unix end.
+
+Files in VAX master version:
+
+   ASTROM           C-shell script to run Unix versions
+   ASTROM.COM       DCL command procedure to run VAX/VMS version
+   ASTROM.BAT       MS-DOS command script to run PC version
+   ASTROM.EXE       VAX/VMS executable
+   CREATE.COM       DCL command procedure to build releases
+   *.SUN4           source for Sun SPARCstation etc
+   *.VAX            source for VAX/VMS etc
+   *.PCM            source for PC/MS-DOS using Microsoft FORTRAN
+   *.FOR            source which is always platform-independent
+   *.IND            source for which platform-dependent variants exist
+   READ.ME          this file
+   ASTROM.NEWS      news item for latest release
+   MK               mk script for Unix versions
+   MAKEFILE         make file for Unix versions
+   PC.BAT           MS-DOS procedure for build/rebuild of PC version
+   SUN5.TEX         document
+   VAX_TO_UNIX.USH  C-shell script to complete the VMS to Unix transfer
+
+Recent changes:
+
+  * Now provides reporting of filenames when open failures occur.
+
+  * Measured x,y coordinates are internally scaled to unit RMS
+    to improve numerical properties of the fit.
+
+  * Plate scales are now reported to four decimal places rather
+    than three.
+
+  * There were slight inaccuracies in the treatment of J2000 stars
+    when used in B1950 reductions.  The problem is unlikely to have
+    materially affected the results.
+
+  * The maximum number of reference stars has been increased from
+    1000 to 2000.
+------------------------------------------------------------------------

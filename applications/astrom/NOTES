@@ -1,0 +1,11 @@
+
+This is Pat Wallace's ASTROM package.  I've imported it into my CVS
+repository in order to apply to it, on a branch, patches I've recently
+developed.  This import does _not_ include astrom_source.tar or
+sun5.htx_tar, both of which are generated files.  That means that it
+doesn't build as it is, since the makefile insists on trying to
+extract each of the source files from the tarball -- you can get around
+this by adjusting the TAR_OUT environment variable in the mk script.
+
+Norman Gray (norman@astro.gla.ac.uk)
+2001-06-11

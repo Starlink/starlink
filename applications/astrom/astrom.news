@@ -1,0 +1,20 @@
+1 ASTROM version 3.6                                         Expiry 1 Mar 98
+
+Recent changes:
+
+  * Now provides reporting of filenames when open failures occur.
+
+  * Measured x,y coordinates are internally scaled to unit RMS
+    to improve numerical properties of the fit.
+
+  * Plate scales are now reported to four decimal places rather
+    than three.
+
+  * There were slight inaccuracies in the treatment of J2000 stars
+    when used in B1950 reductions.  The problem is unlikely to have
+    materially affected the results.
+
+  * The maximum number of reference stars has been increased from
+    1000 to 2000.
+
+5th November 1997

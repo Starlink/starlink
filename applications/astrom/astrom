@@ -1,0 +1,36 @@
+#!/bin/csh -f
+#
+#  To invoke the astrom utility, type:
+#
+#     astrom  [input]  [report]
+#
+#  Either or both parameters may be defaulted, by omission
+#  or by use of the notation "", to astrom.dat and astrom.lis
+#  respectively.
+#
+#  P.T.Wallace   Starlink   8 December 1993
+#
+
+#  Declare interrupt handler
+      onintr end
+
+#  String to indicate defaulted terminal I/O arguments
+      set _tty = .
+
+#  Copy arguments
+      set _input = $1
+      set _report = $2
+
+#  Resolve defaults
+      if ($_input == "") then
+         set _input = astrom.dat
+      endif
+      if ($_report == "") then
+         set _report = astrom.lis
+      endif
+
+#  Run the job
+      astrom.x $_tty $_input $_report $_tty
+
+end:
+      exit
