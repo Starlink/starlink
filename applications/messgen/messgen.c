@@ -43,6 +43,7 @@
  *     AJC: A.J. Chipperfield (STARLINK)
  *     NG: Norman Gray (Starlink)
  *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     PWD: Peter W. Draper (Starlink, Durham University)
  *     {enter_new_authors_here}
 
  *  History:
@@ -72,6 +73,9 @@
  *        Add search for _ext external data files to be concatenated
  *        with the MESSGEN error codes.
  *        Allow the error id to have an underscore (eg VD_SAVNOTALL)
+ *     05-JAN-2005 (PWD):
+ *        Increase identifier buffer to allow 15 characters (match
+ *        capabilities of ems/ems1Fcerr.c).
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -181,7 +185,7 @@ process_file(char *filename)
     char fac_outfile[MAXLINE];
 
     char buffer[MAXLINE];
-    char message_ident[10], *message_text;
+    char message_ident[16], *message_text;
     char *p, ch;
     int i, end=0;
 
@@ -305,11 +309,13 @@ process_file(char *filename)
 		return;
 	    }
 	    p = buffer;
-	    while(isalnum(*p) || *p == '_') {
-		message_ident[p-buffer] = *p;
+            i = 0;
+	    while( ( isalnum(*p) || *p == '_' ) && i < 15 ) {
+		message_ident[i] = *p;
 		p++;
+                i++;
 	    }
-	    message_ident[p-buffer] = '\0';
+	    message_ident[i] = '\0';
 	    while (strchr(" \t", *p) != NULL)
 		p++;
 	    ch = *p++;
@@ -336,11 +342,11 @@ process_file(char *filename)
  * Output stage - write the error code to the specified files
  */
 	    if (verify)
-		printf("%10s\t%x\n", message_ident, errcode);
+		printf("%16s\t%x\n", message_ident, errcode);
 	    if (fp_c) {
                 fprintf(fp_c,
                         "/* %s */\n"
-                        "#define %s%-10s	%d	/* messid=%d */\n\n", 
+                        "#define %s%-16s	%d	/* messid=%d */\n\n", 
 			message_text, fac_prefix, message_ident, errcode,
 			message_number);
 	    }
