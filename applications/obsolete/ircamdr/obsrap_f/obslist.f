@@ -260,7 +260,7 @@
 	    ELSE IF( PTYPE( 1:2) .EQ. '_I') THEN
 
 	      CALL MSG_SETI( 'NUM', J)
-	      CALL MSG_SETC( 'IVAL', INTVAR)
+	      CALL MSG_SETI( 'IVAL', INTVAR)
 	      CALL MSG_OUT( 'MESSAGE', 'Observation ^NUM, Value = ^IVAL',
      :	        STATUS)
 
