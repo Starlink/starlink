@@ -8,6 +8,7 @@ pgpack_SOURCES = pgpack.f
 
 # How else to install into bin?
 bin_SCRIPTS = grfont.dat
+dist_noinst_DATA = grfont.txt
 
 grfont.dat: grfont.txt pgpack.f
 	-rm -f grfont.dat
