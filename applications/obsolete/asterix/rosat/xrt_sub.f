@@ -3457,7 +3457,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 
 
 *+XRT_VIGNET_HRI    -   Calculates the vignetting correction for HRI
-      SUBROUTINE XRT_VIGNET_HRI(OFFAXD, VCORR, VSING, STATUS)
+      SUBROUTINE XRT_VIGNET_HRI(OFFAX, VCORR, VSING, STATUS)
 *    Description :
 *     <description of what the subroutine does>
 *    History :
@@ -3468,7 +3468,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Import :
-      REAL OFFAXD			  ! off-axis angle (degrees)
+      REAL OFFAX			  ! off-axis angle (arcmin)
 *    Import-Export :
       REAL VCORR			  ! Vignetting correction
       REAL VSING                          ! Single correction value
@@ -3489,7 +3489,6 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       INTEGER L
       INTEGER I
       REAL ANGLE(NQEMAX),FACTOR(NQEMAX)
-      REAL OFFAX
       REAL VIG,QE
 *-
       IF (STATUS.NE.SAI__OK) RETURN
@@ -3503,8 +3502,6 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       CALL CMP_GET1R(QLOC,'FACTOR',NQEMAX,FACTOR,NQE,STATUS)
       CALL HDS_CLOSE(QLOC,STATUS)
 
-      OFFAX = OFFAXD * 60.0
-	print *,offax
 *
 *    Set vignetting correction according to formula in HRI calibration
 *    report  (December 93)
@@ -3536,7 +3533,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       VCORR=1.0/(VIG*QE)
       VSING=VCORR
 
-
+	print *,vsing
 
       END
 
