@@ -111,6 +111,7 @@
       CHARACTER*20		INSTRUM			!
       CHARACTER*20		MISSION			!
       CHARACTER*50		OBSERVER		!
+      CHARACTER*(DAT__SZLOC)	SOLOC			! SORT object
       CHARACTER*50		TARGET			!
 
       LOGICAL			DOK, FOK, IOK, MOK	! Things present?
@@ -145,6 +146,17 @@
 
 *    The new object
       CALL ADI_NEW0( 'MissionStrings', OARG, STATUS )
+
+*    Check for datasets without fullo info
+      IF ( IOK ) THEN
+        CALL ADI1_LOCSORT( ARGS(1), .FALSE., SOLOC, STATUS )
+        IF ( INSTRUM .EQ. 'WFC' ) THEN
+          MOK = .TRUE.
+          MISSION = 'ROSAT'
+          CALL ADI1_CGET0C( SOLOC, 'DETECTOR', DOK, DET, STATUS )
+          CALL ADI1_CGET0C( SOLOC, 'FILTER', FOK, FILT, STATUS )
+        END IF
+      END IF
 
 *    Write its member values
       IF ( MOK ) THEN
