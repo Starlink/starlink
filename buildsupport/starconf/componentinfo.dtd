@@ -1,5 +1,5 @@
 <!-- A list of components -->
-<!ELEMENT componentlist (component+, manifest*)>
+<!ELEMENT componentset (component+, manifest*)>
 
 <!-- One component.  The ID attribute is a unique identifier for this
      component, used in, for example, <dependencies> elements of other
