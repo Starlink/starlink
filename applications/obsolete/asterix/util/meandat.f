@@ -136,14 +136,13 @@
       INTEGER DP(MAXFIL)                     ! Pointer to data arrays
       INTEGER VP(MAXFIL)                     ! Pointer to variance arrays
       INTEGER QP(MAXFIL)                     ! Pointer to quality arrays
+      INTEGER			IFILES			! Input file list
       INTEGER ODP                            ! Pointer to output arrays
       INTEGER OVP                            ! Pointer to output variance array
       INTEGER OQP                            ! Pointer to output quality array
       INTEGER NELS                           ! Total number of elements in array
       LOGICAL AVERAGE                        ! Average the files or sum ?
       INTEGER CPTR                           ! Pointer to dynamic workspace
-      CHARACTER*80 PATH(42)                  ! Historty records
-      INTEGER NLINES                         ! Number of lines of history text
 *.
 
 *  Check inherited global status.
@@ -159,9 +158,9 @@
       LVAR = .TRUE.
       LQUAL = .TRUE.
       DO LP = 1, ADI__MXDIM
-         DIMS(LP)=1
-         TDIMS(LP)=1
-      ENDDO
+        DIMS(LP) = 1
+        TDIMS(LP) = 1
+      END DO
 
 *  Find how many files are wanted
       CALL USI_GET0I('NFILES', NFILES, STATUS)
@@ -253,7 +252,7 @@
 
 *  Map the data array in the output file and zero it.
       CALL BDI_MAPR( OFID, 'Data', 'UPDATE', ODP, STATUS )
-      CALL ARR_INIT1R(0.0, NELS, %val(ODP), STATUS )
+      CALL ARR_INIT1R(0.0, NELS, %VAL(ODP), STATUS )
 
 *  Map the variance array if variances being used, otherwise delete any
 *  variance array
@@ -261,7 +260,7 @@
 
         CALL BDI_MAPR( OFID, 'Variance', 'UPDATE', OVP, STATUS )
         IF (STATUS .NE. SAI__OK) GOTO 99
-        CALL ARR_INIT1R(0.0, NELS, %val(OVP), STATUS)
+        CALL ARR_INIT1R(0.0, NELS, %VAL(OVP), STATUS)
 
       ELSE
 c         CALL BDI_DELETE( OFID, 'Variance', STATUS )
@@ -276,7 +275,7 @@ c         CALL BDI_DELETE( OFID, 'Variance', STATUS )
         IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Zero the quality array
-        CALL ARR_INIT1B( QUAL__GOOD, NELS, %val(OQP), STATUS )
+        CALL ARR_INIT1B( QUAL__GOOD, NELS, %VAL(OQP), STATUS )
 
       ELSE
 
@@ -296,7 +295,7 @@ c        CALL BDI_DELETE( OFID, 'Quality', STATUS )
          CALL MSG_PRNT('Error creating dynamic space')
          GOTO 99
       END IF
-      CALL ARR_INIT1R( 0.0, NELS, %val(CPTR), STATUS )
+      CALL ARR_INIT1R( 0.0, NELS, %VAL(CPTR), STATUS )
 
 *  Average these files
       CALL MEANDAT_AVERAGE( NFILES, LVAR, LQUAL, AVERAGE, NELS, DP,
@@ -307,8 +306,8 @@ c        CALL BDI_DELETE( OFID, 'Quality', STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *  Put names of input datafiles used into history
-      CALL USI_NAMEI( NLINES, PATH, STATUS )
-      CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()
@@ -430,7 +429,7 @@ c        CALL BDI_DELETE( OFID, 'Quality', STATUS )
         END IF
 
 *    Add the elements from this data array into the output arrays
-        CALL MEANDAT_SUM(WTMETH, WEIGHT, LVAR, LQUAL, NELS,
+        CALL MEANDAT_SUM( WTMETH, WEIGHT, LVAR, LQUAL, NELS,
      :                    %VAL(DP(FLP)),  %VAL(VP(FLP)), %VAL(QP(FLP)),
      :                                              ODATA, OVAR, WTSUM)
 
