@@ -26,13 +26,13 @@
 // Class variables
 AstHandler* AstHandler::channel_source_currenthandler_;
 verbosities AstHandler::verbosity_ = normal;
-const double AstHandler::DegreesPerRadian = 360.0/2/3.141592653589793238;
+const double AstHandler::DegreesPerRadian = 57.2957795130823208767;
 
-// Parameter frameset is a vector of strings, each of which is a line
-// of an AST channel output.  Parameter fromdomain is
-// the names of the domain from which it will convert coordinates:
-// this routine will extract from the proffered frameset a mapping
-// between these domains.
+// Parameter serialFrameset is a vector of strings, each of which is a
+// line of an AST channel output.  Parameter fromdomain is the names
+// of the domain from which it will convert coordinates: this routine
+// will extract from the proffered FrameSet a mapping between these
+// domains.
 AstHandler::AstHandler (vector<string>serialFrameset,
 			string fromdomain)
     throw (MoggyException)
@@ -55,13 +55,17 @@ AstHandler::AstHandler (vector<string>serialFrameset,
     astobj_ = static_cast<AstObject*>(astRead (channel_));
     channel_ = static_cast<AstChannel*>(astAnnul (channel_));
 
+    // Check here that this is indeed a FrameSet.
+    // Alternatively (for the future) we could accept a mapping.
+    // In that case, we'd have to adjust inputSkyDomain, since
+    // astobj_ would no longer, then, be a FrameSet.
+    if (! astIsAFrameSet (astobj_))
+	throw MoggyException
+	    ("AstHandler: input AST object is not a FrameSet");
+
     if (verbosity_ > normal)
     {
 	cerr << "AstHandler: read a " << astGetC(astobj_, "Domain") << endl;
-	// Should check here that this is indeed a FrameSet.
-	// Alternatively (for the future) we could accept a mapping.
-	// In that case, we'd have to adjust inputSkyDomain, since
-	// astobj_ would no longer, then, be a FrameSet
 	if (astIsAFrameSet (astobj_))
 	    cerr << "    IsA FrameSet!" << endl;
     }
