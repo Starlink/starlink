@@ -270,9 +270,12 @@ sub point ($$$) {
 			    # sexagesimal, we need to convert the
 			    # other one, too.
 			    my $sexco = deg2sex ($args[$i],
-						 ($i==0?1:0)); # isra
+						 ($i==0?1:0), # isra
+						 ':');
 			    if (defined($sexco)) {
-				push (@a, split (' ',$sexco));
+				# split on colons, removing one
+				# leading zero on minutes or seconds
+				push (@a, split (/:0?/,$sexco));
 			    } else {
 				carp "Moggy::point: invalid ".
 				  ($i==0?"RA":"Dec").": ".
