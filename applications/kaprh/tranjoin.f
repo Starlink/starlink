@@ -101,7 +101,7 @@
 *     global parameter.
 
 *  Related Applications:
-*     KAPPA: TRANSFORMER, TRANINVERT, TRANMAKE, TRANTRACE;
+*     KAPRH: TRANSFORMER, TRANINVERT, TRANMAKE, TRANTRACE;
 *     CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
 
 *  [optional_A_task_items]...

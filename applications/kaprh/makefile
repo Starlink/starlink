@@ -435,9 +435,10 @@ PRIVATE_INCLUDES =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = HLPCMD PRM_PAR SAE_PAR DAT_PAR CTM_PAR FIO_ERR \
-IDI_ERR NUM_DEC_CVT FIO_PAR IDI_PAR NDF_ERR NUM_DEF_CVT GNS_PAR NDF_PAR \
-PAR_ERR NUM_DEC_R SUBPAR_PAR NUM_DEF_R GKS_PAR AST_PAR
+EXTERNAL_INCLUDES = AST_PAR CTM_PAR DAT_ERR DAT_PAR FIO_ERR FIO_PAR \
+GKS_PAR GNS_PAR HLPCMD IDI_ERR IDI_PAR MSG_PAR NDF_ERR NDF_PAR \
+NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R PAR_ERR PRM_PAR SAE_PAR \
+SUBPAR_PAR TRN_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -448,7 +449,8 @@ F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
 
 KAPRH_F1_ROUTINES = crelut.f greyplot.f contover.f snapshot.f turbocont.f inspect.f \
 mosaic.f quilt.f lutflip.f luthilite.f lutrot.f luttweak.f idinvisible.f \
-idpazo.f idset.f idclear.f idstate.f ovset.f ovclear.f
+idpazo.f idset.f idclear.f idstate.f ovset.f ovclear.f \
+transformer.f traninvert.f tranjoin.f tranmake.f trantrace.f
 
 #  Kappa f files for which there are no corresponding iraf .par files.
 KAPRH_F2_ROUTINES = krhhelp.f
@@ -464,7 +466,8 @@ kps1_imzbo.f lccell.f ncraxs.f kps1_ncuco.f kps1_clpal.f cntkey.f \
 kps1_hstcb.f kps1_hstcr.f kps1_hstcw.f kps1_hstcd.f kps1_hstcub.f \
 kps1_hstci.f kps1_hstcuw.f getv2.f hstrep.f inpe.f insl.f inxy.f peepsb.f \
 hstdsp.f imlst.f inpol.f linplt.f slc2t1.f hstlo.f inhi.f inre.f \
-kps1_lutwk.f inva.f linset.f thrsr.f mfnext.f mfopen.f moscad.f moscdv.f
+kps1_lutwk.f inva.f linset.f thrsr.f mfnext.f mfopen.f moscad.f moscdv.f \
+kps1_wltrn.f kps1_wptrn.f kps1_trncl.f
 
 MONO_SOURCE = kaprh_mon.f
 
@@ -605,6 +608,7 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 #
 AST_PAR:	$(STAR_INC)/ast_par;	$(LINK) $? $@
 CTM_PAR:	$(STAR_INC)/ctm_par;	$(LINK) $? $@
+DAT_ERR:	$(STAR_INC)/dat_err;	$(LINK) $? $@
 DAT_PAR:	$(STAR_INC)/dat_par;	$(LINK) $? $@
 FIO_ERR:	$(STAR_INC)/fio_err;	$(LINK) $? $@
 FIO_PAR:	$(STAR_INC)/fio_par;	$(LINK) $? $@
@@ -613,6 +617,7 @@ GNS_PAR:	$(STAR_INC)/gns_par;	$(LINK) $? $@
 HLPCMD:	$(STAR_INC)/hlpcmd;	$(LINK) $? $@
 IDI_ERR:	$(STAR_INC)/idi_err;	$(LINK) $? $@
 IDI_PAR:	$(STAR_INC)/idi_par;	$(LINK) $? $@
+MSG_PAR:	$(STAR_INC)/msg_par;	$(LINK) $? $@
 NDF_ERR:	$(STAR_INC)/ndf_err;	$(LINK) $? $@
 NDF_PAR:	$(STAR_INC)/ndf_par;	$(LINK) $? $@
 NUM_DEC_CVT:	$(STAR_INC)/num_dec_cvt;	$(LINK) $? $@
@@ -623,6 +628,7 @@ PAR_ERR:	$(STAR_INC)/par_err;	$(LINK) $? $@
 PRM_PAR:	$(STAR_INC)/prm_par;	$(LINK) $? $@
 SAE_PAR:	$(STAR_INC)/sae_par;	$(LINK) $? $@
 SUBPAR_PAR:	$(STAR_INC)/subpar_par;	$(LINK) $? $@
+TRN_PAR:	$(STAR_INC)/trn_par;	$(LINK) $? $@
 
 #
 #  Rules for extracting source files from the source archive.  Split to
@@ -1742,5 +1748,13 @@ slc2t1.o:	 SAE_PAR PRM_PAR
 snapshot.o:	 SAE_PAR DAT_PAR CTM_PAR PAR_ERR NDF_PAR IDI_PAR IDI_ERR
 thrsr.o:	 SAE_PAR PRM_PAR
 turbocont.o:	 SAE_PAR DAT_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR GKS_PAR
+kps1_trncl.o:	 SAE_PAR TRN_PAR
+kps1_wltrn.o:	 SAE_PAR DAT_PAR TRN_PAR
+kps1_wptrn.o:	 SAE_PAR DAT_PAR TRN_PAR
+traninvert.o:	 SAE_PAR DAT_PAR
+tranjoin.o:	 SAE_PAR DAT_PAR DAT_ERR PAR_ERR
+tranmake.o:	 SAE_PAR DAT_PAR DAT_ERR PAR_ERR TRN_PAR
+transformer.o:	 SAE_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR TRN_PAR
+trantrace.o:	 SAE_PAR TRN_PAR DAT_PAR PAR_ERR
 
 #  End of makefile.

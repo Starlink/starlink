@@ -52,7 +52,7 @@
 *     global parameter.
 
 *  Related Applications:
-*     KAPPA: TRANSFORMER, TRANJOIN, TRANMAKE, TRANTRACE;
+*     KAPRH: TRANSFORMER, TRANJOIN, TRANMAKE, TRANTRACE;
 *     CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
 
 *  [optional_A_task_items]...

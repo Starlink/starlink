@@ -97,8 +97,17 @@
       echo "Generating iraf files"
       ifd2iraf kaprh
 
+#  Create the on-line help file.
+      foreach file (`grp kaprh_ifls`)
+         set ffile = `basename $file .ifl`.f
+         set hfile = `basename $file .ifl`.help
+         prohlp in=$ffile out=$hfile
+      end
+      cat kaprh.star-hlp *.help > new.hlp
+      mv new.hlp kaprh.hlp
+      rm *.help
+
 #  Generate the IRAF documentation.
-      mv kaprh.star-hlp kaprh.hlp
       ifd_irafhlpgen kaprh
 
 #  Remove entries from kaprh.men and kaprh.hd which do not relate to actions.

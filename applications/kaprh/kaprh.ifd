@@ -1831,6 +1831,928 @@ iraf! {
  
       }
 
+      action traninvert {
+         alias {trani(nvert)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter transform {
+				 # file
+            position 1
+            type TRN
+            access UPDATE
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.TRANSFORM
+            prompt {Transformation structure to invert}
+            helpkey *
+          }
+
+      }
+
+      action tranjoin {
+         alias {tranj(oin)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter in1 {
+				 # file (first input)
+            position 1
+            type TRN
+            access UPDATE
+            vpath PROMPT
+            ppath CURRENT
+            association ->GLOBAL.TRANSFORM
+            prompt {First transformation}
+            helpkey *
+          }
+
+         parameter in2 {
+				 # file (second input)
+            position 2
+            type TRN
+            access UPDATE
+            vpath PROMPT
+            ppath CURRENT
+            association ->GLOBAL.TRANSFORM
+            prompt {Second transformation}
+            helpkey *
+          }
+
+         parameter out {
+				 # file
+            position 3
+            type TRN
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.TRANSFORM
+            prompt {New structure to hold concatenated transformation}
+            helpkey *
+          }
+
+         parameter dest {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default NEW
+            prompt {Destination of concatenated transformation}
+            helpkey *
+          }
+
+      }
+
+      action tranmake {
+         alias {tranm(ake)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter class {
+            size *
+            type LITERAL
+            prompt {Classifications of the transformation}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+            default !
+          }
+
+         parameter comment {
+            position 3
+            type LITERAL
+            prompt {Comment to be stored with the transformation}
+            vpath PROMPT
+            ppath DEFAULT
+            helpkey *
+            default !
+          }
+
+         parameter fa {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fb {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fc {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fd {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fe {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter ff {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fg {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fh {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fi {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fj {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fk {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fl {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fm {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fn {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fo {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fp {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fq {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fr {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fs {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter ft {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fu {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fv {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fw {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fx {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fy {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fz {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Sub-expression}
+            helpkey TRANMAKE PARAMETERS FA-FZ
+          }
+
+         parameter fittype {
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 5
+            prompt {Type of bilinear transform (1-5)}
+            helpkey *
+          }
+
+         parameter for1 {
+            type LITERAL
+            prompt {First forward mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter for2 {
+            type LITERAL
+            prompt {Second forward mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter for3 {
+            type LITERAL
+            prompt {Third forward mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter for4 {
+            type LITERAL
+            prompt {Fourth forward mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter for5 {
+            type LITERAL
+            prompt {Fifth forward mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter for6 {
+            type LITERAL
+            prompt {Sixth forward mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter for7 {
+            type LITERAL
+            prompt {Seventh forward mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inv1 {
+            type LITERAL
+            prompt {First inverse mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inv2 {
+            type LITERAL
+            prompt {Second inverse mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inv3 {
+            type LITERAL
+            prompt {Third inverse mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inv4 {
+            type LITERAL
+            prompt {Fourth inverse mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inv5 {
+            type LITERAL
+            prompt {Fifth inverse mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inv6 {
+            type LITERAL
+            prompt {Sixth inverse mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inv7 {
+            type LITERAL
+            prompt {Seventh inverse mapping}
+            vpath PROMPT
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter nvin {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Number of input variables in the transformation}
+            helpkey *
+            default 2
+          }
+
+         parameter nvout {
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC CURRENT
+            prompt {Number of output variables in the transformation}
+            helpkey *
+            default 2
+          }
+
+         parameter pa {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pb {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pc {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pd {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pe {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pf {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pg {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter ph {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pi {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3.14159265359D0
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pj {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pk {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pl {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pm {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pn {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter po {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pp {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pq {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pr {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter ps {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pt {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pu {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pv {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pw {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter px {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter py {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter pz {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Constant value}
+            helpkey TRANMAKE PARAMETERS PA-PZ
+          }
+
+         parameter prec {
+            type LITERAL
+            prompt {Precision of the transformation}
+            vpath DEFAULT
+            ppath CURRENT
+            helpkey *
+            default _REAL
+          }
+
+         parameter tr {
+            position 4
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            default 0 1 0 0 0 1
+            prompt {Transformation coefficients}
+            helpkey *
+            size *
+          }
+
+         parameter transform {
+            position 1
+            type TRN
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.TRANSFORM
+            prompt {File to hold the transformation}
+            helpkey *
+          }
+
+         parameter trtype {
+            position 2
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default Expres
+            prompt {Transformation type}
+            helpkey *
+          }
+
+      }
+
+      action transformer {
+         alias {trans(former)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter conserve {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Conserve flux?}
+            helpkey *
+            default FALSE
+          }
+
+         parameter cosys {
+            type LITERAL
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DYNAMIC
+            prompt {Co-ordinate system}
+            association <->GLOBAL.COORD_SYSTEM
+            helpkey *
+            default World
+          }
+
+         parameter full {
+				 # dimensions
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Apply the transformation to higher dimensions?}
+            helpkey *
+            default FALSE
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF}
+            helpkey *
+          }
+
+         parameter lbound {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Lower bounds of the output NDF}
+            helpkey *
+          }
+
+         parameter lcoord {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Lower co-ordinate limits of the output NDF}
+            helpkey *
+          }
+
+         parameter method {
+            position 4
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DYNAMIC
+            prompt {Re-sampling method}
+            helpkey *
+            default Nearest
+          }
+
+         parameter out {
+            position 3
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF}
+            helpkey *
+          }
+
+         parameter shape {
+            position 5
+            type LITERAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {Method to define the shape of the output NDF}
+            helpkey *
+          }
+
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default {KAPPA - Transformer}
+            prompt {Output NDF title}
+            helpkey *
+          }
+
+         parameter transform {
+            position 2
+            type TRN
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.TRANSFORM
+            prompt {Transformation structure}
+            helpkey *
+          }
+
+         parameter ubound {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Upper bounds of the output NDF}
+            helpkey *
+          }
+
+         parameter ucoord {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Upper co-ordinate limits of the output NDF}
+            helpkey *
+          }
+
+      }
+
+      action trantrace {
+         alias {trant(race)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter classfor {
+            type LITERAL
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter classinv {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default =
+            helpkey *
+          }
+
+         parameter comment {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default {No comment}
+            helpkey *
+          }
+
+         parameter forward {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default =
+            helpkey *
+          }
+
+         parameter inverse {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default =
+            helpkey *
+          }
+
+         parameter logfile {
+            position 2
+            type FILENAME
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Filename to store trace of TRANSFORM structure}
+            default !
+            helpkey *
+          }
+
+         parameter nvin {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter nvout {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter prec {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default _REAL
+            helpkey *
+          }
+
+         parameter transform {
+            position 1
+            type TRN
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.TRANSFORM
+            prompt {Transformation structure to list}
+            helpkey *
+          }
+
+         parameter version {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+          }
+
+      }
+
       action turbocont {
          alias {turb(ocont)}
 

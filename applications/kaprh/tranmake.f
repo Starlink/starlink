@@ -301,7 +301,7 @@
 *     the shell or parameter system.
 
 *  Related Applications:
-*     KAPPA: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANSFORMER,
+*     KAPRH: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANSFORMER,
 *     TRANTRACE; CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
 
 *  Implementation Deficiencies:

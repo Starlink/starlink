@@ -166,6 +166,21 @@
          ELSE IF ( NAME .EQ. 'TURBOCONT' ) THEN
             CALL TURBOCONT ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'TRANSFORMER' ) THEN
+            CALL TRANSFORMER ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'TRANINVERT' ) THEN
+            CALL TRANINVERT ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'TRANJOIN' ) THEN
+            CALL TRANJOIN ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'TRANMAKE' ) THEN
+            CALL TRANMAKE ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'TRANTRACE' ) THEN
+            CALL TRANTRACE ( STATUS )
+
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'CMD', NAME )

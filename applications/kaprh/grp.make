@@ -17,25 +17,29 @@ _kaprh.hd kaprh.cl kaprh.men kaprh_mon.tcl crelut.par greyplot.par \
 contover.par mosaic.par quilt.par snapshot.par turbocont.par \
 inspect.par lutflip.par luthilite.par lutrot.par luttweak.par \
 idinvisible.par idpazo.par idset.par idstate.par idclear.par \
-ovset.par ovclear.par
+ovset.par ovclear.par tranjoin.par transformer.par traninvert.par \
+tranmake.par trantrace.par
 
 #  Contents of the doc/ directory in kaprh_iraf.tar
 IRAF_DOCS = crelut.hlp greyplot.hlp contover.hlp mosaic.hlp quilt.hlp \
 snapshot.hlp turbocont.hlp inspect.hlp lutflip.hlp luthilite.hlp \
 lutrot.hlp luttweak.hlp idinvisible.hlp idpazo.hlp idset.hlp idclear.hlp \
-idstate.hlp ovset.hlp ovclear.hlp
+idstate.hlp ovset.hlp ovclear.hlp tranjoin.hlp transformer.hlp \
+traninvert.hlp tranmake.hlp trantrace.hlp
 
 # The contents of the kaprh_ifls.tar file:
 KAPRH_IFLS = crelut.ifl greyplot.ifl krhhelp.ifl kaprh_mon.ifl \
 contover.ifl mosaic.ifl quilt.ifl snapshot.ifl turbocont.ifl \
 inspect.ifl lutflip.ifl luthilite.ifl lutrot.ifl luttweak.ifl \
 idinvisible.ifl idpazo.ifl idset.ifl idclear.ifl idstate.ifl \
-ovset.ifl ovclear.ifl
+ovset.ifl ovclear.ifl tranjoin.ifl transformer.ifl traninvert.ifl \
+tranmake.ifl trantrace.ifl
 
 # The contents of the kaprh_sub.tar file:
 KAPRH_SUB = crelut.f greyplot.f krhhelp.f contover.f mosaic.f quilt.f snapshot.f \
 turbocont.f inspect.f lutflip.f luthilite.f lutrot.f luttweak.f \
-idinvisible.f idpazo.f idset.f idstate.f idclear.f ovset.f ovclear.f
+idinvisible.f idpazo.f idset.f idstate.f idclear.f ovset.f ovclear.f \
+tranjoin.f transformer.f traninvert.f tranmake.f trantrace.f
 
 # The source RCS files needed to create the kapsub_sub.tar file:
 KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
@@ -50,14 +54,13 @@ kps1_hstcd.f kps1_hstcub.f kps1_hstci.f kps1_hstcuw.f
 KAPSUB_GEN = kps1_dscl.gen kps1_hstc.gen
 
 # Non-generic source files needed for kapsub_sub.tar :
-KAPSUB_NONGEN = cnthlt.f cntkey.f cntsbp.f gethlp.f kaprh_mon.f \
-kps1_cnser.f kps1_cntur.f kps1_faind.f kps1_fainb.f kps1_faini.f \
-kps1_fainw.f kps1_fainr.f kps1_imzbo.f kps1_ncuco.f lccell.f \
-kps1_clpal.f kps1_lutwk.f ncraxs.f \
-getv2.f   hstrep.f  inpe.f   insl.f     inxy.f    peepsb.f \
-hstdsp.f  imlst.f   inpol.f  linplt.f  slc2t1.f \
-hstlo.f   inhi.f    inre.f   inva.f     linset.f  thrsr.f \
-mfnext.f  mfopen.f  moscad.f  moscdv.f 
+KAPSUB_NONGEN = cnthlt.f cntkey.f cntsbp.f gethlp.f getv2.f hstdsp.f \
+hstlo.f hstrep.f imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f \
+inxy.f kaprh_mon.f kps1_clpal.f kps1_cnser.f kps1_cntur.f \
+kps1_fainb.f kps1_faind.f kps1_faini.f kps1_fainr.f kps1_fainw.f \
+kps1_imzbo.f kps1_lutwk.f kps1_ncuco.f kps1_trncl.f kps1_wltrn.f \
+kps1_wptrn.f lccell.f linplt.f linset.f mfnext.f mfopen.f moscad.f \
+moscdv.f ncraxs.f peepsb.f slc2t1.f thrsr.f
 
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KAPSUB_GEN) 

@@ -115,7 +115,7 @@
 
 *  [optional_A_task_items]...
 *  Related Applications:
-*     KAPPA: TRANSFORMER, TRANINVERT, TRANJOIN, TRANMAKE;
+*     KAPRH: TRANSFORMER, TRANINVERT, TRANJOIN, TRANMAKE;
 *     CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
 
 *  Authors:

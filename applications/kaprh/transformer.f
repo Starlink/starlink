@@ -220,7 +220,7 @@
 *     -  There can be an arbitrary number of NDF dimensions.
 
 *  Related Applications:
-*     KAPPA: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANMAKE,
+*     KAPRH: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANMAKE,
 *     TRANTRACE; CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
 
 *  Implementation Deficiencies:
