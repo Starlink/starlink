@@ -27,7 +27,7 @@ AC_CHECK_FUNCS(memmove bcopy)
 
 dnl   This package has no dependencies
 
-STAR_LATEX_DOCUMENTATION(sun209, [sun209.tex sun209.ps sun209.htx_tar])
+STAR_LATEX_DOCUMENTATION(sun209)
 
 dnl   Header checks.  
 AM_CONFIG_HEADER(config.h)
