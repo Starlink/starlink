@@ -45,6 +45,10 @@
 *          and three merges rather than one merge on all quadrants
 *     12 April 2004 (timj):
 *          Tidy up header
+*     14 April 2004 (timj):
+*          Make sure that we do not suffer from the problem whereby
+*          an identical variable can be supplied as an argument for
+*          ADJQUAD and WIDEBAND.
 *     {enter_further_changes_here}
  
 *
@@ -69,9 +73,11 @@
       INTEGER NUSE               ! Half number of channels to drop
       INTEGER JDEF               ! Returned by GENLIB
       REAL*8  FEDGE(2)           ! Frequency boundaries of overlap
+      LOGICAL LADJQUAD           ! Local version of ADJQUAD
+      LOGICAL LWIDEBAND          ! Local version of WIDEBAND
 
 * Given and returned:
-      INTEGER IFAIL              ! Don't know what to do with this'
+      INTEGER IFAIL              ! Global error
 
 
 * Global constants
@@ -110,14 +116,14 @@
      +        NUSE,'I4',NUSE,JDEF)
          JDEF = 0
          CALL GEN_YESNO ('Adjust any DC offset quadrants? ', .FALSE.,
-     +        ADJQUAD, JDEF)
+     +        LADJQUAD, JDEF)
          JDEF = 0
          CALL GEN_YESNO ('Wideband mode (also merge Y spectrum)? ',
-     +        .FALSE., WIDEBAND, JDEF)
+     +        .FALSE., LWIDEBAND, JDEF)
 
 C         print *,'NUSE = ',NUSE
-C         IF (ADJQUAD) print *,'ADJ quad is true'
-C         IF (WIDEBAND) print *,'Wideband mode is true'
+C         IF (LADJQUAD) print *,'ADJ quad is true'
+C         IF (LWIDEBAND) print *,'Wideband mode is true'
 
 C Call the core dasmerge subroutine
          IF (NUSE .LE. NOVER .AND. NUSE .GT. 0) THEN
@@ -135,14 +141,19 @@ C Call the core dasmerge subroutine
          END IF
 
 C         PRINT *, 'NDROP = ',NDROP
-C         IF (.NOT.ADJQUAD) print *,'ADJ quad is false'
+C         IF (.NOT.LADJQUAD) print *,'ADJ quad is false'
 
-         CALL DODASMERGE(NDROP, ADJQUAD, WIDEBAND, IFAIL)
+         CALL DODASMERGE(NDROP, LADJQUAD, LWIDEBAND, IFAIL)
 
 
       ELSE
          WRITE(ILOUT,*) 'Spectrum only has one quadrant'
       END IF
+
+C     Copy logicals to output variable. Do it this way to protect us
+C     from being called with two identical dummy variables
+      WIDEBAND = LWIDEBAND
+      ADJQUAD = LADJQUAD
 
       END
 
