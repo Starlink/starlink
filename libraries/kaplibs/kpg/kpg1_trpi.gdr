@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_TRPIR( NDIMI, IDIMS, TRID, AXES, OEL, NDIMO,
+      SUBROUTINE KPG1_TRPI<T>( NDIMI, IDIMS, TRID, AXES, OEL, NDIMO,
      :                         OLBND, ODIMS, COIN, COOUT, FRIND, INDICE,
      :                         STATUS )
 *+
@@ -118,12 +118,12 @@
       INTEGER OLBND( NDIMO )
       INTEGER ODIMS( NDIMO )
  
-      REAL AXES( * )
+      <TYPE> AXES( * )
  
 *  Arguments Returned:
-      REAL COIN( OEL, NDIMI )
-      REAL COOUT( OEL, NDIMO )
-      REAL FRIND( OEL, NDIMI )
+      <TYPE> COIN( OEL, NDIMI )
+      <TYPE> COOUT( OEL, NDIMO )
+      <TYPE> FRIND( OEL, NDIMI )
       INTEGER INDICE( * )
  
 *  Status:
@@ -145,7 +145,7 @@
                                ! transformation
       INTEGER OFFSET           ! Offset within the first dimension
                                ! of the output array
-      REAL ORIGIN( NDF__MXDIM ) ! Origins of each axis
+      <TYPE> ORIGIN( NDF__MXDIM ) ! Origins of each axis
       INTEGER STRIDI( NDF__MXDIM ) ! Dimension strides for input array
       INTEGER STRIDO( NDF__MXDIM ) ! Dimension strides for output
                                ! co-ordinates
@@ -193,20 +193,20 @@
  
 *  The co-ordinates of the first dimension are fixed throughout this
 *  routine, as the transformation is applied row by row.
-      ORIGIN( 1 ) = NUM_ITOR( OLBND( 1 ) )
+      ORIGIN( 1 ) = NUM_ITO<T>( OLBND( 1 ) )
       DO I = 1, ODIMS( 1 )
-         COOUT( I, 1 ) = ORIGIN( 1 ) + NUM_ITOR( I -1 )
-     :                   - 1.0E0 / 2.0E0
+         COOUT( I, 1 ) = ORIGIN( 1 ) + NUM_ITO<T>( I -1 )
+     :                   - 1<CONST> / 2<CONST>
       END DO
       AXJUMP( 1 ) = 1
  
 *  Initialise the input co-ordinates for any higher dimensions.
       IF ( NDIMO .GT. 1 ) THEN
          DO IAXIS = 2, NDIMO
-            ORIGIN( IAXIS ) = NUM_ITOR( OLBND( IAXIS ) )
+            ORIGIN( IAXIS ) = NUM_ITO<T>( OLBND( IAXIS ) )
             AXJUMP( IAXIS ) = AXJUMP( IAXIS - 1 ) + IDIMS( IAXIS - 1 )
             DO I = 1, ODIMS( 1 )
-               COOUT( I, IAXIS ) = ORIGIN( IAXIS ) - 1.0E0 / 2.0E0
+               COOUT( I, IAXIS ) = ORIGIN( IAXIS ) - 1<CONST> / 2<CONST>
             END DO
          END DO
       END IF
@@ -270,7 +270,7 @@
                   OFFSET = MOD( K, STRIDO( J ) )
                   IF ( OFFSET .NE. 0 ) THEN
                      DO I = 1, ODIMS( 1 )
-                        COOUT( I, J ) = COOUT( I, J ) + 1.0E0
+                        COOUT( I, J ) = COOUT( I, J ) + 1<CONST>
                      END DO
  
 *  The input co-ordinates have been updated and are ready for
@@ -282,7 +282,7 @@
 *  to it's minimum value for the next stride.
                      DO I = 1, ODIMS( 1 )
                         COOUT( I, J ) = ORIGIN( J ) -
-     :                                  1.0E0 / 2.0E0
+     :                                  1<CONST> / 2<CONST>
                      END DO
  
 *  Now go to the next higher dimension to see if that has completed a
@@ -299,7 +299,7 @@
  
 *   Convert the co-ordinates for those of the output array, to those
 *   of the input array.
-            CALL TRN_TRNR( .TRUE., OEL, NCOUT, ODIMS( 1 ), COOUT,
+            CALL TRN_TRN<T>( .TRUE., OEL, NCOUT, ODIMS( 1 ), COOUT,
      :                       TRID, OEL, NCIN, COIN, STATUS )
  
 *   In turn convert those co-ordinates to fractional element indices.
@@ -310,7 +310,7 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
                DO IAXIS = 1, NDIMI
                   CALL ERR_MARK
-                  CALL KPG1_AINBR( 1, IDIMS( IAXIS ), AXES(
+                  CALL KPG1_AINB<T>( 1, IDIMS( IAXIS ), AXES(
      :                               AXJUMP( IAXIS ) ), ODIMS( 1 ),
      :                               COIN( 1, IAXIS ),
      :                               FRIND( 1, IAXIS ), STATUS )
@@ -329,7 +329,7 @@
          VOFF = 1
          DO IAXIS = 1, NDIMI
             I = MOD( K - 1, ODIMS( 1 ) ) + 1
-            IF ( FRIND( I, IAXIS ) .EQ. VAL__BADR ) THEN
+            IF ( FRIND( I, IAXIS ) .EQ. VAL__BAD<T> ) THEN
                INDICE( K ) = VAL__BADI
                GO TO 100
  
@@ -337,12 +337,12 @@
 *   Allow for the sign of the value.  The 3/2 is -1/2 for the conversion
 *   to NINT, and -1 for the fact that there are the index less one
 *   strides to be applied to the vector offset.
-            ELSE IF ( FRIND( I, IAXIS ) .LT. 0.0E0 ) THEN
+            ELSE IF ( FRIND( I, IAXIS ) .LT. 0<CONST> ) THEN
                VOFF = VOFF + INT( FRIND( I, IAXIS ) -
-     :                3.0E0 / 2.0E0 ) * STRIDI( IAXIS )
+     :                3<CONST> / 2<CONST> ) * STRIDI( IAXIS )
             ELSE
                VOFF = VOFF + INT( FRIND( I, IAXIS ) -
-     :                1.0E0 / 2.0E0 ) * STRIDI( IAXIS )
+     :                1<CONST> / 2<CONST> ) * STRIDI( IAXIS )
             END IF
          END DO
          INDICE( K ) = VOFF

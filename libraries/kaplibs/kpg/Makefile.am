@@ -38,7 +38,8 @@ KPG_BDIRW_GEN = kpg1_iscl.gbdirw
 # Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
 kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr \
-kpg1_bloc.gdr kpg1_litn.gdr kpg1_ludc.gdr kpg1_mdet.gdr kpg1_trbo.gdr
+kpg1_bloc.gdr kpg1_litn.gdr kpg1_ludc.gdr kpg1_mdet.gdr kpg1_trbo.gdr \
+kpg1_trpi.gdr
 
 KPG_DIR_GEN = kpg1_mul.gdir
 
@@ -128,8 +129,8 @@ kpg1_sscof.f kpg1_storb.f kpg1_stord.f kpg1_stori.f \
 kpg1_storr.f kpg1_storub.f kpg1_storuw.f kpg1_storw.f \
 kpg1_trald.f kpg1_tralr.f \
 kpg1_trlib.f kpg1_trlid.f kpg1_trlii.f \
-kpg1_trlir.f kpg1_trliub.f kpg1_trliuw.f kpg1_trliw.f kpg1_trpid.f \
-kpg1_trpir.f kpg1_trspb.f kpg1_trspd.f kpg1_trspi.f kpg1_trspr.f \
+kpg1_trlir.f kpg1_trliub.f kpg1_trliuw.f kpg1_trliw.f  \
+kpg1_trspb.f kpg1_trspd.f kpg1_trspi.f kpg1_trspr.f \
 kpg1_trspub.f kpg1_trspuw.f kpg1_trspw.f kpg1_unz2d.f kpg1_unz2r.f \
 kpg1_vasvb.f kpg1_vasvd.f kpg1_vasvi.f kpg1_vasvr.f kpg1_vasvub.f \
 kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_wmodb.f \
