@@ -1199,7 +1199,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 
 *      ENCPSF field
         CALL PSS_CRERF( SID, 'ENCPSF', '_REAL', ' ', O_EPSF, STATUS )
-        CALL SSO_PUTFITEM0C( SID, 'ENCPSF', 'LABEL', 30,
+        CALL SSI_PUTFITEM0C( SID, 'ENCPSF', 'LABEL', 30,
      :			        'Enclosed psf fraction', STATUS )
 
 *      Background list if background supplied
@@ -1247,7 +1247,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
         END IF
 
 *      Error form
-        CALL SSO_PUTPAR0L( SID, 1, 'SYMMETRIC', (.NOT.ASYMET),
+        CALL SSI_PUTPAR0L( SID, 1, 'SYMMETRIC', (.NOT.ASYMET),
      :                                                 STATUS )
 
 *      Diagnostic parameters
