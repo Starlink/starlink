@@ -89,9 +89,11 @@ first.
 	(error (string-append
 		"Row "
 		(number->string (child-number (current-node)))
-		" of table has more than "
+		" of table has "
+		actual-elements
+		" columns, rather than "
 		(number->string (cadr colno))
-		" rows, as declared")))))
+		", as declared")))))
 
 (element entry
   (make element gi: "td"
