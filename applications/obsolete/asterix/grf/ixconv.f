@@ -246,7 +246,7 @@
       CALL DYN_MAPD( 2, ODIMS, WPTR_XR, STATUS )
       CALL IXCONV_COPY2( DIMS1(1), DIMS1(2), %VAL(DPTR_1), M3, N3,
      :                   %VAL(WPTR_XR), AVX, STATUS )
-      CALL BDA_UNMAPDATA( LOC1, STATUS )
+c      CALL BDA_UNMAPDATA( LOC1, STATUS )
 
 *    Fill X_Imaginary array with zeroes
       CALL DYN_MAPD( 2, ODIMS, WPTR_XI, STATUS )
