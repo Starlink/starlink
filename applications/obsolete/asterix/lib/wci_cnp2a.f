@@ -119,8 +119,8 @@
       END IF
 
 *  Get axis scalings
-      CALL ADI_CGET1I( PIXID, 'BASE', 2, ABASE, DUM, STATUS )
-      CALL ADI_CGET1I( PIXID, 'SCALE', 2, ASCALE, DUM, STATUS )
+      CALL ADI_CGET1R( PIXID, 'BASE', 2, ABASE, DUM, STATUS )
+      CALL ADI_CGET1R( PIXID, 'SCALE', 2, ASCALE, DUM, STATUS )
 
 *  Calculate axis values
       APOS(1) = ABASE(1) + (PPOS(1)-1.0)*ASCALE(1)
