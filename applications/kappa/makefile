@@ -242,6 +242,9 @@
 #        development system.
 #     17-JUL-2000 (DSB):
 #        Removed NDG library since it is now distributed independantly.
+#     12-OCT-2000 (DSB):
+#        Use NATIVE to convert all data files to the native format
+#        of the platform at install time.
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -435,7 +438,7 @@ PKG_LINK = :
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.15-5
+PKG_VERS = 0.15-6
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -898,17 +901,17 @@ MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
 HELP_SOURCES = $(PKG_NAME).hlp
 
-#  List of ancillary data files.
+#  List of ancillary data files (NDFs only!).
 
 DATA_FILES = $(LUTS) $(TEST_FILES) 
 
-#  Define the standard colour tables.
+#  Define the standard colour tables (NDFs only!).
 
 LUTS = \
 bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf \
 ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf grey_lut.sdf logo_lut.sdf
 
-#  Define the package test data.
+#  Define the package test data (NDFs only!).
 
 TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf m31.sdf iras.sdf \
 m31_issa_100.sdf m31_issa_60.sdf m31_issa_25.sdf m31_issa_12.sdf m57.sdf \
@@ -1627,6 +1630,27 @@ install:
            else :; fi;\
         done
 #
+#  Create the KAPPA application/task name soft links.
+	for f in $(KAPPA_TASKS) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) ./$(KAPPA_MON) $(INSTALL_BIN)/$$f ;\
+           else :; fi;\
+        done
+#
+#  Create the KAPVIEW application/task name soft links.
+	for f in $(KAPVIEW_TASKS) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) ./$(KAPVIEW_MON) $(INSTALL_BIN)/$$f ;\
+           else :; fi;\
+        done
+#
+#  Create the NDFPACK application/task name soft links.
+	for f in $(NDFPACK_TASKS) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) ./$(NDFPACK_MON) $(INSTALL_BIN)/$$f ;\
+           else :; fi;\
+        done
+#
 #  Install the interface files, giving them world-read permission.
 	for f in $(IFC_FILES) ""; do \
            if test -n "$$f"; then \
@@ -1648,10 +1672,11 @@ install:
            else :; fi;\
         done
 #
-#  Install the colour tables and test data, giving them world-read
-#  permission.
+#  Install the colour tables and test data, converting them to the
+#  native format of the platform, and giving them world-read permission.
 	for f in $(DATA_FILES) ""; do \
            if test -n "$$f"; then \
+              $(INSTALL_BIN)/native `basename $$f .sdf`;\
               cp -p $$f $(INSTALL_BIN);\
               chmod 644 $(INSTALL_BIN)/$$f;\
               rm -f $$f;\
@@ -1691,28 +1716,6 @@ install:
               $(LINK) $(INSTALL_HELP)/$$f $$f;\
            else :; fi;\
         done
-#
-#  Create the KAPPA application/task name soft links.
-	for f in $(KAPPA_TASKS) ""; do \
-           if test -n "$$f"; then \
-              $(LINK) ./$(KAPPA_MON) $(INSTALL_BIN)/$$f ;\
-           else :; fi;\
-        done
-#
-#  Create the KAPVIEW application/task name soft links.
-	for f in $(KAPVIEW_TASKS) ""; do \
-           if test -n "$$f"; then \
-              $(LINK) ./$(KAPVIEW_MON) $(INSTALL_BIN)/$$f ;\
-           else :; fi;\
-        done
-#
-#  Create the NDFPACK application/task name soft links.
-	for f in $(NDFPACK_TASKS) ""; do \
-           if test -n "$$f"; then \
-              $(LINK) ./$(NDFPACK_MON) $(INSTALL_BIN)/$$f ;\
-           else :; fi;\
-        done
-
 #
 #  Write the package version to a file in the installation directory.
 	echo $(PKG_VERS) 1>$(INSTALL_BIN)/version.dat

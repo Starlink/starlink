@@ -8,11 +8,7 @@
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kappa_source  aif_sub fts_sub ira_sub kapgen_sub \
 kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub \
-kappa_iraf kappa_ccdpack
-
-# The names of all the tar files containing system-specific files:
-TAR_FILES_B = kappa_data_alpha_OSF1 kappa_data_ix86_Linux \
-kappa_data_sun4_Solaris 
+kappa_iraf kappa_ccdpack kappa_data
 
 # The contents of the kappa_ccdpack.tar file:
 KAPPA_CCDPACK = ccd1_orvar.f ccd1_par ccg1_bmd1d.f ccg1_bmd3d.f \
@@ -310,36 +306,12 @@ iraf_usage.hlp listshow.hlp listmake.hlp wcsadd.hlp wcsalign.hlp \
 wcsattrib.hlp wcscopy.hlp wcsframe.hlp wcsremove.hlp wcsshow.hlp \
 chain.hlp reshape.hlp copybad.hlp wcstran.hlp scatter.hlp kapversion.hlp
 
-# The contents of the kappa_data_alpha_OSF1.tar file:
-KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf.alpha_OSF1 cont_lut.sdf.alpha_OSF1 \
-fc_lut.sdf.alpha_OSF1 heat_lut.sdf.alpha_OSF1 ikon_lut.sdf.alpha_OSF1 \
-ramps_lut.sdf.alpha_OSF1 spectrum_lut.sdf.alpha_OSF1 zebra_lut.sdf.alpha_OSF1 \
-ccdframec.sdf.alpha_OSF1 comwest.sdf.alpha_OSF1 spectrum.sdf.alpha_OSF1 \
-m31.sdf.alpha_OSF1 iras.sdf.alpha_OSF1 grey_lut.sdf.alpha_OSF1 \
-m31_issa_100.sdf.alpha_OSF1 m31_issa_12.sdf.alpha_OSF1 \
-m31_issa_25.sdf.alpha_OSF1 m31_issa_60.sdf.alpha_OSF1 m57.sdf.alpha_OSF1 \
-logo.sdf.alpha_OSF1 logo_lut.sdf.alpha_OSF1
-
-# The contents of the kappa_data_ix86_Linux.tar file:
-KAPPA_DATA_IX86_LINUX = bgyrw_lut.sdf.ix86_Linux ccdframec.sdf.ix86_Linux \
-comwest.sdf.ix86_Linux cont_lut.sdf.ix86_Linux fc_lut.sdf.ix86_Linux \
-heat_lut.sdf.ix86_Linux ikon_lut.sdf.ix86_Linux ramps_lut.sdf.ix86_Linux \
-spectrum.sdf.ix86_Linux spectrum_lut.sdf.ix86_Linux zebra_lut.sdf.ix86_Linux \
-m31.sdf.ix86_Linux iras.sdf.ix86_Linux grey_lut.sdf.ix86_Linux \
-m31_issa_100.sdf.ix86_Linux m31_issa_12.sdf.ix86_Linux \
-m31_issa_25.sdf.ix86_Linux m31_issa_60.sdf.ix86_Linux  m57.sdf.ix86_Linux \
-logo.sdf.ix86_Linux logo_lut.sdf.ix86_Linux
-
-# The contents of the kappa_data_sun4_Solaris.tar file:
-KAPPA_DATA_SUN4_SOLARIS = bgyrw_lut.sdf.sun4_Solaris \
-ccdframec.sdf.sun4_Solaris comwest.sdf.sun4_Solaris cont_lut.sdf.sun4_Solaris \
-fc_lut.sdf.sun4_Solaris heat_lut.sdf.sun4_Solaris ikon_lut.sdf.sun4_Solaris \
-ramps_lut.sdf.sun4_Solaris spectrum.sdf.sun4_Solaris \
-spectrum_lut.sdf.sun4_Solaris zebra_lut.sdf.sun4_Solaris \
-m31.sdf.sun4_Solaris iras.sdf.sun4_Solaris grey_lut.sdf.sun4_Solaris \
-m31_issa_100.sdf.sun4_Solaris m31_issa_12.sdf.sun4_Solaris \
-m31_issa_25.sdf.sun4_Solaris m31_issa_60.sdf.sun4_Solaris m57.sdf.sun4_Solaris \
-logo.sdf.sun4_Solaris logo_lut.sdf.sun4_Solaris
+# The contents of the kappa_data.tar file:
+KAPPA_DATA = bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf \ 
+ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf ccdframec.sdf comwest.sdf \ 
+spectrum.sdf m31.sdf iras.sdf grey_lut.sdf m31_issa_100.sdf \ 
+m31_issa_12.sdf m31_issa_25.sdf m31_issa_60.sdf m57.sdf logo.sdf \ 
+logo_lut.sdf
 
 # The contents of the kappa_ifls.tar file:
 KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl collapse.ifl \
@@ -511,9 +483,8 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
 $(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(KAPGEN_SOURCES) $(IRA_SUB) \
-$(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
-$(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SOURCES) $(KAPPA_CCDPACK) $(KAPVIEW_SUB) \
-$(NDFPACK_SUB) 
+$(KAPPA_DATA) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SOURCES) \
+$(KAPPA_CCDPACK) $(KAPVIEW_SUB) $(NDFPACK_SUB) 
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_gd1.eps \
@@ -523,8 +494,7 @@ sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps kappa.news \
 aif_sub.tar fts_sub.tar ira_sub.tar kapgen_sub.tar kappa_sub.tar \
 lpg_source.tar ctg_source.tar kapsub_sub.tar kappa_ccdpack.tar \
 kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
-kappa_data_alpha_OSF1.tar kappa_data_ix86_Linux.tar \
-kappa_data_sun4_Solaris.tar sun221.tex sun221.htx_tar kappa_iraf.tar
+kappa_data.tar sun221.tex sun221.htx_tar kappa_iraf.tar
 
 #  Target for use by the grp command.
 $(action)

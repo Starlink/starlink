@@ -195,23 +195,6 @@ FOO5
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
-#  Now do the system-dependant ones listed in group TAR_FILES_B. The contents
-#  of these tar files have the SYSTEM value appended to the end of each file 
-#  name.
-      foreach file (`grp tar_files_b`)
-         setenv news " "
-         foreach item (`grp ${file}`)
-            setenv new `echo ${item} | awk -F. '{print $1"."$2}'` 
-            mv $item $new
-            setenv news "$news $new"
-         end
-
-         echo "Creating ${file}.tar"
-         tar -cvh -f ${TEMPDIR}/${file}.tar $news
-         rm -f $news
-         mv ${TEMPDIR}/${file}.tar ${REL_DIR}
-      end
-
 #  Make the ctg and lpg source tar files.
       ${CTG_SYS}/dev/bin/make_source.csh
       ${LPG_SYS}/dev/bin/make_source.csh
