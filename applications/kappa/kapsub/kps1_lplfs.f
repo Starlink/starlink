@@ -85,6 +85,8 @@
 *  History:
 *     21-SEP-1998 (DSB):
 *        Original version.
+*     9-DEC-1998 (DSB):
+*        Modified Y axis label to include NDF label component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,6 +123,7 @@
 
 *  Local Variables:
       CHARACTER ATTR*20          ! Attribute name
+      CHARACTER LAB*80           ! Label text string
       CHARACTER TEXT*30          ! General text string
       DOUBLE PRECISION POS( 2 )  ! Start and end of samples in GRID Frame
       INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
@@ -361,31 +364,44 @@
          CALL AST_SETC( WWWANT, 'SYMBOL(1)', 'OFFSET ', STATUS )
       END IF
 
+*  Get the Label component from the NDF, use a default equal to 
+*  "<MCOMP> value" where MCOMP is the name of the NDF component.
+      LAB = MCOMP
+      CALL NDF_CGET( INDF, 'LABEL', LAB, STATUS )
+
 *  Set the label, symbol and units for the data axis (axis 2).
       IF( YLOG ) THEN
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( 'Log\\d10\\u(', TEXT, IAT )
-         CALL CHR_APPND( MCOMP, TEXT, IAT )
+         CALL CHR_APPND( LAB, TEXT, IAT )
          CALL CHR_APPND( ')', TEXT, IAT )
          CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
 
-         TEXT( IAT : IAT ) = ' '   
-         CALL CHR_APPND( 'value)', TEXT, IAT )
+         IF( LAB .EQ. MCOMP ) THEN
+            TEXT( IAT : IAT ) = ' '   
+            CALL CHR_APPND( 'value)', TEXT, IAT )
+         END IF
+
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', DUNIT,
-     :                                       STATUS )
+         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
+     :                                       DUNIT, STATUS )
+
       ELSE
          TEXT = ' '
          IAT = 0
-         CALL CHR_APPND( MCOMP, TEXT, IAT )
+         CALL CHR_APPND( LAB, TEXT, IAT )
          CALL AST_SETC( WWWANT, 'SYMBOL(2)', TEXT( : IAT ), STATUS )
    
-         IAT = IAT + 1
-         CALL CHR_APPND( 'value', TEXT, IAT )
+         IF( LAB .EQ. MCOMP ) THEN
+            IAT = IAT + 1
+            CALL CHR_APPND( 'value', TEXT, IAT )
+         END IF
+
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', DUNIT,
-     :                                       STATUS )
+         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
+     :                                       DUNIT, STATUS )
+
       END IF
 
 *  Set the Domain of the "what we want" Frame to DATAPLOT (a special
