@@ -20,3 +20,9 @@
 
  Full details of the release are given in the updated Starlink 
  User Note SUN/194.2.
+
+ V0.5-1
+
+   * import PDA_DRANN and PDA_RANS from CCDPACK and PISA
+     [double precision random number generator and seed]
+   * Add PDA_R1MACH to completment PDA_D1MACH
