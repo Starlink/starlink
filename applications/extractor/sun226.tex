@@ -15,13 +15,13 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.3}
+\newcommand{\stardocnumber}    {226.4}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {23 November 1999}
+\newcommand{\stardocdate}      {20 March 2000}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
-\newcommand{\stardocversion}   {1.1}
+\newcommand{\stardocversion}   {1.2}
 \newcommand{\stardocmanual}    {User Manual}
 \newcommand{\stardocabstract}  {\EXTRACTOR\ will detect sources in
 an astronomical image and build a catalogue listing them. It is based on the
@@ -574,7 +574,7 @@ operation, and how to configure it, in the
 as a Starlink Miscellaneous User Document, MUD/165\footnote{Note this
 document is still in draft consequently you should read this in
 conjunction with the A\&AS paper.}) \dash\ you configure \EXTRACTOR\
-in much the same way, although with 
+in much the same way, although with
 \htmlref{some restrictions}{implementation_notes}
 \latex{(see Section~\ref{implementation_notes})}.
 
@@ -658,8 +658,8 @@ The
 gives a full list of possible parameter names and values, but it is only
 sensible to change a few in this way.
 
-\subsection{Running EXTRACTOR from scripts}
-If you'd like to run EXTRACTOR from a script, just say for instance
+\subsection{Running \EXTRACTOR\ from scripts}
+If you'd like to run \EXTRACTOR\ from a script, just say for instance
 sampling different populations of objects at different thresholds, you
 can do this using the NAME VALUE parameters (avoiding the need to have
 multiple configuration files), but you need to adopt a slightly
@@ -697,7 +697,7 @@ Using the C-shell \verb+<<EOF+ mechanism allows you to send
 information to the program as if you're typing it in.
 
 
-\section{\xlabel{the_default_configuration}\label{defaults}\xlabel{defaults}The Default Configuration}
+\section{\xlabel{the_default_configuration}\label{defaults}\xlabel{defaults}The default configuration}
 
 The directory \texttt{\$EXTRACTOR\_DIR/config} contains the default
 configuration files.
@@ -791,13 +791,13 @@ image (in fact GAIA produced the image used on the title page of this
 document).
 
 GAIA also displays the results catalogue so you can view the
-measurements associated with each object and vice versa (i.e. you can
-select one of the displayed ellipses and view the associated
+measurements associated with each object and vice versa (\textit{i.e.}
+you can select one of the displayed ellipses and view the associated
 measurements, or select a row of measurements and view the associated
 object). The catalogue interface also allows you to sort and select
 objects on the basis of their measurements.
 
-\section{\label{implementation_notes}\xlabel{implementation_notes}Implementation Notes}
+\section{\label{implementation_notes}\xlabel{implementation_notes}Implementation notes}
 
 \EXTRACTOR, unlike the PISA (\xref{SUN/109}{sun109}{}) package that it
 will eventually replace, will read data in floating point format
@@ -832,45 +832,146 @@ If you come across any problems with \EXTRACTOR\ please notify
 Starlink Software Support
 (\htmladdnormallink{extractor@star.rl.ac.uk}{mailto:extractor@star.rl.ac.uk}).
 
+\section{Isophotal radii}
+
+\SExtractor\ can measure the areas of objects at $8$ optimally selected
+intensities. These intensities are consequently different for each
+object. Traditionally this has not been the case and isophotal
+areas/radii have been measured at fixed intervals above some
+threshold. Consequently, for convenience and compatibility with
+existing data and analysis methods, the \EXTRACTOR\ and \SExtractor\
+programs have been extended to provide a flexible configuration scheme
+that allows this traditional behaviour to be recovered and extended.
+
+The configuration options that control what intensities are used for
+the isophotal radii estimates are \texttt{RAD\_TYPE} and 
+\texttt{RAD\_THRESH}. \texttt{RAD\_TYPE} can be either \texttt{SB} or
+\texttt{INT}, which indicate that the levels will be defined in terms
+of surface brightnesses or plain intensities, respectively.
+
+The \texttt{RAD\_THRESH} option can have up to three values qualifying
+values, depending on the value of \texttt{RAD\_TYPE}. If
+\texttt{RAD\_TYPE} is \texttt{SB} then you should enter a line
+consisting of:
+\begin{quote}
+   \texttt{RAD\_THRESH        step[,start,zp]}
+\end{quote}
+in your \texttt{default.sex} file. The value \texttt{step} being the
+required interval between levels, \texttt{start} being the value of
+the first level and \texttt{zp} the data zero point (all in magnitudes per
+square arcsecond). If only one value is given then the starting point
+is assumed to be the analysis threshold and the zero point is derived
+from the photometric value (\texttt{MAG\_ZEROPOINT}).
+
+If a \texttt{RAD\_THRESH} value is not given (and any of the catalogue
+parameters \texttt{RAD0} -- \texttt{RAD15} are requested) then a
+default step of $0.75$ magnitudes per square arcsec is used.
+
+If \texttt{RAD\_TYPE} is \texttt{INT} then the correct line format is:
+\begin{quote}
+   \texttt{RAD\_THRESH        step[,start]}
+\end{quote}
+\texttt{step} being the interval between levels in plain magnitudes
+and \texttt{start} being the intensity of the first level. If
+\texttt{start} is not given then the analysis threshold is used.
+
+If no \texttt{RAD\_THRESH} values are given this time then the
+APM/PISA (see \xref{SUN/109}{sun109}{}) analysis thresholds are used:
+\begin{quote}
+    $I_{i} = I_{t} * 2^{(i+2)},\ i = 2, 16$
+\end{quote}
+where $I_{i}$ = threshold for ith level, $I_{t}$ = measurement
+threshold. This gives approx $0.75$ magnitude steps ($2.5*log(2)$).
+
+The actual measurements are associated with the catalogue parameters,
+\texttt{RAD0} through \texttt{RAD15}, these must be present in the
+\texttt{default.param} file.
+
+For completeness the existing \texttt{ISO0}-\texttt{ISO7} areas in
+\SExtractor\ are based on an \texttt{optimal} sampling of each object
+profile. Under this scheme each level is:
+\begin{quote}
+    $I_{i} = I_{t} * (I_{p}/I_{t})^{i/8}, \ i=1,8$
+\end{quote}
+where $I_{p}$ = peak intensity and $I_{t}$ and $I_{i}$ are as above.
+So you get a range of levels for each object spanning the range from
+its peak intensity down to the threshold.
+
 \section{Changes}
-\subsection{Version 1.1-0}
-
- The \EXTRACTOR\ and \SExtractor\ programs have been updated to
- \SExtractor\ version $2.0.19$ (the previous version was
- $2.0.15$). The changes introduced by this are (from the SExtractor
- change log):
+\subsection{Version 1.2-0}
+ This is a minor update to the \EXTRACTOR\ package with several
+ significant changes:
  \begin{itemize}
- \item SEGMENTATION numbering problem fixed.
- \item new ASSOC\_TYPE NEAREST option.
- \item MAP\_RMS measurement mode and FLAG\_TYPE MAX bugs fixed.
- \item New BACK\_TYPE, BACK\_VALUE and THRESH\_TYPE parameters.
- \item FLUX\_RADIUS no longer requires FLUX\_AUTO.
- \item documentation (mud165) slightly improved.
+   \item The version of \SExtractor\ has been updated to version 2.1.6. 
+
+   \item New parameters to control the measurement of \texttt{mean}
+         object radii at configurable intensity levels have been
+         added to the Starlink version of \EXTRACTOR\ and \SExtractor.
  \end{itemize}
- The BACK\_TYPE/BACK\_VALUE parameters now allow the background used to
- be defined as a single constant for the whole image (BACK\_TYPE takes
- the values ``INTERNAL'' and ``MANUAL'') and the THRESH\_TYPE controls
- whether the detection and analysis thresholds are a multiple of the 
- background RMS, or just in absolute data units.
-
- A serious bug calculating the CLASS\_STAR parameter (which is only 
- revealed on Digital UNIX systems) has been fixed.
-
- The MAG\_APER parameter now works correctly under ICL (and TCL). This
- was crashing during a second run.
-
-\subsection{Version 1.1-3}
- This is a minor update to the \EXTRACTOR\ program.
+ The update to \SExtractor\ 2.1.6 introduces the following changes (from 
+ the \SExtractor\ change log).
  \begin{itemize}
- \item  The range of output WCS coordinates should now always be 
-       correctly normalised ({\it i.e.} RA's in range $0-24$hrs).
- \item Apertures should now be actually visible in the ``APERTURES'' 
-       checkimage.
- \item Skycat catalogues output from detached monoliths (Tcl \& ICL)
-       should now always have the correct Tab formatting. This caused
-       the ``blank catalogue window'' problems in GAIA when repeatedly
-       analysing the same image. 
+   \item Version 2.1.6
+     \begin{itemize}
+        \item crowding-flag bug introduced in V2.1.5 fixed.
+     \end{itemize}
+   \item Version 2.1.5
+      \begin{itemize}
+        \item Small inaccuracy in crowding-flag positioning fixed.
+        \item Fixed division by zero in local background in 
+              \texttt{MASK\_TYPE} \texttt{CORRECT} mode.
+        \item Risk of segmentation fault with huge weight maps fixed.
+      \end{itemize}
+   \item Version 2.1.4
+      \begin{itemize}
+        \item Quote (') symbol now properly handled in FITS headers.
+        \item Removed display of debug information inadvertently left
+              in the previous release.
+      \end{itemize}
+   \item Version V2.1.3
+      \begin{itemize}
+        \item Bug in \texttt{ASSOC} on Linux systems fixed.
+        \item Background bug in \texttt{WEIGHT\_TYPE} \texttt{NONE}, 
+              \texttt{MAP\_WEIGHT} mode fixed.
+        \item \texttt{THRESH\_TYPE} \texttt{ABSOLUTE} now works on
+              weighted images. 
+      \end{itemize}
+   \item Version V2.1.0
+      \begin{itemize}
+        \item Better formatting of output flags.
+        \item  New display.
+        \item Total robust handling of weight-maps during background-
+              determination.
+        \item (tiny) differences between single and double-image results
+              suppressed.
+        \item New (experimental) \texttt{\_PROFILE} photometric parameters.
+        \item New \texttt{WEIGHT\_GAIN} parameter.
+      \end{itemize}
+   \item Version V2.0.22
+      \begin{itemize}
+        \item Many memory leaks fixed.
+        \item \texttt{CLEAN}ing bug with very faint sources fixed.
+        \item \texttt{BACKGROUND\_RMS} check-images are now operational in
+              single-image mode.
+        \item Documentation improved.
+      \end{itemize}
+   \item Version V2.0.21
+      \begin{itemize}
+        \item \texttt{BACK\_VALUE} bug fixed.
+        \item \texttt{XPEAK} and \texttt{YPEAK} offset bugs fixed.
+      \end{itemize}
+   \item Version V2.0.20
+      \begin{itemize}
+        \item \texttt{ASSOC} bug in 2 \texttt{ASSOC\_PARAMS} mode fixed.
+        \item Variable thresholding is now taken into account when
+              computing \texttt{FWHM} and \texttt{CLASS\_STAR}
+              if \texttt{WEIGHT\_TYPE} != \texttt{NONE}
+      \end{itemize}
  \end{itemize}
+ The new mean radii measurements are controlled by the keywords
+ \texttt{RAD\_THRESH} and \texttt{RAD\_TYPE}. These allow for up to 
+ $16$ levels specified by the \texttt{RAD0} through \texttt{RAD15} 
+ parameters.
 
 \section{\xlabel{references}References}
 Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
@@ -992,7 +1093,7 @@ Warren-Smith R.F. : \xref{SUN/33}{sun33}{} : NDF \dash\ Routines for Accessing t
 \newpage
 \section{\xlabel{labeldefault_sex}\label{default_sex}
          \xlabel{default_sex}
-         The Default Preferences}
+         The default preferences}
 
 This is a listing of \texttt{\$EXTRACTOR\_DIR/config/default.sex}, the
 installed default preferences file.

@@ -1,11 +1,71 @@
 1 Update to EXTRACTOR
-  
- EXTRACTOR/SExtractor sources updated to SExtractor version 2.1.5.
+
+ A minor update to the EXTRACTOR package with several significant
+ changes:
+
+    o The version of SExtractor has been updated to version 2.1.6. 
+
+    o New parameters to control the measurement of "mean" object radii
+      at configurable intensity levels have been added to the Starlink
+      version of EXTRACTOR and SExtractor.
+
+ The update to SExtractor 2.1.6 introduces the following changes (from 
+ the SExtractor change log).
+
+     o Version 2.1.6
+       - crowding-flag bug introduced in V2.1.5 fixed.
+
+     o Version 2.1.5
+        - Small inaccuracy in crowding-flag positioning fixed.
+        - Fixed division by zero in local background in MASK_TYPE 
+          CORRECT mode.
+        - Risk of segmentation fault with huge weight maps fixed.
+
+     o Version 2.1.4
+        - Quote (') symbol now properly handled in FITS headers.
+        - Removed display of debug information inadvertently left
+          in the previous release.
+
+     o Version V2.1.3
+        - Bug in ASSOC on Linux systems fixed.
+        - Background bug in WEIGHT_TYPE NONE,MAP_WEIGHT mode fixed.
+        - THRESH_TYPE ABSOLUTE now works on weighted images.
+
+     o Version V2.1.0
+        - Better formatting of output flags.
+        - New display.
+        - Total robust handling of weight-maps during background-
+          determination.
+        - (tiny) differences between single and double-image results
+          suppressed.
+        - New (experimental) _PROFILE photometric parameters.
+        - New WEIGHT_GAIN parameter.
+
+     o Version V2.0.22
+        - Many memory leaks fixed.
+        - CLEANing bug with very faint sources fixed.
+        - BACKGROUND_RMS check-images are now operational in
+          single-image mode.
+        - Documentation improved.
+
+     o Version V2.0.21
+        - BACK_VALUE bug fixed.
+        - XPEAK and YPEAK offset bugs fixed.
+
+     o Version V2.0.20
+        - ASSOC bug in 2 ASSOC_PARAMS mode fixed.
+        - Variable thresholding is now taken into account when
+          computing FWHM and CLASS_STAR if WEIGHT_TYPE != NONE
+
+ The new mean radii measurements are controlled by the keywords
+ RAD_THRESH and RAD_TYPE. These allow for up to 16 levels specified by
+ the RAD0 through RAD15 parameters (see SUN/226 for how to use these
+ keywords).
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
     % showme sun226
 
- Peter W. Draper 9th February 2000 (P.W.Draper@durham.ac.uk).
+ Peter W. Draper 20th March 2000 (extractor@star.rl.ac.uk).
 
