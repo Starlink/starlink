@@ -146,6 +146,8 @@
 
 *   Find out how many pictures are in the database entry
 *   Look in the cache first
+         WKSLOC = ' '
+         PSTLOC = ' '
          IF ( ( CNUMPW .EQ. WKNAME ) .AND. ( CNUMPS .GT. 0 ) ) THEN
             TOTNUM = CNUMPS
 
@@ -153,10 +155,8 @@
          ELSE
             CALL AGI_1FDB( FOUND, STATUS )
             IF ( FOUND ) THEN
-               WKSLOC = ' '
                CALL AGI_1FWORK( WKNAME, WKSLOC, FOUND, STATUS )
                IF ( FOUND ) THEN
-                  PSTLOC = ' '
                   CALL AGI_1IPIC( WKSLOC, PSTLOC, TOTNUM, FOUND,
      :                            STATUS )
                ENDIF
