@@ -147,7 +147,7 @@
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 600
+            default 300
             prompt {Width of NDF preview display in pixels}
             helpkey *
          }
@@ -158,7 +158,7 @@
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 400
+            default 300
             prompt {Height of NDF preview display in pixels}
             helpkey *
          }
