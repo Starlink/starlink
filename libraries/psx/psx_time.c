@@ -48,6 +48,8 @@
 *        Changed IMPORT and EXPORT macros to GENPTR.
 *     22-SEP-2004 (TIMJ):
 *        Add check for 32bit integer overflow in 2038
+*     10-MAR-2005 (TIMJ):
+*        Return immediately with nticks=-1 if status is bad on entry
 *     {enter_changes_here}
 
 *  Bugs:
@@ -82,6 +84,10 @@ F77_SUBROUTINE(psx_time)( INTEGER(nticks), INTEGER(status) )
 /* Local Variables:							    */
    time_t t;         /* Local version of the time */
 
+/* Initialise nticks to -1 for bad status                                   */
+   *nticks = -1;
+   if (*status != SAI__OK) return;
+
    t = time( NULL );
 
 /* Check the value returned.						    */
@@ -103,8 +109,6 @@ F77_SUBROUTINE(psx_time)( INTEGER(nticks), INTEGER(status) )
 
    if (*status == SAI__OK ) {
      *nticks = (F77_INTEGER_TYPE)t;
-   } else {
-     *nticks = -1;
    }
 
 }
