@@ -12,6 +12,10 @@
   load the image (with a dialog message about "missing data
   component"), this problem is now fixed.
 
+  The astrometry fitting toolboxes (using reference positions) have
+  been upgraded to accept RA and Dec values with space separations.
+  Note that in general you should use colons as the separators.
+
   To try out GAIA for yourself type the following command:
 
       %  gaia [image_file]
@@ -24,4 +28,4 @@
 
   Peter W. Draper (p.w.draper@durham.ac.uk) and
 
-  2nd May 2002.
+  14 June 2002.
