@@ -94,6 +94,7 @@
       REAL EPS
       INTEGER DIM3
       REAL STOKES( EL, DIM3 )
+      LOGICAL DEZERO
 
 *  Arguments Given and Returned:
       REAL SUM1( EL )

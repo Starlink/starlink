@@ -117,6 +117,7 @@
       REAL NSIGMA
       REAL TVAR
       INTEGER TOL
+      LOGICAL DEZERO
 
 *  Arguments Given and Returned:
       LOGICAL CONV

@@ -173,6 +173,7 @@
       INTEGER HW
       LOGICAL SETVAR
       REAL MNFRAC
+      LOGICAL DEZERO
 
 *  Arguments Returned:
       REAL ZERO( NNDF )
