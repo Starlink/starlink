@@ -10987,6 +10987,9 @@ proc Save {} {
 #  output images.
          close $intfiles_id
 
+# Set the "current image" name blank.
+         set SIMAGE " "
+
 # If required calculate Stokes parameters.
          if { $ok && $STOKES } {
 
