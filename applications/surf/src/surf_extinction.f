@@ -557,7 +557,7 @@
      :  ITEMP, STATUS)
       CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
      :  ITEMP, STATUS)
-      CALL NDF_MAP (INDF, 'QUALITY', '_INTEGER', 'READ',
+      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
      :  IN_QUALITY_PTR, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -1234,7 +1234,7 @@
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUTNDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUTNDF, 'QUALITY', '_INTEGER', 'WRITE',
+      CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
 
 *  extract data for the required bolometers into the output data arrays
@@ -1439,7 +1439,7 @@
          DO I = 1, N_MEASUREMENTS * N_INTEGRATIONS
             DO J = 1, JIGGLE_COUNT
                RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
-               CALL SCULIB_VFILLR(1,RTEMP,
+               CALL SCULIB_CFILLR(1,RTEMP,
      :              %VAL(OUT_A_PTR+(POSITION*VAL__NBR)))
                POSITION = POSITION + 1
             END DO
@@ -1447,6 +1447,7 @@
 
       END IF
       CALL NDF_ACPUT ('Integration', OUTNDF, 'LABEL', 2, STATUS)
+
       CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
 
 *  unmap the main data array
