@@ -1,0 +1,119 @@
+#  Name:
+#     POLIMAGE.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-APR-1998 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLIMAGE
+
+   helplib        'POLPACK_HELP:'
+
+   parameter      BOX          
+      type        '_REAL'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'DEFAULT'
+      default     1.0
+      prompt      'Bin size'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLDAT
+      position    3
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Name of catalogue column holding data values'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLVAR
+      position    4
+      type        LITERAL
+      ppath       'CURRENT,DEFAULT'
+      vpath       'DEFAULT'
+      default     !
+      prompt      'Name of catalogue column holding variances'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLX
+      position    5
+      type        LITERAL
+      ppath       'CURRENT,DEFAULT'
+      vpath       'DEFAULT'
+      default     'X'
+      prompt      'Name of catalogue column holding X positions'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLY
+      position    6
+      type        LITERAL
+      ppath       'CURRENT,DEFAULT'
+      vpath       'DEFAULT'
+      default     'Y'
+      prompt      'Name of catalogue column holding Y positions'
+      helpkey     '*'
+   endparameter
+
+   parameter      IN
+      position    1
+      type        LITERAL
+      ppath       'CURRENT'
+      association '<-GLOBAL.CATALOGUE'
+      prompt      'Input catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter   	  OUT 
+      position    2
+      type        NDF
+      access      WRITE
+      ppath       'CURRENT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output image'
+      helpkey     '*'
+   endparameter
+
+   parameter      METHOD         
+      position    7
+      type        'LITERAL'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT '
+      default     'MEAN'
+      prompt      'Binning method'
+      helpkey     '*'
+   endparameter
+
+   parameter      MINVAL         
+      type        '_INTEGER'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     1
+      prompt      'Min. number of good input values per bin'
+      helpkey     '*'
+   endparameter
+
+   parameter      SIGMAS         
+      type        _REAL
+      vpath       'CURRENT,DEFAULT '
+      ppath       'CURRENT,DEFAULT '
+      default     4.0
+      prompt      'Clipping limit (standard deviations)'
+      helpkey     '*'
+   endparameter
+
+endinterface
