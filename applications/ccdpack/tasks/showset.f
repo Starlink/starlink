@@ -255,6 +255,17 @@
 *  Begin a new AST context.
       CALL AST_BEGIN( STATUS )
 
+*  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on
+*  an uninitialised group cannot cause trouble.
+      INGRP = GRP__NOID
+      INDGRP = GRP__NOID
+      NAMGRP = GRP__NOID
+      OKGRP = GRP__NOID
+      KEYGRP = GRP__NOID
+      DO I = 1, CCD1__MXNDF
+         SPLGRP( I ) = GRP__NOID
+      END DO
+
 *  Access an NDG group containing a list of NDF names.
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, INGRP, NNDF, STATUS )
 
@@ -266,6 +277,7 @@
       CALL PAR_GET0L( 'INDEXLIKE', ILIKE, STATUS )
 
 *  Get the group of allowed Set Index attribute values.
+      NSPLIT = 0
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       INDGRP = GRP__NOID
 
@@ -499,7 +511,7 @@
       CALL CCD1_GRDEL( NAMGRP, STATUS )
       CALL CCD1_GRDEL( OKGRP, STATUS )
       CALL CCD1_GRDEL( KEYGRP, STATUS )
-      DO I = 1, NSPLIT
+      DO I = 1, MIN( NSPLIT, CCD1__MXNDF )
          CALL CCD1_GRDEL( SPLGRP( I ), STATUS )
       END DO
 
