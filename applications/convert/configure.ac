@@ -25,7 +25,11 @@ dnl    Setup for building monoliths.
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [ast sae chr hds fio cnf grp mers prm ndf ndg par psx subpar shl figaro])
+STAR_DECLARE_DEPENDENCIES([build], 
+   [ast chr cnf figaro fio grp hds mers ndf ndg par prm psx sae shl subpar])
+
+dnl    Need to pre-process generic code.
+STAR_CHECK_PROGS(generic)
 
 dnl    Progs needed for gif2ndf, ndf2gif and tiff2ndf
 STAR_CHECK_PROGS(ppmtogif)
@@ -47,8 +51,8 @@ AC_PROG_RANLIB
 dnl    Documentation.
 STAR_LATEX_DOCUMENTATION([sun55])
 
-dnl    Library/component sub-directories.
-AC_CONFIG_SUBDIRS([libaif libcof libcoi libcon idl iraf])
+dnl    Library/component sub-directories. IDL requires special handling.
+AC_CONFIG_SUBDIRS([idl])
 
 dnl    Check if we have any IRAF libraries on this platform.
 dnl    On success this section gives a -DHAVE_IRAF_LIBIMFORT_A=1 macro
@@ -77,6 +81,7 @@ dnl    Define -DHAVE_IRAF_LIBIMFORT_A=1, if libimfort.a exists.
 AC_CHECK_FILES([iraf/libimfort.a])
 
 dnl    Configure .in files.
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml iraf/Makefile libaif/Makefile
+                 libcof/Makefile libcoi/Makefile libcon/Makefile])
 
 AC_OUTPUT
