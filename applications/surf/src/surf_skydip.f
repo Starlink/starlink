@@ -52,9 +52,12 @@
 *    History :
 *     $Id$
 *     $Log$
-*     Revision 1.5  1996/08/27 03:42:44  timj
-*     Fix UBYTES for QUALITY
+*     Revision 1.6  1996/08/28 03:07:57  timj
+*     Added BADBIT
 *
+c Revision 1.5  1996/08/27  03:42:44  timj
+c Fix UBYTES for QUALITY
+c
 c Revision 1.4  1996/08/26  19:36:40  timj
 c Quality array was being mapped as REAL instead of UBYTE.
 c
@@ -87,6 +90,8 @@ c
 *    Local Constants :
       REAL    ARCSEC                    ! 1 arcsec in radians
       PARAMETER (ARCSEC = 4.8481368E-6)
+      BYTE    BADBIT                    ! Bad bit mask
+      PARAMETER (BADBIT = 1)
       REAL    DEG2RAD                   ! Convert degrees to radians
       PARAMETER (DEG2RAD = 0.017453292)
       INTEGER MAXDIM
@@ -726,6 +731,7 @@ c
 
       CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      : OUT_QUAL_PTR, ITEMP, STATUS)
+      CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 
       CALL SCULIB_COPYB(UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR))
 
