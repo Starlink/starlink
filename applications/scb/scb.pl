@@ -811,10 +811,9 @@ sub package_list {
          <h2>Packages</h2>
          <dir compact>
       ";
-      my $typesel = $type ? "type='$type'" : '';
       foreach $pack (@packages) {
          print "<li> ";
-         print "<a href='${scb}package=$pack&$typesel'>$pack</a>\n";
+         print "<a href='${scb}package=$pack&type=$type'>$pack</a>\n";
       }
       print "</dir>\n";
    }
