@@ -6,7 +6,7 @@
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
      :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
-     :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
+     :     INT_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
      :     NPARS, PARS, STATUS)
 *+
 *  Name:
@@ -24,7 +24,7 @@
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
 *     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
-*     :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
+*     :     INT_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
 *     :     NPARS, PARS, STATUS)
  
 *  Description:
@@ -72,9 +72,9 @@
 *        UT time of each observation
 *     FILENAME( MAX_FILE ) = CHAR (Returned)
 *        Actual filename of each file read.
-*     BOL_ADC = INTEGER (Returned)
+*     BOL_ADC ( ) = INTEGER (Returned)
 *        ADC information for bolometers - only used by BOLREBIN
-*     BOL_CHAN = INTEGER (Returned)
+*     BOL_CHAN ( ) = INTEGER (Returned)
 *        Channel information for bolometers - only used by BOLREBIN
 *     BOL_RA_PTR( MAX_FILE ) = INTEGER (Returned)
 *        Array of pointers to RA bolometer positions read from each file
@@ -103,6 +103,8 @@
 *        Bad bits mask for each file
 *     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
 *        Position of integrations in each data file
+*     BOLWT (max num of bols, MAX_FILE) = REAL (Returned)
+*        Relative Weights of each bolometer for each file
 *     WEIGHT( MAX_FILE ) = REAL (Returned)
 *        Weight of each input file
 *     SHIFT_DX( MAX_FILE ) = REAL (Returned)
@@ -175,6 +177,8 @@
       REAL             WAVELENGTH
 
 *  Arguments Returned:
+      REAL             BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC, 
+     :     MAX_FILE)
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_DEC_END(MAX_FILE)
@@ -315,7 +319,7 @@
      :           DATA_END(N_FILE), VARIANCE_PTR(N_FILE),
      :           VARIANCE_END(N_FILE), QMF, QUALITY_PTR(N_FILE),
      :           QUALITY_END(N_FILE), QBITS(N_FILE), 
-     :           .FALSE., 0, INT_LIST, STATUS)
+     :           .FALSE., 0, INT_LIST, BOLWT(1,N_FILE), STATUS)
 
             CALL MSG_BLANK(STATUS)
 
@@ -432,7 +436,7 @@
      :                    BOL_DEC_END, DATA_PTR, DATA_END, 
      :                    VARIANCE_PTR, VARIANCE_END,
      :                    QMF, QUALITY_PTR, QUALITY_END, QBITS,
-     :                    INT_LIST, WEIGHT, SHIFT_DX, 
+     :                    INT_LIST, BOLWT, WEIGHT, SHIFT_DX, 
      :                    SHIFT_DY,  NPARS, PARS, 
      :                    STATUS)
 
@@ -470,7 +474,7 @@
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
      :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
-     :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
+     :     INT_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
      :     NPARS, PARS,
      :     STATUS)
 *+
@@ -513,6 +517,8 @@
       REAL             WAVELENGTH
 
 *  Arguments Returned:
+      REAL             BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC, 
+     :     MAX_FILE)
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_DEC_END(MAX_FILE)
@@ -560,7 +566,7 @@
      :     BOL_DEC_END, DATA_PTR, DATA_END, 
      :     VARIANCE_PTR, VARIANCE_END,
      :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
-     :     INT_LIST, WEIGHT, SHIFT_DX, 
+     :     INT_LIST, BOLWT, WEIGHT, SHIFT_DX, 
      :     SHIFT_DY,  NPARS, PARS, 
      :     STATUS)
 
