@@ -19,8 +19,8 @@ libsla_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 FPP_ROUTINES = \
-	random.fpp \
-	gresid.fpp
+	random.F \
+	gresid.F
 
 F_ROUTINES = \
         addet.f  \

@@ -25,13 +25,13 @@ dnl    If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 dnl    Platform-dependent/preprocessed sources.  This is slightly
-dnl    subtle: file random.fpp is a preprocessable file.  However,
+dnl    subtle: file random.F is a preprocessable file.  However,
 dnl    there are also versions available for VAX/VMS
-dnl    (random.fpp__vms) and Microsoft Fortran (random.fpp__win), and
+dnl    (random.F__vms) and Microsoft Fortran (random.F__win), and
 dnl    these are sufficiently distinct that it's not worth just
 dnl    configuring the function name.
 dnl
-dnl    The random and gresid VMS and Windows files have a .fpp
+dnl    The random and gresid VMS and Windows files have a .F
 dnl    extension: there's no preprocessable code in them, but they
 dnl    have to have the same name as the file which does have.
 dnl
@@ -44,10 +44,10 @@ dnl    __win files?), since config.guess doesn't cover VMS at all, but
 dnl    the following, as well as documenting the relationship, also
 dnl    causes the corresponding files to be included in the
 dnl    distribution, where they might be of use to someone.
-STAR_PLATFORM_SOURCES([random.fpp gresid.fpp wait.f],
+STAR_PLATFORM_SOURCES([random.F gresid.F wait.f],
                       [__vms __win default])
 
-if cmp -s random.fpp random.fppdefault; then
+if cmp -s random.F random.Fdefault; then
     # The unix version, to be configured
     #AC_LANG_PUSH([Fortran])
     found_random=false
