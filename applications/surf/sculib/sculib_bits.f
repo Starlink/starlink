@@ -2,13 +2,24 @@
 *
 *     Description:
 *      Routines specifically designed for handling QUALITY bits
-*      Bits start counting a 0
+*      Bits start counting at 0
 *      Do it this way just in case the FORTRAN is non-portable in a similar
 *      way to NDF_FUNC (NDF_QMASK)
+*
+*    Functions:
+*      BYTE SCULIB_BITON
+*      BYTE SCULIB_BITOFF
+*      BYTE SCULIB_BITOR
+*      BYTE SCULIB_BITAND
+*      BYTE SCULIB_BITTEST
+
 *    Authors:
 *     T. Jenness (timj@jach.hawaii.edu)
 *    History:
 *     $Log$
+*     Revision 1.6  1999/05/25 23:36:05  timj
+*     Add SCULIB_BITTEST
+*
 *     Revision 1.5  1997/05/30 18:31:50  timj
 *     Use generic BYTE functions (IBSET instead of IIBSET etc).
 *     Use NUM_ functions to convert BITNUM to BYTE (easier than changing
@@ -30,6 +41,7 @@ c
 *-
 
 *+ SCULIB_BITON - turn on a bit
+
       BYTE FUNCTION SCULIB_BITON (VAL, BIT)
 *    Description:
 *     Turns on a bit in a byte
@@ -62,12 +74,12 @@ c
 
       END
 
-*+ SCULIB_BITOF - turn off a bit
+*+ SCULIB_BITOFF - turn off a bit
       BYTE FUNCTION SCULIB_BITOFF (VAL, BIT)
 *    Description:
 *     Turns off a bit in a byte
 *    Invocation:
-*     NEWBYTE = SCULIB_BITON(VAL, BIT)
+*     NEWBYTE = SCULIB_BITOFF(VAL, BIT)
 *    Parameters:
 *     VAL              = BYTE (Given)
 *           The byte to be changed
@@ -149,5 +161,40 @@ c
 *-
 
       SCULIB_BITAND = IAND(VAL1, VAL2)
+
+      END
+
+*+ SCULIB_BITON - turn on a bit
+
+      LOGICAL FUNCTION SCULIB_BITTEST (VAL, BIT)
+*    Description:
+*     Tests whether specified bit is turned on or not.
+*     Returns TRUE if it is on, false otherwise.
+*    Invocation:
+*     NEWBYTE = SCULIB_BITTEST(VAL, BIT)
+*    Parameters:
+*     VAL              = BYTE (Given)
+*           The byte to be tested
+*     BIT              = INT (Given)
+*           The bit to be tested
+*
+*    Type Definitions:
+      IMPLICIT NONE
+*    Global constants :
+*    Import :
+      BYTE VAL
+      INTEGER BIT
+*    Export:
+*    Status :
+*    External references :
+*    Global variables :
+*    Local Constants :
+*    Local variables :
+*-
+
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
+
+      SCULIB_BITTEST = BTEST(VAL, NUM_ITOUB(BIT))
 
       END
