@@ -79,10 +79,13 @@ KAPGEN_SOURCES = $(KAPGEN_NONGEN) $(KAPGEN_GEN)
 # The contents of the kapgen_sub.tar file (including expanded generic
 # files and the generic source files):
 KAPGEN_SUB = $(KAPGEN_SOURCES) kpg1_darar.f kpg1_darad.f kpg1_darai.f \
-kpg1_daraw.f kpg1_darab.f kpg1_daraub.f kpg1_darauw.f
+kpg1_daraw.f kpg1_darab.f kpg1_daraub.f kpg1_darauw.f kpg1_fracr.f \
+kpg1_fracd.f kpg1_fraci.f kpg1_fracw.f kpg1_fracb.f kpg1_fracub.f \
+kpg1_fracuw.f kpg1_mixvr.f kpg1_mixvd.f kpg1_mixvi.f kpg1_mixvw.f \
+kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f
 
 # Generic source files needed for kapsub_sub.tar:
-KAPGEN_GEN = kpg1_dara.gen
+KAPGEN_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen
 
 # Non-generic source files needed for kapgen_sub.tar:
 KAPSUB_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
@@ -213,7 +216,7 @@ kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f kpg1_mkpos.f \
 kpg1_graph.f kpg1_ndfnm.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
 kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f kpg1_asgdp.f \
-kpg1_grlm1.f kpg1_grlm2.f kpg1_cpbdd.f kpg1_mixvr.f kpg1_expob.f \
+kpg1_grlm1.f kpg1_grlm2.f kpg1_cpbdd.f kpg1_expob.f \
 kpg1_expod.f kpg1_expoi.f kpg1_expor.f kpg1_expoub.f kpg1_expouw.f \
 kpg1_expow.f kpg1_logab.f kpg1_logad.f kpg1_logai.f kpg1_logar.f \
 kpg1_logaub.f kpg1_logauw.f kpg1_logaw.f kpg1_cpbdr.f kpg1_pgclr.f \
