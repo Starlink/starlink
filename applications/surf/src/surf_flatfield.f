@@ -57,6 +57,7 @@
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
 *    Local variables :
+      BYTE             BADBIT
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
                                        ! input file
@@ -117,6 +118,10 @@
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', IN_NDF, STATUS)
+
+* Read in badbit mask
+      CALL NDF_BB(IN_NDF, BADBIT, STATUS)
+
 
 *  get some general descriptive parameters of the observation
 
@@ -327,6 +332,8 @@
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'UPDATE', OUT_V_PTR,
      :  ITEMP, STATUS)
  
+* Bad bit mask
+      CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 
 *  flatfield the data 
 
