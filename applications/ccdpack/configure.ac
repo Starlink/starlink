@@ -12,8 +12,10 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_CHECK_PROGS(atclsh)
 STAR_CHECK_PROGS(hlib)
 STAR_CHECK_PROGS(ifd2star)
-AC_CHECK_LIB(tcl,Tcl_AppInit)
-AC_CHECK_LIB(tk,Tk_Init)
+AC_CHECK_LIB(tcl8.2,Tcl_Init)
+AC_CHECK_LIB(tk8.2,Tk_Init)
+AC_CHECK_LIB(itcl3.1,Itcl_Init)
+AC_CHECK_LIB(itk3.1,Itk_Init)
 
 # Note that the starlink Tcl, Tk and ITcl are required, since we need
 # some somewhat-private include files.  I'm not sure how naughty 
