@@ -4,7 +4,7 @@
 *     ASTEXP
 
 *  Purpose:
-*     Exports AST FrameSet information from NDFs into an external file.
+*     Exports coordinate system information from NDFs to an AST file
 
 *  Language:
 *     Starlink Fortran 77
@@ -37,12 +37,12 @@
 *     contain information about the positioning of images in a set of
 *     related NDFs.
 *
-*     AST files written out by this application can be applied to
-*     other NDFs of similar origin using the ASTIMP application, so 
+*     AST files written out by this program can be applied to
+*     other NDFs of similar origin using the ASTIMP program, so 
 *     that registration information present in the WCS components of 
-*     one set of NDFs (put there for instance by the REGISTER or WCSEDIT
-*     applications) can be transferred using ASTIMP and ASTEXP to 
-*     another similar set.  This "similar set" will typically be one 
+*     one set of NDFs (put there for instance by the REGISTER or
+*     WCSEDIT programs) can be transferred using ASTIMP and ASTEXP to
+*     another similar set.  This "similar set" will typically be one
 *     from chips in the same mosaic camera instrument.
 *
 *     A 2-frame frameset is output for each NDF.  The Base frame is one
@@ -79,7 +79,7 @@
 *        output AST file.  To be useful, this must specify a frame 
 *        which occurs in all the NDFs in the IN list, and can be 
 *        expected to occur in any NDF to which the AST file will 
-*        later be applied using ASTIMP.  It will normally be PIXEL.
+*        later be applied using ASTIMP.
 *
 *        The value of the parameter can be one of the following:
 *        - A domain name such as SKY, AXIS, PIXEL, etc.
@@ -103,8 +103,9 @@
 *        keyword1.keyword2 etc.  Each keyword must be no longer than 
 *        8 characters.
 *     FITSROT = LITERAL (Read)
-*        This parameter gives the name of a FITS header keyword whose
-*        value will be used to rotate the frames when they are imported.
+*        If this parameter is not null, it gives the name of a FITS
+*        header keyword whose value gives a number of degrees to 
+*        rotate the coordinate system by when it is imported.
 *        If any lower case characters are given, they are converted 
 *        to upper case.  This may be a compound name to handle 
 *        hierarchical keywords, in which case it has the form 
@@ -172,11 +173,12 @@
 *        applied.  A suitable value might be the name of the 
 *        instrument from which the NDFs are obtained.
 *
-*        Note that the frames which are written to the AST file are the
-*        Current frames of the NDFs supplied; this parameter only gives
-*        the name that the frames will have in the AST file, and 
-*        consequently the name by which they will be known when the
-*        WCS information is imported into other NDFs using ASTIMP.
+*        Note that the frames which are written to the AST file are
+*        always the Current frames of the NDFs supplied; this
+*        parameter only gives the name that the frames will have in
+*        the AST file, and consequently the name by which they will be
+*        known when the WCS information is imported into other NDFs
+*        using ASTIMP.
 *
 *        The name is converted to upper case, and whitespace is removed.
 *        [CCD_EXPORT]
@@ -194,26 +196,26 @@
 *        of a FITS header keyword present in the FITS extension of each
 *        NDF whose value distinguishes the CCDs from each other 
 *        (presumably present in the unreduced data).  The mappings 
-*        between the frame in the 'PIXEL' domain of the input NDFs and 
-*        their Current frames are recorded.
+*        between the pixel coordinates and Current coordinates of the
+*        input NDFs are recorded.
 *
-*     astexp "im1,im2,im3" astfile=camera.ast baseframe=AXIS 
+*     astexp "im1,im2,im3" astfile=camera.ast baseframe=axis 
 *            title="Focal plane alignment" accept
 *        In this case the OUTDOMAIN parameter takes its default value
-*        of 'CCD_EXPORT', but mappings are between the Current domains
-*        of the input NDFs and their 'AXIS' domains.  This could be
-*        a good idea if the images had been shrunk using KAPPA's
-*        COMPAVE or something similar, which modifies the PIXEL 
-*        coordinates but leaves the AXIS coordinates unchanged.
-*        No suitable FITS header is available
-*        to distinguish the different types of NDF, so the IDTYPE 
-*        parameter is allowed to assume its default value of INDEX.  
-*        When camera.ast is used for importing frameset information, 
-*        the NDFs from the three different chips must be listed in the 
-*        same order as when this command was invoked.  The title of the
-*        output Current frame will be as given.
+*        of 'CCD_EXPORT', but mappings are between the Current
+*        coordinates of the input NDFs and their 'AXIS' coordinates.
+*        This could be a good idea if the images had been shrunk using
+*        KAPPA's COMPAVE or something similar, which modifies the
+*        PIXEL coordinates but leaves the AXIS coordinates unchanged.
+*        No suitable FITS header is available to distinguish the
+*        different types of NDF, so the IDTYPE parameter is allowed to
+*        assume its default value of INDEX.  When camera.ast is used
+*        for importing frameset information, the NDFs from the three
+*        different chips must be listed in the same order as when this
+*        command was invoked.  The title of the output Current frame
+*        will be as given.
 *
-*     astexp r10595[2,3,4,5] wfc.ast outdomain=WFC 
+*     astexp "r10595[2345]" wfc.ast outdomain=wfc 
 *            idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA
 *        This exports the alignment information from the four named
 *        NDFs to a file wfc.ast.  The CHIPNAME FITS header identifies
