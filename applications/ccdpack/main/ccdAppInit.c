@@ -165,9 +165,8 @@ Tcl_AppInit(interp)
      * time are declared via the tclbgcmd mechanism.
      */
 
-    Tcl_CreateObjCommand( interp, "ndfdrawpair", tclbgcmd,
-                          (ClientData) NdfDrawpair, 
-                          (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "ndfdrawpair", NdfDrawpair,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "ndfcentroffset", NdfCentroffset,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "ccdputs", CcdputsCmd,
