@@ -1,5 +1,5 @@
 *+  PSF_ANAL - User defined PSF handler
-      SUBROUTINE PSF_ANAL( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
+      SUBROUTINE PSF_ANAL( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
      :                                          NY, ARRAY, STATUS )
 *
 *    Description :
@@ -41,12 +41,11 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'MATH_PAR'
-      INCLUDE 'PSF_ANAL_CMN'
 *
 *    Import :
 *
       REAL                     DX, DY, X0, Y0,QX,QY
-      INTEGER                  NX,NY,SLOT
+      INTEGER                  NX,NY,PSID
       LOGICAL                  INTEG
 *
 *    Export :
@@ -67,146 +66,148 @@
 *
 *    Local variables :
 *
-      REAL                     SIGX, SIGY              ! GAUSSIAN variables
-      REAL                     HHYPOT, PROBP, PROBSP   ! TOPHAT variables
-      REAL                     H, HR                   ! TRAINGLE variables
-      REAL                     FWHM, FWMV, FWZR        ! FLAT_TRI variables
+      CHARACTER*3		KIND			! Form of psf
 
-      REAL                     DELX, DELY              ! Offsets from X0,Y0
-      REAL                     LHS, BOT                ! Left side and bottom
+      REAL                      SIGX, SIGY              ! GAUSSIAN variables
+      REAL                      HHYPOT, PROBP, PROBSP   ! TOPHAT variables
+      REAL                      H, HR                   ! TRAINGLE variables
+      REAL                      FWHM, FWMV, FWZR        ! FLAT_TRI variables
+
+      REAL                      DELX, DELY              ! Offsets from X0,Y0
+      REAL                      LHS, BOT                ! Left side and bottom
                                                        ! of ARRAY in radians
-      REAL                     R                       ! Distance pixel to X0,Y0
-      REAL                     RC, ALPHA               ! King profile params
-      REAL                     THETA                   ! PA of pixel wrt X0,Y0
-      REAL                     W                       ! Mask width
-      REAL                     XP, YP                  ! Pixel centres
-      REAL                     XPP, YPP                ! Sub-pixel centres
+      REAL                      R                       ! Distance pixel to X0,Y0
+      REAL                     	THETA                   ! PA of pixel wrt X0,Y0
+      REAL                      W                       ! Mask width
+      REAL			W1, W2			! Stored widths
+      REAL                      XP, YP                  ! Pixel centres
+      REAL                      XPP, YPP                ! Sub-pixel centres
 
-      INTEGER                  I, J                    ! Loops over output data
-      INTEGER                  II, JJ                  ! Subsample loops
-      INTEGER                  KIND                    ! Variety of user PSF
+      INTEGER                   I, J                    ! Loops over output data
+      INTEGER                   II, JJ                  ! Subsample loops
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Decide on form of PSF
-      KIND = AN_KIND(SLOT)
+*  Decide on form of PSF
+      CALL PSF0_GETID0C( PSID, 'Form', KIND, STATUS )
 
-*    Find LHS and BOT in radians
+*  Find LHS and BOT in radians
       LHS = X0 + QX - DX * REAL(NX) / 2.0
       BOT = Y0 + QY - DY * REAL(NY) / 2.0
 
-*    Gaussian
-      IF ( KIND .EQ. ANAL_GAUSS ) THEN
+*  Get widths
+      CALL PSF0_GETID0R( PSID, 'Width1', W1, STATUS )
+      CALL PSF0_GETID0R( PSID, 'Width2', W2, STATUS )
 
-*      Get the full-widths in each dimension, and convert to sigmas
-        SIGX = AN_PW(SLOT,1) /
-     :                       ( 2.0 * SQRT(2.0*ALOG(2.0)) )
-        SIGY = AN_PW(SLOT,2) /
-     :                       ( 2.0 * SQRT(2.0*ALOG(2.0)) )
+*  Gaussian
+      IF ( KIND .EQ. 'GAU' ) THEN
 
-*      Fill in values
+*    Get the full-widths in each dimension, and convert to sigmas
+        SIGX = W1 / ( 2.0 * SQRT(2.0*ALOG(2.0)) )
+        SIGY = W2 / ( 2.0 * SQRT(2.0*ALOG(2.0)) )
+
+*    Fill in values
         CALL MATH_INTGAU2D( SIGX, SIGY, 0.0,0.0,0.0, QX, QY,
      :                       DX, DY, NX, NY, ARRAY, STATUS )
 
-*    King profile
-      ELSE IF ( KIND .EQ. ANAL_KING ) THEN
+*  King profile
+      ELSE IF ( KIND .EQ. 'KIN' ) THEN
 
-*      Get the profile control parameters
-        RC = AN_PW(SLOT,1)
-        ALPHA = AN_PW(SLOT,2)
+*    Get the profile control parameters
+        RC = W1
+        ALPHA = W2
 
-*      Fill in values
-        CALL MATH_INTKING2D( RC, ALPHA, 0.0, 0.0, QX, QY,
+*    Fill in values
+        CALL MATH_INTKING2D( W1, W2, 0.0, 0.0, QX, QY,
      :                       DX, DY, NX, NY, ARRAY, STATUS )
 
 
-*    Lorentz profile
-      ELSE IF ( KIND .EQ. ANAL_LORENTZ ) THEN
+*  Lorentz profile
+      ELSE IF ( KIND .EQ. 'LOR' ) THEN
 
-*      Fill in values
-        CALL MATH_INTLOR2D( AN_PW(SLOT,1), AN_PW(SLOT,2), 0.0, 0.0,
-     :                      0.0, QX, QY,
+*    Fill in values
+        CALL MATH_INTLOR2D( W1, W2, 0.0, 0.0, 0.0, QX, QY,
      :                      DX, DY, NX, NY, ARRAY, STATUS )
 
-*    Top hat
+*  Top hat
       ELSE IF ( KIND .EQ. ANAL_TOPHAT ) THEN
 
-*      Get radius of tophat
-        W = AN_PW(SLOT,1) / 2.0
+*    Get radius of tophat
+        W = W1 / 2.0
 
-*      Probability per pixel completely inside tophat
+*    Probability per pixel completely inside tophat
         PROBP = ABS(DX*DY) / (MATH__PI*W*W)
 
-*      Process each pixel grid
+*    Process each pixel grid
         DO J = 1, NY
 
-*        Y position of pixel centres in this row
+*      Y position of pixel centres in this row
           YP = BOT + (REAL(J)-0.5)*DY
 
           DO I = 1, NX
 
-*          X position of pixel centre
+*        X position of pixel centre
             XP = LHS + (REAL(I)-0.5)*DX
 
-*          Find distance from psf centre
+*        Find distance from psf centre
             R = SQRT( (XP-X0)**2 + (YP-Y0)**2 )
 
-*          Find position angle of pixel
+*        Find position angle of pixel
             IF ( (XP-X0) .EQ. 0.0 ) THEN
               THETA = 0.0
             ELSE
               THETA = ATAN2(YP-Y0,XP-X0)
             END IF
 
-*          HHYPOT is the radius from the psf inside which any ARRAY pixel
-*          centre is guaranteed to mean the whole pixel being inside the
-*          tophat width. This clearly depends on the P.A. of the pixel
-*          centre w.r.t. the psf centre. The relation below gives a value
-*          of DX/2 on the principal axes rising to a maximum of (DX*root2)/2
-*          at 45 degrees to the principal axes.
+*        HHYPOT is the radius from the psf inside which any ARRAY pixel
+*        centre is guaranteed to mean the whole pixel being inside the
+*        tophat width. This clearly depends on the P.A. of the pixel
+*        centre w.r.t. the psf centre. The relation below gives a value
+*        of DX/2 on the principal axes rising to a maximum of (DX*root2)/2
+*        at 45 degrees to the principal axes.
             HHYPOT = (1.0 + SIN(2.0*THETA)*(ROOT2-1.0))*ABS(DX)/2.0
 
-*          Pixel well inside tophat radius
+*        Pixel well inside tophat radius
             IF ( R .LT. (W-HHYPOT) ) THEN
 
               ARRAY(I,J) = PROBP
 
-*          Well outside?
+*        Well outside?
             ELSE IF ( R .GT. (W+HHYPOT) ) THEN
 
               ARRAY(I,J) = 0.0
 
-*          Sub-sample
+*       Sub-sample
             ELSE
 
-*            Probability per sub-pixel
+*          Probability per sub-pixel
               PROBSP = PROBP / REAL(OVERSAMPLE**2)
 
-*            Sub-sample the ARRAY pixel accumulating probability from those
-*            subpixels inside the tophat.
+*          Sub-sample the ARRAY pixel accumulating probability from those
+*          subpixels inside the tophat.
               ARRAY(I,J) = 0.0
               DO JJ = 1, OVERSAMPLE
                 YPP = YP - 0.5*DY + (REAL(JJ-1)+0.5)*DY/OVERSAMPLE
                 DO II = 1, OVERSAMPLE
                   XPP = XP - 0.5*DX + (REAL(II-1)+0.5)*DX/OVERSAMPLE
 
-*                Radius of subpixel
+*              Radius of subpixel
                   R = SQRT( (XPP-X0)**2 + (YPP-Y0)**2 )
 
-*                Inside
+*              Inside
                   IF ( R .LT. (W-HHYPOT/OVERSAMPLE) ) THEN
 
                     ARRAY(I,J) = ARRAY(I,J) + PROBSP
 
-*                Some part of pixel inside top-hat radius?
+*              Some part of pixel inside top-hat radius?
                   ELSE IF ( R .LT. (W+HHYPOT/OVERSAMPLE) ) THEN
 
-*                  The permissible range of (R-W) is from -1.0 to 1.0 in units
-*                  of HHYPOT/OVERSAMPLE, corresponding to the radial extremity
-*                  of a subpixel being just inside W to just outside W. Map
-*                  the above range onto 1.0 to 0.0
+*                The permissible range of (R-W) is from -1.0 to 1.0 in units
+*                of HHYPOT/OVERSAMPLE, corresponding to the radial extremity
+*                of a subpixel being just inside W to just outside W. Map
+*                the above range onto 1.0 to 0.0
                     ARRAY(I,J) = ARRAY(I,J) + PROBSP *
      :                    (0.5 - (R-W)/(HHYPOT/OVERSAMPLE)/2.0 )
 
@@ -220,10 +221,10 @@
           END DO
         END DO
 
-      ELSE IF ( KIND .EQ. ANAL_TRIANGLE ) THEN
+      ELSE IF ( KIND .EQ. 'TRI' ) THEN
 
 *      Get width of triangle
-        W = AN_PW(SLOT,1)
+        W = W1
 
 *      Get height of pyramid and multiply by sub-pixel area.
         H = (3.0 / W**2) * ABS(DX*DY) / OVERSAMPLE**2
@@ -283,11 +284,11 @@
 
         END DO
 
-      ELSE IF ( KIND .EQ. ANAL_FLAT_TRI ) THEN
+      ELSE IF ( KIND .EQ. 'FTR' ) THEN
 
 *      Get various widths
-        FWZR = AN_PW(SLOT,1)
-        FWHM = AN_PW(SLOT,2)
+        FWZR = W1
+        FWHM = W2
         FWMV = 2.0*FWHM - FWZR
 
 *      Height of pyramid without top cut off
@@ -364,7 +365,7 @@
       END
 
 *+  PSF_ANAL_HINT - Analytic defined PSF initialisation
-      SUBROUTINE PSF_ANAL_HINT( SLOT, HINT, DATA, STATUS )
+      SUBROUTINE PSF_ANAL_HINT( PSID, HINT, DATA, STATUS )
 *
 *    Description :
 *
@@ -392,7 +393,7 @@
 *
 *    Import :
 *
-      INTEGER                 	SLOT            	! PSF handle
+      INTEGER                 	PSID
       CHARACTER*(*)           	HINT		 	! Hint name
 *
 *    Export :
@@ -429,7 +430,7 @@
       END
 
 *+  PSF_ANAL_INIT - Analytic defined PSF initialisation
-      SUBROUTINE PSF_ANAL_INIT( SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_ANAL_INIT( PSID, SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -461,11 +462,10 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_ANAL_CMN'
 *
 *    Import :
 *
+      INTEGER			PSID
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
@@ -482,6 +482,7 @@
 *
 *    Local variables :
 *
+      CHARACTER*3		CH3			! 3 chars of CHOICE
       CHARACTER*30            CHOICE            ! User's choice for PSF
       CHARACTER*30            FTPAR             ! FLAT_TRI parameters
       CHARACTER*80            PROMPT            !
@@ -490,21 +491,22 @@
       REAL                    GWIDTH            ! Width of a mask
       REAL                    X_DR, Y_DR        ! Axis scales
       REAL                    X_TOR, Y_TOR      ! Axis unit conversions
+      REAL			W1, W2			! Widths
 
-      INTEGER                 BEG, IC           ! Character pointers
-      INTEGER                 X_AX,Y_AX,E_AX,T_AX
+      INTEGER                 	BEG, IC           ! Character pointers
+      INTEGER                 	X_AX,Y_AX,E_AX,T_AX	! Axis numbers
 
-      LOGICAL                 X_OK, Y_OK        ! Axes ok?
+      LOGICAL                 	X_OK, Y_OK        	! Axes ok?
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
+*  Initialise
       X_OK = .FALSE.
       Y_OK = .FALSE.
 
-*    Tell user about user-definitions
+*  Tell user about user-definitions
       CALL MSG_PRNT( 'PSF definitions available')
       CALL MSG_PRNT( ' ')
       CALL MSG_PRNT( 'GAUSSIAN     - Gaussian response        '/
@@ -515,18 +517,18 @@
      :              /'  KING         - King profile ')
       CALL MSG_PRNT( ' ')
 
-*    Define the default mask
+*  Define the default mask
       CALL USI_DEF0C( 'MASK', 'GAUSSIAN', STATUS )
 
-*    Get user's choice
+*  Get user's choice
       CALL USI_GET0C( 'MASK', CHOICE, STATUS )
       CALL USI_CANCL( 'MASK', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Identify spatial axes
+*  Identify spatial axes
       CALL PSF1_GETAXID( INST, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
-*    Tell the user about the pixel size if we have a dataset.
+*  Tell the user about the pixel size if we have a dataset.
       X_OK = PSF1_GETAXOK( INST, X_AX, STATUS )
       Y_OK = PSF1_GETAXOK( INST, Y_AX, STATUS )
       X_DR = PSF1_GETAXDR( INST, X_AX, STATUS )
@@ -535,7 +537,7 @@
       Y_TOR = PSF1_GETAXTOR( INST, Y_AX, STATUS )
       CALL PSF1_GETAXTXT( INST, X_AX, LABEL, UNITS, STATUS )
 
-*    Are dataset axes ok?
+*  Are dataset axes ok?
       IF ( X_OK .AND. Y_OK .AND. .NOT.
      :                           STR_ABBREV(UNITS,'PIXELS') ) THEN
         CALL MSG_SETR( 'XP', ABS(X_DR/X_TOR) )
@@ -551,7 +553,7 @@
 *    Check on each possibility
       IF ( STR_ABBREV(CHOICE,'GAUSSIAN') ) THEN
 
-        AN_KIND(SLOT) = ANAL_GAUSS
+        CH3 = 'GAU'
 
 *      We need a width for the gaussian
         PROMPT = 'Gaussian FWHM in '//UNITS(:CHR_LEN(UNITS))
@@ -562,12 +564,13 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Convert it to radians
-        AN_PW(SLOT,1) = GWIDTH*X_TOR
-        AN_PW(SLOT,2) = GWIDTH*Y_TOR
+        W1 = GWIDTH*X_TOR
+        W2 = GWIDTH*Y_TOR
 
+*  King profile
       ELSE IF ( STR_ABBREV(CHOICE,'KING') ) THEN
 
-        AN_KIND(SLOT) = ANAL_KING
+        CH3 = 'KIN'
 
         CALL USI_PROMT( 'AUX', 'King core radius (in '/
      :           /UNITS(:CHR_LEN(UNITS))//') and index', STATUS )
@@ -582,7 +585,7 @@
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
-          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT,1), STATUS )
+          CALL CHR_CTOR( FTPAR(BEG:IC), W1, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT( 'Error parsing core radius' )
@@ -593,7 +596,7 @@
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
-          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT,2), STATUS )
+          CALL CHR_CTOR( FTPAR(BEG:IC), W2, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT( 'Error parsing profile index' )
@@ -603,13 +606,14 @@
         END IF
 
 *      Convert core radius to radians
-        AN_PW(SLOT,1) = AN_PW(SLOT,1) * X_TOR
+        W1 = W1 * X_TOR
 
+*  Lorentzian profile
       ELSE IF ( STR_ABBREV(CHOICE,'LORENTZ') ) THEN
 
-        AN_KIND(SLOT) = ANAL_LORENTZ
+        CH3 = 'LOR'
 
-*      We need a width for the Lorentzian
+*    We need a width for the Lorentzian
         PROMPT = 'Lorentzian HWHM in '//UNITS(:CHR_LEN(UNITS))
         CALL USI_PROMT( 'AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
         CALL USI_DEF0R( 'AUX', ABS(X_DR/X_TOR), STATUS )
@@ -617,13 +621,13 @@
         CALL USI_CANCL( 'AUX', STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Convert it to radians
-        AN_PW(SLOT,1) = GWIDTH*X_TOR
-        AN_PW(SLOT,2) = GWIDTH*Y_TOR
+*    Convert it to radians
+        W1 = GWIDTH*X_TOR
+        W2 = GWIDTH*Y_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'TOPHAT') ) THEN
 
-        AN_KIND(SLOT) = ANAL_TOPHAT
+        CH3 = 'TOP'
 
 *      Get width of tophat
         PROMPT = 'Tophat full width in '//UNITS(:CHR_LEN(UNITS))
@@ -632,11 +636,11 @@
         CALL USI_CANCL( 'AUX', STATUS )
 
 *      Convert it to radians
-        AN_PW(SLOT,1) = GWIDTH*X_TOR
+        W1 = GWIDTH*X_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'TRIANGLE') ) THEN
 
-        AN_KIND(SLOT) = ANAL_TRIANGLE
+        CH3 = 'TRI'
 
 *      Get width of tophat
         PROMPT = 'Triangle zero-point full width in '//UNITS
@@ -646,12 +650,12 @@
         CALL USI_CANCL( 'AUX', STATUS )
 
 *      Convert it to radians
-        AN_PW(SLOT,1) = GWIDTH*X_TOR
-        AN_PW(SLOT,2) = GWIDTH*Y_TOR
+        W1 = GWIDTH*X_TOR
+        W2 = GWIDTH*Y_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'FLAT_TRI') ) THEN
 
-        AN_KIND(SLOT) = ANAL_FLAT_TRI
+        CH3 = 'FTR'
 
         CALL MSG_PRNT( 'Please supply full-width at zero response'/
      :                  /' (FWZR) and full-width half-max (FWHM)' )
@@ -668,7 +672,7 @@
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
-          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT,1), STATUS )
+          CALL CHR_CTOR( FTPAR(BEG:IC), W1, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT( 'Error parsing FWZR' )
@@ -678,7 +682,7 @@
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
-          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT,2), STATUS )
+          CALL CHR_CTOR( FTPAR(BEG:IC), W2, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT( 'Error parsing FWHM' )
@@ -687,15 +691,15 @@
 
         END IF
 
-        IF ( AN_PW(SLOT,1) .LT. AN_PW(SLOT,2) ) THEN
+        IF ( W1 .LT. W2 ) THEN
           CALL MSG_PRNT( 'The zero point full width can''t be LESS'/
      :                                            /' than the FWHM!' )
           GOTO 49
         END IF
 
 *      Convert them both to radians
-        AN_PW(SLOT,1) = AN_PW(SLOT,1)*X_TOR
-        AN_PW(SLOT,2) = AN_PW(SLOT,2)*Y_TOR
+        W1 = W1*X_TOR
+        W2 = W2*X_TOR
 
       ELSE
         STATUS = SAI__ERROR
@@ -703,7 +707,12 @@
 
       END IF
 
-*    Tidy up
+*  Store instance data
+      CALL PSF0_SETID0C( PSID, 'Form', CH3, STATUS )
+      CALL PSF0_SETID0R( PSID, 'Width1', W1, STATUS )
+      CALL PSF0_SETID0R( PSID, 'Width2', W2, STATUS )
+
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_ANAL_INIT', STATUS )
       END IF
@@ -712,7 +721,7 @@
 
 
 *+  PSF_ANAL_PFL - Analytic psf energy profiling
-      SUBROUTINE PSF_ANAL_PFL( SLOT, NFRAC, FRAC, RADII, STATUS )
+      SUBROUTINE PSF_ANAL_PFL( PSID, NFRAC, FRAC, RADII, STATUS )
 *
 *    Description :
 *
@@ -764,11 +773,10 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_ANAL_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT,NFRAC
+      INTEGER                  PSID,NFRAC
       REAL                     FRAC(*)
 *
 *    Export :
@@ -781,94 +789,97 @@
 *
 *    Local variables :
 *
+      CHARACTER*3		KIND			! Form of psf
+
       REAL                     FP, FWHM, FWMV, FWZR    ! FLAT_TRI variables
       REAL                     FBP
       REAL                     R,OLDR                  !
       REAL                     W                       ! A mask width
 
       INTEGER                  I                       ! Loop over radii
-      INTEGER                  KIND                    ! Variety of user PSF
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get analytic form
-      KIND = AN_KIND(SLOT)
+*  Decide on form of PSF
+      CALL PSF0_GETID0C( PSID, 'Form', KIND, STATUS )
 
-*    Gaussian?
-      IF ( KIND .EQ. ANAL_GAUSS ) THEN
+*  Gaussian?
+      IF ( KIND .EQ. 'GAU' ) THEN
 
         STATUS = SAI__ERROR
 
-*    Tophat?
-      ELSE IF ( KIND .EQ. ANAL_TOPHAT ) THEN
+*  Tophat?
+      ELSE IF ( KIND .EQ. 'TOP' ) THEN
 
 *      Get half-width of mask in radians
-        W = AN_PW(SLOT,1) / 2.0
+        CALL PSF0_GETID0R( PSID, 'Width1', W, STATUS )
+        W = W / 2.0
 
 *      For each energy fraction
         DO I = 1, NFRAC
           RADII(I) = W * SQRT(FRAC(I))
         END DO
 
-*    Pyramid
-      ELSE IF ( KIND .EQ. ANAL_TRIANGLE ) THEN
+*  Pyramid
+      ELSE IF ( KIND .EQ. 'TRI' ) THEN
 
-*      Get width of mask in radians
-        W = AN_PW(SLOT,1)
+*    Get width of mask in radians
+        CALL PSF0_GETID0R( PSID, 'Width1', W, STATUS )
 
-*      For each energy fraction
+*    For each energy fraction
         DO I = 1, NFRAC
 
-*        First guess at radius, scaled from 0.0 to 1.0
+*      First guess at radius, scaled from 0.0 to 1.0
           R = SQRT(FRAC(I))
 
-*        Iterate until convergence
+*      Iterate until convergence
           OLDR = -999.0
           DO WHILE ( ABS(R-OLDR)/R .GT. 0.0001 )
             OLDR = R
             R = R - (3.0*R**2-2.0*R**3-FRAC(I)) / (6.0*R-6.0*R**2)
           END DO
 
-*        Convert to real distance
+*      Convert to real distance
           RADII(I) = R*W/2.0
 
         END DO
 
-*    Flat pyramid
-      ELSE IF ( KIND .EQ. ANAL_FLAT_TRI ) THEN
+*  Flat pyramid
+      ELSE IF ( KIND .EQ. 'FTR' ) THEN
 
-*      Get various widths
-        FWZR = AN_PW(SLOT,1)
-        FWHM = AN_PW(SLOT,2)
+*    Get various widths
+        CALL PSF0_GETID0R( PSID, 'Width1', FWZR, STATUS )
+        CALL PSF0_GETID0R( PSID, 'Width2', FWHM, STATUS )
         FWMV = 2.0*FWHM - FWZR
 
-*      Fraction of energy inside plateau
+*    Fraction of energy inside plateau
         FP = 3.0*(FWZR-FWMV)*FWMV**2/(FWZR**3-FWMV**3)
 
-*      For each energy fraction
+*    For each energy fraction
         DO I = 1, NFRAC
 
-*        Requested fraction inside plateau
+*      Requested fraction inside plateau
           IF ( FRAC(I) .LE. FP ) THEN
 
-*          Just a tophat normalised to FP
+*        Just a tophat normalised to FP
             RADII(I) = (FWMV/2.0) * SQRT(FRAC(I)/FP)
+
           ELSE
 
-*          An energy fraction in excess of FP can be translated into a
-*          real excess volume in an untruncated pyramid of height H.
+*        An energy fraction in excess of FP can be translated into a
+*        real excess volume in an untruncated pyramid of height H.
 
-*          Find the fraction of energy enclosed in the untruncated pyramid
-*          at the radius corresponding to the edge of the plateau, FWMV.
+*        Find the fraction of energy enclosed in the untruncated pyramid
+*        at the radius corresponding to the edge of the plateau, FWMV.
             R = (FWMV/FWZR)
             FBP = 3.0*R**2-2.0*R**3
 
-*          Scale our (FRAC(I) between FP and 1) into the range (FBP to 1.0)
+*        Scale our (FRAC(I) between FP and 1) into the range (FBP to 1.0)
             FBP = FBP + (1.0-FBP)*(FRAC(I)-FP)/(1.0-FP)
 
-*          Now use iteration scheme to get normalised radius
+*        Now use iteration scheme to get normalised radius
 c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
             OLDR = -999.0
             DO WHILE ( ABS(R-OLDR)/R .GT. 0.0001 )
@@ -876,14 +887,14 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
               R = R - (3.0*R**2-2.0*R**3-FBP) / (6.0*R-6.0*R**2)
             END DO
 
-*          And convert to real units
+*        And convert to real units
             RADII(I) = R * FWZR/2.0
 
           END IF
 
         END DO
 
-*    Report error
+*  Report error
       ELSE
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Unknown analytic psf code', STATUS )
@@ -1424,7 +1435,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 *+  PSF_ASCA_INIT - ASCA psf initialisation
-      SUBROUTINE PSF_ASCA_INIT( SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_ASCA_INIT( PSID, SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -1458,6 +1469,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
 *    Import :
 *
+      INTEGER			PSID
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
@@ -1815,7 +1827,7 @@ C         CALL CAL_CLOSE( IGNORE )
       END
 
 *+  PSF_PWFC_INIT - Initialise the WFC pointed psf system
-      SUBROUTINE PSF_PWFC_INIT( SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_PWFC_INIT( PSID, SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -1857,6 +1869,7 @@ C         CALL CAL_CLOSE( IGNORE )
 *
 *    Import :
 *
+      INTEGER			PSID
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
@@ -2301,7 +2314,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_RADIAL_INIT - Radially defined PSF initialisation
-      SUBROUTINE PSF_RADIAL_INIT( SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_RADIAL_INIT( PSID, SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -2335,6 +2348,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
+      INTEGER			PSID
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
@@ -2964,7 +2978,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 
 *+  PSF_RESPFILE_INIT - Response defined PSF initialisation
-      SUBROUTINE PSF_RESPFILE_INIT( SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_RESPFILE_INIT( PSID, SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -3002,6 +3016,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
+      INTEGER			PSID
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
@@ -3290,7 +3305,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
-      INCLUDE 'PSF_ANAL_CMN'
       INCLUDE 'PSF_ASCA_CMN'
       INCLUDE 'PSF_RADIAL_CMN'
       INCLUDE 'PSF_RESPFILE_CMN'
@@ -3334,7 +3348,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Reset the SYSTEM_INIT flag in each common block
-      AN_INIT = .TRUE.
       AS_INIT = .TRUE.
       TB_INIT = .TRUE.
       RF_INIT = .TRUE.
@@ -3511,7 +3524,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_TABULAR_INIT - Tabular defined PSF initialisation
-      SUBROUTINE PSF_TABULAR_INIT( SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_TABULAR_INIT( PSID, SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -3549,6 +3562,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
+      INTEGER			PSID
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
@@ -3954,7 +3968,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_WFC_INIT - Initialise the WFC survey psf system
-      SUBROUTINE PSF_WFC_INIT( SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_WFC_INIT( PSID, SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -3998,6 +4012,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
+      INTEGER			PSID
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
@@ -5106,7 +5121,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_XRT_PSPC_INIT - XRT PSPC psf initialisation
-      SUBROUTINE PSF_XRT_PSPC_INIT( SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_XRT_PSPC_INIT( PSID, SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -5141,6 +5156,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
+      INTEGER			PSID
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data

@@ -222,9 +222,9 @@
           END IF
 
 *        Get psf data
-          CALL PSF_2D_DATA_INT( %VAL(L_MOD_D(MID,LID)), SLOT,
-     :                          MX0, MY0, 0.0, 0.0, DX, DY, INTEG,
-     :                          SM_NX(SLOT), SM_NY(SLOT),
+          CALL PSF_2D_DATA_INT( %VAL(L_MOD_D(MID,LID)), P_PSID(SLOT),
+     :                          SLOT, MX0, MY0, 0.0, 0.0, DX, DY,
+     :                          INTEG, SM_NX(SLOT), SM_NY(SLOT),
      :                          %VAL(PDATA), STATUS )
           CALL ARR_SELEM1L( SM_FLAG(SLOT), SM_NMOD(SLOT), MODI,
      :                      .TRUE., STATUS )
@@ -238,7 +238,8 @@
 *    Get simple psf data
       ELSE
 
-        CALL PSF_2D_DATA_INT( %VAL(L_MOD_D(MID,LID)), SLOT, X0, Y0, QX,
+        CALL PSF_2D_DATA_INT( %VAL(L_MOD_D(MID,LID)), P_PSID(SLOT),
+     :                             SLOT, X0, Y0, QX,
      :                       QY, DX, DY, INTEG, NX, NY, ARRAY, STATUS )
 
       END IF
@@ -249,8 +250,9 @@
 
 
 *+  PSF_2D_DATA_INT - Grab 2D PSF data using routine specified by PSF_ROUTINE
-      SUBROUTINE PSF_2D_DATA_INT( PSF_ROUTINE, SLOT, X0, Y0, QX, QY, DX,
-     :                                 DY, INTEG, NX,NY, ARRAY, STATUS )
+      SUBROUTINE PSF_2D_DATA_INT( PSF_ROUTINE, PSID, SLOT, X0, Y0,
+     :                            QX, QY, DX,
+     :                            DY, INTEG, NX,NY, ARRAY, STATUS )
 *
 *    Deficiencies :
 *
@@ -285,6 +287,7 @@
 *
       EXTERNAL                 PSF_ROUTINE             ! Action routine
       INTEGER                  SLOT                    ! PSF to use
+      INTEGER                  PSID                    ! PSF to use
       REAL                     X0, Y0                  ! Evaluate psf here
       REAL                     QX,QY                   ! Offset to ARRAY centre
       REAL                     DX, DY                  ! Pixel size in radians
@@ -352,10 +355,10 @@
 
 *            Get data
               IF ( I .EQ. 1 ) THEN
-                CALL PSF_ROUTINE( SLOT, X0, Y0, QX, QY, DX, DY, INTEG,
+                CALL PSF_ROUTINE( PSID, X0, Y0, QX, QY, DX, DY, INTEG,
      :                                         NX, NY, ARRAY, STATUS )
               ELSE
-                CALL PSF_ROUTINE( SLOT, X0, Y0, QX, QY, DX, DY, INTEG,
+                CALL PSF_ROUTINE( PSID, X0, Y0, QX, QY, DX, DY, INTEG,
      :                                  NX, NY, %VAL(MAPPTR), STATUS )
                 CALL PSF_2D_DATA_EADD( NX*NY, %VAL(MAPPTR), ARRAY,
      :                                                    STATUS )
@@ -382,13 +385,13 @@
      :                                               0, 0, STATUS )
 
 *        Get data
-          CALL PSF_ROUTINE( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
+          CALL PSF_ROUTINE( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
      :                                                   ARRAY, STATUS )
 
         END IF
 
       ELSE
-        CALL PSF_ROUTINE( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
+        CALL PSF_ROUTINE( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
      :                                                 ARRAY, STATUS )
 
       END IF

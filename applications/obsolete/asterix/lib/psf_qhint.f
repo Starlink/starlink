@@ -27,7 +27,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -59,7 +58,7 @@
       IF ( L_MOD_H(P_MODID(SLOT),P_LIBID(SLOT)) .NE. 0 ) THEN
         CALL PSF_QHINT_EXEC( %VAL(L_MOD_H(P_MODID(SLOT),
      :                                  P_LIBID(SLOT))),
-     :                      SLOT, HINT, DATA, STATUS )
+     :                      P_PSID(SLOT), HINT, DATA, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           OK = .TRUE.
         ELSE
@@ -77,7 +76,7 @@
 
 
 *+  PSF_QHINT_EXEC - Invoke library routine for hints
-      SUBROUTINE PSF_QHINT_EXEC( ROUTINE, SLOT, HINT, DATA, STATUS )
+      SUBROUTINE PSF_QHINT_EXEC( ROUTINE, PSID, HINT, DATA, STATUS )
 *
 *    Description :
 *
@@ -100,7 +99,7 @@
 *    Import :
 *
       EXTERNAL                 ROUTINE                 ! LIB routine to call
-      INTEGER                  SLOT                    ! The PSF id
+      INTEGER                  PSID			! Psf object
       CHARACTER*(*)            HINT		       ! Hint name
 *
 *    Export :
@@ -115,6 +114,6 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      CALL ROUTINE( SLOT, HINT, DATA, STATUS )
+      CALL ROUTINE( PSID, HINT, DATA, STATUS )
 
       END
