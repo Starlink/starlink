@@ -739,6 +739,7 @@
       BORD=' '
       IF (SYS(1:5).EQ.'SunOS') BORD='msb'
       IF (SYS(1:4).EQ.'OSF1') BORD='lsb'
+      IF (SYS(1:5).EQ.'Linux') BORD='lsb'
       IF (BORD.EQ.' ') THEN
          STATUS=SAI__ERROR         
          CALL ERR_REP(' ','Unsupported operating system.',
@@ -1113,6 +1114,7 @@
       BORD=' '
       IF (SYS(1:5).EQ.'SunOS') BORD='msb'
       IF (SYS(1:4).EQ.'OSF1') BORD='lsb'
+      IF (SYS(1:5).EQ.'Linux') BORD='lsb'
       IF (BORD.EQ.' ') THEN
          STATUS=SAI__ERROR         
          CALL ERR_REP(' ','Unsupported operating system.',
@@ -3720,7 +3722,7 @@
          BORD = ' '
          IF( SYS(1:5) .EQ. 'SunOS' ) BORD = 'msb'
          IF( SYS(1:4) .EQ. 'OSF1' ) BORD = 'lsb'
-
+         IF( SYS(1:5) .EQ. 'Linux' ) BORD = 'lsb'
          IF( BORD .EQ. ' ' ) THEN
             CALL MSG_SETC( 'OS', SYS )
             STATUS = SAI__ERROR         
