@@ -3,6 +3,10 @@
    A new release of KAPPA (V0.16) has been made. The changes are
    described fully in sun95.
 
-   - A new command called LUTWARM has been added. It loads a colour table
-   which goes from black to white, passing through warm shades of yellow
-   and brown, as popularised by GAIA. 
+   - A new command called LUTWARM has been added. It loads a colour 
+   table which goes from black to white, passing through warm shades 
+   of yellow and brown, as popularised by GAIA. 
+
+   - THRESH may now be used to replace data between specified
+   thresholds as well as outside specified thresholds, by setting 
+   the lower threshold greater than the upper threshold.

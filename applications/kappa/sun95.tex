@@ -39117,21 +39117,29 @@ right.
 \sstroutine{
    THRESH
 }{
-   Edits an NDF such that array values below and above two thresholds
-   take constant values
+   Edits an NDF to replace values between or outside given limits
+   with specified constant values
 }{
    \sstdescription{
-      This application creates from an input NDF structure an NDF with
-      an array component whose values are edited as follows.  Array
-      values between and including the upper and lower thresholds are
-      copied from the input to output array.  Any values in the input
-      array greater than the upper threshold will be set to one
-      specified value, and anything less than the lower threshold will
-      be set to another specified value, in the output data array.
-      Thus if the replacement values equal their respective thresholds
-      this application creates an NDF constrained to lie between two
-      bounds.  Each replacement value may be the bad-pixel value for
-      masking.
+      This application creates an output NDF by copying values from an
+      input NDF, replacing all values within given data ranges by
+      a user-specified constant or by the bad value. Upper and lower
+      thresholds are supplied using parameters THRLO and THRHI.
+
+      If THRLO is less than or equal to THRHI, values between and
+      including the two thresholds are copied from the input to output
+      array.  Any values in the input array greater than the upper
+      threshold will be set to the value of parameter NEWHI, and anything
+      less than the lower threshold will be set to the value of parameter
+      NEWLO, in the output data array. Thus the output NDF is constrained
+      to lie between the two bounds.
+
+      If THRLO is greater than THRHI, values greater than or equal to
+      THRLO are copied from the input to output array, together with
+      values less than or equal to THRHI.  Any values between THRLO and
+      THRHI will be set to the value of parameter NEWLO in the output NDF.
+
+      Each replacement value may be the bad-pixel value for masking.
    }
    \sstusage{
       thresh in out thrlo thrhi newlo newhi [comp]
@@ -39141,10 +39149,11 @@ right.
          COMP = LITERAL (Read)
       }{
          The components whose values are to be constrained between
-         thresholds.  It may be {\tt "Data"}, {\tt "Variance"}, or
-         {\tt "Quality"}.  If {\tt "Quality"} is specified, then the
-         quality values are treated as numerical values in the range
-         0 to 255. {\tt ["Data"]}
+         thresholds.  The options are limited to the arrays within the
+         supplied NDF.  In general the value may be {\tt "}Data{\tt "}, {\tt "}Quality{\tt "},
+         {\tt "}Error{\tt "}, or {\tt "}Variance{\tt "}.  If {\tt "}Quality{\tt "} is specified, then the
+         quality values are treated as numerical values in the range 0
+         to 255.  {\tt ["Data"]}
       }
       \sstsubsection{
          IN = NDF  (Read)
@@ -39155,9 +39164,9 @@ right.
       \sstsubsection{
          NEWLO = LITERAL (Read)
       }{
-         This defines the value to which all input array-element values
+         This gives the value to which all input array-element values
          less than the lower threshold are set.  If this is set to
-         {\tt "Bad"}, the bad value is substituted.  Numerical values of
+         {\tt "}Bad{\tt "}, the bad value is substituted.  Numerical values of
          NEWLO must lie in within the minimum and maximum values of the
          data type of the array being processed.  The suggested default
          is the lower threshold.
@@ -39165,12 +39174,13 @@ right.
       \sstsubsection{
          NEWHI = LITERAL (Read)
       }{
-         This defines the value to which all input array-element values
+         This gives the value to which all input array-element values
          greater than the upper threshold are set.  If this is set to
-         {\tt "Bad"}, the bad value is substituted.  Numerical values of
+         {\tt "}Bad{\tt "}, the bad value is substituted.  Numerical values of
          NEWHI must lie in within the minimum and maximum values of the
          data type of the array being processed.  The suggested default
-         is the upper threshold.
+         is the upper threshold. This parameter is ignored if THRLO is
+         greater than THRHI.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -39190,16 +39200,15 @@ right.
          THRLO = \_DOUBLE (Read)
       }{
          The lower threshold value within the input array.  It must lie
-         in within the minimum and maximum values of the data type of
+         within the minimum and maximum values of the data type of
          the array being processed.  The suggested default is the
          current value.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF structure.  A null value ({\tt !})
-         propagates the title from the input NDF to the output NDF.
-         {\tt [!]}
+         Title for the output NDF structure.  A null value (!)
+         propagates the title from the input NDF to the output NDF. {\tt [!]}
       }
    }
    \sstexamples{
@@ -39207,8 +39216,15 @@ right.
          thresh zzcam zzcam2 100 500 0 0
       }{
          This copies the data array in the NDF called zzcam to the NDF
-         called zzcam2.  Any data value less than 100 and greater than
+         called zzcam2.  Any data value less than 100 or greater than
          500 in zzcam is set to 0 in zzcam2.
+      }
+      \sstexamplesubsection{
+         thresh zzcam zzcam2 500 100 0
+      }{
+         This copies the data array in the NDF called zzcam to the NDF
+         called zzcam2.  Any data value less than 500 and greater than
+         100 in zzcam is set to 0 in zzcam2.
       }
       \sstexamplesubsection{
          thresh zzcam zzcam2 100 500 0 0 comp=Variance
@@ -39217,17 +39233,17 @@ right.
          thresholds apply to the variance array.
       }
       \sstexamplesubsection{
-         thresh n253 n253cl thrlo=$-$0.5 thrhi=10.1 $\backslash$
+         thresh n253 n253cl thrlo=-0.5 thrhi=10.1 $\backslash$
       }{
          This copies the data array in the NDF called n253 to the NDF
-         called n253cl.  Any data value less than $-$0.5 in n253 is set
-         to $-$0.5 in n253cl, and any value greater than 10.1 in n253
+         called n253cl.  Any data value less than -0.5 in n253 is set
+         to -0.5 in n253cl, and any value greater than 10.1 in n253
          becomes 10.1 in n253cl.
       }
       \sstexamplesubsection{
-         thresh pavo pavosky $-$0.02 0.02 bad bad
+         thresh pavo pavosky -0.02 0.02 bad bad
       }{
-         All data values outside the range $-$0.02 to 0.02 in the NDF
+         All data values outside the range -0.02 to 0.02 in the NDF
          called pavo become bad in the NDF called pavosky.  All values
          within this range are copied from pavo to pavosky.
       }
@@ -39257,7 +39273,6 @@ right.
       }
    }
 }
-
 
 \sstroutine{
    TRANDAT
@@ -45925,6 +45940,14 @@ The following applications have been modified:
                long as the keyword value is blank.
          \item A bug has been fixed which caused comments to be lost if
                they abut the keyword value in the text file.
+      \end{itemize}
+
+   \item [\htmlref{THRESH}{THRESH}] \mbox{}
+      \begin{itemize}
+         \item May now be used to replace data {\emph between} specified
+               thresholds as well as {\emph outside} specified thresholds,
+               by setting the lower threshold greater than the upper
+               threshold.
       \end{itemize}
 
 \end{description}
