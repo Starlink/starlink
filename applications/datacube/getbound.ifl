@@ -16,7 +16,7 @@ interface GETBOUND
       helpkey '*'
    endparameter
    parameter LBOUND
-      type _INTEGER
+      type _DOUBLE
       access 'WRITE'
       vpath 'INTERNAL'
       helpkey '*'
