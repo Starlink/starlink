@@ -65,6 +65,20 @@
 *        4 - Use a constant weight of 1.0 for all input images. Any 
 *        variances supplied with the input images are ignored. 
 
+*  Notes:
+*     -  The reference direction for the output Stokes vectors is chosen
+*     as follows: If the output cube has a WCS component containing a
+*     SkyFrame, then the direction of the positive latitude axis (i.e.
+*     north) at the centre of the field is used as the Stokes vector 
+*     reference direction. If no SkyFrame is available or if the
+*     direction of north is not defined, then the positive direction of
+*     the second pixel axis (Y) is used instead. The selected reference
+*     direction is recorded in the POLPACK extension of the output cube
+*     as item ANGROT (the anti-clockwise angle from the first pixel axis
+*     (X) to the reference direction, in degrees).
+*     -  An item VERSION is added to the polpack extension indicating the 
+*     current version number of the POLPACK package.
+
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
  
@@ -121,6 +135,7 @@
       INTEGER WSCH               ! Weighting scheme to use
       LOGICAL INVAR              ! Use input variances?
       LOGICAL OUTVAR             ! Create output variances?
+      REAL ANGROT                ! ACW angle from +X to o/p ref. direction
       REAL NSIGMA                ! Rejection threshold
 *.
 
@@ -256,9 +271,8 @@
       CALL NDF_XDEL( INDFO, 'POLPACK', STATUS )
       CALL NDF_XNEW( INDFO, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS ) 
 	
-*  Store the ANGROT value (always zero since the reference direction for
-*  the Stokes vector is always the X axis).
-      CALL NDF_XPT0R( 0.0, INDFO, 'POLPACK', 'ANGROT', STATUS ) 
+*  Store the current POLPACK version string in the POLPACK extension.
+      CALL POL1_PTVRS( INDFO, STATUS )
 
 *  Store the STOKES value which indicates what each plane of the cube
 *  contains.
@@ -304,7 +318,7 @@
       CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
      :                 INDFO, INDFC, NITER, NSIGMA, ILEVEL, SMBOX/2,
-     :                 STATUS )
+     :                 ANGROT, STATUS )
 
 *  Tidy up.
 *  ========
