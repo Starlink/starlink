@@ -38,6 +38,7 @@ extern "C" {
 #undef HAVE_PROTOTYPES
 #endif
 
+
 bool kpathsea::initialised_ = false;
 verbosities kpathsea::verbosity_ = normal;
 
@@ -56,7 +57,30 @@ void kpathsea::init (const char *program_name, const int basedpi)
     else
 	cerr << "TEXMFCNF=" << texmfcnf << '\n';
 #endif
+
+#ifdef FAKE_PROGNAME
+    // Lie about the program name, so we can influence the definitions of
+    // the SELFAUTO{LOC,DIR,PARENT} variables.
+    //
+    // kpse_set_program_name uses the value of program_invocation_name if
+    // that's defined, and defines it, and initialises it to program_name,
+    // if it's not.  The only way we can reliably intervene here is by
+    // setting that variable ourselves.  Unfortunately, this means that we're
+    // lying about this for the remainder of this program, but we can't do
+    // better than this without independently discovering for ourselves if 
+    // program_invocation_name is set in the libc library.  We can't get
+    // round this by defining the variables by hand ourselves, since 
+    // kpse_set_program_name does elaborate following of links and other
+    // consistency checks, which we do not want to duplicate here.
+    //
+    // In any case, this is supposed to be not much more than a hack to avoid
+    // being bitten by arguably misconfigured texmf.cnf files, so don't lose
+    // sleep over it.
+    program_name = program_invocation_name = FAKE_PROGNAME;
+#endif
+
     kpse_set_program_name (program_name, "dvi2bitmap");
+
     //kpse_init_prog ("TEX", basedpi, "localfont", "cmr10");
     kpse_init_prog ("TEX", basedpi, NULL, NULL);
     initialised_ = true;

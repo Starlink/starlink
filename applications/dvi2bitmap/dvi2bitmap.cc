@@ -305,6 +305,9 @@ main (int argc, char **argv)
 #ifdef DEFAULT_TEXMFCNF
 		cout << "DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
 #endif
+#ifdef FAKE_PROGNAME
+		cout << "FAKE_PROGNAME=" << FAKE_PROGNAME << '\n';
+#endif
 		if (*++*argv == 'V')
 		    cout << RCSID << '\n';
 		exit(0);	// ...and exit
@@ -637,7 +640,7 @@ bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
 		    {
 			bool seenHash = false;
 			b.ofile_pattern = "";
-			for (int i=0; i<s->length(); i++)
+			for (unsigned int i=0; i<s->length(); i++)
 			{
 			    char c;
 			    if ((c=(*s)[i]) == '#')
@@ -669,7 +672,7 @@ bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
 		string side_s = *s;
-		Bitmap::Margin side;
+		Bitmap::Margin side = Bitmap::All;
 		s++;
 		if (s == l.end()) { stringOK = false; break; }
 		int dimen = atoi (s->c_str());
@@ -683,7 +686,6 @@ bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
 		    npixels += oneInch;
 		}
 		dimen = static_cast<int>(npixels);
-		bool cropAll = false;
 
 		if (side_s == "left")
 		    side = Bitmap::Left;
@@ -694,7 +696,7 @@ bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
 		else if (side_s == "bottom")
 		    side = Bitmap::Bottom;
 		else if (side_s == "all")
-		    cropAll = true;
+		    side = Bitmap::All;
 		else
 		    stringOK = false;
 
@@ -705,7 +707,7 @@ bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
 			 << '\n';
 
 		if (stringOK)
-		    if (cropAll)
+		    if (side == Bitmap::All)
 		    {
 			if (setDefault)
 			    for (int tside=0; tside<4; tside++)

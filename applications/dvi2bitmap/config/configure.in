@@ -87,6 +87,15 @@ AC_ARG_ENABLE(maketexpk,
   test -z "$MKTEXPK_PATH" && test -n "MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"),
   test -z "$MKTEXPK_PATH" && test -n "MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"))
 
+dnl   Do we want to use the fake_progname feature in kpathsea.cc?
+AC_PATH_PROG(XDVI_PATH, xdvi)
+AC_ARG_ENABLE(fake-progname,
+[  --enable-fake-progname[=prog] Have dvi2bitmap lie about its name],
+  if test "$enableval" = "yes"
+  then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${XDVI_PATH}")
+  elif test "$enableval" != "no"
+  then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${enableval}")
+  fi)
 
 dnl   Specify support for Kpathsea library
 AC_SUBST(KPATHSEAOBJ)
