@@ -2,12 +2,12 @@ package PDL::IO::NDF;
 
 =head1 NAME
 
-  PDL::Io::NDF - PDL Module for reading and writing Starlink
+PDL::IO::NDF - PDL Module for reading and writing Starlink
                  N-dimensional data structures as PDLs.
 
 =head1 SYNOPSIS
 
-  use PDL::Io::NDF;
+  use PDL::IO::NDF;
 
   $a = PDL->rndf($file);
 
@@ -72,23 +72,24 @@ $EXTNAME = 'NDF_EXT';
 
 =head2 rndf()
 
-  Reads a piddle from a NDF format data file.
+Reads a piddle from a NDF format data file.
 
      $pdl = rndf('file.sdf');
      $pdl = rndf('file.sdf',1);
 
-  The '.sdf' suffix is optional. The optional second argument turns off
-  automatic quality masking and returns a quality array as well.
+The '.sdf' suffix is optional. The optional second argument turns off
+automatic quality masking and returns a quality array as well.
 
-  Header information and NDF Extensions are stored in the piddle as a hash
-  which can be retreived with the $pdl->gethdr command.
-  Array extensions are stored in the header as follows:
+Header information and NDF Extensions are stored in the piddle as a hash
+which can be retreived with the $pdl->gethdr command.
+Array extensions are stored in the header as follows:
 
      $a - the base DATA_ARRAY
 
-  If $hdr = $a->gethdr;
+If $hdr = $a->gethdr;
 
-  then:
+then:
+
       %{$hdr}        contains all the FITS headers plus:
       $$hdr{Error}   contains the Error/Variance PDL
       $$hdr{Quality} The quality byte array (if reqeusted)
@@ -202,31 +203,31 @@ sub PDL::rndf {  # Read a piddle from a NDF file
 
 =head2 wndf()
 
-  Writes a piddle to a NDF format file:
+Writes a piddle to a NDF format file:
 
    $pdl->wndf($file);
    wndf($pdl,$file);
 
-  wndf can be used for writing PDLs to NDF files. All the extensions
-  created by rndf are supported by wndf.  This means that error, axis
-  and quality arrays will be written if they exist. Extensions are also
-  reconstructed by using their name (ie FIGARO.TEST would be expanded as
-  a FIGARO extension and a TEST component). Hdr keywords Label, Title
-  and Units are treated as special cases and are written to the label,
-  title and units fields of the NDF.
+wndf can be used for writing PDLs to NDF files. All the extensions
+created by rndf are supported by wndf.  This means that error, axis
+and quality arrays will be written if they exist. Extensions are also
+reconstructed by using their name (ie FIGARO.TEST would be expanded as
+a FIGARO extension and a TEST component). Hdr keywords Label, Title
+and Units are treated as special cases and are written to the label,
+title and units fields of the NDF.
 
-  Header information is written to corresponding NDF extensions.
-  NDF extensions can also be created in the {NDF} hash by using a key
-  containing '.', ie {NDF}{'IRAS.DATA'} would write the information to
-  an IRAS.DATA extension in the NDF. rndf stores this as
-  $$hdr{NDF}{IRAS}{DATA} and the two systems are interchangeable.
+Header information is written to corresponding NDF extensions.
+NDF extensions can also be created in the {NDF} hash by using a key
+containing '.', ie {NDF}{'IRAS.DATA'} would write the information to
+an IRAS.DATA extension in the NDF. rndf stores this as
+$$hdr{NDF}{IRAS}{DATA} and the two systems are interchangeable.
 
-  rndf stores type information in {NDF}{'_TYPES'} and below so that
-  wndf can reconstruct the data type of non-PDL extensions. If no
-  entry exists in _TYPES, wndf chooses between characters, integer and
-  double on a best guess basis.  Any perl arrays are written as CHAR
-  array extensions (on the assumption that numeric arrays will exist as
-  PDLs).
+rndf stores type information in {NDF}{'_TYPES'} and below so that
+wndf can reconstruct the data type of non-PDL extensions. If no
+entry exists in _TYPES, wndf chooses between characters, integer and
+double on a best guess basis.  Any perl arrays are written as CHAR
+array extensions (on the assumption that numeric arrays will exist as
+PDLs).
 
 =cut
 
@@ -389,7 +390,7 @@ The perl NDF module must be available.
 =head1 AUTHOR
 
 This module was written by Tim Jenness, t.jenness@jach.hawaii.edu.
-Copyright (C) Tim Jenness 1997.
+Copyright (C) Tim Jenness 1997-1999.
 
 =head1 SEE ALSO
 
