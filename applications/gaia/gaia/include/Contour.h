@@ -149,7 +149,7 @@ public:
 
   // Maximum of two values of the same type.
 #define GENERATE_MAX( T ) \
-  inline T& max( const T& a, const T &b ) \
+  inline const T& max( const T& a, const T &b ) \
      { return a > b ? a : b; }
   GENERATE_MAX(char);
   GENERATE_MAX(unsigned char);
@@ -161,7 +161,7 @@ public:
 
   // Minimum of two values of the same type.
 #define GENERATE_MIN( T ) \
-  inline T& min( const T& a, const T& b ) \
+  inline const T& min( const T& a, const T& b ) \
      { return a < b ? a : b; }
   GENERATE_MIN(char);
   GENERATE_MIN(unsigned char);
