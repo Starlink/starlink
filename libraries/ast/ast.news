@@ -44,6 +44,19 @@ o  The value of the Plot attribute NumLab, which controls the
    effect on whether labelling of a coordinate grid is interior or
    exterior (as controlled by the Labelling attribute).
 
+o  Some support is now provided for use of the IRAF-specific "ZPX"
+   sky projection in FITS headers.
+
+o  The coordinate system "ICRS" is now recognised in FITS headers and
+   is taken to be equivalent to "FK5" (as an interim measure).
+
+o  A bug has been fixed which could cause longitude values to be
+   incorrect by 180 degrees when using cylindrical sky projections.
+
+o  A bug has been fixed which could result in incorrect naming of the
+   FITS sky projection parameters ProjP(0) to ProjP(9) when writing
+   them	out as FITS cards.
+
 o  Some minor memory leaks have been fixed.
 
 o  A small number of documentation errors have been corrected.

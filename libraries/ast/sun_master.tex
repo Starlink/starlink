@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.5}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {11th November 1999}
+\newcommand{\stardocdate}      {17th December 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -16951,6 +16951,29 @@ suppressed on one axis only by setting the length to zero.
 plotting of numerical labels on coordinate axes, no longer has any
 effect on whether labelling of a coordinate grid is interior or
 exterior (as controlled by the Labelling attribute).
+
+\item The FitsChan class now provides some support for the
+IRAF-specific ``ZPX'' sky projection, which is converted transparently
+into the equivalent FITS ``ZPN'' projection (see the description of the
+Encoding attribute for details).
+
+\item The FitsChan class now recognises the coordinate system ``ICRS''
+(International Celestial Reference System) as equivalent to
+``FK5''. This is an interim measure and full support for the
+(exceedingly small) difference between ICRS and FK5 will be added at a
+future release.
+
+Note that ``ICRS'' is not yet recognised as a coordinate system by other
+classes such as SkyFrame, so this change only facilitates the
+importation of foreign data.
+
+\item A bug in the FitsChan class has been fixed which could result in
+longitude values being incorrect by 180 degrees when using cylindrical
+sky projections, such as the FITS ``CAR'' projection.
+
+\item A bug in the FitsChan class has been fixed which could result in
+the FITS sky projection parameters ProjP(0) to ProjP(9) being
+incorrectly named PROJP1 to PROJP10 when written out as FITS cards.
 
 \item Some minor memory leaks have been fixed.
 
