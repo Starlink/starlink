@@ -255,9 +255,9 @@
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
                IF( ILEVEL .GE. 2 ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
-        :                       'does not matter and so is being '//
-        :                       'ignored... The F factors may only '//
-        :                       'be approximate!', STATUS )
+     :                       'does not matter and so is being '//
+     :                       'ignored... The F factors may only '//
+     :                       'be approximate!', STATUS )
                   CALL ERR_FLUSH( STATUS )
                ELSE
                   CALL ERR_ANNUL( STATUS )
@@ -285,9 +285,9 @@
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
                IF( ILEVEL .GE. 2 ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
-        :                       'does not matter and so is being '//
-        :                       'ignored... The F factors may only '//
-        :                       'be approximate!', STATUS )
+     :                       'does not matter and so is being '//
+     :                       'ignored... The F factors may only '//
+     :                       'be approximate!', STATUS )
                   CALL ERR_FLUSH( STATUS )
                ELSE
                   CALL ERR_ANNUL( STATUS )
@@ -339,8 +339,8 @@
             ELSE
                IF( ILEVEL .GE. 2 ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
-        :                       'does not matter and so is being '//
-        :                       'ignored...', STATUS )
+     :                       'does not matter and so is being '//
+     :                       'ignored...', STATUS )
                   CALL ERR_FLUSH( STATUS )
                ELSE
                   CALL ERR_ANNUL( STATUS )
@@ -370,9 +370,9 @@
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
                IF( ILEVEL .GE. 2 ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
-        :                       'does not matter and so is being '//
-        :                       'ignored... The F factors may only '//
-        :                       'be approximate!', STATUS )
+     :                       'does not matter and so is being '//
+     :                       'ignored... The F factors may only '//
+     :                       'be approximate!', STATUS )
                   CALL ERR_FLUSH( STATUS )
                ELSE
                   CALL ERR_ANNUL( STATUS )
@@ -400,9 +400,9 @@
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
                IF( ILEVEL .GE. 2 ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
-        :                       'does not matter and so is being '//
-        :                       'ignored... The F factors may only '//
-        :                       'be approximate!', STATUS )
+     :                       'does not matter and so is being '//
+     :                       'ignored... The F factors may only '//
+     :                       'be approximate!', STATUS )
                   CALL ERR_FLUSH( STATUS )
                ELSE
                   CALL ERR_ANNUL( STATUS )
@@ -446,8 +446,8 @@
             ELSE
                IF( ILEVEL .GE. 2 ) THEN
                   CALL ERR_REP( ' ', 'The above error probably '//
-        :                       'does not matter and so is being '//
-        :                       'ignored...', STATUS )
+     :                       'does not matter and so is being '//
+     :                       'ignored...', STATUS )
                   CALL ERR_FLUSH( STATUS )
                ELSE
                   CALL ERR_ANNUL( STATUS )
