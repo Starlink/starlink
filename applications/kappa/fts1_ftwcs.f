@@ -21,9 +21,9 @@
 *     It can also create AXIS structures (see below).
 *
 *     The information needed to create the FrameSet can be stored several
-*     times in a single FITS header, using different keywords each time.
-*     Each of these descriptions is known as an "encoding" and AST supports 
-*     several different encoding schemes (i.e. FITS-WCS, DSS, NATIVE).
+*     times in a single FITS header, using different keywords each time. Each
+*     of these descriptions is known as an "encoding" and AST supports several
+*     different encoding schemes (i.e. FITS-WCS, FITS-IRAF, DSS, NATIVE).
 *     If the supplied FITS header contains more than one encoding then we
 *     need to choose which one to use. This decision is important because
 *     is is possible for encodings to be inconsistent (i.e. software may
@@ -43,7 +43,7 @@
 *     if it is equivalent to pixel coordinates, and so no AXIS structures 
 *     will be created by this routine in this case. Also, if the AXIS Frame 
 *     represents linear axis coordinates, then there will already be AXIS 
-*     structures in the NDF (created earlier within FITS2NDF), and so again 
+*     structures in the NDF (created earlier within FITSIN), and so again 
 *     no AXIS  structures will be created by this routine. Thus, this routine 
 *     will only create AXIS structures in the cases where the axis coordinates 
 *     are non-linear.
@@ -80,6 +80,8 @@
 *        Original version.
 *     14-SEP-1998 (DSB):
 *        Changed to report the first 3 bad header cards.
+*     9-DEC-1998 (DSB):
+*        Included FITS-IRAF encoding.
 *     {enter_changes_here}
 
 *  Bugs:
