@@ -46,7 +46,7 @@ stylesheet will be written to the file named by '%latex-manifest%'.
 	)
 
 <routine>
-<routinename>%latex-document-preamble%
+<routinename>%latex-document-general-preamble%
 <description>
 <p>Any definitions which are to be emitted as part of the LaTeX
 preamble.
@@ -77,11 +77,18 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 
 <returnvalue type=string>String with the LaTeX preamble in it.
 <codebody>
-(define %latex-document-preamble%
-  (string-append
+(define %latex-document-general-preamble%
    "\\setcounter{secnumdepth}{0}
 \\setcounter{tocdepth}{2}
-%
+\\pagestyle{myheadings}
+\\setlength{\\textwidth}{160mm}
+\\setlength{\\textheight}{230mm}
+\\setlength{\\topmargin}{-2mm}
+\\setlength{\\oddsidemargin}{0mm}
+\\setlength{\\evensidemargin}{0mm}
+\\setlength{\\parindent}{0mm}
+\\setlength{\\parskip}{\\medskipamount}
+\\setlength{\\unitlength}{1mm}
 \\makeatletter
 <!-- Catcode all specials to other, and add discretionary hyphenation for
      dots and slashes within URLs and paths.  There's no need for any
@@ -116,8 +123,10 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\long\\def\\setAbstract#1{\\def\\@Abstract{#1}}
 \\let\\@Title\\@empty
 \\def\\setTitle#1{\\def\\@Title{#1}}
+\\let\\@SubTitle\\@empty
+\\def\\setSubTitle#1{\\def\\@SubTitle{#1}}
 \\let\\@DocCode\\@empty
-\\def\\setDocCode#1{\\def\\@DocCode{#1}}
+\\def\\setDocCode#1{\\def\\@DocCode{#1}\\markboth{\\@DocCode}{\\@DocCode}}
 \\let\\@DocRef\\@empty
 \\def\\setDocRef#1{\\def\\@DocRef{#1}}
 \\let\\@Authorlist\\@empty
@@ -156,7 +165,10 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
     \\@Date
   \\end{flushright}
   \\vspace{-4mm}\\rule{\\textwidth}{0.5mm}\\vspace{5mm}
-  \\begin{center}\\Huge\\bfseries \\@Title\\end{center}\\vspace{4ex}
+  \\begin{center}\\Huge\\bfseries \\@Title
+    \\ifx\\@SubTitle\\@empty\\else
+        \\vspace{2ex}\\\\\\LARGE\\bfseries\\@SubTitle\\fi
+    \\end{center}\\vspace{4ex}
   \\ifx\\@Abstract\\@empty\\else		% optional
     \\vspace{10mm}\\begin{center}\\Large\\bfseries Abstract\\end{center}
       \\begin{flushleft}\\@Abstract\\end{flushleft}\\fi
@@ -169,29 +181,41 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\newenvironment{VersoTitlepage}{\\clearpage\\hbox{}\\vfill}{%
   \\ifx\\@Copyright\\@empty\\else
     \\par\\vspace{2ex}\\copyright \\@Copyright\\fi}
-<!--
-%% Generate the TOC in a single LaTeX pass.
-%% This should be generic enough that LOT and LOF should be similar
-%%\\newcommand\\TableOfContents{\\clearpage\\tableofcontents}
-%\\newcommand\\TableOfContents{\\cleardoublepage
-%  \\newwrite\\tf@toc
-%  \\immediate\\openout\\tf@toc \\jobname.toc \\relax
-%  \\immediate\\write\\tf@toc{\\string\\renewcommand\\string\\thepage{\\string\\roman{page}}\\string\\setcounter{page}{\\arabic{page}}}
-%  \\immediate\\write\\tf@toc{\\string\\section*{Table of Contents}}
-%  \\AtEndDocument\\ReadTableOfContents
-%  }
-%% Redefine addtocontents, to avoid writing via aux file
-%\\def\\addtocontents#1#2{\\write\\csname tf@#1\\endcsname{#2}}
-%\\newcommand\\ReadTableOfContents{%
-%  \\cleardoublepage
-%  \\immediate\\closeout\\tf@toc
-%  \\@input{\\jobname.toc}}
-% Generate TOC+LOF+LOT in a single LaTeX pass.
-% TOC etc appear at _end_ of document, with correct page numbers.
-% Use standard aux-file mechanism.  Indirection isn't necessary here, but
-% too complicated to replace.
--->
-\\def\\@OpenTocFile#1{\\expandafter\\newwrite\\csname tf@#1\\endcsname
+<!-- replace \\caption, and hence table/figure counter and assoc
+     mechanisms.  Allow the caller to set the caption type, which is
+     necessary if we set a tabular+caption outside of a (floating) {table}.
+     -->
+\\def\\SetCapType#1{\\def\\@captype{#1}}%
+\\def\\Caption#1#2{\\expandafter\\def\\csname fnum@\\@captype\\endcsname{#1}%
+  \\expandafter\\def\\csname the\\@captype\\endcsname{#2}%
+  \\@dblarg{\\@caption\\@captype}}
+<!-- Set equation number -->
+\\newif\\if@SetEqnNum\\@SetEqnNumfalse
+\\def\\SetEqnNum#1{\\global\\def\\Eqn@Number{#1}\\global\\@SetEqnNumtrue}
+\\def\\@eqnnum{{\\normalfont \\normalcolor (\\Eqn@Number)}}
+\\def\\equation{$$}
+\\def\\endequation{\\if@SetEqnNum\\eqno \\hbox{\\@eqnnum}\\global\\@SetEqnNumfalse\\fi 
+    $$\\@ignoretrue}
+\\def\\@@eqncr{\\let\\reserved@a\\relax
+    \\ifcase\\@eqcnt \\def\\reserved@a{& & &}\\or \\def\\reserved@a{& &}%
+     \\or \\def\\reserved@a{&}\\else
+       \\let\\reserved@a\\@empty
+       \\@latex@error{Too many columns in eqnarray environment}\\@ehc\\fi
+     \\reserved@a \\if@SetEqnNum\\@eqnnum\\global\\@SetEqnNumfalse\\fi
+     \\global\\@eqcnt\\z@\\cr}
+% Make \\nonumber a no-op, so it can't cause confusion
+\\let\\nonumber\\relax
+<!-- Other bits and bobs -->
+\\def\\Underscore{\\ifmmode _\\else\\texttt{\\char\"5F}\\fi}
+\\def\\Eqnref#1{Eqn.~(#1)}
+")
+
+(define %latex-ordinary-toc%
+  "\\def\\TableOfContents{\\clearpage\\tableofcontents}
+")
+
+(define %latex-onepass-toc%
+  "\\def\\@OpenTocFile#1{\\expandafter\\newwrite\\csname tf@#1\\endcsname
   \\immediate\\openout\\csname tf@#1\\endcsname \\jobname.#1 \\relax}
 \\newcommand\\TableOfContents{\\cleardoublepage
   \\xdef\\@TocStartPage{\\the\\c@page}
@@ -230,63 +254,33 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
        \\@input{\\jobname.lot}}%
     \\clearpage  % flush pages
     }}
-<!-- replace \\caption, and hence table/figure counter and assoc mechanisms -->
-\\def\\Caption#1#2{\\expandafter\\def\\csname fnum@\\@captype\\endcsname{#1}%
-  \\expandafter\\def\\csname the\\@captype\\endcsname{#2}%
-  \\@dblarg{\\@caption\\@captype}}
-<!-- Set equation number -->
-\\newif\\if@SetEqnNum\\@SetEqnNumfalse
-\\def\\SetEqnNum#1{\\global\\def\\Eqn@Number{#1}\\global\\@SetEqnNumtrue}
-\\def\\@eqnnum{{\\normalfont \\normalcolor (\\Eqn@Number)}}
-\\def\\equation{$$}
-\\def\\endequation{\\if@SetEqnNum\\eqno \\hbox{\\@eqnnum}\\global\\@SetEqnNumfalse\\fi 
-    $$\\@ignoretrue}
-\\def\\@@eqncr{\\let\\reserved@a\\relax
-    \\ifcase\\@eqcnt \\def\\reserved@a{& & &}\\or \\def\\reserved@a{& &}%
-     \\or \\def\\reserved@a{&}\\else
-       \\let\\reserved@a\\@empty
-       \\@latex@error{Too many columns in eqnarray environment}\\@ehc\\fi
-     \\reserved@a \\if@SetEqnNum\\@eqnnum\\global\\@SetEqnNumfalse\\fi
-     \\global\\@eqcnt\\z@\\cr}
-% Make \\nonumber a no-op, so it can't cause confusion
-\\let\\nonumber\\relax
-<!-- Other bits and bobs -->
-\\def\\Underscore{\\ifmmode _\\else\\texttt{\\char\"5F}\\fi}
-\\def\\Eqnref#1{Eqn.~(#1)}
-%\\catcode`\\^^M=10 % make end-of-line a space
-\\makeatother
-"
-<!-- Add the sst.tex file from the now-defunct SUN/110 distribution -->
-"% +
+")
+
+(define %latex-sst-preamble%
+  ;;Add the sst.tex file from the now-defunct SUN/110 distribution
+  "%+
 %  Name:
 %     SST.TEX
-
 %  Purpose:
 %     Define LaTeX commands for laying out Starlink routine descriptions.
-
 %  Language:
 %     LaTeX
-
 %  Type of Module:
 %     LaTeX data file.
-
 %  Description:
 %     This file defines LaTeX commands which allow routine documentation
 %     produced by the SST application PROLAT to be processed by LaTeX and
 %     by LaTeX2html. The contents of this file should be included in the
 %     source prior to any statements that make of the sst commnds.
-
 %  Notes:
 %     The commands defined in the style file html.sty provided with LaTeX2html 
 %     are used. These should either be made available by using the appropriate
 %     sun.tex (with hypertext extensions) or by putting the file html.sty 
 %     on your TEXINPUTS path (and including the name as part of the  
 %     documentstyle declaration).
-
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
 %     PDRAPER: P.W. Draper (Starlink - Durham University)
-
 %  History:
 %     10-SEP-1990 (RFWS):
 %        Original version.
@@ -297,21 +291,16 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 %     8-DEC-1994 (PDRAPER):
 %        Added support for simplified formatting using LaTeX2html.
 %     {enter_further_changes_here}
-
 %  Bugs:
 %     {note_any_bugs_here}
-
-% -
-
+%-
 %  Define length variables.
 \\newlength{\\sstbannerlength}
 \\newlength{\\sstcaptionlength}
 \\newlength{\\sstexampleslength}
 \\newlength{\\sstexampleswidth}
-
 %  Define a \\tt font of the required size.
 \\newfont{\\ssttt}{cmtt10 scaled 1095}
-
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
 \\newcommand{\\sstroutine}[3]{
@@ -334,17 +323,12 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
       #3
    \\end{description}
 }
-
 %  Format the description section.
 \\newcommand{\\sstdescription}[1]{\\item[Description:] #1}
-
 %  Format the usage section.
 \\newcommand{\\sstusage}[1]{\\item[Usage:] \\mbox{} \\\\[1.3ex] {\\ssttt #1}}
-
-
 %  Format the invocation section.
 \\newcommand{\\sstinvocation}[1]{\\item[Invocation:]\\hspace{0.4em}{\\tt #1}}
-
 %  Format the arguments section.
 \\newcommand{\\sstarguments}[1]{
    \\item[Arguments:] \\mbox{} \\\\
@@ -353,7 +337,6 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
       #1
    \\end{description}
 }
-
 %  Format the returned value section (for a function).
 \\newcommand{\\sstreturnedvalue}[1]{
    \\item[Returned Value:] \\mbox{} \\\\
@@ -362,7 +345,6 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
       #1
    \\end{description}
 }
-
 %  Format the parameters section (for an application).
 \\newcommand{\\sstparameters}[1]{
    \\item[Parameters:] \\mbox{} \\\\
@@ -371,7 +353,6 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
       #1
    \\end{description}
 }
-
 %  Format the examples section.
 \\newcommand{\\sstexamples}[1]{
    \\item[Examples:] \\mbox{} \\\\
@@ -380,27 +361,20 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
       #1
    \\end{description}
 }
-
 %  Define the format of a subsection in a normal section.
 \\newcommand{\\sstsubsection}[1]{ \\item[{#1}] \\mbox{} \\\\}
-
 %  Define the format of a subsection in the examples section.
 \\newcommand{\\sstexamplesubsection}[2]{\\sloppy
 \\item[\\parbox{\\sstexampleslength}{\\ssttt #1}] \\mbox{} \\\\ #2 }
-
 %  Format the notes section.
 \\newcommand{\\sstnotes}[1]{\\item[Notes:] \\mbox{} \\\\[1.3ex] #1}
-
 %  Provide a general-purpose format for additional (DIY) sections.
 \\newcommand{\\sstdiytopic}[2]{\\item[{\\hspace{-0.35em}#1\\hspace{-0.35em}:}] \\mbox{} \\\\[1.3ex] #2}
-
 %  Format the implementation status section.
 \\newcommand{\\sstimplementationstatus}[1]{
    \\item[{Implementation Status:}] \\mbox{} \\\\[1.3ex] #1}
-
 %  Format the bugs section.
 \\newcommand{\\sstbugs}[1]{\\item[Bugs:] #1}
-
 %  Format a list of items while in paragraph mode.
 \\newcommand{\\sstitemlist}[1]{
   \\mbox{} \\\\
@@ -409,12 +383,59 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
      #1
   \\end{itemize}
 }
-
 %  Define the format of an item.
 \\newcommand{\\sstitem}{\\item}
-
 %  End of sst.tex layout definitions.
 % .
 % @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
-"))
+")
 
+(define %latex-end-preamble%
+  "%\\catcode`\\^^M=10 % make end-of-line a space
+\\makeatother
+")
+
+<routine>
+<routinename>section-samepage
+<description>
+If true, sections will not automatically start a new page (ie, the
+default is that they will).  This can conveniently ve set with
+<code/-V section-samepage/ on the Jade command line. 
+<returnvalue type=boolean>True if sections are to start a new page.
+<codebody>
+(define section-samepage
+  #f)
+
+<routine>
+<routinename>appendix-samepage
+<description>
+If true, appendices will not automatically start a new page (ie, the
+default is that they will).  This can conveniently ve set with
+<code/-V appendix-samepage/ on the Jade command line. 
+<returnvalue type=boolean>True if sections are to start a new page.
+<codebody>
+(define appendix-samepage
+  #f)
+
+<routine>
+<routinename>onepass-latex
+<description>
+If true, the generatex LaTeX will be such that it can be processed in
+a single pass.  This has the side-effect that the table of contents
+is printed last, even though it has the correct page-numbering.
+This can conveniently ve set with
+<code/-V onepass-latex/ on the Jade command line. 
+<returnvalue type=boolean>True if we are to generate one-pass LaTeX.
+<codebody>
+(define onepass-latex
+  #f)
+
+<routine>
+<routinename>%latex-float-spec%
+<description>The optional argument to the LaTeX floating
+environments.
+<returnvalue>String containing LaTeX float specification.  It must
+include the leading `?' which indicates it is an optional argument.
+<codebody>
+(define %latex-float-spec%
+  "?tph")
