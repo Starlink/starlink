@@ -1476,6 +1476,10 @@ const char *astGetC_( AstObject *this, const char *attrib ) {
    static int init = 0;          /* "strings" array initialised? */
    static int istr = 0;          /* Offset of next string in "strings" */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Initialise. */
    result = NULL;
 
@@ -1500,8 +1504,15 @@ const char *astGetC_( AstObject *this, const char *attrib ) {
    element, so the earlier string is effectively replaced by the new
    one.) */
    if ( astOK ) {
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
       strings[ istr ] = astStore( strings[ istr ], value,
                                   strlen( value ) + (size_t) 1 );
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
 
 /* If OK, return a pointer to the copy and increment "istr" to use the
    next element of "strings" on the next invocation. Recycle "istr" to
