@@ -989,22 +989,24 @@
 *  Get the original current frame index for future use.
                      JCUR = AST_GETI( IWCS, 'Current', STATUS )
 
-*  Generate a mapping representing the linear transformation.
-                     CALL CCD1_LNMAP( TR( 1, I ), MAPTFM, STATUS )
-
-*  Generate a frame in domain called OUTDM, the purpose of which is to 
-*  group the frames produced by this application.
-                     FRREG = AST_FRAME( 2, ' ', STATUS )
-                     CALL AST_SETC( FRREG, 'Domain', OUTDM, STATUS )
-                     CALL AST_SETC( FRREG, 'Title', 
-     :                              'Alignment by REGISTER', STATUS )
-
 *  Ensure the Current frame is the one relative to which we've got the 
 *  mapping.
                      IF ( .NOT. USEWCS ) THEN
                         CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
                      END IF
                      
+*  Generate a mapping representing the linear transformation.
+                     CALL CCD1_LNMAP( TR( 1, I ), MAPTFM, STATUS )
+
+*  Generate a frame in domain called OUTDM, the purpose of which is to 
+*  group the frames produced by this application.  It is a doctored 
+*  copy of the frame it's defined relative to.
+                     FRREG = AST_COPY( AST_GETFRAME( IWCS, AST__CURRENT,
+     :                                               STATUS), STATUS )
+                     CALL AST_SETC( FRREG, 'Domain', OUTDM, STATUS )
+                     CALL AST_SETC( FRREG, 'Title', 
+     :                              'Alignment by REGISTER', STATUS )
+
 *  Add the OUTDM domain frame, with the appropriate mapping, to the 
 *  WCS component of the NDF.  This will become the current frame.
                      CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAPTFM, 
