@@ -15,9 +15,9 @@
 *  Invocation:
 *     CALL BDF2NDF( STATUS )
 
-*   Arguments:
-*      STATUS = INTEGER (Given and Returned)
-*         The global status.
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application converts data files from the Bulk Data Frame
@@ -28,47 +28,47 @@
 *  Usage:
 *     BDF2NDF IN OUT [TYPE] [DESCRIP]
 
-*   ADAM Parameters:
-*      IN = BDF (Read)
-*         The BDF to be converted to an NDF.  A file extension must not
-*         be given since ".BDF" is assumed.
-*      OUT = NDF (Write)
-*         The name of NDF converted from the BDF.  It becomes the new
-*         current NDF.
-*      TYPE = LITERAL (Read)
-*         The data type of the output NDF.  It must be one of the
-*         following HDS types: "_BYTE", "_WORD", "_REAL", "_INTEGER",
-*         "_DOUBLE", "_UBYTE", "_UWORD" corresponding to signed byte,
-*         signed word, real, integer, double precision, unsigned byte,
-*         and unsigned word.  See SUN/92 for further details.  An
-*         unambiguous abbreviation may be given.  The default is the
-*         type corresponding to that of the BDF.  []
-*      DESCRIP = _LOGICAL (Read)
-*         If true the descriptors in the BDF are reported as they are
-*         copied to the FITS extension within the output NDF. [FALSE]
-*      CONNECT = FILENAME (Write)
-*         The Interim connection file.  It is deleted when the
-*         application terminates.  [NDF2BDF.TMP]
-*      COMMAND = FILENAME (Write)
-*         The Interim command file.  It is deleted when the application
-*         terminates.  [USERCOM.TMP]
+*  ADAM Parameters:
+*     IN = BDF (Read)
+*        The BDF to be converted to an NDF.  A file extension must not
+*        be given since ".BDF" is assumed.
+*     OUT = NDF (Write)
+*        The name of NDF converted from the BDF.  It becomes the new
+*        current NDF.
+*     TYPE = LITERAL (Read)
+*        The data type of the output NDF.  It must be one of the
+*        following HDS types: "_BYTE", "_WORD", "_REAL", "_INTEGER",
+*        "_DOUBLE", "_UBYTE", "_UWORD" corresponding to signed byte,
+*        signed word, real, integer, double precision, unsigned byte,
+*        and unsigned word.  See SUN/92 for further details.  An
+*        unambiguous abbreviation may be given.  The default is the
+*        type corresponding to that of the BDF.  []
+*     DESCRIP = _LOGICAL (Read)
+*        If true the descriptors in the BDF are reported as they are
+*        copied to the FITS extension within the output NDF. [FALSE]
+*     CONNECT = FILENAME (Write)
+*        The Interim connection file.  It is deleted when the
+*        application terminates.  [NDF2BDF.TMP]
+*     COMMAND = FILENAME (Write)
+*        The Interim command file.  It is deleted when the application
+*        terminates.  [USERCOM.TMP]
 
 *  Examples:
 *     BDF2NDF OLD NEW
-*         This converts the BDF called OLD (in file OLD.BDF) to the NDF
-*         called NEW (in file NEW.SDF).  NEW's data array will have
-*         the same data type as that of OLD.  Descriptors are copied
-*         to the FITS extension but are not reported.
+*        This converts the BDF called OLD (in file OLD.BDF) to the NDF
+*        called NEW (in file NEW.SDF).  NEW's data array will have
+*        the same data type as that of OLD.  Descriptors are copied
+*        to the FITS extension but are not reported.
 *     BDF2NDF OLD NEW DESCRIP
-*         This converts the BDF called OLD (in file OLD.BDF) to the NDF
-*         called NEW (in file NEW.SDF).  NEW's data array will have
-*         the same data type as that of OLD.  Descriptors are copied
-*         to the FITS extension and are reported.
+*        This converts the BDF called OLD (in file OLD.BDF) to the NDF
+*        called NEW (in file NEW.SDF).  NEW's data array will have
+*        the same data type as that of OLD.  Descriptors are copied
+*        to the FITS extension and are reported.
 *     BDF2NDF HORSE HORSE TYPE="_WORD"
-*         This converts the BDF called HORSE (in file HORSE.BDF) to the
-*         NDF also called HORSE (in file HORSE.SDF).  The NDF's data
-*         array will contain signed 2-byte integers.  Descriptors are
-*         copied to the FITS extension but are not reported.
+*        This converts the BDF called HORSE (in file HORSE.BDF) to the
+*        NDF also called HORSE (in file HORSE.SDF).  The NDF's data
+*        array will contain signed 2-byte integers.  Descriptors are
+*        copied to the FITS extension but are not reported.
 
 *  Notes:
 *     -  The conversion rules can be summarised as follow:
