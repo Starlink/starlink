@@ -601,7 +601,7 @@
                CALL MSG_OUT( ' ', '  Number of input NDFs ^NNDF not '
      :         // 'divisible by SETSIZE ^SETSIZ - try again.',
      :         STATUS )
-               CALL PAR_CANCL( 'SETSIZ', STATUS )
+               CALL PAR_CANCL( 'SETSIZE', STATUS )
                NTRY = NTRY + 1
                GO TO 1
             ELSE
