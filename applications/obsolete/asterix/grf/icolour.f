@@ -15,6 +15,7 @@
 *       5 May 94: V1.7-5 SMG converted to TSM (DJA)
 *       2 Jun 94: V1.7-6 Bug fix (RJV)
 *      16 Aug 94: V1.7-7 Bug fix (not reading colours) (RJV)
+*      14 Aug 95: V1.8-0 Interface with GUI (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -31,7 +32,7 @@
       CHARACTER*10 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICOLOUR Version 1.7-7')
+      PARAMETER (VERSION = 'ICOLOUR Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -58,7 +59,13 @@
         CALL GCB_ATTACH('IMAGE',STATUS)
         CALL IMG_2DGCB(STATUS)
 
-        IF (MODE.EQ.'READ') THEN
+        IF (MODE.EQ.'LOAD'.AND.I_GUI) THEN
+          CALL ICOLOUR_GUI_LOAD(STATUS)
+        ELSEIF (MODE.EQ.'UPDATE'.AND.I_GUI) THEN
+          CALL ICOLOUR_GUI_UPDATE(STATUS)
+        ELSEIF (MODE.EQ.'SAVE'.AND.I_GUI) THEN
+          CALL ICOLOUR_GUI_SAVE(STATUS)
+        ELSEIF (MODE.EQ.'READ') THEN
           CALL ICOLOUR_RGB(.FALSE.,STATUS)
           CALL ICOLOUR_NEG(.FALSE.,STATUS)
           CALL ICOLOUR_READ(0,STATUS)
@@ -460,6 +467,8 @@
       ENDIF
 
       END
+
+
 
 
 
@@ -909,5 +918,196 @@
         ROW=ROW+1
       ENDDO
       CALL TSM_REFRESH( SCREENID, STATUS )
+
+      END
+
+
+
+
+*+  ICOLOUR_GUI_LOAD
+      SUBROUTINE ICOLOUR_GUI_LOAD(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Global variables :
+      REAL COL(3,16)
+      INTEGER NCOL,NSHADE,FIRST,LAST
+      COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
+*    Local variables :
+      INTEGER BGCOL
+      INTEGER I,N
+      LOGICAL OK
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+
+*  get current colour table
+        CALL GCB_GETI('COLOUR_N',OK,N,STATUS)
+        IF (OK.AND.N.EQ.16) THEN
+          DO I=1,N
+            CALL GCB_GET1R('COLOUR_RED',I,1,OK,COL(1,I),STATUS)
+            CALL GCB_GET1R('COLOUR_GREEN',I,1,OK,COL(2,I),STATUS)
+            CALL GCB_GET1R('COLOUR_BLUE',I,1,OK,COL(3,I),STATUS)
+          ENDDO
+        ELSE
+          CALL GFX_DEFCOLS(COL,STATUS)
+        ENDIF
+
+
+
+*  get colour capability of device
+        CALL GDV_COLOURS(BGCOL,FIRST,LAST,STATUS)
+*  how many useable colours
+        NCOL=LAST-FIRST+1
+
+*  how many shades between main colours
+        NSHADE=(NCOL-16)/15
+
+      ENDIF
+
+
+      END
+
+
+*+  ICOLOUR_GUI_UPDATE
+      SUBROUTINE ICOLOUR_GUI_UPDATE(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Global variables :
+      REAL COL(3,16)
+      INTEGER NCOL,NSHADE,FIRST,LAST
+      COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
+*    Local variables :
+      REAL RED,GREEN,BLUE
+      REAL REDHUE,GREENHUE,BLUEHUE
+      INTEGER ID,NB
+      INTEGER CI
+      INTEGER J,K,J1,J2
+      INTEGER ICOL
+*-
+
+      IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
+
+*  which colour is being changed
+        CALL NBS_FIND_ITEM(I_NBID,'COLOUR_',ID,STATUS)
+        CALL NBS_GET_VALUE(ID,0,VAL__NBI,ICOL,NB,STATUS)
+
+*  convert to colour index within full range
+        J1=MAX(1,ICOL-1)
+        J2=MIN(15,ICOL+1)
+        CI=FIRST+(J1-1)*(NSHADE+1)
+
+*  get new primary colours
+        CALL NBS_FIND_ITEM(I_NBID,'COLOUR_RED',ID,STATUS)
+        CALL NBS_GET_CVALUE(ID,0,STRING,NB,STATUS)
+        READ(STRING(:NB),*) RED
+        COL(1,ICOL)=RED
+        CALL NBS_FIND_ITEM(I_NBID,'COLOUR_GREEN',ID,STATUS)
+        CALL NBS_GET_CVALUE(ID,0,STRING,NB,STATUS)
+        READ(STRING(:NB),*) GREEN
+        COL(2,ICOL)=GREEN
+        CALL NBS_FIND_ITEM(I_NBID,'COLOUR_BLUE',ID,STATUS)
+        CALL NBS_GET_CVALUE(ID,0,STRING,NB,STATUS)
+        READ(STRING(:NB),*) BLUE
+        COL(3,ICOL)=BLUE
+
+*  set colour
+        DO J=J1,J2-1
+          RED=COL(1,J)
+          REDHUE=(COL(1,J+1)-RED)/REAL(NSHADE+1)
+          GREEN=COL(2,J)
+          GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
+          BLUE=COL(3,J)
+          BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
+          CALL PGSCR(CI,RED,GREEN,BLUE)
+          DO K=1,NSHADE
+            CI=CI+1
+            RED=RED+REDHUE
+            GREEN=GREEN+GREENHUE
+            BLUE=BLUE+BLUEHUE
+            CALL PGSCR(CI,RED,GREEN,BLUE)
+          ENDDO
+          CI=CI+1
+        ENDDO
+        RED=COL(1,J2)
+        GREEN=COL(2,J2)
+        BLUE=COL(3,J2)
+        CALL PGSCR(LAST,RED,GREEN,BLUE)
+
+      ENDIF
+
+      END
+
+
+*+  ICOLOUR_GUI_SAVE
+      SUBROUTINE ICOLOUR_GUI_SAVE(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Global variables :
+      REAL COL(3,16)
+      INTEGER NCOL,NSHADE,FIRST,LAST
+      COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
+*    Local variables :
+      REAL RED,GREEN,BLUE
+      REAL REDHUE,GREENHUE,BLUEHUE
+      INTEGER BGCOL,FIRST,LAST
+      INTEGER CI
+      INTEGER J,K,J1,J2
+      INTEGER ICHR
+      INTEGER ICOL
+      INTEGER ICOMP
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+
+*  get current colour table
+        CALL GCB_SETI('COLOUR_N',16,STATUS)
+        DO I=1,16
+          CALL GCB_SET1R('COLOUR_RED',I,1,COL(1,I),STATUS)
+          CALL GCB_SET1R('COLOUR_GREEN',I,1,COL(2,I),STATUS)
+          CALL GCB_SET1R('COLOUR_BLUE',I,1,COL(3,I),STATUS)
+        ENDDO
+
+
+      ENDIF
 
       END
