@@ -109,6 +109,7 @@
 
       STRUCTURE /DATASET/
         LOGICAL USED			! whether this slot being used
+        INTEGER ADI_ID			! ADI identifier
         CHARACTER*20 PAR		! Parameter name
         CHARACTER*(DAT__SZLOC) LOC	! locator to dataset
         CHARACTER*1 IO			! input or output dataset
