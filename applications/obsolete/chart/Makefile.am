@@ -13,11 +13,11 @@ chart_mon_TASKS = $(TASKS)
 BUILT_SOURCES = chart.csh chart.icl $(IFL_FILES)
 
 TASKS = astro bsearch display ecreate fcreate listo oset ploto \
-	qcreate rgogs search setone sset typeo disp
+	qcreate rgogs search setone sset typeo cht_disp
 
 IFL_FILES = $(TASKS:=.ifl) chart.ifl
 
-DYNSCRIPTS = chart.csh chart.icl
+DYNSCRIPTS = chart.csh chart.icl chart.sh
 
 PRIVATE_INCLUDES = MAIN CHT_ERR
 

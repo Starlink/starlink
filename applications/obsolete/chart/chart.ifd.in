@@ -266,7 +266,7 @@ package chart {
           }
 
       }
-      action cht_disp {
+      action disp {
 
       }
       action display {
@@ -438,7 +438,7 @@ package chart {
           }
 
       }
-      action cht_listo {
+      action listo {
       }
       action oset {
 

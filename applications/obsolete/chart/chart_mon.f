@@ -93,6 +93,10 @@
       ELSE IF ( ACTION .EQ. 'DISPLAY' ) THEN
          CALL CHT_DISPLAY( STATUS )
 
+*  Output the contents of the parameters file to the terminal
+      ELSE IF ( ACTION .EQ. 'DISP' ) THEN
+         CALL CHT_DISP( STATUS )
+
 *  Create a file of supplementary objects
       ELSE IF ( ACTION .EQ. 'ECREATE' ) THEN
          CALL CHT_ECREATE( STATUS )
