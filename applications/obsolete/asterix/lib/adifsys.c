@@ -119,13 +119,15 @@ ADIlogical adix_isfile( ADIobj id, ADIstatus status )
 
 ADIobj adix_getlink( ADIobj id, ADIstatus status )
   {
-  ADIobj	rid,lid;
+  ADIobj	rid;
 
   _chk_init_err; _chk_stat_ret(ADI__nullid);
 
-  adic_find( id, "ADIlink", &lid, status );
-  adic_getref( lid, &rid, status );
-  adic_erase( &lid, status );
+  adic_cgetref( id, "ADIlink", &rid, status );
+  if ( *status == ADI__NOTSET ) {
+    adic_erranl( status );
+    rid = ADI__nullid;
+    }
 
   return rid;
   }
