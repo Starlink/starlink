@@ -1,4 +1,4 @@
-      SUBROUTINE SCUHELP( STATUS )
+      SUBROUTINE SURF_SCUHELP( STATUS )
 *+
 *  Name:
 *     SCUHELP
@@ -13,19 +13,20 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL SCUHELP( STATUS )
+*     CALL SURF_SCUHELP( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Description:
-*     Displays help about SCUBA.  The help information has classified
+*     Displays help about SCUBA software. The help information has classified
 *     and alphabetical lists of commands, general information about
 *     SCUBA and related material; it describes individual commands in
 *     detail.
 *
-*     Here are some of the main options.
+
+*  Examples:
 *        scuhelp
 *           No parameter is given so the introduction and the top-level
 *           help index is displayed.
@@ -43,22 +44,19 @@
 *           This lists a one-line summary of each application in the
 *           given functionality classification.
 
-*     See the Section "Navigating the Help Library" for details how to
-*     move around the help information, and to select the topics you
-*     want to view.
 
 *  Usage:
 *     scuhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
 
 *  ADAM Parameters:
 *     TOPIC = LITERAL (Read)
-*        Topic for which help is to be given. [" "]
+*        Topic for which help is to be given.
 *     SUBTOPIC = LITERAL (Read)
-*        Subtopic for which help is to be given. [" "]
+*        Subtopic for which help is to be given.
 *     SUBSUBTOPIC = LITERAL (Read)
-*        Subsubtopic for which help is to be given. [" "]
+*        Subsubtopic for which help is to be given.
 *     SUBSUBSUBTOPIC = LITERAL (Read)
-*        Subsubsubtopic for which help is to be given. [" "]
+*        Subsubsubtopic for which help is to be given.
 
 *  Algorithm:
 *     -  Check for error on entry; return if not o.k.
@@ -77,25 +75,26 @@
 *     describe the topic.
 *
 *     At a prompt you may enter:
-*        o  a topic and/or subtopic name(s) to display the help for that
+
+*        -  a topic and/or subtopic name(s) to display the help for that
 *           topic or subtopic, so for example, "block parameters box"
 *           gives help on BOX, which is a subtopic of Parameters, which
 *           in turn is a subtopic of BLOCK;
 *
-*        o  a <CR> to see more text at a "Press RETURN to continue ..."
+*        -  a <CR> to see more text at a "Press RETURN to continue ..."
 *           request;
 *
-*        o  a <CR>} at topic and subtopic prompts to move up one level
+*        -  a <CR> at topic and subtopic prompts to move up one level
 *           in the hierarchy, and if you are at the top level it will
 *           terminate the help session;
 *
-*        o  a CTRL/D (pressing the CTRL and D keys simultaneously) in
+*        -  a CTRL/D (pressing the CTRL and D keys simultaneously) in
 *           response to any prompt will terminate the help session;
 *
-*        o  a question mark "?" to redisplay the text for the current
+*        -  a question mark "?" to redisplay the text for the current
 *           topic, including the list of topic or subtopic names; or
 * 
-*        o  an ellipsis "..." to display all the text below the
+*        -  an ellipsis "..." to display all the text below the
 *           current point in the hierarchy.  For example, "BLOCK..."
 *           displays information on the BLOCK topic as well as
 *           information on all the subtopics under BLOCK.
@@ -103,26 +102,31 @@
 *     You can abbreviate any topic or subtopic using the following
 *     rules.
 *
-*        o  Just give the first few characters, e.g. "PARA" for
+*        -  Just give the first few characters, e.g. "PARA" for
 *           Parameters.
 * 
-*        o  Some topics are composed of several words separated by
+*        -  Some topics are composed of several words separated by
 *           underscores.  Each word of the keyword may be abbreviated,
 *           e.g. "Colour_Set" can be shortened to "C_S".
 * 
-*        o  The characters "%" and "*" act as wildcards, where the
+*        -  The characters "%" and "*" act as wildcards, where the
 *           percent sign matches any single character, and asterisk
 *           matches any sequence of characters.  Thus to display
 *           information on all available topics, type an asterisk in
 *           reply to a prompt.
 *
-*        o  If a word contains, but does end with an asterisk wildcard,
+*        -  If a word contains, but does end with an asterisk wildcard,
 *           it must not be truncated.
 * 
-*        o  The entered string must not contain leading or embedded
+*        -  The entered string must not contain leading or embedded
 *           spaces.
 *
 *     Ambiguous abbreviations result in all matches being displayed.
+
+*  Notes:
+*     The environment variable SURF_HELP should be set to point to
+*     the help file. This variable is usually set as part of the Starlink
+*     login.
 
 *  Implementation Status:
 *     -  Uses the portable help system.
@@ -174,7 +178,7 @@
 
 *  Local Constants:
       CHARACTER*10 LIBNAM      ! Name of the KAPPA help library
-      PARAMETER ( LIBNAM = 'SCUBA_HELP' )
+      PARAMETER ( LIBNAM = 'SURF_HELP' )
       INTEGER MAXLEV           ! Maximum number of help levels
       PARAMETER ( MAXLEV = 4 )
 
