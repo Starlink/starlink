@@ -200,6 +200,9 @@
 *       Data following the third column is copied without modification
 *       into the results files
 *
+*       In all cases, the coordinates in position lists are pixel
+*       coordinates.
+*
 *     - NDF extension items. 
 *
 *       If NDFNAMES is TRUE then the item "CURRENT_LIST" of the 
