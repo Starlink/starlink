@@ -283,18 +283,6 @@ itcl::class gaia::GaiaTextImport {
       }
       set_delimeter_ { }
 
-      #  Fixed width control.
-      itk_component add fixwidths {
-         LabelEntry $parent.fixwidths \
-            -labelwidth $lwidth \
-            -text "Field widths:" \
-            -textvariable [scope values_($this,fixwidths)] \
-            -value $values_($this,fixwidths)
-      }
-      pack $itk_component(fixwidths) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(fixwidths) \
-         {Widths of fields: width1,width2,...}
-
       #  Comment delimeter.
       itk_component add comment {
          LabelEntry $parent.comment \
@@ -319,6 +307,28 @@ itcl::class gaia::GaiaTextImport {
       pack $itk_component(skip) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(skip) \
          {Number of lines to skip at head of file (includes comments)}
+
+      #  Fixed width control.
+      itk_component add fixwidths {
+         LabelEntry $parent.fixwidths \
+            -labelwidth $lwidth \
+            -text "Field widths:" \
+            -textvariable [scope values_($this,fixwidths)] \
+            -value $values_($this,fixwidths)
+      }
+      pack $itk_component(fixwidths) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(fixwidths) \
+         {Widths of fields: width1,width2,...}
+
+      #  Interactive tab positioning widget.
+      itk_component add tabstop {
+         GaiaTabStops $parent.tabstop \
+            -change_cmd [code $this update_fixed_] \
+            -text "No information, press update"
+      }
+      pack $itk_component(tabstop) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(tabstop) \
+         {Fixed width positions (interactive adjustment)}
    }
 
 
@@ -328,11 +338,18 @@ itcl::class gaia::GaiaTextImport {
          #  Using delimeter
          $itk_component(delimeter) configure -state normal
          $itk_component(fixwidths) configure -state disabled
+         $itk_component(tabstop) configure -state disabled
       } else {
          #  Using fixed format
          $itk_component(delimeter) configure -state disabled
          $itk_component(fixwidths) configure -state normal
+         $itk_component(tabstop) configure -state normal
       }
+   }
+
+   #  Set the fixed widths.
+   protected method update_fixed_ {value} {
+      set values_($this,fixwidths) $value
    }
 
    #  Set the delimeter symbol.
@@ -479,6 +496,7 @@ itcl::class gaia::GaiaTextImport {
       #  Add each decoded line. Open the file.
       set fid [::open $itk_option(-infile) r]
       set count 0
+      set first 1
       while { 1 } {
          incr count
          set llen [gets $fid line]
@@ -487,6 +505,10 @@ itcl::class gaia::GaiaTextImport {
                if { ! [string match "$values_($this,comment)*" $line] } {
                   set ncol [parseline_ $line]
                   $itk_component(table) append_row $wordlist_
+                  if { $first } {
+                     $itk_component(tabstop) configure -text $line
+                     set $first 0
+                  }
                }
             } elseif { $llen < 0 } {
                break
@@ -494,8 +516,6 @@ itcl::class gaia::GaiaTextImport {
          }
       }
       ::close $fid
-
-
       $itk_component(table) new_info
    }
 
@@ -513,7 +533,6 @@ itcl::class gaia::GaiaTextImport {
          #  Open the file.
          if { $itk_option(-infile) != "" } {
             set fid [::open $itk_option(-infile) r]
-            set first_line_ {}
             set count 0
             while { 1 } {
                incr count
@@ -521,7 +540,6 @@ itcl::class gaia::GaiaTextImport {
                if { $count > $values_($this,skip) } {
                   if { $llen > 0 } {
                      if { ! [string match "$values_($this,comment)*" $line] } {
-                        set first_line_ $line
                         break
                      }
                   }

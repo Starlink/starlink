@@ -35,6 +35,7 @@ FILES        = \
  GaiaEspSelectObject.tcl StarKeywordFile.tcl StarLabelCheckLabel.tcl \
  StarLabelWidgetChild.tcl StarSTLFile.tcl GaiaEspSelectList.tcl \
  GaiaEspSelectListEditor.tcl GaiaEsp.tcl \
+ GaiaTabStops.tcl \
  gaia2astrom.tcl gaiaMain.tcl \
  gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
