@@ -17421,6 +17421,29 @@ point by a specified distance along a geodesic curve which passes
 through the starting point at a given position angle. It can only be used
 with 2-dimensional Frames.
 
+\item The Frame class has a new method called 
+f+
+AST\_AXDISTANCE
+f-
+c+
+astAxDistance
+c-
+which returns the increment between two supplied axis values. For
+axes belonging to SkyFrames, the returned value is normalized into
+the range $\pm\pi$.
+
+\item The Frame class has a new method called 
+f+
+AST\_AXOFFSET
+f-
+c+
+astAxOffset
+c-
+which returns an axis value a given increment away from a specified axis
+value. For axes belonging to SkyFrames, the returned value is normalized into
+the range $\pm\pi$ (for latitude axes) or zero to $2\pi$ (for longitude
+axes).
+
 \item The Plot class has a new method called 
 f+
 AST\_GENCURVE
