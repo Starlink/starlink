@@ -30,6 +30,9 @@
 *  History:
 *     21-DEC-1999 (DSB):
 *        Original version.
+*     15-MAR-2004 (DSB):
+*        Moved DAT_ANNUL calls inside the IF block to avoid "Locator
+*        invalid" errors.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -207,13 +210,10 @@
 
          END DO
 
-      END IF
-
-*  Tidy up
- 999  CONTINUE
-
 *  Annul locators.
-      CALL DAT_ANNUL( XLOC, STATUS )
-      CALL DAT_ANNUL( LOC, STATUS )
+         CALL DAT_ANNUL( XLOC, STATUS )
+         CALL DAT_ANNUL( LOC, STATUS )
+
+      END IF
 
       END

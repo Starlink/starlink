@@ -70,6 +70,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -88,6 +89,10 @@
 *        Assume trailing "[.]" strings are glob patterns, unless they
 *        result in no matching files, in which case assume they are 
 *        foreign extension specifiers.
+*     11-MAR-2004 (PWD):
+*        Increased the size of all local character strings to
+*        GRP__SZNAM. Previously some (notably BN) where 50 which was
+*        truncating file names.
 *     {enter_further_changes_here}
 
 *-
@@ -124,23 +129,23 @@
       PARAMETER ( MXSRCH = 2048 )
 
 *  Local Variables:
-      CHARACTER BN*50              ! File basename
-      CHARACTER BNM*50             ! Modified file basename
+      CHARACTER BN*(GRP__SZNAM)    ! File basename
+      CHARACTER BNM*(GRP__SZNAM)   ! Modified file basename
       CHARACTER DIR*(GRP__SZNAM)   ! Directory field
       CHARACTER FTEMP*(GRP__SZNAM) ! File template
-      CHARACTER FXS*200            ! Foreign extension specifier
+      CHARACTER FXS*(GRP__SZNAM)    ! Foreign extension specifier
       CHARACTER LOC*(DAT__SZLOC)   ! Locator for top-level object
       CHARACTER LOC2*(DAT__SZLOC)  ! Locator for component object
       CHARACTER NAM*(GRP__SZNAM)   ! File base name field
       CHARACTER PATH*(GRP__SZNAM)  ! Data path 
       CHARACTER REST*(GRP__SZNAM)  ! The remaining text after the file spec
       CHARACTER SEARCH*(MXSRCH)    ! The total search string
-      CHARACTER SEC*50             ! File NDF/HDS section
+      CHARACTER SEC*(GRP__SZNAM)   ! File NDF/HDS section
       CHARACTER SLICE*(GRP__SZNAM) ! The NDF slice spec
       CHARACTER SPEC*(GRP__SZNAM)  ! The file spec of the matching file
       CHARACTER STORED*(GRP__SZNAM)! Text to store in the supplied group
-      CHARACTER SUF*50             ! File suffix
-      CHARACTER SUFF*50            ! Modified file suffix
+      CHARACTER SUF*(GRP__SZNAM)   ! File suffix
+      CHARACTER SUFF*(GRP__SZNAM)  ! Modified file suffix
       CHARACTER TYP*(GRP__SZNAM)   ! File type field
       INTEGER F                  ! Index of first non-blank character
       INTEGER G2SIZ              ! Size of IGRP2 group
