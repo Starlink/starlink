@@ -39,6 +39,10 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Added AxisDistance and AxisOffset.
 *     20-OCT-2002 (DSB):
 *        Added Top and Bottom attributes.
+*     8-JAN-2003 (DSB):
+*        - Changed private InitVtab method to protected astInitAxisVtab
+*        method.
+*        - Include descriptive label for units string within a Dump.
 *class--
 */
 
@@ -64,6 +68,7 @@ f     only within textual output (e.g. from AST_WRITE).
 #include "pointset.h"            /* Sets of coordinates (for AST__BAD) */
 #include "channel.h"             /* I/O channels */
 #include "axis.h"                /* Interface definition for this class */
+#include "unit.h"                /* Definitions of physical units */
 
 /* C header files. */
 /* --------------- */
@@ -135,7 +140,6 @@ static void ClearAxisUnit( AstAxis * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstAxisVtab * );
 static void SetAttrib( AstObject *, const char * );
 static void SetAxisDigits( AstAxis *, int );
 static void SetAxisDirection( AstAxis *, int );
@@ -471,9 +475,9 @@ static double AxisGap( AstAxis *this, double gap, int *ntick ) {
 
 /* Local Data: */
    static double table1[ 10 ] =  /* Table of nice decimal gaps */
-            { 1.0, 2.0, 2.0, 4.0, 5.0, 5.0, 5.0, 10.0, 10.0, 10.0 };
+            { 1.0, 2.0, 2.0, 5.0, 5.0, 5.0, 5.0, 10.0, 10.0, 10.0 };
    static int table2[ 10 ] =     /* Table giving number of divisions */
-            {   5,   4,   4,   4,   5,   5,   5,    5,    5,    5 };
+            {   5,   4,   4,   5,   5,   5,   5,    5,    5,    5 };
 
 /* Initialise. */
    result = 0.0;
@@ -1006,23 +1010,24 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
-static void InitVtab( AstAxisVtab *vtab ) {
+void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitAxisVtab
 
 *  Purpose:
 *     Initialise a virtual function table for an Axis.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "axis.h"
-*     void InitVtab( AstAxisVtab *vtab )
+*     void astInitAxisVtab( AstAxisVtab *vtab, const char *name )
 
 *  Class Membership:
-*     Axis member function.
+*     Axis vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -1031,7 +1036,14 @@ static void InitVtab( AstAxisVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -1039,6 +1051,10 @@ static void InitVtab( AstAxisVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitObjectVtab( (AstObjectVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAAxis) to determine if an object belongs
@@ -1540,7 +1556,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->symbol = NULL;
    out->unit = NULL;
 
-/* Make copies of the allocated strings. */
+/* Make copies of the allocated strings and Objects. */
    if ( in->label ) out->label = astStore( NULL, in->label,
                                  strlen( in->label ) + (size_t) 1 );
    if ( in->format ) out->format = astStore( NULL, in->format,
@@ -1632,7 +1648,9 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Local Variables: */
    AstAxis *this;                /* Pointer to the Axis structure */
+   char comment[ 80 ];           /* Buffer for comment string */
    const char *sval;             /* Pointer to string value */
+   const char *lab;              /* Pointer to unit label */
    double dval;                  /* Double value */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
@@ -1675,7 +1693,20 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ----- */
    set = TestAxisUnit( this );
    sval = set ? GetAxisUnit( this ) : astGetAxisUnit( this );
-   astWriteString( channel, "Unit", set, 0, sval, "Axis units" );
+
+/* Get any label associated with the unit string. */
+   lab = astUnitLabel( sval );
+
+/* Construct a comment including the above label (but only if it is not
+   the same as the unit string) . */
+   if( lab && strcmp( lab, sval ) ) {
+      (void) sprintf( comment, "Axis units (%s)", lab );
+   } else {
+      (void) sprintf( comment, "Axis units" );
+   }
+
+/* Write out the Unit value. */
+   astWriteString( channel, "Unit", set, 0, sval, comment );
 
 /* Digits. */
 /* ------- */
@@ -1707,7 +1738,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ------- */
    set = TestAxisBottom( this );
    dval = set ? GetAxisBottom( this ) : astGetAxisBottom( this );
-   astWriteDouble( channel, "Bot", set, 0, dval, "Minimum legal axis value" );
+   astWriteDouble( channel, "Bottom", set, 0, dval, "Minimum legal axis value" );
 }
 
 /* Standard class functions. */
@@ -1936,14 +1967,14 @@ AstAxis *astInitAxis_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitAxisVtab( vtab, name );
+
 /* Initialise an Object structure (the parent class) as the first component
    within the Axis structure, allocating memory if necessary. */
-   new = (AstAxis *) astInitObject( mem, size, init, (AstObjectVtab *) vtab,
+   new = (AstAxis *) astInitObject( mem, size, 0, (AstObjectVtab *) vtab,
                                     name );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-   if ( init ) InitVtab( vtab );
    if ( astOK ) {
 
 /* Initialise the Axis data. */
@@ -1966,7 +1997,7 @@ AstAxis *astInitAxis_( void *mem, size_t size, int init,
    return new;
 }
 
-AstAxis *astLoadAxis_( void *mem, size_t size, int init,
+AstAxis *astLoadAxis_( void *mem, size_t size,
                        AstAxisVtab *vtab, const char *name,
                        AstChannel *channel ) {
 /*
@@ -1982,7 +2013,7 @@ AstAxis *astLoadAxis_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "axis.h"
-*     AstAxis *astLoadAxis( void *mem, size_t size, int init,
+*     AstAxis *astLoadAxis( void *mem, size_t size,
 *                           AstAxisVtab *vtab, const char *name,
 *                           AstChannel *channel )
 
@@ -1999,6 +2030,7 @@ AstAxis *astLoadAxis_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a Axis at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -2017,14 +2049,6 @@ AstAxis *astLoadAxis_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstAxis) is used instead.
-*     init
-*        A boolean flag indicating if the Axis's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the Axis class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new Axis. If this is NULL, a pointer
@@ -2064,26 +2088,23 @@ AstAxis *astLoadAxis_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstAxis );
-      init = !class_init;
       vtab = &class_vtab;
       name = "Axis";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitAxisVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built Axis. */
-   new = astLoadObject( mem, size, init, (AstObjectVtab *) vtab, name,
+   new = astLoadObject( mem, size, (AstObjectVtab *) vtab, name,
                         channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */
@@ -2133,7 +2154,7 @@ AstAxis *astLoadAxis_( void *mem, size_t size, int init,
 
 /* Bottom. */
 /* ---- */
-      new->bottom = astReadDouble( channel, "bot", AST__BAD );
+      new->bottom = astReadDouble( channel, "bottom", AST__BAD );
       if ( TestAxisBottom( new ) ) SetAxisBottom( new, new->bottom );
 
 /* If an error occurred, clean up by deleting the new Axis. */

@@ -219,6 +219,8 @@
 *        Added AxisDistance and AxisOffset.
 *     10-OCT-2002 (DSB):
 *        Added Top and Bottom.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitAxisVtab method.
 *-
 */
 
@@ -332,8 +334,11 @@ AstAxis *astAxisId_( const char *, ... );
 /* Initialiser. */
 AstAxis *astInitAxis_( void *, size_t, int, AstAxisVtab *, const char * );
 
+/* Vtab initialiser. */
+void astInitAxisVtab_( AstAxisVtab *, const char * );
+
 /* Loader. */
-AstAxis *astLoadAxis_( void *, size_t, int, AstAxisVtab *, const char *,
+AstAxis *astLoadAxis_( void *, size_t, AstAxisVtab *, const char *,
                        AstChannel * );
 #endif
 
@@ -418,9 +423,11 @@ void astSetAxisBottom_( AstAxis *, double );
 #define astInitAxis(mem,size,init,vtab,name) \
 astINVOKE(O,astInitAxis_(mem,size,init,vtab,name))
 
+/* Vtab Initialiser. */
+#define astInitAxisVtab(vtab,name) astINVOKE(V,astInitAxisVtab_(vtab,name))
 /* Loader. */
-#define astLoadAxis(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadAxis_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadAxis(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadAxis_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */
