@@ -46,7 +46,8 @@
 *        FALSE, data values are packed as efficiently as possible within
 *        each record. [FALSE]
 *     IN = NDF (Read)
-*        Input NDF data structure.
+*        Input NDF data structure. The suggested default is the current
+*        NDF if one exists, otherwise it is the current value.
 *     NOPEREC = _INTEGER (Read)
 *        The number of data values per record of the output file, when
 *        FIXED is TRUE.  It should be in the range 1 to 16383.

@@ -39,7 +39,8 @@
 *        file, unless there is no extension whereupon a minimal FITS
 *        header is written to the unformatted file. [FALSE]
 *     IN = NDF (Read)
-*        Input NDF data structure.
+*        Input NDF data structure. The suggested default is the current
+*        NDF if one exists, otherwise it is the current value.
 *     NOPEREC = _INTEGER (Read)
 *        The number of data values per record of the output file.  It
 *        should be in the range 1 to 8191, unless the array is double

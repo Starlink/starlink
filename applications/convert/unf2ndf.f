@@ -55,7 +55,8 @@
 *        size of first dimension to be used.
 *     OUT = NDF (Read and Write)
 *        Output NDF data structure.  When COMP is not "Data" the NDF
-*        is modified rather than a new NDF created.
+*        is modified rather than a new NDF created.  It becomes the new
+*        current NDF.
 *     SHAPE = _INTEGER (Read)
 *        The shape of the NDF to be created.  For example, [40,30,20]
 *        would create 40 columns by 30 lines by 10 bands.  It is only

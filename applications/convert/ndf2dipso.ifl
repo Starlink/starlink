@@ -1,4 +1,4 @@
-## NDF2DIPSO - Writes an NDF to a DIPSO-format file, which can be read by the DIPSO READ command.
+## NDF2DIPSO - Writes an NDF to a DIPSO-format file.
    
 #+
 #  Name:

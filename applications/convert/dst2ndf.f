@@ -4,7 +4,7 @@
 *      DST2NDF
 
 *   Purpose:
-*      Converts a Figaro version 2 DST file to an NDF.
+*      Converts a Figaro (Version 2) DST file to an NDF.
 
 *   Language:
 *      Starlink Fortran 77
@@ -20,8 +20,8 @@
 *         The global status.
 
 *   Description:
-*      This application converts a Figaro version 2 DST file to a
-*      version 3 file, i.e. to an NDF.  The rules for converting the
+*      This application converts a Figaro Version-2 DST file to a
+*      Version-3 file, i.e. to an NDF.  The rules for converting the
 *      various components of a DST are listed in the notes.  Since
 *      both are hierarchical formats most files can be be converted with
 *      little or no information lost.

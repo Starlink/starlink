@@ -34,7 +34,8 @@ FIXED = _LOGICAL (Read)
    each record. [FALSE]
 3 IN
 IN = NDF (Read)
-   Input NDF data structure.
+   Input NDF data structure. The suggested default is the current
+   NDF if one exists, otherwise it is the current value.
 3 NOPEREC
 NOPEREC = _INTEGER (Read)
    The number of data values per record of the output file, when

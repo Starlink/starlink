@@ -2,14 +2,13 @@
 \sstroutine{
    NDF2DIPSO
 }{
-   Writes an NDF to a DIPSO-format file, which can be read by the
-   DIPSO READ command
+   Converts an NDF to a DIPSO-format file
 }{
    \sstdescription{
-      The routine reads a 1-dimensional NDF data file and writes a
-      DIPSO format file.  The NDF TITLE object is also written to the
-      DIPSO file.  Bad pixels found in the NDF result in `breaks' in
-      the DIPSO file.
+      The routine converts a 1-dimensional NDF data file into a
+      DIPSO-format file.  The resultant file can be imported into DIPSO
+      by its READ command.  See SUN/50. The rules for the conversion
+      are listed in the Notes.
    }
    \sstusage{
       NDF2DIPSO IN OUT
@@ -46,6 +45,16 @@
       \sstitemlist{
 
          \sstitem
+         The NDF TITLE object is to the DIPSO file.
+
+         \sstitem
+         The NDF data array becomes the main array in the DIPSO file.
+         Bad pixels found in the NDF result in `breaks' in the DIPSO file.
+
+         \sstitem
+         The axis centres becomes the $x$-axis array in the DIPSO file.
+
+         \sstitem
          Most NDF components are not supported by the DIPSO format,
          and therefore anything but the data array, axis centres, and
          data title will not be copied.
@@ -69,4 +78,3 @@
       }
    }
 }
-\end{document}

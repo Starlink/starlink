@@ -4,8 +4,7 @@
 *     NDF2DIPSO
 
 *  Purpose:
-*     Writes an NDF to a DIPSO-format file, which can be read by the
-*     DIPSO READ command.
+*     Converts an NDF to a DIPSO-format file.
 
 *  Language:
 *     Starlink Fortran 77
@@ -24,10 +23,10 @@
 *     NDF2DIPSO IN OUT
 
 *  Description:
-*     The routine reads a 1-dimensional NDF data file and writes a
-*     DIPSO format file.  The NDF TITLE object is also written to the
-*     DIPSO file.  Bad pixels found in the NDF result in `breaks' in
-*     the DIPSO file.
+*     The routine converts a 1-dimensional NDF data file into a
+*     DIPSO-format file.  The resultant file can be imported into DIPSO
+*     by its READ command.  See SUN/50. The rules for the conversion
+*     are listed in the Notes.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -46,6 +45,10 @@
 *        the DIPSO file SPECTRE.DAT.
 
 *  Notes:
+*     -  The NDF TITLE object is to the DIPSO file.
+*     -  The NDF data array becomes the main array in the DIPSO file.
+*     Bad pixels found in the NDF result in `breaks' in the DIPSO file.
+*     -  The axis centres becomes the x-axis array in the DIPSO file.
 *     -  Most NDF components are not supported by the DIPSO format,
 *     and therefore anything but the data array, axis centres, and
 *     data title will not be copied.
@@ -74,6 +77,8 @@
 *        applications and with the paper documentation.  Added Usage,
 *        Implementation Status, and Examples items.  Improved the error
 *        reports.
+*     1992 September 22 (MJC):
+*        Added Notes and a section on how to create the input file.
 *     {enter_further_changes_here}
 
 *  Bugs:
