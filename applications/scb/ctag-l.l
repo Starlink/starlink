@@ -167,7 +167,8 @@ void munch();
 extern char *yylval;
 extern int yyleng;
 
-#define BUFINC 128       /* Amount by which to increase buffer each time */
+#define BUFINC 128       /* Amount by which to increase buffer each time.
+                            Affects only time/memory efficiency. */
 
 /*
 *  These definitions set up variables to be used for passing text to
@@ -189,6 +190,7 @@ extern int yyleng;
    int prealloc = 0;
 
 
+   int yywrap() {
 /*
 *+
 *  Name:
@@ -204,7 +206,6 @@ extern int yyleng;
 *     to the parser, it won't be returned at all.
 *-
 */
-   int yywrap() {        /* At end of file, output unreturned text directly. */
       if ( preleng > 0 )
          printf( "%s", preval ); 
       return(1); 
@@ -306,7 +307,8 @@ extern int yyleng;
 *  Description:
 *     This routine sets yylval (the value which is passed up to the parser)
 *     to the string of all the characters which have been encountered 
-*     since the last token was passed back.
+*     since the last token was passed back.  Note that it mallocs storage
+*     for this purpose, so this must be free'd at some point by the parser.
 *-
 */
 
@@ -430,20 +432,38 @@ extern int yyleng;
 *     with an HTML-like tag.
 *-
 */
+
+/* Local variables. */
       char c;
       int i, p1, p2;
 
+/* Add matched text. */
       sappend( yytext );
+
+/* Add start of tag. */
       sappend( "<a name='INCLUDE-" );
+
+/* Add the name of the included file to attribute value. */
       p1 = preleng;
       while ( ( c = input() ) && c != '"' && c != '\n' )
          cappend( c );
       p2 = preleng;
+
+/* Close the start tag. */
       sappend( "'>" );
+
+/* Copy the name of the included file from the attribute value to the
+   contents of the tag. */
       for ( i = p1; i < p2; i++ )
          cappend( preval[ i ] );
+
+/* Add the end tag. */
       sappend( "</a>" );
+
+/* Add the final quote. */
       cappend( c );
+
+/* Copy anything else on the line. */
       cpprest();
    }
 
