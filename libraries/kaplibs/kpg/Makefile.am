@@ -64,7 +64,7 @@ kpg1_flcod.f kpg1_flcor.f kpg1_flipb.f kpg1_flipd.f kpg1_flipi.f \
 kpg1_flipr.f kpg1_flipub.f kpg1_flipuw.f kpg1_flipw.f \
 kpg1_gaufb.f kpg1_gaufd.f kpg1_gaufi.f kpg1_gaufr.f kpg1_pseed.f \
 kpg1_gaufub.f kpg1_gaufuw.f kpg1_gaufw.f kpg1_gausd.f kpg1_gausr.f \
-kpg1_gaxlb.f kpg1_gca.f kpg1_getim.f kpg1_getyp.f kpg1_ghstb.f \
+kpg1_gaxlb.f kpg1_getim.f kpg1_getyp.f kpg1_ghstb.f \
 kpg1_ghstd.f kpg1_ghsti.f kpg1_ghstr.f kpg1_ghstub.f kpg1_ghstuw.f \
 kpg1_ghstw.f kpg1_gilst.f \
 kpg1_gnlbu.f \
