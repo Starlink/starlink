@@ -970,6 +970,34 @@ package chart {
       }
    }
 
+   command ast2a {
+      obey { $CHART_DIR/ast2a }
+   }
+
+   command ast2b {
+      obey { $CHART_DIR/ast2b }
+   }
+
+   command csi2a {
+      obey { $CHART_DIR/csi2a }
+   }
+
+   command csi2a {
+      obey { $CHART_DIR/csi2b }
+   }
+
+   command nso2a {
+      obey { $CHART_DIR/nso2a }
+   }
+
+   command nso2b {
+      obey { $CHART_DIR/nso2b }
+   }
+
+   command chart_params {
+      obey { $CHART_DIR/chart_params }
+   }
+
   icl {defhelp chart $CHART_HELP 0}
 
   display {

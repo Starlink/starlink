@@ -1,0 +1,1259 @@
+ 1                                                                           A 1. 1      
+         TABLE 1       DEFINITION OF THE CODED NUMBERING SYSTEM                          
+         *******                                                                         
+                                                                                         
+                                                                                         
+                                                                                         
+         DURCHMUSTERUNG CATALOGUES                                                       
+                                                                                         
+                                                                                         
+         -0.0AABBBBB   CPD   SOUTH OF -52 (1875)                                         
+                                                                                         
+         -0.0AABBBBB   COD   NORTH OF -52 (1875)                                         
+                                                                                         
+         -0.0AABBBBB   BD    NORTH OF -23 (1855)                                         
+                                                                                         
+          0.0AABBBBB   BD    NORTHERN HEMISPHERE                                         
+                       AA = DECLINATION ZONE, BBBBB = STAR NUMBER                        
+                                                                                         
+                                                                                         
+         HD AND HDE CATALOGUES                                                           
+                                                                                         
+                                                                                         
+          1.00BBBBBB   HD AND HDE                                                        
+                       BBBBBB = HD- OR HDE NUMBER                                        
+                                                                                         
+                                                                                         
+         OPEN AND GLOBULAR CLUSTERS                                                      
+                                                                                         
+                                                                                         
+          2.XXXXBBBB   NGC CLUSTERS                                                      
+                                                                                         
+          3.XXXXBBBB   IC  CLUSTERS                                                      
+                       XXXX = NGC OR IC NUMBER, BBBB = STAR NUMBER ACCORDING TO          
+                       AUTHORS QUOTED IN THE REFERENCE LIST IN TABLE 5 AND 6             
+                                                                                         
+          4.AAXXBBBB   CLUSTERS WITHOUT NGC OR IC IDENTIFICATION                         
+                       FOR LISTS CONTAINING LESS THAN 100 CLUSTERS                       
+                                                                                         
+          5.AXXXBBBB   CLUSTERS WITHOUT NGC OR IC IDENTIFICATION                         
+                       FOR LISTS CONTAINING MORE THAN 100 CLUSTERS                       
+                       AA, A CODE FOR NAME, ACCORDING TO TABLE 2                         
+                       XX, XXX CLUSTER NUMBER ACCORDING TO THE NAME                      
+                       BBBB = STAR NUMBER ACCORDING TO AUTHOR QUOTED                     
+                       IN THE REFERENCES LIST IN TABLES 7A AND 7B                        
+                                                                                         
+                                                                                         
+         VARIOUS CATALOGUES AND LISTS OF STARS                                           
+                                                                                         
+                                                                                         
+          6.0AABBBBB   CATALOGUES CONTAINING MORE THAN 10000 STARS                       
+                                                                                         
+          6.1AAABBBB   CATALOGUES CONTAINING MORE THAN 1000 STARS                        
+                                                                                         
+          6.2AAAABBB   LISTS OF LESS THAN 1000 STARS                                     
+                       AA, AAA, AAAA AUTHORS IDENTIFICATION ACCORDING TO TABLE 8         
+                       BBBBB, BBBB, BBB = STAR NUMBER                                    
+ 1                                                                           A 1. 2      
+                                                                                         
+          6.3AAXXBBB   LISTS OF STARS APPEARING IN TABLES DEFINED BY ONE AUTHOR          
+                       AA = AUTHOR IDENTIFICATION ACCORDING TO TABLE 8                   
+                       XX = TABLE NUMBER , BBB = STAR NUMBER                             
+                                                                                         
+          6.4XXAABBB   LISTS OF STARS GROUPED BY CONSTELLATION                           
+                       XX = CONSTELLATION CODE ACCORDING TO TABLE 3                      
+                       AA = AUTHOR IDENTIFICATION, BBB = STAR NUMBER                     
+                                                                                         
+          6.5XXABBBB   CODE FOR VARIABLE STARS                                           
+                       XX = CONSTELLATION CODE ACCORDING TO TABLE 3                      
+                       A  = CATALOGUE IDENTIFICATION, BBBB = STAR NUMBER                 
+                                                                                         
+          6.9ZZZZZZZ   LISTS OF STARS NOT INCLUDED IN THE PRECEDING DEFINITIONS          
+                                                                                         
+                                                                                         
+         SELECTED AREAS                                                                  
+                                                                                         
+                                                                                         
+          7.AXXXBBBB   CODE FOR STARS IN SELECTED AREAS                                  
+                       A = CATALOGUE IDENTIFICATION ACCORDING TO TABLE 9                 
+                       XXX = SELECTED AREA NUMBER, BBBB = STAR NUMBER                    
+                                                                                         
+                                                                                         
+         DECLINATION ZONES CATALOGUES                                                    
+                                                                                         
+                                                                                         
+          8.AAXXBBBB   LISTS OF STARS DIVIDED BY DECLINATION ZONES                       
+                       AA = LIST IDENTIFICATION  (TABLE 10)                              
+                       AA = 00-49  NORTHERN HEMISPHERE ZONES                             
+                       AA = 50-99  SOUTHERN HEMISPHERE ZONES                             
+                       XX = ZONE, BBBB = STAR NUMBER                                     
+                                                                                         
+                                                                                         
+         MISCELLANOUS LISTS                                                              
+                                                                                         
+                                                                                         
+          9.0AAABBBB   LISTS OF STARS IN ASSOCIATIONS                                    
+                       AAA = CODE FOR ASSOCIATIONS (TABLE 4)                             
+                       BBBB = STAR NUMBER ACCORDING TO THE AUTHOR                        
+                       IN THE REFERENCES LIST IN TABLE 11                                
+                                                                                         
+          9.2XXXXABB   PHOTOELECTRIC SEQUENCES FOR NGC OBJECTS                           
+                       XXXX = NGC NUMBER, A = AUTHOR, BB = STAR NUMBER                   
+                                                                                         
+          9.5AYXXBBB   STANDARD REGIONS                                                  
+                       Y = 1-6 (A-F), XX = 01-09, BBB = STAR NUMBER                      
+                       A = IDENTIFICATION (TABLE 11), XX = REGION                        
+                                                                                         
+          9.6AXXBBBB   MISCELLANOUS REGIONS                                              
+                       A = REGION IDENTIFICATION  (TABLE 4)                              
+                       XX = REGION NUMBER, BBBB = STAR NUMBER                            
+                                                                                         
+          9.8AXXXBBB   STARS FROM LISTS OF GICLAS                                        
+                       A = CATALOGUE IDENTIFICATION (TABLE 11)                           
+                       XXX = CHART NUMBER, BBB = STAR NUMBER                             
+ 1                                                                           A 2. 1      
+                                                                                         
+         TABLE 2       NAME CODE FOR CLUSTER IDENTIFICATIONS                             
+         *******                                                                         
+                                                                                         
+                                                                                         
+                   +4.01    ABELL                +4.21    HOGG                           
+                   +4.02    ALTER                +4.22    ISKURZDAJAN                    
+                   +4.03    APRIAMASWILI         +4.23    KING                           
+                   +4.04    ARP                  +4.24    LYNGA                          
+                   +4.05    BAADE                +4.25    MARKARJAN                      
+                   +4.06    BARHATOVA            +4.26    PALOMAR                        
+                   +4.07    BASEL                +4.27    PISMIS                         
+                   +4.08    BIURAKAN             +4.28    ROSLUND                        
+                   +4.09    BLANCO               +4.29    SHER                           
+                   +4.10    CZERNIK              +4.30    STEPHENSON                     
+                                                                                         
+                   +4.11    DEJE                 +4.31    STOCK                          
+                   +4.12    DOLIDZE              +4.32    SAHLBAJAN                      
+                   +4.13    DOLIDZE - DZIM       +4.33    TERZAN                         
+                   +4.14    DUFAY                +4.34    TOMBAUGH                       
+                   +4.15    FEINSTEIN            +4.35    TRUMPLER                       
+                   +4.16    GINGERICH            +4.36    UPGREN                         
+                   +4.17    GRAFF                +4.37    VAN DEN BERGH                  
+                   +4.18    HAFFNER              +4.38    WESTERLUND                     
+                   +4.19    HARVARD              +4.39    ZWICKY                         
+                   +4.20    HAUTE-PROVENCE       +4.40    BOCHUM                         
+                                                                                         
+                   +5.0     BERKELEY             +5.3     RUPRECHT                       
+                   +5.1     COLLINDER            +5.4     VAN DEN BERGH - HAGEN          
+                   +5.2     MELOTTE                                                      
+ 1                                                                           A 3. 1      
+         TABLE 3       CONSTELLATION CODE                                                
+         *******                                                                         
+                                                                                         
+                  1  ANDROMEDA         31  CYGNUS            61  PAVO                    
+                  2  ANTLIA            32  DELPHINUS         62  PEGASUS                 
+                  3  APUS              33  DORADO            63  PERSEUS                 
+                  4  AQUARIUS          34  DRACO             64  PHOENIX                 
+                  5  AQUILA            35  EQUULEUS          65  PICTOR                  
+                  6  ARA               36  ERIDANUS          66  PISCES                  
+                  7  ARIES             37  FORNAX            67  PISCIS AUSTRINUS        
+                  8  AURIGA            38  GEMINI            68  PUPPIS                  
+                  9  BOOTES            39  GRUS              69  PYXIS                   
+                 10  CAELUM            40  HERCULES          70  RETICULUM               
+                                                                                         
+                 11  CAMELOPARDIS      41  HOROLOGIUM        71  SAGITTA                 
+                 12  CANCER            42  HYDRA             72  SAGITTARIUS             
+                 13  CANES VENATICI    43  HYDRUS            73  SCORPIUS                
+                 14  CANIS MAIOR       44  INDUS             74  SCULPTOR                
+                 15  CANIS MINOR       45  LACERTA           75  SCUTUM                  
+                 16  CAPRICORNUS       46  LEO               76  SERPENS CAPUT           
+                 17  CARINA            47  LEO MINOR         77  SERPENS CAUDA           
+                 18  CASSIOPEIA        48  LEPUS             78  SEXTANS                 
+                 19  CENTAURUS         49  LIBRA             79  TAURUS                  
+                 20  CEPHEUS           50  LUPUS             80  TELESCOPIUM             
+                                                                                         
+                 21  CETUS             51  LYNX              81  TRIANGULUM              
+                 22  CHAMAELEON        52  LYRA              82  TRIANGULUM AUSTRALE     
+                 23  CIRCINUS          53  MENSA             83  TUCANA                  
+                 24  COLUMBA           54  MICROSCOPIUM      84  URSA MAIOR              
+                 25  COMA BERENICES    55  MONOCEROS         85  URSA MINOR              
+                 26  CORONA AUSTRALIS  56  MUSCA             86  VELA                    
+                 27  CORONA BOREALIS   57  NORMA             87  VIRGO                   
+                 28  CORVUS            58  OCTANS            88  VOLANS                  
+                 29  CRATER            59  OPHIUCUS          89  VULPECULA               
+                 30  CRUX              60  ORION                                         
+ 1                                                                           A 4. 1      
+         TABLE 4A        CODE OF SOME USUAL NUMBERING SYSTEMS                            
+         ********                                                                        
+                                                                                         
+                                                                                         
+          2.XXXXBBBB                                                                     
+                        +2.0869  H PERSEI                                                
+                        +2.0884  CHI PERSEI                                              
+                        +2.2632  PRAESEPE                                                
+                                                                                         
+          4.AAXXBBBB                                                                     
+                        +4.0901  ZETA SCL CLUSTER                                        
+                                                                                         
+          5.2XXXBBBB                                                                     
+                        +5.2020  ALPHA PERSEI CLUSTER                                    
+                        +5.2022  PLEIADES                                                
+                        +5.2025  HYADES                                                  
+                        +5.2111  COMA BERENICES                                          
+                                                                                         
+          6.0AABBBBB                                                                     
+                        +6.000  LUYTEN LB  NUMBERS                                       
+                        +6.001  LUYTEN LTT NUMBERS                                       
+                                                                                         
+          6.1AAABBBB                                                                     
+                        +6.1000  LUMINOUS STARS  WARNER AND SWASEY OBS.                  
+                        +6.1001  GLIESE CATALOGUE OF NEARBY STARS                        
+                        +6.1002  WOLLEY CATALOGUE                                        
+                        +6.1003  YALE TRIGONOMETRIC PARALLAXES                           
+                        +6.1004  WORLEY  CAT OF VISUAL BINARY ORBITS                     
+                        +6.1005  GICLAS NO GR                                            
+                        +6.1006  GICLAS NO GD                                            
+                        +6.1007  IRIARTE, CHAVIRA NO NGP                                 
+                        +6.1008  CHAVIRA NO SGP                                          
+                        +6.1012  MERRILL, BURWELL NO MWC                                 
+                        +6.1013  HENIZE NO HE3                                           
+                        +6.1016  HARO, LUYTEN NO PHL                                     
+                                                                                         
+          6.2AAAABBB                                                                     
+                        +6.20001  FEIGE NUMBERS                                          
+                        +6.20002  LYNGA (1964) OB STARS NUMBERS                          
+                        +6.20004  HZ NUMBERS                                             
+                        +6.20017  SLETTEBAK AND STOCK NO SSII                            
+                        +6.20010  MERRILL, BURWELL NO AS                                 
+                        +6.20020  EGGEN, GREENSTEIN NO EG                                
+                        +6.20021  SLETTEBAK, BRUNDAGE NO SB                              
+                        +6.20029  VAN WIJK SEQUENCE                                      
+                                                                                         
+          6.3AAXXBBB                                                                     
+                        +6.300  BOK, BOK STANDARD SEQUENCE                               
+                        +6.303  CASE IDENTIFICATION LISTS                                
+                        +6.307  BOK, BOK, MILLER STANDARD SEQUENCE                       
+                                                                                         
+          6.9AAXXBBB                                                                     
+                        +6.900   LODEN S REGIONS WITHOUT SIGN                            
+                        +6.901   LODEN S REGIONS WITH + SIGN                             
+                        +6.902   LODEN S REGIONS WITH - SIGN                             
+ 1                                                                           A 4. 2      
+                                                                                         
+          7.AXXXBBBB                                                                     
+                        +7.0     HARVARD S.A., KAPTEYN SYSTEMATIC PLAN                   
+                        +7.1     VAN RHIJN S.A., KAPTEYN SPECIAL PLAN                    
+                        +7.2     MOUNT WILSON S.A.                                       
+                        +7.3     BERGEDORFER SPEKTRAL DURCHMUSTERUNG                     
+                        +7.4     POTSDAMER SPEKTRAL DURCHMUSTERUNG                       
+                        +7.5     RADCLIFFE PROPER MOTIONS                                
+                        +7.8     MCCORMICK ZONES                                         
+                                                                                         
+          8.AAXXBBBB                                                                     
+                        +8.00  NO UPGREN (1962)                                          
+                        +8.01  CATALOGUE LS VOL I                                        
+                        +8.02  CATALOGUE LS VOL II                                       
+                        +8.03  CATALOGUE LS VOL III                                      
+                        +8.04  CATALOGUE LS VOL IV                                       
+                        +8.05  CATALOGUE LS VOL V                                        
+                        +8.06  CATALOGUE LS VOL VI                                       
+                        +8.07  CATALOGUE IRC NORTHERN ZONES                              
+                        +8.54  CATALOGUE LS VOL IV                                       
+                        +8.57  CATALOGUE IRC SOUTHERN ZONES                              
+                                                                                         
+          9.0AAABBBB                                                                     
+                        +9.0001  ORION  NO BRUN                                          
+                        +9.0002  III CEPHEI  NO BLAAUW                                   
+                        +9.0003  CYG OB 2 NO REDDISH  (VI CYGNI)                         
+                        +9.0004  RING ORI   NO ISSERSTEDT                                
+                        +9.0005  RING HYDRA NO ISSERSTEDT                                
+                        +9.0006  RING AQL   NO ISSERSTEDT                                
+                        +9.0007  SCO OB1  NO BRAES                                       
+                        +9.0008  CLUSTER IN LINE OF SIGHT OF THE LMC                     
+                        +9.0011  CHAMAELEON T ASSOCIATION                                
+                        +9.0012  MOFFAT (1976) ANON CLUSTER                              
+                                                                                         
+          9.5AYXXBBB                                                                     
+                        +9.50  HARVARD STANDARD REGIONS                                  
+                        +9.51  COUSINS ET STOY  E  REGIONS                               
+                                                                                         
+          9.6AXXBBBB                                                                     
+                        +9.60XX  LF REGIONS                                              
+                        +9.64XX  XXHLF4 REGIONS                                          
+                                                                                         
+          9.8AXXXBBB                                                                     
+                        +9.80  G-NUMBERED STARS                                          
+                        +9.81  HYADES GICLAS                                             
+                        +9.82  GICLAS DOUBLE STARS GXXX-BXX                              
+ 1                                                                           A 4. 3      
+         TABLE 4B        INDEX                                                           
+         ********                                                                        
+                                                                                         
+                                                                                         
+                                                                                         
+         NEARBY STARS                                                                    
+                                                                                         
+                        +6.1001BBBB   GLIESE CATALOGUE                                   
+                        +6.1002BBBB   WOOLLEY ET AL. CATALOGUE                           
+                                                                                         
+                                                                                         
+         PROPER MOTION STARS                                                             
+                                                                                         
+                        +6.001BBBBB   LUYTEN NO LTT                                      
+                        +9.80XXXBBB   GICLAS NO G                                        
+                        +9.82XXXAAA   GICLAS DOUBLE STARS NO GXXX-BAAA                   
+                        +6.1014BBBB   WOLF LISTS                                         
+                                                                                         
+                                                                                         
+         RED STARS                                                                       
+                                                                                         
+                        +6.1005BBBB   GICLAS NO GR                                       
+                        +6.20030BBB   VYSSOTSKY LISTS                                    
+                                                                                         
+                                                                                         
+         WHITE DWARFS                                                                    
+                                                                                         
+                        +6.1005BBBB   GICLAS NO GD                                       
+                        +6.20020BBB   EGGEN, GREENSTEIN NO EG                            
+                                                                                         
+                                                                                         
+         OB STARS                                                                        
+                                                                                         
+                        +6.1000BBBB   STEPHENSON, SANDULEAK NO SLS                       
+                        +8.01XXBBBB   HAMBURG SURVEY VOL I NO NLS                        
+                        +8.02XXBBBB   HAMBURG SURVEY VOL II                              
+                        +8.03XXBBBB   HAMBURG SURVEY VOL III                             
+                        +8.04XXBBBB   HAMBURG SURVEY VOL IV                              
+                        +8.05XXBBBB   HAMBURG SURVEY VOL V                               
+                        +8.06XXBBBB   HAMBURG SURVEY VOL VI                              
+                        +6.1009BBBB   HILTNER LIST (1956)                                
+                        +6.20002BBB   LYNGA (1964)                                       
+                        +6.20005BBB   LYNGA (1968)                                       
+                        +6.20007BBB   WRAMDEMARK (1976)                                  
+                        +6.20023BBB   MUNCH (1951)                                       
+                                                                                         
+                                                                                         
+         FAINT BLUE STARS                                                                
+                                                                                         
+                        +6.000BBBBB   LUYTEN NO LB                                       
+                        +6.20001BBB   FEIGE LIST                                         
+                        +6.20004BBB   HUMASON, ZWICKY NO HZ                              
+                        +6.20015BBB   BARBIERI (1968)                                    
+                        +6.20016BBB   BARBIERI                                           
+                        +6.20022BBB   JAIDEE, LYNGA NO JL                                
+                        +6.20028BBB   KLEMOLA (1961)                                     
+                                                                                         
+ 1                                                                           A 4. 4      
+                                                                                         
+         EMISSION-LINE STARS                                                             
+                                                                                         
+                        +6.1012BBBB   MERRILL, BURWELL NO MWC                            
+                        +6.1013BBBB   HENIZE NO HE3                                      
+                        +6.20010BBB   MERILL, BURWELL NO AS                              
+                        +6.20036BBB   HARO, CHAVIRA (1964)                               
+                        +6.20037BBB   HARO, IRIARTE, CHAVIRA (1953)                      
+                        +6.20038BBB   HERBIG NO LKHALPHA                                 
+                        +6.20055BBB   VATICAN NO VES                                     
+                        +6.20059BBB   IRIARTE, CHAVIRA (1956)                            
+                                                                                         
+                                                                                         
+         NORTH GALACTIC POLE                                                             
+                                                                                         
+                        +6.1007BBBB   IRIARTE, CHAVIRA NO NGP                            
+                        +6.20018BBB   SLETTEBAK, STOCK NO SSII                           
+                        +8.00XXBBBB   UPGREN LIST                                        
+                                                                                         
+                                                                                         
+         SOUTH GALACTIC POLE                                                             
+                                                                                         
+                        +6.1016BBBB   HARO, LUYTEN NO PHL                                
+                        +6.20021BBB   SLETTEBAK, BRUNDAGE NO SB                          
+                        +6.1008BBBB   CHAVIRA NO SGP                                     
+                        +6.20035BBB   PHILIP, SANDULEAK                                  
+                                                                                         
+                                                                                         
+         LARGE MAGELLANIC CLOUD                                                          
+                                                                                         
+                        +8.58XXBBBB   SANDULEAK CATALOGUE                                
+                        +6.20050BBB   FEHRENBACH, DUFLOT *G                              
+                        +6.20051BBB   FEHRENBACH, DUFLOT *S                              
+                        +6.20052BBB   BRUNET ET AL. (1975)                               
+                        +6.20057BBB   FEAST, THACKERAY, WESSELINK (1960)                 
+                        +6.20012BBB   ARDEBERG ET AL. *C                                 
+                        +6.20010BBB   FEHRENBACH, DUFLOT *P                              
+                        +6.20049BBB   HENIZE EMISSION-LINE STARS  NO HEN S...            
+                        +6.20062BBB   WARREN, PENFOLD LMC X-3 SEQUENCE                   
+                                                                                         
+                                                                                         
+         SMALL MAGELLANIC CLOUD                                                          
+                                                                                         
+                        +6.20027BBB   SANDULEAK LIST                                     
+                        +6.20053BBB   AZZOPARDI, VIGNEAU CATALOGUE                       
+ 1                                                                           A 5. 1      
+         TABLE 5       REFERENCES FOR THE NUMEROTATION OF STARS IN NGC CLUSTERS          
+         *******                                                                         
+                                                                                         
+          2.0103BBBB   HARDORP J. 1960, ASTR.ABH.HAMBURG.STERNW.BERGEDORF 5 NO 7         
+          2.0129BBBB   ARP H.C., ET AL. 1959, ASTROPHYS.J. 130,80                        
+          2.0188BBBB   SANDAGE A.R. 1962, ASTROPHYS.J. 135,333                           
+          2.0225BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.0362BBBB   MENZIES J.W. 1967, THESIS                                         
+          2.0457BBBB   BODEN E. 1946, UPPSALA ASTR.OBS.ANN. 2,1                          
+          2.0559BBBB   LINDOFF V. 1969, ARK.ASTR. 5,221                                  
+          2.0581BBBB   STEPPE H. 1974, ASTRON.ASTROPHYS.SUPP. 15,91                      
+          2.0609BBBB   LEE V.L., BURKHEAD M.S. 1971, ASTR.J. 76,467                      
+          2.0654BBBB   MUELLER E.A. 1955, Z.ASTROPHYS. 38,110                            
+                                                                                         
+          2.0659BBBB   MCCUSKEY S.W., HOUK N. 1964, ASTR.J. 69,412                       
+          2.0663BBBB   WALLENQUIST A. 1929, UPPSALA ASTR.OBS.MEDD. NO 42                 
+          2.0744BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.0752BBBB   HEINEMANN K. 1926, ASTR.NACH. 227,193                             
+          2.0869BBBB   OOSTERHOFF P.TH. 1937, ANN.STERRW.LEIDEN 17 PART 1                
+          2.0884BBBB   OOSTERHOFF P.TH. 1937, ANN.STERRW.LEIDEN 17 PART 1                
+          2.0957BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.1027BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.1039BBBB   DIECKVOSS W. 1954, ASTR.NACH. 282,25                              
+          2.1245BBBB   CHINCARINI G. 1964, MEM.SOC.ASTR.ITALIANA 35,133                  
+                                                                                         
+          2.1261BBBB   ALCAINO G., CONTRERAS C. 1971, ASTRON.ASTROPHYS. 11,14            
+          2.1342BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.1444BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.1502BBBB   PURGATHOFER A. 1964, ANN.UNIV.STERNW. WIEN 26 NO 2                
+          2.1528BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.1545BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.1647BBBB   CUFFEY J. 1937, ANN.HARV.COLL.OBS. 105,403                        
+          2.1662BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.1664BBBB   LARSSON-LEANDER G. 1957, STOCKHOLM OBS.ANN. 20 NO 2               
+          2.1750BBBB   LI HEN 1954, ANN.OBS.ASTR. ZO-SE 23,1                             
+                                                                                         
+          2.1778BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.1807BBBB   PURGATHOFER A. 1964, ANN.UNIV.STERNW. WIEN 26 NO 2                
+          2.1817BBBB   CUFFEY J. 1938, ANN.HARV.COLL.OBS. 106,39                         
+          2.1851BBBB   ALCAINO G. 1969, ASTROPHYS.J. 156,853                             
+          2.1857BBBB   CUFFEY J. 1937, ANN.HARV.COLL.OBS. 105,433                        
+          2.1893BBBB   CUFFEY J. 1937, ANN.HARV.COLL.OBS. 105,403                        
+          2.1907BBBB   PURGATHOFER A. 1964, ANN.UNIV.STERNW. WIEN 26 NO 2                
+          2.1912BBBB   CUFFEY J. 1937, ANN.HARV.COLL.OBS. 105,403                        
+          2.1960BBBB   BODEN E. 1951, UPPSALA ASTR.OBS.ANN. 3 NO 4                       
+          2.2024BBBB   JOHNSON H.L., MENDOZA E.E. 1963, BOL.OBS.TON.TACUBAYA 3,331       
+                                                                                         
+          2.2081BBBB   WESTERLUND B.E. 1961, UPPSALA ASTR.OBS.ANN. 5,58                  
+          2.2099BBBB   NORDLUND J. 1909, ARKIV MAT.FIS. 5,17                             
+          2.2129BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.2141BBBB   BURKHEAD M.S., ET AL. 1972, ASTR.J. 77,661                        
+          2.2168BBBB   CUFFEY J. 1938, ANN.HARV.COLL.OBS. 106,39                         
+          2.2169BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.2175BBBB   PISMIS P. 1970, BOL.OBS.TONANTZINTLA TACUBAYA 5,219               
+          2.2186BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          2.2204BBBB   HAWARDEN T.G. 1976, MON.NOT.R.ASTR.SOC. 174,225                   
+          2.2215BBBB   BECKER W. 1960, Z.ASTROPHYS. 49,168                               
+ 1                                                                           A 5. 2      
+          2.2232BBBB   CLARIA J.J. 1972, ASTRON.ASTROPHYS 19,303                         
+          2.2243BBBB   HAWARDEN T.G. 1975, MON.NOT.R.ASTR.SOC. 173,301                   
+          2.2244BBBB   VAN SCHEWICK H. 1958, VEROEFF.ASTR.INST.UNIV. BONN NO 51          
+          2.2251BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.2252BBBB   VAN SCHEWICK H. 1958, VEROEFF.ASTR.INST.UNIV. BONN NO 51          
+          2.2264BBBB   WALKER M.F. 1956, ASTROPHYS.J.SUPP. 23,365                        
+                       VASILEVSKIS S. 1965, ASTR.J. 70,10   (NO VAS.+300)                
+          2.2269BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          2.2281BBBB   VASILEVSKIS S., BALZ A.G.A. 1959, ASTR.J. 64,170                  
+          2.2286BBBB   LI HEN 1954, ANN.OBS.ASTR. ZO-SE 23,1                             
+                                                                                         
+          2.2287BBBB   COX A.N. 1954, ASTROPHYS.J. 119,188                               
+          2.2301BBBB   GRUBISSICH C., PURGATHOFER A. 1962, Z.ASTROPHYS. 54,41            
+          2.2302BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          2.2323BBBB   CUFFEY J. 1941, ASTR.J. 94,55                                     
+          2.2324BBBB   CUFFEY J. 1941, ASTR.J. 94,55                                     
+          2.2335BBBB   CLARIA J.J. 1973, ASTRON.ASTROPHYS.SUPP. 9,251                    
+          2.2343BBBB   CLARIA J.J. 1972, ASTR.J. 77,868                                  
+          2.2345BBBB   MOFFAT A.F.J. 1974, ASTRON.ASTROPHYS.SUPP. 16,33                  
+          2.2353BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.2360BBBB   BECKER W. 1960, Z.ASTROPHYS. 51,49                                
+                                                                                         
+          2.2362BBBB   JOHNSON H.L. 1950, ASTROPHYS.J. 112,240                           
+          2.2367BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          2.2383BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          2.2384BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          2.2414BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          2.2420BBBB   CANNON R.D., LLOYD C. 1970, MON.NOT.R.ASTR.SOC. 150,279           
+          2.2421BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          2.2422BBBB   VAN SCHEWICK H. 1966, VEROEFF.ASTR.INST.UNIV.BONN NO 74           
+          2.2423BBBB   SMYTH M.J., NANDY K. 1962, PUBL.R.OBS.EDINBURGH  III,23           
+          2.2437BBBB   CUFFEY J. 1941, ASTROPHYS.J. 94,55                                
+                                                                                         
+          2.2439BBBB   WHITE S.D.M. 1975, ASTROPHYS.J. 197,67                            
+          2.2447BBBB   BECKER W. 1959, Z. ASTROPHYS. 48,279                              
+          2.2451BBBB   WILLIAMS P.M. 1967, MON. NOTES ASTR.SOC.STH.AFR. 26,30            
+          2.2453BBBB   SEGGEWISS W. 1971, VEROEFF.ASTR.INST.UNIV.BONN NO 83              
+          2.2467BBBB   LODEN L.O. 1966, ARK.ASTR. 4,65                                   
+          2.2477BBBB   EGGEN O.J., STOY R.H. 1961, R.OBS.BULL. NO 24                     
+          2.2482BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          2.2483BBBB   FITZGERALD M.P., MOFFAT A.F.J. 1975, ASTRON.ASTROPHYS. 20,289     
+          2.2506BBBB   PURGATHOFER A. 1964, ANN.UNIV.STERNW. WIEN 26 NO 2                
+          2.2516BBBB   COX A.N. 1955, ASTROPHYS.J. 121,628                               
+                                                                                         
+          2.2527BBBB   LINDOFF U. 1973, ASTRON.ASTROPHYS.SUPP. 9,229                     
+          2.2533BBBB   LINDOFF U. 1968, ARK.ASTR. 4,587                                  
+          2.2539BBBB   PESCH P. 1961, ASTROPHYS.J. 134,602                               
+          2.2546BBBB   LINDOFF U. 1968, ARK.ASTR. 5,63                                   
+          2.2547BBBB   FERNIE J.D. 1959, MON.NOTES ASTR.SOC.STH.AFR. 18,57               
+          2.2548BBBB   LI HEN 1954, ANN.OBS.ASTR.ZO-SE 23,1                              
+          2.2567BBBB   LINDOFF U. 1968, ARK.ASTR. 4,587                                  
+          2.2571BBBB   LINDOFF U. 1968, ARK.ASTR. 4,587                                  
+          2.2579BBBB   LINDOFF U. 1968, ARK.ASTR. 5,63                                   
+          2.2632BBBB   KLEIN-WASSINK W.J. 1927, PUBL.KAPTEYN ASTR.LAB. 41                
+ 1                                                                           A 5. 3      
+                       VANDERLINDEN H.L. 1933, ETUDE DE L AMAS DE PRAESEPE.              
+                       J. DUCULOT, GEMBLOUX (BELGIQUE). NO VL+1000                       
+          2.2635BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          2.2660BBBB   HARTWICK F.D.A., HESSER J.E. 1973, ASTROPHYS.J. 183,883           
+          2.2669BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          2.2670BBBB   LYNGA G. 1959, ARK.ASTR. 2,379                                    
+          2.2682BBBB   FAGERHOLM E. 1906, UPPSALA DISSERTATION                           
+                       MURRAY C.A., ET AL. 1965, R.OBS.BULL. NO 91, NO+400               
+          2.2808BBBB   ALCAINO G. 1969, ASTROPHYS.J. 156,853                             
+          2.2818BBBB   TIFFT W.G., ET AL. 1972, MON.NOT.R.ASTR.SOC. 158,47               
+                                                                                         
+          2.2910BBBB   BECKER W. 1960, Z.ASTROPHYS. 51,498                               
+          2.2972BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          2.3033BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          2.3105BBBB   MOFFAT A.F.J., FITZGERALD M.P. 1974, ASTRON.ASTROPHYS.SUPP. 16,25 
+          2.3114BBBB   JANKOWITZ N.E., MCCOSH C.J. 1963, MON.NOTES ASTR.SOC.STH.AFR 22,18
+          2.3228BBBB   HOGG A.R. 1963, MON.NOT.R.ASTR.SOC. 125,307                       
+          2.3255BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          2.3293BBBB   FEAST M.W. 1958, MON.NOT.R.ASTR.SOC. 118,618                      
+          2.3324BBBB   CLARIA J.J. 1977, ASTRON.ASTROPHYS.SUPP. 27,145                   
+          2.3330BBBB   BECKER W. 1960, Z.ASTROPHYS. 49,168                               
+                                                                                         
+          2.3532BBBB   KOELBLOED D. 1959, BULL.ASTR.INST.NETHERL. 14,265                 
+          2.3572BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          2.3590BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          2.3603BBBB   SHER D. 1965, MON.NOT.R.ASTR.SOC. 129,237                         
+          2.3680BBBB   EGGEN O.J. 1969, ASTROPHYS.J. 155,439                             
+          2.3766BBBB   AHMED F. 1962, PUBL.R.OBS.EDINBURGH 3,60                          
+          2.4103BBBB   WESSELINK A.J. 1969, MON.NOT.R.ASTR.SOC. 146,329                  
+          2.4147BBBB   SANDAGE A.R., WALKER M.F. 1955, ASTR.J. 60,230                    
+          2.4337BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.4439BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+                                                                                         
+          2.4349BBBB   LOHMAN W. 1961, ASTR.NACH. 286,105                                
+          2.4463BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.4609BBBB   FEINSTEIN A., MARRACO H.G. 1971, PUBL.ASTR.SOC.PACIFIC 83,218     
+          2.4755BBBB   ARP H., VAN SANT C.T. 1958, ASTR.J. 63,341                        
+          2.4815BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.4883BBBB   ALCAINO G. 1971, ASTRON.ASTROPHYS. 13,287                         
+          2.5053BBBB   PURGATHOFER A.TH. 1966, MITT.UNIV.STERNW.WIEN 13 NO 3             
+          2.5138BBBB   LINDOFF U. 1972, ASTRON.ASTROPHYS.SUPP. 7,231                     
+          2.5139BBBB   WOOLLEY R.R., ET AL. 1966, R.OBS.ANN. NO 2                        
+          2.5168BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+                                                                                         
+          2.5281BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.5316BBBB   RAHIM M.A. 1966, ASTR.NACH. 289,75                                
+          2.5460BBBB   CLARIA J.J. 1971, ASTR.J. 76,369                                  
+          2.5606BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.5617BBBB   LINDOFF U. 1968, ARK.ASTR. 4,471                                  
+          2.5662BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.5749BBBB   LYNGA G. 1964, MEDD.LUNDS ASTR.OBS. 2 NO 139                      
+          2.5822BBBB   BRUCK M.T., ET AL. 1968, PUBL.R.OBS.EDINBURGH 6 NO 9              
+          2.5823BBBB   BRUCK M.T., ET AL. 1968, PUBL.R.OBS.EDINBURGH 6 NO 9              
+          2.6005BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+ 1                                                                           A 5. 4      
+          2.6025BBBB   FEINSTEIN A. 1971, PUBL.ASTR.SOC.PACIFIC 83,800                   
+          2.6031BBBB   LINDOFF U. 1966, ARK.ASTR. 4,305                                  
+          2.6067BBBB   THACKERAY A.D., ET AL. 1962, MON.NOT.R.ASTR.SOC. 124,445          
+          2.6087BBBB   LANDOLT A.J. 1964, ASTROPHYS.J.SUPP. 8,329                        
+          2.6121BBBB   GREENSTEIN J.L. 1939, ASTROPHYS.J. 90,387                         
+          2.6124BBBB   KOELBLOED D. 1959, BULL.ASTR.INST.NETHERL. 14,265                 
+          2.6134BBBB   LINDOFF U. 1972, ASTRON.ASTROPHYS.SUPP. 7,231                     
+          2.6167BBBB   BRUCK M.T., SMYTH M.J. 1966, PUBL.R.OBS.EDINBURGH 5,195           
+          2.6169BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.6178BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+                                                                                         
+          2.6193BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.6204BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.6208BBBB   LINDOFF U. 1972, ASTRON.ASTROPHYS.SUPP. 7,231                     
+          2.6218BBBB   RACINE R. 1971, ASTR.J. 76,331                                    
+          2.6231BBBB   SEGGEWISS W. 1968, VEROEFF.ASTR.INST.UNIV.BONN NO 79              
+          2.6242BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.6249BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          2.6250BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          2.6259BBBB   HAWARDEN F.G. 1974, MON.NOT.R.ASTR.SOC. 169,539                   
+          2.6281BBBB   FEINSTEIN A., FORTE J.C. 1974, PUBL.ASTR.SOC.PACIFIC 86,284       
+                                                                                         
+          2.6322BBBB   LOHMAN W., SCHNUR G. 1962, ASTR.NACH 287,17                       
+          2.6341BBBB   SANDAGE A.R., WALKER M.F. 1966, ASTROPHYS.J. 143,313              
+          2.6352BBBB   ALCAINO G. 1971, ASTRON.ASTROPHYS 11,7                            
+          2.6362BBBB   ALCAINO G. 1970, ASTROPHYS.J. 159,325                             
+          2.6383BBBB   THE P.S. 1965, CONTR.BOSSCHA OBS. NO 32                           
+          2.6396BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          2.6397BBBB   WOOLLEY R., ET AL. 1961, R.OBS.BULL. NO 43                        
+          2.6405BBBB   ROHLFS K., ET AL. 1959, Z.ASTROPHYS. 47,15                        
+          2.6416BBBB   THE P.S., STOKES N. 1970, ASTRON.ASTROPHYS. 5,298                 
+          2.6425BBBB   THE P.S., STOKES N. 1970, ASTRON.ASTROPHYS. 5,298                 
+                                                                                         
+          2.6451BBBB   ALCAINO G. 1971, ASTRON.ASTROPHYS. 13,399                         
+          2.6475BBBB   KOELBLOED D. 1959, BULL.ASTR.INST.NETHERL. 14,265                 
+          2.6494BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.6514BBBB   OGURA K., ISHIDA K. 1975, PUBL.ASTR.SOC.JAPAN 27,119              
+          2.6530BBBB   WALKER M.F. 1957, ASTROPHYS.J. 125,636                            
+          2.6531BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.6541BBBB   ALCAINO G. 1971, ASTRON.ASTROPHYS. 13,399                         
+          2.6604BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          2.6611BBBB   WALKER M.F. 1961, ASTROPHYS.J. 133,438                            
+          2.6613BBBB   LINDOFF U. 1971, ASTRON.ASTROPHYS. 15,439                         
+                                                                                         
+          2.6618BBBB   OGURA K., ISHIDA K. 1976, PUBL.ASTR.SOC.JAPAN 28,35               
+          2.6633BBBB   KOPFF E. 1943, ASTR.NACH. 274,69                                  
+          2.6649BBBB   CUFFEY J. 1940, ASTROPHYS.J. 92,312                               
+          2.6649BBBB   MADORE B.F., VAN DEN BERGH S. 1975, ASTROPHYS.J. 197,55           
+          2.6664BBBB   ARP H.C. 1958, ASTROPHYS.J. 128,166                               
+          2.6694BBBB   CUFFEY J. 1940, ASTROPHYS.J. 92,312                               
+          2.6705BBBB   KUSTNER H. 1923, VEROEFF.ASTR.INST.UNIV.BONN NO 18                
+          2.6709BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.6716BBBB   LINDOFF U. 1971, ASTRON.ASTROPHYS. 15,439                         
+          2.6752BBBB   ALCAINO G. 1970, ASTROPHYS.J. 159,325                             
+ 1                                                                           A 5. 5      
+          2.6755BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.6791BBBB   KINMAN T.D. 1965, ASTROPHYS.J. 142,655                            
+          2.6802BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.6811BBBB   LINDOFF U. 1972, ASTRON.ASTROPHYS. 16,315                         
+          2.6819BBBB   AUNER G. 1974, ASTRON.ASTROPHYS.SUPP. 13,143                      
+          2.6823BBBB   BARKHATOVA K.A. 1957, SOVIET ASTR. 1,827                          
+          2.6830BBBB   BARKHATOVA K.A. 1957, SOVIET ASTR. 1,822                          
+          2.6834BBBB   FUNFSCHILLING H.  1967, Z.ASTROPHYS. 66,440                       
+          2.6838BBBB   ARP H.C., HARTWICK F.D.A. 1971, ASTROPHYS.J. 167,499              
+          2.6866BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+                                                                                         
+          2.6871BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.6882BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.6883BBBB   PURGATHOFER A. 1964, ANN.UNIV.STERNW. WIEN 26 NO 2                
+          2.6891BBBB   DICKENS R.J. 1972, MON.NOT.R.ASTR.SOC. 157,281                    
+          2.6910BBBB   TIFFT W.G. 1958, ASTR.J. 63,127                                   
+          2.6913BBBB   TIFFT W.G. 1958, ASTR.J. 63,127                                   
+          2.6939BBBB   KUSTNER F. 1923, VEROEFF.ASTR.INST.UNIV.BONN NO 48                
+          2.6940BBBB   VASILEVSKIS S., RACH R.A. 1957, ASTR.J. 62,175                    
+          2.7031BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.7039BBBB   HASSAN S.M. 1973, ASTRON.ASTROPHYS.SUPP. 9,261                    
+                                                                                         
+          2.7062BBBB   JONES B.F., VAN ALTENA W.F. 1970, ASTRON.ASTROPHYS. 9,86          
+          2.7063BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.7067BBBB   BECKER W. 1965, MEM.ASTR.SOC.ITALIANA 36,283                      
+          2.7082BBBB   HASSAN S.M. 1973, ASTRON.ASTROPHYS.SUPP. 9,261                    
+          2.7086BBBB   HASSAN S.M. 1967, Z.ASTROPHYS. 66,6                               
+          2.7092BBBB   MAVERS F.W. 1940, ASTR.ABH.HAMBURG.STERNW. BERGEDORF 5 NO 7       
+          2.7099BBBB   DICKENS R.J. 1972, MON.NOT.R.ASTR.SOC. 157,299                    
+          2.7128BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.7142BBBB   VAN DEN BERGH S. 1970, ASTRON.ASTROPHYS. 9,209                    
+          2.7160BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+                                                                                         
+          2.7209BBBB   MAVERS F.W. 1940, ASTR.ABH.HAMBURG.STERNW. BERGEDORF 5 NO 4       
+          2.7235BBBB   BECKER W. 1965, MEM.ASTR.SOC.ITALIANA 36,271                      
+          2.7243BBBB   LENGAUER G.G. 1937, IZV.GLAV.ASTR.OBS.PULKOVE 15 NO 126           
+          2.7654BBBB   LUNDBY A. 1946, UPPSALA ASTR.OBS.ANN. 1 NO 10                     
+          2.7686BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          2.7762BBBB   CHINCARINI G. 1966, MEM.SOC.ASTR.ITALIANA 37,423                  
+          2.7788BBBB   BECKER W. 1965, MEM.ASTR.SOC.ITALIANA 36,277                      
+          2.7789BBBB   KUESTNER F. 1923, VEROEFF.ASTR.INST.UNIV.BONN NO 8                
+          2.7790BBBB   SANDAGE A.R. 1958, ASTROPHYS.J. 128,150                           
+          2.7822BBBB   BLANCO V. 1959, ASTROPHYS.J. 130,482                              
+ 1                                                                           A 6. 1      
+         TABLE 6       REFERENCES FOR THE NUMEROTATION OF STARS IN IC CLUSTERS           
+         *******                                                                         
+                                                                                         
+          3.0166BBBB   BURKHEAD M.S. 1969, ASTR.J. 74,1171                               
+          3.0348BBBB   GINGRICH C.H. 1922, ASTROPHYS.J. 56,139                           
+          3.1369BBBB   HASSAN S.M. 1973, ASTRON.ASTROPHYS.SUPP. 9,261                    
+          3.1805BBBB   VASILEVSKIS S. 1965, ASTR.J. 70,10                                
+          3.1848BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          3.2391BBBB   PERRY C.L., HILL G. 1969, ASTR.J. 74,89  (NO CDS)                 
+          3.2395BBBB   LYNGA G. 1959, ARK.ASTR. 2,379                                    
+          3.2581BBBB   EVANS L.T. 1969, MON.NOT.R.ASTR.SOC. 146,101                      
+          3.2602BBBB   BRAES L.L.E. 1962, BULL.ASTR.INST.NETHERL.16,297                  
+          3.2714BBBB   BECKER W. 1960, Z.ASTROPHYS. 51,498                               
+                                                                                         
+          3.2944BBBB   THACKERAY A.D., WESSELINK A.J. 1965, MON.NOT.R.ASTR.SOC. 131,121  
+          3.4651BBBB   LINDOFF U. 1972, ASTRON.ASTROPHYS.SUPP. 7,231                     
+          3.4665BBBB   KOPFF E. 1943, ASTR.NACH. 274,69                                  
+          3.4725BBBB   JOHNSON H.L. 1960, ASTROPHYS.J. 131,620                           
+          3.4756BBBB   KOPFF E. 1943, ASTR.NACH. 274,69                                  
+          3.4996BBBB   VAN SCHEWICK H. 1967, VEROEFF.ASTR.INST.UNIV.BONN 76,35           
+          3.5146BBBB   WALKER M.F. 1960, ASTROPHYS.J. 130,57                             
+ 1                                                                           A 7. 1      
+         TABLE 7A      REFERENCES FOR THE NUMEROTATION OF STARS IN ANONYMOUS CLUSTERS    
+         ********                                                                        
+                                                                                         
+          4.0802BBBB   DUPUY D.L., ZUKAUSKAS W. 1976, R.A.S.C.JOUR. 70,169               
+          4.0810BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          4.0901BBBB   EPSTEIN I. 1968, ASTR.J. 73,556                                   
+          4.1225BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          4.1808BBBB   FENKART R.P., ET AL. 1972, ASTRON.ASTROPHYS.SUPP. 7,487           
+          4.1815BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          4.1816BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          4.1910BBBB   LYNGA G. 1964, MEDD.LUNDS ASTR.OBS. II NO 139                     
+          4.2109BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.2110BBBB   CLARIA J.J. 1976, ASTR.J. 81,155                                  
+                                                                                         
+          4.2111BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.2112BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.2114BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          4.2115BBBB   FEINSTEIN A. 1971, PUBL.ASTR.SOC.PACIFIC 83,218                   
+          4.2116BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          4.2118BBBB   HOGG A.R. 1961, OBSERVATORY 81,69                                 
+          4.2122BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          4.2314BBBB   HARDORP J. 1960, ASTR.ABH.HAMBURG.STERNW. BERGEDORF 5 NO 7        
+          4.2402BBBB   LINDOFF U. 1968, ARK.ASTR. 4,471                                  
+          4.2404BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+                                                                                         
+          4.2406BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          4.2414BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          4.2518BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          4.2538BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS. 44,413             
+          4.2701BBBB   LINDOFF U. 1968, ARK.ASTR. 5,63                                   
+          4.2704BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          4.2705BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          4.2706BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          4.2708BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          4.2713BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+                                                                                         
+          4.2712BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          4.2716BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          4.2717BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.2718BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          4.2720BBBB   LYNGA G. 1964, MEDD.LUNDS ASTR.OBS. 2 NO 139                      
+          4.2724BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          4.2805BBBB   LEE P.D., PERRY C.L. 1971, ASTR.J. 76,464  (NO CDS)               
+          4.2901BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.3102BBBB   KRZEMINSKI W., SERKOWSKI K. 1967, ASTROPHYS.J. 147,988            
+          4.3113BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+                                                                                         
+          4.3114BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.3116BBBB   LYNGA G. IAU SYMP. NO 38,270 (NO CDS)                             
+          4.3502BBBB   HOAG A.A., ET AL. 1961, PUBL.U.S.NAV.OBS. 17,347                  
+          4.3507BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          4.3509BBBB   PISMIS P. 1970, BOL.OBS.TONANTZINTLA TACUBAYA 35,293              
+          4.3510BBBB   LYNGA G. 1959, ARK.ASTR. 2,379                                    
+          4.3514BBBB   THE P.S., VLEEMING G. 1971, ASTRON.ASTROPHYS. 14,120              
+          4.3515BBBB   GRUBISSICH C. 1968, Z.ASTROPHYS. 68,173                           
+          4.3516BBBB   FEINSTEIN A. 1969, MON.NOT.R.ASTR.SOC. 143,273                    
+          4.3517BBBB   SHER D. 1965, MON.NOT.R.ASTR.SOC. 129,237                         
+ 1                                                                           A 7. 2      
+          4.3518BBBB   SCHMIDT H., DIAZ G. 1946, VEROEFF.ASTR.INST.UNIV.BONN NO 71       
+          4.3521BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          4.3527BBBB   THE P.S., STOKES N. 1970, ASTRON.ASTROPHYS. 5,298                 
+          4.3528BBBB   THE P.S., STOKES N. 1970, ASTRON.ASTROPHYS. 5,298                 
+          4.3535BBBB   YILMAZ F. 1966, Z.ASTROPHYS. 64,54                                
+          4.3601BBBB   RUFENER F. 1971, ASTRON.ASTROPHYS.SUPP. 3,181                     
+          4.3801BBBB   WESTERLUND B.E. 1961, UPPSALA ASTR.OBS.ANN. 5,17                  
+          4.3802BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.3803BBBB   WESTERLUND B.E. 1969, ASTR.J. 74,882                              
+          4.4002BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+                                                                                         
+          4.4003BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          4.4004BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          4.4008BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.4009BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.4010BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.4011BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.4012BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          4.4013BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          4.4014BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+ 1                                                                           A 7. 3      
+         TABLE 7B                                                                        
+         ********                                                                        
+                                                                                         
+          5.1096BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          5.1121BBBB   FEINSTEIN A. 1967, ASTROPHYS.J. 149,107                           
+          5.1140BBBB   WILLIAMS P.M. 1967, MON.NOTES ASTR.SOC.STH.AFR. 26,126            
+          5.1197BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          5.1228BBBB   FEINSTEIN F., ET AL. 1976, ASTRON.ASTROPHYS.SUPP. 24,389          
+          5.1258BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          5.1268BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          5.1271BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          5.1307BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          5.1347BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+                                                                                         
+          5.1399BBBB   HALL D.S., VAN LANDINGHAM F.G. 1970, PUBL.ASTR.SOC.PACIFIC 82,487 
+          5.1463BBBB   TOWNSED R.E. 1975, PUBL.ASTR.SOC.PACIFIC 87,753                   
+          5.2020BBBB   HECKMANN O., ET AL. 1956, MITT.HAMBURG.STERNW. BERGEDORF NO 101   
+          5.2022BBBB   HERTZSPRUNG E. 1947, ANN.STERREW.LEIDEN 19,3                      
+          5.2025BBBB   VAN BUEREN H.G. 1952, BULL.ASTR.INST.NETHERL.11,385               
+                       VAN ALTENA W.F. 1966, ASTR.J. 1966, 71,482  (NO VL+1000)          
+          5.2066BBBB   HAWARDEN T.G. 1976, MON.NOT.R.ASTR.SOC. 174,471                   
+          5.2101BBBB   BRAES L.L.E. 1962, MON.NOTES ASTR.SOC.STH.AFR. 21,16              
+          5.2105BBBB   SHER D. 1965, MON.NOT.R.ASTR.SOC. 129,237                         
+          5.2111BBBB   TRUMPLER R.J. 1938, LICK OBS.BULL. 18,167                         
+                                                                                         
+          5.2227BBBB   EPSTEIN I. 1968, ASTR.J. 73,556                                   
+          5.3018BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          5.3020BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          5.3032BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          5.3034BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          5.3036BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          5.3046BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          5.3047BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          5.3049BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          5.3055BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+                                                                                         
+          5.3059BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 7,133         
+          5.3067BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,85         
+          5.3076BBBB   VOGT N., MOFFAT A.F.J. 1972, ASTRON.ASTROPHYS.SUPP. 9,97          
+          5.3079BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,855        
+          5.3097BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,125        
+          5.3098BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          5.3107BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          5.3108BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          5.3118BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+          5.3119BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+                                                                                         
+          5.3127BBBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS.SUPP. 20,155        
+          5.3166BBBB   MOFFAT A.F.J., VOGT N. 1973, ASTRON.ASTROPHYS.SUPP. 10,135        
+ 1                                                                           A 8. 1      
+         TABLE 8       REFERENCES FOR CATALOGUES AND LISTS                               
+         *******                                                                         
+                                                                                         
+          6.000BBBBB   LUYTEN W.J. A SEARCH FOR FAINT BLUE STARS.                        
+                       UNIVERSITY OF MINNEAPOLIS (MINNESOTA)                             
+          6.001BBBBB   LUYTEN W.J. 1957, A CATALOGUE OF  9867 STARS IN THE               
+                       SOUTHERN HEMISPHERE WITH PROPER MOTION EXCEEDING 0.2              
+                       ANNUALLY. LUND PRESS, MINNEAPOLIS (MINNESOTA)                     
+                       LUYTEN W.J. 1961, A CATALOGUE OF 7127 STARS IN THE                
+                       NORTHERN HEMISPHERE WITH PROPER MOTION EXCEEDING 0.2              
+                       ANNUALLY. THE LUND PRESS, MINNEAPOLIS (MINNESOTA)                 
+                       LUYTEN W.J. 1962, FIRST SUPPLEMENT TO THE LTT                     
+                       CATALOGUES. THE OBS,UNIV. MINNESOTA                               
+                                                                                         
+                                                                                         
+          6.1000BBBB   STEPHENSON C.B., SANDULEAK N. 1971, PUBL.WARNER SWASEY OBS. I NO 1
+          6.1001BBBB   GLIESE W. 1969, CATALOGUE OF NEARBY STARS,VEROEFF.HEIDELBERG NO 22
+          6.1002BBBB   WOOLLEY R., ET AL. 1970, R.OBS.ANN. NO 5                          
+          6.1003BBBB   JENKINS L.D.  GENERAL CATALOGUE OF TRIGONOMETRIC                  
+                       STELLAR PARALLAXES, 1963, YALE UNIV.OBS.                          
+          6.1004BBBB   WORLEY C.E. 1963, PUBL.U.S.NAV.OBS. 18 PART 3                     
+          6.1005BBBB   GICLAS H.L., ET AL. 1972, LOWELL OBS.BULL. NO 158                 
+                                           1973, LOWELL OBS.BULL. NO 160                 
+                                           1975, LOWELL OBS.BULL. NO 162                 
+          6.1006BBBB   GICLAS H.L., ET AL. 1965, LOWELL OBS.BULL. NO 125                 
+                                                                                         
+                                           1967, LOWELL OBS.BULL. NO 141                 
+                                           1970, LOWELL OBS.BULL. NO 153                 
+                                           1972, LOWELL OBS.BULL. NO 158                 
+                                           1973, LOWELL OBS.BULL. NO 160                 
+                                           1975, LOWELL OBS.BULL. NO 162                 
+          6.1007BBBB   IRIARTE B., CHAVIRA E. 1957, BOL.OBS.TONANTZINTLA TACUBAYA NO 16,3
+                       CHAVIRA E. 1959, BOL.OBS.TONANTZINTLA TACUBAYA NO 18,3            
+          6.1008BBBB   CHAVIRA E. 1958, BOL.OBS.TONANTZINTLA TACUBAYA NO 17,5            
+          6.1009BBBB   HILTNER W.A. 1956, ASTROPHYS.J.SUPPL.SER. 22,349                  
+          6.1010BBBB   FEHRENBACH CH., DUFLOT M. 1970, ASTR.AP.SPECIAL SUPP. NO 1 (*P)   
+                                                                                         
+          6.1011BBBB   NUMEROVA A.B. 1958, IZV.KRYM.ASTROFIZ.OBS. 19,230                 
+          6.1012BBBB   MERRILL P.W., BURWELL C.G. 1933, ASTROPHYS.J. 78,87               
+                                                  1943, ASTROPHYS.J. 98,153              
+                                                  1949, ASTROPHYS.J. 110,387             
+          6.1013BBBB   HENIZE K.G. 1976, ASTROPHYS.J.SUPPL.SER. 30,491                   
+          6.1014BBBB   WOLFF M. 1919-1930, LISTS IN ASTR. NACH.                          
+          6.1015BBBB   VAN DEN BERGH S. 1971, ASTR.J. 76,1082                            
+          6.1016BBBB   HARO G., LUYTEN W.J. 1962, BOL.OBS.TONANTZINTLA TACUBAYA 3,37     
+                                                                                         
+                                                                                         
+          6.20001BBB   FEIGE J. 1958, ASTROPHYS.J. 128,267                               
+          6.20002BBB   LYNGA G. 1964, MEDD.LUNDS ASTR.OBS. II NO 141                     
+          6.20003BBB   RUBIN, V., LOSEE J.M. 1971, ASTR.J. 76,1099                       
+          6.20004BBB   HUMASON M.L., ZWICKY F. 1947, ASTROPHYS.J. 105,85                 
+          6.20005BBB   LYNGA G. 1968, MEDD.LUNDS ASTR.OBS. I NO 238                      
+          6.20006BBB   BARNES T.G., EVANS N.R. 1970, PUBL.ASTR.SOC.PACIFIC 82,888        
+          6.20007BBB   WRAMDEMARK S. 1976, ASTRON.ASTROPHYS.SUPP. 26,31                  
+          6.20008BBB   LYNGA G. 1964, MEDD.LUNDS ASTR.OBS. II NO 139                     
+          6.20009BBB   GRAHAM J.A. 1968, BULL.ASTR.INST.NETHERL.SUPPL. 2,397             
+          6.20010BBB   MERRILL P.W., BURWELL C.G. 1950, ASTROPHYS.J. 112,72              
+ 1                                                                           A 8. 2      
+          6.20011BBB   SHERWOOD W.A., DACHS J. 1976, ASTRON.ASTROPHYS. 48,187            
+          6.20012BBB   ARDEBERG A., ET AL. 1972, ASTRON.ASTROPHYS.SUPP. 6,249            
+          6.20013BBB   MAYALL M.W. 1951, HARVARD COLL.OBS.BULL. 920,32                   
+          6.20015BBB   BARBIERI C., ET AL. 1968, PUBBL.OSS.ASTR.PADOVA NO 143            
+          6.20016BBB   BARBIERI C. TO BE PUBLISHED                                       
+          6.20017BBB   SLETTEBAK A., STOCK J. 1959, ASTR.ABH.HAMB.STERNW.BERGEDORF 5,25  
+          6.20018BBB   BERN K., VIRDEFORS B. 1972, ASTRON.ASTROPHYS.SUPP. 6,117          
+          6.20019BBB   HOGG A.R. 1963, PUBL.ASTR.SOC.PACIFIC 75,194                      
+          6.20020BBB   EGGEN O.J., GREENSTEIN G. 1965, ASTROPHYS.J. 141, 83              
+                                                 1965, ASTROPHYS.J. 142,925              
+                                                                                         
+                                                 1967, ASTROPHYS.J. 150,927              
+          6.20021BBB   SLETTEBAK A., BRUNDAGE R.K. 1971, ASTR.J. 76,338                  
+          6.20022BBB   JAIDEE S., LYNGA G. 1969, ARK.ASTR. 5,345                         
+          6.20023BBB   MUNCH L. 1951, ASTROPHYS.J. 113,309                               
+          6.20025BBB   AZZOPARDI M., VIGNEAU J. 1975, ASTRON.ASTROPHYS.SUPP. 19,271      
+          6.20027BBB   SANDULEAK N. 1968, ASTR.J. 73,246                                 
+          6.20028BBB   KLEMOLA A. 1961, ASTR.J. 67,740                                   
+          6.20029BBB   VAN WIJK U. 1952, HARVARD BULL NO 921,7                           
+          6.20030BBB   VYSSOTSKY A.N. 1943, ASTROPHYS.J. 97,381                          
+                                      1946, ASTROPHYS.J. 104,234                         
+                                                                                         
+                                      1952, ASTROPHYS.J. 116,117                         
+                                      1956, ASTR.J. 61,201                               
+                                      1958, ASTR.J. 63,211                               
+          6.20031BBB   HARTWICK F.D.A., HESSER J.E. 1973, ASTROPHYS.J. 183,883           
+          6.20032BBB   LANDOLT A.U. 1973, PUBL.ASTR.SOC.PACIFIC 85,203                   
+          6.20034BBB   RUFENER F. 1971, ASTRON.ASTROPHYS.SUPP. 3,181                     
+          6.20035BBB   PHILIP A.G.D., SANDULEAK N. 1968, BOL.OBS.TONANTZ.TAC. NO 4,253   
+          6.20036BBB   HARO G., CHAVIRA E. 1964, ONR SYMP. FLAGSTAFF ARIZONA             
+          6.20037BBB   HARO G., IRIARTE B., CHAVIRA E. 1953, BOL.OBS.TON.Y TAC. NO 8,3   
+          6.20038BBB   HERBIG G.H. 1962, ADV.ASTR.ASTROPHYS. 1,47                        
+                                                                                         
+          6.20039BBB   SANDAGE A., WALKER M.F. 1966, ASTROPHYS.J. 143,313                
+          6.20040BBB   LJUNGGREN B., OJA T. 1964, ARK.ASTR. 3,439                        
+          6.20043BBB   VAN DEN BERGH S. 1971, ASTROPHYS.J. 165,259                       
+          6.20044BBB   RODGERS A.W. 1960, MON.NOT.R.ASTR.SOC. 120,163                    
+          6.20045BBB   LANDOLT A.U. 1975, PUBL.ASTR.SOC.PACIFIC 87,379                   
+          6.20046BBB   MUZZIO J.C., RYDGREN A.E. 1974, ASTR.J. 79,864                    
+          6.20047BBB   ROBERTS M.S. 1962, ASTR.J. 67,79                                  
+          6.20049BBB   HENIZE K.G. 1956, ASTROPHYS.J.SUPPL.SER. II,315  (TABLE 1)        
+          6.20050BBB   FEHRENBACH CH., DUFLOT M. 1970, ASTR.AP.SPECIAL SUPP. NO 1 (*S)   
+          6.20051BBB   FEHRENBACH CH., DUFLOT M. 1970, ASTR.AP.SPECIAL SUPP. NO 1 (*G)   
+                                                                                         
+          6.20052BBB   BRUNET J.P., ET AL. 1975, ASTRON.ASTROPHYS.SUPP. 21,109           
+          6.20053BBB   AZZOPARDI M., VIGNEAU J. 1975, ASTRON.ASTROPHYS.SUPP. 22,285      
+          6.20055BBB   COYNE G.V., ET AL. 1974, VATICAN OBS.PUB. 1 NO 5                  
+                                          1975, VATICAN OBS.PUB. 1 NO 6                  
+                                          1976, VATICAN OBS.PUB. 1 NO 8                  
+          6.20056BBB   ABELL G.O. 1966, ASTROPHYS.J. 144,259                             
+          6.20057BBB   FEAST M.W., ET AL. 1960, MON.NOT.R.ASTR.SOC. 121,337              
+          6.20058BBB   VANDERVORT G.L. 1958, ASTR.J. 63,477                              
+          6.20059BBB   IRIARTE E.B., CHAVIRA E. 1956, BOL.OBS.TONANTZINTLA TACUBAYA 14,31
+          6.20060BBB   DENOYELLE J. 1977, ASTRON.ASTROPHYS.SUPPL. 27,343                 
+ 1                                                                           A 8. 3      
+          6.20061BBB   VAN DEN BERGH S., HERBST E. 1974, ASTR.J. 79,603                  
+          6.20062BBB   WARREN P.R., PENFOLD J.E. 1974, MON.NOTES ASTR.SOC.STH.AFR. 14,8  
+          6.20063BBB   PENSTON M.V., WING R.F. 1974, OBSERVATORY 93,149                  
+          6.20064BBB   MUNCH G. 1956, BOL.OBS.TONANTZINTLA TACUBAYA NO 15,32             
+          6.20065BBB   SCHMIDT E.G. 1975, MON.NOT.R.ASTR.SOC. 172,401 (GLOBULE B361)     
+          6.20066BBB   BERTAUD CH., ET AL. 1973, ASTRON.ASTROPHYS. 24,357                
+                                                                                         
+                                                                                         
+          6.300XXBBB   BOK B.J., BOK P.F. 1969, ASTR.J. 74,1125                          
+          6.301XXBBB   FITZGERALD M.P., ET AL. 1969, PUBL.ASTR.SOC.PACIFIC 81,804        
+          6.302XXBBB   WARREN P.R., ET AL. 1976, MON.NOT.R.ASTR.SOC. 174,213             
+          6.303XXBBB   NASSAU J.J., ET AL. 1954, ASTROPHYS.J. 120,478                    
+                       BLANCO V.M., NASSAU J.J. 1957, ASTROPHYS.J. 125,408               
+          6.306XXBBB   WESTERLUND B.E. 1969, ASTR.J. 74,882                              
+          6.307XXBBB   BOK J.B., ET AL. 1972, ASTR.J. 77,733                             
+          6.308XXBBB   ARDEBERG A., ET AL. 1973, ASTRON.ASTROPHYS.SUPP. 9,163            
+          6.309XXBBB   WRAMDEMARK S. 1973, ASTRON.ASTROPHYS.SUPP. 11,365                 
+          6.310XXBBB   MILLER E.W., MCCARTHY C.C. 1974, ASTR.J. 79,1294                  
+                                                                                         
+          6.311XXBBB   DENOYELLE J. 1975, ASTRON.ASTROPHYS.SUPP. 19,45                   
+          6.312XXBBB   BOUIGUE R. 1959, ANN.OBS.ASTR.TOULOUSE 27,47                      
+          6.313XXBBB   BOUIGUE R., ET AL. 1961, ANN.OBS.ASTR.TOULOUSE 28,33              
+          6.314XXBBB   SEGGEWISS W. 1971, VEROEFF.ASTR.INST.UNIV.BONN NO 82              
+          6.315XXBBB   DUFOUR R.J., DUVAL J.E. 1975, PUBL.ASTR.SOC.PACIFIC 87,769        
+                                                                                         
+                                                                                         
+          6.40501BBB   PURGATHOFER A.T.H. 1969, LOWELL OBS.BULL. 7 NO 10                 
+          6.40601BBB   WHITEOAK J. 1963, MON.NOT.R.ASTR.SOC. 125,105                     
+          6.41400BBB   CLARIA J.J. 1974, ASTR.J. 79,1022                                 
+          6.41701BBB   LYNGA G., WRAMDEMARK S. 1973, ASTRON.ASTROPHYS.SUPP. 12,365       
+                       WRAMDEMARK S. 1976, ASTRON.ASTROPHYS.SUPP. 23,231 (NO+200)        
+          6.41702BBB   WRAMDEMARK S. 1976, ASTRON.ASTROPHYS.SUPP. 23,231                 
+          6.41901BBB   MCGRUDER C.H., SCHNUR G. 1971, ASTRON.ASTROPHYS. 14,16            
+          6.42001BBB   SARG K., WRAMDEMARK S. 1970, ASTRON.ASTROPHYS.SUPP. 2,251         
+          6.42002BBB   BARBIER M., ET AL. 1973, ASTRON.ASTROPHYS. 27,421                 
+          6.42301BBB   HAUG U., ET AL. 1966, Z.ASTROPHYS 64,140                          
+                                                                                         
+          6.43001BBB   LYNGA G., WRAMDEMARK S. 1973, ASTRON.ASTROPHYS.SUPP. 12,365       
+          6.43101BBB   STENHOLM B., SODERHJELM S. 1972, ASTRON.ASTROPHYS.SUPP. 7,385     
+          6.43102BBB   STENHOLM B., SODERHJELM S. 1972, ASTRON.ASTROPHYS.SUPP. 7,385     
+          6.43103BBB   LODEN L.O., LODEN K.A. 1964, ARK.ASTR. 3,299                      
+          6.43104BBB   BREGMAN J., ET AL. 1973, LICK OBS.BULL. NO 647                    
+          6.45701BBB   HAUG U., ET AL. 1966, Z.ASTROPHYS 64,140                          
+          6.45702BBB   DRILLING J.S. 1972, ASTR.J. 77,463                                
+          6.45703BBB   MUZZIO J.C., MCCARTHY C.C. 1973, ASTR.J. 78,924                   
+                       MUZZIO J.C. 1974, ASTR.J. 79 ,959                                 
+          6.46201BBB   PHILIP A.G.D. 1966, ASTROPHYS.J.SUPPL.SER. 12,391                 
+ 1                                                                           A 8. 4      
+          6.46801BBB   LINDOFF U. 1968, ARK.ASTR. 4,433                                  
+          6.46802BBB   MUNCH L. 1954, BOL.OBS.TONANTZINTLA TACUBAYA 9,29                 
+          6.46803BBB   FITZGERALD P.M., MOFFAT A.F.J. 1975, ASTRON.ASTROPHYS.SUPP. 20,289
+          6.47101BBB   ROSLUND C. 1967, ARK.ASTR. 43,41                                  
+          6.47200BBB   MOFFAT A.F.J., VOGT N. 1975, ASTRON.ASTROPHYS. 44,413             
+          6.47301BBB   ROSLUND C. 1967, ARK.ASTR. 4,341                                  
+          6.47302BBB   ROSLUND C. 1964, ARK.ASTR. 3,357                                  
+          6.47501BBB   ROSLUND C. 1963, ARK.ASTR. 3,97                                   
+          6.47901BBB   LANDOLT A.U. 1967, A.J. 72,1012                                   
+          6.48601BBB   LYNGA G., WRAMDEMARK S. 1973, ASTRON.ASTROPHYS.SUPP. 12,365       
+                                                                                         
+                                                                                         
+          6.5XX0BBBB   KUKARKIN B.V., ET AL. 1958, 1960, 1967, GCVS                      
+                       STAR NAME OF THE TYPE * DF TAU *                                  
+          6.5XX1BBBB   KUKARKIN B.V., ET AL. 1958, 1960, 1967, GCVS                      
+                       STAR NAME OF THE TYPE * V380 ORI *                                
+                                                                                         
+                                                                                         
+          6.900XXBBB   LODEN L.O., 1967, ARK.ASTR. 4,375                                 
+                                   1968, ARK.ASTR. 4,425                                 
+                                   1969, ARK.ASTR. 5,149                                 
+                                   1969, ARK.ASTR. 5,161                                 
+                       LODEN L.O., NORDSTROM B. 1969, ARK.ASTR. 5,231                    
+          6.901XXBBB   LODEN L.O., 1967, ARK.ASTR. 4,375                                 
+                                   1968, ARK.ASTR. 4,425                                 
+                                   1969, ARK.ASTR. 5,149                                 
+                                   1969, ARK.ASTR. 5,161                                 
+                       LODEN L.O., NORDSTROM B. 1969, ARK.ASTR. 5,231                    
+                                                                                         
+          6.902XXBBB   LODEN L.O., 1967, ARK.ASTR. 4,375                                 
+                                   1968, ARK.ASTR. 4,425                                 
+                                   1969, ARK.ASTR. 5,149                                 
+                                   1969, ARK.ASTR. 5,161                                 
+                       LODEN L.O., NORDSTROM B. 1969, ARK.ASTR. 5,231                    
+          6.9030XBBB   MACCONNELL D.J. 1968, ASTROPHYS.J.SUPPL.SER. 16,275               
+                       X = 1 NW, 2 SW, 3 SE, 4 NE                                        
+          6.9040TEEB   WILDEY R.L. 1964, ASTROPHYS.J.SUPPL.SER. 8,439                    
+                       T=TABLE NUMBER, EE=MAIN STAR NUMBER, B=STAR NUMBER                
+          6.9050QQBB   ANGIONE R.J. 1971, ASTR.J. 76,412                                 
+                                                                                         
+                       QQ=QUASAR NUMBER NUMBERED IN SEQUENCE, BB=STAR                    
+                       NUMBER. A=1,B=2,C=3,ETC.                                          
+          6.9051QQBB   WING R.F. 1973, ASTR.J. 78,684                                    
+          6.9052QQBB   PENSTON M.V., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          6.9053QQXX   MCGIMSEY B.Q., MILLER H.R., WILLIAMSON R.M. 1976, ASTR.J. 81,750  
+          6.9060XBBB   MCCLURE R.D., RACINE R. 1969, ASTR.J. 74,1000                     
+                       X=1, 2, 3, 4 FOR M3, M13, M31, M33 SEQUENCES                      
+          6.907007BB   RACINE R. 1968, ASTR.J. 73,233                                    
+          6.907009BB   AVENI A.F., HUNTER J.H. 1972, ASTR.J. 77,17                       
+          6.907019BB   RACINE R. 1968, ASTR.J. 73,233                                    
+ 1                                                                           A 8. 5      
+          6.907064BB   RACINE R. 1968, ASTR.J. 73,233                                    
+          6.907080BB   AVENI A.F., HUNTER J.H. 1972, ASTR.J. 77,17                       
+          6.907087BB   RACINE R. 1968, ASTR.J. 73,233                                    
+          6.907090BB   RACINE R. 1968, ASTR.J. 73,233                                    
+          6.907092BB   RACINE R. 1968, ASTR.J. 73,233                                    
+          6.907114BB   RACINE R. 1968, ASTR.J. 73,233                                    
+          6.907119BB   RACINE R. 1968, ASTR.J. 73,233                                    
+          6.907130BB   RACINE R. 1968, ASTR.J. 73,233                                    
+          6.907141BB   AVENI A.F., HUNTER J.H. 1972, ASTR.J. 77,17                       
+          6.907146BB   AVENI A.F., HUNTER J.H. 1972, ASTR.J. 77,17                       
+                                                                                         
+          6.907150BB   AVENI A.F., HUNTER J.H. 1972, ASTR.J. 77,17                       
+          6.907152BB   AVENI A.F., HUNTER J.H. 1972, ASTR.J. 77,17                       
+          6.908BBBBB   FOR REFERENCES SEE TABLE 12                                       
+          6.910XBBBB   WEHINGER P.A., HIDAJAT B. 1973, ASTR..J. 78,401                   
+          6.911XXBBB   HAGGKVIST J., OJA T. 1973, ASTRON.ASTROPHYS.SUPP. 12,381          
+          6.912XXXXB   LODEN L.O. 1973, ASTRON.ASTROPHYS.SUPP. 10,125                    
+          6.913AABBB   HETZLER C. 1937, ASTROPHYS.J. 86,509                              
+                       AA=NO REGION, BBB=STAR NUMBER IN AA REGION                        
+          6.914XXXBB   JOY A.H. 1949, ASTROPHYS.J. 110,424                               
+                       XXX REGION NUMBER,  BB STAR NUMBER                                
+                                                                                         
+          6.915XXXBB   SANDERS W.L. 1966, ASTR.J. 71,719                                 
+                       XXX REGION NUMBER ATTRIBUTED IN ORDER, BB STAR NUMBER             
+          6.916XXXBB   VOGT N., MOFFAT A.F.J. 1975, ASTRON.ASTROPHYS. 45,405             
+                       XXX SHARPLESS (APJ SUP 4,257) HII REGION NUMBER, BB STAR NUMBER   
+ 1                                                                           A 9. 1      
+         TABLE 9       REFERENCES FOR THE CATALOGUES OF SELECTED AREAS                   
+         *******                                                                         
+                                                                                         
+                                                                                         
+          7.0XXXBBBB   DURCHMUSTERUNG OF SELECTED AREAS, SYSTEMATIC PLAN                 
+                       1918-1923, ANN.HARV.COLL.OBS. 101, 102, 103                       
+                                                                                         
+          7.1XXXBBBB   VAN RHIJN, P.J. DURCHMUSTERUNG OF SELECTED AREAS                  
+                       OF THE SPECIAL PLAN, KAPTEYN ASTR. LAB.                           
+                                                                                         
+          7.2XXXBBBB   MOUNT WILSON SELECTED AREAS                                       
+                       1930, CARNEGIE INST. PUBL. NO 402                                 
+                                                                                         
+          7.3XXXBBBB   SCHWASSMANN, A.,VAN RHIJN, P.J. 1938,  BERGEDORFER                
+                       SPEKTRAL DURCHMUSTERUNG DER 115 NORDLICHEN                        
+                       KAPTEYNSCHEN EICHFELDER. HAMBURGER STERNWARTE IN BERGEDORF        
+                                                                                         
+          7.4XXXBBBB   BECKER, F., BRUCK, H. 1931-1935, PUBL.ASTROPHYS.                  
+                       OBS.POTSDAM, VOL 27-28, SPECTRAL DURCHMUSTERUNG DER               
+                       KAPTEYNSCHEN EICHFELDERN SUDHIMMELS                               
+                                                                                         
+          7.5XXXBBBB   KNOX-SHAW, H., BARRETT, H.G.S. 1934, THE RADCLIFFE                
+                       CALALOGUE OF PROPER MOTIONS IN THE SELECTED AREAS                 
+                       1 TO 115. OXFORD UNIVERSITY PRESS                                 
+                                                                                         
+          7.8XXXBBBB   VAN DE KAMP P., VYSSOTSKY A.N. 1937, PUBL.MCCORMICK OBS. VII,47   
+                       VYSSOTSKY A.M., WILLIAMS E.T.R. 1948, PUBL.MCCORMICK OBS. X,57    
+ 1                                                                           A10. 1      
+         TABLE 10      REFERENCES FOR THE LISTS BY DECLINATION                           
+         ********                                                                        
+                                                                                         
+                                                                                         
+                                                                                         
+         NORTHERN ZONES                                                                  
+                                                                                         
+          8.00XXBBBB   UPGREN A.R. 1962, ASTR.J. 67,37                                   
+          8.01XXBBBB   HARDORP J., ET AL. 1959, LUMINOUS STARS IN THE NORTHERN MILKY WAY 
+                                                HAMGURG - BERGEDORF VOL I                
+          8.02XXBBBB   STOCK J., ET AL. 1960, HAMBURG - BERGEDORF VOL II                 
+          8.03XXBBBB   HARDORP J., ET AL. 1964, HAMBURG - BERGEDORF VOL III              
+          8.04XXBBBB   NASSAU J.J., STEPHENSON C.B. 1963, HAMBURG - BERGEDORF VOL IV     
+          8.05XXBBBB   HARDORP J., ET AL. 1965, HAMBURG - BERGEDORF VOL V                
+          8.06XXBBBB   NASSAU J.J., ET AL. 1965, HAMBURG - BERGEDORF VOL VI              
+          8.07XXBBBB   NEUGEBAUER G.N., LEIGHTON R.B. 1969 IRC NORTHERN ZONES            
+                       TWO-MICRON SKY SURVEY. CALIFORNIA INSTITUTE OF TECNOLOGY, NASA    
+                                                                                         
+                                                                                         
+         SOUTHERN ZONES                                                                  
+                                                                                         
+          8.54XXBBBB   NASSAU J.J., STEPHENSON C.B. 1963, HAMBURG - BERGEDORF VOL IV     
+          8.56XXBBBB   NASSAU J.J., ET AL. 1965, HAMBURG - BERGEDORF VOL VI              
+          8.57XXBBBB   NEUGEBAUER G.N., LEIGHTON R.B. 1969 IRC SOUTHERN ZONES            
+                       TWO-MICRON SKY SURVEY. CALIFORNIA INSTITUTE OF TECNOLOGY, NASA    
+          8.58XXABBB   SANDULEAK N.  1969, CONTR.CERRO TOLOLO INTERAMER.OBS. NO 89       
+                       XX DECLINATION ZONE, A=1 SUPPLEMENTARY STARS, BBB STAR NUMBER     
+ 1                                                                           A11. 1      
+         TABLE 11      MISCELLANOUS LISTS                                                
+         ********                                                                        
+                                                                                         
+                                                                                         
+                                                                                         
+         REFERENCES FOR THE NUMBERING OF STARS IN ASSOCIATIONS AND RINGS                 
+                                                                                         
+          9.0001BBBB   BRUN A. 1935, PUBL.OBS.LYON 1, FASC 12,1                          
+          9.0002BBBB   BLAAUW A. ET AL. 1959, ASTROPHYS.J. 130,69                        
+          9.0003BBBB   REDDISH V.C., ET AL. 1966, PUBL.R.OBS. EDINBURGH 5 NO 8           
+          9.0004BBBB   ISSERSTEDT J. 1968, VEROEFF.ASTR.INST.UNIV.BOCHUM 1,121           
+          9.0005BBBB   ISSERSTEDT J. 1968, VEROEFF.ASTR.INST.UNIV.BOCHUM 1,121           
+          9.0006BBBB   ISSERSTEDT J. 1969, ASTRON.ASTROPHYS. 3,210                       
+          9.0007BBBB   BRAES L.L.E. 1967, BULL.ASTR.INST.NETHERL.SUPPL. 2 NO 1           
+          9.0008BBBB   SANDULEAK N., PHILIP A.G.D. 1968, ASTR.J. 73,566                  
+          9.0009BBBB   BAADE W., SWOPE H.H. 1961, ASTR.J. 66,300                         
+          9.0010BBBB   PARENAGO P. 1954, TRUDY GOS.ASTR.INST.STERNBERGA VOL 25           
+                                                                                         
+          9.0011BBBB   HENIZE K.G., MENDOZA V E.E. 1973, ASTROPHYS.J. 180,115            
+          9.0012BBBB   MOFFAT A.F.J. 1976, ASTRON.ASTROPHYS. 50,429                      
+                                                                                         
+                                                                                         
+         REFERENCES FOR SEQUENCES NEAR NGC OBJECTS                                       
+                                                                                         
+          9.202880BB   ALCAINO G. 1975, ASTRON.ASTROPHYS.SUPP. 21,5                      
+          9.203620BB   ALCAINO G. 1976, ASTRON.ASTROPHYS.SUPP. 26,359                    
+          9.206090BB   LEE V.L., BURKHEAD M.S. 1971, ASTR.J. 76,467                      
+          9.261210BB   ALCAINO G. 1975, ASTRON.ASTROPHYS.SUPP. 21,5                      
+          9.210680BB   PENSTON M.J., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          9.212750BB   PENSTON M.J., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          9.218510BB   ALCAINO G. 1976, ASTRON.ASTROPHYS.SUPP. 50,299                    
+          9.219040BB   ALCAINO G. 1976, ASTRON.ASTROPHYS.SUPP. 26,353                    
+          9.222980BB   ALCAINO G. 1974, ASTRON.ASTROPHYS.SUPP. 13,55                     
+          9.224190BB   RACINE R., HARRIS W.E. 1975, ASTROPHYS.J. 196,413                 
+                                                                                         
+          9.228080BB   WHITE R.E. 1970, ASTR.J. 75,167                                   
+                       HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.232010BB   ALCAINO G. 1976, ASTRON.ASTROPHYS.SUPP. 26,251                    
+          9.232270BB   PENSTON M.J., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          9.235160BB   PENSTON M.J., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          9.240510BB   PENSTON M.J., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          9.241510BB   PENSTON M.J., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          9.242160BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.243400BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.243720BB   ALCAINO G. 1974, ASTRON.ASTROPHYS.SUPP. 13,345                    
+                                                                                         
+          9.243740BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.244060BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.244310BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.244580BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.244720BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.244990BB   WHITE R.E.  1971, ASTR.J. 76,419                                  
+          9.245260BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.245640BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.245650BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.245690BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+ 1                                                                           A11. 2      
+          9.245900BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.245940BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.245960BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.246360BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.246470BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.246970BB   HANES D.A., HARRIS W.E., MADORE B.F. 1976, MON.NOT.RAS 177,653    
+          9.248330BB   MENZIES J. 1972, MON.NOT.R.ASTR.SOC. 156,207                      
+          9.251280BB   ROSLUND C. 1969, ARK.ASTR. 5,249                                  
+          9.252860BB   ALCAINO G.  1974, ASTRON.ASTROPHYS.SUPP. 18,9                     
+          9.252861BB   HARRIS W.E., ET AL. 1976, ASTROPHYS.J.SUPPL.SER, 31,13            
+                                                                                         
+          9.255480BB   PENSTON M.J., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          9.256940BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.258240BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.259270BB   WHITE R.E. 1970, ASTR.J. 75,167                                   
+          9.259860BB   HARRIS W.E., ET AL. 1976, ASTROPHYS.J.SUPPL.SER, 31,13            
+          9.260930BB   HARRIS W.E., RACINE R. 1974, ASTR.J. 79,472                       
+          9.261010BB   WHITE R.E. 1970, ASTR.J. 75,167                                   
+          9.261011BB   ALCAINO G. 1974, ASTRON.ASTROPHYS.SUPP. 18,9                      
+          9.262540BB   HARRIS W.E., ET AL. 1976, ASTROPHYS.J.SUPPL.SER, 31,13            
+          9.262560BB   BERNARD A. 1976, ASTRON.ASTROPHYS.SUPP. 25,281                    
+                                                                                         
+          9.262660BB   WHITE R.E. 1971, ASTR.J. 76,419                                   
+          9.262661BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.262730BB   HARRIS W.E., ET AL. 1976, ASTROPHYS.J.SUPPL.SER, 31,13            
+          9.263040BB   BERNARD A. 1976, ASTRON.ASTROPHYS.SUPP. 25,281                    
+          9.263160BB   WHITE R.E. 1971, ASTR.J. 76,419                                   
+          9.263250BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.263520BB   HARTWICK F.D.A., HESSER J.E. 1972, ASTROPHYS.J. 175,77            
+          9.263880BB   WHITE R.E. 1971, ASTR.J. 76,419                                   
+          9.264020BB   DEMERS S., WEHLAU A. 1971, ASTR.J. 76,916                         
+          9.265170BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+                                                                                         
+          9.265220BB   VAN DEN BERGH S. 1971, ASTR.J. 76,1082                            
+          9.265280BB   VAN DEN BERGH S. 1971, ASTR.J. 76,1082                            
+          9.266380BB   BERNARD A. 1976, ASTRON.ASTROPHYS.SUPP. 25,281                    
+          9.266810BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.267150BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.267520BB   WESSELINK A.J. 1974, MON.NOT.R.ASTR.SOC. 168,345                  
+          9.268090BB   ALCAINO G. 1975, ASTRON.ASTROPHYS.SUPP. 22,193                    
+          9.268091BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.268640BB   HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.269340BB   HARRIS W.E., RACINE R. 1973, ASTR.J. 78,242                       
+                                                                                         
+          9.270890BB   DEMERS S. 1969, ASTR.J. 74,925                                    
+                       HARRIS W.E. 1975, ASTROPHYS.J.SUPPL.SER. 29,397                   
+          9.274690BB   PENSTON M.J., ET AL. 1971, PUBL.ASTR.SOC.PACIFIC 83,783           
+          9.272930BB   DAHN S.C., ET AL. 1973, PUBL.ASTR.SOC.PACIFIC 85,224              
+ 1                                                                           A11. 3      
+                                                                                         
+                                                                                         
+         REFERENCES FOR VARIOUS REGIONS                                                  
+                                                                                         
+          9.50YXXBBB   HARVARD STD REGIONS 1917, ANN.HARV.COLL.OBS. 71,233               
+          9.515XXBBB   COUSINS A.W.J., STOY R.H. 1961, R.OBS.BULL NO 49                  
+          9.6005BBBB   MCCUSKEY S.W., HOUK N. 1964, ASTR.J. 69,412                       
+          9.6011BBBB   WOODEN W.H. II 1970, ASTR.J. 75,324                               
+          9.6012BBBB   WOODEN W.H. II 1970, ASTR.J. 75,324                               
+          9.6013BBBB   WOODEN W.H. II 1970, ASTR.J. 75,324                               
+          9.6014BBBB   WOODEN W.H. II 1970, ASTR.J. 75,324                               
+          9.6403BBBB   DRILLING J.S. 1971, ASTR.J. 76,1072                               
+                       DRILLING J.S. 1973, ASTR.J. 78,44 (NO+1000)                       
+          9.6404BBBB   DRILLING J.S. 1971, ASTR.J. 76,1072                               
+                                                                                         
+                       DRILLING J.S. 1973, ASTR.J. 78,44 (NO+1000)                       
+          9.72XXXBBB   LUCKE P.B. 1973, THESIS                                           
+                       XXX ASSOCIATION NUMBER, BBB STAR NUMBER                           
+                                                                                         
+                                                                                         
+         G - NUMBERED STARS                                                              
+                                                                                         
+          9.80XXXBBB   GICLAS H.L., BURNHAM R., THOMAS N.G.                              
+                       1971, LOWELL OBS. FLAGSTAFF                                       
+                       LOWELL PROPER MOTION SURVEY (NORTHERN HEMISPHERE)                 
+                       GICLAS H.L., ET AL. 1972, LOWELL OBS.BULL. NO 158                 
+                                           1973, LOWELL OBS.BULL. NO 160                 
+                                           1975, LOWELL OBS.BULL. NO 162                 
+          9.81XXXBBB   GICLAS H.L., ET AL. 1962, LOWELL OBS.BULL. NO 118                 
+          9.82XXXBBB   GICLAS H.L., ET AL. 1963, LOWELL OBS.BULL. NO 120                 
+                                           1964, LOWELL OBS.BULL. NO 122                 
+                                           1964, LOWELL OBS.BULL. NO 124                 
+                                                                                         
+                                           1966, LOWELL OBS.BULL. NO 132                 
+                                           1966, LOWELL OBS.BULL. NO 136                 
+                                           1967, LOWELL OBS.BULL. NO 140                 
+                                           1970, LOWELL OBS.BULL. NO 152                 
+                                           1972, LOWELL OBS.BULL. NO 158                 
+                                           1973, LOWELL OBS.BULL. NO 160                 
+                                           1975, LOWELL OBS.BULL. NO 162                 
+ 1                                                                           A12. 1      
+         TABLE 12      REFERENCES FOR STARS UNDER CODE +6.908BBBBB                       
+         ********                                                                        
+                                                                                         
+          6.90800001   STAR NEAR L1159-16 = WOOLLEY 9066                                 
+                       LIPPINCOTT S.L., YANG C.Y. 1967, ASTR.J. 72,840                   
+                       LANDOLT A.U. 1968, PUBL.ASTR.SOC.PACIFIC 80,331 (CHART)           
+          6.90800002   MUNCH G. 1964, ASTROPHYS.J. 140,162   * OB+27.89                  
+          6.90800003   STAR E IN LMC X-1 ERROR BOX                                       
+                       JONES C.A., ET AL. 1974, ASTROPHYS.J. 190,L1                      
+          6.90800004   ANON NEAR BD-22 4494 (M2IB)                                       
+                       HUMPHREYS R.M., NEY, E.P. 1974, ASTROPHYS.J. 194,623              

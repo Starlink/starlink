@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!@CSH@ -f
 #+
 #  Name:
 #     chart_params
@@ -18,7 +18,7 @@
 
 #  Arguments:
 #     $1
-#        The command used to invok this script (ignored).
+#        The command used to invoke this script (ignored).
 #     $2
 #        The name of the file that the soft link will point to.
 
@@ -35,11 +35,14 @@
 
 #  Authors:
 #     PMA: Peter Allan (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     2-APR-1993 (PMA):
 #        Original version.
+#     5-AUG-2004 (TIMJ):
+#        Autoconfed
 #     {enter_changes_here}
 
 #  Bugs:
@@ -64,7 +67,7 @@ if ( "$2" == "" ) then
 else
    set parfile = "$2"
 endif
-ln -s ${parfile} PAR
+@LN_S@ ${parfile} PAR
 if ( ! -f ${parfile} ) then
-   cp INSTALL_ETC/chartpar.dat ./PAR
+   cp @staretcdir@/chartpar.dat ./PAR
 endif
