@@ -664,7 +664,7 @@
 
 *   Create the .VARIANCE structure, if necessary.
       IF ( .NOT. PRIM .AND. ERPRES ) THEN
-         CALL DTA_CRVAR( OUTNDF( :NPC )//'VARIANCE', 'ARRAY', DSTAT )
+         CALL DTA_CRVAR( OUTNDF( :NPC )//'.VARIANCE', 'ARRAY', DSTAT )
       END IF
       IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
