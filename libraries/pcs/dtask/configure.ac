@@ -32,11 +32,20 @@ dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
 dnl    which correspond to it.
 STAR_MESSGEN(act_err.msg dtask_err.msg)
 
+dnl    We need some further configuration: see the original dtask
+dnl    makefile, which edits in extra libraries on Solaris (such as
+dnl    -lsocket); see the installs of LINK_SCRIPTS in that makefile.
+dnl    This is probably part of a more general bit of configuration
+dnl    necessary on Solaris.
+
 STAR_ETC_FILES(dtask_main.txt)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES(Makefile component.xml)
+
+dnl    Files alink.in and ilink.in are substituted at `make' time,
+dnl    not configure time.
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
