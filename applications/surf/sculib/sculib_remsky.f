@@ -58,6 +58,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.4  1997/11/30 23:40:03  timj
+*     Write a message even if we are not adding on the constant offset.
+*
 *     Revision 1.3  1997/10/17 02:21:07  timj
 *     Add the mean sky level that was removed, back onto the data
 *     after sky removal.
@@ -239,7 +242,12 @@
          CALL MSG_SETR('BAC', SNGL(MEAN_LEVEL))
 
          CALL MSG_OUTIF(MSG__NORM, ' ', 'Adding mean background level'//
-     :        ' onto data (value=^BAC)', STATUS)
+     :        ' back onto data (value=^BAC)', STATUS)
+
+      ELSE
+
+         CALL MSG_OUTIF(MSG__NORM, ' ', 'Not adding back average sky '//
+     :        'level', STATUS)
 
       END IF
 
