@@ -1,27 +1,61 @@
-*+  CORRECT - Normalise a binned dataset in time
       SUBROUTINE CORRECT( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     CORRECT
+
+*  Purpose:
+*     Normalise a binned dataset in time
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL CORRECT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Normalises binned datasets in time, ie. converts the input file
 *     with units X to X/second (X could be counts, or counts per unit
 *     area).
-*
-*    Environment parameters :
-*
-*     INP = UNIV(R)
-*       Input dataset name
-*     OVER = LOGICAL(R)
-*       Overwrite the input file?
-*     OUT = UNIV(R)
-*       Output dataset. Only used if OVER is false
-*     TEXP = REAL(R)
-*       Exposure time. Only used if not present in file
-*     POISS = LOGICAL(R)
-*       Copy data to variance if not present on input?
-*
-*    Method :
-*
+
+*  Usage:
+*     correct {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input dataset name
+*     OVER = LOGICAL (read)
+*        Overwrite the input file?
+*     OUT = CHAR (read)
+*        Output dataset. Only used if OVER is false
+*     TEXP = REAL (read)
+*        Exposure time. Only used if not present in file
+*     POISS = LOGICAL (read)
+*        Copy data to variance if not present on input?
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     The complexity of the operation required depends on the components
 *     present in the input.
 *
@@ -40,46 +74,76 @@
 *      IF T_RESOLVED and input dataset has a time axis
 *        Correct for dead time as function(T)
 *      END IF
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*
-*     David J. Allan (ROSAT,BHVAD::DJA)
-*
-*    History :
-*
-*     12 Nov 93 : V1.7-0 Original (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     30 Jul 95 : V1.8-1 Preliminary ADI conversions (DJA)
-*      5 Sep 95 : V1.8-2 Better treatment of live times (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     correct, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     12 Nov 1993 V1.7-0 (DJA):
+*        Original version
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     30 Jul 1995 V1.8-1 (DJA):
+*        Preliminary ADI conversions
+*      5 Sep 1995 V1.8-2 (DJA):
+*        Better treatment of live times
+*     12 Sep 1995 V2.0-0 (DJA):
+*        Full ADI port.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER 			STATUS
-*
-*    Function declarations :
-*
-      INTEGER			CHR_LEN
-*
-*    Local constants :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL                  CHR_LEN
+        INTEGER                 CHR_LEN
+
+*  Local Constants:
       INTEGER                   MAXHTEXT
         PARAMETER               ( MAXHTEXT = 8 )
-*
-*    Local variables :
-*
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'CORRECT Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*80		HTXT(MAXHTEXT)		! History text
       CHARACTER*80		TEXT			!
 
@@ -99,14 +163,11 @@
       INTEGER			OFID			! Output dataset id
       INTEGER			ON_PTR, OFF_PTR, DUR_PTR! LIVE_TIME data
       INTEGER			QPTR			! Quality pointer
-      INTEGER                   T_AX, X_AX, Y_AX 	! Axis numbers
-      INTEGER			TDIMS(ADI__MXDIM)	! Temp dimensions
+      INTEGER                   T_AX 			! Time axis number
       INTEGER			TIMID			! I/p timing
       INTEGER                   TLEN			! Length of a string!
-      INTEGER			TNDIM			! Temp dimensionality
       INTEGER			VPTR			! Variance pointer
 
-      LOGICAL			ANYBAD			! Any bad points?
       LOGICAL			AXNORM			! T axis normalised?
       LOGICAL			GOT_TEXP		! Got an exposure time?
       LOGICAL 			L_ON, L_OFF, L_DUR	! LIVE_TIME components?
@@ -117,21 +178,16 @@
       LOGICAL			QOK			! Quality present?
       LOGICAL			T_RESOLVED		! Got live times?
       LOGICAL			VOK			! Variance present?
-*
-*    Version :
-*
-      CHARACTER*30 VERSION
-        PARAMETER  ( VERSION = 'CORRECT Version 1.8-2' )
-*-
+*.
 
-*  Check status
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Initialise Asterix
-      CALL AST_INIT()
 
 *  Version id
       CALL MSG_PRNT( VERSION )
+
+*  Initialise ASTERIX
+      CALL AST_INIT()
 
 *  Overwrite input?
       CALL USI_GET0L( 'OVER', OVER, STATUS )
@@ -139,12 +195,12 @@
 
 *  Get either one or two dataset names
       IF ( OVER ) THEN
-        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', IFID, STATUS )
         CALL ADI_CLONE( IFID, OFID, STATUS )
 
       ELSE
-        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
-        CALL ADI_FCOPY( IFID, OFID, STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
 
       END IF
 
@@ -158,22 +214,23 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Get input data
-      CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHK( OFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( OFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid numeric data', STATUS )
         GOTO 99
       END IF
-      CALL BDI_MAPDATA( OFID, 'UPDATE', DPTR, STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'UPDATE', DPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Total number of data points
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *  Variance present?
-      CALL BDI_CHKVAR( OFID, VOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHK( OFID, 'Variance', VOK, STATUS )
       IF ( VOK ) THEN
-        CALL BDI_MAPVAR( OFID, 'UPDATE', VPTR, STATUS )
+        CALL BDI_MAPR( OFID, 'Variance', 'UPDATE', VPTR, STATUS )
 
 *  Given user option of creating Poisson array
       ELSE
@@ -182,8 +239,7 @@
 
 *    Create variance array from data?
         IF ( POISS ) THEN
-          CALL BDI_CREVAR( OFID, NDIM, DIMS, STATUS )
-          CALL BDI_MAPVAR( OFID, 'WRITE', VPTR, STATUS )
+          CALL BDI_MAPR( OFID, 'Variance', 'WRITE', VPTR, STATUS )
           CALL ARR_COP1R( NELM, %VAL(DPTR), %VAL(VPTR), STATUS )
           VOK = (STATUS.EQ.SAI__OK)
         END IF
@@ -192,13 +248,9 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Quality present?
-      CALL BDI_CHKQUAL( OFID, QOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHK( OFID, 'Quality', QOK, STATUS )
       IF ( QOK ) THEN
-        CALL BDI_MAPLQUAL( OFID, 'READ', ANYBAD, QPTR, STATUS )
-        IF ( .NOT. ANYBAD ) THEN
-          CALL BDI_UNMAPLQUAL( OFID, STATUS )
-          QOK = .FALSE.
-        END IF
+        CALL BDI_MAPL( OFID, 'LogicalQuality', 'READ', QPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -210,7 +262,7 @@
       CALL TCI_GETID( OFID, TIMID, STATUS )
       IF ( TIMID .NE. ADI__NULLID ) THEN
 
-*      Are the 3 supported live time objects present?
+*    Are the 3 supported live time objects present?
         CALL ADI_THERE( TIMID, 'LiveOn', L_ON, STATUS )
         CALL ADI_THERE( TIMID, 'LiveOff', L_OFF, STATUS )
         CALL ADI_THERE( TIMID, 'LiveDur', L_DUR, STATUS )
@@ -247,7 +299,7 @@
           END IF
         END IF
 
-*      Try simple exposure time
+*    Try simple exposure time
         IF ( .NOT. GOT_TEXP ) THEN
           CALL ADI_THERE( TIMID, 'Exposure', OK, STATUS )
           IF ( OK ) THEN
@@ -271,7 +323,11 @@
       IF ( T_RESOLVED ) THEN
 
 *    Look for time axis
-        CALL AXIS_TFINDXYT( OFID, NDIM, X_AX, Y_AX, T_AX, STATUS )
+        CALL BDI0_FNDAXC( OFID, 'T', T_AX, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          T_AX = 0
+        END IF
 
 *    No time axis?
         IF ( T_AX .EQ. 0 ) THEN
@@ -280,15 +336,6 @@
           T_RESOLVED = .FALSE.
 
         ELSE
-
-*      Ambiguous axis?
-          IF ( T_AX .LT. 0 ) THEN
-            T_AX = - T_AX
-            CALL BDI_GETAXLABEL( OFID, T_AX, TEXT, STATUS )
-            CALL MSG_SETC( 'LABEL', TEXT )
-            CALL MSG_PRNT( 'WARNING : Ambiguous time axis, using'/
-     :                                           /' axis ^LABEL' )
-          END IF
 
 *      Warn if not 1st dimension
           IF ( T_AX .NE. 1 ) THEN
@@ -302,11 +349,12 @@
           ELSE
 
 *        Map time axis data and widths
-            CALL BDI_MAPAXVAL( OFID, 'READ', T_AX, APTR, STATUS )
-            CALL BDI_MAPAXWID( OFID, 'READ', T_AX, AWPTR, STATUS )
+            CALL BDI_AXMAPR( OFID, T_AX, 'Data', 'READ', APTR, STATUS )
+            CALL BDI_AXMAPR( OFID, T_AX, 'Width', 'READ', AWPTR,
+     :                       STATUS )
 
 *        Has data been normalised wrt the time axis already?
-            CALL BDI_GETAXNORM( OFID, T_AX, AXNORM, STATUS )
+            CALL BDI_AXGET0L( OFID, T_AX, 'Normalised', AXNORM, STATUS )
 
 *        If it has, we have to denormalise and renormalise again afterwards
             IF ( AXNORM ) THEN
@@ -408,10 +456,10 @@
       END IF
 
 *  Adjust the data label
-      CALL BDI_GETLABEL( OFID, TEXT, STATUS )
+      CALL BDI_GET0C( OFID, 'Label', TEXT, STATUS )
       IF ( TEXT .GT. ' ' ) THEN
-        CALL BDI_PUTLABEL( OFID, '('//TEXT(:CHR_LEN(TEXT))//') / s',
-     :                     STATUS )
+        CALL BDI_PUT0C( OFID, 'Label', '('//TEXT(:CHR_LEN(TEXT))/
+     :                  /') / s', STATUS )
       END IF
 
 *  Flag dataset as corrected
