@@ -20,6 +20,7 @@ JADE=jade
 JADEFLAGS=
 IMGEQ=$(LIBDIR)/img-eqlist.pl
 PSTOPNM=$(LIBDIR)/pstopnm-s
+DVI2BITMAP=dvi2bitmap
 
 # The HTML stylesheet does not output the generated HTML to standard
 # output, but instead generates a filename.  It needs to do this so
@@ -77,14 +78,14 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 		> tmp-make.stamp
 	ROOT=`awk -F: '{print $$1}' tmp-make.stamp`	; \
 	$(IMGEQ) $$ROOT.imgeq.list 			; \
-	$(MAKE)  $$ROOT.imgeq.gif.stamp
+	$(MAKE)  $$ROOT.imgeq.d2b.stamp
 	mv tmp-make.stamp $@	# ...only when successful
 
 #%.imgeq.sgml %.imgeq.tex: %.imgeq.list.stamp
 #	ROOT=`awk -F: '{print $$1}' $<`; \
 #	$(IMGEQ) $$ROOT.imgeq.list
 
-### Do not invoke the %.imgeq.gif.stamp target directly (in another makefile)
+### Do not invoke the %.imgeq.ps.stamp target directly (in another makefile)
 ### It's here to be invoked in a recursive make by the %.imgeq.list.stamp
 ### rule.  Use the %.imgeq.list.stamp target instead.
 # processing chain is something like
@@ -93,7 +94,7 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 #
 # See notes in the script texttogif at
 # http://www.fourmilab.ch/webtools/textogif/textogif.html
-%.imgeq.gif.stamp: %.imgeq.ps
+%.imgeq.ps.stamp: %.imgeq.ps
 	$(PSTOPNM) -resolution 144 $<
 	for f in `ls $(<:.imgeq.ps=)*.ppm | sed 's/\.[^.]*$$//'`; do \
 		echo $$f; \
@@ -103,6 +104,12 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 		ppmtogif -interlace -transparent rgb:b2/b2/b2 \
 		>$$f.gif ;\
 	done
+	touch $@
+
+# Should we have something in here to check whether all fonts are available?
+# Eg, `-q 2>>missing-fonts'.  Or pre-test with -n
+%.imgeq.d2b.stamp: %.imgeq.dvi
+	$(DVI2BITMAP) -r 110 -m 2 -s 2 -t gif $<
 	touch $@
 
 # The LaTeX stylesheet, like the HTML stylesheet, outputs a stamp.
