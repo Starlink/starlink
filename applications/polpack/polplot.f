@@ -834,6 +834,7 @@
 *  of the Z value being used.
       ELSE
          ZTEXT = ' '
+         ZUSE = VAL__BADR
       END IF
 
 *  Give the user the chance to change the Current Frame. 
@@ -1275,6 +1276,10 @@
          END IF
 
          IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Clear any title in this plot (the key has its own default Title,
+*  created in POL1_VECKY).
+         CALL AST_CLEAR( IPLOTK, 'TITLE', STATUS )        
 
 *  Ensure that previous synonyms are cleared.
          CALL KPG1_ASPSY( ' ', ' ', STATUS )

@@ -19,8 +19,8 @@
 
 *  Description:
 *     This routine calculates Stokes vectors from a set of single-beam 
-*     intensity images, and stores them in the supplied output NDF. The
-*     method used is described by Sparks & Axon (PASP ????). Once I,Q,U
+*     intensity images or cubes, and stores them in the supplied output NDF. 
+*     The method used is described by Sparks & Axon (PASP ????). Once I,Q,U
 *     values have been found, the corresponding input data values can be
 *     found and the residuals between these and the actual input data values
 *     can be used to reject aberrant input data values (i.e. input data
@@ -95,8 +95,9 @@
 *     INDFC = INTEGER (Given)
 *        An NDF identifier for the output NDF in which to store the 
 *        QU co-variances associated with the Stokes vectors stored in INDFO.
-*        The NDF should be 2/3D with the same bounds as INDFO. This argument 
-*        is ignored if VAR is .FALSE. 
+*        The NDF should be 2/3D with the same bounds as INDFO (excluding
+*        the extra Stokes axis in INDFO). This argument is ignored if VAR is 
+*        .FALSE. 
 *     MAXIT = INTEGER (Given)
 *        The maximum number of rejection iterations to perform. If this is zero
 *        then no rejection iterations are performed.
@@ -108,9 +109,10 @@
 *        brief details of each iteration; 2 gives some details of each
 *        iteration; 3 gives full details of each iteration.
 *     HW = INTEGER (Given)
-*        The half size of the box to use when smoothing STokes vectors
-*        prior to estimating input variances (in pixels). The full size
-*        used is 2*HW + 1.
+*        The half size of the box to use when applying spatial smoothing to
+*        Stokes vectors prior to estimating input variances (in pixels). The 
+*        full size used is 2*HW + 1. If the input NDFs are 3D, no smoothing 
+*        occurs along the third axis.
 *     SETVAR = LOGICAL (Given)
 *        If TRUE, and if WSCH is 2, then a constant value is stored in the 
 *        VARIANCE component of each input NDF on exit. This constant value 
@@ -142,6 +144,8 @@
 *        Original version.
 *     15-AUG-2000 (DSB):
 *        Added argument TRIM.
+*     22-FEB-2001 (DSB):
+*        Modified to support 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -188,8 +192,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER DIM1               ! Dimension of output cube on axis 1
-      INTEGER DIM2               ! Dimension of output cube on axis 2
+      INTEGER DIM1               ! X dimension of output cube (spatial axis 1)
+      INTEGER DIM2               ! Y dimension of output cube (spatial axis 2)
+      INTEGER DIM3               ! Z dimension of output cube (freq axis 3)
       INTEGER DIMST              ! Dimension of output cube on the Stokes axis
       INTEGER EL                 ! No. of elements in a plane of the output NDF
       INTEGER I                  ! Index of current input NDF
@@ -246,23 +251,29 @@
       CALL NDF_BOUND( INDFO, 4, LBND, UBND, NDIM, STATUS )
       DIM1 = UBND( 1 ) - LBND( 1 ) + 1
       DIM2 = UBND( 2 ) - LBND( 2 ) + 1
-      DIMST = UBND( NDIM ) - LBND( NDIM ) + 1
+      IF( NDIM .EQ. 4 ) THEN
+         DIM3 = UBND( 3 ) - LBND( 3 )
+         DIMST = UBND( 4 ) - LBND( 4 ) + 1
+      ELSE
+         DIM3 = 1
+         DIMST = UBND( 3 ) - LBND( 3 ) + 1
+      END IF
 
 *  Find the number of axes in each input NDF by decrementing the number
 *  of axes in the output NDF.
       NDIMI = NDIM - 1
 
-*  Store the bounds for the sections of the input NDF to be used.
+*  Store the bounds for the section of the input NDFs to be used.
       DO I = 1, NDIMI
          LBNDI( I ) = LBND( I )
          UBNDI( I ) = UBND( I )
       END DO
 
-*  Store the number of elements in a single plane of the output NDF.
-      EL = DIM1*DIM2
+*  Store the number of elements per Stokes parameter in the output NDF.
+      EL = DIM1*DIM2*DIM3
 
 *  Map the output DATA array in which to store the IQU values. NEL gets
-*  set to the number of elements in the entire output cube.
+*  set to the number of elements in the entire output NDF.
       CALL NDF_MAP( INDFO, 'DATA', '_REAL', 'WRITE', IPDOUT, NEL, 
      :              STATUS )   
 
@@ -342,7 +353,7 @@
 *  fitting a least squares quadratic surface to the data within a small 
 *  fitting box.
       IF( ITER .GT. 0 ) THEN 
-         CALL POL1_SNGSM( ILEVEL, HW, DIM1, DIM2, DIMST, 
+         CALL POL1_SNGSM( ILEVEL, HW, DIM1, DIM2, DIM3, DIMST, 
      :                    %VAL( IPVOUT ), %VAL( IPDOUT ), 
      :                    %VAL( IPCOUT ), %VAL( IPIE1 ),
      :                    %VAL( IPX4 ), %VAL( IPX3Y ), 
@@ -350,8 +361,8 @@
      :                    %VAL( IPX3 ), %VAL( IPX2Y ),
      :                    %VAL( IPXY2 ), STATUS )
 
-*  If required, update the image holding the estimated variance at each
-*  pixel with in the input images. All input images are assumed to have
+*  If required, update the array holding the estimated variance at each
+*  pixel with in the input NDFs. All input NDFs are assumed to have
 *  the same variance at any given pixel position. IPIE1 and IPIE2 are used 
 *  as temporary work space.
          IF( WSCH .EQ. 2 ) THEN 
@@ -370,7 +381,7 @@
      :                    STATUS )
          END IF
 
-*  On the zeroth iteration, initialise the variance estimate image to hold 
+*  On the zeroth iteration, initialise the variance estimate array to hold 
 *  1.0 at every pixel. Do not do this if variances in the input NDFs will
 *  be used.
       ELSE IF( WSCH .NE. 1 ) THEN

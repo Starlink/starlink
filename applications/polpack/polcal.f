@@ -21,9 +21,11 @@
 *        The global status.
 
 *  Description:
-*     This application converts a set of 2D (or 3D) arrays holding analysed
-*     intensity, into a 3D (or 4D) data cube holding a Stokes vector at 
-*     every pixel in the supplied intensity arrays. 
+*     This application converts a set of input NDFs holding analysed intensity, 
+*     into an output NDF holding a Stokes vector at every pixel in the supplied 
+*     input NDFs. If the input NDFs are 2-dimensional images, the output NDF
+*     will be 3-dimensional. If the input NDFs are 3-dimensional cubes
+*     (spectropolarimetry data for instance), the output NDF will be 4-dimensioanl. 
 *
 *     Either dual or single beam data can be processed, with an
 *     appropriate algorithm being used in each case. There is also an
@@ -101,7 +103,7 @@
 *        access only is required unless the SETVAR parameter is assigned a 
 *        TRUE value.
 *     MAXIT = _INTEGER (Read)
-*        This parameter is only accessed by both single and dual-beam 
+*        This parameter is accessed by both single and dual-beam 
 *        algorithm, but is used slightly differently in each case. 
 *
 *        In dual beam mode, it specifies the maximum number of iterations 

@@ -47,18 +47,18 @@
 *     EPS( NNDF ) = REAL (Given)
 *        The analyser efficiency factor for each input NDF. 
 *     EL = INTEGER (Given)
-*        Number of pixels in each image.
+*        Number of pixels for each Stokes parameter in the output NDF.
 *     HW = INTEGER (Given)
 *        The half size of the box to use when smoothing squared residuals.
 *        The full size used is 2*HW + 1.
 *     DEZERO = LOGICAL (Given)
 *        Perform zero point corrections?
 *     DIMST = INTEGER (Given)
-*        Number of planes in STOKES.
+*        Number of Stokes planes in STOKES.
 *     STOKES( EL, DIMST ) = REAL (Given)
 *        Current (smoothed) Stokes vectors.
 *     NDIMI = INTEGER (Given)
-*        No. of dimensions in the input NDF section.
+*        No. of dimensions in the input NDF section (2 or 3)
 *     LBNDI( NDIMI ) = INTEGER (Given)
 *        Lower pixel index bounds of input NDF section.
 *     UBNDI( NDIMI ) = INTEGER (Given)
@@ -88,6 +88,8 @@
 *  History:
 *     12-APR-1999 (DSB):
 *        Original version.
+*     22-FEB-2001 (DSB):
+*        Modified to support 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -137,9 +139,12 @@
       INTEGER IPDIN              ! Pointer to input DATA array
       INTEGER IPW1               ! Pointer to work array     
       INTEGER IPW2               ! Pointer to work array     
+      INTEGER IZ                 ! Index of current spatial plane
+      INTEGER K                  ! Index of first pixel in spatial plane
       INTEGER NEL                ! No. of mapped elements
       INTEGER NX                 ! Dimension of output cube on axis 1
       INTEGER NY                 ! Dimension of output cube on axis 2
+      INTEGER NZ                 ! Dimension of output cube on axis 3
 *.
 
 *  Check the inherited global status.
@@ -190,18 +195,31 @@
             END IF
          END DO
 
-*  Store the sizes of the first two dimensions.
+*  Store the sizes of the input dimensions.
          NX = UBNDI( 1 ) - LBNDI( 1 ) + 1
          NY = UBNDI( 2 ) - LBNDI( 2 ) + 1
+         IF( NDIMI .EQ. 3 ) THEN 
+            NZ = UBNDI( 3 ) - LBNDI( 3 ) + 1
+         ELSE
+            NZ = 1
+         END IF
 
 *  Get work space needed to do the smoothing in POL1_BLOCR.
          CALL PSX_CALLOC( NX, '_DOUBLE', IPW1, STATUS )
          CALL PSX_CALLOC( NX, '_INTEGER', IPW2, STATUS )
 
-*  Smooth the mean squared residuals in WORK to get the variance 
-*  estimates (store them back in VEST).
-         CALL POL1_BLOCR( NX, NY, WORK, HW, HW, 1, VEST, %VAL( IPW1 ), 
-     :                    %VAL( IPW2 ), STATUS )
+*  Loop round smoothing each spatial plane.
+         DO IZ = 0, NZ - 1     
+
+*  Find the index within WORK of the first pixel in this spatial plane.
+            K = IZ*NX*NY
+
+*  Smooth the mean squared residuals in this spatial plane of WORK to get 
+*  the variance estimates (store them back in VEST).
+            CALL POL1_BLOCR( NX, NY, WORK( K ), HW, HW, 1, VEST( K ), 
+     :                       %VAL( IPW1 ), %VAL( IPW2 ), STATUS )
+
+         END DO
 
 *  Free the work space.
          CALL PSX_FREE( IPW1, STATUS )

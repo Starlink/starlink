@@ -437,77 +437,13 @@
 *  See if we should trim any bad margins from the output NDF.
       CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
 
-*  If the input NDFs are 2D (i.e. number of output axes is 3), calculate 
-*  the I,Q,U values.        
-      IF( NDIMO .EQ. 3 ) THEN
-         CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
+*  Calculate the I,Q,U values.        
+      CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
      :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
      :                 TRIM, INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, 
      :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), 
      :                 STATUS )
-
-*  If the input NDFs are 3, process each plane separately.
-      ELSE
-
-*  Create a group to hold 2D NDF section strings.
-         CALL GRP_NEW( '2D NDF sections', IGRP3, STATUS ) 
-
-*  Loop round each frequency channel.
-         DO Z = LBNDO( 3 ), UBNDO( 3 )
-
-*  First create a group holding strings describing sections of the input
-*  NDFs for the current plane. For each NDF, an NDF identifiers is
-*  obtained, and then a section is obtained for the required plane, and
-*  the full specification of this slice is then found and appeneded to
-*  the end of the group.
-            CALL GRP_SETSZ( IGRP3, 0, STATUS ) 
-            DO I = 1, NNDF
-               CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
-               CALL NDF_BOUND( INDF, 3, LBND, UBND, NDIM, STATUS )
-               LBND( 3 ) = Z
-               UBND( 3 ) = Z
-               CALL NDF_SECT( INDF, NDIM, LBND, UBND, INDFS, STATUS ) 
-               CALL NDF_MSG( 'NDF', INDFS )
-               CALL MSG_LOAD( ' ', '^NDF', NDFNM, NC, STATUS )
-               CALL GRP_PUT( IGRP3, 1, NDFNM( : NC ), 0, STATUS ) 
-               CALL NDF_ANNUL( INDF, STATUS )
-               CALL NDF_ANNUL( INDFS, STATUS )
-            END DO
-
-*  Obtain a section of the output NDF to receive the results of
-*  processing this Z plane.
-            LBNDO( 3 ) = Z
-            UBNDO( 3 ) = Z
-            CALL NDF_SECT( INDFO, NDIMO, LBNDO, UBNDO, INDFOS, STATUS ) 
-
-*  Obtain a section of the output covariance NDF to receive the results of
-*  processing this Z plane.
-            IF( INDFC .NE. NDF__NOID ) THEN 
-               CALL NDF_SECT( INDFC, NDIMO - 1, LBNDO, UBNDO, INDFCS, 
-     :                        STATUS ) 
-            ELSE
-               INDFCS = NDF__NOID
-            END IF
-
-*  Calculate the I,Q,U values.        
-            CALL POL1_SNGSV( IGRP3, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
-     :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
-     :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
-     :                 TRIM, INDFOS, INDFCS, MAXIT, NSIGMA, ILEVEL, 
-     :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), 
-     :                 STATUS )
-
-*  Annull the NDF sections.
-            CALL NDF_ANNUL( INDFOS, STATUS )
-            IF( INDFCS .NE. NDF__NOID ) CALL NDF_ANNUL( INDFCS, STATUS )
-
-         END DO
-
-*  Delete the group.
-         CALL GRP_DELET( IGRP3, STATUS )
-
-      END IF
 
 *  Tidy up.
 *  ========
