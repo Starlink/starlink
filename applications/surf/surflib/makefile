@@ -6,6 +6,7 @@
 
 FC    = f77
 FFLAGS = -g -C
+FFLAGS = -g -fno-second-underscore
 CFLAGS = 
 LINK   = ln -s
 
