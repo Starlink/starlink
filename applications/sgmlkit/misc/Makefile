@@ -17,3 +17,5 @@ bindocs.sgml: $(BINSCRIPTS)
 	cp bindocs.head $@
 	for f in $(BINSCRIPTS); do sed -f script2sgml.sed $$f >> $@; done
 
+clean:
+	rm -f misc.stamp libdocs.sgml bindocs.sgml
