@@ -55,7 +55,7 @@
 
 #-
 
-      echo -lems `cnf_link_adam` \
+      echo -lgsd `cnf_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
