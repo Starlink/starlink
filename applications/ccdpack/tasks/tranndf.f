@@ -160,21 +160,22 @@
 *        supplied by the user (see the INEXT parameter). [TRUE]
 
 *  Examples:
-*     tranndf '*' '*-trn' reset
-*        This transforms all the NDFs in the current directory if
-*        they contain suitable transformation structures in their
-*        extensions. It uses nearest-neighbour resampling and conserves
-*        the flux levels. The output NDFs are of a size such that all
-*        the input pixels have contributed.
+*     tranndf '*' '*-resamp' reset
+*        This transforms all the NDFs in the current directory from
+*        the coordinates represented by the PIXEL-domain frame
+*        to the coordinates represented by the Current frame in their
+*        WCS components.  It uses nearest-neighbour resampling and
+*        conserves the flux levels. The output NDFs are of a size such
+*        that all the input pixels have contributed.
 *     tranndf curved straight linint shape=same
 *        As above, except linear interpolation is used, and the straight
 *        array uses the bounds of curved.
 *     tranndf 'a119*' '*s' inext=false transform=proj.merc shape=bounds
 *             lbound='[1,-20]' ubound='[256,172]'
-*        This transforms the NDFs called a119*, using the transformation
-*        merc in the HDS file called proj, into NDFs called a119*s.
-*        It uses nearest-neighbour resampling.  All the output NDFs
-*        have size 256 x 192 pixels and origin (1,-20).
+*        This transforms the images called a119*, using the transformation
+*        structure merc in the HDS file called proj, into images called 
+*        a119*s.  It uses nearest-neighbour resampling.  All the output
+*        images have size 256 x 192 pixels and origin (1,-20).
 
 *  Implementation Status:
 *     - Flux conservation can only be applied to constant-determinant
