@@ -42,15 +42,24 @@ int main( int argc, char *argv[] ) {
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     18-NOV-1997 (RFWS);
 *        Original version.
+*     24-OCT-2000 (DSB):
+*        Ensure that the number of digits used is at least the minimum
+*        required by IEEE for a conversion from binary to string and back 
+*        to binary to be an identity. 
 *-
 */
 
 /* Local Constants: */
 #define BUFF_LEN ( 2 * DBL_DIG + 20 ) /* Buffer length */
+#define IEEE_DIG 17                   /* Minimum number of digits required by 
+                                         IEEE for conversion from binary to 
+                                         string and back again to be an
+                                         identity. */
 
 /* Local Variables: */
    char buff[ BUFF_LEN + 1 ];    /* Buffer for formatted string */
@@ -58,8 +67,10 @@ int main( int argc, char *argv[] ) {
    int digits;                   /* Number of digits of precision */
 
 /* Vary the precision over a reasonable range to see how many decimal
-   digits are required. */
-   for ( digits = DBL_DIG; digits <= ( 2 * DBL_DIG ); digits++ ) {
+   digits are required. The initial number of digits is the larger of
+   DBL_DIG and IEEE_DIG. */
+   for ( digits = ( DBL_DIG > IEEE_DIG )?DBL_DIG:IEEE_DIG; 
+         digits <= ( 2 * DBL_DIG ); digits++ ) {
 
 /* Format the AST__BAD value using this precision and then read it
    back. */
