@@ -38,8 +38,6 @@
 *     in planes 1, 2 and 3. Currently, circular polarimetry can only be 
 *     performed by the dual-beam algorithm, in which case the output cube 
 *     contains only 2 planes holding I and V values (see parameter PMODE). 
-*     If all the input images contain variances, and the VARIANCE parameter 
-*     is not set to FALSE, then the output cube will also contain variances.
 
 *  Usage:
 *     polcal in out
@@ -88,18 +86,16 @@
 *     NITER = _INTEGER (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the maximum number of iterations to be used when 
-*        rejecting aberrant input values. It may be set to zero to
-*        prevent iterations and so speed up the processing. [1]
+*        estimating input variances and rejecting aberrant input values. 
+*        It may be set to zero to prevent iterations and so speed up the 
+*        processing. [1]
 *     NSIGMA = _REAL (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the threshold at which to reject input data values. If
 *        an input data value differs from the data value implied by the
-*        current I, Q and U values by more than NSIGMA standard deviations, 
-*        then it will not be included in the next calculation of I, Q and U.
-*        If parameter VARIANCE is TRUE, then the standard deviation is 
-*        obtained from the VARIANCE component of the input image. Otherwise,
-*        a the standard deviation used is the RMS residual for the entire
-*        image. [3.0]
+*        current I, Q and U values by more than NSIGMA standard
+*        deviations, then it will not be included in the next calculation
+*        of I, Q and U. [3.0]
 *     OUT = NDF (Read)
 *        The name of the output 3D cube holding the Stokes parameters.
 *        The x-y plane of this cube covers the overlap region of the 
@@ -159,49 +155,41 @@
 *        be included in the output cube. A null (!) value results in variance 
 *        values being created if possible, but not otherwise. [!]
 *     WEIGHTS = _INTEGER (Read)
-*        Indicates how the weight to associate with each input intensity
-*        value should be chosen. It should be an integer in the range 1
-*        to 4. These values select the following weighting schemes:
+*        This parameter is only accessed by the single-beam algorithm. It
+*        indicates how the weight and variance associated with each input 
+*        intensity value should be chosen. It should be an integer in the 
+*        range 1 to 4. These values select the following schemes:
 *        
-*        - 1 -- Use the reciprocal of the variances supplied with the
-*        input images. If any input images do not have associated variances
-*        then a constant weight of 1.0 will be used for all input images.
+*        - 1 -- Use the variances supplied with the input images. The
+*        reciprocal of these variances are used as weights. If any input 
+*        images do not have associated variances then a constant weight of 
+*        1.0 will be used for all input images.
 *
-*        - 2 -- Use the reciprocal of the variances supplied with the
-*        input images. If an input image does not have associated variances
-*        then the weights used for that image are based on an estimate of the 
-*        variances derived from the spread of input intensity values. 
+*        - 2 -- Use the variances supplied with the input images. If any
+*        input images do not have associated variances then estimates of 
+*        the variances are made for all input images based on the spread of 
+*        data values. The reciprocal of these variances are used as weights. 
+*        An error will be reported if parameter NITER is set to zero, thus
+*        preventing the iterative estimation of input variances.
 *
-*        - 3 -- Use the reciprocal of an estimate of the input variance
-*        derived from the spread of input intensity values. Any variances 
-*        supplied with the input images are ignored.
+*        - 3 -- Use estimates of the variances for all input images based 
+*        on the spread of data values. The reciprocal of these variances 
+*        are used as weights. Any variances supplied with the input images 
+*        are ignored. An error will be reported if parameter NITER is set to 
+*        zero, thus preventing the iterative estimation of input variances.
 *
 *        - 4 -- Use a constant weight of 1.0 for all input images. Any 
 *        variances supplied with the input images are ignored. 
 *
-*        [1]
+*        The dual-beam algorithm always uses scheme 1. [1]
  
 *  The Single-beam Algorithm:
 *        In single-bean mode, the I, Q and U values at each output pixel are 
 *        chosen to minimise the sum of the squared residuals between the 
 *        supplied intensity values and the intensity values implied by the I, 
-*        Q and U values. Input intensity values are weighted by the reciprocal 
-*        of the associated variance values when doing the fit if output 
-*        variances are being created (see parameter VARIANCE). The algorithm 
+*        Q and U values. Input intensity values are weighted according to
+*        the scheme chosen using parameter WEIGHTS. The basic algorithm 
 *        is described by Sparks and Axon (submitted to P.A.S.P.). 
-*
-*        In order to provide some safe-guards against aberrant values in the 
-*        input images, an iterative scheme is used which rejects input data 
-*        values which are badly inconsistent with the calculated I, Q and U 
-*        values. After rejecting such values, the algorithm goes on to 
-*        re-calculate the I, Q and U values excluding the rejected input 
-*        values. This process is repeated a number of times given by parameter 
-*        NITER. Input values are rejected if they differ by more than
-*        NSIGMA standard deviations from the value implied by the current
-*        I, Q and U values. The standard deviation used is the square
-*        root of the input variance value if output variances are being
-*        created (see parameter VARIANCE), or the standard deviation of all
-*        residuals in the current image otherwise.
 *
 *        Single beam mode can take account of imperfections in the analyser.
 *        The transmission (i.e. the overall throughput) and efficiency
@@ -225,6 +213,32 @@
 *        any value (i.e. they are not restricted to the values 0.0, 22.5,
 *        45.0 and 67.5 degrees as in the dual-beam algorithm).
 *
+*        If the input intensity images do not contain usable variances,
+*        then estimates of these variances can be made from the spread of
+*        supplied data values. This is an iterative process. Initially,
+*        Stokes vectors are estimated assigning a uniform constant weight
+*        to all input data values. These Stokes vectors are smoothed
+*        by replacing each value by the mean of those in a 5 by 5 pixel 
+*        box centred on the value. The squared residuals are then found 
+*        between the supplied intensities and the intensities implied by
+*        these smoothed Stokes vectors. The variance at each input pixel is
+*        then assumed to be equal to the mean of the squared residuals 
+*        within a 5 by 5 pixel box centred on the input pixel.
+*        
+*        In order to provide some safe-guards against aberrant values in 
+*        the input images, input data values which are badly inconsistent 
+*        with the smoothed Stokes vectors are rejected at this point. Pixels
+*        are rejected if the corresponding squared residual is greater than 
+*        NSIGMA times the standard deviation expected for the pixel value.
+*        This standard deviation may be derived from the variances in the 
+*        input data file, or from the variances estimated from the spread
+*        of data values (see parameter WEIGHTS).
+*
+*        After rejecting such values, the algorithm goes on to re-calculate 
+*        the Stokes vectors excluding the rejected input values, weighting
+*        the input data values as specified by parameter WEIGHTS. This 
+*        process is repeated a number of times given by parameter NITER. 
+*
 *        There are a couple of restrictions in single-beam mode. Firstly,
 *        there is currently no facility for measuring circular
 *        polarization. Secondly, no attempt is made to correct for
@@ -238,7 +252,8 @@
 *        intensity I is estimated by summing such pairs of images. The
 *        various estimates of these quantities provided by different pairs 
 *        are stacked together using a median estimator to provide some
-*        safe-guards against aberrant input values. Circular 
+*        safe-guards against aberrant input values. Circular polarization
+*        can also be measured.
 *
 *        Only polarimeters with a fixed analyser and rotating half-wave plate
 *        are supported, and the half-wave plate angle (given by item
@@ -333,7 +348,6 @@
       INTEGER VAR                ! Variances required flag
       LOGICAL DBEAM              ! Use dual-beam mode?
       LOGICAL LVAL               ! Logical parameter value
-      INTEGER WEIGHT             ! Weighting scheme
 *.
 
 *  Check inherited global status.
@@ -372,9 +386,6 @@
          VAR = -1
       END IF
 
-*  Get the weighting scheme to use.
-      CALL PAR_GDR0I( 'WEIGHTS', 1, 1, 4, .FALSE., WEIGHT, STATUS )
-
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -403,13 +414,9 @@
 
 *  Process the data using dual or single beam mode.
       IF( DBEAM ) THEN
-
-* >>>>>>>>  NEED TO ADD WEIGHT INTO THE FOLLOWING DUAL_BEAM CALL.  <<<<<<<<
-
          CALL POL1_DULBM( IGRP, VAR, ILEVEL, STATUS )
-
       ELSE
-         CALL POL1_SNGBM( IGRP, VAR, WEIGHT, ILEVEL, STATUS )
+         CALL POL1_SNGBM( IGRP, VAR, ILEVEL, STATUS )
       END IF
 
 * Tidy up.

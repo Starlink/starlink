@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGBM( IGRP1, IVAR, WEIGHT, ILEVEL, STATUS )
+      SUBROUTINE POL1_SNGBM( IGRP1, IVAR, ILEVEL, STATUS )
 *+
 *  Name:
 *     POL1_SNGBM
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGBM( IGRP1, IVAR, WEIGHT, ILEVEL, STATUS )
+*     CALL POL1_SNGBM( IGRP1, IVAR, ILEVEL, STATUS )
 
 *  Description:
 *     This routine creates a 3D NDF holding Stokes vectors calculated from 
@@ -25,25 +25,6 @@
 *        then output variances are not required. If zero, then output 
 *        variances will be created if possible, but no error is reported
 *        otherwise.
-*     WEIGHT = INTEGER (Given)
-*        The weighting scheme to use:
-*
-*        1 - Use the reciprocal of the variances supplied with the
-*        input images. If any input images do not have associated variances
-*        then a constant weight of 1.0 will be used for all input images.
-*
-*        2 - Use the reciprocal of the variances supplied with the
-*        input images. If an input image does not have associated variances
-*        then the weights used for that image are based on an estimate of the 
-*        variances derived from the spread of input intensity values. 
-*
-*        3 - Use the reciprocal of an estimate of the input variance
-*        derived from the spread of input intensity values. Any variances 
-*        supplied with the input images are ignored.
-*
-*        4 - Use a constant weight of 1.0 for all input images. Any 
-*        variances supplied with the input images are ignored. 
-*
 *     ILEVEL = INTEGER (Given)
 *        The amount of information to display on the screen; 0 for none;
 *        1 for some; 2 for lots.
@@ -64,6 +45,24 @@
 *        The output NDF holding the Stokes vector cube.
 *     TITLE = LITERAL (Read)
 *        A title for the output cube.
+*     WEIGHT = _INTEGER (Read)
+*        The weighting scheme to use:
+*
+*        1 - Use the reciprocal of the variances supplied with the
+*        input images. If any input images do not have associated variances
+*        then a constant weight of 1.0 will be used for all input images.
+*
+*        2 - Use the reciprocal of the variances supplied with the
+*        input images. If an input image does not have associated variances
+*        then the weights used for that image are based on an estimate of the 
+*        variances derived from the spread of input intensity values. 
+*
+*        3 - Use the reciprocal of an estimate of the input variance
+*        derived from the spread of input intensity values. Any variances 
+*        supplied with the input images are ignored.
+*
+*        4 - Use a constant weight of 1.0 for all input images. Any 
+*        variances supplied with the input images are ignored. 
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -94,7 +93,6 @@
 *  Arguments Given:
       INTEGER IGRP1
       INTEGER IVAR
-      INTEGER WEIGHT
       INTEGER ILEVEL
 
 *  Status:
@@ -122,6 +120,7 @@
       INTEGER NNDF               ! No. of input NDFs
       INTEGER PLACE              ! Place holder for co-variances NDF
       INTEGER UBNDO( 3 )         ! Upper bounds of output NDF
+      INTEGER WEIGHT             ! Weighting scheme to use
       INTEGER WSCH               ! Weighting scheme to use
       LOGICAL INVAR              ! Use input variances?
       LOGICAL OUTVAR             ! Create output variances?
@@ -144,6 +143,9 @@
 
 *  Get the number of input NDFs.
       CALL GRP_GRPSZ( IGRP1, NNDF, STATUS )
+
+*  Get the weighting scheme to use.
+      CALL PAR_GDR0I( 'WEIGHTS', 1, 1, 4, .FALSE., WEIGHT, STATUS )
 
 *  First check the supplied NDFs, and get the required header information
 *  from each one.
@@ -170,7 +172,7 @@
      :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, %VAL( IPIMI ),
      :                 LBNDO, UBNDO, STATUS, %VAL( IMGID_LEN ) )
 
-*  Choose the weigfhting scheme to use, taking account of the
+*  Choose the weighting scheme to use, taking account of the
 *  availability of input variances. Also, estimates of input variances
 *  can only be made if we are allowed to iterate (i.e. if niter is
 *  greater than zero).
@@ -185,7 +187,7 @@
          IF( INVAR ) THEN
             WSCH = 1
          ELSE IF( NITER .GT. 0 ) THEN
-            WSCH = 2
+            WSCH = 3
          ELSE
             WSCH = 4
          END IF
