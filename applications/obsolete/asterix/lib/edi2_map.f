@@ -135,7 +135,7 @@
       CALL ADI2_FNDBTC( EVHDU, LIST, BCOL, STATUS )
 
 *  Locate storage area for this column
-      CALL BDI0_LOCPST( EVHDU, LIST, .TRUE., PSID, STATUS )
+      CALL BDI0_LOCPST( ARGS(2), LIST, .TRUE., PSID, STATUS )
 
 *  Map the column
       IF ( LBND .EQ. 0 ) THEN
