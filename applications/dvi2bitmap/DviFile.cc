@@ -32,6 +32,12 @@
 
 #include <config.h>
 
+#ifdef HAVE_CSTD_INCLUDE
+#include <cmath>		// for fabs()
+#else
+#include <math.h>
+#endif
+
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 using std::endl;
@@ -70,27 +76,40 @@ verbosities DviFile::verbosity_ = normal;
  * {@link #getEvent} and handling the returned object.
  *
  * @param fn the name of the DVI file
- * @param res the base DPI to be used for processing the file, in pixels-per-inch
- * @param magmag the factor by which the DVI file's internal
- * magnification factor should itself be magnified -- default 1.0
+ *
+ * @param res the base DPI to be used for processing the file, in
+ * pixels-per-inch
+ *
+ * @param externalmag the factor by which the DVI file's internal
+ * magnification factor should itself be magnified, specified
+ * externally to the DVI file (on a command line, for example);
+ * default is 1.0
+ *
+ * @param read_post if true, then the DVI postamble will be read; if
+ * false, it will be skipped.  This is false by default, but if the
+ * postamble is read, then the font declarations there will be read
+ * and acted on, which <em>may</em> speed things up.
  */
-DviFile::DviFile (string& fn, int res, double magmag)
+DviFile::DviFile (string& fn, int res, double externalmag, bool read_post)
     : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
-      current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
-      magfactor_(1.0), skipPage_(false),
+      current_font_(0), dvif_(0), resolution_(res), extmag_(externalmag),
+      netmag_(1.0), skipPage_(false),
       max_drift_(0),
-      widest_page_(-1), deepest_page_(-1)
+      widest_page_(-1), deepest_page_(-1), have_read_postamble_(false)
 {
     PkFont::setResolution(res);
 
     try
     {
 	dvif_ = new InputByteStream (fileName_, false, ".dvi");
-	read_postamble();
+	if (read_post) {
+	    read_postamble();
+	    dvif_->seek(0);	// return to beginning
+	}
+
 #if HOMEMADE_POSSTATESTACK
-	posStack_ = new PosStateStack(postamble_.s);
+	posStack_ = new PosStateStack(read_post ? postamble_.s : 100);
 #endif
-	dvif_->seek(0);		// return to beginning
     }
     catch (InputByteStreamError& e)
     {
@@ -111,20 +130,32 @@ DviFile::DviFile (string& fn, int res, double magmag)
  * @param res the base DPI to be used for processing the file, in pixels-per-inch
  * @param magmag the factor by which the DVI file's internal
  * magnification factor should itself be magnified -- default 1.0
+ *
+ * @param read_post if true, then the DVI postamble will be read; if
+ * false, it will be skipped.  This is false by default, but if the
+ * postamble is read, then the font declarations there will be read
+ * and acted on, which <em>may</em> speed things up.
  */
-DviFile::DviFile (const char* fn, int res, double magmag)
+DviFile::DviFile (const char* fn, int res, double externalmag, bool read_post)
     : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
-      current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
-      magfactor_(1.0), skipPage_(false),
-      max_drift_(0)
+      current_font_(0), dvif_(0), resolution_(res), extmag_(externalmag),
+      netmag_(1.0), skipPage_(false),
+      max_drift_(0),
+      widest_page_(-1), deepest_page_(-1), have_read_postamble_(false)
 {
     PkFont::setResolution(res);
 
     try
     {
 	dvif_ = new InputByteStream (fileName_, false, ".dvi");
-	read_postamble();
-	dvif_->seek(0);		// return to beginning
+	if (read_post) {
+	    read_postamble();
+	    dvif_->seek(0);	// return to beginning
+	}
+
+#if HOMEMADE_POSSTATESTACK
+	posStack_ = new PosStateStack(read_post ? postamble_.s : 100);
+#endif
     }
     catch (InputByteStreamError& e)
     {
@@ -536,20 +567,20 @@ DviFileEvent *DviFile::getEvent()
 		}
 		break;
 
-		// fnt_def1 to 4 are read when the postamble is read.
-		// The definitions here should be duplicates - just check
-		// that the font number has been seen already
+		// If the postamble was read, then these font
+		// definitions should be duplicates; otherwise,
+		// they're the first declarations of the fonts.
 	      case 243:		// fnt_def1
-		check_duplicate_font (1);
+		fnt_def_(netmag_, 1);
 		break;
 	      case 244:		// fnt_def2
-		check_duplicate_font (2);
+		fnt_def_(netmag_, 2);
 		break;
 	      case 245:		// fnt_def3
-		check_duplicate_font (3);
+		fnt_def_(netmag_, 3);
 		break;
 	      case 246:		// fnt_def4
-		check_duplicate_font (4);
+		fnt_def_(netmag_, 4);
 		break;
 	      case 247:		// pre
 		{
@@ -582,6 +613,36 @@ DviFileEvent *DviFile::getEvent()
     assert (gotEvent != 0);
 
     return gotEvent;
+}
+
+/**
+ * Returns a fallback font, for use when a requested font is not
+ * available.  The font returned depends on whether the DVI postamble
+ * was read or not, on what fonts have already been seen in the file,
+ * and on the font desired.  This flexibility will not, however, stray
+ * beyond the liberty given by section 4.4, `Missing fonts', in the
+ * DVI standard.
+ *
+ * @param desired a pointer to the font which was requested (but not,
+ * presumably, loaded), or 0 if this information is not available
+ * @return a pointer to a fallback font, or zero if absolutely no
+ * fonts are available
+ */
+const PkFont* DviFile::getFallbackFont(const PkFont* desired)
+{
+    const FontSet* fs = getFontSet();
+    const PkFont* best_so_far = 0;
+    for (FontSet::const_iterator ci = fs->begin(); ci != fs->end(); ++ci) {
+	const PkFont* f = *ci;
+	if (desired == 0)
+	    return f;
+	double diff = fabs(desired->designSize() - f->designSize());
+	if (diff == 0.0)
+	    return f;
+	if (diff < fabs(desired->designSize() - best_so_far->designSize()))
+	    best_so_far = f;
+    }
+    return best_so_far;
 }
 
 // getByte and the get?I? routines are just interfaces to the corresponding 
@@ -819,34 +880,42 @@ void DviFile::read_postamble()
     if (getByte() != 248)
 	throw DviError ("DviFile::read_postamble: expected post command");
     // Read and discard four integers
-    (void) dvif_->getUIU(4); // final bop
-    (void) dvif_->getUIU(4);	// numerator
-    (void) dvif_->getUIU(4);	// denominator
+    (void) dvif_->getUIU(4);	// pointer to final bop
+    (void) dvif_->getUIU(4);	// unit-of-measurement numerator...
+    (void) dvif_->getUIU(4);	// ...and denominator
     unsigned int dvimag = dvif_->getUIU(4);	// mag
-    // immediately multiply it by magmag
-    postamble_.mag = dvimag;
+    postamble_.mag = dvimag;	// store dvimag
     postamble_.l = dvif_->getUIU(4);    
     postamble_.u = dvif_->getUIU(4);    
     postamble_.s = dvif_->getUIU(2);    
     postamble_.t = dvif_->getUIU(2);
-    // multiply the page sizes by the magnification
-    if (magmag_ != 1.0)
-    {
-	dvimag = static_cast<unsigned int>(dvimag*magmag_);
-	postamble_.mag = dvimag;
-	postamble_.l = static_cast<unsigned int>(postamble_.l
-						 * (double)dvimag / 1000.0);
-	postamble_.u = static_cast<unsigned int>(postamble_.u
-						 * (double)dvimag / 1000.0);
+    // Multiply the page sizes by the external magnification.  Do not
+    // multiply the postamble sizes by this -- leave them as they were
+    // read from the file.
+    // XXX: I'm not absolutely positive that the logic here is correct.  The
+    // postamble information is ignored in dvi2bitmap (apart from
+    // fnt_defs), and so errors here aren't noticed or tested.
+    if (extmag_ != 1.0) {
+	dvimag = static_cast<unsigned int>(dvimag*extmag_);
+// 	postamble_.mag = dvimag;
+// 	postamble_.l = static_cast<unsigned int>(postamble_.l
+// 						 * (double)dvimag / 1000.0);
+// 	postamble_.u = static_cast<unsigned int>(postamble_.u
+// 						 * (double)dvimag / 1000.0);
     }
     // px_per_dviu_ is set in preamble
     widest_page_ = static_cast<int>(postamble_.u * px_per_dviu_);
     deepest_page_ = static_cast<int>(postamble_.l * px_per_dviu_);
+
+    // dvimag/1000 is the font magnification factor
+    double fontmag = dvimag/1000.0;
+    
     if (verbosity_ > normal)
 	cerr << "Postamble: l=" << postamble_.l
 	     << " u=" << postamble_.u
 	     << " s=" << postamble_.s
 	     << " t=" << postamble_.t
+	     << "; fontmag=" << fontmag
 	     << endl;
 
     // process the following font definitions, building up a map of used fonts
@@ -857,16 +926,16 @@ void DviFile::read_postamble()
 	switch (opcode)
 	{
 	  case 243:		// fnt_def1
-	    fnt_def_(dvimag, 1);
+	    fnt_def_(fontmag, 1);
 	    break;
 	  case 244:		// fnt_def2
-	    fnt_def_(dvimag, 2);
+	    fnt_def_(fontmag, 2);
 	    break;
 	  case 245:		// fnt_def3
-	    fnt_def_(dvimag, 3);
+	    fnt_def_(fontmag, 3);
 	    break;
 	  case 246:		// fnt_def4
-	    fnt_def_(dvimag, 4);
+	    fnt_def_(fontmag, 4);
 	    break;
 
 	  case 249:		// post_post
@@ -878,6 +947,8 @@ void DviFile::read_postamble()
 	    break;
 	}
     }
+
+    have_read_postamble_ = true;
 }
 
 /**
@@ -886,10 +957,20 @@ void DviFile::read_postamble()
  * it was opcode 243..246 (<code>fnt_def1..4</code>) which invoked
  * this.
  *
- * @param dvimag dvi file magnification
+ * <p>It is not an error for a font to be defined twice -- the second
+ * definition is simply ignored.  This is so that we can invoke
+ * <code>fnt_def_</code> in the postamble and the run of the file,
+ * without worrying about whether the postamble is being or has been
+ * read.  This means that we cannot detect if a font is declared
+ * twice.  The DVI standard says that this must not happen, but it
+ * does not require processors to warn if it does, so this behaviour
+ * is both convenient and permissable.
+ *
+ * @param fontmag magnification factor (1.0 = no mag) for the font to
+ * be read
  * @param nbytes number of bytes of font-number to read
  */
-void DviFile::fnt_def_(unsigned int dvimag, int nbytes)
+void DviFile::fnt_def_(double fontmag, int nbytes)
 {
     int num;
     unsigned int c, s, d;
@@ -904,8 +985,6 @@ void DviFile::fnt_def_(unsigned int dvimag, int nbytes)
     else
 	num = getSIU(nbytes);
 
-    if (fontSet_.get(num) != 0)
-	throw DviError ("Font %d defined twice", num);
     c = getUIU(4);	// checksum (see DVI std, A.4)
     s = getUIU(4);	// scale factor, DVI units
     d = getUIU(4);	// design size
@@ -915,12 +994,22 @@ void DviFile::fnt_def_(unsigned int dvimag, int nbytes)
 	fontdir += static_cast<char>(getByte());
     for (int l = getSIU(1); l>0; l--)
 	fontname += static_cast<char>(getByte());
-    fontSet_.add(num, new PkFont(dvimag, c, s, d, fontname));
-    if (verbosity_ > normal)
-	cerr << "fnt_def_: defined font " << fontname
-	     << " size=" << fontSet_.size()
-	     << "==? " << getFontSet()->size()
-	     << endl;
+    PkFont *f = fontSet_.get(num);
+    if (f == 0) {
+	// font hasn't been seen before
+	fontSet_.add(num, new PkFont(fontmag, c, s, d, fontname));
+	if (verbosity_ > normal)
+	    cerr << "fnt_def_: defined font " << num << ": "
+		 << fontname
+		 << " size=" << fontSet_.size()
+		 << "==? " << getFontSet()->size()
+		 << endl;
+    } else {
+	// font has been seen already, probably in the postamble
+	if (verbosity_ > normal)
+	    cerr << "fnt_def_: found inline definition of font " << num
+		 << "=" << f->name() << "/" << fontname << endl;
+    }
     return;
 }
 
@@ -948,7 +1037,7 @@ void DviFile::fnt_def_(unsigned int dvimag, int nbytes)
  * were told that TeX's DVI files have (DVI units=sp).
  *
  * <p>The `device units' in this case are pixels, each of which is
- * (1pt=1/72.27in)/magfactor_ in size.   This matters, as it
+ * (1pt=1/72.27in)/netmag_ in size.   This matters, as it
  * determines the size of the max_drift_ parameter, as described in
  * the DVI standard, section 2.6.2.
  *
@@ -961,15 +1050,15 @@ void DviFile::process_preamble(DviFilePreamble* p)
     preamble_.den = p->den;
     preamble_.mag = p->mag;
     preamble_.comment = p->comment;
-    if (p->mag == 1000 && magmag_ == 1.0)
-	magfactor_ = 1.0;
+    if (preamble_.mag == 1000 && extmag_ == 1.0)
+	netmag_ = 1.0;
     else
-	magfactor_ = (double)p->mag/1000.0 * magmag_;
+	netmag_ = (double)preamble_.mag/1000.0 * extmag_;
     // Note dviu_per_pt_ does not include DVI-magnification
-    // (so `true' dviu_per_pt_ would be this/magfactor_)
+    // (so `true' dviu_per_pt_ would be this/netmag_)
     dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
-    double device_units = 1.0/72.27/magfactor_;
+    double device_units = 1.0/72.27/netmag_;
     if (device_units > 0.01)
 	max_drift_ = 0;
     else if (device_units > 0.005)
@@ -979,46 +1068,15 @@ void DviFile::process_preamble(DviFilePreamble* p)
     if (verbosity_ > normal)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
 	     << ", px_per_dviu_ = " << px_per_dviu_
-	     << ", mag=" << p->mag
-	     << ", magmag=" << magmag_
+	     << ", mag=" << preamble_.mag
+	     << ", extmag=" << extmag_
 	     << endl
 	     << "Scales: resolution_=" << resolution_
-	     << " magfactor_=" << magfactor_
+	     << " netmag_=" << netmag_
 	     << " device_units=" << device_units
 	     << "=>max_drift_=" << max_drift_
 	     << endl;
 }
-
-void DviFile::check_duplicate_font (int ksize)
-{
-    int number;
-    if (ksize == 4)
-	number = getSIS(4);
-    else
-	number = getSIU(ksize);
-
-    // Read `c' into s, and discard it by immediately reading `s'.
-    unsigned int s = getUIU(4); // c
-    s = getUIU(4);		// s
-    unsigned int d = getUIU(4);	// d
-    int namelen = getSIU(1);	// a
-    namelen += getSIU(1);	// l
-    string name = "";
-    for (; namelen>0; namelen--)
-	name += getByte();
-
-    //PkFont *f = fontMap_[number];
-    PkFont *f = fontSet_.get(number);
-    if (f == 0)
-	throw DviError
-	    ("font %s at mag %g (number %d) declared in body but not in postamble",
-	     name.c_str(), (double)s/d, number);
-    if (f->seenInDoc())
-	throw DviError ("font %s at mag %g (number %d) declared twice",
-			name.c_str(), (double)s/d, number);
-    f->setSeenInDoc();
-}
-
 
 void DviFileEvent::debug ()
 const
