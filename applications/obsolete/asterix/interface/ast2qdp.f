@@ -77,6 +77,7 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -97,6 +98,8 @@
 *        New prologues.
 *     14 Dec 1995 V2.0-0 (DJA):
 *        ADI port
+*      3 Jul 1997 V2.1-0 (RB):
+*        Output LABELs correctly
 *     {enter_changes_here}
 
 *  Bugs:
@@ -108,16 +111,16 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'ADI_PAR'
-      INCLUDE 'PRM_PAR'
+      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/ADI_PAR'
+      INCLUDE '/star/include/prm_par'
 
 *  Status:
       INTEGER			STATUS             	! Global status
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AST2QDP Version 2.1-0b' )
+        PARAMETER		( VERSION = 'AST2QDP Version rb test' )
 
 *  Local Variables:
       CHARACTER*80              LABEL              	!
@@ -236,7 +239,7 @@
       CALL BDI_GET0C( IFID, 'Title', TITLE, STATUS )
       IF ( TITLE .GT. ' ' ) THEN
         CALL MSG_SETC( 'LAB', TITLE )
-        CALL AIO_WRITE( OID, 'LABEL T "^LAB"', STATUS )
+        CALL AIO_WRITE( OID, 'LAB T "^LAB"', STATUS )
       END IF
 
 *  X axis label and units
@@ -244,8 +247,8 @@
       IF ( LABEL .GT. ' ' ) THEN
         CALL BDI_AXGET0C( IFID, 1, 'Units', UNITS, STATUS )
         IF ( UNITS .GT. ' ' ) THEN
-          CALL MSG_SETC( 'UNIT', UNITS )
           CALL MSG_SETC( 'LAB', LABEL )
+          CALL MSG_SETC( 'UNIT', UNITS )
           CALL AIO_WRITE( OID, 'LAB X "^LAB (^UNIT)"', STATUS )
         ELSE
           CALL MSG_SETC( 'LAB', LABEL )
@@ -256,13 +259,14 @@
 *  The data (=Y) axis label and units
       CALL BDI_GET0C( IFID, 'Label', LABEL, STATUS )
       IF ( LABEL .GT. ' ' ) THEN
-        CALL MSG_SETC( 'LAB', LABEL )
         CALL BDI_GET0C( IFID, 'Units', UNITS, STATUS )
         IF ( UNITS .GT. ' ' ) THEN
+          CALL MSG_SETC( 'LAB', LABEL )
           CALL MSG_SETC( 'UNIT', UNITS )
-          CALL AIO_WRITE( OID, 'LABEL Y "^LAB (^UNIT)"', STATUS )
+          CALL AIO_WRITE( OID, 'LAB Y "^LAB (^UNIT)"', STATUS )
         ELSE
-          CALL AIO_WRITE( OID, 'LABEL Y "^LAB"', STATUS )
+          CALL MSG_SETC( 'LAB', LABEL )
+          CALL AIO_WRITE( OID, 'LAB Y "^LAB"', STATUS )
         END IF
       END IF
 
@@ -462,7 +466,7 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
 
 *  Import:
       INTEGER			OID, N
