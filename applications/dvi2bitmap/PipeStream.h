@@ -44,7 +44,7 @@ class PipeStream : public InputByteStream {
     PipeStream (string cmd, string envs="")
 	    throw (InputByteStreamError);
     ~PipeStream();
-    string getResult(void)
+    string getResult(bool allOfFile=false, bool gobbleRest=true)
 	    throw (InputByteStreamError);
     virtual void close(void);
     int getStatus(void);
