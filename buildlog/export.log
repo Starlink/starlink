@@ -324,7 +324,7 @@ export:
 prepare:
 
 check_packages:
-[available] Dec 13, 2003 5:36:12 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 14, 2003 5:37:15 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1051,4 +1051,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
 
 BUILD SUCCESSFUL
-Total time: 20 minutes 16 seconds
+Total time: 20 minutes 21 seconds
