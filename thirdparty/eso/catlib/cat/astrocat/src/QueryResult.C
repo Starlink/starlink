@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: QueryResult.C,v 1.24 2001/08/27 10:10:32 abrighto Exp $
+ * $Id: QueryResult.C,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $
  *
  * QueryResult.C - method definitions for class QueryResult
  *
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  07 Nov 95  Created
  */
-static const char* const rcsId="@(#) $Id: QueryResult.C,v 1.24 2001/08/27 10:10:32 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: QueryResult.C,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $";
 
 
 #include <stdio.h>
@@ -160,7 +160,7 @@ int QueryResult::circularSearch(
     delete os.str();
     return status;
     
-    return 0;
+    //return 0;			// Unreachable!
 }
 
 
