@@ -1,4 +1,4 @@
-      SUBROUTINE COF_CHISR( FUNIT, NDF, STATUS )
+      SUBROUTINE COF_CHISR( FUNIT, NDF, NHEAD, RETAIN, STATUS )
 *+
 *  Name:
 *     COF_CHISR
@@ -11,24 +11,31 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_CHISR( FUNIT, NDF, STATUS )
+*     CALL COF_CHISR( FUNIT, NDF, NHEAD, RETAIN, STATUS )
 
 *  Description:
 *     The routine searches the FITS header for the HISTORY keywords that
 *     were written by COF_WHISR, and so create the HISTORY structure
 *     in an NDF.  It does assume that the HISTORY text has not been
-*     tampered.
+*     tampered.  It also flags these HISTORY headers so they may be
+*     excluded from the FITS airlock.
 
 *  Arguments:
 *     FUNIT = INTEGER (Given)
 *        The FITSIO unit number for the FITS file.
 *     NDF = INTEGER (Given)
 *        The identifier for the NDF to contain the axis structure.
+*     NHEAD = INTEGER (Given)
+*        Number of FITS headers.
+*     RETAIN( NHEAD ) = LOGICAL (Given and Returned)
+*        Flags to indicate whether or not to propagate each FITS header
+*        line to the NDF's FITS airlock.  Headers that are used to
+*        restore NDF HISTORY records will be flagged .FALSE. on exit.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Prior Requirements:
-*     The NDF and FITS files must be open.
+*     The NDF and FITS files must be open, the former with write access.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -40,6 +47,10 @@
 *     1997 July 30 (MJC):
 *        Truncated the character strings in the HISTORY records.  Added
 *        protection against long lines of additional history text.
+*     1997 November 16 (MJC):
+*        Added NHEAD and RETAIN arguments.  Flag NDF-style HISTORY
+*        records by setting their corresponding RETAIN elements to
+*        .FALSE..
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -59,6 +70,10 @@
 *  Arguments Given:
       INTEGER FUNIT
       INTEGER NDF
+      INTEGER NHEAD
+
+*  Arguments Given and Returned:
+      LOGICAL RETAIN( NHEAD )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -139,9 +154,11 @@
 *  Start the search from the first card.
       KINDEX = 1
 
-*  Loop until all the HISTORY records have been found.
+*  Loop until all the HISTORY records have been found.  Only continue
+*  search when there are untested headers remaining.
   100 CONTINUE                 ! Star of DO WHILE loop
-      IF ( HISPRE .AND. STATUS .EQ. SAI__OK ) THEN
+      IF ( HISPRE .AND. STATUS .EQ. SAI__OK .AND.
+     :     KINDEX .LE. NHEAD ) THEN
 
 *  Search for a HISTORY card.  KINDEX is updated with the keyword index
 *  number if a HISTORY record is found.
@@ -189,10 +206,25 @@
             CALL DAT_PUT0C( CLOC, CREATD, STATUS )
             CALL DAT_ANNUL( CLOC, STATUS )
 
+*  Record that this card is not to be propagated to the FITS airlock.
+            RETAIN( KINDEX ) = .FALSE.
+
+*  Obtain the previous header card from the first HISTORY record (if a
+*  previous card exists).  NDF HISTORY written by NDF2FITS is preceded
+*  by a blank line.  This line should be removed to restore the former
+*  appearance of the headers.
+            IF ( KINDEX .GT. 1 .AND. MAKHIS ) THEN
+               CALL FTGREC( FUNIT, KINDEX - 1, CARD, FSTAT )
+               IF ( CARD .EQ. ' ' ) RETAIN( KINDEX - 1 ) = .FALSE.
+            END IF
+
 *  Skip to the next header card.  Here we assume that these headers have
 *  not been tampered.
             KINDEX = KINDEX + 1
             CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
+
+*  Record that this card is not to be propagated to the FITS airlock.
+            RETAIN( KINDEX ) = .FALSE.
 
 *  Obtain the update mode.
             MODE = CARD( 24:NDF__SZHUM+23 )
@@ -240,6 +272,9 @@
 *  Skip over the expected blank line in the header.
             KINDEX = KINDEX + 1
 
+*  Record that this card is not to be propagated to the FITS airlock.
+            RETAIN( KINDEX ) = .FALSE.
+
 *  Create a new RECORDS element.
 *  =============================
             DO IREC = NEXREC + 1, NEXREC + CURREC
@@ -248,6 +283,9 @@
 *  not been tampered.
                KINDEX = KINDEX + 1
                CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
+
+*  Record that this card is not to be propagated to the FITS airlock.
+               RETAIN( KINDEX ) = .FALSE.
 
 *  Calculate the length of the record number.
                CALL CHR_ITOC( IREC, IC, NC )
@@ -281,6 +319,9 @@
                KINDEX = KINDEX + 1
                CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
 
+*  Record that this card is not to be propagated to the FITS airlock.
+               RETAIN( KINDEX ) = .FALSE.
+
 *  Break the line into words.
                CALL CHR_DCWRD( CARD, MAXWRD, NWORD, START, END, WORDS,
      :                         STATUS )
@@ -310,6 +351,9 @@
                KINDEX = KINDEX + 1
                CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
 
+*  Record that this card is not to be propagated to the FITS airlock.
+               RETAIN( KINDEX ) = .FALSE.
+
 *  Extract the dataset name.
                REFER = CARD( 20: )
                CSIZE = MAX( 1, MIN( CHR_LEN( REFER ), NDF__SZREF ) )
@@ -335,9 +379,16 @@
                   KINDEX = KINDEX + 1
                   CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
 
+*  Record that this card is not to be propagated to the FITS airlock,
+*  provided it is HISTORY.
+                  KEYWRD = CARD( 1:8 )
+                  IF ( CARD .EQ. ' '  .OR.
+     :                 KEYWRD .EQ. 'HISTORY' ) THEN
+                     RETAIN( KINDEX ) = .FALSE.
+                  END IF
+
 *  See whether there is a blank card or the END card present, denoting
 *  the end of the HISTORY records.
-                  KEYWRD = CARD( 1:8 )
                   PARSKP = KEYWRD .EQ. 'HISTORY' .AND.
      :                     CARD( 11: ) .EQ. ' ' 
                   IF ( KEYWRD .EQ. ' ' .OR. KEYWRD .EQ. 'END' .OR.
@@ -442,17 +493,11 @@
 
 *  For the moment, assume there is only one set of NDF-style HISTORY
 *  headers.  This should only fail if the headers have been tampered,
-*  i.e. divided.  In fact it is possible to have a growing number of
-*  duplicate NDF-style HISTORY records created in the headers because
-*  they aren't filtered (as in COI_CHISR).  So commenting out the GOTO
-*  below is sensible.  At some point add the RETAIN logical array.
-*  This can't be done now as if requires COF_2DFIM, COF_F2NDF, and
-*  COF_WREXT to be altered.  Unfortunately, the last routine is used
-*  widely.  As I'm writing this just prior to the submission deadline,
-*  it's prudent not to make this change now.
+*  i.e. divided.  In normal circumstances this loop shouldn't be
+*  required anyway.
 *
 *  Return to start of DO WHILE loop.
-*         GOTO 100
+*        GOTO 100
       END IF
 
 *  Check for a FITSIO error.  Handle a bad status.  Negative values are
