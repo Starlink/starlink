@@ -68,6 +68,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
@@ -86,13 +87,10 @@
 *    Local variables :
       CHARACTER*(DAT__SZLOC) RLOC                 ! Locator to response file
       CHARACTER*(DAT__SZLOC) ELOC                 ! Locator to effective areas
-      CHARACTER*(DAT__SZTYP) TYPE                 ! Type of source file
-      CHARACTER*80 PATH(10)                       ! History text
       CHARACTER*80 RFILE                          ! Name of response file
       CHARACTER*80 EFILE                          ! Name of eff. area file
       CHARACTER*80 PFILE                          ! Name of particle file
       CHARACTER*80 CALDIR                         ! Dir. for XRT cal. files
-      INTEGER NLINES                              ! No of history lines
       REAL AMULT                                  ! Area multiplication
 *
 *      Pointers:
@@ -126,7 +124,6 @@
       INTEGER SID,BID,OID,MID,PFID
       LOGICAL SLVAR                               ! variances in source file?
       LOGICAL BLVAR                               ! variances in bckgnd file?
-      LOGICAL INPRIM                              ! Is input data primitive
       LOGICAL LHRI                                ! Is it an HRI observation ?
       LOGICAL LPART                               ! Take particles into account
       LOGICAL PCORR                               ! Perform the position
@@ -136,6 +133,7 @@
       REAL SVDEF                                  ! Default source variance
       REAL BVDEF                                  ! Default bckgnd variance
       INTEGER LP
+      INTEGER			IFILES			! Input file info
       BYTE SMASK, BMASK                           ! Quality masks
       LOGICAL SLQUAL, BLQUAL, LBMOD
 *    Local data :
@@ -1451,7 +1449,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       END
 
 *+XRTSUB_GETDATA    Maps the data array and reorders if necessary
-      SUBROUTINE XRTSUB_GETDATA(IFID,LOCIN,MODE, HEAD, ODIMS, ORDER,
+      SUBROUTINE XRTSUB_GETDATA(IFID, MODE, HEAD, ODIMS, ORDER,
      &                      DPNTR,TDPNTR, LVAR, VPNTR, TVPNTR, LQUAL,
      &                         QPNTR, TQPNTR, MASK, LREORD, STATUS)
 *    Description :
@@ -1493,7 +1491,6 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
       INTEGER			IFID			! Input file id
-      CHARACTER*(DAT__SZLOC) LOCIN       ! Locator to input fle
       CHARACTER*(*) MODE		 ! Access mode
 *    Import-Export :
       RECORD /CORR/ HEAD
@@ -1522,9 +1519,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       LOGICAL OK                ! Is axis array present and regular ?
       CHARACTER*40 LABEL                 ! Axis label
       CHARACTER*(DAT__SZLOC) HLOC  ! Locator to header ans instrument box
-      INTEGER VNDIM, VDIMS(DAT__MXDIM)   ! Variance dimensions
       INTEGER AXTYPE                     ! Axis type
-      INTEGER QNDIM, QDIMS(DAT__MXDIM)   ! Quality dimensions
       INTEGER NSIZE                      ! Total no. of data elements
       INTEGER WRONG                      ! Number of out of order axes
       INTEGER WRGAX                      ! AXIS position of wrong axis
