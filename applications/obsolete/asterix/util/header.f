@@ -78,6 +78,7 @@
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, WIDTH, STATUS )
 
       IF (STATUS .EQ. SAI__OK) THEN
+        CALL BDI_PRIM( FID, PRIM, STATUS )
         IF (.NOT. PRIM) THEN
 
 *  do editing if required
