@@ -140,6 +140,7 @@
 #     AJC: A.J.Chipperfield (Starlink, RAL)
 #     PDRAPER: P.W. Draper (Starlink, Durham University)
 #     MBT: M.B.Taylor (Starlink, IoA)
+#     AA: A.Allan (Starlink, Keele)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -241,6 +242,8 @@
 #        Modified to use IFD files as source of IFL files.
 #     12-MAY-1999 (MBT):
 #        Removed all NAG references.  Renamed ccdpack.tar to ccdpack_sub.tar.
+#     21-SEP-1999 (MBT):
+#        Merged in changes from AA's changes to DRIZZLE, TRANNDF etc.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -623,7 +626,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f ccd1_setex.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f \
  kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
- ira1_chscs.f ira_seteq.f ira_iscs.f
+ ira1_chscs.f ira_seteq.f ira_iscs.f \
+ ccd1_box.f ccd1_dodiz.f ccd1_gszff.f ccd1_sgare.f ccd1_tran.f 
 
 IRGSRC = irg1_axlim.f irg1_brack.f irg1_check.f irg1_fspec.f \
  irg1_lasto.f irg1_ncut.f irg1_ndfch.f irg1_slice.f \
@@ -674,14 +678,14 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_wtm4.gen ccg1_smr1.gen ccg1_smd2.gen ccg1_smr2.gen \
  ccg1_smd3.gen ccg1_smr3.gen ccg1_fmr1.gen ccg1_fmr2.gen \
  ccg1_fmr3.gen ccg1_fmd1.gen ccg1_fmd2.gen ccg1_fmd3.gen \
- ccg1_kthx.gen kpg1_asli.gen
+ ccg1_kthx.gen ccg1_asli.gen
 
 #  Routines which may be real or double precision
 GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
  kpg1_mdet.grd kpg1_litn.grd kpg1_trbo.grd kpg1_trpi.grd \
  ccg1_irhg.grd ccg1_irhl.grd ccg1_cmpr.grd ccg1_crdt.grd \
  ccg1_mvdt.grd ccg1_ptbd.grd ccg1_qntl.grd ccg1_skys.grd \
- kpg1_ludc.grd ccg1_evar.grd kpg1_asbo.grd kpg1_aspi.grd
+ kpg1_ludc.grd ccg1_evar.grd ccg1_aspi.grd
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = ccg1_fch0.glrdic ccg1_sto0.glrdic ccg1_fch1.glrdic \
@@ -713,7 +717,7 @@ CIRGSRC = irg1_wild.c
 
 REDTASKS = makebias debias makecal calcor makeflat flatcor
 REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
- pairndf ccdedit makemos tranndf astimp astexp wcsreg wcsedit
+ pairndf ccdedit makemos tranndf drizzle astimp astexp wcsreg wcsedit
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
  picinfo import present schedule ccdimp ccdexp
 SCRTASKS = reduce ccdalign xreduce
@@ -770,7 +774,7 @@ IRAF_HELP = calcor.hlp makebias.hlp ccdalign.hlp makecal.hlp \
    debias.hlp schedule.hlp findcent.hlp tranlist.hlp findobj.hlp \
    tranndf.hlp findoff.hlp typical_initial_reduction.hlp flatcor.hlp \
    use_globals.hlp idicurs.hlp xreduce.hlp import.hlp \
-   astimp.hlp astexp.hlp wcsreg.hlp wcsedit.hlp
+   drizzle.hlp astimp.hlp astexp.hlp wcsreg.hlp wcsedit.hlp
 
 #  Name of the help task.
 
@@ -2154,6 +2158,7 @@ ccd1_asfio.o: FIO_PAR PAR_ERR SAE_PAR
 ccd1_asnk.o: CCD1_PAR CCD1_FDCM SAE_PAR
 ccd1_asrc.o: CCD1_PAR CCD1_FDCM FIO_ERR SAE_PAR
 ccd1_auto.o: CCD1_PAR IRG_FAC MSG_PAR SAE_PAR
+ccd1_box.o: SAE_PAR
 ccd1_calcj.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_cat.o: FIO_ERR MSG_PAR SAE_PAR
 ccd1_cen2.o: SAE_PAR
@@ -2189,6 +2194,7 @@ ccd1_dlcat.o: SAE_PAR
 ccd1_dmprg.o: AST_PAR SAE_PAR
 ccd1_docmd.o: SAE_PAR
 ccd1_docmp.o: DAT_PAR NDF_PAR SAE_PAR USER_ERR
+ccd1_dodiz.o: AST_PAR DAT_PAR NDF_PAR PRM_PAR SAE_PAR
 ccd1_domos.o: NDF_PAR SAE_PAR
 ccd1_dqeds.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_drawi.o: IDI_ERR SAE_PAR
@@ -2225,6 +2231,7 @@ ccd1_grapc.o: PRM_PAR SAE_PAR
 ccd1_grpth.o: PRM_PAR SAE_PAR
 ccd1_grrep.o: CCD1_PAR SAE_PAR
 ccd1_groff.o: MSG_PAR PRM_PAR SAE_PAR
+ccd1_gszff.o: CCD1_PAR FIO_ERR PAR_ERR PRM_PAR SAE_PAR
 ccd1_gtbds.o: SAE_PAR
 ccd1_gtcmp.o: SAE_PAR
 ccd1_gtcpb.o: SAE_PAR
@@ -2337,6 +2344,7 @@ ccd1_sched.o: SAE_PAR
 ccd1_scrch.o: SAE_PAR
 ccd1_sdect.o: FIO_ERR MSG_PAR PAR_ERR PSX_ERR SAE_PAR
 ccd1_setpa.o: SAE_PAR
+ccd1_sgare.o: SAE_PAR
 ccd1_sngl.o: PRM_PAR SAE_PAR
 ccd1_soff.o: PRM_PAR SAE_PAR
 ccd1_spair.o: IDI_ERR IDI_PAR NDF_PAR SAE_PAR
@@ -2352,6 +2360,7 @@ ccd1_szslv.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR PRM_PAR SAE_PAR USER_ERR
 ccd1_tmpnm.o: PRM_PAR SAE_PAR
 ccd1_trout.o: SAE_PAR MSG_PAR
 ccd1_touch.o: SAE_PAR
+ccd1_tran.o: AST_PAR CCD1_MOSCM CCD1_MOSPR CCD1_PAR DAT_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
 ccd1_tstb.o: SAE_PAR
 ccd1_untmp.o: CCD1_PAR CCD1_TMPCM DAT_PAR
 ccd1_vlin.o: PRM_PAR SAE_PAR
@@ -2594,13 +2603,13 @@ kpg1_tdli.o: NDF_PAR PRM_PAR SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_trbo.o: NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 kpg1_trpi.o: NDF_PAR PRM_PAR SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_vasv.o: PRM_PAR SAE_PAR
-kpg1_asli.o: AST_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
-kpg1_asbo.o: AST_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
-kpg1_aspi.o: AST_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_asli.o: AST_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_aspi.o: AST_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_odiz.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 makebias.o: CCD1_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 makecal.o: CCD1_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 makeflat.o: CCD1_PAR DAT_PAR NDF_PAR SAE_PAR
-makemos.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
+makemos.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR FIO_ERR FIO_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
 pairndf.o: CCD1_PAR DAT_PAR IDI_ERR IDI_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
 picinfo.o: SAE_PAR
 plotlist.o: CCD1_PAR FIO_PAR SAE_PAR
@@ -2611,7 +2620,8 @@ register.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR USER_ERR
 runxreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR
-tranndf.o: CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
+tranndf.o: AST_PAR CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
+drizzle.o: AST_PAR CCD1_MOSCM CCD1_MOSPR CCD1_PAR DAT_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PRM_PAR SAE_PAR
 wcsreg.o: AST_PAR CCD1_PAR FIO_PAR SAE_PAR
 wcsedit.o: AST_PAR IRH_PAR PAR_ERR SAE_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
