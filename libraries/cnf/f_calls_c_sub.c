@@ -1,6 +1,5 @@
 #include <string.h>
 #include "f77.h"
-#include "cnf.h"
 
 F77_SUBROUTINE(ti)( INTEGER_ARRAY(ia), INTEGER(ni), INTEGER(i) )
 
