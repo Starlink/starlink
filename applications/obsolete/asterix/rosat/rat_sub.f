@@ -516,6 +516,7 @@
       CHARACTER*(DAT__SZLOC)   ALOC                   ! locator
       INTEGER DUMMY			! Value not used
       character*(DAT__SZNAM) name
+      logical valid
 *
       IF (STATUS.NE.SAI__OK) RETURN
 
