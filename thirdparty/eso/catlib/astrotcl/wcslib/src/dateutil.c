@@ -402,7 +402,7 @@ double	*date;	/* Date as yyyy.mmdd (returned) */
 double	*time;	/* Time as hh.mmssxxxx (returned) */
 
 {
-    long tsec;
+    time_t tsec;
     struct timeval tp;
     struct timezone tzp;
     struct tm *ts;
@@ -1665,9 +1665,11 @@ long	isec;	/* Seconds past 1970-01-01 */
 {
     double date, time;
     struct tm *ts;
+    const time_t localisec = (const time_t)isec;
+    /* make argument compatible with localtime(const time_t*) */
 
     /* Get local time  from UT seconds */
-    ts = localtime (&isec);
+    ts = localtime (&localisec);
     if (ts->tm_year < 1000)
 	date = (double) (ts->tm_year + 1900);
     else
@@ -1991,7 +1993,7 @@ double	*date;	/* Date as yyyy.mmdd (returned) */
 double	*time;	/* Time as hh.mmssxxxx (returned) */
 
 {
-    long tsec;
+    time_t tsec;
     struct timeval tp;
     struct timezone tzp;
     struct tm *ts;
@@ -2048,7 +2050,7 @@ char *
 ut2fd()
 {
     int year, month, day, hour, minute, second;
-    long tsec;
+    time_t tsec;
     struct timeval tp;
     struct timezone tzp;
     struct tm *ts;
