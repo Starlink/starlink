@@ -1,80 +1,158 @@
-*+  FOLDBIN - Folds binned data into phase bins
       SUBROUTINE FOLDBIN( STATUS )
-*    Description :
+*+
+*  Name:
+*     FOLDBIN
+
+*  Purpose:
+*     Folds binned data into phase bins
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL FOLDBIN( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Folds nD data into phase bins and generates a folded nD data set
 *     containing the bin means (weighted if errors are available) and standard
 *     deviations, also the chi-squared fits to constant levels.
 *     Note - if axis zero is defined then this must be incorporated in the
 *     phase zero epoch.
-*    Method :
+
+*  Usage:
+*     foldbin {parameter_usage}
+
+*  Environment Parameters:
+*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
+*        {parameter_description}
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     The basic technique is straightforward.
 *     Arrays are mapped so there is no size limitation.
 *     Bad quality data are excluded.
 *     If time is not AXIS1 then the axes are swapped.
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     Trevor Ponman  (BHVAD::TJP)
-*     Phillip Andrews (PLA_ROSAT@uk.ac.bham.sr.star)
-*     David J. Allan (BHVAD::DJA)
-*     Simon Duck (BHVAD::SRD)
-*     Andrew Norton (SOTON::AJN)
-*    History :
-*     26 Mar 86: Original (TJP)
-*     29 Aug 86: Renamed (JCMP)
-*
-*     10 Sep 87: Accepts primitive input object. Checks validity of locators
-*                before attempting to annul them. Displays name of input object.
-*                Displays AXIS(1) UNITS. Displays max No of output bins (and
-*                makes sure this is not exceeded). Program suggests defaults
-*                for phase zero epoch and No of phase bins
-*                (= No of input bins in phase period). ACTIONS added to
-*                History record. (PLA)
-*     10 Dec 89: Ghastly spelling mistakes removed! Axis(1) text now correct.
-*                Uses MSG_PRNT now. (DJA)
-*     12 Jan 90: V1.0-3 Re-write to use ASTLIB! No longer generates negative
-*                       variances. Doesn't re-prompt after invalid input.
-*                       The TIM_ routines now use IMPLICIT NONE. (BHVAD::DJA)
-*     10 Apr 90: V1.0-4 Accepts nD data and folds each dimension over time. If
-*                       time is not the AXIS(1) then the axes are swapped so
-*                       that it is. (SRD)
-*     19 Jul 90:      - bugs fixed in TIM_FOLDU : arrays  BVAR & YBAR had
-*                       not been initialised to zero (AJN)
-*     24 Jul 90:      - serious bug fixed - epoch zero was carried over
-*                       to subroutines in days and calculation was done
-*                       in seconds - now converted to seconds before use,
-*                       also used in dble precision for accuracy with short
-*                       periods & long offsets (AJN)
-*     31 Jul 91:      - prints a warning when the max. no. of phase bine
-*                       for ordinary sampling is used. (LTVAD::RDS)
-*      7 Oct 92: V1.7-0 TIM_FOLDx routine renamed FOLDBIN_FOLDx to avoid
-*                       clash with FOLDLOTS routines of same name but
-*                       different function (DJA)
-*     30 Mar 93: V1.7-1 Updated by someone (not me!) (DJA)
-*     17 Aug 93: V1.7-2 Trivial changes to ARR_REG routines (DJA)
-*     18 Apr 95 : V1.8-0 Updated data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     foldbin, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmngham)
+*     SRD: Simon Duck (University of Birmngham)
+*     AJN: Andrew Norton (University of Southampton)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     26 Mar 1986 (TJP):
+*        Original version
+*     29 Aug 1986 (JCMP):
+*        Renamed
+*     10 Sep 1987 V1.0-0 (PLA):
+*        Accepts primitive input object. Checks validity of locators before
+*        attempting to annul them. Displays name of input object. Displays
+*        AXIS(1) UNITS. Displays max No of output bins (and makes sure this
+*        is not exceeded). Program suggests defaults for phase zero epoch and
+*        No of phase bins (= No of input bins in phase period). ACTIONS added
+*        to History record.
+*     10 Dec 1989 V1.0-1 (DJA):
+*        Ghastly spelling mistakes removed! Axis(1) text now correct.
+*     12 Jan 1990 V1.0-3 (DJA):
+*        Re-write to use ASTLIB! No longer generates negative variances.
+*        Doesn't re-prompt after invalid input.
+*     10 Apr 1990 V1.0-4 (DJA):
+*        Accepts nD data and folds each dimension over time. If time is not
+*        the AXIS(1) then the axes are swapped so that it is.
+*     19 Jul 1990 V1.0-5 (AJN):
+*        Bugs fixed in TIM_FOLDU : arrays  BVAR & YBAR had
+*        not been initialised to zero
+*     24 Jul 1990 V1.0-6 (AJN):      -
+*        Serious bug fixed - epoch zero was carried over to subroutines in
+*        days and calculation was done in seconds - now converted to seconds
+*        before use, also used in dble precision for accuracy with short
+*        periods & long offsets (AJN)
+*     31 Jul 1991 V1.0-7 (RDS):
+*        Prints a warning when the max. no. of phase bine
+*        for ordinary sampling is used.
+*      7 Oct 1992 V1.7-0 (DJA):
+*        TIM_FOLDx routine renamed FOLDBIN_FOLDx to avoid clash with FOLDLOTS
+*        routines of same name but different function
+*     30 Mar 1993 V1.7-1 (DJA):
+*        Updated by someone (not me!)
+*     17 Aug 1993 V1.7-2 (DJA):
+*        Trivial changes to ARR_REG routines
+*     13 Dec 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local Constants :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
       INTEGER            MAXHTXT                ! Maximum amount of history
          PARAMETER       (MAXHTXT = 10)
-*
-*    Local variables :
-*
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'FOLDBIN Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*132      HTXT(MAXHTXT)          ! History text
       CHARACTER*80       UNITS                  ! Value of AXIS(1) UNITS.
 
@@ -86,6 +164,7 @@
       REAL               PERIOD                 ! Folding period
       REAL               CHISQ                  ! Chi-squared fit to constant
                                                 ! level (i.e.phase indept.)
+      REAL			SPARR(2)		! Spaced array info
 
       INTEGER			FFID			! Folded dataset id
       INTEGER			IFID			! Input dataset id
@@ -100,19 +179,12 @@
       INTEGER            NELM
       INTEGER            NELM2
       INTEGER            NACTDIM                ! Dimensionality of data
-      INTEGER            VNDIM                  ! Dimensions of variance
-      INTEGER            VDIMS(ADI__MXDIM)      ! size of variance
-      INTEGER            VDIM(ADI__MXDIM)
-      INTEGER            QNDIM                  ! dimensions of quality
-      INTEGER            QDIMS(ADI__MXDIM)      ! size of quality
-      INTEGER            QDIM(ADI__MXDIM)
       INTEGER            DPTR                   ! Pointer to data array
       INTEGER            XPTR                   ! Pointer to axis data
       INTEGER            XWPTR                  ! Pointer to width data
       INTEGER            VPTR                   ! Pointer to variances
       INTEGER            QPTR                   ! Pointer to quality array
       INTEGER            FDPTR                  ! Pointer to folded data array
-      INTEGER            FXPTR                  ! Pointer to folded axis data
       INTEGER            FVPTR                  ! Pointer to folded error array
       INTEGER            FNPTR                  ! Pointer to folded no. array
       INTEGER            FQPTR                  ! Pointer to folded quality array
@@ -131,47 +203,52 @@
       INTEGER            AXDIM
       INTEGER            INBINS                 ! Number of input bins/ period.
       INTEGER            SIZ
-      INTEGER            USED                   ! # history text lines
+      INTEGER            	USED                   	! # history text lines
 
-      BYTE               MASK                   ! Quality mask
+      BYTE               	MASK                   	! Quality mask
 
-      LOGICAL            OK                 	! things ok?
-      LOGICAL            VOK                    ! Variance present?
-      LOGICAL            QOK                    ! Data quality present?
-      LOGICAL            REGULAR                ! Is input regularly binned?
-      LOGICAL            BOK                    ! BASE_TAI present
-      LOGICAL            BAD                    ! Any BAD data?
-      LOGICAL            WEIGHT
-*
-*    Version id
-*
-      CHARACTER*30		VERSION
-        PARAMETER       	( VERSION = 'FOLDBIN Version 1.8-0' )
-*-
+      LOGICAL            	OK                 	! things ok?
+      LOGICAL            	VOK                    	! Variance present?
+      LOGICAL            	QOK                    	! Data quality present?
+      LOGICAL            	REGULAR                	! Is input regularly binned?
+      LOGICAL            	BOK                    	! BASE_TAI present
+      LOGICAL            	WEIGHT			!
+*.
 
-*    Check status.
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
-      CALL AST_INIT
-
-*    Version
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Obtain data object, access and check it.
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+*  Initialise ASTERIX
+      CALL AST_INIT()
 
-*    Check status - drop out if bad
+*  Obtain data object, access and check it.
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check and map input data
-      CALL BDI_CHKDATA( IFID, OK, NACTDIM, ODIM, STATUS )
+*  Check and map input data
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, ODIM, NACTDIM, STATUS )
       IF ( OK ) THEN
-         CALL BDI_MAPDATA( IFID, 'READ', PTR, STATUS )
+
+*    Map input data
+        CALL BDI_MAPR( IFID, 'Data', 'READ', PTR, STATUS )
+
+*    Locate time axis
+        CALL BDI0_FNDAXC( IFID, 'T', AXDIM, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          IF ( NACTDIM .GT. 1 ) THEN
+            CALL MSG_PRNT( 'WARNING : Unable to recognise a time '/
+     :            /'axis, assuming its axis 1' )
+          END IF
+          AXDIM = 1
+        END IF
 
 *    Swap axes if necessary
-         CALL AXIS_TFIND(IFID,'TIME',NACTDIM,AXDIM,STATUS)
-         IF(AXDIM.NE.1)THEN
+         IF ( AXDIM .NE. 1 ) THEN
             OAX(1)=AXDIM
             DO I=2,AXDIM
                OAX(I)=I-1
@@ -210,19 +287,20 @@
       CALL MSG_PRNT( 'Data is ^DIMS dimensional' )
 
 *  Create a folded data object.
-      CALL USI_TASSOCO( 'OUT', 'FOLDED_SERIES', FFID, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 99
+      CALL USI_CREAT( 'OUT', ADI__NULLID, FFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    If AXIS(1) UNITS are defined, then display them.
-      UNITS = 'Units'
-      CALL BDI_GETAXUNITS( IFID, AXDIM, UNITS, STATUS )
-      CALL MSG_SETC( 'UNITS', UNITS )
-      CALL MSG_PRNT( 'TIME UNITS are ^UNITS' )
+*  If AXIS(1) UNITS are defined, then display them.
+      CALL BDI_AXGET0C( IFID, AXDIM, 'Units', UNITS, STATUS )
+      IF ( UNITS .GT. ' ' ) THEN
+        CALL MSG_SETC( 'UNITS', UNITS )
+        CALL MSG_PRNT( 'TIME UNITS are ^UNITS' )
+      END IF
 
-*    Get period
+*  Get period
       CALL USI_GET0R( 'PERIOD', PERIOD, STATUS )
 
-*    Define base epoch
+*  Define base epoch
       CALL TCI_GETID( IFID, TIMID, STATUS )
       CALL ADI_THERE( TIMID, 'TAIObs', BOK, STATUS )
       IF ( BOK ) THEN
@@ -235,42 +313,16 @@
       CALL USI_GET0D( 'EPOCH', ZeroEpoch, STATUS )
       ZEROOFFSET = (ZEROEPOCH - BASE_TAI) * 86400.D0
 
-*    Check axis and data match
-      CALL BDI_CHKAXVAL( IFID, AXDIM, OK, REGULAR, SIZ, STATUS )
-      IF ( SIZ .NE. NDATA ) THEN
-         STATUS=SAI__ERROR
-         CALL ERR_REP('NBAD','Axis and Data do not match',STATUS)
-         CALL ERR_FLUSH(STATUS)
-      END IF
-      IF ( OK ) THEN
-
-*       Find number of input bins within period.
-         IF ( REGULAR ) THEN
-            CALL BDI_GETAXVAL( IFID, AXDIM, BASE, SCALE, SIZ, STATUS )
-            INBINS = INT( PERIOD / ABS(SCALE) )
-            CALL MSG_SETI( 'INBINS', INBINS )
-C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
-            CALL USI_DEF0I( 'BINS', INBINS, STATUS )
-            CALL DYN_MAPR( 1, NDATA, XPTR, STATUS )
-            CALL DYN_MAPR( 1, NDATA, XWPTR, STATUS )
-            CALL ARR_REG1R( BASE, SCALE, NDATA, %VAL(XPTR), STATUS )
-            CALL ARR_INIT1R( SCALE, NDATA, %VAL(XWPTR), STATUS )
-         ELSE
-
-*          Map time AXIS data
-            CALL BDI_MAPAXVAL( IFID, 'READ', AXDIM, XPTR, STATUS )
-            CALL BDI_MAPAXWID( IFID, 'READ', AXDIM, XWPTR, STATUS )
-         END IF
-
-      ELSE
-         CALL MSG_PRNT( 'No AXIS(1) data'
+*  Check axis and data match
+      CALL BDI_AXCHK( IFID, AXDIM, 'Data', OK, STATUS )
+      IF ( .NOT. OK ) THEN
+        CALL MSG_PRNT( 'No time axis data'
      :                //' - proceeding assuming unit spacing' )
-
-*       Set up scratch area & fill with 0,1,2...
-         CALL DYN_MAPR( 1, NDATA, XPTR, STATUS )
-         CALL ARR_REG1R( 0.0, 1.0, NDATA, %VAL(XPTR), STATUS )
-
       END IF
+      CALL BDI_AXMAPR( IFID, AXDIM, 'Data', 'READ', XPTR, STATUS )
+      CALL BDI_AXMAPR( IFID, AXDIM, 'Width', 'READ', XWPTR, STATUS )
+      CALL ARR_CHKREG( %VAL(XPTR), INBINS, REGULAR, BASE, SCALE,
+     :                 STATUS )
 
       CALL USI_GET0I( 'BINS', NBINS, STATUS )
 
@@ -280,80 +332,60 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
      &               /' to the folding period')
       END IF
 
-*    Ask if weighted mean required
+*  Ask if weighted mean required
       CALL USI_GET0L('WEIGHT',WEIGHT,STATUS)
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Data error ... set up scratch area for variances
-      CALL BDI_CHKVAR(IFID,VOK,VNDIM,VDIMS,STATUS)
+      CALL BDI_CHK( IFID, 'Variance', VOK, STATUS )
       IF ( VOK ) THEN
-         IF(VNDIM.NE.NACTDIM) THEN
-            STATUS=SAI__ERROR
-            CALL ERR_REP('DIM','Variance does not match Data',STATUS)
-            CALL ERR_FLUSH(STATUS)
-         END IF
-         CALL BDI_MAPVAR(IFID,'READ',VAPTR,STATUS)
-         IF(AXDIM.NE.1)THEN
-            CALL DYN_MAPR(NACTDIM,IDIM,VPTR,STATUS)
-            CALL AR7_AXSWAP_R(VDIMS,%VAL(VAPTR),OAX,VDIM,
-     :                                 %VAL(VPTR),STATUS)
-            CALL DYN_UNMAP(VAPTR,STATUS)
-         ELSE
-            VPTR=VAPTR
-         ENDIF
+        CALL BDI_MAPR( IFID, 'Variance', 'READ', VAPTR, STATUS )
+        IF ( AXDIM .NE. 1 ) THEN
+          CALL DYN_MAPR( NACTDIM, IDIM, VPTR, STATUS )
+          CALL AR7_AXSWAP_R( ODIM, %VAL(VAPTR), OAX, IDIM,
+     :                                %VAL(VPTR), STATUS )
+          CALL DYN_UNMAP( VAPTR, STATUS )
+        ELSE
+          VPTR = VAPTR
+        END IF
       ELSE
-         CALL DYN_MAPR(NACTDIM,IDIM,VPTR,STATUS)
-         CALL ARR_SUMDIM(NACTDIM,IDIM,NELM)
-         CALL ARR_INIT1R(0.0,NELM,%VAL(VPTR),STATUS)
-      ENDIF
+        CALL DYN_MAPR(NACTDIM,IDIM,VPTR,STATUS)
+        CALL ARR_SUMDIM(NACTDIM,IDIM,NELM)
+        CALL ARR_INIT1R(0.0,NELM,%VAL(VPTR),STATUS)
+      END IF
 
 *    and data quality
-      CALL BDI_CHKQUAL(IFID,QOK,QNDIM,QDIMS,STATUS)
+      CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
       IF ( QOK ) THEN
-         IF(QNDIM.NE.NACTDIM) THEN
-            CALL ERR_REP('QIM','Quality does not match Data',STATUS)
-            CALL ERR_FLUSH(STATUS)
-            STATUS=SAI__ERROR
-         END IF
-         CALL BDI_GETMASK(IFID,MASK,STATUS)
-         CALL BDI_MAPLQUAL(IFID,'READ',BAD,QAPTR,STATUS)
-         IF(AXDIM.NE.1)THEN
-           CALL DYN_MAPR(NACTDIM,IDIM,QPTR,STATUS)
-           CALL AR7_AXSWAP_B(QDIMS,%VAL(QAPTR),OAX,QDIM,
-     :                              %VAL(QPTR),STATUS)
-           CALL DYN_UNMAP(QAPTR,STATUS)
-         ELSE
-           QPTR=QAPTR
-         ENDIF
+        CALL BDI_GET0UB( IFID, 'QualityMask', MASK, STATUS )
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QAPTR, STATUS )
+        IF ( AXDIM .NE. 1 ) THEN
+          CALL DYN_MAPL( NACTDIM, IDIM, QPTR, STATUS )
+          CALL AR7_AXSWAP_B( ODIM, %VAL(QAPTR), OAX, IDIM,
+     :                                %VAL(QPTR), STATUS )
+          CALL BDI_UNMAP( IFID, 'QualityMask', QAPTR, STATUS )
+        ELSE
+          QPTR = QAPTR
+        ENDIF
       ELSE
-         CALL STR_CTOB('11111111',MASK,STATUS)
+        MASK = QUAL__MASK
       END IF
-      IF(STATUS.NE.SAI__OK) THEN
-          CALL ERR_FLUSH(STATUS)
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_FLUSH( STATUS )
       END IF
 
-*    Map workspace
-      IDIM(1)=NBINS
+*  Map workspace
+      IDIM(1) = NBINS
       CALL DYN_MAPR(NACTDIM,IDIM,WPTR,STATUS)
       CALL DYN_MAPR(NACTDIM,IDIM,YBARPTR,STATUS)
       CALL DYN_MAPR(NACTDIM,IDIM,SUMPTR,STATUS)
 
-*    Set up and map components in output object
-      CALL BDI_CREDATA(FFID,NACTDIM,IDIM,STATUS)
-      CALL BDI_CREVAR(FFID,NACTDIM,IDIM,STATUS)
-      CALL BDI_CREAXES(FFID,NACTDIM,STATUS)
-      DO L=1,NACTDIM
-        CALL BDI_CREAXVAL(FFID,L,.FALSE.,IDIM(L),STATUS)
-      ENDDO
-      CALL BDI_CREQUAL(FFID,NACTDIM,IDIM,STATUS)
-      CALL BDI_MAPDATA(FFID,'WRITE',FDPTR,STATUS)
-      CALL BDI_MAPVAR(FFID,'WRITE',FVPTR,STATUS)
-      CALL BDI_MAPAXVAL(FFID,'WRITE',1,FXPTR,STATUS)
-      CALL BDI_MAPQUAL(FFID,'WRITE',FQPTR,STATUS)
-      CALL BDI_PUTMASK(FFID,MASK,STATUS)
-      IF ( STATUS.NE.SAI__OK ) THEN
-         CALL ERR_FLUSH(STATUS)
-      END IF
+*  Create interface object
+      CALL BDI_LINK( 'BinDS', FFID, NACTDIM, IDIM, FFID, STATUS )
+      CALL BDI_MAPR( FFID, 'Data', 'WRITE', FDPTR, STATUS )
+      CALL BDI_MAPR( FFID, 'Variance', 'WRITE',FVPTR, STATUS )
+      CALL BDI_MAPUB( FFID, 'Quality', 'WRITE', FQPTR, STATUS )
+      CALL BDI_PUT0UB( FFID, 'QualityMask', MASK, STATUS )
 
 *  Workspace
       CALL DYN_MAPI( NACTDIM, IDIM, FNPTR, STATUS )
@@ -362,19 +394,17 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       CALL DYN_MAPI( NACTDIM, IDIM, FFPTR, STATUS )
       IDIM(1)=NBINS
 
-*    Set output quality to GOOD (as all bad data has been excluded)
-      CALL ARR_SUMDIM(NACTDIM,IDIM,NELM2)
-      CALL ARR_INIT1B(QUAL__GOOD,NELM2,%VAL(FQPTR),STATUS)
+*  Set output quality to GOOD (as all bad data has been excluded)
+      CALL ARR_SUMDIM( NACTDIM, IDIM, NELM2 )
+      CALL ARR_INIT1B( QUAL__GOOD, NELM2, %VAL(FQPTR), STATUS )
 
+*  Pad dimensions to 7-D
       IDIM(1)=NDATA
-
-      DO I=2,7
-        IF(IDIM(I).LT.1)IDIM(I)=1
-      END DO
+      CALL AR7_PAD( 1, IDIM, STATUS )
 
 *    Fold
       IF(WEIGHT)THEN
-      CALL FOLDBIN_FOLDW(%VAL(XPTR),%VAL(XWPTR),%VAL(DPTR),
+        CALL FOLDBIN_FOLDW(%VAL(XPTR),%VAL(XWPTR),%VAL(DPTR),
      :             %VAL(VPTR),NACTDIM,
      :             IDIM,IDIM(1),IDIM(2),IDIM(3),IDIM(4),IDIM(5),
      :             IDIM(6),IDIM(7),QOK,%VAL(QPTR),PERIOD,
@@ -383,7 +413,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
      :             %VAL(FDPTR),%VAL(FVPTR),%VAL(FCPTR),
      :             %VAL(FFPTR),%VAL(FQPTR),IERR,CHISQ,NDOF,STATUS)
       ELSE
-      CALL FOLDBIN_FOLDU(%VAL(XPTR),%VAL(XWPTR),%VAL(DPTR),
+        CALL FOLDBIN_FOLDU(%VAL(XPTR),%VAL(XWPTR),%VAL(DPTR),
      :             %VAL(VPTR),NACTDIM,
      :             IDIM,IDIM(1),IDIM(2),IDIM(3),IDIM(4),IDIM(5),
      :             IDIM(6),IDIM(7),QOK,%VAL(QPTR),PERIOD,
@@ -393,27 +423,26 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
      :             %VAL(FFPTR),%VAL(FQPTR),IERR,CHISQ,NDOF,STATUS)
       ENDIF
       IF ( IERR .NE. 0 ) THEN
-          CALL MSG_SETI( 'IERR', IERR )
-          CALL MSG_PRNT( 'Bad phase bin - IERR = ^IERR' )
+        CALL MSG_SETI( 'IERR', IERR )
+        CALL MSG_PRNT( 'Bad phase bin - IERR = ^IERR' )
       END IF
-      CALL ARR_REG1R( 0.5/REAL(NBINS), 1.0/REAL(NBINS), NBINS,
-     :                                   %VAL(FXPTR), STATUS )
+      SPARR(1) = 0.5/REAL(NBINS)
+      SPARR(2) = 1.0/REAL(NBINS)
+      CALL BDI_AXPUT1R( FFID, 1, 'SpacedData', 2, SPARR, STATUS )
 
-*    Write components to output object
-      N=2
-      DO WHILE ( N .LE. NACTDIM )
-        CALL BDI_COPAXIS(IFID,FFID,OAX(N),N,STATUS )
-        N=N+1
+*  Write components to output object
+      DO N = 2, NACTDIM
+        CALL BDA_AXCOPY( IFID, I, ' ', OAX(N), STATUS )
       END DO
-      CALL BDI_COPTEXT( IFID, FFID, STATUS )
+      CALL BDI_COPY( IFID, 'Title,Label,Units', FFID, ' ', STATUS )
       IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_FLUSH(STATUS)
+        CALL ERR_FLUSH(STATUS)
       END IF
-      CALL BDI_PUTAXLABEL(FFID,1,'Phase',STATUS)
-      CALL BDI_PUTAXNORM(FFID,1,.TRUE.,STATUS)
+      CALL BDI_AXPUT0C( FFID, 1, 'Label', 'Phase', STATUS )
+      CALL BDI_AXPUT0L( FFID, 1, 'Normalised', .TRUE., STATUS )
 
 *  Copy other info from input to output file
-      CALL BDI_COPMORE( IFID, FFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grf', FFID, STATUS )
 
 *  Write auxilliary stuff
       CALL AUI_PUTNI( FFID, 'N_OCCUPANTS', NACTDIM, IDIM, %VAL(FNPTR),
@@ -425,7 +454,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
      :                %VAL(FFPTR), STATUS )
       IDIM(1)=NBINS
 
-*    Add history records
+*  Add history records
       CALL HSI_COPY( IFID, FFID, STATUS )
       CALL HSI_ADD( FFID, VERSION, STATUS )
       HTXT(1) = 'Input {INP}'
@@ -449,11 +478,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
      :                 /' with ^NDOF degrees of freedom')
       END IF
 
-*  Release datasets
-      CALL BDI_RELEASE( IFID, STATUS )
-      CALL BDI_RELEASE( FFID, STATUS )
-
-*   Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -461,7 +486,6 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
 
 
 
-*+  FOLDBIN_FOLDW - folds data Y(X) about a period in X
       SUBROUTINE FOLDBIN_FOLDW(X,AXWID,Y,VAR,NACTDIM,IDIM,L1,L2,L3,
      :                    L4,L5,L6,L7,QOK,QUAL,P,X0,NBINS,W,YBAR,
      :                    SUMVAR,IB,BMN,BMNVAR,CHISQ,NDOF,FQUAL,
