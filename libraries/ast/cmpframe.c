@@ -5675,7 +5675,7 @@ static int GetActiveUnit( AstFrame *this_frame ){
    int result;      /* The ActiveUnit flag for the CmpFrame */
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return 0;
 
 /* If the ActiveUnit value has been set for the CmpFrame use the parent
    implementation to get its value. */
