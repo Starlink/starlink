@@ -118,7 +118,7 @@
               sscanf( argv[ 2 ], "%d", &ifd ) != 1 ||
               sscanf( argv[ 3 ], "%d", &ofd ) != 1 ) {
             fprintf( stderr, "Usage: %s [-pipes ifd ofd]\n", argv[ 0 ] );
-            exit( 1 );
+            return 1;
          }
 
 /* Store the values of the pipes; other routines (currently, ccdlog) may
@@ -129,6 +129,10 @@
 /* We have values for both file descriptors.  Start up a Tcl interpreter
    and loop indefinitely. */
          ccdPipestcl( ifd, ofd );
+
+/* If the previous call returns then the wish did not run properly. */
+         fprintf( stderr, "%s failed.\n", argv[ 0 ] );
+         return 1;
       }
 
 /* We are not running in pipe mode.  Call Tk_main and run as a normal
@@ -196,7 +200,11 @@
       interp = Tcl_CreateInterp();
 
 /* Initialise the interpreter. */
-      Tcl_AppInit( interp );
+      if ( Tcl_AppInit( interp ) != TCL_OK ) {
+         fprintf( stderr, "Application initialization failed: %s\n",
+                          Tcl_GetStringResult( interp ) );
+         return;
+      }
 
 /* Source initialisation script. */
       sprintf( buffer, "%s/%s", getenv( "CCDPACK_DIR" ), initfile );
