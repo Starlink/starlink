@@ -59,7 +59,7 @@
 *
 *    Functions :
 *
-      LOGICAL                  PSF1_GETAXINC
+      REAL                     PSF0_GETAXDR
 *
 *    Local constants :
 *
@@ -109,7 +109,7 @@
       CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *  Direction of increase of X axis
-      IF ( PSF1_GETAXINC( PSID, X_AX, STATUS ) ) THEN
+      IF ( PSF1_GETAXDR( PSID, X_AX, STATUS ) .GT. 0.0 ) THEN
         XDIR = 1.0
       ELSE
         XDIR = -1.0

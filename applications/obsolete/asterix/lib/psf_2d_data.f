@@ -65,7 +65,7 @@
 *
 *    Functions :
 *
-      REAL                      PSF1_GETAXDR
+      REAL                      PSF0_GETAXDR
 *
 *    Local variables :
 *
@@ -111,10 +111,10 @@
       IF ( (DX .EQ. VAL__BADR) .OR. (DY.EQ.VAL__BADR) ) THEN
         CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
         IF ( DX .EQ. VAL__BADR ) THEN
-          DX = PSF1_GETAXDR( PSID, X_AX, STATUS )
+          DX = PSF0_GETAXDR( PSID, X_AX, STATUS )
         END IF
         IF ( DY .EQ. VAL__BADR ) THEN
-          DY = PSF1_GETAXDR( PSID, Y_AX, STATUS )
+          DY = PSF0_GETAXDR( PSID, Y_AX, STATUS )
         END IF
       END IF
 
