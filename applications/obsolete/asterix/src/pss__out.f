@@ -71,6 +71,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -117,7 +118,7 @@
         END IF
 
 *      Create output
-        CALL ADI_FCREAT( SSDS, 'SSDS', SID, STATUS )
+        CALL ADI_FCREAT( SSDS, ADI__NULLID, SID, STATUS )
 
       ELSE
 

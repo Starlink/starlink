@@ -499,6 +499,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
@@ -590,8 +591,8 @@
       IF ( DI_SIG_V_CRAD ) THEN
 
 *      Create significance vs. convolution file
-        WRITE( FNAME, '(A,I4.4,A)' ) 'svc_', GE_EXEC_NSRC, '%hds'
-        CALL ADI_FCREAT( FNAME, 'BinDS', SID, STATUS )
+        WRITE( FNAME, '(A,I4.4,A)' ) 'svc_', GE_EXEC_NSRC, '%HDS'
+        CALL ADI_FCREAT( FNAME, ADI__NULLID, SID, STATUS )
 
 *      Write title containing source position
         CALL BDI_PUTTITLE( SID, 'RA : '//RASTR//', DEC : '/

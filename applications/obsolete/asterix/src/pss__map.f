@@ -188,7 +188,7 @@
       MP_MODE = 'W'
 
 *    Get output dataset
-      CALL ADI_FCREAT( FILE, MP_ID, STATUS )
+      CALL ADI_FCREAT( FILE, ADI__NULLID, MP_ID, STATUS )
 
 *    Generate map axes
       CALL PSS_MAP_SETUP( STATUS )
