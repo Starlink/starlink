@@ -50,6 +50,8 @@
 *
 *    Local variables :
 *
+      REAL			SPARR(2)		! Spaced array data
+
       INTEGER			IFID			! Input dataset id
       INTEGER 			NDIM, DIMS(ADI__MXDIM)	! Input dimensions
       INTEGER			OFID			! Output dataset id
@@ -106,11 +108,11 @@
         CALL BDI_LINK( 'BinDS', 1, NDAT - 1, 'REAL', OFID, STATUS )
 
 *    Set flags
-	CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
         SPARR(1) = 0.0
         SPARR(1) = 1.0
         CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
-        CALL BDI_MAPR( OFID,'WRITE',OVPTR,STATUS )
+	CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
         IF(STATUS.NE.SAI__OK)GOTO 99
         CALL DIFDAT_CALCP( NDAT, %VAL(DPTR), %VAL(ODPTR) )
         CALL MATH_POISSVAR( %VAL(ODPTR), NDAT, 1, %VAL(OVPTR), STATUS )
