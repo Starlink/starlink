@@ -3007,8 +3007,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :                STATUS )
 
 *  Link the response object to a BinDS so we can access its axis info
-      CALL BDI_LINK( 'BinDS', 1, 1, 'REAL', SID, STATUS )
+      CALL BDI_LINK( 'BinDS', RF_NDIM(SLOT), RF_DIMS(1,SLOT), 'REAL',
+     :               SID, STATUS )
       CALL BDI_SETSHP( SID, RF_NDIM(SLOT), RF_DIMS(1,SLOT), STATUS )
+	call adi_print( sid,status)
 
 *  Map the index
       CALL CMP_MAPV( SLOC, 'INDEX', '_INTEGER', 'READ',
