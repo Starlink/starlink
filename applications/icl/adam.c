@@ -35,9 +35,16 @@
  *    4-FEB-2000 (AJC):
  *      Correct error message if SEND action not GET/SET/OBEY/CANCEL(/CONTROL)
  *      Display return from SEND CONTROL DEFAULT ""
+ *    1-JUL-2004 (TIMJ)
+ *      Add autoconf test for strsignal
  *
  ******************************************************************************
  */
+
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
@@ -64,11 +71,14 @@
 
 /* Getting the text name of signals should be easier than this! */
 
-#if( defined(SOL_SIGLIST) )	/* Solaris */
-#define sys_siglist _sys_siglistp
-#elif !defined(__linux)
+#if !HAVE_STRSIGNAL
+#  if( defined(SOL_SIGLIST) )	/* Solaris */
+#    define sys_siglist _sys_siglistp
+#  elif !defined(__linux)
     extern char *sys_siglist[];
+#  endif
 #endif
+
 static value define_interpret ( node * n, int op);
 
 extern void flshbuf(void);					 /* output.c */
@@ -236,7 +246,12 @@ int signo		/* system supplied integer signal number (given) */
 
     if (WIFSIGNALED(status))
 	sprintf(text1, "abnormal termination -\nsignal %s\n",
-		sys_siglist[WTERMSIG(status)] );
+#if HAVE_STRSIGNAL
+		strsignal(WTERMSIG(status))
+#else
+		sys_siglist[WTERMSIG(status)] 
+#endif
+		);
     else if (WIFEXITED(status))
 	if ((WEXITSTATUS(status) == 0 || WEXITSTATUS(status) == SIGTERM) &&
 	    task != task_list)  /* Expected task termination */
@@ -723,8 +738,13 @@ int detached		/* Flag to inidicate 'detached' status (given) */
 		if (waitpid(pid, &status, WNOHANG)) {
 		    bufstring("Child process ");
 		    if( WIFSIGNALED(status) )
-			sprintf(buf,
-			"died - signal %s\n", sys_siglist[WTERMSIG(status)] );
+		      sprintf(buf, "died - signal %s\n",
+#if HAVE_STRSIGNAL
+			      strsignal(WTERMSIG(status))
+#else
+			      sys_siglist[WTERMSIG(status)] 
+#endif
+				);
 		    else
 			sprintf(buf, "unexpected exit - status code %d\n",
 				WEXITSTATUS(status));
