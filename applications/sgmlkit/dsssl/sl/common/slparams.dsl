@@ -29,7 +29,7 @@
 <routinename>%stylesheet-version%
 <description>Version string
 <codebody>
-(define %stylesheet-version% "Starlink SGML Kit, version 0.7-6");%%VERSION%%
+(define %stylesheet-version% "Starlink SGML Kit, version 0.7-8");%%VERSION%%
 
 <routine>
 <routinename>show-element-ids
