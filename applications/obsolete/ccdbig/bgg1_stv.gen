@@ -1,0 +1,74 @@
+      SUBROUTINE BGG1_STV<T>( VAL, SIZE, ARR, STATUS )
+*+
+*  Name:
+*     BGG1_STV<T>
+
+*  Purpose:
+*     To set the elements of a vectorised array to a given value.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL BGG1_STV<T>( VAL, SIZE, ARR, STATUS )
+
+*  Description:
+*     Loops over array setting the elements to the given value.
+
+*  Arguments:
+*     VAL = <COMM> (Given)
+*        The value to set array to.
+*     SIZE = INTEGER (Given)
+*        Size of the array.
+*     ARR( SIZE ) = <COMM> (Returned)
+*        The array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-MAY-1991 (PDRAPER):
+*        Original version.
+*     3-JUL1998 (MBT)
+*        Just changed the name for (consistent) inclusion with CCDBIG.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      <TYPE> VAL
+      INTEGER SIZE
+
+*  Arguments Returned:
+      <TYPE> ARR( SIZE )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      DO 1 I = 1, SIZE
+         ARR( I ) = VAL
+ 1    CONTINUE
+
+      END
+* $Id: ccg1_stv.gen,v 1.1 1997/06/27 09:01:41 pwd Exp $
