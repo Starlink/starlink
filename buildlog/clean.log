@@ -218,4 +218,4 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 BUILD SUCCESSFUL
-Total time: 14 seconds
+Total time: 13 seconds

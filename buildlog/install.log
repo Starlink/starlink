@@ -886,7 +886,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Nov 19, 2004 5:17:30 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Nov 20, 2004 5:17:17 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -925,6 +925,7 @@ dist:
      [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
      [copy] Copying 197 files to /apps/cvsbuild/java/source/topcat/docs/topcat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/docs/topcat
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/topcat
@@ -1083,4 +1084,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 0 seconds
+Total time: 5 minutes 4 seconds
