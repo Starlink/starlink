@@ -10,7 +10,7 @@ Interface EVPOLAR
 
    Parameter OUT
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       association '->GLOBAL.BINDS'
       prompt      'Enter name of the output dataset'
       help        'This will be a binned dataset.'
