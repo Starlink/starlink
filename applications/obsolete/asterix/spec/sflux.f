@@ -145,10 +145,6 @@
 *  Status:
       INTEGER			STATUS             	! Global status
 
-*  External References:
-      [external_declaration]
-      {data_type} {external_name} ! [external_description]
-
 *  Local Constants:
       INTEGER 			MAXEN			! max number of energy channels
 	PARAMETER 		( MAXEN = 5000 )
