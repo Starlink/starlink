@@ -1943,11 +1943,11 @@ F77_SUBROUTINE(adifn(name))( INTEGER(id), CHARACTER(name), INTEGER(status) TRAIL
 
   _ERR_IN("ADI_NAME");			/* Mark routine for error reporting */
 
-  cname = adix_name( (ADIobj) id,	/* Invoke kernel routine */
-		     status );
+/* Invoke kernel routine */
+  cname = adix_name( (ADIobj) *id, status );
 
-  strx_expf( strlen(cname), cname, 	/* Export data */
-	     name_length, name );
+/* Export data */
+  strx_expf( strlen(cname), cname, name_length, name );
 
   _ERR_OUT;
   }
