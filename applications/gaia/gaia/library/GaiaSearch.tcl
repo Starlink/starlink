@@ -68,13 +68,19 @@ itcl::class gaia::GaiaSearch {
       eval itk_initialize $args
    }
    
-   #  Init method, called after the options have been
-   #  evaluated. Invoke the SkySearch::init method, but catch any
-   #  errors so we can destroy this object (this happens if the foreign
-   #  catalogue conversion process fails. Also remove <Enter> binding
-   #  as this slows down the zoom window a lot.
+   #  Init method, called after the options have been evaluated.
    public method init {} {
       SkySearch::init
+
+      #  Remove the "Save with image" menu option. This is not
+      #  available.
+      if { $iscat_ } { 
+	 set m [get_menu File] 
+	 puts "m = $m"
+	 $m delete "Save with image" 
+      }
+
+      #  Remove <Enter> binding as this slows down the zoom window a lot.
       $canvas_ bind $object_tag_  <Any-Enter> {}
       $canvas_ bind $object_tag_  <Any-Leave> {}
 
