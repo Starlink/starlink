@@ -209,6 +209,7 @@
                                         ! file
       INTEGER          IN_VARIANCE_PTR  ! pointer to variance array in input
                                         ! file
+      INTEGER          IPOSN            ! Position in string
       INTEGER          ISTART           ! index of start of sub-string
       INTEGER          ITEMP            ! scratch integer
       INTEGER          IY               ! year of observation
@@ -313,6 +314,7 @@
       REAL             SECOND_TAU       ! zenith sky opacity at SECOND_LST
       INTEGER          SLA_STATUS       ! status return from SLA routine
       CHARACTER*80     STEMP            ! scratch string
+      CHARACTER*40     SUBLIST          ! List of available sub instruments
       CHARACTER*15     SUB_FILTER (SCUBA__MAX_SUB)
                                         ! filters in front of sub-instruments
       CHARACTER*15     SUB_INSTRUMENT (SCUBA__MAX_SUB)
@@ -1056,18 +1058,35 @@
             
 *  get the sub-instrument of interest and check it's OK
 
-      CALL PAR_GET0C ('SUB_INSTRUMENT', SUB_REQUIRED, STATUS)
-      CALL CHR_UCASE (SUB_REQUIRED)
-
-      SUB_POINTER = VAL__BADI
-      IF (N_SUB .GT. 0) THEN
+      IF (N_SUB .EQ. 1) THEN
+*     If we only have one wavelength we dont need to ask
+         SUB_POINTER = 1
+         SUB_REQUIRED = SUB_INSTRUMENT(SUB_POINTER)
+      ELSE
+*     Put all possible answers in a string
+         SUBLIST = ''
+         IPOSN = 0
          DO I = 1, N_SUB
-            IF (SUB_REQUIRED .EQ. SUB_INSTRUMENT(I)) THEN
-               SUB_POINTER =I 
-            END IF
+            CALL CHR_APPND(SUB_INSTRUMENT(I), SUBLIST, IPOSN)
+            CALL CHR_APPND(',',SUBLIST,IPOSN)
          END DO
-      END IF
+*     Ask for the sub array
+         IF (N_SUB .GT. 0) THEN
+         CALL PAR_CHOIC('SUB_INSTRUMENT', SUB_INSTRUMENT(1), SUBLIST,
+     :        .TRUE., SUB_REQUIRED, STATUS)
+         CALL CHR_UCASE (SUB_REQUIRED)
+         END IF
 
+         SUB_POINTER = VAL__BADI
+         IF (N_SUB .GT. 0) THEN
+            DO I = 1, N_SUB
+               IF (SUB_REQUIRED .EQ. SUB_INSTRUMENT(I)) THEN
+                  SUB_POINTER =I 
+               END IF
+            END DO
+         END IF
+      END IF
+         
       IF (STATUS .EQ. SAI__OK) THEN
          IF (SUB_POINTER .EQ. VAL__BADI) THEN
             STATUS = SAI__ERROR
