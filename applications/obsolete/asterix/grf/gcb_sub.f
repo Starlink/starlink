@@ -824,7 +824,7 @@
 
 
 *+  GCB_GETC_SUB - get a character string from specified location in GCB
-      SUBROUTINE GCB_GETC_SUB(GCB,DISP,SIZ,STR,STATUS)
+      SUBROUTINE GCB_GETC_SUB(GCB,DISP,SIZ,FMT,STR,STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -842,6 +842,7 @@
       BYTE GCB(*)
       INTEGER DISP
       INTEGER SIZ
+      CHARACTER*(*) FMT
 *    Import-Export :
 *    Export :
       CHARACTER*(*) STR
