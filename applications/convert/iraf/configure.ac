@@ -29,11 +29,16 @@ dnl    links to various forms of these libraries. Make sure libimfort doesn't
 dnl    exist as we use this to test if libraries for this platform have been
 dnl    found. The libcompat.a file is actually only needed for Linux, so we
 dnl    may need to work around this.
-if test -f "libimfort.a"; then
-  rm libimfort.a
-fi
-STAR_PLATFORM_SOURCES([libcompat.a libimfort.a libos.a libsys.a libvops.a], 
-        [_pc_linux_gnu _sun_solaris _dec_osf _mips _apple_darwin NONE])
+dnl
+dnl    In practice this code needs to be run by the convert configure script
+dnl    (since that is executed before this, so any consequences of this code
+dnl    are not seen), so it has been moved up.
+dnl
+dnl if test -f "libimfort.a"; then
+dnl   rm libimfort.a
+dnl fi
+dnl STAR_PLATFORM_SOURCES([libcompat.a libimfort.a libos.a libsys.a libvops.a], 
+dnl        [_pc_linux_gnu _sun_solaris _dec_osf _mips _apple_darwin NONE])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
