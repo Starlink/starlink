@@ -43,6 +43,9 @@
 #        Tcl variable CCDbrowser to determine the browser to use.
 #        Supplied argument changed from a file name to a URL (and the 
 #        netscape remote openFILE command changed to openURL).
+#     6-JUL-1998 (DSB):
+#        Modified to use HTX_BROWSER as supplied instead of only using
+#        "netscape" or "mosaic".
 #     {enter_further_changes_here}
 
 #-
@@ -54,16 +57,11 @@
 #.
 
 #  Check the browser to use. If HTX_BROWSER doesn't exist use Netscape.
-#  If it does, and it contains the string "netscape" (case-insensitive)
-#  then use netscape. Otherwise use Mosaic.
+#  If it does, use it.
       if { ! [info exists env(HTX_BROWSER)] } { 
          set CCDbrowser netscape
       } {
-         if { [regexp -nocase {netscape} $env(HTX_BROWSER)] } {
-            set CCDbrowser netscape
-         } { 
-            set CCDbrowser Mosaic
-         }
+         set CCDbrowser $env(HTX_BROWSER)
       }
 
       switch -glob $CCDbrowser {
