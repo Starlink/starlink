@@ -15,5 +15,6 @@ scatter.f vecplot.f
 # Create help for this library
 kapview.hlp: $(F_ROUTINES)
 	cat $(F_ROUTINES) > all.f
+	-rm -f kapview.hlp
 	@PROHLP@ in=all.f out=kapview.hlp single=no
 	-rm all.f

@@ -15,5 +15,6 @@ showqual.f setqual.f remqual.f qualtobad.f
 # Create help for this library
 ndfpack.hlp: $(F_ROUTINES)
 	cat $(F_ROUTINES) > all.f
+	-rm -f ndfpack.hlp
 	@PROHLP@ in=all.f out=ndfpack.hlp single=no
 	-rm all.f
