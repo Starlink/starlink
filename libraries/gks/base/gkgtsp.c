@@ -14,6 +14,7 @@
  *   30/07/86  PJWR  UNIX System V version stabilised.
  *   07/04/87  PJWR  Documentation updated.
  *   20/07/04  TIMJ  Autoconf version. ANSI C. Almagmation of Alpha and Sun
+ *   13/07/04  PWD   POSIX termios version.
  */
 
 /*
@@ -31,7 +32,9 @@
 # error "Need to have unistd.h for isatty"
 #endif
 
-#if HAVE_TERMIO_H
+#if HAVE_TERMIOS_H
+#  include <termios.h>
+#elif HAVE_TERMIO_H
 #  include <termio.h>
 #elif HAVE_SGTTY_H
 #  include <sgtty.h>
@@ -66,7 +69,9 @@ f77_integer gkgtsp_(ichan, ittspd)
     1200, 1800, 2400, 4800, 9600, 19200, 38400
   };
 
-#if HAVE_TERMIO_H
+#if HAVE_TERMIOS_H
+  struct termios tty;
+#elif HAVE_TERMIO_H
   struct termio tty;            /* For terminal information */
 #elif HAVE_SGTTY_H
   struct sgttyb  tty;
@@ -80,7 +85,10 @@ f77_integer gkgtsp_(ichan, ittspd)
   /* Make sure we have a terminal attached */
   if(isatty((int)fd))
   {
-#if HAVE_TERMIO_H
+#if HAVE_TERMIOS_H
+    (void)tcgetattr(fd, &tty);
+    *ittspd = cfgetispeed(&tty);
+#elif HAVE_TERMIO_H
     (void)ioctl(fd,TCGETA,&tty);
     *ittspd = bauds[(int)(tty.c_cflag & CBAUD)];
 #elif HAVE_SGTTY_H

@@ -15,6 +15,7 @@
  *  07/04/87  PJWR  Documentation updated.
  *  09/07/87  PJWR  Updated error codes for GKS 7.4.
  *  20/06/04  TIMJ  Autoconf merge of SysV and UCB versions
+ *  13/07/04  PWD   POSIX termios version.
  */
 
 /*
@@ -32,8 +33,11 @@
 # error "Need to have unistd.h for isatty"
 #endif
 
-#if HAVE_TERMIO_H
+#if HAVE_TERMIOS_H
+#  include <termios.h>
+#elif HAVE_TERMIO_H
 #  include <termio.h>			/* For termio(7) */
+#  define NCCS NCC
 #elif HAVE_SGTTY_H
 #  include <sgtty.h>
 #else
@@ -56,7 +60,7 @@
 
 #define GKS_BRK		'\032'		/* GKS break character (SUB) */
 
-#if HAVE_TERMIO_H
+#if HAVE_TERMIO_H || HAVE_TERMIOS_H
 
 #define DISABLE		'\0'		/* Use NUL to disable */
 #define NONE		(char)(-1)	/* Initialisation value */
@@ -123,7 +127,9 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 		  {
 		    NONE
 		  };
-#if HAVE_TERMIO_H
+#if HAVE_TERMIOS_H
+  struct termios  parms;
+#elif HAVE_TERMIO_H
   struct termio	  parms;	   /* For terminal parameters */
 #elif HAVE_SGTTY_H
   static char     modified[KWK] =  /* Which structure was modified */
@@ -149,24 +155,30 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 
       index = gkywca_.kwkix - 1;
 
-#if HAVE_TERMIO_H
+#if HAVE_TERMIOS_H || HAVE_TERMIO_H
       /* Either modify (KON) or restore (KOFF) characters according to *action */
 
       if(*action == KON)
 	{
       
 	  /* Get the terminal parameters. */
-
+#if HAVE_TERMIOS_H
+          (void)tcgetattr(fd, &parms);
+#else
 	  (void)ioctl(fd, TCGETA, &parms);
-
+#endif
 	  /* Scan special characters,  modify as appropriate. */
 
-	  for(i = 0; i < NCC; i++)
+	  for(i = 0; i < NCCS; i++)
 	    if(parms.c_cc[i] == GKS_BRK)
 	      {
 		was_break[index] = i;
 		parms.c_cc[i] = DISABLE;
+#if HAVE_TERMIOS_H
+                (void)tcsetattr(fd, TCSETA,&parms);
+#else
 		(void)ioctl(fd, TCSETA, &parms);
+#endif
 		break;
 	      }
       
@@ -178,14 +190,23 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 
 	  if(was_break[index] != NONE)
 	    {
+#if HAVE_TERMIOS_H
+              (void)tcgetattr(fd, &parms);
+#else
 	      (void)ioctl(fd, TCGETA, &parms);
+#endif
 	      parms.c_cc[was_break[index]] = GKS_BRK;
 	      was_break[index] = NONE;
+#if HAVE_TERMIOS_H
+	      (void)tcsetattr(fd, TCSETA, &parms);
+#else
 	      (void)ioctl(fd, TCSETA, &parms);
+#endif
 	    }
 	} else {
 	  gkyerr_.kerror = -2006;
 	}
+
 #elif HAVE_SGTTY_H
       /* Either modify (KON) or restore (KOFF) characters according to *action */
 

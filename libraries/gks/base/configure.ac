@@ -27,7 +27,7 @@ AC_PROG_LIBTOOL
 
 dnl    Terminal control
 AC_HEADER_STDC
-AC_CHECK_HEADERS( termio.h sgtty.h sys/ioctl.h )
+AC_CHECK_HEADERS( termios.h termio.h sgtty.h sys/ioctl.h )
 AC_CHECK_FUNCS([isatty ioctl])
 
 dnl    Other options here, such as
