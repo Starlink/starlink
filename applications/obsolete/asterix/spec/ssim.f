@@ -62,6 +62,7 @@
 *     14 Jun 95 : V1.8-2 Ensure effective exposure is updated in the
 *                        Poisson error case (DJA)
 *     25 Aug 95 : V1.8-3 Silly big with new vignetting code (DJA)
+*      9 Nov 95 : V2.0-0 Data interface converted to ADI (DJA)
 *
 *    Type definitions :
 	IMPLICIT NONE
@@ -91,7 +92,6 @@
 	INTEGER VPTR			! Pointer to variance array
 	INTEGER BPTR			! Pointer to b/g array
 	INTEGER CHPTR			! Pointer to i/p channel spec array
-	INTEGER AXPTR			! Pointer to o/p axis array
 	INTEGER I			!
 	INTEGER NPAR			! No of parameters
 	INTEGER NDIM			! Dimensionality
@@ -113,6 +113,7 @@
       INTEGER			NCH			! # chars used in string
       INTEGER 			NCHAN			! Channels in spectrum
       INTEGER			OFID			! Output dataset id
+      INTEGER			SPID			! Spectral object
       INTEGER			TIMID			! Timing info
 
       LOGICAL 			BG			! B/g spectrum to be added?
@@ -140,7 +141,7 @@
       FOUND = .FALSE.
 
 *  Read input file
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', '*', 'READ', IFID, STATUS )
       CALL FIT_GETINS( IFID, 0, 1, FOUND, INSTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF(.NOT.FOUND)THEN
@@ -149,13 +150,13 @@
       END IF
 
 * Get model specification
-      CALL USI_TASSOCI( 'MODEL', '*', 'READ', MFID, STATUS )
+      CALL USI_ASSOC( 'MODEL', '*', 'READ', MFID, STATUS )
       CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
      :                 FROZEN, STATUS )
       IF(STATUS.NE.SAI__OK) GOTO 99
 
 * Background spectrum
-      CALL USI_TASSOCI( 'BG', '*', 'READ', BGID, STATUS )
+      CALL USI_ASSOC( 'BG', 'BinDS', 'READ', BGID, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 	BG = .TRUE.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -176,7 +177,8 @@
       CALL SFIT_GETZ( Z, STATUS )
 
 *  Output dataset
-      CALL USI_TASSOCO( 'OUT', 'SPECTRUM', OFID, STATUS )
+      CALL BDI_NEW( 'Spectrum', 1, NCHAN, SPID, STATUS )
+      CALL USI_CREAT( 'OUT', SPID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Set up the only OBDAT component needed (no. of channels, taken from response)
@@ -194,7 +196,7 @@
      :                  %VAL(PREDDAT.MUBNDPTR), STATUS )
 
 *  Copy ancillary stuff
-      CALL BDI_COPMORE( IFID, OFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
 
 *  Read timing info from input, adjust and write to output
       IF ( POISS ) THEN
@@ -210,32 +212,21 @@
       CALL ADI_CPUT0C( DETID, 'Target', 'Simulated data', STATUS )
       CALL DCI_PUTID( OFID, DETID, STATUS )
 
-*  Set up output components
-      CALL BDI_CREDATA( OFID, 1, NCHAN, STATUS )
-      CALL BDI_CREAXES( OFID, 1, STATUS )
-      CALL BDI_CREAXVAL( OFID, 1, .FALSE., NCHAN, STATUS )
-      IF ( POISS ) THEN
-	CALL BDI_CREVAR( OFID, 1, NCHAN, STATUS )
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
 *  Copy ChannelSpec from response matrix to output axis
       CALL ADI_CMAPR( INSTR.R_ID, 'ChannelSpec', 'READ', CHPTR, STATUS )
-      CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, AXPTR, STATUS )
-      CALL ARR_COP1R( NCHAN, %VAL(CHPTR), %VAL(AXPTR), STATUS )
-      CALL BDI_UNMAPAXVAL( OFID, 1, STATUS )
+      CALL BDI_AXPUT1R( OFID, 1, 'Data', NCHAN, %VAL(CHPTR), STATUS )
       CALL ADI_CUNMAP( INSTR.R_ID, 'ChannelSpec', CHPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *  Map data etc and write labels
-      CALL BDI_MAPDATA( OFID, 'WRITE', DPTR, STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', DPTR, STATUS )
       IF ( POISS ) THEN
-	CALL BDI_MAPVAR( OFID, 'WRITE', VPTR, STATUS )
+	CALL BDI_MAPR( OFID, 'Variance', 'WRITE', VPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-      CALL BDI_PUTLABEL( OFID, 'Intensity', STATUS )
-      CALL BDI_PUTUNITS( OFID, 'count/sec', STATUS )
-      CALL BDI_PUTAXLABEL( OFID, 1, 'Channel', STATUS )
+      CALL BDI_PUT0C( OFID, 'Label', 'Intensity', STATUS )
+      CALL BDI_PUT0C( OFID, 'Units', 'count/sec', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Channel', STATUS )
       IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH( STATUS )
 
 *  Copy spectral model into ASTERIX.SPEC_MODEL auxilliary data
@@ -251,7 +242,8 @@
 
 *  Map background data and ...
       IF ( BG ) THEN
-	CALL BDI_CHKDATA( BGID, OK, NDIM, DIMS, STATUS )
+        CALL BDI_CHK( BGID, 'Data', OK, STATUS )
+        CALL BDI_GETSHP( BGID, ADI__MXDIM, DIMS, NDIM, STATUS )
 	IF ( .NOT. OK ) THEN
 	  CALL MSG_PRNT( 'No background spectrum available' )
 	  BG = .FALSE.
@@ -263,7 +255,7 @@
 	  BG = .FALSE.
 	  GOTO 10
 	END IF
-	CALL BDI_MAPDATA( BGID, 'READ', BPTR, STATUS )
+	CALL BDI_MAPR( BGID, 'Data', 'READ', BPTR, STATUS )
 
 * ...write b/g dataset name to output file
 	CALL ADI_FTRACE( BGID, I, BGOBJ, FILE, STATUS )
