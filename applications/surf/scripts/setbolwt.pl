@@ -138,7 +138,7 @@ foreach $ndf (@ndfs) {
     for ($i=1; $i <= $nrec; $i++) {
       ndf_hinfo($indf, 'APPLICATION', $i, $app, $status);
 
-      if ($app eq 'EXTINCTION') {
+      if ($app =~ /^EXTINCTION/) {
 	$okay = 1;
 	last;
       }
