@@ -381,7 +381,7 @@ incomprehensible) documentation, the SGML standard
         >Norman Gray
 <docnumber>1234
 <history>
-  <version number=0 date='21-APR-1999'>Initial version
+  <version number=0 date='21-APR-1999' author=ng>Initial version
 </history>
 <abstract>
   This is a sample SUN
@@ -431,6 +431,10 @@ that the only <em/required/ content of a document
 body is the abstract!  Also, the only required attribute of the
 <code/author/ element is the <code/id/ attribute.
 
+<li>Starlink SGML documents are <em/case-sensitive/ (unlike most SGML
+documents).  The element names must all be lowercase, and SGML
+reserved words uppercase, as in this example.
+
 <li>There are actually more elements present here than are apparent to
 the eye.  As well as allowing some closing tags to be omitted, a DTD
 can be allow certain <em/opening/ tags to be omitted, too.  In fact,
@@ -442,37 +446,31 @@ id=fig.simplesun2>.
 of the document in <ref id=fig.simplesun>.</caption>
 <px>
 <verbatim><![ CDATA [
-<SUN>
-<DOCINFO>
-<TITLE>The Starlink SGML set</TITLE>
-<AUTHORLIST>
-<AUTHOR EMAIL="norman@astro.gla.ac.uk" 
-WEBPAGE="http://www.astro.gla.ac.uk/users/norman" 
-AFFILIATION="University of Glasgow" 
-ID="NG">Norman Gray</AUTHOR>
-</AUTHORLIST>
-<DOCNUMBER>1234</DOCNUMBER>
-<HISTORY>
-<VERSION NUMBER="0" DATE="21-APR-1999">
-<PX>Initial version</PX>
-</VERSION>
-</HISTORY>
-<COPYRIGHT>
-<P>Copyright 1999, Particle Physics and Astronomy Research Council</P>
-</COPYRIGHT>
-</DOCINFO>
-<DOCBODY>
-<ABSTRACT>
-<PX>This is a sample SUN</PX>
-</ABSTRACT>
-<SECT ID="INTRO" EXPORT>
-<SUBHEAD>
-<TITLE>Introduction</TITLE>
-</SUBHEAD>
-<P>Starlink SUNs are easy to write.</P>
-</SECT>
-</DOCBODY>
-</SUN>
+<sun>
+<docinfo>
+<title>The Starlink SGML set</title>
+<authorlist>
+<author email="norman@astro.gla.ac.uk" webpage="http://www.astro.gla.ac.uk/users/norman" affiliation="University of Glasgow" id="ng">Norman Gray</author>
+</authorlist>
+<docnumber>1234</docnumber>
+<history>
+<version number="0" date="21-APR-1999" author="ng">
+<px>Initial version</px>
+</version>
+</history>
+</docinfo>
+<docbody>
+<abstract>
+<px>This is a sample SUN</px>
+</abstract>
+<sect id="intro" export>
+<subhead>
+<title>Introduction</title>
+</subhead>
+<p>Starlink SUNs are easy to write.</p>
+</sect>
+</docbody>
+</sun>
 ]]></verbatim>
 </figure>
 
@@ -1258,9 +1256,12 @@ for example, <citation/lamport/ for further details.
 <p>You can include notes in your document with the note element.
 At present, the notes are presented as footnotes in
 the paper version of your document and collected together as endnotes
-in the online version.  Note that since the notes are collected within
+in the online version.
+<!--
+Note that since the notes are collected within
 the backmatter element, the notes <em/will not be printed/ unless
 a backmatter element is present.
+-->
 
 <p>Although the indexing support is defined in the DTD, there is not
 yet any application support for it.  It is likely to use the
@@ -3200,6 +3201,12 @@ DSSSL (see <ref id=appx.system.dsssl> and~<citation/iso10179/), which
 is a standard, but generates HTML using DSSSL extensions specific to
 Jade, and generates LaTeX using DSSSL extensions specific to a patched
 version of Jade.
+
+<p>A good deal of effort has been invested in making the SGML side of
+this project both robust and correct.  `Correct' here means a lot more
+than merely `it works': it means that it conforms with both the letter
+and the spirit of the SGML standard, and with the occasionally
+nebulous notions of `best practice' for SGML applications.
 
 <subsubsect id=appx.system.hytime export>HyTime, architectures and groves
 
