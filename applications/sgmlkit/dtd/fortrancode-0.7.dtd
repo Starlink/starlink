@@ -135,6 +135,7 @@
 				"~"		nbsp
 				>
 <!SHORTREF	partypemap	"&#RE;"		pardesc.ref
+				"_"		underscore
 				":"		pardesc.ref
 						>
 <!USEMAP	parametermap	parameter	>
