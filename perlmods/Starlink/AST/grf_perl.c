@@ -136,6 +136,8 @@ int astGLine( int n, const float *x, const float *y ){
   AV * YY;
   int retval;
 
+  Report("astGlinePerl");
+
   if (!astOK) return 0;
   if (CurrentPlot == NULL ) return 0;
 
@@ -208,6 +210,6 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 
 static void Report( const char *name ){
    astError( AST__GRFER, "%s: No graphics facilities are available.", name );
-   astError( AST__GRFER, "Re-link using an option such as '-pgplot' with "
-             "the ast_link script." );
+   astError( AST__GRFER, "Register one using eg Starlink::AST::PGPLOT "
+             " ->pgplot method." );
 }
