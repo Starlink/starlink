@@ -816,6 +816,8 @@ execute_mk_script:
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
 
 javadoc_check:
@@ -829,8 +831,8 @@ dist:
 
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 141 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
 
 export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava.tar.gz
@@ -838,4 +840,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 12 seconds
+Total time: 3 minutes 20 seconds

@@ -416,12 +416,12 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/frog/build/classes
-    [javac] Compiling 98 source files to /apps/cvsbuild/java/source/frog/build/classes
+    [javac] Compiling 99 source files to /apps/cvsbuild/java/source/frog/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 13 files to /apps/cvsbuild/java/source/frog/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/frog/lib/frog
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/frog/lib/frog
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/frog/lib/frog
 
 execute_mk_script:
      [copy] Copying 5 files to /apps/cvsbuild/java/source/frog/build/jni
@@ -444,4 +444,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 54 seconds
+Total time: 1 minute 36 seconds

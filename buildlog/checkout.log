@@ -5620,6 +5620,14 @@ U java/source/frog/.properties
 U java/source/frog/build.xml
 cvs checkout: Updating java/source/frog/src
 cvs checkout: Updating java/source/frog/src/docs
+U java/source/frog/src/docs/FrogHelpSet.hs
+U java/source/frog/src/docs/JavaHelpTest.java
+U java/source/frog/src/docs/Map.jhm
+U java/source/frog/src/docs/TOC.xml
+U java/source/frog/src/docs/make_docs
+U java/source/frog/src/docs/make_searchdb
+cvs checkout: Updating java/source/frog/src/docs/frogdocs
+U java/source/frog/src/docs/frogdocs/index.html
 cvs checkout: Updating java/source/frog/src/etc
 cvs checkout: Updating java/source/frog/src/jni
 U java/source/frog/src/jni/Dummy.c
@@ -5628,7 +5636,9 @@ U java/source/frog/src/jni/frog_libraries
 U java/source/frog/src/jni/makefile
 U java/source/frog/src/jni/mk
 cvs checkout: Updating java/source/frog/src/lib
+U java/source/frog/src/lib/frog_help.jar
 U java/source/frog/src/lib/jama.jar
+U java/source/frog/src/lib/jhall.jar
 cvs checkout: Updating java/source/frog/src/main
 cvs checkout: Updating java/source/frog/src/main/uk
 cvs checkout: Updating java/source/frog/src/main/uk/ac
@@ -5674,6 +5684,8 @@ cvs checkout: Updating java/source/frog/src/main/uk/ac/starlink/frog/gram
 U java/source/frog/src/main/uk/ac/starlink/frog/gram/BestPeriod.java
 U java/source/frog/src/main/uk/ac/starlink/frog/gram/ChisqPeriodogram.java
 U java/source/frog/src/main/uk/ac/starlink/frog/gram/FourierTransform.java
+cvs checkout: Updating java/source/frog/src/main/uk/ac/starlink/frog/help
+U java/source/frog/src/main/uk/ac/starlink/frog/help/HelpHolder.java
 cvs checkout: Updating java/source/frog/src/main/uk/ac/starlink/frog/iface
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/AboutFrame.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/ArithmeticDialog.java

@@ -949,6 +949,8 @@ execute_mk_script:
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
 
 javadoc_check:
@@ -961,6 +963,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/frog/bin/frog
     [mkdir] Created dir: /apps/cvsbuild/java/source/frog/etc/frog
      [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/bin/frog
+     [copy] Copying 7 files to /apps/cvsbuild/java/source/frog/docs/frog
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 install:
@@ -969,8 +972,8 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/etc/frog
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/frog
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 141 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 2 seconds
+Total time: 3 minutes 13 seconds

@@ -540,6 +540,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/jsky-2.0.zip
@@ -953,6 +954,8 @@ execute_mk_script:
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
 
 javadoc_check:
@@ -965,11 +968,11 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/frog-0.1a.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
-     [gzip] Building: /apps/cvsbuild/export/frog-0.1a.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/frog-0.1a.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
+      [zip] Building zip: /apps/cvsbuild/export/frog-0.6.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
+     [gzip] Building: /apps/cvsbuild/export/frog-0.6.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/frog-0.6.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 13 minutes 8 seconds
+Total time: 13 minutes 13 seconds
