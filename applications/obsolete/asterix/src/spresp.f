@@ -484,7 +484,7 @@
       CALL HDX_PUTR( SLOC, 'DATA_ARRAY', NUSED, %VAL(SP_PTR), STATUS )
 
 *    Add a bit of history
-      CALL HIST_ADD( IFID, VERSION, STATUS )
+      CALL HSI_ADD( IFID, VERSION, STATUS )
 
 *    Release response
       CALL BDI_RELEASE( SID, STATUS )
