@@ -145,6 +145,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.18  1997/07/22 17:50:47  timj
+*     Remove reference to IN_CENTRE_COORDS (should be CENTRE_COORDS)
+*
 *     Revision 1.17  1997/06/27 23:17:59  timj
 *     Tweak header.
 *
@@ -283,8 +286,6 @@ c
       INTEGER          INT_V_PTR (SCUBA__MAX_BEAM)
                                        ! start of space holding integration
                                        ! variance
-      CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
-                                       ! an input file
       INTEGER          IN_D_PTR        ! pointer to input data array
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                        ! locator to FITS extension in input
@@ -634,7 +635,7 @@ c
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LONG',
      :     LONG, STATUS)
 
-      IF (IN_CENTRE_COORDS .EQ. 'PLANET') THEN
+      IF (CENTRE_COORDS .EQ. 'PLANET') THEN
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LAT2',
      :        LAT2, STATUS)
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LONG2',
