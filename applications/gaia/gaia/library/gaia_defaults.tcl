@@ -123,4 +123,8 @@ proc gaia::setXdefaults {} {
     #  Stop fixed font being used in on Canvas (this doesn't print).
     option add *StarCanvasDraw.textFont -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
     option add *CanvasDraw.textFont -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
+
+    #  OptionDialog
+    option add *OptionDialog.messageWidth 4i 
+    option add *OptionDialog.messageFont $labelFont
 }

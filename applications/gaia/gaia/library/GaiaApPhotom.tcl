@@ -133,27 +133,29 @@
 #     TopLevelWidget
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     12-MAR-1996 (PDRAPER):
+#     12-MAR-1996 (PWD):
 #        Original version.
-#     8-JUL-1996 (PDRAPER):
+#     8-JUL-1996 (PWD):
 #        Converted to itcl2.0.
-#     21-NOV-1996 (PDRAPER):
+#     21-NOV-1996 (PWD):
 #        Output in magnitudes is now optional.
-#     16-JUL-1997 (PDRAPER):
+#     16-JUL-1997 (PWD):
 #        Modified so that files which are read in do re-create
 #        any associated sky apertures.
-#     30-MAR-1998 (PDRAPER):
+#     30-MAR-1998 (PWD):
 #        Modified to read file when given name.
-#     18-MAY-1998 (PDRAPER):
+#     18-MAY-1998 (PWD):
 #        Added support for image exposure times.
-#     21-MAY-1999 (PDRAPER):
+#     21-MAY-1999 (PWD):
 #        Substantial rework of interface to add panes (to save
 #        real-estate and a pop-up window) and the ability to append to
 #        a named file.
+#     24-MAY-2000 (PWD):
+#        Added changes so that user can disable exit confirmation.
 #     {enter_further_changes_here}
 #-
 
@@ -535,11 +537,18 @@ itcl::class gaia::GaiaApPhotom {
       #  Check if any new measurements have been made, if so then
       #  offer not to quit.
       if { [$object_list_ cget -modified] } {
-         DialogWidget $w_.dialog \
-            -title {Unsaved apertures} \
-            -text {There are unsaved apertures, are you sure you want to quit?} \
-            -buttons [list Yes No]
-         set answer [$w_.dialog activate]
+         if { ! $itk_option(-quiet_exit) } {
+            OptionDialog $w_.dialog \
+               -title {Unsaved apertures} \
+               -text {There are unsaved apertures, are you sure you want to quit?} \
+               -buttons [list Yes No] \
+               -option_text {Do not ask this question again} \
+               -option_state 0 \
+               -option_cmd {::option add *GaiaApPhotom.quiet_exit}
+            set answer [$w_.dialog activate]
+         } else {
+            set answer 0
+         }
          if { ! $answer } {
             delete object $this
          }
@@ -876,6 +885,9 @@ itcl::class gaia::GaiaApPhotom {
          }
       }
    }
+
+   #  Quietly exit without asking about saving results.
+   itk_option define -quiet_exit quiet_exit Quiet_exit 0
 
    #  Whether aperures are keep same size.
 

@@ -242,6 +242,9 @@ itcl::class gaia::Gaia {
 
       #  Center image first time.
       after 0 [code $image_ center]
+
+      #  When interface exists, display any AST warnings.
+      after 0 [code $image_ display_astwarn 1]
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or

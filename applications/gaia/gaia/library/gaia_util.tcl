@@ -71,3 +71,24 @@ proc filename_dialog {{dir "."} {filter "*"} {parent ""} {types ""}} {
       return [$w get]
    }
 }
+
+#  Warning dialog with addition option to execute some command
+#  associated with a choice button (like don't show warnings of this
+#  class again).
+proc option_dialog {realmsg optionmsg optioncommand optionstate {parent ""}} {
+    if {"$parent" != ""} {
+        if {"[set parent [winfo toplevel $parent]]" == "."} {
+            set parent ""
+        }
+    }
+    set w $parent.option_dialog
+    catch {destroy $w}
+    [gaia::OptionDialog $w \
+        -title Warning \
+        -text "Warning: $realmsg" \
+        -transient 1 \
+        -bitmap warning \
+        -option_text $optionmsg \
+        -option_state $optionstate \
+        -option_cmd $optioncommand] activate
+}

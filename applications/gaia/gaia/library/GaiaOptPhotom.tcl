@@ -131,6 +131,8 @@
 #  History:
 #     27-MA7-1999 (PDRAPER):
 #        Original version.
+#     24-MAY-2000 (PWD):
+#        Added changes so that user can disable exit confirmation.
 #     {enter_further_changes_here}
 #-
 
@@ -571,11 +573,18 @@ itcl::class gaia::GaiaOptPhotom {
       #  Check if any new measurements have been made, if so then
       #  offer not to quit.
       if { [$object_list_ cget -modified] } {
-         DialogWidget $w_.dialog \
-            -title {Unsaved measurements} \
-            -text {There are unsaved measurements, are you sure you want to quit?} \
-            -buttons [list Yes No]
-         set answer [$w_.dialog activate]
+         if { ! $itk_option(-quiet_exit) } {
+            OptionDialog $w_.dialog \
+               -title {Unsaved apertures} \
+               -text {There are unsaved apertures, are you sure you want to quit?} \
+               -buttons [list Yes No] \
+               -option_text {Do not ask this question again} \
+               -option_state 0 \
+               -option_cmd {::option add *GaiaOptPhotom.quiet_exit}
+            set answer [$w_.dialog activate]
+         } else {
+            set answer 0
+         }
          if { ! $answer } {
             delete object $this
          }
@@ -583,7 +592,7 @@ itcl::class gaia::GaiaOptPhotom {
          delete object $this
       }
    }
-
+      
    #  Read and display positions from a PHOTOM file.
    method read_file {{filename ""} {update 0}} {
       if { $filename == "" } {
@@ -975,6 +984,9 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -colors colors Colors {
        red green blue cyan magenta yellow white grey90 grey40 grey10 black
    }
+
+   #  Quietly exit without asking about saving results.
+   itk_option define -quiet_exit quiet_exit Quiet_exit 0
 
    #  Protected variables: (only available to instance)
    #  --------------------

@@ -157,7 +157,7 @@ itcl::class gaia::GaiaImageCtrl {
       }
 
       #  Make sure that the $panel.zoom.dozoom variable is always set
-      #  (if switch off as a option then this isn't the case which
+      #  (if switched off as a option then this isn't the case which
       #  causes problems with hide_control_panel).
       global ::$itk_component(panel).zoom.dozoom
       set $itk_component(panel).zoom.dozoom $itk_option(-dozoom)
@@ -195,7 +195,7 @@ itcl::class gaia::GaiaImageCtrl {
    # top-level window associated with this canvas has the focus
    # (i.e. it's not in another toplevel somewhere). If this isn't
    # done then mysterious raises of the main image window can occur
-   # with some window managers (mainly CDE, with click-to-focus & 
+   # with some window managers (mainly CDE, with click-to-focus &
    # autoraise).
    #
    # allan: 19.6.98: disabled the above behavior, since it causes
@@ -210,11 +210,11 @@ itcl::class gaia::GaiaImageCtrl {
       set top [winfo toplevel $w_]
       set focus [focus -displayof $top]
       if { $focus != {} } {
-         if {[winfo toplevel $focus] == "$top" } { 
-            
+         if {[winfo toplevel $focus] == "$top" } {
+
             #  This toplevel has the focus (or at least a child of it
             #  has), so it's ok to proceed.
-            if { $way == "in" } { 
+            if { $way == "in" } {
                set $w_.focus [focus -displayof .]
                catch {focus $canvas_}
             } else {
@@ -408,11 +408,27 @@ itcl::class gaia::GaiaImageCtrl {
       #  Record this name, until another new image is set.
       set last_file_ $itk_option(-file)
 
-      #  Issue any warnings about the WCS.
-      set warn [$image_ astwarnings]
-      if { $warn != {} && $itk_option(-wcs_warnings) } {
-         warning_dialog \
-            "Your WCS calibration has the following deficiency:\n$warn"
+      #  Issue any warnings about problems with the WCS.
+      display_astwarn 0
+   }
+
+   #  Issue a warning containing any AST messages about WCS.
+   public method display_astwarn { {init 0} } {
+      if { $init } { 
+         #  First message is deferred until image is visible. If init
+         #  is 1 then we set show_astwarn_ which allows future warnings
+         #  to be issued.
+         set show_astwarn_ 1
+      }
+      if { $show_astwarn_ && ! $itk_option(-hide_astwarn) } {
+         set warn [$image_ astwarnings]
+         if { $warn != {} } {
+            option_dialog \
+               "Your WCS calibration has the following deficiency:\n$warn" \
+               "Don't show any further warnings about WCS deficiencies" \
+               [code $this configure -hide_astwarn] \
+               $itk_option(-hide_astwarn)
+         }
       }
    }
 
@@ -503,7 +519,7 @@ itcl::class gaia::GaiaImageCtrl {
 				-transient 1 -withdraw 1 -filter_types $types]
 	   wm transient $fileselect_ [winfo toplevel $w_]
        } else {
-          
+
           #  It's a transient so shouldn't need to do this... but CDE
           #  needs it.
           wm deiconify $fileselect_
@@ -868,8 +884,8 @@ itcl::class gaia::GaiaImageCtrl {
    #  Component of the NDF that is displayed.
    itk_option define -component component Component data
 
-   #  Whether to show warnings about WCS issues or not.
-   itk_option define -wcs_warnings wcs_warnings Wcs_warnings 1
+   #  Whether to hide warnings about WCS issues or not.
+   itk_option define -hide_astwarn hide_astwarn Hide_astwarn 0
 
    #  Protected variables:
    #  ====================
@@ -895,6 +911,9 @@ itcl::class gaia::GaiaImageCtrl {
    #  Last zoom factor stack.
    protected variable lastzoom_
    protected variable nlastzoom_ 0
+
+   #  Initialisation flag for AST warnings (not issued until this 1).
+   protected variable show_astwarn_ 0
 
    #  Common variables:
    #  =================
