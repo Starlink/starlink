@@ -148,7 +148,7 @@ $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
 	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	   $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
-	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(TCLTKLIBS) \
+	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
