@@ -11,12 +11,12 @@
 
 #  Description:
 #     This class encapsulates the vector highlighting properties of a
-#     GaiaPolarimetry toolbox. It is a FrameWidget which contains controls 
-#     which allow the user to set these properties. The GaiaPolDisp class 
-#     sets up canvas bindings which cause each vector to be highlighted as 
+#     GaiaPolarimetry toolbox. It is a FrameWidget which contains controls
+#     which allow the user to set these properties. The GaiaPolDisp class
+#     sets up canvas bindings which cause each vector to be highlighted as
 #     the mouse pointer passes over it.
 
-#    
+#
 #  Invocations:
 #
 #        GaiaPolUHigh object_name [configuration options]
@@ -58,11 +58,11 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Inheritances:
 #  =============
-   inherit ::util::FrameWidget 
+   inherit ::util::FrameWidget
 
 #  Constructor:
 #  ============
-   constructor {args} {    
+   constructor {args} {
 
 #  Evaluate any options.
       eval itk_initialize $args
@@ -70,13 +70,15 @@ itcl::class gaia::GaiaPolUHigh {
 #  Initialise data for this object.
       set created_ 0
 
-#  Create a font for highlight labels.
-      font create $font_      
+#  Create a font for highlight labels. Name not unique so can fail.
+      catch {
+         font create $font_
+      } msg 
 
 #  Set defaults
-      reset 
+      reset
    }
-   
+
 #  Destructor:
 #  ============
    destructor {
@@ -150,7 +152,7 @@ itcl::class gaia::GaiaPolUHigh {
       set values_($this,ffam) "courier"
       set values_($this,fsize) 20
       set values_($this,fbold) 0
-      
+
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
       set optfile "$itk_option(-optdir)/GaiaPolUHigh.opt"
@@ -164,7 +166,7 @@ itcl::class gaia::GaiaPolUHigh {
          }
       }
 
-#  Replace illegal blank values read from the options file with the hardwired 
+#  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
       if { $values_($this,enable) == "" } { set values_($this,enable) 1 }
       if { $values_($this,clr) == "" } { set values_($this,clr) "#0f0" }
@@ -197,7 +199,7 @@ itcl::class gaia::GaiaPolUHigh {
       newVals
    }
    public method getColour {} {return $values_($this,clr)}
-   
+
    public method setFormat {fmt} {
       set values_($this,fmt) $fmt
       newVals
@@ -209,7 +211,7 @@ itcl::class gaia::GaiaPolUHigh {
       }
       return $values_($this,fmt)
    }
-   
+
    public method getFont {} {return $font_}
 
    public method setFontFam {f} {
@@ -266,7 +268,7 @@ itcl::class gaia::GaiaPolUHigh {
    }
 
 #  Set the font attributes so that they match the current settings of the
-#  font-related controls, and save the current values as next times 
+#  font-related controls, and save the current values as next times
 #  previous values.
 #  ----------------------------------------------------------------------
    public method updateFont {} {
@@ -288,7 +290,7 @@ itcl::class gaia::GaiaPolUHigh {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the values_ array so that hey can be reinstated later (the widget 
+#  Save the values_ array so that hey can be reinstated later (the widget
 #  creation commands seem to reset them to blank).
          foreach name [array names values_] {
             set temp($name) $values_($name)
@@ -319,7 +321,7 @@ itcl::class gaia::GaiaPolUHigh {
          set r -1
 
 #  Header...
-         itk_component add header1 { 
+         itk_component add header1 {
 	    LabelRule $w_.header1 -text "Vector Highlighting:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
@@ -336,13 +338,13 @@ itcl::class gaia::GaiaPolUHigh {
 			      -labelwidth $lwidth \
                               -command [code $this activ enable] \
                               -anchor nw \
-                              -variable [scope values_($this,enable)] 
+                              -variable [scope values_($this,enable)]
 	 }
          grid $itk_component(enable) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(enable) {Controls whether the vector under the mouse pointer is highlighted or not}
-	 	 
+
 #  Vertical space.
-         grid [frame $w_.space1 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space1 -height $vspace2] -row [incr r]
 
 #  Next row.
          incr r
@@ -365,12 +367,12 @@ itcl::class gaia::GaiaPolUHigh {
          }
 
 #  Vertical space
-         grid [frame $w_.space2 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space2 -height $vspace2] -row [incr r]
 
 #  Next row.
          incr r
 
-#  Create a LabelEntry to control the format string to use when formatting 
+#  Create a LabelEntry to control the format string to use when formatting
 #  the vector length to create the highlight label.
          itk_component add fmt {
 	    LabelEntry $w_.fmt -text "Format string:" \
@@ -378,13 +380,13 @@ itcl::class gaia::GaiaPolUHigh {
                                -textvariable [scope values_($this,fmt)] \
                                -valuewidth 20 \
                                -command [code $this activ fmt] \
-                               -anchor nw 
+                               -anchor nw
 	 }
          grid $itk_component(fmt) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(fmt) {Tcl format string to use when labelling the vector under the mouse pointer}
 
 #  Vertical space
-         grid [frame $w_.space3 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space3 -height $vspace2] -row [incr r]
 
 #  Next row.
          incr r
@@ -406,7 +408,7 @@ itcl::class gaia::GaiaPolUHigh {
          }
 
 #  Vertical space
-         grid [frame $w_.space4 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space4 -height $vspace2] -row [incr r]
 
 #  Next row.
          incr r
@@ -425,7 +427,7 @@ itcl::class gaia::GaiaPolUHigh {
          add_short_help $itk_component(fsize) {Font size to use when labelling the vector under the pointer}
 
 #  Vertical space
-         grid [frame $w_.space5 -height $vspace2] -row [incr r] 
+         grid [frame $w_.space5 -height $vspace2] -row [incr r]
 
 #  Next row.
          incr r
@@ -438,13 +440,13 @@ itcl::class gaia::GaiaPolUHigh {
 			      -labelwidth $lwidth \
                               -command [code $this newFont fbold] \
                               -anchor nw \
-                              -variable [scope values_($this,fbold)] 
+                              -variable [scope values_($this,fbold)]
 	 }
          grid $itk_component(fbold) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(fbold) {Should highlight labels be bold?}
 
 #  Vertical space
-         grid [frame $w_.space6 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space6 -height $vspace1] -row [incr r]
 
 #  Allow all cells of the grid to expand equally if the window is resized.
          for {set i 0} {$i < $ncol} {incr i} {
@@ -456,7 +458,7 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Re-instate the original values_ array.
          foreach name [array names values_] {
-            set values_($name) $temp($name) 
+            set values_($name) $temp($name)
          }
       }
    }
@@ -492,7 +494,7 @@ itcl::class gaia::GaiaPolUHigh {
 #  destroyed.
    itk_option define -optdir optdir Optdir {}
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -512,16 +514,16 @@ itcl::class gaia::GaiaPolUHigh {
        variable attr_
 
 #  The name of the font used for highlight labels.
-       variable font_ GaiaPolHighFont			    
+      variable font_ GaiaPolHighFont
 
 #  An array of the previous control values.
-       variable oldvals_ 
+       variable oldvals_
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

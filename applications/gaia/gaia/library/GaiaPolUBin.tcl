@@ -342,7 +342,7 @@ itcl::class gaia::GaiaPolUBin {
                                  -command [code $this bin] \
                                  -labelwidth $lwidth \
                                  -anchor nw \
-                                 -buttonbitmap "@$env(GAIA_PLUGIN)/finger.xbm"
+                                 -buttonbitmap finger
          }
          grid $itk_component(binner) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(binner) {Click to bin all currently displayed vectors using the current settings}

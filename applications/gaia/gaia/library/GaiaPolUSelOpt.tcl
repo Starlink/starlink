@@ -409,7 +409,7 @@ itcl::class gaia::GaiaPolUSelOpt {
                                  -command [code $this All 0] \
    			         -labelwidth $lwidth \
                                  -anchor nw \
-                                 -buttonbitmap "@$env(GAIA_PLUGIN)/finger.xbm"
+                                 -buttonbitmap finger
 	 }
          grid $itk_component(sall) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(sall) {Click to select all vectors in the catalogue}
@@ -421,7 +421,7 @@ itcl::class gaia::GaiaPolUSelOpt {
                                  -command [code $this All 1] \
    			         -labelwidth $lwidth \
                                  -anchor nw \
-                                 -buttonbitmap "@$env(GAIA_PLUGIN)/finger.xbm"
+                                 -buttonbitmap finger
 	 }
          grid $itk_component(dall) -row $r -column 1 -sticky nw -padx $px
          add_short_help $itk_component(dall) {Click to de-select all vectors in the catalogue}
@@ -432,7 +432,7 @@ itcl::class gaia::GaiaPolUSelOpt {
                                  -command [code $this All invert] \
    			         -labelwidth $lwidth \
                                  -anchor nw \
-                                 -buttonbitmap "@$env(GAIA_PLUGIN)/finger.xbm"
+                                 -buttonbitmap finger
 	 }
          grid $itk_component(invert) -row $r -column 2 -sticky nw -padx $px
          add_short_help $itk_component(invert) {Click to swap the currently selected and unselected vectors}

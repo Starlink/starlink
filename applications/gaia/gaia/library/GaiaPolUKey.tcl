@@ -11,8 +11,8 @@
 
 #  Description:
 #     This class encapsulates the vector key properties of a
-#     GaiaPolarimetry toolbox. It is a FrameWidget which contains controls 
-#     which allow the user to set these properties. The GaiaPolDisp class 
+#     GaiaPolarimetry toolbox. It is a FrameWidget which contains controls
+#     which allow the user to set these properties. The GaiaPolDisp class
 #     uses these properties to display a suitable vector key.
 
 #  Invocations:
@@ -56,11 +56,11 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Inheritances:
 #  =============
-   inherit ::util::FrameWidget 
+   inherit ::util::FrameWidget
 
 #  Constructor:
 #  ============
-   constructor {args} {    
+   constructor {args} {
 
 #  Evaluate any options.
       eval itk_initialize $args
@@ -68,13 +68,15 @@ itcl::class gaia::GaiaPolUKey {
 #  Initialise data for this object.
       set created_ 0
 
-#  Create a font for the key label.
-      font create $lfont_      
+#  Create a font for the key label. Name not unique so can fail.
+      catch {
+         font create $lfont_
+      } msg
 
 #  Set defaults.
-      reset  
+      reset
    }
-   
+
 #  Destructor:
 #  ============
    destructor {
@@ -138,7 +140,7 @@ itcl::class gaia::GaiaPolUKey {
 
    public method setLColour {col} {set values_($this,lclr) $col; newVals}
    public method getLColour {} {return $values_($this,lclr)}
-   
+
    public method setLFormat {fmt} {set values_($this,lfmt) $fmt; newVals}
    public method getLFormat {} {
       if { [catch { format $values_($this,lfmt) 0.0 }] } {
@@ -147,19 +149,19 @@ itcl::class gaia::GaiaPolUKey {
       }
       return $values_($this,lfmt)
    }
-   
+
    public method setVColour {col} {set values_($this,vclr) $col; newVals}
    public method getVColour {} {return $values_($this,vclr)}
-   
+
    public method setVValue {val} {set values_($this,vval) $val; newVals}
    public method getVValue {} {return $values_($this,vval)}
 
    public method setVWidth {wid} {set values_($this,vwid) $wid; newVals}
    public method getVWidth {} {return $values_($this,vwid)}
-   
+
    public method setBgPad {pad} {set values_($this,pad) $pad; newVals}
    public method getBgPad {} {return $values_($this,pad)}
-   
+
    public method setBgColour {clr} { set values_($this,bgclr) $clr; newVals}
    public method getBgColour {} {
       set ret $values_($this,bgclr)
@@ -264,7 +266,7 @@ itcl::class gaia::GaiaPolUKey {
          }
       }
 
-#  Replace illegal blank values read from the options file with the hardwired 
+#  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
       if { $values_($this,enable) == "" } { set values_($this,enable) 1 }
       if { $values_($this,lclr) == "" } { set values_($this,lclr) "#fff" }
@@ -278,7 +280,7 @@ itcl::class gaia::GaiaPolUKey {
       if { $values_($this,bdclr) == "" } { set values_($this,bdclr) "#fff" }
       if { $values_($this,bdwid) == "" } { set values_($this,bdwid) 1 }
 
-#  Hard-wired defaults are used for option values which depend on the 
+#  Hard-wired defaults are used for option values which depend on the
 #  particular vector map being displayed.
       set values_($this,vval) ""
 
@@ -309,7 +311,7 @@ itcl::class gaia::GaiaPolUKey {
    }
 
 #  Set the font attributes so that they match the current settings of the
-#  font-related controls, and save the current values as next times 
+#  font-related controls, and save the current values as next times
 #  previous values.
 #  ----------------------------------------------------------------------
    public method updateFont {} {
@@ -319,8 +321,8 @@ itcl::class gaia::GaiaPolUKey {
          set wgt "normal"
       }
 
-#  For some untracable reason, configuring the font used by an existing key 
-#  can cause a core dump. To avoid this the key is first removed, then the 
+#  For some untracable reason, configuring the font used by an existing key
+#  can cause a core dump. To avoid this the key is first removed, then the
 #  font is configured, and then a new font is created. First disable the
 #  key (if it is currently enabled).
       if { $values_($this,enable) } {
@@ -352,7 +354,7 @@ itcl::class gaia::GaiaPolUKey {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the values_ array so that hey can be reinstated later (the widget 
+#  Save the values_ array so that hey can be reinstated later (the widget
 #  creation commands seem to reset them to blank).
          foreach name [array names values_] {
             set temp($name) $values_($name)
@@ -390,13 +392,13 @@ itcl::class gaia::GaiaPolUKey {
 			      -labelwidth $lwidth \
                               -command [code $this activ enable] \
                               -anchor nw \
-                              -variable [scope values_($this,enable)] 
+                              -variable [scope values_($this,enable)]
 	 }
          grid $itk_component(enable) -row [incr r] -column 0 -sticky nw -padx $px
          add_short_help $itk_component(enable) {Controls whether the a vector key is displayed or not}
-	 	 
+
 #  Label parameters...
-         itk_component add header1 { 
+         itk_component add header1 {
 	    LabelRule $w_.header1 -text "Textual Label:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
@@ -422,7 +424,7 @@ itcl::class gaia::GaiaPolUKey {
                -value $clr
          }
 
-#  Create a LabelEntry to control the format string to use when formatting 
+#  Create a LabelEntry to control the format string to use when formatting
 #  the textual label.
          itk_component add lfmt {
 	    LabelEntry $w_.lfmt -text "Format string:" \
@@ -430,13 +432,13 @@ itcl::class gaia::GaiaPolUKey {
                                 -textvariable [scope values_($this,lfmt)] \
                                 -valuewidth 20 \
                                 -command [code $this activ lfmt] \
-                                -anchor nw 
+                                -anchor nw
 	 }
          grid $itk_component(lfmt) -row $r -column 1 -columnspan 2 -sticky nw -padx $px
          add_short_help $itk_component(lfmt) {Tcl format string to use for the textual label in the key}
 
 #  Vertical space.
-         grid [frame $w_.space1b -height $vspace2] -row [incr r] 
+         grid [frame $w_.space1b -height $vspace2] -row [incr r]
 
 #  Next row
          incr r
@@ -478,16 +480,16 @@ itcl::class gaia::GaiaPolUKey {
       			             -labelwidth $lwidth \
                                      -command [code $this newFont fbold] \
                                      -anchor nw \
-                                     -variable [scope values_($this,fbold)] 
+                                     -variable [scope values_($this,fbold)]
 	 }
          grid $itk_component(fbold) -row $r -column 2 -sticky nw -padx $px
          add_short_help $itk_component(fbold) {Should the textual label in the key be bold?}
 
 #  Vertical space.
-         grid [frame $w_.space1 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space1 -height $vspace1] -row [incr r]
 
 #  Vector parameters...
-         itk_component add header2 { 
+         itk_component add header2 {
 	    LabelRule $w_.header2 -text "Key Vector:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0 -padx 1m \
@@ -540,10 +542,10 @@ itcl::class gaia::GaiaPolUKey {
          add_short_help $itk_component(vwid) {Line width for the key vector}
 
 #  Vertical space.
-         grid [frame $w_.space2 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space2 -height $vspace1] -row [incr r]
 
 #  Background parameters...
-         itk_component add header3 { 
+         itk_component add header3 {
 	    LabelRule $w_.header3 -text "Background:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
@@ -572,7 +574,7 @@ itcl::class gaia::GaiaPolUKey {
                -label "clear" \
                -command [code $this activ bgclr] \
                -background "#fff" \
-               -value "(clear)" 
+               -value "(clear)"
 
 #  Create a LabelEntry to control the width of the margin.
          itk_component add pad {
@@ -588,10 +590,10 @@ itcl::class gaia::GaiaPolUKey {
          add_short_help $itk_component(pad) {The width of the margin around the key, in cm}
 
 #  Vertical space.
-         grid [frame $w_.space3 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space3 -height $vspace1] -row [incr r]
 
 #  Border parameters...
-         itk_component add header4 { 
+         itk_component add header4 {
 	    LabelRule $w_.header4 -text "Border:"
 	 }
          grid $itk_component(header4) -row [incr r] -column 0 -padx 1m \
@@ -620,7 +622,7 @@ itcl::class gaia::GaiaPolUKey {
                -label "clear" \
                -command [code $this activ bdclr] \
                -background "#fff" \
-               -value "(clear)" 
+               -value "(clear)"
 
 #  Create a LabelEntry to control the thickness of the border
          itk_component add bdwid {
@@ -636,7 +638,7 @@ itcl::class gaia::GaiaPolUKey {
          add_short_help $itk_component(bdwid) {The line thickness for the key border}
 
 #  Vertical space
-         grid [frame $w_.space4 -height $vspace1] -row [incr r] 
+         grid [frame $w_.space4 -height $vspace1] -row [incr r]
 
 #  Allow all cells of the grid to expand equally if the window is resized.
          for {set i 0} {$i < $ncol} {incr i} {
@@ -648,7 +650,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Re-instate the original values_ array.
          foreach name [array names values_] {
-            set values_($name) $temp($name) 
+            set values_($name) $temp($name)
          }
       }
    }
@@ -683,7 +685,7 @@ itcl::class gaia::GaiaPolUKey {
 #  A command to call when any control values are changed by the user.
    itk_option define -changecmd changecmd Changecmd {}
 
-#  Protected data members: 
+#  Protected data members:
 #  =======================
    protected {
 
@@ -703,16 +705,16 @@ itcl::class gaia::GaiaPolUKey {
        variable attr_
 
 #  The name of the font used for the key label.
-       variable lfont_ GaiaPolKeyFont	
+       variable lfont_ GaiaPolKeyFont
 
 #  An array of the previous control values.
-       variable oldvals_ 
+       variable oldvals_
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
    }
 
-#  Private data members: 
+#  Private data members:
 #  =====================
 #  (none)
 

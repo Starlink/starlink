@@ -20,9 +20,6 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "annular_ellipse.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("annular_ellipse"), (char*)annular_ellipse_bits, annular_ellipse_width, annular_ellipse_height);
 
-    #include "dot.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("dot"), (char*)dot_bits, dot_width, dot_height);
-
     #include "column.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("column"), (char*)column_bits, column_width, column_height);
 
@@ -31,6 +28,9 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
 
     #include "diamond.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("diamond"), (char*)diamond_bits, diamond_width, diamond_height);
+
+    #include "dot.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("dot"), (char*)dot_bits, dot_width, dot_height);
 
     #include "ellipse.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("ellipse"), (char*)ellipse_bits, ellipse_width, ellipse_height);
@@ -50,6 +50,9 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "poly.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("poly"), (char*)poly_bits, poly_width, poly_height);
 
+    #include "rectangle.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("rectangle"), (char*)rectangle_bits, rectangle_width, rectangle_height);
+
     #include "rotbox.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("rotbox"), (char*)rotbox_bits, rotbox_width, rotbox_height);
 
@@ -59,8 +62,8 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "triangle.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("triangle"), (char*)triangle_bits, triangle_width, triangle_height);
 
-    #include "rectangle.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("rectangle"), (char*)rectangle_bits, rectangle_width, rectangle_height);
+    #include "finger.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("finger"), (char*)finger_bits, finger_width, finger_height);
 
     #include "gaia_logo.xpm"
     Tix_DefinePixmap(interp, Tk_GetUid("gaia_logo"), gaia_logo_xpm);

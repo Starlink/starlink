@@ -497,7 +497,7 @@ itcl::class gaia::GaiaPolUInteg {
                                  -command [code $this get_cols] \
    			         -labelwidth $lwidth \
                                  -anchor nw \
-                                 -buttonbitmap "@$env(GAIA_PLUGIN)/finger.xbm"
+                                 -buttonbitmap finger
 	 }
          grid $itk_component(cols) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(cols) {Click to select the catalogue columns for which statistics are required}

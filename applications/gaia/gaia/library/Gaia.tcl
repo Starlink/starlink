@@ -70,6 +70,8 @@
 #        Added positions toolbox.
 #     18-JUL-2000 (PWD):
 #        Added XY profiles toolbox.
+#     22-MAR-2001 (PWD):
+#        Added Polarimetry toolbox.
 #     {enter_changes_here}
 
 #-
@@ -571,6 +573,10 @@ itcl::class gaia::Gaia {
          {Show X and Y averaged profiles of a rectangular region} \
          -command [code $this make_toolbox xyprofile] \
 
+      add_menuitem $m command "Polarimetry toolbox... " \
+         {Display and manipulate POLPACK vector maps} \
+         -command [code $this make_toolbox polarimetry 0 1] \
+
       if { $itk_option(-demo_mode) } {
 	 add_menuitem $m command "Demonstration mode..." \
 	       {See a demonstration of GAIA (needs an empty directory)} \
@@ -590,7 +596,8 @@ itcl::class gaia::Gaia {
    #  Make or clone a GAIA toolbox. Allow the toolbox to be created
    #  if no image displayed, only on special request.
    public method make_toolbox {type {clone 0} {noimage 0} } {
-      #  Do nothing if no image is displayed.
+
+      #  Do nothing if no image is displayed, unless allowed.
       if { [$image_ cget -file] != "" || $type == "demo" || $noimage } {
          set basename $type
          if { $clone } {
@@ -886,6 +893,21 @@ itcl::class gaia::Gaia {
             -number $clone_ \
             -clone_cmd [code $this make_toolbox xyprofile 1] \
             -rect_id $rect_id
+      }
+   }
+
+   #  Make polarimetry toolbox.
+   public method make_polarimetry_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaPolarimetry $w_.\#auto \
+            -image $image_ \
+            -rtdimage [$image_ get_image] \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox polarimetry 1 1] \
+            -really_die $cloned
       }
    }
 

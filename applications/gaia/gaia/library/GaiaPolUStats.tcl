@@ -702,7 +702,7 @@ public method clear {} {
                                  -command [code $this get_cols] \
    			         -labelwidth $lwidth \
                                  -anchor nw \
-                                 -buttonbitmap "@$env(GAIA_PLUGIN)/finger.xbm"
+                                 -buttonbitmap finger
 	 }
          grid $itk_component(cols) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(cols) {Click to select the catalogue columns for which statistics are required}
@@ -714,7 +714,7 @@ public method clear {} {
                                  -command [code $this get_stats] \
    			         -labelwidth $lwidth \
                                  -anchor nw \
-                                 -buttonbitmap "@$env(GAIA_PLUGIN)/finger.xbm"
+                                 -buttonbitmap finger
 	 }
          grid $itk_component(stats) -row $r -column 1 -sticky nw -padx $px
          add_short_help $itk_component(stats) {Click to select which statistics to display}
