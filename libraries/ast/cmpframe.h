@@ -189,6 +189,8 @@
 *           Validate class membership.
 *        astInitCmpFrame
 *           Initialise a CmpFrame.
+*        astInitCmpFrameVtab
+*           Initialise the virtual function table for the CmpFrame class.
 *        astLoadCmpFrame
 *           Load a CmpFrame.
 
@@ -225,6 +227,8 @@
 *        Improved the prologue.
 *     25-FEB-1998 (RFWS):
 *        Over-ride the astUnformat method.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitCmpFrameVtab method.
 *-
 */
 
@@ -243,6 +247,15 @@
 /* --------------- */
 #if defined(astCLASS)            /* Protected */
 #include <stddef.h>
+#endif
+
+/* Macros. */
+/* ------- */
+#if defined(astCLASS)            /* Protected */
+
+/* The legal System values recognized by this class of Frame. */
+#define AST__COMP 0
+
 #endif
 
 /* Type Definitions. */
@@ -300,8 +313,11 @@ AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 AstCmpFrame *astInitCmpFrame_( void *, size_t, int, AstCmpFrameVtab *,
                                const char *, AstFrame *, AstFrame * );
 
+/* Vtab initialiser. */
+void astInitCmpFrameVtab_( AstCmpFrameVtab *, const char * );
+
 /* Loader. */
-AstCmpFrame *astLoadCmpFrame_( void *, size_t, int, AstCmpFrameVtab *,
+AstCmpFrame *astLoadCmpFrame_( void *, size_t, AstCmpFrameVtab *,
                                const char *, AstChannel * );
 #endif
 
@@ -340,9 +356,11 @@ AstCmpFrame *astLoadCmpFrame_( void *, size_t, int, AstCmpFrameVtab *,
 #define astInitCmpFrame(mem,size,init,vtab,name,frame1,frame2) \
 astINVOKE(O,astInitCmpFrame_(mem,size,init,vtab,name,astCheckFrame(frame1),astCheckFrame(frame2)))
 
+/* Vtab Initialiser. */
+#define astInitCmpFrameVtab(vtab,name) astINVOKE(V,astInitCmpFrameVtab_(vtab,name))
 /* Loader. */
-#define astLoadCmpFrame(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadCmpFrame_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadCmpFrame(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadCmpFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

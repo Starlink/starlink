@@ -60,6 +60,8 @@
 *           Validate class membership.
 *        astInitDssMap
 *           Initialise a DssMap.
+*        astInitDssMapVtab
+*           Initialise the virtual function table for the DssMap class.
 *        astLoadDssMap
 *           Load a DssMap.
 
@@ -97,6 +99,8 @@
 *        All public functions made protected.
 *     4-NOV-1997 (DSB):
 *        Removed copy of supplied FitsChan from DssMap structure.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitDssMapVtab method.
 *-
 */
 
@@ -300,8 +304,11 @@ AstDssMap *astDssMap_( void *, const char *, ... );
 AstDssMap *astInitDssMap_( void *, size_t, int, AstDssMapVtab *,
                              const char *, AstFitsChan * );
 
+/* Vtab initialiser. */
+void astInitDssMapVtab_( AstDssMapVtab *, const char * );
+
 /* Loader. */
-AstDssMap *astLoadDssMap_( void *, size_t, int, AstDssMapVtab *,
+AstDssMap *astLoadDssMap_( void *, size_t, AstDssMapVtab *,
                              const char *, AstChannel * );
 #endif
 
@@ -342,9 +349,11 @@ AstFitsChan *astDssFits_( AstDssMap * );
 #define astInitDssMap(mem,size,init,vtab,name,fits) \
 astINVOKE(O,astInitDssMap_(mem,size,init,vtab,name,astCheckFitsChan(fits)))
 
+/* Vtab Initialiser. */
+#define astInitDssMapVtab(vtab,name) astINVOKE(V,astInitDssMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadDssMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadDssMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadDssMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadDssMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

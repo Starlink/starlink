@@ -16,6 +16,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     2-JAN-1996 (RFWS):
@@ -35,6 +36,8 @@
 *     18-MAR-1998 (RFWS):
 *        Added notes about functions being available for writing
 *        foreign language and graphics interfaces, etc.
+*     27-NOV-2002 (DSB):
+*        Added suppression of error reporting using astReporting.
 */
 
 /* Define the astCLASS macro (even although this is not a class
@@ -58,6 +61,9 @@
 /* Status variable. */
 static int internal_status = 0;  /* Internal error status */
 static int *status_ptr = &internal_status; /* Pointer to status variable */
+
+/* Reporting flag: delivery of message is supressed if zero. */
+static int reporting = 1;         
 
 /* Error context. */
 static const char *current_file = NULL; /* Current file name pointer */
@@ -226,8 +232,9 @@ void astError_( int status, const char *fmt, ... ) {
       }
       nc += sprintf( buff + nc, "." );
 
-/* Deliver the error message. */
-      astPutErr( status, buff );
+/* Deliver the error message unless reporting has been switched off using
+   astReporting. */
+      if( reporting ) astPutErr( status, buff );
 
 /* Set the global status. */
       astSetStatus( status );
@@ -239,8 +246,9 @@ void astError_( int status, const char *fmt, ... ) {
 /* Tidy up the argument pointer. */
    va_end( args );
 
-/* Deliver the error message. */
-   astPutErr( status, buff );
+/* Deliver the error message unless reporting has been switched off using
+   astReporting. */
+   if( reporting ) astPutErr( status, buff );
 
 /* Set the error status value. */
    astSetStatus( status );
@@ -286,6 +294,46 @@ c--
 
 /* Test the error status value and return the required result. */
    return ( *status_ptr == 0 );
+}
+
+int astReporting_( int report ) {
+/*
+c+
+*  Name:
+*     astReporting
+
+*  Purpose:
+*     Controls the reporting of error messages.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "error.h"
+*     int astReporting( int report )
+
+*  Description:
+*     Error messages supplied to astError will only be delivered to the
+*     underlying error system if the "Reporting" flag is set to a
+*     non-zero value. Setting this flag to zero suppresses the reporting
+*     of error messages (the value of the AST error status however is
+*     unaffected).
+
+*  Parameters:
+*     report
+*        The new value for the Reporting flag.
+
+*  Returned Value:
+*     The original value of the Reporting flag.
+
+*  Notes:
+*     - The Reporting flag is initially set to 1.
+c-
+*/
+   int oldval;
+   oldval = reporting;
+   reporting = report;
+   return oldval;
 }
 
 void astSetStatus_( int status ) {

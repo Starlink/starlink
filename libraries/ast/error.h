@@ -29,6 +29,8 @@
 *           Store a routine, file and line number context in case of error.
 *        astError
 *           Set the AST error status and report an error message.
+*        astReporting
+*           Controls the reporting of error messages.
 
 *  Macros Defined:
 *     Public:
@@ -63,6 +65,8 @@
 *     18-MAR-1998 (RFWS):
 *        Make interface available for writing foreign language and
 *        graphics interfaces, etc.
+*     27-NOV-2002 (DSB):
+*        Added astReporting.
 *-
 */
 
@@ -87,6 +91,7 @@ void astSetStatus_( int );
                                  /* language or graphics interfaces. */
 void astAt_( const char *, const char *, int );
 void astError_( int, const char *, ... );
+int astReporting_( int );
 #endif
 
 /* Function interfaces. */
@@ -104,5 +109,6 @@ void astError_( int, const char *, ... );
                                  /* language or graphics interfaces. */
 #define astAt(routine,file,line) astAt_(routine,file,line)
 #define astError astError_
+#define astReporting astReporting_
 #endif
 #endif

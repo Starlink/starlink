@@ -64,6 +64,10 @@ f     The CmpMap class does not define any new routines beyond those
 *        parallel CmpMaps, and vice versa.
 *     26-SEP-2001 (DSB):
 *        Over-ride the astDecompose method.
+*     8-JAN-2003 (DSB):
+*        - Changed private InitVtab method to protected astInitCmpMapVtab
+*        method.
+*        - 
 *class--
 */
 
@@ -124,7 +128,6 @@ static void Copy( const AstObject *, AstObject * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstCmpMapVtab * );
 static void MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
 
 /* Member functions. */
@@ -391,23 +394,24 @@ static void Decompose( AstMapping *this_mapping, AstMapping **map1,
    }
 }
 
-static void InitVtab( AstCmpMapVtab *vtab ) {
+void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitCmpMapVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a CmpMap.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     void InitVtab( AstCmpMapVtab *vtab )
+*     void astInitCmpMapVtab( AstCmpMapVtab *vtab, const char *name )
 
 *  Class Membership:
-*     CmpMap member function.
+*     CmpMap vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -416,7 +420,14 @@ static void InitVtab( AstCmpMapVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -424,6 +435,10 @@ static void InitVtab( AstCmpMapVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitMappingVtab( (AstMappingVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsACmpMap) to determine if an object belongs to
@@ -2106,6 +2121,9 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitCmpMapVtab( vtab, name );
+
 /* Initialise. */
    new = NULL;
 
@@ -2154,13 +2172,10 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
    the number of input and output coordinates and in which directions the
    Mapping should be defined. */
    if ( astOK ) {
-      new = (AstCmpMap *) astInitMapping( mem, size, init,
+      new = (AstCmpMap *) astInitMapping( mem, size, 0,
                                           (AstMappingVtab *) vtab, name,
                                           nin, nout, map_f, map_i );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-      if ( init ) InitVtab( vtab );
       if ( astOK ) {
 
 /* Initialise the CmpMap data. */
@@ -2191,7 +2206,7 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
    return new;
 }
 
-AstCmpMap *astLoadCmpMap_( void *mem, size_t size, int init,
+AstCmpMap *astLoadCmpMap_( void *mem, size_t size,
                            AstCmpMapVtab *vtab, const char *name,
                            AstChannel *channel ) {
 /*
@@ -2207,7 +2222,7 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     AstCmpMap *astLoadCmpMap( void *mem, size_t size, int init,
+*     AstCmpMap *astLoadCmpMap( void *mem, size_t size,
 *                               AstCmpMapVtab *vtab, const char *name,
 *                               AstChannel *channel )
 
@@ -2224,6 +2239,7 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a CmpMap at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -2242,14 +2258,6 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstCmpMap) is used instead.
-*     init
-*        A boolean flag indicating if the CmpMap's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the CmpMap class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new CmpMap. If this is NULL, a pointer to
@@ -2289,26 +2297,23 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstCmpMap );
-      init = !class_init;
       vtab = &class_vtab;
       name = "CmpMap";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitCmpMapVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built CmpMap. */
-   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+   new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

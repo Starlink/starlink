@@ -68,7 +68,17 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Added astResolve.
 *     26-SEP-2001 (DSB):
 *        Over-ride the astDecompose method.
-
+*     20-DEC-2002 (DSB):
+*        Allows the System attribute to be set for a component Frame by
+*        including an axis index in the attribute name (e.g. "System(3)").
+*     8-JAN-2003 (DSB):
+*        - Changed private InitVtab method to protected astInitCmpFrameVtab
+*        method.
+*        - Override astGetAttrib, astClearAttrib, astTestAttrib,
+*        astSetAttrib to allow System attribute to be set for individual
+*        axes.
+*        - Override astGetEpoch astGetSystem, astGetAlignSystem.
+*        astValidateSystem, astSystemString, astSystemCode.
 *class--
 */
 
@@ -78,6 +88,10 @@ f     The CmpFrame class does not define any new routines beyond those
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS CmpFrame
+
+/* Define the first and last acceptable System values. */
+#define FIRST_SYSTEM AST__COMP
+#define LAST_SYSTEM AST__COMP
 
 /* Define numerical constants for use in this module. */
 #define LABEL_BUFF_LEN 100       /* Max length of default axis Label string */
@@ -456,9 +470,16 @@ static AstCmpFrameVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static AstSystemType (* parent_getsystem)( AstFrame * );
+static AstSystemType (* parent_getalignsystem)( AstFrame * );
 static const char *(* parent_getdomain)( AstFrame * );
 static const char *(* parent_gettitle)( AstFrame * );
+static double (* parent_getepoch)( AstFrame * );
 static double (* parent_angle)( AstFrame *, const double[], const double[], const double[] );
+static const char *(* parent_getattrib)( AstObject *, const char * );
+static int (* parent_testattrib)( AstObject *, const char * );
+static void (* parent_clearattrib)( AstObject *, const char * );
+static void (* parent_setattrib)( AstObject *, const char * );
 
 /* Pointer to axis index array accessed by "qsort". */
 static int *qsort_axes;
@@ -477,6 +498,10 @@ AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstAxis *GetAxis( AstFrame *, int );
+static AstSystemType GetAlignSystem( AstFrame * );
+static AstSystemType GetSystem( AstFrame * );
+static AstSystemType SystemCode( AstFrame *, const char * );
+static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
 static const char *Abbrev( AstFrame *, int, const char *, const char * );
 static const char *Format( AstFrame *, int, double );
 static const char *GetDomain( AstFrame * );
@@ -485,10 +510,12 @@ static const char *GetLabel( AstFrame *, int );
 static const char *GetSymbol( AstFrame *, int );
 static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
+static const char *SystemString( AstFrame *, AstSystemType );
 static const int *GetPerm( AstFrame * );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
+static double GetEpoch( AstFrame * );
 static int GenAxisSelection( int, int, int [] );
 static int GetDirection( AstFrame *, int );
 static int GetMaxAxes( AstFrame * );
@@ -519,7 +546,6 @@ static void Copy( const AstObject *, AstObject * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstCmpFrameVtab * );
 static void Norm( AstFrame *, double [] );
 static void Offset( AstFrame *, const double [], const double [], double, double [] );
 static void PartitionSelection( int, const int [], const int [], int, int, int [], int );
@@ -535,6 +561,11 @@ static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
 static void SetSymbol( AstFrame *, int, const char * );
 static void SetUnit( AstFrame *, int, const char * );
+
+static const char *GetAttrib( AstObject *, const char * );
+static int TestAttrib( AstObject *, const char * );
+static void ClearAttrib( AstObject *, const char * );
+static void SetAttrib( AstObject *, const char * );
 
 /* Member functions. */
 /* ================= */
@@ -957,6 +988,76 @@ static double Angle( AstFrame *this_frame, const double a[],
 
 /* Return the result. */
    return result;
+}
+
+static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void ClearAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astClearAttrib protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function clears the value of a specified attribute for a
+*     CmpFrame, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     attrib
+*        Pointer to a null terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+
+*  Notes:
+*     - This function uses one-based axis numbering so that it is
+*     suitable for external (public) use.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   AstFrame *fr;                 /* Pointer to primary Frame containing axis */
+   int axis;                     /* Sipplied (1-based) axis index */
+   int faxis;                    /* Index of primary Frame axis */
+   int len;                      /* Length of attrib string */
+   int nc;                       /* Number of characters used so dar */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_object;
+
+/* Obtain the length of the "attrib" string. */
+   len = strlen( attrib );
+
+/* Check the attribute name and clear the appropriate attribute. */
+
+/* System(axis). */
+/* ------------- */
+   if ( nc = 0,
+        ( 1 == astSscanf( attrib, "system(%d)%n", &axis, &nc ) )
+          && ( nc >= len ) ) {
+      astPrimaryFrame( this, axis - 1, &fr, &faxis );
+      astClear( fr, "system" );
+
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib );
+   }
 }
 
 static void ClearMaxAxes( AstFrame *this_frame ) {
@@ -1442,6 +1543,158 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
    return result;
 }
 
+static AstSystemType GetAlignSystem( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetAlignSystem
+
+*  Purpose:
+*     Obtain the AlignSystem attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstSystemType GetAlignSystem( AstFrame *this_frame )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetAlignSystem protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns the AlignSystem attribute for a CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*  Returned Value:
+*     The AlignSystem value.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to CmpFrame structure */
+   AstSystemType result;         /* Value to return */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* If a AlignSystem attribute has been set, invoke the parent method to obtain 
+   it. */
+   if ( astTestAlignSystem( this ) ) {
+      result = (*parent_getalignsystem)( this_frame );
+
+/* Otherwise, provide a suitable default. */
+   } else {
+      result = AST__COMP;
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "CmpFrame.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astGetAttrib
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a CmpFrame, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - This function uses one-based axis numbering so that it is
+*     suitable for external (public) use.
+*     - The returned string pointer may point at memory allocated
+*     within the CmpFrame, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the CmpFrame. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   const char *result;           /* Pointer value to return */
+   AstFrame *fr;                 /* Pointer to primary Frame containing axis */
+   int axis;                     /* Supplied (1-base) axis index */
+   int faxis;                    /* Index of primary Frame axis */
+   int len;                      /* Length of attrib string */
+   int nc;                       /* Length of string used so far */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_object;
+
+/* Obtain the length of the attrib string. */
+   len = strlen( attrib );
+
+/* Compare "attrib" with each recognised attribute name in turn,
+   obtaining the value of the required attribute. If necessary, write
+   the value into "buff" as a null-terminated string in an appropriate
+   format.  Set "result" to point at the result string. */
+
+/* System(axis). */
+/* ------------- */
+   if ( nc = 0,
+        ( 1 == astSscanf( attrib, "system(%d)%n", &axis, &nc ) )
+        && ( nc >= len ) ) {
+      astPrimaryFrame( this, axis - 1, &fr, &faxis );
+      result = astGetC( fr, "system" );
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib );
+   }
+
+/* Return the result. */
+   return result;
+
+}
+
 static int GenAxisSelection( int naxes, int nselect, int axes[] ) {
 /*
 *  Name:
@@ -1795,6 +2048,80 @@ static int GetMinAxes( AstFrame *this_frame ) {
    return result;
 }
 
+static double GetEpoch( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetEpoch
+
+*  Purpose:
+*     Get a value for the Epoch attribute of a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double GetEpoch( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetEpoch method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns a value for the Epoch attribute of a
+*     CmpFrame.  
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*  Returned Value:
+*     The Epoch attribute value.
+
+*  Notes:
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   double result;                /* Result value to return */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* If an Epoch attribute value has been set, invoke the parent method
+   to obtain it. */
+   if ( astTestEpoch( this ) ) {
+      result = (*parent_getepoch)( this_frame );
+
+/* Otherwise, if the Epoch value is set in the first component Frame,
+   return it. */
+   } else if( astTestEpoch( this->frame1 ) ){
+      result = (*parent_getepoch)( this->frame1 );
+
+/* Otherwise, if the Epoch value is set in the second component Frame,
+   return it. */
+   } else if( astTestEpoch( this->frame2 ) ){
+      result = (*parent_getepoch)( this->frame2 );
+
+/* Otherwise, return the default Epoch value from the first component
+   Frame. */
+   } else {
+      result = (*parent_getepoch)( this->frame1 );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int GetNaxes( AstFrame *this_frame ) {
 /*
 *  Name:
@@ -1929,6 +2256,67 @@ static const int *GetPerm( AstFrame *this_frame ) {
 
 /* Return a pointer to the axis permutation array. */
    return this->perm;
+}
+
+static AstSystemType GetSystem( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetSystem
+
+*  Purpose:
+*     Obtain the System attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstSystemType GetSystem( AstFrame *this_frame )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetSystem protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns the System attribute for a CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The System value.
+
+*  Notes:
+*     - AST__BADSYSTEM is returned if this function is invoked with
+*     the global error status set or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to CmpFrame structure */
+   AstSystemType result;         /* Value to return */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* If a System attribute has been set, invoke the parent method to obtain 
+   it. */
+   if ( astTestSystem( this ) ) {
+      result = (*parent_getsystem)( this_frame );
+
+/* Otherwise, provide a suitable default. */
+   } else {
+      result = AST__COMP;
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static const char *GetTitle( AstFrame *this_frame ) {
@@ -2098,23 +2486,24 @@ static int GoodPerm( int ncoord_in, const int inperm[],
    return result;
 }
 
-static void InitVtab( AstCmpFrameVtab *vtab ) {
+void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitCmpFrameVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a CmpFrame.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "cmpframe.h"
-*     void InitVtab( AstCmpFrameVtab *vtab )
+*     void astInitCmpFrameVtab( AstCmpFrameVtab *vtab, const char *name )
 
 *  Class Membership:
-*     CmpFrame member function.
+*     CmpFrame vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -2123,15 +2512,27 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitFrameVtab( (AstFrameVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsACmpFrame) to determine if an object belongs
@@ -2146,8 +2547,18 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    frame = (AstFrameVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
 
    parent_getdomain = frame->GetDomain;
    frame->GetDomain = GetDomain;
@@ -2155,8 +2566,17 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
    parent_gettitle = frame->GetTitle;
    frame->GetTitle = GetTitle;
 
+   parent_getepoch = frame->GetEpoch;
+   frame->GetEpoch = GetEpoch;
+
    parent_angle = frame->Angle;
    frame->Angle = Angle;
+
+   parent_getsystem = frame->GetSystem;
+   frame->GetSystem = GetSystem;
+
+   parent_getalignsystem = frame->GetAlignSystem;
+   frame->GetAlignSystem = GetAlignSystem;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -2205,6 +2625,9 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
    frame->TestSymbol = TestSymbol;
    frame->TestUnit = TestUnit;
    frame->Unformat = Unformat;
+   frame->ValidateSystem = ValidateSystem;
+   frame->SystemString = SystemString;
+   frame->SystemCode = SystemCode;
 
 /* Declare the copy constructor, destructor and class dump
    function. */
@@ -3149,10 +3572,16 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
    axes from the target. This is done without overlaying any template
    attributes. Annul the Mappings produced by this process, as these
    are not needed. */
+
+   frame1 = NULL;
+   junk_map = NULL;
    (void) astSubFrame( target, NULL, naxes1, axes1, NULL, &junk_map, &frame1 );
-   junk_map = astAnnul( junk_map );
+   if( junk_map ) junk_map = astAnnul( junk_map );
+
+   frame2 = NULL;
+   junk_map = NULL;
    (void) astSubFrame( target, NULL, naxes2, axes2, NULL, &junk_map, &frame2 );
-   junk_map = astAnnul( junk_map );
+   if( junk_map ) junk_map = astAnnul( junk_map );
 
 /* Match the sub-Frames with the template component Frames. */
 /* -------------------------------------------------------- */
@@ -4150,6 +4579,92 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 
 }
 
+static void SetAttrib( AstObject *this_object, const char *setting ) {
+/*
+*  Name:
+*     SetAttrib
+
+*  Purpose:
+*     Set an attribute value for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetAttrib( AstObject *this, const char *setting )
+
+*  Class Membership:
+*     CmpFrame member function (extends the astSetAttrib method inherited from
+*     the Mapping class).
+
+*  Description:
+*     This function assigns an attribute value for a CmpFrame, the attribute
+*     and its value being specified by means of a string of the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in lower
+*     case with no white space present. The value to the right of the "="
+*     should be a suitable textual representation of the value to be assigned
+*     and this will be interpreted according to the attribute's data type.
+*     White space surrounding the value is only significant for string
+*     attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     setting
+*        Pointer to a null terminated string specifying the new attribute
+*        value.
+
+*  Returned Value:
+*     void
+
+*  Notes:
+*     This protected method is intended to be invoked by the Object astSet
+*     method and makes additional attributes accessible to it.
+*/
+
+/* Local Vaiables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   AstFrame *fr;                 /* Pointer to primary Frame containing axis */
+   int axis;                     /* Supplied (1-base) axis index */
+   int faxis;                    /* Index of primary Frame axis */
+   int len;                      /* Length of setting string */
+   int nc;                       /* Number of characters read by astSscanf */
+   int system;                   /* Offset to start of system value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = strlen( setting );
+
+/* Test for each recognised attribute in turn, using "astSscanf" to parse the
+   setting string and extract the attribute value (or an offset to it in the
+   case of string values). In each case, use the value set in "nc" to check
+   that the entire string was matched. Once a value has been obtained, use the
+   appropriate method to set it. */
+
+/* System(axis). */
+/* ------------- */
+   if ( nc = 0,
+        ( 1 == astSscanf( setting, "system(%d)= %n%*s %n", &axis, &system, 
+                          &nc ) ) && ( nc >= len ) ) {
+      astPrimaryFrame( this, axis - 1, &fr, &faxis );
+      astSetC( fr, "system", setting+system );
+
+/* Pass any unrecognised setting to the parent method for further
+   interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting );
+   }
+}
+
 static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
 /*
 *  Name:
@@ -4285,6 +4800,134 @@ static void SetMinAxes( AstFrame *this_frame, int minaxes ) {
 */
 
 /* Do nothing. */
+}
+
+static AstSystemType SystemCode( AstFrame *this, const char *system ) {
+/*
+*  Name:
+*     SystemCode
+
+*  Purpose:
+*     Convert a string into a coordinate system type code.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstSystemType SystemCode( AstFrame *this, const char *system )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSystemCode method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function converts a string used for the external
+*     description of a coordinate system into a CmpFrame
+*     coordinate system type code (System attribute value). It is the
+*     inverse of the astSystemString function.
+
+*  Parameters:
+*     this
+*        The Frame.
+*     system
+*        Pointer to a constant null-terminated string containing the
+*        external description of the coordinate system.
+
+*  Returned Value:
+*     The System type code.
+
+*  Notes:
+*     - A value of AST__BADSYSTEM is returned if the coordinate
+*     system description was not recognised. This does not produce an
+*     error.
+*     - A value of AST__BADSYSTEM is also returned if this function
+*     is invoked with the global error status set or if it should fail
+*     for any reason.
+*/
+
+/* Local Variables: */
+   AstSystemType result;      /* Result value to return */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Match the "system" string against each possibility and assign the
+   result. The CmpFrame class only supports a single system "Compound". */
+   if ( astChrMatch( "Compound", system ) ) {
+      result = AST__COMP;
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static const char *SystemString( AstFrame *this, AstSystemType system ) {
+/*
+*  Name:
+*     SystemString
+
+*  Purpose:
+*     Convert a coordinate system type code into a string.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     const char *SystemString( AstFrame *this, AstSystemType system )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSystemString method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function converts a CmpFrame coordinate system type code
+*     (System attribute value) into a string suitable for use as an
+*     external representation of the coordinate system type.
+
+*  Parameters:
+*     this
+*        The Frame.
+*     system
+*        The coordinate system type code.
+
+*  Returned Value:
+*     Pointer to a constant null-terminated string containing the
+*     textual equivalent of the type code supplied.
+
+*  Notes:
+*     - A NULL pointer value is returned if the coordinate system
+*     code was not recognised. This does not produce an error.
+*     - A NULL pointer value is also returned if this function is
+*     invoked with the global error status set or if it should fail
+*     for any reason.
+*/
+
+/* Local Variables: */
+   const char *result;           /* Pointer value to return */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Match the "system" value against each possibility and convert to a
+   string pointer. (Where possible, return the same string as would be
+   used in the FITS WCS representation of the coordinate system). A 
+   CmpFrame only allows a single System value, "Compound". */
+   switch ( system ) {
+   case AST__COMP:
+      result = "Compound";
+      break;
+   }
+
+/* Return the result pointer. */
+   return result;
 }
 
 static int SubFrame( AstFrame *target_frame, AstFrame *template,
@@ -4802,6 +5445,85 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    return match;
 }
 
+static int TestAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     int TestAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astTestAttrib protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     a value has been set for one of a CmpFrame's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     attrib
+*        Pointer to a null terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - This function uses one-based axis numbering so that it is
+*     suitable for external (public) use.
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   AstFrame *fr;                 /* Pointer to primary Frame containing axis */
+   int axis;                     /* Supplied (1-base) axis index */
+   int faxis;                    /* Index of primary Frame axis */
+   int len;                      /* Length of attrib string */
+   int nc;                       /* Length of string used so far */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_object;
+
+/* Obtain the length of the attrib string. */
+   len = strlen( attrib );
+
+/* Check the attribute name and test the appropriate attribute. */
+   if ( nc = 0,
+        ( 1 == astSscanf( attrib, "system(%d)%n", &axis, &nc ) )
+        && ( nc >= len ) ) {
+      astPrimaryFrame( this, axis - 1, &fr, &faxis );
+      result = astTest( fr, "system" );
+      
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      result = (*parent_testattrib)( this_object, attrib );
+   }
+
+/* Return the result, */
+   return result;
+}
+
 static int TestMaxAxes( AstFrame *this_frame ) {
 /*
 *  Name:
@@ -5032,6 +5754,76 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
 
 /* Return the number of chracters read. */
    return nc;
+}
+
+static int ValidateSystem( AstFrame *this, AstSystemType system, const char *method ) {
+/*
+*
+*  Name:
+*     ValidateSystem
+
+*  Purpose:
+*     Validate a value for a CmpFrame's System attribute.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     int ValidateSystem( AstFrame *this, AstSystemType system, 
+*                         const char *method )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astValidateSystem method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function checks the validity of the supplied system value.
+*     If the value is valid, it is returned unchanged. Otherwise, an
+*     error is reported and a value of AST__BADSYSTEM is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     system
+*        The system value to be checked. 
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function
+*        to validate an axis index. This method name is used solely
+*        for constructing error messages.
+
+*  Returned Value:
+*     The validated system value.
+
+*  Notes:
+*     - A value of AST__BADSYSTEM will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstSystemType result;              /* Validated system value */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If the value is out of bounds, report an error. */
+   if ( system < FIRST_SYSTEM || system > LAST_SYSTEM ) {
+         astError( AST__AXIIN, "%s(%s): Bad value (%d) given for the System "
+                   "attribute of a %s.", method, astGetClass( this ),
+                   (int) system, astGetClass( this ) );
+
+/* Otherwise, return the supplied value. */
+   } else {
+      result = system;
+   }
+
+/* Return the result. */
+   return result;
 }
 
 /* Functions which access class attributes. */
@@ -5597,16 +6389,16 @@ AstCmpFrame *astInitCmpFrame_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitCmpFrameVtab( vtab, name );
+
 /* Initialise a Frame structure (the parent class) as the first
    component within the CmpFrame structure, allocating memory if
    necessary. Set the number of Frame axes to zero, since all axis
    information is stored within the component Frames. */
-   new = (AstCmpFrame *) astInitFrame( mem, size, init, (AstFrameVtab *) vtab,
+   new = (AstCmpFrame *) astInitFrame( mem, size, 0, (AstFrameVtab *) vtab,
                                        name, 0 );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-   if ( init ) InitVtab( vtab );
    if ( astOK ) {
 
 /* Initialise the CmpFrame data. */
@@ -5633,7 +6425,7 @@ AstCmpFrame *astInitCmpFrame_( void *mem, size_t size, int init,
    return new;
 }
 
-AstCmpFrame *astLoadCmpFrame_( void *mem, size_t size, int init,
+AstCmpFrame *astLoadCmpFrame_( void *mem, size_t size,
                                AstCmpFrameVtab *vtab, const char *name,
                                AstChannel *channel ) {
 /*
@@ -5649,7 +6441,7 @@ AstCmpFrame *astLoadCmpFrame_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "cmpframe.h"
-*     AstCmpFrame *astLoadCmpFrame( void *mem, size_t size, int init,
+*     AstCmpFrame *astLoadCmpFrame( void *mem, size_t size,
 *                                   AstCmpFrameVtab *vtab, const char *name,
 *                                   AstChannel *channel )
 
@@ -5662,10 +6454,6 @@ AstCmpFrame *astLoadCmpFrame_( void *mem, size_t size, int init,
 *     (which allocates memory if necessary) and then initialises a
 *     CmpFrame structure in this memory, using data read from the
 *     input Channel.
-*
-*     If the "init" flag is set, it also initialises the contents of a
-*     virtual function table for a CmpFrame at the start of the memory
-*     passed via the "vtab" parameter.
 
 *  Parameters:
 *     mem
@@ -5684,14 +6472,6 @@ AstCmpFrame *astLoadCmpFrame_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstCmpFrame) is used instead.
-*     init
-*        A boolean flag indicating if the CmpFrame's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the CmpFrame class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new CmpFrame. If this is NULL, a pointer
@@ -5737,26 +6517,23 @@ AstCmpFrame *astLoadCmpFrame_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstCmpFrame );
-      init = !class_init;
       vtab = &class_vtab;
       name = "CmpFrame";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitCmpFrameVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built CmpFrame. */
-   new = astLoadFrame( mem, size, init, (AstFrameVtab *) vtab, name,
+   new = astLoadFrame( mem, size, (AstFrameVtab *) vtab, name,
                        channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

@@ -72,6 +72,8 @@
 *           Validate class membership.
 *        astInitCmpMap
 *           Initialise a CmpMap.
+*        astInitCmpMapVtab
+*           Initialise the virtual function table for the CmpMap class.
 *        astLoadCmpMap
 *           Load a CmpMap.
 
@@ -108,6 +110,8 @@
 *        Implemented external interface and I/O facilities.
 *     13-DEC-1996 (RFWS):
 *        Over-ride the astSimplify method.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitCmpMapVtab method.
 *-
 */
 
@@ -185,8 +189,11 @@ AstCmpMap *astCmpMapId_( void *, void *, int, const char *, ... );
 AstCmpMap *astInitCmpMap_( void *, size_t, int, AstCmpMapVtab *,
                            const char *, AstMapping *, AstMapping *, int );
 
+/* Vtab initialiser. */
+void astInitCmpMapVtab_( AstCmpMapVtab *, const char * );
+
 /* Loader. */
-AstCmpMap *astLoadCmpMap_( void *, size_t, int, AstCmpMapVtab *,
+AstCmpMap *astLoadCmpMap_( void *, size_t, AstCmpMapVtab *,
                            const char *, AstChannel * );
 #endif
 
@@ -226,9 +233,11 @@ AstCmpMap *astLoadCmpMap_( void *, size_t, int, AstCmpMapVtab *,
 #define astInitCmpMap(mem,size,init,vtab,name,map1,map2,series) \
 astINVOKE(O,astInitCmpMap_(mem,size,init,vtab,name,astCheckMapping(map1),astCheckMapping(map2),series))
 
+/* Vtab Initialiser. */
+#define astInitCmpMapVtab(vtab,name) astINVOKE(V,astInitCmpMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadCmpMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadCmpMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadCmpMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadCmpMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

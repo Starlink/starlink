@@ -71,6 +71,9 @@ f     The DssMap class does not define any new routines beyond those
 *     22-DEC-1997 (DSB):
 *        Bug fixed in MapMerge which caused a core dump when a
 *        DssMap/WinMap combination is succesfully simplified.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitDssMapVtab
+*        method.
 *class--
 */
 
@@ -144,7 +147,6 @@ static struct WorldCoor *BuildWcs( AstFitsChan *, const char *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject *obj );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstDssMapVtab * );
 
 /* Member functions. */
 /* ================= */
@@ -512,23 +514,24 @@ static AstFitsChan *DssFits( AstDssMap *this ) {
    return ret;
 }
 
-static void InitVtab( AstDssMapVtab *vtab ) {
+void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitDssMapVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a DssMap.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "dssmap.h"
-*     void InitVtab( AstDssMapVtab *vtab )
+*     void astInitDssMapVtab( AstDssMapVtab *vtab, const char *name )
 
 *  Class Membership:
-*     DssMap member function.
+*     DssMap vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -537,7 +540,14 @@ static void InitVtab( AstDssMapVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -546,6 +556,10 @@ static void InitVtab( AstDssMapVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitMappingVtab( (AstMappingVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsADssMap) to determine if an object belongs
@@ -1406,6 +1420,9 @@ AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitDssMapVtab( vtab, name );
+
 /* Initialise. */
    new = NULL;
 
@@ -1418,13 +1435,10 @@ AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
 /* Initialise a 2-D Mapping structure (the parent class) as the first component
    within the DssMap structure, allocating memory if necessary. Specify that
    the Mapping should be defined in both the forward and inverse directions. */
-      new = (AstDssMap *) astInitMapping( mem, size, init,
+      new = (AstDssMap *) astInitMapping( mem, size, 0,
                                           (AstMappingVtab *) vtab, name,
                                           2, 2, 1, 1 );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-      if ( init ) InitVtab( vtab );
       if ( astOK ) {
 
 /* Initialise the DssMap data. */
@@ -1445,7 +1459,7 @@ AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
    return new;
 }
 
-AstDssMap *astLoadDssMap_( void *mem, size_t size, int init,
+AstDssMap *astLoadDssMap_( void *mem, size_t size,
                              AstDssMapVtab *vtab, const char *name,
                              AstChannel *channel ) {
 /*
@@ -1461,7 +1475,7 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "dssmap.h"
-*     AstDssMap *astLoadDssMap( void *mem, size_t size, int init,
+*     AstDssMap *astLoadDssMap( void *mem, size_t size,
 *                                 AstDssMapVtab *vtab, const char *name,
 *                                 AstChannel *channel )
 
@@ -1478,6 +1492,7 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a DssMap at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -1496,14 +1511,6 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstDssMap) is used instead.
-*     init
-*        A boolean flag indicating if the DssMap's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the DssMap class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new DssMap. If this is NULL, a pointer
@@ -1546,26 +1553,23 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstDssMap );
-      init = !class_init;
       vtab = &class_vtab;
       name = "DssMap";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitDssMapVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built DssMap. */
-   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+   new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 
 /* Read input data. */
