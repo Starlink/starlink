@@ -32,6 +32,8 @@
 *     IN = NDF (Read)
 *        The name of the raw skydip data file or of the file processed
 *        by REDUCE_SWITCH.
+*     B_ERR = REAL (Write)
+*        The error on the fitted value of B_VAL
 *     B_FIT = REAL (Write)
 *        The fitted value of the B parameter.
 *     B_VAL = REAL (Read)
@@ -44,6 +46,8 @@
 *        derived from the scatter in the individual integrations (false).
 *        The value used for the fixed variance is the mean of all the
 *        calculated variances.
+*     ETA_ERR = REAL (Write)
+*        The error on the fitted value of ETA_TEL
 *     ETA_TEL = REAL (Read)
 *        The telescope efficiency. If available the current telescope value 
 *        is used as the default.  Values must be between 0 and 1.0. 
@@ -60,10 +64,15 @@
 *     OUT = CHAR (Write)
 *        The name of the output file that contains the measured 
 *        sky temperatures.
+*     SIGMA = DOUBLE (Write)
+*        Standard deviation of the difference between the fit
+*        and the input data.
 *     SUB_INSTRUMENT = CHAR (Read)
 *        The name of the sub-instrument whose data are to be
 *        selected from the input file and fitted. Permitted 
 *        values are SHORT, LONG, P1100, P1350 and P2000
+*     TAUZ_ERR = REAL (Write)
+*        The error on the fitted value of TAUZ
 *     TAUZ_FIT = REAL (Write)
 *        The fitted sky opacity for the selected sub instrument.
 *     T_COLD = REAL (Read)
@@ -131,6 +140,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.27  1998/06/06 03:23:24  timj
+*     Add errors - store as parameters
+*
 *     Revision 1.26  1998/01/23 04:01:33  timj
 *     Fix some typos in the header.
 *
@@ -283,6 +295,7 @@ c
       REAL         AV_VAR(SCUBA__MAX_SUB, SCUBA__MAX_MEAS)  
                                         ! Var for average skydip
       REAL    B                         ! requested B
+      REAL    B_ERROR                   ! Error in B
       LOGICAL BADPIX                    ! are there bad pixels
       REAL    B_FIT                     ! B parameter
       INTEGER BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -311,6 +324,7 @@ c
       INTEGER DUMMY_PTR                 ! Scratch space 4
       REAL    EL                        ! Elevation in radians used for loop
       REAL    END_EL                    ! End elevation of skydip
+      REAL    ETA_ERROR                 ! Error in ETA_TEL
       REAL    ETA_TEL                   ! Telescope efficiency
       REAL    ETA_TEL_FIT               ! Fitted eta_tel
       INTEGER EXP_END                   ! end index of data for an exposure
@@ -369,6 +383,7 @@ c
       LOGICAL RESW                      ! Was the data reduce_switched
       REAL    REXISQ                    ! Reduced chi square
       INTEGER RUN_NUMBER                ! run number of observation
+      DOUBLE PRECISION SIGMA            ! Sigma of difference between model/dat
       LOGICAL SKYDIP                    ! .TRUE. if not RAW data
       INTEGER SLICE_PTR                 ! Pointer to start of slice
       INTEGER SLICE_PTR_END             ! Pointer to end of slice
@@ -384,6 +399,7 @@ c
       DOUBLE PRECISION SUMSQ            ! Sum of squares from SCULIB_STATR
       DOUBLE PRECISION STDEV            ! Standard deviation of measurement
       CHARACTER*15 SWITCH_MODE          ! switch mode used
+      REAL    TAU_ERROR                 ! Error in tau
       REAL    TAUZ_FIT                  ! Fitted TAU
       CHARACTER * 15 TITLE              ! File title
       REAL    T_AMB                     ! Temperature of ambient load
@@ -1001,11 +1017,16 @@ c
       TAUZ_FIT = VAL__BADR
       REXISQ = VAL__BADR
       ETA_TEL_FIT = VAL__BADR
+      B_ERROR = VAL__BADR
+      TAU_ERROR = VAL__BADR
+      ETA_ERROR = VAL__BADR
+      SIGMA = VAL__BADD
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_FIT_SKYDIP (CVAR, NKEPT, AIRMASS, JSKY,JSKY_VAR,
      :        WAVE, SUB_INST, FILT, T_TEL, T_AMB, ETA_TEL,B,ETA_TEL_FIT,
-     :        B_FIT, TAUZ_FIT, REXISQ, STATUS)
+     :        B_FIT, TAUZ_FIT, REXISQ, TAU_ERROR, ETA_ERROR, B_ERROR,
+     :        SIGMA, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
             FITFAIL = .FALSE.
@@ -1022,15 +1043,23 @@ c
 *     Want to make sure that the GOODFIT parameter is set to false if
 *     we have had any problems at all. Just make sure it is written
 *     with a good status
+
+*     Check parameters for non-physical ranges
+      IF (TAUZ_FIT .LT. 0.0) FITFAIL = .TRUE.
+      IF (ETA_TEL_FIT .LT. 0.0) FITFAIL = .TRUE.
+      IF (B_FIT .LT. 0.0) FITFAIL = .TRUE.
+      IF (FITFAIL) NFILES = 1
       
       GOOD = SAI__OK
       CALL PAR_PUT0L('GOODFIT', .NOT.FITFAIL, GOOD)
       CALL PAR_PUT0R('TAUZ_FIT', TAUZ_FIT, GOOD)
+      CALL PAR_PUT0R('TAUZ_ERR', TAU_ERROR, GOOD)
       CALL PAR_PUT0R('B_FIT', B_FIT, GOOD)
+      CALL PAR_PUT0R('B_ERR', B_ERROR, GOOD)
       CALL PAR_PUT0R('ETA_TEL_FIT', ETA_TEL_FIT, GOOD)
+      CALL PAR_PUT0R('ETA_TEL_ERR', ETA_ERROR, GOOD)
       CALL PAR_PUT0R('XISQ', REXISQ, GOOD)
-
-
+      CALL PAR_PUT0D('SIGMA', SIGMA, GOOD)
 
 *     Now create output files
 *     Only create model if we fitted okay
