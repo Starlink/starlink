@@ -667,7 +667,7 @@ kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f kps1_cremg.f kps1_crets.f \
 kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look.f kps1_look1.f kps1_look2.f \
 kps1_ltaba.f 
 
-MEM_F_ROUTINES = 
+MEM_F_ROUTINES = mem2d.f
 
 NDFPACK_F_ROUTINES = \
 axconv.f axlabel.f axunits.f erase.f \
