@@ -2182,6 +2182,7 @@ INSPECT     - Inspects a 2-d NDF in a variety of ways.
 MANIC       - Converts all or part of a data array from one
               dimensionality to another.
 NDFCOPY     - Copies an NDF (or NDF section) to a new location.
+PERMAXES    - Permute the axes of an NDF
 PROFILE     - Creates a 1-d profile through an N-d NDF.
 RESHAPE     - Reshapes an NDF, treating its arrays as vectors.
 ROTATE      - Rotates a 2-dimensional NDF about its centre through any
@@ -2214,6 +2215,7 @@ NATIVE      - Converts an HDS object to native machine data
 
 3 NDF_array_components
 NDFCOPY     - Copies an NDF (or NDF section) to a new location.
+PERMAXES    - Permute the axes of an NDF
 SETBAD      - Sets new bad-pixel flag values for an NDF.
 SETBB       - Sets a new value for the quality bad-bits mask of an NDF.
 SETBOUND    - Sets new bounds for an NDF.
@@ -2228,6 +2230,7 @@ AXLABEL     - Sets a new label value for an axis within an NDF data
               structure.
 AXUNITS     - Sets a new units value for an axis within an NDF data
               structure.
+PERMAXES    - Permute the axes of an NDF
 SETAXIS     - Sets values for an axis array component within an NDF data
               structure.
 SETNORM     - Sets a new value for one or all of an NDF's
@@ -2258,6 +2261,7 @@ HISLIST     - Lists NDF history records.
 HISSET      - Sets the NDF history update mode.
 
 3 NDF_world_coordinate_systems
+PERMAXES    - Permute the axes of an NDF
 WCSADD      - Adds a new co-ordinate Frame into the WCS component of an
               NDF.
 WCSALIGN    - Aligns a group of 2-d NDFs using WCS information.
@@ -23959,6 +23963,65 @@ DSB: David S. Berry (STARLINK)
 
    -  Any number of NDF dimensions is supported.
 
+1 PERMAXES
+Permute an NDF's pixel axes.
+
+Usage:
+
+   permaxes in out perm
+
+Description:
+
+   This application re-orders the pixel axes of an NDF, together with
+   all related information.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The input NDF data structure.
+3 OUT
+OUT = NDF (Write)
+   The output NDF data structure.
+3 PERM
+PERM() = _INTEGER (Read)
+   A list of integers defining how the pixel axes are to be permuted.
+   The list must contain one element for each pixel axis in the NDF.
+   The first element is the index of the pixel axis within the input
+   NDF which is to become axis 1 in the output NDF. The second element
+   is the index of the pixel axis within the input NDF which is to
+   become axis 2 in the output NDF, etc. Axes are numbered from 1.
+3 TITLE
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value will cause the title
+   of the NDF supplied for parameter IN to be used instead. [!]
+2 Examples
+permaxes a b [2,1]
+   Swaps the axes in the 2-dimensional NDF called "a", to produce a
+   new 2-dimensional NDF called "b".
+
+permaxes a b [3,1,2]
+   Creates a new 3-dimensional NDF called "b" in which axis 1
+   corresponds to axis 3 in the input 3-dimension NDF called "a",
+   axis 2 corresponds to input axis 1, axis 3 corresponds to input
+   axis 2.
+2 Related_Applications
+   KAPPA: ROTATE, FLIP; Figaro: IREVX, IREVY, IROT90.
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 6-FEB-2001 (DSB):
+    Original version.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
+   input NDF and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  The data
+   type of the input pixels is preserved in the output NDF.
+
 1 PICBASE
 Selects the BASE picture from the graphics database.
 
@@ -30478,6 +30541,7 @@ PALSAVE     - Saves the current palette of a colour table to an NDF.
 PARGET      - Obtains the value or values of an application
               parameter.
 PASTE       - Pastes a series of NDFs upon each other.
+PERMAXES    - Permute the axes of an NDF
 PICBASE     - Selects the BASE picture from the graphics database.
 PICCUR      - Uses a cursor to select the current picture and to
               report the co-ordinates of points.

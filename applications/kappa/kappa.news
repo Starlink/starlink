@@ -7,6 +7,11 @@
    table which goes from black to white, passing through warm shades 
    of yellow and brown, as popularised by GAIA. 
 
+   - A new command called PERMAXES has been added. It permutes the axes
+   of an NDF. This rearranges the pixel values within the NDF and also
+   rearranges the AXIS stuctures and WCS FrameSet so that they refer to
+   the correct pixel axes.
+
    - THRESH may now be used to replace data between specified
    thresholds as well as outside specified thresholds, by setting 
    the lower threshold greater than the upper threshold.
@@ -26,3 +31,4 @@
    - The TextBackColour plotting attribute, which allows the background
    colour for text to be selected (or set transparent) has been documented 
    in SUN/95.
+

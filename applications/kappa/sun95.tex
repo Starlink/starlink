@@ -11420,6 +11420,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Obtains the value or values of an application parameter.}
 \menuitem{PASTE}{
  Pastes a series of NDFs upon each other.}
+\menuitem{PERMAXES}{
+ Permutes the axes of an NDF.}
 \menuitem{PICBASE}{
  Selects the BASE picture from the graphics database.}
 \menuitem{PICCUR}{
@@ -11904,6 +11906,8 @@ functions as follows.
  Converts all or part of a data array from one dimensionality to another.
 \classitem{NDFCOPY}
  Copies an NDF (or NDF section) to a new location.
+\classitem{PERMAXES}
+ Permutes the axes of an NDF.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
 \classitem{RESHAPE}
@@ -11953,6 +11957,8 @@ functions as follows.
 \begin{description}
 \classitem{NDFCOPY}
  Copies an NDF (or NDF section) to a new location.
+\classitem{PERMAXES}
+ Permutes the axes of an NDF.
 \classitem{SETBAD}
  Sets new bad-pixel flag values for an NDF.
 \classitem{SETBB}
@@ -11974,6 +11980,8 @@ functions as follows.
  Sets a new label value for an axis within an NDF data structure.
 \classitem{AXUNITS}
  Sets a new units value for an axis within an NDF data structure.
+\classitem{PERMAXES}
+ Permutes the axes of an NDF.
 \classitem{SETAXIS}
  Sets values for an axis array component within an NDF data structure.
 \classitem{SETNORM}
@@ -12030,6 +12038,8 @@ functions as follows.
 %
 \item {\large\bf NDF World Coordinate Systems}
 \begin{description}
+\classitem{PERMAXES}
+ Permutes the axes of an NDF.
 \classitem{WCSADD}
  Adds a new co-ordinate Frame into the WCS component of an NDF.
 \classitem{WCSALIGN}
@@ -33079,6 +33089,85 @@ plot (9k).
 }
 
 \sstroutine{
+   PERMAXES
+}{
+   Permute an NDF{\tt '}s pixel axes
+}{
+   \sstdescription{
+      This application re-orders the pixel axes of an NDF, together with
+      all related information.
+   }
+   \sstusage{
+      permaxes in out perm
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF data structure.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF data structure.
+      }
+      \sstsubsection{
+         PERM() = \_INTEGER (Read)
+      }{
+         A list of integers defining how the pixel axes are to be permuted.
+         The list must contain one element for each pixel axis in the NDF.
+         The first element is the index of the pixel axis within the input
+         NDF which is to become axis 1 in the output NDF. The second element
+         is the index of the pixel axis within the input NDF which is to
+         become axis 2 in the output NDF, \emph{etc}. Axes are numbered from 1.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         A title for the output NDF.  A null value will cause the title
+         of the NDF supplied for parameter IN to be used instead. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         permaxes a b [2,1]
+      }{
+         Swaps the axes in the 2-dimensional NDF called {\tt "}a{\tt "}, to produce a
+         new 2-dimensional NDF called {\tt "}b{\tt "}.
+      }
+      \sstexamplesubsection{
+         permaxes a b [3,1,2]
+      }{
+         Creates a new 3-dimensional NDF called {\tt "}b{\tt "} in which axis 1
+         corresponds to axis 3 in the input 3-dimension NDF called {\tt "}a{\tt "},
+         axis 2 corresponds to input axis 1, axis 3 corresponds to input
+         axis 2.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: ROTATE, FLIP; Figaro: IREVX, IREVY, IROT90.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
+         input NDF and propagates all extensions.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         All non-complex numeric data types can be handled.  The data
+         type of the input pixels is preserved in the output NDF.
+      }
+   }
+}
+\sstroutine{
    PICBASE
 }{
    Selects the BASE picture from the graphics database.
@@ -46141,6 +46230,10 @@ The following new commands have been added:
    \item [\htmlref{OUTLINE}{OUTLINE}] \mbox{}
        Draws an outline of an NDF, optionally aligning it with an
        existing plot. This is a synonym for {\tt contour mode=bounds}.
+   \item [\htmlref{PERMAXES}{PERMAXES}] \mbox{}
+       Permutes the axes of an NDF. This rearranges the pixel values
+       within the NDF and also rearranges the AXIS stuctures and WCS 
+       FrameSet so that they refer to the correct pixel axes.
 \end{description}
 
 \begin{latexonly}
@@ -46489,6 +46582,8 @@ functions as follows.
  Converts all or part of a data array from one dimensionality to another.
 \classitem{NDFCOPY}
  Copies an NDF (or NDF section) to a new location.
+\classitem{PERMAXES}
+ Permutes the axes of an NDF.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
 \classitem{RESHAPE}
@@ -46538,6 +46633,8 @@ functions as follows.
 \begin{description}
 \classitem{NDFCOPY}
  Copies an NDF (or NDF section) to a new location.
+\classitem{PERMAXES}
+ Permutes the axes of an NDF.
 \classitem{SETBAD}
  Sets new bad-pixel flag values for an NDF.
 \classitem{SETBB}
@@ -46559,6 +46656,8 @@ functions as follows.
  Sets a new label value for an axis within an NDF data structure.
 \classitem{AXUNITS}
  Sets a new units value for an axis within an NDF data structure.
+\classitem{PERMAXES}
+ Permutes the axes of an NDF.
 \classitem{SETAXIS}
  Sets values for an axis array component within an NDF data structure.
 \classitem{SETNORM}
@@ -46615,6 +46714,8 @@ functions as follows.
 %
 \item {\large\bf NDF World Coordinate Systems}
 \begin{description}
+\classitem{PERMAXES}
+ Permutes the axes of an NDF.
 \classitem{WCSADD}
  Adds a new co-ordinate Frame into the WCS component of an NDF.
 \classitem{WCSALIGN}
