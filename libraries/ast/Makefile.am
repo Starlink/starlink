@@ -262,7 +262,9 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 # Make all library code position independent by default. This is handy for
 # creating shareable libraries from the static ones (Java JNI libraries). 
-# Note we do not use AM_CFLAGS as this would also apply to local programs.
+# Note we do not simply set the AM_CFLAGS variable, as this would also
+# apply to programs compiled without using libtool, possibly causing the
+# compilation to fail.
 if !NOPIC
 libast_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_err_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
