@@ -123,10 +123,10 @@
 
 *  Check that supplied X value lies inside user range
       IF ( XOUT .LE. XIN(1) ) THEN
-        YOUT = Y(1)
+        YOUT = YIN(1)
 
       ELSE IF ( XOUT .GE. XIN(N) ) THEN
-        YOUT = Y(N)
+        YOUT = YIN(N)
 
       ELSE
 
