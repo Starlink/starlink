@@ -48,7 +48,7 @@
         ENDIF
 
         CALL BDA_RELEASE(OLOC,STATUS)
-        CALL USI_ANNUL(OLOC,STATUS)
+        CALL USI_ANNUL('OUT',STATUS)
 
       ENDIF
 

@@ -1427,32 +1427,11 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-c      CHARACTER*(DAT__SZLOC) LOC
-c      INTEGER DIMS(2)
-c      INTEGER PTR
-c      LOGICAL MASK,ARDFILE
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-c        CALL USI_GET0L('MASK',MASK,STATUS)
-c        IF (MASK) THEN
-c          CALL USI_ASSOCO('OUT','REGION_MASK',LOC,STATUS)
-c          DIMS(1)=I_NX
-c          DIMS(2)=I_NY
-c          CALL BDA_CRETDATA(LOC,'_BYTE',2,DIMS,STATUS)
-c          CALL BDA_MAPTDATA(LOC,'_BYTE','W',PTR,STATUS)
-c          CALL ARR_COP1B(I_NX*I_NY,%val(I_REG_PTR),%val(PTR),STATUS)
-c          CALL BDA_COPAXES(I_LOC,LOC,STATUS)
-c          CALL BDA_COPMORE(I_LOC,LOC,STATUS)
-c          CALL BDA_RELEASE(LOC,STATUS)
-c          CALL USI_ANNUL(LOC,STATUS)
-c        ENDIF
-
-c        CALL USI_GET0L('ARDFILE',ARDFILE,STATUS)
-c        IF (ARDFILE) THEN
-          CALL ARX_WRITE('FILE',I_ARD_ID,STATUS)
-c        ENDIF
+        CALL ARX_WRITE('FILE',I_ARD_ID,STATUS)
 
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -1502,7 +1481,7 @@ c        ENDIF
         CALL ARR_COP1B(I_NX*I_NY,%val(PTR),%val(I_REG_PTR),STATUS)
         I_REG_TYPE='COMPLEX'
         CALL BDA_RELEASE(LOC,STATUS)
-        CALL USI_ANNUL(LOC,STATUS)
+        CALL USI_ANNUL('INP',STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IREGION_IMPORT',STATUS)

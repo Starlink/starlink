@@ -150,7 +150,7 @@
         ENDIF
 
         CALL BDA_RELEASE(LOC,STATUS)
-        CALL USI_ANNUL(LOC,STATUS)
+        CALL USI_ANNUL('INP',STATUS)
 
       ENDIF
 
