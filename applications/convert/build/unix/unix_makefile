@@ -258,6 +258,17 @@
 #        COI libraries.  Updated the dependencies.  Added PUBLIC_TASKS
 #        macro.  Revised archive target to make four other tar files.
 #        Removed undocumented test-archive target.
+#     1997 October 3 (MJC):
+#        Made OBJECT_LIBRARIES a build target, so the clean target does not
+#        remove them, and therefore the libraries are available for code
+#        development and debugging without having to rebuild the whole
+#        package.
+#     1997 November 16 (MJC):
+#        V1.0-1.  Added cof_wfexf.f and cof_nhead.f.  Updated cof_2dfim
+#        include-file dependencies.
+#     1997 November 25 (MJC):
+#        Incorparated AJC's recent changes for V1.1 including the
+#        introduction of getent.f.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -549,6 +560,7 @@ cof_mxmnd.f cof_mxmni.f cof_mxmnr.f cof_mxmnw.f \
 cof_ndf2f.f \
 cof_ndfax.f \
 cof_ndfcc.f \
+cof_nhead.f \
 cof_rhead.f \
 cof_sbnd.f \
 cof_scofd.f cof_scofi.f cof_scofr.f cof_scofw.f \
@@ -559,6 +571,7 @@ cof_swsaa.f \
 cof_t2hds.f \
 cof_thier.f \
 cof_typsz.f \
+cof_wfexf.f \
 cof_wfext.f \
 cof_wgbfe.f \
 cof_whead.f \
@@ -648,7 +661,7 @@ F_ROUTINES = $(AIF_F_ROUTINES) $(COF_F_ROUTINES) $(COI_F_ROUTINES) \
 #  they have no documententation.
 
 SPP_F_ROUTINES = \
-adline.f gethis.f getlin.f nhist.f nlines.f
+adline.f getent.f gethis.f getlin.f nhist.f nlines.f
 
 #  List of Fortran BLOCK DATA routines.
 
@@ -747,8 +760,8 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(A_TASKS) \
-$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT) \
+BUILT_FILES = $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(OBJECT_LIBRARIES) \
+$(A_TASKS) $(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT) \
 $(PUBLIC_TASKS)
 
 #  List of links used to access include files during compilation.  This
@@ -1594,8 +1607,7 @@ clean:
 	@-rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) \
                 $(F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
                 $(SPP_F_ROUTINES) \
-                $(OBJECT_FILES) \
-                $(OBJECT_LIBRARIES) $(IRAF_LIBRARIES:.a=.*) \
+                $(OBJECT_FILES) $(IRAF_LIBRARIES:.a=.*) \
                 $(A_TASKS_F) $(IFL_FILES) \
                 $(HELP_SOURCES) 1>/dev/null 2>/dev/null
 	@- rm -r -f $(FIGARO_INCLUDES) 1>/dev/null 2>/dev/null
@@ -1681,7 +1693,7 @@ aif_temp.o:        SAE_PAR DAT_PAR
 ascii2ndf.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
 cof_2dfex.o:       SAE_PAR DAT_PAR PRM_PAR
 cof_2dfif.o:       SAE_PAR DAT_PAR PRM_PAR
-cof_2dfim.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+cof_2dfim.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR MSG_PAR
 cof_atypc.o:       SAE_PAR
 cof_bn2ht.o:       SAE_PAR
 cof_bp2ht.o:       SAE_PAR
@@ -1726,6 +1738,7 @@ cof_mxmnw.o:       SAE_PAR PRM_PAR
 cof_ndf2f.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 cof_ndfax.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
 cof_ndfcc.o:       SAE_PAR NDF_PAR
+cof_nhead.o:       SAE_PAR
 cof_rhead.o:       SAE_PAR
 cof_sbnd.o:        SAE_PAR NDF_PAR
 cof_scofd.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
@@ -1739,13 +1752,14 @@ cof_swsaa.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
 cof_t2hds.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
 cof_thier.o:       SAE_PAR DAT_PAR
 cof_typsz.o:       SAE_PAR PRM_PAR
+cof_wfexf.o:       SAE_PAR DAT_PAR
 cof_wfext.o:       SAE_PAR DAT_PAR
 cof_wgbfe.o:       SAE_PAR DAT_PAR PRM_PAR
 cof_whead.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
 cof_whisr.o:       SAE_PAR NDF_PAR PRM_PAR COF_CMN
 cof_wndfh.o:       SAE_PAR NDF_PAR PRM_PAR
 cof_wrtab.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
-coi_alogd.o:        SAE_PAR
+coi_alogd.o:       SAE_PAR
 coi_alogr.o:       SAE_PAR
 coi_axexp.o:       SAE_PAR PRM_PAR NDF_PAR
 coi_aximp.o:       SAE_PAR PRM_PAR NDF_PAR
