@@ -1,0 +1,68 @@
+.help command_descriptions Starlink ccdpack
+.nf
+     CALCOR: Performs dark or flash count corrections.
+ 
+     CCDALIGN: Determines general inter-NDF transformations.
+
+     CCDCLEAR: Clears global parameters.
+
+     CCDEDIT: Edits the CCDPACK extensions of NDFs.
+
+     CCDFORK: Creates a script for executing CCDPACK commands in 
+              a background process.
+
+     CCDNDFAC: Accesses a list of NDFs, writing their names to a file.
+
+     CCDNOTE: Adds a note to the log file.
+
+     CCDSETUP: Sets up the CCDPACK global parameters.
+
+     CCDSHOW: Displays the current values of any CCDPACK global parameters. 
+
+     DEBIAS: Debiasses lists of NDFs either by bias NDF subtraction 
+             or by interpolation -- applies bad data masks --
+             extracts a subset of the data area -- produces variances --
+             applies saturation values.
+
+     FINDCENT: Centroids NDF image features.
+
+     FINDOBJ: Locates and centroids NDF image features.
+
+     FINDOFF: Performs pattern-matching between position lists related 
+              by simple offsets.
+
+     FLATCOR: Performs the flatfield correction on a list of NDFs.
+
+     IDICURS: Reads co-ordinates from an X display (allows zooming 
+              and panning).
+
+     IMPORT: Imports FITS information into NDFs.
+
+     MAKEBIAS: Produces a bias calibration NDF.
+
+     MAKECAL: Produces calibration NDFs for flash or dark counts.
+
+     MAKEFLAT: Produces a flatfield NDF.
+
+     MAKEMOS: Makes NDF mosaics by combining and (optionally) normalising.
+
+     PAIRNDF: Displays and manipulates NDF pairs to allow easy registration 
+              (offsets only).
+
+     PLOTLIST: Draws position markers on a graphics display.
+
+     PRESENT: Presents a list of NDFs to CCDPACK.
+
+     REDUCE: Automatic CCD data reduction facility (command-line version).
+
+     REGISTER: Determines transformations between lists of positions.
+
+     SCHEDULE: Schedules an automated CCDPACK reduction.
+
+     TRANLIST: Transforms lists of positions.
+
+     TRANNDF: Transforms (resamples) NDFs.
+
+     XREDUCE: Starts the automated CCD data reduction GUI.
+
+.endhelp

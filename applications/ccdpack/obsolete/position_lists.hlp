@@ -1,0 +1,43 @@
+.help position_lists Starlink ccdpack
+.nf
+ The positions of objects are stored in ordinary text files which are
+ referred to as position lists. The format of these lists is flexible.
+ Usually position lists have three columns:
+
+     Identifier    X-position    Y-position
+
+ these may be separated by commas or white space. The identifier is
+ an integer value which is used to identify positions which are the
+ related (i.e. of the same object on different frames) in different
+ lists.
+
+ If more than three columns exist then only the first three are used.
+
+ If only two columns exist it is assumed that they are
+
+     X-position   Y-position
+
+ such lists may be produced by KAPPA applications. In applications
+ which rely on a knowledge of the identifiers these are assumed to be
+ monotonically increasing from one in the first row.
+
+ Comments are allowed in position lists using the character "#".
+ In-line and whole-line comments are allowed.
+
+ Usually position lists are "associated" with NDFs. What is means is
+ that when a position list is created a record of its name is kept
+ in the extension of the NDF. It is then usual to refer to the NDF
+ instead of the position list when the position list is to be
+ accessed. Applications which create new position lists (from old
+ ones) associate the new position lists with the appropriate NDF.
+ Using this method avoids any confusion about the relationship of
+ position lists and NDFs, which is vital when determining the
+ registration of many NDFs at one go. It also allows the use of
+ the wildcarding properties of NDF names when accessing position
+ lists.
+
+ Position lists may be associated with NDFs using the CCDEDIT
+ routine. It is also possible to disable associations using the
+ NDFNAMES global parameter (CCDSETUP).
+
+.endhelp

@@ -1,0 +1,249 @@
+.help makeflat Starlink ccdpack
+.nf
+Produces a flatfield calibration NDF.
+
+Usage:
+
+   makeflat in out method { alpha=?
+                          { sigmas=?
+                          { sigmas=? niter=?
+                          { min=? max=?
+
+Description:
+
+   This routine combines a set of frames into a flatfield. The
+   input data should be of a photometrically flat source, and
+   should be corrected for any instrumental effects. The output
+   calibration frame is normalised to have an average value of one.
+
+   The input data are filtered in an attempt to remove any small
+   blemishes etc. before combination.  This is achieved by smoothing
+   using a boxfilter and then comparing with the original data. An
+   estimate of the standard deviation of each pixel from its
+   surroundings is made. Pixels deviating by more than GAMMA
+   standard deviations are rejected. This procedure is then
+   iterated ITER times. In this way, all image features with a
+   scale size comparable with, or smaller than, the smoothing area
+   size are rejected.
+
+Parameters:
+
+ALPHA = _REAL (Read)
+   The fraction of extreme values to remove before combining
+   the data at any pixel. This fraction is removed from each
+   extreme so can only take a value in the range 0 to 0.5.
+   Only used if METHOD="TRIMMED"
+   [0.2]
+BOXSIZE(2) = _INTEGER (Read)
+   The X and Y sizes (in pixels) of the rectangular box to be
+   applied to smooth the input images. If only a single value is
+   given, then it will be duplicated so that a square filter is
+   used. The values given will be rounded up to positive odd
+   integers if necessary. The values should be adjusted to be
+   larger than the size of any expected defects.
+   [15,15]
+CLEAN = _LOGICAL (Read)
+   Whether or not to attempt to clean the input images of any
+   defects. For some data types (i.e. spectra) small scale
+   strutures and sharp edges may be real and can be protected
+   against removal by setting this parameter FALSE.
+   [TRUE]
+GAMMA = _REAL (Read)
+   The number of standard deviations by which a value has to
+   deviate from the local mean (defined by the mean within a box
+   of BOXSIZE(1) by BOXSIZE(2) pixels) before it is considered to
+   be in error. Aberrant pixels are removed from the data before
+   the next "cleaning" iteration is performed.
+   [3.0]
+IN = LITERAL (Read)
+   A list NDF names. These contain the flatfield data.  The NDF
+   names should be separated by commas and may include wildcards.
+ITER = _INTEGER (Read)
+   The number of defect rejecting iterations.
+   [3]
+KEEPIN = _LOGICAL (Read)
+   Whether to keep (i.e. not delete) the input NDFs or
+   not. Deleting the input NDFs has the advantage of saving disk
+   space, but should probably only be used if this program is part
+   of a sequence of commands and the intermediary data used by
+   it are not important.
+
+   The default for this parameter is TRUE and this cannot be
+   overridden except by assignment on the command line or in
+   response to a forced prompt.
+   [TRUE]
+LOGFILE = FILENAME (Read)
+   Name of the CCDPACK logfile.  If a null (!) value is given for
+   this parameter then no logfile will be written, regardless of
+   the value of the LOGTO parameter.
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "CCDPACK.LOG".
+   [CCDPACK.LOG]
+LOGTO = LITERAL (Read)
+   Every CCDPACK application has the ability to log its output
+   for future reference as well as for display on the terminal.
+   This parameter controls this process, and may be set to any
+   unique abbreviation of the following:
+
+      -  TERMINAL  -- Send output to the terminal only
+
+      -  LOGFILE   -- Send output to the logfile only (see the
+                      LOGFILE parameter)
+
+      -  BOTH      -- Send output to both the terminal and the
+                      logfile
+
+      -  NEITHER   -- Produce no output at all
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "BOTH".
+   [BOTH]
+MAX = _REAL (Read)
+   If METHOD = "THRESH" then this value defines the upper limit
+   for values which can be used when combining the data. This
+   limit applies to the output data range.
+METHOD = LITERAL (Read)
+   The method to be used to combine the data components of
+   the input NDFs. This may be set to any unique abbreviation of
+   the following:
+
+      -  MEAN      -- Mean of the input data values
+
+      -  MEDIAN    -- Median of the input data values
+
+      -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
+                      alpha of the values are removed from
+                      each extreme
+
+      -  MODE      -- An iteratively "sigma clipped" mean which
+                      approximates to the modal value
+
+      -  SIGMA     -- A sigma clipped mean
+
+      -  THRESHOLD -- Mean with values above and below given
+                      limits removed
+
+      -  MINMAX    -- Mean with the highest and lowest values
+                      removed
+
+      -  BROADENED -- A broadened median (the mean of a small
+                      number of central values)
+   [MEDIAN]
+MIN = _REAL (Read)
+   If METHOD = "THRESH" then this value defines the lower limit
+   for values which can be used when combining the data. This
+   limit applies to the output data range.
+MINPIX = _INTEGER (Read)
+   The minimum number of good (ie. not BAD) pixels required which
+   are required to contribute to the value of an output pixel.
+   Output pixels not meeting this requirement are set BAD.
+   [1]
+NITER = _INTEGER (Read)
+   The number of refining iterations performed if METHOD = "MODE".
+   [7]
+OUT = LITERAL (Write)
+   Name of an NDF to contain the output flatfield data. Note this
+   NDF will have a precision of at least _REAL. This name may be
+   specified using indirection through a file.
+SIGMAS = _REAL (Read)
+   Number of standard deviations to reject data at. Used for
+   "MODE" and "SIGMA" methods. For METHOD = "MODE" the standard
+   deviation is estimated from the population of values.
+   For METHOD = "SIGMA" this value is the pixel variance it one
+   exists, otherwise it is the inverse of the mean data value.
+   [4.0]
+TITLE = LITERAL (Read)
+   Title for the output NDF.
+   [Output from MAKEFLAT]
+
+Examples
+
+makeflat in='"f1,f2,f3,f4,f5"' method=median out=mflat
+   This forms a master flat field from NDFs f1 to f5. The input
+   data are first cleaned using the default values for the GAMMA
+   and ITER parameters. The combination mode chosen is the
+   median.  The output NDF is mflat. Note the quotes when
+   entering a comma separated list on the command line.
+
+makeflat in=^flat_frames.lis out=master_flat
+   In this example the list of NDFs is read from the file
+   flat_frames.lis. This file may contain indirection to other files
+   up to a depth of 7.
+
+makeflat in='flatr/*' out='flatr/master_flat' gamma=2.5 iter=5
+   In this example all the NDFs in the subdirectory bias/ are
+   used. The input data are severely cleaned using a noise cut
+   of 2.5 standard deviations (current) and 5 iterations. Such
+   severe cleaning is only recommended when many input frames
+   are given, if this is not the case then BAD areas may be seen
+   in the output NDF.
+makeflat in='ff*' out=master_flat gamma=10 iter=1
+   In this example all the frames "ff*" are combined into a master
+   flatfield. Defect rejection is still performed but with 
+   gamma set so high and by performing only one iteration 
+   almost no bad data will be detected.
+
+
+Notes
+
+- The data input into this routine should have bias strip
+  regions and any badly vignetted parts removed.
+
+Behaviour_of_parameters
+
+   Most parameters retain their current value as default. The
+   "current" value is the value assigned on the last run of the
+   application. If the application has not been run then the
+   "intrinsic" defaults, as shown in the parameter help, apply.
+   The exceptions to this rule are:
+
+      - TITLE   -- always "Output from MAKEFLAT"
+
+      - KEEPIN  -- always TRUE
+
+   Retaining parameter values has the advantage of allowing you to
+   define the default behaviour of the application but does mean
+   that additional care needs to be taken when using the application
+   on new datasets/different devices, or after a break of sometime.
+   The intrinsic default behaviour of the application may be
+   restored by using the RESET keyword on the command line.
+
+   Certain parameters (LOGTO and LOGFILE) have global values. These
+   global values will always take precedence, except when an
+   assignment is made on the command line.  Global values may be set
+   and reset using the CCDSETUP and CCDCLEAR commands.
+
+Authors
+
+PDRAPER: Peter Draper (STARLINK)
+
+History
+
+ 7-MAY-1991 (PDRAPER):
+    Original version.
+
+ 5-JUL-1993 (PDRAPER):
+    Made some workspace dynamic.
+
+ 2-FEB-1994 (PDRAPER):
+    Added ability to delete input files.
+
+ 12-SEP-1995 (PDRAPER):
+    Added KEEPIN.
+
+ 6-OCT-1995 (PDRAPER):
+    Updated to CCDPACK 2.0.
+
+Implementation_Status
+
+   - The routine supports BAD pixels and all data types except
+     COMPLEX.  All combinational arithmetic is performed using
+     floating point.  The AXIS, TITLE and QUALITY components are
+     correctly propagated. The output is a ratio so the units are set
+     to blank. The variances are propagated through the combination
+     processing, assuming that the input data have a normal
+     distribution.
+.endhelp

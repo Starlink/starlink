@@ -1,0 +1,304 @@
+.help findoff Starlink ccdpack
+.nf
+Performs pattern-matching between position lists related by
+simple offsets.
+
+Usage:
+
+   findoff inlist error outlist
+
+Description:
+
+   This routine is designed to determine which positions in many
+   unaligned and unlabeled lists match, subject to the condition
+   that the transformations between the lists are well modelled by
+   simple translations.
+
+   The results from this routine are labelled position lists (one
+   for each input list) which may be used to complete image
+   registration using the REGISTER routine. The estimated offsets are
+   also reported.
+
+Parameters:
+
+COMPLETE = _DOUBLE (Read)
+   A completeness threshold for rejecting matched position
+   list pairs. A completeness factor is estimated by counting the
+   number of objects in the overlap region of two lists, taking
+   the minimum of these two values (this adjusts for
+   incompleteness due to a different object detection threshold)
+   and comparing this with the number of objects actually
+   matched. Ideally a completeness of 1 should be found, the lower
+   this value the lower the quality of the match.
+   [0.5]
+ERROR = _DOUBLE (Read)
+   The error in the X and Y positions. This value is used to
+   determine which positions match within an error box (SLOW) or
+   as a bin size (FAST). An inaccurate value may result in
+   excessive false or null matches.
+   [1.0]
+FAILSAFE = _LOGICAL (Read)
+   If FAST is TRUE then this parameter indicates whether the SLOW
+   algorithm is to be used when FAST fails.
+   [TRUE]
+FAST = _LOGICAL (Read)
+   If TRUE then the FAST matching algorithm is used, otherwise
+   just the SLOW algorithm is used.
+   [TRUE]
+INLIST = LITERAL (Read)
+   This parameter is used to access the names of the lists
+   which contain the positions and, if NDFNAMES is TRUE, the names
+   of the associated NDFs. If NDFNAMES is TRUE the names of the
+   position lists are assumed to be stored in the extension of the
+   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the NDFs themselves should be given in response (and may
+   include wildcards).
+
+   If NDFNAMES is FALSE then the actual names of the position
+   lists should be given. These may not use wildcards but may be
+   specified using indirection (other CCDPACK position list
+   processing routines will write the names of their results file
+   into files suitable for use in this manner) the indirection
+   character is "^".
+LOGFILE = FILENAME (Read)
+   Name of the CCDPACK logfile.  If a null (!) value is given for
+   this parameter then no logfile will be written, regardless of
+   the value of the LOGTO parameter.
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "CCDPACK.LOG".
+   [CCDPACK.LOG]
+LOGTO = LITERAL (Read)
+   Every CCDPACK application has the ability to log its output
+   for future reference as well as for display on the terminal.
+   This parameter controls this process, and may be set to any
+   unique abbreviation of the following:
+
+      -  TERMINAL  -- Send output to the terminal only
+
+      -  LOGFILE   -- Send output to the logfile only (see the
+                      LOGFILE parameter)
+
+      -  BOTH      -- Send output to both the terminal and the
+                      logfile
+
+      -  NEITHER   -- Produce no output at all
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "BOTH".
+   [BOTH]
+MINMATCH = _INTEGER (Read)
+   This parameter specifies the minimum number of positions
+   which must be matched for a comparison of two lists to be
+   deemed successful. This must be greater than 2.
+   [3]
+MINSEP = _DOUBLE (Read)
+   Positions which are very close may cause false matches by being
+   within the error box of other positions. The value of this
+   parameter controls how close objects may be before they are
+   both rejected (this occurs before pattern-matching).
+   [Dynamic -- 5.0*ERROR]
+NAMELIST = LITERAL (Read)
+   The name of a file to contain the names of the output
+   position lists. The names written to this file are those
+   generated using the expression given to the OUTLIST parameter.
+   This file may be used in an indirection expression to input
+   all the position lists output from this routine into another
+   routine (say REGISTER), if the associating position lists with
+   NDFs option is not being used.
+   [FINDOFF.LIS]
+NDFNAMES = _LOGICAL (Read)
+   If TRUE then the routine will assume that the names of the
+   position lists are stored in the NDF CCDPACK extensions under
+   the item "CURRENT_LIST". The names will be present in the
+   extension if the positions were located using a CCDPACK
+   application (such as FINDOBJ). Using this facility allows the
+   transparent propagation of position lists through processing
+   chains.
+
+   If a global value for this parameter has been set using
+   CCDSETUP then that value will be used.
+   [TRUE]
+OUTLIST = FILENAME (Write)
+   A list of names specifying the result files. These contain
+   labelled positions which can be used in registration.
+   The names of the lists may use modifications of the
+   input names (NDF names if available otherwise the names of the
+   position lists). So if you want to call the output lists
+   the same name as the input NDFs except to add a type use.
+
+      OUTLIST > *.find
+
+   If no NDF names are given (NDFNAMES is FALSE) then if you want
+   to change the extension of the files (from ".find" to ".off"
+   in this case) use
+
+      OUTLIST > *|find|off|
+
+   Or alternatively you can use an explicit list of names.
+   These may use indirection elements as well as names separated
+   by commas.
+   [*]
+USECOMP = LOGICAL (Read)
+   This parameter specifies whether the completeness value will
+   be used to weight the number of matches between a pair, when
+   determining the graph connecting all input datasets. Using
+   a completeness weight increases the chance of selecting high
+   quality matches, but may reduce the chance of selecting matches
+   with the highest counts in favour of those with lower counts.
+   [TRUE]
+
+Examples
+
+findoff inlist='*' error=1 outlist='*.off'
+   In this example all the NDFs in the current directory are
+   accessed and their associated position lists are used. The
+   matched positions are named *.off. The method used is to try
+   the FAST algorithm, switching to SLOW if FAST fails. The
+   completeness measure is used when forming the spanning tree.
+   Matches with completenesses less than 0.5 and with less than
+   three positions are rejected.
+
+findoff fast nofailsafe
+   In this example the only the FAST algorithm is used.
+
+findoff usecomp=false
+   In this example the completeness factor is derived but not used
+   to weight the edges of the spanning tree.
+
+findoff error=0.002 minsep=0.008
+   In this example very precise measurements (or small units)
+   are being used. The intrinsic error in the measurements is
+   around 0.002 and positions within a box 0.008 of each other are
+   rejected.
+
+Notes
+
+- Position list formats.
+
+  CCDPACK supports data in two formats.
+
+  CCDPACK format - the first three columns are interpreted as the
+  following.
+
+     - Column 1: an integer identifier
+
+     - Column 2: the X position
+
+     - Column 3: the Y position
+
+  The column one value must be an integer and is used to identify
+  positions which are the same but which have different locations
+  on different images. Values in any other (trailing) columns are
+  usually ignored.
+
+  EXTERNAL format - positions are specified using just an X
+  and a Y entry and no other entries.
+
+     - Column 1: the X position
+
+     - Column 2: the Y position
+
+  This format is used by KAPPA applications such as CURSOR.
+
+  Comments may be included in a file using the characters "#" and
+  "!". Columns may be separated by the use of commas or spaces.
+
+- NDF extension items.
+
+  If NDFNAMEs is TRUE then the names of the input position lists
+  will be gotten from the item "CURRENT_LIST" of the CCDPACK
+  extension of the input NDFs. On exit this item will be updated
+  to contain the name of the appropriate output lists.
+
+Notes_on_Algorithms
+
+   The pattern-matching process uses two algorithms, one which
+   matches all the point pair-offsets between any two input lists,
+   looking for the matches with the most common positions, and one
+   which uses a statistical method based on a histogram of the
+   differences in the offsets (where the peak in the histogram is
+   assumed the most likely difference). In each case an estimate of
+   the positional error must be given as it is used when deciding
+   which positions match (given an offset) or is used as the bin
+   size when forming histograms.
+
+   Which algorithm you should use depends on the number of points
+   your positions lists contain and the expected size of the overlaps
+   between the datasets. Obviously it is much easier to detect two
+   lists with most of their positions in common. With small overlaps
+   a serious concern is the likelihood of finding a `false' match.
+   False matches must be more likely the larger the datasets and the
+   smaller the overlap.
+
+   The first algorithm (referred to as SLOW) is more careful and is
+   capable of selecting out positions when small overlaps in the
+   data are present (although a level of false detections will
+   always be present) but the process is inherently slow (scaling as
+   n**3log2(n)).  The second algorithm (referred to as FAST) is an
+   n*n process so is much quicker, but requires much better
+   overlapping.
+
+   Because the FAST process takes so little CPU time it is better to
+   try this first (without the SLOW process as a backup), only use
+   the SLOW algorithm when you have small datasets and do not
+   expect large areas (numbers of positions) of overlap.
+
+   The global registration process works by forming a graph with
+   each position list at a node and with connecting edges of weight
+   the number of matched position-pairs. The edge weights may be
+   modified by a completeness factor which attempts to assess the
+   quality of the match (this is based on the ratio of the expected
+   number of matches in the overlap region to the actual number,
+   random matches shouldn't return good statistics when compared
+   with genuine ones). This still leaves a possibility of false
+   matches disrupting any attempt to register the datasets so a
+   single "spanning tree" is chosen (this is a graph which just
+   visits each node the minimum number of times required to get
+   complete connectivity, no loops allowed) which has the highest
+   possible number of matched positions (rejecting edges with few
+   matched positions/low completenesses where possible). This gives
+   a most likely solution to the offsets between the position lists,
+   rather than the "best" solution which could well include false
+   matches; compare this solution with a median as opposed to a
+   mean. The final registration is then used to identify all the
+   objects which are the same in all datasets (using a relaxation
+   method), resulting in labelled position lists which are output
+   for use by REGISTER.
+
+Behaviour_of_parameters
+
+   Most parameters retain their current value as default. The
+   "current" value is the value assigned on the last run of the
+   application. If the application has not been run then the
+   "intrinsic" defaults, as shown in the parameter help, apply.
+
+   Retaining parameter values has the advantage of allowing you to
+   define the default behaviour of the application but does mean
+   that additional care needs to be taken when re-using the
+   application after a break of sometime. The intrinsic default
+   behaviour of the application may be restored by using the RESET
+   keyword on the command line.
+
+   Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
+   values. These global values will always take precedence, except
+   when an assignment is made on the command line.  Global values may
+   be set and reset using the CCDSETUP and CCDCLEAR commands.
+
+Authors
+
+PDRAPER: Peter Draper (STARLINK)
+
+History
+
+ 29-SEP-1992 (PDRAPER):
+    Original version.
+
+ 12-MAY-1993 (PDRAPER):
+    Added new techniques for SLOW.
+
+ 6-OCT-1995 (PDRAPER):
+    Updated for CCDPACK 2.0.
+.endhelp

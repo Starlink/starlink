@@ -1,0 +1,76 @@
+.help typical_initial_reduction Starlink ccdpack
+.nf
+ The following text displays the input to a typical reduction
+ sequence, performed using CCDPACK. Note the sequence of operations
+ and the use of single quotes to protect symbols with special meaning
+ to the shell (these are only necessary when entering values on the
+ command line). Only the lines starting a % line are meant to be typed!
+
+     Initialise package.
+     ---
+
+ % ccdpack
+
+     Clear any previous global parameters.
+     ---
+
+ % ccdclear
+  
+     Now set up the new global parameters. Set the bounds of the bias
+     strip, the nominal readout noise value (in ADUs), the nominal
+     Analogue to Digital Conversion (ADC) factor, the readout
+     direction (along the X dimension). Set the useful extent of the
+     CCD area, initialise the logfile system to write to the terminal
+     and to echo to the logfile. Set PRESERVE to keep the input data
+     type.
+     ---
+
+ % ccdsetup bounds=[323,349] rnoise=10 adc=1 direction=x \
+            extent=[4,318,3,510] logto=both logfile=ccdpack.log \
+            preserve=true reset accept
+
+     Add some notes about this run.  --- The commands after this
+     point could be entered into file and used as the input to
+     ccdfork, whose output could then be forked into a background
+     process.
+     ---
+ 
+ % ccdnote '"Example of typical CCDPACK reduction sequence"'
+
+     Make the calibration bias NDF. RESET any previous parameter
+     values back to their defaults (important in case of any
+     previously latched parameters).
+     ---
+
+ % makebias in='bias/*' out=bias/master_bias method=median reset accept
+
+     DEBIAS all the NDFs. Note using a calibration bias NDF and 
+     normalising to the bias strip.
+     ---
+
+ % debias in='"flatr/*,flatb/*,bdata/*,rdata/*"' out='*_debias' \
+          mask=mask/mask bias=bias/master_bias reset accept
+
+     Create the calibration flat fields.
+     ---
+
+ % makeflat in='flatr/*_debias' out=flatr/master_flat reset accept
+ % makeflat in='flatb/*_debias' out=flatb/master_flat reset accept
+
+     Flat field the appropriate frames.
+     ---
+
+ % flatcor in='rdata/*_debias' out='rdata/*|debias|flattened|' \
+           flat=flatr/master_flat reset accept
+ % flatcor in='bdata/*_debias' out='bdata/*|debias|flattened|' \
+           flat=flatb/master_flat reset accept
+
+  
+ If dark counts or pre-flash frames need processing, then they should
+ be debiassed and made into calibration masters using MAKECAL. The
+ calibration frame should then be (appropriately) subtracted from all 
+ frames before producing the flatfields and performing flatfield
+ correction.
+
+! $Id$
+.endhelp
