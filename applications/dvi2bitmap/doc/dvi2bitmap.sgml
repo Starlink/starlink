@@ -71,8 +71,12 @@ Bugfix release.
 Explained how to set DVI2BITMAP_PK_PATH automatically.
 </change>
 
-<distribution string="0.9-3" date='12-Jun-2000' author=ng versionid='v0-9-3'>
+<distribution string="0.9-3" date='21-Jun-2000' author=ng versionid='v0-9-3'>
 Mostly clarifying and amplifying explanations.</distribution>
+
+<distribution string="0.9-4" date="23-Jun-2000" author="ng" versionid="v0-9-4">
+Adjustments to distribution -- no functionality change.
+</distribution>
 
 </history>
 
@@ -808,6 +812,8 @@ just a driver for the Makefile within the tar file, you should get the
 same results both ways.
 
 <subsect id=install.starlink export>Starlink nodes
+<update versionid=v0-9-4>Added a note discussing the <code/export_run>
+distribution bundle, and possible problems with it.</update>
 
 <p>If you are on a Starlink node, then you
 should be able to use the usual <code/mk> script.  Define the
@@ -825,15 +831,24 @@ give the commands
 is not distributed with this package and not present by default on all
 project machines).
 
-<p>There are some issues involved in creating an <code/export_run>
-distribution.  Part of the configuration of <code/dvi2bitmap> involves
-establishing the location of font-building scripts and TeX
-configuration files.  This means that <code/export_run> distributions
-must be configured at <em/installation> time, rather than at build
-time; that probably requires either configuration files or lots of
-environment variables, and is almost certainly a bit of a mess.  This
-hasn't been properly confronted, yet, and I do <em/not> recommend
-<code/export_run> distributions at present.
+<p>There are some issues involved in creating, and hence in
+installing, an <code/export_run> distribution.  Part of the
+configuration of <code/dvi2bitmap> involves establishing the location,
+on the build system, of font-building scripts and TeX configuration
+files.  However, the point of the <code/export_run> distributions is
+that it should run on systems <em/other> than the build system.  We
+deal with this by (a) configuring <code/dvi2bitmap> to use a custom
+font-building script, which is distributed and installed with the
+package, and which is simply an interface to whichever of the real
+font-builders is available on the target system, and (b) configuring
+it with <code/--disable-texmfcnf>.  The former should be OK as long as
+one of <code/mktexpk> and <code/MakeTeXPK> is in the path after
+installation.  The latter, however will cause a problem if
+<code/kpathsea> is enabled (which may or may not be the case for the
+<code/export_run> system), since this will probably <em/fail> unless
+the environment variable <code/TEXMFCNF> is defined (see
+<kbd/kpsewhich cnf texmf.cnf>).  You can see what features are enabled
+with the command <kbd/dvi2bitmap -V>.
 
 <subsect id=install.nonstarlink export>General installation and configuration
 <update versionid="upd1">
