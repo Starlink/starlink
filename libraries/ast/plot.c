@@ -247,6 +247,8 @@ f     using AST_GRID
 *        violations on some systems.
 *     16-JUL-1999 (DSB):
 *        Fixed memory leaks in EdgeCrossings and EdgeLabels.
+*     16-SEP-1999 (DSB):
+*        Avoid writing out clipping limits if they are undefined.
 *class--
 */
 
@@ -18244,11 +18246,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* The lower bounds of the clipping volume. */
       for( axis = 0; axis < this->clip_axes; axis++ ){
          (void) sprintf( buff, "ClpLb%d", axis + 1 );
-         if( this->clip_lbnd ){
+         if( this->clip_lbnd && (this->clip_lbnd)[ axis ] != AST__BAD ){
             astWriteDouble( channel, buff, 1, 0, (this->clip_lbnd)[ axis ], 
-                            "Lower bound of clipping region" );
-         } else {
-            astWriteDouble( channel, buff, 0, 0, -DBL_MAX, 
                             "Lower bound of clipping region" );
          }
       }
@@ -18256,13 +18255,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* The upper bounds of the clipping volume. */
       for( axis = 0; axis < this->clip_axes; axis++ ){
          (void) sprintf( buff, "ClpUb%d", axis + 1 );
-         if( this->clip_ubnd ){
+         if( this->clip_ubnd && (this->clip_ubnd)[ axis ] != AST__BAD ){
             astWriteDouble( channel, buff, 1, 0, (this->clip_ubnd)[ axis ], 
                             "Upper bound of clipping region" );
-         } else {
-            astWriteDouble( channel, buff, 0, 0, DBL_MAX, 
-                            "Upper bound of clipping region" );
-         }
+         } 
       }
 
 /* The number of bounds supplied for the clipping volume. */
@@ -19232,13 +19228,15 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
             new->clip_lbnd = (double *) astFree( (void *) new->clip_lbnd );
             new->clip_ubnd = (double *) astFree( (void *) new->clip_ubnd );
 
-/* Otherwise, store the bounds. */
+/* Otherwise, store the bounds. Use extreme defaults if no values are
+   available. */
          } else {
             for( axis = 0; axis < new->clip_axes; axis++ ){
                (void) sprintf( buff, "clplb%d", axis + 1 );
-               new->clip_lbnd[ axis ] = astReadDouble( channel, buff, DBL_MIN );
+               new->clip_lbnd[ axis ] = astReadDouble( channel, buff, -DBL_MAX );
+
                (void) sprintf( buff, "clpub%d", axis + 1 );
-               new->clip_ubnd[ axis ] = astReadDouble( channel, buff, DBL_MIN );
+               new->clip_ubnd[ axis ] = astReadDouble( channel, buff, DBL_MAX );
             }
          }
 

@@ -43,7 +43,7 @@ f     used using AST_INTRAREG before creating an IntraMap.
 *     In addition to those attributes common to all Mappings, every
 *     IntraMap also has the following attributes:
 *
-*     - IntraID: IntraMap identification string
+*     - IntraFlag: IntraMap identification string
 
 *  Functions:
 c     The IntraMap class does not define any new functions beyond those
@@ -150,19 +150,19 @@ void astIntraRegFor_( const char *, int, int, void (* tran)( AstMapping *, int, 
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static char *CleanName( const char *, const char * );
 static const char *GetAttrib( AstObject *, const char * );
-static const char *GetIntraID( AstIntraMap * );
+static const char *GetIntraFlag( AstIntraMap * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
-static int TestIntraID( AstIntraMap * );
+static int TestIntraFlag( AstIntraMap * );
 static void ClearAttrib( AstObject *, const char * );
-static void ClearIntraID( AstIntraMap * );
+static void ClearIntraFlag( AstIntraMap * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void InitVtab( AstIntraMapVtab * );
 static void IntraReg( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
 static void SetAttrib( AstObject *, const char * );
-static void SetIntraID( AstIntraMap *, const char * );
+static void SetIntraFlag( AstIntraMap *, const char * );
 static void TranWrap( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] );
 
 /* Member functions. */
@@ -296,10 +296,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Check the attribute name and clear the appropriate attribute. */
 
-/* IntraID. */
-/* -------- */
-   if ( !strcmp( attrib, "intraid" ) ) {
-      astClearIntraID( this );
+/* IntraFlag. */
+/* ---------- */
+   if ( !strcmp( attrib, "intraflag" ) ) {
+      astClearIntraFlag( this );
 
 /* Not recognised. */
 /* --------------- */
@@ -375,10 +375,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    the value into "buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
-/* IntraID. */
-/* -------- */
-   if ( !strcmp( attrib, "intraid" ) ) {
-      result = astGetIntraID( this );
+/* IntraFlag. */
+/* ---------- */
+   if ( !strcmp( attrib, "intraflag" ) ) {
+      result = astGetIntraFlag( this );
 
 /* Not recognised. */
 /* --------------- */
@@ -437,10 +437,10 @@ static void InitVtab( AstIntraMapVtab *vtab ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
-   vtab->ClearIntraID = ClearIntraID;
-   vtab->GetIntraID = GetIntraID;
-   vtab->SetIntraID = SetIntraID;
-   vtab->TestIntraID = TestIntraID;
+   vtab->ClearIntraFlag = ClearIntraFlag;
+   vtab->GetIntraFlag = GetIntraFlag;
+   vtab->SetIntraFlag = SetIntraFlag;
+   vtab->TestIntraFlag = TestIntraFlag;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -1239,10 +1239,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          intramap2 = (AstIntraMap *) ( *map_list )[ imap2 ];
 
 /* Check that the two IntraMaps use the same transformation function
-   and have the same IntraID string (if set). */
+   and have the same IntraFlag string (if set). */
          if ( ( intramap1->ifun == intramap2->ifun ) &&
-              !strcmp( intramap1->intra_id ? intramap1->intra_id : "",
-                       intramap2->intra_id ? intramap2->intra_id : "" ) ) {
+              !strcmp( intramap1->intraflag ? intramap1->intraflag : "",
+                       intramap2->intraflag ? intramap2->intraflag : "" ) ) {
 
 /* Determine the number of input coordinates that the first IntraMap
    would have if its Invert attribute were set to the value of the
@@ -1372,7 +1372,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Vaiables: */
    AstIntraMap *this;            /* Pointer to the IntraMap structure */
-   int intra_id;                 /* Offset of IntraID value in string */
+   int intraflag;                /* Offset of IntraFlag value in string */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by sscanf */
 
@@ -1391,12 +1391,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    that the entire string was matched. Once a value has been obtained, use the
    appropriate method to set it. */
 
-/* IntraID. */
-/* -------- */
+/* IntraFlag. */
+/* ---------- */
    if ( nc = 0,
-        ( 0 == sscanf( setting, "intraid=%n%*[^\n]%n", &intra_id, &nc ) )
+        ( 0 == sscanf( setting, "intraflag=%n%*[^\n]%n", &intraflag, &nc ) )
         && ( nc >= len ) ) {
-      astSetIntraID( this, setting + intra_id );
+      astSetIntraFlag( this, setting + intraflag );
 
 /* Not recognised. */
 /* --------------- */
@@ -1461,10 +1461,10 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Check the attribute name and test the appropriate attribute. */
 
-/* IntraID. */
-/* -------- */
-   if ( !strcmp( attrib, "intraid" ) ) {
-      result = astTestIntraID( this );
+/* IntraFlag. */
+/* ---------- */
+   if ( !strcmp( attrib, "intraflag" ) ) {
+      result = astTestIntraFlag( this );
 
 /* Not recognised. */
 /* --------------- */
@@ -1721,7 +1721,7 @@ static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
 /*
 *att++
 *  Name:
-*     IntraID
+*     IntraFlag
 
 *  Purpose:
 *     IntraMap identification string.
@@ -1733,33 +1733,67 @@ static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
 *     String.
 
 *  Description:
-*     This attribute allows an IntraMap to be tagged so that it is
-*     distinguishable from other IntraMaps.
+c     This attribute allows an IntraMap to be flagged so that it is
+c     distinguishable from other IntraMaps. The transformation function
+c     associated with the IntraMap may then enquire the value of this
+c     attribute and adapt the transformation it provides according to the
+c     particular IntraMap involved.
+f     This attribute allows an IntraMap to be flagged so that it is
+f     distinguishable from other IntraMaps. The transformation routine
+f     associated with the IntraMap may then enquire the value of this
+f     attribute and adapt the transformation it provides according to the
+f     particular IntraMap involved.
+*
+c     Although this is a string attribute, it may often be useful to store
+c     numerical values here, encoded as a character string, and to use these
+c     as data within the transformation function. Note, however, that this
+c     mechanism is not suitable for transferring large amounts of data (more
+c     than about 1000 characters) to an IntraMap. For that purpose, global
+c     variables are recommended, although the IntraFlag value can be used to
+c     supplement this approach. The default IntraFlag value is an empty
+c     string.
+f     Although this is a string attribute, it may often be useful to store
+f     numerical values here, encoded as a character string, and to use these
+f     as data within the transformation routine. Note, however, that this
+f     mechanism is not suitable for transferring large amounts of data (more
+f     than about 1000 characters) to an IntraMap. For that purpose, global
+f     variables are recommended, although the IntraFlag value can be used to
+f     supplement this approach. The default IntraFlag value is an empty
+f     string.
 
 *  Applicability:
 *     IntraMap
 *        All IntraMaps have this attribute.
 
 *  Notes:
-*     - A pair of IntraMaps cannot be simplified (e.g. using astSimplify)
-*     unless they have identical IntraID values.
+c     - A pair of IntraMaps whose transformations may potentially cancel
+c     cannot be simplified to produce a UnitMap (e.g. using astSimplify)
+c     unless they have the same IntraFlag values. The test for equality is
+c     case-sensitive.
+f     - A pair of IntraMaps whose transformations may potentially cancel
+f     cannot be simplified to produce a UnitMap (e.g. using AST_SIMPLIFY)
+f     unless they have the same IntraFlag values. The test for equality is
+f     case-sensitive.
 *att--
 */
-/* Clear the IntraID value by freeing the allocated memory and
+
+/* Clear the IntraFlag value by freeing the allocated memory and
    assigning a NULL pointer. */
-astMAKE_CLEAR(IntraMap,IntraID,intra_id,astFree( this->intra_id ))
+astMAKE_CLEAR(IntraMap,IntraFlag,intraflag,astFree( this->intraflag ))
 
-/* Return a pointer to the IntraID value. */
-astMAKE_GET(IntraMap,IntraID,const char *,NULL,this->intra_id)
+/* Return a pointer to the IntraFlag value. */
+astMAKE_GET(IntraMap,IntraFlag,const char *,NULL,this->intraflag)
 
-/* Set a IntraID value by freeing any previously allocated memory, allocating
-   new memory, storing the string and saving the pointer to the copy. */
-astMAKE_SET(IntraMap,IntraID,const char *,intra_id,astStore( this->intra_id,
-                                                             value,
-                                                strlen( value ) + (size_t) 1 ))
+/* Set a IntraFlag value by freeing any previously allocated memory,
+   allocating new memory, storing the string and saving the pointer to
+   the copy. */
+astMAKE_SET(IntraMap,IntraFlag,const char *,intraflag,astStore(
+                                                      this->intraflag, value,
+                                                      strlen( value ) +
+                                                      (size_t) 1 ))
 
-/* The IntraID value is set if the pointer to it is not NULL. */
-astMAKE_TEST(IntraMap,IntraID,( this->intra_id != NULL ))
+/* The IntraFlag value is set if the pointer to it is not NULL. */
+astMAKE_TEST(IntraMap,IntraFlag,( this->intraflag != NULL ))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -1803,16 +1837,17 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* For safety, first clear any references to the input memory from
    the output IntraMap. */
-   out->intra_id = NULL;
+   out->intraflag = NULL;
 
 /* If necessary, allocate memory in the output IntraMap and store a
-   copy of the input IntraID string. */
-   if ( in->intra_id ) out->intra_id = astStore( NULL, in->intra_id,
-                                         strlen( in->intra_id ) + (size_t) 1 );
+   copy of the input IntraFlag string. */
+   if ( in->intraflag ) out->intraflag = astStore( NULL, in->intraflag,
+                                                   strlen( in->intraflag ) +
+                                                   (size_t) 1 );
 
 /* If an error occurred, free any allocated memory. */
    if ( !astOK ) {
-      out->intra_id = astFree( out->intra_id );
+      out->intraflag = astFree( out->intraflag );
    }
 }
 
@@ -1850,8 +1885,8 @@ static void Delete( AstObject *obj ) {
 /* Obtain a pointer to the IntraMap structure. */
    this = (AstIntraMap *) obj;
 
-/* Free the memory used for the IntraID string if necessary. */
-   this->intra_id = astFree( this->intra_id );
+/* Free the memory used for the IntraFlag string if necessary. */
+   this->intraflag = astFree( this->intraflag );
 }
 
 /* Dump function. */
@@ -1901,11 +1936,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    astWriteString( channel, "Fname", 1, 1, tran_data[ this->ifun ].name,
                    "Name of transformation function" );
 
-/* IntraID string. */
-/* --------------- */
-   set = TestIntraID( this );
-   sval = set ? GetIntraID( this ) : astGetIntraID( this );
-   astWriteString( channel, "ID", set, 0, sval,
+/* IntraFlag string. */
+/* ----------------- */
+   set = TestIntraFlag( this );
+   sval = set ? GetIntraFlag( this ) : astGetIntraFlag( this );
+   astWriteString( channel, "Iflag", set, 0, sval,
                    "IntraMap identification string" );
 
 /* Purpose string. */
@@ -2302,8 +2337,8 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 
 /* Initialise the IntraMap data. */
 /* ---------------------------- */
-/* Initialise the IntraID string pointer. */
-               new->intra_id = NULL;
+/* Initialise the IntraFlag string pointer. */
+               new->intraflag = NULL;
 
 /* Store the index used to access the transformation function data. */
                new->ifun = ifun;
@@ -2458,9 +2493,9 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
 /* ----------------------------- */
       fname = astReadString( channel, "fname", "" );
 
-/* IntraID string. */
-/* --------------- */
-      new->intra_id = astReadString( channel, "id", NULL );
+/* IntraFlag string. */
+/* ----------------- */
+      new->intraflag = astReadString( channel, "iflag", NULL );
 
 /* Purpose string. */
 /* --------------- */
