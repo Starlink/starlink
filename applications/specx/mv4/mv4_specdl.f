@@ -34,6 +34,7 @@
 *  Authors:
 *     rp: Rachael Padman (UCB, MRAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,6 +45,8 @@
 *     01 Sep 1994 (hme):
 *        Take care that new size is not zero.
 *        Also, cannot reduce length of array before the cell is empty.
+*     16 Aug 2004 (timj):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -56,6 +59,7 @@
 
 *  Global Constants:
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'MAPV4'
@@ -70,7 +74,7 @@
 *  shorter than so far.
 *  We assume that the current shape is what is NSPEC in the memory copy
 *  of the map header.
-      CALL MV4_SPECD2( I, J, %VAL(IDXPTR) )
+      CALL MV4_SPECD2( I, J, %VAL(CNF_PVAL(IDXPTR)) )
 
 *  Return.
       END

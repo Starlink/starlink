@@ -55,6 +55,8 @@
 *        Map format 4.2
 *     21 Sep 2000 (ajc):
 *        Unused TNDF, DATPTR
+*     16 Aug 2004 (timj):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +70,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'MAPHD'
@@ -122,7 +125,8 @@
 *     Copy the data from the (I,J)-th row of the cube.
 *     Includes conversion between HDS and Specx bad values.
          IF ( STATUS .EQ. SAI__OK )
-     :      CALL MV4_SPECW2( I, J, MEMCUB, %VAL(POSPTR), INDEX(I, J))
+     :      CALL MV4_SPECW2( I, J, MEMCUB, %VAL(CNF_PVAL(POSPTR)), 
+     :        INDEX(I, J))
 
 
 

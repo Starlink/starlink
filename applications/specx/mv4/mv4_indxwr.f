@@ -24,6 +24,7 @@
 *  Authors:
 *     rp: Rachael Padman (UCB, MRAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -31,6 +32,8 @@
 *        Original version.
 *     31 Aug 1994 (hme):
 *        NDF/HDS-based sparse cube.
+*     16 Aug 2004 (timj):
+*        Add CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -43,6 +46,7 @@
 
 *  Global Constants:
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'MAPHD'
@@ -53,7 +57,7 @@
 
 *.
 
-      CALL MV4_INDXW2( MEMIDX, %VAL(IDXPTR) )
+      CALL MV4_INDXW2( MEMIDX, %VAL(CNF_PVAL(IDXPTR)) )
 
       END
 

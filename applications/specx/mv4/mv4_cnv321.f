@@ -55,6 +55,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +79,8 @@
 *        If the output file existed, the call to close it did not have
 *        the STATUS argument (DAT_ANNUL).
 *        Close output file only if it was opened properly.
+*     16 Aug 2004 (timj):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,6 +95,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'DAT_ERR'          ! Standard DAT error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'MAPV4'            ! Specx NDF-based map variables
@@ -566,13 +570,17 @@
 
 *  Read index into output file. Includes conversion to native for format
 *  before 4.0. Also includes conversion of -1000 to VAL__BADI.
-      CALL MV4_CNVIDX( OLD_VERSION, UNIT, %VAL(IDXPTR) )
+      CALL MV4_CNVIDX( OLD_VERSION, UNIT, %VAL(CNF_PVAL(IDXPTR)) )
 
 
 *  Convert data.
 *  =============
 
 *  Get a workspace to hold one spectrum as read from input.
+*  For consistency should really be using IGETVM here
+*  Note that if we switch to IGETVM we will not be able to assume
+*  that CNF_PVAL is the correct thing to use here.
+      CUBPTR = 0
       CALL PSX_MALLOC( 4*NPTS1*MSTEP*NSTEP, CUBPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          WRITE( *, * ) 'Failed to get work space for cube.'
@@ -583,7 +591,8 @@
 *  Read each input spectrum and write it to output. Includes conversion
 *  to native for format before 4.0. Also includes conversion of
 *  BADPIX_VAL to VAL__BADR.
-      CALL MV4_CNVCUB( OLD_VERSION, UNIT, %VAL(IDXPTR), %VAL(CUBPTR) )
+      CALL MV4_CNVCUB( OLD_VERSION, UNIT, %VAL(CNF_PVAL(IDXPTR)),
+     :     %VAL(CNF_PVAL(CUBPTR)) )
 
 
 *  Tidy up.

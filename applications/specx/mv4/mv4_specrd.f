@@ -43,6 +43,8 @@
 *        and reject if the index is too high. This was added
 *        because some people have maps where NSPEC is not equal
 *        to the number of spectra in the map itself!
+*     16 Aug 2004 (timj):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -56,6 +58,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'MAPHD'
@@ -92,7 +95,8 @@
 *     Copy the data into the (I,J)-th row of the cube.
 *     Includes conversion between HDS and Specx bad values.
          IF ( STATUS .EQ. SAI__OK )
-     :      CALL MV4_SPECR2( I, J, %VAL(POSPTR), MEMCUB, INDEX(I, J) )
+     :      CALL MV4_SPECR2( I, J, %VAL(CNF_PVAL(POSPTR)), MEMCUB,
+     :        INDEX(I, J) )
 
 
 *     Close Starlink error context.

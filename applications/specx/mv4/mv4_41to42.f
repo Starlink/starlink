@@ -30,6 +30,8 @@
 *  History:
 *     11 Oct 1995 (timj): 
 *         First attempt
+*     16 Aug 2004 (timj):
+*         Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -46,6 +48,7 @@
       INCLUDE 'DAT_PAR'          ! Standard DAT constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'DAT_ERR'          ! Standard ERR constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Global Variables:
 *     none
@@ -207,7 +210,8 @@
          CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ',
      :        IPTR, DUMMY, STATUS )
 *  Copy the data through the pointers
-         CALL MV4_41COPY( %VAL(PPTR), %VAL(IPTR), CNT, NUMPTS, NUMSPEC )
+         CALL MV4_41COPY( %VAL(CNF_PVAL(PPTR)), %VAL(CNF_PVAL(IPTR)), 
+     :        CNT, NUMPTS, NUMSPEC )
          CALL NDF_UNMAP( INDF, 'DATA', STATUS )
          CALL NDF_ANNUL( INDF, STATUS )
       END DO
