@@ -3,6 +3,7 @@
 #include <string.h>
 #include "sae_par.h"
 #include "merswrap.h"
+#include "msg_par.h"
 
 /* adamprint - convert a C-style print arguments to ADAM MSG output
 */
@@ -11,9 +12,9 @@ void adamprint( FILE *file, char *fmt, ... )
    va_list ap;  /* points to each unnamed arg in turn */
 
    char *p, *pstart, *sval, *fmtcpy;
-   char pfmt[10];
-   char string[80]="";
-   char tok[80];
+   char pfmt[20];
+   char string[MSG__SZMSG]="";
+   char tok[MSG__SZMSG];
    char cval;
    int ival;
    char *i, *j;
