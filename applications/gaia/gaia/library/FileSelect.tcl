@@ -79,6 +79,10 @@
 #                 30 Mar 00  added changes to add a file filter
 #                            when user just types in a directory
 #                            (which doesn't then show any files).
+#                 05 Jun 00  added catch to directory list expansion,
+#                            this blows up if a file like "~noname" is
+#                            found (a failed attempt to seek
+#                            $env(HOME)/noname is made). 
 
 itk::usual FileSelect {}
 
@@ -506,13 +510,15 @@ itcl::class util::FileSelect {
 	$fs(dirs) delete 0 end
 
 	foreach i [exec /bin/ls -a $itk_option(-dir)] {
-	    if {[file isdirectory $i]} {
-		if {$itk_option(-full)} {
+           catch {
+              if {[file isdirectory $i]} {
+                 if {$itk_option(-full)} {
 		    $fs(dirs) insert end "$itk_option(-dir)/$i"
-		} else {
+                 } else {
 		    $fs(dirs) insert end [file tail $i]
-		}
-	    }
+                 }
+              }
+           }
 	}
 
 	if {[$fs(dirs) size]} {
