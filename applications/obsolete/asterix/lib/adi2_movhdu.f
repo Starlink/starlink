@@ -127,6 +127,8 @@
       CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
       IF ( (FSTAT.NE.0) .AND. (FSTAT.NE.107) ) THEN
         CALL ADI2_FITERP( FSTAT, STATUS )
+      ELSE IF ( FSTAT .EQ. 107 ) THEN
+        FSTAT = 0
       END IF
 
 *  Report any errors

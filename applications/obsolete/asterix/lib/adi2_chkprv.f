@@ -213,6 +213,6 @@
       END DO
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_CHKPRV', STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_CHKPRV', STATUS )
 
       END
