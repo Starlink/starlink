@@ -45,6 +45,8 @@
 #        Added entries for ASTIMP and ASTEXP.
 #     15-APR-1999 (MBT):
 #        Added entry for WCSREG.
+#     27-APR-1999 (MBT):
+#        Added entry for wcsexercise script.
 #     {enter_changes_here}
 #
 #-
@@ -149,6 +151,9 @@
 #
       alias tranndf '$CCDPACK_DIR/tranndf'
       alias ccd_tranndf '$CCDPACK_DIR/tranndf'
+#
+      alias wcsexercise '$CCDPACK_DIR/wcsexercise'
+      alias ccd_wcsexercise '$CCDPACK_DIR/wcsexercise'
 #
       alias wcsreg '$CCDPACK_DIR/wcsreg'
       alias ccd_wcsreg '$CCDPACK_DIR/wcsreg'
