@@ -159,6 +159,10 @@
 
 1 Changes_this_release
 
+  Release 3.0-2 improves efficiency and removes some bugs from DRIZZLE.
+  It improves behaviour of IDICURS, PAIRNDF and CCDALIGN on PseudoColor
+  visuals (causes them to note a problem not just crash).
+
   Release 3.0-1 makes a few non-user-visible code modifications and minor
   documentation bugfixes to the beta test release 3.0-0b.  The WRITESZ
   parameter of MAKEMOS is also withdrawn and the defaults of the CORRECT
