@@ -345,7 +345,7 @@ typedef struct AstMappingVtab {
    int (* GetReport)( AstMapping * );
    int (* GetTranForward)( AstMapping * );
    int (* GetTranInverse)( AstMapping * );
-   int (* LinearApprox)( AstMapping *this, const double *lbnd, const double *ubnd, double tol, double *fit );
+   int (* LinearApprox)( AstMapping *, const double *, const double *, double, double * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int ** );
    int (* ResampleB)( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
    int (* ResampleD)( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
@@ -416,7 +416,7 @@ int astResampleUI_( AstMapping *, int, const int [], const int [], const unsigne
 int astResampleUL_( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
 int astResampleUS_( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
 void astInvert_( AstMapping * );
-int astLinearApprox_( AstMapping *this, const double *lbnd, const double *ubnd, double tol, double *fit );
+int astLinearApprox_( AstMapping *, const double *, const double *, double, double * );
 void astTran1_( AstMapping *, int, const double [], int, double [] );
 void astTran2_( AstMapping *, int, const double [], const double [], int, double [], double [] );
 void astTranN_( AstMapping *, int, int, int, const double *, int, int, int, double * );

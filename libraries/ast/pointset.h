@@ -352,7 +352,7 @@ typedef struct AstPointSetVtab {
    double **(* GetPoints)( AstPointSet * );
    int (* GetNcoord)( const AstPointSet * );
    int (* GetNpoint)( const AstPointSet * );
-   void (* PermPoints)( AstPointSet *this, int, const int perm[] );
+   void (* PermPoints)( AstPointSet *, int, const int[] );
    void (* SetPoints)( AstPointSet *, double ** );
    void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet * );
 } AstPointSetVtab;
@@ -393,7 +393,7 @@ void astSetPoints_( AstPointSet *, double ** );
 void astSetSubPoints_( AstPointSet *, int, int, AstPointSet * );
 
 # if defined(astCLASS)           /* Protected */
-void astPermPoints_( AstPointSet *this, int, const int perm[] );
+void astPermPoints_( AstPointSet *, int, const int[] );
 int astGetNcoord_( const AstPointSet * );
 int astGetNpoint_( const AstPointSet * );
 #endif
