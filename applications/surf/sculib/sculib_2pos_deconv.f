@@ -99,7 +99,7 @@
       INTEGER EXPOSURE                         ! exposure number of scan
       INTEGER INTEGRATION                      ! integration number of scan
       INTEGER MEASUREMENT                      ! measurement number of scan
-      INTEGER NORM                             ! normalisation factor
+      REAL    NORM                             ! normalisation factor
       INTEGER N_CONV                           ! number of points in convolution
                                                ! function
       INTEGER N_SCAN                           ! number of points in scan
@@ -164,7 +164,7 @@
 *  FT to give the desired result. The equivalent is achieved by convolving
 *  the map data with the function whose FT is the inverse of that of the
 *  beam chop. This is the `asymmetric function' used in NOD2 and
-*  SCULIB_GENASCONFN calculates it.
+*  SCULIB_2POS_CONFN calculates it.
 
                CALL SCULIB_2POS_CONFN (BEAM_SEP, SAMPLE_DX, N_SCAN, 
      :           1.0, N_CONV, AS_CONV_FUNCTION, STATUS)
@@ -190,13 +190,13 @@
 
                   CALL SCULIB_CONVOLVE (SCRATCH1_DATA,
      :              SCRATCH1_VARIANCE, SCRATCH1_QUALITY, 
-     :              SY_CONV_FUNCTION, N_SCAN, N_CONV, NORM,
+     :              SY_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
      :              SCRATCH2_DATA, SCRATCH2_VARIANCE, 
      :              SCRATCH2_QUALITY, STATUS)
 
                   CALL SCULIB_CONVOLVE (SCRATCH2_DATA,
      :              SCRATCH2_VARIANCE, SCRATCH2_QUALITY, 
-     :              AS_CONV_FUNCTION, N_SCAN, N_CONV, NORM,
+     :              AS_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
      :              SCRATCH1_DATA, SCRATCH1_VARIANCE, 
      :              SCRATCH1_QUALITY, STATUS)
 
