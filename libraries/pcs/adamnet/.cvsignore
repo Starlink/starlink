@@ -1,12 +1,9 @@
-NDF_ERR
-fac_1506_err
-ndf_ctest
-ndf_err.h
-ndf_ftest
-ssn20.ps
-sun33.ps
-sun33.dvi
-ssn20.dvi
+adamnet
+antmaster
+antslave
+traceit
+fac_111_err
+ant_err.h
 *.lo
 *.la
 Makefile
@@ -30,5 +27,4 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
-
 starconf.status

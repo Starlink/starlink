@@ -26,3 +26,5 @@ stamp-h1
 make.log
 .deps
 
+starconf.status
+config.h.in

@@ -33,6 +33,7 @@ STAR_LATEX_DOCUMENTATION(sun15)
 
 STAR_MESSGEN(pgp_err.msg)
 
+AC_CONFIG_SUBDIRS(examples)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
