@@ -71,6 +71,7 @@
 
 *  Authors:
 *     JBVAD::PAH: Paul Harrison (STARLINK)
+*     John Lightfoot (RoE)
 *     {enter_new_authors_here}
 
 *  History:
