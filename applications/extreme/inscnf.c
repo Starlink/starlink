@@ -251,6 +251,11 @@
             case '(':
             case ')':
                buf[ leng + yleng - 1 ].flag = tok;
+               break;
+            case CNF_PVAL:
+               fprintf( stderr, "%s: CNF_PVAL already present in input file\n",
+                                name );
+               break;
          }
          leng += yleng;
 
@@ -332,7 +337,7 @@
 
 /* Warn if the content of the %VAL looks like an integer. */
                      if ( tokid[ i + 3 ] == INTEGER_CONSTANT ) {
-                        fprintf( stderr, "%s: Integer %%VAL arg in %s?\n",
+                        fprintf( stderr, "%s: Constant %%VAL argument in %s?\n",
                                  name, namestart );
                      }
 
@@ -344,7 +349,7 @@
                            if ( buf[ j ].chr == '_' && 
                                 buf[ j + 1 ].chr == '_' ) {
                               fprintf( stderr, 
-                                       "%s: Constant %%VAL arg in %s?\n",
+                                       "%s: Constant %%VAL argument in %s?\n",
                                        name, namestart );
                               break;
                            }
