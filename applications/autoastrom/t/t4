@@ -1,3 +1,6 @@
+#! /bin/sh -
+
+##testing ymd2jd, ymd2je, parse_fits_date
 
 test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
 test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
@@ -5,29 +8,67 @@ test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
 export AUTOASTROM_DIR;
 exec $PERLBIN <<'EOD';
 
-use lib '..';
-use autoastrom;
+use lib "$ENV{AUTOASTROM_DIR}";
+use autoastrom qw(ymd2jd ymd2je parse_fits_date);
+
+# Test integer division (M-14)/12 is the only negative-argument
+# integer division in the ymd2jd formlua.
+printf ("5/3=%d  2/3=%d  -2/3=%d  -5/3=%d  (1-14)/12=%d  (2-14)/12=%d  (3-14)/12=%d\n",
+	5/3, 2/3, -2/3, -5/3, (1-14)/12, (2-14)/12, (3-14)/12);
 
 # The correct values in brackets are obtained from SLALIB's sla_cldj
+# (which calculates JD at 00:00 on the day in question).
+printf ("ymd2jd( 2000,  1,  1 ) = %12d    (2451545)\n", ymd2jd(2000,  1,  1));
+printf ("ymd2jd( 2000,  1,  2 ) = %12d    (2451546)\n", ymd2jd(2000,  1,  2));
+printf ("ymd2jd( 1999, 12, 31 ) = %12d    (2451544)\n", ymd2jd(1999, 12, 31));
+printf ("ymd2jd( 1996,  1,  1 ) = %12d    (2450084)\n", ymd2jd(1996,  1,  1));
+printf ("ymd2jd( 1996,  3,  1 ) = %12d    (2450144)\n", ymd2jd(1996,  3,  1));
+printf ("ymd2jd( 1995,  1,  1 ) = %12d    (2449719)\n", ymd2jd(1995,  1,  1));
+printf ("ymd2jd( 2004,  2, 28 ) = %12d    (2453064)\n", ymd2jd(2004,  2, 28));
+printf ("ymd2jd( 2004,  3,  1 ) = %12d    (2453066)\n", ymd2jd(2004,  3,  1));
+printf ("ymd2jd( 2005,  1,  1 ) = %12d    (2453372)\n", ymd2jd(2005,  1,  1));
+printf ("ymd2jd( 2101,  1,  1 ) = %12d    (2488435)\n", ymd2jd(2101,  1,  1));
+printf ("ymd2jd( 1901,  1,  1 ) = %12d    (2415386)\n", ymd2jd(1901,  1,  1));
+printf ("ymd2jd( 1899,  1,  1 ) = %12d    (2414656)\n", ymd2jd(1899,  1,  1));
 
-printf ("2000,  1,  1 --> %d   (2451545)\n", ymd2jd(2000,  1,  1));
-printf ("2000,  1,  2 --> %d   (2451546)\n", ymd2jd(2000,  1,  2));
-printf ("1999, 12, 31 --> %d   (2451544)\n", ymd2jd(1999, 12, 31));
-printf ("1996,  1,  1 --> %d   (2450084)\n", ymd2jd(1996,  1,  1));
-printf ("1996,  3,  1 --> %d   (2450144)\n", ymd2jd(1996,  3,  1));
-printf ("1995,  1,  1 --> %d   (2449719)\n", ymd2jd(1995,  1,  1));
-printf ("2004,  2, 28 --> %d   (2453064)\n", ymd2jd(2004,  2, 28));
-printf ("2004,  3,  1 --> %d   (2453066)\n", ymd2jd(2004,  3,  1));
-printf ("2005,  1,  1 --> %d   (2453372)\n", ymd2jd(2005,  1,  1));
-printf ("2101,  1,  1 --> %d   (2488435)\n", ymd2jd(2101,  1,  1));
-printf ("1901,  1,  1 --> %d   (2415386)\n", ymd2jd(1901,  1,  1));
-printf ("1899,  1,  1 --> %d   (2414656)\n", ymd2jd(1899,  1,  1));
+# The correct values in brackets are from sla_cldj plus sla_epj
+printf ("ymd2je( 2000,  1,  1 ) = %12.7f    (2000.0000000)\n",
+	ymd2je(2000,  1,  1));
+printf ("ymd2je( 2000,  7,  1 ) = %12.7f    (2000.4982888)\n",
+	ymd2je(2000,  7,  1));
+printf ("ymd2je( 2000, 12, 31 ) = %12.7f    (2000.9993155)\n",
+	ymd2je(2000, 12, 31));
+printf ("ymd2je( 2000,  6, 30 ) = %12.7f    (2000.4955510)\n",
+	ymd2je(2000,  6, 30));
 
-printf ("ymd2je (2000,  1,  1) = %.7f\n", ymd2je(2000,  1,  1));
-printf ("ymd2je (2000,  7,  1) = %.7f\n", ymd2je(2000,  7,  1));
-printf ("ymd2je (2000, 12, 31) = %.7f\n", ymd2je(2000, 12, 31));
-printf ("ymd2je (2000,  6, 30) = %.7f\n", ymd2je(2000,  6, 30));
 
+# Test parse_fits_date
+sub test_fits_date {
+    my $d = shift;
+    my $je = parse_fits_date ($d);
+    printf ("FITS date %27s     ", '<'.$d.'>');
+    if (defined($je)) {
+	print "$je\n";
+    } else {
+	print "ERROR\n";
+    }
+}
+
+test_fits_date ("23/10/01");	# valid FITS date
+test_fits_date ("  23/10/99  ");
+test_fits_date ("1999-10-23");	# valid ISO-style date
+test_fits_date (" 2000-06-30 ");
+test_fits_date ("2000-06-30T12:00:00");	# identical to 2000-06-30
+test_fits_date ("2000-06-30T12:05:15.576"); # noon plus 0.00001dy 
+test_fits_date ("2000-06-30T11:54:44.424"); # noon minus 0.00001dy 
+test_fits_date ("2000-06-30T12:05:16"); # without fractional seconds
+test_fits_date ("2000-06-30T12:05"); # error: no seconds
+test_fits_date ("2001-1-1");	# error: must have leading zeros
+test_fits_date ("20010630");	# error: no separators
+test_fits_date ("2001/06/30");	# error: ISO-style date uses hyphens not slash
+test_fits_date ("23-10-99");	# error: FITS-style date uses slash not hyphen
+test_fits_date ("1234 2000-06-30"); # error: includes leading junk
+test_fits_date ("2000-06-30 /"); # error: includes trailing junk
 
 exit 0;
 EOD;
