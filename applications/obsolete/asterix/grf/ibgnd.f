@@ -1082,6 +1082,7 @@
       MINFR = VAL__MAXR
       MAXFR = VAL__MINR
       RMSFR = 0.0
+      NFR = 0
       DO J = 1, NY
         DO I = 1, NX
 
@@ -1092,7 +1093,7 @@
             IF ( (BGMOD(I,J) .NE. 0.0) .AND.
      :            (BQ(I,J) .EQ. QUAL__GOOD) ) THEN
               NFR = NFR + 1
-              FR = FR / BGMOD(I,J)
+              FR = FR / ABS(BGMOD(I,J))
               RMSFR = RMSFR + FR**2
               IF ( FR .GT. MAXFR ) THEN
                 MAXFR = FR
@@ -1124,7 +1125,7 @@
         CALL MSG_SETI( 'Y', MAXFR_Y )
         CALL MSG_PRNT( '  Worst +ve deviation from model is ^R% at '/
      :               /'pixel (^X,^Y)' )
-        CALL MSG_SETR( 'MAXFR', MAXFR*100.0 )
+        CALL MSG_SETR( 'R', MINFR*100.0 )
         CALL MSG_SETI( 'X', MINFR_X )
         CALL MSG_SETI( 'Y', MINFR_Y )
         CALL MSG_PRNT( '  Worst -ve deviation from model is ^R% at '/
