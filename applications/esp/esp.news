@@ -1,5 +1,43 @@
-1 ESP - Extended Surface Photometry - update
-                                                   Expires: **.**.**
+
+
+ESP - Extended Surface Photometry
+=================================
+
+
+%%VERSION%%
+This is release 0.10-8
+
+Release notes
+-------------
+
+The only significant difference from the 0.10-1 release of ESP is to
+make ESP WCS-aware (these changes were made by Mark Taylor).
+
+Also, there were several changes to make ESP more compatible with GAIA.
+
+There are a few other changes associated with code tidyups and minor
+bugfixes.
+
+
+The user-visible changes are:
+
+ * The COSYS parameter has disappeared, made redundant by the addition 
+   of WCS facilities throughout the program.
+
+ * ELLPRO and ELLFOU now take an OUTCAT parameter, which specifies a
+   file to receive output in the form of a catalogue, readable by the
+   CAT library (see SUN/181).
+
+ * Added missing documentation to HISTPEAK and LOBACK.
+
+ * Slight changes to output formats, to a few parameter defaults and
+   to a few error messages to make them more useful.
+
+
+
+
+Version 0.10-1 release notes
+----------------------------
  
  The ESP package has been rereleased on Unix.  This is a package for
  Extended Surface Photometry, aimed at photometry of large galaxies. 
