@@ -1,0 +1,6 @@
+#define nocursor_width 1
+#define nocursor_height 1
+
+static char nocursor_bits[] = {
+ 0x00
+ };
