@@ -133,6 +133,9 @@
 *        of bad cells
 *     10-JUL-2001 (DSB):
 *        Corrected data type of ERR from REAL to DOUBLE PRECISION.
+*     17-JUL-2001 (DSB):
+*        Draw the error bars before the data points, rather than after
+*        them, to avoid the data points being obscured by the error bars.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -294,6 +297,155 @@
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  First draw the error bars if required. This is done first so that the
+*  data points are not obscured by the error bars.
+*  =====================================================================
+      IF( ( XERROR .OR. YERROR ) .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  Save the size of the serif for error bars. This is scaled by the 
+*  "size(errbars)" attribute which is a synonym for "size(axes)".
+         SERIF = AST_GETR( IPLOT, 'SIZE(AXES)', STATUS )*0.02*
+     :                     MIN( ABS( WX2 - WX1 ), ABS( WY2 - WY1 ) )
+
+*  The plotting attributes to use for the error bars are currently
+*  assigned to the "Axes" element in the Plot. We need to transfer these
+*  to the "Curves" elements.
+         CALL AST_SETI( IPLOT, 'COLOUR(CURVES)', 
+     :                  AST_GETI( IPLOT, 'COLOUR(AXES)', STATUS ), 
+     :                  STATUS )
+
+         CALL AST_SETR( IPLOT, 'WIDTH(CURVES)', 
+     :                  AST_GETR( IPLOT, 'WIDTH(AXES)', STATUS ), 
+     :                  STATUS )
+
+         CALL AST_SETI( IPLOT, 'STYLE(CURVES)', 
+     :                  AST_GETI( IPLOT, 'STYLE(AXES)', STATUS ), 
+     :                  STATUS )
+
+
+*  Set PGPLOT attributes to match the plotting style used by the Plot for 
+*  drawing Curves. Save the current PGPLOT attribute values in ATTR.
+         CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
+
+*  Loop round positions which have good X and Y values. Step over FREQ
+*  positions each time.
+         DO I = ILO + FREQ/2, IHI, FREQ
+            IF( X( I ) .NE. AST__BAD .AND. Y( I ) .NE. AST__BAD ) THEN
+               RX = REAL( X( I ) )
+               RY = REAL( Y( I ) )
+
+*  Find the X limits of the error box.
+               XLO = RX
+               XHI = RX
+               IF( XERROR ) THEN
+
+                  ERR = XBAR( I, 1 )
+                  IF( ERR .NE. AST__BAD ) THEN
+                      XHI = MAX( XHI, REAL( ERR ) )
+                      XLO = MIN( XLO, REAL( ERR ) )
+                  END IF
+
+                  ERR = XBAR( I, 2 )
+                  IF( ERR .NE. AST__BAD ) THEN
+                      XHI = MAX( XHI, REAL( ERR ) )
+                      XLO = MIN( XLO, REAL( ERR ) )
+                  END IF
+
+               END IF
+
+*  Find the Y limits of the error box.
+               YLO = RY
+               YHI = RY
+               IF( YERROR ) THEN
+
+                  ERR = YBAR( I, 1 )
+                  IF( ERR .NE. AST__BAD ) THEN
+                      YHI = MAX( YHI, REAL( ERR ) )
+                      YLO = MIN( YLO, REAL( ERR ) )
+                  END IF
+
+                  ERR = YBAR( I, 2 )
+                  IF( ERR .NE. AST__BAD ) THEN
+                      YHI = MAX( YHI, REAL( ERR ) )
+                      YLO = MIN( YLO, REAL( ERR ) )
+                  END IF
+
+               END IF
+
+*  If ERSHAP specifies a diagonal cross, draw a poly line from bottom left 
+*  to centre, to top right corner of the error box,
+               IF( ERSHAP .EQ. 2 ) THEN 
+                  IF( XERROR ) THEN
+                     CALL PGMOVE( XLO, YLO )
+                     CALL PGDRAW(  RX,  RY )
+                     CALL PGDRAW( XHI, YHI )
+                  END IF
+                  IF( YERROR ) THEN
+                     CALL PGMOVE( XLO, YHI )
+                     CALL PGDRAW(  RX,  RY )
+                     CALL PGDRAW( XHI, YLO )
+                  END IF
+
+*  If ERSHAP specifies a vertical cross, draw line between the limits at
+*  through central X/Y position, and ad short bars across the ends.
+               ELSE IF( ERSHAP .EQ. 1 ) THEN
+
+                  IF( XERROR ) THEN
+                     CALL PGMOVE( XLO, RY )
+                     CALL PGDRAW( XHI, RY )
+   
+                     CALL PGMOVE( XLO, RY - SERIF )
+                     CALL PGDRAW( XLO, RY + SERIF )
+                     CALL PGMOVE( XHI, RY - SERIF )
+                     CALL PGDRAW( XHI, RY + SERIF )
+                  END IF
+
+                  IF( YERROR ) THEN
+                     CALL PGMOVE( RX, YLO )
+                     CALL PGDRAW( RX, YHI )
+   
+                     CALL PGMOVE( RX - SERIF, YLO )
+                     CALL PGDRAW( RX + SERIF, YLO )
+                     CALL PGMOVE( RX - SERIF, YHI )
+                     CALL PGDRAW( RX + SERIF, YHI )
+                  END IF
+
+*  If ERSHAP specifies a diamond, draw a poly line around the error box.
+               ELSE IF( ERSHAP .EQ. 3 ) THEN
+                  CALL PGMOVE( XLO, RY )
+                  CALL PGDRAW( RX, YHI )
+                  CALL PGDRAW( XHI, RY )
+                  CALL PGDRAW( RX, YLO )
+                  CALL PGDRAW( XLO, RY )
+
+*  Report an error if the MODE value was illegal.
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETI( 'SHAP', ERSHAP )
+                  CALL ERR_REP( 'KPG1_PLTLN_ERR2', 'KPG1_PLTLN: '//
+     :                          'Illegal ERSHAP value (^SHAP) '//
+     :                          'supplied (programming error).', 
+     :                          STATUS )
+                  GO TO 999
+
+               END IF
+
+            END IF
+
+         END DO
+
+*  Re-instate the original PGPLOT attributes.
+         CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR, STATUS )
+
+*  Re-instate the original plotting attributes for AST Curves.
+         CALL AST_SETI( IPLOT, 'COLOUR(CURVES)', CVCOL0, STATUS )
+         CALL AST_SETR( IPLOT, 'WIDTH(CURVES)', CVWID0, STATUS )
+         CALL AST_SETI( IPLOT, 'STYLE(CURVES)', CVSTY0, STATUS )
+
+      END IF
+
+*  Now draw the data points on top of the error bars.
 
 *  First deal with "staircase" histograms.
 *  =======================================
@@ -549,147 +701,6 @@
          CALL ERR_REP( 'KPG1_PLTLN_ERR1', 'KPG1_PLTLN: Illegal MODE '//
      :                 'value (^MODE) supplied (programming error).',
      :                 STATUS )
-      END IF
-
-*  Now draw the error bars if required.
-*  ====================================
-      IF( ( XERROR .OR. YERROR ) .AND. STATUS .EQ. SAI__OK ) THEN
-
-*  Save the size of the serif for error bars. This is scaled by the 
-*  "size(errbars)" attribute which is a synonym for "size(axes)".
-         SERIF = AST_GETR( IPLOT, 'SIZE(AXES)', STATUS )*0.02*
-     :                     MIN( ABS( WX2 - WX1 ), ABS( WY2 - WY1 ) )
-
-*  The plotting attributes to use for the error bars are currently
-*  assigned to the "Axes" element in the Plot. We need to transfer these
-*  to the "Curves" elements.
-         CALL AST_SETI( IPLOT, 'COLOUR(CURVES)', 
-     :                  AST_GETI( IPLOT, 'COLOUR(AXES)', STATUS ), 
-     :                  STATUS )
-
-         CALL AST_SETR( IPLOT, 'WIDTH(CURVES)', 
-     :                  AST_GETR( IPLOT, 'WIDTH(AXES)', STATUS ), 
-     :                  STATUS )
-
-         CALL AST_SETI( IPLOT, 'STYLE(CURVES)', 
-     :                  AST_GETI( IPLOT, 'STYLE(AXES)', STATUS ), 
-     :                  STATUS )
-
-
-*  Set PGPLOT attributes to match the plotting style used by the Plot for 
-*  drawing Curves. Save the current PGPLOT attribute values in ATTR.
-         CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
-
-*  Loop round positions which have good X and Y values. Step over FREQ
-*  positions each time.
-         DO I = ILO + FREQ/2, IHI, FREQ
-            IF( X( I ) .NE. AST__BAD .AND. Y( I ) .NE. AST__BAD ) THEN
-               RX = REAL( X( I ) )
-               RY = REAL( Y( I ) )
-
-*  Find the X limits of the error box.
-               XLO = RX
-               XHI = RX
-               IF( XERROR ) THEN
-
-                  ERR = XBAR( I, 1 )
-                  IF( ERR .NE. AST__BAD ) THEN
-                      XHI = MAX( XHI, REAL( ERR ) )
-                      XLO = MIN( XLO, REAL( ERR ) )
-                  END IF
-
-                  ERR = XBAR( I, 2 )
-                  IF( ERR .NE. AST__BAD ) THEN
-                      XHI = MAX( XHI, REAL( ERR ) )
-                      XLO = MIN( XLO, REAL( ERR ) )
-                  END IF
-
-               END IF
-
-*  Find the Y limits of the error box.
-               YLO = RY
-               YHI = RY
-               IF( YERROR ) THEN
-
-                  ERR = YBAR( I, 1 )
-                  IF( ERR .NE. AST__BAD ) THEN
-                      YHI = MAX( YHI, REAL( ERR ) )
-                      YLO = MIN( YLO, REAL( ERR ) )
-                  END IF
-
-                  ERR = YBAR( I, 2 )
-                  IF( ERR .NE. AST__BAD ) THEN
-                      YHI = MAX( YHI, REAL( ERR ) )
-                      YLO = MIN( YLO, REAL( ERR ) )
-                  END IF
-
-               END IF
-
-*  If ERSHAP specifies a diagonal cross, draw a poly line from bottom left 
-*  to centre, to top right corner of the error box,
-               IF( ERSHAP .EQ. 2 ) THEN 
-                  IF( XERROR ) THEN
-                     CALL PGMOVE( XLO, YLO )
-                     CALL PGDRAW(  RX,  RY )
-                     CALL PGDRAW( XHI, YHI )
-                  END IF
-                  IF( YERROR ) THEN
-                     CALL PGMOVE( XLO, YHI )
-                     CALL PGDRAW(  RX,  RY )
-                     CALL PGDRAW( XHI, YLO )
-                  END IF
-
-*  If ERSHAP specifies a vertical cross, draw line between the limits at
-*  through central X/Y position, and ad short bars across the ends.
-               ELSE IF( ERSHAP .EQ. 1 ) THEN
-
-                  IF( XERROR ) THEN
-                     CALL PGMOVE( XLO, RY )
-                     CALL PGDRAW( XHI, RY )
-   
-                     CALL PGMOVE( XLO, RY - SERIF )
-                     CALL PGDRAW( XLO, RY + SERIF )
-                     CALL PGMOVE( XHI, RY - SERIF )
-                     CALL PGDRAW( XHI, RY + SERIF )
-                  END IF
-
-                  IF( YERROR ) THEN
-                     CALL PGMOVE( RX, YLO )
-                     CALL PGDRAW( RX, YHI )
-   
-                     CALL PGMOVE( RX - SERIF, YLO )
-                     CALL PGDRAW( RX + SERIF, YLO )
-                     CALL PGMOVE( RX - SERIF, YHI )
-                     CALL PGDRAW( RX + SERIF, YHI )
-                  END IF
-
-*  If ERSHAP specifies a diamond, draw a poly line around the error box.
-               ELSE IF( ERSHAP .EQ. 3 ) THEN
-                  CALL PGMOVE( XLO, RY )
-                  CALL PGDRAW( RX, YHI )
-                  CALL PGDRAW( XHI, RY )
-                  CALL PGDRAW( RX, YLO )
-                  CALL PGDRAW( XLO, RY )
-
-*  Report an error if the MODE value was illegal.
-               ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI( 'SHAP', ERSHAP )
-                  CALL ERR_REP( 'KPG1_PLTLN_ERR2', 'KPG1_PLTLN: '//
-     :                          'Illegal ERSHAP value (^SHAP) '//
-     :                          'supplied (programming error).', 
-     :                          STATUS )
-                  GO TO 999
-
-               END IF
-
-            END IF
-
-         END DO
-
-*  Re-instate the original PGPLOT attributes.
-         CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR, STATUS )
-
       END IF
 
 *  Tidy up.

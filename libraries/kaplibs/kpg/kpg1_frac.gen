@@ -115,6 +115,8 @@
 *        of signed integral data types with a large dynamic range.
 *     28-NOV-2000 (DSB):
 *        More fixes from MT related to typing of MINV and MAXV.
+*     18-JUL-2001 (DSB):
+*        Add a STATUS check after the call to KPG1_GHST<T>.
 *     {enter_further_changes_here}
 
 *-
@@ -408,6 +410,9 @@
          ELSE
             FINDHI = .TRUE.
          END IF
+
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Count the number of empty bins with the histogram.
          CALL KPG1_NUMBI( .FALSE., .FALSE., .TRUE., CLNBIN, HIST, 0,
