@@ -108,7 +108,9 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local variables:
+      DOUBLE PRECISION		CROTA			! Cos(ROTA)
       DOUBLE PRECISION		ROTA			! Rotation angle
+      DOUBLE PRECISION		SROTA			! Sin(ROTA)
 *.
 
 *  Check inherited global status.
@@ -125,13 +127,18 @@
 
 *  Null rotation?
       IF ( ROTA .NE. 0D0 ) THEN
+
+*    Find cosine and sine of ROTA
+        CROTA = COS(ROTA*MATH__DDTOR)
+        SROTA = SIN(ROTA*MATH__DDTOR)
+
         IF ( FORW ) THEN
-          OPOS(1) = COSD(ROTA)*IPOS(1) + SIND(ROTA)*IPOS(2)
-          OPOS(2) = COSD(ROTA)*IPOS(2) - SIND(ROTA)*IPOS(1)
+          OPOS(1) = CROTA*IPOS(1) + SROTA*IPOS(2)
+          OPOS(2) = CROTA*IPOS(2) - SROTA*IPOS(1)
 
         ELSE
-          OPOS(1) = COSD(ROTA)*IPOS(1) - SIND(ROTA)*IPOS(2)
-          OPOS(2) = COSD(ROTA)*IPOS(2) + SIND(ROTA)*IPOS(1)
+          OPOS(1) = CROTA*IPOS(1) - SROTA*IPOS(2)
+          OPOS(2) = CROTA*IPOS(2) + SROTA*IPOS(1)
 
         END IF
 
