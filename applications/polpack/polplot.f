@@ -45,7 +45,9 @@
 *        fraction of the largest dimension of the vector map. [0.0]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot.  [TRUE]
+*        vector map, showing the coordinate Frame specified by parameter
+*        COSYS. The appearance of the axes can be controlled using
+*        the STYLE parameter. [TRUE]
 *     CAT = LITERAL (Read)
 *        The name of the input catalogue. This may be in any format
 *        supported by the CAT library (see SUN/181).
@@ -56,10 +58,15 @@
 *        on top of an existing DATA picture, then set CLEAR to FALSE. The
 *        vector map will then be drawn in alignment with the displayed 
 *        data. If possible, alignment occurs within the coordinate Frame 
-*        specified by parameter COSYS. If this is not possible, (for instance 
-*        if suitable WCS information was not available when the existing DATA 
-*        picture was created), then a warning is issued, and alignment 
-*        occurs in pixel coordinates (again if possible). [TRUE]
+*        specified using parameter COSYS. If this is not possible, (for 
+*        instance if suitable WCS information was not available when the 
+*        existing DATA picture was created), then an alignment is attempted 
+*        in PIXEL coordinates. If this is not possible, then alignment is
+*        attempted in GRID coordinates. If this is not possible, then
+*        alignment is attempted in the first suitable Frame in the catalogue
+*        irrespective of its Domain. A message is displayed indicating the 
+*        Domain in which alignment occurred. If there are no suitable Frames 
+*        in the catalogue then an error is reported. [TRUE]
 *     COLANG = LITERAL (Read)
 *        The name of the catalogue column holding the orientation of each 
 *        vector. The values are considered to be in units of degrees unless 
@@ -157,7 +164,7 @@
 *        of the value 1). The length of the example vector is formatted as an
 *        axis 2 value (using attribute FORMAT(2), etc - the synonym VECTOR
 *        can be used in place of the value 2). A null (!) value causes the 
-*        key style used on the previous invocation of contour to be 
+*        key style used on the previous invocation of POLPLOT to be 
 *        re-used. If no previous key style is available, or if the keyword 
 *        RESET is supplied, then the default key style established using 
 *        application SETSTYLE is used. [!]
@@ -177,15 +184,11 @@
 *        name of a Plot attribute, and "value" is the value to assign to 
 *        the attribute. Vectors are drawn as "Curves" but may also be 
 *        refered to using the synonym "Vectors" when specifying Plot 
-*        attributes. Default values are supplied for any attributes 
-*        which are not specified. If the vectors are being drawn over an 
-*        existing DATA picture (see parameter CLEAR), then these defaults 
-*        come from the existing DATA picture. Otherwise, they are inherited 
-*        from the previous invocation of POLPLOT. If this is the first 
-*        invocation (or if the options database file has been deleted), or 
-*        if the keyword RESET is supplied, then the defaults used are those 
-*        established by KAPPA application SETSTYLE. A null (!) value causes 
-*        defaults to be used for all attributes. [!]
+*        attributes. Default values are supplied for any attributes which 
+*        are not specified. These are obtained from the WCS information 
+*        in the supplied catalogue, or inherited from the previous 
+*        invocation of POLPLOT. See application SETSTYLE. A null (!) value 
+*        causes defaults to be used for all attributes. [!]
 *     VSCALE = _REAL (Read)
 *        The scale to be used for the vectors.  The supplied value
 *        should give the data value corresponding to a vector length of
@@ -205,10 +208,13 @@
 *        positive y axis) in the displayed map. The position of each vector
 *        is specified by columns "ra" and "dec". The annotated axes give
 *        equatorial (RA/DEC) coordinates refered to the equinox of B1950.
-*        If the vector map is displayed over an existing DATA picture,
-*        then the FrameSet associated with the existing picture (in the
-*        AGI database) must contain sky coordinate Frame so that the
-*        vectors can be aligned with the existing picture.
+*        If the vector map is displayed over an existing DATA picture, then
+*        the vector map will be aligned on the sky with the previously 
+*        displayed data if possible (i.e. the FrameSet associated with the 
+*        existing picture in the AGI database contains a sky coordinate
+*        Frame). If this is not possible, then the vector map will be
+*        aligned in pixel or grid coordinates. A message is displayed
+*        indicating the domain in which alignment took place.
 *     polplot poltab x y p theta arrow=0.01 just=start nokey
 *        Produces a vector map in which each vector is represented by an 
 *        arrow, starting at the position of the corresponding pixel.  No key
