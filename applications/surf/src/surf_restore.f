@@ -21,6 +21,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
+      INCLUDE 'REDS_SYS'                ! REDS constants
 *    Import :
 *    Import-Export :
 *    Export :
@@ -31,9 +32,9 @@
 *    Local Constants :
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
-      INTEGER MAX_FITS                  ! maximum number of FITS items in file
-      PARAMETER (MAX_FITS = 200)
 *    Local variables :
+      LOGICAL      ABORTED              ! .TRUE. if observation was
+                                        ! aborted
       CHARACTER*15 CHOP_COORDS          ! coordinate system of chop
       CHARACTER*15 CHOP_FUN             ! chop mode used in observation
       REAL         CHOP_THROW           ! chopper throw (arcsec)
@@ -42,7 +43,8 @@
       LOGICAL      EXTINCTION           ! .TRUE. if the EXTINCTION application
                                         ! has already been run on the 
                                         ! input file
-      CHARACTER*80 FITS (MAX_FITS)      ! array of FITS keyword lines
+      CHARACTER*80 FITS (SCUBA__MAX_FITS)
+                                        ! array of FITS keyword lines
       INTEGER      I                    ! DO loop variable
       INTEGER      INDF                 ! NDF identifier of input file
       INTEGER      INTEGRATION          ! integration index in DO loop
@@ -63,6 +65,9 @@
                                         ! file
       INTEGER      IN_VARIANCE_PTR      ! pointer to variance array in input
                                         ! file
+      INTEGER      LAST_EXP             ! exposure where abort occurred
+      INTEGER      LAST_INT             ! integration where abort occurred
+      INTEGER      LAST_MEAS            ! measurement where abort occurred
       INTEGER      MEASUREMENT          ! measurement index in DO loop
       INTEGER      NDIM                 ! the number of dimensions in an array
       INTEGER      NREC                 ! number of history records in file
@@ -82,6 +87,8 @@
       INTEGER      RUN_NUMBER           ! run number of observation
       REAL         SAMPLE_DX            ! sample spacing along scans
       CHARACTER*15 SAMPLE_MODE          ! SAMPLE_MODE of observation
+      CHARACTER*80 STATE                ! 'state' of SCUCD at end of
+                                        ! observation
       CHARACTER*80 STEMP                ! scratch string
 *    Internal References :
 *    Local data :
@@ -102,28 +109,29 @@
       CALL NDF_XLOC (INDF, 'SCUCD', 'READ', IN_SCUCDX_LOC, STATUS)
 
       CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
-      IF (ITEMP .GT. MAX_FITS) THEN
+      IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'REDS_RESTORE: input file '//
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
-      CALL DAT_GET1C (IN_FITSX_LOC, MAX_FITS, FITS, N_FITS, STATUS)
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS,
+     :  STATUS)
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
 
-      CALL SCULIB_GET_FITS_I (MAX_FITS, N_FITS, FITS, 'RUN', 
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN', 
      :  RUN_NUMBER, STATUS)
-      CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, 'OBJECT',
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
      :  OBJECT, STATUS)
-      CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, 'MODE',
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
      :  OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
-      CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, 'SAM_MODE',
-     :  SAMPLE_MODE, STATUS)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :  'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
-      CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, 'CHOP_CRD',
-     :  CHOP_COORDS, STATUS)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :  'CHOP_CRD', CHOP_COORDS, STATUS)
       CALL CHR_UCASE (CHOP_COORDS)
 
 *  check that the observation was suitable for RESTORE
@@ -193,13 +201,23 @@
 
 *  get some other FITS items needed for this stage of reduction
 
-      CALL SCULIB_GET_FITS_R (MAX_FITS, N_FITS, FITS, 'SAM_DX',
+      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'SAM_DX',
      :  SAMPLE_DX, STATUS)
-      CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, 'CHOP_FUN',
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CHOP_FUN',
      :  CHOP_FUN, STATUS)
       CALL CHR_UCASE (CHOP_FUN)
-      CALL SCULIB_GET_FITS_R (MAX_FITS, N_FITS, FITS, 'CHOP_THR',
+      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'CHOP_THR',
      :  CHOP_THROW, STATUS)
+
+*  find out if the observation was aborted
+
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
+     :  STATE, STATUS)
+      CALL CHR_UCASE (STATE)
+      ABORTED = .FALSE.
+      IF (INDEX(STATE,'ABORTING') .NE. 0) THEN
+         ABORTED = .TRUE.
+      END IF
 
 *  map the various components of the data array and check the data dimensions 
 
@@ -273,9 +291,32 @@
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
 
-      CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
-     :  'exposure(s) in ^N_I integration(s) in '//
-     :  '^N_M measurement(s)', STATUS)
+      IF (.NOT. ABORTED) THEN
+         CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
+     :     'exposure(s) in ^N_I integration(s) in '//
+     :     '^N_M measurement(s)', STATUS)
+      ELSE
+
+*  get the exposure, integration, measurement numbers at which the
+*  abort occurred
+
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'EXP_NO', LAST_EXP, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'INT_NO', LAST_INT, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MEAS_NO', LAST_MEAS, STATUS)
+
+         CALL MSG_OUT (' ', 'REDS: the observation should have '//
+     :     'had ^N_E exposure(s) in ^N_I integrations in ^N_M '//
+     :     'measurement(s)', STATUS)
+         CALL MSG_SETI ('N_E', LAST_EXP)
+         CALL MSG_SETI ('N_I', LAST_INT)
+         CALL MSG_SETI ('N_M', LAST_MEAS)
+         CALL MSG_OUT (' ', ' - However, the observation was '//
+     :     'ABORTED during exposure ^N_E of integration ^N_I '//
+     :     'of measurement ^N_M', STATUS)
+      END IF         
 
 *  now open the output NDF, propagating it from the input file
 

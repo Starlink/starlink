@@ -112,9 +112,12 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
-*     Revision 1.12  1997/03/05 23:59:03  timj
-*     can't remember
+*     Revision 1.13  1997/03/21 20:35:43  jfl
+*     modified to handle aborted observations
 *
+c Revision 1.12  1997/03/05  23:59:03  timj
+c can't remember
+c
 c Revision 1.11  1996/11/02  01:41:38  timj
 c Fix bug in History header
 c
@@ -160,6 +163,7 @@ c
       BYTE BADBIT                      ! Bad bits mask
       PARAMETER (BADBIT = 7)
 *    Local variables :
+      LOGICAL      ABORTED             ! .TRUE. if observation was aborted
       INTEGER      BEAM                ! beam index in DO loop
       INTEGER      BEAM_OFFSET         ! offset in output data array due to
                                        ! beam index
@@ -206,10 +210,18 @@ c
       INTEGER      IN_DEM_PNTR_PTR     ! pointer to input .SCUBA.DEM_PNTR array
       INTEGER      ISTAT               ! temporary status
       INTEGER      ITEMP               ! scratch integer
+      INTEGER      LAST_EXP            ! the last exposure number in
+                                       ! an aborted observation
+      INTEGER      LAST_INT            ! the last integration number in
+                                       ! an aborted observation
+      INTEGER      LAST_MEAS           ! the last measurement number in
+                                       ! an aborted observation
       INTEGER      LBND (MAXDIM)       ! lower bounds of array
       CHARACTER*(DAT__SZLOC) LOC1      !
       CHARACTER*(DAT__SZLOC) LOC2      !
       INTEGER      MEASUREMENT         ! measurement index in DO loop
+      LOGICAL      MISSING_SWITCH      ! .TRUE. if any switches are
+                                       ! missing in an exposure
       INTEGER      NDIM                ! the number of dimensions in an array
       INTEGER      NERR                ! Number of errors returned from VEC_ITOI
       INTEGER      NREC                ! number of history records in file
@@ -237,6 +249,9 @@ c
       CHARACTER*15 SAMPLE_MODE         ! sample mode of observation
       INTEGER      SPIKE_LEVEL         ! level to despike
       INTEGER      START_BEAM          ! first reduced beam
+      CHARACTER*80 STATE               ! string describing the 'state'
+                                       ! of SCUCD when the observation
+                                       ! finished
       CHARACTER*20 STEMP               ! scratch string
       INTEGER      SWITCHES            ! number of switches implied by
                                        ! SWITCH_MODE
@@ -380,6 +395,16 @@ c
          END IF
       END IF
 
+*  see if the observation completed normally or was aborted
+
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
+     :  STATE, STATUS)
+      CALL CHR_UCASE (STATE)
+      ABORTED = .FALSE.
+      IF (INDEX(STATE,'ABORTING') .NE. 0) THEN
+         ABORTED = .TRUE.
+      END IF
+
 *  now find the chop function, switch mode and whether the internal 
 *  calibrator was turned on
 
@@ -431,7 +456,8 @@ c
          END IF
       END IF
 
-* Switch off automatic quality checking
+*  Switch off automatic quality checking
+
       CALL NDF_SQMF(.FALSE., IN_NDF, STATUS)
 
 *  map the data array and check its dimensions 
@@ -532,11 +558,34 @@ c
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
 
-      CALL MSG_OUT (' ', 'REDS: file contains data for ^N_S '//
-     :  'switch(es) in ^N_E exposure(s) in ^N_I integration(s) in '//
-     :  '^N_M measurement(s)', STATUS)
+      IF (.NOT. ABORTED) THEN
+         CALL MSG_OUT (' ', 'REDS: file contains data for ^N_S '//
+     :     'switch(es) in ^N_E exposure(s) in ^N_I integration(s) '//
+     :     'in ^N_M measurement(s)', STATUS)
+      ELSE
+       
+*  get the exposure, integration, measurement numbers at which the 
+*  abort occurred
 
-* Ask for the level at switch spikes should be removed
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'EXP_NO', LAST_EXP, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'INT_NO', LAST_INT, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MEAS_NO', LAST_MEAS, STATUS)
+
+         CALL MSG_OUT (' ', 'REDS: the observation should have '//
+     :     'had ^N_S switch(es) in ^N_E exposure(s) in ^N_I '//
+     :     'integration(s) in ^N_M measurement(s)', STATUS)
+         CALL MSG_SETI ('N_E', LAST_EXP)
+         CALL MSG_SETI ('N_I', LAST_INT)
+         CALL MSG_SETI ('N_M', LAST_MEAS)
+         CALL MSG_OUT (' ', ' - However, the observation was '//
+     :     'ABORTED during exposure ^N_E of integration ^N_I '//
+     :     'of measurement ^N_M', STATUS)
+      END IF 
+
+*  Ask for the level at switch spikes should be removed
 
       CALL PAR_GET0I('SPIKE_LEVEL', SPIKE_LEVEL, STATUS)
       SPIKE_LEVEL = SPIKE_LEVEL * 256
@@ -607,6 +656,7 @@ c
       CALL ARY_MAP (IARY2, '_INTEGER', 'WRITE', OUT_DEM_PNTR_PTR, ITEMP,
      :  STATUS)
 
+
 *  now got through the various exposures in the observation, reducing the
 *  component switches into the output array
 
@@ -617,19 +667,41 @@ c
             DO INTEGRATION = 1, N_INTEGRATIONS
                DO EXPOSURE = 1, N_EXPOSURES
 
+                  MISSING_SWITCH = .FALSE.
+
 *  find the offset of the switches in the data array
 
                   CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
      :              N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
      :              N_MEASUREMENTS, N_POS, 1, EXPOSURE, INTEGRATION,
      :              MEASUREMENT, SWITCH1_START, SWITCH1_END, STATUS)
+                  IF ((SWITCH1_START .EQ. VAL__BADI) .OR.
+     :                (SWITCH1_START .EQ. 0))        THEN
+                     CALL MSG_SETI ('E', EXPOSURE)
+                     CALL MSG_SETI ('I', INTEGRATION)
+                     CALL MSG_SETI ('M', MEASUREMENT)
+                     CALL MSG_OUT (' ', 'REDS: no data for '//
+     :                 'switch 1 in exp ^E, int ^I, meas ^M',
+     :                 STATUS)
+                     MISSING_SWITCH = .TRUE.
+                  END IF
 
                   IF (N_SWITCHES .GE. 2) THEN
                      CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
      :                 N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
-     :                 N_MEASUREMENTS, N_POS, 2, EXPOSURE, INTEGRATION,
-     :                 MEASUREMENT, SWITCH2_START, SWITCH2_END, 
-     :                 STATUS)
+     :                 N_MEASUREMENTS, N_POS, 2, EXPOSURE,
+     :                 INTEGRATION, MEASUREMENT, SWITCH2_START,
+     :                 SWITCH2_END, STATUS)
+                     IF ((SWITCH2_START .EQ. VAL__BADI) .OR.
+     :                   (SWITCH2_START .EQ. 0))        THEN
+                        CALL MSG_SETI ('E', EXPOSURE)
+                        CALL MSG_SETI ('I', INTEGRATION)
+                        CALL MSG_SETI ('M', MEASUREMENT)
+                        CALL MSG_OUT (' ', 'REDS: no data for '//
+     :                    'switch 2 in exp ^E, int ^I, meas ^M',
+     :                    STATUS)
+                        MISSING_SWITCH = .TRUE.
+                     END IF
                   ELSE
                      SWITCH2_START = SWITCH1_START
                   END IF
@@ -637,115 +709,141 @@ c
                   IF (N_SWITCHES .GE. 3) THEN
                      CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
      :                 N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
-     :                 N_MEASUREMENTS, N_POS, 3, EXPOSURE, INTEGRATION,
-     :                 MEASUREMENT, SWITCH3_START, SWITCH3_END,
-     :                 STATUS)
+     :                 N_MEASUREMENTS, N_POS, 3, EXPOSURE,
+     :                 INTEGRATION, MEASUREMENT, SWITCH3_START,
+     :                 SWITCH3_END, STATUS)
+                     IF ((SWITCH3_START .EQ. VAL__BADI) .OR.
+     :                   (SWITCH3_START .EQ. 0))        THEN
+                        CALL MSG_SETI ('E', EXPOSURE)
+                        CALL MSG_SETI ('I', INTEGRATION)
+                        CALL MSG_SETI ('M', MEASUREMENT)
+                        CALL MSG_OUT (' ', 'REDS: no data for '//
+     :                    'switch 3 in exp ^E, int ^I, meas ^M',
+     :                    STATUS)
+                        MISSING_SWITCH = .TRUE.
+                     END IF
                   ELSE
                      SWITCH3_START = SWITCH2_START
                   END IF
 
-*  find the number of data in the switch 
 
-                  N_SWITCH_POS = SWITCH1_END - SWITCH1_START + 1
+                  IF (.NOT. MISSING_SWITCH) THEN
+
+*  we, have data for all the switches in the exposure, find the number of
+*  data in the switch 
+
+                     N_SWITCH_POS = SWITCH1_END - SWITCH1_START + 1
 
 *  if required, divide the mean calibrator signal for each switch into the data
 
-                  IF (USE_CALIBRATOR) THEN
-                     CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
-     :                 N_SWITCH_POS,
-     :                 %val(DEMOD_DATA_PTR + 
-     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_VARIANCE_PTR + 
-     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_CALIBRATOR_PTR +
-     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_QUALITY_PTR + 
-     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBUB))
-
-                     IF (N_SWITCHES .GE. 2) THEN
+                     IF (USE_CALIBRATOR) THEN
                         CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
      :                    N_SWITCH_POS,
      :                    %val(DEMOD_DATA_PTR + 
-     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
      :                    %val(DEMOD_VARIANCE_PTR + 
-     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
      :                    %val(DEMOD_CALIBRATOR_PTR +
      :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
      :                    %val(DEMOD_QUALITY_PTR + 
-     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBUB))
-                     END IF
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBUB))
 
-                     IF (N_SWITCHES .GE. 3) THEN
-                        CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
-     :                    N_SWITCH_POS,
-     :                    %val(DEMOD_DATA_PTR + 
-     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_VARIANCE_PTR + 
-     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_CALIBRATOR_PTR +
-     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_QUALITY_PTR + 
-     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBUB))
+                        IF (N_SWITCHES .GE. 2) THEN
+                           CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
+     :                       N_SWITCH_POS,
+     :                       %val(DEMOD_DATA_PTR + 
+     :                       (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
+     :                       %val(DEMOD_VARIANCE_PTR + 
+     :                       (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
+     :                       %val(DEMOD_CALIBRATOR_PTR +
+     :                       (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                       %val(DEMOD_QUALITY_PTR + 
+     :                       (SWITCH2_START - 1) * N_BOLS * VAL__NBUB))
+                        END IF
+
+                        IF (N_SWITCHES .GE. 3) THEN
+                           CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
+     :                       N_SWITCH_POS,
+     :                       %val(DEMOD_DATA_PTR + 
+     :                       (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
+     :                       %val(DEMOD_VARIANCE_PTR + 
+     :                       (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
+     :                       %val(DEMOD_CALIBRATOR_PTR +
+     :                       (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                       %val(DEMOD_QUALITY_PTR + 
+     :                       (SWITCH3_START - 1) * N_BOLS * VAL__NBUB))
+                        END IF
                      END IF
-                  END IF
 
 *  set up the number of `beams' to be reduced
 
-		  IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
-                     START_BEAM = 1
-                     END_BEAM = SCUBA__MAX_BEAM
-                  ELSE
-                     START_BEAM = 2
-                     END_BEAM = 2
-                  END IF
+                     IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+                        START_BEAM = 1
+                        END_BEAM = SCUBA__MAX_BEAM
+                     ELSE
+                        START_BEAM = 2
+                        END_BEAM = 2
+                     END IF
 
 *  reduce the switch
 
-		  DO BEAM = START_BEAM, END_BEAM
+		     DO BEAM = START_BEAM, END_BEAM
 
 *  calculate the data offset in the `beam' plane
 
-                     BEAM_OFFSET = (BEAM - START_BEAM) * N_POS * N_BOLS
+                        BEAM_OFFSET = (BEAM - START_BEAM) * N_POS *
+     :                    N_BOLS
 
-                     CALL SCULIB_REDUCE_SWITCH (CHOP_FUNCTION,
-     :                 N_SWITCHES, N_SWITCH_POS * N_BOLS,
-     :                 %val(DEMOD_DATA_PTR + 
-     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_VARIANCE_PTR + 
-     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_QUALITY_PTR + 
-     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBUB),
-     :                 %val(DEMOD_DATA_PTR +
-     :                 (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_VARIANCE_PTR + 
-     :                 (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_QUALITY_PTR + 
-     :                 (SWITCH2_START - 1) * N_BOLS * VAL__NBUB),
-     :                 %val(DEMOD_DATA_PTR + 
-     :                 (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_VARIANCE_PTR + 
-     :                 (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
-     :                 %val(DEMOD_QUALITY_PTR + 
-     :                 (SWITCH3_START - 1) * N_BOLS * VAL__NBUB),
-     :                 BEAM,
-     :                 %val(OUT_DATA_PTR + (BEAM_OFFSET +
-     :                 (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
-     :                 %val(OUT_VARIANCE_PTR + (BEAM_OFFSET +
-     :                 (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
-     :                 %val(OUT_QUALITY_PTR + (BEAM_OFFSET +
-     :                 (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
-     :                 BEAM_WEIGHT(BEAM),
-     :                 STATUS)
-                  END DO
+                        CALL SCULIB_REDUCE_SWITCH (CHOP_FUNCTION,
+     :                    N_SWITCHES, N_SWITCH_POS * N_BOLS,
+     :                    %val(DEMOD_DATA_PTR + 
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_VARIANCE_PTR + 
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_QUALITY_PTR + 
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBUB),
+     :                    %val(DEMOD_DATA_PTR +
+     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_VARIANCE_PTR + 
+     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_QUALITY_PTR + 
+     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBUB),
+     :                    %val(DEMOD_DATA_PTR + 
+     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_VARIANCE_PTR + 
+     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_QUALITY_PTR + 
+     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBUB),
+     :                    BEAM,
+     :                    %val(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                    (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                    %val(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                    (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
+     :                    %val(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                    (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
+     :                    BEAM_WEIGHT(BEAM),
+     :                    STATUS)
+                     END DO
 
 *  increment the output offset
 
-                  ITEMP = ((MEASUREMENT-1) * N_INTEGRATIONS +
+                     ITEMP = ((MEASUREMENT-1) * N_INTEGRATIONS +
      :                 INTEGRATION-1) * N_EXPOSURES + EXPOSURE-1
-                  CALL VEC_ITOI(.FALSE., 1, EXP_POINTER,
-     :                 %val(OUT_DEM_PNTR_PTR + ITEMP * VAL__NBI), IERR,
-     :                 NERR, STATUS)
-                  EXP_POINTER = EXP_POINTER + N_SWITCH_POS
+                     CALL VEC_ITOI(.FALSE., 1, EXP_POINTER,
+     :                 %val (OUT_DEM_PNTR_PTR + ITEMP * VAL__NBI),
+     :                 IERR, NERR, STATUS)
+                     EXP_POINTER = EXP_POINTER + N_SWITCH_POS
+                  ELSE
+
+*  we are missing data for at least one switch, we can't reduce the
+*  exposure so put a 0 in the DEM_PNTR array to indicate this
+
+                     ITEMP = ((MEASUREMENT-1) * N_INTEGRATIONS +
+     :                 INTEGRATION-1) * N_EXPOSURES + EXPOSURE-1
+                     CALL VEC_ITOI (.FALSE., 1, 0,
+     :                 %val (OUT_DEM_PNTR_PTR + ITEMP * VAL__NBI),
+     :                 IERR, NERR, STATUS)
+                  END IF
                END DO
             END DO
          END DO
