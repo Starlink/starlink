@@ -1,0 +1,5 @@
+      real function esp1_vers ()
+c     Library version: @PACKAGE_VERSION@
+c     This file is auto-generated -- see makefile
+      esp1_vers=@PACKAGE_VERSION_INTEGER@
+      end
