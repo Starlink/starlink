@@ -59,7 +59,7 @@
 *     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
-*     package:hsi, usage:private
+*     package:hsi, usage:private, history, initialisation
 
 *  Copyright:
 *     Copyright (C) University of Birmingham, 1995
@@ -95,6 +95,8 @@
 *  External References:
       EXTERNAL			HSI1_ADD
       EXTERNAL			HSI1_COPY
+      EXTERNAL			HSI1_GETCTR
+      EXTERNAL			HSI1_GETREC
       EXTERNAL			HSI1_NEW
       EXTERNAL			HSI1_OK
       EXTERNAL			HSI1_PTXT
@@ -120,6 +122,10 @@
      :                   DID, STATUS )
 
 *    Data extractors
+        CALL ADI_DEFMTH( 'GetHistoryCtrl(HDSfile)', HSI1_GETCTR,
+     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'GetHistoryRec(HDSfile,INTEGER)', HSI1_GETREC,
+     :                   DID, STATUS )
 
 *    Checkers
         CALL ADI_DEFMTH( 'ChkHistory(HDSfile)', HSI1_OK,

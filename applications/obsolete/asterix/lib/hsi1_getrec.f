@@ -106,16 +106,17 @@
 
 *  Local Variables:
       CHARACTER*30              CDATE                   ! Creation date
-      CHARACTER*80		COMMAND			! Creation command
       CHARACTER*(DAT__SZLOC)    CRLOC                   ! Current RECORDS cell
       CHARACTER*(DAT__SZLOC)    HLOC                    ! HISTORY object
       CHARACTER*(DAT__SZLOC)    LOC                     ! Dataset locator
       CHARACTER*(DAT__SZLOC)    RLOC                    ! RECORDS object
+      CHARACTER*132		TEXT			! History text
       CHARACTER*(DAT__SZLOC)    TXLOC                   ! TEXT object
       CHARACTER*(DAT__SZLOC)    TXCLOC                  ! TEXT object cell
 
       INTEGER			CID			! ADI array cell
       INTEGER			CREC			! Current # records
+      INTEGER                   ILINE                   ! Loop over text lines
       INTEGER			IREC			! Record required
       INTEGER                   NLINE                   ! Number of TEXT lines
 
