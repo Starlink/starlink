@@ -8,7 +8,14 @@ applications (see SUN/238).
 
 Version 1.1. includes the following changes:
 
--  The kaplibs_link_adam script now has an optional switch, "-nogks",
-which allows applications to be linked with the native version of PGPLOT
-instead of the Starlink GKS-based version.
- 
+   - The kaplibs_link_adam script now has an optional switch, "-nogks",
+   which allows applications to be linked with the native version of
+   PGPLOT instead of the Starlink GKS-based version.
+
+   - The routine KPG1_PGOPN now initializes the colour table of the
+   opened device by reading a colour table from the file
+   ~/adam/kappa_lut.sdf. If this file does not exist, a monochrome colour
+   table is used. Applications which change the current colour table
+   should update this file by calling new routine KPG1_LTSAV to save
+   the current colour table in the file.
+

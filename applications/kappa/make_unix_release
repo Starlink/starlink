@@ -80,7 +80,7 @@
          exit
       endif
 
-      foreach file (kappa_mon.f kapview_mon.f ndfpack_mon.f kappa.ifd kappa.demo)
+      foreach file (kappa_mon.f kapgks_mon.f kapview_mon.f ndfpack_mon.f kappa.ifd kappa.demo)
          sed -e "s#PKG_VERS#$vers[3]#g" $file > temp
          mv -f temp $file
       end
