@@ -23,9 +23,9 @@ static const char RCSID[] =
 verbosities DviFile::verbosity_ = normal;
 
 DviFile::DviFile (string s, int res, double magmag)
-    : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0), dvif_(0),
-      skipPage_(false), current_font_(0), resolution_(res), magmag_(magmag),
-      magfactor_(1.0), iterOK_(false)
+    : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0),
+      current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
+      magfactor_(1.0), skipPage_(false), iterOK_(false)
 {
     PkFont::setResolution(res);
 

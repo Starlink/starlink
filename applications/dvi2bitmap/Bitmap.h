@@ -20,7 +20,8 @@ class Bitmap {
     Bitmap (const int width, const int height, const int bpp=1);
     ~Bitmap();
 
-    enum Margin { Left=0, Right=1, Top=2, Bottom=3 };
+    // make sure Left..Bottom are 0..3 (I should use an iterator, I know...)
+    enum Margin { Left=0, Right=1, Top=2, Bottom=3, All=4 };
 
     void paint (const int x, const int y, const int w, const int h,
 		const Byte* b);

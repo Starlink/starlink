@@ -38,7 +38,7 @@ bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
 // Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
 // with point (0,0) in the top left corner.
 Bitmap::Bitmap (const int w, const int h, const int bpp)
-    : W(w), H(h), bpp_(bpp), transparent_(false), frozen_(false)
+    : W(w), H(h), frozen_(false), transparent_(false), bpp_(bpp)
 {
     B = new Byte[W*H];
     memset ((void*)B, 0, W*H);
@@ -320,7 +320,9 @@ void Bitmap::scaleDown (const int factor)
 	    int tot = 0;
 	    int x=col1*factor;
 	    int y=row1*factor;
+#if !SCALEDOWN_COMPLETE_AVERAGE
 	    int count = 0;
+#endif
 	    int colspan = (col1 < complete_bbR ? factor : rem_cols);
 	    for (int row2=y; row2<y+rowspan; row2++)
 		for (int col2=x; col2<x+colspan; col2++)
@@ -399,7 +401,7 @@ void Bitmap::write (const string filename, const string format)
     string outfilename = filename;
     if (fileext.length() != 0)
     {
-	int extlen = fileext.length();
+	unsigned int extlen = fileext.length();
 	if (extlen > outfilename.length() ||
 	    outfilename.substr(outfilename.length()-extlen, extlen) != fileext)
 	    outfilename += '.' + fileext;
