@@ -9,18 +9,18 @@ lib_LTLIBRARIES = libimg_adam.la
 
 ## Declare the sources for the library.
 libimg_adam_la_SOURCES = \
-        $(PUBLIC_INCLUDES) \
-	$(PRIVATE_INCLUDES) \
-        $(BLOCK_DATA_FILES) \
-        $(C_ROUTINES) \
-        $(F_ROUTINES) \
-        $(G_ROUTINES:.gen=.f) \
-        $(GSD_ROUTINES:.gsd=.f) \
-        $(GSC_ROUTINES:.gsc=.f)
+ $(PUBLIC_INCLUDES) \
+ $(PRIVATE_INCLUDES) \
+ $(BLOCK_DATA_FILES) \
+ $(C_ROUTINES) \
+ $(F_ROUTINES) \
+ $(G_ROUTINES:.gen=.f) \
+ $(GNP_ROUTINES:.gnp=.f) \
+ $(GCP_ROUTINES:.gcp=.f)
 
 ##  Distribute the original sources, in case these are needed for further
 ##  development. 
-EXTRA_DIST = $(G_ROUTINES) $(GSD_ROUTINES) $(GSC_ROUTINES)
+EXTRA_DIST = $(G_ROUTINES) $(GNP_ROUTINES) $(GCP_ROUTINES)
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = $(PUBLIC_INCLUDES)
@@ -68,10 +68,10 @@ G_ROUTINES = img_in1x.gen img_in2x.gen img_in3x.gen img_inx.gen \
  img_outx.gen img_tmp1x.gen img_tmp2x.gen img_tmp3x.gen \
  img_tmpx.gen img_mod1x.gen img_mod2x.gen img_mod3x.gen img_modx.gen
 
-GSD_ROUTINES = img1_gkeyx.gsd
+GNP_ROUTINES = img1_gkeyx.gnp
 
-GSC_ROUTINES = hdr_inx.gsc hdr_outx.gsc img1_rdexx.gsc img1_rdftx.gsc \
- img1_wkeyx.gsc img1_wrexx.gsc img1_wrftx.gsc
+GCP_ROUTINES = hdr_inx.gcp hdr_outx.gcp img1_rdexx.gcp img1_rdftx.gcp \
+ img1_wkeyx.gcp img1_wrexx.gcp img1_wrftx.gcp
 
 ## Note that we cannot call this variable just BLOCK_DATA, since automake
 ## interprets this as a `primary' DATA
@@ -97,21 +97,23 @@ GFLAGS = n
 .gen.f:
 	$(GC) -t $(GFLAGS) $<
 
-#  Run generic to get rlidc types
-GSCFLAGS = drlic
-.gsc.f:
-	$(LN_S) $< $(<:.gsc=.gen)
-	$(GC) -t $(GSCFLAGS) $(<:.gsc=.gen)
-	$(RM) $(<:.gsc=.gen)
+#  Run generic to get the complete set of parameter types (rlidc)
+GCPFLAGS = rlidc
+.gcp.f:
+	$(LN_S) $< $(<:.gcp=.gen)
+	$(GC) -t $(GCPFLAGS) $(<:.gcp=.gen)
+	$(RM) $(<:.gcp=.gen)
 
-#  Run generic to get rlid types.
-GSDFLAGS = drli
-.gsd.f:
-	$(LN_S) $< $(<:.gsd=.gen)
-	$(GC) -t $(GSDFLAGS) $(<:.gsd=.gen)
-	$(RM) $(<:.gsd=.gen)
+#  Run generic to get numeric parameter rlid types.
+GNPFLAGS = rlid
+.gnp.f:
+	$(LN_S) $< $(<:.gnp=.gen)
+	$(GC) -t $(GNPFLAGS) $(<:.gnp=.gen)
+	$(RM) $(<:.gnp=.gen)
 
 ##  The Fortran intermediary files should be cleaned away sometime.
 ##  Since they are distributed make this maintainer-clean.
-MAINTAINERCLEANFILES = $(G_ROUTINES:.gen=.f) $(GSD_ROUTINES:.gsd=.f) \
- $(GSC_ROUTINES:.gsc=.f)
+MAINTAINERCLEANFILES = $(G_ROUTINES:.gen=.f) $(GNP_ROUTINES:.gnp=.f) \
+ $(GCP_ROUTINES:.gcp=.f)
+
+#  Installation check, sorry, don't know how to do this for an Atask.

@@ -22,6 +22,8 @@
  *       Added BAD data values.
  *    24-OCT-2000 (PDRAPER):
  *       Added hdrCopy prototype.
+ *    08-JUN-2004 (PDRAPER):
+ *       Changed BAD values to use  PRIMDAT values.
  *    {enter_further_changes_here}
  *    
  */
@@ -30,14 +32,23 @@
 
 #include <float.h>
 #include <limits.h>
+#include <prm_par.h>
 
-#define VAL__BADF    -FLT_MAX
-#define VAL__BADD    -DBL_MAX
-#define VAL__BADI    INT_MIN
-#define VAL__BADS    SHRT_MIN
-#define VAL__BADUS   USHRT_MAX
-#define VAL__BADB    CHAR_MIN
-#define VAL__BADUB   UCHAR_MAX
+/* PRM defines:
+   VAL__BADUB
+   VAL__BADB
+   VAL__BADUW
+   VAL__BADW
+   VAL__BADI
+   VAL__BADR
+   VAL__BADD
+*/
+
+/*  IMG historical C-like names, preserve for backwards compatibility */
+#define VAL__BADF    VAL__BADR
+#define VAL__BADS    VAL__BADW
+#define VAL__BADUS   VAL__BADUW
+
 
 /*  Function prototypes. */
 
