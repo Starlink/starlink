@@ -9,7 +9,10 @@
 *
 *	Contents:	handling of "check-images".
 *
-*	Last modify:	27/07/98
+*	Last modify:	04/02/98
+*                       28/10/98 (AJC):
+*                          Major remodel to produce NDFs
+*                          N.B. Header information lost.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -24,11 +27,16 @@
 #include	"astrom.h"
 #include	"check.h"
 
+#include        "sae_par.h"
+#include        "ndf.h"
+#include        "dat_par.h"
+
 /********************************* addcheck **********************************/
 /*
 Add a PSF to a CHECK-image (with a multiplicative factor).
 Outside boundaries are taken into account.
 */
+
 void	addcheck(checkstruct *check, float *psf,
 			int w,int h, int ix,int iy, float amplitude)
   {
@@ -139,184 +147,143 @@ checkstruct	*initcheck(picstruct *field, char *filename,
 			checkenum check_type)
 
   {
-   astromstruct	*as;
    checkstruct	*check;
    char		*buf;
    int		i, ival;
    size_t	padsize;
    double	dval;
-   USHORT	*ptri;
-   PIXTYPE	*ptrf;
+   USHORT	*pntri;
+   PIXTYPE	*pntrf;
+   void         *pntr[3];
+   int 		placehldr;
+   int          lbnd[2], ubnd[2];
+   int 		ndim;
+   int          status = SAI__OK;
 
   QCALLOC(check, checkstruct, 1);
 
   strcpy(check->filename, filename);
   check->type = check_type;
-  if (!(check->file = fopen(check->filename, "wb")))
+
+  ndfOpen( DAT__ROOT, check->filename, "WRITE", "UNKNOWN",
+           &check->ndf, &placehldr, &status );
+  if ( status != SAI__OK ) 
     error(EXIT_FAILURE, "*Error*: Cannot open for output ", check->filename);
 
-/* Inherit the field FITS header */
-  check->fitsheadsize = field->fitsheadsize;
-  QMALLOC(check->fitshead, char, check->fitsheadsize);
-  memcpy(check->fitshead, field->fitshead, check->fitsheadsize);
-  check->y = 0;
-/* Neutralize possible scaling factors */
-  dval = 1.0;fitswrite(check->fitshead, "BSCALE  ", &dval, H_FLOAT, T_DOUBLE);
-  dval = 0.0;fitswrite(check->fitshead, "BZERO   ", &dval, H_FLOAT, T_DOUBLE);
-  ival = 1;fitswrite(check->fitshead, "BITSGN  ", &ival, H_INT, T_LONG);
-  if (field->compress_type != COMPRESS_NONE)
-    fitswrite(check->fitshead, "IMAGECOD", "NONE", H_STRING, T_STRING);
-  fitswrite(check->fitshead, "ORIGIN  ", BANNER, H_STRING, T_STRING);
+  if ( check->ndf != NDF__NOID ) {
+/* Delete an existing file */
+     ndfDelet( &check->ndf, &status );
+/* And get a placeholder */
+     ndfOpen( DAT__ROOT, check->filename, "WRITE", "UNKNOWN",
+              &check->ndf, &placehldr, &status );
+     if ( status != SAI__OK )
+        error(EXIT_FAILURE, "*Error*: Deleting existing file ", check->filename);
+  }     
 
+/* We should now have a placeholder */
+  if ( placehldr == NDF__NOPL )
+     error(EXIT_FAILURE, "*Error*: Getting NDF placeholder ", check->filename);
+
+/* Create an NDF of the required type and size */
+  lbnd[0]=lbnd[1]=1;
   switch(check_type)
-    {
-    case CHECK_IDENTICAL:
-    case CHECK_BACKGROUND:
-    case CHECK_FILTERED:
-    case CHECK_SUBTRACTED:
-      ival = -32;
-      fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
-      check->width = field->width;
-      check->height = field->height;
-      check->npix = field->npix;
-      QMALLOC(ptrf, PIXTYPE, check->width);
-      check->pix = (void *)ptrf;
-      QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
-      free(check->fitshead);
-      break;
-
-    case CHECK_BACKRMS:
-    case CHECK_SUBOBJECTS:
-      ival = -32;
-      fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
-      check->width = field->width;
-      check->height = field->height;
-      check->npix = field->npix;
-      QMALLOC(ptrf, PIXTYPE, check->width);
-      check->pix = (void *)ptrf;
-      QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
-      free(check->fitshead);
+  {
+  case CHECK_BACKRMS:
+  case CHECK_SUBOBJECTS:
 /*---- Allocate memory for replacing the blanked pixels by 0 */
-      if (!check->line)
+     if (!check->line)
         QMALLOC(check->line, PIXTYPE, field->width);
-      break;
+/*---- Fall through here */
+  case CHECK_IDENTICAL:
+  case CHECK_BACKGROUND:
+  case CHECK_FILTERED:
+  case CHECK_SUBTRACTED:
+  case CHECK_OBJECTS:
+  case CHECK_APERTURES:
+  case CHECK_SUBPROTOS:
+  case CHECK_PROTOS:
+  case CHECK_ASSOC:
+  case CHECK_MAPSOM:
+     ubnd[0] = check->width = field->width;
+     ubnd[1] = check->height = field->height;
+     check->npix = field->npix;
+/*     ndfBound( field->ndf, 2, lbnd, ubnd, &ndim, &status );*/
+     ndfNew( "_REAL", 2, lbnd, ubnd, &placehldr, &check->ndf, &status );
+     break;
+  case CHECK_SEGMENTATION:
+     ubnd[0] = check->width = field->width;
+     ubnd[1] = check->height = field->height;
+     check->npix = field->npix;
+     ndfNew( "_WORD", 2, lbnd, ubnd, &placehldr, &check->ndf, &status );
+     break;
+  case CHECK_MINIBACKGROUND:
+  case CHECK_MINIBACKRMS:
+     ubnd[0] = check->width = field->nbackx;
+     ubnd[1] = check->height = field->nbacky;
+     check->npix = check->width * check->height;
+     ndfNew( "_REAL", 2, lbnd, ubnd, &placehldr, &check->ndf, &status );
+     break;
+  default:
+     error(EXIT_FAILURE, "*Error* Invalid check_type in ", "initcheck()!");
+  }         
 
-    case CHECK_OBJECTS:
-    case CHECK_APERTURES:
-    case CHECK_SUBPROTOS:
-    case CHECK_PROTOS:
-      ival = -32;
-      fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
-      check->width = field->width;
-      check->height = field->height;
-      check->npix = field->npix;
-      check->overlay = 30*field->backsig;
-      QCALLOC(ptrf, PIXTYPE, check->npix);
-      check->pix = (void *)ptrf;
-      QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
-      free(check->fitshead);
-      break;
+/* Propagate the original header */
+     ndfCput( field->ident, check->ndf, "TITLE", &status );
 
-    case CHECK_SEGMENTATION:
-      ival = 16;
-      fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
-      check->width = field->width;
-      check->height = field->height;
-      check->npix = field->npix;
-      QCALLOC(ptri, USHORT, check->npix);
-      check->pix = (void *)ptri;
-      QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
-      free(check->fitshead);
-      break;
-
-    case CHECK_ASSOC:
-      ival = -32;
-      fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
-      check->width = field->width;
-      check->height = field->height;
-      check->npix = field->npix;
-      QMALLOC(ptrf, PIXTYPE, check->npix);
-      check->pix = (void *)ptrf;
-/*---- Initialize the pixmap to IEEE NaN */
-      memset(ptrf, 0xFF, check->npix*sizeof(LONG));
-      QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
-      free(check->fitshead);
-      break;
-
-    case CHECK_MINIBACKGROUND:
-    case CHECK_MINIBACKRMS:
-      ival = -32;
-      fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
-      check->width = field->nbackx;
-      fitswrite(check->fitshead, "NAXIS1  ", &check->width, H_INT, T_LONG);
-      check->height = field->nbacky;
-      fitswrite(check->fitshead, "NAXIS2  ", &check->height, H_INT, T_LONG);
-/* Scale the WCS information if present */
-      if (as=field->astrom)
-        {
-        dval = as->cdelt[0]*field->backw;
-        fitswrite(check->fitshead, "CDELT1  ", &dval, H_EXPO, T_DOUBLE);
-        dval = as->cdelt[1]*field->backh;
-        fitswrite(check->fitshead, "CDELT2  ", &dval, H_EXPO, T_DOUBLE);
-        dval = (as->crpix[0]-0.5)/field->backw + 0.5;
-        fitswrite(check->fitshead, "CRPIX1  ", &dval, H_EXPO, T_DOUBLE);
-        dval = (as->crpix[1]-0.5)/field->backh + 0.5;
-        fitswrite(check->fitshead, "CRPIX2  ", &dval, H_EXPO, T_DOUBLE);
-
-        dval = as->pc[0]*as->cdelt[0]*field->backw;
-        fitswrite(check->fitshead, "CD1_1   ", &dval, H_EXPO, T_DOUBLE);
-        dval = as->pc[1]*as->cdelt[1]*field->backh;
-        fitswrite(check->fitshead, "CD1_2  ", &dval, H_EXPO, T_DOUBLE);
-        dval = as->pc[2]*as->cdelt[0]*field->backw;
-        fitswrite(check->fitshead, "CD2_1   ", &dval, H_EXPO, T_DOUBLE);
-        dval = as->pc[3]*as->cdelt[1]*field->backh;
-        fitswrite(check->fitshead, "CD2_2  ", &dval, H_EXPO, T_DOUBLE);
-        }
-      check->npix = check->width*check->height;
-      QMALLOC(ptrf, PIXTYPE, check->npix);
-      check->pix = (void *)ptrf;
-      if (check_type==CHECK_MINIBACKRMS)
-        memcpy(check->pix, field->sigma, check->npix*sizeof(float));
-      else
-        memcpy(check->pix, field->back, check->npix*sizeof(float));
-      QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
-      free(check->fitshead);
-#     ifdef BSWAP
-        swapbytes(check->pix, sizeof(float), (int)check->npix);
-#     endif
-      QFWRITE(check->pix,check->npix*sizeof(float),check->file,
-	check->filename);
-/*---- Put the buffer back to its original state */
-#     ifdef BSWAP
-        swapbytes(check->pix, sizeof(float), (int)check->npix);
-#     endif
-      free(check->pix);
-      QCALLOC(buf, char, FBSIZE);
-      padsize = (FBSIZE -((check->npix*sizeof(PIXTYPE))%FBSIZE))% FBSIZE;
-      if (padsize)
-        QFWRITE (buf, padsize, check->file, check->filename);
-      fclose(check->file);
-      free(buf);
-      break;
-
-    case CHECK_MAPSOM:
-      ival = -32;
-      fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
-      check->width = field->width;
-      check->height = field->height;
-      check->npix = field->npix;
-      QMALLOC(ptrf, PIXTYPE, check->npix);
-      check->pix = (void *)ptrf;
-      for (i=check->npix; i--;)
-        *(ptrf++) = -10.0;
-      QFWRITE(check->fitshead,check->fitsheadsize,check->file,check->filename);
-      free(check->fitshead);
-      break;
-
-    default:
-      error(EXIT_FAILURE, "*Internal Error* in ", "initcheck()!");
-    }
-
+/* Now map and initialise appropriately */
+  check->pix = NULL;
+  switch (check_type)
+  {
+  case CHECK_IDENTICAL:
+  case CHECK_BACKGROUND:
+  case CHECK_FILTERED:
+  case CHECK_SUBTRACTED:
+  case CHECK_BACKRMS:
+  case CHECK_SUBOBJECTS:
+     QMALLOC( pntrf, PIXTYPE, check->width);
+     check->pix = (void *)pntrf;
+/*----- Fall through here */
+  case CHECK_OBJECTS:
+  case CHECK_APERTURES:
+  case CHECK_SUBPROTOS:
+  case CHECK_PROTOS:
+     ndfMap( check->ndf, "DATA", "_REAL", "WRITE/ZERO", 
+             pntr, &check->nel, &status );
+     check->map = pntr[0];
+     if ( !check->pix )
+        check->pix = check->map;
+     break;
+  case CHECK_ASSOC:
+     ndfMap( check->ndf, "DATA", "_REAL", "WRITE/BAD", 
+             pntr, &check->nel, &status );
+     check->pix = check->map = pntr[0];
+     break;
+  case CHECK_MAPSOM:
+     ndfMap( check->ndf, "DATA", "_REAL", "WRITE", 
+             pntr, &check->nel, &status );
+     check->pix = check->map = pntr[0];
+     for (i=check->nel,pntrf=(PIXTYPE *)check->map;i--;)
+        *(pntrf++) = -10.0;
+     break;
+  case CHECK_SEGMENTATION:
+     ndfMap( check->ndf, "DATA", "_WORD", "WRITE/ZERO", 
+             pntr, &check->nel, &status );
+     check->pix = check->map = pntr[0];
+     break;
+  case CHECK_MINIBACKGROUND:
+  case CHECK_MINIBACKRMS:
+     ndfMap( check->ndf, "DATA", "_REAL", "WRITE", 
+             pntr, &check->nel, &status );
+     check->map = pntr[0];
+     if (check_type==CHECK_MINIBACKRMS)
+        memcpy(check->map, field->sigma, check->npix*sizeof(float));
+     else
+        memcpy(check->map, field->back, check->npix*sizeof(float));
+     ndfAnnul(&check->ndf,&status);
+     break;
+  default:
+     error(EXIT_FAILURE, "*Error* Invalid check_type in ", "initcheck()!");
+  }
 
   return check;
   }
@@ -324,7 +291,7 @@ checkstruct	*initcheck(picstruct *field, char *filename,
 
 /******************************** writecheck *********************************/
 /*
-Write ONE line of npix pixels of a check-image.
+Write ONE line of pixels of a check-image.
 */
 void	writecheck(checkstruct *check, PIXTYPE *data, int w)
 
@@ -355,16 +322,9 @@ void	writecheck(checkstruct *check, PIXTYPE *data, int w)
     data = check->line;
     }
 
-
-# ifdef BSWAP
-  swapbytes(data, sizeof(PIXTYPE), w);
-# endif
-  QFWRITE(data, w*sizeof(PIXTYPE), check->file, check->filename);
-# ifdef BSWAP
-/* Put the buffer back to its original state */
-  swapbytes(data, sizeof(PIXTYPE), w);
-# endif
-
+/* Write line into mapped NDF */
+  memcpy( (PIXTYPE *)check->map+check->pos, data, w*sizeof(PIXTYPE) );
+  check->pos += w;
   return;
   }
 
@@ -390,31 +350,15 @@ void	endcheck(picstruct *field, checkstruct *check)
     case CHECK_FILTERED:
     case CHECK_SUBTRACTED:
       free(check->pix);
-      padsize = (FBSIZE -((check->npix*sizeof(PIXTYPE))%FBSIZE)) % FBSIZE;
       break;
 
     case CHECK_OBJECTS:
     case CHECK_APERTURES:
     case CHECK_SUBPROTOS:
-    case CHECK_PROTOS:
     case CHECK_ASSOC:
-#     ifdef BSWAP
-      swapbytes(check->pix, sizeof(PIXTYPE), (int)check->npix);
-#     endif
-      QFWRITE(check->pix,check->npix*sizeof(PIXTYPE),
-		check->file,check->filename);
-      free(check->pix);
-      padsize = (FBSIZE-((check->npix*sizeof(PIXTYPE))%FBSIZE)) % FBSIZE;
       break;
 
     case CHECK_SEGMENTATION:
-#     ifdef BSWAP
-      swapbytes(check->pix, sizeof(USHORT), (int)check->npix);
-#     endif
-      QFWRITE(check->pix,check->npix*sizeof(USHORT),
-		check->file,check->filename);
-      free(check->pix);
-      padsize = (FBSIZE -((check->npix*sizeof(USHORT))%FBSIZE)) % FBSIZE;
       break;
 
     case CHECK_SUBOBJECTS:
@@ -426,30 +370,16 @@ void	endcheck(picstruct *field, checkstruct *check)
       free(check->pix);
       free(check->line);
       check->line = NULL;
-      padsize = (FBSIZE -((check->npix*sizeof(PIXTYPE))%FBSIZE)) % FBSIZE;
       break;
       }
 
     case CHECK_MAPSOM:
-#     ifdef BSWAP
-      swapbytes(check->pix, sizeof(PIXTYPE), (int)check->npix);
-#     endif
-printf("%d\n", check->npix);
-      QFWRITE(check->pix,check->npix*sizeof(PIXTYPE),
-		check->file,check->filename);
-      free(check->pix);
-      padsize = (FBSIZE -((check->npix*sizeof(USHORT))%FBSIZE)) % FBSIZE;
       break;
 
     default:
       error(EXIT_FAILURE, "*Internal Error* in ", "endcheck()!");
     }
 
-  QCALLOC(buf, char, FBSIZE);
-  if (padsize)
-    QFWRITE (buf, padsize, check->file, check->filename);
-  fclose(check->file);
-  free(buf);
   free(check);
 
   return;

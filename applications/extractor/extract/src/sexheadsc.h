@@ -10,6 +10,8 @@
 *	Contents:	header structure and templates for SkyCat output.
 *
 *	Last modify:	02/09/97
+*                       23/10/98 (AJC):
+*                         Remove col headings from skycathead
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -20,8 +22,7 @@ char	skycathead[] = "QueryResult\n\n"
 	"long_name: SExtractor catalog\n"
 	"short_name: SExCat\n"
 	"symbol: id diamond %4.1f\n"
-	"# End config entry\n\n"
-	"id\tra\tdec\tmag";
+	"# End config entry\n\n";
 
 char	skycattail[] = "[EOD]";
 

@@ -10,6 +10,8 @@
 *	Contents:	handling of "check-images".
 *
 *	Last modify:	05/09/97
+*                       16/07/98  (AJC)
+*                         Add NDF section to checkstruct
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -19,7 +21,6 @@
 typedef struct structcheck
   {
   char		filename[MAXCHAR];	/* ptr to check-image filename */
-  FILE		*file;			/* ptr to check-image file structure */
   char		*fitshead;		/* ptr to check-image FITS header */
   int		fitsheadsize;		/* size of check-image FITS header */
   void		*pix;			/* ptr to check-image pixmap */
@@ -29,6 +30,12 @@ typedef struct structcheck
   PIXTYPE	overlay;		/* intensity of the overlayed plots */
   PIXTYPE	*line;			/* buffered image line */
   checkenum	type;			/* CHECKIMAGE_TYPE */
+/* ---- NDF */
+  int           ndf;                    /* NDF identifier */
+  void          *map;                   /* Pointer to mapped data */
+  int           pos;                    /* Pixel position within mapped data */
+  int           nel;                    /* size of map (pixels) */
+  int           file;                   /* next pixel number from map */
   }	checkstruct;
 
 /*------------------------------- functions ---------------------------------*/

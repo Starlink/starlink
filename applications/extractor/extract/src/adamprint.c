@@ -20,7 +20,7 @@ void adamprint( FILE *file, char *fmt, ... )
    double dval;
    int status = SAI__OK;
 
-   fmtcpy = (char *)malloc( (size_t)strlen( fmt ) );
+   fmtcpy = (char *)malloc( (size_t)strlen( fmt ) + 1 );
    strcpy( fmtcpy, fmt );
 
    va_start(ap, fmt); /* ap points to first unnamed arg */

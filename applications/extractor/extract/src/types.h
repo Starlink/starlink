@@ -10,6 +10,8 @@
 *	Contents:	global type definitions.
 *
 *	Last modify:	11/08/98
+*                       28/10/98 (AJC)
+*                         Add NDF bit to picstruct
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -232,7 +234,7 @@ typedef struct
   char		*rfilename;		/* pointer to the reduced image name */
   char		ident[MAXCHAR];		/* field identifier (read from FITS)*/
   char		rident[MAXCHAR];	/* field identifier (relative) */
-  FILE		*file;			/* pointer the image file structure */
+/*  FILE		*file;		  /* pointer the image file structure */
   char		*fitshead;		/* pointer to the FITS header */
   int		fitsheadsize;		/* FITS header size */
 /* ---- main image parameters */
@@ -295,6 +297,11 @@ typedef struct
   int		*interp_ytimeoutbuf;	/* interpolation timeout line buffer */
   int		interp_xtimeout;	/* interpolation timeout value in x */
   int		interp_ytimeout;	/* interpolation timeout value in y */
+/* ---- NDF */
+  int           ndf;                    /* NDF identifier */
+  void          *map;                   /* pointer to mapped data */
+  int           nel;                    /* size of map (pixels) */
+  int           file;                   /* next pixel number from map */
   }	picstruct;
 
 

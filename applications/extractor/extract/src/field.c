@@ -10,6 +10,8 @@
 *	Contents:	Handling of field structures.
 *
 *	Last modify:	02/02/98
+*                       27/10/98 (AJC)
+*                          Use AFPRINTF not fprintf
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -51,7 +53,7 @@ picstruct	*newfield(char *filename, int flags)
 /* Check the image exists and read important info (image size, etc...) */
   readimagehead(field);
   if (prefs.verbose_type != QUIET)
-    fprintf(OUTPUT, "%s \"%.20s\" / %d x %d / %d bits %s data\n",
+    AFPRINTF(OUTPUT, "%s \"%.20s\" / %d x %d / %d bits %s data\n",
 	flags&FLAG_FIELD?   "Flagging  from:" :
        (flags&(RMS_FIELD|VAR_FIELD|WEIGHT_FIELD)?
 			     "Weighting from:" :
@@ -158,7 +160,7 @@ picstruct	*newfield(char *filename, int flags)
     else
       field->thresh = prefs.thresh[0]*field->backsig;
     if (prefs.verbose_type != QUIET)
-      fprintf(OUTPUT, "    Background: %-10g RMS: %-10g / Threshold: %-10g \n",
+      AFPRINTF(OUTPUT, "    Background: %-10g RMS: %-10g / Threshold: %-10g \n",
 	field->backmean, field->backsig, (flags & DETECT_FIELD)?
 	field->dthresh: field->thresh);
 

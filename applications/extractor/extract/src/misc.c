@@ -10,6 +10,9 @@
 *	Contents:	miscellaneous functions.
 *
 *	Last modify:	31/05/97
+*                       28/10/98 (AJC)
+*                         ADAM version of error
+*                         Use AFPRINTF in warning
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -17,21 +20,32 @@
 #include	<ctype.h>
 #include	<stdio.h>
 #include	<stdlib.h>
+#include        <setjmp.h>
 
 #include	"define.h"
 #include	"globals.h"
+#include 	"merswrap.h"
+#include        "sae_par.h"
 
+jmp_buf		env;
 
 /********************************* error ************************************/
 /*
+Version for ADAM
+
 I hope it will never be used!
 */
+
 void	error(int num, char *msg1, char *msg2)
   {
-  fprintf(stderr, "\n> %s%s\n\n",msg1,msg2);
-  exit(num);
-  }
+  int status;
 
+  status = SAI__ERROR;
+  msgSetc( "TOK1", msg1 );
+  msgSetc( "TOK2", msg2 );
+  errRep( " ", "^TOK1 ^TOK2", &status );
+  longjmp( env, num );
+  }
 
 /******************************* cistrcmp ***********************************/
 /*
@@ -113,7 +127,7 @@ Print a warning message on screen.
 */
 void	warning(char *msg1, char *msg2)
   {
-  fprintf(OUTPUT, "\n> WARNING: %s%s\n\n",msg1,msg2);
+  AFPRINTF(OUTPUT, "\n> WARNING: %s%s.\n\n",msg1,msg2);
   return;
   }
 

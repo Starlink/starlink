@@ -10,6 +10,12 @@
 *	Contents:	functions to refine extraction of objects.
 *
 *	Last modify:	15/03/98
+*                       02/11/98 (AJC)
+*                         Initialize if necessary
+*                       24/11/98 (PWD)
+*                         Nullify freed pointers to make sure memort
+*                         is reallocated next pass. Removed AJC
+*                         changes in this area.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -52,7 +58,6 @@ int	parcelout(objliststruct *objlistin, objliststruct *objlistout)
 			xn,
 			nbm = NBRANCH,
 			out;
-
 
   out = RETURN_OK;
 
@@ -203,9 +208,13 @@ free the memory allocated by global pointers in refine.c
 */
 void	freeparcelout(void)
   {
+    /* PWD: assigned freed pointers to NULL, need for next program invocation*/
   free(son);
+  son = NULL;
   free(ok);
+  ok = NULL;
   free(objlist);
+  objlist = NULL;
   return;
   }
 

@@ -10,11 +10,21 @@
 *	Contents:	global declarations.
 *
 *	Last modify:   29/04/98
+*                      02/11/98 (AJC)
+*                        Add initialise flag
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
 #include	"types.h"
+
+/*----------------------- initialization flags ------------------------------
+ * These are required for the ADAM version so that the need for initialization
+ * (or not) of static and external variables can be flagged when an executable
+ * image is run repeatedly.
+*/
+int                     initparcelout; /* initialization in parcelout */
+int                     initprintf; /* Initialization in initcat */
 
 /*----------------------- miscellaneous variables ---------------------------*/
 

@@ -10,6 +10,9 @@
 *	Contents:	functions for output of catalog data.
 *
 *	Last modify:	11/08/98
+*                       23/10/98 (AJC):
+*                          Make SKYCAT header have correct column headings
+*                          Assume 1 block header for FITS.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -19,6 +22,7 @@
 #include	<string.h>
 
 #include	"define.h"
+#include        "mydefs.h"
 #include	"globals.h"
 #include	"fitscat.h"
 #include	"param.h"
@@ -278,13 +282,33 @@ void	initcat(picstruct *field)
 	      " Id Ra Dec Mag");
 /*--- We add a tab between rows, as required by Skycat */
       fprintf(ascfile, skycathead, 8.0);
-      for (i=1,key=key->nextkey; i++<objtab->nkey; key=key->nextkey)
+/*AJCmod      for (i=1,key=key->nextkey; i++<objtab->nkey; key=key->nextkey)*/
+      for (i=0; i++<objtab->nkey; key=key->nextkey)
+/*AJC endmod*/
         {
-        if (i>4)
+/*AJC remove        if (i>4)
           fprintf(ascfile, "\t%s", key->name);
         sprintf(gstr, "\t%s", key->printf);
         strcpy(key->printf, gstr);
         }
+*AJC end remove*/
+/*AJC insert*/
+
+        if (i>1)
+           {
+           fprintf(ascfile, "\t%s", key->name);
+           if (!initprintf)
+              {
+/* Once and once only insert \t into k->printf */
+              sprintf(gstr, "\t%s", key->printf);
+              strcpy(key->printf, gstr);
+              }
+           }
+        else
+           fprintf(ascfile, key->name);
+        }
+      initprintf+=1;
+/*AJC endinsert*/
       fprintf(ascfile, "\n------------------\n");
       }
     }
@@ -304,8 +328,14 @@ void	initcat(picstruct *field)
 /*------ We create a dummy table (only used through its header) */
         QCALLOC(asctab, tabstruct, 1);
         asctab->headnblock = field->fitsheadsize/FBSIZE;
-        QMALLOC(asctab->headbuf, char, asctab->headnblock*FBSIZE);
+/*AJC        QMALLOC(asctab->headbuf, char, asctab->headnblock*FBSIZE);
         memcpy(asctab->headbuf, field->fitshead, asctab->headnblock*FBSIZE);
+*/
+/*AJC insert*/
+        asctab->headnblock=1;
+        QMALLOC(asctab->headbuf, char, asctab->headnblock*FBSIZE);
+        strncpy(asctab->headbuf,"END     ",8);
+/*AJC endinsert*/
         key = headkey;
         while (*key->name)
           addkeyto_head(asctab, key++);

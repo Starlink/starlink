@@ -10,6 +10,8 @@
 *	Contents:	main program.
 *
 *	Last modify:	13/07/98
+*                       28/10/98 (AJC)
+*                          Use AFPRINTF not fprintf
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -275,7 +277,7 @@ void	makeit()
     neurclose();
 
   if (prefs.verbose_type != QUIET)
-    fprintf(OUTPUT, "Objects: detected %-8d / sextracted %-8d\n",
+    AFPRINTF(OUTPUT, "Objects: detected %-8d / sextracted %-8d\n",
 	cat.ndetect, cat.ntotal);
 /*
   if (FLAG(obj.retinout))

@@ -10,6 +10,13 @@
 *	Contents:	global definitions.
 *
 *	Last modify:	20/08/98
+*                       14/07/98 (AJC)
+*                          QFTELL, QFSEEK work with mapped NDF
+*                          NPRINTF, FPRINTF, NFPRINTF use adamprint
+*                       11/09/98 (AJC)
+*                          FITSTOx use AST
+*                       27/10/98 (AJC)
+*                          Add AFPRINTF to always print
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -119,7 +126,7 @@
 
 #define	FBSIZE	2880L	/* size (in bytes) of one FITS block */
 
-#define	FITSTOF(k, def) \
+/*#define	FITSTOF(k, def) \
 			(st[0]=0,((point = fitsnfind(buf, k, n))? \
 				 fixexponent(point), \
 				atof(strncat(st, &point[10], 70)) \
@@ -134,6 +141,27 @@
                 { if (fitsread(buf,k,str,H_STRING,T_STRING)!= RETURN_OK) \
                     strcpy(str, (def)); \
                 }
+*/
+#define	FITSTOF(k, def) \
+			(astClear( fitschan, "Card" ),\
+                         astFindFits( fitschan, k, st, 1 ))?\
+				(fixexponent(st+10), \
+				atof(st+10)) \
+				:def
+
+#define	FITSTOI(k, def) \
+			(astClear( fitschan, "Card" ),\
+                         astFindFits( fitschan, k, st, 1 ))?\
+				atoi(st+10) \
+				:def
+
+#define	FITSTOS(k, str, def) \
+			{ astClear( fitschan, "Card" );\
+                        if (astFindFits( fitschan, k, st, 1 ))\
+                          {int i,j;\
+                           for (i=11,j=0;st[i]!='\'';str[j++]=st[i++]);\
+                           for (;j&&str[--j]==' ';str[j]='\0');}\
+                    	else strcpy(str, def);}
 
 /*------------------------------- Other Macros -----------------------------*/
 
@@ -147,7 +175,7 @@
 		if (fwrite(ptr, (size_t)(size), (size_t)1, afile)!=1) \
 		  error(EXIT_FAILURE, "*Error* while writing ", fname)
 
-#define	QFSEEK(afile, offset, pos, fname) \
+/*#define	QFSEEK(afile, offset, pos, fname) \
 		if (fseek(afile, (offset), pos)) \
 		  error(EXIT_FAILURE,"*Error*: file positioning failed in ", \
 			fname)
@@ -156,6 +184,13 @@
 		if ((pos=ftell(afile))==-1) \
 		  error(EXIT_FAILURE,"*Error*: file position unknown in ", \
 			fname)
+*/
+
+#define	QFSEEK(afile, offset, pos, fname) \
+                afile = offset
+
+#define	QFTELL(pos, afile, fname) \
+                pos = afile
 
 #define	QCALLOC(ptr, typ, nel) \
 		{if (!(ptr = (typ *)calloc((size_t)(nel),sizeof(typ)))) \
@@ -188,7 +223,7 @@
 #define	PIX(pic, x, y)	pic->strip[(((int)y)%pic->stripheight) \
 				*pic->width +(int)x]
 
-#define	NPRINTF		if (prefs.verbose_type == NORM \
+/*#define	NPRINTF		if (prefs.verbose_type == NORM \
 				|| prefs.verbose_type==WARN) fprintf
 
 #define	NFPRINTF(w,x)	{if (prefs.verbose_type==NORM \
@@ -198,6 +233,20 @@
 				fprintf(w, "%s.\n", x);}
 
 #define	FPRINTF		if (prefs.verbose_type == FULL)	fprintf
+*/
+
+#define	NPRINTF		if (prefs.verbose_type == NORM \
+				|| prefs.verbose_type==WARN) adamprint
+
+#define	NFPRINTF(w,x)	{if (prefs.verbose_type==NORM \
+				|| prefs.verbose_type==WARN) \
+				adamprint(w, "\33[1M> %s\33[1A\n",x); \
+			else if (prefs.verbose_type == FULL) \
+				adamprint(w, "%s.\n", x);}
+
+#define	FPRINTF		if (prefs.verbose_type == FULL)	adamprint
+
+#define	AFPRINTF	adamprint
 
 #define	QWARNING       	if (prefs.verbose_type==WARN \
 				|| prefs.verbose_type==FULL)	warning
