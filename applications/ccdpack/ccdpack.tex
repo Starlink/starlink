@@ -8,7 +8,7 @@
 \newcommand{\stardocnumber}    {1.0}
 \newcommand{\stardocauthors}   {P.W. Draper, M.B. Taylor}
 \newcommand{\stardocdate}      {July 2001}
-\newcommand{\stardoctitle}     {Hypertext help}
+\newcommand{\stardoctitle}     {XREDUCE help}
 % -----------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
@@ -337,12 +337,33 @@ window created by this button.
 otherwise you will need to organize your data into its different types
 (target, bias, flatfield etc.) by hand in this window.
 \item \butt{Bypass Stage}: this button allows you to proceed to
-\wlab{Reduction} stage.
+\wlab{Group by Set} or \wlab{Reduction} stage.
 This is probably only of use if you have
 \htmlref{restored the state}{CCDMainMenu}
 of the interface from a previous time (but note that you'll also need to be
 using the same data, if not you must not bypass this stage).
 \end{itemize}
+
+\subsection{Group by Set \xlabel{CCDMainSets}}
+If you are working with multiple-image exposures and have chosen
+to group images by Set, you will need to tell XREDUCE which 
+images correspond to which others.  
+\begin{itemize}
+\item \butt{Add Set Headers}:
+This will begin a dialog in which you must specify how images are
+grouped together.  XREDUCE has to know this so that it can match up
+frames with the appropriate CCD parameters, generate calibration
+frames from images originating from the same CCD and so on.
+\item \butt{Bypass Stage}:
+This button allows you to proceed to the \wlab{Reduction} stage.
+It is probably only of use if the NDFs already contain the 
+correct Set headers, or if you do not want to use Set headers
+(i.e. you do not need to process multiple-image exposures) at all.
+\end{itemize}
+
+If you are working with single-image exposures (no Sets) then you
+will never need to use this section (and the buttons in it will
+not be active).
 
 \subsection{Reduction \xlabel{CCDMainReduction}}
 After \wlab{Configuration} and \wlab{Data Import} have been completed
@@ -355,6 +376,14 @@ options available to you are assessed).
 The \wlab{Known Data Files} section displays the list of currently
 known data files. Due to a limitation in the XREDUCE program it may be
 necessary to press the \butt{Update} button to see this list.
+
+Note that where NDF/HDS files are shown the usable NDF structures
+within them are listed rather than the files themselves.
+Normally this just means you will see the file listed 
+with its \text{.sdf} extension missing.  However, if there are HDS
+container files holding more than one NDF each, then a given
+file in the directory may correspond to multiple images listed
+for possible selection.
 
 \begin{itemize}
 \item \butt{Exit}: conditionally exits the program closing the GUI.
@@ -460,13 +489,60 @@ Use the \menu{Help} menu to get advice on using this window.
 The \menu{File} menu allows you to exit from this program and close or
 accept the window.
 
+\section{Selecting an existing image \xlabel{CCDGetImageNameWindow}}
+This window allows you to select an image from a list in a directory.
+
+The \wlab{Directory:} entry shows the current directory. You can edit this
+and then move to a new directory by pressing Return.
+
+The \wlab{File Filter:} entry shows the pattern used to filter the
+filenames in the current directory (patterns are similar to those used
+by \text{ls}). You can apply the filter by either pressing return in
+this entry or by pressing the \butt{Filter} button.
+
+The list on the left-hand side shows all the directories that are in
+the current directory. You move into a new directory by double
+clicking on its name. \text{"../"} moves up one directory.
+
+The list on the right-hand side shows all the images that match the filter
+pattern in the current directory. Select an image by clicking its name and
+pressing \butt{OK}, or by double clicking.
+
+The \wlab{Name of selected image:} entry shows the name of the chosen file.
+You could just type the image name here and accept it by pressing Return or
+\butt{OK}.
+
+Note that where NDF/HDS files are shown the usable NDF structures
+within them are listed rather than the files themselves.
+Normally this just means you will see the file listed
+with its \text{.sdf} extension missing.  However, if there are HDS
+container files holding more than one NDF each, then a given
+file in the directory may correspond to multiple images listed
+for possible selection.
+
+\subsection{Menus \xlabel{CCDGetImageNameMenu}}
+
+The \menu{Options} menu contains a list of the directories that you
+have visited (as well as the current and your home directory) and can
+be used as a shortcut.
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+
+
+
+
+
 \section{Creating a new file \xlabel{CCDNewFileNameWindow}}
 This window allows you to give the name of a file, that may or may not
 already exist. Just type in the name of the new file (if not already
 shown) and press Return or \butt{OK} to accept.
 
 \subsection{Menus \xlabel{CCDNewFileNameMenu}}
-The \menu{Options} contains a single item that allows you to choose
+The \menu{Options} menu contains a single item that allows you to choose
 from a list of files that already exist.
 
 Use the \menu{Help} menu to get advice on using this window.
@@ -474,8 +550,8 @@ Use the \menu{Help} menu to get advice on using this window.
 The \menu{File} menu allows you to exit from this program and close or
 accept the window.
 
-\section{Setting\xlabel{CCDSetGenGlobalsWindow}the general reduction
-         parameters}
+\section{Setting\xlabel{CCDSetGenGlobalsWindow}\label{CCDSetGenGlobalsWindow} 
+         the general reduction parameters}
 In this window you define general features of the reduction. Briefly
 the meaning of the sections in this window are.
 
@@ -485,6 +561,16 @@ The programs that are used by XREDUCE and those that do the actual
 reduction can write their output to a CCDPACK specific log file. If
 you want them to do this then select the \text{true} button and give
 a name for the logfile.
+
+\item \wlab{Images are grouped into Sets:}.
+Grouping by Set allows CCDPACK to use different parameters for images 
+generated by different detectors; this is most often useful when
+you are reducing images from a mosaic camera comprising multiple CCDs.
+If you select the \text{true} option you will later be given the opportunity
+to specify parameters for multiple detectors and to
+indicate which images correspond to each other.
+For more explanation see \xref{Set Processing}{sun139}{ccdpack_sets}
+and \xref{Using Sets in reduction tasks}{sun139}{setreduce}.
 
 \item \wlab{Look for saturated pixels:}. If your data could have pixels
 that are saturated (and the level at which saturation occurs is known)
@@ -538,6 +624,31 @@ Use the \menu{Help} menu to get advice on using this window.
 The \menu{File} menu allows you to exit from this program or
 accept the window.
 
+\section{Specifying the size of Sets\xlabel{CCDGetSetIndicesWindow}}
+
+You will only encounter this window if you have selected the
+\wlab{Images are grouped into Sets} option in the general
+reduction parameters section.  This indicates that each exposure
+comprises a number of image files, for instance each one generated by
+a different CCD in a mosaic camera.
+
+You should use the slider (drag it by holding the mouse button down,
+or click on either side to increment/decrement it) to indicate 
+how many image files are in each exposure, then press \butt{OK}.  
+If you press \butt{Cancel}, the initial value will be used.
+
+\subsection{Menus \xlabel{CCDGetSetIndicesMenu}}
+The \menu{Options} menu contains a single item \menu{No Sets}.
+If you select this, it will prevent XREDUCE from worrying about
+multiple image exposures.  To restore consideration of Sets
+after selecting this, you would have to go back to the 
+\htmlref{\butt{General Options}}{CCDSetGenGlobalsWindow} dialog.
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
 \section{Setting the CCD characteristics \xlabel{CCDSetCCDGlobalsWindow}
          \label{CCDSetCCDGlobalsWindow}}
 
@@ -548,6 +659,25 @@ this might entail then see the description of the
 and a section describing a little more about
 \xref{XREDUCE}{sun139}{usingxreduce},
 or alternatively push on.
+
+If you have selected {\em Images are grouped into Sets\/}
+in the general reduction parameters section, this window will allow
+you to select different detector parameters for the corresponding
+members of each Set; 
+this means that images originating from different CCDs 
+can use parameter settings.
+If you have indicated that each Set has 3 members, there will be a 
+panel near the top of the window looking like this:
+\begin{rawhtml}
+<P>
+<IMG SRC="siselect.gif">
+<P>
+\end{rawhtml}
+Click each button in turn to set the parameters for each Set Index
+value (e.g. each CCD).  When you fill in the values for one Index, 
+they will be filled in for as yet blank values on other Index, so you
+do not need to type in values more than once if they are the same
+for all the chips.
 
 \begin{itemize}
 \item \wlab{Extent of useful detector area:}, \wlab{Readout direction:}
@@ -762,7 +892,7 @@ supply the names of the different types of data.
 \section{Organizing frames into types \xlabel{CCDNDFDoImportWindow}}
 This window allows you to enter files into their different categories.
 The categories that you have selected are shown at the top of the
-window in the \wlab{Data type:} section, this looks something like.
+window in the \wlab{Data type:} section, this looks something like:
 \begin{rawhtml}
 <P>
 <IMG SRC="datatype.gif">
@@ -771,24 +901,33 @@ window in the \wlab{Data type:} section, this looks something like.
 
 To organize your files you select one of the options from
 \wlab{Data type:} (in the case above \text{TARGET} is selected), and
-then choose the files that you require from the \wlab{Files in
-directory} list and enter these into the \wlab{Files selected:}
-list. You can select files by clicking them, dragging the pointer over
+then choose the files that you require from the 
+\wlab{Images in directory} list and enter these into the 
+\wlab{Images selected:} list. 
+You can select files by clicking them, dragging the pointer over
 a range (without releasing the mouse button), or using a combination
 of shift and control with mouse clicks (control for disjoint
 selections) and then transfer the files using the \butt{Add} button,
 or you can just double click on a file to transfer it.
 
+Note that where NDF/HDS files are shown the usable NDF structures
+within them are listed rather than the files themselves.
+Normally this just means you will see the file listed 
+with its \text{.sdf} extension missing.  However, if there are HDS
+container files holding more than one NDF each, then a given
+file in the directory may correspond to multiple images listed
+for possible selection.
+
 After you've selected all the files in the current category, select
 another from the \wlab{Data type:} radio buttons and transfer these to
 \wlab{Files selected:}.
 
-You can remove files from \wlab{Files selected:} by using the buttons
+You can remove files from \wlab{Images selected:} by using the buttons
 \butt{Remove} and \butt{Remove all}.
 
 If you have dark or flash count data that do {\bf not} have the exact
 exposure times necessary ({\em i.e.} have the same dark exposure time
-as the target data), then the \wlab{Files selected:} region will contain
+as the target data), then the \wlab{Images selected:} region will contain
 extra fields (these appear after you've entered a file name) in which
 you will need to enter the exposure times.
 
@@ -840,18 +979,26 @@ created or inspected using the \menu{Create/inspect import control table...}
 item in the \menu{Options} menu.
 
 To select a file for processing you need to transfer it from the
-\wlab{Files in directory:} list to the \wlab{Files selected:} list.
+\wlab{Images in directory:} list to the \wlab{Images selected:} list.
 You can select files by clicking them, dragging the pointer over
 a range (without releasing the mouse button), or using a combination
 of shift and control with mouse clicks (control for picking out a set of
 frames that are not adjacent) and then transfer the files using the
 \butt{Add} button, or you can just double click on a file to transfer it.
 
-You can remove files from \wlab{Files selected:} by selecting the
-them as described above (but in the \wlab{Files selected:} list) and
+Note that where NDF/HDS files are shown the usable NDF structures
+within them are listed rather than the files themselves.
+Normally this just means you will see the file listed 
+with its \text{.sdf} extension missing.  However, if there are HDS
+container files holding more than one NDF each, then a given
+file in the directory may correspond to multiple images listed
+for possible selection.
+
+You can remove files from \wlab{Images selected:} by selecting the
+them as described above (but in the \wlab{Images selected:} list) and
 pressing the \butt{Remove} button. \butt{Remove all} removes them all.
 
-The other parts of this window allow you to select files from other
+The other parts of this window allow you to select images from other
 directories.
 
 
@@ -997,6 +1144,108 @@ window contents into a file.
 whether you want the \butt{Unique} buttons to keep the any versions from
 further down the lists, rather than the from nearer the top. This is
 useful as the \butt{Add} buttons insert at the end of the lists.
+\end{itemize}
+
+Use the \menu{Help} menu to get advice on using this window.
+
+The \menu{File} menu allows you to exit from this program and close or
+accept the window.
+
+\section{Grouping NDFs by Set \xlabel{CCDAddSetHeadersWindow}}
+
+This window allows you to tell XREDUCE how your image files are 
+grouped by Set. 
+One Set can usually be thought of as a single exposure,
+and so data from a mosaic camera which contains 4 CCDs and generates 
+4 data frames per exposure should be arranged into Sets which each
+contain 4 image files.  The order of the files within the Sets is 
+important too, so each file is given a Set Index number, normally 1,2,3,...
+Frames from the same CCD should have the same Set Index in all the Sets.
+
+Using this widget you can either use one of the automatic methods
+for arranging in Sets (the \butt{By Container} or \butt{By Order} buttons)
+or group files manually by pointing and clicking.
+
+There are two main panels displayed in this window:
+\begin{itemize}
+\item
+The \wlab{All NDFs} window displays all the images which XREDUCE 
+knows about (the ones which have been specified as target, flatfield,
+bias frames etc).  To the left of each file name will be written 
+a number giving the Set Index value, if it has been put into a Set yet.
+\item
+The \wlab{NDFs in Sets} window shows all the images which have so far
+been assigned a Set.  As in the \wlab{All NDFs} window the Set Index
+value is written to the left of each name -- since this window contains
+only Setted files they all have one. 
+From the header lines marked just "SET" it is clear which files 
+form a single Set.
+\end{itemize}
+
+The easiest way to specify Set membership is to use one of the
+automatic grouping buttons:
+\begin{itemize}
+\item \butt{By Container}:
+If your data consists of HDS container files each containing the
+multiple NDF structures which correspond to a single exposure,
+then clicking this button will group the NDFs accordingly.
+\item \butt{By Order}:
+If your images are shown in the \wlab{All NDFs} box  so that
+the first $N$ form one exposure, the second $N$ form another,
+etc, where $N$ is the size of each Set, then just clicking this
+button will ask you what the Set size is and then arrange them 
+properly into Set. 
+The action of this button is equivalant to clicking the
+\butt{Append} button with all the NDFs selected.
+\item \butt{Reset}:
+This button erases the current Set grouping so you can start again.
+\end{itemize}
+
+If one of these buttons will not do the job for you automatically,
+you can group the images by hand using the buttons in the middle:
+
+\begin{itemize}
+\item
+To create a new Set, select a number of files from the \wlab{All NDFs}
+window: you can do this by clicking them, dragging the pointer over 
+a range (without releasing the mouse button), or using a combination
+of shift and control with mouse clicks (control for disjoint selections).
+Then clicking the \butt{New Set} button will make a new Set in the
+\butt{NDFs in Sets} window with the selected files added in the order
+they appear in the original list.
+\item
+To add one or more files to the bottom of the list of Setted files,
+select them and click the \butt{Append} button
+(or double click each name to be added).  
+Unlike the \butt{New Set} button, this will not necessarily create
+a new Set, so you can add names in the order you choose to an existing Set. 
+However, a new Set will be started when the one at the end of the
+list reaches current Set size.  The Set size can be configured using
+the \menu{Configure Set size...} option from the \menu{Options} menu.
+\item
+To remove one or more files from the \wlab{NDFs in Sets} list,
+select them and click the \butt{De-Set} button
+(or double click each name to be removed).
+\end{itemize}
+
+When you are done, press the \butt{OK} button, and the selections
+you have made will be applied to the NDFs (the appropriate 
+Set headers will be written).
+If you press the \butt{Cancel} button, no changes will be made.
+
+\subsection{Menus \xlabel{CCDAddSetHeadersMenu}}
+
+The \menu{Options} menu contains the following items.
+\begin{itemize}
+\item \menu{Configure Set size...},
+this allows you to change the normal size of Sets (i.e. how many 
+frames constitute a single exposure).
+\item \menu{Write CCD\_SET alignment coordinate frame},
+this controls whether a Set alignment coordinate frame is written into
+the WCS component of the NDF.
+This will not affect the behaviour of XREDUCE, but does make a difference
+when you are registering the reduced frames.
+See \xref{Set alignment coordinates}{sun139}{ccd_set} for more details.
 \end{itemize}
 
 Use the \menu{Help} menu to get advice on using this window.
