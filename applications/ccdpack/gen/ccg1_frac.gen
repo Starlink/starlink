@@ -123,6 +123,11 @@
 *     1-NOV-2001 (MBT):
 *        Undid one of the changes from 24-NOV-2000, which was me being
 *        stupid.
+*     25-JUL-2002 (MJC)
+*        Allow for integer-spaced data.
+*     12-AUG-2002 (MJC)
+*        Corrections and improvements to the previous enhancement.
+
 *     {enter_further_changes_here}
 
 *-
@@ -184,6 +189,7 @@
       INTEGER HIST( NUMBIN )   ! Histogram for finding fractional values
       LOGICAL INTVAL           ! Data are integers?
       INTEGER I                ! Loop counter
+      DOUBLE PRECISION INCR    ! Increment between adjacent values
       INTEGER J                ! Loop counter for lower histogram bins
       INTEGER K                ! Loop counter for upper histogram bins
       DOUBLE PRECISION LIMITS( NLIMIT ) ! Limits beyond which
@@ -196,6 +202,7 @@
       DOUBLE PRECISION MEAN    ! Bin index of mean
       <LTYPE> MINV             ! Maximum value in the array
       INTEGER NBIN             ! Maximum number of histogram bins used
+      INTEGER NEXT             ! Index of next non-bad element
       INTEGER NUMBER           ! Number of non-zero histogram bins
       INTEGER NUMOUT           ! Number of outliers computed separately?
       INTEGER NUMVAL           ! Number of good values in input array
@@ -274,16 +281,43 @@
                   I = I + 1
                   IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
                      INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                        NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM 
+     :                        NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM
+
+*  Hunt for the next non-bad value to compare the increments.
+                     NEXT = I + 1
+                     DO WHILE ( NEXT .LE. EL .AND. ARRAY( MIN( NEXT,
+     :                          EL ) ) .EQ. VAL__BAD<T> )
+                         NEXT = NEXT + 1
+                     END DO
+
+*  Test the pixel values until any is not an integer increment from
+*  its non-bad neighbour (to identify integer data with a real constant
+*  added).  As in the first test, this has a wide margin of tolerance.
+                     IF ( NEXT .LE. EL ) THEN
+                        INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                         ARRAY( NEXT ) ) )
+                        INTVAL = INTVAL .OR. ( ABS( INCR -
+     :                           NINT( INCR ) ) .LT. FILLIM )
+
+* When all previous tests have succeeded, do not fail because the
+* last pixel is bad.
+                     ELSE
+                        INTVAL = .TRUE.
+                     END IF
                   END IF
                END DO
 
-*  Make more efficient if there are no bad pixels present.
+*  Make the test for integer data or increments more efficient if there
+*  are no bad pixels present.
             ELSE
                DO WHILE ( INTVAL .AND. I .LT. EL )
                   I = I + 1
                   INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                     NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM 
+     :                     NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM
+                  INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                   ARRAY( MIN( I + 1, EL ) ) ) )
+                  INTVAL = INTVAL .OR.
+     :                     ( ABS( INCR - NINT( INCR ) ) .LT. FILLIM )
                END DO
             END IF
          END IF
@@ -416,7 +450,8 @@
          END DO
 
 *  Is the histogram too sparse, suggesting outliers.
-         IF ( DBLE( NUMBER ) / DNBIN .LT. FILLIM ) THEN
+         IF ( DNBIN .GT. 1 .AND.
+     :        DBLE( NUMBER ) / DNBIN .LT. FILLIM ) THEN
 
 *  Obtain the bin width for this iteration.
             BINSIZ = ( NUM_<T>TOD( DATLIM( 2 ) ) - 
