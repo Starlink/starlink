@@ -63,7 +63,7 @@ C Now find locator
 	ENDDO
 *
 	IF(STATUS.NE.SAI__OK) THEN
-           CALL ERR_REP(' ','from HDX_FIND',STATUS)
+           CALL ERR_REP(' ','from ADI1_FIND',STATUS)
         ENDIF
 *
 	END
