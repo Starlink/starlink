@@ -24,6 +24,10 @@
 *    History :
 *     $Id$
 *     5-AUG-1993: Original version.
+*     $Log$
+*     Revision 1.2  1996/08/01 21:24:03  timj
+*     Change AIRMASS def to 1/SIN from 1/COS
+*
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -69,7 +73,7 @@
      :     STATUS)
       ELSE
  
-         AIRMASS = 1.0D0 / COS (ZZ)
+         AIRMASS = 1.0D0 / SIN (ZZ)
 
          IF (AIRMASS .GT. 2.0) THEN
  
