@@ -62,6 +62,9 @@
 *     rebin
 
 *  ADAM parameters:
+*     DEFOUT = LOGICAL (Read) - Used by DESPIKE only
+*        Use default output names (if TRUE). Default is to ask for
+*        output file names.
 *     IN = CHAR (Read)
 *        The name of the input file to be rebinned. This parameter is requested
 *        repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
@@ -195,6 +198,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.55  1998/06/03 23:39:04  timj
+*     DESPIKE can now be told to use default output filenames automatically.
+*     (Note that MEDIAN rebinning was added in the previous version but
+*     left out of the comment)
+*
 *     Revision 1.54  1998/06/03 22:05:31  timj
 *     Add CALCSKY
 *
@@ -445,6 +453,7 @@ c
       INTEGER          COUNT           ! Number of ints in INTREBIN
       INTEGER          CURR_FILE ! Current file in INTREBIN loop
       INTEGER          CURR_INT        ! Current int in INTREBIN loop
+      LOGICAL          DEFOUT          ! Take default output files for DESPIKE
       LOGICAL          DESPIKE         ! Is this the despike task
       LOGICAL          DOLOOP          ! Loop for input data
       INTEGER          EACHBOL         ! Bolometer loop counter
@@ -1289,6 +1298,16 @@ c
 *     each input file. Also means that we now have to generate
 *     an output filename from the input
 
+*     Ask whether the user simply wants to take the
+*     default output filename
+*     This is a kludge -- what we really want to do is create
+*     a GRouP containing all the input filename and let the
+*     user specify the output files as a modification on the input.
+*     This can be dangerous if the input files have the same
+*     root....
+
+         CALL PAR_GET0L('DEFOUT',DEFOUT,STATUS)
+
          DO I = 1, FILE
 
 *     No point writing an output file if there were none.
@@ -1308,18 +1327,37 @@ c
                CALL NDF_FIND (DAT__ROOT, FILENAME(I), ITEMP, STATUS) 
 
 *     OK, propagate the input ndf to the output
+*     If we are using the default output name we
+*     have to propogate the file ourself. Otherwise we can
+*     use the parameter system.
+
+               IF (DEFOUT) THEN
+
+                  CALL NDF_PLACE(DAT__ROOT, OUT, PLACE, STATUS)
+                  CALL NDF_SCOPY(ITEMP,
+     :                 'Units,Axis,DATA,VARIANCE,Quality',
+     :                 PLACE, OUT_NDF, STATUS)
+
+                  CALL MSG_SETC('OUT',OUT)
+                  CALL MSG_SETC('TASK', TSKNAME)
+                  CALL MSG_OUTIF(MSG__NORM, ' ',
+     :                 '^TASK: Storing despiked data in ^OUT', STATUS)
+
+               ELSE
  
-               CALL NDF_PROP (ITEMP, 
-     :              'Units,Axis,DATA,VARIANCE,Quality',
-     :              'OUT', OUT_NDF, STATUS)
+                  CALL NDF_PROP (ITEMP, 
+     :                 'Units,Axis,DATA,VARIANCE,Quality',
+     :                 'OUT', OUT_NDF, STATUS)
+
+               END IF
                
 *     Check status for NULL (ie didn't want to write a file)
-               
-               IF (STATUS .EQ. PAR__NULL) THEN
 
+               IF (STATUS .EQ. PAR__NULL) THEN
+                  
                   CALL ERR_ANNUL(STATUS)
                   CALL NDF_ANNUL(ITEMP, STATUS)
-
+                     
                ELSE
 
 *     Annul the input
