@@ -18,6 +18,7 @@
  ******************************************************************************
  */
 #include <stdio.h>
+#include <ctype.h>
 #include "sae_par.h"
 #include "f77.h"
 #include "cnf.h"
@@ -25,6 +26,7 @@
 #include "dtask_err.h"
 #include "utils.h"
 #include "ems.h"
+#include "output.h"
 
 #include "ams.h"
 #include "messys_par.h"
@@ -50,6 +52,9 @@ extern F77_SUBROUTINE(uface_pwhlp)(CHARACTER(topic),
 				   INTEGER(flag),
 				   INTEGER(status)
 				   TRAIL(topic) TRAIL(library) );
+
+F77_INTEGER_FUNCTION(uface_iput)( CHARACTER(string), CHARACTER(prompt), 
+                                  INTEGER(len) TRAIL(string) TRAIL(prompt) );
 
 /******************************************************************************
  *
@@ -551,8 +556,6 @@ int message_status,	/* message status (given) */
 int *status		/* global status (given and returned) */
 )
 {
-    extern void bufchar(char ch);				/* output.c */
-
     char taskname[MSG_NAME_LEN];
     char context_text[30],	/* textual message context */
 	 status_text[80];	/* textual message status  */
@@ -751,7 +754,7 @@ int *status		/* global status (given and returned) */
 {
     char *param, *prompt, *param_dflt, *hlp_txt, *hlp_key, *errmess;
     char user_prompt[132], taskname[MSG_NAME_LEN], user_value[MSG_VAL_LEN];
-    int gotval, user_vlen;
+    int gotval, user_vlen = 0;
     value val;
 
 /* Help system variables */

@@ -30,6 +30,7 @@
  *
  ******************************************************************************
  */
+#include <stdio.h>
 #include "icl.h"		/* includes value.h */
 #include "parse.h"
 #include "ems.h"

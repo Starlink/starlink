@@ -67,7 +67,7 @@
                                                                 
 #define MAX(i,j) ((i)>(j) ? (i) : (j))
 #define MIN(i,j) ((i)<(j) ? (i) : (j))
-#define ODD(i) ((i)&1 == 1)
+#define ODD(i) (((i)&1) == 1)
 
 /*  Checking whether status value is SAI__OK */
 

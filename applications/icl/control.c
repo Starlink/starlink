@@ -23,12 +23,12 @@
 #include "symtab.h"
 #include "parse.h"
 #include "ems.h"
+#include "output.h"
+#include "carith.h"
+#include "interp.h"
 
-extern void outfpstring(char *mess);			    /* output.c */
-extern void iclems_flush(void);				    /* output.c */
+extern int uface_interrupt(void);                            /* uface.c */
 
-extern value do_operator (value left, int op, value right); /* carith.c */
-extern void get_args(node *);				    /* interp.c */
 
 char *icl_command;
 

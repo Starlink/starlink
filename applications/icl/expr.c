@@ -23,6 +23,7 @@
  *      
  ******************************************************************************
  */
+#include <stdio.h>
 #include <limits.h>
 #include <setjmp.h>
 #include "icl.h"
@@ -30,10 +31,6 @@
 #include "expr.h"
 #include "interp.h"
 #include "output.h"
-
-#ifdef DEBUG
-#include <stdio.h>
-#endif
 
 extern char *string_op(int yaccopcode);				/* node.c */
 

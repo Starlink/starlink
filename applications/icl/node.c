@@ -9,6 +9,7 @@
  *
  ******************************************************************************
  */
+#include <stdio.h>
 #include "icl.h"
 #include "expr.h"
 #include "parse.h"

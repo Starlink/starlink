@@ -17,6 +17,7 @@
  */
 #include <stdio.h>
 #include <signal.h>
+#include <unistd.h>
 #include "icl.h"
 #include "output.h"
 #include "icl_io.h"

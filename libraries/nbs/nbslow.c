@@ -95,6 +95,9 @@
 *     {enter_changes_here}
 */
 
+/* System includes */
+#include <time.h>
+
 /* Depending on whether c_string macro is defined or not, define macros
    for routine names and define module name */
 

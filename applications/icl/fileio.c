@@ -35,6 +35,7 @@
 #include "input.h"
 #include "interp.h"
 #include "symtab.h"
+#include "output.h"
 
 /******************************************************************************
  *

@@ -451,7 +451,11 @@ extern void F77_EXTERNAL_NAME(nbs_strexp) ();
 
 /* Include files	*/
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 /* Error codes */
 
@@ -667,8 +671,6 @@ int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
 
 /* External function declarations */
 
-   extern int	strncmp();
-
 /* Local variable declarations */
 
    char		tname[MAXNAME];
@@ -811,8 +813,6 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
 
 /* External function declarations */
 
-   extern int	strncmp();
-
 /* Local variable declarations */
 
    item_id	tid;
@@ -945,8 +945,6 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 
    extern char	*NBS_ALLOC();
    extern char 	*NBS_INIT_ALLOC();
-
-   extern char	*strncpy();
 
 /* Local variable declarations */
 
@@ -1145,9 +1143,6 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
 
    extern char	*NBS_ALLOC();
 
-   extern int	strncmp();
-   extern char	*strncpy();
-
 /* Local variable declarations */
 
    item_id	tenvsid;
@@ -1343,9 +1338,6 @@ int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
 
    extern char	*NBS_ALLOC();
    extern char	*NBS_DATA_ALLOC();
-
-   extern int	strncmp();
-   extern char	*strncpy();
 
 /* Local variable declarations */
 
@@ -1680,9 +1672,6 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
    extern int	NBS_RELOCATE_POINTERS();
    extern int	*NBS_WRITE_FILE();
 
-   extern int	getpid();
-   extern char	*strncpy();
-
 /* Local variable declarations */
 
    board_id	bid;
@@ -1878,8 +1867,6 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
    extern char	*NBS_RELOCATE_ADDRESS();
    extern int	NBS_UNMAP_SECTION();
 
-   extern int	getpid();
-
 /* Local variable declarations */
 
    board_id	bid;
@@ -2045,8 +2032,6 @@ int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
    extern int	NBS_READ_FILE();
    extern char	*NBS_RELOCATE_ADDRESS();
    extern int	NBS_UNMAP_SECTION();
-
-   extern int	getpid();
 
 /* Local variable declarations */
 
@@ -2356,9 +2341,6 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
    extern int	NBS_RELOCATE_ITEM();
    extern int	NBS_UNMAP_SECTION();
 
-   extern int	getpid();
-/*   extern char	*malloc(); */
-
 /* Local variable declarations */
 
    int		defn_size;
@@ -2571,8 +2553,6 @@ int NBS_FIND_ITEM ( R_INTEGER(envid), RW_CHARACTER(name), item_id *id,
   GENPTR_INTEGER(status)
 
 /* External function declarations */
-
-   extern int	strncmp();
 
 /* Local variable declarations */
 
