@@ -32,10 +32,9 @@ f     AST_FLUXFRAME
 *     - SpecVal: The spectral position at which the flux values are measured.
 
 *  Functions:
-c     In addition to those functions applicable to all Frames, the
-c     following functions may also be applied to all FluxFrames:
-f     In addition to those routines applicable to all Frames, the
-f     following routines may also be applied to all FluxFrames:
+c     The FluxFrame class does not define any new functions beyond those
+f     The FluxFrame class does not define any new routines beyond those
+*     which are applicable to all Frames.
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
