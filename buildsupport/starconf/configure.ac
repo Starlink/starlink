@@ -83,11 +83,16 @@ AC_ARG_VAR([JAVAC], [Location of java compiler])
 AC_PATH_PROG([JAVA], [java], [NOJAVA])
 AC_ARG_VAR([JAVA], [Location of java runtime])
 
+# We install material in the aclocal macro directory with aclocal_DATA
+# (as recommended in the automake manual).  However (slightly
+# unexpectedly) this won't work unless we also define aclocaldir --
+# it's not predefined.  This is probably good, as it ensures the
+# aclocaldir in question is the one reported by the aclocal in the path.
 if test "$ACLOCAL" = unknown; then
     AC_MSG_ERROR([Can't find aclocal -- have the autotools been installed?])
 fi
-AUTOCONF_MACRO_DIR=`$ACLOCAL --print-ac-dir`
-AC_SUBST(AUTOCONF_MACRO_DIR)
+aclocaldir=`$ACLOCAL --print-ac-dir`
+AC_SUBST(aclocaldir)
 
 
 # Convert the version number in PACKAGE_VERSION into an integer
