@@ -943,6 +943,11 @@ $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip: $(PK
 
 #  Personal rules for building source code archives from RCS and
 #  other places.
+
+#  Top of package support tree.
+
+CCDPACK_HOME = /mbt/support/ccdpack
+
 check_source: makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
  $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_dgen.tar \
  $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar irg.tar irh.tar \
@@ -965,12 +970,12 @@ $(PKG_NAME)_source.tar :
 	chmod 700 $(LINK_SCRIPT1) $(LINK_SCRIPT2)
 	chmod 755 $(PUBLIC_SCRIPTS)
 	co $(PRIVATE_SCRIPTS)
-	cp $(HOME)/ccdpack/release/ccdwish.alpha_OSF1.gz \
-	   $(HOME)/ccdpack/release/ccdwish.sun4_Solaris.gz \
-	   $(HOME)/ccdpack/release/ccdwish.ix86_Linux.gz \
-	   $(HOME)/ccdpack/release/atclsh.alpha_OSF1.gz \
-	   $(HOME)/ccdpack/release/atclsh.sun4_Solaris.gz \
-	   $(HOME)/ccdpack/release/atclsh.ix86_Linux.gz ./
+	cp $(CCDPACK_HOME)/release/ccdwish.alpha_OSF1.gz \
+	   $(CCDPACK_HOME)/release/ccdwish.sun4_Solaris.gz \
+	   $(CCDPACK_HOME)/release/ccdwish.ix86_Linux.gz \
+	   $(CCDPACK_HOME)/release/atclsh.alpha_OSF1.gz \
+	   $(CCDPACK_HOME)/release/atclsh.sun4_Solaris.gz \
+	   $(CCDPACK_HOME)/release/atclsh.ix86_Linux.gz ./
 	gunzip ccdwish.alpha_OSF1.gz
 	gunzip ccdwish.sun4_Solaris.gz
 	gunzip ccdwish.ix86_Linux.gz
@@ -1042,8 +1047,8 @@ $(HELPTASK).tar:
 
 $(DOCUMENTATION):
 	co $(LATEX_DOCS) $(PKG_NAME).news
-	cp $(HOME)/ccdpack/documents/$(HYPERTEXT_DOCS:.htx=.htx_tar.gz) ./
-	cp $(HOME)/ccdpack/documents/$(HYPERTEXT_HELP:.htx=.htx_tar.gz) ./
+	cp $(CCDPACK_HOME)/documents/$(HYPERTEXT_DOCS:.htx=.htx_tar.gz) ./
+	cp $(CCDPACK_HOME)/documents/$(HYPERTEXT_HELP:.htx=.htx_tar.gz) ./
 	gunzip $(HYPERTEXT_DOCS:.htx=.htx_tar.gz)
 	gunzip $(HYPERTEXT_HELP:.htx=.htx_tar.gz)
 
@@ -1053,7 +1058,7 @@ $(DATA_FILES):
 
 $(PKG_NAME)_iraf.tar:
 	co $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) $(IRAF_PAR) $(IRAF_HELP)
-	cp $(HOME)/ccdpack/documents/helpdb.mip ./
+	cp $(CCDPACK_HOME)/documents/helpdb.mip ./
 	   $(TAR_IN) $(PKG_NAME)_iraf.tar $(IRAF_STARTUP_SCRIPT) \
 	   $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 	@- $(RM) $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) \
@@ -2566,3 +2571,4 @@ ccg1_smr2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smd3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smr3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 
+# $Id$
