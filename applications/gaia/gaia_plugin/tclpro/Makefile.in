@@ -1,0 +1,239 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.6 1999/03/18 13:06:49 abrighto Exp $
+#
+# Makefile.in - Makefile to create the "gaia" binary
+#               (uses Scriptics Tclpro to create one binary with tcl scripts loaded)
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  29 Oct 98  Created
+# ------------------------------------------------------------------------
+
+DEFINES      = @DEFS@
+
+CFLAGS       = @CXXDEBUGFLAGS@
+
+# C compiler
+CC 	     = @CC@
+
+# C++ compiler
+CXX          = @CXX@
+
+# install directories
+TOPDIR	     = @DESTDIR@
+BINDIR       = @BINDIR@
+GAIA_DIR     = @GAIA_DIR@
+
+OSVERSION    = @OSVERSION@
+
+# name of the directory where we put the binary release
+RELDIR	     = ../skycatgaia-$(OSVERSION)
+
+# set to 1 if shared libs were enabled with --enable-shared configure option
+SHARED       = @SHARED@
+
+# ------------------------------------------------------------------------
+#       Include directives for Tcl, Tk, and X include files 
+# ------------------------------------------------------------------------
+
+TCL_INCLUDE   = @TCLINCSW@
+TK_INCLUDE    = @TKINCSW@
+X_INCLUDE     = @XINCSW@
+
+# ------------------------------------------------------------------------
+#       Libraries for Tcl, Tk, X11, BLT, etc.
+# ------------------------------------------------------------------------
+# use shared X lib (XXX change to static?)
+X_LIB        = @XLIBSW@
+
+# Tclpro runtime library (XXX configure this)
+TCLPRO_DIR   = @TCLPRO_DIR@
+TCLPRO_MACH_DIR  = @TCLPRO_MACH_DIR@
+TCLPRO_LIBDIR= $(TCLPRO_MACH_DIR)/lib
+TCLPRO_LIBS  = $(TCLPRO_LIBDIR)/libtbcload10s.a $(TCLPRO_LIBDIR)/libwrapper10s.a
+TCLPRO_INCLUDE = -I$(TCLPRO_DIR)/include
+TCLPRO_WRAP  = $(TCLPRO_MACH_DIR)/bin/prowrap
+
+# static tcl/tk archives: use tclpro, if available
+TCL_LIB      = $(TCLPRO_LIBDIR)/libtcl8.0.a
+TK_LIB       = $(TCLPRO_LIBDIR)/libtk8.0.a
+ITCL_LIB     = $(TCLPRO_LIBDIR)/libitcl30s.a $(TCLPRO_LIBDIR)/libitk30s.a
+TCLX_LIB     = $(TCLPRO_LIBDIR)/libtclx8.0.5.a
+BLT_LIB      = @BLT_LIB_SPEC_STATIC@
+
+# config file used to hold arguments to prowrap
+TCLPRO_CONFIG  = prowrap.cfg
+
+EXTRA_LIBS   = @LIBS@
+
+TCL_LIBS     = \
+	$(TCLPRO_LIBS) \
+	$(ITCL_LIB) \
+	$(TCLX_LIB) \
+	$(BLT_LIB) \
+	$(TK_LIB) \
+	$(TCL_LIB)
+
+# skycat master lib
+SKYCAT_LIB   = @SKYCAT_LIB_STATIC@
+
+# ------------------------------------------------------------------------
+# Starlink libs
+# ------------------------------------------------------------------------
+STAR_LIB = @STARLINK@/lib
+STAR_LIBS = \
+	-L$(STAR_LIB) \
+	`ast_link -myerr -mygrf` \
+	`ard_link` \
+	`ams_link_adam` \
+	`nbs_link` \
+	`fio_link` \
+	`ndf_link` \
+	-lpda
+
+# gaia lib
+GAIA_LIB  = ../libgaia.a
+
+# ------------------------------------------------------------------------
+# tcl script to load all of the tcl library files
+INIT_SCRIPT  = library/gaiaInit.tcl
+
+# first script loaded, starts gaia
+START_SCRIPT  = library/gaiaStart.tcl
+
+# script to run for the utility shell
+START_SCRIPT2  = library/atclshStart.tcl
+
+# name of tcl interpreter to use to run $(INIT_SCRIPT)
+TCL_INTERP   = gaia_tcl
+
+# name of the base wish interpreter to use to create the tclpro wrapper
+WISH_INTERP   = gaia_wish
+
+# name of the main binary 
+PROG         = bin/skycatgaia
+
+# name of the helper Tcl shell
+PROG2        = bin/atclsh
+
+# include flags
+INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) $(TCLPRO_INCLUDE)
+
+# compiler flags
+CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+# libraries to link
+LIBRARIES    = \
+	$(GAIA_LIB) \
+	$(STAR_LIBS) \
+	$(SKYCAT_LIB) \
+	$(TCL_LIBS) \
+	$(X_LIB) \
+	$(EXTRA_LIBS)
+
+# shared library flags
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
+LD_FLAGS=@LD_FLAGS@
+
+# these objects are only needed to make the gaia_wish binary
+OBJECTS      = proTkUnixMain.o proWrapTkMain.o
+
+# these objects are needed to make the tcl utility shell
+OBJECTS2      = proTclUnixMain.o proWrapTclMain.o
+
+INSTALL      = @INSTALL@
+RANLIB 	     = @RANLIB@
+SHELL 	     = /bin/sh
+RM 	     = rm -f
+LN 	     = ln -s
+
+# locations of Tcl library files
+TCLUTIL_LIBRARY=@TCLUTIL_BUILD_LIBRARY@
+ASTROTCL_LIBRARY=@ASTROTCL_BUILD_LIBRARY@
+RTD_LIBRARY=@RTD_BUILD_LIBRARY@
+CAT_LIBRARY=@CAT_BUILD_LIBRARY@
+SKYCAT_LIBRARY=@SKYCAT_BUILD_LIBRARY@
+GAIA_LIBRARY=@GAIA_BUILD_LIBRARY@
+BLT_LIBRARY=@BLT_LIBRARY@
+
+# ------------------------------------------------------------------------
+all: $(PROG) $(PROG2) release
+
+# build the tclpro wrapped gaia executable
+$(PROG): $(WISH_INTERP) $(TCLPRO_CONFIG)
+	$(TCLPRO_WRAP) \
+		-executable $(WISH_INTERP) \
+		-out $(PROG) \
+		$(START_SCRIPT) \
+		`cat $(TCLPRO_CONFIG)`
+
+# build the tcl utility shell
+$(PROG2): $(TCL_INTERP) FORCE
+	$(TCLPRO_WRAP) \
+		-executable $(TCL_INTERP) \
+		-out $(PROG2) \
+		$(START_SCRIPT2)
+
+# build the tcl interpreter
+$(TCL_INTERP): $(OBJECTS2) $(TCL_LIBS) $(GAIA_LIB) 
+	@echo "linking \"$(TCL_INTERP)\"..."
+	$(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS2) \
+	    -o $(TCL_INTERP) -L. $(LD_SEARCH_FLAGS) $(LIBRARIES)
+	strip $(TCL_INTERP)
+
+# build the wish interpreter
+$(WISH_INTERP): $(OBJECTS) $(TCL_LIBS) $(GAIA_LIB) 
+	@echo "linking \"$(WISH_INTERP)\"..."
+	$(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) \
+	    -o $(WISH_INTERP) -L. $(LD_SEARCH_FLAGS) $(LIBRARIES)
+	strip $(WISH_INTERP)
+
+$(TCLPRO_CONFIG): $(TCL_INTERP)
+	TCLUTIL_LIBRARY=$(TCLUTIL_LIBRARY); export TCLUTIL_LIBRARY; \
+	ASTROTCL_LIBRARY=$(ASTROTCL_LIBRARY); export ASTROTCL_LIBRARY; \
+	RTD_LIBRARY=$(RTD_LIBRARY); export RTD_LIBRARY; \
+	CAT_LIBRARY=$(CAT_LIBRARY); export CAT_LIBRARY; \
+	SKYCAT_LIBRARY=$(SKYCAT_LIBRARY); export SKYCAT_LIBRARY; \
+	GAIA_LIBRARY=$(GAIA_LIBRARY); export GAIA_LIBRARY; \
+	BLT_LIBRARY=$(BLT_LIBRARY); export BLT_LIBRARY; \
+	$(TCL_INTERP) $(INIT_SCRIPT) $(TCLPRO_CONFIG)
+
+# make a release dir including all of the necessary files to run gaia
+release:
+	rm -rf $(RELDIR)
+	mkdir $(RELDIR)
+	cp ../gaia/demos/adamtask.tcl $(RELDIR)
+	cp ../gaia/demos/adamMessageRelay $(RELDIR)
+	$(INSTALL) -s ../gaia/bin/ardstat $(RELDIR)
+	cp ../gaia/bin/ardstat.ifc $(RELDIR)
+	$(INSTALL) -s ../gaia/bin/autocrop $(RELDIR)
+	cp ../gaia/bin/autocrop.ifc $(RELDIR)
+	(cd $(RELDIR); ln -s . bin; ln -s . convert)
+	$(INSTALL) $(PROG) $(RELDIR)
+	$(INSTALL) $(PROG2) $(RELDIR)
+
+install: 
+
+clean:
+	$(RM) $(OBJECTS) *.o $(PROG) $(WISH_INTERP) *\~ "#"* $(TCLPRO_CONFIG)
+
+distclean: clean
+	$(RM) Makefile
+
+depend:
+
+man:
+
+
+FORCE:
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
