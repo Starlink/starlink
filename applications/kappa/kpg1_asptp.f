@@ -16,7 +16,7 @@
 *  Description:
 *     This routine puts a formatted position into a text string starting
 *     at a specified index within the string. Axis symbols may optionally
-*     be included. The axis values are separated by commas.
+*     be included. The axis values are separated by a specified string.
 
 *  Arguments:
 *     FRAME = INTEGER (Given)
