@@ -521,6 +521,7 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
   if ( _ok(status) ) {
     ADIinteger	ai_arg;
     ADIobj	as_arg;
+    ADIobj	*asp_arg;
     char	*cp_arg;
     double	d_arg;
     char	fc;
@@ -637,6 +638,17 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
 	    break;
 	  case '%':
 	    ADIstrmPutInt( dev, &fct, 1, status );
+	    break;
+	  case 'L':
+            nitem = va_arg(ap,int);
+	    asp_arg = va_arg(ap,ADIobj *);
+            while ( nitem-- ) {
+	      adix_print( stream, asp_arg++, 1, ADI__true, status );
+              if ( nitem ) {
+                fct = ',';
+	        ADIstrmPutInt( dev, fct, 1, status );
+                }
+              }
 	    break;
 	  }
 
