@@ -265,9 +265,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  References:
-*     {task_references}...
-
 *  Keywords:
 *     ashow, usage:private
 
@@ -466,9 +463,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  References:
-*     {task_references}...
-
 *  Keywords:
 *     ashow, usage:private
 
@@ -539,6 +533,10 @@
      :                'ig', OCH, STATUS )
       CALL ASHOW_OB( DETID, 'Detector', 'C', 'Detector', ' ',
      :                'ig', OCH, STATUS )
+      CALL ASHOW_OB( DETID, 'Filter', 'C', 'Filter', ' ',
+     :                'ig', OCH, STATUS )
+      CALL ASHOW_OB( DETID, 'DataMode', 'C', 'Data mode', ' ',
+     :                'ig', OCH, STATUS )
 
       CALL AIO_BLNK( OCH, STATUS )
 
@@ -606,9 +604,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  References:
-*     {task_references}...
-
 *  Keywords:
 *     ashow, usage:private
 
@@ -668,8 +663,16 @@
 
       CALL ASHOW_OB( TIMID, 'DateObs', 'C', 'Date at start', ' ',
      :                'np', OCH, STATUS )
+      CALL ASHOW_OB( TIMID, 'MJDObs', 'D', 'MJD at start', ' ',
+     :                'np', OCH, STATUS )
+      CALL ASHOW_OB( TIMID, 'TAIObs', 'C', 'TAI at start', 'days',
+     :                'np', OCH, STATUS )
       CALL ASHOW_OB( TIMID, 'ObsLength', 'R', 'Obs. length', 'seconds',
      :                'np', OCH, STATUS )
+      CALL ASHOW_OB( TIMID, 'Exposure', 'R', 'Exposure', 'seconds',
+     :                'np', OCH, STATUS )
+      CALL ASHOW_OB( TIMID, 'EffExposure', 'R', 'Effective exposure',
+     :                'seconds', 'ig', OCH, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_TIM', STATUS )
@@ -746,9 +749,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  References:
-*     {task_references}...
-
 *  Keywords:
 *     ashow, usage:private
 
@@ -790,7 +790,7 @@
         PARAMETER		( IND = 6 )
 
 *  Local Variables:
-      CHARACTER*15		LDESCRIP
+      CHARACTER*20		LDESCRIP
       CHARACTER*80		CVALUE
 
       DOUBLE PRECISION		DVALUE
