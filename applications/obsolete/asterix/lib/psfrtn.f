@@ -3420,10 +3420,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Shut down WFC system
       CALL PSF_WFC_CLOSE( STATUS )
 
-*    Shutdown ASTERIX
-      CALL DYN_CLOSE()
-      CALL BDA_CLOSE()
-
 *    Back to old error context
       CALL ERR_RLSE( STATUS )
 

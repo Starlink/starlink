@@ -107,7 +107,7 @@
       IF ( (NDIM.GT.0) .AND. (NDIM.LE.ADI__MXDIM) ) THEN
 
 *    Get pointer
-        CALL DYN_MAP( NDIM, DIMS, '<HTYPE>', PTR, STATUS )
+        CALL DYN0_MAP( NDIM, DIMS, '<HTYPE>', PTR, STATUS )
 
 *  Otherwise report error
       ELSE

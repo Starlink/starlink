@@ -156,9 +156,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check DYN system is initialised
-      IF ( .NOT. DYN_ISINIT ) CALL DYN0_INIT( STATUS )
-
 *  Determine element size in bytes
       IF ( (MTYPE(2:2) .EQ. 'I') .OR. (MTYPE(2:2) .EQ. 'L') ) THEN
         SIZE = VAL__NBI
