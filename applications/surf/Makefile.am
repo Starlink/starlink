@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = sculib surflib src
+SUBDIRS = sculib surflib src docs
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc

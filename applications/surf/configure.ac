@@ -34,15 +34,12 @@ STAR_DECLARE_DEPENDENCIES([link], [ndf fio sla hlp pda prm agi kaplibs pgplot gr
 dnl    No use dependencies
 
 dnl Documentation
-STAR_LATEX_DOCUMENTATION( [sun216 ssn72 sc10 sc11] )
+STAR_LATEX_DOCUMENTATION( sun216/ ssn72/ sc10/ sc11/ )
 
 dnl  But we also need to define the docs subdirs
 DOCS_SUBDIRS="hlp sun216 ssn72 sc10 sc11"
 AC_SUBST(DOCS_SUBDIRS)
 
-dnl AC_CONFIG_FILES(Makefile surflib/Makefile sculib/Makefile src/Makefile docs/Makefile docs/hlp/Makefile docs/sun216/Makefile docs/ssn72/Makefile docs/sc10/Makefile docs/sc11/Makefile component.xml surf_set_app_name.f surf.ifd)
-
-AC_CONFIG_FILES(Makefile sculib/Makefile surflib/Makefile src/Makefile   component.xml surf_set_app_name.f surf.ifd)
-
+AC_CONFIG_FILES(Makefile surflib/Makefile sculib/Makefile src/Makefile docs/Makefile docs/hlp/Makefile docs/sun216/Makefile docs/ssn72/Makefile docs/sc10/Makefile docs/sc11/Makefile component.xml surf_set_app_name.f surf.ifd)
 
 AC_OUTPUT
