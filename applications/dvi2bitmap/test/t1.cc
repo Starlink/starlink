@@ -1,4 +1,4 @@
-#include "config.h"
+#include <config.h>
 
 #include <iostream>
 
@@ -152,7 +152,13 @@ int main (int argc, char **argv)
 
     try {
 	string cmd = "./t1.sh LOGNAME HOME T TT";
-	setenv("TT", "test", 1);
+#ifdef HAVE_SETENV
+        setenv("TT", "test", 1);
+#elif defined(HAVE_PUTENV)
+        putenv((char*)"TT=test");
+#else
+#error "Can't set environment variables"
+#endif
 	string envs = "LOGNAME=blarfl HOME=blarfl T=t + LOGNAME=you TT + LOGNAME=me";
 	string expected = "LOGNAME=me!HOME=";
 	char* h = getenv("HOME");
