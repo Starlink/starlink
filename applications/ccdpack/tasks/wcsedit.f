@@ -147,7 +147,7 @@
 *        The fourth frame in the WCS component of each NDF 'data*.sdf' 
 *        is removed.
 *
-*     wcsedit "first,second" mode=add frame=GRID maptype=pcd 
+*     wcsedit "first,second" mode=add frame=GRID maptype=pincushion
 *             coeffs=[-6.8e-10,0,0] domain=NEW
 *        A new frame, in the domain 'NEW', is added to the NDFs first 
 *        and second.  It is connected to the previously existing GRID
@@ -344,9 +344,8 @@
 *  Pincushion transformation.
                ELSE IF ( MAPTYP .EQ. 'PINCUSHION' ) THEN
                   CALL PAR_EXACD( 'COEFFS', 3, COEFFS, STATUS )
-                  STATUS = SAI__ERROR
-                  CALL ERR_REP( ' ', 
-     :'WCSEDIT: Pincushion mapping not implemented yet.', STATUS )
+                  MAP = AST_PCDMAP( COEFFS( 1 ), COEFFS( 2 ), ' ', 
+     :                              STATUS )
                END IF
 
 *  Copy the basis frame, and add the new domain name, to create the 
