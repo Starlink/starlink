@@ -1,0 +1,70 @@
+\newpage
+\sstroutine{
+   NDF2GIF
+}{
+   Converts an NDF into a GIF file.
+}{
+   \sstdescription{
+      This Bourne-shell script converts an NDF into a 256 grey-level
+      Graphics Interchange Format (GIF) file.  One- or two-dimensional
+      images can be handled.  The script uses the CONVERT utility
+      NDF2TIFF to produce a TIFF file and then various PBMPLUS utilities
+      to convert the TIFF file into a GIF file. 
+
+      Error messages are converted into Starlink style (preceded by {\tt !}).
+   }
+   \sstusage{
+      ndf2gif in [out]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The name of the input NDF (without the {\tt .sdf} extension).
+      }
+      \sstsubsection{
+         OUT = FILENAME (Write)
+      }{
+         The name of the GIF file to be generated (without the {\tt .gif}
+         extension, which is appended).
+         If this is omitted, the value of the IN parameter is used.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2gif old new
+      }{
+         This converts the NDF called old (in file {\tt old.sdf})
+         into a GIF file {\tt new.gif}.
+      }
+   }
+   \sstnotes{
+      The following points should be remembered:
+      \sstitemlist{
+
+         \sstitem
+            This initial version of the script generates only 256 grey 
+            levels and does not use the image colour lookup table so
+            absolute data values may be lost.
+         \sstitem
+            The PBMPLUS utilities {\tt tifftopnm} and {\tt ppmtogif}
+            must be available on your PATH.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      \CONVERT: GIF2NDF.
+   }
+   \sstbugs{
+      At the time of writing, this utility does not work on alpha OSF/1
+      due to a problem with {\tt tifftopnm} in the standard release of 
+      PBMPLUS.  OSF/1 users should use a copy of {\tt tifftopnm} obtained from 
+      Netpbm which is based on PBMPLUS but contains many improvements and
+      additions.  A suitable version may be obtained via WWW at
+      \htmladdnormallink{{\tt http://www.astro.cf.ac.uk/pub/Grant.Privett/}}
+      {http://www.astro.cf.ac.uk/pub/Grant.Privett/}.
+      Alternatively, contact Grant Privett, {\tt gjp@astronomy.cardiff.ac.uk}.
+   }
+}
+
