@@ -430,7 +430,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 4.0-7b
+PKG_VERS = 4.0-9
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -580,7 +580,7 @@ LINK_SCRIPT = $(PKG_NAME)_link_adam
 #  Starlink PGPLOT or '-pgplot' for Native PGPLOT.  It affects only
 #  those monoliths which are able to use either implementation.
 
-LINK_SCRIPT_GFLAG = -pgp
+LINK_SCRIPT_GFLAG = -pgplot
 
 #  Private scripts required to build the package.
 
@@ -610,7 +610,7 @@ EXTERNAL_INCLUDES = AST_PAR AST_ERR CHR_ERR DAT_PAR DAT_ERR TRN_PAR TRN_ERR \
  NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW \
  NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R \
  NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_ERR PAR_PAR PRM_PAR SAE_PAR \
- SUBPAR_PAR GRP_PAR GRP_ERR PSX_ERR NDG_ERR
+ GRP_PAR GRP_ERR PSX_ERR NDG_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -697,8 +697,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
  ira1_chscs.f ira_seteq.f ira_iscs.f \
  ccd1_box.f ccd1_gsrt.f ccd1_gszff.f ccd1_sgare.f ccd1_ordg.f ccd1_tran.f \
- ccd1_fspec.f ccd1_slice.f ccd1_grdel.f \
- subpar_init.f
+ ccd1_fspec.f ccd1_slice.f ccd1_grdel.f
 
 HELPSRC = $(HELPTASK).f gethlp.f gthlpi.f kpg1_scrsz.f \
  pthlpo.f sread.f
@@ -960,7 +959,6 @@ PAR_PAR:	$(STAR_INC)/par_par;      $(LINK) $? $@
 PRM_PAR:	$(STAR_INC)/prm_par;      $(LINK) $? $@
 PSX_ERR:	$(STAR_INC)/psx_err;      $(LINK) $? $@
 SAE_PAR:	$(STAR_INC)/sae_par;      $(LINK) $? $@
-SUBPAR_PAR:	$(STAR_INC)/subpar_par;   $(LINK) $? $@
 TRN_ERR:       	$(STAR_INC)/trn_err;      $(LINK) $? $@
 TRN_PAR:       	$(STAR_INC)/trn_par;      $(LINK) $? $@
 USER_ERR:	user_err;	          $(LINK) $? $@
@@ -2772,7 +2770,5 @@ ccg1_smd2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smr2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smd3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smr3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
-
-subpar_init.o: DAT_PAR SAE_PAR SUBPAR_PAR
 
 # $Id$
