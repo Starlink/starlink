@@ -104,7 +104,8 @@
 
       INTEGER			CACHEID			! Cache object
       INTEGER			PTR, PTR2		! Item data address
-      INTEGER			NDIM, DIMS(ADI__MXDIM), NELM
+      INTEGER			NDIM, DIMS(ADI__MXDIM)
+      INTEGER			NELM
 
       LOGICAL			MODIFIED, THERE
 *.
@@ -124,35 +125,46 @@
       CALL ADI_CGET0L( CACHEID, 'Modified', MODIFIED, STATUS )
       IF ( MODIFIED ) THEN
 
+*    If the PSID "Ptr" and the address of the CACHEID "Value" are the same
+*    then there is no need to copy the data
+        CALL ADI_CGET0C( CACHEID, 'TYPE', TYPE, STATUS )
+        CALL ADI_CMAP( CACHEID, 'Value', TYPE, 'READ', PTR2, STATUS )
+        IF ( PTR .EQ. PTR2 ) THEN
+          GOTO 99
+        END IF
+
 *    Find out the new shape and type
-        CALL BDI_GETSHP( PSID, ADI__MXDIM, DIMS, NDIM, STATUS )
+        CALL ADI_CGET1I( PSID, 'SHAPE', ADI__MXDIM, DIMS, NDIM,
+     :                    STATUS )
         CALL ARR_SUMDIM( NDIM, DIMS, NELM )
         CALL ADI_CGET0C( PSID, 'Type', TYPE, STATUS )
 
-*    Destroy the old value and create a new holder
+*    Destroy the old value, create a new holder and assign the pointer
         CALL ADI_CERASE( CACHEID, 'Value', STATUS )
         CALL ADI_CNEW( CACHEID, 'Value', TYPE, NDIM, DIMS, STATUS )
         CALL ADI_CMAP( CACHEID, 'Value', TYPE, 'WRITE', PTR2, STATUS )
 
-*    Copy over the data
-        IF ( TYPE .EQ. 'REAL' ) THEN
-          CALL ARR_COP1R( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
-        ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
-          CALL ARR_COP1D( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
-        ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
-          CALL ARR_COP1I( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
-        ELSE IF ( TYPE .EQ. 'LOGICAL' ) THEN
+*    Copy the data (but what if they are different types?)
+        IF (TYPE .EQ. 'LOGICAL' ) THEN
           CALL ARR_COP1L( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
-        ELSE IF ( TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
-          CALL ARR_COP1W( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
-        ELSE IF ( TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
+        ELSE IF (TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
           CALL ARR_COP1B( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF (TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
+          CALL ARR_COP1W( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF (TYPE .EQ. 'INTEGER' ) THEN
+          CALL ARR_COP1I( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF (TYPE .EQ. 'REAL' ) THEN
+          CALL ARR_COP1R( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF (TYPE .EQ. 'DOUBLE' ) THEN
+          CALL ARR_COP1D( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE
+          print*, '*** Warning (ARYWB): Cannot copy data type ', TYPE
         END IF
 
       END IF
 
 *  Unmap the data
-      CALL ADI_CUNMAP( CACHEID, 'Value', PTR, STATUS )
+ 99   CALL ADI_CUNMAP( CACHEID, 'Value', PTR2, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN
