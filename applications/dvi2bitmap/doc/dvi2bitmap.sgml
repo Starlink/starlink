@@ -52,9 +52,9 @@ New release.  Documentation tidyups.  Mentioned new support for PNG graphics.
 Described problems finding fonts.
 </distribution>
 
-<distribution string="0.8" date="??-June-2000" author="ng" versionid=v0-8>
+<distribution string="0.8" date="08-June-2000" author="ng" versionid=v0-8>
 Documented changes to list of specials (foreground and background
-colours).
+colours, and strut).
 </distribution>
 
 </history>
