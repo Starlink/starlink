@@ -138,7 +138,9 @@
          RETURN
       ENDIF
 
-      type *, IDIMS1, IDIMS2, MAX, MIN, SKY, NSTARS, 
+      UNITNUM = 0
+
+      PRINT *, IDIMS1, IDIMS2, MAX, MIN, SKY, NSTARS, 
      :                   SCALE, SEEING, DISTRIB, BADPIX, FRACTION,
      :                   BADCOL, DISPLAY, SCREEN, FILENAME
 
@@ -172,7 +174,7 @@
       BOX   =  NINT( FWHM * 5 )
 
 *    fill array with the sky value
-	type *, 'before do 1'
+	PRINT *, 'before do 1'
       DO  J  =  1, IDIMS2
          DO  I  =  1, IDIMS1
             IMAGE( I, J )  =  SKY
@@ -183,13 +185,13 @@
 *    G05CCF which used real_time to initialise the seed
 
       CALL G05CCF
-	type *, 'after g05ccf'
+	PRINT *, 'after g05ccf'
 
 *    loop round the requested number of stars generating a random
 *    x,y position and a peak intensity. Then create a Gaussian star
 *    of that intensity at that point
       DO  N  =  1, NSTARS
-	type *, n
+	PRINT *, n
 
 *       get a random, non-integral x,y position
          VALUE  =  G05CAF(X)
