@@ -194,6 +194,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.46  1998/02/03 01:14:24  timj
+*     Make upper limit to map size larger.
+*
 *     Revision 1.45  1998/01/23 02:03:20  timj
 *     Optionally store the WEIGHTS array (use WEIGHTS parameter).
 *     Add the TIMES array (optional).
@@ -1312,7 +1315,7 @@ c
             IX = MAP_SIZE(1)
             IY = MAP_SIZE(2)
 
-            CALL PAR_GDR1I('SIZE', 2, MAP_SIZE, 5, 1000, .TRUE.,
+            CALL PAR_GDR1I('SIZE', 2, MAP_SIZE, 5, 10000, .TRUE.,
      :           MAP_SIZE, STATUS)
 
 *     Need to redefine I_CENTRE and J_CENTRE 
