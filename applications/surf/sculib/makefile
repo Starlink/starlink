@@ -1,5 +1,5 @@
 FC    = f77
-FFLAGS = -O4
+FFLAGS = -O4 -C -ftrap=%all
 
 # install
 
@@ -60,8 +60,10 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_copyb.f sculib_cfillb.f sculib_bits.f\
 	sculib_bessel_wtinit.f sculib_linear_wtinit.f sculib_set_quality.f \
 	sculib_extract_2dim_b.f sculib_extract_2dim_r.f \
-	sculib_extract_2dim_d.f sculib_skyfunc.f sculib_skyfuncd.f
-
+	sculib_extract_2dim_d.f sculib_skyfunc.f sculib_skyfuncd.f \
+	sculib_get_dem_pntr.f sculib_get_lst_strt.f sculib_get_bol_desc.f \
+	sculib_get_jiggle.f sculib_get_raster.f sculib_get_mjd.f \
+	sculib_process_bols.f sculib_get_sub_inst.f
 
 OBJS = ${FSOURCES:.f=.o}
 
@@ -74,6 +76,6 @@ lib:	${OBJS}
 clean:	
 	/bin/rm -f libsculib.a *.o
 
-install:
+install: lib
 	${INSTALL} ${INSTOPTS} libsculib.a ${INSTDIR}
 
