@@ -33,7 +33,7 @@ Altered documentation of font-searching, to match new functionality.
 versionid="upd5">Assorted changes, to describe significant new functionality.
 </distribution>
 
-<change date="13-SEP-1999" author=ng versionid="post-upd5>
+<change date="13-SEP-1999" author=ng versionid="post-upd5">
 Added page-selection features, and documented them.
 </change>
 
@@ -118,7 +118,7 @@ to support other models of use.
 
 <subsect id=usage.options export>Options
 <update versionid="upd5">Added documentation of -c and -C options</update>
-<update versionid="post-upd4">Added documentation of -p -l -pp
+<update versionid="post-upd5">Added documentation of -p -l -pp
 options.  Note that the old -l and -L options have changed into the
 new -L and -LL options.</update>
 
@@ -202,7 +202,7 @@ id=usage.special>).  If there is no
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
 
-<dt><code/-p p-spec/, <code/-l l-spec/ <code/-pp pp-spec/
+<dt><code/-p p-spec/, <code/-l l-spec/, <code/-pp pp-spec/
 <dd>These select page ranges, using a slight extension of the notation
 used by <code/dvips/ (and the same option letters).  The <code/p-spec/
 and <code/l-spec/ are single page numbers; if either of these are
@@ -344,7 +344,7 @@ magnification factor to 2, so that the program uses a double-size font
 factor of 2 to obtain a bitmap of the correct size.
 
 <p><verbatim>
-% dvi2bitmap -n -l -r 110 -m 1.5 -Q hello.dvi
+% dvi2bitmap -n -L -r 110 -m 1.5 -Q hello.dvi
 cmr10 165 110 1.5 localfont
 </verbatim>
 This reads the DVI file to find out what fonts are required, but does
@@ -581,9 +581,8 @@ depending on your shell.
 
 <p>Things I'd like to do sometime:
 <ul>
-<li>At some point I'll add an option to select which pages are
-processed.  This comes under the heading of `fiddly' rather
-than `interestingly difficult'. 
+<li>I'd like to support PNG and PBM graphics.
+<li>Ermmm, any suggestions?
 
 </ul>
 
@@ -596,7 +595,7 @@ repository of &tex; and &latex; documentation.  The archive is
 mirrored in numerous places, but the UK node is at
 <url>http://www.tex.ac.uk</url>.
 
-<p>DVItype and PKtoPX are two programs Donald Knuth programs intended
+<p>DVItype and PKtoPX are two programs Donald Knuth intended
 as model DVI and PK file 
 readers, and as containers for the canonical documentation of the DVI
 and PK file formats.  They might be available as part of your &tex;
@@ -672,7 +671,8 @@ gifs.  It's very robust by now.
 <webref url="http://www.fourmilab.ch/webtools/textogif/textogif.html"
 	>textogif</webref>
 is a Perl program which orchestrates the various tools to do the
-conversion via postscript, once you've generated the DVI file.
+conversion via postscript, once you've generated the DVI file.  It
+works, but it's <em/terribly/ slow, which was the motivation for this program.
 
 <p><webref url="http://www.cis.ohio-state.edu/~gurari/TeX4ht/mn.html"
 	>TeX4ht</webref> (&tex; for Hypertext) uses &tex;'s own
