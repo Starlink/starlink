@@ -392,6 +392,21 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        AIPSFromStore: use larger of coscro and sincro when determining
 *        CDELT values. Previously a non-zero coscro was always used, even
 *        if it was a s small as 1.0E-17.
+*     3-OCT-2002 (DSB):
+*        - SkySys: Corrected calculation of longitude axis index for unknown
+*        celestial systems.
+*        - SpecTrans: Corrected check for latcor terms for ZPX projections.
+*        - WcsFrame: Only store an explicit equinox value in a skyframe if 
+*        it needs one (i.e. if the system is ecliptic or equatorial).
+*        - WcsWithWcs: For Zenithal projections, always use the default
+*        LONPOLE value, and absorb any excess rotation caused by this
+*        into the CD matrix.
+*        - WcsWithWcs: Improve the check that the native->celestial mapping 
+*        is a pure rotation, allowing for rotations which change the
+*        handed-ness of the system (if possible).
+*        - WcsWithWcs: Avoid using LONPOLE keywords when creating headers
+*        for a zenithal projection. Instead, add the corresponding rotation 
+*        into the CD matrix.
 *class--
 */
 
@@ -13138,7 +13153,7 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
       } else {
 
          latax = astGetLatAxis( skyfrm );         
-         lonax = 2 - latax;
+         lonax = 1 - latax;
 
          latsym = astGetSymbol( skyfrm, latax );
          lonsym = astGetSymbol( skyfrm, lonax );
@@ -16757,8 +16772,10 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
 /* Store the epoch of the observation in the SkyFrame. */
       if( mjdobs != AST__BAD ) astSetEpoch( skyframe, mjdobs );
 
-/* Store the epoch of the reference equinox in the SkyFrame. */
-      if( equinox != AST__BAD ) astSetEquinox( skyframe, eqmjd );
+/* For equatorial and ecliptic systems, store the epoch of the reference 
+   equinox in the SkyFrame. */
+      if( ( !strcmp( sys, "EQU" ) || !strcmp( sys, "ECL" ) ) &&
+          equinox != AST__BAD ) astSetEquinox( skyframe, eqmjd );
 
 /* If there are more than 2 axes, then there must also be some non-celestial 
    axes. */
@@ -18564,29 +18581,64 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
 
 */
 
+
 /* Local Variables: */
+   AstMapping *map3b;       /* Mapping from Nat.Sph. to celestial lon/lat */
+   AstMapping *map3c;       /* Mapping from Nat.Sph. to celestial lon/lat */
+   AstMatrixMap *rmap;      /* MatrixMap which inverts longitude values */
    AstPointSet *pset1;      /* PointSet holding coordinates */
    AstPointSet *pset2;      /* PointSet holding coordinates */
+   AstPointSet *pset3;      /* PointSet holding coordinates */
    AstSkyFrame *skyfrm;     /* Pointer to celestial coordinate Frame */
+   AstWinMap *colmap;       /* Co-latitude -> latitude Mapping */
    double **ptr1;           /* Pointer to coordinate data */
    double **ptr2;           /* Pointer to coordinate data */
+   double **ptr3;           /* Pointer to coordinate data */
+   double *ina;             /* Pointer to input corner A coords */ 
+   double *inb;             /* Pointer to input corner B coords */ 
+   double *mat;             /* Pointer to array of matrix diagonal elements */
+   double *outa;            /* Pointer to output corner A coords */ 
+   double *outb;            /* Pointer to output corner B coords */ 
    double *work;            /* Pointer to workspace */
    double alpha0;           /* Long. of ref. point in standard system */
    double alphap;           /* Celestial longitude of native north pole */
+   double cdlat_lat;        /* Original CD term */
+   double cdlat_lon;        /* Original CD term */
+   double cdlon_lat;        /* Original CD term */
+   double cdlon_lon;        /* Original CD term */
+   double coserr;           /* Cos( err ) */
+   double deflonpole;       /* Default value for lonpole */
    double delta0;           /* Lat. of ref. point in standard system */
+   double dot;              /* Dot product value */
+   double err;              /* Error introduced into phi */
    double error;            /* Difference between values */
    double latpole;          /* Native latitude of celestial north pole */
    double lonpole;          /* Native longitude of celestial north pole */
+   double mx;               /* Max value */
+   double natlat;           /* Native latitude of projection ref point */
+   double newcdlat_lat;     /* New CD term */
+   double newcdlat_lon;     /* New CD term */
+   double newcdlon_lat;     /* New CD term */
+   double newcdlon_lon;     /* New CD term */
    double pv;               /* Projection parameter value */
-   double s2;               /* Sum of squared values */
-   double sky_lat;          /* Normalised latitude at reference point */
-   double sky_long;         /* Normalised longitude at reference point */
+   double s1;               /* Cosine of the angle subtended by a pixel */
+   double sinerr;           /* Sin( err ) */
+   double skyref[ 2 ];      /* Latitude/longitude at reference point */
    double val;              /* Keyword value */
-   int axis;                /* Axis index within skyframe */
+   double vx[ 3 ];          /* Unit vector along X axis */
+   double vy[ 3 ];          /* Unit vector along Y axis */
+   double vz[ 3 ];          /* Unit vector along Z axis */
+   double vzz[ 3 ];         /* An approximation to vz */
+   double x0;               /* Original x value at first point */
+   double x1;               /* Original x value at second point */
+   double x2;               /* Original x value at third point */
+   int skylonaxis;          /* Index of longitude axis within skyframe */
+   int skylataxis;          /* Index of latitude axis within skyframe */
    int axlat;               /* Zero-based index of latitude axis */
    int axlon;               /* Zero-based index of longitude axis */
    int celsys;              /* Is there a celestial coordinate pair? */
    int i,j;                 /* Loop count */
+   int nout;                /* No of output axes */
    int ok;                  /* Can the Mapping be used? */
    int ret;                 /* Can the Mapping be described by FITS-WCS? */
 
@@ -18600,9 +18652,9 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
    work = (double *) astMalloc( sizeof(double)*naxis );
 
 /* Create two PointSets to hold two points each. */
-   pset1 = astPointSet( 2, naxis, "" );
+   pset1 = astPointSet( 3, naxis, "" );
    ptr1 = astGetPoints( pset1 );
-   pset2 = astPointSet( 2, naxis, "" );
+   pset2 = astPointSet( 3, naxis, "" );
    ptr2 = astGetPoints( pset2 );
 
 /* Check the projection parameters and pointers can be used. */
@@ -18616,6 +18668,7 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
       for( i = 0; i < naxis; i++ ) {
          ptr1[ i ][ 0 ] = 0.0;
          ptr1[ i ][ 1 ] = 0.0;
+         ptr1[ i ][ 2 ] = 0.0;
       }
       astTransform( map1, pset1, 0, pset2 );
       for( i = 0; i < naxis; i++ ) {
@@ -18634,16 +18687,58 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
       axlon = astGetWcsAxis( map2, 0 );
       axlat = astGetWcsAxis( map2, 1 );
 
+/* Get a pointer to the SkyFrame defining the celestial axes. */
+      if( axlon == -1 ) {
+         skyfrm = NULL;
+         map3b = astClone( map3 );
+      } else {
+         astPrimaryFrame( phyfrm, axlon, (AstFrame **) &skyfrm, &skylonaxis );
+         skylataxis = 1 - skylonaxis;
+
+/* The HPR (Helio-projective Radial) system has a co-latitude axis instead 
+   of a latitude axis, but is represented within FITS by a "HRLT" axis
+   which gives the corrresponding latitude (not co-latitude). Append a 
+   WinMap to "map3" which converts the co-latitude values back into 
+   latitude values. */
+         if( !strcmp( astGetC( skyfrm, "system" ), "HPR" ) ) {
+            nout = astGetNout( map3 );
+            ina = (double *) astMalloc( nout*sizeof( double ) );
+            inb = (double *) astMalloc( nout*sizeof( double ) );
+            outa = (double *) astMalloc( nout*sizeof( double ) );
+            outb = (double *) astMalloc( nout*sizeof( double ) );
+            if( astOK ) {
+               for( i = 0; i < nout; i++ ) {
+                  ina[ i ] = 0.0;
+                  inb[ i ] = 1.0;
+                  outa[ i ] = ina[ i ];
+                  outb[ i ] = inb[ i ];
+               }
+               outa[ axlat ] = AST__DPIBY2 - ina[ axlat ];
+               colmap = astWinMap( nout, ina, inb, outa, outb, "" );
+               map3b = (AstMapping *) astCmpMap( map3, colmap, 1, "" );
+               colmap= astAnnul( colmap );
+            }             
+            ina = (double *) astFree( (void *) ina );
+            inb = (double *) astFree( (void *) inb );
+            outa = (double *) astFree( (void *) outa );
+            outb = (double *) astFree( (void *) outb );
+
+         } else {
+            map3b = astClone( map3 );
+         }
+      }
+
 /* The reference point in the physical co-ordinate system is found by
    transforming the reference point in native spherical co-ordinates
-   into absolute physical coordinates using map3. Note, the reference 
+   into absolute physical coordinates using map3b. Note, the reference 
    pixel given by CRPIX does not necessarily map onto physical 
    reference point given by CRVAL. For instance, the two points will be
    different for a TAN projection in which any of the PVi_0 projection
    parameters are not zero. */
       for( i = 0; i < naxis; i++ ) ptr1[ i ][ 0 ] = 0.0;
-      ptr1[ axlat ][ 0 ] = astGetNatLat( map2 );
-      astTransform( map3, pset1, 1, pset2 );
+      natlat = astGetNatLat( map2 );
+      ptr1[ axlat ][ 0 ] = natlat;
+      astTransform( map3b, pset1, 1, pset2 );
       for( i = 0; i < naxis; i++ ) {
          SetItem( &(store->crval), i, 0, s, ptr2[ i ][ 0 ] );
       }
@@ -18655,30 +18750,20 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
 
 /* Normalise the latitude and longitude values at the reference point. The
    longitude and latitude values stored above will be in radians, but after
-   normalization we convert them to degrees, as expected by other
-   functions which handle FitsStores. */
-         sky_long = GetItem( &(store->crval), axlon, 0, s, NULL, method, 
-                             class );
-         sky_lat = GetItem( &(store->crval), axlat, 0, s, NULL, method, 
-                             class );
+   normalization we convert them to degrees, as expected by other functions 
+   which handle FitsStores. */
+         skyref[ skylonaxis ] = GetItem( &(store->crval), axlon, 0, s, NULL, 
+                                         method, class );
+         skyref[ skylataxis ] = GetItem( &(store->crval), axlat, 0, s, NULL, 
+                                         method, class );
 
-         if( ZEROANG( sky_long ) ) sky_long = 0.0;
-         if( ZEROANG( sky_lat  ) ) sky_lat = 0.0;
+         if( ZEROANG( skyref[ 0 ] ) ) skyref[ 0 ] = 0.0;
+         if( ZEROANG( skyref[ 1 ] ) ) skyref[ 1 ] = 0.0;
 
-         sky_long = slaDranrm( sky_long );
-         sky_lat = slaDrange( sky_lat );
+         astNorm( skyfrm, skyref );         
 
-         if ( sky_lat > AST__DPIBY2 ) {
-            sky_long += ( sky_long < AST__DPI ) ? AST__DPI : -AST__DPI ;
-            sky_lat = AST__DPI - sky_lat;
-
-         } else if ( sky_lat < -AST__DPIBY2 ) {
-            sky_long += ( sky_long < AST__DPI ) ? AST__DPI : -AST__DPI;
-            sky_lat = -AST__DPI - sky_lat;
-         }
-
-         SetItem( &(store->crval), axlon, 0, s, AST__DR2D*sky_long );
-         SetItem( &(store->crval), axlat, 0, s, AST__DR2D*sky_lat );
+         SetItem( &(store->crval), axlon, 0, s, AST__DR2D*skyref[ skylonaxis ] );
+         SetItem( &(store->crval), axlat, 0, s, AST__DR2D*skyref[ skylataxis ] );
 
 /* Store the WCS projection parameters. */
          for( i = 0; i < 99; i++ ){
@@ -18686,20 +18771,6 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
             if( pv != AST__BAD ) SetItem( &(store->pv), axlon, i, s, pv );
             pv = astGetPV( map2, axlat, i );
             if( pv != AST__BAD ) SetItem( &(store->pv), axlat, i, s, pv );
-         }
-
-/* Scale the CD terms referring to the celestial axis so that they create
-   degrees instead of radians. */
-         for( i = 0; i < naxis; i++ ){
-            val = GetItem( &(store->cd), axlat, i, s, NULL, method, class );
-            if( val != AST__BAD ) SetItem( &(store->cd), axlat, i, s, 
-                                           val*AST__DR2D );
-         }
-
-         for( i = 0; i < naxis; i++ ){
-            val = GetItem( &(store->cd), axlon, i, s, NULL, method, class );
-            if( val != AST__BAD ) SetItem( &(store->cd), axlon, i, s, 
-                                           val*AST__DR2D );
          }
 
       }
@@ -18720,47 +18791,160 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
          }
       }
 
-/* Store the squared arc-size of a pixel in celestial coordinates. These are 
-   used to determine the accuracy required for the Mappings. */
+/* Store the cosine of the angle subtended by a pixel in celestial 
+   coordinates. This is used to determine the accuracy required for the 
+   rotational Mapping. */
       if( celsys && astOK ) {
-         s2 = work[ axlat ]*work[ axlat ] + work[ axlon ]*work[ axlon ];
+         s1 = cos( sqrt( work[ axlat ]*work[ axlat ] + 
+                         work[ axlon ]*work[ axlon ] ) );
       } else {
-         s2 = 0.0;
+         s1 = 1.0;
       }
 
-/* We now need to check that the Mapping (map3) which comes after the WCS
+/* We now need to check that the Mapping (map3b) which comes after the WCS
    projection (map2) is of the correct form to be represented by FITSWCS. 
-   For the celestial axes, map3 must represent a 3D spherical rotation. To
-   check this, two native spherical positions separated by a known 
-   arc-distance are transformed. If the arc-distance between the transformed 
-   points is the same, then the projection is assumed to be acceptable. The 
-   positions chosen are the north pole and origin of the native spherical 
-   coordinate system which are separated by 90 degrees.
+   For the celestial axes, map3b must represent a 3D spherical rotation. To
+   check this, three native spherical positions (0,0) (pi/2,0) and (0,pi/2)
+   (the ends of the X, Y and Z axes) are transformed into "celestial"
+   coordinates. The transformed positions are converted from spherical 
+   into Cartesian coordinates, and a check is made that Z = X cross Y (or 
+   Y cross X for left-handed systems).
    
-   For any non-celestial axes, map3 must be a simple shift of origin. To 
+   For any non-celestial axes, map3b must be a simple shift of origin. To 
    check this, two positions separated by a known vector are transformed.
    If the vector between the transformed positions is the same, then the
-   projection is assumed to be acceptable. 
+   projection is assumed to be acceptable (the thrid position is not used). 
 
-   Set up the two positions and transform them into physical coordinates. */
+   Set up the three native spherical positions and transform them into 
+   celestial spherical coordinates. */
       for( i = 0; i < naxis; i++ ) {
          ptr1[ i ][ 0 ] = 0.0;
          ptr1[ i ][ 1 ] = (double) i;
+         ptr1[ i ][ 2 ] = 0.0;
       }
-      if( celsys ) ptr1[ axlat ][ 1 ] = AST__DPIBY2;
-      astTransform( map3, pset1, 1, pset2 );         
+      if( celsys ) {
+         ptr1[ axlon ][ 1 ] = AST__DPIBY2;
+         ptr1[ axlat ][ 1 ] = 0.0;
+         ptr1[ axlat ][ 2 ] = AST__DPIBY2;
+      }
+      astTransform( map3b, pset1, 1, pset2 );         
 
-/* Check that the arc distance between the two transformed celestial positions 
-   is 90 degrees. The allowed error is 10th of a pixel. */
-      error = celsys ? slaDsep( ptr2[ axlon ][ 0 ], ptr2[ axlat ][ 0 ],
-                  ptr2[ axlon ][ 1 ], ptr2[ axlat ][ 1 ] ) - AST__DPIBY2 : 0.0;
+/* Assume the matrix is usable. */
+      ok = 1;
 
-      if( astOK && error*error <= 0.01*s2 ){
+/* If we have celestial axes, do the relevant checks... */
+      if( celsys ) {
+
+/* Convert the 3 positions from spherical to cartesian. */
+         slaDcs2c( ptr2[ axlon ][ 0 ],  ptr2[ axlat ][ 0 ], vx );
+         slaDcs2c( ptr2[ axlon ][ 1 ],  ptr2[ axlat ][ 1 ], vy );
+         slaDcs2c( ptr2[ axlon ][ 2 ],  ptr2[ axlat ][ 2 ], vz );
+
+/* If the matrix is a pure rotation, vz should equal the vector product
+   of vx and vy. If the matrix is a pure rotation, except for a change of
+   handed-ness, then vz will be reflected (i.e. equal to (vy X vx) instead
+   of (vx X vy) ). Find ( vx X vy ), and store in vzz. */
+         slaDvxv( vx, vy, vzz );
+         
+/* vzz and vz should be equal (and both of unit length). Therefore the dot 
+   product vzz.vz should be very nearly equal to 1.0. */
+         dot = slaDvdv( vzz, vz );
+         if( dot >= s1 ) {
+            ok = 1;
+
+/* If the dot product vzz.vz equals -1.0, then the Mapping is a rotation
+   matrix but changes the handedness of the system (a right-handed system
+   has longitude increasing anti-clockwise when viewed from above the north 
+   pole, but a left-handed system has longitude increasing clockwise when 
+   viewed from above the north pole). */
+         } else if( dot <= -s1 ) {
+
+/* We can still use such a Mapping if the projection is suitable. If 
+   changing the sign of the native longitude results in the projection 
+   plane X value changing sign, then we can modify the rotation Mapping
+   to make it a pure rotation, so long as we also modify the CD matrix 
+   to take account of the inversion in the sign of X. First we do the
+   check on the projection. Transform three native spherical positions 
+   into projection plane (x,y) values. */
+            ok = 0;            
+            ptr1[ axlon ][ 0 ] = 0.01;
+            ptr1[ axlat ][ 0 ] = natlat;
+
+            ptr1[ axlon ][ 1 ] = -0.01;
+            ptr1[ axlat ][ 1 ] = natlat;
+
+            ptr1[ axlon ][ 2 ] = 0.02;
+            ptr1[ axlat ][ 2 ] = natlat;
+
+            pset3 = astTransform( map2, pset1, 0, NULL );         
+            ptr3 = astGetPoints( pset3 );
+            if( astOK ) {
+
+/* Note the three X values. */
+               x0 = ptr3[ axlon ][ 0 ];
+               x1 = ptr3[ axlon ][ 1 ];
+               x2 = ptr3[ axlon ][ 2 ];
+
+/* Now invert the sign of the longitude at the three positions, and
+   transform them again into projection plane (x,y). */
+               ptr1[ axlon ][ 0 ] *= -1.0;
+               ptr1[ axlon ][ 1 ] *= -1.0;
+               ptr1[ axlon ][ 2 ] *= -1.0;
+               astTransform( map2, pset1, 0, pset3 );         
+               if( astOK ) {
+
+/* Compare the three new X values with the old one. If they have all
+   simply changed sign, then the WcsMap has passed the check, and we can
+   use the rotation matrix. */
+                  if( EQUAL( ptr3[ axlon ][ 0 ], -x0 ) &&
+                      EQUAL( ptr3[ axlon ][ 1 ], -x1 ) &&
+                      EQUAL( ptr3[ axlon ][ 2 ], -x2 ) ) {
+
+/* To use the rotation matrix, we must modify it so that it does not
+   change the handedness of the native spherical coordinates. Do this by
+   inverting the sign of the longitude values using a diagonal MatrixMap. */
+                     mat = (double *) astMalloc( naxis*sizeof( double ) );
+                     if( astOK ) {
+                        for( i = 0; i < naxis; i++ ) mat[ i ] = 1.0;
+                        mat[ axlon ] = -1.0;
+                        rmap = astMatrixMap( naxis, naxis, 1, mat, "" );
+                        map3c = (AstMapping *) astCmpMap( rmap, map3b, 1, "" );
+                        map3b = astAnnul( map3b );
+                        rmap = astAnnul( rmap );
+                        map3b = astSimplify( map3c );
+                        map3c = astAnnul( map3c );
+                     }
+                     mat = (double *) astFree( (void *) mat );
+
+/* We also need to invert the sign of the elements of the CD matrix which
+   produce the X axis, in order to cancel out the effect of the above change 
+   to the rotation matrix. */
+                     for( i = 0; i < naxis; i++ ){
+                        val = GetItem( &(store->cd), axlon, i, s, NULL, method,
+                                       class );
+                        if( val != AST__BAD ) SetItem( &(store->cd), axlon, i, 
+                                                       s, -val );
+                     }
+
+/* Indicate the rotation matrix is usable. */
+                     ok = 1;
+
+                  }
+               }
+            }            
+            pset3 = astAnnul( pset3 );
+
+/* Other values of the dot product indicate that the mapping does not
+   represent a spherical rotation. */
+         } else {
+           ok = 0;
+         }
+      }
 
 /* Now check that the displacement between the two points is unchanged on
    any non-celestial axes. The error must be less than a tenth of a pixel
    on every axis to be acceptable. */
-         ok = 1;
+      if( ok ) {
          for( i = 0; i < naxis; i++ ){
             if( i != axlon && i != axlat ){
                error = ( ptr2[ i ][ 1 ] - ptr2[ i ][ 0 ] ) - (double) i;
@@ -18771,7 +18955,7 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
             }
          }
 
-/* If map3 is an acceptable projection, indicate that we have the returned
+/* If map3b is an acceptable Mapping, indicate that we have the returned
    information can be used. */
          if( ok ){
             ret = 1;
@@ -18781,14 +18965,15 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
             if( celsys && astOK ){
 
 /* We now calculate the longitude and latitude of the celestial north pole 
-   in native spherical coordinates (using the inverse of map3). These values 
+   in native spherical coordinates (using the inverse of map3b). These values 
    correspond to the LONPOLE and LATPOLE keywords. */
                for( i = 0; i < naxis; i++ ){
                   ptr2[ i ][ 0 ] = 0.0;
                   ptr2[ i ][ 1 ] = 0.0;
+                  ptr2[ i ][ 2 ] = 0.0;
                }
                ptr2[ axlat ][ 0 ] = AST__DPIBY2;
-               astTransform( map3, pset2, 0, pset1 );
+               astTransform( map3b, pset2, 0, pset1 );
 
 /* Retrieve the latitude and longitude (in the standard system) of the 
    reference point, in radians. */
@@ -18823,20 +19008,80 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
    point. Otherwise, the default is (+ or -) 180 degrees. If LONPOLE takes 
    the default value, replace it with AST__BAD to prevent an explicit keyword
    being stored in the FitsChan. */
+               lonpole = slaDranrm( ptr1[ axlon ][ 0 ] );
                if( delta0 > astGetNatLat( map2 ) ){
-                  if( EQUALANG( ptr1[ axlon ][ 0 ], 0.0 ) ){
-                     lonpole = AST__BAD;
-                  } else {
-                     lonpole = ptr1[ axlon ][ 0 ];
-                  } 
-   
+                  deflonpole = 0.0;
                } else {
-                  if( EQUALANG( ptr1[ axlon ][ 0 ], AST__DPI ) ||
-                      EQUALANG( ptr1[ axlon ][ 0 ], -AST__DPI ) ){
-                     lonpole = AST__BAD;
-                  } else {
-                     lonpole = ptr1[ axlon ][ 0 ];
-                  } 
+                  deflonpole = AST__DPI;
+               }
+               if( EQUALANG( lonpole, deflonpole ) ) lonpole = AST__BAD;
+
+/* For zenithal projections, a non-zero lonpole value can be ignored (i.e.
+   treated as the default value). In these cases, setting lonpole to the
+   default will simply cause the (X,Y) projection plane coordinates to be 
+   rotated by an angle equal to the original lonpole value. We can correct 
+   for this by introducing an extra rotation into the CD matrix. */
+               if( lonpole != AST__BAD && astIsZenithal( map2 ) ) {
+
+/* Using the default value for LONPOLE instead of the original value results 
+   in the value of PHI being too small by an amount equal to "err". */
+                  err = lonpole - deflonpole;
+                  coserr = cos( err );
+                  sinerr = sin( err );
+
+/* Modify the CD matrix elements for the longitude and latitude axes. */
+                  cdlon_lon = GetItem( &(store->cd), axlon, axlon, s, NULL, 
+                                       method, class );
+                  if( cdlon_lon == AST__BAD ) cdlon_lon = 1.0;
+
+                  cdlon_lat = GetItem( &(store->cd), axlon, axlat, s, NULL, 
+                                       method, class );
+                  if( cdlon_lat == AST__BAD ) cdlon_lat = 0.0;
+
+                  cdlat_lon = GetItem( &(store->cd), axlat, axlon, s, NULL, 
+                                       method, class );
+                  if( cdlat_lon == AST__BAD ) cdlat_lon = 0.0;
+
+                  cdlat_lat = GetItem( &(store->cd), axlat, axlat, s, NULL, 
+                                       method, class );
+                  if( cdlat_lat == AST__BAD ) cdlat_lat = 1.0;
+
+                  newcdlon_lon = coserr*cdlon_lon + sinerr*cdlat_lon;
+                  newcdlon_lat = coserr*cdlon_lat + sinerr*cdlat_lat;
+                  newcdlat_lon = coserr*cdlat_lon - sinerr*cdlon_lon;
+                  newcdlat_lat = coserr*cdlat_lat - sinerr*cdlon_lat;
+
+
+/* Set to zero any values which are less than 1.0E-6 of the largest
+   value. */
+                  mx = fabs( newcdlon_lon );
+                  mx = MAX( fabs( newcdlon_lat ), mx );
+                  mx = MAX( fabs( newcdlat_lon ), mx );
+                  mx = MAX( fabs( newcdlat_lat ), mx );
+
+                  mx *= 1.0E-6;
+                  if( fabs( newcdlon_lon ) < mx ) newcdlon_lon = 0.0;
+                  if( fabs( newcdlon_lat ) < mx ) newcdlon_lat = 0.0;
+                  if( fabs( newcdlat_lon ) < mx ) newcdlat_lon = 0.0;
+                  if( fabs( newcdlat_lat ) < mx ) newcdlat_lat = 0.0;
+
+/* Do not include zero off-diagonal terms in the header. */
+                  if( newcdlon_lat == 0.0 ) newcdlon_lat = AST__BAD;
+                  if( newcdlat_lon == 0.0 ) newcdlat_lon = AST__BAD;
+
+/* Store the values. */
+                  SetItem( &(store->cd), axlon, axlat, s, newcdlon_lat );
+                  SetItem( &(store->cd), axlat, axlon, s, newcdlat_lon );
+                  SetItem( &(store->cd), axlon, axlon, s, newcdlon_lon );
+                  SetItem( &(store->cd), axlat, axlat, s, newcdlat_lat );
+
+/* Set lonpole bad to prevent a LONPOLE keyword being stored in the FITS
+   header. */
+                  lonpole = AST__BAD;
+
+/* Also, LATPOLE is not needed for zenithal projections... */
+                  latpole = AST__BAD;
+
                }
 
 /* Store these values. */
@@ -18848,8 +19093,19 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
                   SetItem( &(store->latpole), 0, 0, s, latpole*AST__DR2D );
                }
 
-/* Get a pointer to the SkyFrame defining the celestial axes. */
-               astPrimaryFrame( phyfrm, axlon, (AstFrame **) &skyfrm, &axis );
+/* Scale the CD terms referring to the celestial axis so that they create
+   degrees instead of radians. */
+               for( i = 0; i < naxis; i++ ){
+                  val = GetItem( &(store->cd), axlat, i, s, NULL, method, class );
+                  if( val != AST__BAD ) SetItem( &(store->cd), axlat, i, s, 
+                                                 val*AST__DR2D );
+               }
+      
+               for( i = 0; i < naxis; i++ ){
+                  val = GetItem( &(store->cd), axlon, i, s, NULL, method, class );
+                  if( val != AST__BAD ) SetItem( &(store->cd), axlon, i, s, 
+                                                 val*AST__DR2D );
+               }
 
 /* Store the CTYPE, EQUINOX, MJDOBS, and RADESYS values. */
                SkySys( skyfrm, astGetWcsType( map2 ), store, 
@@ -18868,6 +19124,7 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
 
 /* Free the work space */
    work = (double *) astFree( (void *) work );
+   map3b = astAnnul( map3b );
 
 /* If an error has occurred, indicate that the Mapping cannot be
    described by FITS-WCS. */

@@ -126,6 +126,8 @@ f     The WcsMap class does not define any new routines beyond those
 *     26-SEP-2001 (DSB):
 *        Changed names of all functions and structure to avoid name clashes 
 *        with wcslib.
+*     10-OCT-2002 (DSB):
+*        Added astIsZenithal.
 *class--
 */
 
@@ -623,6 +625,7 @@ static const char *GetAttrib( AstObject *, const char * );
 static int CanMerge( AstMapping *, int, AstMapping *, int );
 static int CanSwap( AstMapping *, AstMapping *, int, int );
 static int GetNP( AstWcsMap *, int );
+static int IsZenithal( AstWcsMap * );
 static int Map( AstWcsMap *, int, int, double *, double *, double *, double *);
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
@@ -1551,6 +1554,7 @@ static void InitVtab( AstWcsMapVtab *vtab ) {
    vtab->GetWcsType = GetWcsType;
    vtab->SetPV = SetPV;
    vtab->TestPV = TestPV;
+   vtab->IsZenithal = IsZenithal;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -1579,6 +1583,93 @@ static void InitVtab( AstWcsMapVtab *vtab ) {
 
 /* Declare the class dump function. */
    astSetDump( vtab, Dump, "WcsMap", "FITS-WCS sky projection" );
+}
+
+static int IsZenithal( AstWcsMap *this ){
+/*
+*+
+*  Name:
+*     IsZenithal
+
+*  Purpose:
+*     Determine if this WcsMap represents a zenithal projection.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     int IsZenithal( AstWcsMap *this )
+
+*  Class Membership:
+*     WcsMap protected function
+
+*  Description:
+*     This function returns a flag indicating if this WcsMap is a zenithal
+*     projection. Some projections which are classed as zenithal in the
+*     Calabretta and Greisen paper are only genuinely zenithal if the
+*     projection parameters have certain values. These projections are
+*     not considered to be zenithal unless the projection parameters have
+*     appropriate values. 
+
+*  Parameters:
+*     this
+*        The WcsMap.
+
+*  Returned Value:
+*     A non-zero value if the WcsMap represents a zenithal projection.
+
+*-
+*/
+
+/* Local Variables: */
+   double p1;                    /* PVi_1 */
+   double p2;                    /* PVi_2 */
+   double p3;                    /* PVi_3 */
+   int latax;                    /* Index of latitude axis */
+   int ret;                      /* Returned flag */
+   int type;                     /* Projection type */
+
+/* Initialise the returned value. */
+   ret = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return ret;
+
+/* Get the projection type. */
+   type = astGetWcsType( this );
+
+/* Get the index of the latitude axis. */
+   latax = astGetWcsAxis( this, 1 );
+
+/* The following are always zenithal... */
+   if( type == AST__TAN  || type == AST__STG  || type == AST__ARC  || 
+       type == AST__ZPN  || type == AST__ZEA  || type == AST__AIR ) {
+      ret = 1;
+
+/* The following are sometimes zenithal... */
+   } else if( type == AST__AZP ) {
+      p2 = astGetPV( this, latax, 2 );
+      if( p2 == AST__BAD || p2 == 0.0 ) ret = 1;
+
+   } else if( type == AST__SIN ) {
+      p1 = astGetPV( this, latax, 1 );
+      p2 = astGetPV( this, latax, 2 );
+      if( p1 == AST__BAD ) p1 = 0.0;
+      if( p2 == AST__BAD ) p2 = 0.0;
+      if( p1 == 0.0 && p2 == 0.0 ) ret = 1;
+
+/* >>>>>>>>>>>>>>>>  UNCOMMENT !!!!!!!  <<<<<<<<<<<<<
+   A new projection introduced by 23/4/2002 paper 
+
+   } else if( type == AST__SZP ) {
+      p3 = astGetPV( this, latax, 2 );
+      if( p3 == AST__BAD ) p3 == 90.0;
+      if( p3 == 90.0 || p3 == -90.0 ) ret = 1; 
+*/
+   }
+
+   return ret;
 }
 
 static void LongRange( const PrjData *prjdata, struct AstPrjPar *params,
@@ -4409,6 +4500,11 @@ void astSetPV_( AstWcsMap *this, int j, int m, double val ) {
 int astTestPV_( AstWcsMap *this, int j, int m ) { 
    if ( !astOK ) return 0; 
    return (**astMEMBER(this,WcsMap,TestPV))( this, j, m ); 
+}
+
+int astIsZenithal_( AstWcsMap *this ) { 
+   if ( !astOK ) return 0; 
+   return (**astMEMBER(this,WcsMap,IsZenithal))( this ); 
 }
 
 

@@ -96,6 +96,8 @@
 *           Get a WcsAxis attribute value for a WcsMap.
 *        astGetWcsType
 *           Get the WcsType attribute value for a WcsMap.
+*        astIsZenithal
+*           Is the projection zenithal?
 *        astSetPV
 *           Set a PVi_j attribute value for a WcsMap.
 *        astTestPV
@@ -226,6 +228,8 @@
 *        Included new protected function, astPrjDesc.
 *     11-FEB-2000 (DSB):
 *        Replaced wcsmap component projp by pointers p and np.
+*     20-OCT-2002 (DSB):
+*        Added astIsZenithal
 *-
 */
 
@@ -338,6 +342,7 @@ typedef struct AstWcsMapVtab {
    int (* TestPV)( AstWcsMap *, int, int );
    void (* ClearPV)( AstWcsMap *, int, int );
    void (* SetPV)( AstWcsMap *, int, int, double );
+   int (* IsZenithal)( AstWcsMap * );
 
 } AstWcsMapVtab;
 #endif
@@ -378,6 +383,7 @@ AstWcsMap *astLoadWcsMap_( void *, size_t, int, AstWcsMapVtab *,
    int astGetWcsAxis_( AstWcsMap *, int );
    int astGetWcsType_( AstWcsMap * );
    int astTestPV_( AstWcsMap *, int, int );
+   int astIsZenithal_( AstWcsMap * );
    void astClearPV_( AstWcsMap *, int, int );
    void astSetPV_( AstWcsMap *, int, int, double );
 #endif
@@ -448,6 +454,9 @@ astINVOKE(V,astGetNatLat_(astCheckWcsMap(this)))
 
 #define astGetWcsAxis(this,index) \
 astINVOKE(V,astGetWcsAxis_(astCheckWcsMap(this),index))
+
+#define astIsZenithal(this) \
+astINVOKE(V,astIsZenithal_(astCheckWcsMap(this)))
 
 #endif
 #endif
