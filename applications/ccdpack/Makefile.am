@@ -9,11 +9,14 @@ ccdsupport_DATA = $(DATA_FILES) ccdpack.shl
 
 bin_SCRIPTS = $(PUBLIC_SCR)
 
-bin_PROGRAMS = ccdwish
+# bin_PROGRAMS = ccdwish
 
-ccdwish_SOURCES = ccdwish.c grf_ccdpack.c grf.h
+noinst_LTLIBRARIES = libgrf_ccdpack.la
+libgrf_ccdpack_la_SOURCES = grf_ccdpack.c grf.h
 
-ccdwish_LDADD = $(LDADD) $(CCDPACK_LDADD)
+ccdwish_SOURCES = ccdwish.c
+
+ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/pgp_ccdpack_link_adam`
 
 bin_MONOLITHS = ccdpack_red ccdpack_reg ccdpack_res ccdpack_scr \
                 ccdhelp
@@ -40,7 +43,9 @@ ccdhelp_TASKS =
 CCDPACK_LIBS = tasks/libccdpack_tasks.la \
                main/libccdpack.la \
                gen/libccdpack_gen.la \
-               main/ccd1_wedge.o main/ccd1_orvar.o
+               libgrf_ccdpack.la \
+               main/ccd1_wedge.o main/ccd1_orvar.o \
+               main/ccd1_box.o main/ccd1_hisp.o
 
 
 ccdpack_red_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/ccdpack_link_adam`
