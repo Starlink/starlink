@@ -171,6 +171,9 @@
       ELSE IF ( NAME .EQ. 'ASTSHIFTMAP' ) THEN
          CALL ASTSHIFTMAP( STATUS )
  
+      ELSE IF ( NAME .EQ. 'ASTMATHMAP' ) THEN
+         CALL ASTMATHMAP( STATUS )
+ 
 
 *  If the action name is not recognised, then report an error.
       ELSE

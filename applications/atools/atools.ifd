@@ -1403,6 +1403,61 @@ iraf! {
           }
       }
 
+      action astmathmap {
+         helplib {$ATOOLS_HELP}
+
+         parameter nin {
+            position 1
+            type _INTEGER
+            prompt {The number of input coordinates in the MathMap}
+            ppath CURRENT DEFAULT
+            default 2
+            helpkey *
+          }
+
+         parameter nout {
+            position 2
+            type _INTEGER
+            prompt {The number of output coordinates in the MathMap}
+            ppath CURRENT DEFAULT
+            default 2
+            helpkey *
+          }
+
+         parameter fwd {
+            position 3
+            type LITERAL
+            prompt {Group of forward expressions}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inv {
+            position 4
+            type LITERAL
+            prompt {Group of inverse expressions}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter options {
+            position 5
+            type LITERAL
+            prompt {Options for the MathMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 6
+            type LITERAL
+            prompt {Name of file in which to store the MathMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
 
 
    }

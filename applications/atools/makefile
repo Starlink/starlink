@@ -464,7 +464,7 @@ astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
 astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f astmapbox.f astinvert.f \
 astspecframe.f astsetrefpos.f astgetrefpos.f astshiftmap.f atl1_notif.f \
-astformat.f asttran2.f
+astformat.f asttran2.f astmathmap.f
 
 F_SUB2 = 
 
@@ -503,7 +503,7 @@ astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
 astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
 astlutmap astpcdmap astwinmap astshiftmap astfindframe astpermaxes astpickaxes \
 astsimplify asttrann astmapbox astinvert astspecframe astsetrefpos \
-astgetrefpos astformat asttran2
+astgetrefpos astformat asttran2 astmathmap
 
 
 #  Monolith routine source name.
@@ -1363,16 +1363,17 @@ astcmpmap.o    : SAE_PAR AST_PAR
 astconvert.o   : SAE_PAR AST_PAR PAR_ERR
 astcopy.o      : SAE_PAR AST_PAR
 astfindframe.o : SAE_PAR AST_PAR PAR_ERR
+astformat.o    : SAE_PAR NDF_PAR AST_PAR GRP_PAR PAR_ERR
 astframe.o     : SAE_PAR NDF_PAR AST_PAR
 astframeset.o  : SAE_PAR AST_PAR
 astget.o       : SAE_PAR AST_PAR
 astgetframe.o  : SAE_PAR AST_PAR       
 astgetmapping.o: SAE_PAR AST_PAR     
-astformat.o    : SAE_PAR NDF_PAR AST_PAR GRP_PAR PAR_ERR
-asttran2.o     : SAE_PAR NDF_PAR AST_PAR GRP_PAR
+astgetrefpos.o : SAE_PAR AST_PAR PAR_ERR
 astinvert.o    : SAE_PAR AST_PAR 
 astlutmap.o    : SAE_PAR AST_PAR
 astmapbox.o    : SAE_PAR NDF_PAR AST_PAR 
+astmathmap.o   : SAE_PAR NDF_PAR AST_PAR GRP_PAR
 astmatrixmap.o : SAE_PAR NDF_PAR AST_PAR
 astpcdmap.o    : SAE_PAR AST_PAR
 astpermaxes.o  : SAE_PAR AST_PAR NDF_PAR
@@ -1382,15 +1383,15 @@ astremapframe.o: SAE_PAR AST_PAR
 astremoveframe.o: SAE_PAR AST_PAR
 astset.o       : SAE_PAR AST_PAR
 astsetrefpos.o : SAE_PAR AST_PAR PAR_ERR
-astgetrefpos.o : SAE_PAR AST_PAR PAR_ERR
+astshiftmap.o  : SAE_PAR AST_PAR NDF_PAR
 astsimplify.o  : SAE_PAR AST_PAR 
 astskyframe.o  : SAE_PAR AST_PAR
 astspecframe.o : SAE_PAR AST_PAR
 asttest.o      : SAE_PAR AST_PAR
+asttran2.o     : SAE_PAR NDF_PAR AST_PAR GRP_PAR
 asttrann.o     : SAE_PAR NDF_PAR AST_PAR PAR_ERR 
 astunitmap.o   : SAE_PAR NDF_PAR AST_PAR
 astwinmap.o    : SAE_PAR AST_PAR NDF_PAR
-astshiftmap.o  : SAE_PAR AST_PAR NDF_PAR
 atl1_assoc.o: SAE_PAR
 atl1_cpcol.o: SAE_PAR
 atl1_creat.o: SAE_PAR AST_PAR SAE_PAR FIO_ERR

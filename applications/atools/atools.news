@@ -11,6 +11,8 @@
 
   Changes in V1.6-2:
 
+  - New command astmathmap. Creates a MathMap.
+
   - New command asttran2. Uses a Mapping to transform a set of 2-D
   positions. Unlike asttrann, this command does not use NDFs to store the
   input and output positions. The input positions can be given in a text
