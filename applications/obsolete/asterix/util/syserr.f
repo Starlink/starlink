@@ -111,7 +111,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'ADI_PAR'
 
 *  Status:
       INTEGER			STATUS             	! Global status
@@ -159,7 +158,7 @@
       IF ( OVER ) THEN
         CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', OFID, STATUS )
       ELSE
-        CALL USI_ASSOC( 'INP', 'BinDS', 'READ', OFID, STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
         CALL USI_CLONE( 'INP', 'OUT', 'BinDS', 'READ', OFID, STATUS )
         CALL USI_SHOW( 'Output dataset {OUT}', STATUS )
       END IF
@@ -240,6 +239,8 @@
 *
 *   Type Definitions :
       IMPLICIT NONE
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 *   Import :
       INTEGER			NDAT		! No of variances
 
