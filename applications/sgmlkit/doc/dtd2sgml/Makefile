@@ -141,6 +141,22 @@ starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 # `sgml-mail/sgml-starlink-0.7' (since there is no rule for building this as a
 # target).  That is, it's only usable in a directory which has been
 # set up to receive the result of the dtddoc.pl script.  See notes at top.
+#
+# NO -- this is bloody silly.  It's far too specific to my home
+# machine's setup, so that you cannot build a set freshly checked out
+# from CVS, even on my home machine.  Also, the Makefile goes crazy
+# trying to keep to conceptually distinct systems working together.  The
+# description->html route should be hived off somewhere else. It can
+# be hacked around for the present (when building from a freshly
+# checked-out copy) by creating, in order, directories and files:
+#
+#     mkdir sgml-mail
+#     touch sgml-mail/sgml-{starlink,programcode}-0.7
+#     mkdir sgml-{starlink,programcode}-0.7
+#     touch {starlink,programcode}-0.7.description
+#
+# Sorry, Mark.
+
 
 # Create the HTML file from the DTD description
 %.html: %.description
