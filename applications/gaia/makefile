@@ -536,7 +536,7 @@ GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 GAIA_FILES = $(GAIA_LIB_FILES) $(GAIA_BIN_FILES)
 
 SKYCAT_FILES = \
- rtdServer rtdClient
+ rtdServer rtdClient rtdCubeDisplay
 
 TCL_FILES = \
  bltCanvEps.pro bltGraph.pro
@@ -548,7 +548,8 @@ $(GAIA_FILES): $(SKYCAT_FILES)
 $(SKYCAT_FILES): $(TCL_FILES)
 
 #  Names of binaries that will need to be stripped.
-RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer gaiaMon
+RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer \
+                   rtdCubeDisplay gaiaMon
 
 #  Names of scripts that will need 755 protections.
 RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
@@ -704,6 +705,7 @@ $(SKYCAT_FILES): .skycat.built
 	make -e all install)
 	cp -p ./built/bin/rtdClient .
 	cp -p ./built/bin/rtdServer .
+	cp -p ./built/bin/rtdCubeDisplay .
 	touch .skycat.built
 
 #  Rule for building the GAIA installation. This installs into built/
