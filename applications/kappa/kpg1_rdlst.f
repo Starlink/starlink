@@ -362,8 +362,15 @@
      :                 STATUS )
 
 *  If the positions do not need to be mapped, just return the pointer to 
-*  the above work array. Also return the number of axes.
-      IF( MAP .EQ. AST__NULL .OR. AST_ISAUNITMAP( MAP, STATUS ) ) THEN
+*  the above work array. Also return the number of axes. Be careful not 
+*  to call AST_ISAUNITMAP with a null Object pointer to avoid AST_ISAUNITMAP
+*  reporting an error.
+      IF( MAP .EQ. AST__NULL ) ) THEN
+         IPPOS = IPW
+         FRIPW = .FALSE.
+         NAX = NAXB
+
+      ELSE IF( AST_ISAUNITMAP( MAP, STATUS ) ) THEN
          IPPOS = IPW
          FRIPW = .FALSE.
          NAX = NAXB
