@@ -33,13 +33,13 @@
 *       Pointers to arrays containing DOUBLE PRECISION X positions
 *     Y_PTR( N_FILES ) = INTEGER (Given)
 *       Pointers to arrays containing DOUBLE PRECISION Y positions
-*     NX = INTEGER (Given)
+*     NX = INTEGER (Returned)
 *       Required number of points in X in output grid
-*     NY = INTEGER (Given)
+*     NY = INTEGER (Returned)
 *       Required number of points in Y in output grid
-*     I_CENTRE = INTEGER (Given)
+*     I_CENTRE = INTEGER (Returned)
 *       Location of reference pixel in X
-*     J_CENTRE = INTEGER (Given)
+*     J_CENTRE = INTEGER (Returned)
 *       Location of reference pixel in Y
 *     STATUS = INTEGER (Given & Returned)
 *       Global Status
@@ -56,6 +56,11 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20 - taken from SURF_REBIN.F
 *     $Log$
+*     Revision 1.7  2005/03/18 06:25:30  timj
+*     + Fix header
+*     + initialise some variables
+*     + trigger error if pixel size is zero
+*
 *     Revision 1.6  2004/09/01 01:02:02  timj
 *     use CNF_PVAL
 *
@@ -127,6 +132,16 @@
       XMIN = VAL__MAXD
       YMIN = VAL__MAXD
       YMAX = VAL__MIND
+      NX = 0
+      NY = 0
+      I_CENTRE = 0
+      J_CENTRE = 0
+
+      IF (PIXEL_SZ .EQ. 0) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP(' ','CALC_OUTPUT_GRID: Pixel size must be '//
+     :        'greater than 0', STATUS )
+      END IF
 
 *     Find range of data
       
