@@ -1,0 +1,14 @@
+
+gk2din.f - linux problem with CHAR function again.
+
+
+gk2dwd.f:845: warning:
+     744 FORMAT(1H+,A,'[?7h'$)
+                            ^
+Missing comma in FORMAT statement at (^)
+
+gk2dpd.f: 77
+
+     200 FORMAT(1H+,A,'[',I2.2,';',I3.3,'H',A,'[?7l'$)
+                                                    ^
+Missing comma in FORMAT statement at (^)
