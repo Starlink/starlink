@@ -21,17 +21,17 @@
 AC_PREREQ(2.50)
 
 
-# Set the STAR_MANIFEST_DIR variable, defaulting it from the environment.
-# This causes the `install-manifest' target to be included in Makefile.in
-: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
-AC_SUBST(STAR_MANIFEST_DIR)
-
-
 ## ------------------------ ##
 ## Autoconf initialisation. ##
 ## ------------------------ ##
 AC_INIT([libtool], [1.5], [bug-libtool@gnu.org])
 AC_CONFIG_SRCDIR([ltmain.in])
+
+
+# Set the STAR_MANIFEST_DIR variable, defaulting it from the environment.
+# This causes the `install-manifest' target to be included in Makefile.in
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+AC_SUBST(STAR_MANIFEST_DIR)
 
 
 
