@@ -43,6 +43,7 @@ verbosities PkFont::verbosity_ = normal;
 verbosities PkGlyph::verbosity_ = normal;
 string PkFont::fontpath_ = "";
 int PkFont::resolution_ = 72;
+bool PkFont::mktexpk_ = true;
 
 PkFont::PkFont(unsigned int dvimag,
 	       unsigned int c,
@@ -63,7 +64,20 @@ PkFont::PkFont(unsigned int dvimag,
 	string pk_file_path;
 	bool got_path = find_font (pk_file_path);
 	if (! got_path)
+	{
+#ifdef MKTEXPK
+	    if (mktexpk_)
+	    {
+		// make the font (XXX FINISH THIS)
+		string mktexpkcmd = MKTEXPK;
+		cerr << "mktexpk: " << mktexpkcmd << '\n';
+	    }
+	    // try again...
+	    got_path = find_font (pk_file_path);
+	    if (! got_path)
+#endif
 	    throw InputByteStreamError ("can't find font file");
+	}
 	path_ = pk_file_path;
 
 	pkf_ = new InputByteStream (path_, true);
@@ -122,7 +136,7 @@ void PkFont::verbosity (const verbosities level)
 // Find a font.  Basic method uses the environment variable and is somewhat
 // cruddy.  If ENABLE_KPATHSEA is defined and the first method doesn't 
 // produce anything (which will be true if the environment variable wasn't
-// set and the -f option wasn't given) then fall through to an call to
+// set and the -f option wasn't given) then fall through to a call to
 // the kpathsea library.
 //
 // Return true if we found a file to open, and return the path in the

@@ -6,6 +6,12 @@
 #define NULL 0
 #include <iostream>		// for cerr
 
+#if NO_CSTD_INCLUDE
+#include <stdlib.h>
+#else
+#include <cstdlib>
+#endif
+
 #include "kpathsea.h"
 
 #ifdef ENABLE_KPATHSEA
@@ -39,6 +45,17 @@ void kpathsea::init (const char *program_name, const int basedpi)
 {
     if (initialised_ && verbosity_ > silent)
 	cerr << "Warning: kpathsea doubly initialised.  Ignored\n";
+#ifdef DEFAULT_TEXMFCNF
+    // if the TEXMFCNF variable isn't set in the environment, set it to this
+    char *texmfcnf = getenv ("TEXMFCNF");
+    if (texmfcnf == NULL)
+    {
+	if (setenv ("TEXMFCNF", DEFAULT_TEXMFCNF, 1))
+	    cerr << "Warning: couldn't set TEXMFCNF\n";
+    }
+    else
+	cerr << "TEXMFCNF=" << texmfcnf << '\n';
+#endif
     kpse_set_program_name (program_name, "dvi2bitmap");
     //kpse_init_prog ("TEX", basedpi, "localfont", "cmr10");
     kpse_init_prog ("TEX", basedpi, NULL, NULL);

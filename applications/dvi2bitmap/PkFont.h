@@ -181,6 +181,7 @@ class PkFont {
     static verbosities verbosity_;
     static string fontpath_;	// colon-separated list of directories
     static int resolution_;
+    static bool mktexpk_;	// automatically make fonts
 };
 
 #endif // #ifndef PK_FONT_HEADER_READ
