@@ -23,10 +23,21 @@
 #ifndef _GETOPT_H
 #define _GETOPT_H 1
 
+#include <config.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
+/* We're building this with a C++ compiler, essentially.  Such
+   compilers are not required to define __STDC__, but the path we
+   should follow, below, is indeed that marked by __STDC__.  So define
+   it here.  This might possibly cause a warning on some compilers. */
+#ifndef __STDC__
+#define __STDC__ 1
+#endif
+
+#if !HAVE_DECL_GETOPT
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,
    the argument value is returned here.
@@ -58,6 +69,9 @@ extern int opterr;
 
 extern int optopt;
 
+#endif /* ifndef HAVE_DECL_GETOPT */
+
+#if !HAVE_DECL_GETOPT_LONG
 /* Describe the long-named options requested by the application.
    The LONG_OPTIONS argument to getopt_long or getopt_long_only is a vector
    of `struct option' terminated by an element containing a name which is
@@ -99,6 +113,8 @@ struct option
 #define required_argument	1
 #define optional_argument	2
 
+#endif /* #if !HAVE_DECL_GETOPT_LONG */
+
 #if defined (__STDC__) && __STDC__
 /* HAVE_DECL_* is a three-state macro: undefined, 0 or 1.  If it is
    undefined, we haven't run the autoconf check so provide the
@@ -115,6 +131,7 @@ extern int getopt (int argc, char *const *argv, const char *shortopts);
 extern int getopt ();
 # endif
 #endif /* __GNU_LIBRARY__ */
+#if !HAVE_DECL_GETOPT_LONG
 extern int getopt_long (int argc, char *const *argv, const char *shortopts,
 		        const struct option *longopts, int *longind);
 extern int getopt_long_only (int argc, char *const *argv,
@@ -126,13 +143,19 @@ extern int _getopt_internal (int argc, char *const *argv,
 			     const char *shortopts,
 		             const struct option *longopts, int *longind,
 			     int long_only);
+#endif /* HAVE_DECL_GETOPT_LONG */
 #else /* not __STDC__ */
+#if !HAVE_DECL_GETOPT
 extern int getopt ();
+#endif /* HAVE_DECL_GETOPT */
+#if !HAVE_DECL_GETOPT_LONG
 extern int getopt_long ();
 extern int getopt_long_only ();
 
 extern int _getopt_internal ();
+#endif /* HAVE_DECL_GETOPT_LONG */
 #endif /* __STDC__ */
+
 
 #ifdef	__cplusplus
 }
