@@ -123,62 +123,21 @@
 *  Check that a value was obtained.
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Remove blanks and convert to uppercase.
-            CALL CHR_RMBLK( COLOUR )
-            CALL CHR_UCASE( COLOUR )
-
-*  Test for the various options.
-*  =============================
-
-*  MIN causes the minimum value to be used, namely '/'.  This requests
-*  the lowest non-reserved colour.
-            IF ( COLOUR .EQ. '/' ) THEN
-               COLIND = LP
-               LOOP = .FALSE.
-
-*  MAX causes the maximum value to be used, namely '{'.  This requests
-*  the highest non-reserved colour.
-            ELSE IF ( COLOUR .EQ. '{' ) THEN
-               COLIND = UP
-               LOOP = .FALSE.
-
-*  See whether it is an integer.
-            ELSE
-               CALL ERR_MARK
-               CALL CHR_CTOI( COLOUR, COLIND, STATUS )
-
-*  If the conversion was successful use the number as a colour index
-*  constrained to be in the full colour table.
-               IF ( STATUS .EQ. SAI__OK ) THEN
-                  COLIND = MIN( UP, MAX( 0, COLIND ) )
-                  LOOP = .FALSE.
-
-*  The value is not numeric so assume that it is a named colour from
-*  the palette.  Find the nearest colour from the palette.  First
-*  ignore the error.
-               ELSE
-                  CALL ERR_ANNUL( STATUS )
-                  CALL ERR_MARK
-                  CALL KPG1_PALCI( COLOUR, COLIND, STATUS )
+*  Attempt to convert the string into a colour index. 
+            CALL KPG1_GTCOL( COLOUR, LP, UP, COLIND, STATUS )
 
 *  Try again if the colour was not recognised.
-                  IF ( STATUS .NE. SAI__OK ) THEN
-                     CALL ERR_FLUSH( STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_FLUSH( STATUS )
+               CALL PAR_CANCL( PNCOL, STATUS )
 
 *  Exit the loop.
-                  ELSE
-                     LOOP = .FALSE.
-                  END IF
-
-                  CALL ERR_RLSE
-               END IF
-               CALL ERR_RLSE
+            ELSE
+               LOOP = .FALSE.
             END IF
 
-*  Cancel the parameter when there is going to be another attempt to
-*  obtain a value.
-            IF ( LOOP ) CALL PAR_CANCL( PNCOL, STATUS )
          END IF
+
       END DO
 
   999 CONTINUE

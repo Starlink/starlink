@@ -547,7 +547,7 @@ kpg1_ivci.f kpg1_iwcg.f kpg1_keyzo.f kpg1_kgodr.f kpg1_lasto.f \
 kpg1_lgtrn.f kpg1_listc.f kpg1_litnd.f kpg1_litnr.f \
 kpg1_litrd.f kpg1_litrr.f kpg1_lltrd.f kpg1_lltrr.f kpg1_loctb.f \
 kpg1_loctd.f kpg1_locti.f kpg1_loctr.f kpg1_loctub.f kpg1_loctuw.f \
-kpg1_loctw.f kpg1_ludcd.f kpg1_ludcr.f kpg1_lutin.f \
+kpg1_loctw.f kpg1_ludcd.f kpg1_ludcr.f kpg1_lutin.f kpg1_gtcol.f \
 kpg1_macol.f kpg1_mdetd.f kpg1_mdetr.f kpg1_meanb.f kpg1_meand.f \
 kpg1_meani.f kpg1_meanr.f kpg1_meanub.f kpg1_meanuw.f kpg1_meanw.f \
 kpg1_medub.f kpg1_medud.f \
@@ -2395,6 +2395,7 @@ kpg1_loctw.o:      SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_ludcd.o:      SAE_PAR PRM_PAR
 kpg1_ludcr.o:      SAE_PAR PRM_PAR
 kpg1_lutin.o:      SAE_PAR
+kpg1_gtcol.o:      SAE_PAR
 kpg1_macol.o:      SAE_PAR
 kpg1_mdetd.o:      SAE_PAR PRM_PAR
 kpg1_mdetr.o:      SAE_PAR PRM_PAR
