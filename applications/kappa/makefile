@@ -401,8 +401,8 @@ ALINK = $(STAR_BIN)/alink
 #  Tcl/Tk 
 
 STARTCL_DIR = /star/bin/startcl
-TCL_VERS = 7.6
-TK_VERS = 4.2
+TCL_VERS = 8.2
+TK_VERS = 8.2
 
 #-------------------------------------------------------------------------------
 

@@ -331,8 +331,8 @@ KAPPA_SOURCE = $(STARLINK)/sources/kappa
 
 #  Tcl/Tk 
 
-TCL_VERS = 7.6
-TK_VERS = 4.2
+TCL_VERS = 8.2
+TK_VERS = 8.2
 
 # A list of startcl object files only needed on the current platform.
 SYSOBJS = 

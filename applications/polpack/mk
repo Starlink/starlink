@@ -223,8 +223,6 @@
       export TAR_IN
       export TAR_OUT
       export LDFLAGS
-      export TK_VERS
-      export TCL_VERS
       export SYSOBJS
 
 #  Check that the SYSTEM environment variable is defined.
@@ -242,8 +240,6 @@
 #  DEC Alpha machines running OSF1.
 #  -------------------------------
             alpha_OSF1)
-               TK_VERS='4.2'
-               TCL_VERS='7.6'
                LDFLAGS=' -oldstyle_liblookup -ljpeg'
                AR_IN='ar -r'
                CC='cc'
@@ -298,8 +294,6 @@
 #  SUN Sparcstations running SunOS 5.x (Solaris).
 #  ---------------------------------------------
             sun4_Solaris)
-               TK_VERS='4.2'
-               TCL_VERS='7.6'
                LDFLAGS=' -lX -ljpeg'
                AR_IN='ar -r'
                CC='cc'
@@ -318,8 +312,6 @@
 #  Intel PC running Linux.
 #  ----------------------
             ix86_Linux)
-               TK_VERS='4.2'
-               TCL_VERS='7.6'
                AR_IN='ar r'
                CC='gcc'
                LDFLAGS=' -ldl -ljpeg -Xlinker -rpath -Xlinker $(STAR_SHARE)'
