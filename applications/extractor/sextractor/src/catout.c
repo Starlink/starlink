@@ -6,7 +6,7 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
-*                       Peter W. Draper (Starlink, University of Durham)
+*                       PETER W. DRAPER (STARLINK, University of Durham)
 *
 *	Contents:	functions for output of catalog data.
 *
@@ -16,6 +16,8 @@
 *                                 real column names. Stop skycattail
 *                                 from being written after file is
 *                                 closed.
+*                       20/03/00: (PWD):
+*                                 Added initialisation of obj.rad FLAGs.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -258,6 +260,11 @@ void	updateparamflags()
   FLAG(obj.iso[0]) |= FLAG(obj2.sprob);
   for (i=0; i<NISO; i++)
     FLAG(obj.iso[0]) |= FLAG(obj.iso[i]);
+
+/* Average radii are all calculated if one is needed */
+  for ( i = 0; i < NRAD; i++ ) {
+     FLAG(obj.rad[0]) |= FLAG(obj.rad[i]);
+  }
 
   return; 
   }

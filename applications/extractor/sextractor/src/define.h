@@ -6,10 +6,12 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP)
+*                       P.W.DRAPER (STARLINK, Durham University)
 *
 *	Contents:	global definitions.
 *
 *	Last modify:	11/02/2000
+*                       20/03/2000 (PWD): Added NRAD define.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -40,6 +42,8 @@
 #define	NISO			8		/* number of isophotes */
 #define	OUTPUT			stderr		/* where all msgs are sent */
 #define PSF_NPSFMAX		11		/* Max number of fitted PSFs */
+
+#define NRAD                    16              /* number of radii */
 
 #ifndef PI
 #define	PI			3.1415926535898	/* never met before? */

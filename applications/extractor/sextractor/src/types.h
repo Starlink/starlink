@@ -6,10 +6,13 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP)
+*                       P.W.DRAPER (STARLINK, Durham University)
 *
 *	Contents:	global type definitions.
 *
 *	Last modify:	11/11/99
+*                       20/03/00 (PWD): Added various members to
+*                                       support userradii function.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -108,6 +111,7 @@ typedef struct
   float		mthresh;		       	/* max. threshold (ADU) */
   int		iso[NISO];			/* isophotal areas */
   float		fwhm;				/* IMAGE FWHM */
+  float         rad[NRAD];                      /* PWD: average radii */
   }	objstruct;
 
 /* II: "BLIND" parameters */
@@ -490,6 +494,12 @@ typedef struct
 /*----- customize */
   double	mama_corflex;
   int		fitsunsigned_flag;			/* Force unsign FITS */
+
+  enum	{RAD_SB, RAD_INT}
+		rad_type;				/* PWD: radii units */
+  int           nrad_type;
+  double        rad[3];                                 /* PWD: radii specs */
+  int           nrad;                                   /* PWD: nb of params */
   }	prefstruct;
 
 

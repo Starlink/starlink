@@ -6,10 +6,12 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP)
+*                       P.W.DRAPER (STARLINK, Durham University)
 *
 *	Contents:	parameter list for catalog data.
 *
 *	Last modify:	20/07/99
+*                       20/03/00 (PWD): Added RAD0-RAD15 parameters.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -320,6 +322,39 @@ keystruct	objkey[] = {
 	&outobj.iso[6], H_INT, T_LONG, "%8d", "pixel**2"},
   {"ISO7", "Isophotal area at level 7",
 	&outobj.iso[7], H_INT, T_LONG, "%8d", "pixel**2"},
+
+  {"RAD0", "Mean radius at brightness threshold 0",
+	&outobj.rad[0], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD1", "Mean radius at brightness threshold 1",
+	&outobj.rad[1], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD2", "Mean radius at brightness threshold 2",
+	&outobj.rad[2], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD3", "Mean radius at brightness threshold 3",
+	&outobj.rad[3], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD4", "Mean radius at brightness threshold 4",
+	&outobj.rad[4], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD5", "Mean radius at brightness threshold 5",
+	&outobj.rad[5], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD6", "Mean radius at brightness threshold 6",
+	&outobj.rad[6], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD7", "Mean radius at brightness threshold 7",
+	&outobj.rad[7], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD8", "Mean radius at brightness threshold 8",
+	&outobj.rad[8], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD9", "Mean radius at brightness threshold 9",
+	&outobj.rad[9], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD10", "Mean radius at brightness threshold 10",
+	&outobj.rad[10], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD11", "Mean radius at brightness threshold 11",
+	&outobj.rad[11], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD12", "Mean radius at brightness threshold 12",
+	&outobj.rad[12], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD13", "Mean radius at brightness threshold 13",
+	&outobj.rad[13], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD14", "Mean radius at brightness threshold 14",
+	&outobj.rad[14], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
+  {"RAD15", "Mean radius at brightness threshold 15",
+	&outobj.rad[15], H_FLOAT, T_FLOAT, "%8.4f", "arcsec"},
 
   {"FLAGS", "Extraction flags",
 	&outobj.flag, H_INT, T_SHORT, "%3d", ""},

@@ -13,7 +13,7 @@ ALL   = analyse.o assoc.o astrom.o back.o bpro.o catout.o check.o clean.o \
 	fitsmisc.o fitsread.o fitstab.o fitsutil.o fitswrite.o flag.o graph.o \
 	growth.o image.o interpolate.o main.o makeit.o manobjlist.o misc.o \
 	neurro.o pc.o photom.o plist.o poly.o prefs.o psf.o readimage.o \
-	refine.o retina.o scan.o som.o weight.o libwcs_c.a
+	refine.o retina.o scan.o som.o weight.o userradii.o libwcs_c.a
 STDH  = define.h globals.h types.h
 STDO  = 
 
@@ -151,6 +151,9 @@ som.o: $(STDH) $(STDO) som.c som.h
 
 weight.o: $(STDH) $(STDO) weight.c weight.h field.h
 	$(CC) $(COPTS) -c weight.c
+
+userradii.o:  $(STDH) $(STDO) userradii.c userradii.h define.h globals.h plist.h
+	$(CC) $(COPTS) -c userradii.c
 
 libwcs_c.a:
 	($(CD) wcs && $(MAKE))

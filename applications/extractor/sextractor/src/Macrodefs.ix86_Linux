@@ -5,7 +5,7 @@
 #
 SEXMACHINE= linux
 CC    = gcc				# the C compiler
-COPTS = -O -DPC_LINUX			# options for the C compiler
+COPTS = -DPC_LINUX -O3 -funroll-loops   # options for the C compiler
 CD    = cd
 CP    = cp
 RM    = rm -f

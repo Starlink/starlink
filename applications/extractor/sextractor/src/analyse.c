@@ -6,10 +6,12 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*                       P.W.DRAPER (STARLINK, Durham University)
 *
 *	Contents:	analyse(), endobject()...: measurements on detections.
 *
 *	Last modify:	12/11/99
+*                       20/03/00 (PWD): Added userradii function.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -60,6 +62,9 @@ Ex:
 compute_myparams(obj); 
 
 */
+  /*  PWD: add userradii function to calculate radii at various
+      intensity levels */
+  userradii(field, dfield, obj, objlist->plist);
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 

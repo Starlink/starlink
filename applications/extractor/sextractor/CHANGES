@@ -1,3 +1,8 @@
+20 March 2000. Peter Draper. Added RAD_THRESH and RAD_TYPE 
+parameters for determiningf average radii of objects above
+a range of different intensities.
+
+
 This is V2.1.6 (February 11 2000). New features include:
 - crowding-flag bug introduced in V2.1.5 fixed.
 
