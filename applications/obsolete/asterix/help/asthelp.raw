@@ -14,7 +14,7 @@
 1 2_Command_summary
  This is a list of commands available in ASTERIX. These are loosely
  grouped by their function. -<Shortform>- and -<macro_commands>- are shown
- with suffixes '+' and '*' respectively.<p>
+ with suffixes '+' Sastconvand '*' respectively.<p>
 
  <ol>
  <li> Instrument Interfaces
@@ -189,7 +189,7 @@
 
  <dl>
  <dt> ASTCONV           
- <dd> Converts between old and new ASTERIX binned datasets.
+ <dd> Converts between FITS and HDS (NDF) formats.
  <dt> AST2QDP           
  <dd> Convert a 1D dataset to QDP format
  <dt> ASTQDP            
@@ -4770,28 +4770,22 @@
  dataset type to another.<p>
 
 2 ASTCONV
- Converts datasets between the old 'Wright-Giddings' STARLINK
- standard format and ASTERIX binned datasets (in the new
- STARLINK NDF format).<p>
+ Converts datasets between FITS and HDS formats..<p>
 
  The direction of conversion is decided according to the input
- dataset specified.<p>
+ dataset specified. The approprate file extension must be included
+ to identify the format.<p>
 
- If an output of the same name is specified then a new version
- of the file is created.<p>
 
 3 Parameters
  Keyword   Posn  Type      Description
  -------   ----  ----      -----------
  INP         1   CHARACTER The input dataset to be converted
  OUT         2   CHARACTER Dataset to receive conversion
- OLD         -   LOGICAL   Default FALSE. Is the input file the old
-                           ASTERIX format?
- NEW         -   LOGICAL   Default TRUE. Is input the new ASTERIX format?
 
 3 Examples
-   ICL> ASTCONV OLD_DS NEW_DS    -  perform appropriate conversion
-                           from OLD_DS to NEW_DS
+   > astconv img.fits img2.sdf    -  convert FITS image to HDS
+
 
 2 AST2QDP
  AST2QDP converts 1 dimensional binned datasets to QDP format. It
