@@ -1,3 +1,7 @@
+ssn21.ps
+starX_link
+starconf.status
+starx_test
 *.lo
 *.la
 Makefile
