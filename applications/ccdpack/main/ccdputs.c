@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     ccdlog
+*     ccdputs
 
 *  Type of Module:
 *     C extension to Tcl.
@@ -10,35 +10,43 @@
 *     ANSI C.
 
 *  Purpose:
-*     Allows output from Tcl via the CCDPACK logging system.
+*     Allows output from Tcl via the ADAM logging system.
 
 *  Usage:
-*     ccdlog ?options? message ?name?
+*     ccdputs ?options? message
 
 *  Description:
-*     The message supplied to this command is output via the CCDPACK 
-*     logging system, which in turn sends its output via the ADAM
-*     messaging system.  It will invoke either the CCD1_MSG or the
-*     CCD1_ERREP routines, according to whether the '-error' flag is
-*     submitted.
+*     The message supplied to this command is output via ADAM message
+*     system.  According to the flags it may be output to the ADAM
+*     message system direct using a MSG_OUT call, or via the CCDPACK 
+*     logging system using CCD1_MSG or CCD1_ERREP calls.
 
 *  Notes:
 *     This command works by writing commands up the pipe to the parent
-*     process, if ccdwish is runningin pipes mode.  Therefore its
+*     process, if ccdwish is running in pipes mode.  Therefore its
 *     implementation is closely tied to the interprocess communication
 *     code in the ccdwish binary.
 
 *  Arguments:
 *     options
-*        If present, the '-error' option will cause the output to get
-*        sent to the CCD1_ERREP routine.  Otherwise, the output will 
-*        get sent to CCD1_MSG.
+*        The following options may be submitted:
+*           -log
+*               This will cause the message to be written via the CCDPACK
+*               logging system using the CCD1_MSG call (should not be used 
+*               with -error).
+*           -error
+*               This will cause the message to be written via the CCDPACK
+*               logging system using the CCD1_ERREP call (should not be
+*               used with -log).
+*           -name name
+*               If supplied, this gives the name of the message to be
+*               passed to the ADAM message system.
+* 
+*        If neither the -log nor the -error flag is specified, the message
+*        will be passed directly to the ADAM message system using a
+*        MSG_OUT call.
 *     message = string
 *        This string will get output as a message.
-*     name = string
-*        If present, this gives the name of the error message (as passed
-*        in the first argument of CCD1_MSG or CCD1_ERREP).  Otherwise the
-*        message is given an empty name.
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -58,45 +66,55 @@
 #include "msg_par.h"
 #include "ccdtcl.h"
 
-   extern int ccdifd;
    extern int ccdofd;
 
 /**********************************************************************/
-   int CcdlogCmd( ClientData clientData, Tcl_Interp *interp, int objc,
-                  Tcl_Obj *CONST objv[] ) {
+   int CcdputsCmd( ClientData clientData, Tcl_Interp *interp, int objc,
+                   Tcl_Obj *CONST objv[] ) {
 /**********************************************************************/
-      int nflag;
-      int errmsg;
-      int mleng;
-      int nleng;
-      int status[ 1 ];
-      char *msg;
-      char *name;
+      int i;                        /* Loop variable */
+      int mleng;                    /* Length of the message */
+      int nflag;                    /* Number of flag arguments */
+      int nleng;                    /* Length of the name argument */
+      int status[ 1 ];              /* The starlink inherited status */
+      int stype;                    /* The type of message to be sent. */
+      char *flag;                   /* Text of flag argument */
+      char *msg;                    /* Text of the message */
+      char *name;                   /* Name of the message */
+      char *usage;                  /* Usage string */
+
+/* Set usage string. */
+      usage = "ccdputs ?-error? ?-log? ?-name name? message";
 
 /* Process flags. */
-      errmsg = 0;
-      nflag = 0;
-      if ( objc > 1 + nflag && 
-           ! strcmp( Tcl_GetString( objv[ 1 + nflag ] ), "-error" ) ) {
-         errmsg = 1;
-         nflag++;
+      stype = CCD_CCDMSG;
+      name = " ";
+      nleng = 1;
+      for ( i = 1; *( flag = Tcl_GetString( objv[ i ] ) ) == '-'; i++ ) {
+         if ( ! strcmp( flag, "-log" ) ) {
+            stype = CCD_CCDLOG;
+         }
+         else if ( ! strcmp( flag, "-error" ) ) {
+            stype = CCD_CCDERR;
+         }
+         else if ( ! strcmp( flag, "-name" ) ) {
+            name = Tcl_GetStringFromObj( objv[ ++i ], &nleng );
+         }
+         else {
+            Tcl_SetObjResult( interp, Tcl_NewStringObj( usage, -1 ) );
+            return TCL_ERROR;
+         }
       }
+      nflag = i - 1;
 
 /* Check syntax. */
-      if ( objc + nflag < 2 || objc + nflag > 3 ) {
-         Tcl_WrongNumArgs( interp, 1, objv, "?options? msg ?name?" );
+      if ( objc + nflag != 2 ) {
+         Tcl_WrongNumArgs( interp, 1, objv, "?options? message" );
          return TCL_ERROR;
       }
 
 /* Get string arguments. */
       msg = Tcl_GetStringFromObj( objv[ 1 + nflag ], &mleng );
-      if ( objc + nflag == 3 ) {
-         name = Tcl_GetStringFromObj( objv[ 2 + nflag ], &nleng );
-      }
-      else {
-         name = " ";
-         nleng = 1;
-      }
 
 /* There are two possibilities: either we are running as a subprocess,
    or we are running free standing.  Find out which. */
@@ -104,9 +122,7 @@
 
 /* We are running as a subprocess.  Write the message in an appropriate
    format back up the pipe to the parent. */
-         int log_flag;
-         log_flag = errmsg ? CCD_CCDERR : CCD_CCDMSG;
-         write( ccdofd, &log_flag, sizeof( int ) );
+         write( ccdofd, &stype, sizeof( int ) );
          write( ccdofd, name, nleng );
          write( ccdofd, "\n", 1 );
          write( ccdofd, msg, mleng + 1 );
