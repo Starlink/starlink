@@ -145,6 +145,12 @@
           IF ( CMD .EQ. 'RESET' ) THEN
             CALL IBGND_RESET( .TRUE., .TRUE., .TRUE., STATUS )
 
+*      Start modelling
+          ELSE IF ( CMD .EQ. 'START' ) THEN
+            IF ( .NOT. I_BGM_ON ) THEN
+              CALL IBGND_NEW( STATUS )
+            END IF
+
 *      Start a new model
           ELSE IF ( CMD .EQ. 'NEW' ) THEN
             CALL IBGND_NEW( STATUS )
@@ -870,6 +876,7 @@
         AMEAN = SAMM(ISAMP)
         SUM = 0.0
         STDDEV = 0.0
+        N = 0
         DO J = 1, NY
           DO I = 1, NX
             IF ( BQ(I,J) .EQ. QUAL__GOOD ) THEN
