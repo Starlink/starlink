@@ -34,7 +34,7 @@
       INCLUDE 'AIO_PAR'
 
 *  Global Variables:
-      INCLUDE 'ASTLIB(AIO_CMN)'		! AIO Initialisation Switches
+      INCLUDE 'AIO_CMN'		        ! AIO Initialisation Switches
 *        AIO_DEF = LOGICAL (Returned)
 *           AIO output channel defined?
 *        AIO_DEF = LOGICAL (Returned)

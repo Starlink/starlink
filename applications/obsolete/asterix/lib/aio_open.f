@@ -49,7 +49,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(AIO_CMN)'
+      INCLUDE 'AIO_CMN'
 *
 *    Import :
 *
