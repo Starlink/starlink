@@ -386,11 +386,11 @@ install-exec-hook: libast.la
 @PREDIST@    -e 's,@PACKAGE_VERSION_MINOR\@,$(PACKAGE_VERSION_MINOR),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION_RELEASE\@,$(PACKAGE_VERSION_RELEASE),' \
 @PREDIST@    -e 's,@PERL\@,$(PERL),'
-@PREDIST@version.h: version.h.in
+@PREDIST@version.h: version.h.in configure.ac
 @PREDIST@	rm -f $@; $(predist_subs) version.h.in >$@
-@PREDIST@builddocs: builddocs.in
+@PREDIST@builddocs: builddocs.in configure.ac
 @PREDIST@	rm -f $@; $(predist_subs) builddocs.in >$@; chmod +x $@
-@PREDIST@addversion: addversion.in
+@PREDIST@addversion: addversion.in configure.ac
 @PREDIST@	rm -f $@; $(predist_subs) addversion.in >$@; chmod +x $@
 
 # Documentation
