@@ -102,7 +102,6 @@
 
       INTEGER			NDIG			! Chars used in STR
       INTEGER			NHDU			! HDU number
-      INTEGER			PID			! Primary HDU id
 
       LOGICAL			CREATED			! Did we create object?
 *.
@@ -242,7 +241,6 @@
 
 *  Local Variables:
       INTEGER			EID			! EXTENSIONS identifier
-      INTEGER			NHDU			! HDU number
 
       LOGICAL			THERE			! Object exists
 *.
