@@ -210,12 +210,15 @@
 *  Local Variables:
       CHARACTER * ( FIO__SZFNM ) ASTFIL ! Name of frameset file
       CHARACTER * ( CCD1__BLEN ) BUF ! Buffer for output
-      INTEGER CHEXP              ! AST pointer to export channel
       CHARACTER * ( AST__SZCHR ) DMBAS ! Domain name of NDF Base frame
       CHARACTER * ( AST__SZCHR ) DMCUR ! Domain name of NDF Current frame
       CHARACTER * ( AST__SZCHR ) DMBAS1 ! Domain name of first NDF Base frame
       CHARACTER * ( AST__SZCHR ) DMCUR1 ! Domain name of first NDF Current frame
       CHARACTER * ( CCD1__BLEN ) FITSID ! FITS keyword to identify frameset
+      CHARACTER * ( CCD1__BLEN ) LABEL ! Identifier label for frameset
+      CHARACTER * ( AST__SZCHR ) OUTDOM ! Name of output domain
+      CHARACTER * ( AST__SZCHR ) TITLE ! Title of frame
+      INTEGER CHEXP              ! AST pointer to export channel
       INTEGER FDAST              ! FIO file descriptor of frameset file
       INTEGER FRCUR              ! AST pointer to current frame
       INTEGER FRBAS              ! AST pointer to Pixel domain frame
@@ -229,12 +232,10 @@
       INTEGER IX                 ! Index of label in group
       INTEGER JCUR               ! Index of Current frame for exported frameset
       INTEGER JBAS               ! Index of Base frame for exported frameset
-      CHARACTER * ( CCD1__BLEN ) LABEL ! Identifier label for frameset
       INTEGER MAP                ! AST mapping between frames
       INTEGER NNDF               ! Number of NDFs in in group
       INTEGER NEXP               ! Number of AST objects output
       LOGICAL OPNAST             ! Whether frameset file was opened
-      CHARACTER * ( AST__SZCHR ) OUTDOM ! Name of output domain
 
 *.
 
@@ -392,6 +393,10 @@
 
 *  Tweak the frames before putting them in the export frameset.
          CALL AST_SETC( FRCUR, 'Domain', OUTDOM, STATUS )
+         TITLE = AST_GETC( FRCUR, 'Title', STATUS )
+         TITLE( CHR_LEN( TITLE ) + 1: ) = ' (exported)'
+         CALL AST_SETC( FRCUR, 'Title', TITLE( 1:CHR_LEN( TITLE ) ), 
+     :                  STATUS )
 
 *  Construct the export frameset itself.
          FSEXP = AST_FRAMESET( FRBAS, ' ', STATUS )
