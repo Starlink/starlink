@@ -48,14 +48,31 @@
 #        Original version.
 #     30-MAR-1999 (DSB):
 #        Added angrot parameter.
+#     8-JUN-1999 (DSB):
+#        Added -h option.
 #     {enter_further_changes_here}
 
 #-
 
-#  Check that there are 4 arguments present.
+#  If the -h option is the first command line argument, run awk on this
+#  script to extract those lines comprising the prologue. Use sed to
+#  strip off comment characters and pipe the result through more. Then
+#  exit.
       set args = ($argv[1-])
+      if ( $#args > 0 ) then
+         if( $argv[1] == "-h" ) then
+
+            awk '{if($1=="#-")p=0;if(p)print $0;if($0=="#+"){p=1;print""}}' ${0} \
+            | sed -e 's/^#/ /' -e 's/^  //' \
+            | more
+            exit
+
+         endif
+      endif
+
+#  Check that there are 4 arguments present.
       if ( $#args != 5 ) then
-         echo "Usage: makecube i q u cube angrot"
+         echo "Usage: makecube [-h] i q u cube angrot"
          exit
       endif
 
