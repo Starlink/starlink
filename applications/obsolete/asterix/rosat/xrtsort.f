@@ -3358,10 +3358,17 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             EL5=MIN((INT((TEV-SRT.MIN_T(1))/TWIDTH) + 1), SDIM5)
             EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
             EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
-*
+
+	if (el1.lt.1.or.el1.gt.sdim1.or.el2.lt.1.or.el2.gt.sdim2) then
+		print *,el1,sdim1,el2,sdim2
+		call flush(6)
+	else
+
             SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &         SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
-*
+
+	endif
+
           ENDIF
 
           IF ( SRT.BCKGND.AND.BOK) THEN
