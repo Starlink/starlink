@@ -55,7 +55,6 @@
 #-
 
       echo -lsubpar_adam \
-           -lparsecon_adam \
            -llex_adam \
            -lams_adam \
            -lmsp \
