@@ -37568,6 +37568,52 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
 \end{htmlonly}
 
 \sstroutine{
+   SHOWQUAL
+}{
+   Display the quality names defined in an NDF
+}{
+   \sstdescription{
+      This routine displays a list of all the quality names currently
+      defined within a supplied NDF (see task SETQUAL). The descriptive
+      comments which were stored with the quality names when they were
+      originally defined are also displayed. An option exists for also
+      displaying the number of pixels which hold each quality.
+   }
+   \sstusage{
+      showqual in [count]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COUNT = \_LOGICAL (Read)
+      }{
+         If true, then the number of pixels in each NDF which holds
+         each defined quality is displayed. These figures are shown
+         in parentheses between the quality name and associated
+         comment.  This option adds significantly to the run time.  {\tt [NO]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         showqual {\tt "}m51,cena{\tt "} yes
+      }{
+         This example displays all the quality names currently defined
+         for the two NDFs {\tt "}m51{\tt "} and {\tt "}cena{\tt "} together with the number of
+         pixels holding each quality.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: REMQUAL, QUALTOBAD, SETQUAL.
+   }
+}
+
+\sstroutine{
    SLIDE
 }{
    Realigns an NDF using a translation

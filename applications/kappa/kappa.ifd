@@ -1666,10 +1666,6 @@ package kappa {
           }
 
          parameter ok {
-				 # verification from the user before
-				 # carrying out an action.  It is only
-				 # prompted for and should not appear
-				 # on the command line.
             type _LOGICAL
             vpath PROMPT
             ppath DEFAULT
@@ -2185,6 +2181,32 @@ package kappa {
             helpkey *
           }
 
+      }
+
+      action showqual {
+
+         helplib {$KAPPA_HELP}
+
+         parameter count {
+            position 2
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Is a count of pixels holding each quality required?}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDFs}
+            helpkey *
+          }
       }
 
       action wcsadd {

@@ -241,6 +241,10 @@
          ELSE IF ( NAME .EQ. 'SETQUAL' ) THEN
             CALL SETQUAL ( STATUS )
 
+*  Display quality names
+         ELSE IF ( NAME .EQ. 'SHOWQUAL' ) THEN
+            CALL SHOWQUAL ( STATUS )
+
 *  Sets a new value for the title component of an NDF data structure.
          ELSE IF ( NAME .EQ. 'SETTITLE' ) THEN
             CALL SETTITLE ( STATUS )
