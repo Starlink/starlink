@@ -14,6 +14,7 @@
 #
 #  Description:
 #     Starts up the POLPACK package and runs the POLHELP application.
+#     The NDF cw.sdf must be present in the current directory.
 #
 #  Authors:
 #     DSB: D.S. Berry (Starlink)
@@ -27,6 +28,6 @@
 #-
 #
 source INSTALL_BIN/polpack.csh
-polhelp
+polka cw nopol nostarthelp accept
 echo "  POLPACK test script completed."
 #      End of shell script.
