@@ -8,7 +8,7 @@
 *   Richard Beard (University of Birmingham)
 *
 * History:
-*   17 Jun 98 V2.2-0 (RB):
+*   17 Jun 98 V2.3-0 (RB):
 *     Original version.
 *-
 
@@ -21,7 +21,7 @@
 
 * Local constants:
 	character*30		version
-	  parameter		( version = 'XRTARD Version 2.2-0' )
+	  parameter		( version = 'XRTARD Version 2.3-0' )
 
 * Local variables
 	character*132		rootname
