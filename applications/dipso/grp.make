@@ -3,7 +3,7 @@
 #  This is a description file for the "make" utility.
 
 # The names of all the tar files 
-TAR_FILES = dipso_source.tar  dipso_sub1.tar
+TAR_FILES = dipso_source  dipso_sub1
 
 # The contents of the dipso_source.tar file:
 DIPSO_SOURCE = ATLIST.DAT ATOMIC.DAT DEMO1.sdf DEMO1_STK.sdf DEMO2.sdf \
