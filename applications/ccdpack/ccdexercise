@@ -28,10 +28,14 @@
 #        install time.
 #     21-MAR-1997 (PDRAPER):
 #        Now does above properly.
+#     20-JAN-1998 (PDRAPER):
+#        Fixed problem with device=! not being accepted on OSF1.
 #     {enter_further_changes_here}
 #-
 #
       onintr EXIT
+      set null = "\!"
+      set abort = "\!\!"
 
 #  Initialise CCDPACK within this shell.
       if ( $?CCDPACK_DIR ) then 
@@ -61,10 +65,10 @@
 #  Does the user want to see image display activity?
       echo -n "DISPLAY - Display device (! for none) > "
       set device = $<
-      if ( "$device" == "\!\!" || "$device" == "" ) then
+      if ( "$device" == "$abort" || "$device" == "" ) then
          goto EXIT
       else
-         if ( "$device" == "\!" ) then
+         if ( "$device" == "$null" ) then
             set device = "NONE"
          endif
       endif
