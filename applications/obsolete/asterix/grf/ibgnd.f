@@ -821,11 +821,12 @@
 
 *    Redo the quality
         CALL IBGND_SETQ( STATUS )
-	print *,'Done setq'
+	print *,'Done setq',I_BGM_SRCPTR(1),I_BGM_SRCPTR(2),
+     :           I_BGM_SRCPTR(3)
 	call flush(6)
 *    Recompute the samples and surface
         CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
-	print *,'Done setq'
+	print *,'Done recalc'
 	call flush(6)
 
 *    Update noticeboard
@@ -2693,6 +2694,8 @@
 
 *  Compute the samples
       IF ( SAMP ) THEN
+	print *,'pre samp comp'
+	call flush(6)
 
         CALL IBGND_SAMP_COMP( I_NX, I_NY, %VAL(I_DPTR),
      :                      %VAL(I_BGM_SAMIDX), %VAL(I_BGM_DPTR),
