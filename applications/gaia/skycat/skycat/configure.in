@@ -238,7 +238,7 @@ rm -f $tmpfile
 # set OS version string
 #
 # -----------------------------------------------------------------------
-OSVERSION="`uname -s`-`uname -r`"
+OSVERSION="`uname -s`-`uname -r|sed s,\(.*\),,`"
 AC_SUBST(OSVERSION)
 
 # -----------------------------------------------------------------------
