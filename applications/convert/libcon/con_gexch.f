@@ -15,7 +15,7 @@
 *  Description:
 *     This routine takes a GRP group containing a list of NDF filenames
 *     and substitutes a specified file extension for the '.sdf' in the
-*     name.  The new names are applend to an output group.  If there is
+*     name.  The new names are appended to an output group.  If there is
 *     no '.sdf' extension, the new extension is appended to the
 *     filenames in the GRP.  Any NDF sections are removed before each
 *     file name is propagated to the new group.  Any directory path
@@ -112,7 +112,7 @@
          GOTO 999
       END IF
 
-*  Inquire the length of the input group.
+*  Inquire the length of the output group.
       CALL GRP_GRPSZ( OGROUP, ONEL, STATUS )
 
 *  Check for an error.
@@ -158,7 +158,7 @@
 *  Append the new extension.
          CALL CHR_APPND( OEXT, FILNAM, CPOS )
 
-*  Write the revised name to the output group
+*  Append the revised name to the output group.
          CALL GRP_PUT( OGROUP, 1, FILNAM( :CPOS ), ONEL + I, STATUS )
       END DO
 
