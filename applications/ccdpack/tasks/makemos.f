@@ -1131,7 +1131,7 @@
 
 *  GENVAR default is TRUE if all variances are available, otherwise it
 *  is FALSE.
-         CALL PAR_DEF0x( 'GENVAR', GENVAR, STATUS )
+         CALL PAR_DEF0L( 'GENVAR', GENVAR, STATUS )
          CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
 
 *  Set up a list of NDF components for the output NDF.
