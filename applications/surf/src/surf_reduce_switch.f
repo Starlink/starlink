@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_REDUCE_SWITCH (STATUS)
+      SUBROUTINE SURF_REDUCE_SWITCH (STATUS)
 *+  
 *  Name:
 *     REDUCE_SWITCH
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_REDUCE_SWITCH (STATUS)
+*     CALL SURF_REDUCE_SWITCH (STATUS)
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -35,16 +35,18 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *        The name of the demodulated data file.
+*     MSG_FILTER = CHAR (Read)
+*         Message filter level. Default is NORM.
 *     OUT = NDF (Read)
 *        The name of the file to contain the output data.
-*     SPIKE_LEVEL = _INTEGER (Read)
+*     SPIKE_LEVEL = INTEGER (Read)
 *        Number of spikes tolerated before marking data point bad.
 *        The default is that the sample should be marked bad if the transputers
 *        detected any spikes during a 1 second sample.
-*     SWITCH = _INTEGER (Read)
+*     SWITCH = INTEGER (Read)
 *        Parameter to indicate which switch to extract. A value of 0 means
 *        that all switches should be reduced. Default is 0.
-*     USE_CALIBRATOR = _LOGICAL (Read)
+*     USE_CALIBRATOR = LOGICAL (Read)
 *        Yes, if you want the data for each bolometer measurement
 *        divided by the corresponding internal calibrator signal.
 *        The default is yes.
@@ -57,7 +59,7 @@
 *        by the calibrator signal and no toleration of spikes detected by
 *        the transputers. The output data will be written to nosw.sdf.
 *     reduce_switch test OUT=nosw SWITCH=2 \
-*        This will selecte switch 2 from test.sdf and write it to nosw.sdf
+*        This will select switch 2 from test.sdf and write it to nosw.sdf
 
 *  Notes:
 *     If the input file is not found in the current directory, the directory
@@ -118,6 +120,10 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.19  1997/06/13 00:01:14  timj
+*     Change name to SURF
+*     Minor doc changes
+*
 *     Revision 1.18  1997/06/05 22:28:11  timj
 *     Initialise pointer variables.
 *
@@ -170,7 +176,7 @@ c
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx
       INCLUDE 'NDF_PAR'                ! for NDF__NOID
       INCLUDE 'MSG_PAR'                ! MSG__ constants
-      INCLUDE 'REDS_SYS'               ! REDS constants
+      INCLUDE 'SURF_PAR'               ! REDS constants
 *    Import :
 *    Import-Export :
 *    Export :
@@ -938,7 +944,7 @@ c
          CALL NDF_XLOC (IN_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL ERR_ANNUL (STATUS)
-            CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION',
+            CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
      :        0, 0, OUT_REDSX_LOC, STATUS)
          END IF
       END IF
