@@ -3741,17 +3741,12 @@ sub handle_dist ()
 
   $output_rules .= &file_contents ('distdir',
 				   new Automake::Location,
-				   %transform,
-                                   'STAREXTRA' => ($starlink_rules
-                                                   ? '$(STAR_EXTRA_DIST)'
-                                                   : ''));
+				   %transform);
 
   # Handle extra distribution features required for Starlink code,
   # but not if the macro STAR_DEFAULTS wasn't seen.  This will be the case
   # if we're configuring thirdparty code, which we typically do not intend
-  # to distribute.  This might need to become finer-grained, but the
-  # original prompt for this was to stop @STAR_EXTRA_DIST@ being
-  # generated when running automake on the libtool Makefile.am.
+  # to distribute.  This might need to become finer-grained.
   &handle_starlink_dist
     if $starlink_rules;
 }
@@ -3777,10 +3772,6 @@ sub handle_starlink_dist ()
             }
         }
     }
-  Automake::Variable::define ('STAR_EXTRA_DIST',
-                              VAR_CONFIGURE, '', TRUE,
-                              subst('STAR_EXTRA_DIST'),
-                              '', INTERNAL, VAR_ASIS);
 }
 
 # &handle_subdirs ()
@@ -5031,6 +5022,9 @@ sub handle_starlink
         register_suffix_rule (INTERNAL, '.xml', '.htx_tar');
         register_suffix_rule (INTERNAL, '.xml', '.texml_tar');
       }
+
+    push_dist_common ('$(stardocs_DATA)')
+      if (var 'stardocs_DATA');
 
     my $want_version_dat = defined $starlink_seen_features{'per-package-dirs'};
 

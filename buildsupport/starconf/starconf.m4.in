@@ -196,13 +196,6 @@ AC_SUBST(STAR_DEPENDENCIES_CHILDREN)
 STAR_DOCUMENTATION=
 AC_SUBST([STAR_DOCUMENTATION])
 
-# Extra files to be distributed.  This is for files added to the
-# distribution list by starconf; files which the user wishes to add 
-# should be specified in the usual way, through the automake
-# EXTRA_DIST variable.
-STAR_EXTRA_DIST=
-AC_SUBST(STAR_EXTRA_DIST)
-
 # Create a PACKAGE_VERSION_INTEGER variable, which contains the
 # package's version number as an integer major*1e6+minor*1e3+release.
 eval [`echo $VERSION | sed -e 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/PACKAGE_VERSION_MAJOR=\1; PACKAGE_VERSION_MINOR=\2; PACKAGE_VERSION_RELEASE=\3;/'`]
@@ -670,7 +663,6 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
     m4_ifval([$2],
        [dnl non-empty second argument -- just add to variable
         if $_star_build_docs; then
-            _STAR_EXTRA_DIST($2)
             STAR@&t@_LATEX_DOCUMENTATION="$2"
         else
             AC_MSG_WARN([not installing docs $1])
@@ -681,7 +673,6 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
             _star_tmp=
             for d in $1
             do
-                _STAR_EXTRA_DIST($d.tex $d.ps $d.htx_tar)
                 _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
             done
             STAR@&t@_LATEX_DOCUMENTATION="$_star_tmp"
@@ -721,7 +712,6 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
     m4_ifval([$2],
        [dnl non-empty second argument -- just add to variable
         if $_star_build_docs; then
-            _STAR_EXTRA_DIST($2)
             STAR@&t@_XML_DOCUMENTATION="$2"
         else
             AC_MSG_WARN([not installing docs $1])
@@ -737,7 +727,6 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
                 _star_tmp=
                 for d in $1
                 do
-                    _STAR_EXTRA_DIST($d.tex $d.ps $d.htx_tar)
                     _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
                 done
                 STAR@&t@_XML_DOCUMENTATION="$_star_tmp"
@@ -1175,17 +1164,6 @@ AC_DEFUN([_STAR_EXTRADIR_COMMON],
    [AC_MSG_WARN([Macro STAR_$1_FILES($2) is obsolete -- use star$1_DATA in Makefile.am instead])
     AC_MSG_WARN([For STAR@&t@_LATEX_DOCUMENTATION, use stardocs_DATA=@STAR@&t@_LATEX_DOCUMENTATION@ instead])]
 )# _STAR_EXTRADIR_COMMON
-
-
-# _STAR_EXTRA_DIST(filelist)
-# --------------------------
-# Declare a space-separated list of files which should be included in
-# the distribution.  This has the same overall function as automake's
-# EXTRA_DIST rule, except that this is under the control of configure.
-AC_DEFUN([_STAR_EXTRA_DIST],
-    [m4_ifval([$1], [], [AC_FATAL([$0: no argument])])dnl
-     STAR_EXTRA_DIST="$STAR_EXTRA_DIST $1"
-])# _STAR_EXTRA_DIST
 
 
 # _STAR_RESTFP_FIX
