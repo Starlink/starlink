@@ -1,3 +1,7 @@
+2001-03-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm: Increase version number since we have improved fits IO
+
 2000-08-11  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* t/fitshdr.t: Create to test fits header stuff
