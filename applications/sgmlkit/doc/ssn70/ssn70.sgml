@@ -3,6 +3,9 @@
   <!ENTITY sgp28	PUBLIC "-//Starlink//DOCUMENT Summary SGP/28//EN"
 			SUBDOC
 			-- How to write good documents for Starlink -->
+  <!ENTITY sun124	PUBLIC "-//Starlink//DOCUMENT Summary SUN/124//EN"
+			SUBDOC
+			-- HLP -->
   <!ENTITY sun188	PUBLIC "-//Starlink//DOCUMENT Summary SUN/188//EN"
 			SUBDOC
 			-- HTX -->
@@ -100,6 +103,11 @@ Cambridge SGML meetings.  This is an interim release, intended as
 a snapshot for distribution to Rodney Warren-Smith and Mark Taylor.
 There will be a proper distribution before 1 June.
 </distribution>
+
+<change date="7-APR-2000" author=mbt>
+<px>Added a description of the HLP file downconversion tool.
+<px>Modified documentation of the programcode upconverter to reflect new usage.
+</change>
 
 </history>
 
@@ -2546,6 +2554,26 @@ only a single pass through &latex;, which means that the
 table-of-contents ends up printed last, requiring trivial
 rearrangement).
 
+
+<subsect id=proc.sgml2hlp export>Generating HELP files
+
+<p>The command <code/sgml2hlp/ can be used to process an SGML document
+conforming to the <ref id=appx.programcode.dtd text=programcode> DTD,
+which will typically contain the marked up prologues of a set of
+user-level tasks in a package,
+into a <code/.hlp/ file, which can be processed into a Starlink help library
+using the <code/HLIB/ program documented in
+<docxref doc="sun124" text="SUN/124">.
+
+<p>The program takes as arguments the name of any file(s) consituting
+the SGML programcode document, and writes the resulting help text
+to standard output.  There are no options.
+Invoking it is therefore very straightforward:
+<verbatim>
+sgml2hlp routines.sgml >package.hlp
+</verbatim>
+
+
 <subsect id=proc.makefile export>Processing documents -- using the Makefile
 <update versionid="v0.6">Makefile approach no longer supported</update>
 
@@ -2896,7 +2924,8 @@ This includes attention to the following &latex; constructs:
     commands.
 <li>The <code>\hyperref</code> and <code>\htmlref</code> commands.
 </ul>
-Normally the upconverter will warn you when LATEXONLY code is omitted,
+Normally the upconverter will warn you when <code>latexonly</code> 
+code is omitted,
 although macro redefinitions at the start of the document are likely
 to be missed.
 
@@ -2913,8 +2942,10 @@ environments, and <code>latex2sgml</code> is no better, and sometimes worse.
 You will almost certainly have to recode these by hand.
 
 <dt>LATEX-notation NDATA
-<dd>Maths is embedded in the final document within M, MEQUATION or
-MEQNARRAY elements, and ought to produce the same result as the original.
+<dd>Maths is embedded in the final document within 
+<ref id=el.sun.m text=m>, <ref id=el.sun.mequation text=mequation> or
+<ref id=el.sun.meqnarray text=meqnarray> elements, 
+and ought to produce the same result as the original.
 However, all user-defined macros (<code>\newcommand</code>s) 
 are expanded before being put into the output, which can lead to
 verbose and ugly inline latex-notation source.
@@ -2922,14 +2953,16 @@ This is sort of unavoidable, since each latex-notation element is
 treated separately, so that a <code>\newcommand</code> near the start
 of the document is not visible to an M element later, 
 and it's very difficult to know which definitions are required for a
-given bit of latex..
+given bit of latex.
 In extreme cases, the only way of getting maintainable SGML may be
 to cut and paste source from the original document.
 
 <p>Conversely, &latex; lengths are not expanded, so that when a length
 is reset somewhere in a document and used later, this setting will 
 be wrong.  This most frequently causes problems in <code>picture</code>
-environments -- a FIGURE with a &lt;FIGURECONTENT NOTATION=LATEXGRAPHICS>
+environments -- a <ref id=el.sun.figure text=figure> 
+with a 
+&lt;<ref id=el.sun.figurecontent text=figurecontent> notation=latexgraphics&gt;
 child may come out with <em>entirely</em> the wrong dimensions.  
 In this case it is necessary to identify by hand where the relevant
 lengths are set in the &latex; source and put them into each
@@ -2940,7 +2973,8 @@ messed up in long latex-notation math elements.
 This is a bug, but I currently don't know how to fix it.
 
 <dt>History and author information
-<dd>The upconverter constructs basic HISTORY and AUTHORLIST elements
+<dd>The upconverter constructs basic <ref id=el.sun.history text=history> and 
+<ref id=el.sun.authorlist text=authorlist> elements
 but doesn't try to be too clever.  You may wish to modify these.
 
 <dt>Line breaks
@@ -2953,8 +2987,9 @@ which can result in overlong lines if long tags have been inserted.
 
 <dt>Extraneous P elements
 <dd>The upconverter, although it tries to avoid it, sometimes writes
-more P elements than necessary -- it is never reasonable to have two
-&lt;P> start tags separated only by whitespace.
+more <ref id=el.sun.p text=p> elements than necessary -- 
+it is never reasonable to have two &lt;p> 
+start tags separated only by whitespace.
 This is a bug and may be fixed in the future.
 
 <dt>Entities going astray
@@ -2994,99 +3029,104 @@ appear verbatim in the output SGML document.
 <subsect id=upconvert.sourcecode export>Upconversion from source code
 
 <p>The &latex; upconverter described in <ref id=upconvert.latex>
-will turn subroutine or command descriptions within a normal SUN into 
+will turn subroutine or command descriptions within a normal
+SUN into 
 SGML like the rest of the text in them, but does not make
 an especially pretty job of it; the proper way is to 
-mark these up using the PROGRAMCODE DTD referenced via a
-CODECOLLECTION element, as described in <ref id=doccode>.
+mark these up using the <ref id=appx.programcode.dtd text=programcode> DTD 
+referenced via a <ref id=el.sun.codecollection text=codecollection> 
+element, as described in <ref id=doccode>.
 
 <p>If the corresponding source files are written with prologues 
 in the normal Starlink style, then an upconverter is provided which
-can mark these up as SGML conforming to the PROGRAMCODE DTD.
+can mark these up as SGML conforming to the programcode DTD.
 It can behave in different ways according to how you wish to 
-organise the files - it can either produce a set of files 
-which are still the same compilable source code as before but can
-also be included directly into an SGML document,
-or it can produce a document containing just the marked up prologues
-to be included.
+organise the files -- it can either generate output which is 
+still the same compilable source code as before but can also
+be included directly into an SGML document,
+or it can produce a document containing just the marked up 
+prologues to be included.
 
-<p>The upconverter currently only exists for Fortran source code,
-and is called <code>fortran2sgml.pl</code>.
-
-<p><code>fortran2sgml.pl</code> has many configuration options 
-which are not detailed exhaustively in this document.
-To invoke it in the simplest instance, simply type
+<p>The source code upconverter currently only exists for Fortran,
+and is called <code>fortran2sgml.pl</code>.  Its usage is
 <verbatim>
-fortran2sgml.pl file.f
+fortran2sgml.pl [-c config-file] [-d | -D] fortran-files
 </verbatim>
-and you will see what the marked up source code looks like.
-The form of the prologue is kept as closely as possible to its
+and the output is always printed to standard output.
+
+<p>When marking up source code the
+form of the prologue is kept as closely as possible to its
 original format, and all the SGML markup is guaranteed to be hidden
 from the compiler in comments (in the very rare case that this is 
 not possible the upconverter will exit with a fatal error).
 Only the prologue lines between the `<code>*+</code>' and `<code>*-</code>', 
-and a comment line immediately after it, and a comment line at the
+one comment line immediately after it, and a comment line at the
 end of the file (or before the next prologue) are changed in any way.
 
-<p>Configuration is done by specifying a configuration file,
-which may be given using the `<code>-c</code>' flag on the command line.
-If this is not done the script will look for a file 
-`<code>f2sconfig.pl</code>' in the current working directory, and use this.
-Otherwise, it will run using the defaults as in the above example.
+<p>If run with no flags, the program will just add tags to prologues
+found in the listed files.  The resulting files can be used, 
+if desired, as the primary source files, and the un-marked-up 
+versions discarded.
+In this case however, the output is not a complete SGML document
+since it lacks the SGML declaration and some other elements 
+which could not be easily hidden from the compiler in comments.
+For this reason a container document which refers to the
+source files using entity references is required.
+This container document can be generated 
+by running <code>fortran2sgml.pl</code>
+with the <code>-d</code> flag, listing the files to which it should refer.
+So if the files containing the prologues which are to be documented
+are <code/x.f/, <code/y.f/ and <code/z.f/, you can do the following:
+<verbatim>
+fortran2sgml.pl x.f > converted/x.f
+fortran2sgml.pl y.f > converted/y.f
+fortran2sgml.pl z.f > converted/z.f
+fortran2sgml.pl -d x.f y.f z.f > converted/routinedoc.sgml
+</verbatim>
+If you later move the container document to a different location from
+the Fortran files it will be necessary to make some modifications
+to the entity declarations in it, which can easily be done by hand.
 
-<p>The configuration file
-is executable Perl overriding variable and subroutine 
-definitions in the <code>fortran2sgml.pl</code> script.
-Many of these are regular expressions giving 
-the details of the pattern matching, so that individual 
-prologue style conventions 
-can be accomodated; to investigate these see the documentation within
-the script itself.
+<p>If run with the <code>-D</code> flag, the program will 
+output a single file which is a complete free-standing SGML document,
+and contains the marked up prologues (the non-prologue parts of the
+source code are not included in this case).
+You could thus generate the same documentation as in the previous
+example by running
+<verbatim>
+fortran2sgml.pl -D x.f y.f z.f > converted/routinedoc.sgml
+</verbatim>
 
-<p>Additionally, there are options determining the action of the script.
-These too are described in detail with inline comments,
-but the following examples illustrate the main points.
-The default configuration, which behaves like a filter, is as follows:
+<p>In either case, the resulting programcode document can
+be included in a SUN or other Starlink document by including an
+appropriate entity declaration in the DTD subset at the top of
+the document:
 <verbatim>
-      @Files = ();
-      $Indir = "";
-      $Outdir = "";
-      $Containerfile = "";
-      $Withindoc = 0;
+&lt;!ENTITY prologues SYSTEM 'routinedoc.sgml' SUBDOC>
 </verbatim>
-By writing
-<verbatim>
-      @Files = qw( makebias.f makecal.f calcor.f makeflat.f );
-      $Indir = "/stardev/local/sources/ccdpack";
-      $Outdir = ".";
-      $Containerfile = "ccd-progs.sgml";
-      $Withindoc = 0;
-      1;
-</verbatim>
-we get a set of files in the current directory with the same names
-as the original source files given in the `<code>@Files =</code>' 
-line, which compile to do the same, but have their prologues marked
-up in SGML.  There is additionally a file `<code>ccd-progs.sgml</code>'
-which refers to all the others.
-If we wish therefore, it is possible to throw away the unmarked up
-versions of the routines, replace them in the main source archive
-by the new ones, and in the appropriate SUN include the entity
-declaration
-<verbatim>
-&lt;!ENTITY prologues SYSTEM 'ccd-progs.sgml' SUBDOC>
-</verbatim>
+and referring to it later using a <ref id=el.sun.codecollection> element:
 and in the proper place the entity reference
 <verbatim>
-&lt;!CODECOLLECTION DOC=prologues>
+&lt;routinelist>
+&lt;p>Here is the documentation of the subroutines:
+&lt;!codecollection doc='prologues'>
+&lt;/routinelist>
 </verbatim>
+The same document can be processed using
+the <ref id=proc.sgml2hlp text=sgml2hlp> downconverter to produce
+Starlink help files.
 
-<p>If you prefer to keep the source in its original form and 
-generate the SGML from the code prologues each time they are
-modified, then the configuration file should read as above,
-but with
-<verbatim>
-      $Withindoc = 1;
-</verbatim>
+<p>The configuration file supplied by the <code>-c</code> flag 
+is not required, but if supplied it
+can override some of the assumptions the program makes 
+about the exact form of the source code -- what characters 
+are used to represent bullet lists,
+how many spaces constitute an indent and so on. 
+In any case it will try to make good guesses about what is and
+is not a list, verbatim block, paragraph and so on.
+The configuration file takes the form of executable Perl source
+code; see comments in the script if you wish to use this option.
+
 
 <sect id=final export>Finally
 
