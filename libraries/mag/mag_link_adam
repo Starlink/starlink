@@ -1,1 +1,1 @@
-echo -lmag_adam -lmag `hds_link_adam`
+echo -lmag_adam -lmag `par_link_adam` `hds_link_adam`

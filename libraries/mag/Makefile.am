@@ -56,11 +56,19 @@ C_ROUTINES = ioc.c
 BUILT_SOURCES = MAG_ERR MIO_ERR mio_err.h
 
 
-# Do not know how to test the ADAM monolith versions (mgtest.f and mag_test.f)
+# magtest is ADAM monolith
 
-TESTS = ioctest
+TESTS = mag_test ioctest magtest
 
-check_PROGRAMS = ioctest
+check_PROGRAMS = mag_test ioctest
+check_MONOLITHS = magtest
 
 ioctest_SOURCES = ioctest.f
 ioctest_LDADD = libmag.la `err_link` `psx_link`
+
+mag_test_SOURCES = mag_test.f
+mag_test_LDADD = `$(srcdir)/mag_link_adam`
+
+magtest_TASKS =
+magtest_SOURCES = magtest.f
+magtest_LDADD = `$(srcdir)/mag_link_adam` `prm_link`

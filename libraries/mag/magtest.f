@@ -37,6 +37,9 @@
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'MAG_ERR'
+
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
 *    Status
       INTEGER STATUS
 *    Local variables
@@ -46,8 +49,8 @@
       INTEGER JREC            !Record number within file
       INTEGER IFILE           !File number
       INTEGER NWRIT           !Number of bytes actually in record
-      BYTE OBUFF(65535)       !Output buffer
-     
+      BYTE OBUFF(65536)       !Output buffer
+
       PRINT *,'STARTED'
 *    Allocate and mount
       CALL MAG_ALOC('TAPE', STATUS)
@@ -138,6 +141,8 @@
          CALL MSG_SETI('NWRIT', NWRIT)
          CALL STATPRINT( 'WRITING EXTRA-LONG BLOCK - NWRIT is ^NWRIT', 
      :    STATUS)
+         IF (STATUS .NE. SAI__OK) GO TO 999
+
 *
 *       Now rewind tape
          CALL MAG_REW( TP, STATUS )
@@ -152,7 +157,7 @@
      :      .OR.  (OBUFF(65535) .NE. 127) )THEN
 *           Something wrong with the values returned - print them
                CALL MSG_SETI('NWRIT', NWRIT)
-               CALL MSG_SETI('ENDVAL', OBUFF(65535) )
+               CALL MSG_SETI('ENDVAL', NUM_BTOI(OBUFF(65535)) )
                CALL MSG_OUT(' ',
      :         'NWRIT is ^NWRIT (65535); Last byte is ^ENDVAL (255)',
      :          STATUS )
@@ -162,16 +167,19 @@
          ENDIF
 
          CALL STATPRINT( 'READING EXTRA-LONG BLOCK', STATUS)
+         IF (STATUS .NE. SAI__OK) GO TO 999
 *
 *       Now rewind tape
          CALL MAG_REW( TP, STATUS )
          CALL STATPRINT( 'REW', STATUS)
+         IF (STATUS .NE. SAI__OK) GO TO 999
 *
 *       Now dismount - expect failure (is active)
 *
          CALL MAG_DISM( 'TAPE', .FALSE., STATUS)
          CALL STATPRINT( 'DISMOUNT when active', STATUS)
          IF (STATUS .EQ. MAG__ISACT) STATUS = SAI__OK
+         IF (STATUS .NE. SAI__OK) GO TO 999
 
 *       Annul the tape descriptor
          CALL MAG_ANNUL( TP, STATUS )
@@ -180,15 +188,18 @@
          CALL MAG_REW( TP, STATUS )
          CALL STATPRINT( 'REW when not active', STATUS)
          IF (STATUS .EQ. MAG__NTOPN) STATUS = SAI__OK
+         IF (STATUS .NE. SAI__OK) GO TO 999
 
 *       Try DISMOUNT again
          CALL MAG_DISM( 'TAPE', .FALSE., STATUS) 
          CALL STATPRINT( 'DISMOUNT', STATUS)
+         IF (STATUS .NE. SAI__OK) GO TO 999
 
 *       and again - expect error this time
          CALL MAG_DISM( 'TAPE', .FALSE., STATUS)
          CALL STATPRINT( 'DISMOUNT when dismounted', STATUS )
          IF (STATUS .EQ. MAG__DVNMT) STATUS = SAI__OK
+         IF (STATUS .NE. SAI__OK) GO TO 999
 
       ENDIF
 
@@ -249,11 +260,12 @@
 *    Local variables
       INTEGER WRSTAT
 
+      CALL MSG_SETC('KEY', KEY)
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL MSG_OUT(' ', KEY//': OK', STATUS)
+         CALL MSG_OUT(' ', '^KEY: OK', STATUS)
       ELSE
          WRSTAT = STATUS
-         CALL ERR_OUT(' ', KEY//': ^STATUS', STATUS)
+         CALL ERR_OUT(' ', '^KEY: ^STATUS', STATUS)
          STATUS = WRSTAT
       ENDIF
       END
