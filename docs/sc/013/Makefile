@@ -7,15 +7,16 @@
 
 SGML2DOCS=$(STARLINK_SGML_DIR)/bin/sgml2docs
 DOCDIR=/home/norman/s/src/docs
+VERSION=$(shell cat VERSION)
 
-all: sc13.tar-htx sc13.tar-tex sc13-examples.tar
+all: sc13.$(VERSION).tar-htx sc13.$(VERSION).tar-tex sc13-examples.tar
 
-sc13.tar-htx: sc13.sgml ReleaseNotes examples/fpp.c.sgml
+sc13.$(VERSION).tar-htx: sc13.sgml ReleaseNotes examples/fpp.c.sgml
 	SGML_CATALOG_FILES=$(DOCDIR)/document-summaries/CATALOG:$(STARLINK_SGML_DIR)/dtd/CATALOG \
 	BIBINPUTS=$$PWD \
 		$(SGML2DOCS) --html --tarball $@ sc13.sgml
 
-sc13.tar-tex: sc13.sgml ReleaseNotes examples/fpp.c.sgml
+sc13.$(VERSION).tar-tex: sc13.sgml ReleaseNotes examples/fpp.c.sgml
 	SGML_CATALOG_FILES=$(DOCDIR)/document-summaries/CATALOG:$(STARLINK_SGML_DIR)/dtd/CATALOG \
 	BIBINPUTS=$$PWD \
 		$(SGML2DOCS) --latex --tarball $@ sc13.sgml
