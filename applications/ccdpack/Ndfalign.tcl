@@ -7,11 +7,11 @@
 #     [incr Tk] Mega-Widget
  
 #  Purpose:
-#     Provide a window in which a user can align two NDFs.
+#     Provide a window in which a user can align two images.
  
 #  Description.
-#     This class provides a mega-widget which will display two NDFs
-#     and allow the user to overlay them interactively, thus 
+#     This class provides a mega-widget which will display two NDF
+#     Sets and allow the user to overlay them interactively, thus 
 #     specifying an offset between the two.  The offset chosen by
 #     the user can be retrieved by the caller.
 
@@ -19,23 +19,23 @@
 #
 #     activate
 #        Following a call to this method, the object gets put in the
-#        "active" status, and it will allow NDFs to be aligned by the
+#        "active" status, and it will allow images to be aligned by the
 #        user, update the display with respect to user actions, etc.
 #        Prior to this call, the visual state of the object will
 #        probably be inconsistent with the configuration options which
 #        have been passed to it.  This method should normally be called 
-#        only after a pair of NDFs has been loaded in using loadndf.
+#        only after a pair of images has been loaded in using loadndf.
 #
 #     deactivate
 #        After a call to this method, the user may no longer interact 
 #        with the widget to add points etc.
 #
 #     loadndf slot ndf ?frame? ?percs? ?maxcanv?
-#        This method loads an NDF into the viewer.
+#        This method loads an NDF Set into the viewer.
 #           - slot     -- Either "A" or "B", to identify whether this is
 #                         the A or B NDF.
-#           - ndf      -- ndf object
-#           - frame    -- The frame into which to resample the NDF before
+#           - ndf      -- an ndf or ndfset object
+#           - frame    -- The frame into which to resample the NDFs before
 #                         plotting.  If absent, the current frame is used.
 #           - percs    -- If present, this is a two-element list giving the 
 #                         percentile bounds between which the display of the
@@ -46,11 +46,11 @@
 #     maxcanvas
 #        Returns a number a bit bigger than the larger of the width and
 #        the height of a GWM item big enough to hold the two currently
-#        loaded NDFs just after the two loadndf calls at the current
+#        loaded images just after the two loadndf calls at the current
 #        zoom factor.  This may not be the same that given by the most
 #        recently created GWM item, which is what we would get if we 
 #        just inherited the Gwmview maxcanvas method, since the two 
-#        NDFs may overlap or be far from each other when this is called. 
+#        images may overlap or be far from each other when this is called. 
 #
 #     offset
 #        Returns a two-element list giving the X and Y position of the
@@ -61,7 +61,7 @@
 #        have a non-empty overlap as currently offset.
 #
 #     pointsndf slot frame
-#        This method returns the list of selected points of the NDF
+#        This method returns the list of selected points of the image
 #        currently loaded into the indicated slot.  The points will be
 #        given in coordinates of the indicated frame.
 #        At any given time the method will return a list for both slots 
@@ -70,7 +70,7 @@
 #        The returned list has the same format as for the points method
 #        of the Gwmview class; one element for each marked point, each 
 #        element being of the form {index xpos ypos}.
-#           - slot     -- Either "A" or "B" to identify the NDF.
+#           - slot     -- Either "A" or "B" to identify the image.
 #           - frame    -- Coordinate frame in which to return coords.
 #                         Numeric index, domain name, CURRENT or BASE.
 #
@@ -80,25 +80,23 @@
 #
 #     info = string
 #        Gives a string which will be displayed somewhere in the window
-#        near each displayed NDF.  The following substitutions will be 
+#        near each displayed NDF Set.  The following substitutions will be 
 #        made before the string is displayed:
-#           - %N  -- Full name of the NDF
-#           - %n  -- Shortened name of the NDF (e.g. without full path)
-#           - %h  -- X dimension of the NDF in pixels
-#           - %w  -- Y dimension of the NDF in pixels
-#           - %b  -- Pixel bounds of the NDF ([X1:X2,Y1:Y2])
-#           - %f  -- Domain of WCS frame used for NDF
+#           - %N  -- Full name
+#           - %n  -- Shortened name (e.g. without full path)
+#           - %f  -- Domain of WCS frame used
+#           - %p  -- Number of pixels ('X x Y' (single) or 'N pixels' (Set))
+#           - %b  -- Pixel bounds ('[X1:X2,Y1:Y2]' (single) or '' (Set))
 #
 #     title = string
 #        This gives a title to show in the title bar which the window
 #        manager displays.  The following substitutions will be made
 #        before the title is displayed:
-#           - %$N -- Full name of the NDF
-#           - %$n -- Shortened name of the NDF (e.g. without full path)
-#           - %$h -- X dimension of the NDF in pixels
-#           - %$w -- Y dimension of the NDF in pixels
-#           - %$b -- Pixel bounds of the NDF ([X1:X2,Y1:Y2])
-#           - %$f -- Domain of WCS frame used for NDF
+#           - %$N -- Full name
+#           - %$n -- Shortened name (e.g. without full path)
+#           - %$f -- Domain of WCS frame used
+#           - %p  -- Number of pixels ('X x Y' (single) or 'N pixels' (Set))
+#           - %b  -- Pixel bounds ('[X1:X2,Y1:Y2]' (single) or '' (Set))
 #
 #        In each of the above, the "$" should be replaced by "A" or "B"
 #        to apply to the "A" or "B" image.
@@ -110,6 +108,15 @@
 #     the PGPLOT driver for the GWM widget.  This is fixed in PGPLOT
 #     5.2.0-6, but not in the Spring 2000 release.  When the fixed version
 #     can be relied on to be there, this should be removed.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+
+#  History:
+#     10-NOV-2000 (MBT):
+#        Original version.
+#     8-MAR-2001 (MBT):
+#        Upgraded for use with Sets.
 
 #-
 
@@ -125,11 +132,12 @@
 #  Initialise some of the slot-indexed arrays, so we don't have to keep 
 #  testing for their non-existence before they have been set.
       foreach slot { A B } {
-         set ndf($slot) ""
+         set ndfset($slot) ""
          set wcsframe($slot) ""
-         set ndfname($slot) ""
-         set ndfshort($slot) ""
+         set fullname($slot) ""
+         set shortname($slot) ""
          set present($slot) 0
+         set nndf($slot) 0
       }
       set canvas [ canvas ]
 
@@ -164,30 +172,35 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public method loadndf { slot ndfob { frame CURRENT } { percs { 0 100 } } 
-                                                           { maxcanv 0 } } {
+      public method loadndf { slot ndfob { frame CURRENT } \
+                              { percs { 0 100 } } { maxcanv 0 } } {
 #-----------------------------------------------------------------------
 
 #  Validate the slot identifier.
          if { $slot != "A" && $slot != "B" } {
-            error "Invalid NDF load in Ndfalign - programming error"
+            error "Invalid NDF Set load in Ndfalign - programming error"
          }
 
-#  Check that we are being asked to load a valid NDF.
-         if { [ catch { $ndfob validndf } valid ] } {
-            error "ndfview loadndf: \"$ndfob\" is not an ndf object."
-         } elseif { ! $valid } {
-            error "ndfview loadndf: \"$ndfob\" represents an invalid NDF."
+#  Ensure that we have a valid NDF Set object to load.
+         if { ! [ catch { $ndfob validndfset } valid ] } {
+            if { $valid } {
+               set ndfsetob $ndfob
+            } else {
+               error "ndfview loadndf: \"$ndfob\" is an invalid ndf."
+            }
+         } elseif { ! [ catch { $ndfob validndf } valid ] } {
+            if { $valid } {
+               set ndfsetob [ ndfset $ndfob ]
+            } else {
+               error "ndfview loadndf: \"$ndfob\" is an invalid ndfset."
+            }
+         } else {
+            error "ndfview loadndf: \"$ndfob\" is neither an ndf nor a ndfset."
          }
 
-#  Get NDF bounds and ensure it is two-dimensional.
-         set bounds [ $ndfob bounds ]
-         if { [ llength $bounds ] != 2 } {
-            error "NDF should be an image but has $ndim dimensions."
-         }
-
-#  Store the ndf object.
-         set ndf($slot) $ndfob
+#  Store the NDF Set object.
+         set ndfset($slot) $ndfsetob
+         set nndf($slot) [ $ndfsetob nndf ]
          set wcsframe($slot) $frame
 
 #  Validate and store the display percentiles.
@@ -197,32 +210,56 @@
          set percentiles($slot) $percs
 
 #  Get the NDF name and make a shortened version.
-         set ndfname($slot) [ $ndf($slot) name ]
-         regsub {.*[./]} $ndfname($slot) {} ndfshort($slot)
+         set fullname($slot) [ $ndfset($slot) name ]
+         regsub {.*[./]} $fullname($slot) {} shortname($slot)
 
-#  Write info string substitution variables.
-         set infodata($slot,f) [ $ndf($slot) frameatt Domain $wcsframe($slot) ]
-         set infodata($slot,N) $ndfname($slot)
-         set infodata($slot,n) $ndfshort($slot)
-         set infodata($slot,h) [ expr [ lindex [ lindex $bounds 0 ] 1 ] - \
-                                      [ lindex [ lindex $bounds 0 ] 0 ] + 1 ]
-         set infodata($slot,w) [ expr [ lindex [ lindex $bounds 1 ] 1 ] - \
-                                      [ lindex [ lindex $bounds 1 ] 0 ] + 1 ]
-         set infodata($slot,b) {}
-         append infodata($slot,b) \
-            [ expr [ lindex [ lindex $bounds 0 ] 0 ] ] ":" \
-            [ expr [ lindex [ lindex $bounds 0 ] 1 ] ] "," \
-            [ expr [ lindex [ lindex $bounds 1 ] 0 ] ] ":" \
-            [ expr [ lindex [ lindex $bounds 1 ] 1 ] ]
+#  Write info string substitution variables.  We take the opportunity
+#  here to verify that all NDFs are two-dimensional.
+         set infodata($slot,f) \
+             [ $ndfset($slot) frameatt Domain $wcsframe($slot) ]
+         set infodata($slot,N) $fullname($slot)
+         set infodata($slot,n) $shortname($slot)
+         if { $nndf($slot) == 1 } {
+            set bounds [ $ndfsetob ndfdo 0 bounds ]
+            set ndim [ llength $bounds ]
+            if { $ndim != 2 } {
+               set name [ $ndfsetob ndfdo 0 name ]
+               error "NDF $name has $ndim dimensions instead of 2."
+            }
+            set x1 [ lindex [ lindex $bounds 0 ] 0 ]
+            set x2 [ lindex [ lindex $bounds 0 ] 1 ]
+            set y1 [ lindex [ lindex $bounds 1 ] 0 ]
+            set y2 [ lindex [ lindex $bounds 1 ] 1 ]
+            set infodata($slot,b) "\[$x1:$x2,$y1:$y2\]"
+            set infodata($slot,p) \
+               "[ expr $x2 - $x1 + 1 ] x [ expr $y2 - $y1 + 1 ]"
+        } else {
+            set infodata($slot,b) ""
+            set npix 0
+            for { set i 0 } { $i < $nndf($slot) } { incr i } {
+               set bounds [ $ndfsetob ndfdo $i bounds ]
+               set ndim [ llength $bounds ]
+               if { $ndim != 2 } {
+                  set name [ $ndfsetob ndfdo $i name ]
+                  error "NDF $name has $ndim dimensions instead of 2"
+               }
+               set x1 [ lindex [ lindex $bounds 0 ] 0 ]
+               set x2 [ lindex [ lindex $bounds 0 ] 1 ]
+               set y1 [ lindex [ lindex $bounds 1 ] 0 ]
+               set y2 [ lindex [ lindex $bounds 1 ] 1 ]
+               incr npix [ expr ( $x2 - $x1 + 1 ) * ( $y2 - $y1 + 1 ) ]
+            }
+            set infodata($slot,p) "$npix pixels"
+        }
 
 #  Store coordinates of the bounding box in the frame we are using.
-         set bbox [ $ndf($slot) bbox $wcsframe($slot) ]
+         set bbox [ $ndfset($slot) bbox $wcsframe($slot) ]
          set xlo($slot) [ lindex [ lindex $bbox 0 ] 0 ]
          set xhi($slot) [ lindex [ lindex $bbox 0 ] 1 ]
          set ylo($slot) [ lindex [ lindex $bbox 1 ] 0 ]
          set yhi($slot) [ lindex [ lindex $bbox 1 ] 1 ]
 
-#  Record that this slot is occupied by a valid NDF.
+#  Record that this slot is occupied by a valid image.
          set present($slot) 1
 
 #  Initialise some variables to clean values.
@@ -232,16 +269,16 @@
 #  If we have two NDFs then it's time to worry about details of the display.
          if { $present(A) && $present(B) } {
 
-#  Compare the pixel sizes of the two NDFs in their selected frames.
-            set pa [ $ndf(A) pixelsize $wcsframe(A) ]
-            set pb [ $ndf(B) pixelsize $wcsframe(B) ]
+#  Compare the pixel sizes of the two images in their selected frames.
+            set pa [ $ndfset(A) pixelsize $wcsframe(A) ]
+            set pb [ $ndfset(B) pixelsize $wcsframe(B) ]
             if { [ max [ expr $pa / $pb ] [ expr $pb / $pa ] ] > 20 } {
                ccdputs -log "  There is a gross discrepancy in pixel sizes; " \
                             "alignment will be difficult."
             }
 
 #  Change the pixelsize variable if pixel sizes in the frames of the
-#  currently loaded NDFs are grossly different from the currently used
+#  currently loaded images are grossly different from the currently used
 #  value.
             set psize [ max $pa $pb [ expr 1 / $pa ] [ expr 1 / $pb ] ]
             if { [ max [ expr $psize / $pixelsize ] \
@@ -333,7 +370,7 @@
       public method maxcanvas {} {
 #-----------------------------------------------------------------------
          foreach slot { A B } {
-            set bb [ $ndf($slot) bbox $wcsframe($slot) ]
+            set bb [ $ndfset($slot) bbox $wcsframe($slot) ]
             set x($slot) [ expr [ lindex [ lindex $bb 0 ] 1 ] - \
                                 [ lindex [ lindex $bb 0 ] 0 ] ]
             set y($slot) [ expr [ lindex [ lindex $bb 1 ] 1 ] - \
@@ -373,8 +410,8 @@
          foreach p [ points ] {
             set pfrm [ list [ expr [ lindex $p 1 ] - $xoff($slot) ] \
                             [ expr [ lindex $p 2 ] - $yoff($slot) ] ]
-            set ppix [ lindex [ $ndf($slot) wcstran $wcsframe($slot) $frame \
-                                $pfrm ] 0 ]
+            set ppix [ lindex [ $ndfset($slot) wcstran $wcsframe($slot) \
+                                $frame $pfrm ] 0 ]
             lappend rp [ list [ lindex $p 0 ] \
                               [ lindex $ppix 0 ] [ lindex $ppix 1 ] ]
          }
@@ -412,7 +449,7 @@
 #  is up to date with respect to the various configuration variables etc.
 
 #  Only attempt to display if we are in the active status and have two
-#  NDFs to display.
+#  images to display.
          if { $status != "active" || ! $present(A) || ! $present(B) } { 
             return 
          }
@@ -422,8 +459,8 @@
 #  the method may get called, possibly quite often, just to be sure that
 #  the display is up to date.
          if { ! [ array exists displayed ] ||
-              $displayed(A,ndfname) != $ndfname(A) || \
-              $displayed(B,ndfname) != $ndfname(B) || \
+              $displayed(A,fullname) != $fullname(A) || \
+              $displayed(B,fullname) != $fullname(B) || \
               $displayed(A,xoff) != $xoff(A) || \
               $displayed(B,xoff) != $xoff(B) || \
               $displayed(A,yoff) != $yoff(A) || \
@@ -433,19 +470,19 @@
 #  This may be time-consuming.  Post a waiting message.
             waitpush "Drawing images"
 
-#  If this pair of NDFs has not been displayed before (but not if only
+#  If this pair of images has not been displayed before (but not if only
 #  the display characteristics have changed) then update the title bar.
             if { ! [ array exists displayed ] || \
-                 $displayed(A,ndfname) != $ndfname(A) || \
-                 $displayed(B,ndfname) != $ndfname(B) } {
+                 $displayed(A,fullname) != $fullname(A) || \
+                 $displayed(B,fullname) != $fullname(B) } {
                configure -title $title
                configure -info $info
             }
 
 #  Keep a record of the attributes currently being displayed so if we
 #  are called upon to do the same again we can skip it.
-            set displayed(A,ndfname) $ndfname(A)
-            set displayed(B,ndfname) $ndfname(B)
+            set displayed(A,fullname) $fullname(A)
+            set displayed(B,fullname) $fullname(B)
             set displayed(A,xoff) $xoff(A)
             set displayed(B,xoff) $xoff(B)
             set displayed(A,yoff) $yoff(A)
@@ -468,28 +505,32 @@
 #  Make the new GWM item.
             makegwm $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ]
 
-#  Create polygons on the canvas for both NDFs.  This both provides visual
-#  feedback for the user and makes it easier to identify positions on
-#  the canvas.
+#  Create polygons on the canvas for both images.  This both provides
+#  visual feedback for the user and makes it easier to identify 
+#  positions on the canvas.
             foreach slot { A B } {
-               set vertices ""
-               foreach pt [ $ndf($slot) polygon $wcsframe($slot) ] {
-                  set cpt [ view2canv [ expr $xoff($slot) + [ lindex $pt 0 ] ] \
-                                      [ expr $yoff($slot) + [ lindex $pt 1 ] ] ]
-                  lappend vertices [ lindex $cpt 0 ] [ lindex $cpt 1 ]
+               for { set i 0 } { $i < $nndf($slot) } { incr i } {
+                  set vertices ""
+                  foreach pt [ $ndfset($slot) ndfdo $i polygon \
+                                                       $wcsframe($slot) ] {
+                     set cpt [ view2canv \
+                                  [ expr $xoff($slot) + [ lindex $pt 0 ] ] \
+                                  [ expr $yoff($slot) + [ lindex $pt 1 ] ] ]
+                     lappend vertices [ lindex $cpt 0 ] [ lindex $cpt 1 ]
+                  }
+                  eval $canvas create polygon $vertices \
+                          -fill \{\} -outline green -tags image$slot
                }
-               eval $canvas create polygon $vertices \
-                       -fill \{\} -outline green -tags image$slot
             }
          
-#  Draw the NDFs onto the GWM.
+#  Draw the images onto the GWM.
             set overlap [ \
                ndfdrawpair [ gwmname ]/GWM \
                   $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ] \
                   $zoomfactor \
-                  $ndf(A) $wcsframe(A) $xoff(A) $yoff(A) \
+                  $ndfset(A) $wcsframe(A) $xoff(A) $yoff(A) \
                   [ lindex $percentiles(A) 0 ] [ lindex $percentiles(A) 1 ] \
-                  $ndf(B) $wcsframe(B) $xoff(B) $yoff(B) \
+                  $ndfset(B) $wcsframe(B) $xoff(B) $yoff(B) \
                   [ lindex $percentiles(B) 0 ] [ lindex $percentiles(B) 1 ] \
             ]
             # $canvas create oval -5 -5 5 5 -fill yellow
@@ -518,6 +559,7 @@
 #-----------------------------------------------------------------------
          set cx [ $canvas canvasx $x ]
          set cy [ $canvas canvasy $y ]
+         set inmotion ""
 
 #  See if we are in the overlap region.
          if { $slot == "A" } { set otherslot B } else { set otherslot A }
@@ -530,9 +572,8 @@
             }
          }
 
-#  If in the overlap region, add a point, otherwise start a drag sequence.
+#  If we are in the overlap region, add a point.
          if { $olap } {
-            set inmotion ""
             set viewpos [ canv2view $cx $cy ]
             set vx [ lindex $viewpos 0 ]
             set vy [ lindex $viewpos 1 ]
@@ -540,10 +581,17 @@
             set tag mark$ipoint
             $canvas bind $tag <Button-3> [ code $this removepoint $ipoint ]
             $canvas bind $tag <Button-1> [ $canvas bind gwmitem <Button-1> ]
-         } else {
+
+#  If we are not in an overlap and no points exist, start a drag sequence.
+         } elseif { [ llength [ points ] ] == 0 } {
             set inmotion $slot
             set xlast [ set xfirst $cx ]
             set ylast [ set yfirst $cy ]
+
+#  If we are not in an overlap and points exist then do not permit dragging.
+#  Just hoot.
+         } else {
+            bell
          }
       }
 
@@ -635,11 +683,12 @@
 #  The following are arrays indexed by slot, i.e. "A" or "B", according 
 #  to which NDF they refer to.
       private variable infodata        ;# Array holding substitution strings
-      private variable ndf             ;# Tcl ndf object
-      private variable ndfname         ;# Full name of NDF
-      private variable ndfshort        ;# Short name of NDF
+      private variable fullname        ;# Full name of NDF Set
+      private variable ndfset          ;# Tcl ndf object
+      private variable nndf            ;# Number of member NDFs
       private variable percentiles     ;# Display percentiles for NDF
       private variable present         ;# Is slot occupied by a valid NDF?
+      private variable shortname       ;# Short name of NDF Set
       private variable wcsframe        ;# Frame into which NDF is resampled
       private variable xlo             ;# Lower X bounding box frame coordinate
       private variable xhi             ;# Upper X bounding box frame coordinate

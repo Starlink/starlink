@@ -7,56 +7,56 @@
 #     [incr Tk] Mega-Widget
 
 #  Purpose:
-#     Provide a method of choosing NDFs from a set.
+#     Provide a method of choosing images from a group.
 
 #  Description:
 #     This class provides a GUI which allows a user to choose pairs of
-#     NDFs from a given set.  The user is given thumbnail images and
+#     NDF Sets from a given group.  The user is given thumbnail images and
 #     some textual information (like their names) and client widgets
-#     can call methods in order to find out which NDFs have been chosen.
+#     can call methods in order to find out which images have been chosen.
 
 #  Constructor:
 #
 #     ndfchoose pathname ndf ndf ?ndf ...? ?options?
 #        An NDF chooser object is constructed in the normal way; apart
-#        from any configuration options, all arguments are existing ndf 
-#        objects which are to form the list amongst which the user can
-#        choose.  Ndf objects cannot be added to this list after 
-#        construction time.  The ndf objects form an ordered list, 
-#        and are subsequently referred to by index; the index of the 
-#        first is 1, of the second is 2, etc.
+#        from any configuration options, all arguments are existing ndf
+#        or ndfset objects representing images which are to form the 
+#        list amongst which the user can choose.  Images cannot
+#        be added to this list after construction time.  The images 
+#        form an ordered list, and are subsequently referred to by
+#        index; the index of the first is 1, of the second is 2, etc.
 
 #  Public Methods:
 #
 #     getpair
-#        Returns an ordered list of two ndf indices, indicating the pair 
-#        of NDFs which is currently selected by the user.  An invalid
-#        ndf is indicated by an empty string.  If the -validate 
+#        Returns an ordered list of two image indices, indicating the pair 
+#        of images which is currently selected by the user.  An invalid
+#        ndfset is indicated by an empty string.  If the -validate 
 #        configuration variable has been specified, and the pair does
 #        not satisfy this criterion, then a single empty string will
 #        be returned.
 #
 #     highlight index ?state?
-#        This method controls highlighting of the NDF indicated.
+#        This method controls highlighting of the image indicated.
 #        With no optional state argument it returns a value giving
 #        the current state of highlighting.  If the state argument
 #        is supplied, it will set the highlighting state to the given
 #        value.  There are currently two highlighting states available,
 #        0 and 1.  0 means not highlighted and 1 means highlighted.
-#        All NDFs start in highlighting state 0.
-#           - index     -- Index of the ndf whose state is to be set/queried
-#           - ?state?   -- State into which ndf index should be put
+#        All images start in highlighting state 0.
+#           - index     -- Index of the image whose state is to be set/queried
+#           - ?state?   -- State into which image index should be put
 #
 #     percentiles index
 #        This method returns a list giving the percentile cutoff
-#        values which are used to display each NDF.  The list has two
+#        values which are used to display each image.  The list has two
 #        elements {lo hi} where 0 <= lo <= hi <= 100.
-#           - index     -- Index of the ndf whose percentiles are required
+#           - index     -- Index of the image whose percentiles are required
 #
 #     wcsframe index
 #        This method returns the domain name of the WCS frame currently
-#        selected for the given NDF.
-#           - index     -- Index of the ndf whose frame name is required
+#        selected for the given image
+#           - index     -- Index of the image whose frame name is required
 
 #  Public Variables (Configuration Options):
 #
@@ -71,7 +71,7 @@
 #     percentiles = list
 #        A list containing two numbers between 0 and 100.  This is used 
 #        as a default percentile cutoff limit for NDF display, but the
-#        user can select different values for different NDFs.
+#        user can select different values for different images.
 #
 #     status = string
 #        A value which gives the status of the object.  It may have the
@@ -106,8 +106,16 @@
 #     viewport = list
 #        The value of the viewport variable is a list of two integers, 
 #        being the width and height in pixels of the window in which 
-#        each previewd NDF is displayed.
-#
+#        each previewed image is displayed.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+
+#  History:
+#     10-NOV-2000 (MBT):
+#        Original version.
+#     8-MAR-2001 (MBT):
+#        Upgraded for use with Sets.
 #-
 
 #  Inheritance.
@@ -125,33 +133,45 @@
       } {
 
 #  Parse the arguments: any arguments before the first one starting with
-#  a minus sign are interpreted as ndf objects, and any following are
-#  configuration options.  We happen to know that ndf objects never 
+#  a minus sign are interpreted as ndfset objects, and any following are
+#  configuration options.  We happen to know that ndfset objects never 
 #  start with a minus sign, so no ambiguities can arise.  Also validate
 #  that the arguments are what they ought to be.
-         set ndflist "<blank>"
-         set nndf 0
+         set ndfsetlist "<blank>"
+         set nndfset 0
          while { [ llength $args ] > 0 && \
                  [ string index [ lindex $args 0 ] 0 ] != "-" } {
-            set ndf [ lindex $args 0 ]
-            if { [ catch { $ndf validndf } ] } {
-               error "Argument \"$ndf\" is not a valid ndf object."
+            set ndfob [ lindex $args 0 ]
+            if { ! [ catch { $ndfob validndfset } valid ] } {
+               if { $valid } {
+                  set ndfset $ndfob
+               } else {
+                  error "Argument \"$ndfob\" is an invalid ndf."
+               }
+            } elseif { ! [ catch { $ndfob validndfset } valid ] } {
+               if { $valid } {
+                  set ndfset [ ndfset $ndfob ]
+               } else {
+                  error "Argument \"$ndfob\" is an invalid ndfset."
+               }
+            } else {
+               error "Argument \"$ndfob\" is not an ndf or an ndfset object."
             }
-            set highlight([incr nndf]) 0
-            lappend ndflist $ndf
+            set highlight([incr nndfset]) 0
+            lappend ndfsetlist $ndfset
             set args [ lreplace $args 0 0 ]
          }
-         if { $nndf == 0 } {
-            error "No ndf objects supplied"
+         if { $nndfset == 0 } {
+            error "No ndfset objects supplied"
          }
 
-#  Initialise values of selected NDFs.
+#  Initialise values of selected images.
          set inview(A) ""
          set inview(B) ""
 
 #  Set the list of all available FITS header lines.  Use those from the 
-#  first named NDF as an example.
-         set allfits [ [ lindex $ndflist 1 ] fitshead ]
+#  first named NDF in the first NDF Set as an example.
+         set allfits [ [ lindex $ndfsetlist 1 ] ndfdo 0 fitshead ]
 
 #  Add control groups to the control panel.
          addgroup style Style
@@ -198,8 +218,8 @@
          addcontrol $itk_component(done) action
 
 #  Construct the choosing area.  This is the business end of the widget
-#  and consists of two tabsets and two frames in which NDFs can be 
-#  displayed.  Each window is drawn once for each of the NDFs under the
+#  and consists of two tabsets and two frames in which images can be 
+#  displayed.  Each window is drawn once for each of the images under the
 #  widget's control, and this window is mapped or unmapped in one of
 #  the frames by a geometry manager according to what the user selects.
 #  First set a container frame within which all this display will happen.
@@ -208,7 +228,7 @@
             frame $interior.choosearea
          }
 
-#  Set the dimensions of the windows to hold NDFs.
+#  Set the dimensions of the windows to hold images.
          set viewx [ lindex $viewport 0 ]
          set viewy [ lindex $viewport 1 ]
 
@@ -253,7 +273,7 @@
 
 #  Add selection tabs to both tabsets for each of the NDFs.
             $itk_component(tabs$slot) add -label "<blank>" -state disabled
-            for { set i 1 } { $i < [ llength $ndflist ] } { incr i } {
+            for { set i 1 } { $i < [ llength $ndfsetlist ] } { incr i } {
                $itk_component(tabs$slot) add -label " "
             }
 
@@ -262,7 +282,7 @@
             pack $itk_component(tabs$slot) -side $side($slot) -fill y -anchor n
             pack $itk_component(ndf$slot) -side $side($slot)
 
-#  Set the initially selected NDFs to blank ones.
+#  Set the initially selected images to blank ones.
             ndfselect $slot 0
          }
 
@@ -273,8 +293,8 @@
          pack $itk_component(choosearea) -side top
 
 #  Generate frames which will contain the windows to be displayed for each
-#  of the NDFs.
-         for { set i 0 } { $i < $nndf } { incr i } {
+#  of the images.
+         for { set i 0 } { $i < $nndfset } { incr i } {
             itk_component add image$i {
                frame $itk_component(choosearea).image$i \
                          -width $viewx -height $viewy
@@ -311,7 +331,7 @@
 #-----------------------------------------------------------------------
       public method highlight { index { state "" } } {
 #-----------------------------------------------------------------------
-         if { $index < 1 || $index > $nndf } {
+         if { $index < 1 || $index > $nndfset } {
             error "Highlight index out of range"
          }
          if { $state ==  "" } {
@@ -350,8 +370,8 @@
          }
          if { $retval == "" } {
             if { $index != "A" && $index != "B" } {
-               set ndf [ lindex $ndflist $index ]
-               set retval [ $ndf frameatt Domain CURRENT ]
+               set ndfset [ lindex $ndfsetlist $index ]
+               set retval [ $ndfset frameatt Domain CURRENT ]
             }
          }
          return $retval
@@ -371,7 +391,7 @@
 
          if { [ lindex $args 0 ] == "all" } {
             set args {}
-            for { set i 1 } { $i <= $nndf } { incr i } {
+            for { set i 1 } { $i <= $nndfset } { incr i } {
                lappend args $i
             }
          }
@@ -387,7 +407,7 @@
                   $itk_component(tabsB) tabconfigure $i -state disabled
                }
                highlighted {
-                  set name [ [ lindex $ndflist $i ] name ]
+                  set name [ [ lindex $ndfsetlist $i ] name ]
                   $itk_component(tabsA) tabconfigure $i \
                       -label "$name +" \
                       -font "helvetica -12 bold"
@@ -396,7 +416,7 @@
                       -font "helvetica -12 bold"
                }
                unhighlighted {
-                  set name [ [ lindex $ndflist $i ] name ]
+                  set name [ [ lindex $ndfsetlist $i ] name ]
                   $itk_component(tabsA) tabconfigure $i \
                       -label "$name   " \
                       -font "helvetica -12 normal"
@@ -422,16 +442,16 @@
 
 #  Validate the index argument.
          if { $index == "A" } {
-            set isndf 0
+            set isndfset 0
             set side left
             set textpos "-y 10 -relx 0 -x 10 -anchor nw"
          } elseif { $index == "B" } {
-            set isndf 0
+            set isndfset 0
             set side right
             set textpos "-y 10 -relx 1 -x -10 -anchor ne"
          } elseif { $index > 0 } {
-            set isndf 1
-            set ndf [ lindex $ndflist $index ]
+            set isndfset 1
+            set ndfset [ lindex $ndfsetlist $index ]
          } else {
             error "Invalid index argument \"$index\" to ndfplotwindow"
          }
@@ -443,7 +463,7 @@
 #  Get characteristics of the plot.
             set width [ lindex $viewport 0 ]
             set height [ lindex $viewport 1 ]
-            if { $isndf } {
+            if { $isndfset } {
                set percs [ percentiles $index ]
                set wcsframe [ wcsframe $index ]
             } else {
@@ -474,10 +494,10 @@
                       [ expr "{$index}" == "{1}" ]
 
 #  Create the GWM widget.
-            if { $isndf } {
+            if { $isndfset } {
 
 #  Display might be time-consuming: post a busy window.
-               waitpush "Drawing image [ $ndf name ]"
+               waitpush "Drawing image [ $ndfset name ]"
 
 #  Construct the GWM widget.
                set gwmname [ winfo id $itk_component(choosearea) ]_$index
@@ -488,34 +508,16 @@
                       -name $gwmname
                }
 
-#  Get the percentile values.
-               set scalevals [ $ndf percentile [ lindex $percs 0 ] \
-                                               [ lindex $percs 1 ] ]
-
 #  Plot the NDF inside the GWM.
                set options {border=1 drawtitle=0 textlab=0 tickall=1 \
                             colour=3 colour(numlab)=5 colour(border)=4}
                lappend options $displaystyle
-               $ndf display -resamp "$gwmname/GWM" \
-                            [ lindex $scalevals 0 ] [ lindex $scalevals 1 ] \
-                            $wcsframe [ join $options "," ]
-
-             # set devname "xw;$gwmname"
-             # taskrun lutable \
-             #    "coltab=grey mapping=linear device=$devname reset"
-             # taskrun display " \
-             #       in=[ $ndf name ] \
-             #       device=$devname \
-             #       scale=true \
-             #       mode=scale \
-             #       low=[ lindex $scalevals 0 ] \
-             #       high=[ lindex $scalevals 1 ] \
-             #       margin=0 \
-             #       style=\"drawtitle=0,tickall=1,$displaystyle\" \
-             #    "
+               $ndfset display -resamp "$gwmname/GWM" \
+                               [ lindex $percs 0 ] [ lindex $percs 1 ] \
+                               $wcsframe [ join $options "," ]
 
 #  It may be a good idea to unmap the NDF here (although it may not).
-               $ndf mapped 0
+               $ndfset mapped 0
 
 #  Remove the busy window.
                waitpop
@@ -527,7 +529,8 @@
                       -width $width \
                       -height $height
                }
-               set msg "Use the tabs to\npick an NDF for\ndisplay on the $side"
+               set msg \
+                  "Use the tabs to\npick an image for\ndisplay on the $side"
                itk_component add plot$index:instructions {
                   label $itk_component(plot$index:display).instruct$index \
                      -justify $side -text $msg
@@ -561,17 +564,17 @@
       private method ndfinfowindow { index } {
 #-----------------------------------------------------------------------
 #  This method returns the name of a window which contains textual 
-#  annotations for the drawn NDF, i.e. its name, applicable FITS headers,
+#  annotations for the drawn image, i.e. its name, applicable FITS headers,
 #  etc.  The argument may be either the numerical index of one of the
-#  ndfs in the list, or a slot name (A or B).  In the latter case, a 
+#  images in the list, or a slot name (A or B).  In the latter case, a 
 #  suitable blank window will be returned.
 
 #  Validate the index argument.
          if { $index == "A" || $index == "B" } {
-            set isndf 0
+            set isndfset 0
          } elseif { $index > 0 } {
-            set isndf 1
-            set ndf [ lindex $ndflist $index ]
+            set isndfset 1
+            set ndfset [ lindex $ndfsetlist $index ]
          } else {
             error "Invalid index argument \"$index\" to ndfinfowindow"
          }
@@ -603,12 +606,24 @@
             set dims ""
             set name ""
             set val ""
-            if { $isndf } { 
-               set name [ $ndf name ]
-               foreach dim [ $ndf bounds ] {
-                  append dims "[ lindex $dim 0 ]:[ lindex $dim 1 ] x "
+            if { $isndfset } { 
+               set name [ $ndfset name ]
+               if { [ $ndfset nndf ] == 1 } {
+                  foreach dim [ $ndfset ndfdo 0 bounds ] {
+                     append dims "[ lindex $dim 0 ]:[ lindex $dim 1 ] x "
+                  }
+                  regsub " x $" $dims "" dims
+               } else {
+                  set dims 0
+                  for { set i 0 } { $i < [ $ndfset nndf ] } { incr i } {
+                     set npix 1
+                     foreach dim [ $ndfset ndfdo $i bounds ] {
+                        set npix [ expr $npix * ( [ lindex $dim 1 ] - \
+                                                  [ lindex $dim 0 ] + 1 ) ]
+                     }
+                     incr dims $npix
+                  }
                }
-               regsub " x $" $dims "" dims
             }
 
 #  Construct a set of labelled widgets containing the information.
@@ -617,7 +632,7 @@
 #  Construct a list of key, value pairs to be displayed in the text region.
             set pairs {}
             lappend pairs [ list "Name" $name ]
-            lappend pairs [ list "Dimensions" $dims ]
+            lappend pairs [ list "Pixels" $dims ]
             if { ! $choosepercentiles } {
                lappend pairs [ list "Display cutoff" \
                             "[ lindex $percval 0 ]% - [ lindex $percval 1]%" ]
@@ -627,8 +642,8 @@
             }
             foreach fh $showfits {
                set key [ lindex $fh 1 ]
-               if { $isndf } {
-                  set val [ lindex [ $ndf fitshead $key ] 0 ]
+               if { $isndfset } {
+                  set val [ lindex [ $ndfset ndfdo 0 fitshead $key ] 0 ]
                }
                lappend pairs [ list "FITS $key" $val ]
             }
@@ -642,7 +657,7 @@
                   iwidgets::labeledwidget \
                      $itk_component(info$index).w$key -labeltext "$keytext:"
                }
-               if { $isndf } {
+               if { $isndfset } {
                   itk_component add info$index:val_$key {
                      label [ $itk_component(info$index:key_$key) \
                              childsite ].val \
@@ -660,7 +675,7 @@
                      $itk_component(info$index).wpercentile \
                      -labeltext "Display cutoff:"
                }
-               if { $isndf } {
+               if { $isndfset } {
                   itk_component add info$index:val_percentile {
                      percentilecontrol [ \
                         $itk_component(info$index:key_percentile) \
@@ -684,7 +699,7 @@
                   iwidgets::labeledwidget $itk_component(info$index).wwcsframe \
                      -labeltext "WCS frame:"
                }
-               if { $isndf } {
+               if { $isndfset } {
                   itk_component add info$index:val_wcsframe {
                      wcsframecontrol [ \
                         $itk_component(info$index:key_wcsframe) childsite ].val
@@ -692,7 +707,7 @@
                   set wcsframecontrol($index) \
                      $itk_component(info$index:val_wcsframe)
                   $wcsframecontrol($index) configure \
-                     -ndf $ndf \
+                     -ndf $ndfset \
                      -value $wcsval \
                      -command [ code $this refresh $index ]
                   lappend controls $wcsframecontrol($index)
@@ -744,7 +759,7 @@
       private method ndfselect { slot index } {
 #-----------------------------------------------------------------------
 #  If item is zero, this indicates a blank window.  Otherwise, it is the
-#  window corresponding to the indicated NDF.
+#  window corresponding to the indicated image.
          $itk_component(gotpair) configure -state disabled
          if { $slot == "A" } { set otherslot B } else { set otherslot A }
          if { $inview($slot) != "" } {
@@ -882,7 +897,7 @@
                $itk_component(view$slot) configure \
                    -width [ lindex $viewport 0 ] -height [ lindex $viewport 1 ]
             }
-            for { set i 0 } { $i < $nndf } { incr i } {
+            for { set i 0 } { $i < $nndfset } { incr i } {
                $itk_component(image$i) configure \
                    -width [ lindex $viewport 0 ] -height [ lindex $viewport 1 ]
             }
@@ -941,15 +956,15 @@
 ########################################################################
       private variable allfits         ;# List of available FITS header lines
       private variable highlight       ;# Array by ndf index of highlight state
-      private variable inview          ;# Array by slot of viewed NDFs
+      private variable inview          ;# Array by slot of viewed images
       private variable noted           ;# Array containing info characteristics
       private variable lastvp { 0 0 }  ;# Last value of viewport variable
-      private variable nndf            ;# Number of NDFs under chooser control
-      private variable ndflist         ;# List of ndf objects
-      private variable percentilecontrol;# Perc control widgets for each NDF
+      private variable nndfset         ;# Number of images under chooser control
+      private variable ndfsetlist      ;# List of ndfset objects
+      private variable percentilecontrol;# Perc control widgets for each image
       private variable plotted         ;# Array containing plot characteristics
-      private variable showfits {}     ;# FITS headers to display for each NDF 
-      private variable wcsframecontrol ;# Frame control widgets for each NDF
+      private variable showfits {}     ;# FITS headers to display for each image
+      private variable wcsframecontrol ;# Frame control widgets for each image
 
       private common CCDdir $env(CCDPACK_DIR)
 
