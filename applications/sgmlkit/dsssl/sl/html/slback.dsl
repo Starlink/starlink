@@ -131,6 +131,13 @@ the data of the CITATION element.
   (element bibliography
     (make-section-reference title: (literal "Bibliography"))))
 
+<misccode>
+<description>
+Linking support.  Create a page listing all the exported IDs in the document,
+so that document authors can find them in once place.
+<codebody>
+; nothing yet
+
 <codereference doc="lib.dsl" id="code.lib">
 <title>Library code
 <description>

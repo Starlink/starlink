@@ -96,7 +96,7 @@ the current node.
 	 (fragid (if (or (chunk? target)
 			 (not id))
 		     ""
-		     (string-append "#" id))))
+		     (string-append "#xref_" id))))
     (if reffrag
 	(string-append url fragid)
 	url)))
