@@ -3,7 +3,7 @@
 package libscb;
 require Exporter;
 @ISA = qw/Exporter/;
-@EXPORT = qw/tarxf popd pushd/;
+@EXPORT = qw/tarxf popd pushd module_name/;
 
 use Cwd;
 
@@ -69,6 +69,47 @@ sub tarxf {
 }
 
 ########################################################################
+sub module_name {
+
+#  Examines a line of source code to see whether it identifies the 
+#  start of an indexable module (e.g. Fortran SUBROUTINE or FUNCTION).
+#  Returns the name if so, or undef otherwise.
+#
+#  Note the parsing is not perfect - it would be fooled for instance
+#  by a subroutine definition in which the name of the subroutine was
+#  split between continuation lines.
+#
+#  Probably this could be made (much) more efficient, but it's not
+#  expected that this code should have to be run very often.
+
+#  Arguments.
+
+   local $_ = shift || $_;    #  $_ used if none specified.
+
+#  Local constants.
+
+   my @ftypes = qw/INTEGER REAL DOUBLEPRECISION COMPLEX LOGICAL
+                    CHARACTER BYTE UBYTE WORD UWORD/;
+   my $ftypdef = '(' . join ('|', @ftypes) . ')\**(\([^\)]\))?[0-9]*';
+
+#  Strip lines of syntactically uninteresting parts.
+
+   return (undef) if (/^[*cC]/);     # Ignore F77 comments.
+   s/!.*$//;                         # Discard inline comments.
+   chomp;                            # Discard end of line character.
+   s/^......//;                      # Discard first six characters.
+   s/ //g;                           # Remove spaces.
+   return (undef) unless ($_);       # Ignore empty lines.
+   tr/a-z/A-Z/;                      # Fold case to upper.
+   s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
+
+   ($type, $name) = /^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(]+)/;
+
+   return $name;
+}
+
+
+########################################################################
 sub pushd {
 
 #  Pushd does the same thing as its C-shell namesake.
@@ -86,5 +127,6 @@ sub popd {
    my $dir = pop @dirstack;
    chdir $dir or die "Couldn't change directory to $dir\n";
 }
+
 
 1;
