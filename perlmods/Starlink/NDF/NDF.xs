@@ -1,12 +1,12 @@
 /*
 
 
-    NDF.xs v1.0
+    NDF.xs v1.2
 
 
     perl-NDF glue 
 
-    NDF, ERR, MSG complete
+    NDF, ERR, MSG, DAT, CMP, HDS complete
 
  */
 #ifdef __cplusplus
@@ -20,7 +20,6 @@ extern "C" {
 #endif
 
 /* The array handling code can be included here */
-
 /* Deal with the packing of perl arrays to C pointers */
 
 #include "arrays/arrays.h"
@@ -34,9 +33,12 @@ extern "C" {
 
 #include "dat_par.h"
 #include "sae_par.h"
+
+/*
 #include "err_err.h"
 #include "ems_err.h"
 #include "msg_par.h"
+*/
 
 /* These come from ndf_par which should have a .h file...*/
 #ifdef MSG__SZMSG
@@ -45,22 +47,64 @@ extern "C" {
 #define NDF__SZHIS   72
 
 
+/* This is here for linux when building the sharable library */
+/* libf2c seems to want it */
+
+void MAIN__ () {
+   /* Cheat to define MAIN__ symbol */
+   croak("This should never happen");
+}
+
+/* This is to prevent a call to getarg_ on the alpha */
+/* It seems that the alpha routine has a segmentation violation when */
+/* called from a C main() */
+
+/* Comment this out if it clashes with your fortran version */
+/* This code is called whenever the HISTORY component is updated */
+
+#include "getarg.c" 
+
+
+/* Setup typedefs for the C to Fortran conversion */
+/* Protects against 64 bit problems */
+/* Firstly define the C -> Fortran conversion */
+/* Need to make sure that ints are 32bit for starlink software */
+
+typedef int    ndfint;
+typedef float  ndffloat;
+typedef double ndfdouble;
+
+typedef I32 Logical;
+
+/* Also need to define the packing types i,f,s etc as used in the */
+/*   typemap and in arrays.c */
+/* Just use 'i' 'f' and 'd' at the moment */
+/* Will need to change arrays.c if a system uses a 64 bit 'int' */
+
+#define PACKI32 'i'
+#define PACKF   'f'
+#define PACKD   'd'
+
 /* Set up some new variable types for using HDS locators */
+/* Now define the locator type */
 
-typedef char  locator;
-typedef int Logical;
+typedef char locator;
 
 
-/* Need to define variables for these CPP parameters */
+
+
+/* Need to define variables for these CPP parameters 
+   as they are used in the typemaps */
 static STRLEN  datszloc = DAT__SZLOC;
-static char datroot[DAT__SZLOC]  = DAT__ROOT;
+static locator datroot[DAT__SZLOC]  = DAT__ROOT;
+
 
 
 /* Create some static workspace for strings */
 #define FCHAR 512       /* Size of Fortran character string */
 static char str1[FCHAR];
 static char str2[FCHAR];
-static char floc[DAT__SZLOC];
+static locator floc[DAT__SZLOC];
 
 
 /* This stuff is from h2xs */
@@ -96,16 +140,79 @@ int arg;
 
   case 'E':
 
-    if (strEQ(name, "EMS__OPTER")) return ((double)EMS__OPTER);
-    if (strEQ(name, "EMS__NOMSG")) return ((double)EMS__NOMSG);
-    if (strEQ(name, "EMS__UNSET")) return ((double)EMS__UNSET);
-    if (strEQ(name, "EMS__BADOK")) return ((double)EMS__BADOK);
-    if (strEQ(name, "EMS__NSTER")) return ((double)EMS__NSTER);
-    if (strEQ(name, "EMS__BDKEY")) return ((double)EMS__BDKEY);
-    if (strEQ(name, "EMS__BTUNE")) return ((double)EMS__BTUNE);
-    if (strEQ(name, "EMS__NOENV")) return ((double)EMS__NOENV);
-    if (strEQ(name, "EMS__EROVF")) return ((double)EMS__EROVF);
-    if (strEQ(name, "EMS__CXOVF")) return ((double)EMS__CXOVF);
+    /* err_par.h */
+
+    if (strEQ(name, "EMS__OPTER")) 
+#   ifdef EMS__OPTER
+      return ((double)EMS__OPTER);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__NOMSG")) 
+#   ifdef EMS__NOMSG
+      return ((double)EMS__NOMSG);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__UNSET")) 
+#   ifdef EMS__UNSET
+      return ((double)EMS__UNSET);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__BADOK")) 
+#   ifdef EMS__BADOK
+      return ((double)EMS__BADOK);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__NSTER")) 
+#   ifdef EMS__NSTER
+      return ((double)EMS__NSTER);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__BDKEY")) 
+#   ifdef EMS__BDKEY
+      return ((double)EMS__BDKEY);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__BTUNE")) 
+#   ifdef EMS__BTUNE
+      return ((double)EMS__BTUNE);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__NOENV")) 
+#   ifdef EMS__NOENV
+      return ((double)EMS__NOENV);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__EROVF")) 
+#   ifdef EMS__EROVF
+      return ((double)EMS__EROVF);
+#   else
+      goto not_there;
+#   endif
+
+    if (strEQ(name, "EMS__CXOVF")) 
+#   ifdef EMS__CXOVF
+      return ((double)EMS__CXOVF);
+#   else
+      goto not_there;
+#   endif
+
+      /*  err_par.h */
 
     if (strEQ(name, "ERR__OPTER"))
 #   ifdef ERR__OPTER
@@ -242,6 +349,7 @@ stringCtof77 (char*c, int len) {
    }
  
 }
+
  
  
 MODULE = NDF    PACKAGE = NDF
@@ -280,11 +388,11 @@ constant(name,arg)
 
 void
 ndf_acget(indf, comp, iaxis, value, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
+  ndfint &iaxis
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
    strncpy(str1, value, sizeof(str1));/* Copy value to temp */
@@ -297,11 +405,11 @@ ndf_acget(indf, comp, iaxis, value, status)
 
 void
 ndf_aclen(indf, comp, iaxis, length, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
-  int length = NO_INIT
-  int &status
+  ndfint &iaxis
+  ndfint length = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$ 
  CODE:
    ndf_aclen_(&indf, comp, &iaxis, &length, &status, strlen(comp));
@@ -312,10 +420,10 @@ ndf_aclen(indf, comp, iaxis, length, status)
 void
 ndf_acmsg(token, indf, comp, iaxis, status)
   char * token
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
-  int &status
+  ndfint &iaxis
+  ndfint &status
  PROTOTYPE: $$$$$ 
  CODE:
   ndf_acmsg_(token, &indf, comp, &iaxis, &status, strlen(token), strlen(comp));
@@ -325,10 +433,10 @@ ndf_acmsg(token, indf, comp, iaxis, status)
 void
 ndf_acput(value, indf, comp, iaxis, status)
   char * value
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
-  int &status
+  ndfint &iaxis
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_acput_(value, &indf, comp, &iaxis, &status, strlen(value), strlen(comp));
@@ -337,8 +445,8 @@ ndf_acput(value, indf, comp, iaxis, status)
 
 void
 ndf_acre(indf, status)
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   ndf_acre_(&indf, &status);
@@ -347,11 +455,11 @@ ndf_acre(indf, status)
 
 void
 ndf_aform(indf, comp, iaxis, form, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
+  ndfint &iaxis
   char * form = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
    form = str1;
@@ -363,14 +471,14 @@ ndf_aform(indf, comp, iaxis, form, status)
 
 void
 ndf_amap(indf, comp, iaxis, type, mmod, pntr, el, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
+  ndfint &iaxis
   char * type
   char * mmod
-  int &pntr = NO_INIT
-  int &el   = NO_INIT
-  int &status
+  ndfint &pntr = NO_INIT
+  ndfint &el   = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$$$$
  CODE:
   ndf_amap_(&indf, comp, &iaxis, type, mmod, &pntr, &el, &status, strlen(comp), strlen(type), strlen(mmod));
@@ -381,10 +489,10 @@ ndf_amap(indf, comp, iaxis, type, mmod, pntr, el, status)
 
 void
 ndf_anorm(indf, iaxis, norm, status)
-  int &indf
-  int &iaxis
+  ndfint &indf
+  ndfint &iaxis
   Logical &norm = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_anorm_(&indf, &iaxis, &norm, &status);
@@ -394,10 +502,10 @@ ndf_anorm(indf, iaxis, norm, status)
 
 void
 ndf_arest(indf, comp, iaxis, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
-  int &status
+  ndfint &iaxis
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_arest_(&indf, comp, &iaxis, &status, strlen(comp));
@@ -407,9 +515,9 @@ ndf_arest(indf, comp, iaxis, status)
 void
 ndf_asnrm(norm, indf, iaxis, status)
   Logical &norm
-  int &indf
-  int &iaxis
-  int &status
+  ndfint &indf
+  ndfint &iaxis
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_asnrm_(&norm, &indf, &iaxis, &status);
@@ -420,8 +528,8 @@ ndf_asnrm(norm, indf, iaxis, status)
 #ndf_assoc(param, mode, indf, status)
 #  char * param
 #  char * mode
-#  int &indf = NO_INIT
-#  int &status
+#  ndfint &indf = NO_INIT
+#  ndfint &status
 # PROTOTYPE: $$$$
 # CODE:
 #  ndf_assoc_(param, mode, &indf, &status, strlen(param), strlen(mode));
@@ -431,11 +539,11 @@ ndf_asnrm(norm, indf, iaxis, status)
 
 void
 ndf_astat(indf, comp, iaxis, state, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
+  ndfint &iaxis
   Logical &state = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_astat_(&indf, comp, &iaxis, &state, &status, strlen(comp));
@@ -446,10 +554,10 @@ ndf_astat(indf, comp, iaxis, state, status)
 void
 ndf_astyp(type, indf, comp, iaxis, status)
   char * type
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
-  int &status
+  ndfint &iaxis
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_astyp_(type, &indf, comp, &iaxis, &status, strlen(type), strlen(comp));
@@ -458,11 +566,11 @@ ndf_astyp(type, indf, comp, iaxis, status)
 
 void
 ndf_atype(indf, comp, iaxis, type, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
+  ndfint &iaxis
   char * type = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
    type = str1;
@@ -474,10 +582,10 @@ ndf_atype(indf, comp, iaxis, type, status)
 
 void
 ndf_aunmp(indf, comp, iaxis, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &iaxis
-  int &status
+  ndfint &iaxis
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
    ndf_aunmp_(&indf, comp, &iaxis, &status, strlen(comp));
@@ -486,11 +594,11 @@ ndf_aunmp(indf, comp, iaxis, status)
 
 void
 ndf_bad(indf, comp, check, bad, status)
-  int &indf
+  ndfint &indf
   char * comp
   Logical &check
   Logical &bad = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_bad_(&indf, comp, &check, &bad, &status, strlen(comp));
@@ -500,9 +608,9 @@ ndf_bad(indf, comp, check, bad, status)
 
 void
 ndf_bb(indf, badbit, status)
-  int &indf
+  ndfint &indf
   unsigned char &badbit = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_bb_(&indf, &badbit, &status);
@@ -512,12 +620,12 @@ ndf_bb(indf, badbit, status)
 
 void
 ndf_block(indf1, ndim, mxdim, iblock, indf2, status)
-  int &indf1
-  int &ndim
-  int * mxdim
-  int &iblock
-  int &indf2 = NO_INIT
-  int &status
+  ndfint &indf1
+  ndfint &ndim
+  ndfint * mxdim
+  ndfint &iblock
+  ndfint &indf2 = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$$
  CODE:
   ndf_block_(&indf1, &ndim, mxdim, &iblock, &indf2, &status);
@@ -527,19 +635,19 @@ ndf_block(indf1, ndim, mxdim, iblock, indf2, status)
 
 void
 ndf_bound(indf, ndimx, lbnd, ubnd, ndim, status)
-  int &indf
-  int &ndimx
-  int * lbnd = NO_INIT
-  int * ubnd = NO_INIT
-  int &ndim = NO_INIT
-  int &status
+  ndfint &indf
+  ndfint &ndimx
+  ndfint * lbnd = NO_INIT
+  ndfint * ubnd = NO_INIT
+  ndfint &ndim = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@\@$$
  CODE:
-  lbnd = get_mortalspace(ndimx, 'i'); /* Dynamically allocate C array */
-  ubnd = get_mortalspace(ndimx,'i'); /* Dynamically allocate C array */
+  lbnd = get_mortalspace(ndimx, PACKI32); /* Dynamically allocate C array */
+  ubnd = get_mortalspace(ndimx,PACKI32); /* Dynamically allocate C array */
   ndf_bound_(&indf, &ndimx, lbnd, ubnd, &ndim, &status);
-  unpack1D( (SV*)ST(2), (void *)lbnd, 'i', ndim);
-  unpack1D( (SV*)ST(3), (void *)ubnd, 'i', ndim);
+  unpack1D( (SV*)ST(2), (void *)lbnd, PACKI32, ndim);
+  unpack1D( (SV*)ST(3), (void *)ubnd, PACKI32, ndim);
  OUTPUT:
   lbnd
   ubnd
@@ -548,10 +656,10 @@ ndf_bound(indf, ndimx, lbnd, ubnd, ndim, status)
 
 void
 ndf_cget(indf, comp, value, status)
-  int &indf
+  ndfint &indf
   char * comp
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
    strncpy(str1, value, sizeof(str1));
@@ -564,11 +672,11 @@ ndf_cget(indf, comp, value, status)
 
 void
 ndf_chunk(indf1, mxpix, ichunk, indf2, status)
-  int &indf1
-  int &mxpix
-  int &ichunk
-  int &indf2 = NO_INIT
-  int &status
+  ndfint &indf1
+  ndfint &mxpix
+  ndfint &ichunk
+  ndfint &indf2 = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_chunk_(&indf1, &mxpix, &ichunk, &indf2, &status);
@@ -580,9 +688,9 @@ ndf_chunk(indf1, mxpix, ichunk, indf2, status)
 #void
 #ndf_cinp(param, indf, comp, status)
 #  char * param
-#  int &indf
+#  ndfint &indf
 #  char * comp
-#  int &status
+#  ndfint &status
 # PROTOTYPE: $$$$
 # CODE:
 #  ndf_cinp_(param, &indf, comp, &status, strlen(param), strlen(comp));
@@ -591,10 +699,10 @@ ndf_chunk(indf1, mxpix, ichunk, indf2, status)
 
 void
 ndf_clen(indf, comp, length, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &length = NO_INIT
-  int &status
+  ndfint &length = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_clen_(&indf, comp, &length, &status, strlen(comp));
@@ -604,10 +712,10 @@ ndf_clen(indf, comp, length, status)
 
 void
 ndf_cmplx(indf, comp, cmplx, status)
-  int &indf
+  ndfint &indf
   char * comp
   Logical &cmplx = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_cmplx_(&indf, comp, &cmplx, &status, strlen(comp));
@@ -617,10 +725,10 @@ ndf_cmplx(indf, comp, cmplx, status)
 
 void
 ndf_copy(indf1, place, indf2, status)
-  int &indf1
-  int &place
-  int &indf2 = NO_INIT
-  int &status
+  ndfint &indf1
+  ndfint &place
+  ndfint &indf2 = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_copy_(&indf1, &place, &indf2, &status);
@@ -632,9 +740,9 @@ ndf_copy(indf1, place, indf2, status)
 void
 ndf_cput(value, indf, comp, status)
   char * value
-  int &indf
+  ndfint &indf
   char * comp
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
    ndf_cput_(value, &indf, comp, &status, strlen(value), strlen(comp));
@@ -645,11 +753,11 @@ ndf_cput(value, indf, comp, status)
 #ndf_creat(param, ftype, ndim, lbnd, ubnd, indf, status)
 #  char * param
 #  char * ftype
-#  int &ndim
-#  int * lbnd
-#  int * ubnd
-#  int &indf = NO_INIT
-#  int &status
+#  ndfint &ndim
+#  ndfint * lbnd
+#  ndfint * ubnd
+#  ndfint &indf = NO_INIT
+#  ndfint &status
 # PROTOTYPE: $$$\@\@$$
 # CODE:
 #  ndf_creat_(param, ftype, &ndim, lbnd, ubnd, &indf, &status, strlen(param), strlen(ftype));
@@ -661,10 +769,10 @@ ndf_cput(value, indf, comp, status)
 #ndf_crep(param, ftype, ndim, ubnd, indf, status)
 #  char * param
 #  char * ftype
-#  int &ndim
-#  int * ubnd
-#  int indf = NO_INIT
-#  int &status
+#  ndfint &ndim
+#  ndfint * ubnd
+#  ndfint indf = NO_INIT
+#  ndfint &status
 # PROTOTYPE: $$$\@$$
 # CODE:
 #  ndf_crep_(param, ftype, &ndim, ubnd, &indf, &status, strlen(param), strlen(ftype));
@@ -674,8 +782,8 @@ ndf_cput(value, indf, comp, status)
 
 void
 ndf_delet(indf, status)
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   ndf_delet_(&indf, &status);
@@ -684,18 +792,18 @@ ndf_delet(indf, status)
 
 void
 ndf_dim(indf, ndimx, dim, ndim, status)
-  int &indf
-  int &ndimx
-  int * dim = NO_INIT
-  int &ndim = NO_INIT
-  int &status
+  ndfint &indf
+  ndfint &ndimx
+  ndfint * dim = NO_INIT
+  ndfint &ndim = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  dim = get_mortalspace(ndimx, 'i');
+  dim = get_mortalspace(ndimx, PACKI32);
   ndf_dim_(&indf, &ndimx, dim, &ndim, &status);
-  unpack1D( (SV*)ST(2), (void *)dim, 'i', ndim);
+  unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
-  dim
+#  dim
   ndim
   status
 
@@ -703,8 +811,8 @@ ndf_dim(indf, ndimx, dim, ndim, status)
 #ndf_exist(param, mode, indf, status)
 #  char * param
 #  char * mode
-#  int &indf = NO_INIT
-#  int &status
+#  ndfint &indf = NO_INIT
+#  ndfint &status
 # PROTOTYPE: $$$$
 # CODE:
 #  ndf_exist_(param, mode, &indf, &status, strlen(param), strlen(mode));
@@ -714,10 +822,10 @@ ndf_dim(indf, ndimx, dim, ndim, status)
 
 void
 ndf_form(indf, comp, form, status)
-  int &indf
+  ndfint &indf
   char * comp
   char * form = NO_INIT
-  int &status 
+  ndfint &status 
  PROTOTYPE: $$$$
  CODE:
    form = str1;
@@ -729,10 +837,10 @@ ndf_form(indf, comp, form, status)
 
 void
 ndf_ftype(indf, comp, ftype, status)
-  int &indf
+  ndfint &indf
   char * comp
   char * ftype = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
    ftype = str1;
@@ -744,10 +852,10 @@ ndf_ftype(indf, comp, ftype, status)
 
 void
 ndf_isacc(indf, access, isacc, status)
-  int &indf
+  ndfint &indf
   char * access
   Logical &isacc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_isacc_(&indf, access, &isacc, &status, strlen(access));
@@ -757,9 +865,9 @@ ndf_isacc(indf, access, isacc, status)
 
 void
 ndf_isbas(indf, isbas, status)
-  int &indf
+  ndfint &indf
   Logical &isbas = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_isbas_(&indf, &isbas, &status);
@@ -769,9 +877,9 @@ ndf_isbas(indf, isbas, status)
 
 void
 ndf_istmp(indf, istmp, status)
-  int &indf
+  ndfint &indf
   Logical &istmp = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_istmp_(&indf, &istmp, &status);
@@ -781,10 +889,10 @@ ndf_istmp(indf, istmp, status)
 
 void
 ndf_loc(indf, mode, loc, status)
-  int &indf
+  ndfint &indf
   char * mode
   locator * loc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   loc = floc;
@@ -795,11 +903,11 @@ ndf_loc(indf, mode, loc, status)
 
 void
 ndf_mapql(indf, pntr, el, bad, status)
-  int &indf
-  int &pntr = NO_INIT
-  int &el = NO_INIT
+  ndfint &indf
+  ndfint &pntr = NO_INIT
+  ndfint &el = NO_INIT
   Logical &bad = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_mapql_(&indf, &pntr, &el, &bad, &status);
@@ -811,14 +919,14 @@ ndf_mapql(indf, pntr, el, bad, status)
 
 void
 ndf_mapz(indf, comp, type, mmod, rpntr, ipntr, el ,status)
-  int &indf
+  ndfint &indf
   char * comp 
   char * type
   char * mmod
-  int &rpntr = NO_INIT
-  int &ipntr = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &rpntr = NO_INIT
+  ndfint &ipntr = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$$$$
  CODE:
   ndf_mapz_(&indf, comp, type, mmod, &rpntr, &ipntr, &el, &status, strlen(comp), strlen(type), strlen(mmod));
@@ -831,12 +939,12 @@ ndf_mapz(indf, comp, type, mmod, rpntr, ipntr, el ,status)
 void
 ndf_mbad(badok, indf1, indf2, comp, check, bad, status)
   Logical &badok
-  int &indf1
-  int &indf2
+  ndfint &indf1
+  ndfint &indf2
   char * comp
   Logical &check
   Logical &bad = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$$$
  CODE:
   ndf_mbad_(&badok, &indf1, &indf2, comp, &check, &bad, &status, strlen(comp));
@@ -847,12 +955,12 @@ ndf_mbad(badok, indf1, indf2, comp, check, bad, status)
 void
 ndf_mbadn(badok, n, ndfs, comp, check, bad, status)
   Logical &badok
-  int &n
-  int * ndfs
+  ndfint &n
+  ndfint * ndfs
   char * comp
   Logical &check
   Logical &bad = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$\@$$$$
  CODE:
   ndf_mbadn_(&badok, &n, ndfs, comp, &check, &bad, &status, strlen(comp));
@@ -863,9 +971,9 @@ ndf_mbadn(badok, n, ndfs, comp, check, bad, status)
 void
 ndf_mbnd(option, indf1, indf2, status)
   char * option
-  int &indf1
-  int &indf2
-  int &status
+  ndfint &indf1
+  ndfint &indf2
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_mbnd_(option, &indf1, &indf2, &status, strlen(option));
@@ -877,9 +985,9 @@ ndf_mbnd(option, indf1, indf2, status)
 void
 ndf_mbndn(option, n, ndfs, status)
   char * option
-  int &n
-  int * ndfs
-  int &status
+  ndfint &n
+  ndfint * ndfs
+  ndfint &status
  PROTOTYPE: $\@$$
  CODE:
   ndf_mbndn_(option, &n, ndfs, &status, strlen(option));
@@ -890,12 +998,12 @@ ndf_mbndn(option, n, ndfs, status)
 void
 ndf_mtype(typlst, indf1, indf2, comp, itype, dtype, status)
   char * typlst
-  int &indf1
-  int &indf2
+  ndfint &indf1
+  ndfint &indf2
   char * comp
   char * itype = NO_INIT
   char * dtype = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$$$
  CODE:
   itype = str1;
@@ -911,12 +1019,12 @@ ndf_mtype(typlst, indf1, indf2, comp, itype, dtype, status)
 void
 ndf_mtypn(typlst, n, ndfs, comp, itype, dtype, status)
   char * typlst
-  int &n
-  int * ndfs
+  ndfint &n
+  ndfint * ndfs
   char * comp
   char * itype = NO_INIT
   char * dtype = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$\@$$$$
  CODE:
   itype = str1;
@@ -931,11 +1039,11 @@ ndf_mtypn(typlst, n, ndfs, comp, itype, dtype, status)
 
 void
 ndf_nbloc(indf, ndim, mxdim, nblock, status)
-  int &indf
-  int &ndim
-  int * mxdim
-  int &nblock = NO_INIT
-  int &status
+  ndfint &indf
+  ndfint &ndim
+  ndfint * mxdim
+  ndfint &nblock = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
   ndf_nbloc_(&indf, &ndim, mxdim, &nblock, &status);
@@ -945,10 +1053,10 @@ ndf_nbloc(indf, ndim, mxdim, nblock, status)
 
 void
 ndf_nchnk(indf, mxpix, nchunk, status)
-  int &indf
-  int &mxpix
-  int &nchunk = NO_INIT
-  int &status
+  ndfint &indf
+  ndfint &mxpix
+  ndfint &nchunk = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_nchnk_(&indf, &mxpix, &nchunk, &status);
@@ -959,11 +1067,11 @@ ndf_nchnk(indf, mxpix, nchunk, status)
 void
 ndf_newp(ftype, ndim, ubnd, place, indf, status)
   char * ftype
-  int &ndim
-  int * ubnd
-  int &place
-  int &indf = NO_INIT
-  int &status
+  ndfint &ndim
+  ndfint * ubnd
+  ndfint &place
+  ndfint &indf = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$$
  CODE:
   ndf_newp_(ftype, &ndim, ubnd, &place, &indf, &status, strlen(ftype));
@@ -975,8 +1083,8 @@ ndf_newp(ftype, ndim, ubnd, place, indf, status)
 void
 ndf_noacc(access, indf, status)
   char * access
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_noacc_(access, &indf, &status, strlen(access));
@@ -985,11 +1093,11 @@ ndf_noacc(access, indf, status)
 
 #void
 #ndf_prop(indf1, clist, param, indf2, status)
-#  int &indf1
+#  ndfint &indf1
 #  char * clist
 #  char * param
-#  int &indf2 = NO_INIT
-#  int &status
+#  ndfint &indf2 = NO_INIT
+#  ndfint &status
 # PROTOTYPE: $$$$$
 # CODE:
 #  ndf_prop_(&indf1, clist, param, &indf2, &status, strlen(clist), strlen(param));
@@ -999,9 +1107,9 @@ ndf_noacc(access, indf, status)
 
 void
 ndf_qmf(indf, qmf, status)
-  int &indf
+  ndfint &indf
   Logical &qmf = NO_INIT
-  int &status 
+  ndfint &status 
  PROTOTYPE: $$$
  CODE:
   ndf_qmf_(&indf, &qmf, &status);
@@ -1011,9 +1119,9 @@ ndf_qmf(indf, qmf, status)
 
 void
 ndf_reset(indf, comp, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &status 
+  ndfint &status 
  PROTOTYPE: $$$
  CODE:
   ndf_reset_(&indf, comp, &status, strlen(comp));
@@ -1022,11 +1130,11 @@ ndf_reset(indf, comp, status)
 
 void
 ndf_same(indf1, indf2, same, isect, status)
-  int &indf1
-  int &indf2
+  ndfint &indf1
+  ndfint &indf2
   Logical &same = NO_INIT
   Logical &isect = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_same_(&indf1, &indf2, &same, &isect, &status);
@@ -1038,9 +1146,9 @@ ndf_same(indf1, indf2, same, isect, status)
 void
 ndf_sbad(bad, indf, comp, status)
   Logical &bad
-  int &indf
+  ndfint &indf
   char * comp
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_sbad_(&bad, &indf, comp, &status, strlen(comp));
@@ -1051,8 +1159,8 @@ ndf_sbad(bad, indf, comp, status)
 void
 ndf_sbb(badbit, indf, status)
   unsigned char &badbit
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_sbb_(&badbit, &indf, &status);
@@ -1061,11 +1169,11 @@ ndf_sbb(badbit, indf, status)
 
 void
 ndf_sbnd(ndim, lbnd, ubnd, indf, status)
-  int &ndim
-  int * lbnd
-  int * ubnd
-  int &indf
-  int &status
+  ndfint &ndim
+  ndfint * lbnd
+  ndfint * ubnd
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $\@\@$$
  CODE:
   ndf_sbnd_(&ndim, lbnd, ubnd, &indf, &status);
@@ -1074,11 +1182,11 @@ ndf_sbnd(ndim, lbnd, ubnd, indf, status)
 
 void
 ndf_scopy(indf1, clist, place, indf2, status)
-  int &indf1
+  ndfint &indf1
   char * clist
-  int &place
-  int &indf2 = NO_INIT
-  int &status
+  ndfint &place
+  ndfint &indf2 = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_scopy_(&indf1, clist, &place, &indf2, &status, strlen(clist));
@@ -1089,12 +1197,12 @@ ndf_scopy(indf1, clist, place, indf2, status)
 
 void
 ndf_sect(indf1, ndim, lbnd, ubnd, indf2, status)
-  int &indf1
-  int &ndim
-  int * lbnd
-  int * ubnd
-  int &indf2 = NO_INIT
-  int &status
+  ndfint &indf1
+  ndfint &ndim
+  ndfint * lbnd
+  ndfint * ubnd
+  ndfint &indf2 = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@\@$$
  CODE:
   ndf_sect_(&indf1, &ndim, lbnd, ubnd, &indf2, &status);
@@ -1105,10 +1213,10 @@ ndf_sect(indf1, ndim, lbnd, ubnd, indf2, status)
 
 void
 ndf_shift(nshift, shift, indf, status)
-  int &nshift
-  int * shift
-  int &indf
-  int &status
+  ndfint &nshift
+  ndfint * shift
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $\@$$
  CODE:
   ndf_shift_(&nshift, shift, &indf, &status);
@@ -1116,10 +1224,23 @@ ndf_shift(nshift, shift, indf, status)
   status  
 
 void
+ndf_size(indf, size, status)
+  ndfint &indf
+  ndfint &size = NO_INIT
+  ndfint &status
+ PROTOTYPE: $$$
+ CODE:
+   ndf_size_(&indf, &size, &status);
+ OUTPUT:
+   size
+   status
+
+
+void
 ndf_sqmf(qmf, indf, status)
   Logical &qmf
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_sqmf_(&qmf, &indf, &status);
@@ -1128,10 +1249,10 @@ ndf_sqmf(qmf, indf, status)
 
 void
 ndf_ssary(iary1, indf, iary2, status)
-  int &iary1
-  int &indf
-  int &iary2 = NO_INIT
-  int &status
+  ndfint &iary1
+  ndfint &indf
+  ndfint &iary2 = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_ssary_(&iary1, &indf, &iary2, &status);
@@ -1141,10 +1262,10 @@ ndf_ssary(iary1, indf, iary2, status)
  
 void
 ndf_state(indf, comp, state, status)
-  int &indf
+  ndfint &indf
   char * comp
   Logical &state = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_state_(&indf, comp, &state, &status, strlen(comp));
@@ -1156,9 +1277,9 @@ ndf_state(indf, comp, state, status)
 void
 ndf_stype(ftype, indf, comp, status)
   char * ftype
-  int &indf
+  ndfint &indf
   char * comp
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_stype_(ftype, &indf, comp, &status, strlen(ftype), strlen(comp));
@@ -1167,10 +1288,10 @@ ndf_stype(ftype, indf, comp, status)
 
 void
 ndf_type(indf, comp, type, status)
-  int &indf
+  ndfint &indf
   char * comp
   char * type = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   type = str1;
@@ -1187,8 +1308,8 @@ void
 ndf_find(loc, name, indf, status)
   locator * loc
   char * name
-  int  &indf = NO_INIT
-  int &status
+  ndfint  &indf = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_find_(loc, name, &indf, &status, DAT__SZLOC, strlen(name));
@@ -1203,9 +1324,9 @@ ndf_open(loc, name, mode, stat, indf, place, status)
   char * 	name
   char * 	mode
   char * 	stat
-  int 	&indf  = NO_INIT
-  int 	&place = NO_INIT
-  int 	&status
+  ndfint 	&indf  = NO_INIT
+  ndfint 	&place = NO_INIT
+  ndfint 	&status
  PROTOTYPE: $$$$$$$
  CODE:
   ndf_open_(loc, name, mode, stat, &indf, &place, &status, DAT__SZLOC, strlen(name), strlen(mode), strlen(stat));
@@ -1220,13 +1341,13 @@ ndf_open(loc, name, mode, stat, indf, place, status)
 
 void
 ndf_map(indf, comp, type, mode, pntr, el, status)
-  int &indf
+  ndfint &indf
   char * comp
   char * type
   char * mode
-  int &pntr = NO_INIT
-  int &el   = NO_INIT
-  int &status
+  ndfint &pntr = NO_INIT
+  ndfint &el   = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$$$
  CODE:
   ndf_map_(&indf, comp, type, mode, &pntr, &el, &status, strlen(comp), strlen(type), strlen(mode));
@@ -1237,9 +1358,9 @@ ndf_map(indf, comp, type, mode, pntr, el, status)
 
 void
 ndf_unmap(indf, comp, status)
-  int &indf
+  ndfint &indf
   char * comp
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_unmap_(&indf, comp, &status, strlen(comp));
@@ -1251,8 +1372,8 @@ ndf_unmap(indf, comp, status)
 
 void
 ndf_annul(indf, status)
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   ndf_annul_(&indf, &status);
@@ -1261,9 +1382,9 @@ ndf_annul(indf, status)
 
 void
 ndf_base(in_ndf, out_ndf, status)
-  int &in_ndf
-  int &out_ndf = NO_INIT
-  int &status
+  ndfint &in_ndf
+  ndfint &out_ndf = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_base_(&in_ndf, &out_ndf, &status);
@@ -1280,9 +1401,9 @@ ndf_begin()
 
 void
 ndf_clone(in_ndf, out_ndf, status)
-  int &in_ndf
-  int &out_ndf = NO_INIT
-  int &status
+  ndfint &in_ndf
+  ndfint &out_ndf = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_clone_(&in_ndf, &out_ndf, &status);
@@ -1293,7 +1414,7 @@ ndf_clone(in_ndf, out_ndf, status)
 
 void
 ndf_end(status)
-  int &status
+  ndfint &status
  PROTOTYPE: $
  CODE:
   ndf_end_(&status);
@@ -1302,9 +1423,9 @@ ndf_end(status)
 
 void
 ndf_valid(indf, valid, status)
-  int &indf
+  ndfint &indf
   Logical &valid = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_valid_(&indf, &valid, &status);
@@ -1317,9 +1438,9 @@ ndf_valid(indf, valid, status)
 void
 ndf_cmsg(token, indf, comp, status)
   char * token
-  int &indf
+  ndfint &indf
   char * comp
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_cmsg_(token, &indf, comp, &status, strlen(token), strlen(comp));
@@ -1329,7 +1450,7 @@ ndf_cmsg(token, indf, comp, status)
 void
 ndf_msg(token, indf)
   char * token
-  int &indf
+  ndfint &indf
   PROTOTYPE: $$
   CODE:
    ndf_msg_(token, &indf, strlen(token));
@@ -1341,8 +1462,8 @@ void
 ndf_place(loc, name, place, status)
   locator * loc
   char * name
-  int &place = NO_INIT
-  int &status
+  ndfint &place = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_place_(loc, name, &place, &status, DAT__SZLOC, strlen(name));
@@ -1353,12 +1474,12 @@ ndf_place(loc, name, place, status)
 void
 ndf_new(ftype, ndim, lbnd, ubnd, place, indf, status)
   char * ftype
-  int &ndim
-  int * lbnd
-  int * ubnd
-  int &place
-  int &indf = NO_INIT
-  int &status
+  ndfint &ndim
+  ndfint * lbnd
+  ndfint * ubnd
+  ndfint &place
+  ndfint &indf = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@\@$$$
  CODE:
   ndf_new_(ftype, &ndim, lbnd, ubnd, &place, &indf, &status, strlen(ftype));
@@ -1368,8 +1489,8 @@ ndf_new(ftype, ndim, lbnd, ubnd, place, indf, status)
 
 void
 ndf_temp(place, status)
-  int &place = NO_INIT
-  int &status
+  ndfint &place = NO_INIT
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   ndf_temp_(&place, &status);
@@ -1381,9 +1502,9 @@ ndf_temp(place, status)
 
 void
 ndf_xdel(indf, xname, status)
-  int &indf
+  ndfint &indf
   char * xname
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_xdel_(&indf, xname, &status, strlen(xname));
@@ -1392,11 +1513,11 @@ ndf_xdel(indf, xname, status)
 
 void
 ndf_xgt0c(indf, xname, cmpt, value, status)
-  int &indf
+  ndfint &indf
   char * xname
   char * cmpt
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE:  $$$$$
  CODE:
   /* Copy string across so that it can be returned unchanged if error */
@@ -1410,11 +1531,11 @@ ndf_xgt0c(indf, xname, cmpt, value, status)
 
 void
 ndf_xgt0d(indf, xname, cmpt, value, status)
-  int &indf
+  ndfint &indf
   char * xname
   char * cmpt
-  double &value
-  int &status
+  ndfdouble &value
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xgt0d_(&indf, xname, cmpt, &value, &status, strlen(xname), strlen(cmpt));
@@ -1425,11 +1546,11 @@ ndf_xgt0d(indf, xname, cmpt, value, status)
 
 void
 ndf_xgt0i(indf, xname, cmpt, value, status)
-  int &indf
+  ndfint &indf
   char * xname
   char * cmpt
-  int &value
-  int &status
+  ndfint &value
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xgt0i_(&indf, xname, cmpt, &value, &status, strlen(xname), strlen(cmpt));
@@ -1439,11 +1560,11 @@ ndf_xgt0i(indf, xname, cmpt, value, status)
 
 void
 ndf_xgt0l(indf, xname, cmpt, value, status)
-  int &indf
+  ndfint &indf
   char * xname
   char * cmpt
   Logical &value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xgt0l_(&indf, xname, cmpt, &value, &status, strlen(xname), strlen(cmpt));
@@ -1454,11 +1575,11 @@ ndf_xgt0l(indf, xname, cmpt, value, status)
 
 void
 ndf_xgt0r(indf, xname, cmpt, value, status)
-  int &indf
+  ndfint &indf
   char * xname
   char * cmpt
-  float &value
-  int &status
+  ndffloat &value
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xgt0r_(&indf, xname, cmpt, &value, &status, strlen(xname), strlen(cmpt));
@@ -1468,12 +1589,12 @@ ndf_xgt0r(indf, xname, cmpt, value, status)
 
 void
 ndf_xiary(indf, xname, cmpt, mode, iary, status)
-  int &indf
+  ndfint &indf
   char * xname
   char * cmpt
   char * mode
-  int &iary = NO_INIT
-  int &status
+  ndfint &iary = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$$
  CODE:
   ndf_xiary_(&indf, xname, cmpt, mode, &iary, &status, strlen(xname), strlen(cmpt), strlen(mode));
@@ -1486,11 +1607,11 @@ ndf_xiary(indf, xname, cmpt, mode, iary, status)
 
 void
 ndf_xloc(indf, xname, mode, xloc, status)
-  int &indf
+  ndfint &indf
   char * xname
   char * mode
   locator * xloc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   xloc = floc;
@@ -1501,10 +1622,10 @@ ndf_xloc(indf, xname, mode, xloc, status)
 
 void
 ndf_xname(indf, n, xname, status)
-  int &indf
-  int &n
+  ndfint &indf
+  ndfint &n
   char * xname = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   xname = str1;
@@ -1516,13 +1637,13 @@ ndf_xname(indf, n, xname, status)
 
 void
 ndf_xnew(indf, xname, type, ndim, dim, loc, status)
-  int &indf
+  ndfint &indf
   char * xname
   char * type
-  int &ndim
-  int * dim
+  ndfint &ndim
+  ndfint * dim
   locator * loc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$\@$$
  CODE:
   loc = floc;
@@ -1533,9 +1654,9 @@ ndf_xnew(indf, xname, type, ndim, dim, loc, status)
 
 void
 ndf_xnumb(indf, nextn, status)
-  int &indf
-  int &nextn = NO_INIT
-  int &status
+  ndfint &indf
+  ndfint &nextn = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_xnumb_(&indf, &nextn, &status);
@@ -1546,10 +1667,10 @@ ndf_xnumb(indf, nextn, status)
 void
 ndf_xpt0c(value, indf, xname, cmpt, status)
   char * value
-  int &indf
+  ndfint &indf
   char * xname
   char * cmpt
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xpt0c_(value, &indf, xname, cmpt, &status, strlen(value), strlen(xname), strlen(cmpt));
@@ -1559,11 +1680,11 @@ ndf_xpt0c(value, indf, xname, cmpt, status)
 
 void
 ndf_xpt0d(value, indf, xname, cmpt, status)
-  double &value
-  int &indf
+  ndfdouble &value
+  ndfint &indf
   char * xname
   char * cmpt
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xpt0d_(&value, &indf, xname, cmpt, &status, strlen(xname), strlen(cmpt));
@@ -1572,11 +1693,11 @@ ndf_xpt0d(value, indf, xname, cmpt, status)
 
 void
 ndf_xpt0i(value, indf, xname, cmpt, status)
-  int &value
-  int &indf
+  ndfint &value
+  ndfint &indf
   char * xname
   char * cmpt
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xpt0i_(&value, &indf, xname, cmpt, &status, strlen(xname), strlen(cmpt));
@@ -1586,10 +1707,10 @@ ndf_xpt0i(value, indf, xname, cmpt, status)
 void
 ndf_xpt0l(value, indf, xname, cmpt, status)
   Logical &value
-  int &indf
+  ndfint &indf
   char * xname
   char * cmpt
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xpt0l_(&value, &indf, xname, cmpt, &status, strlen(xname), strlen(cmpt));
@@ -1598,11 +1719,11 @@ ndf_xpt0l(value, indf, xname, cmpt, status)
 
 void
 ndf_xpt0r(value, indf, xname, cmpt, status)
-  float &value
-  int &indf
+  ndffloat &value
+  ndfint &indf
   char * xname
   char * cmpt
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   ndf_xpt0r_(&value, &indf, xname, cmpt, &status, strlen(xname), strlen(cmpt));
@@ -1612,10 +1733,10 @@ ndf_xpt0r(value, indf, xname, cmpt, status)
 
 void
 ndf_xstat(indf, xname, there, status)
-  int &indf
+  ndfint &indf
   char * xname
   Logical  &there = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_xstat_(&indf, xname, &there, &status, strlen(xname));
@@ -1629,7 +1750,7 @@ ndf_xstat(indf, xname, there, status)
 void
 ndf_happn(appn, status)
   char * appn
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   ndf_happn_(appn, &status, strlen(appn));
@@ -1639,8 +1760,8 @@ ndf_happn(appn, status)
 
 void
 ndf_hcre(indf, status)
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   ndf_hcre_(&indf, &status);
@@ -1649,9 +1770,9 @@ ndf_hcre(indf, status)
 
 void
 ndf_hdef(indf, appn, status)
-  int &indf
+  ndfint &indf
   char * appn
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_hdef_(&indf, appn, &status, strlen(appn));
@@ -1660,7 +1781,7 @@ ndf_hdef(indf, appn, status)
 
 void
 ndf_hend(status)
-  int &status
+  ndfint &status
  PROTOTYPE: $
  CODE:
   ndf_hend_(&status);
@@ -1669,12 +1790,12 @@ ndf_hend(status)
 
 void
 ndf_hfind(indf, ymdhm, sec, eq, irec, status)
-  int &indf
-  int * ymdhm
-  float &sec
+  ndfint &indf
+  ndfint * ymdhm
+  ndffloat &sec
   Logical &eq
-  int &irec = NO_INIT
-  int &status
+  ndfint &irec = NO_INIT
+  ndfint &status
   PROTOTYPE: $\@$$$$
   CODE:
   ndf_hfind_(&indf, ymdhm, &sec, &eq, &irec, &status);
@@ -1684,11 +1805,11 @@ ndf_hfind(indf, ymdhm, sec, eq, irec, status)
 
 void
 ndf_hinfo(indf, item, irec, value, status)
-  int &indf
+  ndfint &indf
   char * item
-  int &irec
+  ndfint &irec
   char * value = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   value = str1;
@@ -1700,9 +1821,9 @@ ndf_hinfo(indf, item, irec, value, status)
 
 void
 ndf_hnrec(indf, nrec, status)
-  int &indf
-  int &nrec = NO_INIT
-  int &status
+  ndfint &indf
+  ndfint &nrec = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_hnrec_(&indf, &nrec, &status);
@@ -1712,22 +1833,22 @@ ndf_hnrec(indf, nrec, status)
 
 void
 ndf_hout(indf, irec, status)
-  int &indf
-  int &irec
-  int &status
+  ndfint &indf
+  ndfint &irec
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
-  extern void * ndf_hecho_(int *, char *, int *);
+  extern void * ndf_hecho_(ndfint *, char *, ndfint *);
   ndf_hout_(&indf, &irec, (void *)ndf_hecho_, &status);
  OUTPUT:
   status
 
 void
 ndf_hpurg(indf, irec1, irec2, status)
-  int &indf
-  int &irec1
-  int &irec2
-  int &status
+  ndfint &indf
+  ndfint &irec1
+  ndfint &irec2
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ndf_hpurg_(&indf, &irec1, &irec2, &status);
@@ -1739,14 +1860,14 @@ ndf_hput_r(hmode, appn, repl, nlines, chrsz, text, trans, wrap, rjust, indf, sta
   char * hmode
   char * appn
   Logical &repl
-  int &nlines
-  int chrsz
+  ndfint &nlines
+  ndfint chrsz
   char * text
   Logical &trans
   Logical &wrap
   Logical &rjust
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$$$$$$$$$$
  CODE:
   ndf_hput_(hmode, appn, &repl, &nlines, text, &trans, &wrap, &rjust, &indf, &status, strlen(hmode), strlen(appn), chrsz);
@@ -1756,8 +1877,8 @@ ndf_hput_r(hmode, appn, repl, nlines, chrsz, text, trans, wrap, rjust, indf, sta
 void
 ndf_hsmod(hmode, indf, status)
   char * hmode
-  int &indf
-  int &status
+  ndfint &indf
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_hsmod_(hmode, &indf, &status, strlen(hmode));
@@ -1769,8 +1890,8 @@ ndf_hsmod(hmode, indf, status)
 void
 ndf_gtune(tpar, value, status)
   char * tpar
-  int &value = NO_INIT
-  int &status
+  ndfint &value = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_gtune_(tpar, &value, &status, strlen(tpar));
@@ -1781,8 +1902,8 @@ ndf_gtune(tpar, value, status)
 void
 ndf_tune(tpar, value, status)
   char * tpar
-  int &value
-  int &status
+  ndfint &value
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ndf_tune_(tpar, &value, &status, strlen(tpar));
@@ -1796,9 +1917,9 @@ ndf_tune(tpar, value, status)
 void
 dat_alter(loc, ndim, dim, status)
   locator * loc
-  int &ndim
-  int * dim
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &status
  PROTOTYPE: $$\@$
  CODE:
   dat_alter_(loc, &ndim, dim, &status, DAT__SZLOC);
@@ -1808,7 +1929,7 @@ dat_alter(loc, ndim, dim, status)
 void
 dat_annul(loc, status)
   locator * loc
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   dat_annul_(loc, &status, DAT__SZLOC);
@@ -1820,9 +1941,9 @@ void
 dat_basic(loc, mode, pntr, len, status)
   locator * loc
   char * mode
-  int &pntr = NO_INIT
-  int &len = NO_INIT
-  int &status
+  ndfint &pntr = NO_INIT
+  ndfint &len = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   dat_basic_(loc, mode, &pntr, &len, &status, DAT__SZLOC, strlen(mode));
@@ -1837,7 +1958,7 @@ dat_ccopy(loc1, loc2, name, loc3, status)
   locator * loc2
   char * name
   locator * loc3 = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   loc3 = floc;
@@ -1848,7 +1969,7 @@ dat_ccopy(loc1, loc2, name, loc3, status)
 
 void
 dat_cctyp(size, type)
-  int &size
+  ndfint &size
   char * type = NO_INIT
  PROTOTYPE: $$
  CODE:
@@ -1861,10 +1982,10 @@ dat_cctyp(size, type)
 void
 dat_cell(loc1, ndim, sub, loc2, status)
   locator * loc1
-  int &ndim
-  int * sub
+  ndfint &ndim
+  ndfint * sub
   locator * loc2
-  int &status
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
   loc2 = floc;
@@ -1876,8 +1997,8 @@ dat_cell(loc1, ndim, sub, loc2, status)
 void
 dat_clen(loc, clen, status)
   locator * loc
-  int &clen = NO_INIT
-  int &status
+  ndfint &clen = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_clen_(loc, &clen, &status, DAT__SZLOC); 
@@ -1889,7 +2010,7 @@ void
 dat_clone(loc1, loc2, status)
   locator * loc1
   locator * loc2 = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   loc2 = floc;
@@ -1901,9 +2022,9 @@ dat_clone(loc1, loc2, status)
 void
 dat_coerc(loc1, ndim, loc2, status)
   locator * loc1
-  int &ndim
+  ndfint &ndim
   locator * loc2 = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   loc2 = floc;
@@ -1917,7 +2038,7 @@ dat_copy(loc1, loc2, name, status)
   locator * loc1
   locator * loc2
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_copy_(loc1, loc2, name, &status, DAT__SZLOC, DAT__SZLOC, strlen(name)); 
@@ -1929,7 +2050,7 @@ dat_drep(loc, format, order, status)
   locator * loc
   char * format = NO_INIT
   char * order = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   format = str1;
@@ -1947,7 +2068,7 @@ void
 dat_erase(loc, name, status)
   locator * loc
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_erase_(loc, name, &status, DAT__SZLOC, strlen(name));
@@ -1956,8 +2077,8 @@ dat_erase(loc, name, status)
 
 void
 dat_ermsg(status, length, msg)
-  int &status
-  int &length = NO_INIT
+  ndfint &status
+  ndfint &length = NO_INIT
   char * msg = NO_INIT
  PROTOTYPE: $$$
  CODE:
@@ -1973,7 +2094,7 @@ dat_find(inloc, name, outloc, status)
   locator * inloc
   char * name
   locator * outloc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   outloc = floc;
@@ -1986,7 +2107,7 @@ void
 dat_get0c(loc, value, status)
   locator * loc
   char * value = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   value = str1;
@@ -2000,8 +2121,8 @@ dat_get0c(loc, value, status)
 void
 dat_get0d(loc, value, status)
   locator * loc
-  double &value = NO_INIT
-  int &status
+  ndfdouble &value = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_get0d_(loc, &value, &status, DAT__SZLOC);
@@ -2012,8 +2133,8 @@ dat_get0d(loc, value, status)
 void
 dat_get0i(loc, value, status)
   locator * loc
-  int &value = NO_INIT
-  int &status
+  ndfint &value = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_get0i_(loc, &value, &status, DAT__SZLOC);
@@ -2025,7 +2146,7 @@ void
 dat_get0l(loc, value, status)
   locator * loc
   Logical &value = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_get0l_(loc, &value, &status, DAT__SZLOC);
@@ -2036,8 +2157,8 @@ dat_get0l(loc, value, status)
 void
 dat_get0r(loc, value, status)
   locator * loc
-  float &value = NO_INIT
-  int &status
+  ndffloat &value = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_get0r_(loc, &value, &status, DAT__SZLOC);
@@ -2048,13 +2169,13 @@ dat_get0r(loc, value, status)
 void
 dat_get1c(loc, elx, value, el, status)
   locator * loc
-  int &elx
+  ndfint &elx
   char * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  int i;
+  ndfint i;
   value = malloc(elx * FCHAR);
   dat_get1c_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
 
@@ -2071,15 +2192,15 @@ dat_get1c(loc, elx, value, el, status)
 void
 dat_get1d(loc, elx, value, el, status)
   locator * loc
-  int &elx
-  double * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndfdouble * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'd');
+  value = get_mortalspace(elx, PACKD);
   dat_get1d_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, 'd', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -2088,15 +2209,15 @@ dat_get1d(loc, elx, value, el, status)
 void
 dat_get1i(loc, elx, value, el, status)
   locator * loc
-  int &elx
-  int * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndfint * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'i');
+  value = get_mortalspace(elx, PACKI32);
   dat_get1i_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, 'i', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -2105,15 +2226,15 @@ dat_get1i(loc, elx, value, el, status)
 void
 dat_get1r(loc, elx, value, el, status)
   locator * loc
-  int &elx
-  float * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndffloat * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'f');
+  value = get_mortalspace(elx, PACKF);
   dat_get1r_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, 'f', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
  OUTPUT:
   value
   el
@@ -2122,13 +2243,13 @@ dat_get1r(loc, elx, value, el, status)
 void
 dat_getvc(loc, elx, value, el, status)
   locator * loc
-  int &elx
+  ndfint &elx
   char * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  int i;
+  ndfint i;
   value = malloc(elx * FCHAR);
   dat_getvc_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
   /* Write to perl character array */
@@ -2144,15 +2265,15 @@ dat_getvc(loc, elx, value, el, status)
 void
 dat_getvd(loc, elx, value, el, status)
   locator * loc
-  int &elx
-  double * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndfdouble * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'd');
+  value = get_mortalspace(elx, PACKD);
   dat_getvd_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, 'd', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -2161,15 +2282,15 @@ dat_getvd(loc, elx, value, el, status)
 void
 dat_getvi(loc, elx, value, el, status)
   locator * loc
-  int &elx
-  int * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndfint * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'i');
+  value = get_mortalspace(elx, PACKI32);
   dat_getvi_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, 'i', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -2178,15 +2299,15 @@ dat_getvi(loc, elx, value, el, status)
 void
 dat_getvr(loc, elx, value, el, status)
   locator * loc
-  int &elx
-  float * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndffloat * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'f');
+  value = get_mortalspace(elx, PACKF);
   dat_getvr_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, 'f', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
  OUTPUT:
   value
   el
@@ -2195,9 +2316,9 @@ dat_getvr(loc, elx, value, el, status)
 void
 dat_index(loc, index, nloc, status)
   locator * loc
-  int &index
+  ndfint &index
   locator * nloc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   nloc = floc;
@@ -2209,8 +2330,8 @@ dat_index(loc, index, nloc, status)
 void
 dat_len(loc, len, status)
   locator * loc
-  int &len = NO_INIT
-  int &status
+  ndfint &len = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_len_(loc, &len, &status, DAT__SZLOC);
@@ -2223,10 +2344,10 @@ dat_map(loc, type, mode, ndim, dim, pntr, status)
   locator * loc
   char * type
   char * mode
-  int &ndim
-  int * dim
-  int &pntr = NO_INIT
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &pntr = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$\@$$
  CODE:
   dat_map_(loc, type, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(type), strlen(mode));
@@ -2238,10 +2359,10 @@ void
 dat_mapc(loc, mode, ndim, dim, pntr, status)
   locator * loc
   char * mode
-  int &ndim
-  int * dim
-  int &pntr = NO_INIT
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &pntr = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
   dat_mapc_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
@@ -2253,10 +2374,10 @@ void
 dat_mapd(loc, mode, ndim, dim, pntr, status)
   locator * loc
   char * mode
-  int &ndim
-  int * dim
-  int &pntr = NO_INIT
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &pntr = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
   dat_mapd_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
@@ -2268,10 +2389,10 @@ void
 dat_mapi(loc, mode, ndim, dim, pntr, status)
   locator * loc
   char * mode
-  int &ndim
-  int * dim
-  int &pntr = NO_INIT
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &pntr = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
   dat_mapi_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
@@ -2283,10 +2404,10 @@ void
 dat_mapl(loc, mode, ndim, dim, pntr, status)
   locator * loc
   char * mode
-  int &ndim
-  int * dim
-  int &pntr = NO_INIT
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &pntr = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
   dat_mapl_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
@@ -2298,10 +2419,10 @@ void
 dat_mapr(loc, mode, ndim, dim, pntr, status)
   locator * loc
   char * mode
-  int &ndim
-  int * dim
-  int &pntr = NO_INIT
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &pntr = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
   dat_mapr_(loc, mode, &ndim, dim, &pntr, &status, DAT__SZLOC, strlen(mode));
@@ -2314,9 +2435,9 @@ dat_mapv(loc, type, mode, pntr, el, status)
   locator * loc
   char * type
   char * mode
-  int &pntr = NO_INIT
-  int &el   = NO_INIT
-  int &status
+  ndfint &pntr = NO_INIT
+  ndfint &el   = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$$
  CODE:
   dat_mapv_(loc, type, mode, &pntr, &el, &status, DAT__SZLOC, strlen(type), strlen(mode));
@@ -2328,9 +2449,9 @@ dat_mapv(loc, type, mode, pntr, el, status)
 void
 dat_mould(loc, ndim, dim, status)
   locator * loc
-  int &ndim
-  int * dim
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &status
  PROTOTYPE: $$\@$
  CODE:
   dat_mould_(loc, &ndim, dim, &status, DAT__SZLOC);
@@ -2342,7 +2463,7 @@ dat_move(loc1, loc2, name, status)
   locator * loc1
   locator * loc2
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_move_(loc1, loc2, name, &status, DAT__SZLOC, strlen(name));
@@ -2361,7 +2482,7 @@ void
 dat_name(loc, name, status)
   locator * loc
   char * name = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   name = str1;
@@ -2374,8 +2495,8 @@ dat_name(loc, name, status)
 void
 dat_ncomp(loc, ncomp, status)
   locator * loc
-  int &ncomp = NO_INIT
-  int &status
+  ndfint &ncomp = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_ncomp_(loc, &ncomp, &status, DAT__SZLOC);
@@ -2389,9 +2510,9 @@ dat_new(loc, name, type, ndim, dim, status)
   locator * loc
   char * name
   char * type
-  int &ndim
-  int * dim
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &status
   PROTOTYPE: $$$$\@$
  CODE:
   dat_new_(loc, name, type, &ndim, dim, &status, DAT__SZLOC, strlen(name), strlen(type));
@@ -2402,7 +2523,7 @@ void
 dat_new0d(loc, name, status)
   locator * loc
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_new0d_(loc, name, &status, DAT__SZLOC, strlen(name));
@@ -2413,7 +2534,7 @@ void
 dat_new0i(loc, name, status)
   locator * loc
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_new0i_(loc, name, &status, DAT__SZLOC, strlen(name));
@@ -2424,7 +2545,7 @@ void
 dat_new0l(loc, name, status)
   locator * loc
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_new0l_(loc, name, &status, DAT__SZLOC, strlen(name));
@@ -2435,7 +2556,7 @@ void
 dat_new0r(loc, name, status)
   locator * loc
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_new0r_(loc, name, &status, DAT__SZLOC, strlen(name));
@@ -2446,8 +2567,8 @@ void
 dat_new0c(loc, name, len, status)
   locator * loc
   char * name
-  int &len
-  int &status
+  ndfint &len
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_new0c_(loc, name, &len, &status, DAT__SZLOC, strlen(name));
@@ -2458,8 +2579,8 @@ void
 dat_new1d(loc, name, el, status)
   locator * loc
   char * name
-  int &el
-  int &status
+  ndfint &el
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_new1d_(loc, name, &el, &status, DAT__SZLOC, strlen(name));
@@ -2470,8 +2591,8 @@ void
 dat_new1i(loc, name, el, status)
   locator * loc
   char * name
-  int &el
-  int &status
+  ndfint &el
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_new1i_(loc, name, &el, &status, DAT__SZLOC, strlen(name));
@@ -2482,8 +2603,8 @@ void
 dat_new1l(loc, name, el, status)
   locator * loc
   char * name
-  int &el
-  int &status
+  ndfint &el
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_new1l_(loc, name, &el, &status, DAT__SZLOC, strlen(name));
@@ -2494,8 +2615,8 @@ void
 dat_new1r(loc, name, el, status)
   locator * loc
   char * name
-  int &el
-  int &status
+  ndfint &el
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_new1r_(loc, name, &el, &status, DAT__SZLOC, strlen(name));
@@ -2506,9 +2627,9 @@ void
 dat_new1c(loc, name, len, el, status)
   locator * loc
   char * name
-  int &len
-  int &el
-  int &status
+  ndfint &len
+  ndfint &el
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   dat_new1c_(loc, name, &len, &el, &status, DAT__SZLOC, strlen(name));
@@ -2519,10 +2640,10 @@ void
 dat_newc(loc, name, len, ndim, dim, status)
   locator * loc
   char * name
-  int &len
-  int &ndim
-  int * dim
-  int &status
+  ndfint &len
+  ndfint &ndim
+  ndfint * dim
+  ndfint &status
   PROTOTYPE: $$$$\@$
  CODE:
   dat_newc_(loc, name, &len, &ndim, dim, &status, DAT__SZLOC, strlen(name));
@@ -2533,7 +2654,7 @@ void
 dat_paren(loc1, loc2, status)
   locator * loc1
   locator * loc2 = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   loc2 = floc;
@@ -2545,8 +2666,8 @@ dat_paren(loc1, loc2, status)
 void
 dat_prec(loc, nbyte, status)
   locator * loc
-  int &nbyte = NO_INIT
-  int &status
+  ndfint &nbyte = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_prec_(loc, &nbyte, &status, DAT__SZLOC);
@@ -2558,7 +2679,7 @@ void
 dat_prim(loc, reply, status)
   locator * loc
   Logical &reply = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_prim_(loc, &reply, &status, DAT__SZLOC);
@@ -2571,7 +2692,7 @@ dat_prmry(set, loc, prmry, status)
   Logical &set
   locator * loc
   Logical &prmry
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_prmry_(&set, loc, &prmry, &status, DAT__SZLOC);
@@ -2583,11 +2704,11 @@ dat_prmry(set, loc, prmry, status)
 void
 dat_putc_r(loc, ndim, dim, chrsz, value, status)
   locator * loc
-  int &ndim
-  int * dim
-  int chrsz
+  ndfint &ndim
+  ndfint * dim
+  ndfint chrsz
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$$
  CODE:
   dat_putc_(loc, &ndim, dim, value, &status, DAT__SZLOC, chrsz);
@@ -2597,10 +2718,10 @@ dat_putc_r(loc, ndim, dim, chrsz, value, status)
 void
 dat_putd(loc, ndim, dim, value, status)
   locator * loc
-  int &ndim
-  int * dim
-  double * value
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfdouble * value
+  ndfint &status
  PROTOTYPE: $$\@\@$
  CODE:
   dat_putd_(loc, &ndim, dim, value, &status, DAT__SZLOC);
@@ -2610,10 +2731,10 @@ dat_putd(loc, ndim, dim, value, status)
 void
 dat_puti(loc, ndim, dim, value, status)
   locator * loc
-  int &ndim
-  int * dim
-  int * value
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint * value
+  ndfint &status
  PROTOTYPE: $$\@\@$
  CODE:
   dat_puti_(loc, &ndim, dim, value, &status, DAT__SZLOC);
@@ -2623,10 +2744,10 @@ dat_puti(loc, ndim, dim, value, status)
 void
 dat_putr(loc, ndim, dim, value, status)
   locator * loc
-  int &ndim
-  int * dim
-  float * value
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndffloat * value
+  ndfint &status
  PROTOTYPE: $$\@\@$
  CODE:
   dat_putr_(loc, &ndim, dim, value, &status, DAT__SZLOC);
@@ -2637,7 +2758,7 @@ void
 dat_put0c(loc, value, status)
   locator * loc
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_put0c_(loc, value, &status, DAT__SZLOC, strlen(value));
@@ -2647,8 +2768,8 @@ dat_put0c(loc, value, status)
 void
 dat_put0d(loc, value, status)
   locator * loc
-  double &value
-  int &status
+  ndfdouble &value
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_put0d_(loc, &value, &status, DAT__SZLOC);
@@ -2658,8 +2779,8 @@ dat_put0d(loc, value, status)
 void
 dat_put0i(loc, value, status)
   locator * loc
-  int &value
-  int &status
+  ndfint &value
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_put0i_(loc, &value, &status, DAT__SZLOC);
@@ -2670,7 +2791,7 @@ void
 dat_put0l(loc, value, status)
   locator * loc
   Logical &value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_put0l_(loc, &value, &status, DAT__SZLOC);
@@ -2680,8 +2801,8 @@ dat_put0l(loc, value, status)
 void
 dat_put0r(loc, value, status)
   locator * loc
-  float &value
-  int &status
+  ndffloat &value
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_put0r_(loc, &value, &status, DAT__SZLOC);
@@ -2691,10 +2812,10 @@ dat_put0r(loc, value, status)
 void
 dat_put1c_r(loc, el, chrsz, value, status)
   locator * loc
-  int &el
-  int chrsz
+  ndfint &el
+  ndfint chrsz
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   dat_put1c_(loc, &el, value, &status, DAT__SZLOC, chrsz);
@@ -2704,9 +2825,9 @@ dat_put1c_r(loc, el, chrsz, value, status)
 void
 dat_put1d(loc, el, value, status)
   locator * loc
-  int &el
-  double * value
-  int &status
+  ndfint &el
+  ndfdouble * value
+  ndfint &status
  PROTOTYPE: $$\@$
  CODE:
   dat_put1d_(loc, &el, value, &status, DAT__SZLOC);
@@ -2716,9 +2837,9 @@ dat_put1d(loc, el, value, status)
 void
 dat_put1i(loc, el, value, status)
   locator * loc
-  int &el
-  int * value
-  int &status
+  ndfint &el
+  ndfint * value
+  ndfint &status
  PROTOTYPE: $$\@$
  CODE:
   dat_put1i_(loc, &el, value, &status, DAT__SZLOC);
@@ -2728,9 +2849,9 @@ dat_put1i(loc, el, value, status)
 void
 dat_put1r(loc, el, value, status)
   locator * loc
-  int &el
-  float * value
-  int &status
+  ndfint &el
+  ndffloat * value
+  ndfint &status
  PROTOTYPE: $$\@$
  CODE:
   dat_put1r_(loc, &el, value, &status, DAT__SZLOC);
@@ -2740,10 +2861,10 @@ dat_put1r(loc, el, value, status)
 void
 dat_putvc_r(loc, el, chrsz, value, status)
   locator * loc
-  int &el
-  int chrsz
+  ndfint &el
+  ndfint chrsz
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   dat_putvc_(loc, &el, value, &status, DAT__SZLOC, chrsz);
@@ -2753,9 +2874,9 @@ dat_putvc_r(loc, el, chrsz, value, status)
 void
 dat_putvd(loc, el, value, status)
   locator * loc
-  int &el
-  double * value
-  int &status
+  ndfint &el
+  ndfdouble * value
+  ndfint &status
  PROTOTYPE: $$\@$
  CODE:
   dat_putvd_(loc, &el, value, &status, DAT__SZLOC);
@@ -2765,9 +2886,9 @@ dat_putvd(loc, el, value, status)
 void
 dat_putvi(loc, el, value, status)
   locator * loc
-  int &el
-  int * value
-  int &status
+  ndfint &el
+  ndfint * value
+  ndfint &status
  PROTOTYPE: $$\@$
  CODE:
   dat_putvi_(loc, &el, value, &status, DAT__SZLOC);
@@ -2777,9 +2898,9 @@ dat_putvi(loc, el, value, status)
 void
 dat_putvr(loc, el, value, status)
   locator * loc
-  int &el
-  float * value
-  int &status
+  ndfint &el
+  ndffloat * value
+  ndfint &status
  PROTOTYPE: $$\@$
  CODE:
   dat_putvr_(loc, &el, value, &status, DAT__SZLOC);
@@ -2790,8 +2911,8 @@ void
 dat_ref(loc, ref, lref, status)
   locator * loc
   char * ref = NO_INIT
-  int &lref = NO_INIT
-  int &status
+  ndfint &lref = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ref = str1;
@@ -2805,8 +2926,8 @@ dat_ref(loc, ref, lref, status)
 void
 dat_refct(loc, refct, status)
   locator * loc
-  int &refct = NO_INIT
-  int &status
+  ndfint &refct = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_refct_(loc, &refct, &status, DAT__SZLOC);
@@ -2818,7 +2939,7 @@ void
 dat_renam(loc, name, status)
   locator * loc
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_renam_(loc, name, &status, DAT__SZLOC, strlen(name));
@@ -2828,7 +2949,7 @@ dat_renam(loc, name, status)
 void
 dat_reset(loc, status)
   locator * loc
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   dat_reset_(loc, &status, DAT__SZLOC);
@@ -2839,7 +2960,7 @@ void
 dat_retyp(loc, type, status)
   locator * loc
   char * type
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_retyp_(loc, type, &status, DAT__SZLOC, strlen(type));
@@ -2849,15 +2970,15 @@ dat_retyp(loc, type, status)
 void
 dat_shape(loc, ndimx, dim, ndim, status)
   locator * loc
-  int &ndimx
-  int * dim = NO_INIT
-  int &ndim = NO_INIT
-  int &status
+  ndfint &ndimx
+  ndfint * dim = NO_INIT
+  ndfint &ndim = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  dim = get_mortalspace(ndimx, 'i');
+  dim = get_mortalspace(ndimx, PACKI32);
   dat_shape_(loc, &ndimx, dim, &ndim, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)dim, 'i', ndim);
+  unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
   dim
   ndim
@@ -2866,8 +2987,8 @@ dat_shape(loc, ndimx, dim, ndim, status)
 void
 dat_size(loc, size, status)
   locator * loc
-  int &size = NO_INIT
-  int &status
+  ndfint &size = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_size_(loc, &size, &status, DAT__SZLOC);
@@ -2878,11 +2999,11 @@ dat_size(loc, size, status)
 void
 dat_slice(loc1, ndim, diml, dimu, loc2, status)
   locator * loc1
-  int ndim
-  int * diml
-  int * dimu
+  ndfint ndim
+  ndfint * diml
+  ndfint * dimu
   locator * loc2 = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$\@\@$$
  CODE:
   loc2 = floc;
@@ -2895,7 +3016,7 @@ void
 dat_state(loc, reply, status)
   locator * loc
   Logical &reply = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_state_(loc, &reply, &status, DAT__SZLOC);
@@ -2907,7 +3028,7 @@ void
 dat_struc(loc, reply, status)
   locator * loc
   Logical &reply = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_struc_(loc, &reply, &status, DAT__SZLOC);
@@ -2918,10 +3039,10 @@ dat_struc(loc, reply, status)
 void
 dat_temp(type, ndim, dim, loc, status)
   char * type
-  int &ndim
-  int * dim
+  ndfint &ndim
+  ndfint * dim
   locator * loc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
   loc = floc;
@@ -2935,7 +3056,7 @@ dat_there(loc, name, reply, status)
   locator * loc
   char * name
   Logical &reply = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_there_(loc, name, &reply, &status, DAT__SZLOC, strlen(name));
@@ -2947,7 +3068,7 @@ void
 dat_type(loc, type, status)
   locator * loc
   char * type = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   type = str1;
@@ -2961,7 +3082,7 @@ dat_type(loc, type, status)
 void
 dat_unmap(loc, status)
   locator * loc
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   dat_unmap_(loc, &status, DAT__SZLOC);
@@ -2972,7 +3093,7 @@ void
 dat_valid(loc, reply, status)
   locator * loc
   Logical &reply = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   dat_valid_(loc, &reply, &status, DAT__SZLOC);
@@ -2984,7 +3105,7 @@ void
 dat_vec(loc1, loc2, status)
   locator * loc1
   locator * loc2 = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   loc2 = floc;
@@ -2996,9 +3117,9 @@ dat_vec(loc1, loc2, status)
 void
 dat_where(loc, block, offset, status)
   locator * loc
-  int &block = NO_INIT
-  int &offset = NO_INIT
-  int &status
+  ndfint &block = NO_INIT
+  ndfint &offset = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   dat_where_(loc, &block, &offset, &status, DAT__SZLOC);
@@ -3015,7 +3136,7 @@ cmp_get0c(loc, name, value, status)
   locator * loc
   char * name
   char * value = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   value = str1;
@@ -3029,8 +3150,8 @@ void
 cmp_get0d(loc, name, value, status)
   locator * loc
   char * name
-  double &value = NO_INIT
-  int &status
+  ndfdouble &value = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   cmp_get0d_(loc, name, &value, &status, DAT__SZLOC, strlen(name));
@@ -3042,8 +3163,8 @@ void
 cmp_get0i(loc, name, value, status)
   locator * loc
   char * name
-  int &value = NO_INIT
-  int &status
+  ndfint &value = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   cmp_get0i_(loc, name, &value, &status, DAT__SZLOC, strlen(name));
@@ -3056,7 +3177,7 @@ cmp_get0l(loc, name, value, status)
   locator * loc
   char * name
   Logical &value = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   cmp_get0l_(loc, name, &value, &status, DAT__SZLOC, strlen(name));
@@ -3068,8 +3189,8 @@ void
 cmp_get0r(loc, name, value, status)
   locator * loc
   char * name
-  float &value = NO_INIT
-  int &status
+  ndffloat &value = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   cmp_get0r_(loc, name, &value, &status, DAT__SZLOC, strlen(name));
@@ -3082,13 +3203,13 @@ void
 cmp_get1c(loc, name, elx, value, el, status)
   locator * loc
   char * name
-  int &elx
+  ndfint &elx
   char * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
-  int i;
+  ndfint i;
   value = malloc(elx * FCHAR);
   cmp_get1c_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
   /* Write to perl character array */
@@ -3105,15 +3226,15 @@ void
 cmp_get1d(loc, name, elx, value, el, status)
   locator * loc
   char * name
-  int &elx
-  double * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndfdouble * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'd');
+  value = get_mortalspace(elx, PACKD);
   cmp_get1d_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
-  unpack1D( (SV*)ST(2), (void *)value, 'd', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -3123,15 +3244,15 @@ void
 cmp_get1i(loc, name, elx, value, el, status)
   locator * loc
   char * name
-  int &elx
-  int * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndfint * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'i');
+  value = get_mortalspace(elx, PACKI32);
   cmp_get1i_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
-  unpack1D( (SV*)ST(2), (void *)value, 'i', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -3141,15 +3262,15 @@ void
 cmp_get1r(loc, name, elx, value, el, status)
   locator * loc
   char * name
-  int &elx
-  float * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndffloat * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$\@$$
  CODE:
-  value = get_mortalspace(elx, 'f');
+  value = get_mortalspace(elx, PACKF);
   cmp_get1r_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
-  unpack1D( (SV*)ST(2), (void *)value, 'f', el);
+  unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
  OUTPUT:
   value
   el
@@ -3161,13 +3282,13 @@ void
 cmp_getvc(loc, name, elx, value, el, status)
   locator * loc
   char * name
-  int &elx
+  ndfint &elx
   char * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
-  int i;
+  ndfint i;
   value = malloc(elx * FCHAR);
   cmp_getvc_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
   /* Write to perl character array */
@@ -3184,15 +3305,15 @@ void
 cmp_getvd(loc, name, elx, value, el, status)
   locator * loc
   char * name
-  int &elx
-  double * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndfdouble * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
-  value = get_mortalspace(elx, 'd');
+  value = get_mortalspace(elx, PACKD);
   cmp_getvd_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name));
-  unpack1D( (SV*)ST(3), (void *)value, 'd', el);
+  unpack1D( (SV*)ST(3), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -3202,15 +3323,15 @@ void
 cmp_getvi(loc, name, elx, value, el, status)
   locator * loc
   char * name
-  int &elx
-  int * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndfint * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
-  value = get_mortalspace(elx, 'i');
+  value = get_mortalspace(elx, PACKI32);
   cmp_getvi_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name));
-  unpack1D( (SV*)ST(3), (void *)value, 'i', el);
+  unpack1D( (SV*)ST(3), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -3220,10 +3341,10 @@ void
 cmp_getvr(loc, name, elx, value, el, status)
   locator * loc
   char * name
-  int &elx
-  float * value = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &elx
+  ndffloat * value = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
   value = get_mortalspace(elx, 'r');
@@ -3239,8 +3360,8 @@ void
 cmp_len(loc, name, len, status)
   locator * loc
   char * name
-  int &len = NO_INIT
-  int &status
+  ndfint &len = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   cmp_len_(loc, name, &len, &status, DAT__SZLOC, strlen(name));
@@ -3254,9 +3375,9 @@ cmp_mapv(loc, name, type, mode, pntr, el, status)
   char * name
   char * type
   char * mode
-  int &pntr = NO_INIT
-  int &el   = NO_INIT
-  int &status
+  ndfint &pntr = NO_INIT
+  ndfint &el   = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$$$
  CODE:
   cmp_mapv_(loc, name, type, mode, &pntr, &el, &status, DAT__SZLOC, strlen(name), strlen(type), strlen(mode));
@@ -3270,9 +3391,9 @@ cmp_mod(loc, name, type, ndim, dim, status)
   locator * loc
   char * name
   char * type
-  int &ndim
-  int * dim
-  int &status
+  ndfint &ndim
+  ndfint * dim
+  ndfint &status
  PROTOTYPE: $$$$\@$
  CODE:
   cmp_mod_(loc, name, type, &ndim, dim, &status, DAT__SZLOC, strlen(name), strlen(type));
@@ -3283,10 +3404,10 @@ void
 cmp_modc(loc, name, len, ndim, dim, status)
   locator * loc
   char * name
-  int &len
-  int &ndim
-  int * dim
-  int &status
+  ndfint &len
+  ndfint &ndim
+  ndfint * dim
+  ndfint &status
  PROTOTYPE: $$$$\@$
  CODE:
   cmp_modc_(loc, name, len, &ndim, dim, &status, DAT__SZLOC, strlen(name));
@@ -3298,7 +3419,7 @@ cmp_prim(loc, name, reply, status)
   locator * loc
   char * name
   Logical &reply = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   cmp_prim_(loc, name, &reply, &status, DAT__SZLOC, strlen(name));
@@ -3311,7 +3432,7 @@ cmp_put0c(loc, name, value, status)
   locator * loc
   char * name
   char * value
-  int &status
+  ndfint &status
   PROTOTYPE: $$$$
  CODE:
   cmp_put0c_(loc, name, value, &status, DAT__SZLOC, strlen(name), strlen(value));
@@ -3322,8 +3443,8 @@ void
 cmp_put0d(loc, name, value, status)
   locator * loc
   char * name
-  double &value
-  int &status
+  ndfdouble &value
+  ndfint &status
   PROTOTYPE: $$$$
  CODE:
   cmp_put0d_(loc, name, &value, &status, DAT__SZLOC, strlen(name));
@@ -3334,8 +3455,8 @@ void
 cmp_put0i(loc, name, value, status)
   locator * loc
   char * name
-  int &value
-  int &status
+  ndfint &value
+  ndfint &status
   PROTOTYPE: $$$$
  CODE:
   cmp_put0i_(loc, name, &value, &status, DAT__SZLOC, strlen(name));
@@ -3347,7 +3468,7 @@ cmp_put0l(loc, name, value, status)
   locator * loc
   char * name
   Logical &value
-  int &status
+  ndfint &status
   PROTOTYPE: $$$$
  CODE:
   cmp_put0l_(loc, name, &value, &status, DAT__SZLOC, strlen(name));
@@ -3358,8 +3479,8 @@ void
 cmp_put0r(loc, name, value, status)
   locator * loc
   char * name
-  float &value
-  int &status
+  ndffloat &value
+  ndfint &status
   PROTOTYPE: $$$$
  CODE:
   cmp_put0r_(loc, name, &value, &status, DAT__SZLOC, strlen(name));
@@ -3370,10 +3491,10 @@ void
 cmp_put1c_r(loc, name, el, chrsz, value, status)
   locator * loc
   char * name
-  int &el
-  int chrsz
+  ndfint &el
+  ndfint chrsz
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   cmp_put1c_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name), chrsz);
@@ -3385,9 +3506,9 @@ void
 cmp_put1d(loc, name, el, value, status)
   locator * loc
   char * name
-  int &el
-  double * value
-  int &status
+  ndfint &el
+  ndfdouble * value
+  ndfint &status
   PROTOTYPE: $$$\@$
  CODE:
   cmp_put1d_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name));
@@ -3398,9 +3519,9 @@ void
 cmp_put1i(loc, name, el, value, status)
   locator * loc
   char * name
-  int &el
-  int * value
-  int &status
+  ndfint &el
+  ndfint * value
+  ndfint &status
   PROTOTYPE: $$$\@$
  CODE:
   cmp_put1i_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name));
@@ -3411,9 +3532,9 @@ void
 cmp_put1r(loc, name, el, value, status)
   locator * loc
   char * name
-  int &el
-  float * value
-  int &status
+  ndfint &el
+  ndffloat * value
+  ndfint &status
   PROTOTYPE: $$$\@$
  CODE:
   cmp_put1r_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name));
@@ -3425,11 +3546,11 @@ void
 cmp_putni(loc, name, ndim, dimx, value, dim, status)
   locator * loc
   char * name
-  int &ndim
-  int * dimx
-  int * value
-  int * dim
-  int &status
+  ndfint &ndim
+  ndfint * dimx
+  ndfint * value
+  ndfint * dim
+  ndfint &status
   PROTOTYPE: $$$\@\@\@$
  CODE:
   cmp_putni_(loc, name, &ndim, dimx, value, dim, &status, DAT__SZLOC, strlen(name));
@@ -3440,10 +3561,10 @@ void
 cmp_putvc_r(loc, name, el, chrsz, value, status)
   locator * loc
   char * name
-  int &el
-  int chrsz
+  ndfint &el
+  ndfint chrsz
   char * value
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   cmp_putvc_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name), chrsz);
@@ -3455,9 +3576,9 @@ void
 cmp_putvd(loc, name, el, value, status)
   locator * loc
   char * name
-  int &el
-  double * value
-  int &status
+  ndfint &el
+  ndfdouble * value
+  ndfint &status
   PROTOTYPE: $$$\@$
  CODE:
   cmp_putvd_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name));
@@ -3468,9 +3589,9 @@ void
 cmp_putvi(loc, name, el, value, status)
   locator * loc
   char * name
-  int &el
-  int * value
-  int &status
+  ndfint &el
+  ndfint * value
+  ndfint &status
   PROTOTYPE: $$$\@$
  CODE:
   cmp_putvi_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name));
@@ -3481,9 +3602,9 @@ void
 cmp_putvr(loc, name, el, value, status)
   locator * loc
   char * name
-  int &el
-  float * value
-  int &status
+  ndfint &el
+  ndffloat * value
+  ndfint &status
   PROTOTYPE: $$$\@$
  CODE:
   cmp_putvr_(loc, name, &el, value, &status, DAT__SZLOC, strlen(name));
@@ -3494,15 +3615,15 @@ void
 cmp_shape(loc, name, ndimx, dim, ndim, status)
   locator * loc
   char * name
-  int &ndimx
-  int * dim = NO_INIT
-  int &ndim = NO_INIT
-  int &status
+  ndfint &ndimx
+  ndfint * dim = NO_INIT
+  ndfint &ndim = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$\@$$
  CODE:
-  dim = get_mortalspace(ndimx, 'i');
+  dim = get_mortalspace(ndimx, PACKI32);
   cmp_shape_(loc, name, &ndimx, dim, &ndim, &status, DAT__SZLOC, strlen(name));
-  unpack1D( (SV*)ST(3), (void *)dim, 'i', ndim);
+  unpack1D( (SV*)ST(3), (void *)dim, PACKI32, ndim);
  OUTPUT:
   dim
   ndim
@@ -3512,8 +3633,8 @@ void
 cmp_size(loc, name, size, status)
   locator * loc
   char * name
-  int &size = NO_INIT
-  int &status
+  ndfint &size = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   cmp_size_(loc, name, &size, &status, DAT__SZLOC, strlen(name));
@@ -3526,7 +3647,7 @@ cmp_struc(loc, name, reply, status)
   locator * loc
   char * name
   Logical &reply = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   cmp_struc_(loc, name, &reply, &status, DAT__SZLOC, strlen(name));
@@ -3539,7 +3660,7 @@ cmp_type(loc, name, type, status)
   locator * loc
   char * name
   char * type = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   type = str1;
@@ -3553,7 +3674,7 @@ void
 cmp_unmap(loc, name, status)
   locator * loc
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   cmp_unmap_(loc, name, &status, DAT__SZLOC, strlen(name));
@@ -3567,7 +3688,7 @@ hds_copy(loc, file, name, status)
   locator * loc
   char * file
   char * name
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   hds_copy_(loc, file, name, &status, DAT__SZLOC, strlen(file), strlen(name));
@@ -3577,7 +3698,7 @@ hds_copy(loc, file, name, status)
 void
 hds_erase(loc, status)
   locator * loc
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   hds_erase_(loc, &status, DAT__SZLOC);
@@ -3586,8 +3707,8 @@ hds_erase(loc, status)
 
 void
 hds_ewild(iwld, status)
-  int &iwld
-  int &status
+  ndfint &iwld
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   hds_ewild_(&iwld, &status);
@@ -3598,7 +3719,7 @@ hds_ewild(iwld, status)
 void
 hds_flush(group, status)
   char * group
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   hds_flush_(group, &status, strlen(group));
@@ -3608,7 +3729,7 @@ hds_flush(group, status)
 void
 hds_free(loc, status)
   locator * loc
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   hds_free_(loc, &status, DAT__SZLOC);
@@ -3619,7 +3740,7 @@ void
 hds_group(loc, group, status)
   locator * loc
   char * group = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   group = str1;
@@ -3632,8 +3753,8 @@ hds_group(loc, group, status)
 void
 hds_gtune(param, value, status)
   char * param
-  int &value = NO_INIT
-  int &status
+  ndfint &value = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   hds_gtune_(param, &value, &status, strlen(param));
@@ -3645,7 +3766,7 @@ void
 hds_link(loc, group, status)
   locator * loc
   char * group
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   hds_link_(loc, group, &status, DAT__SZLOC);
@@ -3655,7 +3776,7 @@ hds_link(loc, group, status)
 void
 hds_lock(loc, status)
   locator * loc
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   hds_lock_(loc, &status, DAT__SZLOC);
@@ -3668,10 +3789,10 @@ hds_new(file, name, type, ndim, dim, loc, status)
   char * file
   char * name
   char * type
-  int &ndim
-  int * dim
+  ndfint &ndim
+  ndfint * dim
   locator * loc = NO_INIT
-  int &status
+  ndfint &status
   PROTOTYPE: $$$$\@$$
  CODE:
   loc = floc;
@@ -3686,7 +3807,7 @@ hds_open(file, mode, loc, status)
   char * file
   char * mode
   locator * loc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   loc = floc;
@@ -3698,7 +3819,7 @@ hds_open(file, mode, loc, status)
 void
 hds_show(topic, status)
   char * topic
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   hds_show_(topic, &status, strlen(topic));
@@ -3709,7 +3830,7 @@ hds_show(topic, status)
 void
 hds_state(state, status)
   Logical &state
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   hds_state_(&state, &status);
@@ -3719,7 +3840,7 @@ hds_state(state, status)
 
 void
 hds_stop(status)
-  int &status
+  ndfint &status
  PROTOTYPE: $
  CODE:
   hds_stop_(&status);
@@ -3727,10 +3848,10 @@ hds_stop(status)
 void
 hds_trace(loc, nlev, path, file, status)
   locator * loc
-  int & nlev = NO_INIT
+  ndfint & nlev = NO_INIT
   char * path = NO_INIT
   char * file = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   path = str1;
@@ -3747,8 +3868,8 @@ hds_trace(loc, nlev, path, file, status)
 void
 hds_tune(param, value, status)
   char * param
-  int &value
-  int &status
+  ndfint &value
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   hds_tune_(param, &value, &status, strlen(param));
@@ -3759,9 +3880,9 @@ void
 hds_wild(fspec, mode, iwld, loc, status)
   char * fspec
   char * mode
-  int &iwld
+  ndfint &iwld
   locator * loc = NO_INIT
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   loc = floc;
@@ -3777,24 +3898,24 @@ hds_wild(fspec, mode, iwld, loc, status)
 
 void
 ary_annul(iary, status)
-  int &iary
-  int &status
+  ndfint &iary
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   ary_annul_(&iary, &status);
   
 void
 ary_dim(iary, ndimx, dim, ndim, status)
-  int &iary
-  int &ndimx
-  int * dim = NO_INIT
-  int &ndim = NO_INIT
-  int &status
+  ndfint &iary
+  ndfint &ndimx
+  ndfint * dim = NO_INIT
+  ndfint &ndim = NO_INIT
+  ndfint &status
  PROTOTYPE: $$@$$
  CODE:
-  dim = get_mortalspace(ndimx, 'i');
+  dim = get_mortalspace(ndimx, PACKI32);
   ary_dim_(&iary, &ndimx, dim, &ndim, &status);
-  unpack1D( (SV*)ST(2), (void *)dim, 'i', ndim);
+  unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
   dim
   ndim
@@ -3804,8 +3925,8 @@ void
 ary_find(loc, name, iary, status)
   locator * loc
   char * name
-  int &iary
-  int &status
+  ndfint &iary
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   ary_find_(loc, name, &iary, &status, DAT__SZLOC, strlen(name));
@@ -3815,12 +3936,12 @@ ary_find(loc, name, iary, status)
 
 void
 ary_map(iary, type, mmod, pntr, el, status)
-  int &iary
+  ndfint &iary
   char * type
   char * mmod
-  int &pntr = NO_INIT
-  int &el = NO_INIT
-  int &status
+  ndfint &pntr = NO_INIT
+  ndfint &el = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$$
  CODE:
   ary_map_(&iary,type, mmod, &pntr, &el, &status, strlen(type), strlen(mmod));
@@ -3831,9 +3952,9 @@ ary_map(iary, type, mmod, pntr, el, status)
 
 void
 ary_ndim(iary, ndim, status)
-  int &iary
-  int &ndim = NO_INIT
-  int &status
+  ndfint &iary
+  ndfint &ndim = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   ary_ndim_(&iary, &ndim, &status);
@@ -3843,9 +3964,9 @@ ary_ndim(iary, ndim, status)
 
 void
 ary_size(iary, npix, status)
-  int &iary
-  int &npix = NO_INIT
-  int &status 
+  ndfint &iary
+  ndfint &npix = NO_INIT
+  ndfint &status 
  PROTOTYPE: $$$
  CODE:
   ary_size_(&iary, &npix, &status);
@@ -3855,8 +3976,8 @@ ary_size(iary, npix, status)
 
 void
 ary_unmap(iary, status)
-  int &iary
-  int &status
+  ndfint &iary
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   ary_unmap_(&iary, &status);
@@ -3867,7 +3988,7 @@ ary_unmap(iary, status)
 
 void
 msg_bell(status)
-  int &status
+  ndfint &status
  PROTOTYPE: $
  CODE:
   msg_bell_(&status);
@@ -3876,7 +3997,7 @@ msg_bell(status)
 
 void
 msg_blank(status)
-  int &status
+  ndfint &status
  PROTOTYPE: $
  CODE:
   msg_blank_(&status);
@@ -3896,7 +4017,7 @@ void
 msg_fmtd(token, format, value)
   char * token
   char * format
-  double  &value
+  ndfdouble  &value
  PROTOTYPE: $$$
  CODE:
   msg_fmtd_(token, format, &value, strlen(token), strlen(format));
@@ -3905,7 +4026,7 @@ void
 msg_fmti(token, format, value)
   char * token
   char * format
-  int  &value
+  ndfint  &value
  PROTOTYPE: $$$
  CODE:
   msg_fmti_(token, format, &value, strlen(token), strlen(format));
@@ -3923,14 +4044,14 @@ void
 msg_fmtr(token, format, value)
   char * token
   char * format
-  float  &value
+  ndffloat  &value
  PROTOTYPE: $$$
  CODE:
   msg_fmtr_(token, format, &value, strlen(token), strlen(format));
 
 void
 msg_iflev(filter)
-  int &filter = NO_INIT
+  ndfint &filter = NO_INIT
  PROTOTYPE: $
  CODE:
   msg_iflev_(&filter);
@@ -3939,8 +4060,8 @@ msg_iflev(filter)
 
 void
 msg_ifset(filter, status)
-  int &filter
-  int &status
+  ndfint &filter
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   msg_ifset_(&filter, &status);
@@ -3950,8 +4071,8 @@ msg_load(param, text, opstr, oplen, status)
   char * param
   char * text
   char * opstr = NO_INIT
-  int &oplen   = NO_INIT
-  int &status
+  ndfint &oplen   = NO_INIT
+  ndfint &status
  PROTOTYPE: $$$$$
  CODE:
   opstr = str1;
@@ -3966,7 +4087,7 @@ void
 msg_out(param, text, status)
   char * param
   char * text
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   msg_out_(param, text, &status, strlen(param), strlen(text));
@@ -3975,10 +4096,10 @@ msg_out(param, text, status)
 
 void
 msg_outif(prior, param, text, status)
-  int &prior
+  ndfint &prior
   char * param
   char * text
-  int &status
+  ndfint &status
  PROTOTYPE: $$$$
  CODE:
   msg_outif_(&prior, param, text, &status, strlen(param), strlen(text));
@@ -4002,7 +4123,7 @@ msg_setc(token, value)
 void
 msg_setd(token, value)
   char * token
-  double &value
+  ndfdouble &value
  PROTOTYPE: $$
  CODE:
   msg_setd_(token, &value, strlen(token));
@@ -4010,7 +4131,7 @@ msg_setd(token, value)
 void
 msg_seti(token, value)
   char * token
-  int &value
+  ndfint &value
  PROTOTYPE: $$
  CODE:
   msg_seti_(token, &value, strlen(token));
@@ -4026,7 +4147,7 @@ msg_setl(token, value)
 void
 msg_setr(token, value)
   char * token
-  float &value
+  ndffloat &value
  PROTOTYPE: $$
  CODE:
   msg_setr_(token, &value, strlen(token));
@@ -4038,7 +4159,7 @@ msg_setr(token, value)
 
 void
 err_annul(status)
-  int &status = NO_INIT
+  ndfint &status = NO_INIT
  PROTOTYPE: $
  CODE:
   err_annul_(&status);
@@ -4047,7 +4168,7 @@ err_annul(status)
 
 void
 err_begin(status)
-  int &status
+  ndfint &status
  PROTOTYPE: $
  CODE:
   err_begin_(&status);
@@ -4056,7 +4177,7 @@ err_begin(status)
 
 void
 err_end(status)
-  int &status = NO_INIT
+  ndfint &status = NO_INIT
  PROTOTYPE: $
  CODE:
   err_end_(&status);
@@ -4066,7 +4187,7 @@ err_end(status)
 void
 err_facer(token, status)
   char * token
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   err_facer_(token, &status, strlen(token));
@@ -4074,14 +4195,14 @@ err_facer(token, status)
 void
 err_fioer(token, iostat)
   char * token
-  int &iostat
+  ndfint &iostat
  PROTOTYPE: $$
  CODE:
   err_fioer_(token, &iostat, strlen(token));
 
 void
 err_flbel(status)
-  int &status = NO_INIT
+  ndfint &status = NO_INIT
  PROTOTYPE: $
  CODE:
   err_flbel_(&status);
@@ -4090,7 +4211,7 @@ err_flbel(status)
 
 void
 err_flush(status)
-  int &status = NO_INIT
+  ndfint &status = NO_INIT
  PROTOTYPE: $
  CODE:
   err_flush_(&status);
@@ -4099,7 +4220,7 @@ err_flush(status)
 
 void
 err_level(level)
-  int &level = NO_INIT
+  ndfint &level = NO_INIT
  PROTOTYPE: $
  CODE:
   err_level_(&level);
@@ -4109,10 +4230,10 @@ err_level(level)
 void
 err_load(param, parlen, opstr, oplen, status)
   char * param = NO_INIT
-  int  &parlen = NO_INIT
+  ndfint  &parlen = NO_INIT
   char * opstr = NO_INIT
-  int &oplen   = NO_INIT
-  int &status  = NO_INIT
+  ndfint &oplen   = NO_INIT
+  ndfint &status  = NO_INIT
  PROTOTYPE: $$$$$
  CODE:
   param = str1;
@@ -4138,7 +4259,7 @@ void
 err_rep(param, text, status)
   char * param 
   char * text
-  int &status
+  ndfint &status
  PROTOTYPE: $$$
  CODE:
   err_rep_(param, text, &status, strlen(param), strlen(text));
@@ -4154,7 +4275,7 @@ err_rlse()
 
 void
 err_stat(status)
-  int &status = NO_INIT
+  ndfint &status = NO_INIT
  PROTOTYPE: $
  CODE:
   err_stat_(&status);
@@ -4164,35 +4285,76 @@ err_stat(status)
 void
 err_syser(token, status)
   char * token
-  int &status
+  ndfint &status
  PROTOTYPE: $$
  CODE:
   err_syser_(token, &status, strlen(token));
 
 
+########################################
 # Non Starlink stuff
+#  This is so we can handle the pointers used
+#  by starlink packages
+
+
+# This routine copies nbytes from pointer to a perl string
 
 void
 mem2string(address,nbytes,dest_string)
-  int address
-  int nbytes
+  ndfint address
+  ndfint nbytes
   char * dest_string = NO_INIT
  PROTOTYPE: $$$
  CODE:
   sv_setpvn((SV*)ST(2), (char *)address, nbytes);
 
+# This routine copies a (usually packed) perl string into a 
+# memory location
+
 void
 string2mem(input_string, nbytes, address)
   char * input_string
   size_t nbytes
-  int &address
+  ndfint &address
  PROTOTYPE: $$$
  CODE:
   char * dest;
   dest = (void *) address;
   memmove(dest, input_string, nbytes);
 
-# Return size (in bytes) of ints and floats, shorts
+# This routines copies a perl array (or PDL) into a pointer
+# The type of array is passed in by the user
+# Supported types are:  'u' - unsigned char [fortran ubyte]
+#                       's' - short         [fortran 2 byte word]
+#                       'i' - int           [4 byte int]
+#                       'f' - float         [4 byte real]
+#                       'd' - double        [8 byte double]
+
+#void
+#array2mem(array, type, address)
+#   SV* array
+#   char * type
+#   T_PTR address
+# PREINIT:
+#  ndfint * pint; /* pointer to packed int array */
+#  unsigned char * puchar;
+#  short * pshort;
+#  ndffloat * pfloat;
+#  ndfdouble * pdouble;
+#  ndfint nbytes;
+# CODE:
+
+#  switch (*type) { 
+#    
+#  case 'u':
+#   puchar = (unsigned char *)pack1D((SV*)array, 'u'); 
+#    memmove((void *) address, (void *) puchar, nbytes);
+#    break;
+
+#  }
+
+
+# Return size (in bytes) of ints and ndffloats, shorts
 # by pack type (see Perl pack command)  [b, r and w are FORTRAN types]
 
 int
@@ -4216,19 +4378,19 @@ byte_size(packtype)
 
   case 'd':
   case 'D':
-    RETVAL = sizeof(double);
+    RETVAL = sizeof(ndfdouble);
     break;
 
   case 'i':
   case 'I':
-    RETVAL = sizeof(int);
+    RETVAL = sizeof(ndfint);
     break;
 
   case 'f':
   case 'r':
   case 'R':
   case 'F':
-    RETVAL = sizeof(float);
+    RETVAL = sizeof(ndffloat);
     break;
 
   case 'l':
