@@ -14,8 +14,12 @@ say the Digital Sky Survey, or other on-line sources of images) or an
 NDF with a defined WCS component, then will GAIA display the current
 coordinates in the Alpha and Delta readouts.<br>
 <p align=center>
-<img align=center src="panel.gif">
+<img src="panel.gif">
 <br>
+<p>
+You view coordinates in all the built-in systems using the 
+<a href="alldomains.html">Show all coordinates toolbox</a>.
+
 
 <h3>Getting offsets between positions</h3>
 <p>To see the RA and Dec offsets between two positions just place your
@@ -38,18 +42,32 @@ for controlling the appearance of the grid.
 <li><a href="grid.html">Hints for the grid plotting toolbox</a>.
 </ul>
 
-<h3>Changing the celestial coordinate system</h3>
+<h3>Changing the coordinate system</h3>
 <p>If you need to change the coordinate system of your image (so that for
 instance it shows positions in FK4 instead of FK5, or if you'd like to
 measure a Galactic position) then you can do this using the "Celestial
-coordinates..." toolbox. Typically when calibrating an image you
-calibrate to the system in which your reference positions are
-available (normally FK5 with an equinox of J2000).
+coordinates..." and "Built-in coordinates..." toolboxes. 
+
+The difference between changing the celestial coordinates and built-in
+ones, is that you can request any celestial system supported, as along
+as your image has at least one celestial system already. Whereas the
+built-in ones are just those present in whatever calibration your
+image has (for FITS this tends to be just grid coordinates and your
+initial celestial system, for NDFs there can be many additional
+systems, like pixel coordinates).
 
 <p>Help with using the celestial coordinates toolbox is available:
 <ul>
 <li><a href="system.html">Hints for the celestial coordinates toolbox</a>.
 </ul>
+
+<p>Help with using the built-in coordinates toolbox is available:
+<ul>
+<li><a href="domain.html">Hints for the built-in coordinates toolbox</a>.
+</ul>
+Note that you can see the coordinates in all the built-in systems
+using the <a href="alldomains.html">Show all coordinates toolbox</a>.
+
 
 <h3>Astrometrically calibrating images</h3>
 <p>GAIA offers you a great deal of flexibility in setting and checking
