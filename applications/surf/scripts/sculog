@@ -253,6 +253,9 @@ foreach $scufile (@sortndf) {
 
   %fitsitem = ();
 
+  # Set up the mode since $var =~ /undef/ returns true!
+  $fitsitem{'MODE'} = "undefined";
+
 # Read in all the FITS items and store in HASH
   for ($i = 0; $i < $nfits; $i++) {
     ($item, $value, $comment) = fits_get_nth_item(@fits,$i);
