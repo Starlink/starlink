@@ -95,6 +95,8 @@ void  computeaperflux(picstruct *field, picstruct *wfield,
     }
 
   strip = field->strip;
+  wstript = wstrip; /* PWD: this was unintialised for wfield=NULL */
+
   if (wfield)
     wstrip = wfield->strip;
   for (y=ymin; y<ymax; y++)

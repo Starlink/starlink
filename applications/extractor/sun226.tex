@@ -18,7 +18,7 @@
 \newcommand{\stardocnumber}    {226.4}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {24 April 2001}
+\newcommand{\stardocdate}      {14 September 2001}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocversion}   {1.2}
@@ -691,8 +691,8 @@ detect_thresh
 !
 EOF
 
-# Extract all objects above 2 sigma
-extractor keywords image=image config=default.sex <<EOF
+# Extract all objects above 2 sigma and measure on a different image.
+extractor keywords image='"detect,measure"' config=default.sex <<EOF
 catalog_name
 thresh2.cat
 detect_thresh
@@ -1006,10 +1006,25 @@ the peak intensity.
               if \texttt{WEIGHT\_TYPE} != \texttt{NONE}
       \end{itemize}
  \end{itemize}
- The new mean radii measurements are controlled by the keywords
- \texttt{RAD\_THRESH} and \texttt{RAD\_TYPE}. These allow for up to 
- $16$ levels specified by the \texttt{RAD0} through \texttt{RAD15} 
- parameters.
+
+\subsection{Version 1.3-0}
+A minor update to \EXTRACTOR\ with the following changes:
+\begin{itemize}
+   \item a bug in \EXTRACTOR\ that could cause a crash on Tru64 UNIX if
+       the measurement image contained BAD values that the detection
+       image did not, has been fixed.
+
+    \item The output format for the \texttt{X\_WORLD} and
+          \texttt{Y\_WORLD} fields has been changed to always give at
+           least $0.01$ arcsecond accuracy. 
+
+    \item \EXTRACTOR\ and \SExtractor\ have modified to offer the
+       \texttt{BKGSIG} parameter (local background sigma) option used
+       by \texttt{GIM2D} .
+
+     \item A bug causing the output from \EXTRACTOR\ to be occasionally 
+       garbled has been fixed.
+\end{itemize}
 
 \section{\xlabel{references}References}
 Bailey, J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\

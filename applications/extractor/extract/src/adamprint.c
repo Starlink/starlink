@@ -25,7 +25,7 @@ void adamprint( FILE *file, char *fmt, ... )
 
     /* Strip out any 4 character escape sequences from format string */
     len = strlen( fmt );
-    fmtcpy = (char *) malloc( (size_t) len );
+    fmtcpy = (char *) malloc( (size_t) len + 1 );
     for ( i = 0, j = 0; i < len; i++, j++ ) {
         if ( fmt[i] == '\33' ) i += 4;
         fmtcpy[j] = fmt[i];
