@@ -18,9 +18,12 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.5  1996/09/18 19:13:19  timj
-*     Add KSTEST, change CONCAT to SCUCAT
+*     Revision 1.6  1996/10/15 01:44:29  timj
+*     Add DRAWSIG
 *
+c Revision 1.5  1996/09/18  19:13:19  timj
+c Add KSTEST, change CONCAT to SCUCAT
+c
 c Revision 1.4  1996/09/17  02:14:22  timj
 c Add CONCAT
 c
@@ -105,6 +108,9 @@ c
       ELSE IF (NAME .EQ. 'KSTEST') THEN
 
          CALL REDS_KSTEST (STATUS)
+
+      ELSE IF (NAME .EQ. 'DRAWSIG') THEN
+         CALL DRAWSIG (STATUS) 
 
       END IF
 
