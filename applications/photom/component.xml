@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="photom">
+  <version>1.9-0</version>
+  <path>applications/photom</path>
+  <description>PHOTOM - A Photometry Package</description>
+  <abstract><p>PHOTOM is a package for measuring the sky corrected
+    magnitudes and fluxes of astronomical objects, within circular and
+    elliptical apertures, using either the aperture or optimal extraction
+    algorithms.</p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>ard</build><build>fio</build><build>grp</build><build>ndf</build><build>agi</build><build>sgs</build><build>pgp</build><build>gns</build><build>gks</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation> sun45</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
