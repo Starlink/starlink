@@ -450,7 +450,7 @@ pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_vecky.f pol1_vecpl.f \
 pol1_vect.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f polbin.f \
 polcal.f polcent.f polexp.f polext.f polhelp.f polimp.f polka.f \
 polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f pol1_dbeam.f \
-pol1_sngad.f  pol1_sngcl.f  pol1_sngbm.f pol1_snghd.f \
+pol1_sngad.f  pol1_sngcl.f  pol1_sngbm.f pol1_snghd.f polimpx.f \
 pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f \
 pol1_sngsm.f pol1_blocr.f pol1_sngvn.f pol1_sngva.f pol1_sngct.f\
 polsim.f pol1_simcl.f pol1_ptvrs.f pol1_gtvrs.f pol1_prsvr.f \
@@ -493,7 +493,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polka datapic polcent polcal polimp polext \
+TASKS = polhelp polka datapic polcent polcal polimp polimpx polext \
 polexp polvec polplot polbin polsim polimage
 
 #  Monolith routine source name.
@@ -512,7 +512,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl polimage.ifl \
-polbin.ifl polsim.ifl
+polbin.ifl polsim.ifl polimpx.ifl
 
 #  List of help library sources.
 
@@ -1828,6 +1828,7 @@ polexp.o:	 SAE_PAR DAT_PAR GRP_PAR
 polext.o:	 SAE_PAR DAT_PAR GRP_PAR PAR_ERR PRM_PAR
 polhelp.o:	 SAE_PAR PAR_ERR
 polimp.o:	 SAE_PAR DAT_PAR FIO_PAR GRP_PAR
+polimpx.o:	 SAE_PAR DAT_PAR GRP_PAR
 polka.o:	 SAE_PAR GRP_PAR PAR_ERR PRM_PAR NDF_PAR
 polpack_mon.o:	 SAE_PAR PAR_PAR
 polplot.o:	 SAE_PAR PRM_PAR AST_PAR CAT_PAR PAR_ERR

@@ -612,6 +612,40 @@ interface POLIMP
 endinterface
 #+
 #  Name:
+#     POLIMPX.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     6-MAY-1999 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLIMPX
+
+   helplib 'POLPACK_HELP:'
+
+   parameter IN                  
+      position 1
+      type     NDF
+      access   READ
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
 #     POLKA.IFL
 
 #  Type of Module:
