@@ -5316,6 +5316,7 @@ U java/source/hds/src/testcases/uk/ac/starlink/hds/HDSNDArrayTest.java
 U java/source/hds/src/testcases/uk/ac/starlink/hds/HDSTest.java
 U java/source/hds/src/testcases/uk/ac/starlink/hds/NDFNdxTest.java
 U java/source/hds/src/testcases/uk/ac/starlink/hds/NdfMakerTest.java
+U java/source/hds/src/testcases/uk/ac/starlink/hds/no-ns.xml
 U java/source/hds/src/testcases/uk/ac/starlink/hds/reduced_data1.sdf
 cvs checkout: Updating java/source/hdx
 U java/source/hdx/build.xml
@@ -7399,6 +7400,7 @@ U java/source/table/src/resources/uk/ac/starlink/table/text/UCDs
 cvs checkout: Updating java/source/table/src/script
 U java/source/table/src/script/startab
 U java/source/table/src/script/tablecopy
+U java/source/table/src/script/topcat
 cvs checkout: Updating java/source/tamfits
 U java/source/tamfits/README
 U java/source/tamfits/build.xml
