@@ -35,6 +35,7 @@ GRP_C_ROUTINES = \
     fskyframe.c \
     fslamap.c \
     fspecframe.c \
+    fdsbspecframe.c \
     fspecmap.c \
     fsphmap.c \
     ftranmap.c \
@@ -61,6 +62,7 @@ GRP_C_ROUTINES = \
     skyaxis.c \
     skyframe.c \
     slamap.c \
+    dsbspecframe.c \
     specframe.c \
     specmap.c \
     sphmap.c \
@@ -115,6 +117,7 @@ AST_H_FILES = \
                 plot.h \
              skyframe.h \
              specframe.h \
+                dsbspecframe.h \
        channel.h \
           fitschan.h \
           xmlchan.h 

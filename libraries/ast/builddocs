@@ -29,6 +29,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/channel.c \
             ${srcdir}/cmpframe.c \
             ${srcdir}/cmpmap.c \
+            ${srcdir}/dsbspecframe.c \
             ${srcdir}/dssmap.c \
             ${srcdir}/error.c \
             ${srcdir}/fchannel.c \

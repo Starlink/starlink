@@ -53,6 +53,7 @@ object.h \
             plot.h \
          skyframe.h \
          specframe.h \
+            dsbspecframe.h \
    channel.h \
       fitschan.h
 

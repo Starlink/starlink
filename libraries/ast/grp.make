@@ -41,6 +41,7 @@ frame.c \
 frameset.c \
 fskyframe.c \
 fslamap.c \
+fdsbspecframe.c \
 fspecframe.c \
 fspecmap.c \
 fsphmap.c \
@@ -72,6 +73,7 @@ skyaxis.c \
 skyframe.c \
 sla.c \
 slamap.c \
+dsbspecframe.c \
 specframe.c \
 specmap.c \
 sphmap.c \
@@ -131,6 +133,7 @@ skyaxis.h \
 skyframe.h \
 slalib.h \
 slamap.h \
+dsbspecframe.h \
 specframe.h \
 specmap.h \
 sphmap.h \

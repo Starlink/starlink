@@ -4,6 +4,7 @@
 #include "cmpframe.h"
 #include "cmpmap.h"
 #include "dssmap.h"
+#include "dsbspecframe.h"
 #include "fitschan.h"
 #include "frame.h"
 #include "frameset.h"
@@ -60,6 +61,8 @@
 *        Added the SpecMap and SpecFrame classes.
 *     15-JUL-2003 (DSB):
 *        Added the GrsimMap class.
+*     6-AUG-2004 (DSB):
+*        Added the DSBSpecFrame class.
 *-
 */
 
@@ -73,6 +76,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(Channel);
    LOAD(CmpFrame);
    LOAD(CmpMap);
+   LOAD(DSBSpecFrame);
    LOAD(DssMap);
    LOAD(FitsChan);
    LOAD(Frame);

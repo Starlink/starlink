@@ -249,7 +249,7 @@ AstMathMap *astMathMap_( int, int, int, const char *[], int, const char *[],
                          const char *, ... );
 #else
 AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[],
-                           const char *options, ... );
+                           const char *, ... );
 #endif
 
 #if defined(astCLASS)            /* Protected */
