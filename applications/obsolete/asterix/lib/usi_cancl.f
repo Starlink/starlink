@@ -51,8 +51,8 @@
       CALL ERR_MARK
 
 *    Check USI initialised
-      IF ( .NOT .USI_SYINIT ) THEN
-        CALL USI_INIT( STATUS )
+      IF ( .NOT. USI_SYINIT ) THEN
+        CALL USI_INIT( )
       END IF
 
 *    Locate the CANCL facility in this context
