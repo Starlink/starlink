@@ -44,8 +44,9 @@ proc red4FileObs {taskname type} {
 
 #     Else file as calib if required
         } elseif {$type=="calib"} {
-          $taskname obey file_calib "observation=$obs change_label=TRUE \
-            newlabel='Wavelength' newunits='Microns'" -inform "Cgs4drInform $taskname %V"
+          $taskname obey file_calib \
+            "observation=$obs change_label='TRUE' newlabel='Wavelength' newunits='Microns'" \
+            -inform "cgs4drInform $taskname %V"
 
 #     Otherwise we need to change a fits item
         } else {
