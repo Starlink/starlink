@@ -477,6 +477,7 @@ do
         echo "echo 'filename=$filename' >&4"                             >&3
 cat >&3 <<\_STARCONF3_EOD
 cat >&4 <<\_STARCONF4_EOD
+    if test -e $filename; then
         # Extract the first word on the second line, and the value of rnum
         eval `sed -n -e '2s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\).*/original=\1; file_version=\2;/p' -e 3q $filename`
         if test "X$original" != Xoriginal; then
@@ -488,6 +489,10 @@ cat >&4 <<\_STARCONF4_EOD
             # no need to do anything
             unpack_this=false
         fi
+    else
+        # file doesn't exist, so unpack it
+        unpack_this=true
+    fi
 _STARCONF4_EOD
 _STARCONF3_EOD
     elif expr x$opts : "x.*f" >/dev/null; then
