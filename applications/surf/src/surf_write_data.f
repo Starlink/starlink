@@ -119,12 +119,12 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
+      INTEGER NPTS
       DOUBLE PRECISION BOL_RA(NPTS)
       DOUBLE PRECISION BOL_DEC(NPTS)
       INTEGER FD
       REAL    IN_DATA(NPTS)
       REAL    IN_VARIANCE(NPTS)
-      INTEGER NPTS
 
 *  Status
       INTEGER STATUS
