@@ -509,12 +509,12 @@
             IF (.NOT.OK) THEN
               FONT=1
             ENDIF
-            CALL IMG_NBPUT0C('PAR_I1',FONT,STATUS)
+            CALL IMG_NBPUT0I('PAR_I1',FONT,STATUS)
             CALL GCB_GET1I('TITLE_BOLD',I,1,OK,BOLD,STATUS)
             IF (.NOT.OK) THEN
               BOLD=1
             ENDIF
-            CALL IMG_NBPUT0C('PAR_I2',BOLD,STATUS)
+            CALL IMG_NBPUT0I('PAR_I2',BOLD,STATUS)
             CALL GCB_GET1R('TITLE_SIZE',I,1,OK,SIZE,STATUS)
             IF (.NOT.OK) THEN
               SIZE=1.0
