@@ -1,0 +1,1282 @@
+#+
+#  Name:
+#     makefile
+#
+#  Purpose:
+#     Builds and installs the CONVERT package
+#
+#  Type of Module:
+#     Description file for the "make" utility.
+#
+#  Description:
+#     This description file is used by the "make" utility to build
+#     the CON object-code library, the CONVERT executables, compiled
+#     interface files and help library from the distributed source
+#     files; to install the resulting system for use, and to perform
+#     other housekeeping tasks.
+#
+#  Invocation:
+#     This makefile is not intended to be used by make when invoked
+#     directly (although this is possible), but instead to be used via
+#     the accompanying mk script. This script sets up a number of
+#     environment variables which are used as macros within the
+#     makefile and which accommodate differences between machines and
+#     operating systems (it invokes make with the -e option). Please
+#     consult the mk script prologue for full details.
+#
+#  Targets:
+#     The following make targets are defined in this script for
+#     external use:
+#     
+#        [help]
+#	    This is the default target.  It outputs a message describing
+#	    the mk script and lists the targets provided.
+#        archive
+#           Creates the source-file tar file.  It is not part of the 
+#           standard set of Starlink targets, and it is provided for
+#           use during code development and the convenience for the
+#           programmer.
+#        check
+#	    Performs a simple check that all necessary source files are
+#	    present, and displays the version number and current state
+#	    of the package (built/installed/tested, etc.).
+#        build
+#           Compiles the source files and creates all files needed
+#           prior to installing the package for use.
+#        install
+#	    Installs the package for use by putting the necessary files
+#	    into sub-directories of the $INSTALL directory (the $HOME
+#	    directory is used if the environment variable INSTALL is
+#	    not defined).  Links to the installed files are left in the
+#	    source directory.
+#        deinstall
+#           Reverses the action of the install target, removing files
+#           from sub-directories of the $INSTALL directory and
+#           restoring them to the source directory (the $HOME directory
+#           is used by default if the environment variable INSTALL is
+#           not defined).
+#        test
+#           Runs an installed application on test data to check for
+#           correct installation of the package.
+#        export
+#           Produces an export copy of the built package suitable for
+#           passing to another user.  A compressed tar file is created
+#           in the $EXPORT directory containing copies of the source
+#           files and built files for the package (the current
+#           directory is used by default if the environment variable
+#           EXPORT is not defined).  The package should normally be
+#           built, installed and tested (see above) before using this
+#           target.  After unpacking the exported file on a similar
+#           machine, the recipient may simply install it for use.
+#        export_source
+#	    Produces an export copy of the source for the package
+#	    suitable for passing to another user to build (possibly on
+#	    a different type of machine).  A compressed tar file is
+#	    created in the $EXPORT directory containing copies of just
+#	    the source files for the packge (the current directory is
+#	    used by default if the environment variable EXPORT is not
+#	    defined).  After unpacking the exported file, the recipient
+#	    must build the package before installing it for use.
+#        clean
+#           Cleans up after building the package, removing all
+#           intermediate files created during the building process, but
+#           leaving the built files themselves.
+#        unbuild
+#           Reverses the building process, removing all intermediate
+#           files along with all the built files.
+
+#  External Dependencies:
+#     The CONVERT package depends on the following other Starlink packages
+#     which must previously have been installed into the appropriate
+#     sub-directories of the $STARLINK directory (/star is used if the
+#     environment variable STARLINK is not defined).
+#
+#        chr
+#           Character-handling routines.
+#        dta
+#           Figaro old data system and Figaro include files.
+#        err/msg
+#           Message and error reporting systems.
+#        fio
+#           Fortran input-output routines.
+#        hds
+#           Hierarchical data system.
+#        help
+#           Portable Help System.
+#        iraf
+#           IRAF Fortran libraries.
+#        ndf
+#           N-dimensional-data-format routines.
+#        par
+#           Parameter-system routines.
+#        posix
+#           POSIX routines.
+#        primdat
+#           Primitive data facilities.
+#        sae_par
+#           Global include file in /star/include.
+
+#  Notes:
+#     This makefile uses the presence/absence of the hidden files
+#     .BUILT, .INSTALLED_$(SYSTEM) and .TESTED_$(SYSTEM) to record the
+#     current state of the system during housekeeping operations.
+
+#  Implementation Deficiencies:
+#     The method of generating the list of external libraries passed to
+#     the $(BLD_SHR) command is still preliminary.
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 July 28 (MJC):
+#        Original version based upon the TRACE makefile.
+#     {note_further_changes_here}
+#
+#-
+
+#-------------------------------------------------------------------------------
+
+#  Help target.
+#  ===========
+#
+#  This is the default target, so appears first.
+
+#  Display information about the mk script and the make targets.
+
+help:
+	@ echo \
+    '   The makefile provided is intended to be used by the make utility when';\
+        echo \
+    '   invoked via the associated mk script. This script defines environment';\
+        echo \
+    '   variables which are used by make to accommodate differing machine and';\
+        echo \
+    '   operating system characteristics. Please see the mk script prologue';\
+        echo \
+    '   for full details.';\
+        echo;\
+        echo \
+    '   The following targets are provided:';\
+        echo;\
+        echo \
+    '      help          - Print out this message';\
+        echo \
+    '      archive       - Create the source tar file from individual source files';\
+        echo \
+    '      check         - Check source file presence and show current state';\
+        echo \
+    '      build         - Build the package from source';\
+        echo \
+    '      install       - Install the built package for use';\
+        echo \
+    '      deinstall     - Deinstall the package';\
+        echo \
+    '      test          - Perform a quick test of the installation';\
+        echo \
+    '      export        - Make a tar file for exporting the built package';\
+        echo \
+    '      export_source - Make a tar file for exporting the package source';\
+        echo \
+    '      clean         - Tidy up after building the package';\
+        echo \
+    '      unbuild       - Remove all the built files';\
+        echo;\
+        echo \
+    '   To build and install the $(PKG_NAME) package on a supported system, do:';\
+        echo;\
+        echo \
+    '      mk build; mk install; mk test; mk clean';\
+        echo
+
+#-------------------------------------------------------------------------------
+
+#  Defaults
+#  ========
+
+#  This section defines default macros and should rarely need changing.
+#  The values given here should be overridden externally to adapt to
+#  the local system setup (either use the mk script or use environment
+#  variables and invoke "make" with the "-e" option).
+
+#  Name of computer system.
+
+SYSTEM = unknown
+
+#  Pathname of the root directory beneath which other Starlink software
+#  is currently installed.
+
+STARLINK = /star
+
+#  Pathnames of Starlink sub-directories that may be referenced when
+#  building this package.
+
+STAR_BIN = $(STARLINK)/bin
+STAR_DATES = $(STARLINK)/dates
+STAR_ETC = $(STARLINK)/etc
+STAR_HELP = $(STARLINK)/help
+STAR_INC = $(STARLINK)/include
+FIG_INC = $(STARLINK)/figaro/inc
+
+#  Pathname of the root directory beneath which the built files for
+#  this package should be installed for use. This defaults to the
+#  user's home directory.
+
+INSTALL = $(HOME)
+
+#  Directory into which exported tar files will be placed.  This
+#  defaults to the current directory.
+
+EXPORT = .
+
+#  Default macros for compiling C and Fortran source code.
+
+CC = c89
+CFLAGS = -O
+FC = fort77
+FFLAGS = -O
+
+#  Command for forming a link to a file.
+
+LINK = ln
+
+#  Command for "randomizing" an object library. The default acts as a
+#  null command.
+
+RANLIB = echo >/dev/null
+
+#  Commands for adding to and extracting from an archive file (.tar).
+
+TAR_IN = pax -w -v -x ustar -f
+TAR_OUT = pax -r -f
+
+#  Command for adding a file to an archive (.a).
+
+AR_IN = ar -r
+
+#  Default file type extension for a shareable library and command for
+#  building a shareable library (the default acts as a null command).
+
+SHARE = .so
+BLD_SHR = echo >/dev/null
+
+#-------------------------------------------------------------------------------
+
+#  Define package source files.
+#  ============================
+
+#  This section defines the set of source files for the package.
+
+#  Name of the package and the package version number.
+#
+#  The major component of the version number (before the dot) should
+#  normally only be incremented following major changes to the package.
+#  The minor version number (after the dot) is the number normally
+#  incremented following development which introduces new documented
+#  functionality.  The revision number (after the dash) should be
+#  incremented for other minor changes (bug fixes, etc.) which do not
+#  merit documentation changes.
+
+PKG_NAME = convert
+PKG_VERS = 0.6
+
+#  Library version number.
+#
+#  The minor component of this number (following the dot) should be
+#  incremented whenever a new routine is added to a library or some
+#  other change is made such that programs built with the latest
+#  version would fail to run using an earlier version. The major number
+#  should be incremented if a change is made such that existing
+#  programs would have to be re-built in order to work with the new
+#  version.
+
+LIB_VERS = 
+
+#  List of files comprising the distributed source-only system. This
+#  defines the minimum set of files required to completely rebuild the
+#  package from source (including this makefile, the associated mk
+#  script and any documentation files).
+
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+
+#  List of public script files. These are scripts which form part of
+#  the package and will be required by users of it. They will be
+#  installed in the $(INSTALL_DIR) directory with execute permission
+#  set.
+
+PUBLIC_SCRIPTS = 
+
+#  List of public include files. These are include files which form
+#  part of the package and may be required by users of it. They will be
+#  installed in the $(INSTALL_INC) directory.
+
+PUBLIC_INCLUDES = 
+
+#  List of private include files. These are additional include files
+#  which form part of the package and are required in order to build
+#  it, but which are not required by users of it.
+
+PRIVATE_INCLUDES = HLPCMD
+
+#  List of external include files. These are files which are required
+#  in order to build the package but form part of other, externally
+#  installed packages. This list should contain the names used to
+#  reference the files within the source code, not the actual names of
+#  the files.
+
+EXTERNAL_INCLUDES = SAE_PAR CHR_ERR CMP_ERR DAT_PAR DAT_ERR FIO_PAR \
+                    MSG_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT \
+                    NDF_PAR NDF_ERR PAR_PAR PAR_ERR PRM_PAR \
+                    PSX_ERR
+
+#  Fortran routines required for building the library used by the
+#  application.  Note that we keep the SPP convert routines separate;
+#  they have no documententation.
+
+F_ROUTINES = \
+aif_temp.f aif_antmp.f con_afhir.f \
+con_axlid.f con_axlii.f con_axlir.f con_axliuw.f con_axliw.f \
+con_bitpx.f con_btypc.f \
+con_cd2ir.f con_cd2iw.f \
+con_chvar.f con_chvaw.f \
+con_ci2dr.f con_ci2dw.f \
+con_diprd.f con_dipwr.f con_dst2n.f \
+con_ffrmt.f con_fill.f con_fitax.f con_ftype.f \
+con_ghelp.f con_ghlpi.f \
+con_gkeyc.f con_gkeyd.f con_gkeyi.f con_gkeyl.f con_gkeyr.f \
+con_iaffd.f con_iaffi.f con_iaffr.f \
+con_ifufb.f con_ifufd.f con_ifufi.f con_ifufr.f con_ifufub.f \
+            con_ifufuw.f con_ifufw.f \
+con_lnear.f con_mandh.f con_move.f con_ndfcm.f \
+con_oaffd.f con_oaffi.f con_oaffr.f \
+con_ofufb.f con_ofufd.f con_ofufi.f con_ofufr.f con_ofufub.f \
+            con_ofufuw.f con_ofufw.f \
+con_pcard.f con_pfith.f \
+con_prsad.f con_prsai.f con_prsar.f \
+con_phlpo.f con_rescm.f con_rgasp.f con_sphea.f con_sread.f \
+con_ssazd.f con_ssadr.f \
+con_trndd.f con_trndi.f con_trndr.f \
+con_typsz.f con_wfman.f con_wgasp.f
+
+SPP_F_ROUTINES = \
+adline.f gethis.f getlin.f nhist.f nlines.f
+
+#  The A-task Fortran routines.
+
+ATASK_F_ROUTINES = \
+ascii2ndf.f \
+conhelp.f \
+dipso2ndf.f \
+dst2ndf.f \
+gasp2ndf.f \
+iraf2ndf.f \
+ndf2ascii.f \
+ndf2dipso.f \
+ndf2dst.f \
+ndf2gasp.f \
+ndf2iraf.f \
+ndf2unf.f \
+unf2ndf.f
+
+#  Precompiled IRAF libraries.
+IRAF_LIBRARIES = libimfort.a libos.a libsys.a libvops.a
+
+#  Define the interface files required for compilation.
+
+INTERFACE_FILES = $(ATASK_F_ROUTINES:.f=.ifl)
+
+#  Define the source help file.
+
+HELP_SOURCE = $(PKG_NAME).hlp
+
+#  Block data routines.
+
+BLOCK_DATA = 
+
+#  C routines required for building the library.  This is just a
+#  list of all the C source files.
+
+C_ROUTINES = 
+
+#  List of documentation files.
+
+#DOCUMENTATION = sun55.tex convert.news
+DOCUMENTATION = 
+
+#  Files needed to test the installation.
+
+TEST_FILES = $(PKG_NAME)_test.dst
+
+#-------------------------------------------------------------------------------
+
+#  Define files required for building the package.
+#  ==============================================
+#
+#  This section defines the set of files produced from the source files
+#  when the package is built and installed.
+
+#  Use .o, .c and .f suffix rules for source code.
+
+.SUFFIXES:
+.SUFFIXES: .o .c .f
+
+#  Define new suffixes for compiling and interface file.
+
+.SUFFIXES: .ifc .ifl
+
+#  Define new suffixes for building a help library from source.
+
+.SUFFIXES: .hlp .shl
+
+#  List of files which must be built from the source files before the
+#  package can be installed for use. This should comprise all the files
+#  that are required to use the package (but excluding the date stamp
+#  file).
+
+BUILT_FILES = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(OBJECT_LIBRARIES) \
+$(SHAREABLE_LIBRARIES) $(ATASKS) $(COMPILED_INTERFACE_FILES) (HELP_LIBRARIES)
+
+#  List of links used to access include files during compilation.  This
+#  should comprise all the external include files and any other include
+#  files whose names do not exactly match the names used in the source
+#  code.
+
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
+
+#  Rules to set up links to locate each of the above include files.
+
+CHR_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
+CMP_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
+DAT_ERR:     $(STAR_INC)/dat_err;     $(LINK) $? $@
+DAT_PAR:     $(STAR_INC)/dat_par;     $(LINK) $? $@
+DTACODES:    $(FIG_INC)/dtacodes.inc; $(LINK) $? $@
+DYNAMIC_MEMORY:  $(FIG_INC)/dynamic_memory.inc; $(LINK) $? $@
+FIO_PAR:     $(STAR_INC)/fio_par;     $(LINK) $? $@
+HLPCMD:      ./hlpcmd;                $(LINK) $? $@
+MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
+NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
+NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
+NUM_CMN:     $(STAR_INC)/num_cmn;     $(LINK) $? $@
+NUM_DEC_CVT: $(STAR_INC)/num_dec_cvt; $(LINK) $? $@
+NUM_DEF_CVT: $(STAR_INC)/num_def_cvt; $(LINK) $? $@
+PAR_ERR:     $(STAR_INC)/par_err;     $(LINK) $? $@
+PAR_PAR:     $(STAR_INC)/par_par;     $(LINK) $? $@
+PRM_PAR:     $(STAR_INC)/prm_par;     $(LINK) $? $@
+PSX_ERR:     $(STAR_INC)/psx_err;     $(LINK) $? $@
+SAE_PAR:     $(STAR_INC)/sae_par;     $(LINK) $? $@
+
+#  Rules for extracting source files from the source archive.
+
+$(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(F_ROUTINES) \
+$(F_ROUTINES_ADAM) $(ATASK_F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
+$(INTERFACE_FILES) $(HELP_SOURCE):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+
+#  Rules for extracting machine specific source files from the source
+#  archive.
+
+$(MACHINE_SPECIFIC_F_ROUTINES):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@-$(MACHINE_TYPE)
+	mv $@-$(MACHINE_TYPE) $@
+
+#  List of object files produced by compiling the source code and rules
+#  for performing the compilations.
+
+OBJECT_FILES = $(F_ROUTINES:.f=.o) $(MACHINE_SPECIFIC_F_ROUTINES:.f=.o) \
+   $(BLOCK_DATA:.f=.o) $(C_ROUTINES:.c=.o)
+OBJECT_FILES_ADAM = $(F_ROUTINES_ADAM:.f=.o)
+ATASK_OBJECT_FILES = $(ATASK_F_ROUTINES:.f=.o)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+.f.o:
+	$(FC) $(FFLAGS) -c $<
+
+#  List of the object-library files to be built and rules for building
+#  them.
+
+OBJECT_LIBRARIES = lib$(PKG_NAME).a
+
+lib$(PKG_NAME).a: $(OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+
+#  List of the shareable-library files to be built and rules for building
+#  them.
+
+SHAREABLE_LIBRARIES = 
+
+#  List of the A-tasks to be built, their dependencies and rule for
+#  building them.
+
+$(ATASKS)= $(ATASK_OBJECT_FILES:.o=)
+	alink ascii2ndf.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
+        alink conhelp.o libconlib.a `help_link`
+	alink dipso2ndf.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
+	alink dst2ndf.o libconlib.a `ndf_link_adam` `prm_link_adam` \
+                        $(STARLINK)/figaro/lib/libdta.a \
+                        $(STARLINK)/figaro/lib/libdyn.a \
+                        $(STARLINK)/figaro/lib/libcnv.a ; \
+	alink gasp2ndf.o libconlib.a `ndf_link_adam` ; \
+	alink iraf2ndf.o libconlib.a libconspp.a `ndf_link_adam` \
+                         libimfort.a libsys.a libvops.a libos.a
+	alink ndf2ascii.o libconlib.a `ndf_link_adam` `fio_link_adam` ; \
+	alink ndf2dipso.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
+	alink ndf2dst.o libconlib.a `ndf_link_adam` `prm_link_adam` ; \
+	alink ndf2gasp.o libconlib.a `ndf_link_adam` ; \
+	alink ndf2iraf.o libconlib.a libconspp.a `ndf_link_adam` \
+                         libimfort.a libsys.a libvops.a libos.a
+	alink ndf2unf.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
+	alink unf2ndf.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
+	
+#  List of the interface files to be built and rules for compiling them.
+
+COMPILED_INTERFACE_FILES = $(INTERFACE_FILES:.ifl=.ifc)
+
+.ifl.ifc:
+	$(COMPIFL.ifl) $(OUTPUT_OPTIONS) $< 
+
+#  Define the compifl macro definitions.
+
+COMPIFL.ifl = $(IFC) $(IFFLAGS)
+IFC = compifl
+IFFLAGS =
+
+#  List of the help libraries and rules for building them.
+
+HELP_LIBRARIES = $(HELP_SOURCE:.hlp=.shl)
+
+.hlp.shl:
+	$(COMPIFL.hlp) $(HELP_OPTIONS) $< 
+
+#  Define the help macro definitions.
+
+COMPIFL.hlp = $(HELP_BUILD) $(HFLAGS)
+HELP_BUILD = hlib
+HFLAGS =
+
+#  Name of the date stamp file. This is used to record the time of the
+#  most recent build for use in subsequent operations that require it.
+#  There must be no rule for generating this file; it is only updated
+#  as a side effect of building the package.
+
+DATE_STAMP = $(PKG_NAME)_datestamp
+
+#  Pathnames of directories into which files may be placed when the
+#  package is installed.
+
+INSTALL_BIN = $(INSTALL)/bin
+INSTALL_DATES = $(INSTALL)/dates
+INSTALL_ETC = $(INSTALL)/etc
+INSTALL_HELP = $(INSTALL)/help
+INSTALL_INC = $(INSTALL)/include
+INSTALL_LIB = $(INSTALL)/lib
+
+#  List of directories actually used for installation (selected from
+#  those above) and rules to create them.
+
+INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_INC) $(INSTALL_LIB)
+
+$(INSTALL_DIRS): 
+	mkdir $@
+
+#-------------------------------------------------------------------------------
+
+#  Primary targets.
+#  ===============
+#
+#  These are the targets intended for normal external use (apart from
+#  help, which appears at the start of the file).
+
+#  archive: Create the source tar file.
+#  ------------------------------------
+#
+#  This is for development use.  It enables the source tar file to be
+#  created and updated(?).
+
+archive: $(PKG_NAME)_source.tar
+	@ echo "   Build of the $(PKG_NAME)_source.tar file is complete"
+
+#  check: Check source file presence and show current state.
+#  --------------------------------------------------------
+
+#  The check target simply depends on all the source files being
+#  present.
+
+check: $(SOURCE_FILES)
+	@ echo
+	@ echo \
+   '*** This is $(PKG_NAME) version V$(PKG_VERS) on system $(SYSTEM)'
+	@ echo
+	@ echo '    All essential source files are present'
+	@ echo
+
+#  Display the current state.
+	@ if test -f .BUILT;\
+          then echo '    The package is currently:  built';\
+          else echo '    The package is currently:  not built';fi
+	@ if test -f .INSTALLED_$(SYSTEM);\
+          then echo '                               installed';\
+          else echo '                               not installed';fi
+	@ if test -f .TESTED_$(SYSTEM);\
+          then echo '                               tested';\
+          else echo '                               not tested';fi
+	@ echo
+
+#  build: Build the system.
+#  -----------------------
+#
+#  Compile the source and build the required files in the source
+#  directory.
+
+#  The build target first checks that the package is not installed. If
+#  not, it then causes the .BUILT target to be made which ensures that
+#  the package has been built.
+
+build:
+	@ if test -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo \
+   '*** The $(PKG_NAME) package is currently installed -- please use the';\
+           echo '    "deinstall" target before re-building it';\
+           echo;\
+        elif $(MAKE) .BUILT; then \
+           echo;\
+           echo '*** The $(PKG_NAME) package has been built';\
+           echo;\
+        fi
+
+#  The .BUILT target records the time of the most recent build which
+#  modified any of the built files. It depends on all the built files
+#  being up to date (which causes them to be built).
+
+.BUILT: $(BUILT_FILES)
+#
+#  Enter information about the current machine and build environment
+#  into the date stamp file.
+	@ echo 'Package : $(PKG_NAME)'         >$(DATE_STAMP)
+	@ echo 'Version : V$(PKG_VERS)'       >>$(DATE_STAMP)
+	@ echo 'Library : V$(LIB_VERS)'       >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo "Built by: $(USER) on node `uname -n`" \
+                                              >>$(DATE_STAMP)
+	@ echo "On      : `date`"             >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo \
+  "Machine : `uname -m` running `uname -s` `uname -v` (release `uname -r`)" \
+                                              >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo 'make macros:'                 >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo '   SYSTEM  : $(SYSTEM)'       >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo '   EXPORT  : $(EXPORT)'       >>$(DATE_STAMP)
+	@ echo '   INSTALL : $(INSTALL)'      >>$(DATE_STAMP)
+	@ echo '   STARLINK: $(STARLINK)'     >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo '   AR_IN   : $(AR_IN)'        >>$(DATE_STAMP)
+	@ echo '   BLD_SHR : $(BLD_SHR)'      >>$(DATE_STAMP)
+	@ echo '   CC      : $(CC)'           >>$(DATE_STAMP)
+	@ echo '   CFLAGS  : $(CFLAGS)'       >>$(DATE_STAMP)
+	@ echo '   FC      : $(FC)'           >>$(DATE_STAMP)
+	@ echo '   FFLAGS  : $(FFLAGS)'       >>$(DATE_STAMP)
+	@ echo '   LINK    : $(LINK)'         >>$(DATE_STAMP)
+	@ echo '   RANLIB  : $(RANLIB)'       >>$(DATE_STAMP)
+	@ echo '   SHARE   : $(SHARE)'        >>$(DATE_STAMP)
+	@ echo '   TAR_IN  : $(TAR_IN)'       >>$(DATE_STAMP)
+	@ echo '   TAR_OUT : $(TAR_OUT)'      >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+
+#  Record completion of the build.
+	@ touch .BUILT
+
+#  install: Install the package for use.
+#  ------------------------------------
+#
+#  Copy the built files to their installation directories, from where
+#  they may be accessed.
+
+#  The install target first checks that no part of the package is
+#  already installed. If not, it causes the .INSTALLED_$(SYSTEM) target
+#  to be made which performs the installation.
+
+install:
+	@ if test -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo \
+   '*** The $(PKG_NAME) package has already been installed -- please use the';\
+           echo \
+   '    "deinstall" target first if you wish to reinstall it';\
+           echo;\
+        elif $(MAKE) .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo \
+   '*** The $(PKG_NAME) package has been installed in directory $(INSTALL)';\
+           echo;\
+        fi
+
+#  The .INSTALLED_$(SYSTEM) target copies each file from the source
+#  directory using "cp -p" to preserve its date, and replaces each
+#  original file by a link to the installed copy.
+
+.INSTALLED_$(SYSTEM): $(INSTALL_DIRS)
+	
+#  Touch .INSTALLED_$(SYSTEM) to record that the package is installed
+#  (at least in part).
+	@ touch .INSTALLED_$(SYSTEM)
+
+#  Install the public scripts, giving them world execute permission.
+	for f in $(PUBLIC_SCRIPTS); do \
+           cp -p $$f $(INSTALL_BIN);\
+           chmod 755 $(INSTALL_BIN)/$$f;\
+           rm $$f;\
+           $(LINK) $(INSTALL_BIN)/$$f $$f;\
+        done
+
+#  Install the A-tasks and compiled interface files, giving them world
+#  execute permission.
+	for f in $(ATASKS) $(COMPILED_INTERFACE_FILES) ; do \
+           cp -p $$f $(INSTALL_BIN);\
+           chmod 755 $(INSTALL_BIN)/$$f;\
+           rm $$f;\
+           $(LINK) $(INSTALL_BIN)/$$f $$f;\
+        done
+
+#  Install the help libraries, giving them world read permission.
+	for f in $(HELP_LIBRARIES); do \
+           cp -p $$f $(INSTALL_INC);\
+           chmod 644 $(INSTALL_INC)/$$f;\
+           rm $$f;\
+           $(LINK) $(INSTALL_INC)/$$f $$f;\
+        done
+
+#  Install the public include files, giving them world read permission.
+	for f in $(PUBLIC_INCLUDES); do \
+           cp -p $$f $(INSTALL_INC);\
+           chmod 644 $(INSTALL_INC)/$$f;\
+           rm $$f;\
+           $(LINK) $(INSTALL_INC)/$$f $$f;\
+        done
+
+#  Install the object libraries, giving them world read permission.
+	for f in $(OBJECT_LIBRARIES); do \
+           cp -p $$f $(INSTALL_LIB);\
+           chmod 644 $(INSTALL_LIB)/$$f;\
+           rm $$f;\
+           $(LINK) $(INSTALL_LIB)/$$f $$f;\
+        done
+
+#  Install shareable libraries, giving them read permission (unless
+#  they are dummy, zero size, files in which case they are left in
+#  place).
+	for f in $(SHAREABLE_LIBRARIES); do \
+           if test -s $$f; then \
+              cp -p $$f $(INSTALL_LIB);\
+              chmod 644 $(INSTALL_LIB)/$$f;\
+              rm $$f;\
+              $(LINK) $(INSTALL_LIB)/$$f $$f;\
+           else :; fi \
+        done
+
+#  Install the date stamp file and make it read-only to prevent its
+#  date being changed.
+	cp -p $(DATE_STAMP) $(INSTALL_DATES)
+	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
+	chmod 644 $(DATE_STAMP)
+	rm $(DATE_STAMP)
+	$(LINK) $(INSTALL_DATES)/$(DATE_STAMP) $(DATE_STAMP)
+
+#  deinstall: Deinstall the package.
+#  --------------------------------
+#
+#  Reverse the action of the install target, removing the installed
+#  files and returning them to the source directory.
+
+#  The deinstall target checks that the package is installed.  If so, it
+#  causes the do_deinstall target to be made which performs the
+#  deinstallation.
+
+deinstall:
+	@ if test ! -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo '*** The $(PKG_NAME) package is not currently installed';\
+           echo;\
+        else \
+           $(MAKE) do_deinstall;\
+           echo;\
+           echo \
+'*** The $(PKG_NAME) package has been deinstalled from directory $(INSTALL)';\
+           echo;\
+        fi
+
+#  The do_deinstall target (which should never exist) checks that an
+#  installed version of each file exists (in case an install failed
+#  part of the way through) and returns it to the source directory,
+#  using "cp -p" to preserve file dates.  Links are removed from the
+#  source directory before copying.
+
+do_deinstall:
+	
+#  Note the package will need to be tested again.
+	
+	@- if test -f .TESTED_$(SYSTEM); then rm .TESTED_$(SYSTEM); else :; fi
+
+#  Deinstall the public script files, if installed versions exist.
+	
+	- for f in $(PUBLIC_SCRIPTS); do \
+           if test -f $(INSTALL_BIN)/$$f; then \
+              rm $$f;\
+              cp -p $(INSTALL_BIN)/$$f ./;\
+              rm $(INSTALL_BIN)/$$f;\
+           else :; fi \
+        done
+
+#  Deinstall the A-tasks and compiled interface files, if installed
+#  versions exist.
+	
+	- for f in $(ATASKS) $(COMPILED_INTERFACE_FILES); do \
+           if test -f $(INSTALL_BIN)/$$f; then \
+              rm $$f;\
+              cp -p $(INSTALL_BIN)/$$f ./;\
+              rm $(INSTALL_BIN)/$$f;\
+           else :; fi \
+        done
+
+#  Deinstall the public include files, if installed versions exist.
+	
+	- for f in $(PUBLIC_INCLUDES); do \
+           if test -f $(INSTALL_INC)/$$f; then \
+              rm $$f;\
+              cp -p $(INSTALL_INC)/$$f ./;\
+              rm $(INSTALL_INC)/$$f;\
+           else :; fi \
+        done
+
+#  Deinstall the help libraries, if installed versions exist.
+	
+	- for f in $(HELP_LIBRARIES); do \
+           if test -f $(INSTALL_INC)/$$f; then \
+              rm $$f;\
+              cp -p $(INSTALL_INC)/$$f ./;\
+              rm $(INSTALL_INC)/$$f;\
+           else :; fi \
+        done
+
+#  Deinstall the object and shareable libraries, if installed versions exist.
+	
+	- for f in $(OBJECT_LIBRARIES) $(SHAREABLE_LIBRARIES); do \
+           if test -f $(INSTALL_LIB)/$$f; then \
+              rm $$f;\
+              cp -p $(INSTALL_LIB)/$$f ./;\
+              rm $(INSTALL_LIB)/$$f;\
+           else :; fi \
+        done
+
+#  Deinstall the date stamp file after setting its protection so it may
+#  be removed.
+	
+	- if test -f $(INSTALL_DATES)/$(DATE_STAMP); then \
+           chmod 644 $(DATE_STAMP); rm $(DATE_STAMP);\
+           chmod 644 $(INSTALL_DATES)/$(DATE_STAMP);\
+           cp -p $(INSTALL_DATES)/$(DATE_STAMP) ./;\
+           rm $(INSTALL_DATES)/$(DATE_STAMP);\
+        else :; fi
+
+#  Note the system is no longer installed. Touch .BUILT, since we have
+#  returned the built files to the source directory.
+	
+	@- rm .INSTALLED_$(SYSTEM) 1>/dev/null 2>/dev/null
+	@ touch .BUILT
+
+#  test: Perform an installation test.
+#  ----------------------------------
+#
+#  Check that installed files are in their correct places and that a
+#  simple invocation of an A-task will run correctly.
+
+#  The test target checks that the package is currently installed. If
+#  so, it causes the do_test target to be made, which performs the
+#  installation test.
+
+test:
+	@ if test ! -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo '*** The $(PKG_NAME) package is not currently installed';\
+           echo;\
+        elif $(MAKE) do_test; then\
+           echo;\
+           echo \
+           '*** Installation test for the $(PKG_NAME) package has been run';\
+           echo;\
+        fi
+
+#  The do_test target (which should never exist) performs the
+#  installation test.
+
+do_test: $(EXTERNAL_INCLUDES)
+	
+#  Note the test has not yet succeeded.
+	
+	@- if test -f .TESTED_$(SYSTEM); then rm .TESTED_$(SYSTEM); else :; fi
+	
+#  Extract the test data file from the archive.
+	
+	$(TAR_OUT) $(PKG_NAME)_source.tar $(PKG_NAME)_test.sdf \
+             $(PKG_NAME)_test.ifl
+
+#  Execute the test.  Remove the test data when done. 
+	./trace $(PKG_NAME)_test
+	rm $(PKG_NAME)_test.sdf
+	
+#  Note the test has been run.
+	
+	@ touch .TESTED_$(SYSTEM)
+	@ echo "   Test of $(PKG_NAME) installation completed."
+
+#  export: Export the installed system.
+#  -----------------------------------
+#
+#  Export the source plus all the built files to a new user.
+
+#  The export target depends on the resulting compressed tar file being
+#  up to date.
+
+export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+	@ echo
+	@ echo \
+'*** Export copy of the built $(PKG_NAME) package is in the compressed'
+	@ echo \
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+	@ echo
+
+#  The compressed tar file is up to date if it exists and is more
+#  recent than all the source files and the date stamp file (which
+#  records the time of the last build which modified any files).
+
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+	
+#  Issue a warning if the package has not been tested.
+	
+	@ if test ! -f .TESTED_$(SYSTEM); then \
+           echo;\
+           echo '*** Warning: the $(PKG_NAME) package has not been tested';\
+           echo;\
+        else :; fi
+	
+#  Remove any pre-existing tar files before creating new ones.
+	
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar; then \
+           rm $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
+           rm $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	$(TAR_IN) $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar $(SOURCE_FILES) \
+            $(BUILT_FILES) $(DATE_STAMP) .BUILT
+	compress -v $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar
+
+#  export_source: Export the source.
+#  --------------------------------
+#
+#  Export the source files only to a new user.
+
+#  This target depends on the resulting compressed tar file being up to
+#  date.
+
+export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+	@ echo
+	@ echo \
+'*** Export copy of the $(PKG_NAME) package source is in the compressed'
+	@ echo \
+'    tar file $(EXPORT)/$(PKG_NAME).tar.Z'
+	@ echo
+
+#  The compressed tar file is up to date if it exists and is more
+#  recent than all the source files.
+
+$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+#
+#  Remove any pre-existing tar files before creating new ones.
+	
+	if test -f $(EXPORT)/$(PKG_NAME).tar; then \
+           rm $(EXPORT)/$(PKG_NAME).tar; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
+           rm $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	$(TAR_IN) $(EXPORT)/$(PKG_NAME).tar $(SOURCE_FILES)
+	compress -v $(EXPORT)/$(PKG_NAME).tar
+
+#  clean: Clean up the source directory.
+#  ------------------------------------
+#
+#  Remove all intermediate files. Do not remove built files.
+
+clean:
+	@- rm $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(F_ROUTINES) \
+              $(MACHINE_SPECIFIC_F_ROUTINES) $(F_ROUTINES_ADAM) \
+              $(ATASK_F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
+              $(INTERFACE_FILES) $(HELP_SOURCE) \
+              $(OBJECT_FILES) $(OBJECT_FILES_ADAM) \
+              $(ATASK_OBJECT_FILES) 1>/dev/null 2>/dev/null
+	@ echo
+	@ echo '*** Intermediate files removed'
+	@ echo
+
+#  unbuild: Reverse the build process.
+#  ----------------------------------
+
+#  Remove all intermediate files and all built files, and note that the
+#  package is no longer built or tested.
+
+unbuild: clean
+	@- rm $(BUILT_FILES) $(DATE_STAMP) 1>/dev/null 2>/dev/null
+	@- rm .BUILT 1>/dev/null 2>/dev/null
+	@ echo '*** Built files removed'
+	@ echo
+
+#-------------------------------------------------------------------------------
+
+#  Development targets and rules.
+#  ==============================
+
+#  Rule for building the source tar file.
+
+$(PKG_NAME)_source.tar: 
+	$(TAR_IN) $(PKG_NAME)_source.tar $(F_ROUTINES) \
+                $(MACHINE_SPECIFIC_F_ROUTINES) $(F_ROUTINES_ADAM) \
+                $(ATASK_F_ROUTINES) $(C_ROUTINES) \
+                $(PUBLIC_INCLUDES) $(BLOCK_DATA) $(PRIVATE_INCLUDES) \
+                $(PUBLIC_SCRIPTS) $(TEST_FILES) \
+                $(INTERFACE_FILES) $(HELP_SOURCE) \
+
+#----------------------------------------------------------------------------
+
+#  Include-file dependencies.
+#  ==========================
+
+#  Object file dependencies on include files (or links to those include
+#  files). These are normally generated automatically from the source
+#  files.
+
+ascii2ndf.o:       SAE_PAR
+ascii2ndf.o:       NDF_PAR
+ascii2ndf.o:       PRM_PAR
+con_afhir.o:       SAE_PAR
+con_axlid.o:       SAE_PAR
+con_axlid.o:       PRM_PAR
+con_axlid.o:       NUM_DEC_CVT
+con_axlid.o:       NUM_DEF_CVT
+con_axlii.o:       SAE_PAR
+con_axlii.o:       PRM_PAR
+con_axlii.o:       NUM_DEC_CVT
+con_axlii.o:       NUM_DEF_CVT
+con_axlir.o:       SAE_PAR
+con_axlir.o:       PRM_PAR
+con_axlir.o:       NUM_DEC_CVT
+con_axlir.o:       NUM_DEF_CVT
+con_axliuw.o:      SAE_PAR
+con_axliuw.o:      PRM_PAR
+con_axliuw.o:      NUM_DEC_CVT
+con_axliuw.o:      NUM_DEF_CVT
+con_axliw.o:       SAE_PAR
+con_axliw.o:       PRM_PAR
+con_axliw.o:       NUM_DEC_CVT
+con_axliw.o:       NUM_DEF_CVT
+con_bitpx.o:       SAE_PAR
+con_btypc.o:       SAE_PAR
+con_cd2ir.o:       SAE_PAR
+con_cd2iw.o:       SAE_PAR
+con_chvar.o:       SAE_PAR
+con_chvar.o:       PRM_PAR
+con_chvar.o:       NUM_DEC_CVT
+con_chvar.o:       NUM_DEF_CVT
+con_chvaw.o:       SAE_PAR
+con_chvaw.o:       PRM_PAR
+con_chvaw.o:       NUM_DEC_CVT
+con_chvaw.o:       NUM_DEF_CVT
+con_ci2dr.o:       SAE_PAR
+con_ci2dw.o:       SAE_PAR
+con_diprd.o:       SAE_PAR
+con_diprd.o:       PRM_PAR
+con_dipwr.o:       SAE_PAR
+con_dipwr.o:       PRM_PAR
+con_dst2n.o:       SAE_PAR
+con_dst2n.o:       DTACODES
+con_dst2n.o:       DYNAMIC_MEMORY
+con_ffrmt.o:       SAE_PAR
+con_fill.o:        SAE_PAR
+con_fitax.o:       SAE_PAR
+con_fitax.o:       PRM_PAR
+con_ftype.o:       SAE_PAR
+con_ghelp.o:       SAE_PAR
+con_ghelp.o:       HLPCMD
+con_ghlpi.o:       SAE_PAR
+con_ghlpi.o:       HLPCMD
+con_gkeyc.o:       SAE_PAR
+con_gkeyd.o:       SAE_PAR
+con_gkeyi.o:       SAE_PAR
+con_gkeyl.o:       SAE_PAR
+con_gkeyr.o:       SAE_PAR
+con_iaffd.o:       SAE_PAR
+con_iaffd.o:       PRM_PAR
+con_iaffd.o:       NUM_DEC_CVT
+con_iaffd.o:       NUM_DEF_CVT
+con_iaffi.o:       SAE_PAR
+con_iaffi.o:       PRM_PAR
+con_iaffi.o:       NUM_DEC_CVT
+con_iaffi.o:       NUM_DEF_CVT
+con_iaffr.o:       SAE_PAR
+con_iaffr.o:       PRM_PAR
+con_iaffr.o:       NUM_DEC_CVT
+con_iaffr.o:       NUM_DEF_CVT
+con_ifufb.o:       SAE_PAR
+con_ifufb.o:       PRM_PAR
+con_ifufb.o:       NUM_DEC_CVT
+con_ifufb.o:       NUM_DEF_CVT
+con_ifufd.o:       SAE_PAR
+con_ifufd.o:       PRM_PAR
+con_ifufd.o:       NUM_DEC_CVT
+con_ifufd.o:       NUM_DEF_CVT
+con_ifufi.o:       SAE_PAR
+con_ifufi.o:       PRM_PAR
+con_ifufi.o:       NUM_DEC_CVT
+con_ifufi.o:       NUM_DEF_CVT
+con_ifufr.o:       SAE_PAR
+con_ifufr.o:       PRM_PAR
+con_ifufr.o:       NUM_DEC_CVT
+con_ifufr.o:       NUM_DEF_CVT
+con_ifufub.o:      SAE_PAR
+con_ifufub.o:      PRM_PAR
+con_ifufub.o:      NUM_DEC_CVT
+con_ifufub.o:      NUM_DEF_CVT
+con_ifufuw.o:      SAE_PAR
+con_ifufuw.o:      PRM_PAR
+con_ifufuw.o:      NUM_DEC_CVT
+con_ifufuw.o:      NUM_DEF_CVT
+con_ifufw.o:       SAE_PAR
+con_ifufw.o:       PRM_PAR
+con_ifufw.o:       NUM_DEC_CVT
+con_ifufw.o:       NUM_DEF_CVT
+con_lnear.o:       SAE_PAR
+con_lnear.o:       PRM_PAR
+con_mandh.o:       SAE_PAR
+con_mandh.o:       PRM_PAR
+con_move.o:        SAE_PAR
+con_ndfcm.o:       SAE_PAR
+con_oaffd.o:       SAE_PAR
+con_oaffd.o:       PRM_PAR
+con_oaffd.o:       NUM_DEC_CVT
+con_oaffd.o:       NUM_DEF_CVT
+con_oaffi.o:       SAE_PAR
+con_oaffi.o:       PRM_PAR
+con_oaffi.o:       NUM_DEC_CVT
+con_oaffi.o:       NUM_DEF_CVT
+con_oaffr.o:       SAE_PAR
+con_oaffr.o:       PRM_PAR
+con_oaffr.o:       NUM_DEC_CVT
+con_oaffr.o:       NUM_DEF_CVT
+con_ofufb.o:       SAE_PAR
+con_ofufb.o:       PRM_PAR
+con_ofufb.o:       NUM_DEC_CVT
+con_ofufb.o:       NUM_DEF_CVT
+con_ofufd.o:       SAE_PAR
+con_ofufd.o:       PRM_PAR
+con_ofufd.o:       NUM_DEC_CVT
+con_ofufd.o:       NUM_DEF_CVT
+con_ofufi.o:       SAE_PAR
+con_ofufi.o:       PRM_PAR
+con_ofufi.o:       NUM_DEC_CVT
+con_ofufi.o:       NUM_DEF_CVT
+con_ofufr.o:       SAE_PAR
+con_ofufr.o:       PRM_PAR
+con_ofufr.o:       NUM_DEC_CVT
+con_ofufr.o:       NUM_DEF_CVT
+con_ofufub.o:      SAE_PAR
+con_ofufub.o:      PRM_PAR
+con_ofufub.o:      NUM_DEC_CVT
+con_ofufub.o:      NUM_DEF_CVT
+con_ofufuw.o:      SAE_PAR
+con_ofufuw.o:      PRM_PAR
+con_ofufuw.o:      NUM_DEC_CVT
+con_ofufuw.o:      NUM_DEF_CVT
+con_pcard.o:       SAE_PAR
+con_pfith.o:       SAE_PAR
+con_phlpo.o:       SAE_PAR
+con_phlpo.o:       HLPCMD
+con_prsad.o:       SAE_PAR
+con_prsad.o:       CHR_ERR
+con_prsai.o:       SAE_PAR
+con_prsai.o:       CHR_ERR
+con_prsar.o:       SAE_PAR
+con_prsar.o:       CHR_ERR
+con_rgasp.o:       SAE_PAR
+con_sphea.o:       SAE_PAR
+con_sphea.o:       NDF_PAR
+con_ssazr.o:       SAE_PAR
+con_ssazr.o:       NUM_CMN
+con_ssazr.o:       NUM_DEC_CVT
+con_ssazr.o:       NUM_DEF_CVT
+con_ssazd.o:       SAE_PAR
+con_ssazd.o:       NUM_CMN
+con_ssazd.o:       NUM_DEC_CVT
+con_ssazd.o:       NUM_DEF_CVT
+con_trndd.o:       SAE_PAR
+con_trndd.o:       PRM_PAR
+con_trndi.o:       SAE_PAR
+con_trndi.o:       PRM_PAR
+con_trndr.o:       SAE_PAR
+con_trndr.o:       PRM_PAR
+con_typsz.o:       SAE_PAR
+con_typsz.o:       PRM_PAR
+con_typsz.o:       NDF_PAR
+con_wfman.o:       SAE_PAR
+con_wfman.o:       MSG_PAR
+con_wgasp.o:       SAE_PAR
+conhelp.o:         SAE_PAR
+conhelp.o:         PAR_ERR
+dipso2ndf.o:       SAE_PAR
+dipso2ndf.o:       NDF_PAR
+dipso2ndf.o:       PRM_PAR
+dst2ndf.o:         SAE_PAR
+gasp2ndf.o:        SAE_PAR
+gasp2ndf.o:        MSG_PAR
+gasp2ndf.o:        PAR_PAR
+iraf2ndf.o:        SAE_PAR
+iraf2ndf.o:        DAT_PAR
+iraf2ndf.o:        DAT_ERR
+iraf2ndf.o:        NDF_PAR
+iraf2ndf.o:        PSX_ERR
+iraf2ndf.o:        CMP_ERR
+iraf2ndf.o:        MSG_PAR
+ndf2ascii.o:       SAE_PAR
+ndf2ascii.o:       NDF_PAR
+ndf2ascii.o:       PRM_PAR
+ndf2dipso.o:       SAE_PAR
+ndf2dipso.o:       NDF_PAR
+ndf2dst.o:         SAE_PAR
+ndf2dst.o:         FIO_PAR
+ndf2dst.o:         NDF_PAR
+ndf2gasp.o:        SAE_PAR
+ndf2gasp.o:        MSG_PAR
+ndf2gasp.o:        NDF_PAR
+ndf2gasp.o:        NDF_ERR
+ndf2gasp.o:        PAR_ERR
+ndf2gasp.o:        PRM_PAR
+ndf2iraf.o:        SAE_PAR
+ndf2iraf.o:        DAT_PAR
+ndf2iraf.o:        MSG_PAR
+ndf2iraf.o:        NDF_PAR
+ndf2iraf.o:        PAR_ERR
+ndf2iraf.o:        NDF_ERR
+ndf2iraf.o:        PRM_PAR
+ndf2iraf.o:        NUM_DEC_CVT
+ndf2iraf.o:        NUM_DEF_CVT
+ndf2unf.o:         SAE_PAR
+ndf2unf.o:         NDF_PAR
+ndf2unf.o:         PRM_PAR
+unf2ndf.o:         SAE_PAR
+unf2ndf.o:         NDF_PAR
+unf2ndf.o:         PRM_PAR
+
+#  End of makefile.
