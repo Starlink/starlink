@@ -326,12 +326,12 @@
       CALL ERI_GETIDS( IFID, SLICE, RMFID, ARFID, STATUS )
 
 * Get the base and scale values of the PHA axis
-      CALL BDI_MAPAXVAL( IFID, 'READ', E_AX, EAPTR, STATUS )
-      IF (STATUS .NE. SAI__OK) THEN
-        CALL ERR_REP( ' ', 'Error reading spectral axis values',
-     :                STATUS )
-        GOTO 99
-      END IF
+C      CALL BDI_MAPAXVAL( IFID, 'READ', E_AX, EAPTR, STATUS )
+C      IF (STATUS .NE. SAI__OK) THEN
+C        CALL ERR_REP( ' ', 'Error reading spectral axis values',
+C     :                STATUS )
+C        GOTO 99
+C      END IF
 
 *  Check if instrument is ROSAT XRT, WFC, EXOSAT ME or LE.
       NIGNORE = 0
@@ -478,7 +478,7 @@ C	  STPTIME = 1.1E6
      :             'Creator of this file', STATUS )
       CALL ADI2_PKEY0R( OPHA, 'SPECTRUM', 'EXPOSURE', EXTIME,
      :             'Exposure time', STATUS )
-      CALL ADI2_PKEY0R( OPHA, 'SPECTRUM', 'AREASCAL', 1.0,
+      CALL ADI2_PKEY0R( OPHA, 'SPECTRUM', 'AREASCAL', GEOMAREA,
      :             'Area scaling factor', STATUS )
       CALL ADI2_PKEY0R( OPHA, 'SPECTRUM', 'BACKSCAL', 1.0,
      :             'Background scaling factor', STATUS )
@@ -542,6 +542,8 @@ C	  STPTIME = 1.1E6
 
 *  Write the spectrum
       CALL ADI2_GETLUN( OPHA, LUN, STATUS )
+      CALL DYN_MAPR( 1, DIMS(E_AX), EAPTR, STATUS )
+      CALL ARR_REG1R( 1.0, 1.0, DIMS(E_AX), %VAL(EAPTR), STATUS )
       CALL FTPCLE( LUN, 1, 1, 1, DIMS(E_AX), %VAL(EAPTR), STATUS )
       CALL FTPCLE( LUN, 2, 1, 1, DIMS(E_AX), %VAL(IDPTR), STATUS )
       IF ( ERROK ) THEN
