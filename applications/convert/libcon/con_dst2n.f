@@ -167,6 +167,9 @@
 *        structure, and an axis array that is missing from the first or
 *        second axis, the corresponding NDF axis-centre array is given
 *        a dimension equal to the number of FITS headers.
+*     1992 October 21 (MJC):
+*        Fixed another couple of bugs along the same lines as above.
+*        Now use separate variables for the diferent object dimensions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -211,6 +214,7 @@
       CHARACTER AXOUTV*50        ! Name of output axis variance array
       CHARACTER AXOUTW*50        ! Name of output axis width array
       BYTE      BARRAY(100)      ! Used to read in BYTE type data items
+      INTEGER   CDIMS(7)         ! Dimensions of character objects
       CHARACTER COMMENT*50       ! FITS item comment
       DOUBLE PRECISION DARRAY(100) ! Used to read in DP type data items
       INTEGER   DIMS(7)          ! Dimensions of output data
@@ -799,8 +803,8 @@
 
 *                  Inquire the dimensions and object name.  Generate the
 *                  full component name.
-                     CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
-                     CALL DTA_CRNAM( 'OUTPUT', NAME2, NDIM, DIMS, 
+                     CALL DTA_SZVAR( LEVEL2, 7, NDIM, CDIMS, DSTAT )
+                     CALL DTA_CRNAM( 'OUTPUT', NAME2, NDIM, CDIMS, 
      :                               NAMOUT, DSTAT )
                      CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
 
@@ -808,7 +812,7 @@
 *                  and .UNITS in the output structure.  This is done by
 *                  reading the value, creating the named object in the
 *                  NDF, and writing the value to it.
-                     NDATA = DIMS( 1 )
+                     NDATA = CDIMS( 1 )
                      CALL DTA_RDVARC( LEVEL2, NDATA, STRING, DSTAT )
                      CALL DTA_CRNAM( 'OUTPUT', NAME2, 0, 0, 
      :                               NAMOUT, DSTAT )
@@ -1151,15 +1155,15 @@
      :                         NAME2 .EQ. 'UNITS' ) THEN
 
 *                     Inquire the dimensions of the object.
-                        CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
+                        CALL DTA_SZVAR( LEVEL2, 7, NDIM, CDIMS, DSTAT )
 
 *                     Generate the full name of the output component.
-                        CALL DTA_CRNAM( AXOUT, NAME2, NDIM, DIMS, 
+                        CALL DTA_CRNAM( AXOUT, NAME2, NDIM, CDIMS, 
      :                                  NAMOUT, DSTAT )
 
 *                     Make the output structure.
                         CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
-                        NDATA = DIMS( 1 )
+                        NDATA = CDIMS( 1 )
 
 *                     The .n.LABEL and .n.UNITS are copied to .LABEL
 *                     and .UNITS in the output axis structure.  This is
@@ -1228,13 +1232,7 @@
             ELSE IF ( NAME1 .EQ. 'TABLE' ) THEN
 
 *            TABLE used for FIGARO SPIKETRUM routines. Copy this to 
-*            .MORE.FIGARO.TABLE.
-
-*            Obtain the type and dimensions of the structure.
-               CALL DTA_TYVAR( LEVEL1, TYPE, DSTAT )
-               CALL DTA_SZVAR( LEVEL1, 7, NDIM, DIMS, DSTAT )
-
-*            Copy it to the Figaro TABLE extension.
+*            .MORE.FIGARO.TABLE extension.
                CALL DTA_CYVAR( 'INPUT.TABLE', 
      :                         'OUTPUT.MORE.FIGARO.TABLE', 
      :                         DSTAT )
@@ -1470,8 +1468,10 @@
 
 *   Make sure that an axis data array is present for each axis
 *   structure in the output NDF. If none is present an array filled
-*   with 0.5,1.5,2.5... is created.
-      CALL DTA_SZVAR( 'OUTPUT.DATA_ARRAY', 7, NDIM, DIMS, DSTAT )
+*   with 0.5,1.5,2.5... is created.  Re-obtain the dimensions of the
+*   data array.  Output file cannot be used in case the NDF has the
+*   simple form.
+      CALL DTA_SZVAR( 'INPUT.Z.DATA', 7, NDIM, DIMS, DSTAT )
       IF ( NEEDAX .AND. NAXIS .GT. 1 ) THEN
          DO IAXIS = 1, NAXIS
 
