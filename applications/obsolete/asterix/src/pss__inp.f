@@ -79,6 +79,8 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
+      INCLUDE 'GRP_PAR'
+      INCLUDE 'PAR_ERR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -96,11 +98,18 @@
 *
 *    Local variables :
 *
-      CHARACTER                PATH*80                 ! Object path
+      CHARACTER                 PATH*80                 ! Object path
+      CHARACTER*132		SREGION			! Search region file
 
-      INTEGER                  NLEV                    ! Useless TRACE output
+      REAL			BASE(2), SCALE(2)	! ARD mask bounds
 
-      LOGICAL                  OK                      ! Validity checks
+      INTEGER			GRPID			! ARD identifier
+      INTEGER			IAX			! Axis loop
+      INTEGER			MPTR			! ARD mask data
+      INTEGER                   NLEV                    ! Useless TRACE output
+      INTEGER			NQPTR			! New quality array
+
+      LOGICAL                   OK                      ! Validity checks
 *-
 
 *    Check status
@@ -146,18 +155,69 @@
       IF ( IM_UNITS .LE. ' ' ) IM_UNITS = 'count'
 
 *  Look for quality
+      BDS_QUAL_DYNAMIC = .FALSE.
       CALL BDI_CHK( IM_ID, 'Quality', BDS_QUAL_OK, STATUS )
       IF ( BDS_QUAL_OK ) THEN
         CALL BDI_MAPUB( IM_ID, 'MaskedQuality', 'READ',
      :                  BDS_QUAL_PTR, STATUS )
-
-*    Which way to use quality if present?
-        IF ( BDS_QUAL_OK ) THEN
-          CALL USI_GET0L( 'QBAD', CP_NOBADQSRC, STATUS )
-        END IF
-
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Check axes
+      CALL PSS_GET_AXES( STATUS )
+
+*  Extra quality mask?
+      CALL USI_GET0C( 'SREGION', SREGION, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*    Load the ARD file
+        CALL ARX_OPEN( 'READ', GRPID, STATUS )
+        CALL ARX_READ( 'SREGION', GRPID, STATUS )
+
+*    Convert to a mask
+        CALL DYN_MAPI( 2, BDS_DIMS, MPTR, STATUS )
+        DO IAX = 1, 2
+          BASE(IAX) = AX_BR(IAX) / AX_TOR(IAX)
+          SCALE(IAX) = AX_DR(IAX) / AX_TOR(IAX)
+        END DO
+        CALL ARX_MASK( GRPID, BDS_DIMS, BASE, SCALE, AX_UNITS,
+     :                 %VAL(MPTR), STATUS )
+
+*    Make new quality array, marking as dynamic
+        CALL DYN_MAPB( BDS_NDIM, BDS_DIMS, NQPTR, STATUS )
+        BDS_QUAL_DYNAMIC = .TRUE.
+
+*    Copy in dataset quality if present
+        IF ( BDS_QUAL_OK ) THEN
+          CALL ARR_COP1B( BDS_NELM, %VAL(BDS_QUAL_PTR), %VAL(NQPTR),
+     :                    STATUS )
+          CALL BDI_UNMAP( IM_ID, 'MaskedQuality', BDS_QUAL_PTR,
+     :                    STATUS )
+        END IF
+
+*    Add in the masked quality, ORing it if the input data quality is
+*    present
+        CALL PSS_INP_ADQ( BDS_NELM, BDS_QUAL_OK, %VAL(MPTR),
+     :                    %VAL(NQPTR), STATUS )
+
+*    Close the ARD file and its mask
+        CALL DYN_UNMAP( MPTR, STATUS )
+        CALL ARX_CLOSE( GRPID, STATUS )
+
+*    Quality is now present
+        BDS_QUAL_PTR = NQPTR
+        BDS_QUAL_OK = .TRUE.
+
+*  No search region supplied?
+      ELSE IF ( STATUS .NE. PAR__NULL ) THEN
+        CALL ERR_ANNUL( STATUS )
+
+      END IF
+
+*  Which way to use quality if present?
+      IF ( BDS_QUAL_OK ) THEN
+        CALL USI_GET0L( 'QBAD', CP_NOBADQSRC, STATUS )
+      END IF
 
 *  See if there's VARIANCE present
       CALL BDI_CHK( IM_ID, 'Variance', IM_VAR_OK, STATUS )
@@ -167,9 +227,6 @@
      :                    BDS_QUAL_PTR, %VAL(IM_VAR_PTR), STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*  Check axes
-      CALL PSS_GET_AXES( STATUS )
 
 *  Only if first file
       IF ( IFILE .EQ. 1 ) THEN
@@ -283,6 +340,71 @@
 *    Report errors
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSS_INP_OPEN', STATUS )
+      END IF
+
+      END
+
+
+*+  PSS_INP_ADQ - Add or OR ARD mask data with masked quality array
+      SUBROUTINE PSS_INP_ADQ( N, ORIT, MASK, Q, STATUS )
+*
+*    Description :
+*
+*    Method :
+*
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*     18 Jul 96 : Original (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'QUAL_PAR'
+*
+*    Import :
+*
+      INTEGER			N, MASK(*)
+      LOGICAL			ORIT
+*
+*    Import/Export:
+*
+      BYTE			Q(*)
+*
+*    Status :
+*
+      INTEGER                  STATUS                  ! Run-time error
+*
+*    Local variables :
+*
+      INTEGER			I			! Loop over masks
+*-
+
+*  Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  OR the mask?
+      IF ( ORIT ) THEN
+        DO I = 1, N
+          IF ( MASK(I) .LE. 0 ) THEN
+            Q(I) = QUAL__BAD
+          END IF
+        END DO
+      ELSE
+        DO I = 1, N
+          IF ( MASK(I) .GT. 0 ) THEN
+            Q(I) = QUAL__GOOD
+          ELSE
+            Q(I) = QUAL__BAD
+          END IF
+        END DO
       END IF
 
       END
