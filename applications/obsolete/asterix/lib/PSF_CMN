@@ -16,16 +16,6 @@
 *         Removed library stuff
 *-
 
-      INTEGER                   PSF_E_NONE        	! Energy modes
-        PARAMETER               ( PSF_E_NONE = 0 )
-      INTEGER                   PSF_E_CHANNEL
-        PARAMETER               ( PSF_E_CHANNEL = 1 )
-      INTEGER                   PSF_E_MODEL
-        PARAMETER               ( PSF_E_MODEL = 2 )
-
-      INTEGER                   PGRID_MAXR		! Max bins in polar model
-        PARAMETER               ( PGRID_MAXR = 30 )
-
 *  Psf system initialised
       LOGICAL                   PSFAUTO                 ! Automatic mode
 
@@ -50,24 +40,8 @@
       REAL		        SM_R_DX(PSF_NMAX)	!      "       "
       REAL		        SM_R_DY(PSF_NMAX)	!      "       "
 
-*  Energy model
-      INTEGER                   EM_MODE(PSF_NMAX)
-      INTEGER                   EM_NBIN(PSF_NMAX)
-      INTEGER                   EM_CBPTR(PSF_NMAX)
-      LOGICAL                   EM_OK(PSF_NMAX)
-
 *  Psf list
       INTEGER			P_PLIST			! ADI structure
-
-*  Psf instance data
-      LOGICAL                   P_USED(PSF_NMAX)  	! Slot in use
-      LOGICAL                   P_EVDS(PSF_NMAX)  	! File is an event dataset
-      LOGICAL                   P_MODEL(PSF_NMAX) 	! Psf is a model
-      LOGICAL                   P_EOK(PSF_NMAX)   	! Psf energy dependent?
-      INTEGER		        P_INST(PSF_NMAX)	! Internal instance data
-      LOGICAL			P_GOTAX(PSF_NMAX)	! Got axis stuff yet?
-      INTEGER			P_FID(PSF_NMAX)		! Dataset identifiers
-      INTEGER			P_PSID(PSF_NMAX)	! Psf description
 
 *  Non-character common block
       COMMON /PSF_CMN/
@@ -77,8 +51,4 @@
      :            SM_P_NA, SM_P_NR, SM_P_REG,
      :            SM_P_DR, SM_P_RUP, SM_R_NX,
      :            SM_R_NY, SM_R_DX, SM_R_DY,
-     :          P_USED, P_EOK, 				! Psf instances
-     :            P_EVDS, P_MODEL, P_INST, P_GOTAX,
-     :            P_FID, P_PSID, P_PLIST,
-     :          EM_MODE,EM_NBIN,EM_CBPTR,EM_OK, 	! Energy model specs
      :          PSFAUTO
