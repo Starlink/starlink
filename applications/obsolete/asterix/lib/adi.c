@@ -1556,7 +1556,7 @@ void adix_prnt_struc( ADIobj id, ADIstatus status )
     adix_print( _CDAR(sid), ADI__true, status );
     sid = _CDR(sid);
     if ( ! _null_q(sid) )
-      putchar( ', ' );
+      printf( ", " );
     }
   putchar( '}' );
   }
