@@ -6,7 +6,12 @@
   <version>@PACKAGE_VERSION@</version>
   <path>applications/sgmlkit</path>
   <description>Starlink documentation SGML kit</description>
-  <!-- <abstract><p></p></abstract> -->
+  <abstract><p>The Starlink SGML set supports people writing Starlink
+      documents, such as SUNs, SSNs, MUDs and the like.  It consists of a
+      definition of a markup language suitable for such documents,
+      plus software to convert these source documents to reader-friendly
+      form.  At present, these `output formats' include HTML and LaTeX
+      (and hence include postscript and PDF formats).</p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
@@ -22,6 +27,6 @@
       <email>m.b.taylor@bristol.ac.uk</email>
     </person>
   </developers>
-  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
 </component>
