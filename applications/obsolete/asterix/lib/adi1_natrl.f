@@ -109,7 +109,7 @@
       CLASS = ' '
 
 *    Retrieve the locator from the property list
-      CALL ADI_GETLOC( ID, FLOC, STATUS )
+      CALL ADI1_GETLOC( ID, FLOC, STATUS )
 
 *    Is it primitive?
       CALL DAT_PRIM( FLOC, PRIM, STATUS )
