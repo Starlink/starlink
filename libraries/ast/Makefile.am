@@ -345,11 +345,11 @@ install-exec-local: libast.la
 @PREDIST@    -e 's,@PACKAGE_VERSION_RELEASE\@,$(PACKAGE_VERSION_RELEASE),' \
 @PREDIST@    -e 's,@PERL\@,$(PERL),'
 @PREDIST@version.h: version.h.in
-@PREDIST@	rm -f $@; $(predist_subs) $< >$@
+@PREDIST@	rm -f $@; $(predist_subs) version.h.in >$@
 @PREDIST@builddocs: builddocs.in
-@PREDIST@	rm -f $@; $(predist_subs) $< >$@; chmod +x $@
+@PREDIST@	rm -f $@; $(predist_subs) builddocs.in >$@; chmod +x $@
 @PREDIST@addversion: addversion.in
-@PREDIST@	rm -f $@; $(predist_subs) $< >$@; chmod +x $@
+@PREDIST@	rm -f $@; $(predist_subs) addversion.in >$@; chmod +x $@
 
 # Documentation
 @PREDIST@$(PAPER_DOCUMENTATION): sun211_figures builddocs addversion
