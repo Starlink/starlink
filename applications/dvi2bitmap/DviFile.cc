@@ -7,18 +7,26 @@
 #include "DviFile.h"
 #include "InputByteStream.h"
 
+// Static debug switch
+bool DviFile::debug_;
 
 DviFile::DviFile (string s)
-    : bytenum_(0), fileName_(s)
+    : fileName_(s)
 {
-    ibs_ = new InputByteStream (s);
-    if (ibs_->eof())
-	cerr << "Can't open file " << s << '\n';
+    try
+    {
+	dvif_ = new InputByteStream (s);
+	read_postamble();
+    }
+    catch (InputByteStreamError& e)
+    {
+	throw DviError ("DviFile: "+e.problem());
+    }
 }
 
 DviFile::~DviFile()
 {
-    delete ibs_;
+    delete dvif_;
 }
 
 // This is the routine which does most of the actual work.  It scans
@@ -41,7 +49,8 @@ DviFileEvent *DviFile::getEvent()
     while (! gotEvent)
     {
 	opcode = getByte();
-	cerr << 'O' << static_cast<int>(opcode) << '\n';
+	if (debug_)
+	    cerr << 'O' << static_cast<int>(opcode) << '\n';
 	if (opcode <= 127)	// set character
 	{
 	    setChar.charno = opcode;
@@ -132,22 +141,14 @@ DviFileEvent *DviFile::getEvent()
 		    // posStack_.push(*ps);
 		    PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
 		    posStack_.push(ps);
-		    //cerr << ">>ps=" << ps << '\n';
+		    if (debug_)
+			cerr << ">>ps=" << ps << '\n';
 		}
 		break;
 	      case 142:		// pop
 		{
-		    //PosState &ps = posStack_.top();
-		    //posStack_.pop();
-		    //h_ = ps.h;
-		    //v_ = ps.v;
-		    //w_ = ps.w;
-		    //x_ = ps.x;
-		    //y_ = ps.y;
-		    //z_ = ps.z;
-		    //delete &ps;
-		    PosState *ps = posStack_.pop();
-		    //cerr << "<<ps=" << ps << '\n';
+		    PosState *ps = posStack_.top();
+		    posStack_.pop();
 		    h_ = ps->h;
 		    v_ = ps->v;
 		    w_ = ps->w;
@@ -155,6 +156,16 @@ DviFileEvent *DviFile::getEvent()
 		    y_ = ps->y;
 		    z_ = ps->z;
 		    delete ps;
+		    //PosState *ps = posStack_.pop();
+		    //h_ = ps->h;
+		    //v_ = ps->v;
+		    //w_ = ps->w;
+		    //x_ = ps->x;
+		    //y_ = ps->y;
+		    //z_ = ps->z;
+		    //delete ps;
+		    if (debug_)
+			cerr << "<<ps=" << ps << '\n';
 		}
 		break;
 	      case 143:		// right1
@@ -381,43 +392,77 @@ DviFileEvent *DviFile::getEvent()
 // routines in InputByteStream
 Byte DviFile::getByte()
 {
-    if (eof() || ibs_ == 0)
+    if (eof() || dvif_ == 0)
 	throw DviBug ("Tried to getByte when no file open");
     else
     {
-	return ibs_->getByte();
+	return dvif_->getByte();
     }
 }
 signed int DviFile::getSIU(int n)
 {
-    if (eof() || ibs_ == 0)
+    if (eof() || dvif_ == 0)
 	throw DviBug ("Tried to getSIU when no file open");
     else
     {
-	return ibs_->getSIU(n);
+	return dvif_->getSIU(n);
     }
 }
 signed int DviFile::getSIS(int n)
 {
-    if (eof() || ibs_ == 0)
+    if (eof() || dvif_ == 0)
 	throw DviBug ("Tried to getSIS when no file open");
     else
     {
-	return ibs_->getSIS(n);
+	return dvif_->getSIS(n);
     }
 }
 unsigned int DviFile::getUIU(int n)
 {
-    if (eof() || ibs_ == 0)
+    if (eof() || dvif_ == 0)
 	throw DviBug ("Tried to getUIU when no file open");
     else
     {
-	return ibs_->getUIU(n);
+	return dvif_->getUIU(n);
     }
 }
 bool DviFile::eof()
 {
-    return ibs_->eof();
+    return dvif_->eof();
+}
+
+void DviFile::read_postamble()
+{
+    dvif_->gotoEnd();
+    Byte dviB;
+    while ((dviB = dvif_->getByte(0)) == 223)
+	dvif_->backspace();
+    if (dviB != 2)
+	// should be the identification byte, 2
+	throw DviError ("DviFile::read_postamble: id byte not 2");
+    dvif_->backspace(5);	// should now be pointing at post_post opcode
+    if (dvif_->getByte() != 249)
+	throw DviError
+	    ("DviFile::read_postamble: post_post not in correct place");
+    unsigned int q = dvif_->getUIU(4);
+    if (debug_)
+	cerr << "Postamble address=" << q << '\n';
+    dvif_->seek(q);
+    unsigned int int4 = dvif_->getUIU(4); // numerator
+    int4 = dvif_->getUIU(4);	// denominator
+    int4 = dvif_->getUIU(4);	// mag
+    postamble_.l = dvif_->getUIU(4);    
+    postamble_.u = dvif_->getUIU(4);    
+    postamble_.s = dvif_->getUIU(2);    
+    postamble_.t = dvif_->getUIU(2);
+    if (debug_)
+	cerr << "Postamble: l=" << postamble_.l
+	     << " u=" << postamble_.u
+	     << " s=" << postamble_.s
+	     << " t=" << postamble_.t
+	     << '\n';
+    // ignore the following font definitions - the in-file definitions are
+    // processed during the subsequent reading of the file
 }
 
 void DviFileEvent::debug ()
@@ -472,6 +517,7 @@ const
 	comment << "\'\n";
 }
 
+/*
 void DviFile::PosStateStack::push(PosState *p)
 {
     if (i == size)
@@ -491,3 +537,4 @@ DviFile::PosStateStack::PosStateStack()
 {
     s = new (PosState*)[size];
 }
+*/

@@ -11,10 +11,13 @@
 // Open the requested file.  If preload is true, then open the file and
 // read it entire into memory, since the client will be seeking a lot.
 InputByteStream::InputByteStream (string s, bool preload=false)
-    : preloaded_(preload)
+    : eof_(true), preloaded_(preload)
 {
     fd_ = open (s.c_str(), O_RDONLY);
-    eof_ = (fd_ < 0);		// set true if open failed
+    if (fd_ < 0)
+	throw InputByteStreamError ("can\'t open file " + s + " to read");
+
+    eof_ = false;
 
     if (!eof_)
     {
@@ -52,7 +55,7 @@ InputByteStream::~InputByteStream ()
     delete[] buf_;
 }
 
-Byte InputByteStream::getByte()
+Byte InputByteStream::getByte(int n=1)
 {
     if (eof_)
 	return 0;
@@ -68,14 +71,53 @@ Byte InputByteStream::getByte()
 	    eof_ = true;
 	else
 	{
-	    int bufcontents = read (fd_, buf_, buflen_);
-	    eof_ = (bufcontents == 0);
+	    read_buf_();
 	    p_ = buf_;
-	    eob_ = buf_ + bufcontents;
 	}
     }
-    return eof_ ? 0 : *p_++;
+    Byte result = eof_ ? 0 : *p_;
+    p_ += n;
+    return result;
 }
+
+void InputByteStream::gotoEnd()
+{
+    if (preloaded_)
+    {
+	p_ = eob_ - 1;
+    }
+    else
+    {
+	if (lseek (fd_, -buflen_, SEEK_END) < 0)
+	    throw InputByteStreamError ("gotoEnd: can\'t seek");
+	read_buf_();
+	p_ = eob_ - 1;		// point at last byte
+    }
+}
+void InputByteStream::backspace (int n=1)
+{
+    if (n < 0)
+	throw DviBug ("InputByteStream::backspace: n < 0");
+    if (preloaded_)
+    {
+	p_ -= n;
+	if (p_ < eob_)
+	    throw DviBug
+	      ("InputByteStream::backspace: backspace past beginning of file");
+    }
+    else
+    {
+	p_ -= n;
+	if (p_ < buf_)
+	{
+	    // at beginning of buffer - read previous block
+	    if (lseek (fd_, 2*buflen_, SEEK_CUR) < 0)
+		throw DviBug ("InputByteStream::backspace: can\'t seek");
+	    read_buf_();
+	    p_ += buflen_;
+	}
+    }
+}   
 
 const Byte *InputByteStream::getBlock (unsigned int pos, unsigned int length)
 {
@@ -111,11 +153,19 @@ bool InputByteStream::eof()
 
 void InputByteStream::seek (unsigned int pos)
 {
-    if (!preloaded_)
-	throw DviBug ("Can't seek non-preloaded file");
-    if (pos < 0 || pos > buflen_)
-	throw DviBug ("seek out of range");
-    p_ = buf_ + pos;
+    if (preloaded_)
+    {
+	if (pos < 0 || pos > buflen_)
+	    throw DviBug ("InputByteStream::seek: out of range");
+	p_ = buf_ + pos;
+    }
+    else
+    {
+	if (lseek (fd_, pos, SEEK_SET) < 0)
+	    throw DviBug ("InputByteStream::seek: can\'t seek");
+	read_buf_();
+	p_ = buf_;
+    }
 }
 unsigned int InputByteStream::pos ()
 {
@@ -130,7 +180,14 @@ void InputByteStream::skip (unsigned int skipsize)
     p_ += skipsize;
 }
 
-
+void InputByteStream::read_buf_ ()
+{
+    int bufcontents = read (fd_, buf_, buflen_);
+    if (bufcontents < 0)
+	throw DviBug ("InputByteStream::read_buf_: can't read");
+    eof_ = (bufcontents == 0);
+    eob_ = buf_ + bufcontents;
+}
 /*
 #if (sizeof(unsigned int) != 4)
 // The code here is intended to deal with the case where (un)signed

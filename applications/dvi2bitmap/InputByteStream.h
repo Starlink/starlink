@@ -7,10 +7,17 @@
 #include <string>
 #include "dvi2bitmap.h"
 
+class InputByteStreamError : public DviError {
+ public:
+    InputByteStreamError(string s) : DviError(s) { }
+};
+
 class InputByteStream {
  public:
     bool eof();
-    Byte getByte();
+    Byte getByte(int n=1);
+    void backspace(int n=1);
+    void gotoEnd();
     signed int getSIU(int);
     signed int getSIS(int);
     unsigned int getUIU(int);
@@ -28,5 +35,6 @@ class InputByteStream {
     Byte *eob_;			// end of buffer
     bool eof_;
     const bool preloaded_;
+    void read_buf_(void);
 };
 #endif // #ifndef INPUT_BYTE_STREAM_HEADER_READ

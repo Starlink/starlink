@@ -6,6 +6,12 @@
 
 #include <string>
 #include "InputByteStream.h"
+#include "dvi2bitmap.h"
+
+class PkError : public DviError {
+ public:
+    PkError(string s) : DviError(s) { }
+};
 
 class PkRasterdata {
  public:
@@ -77,16 +83,18 @@ class PkFont {
     ~PkFont();
     PkGlyph *glyph (unsigned int i) const { return glyphs_[i]; }
     static debug (bool sw) { debug_ = sw; }
+    static void setFontPath(string fp) { fontpath_ = fp; }
  private:
     unsigned int checksum_, scalefactor_, designsize_;
     string name_;
-    InputByteStream *ibs_;
+    InputByteStream *pkf_;
     unsigned int id_, ds_, cs_, hppp_, vppp_;
     string comment_;
     const nglyphs_ = 256;
     PkGlyph *glyphs_[nglyphs_];
     void read_font(InputByteStream&);
     static bool debug_;
+    static string fontpath_;	// single string with %F in it
 };
 
 #endif // #ifndef PK_FONT_HEADER_READ

@@ -18,22 +18,26 @@ public:
     DviFileEvent *getEvent();
     DviFile (string s);
     ~DviFile();
+    static debug (bool sw) { debug_ = sw; }
 private:
     string fileName_;
-    int bytenum_;
-    Byte cb_;
     int h_, v_, w_, x_, y_, z_;
-    InputByteStream *ibs_;
+    InputByteStream *dvif_;
     Byte getByte();
     signed int getSIU(int), getSIS(int);
     unsigned int getUIU(int);
+    struct postamble {
+	unsigned int l, u, s, t;
+    } postamble_;
+    void read_postamble ();
     struct PosState {
 	int h, v, w, x, y, z;
 	PosState(int h, int v, int w, int x, int y, int z)
 	    : h(h),v(v),w(w),x(x),y(x),z(z) { }
     };
-    //stack<PosState> posStack_;
-    class PosStateStack {
+    stack<PosState*> posStack_;
+    /*
+      class PosStateStack {
 	// this is ultra-cruddy, but I'm doing something wrong the way
 	// I use the STL stack, so this is to experiment with.
     public:
@@ -47,6 +51,8 @@ private:
 	int i;
     };
     PosStateStack posStack_;
+    */
+    static bool debug_;
 };
 
 

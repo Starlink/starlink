@@ -10,6 +10,7 @@
 bool PkRasterdata::debug_;
 bool PkFont::debug_;
 bool PkGlyph::debug_;
+string PkFont::fontpath_;
 
 PkFont::PkFont(unsigned int c,
 	       unsigned int s,
@@ -17,36 +18,47 @@ PkFont::PkFont(unsigned int c,
 	       string name)
 {
     //name_ = "/var/lib/texmf/pk/ljfour/public/cm/cmr6.600pk"; // temp
-    name_ = "/var/lib/texmf/fonts/pk/ljfour/public/cm/cmr10.600pk";
-    ibs_ = new InputByteStream (name_, true);
-
-    for (int i=0; i<nglyphs_; i++)
-	glyphs_[i] = 0;
-    read_font (*ibs_);
+    //name_ = "/var/lib/texmf/fonts/pk/ljfour/public/cm/cmr10.600pk";
+    name_ = fontpath_;
+    int strpos = name_.find("%F");
+    name_.replace(strpos, 2, name);
+    cout << "Font file: " << name_ << '\n';
+    try
+    {
+	pkf_ = new InputByteStream (name_, true);
+	for (int i=0; i<nglyphs_; i++)
+	    glyphs_[i] = 0;
+	read_font (*pkf_);
+    }
+    catch (InputByteStreamError& e)
+    {
+	string prob = e.problem();
+	throw PkError (prob);
+    }
 };
 
 PkFont::~PkFont()
 {
-    delete ibs_;
+    delete pkf_;
 }
 
-void PkFont::read_font (InputByteStream& ibs)
+void PkFont::read_font (InputByteStream& pkf)
 {
     // read the preamble, and check that the requested parameters match
     Byte preamble_opcode;
-    if ((preamble_opcode = ibs.getByte()) != 247)
+    if ((preamble_opcode = pkf.getByte()) != 247)
 	throw DviError ("PK file doesn't start with preamble");
-    if ((id_ = ibs.getByte()) != 89)
+    if ((id_ = pkf.getByte()) != 89)
 	throw DviError ("PK file has wrong ID byte");
 
-    int comment_length = ibs.getByte();
+    int comment_length = pkf.getByte();
     comment_ = "";
     for (;comment_length > 0; comment_length--)
-	comment_ += static_cast<char>(ibs.getByte());
-    ds_   = ibs.getUIU(4);
-    cs_   = ibs.getUIU(4);
-    hppp_ = ibs.getUIU(4);
-    vppp_ = ibs.getUIU(4);
+	comment_ += static_cast<char>(pkf.getByte());
+    ds_   = pkf.getUIU(4);
+    cs_   = pkf.getUIU(4);
+    hppp_ = pkf.getUIU(4);
+    vppp_ = pkf.getUIU(4);
 
 
     if (debug_)
@@ -61,7 +73,7 @@ void PkFont::read_font (InputByteStream& ibs)
     bool end_of_scan = false;
     while (! end_of_scan)
     {
-	Byte opcode = ibs.getByte();
+	Byte opcode = pkf.getByte();
 	if (opcode <= 239)	// character definition
 	{
 	    bool two_byte = opcode & 4;
@@ -75,86 +87,86 @@ void PkFont::read_font (InputByteStream& ibs)
 	    if (two_byte)
 		if (pl_prefix == 3) // long-form character preamble
 		{
-		    packet_length = ibs.getUIU(4);
-		    g_cc       = ibs.getByte();
-		    g_tfmwidth = ibs.getUIU(4);
-		    g_dx       = ibs.getUIU(4);
-		    g_dy       = ibs.getUIU(4);
-		    g_w        = ibs.getUIU(4);
-		    g_h        = ibs.getUIU(4);
-		    g_hoffu    = ibs.getUIU(4);
-		    g_voffu    = ibs.getUIU(4);
+		    packet_length = pkf.getUIU(4);
+		    g_cc       = pkf.getByte();
+		    g_tfmwidth = pkf.getUIU(4);
+		    g_dx       = pkf.getUIU(4);
+		    g_dy       = pkf.getUIU(4);
+		    g_w        = pkf.getUIU(4);
+		    g_h        = pkf.getUIU(4);
+		    g_hoffu    = pkf.getUIU(4);
+		    g_voffu    = pkf.getUIU(4);
 
 		    if (g_cc < 0 || g_cc >= nglyphs_)
 			throw DviError
 			    ("PK file has out-of-range character code");
 
-		    pos = ibs.pos();
+		    pos = pkf.pos();
 		    packet_length -= 7*4;
 		    PkRasterdata *rd
 			= new PkRasterdata (opcode,
-					    ibs.getBlock(pos,packet_length),
+					    pkf.getBlock(pos,packet_length),
 					    packet_length, g_w, g_h);
 		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dx, g_dy, 
 						 g_w, g_h, g_hoffu, g_voffu,
 						 rd);
-		    ibs.skip (packet_length);
+		    pkf.skip (packet_length);
 		}
 		else		// extended short form character preamble
 		{
 		    packet_length = pl_prefix;
 		    packet_length <<= 16;
-		    packet_length += ibs.getUIU(2);
-		    g_cc       = ibs.getByte();
-		    g_tfmwidth = ibs.getUIU(3);
-		    g_dm       = ibs.getUIU(2);
-		    g_w        = ibs.getUIU(2);
-		    g_h        = ibs.getUIU(2);
-		    g_hoff     = ibs.getSIS(2);
-		    g_voff     = ibs.getSIS(2);
+		    packet_length += pkf.getUIU(2);
+		    g_cc       = pkf.getByte();
+		    g_tfmwidth = pkf.getUIU(3);
+		    g_dm       = pkf.getUIU(2);
+		    g_w        = pkf.getUIU(2);
+		    g_h        = pkf.getUIU(2);
+		    g_hoff     = pkf.getSIS(2);
+		    g_voff     = pkf.getSIS(2);
 
 		    if (g_cc < 0 || g_cc >= nglyphs_)
 			throw DviError
 			    ("PK file has out-of-range character code");
 
-		    pos = ibs.pos();
+		    pos = pkf.pos();
 		    packet_length -= 3 + 5*2;
 		    PkRasterdata *rd
 			= new PkRasterdata (opcode,
-					    ibs.getBlock(pos,packet_length),
+					    pkf.getBlock(pos,packet_length),
 					    packet_length, g_w, g_h);
 		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dm,
 						 g_w, g_h, g_hoff, g_voff,
 						 rd);
-		    ibs.skip (packet_length);
+		    pkf.skip (packet_length);
 		}
 	    else		// short form character preamble
 	    {
 		packet_length = pl_prefix;
 		packet_length <<= 8;
-		packet_length += ibs.getByte();
-		g_cc       = ibs.getByte();
-		g_tfmwidth = ibs.getUIU(3);
-		g_dm       = ibs.getUIU(1);
-		g_w        = ibs.getUIU(1);
-		g_h        = ibs.getUIU(1);
-		g_hoff     = ibs.getSIS(1);
-		g_voff     = ibs.getSIS(1);
+		packet_length += pkf.getByte();
+		g_cc       = pkf.getByte();
+		g_tfmwidth = pkf.getUIU(3);
+		g_dm       = pkf.getUIU(1);
+		g_w        = pkf.getUIU(1);
+		g_h        = pkf.getUIU(1);
+		g_hoff     = pkf.getSIS(1);
+		g_voff     = pkf.getSIS(1);
 
 		if (g_cc < 0 || g_cc >= nglyphs_)
 		    throw DviError
 			("PK file has out-of-range character code");
 
-		pos = ibs.pos();
+		pos = pkf.pos();
 		packet_length -= 8;
 		PkRasterdata *rd
 		    = new PkRasterdata (opcode,
-					ibs.getBlock(pos,packet_length),
+					pkf.getBlock(pos,packet_length),
 					packet_length, g_w, g_h);
 		glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dm,
 					     g_w, g_h, g_hoff, g_voff,
 					     rd);
-		ibs.skip(packet_length);
+		pkf.skip(packet_length);
 	    }
 	    if (debug_)
 		cerr << "Char " << g_cc
@@ -180,16 +192,16 @@ void PkFont::read_font (InputByteStream& ibs)
 		lenb++;
 		{
 		    string special = "";
-		    for (unsigned int special_len = ibs.getUIU(lenb);
+		    for (unsigned int special_len = pkf.getUIU(lenb);
 			 special_len > 0;
 			 special_len--)
-			special += static_cast<char>(ibs.getByte());
+			special += static_cast<char>(pkf.getByte());
 		    if (debug_)
 			cerr << "Special \'" << special << "\'\n";
 		}
 		break;
 	      case 244:		// pk_yyy
-		for (int i=0; i<4; i++) (void) ibs.getByte();
+		for (int i=0; i<4; i++) (void) pkf.getByte();
 		break;
 	      case 245:		// pk_post
 		end_of_scan = true;

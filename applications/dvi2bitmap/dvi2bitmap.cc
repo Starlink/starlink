@@ -19,25 +19,28 @@ main (int argc, char **argv)
     if (argc != 2)
 	Usage ();
 
-    string ifname = argv[1];
-    DviFile *dvif = new DviFile(ifname);
-    if (dvif->eof())
-    {
-	cout << "Can't open file " << ifname << " to read\n";
-	std::exit(1);
-    }
-
+    DviFile::debug(true);
     PkFont::debug(true);
     PkRasterdata::debug(false);
+    PkFont::setFontPath("/var/tmp/fonts/pk/ibmvga/public/cm/%F.110pk");
 
+    string ifname = argv[1];
     try
     {
+	DviFile *dvif = new DviFile(ifname);
+	if (dvif->eof())
+	{
+	    cout << "Can't open file " << ifname << " to read\n";
+	    std::exit(1);
+	}
+
 	DviFileEvent *ev;
 	DviFilePostamble *post;
 	do
 	{
 	    ev = dvif->getEvent();
 	    ev->debug();
+	    /*
 	    if (DviFileFontDef *fd = dynamic_cast<DviFileFontDef*>(ev))
 	    {
 		PkFont *f = new PkFont(fd->checksum,
@@ -62,7 +65,7 @@ main (int argc, char **argv)
 		    }
 		}
 	    }
-
+	    */
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
     }
