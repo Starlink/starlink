@@ -77,8 +77,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     10 Nov 1995 (DJA):
+*        Extended to allow copying of whole axis
 *     {enter_changes_here}
 
 *  Bugs:
@@ -114,19 +116,29 @@
       CALL CHR_ITOC( IAX, ASTR, NDIG1 )
       CALL CHR_ITOC( OAX, BSTR, NDIG2 )
 
-*  Loop over items while more of them and status is ok
-      CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
-      DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
+*  Have items been specified?
+      IF ( ITEMS .GT. ' ' ) THEN
 
-*    Copy the axis item
-        CALL BDI_COPY( ID, 'Axis_'//ASTR(:NDIG1)//'_'//ITEMS(C1:C2),
-     :                 OID, 'Axis_'//BSTR(:NDIG2)//'_'//ITEMS(C1:C2),
-     :                 STATUS )
+*    Loop over items while more of them and status is ok
+        CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
+        DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
-*    Advance iterator to next item
-        CALL UDI0_ADVITI( ITEMS, C1, C2, IITEM, STATUS )
+*      Copy the axis item
+          CALL BDI_COPY( ID, 'Axis_'//ASTR(:NDIG1)//'_'//ITEMS(C1:C2),
+     :                   OID, 'Axis_'//BSTR(:NDIG2)//'_'//ITEMS(C1:C2),
+     :                   STATUS )
 
-      END DO
+*      Advance iterator to next item
+          CALL UDI0_ADVITI( ITEMS, C1, C2, IITEM, STATUS )
+
+        END DO
+
+*  Simple axis copy
+      ELSE
+        CALL BDI_COPY( ID, 'Axis_'//ASTR(:NDIG1),
+     :                 OID, 'Axis_'//BSTR(:NDIG2), STATUS )
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_AXCOPY', STATUS )
