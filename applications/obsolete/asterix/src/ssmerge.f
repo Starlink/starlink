@@ -41,6 +41,7 @@
 *     22 Jul 93 : V1.7-1  Added PPROB field (DJA)
 *     26 Nov 93 : V1.7-3  Correct termination when no wildcards used (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     12 Nov 95 : V1.8-1  Merge EXT_SIG field (DJA)
 *
 *    Type definitions :
 *
@@ -67,7 +68,7 @@
       INTEGER               MAXFILE                   ! Max number of files
          PARAMETER          (MAXFILE=10000)
       INTEGER               MAXFLD                    ! Max number of fields
-         PARAMETER          (MAXFLD=13)
+         PARAMETER          (MAXFLD=14)
       INTEGER               MAXPAR                    ! Max number of pars
          PARAMETER          (MAXPAR=10)
 *
@@ -135,12 +136,12 @@
      :                        'RA', 'DEC',    'ERRORS',
      :                        'FLUX', 'CFLUX', 'EXTEN',
      :                        'SIGNIF','BACK','ENCPSF',
-     :                        'DELTA_C','PPROB'/
+     :                        'DELTA_C','PPROB','EXT_SIG'/
 *
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSMERGE Version 1.7-2' )
+        PARAMETER           ( VERSION = 'SSMERGE Version 1.8-1' )
 *-
 
 *    Check status
