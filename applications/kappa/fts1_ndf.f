@@ -210,6 +210,8 @@
 *        where byte-swapping is required.
 *     9-JUN-1998 (DSB):
 *        Added support for NDF WCS component.
+*     8-OCT-1998 (DSB):
+*        KPG1_CHVAx changed to FTS1_CHVAx so that they can be in libfits.a.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -515,7 +517,7 @@
 
 *          Map the data array.
 
-            CALL KPG1_MAP( NDF, 'Data', FMTOUT, 'WRITE', DAPNTR, EL,
+            CALL NDF_MAP( NDF, 'Data', FMTOUT, 'WRITE', DAPNTR, EL,
      :                    STATUS )
 
 *          Clear up after an error.
@@ -647,17 +649,17 @@
 *             the IEEE numbers.
 
                IF ( BPV .EQ. 1 ) THEN
-                  CALL KPG1_CHVAUB( EL, %VAL( WKPNTR( 1 ) ),
+                  CALL FTS1_CHVAUB( EL, %VAL( WKPNTR( 1 ) ),
      :                              VAL_ITOUB( .FALSE., BLANK, STATUS ),
      :                              VAL__BADUB, %VAL( DAPNTR( 1 ) ),
      :                              NBAD, STATUS )
                ELSE IF ( BPV .EQ. 2 ) THEN
-                  CALL KPG1_CHVAW( EL, %VAL( WKPNTR( 1 ) ),
+                  CALL FTS1_CHVAW( EL, %VAL( WKPNTR( 1 ) ),
      :                             VAL_ITOW( .FALSE., BLANK, STATUS ),
      :                             VAL__BADW, %VAL( DAPNTR( 1 ) ),
      :                             NBAD, STATUS )
                ELSE IF ( BPV .EQ. 4 ) THEN
-                  CALL KPG1_CHVAI( EL, %VAL( WKPNTR( 1 ) ), BLANK,
+                  CALL FTS1_CHVAI( EL, %VAL( WKPNTR( 1 ) ), BLANK,
      :                             VAL__BADI, %VAL( DAPNTR( 1 ) ),
      :                             NBAD, STATUS )
                END IF
@@ -679,7 +681,7 @@
 
 *          Map the data array, filling the array with bad values.
 
-            CALL KPG1_MAP( NDF, 'Data', FMTOUT, 'WRITE/BAD', DAPNTR, EL,
+            CALL NDF_MAP( NDF, 'Data', FMTOUT, 'WRITE/BAD', DAPNTR, EL,
      :                    STATUS )
 
 *          Clear up after an error.

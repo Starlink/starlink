@@ -221,7 +221,9 @@ sqorst.par stats.par sub.par substitute.par surfit.par thresh.par \
 trandat.par traninvert.par tranjoin.par tranmake.par transformer.par \
 trantrace.par trig.par turbocont.par vecplot.par wiener.par zaplin.par \
 kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
-_kappa.hd kappa.men helpdb.mip 
+_kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
+wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
+wcsremove.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
 IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
@@ -262,7 +264,8 @@ tranmake.hlp transformer.hlp trantrace.hlp trig.hlp turbocont.hlp \
 unix_usage.hlp using_help.hlp vecplot.hlp wiener.hlp zaplin.hlp \
 automatic_data_conv.hlp colour_table_and_pa.hlp getting_data_into_k.hlp \
 image_display_inter.hlp masking__bad_values.hlp selecting_graphics_.hlp \
-iraf_usage.hlp 
+iraf_usage.hlp listshow.hlp listmake.hlp wcsadd.hlp wcsalign.hlp \
+wcsattrib.hlp wcscopy.hlp wcsframe.hlp wcsremove.hlp
 
 # The contents of the kappa_data_alpha_OSF1.tar file:
 KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf.alpha_OSF1 cont_lut.sdf.alpha_OSF1 \

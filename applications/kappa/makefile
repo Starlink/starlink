@@ -481,7 +481,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
                     NUM_DEF NUM_DEF_CVT NUM_DEF_B NUM_DEF_D NUM_DEF_I \
                     NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_PAR \
                     PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR AST_PAR PSX_ERR \
-                    AST_ERR
+                    AST_ERR AGI_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -509,7 +509,8 @@ fts1_rdata.f fts1_rfmod.f fts1_rgrda.f fts1_rootn.f fts1_rstab.f \
 fts1_scofb.f fts1_sctab.f fts1_sdscf.f fts1_skip.f fts1_tread.f \
 fts1_ukeyc.f fts1_ukeyd.f fts1_ukeyi.f fts1_ukeyl.f fts1_ukeyr.f \
 fts1_vhead.f fts1_wcsax.f fts1_wcsdf.f fts1_wcsim.f fts1_wcsut.f \
-fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f
+fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f \
+fts1_chvai.f fts1_chvaub.f fts1_chvaw.f 
 
 IRA_F_ROUTINES = \
 ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
@@ -734,7 +735,7 @@ medref.f medrep.f medset.f medwts.f medwv.f mfnext.f mfopen.f moscad.f \
 moscdv.f namsrv.f nmplot.f opus.f otstsb.f peepsb.f setcr.f setknt.f \
 shifts.f shiftx.f shifty.f slc2t1.f slc2t3.f sqshs.f sqshx.f sqshy.f \
 stat3d.f statsb.f statv.f strx.f stry.f thrsr.f trgscl.f trigsb.f \
-tropus.f uput.f 
+tropus.f uput.f uget.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -946,8 +947,9 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM CTM_COM CTM_PAR \
 #  Rules to set up links to locate each of the above include files.
 #
 AGI_ERR:     $(STAR_INC)/agi_err;     $(LINK) $? $@
-AST_ERR:     $(STAR_INC)/ast_err;     $(LINK) $? $@
+AGI_PAR:     $(STAR_INC)/agi_par;     $(LINK) $? $@
 AST_PAR:     $(STAR_INC)/ast_par;     $(LINK) $? $@
+AST_ERR:     $(STAR_INC)/ast_err;     $(LINK) $? $@
 C1_COM:      c1_com;                  $(LINK) $? $@
 CHR_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
 CTM_COM:     ctm_com;                 $(LINK) $? $@
@@ -1138,7 +1140,7 @@ NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 #  them.
 
 OBJECT_LIBRARIES = \
-libkappa.a libkapview.a libndfpack.a libkapsub.a libfits.a libkapgen.a \
+libkappa.a libkapview.a libndfpack.a libkapsub.a libkapgen.a libfits.a \
 libirm.a libaif.a libira.a libndg.a
 
 #
@@ -2455,6 +2457,9 @@ fitsurface.o:	 SAE_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR
 flip.o:	         SAE_PAR NDF_PAR
 fourier.o:	 SAE_PAR PAR_PAR PAR_ERR NDF_PAR NDF_ERR PRM_PAR MSG_PAR
 fts1_axis.o:	 SAE_PAR DAT_PAR PRM_PAR
+fts1_chvai.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+fts1_chvaub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+fts1_chvaw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 fts1_comnt.o:	 SAE_PAR
 fts1_crndf.o:	 SAE_PAR
 fts1_dread.o:	 SAE_PAR
@@ -3517,6 +3522,7 @@ trig.o:	         SAE_PAR DAT_PAR PAR_ERR
 trigsb.o:	 SAE_PAR PRM_PAR
 tropus.o:	 ME_COM C1_COM
 turbocont.o:	 SAE_PAR DAT_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR GKS_PAR
+uget.o:          ME_COM C1_COM
 uput.o:	         ME_COM C1_COM
 vecplot.o:	 SAE_PAR PRM_PAR NDF_PAR CTM_PAR GKS_PAR
 wcsadd.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR
