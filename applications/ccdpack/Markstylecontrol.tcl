@@ -70,6 +70,9 @@
             canvas $itk_component(markstyle).shower \
                -height 26 \
                -width 50 
+         } {
+            usual
+            ignore -background
          }
 
 #  Pack the control.
@@ -248,8 +251,15 @@
 #-----------------------------------------------------------------------
          if { $state == "normal" } {
             bind $canv <ButtonPress-1> [ code $this dodialog ]
+            bind $canv <Enter> [ code $canv configure -background \
+                                         [ $this cget -activebackground ] ]
+            bind $canv <Leave> [ code $canv configure -background \
+                                         [ $this cget -background ] ]
          } elseif { $state == "disabled" } {
             bind $canv <ButtonPress-1> {}
+            bind $canv <Enter> {}
+            bind $canv <Leave> {}
+            $canv configure -background [ $this cget -background ]
          }
       }
  
