@@ -238,7 +238,7 @@ F77_SUBROUTINE(adifn(setecs))( INTEGER(code), CHARACTER(ctx), INTEGER(status) TR
   GENPTR_CHARACTER(ctx)
   GENPTR_INTEGER(status)
 
-  adix_setecs( *code, ctx, ctx_length, NULL, status );
+  adix_setecs( *code, ctx, ctx_length, 0, status );
   }
 
 F77_SUBROUTINE(adifn(setes))( CHARACTER(ctx), INTEGER(status) TRAIL(ctx) )
