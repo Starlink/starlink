@@ -4,7 +4,7 @@
 *     ASTIMP
 
 *  Purpose:
-*     Imports AST FrameSet information into NDFs.
+*     Imports coordinate system information into NDFs from AST files.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,19 +20,18 @@
 *        The global status.
 
 *  Description:
-*     This task reads alignment information from an AST file
-*     and uses it to modify the WCS components of the given NDFs.
-*     A frame in a new domain is added (the same for each NDF) within
-*     which a set of NDFs can be aligned.  The newly added domain
-*     is made the Current domain of the WCS components.
+*     This task reads coordinate system information from an AST file
+*     and uses it to modify the World Coordinate System (WCS)
+*     components of the given NDFs.  A new coordinate system is added
+*     (the same for each NDF) within which a set of NDFs can be
+*     aligned.  The newly added coordinate system becomes the Current
+*     one.
 *
-*     If the WCS component of the NDF has a frame whose Domain has
-*     the same value as that of the Current frame of the frameset 
-*     being imported, it will be overwritten, and a warning message
-*     issued.
+*     If a coordinate system with the same Domain (name) already
+*     exists it will be overwritten, and a warning message issued.
 *
-*     AST files for use by this application will normally be those 
-*     written by the ASTEXP application, and may either be standard
+*     AST files for use by this program will normally be those 
+*     written by the ASTEXP program, and may either be standard
 *     ones designed for use with a particular instrument, or prepared
 *     by the user.
 
@@ -52,12 +51,18 @@
 *        is done with care, and with knowledge of AST objects (SUN/210).
 *        The format of the file is explained in the Notes section.
 *     FITSROT = LITERAL (Read)
-*        The name of a FITS header whose value is an angle through 
-*        which all the imported frames should be rotated.  This 
-*        rotation is done after the mappings given in the AST file 
-*        itself have been applied.  If this parameter is supplied it
-*        overrides any value given in the modification parts of the
-*        AST file.
+*        The name of a FITS header keyword whose value gives a number
+*        of degrees to rotate the coordinate system by when it is
+*        imported.  This rotation is done after the mappings given in
+*        the AST file  itself have been applied.  If any lower case
+*        characters are given, they are converted to upper case.  This
+*        may be a compound name to handle hierarchical keywords, in
+*        which case it has the form keyword1.keyword2 etc.  Each
+*        keyword must be no longer than 8 characters.
+*
+*        It will normally not be necessary to supply this keyword,
+*        since it can be given instead within the AST file.  If it is
+*        supplied however, it overrides any value given there.
 *        [!]
 *     IN = LITERAL (Read)
 *        A list of NDF names whose WCS components are to be modified 
@@ -107,24 +112,27 @@
 *        default is "BOTH".
 *        [BOTH]
 *     ROT = _DOUBLE (Read)
-*        An angle through which all the imported frames should be
-*        rotated.  This rotation is done after the mappings in the AST
-*        file itself have been applied.
+*        A fixed angle in degrees through which all the imported
+*        frames  should be rotated.  This rotation is done after the
+*        mappings in the AST file itself have been applied.
 *        [0]
 
 *  Examples:
-*     astimp data* camera.ast obs1
+*     astimp data* camera.ast
 *        This will apply the AST file "camera.ast" to all the NDFs in
 *        the current directory with names beginning "data".  The file 
 *        "camera.ast" has previously been written using ASTEXP with
-*        the parameter ASTFILE=camera.ast.  A new frame with a Domain 
-*        called "OBS1" is added to the WCS component of each NDF.
+*        the parameter ASTFILE=camera.ast.  A new coordinate system,
+*        with a name that was determined when the AST file was written,
+*        is attached to each NDF.
 *
-*     astimp "data3,data4" instrum.ast obs1 indices=[3,4]
-*        This imports frameset information from the AST file instrum.ast
-*        which was written by ASTEXP with the IDTYPE parameter set to
-*        INDEX.  In this case NDFs of only the third and fourth types
-*        described in that file are being modified.
+*     astimp "data3,data4" instrum.ast indomain=obs1 indices=[3,4]
+*        This imports frameset information from the AST file
+*        instrum.ast which was written by ASTEXP with the IDTYPE
+*        parameter set to INDEX.  In this case NDFs of only the third
+*        and fourth types described in that file are being modified.
+*        The name of the new coordinate system will be OBS1,
+*        overriding the name used when the AST file was written.
 *
 *     astimp astfile=instrum.ast in=! logto=terminal accept
 *        This will simply report on the framesets contained within
