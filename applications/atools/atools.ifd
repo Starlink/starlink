@@ -698,7 +698,7 @@ iraf! {
           }
 
          parameter options {
-            position 2
+            position 5
             type LITERAL
             prompt {Options for the MatrixMap}
             ppath CURRENT DEFAULT
@@ -707,7 +707,7 @@ iraf! {
           }
 
          parameter result {
-            position 3
+            position 6
             type LITERAL
             prompt {Name of file in which to store the MatrixMap}
             ppath DYNAMIC CURRENT
