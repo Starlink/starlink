@@ -480,6 +480,20 @@ url="http://www.starlink.rl.ac.uk/docscode.html" >Starlink document
 server</webref>.  If you also supply a `loc' attribute, the system
 will add that to the end of the generated URL.</p>
 
+<p>Within XML documents, you will have to declare the entity as having a
+notation of XML:
+<example>&lt;!ENTITY otherdoc PUBLIC "-//Starlink//DOCUMENT Summary
+    SUN/123" "" NDATA XML&gt;</example>
+(note that you must include a system-identifier for XML, but that in
+this case it may be null).</p>
+
+<p>You can fall back further, forget about the whole entity business,
+and simply give the document number directly as the value of the `doc'
+attribute: <example>&lt;docxref doc="SUN/123"/&gt;</example> If the
+value of the `doc' attribute is <em>not</em> an entity, as in this
+case, then it is parsed as a document code.  This is probably the most
+straightforward route for XML files.</p>
+
 <p>If you want to make linking within your document more robust, you
 can generate document summaries yourself.  Try experimenting with the
 script in <code>$STARLINK_SGML_DIR/lib/htx2summ.pl</code>

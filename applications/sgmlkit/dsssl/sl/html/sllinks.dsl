@@ -104,45 +104,49 @@ immediately resolve the indirection.
 ; 		  "The stylesheet is presently unable to link to elements of type "
 ; 	          (gi target)))))))
 
-;; Given an FPI (a public identifier) of the form
-;; "-//Starlink//DOCUMENT Summary SUN/123//EN", this returns a sosofo
+;; Given a docnum of the form 'SUN/123', for example, this returns a sosofo
 ;; which represents an "a" element, pointing to the correct place
 ;;
 ;; Parameters:
-;;    fpi the FPI which refers to the document
+;;    docnum the document number, such as "SUN/123"
 ;;    xrefid a location within that document, or #f
 ;;    linktext the content of the link, or #f, in which case a default
 ;;        text is generated
 ;;
 ;; Returns:
 ;;    A sosofo
-(define ($make-dummy-link$ fpi xrefid linktext)
-  (let* ((els (parse-fpi fpi))
-	 (descrip (query-parse-fpi 'text-description els))
-	 (docnum (and descrip
-		      (car (reverse (tokenise-string descrip)))))
-	 (docparts (and docnum
-			(tokenise-string docnum
-					 isbdy?: (lambda (l)
-						   (if (char=? (car l) #\/)
-						       (cdr l)
-						       #f)))))
-	 (href (and docparts
-		    (if (= (length docparts) 2)
-			(string-append %starlink-document-server%
-				       (case-fold-down (car docparts))
-				       (cadr docparts)
-				       ".htx/"
-				       (case-fold-down (car docparts))
-				       (cadr docparts)
-				       ".html#xref_"
-				       (or xrefid ""))
-			#f))))
+(define ($make-dummy-link$ docnum xrefid linktext)
+  (let* ((docparts (and docnum
+                        (tokenise-string docnum
+                                         isbdy?: (lambda (l)
+                                                   (if (char=? (car l) #\/)
+                                                       (cdr l)
+                                                       #f)))))
+         (href (and docparts
+                    (if (= (length docparts) 2)
+                        (string-append %starlink-document-server%
+                                       (case-fold-down (car docparts))
+                                       (cadr docparts)
+                                       ".htx/"
+                                       (case-fold-down (car docparts))
+                                       (cadr docparts)
+                                       ".html#xref_"
+                                       (or xrefid ""))
+                        #f))))
+    
     (if href
 	(make element gi: "a"
 	      attributes: (list (list "href" href))
 	      (literal (or linktext docnum)))
 	#f)))
+;; Given an FPI (a public identifier) of the form
+;; "-//Starlink//DOCUMENT Summary SUN/123//EN", this extracts and returns
+;; the docnum "SUN/123" from it, or #f on error.
+(define ($docnum-from-fpi$ fpi)
+  (let ((descrip (query-parse-fpi 'text-description
+                                  (parse-fpi fpi))))
+    (and descrip
+         (car (reverse (tokenise-string descrip))))))
 
 <routine>
 <description>The <code>docxref</> element has a required attribute
@@ -211,6 +215,12 @@ it produces an <funcname>error</>.
     (cond
      ((not xrefent)
       (error "DOCXREF: missing DOC attribute"))
+
+     ((not (entity-type xrefent))
+      (or ($make-dummy-link$ xrefent xrefid linktext)
+          (error (string-append
+                  "DOCXREF: doc value " xrefent
+                  " does not appear to be the name of a document"))))
      
      ((or (equal? (entity-type xrefent)
                   'subdocument)
@@ -264,7 +274,8 @@ it produces an <funcname>error</>.
          ((not xrefent-gen-sysid)
           ;; Here's the guesswork -- call $make-dummy-link$ to guess
           ;; a link based on the public ID.
-          (or ($make-dummy-link$ xrefent-pubid xrefid linktext)
+          (or ($make-dummy-link$ ($docnum-from-fpi$ xrefent-pubid)
+                                 xrefid linktext)
               (error (string-append
                       "DOCXREF: couldn't make sense of FPI '"
                       xrefent-pubid "'"))))
@@ -335,7 +346,8 @@ it produces an <funcname>error</>.
                   ;; Use the linktext if specified, or the entity name otherwise.
                   ;; Latter isn't great, but all we can do
                   (literal (or linktext xrefent)))
-            (or ($make-dummy-link$ pubid xrefid linktext)
+            (or ($make-dummy-link$ ($docnum-from-fpi$ pubid)
+                                   xrefid linktext)
                 (error (string-append
                         "DOCXREF: couldn't make sense of FPI '" pubid "'"))))))
 

@@ -388,17 +388,25 @@
      The following is very closely related to the example in HyTime
      note 176, except that the equivalent of LOC there has an
      incorrect value prescription of IDREFS, which is corrected in the
-     first TC.  In an earlier version of this (never implemented), the
+     first TC.  (i) In an earlier version of this (never implemented), the
      DOC attribute had a value prescription of CDATA, and was
      interpreted as a queryloc for a Starlink document.  This might
      seem more straightforward, but I think it's probably less good.
-     The current scheme, with the DOC declared as an entity, means
-     that we have to predeclare all the entities we might want to
+     (ii) The next scheme, with the DOC declared as an entity, meant
+     that we had to predeclare all the entities we might want to
      refer to.  That doesn't seem like a good thing, but it means that
      they can all be declared in one catalogue, specific to a site,
      and that intelligence about where documents are (local or through
      a URL?) can be encoded there, specific to each site where the
-     documents are used.
+     documents are used. (iii) The final, current, scheme reverts to
+     the DOC attribute having a CDATA type, but is simpler than the
+     queryloc method: if this is the name of an entity, then that must
+     be an SGML file with a notation of 'documentsummary' or 'xml',
+     and this is parsed as described above; if it is not an entity,
+     but just a string, then it must be a document spec like
+     'SUN/123', and this is handled as with the 'broken' pubid above.
+     This is least elegant, but it's probably robust enough, and works
+     well in the XML world.
 
      The link's effective content should be whatever corresponds to
      the title of the object addressed by LOC.  
@@ -407,7 +415,7 @@
 			<!-- References to elements and data within other
 			     Starlink documents -->
 <!ATTLIST docxref
-	doc		ENTITY	#REQUIRED
+	doc		CDATA	#REQUIRED
 	loc		CDATA	#IMPLIED
 	text		CDATA	#IMPLIED
 
