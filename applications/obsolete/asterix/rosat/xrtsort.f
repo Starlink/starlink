@@ -3796,7 +3796,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                     OK=((SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV)
      &                                  .AND.
      &                 (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
-                  ELSEIF ((INDEX( 'CAE', SRT.SHAPE ) .NE. 0 ) THEN
+                  ELSEIF (INDEX( 'CAE', SRT.SHAPE ) .NE. 0 ) THEN
                     OK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
      &                                  .AND.
      &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O)
