@@ -79,11 +79,11 @@
 *  File system
       CALL BDA_CLOSE()
 
-*  Dynamic memory management
-      CALL DYN_CLOSE()
-
 *  User interface
       CALL USI_CLOSE()
+
+*  Dynamic memory management
+      CALL DYN_CLOSE()
 
 *  Clear floating exceptions
       CALL AST_CLIEEE()
