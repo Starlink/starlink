@@ -3238,7 +3238,7 @@ for NDF applications.
       are supplied directly by the user in response to application
       parameter prompts. If the required information is present within
       each data file in the form of header cards in a FITS extension, then
-      application \htmlref{POLIMP}{POLIMP} may be used in place of POLEXT (\htmlref{POLIMP}{POLIMP} reads the
+      application POLIMP may be used in place of POLEXT (POLIMP reads the
       required values from the FITS extension instead of obtaining values
       from the user).
 
@@ -3247,7 +3247,9 @@ for NDF applications.
       in the POLPACK extension items of the supplied data files. New
       POLPACK extensions are created if necessary. If no new values are
       supplied for an item, the existing item values (if any) are retained.
-      The final contents of the POLPACK extension are then listed.
+      The final contents of the POLPACK extension are then listed. The
+      values (on exit) of the extension items in the last specified data
+      file are written to a set of output parameters.
    }
    \sstusage{
       polext in
@@ -3291,14 +3293,14 @@ for NDF applications.
          EPS = \_REAL (Read)
       }{
          The analyser efficiency. This gives the efficiency with which the
-         analyser rejects light polarized across its axis. A perfect
-         pol-ariser has a value of 1.0. A perfect piece of glass would have
+         analyser rejects light polarised across its axis. A perfect
+         polariser has a value of 1.0. A perfect piece of glass would have
          a value of 0.0. The stored value is used only when processing
          single-beam data. The given value is stored in all supplied data
          files. If a null (!) value is supplied, any image which already
          has an EPS value retains its existing value, and any other images
          are left with an undefined EPS value (this will cause a value of
-         1.0 to be used by \htmlref{POLCAL}{POLCAL}). [!]
+         1.0 to be used by POLCAL). [!]
       }
       \sstsubsection{
          FILTER = LITERAL (Read)
@@ -3364,17 +3366,88 @@ for NDF applications.
          values are left unchanged, but no new ones are added. [!]
       }
       \sstsubsection{
+         STOKES = LITERAL (Read)
+      }{
+         You should use this parameter only if the supplied data files
+         are 3D cubes containing Stokes vectors. It should be a string in
+         which each character indicates the quantity stored in the
+         corresponding plane of the cube (I, Q, U or V). The length of
+         the string should equal the number of planes in the cube. If a
+         null (!) value is supplied, any existing STOKES values are left
+         unchanged, but no new ones are added. [!]
+      }
+      \sstsubsection{
          T = \_REAL (Read)
       }{
          The analyser transmission. This gives the transparency of the
-         analyser to unpolarized light. A perfect polarizer has a value of
+         analyser to unpolarised light. A perfect polariser has a value of
          1.0. A perfect piece of glass would have a value of 2.0. The
          stored value is only used when processing single-beam data. The
          given value is stored in all supplied data files. If a null (!)
          value is supplied, any image which already has a T value retains
          its existing value, and any other images are left with an
          undefined T value (this will cause a value of 1.0 to be used by
-         \htmlref{POLCAL}{POLCAL}). [!]
+         POLCAL). [!]
+      }
+      \sstsubsection{
+         VANGROT = \_REAL (Write)
+      }{
+         The ANGROT value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VANLANG = \_REAL (Write)
+      }{
+         The ANLANG value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VEPS = \_REAL (Write)
+      }{
+         The EPS value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VFILTER = LITERAL (Write)
+      }{
+         The FILTER value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VIMGID = LITERAL (Write)
+      }{
+         The IMGID value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VRAY = LITERAL (Write)
+      }{
+         The RAY value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VSTOKES = LITERAL (Write)
+      }{
+         The STOKES value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VT = \_REAL (Write)
+      }{
+         The T value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VWPLATE = \_REAL (Write)
+      }{
+         The WPLATE value stored in the last data file on exit will be
+         written to this output parameter.
+      }
+      \sstsubsection{
+         VVERSION = LITERAL (Write)
+      }{
+         The POLPACK version number which created the last data file will be
+         written to this output parameter.
       }
       \sstsubsection{
          WPLATE = \_REAL (Read)
@@ -3386,7 +3459,7 @@ for NDF applications.
          existing value, and any other images are left with an undefined
          WPLATE value. Note, when using dual-beam data, Stokes vectors can
          only be calculated for WPLATE values of 0.0, 22.5, 45.0 and 67.5.
-         The \htmlref{POLCAL}{POLCAL} application will fail if any other values are
+         The POLCAL application will fail if any other values are
          supplied. There are no such restrictions on the value of WPLATE
          when using single-beam data. [!]
       }
@@ -3418,7 +3491,7 @@ for NDF applications.
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils
+      Copyright (C) 1998 Central Laboratory of the Research Councils
    }
 }
 \sstroutine{
@@ -6110,6 +6183,11 @@ begin with an upper case letter.
 \item \htmlref{POLEXT}{POLEXT} and \htmlref{POLIMP}{POLIMP} no longer abort
 if non-unique IMGID values are supplied. This allows IMGID values to be set 
 for  extracted O and E ray images.
+
+\item \htmlref{POLEXT}{POLEXT} now allows POLPACK extension items to be
+set for Stokes cubes and extracted O or E ray images, as well as raw
+intensity images. The extension items are now written to output
+parameters as well as to the screen.
 
 \end{itemize}
 
