@@ -62,7 +62,7 @@
       CALL AST_INIT()
 
 *    get locator to object if it exists
-      CALL USI_ASSOC( 'INP%hds', '*', 'UPDATE', OBJID, STATUS )
+      CALL USI_ASSOC( 'INP', '*', 'UPDATE', OBJID, STATUS )
       CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
       CALL DAT_PRIM( OBJLOC, PRIM, STATUS )
       IF ( PRIM ) THEN
@@ -71,7 +71,7 @@
         CALL DAT_TYPE(OBJLOC,TYPE,STATUS)
 
 *        get value from console or other data object
-        CALL USI_ASSOC( 'VALUE%hds', '*', 'READ', VALID, STATUS )
+        CALL USI_ASSOC( 'VALUE', '*', 'READ', VALID, STATUS )
         CALL ADI1_GETLOC( VALID, VALOC, STATUS )
 
 *        check value is simple scalar
