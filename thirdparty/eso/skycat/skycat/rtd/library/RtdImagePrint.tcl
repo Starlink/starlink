@@ -14,6 +14,9 @@
 # Peter W. Draper 14 May 98  Added changes to use Canvas postscript
 #                            printing with a suitably patched Tk.
 #                            Now only get a footer.
+# Peter W. Draper 21 Aug 02  Added swap of width and height values
+#                            when toggling between portrait and landscape
+ 
 
 itk::usual RtdImagePrint {}
 
@@ -76,12 +79,15 @@ itcl::class rtd::RtdImagePrint {
 	    -side top -fill x -expand 1 -in $w_.options
 	pack [radiobutton $w_.rotate.yes -text "Landscape" \
 		  -variable $w_.rotate \
-		  -value yes] \
+		  -value yes \
+                  -command [code $this toggle_rotate_] ] \
 	    [radiobutton $w_.rotate.no -text "Portrait" \
 		 -variable $w_.rotate \
-		 -value no] \
+		 -value no \
+                 -command [code $this toggle_rotate_] ] \
 	    -side left -fill x -expand 1
 	::set $w_.rotate no
+        set last_rotate_ no
 
         #  Capture whole of displayed canvas.
         pack [frame $w_.whole -borderwidth 5] \
@@ -158,7 +164,7 @@ itcl::class rtd::RtdImagePrint {
     }
 
     
-    # called when the "Fit on page" button is pressed
+    # called when the "Encapsulate" button is pressed
 
     protected method toggle_fit_pagesize {} {
 	global ::$w_.fit_to_page
@@ -171,6 +177,18 @@ itcl::class rtd::RtdImagePrint {
 	}
     }
 
+    # switch the "width" and "height" when changing between landscape
+    # and portrait mode
+    protected method toggle_rotate_ {} {
+        global ::$w_.rotate
+       if { $last_rotate_ == [set $w_.rotate] } { 
+           return
+        }       
+       set width [$w_.pagesize.width get]
+       $w_.pagesize.width configure -value [$w_.pagesize.height get]
+       $w_.pagesize.height configure -value $width
+       set last_rotate_ [set $w_.rotate]
+    }
 
     # print the contents of the canvas to the open filedescriptor
 
@@ -434,4 +452,6 @@ itcl::class rtd::RtdImagePrint {
     # canvas widget
     protected variable canvas_
 
+    # last/initial rotate value
+    protected variable last_rotate_ no
 }
