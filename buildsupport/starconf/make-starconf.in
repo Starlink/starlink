@@ -52,10 +52,10 @@
 # since it is checked in, it should not contain any configuration
 # paths.  Therefore after it unpacks the files, starconf.status
 # configures the unpacked files by substituting variables indicated by
-# !!variable_name!!, using values given either on the starconf.status
-# command line or in the environment.  The starconf script handles
-# this by invoking the starconf.status script with arguments whose
-# values come from the installation-time configuration of starconf.
+# !!variable_name!!, using values which are edited in to the installed
+# starconf script when it is configured prior to its installation, and
+# which may be overridden either on the starconf.status command line
+# or in the environment.
 #
 #
 # Dependencies:
@@ -86,11 +86,6 @@ do
     fi
 done
 
-# Find all the !!variables!! which are to be substituted.  For the
-# moment, just hard-wire this, but for full generality we should grep
-# the input files for strings matching !!\([A-Za-z0-9_]*\)!!
-allconfsubs="DEFAULT_STARLINK DEFAULT_PREFIX"
-
 
 # Start generating the output -- open FD 3 for the generated script
 outputscript=starconf
@@ -100,12 +95,49 @@ cat >&3 <<\_STARCONF3_EOD
 #! /bin/sh -
 #
 # This is starconf, version @PACKAGE_VERSION@
+#
+# Usage:
+#    starconf
+#    starconf --show variable [...]
+#
+# The first form configures the current directory.  The second form shows
+# the default values of the given variables, _without_ any defaulting
+# from the environment.
 
 # Configuration
 bindir=@bindir@
 datadir=@datadir@
 ln_s="@LN_S@"
 curr_starconf_version="@PACKAGE_VERSIONINT@"
+
+# Default all the variables which are to be substituted into !!variable!!  It would
+# probably be desirable to grep the input files for !!...!! variables, but that
+# doesn't seem necessary at the moment (and would add complication).
+#
+# The set of variables here should all be listed in Makefile.am
+allconfsubs=" STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX "
+STARCONF_DEFAULT_STARLINK=@STARCONF_DEFAULT_STARLINK@
+STARCONF_DEFAULT_PREFIX=@STARCONF_DEFAULT_PREFIX@
+
+if test $# -gt 0; then
+    case $1 in
+    --show)
+        shift
+        while test $# -gt 0
+        do
+            expr "x$allconfsubs" : "x.* $1 " >/dev/null ||
+                { echo "Unrecognised variable $1" >&2; exit 1; }
+            eval echo '${'$1'}'
+            shift
+        done
+        exit 0
+        ;;
+    *)  echo "Usage: $0 [--show variable...]"
+        exit 1
+        ;;
+    esac
+fi
+
 
 # Always include the following files:
 _STARCONF3_EOD
@@ -183,7 +215,7 @@ else
     exit 1
 fi
 
-# Similarly, scan Makefile.am and check that there it includes
+# Similarly, scan Makefile.am and check that there it NO LONGER includes
 # Makefile.starconf
 if grep 'include .*Makefile.starconf' Makefile.am >/dev/null; then
     echo "$0: Makefile.am still includes \$(srcdir)/Makefile.starconf"
@@ -219,7 +251,8 @@ cat >&4 <<EOF
 # where VARIABLE is one of the variables
 #     $allconfsubs
 # This substitutes instances of !!variable!! in the file(s) below,
-# when they are unpacked.
+# when they are unpacked.  The variable may be specified on the command line
+# as shown, and is also defaulted from the environment.
 #
 # Re-run this file to regenerate the files listed below:
 EOF
@@ -230,38 +263,30 @@ echo "    echo \$f | sed \"s/^[$optchars]*\([^:]*\).*/#    \1/\" >&4"    >&3
 echo 'done'                                                              >&3
 echo 'echo "" >&4'                                                       >&3
 
-echo "echo 'allconfsubs=\"$allconfsubs\"' >&4"                           >&3
+echo 'echo "allconfsubs=\"$allconfsubs\"" >&4'                           >&3
+echo 'echo ": \${STARCONF_DEFAULT_STARLINK=$STARCONF_DEFAULT_STARLINK}" >&4'>&3
+echo 'echo ": \${STARCONF_DEFAULT_PREFIX=$STARCONF_DEFAULT_PREFIX}" >&4' >&3
+
 cat >&3 <<\_STARCONF3_EOD
 cat >&4 <<\_STARCONF4_EOD
-sedsubsts=
-# Process the arguments, which are variable=value pairs, processing
-# then into a collection of sed substitutions.  No spaces in the `value'!
 while test $# -gt 0
 do
-    expr "$1" : '.*=' >/dev/null || \
+    # Don't bother testing whether the set variable is in $allconfsubs -- requires
+    # too much expr|sed magic if you want to be truly portable
+    expr "x$1" : 'x[a-zA-Z0-9_]*=[^ ]*$' >/dev/null || \
         { echo "Usage: $0 [variable=value...]"; exit 1; }
-    sedsubsts="$sedsubsts "`echo $1 | sed 's/\(.*\)=\(.*\)/-e s,!!\1!!,\2,/'`
+    eval "$1"
     shift
 done
-if test -n "$allconfsubs"; then
-    for s in $allconfsubs
-    do
-        if expr "x$sedsubsts" : "x.*!!$s!!" >/dev/null; then
-            : OK
-        else
-            eval sval='${'$s'}'
-            if test -n "$sval"; then
-                sedsubsts="$sedsubsts -e s,!!$s!!,$sval,"
-            else
-                echo "$0: no value for config variable $s, supply one with 'starconf.status $s=xxx' or 'env $s=xxx starconf.status'"
-                exit 1
-            fi
-        fi
-    done
-fi
-if test -n "$sedsubsts"; then
-    sedsubsts="sed $sedsubsts"
-fi
+
+sedsubsts='sed '
+for x in $allconfsubs
+do
+    eval t='${'$x'}'
+    echo "Configuring with $x=$t"
+    sedsubsts="$sedsubsts -e s,!!$x!!,$t,"
+done
+
 _STARCONF4_EOD
 _STARCONF3_EOD
 
@@ -312,7 +337,6 @@ do
     echo "echo 'fi'                                      >&4"            >&3
     echo "echo 'expr $filename : \".*m4\$\" >/dev/null && allm4=\"\$allm4 $filename\"' >&4" >&3
     echo "echo 'allextracted=\"\$allextracted $filename\"' >&4"          >&3
-#    echo 'fi'                                                            >&3
 done
 
 cat >&3 <<\_STARCONF3_EOD
@@ -343,7 +367,7 @@ exec 4>&-
 # ...and make it executable
 chmod +x starconf.status
 # Finally, exec the new script
-exec ./starconf.status DEFAULT_STARLINK=@DEFAULT_STARLINK@ DEFAULT_PREFIX=@DEFAULT_PREFIX@
+exec ./starconf.status
 _STARCONF3_EOD
 
 echo "exit 0" >&3
