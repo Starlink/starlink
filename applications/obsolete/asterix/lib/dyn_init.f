@@ -1,38 +1,97 @@
-*+  DYN_INIT - initialises DYN_ system
       SUBROUTINE DYN_INIT()
-*    Description :
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     BHVAD::RJV
-*    History :
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Status :
-*    Import :
-*    Import/Export :
-*    Export :
-*    External references :
-*    Global variables :
-      INCLUDE 'ASTLIB(DYN_CMN)'
-*    Local Constants :
-      INTEGER NULL
-      PARAMETER (NULL=0)
-*    Local variables :
-      INTEGER N
+*+
+*  Name:
+*     DYN_INIT
+
+*  Purpose:
+*     Explicitly initialise the DYN package
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL DYN_INIT( )
+
+*  Description:
+*     Explicitly initialise the DYN package
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     DYN Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/dyn.html
+
+*  Keywords:
+*     package:dyn, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     20 Mar 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
-      DO N=1,DYN_NMAX
-        LIST(N).PTR=NULL
-        LIST(N).NITEM=NULL
-        LIST(N).NPAGE=NULL
-        LIST(N).NBYTE=NULL
-        LIST(N).SECTION=.FALSE.
-        LIST(N).LOC=' '
-      ENDDO
-      NPTR=NULL
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Global Variables:
+      INCLUDE 'DYN_CMN'                                 ! DYN common block
+*       DYN_INIT = LOGICAL (given)
+*         DYN class definitions loaded?
+
+*  External References:
+      EXTERNAL			DYN0_BLK		! Ensures inclusion
+
+*  Local Variables:
+      INTEGER 			STATUS             	! Local status
+*.
+
+*  Initialise local status
+      STATUS = SAI__OK
+
+*  Check initialised
+      IF ( .NOT. DYN_ISINIT ) CALL DYN0_INIT( STATUS )
 
       END
