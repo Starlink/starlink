@@ -1,53 +1,71 @@
 #! /usr/bin/perl -w 
 #
 # RCS $Id$
-#
+#+
+#<func>
+#<routinename>abstract-star2html.pl
+#<purpose>Obtain an SGML summary of a Star2HTML document
+#<description>
 # This reads a file marked up using the Star2HTML
 # extensions, plus an HTX index file, and produces a summary of the
 # document marked up using the DocumentSummary DTD.  That includes the
 # sub*section structure, the cross-references, and most of the header.
 #
-# Usage:
-#
+# <p>Usage:
+# <verbatim>
 #    abstract-star2html.pl --prefix=sun180.htx/ \
 #          /star/docs/sun180.tex /star/docs/sun180.htx/htx.index \
 #          > sun180.summary
+# </verbatim>
 #
-# The prefix is added to each of the filenames in the HTX index, to
-# make the generated URLs relative to the appropriate root of the
-# document server, which is set in the DSSSL variable
-# %starlink-document-server%, and might have the value
-# `file:///star/docs/'
+# <p>The parsing can cope with <code>\xlabel</code> commands either outside 
+# section headings or inside them, and copes with multiple
+# <code>\xlabel</code> commands within a heading by emitting <LABEL>
+# elements after the heading.  It logs a message to stderr when it
+# discovers this. 
 #
-# The parsing can cope with \xlabel commands either outside section headings
-# or inside them, and copes with multiple \xlabel commands within a heading
-# by emitting <LABEL> elements after the heading.  It logs a message to stderr
-# when it discovers this.
+# <p>The parsing respects <code>\begin{htmlonly}...\end{htmlonly}</code>
 #
-# The parsing respects \begin{htmlonly}...\end{htmlonly}
-#
-# The parsing copes with the arguments to each of the commands it matches
-# (\newcommand{\star...} and \sub*section{...}) being on more than one line.
+# <p>The parsing copes with the arguments to each of the commands it matches
+# (<code>\newcommand{\star...}</code> and <code>\sub*section{...}</code>)
+# being on more than one line. 
 # It concatenates the lines before analysing them.
 #
-# Emits a warning if an \xlabel doesn't appear in the HTX index file.
+# <p>Emits a warning if an <code>\xlabel</code> doesn't appear in the
+# HTX index file.
 #
 #
-# Limitations:
+# <p>Limitations:
 #
-# The result could benefit from a little editing, to insert the
+# <p>The result could benefit from a little editing, to insert the
 # attribute values of the AUTHOR element such as email address, which
 # aren't included in the Star2HTML file, but it should be valid
 # without it.  However, these attributes aren't actually used in the
 # cross reference, so there's no great loss at present.
 #
-# It also
+# <p>It also
 # assumes that the things it matches are at the beginning of the line, possibly
 # preceded by whitespace (this isn't just to speed it up, but also to avoid
-# matching any reference to the \section command within the body of the text).
+# matching any reference to the <code>\section</code> command within the
+# body of the text).
 #
-# The parsing doesn't attempt to deal with markup in section titles, but it
+# <p>The parsing doesn't attempt to deal with markup in section titles, but it
 # does attempt to detect and warn about it, logging a message to stderr.
+#<returnvalue none>
+#<parameter>input-file-name<type>Star2HTML file
+#  <description>A file marked up using the Star2HTML extensions to LaTeX2HTML
+#<parameter>index-file-name<type>SGML file
+#  <description>A file conforming to the DocumentSummary DTD
+#<parameter>--prefix=url-prefix<type>option
+#  <description>The prefix is added to each of the filenames in the
+# HTX index, to make the generated URLs relative to the appropriate
+# root of the document server, which is set in the DSSSL variable 
+# <code>%starlink-document-server%<code>, and might have the value
+# <code>`file:///star/docs/'</code>
+#<author id=ng webpage='http://www.astro.gla.ac.uk/users/norman/'
+#  affiliation='Glasgow'>Norman Gray
+
+$ident_string = "Starlink SGML system, release ((PKG_VERS))";
 
 $programname = $0;
 $urlprefix = '';
@@ -287,5 +305,5 @@ sub check_markup {
 
 
 sub Usage {
-    die "Usage: $programname [--prefix=url-prefix] input-file-name index-file-name\n";
+    die "$ident_string\nUsage: $programname [--prefix=url-prefix] input-file-name index-file-name\n";
 }
