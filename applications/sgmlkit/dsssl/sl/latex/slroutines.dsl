@@ -604,6 +604,10 @@ $Id$
 	    (empty-sosofo)))))
   (element routine
     (process-matching-children 'routineprologue))
+  (element routineprologue
+    (process-matching-children 'routinename))
+  (element routinename
+    (process-children))
   (element name
     (process-children)))
 
@@ -613,8 +617,19 @@ $Id$
 (element coderef
   (if (string=? (data (current-node)) "")
       (let* ((cc (node-list-or-false
-		  (element-with-id
-		   (attribute-string (normalize "collection")))))
+		  ;; If there's a collection attribute, then it
+		  ;; provides the ID of a codecollection element.  If
+		  ;; this attribute isn't present, then use instead
+		  ;; the _first_ (which includes the only)
+		  ;; codecollection element in the document.
+		  (if (attribute-string (normalize "collection"))
+		      (element-with-id
+		       (attribute-string (normalize "collection")))
+		      (node-list-first
+			(select-elements
+			 (select-by-class (descendants (getdocbody))
+					  'element)
+			 'codecollection)))))
 	     (ccdoc (and cc
 			 (document-element-from-entity
 			  (attribute-string (normalize "doc") cc))))
