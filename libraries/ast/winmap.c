@@ -69,6 +69,8 @@ f     The WinMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitWinMapVtab
 *        method.
+*     8-SEP-2003 (DSB):
+*        Allow WinMaps to swap with WcsMaps if possible.
 *class--
 */
 
@@ -91,6 +93,7 @@ f     The WinMap class does not define any new routines beyond those
 #include "unitmap.h"             /* Unit mappings */
 #include "zoommap.h"             /* Zoom mappings */
 #include "permmap.h"             /* Axis permutations */
+#include "wcsmap.h"              /* Celestial projections */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "channel.h"             /* I/O channels */
 #include "winmap.h"              /* Interface definition for this class */
@@ -150,6 +153,7 @@ static void PermGet( AstPermMap *, int **, int **, double ** );
 static void SetAttrib( AstObject *, const char * );
 static void WinMat( AstMapping **, int *, int );
 static void WinPerm( AstMapping **, int *, int );
+static void WinWcs( AstMapping **, int *, int );
 
 /* Function Macros */
 /* =============== */
@@ -214,12 +218,15 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 
 /* Local Variables: */
    AstMapping *nowin;        /* Pointer to non-WinMap Mapping */
+   AstWinMap *win;           /* Pointer to the WinMap */
    const char *class1;       /* Pointer to map1 class string */
    const char *class2;       /* Pointer to map2 class string */
    const char *nowin_class;  /* Pointer to non-WinMap class string */
    double *consts;           /* Pointer to constants array */
    int *inperm;              /* Pointer to input axis permutation array */
    int *outperm;             /* Pointer to output axis permutation array */
+   int axlat;                /* Latitude axis in WcsMap */
+   int axlon;                /* Longitude axis in WcsMap */
    int i;                    /* Loop count */
    int invert[ 2 ];          /* Original invert flags */
    int nin;                  /* No. of input coordinates for the PermMap */
@@ -249,15 +256,30 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
       if( !strcmp( class1, "WinMap" ) ){
          nowin = map2;
          nowin_class = class2;
+         win = (AstWinMap *) map1;
       } else {
          nowin = map1;
          nowin_class = class1;
+         win = (AstWinMap *) map2;
       }
 
 /* If it is a MatrixMap, the Mappings can be swapped. */
       if( !strcmp( nowin_class, "MatrixMap" ) ){
          ret = 1;
 
+/* If it is a WcsMap, the Mappings can be swapped if the WinMap is
+   equivalent to a unit transformation on the celestial axes of the
+   WcsMap. */
+      } else if( !strcmp( nowin_class, "WcsMap" ) ){
+
+/* Get the indices of the celestial coordinates inthe WcsMap. */
+         axlat = astGetWcsAxis( (AstWcsMap *) nowin, 1 );
+         axlon = astGetWcsAxis( (AstWcsMap *) nowin, 0 );
+
+/* Check the shift and scale for these axes. */
+         ret = ( win->a[ axlon ] == 0.0 && win->b[ axlon ] == 1.0 && 
+                 win->a[ axlat ] == 0.0 && win->b[ axlat ] == 1.0 );
+         
 /* If it is a PermMap, the Mappings can be swapped so long as all links 
    between input and output axes in the PermMap are bi-directional. This
    does not preclude the existence of unconnected axes, which do not 
@@ -829,7 +851,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the WinMap could not merge directly with either of its neighbours,
    we consider whether it would be worthwhile to swap the WinMap with
    either of its neighbours. This can only be done for certain classes
-   of Mapping (MatrixMap & some PermMaps), and will usually require both 
+   of Mapping (MatrixMap & some PermMaps & WcsMaps), and will usually require both 
    Mappings to be modified (unless they are commutative). The advantage of 
    swapping the order of the Mappings is that it may result in the WinMap 
    being adjacent to a Mapping with which it can merge directly on the next
@@ -871,6 +893,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    with -1 for the number of steps to indicate that no merging is possible. 
    WinMaps can swap with MatrixMaps and some PermMaps. */
                   if( strcmp( nclass, "MatrixMap" ) &&
+                      strcmp( nclass, "WcsMap" ) &&
                       strcmp( nclass, "PermMap" ) ) {
                      break;
                   }
@@ -903,6 +926,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                   }
 
                   if( strcmp( nclass, "MatrixMap" ) &&
+                      strcmp( nclass, "WcsMap" ) &&
                       strcmp( nclass, "PermMap" ) ) {
                      break;
                   }
@@ -962,6 +986,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
                   } else if( !strcmp( nclass, "PermMap" ) ){
                      WinPerm( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+
+                  } else if( !strcmp( nclass, "WcsMap" ) ){
+                     WinWcs( (*map_list) + i1, (*invert_list) + i1, where - i1 );
                   }
 
 /* Store the index of the first modified Mapping. */
@@ -1008,6 +1035,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                         WinMat( mc, ic, where - i1 );
                      } else if( !strcmp( nclass, "PermMap" ) ){
                         WinPerm( mc, ic, where - i1 );
+                     } else if( !strcmp( nclass, "WcsMap" ) ){
+                        WinWcs( mc, ic, where - i1 );
                      }
 
 /* If neither of the swapped Mappings can be simplified further, then there
@@ -1785,6 +1814,59 @@ static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
 /* Free the copies of the scale and shift terms from the supplied WinMap. */
    b = (double *) astFree( (void *) b );
    a = (double *) astFree( (void *) a );
+
+/* Return. */
+   return;
+}
+
+static void WinWcs( AstMapping **maps, int *inverts, int iwm  ){
+/*
+*  Name:
+*     WinWcs
+
+*  Purpose:
+*     Swap a WinMap and a WcsMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     void WinWcs( AstMapping **maps, int *inverts, int iwm )
+
+*  Class Membership:
+*     WinMap member function 
+
+*  Description:
+*     A list of two Mappings is supplied containing a WinMap and a
+*     WcsMap. These Mappings are swapped.
+
+*  Parameters:
+*     maps
+*        A pointer to an array of two Mapping pointers.
+*     inverts
+*        A pointer to an array of two invert flags.
+*     iwm
+*        The index within "maps" of the WinMap.
+
+*/
+
+/* Local Variables: */
+   AstMapping *m1;               /* Pointer to a Mapping */
+   int inv;                      /* Invert value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Simply swap the values (the CanSwap function will have checked that
+   the WcsMap and WinMap can simply be swapped). */
+   m1 = maps[ 0 ];
+   maps[ 0 ] = maps[ 1 ];
+   maps[ 1 ] = m1;
+
+   inv = inverts[ 0 ];
+   inverts[ 0 ] = inverts[ 1 ];
+   inverts[ 1 ] = inv;
 
 /* Return. */
    return;
