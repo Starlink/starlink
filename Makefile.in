@@ -77,17 +77,13 @@ all: $(ALL_TARGETS)
 # version of this file is used by the ./bootstrap script, in which the
 # JAVA variable is empty (since the directory may not have been
 # configured yet); we must not fail in this case, nor may we attempt
-# to make GenerateDependencies.class.
+# to make GenerateDependencies.class.  In this case simply do nothing,
+# because the Makefile.dependencies file can be assumed to be up-to-date.
 Makefile.dependencies: componentset.xml
-	if test -f buildsupport/starconf/java/GenerateDependencies.class \
-			-o -z "$(JAVA)";then \
-		:; \
-	    else \
-		cd buildsupport/starconf/java && \
-		    $(MAKE) GenerateDependencies.class; \
-	    fi
 	if test -n "$(JAVA)"; then \
-	    $(JAVA) -classpath buildsupport/starconf/java \
+	    (cd buildsupport/starconf/java \
+	        && $(MAKE) GenerateDependencies.class) \
+	    && $(JAVA) -classpath buildsupport/starconf/java \
 		GenerateDependencies componentset.xml >$@ \
 	    && echo "componentset.xml: \\" >>$@ \
 	    && find . -name component.xml | sed 's/\(.*\)/		\1 \\/' >>$@ \
