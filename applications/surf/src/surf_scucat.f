@@ -28,7 +28,7 @@
 *     be created (eg test_h7 and test_h9 - if the OUT parameter was set to
 *     'test'). For each new bolometer a new
 *     file is created. Data for existing bolometers are appended. New files
-*     are created each time SCUCAT is run (ie old files are over-written).
+*     are created each time SCUCAT is run (ie existing files are over-written).
 *
 
 *  Usage:
@@ -36,14 +36,14 @@
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*        The input dataset(s). This parameter is requested for repeatedly
+*        The input dataset(s). This parameter is requested repeatedly
 *        until a NULL (!) value is given.
 *     OUT = _CHAR (Write)
 *        The root name of the output NDF. 
 
 *  Examples:
 *     scucat in=phot out=test
-*        This routine will copy the data from phot to test, reducing mulitple
+*        This routine will copy the data from phot to test, reducing multiple
 *        bolometers to indiviual files. If the input set contained data
 *        for bolometer H7 the output file will be test_h7.sdf.
 *        The program will then ask for another data set.
@@ -59,9 +59,12 @@
 *  History:
 *     $Id$
 *     $Log$
-*     Revision 1.11  1997/01/09 18:35:02  timj
-*     Write a new NDF for each bolometer found in input files.
+*     Revision 1.12  1997/01/17 00:32:36  timj
+*     Spell fixes to header.
 *
+c Revision 1.11  1997/01/09  18:35:02  timj
+c Write a new NDF for each bolometer found in input files.
+c
 c Revision 1.10  1996/12/06  18:31:59  timj
 c Now recognises multiple bolometers in file and writes out all bolometer
 c data to concatenated data.
