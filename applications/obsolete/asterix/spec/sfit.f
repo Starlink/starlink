@@ -258,6 +258,7 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
       LOGICAL 			NOFREE			! No parameters free
       LOGICAL 			ER			! Parameter error calculation required?
       LOGICAL 			OP			! Printout required?
+      LOGICAL			THERE
 *.
 
 *  Check inherited global status.
@@ -370,12 +371,19 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
 
       END IF
 
-*  Calculate approximate parameter errors and display
+*  Should errors be calculated?
       IF ( NOFREE ) THEN
 	ER = .FALSE.
       ELSE
-	CALL USI_GET0L('ERR',ER,STATUS)
+	CALL ADI_THERE( MCTRL, 'Style', THERE, STATUS )
+        IF ( .NOT. THERE ) THEN
+	  CALL USI_GET0L('ERR',ER,STATUS)
+        ELSE
+          ER = .FALSE.
+        END IF
       END IF
+
+*  Calculate approximate parameter errors and display
       IF ( ER ) THEN
 	CALL MSG_BLNK()
 	CALL MSG_PRNT( 'Calculating approximate parameter errors' )
