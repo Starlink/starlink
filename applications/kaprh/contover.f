@@ -426,6 +426,7 @@
                                ! used)
      :  ITYPE * ( NDF__SZTYP ),! Processing type of the image
      :  MCOMP * 8,             ! Component to be mapped
+     :  MODE * 20,             ! Height choosing mode
      :  REFNAM * ( 132 )       ! Reference data associated with the last
                                ! DATA picture
 
@@ -503,6 +504,17 @@
 *    Check the global inherited status.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+
+
+      call msg_blank( status )   
+      call msg_blank( status )   
+      call msg_out( ' ', '  WARNING:  The CONTOVER application will '//
+     :              'be withdrawn at the next release of KAPPA. Use '//
+     :              'CONTOUR CLEAR=NO instead.', STATUS )
+      call msg_blank( status )   
+      call msg_blank( status )   
+
 
       DEVCAN = .FALSE.
 
@@ -794,7 +806,7 @@
       CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'STEPCNT',
      :                 'HEIGHTS', 'PERCENTILES', BAD, EL,
      :                 %VAL( PNTRI( 1 ) ), MXCONT, CNTLEV, PERCNT,
-     :                 AREA, NCONT, STATUS )
+     :                 AREA, NCONT, MODE, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GOTO 960
 
