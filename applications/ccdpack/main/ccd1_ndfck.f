@@ -638,7 +638,7 @@
 *  Get value from user if required, or just check etc.
                         CALL DAT_THERE( LOCEXT, 'ZEROED', OK, STATUS )
                         IF ( OK ) THEN
-                           CALL CMP_GET0D( LOCEXT, 'ZEROED', LVAL, 
+                           CALL CMP_GET0L( LOCEXT, 'ZEROED', LVAL, 
      :                                     STATUS )
                            FRMEXT = .TRUE.
                         END IF
