@@ -5818,8 +5818,7 @@ applications again, but using a suitable encapsulated PostScript graphics
 device instead of the X-windows device used earlier in this chapter.
 Each application will then write its graphical output to one or more disk
 files. Once all applications have been run, you combine all these
-files together using {\footnotesize PSMERGE} (see
-\xref{SUN/164}{sun164}{}). This creates a single PostScript file
+files together using \PSMERGEref\ to create a single PostScript file
 containing the entire plot which can be printed or included in another
 document. We will look at this method in more detail in the rest of
 this section.
@@ -5879,8 +5878,8 @@ that you do not include any files from a previous plot by mistake.
 Once all applications have been run, you will have a potentially long
 list of GKS PostScript files in your current directory. These need to be
 stacked together to produce a single PostScript file which can either be
-printed or included in a document. To do this, we use {\footnotesize
-PSMERGE} as follows\footnote{You can include all the PostScript files,
+printed or included in a document. To do this, we use 
+PSMERGE as follows\footnote{You can include all the PostScript files,
 including those which do not contain any actual drawing commands.}:
 
 \small
@@ -5892,8 +5891,8 @@ including those which do not contain any actual drawing commands.}:
 This stacks the first four GKS PostScript files into a single file called
 {\tt total.ps}. This will be a normal ({\it i.e.} not encapsulated) PostScript
 file, so you can print it, but it will be difficult to include it in a
-document. If you include the {\tt -e} option when running {\footnotesize
-PSMERGE}, then an encapsulated PostScript file is created instead:
+document. If you include the {\tt -e} option when running 
+PSMERGE, then an encapsulated PostScript file is created instead:
 
 \small
 \begin{verbatim}
@@ -5931,7 +5930,7 @@ the {\tt -r} and {\tt -t} options:
 \end{verbatim}
 \normalsize
 
-{\footnotesize PSMERGE} has other facilities which allow you to scale,
+PSMERGE has other facilities which allow you to scale,
 shift and rotate individual input files before including them in the 
 output. See \xref{SUN/164}{sun164}{} for details.
 
@@ -42160,6 +42159,9 @@ section \ref{se:style} the use of graphical style parameters.
     values on Solaris systems.
 
 \item The global parameter POSITIONS\_LIST has been replaced by CATALOGUE.
+
+\item CONTOUR no longer core dumps if an abort (!!) is given for
+    parameter PERCENTILES.
  
 \end{itemize}
 
