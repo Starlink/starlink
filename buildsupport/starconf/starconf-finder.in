@@ -6,7 +6,8 @@
 #     and libraries;
 #   * could have a --component option which restricts the search to
 #     one particular component (would require looking through the manifest
-#     files.
+#     files;
+#   * could default to looking through the path.
 
 myname=$0
 Usage () {
@@ -46,12 +47,28 @@ test -n "$progname" || Usage
 instdir=@STARCONF_DEFAULT_PREFIX@
 extrastarlinkdir=@STARCONF_DEFAULT_STARLINK@
 
-apppath=`find $instdir -name $progname`
+# findapppath program directory: find the first executable named $1 under
+# the directory $2, and set apppath to it.
+findapppath () {
+    for p in `cd $2; find . -name $1`
+    do
+        if test -f $2/$p -a -x $2/$p; then
+            apppath=$2/$p
+            break
+        fi
+    done
+}
+
+findapppath $progname $instdir
+
 if test -z "$apppath" -a $extrastarlinkdir != "$instdir"; then
-    apppath=`find $extrastarlinkdir -name $progname`
+    findapppath $progname $extrastarlinkdir
 fi
-if test -z "$apppath" -a -n "$STARLINK" -a "$STARLINK" != $extrastarlinkdir; then
-    apppath=`find $STARLINK -name $progname`
+
+if test -z "$apppath" \
+        -a -n "$STARLINK" \
+        -a "$STARLINK" != $extrastarlinkdir; then
+    findapppath $progname $STARLINK
 fi
 
 if test -z "$apppath"; then
