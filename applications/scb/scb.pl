@@ -1271,7 +1271,7 @@ sub extract_file {
 
 #  If required file exists outside named tarfile, use it directly.
 
-   elsif (-f ($file = "$head$tarcontents")) {
+   elsif (-r ($file = "$head$tarcontents")) {
 
 #     If $file is a tarfile then recurse, else output file directly.
 
@@ -1391,52 +1391,57 @@ sub output {
 #     (if they look like they will successfully refer) or removing
 #     them (if they look spurious).
 
-         my $inhref = 0;
+         my $failedhref = 0;
          $tagged =~ s{(<[^>]+>)}{
             &{
                sub {
                   %tag = parsetag $1;
-                  if (($tag{'Start'} eq 'a') && ($name = $tag{'href'})) {
-                     my $href;
-                     if ($name =~ /^INCLUDE-(.*)/) {
 
-#                       Include file: generate a type=file reference.
+                  if ($tag{'Start'} eq 'a') {
+                     $failedhref = 0;
 
-                        my $file = $1;
-                        if ($file =~ /^[A-Z0-9_.-]*$/ && 
-                           !$file_index->get($file)) {
-                           $file =~ tr/A-Z/a-z/;
-                        }
-                        if ($file_index->get($file)) {
-                           $href = "${scb}$file&amp;$package&amp;type=file";
-                        }
-                     }
-                     else {
+                     if ($name = $tag{'href'}) {
+                        my $href;
+                        if ($name =~ /^INCLUDE-(.*)/) {
 
-#                       Function reference: generate a type=func reference.
+#                          Include file: generate a type=file reference.
 
-                        $loc = $func_index->get($name);
-                        if ($loc) {
-                           if (index ($loc, $locname) >= 0) {
-                              $href = "#$name";
+                           my $file = $1;
+                           if ($file =~ /^[A-Z0-9_.-]*$/ && 
+                              !$file_index->get($file)) {
+                              $file =~ tr/A-Z/a-z/;
                            }
-                           else {
-                              $href = "${scb}$name&amp;$package&amp;type=func"
-                                    . "#$name";
+                           if ($file_index->get($file)) {
+                              $href = "${scb}$file&amp;$package&amp;type=file";
                            }
                         }
-                     }
+                        else {
 
-#                    Either output hyperlink start tag, or bold start tag 
-#                    to show failed hyperlink.
+#                          Function reference: generate a type=func reference.
 
-                     if ($href) {
-                        $inhref = 1;
-                        return "<a href='$href'>";
-                     }
-                     else {
-                        $inhref = 0;
-                        return "<b>";
+                           $loc = $func_index->get($name);
+                           if ($loc) {
+                              if (index ($loc, $locname) >= 0) {
+                                 $href = "#$name";
+                              }
+                              else {
+                                 $href = "${scb}$name&amp;$package&amp;"
+                                       . "type=func#$name";
+                              }
+                           }
+                        }
+
+#                       Either output hyperlink start tag, or bold start tag 
+#                       to show failed hyperlink.
+
+                        if ($href) {
+                           $failedhref = 0;
+                           return "<a href='$href'>";
+                        }
+                        else {
+                           $failedhref = 1;
+                           return "<b>";
+                        }
                      }
                   }
 
@@ -1444,8 +1449,8 @@ sub output {
 #                 was a failed hyperlink.
 
                   elsif ($tag{'End'} eq 'a') {
-                     my $retval = $inhref ? '</a>' : '</b>';
-                     $inhref = 0;
+                     my $retval = $failedhref ? '</b>' : '</a>';
+                     $failedhref = 0;
                      return $retval;
                   }
                   return $1;
