@@ -23,6 +23,9 @@ STARTCL_OBJ = $(libdir)/tkGwm.o $(libdir)/tkGwmCanv.o \
 ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) $(STARTCL_OBJ) \
                 `$(srcdir)/pgp_ccdpack_link` -ljpeg @FCLIBS@
 
+# Need to add X11 after -ltk and -litk on Cygwin (no shareable libraries).
+LIBS = @LIBS@ @X_LIBS@ @X_EXTRA_LIBS@ @X_PRE_LIBS@ -lX11
+
 bin_MONOLITHS = ccdpack_red ccdpack_reg ccdpack_res ccdpack_scr \
                 ccdhelp
 
@@ -150,7 +153,7 @@ ITCL_SCR = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
 
 TCL_INDEX = tclIndex
 
-TCL_SUPPORT_BIN = atclsh
+TCL_SUPPORT_BIN = atclsh$(EXEEXT)
 
 TCL_SUPPORT_TCL = auto.tcl history.tcl init.tcl package.tcl parray.tcl \
  safe.tcl word.tcl
