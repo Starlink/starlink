@@ -185,6 +185,13 @@ done
 # (Re)configure, installing missing files
 echorun autoreconf --install --symlink
 
+# Because buildsupport is not mentioned in AC_CONFIG_SUBDIRS in
+# configure.ac (because we don't want ./configure to recurse into
+# them), the autoreconf above did not run autoreconf in buildsupport.
+# Do that now (partly because we want buildsupport/install-sh from
+# there, but mostly for symmetry).
+(cd buildsupport && autoreconf --install --symlink)
+
 # autoreconf does _not_ add an install-sh link, because there's no
 # Makefile.am in this directory, so it thinks we don't need one.  We
 # do, however, because the child directories have Makefile.am's, and
@@ -193,7 +200,8 @@ echorun autoreconf --install --symlink
 # copy the link rather than its destination.  The options are
 # '--no-dereference' (GNU cp: doesn't support correct -P yet), 
 # '-R -P' (POSIX), '-R' (BSD?: doesn't have -P, though -R does the
-# wrong thing on SunOS) and '' (fallback: does copy of link target)
+# harmlessly wrong thing on SunOS) and '' (fallback: does copy of link
+# target).  If truth be told, this is barely worth the trouble.
 get_install_sh=buildsupport/install-sh
 test -f $get_install_sh || {
     echo "Ooops: ./bootstrap can't find $get_install_sh" >&2
