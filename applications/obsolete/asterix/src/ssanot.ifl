@@ -1,7 +1,7 @@
 INTERFACE SSANOT
    parameter INP
      position 1
-     type 'UNIV'
+     type 'LITERAL'
      ppath 'GLOBAL'
      prompt 'Dataset'
      association '<->GLOBAL.BINDS'
@@ -29,18 +29,21 @@ INTERFACE SSANOT
      vpath 'DEFAULT'
      prompt 'Boldness'
      help 'Multiple of default line thickness'
-   endparameter
-   parameter ERROR
+   ENDPARAMETER
+
+   PARAMETER ERROR
      type '_LOGICAL'
      default Y
      vpath 'DEFAULT'
      ppath 'DEFAULT'
      prompt 'Use positional errors'
-   endparameter
-   parameter NDF
+   ENDPARAMETER
+
+   PARAMETER NDF
      type '_CHAR'
      default '1'
      prompt 'NDF number'
      help 'List or range of components of multiple dataset'
-   endparameter
-endinterface
+   ENDPARAMETER
+
+ENDINTERFACE
