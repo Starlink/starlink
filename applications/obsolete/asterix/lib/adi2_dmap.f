@@ -90,6 +90,8 @@
 *        Original version.
 *     11 Feb 1997 (RB):
 *        Axis data and axis width capability
+*     10 Mar 1997 (RB):
+*        Move axis point from edge to middle of bin
 *     {enter_changes_here}
 
 *  Bugs:
@@ -288,7 +290,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       DO I = 1, NELM
-        AXDAT(I) = (I - BASE) * DELTA
+        AXDAT(I) = (I - BASE - 0.5) * DELTA
       END DO
 
       END
