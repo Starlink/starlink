@@ -20,6 +20,9 @@
 *     22-JUL-2004 (TIMJ):
 *        Original version
 
+*  Notes:
+*     See eg http://gcc.gnu.org/onlinedocs/gcc-3.4.0/g77/Run-time-Library-Errors.html
+
 *-
 
       INTEGER G77__ERFMT        ! Error in format
@@ -28,3 +31,69 @@
       INTEGER G77__ILLUN        ! Illegal unit number
       PARAMETER( G77__ILLUN = 101 )
 
+      INTEGER G77__FIONA         ! Formatted I/O not allowed
+      PARAMETER( G77__FIONA = 102 )
+
+      INTEGER G77__UIONA         ! Unformatted I/O not allowed
+      PARAMETER( G77__UIONA = 103 )
+
+      INTEGER G77__DIONA         ! Direct I/O not allowed
+      PARAMETER( G77__DIONA = 104 )
+
+      INTEGER G77__SIONA         ! Sequential I/O not allowed
+      PARAMETER( G77__SIONA = 105 )
+
+      INTEGER G77__CNTBF         ! Cannot backspace file
+      PARAMETER( G77__CNTBF = 106 )
+
+      INTEGER G77__NULLFN         ! Null file name
+      PARAMETER( G77__NULLFN = 107 )
+
+      INTEGER G77__CNTSF         ! Cannot stat file
+      PARAMETER( G77__CNTSF = 108 )
+
+*     Duplicate code 109 == 114
+      INTEGER G77__UNTNC2         ! Unit not connected
+      PARAMETER( G77__UNTNC2 = 109 )
+
+      INTEGER G77__OFEOR         ! Off end of record
+      PARAMETER( G77__OFEOR = 110 )
+
+      INTEGER G77__TRUNF         ! Truncation failed
+      PARAMETER( G77__TRUNF = 111 )
+
+      INTEGER G77__ILSTI         ! Incomprehensible list input
+      PARAMETER( G77__ILSTI = 112 )
+
+      INTEGER G77__OOFSP         ! Out of free space
+      PARAMETER( G77__OOFSP = 113 )
+
+      INTEGER G77__UNTNC         ! Unit not connected
+      PARAMETER( G77__UNTNC = 114 )
+
+      INTEGER G77__RUNCH         ! Read unexpected character
+      PARAMETER( G77__RUNCH = 115 )
+
+      INTEGER G77__BDINP         ! Bad logical input field
+      PARAMETER( G77__BDINP = 116 )
+
+      INTEGER G77__NOEND         ! No end record
+      PARAMETER( G77__CRFIL = 120 )
+
+      INTEGER G77__CRFIL         ! Cannot read file
+      PARAMETER( G77__CRFIL = 126 )
+
+      INTEGER G77__CWFIL         ! Cannot write file
+      PARAMETER( G77__CWFIL = 127 )
+
+      INTEGER G77__NFEXI         ! 'new' file exists
+      PARAMETER( G77__NFEXI = 128 )
+
+      INTEGER G77__CNAPP         !  cannot append to file
+      PARAMETER( G77__CNAPP = 129 )
+
+      INTEGER G77__NPREC         !  non-positive record number
+      PARAMETER( G77__NPREC = 130 )
+
+      INTEGER G77__IOSTA         !  I/O already started
+      PARAMETER( G77__NPREC = 131 )
