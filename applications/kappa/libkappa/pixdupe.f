@@ -67,8 +67,9 @@
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
 *     VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
-*     data structure and propagates all extensions.  Origin information
-*     becomes undefined by the duplication and so is not propagated.
+*     data structure and propagates all extensions. 
+*     -  The AXIS centre, width and variance values in the output are
+*     formed by duplicating the corresponding input AXIS values. 
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
 
