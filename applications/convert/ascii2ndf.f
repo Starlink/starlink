@@ -267,6 +267,17 @@
 *  Find how many records to skip.
       CALL PAR_GDR0I( 'SKIP', 0, 0, VAL__MAXI, .FALSE., SKIP, STATUS )
 
+*  Find out which component is to be processed.
+*  ============================================
+
+*  Find which component to copy.
+      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Variance,Quality',
+     :                .FALSE., COMP, STATUS )
+      UPDATE = COMP .NE. 'DATA'
+
+*  Check the status to prevent possibly adding confusing error messages.
+      IF ( STATUS .NE. SAI__OK ) GOTO 980
+
 *  Obtain additional parameters for no-FITS header.
 *  ================================================
       IF ( .NOT. HEADER ) THEN
@@ -375,14 +386,6 @@
 
       END IF
 
-*  Find out which component is to be processed.
-*  ============================================
-
-*  Find which component to copy.
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Variance,Quality',
-     :                .FALSE., COMP, STATUS )
-      UPDATE = COMP .NE. 'DATA'
-
 *  Check the status to prevent possibly adding confusing error messages.
       IF ( STATUS .NE. SAI__OK ) GOTO 980
 
@@ -426,8 +429,9 @@
 
 *  This is required so that that one- and two-byte integer types may be
 *  mapped as integer for reading, but are actually stored with the
-*  correct type.
-      IF ( UPDATE ) CALL NDF_STYPE( TYPE, NDF, COMP, STATUS )
+*  correct type.  The type cannot be altered for the QUALITY array.
+      IF ( COMP .EQ. 'VARIANCE' )
+     :  CALL NDF_STYPE( TYPE, NDF, COMP, STATUS )
 
 *  Process the input array.
 *  ========================
