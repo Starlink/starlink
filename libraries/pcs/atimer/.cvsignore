@@ -1,3 +1,5 @@
+atimer_err.h
+fac_380_err
 *.lo
 *.la
 Makefile

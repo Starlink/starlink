@@ -1,3 +1,5 @@
+fac_1000_err
+msp_err.h
 *.lo
 *.la
 Makefile

@@ -1,3 +1,11 @@
+ACT_ERR
+DTASK_ERR
+act_err.h
+alink
+dtask_err.h
+fac_120_err
+fac_320_err
+ilink
 *.lo
 *.la
 Makefile

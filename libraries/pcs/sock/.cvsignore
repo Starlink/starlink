@@ -1,3 +1,5 @@
+fac_390_err
+sock_err.h
 *.lo
 *.la
 Makefile

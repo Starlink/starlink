@@ -1,3 +1,6 @@
+MESSYS_ERR
+fac_110_err
+messys_err.h
 *.lo
 *.la
 Makefile

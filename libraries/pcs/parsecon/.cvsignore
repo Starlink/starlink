@@ -1,3 +1,8 @@
+PARSECON_ERR
+PARSE_ERR
+compifl
+config.h
+fac_160_err
 *.lo
 *.la
 Makefile

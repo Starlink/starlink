@@ -1,3 +1,5 @@
+TASK_ERR
+fac_364_err
 *.lo
 *.la
 Makefile

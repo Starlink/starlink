@@ -1,3 +1,7 @@
+SUBPAR_ERR
+config.h
+fac_170_err
+subpar_err.h
 *.lo
 *.la
 Makefile

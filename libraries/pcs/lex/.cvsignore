@@ -1,3 +1,5 @@
+LEX_ERR
+fac_360_err
 *.lo
 *.la
 Makefile
