@@ -17,13 +17,14 @@
  *       Original version.
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
 FILE *fd1;
 FILE *fd2;
 
-void main( int argc, char *argv[] ){
+int main( int argc, char *argv[] ){
       int n, nb, i, j;
       char c;
 
@@ -84,4 +85,5 @@ void main( int argc, char *argv[] ){
       fclose( fd1 );
       fclose( fd2 );
 
+      return EXIT_SUCCESS;
 }
