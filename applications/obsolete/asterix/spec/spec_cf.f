@@ -127,7 +127,7 @@
 D	  print *,'tlo,thi,tav:',tlo,thi,tav
 
 *   Get spectral and bolometric emissivity
-	  CALL SPEC_RZ_EMISS(NDS,TAV,Z,NEN,ELBOUND,EUBOUND,PARAM,
+	  CALL SPEC_RZ_EMISS('SPEC',NDS,TAV,Z,NEN,ELBOUND,EUBOUND,PARAM,
      :	  %VAL(EMSPTR),STATUS)
 	  CALL SPEC_RZ_BOL(NDS,TAV,Z,EMTOT,STATUS)
 	  IF(STATUS.NE.SAI__OK) GO TO 9000

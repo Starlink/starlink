@@ -182,8 +182,8 @@
 	  BRPARAM(3)=METALS
 
 *        Compute interpolated emissivity (in units of 1E-23 photons*cm**3/s)
-          CALL SPEC_RZ_EMISS(NDS,T,METALS,NEN,ELBOUND,EUBOUND,BRPARAM,
-     :                                                 TEMPFLUX,STATUS)
+          CALL SPEC_RZ_EMISS('SPEC',NDS,T,METALS,NEN,ELBOUND,EUBOUND,
+     :                       BRPARAM,TEMPFLUX,STATUS)
           IF(STATUS.NE.SAI__OK) GO TO 9000
 
 *        normalise spectrum
