@@ -32,6 +32,8 @@
 *        Original version 
 *     10-MAR-1999 (MBT):
 *        Added new tasks ASTIMP and ASTEXP.
+*     15-APR-1999 (MBT):
+*        Added new task WCSREG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,6 +106,9 @@
 
       ELSE IF ( ACTION .EQ. 'TRANNDF' ) THEN 
          CALL TRANNDF( STATUS )
+
+      ELSE IF ( ACTION .EQ. 'WCSREG' ) THEN
+         CALL WCSREG( STATUS )
 
 *  If the action name is not recognised, then report an error.
       ELSE
