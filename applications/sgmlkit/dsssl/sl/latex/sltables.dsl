@@ -87,23 +87,66 @@ first.
 (element tabular
   (process-matching-children 'tgroup))
 
+;; Use the tokenise-string routine, with a special isbdy? function, to
+;; split off the leading digits from the trailing non-digits
+;; characters.  Returns a list of either one or two strings,
+;; containing the number and the unit.
+(define (get-digits-from-string s)
+  (tokenise-string s
+		   isbdy?: (lambda (l)
+			     (case (car l)
+			       ((#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 #\.) #f)
+			       (else l)))
+		   max: 1))
+
+;; From OASIS TR 9503:1995, the colwidth has the following grammar:
+;;
+;;   colwidthspec := "" | propmeasure | fixedmeasure
+;;   propmeasure  := number? `*'
+;;   fixedmeasure := number (`pt' | `cm' | `mm' | `pi' | `in')?
+;;
+;; If the number is omitted from `propmeasure' it is interpreted as `1*', 
+;; and if the `colwidthspec' is given as the empty string, it is interpreted
+;; as `1*'.  If the units are omitted from the `fixedmeasure' they are
+;; taken to be `pt'.  The fixed measure units are case insensitive.
+;; The following interprets a bare unit such as `pt' as `1pt', which
+;; goes beyond the standard, but won't be documented.  "\TabMod" is a
+;; unit which will be defined as pagewidth/n-columns.
+(define (parse-colwidth spec)
+  (let* ((l (get-digits-from-string spec))
+	 ;; num is non-zero-length number, or #f
+	 (num (and (> (string-length (car l)) 0) (car l)))
+	 ;; dim is dimension (inc `*'), or #f
+	 (dim (and (> (length l) 1) (cadr l))))
+    (string-append (or num "1")
+		   (if dim
+		       (case (case-fold-down dim)
+			 (("*") "\\TabMod")
+			 (("pt" "in" "cm" "mm") dim)
+			 (("pi") "pc")
+			 (else (error (string-append "bad unit in " spec))))
+		       "pt"))))
+
 ;; process a colspec `cs' given a pair default `def'.
 ;; Result should be a pair ("l|r|c" . "| or empty")
 (define (proc-colspec cs def)
   (let ((colsep (attribute-string (normalize "colsep") cs))
-	(align (attribute-string (normalize "align") cs)))
-    (cons (if align
-	      (case align
-		(("left" "center" "justify") "l")
-		(("right") "r")
-		(("center") "c")
-		(("char")
-		 (error "colspec: align=char not supported"))
-		(else
-		 (error (string-append
-			 "colspec: unrecognised alignment type ("
-			 align ")"))))
-	      (car def))
+	(align (attribute-string (normalize "align") cs))
+	(colwidth (attribute-string (normalize "colwidth") cs)))
+    (cons (if colwidth
+	      (string-append "p{" (parse-colwidth colwidth) "}")
+	      (if align
+		  (case align
+		    (("left" "center" "justify") "l")
+		    (("right") "r")
+		    (("center") "c")
+		    (("char")
+		     (error "colspec: align=char not supported"))
+		    (else
+		     (error (string-append
+			     "colspec: unrecognised alignment type ("
+			     align ")"))))
+		  (car def)))
 	  (if colsep
 	      (if (= (string->number colsep) 0)
 		  ""
@@ -191,17 +234,24 @@ first.
 				  bspec ")"))))
 		       '(#f #f #f))))	;no frame by default
 	 )
-    (make environment name: "tabular"
-	  parameters: (list (string-append (if (caddr border) "|" "")
-					   colspec-string
-					   (if (caddr border) "|" "")))
-	  (if (car border)
-	      (make empty-command name: "hline")
-	      (empty-sosofo))
-	  (process-children)
-	  (if (cadr border)
-	      (make empty-command name: "hline")
-	      (empty-sosofo)))))
+    (make sequence
+      (make fi data: (string-append "\\TabMod\\textwidth \\divide\\TabMod by "
+				    (number->string colno) " "))
+      ;; The colspec-string may include `{' characters, and these will
+      ;; be undesirably escaped unless the string is output within a
+      ;; formatting-instruction, so don't output this as part of the
+      ;; environment's parameters.
+      (make environment name: "tabular"
+	    (make fi data: (string-append "{" (if (caddr border) "|" "")
+					     colspec-string
+					     (if (caddr border) "|" "") "}"))
+	    (if (car border)
+		(make empty-command name: "hline")
+		(empty-sosofo))
+	    (process-children)
+	    (if (cadr border)
+		(make empty-command name: "hline")
+		(empty-sosofo))))))
 
 ;; COLSPEC
 ;; Supported attributes: align, colname, colnum, colsep,
