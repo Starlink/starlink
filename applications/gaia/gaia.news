@@ -83,8 +83,13 @@
 
 --------------------
 
-New changes:
+New changes: 2.3-2
 
     added percentiles to contour generation
     "automatic" and "percent" now correctly use the image to be
     contoured not the displayed image.
+
+    Measure band now works with just pixels and non-celestial
+    coordinate systems
+
+    SExtractor toolbox increment and decrement arrows right way around.
