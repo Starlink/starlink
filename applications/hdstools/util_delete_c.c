@@ -100,6 +100,8 @@
  */
 #if defined(VAX)
 F77_INTEGER_FUNCTION(lib$delete_file)( CHARACTER(arg) TRAIL(arg) );
+#else
+# include <stdio.h>
 #endif
 
 /*
