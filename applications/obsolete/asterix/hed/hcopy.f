@@ -39,6 +39,8 @@
 *                        characters (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     30 Nov 94 : V1.8-1 Allow primitive to primitive slice copying (DJA)
+*      9 Feb 95 : V1.8-2 Changed definition of array same sizeness to allow
+*                        images to be copied into planes of cubes (DJA)
 *
 *    Type Definitions :
 *
@@ -89,7 +91,7 @@
 *    Version id :
 *
       CHARACTER*(20) VERSION
-	PARAMETER(VERSION= 'HCOPY Version 1.8-1')
+	PARAMETER(VERSION= 'HCOPY Version 1.8-2')
 *-
 
 *    Version id
@@ -186,13 +188,35 @@
 *          Get output shape
             CALL DAT_SHAPE( CLOC, DAT__MXDIM, ONDIM, ODIMS, STATUS )
 
-*          Check they're the same
-            SAME = (NDIM.EQ.ONDIM)
+*          Check they're the same. Arrays are the same if dimensions are
+*          same until MIN(NDIM,ONDIM), and subsequent dimensions are unity
+            SAME = .TRUE.
             IDIM = 1
-            DO WHILE ( (IDIM.LE.NDIM) .AND. SAME )
+            DO WHILE ( (IDIM.LE.MIN(NDIM,ONDIM)) .AND. SAME )
               SAME = (DIMS(IDIM).EQ.ODIMS(IDIM))
               IDIM = IDIM + 1
             END DO
+            IF ( SAME .AND. (NDIM.NE.ONDIM) ) THEN
+              IDIM = MIN(NDIM,ONDIM) + 1
+              IF ( NDIM .GT. ONDIM ) THEN
+                DO WHILE ( (IDIM .LE. NDIM) .AND. SAME )
+                  IF ( DIMS(IDIM) .EQ. 1 ) THEN
+                    IDIM = IDIM + 1
+                  ELSE
+                    SAME = .FALSE.
+                  END IF
+                END DO
+              ELSE
+                DO WHILE ( (IDIM .LE. ONDIM) .AND. SAME )
+                  IF ( ODIMS(IDIM) .EQ. 1 ) THEN
+                    IDIM = IDIM + 1
+                  ELSE
+                    SAME = .FALSE.
+                  END IF
+                END DO
+              END IF
+            END IF
+
             IF ( SAME ) THEN
 
 *            Get output type and map input data with that type
