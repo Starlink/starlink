@@ -581,7 +581,7 @@ PRIVATE_SCRIPTS = dgeneric
 
 PRIVATE_INCLUDES = ccd1_cacm ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
  ccd1_mospr ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
- ndf_const user_err slv.h ccdtcl.h tclndf.h grp_par.h
+ ndf_const user_err slv.h ccdtcl.h tclndf.h grp_par.h grf.h
 
 #  Package include file which will be edited at build time to contain
 #  the package version number.
@@ -744,7 +744,7 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE)
+C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE) $(GRF_SOURCE)
 
 CSUBSRC = ccd1_exec.c slv.c find_file.c \
  tcltalk.c tclbg.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdputs.c \
@@ -825,6 +825,10 @@ WISH = ccdwish
 #  Name of the Tcl windowing shell source file.
 
 WISH_SOURCE = $(WISH).c
+
+#  Name of the file implementing the GRF interface for AST.
+
+GRF_SOURCE = grf_ccdpack.c
 
 #  List of ancilliary data files.
 
@@ -939,7 +943,8 @@ USER_ERR:	user_err;	          $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(PRIVATE_INCLUDES) $(HELP_SOURCES) $(MONO_SOURCE) $(WISH_SOURCE) $(IFD_FILES):
+$(PRIVATE_INCLUDES) $(HELP_SOURCES) $(MONO_SOURCE) \
+$(WISH_SOURCE) $(GRF_SOURCE) $(IFD_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
@@ -1038,7 +1043,8 @@ CCDPACK_HOME = /mbt/support/ccdpack
 
 RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
            $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) $(HELP_SOURCES) \
-           $(WISH_SOURCE) $(IFD_FILES) $(PUBLIC_SCRIPTS) $(TCL_SCRIPTS) \
+           $(WISH_SOURCE) $(GRF_SOURCE) $(IFD_FILES) \
+           $(PUBLIC_SCRIPTS) $(TCL_SCRIPTS) \
            $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
            $(SUBSRC) $(CSUBSRC) $(DGENSRC) $(GENSRC) $(GENRDSRC) \
            $(GENLRDICSRC) $(GENLRDISRC) $(TASKSRC) \
@@ -1080,9 +1086,10 @@ $(PKG_NAME)_source.tar :
 	co $(PKG_INCLUDE)
 	co $(MONO_SOURCE)
 	co $(WISH_SOURCE)
+	co $(GRF_SOURCE)
 	co $(HELP_SOURCES)
 	co $(IFD_FILES)
-	chmod 644 $(HELP_SOURCES) $(MONO_SOURCE) $(WISH_SOURCE) \
+	chmod 644 $(HELP_SOURCES) $(MONO_SOURCE) $(WISH_SOURCE) $(GRF_SOURCE) \
                   $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(IFD_FILES)
 	co $(PUBLIC_SCRIPTS)
 	co $(TCL_SCRIPTS)
@@ -1093,11 +1100,13 @@ $(PKG_NAME)_source.tar :
 	chmod 644 $(TCL_SCRIPTS)
 	co $(PRIVATE_SCRIPTS)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PRIVATE_INCLUDES) $(PKG_INCLUDE) \
-	   $(MONO_SOURCE) $(WISH_SOURCE) $(HELP_SOURCES) $(IFD_FILES) \
+	   $(MONO_SOURCE) $(WISH_SOURCE) $(GRF_SOURCE) \
+           $(HELP_SOURCES) $(IFD_FILES) \
            $(PUBLIC_SCRIPTS) $(TCL_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
            $(PRIVATE_SCRIPTS)
 	@- $(RM) $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) \
-                $(WISH_SOURCE) $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
+                $(WISH_SOURCE) $(GRF_SOURCE) \
+                $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
 		$(TCL_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
                 $(PRIVATE_SCRIPTS)
 
@@ -1174,7 +1183,8 @@ $(PLATFORM_F) dummy_target1:
 #  for performing the compilations.
 
 OBJECT_FILES = $(TASKOBJ) $(SUBOBJ) $(CSUBOBJ) $(GENOBJ) $(GENRDOBJ) \
- $(GENLRDIOBJ) $(GENCOBJ) $(DGENOBJ) $(HELPOBJ) $(MONO_OBJECT) $(WISH_OBJECT)
+ $(GENLRDIOBJ) $(GENCOBJ) $(DGENOBJ) $(HELPOBJ) $(MONO_OBJECT) \
+ $(WISH_OBJECT) $(GRF_OBJECT)
 
 TASKOBJ = $(TASKSRC:.f=.o)
 
@@ -1198,6 +1208,8 @@ HELPOBJ = $(HELPSRC:.f=.o)
 MONO_OBJECT = $(MONO_SOURCE:.f=.o)
 
 WISH_OBJECT = $(WISH_SOURCE:.c=.o)
+
+GRF_OBJECT = $(GRF_SOURCE:.c=.o)
 
 .gen.o:
 	$(GENERIC) -t n $<
@@ -1269,10 +1281,11 @@ $(MONOLITH1): $(PKG_NAME)_red.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
 		$(OBJECT_LIBRARIES) -lpda
 
 $(MONOLITH2): $(PKG_NAME)_reg.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
-              $(LINK_SCRIPT2)
+              $(LINK_SCRIPT2) $(GRF_OBJECT)
 	$(ALINK) $(PKG_NAME)_reg.o -o $(PKG_NAME)_reg \
 	        $(ADDLIBS) $(OBJECT_LIBRARIES) \
-                `ast_link_adam -pgp` `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
+                `ast_link_adam -mygrf` $(GRF_OBJECT) \
+                `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
 		$(OBJECT_LIBRARIES) -lpda
 
 $(MONOLITH3): $(PKG_NAME)_res.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
@@ -2221,6 +2234,7 @@ strip:
 #  files).  These are normally generated automatically from the source
 #  files.
 
+$(GRF_OBJECT): grf.h
 ccd1_algn.o: ccdtcl.h
 ccd1_pndf.o: ccdtcl.h grp_par.h
 ccd1_tcurs.o: ccdtcl.h
