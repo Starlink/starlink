@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: HTTP.C,v 1.2 2001/08/29 16:14:23 norman Exp $
+ * $Id: HTTP.C,v 1.5 2003/01/20 15:52:22 brighton Exp $
  *
  * HTTP.C - method definitions for class HTTP
  *          (based on code from DSS:HTTP.c by Miguell Albrecht)
@@ -12,16 +12,16 @@
  * Allan Brighton  26 Sep 95  Created
  * Peter W. Draper 16 Jun 98  Added support for web proxy servers.
  */
-static const char* const rcsId="@(#) $Id: HTTP.C,v 1.2 2001/08/29 16:14:23 norman Exp $";
+static const char* const rcsId="@(#) $Id: HTTP.C,v 1.5 2003/01/20 15:52:22 brighton Exp $";
 
 
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream.h>
-#include <fstream.h>
-#include <strstream.h>
+#include <cstdio>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -110,7 +110,7 @@ HTTP::~HTTP()
  * take an error message in HTML format from the given stream and pass it
  * on to error(), stripped of HTML syntax (<...>)
  */
-int HTTP::html_error(istream& is)
+int HTTP::html_error(std::istream& is)
 {
     char buf[1024*2];
     is.read(buf, sizeof(buf));
@@ -314,7 +314,7 @@ int HTTP::openCommand(const char* command)
  */
 int HTTP::checkCommandOutput(const char* filename)
 {
-    ifstream is(filename);
+    std::ifstream is(filename);
     if (! is)
 	return 0;
     
@@ -504,27 +504,25 @@ int HTTP::addAuthFileEntry(const char* server, const char* realm)
     if (!auth_file_)
 	authFile(default_auth_file_);
 
-    ifstream is(auth_file_);
-    ostrstream os;
+    std::ifstream is(auth_file_);
+    std::ostringstream os;
     char newentry[1024];
     sprintf(newentry, "%s:%s:%s", server, realm, auth_info_);
     char buf[1024];
     int n = strlen(server) + strlen(realm) + 1;
     while(is.getline(buf, sizeof(buf))) {
 	if (strncmp(buf, newentry, n) != 0)
-	    os << buf << endl;
+	    os << buf << std::endl;
     }
     is.close();
-    os << newentry << endl << ends;
+    os << newentry << std::endl;
     
     // create the auth file with -rw------- perms
-    // Modified: gcc3 loses permission argument! (NG, following PWD, 2003-02-20)
-    ofstream f(auth_file_, ios::out);
+    //ofstream f(auth_file_, ios::out, 0600);
+    std::ofstream f(auth_file_, std::ios::out);
+    chmod(auth_file_, 0600);
     if (f) 
-	f << os.str();
-    delete os.str();
-    //  Change permissions `by hand'
-    chmod( auth_file_, 0600 );
+        f << os.str();
 
     return 0;
 }
@@ -540,7 +538,7 @@ int HTTP::findAuthFileEntry(const char* server, const char* realm)
     if (!auth_file_)
 	authFile(default_auth_file_);
 
-    ifstream is(auth_file_);
+    std::ifstream is(auth_file_);
     char entry[1024];
     sprintf(entry, "%s:%s:", server, realm);
     int n = strlen(entry);
@@ -674,21 +672,22 @@ int HTTP::get(const char* url)
     }
 
     // generate the request
-    ostrstream os(req, sizeof(req));
+    std::ostringstream os;
     os << "GET " << args << " HTTP/1.0\n";
 
     // add the user-agent
     if (! user_agent_)
 	userAgent(default_user_agent_);
-    os << "User-Agent: " << user_agent_ << endl;
+    os << "User-Agent: " << user_agent_ << std::endl;
 
     // If we have authorization info (encoded username:passwd), include it
     // in the request
     if (auth_info_ != NULL) 
-	os << "Authorization: Basic " << auth_info_ << endl;
+	os << "Authorization: Basic " << auth_info_ << std::endl;
 
     // add newline after request and null terminate
-    os << endl << ends;
+    os << std::endl;
+    strncpy(req, os.str().c_str(), sizeof(req));
     
     // send the request
     int n = strlen(req);
@@ -755,7 +754,7 @@ char* HTTP::get(const char* url, int& nlines, int freeFlag)
     }
 	
     // read the data into a buffer
-    ostrstream os;
+    std::ostringstream os;
     char buf[8*1024];
     nlines = 0;
     int n;
@@ -772,8 +771,7 @@ char* HTTP::get(const char* url, int& nlines, int freeFlag)
 	    os.write(buf, n);
 	}
     }
-    os << ends;
-    resultPtr_ = resultBuf_ = os.str();
+    resultPtr_ = resultBuf_ = strdup(os.str().c_str());
 
     // count the lines
     // and remove "end of data" marker 
@@ -826,7 +824,7 @@ char* HTTP::get(const char* url, int& nlines, int freeFlag)
  *
  * Returns 0 if successful, otherwise 1
  */
-int HTTP::get(const char* url, ostream& os)
+int HTTP::get(const char* url, std::ostream& os)
 {
     if (get(url) != 0) {
 	return 1;		// error
@@ -942,7 +940,7 @@ int HTTP::post(const char* url, const char* data)
  *
  * Returns 0 if successful, otherwise 1
  */
-int HTTP::post(const char* url, const char* data, ostream& os)
+int HTTP::post(const char* url, const char* data, std::ostream& os)
 {
     if (post(url, data) != 0) {
 	return 1;		// error
@@ -959,7 +957,7 @@ int HTTP::post(const char* url, const char* data, ostream& os)
  *
  * Returns 0 if successful, otherwise 1
  */
-int HTTP::copy(ostream& os)
+int HTTP::copy(std::ostream& os)
 {
     char buf[8*1024];
     int n;
