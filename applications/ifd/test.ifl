@@ -1,0 +1,36 @@
+monolith TEST
+# ADAM Interface file
+# Created automatically from test.ifd using ifd2star
+# Fri Jun 13 15:52:26 BST 1997
+interface TEST1
+   parameter A
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) First of the two spectra to be adjoined'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter B
+      position 2
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 1.0
+      helpkey '*'
+   endparameter
+endinterface
+interface TEST2
+   parameter A
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(SPectrum) First of the two spectra to be adjoined'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+endinterface
+endmonolith
