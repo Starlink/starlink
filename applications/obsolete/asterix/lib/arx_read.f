@@ -31,7 +31,6 @@
       CHARACTER*1 LC
       INTEGER L
       INTEGER FID
-      INTEGER INDEX
       LOGICAL FILE
       LOGICAL THERE
       LOGICAL CONT
@@ -63,12 +62,10 @@
           IF (FILE) THEN
 *  read from file
             CALL FIO_OPEN(ARDIN,'READ','NONE',0,FID,STATUS)
-            INDEX=0
             DO WHILE (STATUS.EQ.SAI__OK)
               CALL FIO_READF(FID,ARDIN,STATUS)
               IF (STATUS.EQ.SAI__OK) THEN
-                INDEX=INDEX+1
-                CALL GRP_PUT(ID,1,ARDIN,INDEX,STATUS)
+                CALL GRP_PUT(ID,1,ARDIN,0,STATUS)
               ENDIF
             ENDDO
             IF (STATUS.EQ.FIO__EOF) THEN
@@ -78,7 +75,6 @@
 
 *  read from environment
           ELSE
-            INDEX=1
             CONT=.TRUE.
             DO WHILE (CONT.AND.STATUS.EQ.SAI__OK)
               L=CHR_LEN(ARDIN)
@@ -89,9 +85,8 @@
               ELSE
                 CONT=.FALSE.
               ENDIF
-              CALL GRP_PUT(ID,1,ARDIN,INDEX,STATUS)
+              CALL GRP_PUT(ID,1,ARDIN,0,STATUS)
               IF (CONT) THEN
-                INDEX=INDEX+1
                 CALL USI_CANCL(PAR,STATUS)
                 CALL USI_GET0C(PAR,ARDIN,STATUS)
               ENDIF
