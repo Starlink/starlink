@@ -210,7 +210,10 @@ while (`$parent_pscmd |& getfield field=PID`)
 
    # See if current application has changed since we last looked
    #
-   if ("$label_last" != "" && "$label" != "$label_last" && $?elapsed_major) then
+   if (   "$label_last" != "" \
+       && "$label" != "$label_last" \
+       && $?elapsed_major \
+       && $size_max > 0 ) then
 
       # Application has changed since we last looked.  
       # Write summary to log and reset values.
@@ -220,6 +223,8 @@ while (`$parent_pscmd |& getfield field=PID`)
           "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" ) >& /dev/null
       set rss_max = 0
       set size_max = 0
+      set cpu = 0
+      set elapsed = 0
    endif
 
    # Find the process we're interested in.
