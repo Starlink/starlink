@@ -348,13 +348,17 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Should less values be entered than is required copy the last value to
-*  higher dimensions, limiting it to be no smaller than the corresponding
-*  input NDF axis.
+*  higher dimensions.
       IF ( ACTVAL .LT. NDIM ) THEN
          DO I = ACTVAL + 1, NDIM
-            COMPRS( I ) = MIN( IDIMS( I ), COMPRS( ACTVAL ) )
+            COMPRS( I ) = COMPRS( ACTVAL )
          END DO
       END IF
+
+*  Limit all values to be no greater than the corresponding dimension.
+      DO I = 1, NDIM
+         COMPRS( I ) = MIN( IDIMS( I ), COMPRS( I ) )
+      END DO
 
 *  Check there is going to be a compression.
 *  =========================================

@@ -37,9 +37,7 @@
 *        fewer are supplied the last value in the list of compression
 *        factors is given to the remaining dimensions.  Thus if a
 *        uniform compression is required in all dimensions, just one
-*        value need be entered.  All values are constrained to be in
-*        the range one to the size of its corresponding dimension.  The
-*        suggested default is the current value. 
+*        value need be entered. The suggested default is the current value. 
 *     IN  = NDF (Read)
 *        The NDF structure to be reduced in size.
 *     ORIGIN( ) = _INTEGER (Read)
@@ -213,12 +211,11 @@
 *  Obtain the compression factors.
 *  ===============================
 *
-*  Set the acceptable range of values from no compression to compress
-*  to a single element in a dimension.  Initialise values in case of an
+*  Set the acceptable range of values. Initialise values in case of an
 *  error to prevent a possible divide-by-zero catastrophe.
       DO I = 1, NDIM
          CMPMIN( I ) = 1
-         CMPMAX( I ) = IDIMS( I )
+         CMPMAX( I ) = VAL__MAXI
          COMPRS( I ) = 1
       END DO
 
@@ -228,13 +225,17 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Should less values be entered than is required copy the last value to
-*  higher dimensions, limiting it to be no smaller than the corresponding
-*  input NDF axis.
+*  higher dimensions.
       IF ( ACTVAL .LT. NDIM ) THEN
          DO I = ACTVAL + 1, NDIM
-            COMPRS( I ) = MIN( IDIMS( I ), COMPRS( ACTVAL ) )
+            COMPRS( I ) = COMPRS( ACTVAL )
          END DO
       END IF
+
+*  Limit all values to be no greater than the corresponding dimension.
+      DO I = 1, NDIM
+         COMPRS( I ) = MIN( IDIMS( I ), COMPRS( I ) )
+      END DO
 
 *  Check there is going to be a compression.
 *  =========================================
