@@ -409,6 +409,7 @@ itcl::class gaia::GaiaBlink {
       #  Modify the scrollbar positions to reflect the image position 
       #  of the first clone.
       init_scroll_
+      #set_origins_
    }
 
    #  Move the views up the display stack.
@@ -424,13 +425,13 @@ itcl::class gaia::GaiaBlink {
       incr top_
       if { $top_ >= $n_ } { set top_ 0 }
       if { $view_($this,$top_) } {
-	  raise $itk_component(image$top_)
-	  update
-	  eval set id_ \
-	      [after $itk_option(-time) [code catch "$this raise_next" dummy]]
+         raise $itk_component(image$top_)
+         update
+         eval set id_ \
+            [after $itk_option(-time) [code catch "$this raise_next" dummy]]
       } else {
-	  eval set id_ \
-	      [after 0 [code catch "$this raise_next" dummy]]
+         eval set id_ \
+            [after 0 [code catch "$this raise_next" dummy]]
       }
    }
 
@@ -478,12 +479,15 @@ itcl::class gaia::GaiaBlink {
    #  Scroll images vertically.
    method vscroll {args} {
       if { $n_ > 0 } {
+
+         # All images has same scrollregion to keep aligned.
+         set w [$image_($mobile_) dispwidth]
+         set h [$image_($mobile_) dispheight]
+
          for { set i 0 } { $i < $n_ } { incr i } {
             eval $canvas_($i) yview $args
 
             #  Make sure image scale changes are seen now.
-            set w [$image_($i) dispwidth]
-            set h [$image_($i) dispheight]
             $canvas_($i) configure -scrollregion "0 0 $w $h"
          }
       }
@@ -492,12 +496,15 @@ itcl::class gaia::GaiaBlink {
    #  Scroll images horizontally.
    method hscroll {args} {
       if { $n_ > 0 } {
+
+         # All images has same scrollregion to keep aligned.
+         set w [$image_($mobile_) dispwidth]
+         set h [$image_($mobile_) dispheight]
+
          for { set i 0 } { $i < $n_ } { incr i } {
             eval $canvas_($i) xview $args
 
             #  Make sure image scale changes are seen now.
-            set w [$image_($i) dispwidth]
-            set h [$image_($i) dispheight]
             $canvas_($i) configure -scrollregion "0 0 $w $h"
          }
       }
@@ -518,20 +525,25 @@ itcl::class gaia::GaiaBlink {
    }
 
    #  Shift the current image to a new position.
-   private method place_image_ {dir new} {
-      set tag [$itk_component(image$top_) get_imageId]
-      lassign [$canvas_($top_) bbox $tag] x0 y0 x1 y1
-      $image_($top_) convert coords $x0 $y1 canvas x0 y1 image
+   protected method place_image_ {dir new} {
+      place_animage_ $top_ $dir $new
+   }
+
+   #  Shift an image to a new position.
+   private method place_animage_ {index dir new} {
+      set tag [$itk_component(image$index) get_imageId]
+      lassign [$canvas_($index) bbox $tag] x0 y0 x1 y1
+      $image_($index) convert coords $x0 $y1 canvas x0 y1 image
       if { $dir == "x" } {
          set dx [expr $new-$x0]
-         $image_($top_) convert dist $dx 0 image dx dummy canvas
-         $canvas_($top_) move $tag $dx 0
+         $image_($index) convert dist $dx 0 image dx dummy canvas
+         $canvas_($index) move $tag $dx 0
       } else {
          set dy [expr $y1-$new]
-         $image_($top_) convert dist 0 $dy image dummy dy canvas
-         $canvas_($top_) move $tag 0 $dy
+         $image_($index) convert dist 0 $dy image dummy dy canvas
+         $canvas_($index) move $tag 0 $dy
       }
-      update_view_ $top_
+      update_view_ $index
    }
 
    #  Move the mobile image to a new position.
@@ -547,6 +559,13 @@ itcl::class gaia::GaiaBlink {
    #       set y [expr [winfo y $itk_component(image$mobile_)] + ($dy)]
    #       place $itk_component(image$mobile_) -x $x -y $y \
    #          -bordermode outside -relwidth 1.0 -relheight 1.0
+
+   #  Move an image to a new position.
+   private method move_image_ {index dx dy} {
+      raise $itk_component(image$index)
+      set tag [$itk_component(image$index) get_imageId]
+      $canvas_($index) move $tag $dx $dy
+   }
 
    #  Update the offsets of the view when activity drops (do not do this all
    #  the time as this is very slow).
@@ -612,6 +631,27 @@ itcl::class gaia::GaiaBlink {
        } 
    }
 
+   #  Set the origins of the images to reflect any origins. Doesn't work!
+   protected method set_origins_ {} {
+      if { [info exists clones_(1)] } {
+         $image_(0) origin bxo byo
+
+         # All images has same scrollregion to keep aligned.
+         set w [$image_(0) dispwidth]
+         set h [$image_(0) dispheight]
+         for { set i 0 } { $i < $n_ } { incr i } {
+            $image_($i) origin xo yo
+            set dx [expr ( $xo - $bxo ) / 2]
+            set dy [expr ( $byo - $yo ) / 2]
+            puts "dx = $dx, dy = $dy ($xo $yo),($bxo,$byo),($w,$h)"
+            $canvas_($i) configure -scrollregion "0 0 $w $h"
+            move_image_ $i $dx $dy
+            #place_animage_ $i x $dx
+            #place_animage_ $i y $dy
+         }
+      }
+   }
+   
    #  Configuration options: (public variables)
    #  ----------------------
 
