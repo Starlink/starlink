@@ -28,11 +28,11 @@ AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Documentation.
-STAR_LATEX_DOCUMENTATION(sun50)
+STAR_LATEX_DOCUMENTATION(sun50, [sun50.ps sun50.htx_tar sun50.tex])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES([Makefile component.xml my_dipso])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

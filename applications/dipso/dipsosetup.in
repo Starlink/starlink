@@ -1,0 +1,19 @@
+#!/bin/csh
+#
+# v3.3  25.12.95
+#
+setenv DIPSODIR @bindir@
+setenv DIPSOLIB @bindir@
+setenv DIPSOSTARBIN @prefix@/bin
+setenv SPECDAT  @staretcdir@
+setenv OWNERDIR ${HOME}
+#
+#
+alias dipso      '${DIPSODIR}/dipso'
+alias dipso_link '${DIPSODIR}/dipso_link'
+alias my_dipso   '${DIPSODIR}/my_dipso'
+
+echo " "
+echo "Dipso environment setup, type dipso to start task"
+echo " "
+#

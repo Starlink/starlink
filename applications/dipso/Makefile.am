@@ -2,17 +2,17 @@
 
 bin_PROGRAMS = dipso
 
-dipso_SOURCES = run_dipso.c $(BLOCK_DATA_FILES)
+dipso_SOURCES = run_dipso.c
 
 dipso_LDADD = $(LDADD) `dipso_link`
 
-bin_SCRIPTS = dipsosetup
+dist_bin_SCRIPTS = dipsosetup dipsotest dipso_link my_dipso
 
 lib_LTLIBRARIES = libdipso.la
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-libdipso_la_SOURCES = $(F_ROUTINES)  $(C_ROUTINES)
+libdipso_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) $(BLOCK_DATA_FILES)
 
 F_ROUTINES = abload.f abscal.f acheck.f arb.f arith.f arrow.f arysrt.f \
  asterix.f atfit.f atlasrd.f axmat.f badchk.f bbint.f bbody.f calcfx.f \
@@ -65,6 +65,8 @@ PUBLIC_INCLUDES = DECLARE_STKS DECLARE_LBLS DECLARE_PLTS DECLARE_DATA
 OLD_PUBLIC_INCLUDES = declare_stks.f declare_lbls.f declare_plts.f \
  declare_data.f
 
+PRIVATE_INCLUDES = DSB_CLR KARS_COM KUSE_COM
+
 # The `dipsosetup' script needs to have installation locations edited into it
 edit = sed \
         -e 's,@bindir\@,$(bindir),g' \
@@ -77,3 +79,15 @@ dipsosetup: dipsosetup.in
 	   -e 's,@edited_input\@,dipsosetup: produced from dipsosetup.in by Makefile.am,' \
 	   $(srcdir)/dipsosetup.in >dipsosetup.tmp
 	mv dipsosetup.tmp dipsosetup
+
+## Files that should be copied into bindir.
+dipsosupportdir = $(bindir)
+dipsosupport_DATA = ATLIST.DAT demo2.cmd LWPLO.ABS run_dipso.o user.f \
+ ATOMIC.DAT DEMO2.sdf LWRLO.ABS SWPCOR.DAT command.hlp  \
+ exercise.cmd SWPLO.ABS demo1.cmd dipso.hlp help.lis testspec2.cmd \
+ DEMO1_STK.sdf NEBCONT.DAT updates.lis
+
+## Data files for etc/dipso.
+staretc_DATA = specdat/*
+
+EXTRA_DIST = specdat $(PRIVATE_INCLUDES) dipsosetup.in my_dipso.in

@@ -1,0 +1,6 @@
+#!/bin/csh
+
+set FC=@FC@
+source $DIPSODIR/dipsosetup
+${FC} -o dipso run_dipso.o user.o -L$DIPSODIR -L@prefix@/lib `$DIPSODIR/dipso_link`
+
