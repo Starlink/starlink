@@ -2994,6 +2994,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *  Global constants :
         INCLUDE 'SAE_PAR'
         INCLUDE 'DAT_PAR'
+        INCLUDE 'PRM_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3003,6 +3004,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         INTEGER STATUS
 *  Local constants :
 *  Local variables :
+      CHARACTER*12 RAS,DECS
+      DOUBLE PRECISION RA,DEC
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -3010,6 +3013,20 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         I_X=X
         I_Y=Y
 
+*  being run from GUI so put on noticeboard
+        IF (I_GUI) THEN
+          CALL NBS_FIND_ITEM(I_NBID,'X',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,X,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'Y',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,Y,STATUS)
+          CALL IMG_WORLDTOCEL(X,Y,RA,DEC,STATUS)
+          CALL CONV_DEGHMS(REAL(RA),RAS)
+          CALL CONV_DEGDMS(REAL(DEC),DECS)
+          CALL NBS_FIND_ITEM(I_NBID,'RA',ID,STATUS)
+          CALL NBS_PUT_CVALUE(ID,0,RAS,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'DEC',ID,STATUS)
+          CALL NBS_PUT_CVALUE(ID,0,DECS,STATUS)
+        ENDIF
 
       ENDIF
 
