@@ -87,6 +87,7 @@
       INTEGER		        P_INST(PSF_NMAX)	! Internal instance data
       LOGICAL			P_GOTAX(PSF_NMAX)	! Got axis stuff yet?
       INTEGER			P_FID(PSF_NMAX)		! Dataset identifiers
+      INTEGER			P_PSID(PSF_NMAX)	! Psf description
 
 *    Time and energy bands
       LOGICAL                   TE_INIT           	! Initialised yet?
