@@ -198,13 +198,26 @@
 *    No representation supplied
         ELSE IF ( PPOS .EQ. 0 ) THEN
           CALL ADI_FOPEN( FNAME, CLASS, ACCESS, ID, STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL MSG_SETC( 'PAR', PAR )
+            CALL MSG_SETC( 'FILE', FILE )
+            CALL ERR_REP( ' ', 'Unable to associate parameter ^PAR'/
+     :                    /' with file ^FILE', STATUS )
+
+          END IF
 
 *    If caller specified a representation on the parameter, glue it
 *    on to the file name
         ELSE
           CALL ADI_FOPEN( FNAME(:MAX(1,FLEN))//PAR(PPOS:),
      :                                   CLASS, ACCESS, ID, STATUS )
+          CALL MSG_SETC( 'PAR', PAR(:EP) )
+          CALL MSG_SETC( 'FILE', FILE(:MAX(1,FLEN)) )
+          CALL ERR_REP( ' ', 'Unable to associate parameter ^PAR'/
+     :                    /' with file ^FILE', STATUS )
+
         END IF
+
       END IF
 
 *  Store in common
