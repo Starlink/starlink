@@ -21,13 +21,15 @@
       ISTAT=SAI__OK
       DO N=1,USI__NMAX
         IF (DS(N).USED) THEN
-          CALL DAT_VALID(DS(N).LOC,VALID,ISTAT)
-          IF (VALID) THEN
-            CALL DAT_ANNUL(DS(N).LOC,ISTAT)
+          IF ( DS(N).LOC .NE. DAT__NOLOC ) THEN
+            CALL DAT_VALID(DS(N).LOC,VALID,ISTAT)
+            IF (VALID) THEN
+              CALL DAT_ANNUL(DS(N).LOC,ISTAT)
+            ENDIF
+            DS(N).LOC=DAT__NOLOC
+            DS(N).USED=.FALSE.
+            DS(N).IO=BLANK
           ENDIF
-          DS(N).LOC=DAT__NOLOC
-          DS(N).USED=.FALSE.
-          DS(N).IO=BLANK
         ENDIF
       ENDDO
       USI_SYINIT = .FALSE.
