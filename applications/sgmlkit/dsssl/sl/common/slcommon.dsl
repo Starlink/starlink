@@ -196,7 +196,7 @@ wish to get at.
 keywords, you seem to be doing all the work.  You should still call this
 routine in that case, however, so that it can do any other processing
 required.
-<returnvalue type=sosofo>Name of section, prefixed by sectoin number
+<returnvalue type=sosofo>Name of section, prefixed by section number
 <parameter keyword default='(current-node)'>target
   <type>singleton-node-list
   <description>The node we wish to generate a reference to
@@ -792,7 +792,8 @@ the first member of this list amongst the target element's ancestors.
 	(normalize "subsubsubsect")
 	(normalize "appendices")
 	(normalize "figure")
-	(normalize "table")))
+	(normalize "table")
+	(normalize "mlabel")))
 
 
 
@@ -1087,6 +1088,22 @@ Return a non-empty node-list, or false
   (if (node-list-empty? nl)
       #f
       nl))
+
+<func>
+<name>get-equation-number
+<description>
+Return the equation number corresponding to the given node
+<returnvalue type='string'>Equation number, or <code/#f/ if the parameter
+  is not a MLABEL element.
+<parameter optional default='(current-node)'>nl
+  <type>node-list
+  <description>Equation to be numbered.  Should be an MLABEL element.
+<codebody>
+(define (get-equation-number #!optional (nl (current-node)))
+  (let ((gi (gi nl)))
+    (if (string=? gi (normalize "mlabel"))
+	(number->string (element-number nl))
+	#f)))
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <misccode>
