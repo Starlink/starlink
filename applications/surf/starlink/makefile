@@ -143,8 +143,8 @@
 #           Global include files                            
 #        sla
 #           SLALIB.
-#        sgs
-#           SGS routines.
+#        kaplib
+#           Kappa libraries
 #
 #     This makefile can also use the ira (IRAS90 astrometry routines) 
 #     library if it exists.
