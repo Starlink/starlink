@@ -22,7 +22,7 @@ AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
 dnl STAR_HAVE_FC_OPEN_READONLY
-dnl STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ast sae par prm])

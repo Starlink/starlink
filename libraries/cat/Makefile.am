@@ -2,13 +2,18 @@
 
 dist_bin_SCRIPTS = cat_link cat_link_adam
 
-lib_LTLIBRARIES = libcat.la
+lib_LTLIBRARIES = libcat.la libcat_adam.la
 
 libcat_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(PRIVATE_INCLUDES) \
 	$(BLOCK_DATA_FILES) \
 	$(F_ROUTINES)
+
+libcat_adam_la_SOURCES = \
+	$(PUBLIC_INCLUDES) \
+	$(PRIVATE_INCLUDES) \
+	$(ADAM_F_ROUTINES)
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = $(PUBLIC_INCLUDES)
@@ -20,7 +25,7 @@ PRIVATE_INCLUDES = CAT1_NUL CAT1_PAR CAT1_AST_CMN CAT1_ATTRB_CMN \
     CAT3_FIT_PAR CAT3_FIT_CMN CAT5_ANG_CMN CAT5_STL_CMN \
     CAT6_TST_CMN antx1.inc antx2.inc antx3.inc
 
-F_ROUTINES = cat1_dceqp.f cat1_tidnt.f cat5_wrpar.f cat_exist.f  \
+F_ROUTINES =   cat1_dceqp.f  cat1_tidnt.f  cat5_wrpar.f               \
  ant_cfind.f   cat1_dcitm.f  cat1_tidtp.f  cat5_wrtbl.f  cat_fgt0f.f  \
  ant_err.f     cat1_dcnlt.f  cat1_topen.f  cat6_cknme.f  cat_fgt0t.f  \
  ant_errc.f    cat1_dcnme.f  cat3_close.f  cat6_close.f  cat_getxt.f  \
@@ -55,22 +60,33 @@ F_ROUTINES = cat1_dceqp.f cat1_tidnt.f cat5_wrpar.f cat_exist.f  \
  cat1_ckmut.f  cat1_put.f    cat5_gtcld.f  cat_aget.f    cat_trows.f  \
  cat1_cnmpr.f  cat1_qsrtd.f  cat5_gtval.f  cat_aput.f    cat_tuneg.f  \
  cat1_cpyar.f  cat1_rclsp.f  cat5_opnex.f  cat_aset.f    cat_tunes.f  \
- cat1_crcol.f  cat1_rdscr.f  cat5_putxt.f  cat_assoc.f   cat_tyfmt.f  \
+ cat1_crcol.f  cat1_rdscr.f  cat5_putxt.f                cat_tyfmt.f  \
  cat1_crpar.f  cat1_rjlst.f  cat5_rdtbl.f  cat_cinq.f    \
  cat1_crtar.f  cat1_rngls.f  cat5_rdtbx.f  cat_cnewa.f   \
  cat1_crtci.f  cat1_selct.f  cat5_rstxt.f  cat_cnews.f   \
- cat1_crtel.f  cat1_snkta.f  cat5_staet.f  cat_creat.f   \
+ cat1_crtel.f  cat1_snkta.f  cat5_staet.f                \
  cat1_crtid.f  cat1_srcta.f  cat5_stcae.f  cat_egt0f.f   \
  cat1_crtsl.f  cat1_stdir.f  cat5_stnul.f  cat_egt0t.f   \
  cat1_cxfmt.f  cat1_tcnvt.f  cat5_wrcol.f  cat_eidnt.f
 
+ADAM_F_ROUTINES = cat_assoc.f cat_creat.f cat_exist.f
+
 BLOCK_DATA_FILES = ant_block.f attrbb.f catsb.f ctrlb.f idsb.f
 
-## test
+## Standalone local test, requires that other components are installed.
+## Note this doesn't test the ADAM libraries.
 
 TESTS = cat_test
 check_PROGRAMS = cat_test
 
 cat_test_SOURCES = cat_test.f
 cat_test_LDADD = libcat.la `cfitsio_link` `sla_link` `chr_link` `fio_link` \
-                 `err_link` `psx_link` `ast_link` `subpar_link_adam`
+                 `err_link` `psx_link` `ast_link`
+
+##  Make sure output file is removed before running next test, also see if it
+##  differs.
+check-local:
+	@if cmp -s testcat.TXT testcat.TXT.out; then :; else \
+	   echo "*** TEST files DIFFER";\
+	fi
+	@rm -r testcat.TXT
