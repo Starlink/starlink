@@ -11,6 +11,8 @@
 
   Changes in V1.6-2:
 
+  - New command astpolymap. Creates a PolyMap.
+
   - New command astmathmap. Creates a MathMap.
 
   - New command asttran2. Uses a Mapping to transform a set of 2-D

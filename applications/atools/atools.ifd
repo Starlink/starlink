@@ -28,7 +28,7 @@ package atools {
             type _INTEGER
             prompt {Number of input coordinates}
             ppath CURRENT DEFAULT
-            default 1.0
+            default 1
             helpkey *
           }
 
@@ -37,12 +37,12 @@ package atools {
             type _INTEGER
             prompt {Number of output coordinates}
             ppath CURRENT DEFAULT
-            default 1.0
+            default 1
             helpkey *
           }
 
          parameter options {
-            position 4
+            position 5
             type LITERAL
             prompt {Options for the PolyMap}
             ppath CURRENT DEFAULT
@@ -51,7 +51,7 @@ package atools {
           }
 
          parameter result {
-            position 5
+            position 6
             type LITERAL
             prompt {Name of file in which to store the PolyMap}
             ppath DYNAMIC CURRENT
