@@ -1,12 +1,12 @@
       SUBROUTINE SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
-     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
+     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS, N_MEAS,
      :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
-     :     INT_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
+     :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT, ANG_MEAS,
+     :     INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
      :     NPARS, PARS, STATUS)
 *+
 *  Name:
@@ -23,8 +23,8 @@
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-*     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
-*     :     INT_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
+*     :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT, ANG_MEAS,
+*     :     INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
 *     :     NPARS, PARS, STATUS)
  
 *  Description:
@@ -53,7 +53,9 @@
 *     N_POS( MAX_FILE ) = INTEGER (Returned)
 *        Number of samples associated with each file
 *     N_INTS( MAX_FILE ) = INTEGER (Returned)
-*        Number of integrations associated with each file
+*        Total Number of integrations associated with each file (INT*MEAS)
+*     N_MEAS( MAX_FILE ) = INTEGER (Returned)
+*        Number of measurements associated with each file
 *     IN_UT1( MAX_FILE ) = DOUBLE (Returned)
 *        Modified Julian data of observation for each file
 *     IN_RA_CEN( MAX_FILE ) = DOUBLE (Returned)
@@ -105,8 +107,16 @@
 *        Pointer to end of quality array
 *     QBITS(MAX_FILE) = BYTE (Returned)
 *        Bad bits mask for each file
-*     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
+*     ANG_INT( MAX_FILE, SCUBA__MAX_INT,2)  = REAL (Returned)
+*        Array containing the polarimetry angles for each integration
+*        The 2 dimensions are for WPLATE and ANGROT
+*     ANG_MEAS( MAX_FILE, SCUBA__MAX_MEAS,2) = REAL (Returned)
+*        Array containing the pol angles for each measurement
+*        The 2 dimensions are for WPLATE and ANGROT
+*     INT_LIST( MAX_FILE, SCUBA__MAX_INT+1) = INTEGER (Returned)
 *        Position of integrations in each data file
+*     MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS+1) = INTEGER (Returned)
+*        Position of measurements in each data file
 *     BOLWT (max num of bols, MAX_FILE) = REAL (Returned)
 *        Relative Weights of each bolometer for each file
 *     WEIGHT( MAX_FILE ) = REAL (Returned)
@@ -181,6 +191,8 @@
       REAL             WAVELENGTH
 
 *  Arguments Returned:
+      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2)
+      REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
       REAL             BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC, 
      :     MAX_FILE)
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -197,9 +209,11 @@
       DOUBLE PRECISION IN_DEC_CEN(MAX_FILE)
       DOUBLE PRECISION IN_RA_CEN(MAX_FILE)
       DOUBLE PRECISION IN_UT1(MAX_FILE)
+      INTEGER          MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS + 1)
       INTEGER          N_BOL(MAX_FILE)
       INTEGER          N_FITS(MAX_FILE)
       INTEGER          N_INTS(MAX_FILE)
+      INTEGER          N_MEAS(MAX_FILE)
       INTEGER          N_POS(MAX_FILE)
       INTEGER          NPARS
       REAL             PARS(3) ! I know there are 3 parameters
@@ -316,7 +330,8 @@
 *     Read in the NDF
             CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
      :           NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-     :           N_BOL(N_FILE), N_POS(N_FILE), N_INTS(N_FILE),
+     :           N_BOL(N_FILE), N_POS(N_FILE), N_INTS(N_FILE), 
+     :           N_MEAS(N_FILE),
      :           1, IN_UT1(1), IN_UT1(N_FILE), IN_RA_CEN(N_FILE), 
      :           IN_DEC_CEN(N_FILE), FITS(1, N_FILE), N_FITS(N_FILE),
      :           WAVELENGTH, SUB_INSTRUMENT, 
@@ -327,7 +342,8 @@
      :           DATA_END(N_FILE), VARIANCE_PTR(N_FILE),
      :           VARIANCE_END(N_FILE), QMF, QUALITY_PTR(N_FILE),
      :           QUALITY_END(N_FILE), QBITS(N_FILE), 
-     :           .FALSE., 0, INT_LIST, BOLWT(1,N_FILE), STATUS)
+     :           .FALSE., 0, ANG_INT, ANG_MEAS, INT_LIST, MEAS_LIST,
+     :           BOLWT(1,N_FILE), STATUS)
 
             CALL MSG_BLANK(STATUS)
 
@@ -436,7 +452,7 @@
 
                      CALL SURF_PSEUDO_RECURSE( RLEV, SNAME, 
      :                    MAX_FILE, OUT_COORDS, N_FILE, N_BOL, N_POS, 
-     :                    N_INTS, IN_UT1, IN_RA_CEN, 
+     :                    N_INTS, N_MEAS, IN_UT1, IN_RA_CEN, 
      :                    IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :                    SUB_INSTRUMENT, OBJECT, UTDATE, 
      :                    UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
@@ -444,7 +460,8 @@
      :                    BOL_DEC_END, DATA_PTR, DATA_END, 
      :                    VARIANCE_PTR, VARIANCE_END,
      :                    QMF, QUALITY_PTR, QUALITY_END, QBITS,
-     :                    INT_LIST, BOLWT, WEIGHT, SHIFT_DX, 
+     :                    ANG_INT, ANG_MEAS,
+     :                    INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, 
      :                    SHIFT_DY,  NPARS, PARS, 
      :                    STATUS)
 
@@ -475,14 +492,14 @@
 
 
       SUBROUTINE SURF_PSEUDO_RECURSE( RLEV, SNAME, MAX_FILE,
-     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
+     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS, N_MEAS,
      :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
-     :     INT_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
+     :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT, ANG_MEAS,
+     :     INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, SHIFT_DY,
      :     NPARS, PARS,
      :     STATUS)
 *+
@@ -525,6 +542,8 @@
       REAL             WAVELENGTH
 
 *  Arguments Returned:
+      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2)
+      REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
       REAL             BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC, 
      :     MAX_FILE)
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -541,9 +560,11 @@
       DOUBLE PRECISION IN_DEC_CEN(MAX_FILE)
       DOUBLE PRECISION IN_RA_CEN(MAX_FILE)
       DOUBLE PRECISION IN_UT1(MAX_FILE)
+      INTEGER          MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS + 1)
       INTEGER          N_BOL(MAX_FILE)
       INTEGER          N_FITS(MAX_FILE)
       INTEGER          N_INTS(MAX_FILE)
+      INTEGER          N_MEAS(MAX_FILE)
       INTEGER          N_POS(MAX_FILE)
       INTEGER          NPARS
       REAL             PARS(3) ! I know there are 3 parameters
@@ -568,15 +589,15 @@
 
       CALL SURF_RECURSE_READ( RLEV, SNAME, MAX_FILE,
      :     OUT_COORDS, N_FILE, N_BOL, N_POS, 
-     :     N_INTS, IN_UT1, IN_RA_CEN, 
+     :     N_INTS, N_MEAS, IN_UT1, IN_RA_CEN, 
      :     IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :     SUB_INSTRUMENT, OBJECT, UTDATE, 
      :     UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, 
      :     VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END, QBITS,
-     :     INT_LIST, BOLWT, WEIGHT, SHIFT_DX, 
+     :     QMF, QUALITY_PTR, QUALITY_END, QBITS, ANG_INT,
+     :     ANG_MEAS, INT_LIST, MEAS_LIST,BOLWT, WEIGHT, SHIFT_DX, 
      :     SHIFT_DY,  NPARS, PARS, 
      :     STATUS)
 
