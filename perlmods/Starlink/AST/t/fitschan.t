@@ -72,8 +72,7 @@ is( $fchan->Get( "Full" ), -1, "Changing output detail flag to -1" );
 
 # change encoding type
 $fchan->Set( Encoding => "NATIVE" );
-is( $fchan->Get( "Encoding" ), "NATIVE", 
-    "Changing type of the FitsChan object" );
+is($fchan->Get("Encoding"), "NATIVE", "Changing type of the FitsChan object");
     
 # Done!
 
