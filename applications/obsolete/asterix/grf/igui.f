@@ -93,11 +93,17 @@
         ENDIF
 
 *  unpack a structured GCB component
-      ELSEIF (ACTION.EQ.'STRUCT') THEN
+      ELSEIF (ACTION.EQ.'GETSTRUCT') THEN
 
         CALL USI_GET0C('VALUE',VALUE,STATUS)
         CALL CHR_UCASE(VALUE)
         CALL IGUI_GETSTRUCT(VALUE,STATUS)
+
+      ELSEIF (ACTION.EQ.'PUTSTRUCT') THEN
+
+        CALL USI_GET0C('VALUE',VALUE,STATUS)
+        CALL CHR_UCASE(VALUE)
+        CALL IGUI_PUTSTRUCT(VALUE,STATUS)
 
       ENDIF
 
@@ -537,6 +543,92 @@
             DO WHILE (FLAG.EQ.0)
               CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
             ENDDO
+
+            I=I+1
+
+          ENDDO
+
+        ELSEIF (NAME.EQ.'NOTE') THEN
+
+
+        ELSEIF (NAME.EQ.'MARKER') THEN
+
+
+        ELSEIF (NAME.EQ.'SHAPE') THEN
+
+
+        ENDIF
+
+
+      ENDIF
+
+      END
+
+
+
+
+*+  IGUI_PUTSTRUCT
+      SUBROUTINE IGUI_PUTSTRUCT(NAME,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*        rjv@star.sr.bham.ac.uk
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'PRM_PAR'
+*    Import :
+      CHARACTER*(*) NAME
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      CHARACTER TEXT*80,JUST*1
+      REAL SIZE
+      INTEGER FONT,BOLD,COLOUR
+      INTEGER I,N
+      INTEGER FLAG
+      LOGICAL OK
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (NAME.EQ.'TITLE') THEN
+
+          CALL IMG_NBGET0I('PAR_I1',N,STATUS)
+          CALL GCB_SETI('TITLE_N',N,STATUS)
+          I=1
+          DO WHILE (I.LE.N)
+            FLAG=-1
+            DO WHILE (FLAG.EQ.-1)
+              CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
+            ENDDO
+
+            CALL IMG_NBGET0C('PAR_C1',TEXT,STATUS)
+            CALL GCB_SET1C('TITLE_TEXT',I,1,TEXT,STATUS)
+
+            CALL IMG_NBGET0I('PAR_I2',FONT,STATUS)
+            CALL GCB_SET1I('TITLE_FONT',I,1,FONT,STATUS)
+
+            CALL IMG_NBGET0I('PAR_I3',BOLD,STATUS)
+            CALL GCB_SET1I('TITLE_BOLD',I,1,OK,BOLD,STATUS)
+
+            CALL IMG_NBGET0R('PAR_R1',SIZE,STATUS)
+            CALL GCB_SET1R('TITLE_SIZE',I,1,SIZE,STATUS)
+
+            CALL IMG_NBGET0I('PAR_I4',COLOUR,STATUS)
+            CALL GCB_SET1I('TITLE_COLOUR',I,1,COLOUR,STATUS)
+
+            CALL IMG_NBGET0C('PAR_C2',JUST,STATUS)
+            CALL GCB_SET1C('TITLE_JUST',I,1,JUST,STATUS)
+
+            CALL IMG_NBPUT0I('FLAG',-1,STATUS)
 
             I=I+1
 
