@@ -70,6 +70,8 @@
 *  History:
 *     27 Apr 1989 (DJA):
 *        Original version.
+*     21 Feb 1996 (DJA):
+*        Removed concatenation of input argument to build on Linux
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,7 +97,8 @@
       IF ( (STATUS.NE.PAR__NULL) .OR. (STATUS.NE.PAR__ABORT) ) THEN
 
 *      Tag the routine name on the end
-        CALL ERR_REP( ' ', '...from '//RTN, STATUS )
+        CALL MSG_SETC( 'R', RTN )
+        CALL ERR_REP( ' ', '...from ^R', STATUS )
 
       END IF
 
