@@ -277,9 +277,9 @@
 *  Note the original Current frame.
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
-*  Remove any existing POLANL Frame.
+*  Remove any existing POLANAL Frame.
       IF( AST_FINDFRAME( IWCS, AST_FRAME( NDIM, 'MINAXES=1, MAXAXES=20',
-     :                STATUS ), 'POLANL', STATUS ) .NE. AST__NULL ) THEN
+     :               STATUS ), 'POLANAL', STATUS ) .NE. AST__NULL ) THEN
 
          IPOLAN = AST_GETI( IWCS, 'CURRENT', STATUS )
          CALL AST_REMOVEFRAME( IWCS, AST__CURRENT, STATUS )
@@ -342,8 +342,8 @@
          IPIXEL = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Create the Frame describing analyser coordinates. Use the domain
-*  POLANL to identify it.
-         FRAME = AST_FRAME( NDIM, 'Domain=POLANL Title=Polpack '//
+*  POLANAL to identify it.
+         FRAME = AST_FRAME( NDIM, 'Domain=POLANAL, Title=Polpack '//
      :                      'analyser frame', STATUS )
 
 *  Now add the analyser Frame into the FrameSet, using the Mapping created
@@ -356,7 +356,7 @@
          END IF
 
 *  Store the new FrameSet back in the NDF.
-         CALL NDF_PTWCS( INDF, IWCS, STATUS )
+         CALL NDF_PTWCS( IWCS, INDF, STATUS )
 
       END IF
 

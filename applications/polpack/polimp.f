@@ -249,7 +249,7 @@
 *     -  Any existing values in the POLPACK extension are deleted before 
 *     processing the supplied control table.
 *     -  A new Frame is added to the NDF's WCS component and is given the
-*     Domain "POLANL". This Frame is formed by rotating the pixel coordinates 
+*     Domain "POLANAL". This Frame is formed by rotating the pixel coordinates 
 *     Frame so that the first axis is parallel to the analyser axis. The
 *     angle of rotation is given by the ANGROT item in the POLPACK extension
 *     and defaults to zero if ANGROT is not specified in the control table.
