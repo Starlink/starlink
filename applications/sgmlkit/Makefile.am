@@ -16,13 +16,9 @@ dist_texml_SCRIPTS = \
 	lib/texml/bin/texml.py
 dist_texml_DATA = \
 	lib/texml/bin/handler.py \
-	lib/texml/bin/handler.pyc \
 	lib/texml/bin/specmap.py \
-	lib/texml/bin/specmap.pyc \
 	lib/texml/bin/texmlwr.py \
-	lib/texml/bin/texmlwr.pyc \
-	lib/texml/bin/unimap.py \
-	lib/texml/bin/unimap.pyc
+	lib/texml/bin/unimap.py
 
 stardocs_DATA = @STAR_XML_DOCUMENTATION@
 
