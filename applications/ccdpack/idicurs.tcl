@@ -66,7 +66,23 @@
                       -maxpoints $MAXPOS \
                       -geometry ${WINX}x${WINY}
 
+#  Tinker with cosmetic aspects of the viewer.
       [ .viewer component exit ] configure -balloonstr "Finish adding points"
+
+#  Add a help control.
+      catch { unset helplines }
+      lappend helplines \
+         "Click with mouse button 1 (left) on the image to add a point" \
+         "Click with mouse button 3 (right) on the image to remove a point"
+      if { $SHOWIND } {
+         lappend helplines \
+         "" \
+         "Use the `Index' control to change the number of the next point marked"
+      }
+      lappend helplines \
+         "" \
+         "Click the `Done' button to finish marking points and end the program"
+      .viewer configure -helptext [ join $helplines "\n" ]
 
 #  Load the NDF into the widget.
       .viewer loadndf $ndf $MAXCANV

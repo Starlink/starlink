@@ -92,7 +92,7 @@
               " to an image."
       ccdputs "  "
 
-#  Allow selection of points for the reference NDF.
+#  Construct and tweak the viewer for the reference NDF.
       set refndf [ ndf $refndfname ]
       Ndfview .vref \
                   -title "$title: %n (reference)" \
@@ -103,8 +103,26 @@
                   -geometry ${WINX}x${WINY}
       [ .vref component exit ] configure \
          -balloonstr "Start marking points on other images"
+      catch { unset basichelp }
+      lappend basichelp \
+   "Use this viewer to mark objects on the image." \
+   "" \
+   "   Click with mouse button 1 (left) to add a point" \
+   "   Click with mouse button 3 (right) to remove a point" \
+   "   Use the Index control to change the number of the next point marked" \
+   ""
+      set helplines $basichelp
+      lappend helplines \
+   "When you press the `Done' button on the reference image window, you will" \
+   "be asked to mark the corresponding objects on an image from each of the" \
+   "other groups."
+      .vref configure -helptext [ join $helplines "\n" ]
+
+#  Load the reference NDF into the viewer.
       .vref loadndf $refndf $MAXCANV
       ccdputs -log "  Mark points on the reference image, [ $refndf name ]:"
+
+#  Get the user to pick points.
       .vref activate
       tkwait variable status$ref
       set npref [ llength [ .vref points ] ]
@@ -164,6 +182,25 @@
                  -maxpoints $MAXPOS \
                  -geometry $geometry
       [ .v component exit ] configure -balloonstr "Finish marking this image"
+
+#  Alter the help text somewhat to reflect the current state of play.
+      set helplines $basichelp
+      lappend helplines \
+   "For each of the images displayed, mark the same objects as have been" \
+   "indicated on the reference image.  You do not have to mark all the points" \
+   "on each image, but each object marked should have the same index number" \
+   "on every image on which you do mark it." \
+   "" \
+   "When you have finished marking points on each image, press the `Done'" \
+   "button, and you will be asked to move on to the next one." \
+   "" \
+   "The reference image will remain visible, and you can add points to it" \
+   "at any time."
+      .vref configure -helptext [ join $helplines "\n" ]
+
+#  Associate the help window of the new viewer with the help window of 
+#  the reference NDF's viewer's window.
+      [ .v component help ] configure -redirect [ .vref component help ]
 
 #  Create a warning dialog, which may be used if the user fails to select
 #  any points on one of the NDFs.

@@ -338,8 +338,8 @@
                                          [ lindex $percentiles 1 ] ]
 
 #  Display the NDF into the GWM item.
-         set options {labelling=interior border=1 \
-                      colour=3 colour(numlab)=1 colour(border)=4}
+         set options {border=1 drawtitle=0 textlab=0 tickall=1 \
+                      colour=3 colour(numlab)=5 colour(border)=4}
          lappend options $displaystyle
          $ndf display "[ gwmname ]/GWM" \
                       [ lindex $scalevals 0 ] [ lindex $scalevals 1 ] \

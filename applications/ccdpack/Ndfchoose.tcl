@@ -177,6 +177,12 @@
                -state disabled \
                -balloonstr "Do alignment on this pair"
          }
+         itk_component add help {
+            helpcontrol $panel.help
+         } {
+            usual
+            keep -helptext
+         }
          itk_component add done {
             buttoncontrol $panel.done \
                -text "Exit" \
@@ -188,6 +194,7 @@
          addcontrol $itk_component(dstyle) style
          addcontrol $itk_component(showfits) style
          addcontrol $itk_component(gotpair) action
+         addcontrol $itk_component(help) action
          addcontrol $itk_component(done) action
 
 #  Construct the choosing area.  This is the business end of the widget
@@ -836,6 +843,7 @@
             }
             eval $itk_component(fits_listbox) insert end $allfits
             pack $itk_component(fits_listbox) -fill x
+            $itk_component(fits_dialog) center $itk_component(showfits)
          }
 
 #  Set the selections correctly.

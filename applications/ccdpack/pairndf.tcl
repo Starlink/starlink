@@ -96,7 +96,7 @@
       wm withdraw $aligner
       $aligner configure \
                          -title "PAIRNDF: %An -- %Bn" \
-                         -info "%n" \
+                         -info "%n (frame %f)" \
                          -watchstatus alignstatus \
                          -zoom $ZOOM \
                          -uselabels 0 \
@@ -104,6 +104,42 @@
                          -geometry ${WINX}x${WINY} \
 
       [ $aligner component exit ] configure -balloonstr "Use this alignment"
+
+#  Set help text for the aligner widget.
+      catch { unset helplines }
+      lappend helplines \
+   "Use this widget to align two images by positioning one over the other." \
+   "" \
+   "The images displayed are the ones selected in the chooser widget," \
+   "resampled into their Current coordinate frames.  If the images shown here" \
+   "are not related by a simple offset (translation), you will have to" \
+   "quit the application and set the Current coordinate system of all the" \
+   "images so that they are related by translation." \
+   "" \
+   "To make the alignment, do the following:" \
+   "" \
+   "   Grab one of the images by holding down the mouse button on a" \
+   "   recognisable feature, drag it to the same feature on the other image," \
+   "   and release the mouse button.  The picture will then be redrawn with" \
+   "   the overlap region averaged between the two." \
+   "   It should be clear by looking whether the two are well aligned;" \
+   "   if they are not, you can make a small adjustment, or drag them apart" \
+   "   and try again.  To do this you will have to grab one by a part which" \
+   "   is not overlapping the other." \
+   "   Note that the alignment does not have to be perfect, since marked" \
+   "   objects will be centroided to provide an accurate alignment during the" \
+   "   next stage." \
+   "" \
+   "   When you are happy with the alignment, click with the (left) mouse" \
+   "   button on the overlapping region to mark centroidable features." \
+   "   If you mark any in error, they can be removed by clicking on them" \
+   "   with the right mouse button." \
+   "" \
+   "   When you are happy with the features that you have marked, click the" \
+   "   `Done' button.  The marked features will then be centroided in both" \
+   "   the images to provide an accurate alignment." \
+   "   You will then be returned to the chooser widget to select another pair."
+      $aligner configure -helptext [ join $helplines "\n" ]
 
 #  Set the pair selection criterion.
       set choosestatus ""
@@ -181,6 +217,34 @@
          $aligndialog center $aligner
          return [ $aligndialog activate ]
       }
+
+#  Set up help text for the chooser widget.
+      catch { unset helplines }
+      lappend helplines \
+   "Use this window to select a pair of images with some area in common." \
+   "" \
+   "Select one image on each side by clicking on the tab with the right name." \
+   "When this is done, the image will be displayed in the upper part of" \
+   "the window on that side, and some information about it in the lower part." \
+   "" \
+   "You can change the style of image display using the `Grid' button, and " \
+   "select FITS headers to be shown below using the `FITS' button." \
+   "If you resize the window, the displayed images will grow or shrink to fit."\
+   "" \
+   "You can individually change the brightness of each displayed image by" \
+   "using the `Display cutoff' control in its information panel." \
+   "To make alignment easier, it is a good idea to adjust the images all to" \
+   "have about the same brightness." \
+   "" \
+   "When you have selected a pair which overlap, click the `Use this pair'" \
+   "button, and you will be asked to align the two images.  Apart from the" \
+   "first time, you will only be allowed to select a pair for alignment if" \
+   "at least one of them has already been aligned.  Images which have already" \
+   "been aligned are marked with a `+' symbol on their selection tabs." \
+   "" \
+   "When all of the images have been aligned in pairs, the program will" \
+   "automatically move to the next stage, and mutually register them all."
+      $chooser configure -helptext [ join $helplines "\n" ]
 
 #  Loop until all the NDFs have been paired.
       while { [ array size Done ] < $nndf } {

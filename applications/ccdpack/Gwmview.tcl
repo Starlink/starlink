@@ -271,14 +271,18 @@ class Gwmview {
                -cmd [ code $this deactivate ] \
                -balloonstr "Finish with this window"
          }
-      #  itk_component add colour {
-      #     button $itk_component(panel).colour \
-      #        -text "Colours" -command "$this docolours"
-      #  }
+         itk_component add help {
+            helpcontrol $panel.help
+         } {
+            usual
+            keep -helptext
+         }
+
 
 #  Add control widgets to the control panel.
          addcontrol $itk_component(zoom) zoom
          addcontrol $itk_component(marknum) marknum
+         addcontrol $itk_component(help) action
          addcontrol $itk_component(exit) action
 
 #  Add the frame to hold the actual GWM viewing window.
