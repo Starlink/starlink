@@ -100,6 +100,12 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     initialise pointers
+      WK_END = 0
+      WK_PTR = 0
+      IWK_PTR = 0
+      IWK_END = 0
+
 *     Allocate the scratch memory
 
       ITEMP = MAX(31, 27 + NCP)
@@ -116,30 +122,34 @@
 
       MODE = 1
 
-      CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN,
-     :     1,1, X_IN(1), Y_IN(1), RTEMP, %VAL(IWK_PTR), %VAL(WK_PTR), 
-     :     ISTAT, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
 
-      IF (STATUS .NE. SAI__OK .OR. ISTAT .NE. 0) THEN
-         CALL MSG_SETI('ISTAT', ISTAT)
-         CALL ERR_REP(' ', 'SPLINE_PDA_IDSFFT: Spline setup failed '//
-     :        'with ISTAT = ^ISTAT', STATUS)
-      END IF
+         CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN,
+     :        1,1, X_IN(1), Y_IN(1), RTEMP, %VAL(IWK_PTR), %VAL(WK_PTR), 
+     :        ISTAT, STATUS)
+
+         IF (STATUS .NE. SAI__OK .OR. ISTAT .NE. 0) THEN
+            CALL MSG_SETI('ISTAT', ISTAT)
+            CALL ERR_REP(' ', 'SPLINE_PDA_IDSFFT: Spline setup '//
+     :           'failed with ISTAT = ^ISTAT', STATUS)
+         ELSE
 
 *     Now that the spline has been calculated retrieve all the data
 *     for the output grid using MODE 2.
 
-      MODE = 2
-      DATA_OFFSET = 1
+            MODE = 2
+            DATA_OFFSET = 1
 
-      CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NX_OUT,
-     :     NY_OUT, X_OUT, Y_OUT, DATA_OUT, %VAL(IWK_PTR), %VAL(WK_PTR),
-     :     ISTAT, STATUS)
+            CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NX_OUT,
+     :           NY_OUT, X_OUT, Y_OUT, DATA_OUT, %VAL(IWK_PTR), 
+     :           %VAL(WK_PTR), ISTAT, STATUS)
 
-      IF (ISTAT .NE. 0 .OR. STATUS .NE. SAI__OK) THEN
-         CALL MSG_SETI('ISTAT', ISTAT)
-         CALL ERR_REP(' ','SPLINE_PDA_IDSFFT: Spline interpolation'//
-     :        ' failed with ISTAT = ^ISTAT', STATUS)
+            IF (ISTAT .NE. 0 .OR. STATUS .NE. SAI__OK) THEN
+               CALL MSG_SETI('ISTAT', ISTAT)
+               CALL ERR_REP(' ','SPLINE_PDA_IDSFFT: Spline '//
+     :              'interpolation failed with ISTAT = ^ISTAT', STATUS)
+            END IF
+         END IF
       END IF
 
 *     Tidy up memory
