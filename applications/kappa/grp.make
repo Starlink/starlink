@@ -284,7 +284,8 @@ ramps_lut.sdf.alpha_OSF1 spectrum_lut.sdf.alpha_OSF1 zebra_lut.sdf.alpha_OSF1 \
 ccdframec.sdf.alpha_OSF1 comwest.sdf.alpha_OSF1 spectrum.sdf.alpha_OSF1 \
 m31.sdf.alpha_OSF1 iras.sdf.alpha_OSF1 grey_lut.sdf.alpha_OSF1 \
 m31_issa_100.sdf.alpha_OSF1 m31_issa_12.sdf.alpha_OSF1 \
-m31_issa_25.sdf.alpha_OSF1 m31_issa_60.sdf.alpha_OSF1 m57.sdf.alpha_OSF1
+m31_issa_25.sdf.alpha_OSF1 m31_issa_60.sdf.alpha_OSF1 m57.sdf.alpha_OSF1 \
+logo.sdf logo_lut.sdf
 
 # The contents of the kappa_data_ix86_Linux.tar file:
 KAPPA_DATA_IX86_LINUX = bgyrw_lut.sdf.ix86_Linux ccdframec.sdf.ix86_Linux \
@@ -293,7 +294,8 @@ heat_lut.sdf.ix86_Linux ikon_lut.sdf.ix86_Linux ramps_lut.sdf.ix86_Linux \
 spectrum.sdf.ix86_Linux spectrum_lut.sdf.ix86_Linux zebra_lut.sdf.ix86_Linux \
 m31.sdf.ix86_Linux iras.sdf.ix86_Linux grey_lut.sdf.ix86_Linux \
 m31_issa_100.sdf.ix86_Linux m31_issa_12.sdf.ix86_Linux \
-m31_issa_25.sdf.ix86_Linux m31_issa_60.sdf.ix86_Linux  m57.sdf.ix86_Linux
+m31_issa_25.sdf.ix86_Linux m31_issa_60.sdf.ix86_Linux  m57.sdf.ix86_Linux \
+logo.sdf logo_lut.sdf
 
 # The contents of the kappa_data_sun4_Solaris.tar file:
 KAPPA_DATA_SUN4_SOLARIS = bgyrw_lut.sdf.sun4_Solaris \
@@ -303,7 +305,8 @@ ramps_lut.sdf.sun4_Solaris spectrum.sdf.sun4_Solaris \
 spectrum_lut.sdf.sun4_Solaris zebra_lut.sdf.sun4_Solaris \
 m31.sdf.sun4_Solaris iras.sdf.sun4_Solaris grey_lut.sdf.sun4_Solaris \
 m31_issa_100.sdf.sun4_Solaris m31_issa_12.sdf.sun4_Solaris \
-m31_issa_25.sdf.sun4_Solaris m31_issa_60.sdf.sun4_Solaris m57.sdf.sun4_Solaris
+m31_issa_25.sdf.sun4_Solaris m31_issa_60.sdf.sun4_Solaris m57.sdf.sun4_Solaris \
+logo.sdf logo_lut.sdf
 
 # The contents of the kappa_ifls.tar file:
 KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl \
