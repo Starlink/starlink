@@ -127,6 +127,7 @@
       REAL VAL					! Current parameter value
 
       INTEGER BEG                               ! Start of a pmodel name
+      INTEGER			FID			! Model spec id
       INTEGER LSTR				! Length of cmodel spec string
       INTEGER NLB,NRB				! No of left & right brackets
       INTEGER NCIMP				! No of pmodels supported
