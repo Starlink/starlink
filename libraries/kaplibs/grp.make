@@ -226,7 +226,7 @@ irq_annul.f irq_chkqn.f irq_close.f irq_cntq.f irq_comp.f \
 irq_find.f irq_getqn.f irq_new.f irq_numqn.f irq_nxtqn.f \
 irq_remqn.f irq_resql.f irq_resqm.f irq_resq.f \
 irq_rlse.f irq_setqm.f irq_setql.f irq_setq.f irq_syntx.f \
-irq_test.f
+irq_getqx.f
 
 # The contents of the irq_source.tar file (including expanded generic
 # files and the generic source files):

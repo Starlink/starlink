@@ -531,7 +531,7 @@ irq1_simpl.f irq1_sorti.f irq1_space.f irq1_temp.f irq1_vtofx.f \
 irq_addqn.f irq_annul.f irq_chkqn.f irq_close.f irq_cntq.f irq_comp.f \
 irq_find.f irq_getqn.f irq_new.f irq_numqn.f irq_nxtqn.f irq_remqn.f \
 irq_resq.f irq_resql.f irq_resqm.f irq_rlse.f irq_setq.f \
-irq_setql.f irq_setqm.f irq_syntx.f
+irq_setql.f irq_setqm.f irq_syntx.f irq_getqx.f
 
 KPG_F_ROUTINES = bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
 bad2duw.f bad2dw.f bttn3.f chvalb.f chvali.f chvall.f chvalr.f \
