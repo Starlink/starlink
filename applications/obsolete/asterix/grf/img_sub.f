@@ -4239,7 +4239,7 @@ c        REAL XX,XP,YP
       LOGICAL IMG_INBOUNDS
 *    Local variables :
       REAL DISP
-      REAL ALPHA
+      REAL ALPHA,THETA
       REAL RAD
       REAL XP,YP,XPC,YPC,AP,BP
 *-
