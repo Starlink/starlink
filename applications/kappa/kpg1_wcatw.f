@@ -53,6 +53,9 @@
 *        Safety margin of 2 characters removed from ASTTSZ to avoid CAT 
 *        splitting lines itself, resulting in lines which do not start
 *        with "!!".
+*     6-APR-2001 (DSB):
+*        Limit max length of a line of text to no more than the size of a
+*        GRP element.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,8 +127,10 @@
      :                    STATUS )
 
 *  Get the maximum length of text string which can be written to a
-*  COMMENT in the catalogue. Store this value in common.
+*  COMMENT in the catalogue. Store this value in common. Limit it to be
+*  no more than the size of a GRP element.
       CALL CAT_SZTXT( CI, 'WRITE', ASTTSZ, STATUS )
+      ASTTSZ = MIN( ASTTSZ, GRP__SZNAM )
 
 *  Reduce it by 4 to leave room for the "!!" string used to mark the 
 *  start of the AST information, plus an extra safety margin

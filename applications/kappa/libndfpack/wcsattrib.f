@@ -40,6 +40,16 @@
 *     -  set a new value for an attribute.
 *     -  clear an attribute value.
 *     -  test the state of an attribute.
+*
+*     Note, the attributes of the PIXEL, GRID and AXIS Frames are managed
+*     internally by the NDF library. They may be examined using this
+*     application, but an error is reported if any attempt is made to 
+*     change them. The exception to this is that the DOMAIN attribute may
+*     be changed, resulting in a copy of the Frame being added to the WCS 
+*     compnent of the NDF with the new Domain name. The AXIS Frame is 
+*     derived from the AXIS structures within the NDF, so the AXLABEL 
+*     and AXUNITS commands may be used to change the axis label or units 
+*     string for the AXIS Frame.
 
 *  Usage:
 *     wcsattrib ndf mode name newval
@@ -59,7 +69,7 @@
 *        default value will be displayed.
 *
 *        - "Set" -- Assigns a new value, given by parameter NEWVAL, to the 
-*        attribute.
+*        attribute. 
 *
 *        - "Test" -- Displays "TRUE" if the attribute has been assigned a
 *        value, and "FALSE" otherwise (in which case the attribute will
@@ -67,7 +77,7 @@
 *        parameter STATE.
 *
 *        - "Clear" -- Clears the current attribute value, causing it to
-*        revert to its default value.
+*        revert to its default value. 
 *
 *     NEWVAL = LITERAL (Read)
 *        The new value to assign to the attribute.
@@ -113,9 +123,12 @@
 *  Notes:
 *     -  An error is reported if an attempt is made to set or clear the 
 *     Base Frame in the WCS component.
+*     -  The Domain names GRID, AXIS and PIXEL are reserved for use by
+*     the NDF library and an error will be reported if an attempt is made 
+*     to assign one of these values to any Frame.
 
 *  Related Applications:
-*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD
+*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXLABEL, AXUNITS
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -124,6 +137,8 @@
 *  History:
 *     2-OCT-1998 (DSB):
 *        Original version.
+*     6-APR-2001 (DSB):
+*        Do not allow the PIXEL, GRID or AXIS Frames to be changed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -146,6 +161,7 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
+      CHARACTER DOM*30           ! Domain name
       CHARACTER MODE*5           ! Required operation
       CHARACTER NAME*30          ! Attribute name
       CHARACTER NEWVAL*255       ! New attribute value
@@ -153,7 +169,12 @@
       INTEGER INDF               ! NDF identifier for NDF being modified
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER LVAL               ! Length of original value
+      LOGICAL RDONLY             ! Prevent changes to attribute values?
       LOGICAL STATE              ! State of the attribute on entry
+
+*  Local Functions:
+      RDONLY( DOM ) = ( DOM .EQ. 'GRID' .OR. DOM .EQ. 'PIXEL' .OR. 
+     :                  DOM .EQ. 'AXIS' ) 
 *.
 
 *  Check the inherited global status.
@@ -180,6 +201,9 @@
       CALL CHR_RMBLK( NAME )
       CALL CHR_UCASE( NAME )
 
+*  Get the Domain of the current Frame.
+      DOM = AST_GETC( IWCS, 'DOMAIN', STATUS )
+
 *  Get the current state of the attribute and assign it to the output
 *  parameter STATE.
       STATE = AST_TEST( IWCS, NAME, STATUS )
@@ -204,9 +228,40 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'WCSATTRIB_ERR1', 'Cannot change the Base '//
      :                    'attribute of the WCS FrameSet.', STATUS )
+
+*  If the current Frame is one of the Frames managed internally by the
+*  NDF library, then no changes can be made to the Frame, except to
+*  change the Domain name.
+         ELSE IF( RDONLY( DOM ) .AND. NAME .NE. 'DOMAIN' .AND.
+     :            STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL CHR_LCASE( NAME )
+            CALL CHR_UCASE( NAME( 1 : 1 ) )
+            CALL MSG_SETC( 'N', NAME )
+            CALL MSG_SETC( 'D', DOM )
+            CALL ERR_REP( 'WCSATTRIB_ERR2', 'The ^N attribute of the '//
+     :                    '^D Frame cannot be changed.', STATUS )
+
+*  Get the new attribute value, using the old value as the default.
          ELSE  
             CALL PAR_DEF0C( 'NEWVAL', VALUE( : LVAL ), STATUS )
             CALL PAR_GET0C( 'NEWVAL', NEWVAL, STATUS )
+
+*  The Domain attribute may not be set to any of the names of read-only
+*  Frames.
+            IF( NAME .EQ. 'DOMAIN' .AND. STATUS .EQ. SAI__OK ) THEN
+               CALL CHR_UCASE( NEWVAL )
+
+               IF( RDONLY( NEWVAL ) .AND. NEWVAL .NE. VALUE ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC( 'D', NEWVAL )
+                  CALL ERR_REP( 'WCSATTRIB_ERR3', 'Illegal Domain '//
+     :                          'value ''^D'' supplied. The ^D domain'//
+     :                          ' is reserved for use by the NDF '//
+     :                          'library.', STATUS )
+               END IF
+            END IF
+
             CALL AST_SETC( IWCS, NAME, 
      :                     NEWVAL( : MAX( 1, CHR_LEN( NEWVAL ) ) ), 
      :                     STATUS )
@@ -221,8 +276,21 @@
       ELSE
          IF( NAME .EQ. 'BASE' .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'WCSATTRIB_ERR2', 'Cannot clear the Base '//
+            CALL ERR_REP( 'WCSATTRIB_ERR4', 'Cannot clear the Base '//
      :                    'attribute of the WCS FrameSet.', STATUS )
+
+*  If the current Frame is one of the Frames managed internally by the
+*  NDF library, then no attributes can be cleared.
+         ELSE IF( RDONLY( DOM ) .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL CHR_LCASE( NAME )
+            CALL CHR_UCASE( NAME( 1 : 1 ) )
+            CALL MSG_SETC( 'N', NAME )
+            CALL MSG_SETC( 'D', DOM )
+            CALL ERR_REP( 'WCSATTRIB_ERR5', 'The ^N attribute of the '//
+     :                    '^D Frame cannot be cleared.', STATUS )
+
+*  Clear the attribute.
          ELSE  
             CALL AST_CLEAR( IWCS, NAME, STATUS )
          END IF
@@ -240,7 +308,7 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'WCSATTRIB_ERR2', 'WCSATTRIB: Failed to get, '//
+         CALL ERR_REP( 'WCSATTRIB_ERR', 'WCSATTRIB: Failed to get, '//
      :                 'set, test or clear an attribute of an NDF '//
      :                 'WCS component.', STATUS )
       END IF

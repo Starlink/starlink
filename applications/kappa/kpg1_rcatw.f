@@ -42,6 +42,9 @@
 *     8-DEC-1999 (DSB):
 *        Put in hack to allow for CAT changing WCS text class from
 *        COMMENT to AST.
+*     6-APR-2001 (DSB):
+*        Limit max length of a line of text to no more than the size of a
+*        GRP element.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -181,6 +184,11 @@
          END IF
 
       END DO
+
+*  The length to read from each line should not exceed the length of a
+*  GRP element. STL catalogues have a maximum of 1500 characters per line 
+*  of textual information.
+      ASTTSZ = MIN( ASTTSZ, GRP__SZNAM )
 
 *  Now read an AST Object from the text in the GRP group.
 *  ======================================================
