@@ -96,7 +96,6 @@
       INTEGER                L1,L2,L3,L4        ! lengths of char strings
       INTEGER			IFID, OFID		!
 
-      LOGICAL                INPRIM             ! Input is primitive?
       LOGICAL                OK
       LOGICAL                SCALAR_QUAN        ! Is QUANTUM scalar?
       LOGICAL                ANNTYPE            ! annulur or circular aperture?
