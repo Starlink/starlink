@@ -20,12 +20,12 @@
 *        The global status.
 
 *  Description:
-*     This application converts a sequential unformatted file to an
-*     NDF.  Only one of the array components may be created from the
-*     input file.  Preceding the input data there may be an optional
-*     header.  This header may be skipped, or may consist of a simple
-*     FITS header.  In the former case the shape of the NDF has be to
-*     be supplied.
+*     This application converts a sequential unformatted Fortran file
+*     to an NDF.  Only one of the array components may be created from
+*     the input file.  Preceding the input data there may be an
+*     optional header.  This header may be skipped, or may consist of a
+*     simple FITS header.  In the former case the shape of the NDF has
+*     be to be supplied.
 
 *  Usage:
 *     unf2ndf in out [comp] noperec [skip] shape [type]
@@ -49,8 +49,9 @@
 *        header.  On VMS platforms a default file extension of ".DAT"
 *        is appended when parameter IN contains no file extension.
 *     NOPEREC = _INTEGER (Read)
-*        The number of data values per record of the input file.
-*        It should be in the range 1 to 16383.  The suggested default
+*        The number of data values per record of the input file.  On
+*        VAX systems it should be in the range 1 to 16383; but need
+*        only be positive on UNIX systems.  The suggested default
 *        is the size of the first dimension of the array if there is
 *        no current value.  A null (!) value for NOPEREC causes the
 *        size of first dimension to be used.
@@ -232,6 +233,7 @@
                                  ! section of the sub-file in the full
                                  ! header
       INTEGER I                  ! Loop counter
+      CHARACTER MACHIN * ( 24 )  ! Machine name
       INTEGER NCARD              ! Number of cards in the FITS-like
                                  ! header
       INTEGER NDF                ! Identifier for NDF
@@ -239,6 +241,7 @@
       INTEGER NHEADS             ! Number of header sections in the
                                  ! FITS-like header and including the
                                  ! dummy header section
+      CHARACTER NODE * ( 20 )    ! Node name
       LOGICAL NONSDA             ! True if there is a non-standard data
                                  ! array in the FITS-like file
       INTEGER NUMPRE             ! Number of data values per record
@@ -246,9 +249,9 @@
       INTEGER ONDIM              ! The dimensionality of the existing
                                  ! NDF
       INTEGER PNTR( 1 )          ! Pointer to NDF mapped array
-      INTEGER RECL               ! Maximum recordlength of input file
-                                 ! in bytes
+      CHARACTER RELEAS * ( 10 )  ! Release of operating system
       INTEGER SKIP               ! Number of header records to skip
+      CHARACTER SYSNAM * ( 10 )  ! Operating system
       CHARACTER * ( DAT__SZLOC ) TLOC ! Locator to workspace holding the
                                  ! FITS-like headers
       CHARACTER * ( NDF__SZTYP ) TYPE ! Data type for processing
@@ -256,6 +259,8 @@
       LOGICAL UPDATE             ! True if an NDF is to be modified
       LOGICAL VALID              ! True if it is valid to insert the new
                                  ! array into an existing NDF
+      CHARACTER VERSIO * ( 10 )  ! Sub-version of operating system
+      LOGICAL VMS                ! True if running on a VAX/VMS system
 
 *.
 
@@ -266,7 +271,7 @@
 *  =====================================
 
 *  Open the FORTRAN file.
-      CALL FIO_ASSOC( 'IN', 'READ', 'UNFORMATTED', RECL, FD, STATUS )
+      CALL FIO_ASSOC( 'IN', 'READ', 'UNFORMATTED', 0, FD, STATUS )
 
 *  See how to handle a header.
 *  ===========================
@@ -443,10 +448,23 @@
       IF ( COMP .EQ. 'VARIANCE' )
      :  CALL NDF_STYPE( TYPE, NDF, COMP, STATUS )
 
+*  Determine whether or not the operating system is VMS.
+*  =====================================================
+*
+*  This assumes that the system is either VMS or UNIX.  It is needed
+*  to specify the path of the file containing the global parameters.
+      CALL PSX_UNAME( SYSNAM, NODE, RELEAS, VERSIO, MACHIN, STATUS )
+      VMS = INDEX( SYSNAM, 'VMS' ) .NE. 0
+
 *  Obtain the number of values per record.
 *  =======================================
-      CALL PAR_GDR0I( 'NOPEREC', MIN( 16383, DIMS( 1 ) ), 1, 16383,
-     :                .TRUE., NUMPRE, STATUS )
+      IF ( VMS ) THEN
+         CALL PAR_GDR0I( 'NOPEREC', MIN( 16383, DIMS( 1 ) ), 1, 16383,
+     :                   .TRUE., NUMPRE, STATUS )
+      ELSE
+         CALL PAR_GDR0I( 'NOPEREC', DIMS( 1 ), 1, VAL__MAXI,
+     :                   .TRUE., NUMPRE, STATUS )
+      END IF
 
 *  Process the input array.
 *  ========================

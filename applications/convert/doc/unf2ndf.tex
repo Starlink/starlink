@@ -5,7 +5,7 @@
    Converts a sequential unformatted file to an NDF
 }{
    \sstdescription{
-      This application converts a sequential unformatted file to an
+      This application converts a sequential unformatted Fortran file to an
       NDF.  Only one of the array components may be created from the
       input file.  Preceding the input data there may be an optional
       header.  This header may be skipped, or may consist of a simple
@@ -45,8 +45,9 @@
       \sstsubsection{
          NOPEREC = \_INTEGER (Read)
       }{
-         The number of data values per record of the input file.
-         It should be in the range 1 to 16383.  The suggested default
+         The number of data values per record of the input file.  On
+         VMS systems it should be in the range 1 to 16383; but need
+         only be positive on UNIX systems.  The suggested default
          is the size of the first dimension of the array if there is
          no current value.  A null ({\tt !}) value for NOPEREC causes the
          size of first dimension to be used.
