@@ -30,6 +30,9 @@
 *  History:
 *     21-DEC-1999 (DSB):
 *        Original version.
+*     22-AUG-2000 (DSB):
+*        Fixed bug which caused long file names exceeded DAT__SZNAM
+*        characters to be used as HDS object names, resulting in an error.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,10 +103,12 @@
 
 *  If no such file exists, annul the error and create it. Its name is the
 *  same as the base name of the file, and its type is set to NDG__STRUC.
-*  It is created as a scalar.
+*  It is created as a scalar. Ensure the HDS object name does not exceed
+*  the maximum allowed number of characters.
          IF( STATUS .EQ. DAT__FILNF ) THEN
             CALL ERR_ANNUL( STATUS )
-            CALL HDS_NEW( FILE, BN, NDG__STRUC, 0, 0, LOC, STATUS )
+            CALL HDS_NEW( FILE, BN( :MIN( DAT__SZNAM, CHR_LEN( BN ) ) ), 
+      :                   NDG__STRUC, 0, 0, LOC, STATUS )
          END IF
 
 *  Get a clone of this locator.
