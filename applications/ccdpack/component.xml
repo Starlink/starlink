@@ -28,7 +28,7 @@
     </p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tclsys</build><build>startcl</build>
+    <build>parsecon</build><build>dtask</build><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build>
   </dependencies>
   <developers>
     <person>
