@@ -9,7 +9,7 @@
 # example, this may be appropriate for APPLIC_DEPENDS) it be done in the
 # .applTop/config/CONFIG file.
 
-APPLIC_INSTALL     =/home/npr/cgs4dr
+APPLIC_INSTALL     =/export/cgs4/pnd/cgs4dr
 APPLIC_VERSION     =.
 APPLIC_SUBDIR_FILE =Makefile.Dirs
 APPLIC_PWD_CMD     =pwd
