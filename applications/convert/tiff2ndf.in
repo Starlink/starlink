@@ -1,0 +1,143 @@
+
+#  The line above is intentionally blank
+#+
+#  Name:
+#     tiff2ndf
+ 
+#  Purpose:
+#     Converts a TIFF file into an NDF.
+ 
+#  Type of Module:
+#     Bourne shell script
+ 
+#   Usage:
+#     tiff2ndf in [out]
+
+#  Parameters:
+#     IN = FILENAME (Read)
+#        The name of the TIFF file to be converted (without the .tif 
+#        extension, which is assumed).
+#     OUT = NDF (Write)
+#        The name of the NDF to be generated (without the .sdf extension).
+#        If the OUT parameter is omitted, the value of the IN parameter
+#        is used.
+ 
+#  Description:
+#      This Bourne shell script converts a 256 grey-level or
+#      black-and-white dithered Tag Image File Format (TIFF) into a
+#      Starlink NDF file.  One or two-dimensional images can be handled.
+#      The script uses various PBMPLUS utilities to produce a FITS file 
+#      and then KAPPA applications FITSDIN, MATHS and FLIP to produce
+#      the final NDF.  Error messages are converted into Starlink style
+#      (preceded by !).
+ 
+#  Examples:
+#     tiff2ndf old new
+#        This converts the TIFF file old.tif into an NDF called old 
+#        (in file old.sdf).
+#     tiff2ndf horse
+#        This converts the TIFF file horse.tif into an NDF called horse
+#        (in file horse.sdf).
+
+#  Notes:
+#     -  This initial version of the script handles only greyscale
+#     or b/w dithered images.  You are responsible for conversion of
+#     your images to this format prior to use.  This ensures that the
+#     user is responsible for converting RGB values to brightness values.
+#
+#     -  Input image file names must have the extension .tif.
+#
+#     -  The PBMPLUS utilities tifftopnm, ppmtopgm and pgmtofits must 
+#     be available on your PATH.
+ 
+#  Related Applications:
+#     CONVERT: NDF2TIFF
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     GJP: G.J. Privett (Starlink - UWCC)
+#     AJC: A.J. Chipperfield (Starlink - RAL)
+#     {enter_new_authors_here}
+ 
+#  History:
+#     1995 March 3 (MJC):
+#        Original version (GIFs).
+#     1995 November 2 (GJP):
+#        Converted to TIFF requirements from GIF.
+#     1995 November 13 (AJC):
+#        Added fileout parameter, and error reporting and exit at each
+#        stage.  Use long temporary filenames.
+ 
+#  Bugs:
+#     At the time of writing, this utility does not work on alpha OSF/1
+#     due to a problem with tifftopnm in the standard release of 
+#     PBMPLUS.  OSF/1 users should use a copy of tifftopnm obtained from 
+#     Netpbm which is based on PBMPLUS but contains many improvements and
+#     additions.  A suitable version may be obtained via WWW at
+#     http://www.astro.cf.ac.uk/pub/Grant.Privett/.  Alternatively,
+#     contact Grant Privett, gjp@astronomy.cardiff.ac.uk.
+#     {note_further_bugs_here}
+ 
+#-
+
+# Find the required output filename
+out=${2:-$1}
+name=`basename $1`
+
+# Convert the image removing temporary files at each stage.
+
+# Convert image from TIFF format to FITS.
+tifftopnm $1.tif 2> convert_err1_$name.lis | \
+ppmtopgm 2> convert_err2_$name.lis | \
+pgmtofits 2> convert_err3_$name.lis > convert_temp_$name.fit || \
+  { sed 's/^/!  TIFF2NDF:/' convert_err?_$name.lis 1>&2
+    rm -f convert_err?_$name.lis convert_temp_$name.fit
+    exit 1
+  }
+  rm -f convert_err?_$name.lis
+ 
+# Convert image to an NDF. 
+$KAPPA_DIR/fitsdin files=convert_temp_$name.fit out=convert_temp_$name fmtcnv \
+  </dev/null  2>&1 | \
+  sed 's/^\!\!/\! /' | \
+  awk \
+'BEGIN{err=0}\
+/^\!/{if(err==0){err=1;print "!! TIFF2NDF: Error reports from KAPPA:FITSDIN"}};\
+{print}\
+END{if(err==1){exit 1}}' || \
+  (rm -f convert_temp_$name.fit
+   echo "!  TIFF2NDF: Abandoned at FITSDIN"
+   exit 1
+  ) || exit 1
+  rm -f convert_temp_$name.fit
+ 
+# Convert image values to 8 bits.
+$KAPPA_DIR/maths exp="ia+max(0,-sign(255,IA))" ia=convert_temp_$name \
+  out=convert_temp_u$name \
+  </dev/null  2>&1 | \
+  sed 's/^\!\!/\! /' | \
+  awk \
+'BEGIN{err=0}\
+/^\!/{if(err==0){err=1;print "!! TIFF2NDF: Error reports from KAPPA:MATHS"}};\
+{print}\
+END{if(err==1){exit 1}}' || \
+  (rm -f convert_temp_$name.sdf
+   echo "!  TIFF2NDF: Abandoned at MATHS"
+   exit 1
+  ) || exit 1
+  rm -f convert_temp_$name.sdf 
+ 
+# Invert the image.
+$KAPPA_DIR/flip in=convert_temp_u$name out=$out dim=2
+  </dev/null  2>&1 | \
+  sed 's/^\!\!/\! /' | \
+  awk \
+'BEGIN{err=0}\
+/^\!/{if(err==0){err=1;print "!! TIFF2NDF: Error reports from KAPPA:FLIP"}};\
+{print}\
+END{if(err==1){exit 1}}' || \
+  (rm -f convert_temp_u$name.sdf
+   echo "!  TIFF2NDF: Abandoned at FLIP"
+   exit 1
+  ) || exit 1
+  rm -f convert_temp_u$name.sdf 
