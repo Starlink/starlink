@@ -1,4 +1,6 @@
 core.*
+figaro.csh
+figaro.icl
 sun86.ps
 version.dat
 *.ifc
