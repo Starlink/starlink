@@ -68,11 +68,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     3 Jun 1996 (DJA):
 *        Original version.
+*     11 Feb 1997 (RB):
+*        Cope with SpacedData arrays
 *     {enter_changes_here}
 
 *  Bugs:
@@ -109,6 +112,11 @@
       INTEGER			PSID			! Item private store
       INTEGER			PTR			! Item data
       INTEGER			WBPTR			! Write back proc
+
+      CHARACTER*1		CAX
+      LOGICAL			DIDCRE
+      REAL			AXINFO(2), BASE, DELTA
+      INTEGER			IDUM
 *.
 
 *  Check inherited global status.
@@ -119,6 +127,24 @@
 
 *  Extract the arguments
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
+
+*  Special case for coping with spaced data axis array (RB)
+      IF ( ITEM(1:4) .EQ. 'Axis' .AND. ITEM(8:11) .EQ. 'Data' ) THEN
+        CALL ADI_GET1R( ARGS(4), 2, AXINFO, IDUM, STATUS )
+        BASE = AXINFO(1)
+        DELTA = AXINFO(2) - AXINFO(1)
+        CAX = ITEM(6:6)
+        CALL ADI2_CFIND( ARGS(2), ' ', '.CRPIX'//CAX, ' ', .TRUE.,
+     :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
+        CALL ADI_CNEWV0R( ITID, 'Value', BASE, STATUS )
+        CALL ADI_CNEWV0C( ITID, 'Comment', 'First value on x-axis',
+     :                    STATUS )
+        CALL ADI2_CFIND( ARGS(2), ' ', '.CDELT'//CAX, ' ', .TRUE.,
+     :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
+        CALL ADI_CNEWV0R( ITID, 'Value', DELTA, STATUS )
+        CALL ADI_CNEWV0C( ITID, 'Comment', 'Delta value of x-axis',
+     :                    STATUS )
+      ELSE
 
 *  Locate the data item
       CALL BDI2_CFIND( ARGS(1), ARGS(2), ITEM, .TRUE., .FALSE.,
@@ -185,6 +211,7 @@
 
         END IF
 
+      END IF
       END IF
 
 *  Report any errors
