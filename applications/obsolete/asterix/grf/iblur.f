@@ -66,6 +66,9 @@
         CALL IMG_COPYBITS(STATUS)
         I_TITLE_W='Smoothed image'
         I_CAN_UNDO=.FALSE.
+        IF (I_GUI) THEN
+          CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+        ENDIF
 
         IF (I_BAD) THEN
           CALL MSG_PRNT('Warning: data contains bad pixels - '//
@@ -104,6 +107,9 @@
           I_PROC_COUNT=I_PROC_COUNT+1
           I_CAN_UNDO=.TRUE.
           I_LAST_CMD='IBLUR'
+          IF (I_GUI) THEN
+            CALL IMG_NBPUT0I('BUFFER',1,STATUS)
+          ENDIF
 
         ENDIF
 

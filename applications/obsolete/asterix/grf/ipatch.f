@@ -58,6 +58,9 @@
 
         CALL IMG_COPY(.FALSE.,.FALSE.,STATUS)
         I_CAN_UNDO=.FALSE.
+        IF (I_GUI) THEN
+          CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+        ENDIF
 
         IF (MODE.EQ.'INTERP') THEN
           CALL IPATCH_INTERP(%val(I_DPTR_W),%val(I_VPTR_W),
@@ -75,6 +78,9 @@
           I_PROC_COUNT=I_PROC_COUNT+1
           I_CAN_UNDO=.TRUE.
           I_LAST_CMD='IPATCH'
+          IF (I_GUI) THEN
+            CALL IMG_NBPUT0I('BUFFER',1,STATUS)
+          ENDIF
 
         ENDIF
 

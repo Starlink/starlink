@@ -47,6 +47,9 @@
 *
         CALL IMG_COPY(STATUS)
         I_CAN_UNDO=.FALSE.
+        IF (I_GUI) THEN
+          CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+        ENDIF
 
 * Add gausian noise
         CALL INOISE_DOIT(SD,%VAL(I_DPTR_W),STATUS)
@@ -58,6 +61,9 @@
           I_PROC_COUNT=I_PROC_COUNT+1
           I_CAN_UNDO=.TRUE.
           I_LAST_CMD='INOISE'
+          IF (I_GUI) THEN
+            CALL IMG_NBPUT0I('BUFFER',1,STATUS)
+          ENDIF
 
         ENDIF
 

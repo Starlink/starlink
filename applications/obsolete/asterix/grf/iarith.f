@@ -150,7 +150,9 @@
 *  copy existing data to work area
             CALL IMG_COPY(.FALSE.,.FALSE.,STATUS)
             I_CAN_UNDO=.FALSE.
-
+            IF (I_GUI) THEN
+              CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+            ENDIF
             IF (OPER.EQ.'ADD') THEN
               CALL IARITH_SCALAR_ADD(VAL,%VAL(I_DPTR_W),STATUS)
             ELSEIF (OPER.EQ.'SUB') THEN
@@ -178,6 +180,9 @@
 *  copy existing data to work area, creating quality if necessary
             CALL IMG_COPY(.FALSE.,QOK,STATUS)
             I_CAN_UNDO=.FALSE.
+            IF (I_GUI) THEN
+              CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+            ENDIF
 
             IF (OPER.EQ.'ADD') THEN
               CALL IARITH_ADD(%VAL(DPTR),%VAL(VPTR),%VAL(QPTR),
@@ -204,6 +209,9 @@
 
           IF (STATUS.EQ.SAI__OK) THEN
             I_CAN_UNDO=.TRUE.
+            IF (I_GUI) THEN
+              CALL IMG_NBPUT0I('BUFFER',1,STATUS)
+            ENDIF
             I_PROC_COUNT=I_PROC_COUNT+1
             I_LAST_CMD=CMD
           ENDIF

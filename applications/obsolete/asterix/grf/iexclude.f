@@ -49,6 +49,9 @@
 *  copy data to work area and create quality if necessary
         CALL IMG_COPY(.FALSE.,.TRUE.,STATUS)
         I_CAN_UNDO=.FALSE.
+        IF (I_GUI) THEN
+          CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+        ENDIF
 
         IF (MODE.EQ.'SOU') THEN
           CALL IEXCLUDE_SOURCE(STATUS)
@@ -70,6 +73,9 @@
 
         IF (STATUS.EQ.SAI__OK) THEN
           I_CAN_UNDO=.TRUE.
+          IF (I_GUI) THEN
+            CALL IMG_NBPUT0I('BUFFER',1,STATUS)
+          ENDIF
           I_PROC_COUNT=I_PROC_COUNT+1
           I_LAST_CMD='IEXCLUDE'
         ENDIF

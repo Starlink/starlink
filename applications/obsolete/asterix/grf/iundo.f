@@ -38,6 +38,9 @@
         I_CAN_UNDO=.FALSE.
         I_PROC_COUNT=I_PROC_COUNT-1
         I_LAST_CMD=' '
+        IF (I_GUI) THEN
+          CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+        ENDIF
 
 
       ENDIF
