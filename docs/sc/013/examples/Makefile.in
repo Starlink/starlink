@@ -10,16 +10,21 @@
 #
 # $Id$
 
+# Makefile notes: Sun make seems to be the most conservative, since it
+# doesn't define a default rule corresponding to `%: %.c' (see
+# littleendian target) and it doesn't recognise `$<' in non-rule
+# targets (same).
 
 # Compilers to use
 CC=@CC@
 F77=@F77@
 DEFS=@DEFS@
 
-CFLAGS=$(CFLAGS) $(DEFS)
-
 PROFILING=@PROFILINGOPTION@
 NOUNDERSCORES=@NOUNDERSCORES@
+
+CFLAGS=-g $(DEFS)
+
 
 
 EXECS=timewaster fpdemo fpp dfpp mixed crash
@@ -51,6 +56,7 @@ bytesex.h: islittleendian
 	echo '#define BIGENDIAN' `if ./islittleendian; then echo 0; else echo 1;fi` >$@
 
 islittleendian: islittleendian.c
+	$(CC) $(CFLAGS) -o $@ islittleendian.c
 
 #
 # Compile all three profiled programs with the $(PROFILING) flag, 
@@ -72,7 +78,6 @@ timewaster: p1.o p2.o p3.o
 # Compile and link the mixed-language demo.
 #
 mixed: mixed-f.o mixed-c.o
-#	$(LINK.F) -o mixed mixed-c.o mixed-f.o
 	$(CC) $(LDFLAGS) -o mixed mixed-c.o mixed-f.o
 
 # Compile the Fortran code with no trailing underscores
@@ -80,7 +85,7 @@ mixed-f.o: mixed-f.f
 	$(F77) -c mixed-f.f $(NOUNDERSCORES)
 
 mixed-c.o: mixed-c.c
-#	$(CC) $(CFLAGS) -c mixed-c.c
+	$(CC) $(CFLAGS) -c mixed-c.c
 
 
 ######################################################################
