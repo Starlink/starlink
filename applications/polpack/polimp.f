@@ -147,25 +147,22 @@
 *     is given as usual followed by a FITS-keyword which supplies the string 
 *     to be translated. This is then followed by statements which translate 
 *     an "input" string into an "output" string. So for instance if you 
-*     wanted to translate waveplate positions to the equivalent strings 
-*     recognised by POLPACK you might use something like:
+*     were doing circular polarimetry, and wanted to translate quarter 
+*     waveplate positions to the equivalent strings recognised by POLPACK 
+*     you might use something like:
 *
-*        WPLATE     WAVEPLT  A=0.0 -
-*                            B=22.5 -
-*                            C=45.0 -
-*                            D=67.5
+*        WPLATE  POLPLATE        48.0=0.0 -
+*                                138.0=45.0
 *
 *     This does a case insensitive comparison between the value of the FITS 
-*     keyword WAVEPLT and the strings on the left hand sides of the equals 
-*     signs ("A", "B", etc), If a match is found, it assigns the value from 
-*     the right hand side of the equals sign ("0.0", "22.5", etc, these
-*     are interpreted as strings, not numerical values) to the WPLATE 
-*     component in the POLPACK extension. An error is reported if no match 
-*     is found. The "-" signs at the end of each line indicate that the list
-*     continues on the next line. Note, if specified FITS keyword has a
-*     numerical value, then it is converted into textual form before doing 
-*     the comparisons. Leading and trailing spaces in the FITS keyword
-*     value are ignored when doing the comparison.
+*     keyword POLPLATE and the strings on the left hand sides of the equals 
+*     signs ("48.0" and "138.0"), If a match is found (ignoring leading
+*     and trailing blanks), it assigns the value from the right hand side 
+*     of the equals sign ("0.0" or "45.0") to the WPLATE component in the 
+*     POLPACK extension. An error is reported if no match is found. The "-" 
+*     sign at the end of the first line indicates that the list continues 
+*     on the next line. Note, the FITS keyword value and the supplied test 
+*     values are converted to character strings before doing the comparisons. 
 *
 *     If a control table contains more than one line for an extension
 *     item, then each line is processed in turn, replacing any value
