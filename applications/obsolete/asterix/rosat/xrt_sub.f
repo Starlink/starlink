@@ -1363,7 +1363,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
         GOTO 999
       ENDIF
 
-*  Get this records
+*  Get this record
       CALL SLN_GETREC(ID, '*', 0, SELID, STATUS )
 
 *  Locate Selectors
@@ -1381,9 +1381,11 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
         IF (SNAME.EQ.'SPACE') THEN
 
+	print *,'space'
           CALL XRT_GETSEL_ARD(SIID,HEAD,STATUS)
 
         ELSEIF (SNAME.EQ.'TIME') THEN
+	print *,'time'
 
           CALL XRT_GETSEL_RANGE(SIID,HEAD.NTRANGE,HEAD.TMIN,HEAD.TMAX,
      :                                                         STATUS)
@@ -1438,6 +1440,9 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *
 999   CONTINUE
 *
+      IF (STATUS.NE.SAI__OK) THEN
+        CALL ERR_REP(' ','from XRT_GETSEL',STATUS)
+      ENDIF
 
 *
       END
@@ -1485,6 +1490,9 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       CALL ADI_CUNMAP( SIID, 'START', BPTR, STATUS )
       CALL ADI_CUNMAP( SIID, 'STOP', EPTR, STATUS )
 
+      IF (STATUS.NE.SAI__OK) THEN
+        CALL ERR_REP(' ','from XRT_GETSEL_RANGE',STATUS)
+      ENDIF
 
       END
 
@@ -1573,6 +1581,11 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
         HEAD.SHAPE='D'
 
       ENDIF
+
+      IF (STATUS.NE.SAI__OK) THEN
+        CALL ERR_REP(' ','from XRT_GETSEL_ARD',STATUS)
+      ENDIF
+
 
       END
 
