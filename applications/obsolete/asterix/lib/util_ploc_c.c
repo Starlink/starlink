@@ -94,9 +94,9 @@
 /*
  *  Body of code
  */
-F77_POINTER_TYPE F77_EXTERNAL_NAME(util_ploc)( INTEGER(arg )
+F77_POINTER_TYPE *F77_EXTERNAL_NAME(util_ploc)( INTEGER(arg )
   {
   GENPTR_INTEGER(arg)
 
-  return (F77_POINTER_TYPE) arg;
+  return (F77_POINTER_TYPE *) arg;
   }
