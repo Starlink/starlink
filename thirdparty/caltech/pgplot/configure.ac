@@ -41,7 +41,7 @@ dnl    declaration.
 AC_CONFIG_FILES([Makefile])
 
 dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([src cpg drivers fonts])
+AC_CONFIG_SUBDIRS([src drivers drivers fonts cpg])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
