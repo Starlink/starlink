@@ -813,7 +813,7 @@
 #  If we haven't done this before, build the FITS selection window.
          if { [ array names itk_component fits_dialog ] == "" } {
             itk_component add fits_dialog {
-               iwidgets::dialog $itk_interior.d \
+               iwidgets::dialog $itk_component(showfits).d \
                   -modality application \
                   -title "Select FITS headers for display"
             }
