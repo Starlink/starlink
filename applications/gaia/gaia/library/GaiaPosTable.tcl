@@ -65,7 +65,9 @@ itcl::class gaia::GaiaPosTable {
    #  Constructor:
    #  ------------
    constructor {args} {
-      eval gaia::GaiaAstTable::constructor $args
+      #  Remove -showmsize from argument list.
+      regsub {\-showmsize[\ ]+[^\ ]+} "$args" {} safeargs
+      eval gaia::GaiaAstTable::constructor $safeargs
    } {
       #  Evaluate any options.
       itk_option remove gaia::GaiaAstTable::coupled
@@ -103,11 +105,17 @@ itcl::class gaia::GaiaPosTable {
    #  Methods:
    #  --------
 
+   #  Called after all constructors are completed.
+   public method init {} {
+      if { ! $itk_option(-showmsize) } {
+         $itk_option(-markmenu) delete Size
+      }
+   }
 
    #  Add a new row to the table. This serves as a blank entry which
    #  is updated to have the correct X-Y and RA/Dec coordinates.
    public method add_new_row {} {
-      
+
       #  Create a unique identifier.
       set t $itk_component(table)
       set nselect 1
@@ -115,12 +123,12 @@ itcl::class gaia::GaiaPosTable {
          $t clear_selection
          $t search "id" [incr ids_]
          set nselect [$t num_selected]
-      } 
-      
+      }
+
       #  Create the new row.
       $itk_component(table) append_row [list $ids_ 00:00:00 00:00:00 0.0 0.0]
       $itk_component(table) new_info
-      
+
       #  Make this the current selection.
       $itk_component(table) select_row end
       redraw
@@ -197,7 +205,7 @@ itcl::class gaia::GaiaPosTable {
             lassign $msg imagex imagey
          }
       }
-      
+
       #  Convert to WCS system of image.
       set equinox [$rtdimage wcsequinox]
       if { [catch { $rtdimage convert coords \
@@ -213,7 +221,7 @@ itcl::class gaia::GaiaPosTable {
    }
 
    #  Replace/update the table contents with new X and Y
-   #  values. Override to also update the WCS coordinates 
+   #  values. Override to also update the WCS coordinates
    #  using these values.
    public method replace_x_and_y {newlist} {
       set oldcon [$itk_component(table) get_contents]
@@ -247,8 +255,11 @@ itcl::class gaia::GaiaPosTable {
          lassign [$itk_option(-canvas) coords $tags_($nid)] newx newy
          $itk_option(-rtdimage) convert coords $newx $newy canvas x y image
          set equinox [$itk_option(-rtdimage) wcsequinox]
-         $itk_option(-rtdimage) convert coords $newx $newy canvas \
-            ra dec "wcs $equinox"
+         if { [catch {$itk_option(-rtdimage) convert coords \
+                         $newx $newy canvas ra dec "wcs $equinox"}] != 0 } {
+            set ra "00:00:00"
+            set dec "00:00:00"
+         }
          eval $itk_component(table) set_row $old_row [list "$id $ra $dec $x $y"]
       } else {
 
@@ -267,6 +278,10 @@ itcl::class gaia::GaiaPosTable {
 
    #  Whether to centroid initial position or not.
    itk_option define -init_centroid init_centroid Init_Centroid 1
+
+
+   #  Whether to remove menu item that controls marker size.
+   itk_option define -showmsize showmsize Showmsize 1
 
    #  Protected variables: (available to instance)
    #  --------------------

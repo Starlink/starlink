@@ -68,7 +68,7 @@ itcl::class gaia::GaiaPositions {
       eval itk_initialize $args
 
       #  Set the top-level window title.
-      wm title $w_ "GAIA: Record object positions ($itk_option(-number))"
+      wm title $w_ "GAIA: Select positions ($itk_option(-number))"
 
       #  Create the short help window.
       make_short_help
@@ -83,6 +83,7 @@ itcl::class gaia::GaiaPositions {
          GaiaPosTable $w_.table \
             -editmenu [get_menu Edit] \
             -markmenu [get_menu Markers] \
+            -showmsize 0 \
             -rtdimage $itk_option(-rtdimage) \
             -canvas $itk_option(-canvas) \
             -image $itk_option(-image)
@@ -136,6 +137,7 @@ itcl::class gaia::GaiaPositions {
 
       #  Initialisations after widget creation.
       auto_centroid_changed_
+      configure -iqesize $itk_option(-iqesize)
    }
 
    #  Destructor:
@@ -237,6 +239,8 @@ itcl::class gaia::GaiaPositions {
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this auto_centroid_changed_]
+      $short_help_win_ add_menu_short_help $Options {Auto centroid} \
+         {Toggle automatical centroid of initial positions}
 
       #  Add option to define a different centroid maxshift/search box.
       set values_($this,isize) $itk_option(-isize)
@@ -399,6 +403,9 @@ itcl::class gaia::GaiaPositions {
             set ix [expr $ix + 1.0]
             $itk_option(-rtdimage) convert coords $ix $iy image x2 y2 canvas
             set imgscale [$itk_option(-rtdimage) wcsdist $x1 $y1 $x2 $y2]
+            if { $imgscale == "" } {
+               set imgscale 0.0
+            }
 
             #  Update results controls (use format to keep precision down).
             set res [format "%.2f/%.2f (%.2f/%.2f)" \
@@ -468,7 +475,12 @@ itcl::class gaia::GaiaPositions {
    itk_option define -really_die really_die Really_Die 0
 
    #  Size of region about object, used when determining IQE.
-   itk_option define -iqesize iqesize Iqesize 15
+   itk_option define -iqesize iqesize Iqesize 15 {
+      set values_($this,iqesize) $itk_option(-iqesize)
+      if { [info exists itk_component(table) ] } {
+         $itk_component(table) configure -msize $itk_option(-iqesize)
+      }
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------

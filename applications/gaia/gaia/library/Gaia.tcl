@@ -721,28 +721,6 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  When image is flipped etc. we may want to redraw some items that
-   #  are too expensive to flip via Tcl commands.  If auto is set 1
-   #  then the grid is only redrawn if automatic redraws are on.
-   protected method redraw_specials_ { {auto 0} } {
-      if { [info exists itk_component(astgrid) ] &&
-           [winfo exists $itk_component(astgrid) ] } {
-
-         #  Check that window isn't withdrawn
-         if { [wm state $itk_component(astgrid)] != "withdrawn" } {
-            $itk_component(astgrid) draw_grid 0 $auto
-         }
-      }
-
-      if { [info exists itk_component(contour) ] &&
-           [winfo exists $itk_component(contour) ] } {
-
-         #  Check that window isn't withdrawn
-         if { [wm state $itk_component(contour)] != "withdrawn" } {
-            $itk_component(contour) redraw 0
-         }
-      }
-   }
 
    #  Make a patch toolbox.
    public method make_patch_toolbox {name {cloned 0}} {
@@ -771,7 +749,7 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Make a sextractor toolbox.
+   #  Make a SExtractor toolbox.
    public method make_sextractor_toolbox {name {cloned 0}} {
       itk_component add $name {
          GaiaSextractor $w_.\#auto \
@@ -782,7 +760,8 @@ itcl::class gaia::Gaia {
             -filter_types $itk_option(-file_types) \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -clone_cmd [code $this make_toolbox sextractor 1]
+            -clone_cmd [code $this make_toolbox sextractor 1] \
+            -really_die $cloned
       }
    }
 
@@ -798,7 +777,8 @@ itcl::class gaia::Gaia {
             -filter_types $itk_option(-file_types) \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -clone_cmd [code $this make_toolbox contour 1]
+            -clone_cmd [code $this make_toolbox contour 1] \
+            -really_die $cloned
       }
    }
 
@@ -811,7 +791,8 @@ itcl::class gaia::Gaia {
             -rtdimage [$image_ get_image]\
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -clone_cmd [code $this make_toolbox esp 1]
+            -clone_cmd [code $this make_toolbox esp 1] \
+            -really_die $cloned
       }
    }
 
@@ -840,7 +821,52 @@ itcl::class gaia::Gaia {
             -canvas [$image_ get_canvas] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -clone_cmd [code $this make_toolbox demo 1]
+            -clone_cmd [code $this make_toolbox demo 1] \
+            -really_die $cloned
+      }
+   }
+
+   #  When image is flipped etc. we may want to redraw some items that
+   #  are too expensive to flip via Tcl commands.  If auto is set 1
+   #  then the grid is only redrawn if automatic redraws are on.
+   protected method redraw_specials_ { {auto 0} } {
+      if { [info exists itk_component(astgrid) ] &&
+           [winfo exists $itk_component(astgrid) ] } {
+
+         #  Check that window isn't withdrawn
+         if { [wm state $itk_component(astgrid)] != "withdrawn" } {
+            $itk_component(astgrid) draw_grid 0 $auto
+         }
+      }
+
+      if { [info exists itk_component(contour) ] &&
+           [winfo exists $itk_component(contour) ] } {
+
+         #  Check that window isn't withdrawn
+         if { [wm state $itk_component(contour)] != "withdrawn" } {
+            $itk_component(contour) redraw 0
+         }
+      }
+   }
+
+   #  Image has been cleared so reset any toolboxes that require it
+   #  (note most just have canvas objects which are deleted when
+   #  a new image is drawn and do not require any other information).
+   public method cleared {} {
+      if { [info exists itk_component(astgrid) ] } {
+         if { [winfo exists $itk_component(astgrid) ] } {
+            $itk_component(astgrid) remove_grid
+         }
+      }
+      if { [info exists itk_component(astsystem) ] } {
+         if { [winfo exists $itk_component(astsystem) ] } {
+            $itk_component(astsystem) image_changed
+         }
+      }
+      if { [info exists itk_component(contour) ] } {
+         if { [winfo exists $itk_component(contour) ] } {
+            $itk_component(contour) remove_contours
+         }
       }
    }
 
@@ -1008,27 +1034,6 @@ itcl::class gaia::Gaia {
 	 #  Has "-file" so just replace associated value.
 	 incr index
 	 set argv [lreplace $argv $index $index $filename]
-      }
-   }
-
-   #  Image has been cleared so reset any toolboxes that require it
-   #  (note most just have canvas objects which are deleted when
-   #  a new image is drawn and do not require any other information).
-   public method cleared {} {
-      if { [info exists itk_component(astgrid) ] } {
-         if { [winfo exists $itk_component(astgrid) ] } {
-            $itk_component(astgrid) remove_grid
-         }
-      }
-      if { [info exists itk_component(astsystem) ] } {
-         if { [winfo exists $itk_component(astsystem) ] } {
-            $itk_component(astsystem) image_changed
-         }
-      }
-      if { [info exists itk_component(contour) ] } {
-         if { [winfo exists $itk_component(contour) ] } {
-            $itk_component(contour) remove_contours
-         }
       }
    }
 
