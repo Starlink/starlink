@@ -33,6 +33,8 @@
 *     25.02.1992:  Report errors (RLVAD::AJC)
 *     27.02.1992:  Assume entry is ucase unless quoted string (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
+*     01.02.2004:  Checked into CVS repository cvs.starlink.ac.uk.  For any
+*                  further changes, see the repository.
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -112,7 +114,7 @@
 
                STATUS = PARSE__NOMEM
                CALL EMS_REP ( 'PCN_SETASS2',
-     :         'PARSECON: Exceeded storage for glbal associations',
+     :         'PARSECON: Exceeded storage for global associations',
      :          STATUS )
 
             ENDIF
