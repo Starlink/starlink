@@ -1,0 +1,454 @@
+package atools {
+   version PKG_VERS
+   prefix atl
+
+   executable atools_mon {
+
+      action addframe {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter frame {
+            position 4
+            type NDF
+            prompt {The Frame to add to the FrameSet}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter iframe {
+            position 2
+            type LITERAL
+            prompt {The index or Domain of the basis Frame within the FrameSet}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter map {
+            position 3
+            type NDF
+            prompt {The Mapping from the basis Frame to the new Frame}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            position 5
+            type LITERAL
+            prompt {The modified FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+      action astclear {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter attrib {
+            position 2
+            type LITERAL
+            prompt {The attribute to clear}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {Name of file or NDF in which to store the modified Object}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Object}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+      action astget {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter attrib {
+            position 2
+            type LITERAL
+            prompt {The attribute to examine}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Object}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter value {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default { }
+            helpkey *
+          }
+
+      }
+      action astset {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter attrib {
+            position 2
+            type LITERAL
+            prompt {The attribute to set}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file or NDF in which to store the modified Object}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Object}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter value {
+            position 3
+            type LITERAL
+            prompt {The new attribute value}
+            ppath CURRENT
+            helpkey *
+          }
+
+      }
+      action asttest {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter attrib {
+            position 2
+            type LITERAL
+            prompt {The attribute to test}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Object}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter value {
+            type _LOGICAL
+            access WRITE
+            vpath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+      }
+
+iraf! {
+
+      icl {defstring atlh(elp) !$ATOOLS_DIR/atlhelp}
+      icl {defstring kap_atlh(elp) !$ATOOLS_DIR/atlhelp}
+      action atlhelp {
+         alias {atlh(elp)}
+
+         helplib {$ATOOLS_HELP}
+
+         parameter topic {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help topic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subtopic {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subsubtopic {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subsubsubtopic {
+            position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubsubtopic}
+            default {         }
+            helpkey *
+          }
+
+      }
+}
+      action cmpframe {
+         helplib {$ATOOLS_HELP}
+         parameter frame1 {
+            position 1
+            type LITERAL
+            prompt {The first component Frame}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter frame2 {
+            position 2
+            type LITERAL
+            prompt {The second component Frame}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter options {
+            position 3
+            type LITERAL
+            prompt {Options for the CmpFrame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the CmpFrame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+      action cmpmap {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter map1 {
+            position 1
+            type LITERAL
+            prompt {The first component Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter map2 {
+            position 2
+            type LITERAL
+            prompt {The second component Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter series {
+            position 3
+            type _LOGICAL
+            prompt {Combine the Mappings in series?}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter options {
+            position 4
+            type LITERAL
+            prompt {Options for the CmpMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 5
+            type LITERAL
+            prompt {Name of file in which to store the CmpMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+      action frame {
+         helplib {$ATOOLS_HELP}
+
+         parameter naxes {
+            position 1
+            type _INTEGER
+            prompt {The number of axes in the Frame}
+            ppath CURRENT DEFAULT
+            default 2
+            helpkey *
+          }
+
+         parameter options {
+            position 2
+            type LITERAL
+            prompt {Options for the Frame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {Name of file in which to store the Frame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+      action getframe {
+         helplib {$ATOOLS_HELP}
+         parameter frame {
+            position 2
+            type LITERAL
+            prompt {The index or Domain of the required Frame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {Name of file in which to store the Frame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+      action getmapping {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter frame1 {
+            position 2
+            type LITERAL
+            prompt {The index or Domain of the input-end Frame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter frame2 {
+            position 3
+            type LITERAL
+            prompt {The index or Domain of the output-end Frame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the Mapping}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+      action unitmap {
+         helplib {$ATOOLS_HELP}
+
+         parameter naxes {
+            position 1
+            type _INTEGER
+            prompt {The number of axes in the UnitMap}
+            ppath CURRENT DEFAULT
+            default 2
+            helpkey *
+          }
+
+         parameter options {
+            position 2
+            type LITERAL
+            prompt {Options for the UnitMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {Name of file in which to store the UnitMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+   }
+}
