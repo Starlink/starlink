@@ -5,13 +5,13 @@
   ATOOLS package at each release.
 
 
+2 V1.7-1
+
+  - New command asttran1. Transforms 1-dimension positions.
+
 2 V1.6-3
 
   - New command asttranmap. Creates a TranMap.
-
-
-
-
 
 
 2 V1.6-2

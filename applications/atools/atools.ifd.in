@@ -1427,6 +1427,43 @@ iraf! {
           }
       }
 
+      action asttran1 {
+         helplib {$ATOOLS_HELP}
+         parameter forward {
+            position 3
+            type _LOGICAL
+            access READ
+            prompt {Use the forward transformation?}
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter xin {
+            position 2
+            type LITERAL
+            prompt {Group of numerical axis values}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter xout {
+            position 4
+            type LITERAL
+            prompt {Name of output text file to hold axis values}
+            ppath CURRENT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+      }
+
       action asttran2 {
          helplib {$ATOOLS_HELP}
          parameter forward {
