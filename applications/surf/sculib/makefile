@@ -173,7 +173,7 @@ sculib_cfilld.o:
 sculib_cfilli.o:
 sculib_cfillr.o:
 sculib_clip_bol.o: NDF_FUNC PRM_PAR SAE_PAR
-sculib_coadd.o: NDF_FUNC PRM_PAR
+sculib_coadd.o: NDF_FUNC PRM_PAR SAE_PAR
 sculib_coadd_maps.o: PRM_PAR SAE_PAR
 sculib_coadd_remove.o:
 sculib_compress_demod.o: PRM_PAR SAE_PAR

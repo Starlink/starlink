@@ -1729,7 +1729,7 @@ sculib_calc_output_coords.o: SAE_PAR
 sculib_calc_skydip_temps.o: MSG_PAR PRM_PAR SAE_PAR
 sculib_calc_sub_bols.o: SAE_PAR
 sculib_clip_bol.o: NDF_FUNC PRM_PAR SAE_PAR
-sculib_coadd.o: NDF_FUNC PRM_PAR
+sculib_coadd.o: NDF_FUNC PRM_PAR SAE_PAR
 sculib_coadd_maps.o: PRM_PAR SAE_PAR
 sculib_coadd_remove.o:
 sculib_compress_demod.o: PRM_PAR SAE_PAR
