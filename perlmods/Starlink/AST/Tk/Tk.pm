@@ -219,7 +219,7 @@ sub _GText {
    my ( $external, $text, $xf, $yf, $just, $upx, $upy ) = @_;
    my $canvas = $$external[0];
    my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
-   print "_GText: Placeholder routine called\n";
+   print "# _GText: Placeholder routine called\n";
    
    # check we have a string to print
    if( defined $text && length($text) != 0 ) {
@@ -259,7 +259,7 @@ sub _GScales {
     my ( $external, $alpha, $beta ) = @_;
     my $canvas = $$external[0];
     my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
-    print "_GScales: Placeholder routine called\n";
+    print "# _GScales: Placeholder routine called\n";
     
     my ( $nx1, $nx2, $ny1, $ny2, $wx1, $wx2, $wy1, $wy2, $ret );
     
@@ -334,7 +334,7 @@ sub _GTxExt {
    my ( $external, $text, $x, $y, $just, $upx, $upy ) = @_;
    my $canvas = $$external[0];
    my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
-   print "_GTxExt: Placeholder routine called\n";
+   print "# _GTxExt: Placeholder routine called\n";
    
    # initalise @$xb and @$yb
    my ( @xb, @yb );
@@ -371,7 +371,7 @@ sub _GQch {
    my $external = shift;
    my $canvas = $$external[0];
    my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
-   print "_GQch: Placeholder routine called\n";
+   print "# _GQch: Placeholder routine called\n";
    
    my $chv = 12/$canvas->cget( '-height' );
    my $chh = 12/$canvas->cget( '-width' );  
@@ -411,10 +411,46 @@ AST's grf.h:
 
 =cut
 
+my @gattrs; # Global
 sub _GAttr {
-   my ( $external, $attr, $value, $prim ) = @_;
-   print "_GAttr: Placeholder routine called\n";
-   return ( 1, undef );
+   my ( $external, $att, $val, $prim ) = @_;
+   print "# _GAttr: Placeholder routine called\n";
+
+  my $MAX_ATTR = 5;
+  my $i;
+  if ($att == &Starlink::AST::Grf::GRF__STYLE() ) {
+    $i = 1;
+  } elsif ( $att == &Starlink::AST::Grf::GRF__WIDTH() ) {
+    $i = 2;
+  } elsif ( $att == &Starlink::AST::Grf::GRF__SIZE() ) {
+    $i = 3;
+  } elsif ( $att == &Starlink::AST::Grf::GRF__FONT() ) {
+    $i = 4;
+  } elsif ( $att == &Starlink::AST::Grf::GRF__COLOUR() ) {
+    $i = 5;
+  } else {
+    print "# Bad ATT value: ", $att ."\n";
+  }
+
+  my $j;
+  if ($prim == &Starlink::AST::Grf::GRF__LINE() ) {
+    $j = 1;
+  } elsif ($prim == &Starlink::AST::Grf::GRF__MARK() ) {
+    $j = 2;
+  } elsif ($prim == &Starlink::AST::Grf::GRF__TEXT() ) {
+    $j = 3;
+  } else {
+    print "# Bad PRIM value: $prim\n";
+  }
+
+  # Store the new value if required
+  # Convert prim and att to index of 2d array
+  my $index = ( $MAX_ATTR * ($att - 1) + $prim );
+  my $old = $gattrs[$index];
+  $old = &Starlink::AST::AST__BAD() if !defined $old;
+  $gattrs[$index] = $val if $val != &Starlink::AST::AST__BAD();
+
+  return (1, $old);
 }   
 
 
@@ -466,7 +502,7 @@ Zero should be returned if the supplied capability is not recognised.
 sub _GCap {
   my $cap = shift;
   my $value = shift;
-  print "_GCap: Placeholder routine called [assume lack capability]\n";
+  print "# _GCap: Placeholder routine called [assume lack capability]\n";
   return 0;
 }
 
