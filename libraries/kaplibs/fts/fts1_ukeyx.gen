@@ -67,10 +67,13 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Implementation Status:
+*  Notes:
 *     - There is a routine for each of the data types logical, integer,
 *     real and double precision: replace "x" in the routine name by L,
 *     I, R or D as appropriate.
+*     - The comments are written from column 32 or higher if the value
+*     demands more than the customary 20 characters for the value.  A
+*     comment may be omitted if the value is so long to leave no room.
 
 *  Authors:
 *     WG: Wei Gong (IPMAF)
@@ -87,8 +90,12 @@
 *        positioned the comment string in the wrong location.  Used
 *        parameters to define lengths of the parts of a FITS header
 *        card.  Does not attempt to write a blank comment.
-
-*     {enter_changes_here}
+*     1996 July 26 (MJC):
+*        Allowed for values longer than 20 characters by shifting the
+*        comment rightward.  Append the old comment, if requested,
+*        after writing the value rather than trying to squeeze the
+*        new value into the space left by the old.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -127,7 +134,7 @@
 
       INTEGER COMLN              ! Maximum number of characters in a
                                  ! FITS header card comment
-      PARAMETER ( COMLN = 47 )
+      PARAMETER ( COMLN = 69 )
 
       INTEGER HKEYLN             ! Maximum number of characters in a
                                  ! FITS header card hierarchical keyword
@@ -149,9 +156,12 @@
 *  Local Variables:
       INTEGER CARDLN             ! Used length of a card image
       INTEGER CDKYLN             ! Length of the keyword of a card
+      CHARACTER * ( VALLN ) CHRVAL  ! The value in characters
       CHARACTER * ( HKEYLN ) CMPKEY ! Compound name
       INTEGER CMPLN              ! Length of compound name
       CHARACTER * ( COMLN ) CMTSTR ! Comment string of a keyword
+      INTEGER COMPOS             ! Position to start the comment and
+                                 ! its delimiter
       LOGICAL COMPND             ! Compound-keyword flag
       CHARACTER * ( KEYLN ) CRDKEY ! Keyword of a card image
       INTEGER ENDW( MXWORD )     ! End column of each keyword
@@ -161,10 +171,16 @@
       CHARACTER * ( HKEYLN ) KEYWRD  ! Specified keyword
       INTEGER LSTAT              ! Local status
       INTEGER NWORD              ! Number of keywords in a card image
+      LOGICAL OLDCOM             ! Use existing comment?
+      INTEGER POSCOM             ! Position of the start of the
+                                 ! existing comment (w.r.t. = sign)
+      INTEGER POSDEL             ! Position of the start of the
+                                 ! comment delimiter (w.r.t. = sign)
       INTEGER STARTW( MXWORD )   ! Start column of each keyword
       CHARACTER * ( VALLN ) VALSTR ! String expression of keyword value
       INTEGER WORDLN             ! Length of each word
-      CHARACTER * ( KEYLN ) WORDS( MXWORD ) ! Keywords in a card image
+      CHARACTER * ( VALLN ) WORDS( MXWORD ) ! Keywords and value in a
+                                 ! card image
       INTEGER VALN               ! Length of the keyword value
 
 *.
@@ -271,24 +287,65 @@
             GOTO 999
          END IF
 
-*  Blank out the previous value.
-         BUFFER( CARD )( EQUALS + 1:EQUALS + COMCOL - KEYLN - 3 ) = ' '
+*  Determine if the existing comment is to be used.  If it is, extract
+*  the old comment.
+         OLDCOM = CMTBGN .EQ. ' ' .OR. COMNT .EQ. ' '
+         IF ( OLDCOM ) THEN
+
+*  Select the first word following the equals sign.  Ignore the local
+*  status as there will usually be a comment following, and we only
+*  want the (non-complex) value.  Derive the number of characters
+*  comprising the value.
+            CALL CHR_DCWRD( BUFFER( CARD )( EQUALS + 1: ), 1, NWORD,
+     :                      STARTW( 1 ), ENDW( 1 ), CHRVAL, LSTAT )
+
+*  There are a number of special cases.  Deal with these in turn.
+*  First allow for any trailing comment delimiter abutted to the value.
+*  The column positions are with respect to the equals sign.
+            POSDEL = INDEX( CHRVAL, '/' )
+            POSCOM = POSDEL
+            IF ( POSCOM .EQ. 0 ) POSCOM = ENDW( 1 ) + 1
+
+*  Next look for the absence of a slash delimiter.
+            POSDEL = INDEX( BUFFER( CARD )( POSCOM: ), '/' ) + POSCOM
+            IF ( POSDEL .EQ. POSCOM ) THEN
+               CMTSTR = BUFFER( CARD )( POSDEL + 1 + EQUALS: )
+
+*  Discount a space following the slash.
+            ELSE IF ( BUFFER( CARD )( POSDEL:POSDEL ) .EQ. ' ' )THEN
+               CMTSTR = BUFFER( CARD )( POSDEL + 1 + EQUALS: )
+
+*  The comment abuts the slash delimiter.
+            ELSE
+               CMTSTR = BUFFER( CARD )( POSDEL + EQUALS: )
+            END IF
+
+         END IF
+
+*  Blank out the previous value and comment.
+         BUFFER( CARD )( EQUALS + 1: ) = ' '
+
+*  Determine the column where the comment can begin.  If the length is
+*  less the minimum, this leaves the card padded with blanks to the
+*  minimum length.  The comment cannot begin before the minimum length
+*  of a non-character value (including the cumpulsory space after the
+*  equals sign), and so allowing for the trailing space, the comment
+*  must not appear until two columns after this.
+         COMPOS = MAX( COMCOL, EQUALS + VALN + 3 )
 
 *  Insert the new value, right justified.
-         BUFFER( CARD )( COMCOL-1-VALN:COMCOL-2 ) = VALSTR( :VALN )
+         BUFFER( CARD )( COMPOS-1-VALN:COMPOS-2 ) = VALSTR( :VALN )
 
-*  By definition the used length is 30.
-         CARDLN = COMCOL - 2
+*  Only store a comment (new or old) if there is room for part of it.
+         IF ( COMPOS .LT. 79 ) THEN
 
-*  If there is a comment string following keyword value, ...
-         IF ( CMTBGN .NE. ' ' .AND. COMNT .NE. ' ' ) THEN
-            CMTSTR = COMNT
+*  Append the comment (both new or old) to the header card...  Replace
+*  the old comment with a supplied one.
+            IF ( .NOT. OLDCOM ) CMTSTR = COMNT
 
-*  If the length is less the minimum, pad the card with blanks to the
-*  minimum length.  The comment cannot begin before the minimum length
-*  of a non-character value, and so allowing for the space the comment
-*  must not appear until two columns after this.
-            CARDLN = MAX( CARDLN, COMCOL - 2 ) + 1
+*  Initialise the character position.  The comment will be appended
+*  from column COMPOS.
+            CARDLN = COMPOS - 1
 
 *  Append the comment string to the card, or as much as can fit on to
 *  the card.  Notice that leading blanks are not removed from the
