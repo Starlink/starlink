@@ -39,6 +39,15 @@ o The FitsChan class which been modified to interpret FITS-WCS CAR
 projection headers correctly if the longitude reference pixel (CRPIX) is 
 very large.
 
+o The  FITS-AIPS++ encoding in the FitsChan class now recognised
+spectral axes if they conform to the AIPS convention in which the
+spectral axis is descirbed by a CTYPE keyword od the form "AAAA-BBB"
+where "AAAA" is one of FREQ, VELO or FELO, and "BBB" is one of LSR, LSD,
+HEL or OBS. Such spectral axes can be both read and written.
+
+o The FitsChan class now has a FITS-AIPS++ encoding which represents
+WCS information using FITS header cards recognised by the AIPS++ project.
+Support for spectral axes is identical to the FITS-AIPS encoding.
 
 For further details of these changes, see the final appendix of Starlink
 User Note SUN/210 (Fortran version) or SUN/211 (C version). These are

@@ -14974,7 +14974,7 @@ FITS headers, which we call {\em{encodings.}} Here, we are concerned
 with those encodings defined by software systems other than AST, which
 we term {\em{foreign encodings.}}
 
-Currently, AST supports five foreign encodings, which may be selected
+Currently, AST supports six foreign encodings, which may be selected
 by setting the Encoding attribute of a FitsChan to one of the
 following (character string) values:
 
@@ -15040,6 +15040,12 @@ September, 1994).\footnote{Available by ftp from fits.cv.nrao.edu
 data analysis facility, so its use will facilitate data exchange with
 AIPS. This encoding uses {\tt CROTAi} and {\tt CDELTi} keywords to
 describe axis rotation and scaling.
+
+\item[FITS-AIPS++]\mbox{}\\
+Encodes coordinate system information in FITS
+header cards using the conventions used by the AIPS++ project.
+This is an extension of FITS-AIPS which includes some of the
+features of FITS-PC.
 \end{description}
 \end{quote}
 
@@ -15745,7 +15751,7 @@ ways, since this gives the maximum chance that other software will be
 able to read it. This approach is only possible if there is no
 significant conflict between the FITS keywords used by the different
 encodings\footnote{In practice, this means you should avoid mixing
-FITS-IRAF, FITS-WCS, FITS-AIPS and FITS-PC encodings since they share
+FITS-IRAF, FITS-WCS, FITS-AIPS, FITS-AIPS++ and FITS-PC encodings since they share
 many keywords.}.  Adopting this approach would simply require multiple
 calls to astWrite, rewinding the FitsChan and changing its Encoding value
 before each one.
@@ -15756,7 +15762,7 @@ ways, since this gives the maximum chance that other software will be
 able to read it. This approach is only possible if there is no
 significant conflict between the FITS keywords used by the different
 encodings\footnote{In practice, this means you should avoid mixing
-FITS-IRAF, FITS-WCS, FITS-AIPS and FITS-PC encodings since they share
+FITS-IRAF, FITS-WCS, FITS-AIPS, FITS-AIPS++ and FITS-PC encodings since they share
 many keywords.}.  Adopting this approach would simply require multiple
 calls to AST\_WRITE, rewinding the FitsChan and changing its Encoding value
 before each one.
@@ -18406,7 +18412,7 @@ written if the CDMatrix attribute of the FitsChan is
 set to zero.}
 
 \fitskey{CROTA\emph{i}}{Used to create the pixel to WCS Mapping.}{Only
-written in FITS-AIPS encoding.}
+written in FITS-AIPS and FITS-AIPS++ encodings.}
 
 \fitskey{CTYPE\emph{ia}}{Used to choose the class and attributes of the
 WCS Frame, and to create the pixel to WCS Mapping (note, ``STOKES'' and
@@ -18586,7 +18592,7 @@ of the SkyFrame.}{Written if relevant. Determined by the Equinox attribute of
 the SkyFrame.}
 
 \fitskey{EPOCH}{Used to set the Equinox attribute of the SkyFrame.}{Only
-written if using FITS-AIPS encoding. Determined by the Equinox attribute
+written if using FITS-AIPS and FITS-AIPS++ encodings. Determined by the Equinox attribute
 of the SkyFrame.}
 
 \fitskey{MJD-OBS}{Used to set the Epoch attribute of the 
@@ -20339,6 +20345,16 @@ a new attribute called Iwc.
 \item The FitsChan class which been modified to interpret FITS-WCS CAR
 projection headers correctly if the longitude reference pixel (CRPIX) is 
 very large.
+
+\item The  FITS-AIPS++ encoding in the FitsChan class now recognised
+spectral axes if they conform to the AIPS convention in which the
+spectral axis is descirbed by a CTYPE keyword od the form "AAAA-BBB"
+where ``AAAA'' is one of FREQ, VELO or FELO, and ``BBB'' is one of LSR, LSD,
+HEL or OBS. Such spectral axes can be both read and written.
+
+\item The FitsChan class now has a FITS-AIPS++ encoding which represents
+WCS information using FITS header cards recognised by the AIPS++ project.
+Support for spectral axes is identical to the FITS-AIPS encoding.
 
 \item The organisation of the AST distribution and the commands for
 building it have been changed. Whereas AST used to be built and installed
