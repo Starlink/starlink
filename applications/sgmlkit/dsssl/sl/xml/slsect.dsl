@@ -14,11 +14,12 @@ Copyright 1999, Particle Physics and Astronomy Research Council
 $Id$
 ]]>
 
-<func>
+<routine>
 <routinename>$xml-section$
 <description>Simple function which should be called for all sectioning
 commands.
 <returnvalue type=sosofo>Produces a sosofo which creates the section heading.
+<argumentlist>
 <parameter>level
   <type>number
   <description>level of the section
@@ -32,10 +33,9 @@ commands.
   (let ((id (attribute-string (normalize "id")
 			      (current-node))))
     (make element gi: "div"
-	  attributes: (list (list "level" (number->string level))
-			    ;(if id
-				;(list "id" id)
-				;#f)
+	  attributes: (list (if id
+				(list "id" id)
+				#f)
 			    )
 	  (make element gi: "divtitle"
 		(with-mode section-reference
@@ -45,7 +45,7 @@ commands.
 		    (process-children))
 	      (empty-sosofo)))))
 
-<misccode>
+<routine>
 <description>
 Section constructors
 

@@ -1,0 +1,224 @@
+<!--
+  This is a simple XML DTD for Starlink documents.
+
+  It is intended to be an intermediate format which is the 
+  output of the first stage of processing of the main DTD.  Further
+  applications will convert this to the final forms.
+
+  Requirements:
+
+    -  Simple: the converters which process this will not have to be
+       particularly elaborate.  With the exception of 
+       media options, there should be no other bells and whistles
+       which the final down-converter is required to deal with.
+
+    -  Self-contained: with the exception of images, the generated
+       document must be in a single source file.
+
+    -  No public ids: all entity references should be resolved to
+       system-ids.
+
+    -  Portable: any alternatives for different media (either text or
+       graphics) should be carried through to the output.
+
+    -  Flat: it should be easy to generate final forms from the output.
+
+  Non-requirements:
+
+    -  It need not be complete: it should have as much of the original
+       document's information as required to produce useful readable
+       output, but it should not aim to carry all of it.  It need not
+       be possible to reconstruct the original document from this one.
+
+    -  It need not be easy to write by hand.
+
+    -  It need not generate aggregate information such as tables of
+       contents, though if such information is easy to hand, there's
+       no prohibition on it.
+
+    -  It need not be highly structured.
+
+-->
+
+<!ENTITY % version "0.7">
+
+<!-- Define the collection of notations -->
+<!ENTITY % notations-subset 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
+	"notations.text"
+	>
+%notations-subset;
+
+
+
+<!-- Begin the declaration -->
+
+<!ELEMENT slsimple	(docinfo, docbody)>
+
+
+<!-- The docinfo element is document metadata, and has very much
+     the same structure as the corresponding elements in the Starlink
+     General DTD.
+     -->
+<!ELEMENT docinfo	(title, subtitle?, doccode, docref, docdates,
+			 authorlist, abstract?, copyright?, coverimage?,
+			 history?)>
+
+<!ELEMENT docbody	(para*, div*)>
+
+<!ELEMENT title		(#PCDATA)>
+<!ELEMENT subtitle	(#PCDATA)>
+<!ELEMENT doccode	(#PCDATA)>
+<!ELEMENT docref	(#PCDATA)>
+<!ELEMENT docdates	EMPTY>
+<!ELEMENT authorlist	(author+, otherauthors?, editors?)>
+<!ELEMENT otherauthors	(author+)>
+<!ELEMENT editors	(author+)>
+<!ELEMENT author	(#PCDATA)>
+<!ELEMENT abstract	(para+)>
+<!ELEMENT copyright	(para+)>
+<!ELEMENT coverimage	(figurecontent*, para*)>
+<!ELEMENT history	(version | distribution | change)+>
+<!ELEMENT version	(para+)>
+<!ELEMENT distribution	(para+)>
+<!ELEMENT change	(para+)>
+
+<!ATTLIST docdates
+	date		CDATA	#IMPLIED
+	revised		CDATA	#IMPLIED
+	version		CDATA	#IMPLIED
+	distribution	CDATA	#IMPLIED
+	>
+	<!-- attributes:
+		date		contents of the date attribute of the last
+				VERSION element in the history.
+		revised		last change date: contents of the date
+				attribute of the last 
+				CHANGE or DISTRIBUTION element
+		version		contents of the number attribute of the last
+				VERSION element.
+		distribution	contents of the string attribute of the last
+				DISTRIBUTION element.
+		-->
+
+<!ATTLIST author
+	email		CDATA	#IMPLIED
+	webpage		CDATA	#IMPLIED
+	affiliation	CDATA	#IMPLIED
+	role		CDATA	#IMPLIED	
+	id		ID	#REQUIRED
+	>
+
+<!-- The version, distribution and change attribute lists as in the
+     Starlink General DTD.
+     -->
+<!ATTLIST version
+	number		CDATA		#REQUIRED
+	date		CDATA		#REQUIRED
+	author		IDREF		#REQUIRED
+	>
+<!ATTLIST distribution
+	string		CDATA		#REQUIRED
+	date		CDATA		#REQUIRED	
+	author		IDREF		#REQUIRED
+	versionid	ID		#IMPLIED
+	>
+<!ATTLIST change
+	date		CDATA		#REQUIRED
+	author		IDREF		#REQUIRED
+	versionid	ID		#IMPLIED
+	>
+
+
+
+
+<!-- Body content -->
+
+<!ELEMENT div		(divtitle, divbody)>
+<!ELEMENT divtitle	(#PCDATA)>
+<!ELEMENT divbody	(para*, div*)>
+
+<!ENTITY % simpletext	'#PCDATA | span'>
+<!ENTITY % simplephrase	'%simpletext; | ref | xref | webref | url |
+			 note | citation'>
+<!ENTITY % phrase	'%simplephrase; | table | figure | verbatim'>
+
+<!ELEMENT para		(%phrase;)*>
+
+<!ELEMENT span		(%simpletext;)>
+<!ELEMENT citation	(#PCDATA)>
+<!ELEMENT note		(para+)>
+
+<!ELEMENT ref		(%simpletext;)>
+<!ELEMENT xref		(%simpletext;)>
+<!ELEMENT webref	(%simpletext;)>
+<!ELEMENT url		(#PCDATA)>
+
+<!ATTLIST div
+	media	CDATA	#IMPLIED
+	>
+
+
+<!-- tables -->
+<!ELEMENT table		(caption?, tabular)>
+<!ATTLIST table
+	id	ID	#IMPLIED
+	float (float|nofloat) "float"
+	>
+<!ENTITY % tbl.table.name 'tabular'>
+<!ENTITY % tbl.table-titles.mdl ''>
+<!ENTITY % tbl.entry.mdl '(%simplephrase;)*'>
+<!ENTITY % calstbls 
+	PUBLIC "-//OASIS//DTD XML Exchange Table Model 19990315//EN"
+	"oasis-exchange-table-xml.dtd"
+	>
+%calstbls;
+
+<!-- figures -->
+<!ELEMENT figure	(caption, figurecontent*, para*)>
+<!ELEMENT figurecontent	(#PCDATA)>
+
+<!ATTLIST figure
+	float		(float|nofloat)		"float"
+	alt		CDATA			#IMPLIED
+	id		ID			#IMPLIED
+	>
+<!ATTLIST figurecontent	
+	image	
+		CDATA
+		#IMPLIED
+	notation	
+		NOTATION(%text.figure.notations;)
+		#IMPLIED
+	>
+
+<!-- Caption is common to table and figure -->
+<!ELEMENT caption	(para+)>
+
+
+<!ATTLIST div
+	id	ID	#IMPLIED
+	>
+<!ATTLIST para
+	id	ID	#IMPLIED
+	>
+
+<!ATTLIST ref
+	id	IDREF	#REQUIRED
+	>
+<!ATTLIST xref
+	pubid	CDATA	#IMPLIED
+	sysid	CDATA	#IMPLIED
+	>
+<!ATTLIST webref
+	url	NOTATION (URL)	#REQUIRED
+	>
+<!ATTLIST url
+	nolink	(nolink)	#IMPLIED
+	>
+
+<!ATTLIST span
+	class	CDATA	#IMPLIED
+	media	CDATA	#IMPLIED
+	>
+	<!-- class and media to be defined -->

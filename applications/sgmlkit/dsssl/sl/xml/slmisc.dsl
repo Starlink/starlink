@@ -1,7 +1,7 @@
-<![ ignore [
+<!--
 
 Title:
-  Starlink General DTD -- XML stylesheet miscellaneous elements
+  Starlink General DTD: XML stylesheet miscellaneous elements
 
 Author:
   Norman Gray, Glasgow (NG)
@@ -12,18 +12,37 @@ History:
 Copyright 1999, Particle Physics and Astronomy Research Council
 
 $Id$
-]]>
+-->
 
-<misccode>
+<routine>
 <description>
-Support figures and figurecontent.  Omitted at present!
+Support figures and figurecontent.
 Changes here might need matching changes in
 mode make-manifest-mode in sl.dsl.
 <codebody>
 (element figure
-  (empty-sosofo))
+  (make element gi: "figure"
+	(process-children)))
 
-<misccode>
+(element caption
+  (make element gi: "caption"
+	(process-children)))
+
+;; Changes here might need matching changes in 
+;; mode make-manifest-mode in sl.dsl.
+;;
+;; NOTE that the ent-sysid which is used is _stripped_ of its path.
+;; It is the responsibility of this stylesheet's harness to make sure
+;; that the positions of entities like this are resolved post-hoc.
+(element figurecontent
+  (make element gi: "figurecontent"
+	(literal "FIGURE")))
+
+(element coverimage
+  (make element gi: "coverimage"
+	(process-children)))
+
+<routine>
 <description>
 Miscellaneous constructors.  These are constructors which don't really fit
 in anywhere else.  They're not necessarily unimportant, just simple enough not
@@ -85,11 +104,11 @@ to need explanation or elaboration.
 
 (element p
   (make element gi: "para"
-	(process-children)))
+	(process-children-trim)))
 
 (element px
   (make element gi: "para"
-	(process-children)))
+	(process-children-trim)))
 
 (element cite
   (span-type "citation"))
@@ -107,11 +126,37 @@ to need explanation or elaboration.
 (element attribution
   (span-type "emph"))
 
+;(element note
+;  (make element gi: "note"
+;	(process-children)))
+;
+;(element index
+;  (make element gi: "index"
+;	(process-children)))
+;
+;(element citation
+;  (make element gi: "citation"
+;	(process-children)))
+
+(element note
+  (copy-element))
+
+(element index
+  (copy-element))
+
+(element citation
+  (copy-element))
+
 (element draftnote
   (make element gi: "span"
 	attributes: '(("class" "strong"))
 	(literal "Draft Note:")
 	(process-children)))
 
-(element update				; ignore in default mode
-  (empty-sosofo))
+;;; Angle element
+; There's no error-checking here, so if the user includes an angle
+; element with _no_ angles within it, or includes, say, just an angle
+; and fractions of a second, this won't pick it up.
+(element angle
+  (copy-element))
+

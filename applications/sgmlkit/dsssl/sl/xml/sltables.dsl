@@ -27,7 +27,7 @@ model below, but not necessarily to support all of the attributes at
 first.
 -->
 
-<misccode>
+<routine>
 <description>All the flow-object constructors
 <codebody>
 (element table

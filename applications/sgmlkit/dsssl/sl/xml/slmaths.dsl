@@ -14,7 +14,7 @@ Copyright 1999, Particle Physics and Astronomy Research Council
 $Id$
 ]]>
 
-<misccode>
+<routine>
 <description>
 Support for maths in XML documents.  This is easy, because all we do is 
 remove the MLINE and MLABEL elements, taking care to record their equation

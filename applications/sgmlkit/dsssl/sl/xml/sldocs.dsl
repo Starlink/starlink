@@ -1,7 +1,7 @@
-<![ ignore [
+<!--
 
 Title:
-  Starlink General DTD -- XML stylesheet for document elements
+  Starlink General DTD: XML stylesheet for document elements
 
 Author:
   Norman Gray, Glasgow (NG)
@@ -12,23 +12,27 @@ History:
 Copyright 1999, Particle Physics and Astronomy Research Council
 
 $Id$
-]]>
+-->
 
-<func>
+<routine>
 <routinename>process-xml-document
-<description>Generates an entity to hold the XML file.
-<returnvalue type=sosofo>A sosofo which generates logging output to
-stdout, then generates an entity which contains the entire XML file.
-<argumentlist none>
+<description>Generates an XML file on stdout.
+<returnvalue type=sosofo>A sosofo which contains the output file.
 <codebody>
 (define (process-xml-document)
   (make sequence
-    (literal (string-append (root-file-name) ":"))
-    (make entity system-id: (string-append (root-file-name) ".xml")
+    (make processing-instruction data: "xml version=\"1.0\"")
+    (make document-type name: "slsimple"
+	  system-id: "/home/norman/s/src/sgml/w/sgml/dtd/simple-0.7.dtd"
+	  ;public-id: "-//Starlink//DTD Something//EN"
+	  )
+    (make element gi: "slsimple"
 	  (process-matching-children 'docinfo)
-	  (process-matching-children 'docbody))))
+	  (process-matching-children 'docbody))
+    ;(make-backmatter)
+    ))
 
-<misccode>
+<routine>
 <description>These are the document element types.
 <codebody>
 (element sug (process-xml-document))
@@ -41,7 +45,7 @@ stdout, then generates an entity which contains the entire XML file.
 (element mud (process-xml-document))
 
 
-<misccode>
+<routine>
 <description>Flow-object constructors for the document head
 <codebody>
 (element docinfo
@@ -52,58 +56,98 @@ stdout, then generates an entity which contains the entire XML file.
 	 (coverimage (getdocinfo 'coverimage))
 	 ;(date (format-date (car rel)))
 	 (docref (getdocnumber))
+	 (mantype (getdocinfo 'manualtype))
+	 (swvers (getdocinfo 'softwareversion))
+	 (history (getdocinfo 'history))
 	 (abstract (getdocbody 'abstract)))
-  (make element gi: "docinfo"
-    (make element gi: "title" (process-node-list title))
-    (make empty-element gi: "docdates"
-	  attributes: (list
-		       (if (car rel)
-			   (list "date" (format-date (car rel)))
-			   '())
-		       (if (cadr rel)
-			   (list "revised" (format-date (cadr rel)))
-			   '())
-		       (if (caddr rel)
-			   (list "version" (caddr rel))
-			   '())
-		       (if (cadddr rel)
-			   (list "distribution" (cadddr rel))
-			   '())
-		       ))
-    (make element gi: "authorcollection"
-	  (with-mode in-docinfo (process-node-list authorlist)))
-    (if abstract
-	(make element gi: "abstract"
-	      (with-mode in-docinfo (process-node-list abstract)))
-	(empty-sosofo))
-    (if docref
-	(make sequence
-	  (make element gi: "doccode"
-		(literal docref))
-	  (make element gi: "docref"
-		(literal (getdocnumber (current-node) #t))))
-	(empty-sosofo))
-    (if copy
-	(make element gi: "copyright" (process-node-list copy))
-	(empty-sosofo))
-    (if coverimage
-	(make element gi: "coverimage" (process-node-list coverimage))
-	(empty-sosofo)))))
+    (make element gi: "docinfo"
+	  (make element gi: "title" (process-node-list title))
+	  (if (or mantype swvers)
+	      (make element gi: "subtitle"
+		    (if mantype
+			(process-node-list mantype)
+			(empty-sosofo))
+		    (if (and mantype swvers)
+			(literal " -- ")
+			(empty-sosofo))
+		    (if swvers
+			(process-node-list swvers)
+			(empty-sosofo)))
+	      (empty-sosofo))
+	  (if docref
+	      (make sequence
+		(make element gi: "doccode"
+		      (literal docref))
+		(make element gi: "docref"
+		      (literal (getdocnumber (current-node) #t))))
+	      (empty-sosofo))
+	  (make empty-element gi: "docdates"
+		attributes: (list
+			     (if (car rel)
+				 (list "date" (format-date (car rel)))
+				 '())
+			     (if (cadr rel)
+				 (list "revised" (format-date (cadr rel)))
+				 '())
+			     (if (caddr rel)
+				 (list "version" (caddr rel))
+				 '())
+			     (if (cadddr rel)
+				 (list "distribution" (cadddr rel))
+				 '())
+			     ))
+	  (with-mode in-docinfo (process-node-list authorlist))
+	  (if abstract
+	      (make element gi: "abstract"
+		    (with-mode in-docinfo (process-node-list abstract)))
+	      (empty-sosofo))
+	  (if copy
+	      (make element gi: "copyright" (process-node-list copy))
+	      (empty-sosofo))
+	  (if coverimage
+	      (process-node-list coverimage)
+	      (empty-sosofo))
+	  (if history
+	      (process-node-list history)
+	      (empty-sosofo)))))
 
+(element docbody
+  (copy-element))
 
+;; history elements -- copy unchanged
 (element history
-  (empty-sosofo))
+  (copy-element))
+(element version
+  (copy-element))
+(element distribution
+  (copy-element))
+(element change
+  (copy-element))
+
 (element abstract			;dealt with in docinfo element above
   (empty-sosofo))
 (mode in-docinfo
   (element abstract
-    (process-children))
+    (process-children-trim))
   (element authorlist
-    (make element gi: "authorlist"
-	  (process-children-trim)))
-  (element author
-    (make element gi: "author"
-	  (process-children-trim)))
+    (copy-element))
   (element otherauthors
-    (make element gi: "otherauthors"
-	  (process-children-trim))))
+    (copy-element))
+  (element editors
+    (copy-element))
+  (element author
+    (copy-element)))
+
+(element manualtype
+   (case (case-fold-down (attribute-string (normalize "type")))
+      (("users") (literal "User's Guide"))
+      (("programmers") (literal "Programmer's Guide"))
+      (("programmers.c") (literal "Programmer's Guide (C version)"))
+      (("programmers.fortran") (literal "Programmer's Guide (Fortran version)"))
+      (("other") (process-children))
+      (else (error "manualtype: unrecognised manualtype"))))
+
+(element softwareversion
+   (make sequence
+     (literal "Software Version ")
+     (process-children)))
