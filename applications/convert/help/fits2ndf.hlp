@@ -238,7 +238,9 @@ number of the group parameter.
 
    -  HISTORY cards in a special format created by NDF2FITS are
    converted back into NDF history records.  This will only work
-   provided the HISTORY headers have not been tampered.
+   provided the HISTORY headers have not been tampered.  Such
+   headers are not transferred to the FITS airlock, when
+   PROFITS=TRUE.
 
    o  IUE Final Archive LILO, LIHI, SILO, SIHI
 
@@ -404,22 +406,36 @@ number of the group parameter.
       -  HISTORY cards in a special format created by NDF2FITS are
       converted back into NDF history records.
 
-      -  The NDF variance is derived from the data array in the first
-      (IMAGE) sub-file.
+      -  The NDF variance is derived from the data array of an
+      IMAGE extension (usually the first), if present, provided the
+      IMAGE extension headers have an HDUCLAS2 keyword whose value
+      is either 'VARIANCE' or 'ERROR'.
 
       -  The NDF_CLASS extension within the NDF is filled using the
-      next FITS sub-file---a binary table.
+      a FITS binary-table extension whose EXTNAME keyword's value is
+      NDF_CLASS.  Note: no error is reported if this extension does
+      not exist within the FITS file.
 
-      -  The FIBRES extension is created using the second binary
-      table.  The OBJECT substructure's component names, data types,
-      and values are taken from the binary-table columns themselves,
-      and the components of the FIELD substructure are extracted
-      from recognised keywords in the binary-table's header.
+      -  The FIBRES extension is created using another binary table
+      whose EXTNAME keyword's value is FIBRES.  The OBJECT
+      substructure's component names, data types, and values are
+      taken from the binary-table columns themselves, and the
+      components of the FIELD substructure are extracted from
+      recognised keywords in the binary-table's header.  Note:
+      no error is reported if this extension does not exist within
+      the FITS file.
+
+      -  Other IMAGE and BINTABLE extensions are propagated to the
+      NDF extension.  It uses the extension name and type found in
+      the EXTNAME and EXTTYPE keywords, or names it NDF_EXT_n for
+      the nth FITS extension.
 
       -  A FITS extension in the NDF may be written to store the
       primary data unit's headers when parameter PROFITS is TRUE.
+      This FITS airlock will not contain any NDF-style HISTORY
+      records.
 2 References
-   Bailey, J.A. 1996, 2dF Software Report 14, version 0.3.
+   Bailey, J.A. 1997, 2dF Software Report 14, version 0.5.
    NASA Office of Standards and Technology, 1994, "A User's Guide
      for the Flexible Image Transport System (FITS)", version 3.1.
    NASA Office of Standards and Technology, 1995, "Definition of
@@ -439,3 +455,7 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1997 March 24 (MJC):
     Can recreate NDFs produced by NDF2FITS.
+
+ 1997 November 16 (MJC):
+    Filters out NDF-style history from the FITS airlock.  Fixed bug
+    creating NDF extensions which are arrays of structures.
