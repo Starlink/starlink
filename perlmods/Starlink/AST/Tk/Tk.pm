@@ -80,6 +80,8 @@ This function displays lines joining the given positions.
 
 sub _GLine {
    my ( $external, $xf, $yf ) = @_;
+   use Data::Dumper;
+
    my $canvas = $$external[0];
    my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
    
@@ -120,7 +122,7 @@ where $type is an integer used to indicate the type of marker required.
 =cut
 
 sub _GMark {
-   my ($external, $xf, $yf, $type) = shift;
+   my ($external, $xf, $yf, $type) = @_;
    my $canvas = $$external[0];
    my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
    
