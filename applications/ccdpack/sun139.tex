@@ -3422,13 +3422,9 @@ the following effect:
 Since they now share a coordinate system they can now be, for instance,
 aligned with other images from the same instrument or resampled directly.
 
-The AST file can be found at {\tt \$CCDPACK\_DIR/INT-WFC.ast}.
-It's not perfect; 
-compensation for the optical distortions is imperfect in two corners
-and alignment of CCD 2 is poor.  
-If you have data from the WFC then consider
-improving it as an exercise for the reader!
-
+The AST file can be found in {\tt \$CCDPACK\_DIR/INT-WFC.ast}.
+It is thought to be correct to an accuracy of 1 or 2 pixels, 
+which is around half an arcsecond, over the whole focal plane.
 
 
 \subsection{Schematic registration sequences}
@@ -16061,6 +16057,10 @@ This is a major update to CCDPACK.
   has been improved; they now signal an error rather than just crashing.
   In a future release these applications will be replaced by ones which
   run properly on these visuals.
+\item
+  An improved version of the AST file INT-WFC.ast, for astrometry of 
+  frames from the WFC mosaic camera on the Isaac Newton Telescope,
+  has been included.
 \end{itemize}
 
 
