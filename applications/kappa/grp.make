@@ -196,7 +196,7 @@ kps1_apadub.f kps1_apadd.f kps1_apaduw.f kps1_apadi.f kps1_apadw.f \
 kps1_apadr.f kps1_ardmb.f kps1_ardmd.f kps1_ardmi.f kps1_ardmr.f \
 kps1_ardmub.f kps1_ardmuw.f kps1_ardmw.f kps1_laplb.f kps1_lapld.f \
 kps1_lapli.f kps1_laplr.f kps1_laplub.f kps1_lapluw.f kps1_laplw.f \
-kps1_medr.f kps1_medd.f kps1_mmvr.f kps1_mmvd.f kps1_msa.f kps1_mss.f
+kps1_medr.f kps1_medd.f kps1_mmvr.f kps1_mmvd.f 
 
 # Generic source files needed for kapsub_sub.tar:
 KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen kps1_dscl.gen \
@@ -278,7 +278,8 @@ kps1_mlpmp.f kps1_mlpky.f kps1_mlpnd.f kps1_elmap.f kps1_pswcs.f \
 kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f kps1_glidd.f \
 kps1_gliwd.f kps1_glibr.f kps1_glibd.f kps1_glidr.f kps1_ltaba.f \
 kps1_gliwr.f kps1_gligt.f kps1_saxlk.f kps1_look.f \
-kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f
+kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f \
+kps1_msa.f kps1_mss.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \
