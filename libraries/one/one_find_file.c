@@ -306,7 +306,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
    if (*Context == 0) {
        /* FIXME: explain why malloc 2*sizeof()? */
       ContextPtr = (ContextStruct *) cnfMalloc(2 * sizeof(ContextStruct));
-      if ((int) ContextPtr == 0) {
+      if ( ContextPtr == NULL ) {
          *Status = ONE__MALLOCERR;
 	 emsRep("one_find_file","Unable to allocate memory for context struct",
 		Status);
