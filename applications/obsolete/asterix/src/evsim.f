@@ -677,7 +677,7 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
      :                     STATUS )
 
 *          Convolve
-            CALL PSF_CONVOLVE( PW*2+1, TPW*2+1, PTEMP, PW*2+1, PW*2+1,
+            CALL PSF_CONVOLVE( PW*2+1, PW*2+1, PTEMP, PW*2+1, PW*2+1,
      :                         PKERN, PD(-PW,-PW,ISRC), STATUS )
 
           END IF
