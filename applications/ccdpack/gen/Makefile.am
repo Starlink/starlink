@@ -24,22 +24,22 @@ SUFFIXES = .o .c .gen .grd .glrdi .glrdic .gln .dgen .f .h
 
 .grd.f:
 	cp $< $(<:.grd=.gen)
-	$(GENERIC) -t rd $(<:.grd=.gen)
+	$(FGENERIC) -t rd $(<:.grd=.gen)
 	$(RM) $(<:.grd=.gen)
 
 .glrdic.f:
 	cp $< $(<:.glrdic=.gen)
-	$(GENERIC) -t lrdic $(<:.glrdic=.gen)
+	$(FGENERIC) -t lrdic $(<:.glrdic=.gen)
 	$(RM) $(<:.glrdic=.gen)
 
 .glrdi.f:
 	cp $< $(<:.glrdi=.gen)
-	$(GENERIC) -t lrdi $(<:.glrdi=.gen)
+	$(FGENERIC) -t lrdi $(<:.glrdi=.gen)
 	$(RM) $(<:.glrdi=.gen)
 
 .gln.f:
 	cp $< $(<:.gln=.gen)
-	$(GENERIC) -t ln $(<:.gln=.gen)
+	$(FGENERIC) -t ln $(<:.gln=.gen)
 	$(RM) $(<:.gln=.gen)
 
 .dgen.f:
