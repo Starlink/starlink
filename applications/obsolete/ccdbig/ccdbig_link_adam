@@ -1,7 +1,10 @@
-echo "`img_link_adam` `fio_link_adam` `trn_link_adam` \
-      `chr_link_adam` `prm_link_adam` `psx_link_adam` \
-      `ard_link_adam` `grp_link_adam` -lpda " \
+echo "\
+      `img_link_adam` \
+      `fio_link_adam` \
+      `chr_link_adam` \
+      `prm_link_adam` \
+       -lpda " \
     | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
-# $Id: ccdpack_link_adam,v 1.1 1997/06/27 09:01:41 pwd Exp $
+# $Id: ccdbig_link_adam,v 1.1 1998/07/01 16:31:40 mbt Exp $
