@@ -32,15 +32,16 @@
       IF (.NOT.I_OPEN) THEN
         CALL AST_INIT()
         I_BGM_ON = .FALSE.
+        I_OPEN - .TRUE.
       ELSE
         CALL USI_INIT()
       ENDIF
 
       CALL MSG_PRNT(VERSION)
 
-      IF (.NOT.I_OPEN) THEN
-        CALL MSG_PRNT('AST_ERR: image processing not active')
-      ELSE
+c     IF (.NOT.I_OPEN) THEN
+c       CALL MSG_PRNT('AST_ERR: image processing not active')
+c     ELSE
 
 
 *  get input image
