@@ -606,10 +606,9 @@ kpg1_ghstuw.f kpg1_ghstw.f kpg1_gilst.f kpg1_gkeyb.f kpg1_gkeyd.f \
 kpg1_gkeyi.f kpg1_gkeyr.f kpg1_gkeyw.f kpg1_gnlbu.f kpg1_gntit.f \
 kpg1_gpcol.f kpg1_gtaxi.f kpg1_gtaxv.f kpg1_gtchv.f kpg1_gtgrp.f \
 kpg1_gtndf.f kpg1_gtpos.f kpg1_gtwcs.f kpg1_h2ast.f kpg1_hconr.f \
-kpg1_hmltd.f kpg1_hmltr.f kpg1_hmsg.f kpg1_hrcpr.f kpg1_hsdsd.f \
-kpg1_hsdsr.f kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f kpg1_hstab.f \
-kpg1_hstad.f kpg1_hstai.f kpg1_hstar.f kpg1_hstaub.f kpg1_hstauw.f \
-kpg1_hstaw.f kpg1_hstfd.f kpg1_hstfr.f kpg1_hstlo.f kpg1_hstqb.f \
+kpg1_hmltd.f kpg1_hmltr.f kpg1_hmsg.f kpg1_hrcpr.f \
+kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f \
+kpg1_hstfd.f kpg1_hstfr.f kpg1_hstlo.f kpg1_hstqb.f \
 kpg1_hstqd.f kpg1_hstqi.f kpg1_hstqr.f kpg1_hstqub.f kpg1_hstquw.f \
 kpg1_hstqw.f kpg1_iderr.f kpg1_imprg.f kpg1_incor.f kpg1_isclb.f \
 kpg1_iscld.f kpg1_iscli.f kpg1_isclr.f kpg1_isclw.f kpg1_isscs.f \
@@ -664,12 +663,18 @@ kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f kpg1_mkpos.f \
 kpg1_pseed.f kpg1_ndfnm.f kpg1_graph.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
 kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f kpg1_grlm2.f kpg1_grlm1.f \
-kpg1_cpbdd.f kpg1_cpbdr.f kpg1_mixvr.f kpg1_pgopn.f kpg1_pgcls.f \
+kpg1_cpbdd.f kpg1_cpbdr.f kpg1_pgopn.f kpg1_pgcls.f \
 kpg1_expob.f kpg1_expoi.f kpg1_expoub.f kpg1_expow.f kpg1_expod.f \
 kpg1_expor.f kpg1_expouw.f kpg1_logab.f kpg1_logai.f kpg1_logaub.f \
 kpg1_logaw.f kpg1_logad.f kpg1_logar.f kpg1_logauw.f kpg1_asshr.f \
 kpg1_lutky.f kpg1_pvers.f kpg1_orvar.f kpg1_is3d.f kpg1_wtm3d.f \
-kpg1_is3r.f kpg1_wtm3r.f 
+kpg1_is3r.f kpg1_wtm3r.f kpg1_darar.f kpg1_darad.f kpg1_darai.f \
+kpg1_daraw.f kpg1_darab.f kpg1_daraub.f kpg1_darauw.f kpg1_fracr.f \
+kpg1_fracd.f kpg1_fraci.f kpg1_fracw.f kpg1_fracb.f kpg1_fracub.f \
+kpg1_fracuw.f kpg1_mixvr.f kpg1_mixvd.f kpg1_mixvi.f kpg1_mixvw.f \
+kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f kpg1_hsdsd.f kpg1_hsdsr.f \
+kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
+kpg1_hstaub.f kpg1_hstauw.f 
 
 KAPVIEW_F_ROUTINES = \
 colcomp.f contour.f contover.f \
