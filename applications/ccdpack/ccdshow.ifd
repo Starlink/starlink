@@ -26,6 +26,8 @@
 #     17-MAY-2001 (MBT):
 #        Removed most of the parameters from this file.  The global 
 #        parameter values are now accessed directly from CCDSHOW.
+#     3-JUL-3001 (MBT):
+#        Added SAVE and SAVEFILE parameters.
 #     {enter_further_changes_here}
 
 #-
@@ -53,6 +55,29 @@
             prompt {logfile name}
             association <-global.ccdpack_logfile
             default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter save {
+                         # Whether to save CCD parameters or not
+            type _LOGICAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Save CCD parameters for future restoration}
+            helpkey *
+          }
+
+         parameter savefile {
+                             # Name of the file to save parameters
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default CCDPACK_SETUP.DAT
+            prompt {File to store CCD parameters}
+            repeated
             helpkey *
           }
 

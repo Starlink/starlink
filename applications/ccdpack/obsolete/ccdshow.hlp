@@ -50,6 +50,24 @@ LOGTO = LITERAL (Read)
    default is "BOTH".
    [BOTH]
 
+SAVE
+
+SAVE = _LOGICAL (Read)
+   Whether or not to save the values of the program parameters 
+   to a "restoration" file, which can later be used by CCDSETUP 
+   to restore the current values of the global parameters.  
+   If TRUE then you'll need to specify the name of the file using 
+   the SAVEFILE parameter.
+   [FALSE]
+
+SAVEFILE
+
+SAVEFILE = FILENAME (Read)
+   This parameter is only used if the SAVE parameters is TRUE.
+   It allows you to give the name of the restoration file to be used
+   when saving the program parameters.
+   [CCDPACK_SETUP.DAT]
+
 USESET
 
 USESET = _LOGICAL (Read)
@@ -60,6 +78,17 @@ USESET = _LOGICAL (Read)
    the parameter values specific to each Set Index value
    as well as the current unkeyed value.
    [FALSE]
+
+Examples
+
+ccdshow
+   This displays the current values of all the CCDPACK global
+   parameters to the screen.
+ccdshow save savefile=params.save
+   As well as displaying the global parameter values to the
+   screen, this will also write them to a restoration file
+   called 'params.save'.  This file can be used at a later date
+   to restore the current global parameter setup using CCDSETUP.
 
 Behaviour_of_parameters
 

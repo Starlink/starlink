@@ -21,7 +21,8 @@
 
 *  Description:
 *     This routine shows the current value of any CCDPACK global
-*     parameters.
+*     parameters.  It can also be used to save the current setup 
+*     to a file for restoration by CCDSETUP.
 
 *  Usage:
 *     ccdshow
@@ -52,6 +53,18 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
+*     SAVE = _LOGICAL (Read)
+*        Whether or not to save the values of the program parameters 
+*        to a "restoration" file, which can later be used by CCDSETUP 
+*        to restore the current values of the global parameters.  
+*        If TRUE then you'll need to specify the name of the file using
+*        the SAVEFILE parameter.
+*        [FALSE]
+*     SAVEFILE = FILENAME (Read)
+*        This parameter is only used if the SAVE parameters is TRUE.
+*        It allows you to give the name of the restoration file to be used
+*        when saving the program parameters.
+*        [CCDPACK_SETUP.DAT]
 *     USESET = _LOGICAL (Read)
 *        This parameter determines whether values keyed by Set Index
 *        are to be displayed.  If CCDSETUP has been used to set up 
@@ -60,6 +73,16 @@
 *        the parameter values specific to each Set Index value
 *        as well as the current unkeyed value.
 *        [FALSE]
+
+*  Examples:
+*     ccdshow
+*        This displays the current values of all the CCDPACK global 
+*        parameters to the screen.
+*     ccdshow save savefile=params.save
+*        As well as displaying the global parameter values to the 
+*        screen, this will also write them to a restoration file 
+*        called 'params.save'.  This file can be used at a later date
+*        to restore the current global parameter setup using CCDSETUP.
 
 *  Behaviour of parameters:
 *     The parameters LOGTO, LOGFILE and USESET have global values. These
@@ -90,7 +113,8 @@
 *        is substantially rewritten.  In particular access to global
 *        variables is now not done via the parameter system at all,
 *        but using direct inspection of the GLOBAL ADAM parameter file
-*        (via the CCD1_KPGT routine).
+*        (via the CCD1_KPGT routine).  SAVE and SAVEFILE parameters 
+*        are also added.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,6 +131,7 @@
       INCLUDE 'PAR_ERR'          ! Parameter system constants
       INCLUDE 'MSG_PAR'          ! Message system constants
       INCLUDE 'FIO_PAR'          ! FIO parameters 
+      INCLUDE 'CCD1_PAR'         ! CCDPACK private constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -115,18 +140,15 @@
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Length of string
 
-*  Local Constants:
-      INTEGER MAXKEY             ! Maximum number of Set Index keys
-      PARAMETER ( MAXKEY = 20 )
-
 *  Local Variables:
       CHARACTER * ( 8 ) LOGTO    ! Where information is logged to
       CHARACTER BIAS * ( FIO__SZFNM ) ! Name of master bias file.
       CHARACTER CAL * ( FIO__SZFNM ) ! Name of master cal file.
       CHARACTER FLAT * ( FIO__SZFNM ) ! Name of master flat file.
-      CHARACTER KLOCS( MAXKEY ) * ( DAT__SZLOC ) ! Locators for keyed values
-      CHARACTER KSTRS( MAXKEY ) * ( 80 ) ! String representation of keyed params
+      CHARACTER KLOCS( CCD1__MXSI ) * ( DAT__SZLOC ) ! Locators for keyed vals
+      CHARACTER KSTRS( CCD1__MXSI ) * ( 80 ) ! String representing keyed vals
       CHARACTER MSKNAM * ( FIO__SZFNM ) ! Name of mask file.
+      CHARACTER RFILE * ( FIO__SZFNM ) ! Name of restoration file
       CHARACTER ULOC * ( DAT__SZLOC ) ! Locator for unkeyed parameter value
       CHARACTER USTR * ( 80 )    ! String representation of unkeyed parameter
       DOUBLE PRECISION ADC       ! ADC factor
@@ -135,9 +157,10 @@
       DOUBLE PRECISION SATVAL    ! Saturation value 
       INTEGER BOUNDS( 4 )        ! Bias strip bounds
       INTEGER EXTENT( 4 )        ! Useful CCD area
+      INTEGER FDS                ! Restoration file descriptor
       INTEGER I                  ! Dummy
       INTEGER IAT                ! Position in string
-      INTEGER KEYS( MAXKEY )     ! Set Index keys for keyed parameters
+      INTEGER KEYS( CCD1__MXSI ) ! Set Index keys for keyed parameters
       INTEGER LENG               ! String length
       INTEGER MKEY               ! Maximum number of keyed values to be used
       INTEGER NBOUND             ! Number of bounds
@@ -166,14 +189,19 @@
       LOGICAL NDFS               ! INLIST prompts are NDFs
       LOGICAL PRESER             ! Whether to preserve data types.
       LOGICAL QUNKEY             ! Do we have an unkeyed version?
+      LOGICAL SAVE               ! Save restoration file?
       LOGICAL SATUR              ! Look for saturated pixels
       LOGICAL SETSAT             ! Set saturated pixels to saturation value
+      LOGICAL SOPEN              ! Is restoration file open?
       LOGICAL THERE              ! Is HDS component present?
       LOGICAL USESET             ! Whether to use available Set header info
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  No files are open.
+      SOPEN = .FALSE.
 
 *  Startup CCDPACK logging system.
       CALL CCD1_START( 'CCDSHOW', STATUS )
@@ -188,7 +216,7 @@
 *  See if we are using Sets.
       CALL PAR_GET0L( 'USESET', USESET, STATUS )
       IF ( USESET ) THEN
-         MKEY = MAXKEY
+         MKEY = CCD1__MXSI
       ELSE
          MKEY = 0
       END IF
@@ -672,8 +700,29 @@
      :                       ' values ', STATUS )
        END IF
 
+*  Find out if the user wants to save the setup for future restorations.
+      CALL PAR_GET0L( 'SAVE', SAVE, STATUS )
+      IF ( SAVE ) THEN
+
+*  Yes he does get a file name.
+         CALL CCD1_ASFIO( 'SAVEFILE', 'WRITE', 'LIST', 0, FDS, SOPEN,
+     :                    STATUS )
+
+*  And write out the current values.
+         CALL CCD1_SAV( FDS, STATUS )
+
+*  Where the set up is saved to.
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL FIO_FNAME( FDS, RFILE, STATUS )
+         CALL MSG_SETC( 'FNAME', RFILE )
+         CALL CCD1_MSG( ' ', '  Setup stored in file: ^FNAME', STATUS )
+      END IF
+
 *  Close down.
  99   CONTINUE
+
+*  Close any restoration files.
+      IF ( SOPEN ) CALL FIO_CLOSE( FDS, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
