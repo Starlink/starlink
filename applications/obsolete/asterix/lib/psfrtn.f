@@ -1031,7 +1031,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
           ROTA = 180.0
         END IF
       ELSE
-        ROTA = ATAN2D(Y0,-X0)
+        ROTA = ATAN2(Y0,-X0)*MATH__RTOD
       END IF
       IF ( ROTA .LT. 0.0 ) ROTA = ROTA + 360.0
       ROTA = (ROTA - REAL(AZIM(IRAD))+180.0) * MATH__DTOR

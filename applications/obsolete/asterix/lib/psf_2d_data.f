@@ -161,7 +161,7 @@
           IF ( (IR.EQ.1) .OR. (SM_P_NA(SLOT).EQ.1) ) THEN
             IA = 1
           ELSE
-            MA = ATAN2D(Y0,X0)+180.0
+            MA = ATAN2(Y0,X0)*MATH__RTOD+180.0
             IA = INT( MA*SM_P_NA(SLOT)/360.0) + 1
           END IF
 
