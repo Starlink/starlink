@@ -15476,6 +15476,15 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
+         parameter abort {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Abort after first failure?}
+            helpkey *
+          }
+
          parameter acc {
             type _REAL
             vpath DEFAULT
