@@ -9,7 +9,7 @@
   6  600           483.0   51.0  10.2
   7  450           677.0   30.0   7.3
   8  350           866.0   30.0   5.7
-  9                  0.0    0.0   0.0
+  9  200           200.0   72.0   5.7
  10                  0.0    0.0   0.0
  11                  0.0    0.0   0.0
  12                  0.0    0.0   0.0
@@ -63,3 +63,4 @@ These are the SCUBA filters (effective from 23-May-1996).
 Version 27-October-1995 (HEM)
 SCUBA Version 25-July-1996 (WSH)
 
+23-July-2003 (TJ) - Add THUMPER
