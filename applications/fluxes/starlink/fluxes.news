@@ -1,6 +1,12 @@
 FLUXES -- JCMT planetary position and flux density calibration
                                                             Expires: ??.??.??
 
+Version 1.1-3 (Spring 2005)
+
+   - Tidy up usage of MJD vs JD
+   - Improve LST calculation and use TT rather than UT where required
+   - Change build system to use autoconf
+
 Version 1.1-2
 
 Changes in this release (Spring 2001):
