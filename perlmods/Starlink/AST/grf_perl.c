@@ -539,6 +539,11 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
   double cache;
 
   if (!astOK) return 0;
+
+  /* Optimize away if we get both a bad value and null old_value */
+  if (value == AST__BAD && old_value == NULL) return 1;
+
+  /* Make sure we have a plot */
   if (CurrentPlot == NULL ) {
     astError( AST__GRFER, "No Plot object stored. Should not happen." );
     return 0;
