@@ -2136,15 +2136,12 @@ CDIV        - Divides an NDF by a scalar.
 CMULT       - Multiplies an NDF by a scalar.
 CSUB        - Subtracts a scalar from an NDF data structure.
 DIV         - Divides one NDF data structure by another.
-EXP10       - Takes the base-10 exponential of each pixel of a data
-              array.
-EXPE        - Takes the exponential of each pixel of a data array (base e).
-EXPON       - Takes the exponential of each pixel of a data array
-              (specified base).
-LOG10       - Takes the base-10 logarithm of each pixel of a data array.
-LOGAR       - Takes the logarithm of each pixel of a data array
-              (specified base).
-LOGE        - Takes the natural logarithm of each pixel of a data array.
+EXP10       - Takes the base-10 exponential of each pixel of an NDF.
+EXPE        - Takes the exponential of each pixel of an NDF (base e).
+EXPON       - Takes the exponential of each pixel of a NDF (specified base).
+LOG10       - Takes the base-10 logarithm of each pixel of an NDF.
+LOGAR       - Takes the logarithm of each pixel of an NDF (specified base).
+LOGE        - Takes the natural logarithm of each pixel of an NDF. 
 MATHS       - Evaluates mathematical expressions applied to NDF data
               structures.
 MULT        - Multiplies two NDF data structures.
@@ -7534,239 +7531,172 @@ MJC: Malcolm J. Currie (STARLINK)
    NDF has the same numeric type as the input NDF.  However, all
    internal calculations are performed in double precision.
 1 EXP10
-    Takes the base-10 exponential of each pixel of a data array
- 
-   This routine takes the exponential to base 10 of each pixel of
-   a data array. The result goes into a new output data array.
-   Both data arrays are stored in the IMAGE format.
- 
-   The magic-value method is used for processing bad data.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   02-07-1986 : First implementation (REVA::MJM)
-   1986 Aug 6 : Renamed algorithm subroutine (EXPARR), changed new
-                2nd argument to total number of pixels (RAL::CUR).
-   1986 Aug 28: Added argument section, generalised to vectors and
-                tidied (RAL::CUR).
-   1987 Oct 15: Reordered tidying and used CMP_SHAPE (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 30: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       Input IMAGE structure containing the data array
-   BASE  =  REAL( READ )
-       Base of exponential to be taken of each input data array pixel
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure holding result of exponentiated array
-   OTITLE  =  CHAR( READ )
-       Title string for the output IMAGE structure
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Input image'
-  help        'Name of the IMAGE structure containing the input data 
-              array'
-3 BASE
-  position    2
-  keyword     'BASE'
-  type        '_REAL'
-  access      'READ'
-  vpath       'DEFAULT'
-  prompt      'Base'
-  default     10.0
-  help        'Base of exponential to be taken of each input 
-              data-array pixel'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Output image'
-  help        'Name given to the IMAGE structure holding the data 
-              array resulting from exponentiation'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        'LITERAL'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Exp10'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+Takes the base-10 exponential of an NDF data structure.
+
+Usage:
+
+   exp10 in out
+
+Description:
+
+   This routine takes the base-10 exponential of each  pixel of a NDF
+   to produce a new NDF data structure.
+
+   This command is a synonym for "expon base=10D0".
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.
+3 OUT
+OUT = NDF (Write)
+   Output NDF data structure being the exponential of the input NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+2 Examples
+exp10 a b
+   This takes exponentials to base ten of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b inherits its title
+   from a.
+
+exp10 title="Abell 4321" out=b in=a
+   This takes exponentials to base ten of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b has the title
+   "Abell 4321".
+2 Related_Applications
+   KAPPA: LOG10, LOGAR, LOGE, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+   IPOWER.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 13 (MJC):
+    Original NDF version.
+ 1997 November 5 (MJC):
+    Added WCS propagation.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
+   NDF data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
 
 1 EXPE
-    Takes the exponential of each pixel of a data array (base e)
- 
-   This routine takes the exponential to base e of each pixel of
-   a data array. The result goes into a new output data array.
-   Both data arrays are stored in the IMAGE format.
- 
-   The magic-value method is used for processing bad data.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   02-07-1986 : First implementation (REVA::MJM)
-   1986 Aug 6 : Renamed algorithm subroutine (EXPARR), changed new
-                2nd argument to total number of pixels (RAL::CUR).
-   1986 Aug 28: Added argument section, generalised to vectors and
-                tidied (RAL::CUR).
-   1987 Oct 15: Reordered tidying and used CMP_SHAPE (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 30: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       Input IMAGE structure containing the data array
-   BASE  =  REAL( READ )
-       Base of exponential to be taken of each input data array pixel
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure holding result of exponentiated array
-   OTITLE  =  CHAR( READ )
-       Title string for the output IMAGE structure
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Input image'
-  help        'Name of the IMAGE structure containing the input data 
-              array'
-3 BASE
-  position    2
-  keyword     'BASE'
-  type        '_REAL'
-  access      'READ'
-  vpath       'DEFAULT'
-  prompt      'Base'
-  default     2.718282
-  help        'Base of exponential to be taken of each input 
-              data-array pixel'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Output image'
-  help        'Name given to the IMAGE structure holding the data 
-              array resulting from exponentiation'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        'LITERAL'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Expe'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+Takes the natural exponential of an NDF data structure.
+
+Usage:
+
+   expe in out
+
+Description:
+
+   This routine takes the natural exponential of each pixel of a NDF
+   to produce a new NDF data structure.
+
+   This command is a synonym for "expon base=natural".
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.
+3 OUT
+OUT = NDF (Write)
+   Output NDF data structure being the exponential of the input NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+2 Examples
+expe a b
+   This takes the natural exponential of the pixels in the NDF called
+   a, to make the NDF called b.  NDF b inherits its title from a.
+
+expe title="Cas A" out=b in=a
+   This takes the natural exponential of the pixels in the NDF called
+   a, to make the NDF called b.  NDF b has the title "Cas A".
+2 Related_Applications
+   KAPPA: LOG10, LOGAR, LOGE, EXP10, EXPON, POW; Figaro: IALOG, ILOG,
+   IPOWER.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 13 (MJC):
+    Original NDF version.
+ 1997 November 5 (MJC):
+    Added WCS propagation.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
+   NDF data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
 
 1 EXPON
-    Takes the exponential of each pixel of a data array
- 
-   This routine takes the exponential to an input base of each pixel
-   of a data array. The result goes into a new output data array.
-   Both data arrays are stored in the IMAGE format.
- 
-   The magic-value method is used for processing bad data.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   02-07-1986 : First implementation (REVA::MJM)
-   1986 Aug 6 : Renamed algorithm subroutine (EXPARR), changed new
-                2nd argument to total number of pixels (RAL::CUR).
-   1986 Aug 28: Added argument section, generalised to vectors and
-                tidied (RAL::CUR).
-   1987 Oct 15: Reordered tidying and used CMP_SHAPE (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 30: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       Input IMAGE structure containing the data array
-   BASE  =  REAL( READ )
-       Base of exponential to be taken of each input data array pixel
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure holding result of exponentiated array
-   OTITLE  =  CHAR( READ )
-       Title string for the output IMAGE structure
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Input image'
-  help        'Name of the IMAGE structure containing the input data 
-              array'
+Takes the exponential (specified base) of an NDF data structure.
+
+Usage:
+
+   expon in out base
+
+Description:
+
+   This routine takes the exponential to a specified base of each
+   pixel of a NDF to produce a new NDF data structure.
+2 Parameters
+For information on individual parameters, select from the list below:
 3 BASE
-  position    2
-  keyword     'BASE'
-  type        '_REAL'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC,DEFAULT'
-  prompt      'Base'
-  default     2.718282
-  help        'Base of exponential to be taken of each input 
-              data-array pixel'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Output image'
-  help        'Name given to the IMAGE structure holding the data 
-              array resulting from exponentiation'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        'LITERAL'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Expon'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+BASE = LITERAL (Read)
+   The base of the exponential to be applied.  A special value
+   "Natural" gives natural (base-e) exponentiation.
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.
+3 OUT
+OUT = NDF (Write)
+   Output NDF data structure being the exponential of the input NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+2 Examples
+expon a b 10
+   This takes exponentials to base ten of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b inherits its title
+   from a.
+
+expon base=8 title="HD123456" out=b in=a
+   This takes exponentials to base eight of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b has the title
+   "HD123456".
+2 Related_Applications
+   KAPPA: LOG10, LOGAR, LOGE, EXP10, EXPE, POW; Figaro: IALOG, ILOG,
+   IPOWER.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 13 (MJC):
+    Original NDF version.
+ 1997 November 5 (MJC):
+    Added WCS propagation.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
+   NDF data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
 
 1 Feedback
 Bug reports should be mailed to ussc@star.rl.ac.uk in the normal
@@ -15505,241 +15435,170 @@ DSB: David S. Berry (STARLINK)
     Original version.
 
 1 LOG10
-    Takes the base-10 logarithm of each pixel of a data array
- 
-   This routine takes the logarithm to base 10 of each pixel of
-   a data array. The result goes into a new output data array.
-   Both data arrays are stored in the IMAGE format.
- 
-   The magic-value method is used for processing bad data.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   02-07-1986 : First implementation (REVA::MJM)
-   1986 Aug 7 : Renamed algorithm subroutine (LOGARR), changed new
-                2nd argument to total number of pixels. Corrected
-                default base to 10. (RAL::CUR)
-   1986 Aug 29: Added argument section, generalised to vectors and
-                tidied (RAL::CUR).
-   1987 Oct 15: Reordered tidying and used CMP_SHAPE (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 30: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       Input IMAGE structure containing the data array
-   BASE  =  REAL( READ )
-       Base of logarithm to be taken of each input data array pixel
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure holding result of processed data
-   OTITLE  =  CHAR( READ )
-       Title string for the output IMAGE structure
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Input image'
-  help        'Name of the IMAGE structure containing the input data 
-              array'
-3 BASE
-  position    2
-  keyword     'BASE'
-  type        '_REAL'
-  access      'READ'
-  vpath       'DEFAULT'
-  prompt      'Base'
-  default     10.0
-  help        'Base of the logarithm to be taken of each input 
-              data-array pixel'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Output image'
-  help        'Name given to the IMAGE structure holding the data 
-              array resulting from taking logs'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        'LITERAL'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Log10'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+Takes the base-10 logarithm of an NDF data structure.
 
+Usage:
+
+   log10 in out
+
+Description:
+
+   This routine takes the base-10 logarithm of each  pixel of a NDF
+   to produce a new NDF data structure.
+
+   This command is a synonym for "logar base=10D0".
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.
+3 OUT
+OUT = NDF (Write)
+   Output NDF data structure being the logarithm of the input NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+2 Examples
+log10 a b
+   This takes logarithms to base ten of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b inherits its title
+   from a.
+
+log10 title="Abell 4321" out=b in=a
+   This takes logarithms to base ten of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b has the title
+   "Abell 4321".
+2 Related_Applications
+   KAPPA: LOGAR, LOGE, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+   IPOWER.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 13 (MJC):
+    Original NDF version.
+ 1997 November 5 (MJC):
+    Added WCS propagation.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
+   NDF data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
 1 LOGAR
-    Takes the logarithm of each pixel of a data array (specified
-    base)
- 
-   This routine takes the logarithm to a specified base of each
-   pixel of a data array. The result goes into a new output data
-   array. Both data arrays are stored in the IMAGE format.
- 
-   The magic-value method is used for processing bad data.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   02-07-1986 : First implementation (REVA::MJM)
-   1986 Aug 7 : Renamed algorithm subroutine (LOGARR), changed new
-                2nd argument to total number of pixels. (RAL::CUR)
-   1986 Aug 29: Added argument section, generalised to vectors and
-                tidied (RAL::CUR).
-   1987 Oct 15: Reordered tidying and used CMP_SHAPE (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 30: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       Input IMAGE structure containing the data array
-   BASE  =  REAL( READ )
-       Base of logarithm to be taken of each input data array pixel
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure holding result of processed data
-   OTITLE  =  CHAR( READ )
-       Title string for the output IMAGE structure
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Input image'
-  help        'Name of the IMAGE structure containing the input data 
-              array'
-3 BASE
-  position    2
-  keyword     'BASE'
-  type        '_REAL'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC,DEFAULT'
-  prompt      'Base'
-  default     2.718282
-  help        'Base of the logarithm to be taken of each input 
-              data-array pixel'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Output image'
-  help        'Name given to the IMAGE structure holding the data 
-              array resulting from taking logs'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        'LITERAL'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Logar'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+Takes the logarithm (specified base) of an NDF data structure.
 
-1 LOGE
-    Takes the natural logarithm of each pixel of a data array
- 
-   This routine takes the logarithm to base e of each pixel of
-   a data array. The result goes into a new output data array.
-   Both data arrays are stored in the IMAGE format.
- 
-   The magic-value method is used for processing bad data.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   02-07-1986 : First implementation (REVA::MJM)
-   1986 Aug 7 : Renamed algorithm subroutine (LOGARR), changed new
-                2nd argument to total number of pixels. (RAL::CUR)
-   1986 Aug 29: Added argument section, generalised to vectors and
-                tidied (RAL::CUR).
-   1987 Oct 15: Reordered tidying and used CMP_SHAPE (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 30: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       Input IMAGE structure containing the data array
-   BASE  =  REAL( READ )
-       Base of logarithm to be taken of each input data array pixel
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure holding result of processed data
-   OTITLE  =  CHAR( READ )
-       Title string for the output IMAGE structure
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Input image'
-  help        'Name of the IMAGE structure containing the input data 
-              array'
+Usage:
+
+   logar in out base
+
+Description:
+
+   This routine takes the logarithm to a specified base of each
+   pixel of a NDF to produce a new NDF data structure.
+2 Parameters
+For information on individual parameters, select from the list below:
 3 BASE
-  position    2
-  keyword     'BASE'
-  type        '_REAL'
-  access      'READ'
-  vpath       'DEFAULT'
-  prompt      'Base'
-  default     2.718282
-  help        'Base of the logarithm to be taken of each input 
-              data-array pixel'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Output image'
-  help        'Name given to the IMAGE structure holding the data 
-              array resulting from taking logs'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        'LITERAL'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Loge'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+BASE = LITERAL (Read)
+   The base of the logarithm to be applied.  A special value
+   "Natural" gives natural (base-e) logarithms.
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.
+3 OUT
+OUT = NDF (Write)
+   Output NDF data structure being the logarithm of the input NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+2 Examples
+logar a b 10
+   This takes logarithms to base ten of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b inherits its title
+   from a.
+
+logar base=8 title="HD123456" out=b in=a
+   This takes logarithms to base eight of the pixels in the NDF
+   called a, to make the NDF called b.  NDF b has the title
+   "HD123456".
+2 Related_Applications
+   KAPPA: LOG10, LOGE, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+   IPOWER.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 13 (MJC):
+    Original NDF version.
+ 1997 November 5 (MJC):
+    Added WCS propagation.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
+   NDF data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+1 LOGE
+Takes the natural logarithm of an NDF data structure.
+
+Usage:
+
+   loge in out
+
+Description:
+
+   This routine takes the natural logarithm of each pixel of a NDF
+   to produce a new NDF data structure.
+
+   This command is a synonym for "logar base=natural".
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input NDF data structure.
+3 OUT
+OUT = NDF (Write)
+   Output NDF data structure being the logarithm of the input NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+2 Examples
+loge a b
+   This takes the natural logarithm of the pixels in the NDF called
+   a, to make the NDF called b.  NDF b inherits its title from a.
+
+loge title="Cas A" out=b in=a
+   This takes the natural logarithm of the pixels in the NDF called
+   a, to make the NDF called b.  NDF b has the title "Cas A".
+2 Related_Applications
+   KAPPA: LOG10, LOGAR, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+   IPOWER.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 13 (MJC):
+    Original NDF version.
+ 1997 November 5 (MJC):
+    Added WCS propagation.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
+   NDF data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
 
 1 LOOK
     Outputs the values of a sub-array of a 2-d data array to the
@@ -29286,10 +29145,8 @@ ELPROF      - Creates a radial or azimuthal profile of a
               2-dimensional image.
 ERASE       - Erases an HDS object.
 ERRCLIP     - Removes pixels with large errors from an NDF.
-EXP10       - Takes the base-10 exponential of each pixel of a data
-              array.
-EXPE        - Takes the exponential of each pixel of a data array
-              (base e).
+EXP10       - Takes the base-10 exponential of each pixel of an NDF.
+EXPE        - Takes the exponential of each pixel of an NDF (base e).
 EXPON       - Takes the exponential of each pixel  of a data array.
 FFCLEAN     - Removes defects from a substantially flat 1- or
               2-dimensional NDF.
@@ -29349,12 +29206,9 @@ LINPLOT     - Draws a line plot of a 1-d NDF's data values against
               their axis co-ordinates.
 LISTMAKE    - Create a catalogue holding a positions list.
 LISTSHOW    - Reports the positions stored in a positions list.
-LOG10       - Takes the base-10 logarithm of each pixel of a data
-              array.
-LOGAR       - Takes the logarithm of each pixel of a data array
-              (specified base).
-LOGE        - Takes the natural logarithm of each pixel of a data
-              array.
+LOG10       - Takes the base-10 logarithm of each pixel of an NDF.
+LOGAR       - Takes the logarithm of each pixel of an NDF (specified base).
+LOGE        - Takes the natural logarithm of each pixel of an NDF.
 LOOK        - Outputs the values of a sub-array of a 2-d data array
               to the screen or a text file.
 LUCY        - Performs a Richardson-Lucy deconvolution of a 1- or
