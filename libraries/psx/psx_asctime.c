@@ -51,7 +51,7 @@
 *  References:
 *     -  POSIX standard (1988), section 8.1
 *     -  ANSI C standard (1989), section 4.12.3.1
-      
+
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
@@ -59,6 +59,7 @@
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,10 +70,14 @@
 *     23-JUN-2000 (AJC):
 *        Properly import TSTRCT
 *        Tidy refs to CNF routines
-*      8-JAN-2002 (AJC):
+*     08-JAN-2002 (AJC):
 *        #include <string.h>
-*      22-SEP-2004 (TIMJ):
+*     22-SEP-2004 (TIMJ):
 *        Use asctime_r if present
+*     09-MAR-2005 (PWD):
+*        Include unistd.h to get POSIX environment. 
+*        Test for HAVE_ASCTIME_R_THREE_ARGS to work around Solaris asctime_r
+*        having three arguments by default.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +92,9 @@
 #endif
 
 /* Global Constants:		.					    */
+#if HAVE_UNISTD_H
+#  include <unistd.h>            /* Make sure we get POSIX versions         */
+#endif
 
 #include <string.h>              /* C string library                        */
 #include <time.h>		 /* C time library			    */
@@ -127,7 +135,11 @@ F77_SUBROUTINE(psx_asctime)( POINTER(tstrct), CHARACTER(string),
 /* Convert the time structure and copy it to time_s.                        */
 
 #if HAVE_ASCTIME_R
+# if HAVE_ASCTIME_R_THREE_ARGS
+   asctime_r( tstrctc, time_s, SZ_ASCTIME+1 );
+# else
    asctime_r( tstrctc, time_s );
+# endif
 #else
 # if HAVE_ASCTIME
    temps = asctime( tstrctc );

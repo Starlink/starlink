@@ -38,6 +38,29 @@ AC_CHECK_FUNCS([gmtime gmtime_r])
 AC_CHECK_FUNCS([localtime localtime_r])
 AC_CHECK_FUNCS([asctime asctime_r])
 
+dnl    On Solaris ctime_r and asctime_r have three arguments (or two if 
+dnl    _POSIX_PTHREAD_SEMANTICS is defined, but let's avoid that). This
+dnl    test is taken to apply to both functions.
+AC_CACHE_CHECK([if ctime_r wants three arguments], psx_ctime_r_three_args,
+[
+   AC_TRY_COMPILE( [
+      #include <time.h>
+   ],[
+      char buf[27];
+      time_t clock;
+      ctime_r( &clock, buf, 26 );
+   ],[
+      psx_ctime_r_three_args=yes
+   ],[
+      psx_ctime_r_three_args=no
+   ] )
+] )
+
+if test x"$psx_ctime_r_three_args" = xyes ; then
+   AC_DEFINE(HAVE_CTIME_R_THREE_ARGS, 1, [Solaris-style ctime_r])
+   AC_DEFINE(HAVE_ASCTIME_R_THREE_ARGS, 1, [Solaris-style ctime_r])
+fi
+
 dnl    MinGW Windows libraries and functions. Checking for the functions,
 dnl    fails (not enough like UNIX) so must check for the declaration only.
 AC_CHECK_DECLS([GetUserName],,,[#include <windows.h>])

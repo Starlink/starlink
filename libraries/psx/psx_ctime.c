@@ -53,6 +53,7 @@
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,6 +68,10 @@
 *        Remove the cast from nticks to time_t and replace with an internal
 *        variable since the cast does not work reliably if sizeof(Fortran int)
 *        != sizeof(time_t).
+*     09-MAR-2005 (PWD):
+*        Include unistd.h to get POSIX environment. 
+*        Test for HAVE_CTIME_R_THREE_ARGS to work around Solaris ctime_r
+*        having three arguments by default.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,6 +86,9 @@
 #endif
 
 /* Global Constants:		.					    */
+#if HAVE_UNISTD_H
+#  include <unistd.h>            /* Make sure we get POSIX versions         */
+#endif
 
 #if STDC_HEADERS
 #  include <string.h>
@@ -123,7 +131,11 @@ F77_SUBROUTINE(psx_ctime)( INTEGER(nticks), CHARACTER(string),
 
    timep = (time_t) *nticks;
 #if HAVE_CTIME_R
+# if HAVE_CTIME_R_THREE_ARGS
+   ctime_r( &timep, time_s, SZ_CTIME+1 );
+# else
    ctime_r( &timep, time_s );
+# endif
 #else 
 #  if HAVE_CTIME
    temps = ctime( &timep );
