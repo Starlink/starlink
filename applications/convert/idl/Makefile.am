@@ -4,18 +4,19 @@
 bin_SCRIPTS = read_ndf.pro write_ndf.pro idl2hds.pro addnames.pro \
  convert_idl.dlm
 
-## List libraries which are to be built, these are not installed by this 
+## List libraries which are to be built, these are not installed by this
 ## package, convert does that.
 lib_LTLIBRARIES = convert_idl.la
 
 ## Declare the sources for the library.
 convert_idl_la_SOURCES = \
  $(PRIVATE_INCLUDES) \
- $(C_ROUTINES)
+ $(C_ROUTINES) \
+ $(F_ROUTINES)
 
 convert_idl_la_LIBADD = $(LIBADD) `ndf_link`
 
-## We want to dlopen this library (can we not depend on other shareables?).
+## We want to dlopen this library.
 convert_idl_la_LDFLAGS = -module
 
 PRIVATE_INCLUDES = export.h hds.h
@@ -26,9 +27,13 @@ C_ROUTINES = read_ndf.c write_ndf.c probe_ndf.c crehds.c hds2idl.c \
  getidlstringsize.c getobjectdetails.c getstringarray.c tagstrip.c \
  getcomp.c checkarr.c IDL_Load.c hds.c dat.c
 
+##  Dummy Fortran routine to make sure we can handle the Fortran in the
+##  dependency libraries.
+F_ROUTINES = dummy.f
+
 ## In order to get the correct name for the dlopened library we need to let
 ## libtool do it's work and then query the convert_idl.la file for the dlname
-## variable. Once we have this name we can subsitute it into some of the 
+## variable. Once we have this name we can subsitute it into some of the
 ## scripts. Do this at install-time. ENTRY_PREFIX is some prefix used to access
 ## the function, see the IDL documentation if needs to be set.
 
