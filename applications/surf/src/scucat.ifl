@@ -1,0 +1,84 @@
+## SCUCAT - Concatenate photometry data
+
+#+
+#  Name:
+#     SCUCAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+#     {enter_new_authors_here}
+
+#  History:
+#     1997 April 29 (TIMJ)
+#        Add MSG_FILTER
+#     1997 June 10 (TimJ)
+#        Add LOOP
+#     1997 June 11 (TimJ)
+#        Add BOL
+#     1997 Spetember 4 (TIMJ)
+#        Change message in DUMMY
+#-
+
+INTERFACE SCUCAT
+
+      HELPLIB 'SURF_HELP:'
+
+      PARAMETER BOL
+	TYPE _CHAR
+        ACCESS 'READ'
+        VPATH 'PROMPT'
+        PPATH 'CURRENT'
+        HELPKEY '*'
+        PROMPT 'Name of bolometer associated with this data'
+      ENDPARAMETER
+
+      PARAMETER OUT
+	POSITION 1
+	TYPE _CHAR
+	 ACCESS   'WRITE'
+	 VPATH    'PROMPT'
+ 	 PROMPT 'Rootname of files to contain concatenated data'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER DUMMY
+# Allows me to read GLOBAL filename
+	 TYPE NDF
+	 ACCESS 'READ'
+	 VPATH 'GLOBAL'
+	 ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+	 PROMPT 'Please ignore (will only appear in prompt mode)'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+ 
+      PARAMETER IN
+         TYPE     _CHAR
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+	 PPATH    'DYNAMIC, DEFAULT'
+	 DEFAULT  !
+	 POSITION 2
+         PROMPT  'Name of input file containing photometry data'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER LOOP
+        TYPE '_LOGICAL'
+        PROMPT 'Ask for multiple input files'
+        DEFAULT 'yes'
+        VPATH 'default'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+
+ENDINTERFACE

@@ -1,0 +1,163 @@
+## INTREBIN - Rebin the SCUBA data onto a rectangular grid
+
+#+
+#  Name:
+#     INTREBIN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+#     {enter_new_authors_here}
+
+#  History:
+#     1995 (JFL)
+# 	 Original version
+#     1996 September (TIMJ)
+#        Add SELECT_INTS
+#     1996 October 29 (TIMJ)
+#        Use GLOBAL defaults
+#     1996 November 13 (TIMJ)
+#        Add NA,AZ output coords
+#     1997 January 9 (TIMJ)
+#        Comment out defaults and in for REBIN_METHOD (using PAR_CHOIC)
+#     1997 April 8 (TimJ)
+#        Copy from BOLREBIN
+#        Change USE_INTS to USE_SECTION
+#	 Remove SELECT_INTS and INTEGRATIONS
+#     1997 April 9 (TimJ)
+#	 Add DUMMY to deal with GLOBAL defaults in REF	
+#     1997 May 9 (TimJ)
+#	 Add PL output coords
+#     1997 May 21 (TimJ)
+#        Add LOOP parameter
+#     1997 June 19 (TIMJ)
+#        Remove USE_SECTION
+#     1997 Spetember 4 (TIMJ)
+#        Change message in DUMMY
+#     {enter_further_changes_here}
+
+#-
+
+   INTERFACE INTREBIN
+
+      HELPLIB 'SURF_HELP:'
+
+      PARAMETER REF        # First reference date file
+         TYPE   '_CHAR'
+         ACCESS 'READ'
+         PPATH 'GLOBAL'
+	 PROMPT   'Name of first data file to be rebinned'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER LOOP
+        TYPE '_LOGICAL'
+        PROMPT 'Ask for multiple input files'
+        DEFAULT 'yes'
+        VPATH 'default'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER IN
+         TYPE     '_CHAR'
+         ACCESS   'READ'
+         VPATH    'PROMPT'
+         PPATH    'DYNAMIC, DEFAULT'
+         DEFAULT  !
+         PROMPT   'Name of next input file to be rebinned'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER DUMMY
+# Allows me to read GLOBAL filename
+         TYPE NDF
+         ACCESS 'READ'
+         VPATH 'GLOBAL'
+         ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         PROMPT 'Please ignore (will only appear in prompt mode)'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER REBIN_METHOD
+         TYPE    '_CHAR'
+         PROMPT  'Rebinning method to be used'
+#        DEFAULT 'LINEAR'
+#	 IN      'BESSEL','LINEAR','SPLINE1','SPLINE2','SPLINE3'
+	 HELPKEY  '*'
+      ENDPARAMETER
+ 
+      PARAMETER WEIGHT
+        TYPE     '_REAL'
+        PROMPT   'Weight to be assigned to input dataset'
+        DEFAULT  1.0
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER SHIFT_DX
+         TYPE    '_REAL'
+         PROMPT  'X shift to be applied to input dataset on output map (arcsec)'
+         DEFAULT 0.0
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER SHIFT_DY
+         TYPE    '_REAL'
+         PROMPT  'Y shift to be applied to input dataset on output map (arcsec)'
+         DEFAULT 0.0
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER OUT_OBJECT
+         TYPE    '_CHAR'
+         PROMPT  'Object name for output map'
+	 HELP    'This name becomes the title of the output map'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER OUT_COORDS
+         TYPE    '_CHAR'
+         PROMPT  'Coordinate sys of output map; PL,AZ,NA,RB,RJ,RD or GA'
+#	 IN      'RB','RJ','RD','GA', 'NA','AZ','PL'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER LONG_OUT
+         TYPE    '_CHAR'
+         PROMPT  'Longitude of of output map centre in hh (or dd) mm ss.ss format'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER LAT_OUT
+         TYPE    '_CHAR'
+         PROMPT  'Latitude of output map centre in dd mm ss.ss format'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER PIXSIZE_OUT
+         TYPE    '_REAL'
+         PROMPT  'Size of pixels in output map (arcsec)'
+         DEFAULT 3.0
+	 RANGE   0.01, 60.0
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER OUT
+         TYPE    '_CHAR'
+	 ACCESS   'WRITE'
+	 VPATH    'PROMPT'
+	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of container file to contain rebinned map'
+	 HELPKEY  '*'
+      ENDPARAMETER
+         
+   ENDINTERFACE
