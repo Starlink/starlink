@@ -17,7 +17,6 @@ Main Changes in this Version
 ----------------------------
 
 o  The FitsChan class has been modified to support the latest draft FITS
-
    WCS standard, described in the two papers "Representation of world
    coordinates in FITS" (E.W.,Greisen and M.,Calabretta, dated 30th
    November, 1999), and "Representation of celestial coordinates in
