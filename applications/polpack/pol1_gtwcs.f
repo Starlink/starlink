@@ -106,8 +106,9 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Get the WCS information from the supplied 3D NDF.
-      CALL NDF_GTWCS( INDF, IWCS, STATUS )
+*  Get the WCS information from the supplied 3D NDF (or equivalent info
+*  from the FITS or IRAS90 extension).
+      CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
 *  Create a PermMap which will create a 2D Frame from the first 2
 *  axes of the 3D GRID Frame included in the above FrameSet. The

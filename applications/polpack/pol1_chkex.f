@@ -323,8 +323,8 @@
          CALL AST_BEGIN( STATUS )
 
 *  Get an AST pointer for the FrameSet stored in the WCS component of
-*  the NDF.
-         CALL NDF_GTWCS( INDF, IWCS, STATUS )
+*  the NDF (or equivalent info from the FITS or IRAS90 extension).
+         CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
 *  Note the original Current frame.
          ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )

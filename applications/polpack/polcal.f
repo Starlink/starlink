@@ -792,7 +792,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       LBND( 3 ) = 1
       UBND( 3 ) = 1
       CALL NDF_SECT( NDFVAL( 1 ), 3, LBND, UBND, INDFT, STATUS ) 
-      CALL NDF_GTWCS( INDFT, IWCS, STATUS )
+      CALL KPG1_GTWCS( INDFT, IWCS, STATUS )
 
 *  At this point we can release the input images since we now have
 *  versions corrected with the efficiency factors. Do this by ending the

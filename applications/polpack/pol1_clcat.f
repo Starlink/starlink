@@ -24,7 +24,7 @@
 *  Arguments:
 *     IWCS = INTEGER (Given)
 *        An AST pointer to a FrameSet. This should have been obtained using 
-*        the NDF_GTWCS subroutine.
+*        the KPG1_GTWCS subroutine.
 *     CI = INTEGER (Given and Returned)
 *        A CAT identifier for the catalogue. Returned equal to CAT__NOID.
 *     STATUS = INTEGER (Given and Returned)
