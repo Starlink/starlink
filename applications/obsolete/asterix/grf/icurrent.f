@@ -16,7 +16,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -71,6 +70,9 @@
         ENDIF
 
 *  Current position
+	call adi_print(i_sysid,status)
+	call adi_print(i_prjid,status)
+	call adi_print(i_pixid,status)
 	print *,'W to pix'
 	call flush(6)
         CALL IMG_WORLDTOPIX(I_X,I_Y,XPIX,YPIX,STATUS)
