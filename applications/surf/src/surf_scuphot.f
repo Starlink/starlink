@@ -119,6 +119,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.11  1997/04/14 23:58:07  timj
+*     Add more checks for zero jiggle offsets.
+*
 *     Revision 1.10  1997/03/31 19:46:28  timj
 *     Add SCULIB_GET_JIGGLE
 *     Change PACKAGE and TSKNAME to variables.
@@ -394,6 +397,7 @@ c
       CHARACTER*15     UTDATE          ! date of input observation
       CHARACTER*15     UTSTART         ! UT of start of input observation
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
+      LOGICAL          WRITEMAP        ! Am I storing the jiggle maps
       REAL             XMAX            ! maximum x jiggle offset
       REAL             XMIN            ! minimum x jiggle offset
       REAL             XSPACE          ! spacing between x jiggle offsets
@@ -664,6 +668,8 @@ c
 
 *  Now read in the jiggle pattern itself
 
+      WRITEMAP = .TRUE.
+
       CALL SCULIB_GET_JIGGLE(IN_SCUCDX_LOC, SCUBA__MAX_JIGGLE,
      :     N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT, 
      :     JIGGLE_P_SWITCH, SAMPLE_PA, SAMPLE_COORDS, JIGGLE_X,
@@ -678,11 +684,29 @@ c
          CALL SCULIB_CALC_GRID (JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
      :        XMIN, XMAX, XSPACE, UBND(1), YMIN, YMAX, YSPACE, 
      :        UBND(2), IPOS, JPOS, STATUS)
-         
-         IF ((STATUS .NE. SAI__OK) .OR.
-     :        (ABS(XSPACE/YSPACE - 1.0) .GT. 0.001)) THEN
-            CALL ERR_ANNUL (STATUS)
 
+         IF (YSPACE .LT. 0.001) THEN
+*     Zero jiggle
+            IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL (STATUS)
+
+            N_OBSDIM = 1
+            UBND (1) = JIGGLE_COUNT
+            UBND(2) = 1
+
+            DO I = 1, JIGGLE_COUNT
+               IPOS(I) = 0
+               JPOS(I) = 0
+            END DO
+
+            CALL MSG_SETC('PKG', PACKAGE)
+            CALL MSG_OUT (' ', '^PKG: No jiggle pattern was used. '//
+     :           'No images will be stored', STATUS)
+            WRITEMAP = .FALSE.
+
+         ELSE IF (STATUS .NE. SAI__OK .OR.
+     :           (ABS(XSPACE/YSPACE - 1.0) .GT. 0.001)) THEN
+            IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL (STATUS)
+            
             N_OBSDIM = 1
             UBND (1) = JIGGLE_COUNT
             UBND(2) = 1
@@ -691,10 +715,10 @@ c
                IPOS(I) = I
                JPOS(I) = 1
             END DO
-
+            
             CALL MSG_SETC('PKG', PACKAGE)
             CALL MSG_OUT (' ', '^PKG: the jiggle pattern does '//
-     :           'not fit a rectangular mesh, no images will be '//
+     :           'not fit a rectangular mesh, strip images will be '//
      :           'stored', STATUS)
          ELSE
 
@@ -778,79 +802,86 @@ c
 
 	       CALL NDF_BEGIN 
 
+*     Only if I am writing the JIGGLE map
+               IF (WRITEMAP) THEN
+
 *  first, create the NDF to hold the map data, called <bol>_map
 
-	       CALL SCULIB_BOLNAME (BOL_ADC(PHOT_BB(BEAM)),
-     :           BOL_CHAN(PHOT_BB(BEAM)), NDF_NAME, STATUS)
-	       NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_map'
-
-	       CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
-               CALL NDF_NEW('_REAL',N_OBSDIM, LBND, UBND, PLACE, 
-     :              IBEAM, STATUS)
+                  CALL SCULIB_BOLNAME (BOL_ADC(PHOT_BB(BEAM)),
+     :                 BOL_CHAN(PHOT_BB(BEAM)), NDF_NAME, STATUS)
+                  NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_map'
+                  
+                  CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
+                  CALL NDF_NEW('_REAL',N_OBSDIM, LBND, UBND, PLACE, 
+     :                 IBEAM, STATUS)
 
 * probably should store the FITS header
-               CALL NDF_XNEW(IBEAM, 'FITS','_CHAR*80',
-     :              1, N_FITS, OUT_FITSX_LOC, STATUS)
-               CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
-               CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
+                  CALL NDF_XNEW(IBEAM, 'FITS','_CHAR*80',
+     :                 1, N_FITS, OUT_FITSX_LOC, STATUS)
+                  CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
+                  CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
 
 * Create history 
-               CALL NDF_HCRE(IBEAM, STATUS)
+                  CALL NDF_HCRE(IBEAM, STATUS)
 
 *  Map the output data
-	       CALL NDF_MAP (IBEAM, 'QUALITY', '_UBYTE', 'WRITE',
-     :           MAP_Q_PTR, NELM, STATUS)
-	       CALL NDF_MAP (IBEAM, 'DATA', '_REAL', 'WRITE/ZERO',
-     :           MAP_D_PTR, NELM, STATUS)
-	       CALL NDF_MAP (IBEAM, 'VARIANCE', '_REAL', 'WRITE/ZERO',
-     :           MAP_V_PTR, NELM, STATUS)
+                  CALL NDF_MAP (IBEAM, 'QUALITY', '_UBYTE', 'WRITE',
+     :                 MAP_Q_PTR, NELM, STATUS)
+                  CALL NDF_MAP (IBEAM, 'DATA', '_REAL', 'WRITE/ZERO',
+     :                 MAP_D_PTR, NELM, STATUS)
+                  CALL NDF_MAP (IBEAM, 'VARIANCE','_REAL', 'WRITE/ZERO',
+     :                 MAP_V_PTR, NELM, STATUS)
 
 
 *  initialise quality to bad
 
-	       IF (STATUS .EQ. SAI__OK) THEN
-		  CALL SCULIB_CFILLB (NELM, 1, %val(MAP_Q_PTR))
-               END IF
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL SCULIB_CFILLB (NELM, 1, %val(MAP_Q_PTR))
+                  END IF
 
 *  construct axes
 
-	       IF (N_OBSDIM .EQ. 1) THEN
-	          CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
-     :              'WRITE', TEMP_PTR, NELM, STATUS)
-		  IF (STATUS .EQ. SAI__OK) THEN
-		     CALL SCULIB_NFILLR (JIGGLE_COUNT, %val(TEMP_PTR))
+                  IF (N_OBSDIM .EQ. 1) THEN
+                     CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
+     :                    'WRITE', TEMP_PTR, NELM, STATUS)
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        CALL SCULIB_NFILLR (JIGGLE_COUNT, 
+     :                       %val(TEMP_PTR))
+                     END IF
+                     CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
+                  ELSE IF (N_OBSDIM .EQ. 2) THEN
+                     CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
+     :                    'WRITE', TEMP_PTR, NELM, STATUS)
+                     CALL VEC_RTOR(.FALSE., UBND(1), JIGGLE_2D_A1,
+     :                    %val(TEMP_PTR), IERR, NERR, STATUS)
+                     CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
+                     
+                     CALL NDF_AMAP (IBEAM, 'CENTRE', 2, '_REAL',
+     :                    'WRITE', TEMP_PTR, NELM, STATUS)
+                     CALL VEC_RTOR(.FALSE., UBND(2), JIGGLE_2D_A2,
+     :                    %val(TEMP_PTR), IERR, NERR, STATUS)
+                     CALL NDF_AUNMP (IBEAM, 'CENTRE', 2, STATUS)
                   END IF
-		  CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
-               ELSE IF (N_OBSDIM .EQ. 2) THEN
-		  CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
-     :              'WRITE', TEMP_PTR, NELM, STATUS)
-                  CALL VEC_RTOR(.FALSE., UBND(1), JIGGLE_2D_A1,
-     :                 %val(TEMP_PTR), IERR, NERR, STATUS)
-		  CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
-
-		  CALL NDF_AMAP (IBEAM, 'CENTRE', 2, '_REAL',
-     :              'WRITE', TEMP_PTR, NELM, STATUS)
-                  CALL VEC_RTOR(.FALSE., UBND(2), JIGGLE_2D_A2,
-     :                 %val(TEMP_PTR), IERR, NERR, STATUS)
-		  CALL NDF_AUNMP (IBEAM, 'CENTRE', 2, STATUS)
-               END IF
 
 *  set the beam weight
 
-	       IF (STATUS .EQ. SAI__OK) THEN
-                  CALL NDF_XLOC (IBEAM, 'REDS', 'UPDATE',
-     :              OUT_REDSX_LOC, STATUS)
-                  IF (STATUS .NE. SAI__OK) THEN
-                     CALL ERR_ANNUL (STATUS)
-		     CALL NDF_XNEW (IBEAM, 'REDS', 'REDS_EXTENSION',
-     :                 0, 0, OUT_REDSX_LOC, STATUS)
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL NDF_XLOC (IBEAM, 'REDS', 'UPDATE',
+     :                    OUT_REDSX_LOC, STATUS)
+                     IF (STATUS .NE. SAI__OK) THEN
+                        CALL ERR_ANNUL (STATUS)
+                        CALL NDF_XNEW (IBEAM, 'REDS', 'REDS_EXTENSION',
+     :                       0, 0, OUT_REDSX_LOC, STATUS)
+                     END IF
+                     CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL',
+     :                    0, 0, STATUS)
+                     CALL CMP_PUT0R (OUT_REDSX_LOC, 'BEAM_WT', 
+     :                    BEAM_WEIGHT(BEAM), STATUS)
+                     CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
                   END IF
-                  CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL',
-     :              0, 0, STATUS)
-                  CALL CMP_PUT0R (OUT_REDSX_LOC, 'BEAM_WT', 
-     :              BEAM_WEIGHT(BEAM), STATUS)
-                  CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
+
                END IF
+
 
 *  now create the NDF to hold the fitted peaks for each integration,
 *  called <bol>_peak
@@ -919,14 +950,16 @@ c
                CALL NDF_CPUT(OBJECT, IPEAK, 'Title', STATUS)
                CALL NDF_CPUT('Fitted peak',IPEAK, 'LAB', STATUS)
 
-               IF (N_OBSDIM.GT.1) THEN
-                  CALL NDF_ACPUT('X-offset',IBEAM,'LABEL',1,STATUS)
-                  CALL NDF_ACPUT('Y-offset',IBEAM,'LABEL',2,STATUS)
-                  CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',1,STATUS)
-                  CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',2,STATUS)
+               IF (WRITEMAP) THEN
+                  IF (N_OBSDIM.GT.1) THEN
+                     CALL NDF_ACPUT('X-offset',IBEAM,'LABEL',1,STATUS)
+                     CALL NDF_ACPUT('Y-offset',IBEAM,'LABEL',2,STATUS)
+                     CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',1,STATUS)
+                     CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',2,STATUS)
+                  END IF
+                  CALL NDF_CPUT(OBJECT, IBEAM, 'Title', STATUS)
+                  CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB', STATUS)
                END IF
-               CALL NDF_CPUT(OBJECT, IBEAM, 'Title', STATUS)
-               CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB', STATUS)
 
 *  cycle through the integrations coadding them as required
 
@@ -984,25 +1017,30 @@ c
      :              BADBIT, STATUS)
 
 
+*     Only if I am writing the jiggle map               
+
+               IF (WRITEMAP) THEN
 * Initialise the scratch array for UNPACK_JIGGLE_SEPARATES
 
-               CALL SCULIB_MALLOC(UBND(1)*UBND(2) * VAL__NBI, MAP_N_PTR,
-     :              MAP_N_PTR_END, STATUS)
-
+                  CALL SCULIB_MALLOC(UBND(1)*UBND(2) * VAL__NBI, 
+     :                 MAP_N_PTR, MAP_N_PTR_END, STATUS)
+                  
 
 *  store the coadded measurement to the output map
 
-	       IF (STATUS .EQ. SAI__OK) THEN
-		  CALL SCULIB_UNPACK_JIGGLE_SEPARATES (JIGGLE_COUNT,
-     :              1, MEAS_D(1,BEAM), MEAS_V(1,BEAM),
-     :              MEAS_Q(1,BEAM), 1, JIGGLE_COUNT, IPOS, JPOS,
-     :              UBND(1), UBND(2), %val(MAP_D_PTR), %VAL(MAP_V_PTR),
-     :              %val(MAP_Q_PTR), %val(MAP_N_PTR), ITEMP, BADBIT, 
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL SCULIB_UNPACK_JIGGLE_SEPARATES (JIGGLE_COUNT,
+     :                    1, MEAS_D(1,BEAM), MEAS_V(1,BEAM),
+     :                    MEAS_Q(1,BEAM), 1, JIGGLE_COUNT, IPOS, JPOS,
+     :                    UBND(1), UBND(2), %val(MAP_D_PTR), 
+     :                    %VAL(MAP_V_PTR), %val(MAP_Q_PTR), 
+     :                    %val(MAP_N_PTR), ITEMP, BADBIT, 
+     :                    STATUS)
+                  END IF
+                  
+                  CALL SCULIB_FREE ('MAP_N', MAP_N_PTR, MAP_N_PTR_END,
      :                 STATUS)
-	       END IF
-
-               CALL SCULIB_FREE ('MAP_N', MAP_N_PTR, MAP_N_PTR_END,
-     :              STATUS)
+               END IF
 
 *  store the fitted peak values to the output ndf
 
@@ -1015,7 +1053,7 @@ c
 
 *     Write BIT MASK
                CALL NDF_SBB(OUTBAD, IPEAK, STATUS) 
-               CALL NDF_SBB(OUTBAD, IBEAM, STATUS) 
+               IF (WRITEMAP) CALL NDF_SBB(OUTBAD, IBEAM, STATUS) 
 
                ISBAD = .FALSE.
                DO I = 1, N_INTEGRATIONS
@@ -1025,6 +1063,9 @@ c
                CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
 
 *  close the ndfs opened in this ndf context
+               CALL NDF_ANNUL(IPEAK, STATUS)
+               IF (WRITEMAP) CALL NDF_ANNUL(IBEAM, STATUS)
+
 	       CALL NDF_END (STATUS)
 
             END IF
