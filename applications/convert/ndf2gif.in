@@ -1,0 +1,106 @@
+
+#  The line above is intentionally blank
+#+
+#  Name:
+#     ndf2gif
+ 
+#  Purpose:
+#     Converts an NDF into a GIF file.
+ 
+#  Type of Module:
+#     Bourne shell script
+ 
+#  Usage:
+#     ndf2gif in [out]
+
+#  Parameters:
+#     IN = NDF (Read)
+#        The name of the input NDF (without the .sdf extension).
+#     OUT = FILENAME (Write)
+#        The name of the GIF file to be generated (without the .gif 
+#        extension which is appended).  If this is omitted, the value of
+#        the IN parameter is used.
+ 
+#  Description:
+#     This Bourne shell script converts an NDF into a 256 grey-level
+#     Graphics Interchange Format (GIF) file.  One- or two-dimensional
+#     images can be handled.  The script uses the CONVERT utility
+#     NDF2TIFF to produce a TIFF file and then various PBMPLUS utilities
+#     to convert the TIFF file into a GIF file.
+#
+#     Error messages are converted into Starlink style (preceded by !).
+ 
+#  Examples:
+#     ndf2gif old new
+#        This converts the NDF called old (in file old.sdf)
+#        into a GIF file new.gif.
+#     ndf2gif horse
+#        This converts the NDF called horse (in file old.sdf)
+#        into a GIF file horse.gif.
+
+#  Notes:
+#     This initial version of the script handles only 256 grey 
+#     levels and does not use the image colour lookup table so
+#     absolute data values may be lost.
+#
+#     The PBMPLUS utilities tifftopnm} and ppmtogif must be available
+#     on your PATH.
+
+#  Related Applications:
+#     CONVERT: GIF2NDF
+ 
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     GJP: G.J. Privett (Starlink - UWCC)
+#     AJC: A.J. Chipperfield (Starlink - RAL)
+#     {enter_new_authors_here}
+ 
+#  History:
+#     1995 March 2 (MJC):
+#        Original conversion.
+#     1995 October 24 (GJP):
+#        Added prologue and revised to avoid using KAPPA.
+#     1995 November 13 (AJC):
+#        Added default output file, and error reporting and exit at each
+#        stage.
+ 
+#  Bugs:
+#     At the time of writing, this utility does not work on alpha OSF/1
+#     due to a problem with tifftopnm in the standard release of 
+#     PBMPLUS.  OSF/1 users should use a copy of tifftopnm obtained from 
+#     Netpbm which is based on PBMPLUS but contains many improvements and
+#     additions.  A suitable version may be obtained via WWW at
+#     http://www.astro.cf.ac.uk/pub/Grant.Privett/.  Alternatively,
+#     contact Grant Privett, gjp@astronomy.cardiff.ac.uk.
+#     {note_further_bugs_here}
+#-
+ 
+# Set required output file name
+out=${2:-$1}
+name=`basename $2`
+
+# Use NDF2TIFF to create a TIFF file.  Only the DATA component is 
+# propagated.
+
+$CONVERT_DIR/ndf2tiff in=$1 out=convert_temp_$name \
+  </dev/null  2>&1 | \
+  sed 's/^\!\!/\! /' | \
+  awk \
+'BEGIN{err=0}\
+/^\!/{if(err==0){err=1;print "!! NDF2GIF: Error reports from NDF2TIFF"}};\
+{print};\
+END{if(err==1){exit 1}}' || \
+  (rm -f convert_temp_$name.tif
+   echo "!  NDF2GIF: Abandoned at NDF2TIFF"
+   exit 1
+  ) || exit 1
+
+# Use PBMPLUS tools to convert the TIFF file to a GIF image. 
+tifftopnm convert_temp_$name.tif 2> convert_err1_$name.lis | \
+ppmtogif 2> convert_err2_$name.lis > $out.gif || \
+  { sed 's/^/!  NDF2GIF:/' convert_err?_$name.lis 1>&2
+    rm -f convert_err?_$name.lis convert_temp_$name.tif
+    exit 1
+  }
+  rm -f convert_err?_$name.lis 
+  rm -f convert_temp_$name.tif
