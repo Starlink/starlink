@@ -13,6 +13,8 @@
  *                 08/12/98  Changed for egcs compiler 
  *                 21/01/03  Changed for gcc3, now only uses syserror
  *                           rather than errno and sys_errlist.
+ *                 30/04/03  Removed ifdef for errno.h. Needed back
+ *                           for RH7.3.
  */
 static const char* const rcsId="@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $";
 
@@ -22,9 +24,7 @@ static const char* const rcsId="@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abri
 #include <string.h>
 #include <iostream.h>
 #include <strstream.h>
-#ifndef __linux__
 #include <errno.h>
-#endif
 #include <stdio.h>
 #include "error.h"
 
