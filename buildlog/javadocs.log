@@ -1263,15 +1263,15 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: isExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageModel.java:110: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/gui/MultipageModel.html...
-  [javadoc] "Get the index of the given page."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the index of the given page. -1 if it is not known."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageParser.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageParser.java:113: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageWriter.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultiWindowApplication.java:56: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ViewEvent.java:20: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/gui/MultipageModel.html...
+  [javadoc] "Get the index of the given page."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Get the index of the given page. -1 if it is not known."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/JShadePane.java:352: warning - @beaninfo is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/JTreePane.java:337: warning - @beaninfo is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/ListDataModel.java:26: warning - @rating is an unknown tag.
@@ -1407,25 +1407,25 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MultiStrokeRecognizer.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/Scene.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SceneElement.java:28: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/recognition/SceneElement.html...
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SceneElement.java:28: Tag @see: Malformed: Scene, StrokeElement, CompositeElement, ChoiceElement
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SceneRecognizer.java:16: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/StrokeElement.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/StrokeRecognizer.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/TypedData.java:53: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:45: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:510: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:378: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:26: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/recognition/SceneElement.html...
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SceneElement.java:28: Tag @see: Malformed: Scene, StrokeElement, CompositeElement, ChoiceElement
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/recognition/BasicScene.html...
   [javadoc] "Return true if the supports of the two elements (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the supports of the two elements (i.e. the
   [javadoc]  sets elements that they cover) are identical."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:378: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if the supports of the two elements (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the supports of the two elements (i.e. the
   [javadoc]  sets elements that they cover) are identical."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:120: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:137: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#endElement
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MultiStrokeSceneRecognizer.java:18: warning - @rating is an unknown tag.
@@ -2691,4 +2691,4 @@ javadocs:
   [javadoc] 199 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 22 seconds
+Total time: 3 minutes 20 seconds
