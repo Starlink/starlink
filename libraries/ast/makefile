@@ -383,7 +383,7 @@ frameset.h grismmap.h intramap.h loader.h lutmap.h mapping.h \
 mathmap.h matrixmap.h memory.h object.h pcdmap.h \
 permmap.h plot.h pointset.h polymap.h skyaxis.h skyframe.h specframe.h \
 specmap.h slamap.h sphmap.h unit.h unitmap.h wcsmap.h winmap.h \
-zoommap.h shiftmap.h
+zoommap.h xmlchan.h shiftmap.h
 
 #  The following include files are associated with various externally
 #  supplied software items.
@@ -426,11 +426,11 @@ fdssmap.c ferror.c ffitschan.c fframe.c fframeset.c fgrismmap.c \
 fintramap.c fitschan.c flutmap.c fmapping.c fmathmap.c \
 fmatrixmap.c fobject.c fpcdmap.c fpermmap.c fplot.c \
 frame.c frameset.c fskyframe.c fspecframe.c fslamap.c fspecmap.c fsphmap.c \
-funitmap.c fwcsmap.c fwinmap.c fshiftmap.c fzoommap.c grismmap.c intramap.c \
+funitmap.c fwcsmap.c fwinmap.c fshiftmap.c fxmlchan.c fzoommap.c grismmap.c intramap.c \
 loader.c lutmap.c mapping.c mathmap.c matrixmap.c \
 memory.c object.c pcdmap.c permmap.c plot.c fpolymap.c polymap.c \
 pointset.c skyaxis.c skyframe.c specframe.c specmap.c slamap.c sphmap.c \
-unit.c unitmap.c wcsmap.c winmap.c shiftmap.c zoommap.c 
+unit.c unitmap.c wcsmap.c winmap.c shiftmap.c xmlchan.c zoommap.c 
 
 
 #  The default error reporting module.
@@ -1383,6 +1383,8 @@ fwinmap.o: fwinmap.c f77.h c2f77.h error.h memory.h winmap.h mapping.h \
  object.h channel.h pointset.h
 fshiftmap.o: fshiftmap.c f77.h c2f77.h error.h memory.h shiftmap.h mapping.h \
  object.h channel.h pointset.h
+fxmlchan.o: fxmlchan.c f77.h c2f77.h error.h memory.h xmlchan.h \
+ channel.h object.h
 fzoommap.o: fzoommap.c f77.h c2f77.h error.h memory.h zoommap.h \
  mapping.h object.h channel.h pointset.h
 grf_null.o: grf_null.c grf.h error.h ast_err.h
@@ -1450,6 +1452,9 @@ winmap.o: winmap.c error.h memory.h object.h channel.h pointset.h \
 shiftmap.o: shiftmap.c error.h memory.h object.h channel.h pointset.h \
  matrixmap.h mapping.h unitmap.h zoommap.h permmap.h shiftmap.h \
  ast_err.h
+xml.o: xml.c memory.h error.h xml.h ast_err.h
+xmlchan.o: xmlchan.c error.h memory.h object.h channel.h xmlchan.h loader.h \
+ object.h xml.h ast_err.h
 zoommap.o: zoommap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h unitmap.h matrixmap.h zoommap.h ast_err.h
 

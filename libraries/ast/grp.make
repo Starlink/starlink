@@ -48,6 +48,7 @@ funitmap.c \
 fwcsmap.c \
 fshiftmap.c \
 fwinmap.c \
+fxmlchan.c 
 fzoommap.c \
 grf_null.c \
 grf_pgplot.c \
@@ -80,6 +81,8 @@ wcsmap.c \
 wcstrig.c \
 shiftmap.c \
 winmap.c \
+xml.c \
+xmlchan.c \
 zoommap.c
 
 F_ROUTINES = \
@@ -136,6 +139,8 @@ wcsmath.h \
 wcstrig.h \
 shiftmap.h \
 winmap.h \
+xml.h \
+xmlchan.h \
 zoommap.h
 
 F_INCLUDE_FILES = \

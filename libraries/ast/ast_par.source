@@ -47,6 +47,8 @@
 *        Added AST_VERSION.
 *     15-JUL-2003 (DSB):
 *        Added AST_RATE, POLYMAP, SHIFTMAP and GRISMMAP functions.
+*     13-NOV-2003 (DSB):
+*        Added XmlChan class.
 *-
 
 *  Length of character string returned by a character function.
@@ -339,3 +341,7 @@ c      PARAMETER ( AST__UKERNN = 2 )
 *  GrismMap class.
       INTEGER AST_GRISMMAP
       LOGICAL AST_ISAGRISMMAP
+
+*  XmlChan class.
+      INTEGER AST_XMLCHAN
+      LOGICAL AST_ISAXMLCHAN

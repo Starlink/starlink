@@ -15,6 +15,7 @@ MESSFILES=$(PKG)_err fac_$(FAC)_err $(PKG)_err.h
 #  Header files which contribute to the "ast.h" file, organised to correspond
 #  with the class hierarchy.
 HEADFILES = \
+xml.h \
 wcstrig.h \
 proj.h \
 memory.h \
@@ -43,6 +44,7 @@ object.h \
       unitmap.h \
       wcsmap.h \
       winmap.h \
+      xmlchan.h \
       zoommap.h \
       frame.h \
          cmpframe.h \
