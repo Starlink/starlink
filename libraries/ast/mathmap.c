@@ -1,9 +1,10 @@
 /* To do:
-      o Tidy everything up.
-      o Add attributes to support simplification and implement MapMerge.
+      o Implement MapMerge.
+      o Tidy and import error codes.
       o Sort lists of opcodes, symbols, etc. and ensure that all functions
         are present.
       o Add >=, ==, etc. operators.
+      o Write Fortran interface.
       o Write user documentation.
       o Sort out how to implement x ? a : b efficiently (using a mask stack
         maybe?).
@@ -16,24 +17,42 @@
    "protected" symbols available. */
 #define astCLASS MathMap
 
+/* This macro allocates an array of pointers. If successful, each element
+   of the array is initialised to NULL. */
 #define MALLOC_POINTER_ARRAY(array_name,array_type,array_size) \
+\
+/* Allocate the array. */ \
    (array_name) = astMalloc( sizeof(array_type) * (size_t) (array_size) ); \
    if ( astOK ) { \
+\
+/* If successful, loop to initialise each element. */ \
       int array_index_; \
       for ( array_index_ = 0; array_index_ < (array_size); array_index_++ ) { \
          (array_name)[ array_index_ ] = NULL; \
       } \
    }
 
+/* This macro frees a dynamically allocated array of pointers, each of
+   whose elements may point at a further dynamically allocated array
+   (which is also to be freed). It also allows for the possibility of any
+   of the pointers being NULL. */
 #define FREE_POINTER_ARRAY(array_name,array_size) \
+\
+/* Check thet the main array pointer is not NULL. */ \
    if ( (array_name) ) { \
+\
+/* If OK, loop to free each of the sub-arrays. */ \
       int array_index_; \
       for ( array_index_ = 0; array_index_ < (array_size); array_index_++ ) { \
+\
+/* Check that each sub-array pointer is not NULL before freeing it. */ \
          if ( (array_name)[ array_index_ ] ) { \
             (array_name)[ array_index_ ] = \
                astFree( (array_name)[ array_index_ ] ); \
          } \
       } \
+\
+/* Free the main pointer array. */ \
       (array_name) = astFree( (array_name) ); \
    }
 
@@ -87,9 +106,13 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static const char *(* parent_getattrib)( AstObject *, const char * );
+static int (* parent_testattrib)( AstObject *, const char * );
+static void (* parent_clearattrib)( AstObject *, const char * );
+static void (* parent_setattrib)( AstObject *, const char * );
 
 /* This declaration enumerates the operation codes recognised by the
-   virtual machine which evaluates mathematical expressions. */
+   virtual machine which evaluates arithmetic expressions. */
 typedef enum {
    OP_NULL,                      /* Null operation */
    OP_LDCON,                     /* Load constant */
@@ -121,14 +144,14 @@ typedef enum {
    OP_NINT,                      /* Fortran NINT function (round to nearest) */
    OP_ADD,                       /* Add */
    OP_SUB,                       /* Subtract */
-   OP_MULT,                      /* Multiply */
+   OP_MUL,                       /* Multiply */
    OP_DIV,                       /* Divide */
    OP_PWR,                       /* Raise to power */
    OP_MIN,                       /* Minimum of 2 or more values */
    OP_MAX,                       /* Maximum of 2 or more values */
    OP_DIM,                       /* Fortran DIM (positive difference) fn. */
-   OP_MOD,                       /* Fortran MOD (modulus) function */
-   OP_SIGN,                      /* Fortran transfer of sign function */
+   OP_MOD,                       /* Modulus function */
+   OP_SIGN,                      /* Transfer of sign function */
    OP_ATAN2,                     /* Inverse tangent (2 arguments, radians) */
    OP_ATAN2D                     /* Inverse tangent (2 arguments, degrees) */
 } Oper;
@@ -160,7 +183,7 @@ static const Symbol symbol[] = {
    { "-"      ,  1,  1,  1,  0,  0,  4,  4,  0, -1,  0,  OP_SUB    },
    { "+"      ,  1,  1,  1,  0,  0,  4,  4,  0, -1,  0,  OP_ADD    },
    { "**"     ,  2,  1,  1,  0,  0,  9,  6,  0, -1,  0,  OP_PWR    },
-   { "*"      ,  1,  1,  1,  0,  0,  5,  5,  0, -1,  0,  OP_MULT   },
+   { "*"      ,  1,  1,  1,  0,  0,  5,  5,  0, -1,  0,  OP_MUL    },
    { "/"      ,  1,  1,  1,  0,  0,  5,  5,  0, -1,  0,  OP_DIV    },
    { ","      ,  1,  1,  1,  1,  0,  2,  2,  0,  0,  0,  OP_NULL   },
    { "-"      ,  1,  0,  1,  0,  1,  8,  7,  0,  0,  0,  OP_NEG    },
@@ -196,15 +219,14 @@ static const Symbol symbol[] = {
    { "sign("  ,  5,  0,  1,  1,  0, 10,  1,  1, -1,  2,  OP_SIGN   },
    { "atan2(" ,  6,  0,  1,  1,  0, 10,  1,  1, -1,  2,  OP_ATAN2  },
    { "atan2d(",  7,  0,  1,  1,  0, 10,  1,  1, -1,  2,  OP_ATAN2D },
-   { "<bad>"  ,  5,  0,  0,  0,  0, 10, 10,  0,  1,  0,  OP_LDBAD  }
+   { "<bad>"  ,  5,  0,  0,  0,  0, 10, 10,  0,  1,  0,  OP_LDBAD  },
+   { NULL     ,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  OP_NULL   }
 };
 
 /* These variables identify indices in the above array which hold
    special symbols used explicitly in the code. */
 static const int symbol_ldvar = 0; /* Load a variable */
 static const int symbol_ldcon = 1; /* Load a constant */
-static const int symbol_start = 2; /* First symbol with usable text */
-static const int symbol_end = 43; /* Final symbol with usable text */
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -216,7 +238,16 @@ AstMathMap *astMathMapId_( int, int, const char *[], const char *[], const char 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static const char *GetAttrib( AstObject *, const char * );
+static int GetSimpFI( AstMathMap * );
+static int GetSimpIF( AstMathMap * );
+static int TestAttrib( AstObject *, const char * );
+static int TestSimpFI( AstMathMap * );
+static int TestSimpIF( AstMathMap * );
 static void CleanFunctions( int, const char *[], char *** );
+static void ClearAttrib( AstObject *, const char * );
+static void ClearSimpFI( AstMathMap * );
+static void ClearSimpIF( AstMathMap * );
 static void CompileExpression( const char *, int, const char *[], int **, double **, int * );
 static void CompileMapping( int, int, const char *[], const char *[], int ***, int ***, double ***, double ***, int *, int * );
 static void Copy( const AstObject *, AstObject * );
@@ -229,6 +260,9 @@ static void InitVtab( AstMathMapVtab * );
 static void ParseConstant( const char *, int, int *, double * );
 static void ParseName( const char *, int, int * );
 static void ParseVariable( const char *, int, int, const char *[], int *, int * );
+static void SetAttrib( AstObject *, const char * );
+static void SetSimpFI( AstMathMap *, int );
+static void SetSimpIF( AstMathMap *, int );
 static void ValidateSymbol( const char *, int, int, int *, int **, int **, int *, double ** );
 static void VirtualMachine( int, int, const double **, const int *, const double *, int, double * );
 
@@ -326,6 +360,66 @@ static void CleanFunctions( int nfun, const char *fun[], char ***clean ) {
       if ( !astOK ) {
          FREE_POINTER_ARRAY( *clean, nfun )
       }
+   }
+}
+
+static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a MathMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     void ClearAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     MathMap member function (over-rides the astClearAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function clears the value of a specified attribute for a
+*     MathMap, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the MathMap.
+*     attrib
+*        Pointer to a null terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*/
+
+/* Local Variables: */
+   AstMathMap *this;             /* Pointer to the MathMap structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the MathMap structure. */
+   this = (AstMathMap *) this_object;
+
+/* Check the attribute name and clear the appropriate attribute. */
+
+/* SimpFI. */
+/* ------- */
+   if ( !strcmp( attrib, "simpfi" ) ) {
+      astClearSimpFI( this );
+
+/* SimpIF. */
+/* ------- */
+   } else if ( !strcmp( attrib, "simpif" ) ) {
+      astClearSimpIF( this );
+   
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib );
    }
 }
 
@@ -473,17 +567,20 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
    istart = 0;
    for ( istart = 0; astOK && exprs[ istart ]; istart = iend + 1 ) {
 
-/* Compare each of the standard symbols in the symbol data with the
-   next section of the expression, stopping if a match is found. */
+/* Compare each of the symbols in the symbol data with the next
+   section of the expression, stopping if a match is found (or if a NULL
+   "text" value is found, which acts as the end flag). */
       found = 0;
-      for ( sym = symbol_start; sym <= symbol_end; sym++ ) {
+      for ( sym = 0; symbol[ sym ].text; sym++ ) {
 
-/* Only consider symbols which look like operators or operands from
-   the left, according to the setting of the "opernext" flag. Thus, if an
-   operator or operand is missing from the input expression, the next
-   symbol will not be identified, because it will be of the wrong type.
-   Also exclude unary +/- operators if they are out of context. */
-         if ( ( symbol[ sym ].operleft == opernext ) &&
+/* Only consider symbols which have text associated with them and
+   which look like operators or operands from the left, according to the
+   setting of the "opernext" flag. Thus, if an operator or operand is
+   missing from the input expression, the next symbol will not be
+   identified, because it will be of the wrong type. Also exclude unary
+   +/- operators if they are out of context. */
+         if ( symbol[ sym ].size &&
+              ( symbol[ sym ].operleft == opernext ) &&
               ( !symbol[ sym ].unaryoper || unarynext ) ) {
 
 /* Test if the text of the symbol matches the expression at the
@@ -1379,6 +1476,107 @@ static void ExtractVariables( int nfun, const char *fun[], char ***var ) {
    }
 }
 
+static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for a MathMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     MathMap member function (over-rides the protected astGetAttrib
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a MathMap, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the MathMap.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - The returned string pointer may point at memory allocated
+*     within the MathMap, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the MathMap. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Constants: */
+#define BUFF_LEN 50              /* Max. characters in result buffer */
+
+/* Local Variables: */
+   AstMathMap *this;             /* Pointer to the MathMap structure */
+   const char *result;           /* Pointer value to return */
+   int ival;                     /* Integer attribute value */
+   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the MathMap structure. */
+   this = (AstMathMap *) this_object;
+
+/* Compare "attrib" with each recognised attribute name in turn,
+   obtaining the value of the required attribute. If necessary, write
+   the value into "buff" as a null-terminated string in an appropriate
+   format.  Set "result" to point at the result string. */
+
+/* SimpFI. */
+/* ------- */
+   if ( !strcmp( attrib, "simpfi" ) ) {
+      ival = astGetSimpFI( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* SimpIF. */
+/* ------- */
+   } else if ( !strcmp( attrib, "simpif" ) ) {
+      ival = astGetSimpIF( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib );
+   }
+
+/* Return the result. */
+   return result;
+
+/* Undefine macros local to this function. */
+#undef BUFF_LEN
+}
+
 static void InitVtab( AstMathMapVtab *vtab ) {
 /*
 *  Name:
@@ -1409,6 +1607,7 @@ static void InitVtab( AstMathMapVtab *vtab ) {
 
 /* Local Variables: */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -1423,12 +1622,28 @@ static void InitVtab( AstMathMapVtab *vtab ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
-
-/* None. */
+   vtab->ClearSimpFI = ClearSimpFI;
+   vtab->ClearSimpIF = ClearSimpIF;
+   vtab->GetSimpFI = GetSimpFI;
+   vtab->GetSimpIF = GetSimpIF;
+   vtab->SetSimpFI = SetSimpFI;
+   vtab->SetSimpIF = SetSimpIF;
+   vtab->TestSimpFI = TestSimpFI;
+   vtab->TestSimpIF = TestSimpIF;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
@@ -1799,6 +2014,165 @@ static void ParseVariable( const char *exprs, int istart, int nvar,
    }
 }
 
+static void SetAttrib( AstObject *this_object, const char *setting ) {
+/*
+*  Name:
+*     SetAttrib
+
+*  Purpose:
+*     Set an attribute value for a MathMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     void SetAttrib( AstObject *this, const char *setting )
+
+*  Class Membership:
+*     MathMap member function (extends the astSetAttrib method inherited from
+*     the Mapping class).
+
+*  Description:
+*     This function assigns an attribute value for a MathMap, the attribute
+*     and its value being specified by means of a string of the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in lower
+*     case with no white space present. The value to the right of the "="
+*     should be a suitable textual representation of the value to be assigned
+*     and this will be interpreted according to the attribute's data type.
+*     White space surrounding the value is only significant for string
+*     attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the MathMap.
+*     setting
+*        Pointer to a null terminated string specifying the new attribute
+*        value.
+
+*  Returned Value:
+*     void
+*/
+
+/* Local Vaiables: */
+   AstMathMap *this;             /* Pointer to the MathMap structure */
+   int ival;                     /* Integer attribute value */
+   int len;                      /* Length of setting string */
+   int nc;                       /* Number of characters read by sscanf */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the MathMap structure. */
+   this = (AstMathMap *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = strlen( setting );
+
+/* Test for each recognised attribute in turn, using "sscanf" to parse the
+   setting string and extract the attribute value (or an offset to it in the
+   case of string values). In each case, use the value set in "nc" to check
+   that the entire string was matched. Once a value has been obtained, use the
+   appropriate method to set it. */
+
+/* SimpFI. */
+/* ------- */
+   if ( nc = 0,
+        ( 1 == sscanf( setting, "simpfi= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetSimpFI( this, ival );
+
+/* SimpIF. */
+/* ------- */
+   } else if ( nc = 0,
+        ( 1 == sscanf( setting, "simpif= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetSimpIF( this, ival );
+
+/* Pass any unrecognised setting to the parent method for further
+   interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting );
+   }
+}
+
+static int TestAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for a MathMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     int TestAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     MathMap member function (over-rides the astTestAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     a value has been set for one of a MathMap's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the MathMap.
+*     attrib
+*        Pointer to a null terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstMathMap *this;             /* Pointer to the MathMap structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the MathMap structure. */
+   this = (AstMathMap *) this_object;
+
+/* Check the attribute name and test the appropriate attribute. */
+
+/* SimpFI. */
+/* ------- */
+   if ( !strcmp( attrib, "simpfi" ) ) {
+      result = astTestSimpFI( this );
+
+/* SimpIF. */
+/* ------- */
+   } else if ( !strcmp( attrib, "simpif" ) ) {
+      result = astTestSimpIF( this );
+
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      result = (*parent_testattrib)( this_object, attrib );
+   }
+
+/* Return the result, */
+   return result;
+}
+
 static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
                                int forward, AstPointSet *out ) {
 /*
@@ -2136,12 +2510,538 @@ static void ValidateSymbol( const char *exprs, int iend, int sym,
    }
 }
 
+static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
+                            const int *code, const double *con, int stacksize,
+                            double *out ) {
+/*
+*  Name:
+*     VirtualMachine
+
+*  Purpose:
+*     Evaluate a function using a virtual machine.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
+*                          const int *code, const double *con, int stacksize,
+*                          double *out )
+
+*  Class Membership:
+*     MathMap member function.
+
+*  Description:
+*     This function implements a "virtual machine" which executes operations
+*     on an arithmetic stack in order to evaluate transformation functions.
+*     Each operation is specified by an input operation code (opcode) and
+*     results in the execution of a vector operation on a stack. The final
+*     result, after executing all the supplied opcodes, is returned as a
+*     vector.
+*
+*     The virtual machine detects arithmetic errors (such as overflow and
+*     division by zero) and propagates any "bad" coordinate values,
+*     including those present in the input, to the output.
+
+*  Parameters:
+*     npoint
+*        The number of points to be transformd (i.e. the size of the vector
+*        of values on which operations are to be performed).
+*     ncoord_in
+*        The number of input coordinames per point.
+*     ptr_in
+*        Pointer to an array (with "ncoord_in" elements) of pointers to arrays
+*        of double (with "npoint" elements). These arrays should contain the
+*        input coordinate values, such that coordinate number "coord" for point
+*        number "point" can be found in "ptr_in[coord][point]".
+*     code
+*        Pointer to an array of int containing the set of opcodes (cast to int)
+*        for the operations to be performed. The first element of this array
+*        should contain a count of the number of opcodes which follow.
+*     con
+*        Pointer to an array of double containing the set of constants required
+*        to evaluate the function (this may be NULL if no constants are
+*        required).
+*     stacksize
+*        The size of the stack required to evaluate the expression using the
+*        opcodes and constants supplied. This value should be calculated during
+*        expression compilation.
+*     out
+*        Pointer to an array of double (with "npoint" elements) in which to
+*        return the vector of result values.
+*/
+
+/* Local Variables: */
+   double **stack;               /* Array of pointers to stack elements */
+   double *work;                 /* Pointer to stack workspace */
+   double *xv1;                  /* Pointer to first argument vector */
+   double *xv2;                  /* Pointer to second argument vector */
+   double *xv;                   /* Pointer to sole argument vector */
+   double *y;                    /* Pointer to result */
+   double *yv;                   /* Pointer to result vector */
+   double abs1;                  /* Absolute value (temporary variable) */
+   double abs2;                  /* Absolute value (temporary variable) */
+   double pi;                    /* Value of PI */
+   double tmp;                   /* Temporary variable for use in macros */
+   double value;                 /* Value to be assigned to stack vector */
+   double x1;                    /* First argument value */
+   double x2;                    /* Second argument value */
+   double x;                     /* Sole argument value */
+   int iarg;                     /* Loop counter for arguments */
+   int icode;                    /* Opcode value */
+   int icon;                     /* Counter for number of constants used */
+   int istk;                     /* Loop counter for stack elements */
+   int ivar;                     /* Input variable number */
+   int narg;                     /* Number of function arguments */
+   int ncode;                    /* Number of opcodes to process */
+   int point;                    /* Loop counter for stack vector elements */
+   int tos;                      /* Top of stack index */
+   static double d2r;            /* Degrees to radians conversion factor */
+   static double r2d;            /* Radians to degrees conversion factor */
+   static int init = 0;          /* Initialisation performed? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+   
+/* If this is the first invocation of this function, then initialise
+   the trigonometrical conversion factors. */
+   if ( !init ) {
+      pi = acos( -1.0 );
+      r2d = 180.0 / pi;
+      d2r = pi / 180.0;
+
+/* Note that initialisation has been performed. */
+      init = 1;
+   }
+
+/* Allocate space for an array of pointers to elements of the
+   workspace stack (each stack element being an array of double). */
+   stack = astMalloc( sizeof( double * ) * (size_t) stacksize );
+
+/* Allocate space for the stack itself. */
+   work = astMalloc( sizeof( double ) *
+                     (size_t) ( npoint * ( stacksize - 1 ) ) );
+
+/* If OK, then initialise the stack pointer array to identify the
+   start of each vector on the stack. The first element points at the
+   output array (in which the result will be accumulated), while other
+   elements point at successive vectors within the workspace allocated
+   above. */
+   if ( astOK ) {
+      stack[ 0 ] = out;
+      for ( istk = 1; istk < stacksize; istk++ ) {
+         stack[ istk ] = work + ( istk - 1 ) * npoint;
+      }
+
+/* We now define a set of macros for performing vector operations on
+   elements of the stack. Each is in the form of a "case" block for
+   execution in response to the appropriate operation code (opcode). */
+
+/* Zero-argument operation. */
+/* ------------------------ */
+/* This macro performs a zero-argument operation, which results in the
+   insertion of a new vector on to the stack. */
+#define ARG_0(oper,setup,function) \
+\
+/* Test for the required opcode value. */ \
+   case oper: \
+\
+/* Perform any required initialisation. */ \
+      {setup;} \
+\
+/* Increment the top of stack index and obtain a pointer to the new stack \
+   element (vector). */ \
+      yv = stack[ ++tos ]; \
+\
+/* Loop to access each vector element, obtaining a pointer to it. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         y = yv + point; \
+\
+/* Perform the processing, which results in assignment to this element. */ \
+         {function;} \
+      } \
+\
+/* Break out of the "case" block. */ \
+      break;
+
+/* One-argument operation. */
+/* ----------------------- */
+/* This macro performs a one-argument operation, which processes the
+   top stack element without changing the stack size. */
+#define ARG_1(oper,function) \
+\
+/* Test for the required opcode value. */ \
+   case oper: \
+\
+/* Obtain a pointer to the top stack element (vector). */ \
+      xv = stack[ tos ]; \
+\
+/* Loop to access each vector element, obtaining its value and \
+   checking that it is not bad. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         if ( ( x = xv[ point ] ) != AST__BAD ) { \
+\
+/* Also obtain a pointer to the element. */ \
+            y = xv + point; \
+\
+/* Perform the processing, which uses the element's value and then \
+   assigns the result to this element. */ \
+            {function;} \
+         } \
+      } \
+\
+/* Break out of the "case" block. */ \
+      break;
+
+/* Two-argument operation. */
+/* ----------------------- */
+/* This macro performs a two-argument operation, which processes the
+   top two stack elements and produces a single result, resulting in the
+   stack size decreasing by one. In this case, we first define a macro
+   without the "case" block statements present. */
+#define DO_ARG_2(function) \
+\
+/* Obtain pointers to the top two stack elements (vectors), decreasing \
+   the top of stack index by one. */ \
+      xv2 = stack[ tos-- ]; \
+      xv1 = stack[ tos ]; \
+\
+/* Loop to access each vector element, obtaining the value of the \
+   first argument and checking that it is not bad. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         if ( ( x1 = xv1[ point ] ) != AST__BAD ) { \
+\
+/* Also obtain a pointer to the element which is to receive the \
+   result. */ \
+            y = xv1 + point; \
+\
+/* Obtain the value of the second argument, again checking that it is \
+   not bad. */ \
+            if ( ( x2 = xv2[ point ] ) != AST__BAD ) { \
+\
+/* Perform the processing, which uses the two argument values and then \
+   assigns the result to the appropriate top of stack element. */ \
+               {function;} \
+\
+/* If the second argument was bad, so is the result. */ \
+            } else { \
+               *y = AST__BAD; \
+            } \
+         } \
+      }
+
+/* This macro simply wraps the one above up in a "case" block. */
+#define ARG_2(oper,function) \
+   case oper: \
+      DO_ARG_2(function) \
+      break;
+
+/* We now define some macros for performing mathematical operations in
+   a "safe" way - i.e. trapping numerical problems such as overflow and
+   invalid arguments and translating them into the AST__BAD value. */
+
+/* Absolute value. */
+/* --------------- */
+/* This is just shorthand. */
+#define ABS(x) ( ( (x) >= 0.0 ) ? (x) : -(x) )
+
+/* Trap maths overflow. */
+/* -------------------- */
+/* This macro calls a C maths library function and checks for overflow
+   in the result. */
+#define CATCH_MATHS_OVERFLOW(function) \
+   ( \
+\
+/* Clear the "errno" value. */ \
+      errno = 0, \
+\
+/* Evaluate the function. */ \
+      tmp = (function), \
+\
+/* Check if "errno" and the returned result indicate overflow and \
+   return the appropriate result. */ \
+      ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ? AST__BAD : tmp \
+   )
+
+/* Trap maths errors. */
+/* ------------------ */
+/* This macro is similar to the one above, except that it also checks
+   for domain errors (i.e. invalid argument values). */
+#define CATCH_MATHS_ERROR(function) \
+   ( \
+\
+/* Clear the "errno" value. */ \
+      errno = 0, \
+\
+/* Evaluate the function. */ \
+      tmp = (function), \
+\
+/* Check if "errno" and the returned result indicate a domain error or \
+   overflow and return the appropriate result. */ \
+      ( ( errno == EDOM ) || \
+        ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ) ? AST__BAD : tmp \
+   )
+
+/* Safe addition. */
+/* -------------- */
+/* This macro performs addition while avoiding possible overflow. */
+#define SAFE_ADD(x1,x2) ( \
+\
+/* Test if the first argument is non-negative. */ \
+   ( (x1) >= 0.0 ) ? ( \
+\
+/* If so, then we can perform addition if the second argument is \
+   non-positive. Otherwise, we must calculate the most positive safe \
+   second argument value that can be added and test for this (the test \
+   itself is safe against overflow). */ \
+      ( ( (x2) <= 0.0 ) || ( ( (DBL_MAX) - (x1) ) >= (x2) ) ) ? ( \
+\
+/* Perform addition if it is safe, otherwise return AST__BAD. */ \
+         (x1) + (x2) \
+      ) : ( \
+         AST__BAD \
+      ) \
+\
+/* If the first argument is negative, then we can perform addition if \
+   the second argument is non-negative. Otherwise, we must calculate the \
+   most negative second argument value that can be added and test for \
+   this (the test itself is safe against overflow). */ \
+   ) : ( \
+      ( ( (x2) >= 0.0 ) || ( ( (DBL_MAX) + (x1) ) >= -(x2) ) ) ? ( \
+\
+/* Perform addition if it is safe, otherwise return AST__BAD. */ \
+         (x1) + (x2) \
+      ) : ( \
+         AST__BAD \
+      ) \
+   ) \
+)
+
+/* Safe subtraction. */
+/* ----------------- */
+/* This macro performs subtraction while avoiding possible overflow. */
+#define SAFE_SUB(x1,x2) ( \
+\
+/* Test if the first argument is non-negative. */ \
+   ( (x1) >= 0.0 ) ? ( \
+\
+/* If so, then we can perform subtraction if the second argument is \
+   also non-negative. Otherwise, we must calculate the most negative safe \
+   second argument value that can be subtracted and test for this (the \
+   test itself is safe against overflow). */ \
+      ( ( (x2) >= 0.0 ) || ( ( (DBL_MAX) - (x1) ) >= -(x2) ) ) ? ( \
+\
+/* Perform subtraction if it is safe, otherwise return AST__BAD. */ \
+         (x1) - (x2) \
+      ) : ( \
+         AST__BAD \
+      ) \
+\
+/* If the first argument is negative, then we can perform subtraction \
+   if the second argument is non-positive. Otherwise, we must calculate \
+   the most positive second argument value that can be subtracted and \
+   test for this (the test itself is safe against overflow). */ \
+   ) : ( \
+      ( ( (x2) <= 0.0 ) || ( ( (DBL_MAX) + (x1) ) >= (x2) ) ) ? ( \
+\
+/* Perform subtraction if it is safe, otherwise return AST__BAD. */ \
+         (x1) - (x2) \
+      ) : ( \
+         AST__BAD \
+      ) \
+   ) \
+)
+
+/* Safe multiplication. */
+/* -------------------- */
+/* This macro performs multiplication while avoiding possible overflow. */
+#define SAFE_MUL(x1,x2) ( \
+\
+/* Multiplication is safe if the absolute value of either argument is \
+   unity or less. Otherwise, we must use the first argument to calculate \
+   the maximum absolute value that the second argument may have and test \
+   for this (the test itself is safe against overflow). */ \
+   ( ( ( abs1 = ABS( (x1) ) ) <= 1.0 ) || \
+     ( ( abs2 = ABS( (x2) ) ) <= 1.0 ) || \
+     ( ( (DBL_MAX) / abs1 ) >= abs2 ) ) ? ( \
+\
+/* Perform multiplication if it is safe, otherwise return AST__BAD. */ \
+      (x1) * (x2) \
+   ) : ( \
+      AST__BAD \
+   ) \
+)
+
+/* Safe division. */
+/* -------------- */
+/* This macro performs division while avoiding possible overflow. */
+#define SAFE_DIV(x1,x2) ( \
+\
+/* Division is unsafe if the second argument is zero. Otherwise, it is \
+   safe if the abolute value of the second argument is unity or \
+   more. Otherwise, we must use the second argument to calculate the \
+   maximum absolute value that the first argument may have and test for \
+   this (the test itself is safe against overflow). */ \
+   ( ( (x2) != 0.0 ) && \
+     ( ( ( abs2 = ABS( (x2) ) ) >= 1.0 ) || \
+       ( ( (DBL_MAX) * abs2 ) >= ABS( (x1) ) ) ) ) ? ( \
+\
+/* Perform division if it is safe, otherwise return AST__BAD. */ \
+      (x1) / (x2) \
+   ) : ( \
+      AST__BAD \
+   ) \
+)
+
+/* All the required macros are now defined. */
+
+/* Initialise the top of stack index and constant counter. */
+      tos = -1;
+      icon = 0;
+
+/* Determine the number of opcodes to be processed and loop to process
+   them, executing the appropriate "case" block for each one. */
+      ncode = code[ 0 ];
+      for ( icode = 1; icode <= ncode; icode++ ) {
+         switch ( (Oper) code[ icode ] ) {
+
+/* Ignore any null opcodes (which shouldn't occur). */
+            case OP_NULL: break;
+
+/* Otherwise, perform the required vector operation on the stack... */
+
+/* Loading a constant involves incrementing the constant count and
+   assigning the next constant's value to the top of stack element. */
+            ARG_0( OP_LDCON,  value = con[ icon++ ], *y = value )
+
+/* Loading a variable involves obtaining the variable's index by
+   consuming a constant (as above), and then copying the variable's
+   values into the top of stack element. */
+            ARG_0( OP_LDVAR,  ivar = (int) ( con[ icon++ ] + 0.5 ),
+                              *y = ptr_in[ ivar ][ point ] )
+
+/* Loading a "bad" value simply means assigning AST__BAD to the top of
+   stack element. */
+            ARG_0( OP_LDBAD,  , *y = AST__BAD )
+
+/* The following 1-argument operations simply evaluate a function of
+   the top of stack element and assign the result to the same element. */
+            ARG_1( OP_NEG,    *y = -x )
+            ARG_1( OP_SQRT,   *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
+            ARG_1( OP_LOG,    *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
+            ARG_1( OP_LOG10,  *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
+            ARG_1( OP_EXP,    *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
+            ARG_1( OP_SIN,    *y = sin( x ) )
+            ARG_1( OP_COS,    *y = cos( x ) )
+            ARG_1( OP_TAN,    *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
+            ARG_1( OP_SIND,   *y = sin( x * d2r ) )
+            ARG_1( OP_COSD,   *y = cos( x * d2r ) )
+            ARG_1( OP_TAND,   *y = tan( x * d2r ) )
+            ARG_1( OP_ASIN,   *y = ( ABS( x ) <= 1.0 ) ? asin( x ) : AST__BAD )
+            ARG_1( OP_ACOS,   *y = ( ABS( x ) <= 1.0 ) ? acos( x ) : AST__BAD )
+            ARG_1( OP_ATAN,   *y = atan( x ) )
+            ARG_1( OP_ASIND,  *y = ( ABS( x ) <= 1.0 ) ? asin( x ) * r2d :
+                                                         AST__BAD )
+            ARG_1( OP_ACOSD,  *y = ( ABS( x ) <= 1.0 ) ? acos( x ) * r2d :
+                                                         AST__BAD )
+            ARG_1( OP_ATAND,  *y = atan( x ) * r2d )
+            ARG_1( OP_SINH,   *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
+            ARG_1( OP_COSH,   *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
+            ARG_1( OP_TANH,   *y = tanh( x ) )
+            ARG_1( OP_ABS,    *y = ABS( x ) )
+            ARG_1( OP_CEIL,   *y = ceil( x ) )
+            ARG_1( OP_FLOOR,  *y = floor( x ) )
+            ARG_1( OP_NINT,   *y = (int) ( ( x >= 0 ) ? x + 0.5 : x - 0.5 ) )
+
+/* These 2-argument operations evaluate a function of the top two
+   entries on the stack. */
+            ARG_2( OP_ADD,    *y = SAFE_ADD( x1, x2 ) )
+            ARG_2( OP_SUB,    *y = SAFE_SUB( x1, x2 ) )
+            ARG_2( OP_MUL,    *y = SAFE_MUL( x1, x2 ) )
+            ARG_2( OP_DIV ,   *y = SAFE_DIV( x1, x2 ) )
+            ARG_2( OP_PWR,    *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
+            ARG_2( OP_SIGN,   *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
+                                   x1 : -x1 )
+            ARG_2( OP_DIM,    *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
+            ARG_2( OP_MOD,    *y = ( x2 != 0.0 ) ? fmod( x1, x2 ) : AST__BAD )
+            ARG_2( OP_ATAN2,  *y = atan2( x1, x2 ) )
+            ARG_2( OP_ATAN2D, *y = atan2( x1, x2 ) * r2d )
+
+/* These operations take a variable number of arguments, the actual
+   number being determined by consuming a constant. We then loop to
+   perform a 2-argument operation on the stack (as above) the required
+   number of times. */
+         case OP_MAX:
+            narg = (int) ( con[ icon++ ] + 0.5 );
+            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
+               DO_ARG_2( *y = ( x1 >= x2 ) ? x1 : x2 )
+            }
+            break;
+         case OP_MIN:
+            narg = (int) ( con[ icon++ ] + 0.5 );
+            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
+               DO_ARG_2( *y = ( x1 <= x2 ) ? x1 : x2 )
+            }
+            break;
+         }
+      }
+   }
+
+/* When all opcodes have been processed, the result of the function
+   evaluation will reside in the lowest stack entry - i.e. the output
+   array. */
+
+/* Free the workspace arrays. */
+   work = astFree( work );
+   stack = astFree( stack );
+
+/* Undefine macros local to this function. */
+#undef ARG_0
+#undef ARG_1
+#undef DO_ARG_2
+#undef ARG_2
+#undef ABS
+#undef CATCH_MATHS_OVERFLOW
+#undef CATCH_MATHS_ERROR
+#undef SAFE_ADD
+#undef SAFE_SUB
+#undef SAFE_MUL
+#undef SAFE_DIV
+}
+
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
 /* Implement member functions to access the attributes associated with
    this class using the macros defined for this purpose in the
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
+
+/* Clear the SimpFI value by setting it to -INT_MAX. */
+astMAKE_CLEAR(MathMap,SimpFI,simp_fi,-INT_MAX)
+
+/* Supply a default of 0 if no SimpFI value has been set. */
+astMAKE_GET(MathMap,SimpFI,int,0,( ( this->simp_fi != -INT_MAX ) ?
+                                   this->simp_fi : 0 ))
+
+/* Set a SimpFI value of 1 if any non-zero value is supplied. */
+astMAKE_SET(MathMap,SimpFI,int,simp_fi,( value != 0 ))
+
+/* The SimpFI value is set if it is not -INT_MAX. */
+astMAKE_TEST(MathMap,SimpFI,( this->simp_fi != -INT_MAX ))
+
+/* Clear the SimpIF value by setting it to -INT_MAX. */
+astMAKE_CLEAR(MathMap,SimpIF,simp_if,-INT_MAX)
+
+/* Supply a default of 0 if no SimpIF value has been set. */
+astMAKE_GET(MathMap,SimpIF,int,0,( ( this->simp_if != -INT_MAX ) ?
+                                   this->simp_if : 0 ))
+
+/* Set a SimpIF value of 1 if any non-zero value is supplied. */
+astMAKE_SET(MathMap,SimpIF,int,simp_if,( value != 0 ))
+
+/* The SimpIF value is set if it is not -INT_MAX. */
+astMAKE_TEST(MathMap,SimpIF,( this->simp_if != -INT_MAX ))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -2317,7 +3217,7 @@ static void Delete( AstObject *obj ) {
    FREE_POINTER_ARRAY( this->invcon, this->ninv )
 }
 
-/* Dump function. */
+/* dDump function. */
 /* -------------- */
 static void Dump( AstObject *this_object, AstChannel *channel ) {
 /*
@@ -2353,6 +3253,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    char comment[ COMMENT_LEN + 1 ]; /* Buffer for comment strings */
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword strings */
    int ifun;                     /* Loop counter for functions */
+   int ival;                     /* Integer attribute value */
+   int set;                      /* Attribute value set? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2399,6 +3301,24 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                               "   \"        \"    %d", ifun + 1 );
       astWriteString( channel, key, 1, 1, this->invfun[ ifun ], comment );
    }
+
+/* SimpFI. */
+/* ------- */
+/* Write out the forward-inverse simplification flag. */
+   set = TestSimpFI( this );
+   ival = set ? GetSimpFI( this ) : astGetSimpFI( this );
+   astWriteInt( channel, "SimpFI", set, 0, ival,
+                ival ? "Forward-inverse pairs may simplify" :
+                       "Forward-inverse pairs do not simplify" );
+
+/* SimpIF. */
+/* ------- */
+/* Write out the inverse-forward simplification flag. */
+   set = TestSimpIF( this );
+   ival = set ? GetSimpIF( this ) : astGetSimpIF( this );
+   astWriteInt( channel, "SimpIF", set, 0, ival,
+                ival ? "Inverse-forward pairs may simplify" :
+                       "Inverse-forward pairs do not simplify" );
 
 /* Undefine macros local to this function. */
 #undef COMMENT_LEN
@@ -2791,6 +3711,8 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
       new->invstack = invstack;
       new->nfwd = nout;
       new->ninv = nin;
+      new->simp_fi = -INT_MAX;
+      new->simp_if = -INT_MAX;
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -2969,6 +3891,16 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
                new->invfun[ ifun ] = astReadString( channel, key, "" );
             }
 
+/* Forward-inverse simplification flag. */
+/* ------------------------------------ */
+            new->simp_fi = astReadInt( channel, "simpfi", -INT_MAX );
+            if ( TestSimpFI( new ) ) SetSimpFI( new, new->simp_fi );
+
+/* Inverse-forward simplification flag. */
+/* ------------------------------------ */
+            new->simp_if = astReadInt( channel, "simpif", -INT_MAX );
+            if ( TestSimpIF( new ) ) SetSimpIF( new, new->simp_if );
+
 /* Compile the MathMap's transformation functions. */
             CompileMapping( new->ninv, new->nfwd,
                             (const char **) new->fwdfun,
@@ -2989,340 +3921,3 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
 /* Undefine macros local to this function. */
 #undef KEY_LEN
 }
-
-/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/
-
-static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
-                            const int *code, const double *con, int stacksize,
-                            double *out ) {
-
-/* Local Variables: */
-   double **stack;               /* Array of pointers to stack elements */
-   double *work;                 /* Pointer to stack workspace */
-   double *xv1;                  /* Pointer to first argument vector */
-   double *xv2;                  /* Pointer to second argument vector */
-   double *xv;                   /* Pointer to sole argument vector */
-   double *y;                    /* Pointer to result */
-   double *yv;                   /* Pointer to result vector */
-   double abs1;                  /* Absolute value (temporary variable) */
-   double abs2;                  /* Absolute value (temporary variable) */
-   double pi;                    /* Value of PI */
-   double tmp;                   /* Temporary variable for use in macros */
-   double value;                 /* Value to be assigned to stack vector */
-   double x1;                    /* First argument value */
-   double x2;                    /* Second argument value */
-   double x;                     /* Sole argument value */
-   int iarg;                     /* Loop counter for arguments */
-   int icode;                    /* Opcode value */
-   int icon;                     /* Counter for number of constants used */
-   int istk;                     /* Loop counter for stack elements */
-   int ivar;                     /* Input variable number */
-   int narg;                     /* Number of function arguments */
-   int ncode;                    /* Number of opcodes to process */
-   int point;                    /* Loop counter for stack vector elements */
-   int tos;                      /* Top of stack index */
-   static double d2r;            /* Degrees to radians conversion factor */
-   static double r2d;            /* Radians to degrees conversion factor */
-   static int init = 0;          /* Initialisation performed? */
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-   
-/* If this is the first invocation of this function, then initialise
-   the trigonometrical conversion factors. */
-   if ( !init ) {
-      pi = acos( -1.0 );
-      r2d = 180.0 / pi;
-      d2r = pi / 180.0;
-
-/* Note that initialisation has been performed. */
-      init = 1;
-   }
-
-/* Allocate space for an array of pointers to elements of the
-   workspace stack (each stack element being an array of double). */
-   stack = astMalloc( sizeof( double * ) * (size_t) stacksize );
-
-/* Allocate space for the stack itself. */
-   work = astMalloc( sizeof( double ) *
-                     (size_t) ( npoint * ( stacksize - 1 ) ) );
-
-/* If OK, then initialise the stack pointer array to identify the
-   start of each vector on the stack. The first element points at the
-   output array (in which the result will be accumulated), while other
-   elements point at successive vectors within the workspace allocated
-   above. */
-   if ( astOK ) {
-      stack[ 0 ] = out;
-      for ( istk = 1; istk < stacksize; istk++ ) {
-         stack[ istk ] = work + ( istk - 1 ) * npoint;
-      }
-
-/* We now define a set of macros for performing vector operations on
-   elements of the stack. Each is in the form of a "case" block for
-   execution in response to the apprpriate operation code (opcode). */
-
-/* Zero-argument operation. */
-/* ------------------------ */
-/* This macro performs a zero-argument operation, which results in the
-   insertion of a new vector on to the stack. */
-#define ARG_0(oper,setup,function) \
-\
-/* Test for the required opcode value. */ \
-   case oper: \
-\
-/* Perform any required initialisation. */ \
-      {setup;} \
-\
-/* Increment the top of stack index and obtain a pointer to the new stack \
-   element (vector). */ \
-      yv = stack[ ++tos ]; \
-\
-/* Loop to access each vector element, obtaining a pointer to it. */ \
-      for ( point = 0; point < npoint; point++ ) { \
-         y = yv + point; \
-\
-/* Perform the processing, which results in assignment to this element. */ \
-         {function;} \
-      } \
-\
-/* Break out of the "case" block. */ \
-      break;
-
-/* One-argument operation. */
-/* ----------------------- */
-/* This macro performs a one-argument operation, which processes the
-   top stack element without changing the stack size. */
-#define ARG_1(oper,function) \
-\
-/* Test for the required opcode value. */ \
-   case oper: \
-\
-/* Obtain a pointer to the top stack element (vector). */ \
-      xv = stack[ tos ]; \
-\
-/* Loop to access each vector element, obtaining its value and \
-   checking that it is not bad. */ \
-      for ( point = 0; point < npoint; point++ ) { \
-         if ( ( x = xv[ point ] ) != AST__BAD ) { \
-\
-/* Also obtain a pointer to the element. */ \
-            y = xv + point; \
-\
-/* Perform the processing, which uses the element's value and then \
-   assigns the result to this element. */ \
-            {function;} \
-         } \
-      } \
-\
-/* Break out of the "case" block. */ \
-      break;
-
-/* Two-argument operation. */
-/* ----------------------- */
-/* This macro performs a two-argument operation, which processes the
-   top two stack elements and produces a single result, resulting in the
-   stack size decreasing by one. In this case, we first define a macro
-   without the "case" block statements present. */
-#define DO_ARG_2(function) \
-\
-/* Obtain pointers to the top two stack elements (vectors), decreasing \
-   the top of stack index by one. */ \
-      xv2 = stack[ tos-- ]; \
-      xv1 = stack[ tos ]; \
-\
-/* Loop to access each vector element, obtaining the value of the \
-   first argument and checking that it is not bad. */ \
-      for ( point = 0; point < npoint; point++ ) { \
-         if ( ( x1 = xv1[ point ] ) != AST__BAD ) { \
-\
-/* Also obtain a pointer to the element which is to receive the \
-   result. */ \
-            y = xv1 + point; \
-\
-/* Obtain the value of the second argument, again checking that it is \
-   not bad. */ \
-            if ( ( x2 = xv2[ point ] ) != AST__BAD ) { \
-\
-/* Perform the processing, which uses the two argument values and then \
-   assigns the result to the appropriate top of stack element. */ \
-               {function;} \
-\
-/* If the second argument was bad, so is the result. */ \
-            } else { \
-               *y = AST__BAD; \
-            } \
-         } \
-      }
-
-/* This macro simply wraps the one above up in a "case" block. */
-#define ARG_2(oper,function) \
-   case oper: \
-      DO_ARG_2(function) \
-      break;
-
-/* We now define some macros for performing mathematical operations in
-   a "safe" way - i.e. trapping numerical problems such as overflow and
-   invalid arguments and translating them into the AST__BAD value. */
-
-/* Absolute value. */
-/* --------------- */
-/* This is just shorthand for a common operation. */
-#define ABS(x) ( ( (x) >= 0.0 ) ? (x) : -(x) )
-
-/* Trap maths overflow. */
-/* -------------------- */
-/* This macro calls a C maths library function and checks for overflow
-   in the result. */
-#define CATCH_MATHS_OVERFLOW(function) \
-   ( \
-\
-/* Clear the "errno" value. */ \
-      errno = 0, \
-\
-/* Evaluate the function. */ \
-      tmp = (function), \
-\
-/* Check if "errno" and the returned result indicate overflow and \
-   return the appropriate result. */ \
-      ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ? AST__BAD : tmp \
-   )
-
-#define CATCH_MATHS_ERROR(function) \
-   ( \
-      errno = 0, \
-      tmp = (function), \
-      ( ( errno == EDOM ) || \
-        ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ) ? AST__BAD : tmp \
-   )
-
-#define SAFE_ADD(x1,x2) ( \
-   ( (x1) >= 0.0 ) ? ( \
-      ( ( (x2) <= 0.0 ) || ( ( (DBL_MAX) - (x1) ) >= (x2) ) ) ? ( \
-         (x1) + (x2) \
-      ) : ( \
-         AST__BAD \
-      ) \
-   ) : ( \
-      ( ( (x2) >= 0.0 ) || ( ( (DBL_MAX) + (x1) ) >= -(x2) ) ) ? ( \
-         (x1) + (x2) \
-      ) : ( \
-         AST__BAD \
-      ) \
-   ) \
-)
-
-#define SAFE_SUB(x1,x2) ( \
-   ( (x1) >= 0.0 ) ? ( \
-      ( ( (x2) >= 0.0 ) || ( ( (DBL_MAX) - (x1) ) >= -(x2) ) ) ? ( \
-         (x1) - (x2) \
-      ) : ( \
-         AST__BAD \
-      ) \
-   ) : ( \
-      ( ( (x2) <= 0.0 ) || ( ( (DBL_MAX) + (x1) ) >= (x2) ) ) ? ( \
-         (x1) - (x2) \
-      ) : ( \
-         AST__BAD \
-      ) \
-   ) \
-)
-
-#define SAFE_MULT(x1,x2) ( \
-   ( ( ( abs1 = ABS( (x1) ) ) <= 1.0 ) || \
-     ( ( abs2 = ABS( (x2) ) ) <= 1.0 ) || \
-     ( ( (DBL_MAX) / abs1 ) >= abs2 ) ) ? ( \
-      (x1) * (x2) \
-   ) : ( \
-      AST__BAD \
-   ) \
-)
-
-#define SAFE_DIV(x1,x2) ( \
-   ( ( (x2) != 0.0 ) && \
-     ( ( ( abs2 = ABS( (x2) ) ) >= 1.0 ) || \
-       ( ( (DBL_MAX) * abs2 ) >= ABS( (x1) ) ) ) ) ? ( \
-      (x1) / (x2) \
-   ) : ( \
-      AST__BAD \
-   ) \
-)
-
-      tos = -1;
-      icon = 0;
-      ncode = code[ 0 ];
-      for ( icode = 1; icode <= ncode; icode++ ) {
-         switch ( (Oper) code[ icode ] ) {
-            case OP_NULL: break;
-            ARG_0( OP_LDCON,  value = con[ icon++ ], *y = value )
-            ARG_0( OP_LDVAR,  ivar = (int) ( con[ icon++ ] + 0.5 ),
-                              *y = ptr_in[ ivar ][ point ] )
-            ARG_0( OP_LDBAD,  , *y = AST__BAD )
-            ARG_1( OP_NEG,    *y = -x )
-            ARG_1( OP_SQRT,   *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
-            ARG_1( OP_LOG,    *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
-            ARG_1( OP_LOG10,  *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
-            ARG_1( OP_EXP,    *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
-            ARG_1( OP_SIN,    *y = sin( x ) )
-            ARG_1( OP_COS,    *y = cos( x ) )
-            ARG_1( OP_TAN,    *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
-            ARG_1( OP_SIND,   *y = sin( x * d2r ) )
-            ARG_1( OP_COSD,   *y = cos( x * d2r ) )
-            ARG_1( OP_TAND,   *y = tan( x * d2r ) )
-            ARG_1( OP_ASIN,   *y = ( ABS( x ) <= 1.0 ) ? asin( x ) : AST__BAD )
-            ARG_1( OP_ACOS,   *y = ( ABS( x ) <= 1.0 ) ? acos( x ) : AST__BAD )
-            ARG_1( OP_ATAN,   *y = atan( x ) )
-            ARG_1( OP_ASIND,  *y = ( ABS( x ) <= 1.0 ) ? asin( x ) * r2d :
-                                                         AST__BAD )
-            ARG_1( OP_ACOSD,  *y = ( ABS( x ) <= 1.0 ) ? acos( x ) * r2d :
-                                                         AST__BAD )
-            ARG_1( OP_ATAND,  *y = atan( x ) * r2d )
-            ARG_1( OP_SINH,   *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
-            ARG_1( OP_COSH,   *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
-            ARG_1( OP_TANH,   *y = tanh( x ) )
-            ARG_1( OP_ABS,    *y = ABS( x ) )
-            ARG_1( OP_CEIL,   *y = ceil( x ) )
-            ARG_1( OP_FLOOR,  *y = floor( x ) )
-            ARG_1( OP_NINT,   *y = (int) ( ( x >= 0 ) ? x + 0.5 : x - 0.5 ) )
-            ARG_2( OP_ADD,    *y = SAFE_ADD( x1, x2 ) )
-            ARG_2( OP_SUB,    *y = SAFE_SUB( x1, x2 ) )
-            ARG_2( OP_MULT,   *y = SAFE_MULT( x1, x2 ) )
-            ARG_2( OP_DIV ,   *y = SAFE_DIV( x1, x2 ) )
-            ARG_2( OP_PWR,    *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
-            ARG_2( OP_SIGN,   *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
-                                   x1 : -x1 )
-            ARG_2( OP_DIM,    *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
-            ARG_2( OP_MOD,    *y = ( x2 != 0.0 ) ? fmod( x1, x2 ) : AST__BAD )
-            ARG_2( OP_ATAN2,  *y = atan2( x1, x2 ) )
-            ARG_2( OP_ATAN2D, *y = atan2( x1, x2 ) * r2d )
-         case OP_MAX:
-            narg = (int) ( con[ icon++ ] + 0.5 );
-            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
-               DO_ARG_2( *y = ( x1 >= x2 ) ? x1 : x2 )
-            }
-            break;
-         case OP_MIN:
-            narg = (int) ( con[ icon++ ] + 0.5 );
-            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
-               DO_ARG_2( *y = ( x1 <= x2 ) ? x1 : x2 )
-            }
-            break;
-         }
-      }
-   }
-   work = astFree( work );
-   stack = astFree( stack );
-
-#undef ARG_0
-#undef ARG_1
-#undef DO_ARG_2
-#undef ARG_2
-#undef ABS
-#undef CATCH_MATHS_OVERFLOW
-#undef CATCH_MATHS_ERROR
-#undef SAFE_ADD
-#undef SAFE_SUB
-#undef SAFE_MULT
-#undef SAFE_DIV
-}
-

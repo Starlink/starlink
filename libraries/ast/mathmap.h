@@ -137,6 +137,8 @@ typedef struct AstMathMap {
    int invstack;
    int nfwd;
    int ninv;
+   int simp_fi;
+   int simp_if;
 } AstMathMap;
 
 /* Virtual function table. */
@@ -153,9 +155,14 @@ typedef struct AstMathMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-
-/* None. */
-
+   int (* GetSimpFI)( AstMathMap * );
+   int (* GetSimpIF)( AstMathMap * );
+   int (* TestSimpFI)( AstMathMap * );
+   int (* TestSimpIF)( AstMathMap * );
+   void (* ClearSimpFI)( AstMathMap * );
+   void (* ClearSimpIF)( AstMathMap * );
+   void (* SetSimpFI)( AstMathMap *, int );
+   void (* SetSimpIF)( AstMathMap *, int );
 } AstMathMapVtab;
 #endif
 
@@ -189,7 +196,16 @@ AstMathMap *astLoadMathMap_( void *, size_t, int, AstMathMapVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-/* None. */
+#if defined(astCLASS)            /* Protected */
+int astGetSimpFI_( AstMathMap * );
+int astGetSimpIF_( AstMathMap * );
+int astTestSimpFI_( AstMathMap * );
+int astTestSimpIF_( AstMathMap * );
+void astClearSimpFI_( AstMathMap * );
+void astClearSimpIF_( AstMathMap * );
+void astSetSimpFI_( AstMathMap *, int );
+void astSetSimpIF_( AstMathMap *, int );
+#endif
 
 /* Function interfaces. */
 /* ==================== */
@@ -231,7 +247,24 @@ astINVOKE(O,astLoadMathMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
 /* Interfaces to public member functions. */
 /* -------------------------------------- */
 /* Here we make use of astCheckMathMap to validate MathMap pointers
-   before use.  This provides a contextual error report if a pointer
+   before use. This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
-
+#if defined(astCLASS)            /* Protected */
+#define astClearSimpFI(this) \
+astINVOKE(V,astClearSimpFI_(astCheckMathMap(this)))
+#define astClearSimpIF(this) \
+astINVOKE(V,astClearSimpIF_(astCheckMathMap(this)))
+#define astGetSimpFI(this) \
+astINVOKE(V,astGetSimpFI_(astCheckMathMap(this)))
+#define astGetSimpIF(this) \
+astINVOKE(V,astGetSimpIF_(astCheckMathMap(this)))
+#define astSetSimpFI(this,value) \
+astINVOKE(V,astSetSimpFI_(astCheckMathMap(this),value))
+#define astSetSimpIF(this,value) \
+astINVOKE(V,astSetSimpIF_(astCheckMathMap(this),value))
+#define astTestSimpFI(this) \
+astINVOKE(V,astTestSimpFI_(astCheckMathMap(this)))
+#define astTestSimpIF(this) \
+astINVOKE(V,astTestSimpIF_(astCheckMathMap(this)))
+#endif
 #endif
