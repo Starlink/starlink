@@ -132,7 +132,7 @@
 *     small arrays the number of bins is at most a half of the number
 *     of array elements.  Integer arrays have a minimum bin width of
 *     one; this can also reduce the number of bins.  The goal is to
-*     avoid most histogam bins being empty artificially, since the
+*     avoid most histogram bins being empty artificially, since the
 *     sparseness of the histogram is the main criterion for detecting
 *     outliers.  Outliers can also be removed (flagged) via application
 *     THRESH prior to using this application.

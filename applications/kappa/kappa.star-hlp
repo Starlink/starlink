@@ -13139,7 +13139,7 @@ histogram.
 
 Usage:
 
-   histat ndf [comp] [percentiles] [logfile] [numbin]
+   histat ndf [comp] [percentiles] [logfile]
 
 Description:
 
@@ -13229,24 +13229,6 @@ NUMBAD = _INTEGER (Write)
    The number of pixels which were either not valid or were
    rejected from the statistics during iterative K-sigma
    clipping.
-3 NUMBIN
-NUMBIN = _INTEGER (Read)
-   The number of histogram bins to be used.  There is a tradeoff
-   between accuracy and processing time depending on the value
-   of NUMBIN. Increasing the number of bins yields more accurate
-   results, because it reduces quantisation errors biasing
-   the computed statistics, but takes longer to compute.  The
-   bias is in the same sense as the skewness, so generally it
-   will add positive bias.  The default value of NUMBIN is a
-   compromise and generally will give satisfactory results.
-
-   It is hard to quantify the tradeoff precisely; testing with a
-   typical CCD image of stars and galaxies the increase in time
-   went approximately as log of the number of bins, and the
-   accuracy of the pixel sum for some values of NUMBIN were: 100,
-   2.8%; 1000, 0.1% 10000, 0.03%; and 100000, 0.002%.
-
-   NUMBIN must be in the range 100 to 100000. [2048]
 3 NUMGOOD
 NUMGOOD = _INTEGER (Write)
    The number of NDF pixels which actually contributed to the
@@ -13286,17 +13268,28 @@ histat halley logfile=stats.dat
    called halley, and writes the results to a logfile called
    stats.dat.
 
-histat ngc1333 percentiles=[0.25,0.75] numbin=100000
+histat ngc1333 percentiles=[0.25,0.75]
    Computes ordered statistics for the data array in the NDF
-   called ngc1333, including the quartile values.  The highest
-   accuracy is used.
+   called ngc1333, including the quartile values.
 2 Notes
--  If the array has a few extreme outliers this can bias the
-statistics unless the number of bins in the histogram is large,
-or the outliers are removed (flagged) via application THRESH.
+-  Where the histogram contains a few extreme outliers, the
+histogram limits are adjusted to reduce greatly the bias upon
+the statistics, even if a chosen percentile corresponds to an
+extreme outlier.  The outliers are still accounted in the median
+and percentiles.  The histogram normally uses 10000 bins.  For
+small arrays the number of bins is at most a half of the number
+of array elements.  Integer arrays have a minimum bin width of
+one; this can also reduce the number of bins.  The goal is to
+avoid most histogram bins being empty artificially, since the
+sparseness of the histogram is the main criterion for detecting
+outliers.  Outliers can also be removed (flagged) via application
+THRESH prior to using this application.
 
--  There is quantisation bias in the statistics.  See parameter
-NUMBIN.
+-  There is quantisation bias in the statistics, but for
+non-pathological distributions this should be insignificant.
+Accuracy to better than 0.01 of a percentile is normal.  Linear
+interpolation within a bin is used, so the largest errors arise
+near the median.
 2 Related_Applications
    KAPPA: HISTOGRAM, INSPECT, MSTATS, NDFTRACE, NUMB, STATS;
    Figaro: ISTAT.
@@ -13309,6 +13302,11 @@ MJC: Malcolm J. Currie (STARLINK)
  1994 September 27 (MJC):
     Replaced AIF calls with PAR, FIO, and PSX.  Made messages
     conditional and used modern names for subroutines (_$ to 1_).
+
+ 2000 June 13 (MJC):
+    Removed NUMBIN parameter.  No longer obtains dynamic space
+    for the histogram.  Uses improved algorithm for calculating
+    the median and percentiles.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
    QUALITY, TITLE, and HISTORY components of the NDF.
