@@ -273,7 +273,7 @@
       END IF
 
 *  Add to internal list
-      CALL DYN0_MAPADD( PTR, NBYTE, FID, STATUS )
+      CALL DYN0_MAPADD( PTR, NELM, NBYTE, FID, STATUS )
 
 *  Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -284,7 +284,7 @@
 
 
 
-      SUBROUTINE DYN0_MAPADD( PTR, NBYTE, FID, STATUS )
+      SUBROUTINE DYN0_MAPADD( PTR, NITEM, NBYTE, FID, STATUS )
 *+
 *  Name:
 *     DYN0_MAPADD
@@ -296,7 +296,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL DYN0_MAPADD( PTR, NBYTE, FID, STATUS )
+*     CALL DYN0_MAPADD( PTR, NITEM, NBYTE, FID, STATUS )
 
 *  Description:
 *     Tries to allocate an area of mapped memory from either the process
@@ -305,6 +305,8 @@
 *  Arguments:
 *     PTR = INTEGER (given)
 *        Address of the section
+*     NITEM = INTEGER (given)
+*        Number of mapped elements
 *     NBYTE = INTEGER (given)
 *        Number of mapped bytes
 *     FID = INTEGER (GIVEN)
@@ -376,16 +378,18 @@
 
 *  Global Variables:
       INCLUDE 'DYN_CMN'                                 ! DYN common block
-*       DYS_PTR = LOGICAL (given and returned)
+*       DYS_PTR = INTEGER (given and returned)
 *         DYN memory addresses
-*       DYS_NBYTE = LOGICAL (returned)
+*       DYS_NBYTE = INTEGER (returned)
 *         DYN memory sizes
-*       DYS_FID = LOGICAL (returned)
+*       DYS_NITEM = INTEGER (returned)
+*         DYN memory number of elements
+*       DYS_FID = INTEGER (returned)
 *         DYN file identifiers
 
 *  Arguments Given:
       INTEGER			PTR			! See above
-      INTEGER			NBYTE, FID
+      INTEGER			NITEM, NBYTE, FID
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -416,6 +420,7 @@
 *      Initialise fields of slot
         DYS_PTR(I) = PTR
         DYS_NBYTE(I) = NBYTE
+        DYS_NITEM(I) = NITEM
         DYS_FID(I) = FID
 
       ELSE
