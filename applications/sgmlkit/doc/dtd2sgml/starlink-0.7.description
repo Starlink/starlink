@@ -1335,6 +1335,45 @@ just here.
 
 </body>
 </commentary>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Tue, 16 May 2000 15:37:42 +0100 (BST)</date>
+<subject>&lt;refinfo&gt;</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Tue May 16 15:37:43 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Tue, 16 May 2000 15:37:43 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12riTe-0007bu-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Tue, 16 May 2000 15:37:42 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12riTe-0000pm-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Tue, 16 May 2000 15:37:42 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005161532410.2432-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+When written in the form &lt;refinfo&gt;secnum&lt;/refinfo&gt;, I agree.  This does
+look more clumsy than the more natural &lt;refinfo secnum/&gt;.  The reason
+I wrote it like that is so that cunning use of shortrefs would make it
+writable like %secnum%, or something similar, which looks more natural
+still.
+
+However, the disadvantage is that it's only superficially natural --
+because of (possibly fragile in principle) shortref tricksiness.  
+
+I'm not wedded to either form -- I'm quite happy to go with the any
+consensus here.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
 <!--splice:ref-->
 </element>
 
