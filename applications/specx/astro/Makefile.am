@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libastro.la
+noinst_LTLIBRARIES = libastro.la
 
 libastro_la_SOURCES = $(F_ROUTINES)
 

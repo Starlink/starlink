@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libplots.la
+noinst_LTLIBRARIES = libplots.la
 AM_FCFLAGS = -I../inc
 
 libplots_la_SOURCES = $(F_ROUTINES)

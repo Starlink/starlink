@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libgen.la
+noinst_LTLIBRARIES = libgen.la
 
 libgen_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) $(PRIVATE_INCLUDES)
 

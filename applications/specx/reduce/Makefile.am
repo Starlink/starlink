@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libreduce.la
+noinst_LTLIBRARIES = libreduce.la
 AM_FCFLAGS = -I../inc
 
 libreduce_la_SOURCES = $(F_ROUTINES)

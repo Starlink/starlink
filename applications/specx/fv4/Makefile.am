@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libfv4.la
+noinst_LTLIBRARIES = libfv4.la
 
 libfv4_la_SOURCES = $(F_ROUTINES)
 AM_FCFLAGS = -I../inc

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libscl.la
+noinst_LTLIBRARIES = libscl.la
 AM_FCFLAGS = -I../inc
 
 libscl_la_SOURCES = $(F_ROUTINES) $(PRIVATE_INCLUDES)

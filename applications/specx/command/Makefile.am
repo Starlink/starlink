@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libcommand.la
+noinst_LTLIBRARIES = libcommand.la
 
 AM_FCFLAGS = -I../inc -I../exprt
 

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libmv4.la
+noinst_LTLIBRARIES = libmv4.la
 AM_FCFLAGS = -I../inc
 
 libmv4_la_SOURCES = $(F_ROUTINES)

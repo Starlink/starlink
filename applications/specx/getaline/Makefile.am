@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libgetaline.la
+noinst_LTLIBRARIES = libgetaline.la
 bin_SCRIPTS = getaline_link
 
 libgetaline_la_SOURCES = $(C_ROUTINES)

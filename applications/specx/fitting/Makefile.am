@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libfitting.la
+noinst_LTLIBRARIES = libfitting.la
 AM_FCFLAGS = -I../inc
 
 libfitting_la_SOURCES = $(F_ROUTINES)

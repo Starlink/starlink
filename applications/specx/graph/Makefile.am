@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libgraph.la
+noinst_LTLIBRARIES = libgraph.la
 
 libgraph_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) $(PRIVATE_INCLUDES)
 

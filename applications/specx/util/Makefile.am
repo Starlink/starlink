@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libutil.la
+noinst_LTLIBRARIES = libutil.la
 AM_FCFLAGS = -I../inc
 
 libutil_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(PRIVATE_INCLUDES)

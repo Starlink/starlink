@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libterm.la
+noinst_LTLIBRARIES = libterm.la
 AM_FCFLAGS = -I../inc
 
 libterm_la_SOURCES = $(F_ROUTINES)

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libexternal.la
+noinst_LTLIBRARIES = libexternal.la
 AM_FCFLAGS = -I../inc
 
 libexternal_la_SOURCES = $(F_ROUTINES)

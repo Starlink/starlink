@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libmapdis4.la
+noinst_LTLIBRARIES = libmapdis4.la
 AM_FCFLAGS = -I../inc
 
 libmapdis4_la_SOURCES = $(F_ROUTINES) $(PRIVATE_INCLUDES)

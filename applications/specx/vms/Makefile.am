@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libvms.la
+noinst_LTLIBRARIES = libvms.la
 AM_FCFLAGS = -I../inc
 
 libvms_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(C_ROUTINES)
