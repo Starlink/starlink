@@ -128,9 +128,16 @@
       CALL DAT_THERE( ALOC, ROBJ, THERE, STATUS )
       IF ( THERE ) THEN
         CALL MSG_SETC( 'NAME', ROBJ )
-        CALL MSG_PRNT( 'Removing existing ^NAME reference...' )
+        IF ( ARGS(3) .EQ. ADI__NULLID ) THEN
+          CALL MSG_PRNT( 'Deleting existing ^NAME reference...' )
+        ELSE
+          CALL MSG_PRNT( 'Replacing existing ^NAME reference...' )
+        END IF
         CALL DAT_ERASE( ALOC, ROBJ, STATUS )
       END IF
+
+*  If object is null, quit
+      IF ( ARGS(3) .EQ. ADI__NULLID ) GOTO 99
 
 *  Get type of object to write
       CALL ADI_TYPE( ARGS(3), TYPE, STATUS )
@@ -154,7 +161,7 @@
       ELSE
 
 *    Check derived
-        CALL ADI_CHKDER( ARGS(3), 'FileObject', DER, STATUS )
+        CALL ADI_DERVD( ARGS(3), 'FileObject', DER, STATUS )
         IF ( DER ) THEN
 
 *      Extract full path to object
@@ -183,6 +190,6 @@
       END IF
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FRI1_PUT', STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FRI1_PUT', STATUS )
 
       END
