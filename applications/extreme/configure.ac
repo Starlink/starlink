@@ -25,7 +25,6 @@ AC_PATH_PROG(PERL, perl)
 STAR_CHECK_PROGS(prolat, sst)
 
 dnl    See AM_PROG_LEX documentation
-AC_PROG_YACC
 AM_PROG_LEX
 if test "$LEX" != flex; then
   LEX="$SHELL $missing_dir/missing flex"
