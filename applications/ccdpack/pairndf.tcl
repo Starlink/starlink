@@ -117,6 +117,22 @@
                          -validpair [ code pairok %A %B ] \
                          -percentiles [ list $PERCLO $PERCHI ]
 
+#  Create an exit confirmation widget which may or may not be used.
+#  We construct it here rather than at time of use since this allows it
+#  to be posted with less delay after invoking the exit button, which 
+#  makes it look more intuitive.
+      set confirmtext "Not enough images have been paired\n"
+      append confirmtext "to register them all.\n"
+      append confirmtext "Do you really wish to exit?"
+      set quitdialog [ iwidgets::messagedialog .qd \
+                          -modality application \
+                          -bitmap questhead \
+                          -title "PAIRNDF: Confirm exit" \
+                          -text $confirmtext ]
+      $quitdialog buttonconfigure Cancel -text "Abort PAIRNDF"
+      $quitdialog buttonconfigure OK -text "Continue processing"
+      $quitdialog hide Help
+
 #  Loop until all the NDFs have been paired.
       while { [ array size done ] < $nndf } {
 
@@ -133,19 +149,8 @@
             set iB [ lindex $pair 1 ]
 
             if { [ $chooser cget -state ] == "done" } {
-               set confirmtext "Not enough images have been paired\n"
-               append confirmtext "to register them all.\n"
-               append confirmtext "Do you really wish to exit?"
-               iwidgets::messagedialog .md \
-                  -modality application \
-                  -bitmap questhead \
-                  -title "PAIRNDF: Confirm exit" \
-                  -text $confirmtext
-               .md buttonconfigure Cancel -text "Abort PAIRNDF"
-               .md buttonconfigure OK -text "Continue processing"
-               .md hide Help
-               set response [ .md activate ]
-               destroy .md
+               $quitdialog center $chooser
+               set response [ $quitdialog activate ]
                if { $response } {
                   set pair ""
                } else {
