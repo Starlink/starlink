@@ -115,6 +115,7 @@
 
 /* Global Constants:		.					    */
 
+#include <stdio.h>               /* for sprintf */
 #include <stdlib.h>		 /* Standard C library			    */
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "psx_err.h"		 /* PSX error values			    */

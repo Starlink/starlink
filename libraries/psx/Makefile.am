@@ -3,6 +3,7 @@
 bin_SCRIPTS = psx_link psx_link_adam
 
 lib_LTLIBRARIES = libpsx.la
+## libpsx_la_CFLAGS = -Wall   # -Wall is gcc
 
 libpsx_la_SOURCES = \
 	$(C_ROUTINES) \

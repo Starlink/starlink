@@ -70,9 +70,17 @@
 *-----------------------------------------------------------------------------
 */
 
+#include <config.h>
+
 /* Global Constants:		.					    */
 
-#include <time.h>		 /* C time library			    */
+#if STDC_HEADERS
+#  include <string.h>
+#  include <time.h>		 /* C time library			    */
+/* if we start to use sys/time.h, see autoconf AC_HEADER_TIME */
+#endif
+
+
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "sae_par.h"		 /* ADAM constants			    */
 

@@ -19,6 +19,10 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h sys/types.h)
+
 AC_CHECK_FUNCS([getpwuid geteuid getlogin cuserid])
 AC_CHECK_DECLS([cuserid])
 AC_CHECK_FUNCS([setenv])

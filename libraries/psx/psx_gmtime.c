@@ -87,12 +87,17 @@
 ------------------------------------------------------------------------------
 */
 
+#include <config.h>
+
 /* Global Constants:		.					    */
 
-#include <time.h>		 /* C time library			    */
+#if STDC_HEADERS
+#  include <time.h>		 /* C time library			    */
+#endif
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "sae_par.h"		 /* ADAM constants			    */
 #include "psx_err.h"             /* PSX errors                              */
+#include "psx1.h"                /* declares psx1_rep_c */
 
 struct tm *psxtmstr;             /* Pointer to storage for tm struct        */
 

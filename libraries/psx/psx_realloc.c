@@ -113,14 +113,19 @@
 -----------------------------------------------------------------------------
 */
 
+#include <config.h>
 
 /* Global Constants:		.					    */
 
+#include <stdio.h>
 #include <stdlib.h>		 /* Standard C library			    */
+#if STDC_HEADERS
+#  include <string.h>
+#endif
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "psx_err.h"             /* PSX error values                        */
 #include "sae_par.h"		 /* ADAM constants			    */
-
+#include "psx1.h"                /* declares psx1_rep_c */
 
 F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
 {

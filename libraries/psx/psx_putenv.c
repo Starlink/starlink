@@ -60,9 +60,12 @@
 
 */
 
+#include <config.h>
 
 #include <stdlib.h>
-#include <config.h>
+#if STDC_HEADERS
+# include <string.h>
+#endif
 #include "sae_par.h"   /* SSE Constants */
 #include "f77.h"       /* CNF macros and prototypes */
 #include "psx_err.h"   /* PSX errors */
@@ -84,8 +87,9 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
   /* Local variables */
    char *temp_name;
    char *temp_value;
+#if !HAVE_SETENV
    char *envstr;
-   char *oldstr;
+#endif
    char errmsg[100];    /* Adequate space for constructed error message */ 
    int putstat;
 
@@ -97,7 +101,7 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
    temp_value = cnfCreim( value, value_length );
    if( ( temp_name!=NULL) && (temp_value!=NULL) ) {
 
-# if defined( HAVE_SETENV )
+# if HAVE_SETENV
       putstat = setenv(temp_name, temp_value, 1);
 
 # else 

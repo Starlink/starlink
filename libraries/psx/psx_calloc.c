@@ -120,12 +120,16 @@
 -----------------------------------------------------------------------------
 */
 
+#include <config.h>
 
 /* Global Constants:		.					    */
 
-#include <ctype.h>		 /* Character handling			    */ 
-#include <stdlib.h>		 /* Standard C library			    */
-#include <stdio.h>		 /* Standard C I/O library		    */
+#if STDC_HEADERS
+#  include <ctype.h>		 /* Character handling			    */ 
+#  include <stdlib.h>		 /* Standard C library			    */
+#  include <stdio.h>		 /* Standard C I/O library		    */
+#  include <string.h>
+#endif
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "psx_err.h"		 /* PSX error codes			    */
 #include "psx1.h"		 /* Internal PSX routines		    */
