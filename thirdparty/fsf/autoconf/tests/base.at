@@ -1,0 +1,232 @@
+#							-*- Autotest -*-
+
+AT_BANNER([Autoconf base layer.])
+
+# Copyright (C) 2000, 2001, 2003 Free Software Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+
+## ------------------------------- ##
+## AC_REQUIRE: topological sort..  ##
+## ------------------------------- ##
+
+# Check that dependencies are always properly honored.
+
+AT_SETUP([AC_REQUIRE: topological sort])
+
+AT_DATA([configure.ac],
+[[define([REQUIRE_AND_CHECK],
+[AC_REQUIRE([$1])
+test -z "$m4@&t@_translit([$1], [A-Z], [a-z])" && AS_EXIT(1)])
+
+AC_DEFUN([TEST1],
+[REQUIRE_AND_CHECK([TEST2a])
+REQUIRE_AND_CHECK([TEST2b])
+test1=set])
+
+AC_DEFUN([TEST2a],
+[test2a=set])
+
+AC_DEFUN([TEST2b],
+[REQUIRE_AND_CHECK([TEST3])
+test2b=set])
+
+AC_DEFUN([TEST3],
+[REQUIRE_AND_CHECK([TEST2a])
+test3=set])
+
+AS@&t@_INIT
+
+TEST1
+test -z "$test1" &&
+  AC_MSG_ERROR([\$test1 is empty])
+AS_EXIT(0)
+]])
+
+AT_CHECK_AUTOCONF
+AT_CHECK_CONFIGURE
+
+AT_CLEANUP
+
+
+
+## ----------------------------------------------- ##
+## AC_REQUIRE and AC_DEFUN_ONCE: Require, expand.  ##
+## ----------------------------------------------- ##
+
+AT_SETUP([AC_REQUIRE & AC_DEFUN_ONCE: Require, expand])
+
+AT_DATA([configure.ac],
+[[AC_DEFUN([TEST],
+[AC_REQUIRE([MULTI_TEST])
+AC_REQUIRE([SINGLE_TEST])])
+
+AC_DEFUN([MULTI_TEST],
+[multi_test=".$multi_test"])
+
+AC_DEFUN_ONCE([SINGLE_TEST],
+[single_test=".$single_test"])
+
+AS@&t@_INIT
+
+TEST
+TEST
+MULTI_TEST
+MULTI_TEST
+SINGLE_TEST
+SINGLE_TEST
+
+case $multi_test:$single_test in
+  ...:. ) AS_EXIT(0);;
+  ...:* ) AC_MSG_ERROR([DEFUN_ONCE is broken]);;
+  *:.   ) AC_MSG_ERROR([DEFUN is broken (Wow, congrats!)]);;
+esac
+]])
+
+AT_CHECK_AUTOCONF([], 0, [],
+[configure.ac:17: warning: SINGLE_TEST invoked multiple times
+configure.ac:18: warning: SINGLE_TEST invoked multiple times
+])
+
+AT_CHECK_CONFIGURE
+
+AT_CLEANUP
+
+
+
+## ----------------------------------------------- ##
+## AC_REQUIRE and AC_DEFUN_ONCE: Expand, require.  ##
+## ----------------------------------------------- ##
+
+AT_SETUP([AC_REQUIRE & AC_DEFUN_ONCE: Expand, require])
+
+AT_DATA([configure.ac],
+[[AC_DEFUN([TEST],
+[AC_REQUIRE([MULTI_TEST])
+AC_REQUIRE([SINGLE_TEST])])
+
+AC_DEFUN([MULTI_TEST],
+[multi_test=".$multi_test"])
+
+AC_DEFUN_ONCE([SINGLE_TEST],
+[single_test=".$single_test"])
+
+AS@&t@_INIT
+
+MULTI_TEST
+MULTI_TEST
+SINGLE_TEST
+SINGLE_TEST
+TEST
+TEST
+
+case $multi_test:$single_test in
+  ..:. ) AS_EXIT(0);;
+  ..:* ) AC_MSG_ERROR([DEFUN_ONCE is broken]);;
+  *:.  ) AC_MSG_ERROR([DEFUN is broken (Wow, congrats!)]);;
+     * ) AC_MSG_ERROR([received `$multi_test:$single_test']);;
+esac
+]])
+
+AT_CHECK_AUTOCONF([], 0, [],
+[configure.ac:16: warning: SINGLE_TEST invoked multiple times
+])
+AT_CHECK_CONFIGURE
+
+AT_CLEANUP
+
+
+
+## ------------------------- ##
+## AC_REQUIRE & AC_PROVIDE.  ##
+## ------------------------- ##
+
+AT_SETUP([AC_REQUIRE & AC_PROVIDE])
+
+AT_DATA([configure.ac],
+[[AC_DEFUN([TEST],
+[AC_REQUIRE([INNER_TEST])])
+
+AC_DEFUN([INNER_TEST],
+[inner_test=".$inner_test"])
+
+AS@&t@_INIT
+
+AC_PROVIDE([INNER_TEST])
+TEST
+
+case $inner_test in
+  "" ) AS_EXIT(0);;
+  *  ) AC_MSG_ERROR([received `$inner_test']);;
+esac
+]])
+
+AT_CHECK_AUTOCONF
+AT_CHECK_CONFIGURE
+
+AT_CLEANUP
+
+
+## ---------------- ##
+## AC_CACHE_CHECK.  ##
+## ---------------- ##
+
+# Make sure AC_CACHE_CHECK is silent with -q.
+
+AT_SETUP([AC_CACHE_CHECK])
+
+AT_DATA([configure.ac],
+[[AC_INIT
+AC_CACHE_CHECK([for nothing],
+	       [ac_nothing],
+	       [ac_nothing=found])
+]])
+
+AT_CHECK_AUTOCONF
+AT_CHECK_CONFIGURE([-q])
+
+AT_CLEANUP
+
+
+## ---------------- ##
+## AC_TRY_COMMAND.  ##
+## ---------------- ##
+
+AT_SETUP([AC_TRY_COMMAND])
+
+AT_DATA([configure.ac],
+[[AC_INIT
+
+if AC_TRY_COMMAND([(echo "The Cat in the Hat";
+		    echo "The Hat in the Cat" >&2)
+		  | grep \^The\ Cat\ in\ the\ Hat\$ >/dev/null]); then
+  :
+else
+  AC_MSG_ERROR([Didn't see the Cat in the Hat!])
+fi
+
+if AC_TRY_COMMAND([(echo "The Cat in the Hat";
+		    echo "The Hat in the Cat" >&2)
+		  | grep \^The\ Hat\ in\ the\ Cat\$ >/dev/null]); then
+  AC_MSG_ERROR([Saw the Hat in the Cat!])
+fi
+]])
+
+AT_CHECK_AUTOCONF
+AT_CHECK_CONFIGURE([-q])
+
+AT_CLEANUP

@@ -1,0 +1,166 @@
+#							-*- Autotest -*-
+
+AT_BANNER([M4sugar.])
+
+# Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+
+# Order of the tests:
+# - m4_warn
+#
+# - m4_require
+# uses warn/error code.
+#
+# - m4_text_wrap
+
+## --------- ##
+## m4_warn.  ##
+## --------- ##
+
+AT_SETUP([[m4@&t@_warn]])
+
+# m4_text_wrap is used to display the help strings.  Also, check that
+# commas are not swallowed.  This can easily happen because of
+# m4-listification.
+
+# FIXME: For the time being we use -f to make sure we do issue the
+# warnings.  But maybe autom4te should handle that by itself?
+
+AT_DATA_M4SUGAR([script.4s],
+[[m4_init
+m4_defun([cross_warning],
+[m4_warn([cross],  [cross])])
+
+m4_divert_push([0])m4_wrap([m4_divert_pop([0])[]])dnl
+m4_warn([obsolete],  [obsolete])dnl
+cross_warning[]dnl
+m4_warn([syntax], [syntax])dnl
+]])
+
+AT_CHECK_M4SUGAR([-o-], 0, [],
+[script.4s:8: warning: syntax
+])
+
+AT_CHECK_M4SUGAR([-o- -Wall -f], 0, [],
+[script.4s:6: warning: obsolete
+script.4s:7: warning: cross
+script.4s:3: cross_warning is expanded from...
+script.4s:7: the top level
+script.4s:8: warning: syntax
+])
+
+AT_CHECK_M4SUGAR([-o- -Wnone,cross -f], 0, [],
+[script.4s:7: warning: cross
+script.4s:3: cross_warning is expanded from...
+script.4s:7: the top level
+])
+
+AT_CHECK_M4SUGAR([-o- -Wnone,cross,error -f], 1, [],
+[[script.4s:7: warning: cross
+script.4s:3: cross_warning is expanded from...
+script.4s:7: the top level
+]])
+
+AT_CLEANUP
+
+
+## ----------------------------------- ##
+## m4_require: circular dependencies.  ##
+## ----------------------------------- ##
+
+AT_SETUP([[m4@&t@_require: circular dependencies]])
+
+# m4_text_wrap is used to display the help strings.  Also, check that
+# commas are not swallowed.  This can easily happen because of
+# m4-listification.
+
+AT_DATA_M4SUGAR([script.4s],
+[[m4_defun([foo],
+[m4_require([bar])])
+
+m4_defun([bar],
+[m4_require([foo])])
+
+m4_defun([baz],
+[m4_require([foo])])
+
+m4_init
+m4_divert_push([0])m4_wrap([m4_divert_pop([0])[]])dnl
+baz
+]])
+
+AT_CHECK_M4SUGAR([], 1, [],
+[[script.4s:12: error: m4@&t@_require: circular dependency of foo
+script.4s:12: foo is required by...
+script.4s:5: bar is expanded from...
+script.4s:12: bar is required by...
+script.4s:2: foo is expanded from...
+script.4s:12: foo is required by...
+script.4s:8: baz is expanded from...
+script.4s:12: the top level
+autom4te: m4 failed with exit status: 1
+]])
+AT_CLEANUP
+
+
+## -------------- ##
+## m4_text_wrap.  ##
+## -------------- ##
+
+AT_SETUP([[m4@&t@_text_wrap]])
+
+# m4_text_wrap is used to display the help strings.  Also, check that
+# commas are not swallowed.  This can easily happen because of
+# m4-listification.
+
+AT_DATA_M4SUGAR([script.4s],
+[[m4_divert_push([0])m4_wrap([m4_divert_pop([0])])dnl
+m4_text_wrap([Short string */], [   ], [/* ], 20)
+
+m4_text_wrap([Much longer string */], [   ], [/* ], 20)
+
+m4_text_wrap([Short doc.], [          ], [  --short ], 30)
+
+m4_text_wrap([Short doc.], [          ], [  --too-wide], 30)
+
+m4_text_wrap([Super long documentation.], [          ], [  --too-wide], 30)
+
+m4_text_wrap([First, second  , third, [,quoted]])
+]])
+
+AT_DATA([expout],
+[[/* Short string */
+
+/* Much longer
+   string */
+
+  --short Short doc.
+
+  --too-wide
+          Short doc.
+
+  --too-wide
+          Super long
+          documentation.
+
+First, second , third, [,quoted]
+]])
+
+AT_CHECK_M4SUGAR([-o-], 0, [expout])
+
+AT_CLEANUP
