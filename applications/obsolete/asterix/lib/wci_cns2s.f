@@ -61,7 +61,8 @@
 *     {routine_notes}...
 
 *  Prior Requirements:
-*     {routine_prior_requirements}...
+*     The WCI package must have been initialised, and the identifiers
+*     SYSIN and SYSOUT defined.
 
 *  Side Effects:
 *     None
@@ -75,15 +76,16 @@
 *     The test procedure tst_wci_cns2s applying 2 WCI_CNS2S operations
 *     to shift from FK4 -> FK5 and back to FK4, with different equinoxes
 *     and epochs, averaged over the whole celestial sphere, recovers
-*     the original position to an average accuracy of 0.52 arcsec, with
-*     a worst case of 0.77 arcsec.
+*     the original position to an average accuracy of 0.00108 arcsec, with
+*     a worst case of 0.00132 arcsec.
 
 *  Timing:
 *     {routine_timing}
 
 *  External Routines Used:
-*     {name_of_facility_or_package}:
-*        {routine_used}...
+*     WCI:
+*        WCI_CNS2Z	- Convert to standard system
+*        WCI_CNZ2S	- Convert from standard system
 
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
