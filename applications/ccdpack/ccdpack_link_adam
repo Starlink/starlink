@@ -1,6 +1,8 @@
 echo "`img_link_adam` `fio_link_adam` `trn_link_adam` \
       `chr_link_adam` `prm_link_adam` `psx_link_adam` \
-      `ard_link_adam` `ndg_link_adam` `grp_link_adam` -lpda " \
+      `ard_link_adam` `ndg_link_adam` `grp_link_adam` \
+      `agp_link_adam` `ast_link_adam -mygrf` grf_ccdpack.o -lpda \
+      -lcpgplot `pgplot_link_adam`" \
     | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
