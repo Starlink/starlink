@@ -37,10 +37,10 @@
 *     MAXVAL = INTEGER (Given)
 *        The maximum number of values that can be returned (may be
 *        equal to MINVAL).
+*     OUTGRP = INTEGER (Returned)
+*        The GRP group identifier pointing to the strings.
 *     NRET = INTEGER (Returned)
 *        The actual number of returned values.
-*     OUTGRP = INTEGER (Given)
-*        The GRP group identifier pointing to the strings.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
