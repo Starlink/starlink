@@ -93,13 +93,6 @@
 #           defined).  After unpacking the exported file, the recipient
 #           must build the package before installing it for use.
 #
-#           Before using this, make new_esp_source.tar and rename it
-#           to esp_source.tar - this ensures that esp_source.tar has
-#           the current versions of the source files.  This should be
-#           automated, but doing so is not trivial, since the makefile
-#           as it stands at present has esp_source.tar as the
-#           dependency for the source files.
-#
 #        clean
 #           Cleans up after building the package, removing all
 #           intermediate files created during the building process, but
@@ -621,36 +614,6 @@ PSX_ERR:      $(STAR_INC)/psx_err;   $(LINK) $? $@
 AST_ERR:      $(STAR_INC)/ast_err;   $(LINK) $? $@
 AST_PAR:      $(STAR_INC)/ast_par;   $(LINK) $? $@
 CAT_PAR:      $(STAR_INC)/cat_par;   $(LINK) $? $@
-
-#  Rule for extracting source files from the source archive.
-
-#  Express this as a rule to create the file source-unpacked.
-#
-#  This is somewhat twisted, and is caused by the requirement that
-#  since this makefile must function both at packaging time and at
-#  post-distribution build time.  Thus esp_source.tar has to depend on
-#  all the source files so that we can create it from them when we are
-#  creating the export_source target.  However, after distribution,
-#  the source files might also be said to depend on the esp_source.tar
-#  file in the sense that it is that file they are unpacked from.  We
-#  can't express both these dependencies directly here, so we declare
-#  that esp_source.tar depends on all the source files, and
-#  source-unpacked depends on esp_source.tar.  Then, if the build
-#  target depends on source-unpacked (which is rational), we ensure
-#  that the sources will be unpacked before anything else is built.
-#
-#  The requirement here is that the file source-unpacked _exists_.  We 
-#  mustn't express a makefile dependency of source-unpacked on
-#  esp_source.tar, since (a) that dependency would fail in the
-#  development directory, and (b) it would cause esp_source.tar to be
-#  unpacked shortly after it was created in the development
-#  directory.  Thus, since source-unpacked is in the CVS repository,
-#  the following dependency will _always_ be satisfied in the
-#  development directory, but will require the unpacking of the source 
-#  tarball in the distributed directory.
-source-unpacked:
-	test -f $(PKG_NAME)_source.tar && $(TAR_OUT) $(PKG_NAME)_source.tar
-
 
 # Generate the monolith IFL file by concatenating the individual task 
 # IFL files.
@@ -1477,6 +1440,41 @@ strip:
 	@ echo
 	@ echo '*** Binaries stripped'
 	@ echo
+
+#  ---------------------------------------------------------------------------
+#
+#  Development targets.  These are not guaranteed to work outside of
+#  the development directories.
+
+#  Rule for extracting source files from the source archive.
+#
+#  Express this as a rule to create the file source-unpacked.
+#
+#  This is somewhat twisted, and is caused by the requirement that
+#  since this makefile must function both at packaging time and at
+#  post-distribution build time.  Thus esp_source.tar has to depend on
+#  all the source files so that we can create it from them when we are
+#  creating the export_source target.  However, after distribution,
+#  the source files might also be said to depend on the esp_source.tar
+#  file in the sense that it is that file they are unpacked from.  We
+#  can't express both these dependencies directly here, so we declare
+#  that esp_source.tar depends on all the source files, and
+#  source-unpacked depends on esp_source.tar.  Then, if the build
+#  target depends on source-unpacked (which is rational), we ensure
+#  that the sources will be unpacked before anything else is built.
+#
+#  The requirement here is that the file source-unpacked _exists_.  We 
+#  mustn't express a makefile dependency of source-unpacked on
+#  esp_source.tar, since (a) that dependency would fail in the
+#  development directory, and (b) it would cause esp_source.tar to be
+#  unpacked shortly after it was created in the development
+#  directory.  Thus, since source-unpacked is in the CVS repository,
+#  the following dependency will _always_ be satisfied in the
+#  development directory, but will require the unpacking of the source 
+#  tarball in the distributed directory.
+source-unpacked:
+	test -f $(PKG_NAME)_source.tar && $(TAR_OUT) $(PKG_NAME)_source.tar
+
 
 #--------------------------------------------------------------------------
 
