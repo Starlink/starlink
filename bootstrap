@@ -1,15 +1,65 @@
-#!/bin/sh -
-# This is not a starconf bootstrap file
+#! /bin/sh -
+# Top level bootstrap file.
+# This is not a starconf bootstrap file.
+
+# starconf uses the value of STARCONF_DEFAULT_STARLINK
+# during its configuration
+if test "X$STARCONF_DEFAULT_STARLINK" = X; then
+    for d in "$STARLINK" /star
+    do
+        if test -n "$d"; then
+            STARCONF_DEFAULT_STARLINK=$d
+            break
+        fi
+    done
+fi
+export STARCONF_DEFAULT_STARLINK
+echo "Bootstrapping with STARCONF_DEFAULT_STARLINK=$STARCONF_DEFAULT_STARLINK"
+
+# Makefile.dependencies uses BUILDSUPPORT_PREFIX to configure
+# the buildsupport tools
+BUILDSUPPORT_PREFIX=$STARCONF_DEFAULT_STARLINK/buildsupport
+
+# We invoke autoconf below, so must make sure it's on the path,
+# and this directory must be on the path before bootstrapping the 
+# buildsupport directories below
+PATH=$BUILDSUPPORT_PREFIX/bin:$PATH
+
+# Configure and build the bootstrap utilities.
+tempmakefile=Makefile.tmp
+sed 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
+(
+    MISSING_SUPPRESS_RUN=true
+    STAR_MANIFEST_DIR=$STARCONF_DEFAULT_STARLINK/manifests
+    export MISSING_SUPPRESS_RUN BUILDSUPPORT_PREFIX STAR_MANIFEST_DIR PATH
+    echo "Bootstrapping buildsupport:"
+    echo "    make -f $tempmakefile \\"
+    echo "        prefix=$BUILDSUPPORT_PREFIX \\"
+    echo "        MANIFEST=$STAR_MANIFEST_DIR \\"
+    echo "        buildsupport"
+    make -f $tempmakefile \
+        prefix=$BUILDSUPPORT_PREFIX \
+        MANIFEST=$STAR_MANIFEST_DIR \
+        buildsupport
+)
+rm -f $tempmakefile
+
+# Echo a command then run it, terminating the script if the command fails
+echorun() { echo $*; eval $* || exit 1; }
 
 if test -f configure -a configure -nt configure.ac; then
     : nothing to do
 else
-    autoconf
+    echorun autoconf
+    def=`starconf --show STARCONF_DEFAULT_PREFIX`
+    test -n "$def" || { echo "Eeeek! Can't get default prefix!"; exit 1; }
+    echorun "sed -e s,%%PREFIX%%,$def, configure >configure.tmp && mv configure.tmp configure && chmod +x configure"
 fi
 if test ! -x configure; then
     echo "Ooooh dear, autoconf didn't work -- I can't find ./configure"
     exit 1
 fi
+
 
 # Bootstrap any child directories
 for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` ''
