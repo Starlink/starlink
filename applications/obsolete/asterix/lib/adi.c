@@ -706,6 +706,8 @@ ADIobj adix_new_cdef( char *name, int nlen,
   tdef->superclasses = ADI__nullid;
   tdef->defmem = DEF_MEMBER_FLAG_VALUE;
 
+  tdef->pdata = NULL;
+
   return typid;
   }
 
