@@ -34,6 +34,7 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new ANGROT value'
+      helpkey  '*'
    endparameter
 
    parameter ANLANG
@@ -43,6 +44,7 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new ANLANG value'
+      helpkey  '*'
    endparameter
 
    parameter EPS
@@ -52,6 +54,7 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new EPS value'
+      helpkey  '*'
    endparameter
 
    parameter FILTER
@@ -61,6 +64,7 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new FILTER value'
+      helpkey  '*'
    endparameter
 
    parameter IMGID
@@ -70,6 +74,7 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'New IMGID value(s)'
+      helpkey  '*'
    endparameter
 
    parameter IN                  # List of Input NDFs
@@ -90,6 +95,7 @@ interface POLEXT
       ppath    'DEFAULT'
       default  !
       prompt   'File to contain a list of the NDFs'
+      helpkey  '*'
    endparameter
 
    parameter QUIET
@@ -99,6 +105,7 @@ interface POLEXT
       ppath    'DEFAULT'
       default  F
       prompt   'Should all screen output be suppressed?'
+      helpkey  '*'
    endparameter
 
    parameter RAY
@@ -108,6 +115,7 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new RAY value'
+      helpkey  '*'
    endparameter
 
    parameter T
@@ -117,6 +125,7 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new T value'
+      helpkey  '*'
    endparameter
 
    parameter WPLATE
@@ -126,6 +135,7 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new WPLATE value'
+      helpkey  '*'
    endparameter
 
 endinterface

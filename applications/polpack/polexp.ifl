@@ -41,6 +41,7 @@ interface POLEXP
       ppath    'DEFAULT'
       default  !
       prompt   'File to contain a list of the NDFs'
+      helpkey  '*'
    endparameter
 
    parameter QUIET
@@ -50,6 +51,7 @@ interface POLEXP
       ppath    'DEFAULT'
       default  F
       prompt   'Should all screen output be suppressed?'
+      helpkey  '*'
    endparameter
 
 endinterface

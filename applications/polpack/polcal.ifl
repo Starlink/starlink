@@ -117,6 +117,7 @@ interface POLCAL
       default  'LINEAR'
       ppath    'DEFAULT'
       prompt   'Polarimetric mode (LINEAR or CIRCULAR)'
+      helpkey  '*'
    endparameter
 
    parameter   SKYSUP
@@ -146,6 +147,7 @@ interface POLCAL
       default  'Output from POLCAL'
       ppath    'DYNAMIC, DEFAULT'
       prompt   'Title for output NDF'
+      helpkey  '*'
    endparameter
 
    parameter   TOLS 
