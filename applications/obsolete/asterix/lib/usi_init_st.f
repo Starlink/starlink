@@ -41,7 +41,7 @@
       INTEGER			STATUS
 
 *  Local Variables:
-      INTEGER                   CALLID                  ! CALLABLE system
+c     INTEGER                   CALLID                  ! CALLABLE system
 *.
 
 *    Initialise status

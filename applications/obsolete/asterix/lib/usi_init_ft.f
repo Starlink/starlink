@@ -42,7 +42,7 @@
 
 *  Local Variables:
       INTEGER			FTOOLID			! FTOOL system
-      INTEGER			CALLID			! CALLABLE system
+c     INTEGER			CALLID			! CALLABLE system
 *.
 
 *    Not already initialised?
