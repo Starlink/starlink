@@ -42,7 +42,7 @@
 #     16-JUN-1997 (PDRAPER):
 #        Replace reduce and ccdalign scripts by super-script equivalents.
 #     10-MAR-1999 (MBT):
-*        Added entries for ASTIMP and ASTEXP.
+#        Added entries for ASTIMP and ASTEXP.
 #     {enter_changes_here}
 #
 #-
