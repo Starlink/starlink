@@ -16,10 +16,11 @@ class PkGlyph {
 	    unsigned int w,
 	    unsigned int h,
 	    int hoff,
-	    int voff)
+	    int voff,
+	    const Byte *rasterdata)
 	: dyn_f_(dyn_f),
 	cc_(cc), tfmwidth_(tfmwidth), dm_(dm), w_(w), h_(h),
-	hoff_(hoff), voff_(voff),
+	hoff_(hoff), voff_(voff), rasterdata_(rasterdata),
 	longform_(false), bitmap_(0) { };
     PkGlyph(Byte dyn_f,
 	    unsigned int cc,
@@ -29,30 +30,31 @@ class PkGlyph {
 	    unsigned int w,
 	    unsigned int h,
 	    unsigned int hoff,
-	    unsigned int voff)
+	    unsigned int voff,
+	    const Byte *rasterdata)
 	: dyn_f_(dyn_f),
 	cc_(cc), tfmwidth_(tfmwidth), dx_(dx), dy_(dy), w_(w), h_(h),
-	hoffu_(hoff), voffu_(voff),
+	hoffu_(hoff), voffu_(voff), rasterdata_(rasterdata),
 	longform_(true), bitmap_(0) { };
-    inline Byte *bitmap() const	{ return bitmap_; }
+    const Byte *bitmap();
     inline unsigned int w() const { return w_; }
     inline unsigned int h() const { return h_; }
-    void construct_bitmap (const Byte *rasterinfo);
  private:
     Byte dyn_f_;
     unsigned int cc_, tfmwidth_, dm_, dx_, dy_, w_, h_;
     int hoff_, voff_;
     unsigned int hoffu_, voffu_;
+    const Byte *rasterdata_;
     bool longform_;
     Byte *bitmap_;
-    // PKDecodeState keeps state for nybble and get_bitmap
+    void construct_bitmap ();
+    // PKDecodeState keeps state for nybble, unpackpk and construct_bitmap
     struct PKDecodeState {
 	const Byte *rasterp;
 	bool highnybble;
 	unsigned int repeatcount;
     };
     unsigned int unpackpk(PKDecodeState &);
-    void get_bitmap();
     inline static Byte nybble(PKDecodeState & s) {
 	s.highnybble = !s.highnybble;
 	return (s.highnybble ? (*s.rasterp)>>4 : (*s.rasterp++)&0xf);
@@ -66,7 +68,7 @@ class PkFont {
 	    unsigned int d,
 	    string name);
     ~PkFont();
-    PkGlyph *glyph (unsigned int i) const;
+    PkGlyph *glyph (unsigned int i) const { return glyphs_[i]; }
     
  private:
     unsigned int checksum_, scalefactor_, designsize_;
@@ -76,7 +78,6 @@ class PkFont {
     string comment_;
     const nglyphs_ = 256;
     PkGlyph *glyphs_[nglyphs_];
-    struct { unsigned int pos, len; } glyph_data_[nglyphs_];
     void read_font(InputByteStream&);
 };
 

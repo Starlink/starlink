@@ -37,20 +37,35 @@ main (int argc, char **argv)
 	    //cout << "Event " << ev->type << '\n';
 	    ev->debug();
 	    if (DviFileFontDef *fd = dynamic_cast<DviFileFontDef*>(ev))
+	    {
 		PkFont *f = new PkFont(fd->checksum,
 				       fd->scale,
 				       fd->size,
 				       fd->fontname);
+		PkGlyph *g = f->glyph(';');
+		const Byte *b = g->bitmap();
+		cout << ('\n');
+		for (int i=0; i<g->h(); i++)
+		{
+		    for (int j=0; j<g->w(); j++)
+		    {
+			cout << (*b ? '*' : ' ');
+			b++;
+		    }
+		    cout << '\n';
+		}
+	    }
+
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
     }
     catch (DviError e)
     {
-	cout << "DVI error: " << e.problem << '\n';
+	cerr << "DVI error: " << e.problem << '\n';
     }
     catch (DviBug e)
     {
-	cout << "BUG: " << e.problem << '\n';
+	cerr << "BUG: " << e.problem << '\n';
     }
 
     exit (0);

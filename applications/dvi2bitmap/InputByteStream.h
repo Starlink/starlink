@@ -14,7 +14,7 @@ class InputByteStream {
     signed int getSIU(int);
     signed int getSIS(int);
     unsigned int getUIU(int);
-    const Byte *getBlock (unsigned int pos, unsigned int len);
+    const Byte *getBlock (unsigned int pos);
     void seek (unsigned int);
     unsigned int pos ();
     void skip (unsigned int);

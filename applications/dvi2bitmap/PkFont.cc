@@ -10,7 +10,8 @@ PkFont::PkFont(unsigned int c,
 	       unsigned int d,
 	       string name)
 {
-    name_ = "/var/lib/texmf/pk/ljfour/public/cm/cmr6.600pk"; // temp
+    //name_ = "/var/lib/texmf/pk/ljfour/public/cm/cmr6.600pk"; // temp
+    name_ = "/var/lib/texmf/fonts/pk/ljfour/public/cm/cmr10.600pk";
     ibs_ = new InputByteStream (name_, true);
 
     for (int i=0; i<nglyphs_; i++)
@@ -61,6 +62,7 @@ void PkFont::read_font (InputByteStream& ibs)
 	    bool two_byte = opcode & 4;
 	    Byte pl_prefix = opcode & 3;
 	    unsigned int packet_length;
+	    unsigned int pos;	// primarily for debugging output
 
 	    unsigned int g_cc, g_tfmwidth, g_dm, g_dx, g_dy, g_w, g_h;
 	    int g_hoff, g_voff;
@@ -82,13 +84,12 @@ void PkFont::read_font (InputByteStream& ibs)
 			throw DviError
 			    ("PK file has out-of-range character code");
 
-		    packet_length -= 7*4;
-		    glyph_data_[g_cc].pos = ibs.pos();
-		    glyph_data_[g_cc].len = packet_length;
+		    pos = ibs.pos();
 		    glyphs_[g_cc] = new PkGlyph (dyn_f,
 						 g_cc, g_tfmwidth, g_dx, g_dy, 
-						 g_w, g_h, g_hoffu, g_voffu);
-		    ibs.skip (packet_length);
+						 g_w, g_h, g_hoffu, g_voffu,
+						 ibs.getBlock(pos));
+		    ibs.skip (packet_length - 7*4);
 		}
 		else		// extended short form character preamble
 		{
@@ -107,13 +108,12 @@ void PkFont::read_font (InputByteStream& ibs)
 			throw DviError
 			    ("PK file has out-of-range character code");
 
-		    packet_length -= 3 + 5*2;
-		    glyph_data_[g_cc].pos = ibs.pos();
-		    glyph_data_[g_cc].len = packet_length;
+		    pos = ibs.pos();
 		    glyphs_[g_cc] = new PkGlyph (dyn_f,
 						 g_cc, g_tfmwidth, g_dm,
-						 g_w, g_h, g_hoff, g_voff);
-		    ibs.skip (packet_length);
+						 g_w, g_h, g_hoff, g_voff,
+						 ibs.getBlock(pos));
+		    ibs.skip (packet_length - 3 - 5*2);
 		}
 	    else		// short form character preamble
 	    {
@@ -132,20 +132,19 @@ void PkFont::read_font (InputByteStream& ibs)
 		    throw DviError
 			("PK file has out-of-range character code");
 
-		packet_length -= 8;
-		glyph_data_[g_cc].pos = ibs.pos();
-		glyph_data_[g_cc].len = packet_length;
+		pos = ibs.pos();
 		glyphs_[g_cc] = new PkGlyph (dyn_f,
 					     g_cc, g_tfmwidth, g_dm,
-					     g_w, g_h, g_hoff, g_voff);
-		ibs.skip(packet_length);
+					     g_w, g_h, g_hoff, g_voff,
+					     ibs.getBlock(pos));
+		ibs.skip(packet_length - 8);
 	    }
 	    cout << "Char " << g_cc
 		 << " tfm=" << g_tfmwidth
 		 << " w="   << g_w
 		 << " h="   << g_h
 		 << " off=(" << g_hoff << ',' << g_voff
-		 << ")\n\tat " << glyph_data_[g_cc].pos
+		 << ")\n\tat " << pos
 		 << '(' << packet_length << ")\n";
 	}
 	else			// opcode is command
@@ -189,21 +188,6 @@ void PkFont::read_font (InputByteStream& ibs)
     }
 }
 
-PkGlyph *PkFont::glyph (unsigned int n)
-const
-{
-    if (n < 0 || n >= nglyphs_)
-	throw DviError ("glyph number out of range");
-
-    // Check that the glyph has its bitmap first. If not, have it create
-    // it, in which case we pass it the rasterinfo from the PK file.
-    if (glyphs_[n]->bitmap() == 0)
-	glyphs_[n]->construct_bitmap (ibs_->getBlock(glyph_data_[n].pos,
-						     glyph_data_[n].len));
-    return glyphs_[n];
-}
-	
-
 unsigned int PkGlyph::unpackpk (PKDecodeState& s)
 {
     unsigned int res = 0;
@@ -238,41 +222,39 @@ unsigned int PkGlyph::unpackpk (PKDecodeState& s)
     return res;
 }
 
+const Byte *PkGlyph::bitmap()
+{
+    if (bitmap_ == 0)
+	construct_bitmap();
+    return bitmap_;
+}
+
 // Construct a bitmap from the provided rasterinfo, which has come from
 // the PK file.  Place the resulting bitmap in bitmap_
-void PkGlyph::construct_bitmap (const Byte *rasterinfo)
+void PkGlyph::construct_bitmap()
 {
-    Byte runcount;
-    // highnybble_ , rasterp_ and repeatcount_ are class variables
-    // shared between construct_bitmap, nybble and unpackpk
-    struct PKDecodeState pkds;
-    pkds.highnybble = false;
-    pkds.rasterp = rasterinfo;
-    pkds.repeatcount = 0;
-
     bitmap_ = new Byte[w_ * h_];
-
-    Byte pixelcolour = 1;	// start off black
 
     if (dyn_f_ == 14)
     {
 	// rasterinfo is a pure bitmap - no decoding necessary
 	unsigned int nbits_req = w_*h_;
-	Byte *p = bitmap_;
+	Byte *p = bitmap_;		// build this up...
+	const Byte *r = rasterdata_;	// ...from here
 	Byte b;
 
 	while (nbits_req >= 8)
 	{
-	    for (int i=7, b=*rasterinfo; i>=0; i--, b>>=1)
+	    for (int i=7, b=*r; i>=0; i--, b>>=1)
 		p[i] = b&1;
 	    p += 8;
-	    rasterinfo++;
+	    r++;
 	    nbits_req -= 8;
 	}
 	if (nbits_req > 0)
 	{
 	    // get the last few bits
-	    b >>= (8-nbits_req);
+	    b = *r >> (8-nbits_req);
 	    for (int i=nbits_req-1; i>=0; i--, b>>=1)
 		p[i] = b&1;
 	}
@@ -280,14 +262,23 @@ void PkGlyph::construct_bitmap (const Byte *rasterinfo)
     else
     {
 	// decode the rasterinfo
+
+	// highnybble_ , rasterp_ and repeatcount_ are class variables
+	// shared between construct_bitmap, nybble and unpackpk
+	struct PKDecodeState pkds;
+	pkds.highnybble = false;
+	pkds.rasterp = rasterdata_;
+	pkds.repeatcount = 0;
+
 	Byte *rowp = bitmap_;
 	Byte *rowstart = bitmap_;
 	unsigned int nrow = 0;
 	unsigned int ncol = 0;
+	Byte pixelcolour = 1;	// start off black
 
 	while (nrow < h_)
 	{
-	    runcount = unpackpk(pkds);
+	    unsigned int runcount = unpackpk(pkds);
 	    for (; runcount>0; runcount--)
 	    {
 		*rowp++ = pixelcolour;

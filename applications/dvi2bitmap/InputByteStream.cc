@@ -28,6 +28,8 @@ InputByteStream::InputByteStream (string s, bool preload=false)
 	    if (bufcontents != buflen_)
 		throw DviError ("Couldn't preload file");
 	    eob_ = buf_ + bufcontents;
+	    cerr << "stat.st_size="<<buflen_
+		 <<" bufcontents="<<bufcontents<<'\n';
 
 	    close (fd_);
 	    fd_ = -1;
@@ -74,7 +76,7 @@ Byte InputByteStream::getByte()
     return eof_ ? 0 : *p_++;
 }
 
-const Byte *InputByteStream::getBlock (unsigned int pos, unsigned int len)
+const Byte *InputByteStream::getBlock (unsigned int pos)
 {
     if (eof_)
 	return 0;
@@ -84,8 +86,6 @@ const Byte *InputByteStream::getBlock (unsigned int pos, unsigned int len)
 	throw DviBug ("InputByteStream pointer before buffer start");
     if (blockp > eob_)
 	throw DviBug ("InputByteStream pointer beyond EOF");
-    if (blockp+len > eob_)
-	throw DviBug ("InputByteStream getBlock requested beyond EOF");
 
     return blockp;
 }
