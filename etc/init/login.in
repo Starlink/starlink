@@ -14,7 +14,7 @@
 #     Append @bindir@, @bindir@/startcl and @starjavadir@/bin
 #     to PATH, clear path first.
 
-set tmppath = ${PATH}
+set tmppath = "${PATH}"
 if (`echo ${tmppath} | grep -c ':@bindir@/startcl:'` != 0) \
     set tmppath = `echo ${tmppath} | sed -e 's#:@bindir@/startcl:#:#g'`
 
@@ -42,7 +42,7 @@ if (`echo ${tmppath} | grep -c ':@starjavadir@/bin$'` != 0) \
 if (`echo ${tmppath} | grep -c '^@starjavadir@/bin'` != 0) \
     set tmppath = `echo ${tmppath} | sed -e 's#@starjavadir@:##g'`
 
-setenv PATH ${tmppath}:@bindir@/startcl:@bindir@:@starjavadir@/bin
+setenv PATH "${tmppath}:@bindir@/startcl:@bindir@:@starjavadir@/bin"
 
 
 #
@@ -52,8 +52,8 @@ setenv PATH ${tmppath}:@bindir@/startcl:@bindir@:@starjavadir@/bin
 set JREHOME = @exec_prefix@/java/jrehome
 set JDKHOME = @exec_prefix@/java/jdkhome
 
-if ( -f ${JDKHOME} ) setenv PATH `cat ${JDKHOME}`/bin:${PATH}
-if ( -f ${JREHOME} ) setenv PATH `cat ${JREHOME}`/bin:${PATH}
+if ( -f ${JDKHOME} ) setenv PATH "`cat ${JDKHOME}`/bin:${PATH}"
+if ( -f ${JREHOME} ) setenv PATH "`cat ${JREHOME}`/bin:${PATH}"
 unset JREHOME JDKHOME
 
 #     Check if LD_LIBRARY_PATH is set
@@ -97,22 +97,54 @@ if ( ${?LD_LIBRARY_PATH} ) then
 #  Add required components to end of LD_LIBRARY_PATH if flag variables
 #  indicate they are not present.
 
-   if ( $foundit_one == "no" && -e @exec_prefix@/sun4_Solaris ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@libdir@:@starjavadir@/lib/sparc
-   if ( $foundit_one == "no" && -e @exec_prefix@/sun4 ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@libdir@:@starjavadir@/lib/sparc
-   if ( $foundit_two == "no" && -e @exec_prefix@/sun4_Solaris ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/usr/openwin/lib:@starjavadir@/lib/sparc
-   if ( $foundit_four == "no" && -e @exec_prefix@/alpha_OSF1 ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@sharelibdir@:@starjavadir@/lib/alpha
-   if ( $foundit_four == "no" && -e @exec_prefix@/ix86_Linux ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@sharelibdir@:@starjavadir@/lib/i386
-   if ( $foundit_four == "no" && -e @exec_prefix@/sun4_Solaris ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:@sharelibdir@:@starjavadir@/lib/sparc
+   if ( $foundit_one == "no" ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@libdir@"
+   endif
+
+   if ( $foundit_one == "no" && -e @exec_prefix@/sun4_Solaris ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/sparc"
+   endif
+   if ( $foundit_one == "no" && -e @exec_prefix@/sun4 ) then 
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/sparc"
+   endif
+
+   if ( $foundit_two == "no" && -e @exec_prefix@/sun4_Solaris ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/openwin/lib:@starjavadir@/lib/sparc"
+   endif
+
+   if ( $foundit_four == "no" ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@sharelibdir@"
+   endif
+
+   if ( $foundit_four == "no" && -e @exec_prefix@/alpha_OSF1 ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/alpha"
+   endif
+   if ( $foundit_four == "no" && -e @exec_prefix@/ix86_Linux ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
+   endif
+   if ( $foundit_four == "no" && -e @exec_prefix@/sun4_Solaris ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/sparc"
+   endif
    unset foundit_one foundit_two foundit_three foundit_four
 
 else
 
 #  LD_LIBRARY_PATH is not set.  Add required components.
 
-   if ( -e @exec_prefix@/alpha_OSF1 ) setenv LD_LIBRARY_PATH @sharelibdir@:@starjavadir@/lib/alpha
-   if ( -e @exec_prefix@/ix86_Linux ) setenv LD_LIBRARY_PATH @sharelibdir@:@starjavadir@/lib/i386
-   if ( -e @exec_prefix@/sun4_Solaris ) setenv LD_LIBRARY_PATH @sharelibdir@:@libdir@:/usr/openwin/lib:@starjavadir@/lib/sparc
-   if ( -e @exec_prefix@/sun4 ) setenv LD_LIBRARY_PATH @libdir@:@starjavadir@/lib/sparc
+   setenv LD_LIBRARY_PATH @sharelibdir@
+
+   if ( -e @exec_prefix@/alpha_OSF1 ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/alpha"
+   endif
+   if ( -e @exec_prefix@/ix86_Linux ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
+   endif
+   if ( -e @exec_prefix@/sun4_Solaris ) then 
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@libdir@:/usr/openwin/lib:@starjavadir@/lib/sparc"
+   endif
+   if ( -e @exec_prefix@/sun4 ) then
+      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@libdir@:@starjavadir@/lib/sparc"
+   endif
 endif
 
 #
@@ -123,13 +155,14 @@ endif
 
 #
 #  TCLSYS
-if ( -e @exec_prefix@/dates/tclsys_datestamp ) then
-   set tclsys_install=`grep INSTALL @exec_prefix@/dates/tclsys_datestamp | awk -F: '{print $2}' - `
+if ( -e @exec_prefix@/manifests/tcl ) then
+   set tclsh_names=`grep 'bin/tclsh' /star/manifests/tcl`
+   set tclsys_install=`echo $tclsh_names[1]:h:h`
    if ( "@exec_prefix@" != ${tclsys_install} ) then
       setenv TCL_LIBRARY @libdir@
       setenv TK_LIBRARY @libdir@
    endif
-   unset tclsys_install
+   unset tclsys_install tclsh_names
 endif
 
 #
@@ -140,8 +173,6 @@ if ( ! ${?WWW_HOME} ) setenv WWW_HOME http://www.starlink.rl.ac.uk/
 #
 #  HTX browser.  If HTX_BROWSER is not defined, set it to netscape.
 if ( ! ${?HTX_BROWSER} ) setenv HTX_BROWSER netscape
-set uname_os = `uname -s`
-if( ${uname_os} == 'Darwin' ) setenv HTX_BROWSER safari
 
 #
 #  MAN pages.  If none defined, create a default, then add to it.
@@ -393,9 +424,10 @@ endif
 
 
 #
-#  PERL
-if ( -e @exec_prefix@/dates/perl_datestamp ) then
-   set perl_install=`grep INSTALL @exec_prefix@/dates/perl_datestamp | awk -F: '{print $2}' - `
+#  PERL -- note this isn't a third party package at present.
+if ( -e @exec_prefix@/manifests/perl ) then
+   set perl_names=`grep 'bin/perl' /star/manifests/perl`
+   set perl_install=`echo $perl_names[1]:h:h`
    if ( "@exec_prefix@" != ${perl_install} ) then
       set perl_version = 5.8.0
       if ( -e @exec_prefix@/Perl/perl_sys ) then
@@ -411,7 +443,7 @@ if ( -e @exec_prefix@/dates/perl_datestamp ) then
          setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/site_perl
       endif
    endif
-   unset perl_install perl_version
+   unset perl_install perl_version perl_names
 endif
 
 
