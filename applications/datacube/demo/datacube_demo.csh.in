@@ -48,14 +48,15 @@ set tmpdir = "/tmp"
 mkdir "${tmpdir}/${user}"
 set colfile = "${tmpdir}/${user}/test_col.sdf"
 set ripfile = "${tmpdir}/${user}/test_rip.sdf"
-set cubfile = "${DATACUBE_DIR}/smirfsdc.sdf"
-set wlifile = "${DATACUBE_DIR}/smirfswl.sdf"
-set rspfile = "${DATACUBE_DIR}/smirfsrs.sdf"
+set cubfile = "@datadir@/datacube/smirfsdc.sdf"
+set wlifile = "@datadir@/datacube/smirfswl.sdf"
+set rspfile = "@datadir@/datacube/smirfsrs.sdf"
 set plotdev = "xwin"
 
 # do package setup
 
 alias echo 'echo > /dev/null'
+setenv DATACUBE_DIR @bindir@
 source ${DATACUBE_DIR}/datacube.csh
 unalias echo
 
