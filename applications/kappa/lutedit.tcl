@@ -1,4 +1,4 @@
-#!STAR_BIN/bin/awish
+#!STAR_BIN/awish
 #+
 #  Name:
 #     LutEdit.tcl
@@ -6291,6 +6291,7 @@ proc WaitFor {name args} {
 # Get the image to display and initial lut from the command line.
    if { $argc >= 2 } { 
       set IMAGE [lindex $argv 1] 
+      if { [string trim $IMAGE] == "" } { set IMAGE $KAPPA_DIR/m31 }
    } else {
       set IMAGE $KAPPA_DIR/m31
    }
