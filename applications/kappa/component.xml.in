@@ -23,7 +23,7 @@ packages.
     </person>
     <person>
       <name>Malcolm Currie</name>
-      <uname>dsb</uname>
+      <uname>mjc</uname>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
