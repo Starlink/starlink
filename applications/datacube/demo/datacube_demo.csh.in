@@ -57,6 +57,10 @@ set plotdev = "xwin"
 
 alias echo 'echo > /dev/null'
 setenv DATACUBE_DIR @bindir@
+setenv KAPPA_DIR @bindir@/../kappa
+setenv CONVERT_DIR @bindir@/../convert
+setenv PGPLOT_DIR @bindir@/..
+setenv FIG_DIR @bindir@/../figaro
 source ${DATACUBE_DIR}/datacube.csh
 unalias echo
 
