@@ -98,4 +98,5 @@ $(srcdir)/ilink.in: $(srcdir)/ailink.in.m4
 # Note that libtool is located in $(top_builddir) (not part of the
 # automake interface, but unlikely to change)
 dtask_libtool: $(top_builddir)/libtool
+	rm -f dtask_libtool
 	$(LN_S) $(top_builddir)/libtool dtask_libtool
