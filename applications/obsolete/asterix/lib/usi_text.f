@@ -10,6 +10,7 @@
 *
 *     13 Dec 88 : Original (DJA)
 *     13 Jan 90 : Recoded using SUBPAR_ calls (DJA)
+*     22 Nov 94 : Generic parameter system - removed SUBPAR (DJA)
 *
 *    Type definitions :
 *
@@ -19,7 +20,10 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
+*
+*    Global variables :
+*
+      INCLUDE 'USI_CMN'
 *
 *    Import :
 *
@@ -38,6 +42,7 @@
 *    Function declarations :
 *
       INTEGER             CHR_LEN
+      LOGICAL			CHR_SIMLR
 *
 *    Local variables :
 *
@@ -49,6 +54,7 @@
 
       INTEGER             CODE                ! Internal parameter code
       INTEGER             I                   ! Counter
+      INTEGER             IP                  ! Parameter counter
       INTEGER             LBRACKPOS           ! Position of a "{"
       INTEGER             LEVELS              ! Levels of object
       INTEGER             MAXLINES            ! Max no. of output lines
@@ -90,12 +96,18 @@
             CALL CHR_UCASE(PARNAME)
 
 *          Is it valid?
-            CALL SUBPAR_FINDPAR( PARNAME(:CHR_LEN(PARNAME)), CODE,
-     :                                                    STATUS )
-            IF ( STATUS .EQ. SAI__OK ) THEN
+            CODE = 0
+            DO IP = 1, USI__NMAX
+              IF ( DS(IP).USED ) THEN
+                IF ( CHR_SIMLR(PARNAME,DS(IP).PAR) ) THEN
+                  CODE = IP
+                END IF
+              END IF
+            END DO
+            IF ( CODE .NE. 0 ) THEN
 
 *            Parameter name is ok - get locator
-              CALL SUBPAR_GETLOC( CODE, PVALID, PLOC, STATUS )
+              PLOC = DS(CODE).LOC
               IF ( STATUS .NE. SAI__OK)  THEN
                 CALL ERR_FLUSH( STATUS )
                 PVALID=.FALSE.

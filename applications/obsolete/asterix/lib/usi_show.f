@@ -47,7 +47,7 @@
       WORK(1) = INTEXT
       NOUT = MAXLINES
       CALL USI_TEXT( 1, WORK, NOUT, STATUS )
-      DO I=1,NOUT
-         CALL MSG_PRNT( WORK(I)(:CHR_LEN(WORK(I))) )
+      DO I = 1, NOUT
+         CALL MSG_OUT( ' ', WORK(I)(:CHR_LEN(WORK(I))), STATUS )
       END DO
       END

@@ -6,7 +6,7 @@
       IMPLICIT NONE
       INCLUDE  'SAE_PAR'
       INCLUDE  'DAT_PAR'
-      INCLUDE  'ASTLIB(USI_CMN)'
+      INCLUDE  'USI_CMN'
 *    Local constants :
       CHARACTER*1 BLANK
       PARAMETER (BLANK=' ')
@@ -15,16 +15,20 @@
       LOGICAL VALID
       INTEGER ISTAT
 *-
+
+      CALL USI0_EXIT()
+
       ISTAT=SAI__OK
-      DO N=1,USI_NMAX
+      DO N=1,USI__NMAX
         IF (DS(N).USED) THEN
           CALL DAT_VALID(DS(N).LOC,VALID,ISTAT)
           IF (VALID) THEN
             CALL DAT_ANNUL(DS(N).LOC,ISTAT)
           ENDIF
-          DS(N).LOC=BLANK
+          DS(N).LOC=DAT__NOLOC
           DS(N).USED=.FALSE.
           DS(N).IO=BLANK
         ENDIF
       ENDDO
+      USI_SYINIT = .FALSE.
       END
