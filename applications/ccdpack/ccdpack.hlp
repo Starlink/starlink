@@ -8388,6 +8388,19 @@ PREVY = _INTEGER (Read and Write)
    by resizing the entire chooser window in the normal way using
    the window manager while the program is running.
    [350]
+3 TOLER
+TOLER = _DOUBLE (Read)
+   The tolerance for deduplicating centroided points (in pixels).
+   If two centroided objects on the same image are within this 
+   distance of each other they will be identified as the same 
+   object.  For a bright elliptical object, centroiding arising 
+   from any nearby point will normally arrive at the same 
+   position, so this can be set to a small value (<1), but 
+   if the objects being identified cover many pixels and are close
+   to the background noise level it may be advantageous to set
+   it to a larger value so that centroids near to each other
+   are identified as referring to the same object.
+   [0.5]
 3 USESET
 USESET = _LOGICAL (Read)
    This parameter determines whether Set header information should

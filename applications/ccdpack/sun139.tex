@@ -2670,6 +2670,8 @@ assume they are monotonically increasing from one.
 
 Whole and in-line comments are allowed in position lists using the
 character `{\tt \#}'.  These are not propagated from input to output lists.
+Note that the final line of the file should be terminated by a 
+newline character (certain text editors do not always enforce this).
 
 The X and Y values in a position list always refer to the 
 pixel coordinates of an image.
@@ -15291,6 +15293,21 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [350]
       }
       \sstsubsection{
+         TOLER = \_DOUBLE (Read)
+      }{
+         The tolerance for deduplicating centroided points (in pixels).
+         If two centroided objects on the same image are within this 
+         distance of each other they will be identified as the same 
+         object.  For a bright elliptical object, centroiding arising 
+         from any nearby point will normally arrive at the same 
+         position, so this can be set to a small value (less than 1), but 
+         if the objects being identified cover many pixels and are close
+         to the background noise level it may be advantageous to set
+         it to a larger value so that centroids near to each other
+         are identified as referring to the same object.
+         [0.5]
+      }
+      \sstsubsection{
          USESET = \_LOGICAL (Read)
       }{
          This parameter determines whether Set header information should
@@ -15357,8 +15374,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstexamplesubsection{
          pairndf in={\tt "}data1,data2{\tt "} outlist={\tt "}d1-pos,d2-pos{\tt "} zoom=2 maxcanv=0
-      }{
               markstyle={\tt "}shape=circle,size=8,thickness=1,colour=HotPink{\tt "}
+      }{
          Only the two images data1 and data2 will be aligned, and the
          corresponding sets of positions will be written to the
          files d1-pos and d2-pos.  The images will initially be

@@ -25,6 +25,8 @@
 #        Added OVERRIDE parameter and removed NAMELIST parameter.
 #     7-MAR-2001 (MBT):
 #        Upgraded for use with Sets.
+#     11-JUL-2001 (MBT):
+#        Added TOLER parameter.
 #     {enter_changes_here}
 
 #-
@@ -122,6 +124,17 @@
             ppath CURRENT DEFAULT
             prompt "Preview 2 images in chooser widget before alignment?"
             default FALSE
+            helpkey *
+         }
+
+         parameter toler {
+                          # Deduplicating tolerance
+            type _DOUBLE
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt "Object de-duplicating tolerance in pixels"
+            default 0.5
             helpkey *
          }
 

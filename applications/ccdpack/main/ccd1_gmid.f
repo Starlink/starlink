@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_GMID( GRAPH, NEDGES, NNODE, IP, IL, X1, Y1, X2,
-     :                      Y2, N, OFFS, ID1, ID2, STATUS )
+     :                      Y2, N, TOLS, OFFS, ID1, ID2, STATUS )
 *+
 *  Name:
 *     CCD1_GMID
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL CCD1_GMID( GRAPH, NEDGES, NNODE, IP, IL, X1, Y1,
-*                     X2, Y2, N, OFFS, ID1, ID2, STATUS )
+*                     X2, Y2, N, TOLS, OFFS, ID1, ID2, STATUS )
 
 *  Description:
 *     This routine generates identifiers for positions within lists
@@ -56,6 +56,16 @@
 *        list are OFFS.
 *     N = INTEGER (Given)
 *        The total number of entries in input merged lists.
+*     TOLS( * ) = DOUBLE PRECISION (Given)
+*        Tolerances for deduplicating centroided points indexed by node.
+*        If two points in an image points are within this distance of 
+*        each other in both X and Y directions they should be considered 
+*        to refer to the same feature.  This might normally be a value 
+*        equivalent to about a pixel, but may be larger to accomodate 
+*        objects which are multi-peaked (for instance if they are only 
+*        faintly apparent above the background noise).  If equivalent
+*        points are known to have the same value every time the 
+*        elements may be set to zero.
 *     OFFS( NEDGES + 1 ) = INTEGER (Given)
 *        The offsets of the start of the input lists which are
 *        associated with an edge. Thus range (OFFS(1), OFFS(2) -1 )
@@ -75,6 +85,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +93,8 @@
 *        Original version.
 *     7-MAR-1993 (PDRAPER):
 *        Complete rewrite.
+*     11-JUL-2001 (MBT):
+*        Added TOLS argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,6 +118,7 @@
       DOUBLE PRECISION Y1( N )
       DOUBLE PRECISION X2( N )
       DOUBLE PRECISION Y2( N )
+      DOUBLE PRECISION TOLS( * )
       INTEGER OFFS( NEDGES + 1 ) 
 
 *  Arguments Given and Returned:
@@ -121,13 +135,11 @@
 *  Local Constants:
       INTEGER MAXIT              ! Maximum number of iterations
       PARAMETER ( MAXIT = 10000) ! used to stop cyclic runaways
-      
 
 *  Local Variables:
       DOUBLE PRECISION XN        ! Current X position
       DOUBLE PRECISION YN        ! Current X position
-      INTEGER CHANGE             ! Numbers of identifiers changed this
-                                 ! time
+      INTEGER CHANGE             ! Numbers of identifiers changed this time
       INTEGER EDGE               ! Current edge
       INTEGER FNODE              ! First node number
       INTEGER I                  ! Loop variable
@@ -137,8 +149,7 @@
       INTEGER LNODE              ! Last node number
       INTEGER NIT                ! Number of iterations
       INTEGER NODE               ! Current node
-      INTEGER NPOS               ! Number of positions associated with a
-                                 ! node
+      INTEGER NPOS               ! Number of positions associated with a node
 
 *.
 
@@ -229,8 +240,10 @@
 
 *  If this the same same position?
                   IF ( IL( J ) .EQ. 1 ) THEN             ! Use X1 and Y1
-                     IF ( XN .EQ. X1( IP( J ) ) ) THEN
-                        IF ( YN .EQ. Y1( IP( J ) ) ) THEN 
+                     IF ( ABS( XN - X1( IP( J ) ) ) 
+     :                    .LE. TOLS( NODE ) ) THEN
+                        IF ( ABS( YN - Y1( IP( J ) ) ) 
+     :                       .LE. TOLS( NODE ) ) THEN
 
 *  Same position set alias to reference ID. If the identifier not the
 *  same. If the identifier is the same then that's fine.
@@ -240,8 +253,10 @@
                         END IF
                      END IF
                   ELSE                                   ! Use X2 and Y2
-                     IF ( XN .EQ. X2( IP( J ) ) ) THEN
-                        IF ( YN .EQ. Y2( IP( J ) ) ) THEN 
+                     IF ( ABS( XN - X2( IP( J ) ) ) 
+     :                    .LE. TOLS( NODE ) ) THEN
+                        IF ( ABS( YN - Y2( IP( J ) ) )
+     :                       .LE. TOLS( NODE ) ) THEN
 
 *  Same position set alias to reference ID. If the identifier not the
 *  same.

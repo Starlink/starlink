@@ -241,6 +241,18 @@
 *        by resizing the entire chooser window in the normal way using
 *        the window manager while the program is running.
 *        [350]
+*     TOLER = _DOUBLE (Read)
+*        The tolerance for deduplicating centroided points (in pixels).
+*        If two centroided objects on the same image are within this 
+*        distance of each other they will be identified as the same 
+*        object.  For a bright elliptical object, centroiding arising 
+*        from any nearby point will normally arrive at the same 
+*        position, so this can be set to a small value (<1), but 
+*        if the objects being identified cover many pixels and are close
+*        to the background noise level it may be advantageous to set
+*        it to a larger value so that centroids near to each other
+*        are identified as referring to the same object.
+*        [0.5]
 *     USESET = _LOGICAL (Read)
 *        This parameter determines whether Set header information should
 *        be used or not.  If USESET is true,
@@ -387,6 +399,8 @@
 *     22-MAY-2001 (MBT):
 *        Changed so that empty position lists are written rather than no
 *        lists at all.
+*     11-JUL-2001 (MBT):
+*        Added new TOLER parameter.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -413,6 +427,9 @@
       CHARACTER * ( 132 ) MSTYLE ! Marker style string
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for writing output lines
       DOUBLE PRECISION PERCNT( 2 ) ! Percentile values for display
+      DOUBLE PRECISION PSIZE    ! Pixel size in current coords
+      DOUBLE PRECISION TOLER    ! Deduplicating tolerance in units of pixels
+      DOUBLE PRECISION TOLS( CCD1__MXNDF ) ! Deduplicating tolerance by Set
       DOUBLE PRECISION XLO      ! Lower acceptable bound for X coordinate
       DOUBLE PRECISION XHI      ! Upper acceptable bound for X coordinate
       DOUBLE PRECISION XOFF( CCD1__MXNDF * CCD1__MXNDF ) ! Initial X offsets
@@ -512,6 +529,10 @@
 
 *  Get the percentage histogram range for image display.
       CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
+
+*  Get the deduplication tolerance.
+      CALL PAR_GET0D( 'TOLER', TOLER, STATUS )
+      TOLER = MAX( 0D0, TOLER )
 
 *  See if we should continue with registration if only a few of the
 *  datasets have been paired.
@@ -622,10 +643,18 @@
 *  Get the WCS component.
          CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
 
-*  If this is the first member of this Set encountered so far, store the
-*  current frame.
+*  If this is the first member of this Set encountered so far, record
+*  information to use for this Set (note it is arbitrary to use the
+*  first one rather than others, but in all normal circumstances the
+*  information should be similar for all members).
          IF ( FRM( IS ) .EQ. AST__NULL ) THEN
+
+*  Store the current frame.
             FRM( IS ) = AST_GETFRAME( IWCS( I ), AST__CURRENT, STATUS )
+
+*  Work out the deduplicating tolerance based on the pixel size.
+            CALL CCD1_PSIZE( IWCS( I ), AST__CURRENT, PSIZE, STATUS )
+            TOLS( IS ) = TOLER * PSIZE
          END IF
       END DO
 
@@ -649,8 +678,8 @@
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and finally merging all positions for each node.
       CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, TOTNOD, IPX1, IPY1, IPRAN1,
-     :                IPX2, IPY2, IPRAN2, NMAT, OFFS, IPXO, IPYO, IPRAN,
-     :                IPID, NOUT, STATUS )
+     :                IPX2, IPY2, IPRAN2, NMAT, TOLS, OFFS, IPXO, IPYO,
+     :                IPRAN, IPID, NOUT, STATUS )
 
 *  Release some memory.
       DO I = 1, COUNT

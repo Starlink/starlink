@@ -1,6 +1,6 @@
       SUBROUTINE CCD1_GMMP( GRAPH, NEDGES, NNODE, IPX1, IPY1, IPRAN1,
-     :                      IPX2, IPY2, IPRAN2, NIN, OFFS, IPX, IPY,
-     :                      IPRANK, IPIDS, NOUT, STATUS )
+     :                      IPX2, IPY2, IPRAN2, NIN, TOLS, OFFS, IPX,
+     :                      IPY, IPRANK, IPIDS, NOUT, STATUS )
 *+
 *  Name:
 *     CCD1_GMMP
@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     CALL CCD1_GMMP( GRAPH, NEDGES, NNODE, IPX1, IPY1, IPRAN1, IPX2,
-*                     IPY2, IPRAN, NIN, OFFS, IPX, IPY, IPRANK, IPIDS,
-*                     NOUT, STATUS )
+*                     IPY2, IPRAN, NIN, TOLS, OFFS, IPX, IPY, IPRANK, 
+*                     IPIDS, NOUT, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -54,6 +54,16 @@
 *        corresponding order.
 *     NIN( * ) = INTEGER (Given)
 *        Number of X and Y positions in IPX1, IPY1, IPX2, IPY2.
+*     TOLS( * ) = DOUBLE PRECISION (Given)
+*        Tolerances for deduplicating centroided points indexed by node.
+*        If two points in an image points are within this distance of 
+*        each other in both X and Y directions they should be considered 
+*        to refer to the same feature.  This might normally be a value 
+*        equivalent to about a pixel, but may be larger to accomodate 
+*        objects which are multi-peaked (for instance if they are only 
+*        faintly apparent above the background noise).  If equivalent
+*        points are known to have the same value every time the 
+*        elements may be set to zero.
 *     OFFS( NEDGES + 1 ) = INTEGER (Given and Returned)
 *        Workspace for offsets into vectorised lists.
 *     IPX( * ) = INTEGER (Returned)
@@ -89,6 +99,8 @@
 *        Original version.
 *     29-JAN-2001 (MBT):
 *        Added the IPRAN1, IPRAN2 and IPRANK parameters.
+*     11-JUL-2001 (MBT):
+*        Added TOLS parameter.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -114,6 +126,7 @@
       INTEGER IPY2( * )
       INTEGER IPRAN2( * )
       INTEGER NIN( * )
+      DOUBLE PRECISION TOLS( * )
 
 *  Arguments Given and Returned:
       INTEGER OFFS( NEDGES + 1 )
@@ -198,7 +211,7 @@
 *  Now do the work of generating the matched identifiers.
       CALL CCD1_GMID( GRAPH, NEDGES, NNODE, %VAL( IP ), %VAL( IL ),
      :                %VAL( IPAX1 ), %VAL( IPAY1 ), %VAL( IPAX2 ),
-     :                %VAL( IPAY2 ), IIN, OFFS, %VAL( IPI1 ),
+     :                %VAL( IPAY2 ), IIN, TOLS, OFFS, %VAL( IPI1 ),
      :                %VAL( IPI2 ), STATUS )
 
 *  Get workspace for the output lists.

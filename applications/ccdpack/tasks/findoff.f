@@ -524,6 +524,7 @@
       DOUBLE PRECISION NEDFAC   ! Minimum completeness factor required
       DOUBLE PRECISION PIXSIZ   ! Linear size of a pixel for this pair
       DOUBLE PRECISION PSIZE( CCD1__MXLIS ) ! Linear size of a pixel
+      DOUBLE PRECISION TOLS( CCD1__MXLIS ) ! Deduplication tolerances
       DOUBLE PRECISION WEIGHT( CCD1__MXLIC ) ! Weights of matched positions
       DOUBLE PRECISION XOFF( CCD1__MXLIC ) ! Determined X translation
       DOUBLE PRECISION XOFFN( CCD1__MXLIS ) ! Final X translation
@@ -1501,9 +1502,12 @@
 
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and final merging all positions for each node.
+         DO I = 1, NSUP
+            TOLS( I ) = 0D0
+         END DO
          CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NNODE, IPXO1, IPYO1,
-     :                   IPRCN1, IPXO2, IPYO2, IPRCN2, NMAT, OFFS, IPX,
-     :                   IPY, IPRAN, IPID, NOUT, STATUS )
+     :                   IPRCN1, IPXO2, IPYO2, IPRCN2, NMAT, TOLS,
+     :                   OFFS, IPX, IPY, IPRAN, IPID, NOUT, STATUS )
 
       ELSE
 
