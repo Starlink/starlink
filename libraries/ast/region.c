@@ -7750,6 +7750,9 @@ astMAKE_TEST(Region,RegionFS,( this->regionfs != -INT_MAX ))
 *  Applicability:
 *     Region
 *        All Regions have this attribute.
+*     CmpRegion
+*        The default FillFactor for a CmpRegion is the FillFactor of its
+*        first component Region.
 *att--
 */
 
@@ -7794,6 +7797,9 @@ astMAKE_SET(Region,FillFactor,double,fillfactor,((value<0.0||value>1.0)?(
 *  Applicability:
 *     Region
 *        All Regions have this attribute.
+*     CmpRegion
+*        The default MeshSize for a CmpRegion is the MeshSize of its
+*        first component Region.
 *att--
 */
 /* If the value of MeshSize is set or cleared, annul the PointSet used to
@@ -7839,6 +7845,9 @@ astMAKE_GET(Region,MeshSize,int,0,( ( this->meshsize == -INT_MAX)?((astGetNaxes(
 *        assumed to be closed. If the PointList region has been negated, then 
 *        it is always assumed to be open. This is required since points
 *        have zero volume and therefore consist entirely of boundary.
+*     CmpRegion
+*        The default Closed value for a CmpRegion is the Closed value of its
+*        first component Region.
 *att--
 */
 /* This is a boolean value (0 or 1) with a value of -INT_MAX when

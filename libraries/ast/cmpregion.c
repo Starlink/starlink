@@ -119,6 +119,9 @@ static int (* parent_testunc)( AstRegion * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static int (* parent_equal)( AstObject *, AstObject * );
+static int (* parent_getclosed)( AstRegion * );
+static int (* parent_getmeshsize)( AstRegion * );
+static double (* parent_getfillfactor)( AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -134,8 +137,11 @@ static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *GetUnc( AstRegion *, int );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char * );
+static double GetFillFactor( AstRegion * );
 static int Equal( AstObject *, AstObject * );
 static int GetBounded( AstRegion * );
+static int GetClosed( AstRegion * );
+static int GetMeshSize( AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
 static int TestUnc( AstRegion * );
 static void ClearUnc( AstRegion * );
@@ -274,6 +280,78 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 /* Return the result, */
    return result;
 }
+
+/*
+*  Name:
+*     MAKE_GET
+
+*  Purpose:
+*     Define a function to get an attribute value for a CmpRegion.
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     MAKE_GET(attribute,lattribute,def,type)
+
+*  Class Membership:
+*     Defined by the CmpRegion class.
+
+*  Description:
+*     This macro expands to an implementation of a private member function
+*     of the form:
+*
+*        static <type> Get<Attribute>( AstRegion *this )
+*
+*     that gets the value of a specified Region attribute providing a
+*     default value from the first component Region.
+
+*  Parameters:
+*     attribute
+*        Name of the attribute, as it appears in the function name.
+*     lattribute
+*        Name of the attribute, all in lower case.
+*     def
+*        Value to return in event of an error.
+*     type
+*        The C type of the attribute.
+*/
+
+/* Define the macro. */
+#define MAKE_GET(attribute,lattribute,def,type) \
+static type Get##attribute( AstRegion *this_region ) { \
+\
+/* Local Variables: */ \
+   AstCmpRegion *this;         /* Pointer to the CmpRegion structure */ \
+   type result;                /* Value to return */ \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return def; \
+\
+/* Test the attribute. If set use the parent method to get the value. */ \
+   if( astTest##attribute( this_region ) ){ \
+      result = (*parent_get##lattribute)( this_region); \
+\
+/* Otherwise, get the value from the first component Region and use it as \
+   the default for the CmpRegion. */ \
+   } else { \
+      this = (AstCmpRegion *) this_region; \
+      result = astGet##attribute( this->region1 ); \
+   } \
+\
+/* Return the result. */ \
+   return result; \
+}
+
+/* Use the above macro to create accessors for the MeshSize, Closed and
+   FillFactor attributes. */
+MAKE_GET(FillFactor,fillfactor,0.0,double)
+MAKE_GET(MeshSize,meshsize,0,int)
+MAKE_GET(Closed,closed,0,int)
+
+/* Undefine the macro. */
+#undef MAKE_GET
 
 static int GetBounded( AstRegion *this_region ) {
 /*
@@ -722,6 +800,15 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name ) {
 
    parent_equal = object->Equal;
    object->Equal = Equal;
+
+   parent_getclosed = region->GetClosed;
+   region->GetClosed = GetClosed;
+
+   parent_getmeshsize = region->GetMeshSize;
+   region->GetMeshSize = GetMeshSize;
+
+   parent_getfillfactor = region->GetFillFactor;
+   region->GetFillFactor = GetFillFactor;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
