@@ -1,6 +1,11 @@
+#include <config.h>
 *+
-*   This is d1mach.f_bigieee: a variant of d1mach.f appropriate for a
-*   machine with big-endian IEEE arithmetic.
+*   This is d1mach.f_master, of which d1mach.f_littleieee and
+*   d1mach.f_bigieee are variants.  It is the same as the version of
+*   d1mach.f distributed in the PORT package, except that it has been
+*   renamed to gau2_d1mach.  I have not uncommented the bounds-check on
+*   I at the bottom - it seems unnecessary, and the seterr subroutine is
+*   unavailable.
 *-
 
       DOUBLE PRECISION FUNCTION GAU2_D1MACH(I)
@@ -56,6 +61,7 @@ C
       EQUIVALENCE (DMACH(4),DIVER(1))
       EQUIVALENCE (DMACH(5),LOG10(1))
 C
+#if WORDS_BIGENDIAN
 C     MACHINE CONSTANTS FOR BIG-ENDIAN IEEE ARITHMETIC (BINARY FORMAT)
 C     MACHINES IN WHICH THE MOST SIGNIFICANT BYTE IS STORED FIRST,
 C     SUCH AS THE AT&T 3B SERIES, MOTOROLA 68000 BASED MACHINES (E.G.
@@ -66,18 +72,18 @@ C
       DATA RIGHT(1),RIGHT(2) / 1017118720,          0 /
       DATA DIVER(1),DIVER(2) / 1018167296,          0 /
       DATA LOG10(1),LOG10(2) / 1070810131, 1352628735 /, SC/987/
-C
+#else
 C     MACHINE CONSTANTS FOR LITTLE-ENDIAN (BINARY) IEEE ARITHMETIC
 C     MACHINES IN WHICH THE LEAST SIGNIFICANT BYTE IS STORED FIRST,
 C     E.G. IBM PCS AND OTHER MACHINES THAT USE INTEL 80X87 OR DEC
 C     ALPHA CHIPS.
 C
-C      DATA SMALL(1),SMALL(2) /          0,    1048576 /
-C      DATA LARGE(1),LARGE(2) /         -1, 2146435071 /
-C      DATA RIGHT(1),RIGHT(2) /          0, 1017118720 /
-C      DATA DIVER(1),DIVER(2) /          0, 1018167296 /
-C      DATA LOG10(1),LOG10(2) / 1352628735, 1070810131 /, SC/987/
-C
+      DATA SMALL(1),SMALL(2) /          0,    1048576 /
+      DATA LARGE(1),LARGE(2) /         -1, 2146435071 /
+      DATA RIGHT(1),RIGHT(2) /          0, 1017118720 /
+      DATA DIVER(1),DIVER(2) /          0, 1018167296 /
+      DATA LOG10(1),LOG10(2) / 1352628735, 1070810131 /, SC/987/
+#endif
 C     MACHINE CONSTANTS FOR AMDAHL MACHINES.
 C
 C      DATA SMALL(1),SMALL(2) /    1048576,          0 /
