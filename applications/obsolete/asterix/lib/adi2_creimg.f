@@ -142,7 +142,7 @@
 
 *  Add an HDU description
       CALL ADI2_ADDHDU( FID, HDU, NHDU, 0, HDUID, STATUS )
-      CALL ADI_CPUT0L( HDUID, '.Changed', .TRUE., STATUS )
+      CALL ADI_CPUT0L( HDUID, 'Changed', .TRUE., STATUS )
       CALL ADI_CPUT0I( FID, '.CurHdu', NHDU, STATUS )
       CALL ADI_CPUT0I( FID, 'Nhdu', NHDU, STATUS )
 
