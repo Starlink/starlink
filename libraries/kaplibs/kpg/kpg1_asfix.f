@@ -101,7 +101,7 @@
       CALL AST_REMAPFRAME( IWCS1, AST__BASE, MAP3, STATUS )
 
 *  Store this modified WCS FrameSet in the output NDF.
-      CALL NDF_PTWCS( INDF2, IWCS1, STATUS ) 
+      CALL NDF_PTWCS( IWCS1, INDF2, STATUS ) 
 
 *  Exit the AST context.
       CALL AST_END( STATUS )
