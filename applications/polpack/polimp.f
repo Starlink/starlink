@@ -47,10 +47,10 @@
 *     polimp in table
 
 *  ADAM Parameters:
-*     IN = LITERAL (Read)
+*     IN = NDF (Read)
 *        A group of data files. This may take the form of a comma separated 
-*        list, or any of the other forms described in the help on "Group 
-*        Expressions".
+*        list of file names , or any of the other forms described in the help 
+*        on "Group Expressions".
 *     NAMELIST = LITERAL (Read)
 *        The name of a file to create containing a list of the successfully 
 *        processed data files. This file can be used when specifying the input 

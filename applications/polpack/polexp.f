@@ -33,10 +33,10 @@
 *     polexp in 
 
 *  ADAM Parameters:
-*     IN = LITERAL (Read)
-*        A group of NDF names. This may take the form of a comma separated 
-*        list, or any of the other forms described in the help on "Group 
-*        Expressions".
+*     IN = NDF (Read)
+*        A group of data files. This may take the form of a comma separated 
+*        list of file names, or any of the other forms described in the help 
+*        on "Group Expressions".
 *     NAMELIST = LITERAL (Read)
 *        The name of a file to create containing a list of the successfully 
 *        processed NDFs. This file can be used when specifying the input 
