@@ -130,6 +130,7 @@
           ELSE
             CALL ADI_TYPE( LHS, TYPE, STATUS )
           END IF
+          IF ( TYPE .LE. ' ' ) TYPE = 'BinDS'
 
 *     Retype the object
           IF ( STATUS .EQ. SAI__OK ) THEN

@@ -105,8 +105,6 @@
 
       INTEGER			CLEN, PLEN		! Lengths of strings
       INTEGER			FID			! File identifier
-
-      LOGICAL			THERE			! Object exists?
 *.
 
 *  New error context
