@@ -288,7 +288,7 @@
 *  Create a WinMap which gives the required shift of pixel origin. 
          DO I = 1, NAXB
             INA( I ) = 0.0D0 
-            INB( I ) = MAX( ABS( OFFSET( I ) ), 1.0 )
+            INB( I ) = MAX( ABS( OFFSET( I ) ), 1.0D0 )
             OUTA( I ) = INA( I ) + OFFSET( I )
             OUTB( I ) = INB( I ) + OFFSET( I )
          END DO
