@@ -469,7 +469,7 @@ PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR DAT_PAR PAR_ERR PRM_PAR GRP_PAR GRP_ERR \
+EXTERNAL_INCLUDES = SAE_PAR DAT_PAR DAT_ERR PAR_ERR PRM_PAR GRP_PAR GRP_ERR \
                     CAT_PAR PSX_ERR SUBPAR_PAR NDF_PAR NUM_DEF_CVT \
                     NUM_DEC_CVT MSG_PAR AST_PAR FIO_ERR
 
@@ -727,6 +727,7 @@ KPG_AST:     kpg_ast;             $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
+DAT_ERR:   $(STAR_INC)/dat_err;   $(LINK) $? $@
 FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
 GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
