@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_CHKEX( INDF, LOC, IGRP, STATUS )
+      SUBROUTINE POL1_CHKEX( INDF, LOC, IGRP, QUIET, STATUS )
 *+
 *  Name:
 *     POL1_CHKEX
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_CHKEX( INDF, LOC, IGRP, STATUS )
+*     CALL POL1_CHKEX( INDF, LOC, IGRP, QUIET, STATUS )
 
 *  Description:
 *     The routine does the following:
@@ -44,6 +44,8 @@
 *        Identifier for a GRP group holding the user IMGID values. If
 *        this is supplied equal to GRP__NOID, then a new group is created
 *        and its identifier is returned.
+*     QUIET = LOGICAL (Given)
+*        Supress screen output - except for warnings and errors?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -74,6 +76,7 @@
 *  Arguments Given:
       INTEGER INDF
       CHARACTER * ( * ) LOC
+      LOGICAL QUIET
 
 *  Arguments Given and Returned:
       INTEGER IGRP
@@ -171,9 +174,11 @@
 
 *  Tell the user what is happening.
             IMGID = NDFNAM( I : LC ) 
-            CALL MSG_SETC( 'IMGID', IMGID )
-            CALL MSG_OUT( ' ', '     Setting IMGID to ''^IMGID''', 
-     :                    STATUS )
+            IF( .NOT. QUIET ) THEN
+               CALL MSG_SETC( 'IMGID', IMGID )
+               CALL MSG_OUT( ' ', '     Setting IMGID to ''^IMGID''', 
+     :                       STATUS )
+            END IF
 
 *  Create ther IMGID component and store the NDF basename as its value.
             CALL DAT_NEW0C( LOC, 'IMGID', LC - I + 1, STATUS ) 
@@ -210,9 +215,11 @@
       IF( .NOT. THERE ) THEN
          CALL DAT_NEW0R( LOC, 'ANGROT', STATUS ) 
          CALL CMP_PUT0R( LOC, 'ANGROT', 0.0, STATUS ) 
-         CALL MSG_SETC( 'IMGID', IMGID )
-         CALL MSG_OUT( ' ', '     Setting ANGROT to 0.0 degrees.',
-     :                 STATUS )
+         IF( .NOT. QUIET ) THEN
+            CALL MSG_SETC( 'IMGID', IMGID )
+            CALL MSG_OUT( ' ', '     Setting ANGROT to 0.0 degrees.',
+     :                    STATUS )
+         END IF
       END IF
 
 *  If the extension does not currently contain a FILTER value,
@@ -235,8 +242,10 @@
       END IF
 
 *  Store the new FILTER value.
-      CALL MSG_SETC( 'VL', FILTER( : IAT ) )
-      CALL MSG_OUT( ' ', '     Setting FILTER to ''^VL''', STATUS )
+      IF( .NOT. QUIET ) THEN
+         CALL MSG_SETC( 'VL', FILTER( : IAT ) )
+         CALL MSG_OUT( ' ', '     Setting FILTER to ''^VL''', STATUS )
+      END IF
       CALL DAT_ERASE( LOC, 'FILTER', STATUS )
       CALL DAT_NEW0C( LOC, 'FILTER', IAT, STATUS ) 
       CALL CMP_PUT0C( LOC, 'FILTER', FILTER( : IAT ), STATUS ) 

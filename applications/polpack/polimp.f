@@ -53,6 +53,9 @@
 *        The name of a file to create containing a list of the
 *        succesfully processed NDFs. This file can be used when 
 *        specifying the input NDFs for subsequent applications. [!]
+*     QUIET = _LOGICAL (Read)
+*        If FALSE, then the values stored in each NDF are listed as it is 
+*        processed. Otherwise, nothing is written to the screen. [FALSE] 
 *     TABLE = LITERAL (Read)
 *        The name of the file containing the table describing how FITS
 *        keyword values are to be translated into POLPACK extension
@@ -307,6 +310,7 @@
       INTEGER NLINES             ! Number of "lines" read from table
       INTEGER NNDF               ! Number of input NDFs
       INTEGER WRDGRP( 3 )        ! GRP identifiers for table "words"
+      LOGICAL QUIET              ! Run silently?
       LOGICAL TOPEN              ! Translation table is open
       LOGICAL OK                 ! Obtained value ok
 *.
@@ -385,16 +389,19 @@
       CALL GRP_NEW( 'Good NDFs', IGRP2, STATUS )
 
 *  Tell the user how many NDFs there are to process.
-      IF( NNDF .GT. 1 ) THEN
-         CALL MSG_SETI( 'N', NNDF )
-         CALL MSG_OUT( ' ', '  ^N input images to process... ',STATUS )
-      ELSE IF( NNDF .EQ. 1 ) THEN
-         CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
-      ELSE
-         CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
+      IF( .NOT. QUIET ) THEN
+         IF( NNDF .GT. 1 ) THEN
+            CALL MSG_SETI( 'N', NNDF )
+            CALL MSG_OUT( ' ', '  ^N input images to process... ',
+     :                    STATUS )
+         ELSE IF( NNDF .EQ. 1 ) THEN
+            CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
+         ELSE
+            CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
+         END IF
+   
+         CALL MSG_BLANK( STATUS )
       END IF
-
-      CALL MSG_BLANK( STATUS )
 
 *  Check that everything is ok so far.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -412,9 +419,11 @@
          CALL NDG_NDFAS( IGRP1, INDEX, 'UPDATE', INDF, STATUS )
 
 *  Write out name of this NDF.
-         CALL NDF_MSG( 'CURRENT_NDF', INDF )
-         CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
-     :                  STATUS )
+         IF( .NOT. QUIET ) THEN
+            CALL NDF_MSG( 'CURRENT_NDF', INDF )
+            CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
+     :                     STATUS )
+         END IF
 
 *  Ensure that the NDF does not already have a POLPACK extension, and
 *  then create one.
@@ -445,12 +454,12 @@
             CALL POL1_IMFIT( FITGRP, DESGRP, INDF, %VAL( IPFIT ),
      :                       FITLEN, %VAL( IPINT ), %VAL( IPREAL ),
      :                       %VAL( IPDBLE ), %VAL( IPLOG ),
-     :                       %VAL( IPCHR), %VAL( IPGOT), STATUS, 
+     :                       %VAL( IPCHR), %VAL( IPGOT), QUIET, STATUS, 
      :                       %VAL( 80 ) )
          END IF
 
 *  Check the values in the POLPACK extension are usable.
-         CALL POL1_CHKEX( INDF, POLLOC, IGRP3, STATUS )
+         CALL POL1_CHKEX( INDF, POLLOC, IGRP3, QUIET, STATUS )
 
 *  Unmap FITS block.
          CALL DAT_UNMAP( FITLOC, STATUS )

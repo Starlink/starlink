@@ -41,6 +41,9 @@
 *        The name of a file to create containing a list of the
 *        succesfully processed NDFs. This file can be used when 
 *        specifying the input NDFs for subsequent applications. [!]
+*     QUIET = _LOGICAL (Read)
+*        If FALSE, then each NDF is listed as it is processed. Otherwise,
+*        nothing is written to the screen. [FALSE] 
 
 *  FITS Keywords:
 *     The following FITS keywords are created. The POLPACK extension item
@@ -112,6 +115,7 @@
       INTEGER NNDF               ! Number of input NDFs
       INTEGER UCARD              ! No. of cards in final FITS extension
       LOGICAL NEW                ! Was a new card added?
+      LOGICAL QUIET              ! Run silently?
       LOGICAL THERE              ! Does FITS extension exist?
 
       DATA FTNAM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
@@ -133,6 +137,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  See if we are running quietly.
+      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+
 *  Access a group of NDFs for processing.
       CALL NDF_BEGIN
       CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
@@ -143,16 +150,19 @@
       CALL GRP_NEW( 'Good NDFs', IGRP2, STATUS )
 
 *  Tell the user how many NDFs there are to process.
-      IF( NNDF .GT. 1 ) THEN
-         CALL MSG_SETI( 'N', NNDF )
-         CALL MSG_OUT( ' ', '  ^N input images to process... ',STATUS )
-      ELSE IF( NNDF .EQ. 1 ) THEN
-         CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
-      ELSE
-         CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
+      IF( .NOT. QUIET ) THEN
+         IF( NNDF .GT. 1 ) THEN
+            CALL MSG_SETI( 'N', NNDF )
+            CALL MSG_OUT( ' ', '  ^N input images to process... ',
+     :                    STATUS )
+         ELSE IF( NNDF .EQ. 1 ) THEN
+            CALL MSG_OUT( ' ', '  1 input image to process... ',STATUS )
+         ELSE
+            CALL MSG_OUT( ' ', '  NO input images to process. ',STATUS )
+         END IF
+   
+         CALL MSG_BLANK( STATUS )
       END IF
-
-      CALL MSG_BLANK( STATUS )
 
 *  Check that everything is ok so far.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -167,9 +177,11 @@
          CALL NDG_NDFAS( IGRP1, I, 'UPDATE', INDF, STATUS )
 
 *  Write out name of this NDF.
-         CALL NDF_MSG( 'CURRENT_NDF', INDF )
-         CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
-     :                  STATUS )
+         IF( .NOT. QUIET ) THEN
+            CALL NDF_MSG( 'CURRENT_NDF', INDF )
+            CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
+     :                     STATUS )
+         END IF
 
 *  Get a locator to the POLPACK extension.
          CALL NDF_XLOC( INDF, 'POLPACK', 'READ', POLLOC, STATUS ) 
@@ -288,7 +300,7 @@
             CALL GRP_PUT( IGRP2, 1, NDFNAM, 0, STATUS )
          END IF
 
-         CALL MSG_BLANK( STATUS )
+         IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
 
  100  CONTINUE
 

@@ -358,7 +358,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar ndg.tar makefile mk $(DOCUMENTATION)
 #  set.
 
 PUBLIC_SCRIPTS = PolMap.tcl PolMap_procs.tcl PolReg.tcl PolReg_procs.tcl \
-CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay 
+CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay ndg_wild
 
 # List of StarTcl files which must reside in the POLPACK binary directory.
 # These should be in the STARTCL_DIR directory.
@@ -440,7 +440,7 @@ PLATFORM_F =
 
 C_ROUTINES = $(C_SUB1) $(C_SUB2)
 
-C_SUB1 = 
+C_SUB1 = ndg1_wild.c
 
 C_SUB2 = polpack.c kpg1_trmsz.c
 
@@ -644,7 +644,7 @@ libpolpack.a: $(O_SUB2)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            -L/star-test/lib -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
+            -L/star-dev/lib -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
             $(LDFLAGS)
 
 

@@ -34,6 +34,10 @@ NAMELIST = LITERAL (Read)
    The name of a file to create containing a list of the
    succesfully processed NDFs. This file can be used when
    specifying the input NDFs for subsequent applications. [!]
+3 QUIET
+QUIET = _LOGICAL (Read)
+   If FALSE, then each NDF is listed as it is processed. Otherwise,
+   nothing is written to the screen. [FALSE]
 2 Examples
 POLEXP in=^names.lis
    This example processes the NDFs listed in the text file
@@ -205,6 +209,10 @@ NAMELIST = LITERAL (Read)
    The name of a file to create containing a list of the
    succesfully processed NDFs. This file can be used when
    specifying the input NDFs for subsequent applications. [!]
+3 QUIET
+QUIET = _LOGICAL (Read)
+   If FALSE, then the values stored in each NDF are listed as it is
+   processed. Otherwise, nothing is written to the screen. [FALSE]
 3 TABLE
 TABLE = LITERAL (Read)
    The name of the file containing the table describing how FITS

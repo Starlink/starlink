@@ -74,6 +74,18 @@ alias pol_polmap    INSTALL_BIN/pol_polmap
 alias pol_polreg    INSTALL_BIN/pol_polreg
 #
 #
+#  Set up the commands and environment variables needed to export and
+#  import POLPACK extension information to and from foreign data formats.
+#
+if ( $?NDF_XTN ) then
+   setenv NDF_XTN $NDF_XTN,POLPACK
+else
+   setenv NDF_XTN POLPACK
+endif
+setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp in=^ndf quiet=y'
+setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp in=^ndf quiet=y'
+#
+#
 # Tell the user that POLPACK commands are now available.
 #
 echo ""

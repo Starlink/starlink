@@ -1,6 +1,6 @@
       SUBROUTINE POL1_IMFIT( FITGRP, DESGRP, NDF, FITBLK, FITLEN,
      :                       IVALS, RVALS, DVALS, LVALS, CVALS,
-     :                       GOTFV, STATUS )
+     :                       GOTFV, QUIET, STATUS )
 *+
 *  Name:
 *     POL1_IMFIT
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_IMFIT( FITGRP, DESGRP, NDF, FITBLK, FITLEN,
-*                      IVALS, RVALS, DVALS, LVALS, CVALS, GOTFV, STATUS )
+*     CALL POL1_IMFIT( FITGRP, DESGRP, NDF, FITBLK, FITLEN, IVALS, RVALS, 
+*                      DVALS, LVALS, CVALS, GOTFV, QUIET, STATUS )
 
 *  Description:
 *   This routine interprets the information passed to it as instructions
@@ -89,6 +89,8 @@
 *        Storage space for falgs indicating if a value for the corresponding 
 *        keyword was found. This should be at least as large as the number 
 *        of FITS items which will be extracted (size of FITGRP groups).
+*     QUIET = LOGICAL (Given)
+*        Suppress screen output - except for warnings and errors?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -125,6 +127,7 @@
       INTEGER NDF
       INTEGER FITLEN
       CHARACTER * ( * ) FITBLK( FITLEN )
+      LOGICAL QUIET
 
 *  Arguments Given and Returned:
       INTEGER IVALS( * )
@@ -308,7 +311,8 @@
                         END IF                        
 
 *  Inform user of result, unless the extension item is defered.
-                        IF( EXTNAM .NE. 'FILTER' ) THEN
+                        IF( .NOT. QUIET .AND. 
+     :                      EXTNAM .NE. 'FILTER' ) THEN
                            CALL MSG_SETC( 'NM', EXTNAM )
                            CALL MSG_OUT( ' ', '     Setting ^NM to '//
      :                                   '''^VL''', STATUS )
@@ -485,7 +489,8 @@
      :                             STATUS )
 
 *  Inform user of result, unless the extension item is defered.
-                  IF( EXTNAM .NE. 'FILTER' ) THEN
+                  IF( .NOT. QUIET .AND.
+     :                EXTNAM .NE. 'FILTER' ) THEN
                      CALL MSG_SETC( 'NM', EXTNAM )
                      CALL MSG_SETC( 'VL', FITVAL )
                      CALL MSG_OUT( ' ', '     Setting ^NM to ''^VL''', 
@@ -585,10 +590,12 @@
                      IF ( .NOT. NOTTRN ) THEN
                         CALL POL1_STOCL( NDF, EXTNAM( :LENNAM ),
      :                                   NOTFND, STATUS )
-                        CALL MSG_SETC( 'NM', EXTNAM )
-                        CALL MSG_SETL( 'VL', NOTFND )
-                        CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', 
-     :                                STATUS )
+                        IF( .NOT. QUIET ) THEN
+                           CALL MSG_SETC( 'NM', EXTNAM )
+                           CALL MSG_SETL( 'VL', NOTFND )
+                           CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', 
+     :                                   STATUS )
+                        END IF
                      ELSE
             
 *  No value -- issue warning.
@@ -703,20 +710,30 @@
                   CALL TRN_TR1I( .FALSE., 1, IZERO, TRID, IFIT, STATUS )
                   CALL POL1_STOCI( NDF, EXTNAM (:LENNAM ), IFIT,
      :                             STATUS )
-                  CALL MSG_SETI( 'VL', IFIT )
-                  CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', STATUS )
+                  IF( .NOT. QUIET ) THEN
+                     CALL MSG_SETI( 'VL', IFIT )
+                     CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', 
+     :                             STATUS )
+                  END IF
+
                ELSE IF ( EXTTYP( 1 : 5 ) .EQ. '_REAL' ) THEN
                   CALL TRN_TR1R( .FALSE., 1, RZERO, TRID, RFIT, STATUS )
                   CALL POL1_STOCR( NDF, EXTNAM( : LENNAM ), RFIT,
      :                             STATUS )
-                  CALL MSG_SETR( 'VL', RFIT )
-                  CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', STATUS )
+                  IF( .NOT. QUIET ) THEN
+                     CALL MSG_SETR( 'VL', RFIT )
+                     CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', 
+     :                             STATUS )
+                  END IF
                ELSE
                   CALL TRN_TR1D( .FALSE., 1, DZERO, TRID, DFIT, STATUS )
                   CALL POL1_STOCD( NDF, EXTNAM( : LENNAM ), DFIT,
      :                             STATUS )
-                  CALL MSG_SETD( 'VL', DFIT )
-                  CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', STATUS )
+                  IF( .NOT. QUIET ) THEN
+                     CALL MSG_SETD( 'VL', DFIT )
+                     CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', 
+     :                             STATUS )
+                  END IF
                END IF
 
 *  Has an error occurred while evaluating the function?

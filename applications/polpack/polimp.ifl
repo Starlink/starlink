@@ -51,4 +51,13 @@ interface POLIMP
       prompt   'File to contain a list of the NDFs'
    endparameter
 
+   parameter QUIET
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  F
+      prompt   'Should all screen output be suppressed?'
+   endparameter
+
 endinterface
