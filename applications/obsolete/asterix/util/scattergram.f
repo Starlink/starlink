@@ -80,7 +80,6 @@
 	CHARACTER*(DAT__SZLOC) LOC1		! 1st input locator
 	CHARACTER*(DAT__SZLOC) LOC2		! 2nd input locator
 	CHARACTER*(DAT__SZLOC) DLOC		! output object locator
-        CHARACTER*(DAT__SZLOC) VLOC		! locator to VARIANCE
 	CHARACTER*(DAT__SZNAM) XNAME,YNAME	! data object names
 	CHARACTER*(80)         YUNIT		! data object units
 	CHARACTER*(132) LINES(MAXLINES)		! history text
@@ -247,13 +246,11 @@
 
 *    Map and copy error data
       IF ( DEX ) THEN
-         CALL BDA_LOCVAR(LOC1,VLOC,STATUS)
-         CALL DAT_MAPV(VLOC,'_REAL','READ',VPTR,N,STATUS)
+         CALL BDA_MAPVAR( LOC1, 'READ', VPTR, STATUS )
          CALL BDA_CREAXWID(DLOC,1,.FALSE.,NITEM,STATUS)
          CALL BDA_MAPAXWID(DLOC,'W',1,WPTR,STATUS)
          CALL SCATTERGRAM_COPWID(%VAL(VPTR),FROM,TO,INCR,%VAL(WPTR),
      :                                                      STATUS )
-         CALL DAT_UNMAP(VLOC,STATUS)
       END IF
       IF ( DEY ) THEN
          CALL BDA_COPVAR(LOC2,DLOC,STATUS)
@@ -273,7 +270,7 @@
         CALL DAT_NAME(LOC2,YNAME,STATUS)
         CALL BDA_PUTLABEL(DLOC,YNAME,STATUS)
       ELSE
-        CALL BDA_COPTEXT( LOC1, DLOC, STATUS )
+        CALL BDA_COPTEXT( LOC2, DLOC, STATUS )
       END IF
 
 *    GCB control (format output as markers)
