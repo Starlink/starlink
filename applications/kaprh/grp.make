@@ -18,23 +18,25 @@ KAPRH_IRAF = doc greyplot.par
 IRAF_DOCS = greyplot.hlp 
 
 # The contents of the kaprh_ifls.tar file:
-KAPRH_IFLS = greyplot.ifl 
+KAPRH_IFLS = greyplot.ifl krhhelp.ifl
 
 # The contents of the kaprh_sub.tar file:
-KAPRH_SUB = greyplot.f
+KAPRH_SUB = greyplot.f krhhelp.f
 
 # The source RCS files needed to create the kapsub_sub.tar file:
 KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
 
 # The contents of the kapsub_sub.tar file (including expanded generic
 # files and the generic source files):
-KAPSUB_SUB = $(KAPSUB_SOURCES) 
+KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_dsclb.f kps1_dscld.f \
+kps1_dscli.f kps1_dsclr.f kps1_dsclw.f
 
 # Generic source files needed for kapsub_sub.tar:
-KAPSUB_GEN = 
+KAPSUB_GEN = kps1_dscl.gen
 
 # Non-generic source files needed for kapsub_sub.tar :
-KAPSUB_NONGEN = 
+KAPSUB_NONGEN = kps1_fainb.f kps1_faind.f kps1_faini.f kps1_fainr.f \
+kps1_fainw.f kps1_imzbo.f ncraxs.f
 
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KAPSUB_GEN) 
