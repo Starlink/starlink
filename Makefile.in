@@ -40,6 +40,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/hlp \
 	$(MANIFEST)/idi \
 	$(MANIFEST)/img \
+        $(MANIFEST)/itcl \
 	$(MANIFEST)/kaplibs \
 	$(MANIFEST)/lex \
 	$(MANIFEST)/mag \
@@ -67,6 +68,8 @@ ALL_TARGETS = \
 	$(MANIFEST)/string \
 	$(MANIFEST)/subpar \
 	$(MANIFEST)/task \
+        $(MANIFEST)/tcl \
+        $(MANIFEST)/tk \
 	$(MANIFEST)/trn
 
 
