@@ -21,7 +21,7 @@ fast_gau_cdf.f fh2_fun.f fh_func.f find_bounds.f find_hinges.f fit_mgauss.f \
 fix_pars.f fnhn_fun.f foii_fun.f fs2_fun.f fs_func.f fsii_fun.f \
 fw2_fun.f fw_func.f gausid.f gaussian.f gaussian_flux.f get_aic.f get_guess.f \
 get_median.f get_opt_vm.f guess_2.f guess_next.f hann.f \
-inherit_guess.f key_menu.f keyges.f limit_plaw.f lm_caf.f lm_caf_s.f \
+inherit_guess.f key_menu.f keyges.f lm_caf.f lm_caf_s.f \
 lm_gausid.f lm_lof.f lm_lof_s.f lm_mgf.f lm_mgf_s.f lm_skf.f \
 lm_skf_s.f lmder.f lmpar.f lock_comps.f lorentz.f lorentz_flux.f \
 median.f medof3.f mg_good.f mga_fun.f mga_func.f mgfun.f mgfun_sub.f \
@@ -36,4 +36,7 @@ s2.f s3.f s3r.f s3rssh.f s4.f s4253h.f s5.f scale_data.f scale_pars.f \
 set_bounds.f set_routines.f sk_fun.f sk_func.f sk_fwhm_err.f skew.f \
 skew_flux.f skew_fwhm.f skew_guess.f split.f submode.f sumsq.f \
 tied_param.f tol_bounds.f weight_fit.f
-            
+
+# Routines that are in the tar ball but never referenced.
+# limit_plaw.f calls limit_par which does not exist anywhere
+OLDF_ROUTINES = limit_plaw.f            
