@@ -92,18 +92,15 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER                	N                  	! Number of names
-      BYTE       		IN(*)              	! Input list data
-      INTEGER                	INDEX(*)           	! Output index
+      INTEGER                	N, INDEX(*)
+      CHARACTER*(*)		TYPE
+      BYTE       		IN(*)
 
 *  Arguments Returned:
-      BYTE       		OUT(*)              	! Output ordered list
+      BYTE       		OUT(*)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  Local Variables:
-      INTEGER			I			! Loop over index
 *.
 
 *  Check inherited global status.
