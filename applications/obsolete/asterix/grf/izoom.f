@@ -18,7 +18,11 @@
 *    External references :
 *    Local Constants :
 *    Local variables :
+      CHARACTER*12 MODE
       REAL XC,YC,DX,DY
+      REAL PX,PY
+      INTEGER NX,NY
+      INTEGER IPX,IPY
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *    Version :
