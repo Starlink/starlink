@@ -1007,9 +1007,9 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
      :        .AND. ( QX .EQ. 0.0 ) .AND. ( QY .EQ. 0.0 ) )
 
 *  Find PHA bounds
-      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
-      CALL PSF0_GETID0I( PSID, 'PhaLo', PHALO, STATUS )
-      CALL PSF0_GETID0I( PSID, 'PhaHi', PHAHI, STATUS )
+      CALL ADI_CGET0L( PSID, 'PhaDef', PHADEF, STATUS )
+      CALL ADI_CGET0I( PSID, 'PhaLo', PHALO, STATUS )
+      CALL ADI_CGET0I( PSID, 'PhaHi', PHAHI, STATUS )
 
 *  Get instrument
       CALL PSF0_GETID0C( PSID, 'Instr', INS, STATUS )
@@ -1489,7 +1489,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       CALL PSF0_SETID0C( PSID, 'Instr', INS, STATUS )
 
 *  User is supplying PHA bounds
-      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      CALL ADI_CGET0L( PSID, 'PhaDef', PHADEF, STATUS )
       IF ( PHADEF ) THEN
 
 *    Locate INSTRUMENT box
@@ -2363,9 +2363,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find PHA bounds
-      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
-      CALL PSF0_GETID0I( PSID, 'PhaLo', PHALO, STATUS )
-      CALL PSF0_GETID0I( PSID, 'PhaHi', PHAHI, STATUS )
+      CALL ADI_CGET0L( PSID, 'PhaDef', PHADEF, STATUS )
+      CALL ADI_CGET0I( PSID, 'PhaLo', PHALO, STATUS )
+      CALL ADI_CGET0I( PSID, 'PhaHi', PHAHI, STATUS )
 
 *  Response data and index
       CALL PSF0_GETID0I( PSID, 'Dptr', RDPTR, STATUS )
@@ -2946,7 +2946,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    If the PHA band is not defined, and the response has a significant
 *    energy dimension, then we need a mean photon energy to index that
 *    energy dimension.
-      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      CALL ADI_CGET0L( PSID, 'PhaDef', PHADEF, STATUS )
       IF ( (DIMS(NDIM).GT.1) .AND. .NOT. PHADEF ) THEN
 
 *    Construct prompt
@@ -2960,9 +2960,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Set PHA band
-        CALL PSF0_SETID0R( PSID, 'PhaLo', ENERGY, STATUS )
-        CALL PSF0_SETID0R( PSID, 'PhaHi', ENERGY, STATUS )
-        CALL PSF0_SETID0L( PSID, 'PhaDef', .TRUE., STATUS )
+        CALL ADI_CPUT0R( PSID, 'PhaLo', ENERGY, STATUS )
+        CALL ADI_CPUT0R( PSID, 'PhaHi', ENERGY, STATUS )
+        CALL ADI_CPUT0L( PSID, 'PhaDef', .TRUE., STATUS )
 
       END IF
 
@@ -4334,12 +4334,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Defined energy band?
-      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      CALL ADI_CGET0L( PSID, 'PhaDef', PHADEF, STATUS )
       IF ( PHADEF ) THEN
-        CALL PSF0_GETID0I( PSID, 'PhaLo', PHALO, STATUS )
+        CALL ADI_CGET0I( PSID, 'PhaLo', PHALO, STATUS )
         ENERGY = REAL(PHALO)/100.0
       ELSE
-        CALL PSF0_GETID0I( PSID, 'Energy', ENERGY, STATUS )
+        CALL ADI_CGET0R( PSID, 'Energy', ENERGY, STATUS )
       END IF
 
 *  Get PSPC option
@@ -5043,11 +5043,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
 *  Get a mean photon energy unless PHA band is defined
-      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      CALL ADI_CGET0L( PSID, 'PhaDef', PHADEF, STATUS )
       IF ( (OPT .NE. 'ON2') .AND. .NOT. PHADEF ) THEN
         CALL USI_PROMT( 'AUX', 'Mean photon energy in KeV', STATUS )
         CALL USI_GET0R( 'AUX', ENERGY, STATUS )
-        CALL PSF0_SETID0R( PSID, 'Energy', ENERGY, STATUS )
+        CALL ADI_CPUT0R( PSID, 'Energy', ENERGY, STATUS )
       END IF
 
 *  Store option
