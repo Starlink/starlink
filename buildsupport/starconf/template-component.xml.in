@@ -20,6 +20,11 @@
   </developers>
   -->
   <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <!-- <tests status="???"/> status=no,user,yes -->
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year></year>
+    <name>???</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

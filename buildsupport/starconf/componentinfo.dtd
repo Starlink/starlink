@@ -12,20 +12,26 @@
                          dependencies,
                          developers?,
                          documentation?,
+                         tests?,
                          bugreports?,
+                         copyright*,
                          notes?)>
 <!-- The component's id attribute is the name of this component, and
      should generally match the package name as declared in
-     configure.ac.  The buildsupport attribute is "yes" if this component
+     configure.ac.  The BUILDSUPPORT attribute is "yes" if this component
      is configured and built during bootstrapping, or "noauto" if it
      should be optionally configured and built during bootstrapping;
      if so, it might need special handling in the top-level bootstrap
-     file.  The status should be marked obsolete when appropriate, as
-     this allows us to check if any component depends on an obsolete one.  -->
+     file.  The STATUS should be marked obsolete when appropriate, as
+     this allows us to check if any component depends on an obsolete
+     one.  The SUPPORT attribute can be one of the codes "S",
+     meaning currently supported by Starlink, or "U" meaning that it
+     is unsupported, or supported by others.  -->
 <!ATTLIST component
         id      	ID      #REQUIRED
 	buildsupport	( yes | no | noauto )	"no"
 	status		( current | obsolete )  "current"
+	support		( S | U )		#IMPLIED
         >
 
 <!-- Version number of this component, which should be the same as the
@@ -34,6 +40,22 @@
 
 <!-- Brief description of this component -->
 <!ELEMENT description   (#PCDATA)>
+
+<!-- The copyright owner or owners.  The name of the copyright owner,
+     as it might appear on a copyright statement, should appear in the
+     NAME child element, followed by optional notes, for example
+     describing which portions of the component are covered.  If
+     different portions of the component are owned by different
+     entities, then there should be more than one copyright element,
+     with some description in the notes. -->
+<!ELEMENT copyright    (year, name, notes?)>
+
+<!-- The copyright year, as a list of years, or year ranges.  This
+     should include each year when some work was done on the
+     component.  For example, it might take the form
+     <year>1995-2000, 2004</year>.  This element must be present, even
+     if it is empty (or indeed approximate!). -->
+<!ELEMENT year         (#PCDATA)>
 
 <!-- Optional longer description of the component's functionality -->
 <!ELEMENT abstract     (p+)>
@@ -135,6 +157,21 @@
 <!-- A list of document numbers, such as sun123, which describe this
      component -->
 <!ELEMENT documentation (#PCDATA)>
+
+<!-- An indication of whether there are tests in this component, so
+     that a 'make check' of the configured Makefile should work.  The
+     STATUS attribute must have one of the values NO, meaning that
+     there are no tests, USER, meaning that there are some tests which
+     should pass, but which require some simple user input, or YES,
+     meaning that there are some tests, which should pass, and which require
+     no user input, so that they may be run unattended.  If there are
+     test which aren't working (that is, they are known to fail), you
+     should put this as NO (ought we to have a separate NOTWORKING
+     status?). -->
+<!ELEMENT tests         EMPTY>
+<!ATTLIST tests
+	status		( yes | no | user )	#REQUIRED
+	>
 
 <!-- An email address where bug reports should be sent -->
 <!ELEMENT bugreports    (#PCDATA)>
