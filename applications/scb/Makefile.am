@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = dbmcat.pl scbcp.pl scbindex.pl scb.pl
+bin_SCRIPTS = dbmcat.pl scbcp.pl scbindex.pl scb.pl scb.csh
 
 bin_PROGRAMS = ctag ftag
 ctag_SOURCES = ctag-y.y tag.c tag.h
@@ -16,7 +16,7 @@ AM_YFLAGS = -d
 BUILT_SOURCES = Scb.pm YyTag.pm scb.csh scb.pl scbindex.pl scbcp.pl dbmcat.pl \
                 ctag-y.h ftag-y.h ctag-l.c ftag-l.c
 
-TESTS = scb_test.sh
+TESTS = scb_test.sh size_test.sh
 check_DATA = scb_test.tar
 
 scb_test.tar:
