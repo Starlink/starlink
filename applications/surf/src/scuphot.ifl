@@ -24,6 +24,8 @@
 #        Add MSG_FILTER
 #     1997 May 21 (TimJ)
 #	 Add ALLBOLS parameter
+#     1997 May 22 (TimJ)
+#	 Make '!' the default for FILE
 #     {enter_further_changes_here}
  
 #-
@@ -73,7 +75,8 @@
          TYPE    'FILENAME'
          VPATH   'PROMPT'
          PROMPT  'Name of ASCII file to contain results summary'
-         PPATH   'CURRENT,DEFAULT'
+	 DEFAULT !
+         PPATH   'DEFAULT'
 	 HELPKEY '*'
       ENDPARAMETER
 
