@@ -47,7 +47,7 @@
 *  get box position
         CALL IMG_GETBOX('XCENT','YCENT','XWID','YWID',XC,YC,DX,DY,
      :                                                      STATUS)
-
+	print *,xc,yc,dx,dy
 *  needs this to stop it hanging for some reason
         CALL MSG_BLNK()
 
