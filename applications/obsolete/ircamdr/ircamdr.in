@@ -10,6 +10,7 @@
 #   05-Jul-95: modified (caa@jach.hawaii.edu)
 #   29-Nov-95: modified env. vars + added some aliases (caa@jach)
 #   05-Dec-95: modified for ukirt operation (caa@jach.hawaii.edu)
+#   12-AUG-04: Starlink CVS/autoconf (timj@jach)
 # endhistory
 # parameters: $1 is a directory /$HOME/
 #             $2 is a UT-date   /UT=today/
@@ -97,7 +98,7 @@ rehash
 
 # Print out a welcome message
 echo ""
-echo "Welcome to IRCAM_CLRED/Portable-IRCAMDR V1.0-0 at UKIRT"
+echo "Welcome to IRCAM_CLRED/Portable-IRCAMDR V@PACKAGE_VERSION@ at UKIRT"
 
 # Start icl and invoke ircamdr
 icl ${IRCAMDR_ROOT}/god_ircamdr_ukirt.icl
