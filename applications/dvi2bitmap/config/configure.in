@@ -64,11 +64,16 @@ dnl   are suppressed if the support for kpathsea is turned off.  This is
 dnl   because they largely depend on kpathsea searching being present.
 dnl
 dnl   Note, however, that font-generation is NOT, now, disabled if kpathsea
-dnl   is.  This can create puzzline errors: fonts might be generated even when
+dnl   is.  This can create puzzling errors: fonts might be generated even when
 dnl   they're not really missing (because the non-kpathsea search mechanism
 dnl   can't find them), but the program still can't find them afterwards 
 dnl   (because the font-generation method has put them where only kpathsea
-dnl   expects to find them).
+dnl   expects to find them).  From experience with user feedback,
+dnl   explaining this problem and running the test script in
+dnl   test/test-font-gen.sh (`make test'), which explains what
+dnl   DVI2BITMAP_PK_PATH should be set to, is less confusing and
+dnl   inconvenient than having to rebuild dvi2bitmap with
+dnl   font-generation forced on.
 dnl
 usekpse=false
 AC_SUBST(KPATHSEAOBJ)
@@ -168,7 +173,7 @@ if $usekpse; then
 AC_PATH_PROG(XDVI_PATH, xdvi)
 AC_ARG_ENABLE(fake-progname,
 [  --enable-fake-progname[=prog]
-                          Have dvi2bitmap lie about its name],
+                          Have dvi2bitmap lie about its name (see full docs)],
   if test "$enableval" = "yes"
   then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${XDVI_PATH}")
   elif test "$enableval" != "no"
