@@ -103,15 +103,13 @@
       INTEGER			FSTAT			! FITSIO status
       INTEGER			LUN			! Logical unit
       INTEGER			NHDU			! HDU number
-
-      LOGICAL			CREATED			! Did we create object?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Locate the HDU
-      CALL ADI2_LOCHDU1( FID, HDU, .TRUE., ID, CREATED, STATUS )
+      CALL ADI2_LOCHDU( FID, HDU, ID, STATUS )
 
 *  Get the HDU number
       CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
@@ -124,6 +122,14 @@
 *  Move the specified unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )
       FSTAT = 0
+      CALL ADI_CGET0L( ID, '.CREATED', CREATED, STATUS )
+      IF ( .NOT. CREATED ) THEN
+        CALL FTCRHD( LUN, FSTAT )
+        IF ( FSTAT .NE. 0 ) THEN
+          CALL ADI2_FITERP( FSTAT, STATUS )
+        END IF
+        CALL ADI_CPUT0L( ID, '.CREATED', .TRUE., STATUS )
+      END IF
       CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
       IF ( (FSTAT.NE.0) .AND. (FSTAT.NE.107) ) THEN
         CALL ADI2_FITERP( FSTAT, STATUS )
