@@ -1,4 +1,14 @@
+2001-03-01  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_skydip_temperatures.F
+	(SCULIB_SKYDIP_TEMPERATURES): Do not want to special-case when the
+	voltage is 0.0 since zero voltage has no special meaning. This is
+	the reason for the dropped-skydip-point phenomenon.
+
 2001-02-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Trap AZ
+	centre coords for clock correction
 
 	* src/surf_skydip.f: Support for raster skydips with new TCS
 
