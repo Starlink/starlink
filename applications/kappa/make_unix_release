@@ -49,11 +49,17 @@
       chmod 777 *
 
 #  Create each of the tar files.
-      foreach file `grp tar_files`
-         tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}_contents` 
-         rm -f `grp ${file}_contents` 
+      foreach file (`grp text_tars`)
+         grp ${file}_contents > ${TEMPDIR}/blt1
+         awk -F. '{print $1"."$2}' ${TEMPDIR}/blt1 > ${TEMPDIR}/blt2
+         awk -F. '{print "mv "$0" "$1"."$2}' ${TEMPDIR}/blt1 > ${TEMPDIR}/blt3
+         chmod u+x ${TEMPDIR}/blt3
+         source ${TEMPDIR}/blt3
+         tar -cvh -f ${TEMPDIR}/${file}.tar `cat ${TEMPDIR}/blt2`
+         rm -f `cat ${TEMPDIR}/blt2`
+         rm ${TEMPDIR}/blt1 ${TEMPDIR}/blt2 ${TEMPDIR}/blt3
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
-      }
+      end
 
 #  Tar up all the release files (source and non-source), and then remove
 #  them.
