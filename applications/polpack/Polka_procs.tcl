@@ -5803,29 +5803,31 @@ proc GetFeature {cx cy rlabel} {
 
       close $tfile_id
 
+# Select a name fo the POLCENT output text file.
+      set tofile [UniqueFile]
+
 # Calculate the box size and max shift values.
       set isize [expr 2 * $PSF_SIZE]
       set maxsh [expr 4 * $PSF_SIZE]
 
 # Attempt to centroid them. 
       set imsec "[Top IMAGE_STACK($IMAGE_DISP)]$SECTION_DISP"
-      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize infile=$tfile"] } {
+      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize infile=$tfile outfile=$tofile"] } {
 
 # If succesful, read the accurate feature coordinates from the output
-# parameters. Convert the parameter vector value into a Tcl list
-# by replacing "D" exponents by "E", removing square brackets, and
-# replacing commas by spaces.
-         regsub -nocase -all D [GetParam polpack polcent:xout] E aax
-         regsub -nocase -all D [GetParam polpack polcent:yout] E aay
+# file. Create a Tcl list containing the X and Y values, replacing "D" 
+# exponents by "E".
+         set qx ""
+         set qy ""
+         set tofile_id [open $tofile r]
 
-         regsub  -all {\[} $aax "" bbx
-         regsub  -all {\[} $aay "" bby
+         while { [gets $tofile_id line] != -1 } {
+            regsub -nocase -all D $line E line2
+            lappend qx [lindex $line2 0]
+            lappend qy [lindex $line2 1]
+         }
 
-         regsub  -all {\]} $bbx "" ccx
-         regsub  -all {\]} $bby "" ccy
-
-         regsub  -all "," $ccx " " qx
-         regsub  -all "," $ccy " " qy
+         close $tofile_id
 
 # Count and remove any positions which could not be centroided. These
 # are flagged by polcent by returning -100000 for X and Y.

@@ -67,6 +67,14 @@ interface POLCENT
       helpkey  '*'
    endparameter
 
+   parameter OUTFILE
+      position 3
+      access   READ
+      type     LITERAL
+      prompt   'Text file to receive accurate positions'
+      helpkey  '*'
+   endparameter
+
    parameter TOLER               # Required tolerance
       type     _DOUBLE
       access   READ
@@ -87,30 +95,12 @@ interface POLCENT
       helpkey  '*'
    endparameter
 
-   parameter      XOUT               # X centroid position
-      access      'WRITE'
-      type        '_REAL'
-      vpath       'DEFAULT'
-      prompt      'Object to contain the x centroid position'
-      default     0.0
-      helpkey     '*'
-   endparameter
-
    parameter      XYOUT              # X and Y centroid positions
       access      'WRITE'
       type        '_CHAR'
       vpath       'DEFAULT'
       prompt      'Object to contain the x an y centroid positions'
       default     ' '
-      helpkey     '*'
-   endparameter
-
-   parameter      YOUT               # Y centroid position
-      access      'WRITE'
-      type        '_REAL'
-      vpath       'DEFAULT'
-      prompt      'Object to contain the y centroid position'
-      default     0.0
       helpkey     '*'
    endparameter
 
