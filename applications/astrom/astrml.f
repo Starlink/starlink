@@ -1,4 +1,4 @@
-      SUBROUTINE ASTRML (LUI, LUR, LUS)
+      SUBROUTINE ASTRML (LUI, LUR, LUS, LUX, FTPREF)
 *+
 *     - - - - - - -
 *      A S T R M L
@@ -11,6 +11,7 @@
 *     LUI   i     I/O unit number for input file
 *     LUR   i     I/O unit number for report file
 *     LUS   i     I/O unit number for synopsis file
+*     LUX   i     I/O unit number for log file (zero to suppress)
 *
 *  Both the report and the synopsis file contain Fortran printer
 *  format codes.  In the case of the synopsis file, the code is
@@ -31,7 +32,8 @@
 
       IMPLICIT NONE
 
-      INTEGER LUI,LUR,LUS
+      INTEGER LUI,LUR,LUS,LUX
+      CHARACTER*(*) FTPREF
 
 *+
 *
@@ -723,12 +725,20 @@
      :        NBEST2,NBEST,NC1,NC2
 *  Flags: adjust plate centre, adjust distortion, only 1 solution
       LOGICAL TWEAKP,TWEAKD,ONESOL
+*  FITS file output: Are we to use fits output?  FITS file name, temp
+*  string, then fitsio status, unit, temp integer
+      LOGICAL FITSOP
+      INTEGER NFILE
+      CHARACTER*(200) FITSFN
+      CHARACTER*(100) FTWS
+      INTEGER FTSTAT,FTUNIT,FTNAXS(2),FTI
 *  Miscellaneous
       INTEGER I,J,N,NFLD,JZ
       DOUBLE PRECISION W1,W2,W3,PRG,PDG,PR,PD,ZD,XI,ETA,XM,YM,
      :                 SUMR2,FNORM,DX,DY,
      :                 R,D,DR,SCALE,XE,YE,XX,YY,XY,W,RR,XP,YP,
      :                 WMAX,WRATIO,SUMSQ,SUMSQO,DDI,SEP,X1,Y1,X2,Y2
+      DOUBLEPRECISION SUM2PX
       CHARACTER NMORSP*2
       LOGICAL ILLCNO
 
@@ -770,6 +780,9 @@
 
 *  Flag new input record needed
       RECTYP=' '
+
+*   Are we planning to write out FITS files with the WCS information?
+      FITSOP = (FTPREF.NE.'')
 
 **************************
 *  PRINCIPAL PARAMETERS  *
@@ -876,8 +889,12 @@
 
 *  Obtain plate centre RA,Dec
       CALL RADEC(WORK,J1,RAPCG,DCPCG,J)
-      IF (J.NE.0) WRITE (LUS,1005) INBUF
- 1005 FORMAT (1X,A/1X,'^^^^^^  POSSIBLE DATA ERROR?  ^^^^^^')
+      IF (J.NE.0) THEN
+         WRITE (LUS,1005) INBUF
+         IF (LUX.GT.0) WRITE (LUX, 1006) INBUF
+ 1005    FORMAT (1X,A/1X,'^^^^^^  POSSIBLE DATA ERROR?  ^^^^^^')
+ 1006    FORMAT ('ERROR 001 Data error? <',a,'>')
+      ENDIF
 
 *  Obtain plate equinox
       EQPCG=WORK(7)
@@ -940,7 +957,10 @@
             W2=WORK(2)
             IF (MOD(W1,1D0).NE.0D0.OR.
      :          W1.LT.0D0.OR.W1.GT.23D0.OR.
-     :          W2.LT.0D0.OR.W2.GE.60D0) WRITE (LUS,1005) INBUF
+     :          W2.LT.0D0.OR.W2.GE.60D0) THEN
+               WRITE (LUS,1005) INBUF
+               IF (LUX.GT.0) WRITE (LUX, 1006) INBUF
+            ENDIF
             STL=S2R*(60D0*(60D0*W1+W2))
             GOTLST=.TRUE.
 
@@ -952,14 +972,20 @@
             W3=WORK(3)
             IF (MOD(W1,1D0).NE.0D0.OR.
      :          MOD(W2,1D0).NE.0D0.OR.
-     :          MOD(W3,1D0).NE.0D0) WRITE (LUS,1005) INBUF
+     :          MOD(W3,1D0).NE.0D0) THEN
+               WRITE (LUS,1005) INBUF
+               IF (LUX.GT.0) WRITE (LUX, 1006) INBUF
+            ENDIF
             CALL sla_CALDJ(INT(W1),INT(W2),INT(W3),UTMJD,J)
             IF (J.NE.0) GO TO 990
             W1=WORK(4)
             W2=WORK(5)
             IF (MOD(W1,1D0).NE.0D0.OR.
      :          W1.LT.0D0.OR.W1.GT.23D0.OR.
-     :          W2.LT.0D0.OR.W2.GE.60D0) WRITE (LUS,1005) INBUF
+     :          W2.LT.0D0.OR.W2.GE.60D0) THEN
+               WRITE (LUS,1005) INBUF
+               IF (LUX.GT.0) WRITE (LUX, 1006) INBUF
+            ENDIF
             UTMJD=UTMJD+(60D0*W1+W2)/1440D0
             GOTUT=.TRUE.
 
@@ -1008,7 +1034,10 @@
             W1=WORK(1)
             W2=WORK(2)
             IF (MOD(W1,1D0).NE.0D0.OR.
-     :          W2.LT.0D0.OR.W2.GE.60D0) WRITE (LUS,1005) INBUF
+     :          W2.LT.0D0.OR.W2.GE.60D0) THEN
+               WRITE (LUS,1005) INBUF
+               IF (LUX.GT.0) WRITE (LUX, 1006) INBUF
+            ENDIF
             W1=ABS(W1)+W2/60D0
             IF (W1.GT.90D0) GO TO 990
             IF (J1(1).LT.0) W1=-W1
@@ -1025,7 +1054,10 @@
             W1=WORK(1)
             W2=WORK(2)
             IF (MOD(W1,1D0).NE.0D0.OR.
-     :          W2.LT.0D0.OR.W2.GE.60D0) WRITE (LUS,1005) INBUF
+     :          W2.LT.0D0.OR.W2.GE.60D0) THEN
+               WRITE (LUS,1005) INBUF
+               IF (LUX.GT.0) WRITE (LUX, 1006) INBUF
+            ENDIF
             W1=ABS(W1)+W2/60D0
             IF (W1.GT.360D0) GO TO 990
             IF (J1(1).LT.0) W1=-W1
@@ -1034,7 +1066,10 @@
             W1=WORK(3)
             W2=WORK(4)
             IF (MOD(W1,1D0).NE.0D0.OR.
-     :          W2.LT.0D0.OR.W2.GE.60D0) WRITE (LUS,1005) INBUF
+     :          W2.LT.0D0.OR.W2.GE.60D0) THEN
+               WRITE (LUS,1005) INBUF
+               IF (LUX.GT.0) WRITE (LUX, 1006) INBUF
+            ENDIF
             W1=ABS(W1)+W2/60D0
             IF (W1.GT.90D0) GO TO 990
             IF (J1(3).LT.0) W1=-W1
@@ -1152,8 +1187,11 @@
      :        GOTTDK.OR.GOTPMB)) THEN
             WRITE (LUR,1007)
             WRITE (LUS,1007)
+            IF (LUX.GT.0) WRITE (LUX, 1008)
  1007       FORMAT (/
      :       1X,'Observation data were incomplete and will be ignored'/)
+ 1008       FORMAT ('ERROR 014 Observation data were incomplete ',
+     :           '//and will be ignored')
          END IF
       ELSE
 
@@ -1258,6 +1296,8 @@
             WRITE (LUS,'(1X,''For the given observation data,'//
      :                 ' the plate centre ZD is'',F6.1,'' degrees!''/'//
      :                '1X,''Reduction will be in MEAN place.'')') ZD/D2R
+            IF (LUX.GT.0) WRITE (LUX, '(''WARNING 002 Plate centre ZD='',
+     :           F6.1,'' Reduction in mean place'')') ZD/D2R
             REDOP=.FALSE.
          END IF
       END IF
@@ -1337,7 +1377,10 @@
 
 *     Decode and report anything suspicious
          CALL RADEC(WORK,J1,RARSG,DCRSG,J)
-         IF (J.NE.0) WRITE (LUS,1005) INBUF
+         IF (J.NE.0) THEN
+            WRITE (LUS,1005) INBUF
+            IF (LUX.GT.0) WRITE (LUX, 1006) INBUF
+         ENDIF
 
 *     Which of the two formats has been employed?
          IF (NFLD.NE.8) THEN
@@ -1749,7 +1792,9 @@
             ELSE IF (J.GT.0) THEN
                WRITE (LUR,1050) J
                WRITE (LUS,1050) J
+               IF (LUX.GT.0) WRITE (LUX, 1051) J
  1050          FORMAT (/1X,'sla_SVD warning',I3)
+ 1051          FORMAT ('WARNING 003 sla_SVD warning',I3)
             END IF
 
 *        Edit singular values of W matrix
@@ -1916,7 +1961,9 @@
             IF (ILLCON) THEN
                WRITE (LUR,1055)
                WRITE (LUS,1055)
+               IF (LUX.GT.0) WRITE (LUX, 1056)
  1055          FORMAT (1X,'Fit was ill-conditioned!'/)
+ 1056          FORMAT ('WARNING 004 Fit was ill-conditioned')
                FITOK=.FALSE.
             ELSE
 
@@ -1929,14 +1976,22 @@
                      IF (ABS(DDI).LT.1000D0.AND.SIGDI.LT.100D0) THEN
                         WRITE (LUR,1060) DDI,DISTE,SIGDI
                         WRITE (LUS,1060) DDI,DISTE,SIGDI
+                        IF (LUX.GT.0) WRITE (LUX, 1061) DDI,DISTE,SIGDI
  1060                   FORMAT (1X,'Radial distortion has changed by',
      :                     SP,F8.2,' to',F8.2,'  (std dev',SS,F6.2,')'/)
+ 1061                   FORMAT ('WARNING 005 Radial distortion '//
+     :                       'changed by ',
+     :                       F8.2,' to',F8.2,'  (std dev',SS,F6.2,')')
                         DISTOR=DISTE
                      ELSE
-                        WRITE (LUR,1061)
-                        WRITE (LUS,1061)
- 1061                   FORMAT (1X,'Radial distortion coefficient ',
+                        WRITE (LUR,1062)
+                        WRITE (LUS,1062)
+                        IF (LUX.GT.0) WRITE (LUX, 1063)
+ 1062                   FORMAT (1X,'Radial distortion coefficient ',
      :                                'cannot reliably be determined!'/)
+ 1063                   FORMAT ('WARNING 006 '//
+     :                       'Radial distortion coefficient ',
+     :                       'cannot reliably be determined!'/)
                         FITOK=.FALSE.
                      END IF
                   END IF
@@ -1957,6 +2012,10 @@
                            CALL sla_DR2AF(0,DCPCG,KSDC,IDCVEC)
                            WRITE (LUS,
      :                       '(1X,''Plate centre has moved by'',F7.1,'//
+     :             ''' arcsec  (std dev'',F6.1,'' arcsec)''/)') SEP,SIGR
+                           IF (LUX.GT.0) WRITE (LUS,
+     :                       '(''INFO 007 Plate centre has moved by'',
+     :                          F7.1,'//
      :             ''' arcsec  (std dev'',F6.1,'' arcsec)''/)') SEP,SIGR
                            WRITE (LUR,
      :      '(1X,''Plate centre has moved from'',I6.2,2I3.2,''.'',I1,'//
@@ -1980,7 +2039,10 @@
                      IF (.NOT.PCOK) THEN
                         WRITE (LUR,1068)
                         WRITE (LUS,1068)
+                        IF (LUX.GT.0) WRITE (LUX,1069)
  1068                   FORMAT (1X,
+     :                   'Plate centre cannot reliably be determined!'/)
+ 1069                   FORMAT ('WARNING 009 ',
      :                   'Plate centre cannot reliably be determined!'/)
                         FITOK=.FALSE.
                      END IF
@@ -2003,7 +2065,8 @@
      :             '(9X,sp,G15.7,'' * Xmeas'',24X,G15.7,'' * Xmeas''/'//
      :                '9X,G15.7,'' * Ymeas'',24X,G15.7,'' * Ymeas''//)')
      :          (PLTCON(I,NSOL)/FNORM,PLTCON(I+MAXSOL,NSOL)/FNORM,I=2,3)
-
+               IF (LUX.GT.0) WRITE (LUX, '("FIT ",I3)') NSOL
+               
 *           Report the backwards solution
                CALL sla_INVF(PLTCON(1,NSOL),PLTCON(1,NSOL+MAXSOL),J)
                IF (J.NE.0) THEN
@@ -2015,6 +2078,163 @@
      :                         '9X,G15.7,'' * X'',28X,G15.7,'' * X''/'//
      :                        '9X,G15.7,'' * Y'',28X,G15.7,'' * Y''//)')
      : (FNORM*PLTCON(I,NSOL+MAXSOL),FNORM*PLTCON(I+3,NSOL+MAXSOL),I=1,3)
+
+*NORMAN
+               IF (FITSOP) THEN
+*               Write a fits file
+                  FTSTAT = 0
+
+*               First, generate a filename from FTPREF and solution number NSOL
+*               Trim blanks from FTPREF (TRIM() isn't implemented)
+                  FTI = INDEX (FTPREF, ' ')
+                  IF (FTI.EQ.0 .OR. FTI.GT.(LEN(FTPREF)-1) .OR.
+     :                 FTI.GT.(LEN(FITSFN)-8)) THEN
+*                  We're in trouble
+                     WRITE (LUS, '(" FITS Filename <",a,
+     :                  "> too long.  FITS writing abandoned")') FTPREF
+                     IF (LUX.GT.0) WRITE (LUX, '("ERROR 010",
+     :                    " FITS Filename <",a,
+     :                    "> too long.  FITS writing abandoned")') 
+     :                    FTPREF
+*                  Set FITSOP false to avoid coming this way again
+                     FITSOP = .FALSE.
+                     GOTO 1070
+                  ENDIF
+                  IF (FTI.EQ.1) THEN
+*                  Nothing there at all!?
+                     WRITE (LUS, 
+     :             '(" FITS filename blank!?  FITS writing abandoned")')
+                     IF (LUX.GT.0) WRITE (LUX,
+     :           '("ERROR 011 FITS filename blank. Writing abandoned")')
+                     FITSOP = .FALSE.
+                     GOTO 1070
+                  ENDIF
+                  FTI=FTI-1
+                  WRITE (FITSFN, '(A,i2.2,".fits")') FTPREF(:FTI), NSOL
+                  FTI = INDEX (FITSFN, ' ')-1
+                  
+*               Right, now try opening the file
+                  CALL FTGIOU (FTUNIT, FTSTAT)
+                  CALL FTINIT (FTUNIT, FITSFN, 1, FTSTAT)
+                  WRITE (LUS, '(" FITS-WCS header for",I3,
+     :                 "-component solution in file ",
+     :                 A)') NTERMS, FITSFN(:FTI)
+                  IF (LUX.GT.0) WRITE (LUX, '("WCS ",A)') FITSFN(:FTI)
+                  FTNAXS(1)=1
+                  FTNAXS(2)=1
+
+*               Write required keywords
+                  CALL FTPHPR (FTUNIT, .TRUE., 8, 2, FTNAXS, 0,
+     :                 1, .FALSE., FTSTAT)
+
+*               Confess who wrote it
+                  CALL FTPHIS (FTUNIT, 'Written by ASTROM', FTSTAT)
+
+*               Write current date (should use FTGSTM, but that's not
+*               available in older versions of FITSIO)
+*                  CALL FTGSDT (IUTD,IUTMO,IUTY, FTSTAT)
+*                  WRITE (FTWS, '(I4,"-",I2.2,"-",I2.2)') 
+*     :                 IUTY, IUTMO, IUTD
+                  CALL FTGSTM (FTWS, FTSTAT)
+                  CALL FTPKYS (FTUNIT, 'DATE', FTWS,
+     :                 'Date file was written', FTSTAT)
+
+                  WRITE (FTWS, '("Astrometric solution: ",i2,
+     :                 "-component solution")'), NTERMS
+                  CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
+                  
+                  WRITE (FTWS, '("Projection geometry: ",A)') KPROJ
+                  CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
+                  IF (KTEL.EQ.'ASTR') THEN
+                     CALL FTPKYS (FTUNIT, 'RADESYS', 'FK5', 
+     :                    'Celestial coordinates in FK5 system', FTSTAT)
+                     CALL FTPKYS (FTUNIT, 'CTYPE1', 'RA---TAN',
+     :                    'RA -- tangent-plane projection', FTSTAT)
+                     CALL FTPKYS (FTUNIT, 'CTYPE2', 'DEC--TAN',
+     :                    'DEC -- tangent-plane projection', FTSTAT)
+                  ELSE
+                     WRITE (LUS, 
+     :                    '(" FITS error: unknown astrometric system")')
+                     IF (LUX.GT.0) WRITE (LUX, '("ERROR 012 ",
+     :                    "unknown astrometric system")')
+                     CALL FTPCOM (FTUNIT, "Don''t know system!!!", 
+     :                    FTSTAT)
+                  ENDIF
+
+*               Coordinates of reference point, and the transformation matrix
+                  CALL FTPKYG (FTUNIT, 'CRVAL1', RAPCG/D2R, 7,
+     :                 'Projection pole -- RA', FTSTAT)
+                  CALL FTPKYG (FTUNIT, 'CRVAL2', DCPCG/D2R, 7,
+     :                 'Projection pole -- DEC', FTSTAT)
+                  CALL FTPKYG (FTUNIT, 'CRPIX1', 
+     :                 fnorm*pltcon(1,nsol+maxsol), 7,
+     :                 'Projection pole -- x-pixels', FTSTAT)
+                  CALL FTPKYG (FTUNIT, 'CRPIX2', 
+     :                 fnorm*pltcon(4,nsol+maxsol), 7,
+     :                 'Projection pole -- y-pixels', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'CD1_1',
+     :                 PLTCON(2,NSOL)/FNORM, 7,
+     :                 'Transformation to intermed. world coords',
+     :                 FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'CD2_1',
+     :                 PLTCON(2+MAXSOL,NSOL)/FNORM, 7, '', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'CD1_2',
+     :                 PLTCON(3,NSOL)/FNORM, 7, '', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'CD2_2',
+     :                 PLTCON(3+MAXSOL,NSOL)/FNORM, 7, '', FTSTAT)
+
+*               Write date of observation
+                  IF (GOTPEP) THEN
+*                  Calculate MJD
+                     IF (KPPCG.EQ.'B') THEN
+                        UTMJD=SLA_EPB2D(EPPCG)
+                     ELSE
+                        UTMJD=SLA_EPJ2D(EPPCG)
+                     ENDIF
+                     CALL sla_DJCL(UTMJD+SEC30,IUTY,IUTMO,IUTD,W1,J)
+                     I=INT(W1*1440D0)
+                     IUTH=I/60
+                     IUTM=MOD(I,60)
+                     WRITE (FTWS, '("Obs. start ",A,F8.3,
+     :                    " (",I4,"-",I2.2,"-",I2.2,
+     :                    "T",I2.2,":",I2.2,")")')
+     :                    KPPCG, EPPCG,
+     :                    IUTY, IUTMO, IUTD, IUTH, IUTM
+                     CALL FTPKYD (FTUNIT, 'MJD-OBS', UTMJD, 7,
+     :                    FTWS, FTSTAT)
+                  ELSE
+                     CALL FTPCOM (FTUNIT, 'no plate epoch available!!',
+     :                    FTSTAT)
+                  ENDIF
+
+*               Finish up
+                  CALL FTCLOS (FTUNIT, FTSTAT)
+                  CALL FTFIOU (FTUNIT, FTSTAT)
+                  
+*               Were there any errors?
+                  IF (FTSTAT.NE.0) THEN
+                     CALL FTGERR (FTSTAT,FTWS)
+                     FTI=LEN(FTWS)
+                     DO WHILE (FTWS(FTI:FTI).EQ.' '.AND.FTI.GT.0)
+                        FTI=FTI-1
+                     ENDDO
+                     WRITE (LUS, '(" FITS error detected: ",a)')
+     :                    FTWS(:FTI)
+                     IF (LUX.GT.0) WRITE (LUX, '("ERROR 013 ",
+     :                    "FITS error: ",A)') FTWS(:FTI)
+                     CALL FTGMSG (FTWS)
+                     DO WHILE (FTWS.NE.'')
+                        FTI=LEN(FTWS)
+                        DO WHILE (FTWS(FTI:FTI).EQ.' '.AND.FTI.GT.0)
+                           FTI=FTI-1
+                        ENDDO
+                        WRITE (LUS, '(" -- ",A)') FTWS(:FTI)
+                        CALL FTGMSG (FTWS)
+                     ENDDO
+                  ENDIF
+               ENDIF
+*            End of FITS writing -- error exit
+ 1070          CONTINUE
 
 *           Plate scale(s), nonperpendicularity and orientation
                CALL sla_DCMPF(PLTCON(1,NSOL),
@@ -2056,6 +2276,8 @@
                CALL sla_PXY(NREF,REFXYE,REFXYM,PLTCON(1,NSOL),
      :                                            REFXYP,XRMS,YRMS,RRMS)
 
+               SUM2PX=0D0
+
 *           Look at each reference star in turn
                DO I=1,NREF
 
@@ -2064,6 +2286,10 @@
                   YM=REFXYM(2,I)
                   XP=REFXYP(1,I)
                   YP=REFXYP(2,I)
+
+*               Calculate sum of squares of pixel residuals.
+*               Note this is not a directly comparable statistic to RRMS.
+                  SUM2PX = SUM2PX + (XM-XP)**2 + (YM-YP)**2
 
 *              Residuals
                   DX=(XP-REFXYE(1,I))/AS2R
@@ -2102,6 +2328,9 @@
      :                                       IRVEC2,KSD2,IDVEC2,DX,DY,DR
                   WRITE (LUS,
      :          '(1X,A,I6,SP,F14.3,F10.3,SS,F10.3)') RNAME(I),I,DX,DY,DR
+                  IF (LUX.GT.0) WRITE (LUX,
+     :                 '("INFO RESIDUAL ",I6,3F14.3)')
+     :                 I,DX,DY,DR
 
 *              Next reference star
                END DO
@@ -2112,6 +2341,11 @@
                RRMS=RRMS/AS2R
                WRITE (LUR,'(/82X,''RMS :'',3F10.3/)') XRMS,YRMS,RRMS
                WRITE (LUS,'(/16X,''RMS :'',3F10.3)') XRMS,YRMS,RRMS
+               IF (LUX.GT.0) WRITE (LUX, '("STAT ",I5,4F14.6)')
+     :              NREF,XRMS,YRMS,RRMS,SUM2PX
+
+               IF (LUX.GT.0) WRITE (LUX, '("ENDFIT")')
+*            End of IF(FITOK)
             END IF
          END IF
 

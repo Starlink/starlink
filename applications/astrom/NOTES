@@ -7,5 +7,9 @@ doesn't build as it is, since the makefile insists on trying to
 extract each of the source files from the tarball -- you can get around
 this by adjusting the TAR_OUT environment variable in the mk script.
 
+On the CVS head, I've modified the makefile so that it doesn't require
+the source tarball to be present.  And I added a regression test
+directory, t.
+
 Norman Gray (norman@astro.gla.ac.uk)
 2001-06-11

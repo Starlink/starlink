@@ -303,7 +303,7 @@ PACK_NAME = ASTROM
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 3.6-2
+PKG_VERS = 3.6-2Norman
 
 #  Library version number.
 #
@@ -447,11 +447,12 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 #  Rules to set up links to locate each of the above include files.
 
 #  Rules for extracting source files from the source archive.
+#  Don't try to re-extract files which already exist
 
 $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(F_ROUTINES) \
 $(BLOCK_DATA) $(C_ROUTINES) $(STARTUP_SCRIPT) \
-$(F_ROUTINES_EXE) $(DEMO_SOURCE): $(PKG_NAME)_source.tar
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+$(F_ROUTINES_EXE) $(DEMO_SOURCE): # $(PKG_NAME)_source.tar
+	test -f $@ || $(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -463,8 +464,8 @@ $(F_ROUTINES_EXE) $(DEMO_SOURCE): $(PKG_NAME)_source.tar
 #  make, a dummy target is present.
 
 $(PLATFORM_F) dummy_target1 $(PLATFORM_F_EXE) \
-$(PLATFORM_PRIVATE_INCLUDES): $(PKG_NAME)_source.tar
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
+$(PLATFORM_PRIVATE_INCLUDES): # $(PKG_NAME)_source.tar
+	test -f $@_$(SOURCE_VARIANT) || $(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
 	@ if test -f $@_$(SOURCE_VARIANT); then :;\
            else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
 	mv $@_$(SOURCE_VARIANT) $@
@@ -496,9 +497,11 @@ SHAREABLE_LIBRARIES =
 
 EXECUTABLE_PROGRAMS = astrom.x
 
+# Use -lcfitsio rather than `fitsio_link` because, as of 2001-06-11 at
+# least, there seems to be significant version skew between them.
 $(EXECUTABLE_PROGRAMS): $(OBJECT_FILES)
 	$(FC) $(FFLAGS) $(OBJECT_FILES) -o $@ \
-            $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) `sla_link` $(LDFLAG2)
+            $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) `sla_link` -lcfitsio $(LDFLAG2)
 
 #  Name of the date stamp file.  This is used to record the time of the
 #  most recent build for use in subsequent operations that require it.

@@ -1,0 +1,41 @@
+
+Pat,
+
+I've made some changes to ASTROM, to fit in with what I needed for the 
+autoastrometry project.  The changes are:
+
+    - After each fit, the transformation can be written out to a
+      FITS-WCS header, which I believe conforms to the recommendations 
+      in the Greisen and Calabretta papers, and which an AST FitsChan
+      can read in.
+
+    - The program can now also write a log file containing essentially 
+      the same information as is written to the summary file, but in a 
+      more easily parseable format.
+
+As a consequence, the astrom.x program can now take six arguments,
+with the fifth being a prefix for the FITS file name, and the sixth
+the name of the log file.  If both these arguments are missing, the
+behaviour should be identical to your original program.
+
+Deficiencies:
+
+    - The design of the format of the log file is rather scrappy.  At
+      present, it does what I need and little more.  If you think this 
+      is a useful feature, I'd imagine you yourself would want to
+      think carefully about how to design it, and I wouldn't want to
+      second-guess you.
+
+    - I haven't made any change to the astrom csh script.  Partly this 
+      was because I can call the program from my script directly as
+      astrom.x; but also it was because with more arguments, the
+      question of the interface to the program becomes more subtle,
+      and I'd guess you'd have your own opinions about that.
+
+There's a script test-astrom which illustrates the modified usage.
+
+All the best,
+
+Norman
+
+

@@ -23,27 +23,48 @@
 *  Called:  IARGC, GETARG, tpt_OPW, tpt_OPR, tpt_ASTRML
 *
 *  P T Wallace   Starlink   28 June 1994
+*
+*  Norman Gray, 2001-06-08: I added two further arguments, when I added
+*    further arguments to astrml().  The fifth argument is a filename
+*    prefix; if present, then this will be used to generate a filename
+*    for a FITS-WCS file.  The sixth argument is a filename; if present, 
+*    and not the same as argument one, it specifies a file
+*    which will receive essentially the same information as the synopsis
+*    file, but more easily parseable by machine; if not present, no such
+*    information is generated.
+*    
 *-
 
       IMPLICIT NONE
 
       INTEGER NFILE
       PARAMETER (NFILE=100)
-      CHARACTER*(NFILE) TERM,INP,REP,SYN,FILE
-      INTEGER LUINP,LUREP,LUSYN,LU,J,N
+      CHARACTER*(NFILE) TERM,INP,REP,SYN,FILE,LOGFIL,FITSFN
+      INTEGER LUINP,LUREP,LUSYN,LULOG,LU,J,N
 
       INTEGER IARGC
 
 
 
 *  Verify there are the right number of arguments
-      IF (IARGC().NE.4) GO TO 9010
+*      IF (IARGC().NE.4) GO TO 9010
+      IF (IARGC().LT.4.OR.IARGC().GT.6) GO TO 9010
 
 *  Pick them up
       CALL GETARG(1,TERM)
       CALL GETARG(2,INP)
       CALL GETARG(3,REP)
       CALL GETARG(4,SYN)
+      IF (IARGC().GT.4) THEN
+         CALL GETARG(5,FITSFN)
+      ELSE
+         FITSFN=''
+      ENDIF
+      IF (IARGC().GT.5) THEN
+         CALL GETARG(6,LOGFIL)
+      ELSE
+         LOGFIL=TERM
+      ENDIF
 
 *  Open the files
       IF (INP.EQ.TERM) THEN
@@ -75,9 +96,21 @@
          CALL OPW(LU,FILE,J)
          IF (J.NE.0) GO TO 9020
       END IF
+      
+      IF (LOGFIL.EQ.TERM) THEN
+         LULOG=0
+      ELSE
+         LULOG=19
+         LU=LULOG
+         FILE=LOGFIL
+         CALL OPW(LU,FILE,J)
+         IF (J.NE.0) GO TO 9020
+      ENDIF
+
+*   Don't do anything with the FITS filename template -- leave that to astrml
 
 *  Call the ASTROM mainline program and exit when finished
-      CALL ASTRML(LUINP,LUREP,LUSYN)
+      CALL ASTRML(LUINP,LUREP,LUSYN,LULOG,FITSFN)
       GO TO 9999
 
 *  Errors
