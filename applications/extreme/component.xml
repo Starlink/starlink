@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="scb">
+<component id="extreme">
   <version>0.1-1</version>
   <path>applications/extreme</path>
   <description>Handling Extreme Data Sets</description>
