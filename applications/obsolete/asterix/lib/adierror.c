@@ -276,6 +276,7 @@ char *adix_errmsg( ADIstatype code, char *buf, int buflen )
       {ADI__ITREND,	"No more items"},
       {ADI__NOFUN,	"No applicable functions"},
       {ADI__INTGTY,	"Integrity check failure"},
+      {ADI__RETRY,	"Retry operation"},
       {SAI__ERROR,	"Error"},
       {SAI__OK,		""}
       };

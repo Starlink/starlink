@@ -463,18 +463,3 @@ ADIobj adix_removeif( ADIlogical (*test)(ADIobj,ADIobj,ADIstatus),
   return newlist;
   }
 
-/*
- *  Exported user Fortran routines
- */
-#ifdef ADI_F77
-F77_SUBROUTINE(adi_newlist2)( INTEGER(aid), INTEGER(bid), INTEGER(cid),
-                              INTEGER(status) )
-  {
-  GENPTR_INTEGER(aid)
-  GENPTR_INTEGER(bid)
-  GENPTR_INTEGER(cid)
-  GENPTR_INTEGER(status)
-
-  *cid = lstx_new2( (ADIobj) *aid, (ADIobj) *bid, (ADIstatus) status );
-  }
-#endif

@@ -487,20 +487,20 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
       jcp = icp;
       atend = ADI__false;
       while ( (jcp<clen) && ! atend ) {
-        if ( cls[jcp] == '|' )
-          atend = ADI__true;
-        else
-          jcp++;
-        }
+	if ( cls[jcp] == '|' )
+	  atend = ADI__true;
+	else
+	  jcp++;
+	}
 
 /* Store end of first word for later */
       if ( ! icp ) fjcp = jcp;
 
 /* Doesn't match what we've got? Advance to next class name */
       if ( strx_cmpc( cls + icp, jcp - icp, ocls ) )
-        icp = jcp + 1;
+	icp = jcp + 1;
       else
-        found = ADI__true;
+	found = ADI__true;
       }
 
 /* We haven't matched any of the requested classes? */
@@ -513,51 +513,60 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
       while ( (icp < clen) && _ok(status) && ! found ) {
 
 /*   Find end of this class name */
-        jcp = icp;
-        atend = ADI__false;
-        while ( (jcp<clen) && ! atend ) {
-          if ( cls[jcp] == '|' )
-            atend = ADI__true;
-          else
-            jcp++;
-          }
+	jcp = icp;
+	atend = ADI__false;
+	while ( (jcp<clen) && ! atend ) {
+	  if ( cls[jcp] == '|' )
+	    atend = ADI__true;
+	  else
+	    jcp++;
+	  }
 
 /*   Store end of first word for later */
-        if ( ! icp ) fjcp = jcp;
+	if ( ! icp ) fjcp = jcp;
 
 /*   Create instance of class */
-        adix_newn( ADI__nullid, NULL, 0, cls+icp, jcp-icp, 0, NULL,
+	adix_newn( ADI__nullid, NULL, 0, cls+icp, jcp-icp, 0, NULL,
 		   &newid, status );
 
 /*   Try to link them */
-        newid = adix_setlnk( newid, id, cls, clen, status );
+	newid = adix_setlnk( newid, id, cls, clen, status );
 
 /*   Linkage worked? Return new object */
-        if ( _ok(status) ) {
-          found = ADI__true;
-          rval = newid;
-          }
+	if ( _ok(status) ) {
+	  found = ADI__true;
+	  rval = newid;
+	  }
 
-/*   Failed to link, so try the next class in the list */
-        else if ( ! _ok(status) ) {
+/*   Retry? Link routine has safely decided it can't handle our data */
+	else if ( *status == ADI__RETRY ) {
 
 /*   Cancel the bad status */
-          adic_erranl( status );
+	  adic_erranl( status );
 
 /*   Destroy the object we don't want */
-          adic_erase( &newid, status );
+	  adic_erase( &newid, status );
 
 /*   Next class */
-          icp = jcp + 1;
-          }
+	  icp = jcp + 1;
+	  }
 
-        }
+/*   Failed to link */
+	else if ( ! _ok(status) ) {
+
+/* Destroy temp object */
+	  ems_begin_c( status );
+	  adic_erase( &newid, status );
+	  ems_end_c( status );
+	  }
+
+	}
       }
 
 /* Report error if no linkage */
     if ( ! found )
       adic_setecs( ADI__NOMTH, "Unable to link object of class %S to any of %*s",
-                   status, ocls, clen, cls );
+		   status, ocls, clen, cls );
     }
 
 /* Set return object */
@@ -676,9 +685,16 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
 	if ( _ok(status) )		/* Did it work? */
 	  found = ADI__true;
-	else if ( _valid_q(cdr) ) {	/* Don't annul status if last file */
+
+/* If statis is retry then the open routine has made a firm decision that the file */
+/* does not belong to this representation */
+	else if ( *status == ADI__RETRY ) {
 	  adic_erranl( status );
-          }
+	  }
+
+/* Other bad status means that the file was opened but something else went wrong */
+	else
+	  adic_erranl( status );
 	}
 
       if ( ! found )			/* Next one */
@@ -698,7 +714,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
     if ( ! ppos )
       adic_setecs( ADI__INVARG, "File %*s cannot be opened", status,
-                   flen, fspec );
+		   flen, fspec );
     }
 
 /* Opened ok? If so, write in details of representation and access mode */
@@ -846,7 +862,6 @@ void ADIfsysInit( ADIstatus status )
     MTHD_TENTRY( "FileCommit(_ADIbase)",        adix_base_null1 ),
     MTHD_TENTRY( "FileClose(_ADIbase)",        adix_base_null1 ),
     MTHD_TENTRY( "NewLink(_ADIbase,_ADIbase)", adix_base_NewLink ),
-/*    MTHD_TENTRY( "SetLink(_ADIbase,_ADIbase)", adix_base_SetLink ), */
     MTHD_TENTRY( "UnLink(_ADIbase,_ADIbase)",  adix_base_UnLink ),
   END_MTHD_TABLE;
 

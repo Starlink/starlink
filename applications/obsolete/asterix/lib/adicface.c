@@ -79,6 +79,8 @@
 *       adic_[c]new0<t>  - Create scalar object [component] of type <t>
 *       adic_[c]new1     - Create 1-D object [component] of named type
 *       adic_[c]new1<t>  - Create 1-D object [component] of type <t>
+*	adic_newlst	 - Create new list object
+*	adic_newref	 - Create a reference object
 *       adic_[c]newv<t>  - Create n-D object [component] with value
 *       adic_[c]newv0<t> - Create scalar object [component] with value
 *       adic_[c]newv1<t> - Create 1-D object [component] with value
@@ -93,6 +95,8 @@
 *       adic_[c]get0<t>	 - Get scalar object [component] value
 *       adic_[c]get1	 - Get 1-D object [component] values with user type
 *       adic_[c]get1<t>	 - Get 1-D object [component] values
+*       adic_getlst      - Get an object [component] list components
+*	adic_[c]getref	 - Get an object [component] reference
 *	adic_[c]map	 - Map object [component] with user type
 *	adic_[c]map<t>	 - Map object [component] with a specific type
 *       adic_[c]put	 - Put n-D object [component] values with user type
@@ -102,6 +106,7 @@
 *       adic_[c]put1	 - Put 1-D object [component] values with user type
 *       adic_[c]put1<t>	 - Put 1-D object [component] values
 *	adic_[c]putid	 - Put ADI object into object [component]
+*	adic_[c]putref	 - Write an object [component] reference
 *	adic_there	 - Does an object component exist?
 *	adic_[c]unmap	 - Unmap object [component]
 *
@@ -127,12 +132,6 @@
 *      Symbol packages :
 *
 *	adic_reqpkg	 - Load a package from the search path
-*
-*      Object references :
-*
-*	adic_[c]getref	 - Read an object [component] reference
-*	adic_newref	 - Create a reference object
-*	adic_[c]putref	 - Write an object [component] reference
 *
 *      Data system :
 *
@@ -1629,6 +1628,45 @@ void adic_reqpkg( char *pkg, ADIstatus status )
 
   _ERR_REP( "adic_reqpkg", Estr__LodDefPkg );
   }
+
+/* -------------------------------------------------------------------------
+ * List objects
+ * -------------------------------------------------------------------------
+ */
+
+void adic_lstnth( ADIobj lid, ADIinteger n, ADIobj *eid, ADIstatus status )
+  {
+  ADIobj 	*eaddr;
+
+  _chk_stat;
+
+  eaddr = lstx_nth( lid, n, status );
+
+  *eid = eaddr ? *eaddr : ADI__nullid;
+
+  _ERR_REP( "adic_lstnth", Estr__GetObjDat );
+  }
+
+
+void adic_newlst( ADIobj aid, ADIobj bid, ADIobj *id, ADIstatus status )
+  {
+  _chk_stat;
+
+  *id = lstx_cell( aid, bid, status );
+
+  _ERR_REP( "adic_newlst", Estr__CreObjDat );
+  }
+
+
+void adic_getlst( ADIobj id, ADIobj *aid, ADIobj *bid, ADIstatus status )
+  {
+  _chk_init;
+
+  _GET_CARCDR(*aid,*bid,id);
+
+  _ERR_REP( "adic_getlst", Estr__GetObjDat );
+  }
+
 
 /* -------------------------------------------------------------------------
  * Object references

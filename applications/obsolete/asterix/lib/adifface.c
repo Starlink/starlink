@@ -77,6 +77,8 @@
 *       adi_[c]new0<t>   - Create scalar object [component] of type <t>
 *       adi_[c]new1      - Create 1-D object [component] of named type
 *       adi_[c]new1<t>   - Create 1-D object [component] of type <t>
+*	adi_newlst	 - Create a new list cell
+*	adi_newref	 - Create a reference object
 *       adi_[c]newv<t>   - Create n-D object [component] with value
 *       adi_[c]newv0<t>  - Create scalar object [component] with value
 *       adi_[c]newv1<t>  - Create 1-D object [component] with value
@@ -91,6 +93,8 @@
 *       adi_[c]get0<t>	 - Get scalar object [component] value
 *       adi_[c]get1	 - Get 1-D object [component] values with user type
 *       adi_[c]get1<t>	 - Get 1-D object [component] values
+*	adi_getlst	 - Get an object [component] list cells
+*	adi_[c]getref	 - Get an object [component] reference
 *	adi_[c]map	 - Map object [component] with user type
 *	adi_[c]map<t>	 - Map object [component] with a specific type
 *       adi_[c]put	 - Put n-D object [component] values with user type
@@ -100,6 +104,7 @@
 *       adi_[c]put1	 - Put 1-D object [component] values with user type
 *       adi_[c]put1<t>	 - Put 1-D object [component] values
 *	adi_[c]putid	 - Put ADI object into object [component]
+*	adi_[c]putref	 - Write an object [component] reference
 *	adi_there	 - Does an object component exist?
 *	adi_[c]unmap	 - Unmap object [component]
 *
@@ -122,12 +127,6 @@
 *
 *	adi_[c]erase	 - Destroy an object [component]
 *
-*      Object references :
-*
-*	adi_getref	 - Read an object reference
-*	adi_newref	 - Create a reference object
-*	adi_putref	 - Write an object reference
-*
 *      Symbol packages :
 *
 *	adi_reqpkg	 - Load a package from the search path
@@ -148,8 +147,9 @@
 *
 *      Miscellaneous :
 *
-*	adi_link	 - Link an identifier to a name group
 *	adi_flush	 - Erase all objects in a name group
+*	adi_link	 - Link an identifier to a name group
+*	adi_lstnth	 - Index N'th component of list
 
 *  Authors:
 *     DJA: David J. Allan (JET-X, University of Birmingham)
@@ -2248,6 +2248,62 @@ F77_SUBROUTINE(adifn(reqpkg))( CHARACTER(pkg), INTEGER(status) TRAIL(pkg) )
   ADIpkgRequire( pkg, pkg_length, status );
 
   _ERR_REP( "ADI_REQPKG", Estr__LodDefPkg );
+  }
+
+/* -------------------------------------------------------------------------
+ * List objects
+ * -------------------------------------------------------------------------
+ */
+
+F77_SUBROUTINE(adifn(lstnth))( INTEGER(lid), INTEGER(n), INTEGER(eid),
+			       INTEGER(status) )
+  {
+  GENPTR_INTEGER(lid)
+  GENPTR_INTEGER(n)
+  GENPTR_INTEGER(eid)
+  GENPTR_INTEGER(status)
+
+  ADIobj 	*eaddr;
+
+  _chk_stat;
+
+  eaddr = lstx_nth( *lid, *n, status );
+
+  *eid = eaddr ? *eaddr : ADI__nullid;
+
+  _ERR_REP( "ADI_LSTNTH", Estr__GetObjDat );
+  }
+
+
+F77_SUBROUTINE(adifn(newlst))( INTEGER(aid), INTEGER(bid), INTEGER(id),
+			       INTEGER(status) )
+  {
+  GENPTR_INTEGER(aid)
+  GENPTR_INTEGER(bid)
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  *id = lstx_cell( *aid, *bid, status );
+
+  _ERR_REP( "ADI_NEWLST", Estr__CreObjDat );
+  }
+
+
+F77_SUBROUTINE(adifn(getlst))( INTEGER(id), INTEGER(aid), INTEGER(bid),
+			       INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(aid)
+  GENPTR_INTEGER(bid)
+  GENPTR_INTEGER(status)
+
+  _chk_init;
+
+  _GET_CARCDR(aid,bid,*id);
+
+  _ERR_REP( "ADI_GETLST", Estr__GetObjDat );
   }
 
 /* -------------------------------------------------------------------------
