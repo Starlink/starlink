@@ -518,12 +518,8 @@ PkGlyph::PkGlyph(unsigned int cc,
       longform_(true), bitmap_(0)
 {
     tfmwidth_ = (double)tfmwidth/(double)two20_ * f->designSize();
-    dx_ = static_cast<int>(dx / (double)two16_ + 0.5);
-    dy_ = static_cast<int>(dy / (double)two16_ + 0.5);
-#if 0
     dx_ = static_cast<int>(floor(dx / (double)two16_ + 0.5));
     dy_ = static_cast<int>(floor(dy / (double)two16_ + 0.5));
-#endif
 }
 
 PkGlyph::PkGlyph(int resolution, PkFont *f)
