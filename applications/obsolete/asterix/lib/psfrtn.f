@@ -2820,6 +2820,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *     23 Dec 93 : Original (DJA)
 *     13 Jun 95 : Return absolute value of min(dx,dy) for granularity in
 *                 rectangular case (DJA)
+*     21 Dec 1995 : Energy granularity (DJA)
 *
 *    Type definitions :
 *
@@ -2881,6 +2882,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :                    ABS(MIN(RF_SCALE(3,SLOT),RF_SCALE(4,SLOT))),
      :                    DATA, STATUS )
         END IF
+
+*    Energy granularity
+      ELSE IF ( HINT .EQ. PSF_H_EGRAN ) THEN
+
+*      Radial psf?
+        CALL ARR_COP1R( 1, RF_SCALE(RF_NDIM(SLOT),SLOT), DATA, STATUS )
 
       ELSE
         STATUS = SAI__ERROR
