@@ -664,9 +664,11 @@ $(MANIFEST)/gaia: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/img \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/par \
