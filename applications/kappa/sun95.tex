@@ -28674,7 +28674,6 @@ plot (9k).
       }
    }
 }
-
 \sstroutine{
    PSF
 }{
@@ -28760,6 +28759,14 @@ plot (9k).
          mean radial profile of the stars and the fitted function.  A
          null ({\tt !}) name indicates that no plot is required.  The
          suggested default is the current graphics device.
+      }
+      \sstsubsection{
+         GAUSS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the gamma coefficient is fixed to be 2; in other words
+         the best-fitting two-dimensional Gaussian is evaluated.  If
+         {\tt FALSE}, gamma is a free parameter of the fit, and the derived
+         value is returned in parameter GAMMA. {\tt [FALSE]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -28953,6 +28960,12 @@ plot (9k).
          As above but there is no graphical output.
       }
       \sstexamplesubsection{
+         psf ngc6405i starlist.dat gauss $\backslash$
+      }{
+         As the first example, except the psf is fitted to a
+         two-dimensional Gaussian.
+      }
+      \sstexamplesubsection{
          psf cofile=starlist in=ngc6405i logfile=fit.log fwhm=(seeing) $\backslash$
       }{
          As the first example, but the results, including the fits to
@@ -29058,6 +29071,7 @@ plot (9k).
       }
    }
 }
+
 \begin{htmlonly}
 Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 (6k).
@@ -38115,12 +38129,8 @@ plotting application.
                   an IRAS90 astrometry structure or FITS extension (if
                   possible) as described earlier.
 
-            \item No parameters have been removed.
-
             \item The following new parameters have been added: CURRENT, FDIM,
                   FDOMAIN, FTITLE, FULLFRAME, FULLWCS, WCS.
-         
-            \item No parameters have been modified.
 
          \end{itemize}
 
@@ -38129,11 +38139,18 @@ plotting application.
             \item This now allows the picture size to be specified in
                   absolute units (centimetres).
 
-            \item No parameters have been removed.
-
             \item The following new parameter has been added: SIZE
-         
-            \item No parameters have been modified.
+
+         \end{itemize}
+
+      \item [\htmlref{PSF}{PSF}] \mbox{} 
+         \begin{itemize}
+            \item  This now allows the gamma coefficient to be constrained
+                   to be two.  A failure to meet the tolerance test is no 
+                   longer fatal. Warning messages showing the requested and 
+                   used tolerances replace the error message.
+
+            \item The following new parameter has been added: GAUSS
 
          \end{itemize}
 
