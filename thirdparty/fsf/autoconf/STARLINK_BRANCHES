@@ -1,0 +1,12 @@
+
+autoconf tree created by the import of autoconf-2.59, on 2004 January 15.
+
+Most branches here are common to autoconf and automake, so see
+../automake/STARLINK_BRANCHES for details.
+
+
+dev-nxg-20040116-add-fpp-support
+--------------------------------
+
+Branch tag applied to automake and autoconf. 
+
