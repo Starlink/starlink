@@ -120,3 +120,6 @@
   XY profiles now display a local value when a row or column contains
   no valid values (previous this displayed zero, which occasionally 
   made the graphs scale to silly values). 
+
+  Contouring toolbox bug fixed. If you entered an incorrect NDF name for the 
+  second image, the error was never recovered and GAIA had to be restarted.
