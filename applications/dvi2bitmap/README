@@ -1,0 +1,10 @@
+
+Generate fonts using something like:
+
+#mktexpk --mfmode ljfour --bdpi 600 --mag magstep\(0.5\) --dpi 657 phvr8r
+
+  #mktexpk --mfmode pixpt --mag 1 --bdpi 2602 --dpi 2602 cmr10
+
+  mktexpk --mfmode ibmvga --mag 1 --bdpi 110 --dpi 110 cmr10
+
+puts the result in /var/tmp/fonts/pk/pixpt/public/cm/cmr10.2602pk
