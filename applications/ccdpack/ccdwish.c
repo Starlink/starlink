@@ -105,11 +105,6 @@
          ccdSetenv( "ITCL_LIBRARY", ccddir, 1 );
          ccdSetenv( "ITK_LIBRARY", ccddir, 1 );
       }
-      fprintf( stderr, "%s %s %s %s\n",
-               getenv( "TCL_LIBRARY" ),
-               getenv( "TK_LIBRARY" ),
-               getenv( "ITCL_LIBRARY" ),
-               getenv( "ITK_LIBRARY" ) );
 
 /* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
    If we have something which looks like a flag but is not of this form,
