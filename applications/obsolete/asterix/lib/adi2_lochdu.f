@@ -262,22 +262,10 @@
 *  Has HDU been created yet?
       CALL ADI_THERE( HCID, LHDU(:HLEN), THERE, STATUS )
       IF ( CANCRE .AND. .NOT. THERE ) THEN
-        CALL ADI2_NEWHDU( FID, LHDU(:HLEN), STATUS )
+        CALL ADI2_NEWHDU( FID, LHDU(:HLEN), HDU, STATUS )
         CREATED = .TRUE.
       END IF
       CALL ADI_FIND( HCID, LHDU(:HLEN), ID, STATUS )
-
-*  Did we create the structure?
-      IF ( CREATED ) THEN
-
-*    Write the true extension name
-        IF ( HDU .EQ. ' ' ) THEN
-          CALL ADI_CPUT0C( ID, 'Name', 'PRIMARY', STATUS )
-        ELSE
-          CALL ADI_CPUT0C( ID, 'Name', HDU, STATUS )
-        END IF
-
-      END IF
 
 *  Release HDU container
       CALL ADI_ERASE( HCID, STATUS )
