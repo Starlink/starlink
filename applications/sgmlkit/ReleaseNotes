@@ -47,6 +47,11 @@ the last programmers' meeting.  These are important, but not
 show-stopping.
 
 <dl>
+<dt>Bundle Jade with the system
+<dd>At present, the distribution consists only of the SGML library stuff.
+I need to work out the magic to get Jade to build on Suns and Alphas,
+and then distribute them together.
+
 <dt>Finish documentation
 <dd>This should be considered a first draft of the documentation -- it
 needs a proper read-through, plus additions concerned with installing
