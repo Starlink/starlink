@@ -103,7 +103,7 @@
 *           -  INDEX   -- ID is given by an integer as taken from the
 *                         INDICES parameter.  This normally gives the
 *                         frameset generated from the N'th NDF in the
-*                         IN list and ID with index N.
+*                         IN list an ID with index N.
 *        [INDEX]
 *     IN = LITERAL (Read)
 *        A list of NDFs from which framesets are to be extracted.
