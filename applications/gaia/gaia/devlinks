@@ -11,4 +11,5 @@ ln -s ../bin/gaiaMon ./cat2tab
 ln -s ../bin/gaiaMon ./tab2asc
 ln -s ../bin/gaiaMon ./tab2cat
 ln -s ../../demodata.tar ./demodata.tar
+ln -s ../gaia.htx  ./gaia.htx
 )
