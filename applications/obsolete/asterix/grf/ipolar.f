@@ -60,6 +60,7 @@
 *      6 Jul 94 : V1.7-5 Optional limit on radial extent (RJV)
 *                        Also switch off even scaling of 2D axes (RJV)
 *     16 Sep 94 : V1.7-6 NORM parameter (RJV)
+*     24 Apr 95 : V1.8-0 Updated data interfaces (DJA)
 *
 *    Type Definitions :
 *
@@ -68,7 +69,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
 *
@@ -82,8 +83,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC	! input object locator
-      CHARACTER*(DAT__SZLOC) OLOC	! output object locator
       CHARACTER*(80) PATH(8) 		! History input axis2-units
       CHARACTER*(80) TITLE 		! Title of files
       CHARACTER*40 AUNITS(2)            ! Units of axes
@@ -109,8 +108,9 @@
 
       INTEGER       AXLP                ! Loop over input axes
       INTEGER       AZAX, RAX           ! Output axis id's
-      INTEGER       DIMS(DAT__MXDIM)    ! Dimensions of input data_array
+      INTEGER       DIMS(ADI__MXDIM)    ! Dimensions of input data_array
       INTEGER       IDPTR               ! Input data
+      INTEGER			IFID			! Input dataset id
       INTEGER       IVPTR               ! input variance
       INTEGER       IQPTR               ! Input quality
       INTEGER       INELM               ! Input number of elements
@@ -121,26 +121,26 @@
       INTEGER       NLINES              ! # lines of history text
       INTEGER       NVAL                ! # values in an axis
       INTEGER       ODIM(3)             ! Output dimensions (1=radial,2=az)
+      INTEGER			OFID			! Output dataset id
       INTEGER       ONDIM               ! Output dimensionality
       INTEGER       ODPTR               ! Output data
       INTEGER       OVPTR               ! Output variance
       INTEGER       OQPTR               ! Output quality
       INTEGER       VNDIM,              ! Dimensionality of input variance
-     :              VDIMS(DAT__MXDIM)   ! Dimensions of input variance
+     :              VDIMS(ADI__MXDIM)   ! Dimensions of input variance
       INTEGER       WPTR                ! Workspace for polaring process
 
       BYTE          BADBITS             ! Quality mask
 
       LOGICAL       CUBE                ! Cube input?
       LOGICAL       OK			! Object is in D_A subclass
-      LOGICAL       INPRIM 		! Primitive array ?
       LOGICAL       ERRORS, REG
       LOGICAL       NORM                ! Normalise to axis units
 *
 *    Version id :
 *
       CHARACTER*30 VERSION
-        PARAMETER  ( VERSION = 'IPOLAR Version 1.7-6' )
+        PARAMETER  ( VERSION = 'IPOLAR Version 1.8-0' )
 *-
 
 *    Version id :
@@ -150,12 +150,11 @@
       CALL AST_INIT()
 
 *    Get input and output data paths
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC,
-     :                                  INPRIM, STATUS )
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map the input data array if present
-      CALL BDA_CHKDATA( ILOC, OK, INDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, INDIM, DIMS, STATUS )
       CALL ARR_SUMDIM( INDIM, DIMS, INELM )
 
 *    Check dimensionality.
@@ -168,18 +167,18 @@
       IF ( CUBE ) THEN
         CALL MSG_PRNT( 'Assuming spatial dimension are numbers'/
      :                                             /' 1 and 2' )
-        CALL DAT_RETYP( OLOC, 'PROFILE_SET', STATUS )
+C        CALL DAT_RETYP( OFID, 'PROFILE_SET', STATUS )
       END IF
 
       IF ( OK ) THEN
-        CALL BDA_MAPDATA( ILOC, 'READ', IDPTR, STATUS )
+        CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
       ELSE
         CALL ERR_REP(' ','Data array not found in input file',STATUS)
         GOTO 99
       END IF
 *
-        CALL BDA_CHKVAR( ILOC, ERRORS, VNDIM, VDIMS, STATUS )
-        CALL BDA_MAPVAR( ILOC, 'READ', IVPTR, STATUS )
+        CALL BDI_CHKVAR( IFID, ERRORS, VNDIM, VDIMS, STATUS )
+        CALL BDI_MAPVAR( IFID, 'READ', IVPTR, STATUS )
 *
         IF (STATUS.NE.SAI__OK) THEN
            CALL MSG_PRNT('Error mapping input variance array')
@@ -187,14 +186,14 @@
         ENDIF
 
 *    Map quality array - if not present all qualities are set good
-      CALL BDA_MAPQUAL( ILOC, 'READ', IQPTR, STATUS )
+      CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT( 'Error mapping input quality array' )
         GOTO 99
       END IF
 
 *    Attempt to get badbits value
-      CALL BDA_GETMASK( ILOC, BADBITS, STATUS )
+      CALL BDI_GETMASK( IFID, BADBITS, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
          BADBITS = QUAL__MASK
@@ -202,11 +201,11 @@
 
 *    Find axis values if present
       DO AXLP = 1, 2
-        CALL BDA_CHKAXVAL( ILOC, AXLP, OK, REG, NVAL, STATUS )
+        CALL BDI_CHKAXVAL( IFID, AXLP, OK, REG, NVAL, STATUS )
 
 *      Is it regular ?
         IF ( REG ) THEN
-          CALL BDA_GETAXVAL( ILOC, AXLP, AMIN(AXLP), ASCALE(AXLP),
+          CALL BDI_GETAXVAL( IFID, AXLP, AMIN(AXLP), ASCALE(AXLP),
      :                                              NVAL, STATUS )
           AMAX(AXLP) = AMIN(AXLP)+(NVAL-1)*ASCALE(AXLP)
         ELSE
@@ -336,15 +335,15 @@
       END IF
 
 *    Create and map output arrays
-      CALL BDA_CREDATA( OLOC, ONDIM, ODIM, STATUS )
-      CALL BDA_CREVAR( OLOC, ONDIM, ODIM, STATUS )
-      CALL BDA_CREQUAL( OLOC, ONDIM, ODIM, STATUS )
-      CALL BDA_MAPDATA( OLOC, 'WRITE', ODPTR, STATUS )
-      CALL BDA_MAPVAR( OLOC, 'WRITE', OVPTR, STATUS )
-      CALL BDA_MAPQUAL( OLOC, 'WRITE', OQPTR, STATUS )
+      CALL BDI_CREDATA( OFID, ONDIM, ODIM, STATUS )
+      CALL BDI_CREVAR( OFID, ONDIM, ODIM, STATUS )
+      CALL BDI_CREQUAL( OFID, ONDIM, ODIM, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+      CALL BDI_MAPVAR( OFID, 'WRITE', OVPTR, STATUS )
+      CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
 
 *    Write in badbits mask
-      CALL BDA_PUTMASK(OLOC, BADBITS, STATUS)
+      CALL BDI_PUTMASK(OFID, BADBITS, STATUS)
 
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error creating output data, variance'/
@@ -354,23 +353,23 @@
 
 *   Write ancilliary objects to new file.
 *    Copy More structure
-      CALL BDA_COPMORE( ILOC, OLOC, STATUS )
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
 
 *    Make sure even axis scaling switched off
       CALL GCB_ATTACH('LOCAL',STATUS)
       CALL GCB_SETL('AXES_SCALING',.FALSE.,STATUS)
-      CALL GCB_SAVE(OLOC,STATUS)
+      CALL GCB_SAVE(OFID,STATUS)
       CALL GCB_DETACH(STATUS)
 
 *    Create axis structure. Either one axis or two.
-      CALL BDA_CREAXES( OLOC, ONDIM, STATUS )
+      CALL BDI_CREAXES( OFID, ONDIM, STATUS )
 
 *    Get the data units of the input file
-      CALL BDA_GETUNITS( ILOC, DUNITS, STATUS )
+      CALL BDI_GETUNITS( IFID, DUNITS, STATUS )
 
 *    Get axis units
       DO AXLP = 1, 2
-        CALL BDA_GETAXUNITS( ILOC, AXLP, AUNITS(AXLP), STATUS )
+        CALL BDI_GETAXUNITS( IFID, AXLP, AUNITS(AXLP), STATUS )
       END DO
 
 *    Check that the units of each axis are the same
@@ -421,14 +420,14 @@
       IF ( NRBIN .NE. 1 ) THEN
 
 *      Write axis label and units
-        CALL BDA_PUTAXLABEL( OLOC, RAX, 'Radius', STATUS )
+        CALL BDI_PUTAXLABEL( OFID, RAX, 'Radius', STATUS )
 
 *      Put output input axis units
-        CALL BDA_PUTAXUNITS( OLOC, RAX, AUNITS(1), STATUS )
+        CALL BDI_PUTAXUNITS( OFID, RAX, AUNITS(1), STATUS )
 
 *      Create and map axis array
-        CALL BDA_CREAXVAL( OLOC, RAX, .TRUE., NRBIN, STATUS )
-        CALL BDA_PUTAXVAL( OLOC, RAX, RBIN/2.0, RBIN, NRBIN, STATUS )
+        CALL BDI_CREAXVAL( OFID, RAX, .TRUE., NRBIN, STATUS )
+        CALL BDI_PUTAXVAL( OFID, RAX, RBIN/2.0, RBIN, NRBIN, STATUS )
 
       END IF
 
@@ -436,12 +435,12 @@
       IF ( NABIN .NE. 1 ) THEN
 
 *      Write axis label and units
-        CALL BDA_PUTAXLABEL( OLOC, AZAX, 'Azimuth', STATUS )
-        CALL BDA_PUTAXUNITS( OLOC, AZAX, 'degrees', STATUS )
+        CALL BDI_PUTAXLABEL( OFID, AZAX, 'Azimuth', STATUS )
+        CALL BDI_PUTAXUNITS( OFID, AZAX, 'degrees', STATUS )
 
 *      Create and map axis array
-        CALL BDA_CREAXVAL( OLOC, AZAX, .TRUE., NABIN, STATUS )
-        CALL BDA_PUTAXVAL( OLOC, AZAX, AZANG+ABIN/2.0, ABIN, NABIN,
+        CALL BDI_CREAXVAL( OFID, AZAX, .TRUE., NABIN, STATUS )
+        CALL BDI_PUTAXVAL( OFID, AZAX, AZANG+ABIN/2.0, ABIN, NABIN,
      :                                                      STATUS )
 
       END IF
@@ -452,14 +451,14 @@
 
 *    Copy third input axis if a cube
       IF ( CUBE ) THEN
-        CALL BDA_COPAXIS( ILOC, OLOC, 3, ONDIM, STATUS )
+        CALL BDI_COPAXIS( IFID, OFID, 3, ONDIM, STATUS )
       END IF
 
 *    Write data units to output file
-      CALL BDA_PUTUNITS( OLOC, DUNITS, STATUS )
+      CALL BDI_PUTUNITS( OFID, DUNITS, STATUS )
 
 *    Write label
-      CALL BDA_PUTLABEL( OLOC, 'Surface brightness', STATUS )
+      CALL BDI_PUTLABEL( OFID, 'Surface brightness', STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Error writing data units and label',
      :                                                  STATUS )
@@ -505,15 +504,15 @@
       END DO
 
 *    Get title of the input file
-      CALL BDA_GETTITLE(ILOC, TITLE, STATUS)
+      CALL BDI_GETTITLE(IFID, TITLE, STATUS)
       TITLE = TITLE(1:CHR_LEN(TITLE)) // ' - polar distribution'
 
 *    Put title to the output file
-      CALL BDA_PUTTITLE( OLOC, TITLE, STATUS )
+      CALL BDI_PUTTITLE( OFID, TITLE, STATUS )
 
 *    Copy and update history file
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Create text strings for history
       CALL USI_NAMEI( NLINES, PATH, STATUS )
@@ -533,7 +532,7 @@
 *
 
 *    Write strings to history structure
-      CALL HIST_PTXT( OLOC, NLINES+3, PATH, STATUS )
+      CALL HSI_PTXT( OFID, NLINES+3, PATH, STATUS )
 
 *    Annul and unmap data accessed by asterix routines.
  99   CALL AST_CLOSE()
