@@ -61,11 +61,18 @@ immediately resolve the indirection.
 	      (literal linktext))
 	  )
 	(if target
-	    (error (string-append
-		    "stylesheet can't link to elements of type "
-		    (gi target)
-		    " (ID " target-id ")"
-		    ))
+	    (make sequence
+	      ;; Can't make this type of link.  Object, but try to
+	      ;; emit something nonetheless.
+	      (if (string=? linktext "")
+		  (literal (string-append
+			    "[reference to " (gi target) "]"))
+		  (literal linktext))
+	      (error (string-append
+		      "The stylesheet is presently unable to link to elements of type "
+		      (gi target)
+		      " (ID " target-id ")"
+		      )))
 	    (error (string-append
 		    "Can't find element with ID " target-id " in this document"
 		    ))))))
@@ -97,7 +104,7 @@ immediately resolve the indirection.
 ; 		  "The stylesheet is presently unable to link to elements of type "
 ; 	          (gi target)))))))
 
-(define ($make-dummy-link$ fpi #!optional (linktext #f))
+(define ($make-dummy-link$ fpi xrefid linktext)
   (let* ((els (parse-fpi fpi))
 	 (descrip (query-parse-fpi 'text-description els))
 	 (docnum (and descrip
@@ -116,7 +123,8 @@ immediately resolve the indirection.
 				       ".htx/"
 				       (case-fold-down (car docparts))
 				       (cadr docparts)
-				       ".html#xref_")
+				       ".html#xref_"
+				       (or xrefid ""))
 			#f))))
     (if href
 	(make element gi: "a"
@@ -136,6 +144,22 @@ However, the <funcname>sgml-parse</> function in DSSSL isn't defined as
 being able to do that; there is a Jade patch which allows it to do
 that, which I hope to build into a Starlink version of Jade when I
 can.
+
+<p>In a project meeting, it was decided that there were substantial
+operational difficulties in guaranteeing that document-summary
+target files would always exist.  Therefore the processing of
+this element was required to work even if the target element
+didn't exist, by parsing the public identifier, and making
+intelligent guesses about the system's environment.  This is very
+messy, not least because it requires messy gymnastics in here.
+
+<p>Initially, the generated link text could be overridden by
+supplying a value for the `text' attribute.  To make this element
+more consistent with the REF element, however, this has been
+changed so that the element's link text is given as content to
+the DOCXREF element.  The `text' attribute is still present and
+supported, for (very temporary) backward compatibility, but
+undocumented.
 
 <p>Once we have obtained the element pointed to by the ID,
 check to see if it is a <funcname>mapid</> element, and if it is,
@@ -159,19 +183,30 @@ it produces an <funcname>error</>.
 	 ;; then perhaps I can put some explanation in next time.
 	 ;(xrefent-sysid (and xrefent
 	 ;	     (entity-system-id xrefent)))
+
+	 ;; If the target document does not exist (which is deemed to
+	 ;; be OK, and from which we recover by parsing the public
+	 ;; ID below), then xrefent-gen-sysid will become false.
 	 (xrefent-gen-sysid (and xrefent
 				 (entity-generated-system-id xrefent)))
 	 (docelem (and xrefent-gen-sysid
 		       (document-element-from-entity xrefent)
 		       ))
+
+	 ;; xrefid is the ID of an element in the target document
+	 ;; which is to become the target of the link
 	 (xrefid (attribute-string (normalize "loc") (current-node)))
-	 ;; xreftarget is the element the docxref refers to, or #f if
-	 ;; attribute LOC is implied or the document doesn't have such
-	 ;; an ID
-	 (tmp-xreftarget (and xrefid
-			      docelem
-			      (node-list-or-false (element-with-id xrefid
-								   docelem))))
+	 ;; xreftarget is the element the docxref refers to, or docelem if
+	 ;; attribute LOC is implied (xrefid is #f) or the document
+	 ;; doesn't have such an ID (element-with-id returns #f).  If
+	 ;; the target document does not exist, then docelem will be
+	 ;; false, and hence so will tmp-xreftarget and xreftarget.
+	 (tmp-xreftarget (or (and xrefid
+				  docelem
+				  (node-list-or-false
+				   (element-with-id xrefid docelem)))
+			     docelem))
+	 ;; If the target element is a mapid element, then dereference it
 	 (xreftarget (if (and tmp-xreftarget
 			      (string=? (gi tmp-xreftarget)
 					(normalize "mapid")))
@@ -179,54 +214,65 @@ it produces an <funcname>error</>.
 							    tmp-xreftarget)
 					  docelem)
 			 tmp-xreftarget))
+	 ;; Call get-link-policy-target to decide whether or not we
+	 ;; are allowed, by the target document's own settings, to
+	 ;; link to this `xreftarget'.
 	 (xrefurl (and xreftarget
 		       (get-link-policy-target xreftarget)))
-	 (linktext (attribute-string (normalize "text")
-				     (current-node))))
+
+	 ;; If the element has content, make that the link text, else
+	 ;; if the element has a `text' attribute (temporary, for
+	 ;; backward compatibility), make that the link
+	 ;; text, else generate the text below.
+	 (linktext (if (not (string=? (data (current-node)) ""))
+		       (data (current-node))
+		       (attribute-string (normalize "text")
+					 (current-node)))))
     (if (and xrefent-gen-sysid
 	     docelem
 	     (string=? (gi docelem)
 		       (normalize "documentsummary"))) ; sanity check...
-	(if xreftarget
-	    (if (car xrefurl)	; link to element by id
-		(error (car xrefurl)) ; violated policy - complain
-		(make element gi: "a"
-		      attributes: (list (list "href"
-					      (cdr xrefurl)))
-		      (if linktext
-			  (literal linktext)
-			  (make sequence
-			    (with-mode mk-docxref
-			      (process-node-list (document-element
-						  xreftarget)))
-			    (literal ": ")
-			    (with-mode section-reference
-			      (process-node-list xreftarget))))))
-	    (make element gi: "a"	; link to whole document
-		  attributes:
-		  (list (list "href"
-			      (let ((url (attribute-string
-					  (normalize "urlpath") docelem)))
-				(if url
-				    ;; Add the #xref_ fragment which
-				    ;; hlink needs.  If this URL was
-				    ;; obtained from a urlpath
-				    ;; attribute, then this is
-				    ;; required.  If not, then we're
-				    ;; probably linking to a document
-				    ;; which originated as SGML, but
-				    ;; put in the fragment all the
-				    ;; same, since hlink will remain
-				    ;; in use in the medium term.
-				    (string-append %starlink-document-server%
-						   url "#xref_")
-				    ;(href-to docelem reffrag: #f)
-				    (href-to docelem force-frag: "xref_")
-				    ))))
+	;; Target document exists, and has a document element of type
+	;; `documentsummary'....
+	;;
+	;; There used to be two cases here, depending on whether
+	;; xreftarget was true or not, which in turn depended on whether
+	;; xrefid was true (ie, if we're linking to an element within
+	;; the document, rather than the document as a whole).  Since
+	;; revision 1.21, however, these two paths have been unified, so that
+	;; xreftarget is either the element indicated by xrefid, or the
+	;; document element, making the second of the following
+	;; alternatives redundant.  I worry, however, that there's
+	;; a case I haven't thought of, but it'll always be possible
+	;; to reinstate the alternative case (or rewrite the damn
+	;; thing from scratch).
+	(if (car xrefurl)
+	    (error (car xrefurl)) ; violated policy - complain
+	    (make element gi: "a"
+		  attributes: (list (list "href"
+					  (cdr xrefurl)))
 		  (if linktext
 		      (literal linktext)
-		      (with-mode mk-docxref
-			(process-node-list docelem)))))
+		      (make sequence
+			(with-mode mk-docxref
+			  (process-node-list (document-element
+					      xreftarget)))
+			(if (node-list=? xreftarget
+					 (document-element
+					  xreftarget))
+			    (empty-sosofo) ; nothing more...
+			    (make sequence ; add in a section reference
+			      (literal ": ")
+			      (with-mode section-reference
+				(process-node-list xreftarget))))))))
+	;; Or...
+	;; Something's wrong, either the target document does not
+	;; exist, or else it does but we can't find the document
+	;; element, or else we can but it doesn't have GI
+	;; `documentsummary'.  In either of the latter cases, simply
+	;; produce an error, but in the first case, recover by
+	;; constructing a link by guesswork, based on the public
+	;; ID...
 	(let ((xrefent-pubid (and xrefent
 				  (entity-public-id xrefent))))
 	  (cond
@@ -239,7 +285,9 @@ it produces an <funcname>error</>.
 	   (xrefent-gen-sysid (error (string-append
 				      "DOCXREF: Couldn't parse " xrefent
 				      " (gen-sys-id " xrefent-gen-sysid ")")))
-	   (xrefent-pubid (or ($make-dummy-link$ xrefent-pubid linktext)
+	   ;; Here's the guesswork -- call $make-dummy-link$ to guess
+	   ;; a link based on the public ID.
+	   (xrefent-pubid (or ($make-dummy-link$ xrefent-pubid xrefid linktext)
 			      (error (string-append
 				      "DOCXREF: couldn't make sense of FPI '"
 				      xrefent-pubid "'"))))
