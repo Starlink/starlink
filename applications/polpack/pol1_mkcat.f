@@ -17,10 +17,11 @@
 *     This routine creates a new CAT catalogue. Columns are created for the 
 *     grid coordinates (X and Y), Stokes parameters (I, Q and U), percentage  
 *     polarisation, polarised intensity, and polarisation angle (in
-*     degrees). The angles stored are theta values - i.e. clockwise angle
+*     degrees). The angles stored are theta values - i.e. anti-clockwise angle
 *     from the reference direction to the polarisation vector - but the
 *     ANG column has scale and zero parameters set for it which convert these
-*     theta values into ANG values.
+*     theta values into ANG values (anti-clockwise from X axis to
+*     polarisation vector).
 *
 *     Columns for the standard deviation associated with each (except pixel 
 *     coordinates) are also produced. For circular polarisation, the Q and 
@@ -173,7 +174,7 @@
 *  Polarisation angle (degrees). Set the scale and zero attributes so that
 *  theta values can be stored instead of ang values.
       CALL CAT_CNEWA( CI, 'ANG', ' ', CAT__TYPER, 0, CAT__SCALR, 1, 
-     :                CAT__NULLD, ' ', -1.0D0, DBLE( ANGROT ), 
+     :                CAT__NULLD, ' ', 1.0D0, DBLE( ANGROT ), 
      :                CAT__NOORD, 'Degrees', 'F6.2', .TRUE., 
      :                'Polarisation angle', II, STATUS )
 
