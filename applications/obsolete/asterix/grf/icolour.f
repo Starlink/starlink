@@ -203,7 +203,7 @@
 *    Local variables :
       CHARACTER*80 REC
       CHARACTER*16 TABS(6)/'default.act','greyscale.act','green.act',
-     :                     'bluegreen.act','red.act',rainbow.act'/
+     :                     'bluegreen.act','red.act','rainbow.act'/
       CHARACTER FILE*132
       REAL COLTAB(3,16)
       INTEGER IFD
