@@ -123,7 +123,6 @@ dnl    which correspond to it.
 STAR_MESSGEN(prm_err.msg)
 
 AC_CONFIG_FILES([Makefile component.xml])
-dnl AC_CONFIG_FILES([Makefile component.xml NUM_CMN NUM_DEF_R NUM_DEF_D])
 AC_CONFIG_HEADERS([config.h])
 
 dnl    This is the bit that does the actual work
