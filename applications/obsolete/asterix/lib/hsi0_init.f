@@ -94,6 +94,7 @@
 
 *  External References:
       EXTERNAL			HSI1_COPY
+      EXTERNAL			HSI1_NEW
 
       EXTERNAL			ADI_DEFMTH
       EXTERNAL			ADI_REQPKG
@@ -113,6 +114,10 @@
 
 *    Define history copiers
         CALL ADI_DEFMTH( 'CopyHistory(HDSfile,HDSfile)', HSI1_COPY,
+     :                   DID, STATUS )
+
+*    Creators of new history
+        CALL ADI_DEFMTH( 'NewHistory(HDSfile)', HSI1_NEW,
      :                   DID, STATUS )
 
 *    Now initialised

@@ -14,7 +14,7 @@
 
 *  Description:
 *     Create new history structure in dataset, deleting existing one if
-*     present. Just invokes HDS version at present.
+*     present.
 
 *  Arguments:
 *     IFID = INTEGER (given)
@@ -54,17 +54,11 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
-*     package:hsi, usage:public
+*     package:hsi, usage:public, history, creation
 
 *  Copyright:
 *     Copyright (C) University of Birmingham, 1995
@@ -88,7 +82,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
       INTEGER			IFID			! Input dataset
@@ -97,14 +90,14 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	ILOC			! Input dataset
+      INTEGER			OARG			! Unused method return
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
-      CALL HIST_NEW( ILOC, STATUS )
+*  Invoke method
+      CALL ADI_EXEC( 'NewHistory', 1, IFID, OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_NEW', STATUS )

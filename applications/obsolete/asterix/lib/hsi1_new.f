@@ -128,14 +128,14 @@
       OARG = ADI__NULLID
 
 *  Extract locator
-      CALL ADI1_GETLOC( ARGS(1), ILOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
 
 *  History exists?
-      CALL DAT_THERE( ILOC, 'HISTORY', THERE, STATUS )
+      CALL DAT_THERE( LOC, 'HISTORY', THERE, STATUS )
       IF ( THERE ) THEN
 
 *    Delete existing history in output
-        CALL DAT_ERASE( ILOC, 'HISTORY', STATUS )
+        CALL DAT_ERASE( LOC, 'HISTORY', STATUS )
         CALL MSG_PRNT( 'Erasing existing history structure...' )
 
       END IF
