@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: error.C,v 1.7 2001/08/27 10:11:33 abrighto Exp $"
+ * "@(#) $Id: error.C,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $"
  *
  * error.C - error reporting routines
  * 
@@ -14,7 +14,7 @@
  * Allan Brighton  01/04/99  Replaced sys_errlist[] with strerror()
  *                           to get around porting problems
  */
-static const char* const rcsId="@(#) $Id: error.C,v 1.7 2001/08/27 10:11:33 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: error.C,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $";
 
 
 #include <stdarg.h>
@@ -70,7 +70,7 @@ int error(const char* msg1, const char* msg2, int code)
  */
 int sys_error(const char* msg1, const char* msg2)
 {
-    extern int errno;
+    //extern int errno; // should be declared in errno.h, at the top
     char* s = strerror(errno);
     if (s == NULL)
 	return error(msg1, msg2);
