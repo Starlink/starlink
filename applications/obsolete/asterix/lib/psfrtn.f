@@ -2606,10 +2606,21 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         IF ( (IX.LT.1) .OR. (IX.GT.RF_DIMS(3,SLOT)) .OR.
      :       (IY.LT.1) .OR. (IY.GT.RF_DIMS(4,SLOT)) ) THEN
           STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Psf requested is outside bounds '/
-     :         /'defined by response - probably an SPRESP problem',
-     :            STATUS )
-          GOTO 99
+          CALL MSG_SETI( 'XR', IX )
+          CALL MSG_SETI( 'YR', IY )
+          CALL MSG_SETI( 'NX', RF_DIMS(3,SLOT) )
+          CALL MSG_SETI( 'NY', RF_DIMS(4,SLOT) )
+          CALL ERR_REP( ' ', 'Psf requested at response grid '/
+     :                  /'(^XR,^YR) when the bounds are (^NX,^NY). '/
+     :                  /'Will continue but there may an SPRESP '/
+     :                  /'problem', STATUS )
+          CALL ERR_FLUSH( STATUS )
+
+*      Force IX,IY into range
+          IX = MAX(1,IX)
+          IY = MAX(1,IY)
+          IX = MIN(IX,RF_DIMS(3,SLOT))
+          IY = MIN(IY,RF_DIMS(4,SLOT))
 
         END IF
 
