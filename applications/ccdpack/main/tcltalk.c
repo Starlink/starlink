@@ -143,7 +143,7 @@
          sprintf( sifd, "%d", cinterp->downfd[ 0 ] );
          sprintf( sofd, "%d", cinterp->upfd[ 1 ] );
          ccddir = getenv( "CCDPACK_DIR" );
-         if ( 0 && ccddir != NULL ) {
+         if ( ccddir != NULL ) {
             av[ 0 ] = buffer;
             strcpy( buffer, ccddir );
             strcat( buffer, "/ccdwish" );

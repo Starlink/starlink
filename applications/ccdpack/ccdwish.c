@@ -310,7 +310,9 @@
       else {
          *pslash = '\0';
       }
-      setenv( "TCLLIBPATH", buffer, 1 );
+      setenv( "TCLLIBPATH", buffer, 0 );
+      setenv( "ITCL_LIBRARY", buffer, 0 );
+      setenv( "ITK_LIBRARY", buffer, 0 );
 
 /* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
    If we have something which looks like a flag but is not of this form,
