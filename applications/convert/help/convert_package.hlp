@@ -10,11 +10,14 @@
      BDF2NDF   -- Converts a Starlink Interim BDF file to an NDF.
      DIPSO2NDF -- Converts a DIPSO file to an NDF.
      DST2NDF   -- Converts a Figaro (Version 2) DST file to an NDF.
+     GASP2NDF  -- Converts an image in GASP format to an NDF.
+     IRAF2NDF  -- Converts an IRAF image to an NDF.
      NDF2ASCII -- Converts an NDF to an ASCII file.
      NDF2BDF   -- Converts an NDF to a Starlink Interim BDF file.
      NDF2DIPSO -- Converts an NDF to a DIPSO-format file.
      NDF2DST   -- Converts an NDF to a Figaro (Version 2) DST file.
-     NDF2IRAF  -- Converts an NDF to an IRAF (OIF) image.
+     NDF2GASP  -- Converts a two-dimensional NDF into a GASP image.
+     NDF2IRAF  -- Converts an NDF to an IRAF image.
      NDF2UNF   -- Converts an NDF to a sequential unformatted file.
      UNF2NDF   -- Converts a sequential unformatted file to an NDF.
 
