@@ -45,7 +45,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'PSS_PAR'
       INCLUDE 'USER_ERR'
@@ -498,14 +497,9 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
       INCLUDE 'PSS_PAR'
-*
-*    Structure definitions :
-*
-      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -540,23 +534,24 @@
       CHARACTER*80             TITLE                   ! Input image title
       CHARACTER 		RASTR*9, DECSTR*10	! Position formatted
 
-      DOUBLE PRECISION		RA, DEC			! Source position
+      DOUBLE PRECISION		CELPOS(2)	       	! Source position
 
-      REAL                     ELO, EHI                ! Width error interval
-      REAL                     EWID                    ! Error width
-      REAL                     T1, T2                  ! Use to centroid
-      REAL                     TRW(5), TRS(5)          ! Centroid triplet
-      REAL                     TSIG(0:MAXWID)          ! Test significances
-      REAL                     TSTAT(0:MAXWID)         ! Test statistic values
+      REAL			APOS(2)
+      REAL                      ELO, EHI                ! Width error interval
+      REAL                      EWID                    ! Error width
+      REAL                      T1, T2                  ! Use to centroid
+      REAL                      TRW(5), TRS(5)          ! Centroid triplet
+      REAL                      TSIG(0:MAXWID)          ! Test significances
+      REAL                      TSTAT(0:MAXWID)         ! Test statistic values
 
-      INTEGER		       APTR, DPTR, QPTR	       ! Diag o/p data pointers
-      INTEGER                  B                       ! Best width index
-      INTEGER                  EB                      ! Error width index
-      INTEGER                  I                       ! Loop over parameters
-      INTEGER                  K                       ! Convergence loop
+      INTEGER		        APTR, DPTR, QPTR	! Diag o/p data pointers
+      INTEGER                   B                       ! Best width index
+      INTEGER                   EB                      ! Error width index
+      INTEGER                   I                       ! Loop over parameters
+      INTEGER                   K                       ! Convergence loop
       INTEGER			OBOX			! Output src id
-      INTEGER		       SBDA		       ! Diag o/p BDA identifier
-      INTEGER                  TLEN                    ! used length of TEXT
+      INTEGER		       	SID		       	! Diag o/p identifier
+      INTEGER                   TLEN                    ! used length of TEXT
 *
 *    Local data :
 *
@@ -585,41 +580,40 @@
       DC_VOLATILE = .TRUE.
 
 *    Find RA and DEC for title
-      CALL CONV_XY2EQU( S_CP(1,ID), S_CP(2,ID), (AX_DR(1) .LT. 0.0),
-     :                  GE_POINT.CTOS, RA, DEC, STATUS )
-      CALL STR_DRADTOC( RA*DTOR, 'HHhMMmSSs', RASTR, STATUS )
-      CALL STR_DRADTOC( DEC*DTOR, 'SDDhMMmSSs', DECSTR, STATUS )
+      APOS(1) = AXV( 1, S_CP(1,ID) )
+      APOS(2) = AXV( 2, S_CP(2,ID) )
+      CALL WCI_CNA2S( APOS, GE_PIXID, GE_PRJID, CELPOS, STATUS )
+      CALL STR_DRADTOC( CELPOS(1), 'HHhMMmSSs', RASTR, STATUS )
+      CALL STR_DRADTOC( CELPOS(2), 'SDDhMMmSSs', DECSTR, STATUS )
 
 *    Diagnostic mode?
       IF ( DI_SIG_V_CRAD ) THEN
 
 *      Create significance vs. convolution file
-        WRITE( FNAME, '(A,I4.4,A)' ) 'svc_', GE_EXEC_NSRC, '.sdf'
-        CALL HDS_NEW( FNAME, 'BINDS', 'BINDS', 0, 0, SLOC, STATUS )
-        CALL BDA_FIND( SLOC, SBDA, STATUS )
+        WRITE( FNAME, '(A,I4.4,A)' ) 'svc_', GE_EXEC_NSRC, '%hds'
+        CALL ADI_FCREAT( FNAME, 'BinDS', SID, STATUS )
 
 *      Write title containing source position
-        CALL BDA_PUTTITLE_INT( SBDA, 'RA : '//RASTR//', DEC : '/
+        CALL BDI_PUTTITLE( SID, 'RA : '//RASTR//', DEC : '/
      :                         /DECSTR, STATUS )
 
 *      Create data, quality and axis
-        CALL BDA_CREDATA_INT( SBDA, 1, MAXWID+1, STATUS )
-        CALL BDA_CREQUAL_INT( SBDA, 1, MAXWID+1, STATUS )
-        CALL BDA_PUTMASK_INT( SBDA, QUAL_MASK, STATUS )
-        CALL BDA_CREAXES_INT( SBDA, 1, STATUS )
-        CALL BDA_CREAXVAL_INT( SBDA, 1, .FALSE., MAXWID+1, STATUS )
+        CALL BDI_CREDATA( SID, 1, MAXWID+1, STATUS )
+        CALL BDI_CREQUAL( SID, 1, MAXWID+1, STATUS )
+        CALL BDI_PUTMASK( SID, QUAL_MASK, STATUS )
+        CALL BDI_CREAXES( SID, 1, STATUS )
+        CALL BDI_CREAXVAL( SID, 1, .FALSE., MAXWID+1, STATUS )
 
 *      Map the 3 arrays
-        CALL BDA_MAPDATA_INT( SBDA, 'WRITE', DPTR, STATUS )
-        CALL BDA_MAPQUAL_INT( SBDA, 'WRITE', QPTR, STATUS )
-        CALL BDA_MAPAXVAL_INT( SBDA, 'WRITE', 1, APTR, STATUS )
+        CALL BDI_MAPDATA( SID, 'WRITE', DPTR, STATUS )
+        CALL BDI_MAPQUAL( SID, 'WRITE', QPTR, STATUS )
+        CALL BDI_MAPAXVAL( SID, 'WRITE', 1, APTR, STATUS )
 
 *      Axis attributes
-        CALL BDA_PUTAXLABEL_INT( SBDA, 1, 'Gaussian convolution',
-     :                           STATUS )
-        CALL BDA_PUTAXUNITS_INT( SBDA, 1, 'arcmin', STATUS )
-        CALL BDA_PUTLABEL_INT( SBDA, 'Significance', STATUS )
-        CALL BDA_PUTUNITS_INT( SBDA, 'sigma', STATUS )
+        CALL BDI_PUTAXLABEL( SID, 1, 'Gaussian convolution', STATUS )
+        CALL BDI_PUTAXUNITS( SID, 1, 'arcmin', STATUS )
+        CALL BDI_PUTLABEL( SID, 'Significance', STATUS )
+        CALL BDI_PUTUNITS( SID, 'sigma', STATUS )
 
       END IF
 
@@ -647,8 +641,8 @@
 
 *    Close diagnostic file
       IF ( DI_SIG_V_CRAD ) THEN
-        CALL BDA_RELEASE_INT( SBDA, STATUS )
-        CALL HDS_CLOSE( SLOC, STATUS )
+        CALL BDI_RELEASE( SID, STATUS )
+        CALL ADI_FCLOSE( SID, STATUS )
       END IF
 
 *    Identify the best width
@@ -1007,7 +1001,7 @@
       END IF
 
 *    Dataset block
-      FIT.DS.DLOC = IM_LOC
+      FIT.DS.D_ID = IM_ID
 
 *    Set up flux parameter
       PARAM(P__F) = S_FLUX(ID)
@@ -1335,7 +1329,6 @@
 *    Structure definitions :
 *
       INCLUDE 'FIT_STRUC'
-      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -1377,16 +1370,16 @@
 
       CHARACTER*1              	EC                      ! Axis character code
       CHARACTER*30             	FNAME                   ! Filename of grid
-      CHARACTER*(DAT__SZLOC)   	GLOC                    ! Locator to grid file
       CHARACTER*4              	NSTR                    ! Source number
       CHARACTER*5              	PREFIX                  ! File prefix
       CHARACTER*20             	STR                     ! Environment variable
       CHARACTER*40             	LABEL, UNITS            ! Grid axis attrs
       CHARACTER 		RASTR*9, DECSTR*10	! Position formatted
 
-      DOUBLE PRECISION		RA, DEC			! Source position
+      DOUBLE PRECISION		CELPOS(2)		! Source position
       DOUBLE PRECISION         	STATMIN                 ! Best value of statistic
 
+      REAL			APOS(2)
       REAL                     	BASE                    ! Axis base value
       REAL                     	SCALE                   ! Axis scale value
       REAL                     	LB(PSS__FITNPAR)        ! Copies of IN_LB
@@ -1397,7 +1390,7 @@
       INTEGER                  	DPTR                    ! Grid data array
       INTEGER                  	DIM                     ! Size of an axis
       INTEGER                  	FIP                     ! Parameter to freeze
-      INTEGER                  	GBDA                    ! Grid BDA identifier
+      INTEGER			GID			! Grid output identifer
       INTEGER                  	IAX                     ! Loop over grid axes
       INTEGER                  	IP                      ! Axis parameter number
       INTEGER                  	LGPAR                   ! Local copy of GPAR
@@ -1464,16 +1457,16 @@
 
 *    Open file
       WRITE( NSTR, '(I4.4)' ) GE_EXEC_NSRC
-      FNAME = PREFIX(:CHR_LEN(PREFIX))//'_'//GVARS//'_'//NSTR
-      CALL HDS_NEW( FNAME, 'FIT_GRID', 'BINDS', 0, 0, GLOC, STATUS )
+      FNAME = PREFIX(:CHR_LEN(PREFIX))//'_'//GVARS//'_'//NSTR//'%hds'
+      CALL ADI_FCREAT( FNAME, 'BinDS', GID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Find RA and DEC for title
-      CALL CONV_XY2EQU( PARAM(P__X), PARAM(P__Y),
-     :                  (AX_DR(1) .LT. 0.0), GE_POINT.CTOS,
-     :                  RA, DEC, STATUS )
-      CALL STR_DRADTOC( RA*DTOR, 'HHhMMmSSs', RASTR, STATUS )
-      CALL STR_DRADTOC( DEC*DTOR, 'SDDdMMmSSs', DECSTR, STATUS )
+      APOS(1) = AXV( 1, PARAM(P__X) )
+      APOS(2) = AXV( 2, PARAM(P__Y) )
+      CALL WCI_CNA2S( APOS, GE_PIXID, GE_PRJID, CELPOS, STATUS )
+      CALL STR_DRADTOC( CELPOS(1), 'HHhMMmSSs', RASTR, STATUS )
+      CALL STR_DRADTOC( CELPOS(2), 'SDDdMMmSSs', DECSTR, STATUS )
 
 *    Loop over parameters to be frozen
       DO IP = 1, LEN(FPARS)
@@ -1590,49 +1583,48 @@
       END DO
 
 *    Create arrays
-      CALL BDA_FIND( GLOC, GBDA, STATUS )
-      CALL BDA_CREDATA_INT( GBDA, NAX, DIMS, STATUS )
-      CALL BDA_CREQUAL_INT( GBDA, NAX, DIMS, STATUS )
+      CALL BDI_CREDATA( GID, NAX, DIMS, STATUS )
+      CALL BDI_CREQUAL( GID, NAX, DIMS, STATUS )
 
 *    Map arrays
-      CALL BDA_MAPDATA_INT( GBDA, 'WRITE', DPTR, STATUS )
-      CALL BDA_MAPQUAL_INT( GBDA, 'WRITE', QPTR, STATUS )
+      CALL BDI_MAPDATA( GID, 'WRITE', DPTR, STATUS )
+      CALL BDI_MAPQUAL( GID, 'WRITE', QPTR, STATUS )
 
 *    Find product of dimensions
       CALL ARR_SUMDIM( NAX, DIMS, NELM )
 
 *    Create axes
-      CALL FIT_CREGRIDAX( GLOC, NAX, GAX, STATUS )
+      CALL FIT_TCREGRIDAX( GID, NAX, GAX, STATUS )
 
 *    Axis labels
       IF ( FAX .GT. 0 ) THEN
-        CALL BDA_PUTAXLABEL_INT( GBDA, FAX, 'Flux', STATUS )
-        CALL BDA_PUTAXUNITS_INT( GBDA, FAX, IM_UNITS, STATUS )
+        CALL BDI_PUTAXLABEL( GID, FAX, 'Flux', STATUS )
+        CALL BDI_PUTAXUNITS( GID, FAX, IM_UNITS, STATUS )
       END IF
       IF ( XAX .GT. 0 ) THEN
-        CALL BDA_PUTAXVAL_INT( GBDA, XAX, AXV(1,GAX(XAX).BASE),
+        CALL BDI_PUTAXVAL( GID, XAX, AXV(1,GAX(XAX).BASE),
      :           GAX(XAX).SCALE/AX_TOR(1), DIMS(XAX), STATUS )
-        CALL BDA_PUTAXLABEL_INT( GBDA, XAX, AX_LABEL(1), STATUS )
-        CALL BDA_PUTAXLABEL_INT( GBDA, XAX, AX_UNITS(1), STATUS )
+        CALL BDI_PUTAXLABEL( GID, XAX, AX_LABEL(1), STATUS )
+        CALL BDI_PUTAXLABEL( GID, XAX, AX_UNITS(1), STATUS )
       END IF
       IF ( YAX .GT. 0 ) THEN
-        CALL BDA_PUTAXVAL_INT( GBDA, YAX, AXV(2,GAX(YAX).BASE),
+        CALL BDI_PUTAXVAL( GID, YAX, AXV(2,GAX(YAX).BASE),
      :           GAX(YAX).SCALE/AX_TOR(2), DIMS(XAX), STATUS )
-        CALL BDA_PUTAXLABEL_INT( GBDA, YAX, AX_LABEL(2), STATUS )
-        CALL BDA_PUTAXLABEL_INT( GBDA, YAX, AX_UNITS(2), STATUS )
+        CALL BDI_PUTAXLABEL( GID, YAX, AX_LABEL(2), STATUS )
+        CALL BDI_PUTAXLABEL( GID, YAX, AX_UNITS(2), STATUS )
       END IF
       IF ( BAX .GT. 0 ) THEN
-        CALL BDA_PUTAXLABEL_INT( GBDA, BAX,
+        CALL BDI_PUTAXLABEL( GID, BAX,
      :           'Background rescale factor', STATUS )
       END IF
 
 *    Title
-      CALL BDA_PUTTITLE_INT( GBDA, 'RA : '//RASTR//', DEC : '//DECSTR,
+      CALL BDI_PUTTITLE( GID, 'RA : '//RASTR//', DEC : '//DECSTR,
      :                       STATUS )
 
 *    Data labels
-      CALL BDA_PUTLABEL_INT( GBDA, LABEL, STATUS )
-      CALL BDA_PUTUNITS_INT( GBDA, UNITS, STATUS )
+      CALL BDI_PUTLABEL( GID, LABEL, STATUS )
+      CALL BDI_PUTUNITS( GID, UNITS, STATUS )
 
 *    Grid the statistic over the cube
       CALL FIT_GRID( 1, FIT.DS, 0, MODEL, 0, NAX, GAX, 1, LGPAR,
@@ -1641,7 +1633,7 @@
      :               PARAM, STATMIN, DPTR, %VAL(QPTR), GQMASK, STATUS )
 
 *    Write quality mask
-      CALL BDA_PUTMASK_INT( GBDA, GQMASK, STATUS )
+      CALL BDI_PUTMASK( GID, GQMASK, STATUS )
 
 *    Convert to probability if needed
       IF ( GPAR .EQ. -1 ) THEN
@@ -1649,8 +1641,8 @@
       END IF
 
 *    Free the grid object
-      CALL BDA_RELEASE_INT( GBDA, STATUS )
-      CALL HDS_CLOSE( GLOC, STATUS )
+      CALL BDI_RELEASE( GID, STATUS )
+      CALL ADI_FCLOSE( GID, STATUS )
 
 *    Abort point
  99   CONTINUE
