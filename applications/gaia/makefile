@@ -536,7 +536,7 @@ GAIA_FILES = \
  StarDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
  StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
  StarPhotomList.tcl StarPhotomObject.tcl gaia2astrom.tcl gaiaMain.tcl \
- gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl
+ gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
  StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
@@ -582,8 +582,8 @@ TCL_FILES = \
  history.tcl init.tcl ldAout.tcl parray.tcl safe.tcl word.tcl \
  bgerror.tcl dialog.tcl msgbox.tcl scale.tcl button.tcl entry.tcl \
  obsolete.tcl scrlbar.tcl tkfbox.tcl clrpick.tcl focus.tcl \
- optMenu.tcl xmfbox.tcl comdlg.tcl palette.tcl tearoff.tcl
- console.tcl listbox.tcl prolog.ps text.tcl menu.tcl safetk.tcl
+ optMenu.tcl xmfbox.tcl comdlg.tcl palette.tcl tearoff.tcl \
+ console.tcl listbox.tcl prolog.ps text.tcl menu.tcl safetk.tcl \
  tk.tcl \
  bltCanvEps.pro bltHier.tcl bltDnd.tcl bltTabset.tcl \
  itcl.tcl \
@@ -592,7 +592,7 @@ TCL_FILES = \
  buttonbox.itk pane.itk calendar.itk panedwindow.itk \
  canvasprintbox.itk promptdialog.itk canvasprintdialog.itk \
  pushbutton.itk checkbox.itk radiobox.itk colors.itcl \
- regexpfield.itk combobox.itk roman.itcl dateentry.itk
+ regexpfield.itk combobox.itk roman.itcl dateentry.itk \
  scopedobject.itcl datefield.itk scrolledcanvas.itk dialog.itk \
  scrolledframe.itk dialogshell.itk scrolledhtml.itk \
  disjointlistbox.itk scrolledlistbox.itk entryfield.itk \
