@@ -667,7 +667,9 @@
    'static unsigned int'. */
          if ( tokoneof( tbuf + i, TYPEQUALS, 0 ) &&
             ! tokoneof( tbuf + i + 1, TYPEQUALS, TYPES, 0 ) ) {
-            if ( t1 != IDENTIFIER || tokoneof( tbuf + i + 2, AFTERDEC, 0 ) ) {
+            if ( t1 != IDENTIFIER || 
+                 strncmp( tbuf[ i + 1 ].strmat, "F77", 3 ) != 0 && 
+                 tokoneof( tbuf + i + 2, AFTERDEC, 0 ) ) {
 
 /* The token at tbuf[ i ] is the last of a list of known type specifier 
    tokens.  Now work backwards, skipping over type qualifier tokens. */
