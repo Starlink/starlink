@@ -56,7 +56,7 @@
          parameter outdomain {
             type LITERAL
             access READ
-            vpath PROMPT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default CCD_REG
             prompt {Name of registration frame domain}
@@ -97,7 +97,7 @@
          parameter outformat {
             type LITERAL
             access READ
-            vpath PROMPT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default WCS
             prompt {How transformation is written to NDF (WCS,TRANSFORM)}
