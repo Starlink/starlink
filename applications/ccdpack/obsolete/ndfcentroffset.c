@@ -86,6 +86,8 @@
 *        Initial version.
 *     12-MAR-2001 (MBT):
 *        Upgraded for use with Sets.
+*     10-JUL-2001 (MBT):
+*        Changed maximum TOLER argument of CCG1_GEN from 0.5 to 0.05.
 
 *-
 */
@@ -313,7 +315,7 @@
          cscale = max( 1.0, 1.0 / zoom );
          ssize = (int) rint( cscale * 9.0 );
          maxshift = cscale * 5.5;
-         toler = min( 0.5, cscale * 0.5 );
+         toler = min( 0.5, cscale * 0.05 );
          maxit = 5;
 
 /* Loop over each point, attempting to centroid it in both sets. */
