@@ -40,7 +40,7 @@
 *  Examples:
 *     NDF2DIPSO OLD NEW
 *        This converts the NDF file NEW.SDF to the DIPSO file OLD.DAT
-*        file
+*        file.
 *     NDF2DIPSO SPECTRE SPECTRE
 *        This converts the NDF called SPECTRE in file SPECTRE.SDF to
 *        the DIPSO file SPECTRE.DAT.

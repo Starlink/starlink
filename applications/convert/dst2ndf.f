@@ -101,12 +101,12 @@
 *     such an axis array, it processes the array using the following
 *     rules, rather than those given above.
 *
-*            .X.DATA         ->   .AXIS[1].MORE.FIGARO.DATA
-*                                 (AXIS[1].DATA_ARRAY is filled with
+*            .X.DATA         ->   .AXIS(1).MORE.FIGARO.DATA
+*                                 (AXIS(1).DATA_ARRAY is filled with
 *                                 pixel co-ordinates)
-*            .X.ERRORS       ->   .AXIS[1].MORE.FIGARO.VARIANCE (after
+*            .X.ERRORS       ->   .AXIS(1).MORE.FIGARO.VARIANCE (after
 *                                 processing)
-*            .X.WIDTH        ->   .AXIS[1].MORE.FIGARO.WIDTH
+*            .X.WIDTH        ->   .AXIS(1).MORE.FIGARO.WIDTH
 
 *  Bad-pixel handling:
 *     The QUALITY array is only copied if the bad-pixel flag

@@ -25,10 +25,10 @@
 *     the DIPSO `WRITE' command.  The DIPSO TITLE is written to the NDF
 *     TITLE.  DIPSO records bad values by means of breaks in the data
 *     array.  The number and positions of these breaks are stored in
-*     the DIPSO file.  This program inserts bad pixels at these break
-*     positions.  The number of bad pixels inserted is based on the
-*     size of the gap in the wavelength scale.  At least one bad pixel
-*     is inserted at every break point.
+*     the DIPSO file.  This application inserts bad pixels at these
+*     break positions.  The number of bad pixels inserted is based on
+*     the size of the gap in the wavelength scale.  At least one bad
+*     pixel is inserted at every break point.
 
 *  Usage:
 *      DIPSO2NDF IN OUT
@@ -51,7 +51,7 @@
 *  Implementation Status:
 *     -  The output NDF has a primitive data array.
 *     -  The input wavelength and flux data are always of Fortran REAL 
-*     type, the output data arrays are of HDS type '_REAL'.
+*     type, the output data arrays are of HDS type _REAL.
 *     -  The application assumes that the bad-pixel padding will not
 *     cause the number of elements in the data array to exceed twice
 *     the original number.

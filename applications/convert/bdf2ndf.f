@@ -104,7 +104,7 @@
 *     contain incarnations of the same data array stored as a REAL
 *     array, and an INTEGER array.  This rather strange behaviour is a
 *     consequence of the way the INTERIM environment deals with data
-*     access.  For example, if a program attempts to map a BDF data
+*     access.  For example, if a application attempts to map a BDF data
 *     array of INTEGER type as a REAL array, type conversion must take
 *     place.  Instead of doing this in virtual memory, a second
 *     incarnation of the data, this time of type REAL is created and
@@ -125,12 +125,12 @@
 *     -  Activate FIO.
 *     -  Get the name of the input BDF. Get and validate the HDS
 *     type. Convert it to an Interim format code for the input BDF.
-*     -  Create a old-style Starlink 'connection file' for a program
-*     BDF2NDF. Create a RUNSTAR-type command line in another file.
-*     Assign the logical names PROGCON and USERCOM to these files. This
-*     will fool the old-style Starlink Interface Routines into working
-*     correctly.  Map in VM the data array using the old-style routune
-*     RDIMAG.
+*     -  Create a old-style Starlink 'connection file' for an
+*     application BDF2NDF. Create a RUNSTAR-type command line in another
+*     file. Assign the logical names PROGCON and USERCOM to these files.
+*     This will fool the old-style Starlink Interface Routines into
+*     working correctly.  Map in VM the data array using the old-style
+*     routine RDIMAG.
 *     -  Create the output NDF with a primitive NDF and map the main
 *     data array with write access.
 *     -  Copy the BDF's data array to the NDF.
@@ -183,7 +183,7 @@
 *  Bugs:
 *     -  May give spurious error messages if running under ICL.  This
 *     happens if a non-existent BDF is given as the input file.  A
-*     subsequent invocation of the program may result in a repeat of
+*     subsequent invocation of the application may result in a repeat of
 *     the error message although the conversion is carried out
 *     correctly.
 *     {note_new_bugs_here}

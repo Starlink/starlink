@@ -58,16 +58,20 @@
 *     NDF2BDF NEW OLD
 *        This converts the NDF called NEW (in file NEW.SDF) to the
 *        BDF called OLD (in file OLD.BDF).  OLD's data array will have
-*        the same data type as that of NEW.
+*        the same data type as that of NEW.  The FITS header within
+*        NEW is converted to descriptors within OLD.
 *     NDF2BDF NEW OLD DESCRIP
 *        This converts the NDF called NEW (in file NEW.SDF) to the
 *        BDF called OLD (in file OLD.BDF).  OLD's data array will have
 *        the same data type as that of NEW.  The FITS header within
-*        NEW is converted to descriptors within OLD.
+*        NEW is converted to descriptors within OLD, and are reported
+*        to the user.
 *     NDF2BDF HORSE HORSE TYPE=R
 *        This converts the NDF called HORSE (in file HORSE.SDF) to the
 *        BDF also called HORSE (in file HORSE.BDF).  The BDF's data
-*        array will contain 4-byte floating-point numbers.
+*        array will contain 4-byte floating-point numbers.  The FITS
+*        header within HORSE is converted to descriptors within
+*        HORSE.BDF.
 
 *  Notes:
 *     The details of the conversion are as follows:
@@ -86,7 +90,7 @@
 *        first data point is stored in the BDF descriptor CRVAL1,
 *        and the incremental value between successive axis data is 
 *        stored in CDELT1. If there is an axis label is written to
-*        descriptor CRTYPE1. (Similarly AXIS(2) structures etc.)
+*        descriptor CRTYPE1. (Similarly for AXIS(2) structures etc.)
 *        FITS does not have an AXIS units keyword or a standard method
 *        of storing axis widths, so these NDF components will not be
 *        propagated.  Non-linear axis data arrays cannot be represented
