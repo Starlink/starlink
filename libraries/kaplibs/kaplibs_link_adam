@@ -8,6 +8,7 @@
            `grp_link_adam` `trn_link_adam` \
            `prm_link_adam` `mag_link_adam` \
            `psx_link_adam` `pda_link_adam` \
+           -lkapgrf `pgp_link_adam`  \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
