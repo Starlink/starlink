@@ -241,8 +241,8 @@
          CALL MSG_PRNT( '^NDAT data points entered' )
 
 *     User input
-         CALL USI_GET0L('TRUNCATE', TRUNC, STATUS)
-         IF (STATUS .NE. SAI__OK) GOTO 99
+         CALL USI_GET0L( 'TRUNCATE', TRUNC, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
          IF ( TRUNC ) THEN
             CALL TIM_TRUNC( DIMS(1), NTRUNC )
@@ -290,16 +290,16 @@
          CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Frequency', STATUS )
          CALL BDI_PUT0C( OFID, 'Label', 'Power', STATUS )
 
-*      Create output data array
-          CALL BDI_PUT1R( OFID, 'Data', NV, %VAL(NEWPTR), STATUS )
+*     Create output data array
+         CALL BDI_PUT1R( OFID, 'Data', NV, %VAL(DPTR), STATUS )
 
-*      Copy stuff from input
+*     Copy stuff from input
          IF ( ISDS ) THEN
 
 *        The data units
             CALL BDI_GETUNITS( IFID, UNITS, STATUS )
             IF ( UNITS .GT. ' ' ) THEN
-              CALL MSG_SETC( 'UN', DUNITS )
+              CALL MSG_SETC( 'UN', UNITS )
               CALL MSG_MAKE( '(^UN)**2', UNITS, ULEN )
               CALL BDI_PUT0C( OFID, 'Units', UNITS(:ULEN), STATUS )
             END IF
@@ -327,7 +327,7 @@
 *    Add new history record. ! This should contain more info.
         CALL HSI_ADD( OFID, VERSION, STATUS )
 
-      ELSE IF ( NDIM .NE. 1 ) THEN
+      ELSE
         CALL ERR_REP( ' ', 'FATAL ERROR: Data is not one-dimensional',
      :                                                        STATUS )
 
