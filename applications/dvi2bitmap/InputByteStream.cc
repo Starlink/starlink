@@ -16,6 +16,9 @@ using std::sprintf;
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 
+// Static debug switch
+int InputByteStream::verbosity_ = 1;
+
 // Open the requested file.  If preload is true, then open the file and
 // read it entire into memory, since the client will be seeking a lot.
 InputByteStream::InputByteStream (string s, bool preload)
@@ -27,13 +30,13 @@ InputByteStream::InputByteStream (string s, bool preload)
 
     eof_ = false;
 
+    struct stat S;
+    if (fstat (fd_, &S))
+	throw InputByteStreamError ("Can't stat open file");
+    filesize_ = S.st_size;
+
     if (preload)
     {
-	struct stat S;
-	if (fstat (fd_, &S))
-	    throw InputByteStreamError ("Can't stat open file");
-	filesize_ = S.st_size;
-
 	buflen_ = filesize_;
 	buf_ = new Byte[buflen_];
 	int bufcontents = read (fd_, buf_, buflen_);
@@ -43,12 +46,19 @@ InputByteStream::InputByteStream (string s, bool preload)
 
 	close (fd_);
 	fd_ = -1;
+
+	if (verbosity_ > 1)
+	    cerr << "InputByteStream: preloaded " << filesize_ << " bytes\n";
     }
     else
     {
 	buflen_ = 512;
 	buf_ = new Byte[buflen_];
 	eob_ = buf_;	// nothing read in yet - eob at start
+
+	if (verbosity_ > 1)
+	    cerr << "InputByteStream: filesize=" << filesize_
+		 << " buflen=" << buflen_ << '\n';
     }
     p_ = buf_;
 }

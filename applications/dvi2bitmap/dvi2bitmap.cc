@@ -88,18 +88,33 @@ main (int argc, char **argv)
 		magmag = atof (*argv);
 		break;
 	      case 'g':		// debugging...
-		for (++*argv; **argv != '\0'; ++*argv)
-		    switch (**argv)
-		    {
-		      case 'd':	// debug DVI file
-			DviFile::verbosity(2);	break;
-		      case 'p':	// debug PK file
-			PkFont::verbosity(2);	break;
-		      case 'r':	// debug rasterdata parsing
-			PkRasterdata::verbosity(2);	break;
-		      default:
-			Usage();
-		    }
+		{
+		    int debuglevel = 2;
+		    for (++*argv; **argv != '\0'; ++*argv)
+			switch (**argv)
+			{
+			  case 'd': // debug DVI file
+			    DviFile::verbosity(debuglevel);
+			    break;
+			  case 'p': // debug PK file
+			    PkFont::verbosity(debuglevel);
+			    break;
+			  case 'r': // debug rasterdata parsing
+			    PkRasterdata::verbosity(debuglevel);
+			    break;
+			  case 'i': // debug input
+			    InputByteStream::verbosity(debuglevel);
+			    break;
+			  case 'm': // debug main program
+			    verbosity = debuglevel;
+			    break;
+			  case 'g':
+			    debuglevel++;
+			    break;
+			  default:
+			    Usage();
+			}
+		}
 		break;
 	      case 'q':		// run quietly
 		DviFile::verbosity(0);
@@ -245,7 +260,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution)
 	    Bitmap *bitmap;
 
 	    ev = dvif->getEvent();
-	    if (verbosity > 1)
+	    if (verbosity > 2)
 		ev->debug();
 	    if (DviFilePage *page = dynamic_cast<DviFilePage*>(ev))
 		if (page->isStart)
@@ -284,7 +299,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution)
 	    else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
 	    {
 		glyph = curr_font->glyph(sc->charno);
-		if (verbosity > 1)
+		if (verbosity > 2)
 		    cerr << "set glyph " << glyph->w() << 'x' << glyph->h()
 			 << " at position ("
 			 << dvif->currH() << ',' << dvif->currV()
@@ -316,6 +331,9 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution)
 		    && (*l)[1] == "outputfile")
 		{
 		    output_filename = (*l)[2];
+		    if (verbosity > 1)
+			cerr << "special: outputfile="
+			     << output_filename << '\n';
 		}
 		else
 		    if (verbosity > 0)

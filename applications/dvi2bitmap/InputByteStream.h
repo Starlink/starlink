@@ -14,6 +14,8 @@ class InputByteStreamError : public DviError {
 
 class InputByteStream {
  public:
+    InputByteStream (string s, bool preload=false);
+    ~InputByteStream();
     bool eof();
     Byte getByte(int n=1);
     signed int getSIU(int);
@@ -25,8 +27,7 @@ class InputByteStream {
     void seek (unsigned int);
     int pos ();
     void skip (unsigned int);
-    InputByteStream (string s, bool preload=false);
-    ~InputByteStream();
+    static void verbosity (int level) { verbosity_ = level; }
  private:
     int fd_;
     int filesize_;
@@ -37,5 +38,8 @@ class InputByteStream {
     bool eof_;
     const bool preloaded_;
     void read_buf_(void);
+
+    // verbosity_ > 1 is debugginf, verbosity_=0 silent
+    static int verbosity_;
 };
 #endif // #ifndef INPUT_BYTE_STREAM_HEADER_READ
