@@ -207,8 +207,6 @@
 *  External References:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN          ! Get non-blank length of string
-      DOUBLE PRECISION PDA_DSTART
-      EXTERNAL PDA_DSTART       ! Initialise random number generator
       
 *  Local Variables:
       CHARACTER * ( 10 ) TYPE   ! Foreign data type
@@ -266,7 +264,6 @@
       DOUBLE PRECISION ANGLE( CCD1__MXNDF ) ! Orientation of output frames
       DOUBLE PRECISION ANGLR    ! Orientation of current frame in radians
       DOUBLE PRECISION DEGRA    ! Degrees - Radians conversion factor
-      DOUBLE PRECISION DUMMY    ! Dummy variable
       DOUBLE PRECISION ORG( 2 * CCD1__MXNDF ) ! Origin coords for output frames
       DOUBLE PRECISION PI       ! Pi
       DOUBLE PRECISION TR( 6 )  ! Coefficients for linear transformation
@@ -385,7 +382,7 @@
 
 *  Get the random number generator seed and initialise the generator.
       CALL PAR_GET0I( 'SEED', ISEED, STATUS )
-      DUMMY = PDA_DSTART( ISEED )
+      CALL PDA_RNSED( ISEED )
 
 *  Get base names for NDFs.
       CALL PAR_GET0C( 'DATANAME', BASDAT, STATUS )
