@@ -68,7 +68,6 @@
  *    To be done :
  *
  *     token setting not ok on UNIX?
- *     package loading, _reqpkg
  *     dodgy putting kernel objects as data members - can't erase
  *     support C and Fortran array indexing
  *     make sure translation of C & Fortran logical values is done ok
@@ -153,6 +152,8 @@ ADIobj       UT_ALLOC_l;
 ADIobj       UT_ALLOC_c;
 ADIobj       UT_ALLOC_p;
 ADIobj       UT_ALLOC_struc;
+
+ADIobj		ADI_G_grplist = ADI__nullid;
 
 ADIboolean      ADI_G_init = ADI__false;
 ADIboolean      ADI_G_init_failed = ADI__false;
@@ -2472,8 +2473,7 @@ void adix_locprp( ADIobj id, char *pname, int plen, ADIobj *pid,
 
   _chk_han(id); _chk_stat;		/* Has to be a handled object */
 
-  adix_pl_find( &_han_pl(id), pname,
-		plen, ADI__false,
+  adix_pl_find( &_han_pl(id), pname, plen, ADI__false,
 		&vaddr, NULL, status );
 
   if ( vaddr )
@@ -5284,4 +5284,35 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
       }
     }
 
+  }
+
+
+void adix_id_flush( ADIobj id, char *grp, int glen, ADIstatus status )
+  {
+  ADIobj	*lvalue;
+
+  adix_pl_find( &ADI_G_grplist, grp, glen, ADI__false,
+		&lvalue, NULL, status );
+
+  if ( lvalue && _ok(status) ) {
+    }
+  else {
+    adic_setetc( "GRP", grp, glen );
+    adic_setecs( ADI__INVARG, "Invalid identifier group /^ID/", status );
+    }
+  }
+
+void adix_id_link( ADIobj id, char *grp, int glen, ADIstatus status )
+  {
+  ADIobj	*lvalue;
+
+  adix_pl_find( &ADI_G_grplist, grp, glen, ADI__true,
+		&lvalue, NULL, status );
+
+  if ( lvalue && _ok(status) ) {
+    }
+  else {
+    adic_setetc( "GRP", grp, glen );
+    adic_setecs( ADI__INVARG, "Invalid identifier group /^ID/", status );
+    }
   }

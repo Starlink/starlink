@@ -153,6 +153,11 @@
 *      Symbol packages :
 *
 *	adic_reqpkg	- Load a package from the search path
+*
+*      Miscellaneous :
+*
+*	adic_link	- Link an identifier to a name group
+*	adic_flush	- Erase all objects in a name group
 
 *  Authors:
 *     DJA: David J. Allan (JET-X, University of Birmingham)
@@ -1636,6 +1641,33 @@ void adic_reqpkg( char *pkg, ADIstatus status )
   _ERR_OUT;
   }
 
+/* -------------------------------------------------------------------------
+ * Miscellaneous
+ * -------------------------------------------------------------------------
+ */
+
+void adic_flush( char *grp, ADIstatus status )
+  {
+  _chk_init; _chk_stat;
+
+  _ERR_IN("adic_flush");
+
+  adix_id_flush( grp, _CSM, status );
+
+  _ERR_OUT;
+  }
+
+void adic_link( ADIobj id, char *grp, ADIstatus status )
+  {
+  _chk_init; _chk_stat;
+
+  _ERR_IN("adic_link");
+
+  adix_id_link( id, grp, _CSM, status );
+
+  _ERR_OUT;
+  }
+
 
 /* ----------------- unincorporated routines --------------- */
 
@@ -1645,8 +1677,8 @@ void adic_defrcb( ADIobj rid, char *name, ADICB rtn, ADIstatus status )
 
   adix_defrcb( rid, name, _CSM, /* Invoke kernel routine */
 	       adix_neweprc( ADI__true,
-                 (ADICB) rtn, status ),
-               status );
+		 (ADICB) rtn, status ),
+	       status );
   }
 
 void adic_getfile( ADIobj id, ADIobj *fid, ADIstatus status )
