@@ -100,13 +100,17 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*1		FKEY			! FITSIO type code
       CHARACTER*20		TYPE			! Type string
 
       INTEGER			BITPIX			! Bits per pixel
       INTEGER			DIMS(ADI__MXDIM)	! Array dimensions
-       INTEGER			FSTAT			! FITSIO status
+      INTEGER			DPTR			! Ptr to data
+      INTEGER			FSTAT			! FITSIO status
+      INTEGER			I			! Loop over dimensions
       INTEGER			LUN			! Logical unit
       INTEGER			NDIM			! Array dimensionality
+      INTEGER			NELM			! Total # elements
 *.
 
 *  Check inherited global status.
@@ -120,14 +124,19 @@
 *  Select the value of BITPIX depending on type
       IF ( TYPE .EQ. 'INTEGER' ) THEN
         BITPIX = 32
+        FKEY = 'J'
       ELSE IF ( TYPE .EQ. 'WORD' ) THEN
         BITPIX = 16
+        FKEY = 'I'
       ELSE IF ( TYPE .EQ. 'BYTE' ) THEN
         BITPIX = 8
+        FKEY = 'B'
       ELSE IF ( TYPE .EQ. 'REAL' ) THEN
         BITPIX = -32
+        FKEY = 'E'
       ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
         BITPIX = -64
+        FKEY = 'D'
       ELSE
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'TYPE', TYPE )
@@ -143,8 +152,42 @@
       FSTAT = 0
       CALL FTPHPR( LUN, .TRUE., BITPIX, NDIM, DIMS, 0, 1, .TRUE.,
      :             FSTAT )
-      IF ( FSTAT .NE. SAI__OK ) THEN
+      CALL FTRDEF( LUN, STATUS )
+      IF ( FSTAT .NE. 0 ) THEN
         CALL ADI2_FITERP( FSTAT, STATUS )
+      END IF
+
+*  Is data defined?
+      CALL ADI_CTHERE( AID, 'Values', THERE, STATUS )
+      IF ( THERE ) THEN
+
+*    Count total number of elements
+        NELM = 1
+        DO I = 1, NDIM
+          NELM = NELM * DIMS(I)
+        END DO
+
+*    Map with supplied type
+        CALL ADI_CMAP( AID, 'Values', TYPE, 'READ', DPTR, STATUS )
+
+*    Write values
+        IF ( FKEY .EQ. 'J' ) THEN
+          CALL FTPPRJ( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+        ELSE IF ( FKEY .EQ. 'I' ) THEN
+          CALL FTPPRI( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+        ELSE IF ( FKEY .EQ. 'B' ) THEN
+          CALL FTPPRB( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+        ELSE IF ( FKEY .EQ. 'E' ) THEN
+          CALL FTPPRE( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+        ELSE IF ( FKEY .EQ. 'D' ) THEN
+          CALL FTPPRD( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+        ELSE IF ( FKEY .EQ. 'L' ) THEN
+          CALL FTPPRL( LUN, 1, 1, NELEM, %VAL(DPTR), STATUS )
+        END IF
+
+*    Unmap
+        CALL ADI_CUNMAP( AID, 'Values', DPTR, STATUS )
+
       END IF
 
 *  Report any errors
