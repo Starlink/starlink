@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = one_link
+bin_SCRIPTS = one_link one_link_adam
+pkgdata_DATA = one.news
 
 lib_LTLIBRARIES = libone.la
 
@@ -24,4 +25,4 @@ TESTS = one_test
 check_PROGRAMS = one_test
 
 one_test_SOURCES = one_test.f
-one_test_LDADD = libone.la `$(srcdir)/one_link`
+one_test_LDADD = libone.la `$(srcdir)/one_link` `err_link`
