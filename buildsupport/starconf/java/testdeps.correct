@@ -10,13 +10,13 @@ a:
 b:
   c
   path=b \
-  (configdep)
+  (configdep) \
   --
 
 # Component c is a configure dependency, so is configurable in place.
 c:
   path=c \
-  (configdep)
+  (configdep) \
   --
 
 d:
@@ -48,7 +48,7 @@ h:
 # Component i is a configure dependency, so is configurable in place.
 i:
   path=i \
-  (configdep)
+  (configdep) \
   --
 
 Component t: circular build dependencies
@@ -62,7 +62,7 @@ Component z: circular build dependencies
 za:
   zb
   path=za \
-  (buildsupport)
+  (buildsupport) \
   --
 
 zb:
