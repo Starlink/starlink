@@ -93,7 +93,7 @@
             access READ
             vpath PROMPT
             ppath CURRENT DEFAULT
-            prompt {Type of frameset identifier}
+            prompt {Type of frameset identifier (FITSID,INDEX)}
             default INDEX
             helpkey *
           }
@@ -102,9 +102,9 @@
             type _INTEGER
             access READ
             vpath PROMPT
-            ppath DYNAMIC
+            ppath CURRENT DEFAULT
             prompt {List of sequence values for INDEX frameset identifiers}
-            dynamic yes
+            default !
             size *
             helpkey *
           }
@@ -117,6 +117,16 @@
             prompt {FITS header keyword to identify frameset}
             helpkey *
           }
+
+         parameter fitsrot {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {FITS header keyword for additional rotation}
+            default !
+            helpkey *
+         }
 
          parameter logto {
                           # Logging system interaction level
