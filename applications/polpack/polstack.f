@@ -262,7 +262,7 @@
 *  output reference direction.
       CALL POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN,
      :                 BIN, ANGRT, %VAL( IPW1 ), NOUT, %VAL( IPPHI), 
-     :                 LBND, UBND, NDIMO, STATUS )
+     :                 NDIMO, LBND, UBND, STATUS )
 
 *  Abort if no output images will be created.
       IF( NOUT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN 
