@@ -1,54 +1,41 @@
-      SUBROUTINE KAPHELP( STATUS )
+      SUBROUTINE HLPS_ADAM( LIBNAM, STATUS )
 *+
 *  Name:
-*     KAPHELP
+*     HLPS_ADAM
 
 *  Purpose:
-*     Gives help about KAPPA.
+*     Gives help about specified application
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Type of Module:
-*     ADAM A-task
+*     Subroutine
 
 *  Invocation:
-*     CALL KAPHELP( STATUS )
+*     CALL HLPS_ADAM( LIBNAM, STATUS )
 
 *  Arguments:
+*     LIBNAM = CHARACTER (Given)
+*        Name of environment variable to use to obtain the location
+*        of the required help library
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Description:
-*     Displays help about KAPPA.  The help information has classified
-*     and alphabetical lists of commands, general information about
-*     KAPPA and related material; it describes individual commands in
-*     detail.
+*     Displays help from the specified help library and provides a method
+*     to navigate the help system. Intended to be called from an ADAM
+*     task subroutine directly with the name of the library to browse.
+*     Expectation is that the ADAM parameters specified below will
+*     be present in a correspondingly named IFL file. A template
+*     IFL file is available.
 *
-*     Here are some of the main options.
-*        kaphelp
-*           No parameter is given so the introduction and the top-level
-*           help index is displayed.
-*        kaphelp application/topic
-*           This gives help about the specified application or topic.
-*        kaphelp application/topic subtopic
-*           This lists help about a subtopic of the specified
-*           application or topic. The hierarchy of topics has a maximum
-*           of four levels.
-*        kaphelp Hints
-*           This gives hints for new and intermediate users.
-*        kaphelp summary
-*           This shows a one-line summary of each application.
-*        kaphelp classified classification
-*           This lists a one-line summary of each application in the
-*           given functionality classification.
-
 *     See the Section "Navigating the Help Library" for details how to
 *     move around the help information, and to select the topics you
 *     want to view.
 
 *  Usage:
-*     kaphelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
+*     xxxhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
 
 *  ADAM Parameters:
 *     TOPIC = LITERAL (Read)
@@ -69,10 +56,10 @@
 
 *  Navigating the Help Library:
 *     The help information is arranged hierarchically.  You can move
-*     around the help information whenever KAPHELP prompts.  This
+*     around the help information whenever XXXHELP prompts.  This
 *     occurs when it has either presented a screen's worth of text or
 *     has completed displaying the previously requested help.  The
-*     information displayed by KAPHELP on a particular topic includes a
+*     information displayed by XXXHELP on a particular topic includes a
 *     description of the topic and a list of subtopics that further
 *     describe the topic.
 *
@@ -158,7 +145,9 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'PAR_ERR'        ! Parameter-system errors
+
+*  Arguments Give:
+      CHARACTER * (*) LIBNAM   ! Name of help environment variable
 
 *  Status:
       INTEGER STATUS
@@ -170,8 +159,6 @@
 
 
 *  Local Constants:
-      CHARACTER*10 LIBNAM      ! Name of the KAPPA help library
-      PARAMETER ( LIBNAM = 'KAPPA_HELP' )
       INTEGER MAXLEV           ! Maximum number of help levels
       PARAMETER ( MAXLEV = 4 )
 
@@ -227,7 +214,7 @@
          END IF
 
 *  Get help text.
-         CALL GETHLP( LIBRAY, HLPTXT, STATUS )
+         CALL HLPS_GETHLP( LIBRAY, HLPTXT, STATUS )
       END IF
 
       END
