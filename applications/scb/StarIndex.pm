@@ -173,22 +173,76 @@ sub new {
 
    my ($class, $indexfile, $access) = @_;
 
-#  Set up mapping of requested access type to Fcntl type access mode.
+#  Map requested access type to Fcntl type access mode.
 
-   my %fmode = ( 'read'   => O_RDONLY,
-                 'update' => O_RDWR | O_CREAT,
-                 'new'    => O_RDWR | O_CREAT | O_TRUNC,
-               );
+   my $fmode = { 'read'    => O_RDONLY,
+                 'update'  => O_RDWR | O_CREAT,
+                 'new'     => O_RDWR | O_CREAT | O_TRUNC
+                                                       }->{$access};
 
 #  Tie the StarIndex object, which is a hash, to the DBM file.
 
    my %locate;
-   tie %locate, NDBM_File, $indexfile, $fmode{$access}, 0644
-      or error "Failed to open dbm file $indexfile - may be corrupted.\n";
+   unless (tie %locate, NDBM_File, $indexfile, $fmode, 0644) {
 
-#  Return the object blessed into this class.
+#     Set up default error message.
 
-   return bless \%locate, $class;
+      my $error = "Unidentified problem opening DBM file '$indexfile'";
+
+#     Try to determine what went wrong with the tie.
+#     First of all try to work out the actual name of the file(s) - not so
+#     easy, since the name it is given will depend on the implementation
+#     of the DBM library (e.g. it might be called just plain $indexfile, or
+#     "$indexfile.db", or be a pair of files $indexfile.{dir,pag}, or ....
+#     We make a reasonably inclusive assumption about the form of the file 
+#     name(s).
+
+      my @indexfiles = 
+         grep /^$indexfile(\.(db\w*|dir|pag))?$/, glob ("$indexfile*");
+      $indexfile =~ m%(.*)/%;
+      my $indexdir = $1 || '.';
+
+   print join "\n", @indexfiles, $indexdir, "\n";
+
+      if (@indexfiles == 0) {
+
+#        Index file does not already exist.
+
+         if (!($fmode & O_CREAT)) {
+            $error = "DBM file '$indexfile' does not seem to exist";
+         }
+         elsif (!-w $indexdir) {
+            $error = "Directory '$indexdir' is not writeable";
+         }
+      }
+      else {
+
+#        Index file does exist.
+
+         if (grep ((! -f), @indexfiles)) {
+            $error = "DBM file '$indexfile' apparently not regular file"
+         }
+         elsif (grep ((! -r), @indexfiles)) {
+            $error = "DBM file '$indexfile' apparently not readable";
+         }
+         elsif (($fmode & O_RDWR) && grep ((! -w), @indexfiles)) {
+            $error = "DBM file '$indexfile' apparently not writable";
+         }
+         elsif (($fmode & O_RDONLY) && grep ((-z), @indexfiles)) {
+            $error = "DBM file '$indexfile' apparently empty";
+         }
+      }
+
+      error "$error\n";
+   }
+
+   else {
+
+#     All OK - return the object blessed into this class.
+
+      return bless \%locate, $class;
+
+   }
 }
 
 
