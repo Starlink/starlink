@@ -195,6 +195,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.51  1998/04/28 20:41:18  timj
+*     Deal with FITS information for each input file.
+*     Default filename is related to input when only one file is
+*     used.
+*
 *     Revision 1.50  1998/04/28 00:32:07  timj
 *     Add Gaussian convolution function
 *
@@ -422,9 +427,12 @@ c
                                        ! pointer to scratch space holding
                                        ! apparent RA / x offset positions of
                                        ! measured points in input file (radians)
+      CHARACTER*5      CHOP_CRD        ! Chop coordinate frame
+      REAL             CHOP_PA         ! Chop PA in arcsec
+      REAL             CHOP_THROW      ! Chop throw in arcsec
       INTEGER          CHR_STATUS      ! Status for call to CHR_FIWE
       INTEGER          COUNT           ! Number of ints in INTREBIN
-      INTEGER          CURR_FILE       ! Current file in INTREBIN loop
+      INTEGER          CURR_FILE ! Current file in INTREBIN loop
       INTEGER          CURR_INT        ! Current int in INTREBIN loop
       LOGICAL          DESPIKE         ! Is this the despike task
       LOGICAL          DOLOOP          ! Loop for input data
@@ -433,6 +441,8 @@ c
       INTEGER          FILE            ! number of input files read
       CHARACTER*40     FILENAME (MAX_FILE)
                                        ! names of input files read
+      CHARACTER*80     FITS(SCUBA__MAX_FITS, MAX_FILE)
+                                       ! FITS entries for each file
       CHARACTER*(DAT__SZNAM) HDSNAME   ! Name of the container (not the fname)
       INTEGER          HMSF (4)        ! holds converted angle information from
                                        ! SLA routine
@@ -478,6 +488,7 @@ c
       INTEGER          IY              ! Temporary Y integer
       INTEGER          I_CENTRE        ! I index of central pixel in output
                                        ! map
+      LOGICAL          JIGGLE          ! Are we rebinning a JIGGLE map
       INTEGER          J_CENTRE        ! J index of central pixel in output
                                        ! map
       INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left 
@@ -490,18 +501,22 @@ c
                                        ! measured positions are calculated
       INTEGER          NDF_PTR         ! Pointer to mapped NDF array
       INTEGER          NERR            ! For VEC copies
+      REAL             NEWPA           ! New chop pa
+      REAL             NEWTHROW        ! New chop throw
       INTEGER          NFILES          ! Number of files in INTREBIN/REBIN
       INTEGER          NPARS           ! Number of dummy pars
       INTEGER          NSPIKES(MAX_FILE) ! Number of spikes per file
       INTEGER          N_BOL (MAX_FILE)! number of bolometers measured in input
                                        ! files
       INTEGER          N_FILE_LOOPS    ! Number of loops for INTREBIN/REBIN
+      INTEGER          N_FITS(MAX_FILE)! Number of FITS entries per file
       INTEGER          N_INTS(MAX_FILE)! Number of integrations per input file
       INTEGER          N_PIXELS        ! Number of pixels in output map
       INTEGER          N_POS (MAX_FILE)! number of positions measured in input
                                        ! files
       INTEGER          N_PTS (MAX_FILE)! Number of bols * positions
       CHARACTER*40     OBJECT(MAX_FILE)! name of object
+      LOGICAL          OKAY            ! Okay to rebin?
       CHARACTER*(132)  OUT             ! Output file name
       CHARACTER*40     OUT_COORDS      ! coordinate system of output map
       INTEGER          OUT_DATA_END    ! End of output data
@@ -539,8 +554,13 @@ c
                                        ! This is used in NDF_SQMF. Rebinning
                                        ! data should use .true.
       INTEGER          QPTR            ! Pointer to mapped output quality
-      INTEGER          RLEV            ! Recursion depth for reading
+      LOGICAL          RASTER          ! Are we regridding a RASTER obs.
+      LOGICAL          RAS_CHOP_LO     ! Is raster chopping in LO
+      LOGICAL          RAS_CHOP_SC     ! Is raster chopping in SC
+      CHARACTER * (10) REB_SUFFIX_STR(SCUBA__N_SUFFIX) ! Suffix for OUT REBIN
+      INTEGER          RLEV     ! Recursion depth for reading
       REAL             RTEMP           ! Scratch real
+      CHARACTER*10     SAMPLE_MODE     ! Sample mode for maps
       REAL             SFACTOR         ! Smoothing factor for spline PDA_SURFIT
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
@@ -575,7 +595,7 @@ c
 * Local data:
 
       DATA SUFFIX_STRINGS /'!_dsp','d','_dsp'/ ! Used for DESPIKE
-
+      DATA REB_SUFFIX_STR /'!_reb','b','_reb'/ ! Used for REBIN
 
 *-
 
@@ -761,10 +781,10 @@ c
             RLEV = 1 ! Set recursion level
             NPARS = 0 ! No parameters set before entry
 
-            CALL  SURF_RECURSE_READ( RLEV, IN, MAX_FILE,
+            CALL SURF_RECURSE_READ( RLEV, IN, MAX_FILE,
      :           OUT_COORDS, FILE, N_BOL, N_POS, 
      :           N_INTS, IN_UT1, IN_RA_CEN, 
-     :           IN_DEC_CEN, WAVELENGTH, 
+     :           IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :           SUB_INSTRUMENT, OBJECT, UTDATE, 
      :           UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
      :           BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
@@ -774,6 +794,7 @@ c
      :           INT_LIST, BOLWT, WEIGHT, SHIFT_DX, 
      :           SHIFT_DY, NPARS, PARS,
      :           STATUS)
+
 
 *     Check error return
 
@@ -861,6 +882,129 @@ c
          END IF
       END IF
 
+*     Check that the CHOP_PA matches if we are using SCAN/MAP
+*     with LO chopping
+
+      CHOP_THROW = VAL__BADR
+      CHOP_PA  = VAL__BADR
+      CHOP_CRD = ' '
+      OKAY = .FALSE.
+
+*     Nothing to check if we only have one input file
+      IF (FILE .GT. 1) THEN
+
+*     First retrieve the SAMPLE_MODE
+         RASTER = .FALSE.
+         JIGGLE = .FALSE.
+         RAS_CHOP_LO = .FALSE.
+         RAS_CHOP_SC = .FALSE.
+
+         DO I = 1, FILE
+
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(I), 
+     :           FITS(1,I), 'SAM_MODE', SAMPLE_MODE, STATUS)
+            CALL CHR_UCASE (SAMPLE_MODE)
+
+            IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+               RASTER = .TRUE.
+
+*     Find CHOP_COORDS
+               CALL SCULIB_GET_FITS_C (N_FITS, N_FITS(I), FITS(1,I), 
+     :              'CHOP_CRD', CHOP_CRD, STATUS)
+
+               IF (CHOP_CRD .EQ. 'LO') THEN
+                  RAS_CHOP_LO = .TRUE.
+               ELSE IF (CHOP_CRD .EQ. 'SC') THEN
+                  RAS_CHOP_SC = .TRUE.
+               END IF
+
+
+            ELSE IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+               JIGGLE = .TRUE.
+            END IF
+
+         END DO
+
+*     Now compare out flags
+         IF (RASTER .AND. JIGGLE) THEN
+
+            IF (RAS_CHOP_LO) THEN
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL MSG_OUTIF(MSG__QUIET, ' ','^TASK: WARNING! '//
+     :              'You are combining jiggle and dual beam '//
+     :              'scan data.', STATUS)
+
+            END IF
+         
+         ELSE IF (RASTER) THEN
+
+            IF (RAS_CHOP_LO .AND. RAS_CHOP_SC) THEN
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL MSG_OUTIF(MSG__QUIET, ' ','^TASK: WARNING! '//
+     :              'You are combining SCAN/MAP data with different '//
+     :              'chopping techniques (SC and LO).', STATUS)
+               
+            ELSE IF (RAS_CHOP_LO) THEN
+*     If we are using RASTER with only LO chopping we need to check that
+*     the chop configurations are acceptable
+
+               CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(1), FITS(1,1), 
+     :              'CHOP_THR', CHOP_THROW, STATUS)
+               CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(1), FITS(1,1), 
+     :              'CHOP_PA', CHOP_PA, STATUS)
+               OKAY = .TRUE.
+               
+*     Loop over files comparing chop config
+               DO I = 2, FILE
+                  CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(I), FITS(1,I), 
+     :                 'CHOP_THR', NEWTHROW, STATUS)
+                  CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(I), FITS(1,I), 
+     :                 'CHOP_PA', NEWPA, STATUS)
+
+                  IF (NEWPA .NE. CHOP_PA .OR. 
+     :                 NEWTHROW .NE. CHOP_THROW) THEN
+                     OKAY = .FALSE.
+                  END IF
+               END DO
+
+               IF (.NOT.OKAY) THEN
+                  CALL MSG_SETC('TASK', TSKNAME)
+                  CALL MSG_OUTIF(MSG__QUIET, ' ','^TASK: WARNING! '//
+     :                 'You are combining different chop '//
+     :                 'configurations.', STATUS)
+               ELSE
+                  CHOP_CRD = 'RJ' ! Always chop in RJ
+               END IF
+
+            END IF
+
+         END IF
+
+      ELSE
+*     Retrieve chop information from first scan only
+         CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1), 
+     :        FITS(1,1), 'SAM_MODE', SAMPLE_MODE, STATUS)
+         CALL CHR_UCASE (SAMPLE_MODE)
+
+         IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+
+            CALL SCULIB_GET_FITS_C (N_FITS, N_FITS(1), FITS(1,1),
+     :           'CHOP_CRD', CHOP_CRD, STATUS)
+
+            IF (CHOP_CRD .EQ. 'LO') THEN
+
+               CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(1), FITS(1,1), 
+     :              'CHOP_THR', CHOP_THROW, STATUS)
+               CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(1), FITS(1,1), 
+     :              'CHOP_PA', CHOP_PA, STATUS)
+
+               CHOP_CRD = 'RJ' ! Always chop in RJ
+               OKAY = .TRUE.
+
+            END IF
+
+         END IF
+      END IF
 
 *     Nasmyth rebin doesn't need a coordinate frame
 *     Should only get through here if I am trying to rebin NA or AZ
@@ -1199,38 +1343,52 @@ c
 
 *     Now I can set a default output filename for parameter 'OUT'
 *     For now the default is just the first word of the object
-*     name
+*     name if there is more than 1 file. Else, derive from input
+*     name and propogate from input NDF.
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IPOSN = 1
-         CHR_STATUS = SAI__OK
-         CALL CHR_FIWE(SOBJECT, IPOSN, CHR_STATUS)
+
+*     Derive from input name
+         IF (FILE .EQ. 1) THEN
+
+*     Generate a default name for the output file
+            CALL SCULIB_CONSTRUCT_OUT(FILENAME(1), SUFFIX_ENV, 
+     :           SCUBA__N_SUFFIX,
+     :           SUFFIX_OPTIONS, REB_SUFFIX_STR, STEMP, STATUS)
+
+*     Else derive from object name
+         ELSE
+            IPOSN = 1
+            CHR_STATUS = SAI__OK
+            CALL CHR_FIWE(SOBJECT, IPOSN, CHR_STATUS)
 
 *     Good status means two words were found (at least)
 *     Bad status means that the end of string was hit before finding
 *     the second word
 
-         IF (CHR_STATUS .EQ. SAI__OK) THEN
-            STEMP = SOBJECT(1:IPOSN)
-         ELSE
-            STEMP = SOBJECT
-            CALL ERR_ANNUL(CHR_STATUS)
-         END IF
+            IF (CHR_STATUS .EQ. SAI__OK) THEN
+               STEMP = SOBJECT(1:IPOSN)
+            ELSE
+               STEMP = SOBJECT
+               CALL ERR_ANNUL(CHR_STATUS)
+            END IF
 
 *     Need to make sure that this default is not just a number
 *     since HDS doesnt create a file in that case
 
-         CALL CHR_CTOR(STEMP, RTEMP, CHR_STATUS)
+            CALL CHR_CTOR(STEMP, RTEMP, CHR_STATUS)
 
 *     Good status implies the wrong answer :-)
 
-         IF (CHR_STATUS .EQ. SAI__OK) THEN
+            IF (CHR_STATUS .EQ. SAI__OK) THEN
 
 *     Prepend a character if the object name is a number
-            CALL CHR_PREFX('i', STEMP, ITEMP)
+               CALL CHR_PREFX('i', STEMP, ITEMP)
 
-         ELSE
-            CALL ERR_ANNUL(CHR_STATUS)
+            ELSE
+               CALL ERR_ANNUL(CHR_STATUS)
+            END IF
+
          END IF
 
       END IF
@@ -1589,7 +1747,9 @@ c
                   CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
      :                 OUT_TITLE, MJD_STANDARD, FILE, FILENAME, 
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
-     :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STATUS )
+     :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, 
+     :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW, 
+     :                 STATUS )
                   
 
 *     Create a REDS extension
