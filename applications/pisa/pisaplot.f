@@ -103,7 +103,7 @@
 *        using the KAPPA facilities should be delayed until all object
 *        classifications have been displayed. The KAPPA palette pen
 *        numbers correspond to PALNUM values (hence the parameter name).
-*        [1]
+*        [3]
 *     PLTITL = CHAR (Read)
 *        The title of the plot, may include PGPLOT escape sequences.
 *        Up to about 40 characters can be accommodated.  This parameter

@@ -1,17 +1,17 @@
-\documentstyle[11pt]{article}
+\documentstyle[twoside,11pt]{article}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun109}
-\newcommand{\stardocnumber}    {109.8}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardocnumber}    {109.9}
 \newcommand{\stardocauthors}   {Peter W. Draper and Nicholas Eaton}
-\newcommand{\stardocdate}      {8th October 1996}
+\newcommand{\stardocdate}      {8 April 1998}
 \newcommand{\stardoctitle}     { {\Huge PISA} \\ [2.5ex]
                       {\huge Position Intensity and Shape Analysis}}
-\newcommand{\stardocversion}   {2.4-0}
+\newcommand{\stardocversion}   {2.4-1}
 \newcommand{\stardocmanual}    {[manual-type]}
 \newcommand{\stardocabstract}  {[Text of abstract]}
 % ? End of document identification
@@ -506,11 +506,11 @@ xxxxx \= xxxxxxxx \= xxxxxxxxxxxxx \= \kill
 
 The SXX, SYY and SXY moments are defined as:
 \begin{center}
-\begin{math}
+\begin{displaymath}
 SXX = \frac{\sum{x^{2}I_{i}}}{\sum{I_{i}}}, \, \,
 SYY = \frac{\sum{y^{2}I_{i}}}{\sum{I_{i}}}, \, \,
 SXY = \frac{\sum{xyI_{i}}}{\sum{I_{i}}}
-\end{math}
+\end{displaymath}
 \end{center}
 Where $x$ and $y$ are offsets from the centre of the object (determined
 by the centroid) and $I_{i}$ is the intensity in a pixel, corrected for
@@ -518,33 +518,33 @@ the background contribution.
 
 The ellipticity is defined by the equation:
 \begin{center}
-\begin{math}
+\begin{displaymath}
 ell = \frac{a-b}{a}
-\end{math}
+\end{displaymath}
 \end{center}
 Where $a$ and $b$ are the semimajor and semiminor axes:
 \begin{center}
-\begin{math}
+\begin{displaymath}
 a^{2} = 2\,(SXX + SYY) +2\,\sqrt{(SXX - SYY)^{2} +4\,SXY^{2}}
-\end{math}
+\end{displaymath}
 \end{center}
 \begin{center}
-\begin{math}
+\begin{displaymath}
 b^{2} = 2\,(SXX + SYY) -2\,\sqrt{(SXX - SYY)^{2} +4\,SXY^{2}}
-\end{math}
+\end{displaymath}
 \end{center}
 Note that these are intensity weighted rms-like distances. If you 
 want to calculate values that go out to say the detection isophote
 then you should use the geometric formulae:
 \begin{center}
-\begin{math}
+\begin{displaymath}
 a = \sqrt{\frac{NPIX}{(\pi\,(1-ELLIPT))}}
-\end{math}
+\end{displaymath}
 \end{center}
 \begin{center}
-\begin{math}
+\begin{displaymath}
 b = a\,(1-ELLIPT)
-\end{math}
+\end{displaymath}
 \end{center}
 
 The results of the areal thresholding analysis are written to the
@@ -552,9 +552,9 @@ file whose name is given by the SIZES parameter.  There are nine
 columns in the output file, the last seven contain the number of pixels
 within the intensity thresholds : -
 \begin{center}
-\begin{math}
-     I_{i} = I_{t} + 2^{(i+2)},\; i=2,8
-\end{math}
+\begin{displaymath}
+ I_{i} = I_{t} + 2^{(i+2)},\; i=2,8
+\end{displaymath}
 \end{center}
 where $I_{t}$ is the threshold intensity and $I_{i}$ is the object
 intensity above the threshold :-
@@ -2027,9 +2027,9 @@ xxxxx\=xxxxxxxx \= xxxxxxxxxxxxx \= \kill
 \end{tabbing}
 
       The SIZES thresholds are determined by the equation. \\
-      \begin{math}
+      \begin{displaymath}
          I_{i} = I_{t} + 2^{(i+2)},\; i=2,8
-      \end{math} \\
+      \end{displaymath} \\
       where $I_{t}$ is the threshold intensity.
 
       }
