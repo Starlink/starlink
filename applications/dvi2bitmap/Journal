@@ -63,3 +63,12 @@ patch to tex-file.c in the kpathsea distribution.
 
 I've given up trying to use automake for the tests in tests/.  Instead
 I'm just using Makefile.in.
+
+
+
+Things to implement
+-------------------
+
+Bitmap line iterators
+Expandable bitmap
+See if it can process dtl's tripvdu.tex

@@ -33,10 +33,12 @@
 #include <string>
 
 #include <stack>
+#include <list>
 #include <map>
 
 #ifdef HAVE_STD_NAMESPACE
 using std::stack;
+using std::list;
 using std::map;
 #endif
 
@@ -65,6 +67,7 @@ public:
     // magmag is a factor by which the file's internal
     // magnification should be increased.
     DviFile (string& s, int resolution, double magmag=1.0);
+    DviFile (const char* s, int resolution, double magmag=1.0);
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
@@ -72,8 +75,13 @@ public:
     /**
      * Sets the verbosity of this module.
      * @param level the required verbosity
+     * @return the previous verbosity level
      */
-    static void verbosity (const verbosities level) { verbosity_ = level; }
+    static verbosities verbosity (const verbosities level) {
+	enum verbosities oldv;
+	verbosity_ = level;
+	return oldv;
+    }
     // currH and currY are current horiz and vert positions in pixel
     // units, including possible drift corrections
     /**
@@ -212,18 +220,76 @@ private:
 #else
     stack<PosState> posStack_;
 #endif
-    map<int,PkFont*> fontMap_;
     static verbosities verbosity_;
 
+ public:
+    /**
+     * Represents the set of fonts in a DVI file
+     */
+    class FontSet {
+    private:
+	FontSet();
+	~FontSet();
+	void add(int fnt_num, PkFont* newfont);
+	PkFont* get(int fnt_num);
+	friend class DviFile;
+	map<int,PkFont*> fontMap_;
+    public:
+	/**
+	 * Tests whether the FontSet is empty
+	 * @return true if the FontSet is empty
+	 */
+	bool empty() const { return fontMap_.empty(); }
+	/**
+	 * Determines the number of fonts in the FontSet
+	 * @return the number of fonts available
+	 */
+	size_t size() const { return fontMap_.size(); }
+	/**
+	 * Represents an iteration over all the fonts in this DVI file
+	 */
+	class const_iterator {
+	public:
+	    const PkFont* operator*() const throw (DviError);
+	    const_iterator& operator++() throw (DviError);
+	    bool operator==(const const_iterator& it) const;
+	    bool operator!=(const const_iterator& it) const;
+	    ~const_iterator();
+	private:
+	    const_iterator();
+	    const_iterator(map<int,PkFont*> m);
+	    list<PkFont*> fontlist_;
+	    friend class DviFile::FontSet;
+	};
+	const_iterator begin() const;
+	const_iterator end() const;
+    private:
+	mutable const_iterator* myIter_;
+    };
+ private:
+    FontSet fontSet_;
+ public:
+    /**
+     * Obtains a representation of the set of fonts contained in this DVI file
+     * @return a pointer to the FontSet for this file
+     */
+    const FontSet* getFontSet() const { return &fontSet_; }
+    // Why can't I have 'FontSet& getFontSet() const { return fontSet_; };'?
+
+#if 0
  public:
     class const_iterator {
     public:
 	const PkFont* operator*() const throw (DviBug);
 	const_iterator& operator++();
+	bool operator==(const const_iterator& it) const;
+	bool operator!=(const const_iterator& it) const;
+#if 0
 	bool operator==(const const_iterator& it) const
 		{ return finished_ == it.finished_; }
 	bool operator!=(const const_iterator& it) const
 		{ return finished_ != it.finished_; }
+#endif
     private:
 	/* These should be implementable more compactly, since we're
 	   just using map's iterator, but there's some visibility
@@ -258,6 +324,7 @@ private:
      */
     const_iterator end() const { return const_iterator(); };
     friend class const_iterator;
+#endif
 };
 
 

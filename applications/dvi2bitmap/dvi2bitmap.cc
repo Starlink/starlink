@@ -758,11 +758,9 @@ int main (int argc, char **argv)
 	no_font_present = true;
 	const PkFont *fallback_font = 0;
 
-// 	for (PkFont *f = dvif->firstFont();
-// 	     f != 0;
-// 	     f = dvif->nextFont())
-	for (DviFile::const_iterator ci = dvif->begin();
-	     ci != dvif->end();
+	const DviFile::FontSet* fontset = dvif->getFontSet();
+	for (DviFile::FontSet::const_iterator ci = fontset->begin();
+	     ci != fontset->end();
 	     ++ci)
 	{
 	    const PkFont *f = *ci;

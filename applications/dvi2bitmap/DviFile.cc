@@ -34,6 +34,7 @@
 
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
+using std::endl;
 #endif
 
 #include "DviFile.h"
@@ -98,6 +99,48 @@ DviFile::DviFile (string& fn, int res, double magmag)
     }
 }
 
+/**
+ * Constructs a new <code>DviFile</code> object.
+ *
+ * <p>Once the DVI file has been opened in this way, its contents can
+ * be processed in an event-based fashion, by repeatedly calling
+ * {@link #getEvent} and handling the returned object.
+ *
+ * @param fn the name of the DVI file
+ * @param res the base DPI to be used for processing the file, in pixels-per-inch
+ * @param magmag the factor by which the DVI file's internal
+ * magnification factor should itself be magnified -- default 1.0
+ */
+DviFile::DviFile (const char* fn, int res, double magmag)
+    : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
+      current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
+      magfactor_(1.0), skipPage_(false),
+      max_drift_(0)
+{
+    PkFont::setResolution(res);
+
+    try
+    {
+	dvif_ = new InputByteStream (fileName_, false, ".dvi");
+	read_postamble();
+	dvif_->seek(0);		// return to beginning
+    }
+    catch (InputByteStreamError& e)
+    {
+	e.print();
+	throw DviError ("DviFile: can't open file");
+    }
+}
+// XXX How do I invoke one constructor from another?  If I do
+// DviFile::DviFile (const char* fn, int res, double magmag)
+// {
+//     string s = fn;
+//     DviFile(s, res, magmag);
+//     cerr << "end of char* constructor: fontSet_.size=" << fontSet_.size() << endl;
+//}
+// ...then the DviFile I construct appears to be a temporary, and things
+// like fontSet_ aren't initialised.
+
 DviFile::~DviFile()
 {
     delete dvif_;
@@ -161,7 +204,7 @@ DviFileEvent *DviFile::getEvent()
 
 	int charno;
 	if (verbosity_ > normal)
-	    cerr << 'O' << static_cast<int>(opcode) << '\n';
+	    cerr << 'O' << static_cast<int>(opcode) << endl;
 	if (opcode <= 127)	// set character
 	{
 	    if (current_font_ == 0)
@@ -173,7 +216,7 @@ DviFileEvent *DviFile::getEvent()
 	else if (opcode >= 171 && opcode <= 234)
 	{
 	    // fnt_num_0 to fnt_num_63
-	    current_font_ = fontMap_[opcode-171];
+	    current_font_ = fontSet_.get(opcode-171);
 	    if (current_font_ == 0)
 		throw DviError ("undefined font requested");
 	    gotEvent = new DviFileFontChange (opcode, current_font_);
@@ -290,7 +333,7 @@ DviFileEvent *DviFile::getEvent()
 			     <<w_<<','<<x_<<','
 			     <<y_<<','<<z_<<','
 			     <<hh_<<','<<vv_
-			     <<'\n';
+			     <<endl;
 		}
 		break;
 	      case 142:		// pop
@@ -324,7 +367,7 @@ DviFileEvent *DviFile::getEvent()
 			     <<w_<<','<<x_<<','
 			     <<y_<<','<<z_<<','
 			     <<hh_<<','<<vv_
-			     <<'\n';
+			     <<endl;
 		}
 		break;
 	      case 143:		// right1
@@ -433,28 +476,28 @@ DviFileEvent *DviFile::getEvent()
 
 	      case 235:		// fnt1
 		i1 = getSIU(1);
-		current_font_ = fontMap_[i1];
+		current_font_ = fontSet_.get(i1);
 		if (current_font_ == 0)
 		    throw DviError ("undefined font %d requested", i1);
 		gotEvent = new DviFileFontChange(opcode, current_font_);
 		break;
 	      case 236:		// fnt2
 		i1 = getSIU(2);
-		current_font_ = fontMap_[i1];
+		current_font_ = fontSet_.get(i1);
 		if (current_font_ == 0)
 		    throw DviError ("undefined font %d requested", i1);
 		gotEvent = new DviFileFontChange(opcode, current_font_);
 		break;
 	      case 237:		// fnt3
 		i1 = getSIU(3);
-		current_font_ = fontMap_[i1];
+		current_font_ = fontSet_.get(i1);
 		if (current_font_ == 0)
 		    throw DviError ("undefined font %d requested", i1);
 		gotEvent = new DviFileFontChange(opcode, current_font_);
 		break;
 	      case 238:		// fnt4
 		i1 = getSIS(4);
-		current_font_ = fontMap_[i1];
+		current_font_ = fontSet_.get(i1);
 		if (current_font_ == 0)
 		    throw DviError ("undefined font %d requested", i1);
 		gotEvent = new DviFileFontChange(opcode, current_font_);
@@ -705,7 +748,7 @@ void DviFile::updateH_ (int hup, int hhup)
 	     << hup << ',' << hhup << ") -> ("
 	     << h_ << ',' << hh_ << ") dist="
 	     << (sdist > 0 ? '+' : '-') << dist
-	     << '\n';
+	     << endl;
 }
 // Similarly, update the vertical position.  vup is in DVI units.
 void DviFile::updateV_ (int vup)
@@ -737,7 +780,7 @@ void DviFile::updateV_ (int vup)
 	     << vup << ") -> ("
 	     << v_ << ',' << vv_ << ',' << y_ << ',' << z_ << ") dist="
 	     << (sdist > 0 ? '+' : '-') << dist
-	     << '\n';
+	     << endl;
 }
 
 void DviFile::read_postamble()
@@ -762,7 +805,7 @@ void DviFile::read_postamble()
     p++;
     unsigned int q = InputByteStream::getUIU(4, p);
     if (verbosity_ > normal)
-	cerr << "Postamble address=" << q << '\n';
+	cerr << "Postamble address=" << q << endl;
 
     dvif_->seek(q);
     if (getByte() != 248)
@@ -793,7 +836,7 @@ void DviFile::read_postamble()
 	     << " u=" << postamble_.u
 	     << " s=" << postamble_.s
 	     << " t=" << postamble_.t
-	     << '\n';
+	     << endl;
 
     // process the following font definitions, building up a map of used fonts
     bool keepreading = true;
@@ -824,88 +867,6 @@ void DviFile::read_postamble()
 	    break;
 	}
     }
-    
-#if 0
-    {
-	int num;
-	unsigned int c, s, d;
-	string fontdir, fontname;
-	Byte opcode = getByte();
-	switch (opcode)
-	{
-	  case 243:		// fnt_def1
-	    num = getSIU(1);
-	    if (fontMap_[num] != 0)
-		throw DviError ("Font %d defined twice", num);
-	    c = getUIU(4);	// checksum (see DVI std, A.4)
-	    s = getUIU(4);	// scale factor, DVI units
-	    d = getUIU(4);	// design size
-	    fontdir = "";	// to be discarded
-	    fontname = "";
-	    for (int a = getSIU(1); a>0; a--)
-		fontdir += static_cast<char>(getByte());
-	    for (int l = getSIU(1); l>0; l--)
-		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
-	    break;
-
-	  case 244:		// fnt_def2
-	    num = getSIU(2);
-	    if (fontMap_[num] != 0)
-		throw DviError ("Font %d defined twice", num);
-	    c = getUIU(4);
-	    s = getUIU(4);
-	    d = getUIU(4);
-	    fontdir = "";
-	    fontname = "";
-	    for (int a = getSIU(1); a>0; a--)
-		fontdir += static_cast<char>(getByte());
-	    for (int l = getSIU(1); l>0; l--)
-		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
-	    break;
-
-	  case 245:		// fnt_def3
-	    num = getSIU(3);
-	    if (fontMap_[num] != 0)
-		throw DviError ("Font %d defined twice", num);
-	    c = getUIU(4);
-	    s = getUIU(4);
-	    d = getUIU(4);
-	    fontdir = "";
-	    fontname = "";
-	    for (int a = getSIU(1); a>0; a--)
-		fontdir += static_cast<char>(getByte());
-	    for (int l = getSIU(1); l>0; l--)
-		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
-	    break;
-
-	  case 246:		// fnt_def4
-	    num = getSIS(4);
-	    if (fontMap_[num] != 0)
-		throw DviError ("Font %d defined twice", num);
-	    c = getUIU(4);
-	    s = getUIU(4);
-	    d = getUIU(4);
-	    fontdir = "";
-	    fontname = "";
-	    for (int a = getSIU(1); a>0; a--)
-		fontdir += static_cast<char>(getByte());
-	    for (int l = getSIU(1); l>0; l--)
-		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
-	    break;
-
-	  case 249:		// post_post
-	    keepreading = false;
-	    break;
-
-	  default:		// error
-	    throw DviError ("unexpected opcode (%d) in postamble", opcode);
-	}
-    }
-#endif
 }
 
 /**
@@ -932,7 +893,7 @@ void DviFile::fnt_def_(unsigned int dvimag, int nbytes)
     else
 	num = getSIU(nbytes);
 
-    if (fontMap_[num] != 0)
+    if (fontSet_.get(num) != 0)
 	throw DviError ("Font %d defined twice", num);
     c = getUIU(4);	// checksum (see DVI std, A.4)
     s = getUIU(4);	// scale factor, DVI units
@@ -943,7 +904,12 @@ void DviFile::fnt_def_(unsigned int dvimag, int nbytes)
 	fontdir += static_cast<char>(getByte());
     for (int l = getSIU(1); l>0; l--)
 	fontname += static_cast<char>(getByte());
-    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
+    fontSet_.add(num, new PkFont(dvimag, c, s, d, fontname));
+    if (verbosity_ > normal)
+	cerr << "fnt_def_: defined font " << fontname
+	     << " size=" << fontSet_.size()
+	     << "==? " << getFontSet()->size()
+	     << endl;
     return;
 }
 
@@ -1004,11 +970,12 @@ void DviFile::process_preamble(DviFilePreamble* p)
 	     << ", px_per_dviu_ = " << px_per_dviu_
 	     << ", mag=" << p->mag
 	     << ", magmag=" << magmag_
-	     << "\nScales: resolution_=" << resolution_
+	     << endl
+	     << "Scales: resolution_=" << resolution_
 	     << " magfactor_=" << magfactor_
 	     << " device_units=" << device_units
 	     << "=>max_drift_=" << max_drift_
-	     << '\n';
+	     << endl;
 }
 
 void DviFile::check_duplicate_font (int ksize)
@@ -1029,7 +996,8 @@ void DviFile::check_duplicate_font (int ksize)
     for (; namelen>0; namelen--)
 	name += getByte();
 
-    PkFont *f = fontMap_[number];
+    //PkFont *f = fontMap_[number];
+    PkFont *f = fontSet_.get(number);
     if (f == 0)
 	throw DviError
 	    ("font %s at mag %g (number %d) declared in body but not in postamble",
@@ -1044,28 +1012,28 @@ void DviFile::check_duplicate_font (int ksize)
 void DviFileEvent::debug ()
 const
 { 
-    cerr << 'E' << static_cast<unsigned int>(opcode_) << '\n';
+    cerr << 'E' << static_cast<unsigned int>(opcode_) << endl;
 }
 void DviFileSetChar::debug ()
 const
 {
     cerr << 'C' << static_cast<unsigned int>(charno_) << "=\'"
-	 << static_cast<char>(charno_) << "\'\n";
+	 << static_cast<char>(charno_) << "\'" << endl;
 }
 void DviFileSetRule::debug()
 const
 {
-    cerr << 'R' << h << 'x' << w << '\n';
+    cerr << 'R' << h << 'x' << w << endl;
 }
 void DviFileFontChange::debug()
 const
 {
-    cerr << 'f' << font->name() << '\n';
+    cerr << 'f' << font->name() << endl;
 }
 void DviFileSpecial::debug()
 const
 {
-    cerr << 'S' << " \'" << specialString << "\'\n";
+    cerr << 'S' << " \'" << specialString << "\'" << endl;
 }
 void DviFilePage::debug()
 const
@@ -1075,16 +1043,16 @@ const
 	cerr << "P+";
 	for (int i=0; i<=9; i++)
 	    cerr << ' ' << count[i];
-	cerr << " : previous " << previous << '\n';
+	cerr << " : previous " << previous << endl;
     }
     else
-	cerr << "P-\n";
+	cerr << "P-" << endl;
 }
 void DviFilePreamble::debug()
 const
 {
-    cerr << '!' << "DVI file: " << num << '/' << den << " : \'" <<
-	comment << "\'\n";
+    cerr << '!' << "DVI file: " << num << '/' << den << " : \'" 
+	 << comment << "\'" << endl;
 }
 
 #if HOMEMADE_POSSTATESTACK
@@ -1118,6 +1086,92 @@ void DviFile::PosStateStack::clear()
 }
 #endif
 
+
+// // Implementation of FontSet
+DviFile::FontSet::FontSet ()
+{
+    // empty
+}
+DviFile::FontSet::~FontSet()
+{
+    if (myIter_ != 0)
+	free(myIter_);
+}
+void DviFile::FontSet::add(int fnt_num, PkFont* newfont)
+{
+    fontMap_[fnt_num] = newfont;
+    if (verbosity_ > normal)
+	cerr << "FontSet: added font " << fnt_num << ", "
+	     << newfont->fontFilename()
+	     << ", now n=" << fontMap_.size()
+	     << endl;
+}
+PkFont* DviFile::FontSet::get(int fnt_num)
+{
+    return fontMap_[fnt_num];
+}
+DviFile::FontSet::const_iterator DviFile::FontSet::begin()
+    const
+{
+    if (myIter_ != 0)
+	free(myIter_);
+    //cerr << "FontSet::begin: fontMap_ size=" << fontMap_.size() << endl;
+    myIter_ = new const_iterator(fontMap_);
+    //cerr << "   ... size=" << fontMap_.size() << endl;
+    return *myIter_;
+}
+DviFile::FontSet::const_iterator DviFile::FontSet::end()
+    const
+{
+    static const_iterator endIterator_;
+    return endIterator_;
+}
+DviFile::FontSet::const_iterator::const_iterator()
+{
+    // empty
+}
+DviFile::FontSet::const_iterator::const_iterator(map<int,PkFont*> m)
+{
+    for (map<int,PkFont*>::const_iterator ci = m.begin();
+	 ci != m.end();
+	 ++ci) {
+	fontlist_.push_back(ci->second);
+    }
+}
+DviFile::FontSet::const_iterator::~const_iterator()
+{
+    // empty
+}
+const PkFont*
+	DviFile::FontSet::const_iterator::operator*() 
+    const
+    throw (DviError)
+{
+    if (fontlist_.size() == 0)
+	throw DviError("Tried to dereference empty iterator");
+    return fontlist_.front();
+}
+DviFile::FontSet::const_iterator&
+	DviFile::FontSet::const_iterator::operator++() 
+    throw (DviError)
+{
+    if (fontlist_.size() == 0)		// empty
+	throw new DviError("Tried to increment empty iterator");
+    fontlist_.pop_front();
+    return *this;
+}
+bool DviFile::FontSet::const_iterator::operator==(const const_iterator& it) 
+    const
+{
+    return fontlist_.size() == it.fontlist_.size();
+}
+bool DviFile::FontSet::const_iterator::operator!=(const const_iterator& it) 
+    const
+{
+    return fontlist_.size() != it.fontlist_.size();
+}
+
+#if 0
 /**
  * Dereferences the iterator.
  * @return pointer to the <code>PkFont</code> currently referenced by
@@ -1144,8 +1198,21 @@ DviFile::const_iterator& DviFile::const_iterator::operator++()
 {
     if (finished_)
 	throw DviBug("DviFile::const_iterator++ : out of bounds");
+    
+    cerr << "operator++" << endl;
     ++mapiter_;
+    cerr << "mapiter++" << endl;
     if (mapiter_ == endmapiter_)
 	finished_ = true;
     return *this;
 }
+
+bool DviFile::const_iterator::operator==(const const_iterator& it) const
+{
+    return finished_ == it.finished_;
+}
+bool DviFile::const_iterator::operator!=(const const_iterator& it) const
+{
+    return finished_ != it.finished_;
+}
+#endif
