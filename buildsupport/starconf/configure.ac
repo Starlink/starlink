@@ -1,7 +1,7 @@
 dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(starconf, 1.0-2, ussc@star.rl.ac.uk)
+AC_INIT(starconf, 1.0-4, ussc@star.rl.ac.uk)
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([starconf.m4.in])
@@ -65,6 +65,9 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PATH_PROG(PERL, perl)
 
+AC_PATH_PROG([JAVAC], [javac], [NOJAVAC])
+AC_ARG_VAR([JAVAC], [Location of java compiler])
+
 PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`]
 AC_SUBST(PACKAGE_VERSIONINT)
 
@@ -73,6 +76,7 @@ dnl   substituted by this command -- since it involves the
 dnl   installation directory variables, it should have them replaced
 dnl   at `make' time, not configure time.  See Makefile.am for details.
 AC_CONFIG_FILES(Makefile starconf.m4 Makefile.starconf bootstrap.installed)
+AC_CONFIG_FILES(java/Makefile)
 AC_CONFIG_FILES(starconf-validate, [chmod +x starconf-validate])
 
 AC_OUTPUT
