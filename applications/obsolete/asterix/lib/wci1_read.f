@@ -194,8 +194,8 @@
      :                SCALE(1), LABEL, UNITS(1), TOR, STATUS )
 
 *  Something not quite right here - rb
-c         CALL PSF_QAXIS( IPSF, Y_AX, DIMS(2), REG(2), PTR(2), BASE(2),
-c    :                SCALE(2), LABEL, UNITS(2), TOR, STATUS )
+          CALL PSF_QAXIS( IPSF, Y_AX, DIMS(2), REG(2), PTR(2), BASE(2),
+     :                SCALE(2), LABEL, UNITS(2), TOR, STATUS )
 
           BASE(1) = BASE(1) / TOR
           SCALE(1) = SCALE(1) / TOR
