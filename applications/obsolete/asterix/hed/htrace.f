@@ -171,9 +171,9 @@
 *
       CHARACTER*40		DSTR		! String for dimensions
       CHARACTER*(DAT__SZNAM)   	NAME		! Object name
-      CHARACTER*132		OUT		! Output buffer
+      CHARACTER*256		OUT		! Output buffer
       CHARACTER*(DAT__SZTYP)   	TYPE		! Object type
-      CHARACTER*132		VSTR		! Value string
+      CHARACTER*256		VSTR		! Value string
 
       DOUBLE PRECISION		VDP
 
@@ -195,7 +195,7 @@
       LOGICAL 			VALID		! Object data is ok?
 
 *  Local Data:
-      CHARACTER*80              BLNK
+      CHARACTER*256             BLNK
       DATA                      BLNK/' '/
 *-
 
