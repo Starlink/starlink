@@ -13,6 +13,7 @@
 ------------------------------------------------------------------------*/
 
 #include   <math.h>                   /* Mathematical definitions       */
+#include   <stdlib.h>
 
 static double  hsq2 = 0.7071067811865475244;    /* constant 0.5*sqrt(2) */
 
