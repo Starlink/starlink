@@ -102,7 +102,8 @@
 
 *  If too few good input images remained when the Stokes vector was
 *  calculated, set the Stokes vector bad.
-         IF( NINT( NOUT( I ) ) < NINT( MNFRAC*REAL( NIN( I ) ) ) ) THEN
+         IF( NINT( NOUT( I ) ) .LT.
+     :       NINT( MNFRAC*REAL( NIN( I ) ) ) ) THEN
             DOUT( I, 1 ) = VAL__BADR
             DOUT( I, 2 ) = VAL__BADR
             DOUT( I, 3 ) = VAL__BADR
