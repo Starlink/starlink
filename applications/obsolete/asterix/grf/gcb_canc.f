@@ -5,8 +5,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -30,7 +28,7 @@
         CALL GCB_CAN_SUB(%val(G_MEMPTR),DISP,SIZ,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_CANC',STATUS)
+          CALL AST_REXIT('GCB_CANC',STATUS)
         ENDIF
 
       ENDIF

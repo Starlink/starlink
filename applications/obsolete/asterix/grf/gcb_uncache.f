@@ -5,8 +5,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -27,7 +25,7 @@
         CALL GCB_LOAD_SUB(%val(PTR),%val(G_MEMPTR),STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_UNCACHE',STATUS)
+          CALL AST_REXIT('GCB_UNCACHE',STATUS)
         ENDIF
 
       ENDIF

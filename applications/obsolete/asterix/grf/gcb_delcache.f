@@ -5,8 +5,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
 *    Import :
@@ -20,8 +18,6 @@
 *    Local variables :
 *-
 
-
       CALL DYN_UNMAP(PTR,STATUS)
-
 
       END

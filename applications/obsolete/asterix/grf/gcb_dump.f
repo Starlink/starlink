@@ -5,8 +5,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -31,7 +29,7 @@
         CALL GCB_DUMP_SUB(%val(G_MEMPTR),NSCAL,NSTRUC,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_DUMP',STATUS)
+          CALL AST_REXIT('GCB_DUMP',STATUS)
         ENDIF
 
       ENDIF
@@ -46,8 +44,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -145,7 +141,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_DUMP_SUB',STATUS)
+          CALL AST_REXIT('GCB_DUMP_SUB',STATUS)
         ENDIF
 
       ENDIF

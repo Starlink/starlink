@@ -5,8 +5,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -38,7 +36,6 @@
 
 *  reset pointer to next available space to start of storage area
         CALL GCB_PUTRELPTR(G_STARTLISTS,G_ENDSTRUC,STATUS)
-
 
       ENDIF
 

@@ -5,8 +5,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -30,7 +28,7 @@
         CALL DYN_MAPB(1,SIZ,PTR,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_CRECACHE',STATUS)
+          CALL AST_REXIT('GCB_CRECACHE',STATUS)
         ENDIF
 
       ENDIF
