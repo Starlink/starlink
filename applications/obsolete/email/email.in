@@ -70,8 +70,8 @@
 #
 
 #  Define directories containing the information files.
-emaildocs=INSTALL_ETC
-admindir=INSTALL_ADMIN
+emaildocs=@staretc@
+admindir=@admindir@
 
 #  Define paths/names of files to be searched.
 places=${emaildocs}/astroplaces.lis
@@ -113,7 +113,7 @@ while :; do
 done
 
 #  Announce version.
-echo 'email address searcher vPKG_VERS'
+echo 'email address searcher v@PACKAGE_VERSION@'
 
 #  Search list of observatories.
 if [ -f ${places} ]; then
