@@ -86,11 +86,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'BDI_CMN'                                 ! BDI common block
-*       BDI_INIT = LOGICAL (given)
-*         BDI class definitions loaded?
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			ID
@@ -103,10 +99,19 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			BDI0_BLK		! Ensures inclusion
+      EXTERNAL			CHR_INSET
+        LOGICAL			CHR_INSET
 
 *  Local Variables:
+      CHARACTER*10		AXORD			! Model axis order
+      CHARACTER*40		LABEL			! Axis label
+
+      INTEGER			DIMS(ADI__MXDIM)	! Dimensions
+      INTEGER			I			! Loop over axes
+      INTEGER			NDIM			! Dimensionality
+
       LOGICAL			FOUND			! Found axis?
+      LOGICAL			THERE			! Axis order string ok?
 *.
 
 *  Check inherited global status.
@@ -119,7 +124,62 @@
 *  Check known code
       IF ( INDEX( 'ETPXY', QCODE ) .GT. 0 ) THEN
 
-*    Loop over axes checking labels
+*    Look for axis order string in data model
+        CALL ADI_THERE( ID, 'AxisOrder', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CGET0C( ID, 'AxisOrder', AXORD, STATUS )
+          IAX = INDEX( AXORD, QCODE )
+          FOUND = (IAX.GT.0)
+
+        ELSE
+
+*      Loop over axes checking labels
+          CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
+          I = 1
+          DO WHILE ( (I.LE.NDIM) .AND. (STATUS.EQ.SAI__OK) .AND.
+     :               .NOT. FOUND )
+            CALL BDI_AXGET0C( ID, I, 'Label', LABEL, STATUS )
+            IF ( (STATUS .EQ. SAI__OK) .AND. (LABEL.GT.' ') ) THEN
+              CALL CHR_UCASE( LABEL )
+               IF ( QCODE .EQ. 'X' ) THEN
+                 IF ( CHR_INSET( 'X_RAW,X_CORR', LABEL ) .OR.
+     :                (LABEL(1:1) .EQ. 'X') .OR.
+     :                (INDEX( LABEL, 'X AXIS' ) .GT. 0) ) THEN
+                   FOUND = .TRUE.
+                 END IF
+
+               ELSE IF ( QCODE .EQ. 'Y' ) THEN
+                 IF ( CHR_INSET( 'Y_RAW,Y_CORR', LABEL ) .OR.
+     :                (LABEL(1:1) .EQ. 'Y') .OR.
+     :                (INDEX( LABEL, 'Y AXIS' ) .GT. 0) ) THEN
+                   FOUND = .TRUE.
+                 END IF
+
+               ELSE IF ( QCODE .EQ. 'T' ) THEN
+                 IF ( CHR_INSET( 'RAW_TIMETAG,TIMETAG', LABEL ) .OR.
+     :                (INDEX( LABEL, 'TIME' ) .GT. 0) ) THEN
+                   FOUND = .TRUE.
+                 END IF
+
+               ELSE IF ( QCODE .EQ. 'E' ) THEN
+                 IF ( CHR_INSET( 'CORR_PHA,PI,PHA,RAW_PHA', LABEL ) .OR.
+     :                (INDEX( LABEL, 'ENERGY' ) .GT. 0) ) THEN
+                   FOUND = .TRUE.
+                 END IF
+
+               ELSE IF ( QCODE .EQ. 'P' ) THEN
+                 FOUND = (INDEX( LABEL, 'PHASE' ) .GT. 0)
+
+               END IF
+            END IF
+
+*        Next axis if not found
+            IF ( .NOT. FOUND ) I = I + 1
+
+          END DO
+          IF ( FOUND ) IAX = I
+
+        END IF
 
 *    Not found?
         IF ( .NOT. FOUND ) THEN
