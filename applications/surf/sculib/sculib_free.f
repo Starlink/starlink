@@ -56,6 +56,9 @@
       REAL    VAL_ITOR                     ! conversion from integer to real
 *    Global variables :
 *    Local Constants :
+      INTEGER BOUNDARY                     ! Number of bytes
+      PARAMETER (BOUNDARY = VAL__NBD)      ! Used for sentinel integers
+
 *    Local variables :
       LOGICAL LOWER                        ! .FALSE. if lower sentinel 
                                            ! has been corrupted
@@ -73,14 +76,14 @@
 *  check sentinel integers, calls to VAL routines are just a way of
 *  accessing the VM
 
-         RTEMP = VAL_ITOR (.FALSE., %val(START_PTR-VAL__NBI), STATUS)
+         RTEMP = VAL_ITOR (.FALSE., %val(START_PTR-BOUNDARY), STATUS)
          LOWER = (INT(RTEMP) .EQ. 37)
          RTEMP = VAL_ITOR (.FALSE., %val(END_PTR+1), STATUS)
          UPPER = (INT(RTEMP) .EQ. 37) 
 
 *  release the memory
 
-         CALL PSX_FREE (START_PTR-VAL__NBI, STATUS)
+         CALL PSX_FREE (START_PTR - BOUNDARY, STATUS)
          START_PTR = 0
          END_PTR = 0
 
