@@ -50,6 +50,10 @@
 //     07-FEB-2000 (PWD):
 //        Added changes to get back writable data components when
 //        needed (for image patching).
+//     10-APR-2000 (PWD):
+//        Changed to use bitpix=8 explicitly when accessing quality
+//        component. Note still assumes variance is same data type as
+//        main array.
 //     {enter_changes_here}
 
 //-
@@ -142,8 +146,14 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
 
          //  NDF we can display something so get the NDF information
          //  we need.
-         gaiaGetInfoMNDF( NDFinfo, 1, &name, &bitpix, &width, &height, 
-                          &inheader, &header_records, &ndfid, &hasv, &hasq ); 
+         gaiaGetInfoMNDF( NDFinfo, 1, &name, &bitpix, &width, &height,
+                          &inheader, &header_records, &ndfid, &hasv, &hasq );
+
+         //  If accessing quality, then the data type is unsigned byte
+         //  not the current bitpix.
+         if ( strncasecmp( "qua", component, 3 ) == 0 ) {
+            bitpix = 8;
+         }
 
          //  Create a Mem object to hold the displayable data.
          int tsize = width * height * ( abs( bitpix ) / 8 );
@@ -188,7 +198,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
 //+
 //  Create a new NDF with a copy of the current data.
 //-
-int NDFIO::write( const char *pathname ) 
+int NDFIO::write( const char *pathname )
 {
    char *error_mess;
    if ( gaiaWriteNDF( pathname, bitpix_, width_, height_, data_.ptr(),
@@ -409,7 +419,13 @@ int NDFIO::makeDisplayable( int index, const char *component )
       void *indata;
       gaiaGetInfoMNDF( NDFinfo_, index, &name, &bitpix, &width,
                        &height, &inheader, &header_records, &ndfid,
-                       &hasv, &hasq ); 
+                       &hasv, &hasq );
+
+      //  If accessing quality, then the data type is unsigned byte
+      //  not the current bitpix.
+      if ( strncasecmp( "qua", component, 3 ) == 0 ) {
+         bitpix = 8;
+      }
 
       //  Create a Mem object to hold the displayable data.
       int tsize = width * height * ( abs( bitpix ) / 8 );
