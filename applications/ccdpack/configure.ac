@@ -6,10 +6,14 @@ STAR_DEFAULTS(per-package-dirs)
 STAR_MONOLITHS
 AC_PROG_FC
 AC_PROG_LIBTOOL
+AC_CHECK_PROG(tclsh)
+AC_CHECK_PROG(wish)
 STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_CHECK_PROGS(atclsh)
 STAR_CHECK_PROGS(hlib)
 STAR_CHECK_PROGS(ifd2star)
+AC_CHECK_LIB(tcl,Tcl_AppInit)
+AC_CHECK_LIB(tk,Tk_Init)
 STAR_DECLARE_DEPENDENCIES([build], 
                           [chr agi ard ast chr fio ndf pgplot prm \
                            psx trn pda ndg tclsys startcl])
