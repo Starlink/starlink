@@ -245,7 +245,7 @@ c$$$      endif
          call msg_seti ('P', p)
          call msg_out (' ', 'Sanity-check failed: '//
      :        'crazy input parameters: nsour=^NSOUR, upix=^UPIX'//
-     :        ', p=^P')
+     :        ', p=^P', status)
          status = sai__error
          goto 999
       endif
