@@ -13,7 +13,6 @@
       PARAMETER (BLANK=' ')
 *    Local variables :
       INTEGER N
-      LOGICAL VALID
       INTEGER ISTAT
 *-
 
