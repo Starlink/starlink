@@ -65,8 +65,8 @@
                       -watchstate viewstate \
                       -zoom $ZOOM \
                       -uselabels $SHOWIND \
-                      -maxpoints $MAXPOS
-      .viewer configure -geometry ${WINX}x${WINY}
+                      -maxpoints $MAXPOS \
+                      -geometry ${WINX}x${WINY}
 
 #  Load the NDF into the widget.
       .viewer loadndf $ndf $MAXCANV

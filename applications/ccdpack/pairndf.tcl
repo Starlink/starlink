@@ -93,9 +93,9 @@
                          -info "%N (%h x %w) Frame: %f" \
                          -watchstate alignstate \
                          -zoom $ZOOM \
-                         -geometry ${WINX}x${WINY} \
                          -uselabels 0 \
-                         -maxpoints $MAXPOS
+                         -maxpoints $MAXPOS \
+                         -geometry ${WINX}x${WINY} \
 
 #  Set the pair selection criterion.
       set choosestate ""
