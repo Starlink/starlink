@@ -4,7 +4,7 @@
 *     PcdMap
 
 *  Purpose:
-*     Apply pincushion/barrel distortion to a 2-dimensional position.
+*     Apply 2-dimensional pincushion/barrel distortion.
 
 *  Constructor Function:
 c     astPcdMap
@@ -17,31 +17,20 @@ f     AST_PCDMAP
 *     or barrel distortion, and is characterized by a single distortion
 *     coefficient.
 *
-*     A PcdMap is specified by giving the distortion coefficient, and the
+*     A PcdMap is specified by giving this distortion coefficient and the
 *     coordinates of the centre of the radial distortion. The forward
 *     transformation of a PcdMap applies the distortion:
 *
-*        RHO = R*( 1 + C*R*R )
+*        RD = R * ( 1 + C * R * R )
 *
 *     where R is the undistorted radial distance from the distortion 
-*     centre specified by attributes PcdCen, RHO is the radial distance 
+*     centre (specified by attribute PcdCen), RD is the radial distance 
 *     from the same centre in the presence of distortion, and C is the 
-*     distortion coefficient given by attribute Disco.
+*     distortion coefficient (given by attribute Disco).
 *
 *     The inverse transformation of a PcdMap removes the distortion
 *     produced by the forward transformation. The expression used to derive 
-*     R from RHO is an approximate inverse of the expression for RHO
-*     given above, obtained from two iterations of Newton's method. The
-*     mismatch between the forward and inverse expressions is negligible
-*     for astrometric applications; to reach 1 milliarcsec at the edge of
-*     the AAT triplet or Schmidt field would require field diameters of 2.4
-*     degrees and 42 degrees respectively.
-*
-c     Note, if a PcdMap is inverted (for instance using astInvert) then
-f     Note, if a PcdMap is inverted (for instance using AST_INVERT) then
-*     the roles of the forward and inverse transformations are reversed;
-*     the forward transformation will remove the distortion, and the
-*     inverse transformation will apply the distortion.
+*     R from RD is an approximate inverse of the expression above.
 
 *  Inheritance:
 *     The PcdMap class inherits from the Mapping class.
@@ -50,8 +39,8 @@ f     Note, if a PcdMap is inverted (for instance using AST_INVERT) then
 *     In addition to those attributes common to all Mappings, every
 *     PcdMap also has the following attributes:
 *
-*     - Disco: Distortion coefficient
-*     - PcdCen(axis): The co-ordinates of the centre of the distortion
+*     - Disco: PcdMap pincushion/barrel distortion coefficient
+*     - PcdCen(axis): Centre coordinates of pincushion/barrel distortion
 
 *  Functions:
 c     The PcdMap class does not define any new functions beyond those
@@ -124,7 +113,7 @@ static void (* parent_setattrib)( AstObject *, const char * );
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstPcdMap *astPcdMapId_( double, double [2], const char *, ... );
+AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -2323,7 +2312,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
 *     Disco
 
 *  Purpose:
-*     PcdMap distortion coefficient. 
+*     PcdMap pincushion/barrel distortion coefficient. 
 
 *  Type:
 *     Public attribute.
@@ -2332,21 +2321,21 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
 *     Double precision.
 
 *  Description:
-*     This attribute holds the PcdMap distortion coefficient used by 
-*     the forward transformation. This coefficient is set when a 
-*     PcdMap is created, but may later be modified. The default value 
-*     is zero, which gives no distortion. For pincushion distortion, 
-*     the supplied value should be positive. For barrel distortion, it 
-*     should be negative.
+*     This attribute specifies the pincushion/barrel distortion coefficient
+*     used by a PcdMap. This coefficient is set when the PcdMap is created,
+*     but may later be modified. If the attribute is cleared, its default
+*     value is zero, which gives no distortion. For pincushion distortion,
+*     the value should be positive. For barrel distortion, it should be
+*     negative.
 *
 *     Note that the forward transformation of a PcdMap applies the 
-*     distortion corresponding to this attribute, and the inverse 
-*     transformation removes this distortion. If a PcdMap is inverted 
-c     (e.g. by using astInvert), then the forward transformation will 
-f     (e.g. by using AST_INVERT), then the forward transformation will 
+*     distortion specified by this attribute and the inverse 
+*     transformation removes this distortion. If the PcdMap is inverted 
+c     (e.g. using astInvert), then the forward transformation will 
+f     (e.g. using AST_INVERT), then the forward transformation will 
 *     remove the distortion and the inverse transformation will apply
-*     the distortion. The distortion itself will still be given by the
-*     same value of Disco.
+*     it. The distortion itself will still be given by the same value of
+*     Disco.
 
 *  Applicability:
 *     PcdMap
@@ -2369,7 +2358,7 @@ astMAKE_TEST(PcdMap,Disco,( this->disco != AST__BAD ))
 *     PcdCen(axis)
 
 *  Purpose:
-*     Co-ordinates of the centre of a pincushion distortion.
+*     Centre coordinates of pincushion/barrel distortion.
 
 *  Type:
 *     Public attribute.
@@ -2378,13 +2367,14 @@ astMAKE_TEST(PcdMap,Disco,( this->disco != AST__BAD ))
 *     Floating point.
 
 *  Description:
-*     This attribute specifies the centre of a pincushion distortion. 
-*     It takes a separate value for each axis of the PcdMap so that, for 
-*     instance, the settings "PcdCen(1)=345.0,PcdCen(2)=-104.4" specifies 
-*     that the pincushion distortion is centred at values of 345.0 and
-*     -104.4 on axes 1 and 2 of the PcdMap. This attribute is set when a 
-*     PcdMap is created, but may later be modified. The default value 
-*     for both axes is zero.
+*     This attribute specifies the centre of the pincushion/barrel
+*     distortion implemented by a PcdMap. It takes a separate value for
+*     each axis of the PcdMap so that, for instance, the settings
+*     "PcdCen(1)=345.0,PcdCen(2)=-104.4" specify that the pincushion
+*     distortion is centred at positions of 345.0 and -104.4 on axes 1 and 2
+*     respectively. This attribute is set when a PcdMap is created, but may
+*     later be modified. If the attribute is cleared, the default value for
+*     both axes is zero.
 
 *  Applicability:
 *     PcdMap
@@ -2392,7 +2382,7 @@ astMAKE_TEST(PcdMap,Disco,( this->disco != AST__BAD ))
 
 *  Notes:
 *     - If no axis is specified, (e.g. "PcdCen" instead of 
-*     "PcdCen(2)"),then a "set" or "clear" operation will affect 
+*     "PcdCen(2)"), then a "set" or "clear" operation will affect 
 *     the attribute value of both axes, while a "get" or "test" 
 *     operation will use just the PcdCen(1) value.
 *att--
@@ -2494,7 +2484,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 astMAKE_ISA(PcdMap,Mapping,check,&class_init)
 astMAKE_CHECK(PcdMap)
 
-AstPcdMap *astPcdMap_( double disco, double pcdcen[2], const char *options, ... ) {
+AstPcdMap *astPcdMap_( double disco, const double pcdcen[2],
+                       const char *options, ... ) {
 /*
 *++
 *  Name:
@@ -2509,7 +2500,8 @@ f     AST_PCDMAP
 
 *  Synopsis:
 c     #include "pcdmap.h"
-c     AstPcdMap *astPcdMap( double disco, double pcdcen[2], const char *options, ... )
+c     AstPcdMap *astPcdMap( double disco, const double pcdcen[2],
+c                           const char *options, ... )
 f     RESULT = AST_PCDMAP( DISCO, PCDCEN, OPTIONS, STATUS )
 
 *  Class Membership:
@@ -2525,31 +2517,31 @@ f     RESULT = AST_PCDMAP( DISCO, PCDCEN, OPTIONS, STATUS )
 *     or barrel distortion, and is characterized by a single distortion
 *     coefficient.
 *
-*     A PcdMap is specified by giving the distortion coefficient, and the
+*     A PcdMap is specified by giving this distortion coefficient and the
 *     coordinates of the centre of the radial distortion. The forward
 *     transformation of a PcdMap applies the distortion:
 *
-*        RHO = R*( 1 + C*R*R )
+*        RD = R * ( 1 + C * R * R )
 *
 *     where R is the undistorted radial distance from the distortion 
-*     centre specified by attributes PcdCen, RHO is the radial distance 
+*     centre (specified by attribute PcdCen), RD is the radial distance 
 *     from the same centre in the presence of distortion, and C is the 
-*     distortion coefficient given by attribute Disco.
+*     distortion coefficient (given by attribute Disco).
 *
 *     The inverse transformation of a PcdMap removes the distortion
 *     produced by the forward transformation. The expression used to derive 
-*     R from RHO is an approximate inverse of the expression for RHO
-*     given above, obtained from two iterations of Newton's method. The
-*     mismatch between the forward and inverse expressions is negligible
-*     for astrometric applications; to reach 1 milliarcsec at the edge of
-*     the AAT triplet or Schmidt field would require field diameters of 2.4
-*     degrees and 42 degrees respectively.
+*     R from RD is an approximate inverse of the expression above, obtained
+*     from two iterations of the Newton-Raphson method. The mismatch between
+*     the forward and inverse expressions is negligible for astrometric
+*     applications (to reach 1 milliarcsec at the edge of the Anglo-Australian
+*     Telescope triplet or a Schmidt field would require field diameters of
+*     2.4 and 42 degrees respectively).
 *
-c     Note, if a PcdMap is inverted (for instance using astInvert) then
-f     Note, if a PcdMap is inverted (for instance using AST_INVERT) then
-*     the roles of the forward and inverse transformations are reversed;
-*     the forward transformation will remove the distortion, and the
-*     inverse transformation will apply the distortion.
+c     If a PcdMap is inverted (e.g. using astInvert) then the roles of the
+f     If a PcdMap is inverted (e.g. using AST_INVERT) then the roles of the
+*     forward and inverse transformations are reversed; the forward
+*     transformation will remove the distortion, and the inverse
+*     transformation will apply it.
 
 *  Parameters:
 c     disco
@@ -2558,8 +2550,10 @@ f     DISCO = DOUBLE PRECISION (Given)
 *        distortion, positive values give pincushion distortion, and 
 *        zero gives no distortion.
 c     pcdcen
-f     PCDCEN[ 2 ] = DOUBLE PRECISION (Given)
-*        The co-ordinates of the centre of the distortion.
+f     PCDCEN( 2 ) = DOUBLE PRECISION (Given)
+c        A 2-element array containing the coordinates of the centre of the
+f        An array containing the coordinates of the centre of the
+*        distortion.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -2625,7 +2619,8 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstPcdMap *astPcdMapId_( double disco, double pcdcen[2], const char *options, ... ) {
+AstPcdMap *astPcdMapId_( double disco, const double pcdcen[2],
+                         const char *options, ... ) {
 /*
 *  Name:
 *     astPcdMapId_
@@ -2638,7 +2633,8 @@ AstPcdMap *astPcdMapId_( double disco, double pcdcen[2], const char *options, ..
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     AstPcdMap *astPcdMapId_( double disco, double pcdcen[2], const char *options, ... ) 
+*     AstPcdMap *astPcdMapId_( double disco, const double pcdcen[2],
+*                              const char *options, ... ) 
 
 *  Class Membership:
 *     PcdMap constructor.
@@ -2696,7 +2692,7 @@ AstPcdMap *astPcdMapId_( double disco, double pcdcen[2], const char *options, ..
 
 AstPcdMap *astInitPcdMap_( void *mem, size_t size, int init,
                            AstPcdMapVtab *vtab, const char *name,
-                           double disco, double pcdcen[2] ){
+                           double disco, const double pcdcen[2] ){
 /*
 *+
 *  Name:
@@ -2712,7 +2708,7 @@ AstPcdMap *astInitPcdMap_( void *mem, size_t size, int init,
 *     #include "pcdmap.h"
 *     AstPcdMap *astInitPcdMap( void *mem, size_t size, int init,
 *                               AstPcdMapVtab *vtab, const char *name,
-*                               double disco, double pcdcen[2] )
+*                               double disco, const double pcdcen[2] )
 
 *  Class Membership:
 *     PcdMap initialiser.

@@ -31,6 +31,7 @@ flutmap.c \
 fmapping.c \
 fmatrixmap.c \
 fobject.c \
+fpcdmap.c \
 fpermmap.c \
 fplot.c \
 frame.c \
@@ -51,6 +52,7 @@ mapping.c \
 matrixmap.c \
 memory.c \
 object.c \
+pcdmap.c \
 permmap.c \
 plot.c \
 pointset.c \
@@ -98,6 +100,7 @@ mapping.h \
 matrixmap.h \
 memory.h \
 object.h \
+pcdmap.h \
 permmap.h \
 plot.h \
 pointset.h \

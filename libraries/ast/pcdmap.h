@@ -42,12 +42,12 @@
 *        transformation removes this distortion. If a PcdMap is inverted 
 *        (e.g. by using astInvert), then the forward transformation will 
 *        remove the distortion and the inverse transformation will apply
-*        the distortion. The distortion itself will still be given by the
-*        same value of Disco.
+*        it. The distortion itself will still be given by the same value of
+*        Disco.
 *     PcdCen(axis)
 *        This attribute specifies the centre of a pincushion distortion. 
 *        It takes a separate value for each axis of the PcdMap so that, for 
-*        instance, the settings "PcdCen(1)=345.0,PcdCen(2)=-104.4" specifies 
+*        instance, the settings "PcdCen(1)=345.0,PcdCen(2)=-104.4" specify
 *        that the pincushion distortion is centred at values of 345.0 and
 *        -104.4 on axes 1 and 2 of the PcdMap. The default for both axes is
 *        zero.
@@ -204,16 +204,16 @@ astPROTO_ISA(PcdMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPcdMap *astPcdMap_( double, double [2], const char *, ... );
+AstPcdMap *astPcdMap_( double, const double [2], const char *, ... );
 #else
-AstPcdMap *astPcdMapId_( double, double [2], const char *, ... );
+AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... );
 #endif
 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
 AstPcdMap *astInitPcdMap_( void *, size_t, int, AstPcdMapVtab *,
-                           const char *, double, double [2] );
+                           const char *, double, const double [2] );
 
 /* Loader. */
 AstPcdMap *astLoadPcdMap_( void *, size_t, int, AstPcdMapVtab *,
