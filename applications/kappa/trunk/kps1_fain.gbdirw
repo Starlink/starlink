@@ -226,11 +226,14 @@
          SIGMA = REAL( SQRT( VARNCE ) )
       END IF
 
-*    Calculate the upper and lower limits between which the
-*    image will be scaled.
+*    Calculate the upper and lower limits between which the image will
+*    be scaled.  These may be constrained by the extreme values for the
+*    data type.
 
-      LOWER = NUM_DTO<T>( MEAN + SIGRNG( 1 ) * SIGMA )
-      UPPER = NUM_DTO<T>( MEAN + SIGRNG( 2 ) * SIGMA )
+      LOWER = NUM_DTO<T>( MAX( MEAN + SIGRNG( 1 ) * SIGMA,
+     :                    NUM_<T>TOD( VAL__MIN<T> ) ) )
+      UPPER = NUM_DTO<T>( MIN( MEAN + SIGRNG( 2 ) * SIGMA,
+     :                    NUM_<T>TOD( VAL__MAX<T> ) ) )
 
 *    Report the scaling limits.
 
