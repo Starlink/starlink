@@ -111,6 +111,9 @@
 *      1 Aug 1995 (DJA):
 *        V2.0-1  Fixed bug in rectangular mode where output units were
 *                not written in radians
+*      3 Oct 1995 (DJA):
+*        V2.0-1  Fixed another bug in rectangular mode, where Y was zero
+*                going into PSF_2D_DATA
 *     {enter_changes_here}
 
 *  Bugs:
@@ -195,7 +198,7 @@
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPRESP Version 2.0-1' )
+        PARAMETER        ( VERSION = 'SPRESP Version 2.0-2' )
 
 *  Local Data:
       DATA EVDS/.FALSE./
