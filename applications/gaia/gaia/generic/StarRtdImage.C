@@ -105,6 +105,9 @@
 //        Added gbandCmd to display image pixels and non-RA/Dec
 //        coordinates, otherwise this is exactly the same as
 //        RtdImage::mbandCmd.
+//     15-JUL-1999 (PWD):
+//        Changed sliceCmd to not flip the line ends when passing
+//        through horizonal and vertical.
 //-
 
 #include <string.h>
@@ -2919,24 +2922,53 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
   //  To do this we reproduce the algorithm of image->getSpectrum.
   int i = 0;
   if (y1 == y0) {
-    // horizontal line
-    int startx = min(x0, x1);
-    int endx = max(x0, x1);
-    for (int x = startx; x <= endx; x++) {
-      xyvalues[i*2] = x;
-      xyvalues[i*2+1] = y0;
-      i++;
+
+    //  Horizontal line (modified to run the direction as supplied).
+    if ( x0 < x1 ) {
+      for (int x = x0; x <= x1; x++) {
+	xyvalues[i*2] = x;
+	xyvalues[i*2+1] = y0;
+	i++;
+      }
+    } else {
+      for (int x = x0; x >= x1; x--) {
+	xyvalues[i*2] = x;
+	xyvalues[i*2+1] = y0;
+	i++;
+      }
+
+      //  The data values are also reversed in this case.
+      int j = numValues - 1;
+      for ( i = 0; i < numValues/2; i++ ) {
+	swap( ivvalues[i*2+1], ivvalues[j*2+1] );
+	j--;
+      }
     }
   } else if (x1 == x0) {
-    // vertical line
-    int starty = min(y0, y1);
-    int endy = max(y0, y1);
-    for (int y = starty; y <= endy; y++) {
-      xyvalues[i*2] = x0;
-      xyvalues[i*2+1] = y;
-      i++;
+
+    //  Vertical line (modified to run the direction as supplied).
+    if ( y0 < y1 ) {
+      for (int y = y0; y <= y1; y++) {
+	xyvalues[i*2] = x0;
+	xyvalues[i*2+1] = y;
+	i++;
+      }
+    } else {
+      for (int y = y0; y >= y1; y--) {
+	xyvalues[i*2] = x0;
+	xyvalues[i*2+1] = y;
+	i++;
+      }
+
+      //  The data values are also reversed in this case.
+      int j = numValues - 1;
+      for ( i = 0; i < numValues/2; i++ ) {
+	swap( ivvalues[i*2+1], ivvalues[j*2+1] );
+	j--;
+      }
     }
   } else {
+
     // sloped line
     // use Bresenham midpoint line scan-conversion algorithm
     // see: Computer Graphics Princ. a. Pract., 2nd Ed., p. 78
@@ -3010,20 +3042,72 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
   //  when a long run of values occur.
   if ( image_->haveBlank() ) {
     double blank = image_->getBlank();
-    double mean = 0.0;
-    int count = 0;
+    //     double mean = 0.0;
+    //     int count = 0;
+    //     for ( i = 0; i < numValues; i++ ) {
+    //       if ( ivvalues[i*2+1] != blank ) {
+    // 	       mean += ivvalues[i*2+1];
+    // 	       count++;
+    //       }
+    //     }
+    //     if ( count != 0 ) {
+    //       mean /= (double) count;
+    //     }
+    //     for ( i = 0; i < numValues; i++ ) {
+    //       if ( ivvalues[i*2+1] == blank ) {
+    // 	       ivvalues[i*2+1] = mean;
+    //       }
+    //     }
+
+    int inblank = 0;
+    int start = 0;
+    double fill = 0.0;
     for ( i = 0; i < numValues; i++ ) {
-      if ( ivvalues[i*2+1] != blank ) {
-	mean += ivvalues[i*2+1];
-	count++;
+      if ( inblank ) { 
+	//  In a region of blanks. If this pixel is blank continue,
+	//  otherwise it is the end of the region and need to fill the 
+	//  blank segment with the mean of the end points.
+	if ( ivvalues[i*2+1] != blank ) {
+	  inblank = 0;
+
+	  //  Trap start of line was blank.
+	  if ( start == -1 ) {
+	    fill = ivvalues[i*2+1];
+            start = 0;
+	  } else {
+	    fill = ( ivvalues[start*2+1] + ivvalues[i*2+1] ) * 0.5;
+	  }
+	  int j;
+	  for ( j = start; j <= i; j++ ) {
+	    ivvalues[j*2+1] = fill;
+	  }
+	}
+      } else if ( ivvalues[i*2+1] == blank ) {
+
+	//  Start of blank region.
+	inblank = 1;
+	start = i - 1;
+
+	//  Trap end of line is only blank.
+	if ( i == numValues - 1 ) {
+	  ivvalues[i*2+1] = ivvalues[(i-1)*2+1] ;
+	}
       }
     }
-    if ( count != 0 ) {
-      mean /= (double) count;
-    }
-    for ( i = 0; i < numValues; i++ ) {
-      if ( ivvalues[i*2+1] == blank ) {
-	ivvalues[i*2+1] = mean;
+    
+    //  If still inblank at end of line use start value, unless this
+    //  is also blank, in which case use 0.
+    if ( inblank ) {
+      if ( start == -1 ) {
+	start = 0;
+      }
+      if ( ivvalues[start*2+1] == blank ) {
+	fill = 0.0;
+      } else {
+	fill = ivvalues[start*2+1] == blank;
+      }
+      for ( i = start; i < numValues; i++ ) {
+	ivvalues[i*2+1] = fill;
       }
     }
   }
@@ -3891,7 +3975,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     return TCL_OK;
   }
 
-  //  Convert input coordinates to canvas coords. Use canvas coords as 
+  //  Convert input coordinates to canvas coords. Use canvas coords as
   //  will plot graphics in these.
   if (convertCoordsStr(0, argv[0], argv[1], NULL, NULL, x0, y0, from_type, to_type) != TCL_OK
       || convertCoordsStr(0, argv[2], argv[3], NULL, NULL, x1, y1, from_type, to_type) != TCL_OK) {
@@ -3946,7 +4030,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
 	|| canvasToImageCoords(ra1, dec1, 0) != TCL_OK ) {
       return TCL_OK;
     }
-    double dist = sqrt(( ra1 - ra0 ) * ( ra1 - ra0 ) + 
+    double dist = sqrt(( ra1 - ra0 ) * ( ra1 - ra0 ) +
 		       ( dec1 - dec0 ) * ( dec1 - dec0 ));
     sprintf( distStr, "%g", dist );
     if (show_angle) {
@@ -3963,7 +4047,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
   double mx = (x0 + x1)/2;
   double my = (y0 + y1)/2;
   int offset = 10;		// offset of labels from lines
-  
+
   char* diag_anchor = "c";	// label anchors
   char* width_anchor = "c";
   char* height_anchor = "c";
