@@ -21,6 +21,8 @@
 #        Generated IFD file from IFL file.
 #     20-JUL-2000 (MBT):
 #        Rewrote to accommodate change from IDI to Tcl GUI.
+#     9-APR-2001 (MBT):
+#        Upgraded for use with Sets.
 #     {enter_changes_here}
 #-
 
@@ -33,18 +35,16 @@
             access READ
             vpath PROMPT
             ppath CURRENT
-            prompt {NDF to associate with positions}
+            prompt {NDFs to be viewed}
             helpkey *
          }
 
          parameter outlist {
                             # Files to use for output position lists
-            position 2
             type LITERAL
             access READ
             vpath PROMPT
-            ppath CURRENT DEFAULT
-            default *.lis
+            ppath CURRENT
             prompt {Output file for positions}
             helpkey *
          }
@@ -53,10 +53,32 @@
                              # Use initial position list?
             type _LOGICAL
             access READ
-            vpath PROMPT CURRENT DEFAULT
+            vpath CURRENT 
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Use initial position list?}
+            helpkey *
+         }
+
+         parameter writelist {
+                              # Write positions at the end?
+            type _LOGICAL
+            access READ
+            vpath CURRENT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Write marked positions to list file?}
+            helpkey *
+         }
+
+         parameter overwrite {
+                              # Overwrite input position list file?
+            type _LOGICAL
+            access READ
+            vpath CURRENT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Use the same position list file for read and write?}
             helpkey *
          }
 
@@ -64,9 +86,9 @@
                           # Get initial position list from extension?
             type _LOGICAL
             access READ
-            vpath PROMPT CURRENT DEFAULT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default FALSE
+            default TRUE
             prompt {Get initial position list from NDF extension?}
             helpkey *
          }
@@ -75,10 +97,31 @@
                            # Location of initial position list
             type LITERAL
             access READ
-            vpath PROMPT CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default !
+            vpath PROMPT
+            ppath CURRENT
             prompt {Input position list}
+            helpkey *
+         }
+
+         parameter useset {
+                           # Use Set header information
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_useset
+            default TRUE
+            prompt "Group images by Set membership?[ccd_global]"
+         }
+
+         parameter verbose {
+                            # Verbosity
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Log all marked positions?}
             helpkey *
          }
 
@@ -174,3 +217,4 @@
           }
 
        }
+# $Id$
