@@ -31,10 +31,6 @@ AC_PROG_RANLIB
 
 dnl   Checks for header files.  I don't actually use these defines within
 dnl   the program, so there doesn't seem much point in testing for them. 
-dnl   I think everything I use is in invoked in the place it's supposed to
-dnl   be according to the C++ standard (with the possible exception of the
-dnl   things in GIFBitmap.cc), so if anything goes wrong here, it's the 
-dnl   compiler's fault, not mine.
 dnl AC_HEADER_STDC
 dnl AC_CHECK_HEADERS(fcntl.h unistd.h)
 dnl AC_CHECK_HEADERS(assert.h)
