@@ -1,9 +1,8 @@
       SUBROUTINE KPS1_SPARB( CFRM, MAP,  DIM1, DIM2, ARRAY, LBND, 
-     :                        ISIZE, RANGE,
-     :                        GAUSS, NXY, POS, LOGF, FD,
-     :                        PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, IDS, 
-     :                        GOTIDS, AXISR, THETA, FWHM, 
-     :                        GAMMA, WIDTH, SIG, STATUS )
+     :                       ISIZE, RANGE, GAUSS, NXY, POS, LOGF, FD,
+     :                       PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, IDS, 
+     :                       GOTIDS, AXISR, THETA, FWHM, GAMMA, WIDTH, 
+     :                       SIG, PX, PY, STATUS )
 *+
 *  Name:
 *     KPS1_SPARB
@@ -17,10 +16,9 @@
 
 *  Invocation:
 *     CALL KPS1_SPARB( CFRM, MAP, DIM1, DIM2, ARRAY, LBND, ISIZE, RANGE,
-*                        GAUSS, NXY, POS, LOGF, FD,
-*                        PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, IDS, 
-*                        GOTIDS, AXISR, THETA, FWHM, GAMMA, 
-*                        WIDTH, SIG, STATUS )
+*                      GAUSS, NXY, POS, LOGF, FD, PNMIN, PAXISR, PORIEN, 
+*                      PFWHM, PGAMMA, IDS, GOTIDS, AXISR, THETA, FWHM, 
+*                      GAMMA, WIDTH, SIG, PX, PY, STATUS )
 
 *  Description:
 *     This routine calls a number of subroutines to find a set of 
@@ -104,6 +102,10 @@
 *     SIG( NXY, 5 ) = REAL (Returned)
 *        Intermediate storage for the widths of the star marginal
 *        profiles.
+*     PX = REAL (Returned)
+*        The X pixel co-ordinate of the first fitted star.
+*     PY = REAL (Returned)
+*        The Y pixel co-ordinate of the first fitted star.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -192,6 +194,8 @@
       REAL GAMMA
       INTEGER WIDTH
       REAL SIG( NXY, 5 )
+      REAL PX
+      REAL PY
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -223,7 +227,6 @@
       CHARACTER UNIT*20          ! Value of Unit attribute
       CHARACTER XVAL*13          ! Formatted axis 1 value
       CHARACTER YVAL*13          ! Formatted axis 2 value
-      DOUBLE PRECISION SEEING    ! FWHM seeing disk
       DOUBLE PRECISION SIGOUT    ! Sigma in Current Frame 
       DOUBLE PRECISION XOUT      ! Current Frame axis 1 centre
       DOUBLE PRECISION YOUT      ! Current Frame axis 2 centre
@@ -251,7 +254,6 @@
       LOGICAL GOTSKY             ! Is the current Frame a SkyFrame?
       LOGICAL SWAP               ! SkyFrame axes swapped?
       REAL AMP                   ! Gaussian amplitude
-      REAL ANGLE                 ! Star orientation in degrees
       REAL ANGOUT                ! Axis orientation in current Frame      
       REAL AXROUT                ! Axis ratio in current Frame      
       REAL BACK                  ! Background level
@@ -275,7 +277,7 @@
 
 *  Determine the mean ellipticity of the star images.
       CALL KPS1_STPAB( DIM1, DIM2, ARRAY, LBND, NXY, ISIZE, POS,
-     :                   SIG0, AXISR, THETA, NGOOD, SIG, STATUS )
+     :                 SIG0, AXISR, THETA, NGOOD, SIG, STATUS )
  
 *  If no stars could be found to determine the ellipticity, abort.
        IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -499,13 +501,21 @@
       ANGOUT = VAL__BADR
       DO I = 1, NXY
          IF ( SIG( I, 5 ) .GT. 1.0E-10 ) THEN
+            PX = REAL( POS( I, 1 ) - 0.5D0 )
+            PY = REAL( POS( I, 2 ) - 0.5D0 )
             CALL KPS1_ELMAP( SWAP, CFRM, POS( I, 1 ) - 0.5D0, 
-     :                       POS( I, 2 ) - 0.5D0,
-     :                       AXISR, 1.0, THETA, MAP, XOUT, YOUT, 
-     :                       AXROUT, SIGOUT, ANGOUT, STATUS )
+     :                       POS( I, 2 ) - 0.5D0, AXISR, SIG0, THETA, 
+     :                       MAP, XOUT, YOUT, AXROUT, SIGOUT, ANGOUT, 
+     :                       STATUS )
+
+            PX = REAL( POS( I, 1 ) - 0.5D0 )
+            PY = REAL( POS( I, 2 ) - 0.5D0 )
+
             GO TO 10
+
          END IF
       END DO
+
  10   CONTINUE
 
 *  Write to log file if required.
@@ -546,7 +556,6 @@
       END IF
 
       CALL MSG_OUT( ' ', '   Mean axis ratio = ^A', STATUS )
-      CALL MSG_BLANK( STATUS )
 
       IF( ANGOUT  .NE. VAL__BADR ) THEN
          CALL MSG_FMTR( 'A', 'G11.4', ANGOUT*57.29578 )
@@ -567,8 +576,6 @@
      :                    STATUS )
          END IF
       END IF
-
-      CALL MSG_BLANK( STATUS )
 
 *  Now write them to the output parameters.
       CALL PAR_PUT0R( PAXISR, AXROUT, STATUS )
@@ -686,7 +693,6 @@
 *  Report results to the user and to the optional log file. These have
 *  only been calculated if FWHM is not undefined.
          IF ( FWHM .NE. VAL__BADR .AND. STATUS .EQ. SAI__OK ) THEN
-            CALL MSG_OUT( 'BLANK', ' ', STATUS )
             WRITE ( BUFFER, '(''   FWHM seeing ='', SS, G11.4, A )' )
      :              FWHM * SCALE, FWHMUN
             CALL MSG_OUT( 'FWHMREP', BUFFER, STATUS )

@@ -16,7 +16,7 @@ FORTRAN_FILES = \
 ctg1_appen.f  ctg1_expan.f  ctg1_match.f  ctg_catas.f   ctg_gtsup.f \
 ctg1_asexp.f  ctg1_fpars.f  ctg1_subst.f  ctg_catcr.f   ctg_ptsup.f \
 ctg1_catch.f  ctg1_gtyps.f  ctg_asso1.f   ctg_crea1.f   ctg_setsz.f \
-ctg1_crexp.f  ctg1_lasto.f  ctg_assoc.f   ctg_creat.f 
+ctg1_crexp.f  ctg1_lasto.f  ctg_assoc.f   ctg_creat.f   ctg1_sort.f
 
 #  C source files 
 C_FILES = \

@@ -385,7 +385,7 @@
       LOGICAL GEO                ! Draw geodesic polygon?
       LOGICAL LABEL              ! Label positions on graphics device?
       LOGICAL QUIET              ! Run quietly?
-
+      LOGICAL PGBUF              ! PG buffering context started?
 *.
 
 *  Check the inherited global status.
@@ -398,6 +398,9 @@
       IPW2 = 0
       IGRP1 = GRP__NOID
       IGRP2 = GRP__NOID
+
+*  Indicate that no PGPLOT buffering context has yet been started.
+      PGBUF = .FALSE.
 
 *  Start a new AST context.
       CALL AST_BEGIN( STATUS )
@@ -502,6 +505,12 @@
             CALL ERR_BEGIN( STATUS )
             CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
             CALL ERR_BEGIN( STATUS )
+         END IF
+
+*  Start a PGPLOT buffering context.
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL PGBBUF
+            PGBUF = .TRUE.
          END IF
 
 *  PGPLOT resets the colour palette when the device is opened. Therefore we
@@ -733,12 +742,15 @@
      :                    GEO, IMARK, CLOSE, LABEL, IGRP2, JUST, 
      :                    %VAL( IPID ), %VAL( IPW3 ), STATUS )
 
+
 *  Free work space used by KPS1_LSHPL.
  998     CONTINUE
          IF( IPW3 .NE. 0 ) CALL PSX_FREE( IPW3, STATUS )
 
-*  Shutdown PGPLOT and the graphics database.
+*  End the PGPLOT buffering context (if started), shutdown PGPLOT and the 
+*  graphics database.
          CALL ERR_BEGIN( STATUS )
+         IF( PGBUF ) CALL PGEBUF 
          CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
          CALL ERR_END( STATUS )
 

@@ -14,9 +14,7 @@
 
 *  Description:
 *     The supplied wild-card template is expanded into a list of file 
-*     names, which are appended to the supplied group. All matching 
-*     files with file type ".sdf" or any of the file type included in 
-*     the environment variable NDF_FORMATS_IN are included. 
+*     names, which are appended to the supplied group. 
 *
 *     The ambiguity between HDS component paths and file types is solved
 *     here by returning only the HDS file in the returned group. For
@@ -30,7 +28,7 @@
 *     same directory/basename but with different file types, then only
 *     the file with the highest priority file type is returned (i.e. 
 *     the .sdf file if available, or the file type which is closest to 
-*     the start of NDF_FORMATS_OUT otherwise).
+*     the start of NDF_FORMATS_IN otherwise).
 
 *  Arguments:
 *     TEMPLT = CHARACTER * ( * ) (Given)

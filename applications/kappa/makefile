@@ -553,7 +553,7 @@ ndg_crep1.f ndg_prop1.f ndg1_sort.f
 F_CTG = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
 ctg1_gtyps.f ctg1_crexp.f ctg1_lasto.f ctg_catas.f ctg_gtsup.f ctg1_subst.f \
-ctg_asso1.f ctg_assoc.f ctg_crea1.f ctg_creat.f 
+ctg_asso1.f ctg_assoc.f ctg_crea1.f ctg_creat.f ctg1_sort.f
 
 F_LPG = lpg_again.f lpg_catcreat.f lpg_prop.f lpg_test.f lpg1_ptpar.f \
 lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f lpg_crep.f \

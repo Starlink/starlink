@@ -1,5 +1,6 @@
       SUBROUTINE FTS1_EDFEX( NKEY, EDITS, NAMES, PSTNS, KOCCUR, POCCUR,
-     :                       VALUES, COMNTS, TYPES, FTSLOC, STATUS )
+     :                       VALUES, COMNTS, TYPES, FTSLOC, THERE,
+     :                       STATUS )
 *+
 *  Name:
 *     FTS1_EDFEX
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL FTS1_EDFEX( NKEY, EDITS, NAMES, PSTNS, KOCCUR, POCCUR,
-*                      VALUES, COMNTS, TYPES, FTSLOC, STATUS )
+*                      VALUES, COMNTS, TYPES, FTSLOC, THERE, STATUS )
 
 *  Description:
 *     This subroutine edits a number of non-reserved keyword cards in
@@ -141,6 +142,8 @@
 *        characters.
 *     FTSLOC = CHARACTER * ( * ) (Given)
 *        The locator to the FITS extension of the NDF.
+*     THERE = LOGICAL (Returned)
+*        Result of final "Exist" operation.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -150,11 +153,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 November 1 (MJC):
 *        Original version based upon FTS1_PTKEY.
+*     22-SEP-1999 (DSB):
+*        Added argument THERE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -180,6 +186,9 @@
       CHARACTER * ( * ) COMNTS( NKEY )
       CHARACTER * ( * ) TYPES( NKEY )
       CHARACTER * ( * ) FTSLOC
+
+*  Arguments Returned:
+      LOGICAL THERE
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -266,8 +275,8 @@
      :                    %VAL( FTSPNT( 1 ) ), %VAL( CPNTR( 1 ) ),
      :                    EDITS, NAMES, PSTNS, KOCCUR, POCCUR, VALUES,
      :                    COMNTS, TYPES, ACTNUM, %VAL( IPNTR1( 1 ) ),
-     :                    %VAL( IPNTR2( 1 ) ), STATUS, %VAL( FITSLN ),
-     :                    %VAL( FITSLN ) )
+     :                    %VAL( IPNTR2( 1 ) ), THERE, STATUS, 
+     :                    %VAL( FITSLN ), %VAL( FITSLN ) )
 
 *  Unmap the FITS array.
       CALL DAT_UNMAP( FTSLOC, STATUS )
@@ -294,7 +303,7 @@
       SUBROUTINE FTS1_EDKEY_C1( OLDSIZ, NKEY, NEWSIZ, CARDS, CWORK,
      :                          EDITS, NAMES, PSTNS, KOCCUR, POCCUR,
      :                          VALUES, COMNTS, TYPES, ACTNUM,
-     :                          IARY1, IARY2, STATUS )
+     :                          IARY1, IARY2, THERE, STATUS )
       
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -320,6 +329,7 @@
 
 *  Arguments Returned:
       CHARACTER * ( * ) CWORK( NEWSIZ )
+      LOGICAL THERE
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -328,6 +338,6 @@
 *  element of the mapped character array.
       CALL FTS1_EDKEY( OLDSIZ, NKEY, NEWSIZ, EDITS, NAMES, PSTNS,
      :                 KOCCUR, POCCUR, VALUES, COMNTS, TYPES, CARDS,
-     :                 ACTNUM, IARY1, IARY2, CWORK, STATUS )
+     :                 ACTNUM, IARY1, IARY2, CWORK, THERE, STATUS )
 
       END

@@ -384,7 +384,7 @@ C_ROUTINES = $(BASIC_C_ROUTINES)
 #  Fortran routines required for both the standalone and ADAM libraries.
 
 BASIC_F_ROUTINES = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
-ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
+ctg1_sort.f ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
 ctg1_gtyps.f ctg1_crexp.f ctg1_lasto.f ctg_catas.f ctg_gtsup.f ctg1_subst.f
 
 #  Additional Fortran routines required for the standalone library.
@@ -1188,6 +1188,7 @@ ctg1_fpars.o:	 SAE_PAR
 ctg1_gtyps.o:	 SAE_PAR
 ctg1_lasto.o:	 SAE_PAR
 ctg1_match.o:	 SAE_PAR GRP_PAR CTG_CONST
+ctg1_sort.o:	 SAE_PAR GRP_PAR PRM_PAR
 ctg1_subst.o:	 SAE_PAR
 ctg_asso1.o:	 SAE_PAR GRP_PAR CAT_PAR
 ctg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR CTG_ERR

@@ -160,7 +160,7 @@
 *        the first supplied value. If these margins are too narrow any axis 
 *        annotation may be clipped. If a null (!) value is supplied, the 
 *        value used is 0.18 (for all edges) if either annotated axes or a 
-*        key are produced, and zero otherwise. [!]
+*        key are produced, and zero otherwise. [current value]
 *     MARKER = _INTEGER (Read)
 *        This parameter is only accessed if parameter MODE is set to
 *        "Chain" or "Mark". It specifies the symbol with which each

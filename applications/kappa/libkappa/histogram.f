@@ -67,7 +67,7 @@
 *        the first supplied value. If these margins are too narrow any axis 
 *        annotation may be clipped. If a null (!) value is supplied, the
 *        value used is 0.18 (for all edges) if either annotated axes or 
-*        a key are produced, and zero otherwise. [!]
+*        a key are produced, and zero otherwise. [current value]
 *     NUMBIN = _INTEGER (Read)
 *        The number of histogram bins to be used. This must lie in the
 *        range 2 to 10000.  The suggested default is the current value.

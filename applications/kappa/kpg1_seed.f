@@ -107,6 +107,4 @@
 *  Return the seed value
       KPG1_SEED = SEED
 
-      write(*,*) seed
-
       END

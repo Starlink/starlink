@@ -88,7 +88,7 @@
 *        the first supplied value. If these margins are too narrow any axis 
 *        annotation may be clipped. If a null (!) value is supplied, the
 *        used value is 0.18 (for all edges) if annotated axes are produced, 
-*        and zero otherwise. [!]
+*        and zero otherwise. [current value]
 *     MARKER = _INTEGER (Read)
 *        Specifies the symbol with which each position should be marked in
 *        the plot. It should be given as an integer PGPLOT marker type. For 

@@ -543,6 +543,7 @@
       LOGICAL USE( MXLIN )     ! Should a line be used?
       LOGICAL VAR              ! Variance component available
       LOGICAL YLOG             ! Show log of data value?
+      REAL DEFMAR( 4 )         ! Default margins round DATA picture
       REAL DUMMY               ! Un-required argument value
       REAL KEYOFF              ! Offset to top of key 
       REAL KEYPOS( 2 )         ! Key position
@@ -774,8 +775,30 @@ c         IMODE = 4
 *  Start the graphics system.
 *  ==========================
 
+*  Set the dynamic defaults for MARGIN.
+      DEFMAR( 1 ) = 0.2
+      DEFMAR( 2 ) = 0.25
+      DEFMAR( 3 ) = 0.2
+      DEFMAR( 4 ) = 0.25
+      CALL PAR_DEF1R( 'MARGIN', 4, DEFMAR, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the MARGIN values.
       CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
+
+*  If a null value was supplied, annul the error and use the default.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         MARGIN( 1 ) = DEFMAR( 1 )
+         MARGIN( 2 ) = DEFMAR( 2 )
+         MARGIN( 3 ) = DEFMAR( 3 )
+         MARGIN( 4 ) = DEFMAR( 4 )
+         NMARG = 4
+      END IF
+
+*  Only use the first 4 values.
       NMARG = MIN( 4, NMARG )
 
 *  Abort if an error has occurred.

@@ -37,7 +37,7 @@
 *     COSYS = LITERAL (Read)
 *        The co-ordinate system to be used.  This can be either "World"
 *        or "Data".  If COSYS = "World" the co-ordinates used in the
-*        ARD file are pixel co-ordinates or indices.  If COSYS = "Data"
+*        ARD file are pixel co-ordinates.  If COSYS = "Data"
 *        the co-ordinates used in the ARD file are interpreted as data
 *        co-ordinates, provided the NDF contains axes that map onto
 *        pixel co-ordinates using linear transformations.  If there are
@@ -221,7 +221,6 @@
 *  See if there is an axis co-ordinate system defined within the NDF.
          CALL NDF_STATE( NDFI, 'Axis', DATAVL, STATUS )
          IF ( DATAVL ) THEN
-
 *  Specify the axes to be used.
             DO I = 1, NDIM
                AXES( I ) = I

@@ -19,11 +19,11 @@
 *     finding a suitable Frame is:
 *
 *     1) The domain of the Current Frame in IWCS2, if not blank.
-*     2) The domain specified by argument DOMAIN, if not blank. If DOMAIN
+*     2) "SKY"
+*     3) "PIXEL"
+*     4) "GRID"
+*     5) The domain specified by argument DOMAIN, if not blank. If DOMAIN
 *        is blank, "AGI_WORLD" is used.
-*     3) "SKY"
-*     4) "PIXEL"
-*     5) "GRID"
 *     6) Any other suitable Frame.
 *
 *     An error is reported if alignment is not possible, and a message 
@@ -40,7 +40,7 @@
 *     DOMAIN = CHARACTER * ( * ) (Given)
 *        A comma separated list of domains in which alignment of the FrameSets 
 *        should be attempted if alignment is not possible in the Current Frame 
-*        of the second FrameSet.
+*        of the second FrameSet, or SKY, PIXEL or GRID.
 *     QUIET = LOGICAL (Given)
 *        Suppress the message identifying the alignment Frame?
 *     IND = INTEGER (Given)
@@ -120,24 +120,25 @@
       DOM = AST_GETC( IWCS2, 'DOMAIN', STATUS )
 
 *  Create a list of preferences for the Domain in which alignment should
-*  occur. First use the Domain of the Current Frame in IWCS2, then try the 
-*  supplied Domain (if any), then try the GRID Domain, then try any other 
-*  Domain. 
+*  occur. First use the Domain of the Current Frame in IWCS2, then try 
+*  SKY, PIXEL and GRID, then try the supplied Domain (if any), then try 
+*  any other Domain. 
       DOMLST = ' '
       IAT = 0
 
-      IF( DOM .NE. ' ' .AND. DOM .NE. DOMAIN ) THEN
+      IF( DOM .NE. ' ' ) THEN
          CALL CHR_APPND( DOM, DOMLST, IAT )
          CALL CHR_APPND( ',', DOMLST, IAT )
       END IF
 
+      CALL CHR_APPND( 'SKY,PIXEL,GRID,', DOMLST, IAT )
+
       IF( DOMAIN .NE. ' ' ) THEN
          CALL CHR_APPND( DOMAIN, DOMLST, IAT )
+         CALL CHR_APPND( ',', DOMLST, IAT )
       ELSE
-         CALL CHR_APPND( 'AGI_WORLD', DOMLST, IAT )
+         CALL CHR_APPND( 'AGI_WORLD,', DOMLST, IAT )
       END IF
-
-      CALL CHR_APPND( ',SKY,PIXEL,GRID, ', DOMLST, IAT )
 
 *  Attempt to align the FrameSets. If succesfull, a new FrameSet is 
 *  returned describing the relationship between the Current Frames in 

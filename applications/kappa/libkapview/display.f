@@ -182,7 +182,7 @@
 *        If a null (!) value is supplied, the value used is (for all edges);
 *        0.2 if annotated axes are being produced; 0.06, if a simple border 
 *        is being produced; and 0.0 if neither border nor axes are being 
-*        produced. [!]
+*        produced. [current value]
 *     MODE = LITERAL (Read)
 *        The method by which the maximum and minimum data values to be 
 *        displayed are chosen. The options are:

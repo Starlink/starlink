@@ -115,6 +115,7 @@
       DOUBLE PRECISION P2( 2 )   ! Second point
       DOUBLE PRECISION OUTPOS( 3, 2 )! Mapped positions
       DOUBLE PRECISION SININ     ! Sine of input angle
+      DOUBLE PRECISION T         ! Temporary storage for swapping
       INTEGER A                  ! Index of longitude axis
       INTEGER B                  ! Index of latitude axis
 *.
@@ -180,6 +181,20 @@
          P2( 1 ) = OUTPOS( 3, 1 )
          P2( 2 ) = OUTPOS( 3, 2 )
          MAJAXS = AST_DISTANCE( FRM, P1, P2, STATUS ) 
+
+*  The Mapping may have resulted in the mapped "minor" axis being longer
+*  than the mapped "major" axis. In this case we swap the roles of the
+*  major and minor axes.
+         IF( SIGOUT .GT. MAJAXS ) THEN
+            T = SIGOUT
+            SIGOUT = MAJAXS
+            MAJAXS = T
+
+            OUTPOS( 3, 1 ) = OUTPOS( 2, 1 )
+            OUTPOS( 3, 2 ) = OUTPOS( 2, 2 )
+            OUTPOS( 2, 1 ) = P2( 1 )
+            OUTPOS( 2, 2 ) = P2( 2 )
+         END IF            
 
 *  Find the axis ratio.
          IF( SIGOUT .NE. 0.0 ) THEN

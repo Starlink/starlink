@@ -72,8 +72,8 @@
 *        Name of a text file containing the co-ordinates of the stars
 *        to be used. Only accessed if parameter INCAT is given a null (!)
 *        value. Each line should contain the formatted axis values for a 
-*        single position, in the current Frame of the NDF. Axis values 
-*        can be separated by spaces, tabs or commas. The file may contain 
+*        single position, in the current Frame of the NDF. Columns can be 
+*        separated by spaces, tabs or commas. The file may contain 
 *        comment lines with the first character # or !. Other columns may
 *        be included in the file, in which case the columns holding the 
 *        required co-ordinates should be specified using parameter POSCOLS.
@@ -95,10 +95,10 @@
 *        [current graphics device]
 *     FWHM = _REAL (Write)
 *        The seeing-disc size: the full width at half maximum across the
-*        minor axis of the stars.  It is in the units defined by the 
-*        current Frame of the NDF. For instance, this will be arc-seconds
-*        if the current Frame is a SKY Frame, and pixels if it is a PIXEL 
-*        Frame.
+*        minor axis of the stars.  It is in units defined by the current 
+*        Frame of the NDF. For instance, a value in arc-seconds will be
+*        reported if the current Frame is a SKY Frame, but pixels will be
+*        used if it is a PIXEL Frame.
 *     GAMMA = _REAL (Write)
 *        The radial fall-off parameter of the star images. See the 
 *        description for more details.  A gamma of two would be a
@@ -116,11 +116,11 @@
 *        to use. If a null (!) value is supplied parameter COFILE will be
 *        used to get the star positions from a simple text file.
 *     ISIZE = _INTEGER (Read)
-*        The side of the square area to be used when forming the
-*        marginal profiles for a star image.  It should be sufficiently
-*        large to contain the entire star image.  It should be an odd
-*        number and must lie in the range from 3 to 101.  If an even
-*        value is given, the next largest odd number is used instead.
+*        The side of the square area to be used when forming the marginal 
+*        profiles for a star image, given as a number of pixels.  It should 
+*        be sufficiently large to contain the entire star image.  It should 
+*        be an odd number and must lie in the range from 3 to 101.  If an
+*        even value is given, the next largest odd number is used instead.
 *        [15]
 *     LOGFILE = FILENAME (Read)
 *        Text file to contain the table of parameters for each star.  A
@@ -133,14 +133,14 @@
 *        the first supplied value. If these margins are too narrow any axis 
 *        annotation may be clipped. If a null (!) value is upplied, the
 *        value used is 0.18 (for all edges) if either annotated axes or a 
-*        key are produced, and zero otherwise. [!]
+*        key are produced, and zero otherwise. [current value]
 *     MARKER = INTEGER (Read)
-*        The PGPLOT marker type to use. Only accessed if MODE is 3 or 
-*        5. [current value]
+*        The PGPLOT marker type to use for the data values in the plot. 
+*        [current value]
 *     MINOR = _LOGICAL (Read)
-*        If MINOR is TRUE the plot abscissa is the distance along the
-*        minor axis from the centre of the PSF.  If MINOR is FALSE, the
-*        major axis is plotted.  [TRUE]
+*        If MINOR is TRUE the horizontal axis of the plot is annotated
+*        with distance along the minor axis from the centre of the PSF. If 
+*        MINOR is FALSE, the distance along the major axis is used.  [TRUE]
 *     ORIENT = _REAL (Write)
 *        The orientation of the major axis of the star images, in degrees. 
 *        If the current Frame of the NDF is a SKY Frame, this will be a 
@@ -150,18 +150,23 @@
 *        ("Y").
 *     OUT = NDF (Write)
 *        The NDF containing the fitted point-spread function evaluated
-*        at each pixel. Its dimensions are always odd numbered and
-*        the centre of the PSF is located at the centre of the image.
-*        If null, !, is entered no output NDF will be created.  The
-*        dimensions of the array are controlled by parameter CUT. [!]
+*        at each pixel. If null, !, is entered no output NDF will be 
+*        created. The dimensions of the array are controlled by parameter 
+*        CUT. The pixel origin is chosen to align the model PSF with the 
+*	 first fitted star in pixel co-ordinates, thus allowing the NDF 
+*        holding the model PSF to be compared directly with the input NDF. 
+*        A WCS component is stored in the output NDF holding a copy of the 
+*        input WCS component. An additional Frame with Domain name OFFSET 
+*        is added, and is made the current Frame. This Frame measures the 
+*        distance from the PSF centre in the units in which the FWHM is 
+*        reported. [!]
 *     POSCOLS = _INTEGER (Read)
 *        Column positions of the co-ordinates (x then y) in an input record 
 *        of the file specified by parameter COFILE.  The columns must be 
 *        different amongst themselves. If there is duplication new values 
 *        will be requested.  Only accessed if INCAT is given a null (!)
 *        value. If a null (!) value is supplied for POSCOLS, the values
-*        used will be [1,2,...] up to the number of axes in the current
-*        Frame of the NDF. [!]
+*        [1,2] will be used. [!] 
 *     RANGE = _REAL (Read)
 *        The number of image profile widths out to which the radial
 *        star profile is to be fitted.  (There is an upper limit of 100
@@ -180,7 +185,7 @@
 *
 *        Each individual attribute setting should be of the form:
 *
-*           <name>=<value>
+**          <name>=<value>
 *        
 *        where <name> is the name of a plotting attribute, and <value> is
 *        the value to assign to the attribute. Default values will be
@@ -197,7 +202,20 @@
 *        etc. (the synonym Symbols may be used in place of Markers). 
 *        [current value]
 *     TITLE = LITERAL (Read)
-*        A title of the output NDF.  ['KAPPA - PSF']
+*        The title for the NDF to contain the fitted point-spread
+*        function.  If null (!) is entered the NDF will not contain a
+*        title.  ["KAPPA - PSF"]
+*     USEAXIS = GROUP (Read)
+*        USEAXIS is only accessed if the current co-ordinate Frame of the 
+*        NDF has more than 2 axes. A group of two strings should be
+*        supplied specifying the 2 axes which are to be used when
+*        determining distances, reporting positions, etc. Each axis can be 
+*        specified either by its integer index within the current Frame (in 
+*        the range 1 to the number of axes in the current Frame), or by its 
+*        Symbol attribute. A list of acceptable values is displayed if an 
+*        illegal value is supplied. If a null (!) value is supplied, the 
+*        axes with the same indices as the 2 significant NDF pixel axes are 
+*        used. [!]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis of the plot. If a null (!) value is supplied, a suitable
@@ -251,6 +269,8 @@
 *     using a stellar photometry application, and to be sufficiently
 *     bright, uncrowded, and noise-free to allow an accurate fit to be
 *     made.
+*     -  It is assumed that the image scale does not vary significantly
+*     across the image.
 *     -  The method to calculate the fit is as follows:
 *
 *        -  Marginal profiles of each star image are formed in four
@@ -284,7 +304,7 @@
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.  The output
-*     point-spread-function NDF has type _REAL.
+*     point-spread-function NDF has the same type as the input NDF.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -328,6 +348,7 @@
 *     20-SEP-1999 (DSB):
 *        Modified to expect input positions in the current WCS Frame of
 *        the NDF. Removed parameter COSYS, RADUNITS, SCALE. Added INCAT.
+*        USEAXIS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -357,16 +378,19 @@
  
 *  Local Variables:
       CHARACTER BUFFER*( NCHLIN )! Buffer to store output string
-      CHARACTER NDFNAM*100      ! Name of input NDF
       CHARACTER DTYPE*( NDF__SZFTP ) ! HDS type of the data values
       CHARACTER ITYPE*( NDF__SZTYP ) ! Implemention HDS type
       CHARACTER NAME*255        ! Name of input positions list
+      CHARACTER NDFNAM*100      ! Name of input NDF
       CHARACTER TITLE*80        ! Title of input positions list
       INTEGER CFRM              ! Pointer to the Current Frame of the NDF
       INTEGER DIMS( NDIM )      ! Dimensions of the NDF
       INTEGER EL                ! Number of elements in the input array and output array
       INTEGER FDL               ! File description for log file
-      INTEGER INDF1              ! Identifier for input NDF
+      INTEGER I                 ! Loop count
+      INTEGER INDF1             ! Identifier for input NDF
+      INTEGER INDF2             ! NDF identifier for output PSF
+      INTEGER INDF3             ! NDF identifier for input NDF section
       INTEGER IPDIN             ! Pointer to input data array
       INTEGER IPID              ! Pointer to array of position identifiers
       INTEGER IPIN              ! Pointer to array of supplied positions
@@ -379,6 +403,8 @@
       INTEGER ISIZE             ! Pixel size of square about a star used to form marginal profiles
       INTEGER IWCS              ! WCS FrameSet from input NDF
       INTEGER IWCSG             ! FrameSet read from input catalogue
+      INTEGER LBND( NDIM )      ! Lower bounds of the output image
+      INTEGER LBNDS( NDF__MXDIM )! Lower bounds of the input NDF
       INTEGER MAP1              ! Mapping from PIXEL Frame to Current Frame
       INTEGER MAP2              ! Mapping from supplied Frame to Current Frame
       INTEGER MAP3              ! Mapping from supplied Frame to PIXEL Frame
@@ -387,13 +413,15 @@
       INTEGER NAXIN             ! No. of axes in supplied Frame
       INTEGER NC                ! Character column counter in output buffer
       INTEGER NCF               ! Character column counter of filenames
-      INTEGER INDF2              ! NDF identifier for output PSF
+      INTEGER NDIMS             ! No. of dimensions in input NDF
       INTEGER NPOS              ! Number of non-comment lines in the x-y file
       INTEGER PSFDIM( NDIM )    ! PSF dimensions
       INTEGER PSFSIZ            ! Dimension of region used to calculate mean PSF
       INTEGER SDIM( NDF__MXDIM )! Significant dimensions of the NDF
       INTEGER SLBND( NDIM )     ! Significant lower bounds of the image
       INTEGER SUBND( NDIM )     ! Significant upper bounds of the image
+      INTEGER UBND( NDIM )      ! Upper bounds of the output image
+      INTEGER UBNDS( NDF__MXDIM )! Upper bounds of the input NDF
       LOGICAL GAUSS             ! Fit to a Gaussian?
       LOGICAL GOTID             ! Does IPID point to an array of identifiers?
       LOGICAL LOGPOS            ! Log file is open for co-ordinates?
@@ -401,9 +429,10 @@
       REAL CUT                  ! The threshold to which the output PSF must extend
       REAL FWHM                 ! FWHM of the star images
       REAL GAMMA                ! Radial fall-off parameter
+      REAL PX                   ! X pixel co-ord at first fitted star
+      REAL PY                   ! Y pixel co-ord at first fitted star
       REAL RANGE                ! Number of image profile widths to which radial profile is to be fitted
       REAL THETA                ! Orientation of the star images
-
 *.
 
 *  Check inherited global status.
@@ -613,7 +642,7 @@
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    STATUS )
+     :                    PX, PY, STATUS )
 
       ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPS1_SPARB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
@@ -621,7 +650,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    STATUS )
+     :                    PX, PY, STATUS )
 
       ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_SPARD( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
@@ -629,7 +658,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    STATUS )
+     :                    PX, PY, STATUS )
 
       ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_SPARI( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
@@ -637,7 +666,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    STATUS )
+     :                    PX, PY, STATUS )
 
       ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPS1_SPARUW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
@@ -645,7 +674,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    STATUS )
+     :                    PX, PY, STATUS )
 
       ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPS1_SPARUB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
@@ -653,7 +682,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    STATUS )
+     :                    PX, PY, STATUS )
 
       ELSE IF( ITYPE .EQ. '_WORD' ) THEN
          CALL KPS1_SPARW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
@@ -661,7 +690,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
-     :                    STATUS )
+     :                    PX, PY, STATUS )
 
       END IF
 
@@ -694,37 +723,53 @@
 *  Start a new NDF context.
       CALL NDF_BEGIN
 
-*  Decide on the bounds of the output NDF so that pixel co-ordinates
-*  (0.0,0.0) is at the centre. This results in each dimension being even.
-      UBND( 1 ) = PSFDIM( 1 ) / 2
-      LBND( 1 ) = 1 - UBND( 1 )
-      UBND( 2 ) = PSFDIM( 2 ) / 2
-      LBND( 2 ) = 1 - UBND( 2 )
+*  Decide on the bounds of the output NDF so that the centre of the psf
+*  is at the position of the first fitted star.
+      UBND( 1 ) = INT( PX ) + 1 + PSFDIM( 1 ) / 2
+      LBND( 1 ) = INT( PX ) + 1 - PSFDIM( 1 ) / 2
+      UBND( 2 ) = INT( PY ) + 1 + PSFDIM( 2 ) / 2
+      LBND( 2 ) = INT( PY ) + 1 - PSFDIM( 2 ) / 2
 
-*  Create a new simple NDF.
-      CALL LPG_CREAT( 'OUT', '_REAL', NDIM, LBND, UBND, INDF2, STATUS )
+*  Find the complete bounds of this section of the input NDF, remembering to
+*  leave bounds of any insignificant axes unchanged.
+      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBNDS, UBNDS, NDIMS, STATUS )
+      DO I = 1, NDIM
+         UBNDS( SDIM( I ) ) = UBND( I )
+         LBNDS( SDIM( I ) ) = LBND( I )
+      END DO
+
+*  Now get an NDF identifier for this section of the input NDF.
+      CALL NDF_SECT( INDF1, NDIMS, LBNDS, UBNDS, INDF3, STATUS )
+
+*  Create a new NDF, by propagating the shape, size, WCS, etc from this 
+*  section.
+      CALL LPG_PROP( INDF3, 'NOLABEL,WCS,AXIS', 'OUT', INDF2,
+     :               STATUS )
 
 *  Map it for write access.
       CALL NDF_MAP( INDF2, 'Data', '_REAL', 'WRITE', IPPSF, EL, STATUS )
 
 *  Get workspace.
-      CALL PSX_CALLOC( UBND( 1 ) - LBND( 1 ) + 2, '_DOUBLE', IPW3, 
+      CALL PSX_CALLOC( UBND( 1 ) - LBND( 1 ) + 3, '_DOUBLE', IPW3, 
      :                 STATUS )
-      CALL PSX_CALLOC( UBND( 2 ) - LBND( 2 ) + 2, '_DOUBLE', IPW4, 
+      CALL PSX_CALLOC( UBND( 2 ) - LBND( 2 ) + 3, '_DOUBLE', IPW4, 
      :                 STATUS )
 
 *  Fill the data array with the evaluated point-spread function.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL KPS1_PSEVL( AXISR, THETA, FWHM, GAMMA, LBND( 1 ), 
-     :                    UBND( 1 ), LBND( 2 ), UBND( 2 ), 
+     :                    UBND( 1 ), LBND( 2 ), UBND( 2 ), PX, PY,
      :                    %VAL( IPPSF ), STATUS )
 
-*  Store the WCS information in the output NDF.
-         CALL KPS1_PSWCS( MAP4, CFRM, SLBND, SUBND, LBND, UBND, INDF2, 
-     :                    %VAL( IPW3 ), %VAL( IPW4 ), STATUS )      
+*  Add an OFFSET Frame to the WCS information in the output NDF.
+         CALL KPS1_PSWCS( INDF2, LBND, UBND, %VAL( IPW3 ), %VAL( IPW4 ), 
+     :                    STATUS )      
 
-*  Obtain a title for the PSF NDF.
+*  Store a title.
          CALL NDF_CINP( 'TITLE', INDF2, 'TITLE', STATUS )
+
+*  Store a label.
+         CALL NDF_CPUT( 'Point Spread Function', INDF2, 'Lab', STATUS )
 
       END IF
 

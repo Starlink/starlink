@@ -790,6 +790,7 @@
 
 *  Initialise the AGI identifier for the first selected picture.
       IPIC1 = -1
+      IPIC2 = -1
 
 *  Loop until no more positions are required, or an error occurs.
       LOOP = .TRUE.
@@ -882,9 +883,13 @@
             CALL AGI_ISAMP( IPIC, SAME, STATUS )
 
 *  If there is a new picture, replace the current picture identifier with the 
-*  new one. Dont annul the current AGI identifier since we may need it later 
-*  on (to compare with IPIC1).
+*  new one. 
             IF( .NOT. SAME ) THEN
+
+*  Annul the previous AGI identifier.
+               CALL AGI_ANNUL( IPIC, STATUS )
+
+*  Store the new one.
                IPIC = IPIC2
 
 *  Annul the pointer for the current Plot.
@@ -895,6 +900,11 @@
 *  AGI_DATA representing AGI DATA co-ordinates (defined by a TRANSFORM 
 *  structure stored with the picture in the database).
                CALL KPG1_GDGET( IPIC, AST__NULL, .TRUE., IPLOT, STATUS )
+
+*  If the picture has not changed, annul the new picture id.
+            ELSE IF( IPIC2 .NE. -1 ) THEN
+               CALL AGI_ANNUL( IPIC2, STATUS )
+               IPIC2 = -1
             END IF
 
 *  Abort if an error has occurred.
@@ -1244,6 +1254,10 @@
 
 *  Re-instate the original current AGI picture,
                   CALL AGI_SELP( IPIC, STATUS )
+
+*  Annul the AGI identifier.
+                  CALL AGI_ANNUL( IPIC2, STATUS )
+                  IPIC2 = -1
 
                END IF
 

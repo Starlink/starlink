@@ -1,7 +1,7 @@
       SUBROUTINE FTS1_EDKEY( NOCARD, NKEY, MXCARD, EDITS, NAMES, PSTNS,
      :                       KOCCUR, POCCUR, VALUES, COMNTS, TYPES,
      :                       FTSCAR, ACTNUM, IARY1, IARY2, CARY,
-     :                       STATUS )
+     :                       EXISTS, STATUS )
 *+
 *  Name:
 *     FTS1_EDKEY
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL FTS1_EDKEY( NOCARD, NKEY, MXCARD, EDITS, NAMES, PSTNS,
 *                      KOCCUR, POCCUR, VALUES, COMNTS, TYPES, FTSCAR,
-*                      ACTNUM, IARY1, IARY2, CARY, STATUS )
+*                      ACTNUM, IARY1, IARY2, CARY, EXISTS, STATUS )
 
 *  Description:
 *     This subroutine inserts, updates, moves, deletes, reports, and
@@ -152,6 +152,8 @@
 *        The second temporary working space.
 *     CARY( MXCARD ) = CHARACTER * ( * ) (Returned)
 *        A temporary working space.
+*     EXISTS = LOGICAL (Returned)
+*        The result of the last "Exist" operation.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -213,6 +215,7 @@
       INTEGER IARY1( MXCARD )
       INTEGER IARY2( MXCARD )
       CHARACTER * ( * ) CARY( MXCARD )
+      LOGICAL EXISTS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -255,6 +258,7 @@
       CHARACTER * ( 1 ) EDIT     ! Edit command abbreviation
       INTEGER ENDCAR             ! Card number of END card 
       INTEGER EQLPSN             ! Position of the equal sign
+      LOGICAL THERE              ! Is it there?
       INTEGER I                  ! Do-loop index
       LOGICAL INTTYP             ! One of the integer data types?
       INTEGER IVALUE             ! FITS value
@@ -290,7 +294,6 @@
       INTEGER REVOC              ! Reference-value-keyword occurrence
                                  ! number
       REAL RVALUE                ! FITS value
-      LOGICAL THERE              ! Shows a new keyword is in FITS array
       INTEGER TMP                ! Temporary card number in chain1
       INTEGER TMP2               ! Temporary card number in chain2
       CHARACTER * ( DAT__SZTYP ) TYPE ! Data type of the value to be
@@ -553,6 +556,7 @@
 *  Perform the Exist command.
 *  ==========================
          IF ( EDIT .EQ. 'E' ) THEN
+            EXISTS = THERE
             CALL MSG_SETL( 'KEYX', THERE )
             CALL MSG_OUTIF( MSG__QUIET, 'EXIST', '^KEYX', STATUS ) 
 

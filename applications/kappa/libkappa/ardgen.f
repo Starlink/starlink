@@ -202,7 +202,7 @@
 *     -  An image must previously have been displayed on the graphics
 *     device.
 *     -  The arguments for the textual description of each shape are as
-*     follows  (all co-ordinates are pixel, i.e. world co-ordinates):
+*     follows :
 *
 *     "Box"       - The co-ordinates of the centre, followed by the
 *                   lengths of the two sides.
@@ -222,6 +222,13 @@
 *                   between the first side and the x axis (in radians).
 *     "Row"       - The y co-ordinate of the row.
 *     "Whole"     - No arguments.
+*
+*      All co-ordinates are pixel, i.e. world co-ordinates. These should
+*      not be mistaken with pixel indices. For example, the pixel with
+*      indices [1,1] extends from 0.0 to 1.0 in world co-ordinates on both 
+*      axes. So the centre of pixel [1,1] is actually at (0.5,0.5). The 
+*      interpretation of the supplied positions does not depend on the
+*      presence of a decimal point (unlike NDF section specifiers).
       
 *  Authors:
 *     GJP: Grant Privett (STARLINK)

@@ -39,7 +39,7 @@
 *                mode
 
 *  ADAM Parameters:
-*     COMMENT = LITERAL (Given)
+*     COMMENT = LITERAL (Read)
 *        The comments to be written to the KEYWORD keyword for the
 *        "Update" and "Write" editing commands.  A null value (!)
 *        gives a blank comment.  The special value "$C" means use the
@@ -56,7 +56,8 @@
 *
 *        "Exist" reports TRUE to standard output if the named keyword
 *        exists in the header, and FALSE if the keyword is not present.
-
+*        The same value is also stored in output parameter EXISTS.
+*
 *        "Move" relocates a named keyword to be immediately before a
 *        second keyword (see parameter POSITION).  When this positional
 *        keyword is not supplied, it defaults to the END card, and if
@@ -79,7 +80,10 @@
 *        comment.  Its location uses the same rules as for the "Move"
 *        command.  The FITS extension is created first should it not
 *        exist.
-*     KEYWORD = LITERAL (Given)
+*     EXISTS = _LOGICAL (Write)
+*        An output parameter which is set to the result of the final
+*        "Exist" operation (see parameter EDIT).
+*     KEYWORD = LITERAL (Read)
 *        The name of the keyword to be edited in the FITS extension.  A
 *        name may be compound to handle hierarchical keywords, and it
 *        has the form keyword1.keyword2.keyword3 etc.  The maximum
@@ -112,7 +116,7 @@
 *        "Interface" which uses parameters. ["Interface"]
 *     NDF = NDF (Read and Write)
 *        The NDF in which the FITS extension is to be edited.
-*     NEWKEY = LITERAL (Given)
+*     NEWKEY = LITERAL (Read)
 *        The name of the keyword to replace the KEYWORD keyword.  It is
 *        only accessed when EDIT="Rename".  A name may be compound to
 *        handle hierarchical keywords, and it has the form
@@ -120,7 +124,7 @@
 *        keywords per FITS card is 20.  Each keyword must be no longer
 *        than 8 characters, and be a valid FITS keyword comprising only
 *        alphanumeric characters, hyphen, and underscore.
-*     POSITION = LITERAL (Given)
+*     POSITION = LITERAL (Read)
 *        The position keyword name.  A position name may be compound to
 *        handle hierarchical keywords, and it has the form
 *        keyword1.keyword2.keyword3 etc.  The maximum number of
@@ -152,7 +156,7 @@
 *        The text file containing the keyword translation table.  The
 *        format of this file is described under "File Format".  For
 *        illustrations, see under "Examples of the File Format".
-*     VALUE = LITERAL (Given)
+*     VALUE = LITERAL (Read)
 *        The new value of the KEYWORD keyword for the "Update" and
 *        "Write" editing commands.  The special value "$V" means use the
 *        current value of the KEYWORD keyword.  This makes it possible
@@ -162,10 +166,6 @@
 *        edited.  This reference keyword must exist and have a value
 *        for a "Write" edit; whereas the FITS-header value is unchanged
 *        for "Update" if there are problems with this reference keyword.
-
-*  Parameter Defaults:
-*     All the parameters have a suggested default of their current
-*     value, except NDF, which uses the global current dataset.
 
 *  Examples:
 *     fitsmod dro42 bscale exist 
@@ -433,11 +433,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 November 8 (MJC):
 *        Original version.
+*     22-SEP-1999 (DSB):
+*        Added EXISTS parameter.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -525,6 +528,7 @@
       REAL RVAL                  ! Real FITS value
       INTEGER SIZE               ! Number of values in the NDF component
       LOGICAL STRING             ! Is value a string?
+      LOGICAL EXISTS             ! Result of final "Exist" operation
       LOGICAL THERE              ! FITS extension already exists?
       CHARACTER * ( DAT__SZTYP ) TYPE ! Component's data type
       INTEGER TYPNTR             ! Pointer to mapped types
@@ -616,8 +620,8 @@
      :                    %VAL( EKPNTR ), %VAL( PKPNTR ),
      :                    %VAL( KOPNTR ), %VAL( POPNTR ),
      :                    %VAL( VAPNTR ), %VAL( COPNTR ),
-     :                    %VAL( TYPNTR ), LOC, STATUS, %VAL( 1 ),
-     :                    %VAL( HKEYLN ), %VAL( HKEYLN ),
+     :                    %VAL( TYPNTR ), LOC, EXISTS, STATUS,
+     :                    %VAL( 1 ), %VAL( HKEYLN ), %VAL( HKEYLN ),
      :                    %VAL( CVALLN ), %VAL( COMLN ), %VAL( 8 ) )
 
 *  Free the workspace.
@@ -942,9 +946,13 @@
 *  Perform the editing operation.
 *  ==============================
          CALL FTS1_EDFEX( NEDIT, EDIT, KEYWRD, KEYIND, KOCCUR,
-     :                    POCCUR, VALUE, COMENT, TYPE, LOC, STATUS )
+     :                    POCCUR, VALUE, COMENT, TYPE, LOC, EXISTS,
+     :                    STATUS )
       END IF
 
+* Store the result of the final "Exist" operation in the EXISTS output
+* parameter.
+      CALL PAR_PUT0L( 'EXISTS', EXISTS, STATUS )
 
   999 CONTINUE
 

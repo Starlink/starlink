@@ -48,11 +48,13 @@
 *     escaped using a backslash "\" to avoid them being interpreted as
 *     GRP editing characters).
 *
-*     - All possible catalogues matching the supplied string
-*     are included in the returned group. For instance, if the string
-*     "fred" is supplied, then the returned group will contain references
-*     to all files with basename fred which any of the file types: .FIT 
-*     .fit .FITS .fits .GSC .gsc .TXT .txt .Txt .sdf
+*     - Only the highest priority file with any give file name is included 
+*     in the returned group. The priority of a file is determined by its 
+*     file type. Priority decreases along the following list of file 
+*     types: .FIT, .fit, .FITS, .fits, .GSC, .gsc, .TXT, .txt, .Txt, .sdf.
+*     If no file type is given by the user, the highest priority available 
+*     file type is used. If an explicit file type is given, then that file 
+*     type is used.
 *
 *     - Names of catalogues stored in FITS format may include an FITS
 *     extension number. For instance, "/home/dsb/mydata.fit{3} refers to

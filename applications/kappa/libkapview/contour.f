@@ -171,7 +171,7 @@
 *        margins are too narrow any axis annotation may be clipped. If a 
 *        null (!) value is supplied, the value used is 0.18 (for all edges) 
 *        if annotated axes are being produced, and zero otherwise. See also 
-*        parameter KEYPOS. [!]
+*        parameter KEYPOS. [current value]
 *     MODE = LITERAL (Read)
 *        The method used to select the contour levels. The options are:
 *

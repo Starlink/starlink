@@ -14,9 +14,11 @@
 
 *  Description:
 *     The supplied wild-card template is expanded into a list of file 
-*     names, which are appended to the supplied group. All matching 
-*     files with any of the file types specified by CTG__FMTIN (defined
-*     in CTG_CONST) are included.
+*     names, which are appended to the supplied group. If the supplied 
+*     template matches files with the same directory/basename but with 
+*     different file types, then only the file with the highest priority 
+*     file type is returned (i.e. the file type which is closest to 
+*     the start of CAT_FORMATS_IN).
 
 *  Arguments:
 *     TEMPLT = CHARACTER * ( * ) (Given)
@@ -85,7 +87,7 @@
 *  Local Variables:
       CHARACTER BN*50              ! File basename
       CHARACTER DIR*(GRP__SZNAM)   ! Directory field
-      CHARACTER EXT*10             ! File catalogue/HDS EXTtion
+      CHARACTER EXT*10             ! FITS extension specifier
       CHARACTER FTEMP*(GRP__SZNAM) ! File template
       CHARACTER NAM*(GRP__SZNAM)   ! File base name field
       CHARACTER REST*64            ! The FITS extension specifier
@@ -102,11 +104,13 @@
       INTEGER IGRP3              ! Group holding remaining text
       INTEGER IGRPB              ! Group holding base name fields
       INTEGER IGRPD              ! Group holding directory fields
-      INTEGER IGRPH              ! Group holding HDS path fields
+      INTEGER IGRPH              ! Group holding FITS extension fields
       INTEGER IGRPT              ! Group holding file type fields
       INTEGER L                  ! Index of last non-blank character
       INTEGER NMATCH             ! No. of matching file types
+      INTEGER SIZE0              ! Size of original group
       INTEGER SLEN               ! Length of total search string
+      LOGICAL PURGE              ! Purge duplicate file names?
 *.
 
 *  Initialise the returned flag to indicate that no matching files have
@@ -115,6 +119,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Save the original size of the supplied group.
+      CALL GRP_GRPSZ( IGRP, SIZE0, STATUS )
 
 *  Ensure that supplemental groups are associated with the returned group
 *  holding extra information. These groups are deleted automatically when
@@ -274,6 +281,11 @@
 
 *  End the error context started before the loop.
       CALL ERR_END( STATUS )         
+
+*  Purge the returned groups of matching files (i.e. file with the same
+*  directory and basename but differing file types).
+      IF( PURGE ) CALL CTG1_SORT( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, 
+     :                            SIZE0 + 1, NFMT, FMT, STATUS )
 
 *  Delete the temporary groups.
  999  CONTINUE

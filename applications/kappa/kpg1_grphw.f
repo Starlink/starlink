@@ -543,10 +543,10 @@
 
       END IF
 
-*  Export the Plot pointer from the current AST context in case the calling 
+*  Export any Plot pointer from the current AST context in case the calling 
 *  routine wants to add anything else to the plot. This means the pointer
 *  will not be annulled by the following call to AST_END.
-      CALL AST_EXPORT( IPLOT, STATUS )
+      IF( IPLOT .NE. AST__NULL ) CALL AST_EXPORT( IPLOT, STATUS )
 
 *  Tidy up.
  999  CONTINUE
