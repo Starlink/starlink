@@ -18,7 +18,7 @@ kpg1_ieeer.c  kpg1_isfinr.c  kpg1_tkast.c
 
 F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) 
 
-KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_mixv.gn kpg1_hsta.gn kpg1_thrs.gn \
+KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn
 
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr 
