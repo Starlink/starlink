@@ -1,7 +1,26 @@
+<subsect id="release-0.4" export="export">
+<subhead><title>Version 0.4</title></subhead>
+
+<p>This is release 0.4 $Date$</p>
+
+<p><strong>THIS IS BETA SOFTWARE.  Some features work only partially or
+unreliably.  It does not have all the functionality of a
+production release.  The interface may well
+change.</strong></p>
+
+<p>Autoastrom requires AST 1.8-1 or better to build.  Depending	on
+precisely which earlier version of AST you have, the moggy tool will
+fail to compile, or if it compiles, fail to link.  If you have AST
+installed in a non-standard place, you should use the
+<code>STARLINKS</code> environment variable at build time (see <ref
+id="build"/>), to tell the build script where to find it.</p>
+
+</subsect>
+
 <subsect id="release-0.3" export="export">
 <subhead><title>Version 0.3</title></subhead>
 
-<p>This is release 0.3 $Date$</p>
+<p>This is release 0.3 Date: 2001/08/29 17:09:52 </p>
 
 <p><strong>THIS IS BETA SOFTWARE.  Some features work only partially or
 unreliably.  It does not have all the functionality of a
@@ -20,5 +39,11 @@ kit is to errors in the initial astrometry.</p></li>
 </ul></p>
 
 </subsect>
+
+<!-- Local Variables: -->
+<!-- mode: xml-mode -->
+<!-- sgml-indent-data: t -->
+<!-- sgml-indent-step: 2 -->
+<!-- End: -->
 
 <!-- $Id$ -->
