@@ -137,7 +137,6 @@
       LOGICAL               DOERR                     ! Output field errors?
       LOGICAL               HEADER                    ! Display a header?
       LOGICAL               HMS                       ! RA/DEC in HMS?
-      LOGICAL               IS_SET                    ! Is the SSDS a set?
       LOGICAL               OK                        ! Validity test
       LOGICAL               POINT_OK                  ! Pointing data there?
       LOGICAL               SYMMETRIC                 ! Symmetric errors?
