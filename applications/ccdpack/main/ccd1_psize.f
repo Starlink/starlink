@@ -21,6 +21,11 @@
 *     anisotropic mapping between the GRID frame and the chosen
 *     one this may not give you what you want, but for most purposes
 *     it is likely to be OK.
+*
+*     Note this routine only examines the first two dimensions at
+*     each end of the mapping.  If the frames involved have fewer
+*     than two dimensions it will fail, and if they have more than
+*     two it will ignore the higher ones.
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
