@@ -91,7 +91,7 @@
 *        They are ignored when processing single-beam data. The supplied
 *        group may take the form of a comma separated list of identifiers,
 *        or any of the other forms described in the help on "Group
-*        Expressions". A separate, unique, non-blank identifier should be
+*        Expressions". A separate, non-blank identifier should be
 *        supplied for each data file specified by parameter IN, in the
 *        same order as the data files. If a null (!) value is supplied,
 *        then any existing IMGID values in the POLPACK extensions are
@@ -174,6 +174,8 @@
 *        Added RAY parameter.
 *     12-FEB-1999 (DSB):
 *        Added T, EPS and ANLANG. Removed restrictions on values of WPLATE.
+*     30-MAR-1999 (DSB):
+*        Fixed bug which prevented IMGID being changed.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -285,6 +287,7 @@
          END IF
    
          CALL MSG_BLANK( STATUS )
+
       END IF
 
 *  Abort if an error has occurred.
@@ -351,7 +354,7 @@
      :                    'supplied for parameter %IMGID. ^NVAL are '//
      :                    'required.', STATUS )
 
-*  Check that all the IMGID values are different and non-blank.
+*  Check that all the IMGID values are non-blank.
          ELSE
             DO I = 1, NNDF
                CALL GRP_GET( IGRP3, I, 1, IMG, STATUS )
@@ -365,23 +368,10 @@
                   GO TO 999
                END IF
 
-               DO J = I + 1, NNDF
-                  CALL GRP_GET( IGRP3, J, 1, IMGJ, STATUS )
-                  IF( IMG .EQ. IMGJ .AND. STATUS .EQ. SAI__OK ) THEN
-                     STATUS = SAI__ERROR
-                     CALL MSG_SETC( 'ID', IMG )
-                     CALL MSG_SETI( 'ITH', I )      
-                     CALL MSG_SETC( 'ITH', CHR_NTH( I ) )      
-                     CALL MSG_SETI( 'JTH', J )      
-                     CALL MSG_SETC( 'JTH', CHR_NTH( J ) )      
-                     CALL ERR_REP( 'POLEXT_3', 'The ^ITH and the '//
-     :                             '^JTH values supplied for '//
-     :                             'parameter %IMGID are equal '//
-     :                             '("^ID").', STATUS )
-                     GO TO 999
-                  END IF
-               END DO
             END DO           
+
+            GOTIMG = .TRUE.
+
          END IF
       END IF
 
