@@ -5,7 +5,7 @@ dist_bin_SCRIPTS = start pisa.icl pisa_demo pisa_demo.icl pisa_proc.icl \
 
 dist_noinst_SCRIPTS = pisa_link_adam
 
-bin_MONOLITHS = pisa_mon pisa_mon4
+bin_MONOLITHS = pisa_mon pisa_mon4 pisahelp
 
 pisa_mon_SOURCES = \
         pisa_mon.f \
@@ -28,8 +28,10 @@ pisa_mon4_LDADD = $(LDADD) `$(srcdir)/pisa_link_adam`
 
 pisa_mon4_TASKS = pisafind4 pisafit4
 
-bin_PROGRAMS = pisahelp
+##  Link the pisahelp program as an atask. 
 pisahelp_SOURCES = pisahelp.f $(HELPSRC)
+pisahelp_TASKS = 
+
 
 SUBSRC = addmod.f func.f analys.f anoise.f checkp.f dchole.f \
          ellpse.f extend.f featur.f fitplo.f gtmlim.f \
@@ -50,18 +52,6 @@ SUBSRC = addmod.f func.f analys.f anoise.f checkp.f dchole.f \
 PRIVATE_INCLUDES = PSA1_PAR hlpcmd.inc
 
 HELPSRC = gethlp.f gthlpi.f kpg1_scrsz.f pthlpo.f sread.f
-
-##  Link the pisahelp program as an atask. Note this isn't a monolith so
-##  we cannot use the MONOLITH builtin rules.
-##  Not a monolith pisahelp
-##pisahelp_SOURCES = \
-##        pisahelp.f \
-##        $(HELPSRC)
-##
-##pisahelp_TASKS = pisahelp
-
-pisahelp: pisahelp.f $(HELPSRC:.f=.o)
-	@ALINK@ pisahelp.f -o pisahelp $(HELPSRC:.f=.o)
 
 ##  The on-line help.
 HELP_SOURCES = pisahelp.hlp
