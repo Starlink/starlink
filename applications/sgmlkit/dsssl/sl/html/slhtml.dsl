@@ -192,10 +192,8 @@ A hook function to add additional tags to the HEAD of your HTML files
   (let* (
 	 ;(home (nav-home (current-node)))
 	 (up   (parent (current-node)))
-	 ;(prev (prev-chunk-element (current-node)))
-	 ;(next (next-chunk-element (current-node)))
-	 (onpair (onwards))
-	 (next (cdr onpair))
+         (next (nav-forward-element (current-node)))
+         (prev (nav-backward-element (current-node)))
 	 (kws  (if (getdocinfo 'keyword) ; node-list, possibly empty
 		   (getdocinfo 'keyword)
 		   (empty-node-list)))
@@ -209,20 +207,18 @@ A hook function to add additional tags to the HEAD of your HTML files
       (with-mode make-html-author-links
 	(process-node-list (getdocinfo 'authorlist)))
 
-;      ;; Add the LINK REL=PREVIOUS tag
-;      (if (node-list-empty? prev)
-;	  (empty-sosofo)
-;	  (make empty-element gi: "link"
-;		attributes: (list (list "rel" "previous")
-;				  ;;(list "title"  (element-title prev))
-;				  (list "href" (href-to prev)))))
+      ;; Add the LINK REL=PREVIOUS tag
+      (if (node-list-empty? prev)
+	  (empty-sosofo)
+	   (make empty-element gi: "link"
+	 	attributes: (list (list "rel" "previous")
+			    (list "href" (href-to prev)))))
 
       ;; Add the LINK REL=NEXT tag
       (if (node-list-empty? next)
 	  (empty-sosofo)
 	  (make empty-element gi: "link"
 		attributes: (list (list "rel" "next")
-				  (list "title" (car onpair))
 				  (list "href" (href-to next)))))
 
 ;      ;; Add the LINK REL=HOME tag
@@ -234,14 +230,12 @@ A hook function to add additional tags to the HEAD of your HTML files
 ;	  (empty-sosofo))
 
       ;; Add the LINK REL=UP tag
-      (if (nav-up? (current-node))
-	  (if (or (node-list-empty? up)
-		  (node-list=? up (document-element)))
-	      (empty-sosofo)
-	      (make empty-element gi: "link"
-		    attributes: (list (list "rel" "up")
-				      (list "href" (href-to up)))))
-	  (empty-sosofo))
+	(if (or (node-list-empty? up)
+	  (node-list=? up (document-element)))
+	    (empty-sosofo)
+	    (make empty-element gi: "link"
+		  attributes: (list (list "rel" "up")
+				    (list "href" (href-to up)))))
 
       ;; Add META NAME=KEYWORD tags
       (let loop ((nl kws))
