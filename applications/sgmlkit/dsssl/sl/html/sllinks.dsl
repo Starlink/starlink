@@ -24,14 +24,18 @@ Check that the target is a member of the list <funcname/target-element-list/.
 <codebody>
 (element ref
   (let ((target (element-with-id (attribute-string (normalize "id")
-						   (current-node)))))
+						   (current-node))))
+	(linktext (attribute-string (normalize "text")
+				    (current-node))))
     (if (member (gi target) (target-element-list))
 	(make element
 	  gi: "A"
 	  attributes: (list (list "href" (href-to target)))
 	  ;(with-mode section-reference
 	  ;  (process-node-list target))
-	  (make-section-reference target: target specify-type: #t)
+	  (if linktext
+	      (literal linktext)
+	      (make-section-reference target: target specify-type: #t))
 	  )
 	(error (string-append
 	     "The stylesheet is presently unable to link to elements of type "
