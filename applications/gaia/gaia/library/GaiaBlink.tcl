@@ -765,81 +765,93 @@ itcl::class gaia::GaiaBlink {
    }
 
    protected method set_ndf_origins_ {} {
-      if { [info exists clones_(0)] } {
-
-         #  Place mobile image at 0 0 and get image coordinates of
-         #  upper left.
-         $canvas_ coords $image_($mobile_) 0 0
-         $image_($mobile_) origin bxo byo
-         set byo [expr $byo+[$image_($mobile_) height]-1]
-
-         set_scroll_region_
-         for { set i 0 } { $i < $n_ } { incr i } {
-
-            #  Origin of upper left of this image (image coordinates).
-            $image_($i) origin xo yo
-            set yo [expr $yo+[$image_($i) height]-1]
-
-            # Pixel shift from mobile image upper left to this one.
-            set dx [expr $xo-$bxo]
-            set dy [expr $byo-$yo]
-
-            # Equivalent canvas shift.
-            $image_($mobile_) convert dist $dx $dy image dx dy canvas
-
-            #  Apply shift
-            $canvas_ coords $image_($i) 0 0
-            $canvas_ move $image_($i) $dx $dy
+      catch {
+         if { [info exists clones_(0)] } {
+            
+            #  Place mobile image at 0 0 and get image coordinates of
+            #  upper left.
+            $canvas_ coords $image_($mobile_) 0 0
+            $image_($mobile_) origin bxo byo
+            set byo [expr $byo+[$image_($mobile_) height]-1]
+            
+            set_scroll_region_
+            for { set i 0 } { $i < $n_ } { incr i } {
+               
+               #  Origin of upper left of this image (image coordinates).
+               $image_($i) origin xo yo
+               set yo [expr $yo+[$image_($i) height]-1]
+               
+               # Pixel shift from mobile image upper left to this one.
+               set dx [expr $xo-$bxo]
+               set dy [expr $byo-$yo]
+               
+               # Equivalent canvas shift.
+               $image_($mobile_) convert dist $dx $dy image dx dy canvas
+               
+               #  Apply shift
+               $canvas_ coords $image_($i) 0 0
+               $canvas_ move $image_($i) $dx $dy
+            }
+            
+            #  Final scrollregion encompasses positions of all images.
+            set_scroll_region_
          }
-
-         #  Final scrollregion encompasses positions of all images.
-         set_scroll_region_
+      } msg
+      if { $msg != {} } {
+         info_dialog $msg
       }
    }
 
    protected method set_wcs_origins_ {} {
-      if { [info exists clones_(0)] } {
+      catch {
+         if { [info exists clones_(0)] } {
 
-         #  Place mobile image at 0 0.
-         $canvas_ coords $image_($mobile_) 0 0
-         set_scroll_region_
-
-         #  Loop over other images asking for the grid coordinates of
-         #  the mobile image that correspond to the WCS coordinates of
-         #  the upper left corner.
-         for { set i 0 } { $i < $n_ } { incr i } {
-
-            #  Origin of upper left of this image (grid coordinates).
-            set xo 0.0
-            set yo [expr [$image_($i) height]-1.0]
-
-            #  Convert to WCS.
-            puts "xo = $xo, yo = $yo"
-            lassign [$image_($i) astpix2wcs $xo $yo 1] wcs1 wcs2
-            puts "wcs1 = $wcs1, wcs2 = $wcs2"
+            #  Place mobile image at 0 0.
+            $canvas_ coords $image_($mobile_) 0 0
+            set_scroll_region_
             
-            #  Back to pixels, but of mobile image.
-            lassign [$image_($mobile_) astwcs2pix $wcs1 $wcs2] xo yo
-            puts "xo = $xo, yo = $yo"
-
-            # Pixel shift from mobile image upper left to this one.
-            set dx $xo
-            set dy [expr [$image_($mobile_) height]-1.0-$yo]
-            puts "dx = $dx, dy = $dy"
-
-            # Equivalent canvas shift.
-            $image_($mobile_) convert dist $dx $dy image dx dy canvas
-
-            #  Apply shift
-            $canvas_ coords $image_($i) 0 0
-            $canvas_ move $image_($i) $dx $dy
+            #  Loop over other images asking for the grid coordinates of
+            #  the mobile image that correspond to the WCS coordinates of
+            #  the upper left corner.
+            for { set i 0 } { $i < $n_ } { incr i } {
+               
+               #  Origin of upper left of this image (grid coordinates).
+               set xo 0.0
+               set yo [expr [$image_($i) height]-1.0]
+               
+               #  Convert to WCS.
+               lassign [$image_($i) astpix2wcs $xo $yo 1] wcs1 wcs2
+               #  Undo fudge that returns these in "degrees", the natural
+               #  units are radians. We don't use astpix2cur as this may
+               #  not return decimal values (if WCS is RA/Dec).
+               set wcs1 [expr $wcs1*$d2r_]
+               set wcs2 [expr $wcs2*$d2r_]
+               
+               #  Back to pixels, but of mobile image.
+               #lassign [$image_($mobile_) astwcs2pix $wcs1 $wcs2] xo yo
+               lassign [$image_($mobile_) astcur2pix $wcs1 $wcs2] xo yo
+               
+               # Pixel shift from mobile image upper left to this one.
+               set dx $xo
+               set dy [expr [$image_($mobile_) height]-1.0-$yo]
+               
+               # Equivalent canvas shift.
+               $image_($mobile_) convert dist $dx $dy image dx dy canvas
+               
+               #  Apply shift
+               $canvas_ coords $image_($i) 0 0
+               $canvas_ move $image_($i) $dx $dy
+            }
+            
+            #  Final scrollregion encompasses positions of all images.
+            set_scroll_region_
          }
-
-         #  Final scrollregion encompasses positions of all images.
-         set_scroll_region_
+      } msg
+      if { $msg != {} } {
+         info_dialog $msg
       }
    }
-
+      
    #  Set the origins for FITS using CRPIX values.
    protected method set_fits_origins_ { {crpix 1} } {
       catch {
@@ -998,6 +1010,9 @@ itcl::class gaia::GaiaBlink {
 
    #  Which views are to be shown (indexed by $this and index).
    common view_
+
+   #  Degrees to radians factor.
+   common d2r_ 0.017453292
 
 #  End of class definition.
 }
