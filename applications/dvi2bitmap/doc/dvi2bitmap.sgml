@@ -75,7 +75,8 @@ and SGML/HTML, see <ref id=sgml.maths>.
 
 <p>The tool dvi2bitmap does this processing in a single step, reading
 the DVI file and font files, and emitting a bitmap.  It can, at
-present, generate XBM, GIF and PNG files.
+present, generate XBM, GIF and, if the relevant library is installed,
+PNG files.
 
 <p>See <ref id=usage> for usage instructions, and <ref id=install> for
 installation instructions.
@@ -762,8 +763,7 @@ source, Luke!'), you probably shouldn't enable it unless you have to.
 equivalent to <code>./configure --enable-kpathsea --enable-mktexpk</code>
 
 <p>The program builds successfully on (at least) egcs-2.90, Sun Workshop
-C++ 5.0, and Alpha Digital C++ 6.0 (with an irrelevant warning in the
-latter case).  It should be written in
+C++ 5.0, and Alpha Compaq C++ 6.2.  It should be written in
 standards-conforming C++, so if it doesn't build then (1) it's not as
 conformant as I think it is (in which case please tell me), (2) your
 compiler is not as conformant as you think it is (in which case please
