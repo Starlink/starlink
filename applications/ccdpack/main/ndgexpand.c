@@ -79,12 +79,14 @@
 
 /* Local variables. */
       char *grpex;                  /* Input group expression */
+      char *pc;                     /* Pointer to character */
       char name[ GRP__SZNAM + 1 ];  /* Name of an expanded item */
       char field[ GRP__SZNAM + 1 ]; /* Supplementary data field */
       int gtsup;                    /* Get supplementary information? */
       int i;                        /* Loop variable */
       int j;                        /* Loop variable */
       int nflag;                    /* Number of flags supplied */
+      int unblank;                  /* Pattern string is not empty */
       Tcl_Obj *ob;                  /* Element of result list */
       Tcl_Obj *result;              /* Result returned to Tcl caller */
       F77_INTEGER_TYPE errgid;      /* GRP identifier for inaccessible group */
@@ -114,19 +116,35 @@
 /* Get arguments. */
       grpex = Tcl_GetString( objv[ 1 + nflag ] );
 
+/* Check for empty string (ndg_asexp does not like being handed one). */
+      unblank = 0;
+      for ( pc = grpex; !unblank && (*pc != '\0'); pc++ ) {
+         if ( *pc != ' ' ) unblank = 1;
+      }
+
+/* If we do not have an empty string, invoke NDG. */
+      if ( unblank ) {
+
 /* Prepare arguments for passing to NDG. */
-      cnfExprt( grpex, fgrpex, fgrpex_length );
-      errgid = GRP__NOID;
-      outgid = GRP__NOID;
+         cnfExprt( grpex, fgrpex, fgrpex_length );
+         errgid = GRP__NOID;
+         outgid = GRP__NOID;
 
 /* Generate a new group to put the results into. */
-      STARCALL(
-         F77_CALL(ndg_asexp)( CHARACTER_ARG(fgrpex), LOGICAL_ARG(&false),
-                              INTEGER_ARG(&errgid), INTEGER_ARG(&outgid), 
-                              INTEGER_ARG(&size), LOGICAL_ARG(&flag), 
-                              INTEGER_ARG(status)
-                              TRAIL_ARG(fgrpex) );
-      )
+         STARCALL(
+            F77_CALL(ndg_asexp)( CHARACTER_ARG(fgrpex), LOGICAL_ARG(&false),
+                                 INTEGER_ARG(&errgid), INTEGER_ARG(&outgid), 
+                                 INTEGER_ARG(&size), LOGICAL_ARG(&flag), 
+                                 INTEGER_ARG(status)
+                                 TRAIL_ARG(fgrpex) );
+         )
+      }
+
+/* If the string was blank, fake an empty result. */
+      else {
+         outgid = GRP__NOID;
+         size = 0;
+      }
 
 /* Initialise the result object. */
       result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
@@ -166,9 +184,11 @@
       }
 
 /* Annul the group. */
-      STARCALL(
-         F77_CALL(grp_delet)( INTEGER_ARG(&outgid), INTEGER_ARG(status) );
-      )
+      if ( outgid != GRP__NOID ) {
+         STARCALL(
+            F77_CALL(grp_delet)( INTEGER_ARG(&outgid), INTEGER_ARG(status) );
+         )
+      }
 
 /* Set result and exit successfully. */
       Tcl_SetObjResult( interp, result );
