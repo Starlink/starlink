@@ -86,11 +86,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'FRI_CMN'                                 ! FRI common block
-*       FRI_INIT = LOGICAL (given)
-*         FRI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			FID
@@ -103,7 +99,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			FRI0_BLK		! Ensures inclusion
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
 
 *  Local Variables:
       INTEGER			FILID			! Base file identifier
@@ -115,7 +112,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. FRI_INIT ) CALL FRI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( FRI__PKG ) ) CALL FRI0_INIT( STATUS )
 
 *  Construct arguments
       CALL ADI_NEWV0C( RNAME, RID, STATUS )

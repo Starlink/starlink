@@ -99,7 +99,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Not already loaded?
-      IF ( .NOT. AST_QPKGI( FRI__PKG ) ) CALL FRI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( FRI__PKG ) ) THEN
 
 *    Load methods for reading and writing references
         CALL ADI_DEFMTH( 'ChkRef(_HDSfile,_CHAR)', FRI1_CHK,
