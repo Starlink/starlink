@@ -183,14 +183,17 @@ programs.
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
+% Size of \tt text - looks better smaller in LaTeX but not HTML.
+\newcommand{\ttsize}{\latexhtml{\small}{}}
+
 % Environment for indenting and using a small font.
-\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+\newenvironment{myquote}{\begin{quote}\ttsize}{\end{quote}}
 
 % In-line typed text, buttons and menu items.
-\newcommand{\butt}[1]{{\small \bf \tt #1}}
-\newcommand{\menu}[1]{{\small \bf \em #1}}
-\newcommand{\wlab}[1]{{\small \bf #1}}
-\newcommand{\text}[1]{{\small \tt #1}}
+\newcommand{\butt}[1]{{\ttsize \bf \tt #1}}
+\newcommand{\menu}[1]{{\ttsize \bf \em #1}}
+\newcommand{\wlab}[1]{{\ttsize \bf #1}}
+\newcommand{\text}[1]{{\ttsize \tt #1}}
 
 % Quick routine descriptions
 \newcommand{\quickdes}[3]{
@@ -208,7 +211,7 @@ programs.
 \newcommand{\xroutine}[1]{\htmlref{{\sc #1}}{#1}}
 
 % Reference to a section of this document.
-\newcommand{\secref}[2]{\latexhtml{Section \ref{#1}}{``\htmlref{#2}{#1}''}}
+\newcommand{\secref}[2]{\latexhtml{Section \ref{#1} ``#2''}{``\htmlref{#2}{#1}''}}
 
 % Latex only sections, subsections etc. Surround these with a latexonly
 % environment.
@@ -485,7 +488,7 @@ programs.
    \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
 
 %  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+   \newcommand{\sstdiytopic}[2]{\item[{#1:}] #2 }
 
 %  sstimplementationstatus
    \newcommand{\sstimplementationstatus}[1]{
@@ -767,7 +770,7 @@ When using CCDPACK from the C-shell (or any other UNIX shell) care needs to
 be taken with some special characters.
 Wildcard characters \text{*,?,[a-z],\{X,Y,Z\}}, quoted strings \text{""}
 and vector braces \text{[ ]} must be protected by using either the
-escape character {\small \verb+\+} or by single quotes (wildcard characters
+escape character {\verb+\+} or by single quotes (wildcard characters
 must be protected as these are expanded internally by CCDPACK, rather than by
 the shell).
 So for instance to pass the names of several data frames and the extent
@@ -6058,13 +6061,13 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{astfiles}{Re-use of coordinate system information with AST files},
       \xroutine{ASTIMP}.
    }
    \sstdiytopic{
-      AST file format:
+      AST file format
    } {
          The AST file is designed to be written by ASTEXP and read by
          \xroutine{ASTIMP} or \xroutine{MAKESET}, and the user does not need to understand its format.
@@ -6344,7 +6347,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{astfiles}{Re-use of coordinate system information with AST files},
       \xroutine{ASTEXP}.
@@ -6744,7 +6747,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{flashordark}{Flash or dark calibration}, \xroutine{MAKECAL}.
    }
@@ -7124,7 +7127,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{usinglineartransforms}{General linear transformations},
       \xroutine{IDICURS}, 
@@ -7254,7 +7257,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \xroutine{CCDSETUP}, \xroutine{CCDSHOW}.
    }
@@ -7758,7 +7761,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          extension of the image image\_with\_bad\_transform is removed.
       }
       \sstexamplesubsection{
-         ccdedit mode=erase fixwcs=yes in=\qt{*}
+         ccdedit mode=erase name=set fixwcs=yes in=\qt{*}
       }{
          All Set header information, and any CCD\_SET coordinate
          frames which are associated with it, will be removed from
@@ -7942,7 +7945,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{backgroundprocessing}{Background processing}.
    }
@@ -8158,7 +8161,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
      \secref{logsystem}{The CCDPACK logging system}.
    }
@@ -8575,7 +8578,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{configuration}{Package configuration},
       \secref{setglobals}{Global parameters with Sets},
@@ -8632,8 +8635,15 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
            LOGTO = BOTH  ! Log file information to\\
            LOGFILE = CCDPACK.LOG  ! Name of logfile
            \end{myquote}}
-          Note that if you are using CCDPACK Sets, you will need to use
-          a separate restoration file for each INDEX value.
+          If you are using CCDPACK Sets, then some lines of this file
+          may be of the form "setindex,keyword=value"; so this sequence:
+          {\tt \begin{myquote}
+          1,RNOISE = 9.80  ! Nominal readout noise in ADUs (Set Index 1)\\
+          2,RNOISE = 8.65  ! Nominal readout noise in ADUs (Set Index 2)\\
+          3,RNOISE = 9.10  ! Nominal readout noise in ADUs (Set Index 3)
+          \end{myquote}}
+          would give the different values for each member of each Set of
+          images.
       }
    }
    \sstdiytopic{
@@ -8703,6 +8713,24 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [BOTH]
       }
       \sstsubsection{
+         SAVE = \_LOGICAL (Read)
+      } {
+         Whether or not to save the values of the program parameters to a
+         \qt{restoration} file, which can later be used by \xroutine{CCDSETUP}
+         to restore the current values of the global parameters.
+         If TRUE then you'll need to specify the name of the file using
+         the SAVEFILE parameter.
+         [FALSE]
+      }
+      \sstsubsection{
+         SAVEFILE = FILENAME (Read)
+      } {
+         This parameter is only used if the SAVE parameters is TRUE.
+         It allows you to give the name of the restoration file to be used
+         when saving the program parameters.
+         [CCDPACK\_SETUP.DAT]
+      }
+      \sstsubsection{
          USESET = \_LOGICAL (Read)
       } {
          This parameter determines whether values keyed by Set Index
@@ -8714,8 +8742,25 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [FALSE]
       }
    }
+   \sstexamples{
+      \sstexamplesubsection{
+         ccdshow
+      } {
+         This displays the current values of all the CCDPACK global
+         parameters to the screen.
+      }
+      \sstexamplesubsection{
+         ccdshow save savefile=params.save
+      } {
+         As well as displaying the global parameter values to the
+         screen, this will also write them to a restoration file
+         called \qt{params.save}.  This file can be used at a later date
+         to restore the current global parameter setup using 
+         \xroutine{CCDSETUP}.
+      }
+   }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \xroutine{CCDSETUP}, \xroutine{CCDCLEAR}.
    }
@@ -9321,7 +9366,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{debiassing}{Debiassing},
       \secref{withbiasframes}{With a master bias},
@@ -9882,7 +9927,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{view-align}{Viewing image alignment}.
    }
@@ -10261,7 +10306,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{drizzling}{Combination by drizzling}.
    }
@@ -10938,7 +10983,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{automatedregistration}{Automated registration}.
    }
@@ -11417,7 +11462,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{automatedregistration}{Automated registration}.
    }
@@ -11785,7 +11830,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{flatfielding}{Flatfielding}, 
       \xroutine{MAKEFLAT}.
@@ -12161,7 +12206,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \xroutine{CCDALIGN}, 
       \xroutine{PAIRNDF}.
@@ -12355,7 +12400,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \xroutine{PRESENT}.
    }
@@ -12564,7 +12609,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                   \end{tabular} }
         \right.$
         \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small method}
+        \makebox[0mm][c]{method}
    }
    \sstparameters{
       \sstsubsection{
@@ -12708,8 +12753,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             \sstitem
                FASTMED   -- Unweighted median of the input data values
 
-            [MEDIAN]
          }
+         See also \secref{combinations}{Image combination techniques}.
+
+         [MEDIAN]
       }
       \sstsubsection{
          MIN = \_REAL (Read)
@@ -12872,7 +12919,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{masterbias}{Making a bias calibration frame},
       \xroutine{DEBIAS}.
@@ -12963,7 +13010,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                   \end{tabular} }
         \right.$
         \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small method}
+        \makebox[0mm][c]{method}
    }
    \sstparameters{
       \sstsubsection{
@@ -13111,8 +13158,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
             \sstitem
                FASTMED   -- Unweighted median of the input data values
-            [MEDIAN]
          }
+         See also \secref{combinations}{Image combination techniques}.
+
+         [MEDIAN]
       }
       \sstsubsection{
          MIN = \_REAL (Read)
@@ -13245,7 +13294,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{flashordark}{Flash or dark calibration},
       \xroutine{CALCOR}.
@@ -13326,7 +13375,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                   \end{tabular} }
         \right.$
         \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small method}
+        \makebox[0mm][c]{method}
    }
    \sstparameters{
       \sstsubsection{
@@ -13500,8 +13549,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
             \sstitem
                FASTMED   -- Unweighted median of the input data values
-            [MEDIAN]
          }
+         See also \secref{combinations}{Image combination techniques}.
+
+         [MEDIAN]
       }
       \sstsubsection{
          MIN = \_REAL (Read)
@@ -13618,7 +13669,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{flatfielding}{Flatfielding}, 
       \xroutine{FLATCOR}.
@@ -13929,8 +13980,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
             \sstitem
                FASTMED   -- Unweighted median of the input data values
-            [MEDIAN]
          }
+         See also \secref{combinations}{Image combination techniques}.
+
+         [MEDIAN]
       }
       \sstsubsection{
          MIN = \_REAL (Read)
@@ -14353,7 +14406,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{mos_norm}{Mosaicing and normalisation}.
    }
@@ -14909,7 +14962,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{addsethead}{Adding Set headers},
       \xroutine{SHOWSET}.
@@ -15315,7 +15368,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{semiautomated}{Semi-automated registration},
       \xroutine{CCDALIGN}, 
@@ -16245,7 +16298,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{settingreductioninfo}{Setting reduction information}.
    }
@@ -16290,7 +16343,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       reduce
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \xroutine{XREDUCE}.
    }
@@ -16790,7 +16843,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{registration}{Determining transformation parameters}.
    }
@@ -17221,7 +17274,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{scheduling}{Scheduling a reduction}.
    }
@@ -17348,10 +17401,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          NAMELIST = LITERAL (Read)
       }{
          The name of an output file in which to write the names of
-         the images selected for output.  Only the image names and not
-         the Set attributes will be written to this file, so it
-         can be used as an indirection file for input to other
-         CCDPACK commands.
+         the images selected for output.  The (non-comment) lines of 
+         this file are of the form:
+         \begin{quote}
+            {\tt image-name \# set-index set-name}
+         \end{quote}
+         since the set-index and set-name values appear to the right
+         of a comment character, the file can thus be used as an
+         indirection file for input to other CCDPACK commands.
          [showset.lis]
       }
       \sstsubsection{
@@ -17449,7 +17506,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{showsethead}{Examining Set headers}.
    }
@@ -18288,7 +18345,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{resampling}{Data resampling}.
    }
@@ -18688,7 +18745,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{wcsdirect}{Handling coordinate systems directly}.
    }
@@ -18953,7 +19010,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{wcscombine}{Combining coordinate systems}.
    }
@@ -19093,7 +19150,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
      import tables.
    }
    \sstdiytopic{
-      See also:
+      See also
    } {
       \secref{usingxreduce}{Using the CCDPACK data reduction GUI},
       \xroutine{REDUCE}.
