@@ -109,6 +109,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void SetAttrib( AstObject *, const char * );
+static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Function Macros */
 /* =============== */
@@ -324,6 +325,7 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
    mapping->Rate = Rate;
+   mapping->MapSplit = MapSplit;
 
 /* Declare the class dump, copy and delete functions.*/
    astSetDump( vtab, Dump, "ShiftMap", "Shift each coordinate axis" );
@@ -508,6 +510,133 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    }
 
 /* Return the result. */
+   return result;
+}
+
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+/*
+*  Name:
+*     MapSplit
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     ShiftMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "shiftmap.h"
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+
+*  Class Membership:
+*     ShiftMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function creates a new Mapping by picking specified inputs from 
+*     an existing ShiftMap. This is only possible if the specified inputs
+*     correspond to some subset of the ShiftMap outputs. That is, there
+*     must exist a subset of the ShiftMap outputs for which each output
+*     depends only on the selected ShiftMap inputs, and not on any of the
+*     inputs which have not been selected. If this condition is not met
+*     by the supplied ShiftMap, then a NULL Mapping is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the ShiftMap to be split (the ShiftMap is not actually 
+*        modified by this function).
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied ShiftMap, then each element 
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied ShiftMap has no subset of outputs which 
+*        depend only on the selected inputs.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the 
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied ShiftMap. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+
+/* Local Variables: */
+   AstShiftMap *newsm;        /* Pointer to returned ShiftMap */
+   AstShiftMap *this;         /* Pointer to ShiftMap structure */
+   int *result;               /* Pointer to returned array */
+   int i;                     /* Loop count */
+   int iin;                   /* Mapping input index */
+   int mnin;                  /* No. of Mapping inputs */
+   int ok;                    /* Are input indices OK? */
+
+/* Initialise */
+   result = NULL;
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the ShiftMap structure. */
+   this = (AstShiftMap *) this_map;
+
+/* Allocate memory for the returned array and create a ShiftMap with the
+   required number of axes and initially unsorted shifts. */
+   result = astMalloc( sizeof( int )*(size_t) nin );
+   newsm = astShiftMap( nin, this->shift, "" );
+   *map = (AstMapping *) newsm;
+
+/* Check pointers can be used safely. */
+   if( astOK ) {
+
+/* Store the required shifts in the new ShiftMap. At the same time check
+   that each axis is valid. */
+      mnin = astGetNin( this );
+      ok = 1;
+      for( i = 0; i < nin; i++ ) {
+         iin = in[ i ];
+         if( iin >= 0 && iin < mnin ) {
+            (newsm->shift)[ i ] = (this->shift)[ iin ];
+            result[ i ] = iin;
+         } else {
+            ok = 0;
+            break;
+         }
+      }
+
+/* If the "in" array contained any invalid values, free the returned
+   resources. */
+      if( !ok ) { 
+         result = astFree( result );
+         *map = astAnnul( *map );
+
+/* If the indices are good, invert the returned ShiftMap if the supplied
+   ShiftMap is inverted. */
+      } else {
+         if( astGetInvert( this ) ) astInvert( *map );
+      }
+   }
+
+/* Free returned resources if an error has occurred. */
+   if( !astOK ) {
+      result = astFree( result );
+      *map = astAnnul( *map );
+   }
+
+/* Return the list of output indices. */
    return result;
 }
 

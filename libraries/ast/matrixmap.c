@@ -172,6 +172,7 @@ static const char *Form[3] = { "Full", "Diagonal", "Unit" }; /* Text values
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping ** );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -207,6 +208,7 @@ static void MatWin( AstMapping **, int *, int );
 static void MatPermSwap( AstMapping **, int *, int );
 static void PermGet( AstPermMap *, int **, int **, double ** );
 static void SMtrMult( int, int, int, const double *, double *, double* );
+static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Member functions. */
 /* ================= */
@@ -1036,11 +1038,14 @@ void astInitMatrixMapVtab_(  AstMatrixMapVtab *vtab, const char *name ) {
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
-   mapping->GetTranForward = GetTranForward;
-   mapping->GetTranInverse = GetTranInverse;
+
+   parent_mapsplit = mapping->MapSplit;
+   mapping->MapSplit = MapSplit;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   mapping->GetTranForward = GetTranForward;
+   mapping->GetTranInverse = GetTranInverse;
    mapping->MapMerge = MapMerge;
    mapping->Rate = Rate;
 
@@ -1786,6 +1791,232 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    }
 
 /* Return the result. */
+   return result;
+}
+
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+/*
+*  Name:
+*     MapSplit
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     MatrixMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "matrixmap.h"
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+
+*  Class Membership:
+*     MatrixMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function creates a new Mapping by picking specified inputs from 
+*     an existing MatrixMap. This is only possible if the specified inputs
+*     correspond to some subset of the MatrixMap outputs. That is, there
+*     must exist a subset of the MatrixMap outputs for which each output
+*     depends only on the selected MatrixMap inputs, and not on any of the
+*     inputs which have not been selected. If this condition is not met
+*     by the supplied MatrixMap, then a NULL Mapping is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the MatrixMap to be split (the MatrixMap is not actually 
+*        modified by this function).
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied MatrixMap, then each element 
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied MatrixMap has no subset of outputs which 
+*        depend only on the selected inputs.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the 
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied MatrixMap. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+
+/* Local Variables: */
+   AstMatrixMap *this;        /* Pointer to MatrixMap structure */
+   double *mat;               /* Pointer to matrix for supplied MatrixMap */
+   double *pmat;              /* Pointer to row start in returned matrix */
+   double *prow;              /* Pointer to row start in supplied matrix */
+   double *rmat;              /* Pointer to matrix for returned MatrixMap */
+   double el;                 /* Next element value in supplied matrix */
+   int *result;               /* Pointer to returned array */
+   int i;                     /* Loop count */
+   int icol;                  /* Column index within supplied MatrixMap */
+   int iel;                   /* Index of next element from the input matrix */
+   int irow;                  /* Row index within supplied MatrixMap */
+   int isel;                  /* Does output depend on any selected inputs? */
+   int ncol;                  /* Number of columns (inputs) in supplied MatrixMap */
+   int nout;                  /* Number of outputs in returned MatrixMap */
+   int nrow;                  /* Number of rows (outputs) in supplied MatrixMap */
+   int ok;                    /* Are input indices OK? */
+   int sel;                   /* Does any output depend on selected inputs? */
+   int unsel;                 /* Does any output depend on unselected inputs? */
+
+/* Initialise */
+   result = NULL;
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Invoke the parent astMapSplit method to see if it can do the job. */
+   result = (*parent_mapsplit)( this_map, nin, in, map );
+
+/* If not, we provide a special implementation here. */
+   if( !result ) {
+
+/* Get a pointer to the MatrixMap structure. */
+      this = (AstMatrixMap *) this_map;
+
+/* Get the number of inputs and outputs. */
+      ncol = astGetNin( this );
+      nrow = astGetNout( this );
+
+/* Check the supplied input indices are usable. */
+      ok = 1;
+      for( i = 0; i < nin; i++ ) {             
+         if( in[ i ] < 0 || in[ i ] >= ncol ) {
+            ok = 0;
+            break;
+         }
+      }
+
+      if( ok ) {
+
+/* Ensure the MatrixMap is stored in full form. */
+         ExpandMatrix( this );
+
+/* Allocate the largest array that could be necessary to hold the
+   returned array of Mapping outputs. */
+         result = astMalloc( sizeof(int)*(size_t) nrow );
+
+/* Allocate the largest array that could be necessary to hold the
+   matrix representing the returned MatrixMap. */
+         rmat = astMalloc( sizeof(double)*(size_t) (nrow*ncol) );
+
+/* Get the matrix which defines the current forward transformation. This
+   takes into account whether the MatrixMap has been inverted or not. */
+         if( astGetInvert( this ) ) {
+            mat = this->i_matrix;
+         } else {
+            mat = this->f_matrix;
+         }      
+
+/* We cannot create the require Mapping if the matrix is undefined. */
+         if( mat && astOK ) {
+
+/* Loop round all the rows in the matrix. */
+            nout = 0;
+            pmat = rmat;
+            iel = 0;
+            for( irow = 0; irow < nrow; irow++ ) {
+
+/* Indicate that this output (i.e. row of the matrix) depends on neither 
+   selected nor unselected inputs as yet. */
+               sel = 0;
+               unsel = 0;
+
+/* Save a pointer to the first element of this row in the MatrixMap
+   matrix. */
+               prow = mat + iel;
+
+/* Loop round all the elements in the current row of the matrix. */
+               for( icol = 0; icol < ncol; icol++ ) {
+
+/* If this element is non-zero and non-bad, then output "irow" depends on
+   input "icol". */
+                  el = mat[ iel++ ];
+                  if( el != 0.0 && el != AST__BAD ) {
+
+/* Is input "icol" one of the selected inputs? */
+                     isel = 0;
+                     for( i = 0; i < nin; i++ ) {             
+                        if( in[ i ] == icol ) {
+                           isel = 1;
+                           break;
+                        }
+                     }
+
+/* If so, note that this output depends on selected inputs. Otherwise note
+   it depends on unselected inputs. */
+                     if( isel ) {
+                        sel = 1;
+                     } else  {
+                        unsel = 1;
+                     }                     
+                  }
+               }
+
+/* If this output depends only on selected inputs, we can include it in
+   the returned Mapping.*/
+               if( sel && !unsel ) {
+
+/* Store the index of the output within the original MatrixMap. */
+                  result[ nout ] = irow;
+
+/* Increment the number of outputs in the returned Mapping. */
+                  nout++;
+
+/* Copy the elements of the current matrix row which correspond to the
+   selected inputs into the new matrix. */
+                  for( i = 0; i < nin; i++ ) *(pmat++) = prow[ in[ i ] ];
+  
+/* If this output depends on both selected and unselected inputs, we can 
+   not produce the required Mapping.*/
+               } else if( sel ) {
+                  ok = 0;
+                  break;
+               }
+            }
+         }
+
+/* If the returned Mapping can be created, create it. */
+         if( ok ) {
+            *map = (AstMapping *) astMatrixMap( nin, nout, 0, rmat, "" );
+
+/* Otherwise, free the returned array. */
+         } else {
+            result = astFree( result );
+         }
+
+/* Free resources. */
+         rmat = astFree( rmat );
+
+/* Re-compress the supplied MatrixMap. */
+         CompressMatrix( this );
+      }
+   }
+
+/* Free returned resources if an error has occurred. */
+   if( !astOK ) {
+      result = astFree( result );
+      *map = astAnnul( *map );
+   }
+
+/* Return the list of output indices. */
    return result;
 }
 

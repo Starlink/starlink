@@ -88,6 +88,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping ** );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -100,6 +101,7 @@ AstTranMap *astTranMapId_( void *, void *, const char *, ... );
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static double Rate( AstMapping *, double *, int, int );
+static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
@@ -172,6 +174,9 @@ void astInitTranMapVtab_(  AstTranMapVtab *vtab, const char *name ) {
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
+
+   parent_mapsplit = mapping->MapSplit;
+   mapping->MapSplit = MapSplit;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -542,6 +547,178 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    if ( !astOK ) result = -1;
 
 /* Return the result. */
+   return result;
+}
+
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+/*
+*  Name:
+*     MapSplit
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     TranMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "tranmap.h"
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+
+*  Class Membership:
+*     TranMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function creates a new Mapping by picking specified inputs from 
+*     an existing TranMap. This is only possible if the specified inputs
+*     correspond to some subset of the TranMap outputs. That is, there
+*     must exist a subset of the TranMap outputs for which each output
+*     depends only on the selected TranMap inputs, and not on any of the
+*     inputs which have not been selected. If this condition is not met
+*     by the supplied TranMap, then a NULL Mapping is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the TranMap to be split (the TranMap is not actually 
+*        modified by this function).
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied TranMap, then each element 
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied TranMap has no subset of outputs which 
+*        depend only on the selected inputs.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the 
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied TranMap. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+
+/* Local Variables: */
+   AstMapping *fmap;          /* Pointer to forward Mapping in supplied TranMap */
+   AstMapping *imap;          /* Pointer to inverse Mapping in supplied TranMap */
+   AstMapping *rfmap;         /* Pointer to split forward Mapping */
+   AstMapping *rimap;         /* Pointer to split inverse Mapping */
+   AstTranMap *this;          /* Pointer to TranMap structure */
+   int *ires;                 /* I/ps of inv Mapping dependent on selected o/ps */
+   int *out;                  /* O/ps of fwd Mapping dependent on selected i/ps */
+   int *result;               /* Pointer to returned array */
+   int finv;                  /* Invert flag to use with fmap */
+   int i;                     /* Loop count */
+   int iinv;                  /* Invert flag to use with imap */
+   int nout;                  /* No. of outputs dependent on selected inputs */
+   int ok;                    /* Can required Mapping be created? */
+   int old_finv;              /* Original Invert flag for fmap */
+   int old_iinv;              /* Original Invert flag for imap */
+
+/* Initialise */
+   result = NULL;
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Invoke the parent astMapSplit method to see if it can do the job. */
+   result = (*parent_mapsplit)( this_map, nin, in, map );
+
+/* If not, we provide a special implementation here. */
+   if( !result ) {
+
+/* Get a pointer to the TranMap structure. */
+      this = (AstTranMap *) this_map;
+
+/* Get pointers to the forward and inverse Mappings, taking into account
+   whether the TranMap has been inverted. */
+      if( !astGetInvert( this ) ) {
+         fmap = this->map1;
+         finv = this->invert1;
+         imap = this->map2;
+         iinv = this->invert2;
+      } else {
+         imap = this->map1;
+         iinv = this->invert1;
+         fmap = this->map2;
+         finv = this->invert2;
+      }
+
+/* Temporarily set the Invert flag of both Mappings back to their
+   original values. */ 
+      old_finv = astGetInvert( fmap );
+      astSetInvert( fmap, finv );
+      old_iinv = astGetInvert( imap );
+      astSetInvert( imap, iinv );
+
+/* Try to split the forward Mapping. */
+      out = astMapSplit( fmap, nin, in, &rfmap );
+
+/* Check the split could be done. */
+      if( out ) {
+
+/* Get the number of outputs which are fed by the selected inputs. */
+         nout = astGetNout( rfmap );
+
+/* See if the inverse Mapping can be split using these outputs as inputs. */
+         astInvert( imap );
+         ires = astMapSplit( imap, nout, out, &rimap );
+         astInvert( imap );
+         if( ires ) {
+            astInvert( rimap );
+
+/* Check that the resulting inputs are the same as the supplied inputs. */
+            if( astGetNin( rimap ) == nin ) {
+               ok = 1;
+               for( i = 0; i < nin; i++ ) {
+                  if( in[ i ] != ires[ i ] ) {
+                     ok = 0;
+                     break;
+                  }
+               }
+
+/* If so create the requirednew TranMap. */
+               if( ok ) {
+                  *map = (AstMapping *) astTranMap( rfmap, rimap, "" );
+                  result = out;
+               }
+            }
+
+/* Free resources. */
+            ires = astFree( ires );
+            rimap = astAnnul( rimap );
+         }
+
+         if( !result ) out = astFree( out );
+         rfmap = astAnnul( rfmap );
+      }
+
+/* Re-instate the Invert flags of the component Mappings. */
+      astSetInvert( fmap, old_finv );
+      astSetInvert( imap, old_iinv );
+   }
+
+/* Free returned resources if an error has occurred. */
+   if( !astOK ) {
+      result = astFree( result );
+      *map = astAnnul( *map );
+   }
+
+/* Return the list of output indices. */
    return result;
 }
 

@@ -163,6 +163,7 @@ static void SetAttrib( AstObject *, const char * );
 static void WinMat( AstMapping **, int *, int );
 static void WinPerm( AstMapping **, int *, int );
 static void WinWcs( AstMapping **, int *, int );
+static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Function Macros */
 /* =============== */
@@ -563,6 +564,7 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
+   mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;
 
 /* Declare the class dump, copy and delete functions.*/
@@ -1424,6 +1426,140 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    }
 
 /* Return the result. */
+   return result;
+}
+
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+/*
+*  Name:
+*     MapSplit
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+
+*  Class Membership:
+*     WinMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function creates a new Mapping by picking specified inputs from 
+*     an existing WinMap. This is only possible if the specified inputs
+*     correspond to some subset of the WinMap outputs. That is, there
+*     must exist a subset of the WinMap outputs for which each output
+*     depends only on the selected WinMap inputs, and not on any of the
+*     inputs which have not been selected. If this condition is not met
+*     by the supplied WinMap, then a NULL Mapping is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap to be split (the WinMap is not actually 
+*        modified by this function).
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied WinMap, then each element 
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied WinMap has no subset of outputs which 
+*        depend only on the selected inputs.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the 
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied WinMap. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+
+/* Local Variables: */
+   AstWinMap *newwm;          /* Pointer to returned WinMap */
+   AstWinMap *this;           /* Pointer to WinMap structure */
+   double *a;                 /* Pointer to zero terms */
+   double *b;                 /* Pointer to scale terms */
+   int *result;               /* Pointer to returned array */
+   int i;                     /* Loop count */
+   int iin;                   /* Mapping input index */
+   int mnin;                  /* No. of Mapping inputs */
+   int ok;                    /* Are input indices OK? */
+
+/* Initialise */
+   result = NULL;
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the WinMap structure. */
+   this = (AstWinMap *) this_map;
+
+/* Allocate memory for the returned array and create a WinMap with the
+   required number of axes and undefined corners. */
+   result = astMalloc( sizeof( int )*(size_t) nin );
+   newwm = astWinMap( nin, NULL, NULL, NULL, NULL, "" );
+   *map = (AstMapping *) newwm;
+
+/* Now get pointers to the scale and zero terms of the supplied WinMap
+   (these describe the forward transformation, taking into account the 
+   setting of the Invert flag). */
+   (void) astWinTerms( this , &a, &b );   
+
+/* Check pointers can be used safely. */
+   if( astOK ) {
+
+/* Store the required scale and zero terms from the supplied WinMap
+   in the new WinMap. At the same time check that each axis is valid. */
+      mnin = astGetNin( this );
+      ok = 1;
+      for( i = 0; i < nin; i++ ) {
+         iin = in[ i ];
+         if( iin >= 0 && iin < mnin ) {
+            (newwm->a)[ i ] = a[ iin ];
+            (newwm->b)[ i ] = b[ iin ];
+            result[ i ] = iin;
+         } else {
+            ok = 0;
+            break;
+         }
+      }
+
+/* If the "in" array contained any invalid values, free the returned
+   resources. */
+      if( !ok ) { 
+         result = astFree( result );
+         *map = astAnnul( *map );
+      }
+   }
+
+/* Free resources. */
+   a = astFree( a );
+   b = astFree( b );
+
+/* Free returned resources if an error has occurred. */
+   if( !astOK ) {
+      result = astFree( result );
+      *map = astAnnul( *map );
+   }
+
+/* Return the list of output indices. */
    return result;
 }
 

@@ -140,6 +140,8 @@
 *           transformation.
 *        astMapList
 *           Decompose a Mapping into a sequence of simpler Mappings.
+*        astMapSplit
+*           Select a subset of Mapping inputs.
 *        astMapMerge
 *           Simplify a sequence of Mappings.
 *        astReportPoints
@@ -365,6 +367,7 @@ typedef struct AstMappingVtab {
    void (* Invert)( struct AstMapping * );
    void (* MapBox)( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
    int (* MapList)( AstMapping *, int, int, int *, AstMapping ***, int ** );
+   int *(* MapSplit)( AstMapping *, int, int *, AstMapping ** );
    void (* ReportPoints)( AstMapping *, int, AstPointSet *, AstPointSet * );
    void (* SetInvert)( AstMapping *, int );
    void (* SetReport)( AstMapping *, int );
@@ -447,6 +450,7 @@ int astTestReport_( AstMapping * );
 void astClearInvert_( AstMapping * );
 void astClearReport_( AstMapping * );
 int astMapList_( AstMapping *, int, int, int *, AstMapping ***, int ** );
+int *astMapSplit_( AstMapping *, int, int *, AstMapping ** );
 void astReportPoints_( AstMapping *, int, AstPointSet *, AstPointSet * );
 void astSetInvert_( AstMapping *, int );
 void astSetReport_( AstMapping *, int );
@@ -565,6 +569,8 @@ astINVOKE(V,astGetTranForward_(astCheckMapping(this)))
 astINVOKE(V,astGetTranInverse_(astCheckMapping(this)))
 #define astMapList(this,series,invert,nmap,map_list,invert_list) \
 astINVOKE(V,astMapList_(this,series,invert,nmap,map_list,invert_list))
+#define astMapSplit(this,nin,in,map) \
+astINVOKE(V,astMapSplit_(this,nin,in,map))
 #define astMapMerge(this,where,series,nmap,map_list,invert_list) \
 astINVOKE(V,astMapMerge_(astCheckMapping(this),where,series,nmap,map_list,invert_list))
 #define astReportPoints(this,forward,in_points,out_points) \

@@ -93,6 +93,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping ** );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -104,16 +105,16 @@ AstPermMap *astPermMapId_( int, const int [], int, const int [], const double []
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static double *GetConstants( AstPermMap * );
 static double Rate( AstMapping *, double *, int, int );
+static int *GetInPerm( AstPermMap * );
+static int *GetOutPerm( AstPermMap * );
+static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static int NullPerm( AstPermMap *, int );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static double *GetConstants( AstPermMap * );
-static int *GetOutPerm( AstPermMap * );
-static int *GetInPerm( AstPermMap * );
-static int NullPerm( AstPermMap *, int );
-
 
 /* Member functions. */
 /* ================= */
@@ -231,6 +232,8 @@ static int *GetInPerm( AstPermMap *this ){
 */
 
 /* Local Variables: */
+   int i;                      /* Loop count */
+   int nin;                    /* Number of inputs. */
    int *result;                /* Pointer to the returned array */
 
 /* Initialise the returned result. */
@@ -239,9 +242,18 @@ static int *GetInPerm( AstPermMap *this ){
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Allocate memoy and put a copy of the InPerm array in it. */
-   result = (int *) astStore( NULL, this->inperm, 
+/* If no inperm array is stored, every input is derived from the
+   corresponding output. Therefore, return an array holding 0 to Nin-1. */
+   if( !this->inperm ) {
+      nin = astGetNin( this );
+      result = (int *) astMalloc( sizeof( int ) * (size_t) nin );
+      if( astOK ) for( i = 0; i < nin; i++ ) result[ i ] = i;
+
+/* Otherwise, allocate memoy and put a copy of the InPerm array in it. */
+   } else {
+      result = (int *) astStore( NULL, this->inperm, 
                               sizeof( int ) * (size_t) astGetNin( this ) );
+   }
 
 /* Return the result. */
    return result;
@@ -297,6 +309,8 @@ static int *GetOutPerm( AstPermMap *this ){
 */
 
 /* Local Variables: */
+   int i;                      /* Loop count */
+   int nout;                   /* Number of outputs. */
    int *result;                /* Pointer to the returned array */
 
 /* Initialise the returned result. */
@@ -305,9 +319,18 @@ static int *GetOutPerm( AstPermMap *this ){
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Allocate memoy and put a copy of the OutPerm array in it. */
-   result = (int *) astStore( NULL, this->outperm, 
+/* If no outperm array is stored, every output is derived from the
+   corresponding input. Therefore, return an array holding 0 to Nout-1. */
+   if( !this->outperm ) {
+      nout = astGetNout( this );
+      result = (int *) astMalloc( sizeof( int ) * (size_t) nout );
+      if( astOK ) for( i = 0; i < nout; i++ ) result[ i ] = i;
+
+/* Otherwise, allocate memory and put a copy of the OutPerm array in it. */
+   } else {
+      result = (int *) astStore( NULL, this->outperm, 
                               sizeof( int ) * (size_t) astGetNout( this ) );
+   }
 
 /* Return the result. */
    return result;
@@ -379,6 +402,9 @@ void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name ) {
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
+
+   parent_mapsplit = mapping->MapSplit;
+   mapping->MapSplit = MapSplit;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -1097,6 +1123,209 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    if ( !astOK ) result = -1;
 
 /* Return the result. */
+   return result;
+}
+
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+/*
+*  Name:
+*     MapSplit
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     PermMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "permmap.h"
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+
+*  Class Membership:
+*     PermMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function creates a new Mapping by picking specified inputs from 
+*     an existing PermMap. This is only possible if the specified inputs
+*     correspond to some subset of the PermMap outputs. That is, there
+*     must exist a subset of the PermMap outputs for which each output
+*     depends only on the selected PermMap inputs, and not on any of the
+*     inputs which have not been selected. If this condition is not met
+*     by the supplied PermMap, then a NULL Mapping is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the PermMap to be split (the PermMap is not actually 
+*        modified by this function).
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied PermMap, then each element 
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied PermMap has no subset of outputs which 
+*        depend only on the selected inputs.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the 
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied PermMap. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+
+/* Local Variables: */
+   AstPermMap *this;          /* Pointer to PermMap structure */
+   double *con;               /* Constants array for new PermMap */
+   int *inp;                  /* Input perm array to use with supplied PermMap */
+   int *inpm;                 /* Input perm array to use with new PermMap */
+   int *outp;                 /* Output perm array to use with supplied PermMap */
+   int *outpm;                /* Output perm array to use with new PermMap */
+   int *result;               /* Pointer to returned array */
+   int i;                     /* Loop count */
+   int iin;                   /* Mapping input index */
+   int iout;                  /* Output index */
+   int j;                     /* Loop count */
+   int ncon;                  /* No. of constants in the new PermMap */
+   int nout;                  /* No. of outputs in the new PermMap */
+   int npin;                  /* No. of inputs in the supplied Mapping */
+   int npout;                 /* No. of outputs in the supplied Mapping */
+   int ok;                    /* Are input indices OK? */
+
+/* Initialise */
+   result = NULL;
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Invoke the parent astMapSplit method to see if it can do the job. */
+   result = (*parent_mapsplit)( this_map, nin, in, map );
+
+/* If not, we provide a special implementation here. */
+   if( !result ) {
+
+/* Get a pointer to the PermMap structure. */
+      this = (AstPermMap *) this_map;
+
+/* Get the number of inputs and outputs in the supplied PermMap. */
+      npin = astGetNin( this );
+      npout = astGetNout( this );
+
+/* Check all input axis indices are valid. */
+      ok = 1;
+      for( i = 0; i < nin; i++ ) {
+         if( in[ i ] < 0 || in[ i ] >= npin ) {
+            ok = 0;
+            break;
+         }
+      }
+
+/* Get pointers to the input and output permutation arrays taking account
+   of whether the PermMap has been inverted. */
+      if( astGetInvert( this ) ) {
+         outp = this->inperm;
+         inp = this->outperm;
+      } else {
+         outp = this->outperm;
+         inp = this->inperm;
+      }
+
+/* Allocate memory for the inperm and outperm arrays of the returned
+   PermMap. Make these the largest they could possible need to be. */
+      inpm = astMalloc( sizeof( int )*(size_t) npin );
+      outpm = astMalloc( sizeof( int )*(size_t) npout );
+      con = astMalloc( sizeof( double )*(size_t) ( npout + npin ) );
+
+/* Allocate memory for the returned array of output indices. */
+      result = astMalloc( sizeof( int )*(size_t) nin );
+      if( astOK ) {
+
+/* Initialise number of outputs in returned PermMap. */
+         nout = 0;
+
+/* Loop round each output of the supplied PermMap. */
+         for( iout = 0; iout < npout; iout++ ) {
+ 
+/* Is this output fed by one of the selected inputs? If so store the
+   input of the returned Mapping which feeds this output and add this
+   output index to the list of returned outputs. */
+            iin = outp ? outp[ iout ] : iout;
+            for( i = 0; i < nin; i++ ) {
+               if( in[ i ] == iin ) {
+                  outpm[ nout ] = i;
+                  result[ nout ] = iout;
+                  nout++;
+                  break;
+               }
+            }
+         }
+
+/* We now need to set up the inperm array for the returned PermMap. This
+   ensures that the inverse transformation in the returned Mapping provides 
+   values for the selected inputs. Loop round all the selected inputs. */
+         ncon = 0;
+         for( i = 0; i < nin; i++ ) {
+            iin = in[ i ];
+ 
+/* Is this input constant or fed by one of the selected outputs? If so store 
+   the output or constant index in the returned Mapping which feeds this input. */
+            ok = 0;
+            iout = inp ? inp[ iin ] : iin;
+            if( iout >= 0 ) {
+               for( j = 0; j < nout; j++ ) {
+                  if( result[ j ] == iout ) {
+                     ok = 1;
+                     inpm[ i ] = j;
+                     break;
+                  }
+               }
+            } else {
+               con[ ncon++ ] = this->constant ? this->constant[ (-iout) - 1 ] : AST__BAD;
+               inpm[ i ] = -ncon;
+               ok = 1;
+            }
+
+/* If this input is fed by an output which has not been selected, then we
+   cannot produce the required Mapping. */
+            if( !ok ) break;
+         }
+
+/* If possible produce the returned PermMap. Otherwise, free the returned
+   array. */
+         if( ok ) {
+            *map = (AstMapping *) astPermMap( nin, inpm, nout, outpm, con, "" );
+         } else {
+            result = astFree( result );
+         }
+
+/* Free other resources. */
+         inpm = astFree( inpm );
+         outpm = astFree( outpm );
+         con = astFree( con );
+      }
+   }
+
+/* Free returned resources if an error has occurred. */
+   if( !astOK ) {
+      result = astFree( result );
+      *map = astAnnul( *map );
+   }
+
+/* Return the list of output indices. */
    return result;
 }
 

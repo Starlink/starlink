@@ -31,10 +31,13 @@
 #  Prior Requirements:
 #     - Requires the gv command (a frontend for ghostscript) to be on your PATH
 #     - The following environment variables are used:
-#        STARLINK - should be set to the root of the tree containing the SSC. A default of 
-#                   /star is used if not set.
-#        AST - should be set to the root of the tree containing the version of AST to be tested. 
-#              A default of $HOME is used if not set.
+#        STARLINK - should be set to the root of the tree in which the SSC is 
+#              installed. A default of /star is used if not set.
+#        AST - should be set to the root of the tree in which the version of 
+#              AST to be tested is installed. A default of $HOME is used if not set.
+#        ASTSOURCE - should be set to the directory containing the AST source 
+#              files. Tests which require source files are skipped if 
+#              this variable is not set.
 #-
 
 if( ! $?STARLINK ) then
@@ -85,6 +88,12 @@ g77 -fno-second-underscore -o $prog $prog.f -I$AST/include -I$STARLINK/include -
 $prog
 rm $prog
 end
+
+if( $?ASTSOURCE ) then
+   gcc -o testsplit testsplit.c -I$ASTSOURCE -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+   testsplit
+   rm testsplit
+endif
 
 # Make new plots.
 echo "\nGenerating new plots...\n"

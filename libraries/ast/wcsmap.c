@@ -606,6 +606,7 @@ static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
+static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping ** );
 
 /* The following array of PrjData structured describes each of the WCSLIB
    projections. The last entry in the list should be for the AST__WCSBAD 
@@ -682,6 +683,7 @@ static void LongRange( const PrjData *, struct AstPrjPrm *, double *, double *);
 static void PermGet( AstPermMap *, int **, int **, double ** );
 static void SetAttrib( AstObject *, const char * );
 static void WcsPerm( AstMapping **, int *, int );
+static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Member functions. */
 /* ================= */
@@ -1919,6 +1921,9 @@ void astInitWcsMapVtab_(  AstWcsMapVtab *vtab, const char *name ) {
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
 
+   parent_mapsplit = mapping->MapSplit;
+   mapping->MapSplit = MapSplit;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
@@ -2726,6 +2731,160 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    }
 
 /* Return the result. */
+   return result;
+}
+
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+/*
+*  Name:
+*     MapSplit
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     WcsMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+
+*  Class Membership:
+*     WcsMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function creates a new Mapping by picking specified inputs from 
+*     an existing WcsMap. This is only possible if the specified inputs
+*     correspond to some subset of the WcsMap outputs. That is, there
+*     must exist a subset of the WcsMap outputs for which each output
+*     depends only on the selected WcsMap inputs, and not on any of the
+*     inputs which have not been selected. If this condition is not met
+*     by the supplied WcsMap, then a NULL Mapping is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the WcsMap to be split (the WcsMap is not actually 
+*        modified by this function).
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied WcsMap, then each element 
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied WcsMap has no subset of outputs which 
+*        depend only on the selected inputs.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the 
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied WcsMap. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+
+/* Local Variables: */
+   AstWcsMap *newwcs;         /* Pointer to returned WcsMap */
+   AstWcsMap *this;           /* Pointer to WcsMap structure */
+   int *result;               /* Pointer to returned array */
+   int i;                     /* Loop count */
+   int iin;                   /* Mapping input index */
+   int ilat;                  /* Index of latitude axis in new WcsMap */
+   int ilon;                  /* Index of longitude axis in new WcsMap */
+   int latax;                 /* Index of latitude axis in supplied WcsMap */
+   int lonax;                 /* Index of longitude axis in supplied WcsMap */
+   int mnin;                  /* No. of Mapping inputs */
+   int ok;                    /* Are input indices OK? */
+
+/* Initialise */
+   result = NULL;
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Invoke the parent astMapSplit method to see if it can do the job. */
+   result = (*parent_mapsplit)( this_map, nin, in, map );
+
+/* If not, we provide a special implementation here. */
+   if( !result ) {
+
+/* Get a pointer to the WcsMap structure. */
+      this = (AstWcsMap *) this_map;
+
+/* Allocate memory for the returned array. */
+      result = astMalloc( sizeof( int )*(size_t) nin );
+      if( astOK ) {
+
+/* Get the indices of the longitude and latitude axes in the WcsMap */
+         lonax = astGetWcsAxis( this, 0 );
+         latax = astGetWcsAxis( this, 1 );
+
+/* See if the selected axes include the longitude and/or latitude axis.
+   At the same time check the axis indices are ok, and set up the output 
+   axis array. */
+         ilat = -1;
+         ilon = -1;
+         mnin = astGetNin( this );
+         ok = 1;
+         for( i = 0; i < nin; i++ ) {
+            iin = in[ i ];
+            if( iin < 0 || iin >= mnin ) {
+               ok = 0;
+               break;
+            } else if( iin == lonax ) {
+               ilon = i;
+            } else if( iin == latax ) {
+               ilat = i;
+            }
+            result[ i ] = iin;
+         }
+
+/* If any of the input indices were invalid, free the returned array. */
+         if( !ok ) {
+            result = astFree( result );   
+
+/* If both longitude and latitude axes are selected, then the returned Mapping 
+   is a WcsMap. Create one based on the supplied WcsMap. */
+         } else if( ilat != -1 && ilon != -1 ) {
+            newwcs = astWcsMap( nin, astGetWcsType( this ), ilon + 1, ilat + 1,
+                                "" );
+            CopyPV( this, newwcs );
+            astSetInvert( newwcs, astGetInvert( this ) );
+            *map = (AstMapping *) newwcs;
+
+/* If neither the longitude nor the latitude axis has been selected, then 
+   the returned Mapping is a UnitMap. */
+         } else if( ilat == -1 && ilon == -1 ) {
+            *map = (AstMapping *) astUnitMap( nin, "" );
+
+/* If only one of the latitude and longitude axes was selected we cannot
+   split the Mapping.*/
+         } else {
+            result = astFree( result );   
+         }
+      }
+   }
+
+/* Free returned resources if an error has occurred. */
+   if( !astOK ) {
+      result = astFree( result );
+      *map = astAnnul( *map );
+   }
+
+/* Return the list of output indices. */
    return result;
 }
 

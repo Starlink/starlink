@@ -122,6 +122,7 @@ static void ClearZoom( AstZoomMap * );
 static void Dump( AstObject *, AstChannel * );
 static void SetAttrib( AstObject *, const char * );
 static void SetZoom( AstZoomMap *, double );
+static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Member functions. */
 /* ================= */
@@ -354,6 +355,7 @@ void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
+   mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;
 
 /* Declare the class dump function. There is no copy constructor or
@@ -780,6 +782,128 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    if ( !astOK ) result = -1;
 
 /* Return the result. */
+   return result;
+}
+
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+/*
+*  Name:
+*     MapSplit
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     ZoomMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "zoommap.h"
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+
+*  Class Membership:
+*     ZoomMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function creates a new Mapping by picking specified inputs from 
+*     an existing ZoomMap. This is only possible if the specified inputs
+*     correspond to some subset of the ZoomMap outputs. That is, there
+*     must exist a subset of the ZoomMap outputs for which each output
+*     depends only on the selected ZoomMap inputs, and not on any of the
+*     inputs which have not been selected. If this condition is not met
+*     by the supplied ZoomMap, then a NULL Mapping is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the ZoomMap to be split (the ZoomMap is not actually 
+*        modified by this function).
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied ZoomMap, then each element 
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied ZoomMap has no subset of outputs which 
+*        depend only on the selected inputs.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the 
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied ZoomMap. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+
+/* Local Variables: */
+   AstZoomMap *this;          /* Pointer to ZoomMap structure */
+   int *result;               /* Pointer to returned array */
+   int i;                     /* Loop count */
+   int iin;                   /* Mapping input index */
+   int mnin;                  /* No. of Mapping inputs */
+   int ok;                    /* Are input indices OK? */
+
+/* Initialise */
+   result = NULL;
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the ZoomMap structure. */
+   this = (AstZoomMap *) this_map;
+
+/* Allocate memory for the returned array and create a ZoomMap with the
+   required number of axes. */
+   result = astMalloc( sizeof( int )*(size_t) nin );
+   *map = (AstMapping *) astZoomMap( nin, astGetZoom( this ), "" );
+
+/* Set its Invert attribute to be like the supplied ZoomMap. */
+   astSetInvert( *map, astGetInvert( this ) );
+
+/* Check pointers can be used safely. */
+   if( astOK ) {
+
+/* Store the required output axis indices. At the same time check that each 
+   axis is valid. */
+      mnin = astGetNin( this );
+      ok = 1;
+      for( i = 0; i < nin; i++ ) {
+         iin = in[ i ];
+         if( iin >= 0 && iin < mnin ) {
+            result[ i ] = iin;
+         } else {
+            ok = 0;
+            break;
+         }
+      }
+
+/* If the "in" array contained any invalid values, free the returned
+   resources. */
+      if( !ok ) { 
+         result = astFree( result );
+         *map = astAnnul( *map );
+      }
+   }
+
+/* Free returned resources if an error has occurred. */
+   if( !astOK ) {
+      result = astFree( result );
+      *map = astAnnul( *map );
+   }
+
+/* Return the list of output indices. */
    return result;
 }
 
