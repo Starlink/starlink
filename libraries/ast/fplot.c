@@ -343,13 +343,19 @@ F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME),
 
 static int FGAttrWrapper( AstPlot *this, int attr, double value, 
                           double *old_value, int prim ) {
+   DECLARE_DOUBLE(OLDVAL);
+   int ret;
+
    if ( !astOK ) return 0;
-   return ( *(int (*)( INTEGER(attr), DOUBLE(value), DOUBLE(old_value),
+
+   ret = ( *(int (*)( INTEGER(attr), DOUBLE(value), DOUBLE(old_value),
                        INTEGER(prim) ))
                   this->grffun[ AST__GATTR ])(  INTEGER_ARG(&attr),
                                                 DOUBLE_ARG(&value), 
-                                                DOUBLE_ARG(old_value),  
+                                                DOUBLE_ARG(&OLDVAL),  
                                                 INTEGER_ARG(&prim) );
+   if( old_value ) *old_value = OLDVAL;
+   return ret;
 }
 
 static int FGFlushWrapper( AstPlot *this ) {
