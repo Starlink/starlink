@@ -44,10 +44,15 @@ SGML_CATALOG_FILES=./CATALOG:$SGML_CATALOG_FILES
 </verbatim>
 (or use the corresponding <code>setenv</> command).
 
+<p>Although it is possible to change any of the following parameters,
+the ones with percent characters in their names are, in a sense,
+`internal parameters', changing which is likely to have unexpected
+consequences.
+
 <authorlist>
 <author id=ng affiliation='Starlink, Glasgow'>Norman Gray
-<copyright>Copyright 1999, Particle Physics and Astronomy Research
-Council
+<copyright>Copyright 1999, 2000, Council of the Central Laboratory
+of the Research Councils
 
 <codegroup>
 <title>Common parameterisation
