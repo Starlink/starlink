@@ -1,0 +1,35 @@
+*+  ECHWIND_PAR - Most global parameters used by ECHWIND
+*
+*   History:
+*
+*     26 Jul 1988 : Original version  (ZUVAD::CJH)
+*     13 Dec 1988 : OV_GREEN added  (AAOEPP::KS)
+*     10 Sep 1989 : Change name from MANCOM_ to ECHWIND_  (AAOEPP::WFL)
+*     12 Sep 1989 : Add ANGLE_FUDGE  (AAOEPP::WFL)
+
+*--------------------------------------------------------------
+      real RAD                              ! guess what
+      parameter (RAD = 57.29577951)
+
+      integer MAX_BOXES                     ! Maximum number of detector
+      parameter (MAX_BOXES = 100)           ! boxes that can be remembered
+
+      real WAVEMAX, WAVEMIN                 ! Max and Min wavelengths
+      parameter (WAVEMIN = 3000.0, WAVEMAX = 11000.0)
+
+      integer MAX_POLY                      ! longest poly line that can be
+      parameter (MAX_POLY = 1000)           ! sent to IDI_PL
+
+      integer MAX_ORDER                     ! Most order positions that can
+      parameter (MAX_ORDER = 200)           ! be stored
+
+      real ANGLE_FUDGE            ! approximate anamorphotic factor
+      parameter (ANGLE_FUDGE=1.5)
+*
+*   colours used in plotting
+*
+      integer white,black,grey,ir,uv,ov_green
+      common /colour_common/  white,black,grey,ir,uv,ov_green
+
+*---------------------------------------------------------------------------
+

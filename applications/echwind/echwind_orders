@@ -1,0 +1,26 @@
+*+  ECHWIND_ORDERS - Common block holding the end coordinates of each spectral
+*                    order
+*
+*   Also holds the coordinates of the stored detector boxes
+*
+*   History :
+*
+*     26 Jul 1988 : Original version  (ZUVAD::CJH)
+*     10 Sep 1989 : Change name from MANCOM_ to ECHWIND_  (AAOEPP::WFL)
+
+*--------------------------------------------------------------
+      real boxes(4, MAX_BOXES)    ! array to hold corner positions of stored
+                                  ! detector positions (mm). (x1, y1, x2, y2)
+      integer nboxes              ! no. of detector positions remembered
+*
+*    order end positions in mm
+*
+      real orderdl(MAX_ORDER)     ! left end of order in dispersion dir.
+      real orderdr(MAX_ORDER)     ! right end of order in dispersion dir.
+      real orderxdl(MAX_ORDER)    ! left end of order in cross-disp. dir.
+      real orderxdr(MAX_ORDER)    ! right end of order in cross-disp. dir.
+
+      common /echwind_orders/ boxes, nboxes,
+     :      orderdl, orderdr, orderxdl, orderxdr
+*--------------------------------------------------------------
+

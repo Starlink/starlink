@@ -1,0 +1,32 @@
+1 ECHWIND - Echelle reduction planning 
+                                                     Expires: ??.??.??
+
+ NEWS: Linux version v3.1-0 available.
+
+ This the Starlink release of the Unix port of ECHWIND, provided by
+ Marion Fisher et al at RGO Cambridge.  It uses a bundled in copy of 
+ the native PGPLOT graphics system.
+
+ To start ECHWIND, enable the Starlink Software, and type:
+
+         % echwind
+
+ Details on how to use ECHWIND are contained in SUN/53.
+
+ v3.1-3 (05-Mar-1999)
+    Fix to plotting system to prevent cursor returning to bottom left
+    corner of the screen every time a mouse click is issued (Linux).
+
+ v3.1-2 (09-Oct-1998)
+    Maintenance release to change linking to use USSC copy of Native PGPLOT
+    and remove the copy of Native PGPLOT bundled with ECHWIND.
+
+ v3.1-0 (07-Feb-1997)
+    Linux port of Starlink version.  Minor modifications of makefile
+    and build procedures.  The display device is defaulted to /XWIN unless
+    the PGPLOT_DEV environment variable is preset to something.  There is 
+    no other change to program functionality or documentation.
+
+ v3.0-0 (16-Jul-1996)
+    Original Starlink version releases.
+

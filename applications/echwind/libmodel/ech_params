@@ -1,0 +1,67 @@
+*+  ECH_PARAMS  -  Common block to hold parameters of all possible
+*                  spectrographs.
+
+*
+*   Description :
+*
+*     This module is 'included' by any routine needing access to spectrograph
+*     parameters.
+*
+*   Authors :
+*
+*     W.F. Lupton  AAO  (AAOEPP::WFL)
+*
+*   History :
+*
+*     07 Dec 1989 : First implementation (AAOEPP::WFL)
+*     26 Sep 1994 : Added blaze0, thetacam, collxe, prface, prapex, gamafac
+*                   (MPF/RGO)
+*
+*   Global constants :
+*
+      integer MAXINSTS          ! maximum number of instruments
+      parameter (MAXINSTS = 5)
+      integer INSTLEN           ! maximum length of an instrument name
+      parameter (INSTLEN = 16)
+      integer MAXECHS           ! maximum number of echelles (per instrument)
+      parameter (MAXECHS = 3)
+      integer ECHLEN            ! maximum length of a echelle name
+      parameter (ECHLEN = 16)
+      integer MAXCAMS           ! maximum number of cameras (per instrument)
+      parameter (MAXCAMS = 3)
+      integer CAMLEN            ! maximum length of a camera name
+      parameter (CAMLEN = 16)
+
+*
+*   Global variables :
+*
+      integer ninsts                    ! number of instruments in file
+      integer npr(0:MAXINSTS)           ! number of prisms
+      real angle(0:MAXINSTS)            ! prism angle (radians)
+      real fcol(0:MAXINSTS)             ! focal length of collimator (mm)
+      real collxe(0:MAXINSTS)           ! collimated axis to echelle dist (m)
+      real prface(0:MAXINSTS)           ! prism face length (glass) (m)
+      real prapex(0:MAXINSTS)           ! prism apex along face (m)
+      real gamafac(0:MAXINSTS)          ! empirical gamma factor
+      character*(INSTLEN) insts(0:MAXINSTS) ! instrument name
+      
+      integer nechs(0:MAXINSTS)         ! number of echelles
+      integer m0(0:MAXECHS,0:MAXINSTS)  ! central order number
+      real d(0:MAXECHS,0:MAXINSTS)      ! number of lines / mm
+      real thetab(0:MAXECHS,0:MAXINSTS) ! blaze angle (radians)
+      real blaze0(0:MAXECHS,0:MAXINSTS) ! blaze0 for theta enc.=10000 (rad.)
+      real theta0(0:MAXECHS,0:MAXINSTS) ! central theta (radians)
+      real gamma0(0:MAXECHS,0:MAXINSTS) ! central gamma (radians)
+      real wave0(0:MAXECHS,0:MAXINSTS)  ! central wavelength (Angstroms)
+      character*(ECHLEN) echs(0:MAXECHS,0:MAXINSTS) ! echelle name
+
+      integer ncams(0:MAXINSTS)         ! number of cameras
+      real fcam(0:MAXCAMS,0:MAXINSTS)   ! camera focal length (mm)
+      real thetacam(0:MAXCAMS,0:MAXINSTS) ! beam separation of camera (radians)
+      character*(CAMLEN) cams(0:MAXCAMS,0:MAXINSTS) ! camera name
+
+      common /ech_params/ ninsts,npr,angle,fcol,insts,
+     :                    nechs,m0,d,thetab,blaze0,theta0,gamma0,wave0,
+     :                    echs,ncams,fcam,thetacam,cams,collxe,prface,
+     :                    prapex,gamafac
+                                        

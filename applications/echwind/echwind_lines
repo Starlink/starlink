@@ -1,0 +1,20 @@
+*+  ECHWIND_LINES - Common block included by routines needing access to the
+*                   list of lines
+*
+*   History :
+*
+*     26 Jul 1988 : Original version  (ZUVAD::CJH)
+*     10 Sep 1989 : Change name from MANCOM_ to ECHWIND_  (AAOEPP::WFL)
+
+*----------------------------------------------------------
+      integer nlines                  ! no. of lines in list
+
+      integer MAXLINES                ! Max. no. of lines
+      parameter (MAXLINES = 1000)
+
+      real lines(MAXLINES)            ! Array for holding wavelengths
+      character*30 line_labels(MAXLINES)  ! Array for line labels
+
+      common /echwind_lines/ nlines, lines, line_labels
+*----------------------------------------------------------
+

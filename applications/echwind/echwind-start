@@ -1,0 +1,9 @@
+#! /bin/csh
+
+# define an environment variable for the ECHWIND program
+# Stephen Meatheringham; 25 May 1992
+
+setenv ECHWIND_SPECTROGRAPHS spectrographs.dat
+setenv ECHWIND_DETECTORS     detectors.dat
+
+setenv ECHWIND_HOME /home/Rahm/mpf/echwind/

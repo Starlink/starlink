@@ -1,0 +1,67 @@
+!+ SPECTROGRAPHS.DAT
+!
+!  Function:
+!    Define parameters for spectrographs whose behaviour can be modelled using
+!    the UCLES model library.
+!
+!  Description:
+!    Initially UCLES and UES are supported, together with a notional short
+!    camera for UCLES. See the header comments to subroutine ECH_LOAD for
+!    details of how to lay out this file if it is not already obvious!
+!
+!  History:
+!    22-Dec-89 - WFL - Original version
+!    26-Sep-94 - MPF - Added BLAZE0, THETACAM, NPR, COLLXE, PRFACE, PRAPEX,
+!                      GAMAFAC, UES now has correct values.
+
+INSTRUMENT UES
+   FCOL 1800.0
+   ANGLE 54.03
+   NPR 3
+   COLLXE -1.848
+   PRFACE 0.2995
+   PRAPEX 0.0297
+   GAMAFAC 1.0
+   ECHELLE 31
+      D 31.6046
+      M0 140
+      WAVE0 4020.10
+      THETAB 64.95
+      BLAZE0 63.46
+   ECHELLE 79
+      D 79.0115
+      M0 56
+      WAVE0 4025.34
+      THETAB 63.96
+      BLAZE0 63.61
+   CAMERA LONG
+      FCAM 700.0
+      THETACAM 12.417
+
+INSTRUMENT UCLES
+   FCOL 6000.0
+   ANGLE 54.1
+   NPR 3
+   COLLXE -1.800
+   PRFACE 0.313
+   PRAPEX 0.015
+   GAMAFAC 1.011
+   ECHELLE 31
+      D 31.6046
+      M0 138
+      WAVE0 4119.68
+      THETAB 64.6
+      BLAZE0 64.6
+   ECHELLE 79
+      D 79.0115
+      M0 55
+      WAVE0 4097.99
+      THETAB 63.55
+      BLAZE0 63.55
+   CAMERA LONG
+      FCAM 700.0
+      THETACAM 12.0
+   CAMERA SHORT
+      FCAM 450.0
+      THETACAM 12.0
+

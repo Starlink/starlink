@@ -1,0 +1,131 @@
+interface ECHWIND
+
+# History:
+#
+# Spring 1988   Original version CJH/UCL
+#   14-Dec-88   Default size for IPCS corrected.  KS/AAO.
+#   17-Feb-89   Remove STORE and don't use current control file.  WFL/AAO.
+#   29-Mar-89	Don't use default for device name. Change default IPCS size
+#               to 33.9 x 18.6 mm until camera mirror is memded.   WFL/AAO
+#   05-Apr-89	Change VPATHs for detector size parameters so that only
+#		the default is used.  WFL/AAO
+#   10-Sep-89	Change all references to MANUAL to refer to ECHWIND; replace
+#               specific detector parameters with parameters for names of
+#               detector files.  WFL/AAO
+#   11-Sep-89   Remove defaults for ANGLE and DEV.  WFL/AAO
+#   12-Sep-89   Add FORMAT and TEXTFILE parameters; remove FCAM since it could
+#               never have worked anyway; change ANGLE to ANGWAVE.  WFL/AAO
+#   12-Sep-89   Add WAVELENGTH and FACTOR parameters for initial central
+#               wavelengths and zoom factors. Adjust defaults and prompts.
+#               WFL/AAO
+#   07-Dec-89	Change DETECTORS logical name to ECHWIND_DETECTORS. WFL/AAO
+#   08-Dec-89	Add SPECTROGRAPHS parameter and ECHWIND_SPECTROGRAPHS logical
+#		name. Add DFLFILE parameter. WFL/AAO
+#   18-Dec-89   Add positional declarations. Correct typos. WFL/AAO
+#    8-Mar-95   Modified for Unix version (de-Adamised) MPF/RGO
+
+parameter config
+   position 1
+   type 'literal'
+   keyword 'config'
+   vpath 'prompt'
+   ppath 'current,default'
+   default 'UES/31/LONG'
+   prompt 'Instrument configuration? '
+endparameter
+
+parameter detector
+   position 2
+   type 'literal'
+   keyword 'det'
+   vpath 'prompt'
+   prompt 'Detector (xx,yy in mm)? '
+   ppath 'current'
+endparameter
+
+parameter linelist
+   type 'literal'
+   keyword 'lines'
+   vpath 'default'
+   prompt 'File containing line list? '
+   ppath 'current,default'
+   default ' '
+endparameter
+
+parameter obsfile
+   type 'literal'
+   keyword 'obsfile'
+   vpath 'prompt'
+   prompt 'File to store results? '
+endparameter
+
+parameter spectrographs
+   type 'literal'
+   keyword 'speclist'
+   vpath 'default'
+   default 'ECHWIND_SPECTROGRAPHS'
+   prompt 'File containing spectrograph parameters? '
+endparameter
+
+parameter detuser
+   type 'literal'
+   keyword 'detlist'
+   vpath 'default'
+   default ' '
+   prompt 'File containing user detector list? '
+endparameter
+
+parameter detsystem
+   type 'literal'
+   keyword 'detsystem'
+   vpath 'default'
+   default 'detectors.dat'
+   prompt 'File containing system detector list? '
+endparameter
+
+parameter angwave
+   type '_real'
+   keyword 'angwave'
+   vpath 'default'
+   prompt 'Slit angle offset or wavelength? '
+   ppath 'current,default'
+   default 0.0
+endparameter
+
+parameter format
+   type '_char'
+   keyword 'form'
+   in 'AAT', 'TEXT'
+   vpath 'current,default'
+   default ' '
+   prompt 'Format of saved configurations? '
+   help 'AAT = UCLES control file, TEXT = text file'
+endparameter
+
+parameter textfile
+   type 'literal'
+   keyword 'file'
+   vpath 'prompt'
+   ppath 'current,default'
+   default 'echwind'
+   prompt 'Text file for saved configurations? '
+endparameter
+
+parameter wavelength
+   type '_real'
+   keyword 'wave'
+   vpath 'default'
+   default 0.0
+   prompt 'Central wavelength? '
+   ppath 'current'
+endparameter
+
+parameter factor
+   type '_real'
+   keyword 'zoom'
+   vpath 'default'
+   default 0.0
+   prompt 'Zoom factor? '
+endparameter
+
+endinterface

@@ -1,0 +1,26 @@
+*+  ECHWIND_MMPIX - Common block that holds information about the current
+*                   window onto the echellogram
+*
+*   This is needed by (among others) the routines which convert coordinates in
+*   mm to coordinates in pixels on the image display (and vice versa)
+*
+*   History :
+*
+*     26 Jul 1988 : Original version  (ZUVAD::CJH)
+*     10 Sep 1989 : Change name from MANCOM_ to ECHWIND_  (AAOEPP::WFL)
+*     11 Sep 1989 : Add detector rotation angle  (AAOEPP::WFL)
+
+*----------------------------------------------------------
+      integer pixx0, pixy0   ! origin of image in pixels (x and y)
+      integer npixx, npixy   ! size of image in pixels (x and y)
+
+      real winx0, winy0      ! origin of displayed part of echellogram
+                             ! in mm (x and y)
+      real swinx, swiny      ! size of displayed part of echellogram
+                             ! in mm (x and y)
+      real angle             ! detector rotation angle (radians)
+
+      common /echwind_mmpix/ pixx0, pixy0, npixx, npixy,
+     :                       winx0, winy0, swinx, swiny, angle
+*----------------------------------------------------------
+

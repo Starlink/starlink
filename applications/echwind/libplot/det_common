@@ -1,0 +1,12 @@
+*+ det_common
+*
+      integer dev_xsize
+      parameter (dev_xsize = 512)       ! size of viewport
+      integer dev_ysize
+      parameter (dev_ysize = 512)
+      integer dev_nbuttons
+      parameter (dev_nbuttons = 3)
+
+      integer win_x1, win_x2, win_y1, win_y2
+*
+      common /det_common/ win_x1, win_x2, win_y1, win_y2

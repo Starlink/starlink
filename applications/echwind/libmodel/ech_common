@@ -1,0 +1,50 @@
+*+  ECH_COMMON  -  Common block to hold fixed parameters for particular
+*                  spectrograph configuration.
+
+*
+*   Description :
+*
+*     This module is 'included' by any routine needing access to the
+*     current spectrograph configuration.
+*
+*   Authors :
+*
+*     C.J. Hirst  UCL  (ZUVAD::CJH)
+*
+*   History :
+*
+*     ?? ??? 1986 : First implementation (ZUVAD::CJH)
+*     08 Dec 1989 : Add the instrument, echelle and camera names (AAOEPP::WFL)
+*     21 Sep 1994 : Add ech_thetacam, ech_blaze0, ech_collxe, ech_prface,
+*                   ech_prapex, ech_gamafac for both UCLES and UES support
+*                   (MPF at RGO)
+*
+*   Global variables :
+*
+      integer ech_npr           ! number of prisms
+      integer ech_m0            ! central order
+      real ech_d                ! number of lines / mm
+      real ech_thetab           ! true blaze angle (radians)
+      real ech_blaze0           ! ideal blaze angle (radians)
+      real ech_fcam             ! camera focal length (mm)
+      real ech_fcol             ! collimator focal length (mm)
+      real ech_angle            ! prism angle (radians)
+      real ech_theta0           ! central theta (radians)
+      real ech_gamma0           ! central gamma (radians)
+      real ech_wave0            ! central wavelength (Angstroms)
+      real ech_thetacam         ! beam separation (radians)
+      real ech_collxe           ! collimated axis to echelle distance (m)
+      real ech_prface           ! prism face length (glass) (m)
+      real ech_prapex           ! prism apex along face (m)
+      real ech_gamafac          ! empirical gamma factor
+      character ech_instrument*20 ! instrument name
+      character ech_echelle*20  ! echelle name
+      character ech_camera*20   ! camera name
+
+      common /ech_common/ ech_d, ech_thetab, ech_blaze0, ech_fcam,
+     :                    ech_fcol, ech_angle, ech_npr, ech_theta0,
+     :                    ech_gamma0, ech_wave0, ech_m0, ech_thetacam, 
+     :                    ech_instrument, ech_echelle, ech_camera,
+     :                    ech_collxe, ech_prface, ech_prapex,
+     :                    ech_gamafac
+

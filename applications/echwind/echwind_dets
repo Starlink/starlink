@@ -1,0 +1,31 @@
+*+  ECHWIND_DETS - Common block included by routines needing access to the
+*                  list of detectors
+*
+*   History :
+*
+*     10 Sep 1989 : Original version  (AAOEPP::WFL)
+*     17 Jul 1996 : Add variables det_list, det_listlen (RAL:ACC)
+
+*----------------------------------------------------------
+
+      integer NDETFILES               ! No. of detector name files
+      parameter (NDETFILES = 2)
+
+      character*15 detparams(NDETFILES) ! Parameter names for detector files
+      data detparams /'DETUSER','DETSYSTEM'/
+
+      integer ndets                   ! No. of detectors in list
+
+      integer MAXDETS                 ! Max. no. of detectors
+      parameter (MAXDETS = 50)
+
+      character*80 dets(MAXDETS)      ! Array for holding detector names
+      real det_sizes(2,MAXDETS)       ! Array for detector sizes
+
+      character*50 det_list           ! List of detectors for prompt string
+      integer det_listlen             ! Length of character string det_list
+
+      common /echwind_dets/ ndets, det_listlen, dets, det_sizes, 
+     :                      det_list
+*----------------------------------------------------------
+
