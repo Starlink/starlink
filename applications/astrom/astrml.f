@@ -2264,14 +2264,15 @@
                   WRITE (FITSFN, '(A,i2.2,".fits")') FTPREF(:FTI), NSOL
                   FTI = INDEX (FITSFN, ' ')-1
                   
-*               Right, now try opening the file
+*               Right, now try opening the file, use a small, but, non-trivial
+*               size so it can be opened by viewing programs.
                   CALL FTGIOU (FTUNIT, FTSTAT)
                   CALL FTINIT (FTUNIT, FITSFN, 1, FTSTAT)
                   WRITE (LUS, '(" FITS-WCS header for",I3,
      :                 "-component solution in file ",
      :                 A)') NTERMS, FITSFN(:FTI)
-                  FTNAXS(1)=1
-                  FTNAXS(2)=1
+                  FTNAXS(1)=5
+                  FTNAXS(2)=5
 
 *               Write required keywords
                   CALL FTPHPR (FTUNIT, .TRUE., 8, 2, FTNAXS, 0,
