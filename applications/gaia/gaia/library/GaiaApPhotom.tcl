@@ -400,6 +400,7 @@ itcl::class gaia::GaiaApPhotom {
       }
       add_short_help $itk_component(DefineSky) \
          {Press and then drag out aperture on image}
+      toggle_sky_button_
 
       #  Copy selected objects.
       itk_component add MeasureFrame {frame $w_.copy}
@@ -512,14 +513,12 @@ itcl::class gaia::GaiaApPhotom {
    #  method etc.
    method define_object {} {
       $itk_component(DefineObject) configure -state disabled
-      $itk_component(DefineObject) configure -relief sunken
       $object_list_ create_object
    }
 
    #  Define a region of sky.
    method define_sky {} {
       $itk_component(DefineSky) configure -state disabled
-      $itk_component(DefineSky) configure -relief sunken
       if { $itk_option(-coupled) } {
          $object_list_ configure -allow_resize 1
       }
@@ -673,12 +672,17 @@ itcl::class gaia::GaiaApPhotom {
    #  completed. This allows us to set the state of the sky region
    #  button.
    private method created_object {} {
-      if { $skymethod_($this) } {
-         $itk_component(DefineSky) configure -state normal
-         $itk_component(DefineSky) configure -relief raised
-      }
+      toggle_sky_button_
       $itk_component(DefineObject) configure -state normal
-      $itk_component(DefineObject) configure -relief raised
+   }
+   
+   #  Toggle the define sky button to reflect the current state.
+   private method toggle_sky_button_ {} {
+      if { $skymethod_($this) } {
+         $itk_component(DefineSky) configure -state disabled
+      } else {
+         $itk_component(DefineSky) configure -state normal
+      }
    }
 
    #  The aperture are measured, read in the results.
@@ -702,20 +706,17 @@ itcl::class gaia::GaiaApPhotom {
       if { $args != {} } {
          if { [lindex $args 0] == "annulus" } {
             set skymethod_($this) 1
-            $itk_component(DefineSky) configure -state disabled
          } else {
             set skymethod_($this) 0
-            $itk_component(DefineSky) configure -state normal
-            $itk_component(DefineSky) configure -relief raised
          }
       } else {
          if { $skymethod_($this) } {
-            $itk_component(DefineSky) configure -state disabled
             configure -annulus 1
          } else {
             configure -annulus 0
          }
       }
+      toggle_sky_button_
    }
 
    #  View all measurements in new window (controlled by

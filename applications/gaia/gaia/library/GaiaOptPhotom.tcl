@@ -325,6 +325,7 @@ itcl::class gaia::GaiaOptPhotom {
          -command [code $this sky_method_changed object]
       add_menu_short_help $Options {Use annular sky regions}  \
          {Toggle to define sky in detached apertures for objects}
+
       set psfskymethod_($this) 1
       $Options add checkbutton \
          -label {Use PSF annular sky regions} \
@@ -389,6 +390,7 @@ itcl::class gaia::GaiaOptPhotom {
       }
       add_short_help $itk_component(DefineSky) \
          {Press and then drag out aperture on image}
+      toggle_sky_button_
 
       #  Copy selected objects, again not for PSF.
       itk_component add Copy {
@@ -469,6 +471,7 @@ itcl::class gaia::GaiaOptPhotom {
       }
       add_short_help $itk_component(DefinePSFSky) \
          {Press and then drag out aperture on image}
+      toggle_psf_sky_button_
 
       #  Pack up window.
       if { $usemags_ } {
@@ -535,7 +538,6 @@ itcl::class gaia::GaiaOptPhotom {
    #  method etc.
    method define_object {} {
       $itk_component(DefineObject) configure -state disabled
-      $itk_component(DefineObject) configure -relief sunken
       $object_list_ create_object
    }
 
@@ -543,14 +545,12 @@ itcl::class gaia::GaiaOptPhotom {
    #  method etc.
    method define_psf {} {
       $itk_component(DefinePSF) configure -state disabled
-      $itk_component(DefinePSF) configure -relief sunken
       $psf_list_ create_object
    }
 
    #  Define a region of sky.
    method define_sky {} {
       $itk_component(DefineSky) configure -state disabled
-      $itk_component(DefineSky) configure -relief sunken
       $object_list_ configure -allow_resize 1
       $object_list_ create_sky_region
       $object_list_ configure -allow_resize 0
@@ -559,7 +559,6 @@ itcl::class gaia::GaiaOptPhotom {
    #  Define a region of sky for PSF object.
    method define_psf_sky {} {
       $itk_component(DefinePSFSky) configure -state disabled
-      $itk_component(DefinePSFSky) configure -relief sunken
       $psf_list_ configure -allow_resize 1
       $psf_list_ create_sky_region
       $psf_list_ configure -allow_resize 0
@@ -717,23 +716,34 @@ itcl::class gaia::GaiaOptPhotom {
    #  completed. This allows us to set the state of the sky region
    #  button for plain objects.
    private method created_object {} {
-      if { $skymethod_($this) } {
-         $itk_component(DefineSky) configure -state normal
-         $itk_component(DefineSky) configure -relief raised
-      }
+      toggle_sky_button_
       $itk_component(DefineObject) configure -state normal
-      $itk_component(DefineObject) configure -relief raised
    }
+
+   #  Toggle the object define sky button to reflect the current state.
+   private method toggle_sky_button_ {} {
+      if { $skymethod_($this) } {
+         $itk_component(DefineSky) configure -state disabled
+      } else {
+         $itk_component(DefineSky) configure -state normal
+      }
+   }
+
 
    #  Notification that the define_object method has been
    #  completed for a PSF object. 
    private method created_psf {} {
-      if { $skymethod_($this) } {
-         $itk_component(DefinePSFSky) configure -state normal
-         $itk_component(DefinePSFSky) configure -relief raised
-      }
+      toggle_psf_sky_button_
       $itk_component(DefinePSF) configure -state normal
-      $itk_component(DefinePSF) configure -relief raised
+   }
+
+   #  Toggle the PSF define sky button to reflect the current state.
+   private method toggle_psf_sky_button_ {} {
+      if { $psfskymethod_($this) } {
+         $itk_component(DefinePSFSky) configure -state disabled
+      } else {
+         $itk_component(DefinePSFSky) configure -state normal
+      }
    }
 
    #  Notification that the PSF or normal objects have changed shape
@@ -772,43 +782,37 @@ itcl::class gaia::GaiaOptPhotom {
    #  skymethod is not annulus the button state isn't changed until a
    #  new object is created (see created_object method).
    private method sky_method_changed {type args} {
-       if { $type == "object" } { 
-	   if { $args != {} } {
-	       if { [lindex $args 0] == "annulus" } {
-		   set skymethod_($this) 1
-		   $itk_component(DefineSky) configure -state disabled
-	       } else {
-		   set skymethod_($this) 0
-		   $itk_component(DefineSky) configure -state normal
-		   $itk_component(DefineSky) configure -relief raised
-	       }
-	   } else {
-	       if { $skymethod_($this) } {
-		   $itk_component(DefineSky) configure -state disabled
-		   configure -annulus 1
-	       } else {
-		   configure -annulus 0
-	       }
-	   }
-       } else {
-	   if { $args != {} } {
-	       if { [lindex $args 0] == "annulus" } {
-		   set psfskymethod_($this) 1
-		   $itk_component(DefinePSFSky) configure -state disabled
-	       } else {
-		   set psfskymethod_($this) 0
-		   $itk_component(DefinePSFSky) configure -state normal
-		   $itk_component(DefinePSFSky) configure -relief raised
-	       }
-	   } else {
-	       if { $psfskymethod_($this) } {
-		   $itk_component(DefinePSFSky) configure -state disabled
-		   configure -psfannulus 1
-	       } else {
-		   configure -psfannulus 0
-	       }
-	   }
-       }
+      if { $type == "object" } { 
+         if { $args != {} } {
+            if { [lindex $args 0] == "annulus" } {
+               set skymethod_($this) 1
+            } else {
+               set skymethod_($this) 0
+            }
+         } else {
+            if { $skymethod_($this) } {
+               configure -annulus 1
+            } else {
+               configure -annulus 0
+            }
+         }
+         toggle_sky_button_
+      } else {
+         if { $args != {} } {
+            if { [lindex $args 0] == "annulus" } {
+               set psfskymethod_($this) 1
+            } else {
+               set psfskymethod_($this) 0
+            }
+         } else {
+            if { $psfskymethod_($this) } {
+               configure -psfannulus 1
+            } else {
+               configure -psfannulus 0
+            }
+         }
+         toggle_psf_sky_button_
+      }
    }
    
    #  View all measurements in new window (controlled by
@@ -918,7 +922,7 @@ itcl::class gaia::GaiaOptPhotom {
    }
    itk_option define -psfannulus psfannulus PsfAnnulus 1 {
       if { $psf_list_ != {} } {
-         $psf_list_ configure -annulus $itk_option(-annulus)
+         $psf_list_ configure -annulus $itk_option(-psfannulus)
       }
    }
 
@@ -953,7 +957,7 @@ itcl::class gaia::GaiaOptPhotom {
    }
 
    itk_option define -psf_selected_colour psf_selected_colour Psf_selected_colour {magenta} {
-      if { $object_list_ != {} } {
+      if { $psf_list_ != {} } {
          $psf_list_ configure -selected_colour $itk_option(-psf_selected_colour)
       }
    }
