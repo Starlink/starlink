@@ -91,16 +91,23 @@ the current node.
 (define (href-to target #!key (reffrag #t) (full-url #f))
   (let* ((id (attribute-string (normalize "id") target))
 	 (entfile (html-file target))
+	 (url (string-append (if full-url %starlink-document-server% "")
+			     entfile))
 	 (fragid (if (or (chunk? target)
 			 (not id))
 		     ""
 		     (string-append "#" id))))
-    (if (chunk? target) ;(or nochunks stream-output)
-	(if reffrag
-	    (string-append (if full-url %starlink-document-server% "")
-			   entfile fragid)
-	    entfile)
-	fragid)))
+    (if reffrag
+	(string-append url fragid)
+	url)))
+;; Following is an attempt to (neatly) suppress the entfile if the reference
+;; would be local, but (chunk?) as currently written returns false for any
+;; nodes within the `master' chunk.
+;    (debug (if (chunk? target) ;(or nochunks stream-output)
+;	(if reffrag
+;	    (string-append url fragid)
+;	    url)
+;	fragid))))
 
 <func>
 <routinename>$standard-html-header$
