@@ -76,7 +76,12 @@
 *        Removed I90_PAR and argument string concatenation.
 *     27-FEB-1997 (PDRAPER):
 *        Removed all NDF and SDF specific code. We now expect
-*        data files to be foreign format too.
+*        data files to be foreign format too. 
+*     8-JUL-1997 (PDRAPER):
+*        More fixes for foreign data formats. Now doesn't use any
+*        existing file types to complete the derived name. Types are
+*        properly determined by the NDF_FORMATS_OUT string in this
+*        case.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,6 +138,7 @@
       CHARACTER TYPE * ( IRH__SZNAM ) ! File type (eg ".SDF").
       INTEGER DEPTH             ! Indirection depth at which current name was specified.
       INTEGER I                 ! Loop count.
+      INTEGER IAT               ! Index in string
       INTEGER MODGRP            ! Identifier for group used as basis for current name.
       INTEGER MODIND            ! Index of name used as basis for current name.
       INTEGER NAMEND            ! Position of first character beyond the end of the file name.
@@ -142,7 +148,7 @@
       LOGICAL INGRP             ! True if GID0 identifies a valid group.
 *.
 
-*  Check inherited global status. 
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If the supplied value of GID is IRH__NOID, create a new output group.
@@ -157,7 +163,7 @@
 *  by IRG. This is assumed to be true if the group title starts with the
 *  string given by symbolic constant IRG__PREFX and the group has a
 *  valid access mode.
-      ELSE 
+      ELSE
          CALL IRG1_CHECK( GID, .TRUE., STATUS )
 
 *  Check that the group is an output group. If not, report an error.
@@ -195,8 +201,10 @@
 *  Remove any slice specification from the input name.
             CALL IRG1_SLICE( FSPEC0, SLICE, NAMEND, STATUS )
 
-*  Get the file name and add it to the temporary group.      
+*  Get the file name.
             CALL IRG1_FSPEC( FSPEC0, ' ', 'NAME', NAME0, STATUS )
+
+*  And add it to the temporary group.
             CALL IRH_PUT( TMPGID, 1, NAME0, 0, STATUS )
          END DO
       END IF
@@ -227,11 +235,23 @@
             CALL IRH_GET( GID0, MODIND, 1, FSPEC0, STATUS )
             CALL IRG1_SLICE( FSPEC0, SLICE, NAMEND, STATUS )
 
-*  Expand the name using the original name to supply defaults for any
-*  fields of the file specification which the user did not specify.
-            CALL IRG1_FSPEC( NAME, FSPEC0, ' ', FSPEC, STATUS )
+*  And remove the file extension if given (this is determined by 
+*  the NDF_FORMATS_OUT string, we just use a value if given one
+*  in the modification list).
+            TYPE = ' '
+            CALL IRG1_FSPEC( FSPEC0, ' ', 'TYPE', TYPE, STATUS )
+            IF ( TYPE .NE. ' ' ) THEN 
+               IAT = INDEX( NAME, TYPE )
+            ELSE
+               IAT = CHR_LEN( NAME )
+            END IF
 
+*  Expand the name using the original name to supply defaults for any
+*  fields of the file specification which the user did not specify 
+*  (except the file type).
+            CALL IRG1_FSPEC( NAME, FSPEC0( :IAT ), ' ', FSPEC, STATUS )
          ELSE
+
 *  Otherwise just use the name.
             FSPEC = NAME
          END IF
@@ -248,7 +268,7 @@
          CALL MSG_SETC( 'P', PARAM )
          CALL ERR_REP( 'IRG_CREAT_ERR2',
      : 'IRG_CREAT: Unable to associate a group of output files with '//
-     : 'parameter ^P', STATUS )      
+     : 'parameter ^P', STATUS )
       END IF
 
       END
