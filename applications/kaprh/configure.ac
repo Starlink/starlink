@@ -25,7 +25,7 @@ STAR_CHECK_PROGS(hlib)
 
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [ast kaplibs hds fio gks gns idi mers ndf prm par sae trn subpar])
+STAR_DECLARE_DEPENDENCIES([build], [ast kaplibs hds fio gks gns idi mers ndf prm par sae trn subpar shl])
 
 STAR_LATEX_DOCUMENTATION(sun239)
 
