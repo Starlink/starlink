@@ -206,20 +206,34 @@ to need explanation or elaboration.
 (mode section-reference
   (element dt
     (make sequence
-      (literal "in section ")
-      (make-section-reference
-       target: (ancestor-member (current-node)
-				(section-element-list)))))
+      (literal "item `")
+      ;; this dt had better be short...
+      (process-children)
+      (literal "'")))
+  ;; Have references to li elements just produce the item number.
+  ;; This isn't going to be much use by itself for a reference far
+  ;; from the target, but in that case one assumes the reference would
+  ;; be supplemented by a reference to the section.
   (element li
-    (if (string=? (gi (parent (current-node)))
-		  (normalize "ol"))
-	(make command name: "ref"
-	      (literal (gen-label)))
-	(make sequence
-	  (literal "in section ")
-	  (make-section-reference
-	   target: (ancestor-member (current-node)
-				    (section-element-list)))))))
+    (literal (string-append "item "
+			    (number->string (child-number (current-node))))))
+;  (element dt
+;    (make sequence
+;      (literal "in section ")
+;      (make-section-reference
+;       target: (ancestor-member (current-node)
+;				(section-element-list)))))
+;   (element li
+;     (if (string=? (gi (parent (current-node)))
+; 		  (normalize "ol"))
+; 	(make command name: "ref"
+; 	      (literal (gen-label)))
+; 	(make sequence
+; 	  (literal "in section ")
+; 	  (make-section-reference
+; 	   target: (ancestor-member (current-node)
+; 				    (section-element-list))))))
+  )
 
 ;;; Paragraphing
 

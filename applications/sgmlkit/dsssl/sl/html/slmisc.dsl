@@ -229,9 +229,14 @@ to need explanation or elaboration.
 
 (mode section-reference
   (element dt
-    (process-children))
+    (make sequence
+      (literal "item `")
+      ;; this dt had better be short...
+      (process-children)
+      (literal "'")))
   (element li
-    (literal "here")))
+    (literal (string-append "item "
+			    (number->string (child-number (current-node)))))))
 
 
 (element (li p)
