@@ -313,11 +313,11 @@
      :                    VAMETH( : NCVM ), PVALS, NVAL, STATUS ) 
 
 *  If a NULL value was supplied, cancel the error and use RANGE.
-         IF ( STATUS .EQ. PAR__NULL ) {
+         IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             PVALS( 1 ) = 'RANGE'
             NVAL = 1
-         }
+         END IF
 
 *  Abort if an error has occurred.
          IF ( STATUS .NE. SAI__OK ) GO TO 999
