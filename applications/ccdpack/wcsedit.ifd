@@ -60,7 +60,6 @@
              vpath PROMPT
              ppath DYNAMIC CURRENT
              prompt {Epoch of basis frame}
-             dynamic yes
              helpkey *
           }
 

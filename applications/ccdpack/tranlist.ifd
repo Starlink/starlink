@@ -172,7 +172,6 @@
             vpath PROMPT
             ppath DYNAMIC CURRENT
             prompt {Source frame epoch of observation}
-            dynamic yes
             helpkey *
           }
 
@@ -182,7 +181,6 @@
             vpath PROMPT
             ppath DYNAMIC CURRENT
             prompt {Destination frame epoch of observation}
-            dynamic yes
             helpkey *
           }
 
