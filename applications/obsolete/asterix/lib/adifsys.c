@@ -49,9 +49,11 @@ void adix_base_NewLink( ADIobj id, ADIobj lid, ADIstatus status )
   adic_cputref( id, "ADIlink", lid, status );
   }
 
-void adix_base_SetLink( ADIobj id, ADIobj lid, ADIstatus status )
+ADIobj adix_base_SetLink( int narg, ADIobj args[], ADIstatus status )
   {
-  adic_cputref( id, "ADIlink", lid, status );
+  adic_cputref( args[0], "ADIlink", args[1], status );
+
+  return ADI__nullid;
   }
 
 void adix_base_UnLink( ADIobj id, ADIobj lid, ADIstatus status )
@@ -68,15 +70,40 @@ void adix_newlnk( ADIobj id, ADIobj lid, ADIstatus status )
   adix_execi( DnameNewLink, 2, args, status );
   }
 
-void adix_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
+ADIobj adix_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
   {
   ADIobj        args[2];
+  ADIclassDef	*otdef;
+  ADIobj	rval;
 
-  _chk_init_err; _chk_stat;
+  _chk_init_err; _chk_stat_ret(ADI__nullid);
 
   args[0] = id; args[1] = lid;
 
-  adix_execi( DnameSetLink, 2, args, status );
+  rval = adix_execi( DnameSetLink, 2, args, status );
+
+/* Did the SetLink method return an alternative left hand data object? */
+  if ( _valid_q(rval) ) {
+
+/* The alternative supplied must be be derived from our original l.h.s */
+    otdef = _DTDEF(id);
+    if ( adix_chkder( _DTDEF(rval), otdef, status ) ) {
+
+/* Destroy the original L.H.S, and return the new object */
+      adic_erase( &id, status );
+      }
+    else {
+      adic_setecs( SAI__ERROR,
+      "The SetLink method returned an object of a class which is not derived from the required class %s",
+      status, otdef->name );
+
+      rval = ADI__nullid;
+      }
+    }
+  else
+    rval = id;
+
+  return rval;
   }
 
 void adix_unlnk( ADIobj id, ADIobj lid, ADIstatus status )
@@ -460,10 +487,10 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 		 &newid, status );
 
 /* Try to link them */
-      adix_setlnk( newid, id, status );
+      newid = adix_setlnk( newid, id, status );
 
       if ( _ok(status) )
-        id = newid;
+	id = newid;
       }
     }
 
@@ -744,7 +771,6 @@ void ADIfsysInit( ADIstatus status )
     GNRC_TENTRY("FileClose(file)",  adix_cdsp_vo,	adix_fdsp_vo),
     GNRC_TENTRY("FileCommit(file)",  adix_cdsp_vo,	adix_fdsp_vo),
     GNRC_TENTRY("NewLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
-    GNRC_TENTRY("SetLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
     GNRC_TENTRY("UnLink(lhs,rhs)",  adix_cdsp_voo,	adix_fdsp_voo),
   END_GNRC_TABLE;
 
