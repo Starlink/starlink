@@ -34,16 +34,24 @@ regression: $(TESTS)
 	    fi; \
 	done
 
+# Things to do, and dependencies to satisfy, before distribution.
+# Parent Makefile makes `prepare-dist' just before packaging.
+prepare-dist: t5.dvi
+	echo "Test directory prepared for distribution"
+
 # Test 5 depends on its DVI file
 t5.test: t5.dvi
 # All the tests depend on the library
 $(TESTS): ../libdvi2bitmap.la
 
 .SUFFIXES: .o .cc .test .dvi .dtl
-.cc.o:
-	$(LIBTOOL) --mode=compile $(CXX) -c $(CXXFLAGS) -o $@ $<
-.o.test:
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $< ../libdvi2bitmap.la $(LIBS) -lm
+.cc.test:
+	$(LIBTOOL) --mode=compile $(CXX) -c $(CXXFLAGS) -o $(<:.cc=.lo) $<
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(<:.cc=.lo) ../libdvi2bitmap.la $(LIBS) -lm
+#.cc.o:
+#	$(LIBTOOL) --mode=compile $(CXX) -c $(CXXFLAGS) -o $@ $<
+#.o.test:
+#	$(LIBTOOL) --mode=link $(CXX) -o $@ $< ../libdvi2bitmap.la $(LIBS) -lm
 .dtl.dvi:
 	dt2dv $< $@ >$@.log 2>&1
 
