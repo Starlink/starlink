@@ -144,6 +144,24 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
+      public method addpoint { vx vy { ipoint "" } } {
+#-----------------------------------------------------------------------
+
+#  Invoke inherited addpoint method to add the point to the list and draw it.
+         set ipoint [ chain  $vx $vy $ipoint ]
+      
+#  Set the canvas tag to use for this point.
+         set tag mark$ipoint
+
+#  Add a binding to remove the point from the canvas.
+         $canvas bind $tag <Button-3> [ code $this removepoint $ipoint ]
+
+#  Return index of added point.
+         return $ipoint
+      }
+
+
+#-----------------------------------------------------------------------
       public method loadndf { ndfob { maxcanv 0 } } {
 #-----------------------------------------------------------------------
 
@@ -244,7 +262,7 @@
          geomset
 
 #  Set key bindings for marking objects.
-         $canvas bind gwmitem <Button-1> [ code $this newpoint %x %y ]
+         $canvas bind all <Button-1> [ code $this newpoint %x %y ]
       }
 
 
@@ -360,20 +378,8 @@
          set vx [ lindex $viewpos 0 ]
          set vy [ lindex $viewpos 1 ]
 
-#  If any point with this index exists in the list already, remove it.
 #  Add the point to the points list and draw it.
-         set ipoint [ addpoint $vx $vy ]
-
-#  Set the canvas tag to use for this point.
-         set tag mark$ipoint
-
-#  Add a binding to remove the point from the canvas.
-         $canvas bind $tag <Button-3> [ code $this removepoint $ipoint ]
-
-#  Cause events inside this item to revert to their behaviour for the 
-#  underlying GWM item (otherwise it is difficult to put two points 
-#  close to each other).
-         $canvas bind $tag <Button-1> [ $canvas bind gwmitem <Button-1> ]
+         addpoint $vx $vy
       }
 
 
@@ -456,11 +462,11 @@
 #-----------------------------------------------------------------------
          if { $trackposition == "" } {
             pack forget $itk_component(tracker)
-            $canvas bind gwmitem <Motion> ""
-            $canvas bind gwmitem <Leave> ""
+            $canvas bind all <Motion> ""
+            $canvas bind all <Leave> ""
          } else {
-            $canvas bind gwmitem <Motion> [ code $this trackpos %x %y ]
-            $canvas bind gwmitem <Leave> [ code $this trackpos "" "" ]
+            $canvas bind all <Motion> [ code $this trackpos %x %y ]
+            $canvas bind all <Leave> [ code $this trackpos "" "" ]
             pack $itk_component(tracker) -fill x -expand 0
          }
       }
