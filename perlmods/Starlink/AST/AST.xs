@@ -708,7 +708,7 @@ new( class, nin, nout, matrix, options )
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::Plot
 
 AstPlot *
-new( class, frame, graphbox, basebox, options )
+_new( class, frame, graphbox, basebox, options )
   char * class
   AstFrame * frame
   AV* graphbox
