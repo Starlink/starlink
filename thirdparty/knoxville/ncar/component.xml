@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ncar">
+  <version>1.3-1</version>
+  <path>thirdparty/knoxville/ncar</path>
+  <description>NCAR - Graphics Utilities</description>
+  <abstract><p>The National Center for Atmospheric Research in Boulder,
+Colorado has, for many years, distributed a extensive suite of high level
+graphics utilities.  When NCAR converted these utilities to run over the ISO
+standard GKS, Starlink was used as a test site.  Starlink was subsequently
+given permission to release the NCAR utilities as part of the Starlink Software
+Collection.  The NCAR utilities offer an alternative high level graphics
+package to PGPLOT (SUN/15) for use within Starlink applications.  The NCAR
+package is arguably more powerful than PGPLOT in functionality and flexibility,
+but it does require a little more time to master.  Starlink provides a set of
+extensions to the NCAR graphics utilities, SNX (SUN/90), to make the use of
+NCAR more accessible to the beginner.  For lower level work, SGS (SUN/85) or
+GKS (SUN/83) should be used.</p></abstract>
+  <dependencies >
+    <build>gks</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation> sun88</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
