@@ -75,3 +75,17 @@ PRIVATE_INCLUDES = \
 	MSG_CMN MSG_SYS
 
 BUILT_SOURCES = ERR_ERR err_err.h MSG_ERR msg_err.h
+
+
+# Testing
+TESTS = err_ftest
+
+check_PROGRAMS = err_ftest
+err_ftest_SOURCES = err_ftest.f
+err_ftest_LDADD = liberr_standalone.la `psx_link` `chr_link` `cnf_link`
+
+# Monoliths with C main do not compile
+#check_MONOLITHS = err_test
+#err_test_TASKS =
+#err_test_SOURCES = err_test.c
+#err_test_LDADD = liberr_adam.la `psx_link_adam` `chr_link_adam` `cnf_link_adam`
