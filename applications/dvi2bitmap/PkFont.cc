@@ -32,10 +32,12 @@
 #include <string.h>
 #include <math.h>
 #include <stdio.h>		// for sprintf
+#include <stdlib.h>		// for system()
 #else
 #include <cstring>
 #include <cmath>
 #include <cstdio>		// for sprintf
+#include <cstdlib>		// for system()
 using std::sprintf;
 using std::memcpy;
 #endif
@@ -115,7 +117,7 @@ PkFont::PkFont(unsigned int dvimag,
 #endif
 		if (verbosity_ >= normal)
 		    cerr << "mktexpk: " << cmd.str() << '\n';
-		system (cmd.str());
+		std::system (cmd.str().c_str());
 		// try again...
 		got_path = find_font (pk_file_path);
 		if (! got_path)
