@@ -52,7 +52,7 @@ interface MAKEMOS
 
    parameter IN                  # List of input NDFs
       position 1
-      type     LITERAL
+      type     _CHAR
       access   READ
       vpath    'PROMPT,CURRENT,GLOBAL'
       ppath    'CURRENT,GLOBAL'
@@ -183,7 +183,7 @@ interface MAKEMOS
    endparameter
 
    parameter REF                 # Reference NDF
-      type     NDF
+      type     _CHAR
       access   READ
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
