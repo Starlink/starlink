@@ -402,7 +402,7 @@ PKG_NUM = 1522
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0-1
+PKG_VERS = 1.0-2
 
 #  Library version number.
 #
