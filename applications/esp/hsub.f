@@ -109,9 +109,11 @@
 *     and HISTPEA2 so that the desired parameters (say mean or median)
 *     are passed between them.
 *
-*     With the addition of the OUTCAT keyword, HSUB is now
-*     used by GAIA to generate backgrounds.  You should not, therefore,
-*     change the keywords in the STL output.
+*     With the addition of the OUTCAT keyword, HSUB is now used by GAIA
+*     to generate backgrounds, so it is not merely an example.  It is
+*     still, of course, useful as an example of how to use the HISTPEAK
+*     functions.  Specifically, you should not change the keywords in
+*     the STL output.
 *
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
@@ -156,7 +158,6 @@
                                       ! 2 - smoothed histogram
                                       ! 3 - projecting peak chords
                                       ! 4 - interpolating smoothed histogram 
-      character *(80) ofname          ! Output file name
       integer outfiod,outunit	      ! Output file descriptor and unit
       integer catfiod, catunit        ! OUTCAT file descriptor and unit
       double precision kurto          ! Image pixel count kurtosis
@@ -166,8 +167,6 @@
                                       ! of the pixel values or the
                                       ! background count standard deviation
       
-*   Local functions
-      logical fio_test		      ! Test FIO system
 *.
 
 *   Check the inherited global status.
