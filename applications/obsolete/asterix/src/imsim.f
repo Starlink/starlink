@@ -264,9 +264,11 @@
           END IF
         ELSE
           CALL ERR_ANNUL( STATUS )
+          TEFF = 1.0
         END IF
 
 *      Report counts in model
+        MTOT = MTOT*TEFF
         CALL MSG_SETR( 'C', MTOT )
         CALL MSG_PRNT( 'Model contains ^C counts' )
 
