@@ -28,13 +28,15 @@
 #        CHANGE_QUALITY.IFL becomes CHANGE_DATA.IFL
 #     1997 May 29 (TIMJ)
 #        Add SECTION
+#     1997 June 19 (TIMJ)
+#        Remove USE_SECTION
 #     {enter_further_changes_here}
  
 #-
 
    INTERFACE CHANGE_DATA
 
-      HELPLIB 'SCUBA_HELP:'
+      HELPLIB 'SURF_HELP:'
 
       PARAMETER      COMP           # NDF COMPONENT TO BE ANALYSED
          TYPE        LITERAL
@@ -77,15 +79,9 @@
          TYPE '_CHAR'
          ACCESS 'READ'
          VPATH 'PROMPT'
+	 PPATH 'Current'
          PROMPT 'Please enter a section (including {})'
          HELPKEY '*'
-      ENDPARAMETER
-
-      PARAMETER USE_SECTION
-        TYPE '_LOGICAL'
-        PROMPT 'Change this section (else change everything else)'
-        DEFAULT 'yes'
-        HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER VALUE
