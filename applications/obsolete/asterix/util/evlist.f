@@ -147,12 +147,15 @@
       INTEGER			FSTAT			! Fortran i/o status
       INTEGER                	I, J, K      	      	! Loop counters
       INTEGER			IDXPTR			! Display index
+      INTEGER			IE1, IE2		! List range values
       INTEGER			IFID			! Input file identifier
       INTEGER			IP			! Photon number
       INTEGER			IVAL		      	! List value
       INTEGER                	INC          	      	! Number of lists to display at once
+      INTEGER			IRNG			! Number of list ranges
       INTEGER			LID			! List identifier
       INTEGER                	LLEN      	      	! List length
+      INTEGER			NRNG			! # separate ranges
       INTEGER                	OCH          	      	! Output channel
       INTEGER                	NDISP        	      	! Number of lists to be displayed
       INTEGER                	NEDISP        	      	! # events to display
@@ -160,6 +163,7 @@
       INTEGER                	NLIST        	      	! actual number of lists
       INTEGER                	OUTWID     	      	! Width of output device
       INTEGER			PTRS(MAXCOLS)		! Mapped list data
+      INTEGER			RNGPTR			! List range index
       INTEGER                	START        	      	! List to display first
 
       LOGICAL                	CONTINUE     	      	! Used to control loops
@@ -206,6 +210,11 @@
      :                  STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
+*  Convert list to range pairs
+      CALL DYN_MAPI( 1, NEDISP*2, RNGPTR, STATUS )
+      CALL EVLIST_L2R( NEDISP, %VAL(IDXPTR), NRNG, %VAL(RNGPTR),
+     :                 STATUS )
+
 *  Print version and introductory information
       IF ( OUTWID .EQ. 132 ) THEN
         CALL AIO_BLNK( OCH, STATUS )
@@ -233,7 +242,7 @@
         END IF
         NLDISP = NDISP - START + 1
 
-*    Map the lists on this page
+*    Get details of lists on this page
         J = 1
         DO I = START, NDISP
 
@@ -253,23 +262,13 @@
           END IF
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Map data
-          CALL EDI_MTYPE( LID, MTYPE(J), STATUS )
-          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL EDI_MAP( IFID, LNAMES(J), MTYPE(J), 'READ', 0, 0,
-     :    		  PTRS(J), STATUS )
-          ELSE
-            CALL ERR_ANNUL( STATUS )
-            PTRS(J) = 0
-          END IF
-
 *      Free the list
           CALL ADI_ERASE( LID, STATUS )
 
 *      Increment list counter
           J = J + 1
 
-*    Next list to map
+*    Next list on the page
         END DO
 
 *    Page header
@@ -289,61 +288,98 @@
         WRITE( OBUF, 12 )
         CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
 
-*    Print the list values
-        DO I = 1, NEDISP
+*    Loop over the ranges to display
+        DO IRNG = 1, NRNG
 
-*      Extract the record number to display
-          CALL ARR_ELEM1I( IDXPTR, NEDISP, I, IP, STATUS )
+*      Extract first and last event numbers in this range
+          CALL ARR_ELEM1I( RNGPTR, 2*NRNG, (IRNG-1)*2+1, IE1, STATUS )
+          CALL ARR_ELEM1I( RNGPTR, 2*NRNG, (IRNG-1)*2+2, IE2, STATUS )
 
-*      Extract and format data
-          DO J = 1, NLDISP
+*      Map this section for each list
+          J = 1
+          DO I = START, NDISP
 
-*        Floating point list
-            IF ( MTYPE(J) .EQ. 'DOUBLE' ) THEN
-              CALL ARR_ELEM1D( PTRS(J), LLEN, IP, DVAL, STATUS )
-              WRITE( C(J), '(1PG14.7)', IOSTAT=FSTAT ) DVAL
+*        Index the list
+            CALL EDI_IDX( IFID, I, LID, STATUS )
 
-*        Integer list
-            ELSE IF ( MTYPE(J) .EQ. 'INTEGER' ) THEN
-              CALL ARR_ELEM1I( PTRS(J), LLEN, IP, IVAL, STATUS )
-              WRITE( C(J), '(1X,I12)', IOSTAT=FSTAT ) IVAL
-
-*        Logical list
-            ELSE IF ( MTYPE(J) .EQ. 'LOGICAL' ) THEN
-              CALL ARR_ELEM1L( PTRS(J), LLEN, IP, LVAL, STATUS )
-              IF ( LVAL ) THEN
-                 C(J) = '    True'
-              ELSE
-                 C(J) = '    False'
-              END IF
+*        Map data
+            CALL EDI_MTYPE( LID, MTYPE(J), STATUS )
+            IF ( STATUS .EQ. SAI__OK ) THEN
+              CALL EDI_MAP( IFID, LNAMES(J), MTYPE(J), 'READ', IE1,
+     :    		    IE2, PTRS(J), STATUS )
+            ELSE
+              CALL ERR_ANNUL( STATUS )
+              PTRS(J) = 0
             END IF
 
+*        Free the list
+            CALL ADI_ERASE( LID, STATUS )
+
+*        Increment list counter
+            J = J + 1
+
+*      Next list to map
           END DO
 
-*      Write data to buffer
- 80       FORMAT( '|', I7, 1X, '|', 7(' ', A15,'|') )
-          WRITE( OBUF, 80 ) IP, (C(K), K = 1, NLDISP )
+*      Print the list values
+          DO I = IE1, IE2
 
-*      Write buffer to device
-          CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
+*        Index into the mapped list sections
+            IP = I - IE1 + 1
 
-*    Next event
+*        Extract and format data
+            DO J = 1, NLDISP
+
+*          Floating point list
+              IF ( MTYPE(J) .EQ. 'DOUBLE' ) THEN
+                CALL ARR_ELEM1D( PTRS(J), LLEN, IP, DVAL, STATUS )
+                WRITE( C(J), '(1PG14.7)', IOSTAT=FSTAT ) DVAL
+
+*          Integer list
+              ELSE IF ( MTYPE(J) .EQ. 'INTEGER' ) THEN
+                CALL ARR_ELEM1I( PTRS(J), LLEN, IP, IVAL, STATUS )
+                WRITE( C(J), '(1X,I12)', IOSTAT=FSTAT ) IVAL
+
+*          Logical list
+              ELSE IF ( MTYPE(J) .EQ. 'LOGICAL' ) THEN
+                CALL ARR_ELEM1L( PTRS(J), LLEN, IP, LVAL, STATUS )
+                IF ( LVAL ) THEN
+                   C(J) = '    True'
+                ELSE
+                   C(J) = '    False'
+                END IF
+              END IF
+
+            END DO
+
+*        Write data to buffer
+ 80         FORMAT( '|', I7, 1X, '|', 7(' ', A15,'|') )
+            WRITE( OBUF, 80 ) I, (C(K), K = 1, NLDISP )
+
+*        Write buffer to device
+            CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
+
+*      Next event
+          END DO
+
+*      Unmap the lists on this page
+          DO I = 1, NLDISP
+            IF ( PTRS(I) .NE. 0 ) THEN
+              CALL EDI_UNMAP( IFID, LNAMES(I), STATUS )
+            END IF
+          END DO
+
+*    Next list range
         END DO
 
 *    Page footer
         WRITE( OBUF, '(10(''-''),<NLDISP>(17(''-'')))')
         CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
 
-*    Unmap the lists on this page
-        DO I = 1, NLDISP
-          IF ( PTRS(I) .NE. 0 ) THEN
-            CALL EDI_UNMAP( IFID, LNAMES(I), STATUS )
-          END IF
-        END DO
-
       END DO
 
 *  Free index workspace
+      CALL DYN_UNMAP( RNGPTR, STATUS )
       CALL DYN_UNMAP( IDXPTR, STATUS )
 
 *  Close output channel
@@ -352,5 +388,150 @@
 *  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
+
+      END
+
+
+      SUBROUTINE EVLIST_L2R( NL, L, NR, R, STATUS )
+*+
+*  Name:
+*     EVLIST_L2R
+
+*  Purpose:
+*     Convert a list of numbers into a list of consecutive ranges
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL EVLIST_L2R( NL, L, NR, R, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     NL = INTEGER (given)
+*        Number of values in list L
+*     L[NR] = INTEGER (given)
+*        Ordered list of values
+*     NR = INTEGER (returned)
+*        Number of ranges
+*     R[2,*] = INTEGER (returned)
+*        Start and stop indexes of ranges
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     evlist, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     25 Sep 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER			NL, L(*)
+
+*  Arguments Returned:
+      INTEGER			NR, R(2,*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			J			! Loop over input
+
+      LOGICAL			FOUND			! Found end of range
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      NR = 0
+      J = 1
+
+*  While more input values
+      DO WHILE ( J .LE. NL )
+
+*    Start of new range
+        NR = NR + 1
+        R(1,NR) = L(J)
+
+*    Find end of range
+        FOUND = .FALSE.
+        DO WHILE ( (J.LE.NL) .AND. .NOT. FOUND )
+          J = J + 1
+          IF ( J .LE. NL ) THEN
+            FOUND = ( L(J) .NE. (L(J-1)+1) )
+          ELSE
+            FOUND = .TRUE.
+          END IF
+        END DO
+
+*    Set end of range
+        IF ( FOUND ) THEN
+          R(2,NR) = L(J-1)
+        ELSE
+          R(2,NR) = L(J)
+        END IF
+
+      END DO
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'EVLIST_L2R', STATUS )
 
       END

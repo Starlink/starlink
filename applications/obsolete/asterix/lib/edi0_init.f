@@ -97,6 +97,9 @@
       EXTERNAL			EDI1_QUNMAP
       EXTERNAL			EDI1_UNMAP
 
+      EXTERNAL			EDI2_MAP
+      EXTERNAL			EDI2_UNMAP
+
 *  Local Variables:
       INTEGER			DID			! Dummy identifier
 *.
@@ -110,7 +113,7 @@
 *    Requires the data models package
         CALL ADI_REQPKG( 'dsmodels', STATUS )
 
-*    Define EDI interface
+*    HDS interface
         CALL ADI_DEFFUN( 'ListMap(_EventDS,_HDSfile,_CHAR,'/
      :      /'_CHAR,_CHAR,_INTEGER,_INTEGER)', EDI1_MAP, DID, STATUS )
         CALL ADI_DEFFUN( 'ListMapQuantum(_EventDS,_HDSfile,_CHAR,'/
@@ -126,6 +129,12 @@
         CALL ADI_DEFFUN( 'ListModify(_EventDS,_HDSfile,_CHAR,'/
      :                     /'_EventList)',
      :                               EDI1_LUPDT, DID, STATUS )
+
+*    FITS interface
+        CALL ADI_DEFFUN( 'ListMap(_EventDS,_FITSfile,_CHAR,'/
+     :      /'_CHAR,_CHAR,_INTEGER,_INTEGER)', EDI2_MAP, DID, STATUS )
+        CALL ADI_DEFFUN( 'ListUnmap(_EventDS,_FITSfile,_CHAR)',
+     :                               EDI2_UNMAP, DID, STATUS )
 
 *    Mark as initialised
         EDI_INIT = .TRUE.
