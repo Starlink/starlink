@@ -109,7 +109,7 @@ specific component, the instructions are slightly different.
    path.  If not, you can build just these by going to the top-level
    of your checkout and giving the command
 
-      % ./bootstrap --buildsupport-only
+      % ./bootstrap --buildsupport
 
  - Now you can go into a specific directory and build the library/application
    as normal (a bootstrap is required if building from CVS)
@@ -117,7 +117,7 @@ specific component, the instructions are slightly different.
       % ./bootstrap
       % ./configure -C
       % make
-      % make install-manifest
+      % make install
 
  - After a `cvs update' in a component, it is possible that some
    generated files will be out of date (if configure.ac or Makefile.am
@@ -129,6 +129,6 @@ specific component, the instructions are slightly different.
 
 
 
-See SSN/78 (in docs/ssn78) for more details on building Starlink classic
+See SSN/78 (in docs/ssn/078) for more details on building Starlink classic
 applications.
 
