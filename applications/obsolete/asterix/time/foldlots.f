@@ -235,8 +235,8 @@
         BASE_TAI=0.0
       ENDIF
 
-      CALL USI_DEF0D( 'PHASE_0_EPOCH', BASE_TAI, STATUS )
-      CALL USI_GET0D( 'PHASE_0_EPOCH', ZeroEpoch, STATUS )
+      CALL USI_DEF0D( 'EPOCH', BASE_TAI, STATUS )
+      CALL USI_GET0D( 'EPOCH', ZeroEpoch, STATUS )
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -268,7 +268,7 @@ C          NBINS = INBINS
       END IF
 
 *    Ask if weighted mean required
-      CALL USI_GET0L('WEIGHT',WEIGHT,STATUS)
+      CALL USI_GET0L('WEIGHTED',WEIGHT,STATUS)
 *
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 

@@ -122,7 +122,7 @@
       CALL AST_INIT
 
 *    Obtain data object, access and check it.
-      CALL USI_ASSOCI( 'INPUT', 'READ', ILOC, PRIM, STATUS )
+      CALL USI_ASSOCI( 'INP', 'READ', ILOC, PRIM, STATUS )
 
 *    Inform user if quality is present
       CALL BDA_CHKQUAL( ILOC, OK, NDIM, DIMS, STATUS )
@@ -176,7 +176,7 @@
      :      ('enter number of points in each section (this will be '
      :                                //'rounded to nearest 2**N)' )
 
-         CALL USI_GET0I( 'SECT_SIZE', LSECT, STATUS )
+         CALL USI_GET0I( 'SECTOR', LSECT, STATUS )
 
          IF ( STATUS .EQ. SAI__OK ) THEN
             LSECT = 2 ** NINT(ALOG10(REAL(LSECT))/ALOG10(2.0))
@@ -206,8 +206,7 @@
             CALL DYN_MAPR( 1, LSECT, WPTR, STATUS )
 
 *          Create a POWER_SPECTRUM object
-            CALL USI_ASSOCO( 'PSPEC_OBJ', 'DYN_SPECTRUM', PLOC,
-     :                                                 STATUS )
+            CALL USI_ASSOCO( 'OUT', 'DYN_SPECTRUM', PLOC, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *          Create components in output file
@@ -291,7 +290,7 @@
 *          Add info to HISTORY structure
             CALL HIST_ADD( PLOC, VERSION, STATUS )
 
-            ACTION(1) = 'Input dataset {INPUT}'
+            ACTION(1) = 'Input dataset {INP}'
             CALL MSG_SETI( 'NDAT', NELM )
             CALL MSG_SETI( 'NSECT', NSECT )
             CALL MSG_SETI( 'LSECT', LSECT )

@@ -8,17 +8,17 @@
 *
 *    Environment parameters :
 *
-*     OBJ1=UNIV(R)
+*     INP1=UNIV(R)
 *            first input object
-*     OBJ2=UNIV(R)
+*     INP2=UNIV(R)
 *            second input object
-*     MAX_LAG=INTEGER(R)
+*     LAG=INTEGER(R)
 *            maximum lag to be computed
 *     WEIGHTED=LOGICAL(R)
 *            cross-correlation to be weighted?
-*     NOISE_CORRECTED=LOGICAL(R)
+*     NOISE=LOGICAL(R)
 *            remove expected noise bias?
-*     XCORR_OBJ=UNIV(W)
+*     OUT=UNIV(W)
 *            output object
 *
 *    Method :
@@ -131,8 +131,8 @@
       CALL AST_INIT
 
 *    Obtain data objects
-      CALL USI_ASSOCI( 'OBJ1', 'READ' , YLOC , YPRIM , STATUS )
-      CALL USI_ASSOCI( 'OBJ2', 'READ' , ZLOC , ZPRIM , STATUS )
+      CALL USI_ASSOCI( 'INP1', 'READ' , YLOC , YPRIM , STATUS )
+      CALL USI_ASSOCI( 'INP2', 'READ' , ZLOC , ZPRIM , STATUS )
       IF(STATUS.NE.SAI__OK) GO TO 9000
 
 *    Find types and inform user
@@ -251,8 +251,8 @@ D     print *,'z;ok,ndim,idim,status:',ok,ndim,idim,status
       ENDIF
 
 *    User input
-      CALL USI_DEF0I('MAX_LAG',ND-1,STATUS)
-      CALL USI_GET0I( 'MAX_LAG', LMAX, STATUS )
+      CALL USI_DEF0I( 'LAG',ND-1,STATUS)
+      CALL USI_GET0I( 'LAG', LMAX, STATUS )
       IF(STATUS.NE.SAI__OK) GO TO 9000
       IF(LMAX.GT.ND-1)THEN
         LMAX=ND-1
@@ -283,7 +283,7 @@ D     print *,'z;ok,ndim,idim,status:',ok,ndim,idim,status
 *      Weighting &/or noise correction required?
         IF(VARS)THEN
           CALL USI_GET0L( 'WEIGHTED', WEIGHT, STATUS )
-          CALL USI_GET0L( 'NOISE_CORRECTED', DENOISE, STATUS )
+          CALL USI_GET0L( 'NOISE', DENOISE, STATUS )
         ENDIF
         IF(STATUS.NE.SAI__OK) GO TO 9000
 
@@ -345,8 +345,8 @@ D     print *,'z;ok,ndim,idim,status:',ok,ndim,idim,status
       ENDIF
 
 *    Create a cross-correlation object
-      CALL USI_DCREAT( 'XCORR_OBJ', 'CROSS_CORR', 0, 0, STATUS )
-      CALL USI_DASSOC( 'XCORR_OBJ', 'WRITE', XCLOC, STATUS )
+      CALL USI_DCREAT( 'OUT', 'CROSS_CORR', 0, 0, STATUS )
+      CALL USI_DASSOC( 'OUT', 'WRITE', XCLOC, STATUS )
       IF(STATUS.NE.SAI__OK) GO TO 9000
 
 *    Create principal arrays

@@ -216,7 +216,7 @@
          CALL MSG_PRNT( 'Data is ^DIMS dimensional' )
 
 *    Create a folded data object.
-      CALL USI_ASSOCO( 'FOLD_OBJ', 'FOLDED_SERIES', FLOC, STATUS )
+      CALL USI_ASSOCO( 'OUT', 'FOLDED_SERIES', FLOC, STATUS )
 
 *    Check status - drop out if bad.
       IF (STATUS .NE. SAI__OK) GOTO 999
@@ -239,8 +239,8 @@
         CALL MSG_PRNT( 'No atomic time: set to zero' )
         BASE_TAI=0.0
       ENDIF
-      CALL USI_DEF0D( 'PHASE_0_EPOCH', BASE_TAI, STATUS )
-      CALL USI_GET0D( 'PHASE_0_EPOCH', ZeroEpoch, STATUS )
+      CALL USI_DEF0D( 'EPOCH', BASE_TAI, STATUS )
+      CALL USI_GET0D( 'EPOCH', ZeroEpoch, STATUS )
       ZEROOFFSET = (ZEROEPOCH - BASE_TAI) * 86400.D0
 
 *    Check axis and data match
@@ -258,7 +258,7 @@
             INBINS = INT( PERIOD / ABS(SCALE) )
             CALL MSG_SETI( 'INBINS', INBINS, STATUS )
 C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
-            CALL USI_DEF0I( 'N_PHASE_BINS', INBINS, STATUS )
+            CALL USI_DEF0I( 'BINS', INBINS, STATUS )
             CALL DYN_MAPR( 1, NDATA, XPTR, STATUS )
             CALL DYN_MAPR( 1, NDATA, XWPTR, STATUS )
             CALL ARR_REG1R( BASE, SCALE, NDATA, %VAL(XPTR), STATUS )
@@ -450,7 +450,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       CALL HIST_COPY( ILOC, FLOC, STATUS )
       CALL HIST_ADD( FLOC, VERSION, STATUS )
       HTXT(1) = 'Input {INP}'
-      HTXT(2) = 'Folded output {FOLD_OBJ}'
+      HTXT(2) = 'Folded output {OUT}'
       CALL MSG_SETR( 'PERIOD', PERIOD )
       CALL MSG_SETC( 'UNITS', UNITS )
       CALL MSG_MAKE( 'The data has been folded into a period of '/

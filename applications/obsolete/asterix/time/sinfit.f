@@ -317,7 +317,7 @@
 *    Add new history component
       CALL HIST_ADD  (OUTLOC, VERSION, STATUS)
 
-      TEXT(1) = 'Input {INPUT}'
+      TEXT(1) = 'Input {INP}'
       I       = 1
       NLINES  = 5
 
