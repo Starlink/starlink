@@ -1,0 +1,47 @@
+*+
+*  Name:
+*     CCD1_CACM
+
+*  Purpose:
+*     Defines the common block for communicating character arrays.
+
+*  Invocation:
+*     INCLUDE 'CCD1_CACM'
+
+*  Description:
+*     This houses the common block for communicating the necessary 
+*     information about a mapped character array to the source and 
+*     sink routines required when using AST Channels.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     5-MAR-2001 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+*        CCD1_CALEN = INTEGER
+*           Length of elements in character array.
+*        CCD1_CANUM = INTEGER
+*           Number of elements in the character array.
+*        CCD1_CAPOS = INTEGER
+*           Current position in array.
+*        CCD1_CAPTR = INTEGER
+*           Pointer to character array.
+      INTEGER CCD1_CALEN
+      INTEGER CCD1_CANUM
+      INTEGER CCD1_CAPOS
+      INTEGER CCD1_CAPTR
+
+*  Define common block.
+      COMMON/ CCD1_CACM / CCD1_CALEN, CCD1_CANUM, CCD1_CAPOS, CCD1_CAPTR
+
+* $Id$
