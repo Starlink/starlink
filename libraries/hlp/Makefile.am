@@ -26,6 +26,8 @@ libhlp_la_SOURCES = \
 FPP_ROUTINES = \
 	fopr.fpp
 
+fopr.fpp: fopr.f
+
 F_ROUTINES = \
 	comstr.f \
 	creh.f \
