@@ -48,7 +48,7 @@
 *        being run (eg KAPPA_DISPLAY).
 *     MARGIN( 4 ) = REAL (Given)
 *        The width of the borders to leave round the DATA picture, given
-*        as fractions of the corresponding dimension of the DATA picture.
+*        as fractions of the corresponding dimension of the current picture.
 *        These should be supplied in the order bottom, right, top, left.
 *     NP = INTEGER (Given)
 *        The number of extra pictures to be included in the FRAME pictures
@@ -69,11 +69,11 @@
 *        previously created extra pictures. The picture is placed at the top or
 *        bottom of all previously created pictures. Ignored if NP is zero.
 *     PSIZE( NP ) = REAL (Given)
-*        The size of each extra picture. For Left and Right pictures, this is
-*        the width of the picture, and the value is given as a fraction
-*        of the width of the DATA picture. For Top and Bottom pictures, it is 
-*        the height of the picture, and it is given as a fraction of the
-*        height of the DATA picture. Ignored if NP is zero.
+*        The size of each extra picture. For Left and Right pictures, this 
+*        is the width of the picture, and the value is given as a fraction
+*        of the width of the current picture. For Top and Bottom pictures, 
+*        it is the height of the picture, and it is given as a fraction of 
+*        the height of the current picture. Ignored if NP is zero.
 *     SASPEC = REAL (Given)
 *        The aspect ratio with which a new DATA picture should be created.
 *        This is the height divided by the width of the DATA picture,
@@ -119,6 +119,9 @@
 *  History:
 *     14-JUL-1998 (DSB):
 *        Original version.
+*     26-OCT-1999 (DSB):
+*        Modified to make margin and picture sizes relative to the
+*        original current picture rather than the new DATA picture.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -161,9 +164,11 @@
       REAL ALPHA                 ! Normalised width excluding the DATA pic
       REAL ASPECT                ! The aspect ratio to use
       REAL BETA                  ! Normalised height excluding the DATA pic
+      REAL CXI                   ! Current picture width in inches
       REAL CXL                   ! X at left of current picture in inches
       REAL CXR                   ! X at right of current picture in inches
       REAL CYB                   ! Y at bottom of current picture in inches
+      REAL CYI                   ! Current picture height in inches
       REAL CYT                   ! Y at top of current picture in inches
       REAL DXI                   ! Width of DATA picture in inches
       REAL DXL                   ! X at left of DATA picture in inches
@@ -179,12 +184,14 @@
       REAL FYB                   ! Y at bottom of FRAME picture in inches
       REAL FYI                   ! Height of FRAME picture in inches
       REAL FYT                   ! Y at top of FRAME picture in inches
+      REAL GAP                   ! Gap to fill available space
       REAL PXI                   ! Width of ancillary picture in inches
       REAL PXL                   ! X at left of ancillary picture in inches
       REAL PXR                   ! X at right of ancillary picture in inches
       REAL PYB                   ! Y at bottom of ancillary picture in inches
       REAL PYI                   ! Height of ancillary picture in inches
       REAL PYT                   ! Y at top of ancillary picture in inches
+      REAL SASP                  ! Aspect ratio of available space
       REAL SZHP                  ! Total normalised height of horizontal pic.s
       REAL SZVP                  ! Total normalised width of vertical pic.s
 *.
@@ -209,24 +216,8 @@
 *  Get the bounds of this viewport, in inches from the bottom left corner
 *  of the screen. Save the size in inches.
       CALL PGQVP( 1, CXL, CXR, CYB, CYT )
-      FXI = CXR - CXL
-      FYI = CYT - CYB
-
-*  Store the current viewport as a FRAME picture, but only if the FRAME
-*  picture would contain something other than the DATA picture. This is
-*  assumed to be so if any ancillary pictures are being created, or if the 
-*  margins around the DATA picture are not zero.
-      IF( NP .GT. 0 .OR. MARGIN( 1 ) .GT. 0.0 .OR. 
-     :    MARGIN( 2 ) .GT. 0.0 .OR. MARGIN( 3 ) .GT. 0.0 .OR.
-     :    MARGIN( 4 ) .GT. 0.0 ) THEN
-
-         CALL AGP_SVIEW( 'FRAME', COMMNT, IPICF, STATUS )
-
-*  If the FRAME and DATA pictures would be equivalent, use the current
-*  picture as the "FRAME" picture.
-      ELSE
-         CALL AGI_ICURP( IPICF, STATUS )
-      END IF
+      CXI = CXR - CXL
+      CYI = CYT - CYB
 
 *  Set the required aspect ratio for the new DATA picture. If the user
 *  has set the FILL parameter TRUE, then use the aspect ratio which gives
@@ -247,78 +238,166 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Find the total width of extra pictures to be created which run
-*  vertically, and the width of those which run horizontally. These
-*  "widths" are in units of the corresponding dimension of the DATA picture
-*  (which has not yet been decided).
-      SZVP = 0
-      SZHP = 0
-      DO I = 1, NP
+*  Find the bounds of the area available for the DATA picture after
+*  taking account of the extra pictures and margins. To begin with, we 
+*  have the whole of the current picture available. FXL, etc, record 
+*  the bounds of the area still available.
+      FXL = CXL
+      FYB = CYB
+      FXR = CXR
+      FYT = CYT
 
-         IF( PSIDE( I ) .EQ. 'R' .OR. PSIDE( I ) .EQ. 'L' ) THEN
-            SZVP = SZVP + ABS( PSIZE( I ) )
+*  Loop round the extra pictures in reverse order. Reduce the available
+*  space to take account of each one.
+      DO I = NP, 1, -1
 
-         ELSE IF( PSIDE( I ) .EQ. 'B' .OR. PSIDE( I ) .EQ. 'T' ) THEN
-            SZHP = SZHP + ABS( PSIZE( I ) )
-
-         ELSE IF( STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'NAME', PNAME( I ) )
-            CALL MSG_SETC( 'SIDE', PSIDE( I ) )
-            CALL ERR_REP( 'KPG1_GDNEW_1', 'KPG1_GDNEW: Invalid '//
-     :                    'side ''^SIDE'' requested for ^NAME '//
-     :                    'picture (programming error).', STATUS )
-            GO TO 999
+         IF( PSIDE( I ) .EQ. 'L' ) THEN
+            FXL = MIN( FXR, FXL + ABS( PSIZE( I )*CXI ) )
+         ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
+            FXR = MAX( FXL, FXR - ABS( PSIZE( I )*CXI ) )
+         ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
+            FYT = MAX( FYB, FYT - ABS( PSIZE( I )*CYI ) )
+         ELSE 
+            FYB = MIN( FYT, FYB + ABS( PSIZE( I )*CYI ) )
          END IF
+
       END DO
 
-*  Add on the width of of the margins around the DATA picture.
-      ALPHA = MARGIN( 2 ) + MARGIN( 4 ) + SZVP
-      BETA = MARGIN( 1 ) + MARGIN( 3 ) + SZHP
+*  Now remove the required margins from the available space.
+      FYB = MIN( FYT, FYB + MARGIN( 1 )*CYI )
+      FXR = MAX( FXL, FXR - MARGIN( 2 )*CXI )
+      FYT = MAX( FYB, FYT - MARGIN( 3 )*CYI )
+      FXL = MIN( FXR, FXL + MARGIN( 4 )*CXI )
 
-*  Calculate the size of the DATA picture (in inches) which leaves room for
-*  the extra pictures and margins. If a zero or negative aspect ratio has 
-*  been given, choose an aspect ratio which gives the largest DATA picture.
-      IF( ASPECT .LE. 0.0 ) THEN
-         DXI = FXI/( 1.0 + ALPHA )
-         DYI = FYI/( 1.0 + BETA )
+*  Store the dimensions of the available space.
+      FXI = FXR - FXL
+      FYI = FYT - FYB
 
-*  If a positive aspect ratio was given, use it.
-      ELSE 
-         DXI = MIN( FXI/( 1.0 + ALPHA ), 
-     :              FYI/( ASPECT*( 1.0 + BETA ) ) ) 
-         DYI = DXI*ASPECT
+*  Report an error if the whole current picture has been used.
+      IF( FXI .LE. 0.1 .OR. FYI .LE. 0.1 ) THEN
+
+         IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'KPG1_GDNEW_2', 'No room left for a '//
+     :                    'DATA picture. Margins or extra pictures '//
+     :                    '(e.g. a KEY picture) need to be made '//
+     :                    'smaller.', STATUS )
+         END IF
+
+         GO TO 999
+
       END IF
 
-*  Find the width and height which will actually be used in the Frame
-*  picture.
-      FW = MIN( FXI, DXI*( 1 + ALPHA ) )
-      FH = MIN( FYI, DYI*( 1 + BETA ) ) 
+*  Store the aspect ratio of the available space.
+      SASP = FYI/FXI
 
-*  Initialise the bounds of the area within the FRAME picture which is still 
-*  available for extra pictures to be created in. Centre the used area of
-*  the Frame within the whole Frame.
-      FXL = CXL + 0.5*( FXI - FW )
-      FXR = CXR - 0.5*( FXI - FW )
-      FYB = CYB + 0.5*( FYI - FH )
-      FYT = CYT - 0.5*( FYI - FH )
+*  If no aspect ratio has been given, use the whole of the available
+*  space for the DATA Picture.
+      IF( ASPECT .LE. 0.0 ) THEN
+         DXL = FXL
+         DXR = FXR
+         DYB = FYB
+         DYT = FYT
+         DXI = DXR - DXL
+         DYI = DYT - DYB
 
-*  Loop round creating the extra pictures in reverse order. Each is created 
-*  within the remaining area in the FRAME box. Change the bounds of the 
-*  remaining area to exclude the area occupied by each picture as it is 
-*  created. Limit each picture to be totally within the current picture.
+*  If the DATA picture is "taller" than the available space, use the full
+*  height of the available space, but only use the width required to give
+*  the correct aspect ratio.
+      ELSE IF( ASPECT .GT. SASP ) THEN
+         DYB = FYB
+         DYT = FYT
+         DYI = DYT - DYB
+         DXI = DYI/ASPECT
+         GAP = 0.5*( FXI - DXI )
+         DXR = FXR - GAP
+         DXL = FXL + GAP
+
+*  If the DATA picture is "wider" than the available space, use the full
+*  width of the available space, but only use the height required to give
+*  the correct aspect ratio.
+      ELSE 
+         DXR = FXR
+         DXL = FXL
+         DXI = DXR - DXL
+         DYI = DXI*ASPECT
+         GAP = 0.5*( FYI - DYI )
+         DYT = FYT - GAP
+         DYB = FYB + GAP
+
+      END IF
+
+*  Get the bounds of the FRAME picture which encloses all the other
+*  pictures. To begin with, set the FRAME bounds equal to the DATA bounds.
+      FXL = DXL
+      FXR = DXR
+      FYB = DYB
+      FYT = DYT
+
+*  Now add on the margins.
+      FYB = FYB - MARGIN( 1 )*CYI
+      FXR = FXR + MARGIN( 2 )*CXI
+      FYT = FYT + MARGIN( 3 )*CYI
+      FXL = FXL - MARGIN( 4 )*CXI
+
+*  Now add on each of the extra pictures.
+      DO I = 1, NP, -1
+
+         IF( PSIDE( I ) .EQ. 'L' ) THEN
+            FXL = FXL - ABS( PSIZE( I )*CXI ) 
+         ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
+            FXR = FXR + ABS( PSIZE( I )*CXI )
+         ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
+            FYT = FYT + ABS( PSIZE( I )*CYI )
+         ELSE 
+            FYB = FYB - ABS( PSIZE( I )*CYI )
+         END IF
+
+      END DO
+
+*  Ensure the FRAME picture does not extend beyond the current picture.
+      FXL = MAX( CXL + 0.001, FXL )
+      FXR = MIN( CXR - 0.001, FXR )
+      FYB = MAX( CYB + 0.001, FYB )
+      FYT = MIN( CYT - 0.001, FYT )
+
+*  Store this areas as a FRAME picture, but only if the FRAME picture 
+*  would contain something other than the DATA picture. This is
+*  assumed to be so if any ancillary pictures are being created, or if the 
+*  margins around the DATA picture are not zero.
+      IF( NP .GT. 0 .OR. MARGIN( 1 ) .GT. 0.0 .OR. 
+     :    MARGIN( 2 ) .GT. 0.0 .OR. MARGIN( 3 ) .GT. 0.0 .OR.
+     :    MARGIN( 4 ) .GT. 0.0 ) THEN
+
+*  Create the new viewport.
+         CALL PGVSIZ( FXL, FXR, FYB, FYT )
+
+*  Set its world co-ordinate bounds.
+         CALL KPG1_GDWIN( -1, STATUS )
+
+*  Save the viewport as a new picture.
+         CALL AGP_SVIEW( 'FRAME', COMMNT, IPICF, STATUS )
+
+*  If the FRAME and DATA pictures would be equivalent, use the current
+*  picture as the "FRAME" picture.
+      ELSE
+         CALL AGI_ICURP( IPICF, STATUS )
+      END IF
+
+*  Now go round and create the ancillary pictures in reverse order. 
+*  Initiallay the entire FRAME picture is available.
       DO I = NP, 1, -1
 
          IF( PSIDE( I ) .EQ. 'L' ) THEN
             PXL = FXL
-            PXR = MIN( CXR, FXL + ABS( PSIZE( I )*DXI ) )
+            PXR = MIN( FXR, FXL + ABS( PSIZE( I )*CXI ) )
             PYB = FYB 
             PYT = FYT
 
             FXL = PXR
 
          ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
-            PXL = MAX( CXL, FXR - ABS( PSIZE( I )*DXI ) )
+            PXL = MAX( FXL, FXR - ABS( PSIZE( I )*CXI ) )
             PXR = FXR
             PYB = FYB 
             PYT = FYT
@@ -328,7 +407,7 @@
          ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
             PXL = FXL
             PXR = FXR
-            PYB = MAX( CYB, FYT - ABS( PSIZE( I )*DYI ) )
+            PYB = MAX( FYB, FYT - ABS( PSIZE( I )*CYI ) )
             PYT = FYT
 
             FYT = PYB
@@ -337,7 +416,7 @@
             PXL = FXL
             PXR = FXR
             PYB = FYB
-            PYT = MIN( CYT, FYB + ABS( PSIZE( I )*DYI ) )
+            PYT = MIN( FYT, FYB + ABS( PSIZE( I )*CYI ) )
 
             FYB = PYT
 
@@ -365,24 +444,10 @@
 
       END DO
 
-*  Get the bounds of the DATA picture, using the specified margins.
-*  Limit to the bounds of the current picture.
-      DXL = MAX( CXL, FXL + MARGIN( 4 )*DXI )
-      DXR = MIN( CXR, DXL + DXI )
-      DYB = MAX( CYB, FYB + MARGIN( 1 )*DYI )
-      DYT = MIN( CYT, DYB + DYI )
-
-*  Report an error if the DATA pcture has zero area.
-      IF( ( DXL .GE. DXR .OR. DYB .GE. DYT ) .AND.
-     :    STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPG1_GDNEW_2', 'DATA picture would have zero '//
-     :                 'size.', STATUS )
-      
-*  Otherwise, create a PGPLOT viewport for the DATA picture, and set its 
-*  world coordinate bounds to the supplied values. If the box defined by
+*  Create a PGPLOT viewport for the DATA picture, and set its world 
+*  coordinate bounds to the supplied values. If the box defined by
 *  the bounds has zero size, use cm from the bottom left corner.
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+      IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Report an error if any of the BOX values are bad.
          IF( BOX( 1 ) .EQ. AST__BAD .OR.
@@ -390,7 +455,7 @@
      :       BOX( 3 ) .EQ. AST__BAD .OR.
      :       BOX( 4 ) .EQ. AST__BAD ) THEN
             STATUS = SAI__OK
-            CALL ERR_REP( 'KPG1_GDNEW_ERR', 'The bounds of the new '//
+            CALL ERR_REP( 'KPG1_GDNEW_4', 'The bounds of the new '//
      :                    'DATA picture are undefined in AGI world '//
      :                    'co-ordinates.', STATUS )
             GO TO 999

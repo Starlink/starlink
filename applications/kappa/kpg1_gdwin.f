@@ -20,7 +20,8 @@
 
 *  Arguments:
 *     IPIC = INTEGER (Given)
-*        The AGI picture identifier.
+*        The AGI picture identifier. If -1, then the current picture is
+*        used.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -31,6 +32,8 @@
 *  History:
 *     19-AUG-1998 (DSB):
 *        Original version.
+*     26-OCT-1999 (DSB):
+*        Modified to allow IPIC = -1.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,11 +68,12 @@
 *  Save the NDC bounds of the current PGPLOT viewport.
       CALL PGQVP( 0, VX1, VX2, VY1, VY2 )
       
-*  Save the current AGI picture.
-      CALL AGI_ICURP( IPIC0, STATUS )
-
-*  Make the specified AGI picture current.
-      CALL AGI_SELP( IPIC, STATUS )
+*  If a picture was given, save the current AGI picture, and make the 
+*  specified AGI picture current.
+      IF( IPIC .NE. -1 ) THEN
+         CALL AGI_ICURP( IPIC0, STATUS )
+         CALL AGI_SELP( IPIC, STATUS )
+      END IF
 
 *  Set the PGPLOT viewport and window so that they correspond to the
 *  specified picture.
@@ -110,8 +114,8 @@
 
       END IF
 
-*  Make the original AGI picture current.
-      CALL AGI_SELP( IPIC0, STATUS )
+*  If required, make the original AGI picture current.
+      IF( IPIC .NE. -1 ) CALL AGI_SELP( IPIC0, STATUS )
 
 *  Re-establish the original viewport.
       CALL PGSVP( VX1, VX2, VY1, VY2 )

@@ -79,11 +79,11 @@
 *        The above strings can be abbreviated to one character.
 *        MARGIN( 4 ) = _REAL (Read)
 *           The widths of the margins to leave for axis annotation, given 
-*           as fractions of the corresponding dimension of the DATA picture. 
+*           as fractions of the corresponding dimension of the current picture. 
 *           Four values may be given, in the order - bottom, right, top, left. 
 *           If less than four values are given, extra values are used equal to 
 *           the first supplied value. If these margins are too narrow any axis 
-*           annotation may be clipped. The dynamic default is 0.18 (for all 
+*           annotation may be clipped. The dynamic default is 0.15 (for all 
 *           edges) if either annotated axes or a key are produced, and zero 
 *           otherwise. 
 *        MARKER = INTEGER )Read)
@@ -227,6 +227,9 @@
 *     1-OCT-1999 (DSB):
 *        Added argument LMODE. Attempt to draw all points, including ones 
 *        which are outside the plot. 
+*     26-OCT-1999 (DSB):
+*        Made MARGIN a fraction of the current picture, not the DATA
+*        picture.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -436,7 +439,7 @@
       IF( .NOT. AXES ) THEN
          DEFMAR = 0.0
       ELSE
-         DEFMAR = 0.18
+         DEFMAR = 0.15
       END IF
       CALL PAR_DEF1R( 'MARGIN', 1, DEFMAR, STATUS )
 

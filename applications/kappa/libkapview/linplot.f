@@ -198,12 +198,12 @@
 *        case insensitive. The initial value is "Extended". [current value]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
-*        as fractions of the corresponding dimension of the DATA picture. 
+*        as fractions of the corresponding dimension of the current picture. 
 *        Four values may be given, in the order - bottom, right, top, left. 
 *        If less than four values are given, extra values are used equal to 
 *        the first supplied value. If these margins are too narrow any axis 
 *        annotation may be clipped. If a null (!) value is supplied, the 
-*        value used is 0.18 (for all edges) if either annotated axes or a 
+*        value used is 0.15 (for all edges) if either annotated axes or a 
 *        key are produced, and zero otherwise. [current value]
 *     MARKER = _INTEGER (Read)
 *        This parameter is only accessed if parameter MODE is set to
@@ -450,6 +450,9 @@
 *        zero rather than a null value.
 *     28-SEP-1999 (DSB):
 *        Added parameter LMODE.
+*     26-OCT-1999 (DSB):
+*        Change MARGIN to be a fraction of the current picture, not of the
+*        DATA picture.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -477,6 +480,9 @@
 *  Local Constants:
       INTEGER NDIM               ! Dimensionality of input array
       PARAMETER( NDIM = 1 )      ! 1-d data
+
+      REAL KW                    ! Width of key picture as fraction of
+      PARAMETER ( KW = 0.1 )     ! current picture.
 
 *  Local Variables:
       CHARACTER COMP*8         ! Component to be displayed
@@ -1026,7 +1032,7 @@
                IF( .NOT. KEY .AND. .NOT. AXES ) THEN
                   CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
                ELSE
-                  CALL PAR_DEF1R( 'MARGIN', 1, 0.18, STATUS )
+                  CALL PAR_DEF1R( 'MARGIN', 1, 0.15, STATUS )
                END IF
 
                CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG,
@@ -1038,7 +1044,7 @@
                   IF( .NOT. KEY .AND. .NOT. AXES ) THEN
                      MARGIN( 1 ) = 0.0
                   ELSE
-                     MARGIN( 1 ) = 0.18
+                     MARGIN( 1 ) = 0.15
                   END IF
                   NMARG = 1
                END IF
@@ -1058,7 +1064,7 @@
 *  existing one. Also create a KEY picture if necessary.
                IF( KEY ) THEN
                   CALL KPG1_PLOTP( IPICD0, 'LINPLOT', MARGIN, 1, 'KEY',
-     :                             'B', 0.2, 0.0, 0.0D0, IPICD, IPICF, 
+     :                             'B', KW, 0.0, 0.0D0, IPICD, IPICF, 
      :                             IPICK, STATUS )
                ELSE
                   CALL KPG1_PLOTP( IPICD0, 'LINPLOT', MARGIN, 0, ' ',
@@ -1286,11 +1292,11 @@
 
 *  Get the margin values, using a dynamic default of zero if no key or
 *  axes are being created (to avoid the unnecessary creation of FRAME 
-*  pictures by KPG1_PLOTP), and 0.18 otherwise.
+*  pictures by KPG1_PLOTP), and 0.15 otherwise.
          IF( .NOT. KEY .AND. .NOT. AXES ) THEN
             CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
          ELSE
-            CALL PAR_DEF1R( 'MARGIN', 1, 0.18, STATUS )
+            CALL PAR_DEF1R( 'MARGIN', 1, 0.15, STATUS )
          END IF
 
          CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG,
@@ -1301,7 +1307,7 @@
             IF( .NOT. KEY .AND. .NOT. AXES ) THEN
                MARGIN( 1 ) = 0.0
             ELSE
-               MARGIN( 1 ) = 0.18
+               MARGIN( 1 ) = 0.15
             END IF
             NMARG = 1
          END IF
@@ -1327,7 +1333,7 @@
          BOX( 4 ) = TRG( 2 )
 
          IF( KEY ) THEN
-            CALL KPG1_PLOTP( -1, 'LINPLOT', MARGIN, 1, 'KEY', 'B', 0.2, 
+            CALL KPG1_PLOTP( -1, 'LINPLOT', MARGIN, 1, 'KEY', 'B', KW, 
      :                       0.0, BOX, IPICD, IPICF, IPICK, STATUS )
          ELSE
             CALL KPG1_PLOTP( -1, 'LINPLOT', MARGIN, 0, ' ', ' ', 0.0, 

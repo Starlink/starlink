@@ -127,12 +127,12 @@
 *        null (!) name indicates that no log file is required. [!]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
-*        as fractions of the corresponding dimension of the DATA picture. 
+*        as fractions of the corresponding dimension of the current  picture. 
 *        Four values may be given, in the order - bottom, right, top, left. 
 *        If less than four values are given, extra values are used equal to 
 *        the first supplied value. If these margins are too narrow any axis 
 *        annotation may be clipped. If a null (!) value is upplied, the
-*        value used is 0.18 (for all edges) if either annotated axes or a 
+*        value used is 0.15 (for all edges) if either annotated axes or a 
 *        key are produced, and zero otherwise. [current value]
 *     MARKER = INTEGER (Read)
 *        The PGPLOT marker type to use for the data values in the plot. 
@@ -349,6 +349,9 @@
 *        Modified to expect input positions in the current WCS Frame of
 *        the NDF. Removed parameter COSYS, RADUNITS, SCALE. Added INCAT.
 *        USEAXIS.
+*     26-OCT-1999 (DSB):
+*        Made MARGIN a fraction of the current picture, not the DATA
+*        picture.
 *     {enter_further_changes_here}
 
 *  Bugs:

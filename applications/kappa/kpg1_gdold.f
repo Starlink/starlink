@@ -32,7 +32,7 @@
 *  Arguments:
 *     MARGIN( 4 ) = REAL (Given)
 *        The width of the borders to leave round the DATA picture, given
-*        as fractions of the corresponding dimension of the DATA picture.
+*        as fractions of the corresponding dimension of the current picture.
 *        These should be supplied in the order bottom, right, top, left.
 *     COMMNT = CHARACTER * ( * ) (Given)
 *        A comment to store with the new pictures added to the AGI
@@ -58,10 +58,10 @@
 *        bottom of all previously created pictures. Ignored if NP is zero.
 *     PSIZE( NP ) = REAL (Given)
 *        The size of each extra picture. For Left and Right pictures, this is
-*        the width of the picture, and the value is given as a fraction
-*        of the width of the DATA picture. For Top and Bottom pictures, it is 
-*        the height of the picture, and it is given as a fraction of the
-*        height of the DATA picture. Ignored if NP is zero.
+*        the width of the picture, and the value is given as a fraction of 
+*        the width of the current picture. For Top and Bottom pictures, it 
+*        is the height of the picture, and it is given as a fraction of the
+*        height of the current picture. Ignored if NP is zero.
 *     IPICD = INTEGER (Given)
 *        An AGI identifier for the existing DATA picture.
 *     IPICD0 = INTEGER (Returned)
@@ -94,6 +94,9 @@
 *  History:
 *     14-JUL-1998 (DSB):
 *        Original version.
+*     26-OCT-1999 (DSB):
+*        Modified to make margin and picture sizes relative to the
+*        original current picture rather than the new DATA picture.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,9 +135,11 @@
 *  Local Variables:
       INTEGER I                  ! Ancillary picture index
       INTEGER IPIC0              ! AGI identifier for original current picture
+      REAL CXI                   ! Width of current picture in inches
       REAL CXL                   ! X at left of current picture in inches
       REAL CXR                   ! X at right of current picture in inches
       REAL CYB                   ! Y at bottom of current picture in inches
+      REAL CYI                   ! Height of current picture in inches
       REAL CYT                   ! Y at top of current picture in inches
       REAL DXI                   ! X size of DATA picture in inches
       REAL DXL                   ! X at left of DATA picture in inches
@@ -174,6 +179,10 @@
 *  values returned are inches from the bottom left corner of the screen.
       CALL PGQVP( 1, CXL, CXR, CYB, CYT )
 
+*  Find the dimensions of the current picture, in inches.
+      CXI = CXR - CXL
+      CYI = CYT - CYB
+
 *  Make the existing DATA picture current.
       CALL AGI_SELP( IPICD, STATUS )
 
@@ -193,10 +202,10 @@
       DYI = DYT - DYB
 
 *  Find the bounds of the area containing the DATA picture and the margins.
-      FYB = DYB - DYI * MARGIN( 1 )
-      FXR = DXR + DXI * MARGIN( 2 )
-      FYT = DYT + DYI * MARGIN( 3 )
-      FXL = DXL - DXI * MARGIN( 4 )
+      FYB = DYB - CYI * MARGIN( 1 )
+      FXR = DXR + CXI * MARGIN( 2 )
+      FYT = DYT + CYI * MARGIN( 3 )
+      FXL = DXL - CXI * MARGIN( 4 )
 
 *  Loop round each required extra picture, extending the above bounds to 
 *  enclose it. Note, the pictures are not actually created yet since
@@ -209,12 +218,12 @@
 *  Find the bounds of this extra picture.
          IF( PSIDE( I ) .EQ. 'R' ) THEN
             PXL = FXR
-            PXR = FXR + ABS( PSIZE( I )*DXI )
+            PXR = FXR + ABS( PSIZE( I )*CXI )
             PYB = FYB
             PYT = FYT
 
          ELSE IF( PSIDE( I ) .EQ. 'L' ) THEN
-            PXL = FXL - ABS( PSIZE( I )*DXI )
+            PXL = FXL - ABS( PSIZE( I )*CXI )
             PXR = FXL
             PYB = FYB
             PYT = FYT
@@ -223,12 +232,12 @@
             PXL = FXL
             PXR = FXR
             PYB = FYT
-            PYT = FYT + ABS( PSIZE( I )*DYI )
+            PYT = FYT + ABS( PSIZE( I )*CYI )
 
          ELSE IF( PSIDE( I ) .EQ. 'B' ) THEN
             PXL = FXL
             PXR = FXR
-            PYB = FYB - ABS( PSIZE( I )*DYI )
+            PYB = FYB - ABS( PSIZE( I )*CYI )
             PYT = FYB
 
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
@@ -294,10 +303,10 @@
 *  We now go back and create any extra required pictures within the FRAME
 *  picture just created. Restore the bounds of the area containing the 
 *  DATA picture and the margin.
-      FYB = DYB - DYI * MARGIN( 1 )
-      FXR = DXR + DXI * MARGIN( 2 )
-      FYT = DYT + DYI * MARGIN( 3 )
-      FXL = DXL - DXI * MARGIN( 4 )
+      FYB = DYB - CYI * MARGIN( 1 )
+      FXR = DXR + CXI * MARGIN( 2 )
+      FYT = DYT + CYI * MARGIN( 3 )
+      FXL = DXL - CXI * MARGIN( 4 )
 
 *  Loop round each required extra picture, creating it if possible.
       DO I = 1, NP
@@ -305,12 +314,12 @@
 *  Find the bounds of this extra picture.
          IF( PSIDE( I ) .EQ. 'R' ) THEN
             PXL = FXR
-            PXR = FXR + ABS( PSIZE( I )*DXI )
+            PXR = FXR + ABS( PSIZE( I )*CXI )
             PYB = FYB
             PYT = FYT
 
          ELSE IF( PSIDE( I ) .EQ. 'L' ) THEN
-            PXL = FXL - ABS( PSIZE( I )*DXI )
+            PXL = FXL - ABS( PSIZE( I )*CXI )
             PXR = FXL
             PYB = FYB
             PYT = FYT
@@ -319,12 +328,12 @@
             PXL = FXL
             PXR = FXR
             PYB = FYT
-            PYT = FYT + ABS( PSIZE( I )*DYI )
+            PYT = FYT + ABS( PSIZE( I )*CYI )
 
          ELSE 
             PXL = FXL
             PXR = FXR
-            PYB = FYB - ABS( PSIZE( I )*DYI )
+            PYB = FYB - ABS( PSIZE( I )*CYI )
             PYT = FYB
 
          END IF

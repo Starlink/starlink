@@ -61,12 +61,12 @@
 *        will take place. [!]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
-*        as fractions of the corresponding dimension of the DATA picture. 
+*        as fractions of the corresponding dimension of the current picture. 
 *        Four values may be given, in the order - bottom, right, top, left. 
 *        If less than four values are given, extra values are used equal to 
 *        the first supplied value. If these margins are too narrow any axis 
 *        annotation may be clipped. If a null (!) value is supplied, the
-*        value used is 0.18 (for all edges) if either annotated axes or 
+*        value used is 0.15 (for all edges) if either annotated axes or 
 *        a key are produced, and zero otherwise. [current value]
 *     NUMBIN = _INTEGER (Read)
 *        The number of histogram bins to be used. This must lie in the
@@ -205,6 +205,9 @@
 *     17-SEP-1999 (DSB):
 *        Tidied up. NDF calls changed to LPG to use auto-looping. Dynamic
 *        default parameters changed to use null default.
+*     26-OCT-1999 (DSB):
+*        Made MARGIN a fraction of the current picture, not the DATA
+*        picture.
 *     {enter_further_changes_here}
 
 *  Bugs:

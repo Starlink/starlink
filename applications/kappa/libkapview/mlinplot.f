@@ -197,7 +197,7 @@
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the contour map for axis 
 *        annotation. The widths should be given as fractions of the 
-*        corresponding dimension of the DATA picture. Four values may be 
+*        corresponding dimension of the current picture. Four values may be 
 *        given, in the order; bottom, right, top, left. If fewer than four 
 *        values are given, extra values are used equal to the first supplied 
 *        value. If these margins are too narrow any axis annotation may be 
@@ -440,6 +440,9 @@
 *  History:
 *     16-AUG-1999 (DSB):
 *        Original AST version, based on earlier version by MJC.
+*     26-OCT-1999 (DSB):
+*        Made MARGIN a fraction of the current picture, not the DATA
+*        picture.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -469,6 +472,9 @@
 
       INTEGER MXLIN              ! Max no. of lines which can be displayed
       PARAMETER( MXLIN = 100 )   
+
+      REAL KW                    ! Width of key as a fraction of width of 
+      PARAMETER( KW = 0.15 )     ! current picture
 
 *  Local Variables:
       CHARACTER CLONUM*5       ! String of low-limit of default list
@@ -776,10 +782,10 @@ c         IMODE = 4
 *  ==========================
 
 *  Set the dynamic defaults for MARGIN.
-      DEFMAR( 1 ) = 0.2
-      DEFMAR( 2 ) = 0.25
-      DEFMAR( 3 ) = 0.2
-      DEFMAR( 4 ) = 0.25
+      DEFMAR( 1 ) = 0.15
+      DEFMAR( 2 ) = 0.2
+      DEFMAR( 3 ) = 0.15
+      DEFMAR( 4 ) = 0.2
       CALL PAR_DEF1R( 'MARGIN', 4, DEFMAR, STATUS )
 
 *  Abort if an error has occurred.
@@ -852,7 +858,7 @@ c         IMODE = 4
   
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( FSET, 'UNKNOWN', 'KAPPA_MLINPLOT', 
-     :                   NDFNAM( : NC ), MARGIN, 1, 'KEY', 'R', 0.5, 
+     :                   NDFNAM( : NC ), MARGIN, 1, 'KEY', 'R', KW, 
      :                   0.0, 'DATAPLOT', BOX, IPICD, IPICF, IPICK, 
      :                   IPLOT, NFRM, ALIGN, STATUS )
 

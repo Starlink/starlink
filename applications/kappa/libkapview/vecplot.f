@@ -173,14 +173,15 @@
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the vector map for axis 
 *        annotation. The widths should be given as fractions of the 
-*        corresponding dimension of the DATA picture. 
-*        The actual margins used may be increased to preserve the aspect 
-*        ratio of the DATA picture. Four values may be given, in the order;
-*        bottom, right, top, left. If fewer than four values are given, 
-*        extra values are used equal to the first supplied value. If these 
-*        margins are too narrow any axis annotation may be clipped. The
-*        dynamic default is 0.2 (for all edges) if annotated axes are being 
-*        produced, and zero otherwise. See also parameter KEYPOS. [current value]
+*        corresponding dimension of the current picture. The actual margins
+*        used may be increased to preserve the aspect ratio of the DATA 
+*        picture. Four values may be given, in the order; bottom, right, 
+*        top, left. If fewer than four values are given, extra values are 
+*        used equal to the first supplied value. If these margins are too 
+*        narrow any axis annotation may be clipped. If a null (!) value
+*        is supplied, the value used is 0.15 (for all edges) if annotated 
+*        axes are being produced, and zero otherwise. See also parameter 
+*        KEYPOS. [current value]
 *     NDF1 = NDF (Read)
 *        NDF structure containing the 2-dimensional image giving the
 *        vector magnitudes.
@@ -312,6 +313,9 @@
 *        system.
 *     4-OCT-1999 (DSB):
 *        Modified to use AST/PGPLOT.
+*     26-OCT-1999 (DSB):
+*        Made MARGIN a fraction of the current picture, not the DATA
+*        picture.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -342,6 +346,9 @@
 
       REAL  DTOR                 ! Degrees to radians conversion factor
       PARAMETER ( DTOR = 1.7453293E-2 )
+
+      REAL  KW                   ! Width of key as a fraction of the width
+      PARAMETER ( KW = 0.3 )     ! of the current picture
 
       INTEGER NDIM               ! Dimensionality of input array
       PARAMETER( NDIM = 2 )
@@ -536,7 +543,7 @@
 
 *  Set the dynamic default for MARGIN.
       IF( AXES ) THEN
-         MARGIN( 1 ) = 0.2
+         MARGIN( 1 ) = 0.15
       ELSE
          MARGIN( 1 ) = 0.0
       END IF
@@ -607,7 +614,7 @@
   
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'KAPPA_VECPLOT', 
-     :                   NDFNAM( : NC ), MARGIN, 1, 'KEY', 'R', 0.5, 
+     :                   NDFNAM( : NC ), MARGIN, 1, 'KEY', 'R', KW, 
      :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
      :                   IPLOT, NFRM, ALIGN, STATUS )
 

@@ -51,7 +51,9 @@
       INTEGER CI2                ! Highest available colour index
       INTEGER CI1                ! Lowest available colour index
       INTEGER FS                 ! Original fill style
-      REAL X1, X2, Y1, Y2        ! Bounds of PGPLOT viewport
+      REAL X1, X2, Y1, Y2        ! Bounds of original PGPLOT window
+      REAL NX1, NX2, NY1, NY2    ! Bounds of original PGPLOT viewport
+      REAL NX1E, NX2E, NY1E, NY2E! Bounds of extended PGPLOT viewport
 *.
 
 *  Check the inherited global status.
@@ -71,13 +73,36 @@
          CALL PGSFS( 1 )
          CALL PGSCI( 0 )
 
-*  Get the extent in world co-ordinates of the current viewport.
+*  We have to jump some hurdles because the GKS version of PGPLOT
+*  doesn't clear the edge pixels in the viewport. So we attempt to
+*  clear a viewport which is slightly larger than the current viewport.
+*  But to do this we need to make the viewport large because PGPLOT
+*  clips at the edge of the viewport (GKS PGPLOT does not support
+*  the disabling of clipping!!!).
+
+*  Get the extent in world co-ords and NDC of the current viewport.
          CALL PGQWIN( X1, X2, Y1, Y2 )
+         CALL PGQVP( 0, NX1, NX2, NY1, NY2 )
 
-*  Draw a filled rectangle covering the current viewport.
-         CALL PGRECT( X1, X2, Y1, Y2 )
+*  Set the viewport to the whole view surface. Set the window to the 
+*  same bounds.
+         CALL PGSVP( 0.0, 1.0, 0.0, 1.0 )
+         CALL PGSWIN( 0.0, 1.0, 0.0, 1.0 )
 
-*  Re-instate the original fill area attributes.
+*  Extend the original viewport slightly to account for rounding error.
+         NX1E = NX1 - 0.001
+         NX2E = NX2 + 0.001
+         NY1E = NY1 - 0.001
+         NY2E = NY2 + 0.001
+
+*  Draw a filled rectangle covering the extended viewport.
+         CALL PGRECT( NX1E, NX2E, NY1E, NY2E )
+
+*  Re-instate the original viewport and window.
+         CALL PGSWIN( X1, X2, Y1, Y2 )
+         CALL PGSVP( NX1, NX2, NY1, NY2 )
+
+*  Re-instate the original attributes.
          CALL PGSFS( FS )
          CALL PGSCI( CI )
 

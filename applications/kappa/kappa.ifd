@@ -2818,7 +2818,7 @@ package kappa {
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             helpkey *
-            default 0.15
+            default 0.05
           }
 
          parameter keystyle {
@@ -3691,7 +3691,7 @@ package kappa {
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             helpkey *
-            default 0.1
+            default 0.05
           }
 
          parameter keystyle {
@@ -5738,7 +5738,7 @@ package kappa {
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             helpkey *
-            default 0.15
+            default 0.05
           }
 
          parameter keystyle {
@@ -7358,7 +7358,7 @@ package kappa {
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             helpkey *
-            default 0.15
+            default 0.05
           }
 
          parameter keystyle {

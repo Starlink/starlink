@@ -107,6 +107,7 @@
       INTEGER PERM( 2 )          ! Axis permutation array
       INTEGER PMAP               ! Pointer to an AST PermMap
       INTEGER WMAP               ! Pointer to an AST WinMap
+      LOGICAL OK                 ! Could small Plot be made?
       LOGICAL UPDATA             ! Use vertical edges for data axis?
       REAL LBND( 2 )             ! Lower LUTKEY bounds
       REAL UBND( 2 )             ! Upper LUTKEY bounds 
@@ -236,7 +237,17 @@
 
 *  Replace the Plot with a new Plot covering a smaller area so that there
 *  is room for the annotation within the current viewport.
-      CALL KPG1_ASSHR( .FALSE., F, IPLOT, STATUS )
+      CALL KPG1_ASSHR( .FALSE., F, IPLOT, OK, STATUS )
+
+*  Report an error if there was insufficient room to create the shrunken
+*  Plot.
+      IF( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_LUTKY_ERR1', 'There is insufficient room'//
+     :                 ' for the colour table key.', 
+     :                 STATUS )
+         GO TO 999
+      END IF
 
 *  Re-establish the attributes of the new Plot so that it is like the old
 *  Plot.

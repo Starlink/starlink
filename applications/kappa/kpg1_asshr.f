@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASSHR( FIXAR, F, IPLOT, STATUS )
+      SUBROUTINE KPG1_ASSHR( FIXAR, F, IPLOT, OK, STATUS )
 *+
 *  Name:
 *     KPG1_PLOT
@@ -11,13 +11,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASSHR( FIXAR, F, IPLOT, STATUS )
+*     CALL KPG1_ASSHR( FIXAR, F, IPLOT, OK, STATUS )
 
 *  Description:
 *     This routine creates a new Plot covering the same window as the 
-*     supplied Plot, but shrunk in GRAPHICS co-ordinates so that all the
-*     annotation produced by AST_GRID falls within the PGPLOT viewport
-*     which is current on entry.
+*     current PGPLOT window, but thw window is shrunk in GRAPHICS space 
+*     so that all the annotation produced by AST_GRID falls within the PGPLOT 
+*     viewport which is current on entry. The sizes of annotations, gaps, 
+*     etc are shrunk if this is necessary in order to fit the annotations 
+*     within the current PGPLOT viewport. 
 
 *  Arguments:
 *     FIXAR = LOGICAL (Given)
@@ -35,6 +37,10 @@
 *        returned in its place. The new Plot contains all the Frames of
 *        the supplied Plot, but its Plot attributes are all cleared. It may
 *        be necessary for the caller to re-instate these attributes.
+*     OK = LOGICAL (Returned)
+*        Returned .FALSE. if there was insufficient room for the required
+*        Plot. No error is reported in this case, and IPLOT os returned 
+*        unchanged.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -66,6 +72,9 @@
 *  Arguments Given and Returned:
       INTEGER IPLOT
 
+*  Arguments Returned:
+      LOGICAL OK
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -76,6 +85,12 @@
 *  Local constants :
       REAL ARAT                  ! Nominal character aspect ratio
       PARAMETER ( ARAT = 1.5 )
+
+      REAL RED                   ! Reduction in annotation size per try
+      PARAMETER ( RED = 0.8 )
+
+      INTEGER MXTRY              ! Max. number of tries.
+      PARAMETER ( MXTRY = 6 )
 
 *  Local Variables:
       CHARACTER EDGE1*6          ! The edge to receive axis 1 labels
@@ -89,7 +104,9 @@
       INTEGER NC2                ! No. of characters in an axis 2 value
       INTEGER NCURR              ! Current Frame index in new Plot
       INTEGER NPLOT              ! New Plot
+      INTEGER NTRY               ! No of tries to fit it in with smaller text
       LOGICAL EXTLAB             ! Are numerical labels drawn around edge?
+      LOGICAL MORE               ! Find another graphics box?
       LOGICAL NUMLB1             ! Are numerical labels drawn for axis 1
       LOGICAL NUMLB2             ! Are numerical labels drawn for axis 2
       LOGICAL TKALL              ! Draw tick marks on all edges?
@@ -98,29 +115,39 @@
       REAL AR                    ! Original window aspect ratio
       REAL CEN                   ! Position of window centre
       REAL GBOX( 4 )             ! Bounds of new window
-      REAL OBOX( 4 )             ! Bounds of old window
       REAL HGT                   ! Height of window 
       REAL HTHGT                 ! Height of text with horizontal baseline
       REAL HTWID                 ! Char. width of text with horizontal baseline
       REAL MAXEXT                ! Maximum allowed margin extension
       REAL MBOT                  ! Width of margin at bottom for annotation
       REAL MINDIM                ! Length of minimum viewport dimension
+      REAL MJTKL1                ! Value of MajTickLen(1)
+      REAL MJTKL2                ! Value of MajTickLen(2)
       REAL MLEFT                 ! Width of margin at left for annotation
+      REAL MNTKL1                ! Value of MinTickLen(1) 
+      REAL MNTKL2                ! Value of MinTickLen(2) 
       REAL MRIGHT                ! Width of margin at right for annotation
       REAL MTOP                  ! Width of margin at top for annotation
       REAL NLGAP1                ! Gap between axis 1 and numerical labels
       REAL NLGAP2                ! Gap between axis 2 and numerical labels
       REAL NLSIZE                ! Character size for numerical labels
+      REAL OBOX( 4 )             ! Bounds of old window
       REAL TKLEN                 ! Max (-ve) length of tick marks
+      REAL TKLEN1                ! Longest exterior tick length for axis 1
+      REAL TKLEN2                ! Longest exterior tick length for axis 2
       REAL TLGAP1                ! Gap between axis 1 and textual labels 
       REAL TLGAP2                ! Gap between axis 2 and textual labels 
       REAL TLSIZE                ! Character size for textual labels
+      REAL TTGAP                 ! Value of TitleGap
+      REAL TTSIZE                ! Value of Size(Title)
       REAL VTHGT                 ! Height of text with vertical baseline
       REAL VTWID                 ! Char. width of text with vertical baseline
       REAL WID                   ! Width of window 
       REAL X1, X2, Y1, Y2    	 ! GRAPHICS bounds of PGPLOT viewport
-      LOGICAL MORE               ! Find another graphics box?
 *.
+
+*  Initialise.
+      OK = .FALSE.
 
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -130,56 +157,81 @@
 
 *  Get the bounds of the current PGPLOT window, in the GRAPHICS Frame 
 *  (millimetres from the bottom left corner of the view surface).
+*  The supplied Plot is assumed to cover this area (i.e. the annotation
+*  produced by AST_GRID would fall outside this area).
       CALL PGQWIN( X1, X2, Y1, Y2 )
 
-*  If required, store the original aspect ratio.
+*  If required, store the original aspect ratio of the plotting area.
       IF( FIXAR ) AR = ABS( Y1 - Y2 )/ABS( X1 - X2 )
 
 *  Get the nominal text height and width in PGPLOT world co-ordinates.
-*  Could be different for vertical and horizontal text.
+*  This could be different for vertical and horizontal text. Assume a
+*  nominal aspect ratio of ARAT for each character.
       CALL PGQCS( 4, VTHGT, HTHGT )
       HTWID = HTHGT/ARAT
       VTWID = VTHGT/ARAT
 
-*  Get various required Plot attributes.
-      EXTLAB = CHR_SIMLR( AST_GETC( IPLOT, 'LABELLING', STATUS ),
-     :                    'EXTERIOR' )
-      NUMLB1 = AST_GETL( IPLOT, 'NUMLAB(1)', STATUS )
-      NUMLB2 = AST_GETL( IPLOT, 'NUMLAB(2)', STATUS )
-      TXTLB1 = AST_GETL( IPLOT, 'TEXTLAB(1)', STATUS )
-      TXTLB2 = AST_GETL( IPLOT, 'TEXTLAB(2)', STATUS )
-      EDGE1 = AST_GETC( IPLOT, 'EDGE(1)', STATUS )
-      EDGE2 = AST_GETC( IPLOT, 'EDGE(2)', STATUS )
-      TKLEN = MIN( AST_GETR( IPLOT, 'MAJTICKLEN', STATUS ),
-     :             AST_GETR( IPLOT, 'MINTICKLEN', STATUS ) )
-      TKALL = AST_GETL( IPLOT, 'TICKALL', STATUS )
-      NLGAP1 = AST_GETR( IPLOT, 'NUMLABGAP(1)', STATUS )
-      NLGAP2 = AST_GETR( IPLOT, 'NUMLABGAP(2)', STATUS )
-      TLGAP1 = AST_GETR( IPLOT, 'TEXTLABGAP(1)', STATUS )
-      TLGAP2 = AST_GETR( IPLOT, 'TEXTLABGAP(2)', STATUS )
-      NLSIZE = AST_GETR( IPLOT, 'SIZE(NUMLAB)', STATUS )
-      TLSIZE = AST_GETR( IPLOT, 'SIZE(TEXTLAB)', STATUS )
+*  If required, attributes controlling the size of annotations will be 
+*  reduced in value in an attempt to fit the annotation and plotting area 
+*  inside the current PGPLOT viewport. On each attempt, such attributes 
+*  are reduced by a factor RED. NTRY records the number of such attempts. 
+*  Initialise it to zero.
+      NTRY = 0
 
-*  Transform the centre position into the current Frame.
+*  Jump here when making a new attempt with smaller annotation.
+ 10   CONTINUE
+
+*  Get the required Plot attributes.
+      EXTLAB = CHR_SIMLR( AST_GETC( IPLOT, 'Labelling', STATUS ),
+     :                    'EXTERIOR' )
+      NUMLB1 = AST_GETL( IPLOT, 'NumLab(1)', STATUS )
+      NUMLB2 = AST_GETL( IPLOT, 'NumLab(2)', STATUS )
+      TXTLB1 = AST_GETL( IPLOT, 'TextLab(1)', STATUS )
+      TXTLB2 = AST_GETL( IPLOT, 'TextLab(2)', STATUS )
+      EDGE1 = AST_GETC( IPLOT, 'Edge(1)', STATUS )
+      EDGE2 = AST_GETC( IPLOT, 'Edge(2)', STATUS )
+      MJTKL1 = AST_GETR( IPLOT, 'MajTickLen(1)', STATUS )
+      MJTKL2 = AST_GETR( IPLOT, 'MajTickLen(2)', STATUS )
+      MNTKL1 = AST_GETR( IPLOT, 'MinTickLen(1)', STATUS )
+      MNTKL2 = AST_GETR( IPLOT, 'MinTickLen(2)', STATUS )
+      TKLEN1 = MIN( MJTKL1, MNTKL1 )
+      TKLEN2 = MIN( MJTKL2, MNTKL2 )
+      TKALL = AST_GETL( IPLOT, 'TickAll', STATUS )
+      NLGAP1 = AST_GETR( IPLOT, 'NumLabGap(1)', STATUS )
+      NLGAP2 = AST_GETR( IPLOT, 'NumLabGap(2)', STATUS )
+      TTGAP = AST_GETR( IPLOT, 'TitleGap', STATUS )
+      TLGAP1 = AST_GETR( IPLOT, 'TextLabGap(1)', STATUS )
+      TLGAP2 = AST_GETR( IPLOT, 'TextLabGap(2)', STATUS )
+      NLSIZE = AST_GETR( IPLOT, 'Size(NumLab)', STATUS )
+      TLSIZE = AST_GETR( IPLOT, 'Size(TextLab)', STATUS )
+      TTSIZE = AST_GETR( IPLOT, 'Size(Title)', STATUS )
+
+*  Transform the centre position of the current PGPLOT viewport (in
+*  GRAPHICS co-ordinates)  into the current Frame.
       CALL AST_TRAN2( IPLOT, 1, 0.5*DBLE( X1 + X2 ), 
      :                0.5*DBLE( Y1 + Y2 ), .TRUE., XC, YC, STATUS ) 
 
-*  Find the number of characters in a formatted axis 1 value.
+*  Find the number of characters in a formatted axis 1 value. This will
+*  not necessarily be the same as the number of digits which actually appear
+*  in the grid annotations, because the Plot Class removes any un-necessary
+*  trailing zeros, for instance. But it will be a conservative estimate
+*  anyway.
       NC1 = CHR_LEN( AST_FORMAT( IPLOT, 1, XC, STATUS ) )
 
 *  Find the number of characters in a formatted axis 2 value.
       NC2 = CHR_LEN( AST_FORMAT( IPLOT, 2, YC, STATUS ) )
 
 *  Assume for the moment that the graphics box will be the entire 
-*  current viewport.       
+*  current viewport. This will mean that the annotation goes outside the 
+*  current viewport. This is not what we want, but it is a starting point.
       GBOX( 1 ) = X1
       GBOX( 3 ) = X2
       GBOX( 2 ) = Y1
       GBOX( 4 ) = Y2
 
-*  Loop round modifying the graphics box on each iteration to a size
-*  which excludes the annotation required for the current size of
-*  graphics box.
+*  Loop round reducing the size of the plotting area until all the
+*  annotation falls within the current PGPLOT viewport. This loop only
+*  changes the size of the plotting area, NOT the size of the annotation.
       MORE = .TRUE.
       DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
@@ -188,27 +240,46 @@
      :                 ABS( GBOX( 2 ) - GBOX( 4 ) ) )
 
 *  Find the margin required for annotation at the bottom of the plot.
+*  Tick marks and numerical labels are only drawn on the bottom edge
+*  if labelling is "Exterior".
+         IF( EXTLAB ) THEN
+
 *  First, find the space needed for any tick marks on the bottom edge.
-         MBOT = 0.0
-         IF( TKALL .OR. CHR_SIMLR( EDGE1, 'BOTTOM' ) .OR. 
-     :                  CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
+            IF( CHR_SIMLR( EDGE1, 'BOTTOM' ) .OR. (
+     :          CHR_SIMLR( EDGE1, 'TOP' ) .AND. TKALL ) ) THEN
+               TKLEN = TKLEN1
+
+            ELSE IF( CHR_SIMLR( EDGE2, 'BOTTOM' ) .OR. (
+     :               CHR_SIMLR( EDGE2, 'TOP' ) .AND. TKALL ) ) THEN
+               TKLEN = TKLEN2
+
+            ELSE
+               TKLEN = 0.0
+            END IF
+
+*  Only tick marks with negative lengths need to be taken into account
+*  because positive lengths extend inwards, into the plotting area and so do
+*  not contibute to the margin.
             IF( TKLEN .LT. 0.0 ) THEN
                MBOT = -MINDIM*TKLEN
+            ELSE
+               MBOT = 0.0
             END IF
-         END IF
 
 *  If numerical labels are being drawn on the bottom edge, see how far
-*  they extend from the edge of the data area.
-         IF( EXTLAB ) THEN
+*  they extend from the edge of the data area. 
             IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'BOTTOM' ) ) THEN
                MBOT = MAX( MBOT, NLGAP1*MINDIM + NLSIZE*HTHGT )
+
             ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
                MBOT = MAX( MBOT, NLGAP2*MINDIM + NLSIZE*HTHGT )
             END IF
+
          END IF
 
 *  If text labels are being drawn on the bottom edge, see how far
-*  they extend.
+*  they extend. These do not depend on the nature of the labellign
+*  (Exterior or Interior).
          IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'BOTTOM' ) ) THEN
             MBOT = MBOT + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*HTHGT )
          ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
@@ -216,24 +287,37 @@
          END IF
 
 *  Now do the same for the top margin.
-         MTOP = 0.0
-         IF( TKALL .OR. CHR_SIMLR( EDGE1, 'TOP' ) .OR. 
-     :                  CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
-            IF( TKLEN .LT. 0.0 ) THEN
-               MTOP = -MINDIM*TKLEN 
-            END IF
-         END IF
-
          IF( EXTLAB ) THEN
+
+            IF( CHR_SIMLR( EDGE1, 'TOP' ) .OR. (
+     :          CHR_SIMLR( EDGE1, 'BOTTOM' ) .AND. TKALL ) ) THEN
+               TKLEN = TKLEN1
+
+            ELSE IF( CHR_SIMLR( EDGE2, 'TOP' ) .OR. (
+     :               CHR_SIMLR( EDGE2, 'BOTTOM' ) .AND. TKALL ) ) THEN
+               TKLEN = TKLEN2
+
+            ELSE
+               TKLEN = 0.0
+            END IF
+   
+            IF( TKLEN .LT. 0.0 ) THEN
+               MTOP = -MINDIM*TKLEN
+            ELSE
+               MTOP = 0.0
+            END IF
+
             IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'TOP' ) ) THEN
                MTOP = MAX( MTOP, NLGAP1*MINDIM + NLSIZE*HTHGT )
             ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
                MTOP = MAX( MTOP, NLGAP2*MINDIM + NLSIZE*HTHGT )
             END IF
+
          END IF
    
          IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'TOP' ) ) THEN
             MTOP = MTOP + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*HTHGT )
+
          ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
             MTOP = MTOP + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*HTHGT )
          END IF
@@ -241,28 +325,39 @@
 *  Add on space to the top margin for the title if required.
          IF( AST_GETC( IPLOT, 'TITLE', STATUS ) .NE. ' ' .AND.
      :       AST_GETL( IPLOT, 'DRAWTITLE', STATUS ) ) THEN
-            MTOP = MTOP + MAX( 0.0, 
-     :                 MINDIM*AST_GETR( IPLOT, 'TITLEGAP', STATUS ) + 
-     :                 HTHGT*AST_GETR( IPLOT, 'SIZE(TITLE)', STATUS ) )
+            MTOP = MTOP + MAX( 0.0, MINDIM*TTGAP + HTHGT*TTSIZE) 
          END IF
 
 *  Now do the same for the left margin, but taking account of the fact
 *  that numerical labels on the left and right are horizontal and so extend
 *  the margin by their length rather than their height.
-         MLEFT = 0.0
-         IF( TKALL .OR. CHR_SIMLR( EDGE1, 'LEFT' ) .OR. 
-     :                  CHR_SIMLR( EDGE2, 'LEFT' ) ) THEN
-            IF( TKLEN .LT. 0.0 ) THEN
-               MLEFT = -MINDIM*TKLEN 
-            END IF
-         END IF
-   
          IF( EXTLAB ) THEN
+
+            IF( CHR_SIMLR( EDGE1, 'LEFT' ) .OR. (
+     :          CHR_SIMLR( EDGE1, 'RIGHT' ) .AND. TKALL ) ) THEN
+               TKLEN = TKLEN1
+
+            ELSE IF( CHR_SIMLR( EDGE2, 'LEFT' ) .OR. (
+     :               CHR_SIMLR( EDGE2, 'RIGHT' ) .AND. TKALL ) ) THEN
+               TKLEN = TKLEN2
+
+            ELSE
+               TKLEN = 0.0
+            END IF
+   
+            IF( TKLEN .LT. 0.0 ) THEN
+               MLEFT = -MINDIM*TKLEN
+            ELSE
+               MLEFT = 0.0
+            END IF
+   
             IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'LEFT' ) ) THEN
                MLEFT = MAX( MLEFT, NLGAP1*MINDIM + NLSIZE*HTWID*NC1 )
+
             ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'LEFT' ) ) THEN
                MLEFT = MAX( MLEFT, NLGAP2*MINDIM + NLSIZE*HTWID*NC2 )
             END IF
+
          END IF
    
          IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'LEFT' ) ) THEN
@@ -272,20 +367,33 @@
          END IF
 
 *  Now do the same for the right margin.
-         MRIGHT = 0.0
-         IF( TKALL .OR. CHR_SIMLR( EDGE1, 'RIGHT' ) .OR. 
-     :                  CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
-            IF( TKLEN .LT. 0.0 ) THEN
-               MRIGHT = -MINDIM*TKLEN 
-            END IF
-         END IF
-   
          IF( EXTLAB ) THEN
+
+            IF( CHR_SIMLR( EDGE1, 'RIGHT' ) .OR. (
+     :          CHR_SIMLR( EDGE1, 'LEFT' ) .AND. TKALL ) ) THEN
+               TKLEN = TKLEN1
+
+            ELSE IF( CHR_SIMLR( EDGE2, 'RIGHT' ) .OR. (
+     :               CHR_SIMLR( EDGE2, 'LEFT' ) .AND. TKALL ) ) THEN
+               TKLEN = TKLEN2
+
+            ELSE
+               TKLEN = 0.0
+            END IF
+   
+            IF( TKLEN .LT. 0.0 ) THEN
+               MRIGHT = -MINDIM*TKLEN
+            ELSE
+               MRIGHT = 0.0
+            END IF
+
             IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'RIGHT' ) ) THEN
                MRIGHT = MAX( MRIGHT, NLGAP1*MINDIM + NLSIZE*HTWID*NC1 )
+
             ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
                MRIGHT = MAX( MRIGHT, NLGAP2*MINDIM + NLSIZE*HTWID*NC2 )
             END IF
+
          END IF
    
          IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'RIGHT' ) ) THEN
@@ -294,16 +402,16 @@
             MRIGHT = MRIGHT + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*VTHGT )
          END IF
 
-*  Extend all margins by the specified fraction of the viewport size.
+*  Extend all margins by the specified fraction of the viewport size
+*  to give some spaces around the edges.
          MAXEXT = MAX( 0.0, 0.5*( 0.95*ABS( GBOX( 3 ) - GBOX( 1 ) ) - 
      :                            ( MLEFT + MRIGHT ) ) )
-
          MLEFT = MLEFT + MIN( F*ABS( GBOX( 3 ) - GBOX( 1 ) ), MAXEXT )
          MRIGHT = MRIGHT + MIN( F*ABS( GBOX( 3 ) - GBOX( 1 ) ), MAXEXT )
 
+
          MAXEXT = MAX( 0.0, 0.5*( 0.95*ABS( GBOX( 4 ) - GBOX( 2 ) ) - 
      :                            ( MTOP + MBOT ) ) )
-
          MBOT = MBOT + MIN( F*ABS( GBOX( 4 ) - GBOX( 2 ) ), MAXEXT )
          MTOP = MTOP + MIN( F*ABS( GBOX( 4 ) - GBOX( 2 ) ), MAXEXT )
 
@@ -313,7 +421,7 @@
          OBOX( 3 ) = GBOX( 3 )
          OBOX( 4 ) = GBOX( 4 )
 
-*  Find the bounds to use for the unclipped region. If no aspect ratio
+*  Find the bounds to use for the plotting area. If no aspect ratio
 *  has been specified, use the whole of the available space, excluding
 *  the margins found above.
          IF( .NOT. FIXAR ) THEN
@@ -358,6 +466,43 @@
 
       END DO
 
+*  Check that the plotting area found above has significant width and height 
+*  (more than 2mm). 
+      OK = ( GBOX( 3 ) - GBOX( 1 ) .GE. 2.0 ) .AND.
+     :     ( GBOX( 4 ) - GBOX( 2 ) .GE. 2.0 ) 
+
+*  If not, we need to reduce the size of the annotation and try again.
+*  Do this up to a maximum of MXTRY times. Reduce each attribute by a
+*  factor of RED. If the labelling is not "Exterior", do not change the 
+*  values of attributes which control numerical labels and tick marks 
+*  since these will not be drawn in the margins.
+      IF( .NOT. OK .AND. NTRY .LT. MXTRY ) THEN
+
+         IF( EXTLAB ) THEN
+            CALL AST_SETR( IPLOT, 'Size(NumLab)', NLSIZE*RED, STATUS ) 
+            CALL AST_SETR( IPLOT, 'NumLabGap(1)', NLGAP1*RED, STATUS ) 
+            CALL AST_SETR( IPLOT, 'NumLabGap(2)', NLGAP2*RED, STATUS ) 
+            CALL AST_SETR( IPLOT, 'MajTickLen(1)', MJTKL1*RED, STATUS )
+            CALL AST_SETR( IPLOT, 'MajTickLen(2)', MJTKL2*RED, STATUS )
+            CALL AST_SETR( IPLOT, 'MinTickLen(1)', MNTKL1*RED, STATUS )
+            CALL AST_SETR( IPLOT, 'MinTickLen(2)', MNTKL2*RED, STATUS )
+         END IF
+
+         CALL AST_SETR( IPLOT, 'Size(TextLab)', TLSIZE*RED, STATUS ) 
+         CALL AST_SETR( IPLOT, 'Size(Title)', TTSIZE*RED, STATUS ) 
+         CALL AST_SETR( IPLOT, 'TextLabGap(1)', TLGAP1*RED, STATUS ) 
+         CALL AST_SETR( IPLOT, 'TextLabGap(2)', TLGAP2*RED, STATUS ) 
+         CALL AST_SETR( IPLOT, 'TitleGap', TTGAP*RED, STATUS ) 
+
+*  Go back and try to find a usable plotting area using smaller annotation.
+         NTRY = NTRY + 1
+         GO TO 10
+
+      END IF
+
+*  If we have got a usable plotting area...
+      IF( OK ) THEN 
+
 *  The graphics area covered by a Plot cannot be changed after it has been
 *  created. Therefore, since we want a Plot covering a different area to
 *  the original Plot, we have to create a new Plot covering the required 
@@ -366,50 +511,52 @@
 *  Create the new Plot holding the Base (GRAPHICS) Frame from the supplied 
 *  Plot. The new Plot covers the screen area found above. This area is 
 *  mapped into the entire area covered by the old Plot.
-      BBOX( 1 ) = DBLE( X1 )
-      BBOX( 2 ) = DBLE( Y1 )
-      BBOX( 3 ) = DBLE( X2 )
-      BBOX( 4 ) = DBLE( Y2 )
-      NPLOT = AST_PLOT( AST_GETFRAME( IPLOT, AST__BASE, STATUS ), GBOX,
-     :                  BBOX, ' ', STATUS ) 
+         BBOX( 1 ) = DBLE( X1 )
+         BBOX( 2 ) = DBLE( Y1 )
+         BBOX( 3 ) = DBLE( X2 )
+         BBOX( 4 ) = DBLE( Y2 )
+         NPLOT = AST_PLOT( AST_GETFRAME( IPLOT, AST__BASE, STATUS ), 
+     :                     GBOX, BBOX, ' ', STATUS ) 
 
 *  We are now in the slightly odd situation of having two Frames with
 *  Domain GRAPHICS in the Plot. Note the index of the one inherited from
 *  the original Plot (i.e. the Current Frame). We will remove this Frame
 *  later.
-      NCURR = AST_GETI( NPLOT, 'CURRENT', STATUS )
+         NCURR = AST_GETI( NPLOT, 'CURRENT', STATUS )
 
 *  Add the FrameSet representing the original Plot into this new Plot,
 *  using a UnitMap to connect the two corresponding GRAPHICS Frames.
 *  Note, the index of the Current Frame first so that it can be
 *  reinstated later.
-      ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
-      CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE', 
-     :                                           STATUS ), STATUS )
-      CALL AST_ADDFRAME( NPLOT, AST__CURRENT, AST_UNITMAP( 2, ' ', 
-     :                                                     STATUS ),
-     :                   IPLOT, STATUS ) 
+         ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+         CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE', 
+     :                                              STATUS ), STATUS )
+         CALL AST_ADDFRAME( NPLOT, AST__CURRENT, AST_UNITMAP( 2, ' ', 
+     :                                                        STATUS ),
+     :                      IPLOT, STATUS ) 
 
 *  We now have three GRAPHICS Frames in the Plot! Clear the Domain of the 
 *  current Frame to avoid confusion.
-      CALL AST_CLEAR( IPLOT, 'DOMAIN', STATUS )
+         CALL AST_CLEAR( IPLOT, 'DOMAIN', STATUS )
 
 *  There are now two copies of the original GRAPHICS Frame in the Plot
 *  (i.e. the two Frames connected by the UnitMap). We can get rid of one.
 *  Get rid of the one which was originally in the new Plot.
-      CALL AST_REMOVEFRAME( NPLOT, NCURR, STATUS )
+         CALL AST_REMOVEFRAME( NPLOT, NCURR, STATUS )
 
 *  Re-instate the original Current Frame, allowing for the one extra Frame
 *  introduced within the new Plot (there were two extra Frames but we've
 *  just removed one of them).
-      CALL AST_SETI( NPLOT, 'CURRENT', ICURR + 1, STATUS )
+         CALL AST_SETI( NPLOT, 'CURRENT', ICURR + 1, STATUS )
 
 *  Annul the supplied Plot.
-      CALL AST_ANNUL( IPLOT, STATUS )      
+         CALL AST_ANNUL( IPLOT, STATUS )      
 
 *  Export the returned Plot.
-      IPLOT = AST_CLONE( NPLOT, STATUS )
-      CALL AST_EXPORT( IPLOT, STATUS )
+         IPLOT = AST_CLONE( NPLOT, STATUS )
+         CALL AST_EXPORT( IPLOT, STATUS )
+
+      END IF
 
 *  End the AST context.
       CALL AST_END( STATUS )

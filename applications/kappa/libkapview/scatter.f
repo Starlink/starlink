@@ -82,12 +82,12 @@
 *        The NDF to be displayed on the vertical axis.
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
-*        as fractions of the corresponding dimension of the DATA picture. 
+*        as fractions of the corresponding dimension of the current picture. 
 *        Four values may be given, in the order - bottom, right, top, left. 
 *        If less than four values are given, extra values are used equal to 
 *        the first supplied value. If these margins are too narrow any axis 
 *        annotation may be clipped. If a null (!) value is supplied, the
-*        used value is 0.18 (for all edges) if annotated axes are produced, 
+*        used value is 0.15 (for all edges) if annotated axes are produced, 
 *        and zero otherwise. [current value]
 *     MARKER = _INTEGER (Read)
 *        Specifies the symbol with which each position should be marked in
@@ -196,6 +196,9 @@
 *  History:
 *     17-JUN-1999 (DSB):
 *        Original version.
+*     26-OCT-1999 (DSB):
+*        Made MARGIN a fraction of the current picture, not the DATA
+*        picture.
 *     {enter_further_changes_here}
 
 *  Bugs:

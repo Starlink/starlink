@@ -3,14 +3,17 @@
 #     kappa_lutview_style.def
 
 #  Purpose:
-#     Default style for KAPPA application LUTVIEW.
+#     Defines the default style produced by the lutview application.
 
 #  Description:
-#     This file specifies the plotting attributes to be used if the user
-#     does not give alternative values using the STYLE Parameter of 
-#     application LUTVIEW. Axis 1 corresponds to the data value or colour 
-#     index. Axis 2 is the other axis which has no physical significance. 
-#     See $KAPPA_DIR/kappa_style.def for more information on KAPPA style
+#     This file contains default settings for plotting style attributes
+#     to be used by lutview. These defaults can be over-ridden by the user 
+#     by supplying a value for the STYLE parameter when running lutview. 
+#     The defaults in this file over-ride the defaults in kappa_style.def.
+#
+#     Axis 1 corresponds to the data value or colour index. Axis 2 is the 
+#     other axis which has no physical significance. See 
+#     $KAPPA_DIR/kappa_style.def for more information on KAPPA style
 #     files.
 
 #  Notes:
@@ -33,9 +36,6 @@
 #  Do not display the title by default.
       drawtitle=0
 
-#  Only put tick marks on the labelled edge.
-      tickall=0
-
 #  Include a textual label only on axis 1.
       textlab(1)=1
       textlab(2)=0
@@ -56,21 +56,20 @@
       size(numlab)=0.8
       size(textlab)=0.9
 
-#  Set the gap between the first axis and the associated textual label. The 
-#  default is 0.01.
-      textlabgap(1)=0.04
+#  Increase the gap between the first axis and the associated textual label. 
+      textlabgap(1)=0.1
 
-#  Make the major ticks marks on axis 1 longer, and make them stick out
-#  rather than in.
-      majticklen(1)=-0.08
+#  Increase the gap between the first axis and the associated numerical label. 
+      numlabgap(1)=0.1
 
-#  Make the gap between axis and numerical values on axis 1 larger to
-#  avoid clashing with the major tick marks.
-      numlabgap(1)=0.15
-
-#  Suppress minor ticks marks on axis 1.
-      minticklen(1)=0
+#  Make the ticks marks on axis 1 (both major and minor) longer.
+      majticklen(1)=0.1
+      minticklen(1)=0.05
 
 #  Suppress tick marks on axis 2.
       majticklen(2)=0
       minticklen(2)=0
+
+#  Only put tick marks on the labelled edge.
+      tickall=0
+
