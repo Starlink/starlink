@@ -55,7 +55,7 @@ public:
     WorldCoords(const char* ra, const char* dec, double equinox = 2000.0, int hflag = 0);
 
     // return true if the coords are null
-    isNull() const {return ra_.isNull() ||  dec_.isNull();}
+    int isNull() const {return ra_.isNull() ||  dec_.isNull();}
 
     // set to the null value
     void setNull() {ra_.setNull(); dec_.setNull();}
