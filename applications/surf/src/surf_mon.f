@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.28  1998/05/13 21:49:00  timj
+*     Add CALCSKY
+*
 *     Revision 1.27  1998/04/23 01:34:03  timj
 *     Add bad status message to start and end.
 *
@@ -147,6 +150,10 @@ c
       IF (NAME .EQ. 'BOLREBIN') THEN
 
          CALL SURF_REBIN (NAME, STATUS)
+
+      ELSE IF (NAME .EQ. 'CALCSKY') THEN
+         
+         CALL SURF_REBIN(NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'CHANGE_DATA') THEN
 
