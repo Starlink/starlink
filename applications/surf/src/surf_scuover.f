@@ -67,10 +67,10 @@
 *  Examples:
 *     scuover
 *        The bolometer names will be overlaid using the default colour.
-*     scuover col=red name=false
+*     scuover col=red noname
 *        This command will overlay bolometer numbers over the image in red.
 *     scuover integration=2
-*        Overlay the bolometer integrations at the start of the second
+*        Overlay the bolometer positions at the start of the second
 *        integration.
 
 *  Notes: 
