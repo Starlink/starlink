@@ -97,7 +97,7 @@ Options:
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
- -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"    
+ -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"
  -port <port>             - Listen for remote cmds on port (default: 0 = choose port).
  -remote <bool>           - Use existing skycat process, if available, with Tk send.
  -scrollbars <bool>       - Display scrollbars (not displayed by default).
@@ -167,7 +167,7 @@ itcl::class gaia::Gaia {
       #  Override top-level names.
       wm title $w_ "GAIA/SkyCat ($clone_)"
       wm iconname $w_ "GAIA/SkyCat ($clone_)"
-      
+
       #  Intercept window manager delete and close down correctly
       #  (as in the Exit option).
       wm protocol $w_ WM_DELETE_WINDOW [code $this remove 0]
@@ -175,12 +175,8 @@ itcl::class gaia::Gaia {
       #  Get the clone number for this window.
       set clone_ $itk_option(-number)
 
-      #  Set/get X defaults - can be overridden in subclass and/or
-      #  in user's .Xdefaults file.
+      #  Set the application name.
       tk appname GAIA
-      util::setXdefaults
-      Rtd::setXdefaults
-      gaia::setXdefaults
 
       #  On openwindows iconwindows are displayed but do not
       #  redirect events, so add a fake deiconify binding.
@@ -208,7 +204,18 @@ itcl::class gaia::Gaia {
       make_menu_changes
    }
 
-   #  Display a window while the application is starting up, overriden 
+   #  Set/get X defaults - can be overridden in subclass and/or
+   #  in user's .Xdefaults file.
+   protected method setXdefaults {} {
+      util::setXdefaults
+      rtd::setXdefaults
+      cat::setXdefaults
+      skycat::setXdefaults
+      gaia::setXdefaults
+   }
+
+
+   #  Display a window while the application is starting up, overriden
    #  to remove skycat logo. Put back for plugin?
    protected method make_init_window {} {
       global ::about_skycat ::skycat_library
@@ -237,15 +244,15 @@ itcl::class gaia::Gaia {
       add_menuitem $m command "About GAIA/SkyCat..." \
          {Display a window with information about this GAIA/SkyCat version} \
          -command [code $itk_component(image) about]
-      
+
       add_menuitem $m command "SkyCat..." \
          {Display information about SkyCat in netscape (if netscape is available)} \
          -command [code $itk_component(image) send_to_netscape $itk_option(-help_url)]
-      
+
       add_short_help $itk_component(menubar).help \
          {Help menu: display information about this application}
    }
-   
+
    #  Create the rtd image widget with the extended RTD functionality
    #  needed by GAIA.
    public method make_rtdimage {} {
@@ -304,10 +311,10 @@ itcl::class gaia::Gaia {
    #  Make changes to Skycat menus that we require.
    public method make_menu_changes {} {
 
-      #  Note bindings are not really needed, unless working with 
+      #  Note bindings are not really needed, unless working with
       #  plugin (GAIA version of TopLevelWidget is fixed).
-      
-      #  File menu. This needs the bindings changing to work with the 
+
+      #  File menu. This needs the bindings changing to work with the
       #  keyboard shortcuts and the "save region" removing.
       set m [get_menu File]
       bind $w_  <Control-o> [code $image_ open]
@@ -329,8 +336,8 @@ itcl::class gaia::Gaia {
       bind $w_  <Control-i> [code $image_ pick_dialog]
       bind $w_  <Control-f> [code $image_ view_fits_header]
 
-      set index [$m index "Hide Control Panel"]
-      incr index -1
+      set index [$m index "Magnification"]
+      incr index
       insert_menuitem $m $index cascade "Blank pixel color" \
          {Change the colour of blank pixels} \
          -menu [menu $m.blank]
@@ -474,7 +481,7 @@ itcl::class gaia::Gaia {
          }
       }
    }
-   
+
    #  Make a magnitude photometry toolbox.
    public method make_magphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
@@ -705,7 +712,7 @@ itcl::class gaia::Gaia {
 
    #  Make a new main window, named either the next in sequence
    #  or using a given name.
-   public method clone {{clone ""} {file ""} args} {
+   public method gaia_clone {{clone ""} {file ""} args} {
 
       #  If given the file replaces the one in the command-line args or
       #  is added to the list.
@@ -754,6 +761,18 @@ itcl::class gaia::Gaia {
       return .rtd$clone
    }
 
+   #  "Usual" clone method.
+   #  Make a new main window, named either the next in sequence or
+   #  using a given name.
+   method clone {args} {
+      global ::argv ::argc
+      set argv $args
+      set argc [llength $argv]
+      # use the -noop option to avoid reloading the main image (part of $argv list)
+      after 0 [code util::TopLevelWidget::start Gaia "-file"]
+      return $prefix_[expr $clone_+1]
+   }
+
    #  Image has been cleared so reset any toolboxes that require it
    #  (note most just have canvas objects which are deleted when
    #  a new image is drawn and do not require any other information).
@@ -798,6 +817,144 @@ itcl::class gaia::Gaia {
       set after_id_ [after 10000 [code $this loaded_eso_config_ 1 "timed out"]]
    }
 
+   #  Start the application with the above class as the main window.
+   #  This proc is called from tkAppInit.c when we are running the single
+   #  binary version.
+   #
+   #  Note that the binary version doesn't need to set auto_path or look for
+   #  Tcl sources or colormaps at run-time, since they are already loaded in
+   #  the binary.
+   public proc startGaia {} {
+      global ::rtd_library ::skycat_library ::gaia_usage ::tk_strictMotif \
+         ::argv0 ::argv ::argc ::env
+      
+      if {! [info exists rtd_library]} {
+         set rtd_library .
+      }
+      
+      #  Where to look for catalog config file:
+      #  use ~/.skycat/skycat.cfg if it exists, since it may contain user's
+      #  preferences, otherwise use $SKYCAT_CONFIG if set, or $CATLIB_CONFIG.
+      set config_file $env(HOME)/.skycat/skycat.cfg
+      if {[file exists $config_file]} {
+         set env(CATLIB_CONFIG) "file:$config_file"
+      } elseif {[info exists env(SKYCAT_CONFIG)]} {
+         set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
+      }
+
+      #  Check for a plugin or binary installation, third option is
+      #  GAIA running in a proper Starlink distribution. Need to 
+      #  detect this and act appropriately (environment is established 
+      #  by script that creates this application).
+      if { ! [ info exists env(NATIVE_GAIA)] } {
+         setup_starlink_env [file dirname [info nameofexecutable]]
+      }
+
+      # set some application options
+      tk appname Gaia
+      set tk_strictMotif 0
+      tk_focusFollowsMouse
+      
+      # insert some default options
+      set argv [linsert $argv 0 -disp_image_icon 1]
+      set argc [llength $argv]
+      
+      # start the application
+      util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"
+   }
+   
+   #  Set up the STARLINK environment based on the given
+   #  directory. PLUGIN SPECIFIC.
+   public proc setup_starlink_env {dir} {
+      global ::tcl_version ::env ::argv ::argc ::gaia_library
+
+      # we need this for the local atclsh binary for running external tcl commands
+      if {[file isdirectory $dir/tcl$tcl_version]} {
+         set env(TCL_LIBRARY) $dir/tcl$tcl_version
+      }
+
+      if {! [file isdirectory $gaia_library]} {
+         set $gaia_library $dir
+      }
+
+      # Check if using local Starlink binaries
+      if {[file exists $dir/autophotom]} {
+         set env(PHOTOM_DIR) $dir
+      }
+
+      if {[file exists $dir/ardmask]} {
+         set env(KAPPA_DIR) $dir
+      }
+
+      # use given dir for STARLINK, unless another value is defined
+      if {! [info exists env(STARLINK)]} {
+         set env(STARLINK) $dir
+      } else {
+         set dir $env(STARLINK)
+      }
+
+      if {![info exists env(PHOTOM_DIR)] && [file exists $dir/bin/photom/autophotom]} {
+         set env(PHOTOM_DIR) $dir/bin/photom
+      }
+      if {![info exists env(KAPPA_DIR)] && [file exists $dir/bin/kappa/ardmask]} {
+         set env(KAPPA_DIR) $dir/bin/kappa
+      }
+      # alternate dirs
+      if {[file exists $dir/bin/gaiapack/ardmask]} {
+         set env(KAPPA_DIR) $dir/bin/gaiapack
+      }
+      if {[file exists $dir/bin/gaiapack/autophotom]} {
+         set env(PHOTOM_DIR) $dir/bin/gaiapack
+      }
+      if {![info exists env(CONVERT_DIR)] && [file exists $dir/bin/convert/ndf2fits]} {
+         set env(CONVERT_DIR) $dir/bin/convert
+         set env(CONVERT_HELP) $dir/bin/convert
+      }
+
+      # add the plugin bin dir to the path
+      set env(PATH) "${dir}/bin:$env(PATH)"
+
+      # See if the user already sourced convert.csh
+      if {! [info exists env(NDF_FORMATS_IN)] && [info exists env(CONVERT_DIR)]} {
+         # Define environment variables (normally done in convert.csh)
+         setup_convert
+      }
+      # Set up CONVERT to work for .fits file as well as .fit.
+      if {[info exists env(NDF_FORMATS_IN)]} {
+         append env(NDF_FORMATS_IN) ",FITS(.fits),FITS(.fit)"
+         append env(NDF_FORMATS_OUT) ",FITS(.fits),FITS(.fit)"
+      }
+
+      #  Extract the known file types and set these up as defaults. These
+      #  are entered as if command-line arguments so that they propagate
+      #  to clone windows.
+      set file_types {{any *} {NDF(.sdf) *.sdf} {FIT(.fit) *.fit} {FITS(fits) *.fits}}
+      if { [info exists env(NDF_FORMATS_IN)] } {
+         set new_types [split $env(NDF_FORMATS_IN) ","]
+         foreach pair $new_types {
+            regexp {([^\(]*).([^\)]*)} $pair dummy name type
+            if { $name != "NDF" && $type != ".fits" && $type != ".fit" } {
+               lappend file_types [list $name\($type\) *${type}]
+            }
+         }
+      }
+      lappend argv "-file_types"
+      lappend argv $file_types
+      incr argc 2
+
+      # need this for library/StarApp.tcl  to find adamtask.tcl
+      if {! [info exists env(TCLADAM_DIR)]} {
+         set env(TCLADAM_DIR) $gaia_library/demos
+      }
+      # XXX should use ~/adam/gaia-[pid] here, but not sure about cleanup...
+      if {! [info exists env(ADAM_USER)]} {
+         set env(ADAM_USER) $env(HOME)/adam/gaia
+      }
+      if {[file isdirectory $env(ADAM_USER)]} {
+         exec rm -rf $env(ADAM_USER)
+      }
+   }
+
    #  Retrieve the ESO config file, returning its content as the result.
    protected method get_eso_config_ {} {
       return [[$image_ get_image] urlget $itk_option(-eso_config_file)]
@@ -836,10 +993,6 @@ itcl::class gaia::Gaia {
    }
 
    # -- public variables (also program options) --
-
-   #  Float the control panel (better real estate control on small
-   #  displays).
-   itk_option define -float_panel float_panel Float_panel 0
 
    #  Mark displayed image as temporary, these are deleted on exit
    #  (after a request to save it is made), try to disable options
@@ -915,4 +1068,7 @@ itcl::class gaia::Gaia {
 
    # maximum clone number so far
    common clone_max_ 0
+
+   # prefix to use to create new main windows (.gaia in the PLUGIN).
+   common prefix_ ".rtd"
 }

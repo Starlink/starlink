@@ -122,7 +122,12 @@ if {[file exists $config_file]} {
 } 
 
 #  Start up the main window.
-eval Gaia .rtd0 $argv
+#eval Gaia .rtd0 $argv
+
+#  This is a native GAIA installation when started by this route.
+set env(NATIVE_GAIA) 1
+
+gaia::Gaia::startGaia
 
 #----------------------------------------------
 #  Debugging code.
