@@ -259,6 +259,7 @@
       export RANLIB
       export TAR_IN
       export TAR_OUT
+      export ADDLIBS
 
 #  Check that the SYSTEM environment variable is defined.
       if test "$SYSTEM" = ""; then
@@ -323,10 +324,11 @@
 
 #  SUN Sparcstations running SunOS 5.x (Solaris).
 #  ---------------------------------------------
-            sun4_Solaris)
+            sun4_Solaris|sun4u_SunOS)
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
+	       ADDLIBS='-lnsl -lsocket'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -339,7 +341,7 @@
 #  ==========
 #  Intel PC running Linux.
 #  ----------------------
-            ix86_Linux)
+            ix86_Linux|i686_Linux)
                AR_IN='ar r'
                CC='gcc'
                CFLAGS='-I$(STAR_INC) -O'
