@@ -188,8 +188,8 @@
  <li> Conversion Commands
 
  <dl>
- <dt> ASTCONV           
- <dd> Converts between FITS and HDS (NDF) formats.
+ <dt> ASTCOPY
+ <dd> Copy dataset and optionally change format.
  <dt> AST2QDP           
  <dd> Convert a 1D dataset to QDP format
  <dt> ASTQDP            
@@ -4769,22 +4769,45 @@
  These applications are concerned with converting data from one
  dataset type to another.<p>
 
-2 ASTCONV
- Converts datasets between FITS and HDS formats..<p>
+2 ASTCOPY
+ Copies an Asterix-compatible dataset and optionally changes
+ format, eg between FITS and HDS.<p>
 
- The direction of conversion is decided according to the input
- dataset specified. The approprate file extension must be included
- to identify the format.<p>
+ Input can be an NDF dataset (HDS), either top level, or
+ embedded; a standard FITS file, which can have any extension
+ other than .sdf; a primitive HDS array; or an explicit set of numbers. <p>
+
+ Output is an NDF dataset or recognised, standard FITS file. When
+ writing to a FITS file the user may be required to specify the class
+ of file (eg. SPECTRUM, TIME-SERIES etc) if this can't be determined
+ from the input. <p>
+
+ Warning - it only copies components that it currently recognises. <p>
+
+ It currently doesn't handle FITS cubes or the conversion between
+ arf/rmf and Asterix instrument responses - this is being worked on. <p>
 
 
 3 Parameters
  Keyword   Posn  Type      Description
  -------   ----  ----      -----------
- INP         1   CHARACTER The input dataset to be converted
- OUT         2   CHARACTER Dataset to receive conversion
+ INP         1   CHARACTER The input dataset to be copied
+ OUT         2   CHARACTER Dataset to receive copy
+ CLASS       3   CHARACTER Class of output dataset
 
 3 Examples
-   > astconv img.fits img2.sdf    -  convert FITS image to HDS
+   > astcopy img.fits img2.sdf         -  convert FITS image to HDS
+
+   > astcopy "5.6 7.8 4.5..." file1    -  create NDF from set of
+                                          numbers
+
+   > astcopy "multi.ndf(5)" file2.fits -  copy 5th component of
+                                          multi-ndf dataset to
+                                          a FITS file
+
+   > astcopy file1.fits file2.fits     -  copy  FITS file,
+                                          filtering out
+                                          unknown components
 
 
 2 AST2QDP
