@@ -1,8 +1,8 @@
 1 SURF - SCUBA User Reduction Facility -update
                                                      Expires: ????.??.??
 
-  This is the sixth public release of SURF (v1.6-2). It will be 
-  distributed on the Autumn 2000 Starlink CD-ROM.
+  This is the release V1.6-7 of SURF. It will be 
+  distributed on the Autumn 2001 Starlink CD-ROM.
 
   The SCUBA User Reduction Facility (SURF) is a collection of applications
   for use in reducing mapping and photometry data from the Submillimetre
@@ -31,6 +31,16 @@
   The list is at scubadr@jach.hawaii.edu.
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
+
+2 New_in_version_1_6_7
+
+  - Bug fix release of v1.6
+
+  - Add support for Raster skydips
+
+  - Minor fixes to SCUBA2MEM with EKH scanning
+
+  - Don't calculate clock correction when using AZ
 
 2 New_in_version_1_6
 
