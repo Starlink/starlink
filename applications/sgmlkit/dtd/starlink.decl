@@ -7,8 +7,28 @@
 	to "ArcBase" (for HyTime), and allowing SUBDOCs and IMPLICIT
 	LINKs.  It might need review at some point, not least to sort
 	out the anomaly in the descset which maps the right hand part
-	of Latin1 to ordinary ASCII.  For some reason this causes (or
-	at least caused) sgmls to crash on Linux.
+	of Latin1 to ordinary ASCII.
+
+	Changes from HTML declaration:
+
+	LCNMCHAR/UCNMCHAR: added '_', so that old star2html
+		cross-references are allowable as IDs.
+	NAMECASE: GENERAL NO: no case-folding, again so that old
+		cross-references can be correctly distinguished.  This
+		is probably a good idea anyway, as it makes the DTD
+		and documents more nearly conformant with XML, which
+		has GENERAL NO in its (fixed) declaration.  It did
+		require quite a lot of DTD editing, though....
+	SHORTREF: four shortrefs added, three (*+, *-, *) so that
+		Fortran code prologues can be abbreviated, and a
+		further one (three hyphens) so that em-dashes can be
+		represented (that last one's sugar).
+	LINK IMPLICIT YES: I did at one time have this turned on
+		because I was experimenting with LPDs.  I don't think
+		we actually have a use for those, however, so I've
+		turned it back off (XML again).
+	SUBDOC YES: we use subdocuments (not conformant with XML).
+	APPINFO "ArcBase": we use HyTime, but not "SGML Document Access".
 --
 
 CHARSET
@@ -53,7 +73,7 @@ SYNTAX
                   UCNMSTRT ""
                   LCNMCHAR ".-_"
                   UCNMCHAR ".-_"
-                  NAMECASE GENERAL YES
+                  NAMECASE GENERAL NO
                            ENTITY  NO
          DELIM    GENERAL  SGMLREF
                   SHORTREF SGMLREF
@@ -81,7 +101,7 @@ FEATURES
     SHORTTAG YES
   LINK
     SIMPLE   NO
-    IMPLICIT YES
+    IMPLICIT NO
     EXPLICIT NO
   OTHER
     CONCUR   NO
