@@ -22,9 +22,9 @@ typedef enum { FALSE, TRUE } bool;
 typedef enum { Pin, Qin, Unknown } tInFlag;
 
 #define DIM     2               /* Dimension of points */
-typedef int     tPointi[DIM];   /* type integer point */
+typedef double  tPointi[DIM];   /* type integer point */
 typedef double  tPointd[DIM];   /* type double point */
-#define PMAX    1000            /* Max # of pts in polygon */
+#define PMAX    100             /* Max # of pts in polygon */
 
 typedef tPointi tPolygoni[PMAX];/* type integer polygon */
 
@@ -88,7 +88,6 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
    inflag = Unknown; FirstPoint = TRUE;
 
    do {
-      /*printf("%%Before Advances:a=%d, b=%d; aa=%d, ba=%d; inflag=%d\n", a, b, aa, ba, inflag);*/
       /* Computations of key variables. */
       a1 = (a + n - 1) % n;
       b1 = (b + m - 1) % m;
@@ -99,7 +98,6 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
       cross = AreaSign( Origin, A, B );
       aHB   = AreaSign( Q[b1], Q[b], P[a] );
       bHA   = AreaSign( P[a1], P[a], Q[b] );
-      printf("%%cross=%d, aHB=%d, bHA=%d\n", cross, aHB, bHA );
 
       /* If A & B intersect, update inflag. */
       code = SegSegInt( P[a1], P[a], Q[b1], Q[b], p, q );
@@ -111,15 +109,20 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
             p0[X] = p[X]; p0[Y] = p[Y];
             printf("%8.2lf %8.2lf moveto\n", p0[X], p0[Y] );
          }
+         printf("%8.2lf %8.2lf lineto\n", p[X], p[Y] );
          inflag = InOut( p, inflag, aHB, bHA );
-         printf("%%InOut sets inflag=%d\n", inflag);
       }
 
       /*-----Advance rules-----*/
 
       /* Special case: A & B overlap and oppositely oriented. */
-      if ( ( code == 'e' ) && (Dot( A, B ) < 0) )
-            PrintSharedSeg( p, q ), exit(EXIT_SUCCESS);
+      if ( ( code == 'e' ) && (Dot( A, B ) < 0) ) {
+         printf("%%A int B:\n");
+         printf("%8.2lf %8.2lf moveto\n", p[X], p[Y] );
+         printf("%8.2lf %8.2lf lineto\n", q[X], q[Y] );
+         ClosePostscript();
+         exit(EXIT_SUCCESS);
+      }
 
       /* Special case: A & B parallel and separated. */
       if ( (cross == 0) && ( aHB < 0) && ( bHA < 0 ) )
@@ -128,26 +131,43 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
       /* Special case: A & B collinear. */
       else if ( (cross == 0) && ( aHB == 0) && ( bHA == 0 ) ) {
             /* Advance but do not output point. */
-            if ( inflag == Pin )
+            if ( inflag == Pin ) {
+               if ( inflag == Qin ) 
+                  printf("%8.2lf    %8.2lf    lineto\n", Q[b][X], Q[b][Y] );
                b = Advance( b, &ba, m, inflag == Qin, Q[b] );
-            else
+            }
+            else {
+               if ( inflag == Pin )
+                  printf("%8.2lf    %8.2lf    lineto\n", P[a][X], P[a][Y] );
                a = Advance( a, &aa, n, inflag == Pin, P[a] );
+            }
          }
 
       /* Generic cases. */
       else if ( cross >= 0 ) {
-         if ( bHA > 0)
+         if ( bHA > 0) {
+            if ( inflag == Pin )
+               printf("%8.2lf    %8.2lf    lineto\n", P[a][X], P[a][Y] );
             a = Advance( a, &aa, n, inflag == Pin, P[a] );
-         else
+         }
+         else {
+            if ( inflag == Qin )
+               printf("%8.2lf    %8.2lf    lineto\n", Q[b][X], Q[b][Y] );
             b = Advance( b, &ba, m, inflag == Qin, Q[b] );
+         }
       }
       else /* if ( cross < 0 ) */{
-         if ( aHB > 0)
+         if ( aHB > 0) {
+            if ( inflag == Qin )
+               printf("%8.2lf    %8.2lf    lineto\n", Q[b][X], Q[b][Y] );
             b = Advance( b, &ba, m, inflag == Qin, Q[b] );
-         else
+         }
+         else {
+            if ( inflag == Pin )
+               printf("%8.2lf    %8.2lf    lineto\n", P[a][X], P[a][Y] );
             a = Advance( a, &aa, n, inflag == Pin, P[a] );
+         }
       }
-      printf("%%After advances:a=%d, b=%d; aa=%d, ba=%d; inflag=%d\n", a, b, aa, ba, inflag);
 
    /* Quit when both adv. indices have cycled, or one has cycled twice. */
    } while ( ((aa < n) || (ba < m)) && (aa < 2*n) && (ba < 2*m) );
@@ -165,8 +185,6 @@ Prints out the double point of intersection, and toggles in/out flag.
 ---------------------------------------------------------------------*/
 tInFlag InOut( tPointd p, tInFlag inflag, int aHB, int bHA )
 {
-   printf("%8.2lf %8.2lf lineto\n", p[X], p[Y] );
-
    /* Update inflag. */
    if      ( aHB > 0)
       return Pin;
@@ -180,8 +198,6 @@ tInFlag InOut( tPointd p, tInFlag inflag, int aHB, int bHA )
 ---------------------------------------------------------------------*/
 int     Advance( int a, int *aa, int n, bool inside, tPointi v )
 {
-   if ( inside )
-      printf("%5d    %5d    lineto\n", v[X], v[Y] );
    (*aa)++;
    return  (a+1) % n;
 }
@@ -199,8 +215,7 @@ int   ReadPoly( tPolygoni P )
    scanf("%d", &nin);
    /*printf("%%Polygon:\n");
    printf("%%  i   x   y\n");*/
-   while ( (n < nin) && (scanf("%d %d",&P[n][0],&P[n][1]) != EOF) ) {
-      /*printf("%%%3d%4d%4d\n", n, P[n][0], P[n][1]);*/
+   while ( (n < nin) && (scanf("%lf %lf",&P[n][0],&P[n][1]) != EOF) ) {
       ++n;
    }
 /*
@@ -220,7 +235,7 @@ void   PrintPoly( int n, tPolygoni P )
    printf("Polygon:\n");
    printf("  i   l   x   y\n");
    for( i = 0; i < n; i++ )
-      printf("%3d%4d%4d%4d\n", i, P[i][0], P[i][1]);
+      printf("%3d%8.2lf%8.2lf%4d\n", i, P[i][0], P[i][1]);
 }
 
 /*
@@ -284,9 +299,6 @@ char	SegSegInt( tPointi a, tPointi b, tPointi c, tPointi d, tPointd p, tPointd q
    double num, denom;  /* Numerator and denoninator of equations. */
    char code = '?';    /* Return char characterizing intersection. */
 
-   /*printf("%%SegSegInt: a,b,c,d: (%d,%d), (%d,%d), (%d,%d), (%d,%d)\n",
-	a[X],a[Y], b[X],b[Y], c[X],c[Y], d[X],d[Y]);*/
-
    denom = a[X] * (double)( d[Y] - c[Y] ) +
            b[X] * (double)( c[Y] - d[Y] ) +
            d[X] * (double)( b[Y] - a[Y] ) +
@@ -324,10 +336,6 @@ char	SegSegInt( tPointi a, tPointi b, tPointi c, tPointi d, tPointd p, tPointd q
 }
 char   ParallelInt( tPointi a, tPointi b, tPointi c, tPointi d, tPointd p, tPointd q )
 {
-/*   
-   printf("ParallelInt: a,b,c,d: (%d,%d), (%d,%d), (%d,%d), (%d,%d)\n",
-	a[X],a[Y], b[X],b[Y], c[X],c[Y], d[X],d[Y]);
-*/
 
    if ( !Collinear( a, b, c) )
       return '0';
@@ -421,16 +429,16 @@ void   OutputPolygons( void )
 
    printf("\n%%Polygon P:\n");
    printf("newpath\n");
-   printf("%d\t%d\tmoveto\n", P[0][X], P[0][Y]);
+   printf("%lf\t%lf\tmoveto\n", P[0][X], P[0][Y]);
    for( i = 1; i <= n; i++ )
-      printf("%d\t%d\tlineto\n", P[i%n][X], P[i%n][Y]);
+      printf("%lf\t%lf\tlineto\n", P[i%n][X], P[i%n][Y]);
    printf("closepath stroke\n");
 
    printf("\n%%Polygon Q:\n");
    printf("newpath\n");
-   printf("%d\t%d\tmoveto\n", Q[0][X], Q[0][Y]);
+   printf("%lf\t%lf\tmoveto\n", Q[0][X], Q[0][Y]);
    for( i = 1; i <= m; i++ )
-      printf("%d\t%d\tlineto\n", Q[i%m][X], Q[i%m][Y]);
+      printf("%lf\t%lf\tlineto\n", Q[i%m][X], Q[i%m][Y]);
    printf("closepath stroke\n");
 
    printf("2 2 setlinewidth\n");
@@ -448,14 +456,6 @@ double  Dot( tPointi a, tPointi b )
        sum += a[i] * b[i];
 
     return  sum;
-}
-
-void	PrintSharedSeg( tPointd p, tPointd q )
-{
-   printf("%%A int B:\n");
-   printf("%8.2lf %8.2lf moveto\n", p[X], p[Y] );
-   printf("%8.2lf %8.2lf lineto\n", q[X], q[Y] );
-   ClosePostscript();
 }
 
 void   ClosePostscript( void )
