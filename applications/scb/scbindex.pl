@@ -45,6 +45,12 @@
 #         SOURCE/figaro/figaro_applic.tar>applic/bclean.f
 #         INCLUDE/par_err
 #
+#     Additionally, some further information is stored in the dbm file:
+#         #SOURCE    - name of the source directory
+#         #INCLUDE   - name of the include directory 
+#     These are for information to whatever program is reading the file
+#     and may be ignored or used as desired.
+#
 #     The resulting DBM file can then be read by a separate program to
 #     locate the source code for a module, using no information other
 #     than its name.
@@ -67,11 +73,12 @@
 
 $srcdir = "/local/star/sources";     # head of source tree
 $incdir = "/star/include";           # include directory
-$tmpdir = "/local/junk/scb";         # scratch directory
+$tmpdir = "/local/junk/scb/index";   # scratch directory
 
 #  Index file location.
 
-$indexfile = "/local/devel/scb/index";
+$indexfile = "/local/devel/scb/test_index";
+$taskfile  = "/local/devel/scb/tasks";
 
 #  Flags.
 
@@ -79,11 +86,14 @@ $verbose = 1;
 
 #  Shell commands required.
 
-$tar = "tar";
-$cat = "cat";
-$zcat = "uncompress -c";
-$gzcat = "gzip -dc";
 $generic = "generic";
+
+#  Required libraries.
+
+use Fcntl;
+use Cwd;
+use SDBM_File;
+use libscb;
 
 #  Declarations.
 
@@ -91,18 +101,11 @@ sub index_list;
 sub index_incdir;
 sub index_dir;
 sub index_tar;
+sub index_hlp;
 sub index_f;
 sub index_gen;
 sub indexinc_list;
 sub write_entry;
-sub pushd;
-sub popd;
-
-#  Required libraries.
-
-use Fcntl;
-use Cwd;
-use SDBM_File;
 
 #  Set up scratch directory.
 
@@ -110,24 +113,41 @@ print "rm -rf $tmpdir\n";
 system "rm -rf $tmpdir" and die "Couldn't clean out $tmpdir: $?\n";
 system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
 
-#  Initialise and open index file, tied to index hash %locate.
+#  Initialise and open index file and tasks file.
 
-unlink "$indexfile.pag", "$indexfile.dir";
+unlink "$indexfile.pag", "$indexfile.dir", "$taskfile.pag", "$taskfile.dir";
 tie %locate, SDBM_File, $indexfile, O_CREAT | O_RDWR, 0644;
+tie %tasks,  SDBM_File, $taskfile,  O_CREAT | O_RDWR, 0644;
 
 #  Index include files.
 
 chdir $incdir or die "Couldn't enter $incdir\n";
 index_incdir "INCLUDE/", ".";
+write_entry "#INCLUDE", $incdir;
 
 #  Index source files.
 
 chdir $srcdir or die "Couldn't enter $srcdir\n";
 index_dir "SOURCE/", ".";
+write_entry "#SOURCE", $srcdir;
+
+#  Check list of tasks.
+
+# check_tasks;
+
+#  Flatten %tasks from a hash of lists to a hash of space-separated strings.
+#  Without this step the only thing written to the DBM file is a set of
+#  references to memory locations, which is useless after the program has
+#  terminated.
+
+while (($key, $value) = each %tasks) {
+   $tasks{$key} = join ' ',@$value;
+}
 
 #  Terminate processing.
 
 untie %locate;
+untie %tasks;
 
 exit;
 
@@ -165,6 +185,9 @@ sub index_list {
       elsif ($file =~ /\.gen$/) {     #  generic fortran source file.
          index_gen $path, $file;
       }
+      elsif ($file =~ /\.hlp$/) {     #  starlink help file
+         index_hlp $path, $file;
+      }
    }
 }
 
@@ -194,33 +217,17 @@ sub index_tar {
    my $path = shift;      #  Logical pathname of current directory.
    my $tarfile = shift;   #  Tarfile in current directory to be indexed.
 
-#  Define a (possibly null) decompression filter.
-
-   $tarfile =~ /\.tar(\.?.*)$/;
-   my $ext = $1;
-   my %filter = ( 
-                  ''    => $cat, 
-                  '.Z'  => $zcat,
-                  '.gz' => $gzcat,
-                );
-
-#  Define pipelines for listing and extracting from tar file.
+#  Define fully qualified pathname for file.
 
    my $fqtarfile = cwd . '/' . $tarfile;
-   my $tcomm = "$filter{$ext} $fqtarfile | $tar tf -";
-   my $xcomm = "$filter{$ext} $fqtarfile | $tar xf -";
+
+#  Change to scratch directory.
+
+   pushd $tmpdir;
 
 #  Unpack tar file.
 
-   pushd $tmpdir;
-   system "$xcomm"        and die "Error in command '$xcomm': $?\n";
-   open TART, "$tcomm|"   or  die "Error in command '$tcomm'\n";
-   my @files;
-   while (<TART>) {
-      chomp;
-      push @files, $_;
-   }
-   close TART             or  die "Error closing '$tcomm'\n";
+   my @files = tarxf $fqtarfile;
 
 #  Pass list of files to indexing routine.
 
@@ -236,45 +243,17 @@ sub index_tar {
 sub index_fortran_file {
 
 #  Examine and index a fortran source file.
-#
-#  Note the parsing is not perfect - it would be fooled for instance
-#  by a subroutine definition in which the name of the subroutine was
-#  split between continuation lines.
-#
-#  Probably this could be made (much) more efficient, but it's not 
-#  expected that this code should have to be run very often.
 
 #  Arguments.
 
    my $path = shift;      #  Logical pathname of FILE to be indexed.
    my $file = shift;      #  File in current directory to be indexed.
 
-#  Local constants.
-
-   my @ftypes = qw/INTEGER REAL DOUBLEPRECISION COMPLEX LOGICAL
-                    CHARACTER BYTE UBYTE WORD UWORD/;
-   my $ftypdef = '(' . join ('|', @ftypes) . ')\**(\([^\)]\))?[0-9]*';
-
-#  Open source file and cycle through it.
+#  Cycle through source file writing index lines where appropriate.
 
    open F, $file or die "Couldn't open $file in directory ".cwd."\n";
    while (<F>) {
-
-#     Strip lines of syntactically uninteresting parts.
-
-      next if (/^[*cC]/);               # Ignore F77 comments.
-      s/!.*$//;                         # Discard inline comments.
-      chomp;                            # Discard end of line character.
-      s/^......//;                      # Discard first six characters.
-      s/ //g;                           # Remove spaces.
-      next unless ($_);                 # Ignore empty lines.
-      tr/a-z/A-Z/;                      # Fold case to upper.
-      s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
-
-#     Write to database if line contains a module name.
-
-      write_entry $2, $path
-         if (/^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(]+)/);
+      write_entry $name, $path if ($name = module_name $_);
    }
    close F;
 }
@@ -315,6 +294,46 @@ sub index_gen {
 #  Tidy up.
 
    unlink $file or die "Failed to remove file $file\n";
+}
+
+########################################################################
+sub index_hlp {
+
+#  Examine and index a .hlp (Starlink interactive help) file.
+#  This routine is a bit hit-and-miss; it uses the (package).hlp file
+#  to guess the names of the top level A-tasks in the package.
+#  It makes the assumption that the help file is called (package).hlp,
+#  and furthermore that all the A-tasks have level-1 entries in the
+#  help file.
+#  If it guesses wrong of course it's not too bad, that is it will not
+#  inhibit any correctly-named modules from being found; the index file
+#  by this routine is only used to generate the top-level menu for the
+#  browser if no module name is entered.
+
+#  Note help sublibraries (@-lines) are not yet supported; any help files
+#  which are split into different .hlp files will turn up looking like
+#  different packages.
+
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of current directory.
+   my $file = shift;      #  .hlp file in current directory to be indexed.
+
+   $file =~ m%([^/]*)\.hlp%;
+   my $package = $1;
+   open HLP, $file or die "Couldn't open $file in directory ".cwd."\n";
+   my ($level, $baselevel);
+   while (<HLP>) {
+      next unless (/^([0-9]) *(\S+)/); 
+      ($level, $topic) = ($1, $2);
+      unless (defined $baselevel) {
+         $baselevel = $level;
+      }
+      if ($level == $baselevel+1) {
+         push @{$tasks{$package}}, $topic;
+      }
+   }
+   close HLP;
 }
 
 ########################################################################
@@ -390,24 +409,5 @@ sub write_entry {
    $locate{$name} = $location
        unless (   defined ($locate{$name})
                && tarlevel ($locate{$name}) > tarlevel ($location) );
-}
-
-########################################################################
-sub pushd {
-
-#  Pushd does the same thing as its C-shell namesake.
-
-   my $dir = shift;
-   push @dirstack, cwd;
-   chdir $dir or die "Couldn't change directory to $dir\n";
-}
-
-########################################################################
-sub popd {
-
-#  Popd does the same thing as its C-shell namesake.
-
-   my $dir = pop @dirstack;
-   chdir $dir or die "Couldn't change directory to $dir\n";
 }
 
