@@ -13,7 +13,7 @@ package Scb;
 #     Perl 5
 
 #  Invocation:
-#     Use Scb;
+#     use Scb;
 
 #  Description:
 #     Utility routines and global variables for source code browser
@@ -51,6 +51,7 @@ require Exporter;
 
 @EXPORT = qw/tarxf popd pushd starpack rmrf parsetag
              $incdir $srcdir $bindir 
+             $mimetypes_file
              $func_indexfile $file_indexfile $taskfile
              %tagger/;
 
@@ -72,6 +73,10 @@ use Cwd;
 $srcdir = "/local/star/sources";        # head of source tree
 $bindir = "/star/bin";                  # Starlink binaries directory
 $incdir = "/star/include";              # Starlink include directory
+
+#  System file locations.
+
+$mimetypes_file = "/etc/mime.types";
 
 #  Index file locations.
 
