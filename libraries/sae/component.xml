@@ -12,7 +12,7 @@
       in the Starlink environment, and for building the USSC.</p>
   </abstract>
   <dependencies >
-    <sourceset>messgen</sourceset>
+    <sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

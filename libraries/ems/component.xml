@@ -14,7 +14,7 @@
       message output or access to the parameter and data
       systems).</p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><link>cnf</link><sourceset>messgen</sourceset>
+    <build>sae</build><build>cnf</build><link>cnf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -159,8 +159,7 @@ edit = sed \
     -e 's,@PERL\@,$(PERL),g' \
     -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
     -e 's,@PACKAGE_BUGREPORT\@,$(PACKAGE_BUGREPORT),g' \
-    -e 's,@l2hdir\@,$(l2hdir),g' \
-    -e 's,@edited_input\@,Generated file from $< -- do not edit,g'
+    -e 's,@l2hdir\@,$(l2hdir),g'
 
 all: all-am
 
@@ -553,12 +552,16 @@ sun199.htx_tar: sun199.tex star2html latex2html
 	tar cf sun199.htx_tar sun199.htx
 latex2html: Makefile $(srcdir)/latex2html.in
 	rm -f latex2html latex2html.tmp
-	$(edit) $(srcdir)/latex2html.in >latex2html.tmp
+	$(edit) \
+	    -e 's,@edited_input\@,latex2html. Generated from latex2html.in by Makefile.am,g' \
+	    $(srcdir)/latex2html.in >latex2html.tmp
 	chmod +x latex2html.tmp
 	mv latex2html.tmp latex2html
 star2html: Makefile $(srcdir)/star2html.in
 	rm -f star2html star2html.tmp
-	$(edit) $(srcdir)/star2html.in >star2html.tmp
+	$(edit) \
+	    -e 's,@edited_input\@,star2html. Generated from star2html.in by Makefile.am,g' \
+	    $(srcdir)/star2html.in >star2html.tmp
 	chmod +x star2html.tmp
 	mv star2html.tmp star2html
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

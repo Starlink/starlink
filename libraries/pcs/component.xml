@@ -16,7 +16,7 @@
       application programs, but form a basic part of the Starlink
       Software Environment</p></abstract>
   <dependencies >
-    <build>adam</build><build>ams</build><build>dtask</build><build>hdspar</build><build>lex</build><build>messys</build><build>misc</build><build>msp</build><build>parsecon</build><build>sock</build><build>string</build><build>subpar</build><build>task</build>
+    <build>adam</build><build>ams</build><build>dtask</build><build>hdspar</build><build>lex</build><build>messys</build><build>misc</build><build>msp</build><build>parsecon</build><build>sock</build><build>string</build><build>subpar</build><build>task</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -1,5 +1,5 @@
 #! /bin/sh -
-# original bootstrap file, installed by starconf 1.0-5, rnum=1000005
+# original bootstrap file, installed by starconf 1.0-6, rnum=1000006
 # If you _need_ to change this file, delete or replace `original' above
 # or else starconf may overwrite it with an updated version
 
@@ -27,6 +27,14 @@
 echorun() { echo $*; eval $* || exit 1; }
 
 if test -z "$STARCONF_BUILDSUPPORT"; then
+    # Use a default, based on starconf.
+    test -x ./starconf.status && \
+        STARCONF_BUILDSUPPORT=`./starconf.status --show buildsupport`
+    # The `starconf' script won't necessarily be in the path.
+    test -n "$STARCONF_BUILDSUPPORT" || \
+        STARCONF_BUILDSUPPORT=`starconf --show buildsupport 2>/dev/null`
+fi
+if test -z "$STARCONF_BUILDSUPPORT"; then
     # Use a default.  We don't normally refer to the STARLINK
     # variable, but we've little choice here.  Try it, but don't fail
     # if it's not there -- we have other defaults.
@@ -34,10 +42,6 @@ if test -z "$STARCONF_BUILDSUPPORT"; then
         STARCONF_BUILDSUPPORT=$STARLINK/buildsupport
         echo "Defaulting STARCONF_BUILDSUPPORT to $STARCONF_BUILDSUPPORT"
     fi
-fi
-if test -z "$STARCONF_BUILDSUPPORT"; then
-    # Still nothing.  See if `starconf' is in the path
-    STARCONF_BUILDSUPPORT=`starconf --show buildsupport 2>/dev/null`
 fi
 if test -z "$STARCONF_BUILDSUPPORT"; then
     # Give up!
@@ -81,7 +85,7 @@ done
 if $STAR_SUPPRESS_AUTORECONF; then
     echo "Suppressing autoreconf"
 else
-    echorun autoreconf
+    echorun autoreconf --install --symlink
 fi
 
 exit 0

@@ -19295,7 +19295,12 @@ echo "$as_me: error: cannot work out how" >&2;}
           stardocs_STARDATA="$stardocs_STARDATA ${docno}.tex ${docno}.ps ${docno}.htx_tar"
 
                     done
-                                        eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
+                                                  for _star_tmp in star2html
+          do
+              STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN<sourceset>$_star_tmp</sourceset>"
+          done
+
+                    eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
 
                       # Extract the first word of "star2html", so it can be a program name with args.
 set dummy star2html; ac_word=$2
