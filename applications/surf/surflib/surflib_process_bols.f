@@ -281,6 +281,10 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.10  2000/08/10 20:59:47  timj
+*     Remove code to put the LST into range 0..2PI when applying clock correction
+*     since that does not work with sources that cross LST day boundaries.
+*
 *     Revision 1.9  2000/06/24 01:04:55  timj
 *     Calculate and correct for possible clock error
 *
@@ -701,11 +705,11 @@
                   DO EXPOSURE = 1, N_EXPOSURES
                      DO I = 1, N_SWITCHES
                         
-*     Add clock error and put into range 0 to 2pi
+*     Add clock error (do not want to correct range to 0..2PI
+*     since that will not distinguish between today and tomorrow)
                         LST_STRT(I,EXPOSURE,INTEGRATION,MEASUREMENT) =
-     :                    SLA_DRANRM( 
      :                    LST_STRT(I,EXPOSURE,INTEGRATION,MEASUREMENT) +
-     :                    CLOCK_ERR)
+     :                    CLOCK_ERR
                      END DO
                   END DO
                END DO
