@@ -208,7 +208,7 @@
 
 *      Set mode
         ID = AIO__M_CONSOLE
-        AIO_WIDTH = 79
+        AIO_WIDTH = 132
 
 *    Simple filename mode
       ELSE
