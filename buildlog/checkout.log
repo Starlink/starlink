@@ -8786,7 +8786,7 @@ cvs checkout: Updating java/source/topcat/src/docs
 U java/source/topcat/src/docs/JEL-licence
 U java/source/topcat/src/docs/Ptplot-licence
 U java/source/topcat/src/docs/docs.dtd
-U java/source/topcat/src/docs/sun178.xml
+U java/source/topcat/src/docs/sun253.xml
 U java/source/topcat/src/docs/toHTML.xslt
 U java/source/topcat/src/docs/toHTML1.xslt
 U java/source/topcat/src/docs/toHelp.xslt
@@ -9317,6 +9317,7 @@ cvs checkout: Updating java/source/votable/src/testcases/uk
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink/votable
+U java/source/votable/src/testcases/uk/ac/starlink/votable/ParameterTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/SerializerTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/VOTableTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/docexample.xml

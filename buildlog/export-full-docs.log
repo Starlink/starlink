@@ -1095,12 +1095,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/parser2d/AndConstraint.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/parser2d/AngleRelation.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/parser2d/AreaRatioRelation.java:19: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/gui/AbstractApplication.html...
-  [javadoc] "Create an abstract application that resides
-  [javadoc]  in the given context (e.g."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Create an abstract application that resides
-  [javadoc]  in the given context (e.g. a frame or an applet)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/parser2d/BasicConstraint.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/parser2d/DeltaXRelation.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/parser2d/DeltaYRelation.java:19: warning - @rating is an unknown tag.
@@ -1127,6 +1121,12 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/View.java:24: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:58: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/gui/AbstractApplication.html...
+  [javadoc] "Create an abstract application that resides
+  [javadoc]  in the given context (e.g."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Create an abstract application that resides
+  [javadoc]  in the given context (e.g. a frame or an applet)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/BasicPage.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setDescription
@@ -1300,10 +1300,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/StraightConnector.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/CompositeFigureTutorial.java:119: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/EdgeController.java:58: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/EdgeRenderer.java:23: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphController.java:35: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphListener.java:21: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/tutorial/TransformedFigureTutorial.html...
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
@@ -1314,8 +1310,18 @@ javadoc-sources:
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/EdgeController.java:58: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/EdgeRenderer.java:23: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphController.java:35: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphListener.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:33: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:101: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/GraphModel.html...
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node, i.e. it can contain children."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphViewListener.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/MutableGraphModel.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/NodeController.java:59: warning - @rating is an unknown tag.
@@ -1330,12 +1336,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphPane.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphUtilities.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphViewEvent.java:25: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/GraphModel.html...
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node, i.e. it can contain children."
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/JGraph.html...
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/JGraph.java:28: Tag @see: Malformed: GraphModel, GraphPane
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/NodeDragInteractor.java:32: warning - @rating is an unknown tag.
@@ -1393,6 +1393,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/layout/RandomIncrLayout.java:23: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/layout/RandomLayout.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/tutorial/EditorTutorial.java:43: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e. how to render a node if it
+  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/tutorial/NestedTutorial.java:38: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/tutorial/NodeRendererTutorial.java:40: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/tutorial/PrepopulatedTutorial.java:35: warning - @rating is an unknown tag.
@@ -1402,13 +1409,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/GraphLogger.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:23: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e. how to render a node if it
-  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Channel.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Delta.java:45: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Generator.java:31: warning - @rating is an unknown tag.
@@ -2344,4 +2344,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 16 seconds
+Total time: 8 minutes 29 seconds
