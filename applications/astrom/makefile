@@ -1065,12 +1065,14 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  ------------------------------------
 #
 #  Remove all intermediate files.  Do not remove built files.
+#  NORMAN: altered this to remove only object files.
 
 clean:
-	@- rm -f $(INCLUDE_LINKS) $(PLATFORM_PRIVATE_INCLUDES) \
-              $(PRIVATE_INCLUDES) $(F_ROUTINES) $(BLOCK_DATA) \
-              $(C_ROUTINES) $(OBJECT_FILES) $(PLATFORM_F) \
-              $(F_ROUTINES_EXE) $(PLATFORM_F_EXE) 1>/dev/null 2>/dev/null
+#	@- rm -f $(INCLUDE_LINKS) $(PLATFORM_PRIVATE_INCLUDES) \
+#              $(PRIVATE_INCLUDES) $(F_ROUTINES) $(BLOCK_DATA) \
+#              $(C_ROUTINES) $(OBJECT_FILES) $(PLATFORM_F) \
+#              $(F_ROUTINES_EXE) $(PLATFORM_F_EXE) 1>/dev/null 2>/dev/null
+	@- rm -f $(OBJECT_FILES) 1>/dev/null 2>/dev/null
 	@ echo
 	@ echo '*** Intermediate files removed'
 	@ echo
@@ -1080,9 +1082,11 @@ clean:
 
 #  Remove all intermediate files and all built files, and note that the
 #  package is no longer built or tested.
+#  NORMAN: altered this to remove only executable files.
 
 unbuild: clean
-	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
+#	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
+	@- rm -f $(EXECUTABLE_PROGRAMS) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
 
