@@ -96,7 +96,9 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      INTEGER			DETID			! Detector info
       INTEGER			PIXID, PRJID, SYSID	! WCS data
+      INTEGER			TIMID			! Timing
 *.
 
 *  Check inherited global status.
@@ -106,6 +108,22 @@
       CALL WCI_GETIDS( ARGS(1), PIXID, PRJID, SYSID, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         CALL WCI_PUTIDS( ARGS(3), PIXID, PRJID, SYSID, STATUS )
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+      END IF
+
+*  Detector info
+      CALL DCI_GETID( ARGS(1), DETID, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        CALL DCI_PUTID( ARGS(3), DETID, STATUS )
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+      END IF
+
+*  Timing
+      CALL TCI_GETID( ARGS(1), TIMID, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        CALL TCI_PUTID( ARGS(3), TIMID, STATUS )
       ELSE
         CALL ERR_ANNUL( STATUS )
       END IF
