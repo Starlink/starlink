@@ -104,6 +104,10 @@
 *  Copy the unit number argument to a global variable.
       FFUNIT = FUNIT
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Write a blank header.
       CARD = ' '
       CALL FTPREC( FUNIT, CARD, FSTAT )

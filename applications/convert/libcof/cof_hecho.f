@@ -79,6 +79,11 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
+*  Write the text.
       DO I = 1, NLINES
          CALL FTPHIS( FFUNIT, TEXT( I ), FSTAT )
       END DO

@@ -166,6 +166,10 @@
 *  Define the null character.
       NULL = CHAR( 0 )
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Define the shape of the binary table.
 *  =====================================
 

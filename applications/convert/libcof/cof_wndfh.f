@@ -161,6 +161,10 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Initialise output flags.
 *  ========================
       AXIFND = .FALSE.

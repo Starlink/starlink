@@ -902,6 +902,7 @@
 *  Close the FITS file.  The inherited status used by FITSIO still
 *  applies to closedown calls, so use a temporary status.
       IF ( FSTAT .GT. FITSOK ) FSTAT = FITSOK
+      FSTATC = FITSOK
       CALL FTCLOS( FUNIT, FSTATC )
       IF ( FSTATC .GT. FITSOK ) THEN
          BUFFER = 'Error closing the FITS file '//FILNAM( :NCF )//'.'

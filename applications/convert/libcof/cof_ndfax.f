@@ -136,6 +136,10 @@
       CALL NDF_ACRE( NDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Initialise flag to indicate whether any axis has been written.
       DFAXIS = .FALSE.
 

@@ -86,8 +86,12 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Obtain the number of keywords in the header.
-      CALL FTGHPS( FUNIT, MAXKEY, KEY, STATUS )
+      CALL FTGHPS( FUNIT, MAXKEY, KEY, FSTAT )
 
 *  Check for a FITSIO error.  Handle a bad status.  Negative values are
 *  reserved for non-fatal warnings.

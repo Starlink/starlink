@@ -125,6 +125,10 @@
       DARRAY = .TRUE.
       SIZE = 1
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Obtain the mandatory FITS headers.
 *  ==================================
       CALL FTGHPR( FUNIT, MAXDIM, SIMPLE, BITPIX, NDIM, AXIS, PCOUNT,

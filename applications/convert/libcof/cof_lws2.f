@@ -164,6 +164,10 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Obtain the column of fluxes and store its units and label in the NDF.
 *  =====================================================================
 

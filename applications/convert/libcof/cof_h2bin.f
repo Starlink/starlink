@@ -170,6 +170,10 @@
 *  Initialise the return value.
       WRITTN = .FALSE.
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Determine whether or not the object is primitive.
       CALL DAT_PRIM( LOC, PRIM, STATUS )
 

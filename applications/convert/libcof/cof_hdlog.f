@@ -105,6 +105,10 @@
 *  Get the length of the filename.
       NCF = CHR_LEN( FILE )
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Find the number of headers.
       CALL FTGHSP( FUNIT, NHEAD, KEYADD, FSTAT )
       IF ( FSTAT .NE. FITSOK ) THEN

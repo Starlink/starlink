@@ -92,6 +92,10 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Check that the current HDU is the primary or IMAGE extension.
 *  At present there is no inquiry routine, so inquire the number of
 *  the HDU.  1 is the primary HDU.
