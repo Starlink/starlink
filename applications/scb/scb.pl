@@ -546,6 +546,8 @@ sub query_form {
    hprint "
       <br>
       <input type=submit value='Retrieve'>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href='$htxserver/sun226.htx/node16.html?xref_BROWSER-HELP'>Help</a>
       </form>
       <hr>
    ";
@@ -860,7 +862,7 @@ sub search_keys {
 
    foreach $index (qw/file func/) {
       while (($name, $loc) = ${$index . '_index'}->each($package)) {
-         if ($name =~ m¬$regex¬io) {
+         if ($name =~ m`$regex`io) {
             $pack = starpack $loc;
             $match{$index}{$pack}{$name} = $loc;
          }
@@ -984,7 +986,7 @@ sub regex_validate {
 #  We use a weird character for the delimiter in order not to interfere
 #  with characters which might be within the regular expression.
 
-   my $delimiter = "¬";
+   my $delimiter = "`";
    my $evalstr = 'my $dummy = ""; $dummy =~ ';
    $evalstr .= "m" . $delimiter . $regex . $delimiter;
    eval $evalstr;
@@ -1379,7 +1381,7 @@ sub output {
       my $pre;
       $ext = '';
       $ext = $1 if ($file =~ /\.([^.]+)$/);
-      if ($taggable $file) {
+      if (taggable $file) {
          eval { $tagged = &{$tagger{$ext}} (join ('', <FILE>), $ext) };
          error "Internal: tagging error: $@" if ($@);
 
