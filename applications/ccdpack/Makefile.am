@@ -40,7 +40,7 @@ ccdpack_red_TASKS = $(REDTASKS)
 ccdpack_reg_TASKS = $(REGTASKS)
 ccdpack_res_TASKS = $(RESTASKS)
 ccdpack_scr_TASKS = $(SCRTASKS)
-ccdhelp_TASKS = 
+ccdhelp_TASKS = ccdhelp
 
 #  Link flags.  This is untidy; you'd think there would be a better way
 #  to cope with interdependencies between noinst_LTLIBRARIES libraries
