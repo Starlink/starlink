@@ -7,7 +7,7 @@
 
 use strict;
 use Test;
-BEGIN { plan tests => 13 }
+BEGIN { plan tests => 17 }
 use Starlink::Versions qw/ :Funcs /;
 
 # Need to know where I am
@@ -47,6 +47,10 @@ ok( starversion_cmp('this_prog', 'V1.2-3'), 1);
 ok( starversion_lt('this_prog', '1.4-18') );
 ok( starversion_eq('this_prog', '1.4-17') );
 ok( starversion_gt('this_prog', '1.3-18') );
+ok( starversion_le('this_prog', '1.4-17') );
+ok( starversion_le('this_prog', '1.4-18') );
+ok( starversion_ge('this_prog', '1.4-17') );
+ok( starversion_ge('this_prog', '1.3-17') );
 
 # This will return undef
 ok( !defined starversion_major('your_prog') );

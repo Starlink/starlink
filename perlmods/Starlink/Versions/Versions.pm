@@ -54,13 +54,14 @@ use File::Spec;         # For catfile()
   starversion starversion_string starversion_minor
   starversion_major starversion_patchlevel
   starversion_cmp starversion_eq starversion_gt starversion_lt
+  starversion_ge starversion_le
   /;
 
 %EXPORT_TAGS = (
 		'Funcs' => [ @EXPORT_OK ],
 		);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 $DEBUG = 0;
 
 # This is the cache used to store the version numbers 
@@ -324,6 +325,35 @@ sub starversion_lt ($$) {
   return 0;
 }
 
+=item B<starversion_le>
+
+Test whether the version of the installed package is less than
+or equal to a supplied version number. In other words, whether the
+installed package is older than or is the requested version.
+
+  if ( starversion_le('kappa', '0.15-2' ) {
+    ...
+  }
+
+The version string format is described in the description of
+C<starversion_cmp>
+
+In perl 5.6.0 this command can be implemented directing using a
+string literal:
+
+  if ( starversion('prog') le v0.15.2 ) {
+    ...
+  }
+
+=cut
+
+sub starversion_le ($$) {
+  if ( starversion_cmp($_[0],$_[1]) <= 0 ) {
+    return 1;
+  }
+  return 0;
+}
+
 =item B<starversion_eq>
 
 Test whether the version of the installed package is equal to 
@@ -377,6 +407,35 @@ string literal:
 
 sub starversion_gt ($$) {
   if (starversion_cmp($_[0],$_[1]) == 1) {
+    return 1;
+  }
+  return 0;
+}
+
+=item B<starversion_ge>
+
+Test whether the version of the installed package is greater than
+or equal to a supplied version number. In other words, whether the
+installed package is newer than or is the requested version.
+
+  if ( starversion_ge('kappa', '0.15-2' ) {
+    ...
+  }
+
+The version string format is described in the description of
+C<starversion_cmp>
+
+In perl 5.6.0 this command can be implemented directing using a
+string literal:
+
+  if ( starversion('prog') ge v0.15.2 ) {
+    ...
+  }
+
+=cut
+
+sub starversion_ge ($$) {
+  if ( starversion_cmp($_[0],$_[1]) >= 0 ) {
     return 1;
   }
   return 0;

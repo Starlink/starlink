@@ -6,7 +6,7 @@
 use strict;
 use Test;
 
-BEGIN {plan tests => 5}
+BEGIN {plan tests => 9}
 use Starlink::Versions qw/ starversion /;
 use Cwd;
 
@@ -44,10 +44,20 @@ if ($skip) {
   skip($skip,1);
   skip($skip,2);
   skip($skip,3);
+  skip($skip,4);
+  skip($skip,5);
+  skip($skip,6);
+  skip($skip,7);
 } else {
   no strict qw/subs/;
   skip($skip, $version, v5.1.17);
 
   skip($skip, ($version gt v0.15.2));
   skip($skip, ($version lt v20.51.1));
+
+  skip($skip, ($version le v6.2.10));
+  skip($skip, ($version le v5.1.17));
+
+  skip($skip, ($version ge v0.12.34));
+  skip($skip, ($version ge v5.1.17));
 }
