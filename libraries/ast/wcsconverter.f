@@ -29,6 +29,7 @@
       INTEGER STATUS, FC, OBJECT, IARGC, CHAN, CHR_LEN
       CHARACTER FILE*80, OFILE*80, LINE*255, TEXT*80, ENCODING*50
       CHARACTER ATTRS*200
+      LOGICAL CDM
 
 *
 * Check command line arguments have been supplied.
@@ -51,6 +52,8 @@
       IF( IARGC() .EQ. 4 ) THEN
          CALL GETARG( 4, ATTRS )
          CALL AST_SET( FC, ATTRS, STATUS )
+      ELSE
+         ATTRS = ' '
       END IF
 
 *
@@ -63,25 +66,23 @@
 * Read each line out of the text file and store it in the FitsChan.
 *
       CALL ERR_MARK
-
       DO WHILE( .TRUE. )
          READ( 10, '(A)', END = 10 ) LINE
          CALL AST_PUTFITS( FC, LINE, 0, STATUS )
       END DO
 
  10   CLOSE( 10 )
-	
+
 * 
 * Set the value of CDMatrix, unless it has already been set.
 * 
       IF( .NOT. AST_TEST( FC, 'CDMATRIX', STATUS ) ) THEN
-         CALL AST_SETL( FC, 'CDMATRIX', AST_GETL( FC, 'CDMATRIX', 
-     :                                            STATUS ),
-     :               STATUS )     
+         CDM = AST_GETL( FC, 'CDMATRIX', STATUS )
+         CALL AST_SETL( FC, 'CDMATRIX', CDM, status )
       END IF
 
 *
-* Attempt to read an Object form the FIitsChan.
+* Attempt to read an Object form the FitsChan.
 *
       CALL AST_CLEAR( FC, 'CARD', STATUS )
       OBJECT = AST_READ( FC, STATUS )
@@ -132,7 +133,7 @@
          ELSE
             OPEN( UNIT=10, FILE=OFILE, STATUS='NEW' )
             IF( FC .EQ. AST__NULL ) THEN
-               FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+               FC = AST_FITSCHAN( AST_NULL, AST_NULL, ATTRS, STATUS )
             END IF
             CALL AST_SETC( FC, 'ENCODING', ENCODING, STATUS )
             CALL AST_CLEAR( FC, 'CARD', STATUS )
