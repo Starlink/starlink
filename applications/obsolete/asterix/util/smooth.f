@@ -56,6 +56,7 @@
 *                         and header updated (DJA)
 *     13 Sep 93 : V1.7-1  Allow non-integer widths (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     26 Mar 95 : V1.8-1 Use new data interface (DJA)
 *
 *    Type definitions :
 *
@@ -64,16 +65,11 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *
 *    Status :
 *
-      INTEGER STATUS
-*
-*    Function declarations :
-*
-      INTEGER CHR_LEN
+      INTEGER			STATUS
 *
 *    Local constants :
 *
@@ -83,12 +79,9 @@
 *
 *    Local variables :
 *
-      CHARACTER*12            CWDTH		! Width of mask in char form.
       CHARACTER*1             DO                ! Are gaps to be restored (Y/N)
       CHARACTER*10            EMETH		! How to treat the data ends
-      CHARACTER*(DAT__SZLOC)  ILOC		! Input dataset
       CHARACTER*40	      LINE		! Line from mask file
-      CHARACTER*(DAT__SZLOC)  OLOC		! Output dataset
       CHARACTER*40            MASK,DUNIT
       CHARACTER*80            PATH(8)           ! Input data path including
                                                 ! Text string for history file
@@ -99,6 +92,9 @@
       REAL START_DATA,END_DATA                  ! Value to use at both ends
       REAL                    START_ERR,END_ERR ! ERROR to use at both ends
       REAL                    TT
+
+      INTEGER			IFID			! Input dataset
+      INTEGER			OFID			! Output dataset
 
       INTEGER                 DPNTR		! Pointer to output data array
       INTEGER                 QPNTR             ! Pointer to output quality
@@ -131,8 +127,6 @@
       INTEGER START1,END1,START2,END2             !Pixel range to fine mean end
       INTEGER IDLEN,J1,J2
 
-      BYTE                    BADBITS		! Input dataset quality mask
-
       LOGICAL                 INPRIM            ! Is input data primitive
       LOGICAL                 JUMPOUT
       LOGICAL                 LDQUAL            ! Is quality array present?
@@ -143,7 +137,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'SMOOTH Version 1.8-0')
+        PARAMETER  (VERSION = 'SMOOTH Version 1.8-1')
 *-
 
 *    Check status
@@ -161,16 +155,14 @@
 *
         IF (OVER) THEN
 *
-           CALL USI_ASSOCI('INP','UPDATE',ILOC,INPRIM,STATUS)
-*
-*   Clone an output locator
-           CALL DAT_CLONE(ILOC,OLOC,STATUS)
+           CALL USI_TASSOCI('INP','*','UPDATE',IFID,STATUS)
+           OFID = IFID
 *
         ELSE
 *
-           CALL USI_ASSOC2('INP','OUT','READ',ILOC,OLOC,
-     &                                               INPRIM,STATUS)
+           CALL USI_TASSOC2('INP','OUT','READ',IFID,OFID,STATUS)
 *
+           CALL BDI_PRIM( IFID, INPRIM, STATUS )
            IF (INPRIM) THEN
               CALL MSG_PRNT('Primitive arrays must be smoothed in'/
      &              /' their original data files: use the OVER switch')
@@ -178,7 +170,7 @@
            ENDIF
 *
 *   Copy all components from old file into new file
-           CALL HDX_COPY(ILOC,OLOC,STATUS)
+           CALL ADI_FCOPY(IFID,OFID,STATUS)
 *
         ENDIF
         IF (STATUS .NE. SAI__OK) GOTO 999
@@ -188,7 +180,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *    Check data in file
-      CALL BDA_CHKDATA(OLOC,OK,NDIMS,NELS,STATUS)
+      CALL BDI_CHKDATA(OFID,OK,NDIMS,NELS,STATUS)
       IF (.NOT. OK) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Data array not found', STATUS )
@@ -196,26 +188,25 @@
       END IF
 
 *    Map the output data array
-      CALL BDA_MAPDATA( OLOC, 'UPDATE', DPNTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'UPDATE', DPNTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP(' ','Error mapping input data array',STATUS)
         GOTO 999
       END IF
 
 *    Map the quality and variance if present
-      CALL BDA_CHKQUAL(OLOC,LDQUAL,NQDIMS,NQELS,STATUS)
+      CALL BDI_CHKQUAL(OFID,LDQUAL,NQDIMS,NQELS,STATUS)
       IF (LDQUAL) THEN
-        CALL BDA_MAPQUAL(OLOC,'UPDATE',QPNTR,STATUS)
-        CALL BDA_GETMASK(OLOC,BADBITS,STATUS)
+        CALL BDI_MAPMQUAL(OFID,'READ',QPNTR,STATUS)
       END IF
       IF (STATUS .NE. SAI__OK) THEN
         CALL ERR_REP(' ','Error mapping input quality array',STATUS)
         GOTO 999
       END IF
-      CALL BDA_CHKVAR(OLOC,LDVAR,NVDIMS,NVELS,STATUS)
+      CALL BDI_CHKVAR(OFID,LDVAR,NVDIMS,NVELS,STATUS)
 *
         IF (LDVAR) THEN
-           CALL BDA_MAPVAR(OLOC,'UPDATE',VPNTR,STATUS)
+           CALL BDI_MAPVAR(OFID,'UPDATE',VPNTR,STATUS)
         ENDIF
 *
         IF (STATUS .NE. SAI__OK) THEN
@@ -237,7 +228,7 @@ C1000    FORMAT(' Smoothing ',4A)
         IF (NDIMS .GT. 1) THEN
 *
 *   Display axis labels
-          CALL AXIS_LIST(ILOC,NDIMS,STATUS)
+          CALL AXIS_TLIST(IFID,NDIMS,STATUS)
           IF (STATUS .NE. SAI__OK) GOTO 999
 *
           JUMPOUT=.FALSE.
@@ -378,7 +369,7 @@ C   Laplacian mask
 		RMASK(LM2-1)=-0.5
 		RMASK(LM2+1)=-0.5
 *    Change units
-                CALL BDA_PUTUNITS(OLOC,'Curvature',STATUS)
+                CALL BDI_PUTUNITS(OFID,'Curvature',STATUS)
 *
                 IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -490,7 +481,7 @@ C  Cosine bell
                    JUMPOUT=.TRUE.
 * Change units
 *   Get original units and use these as a default
-                   CALL BDA_GETUNITS(ILOC,DUNIT,STATUS)
+                   CALL BDI_GETUNITS(IFID,DUNIT,STATUS)
 *
 *   Reset status if gone bad.
                    IF (STATUS .NE. SAI__OK) STATUS=SAI__OK
@@ -498,7 +489,7 @@ C  Cosine bell
                    CALL USI_DEF0C('MSK_NEWUNITS',DUNIT,STATUS)
 *
                    CALL USI_GET0C('MSK_NEWUNITS',DUNIT,STATUS)
-                   CALL BDA_PUTUNITS(OLOC,DUNIT,STATUS)
+                   CALL BDI_PUTUNITS(OFID,DUNIT,STATUS)
 *
                    IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -549,7 +540,7 @@ C  Cosine bell
      :      NELS(1),NELS(2),NELS(3),NELS(4),LDQUAL,LDVAR,EMETH,START1,
      :         END1,START2,END2,START_DATA,END_DATA,START_ERR,END_ERR,
      :     %VAL(EBUFP),%VAL(ABUFP),%VAL(QBUFP),%VAL(RESP),%VAL(ERESP),
-     :        %VAL(ETEMPP),%VAL(QPNTR),BADBITS,%VAL(DPNTR),%VAL(VPNTR))
+     :        %VAL(ETEMPP),%VAL(QPNTR),%VAL(DPNTR),%VAL(VPNTR))
 
 *    Smooth in second direction
       IF ( IDIM1 .GT. 0 ) THEN
@@ -557,27 +548,24 @@ C  Cosine bell
      :       NELS(1),NELS(2),NELS(3),NELS(4),LDQUAL,LDVAR,EMETH,START1,
      :       END1,START2,END2,START_DATA,END_DATA,START_ERR,END_ERR,
      :      %VAL(EBUFP),%VAL(ABUFP),%VAL(QBUFP),%VAL(RESP),%VAL(ERESP),
-     :        %VAL(ETEMPP),%VAL(QPNTR),BADBITS,%VAL(DPNTR),%VAL(VPNTR))
+     :        %VAL(ETEMPP),%VAL(QPNTR),%VAL(DPNTR),%VAL(VPNTR))
       END IF
 
 *    Update the history.
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
-        PATH(NLINES+1)='Smoothed with a '//MASK(1:CHR_LEN(MASK))//
-     &                                                         ' mask'
-
-        CALL CHR_RTOC(WDTH,CWDTH,IDUM)
-*
-        PATH(NLINES+2)='of width ' // CWDTH(1:IDUM) // ' pixels'
-*
-        IF (IDO .EQ. 1) THEN
-           PATH(NLINES+3)='Bad quality data have been set to zero'
-        ELSE
-           PATH(NLINES+3)='Bad quality data have been interpolated'
-        ENDIF
+      CALL MSG_SETC( 'MAS', MASK )
+      CALL MSG_SETR( 'WID', WDTH )
+      CALL MSG_MAKE( 'Smoothed with a ^MAS mask of width ^WID pixels',
+     :               PATH(NLINES+1), IDUM )
+      IF (IDO .EQ. 1) THEN
+        PATH(NLINES+2)='Bad quality data have been set to zero'
+      ELSE
+        PATH(NLINES+2)='Bad quality data have been interpolated'
+      END IF
 
 *    Write input file and action into history
-      CALL HIST_PTXT(OLOC,NLINES+3,PATH,STATUS)
+      CALL HSI_PTXT( OFID, NLINES+2, PATH, STATUS )
 
 *    Tidy up
  999  CALL AST_CLOSE
@@ -591,7 +579,7 @@ C  Cosine bell
      :             NELS1,NELS2,NELS3,NELS4,LDQUAL,LDVAR,EMETH,
      :             START1,END1,START2,END2,START_DATA,END_DATA,
      :             START_ERR,END_ERR,EBUF,
-     :             ABUF,QBUF,RES,ERES,ETEMP,QUAL,BADBITS,ARRAY,VAR)
+     :             ABUF,QBUF,RES,ERES,ETEMP,QUAL,ARRAY,VAR)
 * Description :
 * History :
 *   Modified M Denby 1987-Apr to be compatible with new QCL
@@ -601,7 +589,7 @@ C  Cosine bell
 * Type Definitions :
         IMPLICIT NONE
 * Global constants :
-        INCLUDE 'QUAL_PAR'
+      INCLUDE 'QUAL_PAR'
 * Import :
         INTEGER LMASK                    !Size of mask
         REAL RMASK(LMASK)                !Smoothing mask
@@ -623,12 +611,9 @@ C  Cosine bell
         REAL ERES(NWORK)                 ! Workspace
         REAL ETEMP(NWORK)                ! Workspace
         BYTE QUAL(NELS1,NELS2,NELS3,NELS4)  ! Quality array
-        BYTE BADBITS                        ! Quality mask
 * Import-Export :
 	REAL ARRAY(NELS1,NELS2,NELS3,NELS4) ! Data array
 	REAL VAR (NELS1,NELS2,NELS3,NELS4)  ! Variance array
-* Export :
-* Local constants :
 * Local variables :
 	REAL RMASK2(512)                            ! Square of smoothing mask
 	INTEGER IGAPS(250),IGAPE(250),IND(4),ILOOP(4)
@@ -638,131 +623,141 @@ C  Cosine bell
         INTEGER NGAP,IGAP,NXT,NGG
         INTEGER DIMS(4)                     ! Dimensions loop
 *-
-* Set up a dimensions array
-        DIMS(1)=NELS1
-        DIMS(2)=NELS2
-        DIMS(3)=NELS3
-        DIMS(4)=NELS4
-*
-* Set up useful numbers
-	LM2=LMASK/2
-* Calculate square of mask if errors present
-	IF(LDVAR) THEN
-		DO LM = 1, LMASK
-		    RMASK2(LM) = RMASK(LM) ** 2
-		ENDDO
-	ENDIF
-* Set up loop variables, inner loop must be dimension requested
-	II=0
-	DO J=1,4
-		IF(IDIM.NE.J) THEN
-			II=II+1
-			ILOOP(II)=J
-		ENDIF
-	ENDDO
-	LDIM=NWORK
-	DO J=1,DIMS(ILOOP(1))
-	     IND(ILOOP(1))=J
-          DO K=1,DIMS(ILOOP(2))
-	     IND(ILOOP(2))=K
-             DO L=1,DIMS(ILOOP(3))
-		IND(ILOOP(3))=L
-*
-* This inner loop extracts slice from requested dimension
-		DO I=1,LDIM
-		   IND(IDIM)=I
-		   ABUF(I)=ARRAY(IND(1),IND(2),IND(3),IND(4))
-		   IF(LDVAR) THEN
-		      EBUF(I)=VAR(IND(1),IND(2),IND(3),IND(4))
-		   ENDIF
-                   IF (LDQUAL) THEN
-		      QBUF(I)=QUAL(IND(1),IND(2),IND(3),IND(4))
-		   ENDIF
-		ENDDO
-* Now scan for gaps, tabulate them
-		IF(LDQUAL) THEN
-		   NGAP=0
-		   IGAP=0
-		   NXT=1
-*
-* Check quality of each pixel
-		   DO JJ=1,LDIM
-		      IF( (QBUF(JJ) .AND. BADBITS) .NE. QUAL_GOOD ) THEN
-		          ETEMP(JJ)=EBUF(JJ)
-		          EBUF(JJ)=0.0
-		          IF(IGAP.EQ.0) THEN
-		              IGAP=1
-			      NGAP=NGAP+1
-			      IGAPS(NGAP)=NXT-1
-		          ENDIF
-		      ELSE
-		          IF(IGAP.EQ.1) THEN
-			      IGAP=0
-			      IGAPE(NGAP)=NXT
-			  ENDIF
-		      ENDIF
-		      NXT=NXT+1
-		   ENDDO
-* Fudge if starts with a gap
-		   IF(IGAPS(1).EQ.0) THEN
-		      ABUF(0)=ABUF(IGAPE(1))
-		   ENDIF
-* Fudge if ends with a gap, use start value
-		   IF(IGAP.EQ.1) THEN
-		      IGAPE(NGAP)=LDIM+1
-		      ABUF(LDIM+1)=ABUF(IGAPS(NGAP))
-		   ENDIF
 
-* Interpolate across gaps - if this is the first smooth
-                   IF (FIRST) THEN
-	              DO JJ=1,NGAP
-                         RE=ABUF(IGAPE(JJ))
-		         RS=ABUF(IGAPS(JJ))
-		         NGG=IGAPE(JJ)-IGAPS(JJ)
-		         RW=(RE-RS)/FLOAT(NGG)
-		         DO KK=1,NGG-1
-		            ABUF(IGAPS(JJ)+KK)=ABUF(IGAPS(JJ))+
-     +		    	    RW*REAL(KK)
-		         ENDDO
-		      ENDDO
-		   ENDIF
-*
-		ENDIF
-*
-* Fill out start with first value and end with last value
-                CALL SMOOTH_SETENDS(EMETH, START1, END1, START2, END2,
-     &                   START_DATA, END_DATA, START_ERR, END_ERR,
-     &                   NWORK, LM2, LDIM, QBUF, ABUF, EBUF)
-*
-* Do the crosscorrelation
-		CALL SMOOTH_CORR(ABUF(1-(LM2-1)),RMASK,LMASK,LDIM,RES)
-		IF(LDVAR) THEN
-		   CALL SMOOTH_CORR(EBUF(1-(LM2-1)),RMASK2,LMASK,LDIM,
-     &                                                           ERES)
-		ENDIF
-* Mask out non-exposed stuff if not reinstating gaps
-		IF(IDO.EQ.1.AND.LDQUAL) THEN
-			DO JJ=1,NGAP
-				NGG=IGAPE(JJ)-IGAPS(JJ)
-				DO KK=1,NGG-1
-					RES(IGAPS(JJ)+KK)=0.0
-				ENDDO
-			ENDDO
-		ENDIF
-*
-* Put back in data and error arrays
-		DO I=1,LDIM
-			IND(IDIM)=I
-			ARRAY(IND(1),IND(2),IND(3),IND(4))=RES(I)
-			IF(LDVAR) THEN
-			   VAR(IND(1),IND(2),IND(3),IND(4))=ERES(I)
-			ENDIF
-		ENDDO
-             ENDDO
-          ENDDO
-	ENDDO
-*
-	END
+*  Set up a dimensions array
+      DIMS(1)=NELS1
+      DIMS(2)=NELS2
+      DIMS(3)=NELS3
+      DIMS(4)=NELS4
+
+*  Set up useful numbers
+      LM2 = LMASK/2
+
+*  Calculate square of mask if errors present
+      IF ( LDVAR ) THEN
+	DO LM = 1, LMASK
+	  RMASK2(LM) = RMASK(LM) ** 2
+	END DO
+      END IF
+
+*  Set up loop variables, inner loop must be dimension requested
+      II=0
+      DO J=1,4
+        IF ( IDIM .NE. J ) THEN
+	  II = II + 1
+	  ILOOP(II)=J
+	END IF
+      END DO
+      LDIM = NWORK
+      DO J=1,DIMS(ILOOP(1))
+	IND(ILOOP(1))=J
+        DO K=1,DIMS(ILOOP(2))
+	  IND(ILOOP(2))=K
+          DO L=1,DIMS(ILOOP(3))
+	    IND(ILOOP(3))=L
+
+*        This inner loop extracts slice from requested dimension
+	    DO I=1,LDIM
+	      IND(IDIM)=I
+	      ABUF(I)=ARRAY(IND(1),IND(2),IND(3),IND(4))
+	      IF ( LDVAR ) THEN
+		EBUF(I)=VAR(IND(1),IND(2),IND(3),IND(4))
+	      END IF
+              IF ( LDQUAL ) THEN
+		QBUF(I) = QUAL(IND(1),IND(2),IND(3),IND(4))
+              ELSE
+                QBUF(I) = QUAL__GOOD
+	      END IF
+	    END DO
+
+*        Now scan for gaps, tabulate them
+	    IF ( LDQUAL ) THEN
+	      NGAP = 0
+	      IGAP = 0
+
+*        Check quality of each pixel
+	      DO JJ = 1, LDIM
+
+*            Pixel is bad?
+		IF ( QBUF(JJ) .NE. QUAL__GOOD ) THEN
+		  ETEMP(JJ) = EBUF(JJ)
+		  EBUF(JJ)=0.0
+		  IF ( IGAP .EQ. 0 ) THEN
+		    IGAP = 1
+		    NGAP = NGAP + 1
+		    IGAPS(NGAP) = JJ - 1
+		  END IF
+		ELSE
+		  IF ( IGAP .EQ. 1 ) THEN
+		    IGAP = 0
+		    IGAPE(NGAP) = JJ
+		  END IF
+		END IF
+
+	      END DO
+
+*          Fudge if starts with a gap
+	      IF ( IGAPS(1) .EQ. 0 ) THEN
+		ABUF(0) = ABUF(IGAPE(1))
+	      END IF
+
+*          Fudge if ends with a gap, use start value
+	      IF ( IGAP .EQ. 1 ) THEN
+		IGAPE(NGAP) = LDIM + 1
+		ABUF(LDIM+1) = ABUF(IGAPS(NGAP))
+	      END IF
+
+*          Interpolate across gaps - if this is the first smooth
+              IF ( FIRST ) THEN
+	        DO JJ=1,NGAP
+                  RE = ABUF(IGAPE(JJ))
+		  RS = ABUF(IGAPS(JJ))
+		  NGG = IGAPE(JJ)-IGAPS(JJ)
+		  RW = (RE-RS)/FLOAT(NGG)
+		  DO KK = 1, NGG-1
+		    ABUF(IGAPS(JJ)+KK)=ABUF(IGAPS(JJ)) + RW*REAL(KK)
+		  END DO
+		END DO
+	      END IF
+
+*        End of test if quality present
+	    END IF
+
+*        Fill out start with first value and end with last value
+            CALL SMOOTH_SETENDS(EMETH, START1, END1, START2, END2,
+     :                   START_DATA, END_DATA, START_ERR, END_ERR,
+     :                   NWORK, LM2, LDIM, QBUF, ABUF, EBUF)
+
+*        Do the crosscorrelation
+	    CALL SMOOTH_CORR(ABUF(1-(LM2-1)),RMASK,LMASK,LDIM,RES)
+	    IF ( LDVAR ) THEN
+	      CALL SMOOTH_CORR(EBUF(1-(LM2-1)),RMASK2,LMASK,LDIM, ERES)
+	    END IF
+
+*        Mask out non-exposed stuff if not reinstating gaps
+	    IF ( (IDO.EQ.1) .AND. LDQUAL ) THEN
+	      DO JJ = 1, NGAP
+		NGG = IGAPE(JJ)-IGAPS(JJ)
+		DO KK = 1, NGG-1
+		  RES(IGAPS(JJ)+KK) = 0.0
+		END DO
+	      END DO
+	    END IF
+
+*        Put back in data and error arrays
+	    DO I = 1, LDIM
+	      IND(IDIM) = I
+	      ARRAY(IND(1),IND(2),IND(3),IND(4)) = RES(I)
+	      IF ( LDVAR ) THEN
+		VAR(IND(1),IND(2),IND(3),IND(4)) = ERES(I)
+	      END IF
+	    END DO
+          END DO
+        END DO
+
+      END DO
+
+      END
 
 
 *+ SMOOTH_CORR - Cross-correlates a data array with a mask.
@@ -827,7 +822,6 @@ C  Cosine bell
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       CHARACTER*(*) EMETH               ! End processing method
       INTEGER START1,END1               ! Pixels to use in finding mean
@@ -876,7 +870,7 @@ C  Cosine bell
             END_DATA=ABUF(NVAL)
             START_ERR=EBUF(1)
             END_ERR=EBUF(NVAL)
-*
+
       END IF
 *
 * Set the end values
@@ -928,7 +922,7 @@ C  Cosine bell
 
       DO LOOP = START, STOP
 *
-         IF (QUALITY(LOOP) .EQ. QUAL_GOOD) THEN
+         IF (QUALITY(LOOP) .EQ. QUAL__GOOD) THEN
             SUM = SUM + DATA(LOOP)
             SUMERR = SUMERR + ERROR(LOOP)
             COUNT = COUNT + 1
@@ -945,6 +939,7 @@ C  Cosine bell
       ENDIF
 *
       END
+
 
 *+  SMOOTH_ENDS - Obtain option for dealing with the ends of the data.
       SUBROUTINE SMOOTH_ENDS( NVAL, ENDS, START1, END1, START2, END2,
@@ -992,8 +987,6 @@ C  Cosine bell
 *    Local Constants :
 *    Local variables :
       INTEGER            NUMPIX                                         ! Number of pixels.
-      INTEGER            START                                          ! Start of region to average over.
-      INTEGER            FINISH                                         ! End of region to average over.
 
       LOGICAL            INPUT                                          ! Is input required?
 *-
