@@ -41,9 +41,9 @@ figaro1_LDADD = $(LDADD) \
 ../fig/libfig.la \
 ../fda/libfda.la \
 ../jty/libjty.la \
-../tio/libtio.la \
-../gen/libgen.la \
+../tio/libfigtio.la \
+../gen/libfiggen.la \
 ../gkd/libgkd.la \
 ../par/libfigpar.la \
-../ich/libich.la \
+../ich/libfigich.la \
 `pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`

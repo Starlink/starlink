@@ -20,13 +20,13 @@ CODELESSTASKS = iscruni
 figaro3_LDADD = $(LDADD) \
 ../appsub/libappsub.la \
 ../fig/libfig.la \
-../tio/libtio.la \
+../tio/libfigtio.la \
 ../fla/libfla.la \
 ../fda/libfda.la \
 ../jty/libjty.la \
-../gen/libgen.la \
+../gen/libfiggen.la \
 ../gkd/libgkd.la \
 ../par/libfigpar.la \
-../ich/libich.la \
+../ich/libfigich.la \
 `pda_link`  `agp_link_adam` `grp_link_adam` `ndf_link_adam` \
 `fio_link_adam` 
