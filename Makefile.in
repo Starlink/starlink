@@ -19,6 +19,7 @@ MANIFEST=$(prefix)/manifests
 ALL_TARGETS = \
 	$(MANIFEST)/adam \
 	$(MANIFEST)/ams \
+	$(MANIFEST)/ard \
 	$(MANIFEST)/atimer \
 	$(MANIFEST)/chr \
 	$(MANIFEST)/cnf \
@@ -34,6 +35,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/messys \
 	$(MANIFEST)/misc \
 	$(MANIFEST)/msp \
+	$(MANIFEST)/ndg \
 	$(MANIFEST)/par \
 	$(MANIFEST)/parsecon \
 	$(MANIFEST)/psx \
