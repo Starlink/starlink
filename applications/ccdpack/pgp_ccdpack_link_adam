@@ -1,7 +1,6 @@
-#!/bin/sh
 
 #  Name:
-#     ccdpack_link_adam-pgp
+#     pgp_ccdpack_link_adam
 
 #  Purpose:
 #     Link against CCDPACK libraries and plotting.
