@@ -22,6 +22,7 @@
  *
  */
 
+#include <string.h>
 
 #include <tk.h>
 #include <tixPort.h>
