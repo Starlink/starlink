@@ -34,13 +34,23 @@
 *        The value used to replace bad pixels in the NDF's data array
 *        before it is copied to the IRAF file.  A null value (!) means
 *        no replacements are to be made.  This parameter is ignored if
-*        there are no bad values.  [!]
+*        there are no bad values.  [0]
 *     OUT = LITERAL (Write)
 *        The name of the output IRAF image.  Two files are produced
 *        with the same name but different extensions. The ".pix" file
 *        contains the data array, and ".imh" is the associated header
 *        file that may contain a copy of the NDF's FITS extension.
 *        The suggested default is the current value.
+*     PROFITS = _LOGICAL (Read)
+*        If TRUE, the contents of the FITS extension of the NDF are
+*        merged with the header information derived from the standard
+*        NDF components.  See the Notes for details of the merger.
+*        [TRUE]
+*     PROHIS = _LOGICAL (Read)
+*        If TRUE, any NDF history records are written to the primary
+*        FITS header as HISTORY cards.  These follow the mandatory
+*        headers and any merged FITS-extension headers (see parameter
+*        PROFITS).  [TRUE]
 
 *  Examples:
 *     ndf2iraf abell119 a119
@@ -48,23 +58,64 @@
 *        the pixel file a119.pix and the header file a119.imh.  If there
 *        are any bad values present they are copied verbatim to the IRAF
 *        image.
+*     ndf2iraf abell119 a119 noprohis
+*        As the previous example, except that NDF HISTORY records are
+*        not transferred to the headers in a119.imh.
 *     ndf2iraf qsospe qsospe fillbad=0
 *         Converts the NDF called qsospe to an IRAF image comprising the
 *         pixel file qsospe.imh and the header file qsospe.pix.  Any bad
 *         values in the data array are replaced by zero.
+*     ndf2iraf qsospe qsospe fillbad=0 profits=f
+*        As the previous example, except that any FITS airlock
+*        information in the NDF are not transferred to the headers in
+*        qsospe.imh.
 
 *  Notes:
 *     The rules for the conversion are as follows:
-*     -  The NDF data array is copied to the ".pix" file.
-*     -  The NDF title is written to the header object i_title in
-*     the ".imh" header file.  There is a limit of twenty characters.
+*     -  The NDF data array is copied to the ".pix" file.  Ancillary
+*     information listed below is written to the ".imh" header file in
+*     FITS-like headers.
+*     -  The IRAF "Mini World Coordinate System" (MWCS) is used to
+*     record axis information whenever one of the following criteria is
+*     satisfied:
+*
+*        1) the dataset has some linear axes (system=world);
+*
+*        2) the dataset is one-dimensional with a non-linear axis, or is
+*           two-dimensional with the first axis non-linear and the
+*           second being some aperture number or index
+*           (system=multispec);
+*
+*        3) the dataset has a linear spectral/dispersion axis along the
+*           first dimension and all other dimensions are pixel indices
+*           (system=equispec).
+*
+*     -  The NDF title, label, units are written to the header keywords
+*     TITLE, OBJECT, and BUNIT respectively if they are defined.
+*     Otherwise anys values for these keywords found in the FITS
+*     extension are used (provided parameter PROFITS is TRUE).  There
+*     is a limit of twenty characters for each.
+*     -  The NDF pixel origins are stored in keywords LBOUNDn for the
+*     nth dimension when any of the pixel origins is not equal to 1.
+*     -  Keywords HDUCLAS1, HDUCLASn are set to "NDF" and the
+*     array-component name respectively.
+*     -  The BLANK keyword is set to the Starlink standard bad value,
+*     but only for the _WORD data type and not for a quality array.  It
+*     appears regardless of whether or not there are bad values
+*     actually present in the array.
+*     -  HISTORY headers are propagated from the FITS extension when
+*     PROFITS is TRUE, and from the NDF history component when PROHIS
+*     is TRUE.
 *     -  If there is a FITS extension in the NDF, then the elements up
 *     to the first END keyword of this are added to the `user area' of
-*     the IRAF header file.
+*     the IRAF header file, when PROFITS=TRUE.  However, certain
+*     keywords are excluded: SIMPLE, NAXIS, NAXISn, BITPIX, EXTEND,
+*     PCOUNT, GCOUNT, BSCALE, BZERO, END, and any already created from
+*     standard components of the NDF listed above.
 *     -  A HISTORY record is added to the IRAF header file indicating
 *     that it originated in the named NDF and was converted by
 *     NDF2IRAF.
-*     -  All other NDF components are ignored.
+*     -  All other NDF components are not propagated.
 
 *  Related Applications:
 *     CONVERT: IRAF2NDF.
@@ -80,17 +131,12 @@
 *     It is possible that these may be changed in the future, so
 *     beware.
 
-*  Prior Requirements:
-*     This routine can only be linked on a machine which has the IRAF
-*     system installed, or access to the object libraries required.
-
 *  Implementation Status:
-*     -  It is only supported for sun4\_Solaris and alpha\_OSF1 systems.
 *     -  Only handles one-, two-, and three-dimensional NDFs.
 *     -  Of the NDF's array components only the data array may be
 *     copied.
 *     -  The IRAF image produced has type SIGNED WORD or REAL dependent
-*     of the type of the NDF's data array.  (The IRAF imfort FORTRAN
+*     of the type of the NDF's data array.  (The IRAF IMFORT FORTRAN
 *     subroutine library only supports these data types.)  For _BYTE,
 *     _UBYTE, and _WORD data arrays the IRAF image will have type
 *     SIGNED WORD; for all other data types of the NDF data array a
@@ -108,7 +154,8 @@
 *     IRAF IMFORT subroutine library.
 *
 *  References:
-*     IRAF IMFORT subroutine library manual.
+*     IRAF User Handbook Volume 1A: "A User's Guide to FORTRAN
+*     Programming in IRAF, the IMFORT Interface", by Doug Tody.
 
 *  Keywords:
 *     CONVERT, IRAF
@@ -129,6 +176,17 @@
 *        Added FILLBAD option, full support for one-dimensional NDFs,
 *        allow conversion of cubes, and able to make a signed-word IRAF
 *        image.
+*     1997 March 28 (MJC):
+*        Writes keywords for the label, units, axes, history, origin,
+*        bad value, and class.  Avoid duplication of keywords when merging
+*        the FITS extension.  Control of propagation of the history
+*        records and the FITS extension.  Used more efficient workspace
+*        mechanism.  Restriction to lowercase IRAF file names removed.
+*        Parameter FILLBAD defaults to 0.
+*     1997 July 31 (MJC):
+*        No longer write an END header.  The END keyword is not
+*        significant in the IRAF headers, and additional headers may be
+*        written following it.  Added examples.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,7 +210,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      LOGICAL CHR_EQUAL          ! CHR routine to test string equality
       INTEGER * 2 VAL_RTOW       ! Converts real value to word data type
 
 *  Local Constants:
@@ -174,8 +231,7 @@
       INTEGER EL                 ! Number of pixels in image
       INTEGER ERR                ! IMFORT error code
       REAL FILBAD                ! Value to replace bad pixels
-      INTEGER FIPNTR( 1 )        ! Pointer to mapped FITS extension.
-      CHARACTER * ( DAT__SZLOC ) FITLOC ! Locator to the FITS extension
+      LOGICAL HISPRE             ! History records present?
       INTEGER IMDESC             ! The image descriptor returned by
                                  ! IMOPEN()
       CHARACTER * ( STRLEN ) IMERRM ! IMFORT error message text
@@ -186,8 +242,6 @@
       LOGICAL ISBAD              ! True if the mapped data array
                                  ! contains bad values
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Type used to map the NDF
-      INTEGER J                  ! Loop counter over the number of
-                                 ! lines in an image.
       INTEGER JUNKIT             ! Integer to absorb unwanted output
                                  ! form PSX_LOCALTIME()
       INTEGER LBND( NDIM )       ! Lower bounds array
@@ -197,19 +251,15 @@
       INTEGER MDIM               ! Number of dimensions of the NDF
       INTEGER NAMELN             ! Variable to absorb an unwanted
                                  ! integer returned by MSG_LOAD.
-      INTEGER NCARDS             ! The number of header lines in the
-                                 ! FITS extension.
       INTEGER NDF                ! Identifier for input NDF
-      INTEGER NDFT               ! Identifier for temporary NDF
       INTEGER NREP               ! The number of bad values replaced
       INTEGER NTICKS             ! Integer returned by PSX_TIME()
-      INTEGER PLACE              ! Placeholder to the temporary NDF
       INTEGER PNTR( 1 )          ! Pointer for the input data array
       INTEGER PNTRT( 1 )         ! Pointer for the temporary data array
+      LOGICAL PROFIT             ! Propagate the FITS extension?
+      LOGICAL PROHIS             ! Propagate the history records?
       LOGICAL REPBAD             ! True if there are bad values to
                                  ! replace
-      LOGICAL THERE              ! True if there is a FITS extension
-      CHARACTER * ( 132 ) TITLE  ! Title of the NDF 
       CHARACTER * ( 25 ) TSTRING ! The current time and data as
                                  ! returned by PSX_ASCTIME()
       INTEGER TSTRUCT            ! The time structure from
@@ -228,6 +278,12 @@
 
 *  Initialise the IRAF status.
       ERR = 0
+
+*  Determine whether or not the FITS extension is to be merged.
+      CALL PAR_GET0L( 'PROFITS', PROFIT, STATUS )
+
+*  Determine whether or not the HISTORY component is to be propagated.
+      CALL PAR_GET0L( 'PROHIS', PROHIS, STATUS )
 
 *  Access the input NDF and find its shape.
 *  ========================================
@@ -331,16 +387,18 @@
 *  ==========================================
       IF ( REPBAD ) THEN
 
-*  Get a temporary NDF in which we can replace the bad values by the
-*  nominated value.
-         CALL NDF_TEMP( PLACE, STATUS )
-         CALL NDF_NEW( ITYPE, NDIM, LBND, UBND, PLACE, NDFT, STATUS )
-
-*  Map the temporary NDF.
-         CALL NDF_MAP( NDFT, 'Data', ITYPE, 'WRITE', PNTRT, EL, STATUS )
+*  Call PSX_CALLOC() for a one-dimensional array of the appropriate
+*  data type in which to replace the bad values with the nominated
+*  value.  As a temporary measure until PSX_CALLOC supports _WORD type
+*  we have to call PSX_MALLOC instead.
+         IF ( ITYPE .EQ. '_WORD' ) THEN
+            CALL PSX_MALLOC( EL * VAL__NBW, PNTRT, STATUS )
+         ELSE
+            CALL PSX_CALLOC( EL, ITYPE, PNTRT, STATUS )
+         END IF
 
 *  Call the appropriate routine to copy the data array from the original
-*  to the temporary NDF, and substitute the bad values.
+*  to the workspace, and substitute the bad values.
          IF ( ITYPE .EQ. '_WORD' ) THEN
 
 *  Use VAL_ to protect against potentionally harmful values when there
@@ -379,9 +437,6 @@
 *  name of the IRAF image.
       CALL PAR_GET0C( 'OUT', IRAFIL, STATUS )
 
-*  Covert the file name to lower case.
-      CALL CHR_LCASE( IRAFIL )
-      
 *  Create the IRAF image.
       CALL IMCREA( IRAFIL, DIMS, MDIM, IMTYPE, ERR )
       IF ( ERR .NE. 0 ) GOTO 999
@@ -396,9 +451,9 @@
       IF ( ERR .NE. 0 ) GOTO 999
 
 *  Call PSX_CALLOC() for a one-dimensional array of the appropriate
-*  data type to hold each line of the image.
-*  As a temporary measure until PSX_CALLOC supports _WORD type we have
-*  to call PSX_MALLOC instead.
+*  data type to hold each line of the image.  As a temporary measure
+*  until PSX_CALLOC supports _WORD type we have to call PSX_MALLOC
+*  instead.
       IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL PSX_MALLOC( DIMS( 1 ) * VAL__NBW, LIPNTR, STATUS )
       ELSE
@@ -433,9 +488,10 @@
 *  Free the CALLOCked array.
       CALL PSX_FREE( LIPNTR, STATUS )
 
-*  Unmap the NDF if it has not already been unmapped.
+*  Unmap the NDF if it has not already been unmapped, or the workspace
+*  when bad pixels had to be substituted.
       IF ( REPBAD ) THEN
-         CALL NDF_UNMAP( NDFT, 'Data', STATUS )
+         CALL PSX_FREE( PNTRT, STATUS )
       ELSE
          CALL NDF_UNMAP( NDF, 'Data', STATUS )
       END IF
@@ -444,46 +500,24 @@
 *  copying the array tothe IRAF file.
       IF ( ERR .NE. 0 ) GOTO 999
 
-*  Propagate the title.
-*  ====================
-
-*  Set the title of the IRAF image to the same as that of the NDF.
-*  Use a longer title to prevent an error as there is an NDF_ bug.
-*  Longer text should be truncated with an ellpsis inserted, but
-*  currently that does not happen.
-      CALL NDF_CGET( NDF, 'Title', TITLE, STATUS )
-
-*  Need to use the IMPKWC() routine to set already existing keyword and
-*  standard header keywords.
-      CALL IMPKWC( IMDESC, 'i_title', TITLE( :20 ), ERR )
-      IF ( ERR .NE. 0 .OR. STATUS .NE. SAI__OK ) GOTO 999
-      
-*  Dealing with FITS extension if it exists.
-*  =========================================
-
-*  See whether or not there is a FITS extension.
-      CALL NDF_XSTAT( NDF, 'FITS', THERE, STATUS )
-      IF ( THERE ) THEN
-
-*  Get a locator for the FITS extension. 
-         CALL NDF_XLOC( NDF, 'FITS', 'READ', FITLOC, STATUS )
-
-*  Map the FITS extension
-         CALL DAT_MAPV( FITLOC, '_CHAR*80', 'READ', FIPNTR, NCARDS,
-     :                  STATUS )
-
-*  Pass to the routine ADDFITS() which will add the lines to the IRAF
-*  image.  Add length for UNIX.
-         CALL CON_AFHIR( NCARDS, %VAL( FIPNTR( 1 ) ), IMDESC, STATUS,
-     :                   %VAL( FITSLN ) )
-
-*  Unmap the FITS extension and tidy the locator.
-         CALL DAT_ANNUL( FITLOC, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
+*  Propagate ancillary information to the header file.
+*  ===================================================
+      IF ( ITYPE .EQ. '_WORD' ) THEN
+         CALL COI_WHEAD( NDF, 'Data', IMDESC, 16, PROFIT, STATUS )
+      ELSE
+         CALL COI_WHEAD( NDF, 'Data', IMDESC, -32, PROFIT, STATUS )
       END IF
+
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
 
 *  Write HISTORY to the IRAF image.
 *  ================================
+      CALL NDF_STATE( NDF, 'History', HISPRE, STATUS )
+      IF ( PROHIS .AND. HISPRE ) CALL COI_WHISR( NDF, IMDESC, STATUS )
+
+*  Write supplementary HISTORY to the IRAF image.
+*  ==============================================
 
 *  Update the history information of the IRAF image by adding a
 *  FITS-format HISTORY line to say where the image came from.
@@ -524,11 +558,6 @@
 *  Add the card image to the IRAF image.
       CALL ADLINE( IMDESC, LINE )
       
-*  Copy the 'END' keyword to the line and add it.
-      LINE = ' '
-      CALL CHR_MOVE( 'END', LINE )
-      CALL ADLINE( IMDESC, LINE )
-
 *  Close the IRAF image.
       CALL IMCLOS( IMDESC, ERR )
       
