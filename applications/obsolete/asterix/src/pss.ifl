@@ -47,6 +47,9 @@ INTERFACE PSS
   PARAMETER SREGION
     TYPE '_CHAR'
     PROMPT 'ARD input'
+    DEFAULT !
+    VPATH 'DEFAULT,PROMPT'
+    PPATH 'DEFAULT'
     HELP '^filename or direct text input'
   ENDPARAMETER
 
