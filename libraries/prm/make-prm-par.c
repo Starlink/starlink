@@ -692,6 +692,34 @@ const char* tohex(int size, Number* p)
     static char c[17];
     int i;
     static char *hexdigits = "0123456789ABCDEF";
+    unsigned char *bp;
+
+    assumption(sizeof(int64_t) <= 17-1,
+               "tohex assumes that 16 bytes is big enough for int64_t");
+
+    bp = (unsigned char*)&p->i;
+#if WORDS_BIGENDIAN
+    for (i=0; i<2*size; bp++) {
+        c[i++] = hexdigits[(*bp & 0xf0) >> 4];
+        c[i++] = hexdigits[*bp & 0x0f];
+    }
+    c[i] = '\0';
+#else /* WORDS_BIGENDIAN */
+    c[2*size] = '\0';
+    for (i=2*size-1; i>=0; bp++) {
+        c[i--] = hexdigits[*bp & 0x0f];
+        c[i--] = hexdigits[(*bp & 0xf0) >> 4];
+    }
+#endif /* WORDS_BIGENDIAN */
+
+    return c;
+}
+
+const char* xtohex(int size, Number* p)
+{
+    static char c[17];
+    int i;
+    static char *hexdigits = "0123456789ABCDEF";
 #if WORDS_BIGENDIAN
     unsigned char *bp;
 #else
