@@ -1,6 +1,6 @@
 interface AXSHOW
   parameter INP
-    type 'UNIV'
+    type 'LITERAL'
     position 1
     ppath 'GLOBAL'
     association '<->GLOBAL.BINDS'
