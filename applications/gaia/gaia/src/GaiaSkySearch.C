@@ -222,8 +222,9 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
   }
 
   if ( !cat_ || cat_->status() != 0 ) {
-    cat_ = NULL;
-    return error( "Failed to open catalog:", argv[0] );
+      if ( cat_->status() != 0 ) delete cat_;
+      cat_ = NULL;
+      return error( "Failed to open catalog:", argv[0] );
   }
 
   //  Set up feedback, if requested.
