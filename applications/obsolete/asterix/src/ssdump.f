@@ -686,13 +686,13 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
 
 *              Get the value
                 CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
-     :                             (I-1)*FIELD_ENELM(J) +
+     :                             ((I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_DVAL, STATUS )
                 CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
-     :                             (I-1)*FIELD_ENELM(J) +
+     :                             ((I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_RVAL, STATUS )
                 CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
-     :                             (I-1)*FIELD_ENELM(J) +
+     :                             ((I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_IVAL, STATUS )
 
 *              Error item
@@ -801,6 +801,8 @@ c     RECORD /FIELD/           FLD(*)                  ! Field data
       INTEGER                  PTR                     ! Mapped field data
       INTEGER                  SIZE                    ! Size of a type
       INTEGER                  WID                     ! Field width
+      INTEGER		       EDIMS(DAT__MXDIM)
+      INTEGER		       DIMS(DAT__MXDIM)
 
       LOGICAL                  FOUND                   ! Found field in table?
       LOGICAL                  GOT_ERRORS              ! Field erros to be used?
@@ -923,10 +925,13 @@ c     RECORD /FIELD/           FLD(*)                  ! Field data
             CALL SSO_LOCFLD( SLOC, FNAME, FLOC, STATUS )
 
 *          Get field data dimensions
-            CALL CMP_SHAPE( FLOC, 'DATA_ARRAY', DAT__MXDIM,
-     :                      FIELD_DIMS(NFLD), FIELD_NDIM(NFLD), STATUS )
-            CALL ARR_SUMDIM( FIELD_NDIM(NFLD)-1, FIELD_DIMS(NFLD),
-     :                                        FIELD_NELM(NFLD) )
+            DO I = 1, DAT__MXDIM
+              DIMS(I) = FIELD_DIMS(NFLD,I)
+            END DO
+            CALL CMP_SHAPE( FLOC, 'DATA_ARRAY', DAT__MXDIM, DIMS
+     :                      FIELD_NDIM(NFLD), STATUS )
+            CALL ARR_SUMDIM( FIELD_NDIM(NFLD)-1, DIMS,
+     :                       FIELD_NELM(NFLD) )
 
 *          Field units present?
             CALL DAT_THERE( FLOC, 'UNITS', OK, STATUS )
@@ -957,10 +962,13 @@ c     RECORD /FIELD/           FLD(*)                  ! Field data
 
 *          Field error data
             IF ( FIELD_ETHERE(NFLD) ) THEN
-              CALL CMP_SHAPE( FLOC, 'ERROR', DAT__MXDIM,
-     :                        FIELD_EDIMS(NFLD), FIELD_ENDIM(NFLD), STATUS )
-              CALL ARR_SUMDIM( FIELD_ENDIM(NFLD)-1, FIELD_EDIMS(NFLD),
-     :                                           FIELD_ENELM(NFLD) )
+              DO I = 1, DAT__MXDIM
+                EDIMS(I) = FIELD_EDIMS(NFLD,I)
+              END DO
+              CALL CMP_SHAPE( FLOC, 'ERROR', DAT__MXDIM, EDIMS,
+     :                        FIELD_ENDIM(NFLD), STATUS )
+              CALL ARR_SUMDIM( FIELD_ENDIM(NFLD)-1, EDIMS,
+     :                         FIELD_ENELM(NFLD) )
             ELSE
               FIELD_ENELM(NFLD) = 0
             END IF
