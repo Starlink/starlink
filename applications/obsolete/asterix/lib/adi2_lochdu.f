@@ -244,8 +244,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*2		STR			! NHDU in chars
-
       INTEGER			EID			! EXTENSIONS identifier
       INTEGER			NHDU			! HDU number
 
