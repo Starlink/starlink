@@ -116,7 +116,7 @@
 
 *  Get out if a null return has been given or a PAR__ABORT. Also quit
 *  after an unreasonble number of attempts.
-         IF ( STATUS .EQ. PAR__ABORT )THEN
+         IF ( STATUS .EQ. PAR__ABORT .OR. STATUS .EQ. PAR__NULL )THEN
             GO TO 99
          ELSE IF ( NTRY .GT. 10 ) THEN
             STATUS = SAI__ERROR
