@@ -333,7 +333,7 @@ C          NBINS = INBINS
          CALL ERR_FLUSH(STATUS)
       END IF
       CALL BDI_AXPUT0L( FFID, 1, 'Normalised', .TRUE., STATUS )
-      CALL BDI_AXPUT0L( FFID, 2, 'Normalised', .TRUE., STATUS )
+      CALL BDI_AXPUT0L( CFID, 1, 'Normalised', .TRUE., STATUS )
       CALL BDI_AXPUT0C( FFID, 1, 'Label', 'Phase', STATUS )
       CALL BDI_AXPUT0C( CFID, 1, 'Label', 'Period', STATUS )
       CALL BDI_AXPUT0C( CFID, 1, 'Units', 'seconds', STATUS )

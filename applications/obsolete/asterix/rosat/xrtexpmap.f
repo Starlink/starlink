@@ -205,7 +205,7 @@ c	From INTEGER to improve exposure time evaluation
       END IF
 
 *    Create output file
-      CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
 
 *    Get observation start time
       BASESC = HEAD.BASE_SCTIME
@@ -301,8 +301,8 @@ c	From INTEGER to improve exposure time evaluation
       CALL FTCLOS( LUN, STATUS )
       CALL FIO_PUNIT( LUN, STATUS )
 
-*    Output detector map?
-      CALL USI_TASSOCO( 'DETMAP', 'BINDS', MFID, STATUS )
+*  Output detector map?
+      CALL USI_CREAT( 'DETMAP', ADI__NULLID, MFID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         MAPCHK = .FALSE.
@@ -318,10 +318,8 @@ c	From INTEGER to improve exposure time evaluation
 
 *    Write detector map if needed
       IF ( MAPCHK ) THEN
-        CALL BDI_CREDATA( MFID, 2, DIMS, STATUS )
-        CALL BDI_MAPDATA( MFID, 'WRITE', MPTR, STATUS )
-        CALL ARR_COP1R( DIMS(1)*DIMS(2), RMAP, %VAL(MPTR), STATUS )
-        CALL BDI_RELEASE( MFID, STATUS )
+        CALL XRTEXPMAP_PUTIM( DIMS, PIXSIZE, RMAP,
+     :        'Detector map', ' ', ' ', OFID, STATUS )
         CALL USI_ANNUL( 'DETMAP', STATUS )
       END IF
 
@@ -588,7 +586,7 @@ C      MV      MV (master veto) count rate
 
       END DO
 
-*    Close files
+*  Close files
       CALL HDS_CLOSE( ATTLOC, STATUS )
       CALL HDS_CLOSE( EVRLOC, STATUS )
 
@@ -606,7 +604,7 @@ C      MV      MV (master veto) count rate
       CALL MSG_SETR( 'MV', TMV )
       CALL MSG_PRNT( 'Average master veto rate = ^MV ct/sec' )
 
-*    Sort on roll angle
+*  Sort on roll angle
       DO I=IA-1,2,-1
         DO II=1,I
           IF(IASP(3,II) .GT. IASP(3,II+1)) THEN
@@ -626,16 +624,16 @@ C      MV      MV (master veto) count rate
         END DO
       END DO
 
-*    Start the progress message
+*  Start the progress message
       CALL AIO_REWRITE( 0, 'NOCR', 'Progress : ', STATUS )
 
-*    Now cast the exposure
+*  Now cast the exposure
       NB = IA/20
       NG = 0
       NB1 = -100000
       DO I=1,IA
 
-*      Progress update
+*    Progress update
         IF(MOD(I,NB) .EQ. 0) THEN
           NG = NG + 1
           WRITE( LINE(1:5), '(I3,A)' ) NG*5, ' %'
@@ -696,28 +694,15 @@ C
             ENDDO
         ENDDO
 
-*    Terminate the rewrite
+*  Terminate the rewrite
       CALL AIO_REWRITE( 0, 'TERMINATE', 'DONE ', STATUS )
 
-*    Write exposure map
-      CALL BDI_CREAXES( OFID, 2, STATUS )
-      CALL BDI_PUTAXVAL( OFID, 1, (REAL(DIMS(1)/2)-0.5)*PIXSIZE/3600.0,
-     :                        -PIXSIZE/3600.0, DIMS(1), STATUS )
-      CALL BDI_PUTAXVAL( OFID, 2, -(REAL(DIMS(2)/2)-0.5)*PIXSIZE/3600.0,
-     :                          PIXSIZE/3600.0, DIMS(2), STATUS )
-      CALL BDI_PUTAXTEXT( OFID, 1, 'X position', 'degrees', STATUS )
-      CALL BDI_PUTAXTEXT( OFID, 2, 'Y position', 'degrees', STATUS )
-      CALL BDI_PUTLABEL( OFID, 'Exposure', STATUS )
-      CALL BDI_PUTUNITS( OFID, 'seconds', STATUS )
-      CALL BDI_PUTAXNORM( OFID, 1, .TRUE., STATUS )
-      CALL BDI_PUTAXNORM( OFID, 2, .TRUE., STATUS )
+*  Write exposure map
+      CALL XRTEXPMAP_PUTIM( DIMS, PIXSIZE, EXPARR,
+     :  'Exposure image', 'Exposure', 'seconds',
+     :  OFID, STATUS )
 
-      CALL BDI_CREDATA( OFID, 2, DIMS, STATUS )
-      CALL BDI_MAPDATA( OFID, 'WRITE', DPTR, STATUS )
-      CALL ARR_COP1R( DIMS(1)*DIMS(2), EXPARR, %VAL(DPTR), STATUS )
-      CALL BDI_RELEASE( OFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -824,6 +809,45 @@ C
         DO I = 1,N
           ORIGINAL(I) = NINT(SCALED(I)*7200.0)
         END DO
+      END IF
+
+      END
+
+
+      SUBROUTINE XRTEXPMAP_PUTIM( DIMS, PIXSIZ, DATA, TITLE, LABEL,
+     :                            UNITS, OFID, STATUS )
+      IMPLICIT NONE
+      CHARACTER*(*) TITLE,LABEL,UNITS
+      INTEGER       DIMS(2), OFID
+      REAL          PIXSIZ, DATA(*)
+      INTEGER       STATUS
+
+*  Create interface object
+      CALL BDI_LINK( 'Image', 2, DIMS, 'REAL', OFID, STATUS )
+
+*  Write regular axes
+      SPARR(1) = (REAL(DIMS(1)/2)-0.5)*PIXSIZ/3600.0
+      SPARR(2) = -PIXSIZ/3600.0
+      CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+      SPARR(1) = -(REAL(DIMS(2)/2)-0.5)*PIXSIZ/3600.0
+      SPARR(2) = PIXSIZ/3600.0
+      CALL BDI_AXPUT1R( OFID, 2, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'X position', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Units', 'degrees', STATUS )
+      CALL BDI_AXPUT0C( OFID, 2, 'Label', 'Y position', STATUS )
+      CALL BDI_AXPUT0C( OFID, 2, 'Units', 'degrees', STATUS )
+
+      CALL BDI_PUT0C( OFID, 'Label', LABEL, STATUS )
+      CALL BDI_PUT0C( OFID, 'Units', UNITS, STATUS )
+      CALL BDI_PUT0C( OFID, 'Title', TITLE, STATUS )
+      CALL BDI_AXPUT0L( OFID, 1, 'Normalised', .TRUE., STATUS )
+      CALL BDI_AXPUT0L( OFID, 2, 'Normalised', .TRUE., STATUS )
+
+*  Write data
+      CALL BDI_PUT( OFID, 'Data', 'REAL', NDIM, DIMS, DATA, STATUS )
+
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'XRTEXPMAP_PUTIUM', STATUS )
       END IF
 
       END
