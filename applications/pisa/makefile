@@ -621,17 +621,6 @@ $(PKG_NAME)_source.tar:
 	chmod 755 $(PUBLIC_SCRIPTS) $(LINK_SCRIPT)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(MAIN_SOURCE)
 
-$(DOCUMENTATION):
-	cp $(HOME)/pisa/extras/$(HYPERTEXT_DOCS:.htx=.htx_tar).gz ./
-	gunzip $(HYPERTEXT_DOCS:.htx=.htx_tar)
-	chmod 644 $(LATEX_DOCS) $(PKG_NAME).news
-
-$(DATA_FILES):
-	cp $(HOME)/pisa/extras/frame.sdf.gz ./
-	gunzip frame.sdf.gz
-	chmod 644 frame_stars.acc clustan.dat findinfo.dat \
-	         sizeinfo.dat peakinfo.dat
-
 #  Rules for extracting platform specific source files from the source
 #  archive.
 
