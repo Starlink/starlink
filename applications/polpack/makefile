@@ -435,7 +435,7 @@ pol1_vect.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f polbin.f \
 polcal.f polcent.f polexp.f polext.f polhelp.f polimp.f polka.f \
 polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f pol1_dbeam.f \
 pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f pol1_snghd.f \
-pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f
+pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f pol1_blocr.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -1456,6 +1456,7 @@ ndg_crexp.o:	 SAE_PAR GRP_PAR NDG_CONST PSX_ERR
 ndg_ndfas.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 ndg_ndfcr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 ndg_ndfpr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+pol1_blocr.o:	 SAE_PAR PRM_PAR
 pol1_cext.o:	 SAE_PAR
 pol1_chkex.o:	 SAE_PAR GRP_PAR DAT_PAR NDF_PAR AST_PAR
 pol1_clcat.o:	 SAE_PAR AST_PAR
