@@ -80,6 +80,8 @@ demo v1.0 {
       command {Obey ndfpack wcsframe "ndf=temp frame=pixel"}
       command {Obey kapview display "in=temp(-228:120,225:515) mode=perc percentiles=\[10,90\] lut=$KAPPA_DIR/warm_lut style=def accept"}
 
+      pause 3
+
       text "Graphics applications are no longer restricted to 8-bit
       displays, so you can now have different colour tables in one display."
 
@@ -145,13 +147,13 @@ demo v1.0 {
       the old TRANSFORMER application, with the difference that REGRID
       correctly propagates WCS information."
 
-      pause 6
+      pause 8
 
       text "The above right hand image of m57 has been created by resampling 
       the left hand image using REGRID so that the radius axis is horizontal and the
       angle axis is vertical."
 
-      pause 5
+      pause 7
 
       command {Obey kapview gdclear ""}
       text "The old commands for creating and editing colour tables have
