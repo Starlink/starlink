@@ -91,7 +91,7 @@
 *     LIKE = NDF (Read)
 *        A template NDF containing axis arrays. These arrays will be
 *        copied into the NDF given by parameter NDF. All axes are copied.
-*        The other parameters are only acceessed if a null (!) value is 
+*        The other parameters are only accessed if a null (!) value is 
 *        supplied for LIKE. If the NDF being modified extends beyond the
 *        edges of the template NDF, then the template axis arrays will be
 *        extrapolated to cover the entire NDF. This is done using linear
