@@ -4753,6 +4753,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       INCLUDE 'PAR_ERR'
       INCLUDE 'GRP_PAR'
       INCLUDE 'PRM_PAR'
+      INCLUDE 'FIO_ERR'
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -4806,12 +4807,15 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
             CALL FIO_OPEN(ARDIN,'READ','NONE',0,FID,STATUS)
             INDEX=0
             DO WHILE (STATUS.EQ.SAI__OK)
-              CALL FIO_READ(FID,ARDIN,STATUS)
+              CALL FIO_READF(FID,ARDIN,STATUS)
               IF (STATUS.EQ.SAI__OK) THEN
                 INDEX=INDEX+1
                 CALL GRP_PUT(GRPID,1,ARDIN,INDEX,STATUS)
               ENDIF
             ENDDO
+            IF (STATUS.EQ.FIO__EOF) THEN
+              CALL ERR_ANNUL(STATUS)
+            ENDIF
             CALL FIO_CLOSE(FID,STATUS)
 *  read from environment
           ELSE
@@ -4821,7 +4825,9 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
               CALL USI_CANCL(PAR1,STATUS)
               ARDIN=' '
               CALL USI_GET0C(PAR1,ARDIN,STATUS)
-              IF (STATUS.EQ.PAR__NULL) THEN
+              IF (ARDIN(1:1).EQ.CHAR(0)) THEN
+                ARDIN=' '
+              ELSEIF (STATUS.EQ.PAR__NULL) THEN
                 CALL ERR_ANNUL(STATUS)
                 ARDIN=' '
               ENDIF
