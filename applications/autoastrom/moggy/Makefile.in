@@ -43,6 +43,8 @@ OBJS=moggy.o CommandParse.o CatalogueHandler.o util.o
 $(EXEC): $(OBJS)
 	$(CXX) $(OBJS) $(LIBS) -o $@
 
+test: $(EXEC)
+	cd test; $(MAKE) test
 
 # Distribution
 configure: config/configure.in
@@ -68,14 +70,13 @@ depend:
 	for i in *.h; do \
 		echo "$$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >>depend.tmp;\
 	done
-	sed -e '/^# DO NOT DELETE/,$$d' -e '$$r depend.tmp' Makefile >Makefile.tmp
-	mv Makefile.tmp Makefile
+	sed -e '/^# DO NOT DELETE/,$$d' -e '$$r depend.tmp' Makefile.in >Makefile.tmp
+	mv Makefile.tmp Makefile.in
 	rm -f depend.tmp
 
 
 # DO NOT DELETE THIS LINE (it is used by make depend)
-CatalogueHandler.o: CatalogueHandler.C config.h stringstream.h \
-	CatalogueHandler.h util.h
+CatalogueHandler.o: CatalogueHandler.C config.h stringstream.h CatalogueHandler.h util.h
 CommandParse.o: CommandParse.C config.h CommandParse.h util.h
 moggy.o: moggy.C config.h moggy.h CommandParse.h CatalogueHandler.h util.h
 util.o: util.C util.h
