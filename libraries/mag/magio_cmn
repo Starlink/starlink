@@ -1,0 +1,21 @@
+*    Description :
+*     This file contains the MAGIO Common Block.   This is used by the
+*     environment-independent part of the MAG library.
+*    Global variables :
+      logical Magint			! MAG Initialised ?
+      logical Tfree(MAG__MXDEV)		! Whether slot used
+      integer Ttd(MAG__MXDEV)		! Physical Tape Descriptor
+      integer Tfile(MAG__MXDEV)		! current file number
+      logical Tstart(MAG__MXDEV)	! position in file
+      integer Tblock(MAG__MXDEV)	! block number relative to position
+      logical Tmod(MAG__MXDEV)		! whether status has changed
+
+      common /mag_io_1/ Magint, Tfree, Ttd, Tfile, Tstart, Tblock, Tmod
+      save /mag_io_1/
+
+      character*(MAG__SZNAM) Tname(MAG__MXDEV)	! Name of Tape device
+
+      common /mag_io_2/ Tname
+      save /mag_io_2/
+
+*-

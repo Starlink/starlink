@@ -1,0 +1,6 @@
+*    Description :
+*     This file contains the Internal Global Constants for MAG_SCL.
+*    Global constants :
+      integer MAG__MXPAR		! Maximum number of tape parameters
+      parameter(MAG__MXPAR=3)
+*-

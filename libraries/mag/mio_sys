@@ -1,0 +1,14 @@
+*    Description :
+*     This file contains the Internal Global Constants for MIO.
+*    Global constants :
+      integer MIO__MXDEV		! Maximum number of devices.
+      parameter(MIO__MXDEV=2)
+      integer MIO__SZNAM		! Maximum size of device name
+      parameter(MIO__SZNAM=15)
+      integer MIO__SZMOD		! Maximum size of access mode
+      parameter(MIO__SZMOD=15)
+      integer MIO__SZBUF		! Maximum size of block buffer
+      parameter(MIO__SZBUF=65535)
+
+!     include 'mio_err/nolist'
+*-

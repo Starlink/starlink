@@ -1,0 +1,33 @@
+## TAPECREATE - create a Mag. Tape dataset
+
+interface TAPECREATE
+
+   parameter DRIVE
+      keyword		'DRIVE'
+      position		1
+      type		'_char'
+      access		'read'
+      vpath		'prompt'
+      help		'name of tape drive'
+   endparameter
+
+   parameter DEVICE
+      keyword		'DEVICE'
+      position		2
+      type		'_char'
+      access		'read'
+      vpath		'prompt'
+      help		'device name of tape drive'
+   endparameter
+
+   parameter DEVDATASET
+      keyword		'DEVDATASET'
+      position		3
+      type		'univ'
+      access		'write'
+      vpath		'default,prompt'
+      default           "devdataset"
+      help		'name of device dataset'
+   endparameter
+
+endinterface

@@ -1,0 +1,62 @@
+FACILITY MAG
+100,TOOTD,No more available tape descriptors
+101,ILLTD,Illegal tape descriptor
+102,TOMNY,Too many open tapes
+103,ILLAC,Illegal access mode
+104,UNKPA,Parameter not found
+105,NTACT,Parameter not currently active
+106,ISACT,Parameter currently active
+107,ERACT,Error activating MAG
+108,EREXH,Error establishing exit handler for MAG
+109,IVACM,Invalid access mode
+110,BUFTB,Invalid buffer size
+111,UNKDV,Unable to locate device in DEVDATASET
+112,NOASS,No channel assigned to tape drive
+113,NOFIL,No tape file specified
+114,NOPOS,Tape position not known
+115,NOEOV,End of volume not found
+116,EXCDV,Too many tape devices
+117,ISOPN,Tape device already open
+118,NTOPN,Tape not open
+119,LCERR,Unable to open DEVDATASET
+120,CRERR,Unable to create Magnetic Tape dataset
+121,CNERR,Unable to cancel Magnetic Tape dataset
+122,WRERR,Error Writing to Magnetic Tape dataset
+123,RDERR,Error Reading from Magnetic Tape dataset
+124,IVRSZ,Invalid record size
+125,IVBSZ,Invalid block size
+126,NTMUL,Block size not a multiple of record size
+127,IVBUF,Invalid buffer size
+128,ICBSZ,Inconsistent block size
+129,NOREC,Unknown record size
+130,ERROR,Error
+131,NTSUP,Option not supported
+132,DVALL,Tape drive allocated to another user
+133,DVNAL,Tape drive not allocated
+134,NSHDV,No such tape drive
+135,DVASS,Tape drive already assigned
+136,ACVIO,Access violation
+137,BUFOV,Buffer overflow
+138,DVMNT,Tape drive already mounted
+139,REMOT,Tape drive on remote node
+140,NOPRV,No privilege for attempted operation
+141,INVCH,Invalid channel
+142,EXQUO,Quota exceeded
+143,EXCCH,No channel available
+144,INVDV,Illegal device name
+145,INVLG,Illegal logical name
+146,CTLER,Tape drive controller error
+147,DTCHK,Tape write error
+148,DRVER,Tape drive error
+149,EOF,End of file on tape
+150,EOT,End of tape
+151,EOV,End of volume (2 tape marks)
+152,MDOFL,Tape drive offline
+153,PARIT,Parity error on tape
+154,UNSAF,Tape drive unsafe
+155,VLINV,Tape not mounted
+156,WTLCK,Tape drive write locked
+157,DATOV,Tape data block exceeds buffer size
+158,DVNMT,Tape not mounted
+159,UNKSS,Unknown System Service code
+160,BADSS,VMS System Service Failed

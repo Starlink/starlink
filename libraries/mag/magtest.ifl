@@ -1,0 +1,39 @@
+## MAGTEST - Test the MAG package
+
+interface MAGTEST
+
+   parameter	TAPE
+      ptype		'TAPE'
+      keyword		'TAPE'
+      position		1
+      type		'v_device'
+      access		'read'
+#      rpath		'temp.devices'
+#     vpath		'global,prompt'
+#     association	'->global.virtual_device'
+      default           /dev/rmt0h
+      help		'name of mag tape device to be used'
+   endparameter
+
+   parameter    CANCL
+      keyword   'CANCL'
+      type      '_LOGICAL'
+      position  2
+      access    'read'
+      prompt    'Do you wish to cancel the device parameter?'
+      vpath     'prompt'
+   endparameter
+
+   parameter    ACMODE
+      keyword   'ACMODE'
+      type      'LITERAL'
+      position  3
+      access    'read'
+      prompt    'Access mode to device'
+      help      'Modes are CREATE, WRITE, UPDATE, READ'
+      vpath     'prompt'
+   endparameter
+
+endinterface
+
+endinterface

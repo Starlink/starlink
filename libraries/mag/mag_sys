@@ -1,0 +1,10 @@
+*    Description :
+*     This file contains the Internal Global Constants for MAG.
+*    Global constants :
+      integer MAG__MXDEV		! Maximum number of tape devices
+      parameter(MAG__MXDEV=3)
+      integer MAG__SZNAM		! Maximum size of tape device name
+      parameter(MAG__SZNAM=15)
+!     integer MAG__UNDEF		! Tape position undefined
+!     parameter(MAG__UNDEF=-1)
+*-

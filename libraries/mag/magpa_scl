@@ -1,0 +1,21 @@
+*    Description :
+*     This file contains the MAGPA Common Block.   This Common Block
+*     provides the relationship between Starlink Program Parameters
+*     and MAG Tape Descriptors.
+*    Global variables :
+      logical Pfree(MAG__MXPAR)		! whether slot used
+      integer Pdesc(MAG__MXPAR)		! Tape descriptor for parameter
+      character*(DAT__SZLOC)		! Locator to USR device dataset
+     :  Ploc(MAG__MXPAR)
+      character*(PAR__SZNAM)		! Parameter names
+     :  Ptname(MAG__MXPAR)
+      character*(PAR__SZMOD)		! Parameter access modes
+     :  Pacmod(MAG__MXPAR)
+      character*(DAT__SZLOC)		! Locator to Tape dataset
+     :  Pdloc(MAG__MXPAR)
+
+      common /mag_pa_1/ Pfree, Pdesc, Ploc
+      save /mag_pa_1/
+      common /mag_pa_2/ Ptname, Pdloc, Pacmod
+      save /mag_pa_2/
+*-

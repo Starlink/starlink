@@ -1,0 +1,12 @@
+      logical Mioint                    ! MIO initialisation
+      logical Mfree(MIO__MXDEV)		! File descriptor available ?
+      integer Mchan(MIO__MXDEV)		! Channel number to tape drive
+      common /miogo_cmn/Mioint
+      common /miofil_cmn_1/Mfree, Mchan
+
+      character*(MIO__SZNAM) Mname(MIO__MXDEV)	! Mag. tape name
+      character*(MIO__SZNAM) Mtrans(MIO__MXDEV)	! Mag. tape name
+      character*(MIO__SZMOD) Macmod(MIO__MXDEV)	! access mode
+      common /miofil_cmn_2/Mname, Mtrans, Macmod
+      save /miofil_cmn_2/
+

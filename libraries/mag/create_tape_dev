@@ -1,0 +1,86 @@
+#!/bin/sh
+#
+# Define device names for use with the ADAM MAG library.
+# All physical device names must be "no rewind" devices or the record of
+# the tape position that is kept in usrdevdata.sdf will be wrong after closing
+# the first file.
+#
+# Tape drives for SunOS 4.x.
+#
+if expr `uname -s` == SunOS \& `uname -r | awk -F. '{print $1}'` == 4 >/dev/null
+then
+echo "Creating devices for SunOS 4.x"
+#
+# No-auto-rewind tape drives
+tapecreate /dev/nrst0 /dev/nrst0
+tapecreate /dev/nrst1 /dev/nrst1
+tapecreate /dev/nrst2 /dev/nrst2
+# 
+fi
+#---------------------------------------------------------------------
+# Tape drives for SunOS 5.x.
+#
+if expr `uname -s` == SunOS \& `uname -r | awk -F. '{print $1}'` == 5 >/dev/null
+then
+echo "Creating devices for SunOS 5.x"
+#
+# Low density no-auto-rewind tape drives
+tapecreate /dev/rmt/0ln /dev/rmt/0ln
+tapecreate /dev/rmt/1ln /dev/rmt/1ln
+tapecreate /dev/rmt/2ln /dev/rmt/2ln
+#
+# Medium density no-auto-rewind tape drives
+tapecreate /dev/rmt/0mn /dev/rmt/0mn
+tapecreate /dev/rmt/1mn /dev/rmt/1mn
+tapecreate /dev/rmt/2mn /dev/rmt/2mn
+#
+# High density no-auto-rewind tape drives
+tapecreate /dev/rmt/0hn /dev/rmt/0hn
+tapecreate /dev/rmt/1hn /dev/rmt/1hn
+tapecreate /dev/rmt/2hn /dev/rmt/2hn
+#
+# Low density BSD-emulation tape drives
+tapecreate /dev/rmt/0lb /dev/rmt/0lb
+tapecreate /dev/rmt/1lb /dev/rmt/1lb
+tapecreate /dev/rmt/2lb /dev/rmt/2lb
+#
+# Medium density BSD-emulation tape drives
+tapecreate /dev/rmt/0mb /dev/rmt/0mb
+tapecreate /dev/rmt/1mb /dev/rmt/1mb
+tapecreate /dev/rmt/2mb /dev/rmt/2mb
+#
+# High density BSD-emulation tape drives
+tapecreate /dev/rmt/0hb /dev/rmt/0hb
+tapecreate /dev/rmt/1hb /dev/rmt/1hb
+tapecreate /dev/rmt/2hb /dev/rmt/2hb
+#
+fi
+#---------------------------------------------------------------------
+# Tape drives for ULTRIX and OSF1
+#
+if expr `uname -s` == ULTRIX \| `uname -s` == OSF1 >/dev/null
+then
+echo "Creating devices for ULTRIX or OSF1"
+#
+# Low density no-auto-rewind tape drives
+tapecreate /dev/nrmt0l /dev/nrmt0l
+tapecreate /dev/nrmt1l /dev/nrmt1l
+tapecreate /dev/nrmt2l /dev/nrmt2l
+#
+# Medium density no-auto-rewind tape drives
+tapecreate /dev/nrmt0m /dev/nrmt0m
+tapecreate /dev/nrmt1m /dev/nrmt1m
+tapecreate /dev/nrmt2m /dev/nrmt2m
+#
+# High density no-auto-rewind tape drives
+tapecreate /dev/nrmt0h /dev/nrmt0h
+tapecreate /dev/nrmt1h /dev/nrmt1h
+tapecreate /dev/nrmt2h /dev/nrmt2h
+#
+# QIC-24 density no-auto-rewind tape drives
+tapecreate /dev/nrmt0a /dev/nrmt0a
+tapecreate /dev/nrmt1a /dev/nrmt1a
+tapecreate /dev/nrmt2a /dev/nrmt2a
+#
+fi
+#---------------------------------------------------------------------

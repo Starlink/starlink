@@ -1,0 +1,7 @@
+      integer Mrecsz(MIO__MXDEV) ! Record size
+      integer Mblksz(MIO__MXDEV) ! Block size
+      integer Mnbyte(MIO__MXDEV) ! Number of last byte output in current block
+      byte Mblock(MIO__SZBUF, MIO__MXDEV)	! block buffer
+      common /miobuf_cmn_1/ Mrecsz, Mblksz, Mnbyte, Mblock
+      save /miobuf_cmn_1/
+

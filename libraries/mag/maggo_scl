@@ -1,0 +1,7 @@
+*+ MAGGOx - MAG Implicit Initialisation Data
+      logical Magslp			! Whether package is asleep
+
+      common /mag_go/ Magslp
+      save /mag_go/
+
+*-
