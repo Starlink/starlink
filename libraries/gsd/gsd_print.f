@@ -12,10 +12,10 @@
 *    be used instead.
 *
 *    Firstly, ADAMERRS should not be included. ADAM__OK is zero.
-*    Secondly, GSDPARS must be made a symbolic link to the actual
-*    include file, e.g. "ln -s gsd_pars.inc GSDPARS". The link can be
+*    Secondly, GSD_PAR must be made a symbolic link to the actual
+*    include file, e.g. "ln -s gsd_par GSD_PAR". The link can be
 *    removed after compilation of the Fortran source code.
-*    Thirdly, GSDERRS does not exist. GSD returns zero as good status
+*    Thirdly, GSD_ERR does not exist. GSD returns zero as good status
 *    and something else as bad status. That is usually enough for the
 *    GSD-calling code to know.
 *
@@ -50,7 +50,8 @@
 
       IMPLICIT NONE
 *
-      INCLUDE 'GSDPARS'
+      INCLUDE 'PRM_PAR'       ! Bad values
+      INCLUDE 'GSD_PAR'
 *
 *    Print file
       INTEGER LUN
