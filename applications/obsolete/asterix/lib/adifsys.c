@@ -75,7 +75,17 @@ ADIboolean adix_isfile( ADIobj id )
   {
   ADIclassDefPtr tdef = _DTDEF(id);
 
-  return ( tdef->selfid == DsysFileObj ) ? ADI__true : ADI__false;
+  return adix_chkder( tdef, _cdef_data(DsysFileObj), status );
+  }
+
+
+ADIobj adix_getlink( ADIobj id, ADIstatus status )
+  {
+  ADIobj lid;
+
+  adic_cget0i( id, "ADIlink", &lid, status );
+
+  return lid;
   }
 
 
@@ -174,14 +184,18 @@ void adix_fclose_int( ADIobj rtn, ADIobj id, ADIstatus status )
 
 void ADIfsysFileClose( ADIobj id, ADIstatus status )
   {
+  ADIobj	fid;			/* File object at end of chain */
   ADIobj	ortn;			/* Close routine */
   ADIobj        repid;
   ADIboolean	there;
 
   _chk_stat;
 
+/* Get file object */
+  adic_getfile( id, &fid, status );
+
 /* Extract representation id from file object */
-  adic_cget0i( id, "REP", &repid, status );
+  adic_cget0i( fid, "REP", &repid, status );
 
 /* Representation has supplied a closure routine? */
   adic_there( repid, "CLOSE_RTN", &there, status );
@@ -191,8 +205,7 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
                      8, &ortn, status );
 
 /* Try to close the file */
-    adix_fclose_int( ortn, id, status );
-
+    adix_fclose_int( ortn, fid, status );
     }
 
   }

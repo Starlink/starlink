@@ -4202,34 +4202,6 @@ void adix_print( ADIobj id, ADIboolean value_only, ADIstatus status )
   }
 
 
-ADIobj adix_getlink( ADIobj id, ADIstatus status )
-  {
-  ADIobj        rval = ADI__nullid;
-
-  if ( _krnl_q(id) && ! _han_q(id) ) {
-    adic_setecs( ADI__ILLKOP, "Cannot find ADI file link for kernel object", status );
-    }
-  else
-    {
-    /*
-    adix_findmem( id, "ADIbase::LINK", laddr, status );
-    */
-
-/*    if ( _DTDEF(id)->adisys )
-      {
-      rval = *_class_link(id);
-      }
-    else {
-      adic_setetc( "CLS", _DTDEF(id)->name, 99 );
-      adic_setecs( ADI__ILLOP, "Cannot find ADI file link for object of class ^CLS", status );
-      } */
-    }
-
-  return rval;
-  }
-
-
-
 
 /*
  *  C generic dispatch for methods of form void xx(ADIobj,ADIobj,status)
