@@ -1,4 +1,8 @@
-include $(STARLINK_SGML_DIR)/lib/Makefile.common
+# dvi2bitmap documentation makefile
+#
+# Relies on STARLINK_SGML_DIR being set correctly.
+#
+# $Id$
 
 DOCTARBALLS=doc.tar-htx doc.tar-latex doc.tar-htxsingle
 

@@ -9,7 +9,7 @@ dvi2bitmap
     [\-P[BbTt]] [\-s scalefactor] [\-t png|gif|xbm] [\-o output]
     [\-b(h|w) size] [\-c[lrtb] dimen] [\-C[lrtb] dimen]
     [\-R[fb] int,int,int]
-    [\-nqV] [\-Q[fFtb]] [\-p num] [\-l num] [\-pp ranges]
+    [\-nqV] [\-Q[fFgGtb]] [\-p num] [\-l num] [\-pp ranges]
     dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
@@ -254,8 +254,10 @@ option would start
 .TP
 .I "\-Qf"
 Show missing fonts.
-The program writes on standard output one line per missing font, with
-five fields: the 
+The program writes on standard output one line per missing font,
+starting with
+.I "Qf"
+, then five fields: the 
 font name, the DPI value it was looking for, the base-DPI of the font,
 the magnification factor, and a dummy metafont mode.
 This output can 
@@ -265,7 +267,35 @@ generate the required fonts.
 .I "\-QF"
 As for
 .I "\-Qf"
-except that found fonts are also listed, prefixed by a % character.
+except that found fonts are also listed, prefixed by
+.I "QF"
+.TP
+.I "\-Qg"
+As for
+.I "\-Qf"
+, except that the output consists of the string
+.I "Qg"
+followed by a 
+.I "mktexpk"
+or
+.I "MakeTeXPK"
+command which can be used to generate the font.
+.TP
+.I "\-QG"
+As for
+.I "\-Qf"
+, except that found fonts are also listed, prefixed by
+.I "QG"
+Only one of 
+.I "\-Qf"
+,
+.I "\-QF"
+,
+.I "\-Qg"
+and
+.I "\-QG"
+should be specified -- if more than one appears, only the last
+one is respected.
 .TP
 .I "\-Qt"
 List the output image formats which the program can generate, on
