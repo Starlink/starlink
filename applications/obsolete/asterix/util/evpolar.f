@@ -71,6 +71,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'LIST_PAR'
       INCLUDE 'QUAL_PAR'
@@ -149,8 +150,8 @@
 *    Version anouncement
       CALL MSG_PRNT( VERSION )
 
-*    Initialize BDA routines
-      CALL AST_INIT( STATUS )
+*    Initialize ASTERIX
+      CALL AST_INIT()
 
 *    Get event dataset
       CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
@@ -191,7 +192,7 @@
 
 *      Map it
         CALL DAT_FIND( ILOC, 'QUALITY', QLOC, STATUS )
-        CALL BDI_MAPTDATA( QLOC, '_INTEGER', 'READ', IQPTR, STATUS )
+        CALL BDA_MAPTDATA( QLOC, '_INTEGER', 'READ', IQPTR, STATUS )
 
 *      Get quality processing mode
         CALL USI_GET0I( 'QVAL',  BADQUAL, STATUS )
@@ -207,8 +208,9 @@
         IF ( QUALITY ) THEN
           CALL HDX_SAME( LLOC(INDEX(I)), QLOC, SAME, STATUS )
           IF ( SAME ) THEN
-            CALL MSG_PRNT( 'ERROR : Cannot bin using QUALITY list' )
             STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'ERROR : Cannot bin using QUALITY list',
+     :                    STATUS )
             GOTO 99
           END IF
         END IF
@@ -218,8 +220,8 @@
 
 *      Map and get attributes
         BNAME(I) = LNAM(INDEX(I))
-        CALL BDI_MAPDATA( BLOC(I), 'READ', BPTR(I), STATUS )
-        CALL BDI_GETUNITS( BLOC(I), BUNIT(I), STATUS )
+        CALL BDA_MAPDATA( BLOC(I), 'READ', BPTR(I), STATUS )
+        CALL BDA_GETUNITS( BLOC(I), BUNIT(I), STATUS )
 
       END DO
 
@@ -330,8 +332,7 @@
         CALL BDI_PUTAXVAL( OFID, 2,0.5*ABINSIZE, ABINSIZE, NAZ, STATUS )
         CALL BDI_CREAXWID( OFID, 2, .TRUE., NAZ, STATUS )
         CALL BDI_PUTAXWID( OFID, 2, ABINSIZE, STATUS )
-        CALL BDI_PUTAXLABEL( OFID, 2, 'Azimuth', STATUS )
-        CALL BDI_PUTAXUNITS( OFID, 2, 'degree', STATUS )
+        CALL BDI_PUTAXTEXT( OFID, 2, 'Azimuth', 'degree', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -450,7 +451,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
@@ -525,7 +525,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Import :
@@ -663,7 +662,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Import :
@@ -791,7 +789,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
@@ -864,7 +861,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
