@@ -10,7 +10,7 @@ CATALOG_NAME	test.cat	# name of the output catalog
 CATALOG_TYPE	ASCII_HEAD	# "NONE","ASCII_HEAD","ASCII","FITS_1.0"
 				# "FITS_LDAC" or "ASCII_SKYCAT"
 
-PARAMETERS_NAME	$EXTRACTOR_DIR/../share/extractor/default.param	
+PARAMETERS_NAME	$EXTRACTOR_DIR/config/default.param	
                                 # name of the file containing catalog contents
 
 #------------------------------- Extraction ----------------------------------
@@ -22,7 +22,7 @@ DETECT_THRESH	1.5		# <sigmas> or <threshold>,<ZP> in mag.arcsec-2
 ANALYSIS_THRESH	1.5		# <sigmas> or <threshold>,<ZP> in mag.arcsec-2
 
 FILTER		Y		# apply filter for detection ("Y" or "N")?
-FILTER_NAME	$EXTRACTOR_DIR/../share/extractor/default.conv	
+FILTER_NAME	$EXTRACTOR_DIR/config/default.conv	
                                 # name of the file containing the filter
 
 DEBLEND_NTHRESH	32		# Number of deblending sub-thresholds
@@ -49,7 +49,7 @@ PIXEL_SCALE	1.0		# size of pixel in arcsec (0=use FITS WCS info).
 #------------------------- Star/Galaxy Separation ----------------------------
 
 SEEING_FWHM	1.2		# stellar FWHM in arcsec
-STARNNW_NAME	$EXTRACTOR_DIR/../share/extractor/default.nnw	
+STARNNW_NAME	$EXTRACTOR_DIR/config/default.nnw	
                                 # Neural-Network_Weight table filename
 
 #------------------------------ Background -----------------------------------
