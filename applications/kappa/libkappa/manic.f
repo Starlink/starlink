@@ -1,669 +1,654 @@
-*+  MANIC - Converts all or part of a data array from one dimensionality
-*           to another 
-
       SUBROUTINE MANIC( STATUS )
-*
-*    Description :
-*
-*     This application copies or converts all or part of a 1, 2 or
-*     3-dimensional data array to one or more output data arrays, each
-*     of 1, 2 or 3 dimensions. All data arrays are stored in IMAGE
-*     structures. Windows may be set in any of the dimensions of the
-*     input data array. All or part of the input array may be projected
-*     on to any of the rectangular planes or axes of the input before
-*     being written to an output array; or a 1- or 2-dimensional data
-*     array may be grown to more dimensions to fill an output data
-*     array. Many output data arrays, each of a different configuration
-*     if required, may be extracted from a single input data array with
-*     one call to the routine. 
-*
-*    Invocation :
-*
+*+
+*  Name:
+*     MANIC
+
+*  Purpose:
+*     Change the dimensionality of all or part of an NDF.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL MANIC( STATUS )
-*
-*    Parameters :
-*
-*     INPUT      = IMAGE( READ )
-*         IMAGE structure holding the input data array.
-*     ONDIM      = INTEGER( READ )
-*         Dimensionality of an output data array.
-*     XLIMITS(2) = INTEGER( READ )
-*         The X-axis window on the input data array to be used in
-*           forming an output data array.
-*     YLIMITS(2) = INTEGER( READ )
-*         The Y-axis window on the input data array to be used in
-*           forming an output data array.
-*     ZLIMITS(2) = INTEGER( READ )
-*         The Z-axis window on the input data array to be used in
-*           forming an output data array.
-*     XRANGE(2)  = INTEGER( READ )
-*         The X-axis range for summation in the input data array in
-*           forming an output data array.
-*     YRANGE(2)  = INTEGER( READ )
-*         The Y-axis range for summation in the input data array in
-*           forming an output data array.
-*     ZRANGE(2)  = INTEGER( READ )
-*         The Z-axis range for summation in the input data array in
-*           forming an output data array.
-*     EPLANE     = CHAR( READ )
-*         Plane to be extracted from the input 3-d data array.  The
-*           options are 'XY', 'YZ', 'ZX', 'YX', 'ZY', 'XZ'.
-*     GPLANE     = CHAR( READ )
-*         Input 2-d data array forms this plane when being grown into
-*           a 3-d data array.  The options are 'XY', 'YZ', 'ZX', 'YX',
-*           'ZY', 'XZ'.
-*     ELINE1     = CHAR( READ )
-*         Axis of input 2-d data array to be extracted to form an output
-*           1-d data array.  The alternatives are 'X' or 'Y'.
-*     ELINE2     = CHAR( READ )
-*         Axis of input 3-d data array to be extracted to form an output
-*           1-d data array.  The options are 'X', 'Y', 'Z'.
-*     GLINE1     = CHAR( READ )
-*         Input 1-d data array will form this axis of an output 2-d
-*           data array.  The alternatives are 'X' or 'Y'.
-*     GLINE2     = CHAR( READ )
-*         Input 1-d data array will form this axis of an output 3-d
-*           data array.  The options are 'X', 'Y', 'Z'.
-*     XDIM       = INTEGER( READ )
-*         X-dimension of output 2-d or 3-d data array grown from input
-*           1-d or 2-d data array.
-*     YDIM       = INTEGER( READ )
-*         Y-dimension of output 2-d or 3-d data array grown from input
-*           1-d or 2-d data array.
-*     ZDIM       = INTEGER( READ )
-*         Z-dimension of output 2-d or 3-d data array grown from input
-*           1-d or 2-d data array.
-*     OUTPUT     = IMAGE( WRITE )
-*         IMAGE structure to hold an output data array.
-*     OTITLE     = CHAR( WRITE )
-*         Title for IMAGE structure holding an output data array.
-*     LOOP       = LOGICAL( READ )
-*         Extract or grow further output data arrays from the same input
-*           data array.
-*
-*    Arguments:
-*
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
-*     Check for error on entry - return if not o.k.
-*     Get input IMAGE type data structure
-*     Find out shape of input data-array component
-*     If array is 1 to 3-dimensional then
-*        Initialise LOOP to .TRUE. to start off the loop
-*        Do while LOOP = .TRUE. and no errors occur
-*           Tell user shape of input array
-*           Get dimensionality of output array
-*           If no error so far then
-*              If output array has more dimensions the input array then
-*                 Call MAMORE to set up output array dimensions and
-*                   input array slice limits.
-*              Else if output array has same no. of dimensions as input
-*                array then
-*                 Call MASAME to set up output array dimensions and
-*                   input array slice limits.
-*              Else
-*                 Output array must have fewer dimensions than input
-*                   array so call MALESS to set up output array
-*                   dimensions and input array slice limits.
-*              Endif
-*           Endif
-*           If no error then
-*              Get locator to and then map input array slice
-*              If no error then
-*                 Create output data structure containing a DATA_ARRAY
-*                   component of appropriate dimensionality and
-*                   dimensions, and also create and get a value for a
-*                   TITLE component
-*                 Propagate NDF MORE from the input data file
-*                 If no error then
-*                    Map output data-array component
-*                    If no error then
-*                       If CASE is one where output array has fewer
-*                         dimensions than input then
-*                          Find dimension of workspace arrays
-*                          Obtain and map workspace arrays
-*                       Endif
-*                       If no error so far then
-*                          Perform input to output transformation
-*                            according to value of CASE
-*                          Tidy second work array if exists
-*                       Else
-*                          Report error
-*                       Endif
-*                       Tidy first work array if exists
-*                       Unmap output data array
-*                    Else
-*                       Report error context
-*                    Endif
-*                    Tidy output structure
-*                 Else
-*                    Report error context
-*                 Endif
-*                 Unmap slice
-*              Else
-*                 Report error context
-*              Endif
-*           Else
-*              Report error context
-*           Endif
-*           Tidy up the slice
-*           Ask user if to repeat process for same input array
-*           If loop then
-*              Cancel parameters if necessary
-*           Endif
-*        Enddo
-*        Tidy up input data structure
-*     Else
-*        Report error context
-*     Endif
-*     End
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
-*     C D Pike    (RGO::CDP)
-*     Roger Wood  (RGO::RW)
-*     Dave Baines (ROE::ASOC5)
-*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     15/08/1981 : Original version    (RGO::CDP)
-*     30/03/1983 : Amended  version    (RGO::RW)
-*     21/02/1984 : Revised SSE version (ROE::ASOC5)
-*     1986 Aug 7 : Standardised prologue formatting. Status check on
-*                  entry added (RAL::CUR).
-*     1986 Aug 29: Renamed APP routines into AIF_. Added argument
-*                  section to prologue and tidied. Revised output
-*                  of dimensions via DIMLST routine (RAL::CUR).
-*     1986 Oct 30: Allowed for bad pixel handling in routines MA3TO1,
-*                  MA3TO2 and MA2TO1 for which workspace of the
-*                  appropriate dimension is now found (RAL::CUR).
-*     1987 Oct 15: Reordered tidying and extra status checks
-*                  (RAL::CUR).
-*     1988 Mar 16: Substituted AIF_ANTMP to annul workspace
-*                  (RAL::CUR).
-*     1988 Mar 17: Referred to `array' rather than `image'
-*                  (RAL::CUR).
-*     1988 Jun 20: More reporting of error context (RAL::CUR).
-*     1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR).
-*     1989 Aug  8: Passed array dimensions as separate variables
-*                  to COPY2D, COPY3D, MA1TO2, MA1TO3, MA2TO1, MA2TO3,
-*                  MA3TO1 and MA3TO2 (RAL::CUR).
-*     1989 Dec 21: Workspace managed by AIF_TEMP (RAL::CUR).
-*     1991 Oct 25: Propagates UNITS, LABEL and HISTORY (RAL::CUR).
-*     1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-*     1992 Mar  3: Replaced AIF parameter-system calls by the extended
-*                  PAR library (RAL::CUR).
-*
-*    Type Definitions :
 
-      IMPLICIT NONE            ! no impicit typing allowed
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
-*    Global constants :
+*  Description:
+*     This application manipulates the dimensionality of an NDF. The input
+*     NDF can be projected on to any N-dimensional surface (line, plane,
+*     etc.) by averaging the pixels in perpendicular directions, or grown
+*     into new dimensions by duplicating an existing N-dimensional
+*     surface. The order of the axes can also be changed at the same time.
+*     Any combination of these abilities is also possible.
+*
+*     The shape of the output NDF is specified using parameter AXES. This
+*     is a list of integers, each element of which identifies the source
+*     of the corresponding axis of the output - either the index of one of
+*     the pixel axes of the input, or a zero indicating that the input
+*     should be expanded with copies of itself along that axis.  If any
+*     axis of the input NDF is not referenced in the AXES list, the
+*     missing dimensions will be collapsed to form the resulting data.
+*     Dimensions are collapsed by averaging all the non-bad pixels along
+*     the relevant pixel axis (or axes).
 
-      INCLUDE 'SAE_PAR'        ! global SSE definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'PAR_ERR'        ! parameter-system errors
+*  Usage:
+*     manic in out axes 
 
-*    Status :
+*  ADAM Parameters:
+*     AXES( * ) = _INTEGER (Read)
+*        An array of integers which define the pixel axes of the output
+*        NDF. The array should contain one value for each pixel axis in
+*        the output NDF. Each value can be either a positive integer or
+*        zero. If positive, it is taken to be the index of a pixel axis
+*        within the input NDF which is to be used as the output axis. If
+*        zero, the output axis will be formed by replicating the entire
+*        output NDF a specified number of times (see parameters LBND and
+*        UBND). At least one non-zero value must appear in the list, and
+*        no input axis can be used more than once.
+*     IN  = NDF (Read)
+*        The input NDF. 
+*     LBND( * ) = _INTEGER (Read)
+*        An array holding the lower pixel bounds of any new axes in the
+*        output NDF (that is, output axes which have a zero value in the
+*        corresponding element of the AXES parameter). One element must
+*        be given for each zero-valued element within AXES, in order of 
+*        appearance within AXES.  The dynamic default is to use 1 for
+*        every element. []
+*     OUT = NDF (Write)
+*        The output NDF.
+*     TITLE = LITERAL (Read)
+*        Title for the output NDF.  A null value (!) propagates the title 
+*        from the input NDF to the output NDF. [!]
+*     UBND( * ) = _INTEGER (Read)
+*        An array holding the upper pixel bounds of any new axes in the
+*        output NDF (that is, output axes which have a zero value in the
+*        corresponding element of the AXES parameter). One element must 
+*        be given for each zero-valued element within AXES, in order of 
+*        appearance within AXES.  The dynamic default is to use 1 for
+*        every element. []
 
+*  Examples:
+*     manic image transim [2,1]
+*        This transposes the 2-dimensional NDF image so that its X pixel
+*        co-ordinates are in the Y direction and vice versa. The ordering
+*        of the axes within the current WCS Frame will only be changed if
+*        the Domain of the current Frame is PIXEL or AXES. For instance,
+*        if the current Frame has Domain "SKY", with axis 1 being RA and
+*        axis 2 being DEC, then these will be unchanged in the output NDF.
+*        However, the Mapping which is used to related (RA,DEC) positions
+*        to pixel positions will be modified to take the permutation of
+*        the pixel axes into account.
+*     manic cube summ [3]
+*        This creates a one dimensional output NDF called summ, in which
+*        the single pixel axis correspinds to the Z (third) axis in an input
+*        NDF called (cube). Each element in the output is equal to the 
+*        average data value in the corresponding XY plane of the input.
+*     manic line plane [0,1] lbnd=1 ubnd=25
+*        This takes a 1-dimensional NDF called line and expands it into a 
+*        2-dimensional NDF called plane.  The second pixel axis of the output 
+*        NDF corresponds to the first (and only) pixel axis in the input NDF.
+*        The first pixel axes of the output is formed by replicating the 
+*        the input NDF 25 times.
+*     manic line plane [1,0] lbnd=1 ubnd=25
+*        This does the same as the last example except that the output
+*        NDF is transposed. That is, the input NDF is copied into the
+*        output NDF so that it is parallel to pixel axis 1 (X) in the 
+*        output NDF, instead of pixel axis 2 (Y) as before.
+*     manic cube hyper [1,0,0,0,0,0,3] ubnd=[2,4,2,2,1] accept
+*        This manic example projects the second dimension of an input
+*        3-dimensional NDF onto the plane formed by its first and third
+*        dimensions by averaging, and grows the resulting plane
+*        up through five new dimensions with a variety of extents.
+
+*  Notes:
+*     - This application permutes the NDF pixel axes, and any associated AXIS
+*     structures. It does not change the axes of the current WCS co-ordinate 
+*     Frame, either by permuting, adding or deleting, unless that frame has
+*     Domain "PIXEL" or "AXES". See the first example in the "Examples" 
+*     section. 
+
+*  Related Applications:
+*     KAPPA: COLLAPSE, PERMAXES.
+
+*  Implementation Status:
+*     -  This routine correctly processes the AXIS, DATA, VARIANCE,
+*     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
+*     propagates all extensions.  QUALITY is not propagated.
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  All non-complex numeric data types can be handled.
+*     -  Any number of NDF dimensions is supported, up to a maximum of 7.
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-NOV-2001 (MBT):
+*        Original version (parts were heavily informed by COLLAPSE).
+*     23-NOV-2001 (DSB):
+*        Minor mods to the prologue. Check that UBND values are not less
+*        than LBND values.
+*     {enter_further_changes}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE            ! No default typing allowed
+
+*  Global Constants:
+      INCLUDE  'SAE_PAR'       ! Global SSE definitions
+      INCLUDE  'AST_PAR'       ! AST constants and functions
+      INCLUDE  'NDF_PAR'       ! NDF constants
+      INCLUDE  'DAT_PAR'       ! HDS system constants
+      INCLUDE  'PRM_PAR'       ! VAL constants
+
+*  Status:
       INTEGER STATUS
 
-*    Local constants :
+*  Local Variables:
+      CHARACTER ITYPE*( NDF__SZTYP )! Numeric type of NDF data component
+      CHARACTER LOC1*( DAT__SZLOC ) ! Locator to the whole NDF
+      CHARACTER LOC2*( DAT__SZLOC ) ! Locator to NDF AXIS array
+      CHARACTER LOC3*( DAT__SZLOC ) ! Locator to copy of original AXIS array
+      CHARACTER LOC4*( DAT__SZLOC ) ! Locator to a cell of the new AXIS array
+      CHARACTER LOC5*( DAT__SZLOC ) ! Locator to a cell of the old AXIS array
+      CHARACTER LOC6*( DAT__SZLOC ) ! Locator to a component of the old cell
+      CHARACTER NAME*( DAT__SZNAM ) ! HDS component name
+      INTEGER AXES( NDF__MXDIM ) ! The axis indices forming the output NDF
+      INTEGER BFRM             ! AST pointer to Base Frame in WCS FrameSet
+      INTEGER DFLS( NDF__MXDIM ) ! Default lower bounds
+      INTEGER DIMI( NDF__MXDIM ) ! Dimensions of input NDF
+      INTEGER DIMO( NDF__MXDIM ) ! Dimensions of output NDF
+      INTEGER I                ! Loop variable
+      INTEGER IBASE            ! Index of Base Frame in WCS FrameSet
+      INTEGER ICURR            ! Index of Current Frame in WCS FrameSet
+      INTEGER INDF1            ! NDF identifier of input NDF
+      INTEGER INDF2            ! NDF identifier of output NDF
+      INTEGER INEW             ! Index of the new Base Frame in WCS FrameSet
+      INTEGER INPRM( NDF__MXDIM )! Output axis assigned to each input axis
+      INTEGER IPDI             ! Pointer to mapped input data array
+      INTEGER IPDO             ! Pointer to mapped output data array
+      INTEGER IPDUM            ! Pointer to dummy mapped data
+      INTEGER IPVI             ! Pointer to mapped input variance array
+      INTEGER IPVO             ! Pointer to mapped output variance array
+      INTEGER IPWKC            ! Pointer to workspace
+      INTEGER IPWKE            ! Pointer to workspace
+      INTEGER IWCS             ! AST pointer to WCS FrameSet of NDF
+      INTEGER J                ! Loop variable
+      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
+      INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
+      INTEGER MAXS( NDF__MXDIM ) ! Maximum legal values for AXES elements
+      INTEGER MAXUB( NDF__MXDIM )! Maximum legal values for the UBND elements
+      INTEGER MINS( NDF__MXDIM ) ! Minimum legal values for AXES elements
+      INTEGER NBFRM            ! AST pointer to new Base Frame
+      INTEGER NCOMP            ! Number of HDS components
+      INTEGER NDIMI            ! Dimensionality of input NDF
+      INTEGER NDIMO            ! Dimensionality of output NDF
+      INTEGER NEL              ! Number of elements
+      INTEGER NEWLB( NDF__MXDIM ) ! Lower bounds of new dimensions
+      INTEGER NEWUB( NDF__MXDIM ) ! Upper bounds of new dimensions
+      INTEGER NEXPAN           ! Number of new dimensions in output array
+      INTEGER NUSED            ! Number of input array axes used in output array
+      INTEGER NWKC             ! Number of in pixels collapsing on each out pix
+      INTEGER NWKE             ! Number of copied out pixels for each uniqe one
+      INTEGER OUTPRM( NDF__MXDIM )! Input axis assigned to each output axis
+      INTEGER PMAP             ! AST pointer to PermMap between Base frames
+      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
+      INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      LOGICAL GOTAX            ! Does an AXIS component exist?
+      LOGICAL GOTVAR           ! Does a VARIANCE component exist?
+      LOGICAL USED( NDF__MXDIM ) ! Is input array axis used in output array?
 
-      INTEGER MXSIZE
-      PARAMETER ( MXSIZE = 1000 )
+*.
 
-*    Local variables :
+*  Check the global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
 
-      CHARACTER*( DAT__SZLOC ) ! locators to :
-     :  DLOCI,                 ! input primitive data array
-     :  LOCDI,                 ! structure containing the input data
-                               ! array
-     :  LOCDO,                 ! structure containing the output data
-                               ! array
-     :  LOCI,                  ! input data structure
-     :  LOCO,                  ! output data structure
-     :  WLOC1,                 ! workspace for MA3TO1, MA3TO2 and MA2TO1
-     :  WLOC2,                 !     "      "    "       "     "    "
-     :  SLICE                  ! slice of input data_array
+*  Start an AST context.
+      CALL AST_BEGIN( STATUS )
 
-      CHARACTER * ( DAT__SZNAM )
-     :  DNAMEI,                ! Name of the input data-array component
-     :  DNAMEO                 ! Name of the output data-array component
+*  Start an NDF context.
+      CALL NDF_BEGIN
 
-      INTEGER
-     :  I,                     ! loop counter
-     :  IDIMS( DAT__MXDIM ),   ! input array dimensions
-     :  ODIMS( DAT__MXDIM ),   ! output  "        "
-     :  SDIMS( DAT__MXDIM ),   ! input array slice dimensions
-     :  UPPER( 3 ),            ! upper bounds for slice
-     :  LOWER( 3 ),            ! lower    "    "    "
-     :  MDIM,                  ! work variable used to compute dimension
-                               ! of workspace arrays
-     :  WDIM,                  ! dimension of workspace arrays
-     :  NCDIM,                 ! number characters in dimension list
-     :  ORIGIN( DAT__MXDIM ),  ! Origin of the data array
-     :  PNTRI,                 ! pointer to input data-array component
-     :  PNTRO,                 !    "     " output    "          "
-     :  WPNTR1,                !    "     " workspace
-     :  WPNTR2,                !    "     " workspace
-     :  INDIM,                 ! dimensionality of input array
-     :  ONDIM,                 !        "        " output  "
-     :  MODE,                  ! decision parameter for subroutines
-     :  CASE                   ! type of extraction/projection to be
-                               ! performed
+*  Obtain the input NDF.
+      CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
-      CHARACTER*20
-     :  DIMSTR                 ! list of dimensions of an input array
+*  Get the bounds of the NDF.
+      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBNDI, UBNDI, NDIMI, STATUS )
 
-      LOGICAL
-     :  LOOP                   ! will be .true. if further output arrays
-                               ! to be created
-*-
-*    check status on entry - return if not o.k.
+*  Get the list of axes which is to form the output NDF.  Make sure 
+*  the parameter system will only return values in a meaningful range 
+*  (1..NDIMI).
+      CALL KPG1_FILLI( 0, NDF__MXDIM, MINS, STATUS )
+      CALL KPG1_FILLI( NDIMI, NDF__MXDIM, MAXS, STATUS )
+      CALL PAR_GRMVI( 'AXES', NDF__MXDIM, MINS, MAXS, AXES, NDIMO,
+     :                STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    get a locator to input IMAGE type data structure
-
-      CALL KPG1_GETIM( 'INPUT', LOCI, LOCDI, DNAMEI, ORIGIN, STATUS )
-
-*    origin information is lost.
-
-      DO  I = 1, DAT__MXDIM
-         ORIGIN( I ) = 1
+*  See which dimensions of the input array are used in the output array
+*  (i.e. are not to be collapsed).
+      DO I = 1, NDIMI
+         USED( I ) = .FALSE.
       END DO
 
-*    get a locator to the input data-array object.
-
-      CALL DAT_FIND( LOCDI, DNAMEI, DLOCI, STATUS )
-
-*    enquire shape of input data-array component
-
-      INDIM = 0
-      CALL DAT_SHAPE( DLOCI, DAT__MXDIM, IDIMS, INDIM, STATUS )
-
-*    check for error
-
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*       check that dimensionality is within allowed range
-
-         IF ( ( INDIM .GT. 0 ) .AND. ( INDIM .LT. 4 ) ) THEN
-
-*          initialise LOOP to .TRUE. to start off the loop
-
-            LOOP = .TRUE.
-
-*          repeat the loop as long as LOOP is 'Y' and no errors occur
-
-            DO WHILE ( LOOP .AND. ( STATUS .EQ. SAI__OK ) )
-
-*             tell user dimensionality and dimensions of input array
-
-               CALL MSG_SETI( 'INDIM', INDIM )
-               CALL MSG_OUT( 'INPUT_INDIM',
-     :           'Array is ^INDIM -dimensional', STATUS )
-               CALL DIMLST( INDIM, IDIMS, NCDIM, DIMSTR, STATUS )
-               CALL MSG_SETC( 'DIMSTR', DIMSTR( 1:NCDIM ) )
-               CALL MSG_OUT( 'INPUT_DIM',
-     :           'Dimensions are ^DIMSTR', STATUS )
-
-*             enquire number of dimensions for output array
-
-               CALL PAR_GDR0I( 'ONDIM', INDIM, 1, 3, .TRUE., ONDIM,
-     :                         STATUS )
-
-*             deal with the three basic cases, output array with more,
-*             same or less dimensions than the input array
-
-               IF ( STATUS .EQ. SAI__OK ) THEN
-                  IF ( ONDIM .GT. INDIM ) THEN
-
-                     CALL MAMORE( 'XLIMITS', 'YLIMITS', 'ZLIMITS',
-     :                            'XDIM', 'YDIM', 'ZDIM', 'GLINE1',
-     :                            'GLINE2', 'GPLANE', MXSIZE, INDIM,
-     :                            IDIMS, ONDIM, ODIMS, LOWER, UPPER,
-     :                            CASE, MODE, STATUS )
-
-                  ELSE IF ( ONDIM .EQ. INDIM ) THEN
-
-*                   here CASE is the same as the dimensionality of the
-*                   arrays
-
-                     CASE = INDIM
-                     CALL MASAME( 'XLIMITS', 'YLIMITS', 'ZLIMITS',
-     :                            INDIM, IDIMS, ODIMS, LOWER, UPPER,
-     :                            STATUS )
-                  ELSE
-
-                     CALL MALESS( 'XLIMITS', 'YLIMITS', 'ZLIMITS',
-     :                            'XRANGE', 'YRANGE', 'ZRANGE',
-     :                            'ELINE1', 'ELINE2', 'EPLANE', INDIM,
-     :                            IDIMS, ONDIM, ODIMS, LOWER, UPPER,
-     :                            CASE, MODE, STATUS )
-                  END IF
-               END IF
-
-               IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                get a locator to the required slice of the input array
-
-                  CALL DAT_SLICE( DLOCI, INDIM, LOWER, UPPER, SLICE,
-     :                            STATUS )
-
-*                map the input array slice
-
-                  CALL DAT_MAPN( SLICE, '_REAL', 'READ', INDIM, PNTRI,
-     :                           SDIMS, STATUS )
-
-*                check for error
-
-                  IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                   create the output IMAGE type data structure, create
-*                   and get a value for a TITLE component and create a
-*                   data-array component of dimensionality ONDIM and
-*                   dimensions DIMS(ONDIM)
-
-                     CALL KPG1_CROUT( 'OUTPUT', 'OTITLE', ONDIM, ODIMS,
-     :                                ORIGIN, LOCO, LOCDO, DNAMEO,
-     :                                STATUS )
-
-*                   propagate UNITS, LABEL, HISTORY and extensions from
-*                   the input data file
-
-                     CALL KPG1_IMPRG( LOCI, 'UNITS', LOCO, STATUS )
-
-*                   check for error
-
-                     IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                      map the output data-array component
-
-                        CALL CMP_MAPN( LOCDO, DNAMEO, '_REAL', 'WRITE',
-     :                                 ONDIM, PNTRO, ODIMS, STATUS )
-
-*                      check for error
-
-                        IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                         when the array dimension is less work arrays
-*                         are needed to compute normalised output
-*                         arrays which allow for bad pixels
-
-                           IF ( CASE .EQ. 4 .OR. CASE .EQ. 5 .OR.
-     :                          CASE .EQ. 7) THEN
-
-*                            workspace dimension is the product of the
-*                            largest two input dimensions
-
-                              IF ( CASE .EQ. 4 ) THEN
-                                 MDIM = MIN( IDIMS(1), IDIMS(2),
-     :                                       IDIMS(3) )
-                                 WDIM = ( IDIMS(1) * IDIMS(2) *
-     :                                    IDIMS(3) ) / MDIM
-                              ELSE
-
-*                               workspace dimension is the largest
-*                               input-array dimension
-
-                                 WDIM = -1
-                                 DO  I = 1, INDIM
-                                    WDIM = MAX( WDIM, IDIMS( I ) )
-                                 END DO
-                              END IF
-
-*                            create and map workspace arrays
-
-                              CALL AIF_GETVM( '_REAL', 1, WDIM, WPNTR1,
-     :                                        WLOC1, STATUS )
-                              CALL AIF_GETVM( '_INTEGER', 1, WDIM,
-     :                                        WPNTR2, WLOC2, STATUS )
-                           END IF
-
-*                         check for error
-
-                           IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                            perform the reshaping of the array
-
-*                            1-d to 1-d
- 
-                              IF ( CASE .EQ. 1 ) THEN
-
-                                 CALL COPY1D( SDIMS, %VAL( PNTRI ),
-     :                                        %VAL( PNTRO ), STATUS )
-
-*                            2-d to 2-d
- 
-                              ELSE IF ( CASE .EQ. 2 ) THEN
-
-                                 CALL COPY2D( SDIMS( 1 ), SDIMS( 2 ),
-     :                                        %VAL( PNTRI ),
-     :                                        %VAL( PNTRO ), STATUS )
-
-*                            3-d to 3-d
- 
-                              ELSE IF ( CASE .EQ. 3 ) THEN
-
-                                 CALL COPY3D( SDIMS( 1 ), SDIMS( 2 ),
-     :                                        SDIMS( 3 ), %VAL( PNTRI ),
-     :                                        %VAL( PNTRO ), STATUS )
-
-                              ELSE IF ( CASE .EQ. 4 ) THEN
-
-                                 CALL MA3TO2( MODE, SDIMS( 1 ),
-     :                                        SDIMS( 2 ), SDIMS( 3 ),
-     :                                        %VAL( PNTRI ), ODIMS( 1 ),
-     :                                        ODIMS( 2 ), WDIM,
-     :                                        %VAL(WPNTR1),
-     :                                        %VAL( WPNTR2 ),
-     :                                        %VAL( PNTRO ), STATUS )
-
-                              ELSE IF ( CASE .EQ. 5 ) THEN
-
-                                 CALL MA3TO1( MODE, SDIMS( 1 ),
-     :                                        SDIMS( 2 ), SDIMS( 3 ),
-     :                                        %VAL( PNTRI ), ODIMS( 1 ),
-     :                                        WDIM, %VAL( WPNTR1 ),
-     :                                        %VAL( WPNTR2 ),
-     :                                        %VAL( PNTRO ), STATUS )
-
-                              ELSE IF ( CASE .EQ. 6 ) THEN
-
-                                 CALL MA2TO3( MODE, SDIMS( 1 ),
-     :                                        SDIMS( 2 ), %VAL( PNTRI ),
-     :                                        ODIMS( 1 ), ODIMS( 2 ),
-     :                                        ODIMS( 3 ), %VAL( PNTRO ),
-     :                                        STATUS )
-
-                              ELSE IF ( CASE .EQ. 7 ) THEN
-
-                                 CALL MA2TO1( MODE, SDIMS( 1 ),
-     :                                        SDIMS( 2 ), %VAL( PNTRI ),
-     :                                        ODIMS( 1 ), WDIM,
-     :                                        %VAL( WPNTR1 ),
-     :                                        %VAL( WPNTR2 ), 
-     :                                        %VAL( PNTRO ), STATUS )
-
-                              ELSE IF ( CASE .EQ. 8 ) THEN
-
-                                 CALL MA1TO3( MODE, SDIMS( 1 ),
-     :                                        %VAL( PNTRI ), ODIMS( 1 ),
-     :                                        ODIMS( 2 ), ODIMS( 3 ),
-     :                                        %VAL( PNTRO ), STATUS )
-
-                              ELSE IF ( CASE .EQ. 9 ) THEN
-
-                                 CALL MA1TO2( MODE, SDIMS( 1 ),
-     :                                        %VAL( PNTRI ), ODIMS( 1 ),
-     :                                        ODIMS( 2 ), %VAL( PNTRO ),
-     :                                        STATUS )
-                              END IF
-
-*                            tidy second work array
-
-                              IF ( CASE .EQ. 4 .OR. CASE .EQ. 5 .OR.
-     :                             CASE .EQ. 7 ) THEN
-
-                                 CALL AIF_ANTMP( WLOC2, STATUS )
-                              END IF
-
-                           ELSE
-
-                              CALL ERR_REP( 'ERR_MANIC_WSP', 
-     :                          'MANIC: Unable to get workspace for '/
-     :                          /'averaging', STATUS )
-
-*                         end of creating-and-mapping-workspace check
-
-                           END IF
-
-*                         tidy first work array
-
-                           IF ( CASE .EQ. 4 .OR. CASE .EQ. 5 .OR.
-     :                          CASE .EQ. 7 ) THEN
-
-                              CALL AIF_ANTMP( WLOC1, STATUS )
-
-                           END IF
-
-*                         unmap output data array
-
-                           CALL CMP_UNMAP( LOCDO, DNAMEO, STATUS )
-
-                        ELSE
-
-                           CALL ERR_REP( 'ERR_MANIC_NOMPO',
-     :                       'MANIC: Error occurred whilst trying to '/
-     :                       /'map output frame', STATUS )
-
-*                     end of if-no-error-after-mapping-output-data-array
-*                     check
-
-                        END IF
-
-*                      tidy up output structures
-
-                        CALL DAT_ANNUL( LOCDO, STATUS )
-                        CALL DAT_ANNUL( LOCO, STATUS )
-
-                     ELSE
-
-                        IF ( STATUS .NE. PAR__ABORT ) THEN
-                           CALL ERR_REP( 'ERR_MANIC_NOFRO',
-     :                       'MANIC: Error occurred whilst trying to '/
-     :                       /'access output frame', STATUS )
-                        END IF
-
-*                   end of if-no-error-after-creating-output-structure
-*                   check
-
-                     END IF
-
-*                   unmap the slice
-
-                     CALL DAT_UNMAP( SLICE, STATUS )
-
-                  ELSE
-
-                     CALL ERR_REP( 'ERR_MANIC_NOMPI',
-     :                 'MANIC: Error occurred whilst trying to map '/
-     :                 /'input frame', STATUS )
-
-*                end of mapping-slice-pointer check
-
-                  END IF
-
-               ELSE
-
-                  IF ( STATUS .NE. PAR__ABORT .AND.
-     :                 STATUS .NE. PAR__NULL ) THEN
-                     CALL ERR_REP( 'ERR_MANIC_PAR',
-     :                 'MANIC: Error occurred whilst obtaining pixel '/
-     :                 /'limits', STATUS )
-                  END IF
-
-*             end of no-error-getting-pixel-limitsd check
-
-               END IF
-
-*             tidy up the input slice
-
-               CALL DAT_ANNUL( SLICE, STATUS )
-
-*             enquire if user wishes to make another array from same
-*             input
-
-               CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
-
-*             if reply was Yes then cancel all parameters except INPUT
-
-               IF ( LOOP .AND. ( STATUS .EQ. SAI__OK ) ) THEN
-
-                  CALL DAT_CANCL(  'OUTPUT', STATUS )
-                  CALL PAR_CANCL(   'ONDIM', STATUS )
-                  CALL PAR_CANCL(  'OTITLE', STATUS )
-                  CALL PAR_CANCL( 'XLIMITS', STATUS )
-                  CALL PAR_CANCL( 'YLIMITS', STATUS )
-                  CALL PAR_CANCL( 'ZLIMITS', STATUS )
-                  CALL PAR_CANCL(  'XRANGE', STATUS )
-                  CALL PAR_CANCL(  'YRANGE', STATUS )
-                  CALL PAR_CANCL(  'ZRANGE', STATUS )
-                  CALL PAR_CANCL(  'EPLANE', STATUS )
-                  CALL PAR_CANCL(  'GPLANE', STATUS )
-                  CALL PAR_CANCL(  'ELINE1', STATUS )
-                  CALL PAR_CANCL(  'ELINE2', STATUS )
-                  CALL PAR_CANCL(  'GLINE1', STATUS )
-                  CALL PAR_CANCL(  'GLINE2', STATUS )
-                  CALL PAR_CANCL(    'XDIM', STATUS )
-                  CALL PAR_CANCL(    'YDIM', STATUS )
-                  CALL PAR_CANCL(    'ZDIM', STATUS )
-                  CALL PAR_CANCL(    'LOOP', STATUS )
-               END IF
-
-*          end of current-'manic' loop
-
-            END DO
+      NUSED = 0
+      DO I = 1, NDIMO
+         IF ( AXES( I ) .GT. 0 ) THEN
+            IF ( USED( AXES( I ) ) ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'MANIC_ERR1', 'MANIC: Axis numbers'//
+     :                       ' cannot be used more than once each.',
+     :                       STATUS )
+               GO TO 999
+            END IF
+            USED( AXES( I ) ) = .TRUE.
+            NUSED = NUSED + 1
+         END IF
+      END DO
+
+*  Check that the requested action is reasonable.
+      IF ( NUSED .EQ. 0 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'MANIC_ERR2', 'MANIC: At least one dimension'//
+     :                 ' must be copied from the input NDF.', STATUS )
+         GO TO 999
+      END IF
+
+*  Get the extent of expanded dimensions if any are required.
+      NEXPAN = NDIMO - NUSED
+      IF ( NEXPAN .GT. 0 ) THEN
+
+*  Set the default for the lower bounds dynamically to all 1s.
+         CALL KPG1_FILLI( 1, NEXPAN, DFLS, STATUS )
+         CALL PAR_DEF1I( 'LBND', NEXPAN, DFLS, STATUS )
+
+*  Store maximum values for the upper bound (VAL__MAXI).
+         CALL KPG1_FILLI( VAL__MAXI, NEXPAN, MAXUB, STATUS )
+
+*  Get the values from the environment.
+         CALL PAR_EXACI( 'LBND', NEXPAN, NEWLB, STATUS )
+         CALL PAR_GRM1I( 'UBND', NEXPAN, NEWLB, NEWLB, MAXUB, .FALSE., 
+     :                   NEWUB, STATUS ) 
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Set the upper and lower bounds of the output NDF.
+      INEW = 0
+      DO I = 1, NDIMO
+         IF ( AXES( I ) .EQ. 0 ) THEN
+            INEW = INEW + 1
+            LBNDO( I ) = NEWLB( INEW )
+            UBNDO( I ) = NEWUB( INEW )
          ELSE
+            LBNDO( I ) = LBNDI( AXES( I ) )
+            UBNDO( I ) = UBNDI( AXES( I ) )
+         END IF
+      END DO
 
-*          input array has wrong dimensionality
+*  Create the output NDF by propagation from the input NDF. This results
+*  in history, etc, being passed on. The shape and dimensionality will be
+*  wrong but this will be corrected later.
+      CALL LPG_PROP( INDF1, 'Axis,Units', 'OUT', INDF2, STATUS )
 
-            STATUS = SAI__ERROR
-            CALL MSG_SETI( 'INDIM', INDIM )
-            CALL ERR_REP( 'ERR_MANIC_WRDIM',
-     :        'MANIC: Array is ^INDIM dimensional, not 1,2 or 3-d',
-     :        STATUS )
+*  Set the title of the output NDF.
+      CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDF1, INDF2, STATUS )
 
-*       end of input-data-array-dimension check
+*  The shape and size of the output NDF created above will be wrong, so
+*  we need to correct it by removing the collapse axis. This is easy if
+*  it is the final axis (we would just use NDF_SBND with specifying NDIM-1 
+*  axes), but is not so easy if the collapse axis is not the final axis.
+*  In this case, we do the following:
+*    1) - Save copies of an AXIS structures in the output NDF (because
+*         the following step will change their lengths to match the new
+*         bounds).
+*    2) - Change the bounds and dimensionality of the NDF to the
+*         appropriate values.
+*    3) - Restore the saved AXIS structures, permuting them so that they 
+*         apply to the correct axis.
+*    4) - Adjust the WCS FrameSet to pick the required axis from the
+*         original Base Frame.
 
+*  First see if the AXIS component is defined.
+      CALL NDF_STATE( INDF2, 'AXIS', GOTAX, STATUS )
+
+*  If so, we need to save copies of the AXIS structures.
+      IF ( GOTAX ) THEN
+
+*  Get an HDS locator to the NDF structure.
+         CALL NDF_LOC( INDF2, 'UPDATE', LOC1, STATUS )
+
+*  Get a locator for the AXIS component.
+         CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
+
+*  Take a copy of the AXIS component and call it OLDAXIS.
+         CALL DAT_COPY( LOC2, LOC1, 'OLDAXIS', STATUS )
+
+*  Get a locator for OLDAXIS.
+         CALL DAT_FIND( LOC1, 'OLDAXIS', LOC3, STATUS )
+      END IF
+
+*  Set the output NDF bounds to the required values.  This will change
+*  the lengths of the current AXIS arrays.
+      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDF2, STATUS )
+
+*  We now reinstate any AXIS structures, in their new order.
+      IF ( GOTAX ) THEN
+
+*  First create default axis components for each dimension of the new
+*  NDF.  Some of these will be overwritten with new values, but without
+*  this step the ones corresponding to new dimensions would be missing.
+         CALL NDF_ACRE( INDF2, STATUS )
+
+*  Promote the NDF locator to a primary locator so that the HDS 
+*  container file is not closed when the NDF identifier is annulled.
+         CALL DAT_PRMRY( .TRUE., LOC1, .TRUE., STATUS )
+
+*  The DATA array of the output NDF will not yet be in a defined state.
+*  This would result in NDF_ANNUL reporting an error, so we temporarily
+*  map the DATA array (which puts it in a defined state) to prevent this.
+*  (Shame - this is potentially, though perhaps not usually, expensive).
+         CALL NDF_TYPE( INDF2, 'DATA', ITYPE, STATUS )
+         CALL NDF_MAP( INDF2, 'DATA', ITYPE, 'WRITE', IPDUM, NEL,
+     :                 STATUS )
+
+*  Annul the supplied NDF identifier so that we can change the contents
+*  of the NDF using HDS, without getting out of step with the NDF
+*  library's description of the NDF.
+         CALL NDF_ANNUL( INDF2, STATUS )
+
+*  Loop round each cell in the returned AXIS structure.
+         DO I = 1, NDIMO
+
+*  If this is a copy of an axis from the input NDF, copy the OLDAXIS
+*  components into it.
+            IF ( AXES( I ) .GT. 0 ) THEN
+
+*  Get a locator to this cell in the NDF's AXIS array.
+               CALL DAT_CELL( LOC2, 1, I, LOC4, STATUS )
+
+*  Empty it of any components.
+               CALL DAT_NCOMP( LOC4, NCOMP, STATUS )
+               DO J = NCOMP, 1, -1
+                  CALL DAT_INDEX( LOC4, J, LOC5, STATUS )
+                  CALL DAT_NAME( LOC5, NAME, STATUS )
+                  CALL DAT_ANNUL( LOC5, STATUS )
+                  CALL DAT_ERASE( LOC4, NAME, STATUS )
+                  IF ( STATUS .NE. SAI__OK ) GO TO 999
+               END DO
+
+*  Get a locator to the corresponding cell in the OLDAXIS array.
+               CALL DAT_CELL( LOC3, 1, AXES( I ), LOC5, STATUS )
+
+*  Now copy all the components of the OLDAXIS cell into the AXIS cell.
+*  Find the number of components, and loop round them.   
+               CALL DAT_NCOMP( LOC5, NCOMP, STATUS )
+               DO J = NCOMP, 1, -1
+
+*  Get a locator to this component in the original OLDAXIS cell.
+                  CALL DAT_INDEX( LOC5, J, LOC6, STATUS )
+
+*  Get its name.
+                  CALL DAT_NAME( LOC6, NAME, STATUS )
+
+*  Copy it into the new AXIS structure.
+                  CALL DAT_COPY( LOC6, LOC4, NAME, STATUS )
+
+*  Annul the locators.
+                  CALL DAT_ANNUL( LOC6, STATUS )
+
+*  Abort if an error has occurred.
+                  IF ( STATUS .NE. SAI__OK ) GO TO 999
+               END DO
+
+*  Annul the locators.
+               CALL DAT_ANNUL( LOC4, STATUS )
+               CALL DAT_ANNUL( LOC6, STATUS )
+            END IF
+         END DO
+
+*  Annul the locator to the OLDAXIS structure and then erase the object.
+         CALL DAT_ANNUL( LOC3, STATUS )
+         CALL DAT_ERASE( LOC1, 'OLDAXIS', STATUS )
+
+*  Annul the AXIS array locator.
+         CALL DAT_ANNUL( LOC2, STATUS )
+
+*  Import the modified NDF back into the NDF system.
+         CALL NDF_FIND( LOC1, ' ', INDF2, STATUS )
+
+*  Annul the NDF locator.
+         CALL DAT_ANNUL( LOC1, STATUS )
+      END IF
+
+*  Now to store a suitable WCS frameset in the output NDF.  This will be
+*  a copy of the input NDF's WCS FrameSet but with the Base frame
+*  modified according to the AXES argument.
+
+*  Get the WCS FrameSet from the input NDF.
+      CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
+
+*  Get its Base frame.
+      BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
+
+*  Get the index of its Current frame, since this will be disturbed by
+*  what we are about to do and we must restore it.
+      IBASE = AST_GETI( IWCS, 'BASE', STATUS )
+      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+
+*  Create a new base frame by picking axes from the original base frame.
+*  The format of the AXES array required for AST_PICKAXES is, happily,
+*  the same as used by this program.  This also creates a new PermMap 
+*  which goes from the original Base frame to the new one. However, this
+*  PermMap assigns bad values to new axes, which will cause many WCS
+*  applcations to fail. We really want a PermMap which assigns suitable
+*  contant pixel values to any new axes.
+      NBFRM = AST_PICKAXES( BFRM, NDIMO, AXES, PMAP, STATUS )
+
+*  Unfortunately, the PermMap created by AST_PICKAXES assigns bad values 
+*  to any new or missing axes, which will cause many WCS applications to 
+*  fail. We really want a PermMap which assigns suitable constant pixel 
+*  values to any new or missing axes. We create a better PermMap now.
+*  The AXES parameter corresponds to the OUTPERM argument of the PermMap
+*  constructor. Form a copy in which zero values are changed to -1 (so
+*  that they will be assigned the constant value (1.0) supplied to
+*  AST_PERMMAP, instead of AST__BAD). Also form the corresponding INPERM
+*  array at the same time.
+      DO I = 1, NDIMI
+         INPRM( I ) = -1
+      END DO
+
+      DO I = 1, NDIMO
+         IF( AXES( I ) .GT. 0 ) THEN
+            OUTPRM( I ) = AXES( I )
+            IF( AXES( I ) .LE. NDIMI ) INPRM( AXES( I ) ) = I
+         ELSE
+            OUTPRM( I ) = -1
+         END IF
+      END DO
+
+*  Now create the PermMap assigning the constant value 1.0 to any unused axes
+*  (1.0 is the GRID value of the first element on the pixel axis).      
+      PMAP = AST_PERMMAP( NDIMI, INPRM, NDIMO, OUTPRM, 1.0D0, ' ',
+     :                    STATUS )
+
+*  Now add this Frame into the FrameSet, using the PermMap created above.
+      CALL AST_ADDFRAME( IWCS, AST__BASE, PMAP, NBFRM, STATUS )
+
+*  Get the frame index of the newly created frame.
+      INEW = AST_GETI( IWCS, 'CURRENT', STATUS )
+
+*  Reinstate the original Current frame.
+      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+
+*  Make the new frame the Base frame, and remove the old Base frame.
+      CALL AST_SETI( IWCS, 'BASE', INEW, STATUS )
+      CALL AST_REMOVEFRAME( IWCS, IBASE, STATUS )
+
+*  Save the modified WCS FrameSet in the output NDF.
+      CALL NDF_PTWCS( IWCS, INDF2, STATUS )
+
+*  Now do the main part of the work: reshape and transfer the data 
+*  array from the input NDF to the output one.
+
+*  Get the dimensions of the input and output NDFs in a convenient form.
+      CALL NDF_DIM( INDF1, NDF__MXDIM, DIMI, NDIMI, STATUS )
+      CALL NDF_DIM( INDF2, NDF__MXDIM, DIMO, NDIMO, STATUS )
+
+*  We need to calculate some numbers for allocating workspace.
+*  Find out how many pixels in the input array collapse onto each pixel
+*  in the output array.
+      NWKC = 1
+      DO I = 1, NDIMI
+         IF ( .NOT. USED( I ) ) THEN
+            NWKC = NWKC * DIMI( I )
+         END IF
+      END DO
+
+*  Find out how many pixels in the output array correspond to each 
+*  unique one.
+      NWKE = 1
+      DO I = 1, NDIMO
+         IF ( AXES( I ) .EQ. 0 ) THEN
+            NWKE = NWKE * DIMO( I )
+         END IF
+      END DO
+
+*  Allocate workspace.
+      CALL PSX_CALLOC( NWKC, '_INTEGER', IPWKC, STATUS )
+      CALL PSX_CALLOC( NWKE, '_INTEGER', IPWKE, STATUS )
+
+*  Get the data type of the NDF's DATA component.
+      CALL NDF_TYPE( INDF1, 'DATA', ITYPE, STATUS )
+
+*  Map the data arrays of the input and output NDFs.
+      CALL NDF_MAP( INDF1, 'DATA', ITYPE, 'READ', IPDI, NEL, STATUS )
+      CALL NDF_MAP( INDF2, 'DATA', ITYPE, 'WRITE', IPDO, NEL, STATUS )
+
+*  Do the data pixel copying.
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+         CALL KPG1_MANIB( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
+     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
+     :                    %VAL( IPDO ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
+     :                     AXES, %VAL( IPWKC ), %VAL( IPWKE ),
+     :                     %VAL( IPDO ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+         CALL KPG1_MANIW( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
+     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
+     :                    %VAL( IPDO ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+         CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
+     :                     AXES, %VAL( IPWKC ), %VAL( IPWKE ),
+     :                     %VAL( IPDO ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         CALL KPG1_MANII( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
+     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
+     :                    %VAL( IPDO ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL KPG1_MANIR( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
+     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
+     :                    %VAL( IPDO ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPG1_MANID( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
+     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
+     :                    %VAL( IPDO ), STATUS )
+      END IF
+
+
+*  Unmap the data arrays.
+      CALL NDF_UNMAP( INDF1, 'DATA', STATUS )
+      CALL NDF_UNMAP( INDF2, 'DATA', STATUS )
+
+*  If necessary do the same for the variance array.
+      CALL NDF_STATE( INDF1, 'VARIANCE', GOTVAR, STATUS )
+      IF ( GOTVAR ) THEN
+
+*  Get the data type of the NDF's VARIANCE component.
+         CALL NDF_TYPE( INDF1, 'VARIANCE', ITYPE, STATUS )
+
+*  Map the variance arrays of the input and output NDFs.
+         CALL NDF_MAP( INDF1, 'VARIANCE', ITYPE, 'READ', IPVI, NEL,
+     :                 STATUS )
+         CALL NDF_MAP( INDF2, 'VARIANCE', ITYPE, 'WRITE', IPVO, NEL,
+     :                 STATUS )
+
+*  Do the variance pixel copying.
+         IF ( ITYPE .EQ. '_BYTE' ) THEN
+            CALL KPG1_MANIB( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
+     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
+     :                       %VAL( IPVO ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+            CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
+     :                        AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
+     :                        %VAL( IPVO ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+            CALL KPG1_MANIW( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
+     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
+     :                       %VAL( IPVO ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+            CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
+     :                        AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
+     :                        %VAL( IPVO ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+            CALL KPG1_MANII( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
+     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
+     :                       %VAL( IPVO ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPG1_MANIR( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
+     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
+     :                       %VAL( IPVO ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG1_MANID( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
+     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
+     :                       %VAL( IPVO ), STATUS )
          END IF
 
-*       tidy up the input structures
+*  Unmap the variance arrays.
+         CALL NDF_UNMAP( INDF1, 'VARIANCE', STATUS )
+         CALL NDF_UNMAP( INDF2, 'VARIANCE', STATUS )
+      END IF
+         
+*  Release the workspace.
+      CALL PSX_FREE( IPWKC, STATUS )
+      CALL PSX_FREE( IPWKE, STATUS )
 
-         CALL DAT_ANNUL( DLOCI, STATUS )
-         CALL DAT_ANNUL( LOCDI, STATUS )
-         CALL DAT_ANNUL(  LOCI, STATUS )
+*  Come here if something has gone wrong.
+  999 CONTINUE
 
-      ELSE
+*  End the NDF context.
+      CALL NDF_END( STATUS )
 
-         IF ( STATUS .NE. PAR__ABORT ) THEN
-            CALL ERR_REP( 'ERR_MANIC_NOFRI',
-     :        'MANIC: Error occurred whilst trying to access input '/
-     :        /'frame', STATUS )
-         END IF
+*  End the AST context.
+      CALL AST_END( STATUS )
 
-*    end of if-no-error-after-getting-input-structure check
-
+*  Report a contextual message if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'MANIC_ERR3', 'MANIC: Unable to convert NDF.',
+     :                 STATUS )
       END IF
 
       END

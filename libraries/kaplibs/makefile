@@ -654,7 +654,9 @@ kpg1_wmoduw.f kpg1_wmodw.f kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f \
 kpg1_wrlst.f kpg1_wtm3d.f kpg1_wtm3r.f kpg1_wwrt.f kpg1_xyd2w.f \
 kpg1_xyzwd.f kpg1_xyzwr.f kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f \
 ncraxs.f ncrbck.f ncropn.f normal.f nxtnam.f powarr.f pthlpo.f \
-sread.f zero1d.f zero2d.f 
+sread.f zero1d.f zero2d.f \
+kpg1_manib.f kpg1_manid.f kpg1_manii.f kpg1_manir.f kpg1_maniub.f \
+kpg1_maniuw.f kpg1_maniw.f 
 
 CTG_F_ROUTINES = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \

@@ -9959,187 +9959,68 @@ iraf! {
 
       action manic {
          alias {mani(c)}
+         helplib {$KAPPA_HELP}
 
-         parameter input {
-            position 1
-            type IMAGE
+         parameter axes {
+            position 3
+            type _INTEGER
             access READ
             vpath PROMPT
-            ppath GLOBAL
-            association <-GLOBAL.DATA_ARRAY
-            prompt {Input image}
-            help "Name of the IMAGE structure containing the input data array."
-          }
+            prompt {Input axis for each output axis}
+            size *
+            helpkey *
+         }
 
-         parameter output {
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {Input NDF}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            helpkey *
+         }
+
+         parameter lbnd {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            prompt {Lower bounds for new expanded axes}
+            ppath DYNAMIC
+            size *
+            helpkey *
+         }
+
+         parameter out {
             position 2
-            type IMAGE
+            type NDF
             access WRITE
             vpath PROMPT
+            prompt {Output NDF}
             association ->GLOBAL.DATA_ARRAY
-            prompt {Output image}
-            help "Name of the IMAGE structure to store output data array."
-          }
+            helpkey *
+         }
 
-         parameter otitle {
-            position 3
-            type _CHAR
+         parameter title {
+            type LITERAL
+            access READ
             vpath DEFAULT
-            prompt {Output image title}
-            default {KAPPA - Manic}
-            help "Character string used as a title for the output IMAGE structure."
-          }
+            prompt {Title for output NDF}
+            ppath CURRENT
+            default !
+            helpkey *
+         }
 
-         parameter ondim {
-            position 4
+         parameter ubnd {
             type _INTEGER
+            access READ
             vpath PROMPT
+            prompt {Upper bounds for new expanded axes}
             ppath DYNAMIC
-            prompt {Dimensionality of output image}
-            help "Number of dimensions for the output image.  It must be 1, 2 or 3."
-          }
-
-         parameter xlimits {
-            position 5
-            type _INTEGER
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Window limits for the X-axis of the input data array}
-            help "Give a contiguous range of X-axis pixels that form the output data array."
-          }
-
-         parameter ylimits {
-            position 6
-            type _INTEGER
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Window limits for the Y-axis of the input data array}
-            help "Give a contiguous range of Y-axis pixels that form the output data array."
-          }
-
-         parameter zlimits {
-            position 7
-            type _INTEGER
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Window limits for the Z-axis of the input data array}
-            help "Give a contiguous range of Z-axis pixels that form the output data array."
-          }
-
-         parameter xrange {
-            position 8
-            type _INTEGER
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Range for summation over the X-axis of the input data array}
-            help "Give a contiguous range of X-axis pixels that are going to be summed in forming the output data array."
-          }
-
-         parameter yrange {
-            position 9
-            type _INTEGER
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Range for summation over the Y-axis of the input data array}
-            help "Give a contiguous range of Y-axis pixels that are going to be summed in forming the output data array."
-          }
-
-         parameter zrange {
-            position 10
-            type _INTEGER
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Range for summation over the Z-axis of the input data array}
-            help "Give a contiguous range of Z-axis pixels that are going to be summed in forming the output data array."
-          }
-
-         parameter eplane {
-            position 11
-            type _CHAR
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Plane of the input data array from which the output array is to be extracted}
-            help "Options are: XY, YZ, or XZ."
-          }
-
-         parameter gplane {
-            position 12
-            type _CHAR
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Plane of the output data array which the input data array will form}
-            help "Options are: XY, YZ, or XZ."
-          }
-
-         parameter eline1 {
-            position 13
-            type _CHAR
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Axis of the input data array that will be used to form the output data array?}
-            help "Alternatives are X or Y."
-          }
-
-         parameter eline2 {
-            position 14
-            type _CHAR
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Axis of the input data array that will be used to form the output data array}
-            help "Options are X, Y or Z."
-          }
-
-         parameter gline1 {
-            position 15
-            type _CHAR
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Axis of the output data array that the input data array will form}
-            help "Alternatives are X or Y."
-          }
-
-         parameter gline2 {
-            position 16
-            type _CHAR
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Axis of the output data array that the input data array will form}
-            help "Options are X, Y or Z."
-          }
-
-         parameter xdim {
-            position 17
-            type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {X-dimension for the output data array}
-          }
-
-         parameter ydim {
-            position 18
-            type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Y-dimension for the output data array}
-          }
-
-         parameter zdim {
-            position 19
-            type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Z-dimension for the output data array}
-          }
-
-         parameter loop {
-            position 20
-            type _LOGICAL
-            vpath PROMPT
-            ppath DEFAULT
-            default FALSE
-            prompt {Produce another output IMAGE structure and data array?}
-          }
-
+            size *
+            helpkey *
+         }
       }
 
       action makesurface {
