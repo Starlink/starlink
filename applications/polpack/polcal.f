@@ -156,10 +156,30 @@
 *        be positive. [0.05]
 *     VARIANCE = _LOGICAL (Read)
 *        This parameter should be set to a TRUE value if variances are to
-*        be included in the output cube. This can only be done if all the
-*        input intensity images have associated variance values. A null (!)
-*        value results in variance values being created if possible, but
-*        not otherwise. [!]
+*        be included in the output cube. A null (!) value results in variance 
+*        values being created if possible, but not otherwise. [!]
+*     WEIGHTS = _INTEGER (Read)
+*        Indicates how the weight to associate with each input intensity
+*        value should be chosen. It should be an integer in the range 1
+*        to 4. These values select the following weighting schemes:
+*        
+*        - 1 -- Use the reciprocal of the variances supplied with the
+*        input images. If any input images do not have associated variances
+*        then a constant weight of 1.0 will be used for all input images.
+*
+*        - 2 -- Use the reciprocal of the variances supplied with the
+*        input images. If an input image does not have associated variances
+*        then the weights used for that image are based on an estimate of the 
+*        variances derived from the spread of input intensity values. 
+*
+*        - 3 -- Use the reciprocal of an estimate of the input variance
+*        derived from the spread of input intensity values. Any variances 
+*        supplied with the input images are ignored.
+*
+*        - 4 -- Use a constant weight of 1.0 for all input images. Any 
+*        variances supplied with the input images are ignored. 
+*
+*        [1]
  
 *  The Single-beam Algorithm:
 *        In single-bean mode, the I, Q and U values at each output pixel are 
@@ -313,6 +333,7 @@
       INTEGER VAR                ! Variances required flag
       LOGICAL DBEAM              ! Use dual-beam mode?
       LOGICAL LVAL               ! Logical parameter value
+      INTEGER WEIGHT             ! Weighting scheme
 *.
 
 *  Check inherited global status.
@@ -351,6 +372,9 @@
          VAR = -1
       END IF
 
+*  Get the weighting scheme to use.
+      CALL PAR_GDR0I( 'WEIGHTS', 1, 1, 4, .FALSE., WEIGHT, STATUS )
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -379,9 +403,13 @@
 
 *  Process the data using dual or single beam mode.
       IF( DBEAM ) THEN
+
+* >>>>>>>>  NEED TO ADD WEIGHT INTO THE FOLLOWING DUAL_BEAM CALL.  <<<<<<<<
+
          CALL POL1_DULBM( IGRP, VAR, ILEVEL, STATUS )
+
       ELSE
-         CALL POL1_SNGBM( IGRP, VAR, ILEVEL, STATUS )
+         CALL POL1_SNGBM( IGRP, VAR, WEIGHT, ILEVEL, STATUS )
       END IF
 
 * Tidy up.

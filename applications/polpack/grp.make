@@ -46,7 +46,8 @@ polpack_mon.f polpack_test polplot.f polplot.ifl polvec.f polvec.ifl \
 pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit sread.f \
 tick.bit vertex.bit wrndf.f pol1_dbeam.f pol1_blocr.f \
 pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f  pol1_snghd.f  \
-pol1_sngsv.f pol1_dulbm.f pol1_fillr.f
+pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_sngfl.f pol1_sngsi.f \
+pol1_sngsm.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.

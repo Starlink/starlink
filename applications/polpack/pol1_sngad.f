@@ -1,6 +1,6 @@
-      SUBROUTINE POL1_SNGAD( VAR, EL, DIN, VIN, PHI, T, EPS, IE1, IE2, 
+      SUBROUTINE POL1_SNGAD( EL, DIN, VIN, PHI, T, EPS, IE1, IE2, 
      :                       IE3, MAT11, MAT21, MAT31, MAT22, MAT32, 
-     :                       MAT33, CM1, CM2, STATUS )
+     :                       MAT33, CM1, CM2, COUNT, STATUS )
 *+
 *  Name:
 *     POL1_SNGAD
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGAD( VAR, EL, DIN, VIN, PHI, T, EPS, IE1, IE2, IE3, 
+*     CALL POL1_SNGAD( EL, DIN, VIN, PHI, T, EPS, IE1, IE2, IE3, 
 *                      MAT11, MAT21, MAT31, MAT22, MAT32, MAT33, CM1, 
-*                      CM2, STATUS )
+*                      CM2, COUNT, STATUS )
 
 *  Description:
 *     This routine updates a set of images holding different quanities by 
@@ -24,14 +24,12 @@
 *     intensity images.
 
 *  Arguments:
-*     VAR = LOGICAL (Given)
-*        Are output variances being created?
 *     EL = INTEGER (Given)
 *        The number of pixels in each image.
 *     DIN( EL ) = REAL (Given)
 *        The input intensity values.
 *     VIN( EL ) = REAL (Given)
-*        The input variance values. Only accessed if VAR is TRUE.
+*        The input variance values. 
 *     PHI = REAL (Given)
 *        The analyser angle for the supplied array. In radians.
 *     T = REAL (Given)
@@ -63,6 +61,8 @@
 *        The first term needed to calculate the curvature matrix.
 *     CM2( EL ) = REAL (Given and Returned)
 *        The second term needed to calculate the curvature matrix.
+*     COUNT( EL ) = REAL (Given and Returned)
+*        The number of input images contributing to each output pixel.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -91,7 +91,6 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
-      LOGICAL VAR
       INTEGER EL
       REAL DIN( EL )
       REAL VIN( EL )
@@ -111,6 +110,7 @@
       REAL MAT33( EL )
       REAL CM1( EL )
       REAL CM2( EL )
+      REAL COUNT( EL )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -133,14 +133,7 @@
 
 *  Loop round every pixel.
       DO I = 1, EL
-
-*  If input variances are not available assume a constant value of 1.0 in 
-*  order to give equal weight to all input values.
-         IF( VAR ) THEN
-            VARVAL = VIN( I )
-         ELSE
-            VARVAL = 1.0
-         END IF
+         VARVAL = VIN( I )
 
 *  Ignore this pixel if either the input variance or intensity is bad, or if 
 *  the variance is less than or equal to zero.
@@ -172,6 +165,9 @@
 *  Curvature matrix...
             CM1( I ) = CM1( I ) + RC
             CM2( I ) = CM2( I ) + RS
+
+*  Increase the count of input images contributing to this pixel.
+            COUNT( I ) = COUNT( I ) + 1.0
 
          END IF
 

@@ -158,13 +158,23 @@ interface POLCAL
       helpkey  '*'
    endparameter
 
+   parameter WEIGHTS
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  1
+      prompt   'Scheme for choosing weights for input intensity values'
+      helpkey  '*'
+   endparameter
+
    parameter VARIANCE
       type     _LOGICAL
       access   READ
       vpath    'DEFAULT '
       ppath    'DEFAULT '
       default  !
-      prompt   'Are variance values to be generated?'
+      prompt   'Are output variance values to be generated?'
       helpkey  '*'
    endparameter
 

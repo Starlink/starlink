@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGBM( IGRP1, IVAR, ILEVEL, STATUS )
+      SUBROUTINE POL1_SNGBM( IGRP1, IVAR, WEIGHT, ILEVEL, STATUS )
 *+
 *  Name:
 *     POL1_SNGBM
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGBM( IGRP1, IVAR, ILEVEL, STATUS )
+*     CALL POL1_SNGBM( IGRP1, IVAR, WEIGHT, ILEVEL, STATUS )
 
 *  Description:
 *     This routine creates a 3D NDF holding Stokes vectors calculated from 
@@ -25,6 +25,25 @@
 *        then output variances are not required. If zero, then output 
 *        variances will be created if possible, but no error is reported
 *        otherwise.
+*     WEIGHT = INTEGER (Given)
+*        The weighting scheme to use:
+*
+*        1 - Use the reciprocal of the variances supplied with the
+*        input images. If any input images do not have associated variances
+*        then a constant weight of 1.0 will be used for all input images.
+*
+*        2 - Use the reciprocal of the variances supplied with the
+*        input images. If an input image does not have associated variances
+*        then the weights used for that image are based on an estimate of the 
+*        variances derived from the spread of input intensity values. 
+*
+*        3 - Use the reciprocal of an estimate of the input variance
+*        derived from the spread of input intensity values. Any variances 
+*        supplied with the input images are ignored.
+*
+*        4 - Use a constant weight of 1.0 for all input images. Any 
+*        variances supplied with the input images are ignored. 
+*
 *     ILEVEL = INTEGER (Given)
 *        The amount of information to display on the screen; 0 for none;
 *        1 for some; 2 for lots.
@@ -75,6 +94,7 @@
 *  Arguments Given:
       INTEGER IGRP1
       INTEGER IVAR
+      INTEGER WEIGHT
       INTEGER ILEVEL
 
 *  Status:
@@ -102,7 +122,9 @@
       INTEGER NNDF               ! No. of input NDFs
       INTEGER PLACE              ! Place holder for co-variances NDF
       INTEGER UBNDO( 3 )         ! Upper bounds of output NDF
-      LOGICAL VAR                ! Create output variances?
+      INTEGER WSCH               ! Weighting scheme to use
+      LOGICAL INVAR              ! Use input variances?
+      LOGICAL OUTVAR             ! Create output variances?
       REAL NSIGMA                ! Rejection threshold
 *.
 
@@ -137,26 +159,66 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999     
 
+*  Get the number of rejection iterations to perform.
+      CALL PAR_GET0I( 'NITER', NITER, STATUS )
+      NITER = MAX( 0, NITER )
+
 *  Get the required headers. This also returns the required bounds for
-*  the output NDF, and a flag indicating if output variances can be
-*  created.
-      CALL POL1_SNGHD( IGRP1, NNDF, VAR, %VAL( IPPHI ), %VAL( IPAID ), 
+*  the output NDF, and a flag indicating if input variances are available
+*  in all input NDFs.
+      CALL POL1_SNGHD( IGRP1, NNDF, INVAR, %VAL( IPPHI ), %VAL( IPAID ), 
      :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, %VAL( IPIMI ),
      :                 LBNDO, UBNDO, STATUS, %VAL( IMGID_LEN ) )
 
-*  Report an error if output variances were requested but cannot be
-*  created.
-      IF( IVAR .GT. 0 .AND. .NOT. VAR .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'POL1_SNGBM_ERR1', 'Cannot create output '//
-     :                 'variances since one or more input images do '//
-     :                 'not have variances.', STATUS )
-         GO TO 999
+*  Choose the weigfhting scheme to use, taking account of the
+*  availability of input variances. Also, estimates of input variances
+*  can only be made if we are allowed to iterate (i.e. if niter is
+*  greater than zero).
+      IF( WEIGHT .EQ. 1 ) THEN
+         IF( INVAR ) THEN
+            WSCH = 1
+         ELSE
+            WSCH = 4
+         END IF
 
-*  If output variances could be created, but were not requested, reset the
-*  flag.
-      ELSE IF( IVAR .LT. 0 ) THEN
-         VAR = .FALSE.
+      ELSE IF( WEIGHT .EQ. 2 ) THEN
+         IF( INVAR ) THEN
+            WSCH = 1
+         ELSE IF( NITER .GT. 0 ) THEN
+            WSCH = 2
+         ELSE
+            WSCH = 4
+         END IF
+
+      ELSE IF( WEIGHT .EQ. 3 ) THEN
+         IF( NITER .GT. 0 ) THEN
+            WSCH = 3
+         ELSE
+            WSCH = 4
+         END IF
+
+      ELSE
+         WSCH = 4
+      END IF
+
+*  Decide whether to create output variances.
+      IF( IVAR .GT. 0 ) THEN
+
+         IF( WSCH .EQ. 4 .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'POL1_SNGBM_ERR1', 'Output variances have '//
+     :                    'been requested but cannot be produced. See'//
+     :                    ' parameters VARIANCE, WEIGHTS and NITER.', 
+     :                    STATUS )
+         ELSE
+            OUTVAR = .TRUE.
+         END IF
+
+      ELSE IF( IVAR .EQ. 0 ) THEN      
+         OUTVAR = ( WSCH .LT. 4 )
+
+      ELSE
+         OUTVAR = .FALSE.
       END IF
 
 *  Create the output NDF.
@@ -201,7 +263,7 @@
 *  If VARIANCES are being produced, create a 2D NDF within the POLPACK 
 *  extension to hold the QU co-variance. This NDF has the same shape, size
 *  and type as the base NDF (except that it is 2D instead of 3D). 
-      IF( VAR ) THEN
+      IF( OUTVAR ) THEN
 
 *  Create a _REAL 2D NDF with the bounds of a plane in the 3D NDF.
          CALL NDF_PLACE( XLOC, 'COVAR', PLACE, STATUS ) 
@@ -219,10 +281,6 @@
 
 *  Calculate the Stokes vectors and store them in the output NDF.
 *  ==============================================================
-*  Get the number of rejection iterations to perform.
-      CALL PAR_GET0I( 'NITER', NITER, STATUS )
-      NITER = MAX( 0, NITER )
-
 *  Get the rejection threshold if any iterations are to be performed.
       IF( NITER .GT. 0 ) THEN
          CALL PAR_GET0R( 'NSIGMA', NSIGMA, STATUS )
@@ -230,10 +288,10 @@
       END IF
 
 *  Calcualte the I,Q,U values.        
-      CALL POL1_SNGSV( IGRP1, NNDF, VAR, %VAL( IPPHI ), %VAL( IPAID ), 
-     :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, INDFO, INDFC, 
-     :                 NITER, NSIGMA, ILEVEL, %VAL( IPIMI ), STATUS,
-     :                 %VAL( IMGID_LEN ) )
+      CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
+     :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
+     :                 INDFO, INDFC, NITER, NSIGMA, ILEVEL, 
+     :                 %VAL( IPIMI ), STATUS, %VAL( IMGID_LEN ) )
 
 *  Tidy up.
 *  ========

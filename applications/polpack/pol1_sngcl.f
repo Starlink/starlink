@@ -1,6 +1,6 @@
-      SUBROUTINE POL1_SNGCL( VAR, EL, IE1, IE2, IE3, MAT11, MAT21, 
+      SUBROUTINE POL1_SNGCL( EL, IE1, IE2, IE3, MAT11, MAT21, 
      :                       MAT31, MAT22, MAT32, MAT33, CM1, CM2, 
-     :                       DOUT, VOUT, COUT, STATUS )
+     :                       COUNT, DOUT, VOUT, COUT, STATUS )
 *+
 *  Name:
 *     POL1_SNGCL
@@ -13,8 +13,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGCL( VAR, EL, IE1, IE2, IE3, MAT11, MAT21, MAT31, MAT22, 
-*                      MAT32, MAT33, CM1, CM2, DOUT, VOUT, COUT, STATUS )
+*     CALL POL1_SNGCL( EL, IE1, IE2, IE3, MAT11, MAT21, MAT31, MAT22, 
+*                      MAT32, MAT33, CM1, CM2, COUNT, DOUT, VOUT, COUT, 
+*                      STATUS )
 
 *  Description:
 *     This routine calculates the Stokes vectors, variances and co-variances 
@@ -22,8 +23,6 @@
 *     The method used is described by Sparks & Axon (PASP ????).
 
 *  Arguments:
-*     VAR = LOGICAL (Given)
-*        Are output variances being created?
 *     EL = INTEGER (Given)
 *        The number of pixels in each image.
 *     IE1( EL ) = REAL (Given)
@@ -51,13 +50,15 @@
 *        The first term needed to calculate the curvature matrix.
 *     CM2( EL ) = REAL (Given)
 *        The second term needed to calculate the curvature matrix.
+*     COUNT( EL ) = REAL (Given)
+*        The number of input images contributing to each output pixel.
 *     DOUT( EL, 3 ) = REAL (Returned)
 *        The output Stokes vectors. Plane 1 holds I, plane 2 holds Q
 *        and plane 3 holds U.
 *     VOUT( EL, 3 ) = REAL (Returned)
-*        The output variance values. Only accessed if VAR is TRUE.
+*        The output variance values. 
 *     COUT( EL ) = REAL (Returned)
-*        The output QU co-variance values. Only accessed if VAR is TRUE.
+*        The output QU co-variance values. 
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -86,7 +87,6 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
-      LOGICAL VAR
       INTEGER EL
       REAL IE1( EL )
       REAL IE2( EL )
@@ -99,6 +99,7 @@
       REAL MAT33( EL )
       REAL CM1( EL )
       REAL CM2( EL )
+      REAL COUNT( EL )
 
 *  Arguments Returned:
       REAL DOUT( EL, 3 )
@@ -137,19 +138,18 @@
 *  Evaluate the denominator term.
          DEN = D3*D3*D5 + D6*D6*D1 + D9*D2*D2 - D9*D5*D1 - 2*D2*D3*D6
 
-*  Store bad output values if the denominator is zero.
-         IF( DEN .EQ. 0.0 ) THEN
+*  Store bad output values if the denominator is zero, or if less than
+*  three input images contributed to this output pixel.
+         IF( DEN .EQ. 0.0 .OR. COUNT( I ) .LT. 3.0 ) THEN
 
             DOUT( I, 1 ) = VAL__BADR
             DOUT( I, 2 ) = VAL__BADR
             DOUT( I, 3 ) = VAL__BADR
 
-            IF( VAR ) THEN
-               VOUT( I, 1 ) = VAL__BADR
-               VOUT( I, 2 ) = VAL__BADR
-               VOUT( I, 3 ) = VAL__BADR
-               COUT( I ) = VAL__BADR
-            END IF
+            VOUT( I, 1 ) = VAL__BADR
+            VOUT( I, 2 ) = VAL__BADR
+            VOUT( I, 3 ) = VAL__BADR
+            COUT( I ) = VAL__BADR
 
 *  Otherwise, calculate the required values.
          ELSE 
@@ -167,41 +167,36 @@
      :                       Y2*( D6*D1 - D2*D3 ) + 
      :                       Y3*( D2*D2 - D5*D1 ) ) / DEN
 
-*  Variances and co-variance are only required if VAR is true.
-            IF( VAR ) THEN
-
 *  Calculate the C matrix. This gives the curvature of chi-squared with
 *  respect to (I,Q,U).
-               C1 = 0.25*D1
-               C2 = 0.25*CM1( I )
-               C3 = 0.25*CM2( I )
-               C4 = C2
-               C5 = 0.25*D5
-               C6 = 0.25*D6
-               C7 = C3
-               C8 = C6
-               C9 = 0.25*D9
+            C1 = 0.25*D1
+            C2 = 0.25*CM1( I )
+            C3 = 0.25*CM2( I )
+            C4 = C2
+            C5 = 0.25*D5
+            C6 = 0.25*D6
+            C7 = C3
+            C8 = C6
+            C9 = 0.25*D9
 
 *  Store the I, Q and U variances, and the the QU co-variance in the output 
 *  arrays. Store bad values if the matrix is singular. The variances are
 *  the diagonal elements of the inverted curvature matrix, and the QU
 *  co-variance is column 3 row 2 of the inverted curvature matrix.
-               DEN = C3*C3*C5 + C6*C6*C1 + C9*C2*C2 - C9*C5*C1 - 
-     :               2*C2*C3*C6
+            DEN = C3*C3*C5 + C6*C6*C1 + C9*C2*C2 - C9*C5*C1 - 
+     :            2*C2*C3*C6
 
-               IF( DEN .EQ. 0.0 ) THEN
-                  VOUT( I, 1 ) = VAL__BADR
-                  VOUT( I, 2 ) = VAL__BADR
-                  VOUT( I, 3 ) = VAL__BADR
-                  COUT( I ) = VAL__BADR
+            IF( DEN .EQ. 0.0 ) THEN
+               VOUT( I, 1 ) = VAL__BADR
+               VOUT( I, 2 ) = VAL__BADR
+               VOUT( I, 3 ) = VAL__BADR
+               COUT( I ) = VAL__BADR
 
-               ELSE
-                  VOUT( I, 1 ) = ( C6*C6 - C9*C5 )/DEN
-                  VOUT( I, 2 ) = ( C3*C3 - C1*C9 )/DEN
-                  VOUT( I, 3 ) = ( C2*C2 - C5*C1 )/DEN
-                  COUT( I ) = ( C6*C1 - C2*C3 )/DEN
-               END IF
-
+            ELSE
+               VOUT( I, 1 ) = ( C6*C6 - C9*C5 )/DEN
+               VOUT( I, 2 ) = ( C3*C3 - C1*C9 )/DEN
+               VOUT( I, 3 ) = ( C2*C2 - C5*C1 )/DEN
+               COUT( I ) = ( C6*C1 - C2*C3 )/DEN
             END IF
 
 *  Increment the number of good output pixels.
