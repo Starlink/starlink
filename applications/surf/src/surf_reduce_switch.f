@@ -121,6 +121,12 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.21  1997/07/03 20:18:10  timj
+*     Output file size is now much smaller (use NDF_SECT before propogation
+*     and copy output data to file after reducing the siwtches).
+*
+*     Also add axes at this point.
+*
 *     Revision 1.20  1997/06/20 21:23:49  timj
 *     Update header to reflect the fact that SPIKE_LEVEL now has a default
 *     of 5 and is no longer asked by default. Same for USE_CALIBRATOR.
@@ -242,6 +248,8 @@ c
       INTEGER      IN_DEM_PNTR_PTR     ! pointer to input .SCUBA.DEM_PNTR array
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC ! Locator to .SCUBA extension
       INTEGER      ITEMP               ! scratch integer
+      INTEGER      J                   ! Counter
+      INTEGER      JIGGLE_COUNT        ! Size of jiggle
       INTEGER      LAST_EXP            ! the last exposure number in
                                        ! an aborted observation
       INTEGER      LAST_INT            ! the last integration number in
@@ -254,6 +262,8 @@ c
                                        ! missing in an exposure
       INTEGER      NDIM                ! the number of dimensions in an array
       INTEGER      NERR                ! Number of errors returned from VEC_ITOI
+      INTEGER      NINTS               ! Integration number for AXES
+      INTEGER      NJIGGLE             ! Jiggle number for AXES
       INTEGER      NREC                ! number of history records in file
       INTEGER      N_BOLS              ! number of bolometers measured
       INTEGER      N_EXPOSURES         ! number of exposures per integration
@@ -265,19 +275,28 @@ c
       INTEGER      N_SWITCH_POS        ! the number of positions in a switch
       CHARACTER*30 OBJECT              ! name of object observed
       CHARACTER*15 OBSERVING_MODE      ! type of observation
+      INTEGER      OUT_A_PTR           ! Pointer to AXIS
       INTEGER      OUT_NDF             ! NDF identifier of output file
-      INTEGER      OUT_DATA_PTR        ! pointer to data array in output file
+      INTEGER      OUT_DAT_PTR         ! Pntr to data in output file
+      INTEGER      OUT_DATA_END        ! pointer to end data array 
+      INTEGER      OUT_DATA_PTR        ! pointer to output data array 
       INTEGER      OUT_DEM_PNTR_PTR    ! pointer to output .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
                                        ! HDS locator of REDS extension in 
                                        ! output file
+      INTEGER      OUT_QUL_PTR         ! Mapped output file quality
+      INTEGER      OUT_QUALITY_END     ! end of qual array.
       INTEGER      OUT_QUALITY_PTR     ! pointer to quality array in output 
       CHARACTER*(DAT__SZLOC) OUT_SCUBAX_LOC ! Locator .SCUBA output
-      INTEGER      OUT_VARIANCE_PTR    ! pointer to variance array in output
+      INTEGER      OUT_VAR_PTR         ! Pointer to output variance file
+      INTEGER      OUT_VARIANCE_END    ! pointer to end of variance array
+      INTEGER      OUT_VARIANCE_PTR    ! pointer to variance array
       LOGICAL      REDUCE_SWITCH       ! .TRUE. if REDUCE_SWITCH has already
                                        ! been run on the file
+      REAL         RTEMP               ! Temporary real
       INTEGER      RUN_NUMBER          ! run number of observation
       CHARACTER*15 SAMPLE_MODE         ! sample mode of observation
+      INTEGER      SECNDF              ! Section NDF identifier
       INTEGER      SPIKE_LEVEL         ! level to despike
       INTEGER      START_BEAM          ! first reduced beam
       CHARACTER*80 STATE               ! string describing the 'state'
@@ -487,9 +506,9 @@ c
 
 *  map the data array and check its dimensions 
 
+*     Check the dimensions of the input data
+
       CALL NDF_DIM (IN_NDF, MAXDIM, DIM, NDIM, STATUS)
-      CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
-     :  ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
@@ -514,6 +533,12 @@ c
       END IF
 
       N_POS = DIM (3)
+
+*     Map the input data
+
+      CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
+     :     ITEMP, STATUS)
+
 
 *  map the DEM_PNTR array and check its dimensions
 
@@ -617,34 +642,70 @@ c
      :     STATUS)
       END IF
 
-*  now open the output NDF, propagating it from the input one
+*     Propogating the input to the output results in an output NDF that
+*     is far bigger than needed (since the space is not given back). To
+*     get round this we first create a section of the required size and 
+*     propogate that
 
-      CALL NDF_PROP (IN_NDF, ' ', 'OUT', OUT_NDF, STATUS)
 
-*  create a history component in the output file
+*     First need to calculate new bounds of the array
 
-      CALL NDF_HCRE (OUT_NDF, STATUS)
-
-*  reset the data array bounds and map the various components
+*     First need to set the bounds of the array to small
 
       NDIM = 2
       LBND (1) = 1
       LBND (2) = 1
       UBND (1) = N_BOLS
-      UBND (2) = N_POS
+      UBND (2) = 1     ! N_POS
+      LBND(3)  = 1
+      UBND(3)  = 1
       IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
          NDIM = 3
          LBND (3) = 1
          UBND (3) = SCUBA__MAX_BEAM
       END IF
-      CALL NDF_SBND (NDIM, LBND, UBND, OUT_NDF, STATUS)
 
-      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-     :  OUT_QUALITY_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
-     :  OUT_DATA_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
-     :  OUT_VARIANCE_PTR, ITEMP, STATUS)
+*     Now create a section of the input data so that we can
+*     copy only the necessary size
+
+      CALL NDF_SECT(IN_NDF, NDIM, LBND, UBND, SECNDF, STATUS)
+
+*     Propogate the section to the output
+
+      CALL NDF_PROP (SECNDF, ' ', 'OUT', OUT_NDF, STATUS)
+
+*     create a history component in the output file
+
+      CALL NDF_HCRE (OUT_NDF, STATUS)
+
+*     Since the number of positions in the output file can reduce by a
+*     factor of 2 or 3 (depending on the number of switches) it is
+*     more efficient (for space) to use a malloced array first and
+*     then copy the data to the output file. Note that this may not 
+*     be the most efficient use of memory or speed.
+
+      OUT_DATA_PTR = 0
+      OUT_DATA_END = 0
+      OUT_VARIANCE_PTR = 0
+      OUT_VARIANCE_END = 0
+      OUT_QUALITY_PTR = 0
+      OUT_QUALITY_END = 0
+
+      CALL SCULIB_MALLOC(N_POS * N_BOLS * UBND(3) * VAL__NBR,
+     :     OUT_DATA_PTR, OUT_DATA_END, STATUS)
+      CALL SCULIB_MALLOC(N_POS * N_BOLS * UBND(3) * VAL__NBR,
+     :     OUT_VARIANCE_PTR, OUT_VARIANCE_END, STATUS)
+      CALL SCULIB_MALLOC(N_POS * N_BOLS * UBND(3) * VAL__NBUB,
+     :     OUT_QUALITY_PTR, OUT_QUALITY_END, STATUS)
+
+*     Map the output data
+
+*      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+*     :  OUT_QUALITY_PTR, ITEMP, STATUS)
+*      CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
+*     :  OUT_DATA_PTR, ITEMP, STATUS)
+*      CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
+*     :  OUT_VARIANCE_PTR, ITEMP, STATUS)
 
 *  find the .SCUBA.DEM_PNTR array, change its bounds and map it
 
@@ -929,12 +990,13 @@ c
 
 *  unmap and set the dimensions of the main data array to their final values
 
-         CALL NDF_UNMAP (OUT_NDF, '*', STATUS)
+*         CALL NDF_UNMAP (OUT_NDF, '*', STATUS)
          NDIM = 2
          LBND (1) = 1
          LBND (2) = 1
          UBND (1) = N_BOLS
          UBND (2) = EXP_POINTER - 1
+         UBND (3) = 1
          IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
             NDIM = 3
             LBND (3) = 1
@@ -942,6 +1004,27 @@ c
          END IF
          CALL NDF_SBND (NDIM, LBND, UBND, OUT_NDF, STATUS)
       END IF
+
+*     Map the output file
+
+      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :     OUT_QUL_PTR, ITEMP, STATUS)
+      CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
+     :     OUT_DAT_PTR, ITEMP, STATUS)
+      CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
+     :     OUT_VAR_PTR, ITEMP, STATUS)
+
+*     Copy the reduced data to the output array now that we know the 
+*     correct size.
+*     This is made more complicated because the adjustable bounds are
+*     not from the last dimension if beams are involved.
+*     Its easier to use a small subroutine which I will add to the end
+*     of this code for the moment.
+
+      CALL SURF_LOCAL_COPY(N_BOLS, N_POS, UBND(3), %VAL(OUT_DATA_PTR),
+     :     %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), EXP_POINTER-1,
+     :     %VAL(OUT_DAT_PTR), %VAL(OUT_VAR_PTR), %VAL(OUT_QUL_PTR),
+     :     STATUS)
 
 *  write the BEAM_WEIGHT array to the REDS extension
 
@@ -959,7 +1042,102 @@ c
      :  BEAM_WEIGHT, STATUS)
       CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
 
+* Write the axis info
+*     For PHOTOM observations there are 3 axes 
+*
+*     MAPS:    Axis 1: bolometers   2: Data
+*     PHOTOM:  Axis 1: Bolometers   2: Data   3: Beam
+
+*     Deal with BOLOMETER axis
+
+      CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
+     :     OUT_A_PTR, ITEMP, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_NFILLI (N_BOLS, %val(OUT_A_PTR))
+      END IF
+      CALL NDF_ACPUT ('Bolometer', OUT_NDF, 'LABEL', 1, STATUS)
+      CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 1, STATUS)
+
+*     Deal with BEAM if necessary
+
+      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+
+         CALL NDF_AMAP(OUT_NDF, 'CENTRE', 3, '_INTEGER', 'WRITE',
+     :        OUT_A_PTR, ITEMP, STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL SCULIB_NFILLI (3, %val(OUT_A_PTR))
+         END IF
+         CALL NDF_ACPUT ('Beam', OUT_NDF, 'LABEL', 3, STATUS)
+         CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 3, STATUS)
+
+      END IF
+
+*     Deal with the integrations - SCAN/MAP doesnt use jiggles so I 
+*     have to think about that to work out how big a an integration is
+*     - probably use DEM_PNTR.
+*     SKYDIP will use measurements.
+
+      IF (SAMPLE_MODE .NE. 'RASTER') THEN
+
+         CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
+     :        OUT_A_PTR, ITEMP, STATUS)
+
+         print *,'Size of axis is :',ITEMP, N_POS, EXP_POINTER-1
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            ITEMP = 0
+            
+*     Read the JIGGLE_COUNT from the FITS header
+
+            CALL SCULIB_GET_FITS_I (N_FITS, N_FITS, FITS,
+     :           'JIGL_CNT', JIGGLE_COUNT, STATUS)
+
+*     For aborted datasets need to be careful so must use N_POS
+*     and not just N_INTEGRATIONS. Note that N_POS is in fact
+*     EXP_POINTER - 1 after removing the switches
+
+            N_POS = EXP_POINTER - 1
+ 
+            NINTS = N_POS / JIGGLE_COUNT
+            IF (NINTS * JIGGLE_COUNT .LT. N_POS) THEN
+               NINTS = NINTS + 1
+            END IF
+            
+            DO I = 1, NINTS
+               NJIGGLE = MOD (N_POS - (I-1) * JIGGLE_COUNT, 
+     :              JIGGLE_COUNT)
+               IF (NJIGGLE .EQ. 0) THEN
+                  NJIGGLE = JIGGLE_COUNT
+               END IF
+               
+               DO J = 1, NJIGGLE
+                  RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
+                  CALL SCULIB_CFILLR(1,RTEMP,
+     :                 %VAL(OUT_A_PTR+(ITEMP * VAL__NBR)))
+                  ITEMP = ITEMP + 1
+               END DO
+            END DO
+            
+         END IF  
+
+         CALL NDF_ACPUT ('Integration', OUT_NDF, 'LABEL', 2, STATUS)
+         CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
+      END IF
+
+*     and a title
+
+      CALL NDF_CPUT('Raw data', OUT_NDF, 'LAB', STATUS) 
+      CALL NDF_CPUT(OBJECT, OUT_NDF, 'Title', STATUS)
+      CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
+
+
 *  tidy up
+
+      CALL SCULIB_FREE('RESW_DATA', OUT_DATA_PTR, OUT_DATA_END, STATUS)
+      CALL SCULIB_FREE('RESW_VAR', OUT_VARIANCE_PTR, OUT_VARIANCE_END,
+     :     STATUS)
+      CALL SCULIB_FREE('RESW_QUAL', OUT_QUALITY_PTR, OUT_QUALITY_END,
+     :     STATUS)
 
       CALL SCULIB_FREE ('DEMOD_DATA', DEMOD_DATA_PTR, DEMOD_DATA_END,
      :  STATUS)
@@ -982,9 +1160,79 @@ c
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
       CALL DAT_ANNUL (OUT_SCUBAX_LOC, STATUS)
 
+      CALL NDF_UNMAP(IN_NDF, '*', STATUS)
+      CALL NDF_UNMAP(OUT_NDF, '*', STATUS)
+
       CALL NDF_ANNUL (IN_NDF, STATUS)
       CALL NDF_ANNUL (OUT_NDF, STATUS)
 
       CALL NDF_END (STATUS)
+
+      END
+
+*****************************************************************************
+
+      SUBROUTINE SURF_LOCAL_COPY(N_BOL, N_POS, N_BEAM, IN_DATA, IN_VAR,
+     :     IN_QUAL, OUT_POS, OUT_DATA, OUT_VAR, OUT_QUAL, STATUS)
+*+
+*  Name:
+*     SURF_LOCAL_COPY
+
+*  Purpose:
+*     Compress the reduce switched data to the output size
+
+*  Description:
+*     Copy the input to the output reducing the size of the output
+*     array if necessary. This is needed since the middle dimension changes
+*     in size when multiple beams are being used (ie PHOTOM).
+
+*-
+
+      IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+
+*  Global status:
+
+      INTEGER STATUS
+
+*  Arguments Given:
+
+      INTEGER N_BOL
+      INTEGER N_POS
+      INTEGER N_BEAM
+      INTEGER OUT_POS
+
+      REAL    IN_DATA(N_BOL, N_POS, N_BEAM)
+      REAL    IN_VAR (N_BOL, N_POS, N_BEAM)
+      BYTE    IN_QUAL(N_BOL, N_POS, N_BEAM)
+
+*  Arguments returned:
+
+      REAL    OUT_DATA(N_BOL, OUT_POS, N_BEAM)
+      REAL    OUT_VAR (N_BOL, OUT_POS, N_BEAM)
+      BYTE    OUT_QUAL(N_BOL, OUT_POS, N_BEAM)
+
+*  Local Variables:
+
+      INTEGER I  ! Loop counter
+      INTEGER J  ! Loop counter
+      INTEGER K  ! Loop counter
+
+*.
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      DO K = 1, N_BEAM
+         DO J = 1, OUT_POS
+            DO I = 1, N_BOL
+
+               OUT_DATA(I, J, K) = IN_DATA(I, J, K)
+               OUT_VAR (I, J, K) = IN_VAR (I, J, K)
+               OUT_QUAL(I, J, K) = IN_QUAL(I, J, K)
+
+            END DO
+         END DO
+      END DO
 
       END
