@@ -208,6 +208,15 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 <!-- Other bits and bobs -->
 \\def\\Underscore{\\ifmmode _\\else\\texttt{\\char\"5F}\\fi}
 \\def\\Eqnref#1{Eqn.~(#1)}
+<!-- Angle formatting macros.  See slmisc.dsl -->
+\\def\\hmsangle#1{#1^{\\rm h}}
+\\def\\hmsminutes#1{\\,#1^{\\rm m}}
+\\def\\hmsseconds#1{\\,#1}
+\\def\\hmsfraction#1{{}^{\\rm s}\\!\\!.#1}
+\\def\\dmsangle#1{#1^{\\circ}}
+\\def\\dmsminutes#1{\\,#1\\raisebox{-0.5ex}{$^{'}$}}
+\\def\\dmsseconds#1{\\,#1}
+\\def\\dmsfraction#1{\\hbox to 0pt{${}^{\\prime\\mskip-1.5mu \\prime}\\hss$}.#1}
 ")
 
 (define %latex-ordinary-toc%
