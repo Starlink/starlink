@@ -49,9 +49,6 @@
 *        Original version
 
 *  Bugs:
-*     PDA_IDBVIP can only deal with INCR output points at any one time and
-*     a loop is required in this subroutine to process sets containing 
-*     more points.
 
 *-
       
@@ -80,13 +77,10 @@
 *  External Functions:
 
 *  Local Constants:
-      INTEGER INCR                               ! Number of points that can
-      PARAMETER ( INCR = 700 )                   ! be processed by PDA_IDBVIP
       INTEGER NCP                                ! Number of points used
       PARAMETER ( NCP = 5 )                      ! by spline fit for gradients
 
 *  Local Variables:
-      INTEGER DATA_OFFSET                        ! Loop counter
       INTEGER ISTAT                              ! Spline fit status
       INTEGER ITEMP                              ! Scratch int
       INTEGER IWK_END                            ! Pointer to end of IWK
@@ -106,7 +100,7 @@
 *     Allocate the scratch memory
 
       ITEMP = MAX(31, 27 + NCP)
-      CALL SCULIB_MALLOC(VAL__NBI * ITEMP * NDP + N_PTS, IWK_PTR, 
+      CALL SCULIB_MALLOC(VAL__NBI * (ITEMP * NDP + N_PTS), IWK_PTR, 
      :     IWK_END, STATUS)
       CALL SCULIB_MALLOC(VAL__NBR * 8 * NDP, WK_PTR, WK_END, STATUS)
 
@@ -131,37 +125,20 @@
       END IF
 
 *     Now that the spline has been calculated retrieve all the data
-*     for the output grid using MODE 2. Note that for some reason I can 
-*     only retrieve approximately 700 data points from PDA_IDBVIP with 
-*     each call.
+*     for the output grid using MODE 2. 
 
       MODE = 2
-      DATA_OFFSET = 1
+      NOP = N_PTS
 
-      DO WHILE ((N_PTS - DATA_OFFSET .GT. 0) .AND. STATUS .EQ. SAI__OK) 
+      CALL PDA_IDBVIP(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NOP,
+     :     X_OUT, Y_OUT, DATA_OUT, %VAL(IWK_PTR), %VAL(WK_PTR),
+     :     ISTAT, STATUS)
 
-         IF (N_PTS - DATA_OFFSET .LT. INCR) THEN
-            NOP = N_PTS - DATA_OFFSET
-         ELSE
-            NOP = INCR
-         END IF
-
-         CALL PDA_IDBVIP(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NOP,
-     :        X_OUT(DATA_OFFSET), Y_OUT(DATA_OFFSET),
-     :        DATA_OUT(DATA_OFFSET), %VAL(IWK_PTR), %VAL(WK_PTR), 
-     :        ISTAT, STATUS)
-
-         IF (ISTAT .NE. 0 .OR. STATUS .NE. SAI__OK) THEN
-            CALL MSG_SETI('ISTAT', ISTAT)
-            CALL MSG_SETI('OFFSET', DATA_OFFSET)
-            CALL MSG_SETI('END',DATA_OFFSET + NOP)
-            CALL ERR_REP(' ','SPLINE_PDA_IDBVIP: Spline interpolation'//
-     :           ' with ISTAT = ^ISTAT (whilst processing points '//
-     :           ' ^OFFSET to ^END', STATUS)
-         END IF
-
-         DATA_OFFSET = DATA_OFFSET + INCR
-      END DO
+      IF (ISTAT .NE. 0 .OR. STATUS .NE. SAI__OK) THEN
+         CALL MSG_SETI('ISTAT', ISTAT)
+         CALL ERR_REP(' ','SPLINE_PDA_IDBVIP: Spline interpolation'//
+     :        ' failed with ISTAT = ^ISTAT' , STATUS)
+      END IF
 
 *     Tidy up memory
 
