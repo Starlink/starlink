@@ -48,7 +48,9 @@ HDSPACK/Makefile.PL
 HDSPACK/MANIFEST
 HDSPACK/testhds.sdf
 HDSPACK/t/copobj.t
+HDSPACKt/creobj.t
 HDSPACK/t/delobj.t
+HDSPACK/t/wrapper.t
 Versions/MANIFEST
 Versions/Makefile.PL
 Versions/Versions.pm
