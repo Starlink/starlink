@@ -183,7 +183,7 @@
 *        blank lines.  This routine terminates the output with a blank
 *        line, so have done likewise for a primitive object, and removed
 *        the blank line before the "End of Trace" message.
-*     1992 Sepember 25 (MJC):
+*     1992 September 25 (MJC):
 *        Removed AIF calls.
 *     1993 November 4 (MJC):
 *        Renamed to HDSTRACE from TRACE to avoid a name clash on UNIX
