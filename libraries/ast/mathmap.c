@@ -1,5 +1,5 @@
 /* To do:
-      o Implement gaussian generator.
+      o Allow intermediate expressions.
       o Prototype user docs for expression syntax.
       o Write Fortran interface.
       o Tidy .h file.
@@ -378,6 +378,8 @@ AstMathMap *astMathMapId_( int, int, const char *[], const char *[], const char 
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
 static double Gauss( Rcontext * );
+static double LogGamma( double );
+static double Poisson( Rcontext *, double );
 static double Rand( Rcontext * );
 static int DefaultSeed( const Rcontext * );
 static int GetSeed( AstMathMap * );
@@ -412,120 +414,8 @@ static void SetSimpIF( AstMathMap *, int );
 static void ValidateSymbol( const char *, const char *, int, int, int *, int **, int **, int *, double ** );
 static void VirtualMachine( Rcontext *, int, int, const double **, const int *, const double *, int, double * );
 
-static double LogGamma( double );
-
 /* Member functions. */
 /* ================= */
-static double Poisson( Rcontext *context, double mean ) {
-   double mult;
-   double result;
-   double static thresh;
-   double t;
-   double y;
-   double ymax;
-   int overflow;
-   static double last_mean = -1.0;
-   static double pi;
-   static double root_2mean;
-   static int init;
-   static double log_mean;
-   static double gamma_mean;
-
-   if ( !init ) {
-      pi = acos( -1.0 );
-      init = 1;
-   }
-
-   if ( mean < 0.0 ) {
-      result = AST__BAD;
-
-   } else if ( mean < 12.0 ) {
-      if ( mean != last_mean ) {
-         last_mean = mean;
-         thresh = exp( -mean );
-      }
-      mult = 1.0;
-      result = -1.0;
-      do {
-         mult *= Rand( context );
-         result += 1.0;
-      } while ( mult > thresh );
-
-   } else {
-      if ( mean != last_mean ) {
-         last_mean = mean;
-         root_2mean = sqrt( 2.0 * mean );
-         ymax = DBL_MAX / root_2mean;
-         log_mean = log( mean );
-         gamma_mean = LogGamma( mean + 1.0 );
-      }
-      do {
-         do {
-            errno = 0;
-            y = tan( pi * Rand( context ) );
-            overflow = ( ( errno == ERANGE ) && ( y == HUGE_VAL ) ) ||
-                       ( y > ymax );
-            if ( !overflow ) {
-               result = root_2mean * y;
-               overflow = ( result > ( DBL_MAX - mean ) );
-               if ( !overflow ) result += mean;
-            }
-         } while ( ( result < 0.0 ) || overflow );
-         result = floor( result );
-         t = 0.9 * ( 1.0 + y * y ) * exp( ( result - mean ) * log_mean +
-                                          gamma_mean - LogGamma( result +
-                                                                 1.0 ) );
-      } while ( Rand( context ) > t );
-   }
-   return result;
-}
-
-static double LogGamma( double x ) {
-
-/* Local Constants: */
-   const double c0 = 1.000000000190015;
-   const double c1 = 76.18009172947146;
-   const double c2 = -86.50532032941677;
-   const double c3 = 24.01409824083091;
-   const double c4 = -1.231739572450155;
-   const double c5 = 0.1208650973866179e-2;
-   const double c6 = -0.5395239384953e-5;
-   const double gamma = 5.0;
-
-/* Local Variables: */
-   double result;
-   double sum;
-   double xx;
-   static double root_twopi;
-   static int init = 0;
-
-   if ( !init ) {
-      root_twopi = sqrt( 2.0 * acos( -1.0 ) );
-      init = 1;
-   }
-
-   sum = c0;
-   xx = x + 1.0;
-   sum += c1 / xx;
-   xx += 1.0;
-   sum += c2 / xx;
-   xx += 1.0;
-   sum += c3 / xx;
-   xx += 1.0;
-   sum += c4 / xx;
-   xx += 1.0;
-   sum += c5 / xx;
-   xx += 1.0;
-   sum += c6 / xx;
-
-   result = x + gamma + 0.5;
-   result -= ( x + 0.5 ) * log( result );
-
-   result = -result + log( root_twopi * sum / x );
-
-   return result;
-}
-
 static void CleanFunctions( int nfun, const char *fun[], char ***clean ) {
 /*
 *  Name:
@@ -1908,6 +1798,9 @@ static double Gauss( Rcontext *context ) {
 *        Pointer to an Rcontext structure which holds the random number
 *        generator's context between invocations.
 
+*  Returned Value:
+*     A sample from a standard Gaussian distribution.
+
 *  Notes:
 *     - The sequence of numbers returned is determined by the "seed"
 *     value in the Rcontext structure supplied.
@@ -2171,6 +2064,95 @@ static void InitVtab( AstMathMapVtab *vtab ) {
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "MathMap",
                "Transformation using mathematical functions" );
+}
+
+static double LogGamma( double x ) {
+/*
+*  Name:
+*     LogGamma
+
+*  Purpose:
+*     Calculate the logarithm of the gamma function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     double LogGamma( double x )
+
+*  Class Membership:
+*     MathMap member function.
+
+*  Description:
+*     This function returns the natural logarithm of the gamma function
+*     for real arguments x>0. It uses the approximation of Lanczos, with
+*     constants from Press et al. (Numerical Recipes), giving a maximum
+*     fractional error (on the gamma function) of less than 2e-10.
+
+*  Parameters:
+*     x
+*        The function argument, which must be greater than zero.
+
+*  Returned Value:
+*     The natural logarithm of the gamma function with "x" as argument,
+*     or AST__BAD if "x" is not greater than zero.
+
+*  Notes:
+*     - This function does not generate errors and does not perform error
+*     reporting. It will execute even if the global error status is set.
+*/
+
+/* Local Constants: */
+   const double c0 = 1.000000000190015;
+   const double c1 = 76.18009172947146;
+   const double c2 = -86.50532032941677;
+   const double c3 = 24.01409824083091;
+   const double c4 = -1.231739572450155;
+   const double c5 = 0.1208650973866179e-2;
+   const double c6 = -0.5395239384953e-5;
+   const double gamma = 5.0;
+
+/* Local Variables: */
+   double result;                /* Result value to return */
+   double sum;                   /* Series sum */
+   double xx;                    /* Denominator for summing series */
+   static double root_twopi;     /* sqrt( 2.0 * pi ) */
+   static int init = 0;          /* Initialisation performed? */
+
+/* If initialisation has not yet been performed, calculate the
+   constant required below. */
+   if ( !init ) {
+      root_twopi = sqrt( 2.0 * acos( -1.0 ) );
+
+/* Note that initialisation has been performed. */
+      init = 1;
+   }
+
+/* Return a bad value if "x" is not greater than zero. */
+   if ( x <= 0.0 ) {
+      result = AST__BAD;
+
+/* Otherwise, form the series sum. Since we only use 6 terms, the loop
+   that would normally be used has been completely unrolled here. */
+   } else {
+      xx = x;
+      sum = c0;
+      sum += c1 / ++xx;
+      sum += c2 / ++xx;
+      sum += c3 / ++xx;
+      sum += c4 / ++xx;
+      sum += c5 / ++xx;
+      sum += c6 / ++xx;
+
+/* Calculate the result. */
+      result = x + gamma + 0.5;
+      result -= ( x + 0.5 ) * log( result );
+      result = -result + log( root_twopi * sum / x );
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
@@ -2820,6 +2802,203 @@ static void ParseVariable( const char *method, const char *exprs,
          *iend = -1;
       }
    }
+}
+
+static double Poisson( Rcontext *context, double mean ) {
+/*
+*  Name:
+*     Poisson
+
+*  Purpose:
+*     Produce a pseudo-random value from a Poisson distribution.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     double Poisson( Rcontext *context, double mean )
+
+*  Class Membership:
+*     MathMap member function.
+
+*  Description:
+*     On each invocation, this function returns a pseudo-random number
+*     selected from a Poisson distribution with a specified mean. A
+*     combination of methods is used, depending on the value of the
+*     mean. The algorithm is based on that given by Press et al.
+*     (Numerical Recipes), but re-implemented and extended.
+
+*  Parameters:
+*     context
+*        Pointer to an Rcontext structure which holds the random number
+*        generator's context between invocations.
+*     mean
+*        The mean of the Poisson distribution, which should not be
+*        negative.
+
+*  Returned Value:
+*     A sample (which will only take integer values) from the Poisson
+*     distribution, or AST__BAD if the mean supplied is negative.
+
+*  Notes:
+*     - The sequence of numbers returned is determined by the "seed"
+*     value in the Rcontext structure supplied.
+*     - If the seed value is changed, the "active" flag must also be cleared
+*     so that this function can re-initiallise the Rcontext structure before
+*     generating the next pseudo-random number. The "active" flag should
+*     also be clear to force initialisation the first time an Rcontext
+*     structure is used.
+*     - This function does not perform error checking and does not generate
+*     errors. It will execute even if the global error status is set.
+*/
+
+/* Local Constants: */
+   const double small = 9.3;     /* "Small" distribution mean value */
+
+/* Local Variables: */
+   double pfract;                /* Probability of accepting sample */
+   double product;               /* Product of random samples */
+   double ran;                   /* Sample from Lorentzian distribution */
+   double result;                /* Result value to return */
+   static double beta;           /* Constant for forming acceptance ratio */
+   static double huge;           /* Large mean where std. dev. is negligible */
+   static double last_mean;      /* Value of "mean" on last invocation */
+   static double log_mean;       /* Logarithm of "mean" */
+   static double pi;             /* Value of pi */
+   static double ranmax;         /* Maximum safe value of "ran" */
+   static double root_2mean;     /* sqrt( 2.0 * mean ) */
+   static double sqrt_point9;    /* Square root of 0.9 */
+   static double thresh;         /* Threshold for product of samples */
+   static int init = 0;          /* Local initialisation performed? */
+
+/* If initialisation has not yet been performed, then perform it
+   now. */
+   if ( !init ) {
+
+/* Initialise the mean value from the previous invocation. */
+      last_mean = -1.0;
+
+/* Calculate simple constants. */
+      pi = acos( -1.0 );
+      sqrt_point9 = sqrt( 0.9 );
+
+/* Calculate the value of the distribution mean for which the smallest
+   representable deviation from the mean permitted by the machine
+   precision is one million standard deviations. */
+      huge = pow( 1.0e6 / DBL_EPSILON, 2.0 );
+
+/* Calculate the largest value such that
+   (0.9+(sqrt_point9*ranmax)*(sqrt_point9*ranmax)) doesn't overflow,
+   allowing a small margin for rounding error. */
+      ranmax = ( sqrt( DBL_MAX - 0.9 ) / sqrt( 0.9 ) ) *
+               ( 1.0 - 4.0 * DBL_EPSILON );
+
+/* Note that initialisation has been performed. */
+      init = 1;
+   }
+
+/* If the distribution mean is less than zero, then return a bad
+   result. */
+   if ( mean < 0.0 ) {
+      result = AST__BAD;
+
+/* If the mean is zero, then the result can only be zero. */
+   } else if ( mean == 0.0 ) {
+      result = 0.0;
+
+/* Otherwise, if the mean is sufficiently small, we can use the direct
+   method of summing a series of exponentially distributed random samples
+   and counting the number which occur before the mean is exceeded. This
+   is equivalent to multiplying a series of uniformly distributed
+   samples and counting the number which occur before the product
+   becomes less then an equivalent threshold. */
+   } else if ( mean <= small ) {
+
+/* If the mean has changed since the last invocation, store the new
+   mean and calculate a new threshold. */
+      if ( mean != last_mean ) {
+         last_mean = mean;
+         thresh = exp( -mean );
+      }
+
+/* Initialise the product and the result. */
+      product = 1.0;
+      result = -1.0;
+
+/* Multiply the random samples, counting the number needed to reach
+   the threshold. */
+      do {
+         product *= Rand( context );
+         result += 1.0;
+      } while ( product > thresh );
+
+/* Otherwise, if the distribution mean is large (but not huge), we
+   must use an indirect rejection method. */
+   } else if ( mean <= huge ) {
+
+/* If the mean has changed since the last invocation, then
+   re-calculate the constants required below. Note that because of the
+   restrictions we have placed on "mean", these calculations are safe
+   against overflow. */
+      if ( mean != last_mean ) {
+         last_mean = mean;
+         log_mean = log( mean );
+         root_2mean = sqrt( 2.0 * mean );
+         beta = mean * log_mean - LogGamma( mean + 1.0 );
+      }
+
+/* Loop until a suitable random sample has been generated. */
+      do {
+         do {
+
+/* First transform a sample from a uniform distribution to obtain a
+   sample from a Lorentzian distribution. Check that the result is not so
+   large as to cause overflow later. Also check for overflow in the maths
+   library. If necessary, obtain a new sample. */
+            do {
+               errno = 0;
+               ran = tan( pi * Rand( context ) );
+            } while ( ( ran > ranmax ) ||
+                      ( ( errno == ERANGE ) &&
+                        ( ( ( ran >= 0.0 ) ? ran : -ran ) == HUGE_VAL ) ) );
+
+/* If OK, scale the sample and add a constant so that the sample's
+   distribution approximates the Poisson distribution we
+   require. Overflow is prevented by the check on "ran" above, together
+   with the restricted value of "mean". */
+            result = ran * root_2mean + mean;
+
+/* If the result is less than zero (where the Poisson distribution has
+   value zero), then obtain a new sample. */
+         } while ( result < 0.0 );
+
+/* Round down to an integer, so that the sample is valid for a Poisson
+   distribution. */
+         result = floor( result );
+
+/* Calculate the ratio between the required Poisson distribution and
+   the Lorentzian from which we have sampled (the factor of 0.9 prevents
+   this exceeding 1.0, and overflow is again prevented by the checks
+   performed above). */
+         ran *= sqrt_point9;
+         pfract = ( 0.9 + ran * ran ) *
+                  exp( result * log_mean - LogGamma( result + 1.0 ) - beta );
+
+/* Accept the sample with this fractional probability, otherwise
+   obtain a new sample. */
+      } while ( Rand( context ) > pfract );
+
+/* If the mean is huge, the relative standard deviation will be
+   negligible compared to the machine precision. In such cases, the
+   probability of getting a result that differs from the mean is
+   effectively zero, so we can simply return the mean. */
+   } else {
+      result = mean;
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static double Rand( Rcontext *context ) {
@@ -3655,23 +3834,6 @@ static void VirtualMachine( Rcontext *rcontext, int npoint,
    unsigned long b;              /* Block of bits for result */
    unsigned long neg;            /* Result is negative? (sign bit) */
 
-   {
-      double x[ 1000000 ];
-      int n = 1000000;
-      int i;
-      double s1, s2;
-      s1 = s2 = 0.0;
-      for ( i = 0; i < n; i++ ) {
-         x[ i ] = Poisson( rcontext, 1000000.0 );
-         s1 += x[ i ];
-      }
-      s1 /= n;
-      printf( "mean = %g\n", s1 );
-      for ( i = 0; i < n; i++ ) {
-         s2 += ( x[ i ] - s1 ) * ( x[ i ] - s1 );
-      }
-      printf( "st. dev. squared = %g\n", s2 / ( n - 1 ) );
-   }
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -3896,7 +4058,8 @@ static void VirtualMachine( Rcontext *rcontext, int npoint,
 \
 /* Check if "errno" and the returned result indicate overflow and \
    return the appropriate result. */ \
-      ( ( errno == ERANGE ) && ( result == HUGE_VAL ) ) ? AST__BAD : result \
+      ( ( errno == ERANGE ) && ( ABS( result ) == HUGE_VAL ) ) ? AST__BAD : \
+                                                                 result \
    )
 
 /* Trap maths errors. */
@@ -3915,8 +4078,8 @@ static void VirtualMachine( Rcontext *rcontext, int npoint,
 /* Check if "errno" and the returned result indicate a domain error or \
    overflow and return the appropriate result. */ \
       ( ( errno == EDOM ) || \
-        ( ( errno == ERANGE ) && ( result == HUGE_VAL ) ) ) ? AST__BAD : \
-                                                              result \
+        ( ( errno == ERANGE ) && ( ABS( result ) == HUGE_VAL ) ) ) ? \
+                                 AST__BAD : result \
    )
 
 /* Tri-state boolean OR. */
