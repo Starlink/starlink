@@ -1,7 +1,7 @@
       SUBROUTINE REDS_WTFN_REBIN (METHOD, STATUS)
 *+
 *  Name:
-*     REDS_WTFN_REBIN
+*     REBIN
 
 *  Purpose:
 *     routine to rebin demodulated SCUBA data onto output map
@@ -45,8 +45,10 @@
 *  Usage:
 *     Invoked via the REBIN command.
 
-*  Parameters:
-*     IN = _CHAR (Read)
+*  ADAM arameters:
+*     REF = NDF (Read)
+*        The name of the first NDf to be rebinned. [Global]
+*     IN = NDF (Read)
 *        The name of the input file to be rebinned. This parameter is requested
 *        repeatedly until a NULL value (!) is supplied.
 *     INTEGRATIONS = _INTEGER (Read)
@@ -101,10 +103,14 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.13  1996/11/01 00:19:49  timj
-*     Add default for OUT_OBJECT.
-*     Add RD to IRAS90 output and pass current EPOCH to FITS header.
+*     Revision 1.14  1996/11/02 00:52:10  timj
+*     Use NDF_ASSOC and REF parameter.
+*     Tweak the header
 *
+c Revision 1.13  1996/11/01  00:19:49  timj
+c Add default for OUT_OBJECT.
+c Add RD to IRAS90 output and pass current EPOCH to FITS header.
+c
 c Revision 1.12  1996/10/30  00:30:41  timj
 c Added GLOBAL default for IN parameter.
 c Fixed bug (segmentation fault) when error occurs before NDF_STATE.
@@ -125,6 +131,7 @@ c
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
       INCLUDE 'PAR_ERR'                ! for PAR__ constants
+      INCLUDE 'PAR_PAR'                ! for PAR__ constants
       INCLUDE 'REDS_SYS'               ! REDS definitions
       INCLUDE 'SAE_PAR'                ! SSE global definitions
 
@@ -379,6 +386,7 @@ c
                                        ! output coord system (radians)
       INTEGER          OUT_VARIANCE_PTR! pointer to output map variance array
       DOUBLE PRECISION P (8)           ! input array to IRA_CREAT
+      CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
                                        ! azimuth pointing corrections (radians)
       REAL             POINT_DEL (SCUBA__MAX_POINT)
@@ -420,6 +428,8 @@ c
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
+      CHARACTER*15     SUTDATE         ! date of first observation
+      CHARACTER*15     SUTSTART        ! UT of start of first observation
       CHARACTER*10     TELESCOPE       ! FITS telescope entry
       INTEGER          TOTAL_WEIGHT_END! pointer to end of TOTAL_WEIGHT_PTR
                                        ! space
@@ -500,31 +510,30 @@ c
 
 *     Read in the GLOBAL value first
          IF (FILE .EQ. 1) THEN
-            CALL SUBPAR_FINDPAR( 'DUMMY', IPAR, STATUS)
-            CALL SUBPAR_GETNAME(IPAR, STEMP, STATUS)
-            CALL PAR_DEF0C('IN', STEMP, STATUS)
+            PARAM = 'REF'
          ELSE
-*           Make sure the parameter is cancelled and DEFAULT (NULL) used
-            CALL PAR_CANCL('IN', STATUS)
-            CALL PAR_UNSET('IN', 'DEFAULT', STATUS)
+            PARAM = 'IN'
+*           Make sure the parameter is cancelled
+*            IF (FILE.GT.2) CALL PAR_CANCL(PARAM, STATUS)
          END IF
 
-         IF (STATUS .EQ. SAI__OK) THEN
-            CALL PAR_GET0C('IN', FILENAME(FILE), STATUS)
-            CALL NDF_EXIST ('IN', 'READ', IN_NDF, STATUS)
+         CALL NDF_ASSOC(PARAM, 'READ', IN_NDF, STATUS)
 
-            IF (IN_NDF .EQ. NDF__NOID .OR. STATUS .EQ. PAR__NULL) THEN
-               FILE = FILE - 1
-               READING = .FALSE.
-               CALL ERR_ANNUL(STATUS)
-            ELSE IF (FILE .GT. MAX_FILE) THEN
-               CALL NDF_ANNUL (IN_NDF, STATUS)
-               READING = .FALSE.
-               CALL MSG_SETI ('MAX', MAX_FILE)
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: number of '//
+         IF (IN_NDF .EQ. NDF__NOID .OR. STATUS .EQ. PAR__NULL) THEN
+            FILE = FILE - 1
+            READING = .FALSE.
+            CALL ERR_ANNUL(STATUS)
+         ELSE IF (FILE .GT. MAX_FILE) THEN
+            CALL NDF_ANNUL (IN_NDF, STATUS)
+            READING = .FALSE.
+            CALL MSG_SETI ('MAX', MAX_FILE)
+            STATUS = SAI__ERROR
+            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: number of '//
      :           'files read exceeds maximum allowed - ^MAX', STATUS)
-            END IF
+         ELSE
+*     Store name of file
+            CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS)
+            CALL SUBPAR_GETNAME(IPAR, FILENAME(FILE), STATUS)
          END IF
 
          IF (READING) THEN
@@ -579,6 +588,9 @@ c
      :        'observation of ^OBJECT with ^SAMPLE sampling', STATUS)
 
             IF (OBSERVING_MODE .NE. 'MAP'.AND.
+     :           OBSERVING_MODE.NE.'FOCUS' .AND.
+     :           OBSERVING_MODE.NE.'ALIGNX' .AND.
+     :           OBSERVING_MODE.NE.'ALIGNY' .AND.
      :           OBSERVING_MODE.NE.'POINTING') THEN
                IF (STATUS .EQ. SAI__OK) THEN
                   STATUS = SAI__ERROR
@@ -830,6 +842,8 @@ c
             IF (FILE .EQ. 1) THEN
                MJD_STANDARD = IN_UT1 
                SOBJECT = OBJECT        ! Store first object name
+               SUTDATE = UTDATE
+               SUTSTART = UTSTART
 
 * Work out the epoch of RD maps
                DO I = 1, IM - 1
@@ -1668,6 +1682,8 @@ c
      :     'galactic', STATUS)
          HOURS = .FALSE.
       ELSE IF (OUT_COORDS .EQ. 'RD') THEN
+         CALL MSG_SETC ('UTDATE', SUTDATE)
+         CALL MSG_SETC ('UTSTART', SUTSTART)
          CALL MSG_OUT (' ', 'REDS: output coordinates are '//
      :     'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
       ELSE
