@@ -171,6 +171,7 @@
       ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          ACCESS = 'READ'
+         IGRP = GRP__NOID
       END IF
 
 *  Get the degree of detail required in the output.
@@ -321,6 +322,7 @@
       IF( .NOT. QUIET .AND. IAST .NE. AST__NULL ) THEN
 
 *  Display the AST Object in a TK window.
+         CALL MSG_SETC( 'OBJ', AST_GETC( IAST, 'CLASS', STATUS ) )
          CALL MSG_LOAD( ' ', '^OBJ', TITLE, TLEN, STATUS )       
          CALL KPG1_TKAST( IAST, TITLE( : TLEN ), FULL, STATUS )
 
