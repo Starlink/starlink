@@ -42,7 +42,7 @@
       call ast_begin( status )
 
       frm1 = ast_skyframe( ' ', status )
-      frm2 = ast_specframe( 'Unit=Angstrom', status )
+      frm2 = ast_specframe( 'Unit=Ang', status )
       frm3 = ast_cmpframe( frm1, frm2, ' ', status )
 
       lbnd( 1 ) = AST__BAD     
@@ -1091,7 +1091,7 @@
 
 
 
-      frm2 = ast_specframe( 'Unit=Angstrom', status )
+      frm2 = ast_specframe( 'Unit=Angs', status )
       p1( 1 ) = 1000.0
       p2( 1 ) = 1100.0
       box2 = ast_box( frm2, 0, p1, p2, AST__NULL, ' ', status )
@@ -3295,7 +3295,7 @@ C
       p2(2) = 1.0E-4
       r1 = ast_box( f1, 0, p1, p2, AST__NULL, ' ', status )
 
-      f2 = ast_specframe( 'Unit=Angstrom', status )
+      f2 = ast_specframe( 'Unit=A', status )
       lbnd( 1 ) = 5000.0
       ubnd( 1 ) = 6000.0
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
@@ -3385,7 +3385,7 @@ C
       p2(2) = 1.0E-4
       r1 = ast_box( f1, 0, p1, p2, AST__NULL, ' ', status )
 
-      f2 = ast_specframe( 'System=Wavelen,Unit=Angstrom', status )
+      f2 = ast_specframe( 'System=Wavelen,Unit=angstrom', status )
       lbnd( 1 ) = 5000.0
       ubnd( 1 ) = AST__BAD;
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )

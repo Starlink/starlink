@@ -44,6 +44,8 @@
 *        - Avoid using astStore to allocate more storage than is supplied
 *        in the "data" pointer. This can cause access violations since 
 *        astStore will then read beyond the end of the "data" area.
+*     15-FEB-2005 (DSB):
+*        - Modified CleanExp to fix up some common units mistakes.
 */
 
 /* Module Macros. */
@@ -220,6 +222,8 @@ static const char *CleanExp( const char *exp ) {
 *        - replacement of multiple adjacent spaces by a single space
 *        - removal of spaces adjacent to a parenthesis
 *        - removal of spaces adjacent to a binary operator
+*        - translates various common non-standard units into equivalent
+*          standard units.
 *
 *     Such carefull handling of spaces is necessary since a space is 
 *     recognised by the MakeTree function as a multiplication operator.
@@ -238,11 +242,20 @@ static const char *CleanExp( const char *exp ) {
 */
 
 /* Local Variables: */
-   char *result;
+   char **tok;
    char *r;
+   char *result;
+   char *t;
    char *w;
+   char *p;
+   const char *start;
+   int i;
+   int l;
+   int len;
+   int ntok;
    int po;
    int ps;
+   int word;
 
 /* Initialise */
    result = NULL;
@@ -250,12 +263,115 @@ static const char *CleanExp( const char *exp ) {
 /* Check inherited status */
    if( !astOK ) return result;
 
-/* Cleaning the string will never produce a string longer than the
-   supplied string, so it is safe to use the length of the supplied string
-   as the amount of memory to be allocated for the returned string (plus
-   one for the terminating null). Create a copy of the supplied string. */
-   result = astStore( NULL, exp, strlen( exp ) + 1 );
-   if( astOK ) {
+/* Split the supplied string up into tokens. Each block of contiguous
+   alphanumeric characters is a token. Each contiguous block of 
+   non-alphanumerical characters is also a token. */
+   start = exp;
+   p = (char *) exp;
+   word = isalnum( *p );
+   ntok = 0;
+   tok = NULL;
+   while( *(++p) ){
+      if( word ) {
+         if( !isalnum( *p ) ) {
+            l = p - start;
+            t = astStore( NULL, start, l + 1 );
+            if( t ) t[ l ] = 0;            
+            tok = astGrow( tok, ntok + 1, sizeof( char * ) );
+            if( tok ) tok[ ntok++ ] = t;
+            start = p;
+            word = 0;
+         }
+      } else {
+         if( isalnum( *p ) ) {
+            l = p - start;
+            t = astStore( NULL, start, l + 1 );
+            if( t ) t[ l ] = 0;            
+            tok = astGrow( tok, ntok + 1, sizeof( char * ) );
+            if( tok ) tok[ ntok++ ] = t;
+            start = p;
+            word = 1;
+         }
+      }
+   }
+
+   l = p - start;
+   t = astStore( NULL, start, l + 1 );
+   if( t ) t[ l ] = 0;            
+   tok = astGrow( tok, ntok + 1, sizeof( char * ) );
+   if( tok ) tok[ ntok++ ] = t;
+
+/* Check the tokens for known non-standard unit names, and replace with the 
+   equivalent standard names. Starlink SPLAT has a class called UnitUtilities 
+   which has more of these common units mistakes. AST has to be a bit
+   more conservative than SPLAT though because of its wider remit. */
+   len = 0;
+   if( tok ) {
+      for( i = 0; i < ntok; i++ ) {
+         t = tok[ i ];
+
+/* "A" is strictly Ampere, but is more likely to mean Angstrom. */
+         if( strstr( t, "Ang" ) == t ||
+             strstr( t, "ang" ) == t ||
+             !strcmp( t, "A" ) ) {
+            tok[ i ] = astStore( t, "Angstrom", 9 ) ;
+
+         } else if( !strcmp( t, "cm2" ) ) {
+            tok[ i ] = astStore( t, "cm^2", 5 ) ;
+
+         } else if( !strcmp( t, "m2" ) ) {
+            tok[ i ] = astStore( t, "m^2", 4 ) ;
+
+         } else if( !strcmp( t, "M" ) ) {
+            t[ 0 ] = 'm';
+
+         } else if( !strcmp( t, "CM" ) ) {
+            tok[ i ] = astStore( t, "cm", 3 ) ;
+
+         } else if( strstr( t, "jans" ) == t ||
+                    strstr( t, "Jans" ) == t ||
+                    !strcmp( t, "jy" ) ) {
+            tok[ i ] = astStore( t, "Jy", 3 ) ;
+
+         } else if( !strcmp( t, "sec" ) ) {
+            tok[ i ] = astStore( t, "s", 2 ) ;
+
+         } else if( !strcmp( t, "ev" ) ) {
+            t[ 1 ] = 'V';
+
+         } else if( strstr( t, "ev" ) == t + 1 ) {
+            t[ 2 ] = 'V';
+
+         } else if( !strcmp( t, "micron" ) ) {
+            tok[ i ] = astStore( t, "um", 2 ) ;
+
+         } else if( !strcmp( t, "Watt" ) ||
+                    !strcmp( t, "watt" ) ) {
+            tok[ i ] = astStore( t, "W", 2 ) ;
+
+         }
+
+/* Update the total length of the string. */
+         len += strlen( tok[ i ] );
+      }
+   }
+
+/* Concatentate the tokens into a single string, freeing the individual
+   strings. */
+   result = astMalloc( len + 1 );
+   if( result ) {
+      p = result;
+      for( i = 0; i < ntok; i++ ) {
+         len = strlen( tok[ i ] );
+         memcpy( p, tok[ i ], len );
+         p += len;
+         tok[ i ] = astFree( tok[ i ] );
+      }
+      *p = 0;
+      tok = astFree( tok );
+
+/* Now do other cleaning. 
+   ---------------------- */
 
 /* Initialise a pointer to the previous character read from the string. */
       r = result - 1;
