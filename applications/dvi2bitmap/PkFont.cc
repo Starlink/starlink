@@ -7,6 +7,9 @@
 
 #include "dvi2bitmap.h"
 #include <iostream>		// for debugging code, written to cerr
+#include <sys/stat.h>
+#include <unistd.h>
+#include <vector>
 
 #ifdef ENABLE_KPATHSEA
 #include "kpathsea.h"
@@ -24,9 +27,16 @@ using std::sprintf;
 using std::memcpy;
 #endif
 
+#ifndef PATH_SEP
+#define PATH_SEP ':'
+#endif
+
 #include "InputByteStream.h"
 #include "PkFont.h"
 
+typedef vector<string> string_list;
+string_list break_path (string);
+    
 // define class static variables
 verbosities PkRasterdata::verbosity_ = normal;
 verbosities PkFont::verbosity_ = normal;
@@ -118,15 +128,14 @@ void PkFont::verbosity (const verbosities level)
 // Return true if we found a file to open, and return the path in the
 // argument.  Return false on error.  Success doesn't guarantee
 // that the file exists, just that it was constructed without problems
-// (in fact, when ENABLE_KPATHSEA is defined, success _does_ mean that
-// the file was found, but the other case will always succeed in at
-// least generating a name).
+// (in fact, in both cases, success _does_ mean that
+// the file was found, but this is not guaranteed by this routine).
 bool PkFont::find_font (string& path)
 {
-    int scaled_res
-	= static_cast<int>(resolution_
-			   * ((double)font_header_.s * (double)dvimag_)
-			   / ((double)font_header_.d * 1000.0));
+    double scaled_res = resolution_
+	* ((double)font_header_.s * (double)dvimag_)
+	/ ((double)font_header_.d * 1000.0);
+
     if (verbosity_ > normal)
 	cerr << "Font file: " << name_
 	     << ", checksum=" << font_header_.c
@@ -155,23 +164,18 @@ bool PkFont::find_font (string& path)
 
     if (pkpath.length() != 0)
     {
-	// Fontpath stuff rudimentary -- but allow it to override kpathsea
-	pkpath += '/';
-	pkpath += name_;
-	pkpath += '.';
-	
-	char numbers[10];
-	sprintf (numbers, "%dpk", scaled_res);
-	pkpath += numbers;
-
-	path = pkpath;
-	return true;
+	string found_file;
+	if (search_pkpath (pkpath, name_, scaled_res, found_file))
+	{
+	    path = found_file;
+	    return true;
+	}
     }
 
 #ifdef ENABLE_KPATHSEA
     const char *kpse_file;
 
-    kpse_file = kpathsea::find (name_.c_str(), scaled_res);
+    kpse_file = kpathsea::find (name_.c_str(), static_cast<int>(scaled_res));
 
     if (kpse_file != 0)
     {
@@ -180,7 +184,79 @@ bool PkFont::find_font (string& path)
     }
 #endif
 
+    path = "";
     return false;
+}
+
+// Find a file on the colon-separated path, with the specified name,
+// at the specified resolution.
+//
+// Do font rounding: Check all the integers between 0.998 and 1.002 of
+// the specified resolution.  If, however, this range falls within
+// (n,n+1) (non-inclusive) (ie, it doesn't span _any_ integers) then
+// simply round the number.
+// See DVI Driver Standard.
+bool PkFont::search_pkpath (string path,
+			    string name, double resolution, string& res_file)
+{
+    int size_low, size_high;
+    size_low  = static_cast<int>(ceil  (0.998*resolution));
+    size_high = static_cast<int>(floor (1.002*resolution));
+    if (size_low > size_high)
+	// simply round it
+	size_low = size_high = static_cast<int>(floor(resolution+0.5));
+    if (verbosity_ > normal)
+	cerr << "PkFont::search_pkpath: searching "
+	     << size_low << ".." << size_high << '\n';
+
+    string_list pathlist = break_path (path);
+    if (pathlist.size() == 0)
+	return false;		// ...silently
+
+    bool found = false;
+
+    for (int pathnum = 0; pathnum<pathlist.size() && !found; pathnum++)
+    {
+	string prefix = pathlist[pathnum];
+	prefix += '/';
+	prefix += name;
+	prefix += '.';
+
+	for (int size=size_low; size<=size_high && !found; size++)
+	{
+	    char numbers[10];
+	    sprintf (numbers, "%dpk", size);
+	    string fname = prefix + numbers;
+	    if (verbosity_ > normal)
+		cerr << "PkFont::search_pkpath: trying " << fname << '\n';
+
+	    struct stat S;
+	    if (stat (fname.c_str(), &S) == 0)
+	    {
+		// file exists
+		if (S_ISREG(S.st_mode)
+		    && (S.st_mode & (S_IRUSR|S_IRGRP|S_IROTH)))
+		{
+		    res_file = fname;
+		    found = true;	// exit the loop
+		    if (verbosity_ > normal)
+			cerr << "PkFont::search_pkpath: "
+			     << fname << " found\n";
+		}
+		else
+		    if (verbosity_ > normal)
+			cerr << "PkFont::search_pkpath: " << fname
+			     << " mode " << oct << S.st_mode << dec
+			     << " (not readable)\n";
+	    }
+	    else
+		if (verbosity_ > normal)
+		    cerr << "PkFont::search_pkpath: "
+			 << fname << " not found\n";
+	}
+    }
+
+    return found;	
 }
 
 void PkFont::read_font (InputByteStream& pkf)
@@ -622,4 +698,22 @@ void PkRasterdata::construct_bitmap()
 	    pixelcolour = (pixelcolour==0 ? 1 : 0);
 	}
     }
+}
+
+
+// Utility function: break path at colons, and return list.
+string_list break_path (string path)
+{
+    string_list l;
+    string tmp = "";
+    for (int i=0; i<path.length(); i++)
+	if (path[i] == PATH_SEP)
+	{
+	    l.push_back(tmp);
+	    tmp = "";
+	}
+	else
+	    tmp += path[i];
+    l.push_back(tmp);
+    return l;
 }

@@ -173,11 +173,13 @@ class PkFont {
     PkGlyph *glyphs_[nglyphs_];
     bool find_font (string&);
     void read_font(InputByteStream&);
+    bool search_pkpath (string path,
+			string name, double resolution, string& res_file);
     bool seen_in_doc_;		// true once the font_def command has been
     				// seen in the document, as well as the
     				// postamble
     static verbosities verbosity_;
-    static string fontpath_;	// single string with %F in it
+    static string fontpath_;	// colon-separated list of directories
     static int resolution_;
 };
 
