@@ -71,11 +71,12 @@ value of each component of the colour system, at each pen (see the
 "Colour System" entry in the "Options" menu for further details). One of
 these curves will be highlighted and is known as the "current" curve. All
 editing functions usually affect the current curve only (this may be
-changed by selecting "All Curves" in the Options menu). To change the current
-curve, click on one of the buttons below the lower left corner of the
-editor panel. A narrow bar of colours may optionally be included at the 
-bottom of the editor showing the requested visual appearance of each entry 
-in the colour table.
+changed by selecting "All Curves" in the Options menu). To change the
+current curve, either click on one of the buttons below the lower left
+corner of the editor panel, or click on the required curve, or press the
+spacebar (this cycles through the three curves). A narrow bar of colours
+may optionally be included at the bottom of the editor showing the
+requested visual appearance of each entry in the colour table.
 
 The WHITE VERTICAL LINE is the "cursor", which may be moved by clicking
 anywhere within the editor panel. The pen number and the value of the
@@ -91,7 +92,9 @@ Under the cursor, at the point where it crosses the current curve, is a
 SHORT HORIZONTAL BLACK LINE. This line is called the "marker", and it
 identifies the value and extent of the table entry which contains the
 current pen. This marker can be dragged vertically to change the value
-of the corresponding table entry.
+of the corresponding table entry. Also, pressing the up or down arrow
+keys on the keyboard will change the current entry value by 0.01 for each
+press.
 
 The editor panel can be ZOOMED independently in the horizontal or
 vertical direction. Each direction has a pair of buttons labelled "+" and

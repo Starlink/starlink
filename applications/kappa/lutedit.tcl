@@ -1,4 +1,4 @@
-#!STAR_BIN/awish
+#!STAR_BIN/bin/awish
 #+
 #  Name:
 #     LutEdit.tcl
@@ -43,6 +43,24 @@
 
 # Define procedures...
 
+
+# 
+# Cycle through the 3 curves in the edit.
+#
+proc CycleCurve {} {
+   global RGBNOW
+   global RGBSEL
+
+   if { $RGBNOW == "red" } {
+      set RGBSEL green
+   } elseif { $RGBNOW == "green" } {
+      set RGBSEL blue
+   } else {
+      set RGBSEL red
+   }
+   rgbSel
+
+}
 
 #
 #  Set the cursor in the editor to the pen used to paint the pixel
@@ -116,15 +134,39 @@ proc SetPenVal {new} {
    global LUT
    global RGBNOW
    global MENT
+   global SETPENID
 
+   set SETPENID ""
    if { $new > 1.0 } {
       set new 1.0
    } elseif { $new < 0.0 } {
       set new 0.0
    }
    set LUT($RGBNOW) [lreplace $LUT($RGBNOW) $MENT $MENT $new]
+   updateCursor 2
    updateCurrent 
    record
+}
+
+# 
+# Increment the current pen value by a specified value
+#
+proc IncPenVal {inc} {
+   global PVAL
+   global SETPENID 
+
+   set new [expr $PVAL+$inc]
+   if { $new > 1.0 } {
+      set new 1.0
+   } elseif { $new < 0.0 } {
+      set new 0.0
+   }
+   set PVAL $new
+   update idletasks
+
+   if { $SETPENID != "" } { after cancel $SETPENID }
+   set SETPENID [after 600 "SetPenVal \$PVAL"]
+
 }
 
 
@@ -438,7 +480,7 @@ proc NewPale {i} {
       set NAMEDCOL(CornflowerBlue)	      "100 149 237"
       set NAMEDCOL(Cornsilk)		      "255 248 220"
       set NAMEDCOL(Cyan)		      "  0 255 255"
-      set NAMEDCOL(Dalmon)		      "250 128 114"
+      set NAMEDCOL(Salmon)		      "250 128 114"
       set NAMEDCOL(DarkBlue)		      "0     0 139"
       set NAMEDCOL(DarkCyan)		      "0   139 139"
       set NAMEDCOL(DarkGoldenrod)	      "184 134  11"
@@ -958,31 +1000,38 @@ proc DefPal {} {
       set PAL($i) [format "#%0.2X%0.2X%0.2X"  $v $v $v]
    }
 
-# The rest are HSV values with constant Saturation and Value and varying
-# Hue.
-   set pl(red) ""
-   set pl(green) ""
-   set pl(blue) ""
-   for {set i 8} { $i < $NPAL} { incr i } {
-      lappend pl(red) [expr (double($i)-8.0)/($NPAL-1.0)]
-      lappend pl(green) 1.0
-      lappend pl(blue) 1.0
-   }
+# The other colours are fixed rgb values.
+   set i 8
+   foreach rgb [list \
+                {1     0     0} \
+                {1     0.407 0} \
+                {1     0.531 0} \
+                {1     0.66  0} \
+                {1     0.747 0} \
+                {1     0.851 0} \
+                {1     0.92  0} \
+                {1     1     0} \
+                {0.858 1     0} \
+                {0.62  1     0} \
+                {0     1     0} \
+                {0     1     0.616} \
+                {0     1     0.887} \
+                {0     1     1} \
+                {0     0.931 1} \
+                {0     0.82  1} \
+                {0     0.712 1} \
+                {0     0.496 1} \
+                {0     0     1} \
+                {0.756 0     1} \
+                {1     0     1} \
+                {1     0     0.666}] {
 
-# Convert to RGB values.
-   toRGB pl HSV
+      set r [expr int( [lindex $rgb 0]*255.0 + 0.5 )]   
+      set g [expr int( [lindex $rgb 1]*255.0 + 0.5 )]   
+      set b [expr int( [lindex $rgb 2]*255.0 + 0.5 )]   
 
-# Format and store.
-   set j 0
-   for {set i 8} { $i < $NPAL} { incr i } {
-      set r [lindex $pl(red) $j]
-      set r [expr int(255.0*$r)]
-      set g [lindex $pl(green) $j]
-      set g [expr int(255.0*$g)]
-      set b [lindex $pl(blue) $j]
-      set b [expr int(255.0*$b)]
       set PAL($i) [format "#%0.2X%0.2X%0.2X"  $r $g $b]
-      incr j
+      incr i
    }
 
 # Update the colours of the buttons.
@@ -1632,23 +1681,23 @@ proc newCsys {} {
    if { $CSYS == "RGB" } {
       $RB configure -text Red -state normal
       SetHelp $RB "Press to edit the red intensity curve..." LUTEDIT_RB
-      SetHelp c-red "A curve showing the red intensity at each pen."
+      SetHelp c-red "A curve showing the red intensity at each pen. Click to select."
       $GB configure -text Green -state normal
       SetHelp $GB "Press to edit the green intensity curve..." LUTEDIT_RB
-      SetHelp c-green "A curve showing the green intensity at each pen."
+      SetHelp c-green "A curve showing the green intensity at each pen. Click to select."
       $BB configure -text Blue -state normal
       SetHelp $BB "Press to edit the blue intensity curve..." LUTEDIT_RB
-      SetHelp c-blue "A curve showing the blue intensity at each pen."
+      SetHelp c-blue "A curve showing the blue intensity at each pen. Click to select."
    } elseif { $CSYS == "HSV" } {
       $RB configure -text Hue -state normal
       SetHelp $RB "Press to edit the hue curve (0.0=red 0.33=green 0.67=blue)..." LUTEDIT_RB
-      SetHelp c-red "A curve showing the hue at each pen (0.0=red 0.33=green 0.67=blue)."
+      SetHelp c-red "A curve showing the hue at each pen (0.0=red 0.33=green 0.67=blue). Click to select."
       $GB configure -text Saturation -state normal
       SetHelp $GB "Press to edit the saturation curve (0.0=grey 1.0=full colour)..." LUTEDIT_GB
-      SetHelp c-green "A curve showing the saturation at each pen (0.0=grey 1.0=full colour)."
+      SetHelp c-green "A curve showing the saturation at each pen (0.0=grey 1.0=full colour). Click to select."
       $BB configure -text Value -state normal
       SetHelp $BB "Press to edit the value curve..." LUTEDIT_BB
-      SetHelp c-blue "A curve showing the value (roughly equivalent to the brightness) at each pen."
+      SetHelp c-blue "A curve showing the value (roughly equivalent to the brightness) at each pen. Click to select."
    } elseif { $CSYS == "MONO" } {
       $RB configure -text "Intensity" -state disabled
       SetHelp $RB "Unused in monochrome mode" LUTEDIT_GB
@@ -5231,6 +5280,11 @@ proc ReleaseBind {x y} {
          record
       }
 
+# Selecting a new curve
+   } elseif { $MODE == "crv" } {
+
+# <Do nothing>
+
 # Selecting pens: Store the high and low selected entry numbers. Do not
 # do this if a double click binding has just selected all pens.
    } elseif { $SELID != "" && !$DOUBLE } {
@@ -5655,17 +5709,12 @@ proc SingleBind {x y shift} {
    global SELID
    global HENTRY
    global LENTRY
+   global RGBSEL
+
+   set MODE ""
 
 #  Freeze the cursor shape
    set CFREEZE 1
-
-#  Delete any selection box.
-   if { $SELID != "" } {
-      $CAN2 delete $SELID  
-      set SELID ""
-      set HENTRY ""
-      set LENTRY ""
-   }
 
 # Convert the screen coords to canvas coords, and record this position as
 # the "root" position which is available for use by other procedures.
@@ -5686,6 +5735,9 @@ proc SingleBind {x y shift} {
 
 #  Get the tags associated with the current canvas item.
    set curtags [$CAN2 gettags current]
+
+# Indicate that the cursor can move
+   set newcursor 1
 
 #  If the click occurred over a control point.
    if { [lsearch -exact $curtags cp] != -1 } {
@@ -5748,14 +5800,44 @@ proc SingleBind {x y shift} {
       set MX1 [lindex $c 2]
       set MODE seg
 
-   } else {
-      set MODE ""
+# If the click occurred over a curve, select it.
+   } elseif { [lsearch -exact $curtags c-red] != -1 } {
+      set RGBSEL red
+      set newcursor 0
+      set MODE crv
+      rgbSel
+
+   } elseif { [lsearch -exact $curtags c-green] != -1 } {
+      set RGBSEL green
+      set newcursor 0
+      set MODE crv
+      rgbSel
+
+   } elseif { [lsearch -exact $curtags c-blue] != -1 } {
+      set RGBSEL blue
+      set newcursor 0
+      set MODE crv
+      rgbSel
+
    }
 
-   if { $CURSID != "" } {
-      set CURX $ROOTX 
-      $CAN2 coords $CURSID $CURX $CURY1 $CURX $CURY2
-      updateCursor 0
+# Unless a new curve was selected, update the cursor and selection.
+   if { $newcursor } {
+
+#  Delete any selection box.
+      if { $SELID != "" } {
+         $CAN2 delete $SELID  
+         set SELID ""
+         set HENTRY ""
+         set LENTRY ""
+      }
+
+# Set the new cursor position.
+      if { $CURSID != "" } {
+         set CURX $ROOTX 
+         $CAN2 coords $CURSID $CURX $CURY1 $CURX $CURY2
+         updateCursor 0
+      }
    }
 }
 
@@ -6098,6 +6180,7 @@ proc WaitFor {name args} {
    set RGBSEL red
    set SAFE ""
    set SELID ""
+   set SETPENID ""
    set STATUS ""
    set TOP ""
    set ZOOMX 1
@@ -6678,9 +6761,16 @@ proc WaitFor {name args} {
    bind $F4 <Left> {set CPEN [expr $CPEN-1.0];updateCursor 1}
    bind $F4 <Right> {set CPEN [expr $CPEN+1.0];updateCursor 1}
 
+#  Keyboard up and down arrow keys change the current pen value by +/- 0.01.
+   bind $F4 <Up> {IncPenVal 0.01}
+   bind $F4 <Down> {IncPenVal -0.01}
+
+# Cycle through the curves when space bar is pressed.
+   bind $F4 <space> {CycleCurve}
+
 #  Set cursors to use when pointer is over a canvas item with various tags.
-   set CURTAGS [list mark pcurs cp bkgrnd]
-   set CURSORS [list hand1 hand2 hand1 ""]
+   set CURTAGS [list mark pcurs cp c bkgrnd]
+   set CURSORS [list hand1 hand2 hand1 hand2 ""]
 
 # Source any initialization script in the users main ADAM directory.
    set INITRC $oldadam/luteditrc
