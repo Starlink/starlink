@@ -8,8 +8,11 @@
 #     ADAM A-task parameter interface.
  
 #  Authors:
- 
+#   Tim Jenness (JACH) 
+
 #  History:
+#    24-May-1999 (TIMJ)
+#      Add LIKE parameter and output parameters
 #     {enter_further_changes_here}
  
 #-
@@ -38,6 +41,14 @@
          PROMPT  'Chop position angle (degrees)'
       ENDPARAMETER
  
+
+      PARAMETER LIKE
+        TYPE     'NDF'
+        PROMPT   'Template NDF'
+        DEFAULT  !
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
    
 
       PARAMETER PIXSIZE
@@ -74,5 +85,32 @@
          PROMPT  'Name of file to contain deconvolution weight'
          HELPKEY  '*'
       ENDPARAMETER
- 
+
+      PARAMETER OUTCHOP
+        PROMPT 'Actual chop throw used'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
+      PARAMETER OUTPA
+        PROMPT 'Actual chop position angle used'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
+      PARAMETER OUTPIXSZ
+        PROMPT 'Actual pixel size used'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
    ENDINTERFACE
