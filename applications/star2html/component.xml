@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="star2html">
-  <version>1.4-7</version>
+  <version>1.4-6</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
@@ -24,10 +24,10 @@
     <person>
       <name>Peter Draper</name>
       <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
+      <email>P.W.Draper@durham.ac.uk</email>
     </person>
   </developers>
   <documentation> sun199</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Starlink customised wrapper around latex2html</p></notes>
+  <notes><p>Heavily based on latex2html</p></notes>
 </component>
