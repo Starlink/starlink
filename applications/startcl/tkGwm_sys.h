@@ -11,11 +11,15 @@
 #define MAXX_BYTES (MAXX/8)
 #define MAXRLE     360
 
+#include <config.h>
+
 /* This gets rid of a compiler warning because bith tcl.h and jpeglib.h
    define EXTERN with different arguments. */
 #undef EXTERN
 
+#if HAVE_JPEGLIB_H
 #include "jpeglib.h"
+#endif
 
 /*
  * A data structure of the following type is kept for each gwm
@@ -75,8 +79,10 @@ typedef struct {
     XImage *image;
     int j;
     int colour;
+#if HAVE_JPEGLIB_H
     struct jpeg_compress_struct *cinfo;
     struct jpeg_error_mgr *jerr;
+#endif
 
     /* The following items are used by the ink jet printing routines */
     int mask[NINKS][NPLANES][NBITS];

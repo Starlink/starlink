@@ -20,9 +20,10 @@ AC_FC_LIBRARY_LDFLAGS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+AC_CHECK_HEADERS([jpeglib.h])
 AC_CHECK_LIB(jpeg,jpeg_start_compress)
 
-STAR_DECLARE_DEPENDENCIES(build, [starx adam ams dtask ems gwm messys mers tcl tk nbs sae])
+STAR_DECLARE_DEPENDENCIES(build, [ems gwm mers nbs pcs sae starx tcl tk])
 
 STAR_LATEX_DOCUMENTATION([sun186 sun219])
 
@@ -32,8 +33,7 @@ STAR_PATH_TCLTK(8.2,[tk])
 dnl    How to link to X.
 AC_PATH_XTRA
 
-dnl    If you wish to configure extra files, you can add them to this
-dnl    declaration.
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    This is the bit that does the actual work

@@ -1,8 +1,10 @@
+#include <config.h>
+
 #include <stdio.h>
 #include <math.h>
 
 #include <stdlib.h>
-#if defined(HAVE_MALLOC_H)
+#if HAVE_MALLOC_H
 #  include <malloc.h>
 #endif
 
@@ -17,7 +19,9 @@
 
 static void DoPs(ClientData clientData);
 static void DoInkjet(ClientData clientData);
+#if HAVE_LIBJPEG
 static void DoJpeg(ClientData clientData);
+#endif
 static void init_printer(FILE*);
 static void reset_printer(FILE*);
 static void get_mask(int [NINKS][NPLANES][NBITS]);
@@ -214,6 +218,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
 	Tcl_DoWhenIdle(DoInkjet, gwmPtr);
     }
     else if ( strncmp(gwmPtr->printformat, "JPEG", length) == 0 ) {
+#if HAVE_LIBJPEG
     
     /*
     **  Allocate and initialise compression structures
@@ -258,6 +263,14 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
     **  register work routine
     */
 	Tcl_DoWhenIdle(DoJpeg, gwmPtr);
+
+#else /* HAVE_LIBJPEG */
+        /* what's the best thing to do here?  Just jump out? */
+	Tcl_AppendResult(interp,
+                         "Can't produce JPEGs -- unavailable at build time",
+                         (char *) NULL);
+	return TCL_ERROR;
+#endif
     }
     else
     {
@@ -928,6 +941,7 @@ void send_plane (FILE *out, int change, int is_rle, int nBytes,
 	}
     }
 }
+#if HAVE_LIBJPEG
 static void DoJpeg(ClientData clientData)
 {
 /*
@@ -1013,3 +1027,4 @@ static void DoJpeg(ClientData clientData)
 		TCL_GLOBAL_ONLY);
     }
 }
+#endif
