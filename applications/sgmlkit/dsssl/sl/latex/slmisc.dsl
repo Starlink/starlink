@@ -31,7 +31,6 @@ mode make-manifest-mode in sl.dsl.
 	(if content
 	    (process-node-list content)
 	    (literal "No processable content"))
-	(process-matching-children 'figurecontent)
 	(process-matching-children 'caption))))
 
 (element caption
