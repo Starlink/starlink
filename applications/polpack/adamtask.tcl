@@ -380,7 +380,7 @@ proc adamtask.exit {{n 0}} {
     }
     fileevent $priv(PIPE) readable ""
     adam_reply $priv(RELAY_PATH) $priv(RELAY_MESSID) SYNC "" exit
-    adamtask.realExit $n
+    exit $n
 }
 
 proc adamtask.forget {task arglist} {
