@@ -217,20 +217,20 @@ F77_SUBROUTINE(ast_text)( INTEGER(THIS),
 }
 
 F77_SUBROUTINE(ast_polycurve)( INTEGER(THIS),
-                           INTEGER(NPOINT),
-                           INTEGER(NCOORD),
-                           INTEGER(DIM),
-                           DOUBLE_ARRAY(IN),
-                           INTEGER(STATUS) ) {
+                               INTEGER(NPOINT),
+                               INTEGER(NCOORD),
+                               INTEGER(INDIM),
+                               DOUBLE_ARRAY(IN),
+                               INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_INTEGER(NPOINT)
    GENPTR_INTEGER(NCOORD)
-   GENPTR_INTEGER(DIM)
+   GENPTR_INTEGER(INDIM)
    GENPTR_DOUBLE_ARRAY(IN)
 
    astAt( "AST_POLYCURVE", NULL, 0 );
    astWatchSTATUS(
-      astPolyCurve( astI2P( *THIS ), *NPOINT, *NCOORD, *DIM,
+      astPolyCurve( astI2P( *THIS ), *NPOINT, *NCOORD, *INDIM,
                 (const double (*)[])IN );
    )
 }
