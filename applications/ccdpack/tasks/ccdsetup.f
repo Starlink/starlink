@@ -340,7 +340,7 @@
 *          #
 *          #   Written by pdraper on Wed Sep  6 17:41:54 1995.
 *          #
-*          ADC = 1  ! electrons/ADU
+*          ADC = 1  ! Electrons/ADU
 *          RNOISE = 9.95  ! Nominal readout noise in ADUs
 *          EXTENT = 6, 119, 1, 128  ! Extent of useful CCD area
 *          BOUNDS = 1, 5, 120, 128  ! Bounds of bias strips
@@ -356,11 +356,18 @@
 *          LOGTO = BOTH  ! Log file information to
 *          LOGFILE = CCDPACK.LOG  ! Name of logfile
 *
-*       Note that if you are using CCDPACK Sets, you will need to use
-*       a separate restoration file for each INDEX value.
+*       If you are using CCDPACK Sets, then some lines of this file
+*       may be of the form "setindex,keyword=value"; so this sequence:
+*
+*          1,RNOISE = 9.80  ! Nominal readout noise in ADUs (Set Index 1)
+*          2,RNOISE = 8.65  ! Nominal readout noise in ADUs (Set Index 2)
+*          3,RNOISE = 9.10  ! Nominal readout noise in ADUs (Set Index 3)
+*
+*       would give the different values for each member of each Set of
+*       images.
 
 *  Behaviour of parameters:
-*     All parameters values are obtained by prompting. The suggested
+*     All parameter values are obtained by prompting. The suggested
 *     values (defaults) are either the current global values, if they
 *     exist, or the application current values (from the last time that
 *     the application was run).  Global values corresponding to the 
@@ -397,6 +404,9 @@
 *     10-MAY-2001 (MBT):
 *        Added the INDEX parameter, allowing parameters to be accessed
 *        keyed by their Set Index value.
+*     3-JUL-2001 (MBT):
+*        Modified the format of the save/restore file so that it can
+*        cope with keyed values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -412,7 +422,8 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK system parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'MSG_PAR'          ! MSG system buffer size
-      INCLUDE 'PAR_ERR'          ! Parameter system codes.
+      INCLUDE 'DAT_PAR'          ! HDS system constants
+      INCLUDE 'PAR_ERR'          ! Parameter system codes
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -426,6 +437,8 @@
       CHARACTER * ( FIO__SZFNM ) LOGNAM ! Logfile name
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer
       CHARACTER * ( MSG__SZMSG ) MSKNAM ! Name of mask file or ARD expression
+      CHARACTER * ( DAT__SZLOC ) GLOC ! HDS locator for GLOBAL parameter file
+      CHARACTER * ( DAT__SZLOC ) SLOC ! HDS locator for keyed parameter struct
       CHARACTER * ( 5 ) NULL     ! System NULL expression
       DOUBLE PRECISION ADC       ! ADC factor
       DOUBLE PRECISION DEFER     ! Deferred charge value
@@ -520,6 +533,9 @@
          LINNUM = 0
          EOF = .FALSE.
 
+*  Get locator for keyed data structure.
+         CALL CCD1_GPARF( 'UPDATE', .TRUE., GLOC, SLOC, STATUS )
+
 *  Read it in one line at a time, until end of file.
  1       CONTINUE                   ! Start of 'DO WHILE' loop
          IF ( STATUS .EQ. SAI__OK .AND. .NOT. EOF ) THEN
@@ -534,9 +550,13 @@
 
 *  Find out if the line is a valid data file statement, decode the
 *  values and write out to the environment as dynamic defaults.
-            CALL CCD1_VLIN( LINE, NCHAR, LINNUM, STATUS )
+            CALL CCD1_VLIN( LINE, LINNUM, BYSET, SINDEX, SLOC, STATUS )
             GO TO 1
          END IF
+
+*  Annul locator.
+         CALL DAT_ANNUL( SLOC, STATUS )
+         CALL DAT_ANNUL( GLOC, STATUS )
       END IF
 
 *  Now initialise Logfile system. This uses the parameters LOGTO and
@@ -794,14 +814,32 @@
 
 *  Save index-keyed values to Set Index-specific location if necessary.
       IF ( BYSET ) THEN
-         IF ( GOTADC ) CALL CCD1_KPSV( 'ADC', SINDEX, STATUS )
-         IF ( GOTBDS ) CALL CCD1_KPSV( 'BOUNDS', SINDEX, STATUS )
-         IF ( GOTDEF ) CALL CCD1_KPSV( 'DEFERRED', SINDEX, STATUS )
-         IF ( GOTDIR ) CALL CCD1_KPSV( 'DIRECTION', SINDEX, STATUS )
-         IF ( GOTEXT ) CALL CCD1_KPSV( 'EXTENT', SINDEX, STATUS )
-         IF ( GOTMSK ) CALL CCD1_KPSV( 'MASK', SINDEX, STATUS )
-         IF ( GOTNOI ) CALL CCD1_KPSV( 'RNOISE', SINDEX, STATUS )
-         IF ( GOTSVL ) CALL CCD1_KPSV( 'SATURATION', SINDEX, STATUS )
+
+*  Get locators for the GLOBAL database file and the keyed parameters
+*  structure in which the parameter values are to be stored.
+         CALL CCD1_GPARF( 'UPDATE', .TRUE., GLOC, SLOC, STATUS )
+
+*  Store each parameter value as appropriate.
+         IF ( GOTADC ) 
+     :      CALL CCD1_KPSV( 'ADC', SINDEX, SLOC, STATUS )
+         IF ( GOTBDS ) 
+     :      CALL CCD1_KPSV( 'BOUNDS', SINDEX, SLOC, STATUS )
+         IF ( GOTDEF ) 
+     :      CALL CCD1_KPSV( 'DEFERRED', SINDEX, SLOC, STATUS )
+         IF ( GOTDIR ) 
+     :      CALL CCD1_KPSV( 'DIRECTION', SINDEX, SLOC, STATUS )
+         IF ( GOTEXT ) 
+     :      CALL CCD1_KPSV( 'EXTENT', SINDEX, SLOC, STATUS )
+         IF ( GOTMSK ) 
+     :      CALL CCD1_KPSV( 'MASK', SINDEX, SLOC, STATUS )
+         IF ( GOTNOI ) 
+     :      CALL CCD1_KPSV( 'RNOISE', SINDEX, SLOC, STATUS )
+         IF ( GOTSVL ) 
+     :      CALL CCD1_KPSV( 'SATURATION', SINDEX, SLOC, STATUS )
+
+*  Release the parameter file locators.
+         CALL DAT_ANNUL( SLOC, STATUS )
+         CALL DAT_ANNUL( GLOC, STATUS )
       END IF
 
 *  Find out if the user wants to save the setup for future restorations.
@@ -813,13 +851,7 @@
      :                    STATUS )
 
 *  And write out the current values.
-         CALL CCD1_SAVE( FDS, LINE, GOTLG2, LOGTO, GOTLGN, LOGNAM,
-     :                   GOTADC, ADC, GOTNOI, RNOISE, GOTEXT, EXTENT,
-     :                   GOTBDS, BOUNDS, NBOUND, GOTDIR, DIRECT,
-     :                   GOTDEF, DEFER, GOTMSK, MSKNAM, GOTSAT, SATUR,
-     :                   GOTSPR, SETSAT, GOTSVL, SATVAL, GOTPRE,
-     :                   PRESER, GOTGEN, GENVAR, GOTNAM, NDFS, 
-     :                   GOTSET, USESET, STATUS )
+         CALL CCD1_SAV( FDS, STATUS )
 
 *  Where the set up is saved to.
          CALL CCD1_MSG( ' ', ' ', STATUS )
