@@ -20,6 +20,10 @@
 #                 28 Apr 00  short_help method scoped to public from
 #                            protected, this is needed so that canvas
 #                            items can trigger short_help changes.
+#                 23 Apr 02  Modified busy as this always caused the 
+#                            top-level window to get the focus on
+#                            exit, even when it didn't have the focus
+#                            to start with (causing unintended grab).
 
 itk::usual TopLevelWidget {}
 
@@ -218,26 +222,40 @@ itcl::class util::TopLevelWidget {
     # window
 
     public method busy {cmd} {
-	global ::errorInfo ::errorCode
-	if {[incr busy_count_] == 1} {
-	    catch {focus .}
-	    blt::busy hold $w_
-	    update idletasks
-	}
-	
-	# save any errors and report them later
-	if {[set code [catch [list uplevel $cmd] msg]]} {
-	    set info $errorInfo
-	} 
-
-	if {[incr busy_count_ -1] == 0} {
-	    blt::busy release $w_
-	    catch {focus [focus -lastfor $w_]}
-	}
-
-	if {$code} {
-	    uplevel [list error $msg $info $code]
-	}
+       global ::errorInfo ::errorCode
+       if {[incr busy_count_] == 1} {
+          
+          #  First busy level so record current focus and move it out
+          #  of the window.
+          set oldfocus [focus -displayof $w_]
+          catch {focus .}
+          blt::busy hold $w_
+          update idletasks
+       }
+       
+       # execute command saving any errors and report them later
+       if {[set code [catch [list uplevel $cmd] msg]]} {
+          set info $errorInfo
+       } 
+       
+       # if exiting busy loop, then restore old focus if possible,
+       # otherwise look for last focus, which isn't a top-level window
+       # (doing this can cause unexpected grabs).
+       if {[incr busy_count_ -1] == 0} {
+          blt::busy release $w_
+          if { $oldfocus != "" && [winfo exists $oldfocus]} {
+             set lastfocus $oldfocus
+          } else {
+             set lastfocus [focus -lastfor $w_]
+          }
+          if { $lastfocus != $w_ } {
+             catch {focus $lastfocus}
+          }
+       }
+       
+       if {$code} {
+          uplevel [list error $msg $info $code]
+       }
     }
 
 
