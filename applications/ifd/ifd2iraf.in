@@ -1,4 +1,4 @@
-#! @TCLSH@
+#! @STARTCLSH@
 #
 # This script converts an interface definition (ifd) file to the parameter
 # files and cl scripts needed to run ADAM applications from the IRAF cl.
