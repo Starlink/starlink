@@ -98,3 +98,6 @@ New changes: 2.3-2
 
     NDFs stored with container files are now allowed (useful for SCUBA 
     data).
+
+    Floating point images of size 35,000x2048 pixels are now known to
+    display. Bigger images may also now work.
