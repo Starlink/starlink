@@ -1730,6 +1730,10 @@ void astInitSpecFrameVtab_(  AstSpecFrameVtab *vtab, const char *name ) {
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Check the local error status. */
    if ( !astOK ) return;
 
@@ -1872,7 +1876,17 @@ void astInitSpecFrameVtab_(  AstSpecFrameVtab *vtab, const char *name ) {
 
 /* Create an FK5 J2000 SkyFrame which will be used for formatting and 
    unformatting sky positions, etc. */
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
    skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+
+
 }
 
 static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
