@@ -64,6 +64,9 @@
 *        Now propagates NDF.
 *     03-DEC-1997 (PDRAPER):
 *        Now accepts the name of the component to replace.
+*     28-JUL-1999 (PDRAPER):
+*        Added control of the NDF history component. This is because the 
+*        command-line args may not exist (compiler dependent).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -79,6 +82,7 @@
       INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
       INCLUDE 'NDF_PAR'         ! NDF parameters
       INCLUDE 'AST_PAR'         ! AST parameters
+      INCLUDE 'PSX_ERR'         ! PSX error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) NAME
@@ -117,6 +121,9 @@
       INTEGER IWCS              ! Pointer to WCS object
       LOGICAL HVQUAL            ! Do we have some additional quality
       LOGICAL THERE             ! FITS extension exists
+      CHARACTER * ( NDF__SZHIS ) TEXT( 1 ) ! History text
+      CHARACTER * ( NDF__SZHMX ) APPN ! History application name
+
 *.
 
 *  Set the global status.
@@ -230,6 +237,17 @@
             CALL AST_ANNUL( IWCS, STATUS )
          END IF
          CALL DAT_UNMAP( FITLOC, STATUS )
+
+*  Take control of the NDF history component, by giving values to
+*  override the default values. These values override the default ones.
+         APPN = 'GAIA'
+         CALL ERR_MARK
+         CALL PSX_GETENV( 'GAIA_VERSION', APPN( 7: ), STATUS )
+         IF ( STATUS .EQ. PSX__NOENV ) CALL ERR_ANNUL( STATUS )
+         CALL ERR_RLSE
+         TEXT( 1 ) = 'Created by GAIA save command'
+         CALL NDF_HPUT( 'QUIET', APPN, .TRUE., 1, TEXT, .FALSE., 
+     :                  .FALSE., .FALSE., IDNEW, STATUS )
       END IF
 
 *  Make sure that all the NDF resources etc. are released.

@@ -122,13 +122,16 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 
     // Set the global Tcl variables gaia_library and gaia_version
     // and add gaia_library to the auto_path (goes first, so used
-    // first).
+    // first). Also set global var env(GAIA_VERSION) so this is
+    // available to all sub-shells.
     Tcl_SetVar(interp, "gaia_library", libDir, TCL_GLOBAL_ONLY);
     Tcl_SetVar(interp, "gaia_version", GAIA_VERSION, TCL_GLOBAL_ONLY);
     char cmd[1048];
     sprintf(cmd, "set auto_path [linsert $auto_path 0 %s]", libDir );
-    if (Tcl_Eval(interp, cmd) != TCL_OK)
+    if (Tcl_Eval(interp, cmd) != TCL_OK) {
 	return TCL_ERROR;
+    }
+    Tcl_SetVar2(interp, "env", "GAIA_VERSION", GAIA_VERSION, TCL_GLOBAL_ONLY);
 
     //  Do the Iwidgets initialisation, needed for single binary as
     //  Iwidgets doesn't have a builtin init function (so the script
@@ -136,7 +139,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     libDir = Tcl_GetVar(interp, "iwidgets_library", TCL_GLOBAL_ONLY);
     if (libDir == NULL) {
       libDir = Tcl_GetVar2(interp, "env", "IWIDGETS_LIBRARY",
-                           TCL_GLOBAL_ONLY); 
+                           TCL_GLOBAL_ONLY);
     }
     if (libDir == NULL) {
       libDir = IWIDGETS_LIBRARY;

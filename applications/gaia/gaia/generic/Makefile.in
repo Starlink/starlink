@@ -214,7 +214,7 @@ rtd_cpdat.o: NDF_PAR PRM_PAR SAE_PAR
 rtd_cpx.o: PRM_PAR SAE_PAR
 rtd_rdndf.o: DAT_PAR NDF_PAR PRM_PAR SAE_PAR
 rtd_slice.o: DAT_PAR NDF_PAR SAE_PAR
-rtd_wrndf.o: AST_PAR DAT_PAR NDF_PAR SAE_PAR
+rtd_wrndf.o: AST_PAR DAT_PAR NDF_PAR SAE_PAR PSX_ERR
 slice.o: DAT_PAR NDF_PAR SAE_PAR
 
 LINKS = SAE_PAR PRM_PAR DAT_PAR NDF_PAR GRP_PAR FIO_ERR NUM_DEC_CVT \
@@ -241,5 +241,7 @@ NUM_DEF_CVT:	$(STAR_INC)/num_def_cvt
 AST_PAR:	$(STAR_INC)/ast_par
 	  $(LINK) $? $@
 CAT_PAR:	$(STAR_INC)/cat_par
+	  $(LINK) $? $@
+PSX_ERR:	$(STAR_INC)/psx_err
 	  $(LINK) $? $@
 
