@@ -38,6 +38,8 @@
 #define CNF_PVAL 289
 #define EQUIVALENCE 300
 #define IOSTAT 301
+#define IMPLICITNONE 302
+#define IMPLICIT 303
 
 #define IABS 400
 #define IDIM 401

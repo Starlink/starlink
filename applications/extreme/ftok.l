@@ -131,6 +131,9 @@ SPACE			[ \t]*
 					  count(); return( EQUIVALENCE ); }
 <FIRST>"<"{T}{Y}{P}{E}">"		{ count(); return( GENERIC_TYPE ); }
 <FIRST>{E}{N}{D}			{ count(); return( END ); }
+<FIRST>{I}{M}{P}{L}{I}{C}{I}{T}{SPACE}{N}{O}{N}{E}	{ 
+					  count(); return( IMPLICITNONE ); }
+<FIRST>{I}{M}{P}{L}{I}{C}{I}{T}		{ count(); return( IMPLICIT ); }
 
 {F}{U}{N}{C}{T}{I}{O}{N}		{ count(); return( FUNCTION ); }
 {I}{F}					{ count(); return( IF ); }
