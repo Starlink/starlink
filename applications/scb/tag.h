@@ -10,6 +10,9 @@
       void sappend( char *s );
       void cappend( char c );
 
+/* Function for doing grammar-specific tidying after the parser is finished. */
+      void tagwrap();
+
 /* Utility functions. */
       void *memok( void *ptr );
 
@@ -47,7 +50,6 @@
 
 #define BUFINC 1024      /* Amount by which to increase buffer each time.
                             Affects only time/memory efficiency. */
-
 
 
 
