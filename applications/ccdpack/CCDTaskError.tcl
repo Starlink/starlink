@@ -39,7 +39,7 @@ proc CCDTaskError { task error } {
 #.
    if { $error != "" } { 
       set TASK($task,error)  $error
-      CCDIssueInfo "Application exited in error:$error"
+      CCDIssueInfo "Application exited in error:\n$error"
    }
 #  End of procedure.
 }
