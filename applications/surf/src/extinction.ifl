@@ -54,6 +54,7 @@
          POSITION 3
          PROMPT   'First zenith sky opacity measured'
          TYPE     '_REAL'
+	 DEFAULT  0.0
 	 HELPKEY  '*'
       ENDPARAMETER
 
@@ -61,6 +62,7 @@
          POSITION 4
          PROMPT   'Sidereal time of first opacity measurement; hh mm ss.ss'
          TYPE     '_CHAR'
+	 DEFAULT  '0.0'
 	 HELPKEY  '*'
       ENDPARAMETER
 
@@ -76,6 +78,7 @@
          POSITION 5
          PROMPT   'Second zenith sky opacity measured'
          TYPE     '_REAL'
+	 PPATH    'dynamic'
 	 HELPKEY  '*'
       ENDPARAMETER
 
@@ -83,6 +86,7 @@
          POSITION 6
          PROMPT   'Sidereal time of second opacity measurement; hh mm ss.ss'
          TYPE     '_CHAR'
+	 PPATH    'dynamic'
 	 HELPKEY  '*'
       ENDPARAMETER
 
