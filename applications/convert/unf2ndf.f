@@ -84,7 +84,7 @@
 *        header section.  The NDF is two-dimensional: 100 elements in x
 *        by 60 in y.  Its data array has type _REAL.  The data records
 *        each have 8 values.
-*     unf2ndf ngc253q.dat ngc253 q 100 shape=[100,60] update
+*     unf2ndf ngc253q.dat ngc253 q 100 shape=[100,60]
 *        This copies a quality array from the unformatted file
 *        ngc253q.dat to an existing NDF called ngc253 (such as created
 *        in the first example).  ngc253q.dat does not contain a header
@@ -276,6 +276,17 @@
 *  Find how many records to skip.
       CALL PAR_GDR0I( 'SKIP', 0, 0, VAL__MAXI, .FALSE., SKIP, STATUS )
 
+*  Find out which component is to be processed.
+*  ============================================
+
+*  Find which component to copy.
+      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Variance,Quality',
+     :                .FALSE., COMP, STATUS )
+      UPDATE = COMP .NE. 'DATA'
+
+*  Check the status to prevent possibly adding confusing error messages.
+      IF ( STATUS .NE. SAI__OK ) GOTO 980
+
 *  Obtain additional parameters for no-FITS header.
 *  ================================================
       IF ( .NOT. HEADER ) THEN
@@ -384,14 +395,6 @@
 
       END IF
 
-*  Find out which component is to be processed.
-*  ============================================
-
-*  Find which component to copy.
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Variance,Quality',
-     :                .FALSE., COMP, STATUS )
-      UPDATE = COMP .NE. 'DATA'
-
 *  Check the status to prevent possibly adding confusing error messages.
       IF ( STATUS .NE. SAI__OK ) GOTO 980
 
@@ -435,8 +438,9 @@
 
 *  This is required so that that one- and two-byte integer types may be
 *  mapped as integer for reading, but are actually stored with the
-*  correct type.
-      IF ( UPDATE ) CALL NDF_STYPE( TYPE, NDF, COMP, STATUS )
+*  correct type.  The type cannot be altered for the QUALITY array.
+      IF ( COMP .EQ. 'VARIANCE' )
+     :  CALL NDF_STYPE( TYPE, NDF, COMP, STATUS )
 
 *  Obtain the number of values per record.
 *  =======================================
