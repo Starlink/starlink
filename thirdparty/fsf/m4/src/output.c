@@ -1,5 +1,7 @@
 /* GNU m4 -- A simple macro processor
-   Copyright (C) 1989, 90, 91, 92, 93, 94 Free Software Foundation, Inc.
+
+   Copyright (C) 1989, 1990, 1991, 1992, 1993, 1994, 2004 Free
+   Software Foundation, Inc.
   
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -468,15 +470,15 @@ insert_file (FILE *file)
 
   /* Insert output by big chunks.  */
 
-  errno = 0;
-  while (length = fread (buffer, 1, COPY_BUFFER_SIZE, file),
-	 length != 0) {
-    saved_errno = errno;
-    output_text (buffer, length);
-    errno = saved_errno;
-  }
-  if (errno)
-    M4ERROR ((EXIT_FAILURE, errno, "ERROR: Reading inserted file"));
+  for (;;)
+    {
+      length = fread (buffer, 1, COPY_BUFFER_SIZE, file);
+      if (ferror (file))
+	M4ERROR ((EXIT_FAILURE, errno, "ERROR: Reading inserted file"));
+      if (length == 0)
+	break;
+      output_text (buffer, length);
+    }
 }
 
 /*-------------------------------------------------------------------------.

@@ -11,7 +11,7 @@
        build rule to be generated (by GenerateDependencies.java), but does
        not include it in the list of buildsupport dependencies, so that it
        is not build automatically. -->
-  <version>1.4</version>
+  <version>1.4.2</version>
   <path>thirdparty/fsf/m4</path>
   <description>GNU m4</description>
   <dependencies/>
