@@ -208,12 +208,14 @@
 *    If caller specified a representation on the parameter, glue it
 *    on to the file name
         ELSE
-          CALL ADI_FOPEN( FNAME(:MAX(1,FLEN))//PAR(PPOS:),
-     :                                   CLASS, ACCESS, ID, STATUS )
-          CALL MSG_SETC( 'PAR', PAR(:EP) )
-          CALL MSG_SETC( 'FILE', FNAME(:MAX(1,FLEN)) )
-          CALL ERR_REP( ' ', 'Unable to associate parameter ^PAR'/
-     :                    /' with file ^FILE', STATUS )
+          FNAME(MAX(1,FLEN)+1:) = PAR(PPOS:)
+          CALL ADI_FOPEN( FNAME, CLASS, ACCESS, ID, STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL MSG_SETC( 'PAR', PAR(:EP) )
+            CALL MSG_SETC( 'FILE', FNAME(:MAX(1,FLEN)) )
+            CALL ERR_REP( ' ', 'Unable to associate parameter ^PAR'/
+     :        /' with file ^FILE', STATUS )
+          END IF
 
         END IF
 

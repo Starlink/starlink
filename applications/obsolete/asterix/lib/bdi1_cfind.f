@@ -392,8 +392,9 @@
 *  Otherwise an error
       ELSE
         STATUS = SAI__ERROR
+        CALL MSG_SETC( 'IT', ITEM )
         CALL ERR_REP( 'BDI1_CFIND_1', 'Unrecognised BDI data item '/
-     :                /ITEM, STATUS )
+     :                /'^IT', STATUS )
 
       END IF
 

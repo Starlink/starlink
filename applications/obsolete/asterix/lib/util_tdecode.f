@@ -53,7 +53,7 @@
 *    Function declarations :
       INTEGER CHR_LEN
         EXTERNAL CHR_LEN
-      INTEGER CHR_ISALM,CHR_ISALF
+      LOGICAL CHR_ISALM,CHR_ISALF
         EXTERNAL CHR_ISALM,CHR_ISALF
 *    Local constants :
       INTEGER MAXWRD
@@ -82,12 +82,10 @@
       NTRANGE = 0
 *
       DO WHILE (.NOT. JUMPOUT)
-*
          LP = LP + 1
          JUMPOUT = CHR_ISALM(TSTRING(LP:LP)).OR.
      :             (INDEX('[./',TSTRING(LP:LP)).NE.0)
-*
-      ENDDO
+      END DO
 *
 * Set the first meaningful character in string value
       FCHAR1 = TSTRING(LP:LP)

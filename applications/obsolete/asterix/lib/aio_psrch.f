@@ -38,6 +38,7 @@
 *
 *    Local variables :
 *
+      CHARACTER*132          LFILE               ! Directory path
       CHARACTER*132          PATH               ! Directory path
 
       INTEGER                CPOS               ! position of colon in PATH
@@ -83,8 +84,9 @@
           END IF
 
 *        Try and open file with extension
-          INQUIRE( FILE=PATH(D_S:D_E)//NAME, EXIST=FOUND,
-     :             NAME=FULLNAME )
+          LFILE = PATH(D_S:D_E)
+          LFILE(D_E-D_S+2:) = NAME
+          INQUIRE( FILE=LFILE, EXIST=FOUND, NAME=FULLNAME )
 
 *        If not found advance pointer
           IF ( .NOT. FOUND ) IC = D_E + 2
