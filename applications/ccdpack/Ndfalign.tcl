@@ -421,86 +421,85 @@
 #  they were displayed.  This is important for efficiency reasons since
 #  the method may get called, possibly quite often, just to be sure that
 #  the display is up to date.
-         if { [ array exists displayed ] && 
-              $displayed(A,ndfname) == $ndfname(A) && \
-              $displayed(B,ndfname) == $ndfname(B) && \
-              $displayed(A,xoff) == $xoff(A) && \
-              $displayed(B,xoff) == $xoff(B) && \
-              $displayed(A,yoff) == $yoff(A) && \
-              $displayed(B,yoff) == $yoff(B) && \
-              $displayed(zoomfactor) == $zoomfactor } { 
-            return
-         }
+         if { ! [ array exists displayed ] ||
+              $displayed(A,ndfname) != $ndfname(A) || \
+              $displayed(B,ndfname) != $ndfname(B) || \
+              $displayed(A,xoff) != $xoff(A) || \
+              $displayed(B,xoff) != $xoff(B) || \
+              $displayed(A,yoff) != $yoff(A) || \
+              $displayed(B,yoff) != $yoff(B) || \
+              $displayed(zoomfactor) != $zoomfactor } { 
 
 #  This may be time-consuming.  Post a waiting message.
-         waitpush "Drawing images"
+            waitpush "Drawing images"
 
 #  If this pair of NDFs has not been displayed before (but not if only
 #  the display characteristics have changed) then update the title bar.
-         if { ! [ array exists displayed ] || \
-              $displayed(A,ndfname) != $ndfname(A) || \
-              $displayed(B,ndfname) != $ndfname(B) } {
-            configure -title $title
-            configure -info $info
-         }
+            if { ! [ array exists displayed ] || \
+                 $displayed(A,ndfname) != $ndfname(A) || \
+                 $displayed(B,ndfname) != $ndfname(B) } {
+               configure -title $title
+               configure -info $info
+            }
 
 #  Keep a record of the attributes currently being displayed so if we
 #  are called upon to do the same again we can skip it.
-         set displayed(A,ndfname) $ndfname(A)
-         set displayed(B,ndfname) $ndfname(B)
-         set displayed(A,xoff) $xoff(A)
-         set displayed(B,xoff) $xoff(B)
-         set displayed(A,yoff) $yoff(A)
-         set displayed(B,yoff) $yoff(B)
-         set displayed(zoomfactor) $zoomfactor
+            set displayed(A,ndfname) $ndfname(A)
+            set displayed(B,ndfname) $ndfname(B)
+            set displayed(A,xoff) $xoff(A)
+            set displayed(B,xoff) $xoff(B)
+            set displayed(A,yoff) $yoff(A)
+            set displayed(B,yoff) $yoff(B)
+            set displayed(zoomfactor) $zoomfactor
 
 #  Set the bounds of the GWM item to hold both images.
-         set vxlo [ min [ expr $xoff(A) + $xlo(A) ] \
-                        [ expr $xoff(B) + $xlo(B) ] ]
-         set vxhi [ max [ expr $xoff(A) + $xhi(A) ] \
-                        [ expr $xoff(B) + $xhi(B) ] ]
-         set vylo [ min [ expr $yoff(A) + $ylo(A) ] \
-                        [ expr $yoff(B) + $ylo(B) ] ]
-         set vyhi [ max [ expr $yoff(A) + $yhi(A) ] \
-                        [ expr $yoff(B) + $yhi(B) ] ]
+            set vxlo [ min [ expr $xoff(A) + $xlo(A) ] \
+                           [ expr $xoff(B) + $xlo(B) ] ]
+            set vxhi [ max [ expr $xoff(A) + $xhi(A) ] \
+                           [ expr $xoff(B) + $xhi(B) ] ]
+            set vylo [ min [ expr $yoff(A) + $ylo(A) ] \
+                           [ expr $yoff(B) + $ylo(B) ] ]
+            set vyhi [ max [ expr $yoff(A) + $yhi(A) ] \
+                           [ expr $yoff(B) + $yhi(B) ] ]
 
 #  Clear the canvas (it may contain items other than the GWM).
-         $canvas delete all
+            $canvas delete all
 
 #  Make the new GWM item.
-         makegwm $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ]
+            makegwm $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ]
 
 #  Create polygons on the canvas for both NDFs.  This both provides visual
 #  feedback for the user and makes it easier to identify positions on
 #  the canvas.
-         foreach slot { A B } {
-            set vertices ""
-            foreach pt [ $ndf($slot) polygon $wcsframe($slot) ] {
-               set cpt [ view2canv [ expr $xoff($slot) + [ lindex $pt 0 ] ] \
-                                   [ expr $yoff($slot) + [ lindex $pt 1 ] ] ]
-               lappend vertices [ lindex $cpt 0 ] [ lindex $cpt 1 ]
+            foreach slot { A B } {
+               set vertices ""
+               foreach pt [ $ndf($slot) polygon $wcsframe($slot) ] {
+                  set cpt [ view2canv [ expr $xoff($slot) + [ lindex $pt 0 ] ] \
+                                      [ expr $yoff($slot) + [ lindex $pt 1 ] ] ]
+                  lappend vertices [ lindex $cpt 0 ] [ lindex $cpt 1 ]
+               }
+               eval $canvas create polygon $vertices \
+                       -fill \{\} -outline green -tags image$slot
             }
-            eval $canvas create polygon $vertices \
-                    -fill \{\} -outline green -tags image$slot
-         }
          
 #  Draw the NDFs onto the GWM.
-         set overlap [ \
-            ndfdrawpair [ gwmname ]/GWM \
-               $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ] \
-               $zoomfactor \
-               $ndf(A) $wcsframe(A) $xoff(A) $yoff(A) \
-               [ lindex $percentiles(A) 0 ] [ lindex $percentiles(A) 1 ] \
-               $ndf(B) $wcsframe(B) $xoff(B) $yoff(B) \
-               [ lindex $percentiles(B) 0 ] [ lindex $percentiles(B) 1 ] \
-         ]
-         # $canvas create oval -5 -5 5 5 -fill yellow
+            set overlap [ \
+               ndfdrawpair [ gwmname ]/GWM \
+                  $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ] \
+                  $zoomfactor \
+                  $ndf(A) $wcsframe(A) $xoff(A) $yoff(A) \
+                  [ lindex $percentiles(A) 0 ] [ lindex $percentiles(A) 1 ] \
+                  $ndf(B) $wcsframe(B) $xoff(B) $yoff(B) \
+                  [ lindex $percentiles(B) 0 ] [ lindex $percentiles(B) 1 ] \
+            ]
+            # $canvas create oval -5 -5 5 5 -fill yellow
 
 #  Redraw any points in the points list.
-         refreshpoints
+            refreshpoints
 
-#  Do bad bug magic.
-         # jiggle
+#  Remove the waiting message.
+            waitpop
+         }
 
 #  Set up key bindings for dragging, dropping and marking points.
          foreach slot { A B } {
@@ -511,9 +510,6 @@
             $canvas bind image$slot <ButtonRelease-1> \
                                     [ code $this image_release $slot %x %y ]
          }
-
-#  Remove the waiting message.
-         waitpop
       }
 
 
