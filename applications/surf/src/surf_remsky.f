@@ -137,6 +137,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.22  2005/03/18 06:28:30  timj
+*     THUMPER recognition
+*
 *     Revision 1.21  2004/09/08 02:03:34  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -425,7 +428,8 @@
 
       CALL CHR_UCASE(SUB_INSTRUMENT)
       IF ((SUB_INSTRUMENT .NE. 'SHORT') .AND.
-     :     (SUB_INSTRUMENT .NE. 'LONG')) THEN
+     :     (SUB_INSTRUMENT .NE. 'LONG') .AND.
+     :     (SUB_INSTRUMENT .NE. 'THUMP')) THEN
 
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
