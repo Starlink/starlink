@@ -54,6 +54,8 @@
 #        Added contouring photometry toolbox.
 #     28-MAY-1999 (PDRAPER):
 #        Added optimal photometry toolbox.
+#     28-JUN-1999 (PDRAPER):
+#        Added ramp printing changes, hidden development code for now.
 #     {enter_changes_here}
 
 #-
@@ -517,6 +519,11 @@ itcl::class gaia::Gaia {
 	 add_menuitem $m command "Demonstration mode..." \
 	       {See a demonstration of GAIA (needs an empty directory)} \
 	       -command [code $this make_toolbox demo]
+      }
+      if { $itk_option(-ramp_print) && $itk_option(-with_colorramp) } { 
+	 add_menuitem $m command "Print color ramp..." \
+	    {Print a labelled copy of color ramp to postscript} \
+	    -command [code $this print_ramp_]
       }
    }
 
@@ -1193,6 +1200,17 @@ itcl::class gaia::Gaia {
       }
    }
 
+   #  Print a copy of the colorramp to postscript.
+   private method print_ramp_ {} {
+      utilReUseWidget gaia::GaiaRampPrint $w_.printramp \
+	 -image $image_.colorramp.image \
+	 -show_footer 0 \
+	 -whole_canvas 1 \
+	 -transient 1 \
+	 -mainimage [$image_ get_image] \
+	 -maincanvas [$image_ get_canvas]
+   }
+
    # -- public variables (also program options) --
 
    #  Mark displayed image as temporary, these are deleted on exit
@@ -1236,6 +1254,9 @@ itcl::class gaia::Gaia {
    #  Redefine panel_layout to GAIA default
    itk_option define -panel_layout panel_layout Panel_layout reverse
 
+   #  Show the print colorramp code.
+   itk_option define -ramp_print ramp_print Ramp_Print 0
+   
    # -- Protected variables --
 
    #  Clone number of this window.

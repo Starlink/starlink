@@ -31,6 +31,7 @@ FILES        = \
  GaiaDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
  GaiaApPhotom.tcl GaiaOptPhotom.tcl GaiaPhotomDetails.tcl \
  GaiaPhotomExtras.tcl GaiaPhotomList.tcl GaiaPhotomObject.tcl \
+ GaiaRampPrint.tcl \
  gaia2astrom.tcl gaiaMain.tcl \
  gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \

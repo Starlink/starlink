@@ -75,51 +75,137 @@ itcl::class gaia::GaiaRampPrint {
    #  Methods:
    #  --------
 
+   #  Init method. Called after construction is complete.
+   public method init {} {
+      rtd::RtdImagePrint::init
+
+      wm title $w_ "Print ramp to postscript ($itk_option(-number))"
+
+      #  Remove elements that are not required here.
+      pack forget $w_.whole.yes
+      blt::table forget $w_.pagesize.footer
+
+      #  Add menu to select the font and its size.
+      itk_component add lsize {
+	 LabelEntryScale $w_.lsize \
+	    -text "Label size:" \
+	    -value 1.0 \
+	    -labelwidth 10 \
+	    -valuewidth 5 \
+	    -from 0.25 \
+	    -to 4.0 \
+	    -increment 0.25 \
+	    -resolution 0.25 \
+	    -show_arrows 1 \
+	    -anchor w \
+	    -command [code $this set_label_size_]
+      }
+      set lsize 1.0
+      pack $itk_component(lsize) -side top -fill x -ipadx 1m -ipady 1m
+
+      #  Create a menu that allows the visual selection of one of the
+      #  known fonts. Use a LabelMenu widget to host the choice.
+      itk_component add lfont {
+	 util::LabelMenu $w_.lfont \
+	    -text "Label font:" \
+	    -relief raised \
+	    -labelwidth 10 \
+	    -valuewidth 5
+      }
+      pack $itk_component(lfont) -side top -fill x -ipadx 1m -ipady 1m
+      catch {
+	 #  Now add all the fonts.
+	 foreach {index xname desc} $fontmap_ {
+	    $itk_component(lfont) add \
+	       -command [code $this set_label_font_ $index] \
+	       -label $desc \
+	       -value $xname \
+	       -font $xname
+	 }
+	 set lfont_ 0
+      }
+
+      #  Colours, border and font.
+      itk_component add lcolour {
+	 util::LabelMenu $w_.lcolour \
+	    -text "Label color:" \
+	    -relief raised \
+	    -labelwidth 10
+      }
+      pack $itk_component(lcolour) -side top -fill x -ipadx 1m -ipady 1m
+
+      #  Now add all the colours.
+      foreach {index xname} $colourmap_ {
+	 $itk_component(lcolour) add \
+	    -command [code $this set_label_colour_ $index] \
+	    -label {    } \
+	    -value $xname \
+	    -background $xname
+      }
+      set lcolour_ 0
+
+      itk_component add bcolour {
+	 util::LabelMenu $w_.bcolour \
+	    -text "Border color:" \
+	    -relief raised \
+	    -labelwidth 10
+      }
+      pack $itk_component(bcolour) -side top -fill x -ipadx 1m -ipady 1m
+
+      #  Now add all the colours.
+      foreach {index xname} $colourmap_ {
+	 $itk_component(bcolour) add \
+	    -command [code $this set_border_colour_ $index] \
+	    -label {    } \
+	    -value $xname \
+	    -background $xname
+      }
+      set bcolour_ 0
+   }
+
+   #  Set the fonts, scales and colours.
+   protected method set_label_size_ {size} {
+      set lsize_ $size
+   }
+   protected method set_label_font_ {index} {
+      set lfont_ $index
+   }
+   protected method set_label_colour_ {index} {
+      set lcolour_ $index
+   }
+   protected method set_border_colour_ {index} {
+      set bcolour_ $index
+   }
+
    #  Override set_background to really set the background to the
    #  requested colour (rather than always white). Add a large
    #  surround to remove edge problems.
    method set_background {} {
-       lassign [$canvas_ bbox all] xlow ylow xhigh yhigh
-       set xlow [expr round($xlow-10)]
-       set ylow [expr round($ylow-10)]
-       set xhigh [expr round($xhigh+10)]
-       set yhigh [expr round($yhigh+10)]
-       $canvas_ create rectangle $xlow $ylow $xhigh $yhigh \
-	   -fill [$itk_option(-maincanvas) cget -background] \
-	   -tags ${this}_back
-       $canvas_ lower ${this}_back all
+      lassign [$canvas_ bbox all] xlow ylow xhigh yhigh
+      set xlow [expr round($xlow-10)]
+      set ylow [expr round($ylow-10)]
+      set xhigh [expr round($xhigh+10)]
+      set yhigh [expr round($yhigh+10)]
+      $canvas_ create rectangle $xlow $ylow $xhigh $yhigh \
+	 -fill [$itk_option(-maincanvas) cget -background] \
+	 -tags ${this}_back
+      $canvas_ lower ${this}_back all
    }
 
    #  Add the border and numeric labels to the ramp. This is done by adding
    #  a pseudo AST WCS and using the "grid" command.
    method add_border {} {
-       $image_ configure -ast_tag "${this}_border"
-       $image_ colorramp setwcs $itk_option(-mainimage)
-       $image_ plotgrid "edge(1)=top
-                         labelup(1)=0
-                         labelling=exterior
-                         numlab(1)=1
-                         numlab(2)=0
-                         numlabgap(1)=1.0
-                         size(numlab)=1.0
-                         width(border)=0.005
-                         width(axes)=0.005
-                         width(ticks)=0.005
-                         majticklen=0.0
-                         minticklen=0.0
-                         mintick(2)=5
-                         border=1
-                         grid=0
-                         drawtitle=0
-                         drawaxes=0
-                         textlab=0
-                         tickall=0
-                         labelunits(1)=0
-                         colour(border)=1
-                         colour(numlab)=3
-                         colour(axes)=1
-                         colour(ticks)=0
-                         font(numlab)=3"
+      $image_ configure -ast_tag "${this}_border"
+      $image_ colorramp setwcs $itk_option(-mainimage)
+      $image_ plotgrid "font(numlab)=$lfont_
+                        size(numlab)=$lsize_
+                        colour(border)=$bcolour_
+                        colour(numlab)=$lcolour_ 
+                        grid=0 border=1 drawtitle=0 drawaxes=0
+                        textlab=0 tickall=0 numlab(1)=1 numlab(2)=0
+                        edge(1)=top labelup(1)=0 labelling=exterior
+                        numlabgap(1)=1.0 width(border)=0.005
+                        labelunits(1)=0 majticklen=0.0 minticklen=0.0"
    }
 
    #  Print the contents of the canvas to the open filedescriptor
@@ -190,6 +276,43 @@ itcl::class gaia::GaiaRampPrint {
 
    #  Protected variables: (available to instance)
    #  --------------------
+
+   #  Names of the fonts that we will use and their AST indices.
+   #  A text string to very briefly describe the font is also set.
+   protected variable fontmap_ {
+      0  "-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-*-*" "medium"
+      1  "-adobe-helvetica-medium-o-normal--*-140-*-*-*-*-*-*" "medium"
+      2  "-adobe-helvetica-bold-r-normal--*-140-*-*-*-*-*-*"   "bold"
+      3  "-adobe-helvetica-bold-o-normal--*-140-*-*-*-*-*-*"   "bold"
+      4  "-adobe-helvetica-medium-r-normal--*-120-*-*-*-*-*-*" "medium"
+      5  "-adobe-helvetica-medium-o-normal--*-120-*-*-*-*-*-*" "medium"
+      6  "-adobe-helvetica-bold-r-normal--*-120-*-*-*-*-*-*"   "bold"
+      7  "-adobe-helvetica-bold-o-normal--*-120-*-*-*-*-*-*"   "bold"
+      8  "-adobe-times-medium-r-normal--*-120-*-*-*-*-*-*"     "medium"
+      9  "-adobe-times-medium-i-normal--*-120-*-*-*-*-*-*"     "medium"
+      10 "-adobe-times-bold-r-normal--*-120-*-*-*-*-*-*"       "bold"
+      11 "-adobe-times-bold-i-normal--*-120-*-*-*-*-*-*"       "bold"
+      12 "-adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
+      13 "-adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
+      14 "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
+      15 "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
+      16 "-adobe-symbol-medium-r-normal-*-*-120-*-*-*-*-*-*"   "symbol"
+      17 "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
+   }
+
+   #  Names of the possible colours and their AST index equivalents.
+   protected variable colourmap_ {
+      0 "#fff" 1 "#000" 2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
+      7 "#ff0" 8 "#f80" 9 "#8f0" 10 "#0f8" 11 "#08f" 12 "#80f"
+      13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4"}
+
+   #  Label font, size and colour.
+   protected variable lfont_ 0
+   protected variable lsize_ 1.0
+   protected variable lcolour_ 0
+
+   #  Border colour.
+   protected variable bcolour_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
