@@ -43,7 +43,7 @@ STAR_SPECIAL_INSTALL_COMMAND([
       for d in bin lib include man/man1;
         do $(mkdir_p) $$DESTDIR$(prefix)/$$d;
       done;
-      $(MAKE) DESTDIR=$$DESTDIR install;
+      $(MAKE) DESTDIR=$$DESTDIR install install-lib;
     fi])
 
 
