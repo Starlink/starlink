@@ -251,13 +251,15 @@ if [ $TARGETFORMAT -eq 0 ]; then
     if [ -r "$ROOT.imgeq.list" ]; then
 	# Find dvi2bitmap's default format
 	# Default to gif if the dvi2bitmap version doesn't have the -Qt option
-	imgfmt=`$DVI2BITMAP -Qt 2>/dev/null || echo gif | awk '{print $1}'`
+	imgfmt=`($DVI2BITMAP -Qt 2>/dev/null || echo gif) | awk '{print $1}'`
+	echo $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
 	$run $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
 
 	echo "LaTeXing maths..."
 	$run $LATEX $ROOT.imgeq.tex
 
 	echo "dvi2bitmap..."
+	echo $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi
 	$run $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi
     fi
 
