@@ -30,7 +30,7 @@ ccg1_wtm4d.f ccg1_wtm4r.f
 KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
-c1_com me_com grecom.inc grerr kappa_ardplot_style.def kaphelp.csh \
+c1_com me_com grecom.inc grerr kappa_ardplot_style.def \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f \
 kappa_style.def tkast.tcl kappa_contour_keystyle.def \
 kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \

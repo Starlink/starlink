@@ -16848,10 +16848,6 @@ iraf! {
       }
    }
 
-   command newhelp {
-      obey {$KAPPA_DIR/kaphelp.csh}      
-   }
-
    command picxy {
       alias {picx(y)}
       task picdef {
