@@ -58,6 +58,7 @@ c     DOUBLE PRECISION S18ACF                    ! NAG subroutine
         FAIL=0
         LAST_K0 = 0.0D0
 c       LAST_K0 = S18ACF(A,FAIL)
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S18ACF' )
         IF ( FAIL .NE. 0 ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ',

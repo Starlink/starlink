@@ -115,6 +115,7 @@ c       REAL*8 S14AAF                   ! NAG routine to evaluate Gamma function
         IFAIL=1
         G1=1.0D0
 c       G1=S14AAF(GAMPAR,IFAIL)
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S14AAF' )
         IF (IFAIL .NE. 0) THEN
           PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G1 '
           STATUS=USER__001
@@ -124,6 +125,7 @@ c       G1=S14AAF(GAMPAR,IFAIL)
         IFAIL=1
         G2=1.0D0
 c       G2=S14AAF(GAMPAR,IFAIL)
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S14AAF' )
         IF (IFAIL .NE. 0) THEN
           PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G2 '
           STATUS=USER__001
@@ -133,6 +135,7 @@ c       G2=S14AAF(GAMPAR,IFAIL)
         IFAIL=1
         G3=1.0D0
 c       G3=S14AAF(GAMPAR,IFAIL)
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S14AAF' )
         IF (IFAIL .NE. 0) THEN
           PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G3 '
           STATUS=USER__001
@@ -142,6 +145,7 @@ c       G3=S14AAF(GAMPAR,IFAIL)
         IFAIL=1
         G4=1.0D0
 c       G4=S14AAF(GAMPAR,IFAIL)
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S14AAF' )
         IF (IFAIL .NE. 0) THEN
           PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G4 '
           STATUS=USER__001

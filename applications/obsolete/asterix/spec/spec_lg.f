@@ -114,6 +114,7 @@ c       DOUBLE PRECISION S15ABF
       ELSE
         CUM1=0.0D0
 c       CUM1=S15ABF(Z,IFAIL)
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S15ABF' )
       END IF
       IF(IFAIL.NE.0)THEN
 	STATUS=SAI__ERROR
@@ -129,6 +130,7 @@ c       CUM1=S15ABF(Z,IFAIL)
         ELSE
           CUM2=0.0D0
 c 	  CUM2=S15ABF(Z,IFAIL)
+          CALL MSG_PRNT( '*** WARNING: no PDA replacement for S15ABF')
 	  IF(IFAIL.NE.0)THEN
 	    STATUS=SAI__ERROR
 	    CALL ERR_REP(' ','Bad IFAIL from NAG routine S15ABF',STATUS)

@@ -496,7 +496,7 @@
       END
 
 *+  CROSSPEC_TO_CMPLX - To values into new array for PDA
-      SUBROUTINE CROSSPEC_TO_CMPLEX( N, X, Y, C )
+      SUBROUTINE CROSSPEC_TO_CMPLX( N, X, Y, C )
 * Author:
 *   RB: Richard Beard (ROSAT, University of Birmingham)
 * History:

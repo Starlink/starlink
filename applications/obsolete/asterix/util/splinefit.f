@@ -93,6 +93,7 @@
 
 *  Initialise
       CALL MSG_PRNT(VERSION)
+      CALL NAG_MISSING( 'E02DCF, E02DDF', STATUS )
       CALL AST_INIT()
 
 *  Get input and output
