@@ -1,7 +1,7 @@
       PROGRAM PLOTTER
 
 *  Usage:
-*     PLOTTER <fits file> <attr> <ps file> [<xlo> <ylo> <xhi> <yhi>]
+*     PLOTTER <fits file> <attr1> <attr2> <ps file> [<xlo> <ylo> <xhi> <yhi>]
 
 *  Description:
 *     Plots a standard grid from the specified fits header file, using
@@ -11,12 +11,15 @@
 *  Parameters:
 *     file file
 *        A text file containing fits headers.
-*     attr
+*     attr1
 *        A string containg a comma-separated list of attribute
 *        settings for the Plot.
+*     attr2
+*        A string containg a comma-separated list of attribute
+*        settings for the FitsChan.
 *     ps file
 *        The output postscript file
-*     xlo xhi ylo yhi
+*     xlo ylo xhi yhi
 *        The bounds within the GRID Frame of the required plot.
 *        Taken from the FITS headers if not supplied
 
@@ -33,16 +36,17 @@
 * Check command line arguments have been supplied.
 *
       IF( IARGC() .LT. 3 ) THEN
-         WRITE(*,*) 'Usage: plotter <file file> <attrs> <ps file> '//
-     :              '[<xlo> <ylo> <xhi> <yhi>]'
+         WRITE(*,*) 'Usage: plotter <file file> <attrs> <fattrs> '//
+     :              '<ps file> [<xlo> <ylo> <xhi> <yhi>]'
          RETURN
       END IF
 
 * 
 * Create a FitsChan to store the FITS headers.
 *
+      CALL GETARG( 3, ATTR )
       STATUS = 0
-      FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+      FC = AST_FITSCHAN( AST_NULL, AST_NULL, ATTR, STATUS )
 
 *
 * Open a text file containing a list of FITS headers.
@@ -65,16 +69,16 @@
 *  If the base frame box was supplied on the command line, use it.
 *
       IF( IARGC() .GT. 6 ) THEN
-         CALL GETARG( 4, TEXT )
+         CALL GETARG( 5, TEXT )
          READ( TEXT, * ) PBOX( 1 )
 
-         CALL GETARG( 5, TEXT )
+         CALL GETARG( 6, TEXT )
          READ( TEXT, * ) PBOX( 2 )
 
-         CALL GETARG( 6, TEXT )
+         CALL GETARG( 7, TEXT )
          READ( TEXT, * ) PBOX( 3 )
 
-         CALL GETARG( 7, TEXT )
+         CALL GETARG( 8, TEXT )
          READ( TEXT, * ) PBOX( 4 )
 
 *  Otherwise use NAXISi keywords in the header.
@@ -127,7 +131,7 @@
 * If all is OK, start up PGPLOT.
 *
       IF( STATUS .EQ. 0 ) THEN
-         CALL GETARG( 3, PSFILE )
+         CALL GETARG( 4, PSFILE )
          CALL DELETEFILE( PSFILE )
 
          DEVN = 'pscol_l;'//PSFILE
