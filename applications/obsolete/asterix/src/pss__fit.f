@@ -24,19 +24,33 @@
 *
 *    History :
 *
-*     20 Oct 90 : Original (DJA)
-*     17 Mar 92 : Tests whether source has moved too far (DJA)
-*     29 May 92 : Use FIT_ code rather than LU fitting code (DJA)
-*      6 Aug 92 : Finds sum of enclosed psf (DJA)
-*      6 Sep 92 : Trap FITERR from FIT_ routines (DJA)
-*     16 Oct 92 : FRFLUX lets flux be frozen externally (DJA)
-*     13 Jan 93 : New PARCON facility used (DJA)
-*     30 Apr 93 : Permits NFLEV and NPLEV to be -ve, signifiying that those
-*                 errors are not to be found (DJA)
-*     28 Jun 93 : Call FIT_PARCON iteratively to get error (DJA)
-*      6 Jul 93 : Added Cash & flux versus X,Y diagnostics (DJA)
-*     10 Jul 93 : No longer uses inline functions (DJA)
-*     22 Jul 93 : Added Poisson probability calculation (DJA)
+*     20 Oct 1990 (DJA):
+*        Original version
+*     17 Mar 1992 (DJA):
+*        Tests whether source has moved too far
+*     29 May 1992 (DJA):
+*        Use FIT_ code rather than LU fitting code
+*      6 Aug 1992 (DJA):
+*        Finds sum of enclosed psf
+*      6 Sep 1992 (DJA):
+*        Trap FITERR from FIT_ routines
+*     16 Oct 1992 (DJA):
+*        FRFLUX lets flux be frozen externally
+*     13 Jan 1993 (DJA):
+*        New PARCON facility used
+*     30 Apr 1993 (DJA):
+*        Permits NFLEV and NPLEV to be -ve, signifiying that those
+*        errors are not to be found
+*     28 Jun 1993 (DJA):
+*        Call FIT_PARCON iteratively to get error
+*      6 Jul 1993 (DJA):
+*        Added Cash & flux versus X,Y diagnostics
+*     10 Jul 1993 (DJA):
+*        No longer uses inline functions
+*     22 Jul 1993 (DJA):
+*        Added Poisson probability calculation
+*     24 Apr 1996 (DJA):
+*        Converted minimisation control to ADI
 *
 *    Type definitions :
 *
@@ -115,6 +129,7 @@
       INTEGER                  IP                      ! Loop over parameters
       INTEGER                  ISTAT                   ! Fit statistic
       INTEGER                  ITER                    ! # iterations
+      INTEGER			MCTRL			! Minimisation control
       INTEGER                  PSCALE                  ! Statistic scale factor
       INTEGER                  NIT                     ! # fitting iterations
       INTEGER                  PEGCODE(PSS__FITNPAR)   ! Error peg code
@@ -137,10 +152,10 @@
       DATA                     PPARS/P__X,P__Y/	       ! Positional parameters
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Reset errors
+*  Reset errors
       DO ILEV = 1, PSS__MXEL
         DO IDAT = 1, 2
           S_FERR(IDAT,ILEV,ID) = BADERR
@@ -152,17 +167,20 @@
       END DO
       S_SIGERR(ID) = BADERR
 
-*    No good parameters yet
+*  No good parameters yet
       GOOD_FIT = .FALSE.
 
-*    Set up a dummy MODEL structure
+*  Set up a dummy MODEL structure
       MODEL.NTIE = 0
 
-*    Restart and reset iteration counter
+*  Restart and reset iteration counter
       ITER = 0
-      MINSLO = PSS__FITMINSLO
 
-*    Restart point for re-fit
+*  Create minimisation control object
+      CALL FCI_CURFMC( 2*PSS__FITMXIT, 0, PSS__FITMINSLO, MCTRL,
+     :		       STATUS )
+
+*  Restart point for re-fit
  10   ITER = ITER + 1
       LASTMIN = STATMIN
       IF ( ITER .GT. 8 ) THEN
@@ -171,7 +189,9 @@
      :                          /'parameters for source ^N' )
         GOTO 89
       END IF
-      INITIALISE = .TRUE.
+
+*  Reset the MCTRL
+      CALL FCI_RESET( MCTRL, STATUS )
 
 *    Access psf for this box if needed
       IF ( .NOT. ( PSF_CONSTANT .OR. CP_USECON ) ) THEN
@@ -242,11 +262,10 @@
       END IF
 
 *    Find optimum fit
-      CALL FIT_MIN( 1, FIT.DS, 0, MODEL, 0, 2*PSS__FITMXIT,
-     :              PSS__FITNPAR,
-     :        LB, UB, FROZEN, PSCALE, INITIALISE, MINSLO, ISTAT,
-     :        PSS_FIT_GENMODEL, FIT.PRED, PARAM, DPAR, PEGGED, STATMIN,
-     :        NIT, FINISHED, FITERR, STATUS )
+      CALL FIT_MIN( 1, FIT.DS, 0, MODEL, MCTRL, .FALSE., 0,
+     :              PSS__FITNPAR, LB, UB, FROZEN, PSCALE, ISTAT,
+     :              PSS_FIT_GENMODEL, FIT.PRED, PARAM, DPAR,
+     :              PEGGED, STATMIN, FINISHED, FITERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         STATUS = SAI__OK
         GOTO 89
@@ -256,7 +275,9 @@
         GOTO 89
       ELSE IF ( .NOT. FINISHED ) THEN
         IF ( ABS((STATMIN-LASTMIN)) .LT. ABS(STATMIN*1.0E-5) ) THEN
+          CALL ADI_CGET0R( MCTRL, 'MinSlope', MINSLO, STATUS )
           MINSLO = MINSLO * 10.0
+          CALL ADI_CPUT0R( MCTRL, 'MinSlope', MINSLO, STATUS )
         END IF
         GOTO 10
       END IF
@@ -287,27 +308,29 @@
         PHI(IP) = PERR(IP)
       END DO
 
-*    For each flux error level
+*  For each flux error level
       DO ILEV = 1, NFLEV
 
-*      Flux errors
+*    Flux errors
         CALL MATH_CHISQD(1.0-REAL(FLEV(ILEV)/100.0D0),1,SOFF,STATUS )
 
-*      Find confidence intervals
+*    Find confidence intervals
         EITER = 0
         CONVERGED = .FALSE.
         DO WHILE ( (EITER .LT. MAXEITER) .AND. .NOT. CONVERGED )
 
-*        Store old values
+*      Store old values
           LPLO = PLO(P__F)
           LPHI = PHI(P__F)
 
-*        Next guess at flux errors
-          CALL FIT_PARCON( 1, FIT.DS, 0, MODEL, SOFF, 0, 1, P__F,
-     :         PSS__FITMXIT, MINSLO, PSS__FITNPAR, LB, UB,
-     :         FROZEN, PSCALE, DPAR,
-     :         ISTAT, PSS_FIT_GENMODEL, FIT.PRED, STATMIN, PARAM,
-     :         PEGGED, PLO, PHI, PEGCODE, STATUS )
+*      Reset the MCTRL
+          CALL FCI_RESET( MCTRL, STATUS )
+
+*      Next guess at flux errors
+          CALL FIT_PARCON( 1, FIT.DS, 0, MODEL, MCTRL, SOFF, 0, 1, P__F,
+     :                     PSS__FITNPAR, LB, UB, FROZEN, PSCALE, DPAR,
+     :                     ISTAT, PSS_FIT_GENMODEL, FIT.PRED, STATMIN,
+     :                     PARAM, PEGGED, PLO, PHI, PEGCODE, STATUS )
 
 *        Fit error?
           IF ( STATUS .EQ. USER__001 ) THEN
@@ -357,26 +380,29 @@
       END DO
       IF ( CP_SPOT ) GOTO 89
 
-*    Do positional errors
+*  Do positional errors
  40   STATUS = SAI__OK
       DO ILEV = 1, NPLEV
 
-*      Get change in statistic required
+*    Get change in statistic required
         CALL MATH_CHISQD(1.0-REAL(PLEV(ILEV)/100.0d0),1,SOFF,STATUS)
 
-*      Find confidence intervals
+*    Find confidence intervals
         EITER = 0
         CONVERGED = .FALSE.
         DO WHILE ( (EITER .LT. MAXEITER) .AND. .NOT. CONVERGED )
 
-*        Store old values
+*      Store old values
           LPLO = PLO(P__X)
           LPHI = PHI(P__X)
 
+*      Reset the MCTRL
+          CALL FCI_RESET( MCTRL, STATUS )
+
 *        Next guess at confidence intervals
-          CALL FIT_PARCON( 1, FIT.DS, 0, MODEL, SOFF, 0, 2, PPARS,
-     :             PSS__FITMXIT, MINSLO, PSS__FITNPAR, LB, UB,
-     :            FROZEN, PSCALE, DPAR, ISTAT, PSS_FIT_GENMODEL,
+          CALL FIT_PARCON( 1, FIT.DS, 0, MODEL, MCTRL, SOFF, 0, 2,
+     :                     PPARS, PSS__FITNPAR, LB, UB, FROZEN,
+     :                     PSCALE, DPAR, ISTAT, PSS_FIT_GENMODEL,
      :     FIT.PRED, STATMIN, PARAM, PEGGED, PLO, PHI, PEGCODE, STATUS )
 
           IF ( STATUS .EQ. USER__001 ) THEN
@@ -432,38 +458,38 @@
         PARAM(IP) = PGOOD(IP)
       END DO
 
-*    Evaluate Cash statistic at zero flux
+*  Evaluate Cash statistic at zero flux
       PARAM(P__F) = 0.0
       CALL FIT_STAT( 1, FIT.DS, 0, 0, PARAM, ISTAT,
      :                 PSS_FIT_GENMODEL, FIT.PRED, STAT0, STATUS )
 
-*    To get significance
+*  To get significance
       S_DSTAT(ID) = REAL(STAT0-STATMIN)
       S_SIG(ID) = PSS_CASH_SIG( S_DSTAT(ID) )
 
-*    Evaluate model once more
+*  Evaluate model once more
       CALL PSS_FIT_GENMODEL( ISTAT, 1, FIT.DS, 0, FIT.PRED, 0,
      :                              PGOOD, 1, DC_MOD, STATUS )
 
-*    Find error in significance
+*  Find error in significance
       CALL PSS_STAT_CASH_SIGERR( S_FLUX(ID), S_BSCALE(ID),
      :                              S_SIGERR(ID), STATUS )
 
-*    Get Poisson probability of excess source counts
+*  Get Poisson probability of excess source counts
       IF ( DI_POISS_PROB ) THEN
         CALL PSS_FIT_PPROB( S_PPROB(ID), STATUS )
       END IF
 
-*    Get psf sum
+*  Get psf sum
       S_EPSF(ID) = 0.0
       DO CP = DC_LO, DC_HI
         S_EPSF(ID) = S_EPSF(ID) + DC_PSF(CP)
       END DO
 
-*    Report any errors
+*  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN
 
-*      Errors for frozen flux in spot mode can be ignored
+*    Errors for frozen flux in spot mode can be ignored
         IF ( FRFLUX .AND. CP_SPOT ) THEN
           CALL ERR_ANNUL( STATUS )
         ELSE
@@ -1411,6 +1437,7 @@
       INTEGER                  	IAX                     ! Loop over grid axes
       INTEGER                  	IP                      ! Axis parameter number
       INTEGER                  	LGPAR                   ! Local copy of GPAR
+      INTEGER			MCTRL			! Minimisation control
       INTEGER                  	NAX                     ! Number of GAX used
       INTEGER                  	NELM                    ! Number of grid elements
       INTEGER                  	QPTR                    ! Grid quality array
@@ -1637,11 +1664,17 @@
       CALL BDI_PUT0C( GID, 'Label', LABEL, STATUS )
       CALL BDI_PUT0C( GID, 'Units', UNITS, STATUS )
 
+*  Create minimisation control
+      CALL FCI_CURFMC( PSS__FITMXIT, 0, 0.0, MCTRL, STATUS )
+
 *  Grid the statistic over the cube
-      CALL FIT_GRID( 1, FIT.DS, 0, MODEL, 0, NAX, GAX, 1, LGPAR,
-     :               PSS__FITMXIT, PSS__FITNPAR, LB, UB, FROZEN,
-     :               PSCALE, 0.0, ISTAT, PSS_FIT_GENMODEL, FIT.PRED,
+      CALL FIT_GRID( 1, FIT.DS, 0, MODEL, MCTRL, 0, NAX, GAX, 1, LGPAR,
+     :               PSS__FITNPAR, LB, UB, FROZEN,
+     :               PSCALE, ISTAT, PSS_FIT_GENMODEL, FIT.PRED,
      :               PARAM, STATMIN, DPTR, %VAL(QPTR), GQMASK, STATUS )
+
+*  Destroy minimisation control
+      CALL ADI_ERASE( MTRL, STATUS )
 
 *  Write quality mask
       CALL BDI_PUTUB( GID, 'QualityMask', GQMASK, STATUS )

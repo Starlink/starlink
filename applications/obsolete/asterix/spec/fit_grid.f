@@ -492,7 +492,7 @@
       ELSE
 
 *    Minimise with respect to parameters not on the grid
-        CALL ADI_CPUT0I( MCTRL, 'Niter', 0, STATUS )
+        CALL FCI_RESET( MCTRL, STATUS )
         CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0, .FALSE.,
      :                NPAR, LB, UB, LOCFRO, SSCALE,
      :                FSTAT, PREDICTOR, PREDDAT, LOCPAR, DPAR, PEGGED,

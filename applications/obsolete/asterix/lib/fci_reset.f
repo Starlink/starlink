@@ -81,21 +81,12 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      INTEGER			NITMAX, NUP
-      REAL			MINSLO
-
-*  Arguments Returned:
       INTEGER			CTRLID
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  External References:
-      LOGICAL			AST_QPKGI
-        EXTERNAL		AST_QPKGI
 *.
 
 *  Check inherited global status.

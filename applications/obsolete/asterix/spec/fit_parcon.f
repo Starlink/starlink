@@ -261,7 +261,7 @@
 	    END IF
 
 *        Find minimum
-            CALL ADI_CPUT0I( MCTRL, 'Niter', 0, STATUS )
+            CALL FCI_RESET( MCTRL, STATUS )
 	    CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0, .FALSE.,
      :                    NPAR, LB, UB, FFROZEN, SSCALE, FSTAT,
      :                    PREDICTOR, PREDDAT, FPAR, DPAR, FPEGGED, STAT,
@@ -360,7 +360,7 @@ D	      print *,'new le: ',le(j)
 	      ENDIF
 
 *        Find minimum
-              CALL ADI_CPUT0I( MCTRL, 'Niter', 0, STATUS )
+              CALL FCI_RESET( MCTRL, STATUS )
 	      CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0,
      :                      .FALSE., NPAR, LB, UB, FFROZEN, SSCALE,
      :                      FSTAT, PREDICTOR, PREDDAT, FPAR, DPAR,
