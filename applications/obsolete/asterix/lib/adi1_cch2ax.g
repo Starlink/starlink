@@ -139,7 +139,8 @@
           IF ( NDIM .EQ. 0 ) THEN
             CALL ADI_CNEW0<T>( ID, MEMBER, VALUE, STATUS )
           ELSE
-            CALL ADI_CNEWV( ID, MEMBER, NDIM, DIMS, %VAL(VPTR), STATUS )
+            CALL ADI_CNEWV<T>( ID, MEMBER, NDIM, DIMS,
+     :                         %VAL(VPTR), STATUS )
           END IF
 
 *    Simple object
@@ -147,7 +148,7 @@
           IF ( NDIM .EQ. 0 ) THEN
             CALL ADI_NEWV0<T>( VALUE, ID, STATUS )
           ELSE
-            CALL ADI_NEWV( NDIM, DIMS, %VAL(VPTR), ID, STATUS )
+            CALL ADI_NEWV<T>( NDIM, DIMS, %VAL(VPTR), ID, STATUS )
           END IF
 
         END IF
