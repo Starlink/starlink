@@ -169,6 +169,7 @@
         CALL MSG_SETI( 'A', AXIS )
         CALL BDI0_DESCID( GFID, 'G', STATUS )
         CALL BDI0_DESCID( IFID, 'INP', STATUS )
+          STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Dimension of ^G does not match size '/
      :                /'of axis ^A of ^INP', STATUS )
         GOTO 99
