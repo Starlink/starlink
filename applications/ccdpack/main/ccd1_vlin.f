@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_VLIN( LINE, NCHAR, LINNUM, STATUS )
+      SUBROUTINE CCD1_VLIN( LINE, LINNUM, BYSET, SINDEX, SLOC, STATUS )
 *+
 *  Name:
 *     CCD1_VLIN
@@ -10,15 +10,27 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_VLIN( LINE, NCHAR, LINNUM, STATUS )
+*     CALL CCD1_VLIN( LINE, LINNUM, BYSET, SINDEX, SLOC, STATUS )
 
 *  Description:
 *     This routine interprets the characters in LINE to see if they
 *     represent a valid restoration statement for the CCDSETUP
-*     application. Valid statements have a first word which is the name
-*     of a known parameter (see notes section), the second word is the
-*     parameter value. If the input line is valid then an attempt to set
-*     a dynamic default for that parameter is made. The calling
+*     application. Valid statements may have two formats: a line 
+*     giving the value of a keyed parameter is of the form:
+*
+*        KEY PARAM VALUE
+*
+*     where KEY is an integer and is taken to represent a Set Index
+*     value to which the value applies.  An unkeyed parameter, which
+*     applies regardless of Set Index (unless overridden by a specific
+*     keyed one) is of the form:
+*
+*        PARAM VALUE
+*
+*     If the input line is valid then an attempt to set
+*     a dynamic default for that parameter is made, and a keyed value
+*     will also be written into the keyed part of the GLOBAL ADAM 
+*     parameter file where it can be accessed by CCD1_KPLD. The calling
 *     application must then take appropriate action if this value is to
 *     be used (by setting the VPATH and/or PPATH in the application
 *     interface file to use the DYNAMIC path either as the VPATH or if
@@ -28,10 +40,17 @@
 *     LINE = CHARACTER * ( * ) (Given)
 *        The line of characters read from a setup file. This line should
 *        have been interpreted by CCD1_RDLIN.
-*     NCHAR = INTEGER (Given)
-*        The number of characters in the input line.
 *     LINNUM = INTEGER (Given)
 *        The current line number of the file which is being processed.
+*     BYSET = LOGICAL (Given)
+*        True if parameter setup is currently being done for a single
+*        Set Index value.
+*     SINDEX = INTEGER (Given)
+*        The Set Index value for which parameters are currently being 
+*        set up.  Only used when BYSET is true.
+*     SLOC = CHARACTER * ( * ) (Given)
+*        An HDS locator for the HDS structure in which to store keyed
+*        parameter values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -76,6 +95,8 @@
 *        Added saturation options
 *     26-MAR-2001 (MBT):
 *        Added USESET option.
+*     2-JUL-2001 (MBT):
+*        Upgraded for use with Set Index-keyed parameters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -89,26 +110,25 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
 
 *  Arguments Given:
       CHARACTER LINE * ( * )
-      INTEGER NCHAR
       INTEGER LINNUM
+      LOGICAL BYSET
+      INTEGER SINDEX
+      CHARACTER * ( * ) SLOC
 
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN
-      EXTERNAL CHR_LEN           ! Length of string excluding trailing
-                                 ! blanks
-
 *  Local Variables:
       CHARACTER * ( 80 ) STATE   ! Error statement.
-      CHARACTER * ( VAL__SZI ) LIST( 4 ) ! List of words which may
-                                         ! contain integers
+      CHARACTER * ( CCD1__BLEN ) LINE1 ! Unkeyed part of line
+      CHARACTER * ( VAL__SZI ) LIST( 4 ) ! Words which may contain integers
       DOUBLE PRECISION DVALUE    ! Value of parameter
       INTEGER FIRST              ! First character of word
+      INTEGER KEY                ! Value of key integer at start of line
       INTEGER LAST               ! Last character of word
       INTEGER NWRD               ! Number of words located
       INTEGER START( 5 )         ! Start position of words
@@ -116,8 +136,10 @@
       INTEGER LSTAT              ! Local status
       INTEGER I                  ! Loop variable
       INTEGER BOUNDS( 4 )        ! Buffer for decoded integers
-      LOGICAL NOTFND             ! Set true if a word is not found
+      LOGICAL KEYED              ! Does a key integer start the line?
       LOGICAL LVALUE             ! Value of parameter
+      LOGICAL NOTFND             ! Set true if a word is not found
+      LOGICAL SETDEF             ! Should the parameter dynamic default be set?
 
 *.
 
@@ -127,13 +149,53 @@
 *  Reset error statement
       STATE = ' '
 
+*  See if the line starts with an integer (a Set Index key value).
+      CALL CCD1_NXWRD( LINE, 1, FIRST, LAST, NOTFND, STATUS )
+      IF ( NOTFND ) THEN
+
+*  No text.  Report this and exit.
+         STATUS = SAI__ERROR 
+         STATE = '  Invalid restore file line. No text '
+         GO TO 99
+      END IF
+
+*  Try to interpret the first word as an integer.
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL ERR_MARK
+         CALL CHR_CTOI( LINE( FIRST : LAST ), KEY, STATUS )
+
+*  The word is an integer; this line defines a keyed value.
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            KEYED = .FALSE.
+            KEY = CCD1__BADSI
+            LINE1 = LINE
+
+*  The word is not an integer; this line defines an unkeyed value.
+         ELSE
+            KEYED = .TRUE.
+            FIRST = LAST + 1
+            CALL CHR_FIWS( LINE, FIRST, STATUS )
+            LINE1 = LINE( FIRST : )
+         END IF
+         CALL ERR_RLSE
+      END IF
+
+*  Decide whether we will wish to set the dynamic default for the 
+*  variable in question.  We wish to do this if parameter setup is
+*  not being done by Set Index and this line does not have a key, 
+*  or if setup is being done by Set Index and this line has a key
+*  which matches the Set Index for which it is being done.
+      SETDEF = ( .NOT. BYSET .AND. .NOT. KEYED )
+     :    .OR. ( BYSET .AND. KEYED .AND. KEY .EQ. SINDEX )
+
 *  Look for the possible statements one at a time.
 *=======================================================================
 *  Check for MASK statement.
-      IF ( LINE( 1 : 4 ) .EQ. 'MASK' ) THEN
+      IF ( LINE1( 1 : 4 ) .EQ. 'MASK' ) THEN
 
 *  Extract name of MASK file.
-         CALL CCD1_NXWRD( LINE, 5, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 5, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -142,15 +204,21 @@
             GO TO 99
          END IF
 
-*  Write out the name (check for validity?).
-         CALL PAR_DEF0C( 'MASK', LINE( FIRST : LAST ), STATUS )
+*  Write the value to the keyed parameter structure if the line is keyed.
+         IF ( KEYED ) 
+     :      CALL CCG1_KPPTC( 'MASK', 0, 0, LINE1( FIRST : LAST ), KEY,
+     :                       SLOC, STATUS )
+
+*  Set the dynamic default if required.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0C( 'MASK', LINE1( FIRST : LAST ), STATUS )
 
 *=======================================================================
 *  Check for ADC factor.
-      ELSE IF ( LINE ( 1 : 3 ) .EQ. 'ADC' ) THEN
+      ELSE IF ( LINE1 ( 1 : 3 ) .EQ. 'ADC' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 4, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 4, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -160,7 +228,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOD( LINE( FIRST : LAST ), DVALUE, STATUS )
+         CALL CHR_CTOD( LINE1( FIRST : LAST ), DVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -168,15 +236,20 @@
             GO TO 99
          END IF
 
-*  Write out the value.
-         CALL PAR_DEF0D( 'ADC', DVALUE, STATUS )
+*  Write the value to the keyed parameter structure if the line is keyed.
+         IF ( KEYED ) 
+     :      CALL CCG1_KPPTD( 'ADC', 0, 0, DVALUE, KEY, SLOC, STATUS )
+
+*  Set the dynamic default if required.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0D( 'ADC', DVALUE, STATUS )
 
 *=======================================================================
 *  Check for Readout Noise.
-      ELSE IF ( LINE ( 1 : 6 ) .EQ. 'RNOISE' ) THEN
+      ELSE IF ( LINE1 ( 1 : 6 ) .EQ. 'RNOISE' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 7, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -186,7 +259,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOD( LINE( FIRST : LAST ), DVALUE, STATUS )
+         CALL CHR_CTOD( LINE1( FIRST : LAST ), DVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -195,12 +268,17 @@
          END IF
 
 *  Write out the value.
-         CALL PAR_DEF0D( 'RNOISE', DVALUE, STATUS )
+         IF ( KEYED ) 
+     :      CALL CCG1_KPPTD( 'RNOISE', 0, 0, DVALUE, KEY, SLOC, STATUS )
+
+*  Set the default value if required.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0D( 'RNOISE', DVALUE, STATUS )
 
 *=======================================================================
 *  Check for BOUNDS statement
-      ELSE IF ( LINE ( 1 : 6 ) .EQ. 'BOUNDS' ) THEN
-         CALL CHR_DCWRD( LINE( 7 : ), 4, NWRD, START, STOP, LIST,
+      ELSE IF ( LINE1 ( 1 : 6 ) .EQ. 'BOUNDS' ) THEN
+         CALL CHR_DCWRD( LINE1( 7 : ), 4, NWRD, START, STOP, LIST,
      :                   LSTAT )
 
 *  Check for errors.
@@ -231,15 +309,21 @@
             GO TO 99
          END IF
 
-*  Write out values as default.
-         CALL PAR_DEF1I( 'BOUNDS', NWRD, BOUNDS, STATUS )
+*  Write the value to the keyed parameter structure if the line is keyed.
+         IF ( KEYED )
+     :      CALL CCG1_KPPTI( 'BOUNDS', 1, NWRD, BOUNDS, KEY, SLOC,
+     :                       STATUS )
+
+*  Set the dynamic default if required.
+         IF ( SETDEF )
+     :      CALL PAR_DEF1I( 'BOUNDS', NWRD, BOUNDS, STATUS )
 
 *=======================================================================
 *  Check for DEFERRED charge value
-      ELSE IF ( LINE ( 1 : 8 ) .EQ. 'DEFERRED' ) THEN
+      ELSE IF ( LINE1 ( 1 : 8 ) .EQ. 'DEFERRED' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 9, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -249,7 +333,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOD( LINE( FIRST : LAST ), DVALUE, STATUS )
+         CALL CHR_CTOD( LINE1( FIRST : LAST ), DVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -257,15 +341,21 @@
             GO TO 99
          END IF
 
-*  Write out the value.
-         CALL PAR_DEF0D( 'DEFERRED', DVALUE, STATUS )
+*  Write the value to the keyed parameter structure if the line is keyed.
+         IF ( KEYED )
+     :      CALL CCG1_KPPTD( 'DEFERRED', 0, 0, DVALUE, KEY, SLOC,
+     :                       STATUS )
+
+*  Set the default value if required.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0D( 'DEFERRED', DVALUE, STATUS )
 
 *=======================================================================
 *  Check for readout DIRECTION.
-      ELSE IF ( LINE ( 1 : 9 ) .EQ. 'DIRECTION' ) THEN
+      ELSE IF ( LINE1 ( 1 : 9 ) .EQ. 'DIRECTION' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 10, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 10, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -275,22 +365,28 @@
          END IF
 
 *  Is this a valid direction?
-         IF ( LINE( FIRST : LAST ) .NE. 'X' .AND.
-     :        LINE( FIRST : LAST ) .NE. 'x' .AND.
-     :        LINE( FIRST : LAST ) .NE. 'Y' .AND.
-     :        LINE( FIRST : LAST ) .NE. 'y' ) THEN
+         IF ( LINE1( FIRST : LAST ) .NE. 'X' .AND.
+     :        LINE1( FIRST : LAST ) .NE. 'x' .AND.
+     :        LINE1( FIRST : LAST ) .NE. 'Y' .AND.
+     :        LINE1( FIRST : LAST ) .NE. 'y' ) THEN
              STATUS = SAI__ERROR
              STATE = '  Invalid DIRECTION statement. Bad value'
              GO TO 99
          END IF
 
-*  Write out the value as default.
-         CALL PAR_DEF0C( 'DIRECTION', LINE( FIRST : LAST ), STATUS )
+*  Write the value to the keyed parameter structure if the line is keyed.
+         IF ( KEYED)
+     :      CALL CCG1_KPPTC( 'DIRECTION', 0, 0, LINE1( FIRST : LAST ),
+     :                       KEY, SLOC, STATUS )
+
+*  Set the default value if required.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0C( 'DIRECTION', LINE1( FIRST : LAST ), STATUS )
 
 *=======================================================================
 *  Check for CCD useful area EXTENT.
-      ELSE IF ( LINE ( 1 : 6 ) .EQ. 'EXTENT' ) THEN
-         CALL CHR_DCWRD( LINE( 7 : ), 4, NWRD, START, STOP, LIST,
+      ELSE IF ( LINE1 ( 1 : 6 ) .EQ. 'EXTENT' ) THEN
+         CALL CHR_DCWRD( LINE1( 7 : ), 4, NWRD, START, STOP, LIST,
      :                   LSTAT )
 
 *  Check for errors.
@@ -312,15 +408,21 @@
             GO TO 99
          END IF
 
-*  Write out values as default.
-         CALL PAR_DEF1I( 'EXTENT', NWRD, BOUNDS, STATUS )
+*  Write the value to the keyed parameter structure if the line is keyed.
+         IF ( KEYED )
+     :      CALL CCG1_KPPTI( 'EXTENT', 1, NWRD, BOUNDS, KEY, SLOC,
+     :                       STATUS )
+
+*  Set the dynamic default if required.
+         IF ( SETDEF )
+     :      CALL PAR_DEF1I( 'EXTENT', NWRD, BOUNDS, STATUS )
 
 *=======================================================================
 *  See if saturated values are to be used.
-      ELSE IF ( LINE( 1 : 8 ) .EQ. 'SATURATE' ) THEN
+      ELSE IF ( LINE1( 1 : 8 ) .EQ. 'SATURATE' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 9, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -330,7 +432,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOL( LINE( FIRST : LAST ), LVALUE, STATUS )
+         CALL CHR_CTOL( LINE1( FIRST : LAST ), LVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -339,14 +441,15 @@
          END IF
 
 *  Write out the value.
-         CALL PAR_DEF0L( 'SATURATE', LVALUE, STATUS )
+         IF ( SETDEF )
+     :      CALL PAR_DEF0L( 'SATURATE', LVALUE, STATUS )
 
 *=======================================================================
 *  Check for SATURATION value.
-      ELSE IF ( LINE ( 1 : 10 ) .EQ. 'SATURATION' ) THEN
+      ELSE IF ( LINE1( 1 : 10 ) .EQ. 'SATURATION' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 11, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 11, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -356,7 +459,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOD( LINE( FIRST : LAST ), DVALUE, STATUS )
+         CALL CHR_CTOD( LINE1( FIRST : LAST ), DVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -364,15 +467,21 @@
             GO TO 99
          END IF
 
-*  Write out the value.
-         CALL PAR_DEF0D( 'SATURATION', DVALUE, STATUS )
+*  Set the dynamic default if required.
+         IF ( KEYED )
+     :      CALL CCG1_KPPTD( 'SATURATION', 0, 0, DVALUE, KEY, SLOC,
+     :                       STATUS )
+
+*  Set the default value if required.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0D( 'SATURATION', DVALUE, STATUS )
 
 *=======================================================================
 *  See if saturated pixels are to be set to the saturation value or not.
-      ELSE IF ( LINE( 1 : 6 ) .EQ. 'SETSAT' ) THEN
+      ELSE IF ( LINE1( 1 : 6 ) .EQ. 'SETSAT' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 7, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -382,7 +491,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOL( LINE( FIRST : LAST ), LVALUE, STATUS )
+         CALL CHR_CTOL( LINE1( FIRST : LAST ), LVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -390,15 +499,16 @@
             GO TO 99
          END IF
 
-*  Write out the value.
-         CALL PAR_DEF0L( 'SETSAT', LVALUE, STATUS )
+*  Set the dynamic default.
+      IF ( SETDEF )
+     :   CALL PAR_DEF0L( 'SETSAT', LVALUE, STATUS )
 
 *=======================================================================
 *  See if datatypes are to be PRESERVEd.
-      ELSE IF ( LINE( 1 : 8 ) .EQ. 'PRESERVE' ) THEN
+      ELSE IF ( LINE1( 1 : 8 ) .EQ. 'PRESERVE' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 9, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -408,7 +518,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOL( LINE( FIRST : LAST ), LVALUE, STATUS )
+         CALL CHR_CTOL( LINE1( FIRST : LAST ), LVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -416,15 +526,16 @@
             GO TO 99
          END IF
 
-*  Write out the value.
-         CALL PAR_DEF0L( 'PRESERVE', LVALUE, STATUS )
+*  Set the dynamic default.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0L( 'PRESERVE', LVALUE, STATUS )
 
 *=======================================================================
 *  See if variances are to be generated (GENVAR).
-      ELSE IF ( LINE( 1 : 6 ) .EQ. 'GENVAR' ) THEN
+      ELSE IF ( LINE1( 1 : 6 ) .EQ. 'GENVAR' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 7, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -434,7 +545,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOL( LINE( FIRST : LAST ), LVALUE, STATUS )
+         CALL CHR_CTOL( LINE1( FIRST : LAST ), LVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -442,16 +553,17 @@
             GO TO 99
          END IF
 
-*  Write out the value.
-         CALL PAR_DEF0L( 'GENVAR', LVALUE, STATUS )
+*  Set the dynamic default.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0L( 'GENVAR', LVALUE, STATUS )
 
 *=======================================================================
 *  NDFNAMES
 *  See NDF names are to be used when getting position list name.
-      ELSE IF ( LINE( 1 : 8 ) .EQ. 'NDFNAMES' ) THEN
+      ELSE IF ( LINE1( 1 : 8 ) .EQ. 'NDFNAMES' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 9, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 9, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -461,7 +573,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOL( LINE( FIRST : LAST ), LVALUE, STATUS )
+         CALL CHR_CTOL( LINE1( FIRST : LAST ), LVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -469,16 +581,17 @@
             GO TO 99
          END IF
 
-*  Write out the value.
-         CALL PAR_DEF0L( 'NDFNAMES', LVALUE, STATUS )
+*  Set the dynamic default.
+      IF ( SETDEF )
+     :      CALL PAR_DEF0L( 'NDFNAMES', LVALUE, STATUS )
 
 *=======================================================================
 *  USESET
 *  See if Set header information is to be used if available.
-      ELSE IF ( LINE( 1 : 6 ) .EQ. 'USESET' ) THEN
+      ELSE IF ( LINE1( 1 : 6 ) .EQ. 'USESET' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 7, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 7, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -488,7 +601,7 @@
          END IF
 
 *  Try to convert the value.
-         CALL CHR_CTOL( LINE( FIRST : LAST ), LVALUE, STATUS )
+         CALL CHR_CTOL( LINE1( FIRST : LAST ), LVALUE, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Must be an error.. report this and exit.
@@ -497,16 +610,17 @@
             GO TO 99
          END IF
 
-*  Write out the value.
-         CALL PAR_DEF0L( 'USESET', LVALUE, STATUS )
+*  Set the dynamic default.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0L( 'USESET', LVALUE, STATUS )
 
 *=======================================================================
 *  LOGTO
 *  Check for readout placement for logfile information.
-      ELSE IF ( LINE ( 1 : 5 ) .EQ. 'LOGTO' ) THEN
+      ELSE IF ( LINE1 ( 1 : 5 ) .EQ. 'LOGTO' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 6, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 6, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -515,16 +629,17 @@
             GO TO 99
          END IF
 
-*  Write out the value as default.
-         CALL PAR_DEF0C( 'LOGTO', LINE( FIRST : LAST ), STATUS )
+*  Set the dynamic default.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0C( 'LOGTO', LINE1( FIRST : LAST ), STATUS )
 
 *=======================================================================
 *  LOGFILE
 *  Check for readout placement for logfile information.
-      ELSE IF ( LINE ( 1 : 7 ) .EQ. 'LOGFILE' ) THEN
+      ELSE IF ( LINE1( 1 : 7 ) .EQ. 'LOGFILE' ) THEN
 
 *  Extract value.
-         CALL CCD1_NXWRD( LINE, 8, FIRST, LAST, NOTFND, STATUS )
+         CALL CCD1_NXWRD( LINE1, 8, FIRST, LAST, NOTFND, STATUS )
          IF ( NOTFND ) THEN
 
 *  Must be an error.. report this and exit.
@@ -533,8 +648,9 @@
             GO TO 99
          END IF
 
-*  Write out the value as default.
-         CALL PAR_DEF0C( 'LOGFILE', LINE( FIRST : LAST ), STATUS )
+*  Set the dynamic default.
+         IF ( SETDEF )
+     :      CALL PAR_DEF0C( 'LOGFILE', LINE1( FIRST : LAST ), STATUS )
 
 *=======================================================================
 *  Not a valid statement - comment lines etc. have already been
