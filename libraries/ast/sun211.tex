@@ -18,15 +18,15 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.15}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {23rd April 2004}
+\newcommand{\stardocdate}      {15th June 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 2004 Central Laboratory of the Research Councils}
+\newcommand{\stardoccopyright} {Copyright (C) 2004 Council for the Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
-\newcommand{\stardocversion}   {V3.2}
+\newcommand{\stardocversion}   {V3.3}
 \newcommand{\stardocmanual}    {Programmer's Guide\\(C Version)}
 \newcommand{\stardocmanualhtml}{Programmer's Guide (C Version)}
 \newcommand{\stardocabstract}  {
@@ -917,7 +917,7 @@ following and, where appropriate, their inverses:
 \htmlref{SpecMap}{SpecMap} and \htmlref{GrismMap}{GrismMap}).
 
 \item Conversion between 2-dimensional spherical celestial coordinates
-(longitude and latitude) and a 3-dimensional vectorial positions (the \htmlref{SphMap}{SphMap}).
+(longitude and latitude) and a 3-dimensional vectorial positions (the SphMap).
 
 \item Various projections of the celestial sphere on to 2-dimensional
 coordinate spaces---{\em{i.e.}}\ map projections (the \htmlref{DssMap}{DssMap} and \htmlref{WcsMap}{WcsMap}).
@@ -1353,6 +1353,21 @@ to read the introduction to AST programming concepts in
 reading are given after each example, just in case they don't quite do
 what you want.
 
+\subsection{\ldots Obtain and Install AST}
+The AST library is available both as a stand-alone package and also as 
+part of the Starlink Software Collection\footnote{The Starlink Software 
+Collection can be downloaded from
+\htmladdnormallink{http://www.starlink.ac.uk/Download/}
+{http://www.starlink.ac.uk/Download/}.}. If your site has the Starlink
+Software Collection installed then AST should already be available. 
+
+If not, you can download the AST library by itself from
+\htmladdnormallink{http://www.starlink.ac.uk/ast/}
+{http://www.starlink.ac.uk/ast/}. 
+
+Note, AST requires the SLALIB library (\xref{SUN/67}{sun67}{}) to be 
+installed.
+
 \subsection{\ldots Structure an AST Program}
 
 An AST program normally has the following structure:
@@ -1382,29 +1397,16 @@ The use of \htmlref{astBegin}{astBegin} and \htmlref{astEnd}{astEnd} is optional
 tidying up after you have finished using AST, so is normally
 recommended. For more details of this, see \secref{ss:contexts}. For
 details of how to access the ``ast.h'' header file, see
-\secref{ss:accessingheaderfile} and the description of the
-``\htmlref{ast\_dev}{ast_dev}'' command in \appref{ss:commanddescriptions}.
+\secref{ss:accessingheaderfile}.
 
 \subsection{\label{ss:howtobuild}\ldots Build an AST Program}
 
-Before building any AST program, you may want to issue the UNIX command:
+To build a simple AST program that doesn't use graphics, use:
 
 \begin{quote}
 \small
 \begin{verbatim}
-ast_dev
-\end{verbatim}
-\normalsize
-\end{quote}
-
-which will set up links to the AST include files in your current
-directory.  Then, to build a simple AST program that doesn't use
-graphics, use:
-
-\begin{quote}
-\small
-\begin{verbatim}
-cc program.c -L/star/lib `ast_link` -o program
+cc program.c -L/star/lib -I/star/include `ast_link` -o program
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -1420,8 +1422,7 @@ cc program.c -L/star/lib `ast_link -pgplot` -o program
 \end{quote}
 
 For more details about accessing the ``ast.h'' header file, see
-\secref{ss:accessingheaderfile} and the description of the
-``\htmlref{ast\_dev}{ast_dev}'' command in \appref{ss:commanddescriptions}.  For more
+\secref{ss:accessingheaderfile}. For more
 details about linking programs, see \secref{ss:linking} and the
 description of the ``\htmlref{ast\_link}{ast_link}'' command in
 \appref{ss:commanddescriptions}.
@@ -5519,6 +5520,11 @@ coordinate system residing on the celestial sphere. Many such
 coordinate systems can be represented by a SkyFrame, as we will see
 shortly.
 
+A SkyFrame can represent any of the commonly used celestial coordinate
+systems. Optionally, the origin of the longitude/latitude system can be 
+moved to any specified point in the standard celestial system, allowing
+a SkyFrame to represent offsets from a specified sky position.
+
 When it is first created, a SkyFrame's axes are always in the order
 (longitude,~latitude) but this can be changed, if required, by using the
 \htmlref{astPermAxes}{astPermAxes} function (\secref{ss:permutingaxes}). The order of the axes
@@ -6008,6 +6014,33 @@ it should contain ``d'' or ``h'' to ensure that the first field
 entered by the user will be interpreted as degrees or hours, unless
 otherwise identified. This is the normal behaviour unless an explicit
 Format(axis) value has been set to override the default.
+
+\subsection{Representing Offsets from a Specified Sky Position}
+A \htmlref{SkyFrame}{SkyFrame} can be modified so that its longitude and latitude axes are
+referred to an origin at any specified sky position. Such a coordinate
+system is referred to as an ``offset'' coordinate syetem. First, the \htmlref{System}{System}
+attribute should be set to represent the celestial coordinate system in
+which the origin is to be specified. Then the SkyRef attribute should be
+set to hold the coordinates of the origin within the selected celestial
+coordinate system. 
+
+By default, ``north'' in the new offset coordinate system is parallel to
+north in the original celestial coordinate system. However, the direction
+of north in the offset system can be controlled by assigning a value to
+the SkyRefP attribute. This attribute should be assigned the celestial
+coordinates of a point which is on the zero longitude meridian and which
+has non-zero latitude.
+
+By default, the position given by the SkyRef attribute is used as the
+origin of the new longitude/latitude system, but an option exists to use
+it as the north pole of the system instead. This option is controlled by
+the \htmlref{SkyRefIs}{SkyRefIs} attribute. The choice of value for SkyRefIs depends on what
+sort of offset coordinate system you want. Setting SkyRefIs to
+``Origin'' (the default) produces an offset coordinate system which is
+approximately Cartesian close to the specified position. Setting SkyRefIs
+to
+``Pole'' produces an offset coordinate system which is approximately Polar
+close to the specified position. 
 
 \cleardoublepage
 \section{\xlabel{ss_specframes}\label{ss:specframes}Spectral Coordinate Systems (SpecFrames)}
@@ -11503,44 +11536,8 @@ appropriate directory in place of ``/star'' wherever it occurs.}
 
 \subsection{\label{ss:accessingheaderfile}Accessing the ``ast.h'' Header File}
 
-Before compiling software which uses AST facilities, you may like to
-``log in'' for AST software development with the following command:
-
-\begin{quote}
-\small
-\begin{verbatim}
-ast_dev
-\end{verbatim}
-\normalsize
-\end{quote}
-
-This will create links in your current directory which refer to the
-AST include files (for both Fortran and C).
-You may then refer to the ``ast.h'' header file without having to know
-where it actually resides, for example:
-
-\begin{quote}
-\small
-\begin{verbatim}
-#include "ast.h"
-\end{verbatim}
-\normalsize
-\end{quote}
-
-This file defines the external interface to the AST library, including
-all constants, function prototypes, macros, {\em{etc.}}
-The links created by ``\htmlref{ast\_dev}{ast_dev}'' will persist, but may be removed at
-any time, either explicitly or with the command:
-
-\begin{quote}
-\small
-\begin{verbatim}
-ast_dev remove
-\end{verbatim}
-\normalsize
-\end{quote}
-
-If you do not log in in this way, then the ``ast.h'' header file
+The ``ast.h'' header file defines the external interface to the AST library, 
+including all constants, function prototypes, macros, {\em{etc.}}. This file
 should be located using the usual compiler options for finding C
 include files, for instance:
 
@@ -19764,6 +19761,20 @@ Object             - Base class for all AST Objects
          Pointer to the original Mapping.
       }
    }
+   \sstapplicability{
+      \sstsubsection{
+         Mapping
+      }{
+         This function applies to all Mappings.
+      }
+      \sstsubsection{
+         \htmlref{FrameSet}{FrameSet}
+      }{
+         If the supplied Mapping is a FrameSet, the returned Mapping
+         will be a copy of the supplied FrameSet in which all the
+         inter-\htmlref{Frame}{Frame} Mappings have been simplified.
+      }
+   }
    \sstreturnedvalue{
       \sstsubsection{
          astSimplify()
@@ -19809,6 +19820,13 @@ Object             - Base class for all AST Objects
       setting the SkyFrame's \htmlref{System}{System} attribute (currently, the default
       is ICRS) qualified, as necessary, by a mean \htmlref{Equinox}{Equinox} value and/or
       an \htmlref{Epoch}{Epoch}.
+
+      For each of the supported celestial coordinate systems, a SkyFrame
+      can apply an optional shift of origin to create a coordinate system
+      representing offsets within the celestial coordinate system from some
+      specified point. This offset coordinate system can also be rotated to
+      define new longitude and latitude axes. See attributes SkyRef, \htmlref{SkyRefIs}{SkyRefIs}
+      and SkyRefP
 
       All the coordinate values used by a SkyFrame are in
       radians. These may be formatted in more conventional ways for
@@ -20660,80 +20678,6 @@ Object             - Base class for all AST Objects
          velocity in units of metres per second. See the description of the
          astSpecAdd function for the units expected and returned by each
          conversion.
-
-         \sstitem
-         A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
-         function is invoked with the AST error status set, or if it
-         should fail for any reason.
-      }
-   }
-}
-\sstroutine{
-   astSphMap\sstlabel{astSphMap}
-}{
-   Create a SphMap
-}{
-   \sstdescription{
-      This function creates a new \htmlref{SphMap}{SphMap} and optionally initialises
-      its attributes.
-
-      A SphMap is a \htmlref{Mapping}{Mapping} which transforms points from a
-      3-dimensional Cartesian coordinate system into a 2-dimensional
-      spherical coordinate system (longitude and latitude on a unit
-      sphere centred at the origin). It works by regarding the input
-      coordinates as position vectors and finding their intersection
-      with the sphere surface. The inverse transformation always
-      produces points which are a unit distance from the origin
-      (i.e. unit vectors).
-   }
-   \sstsynopsis{
-      AstSphMap $*$astSphMap( const char $*$options, ... )
-   }
-   \sstparameters{
-      \sstsubsection{
-         options
-      }{
-         Pointer to a null-terminated string containing an optional
-         comma-separated list of attribute assignments to be used for
-         initialising the new SphMap. The syntax used is identical to
-         that for the \htmlref{astSet}{astSet} function and may include {\tt{"}}printf{\tt{"}} format
-         specifiers identified by {\tt{"}}\%{\tt{"}} symbols in the normal way.
-      }
-      \sstsubsection{
-         ...
-      }{
-         If the {\tt{"}}options{\tt{"}} string contains {\tt{"}}\%{\tt{"}} format specifiers, then
-         an optional list of additional arguments may follow it in
-         order to supply values to be substituted for these
-         specifiers. The rules for supplying these are identical to
-         those for the astSet function (and for the C {\tt{"}}printf{\tt{"}}
-         function).
-      }
-   }
-   \sstreturnedvalue{
-      \sstsubsection{
-         astSphMap()
-      }{
-         A pointer to the new SphMap.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The spherical coordinates are longitude (positive
-         anti-clockwise looking from the positive latitude pole) and
-         latitude. The Cartesian coordinates are right-handed, with the x
-         axis (axis 1) at zero longitude and latitude, and the z axis
-         (axis 3) at the positive latitude pole.
-
-         \sstitem
-         At either pole, the longitude is set to the value of the
-         \htmlref{PolarLong}{PolarLong} attribute.
-
-         \sstitem
-         If the Cartesian coordinates are all zero, then the longitude
-         and latitude are set to the value AST\_\_BAD.
 
          \sstitem
          A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
@@ -22572,6 +22516,34 @@ Object             - Base class for all AST Objects
 \section{\label{ss:attributedescriptions}AST Attribute Descriptions}
 \small
 \sstroutine{
+   AlignOffset\sstlabel{AlignOffset}
+}{
+   Align SkyFrames using the offset coordinate system?
+}{
+   \sstdescription{
+      This attribute is a boolean value which controls how a \htmlref{SkyFrame}{SkyFrame}
+      behaves when it is used (by
+      \htmlref{astFindFrame}{astFindFrame} or \htmlref{astConvert}{astConvert}) as a template to match another (target)
+      SkyFrame. It determines the coordinate system in which the two
+      SkyFrames are aligned if a match occurs.
+
+      A non-zero value results in alignment occuring in the offset
+      coordinate system defined by attributes SkyRef, SkyRefP and \htmlref{SkyRefIs}{SkyRefIs}.
+      The default value of zero results in alignment occurring within the
+      coordinate system specified by the \htmlref{AlignSystem}{AlignSystem} attribute.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
+      }
+   }
+}
+\sstroutine{
    AlignStdOfRest\sstlabel{AlignStdOfRest}
 }{
    Standard of rest to use when aligning SpecFrames
@@ -22643,9 +22615,10 @@ Object             - Base class for all AST Objects
       will accept any of the values which may be assigned to the \htmlref{System}{System}
       attribute.
 
-      The \htmlref{Mapping}{Mapping} returned by AST\_FINDFRAME or AST\_CONVERT will use the
-      coordinate system specified by the AlignSystem attribute as an
-      intermediate coordinate system. The total returned Mapping will first
+      The \htmlref{Mapping}{Mapping} returned by
+      astFindFrame or astConvert
+      will use the coordinate system specified by the AlignSystem attribute as
+      an intermediate coordinate system. The total returned Mapping will first
       map positions from the first Frame into this intermediate coordinate
       system, using the attributes of the first Frame. It will then map
       these positions from the intermediate coordinate system into the
@@ -25228,6 +25201,41 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   Iwc\sstlabel{Iwc}
+}{
+   Include a Frame representing FITS-WCS intermediate world coordinates?
+}{
+   \sstdescription{
+      This attribute is a boolean value which is used when a \htmlref{FrameSet}{FrameSet} is
+      read from a \htmlref{FitsChan}{FitsChan} with a foreign FITS encoding (e.g. FITS-WCS) using
+      \htmlref{astRead}{astRead}.
+      If it has a non-zero value then the returned FrameSet will include
+      Frames representing {\tt{"}}intermediate world coordinates{\tt{"}} (IWC). These
+      Frames will have \htmlref{Domain}{Domain} name {\tt{"}}IWC{\tt{"}} for primary axis descriptions, and
+      {\tt{"}}IWCa{\tt{"}} for secondary axis descriptions, where {\tt{"}}a{\tt{"}} is replaced by
+      the single alternate axis description character, as used in the
+      FITS-WCS header. The default value for {\tt{"}}Iwc{\tt{"}} is zero.
+
+      FITS-WCS paper 1 defines IWC as a Cartesian coordinate system with one
+      axis for each WCS axis, and is the coordinate system produced by the
+      rotation matrix (represented by FITS keyword PCi\_j, CDi\_j, etc).
+      For instance, for a 2-D FITS-WCS header describing projected
+      celestial longitude and latitude, the intermediate world
+      coordinates represent offsets in degrees from the reference point
+      within the plane of projection.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         FitsChan
+      }{
+         All FitsChans have this attribute.
+      }
+   }
+}
+\sstroutine{
    Label(axis)\sstlabel{Labelaxis}
 }{
    Axis label
@@ -26565,28 +26573,6 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
-   PolarLong\sstlabel{PolarLong}
-}{
-   The longitude value to assign to either pole
-}{
-   \sstdescription{
-      This attribute holds the longitude value, in radians, to be
-      returned when a Cartesian position corresponding to either the north
-      or south pole is transformed into spherical coordinates. The
-      default value is zero.
-   }
-   \sstattributetype{
-      Double precision.
-   }
-   \sstapplicability{
-      \sstsubsection{
-         \htmlref{SphMap}{SphMap}
-      }{
-         All SphMaps have this attribute.
-      }
-   }
-}
-\sstroutine{
    PreserveAxes\sstlabel{PreserveAxes}
 }{
    Preserve axes?
@@ -27103,6 +27089,192 @@ Object             - Base class for all AST Objects
          The FitsChan class sets the default value of this attribute
          to 1, so that all irrelevant FITS headers will normally be
          ignored.
+      }
+   }
+}
+\sstroutine{
+   SkyRef(axis)\sstlabel{SkyRefaxis}
+}{
+   Position defining the offset coordinate system
+}{
+   \sstdescription{
+      This attribute allows a \htmlref{SkyFrame}{SkyFrame} to represent offsets, rather than
+      absolute axis values, within the coordinate system specified by the
+      \htmlref{System}{System} attribute. If supplied, SkyRef should be set to hold the
+      longitude and latitude of a point within the coordinate system
+      specified by the System attribute. The coordinate system represented
+      by the SkyFrame will then be rotated in order to put the specified
+      position at either the pole or the origin of the new coordinate system
+      (as indicated by the \htmlref{SkyRefIs}{SkyRefIs} attribute). The orientation of the
+      modified coordinate system is then controlled using the SkyRefP
+      attribute.
+
+      If an integer axis index is included in the attribute name (e.g.
+      {\tt{"}}SkyRef(1){\tt{"}}) then the attribute value should be supplied as a single
+      floating point axis value, in radians, when setting a value for the
+      attribute, and will be returned in the same form when getting the value
+      of the attribute. In this case the integer axis index should be {\tt{"}}1{\tt{"}}
+      or {\tt{"}}2{\tt{"}} (the values to use for longitude and latitue axes are
+      given by the \htmlref{LonAxis}{LonAxis} and \htmlref{LatAxis}{LatAxis} attributes).
+
+      If no axis index is included in the attribute name (e.g. {\tt{"}}SkyRef{\tt{"}}) then
+      the attribute value should be supplied as a character string
+      containing two formatted axis values (an axis 1 value followed by a
+      comma, followed by an axis 2 value). The same form
+      will be used when getting the value of the attribute.
+
+      The default values for SkyRef are zero longitude and zero latitude,
+      but no rotation of the SkyFrame coordinate system will occur
+      until a value is set explicitly for at least one axis.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the System attribute of the SkyFrame is changed, any position
+         given for SkyRef is transformed into the new System.
+
+         \sstitem
+         If a value has been assigned to SkyRef attribute, then
+         the default values for certain attributes are changed as follows:
+         the default axis Labels for the SkyFrame are modified by appending
+         {\tt{"}} offset{\tt{"}} to the end, the default axis Symbols for the SkyFrame are
+         modified by prepending the character {\tt{"}}D{\tt{"}} to the start, and the
+         default title is modified by replacing the projection information by the
+         origin information.
+      }
+   }
+   \sstdiytopic{
+      Aligning SkyFrames with Offset Coordinate Systems
+   }{
+      The offset coordinate system within a SkyFrame should normally be
+      considered as a superficial {\tt{"}}re-badging{\tt{"}} of the axes of the coordinate
+      system specified by the System attribute - it merely provides an
+      alternative numerical {\tt{"}}label{\tt{"}} for each position in the System coordinate
+      system. The SkyFrame retains full knowledge of the celestial coordinate
+      system on which the offset coordinate system is based (given by the
+      System attribute). For instance, the SkyFrame retains knowledge of the
+      way that one celestial coordinate system may {\tt{"}}drift{\tt{"}} with respect to
+      another over time. Normally, if you attempt to align two SkyFrames (e.g.
+      using the \htmlref{astConvert}{astConvert} or \htmlref{astFindFrame}{astFindFrame} routine),
+      the effect of any offset coordinate system defined in either SkyFrame
+      will be removed, resulting in alignment being performed in the
+      celestial coordinate system given by the \htmlref{AlignSystem}{AlignSystem} attribute.
+      However, by setting the \htmlref{AlignOffset}{AlignOffset} attribute ot a non-zero value, it
+      is possible to change this behaviour so that the effect of the offset
+      coordinate system is not removed when aligning two SkyFrames.
+   }
+}
+\sstroutine{
+   SkyRefIs\sstlabel{SkyRefIs}
+}{
+   Selects the nature of the offset coordinate system
+}{
+   \sstdescription{
+      This attribute controls how the values supplied for the SkyRef and
+      SkyRefP attributes are used. These three attributes together allow
+      a \htmlref{SkyFrame}{SkyFrame} to represent offsets relative to some specified origin
+      or pole within the coordinate system specified by the \htmlref{System}{System} attribute,
+      rather than absolute axis values. SkyRefIs can take either of the
+      case-insensitive values {\tt{"}}Origin{\tt{"}} or {\tt{"}}Pole{\tt{"}}.
+
+      If SkyRefIs is set to {\tt{"}}Origin{\tt{"}} (the default), then the coordinate system
+      represented by the SkyFrame is modified to put the origin of longitude
+      and latitude at the position specified by the SkyRef attribute.
+
+      If SkyRefIs is set to {\tt{"}}Pole{\tt{"}}, then the coordinate system represented
+      by the SkyFrame is modified to put the north pole at the position
+      specified by the SkyRef attribute.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
+      }
+   }
+}
+\sstroutine{
+   SkyRefP(axis)\sstlabel{SkyRefPaxis}
+}{
+   Position on primary meridian of offset coordinate system
+}{
+   \sstdescription{
+      This attribute is used to control the orientation of the offset
+      coordinate system defined by attributes SkyRef and \htmlref{SkyRefIs}{SkyRefIs}. If used,
+      it should be set to hold the longitude and latitude of a point within
+      the coordinate system specified by the \htmlref{System}{System} attribute. The offset
+      coordinate system represented by the \htmlref{SkyFrame}{SkyFrame} will then be rotated in
+      order to put the position supplied for SkyRefP on the zero longitude
+      meridian. This rotation is about an axis from the centre of the
+      celestial sphere to the point specified by the SkyRef attribute.
+      The default value for SkyRefP is usually the north pole (that is, a
+      latitude of $+$90 degrees in the coordinate system specified by the System
+      attribute). The exception to this is if the SkyRef attribute is
+      itself set to either the north or south pole. In these cases the
+      default for SkyRefP is the origin (that is, a (0,0) in the coordinate
+      system specified by the System attribute).
+
+      If an integer axis index is included in the attribute name (e.g.
+      {\tt{"}}SkyRefP(1){\tt{"}}) then the attribute value should be supplied as a single
+      floating point axis value, in radians, when setting a value for the
+      attribute, and will be returned in the same form when getting the value
+      of the attribute. In this case the integer axis index should be {\tt{"}}1{\tt{"}}
+      or {\tt{"}}2{\tt{"}} (the values to use for longitude and latitue axes are
+      given by the \htmlref{LonAxis}{LonAxis} and \htmlref{LatAxis}{LatAxis} attributes).
+
+      If no axis index is included in the attribute name (e.g. {\tt{"}}SkyRefP{\tt{"}}) then
+      the attribute value should be supplied as a character string
+      containing two formatted axis values (an axis 1 value followed by a
+      comma, followed by an axis 2 value). The same form
+      will be used when getting the value of the attribute.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the position given by the SkyRef attribute defines the origin
+         of the offset coordinate system (that is, if the SkyRefIs attribute
+         is set to {\tt{"}}origin{\tt{"}}), then there will in general be two orientations
+         which will put the supplied SkyRefP position on the zero longitude
+         meridian. The orientation which is actually used is the one which
+         gives the SkyRefP position a positive latitude in the offset coordinate
+         system (the other possible orientation would give the SkyRefP position
+         a negative latitude).
+
+         \sstitem
+         An error will be reported if an attempt is made to use a
+         SkyRefP value which is co-incident with SkyRef or with the point
+         diametrically opposite to SkyRef on the celestial sphere. The
+         reporting of this error is deferred until the SkyRef and SkyRefP
+         attribute values are used within a calculation.
+
+         \sstitem
+         If the System attribute of the SkyFrame is changed, any position
+         given for SkyRefP is transformed into the new System.
       }
    }
 }
@@ -27991,67 +28163,6 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
-   UnitRadius\sstlabel{UnitRadius}
-}{
-   SphMap input vectors lie on a unit sphere?
-}{
-   \sstdescription{
-      This is a boolean attribute which indicates whether the
-      3-dimensional vectors which are supplied as input to a \htmlref{SphMap}{SphMap}
-      are known to always have unit length, so that they lie on a unit
-      sphere centred on the origin.
-
-      If this condition is true (indicated by setting UnitRadius
-      non-zero), it implies that a \htmlref{CmpMap}{CmpMap} which is composed of a
-      SphMap applied in the forward direction followed by a similar
-      SphMap applied in the inverse direction may be simplified
-      (e.g. by \htmlref{astSimplify}{astSimplify}) to become a \htmlref{UnitMap}{UnitMap}. This is because the
-      input and output vectors will both have unit length and will
-      therefore have the same coordinate values.
-
-      If UnitRadius is zero (the default), then although the output
-      vector produced by the CmpMap (above) will still have unit
-      length, the input vector may not have. This will, in general,
-      change the coordinate values, so it prevents the pair of SphMaps
-      being simplified.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstapplicability{
-      \sstsubsection{
-         SphMap
-      }{
-         All SphMaps have this attribute.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         This attribute is intended mainly for use when SphMaps are
-         involved in a sequence of Mappings which project (e.g.) a
-         dataset on to the celestial sphere. By regarding the celestial
-         sphere as a unit sphere (and setting UnitRadius to be non-zero)
-         it becomes possible to cancel the SphMaps present, along with
-         associated sky projections, when two datasets are aligned using
-         celestial coordinates. This often considerably improves
-         performance.
-
-         \sstitem
-         Such a situations often arises when interpreting FITS data and
-         is handled automatically by the \htmlref{FitsChan}{FitsChan} class.
-
-         \sstitem
-         The value of the UnitRadius attribute is used only to control
-         the simplification of Mappings and has no effect on the value of
-         the coordinates transformed by a SphMap. The lengths of the
-         input 3-dimensional Cartesian vectors supplied are always
-         ignored, even if UnitRadius is non-zero.
-      }
-   }
-}
-\sstroutine{
    Warnings\sstlabel{Warnings}
 }{
    Controls the issuing of warnings about various conditions
@@ -28728,6 +28839,9 @@ Object             - Base class for all AST Objects
 
          \sstitem
          \htmlref{FitsDigits}{FitsDigits}: Digits of precision for floating-point FITS values
+
+         \sstitem
+         \htmlref{Iwc}{Iwc}: Add a \htmlref{Frame}{Frame} describing Intermediate World Coords?
 
          \sstitem
          \htmlref{Ncard}{Ncard}: Number of FITS header cards in a FitsChan
@@ -29960,6 +30074,13 @@ Object             - Base class for all AST Objects
       is ICRS) qualified, as necessary, by a mean \htmlref{Equinox}{Equinox} value and/or
       an \htmlref{Epoch}{Epoch}.
 
+      For each of the supported celestial coordinate systems, a SkyFrame
+      can apply an optional shift of origin to create a coordinate system
+      representing offsets within the celestial coordinate system from some
+      specified reference point. This offset coordinate system can also be
+      rotated to define new longitude and latitude axes. See attributes
+      SkyRef, \htmlref{SkyRefIs}{SkyRefIs}, SkyRefP and \htmlref{AlignOffset}{AlignOffset}.
+
       All the coordinate values used by a SkyFrame are in
       radians. These may be formatted in more conventional ways for
       display by using \htmlref{astFormat}{astFormat}.
@@ -29981,6 +30102,9 @@ Object             - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
+         \htmlref{AlignOffset}{AlignOffset}: Align SkyFrames using the offset coordinate system?
+
+         \sstitem
          \htmlref{AsTime(axis)}{AsTimeaxis}: Format celestial coordinates as times?
 
          \sstitem
@@ -29997,6 +30121,15 @@ Object             - Base class for all AST Objects
 
          \sstitem
          \htmlref{Projection}{Projection}: Sky projection description.
+
+         \sstitem
+         SkyRef: Position defining location of the offset coordinate system
+
+         \sstitem
+         \htmlref{SkyRefIs}{SkyRefIs}: Selects the nature of the offset coordinate system
+
+         \sstitem
+         SkyRefP: Position defining orientation of the offset coordinate system
       }
    }
    \sstdiytopic{
@@ -30195,51 +30328,6 @@ Object             - Base class for all AST Objects
          \sstitem
          \htmlref{astSpecAdd}{astSpecAdd}: Add a celestial coordinate conversion to an SpecMap
       }
-   }
-}
-\sstroutine{
-   SphMap\sstlabel{SphMap}
-}{
-   Map 3-d Cartesian to 2-d spherical coordinates
-}{
-   \sstdescription{
-      A SphMap is a \htmlref{Mapping}{Mapping} which transforms points from a
-      3-dimensional Cartesian coordinate system into a 2-dimensional
-      spherical coordinate system (longitude and latitude on a unit
-      sphere centred at the origin). It works by regarding the input
-      coordinates as position vectors and finding their intersection
-      with the sphere surface. The inverse transformation always
-      produces points which are a unit distance from the origin
-      (i.e. unit vectors).
-   }
-   \sstconstructor{
-      \htmlref{astSphMap}{astSphMap}
-   }
-   \sstdiytopic{
-      Inheritance
-   }{
-      The SphMap class inherits from the Mapping class.
-   }
-   \sstdiytopic{
-      Attributes
-   }{
-      In addition to those attributes common to all Mappings, every
-      SphMap also has the following attributes:
-
-      \sstitemlist{
-
-         \sstitem
-         \htmlref{UnitRadius}{UnitRadius}: SphMap input vectors lie on a unit sphere?
-
-         \sstitem
-         \htmlref{PolarLong}{PolarLong}: The longitude value to assign to either pole
-      }
-   }
-   \sstdiytopic{
-      Functions
-   }{
-      The SphMap class does not define any new functions beyond those
-      which are applicable to all Mappings.
    }
 }
 \sstroutine{
@@ -31532,7 +31620,7 @@ into FITS (using ``foreign'' FITS encodings).
 \item Some further improvements have been made to the algorithms for
 simplifying compound Mappings, as used by \htmlref{astSimplify}{astSimplify}.
 
-\item A new \htmlref{UnitRadius}{UnitRadius} attribute has been added to the \htmlref{SphMap}{SphMap}
+\item A new UnitRadius attribute has been added to the SphMap
 class. This allows improved simplification of compound Mappings
 (CmpMaps) involving SphMaps and typically improves performance when
 handling FITS world coordinate information.
@@ -32400,7 +32488,7 @@ with unit scaling on all axes).
 \item Minor bugs have been fixed within the \htmlref{Plot}{Plot} class to do with the choice 
 and placement of numerical axis labels.
 
-\item The \htmlref{SphMap}{SphMap} class has a new attribute called \htmlref{PolarLong}{PolarLong} which gives the 
+\item The SphMap class has a new attribute called PolarLong which gives the 
 longitude value to be returned when a Cartesian position corresponding to 
 either the north or south pole is transformed into spherical coordinates.
 
@@ -32452,12 +32540,10 @@ Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.2}
+\subsection{Changes Introduced in V3.2}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V3.1 and V3.2 (the
-current version):
+occurred in the AST library between versions V3.1 and V3.2:
 
 \begin{enumerate}
 
@@ -32546,6 +32632,54 @@ transformation from another existing Mapping.
 
 \item A bug has been fixed in \htmlref{WcsMap}{WcsMap} which caused error reports to
 include erroneous axis numbers when referring to missing parameter values.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.3}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.2 and V3.3 (the
+current version):
+
+\begin{enumerate}
+
+\item Options have been added to the \htmlref{SkyFrame}{SkyFrame} class which allows the
+origin 
+of celestial coordinates to be moved to any specified point. See the new
+attributes SkyRef, \htmlref{SkyRefIs}{SkyRefIs}, SkyRefP and \htmlref{AlignOffset}{AlignOffset}.
+
+\item An option has been added to the \htmlref{FitsChan}{FitsChan} class which allows extra
+Frames representing cartesian projection plane coordinates (``intermediate 
+world coordinates'' in the parlance of FITS-WCS) to be created when
+reading 
+WCS information from a foreign FITS header. This option is controlled by
+a new attribute called \htmlref{Iwc}{Iwc}.
+
+\item The FitsChan class which been modified to interpret FITS-WCS CAR
+projection headers correctly if the longitude reference pixel (CRPIX) is 
+very large.
+
+\item The organisation of the AST distribution and the commands for
+building it have been changed. Whereas AST used to be built and installed
+with \verb+./mk build; ./mk install+, it now builds using the more standard
+idiom \verb+./configure; make; make install+. The installation location is
+controlled by the \verb+--prefix+ argument to ./configure (as is usual
+for other packages which use this scheme).  Note that the INSTALL environment 
+variable now has a \emph{different} meaning to that which it had
+before, and it should generally be \emph{unset}. Also, there is no need to
+set the SYSTEM variable.
+
+\item Shared libraries are now installed in the same directory as the
+static libraries. In addition, links to sharable libraries are installed 
+with names which include version information, and ``libtool libraries'' 
+are also installed (see \htmladdnormallink{http://www.gnu.org/software/libtool/manual.html}{
+http://www.gnu.org/software/libtool/manual.html}).
+
+\item The \verb+ast_dev+ script has been removed. Instead, the location of
+the AST include files should be specified using the -I option when
+compiling.
+
 
 \end{enumerate}
 
