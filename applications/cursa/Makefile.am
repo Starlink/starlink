@@ -52,14 +52,18 @@ xcatviewsupport_DATA = \
  xcatviewLib/GetRow.tcl xcatviewLib/RemoteName.tcl \
  xcatviewLib/GetExprn.tcl xcatviewLib/GetScatter.tcl \
  xcatviewLib/RemoteQuery.tcl xcatviewLib/RemoteUrl.tcl \
- xcatviewLib/adamtask.tcl xcatviewLib/adamMessageRelay
+ xcatviewLib/adamtask.tcl xcatviewLib/adamMessageRelay \
+ xcatviewLib/tclIndex
 
 ##  Edit scripts during make to have the correct paths.
+NETWORKED = "yes"
 edit = sed \
         -e 's,@bindir\@,$(bindir),g' \
         -e 's,@EXPECTK\@,$(EXPECTK),g' \
         -e 's,@PERL\@,$(PERL),g' \
-        -e 's,@AWISH\@,$(AWISH),g'
+        -e 's,@AWISH\@,$(AWISH),g' \
+        -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
+        -e 's,@NETWORKED\@,$(NETWORKED),g'
 
 xcatview: xcatview.in
 	rm -f xcatview.tmp xcatview
@@ -89,3 +93,17 @@ catremote: catremote.in
 	   -e 's,@edited_input\@,catremote: produced from catremote.in by Makefile.am,' \
 	   $(srcdir)/catremote.in >catremote.tmp
 	mv catremote.tmp catremote
+
+cursa.csh: cursa.csh.in
+	rm -f cursa.csh.tmp cursa.csh
+	$(edit) \
+	   -e 's,@edited_input\@,cursa.csh: produced from cursa.csh.in by Makefile.am,' \
+	   $(srcdir)/cursa.csh.in >cursa.csh.tmp
+	mv cursa.csh.tmp cursa.csh
+
+ cursa_test.csh: cursa_test.csh.in
+	rm -f cursa_test.csh.tmp cursa_test.csh
+	$(edit) \
+	   -e 's,@edited_input\@,cursa_test.csh: produced from cursa_test.csh.in by Makefile.am,' \
+	   $(srcdir)/cursa_test.csh.in >cursa_test.csh.tmp
+	mv cursa_test.csh.tmp cursa_test.csh

@@ -80,60 +80,60 @@ endif
 #  so thatapplications that have conflicting command names are
 #  still available.
 
-alias catcopy         INSTALL_BIN/catcopy
-alias cursa_catcopy   INSTALL_BIN/catcopy
+alias catcopy         @bindir@/catcopy
+alias cursa_catcopy   @bindir@/catcopy
 
-alias catheader       INSTALL_BIN/catheader
-alias cursa_catheader INSTALL_BIN/catheader
+alias catheader       @bindir@/catheader
+alias cursa_catheader @bindir@/catheader
 
-alias catpair         INSTALL_BIN/catpair
-alias cursa_catpair   INSTALL_BIN/catpair
+alias catpair         @bindir@/catpair
+alias cursa_catpair   @bindir@/catpair
 
-alias catsort         INSTALL_BIN/catsort
-alias cursa_catsort   INSTALL_BIN/catsort
+alias catsort         @bindir@/catsort
+alias cursa_catsort   @bindir@/catsort
 
-alias catview         INSTALL_BIN/catview
-alias cursa_catview   INSTALL_BIN/catview
+alias catview         @bindir@/catview
+alias cursa_catview   @bindir@/catview
 
-alias catgscin        INSTALL_BIN/catgscin
-alias cursa_catgscin  INSTALL_BIN/catgscin
+alias catgscin        @bindir@/catgscin
+alias cursa_catgscin  @bindir@/catgscin
 
-alias catselect       INSTALL_BIN/catselect
-alias cursa_catselect INSTALL_BIN/catselect
+alias catselect       @bindir@/catselect
+alias cursa_catselect @bindir@/catselect
 
-alias catcoord        INSTALL_BIN/catcoord
-alias cursa_catcoord  INSTALL_BIN/catcoord
+alias catcoord        @bindir@/catcoord
+alias cursa_catcoord  @bindir@/catcoord
 
-alias catchart        INSTALL_BIN/catchart
-alias cursa_catchart  INSTALL_BIN/catchart
+alias catchart        @bindir@/catchart
+alias cursa_catchart  @bindir@/catchart
 
-alias catchartrn          INSTALL_BIN/catchartrn
-alias cursa_catchartrn    INSTALL_BIN/catchartrn
+alias catchartrn          @bindir@/catchartrn
+alias cursa_catchartrn    @bindir@/catchartrn
 
-alias catphotomfit        INSTALL_BIN/catphotomfit
-alias cursa_catphotomfit  INSTALL_BIN/catphotomfit
+alias catphotomfit        @bindir@/catphotomfit
+alias cursa_catphotomfit  @bindir@/catphotomfit
 
-alias catphotomtrn        INSTALL_BIN/catphotomtrn
-alias cursa_catphotomtrn  INSTALL_BIN/catphotomtrn
+alias catphotomtrn        @bindir@/catphotomtrn
+alias cursa_catphotomtrn  @bindir@/catphotomtrn
 
-alias catphotomlst        INSTALL_BIN/catphotomlst
-alias cursa_catphotomlst  INSTALL_BIN/catphotomlst
+alias catphotomlst        @bindir@/catphotomlst
+alias cursa_catphotomlst  @bindir@/catphotomlst
 
-alias catgrid         INSTALL_BIN/catphotomlst
-alias cursa_catgrid   INSTALL_BIN/catphotomlst
+alias catgrid         @bindir@/catphotomlst
+alias cursa_catgrid   @bindir@/catphotomlst
 
 # Perl scripts.
 
-alias catcdsin        INSTALL_BIN/catcdsin
-alias cursa_catcdsin  INSTALL_BIN/catcdsin
+alias catcdsin        @bindir@/catcdsin
+alias cursa_catcdsin  @bindir@/catcdsin
 
-alias catremote       INSTALL_BIN/catremote
-alias cursa_catremote INSTALL_BIN/catremote
+alias catremote       @bindir@/catremote
+alias cursa_catremote @bindir@/catremote
 
 # tcl/tk script.
 
-alias xcatview        INSTALL_BIN/xcatview
-alias cursa_xcatview  INSTALL_BIN/xcatview
+alias xcatview        @bindir@/xcatview
+alias cursa_xcatview  @bindir@/xcatview
 
 #
 #  Environment variables for catremote.
@@ -146,7 +146,7 @@ alias cursa_xcatview  INSTALL_BIN/xcatview
 #    "java  UrlReader"        -- Java utility.
 #    "wget -q -O -"           -- wget utility (probably RedHat Linux only).
 
-setenv  CATREM_URLREADER "INSTALL_BIN/geturl"
+setenv  CATREM_URLREADER @bindir@/geturl
 
 #
 #  Specify the configuration file to be used.  The URL given here is the
@@ -173,14 +173,14 @@ setenv  CATREM_ECHOURL no
 #  (note that CLASSPATH has to be set rather than setting the corresponding
 #  command line option because the latter does not work on alphas).
 
-setenv CLASSPATH INSTALL_BIN:/usr/lib/netscape/java/classes
+setenv CLASSPATH @bindir@:/usr/lib/netscape/java/classes
 
 
 #
 #  Announce the availability of the CURSA commands.
 
 echo ""
-echo "   CURSA commands are now available -- (Version PKG_VERS)"
+echo "   CURSA commands are now available -- (Version @PACKAGE_VERSION@)"
 echo ""
 
 #

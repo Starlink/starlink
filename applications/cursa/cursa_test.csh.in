@@ -34,7 +34,7 @@
 echo " "
 echo "Set up CURSA..."
 
-INSTALL_BIN/cursa.csh
+@bindir@/cursa.csh
 
 echo " "
 echo "Copy test data and scripts..."
@@ -42,39 +42,39 @@ echo "Copy test data and scripts..."
 mkdir ./cursatest
 cd ./cursatest
 
-cp INSTALL_BIN/5828.gsc .
-cp INSTALL_BIN/catselect.script .
-cp INSTALL_BIN/catpair.script .
-cp INSTALL_BIN/catview.script .
-cp INSTALL_BIN/targets.TXT .
+cp @bindir@/5828.gsc .
+cp @bindir@/catselect.script .
+cp @bindir@/catpair.script .
+cp @bindir@/catview.script .
+cp @bindir@/targets.TXT .
 
 echo " "
 echo "catgscin..."
-INSTALL_BIN/catgscin 5828.gsc
+@bindir@/catgscin 5828.gsc
 
 echo " "
 echo "catselect..."
-INSTALL_BIN/catselect  < catselect.script
+@bindir@/catselect  < catselect.script
 
 echo " "
 echo "catpair..."
-INSTALL_BIN/catpair  < catpair.script
+@bindir@/catpair  < catpair.script
 
 echo " "
 echo "catsort..."
-INSTALL_BIN/catsort join5828 sort5828 MAG ascending
+@bindir@/catsort join5828 sort5828 MAG ascending
 
 echo " "
 echo "catcopy..."
-INSTALL_BIN/catcopy sort5828 copy5828
+@bindir@/catcopy sort5828 copy5828
 
 echo " "
 echo "catheader..."
-INSTALL_BIN/catheader copy5828 N
+@bindir@/catheader copy5828 N
 
 echo " "
 echo "catview..."
-INSTALL_BIN/catview < catview.script 
+@bindir@/catview < catview.script 
 
 #
 # Tidy up.

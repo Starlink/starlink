@@ -1,4 +1,4 @@
-#!@EXPECTK@
+#!@AWISH@
 #
 #  Explicit paths for executables etc.  These are edited at install time
 #  and the flag indicating whether xcatview is running on a networked
@@ -10,7 +10,7 @@
     set     catviewExe   @bindir@/catview
     set     catremoteExe @bindir@/catremote
     lappend auto_path    @bindir@/xcatviewLib
-    set     networked   "NETWORKED"
+    set     networked    @NETWORKED@
 
 #    set     catviewExe   /home/acd/starbase/cursa/atasks/catview
 #    set     catremoteExe /home/acd/starbase/cursa/catremote/catremote
