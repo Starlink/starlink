@@ -126,7 +126,7 @@
       CALL AST_INIT( STATUS )
 
 *    Obtain name of data file, and get a locator to it.
-      CALL USI_ASSOCI( 'INPUT', 'READ', ILOC, IPRIM, STATUS )
+      CALL USI_ASSOCI( 'INP', 'READ', ILOC, IPRIM, STATUS )
       CALL HDS_TRACE( ILOC, NUMLEVELS, PATH, INPUTFILE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
