@@ -147,7 +147,7 @@
       LOGICAL DFLAG                       ! Performing dead time corrections ?
       LOGICAL LHRI                        ! HRI data ?
       BYTE MASK                           ! BADBITS mask
-      INTEGER LP
+      INTEGER LP,OFID
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
@@ -170,6 +170,7 @@
 *
 *   Clone an output locator
          CALL DAT_CLONE(LOC1,LOCOUT,STATUS)
+         CALL ADI1_MKFILE( LOCOUT, 'UPDATE', OFID, STATUS )
 *
       ELSE
 *
@@ -184,6 +185,7 @@
 *
 *   Copy all components from old file into new file
          CALL HDX_COPY(LOC1,LOCOUT,STATUS)
+         CALL ADI1_MKFILE( LOCOUT, 'WRITE', OFID, STATUS )
 *
       ENDIF
 *
@@ -613,9 +615,9 @@
 *   Trace path of input data.
       CALL USI_NAMEI(NLINES,PATH,STATUS)
 *
-      CALL HIST_ADD(LOCOUT, VERSION, STATUS)
+      CALL HSI_ADD( OFID, VERSION, STATUS)
 *
-      CALL HIST_PTXT(LOCOUT, NLINES, PATH, STATUS)
+      CALL HSI_PTXT( OFID, NLINES, PATH, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error writing history record')

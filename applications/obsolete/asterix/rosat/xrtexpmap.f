@@ -319,7 +319,7 @@ c	From INTEGER to improve exposure time evaluation
 *    Write detector map if needed
       IF ( MAPCHK ) THEN
         CALL XRTEXPMAP_PUTIM( DIMS, PIXSIZE, RMAP,
-     :        'Detector map', ' ', ' ', OFID, STATUS )
+     :        'Detector map', ' ', ' ', MFID, STATUS )
         CALL USI_ANNUL( 'DETMAP', STATUS )
       END IF
 
@@ -826,7 +826,7 @@ C
       REAL SPARR(2)
 
 *  Create interface object
-      CALL BDI_LINK( 'Image', 2, DIMS, 'REAL', OFID, STATUS )
+      CALL BDI_LINK( 'XYimage', 2, DIMS, 'REAL', OFID, STATUS )
 
 *  Write regular axes
       SPARR(1) = (REAL(DIMS(1)/2)-0.5)*PIXSIZ/3600.0
@@ -850,7 +850,7 @@ C
       CALL BDI_PUT( OFID, 'Data', 'REAL', 2, DIMS, DATA, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'XRTEXPMAP_PUTIUM', STATUS )
+        CALL AST_REXIT( 'XRTEXPMAP_PUTIM', STATUS )
       END IF
 
       END
