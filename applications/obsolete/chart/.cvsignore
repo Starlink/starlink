@@ -1,3 +1,7 @@
+*.aux
+*.dvi
+*.log
+sun32.ps
 chart.ifd
 crepar
 chart.csh
