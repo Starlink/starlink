@@ -66,6 +66,7 @@ $libs = "$starlibs $amslibs $fortranlibs";
 WriteMakefile(
     'NAME'	=> 'Starlink::ADAM',
     'VERSION_FROM' => 'ADAM.pm', # finds $VERSION
+    'PREREQ_PM' => { 'Starlink::EMS' => 0 },
     'OPTIMIZE'  => $optimize,
     'LIBS'	=> [ "$libs"],   # e.g., '-lm' 
     'DEFINE'	=> '',     # e.g., '-DHAVE_SOMETHING' 
