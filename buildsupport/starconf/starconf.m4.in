@@ -53,6 +53,13 @@ AC_SUBST(STAR_BUILD_DEPENDENCIES)dnl
 STAR_USE_DEPENDENCIES=''
 AC_SUBST(STAR_USE_DEPENDENCIES)dnl
 
+dnl    Create a PACKAGE_VERSIONINT variable, which contains the
+dnl    package's version number as an integer major*1e6+minor*1e3+release.
+dnl    NB hairy quoting: quadrigraph @S|@ is replaced by $ after m4 has run.
+PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print @S|@1*1000000+@S|@2*1000+(NF>2 ? @S|@3 : 0)}'`]
+AC_SUBST(PACKAGE_VERSIONINT)
+
+
 dnl    Note: the following adds an EXTRA_DIST variable to the
 dnl    generated Makefile.  automake generates Makefile.in in such a
 dnl    way that that the contents of the $(EXTRA_DIST) variable is
@@ -99,15 +106,14 @@ AC_SUBST(_STAR_INSTALL_DATA_HOOK)
 #
 # Handle generating message, error, and facility files.
 #
-# The argument is the name of the file with the message declarations
+# The argument is the name of one or more files with the message declarations
 # in it, in the format prescribed by the messgen utility.  This
 # defaults to ${PACKAGE}_err.msg.  The macro may be called more than
 # once if you have more than one .msg file in the directory.
 #
 # This adds Makefile rules to create the appropriate _err, _ERR,
-# _err.h and 
-# fac_nnn_err files, and handles installing the latter file to the
-# help directory, and including it in the distribution.
+# _err.h and fac_nnn_err files, and handles installing the latter file
+# to the help directory, and including it in the distribution.
 #
 # The files which this generates should be declared as sources in
 # the Makefile.am if they are to be used in code, or are to be
@@ -118,29 +124,34 @@ AC_SUBST(_STAR_INSTALL_DATA_HOOK)
 #
 AC_DEFUN([STAR_MESSGEN],
          [AC_REQUIRE([_STAR_BOILERPLATE])dnl
-          _s_facfile=m4_ifval([$1], [$1], [${PACKAGE}_err.msg])
-          if test -r $_s_facfile; then
-              : OK
-          else
-              echo "Facility file $_s_facfile missing or not readable"
-              exit 1
-          fi
-          # Extract the facility name and code from the .msg file
-          # Format is `.FACILITY name,code/PREFIX=xxx'
-          eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY *\([a-zA-Z]*\) *, *\([0-9]*\).*/_s_facname=\1; _s_faccode=\2;/p;q;}' $_s_facfile`]
-          _s_facname=`echo $_s_facname | tr '[A-Z]' '[a-z]'`
-          _s_FACNAME=`echo $_s_facname | tr '[a-z]' '[A-Z]'`
-          cat >>$STAR_BOILERPLATE <<EOD
+          _s_facfile="m4_ifval([$1], [$1], [${PACKAGE}_err.msg])"
+          for infile in $_s_facfile
+          do
+              if test -r $infile; then
+                  : OK
+              else
+                  echo "Facility file $infile missing or not readable"
+                  exit 1
+              fi
+              # Extract the facility name and code from the .msg file
+              # Format is `.FACILITY name,code/PREFIX=xxx'
+              AC_MSG_CHECKING([facility and code in $infile])
+              eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/_s_facname=\1; _s_faccode=\2;/p;q;}' $infile`]
+              _s_facname=`echo $_s_facname | tr '[A-Z]' '[a-z]'`
+              _s_FACNAME=`echo $_s_facname | tr '[a-z]' '[A-Z]'`
+              AC_MSG_RESULT([$_s_facname/$_s_faccode])
+              cat >>$STAR_BOILERPLATE <<EOD
 #  Rules for generating files built by the error message system.
 #  ------------------------------------------------------------
-${_s_FACNAME}_ERR:     $_s_facfile; \$(STARLINK)/bin/messgen -F $_s_facfile
-${_s_facname}_err:     $_s_facfile; \$(STARLINK)/bin/messgen -f $_s_facfile
-${_s_facname}_err.h:   $_s_facfile; \$(STARLINK)/bin/messgen -c $_s_facfile
-fac_${_s_faccode}_err: $_s_facfile; \$(STARLINK)/bin/messgen -e $_s_facfile
+${_s_FACNAME}_ERR:     $infile; \$(STARLINK)/bin/messgen -F $infile
+${_s_facname}_err:     $infile; \$(STARLINK)/bin/messgen -f $infile
+${_s_facname}_err.h:   $infile; \$(STARLINK)/bin/messgen -c $infile
+fac_${_s_faccode}_err: $infile; \$(STARLINK)/bin/messgen -e $infile
 EOD
+              STAR_HELP_FILES(fac_${_s_faccode}_err)
+              _STAR_EXTRA_DIST(fac_${_s_faccode}_err)
+          done
           STAR_DECLARE_BUILD_DEPENDENCIES(messgen)
-          STAR_HELP_FILES(fac_${_s_faccode}_err)
-          _STAR_EXTRA_DIST(fac_${_s_faccode}_err)
 ])# STAR_MESSGEN
 
 
@@ -195,6 +206,98 @@ EOD
 ## dnl _STAR_EXTRA_DIST(fac_$1_err)
 ## dnl ])# STAR_FACILITY_CODE
 
+
+
+# STAR_FPP_SOURCES(fpp-sources)
+# -----------------------------
+#
+# Declares one or more files as Fortran files which should be
+# processed by being run through a Fortran preprocessor.  The source
+# files should have the extension .fpp, but should be listed here
+# without any extension.
+#
+# To use the FPP facilities, you must do several things: (i) call the
+# autoconf macros AC_PROG_FPP, AC_PROG_F77 and AC_PROG_LIBTOOL, before
+# calling this macro; (ii) you must declare in _Makefile.am_ that
+# the suffix .fpp exists, by including the line `.fpp.f:' somewhere in
+# the file; (iii) the object you are building must have a
+# dependency on at least one .f file, in order to prompt automake to
+# do its Fortran magic.  For example, the following is a suitable set
+# of declarations
+#
+#    bin_PROGRAMS = example
+#    example_SOURCES = example1.fpp example2.f example3.c
+#    .fpp.f:
+#
+# Requirements (ii) and (iii) are undeniably ugly, but it is difficult
+# to avoid them without patching automake.  They should be regarded as
+# temporary measures, as we may find a way to fix this in future.  See
+# <http://sources.redhat.com/ml/automake/2000-07/msg00043.html> for
+# Martin Wilck's automake patches.
+#
+# Dependency: AC_PROG_FPP, and variables like FPP, depend on the
+# macros in extra-fortran.m4 being extracted by starconf, and
+# make-starconf.in scans for this macro name to tell it to extract the
+# file.
+#
+AC_DEFUN([STAR_FPP_SOURCES],
+         [AC_REQUIRE([_STAR_BOILERPLATE])dnl
+          AC_REQUIRE([AC_PROG_FPP])dnl
+          m4_ifval([$1], [], [AC_FATAL([$0: called with no sources])])dnl
+          if test "$FPP_SOURCE_EXT" = f; then
+              # Preprocessor must be run separately before invoking the
+              # F77 compiler, and we need to declare that the objects
+              # depend on the generated .f files
+              for _t in $1
+              do
+                  cat >>$STAR_BOILERPLATE <<EOD
+$_t.o: $_t.f
+$_t.lo: $_t.f
+EOD
+              done
+              cat >>$STAR_BOILERPLATE <<\_EOD
+.fpp.f:
+	$(FPP) $(DEFS) $(INCLUDES) $(FPPFLAGS) $(CPPFLAGS) $< $(FPP_OUTPUT)
+_EOD
+          else
+              # The compiler can handle .fpp files directly, so add rules
+              # expressing this.  Add DEFAULT_INCLUDES to the compile
+              # flags so that -I. is added -- is this OK (this really
+              # would be better fixed by automake patches...)
+              dnl Use quadrigraph for dollar, to avoid m4 interpreting $[]@
+              cat >>$STAR_BOILERPLATE <<\_EOD
+.fpp.o:
+	$(F77COMPILE) $(DEFAULT_INCLUDES) -c -o @S|@@ `test -f '$<' || echo '$(srcdir)/'`$<
+.fpp.obj:
+	$(F77COMPILE) $(DEFAULT_INCLUDES) -c -o @S|@@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
+.fpp.lo:
+	$(LTF77COMPILE) $(DEFAULT_INCLUDES) -c -o @S|@@ `test -f '$<' || echo '$(srcdir)/'`$<
+_EOD
+          fi
+])# STAR_FPP_SOURCES
+
+
+# STAR_HAVE_F77_OPEN_READONLY
+# ---------------------------
+#
+# Tests if the Fortran compiler supports the READONLY option on the
+# OPEN command.
+AC_DEFUN([STAR_HAVE_F77_OPEN_READONLY],
+         [AC_REQUIRE([AC_PROG_F77])dnl
+          AC_CACHE_CHECK([whether OPEN has the READONLY specifier],
+                         [star_cv_have_f77_open_readonly],
+                         [AC_LANG_PUSH([Fortran 77])dnl
+                          AC_COMPILE_IFELSE(AC_LANG_PROGRAM([],
+                                              [      OPEN(UNIT=99,READONLY)]),
+                                            [star_cv_have_f77_open_readonly=yes],
+                                            [star_cv_have_f77_open_readonly=no])
+                          AC_LANG_POP(Fortran 77)])
+          if test $star_cv_have_f77_open_readonly = yes; then
+              AC_DEFINE([HAVE_F77_OPEN_READONLY], 1,
+                        [Define to 1 if F77 OPEN has the READONLY specifier])
+          fi
+])
+          
 
 
 # _STAR_MAKE_MANIFEST
@@ -594,7 +697,8 @@ _EOD
         cat $_star_boilerplate                          >>Makefile
         rm -f $_star_boilerplate
     else
-        : This is possibly an error, but worry not
+        echo "Ooops, the file $_star_boilerplate seems to have disappeared"
+        # but carry on regardless....
     fi], [_star_boilerplate=$STAR_BOILERPLATE])
 fi])# _STAR_BOILERPLATE
 
