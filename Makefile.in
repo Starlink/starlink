@@ -87,7 +87,7 @@ Makefile.dependencies: componentset.xml
 	    (cd buildsupport/starconf/java \
 	        && $(MAKE) GenerateDependencies.class) \
 	    && $(JAVA) -classpath buildsupport/starconf/java \
-		GenerateDependencies componentset.xml >$@ \
+		GenerateDependencies componentset.xml >$@; \
 	else :; fi
 
 # Make a componentset.xml by concatenating all the component.xml files
