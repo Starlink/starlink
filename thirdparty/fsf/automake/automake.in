@@ -883,7 +883,7 @@ register_language ('name' => 'ppfc',
                    'link' => '$(FC) $(AM_FCFLAGS) $(FCFLAGS) $(STAR_LDFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
                    'lder' => 'FCLD',
                    'ld' => '$(FC)',
-                   'flags' => ['FFLAGS', 'CPPFLAGS'],
+                   'flags' => ['FCFLAGS', 'CPPFLAGS'],
 
                    'compile' => '$(FC) $(FPP_MAKE_FLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(STAR_FCFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
                    'compiler' => 'FCCOMPILE',
