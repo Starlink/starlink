@@ -9,7 +9,7 @@
 *
 *	Contents:	Make growth curves.
 *
-*	Last modify:	07/05/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -34,7 +34,6 @@ Allocate memory for growth curve stuff.
 */
 void	initgrowth()
   {
-   int	ng;
 
   QMALLOC(growth, double, GROWTH_NSTEP);
 
@@ -61,14 +60,14 @@ Build growth curve based on averages.
 void	makeavergrowth(picstruct *field, picstruct *wfield, objstruct *obj)
 
   {
-   float		*fgrowth,*mgrowth;
+   float		*fgrowth;
    double		*growtht,
 			dx,dx1,dy,dy2,mx,my, r2,r,rlim, d, rextlim2, raper,
 			offsetx,offsety,scalex,scaley,scale2, ngamma, locarea,
-			tv, sigtv, area, pix, var, gain, dpos,step,step2,
+			tv, sigtv, area, pix, var, gain, dpos,step,step2, dg,
 			stepdens, backnoise2, prevbinmargin, nextbinmargin;
    int			i,j,n, x,y, x2,y2, xmin,xmax,ymin,ymax, sx,sy, w,h,
-			fymin,fymax, pflag,corrflag, ipos, nflux,nmag;
+			fymin,fymax, pflag,corrflag, ipos;
    LONG			pos;
    PIXTYPE		*strip,*stript, *wstrip,*wstript,
 			pdbkg, wthresh;
@@ -217,7 +216,7 @@ void	makeavergrowth(picstruct *field, picstruct *wfield, objstruct *obj)
         else
           {
           j = (int)(r*stepdens);
-          if (j<ngrowth)
+         if (j<ngrowth)
             {
             growth[j] += pix;
             locarea = 1.0;
@@ -312,9 +311,11 @@ void	makeavergrowth(picstruct *field, picstruct *wfield, objstruct *obj)
       tv = prefs.flux_frac[j]*obj2->flux_auto;
       growtht = growth-1;
       for (i=0; i<n && *(++growtht)<tv; i++);
-      obj2->flux_radius[j] = step*(i ?
-		  i + (tv - *(growtht-1))/(*growtht - *(growtht-1))
-		: tv/(*growth));
+      obj2->flux_radius[j] = step
+		*(i? ((dg=*growtht - *(growtht-1)) != 0.0 ?
+		  	i + (tv - *(growtht-1))/dg
+			: i)
+		: (*growth !=0.0 ?tv/(*growth) : 0.0));
       }
     }
 

@@ -10,7 +10,7 @@
 *	Contents:	functions dealing with on-line filtering of the image
 *			(for detection).
 *
-*	Last modify:	07/05/98
+*	Last modify:	28/08/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -25,6 +25,7 @@
 #include	"fitscat.h"
 #include	"bpro.h"
 #include	"filter.h"
+#include	"image.h"
 
 /******************************** convolve ***********************************/
 /*
@@ -109,7 +110,7 @@ int	getconv(char *filename)
   fgets(str,MAXCHAR,file);
   if (strncmp(str,"CONV",4))
     {
-    close(file);
+    fclose(file);
     return RETURN_ERROR;
     }
 
@@ -207,7 +208,6 @@ int	getneurfilter(char *filename)
 
    catstruct	*fcat;
    tabstruct	*ftab;
-   char		str[MAXCHAR];
    int		ival;
 
 /* We first map the catalog */

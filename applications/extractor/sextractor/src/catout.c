@@ -14,6 +14,7 @@
 *                       24/11/98: PWD, change ASCII_SKYCAT to output
 *                                 real column names. Stop skycattail
 *                                 from being written after file is closed.
+*	Last modify:	28/12/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -109,6 +110,7 @@ void	readcatparams(char *filename)
           {
           QMALLOC(*((char **)key->ptr), char, key->nbytes);
           key->ptr = *((char **)key->ptr);
+          key->allocflag = 1;
           }
         }
 
@@ -178,7 +180,8 @@ void	updateparamflags()
   FLAG(obj2.flux_auto)  |= FLAG(obj2.mag_auto) | FLAG(obj2.magerr_auto)
 			| FLAG(obj2.fluxerr_auto)
 			| FLAG(obj2.kronfactor)
-			| FLAG(obj2.flux_best);
+			| FLAG(obj2.flux_best)
+			| FLAG(obj2.flux_radius);
 
   FLAG(obj2.fluxerr_isocor) |= FLAG(obj2.magerr_isocor)
 				| FLAG(obj2.fluxerr_best);
@@ -225,11 +228,17 @@ void	updateparamflags()
 			| FLAG(obj2.alphas_psf);
 
   FLAG(obj2.fluxerr_psf) |= FLAG(obj2.poserrmx2_psf) | FLAG(obj2.magerr_psf);
+
+  FLAG(obj2.mx2_pc) |= FLAG(obj2.my2_pc) | FLAG(obj2.mxy_pc)
+			| FLAG(obj2.a_pc) | FLAG(obj2.b_pc)
+			| FLAG(obj2.theta_pc);
+
   FLAG(obj2.flux_psf) |= FLAG(obj2.mag_psf) | FLAG(obj2.x_psf)
 			| FLAG(obj2.y_psf) | FLAG(obj2.xw_psf)
 			| FLAG(obj2.fluxerr_psf)
 			| FLAG(obj2.niter_psf)
-			| FLAG(obj2.chi2_psf);
+			| FLAG(obj2.chi2_psf)
+			| FLAG(obj2.mx2_pc);
 
 /*-------------------------------- Others -----------------------------------*/
   FLAG(obj.fwhm) |= FLAG(obj2.fwhmw);
@@ -406,11 +415,9 @@ void	endcat()
    int		i;
 
 /* Free allocated memory for arrays */
-  memset(&outobj, 0, sizeof(outobj));
-  memset(&outobj2, 0, sizeof(outobj2));
   key = objtab->key;
   for (i=objtab->nkey; i--; key=key->nextkey)
-    if (key->naxis)
+    if (key->naxis && key->allocflag)
       free(key->ptr);
 
   switch(prefs.cat_type)

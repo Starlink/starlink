@@ -10,7 +10,7 @@
 *	Contents:	functions for extraction of connected pixels from
 *			a pixmap.
 *
-*	Last modify:	11/08/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -27,6 +27,7 @@
 #include	"clean.h"
 #include	"extract.h"
 #include	"filter.h"
+#include	"image.h"
 #include	"plist.h"
 
 /****************************** scanimage ************************************
@@ -41,7 +42,7 @@ INPUT   Measurement field pointer,
 OUTPUT  -.
 NOTES   -.
 AUTHOR  E. Bertin (IAP & Leiden & ESO)
-VERSION 11/08/98
+VERSION 28/11/98
  ***/
 void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 		int nffield, picstruct *wfield, picstruct *dwfield)
@@ -58,7 +59,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 
    char			*marker, newmarker, *blankpad, *bpt,*bpt0;
    int			co, i,j, flag, luflag,pstop, xl,xl2,yl, cn,
-			nposize, stacksize, w, h, blankh, flaflag, maxpixnb;
+			nposize, stacksize, w, h, blankh, maxpixnb;
    short	       	trunflag;
    PIXTYPE		thresh, relthresh, cdnewsymbol, cdvar,
 			*scan,*dscan,*cdscan,*dwscan,*cdwscan,*scant,*wscan;
@@ -645,7 +646,7 @@ void  sortit(picstruct *field, picstruct *dfield, picstruct *wfield,
 /*------ Not enough mem. for the BLANK vignet: flag the object now */
         cobj->flag |= OBJ_OVERFLOW;
         cobj->blank = cobj->dblank = NULL;
-        sprintf(gstr, "%d,%d", (int) cobj->mx+1, (int) cobj->my+1); /*PWD: change here */
+        sprintf(gstr, "%.0f,%.0f", cobj->mx+1, cobj->my+1);
         warning("Memory overflow during masking for detection at ", gstr);
         }
       }
@@ -725,7 +726,7 @@ INPUT   objlist number,
 OUTPUT  -.
 NOTES   -.
 AUTHOR  E. Bertin (IAP & Leiden & ESO)
-VERSION 13/02/98
+VERSION 28/11/98
  ***/
 void  preanalyse(int no, objliststruct *objlist, int analyse_type)
 
@@ -737,7 +738,7 @@ void  preanalyse(int no, objliststruct *objlist, int analyse_type)
 		mx,my, mx2,my2,mxy, rv, tv,
 		xm,ym, xm2,ym2,xym,
 		temp,temp2, theta,pmx2,pmy2;
-   int		j, x, y, xmin,xmax, ymin,ymax,area2, fdnpix, dnpix;
+   int		x, y, xmin,xmax, ymin,ymax,area2, fdnpix, dnpix;
   
 
 /*-----  initialize stacks and bounds */

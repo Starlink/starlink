@@ -9,7 +9,7 @@
 *
 *	Contents:	Routines for catalog-associations.
 *
-*	Last modify:	03/09/97
+*	Last modify:	29/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -204,8 +204,6 @@ void	init_assoc(picstruct *field)
 
   {
    assocstruct	*assoc;
-   float	bias,scale, *param, min,max;
-   int		i,j, n;
 
 /* Load the assoc-list */
   if (!(assoc = field->assoc = load_assoc(prefs.assoc_name)))
@@ -249,7 +247,7 @@ int	do_assoc(picstruct *field, float x, float y)
   {
    assocstruct	*assoc;
    double	aver;
-   float	dx,dy, rad, rad2, comp, wparam,
+   float	dx,dy, dist, rad, rad2, comp, wparam,
 		*list, *input, *data;
    int		h, step, i, flag, iy, nobj;
 
@@ -258,7 +256,7 @@ int	do_assoc(picstruct *field, float x, float y)
   memset(assoc->data, 0, prefs.assoc_size*sizeof(float));
   aver = 0.0;
 
-  if (prefs.assoc_type == ASSOC_MIN)
+  if (prefs.assoc_type == ASSOC_MIN || prefs.assoc_type == ASSOC_NEAREST)
     comp = BIG;
   else if (prefs.assoc_type == ASSOC_MAX)
     comp = -BIG;
@@ -279,7 +277,7 @@ int	do_assoc(picstruct *field, float x, float y)
     {
     dx = *list - x;
     dy = *(list+1) - y;
-    if (dx*dx+dy*dy<rad2)
+    if ((dist=dx*dx+dy*dy)<rad2)
       {
       flag++;
       input = list+3;
@@ -292,6 +290,13 @@ int	do_assoc(picstruct *field, float x, float y)
       data = assoc->data;
       switch(prefs.assoc_type)
         {
+        case ASSOC_NEAREST:
+          if (dist<comp)
+            {
+            memcpy(data, input, assoc->ndata*sizeof(float));
+            comp = dist;
+            }
+          break;
         case ASSOC_MEAN:
           aver += wparam;
           for (i=assoc->ndata; i--;)

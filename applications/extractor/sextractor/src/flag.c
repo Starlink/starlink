@@ -9,7 +9,7 @@
 *
 *	Contents:	Function related to external flagging.
 *
-*	Last modify:	29/04/98
+*	Last modify:	18/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -31,7 +31,7 @@ INPUT   obj structure,
 OUTPUT  -.
 NOTES   -.
 AUTHOR  E. Bertin (IAP & Leiden & ESO)
-VERSION 29/04/98
+VERSION 18/11/98
  ***/
 void	getflags(objstruct *obj, pliststruct *pixel)
   {
@@ -66,7 +66,7 @@ void	getflags(objstruct *obj, pliststruct *pixel)
             }
         break;
       case FLAG_MIN:
-        imaflag = INT_MAX;
+        imaflag = UINT_MAX;
         for (pixt=pixel+obj->firstpix;pixt>=pixel;
 		pixt=pixel+PLIST(pixt,nextpix))
           if (cimaflag = PLISTFLAG(pixt,flag[i]))
@@ -83,7 +83,7 @@ void	getflags(objstruct *obj, pliststruct *pixel)
           imaflag = 0;
         break;
       case FLAG_MAX:
-        imaflag = INT_MIN;
+        imaflag = 0;
         for (pixt=pixel+obj->firstpix;pixt>=pixel;
 		pixt=pixel+PLIST(pixt,nextpix))
           if (cimaflag = PLISTFLAG(pixt,flag[i]))

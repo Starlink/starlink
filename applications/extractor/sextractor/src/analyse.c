@@ -9,7 +9,7 @@
 *
 *	Contents:	analyse(), endobject()...: measurements on detections.
 *
-*	Last modify:	14/07/98
+*	Last modify:	13/01/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -25,9 +25,11 @@
 #include	"back.h"
 #include	"check.h"
 #include	"assoc.h"
+#include	"astrom.h"
 #include	"plist.h"
 #include	"flag.h"
 #include	"growth.h"
+#include	"image.h"
 #include	"photom.h"
 #include	"psf.h"
 #include	"retina.h"
@@ -38,7 +40,6 @@ void  analyse(picstruct *field, picstruct *dfield, int objnb,
 		objliststruct *objlist)
 
   {
-   int		i;
    objstruct	*obj = objlist->obj+objnb;
 
 /* Do photometry on the detection image if no other image available */
@@ -515,7 +516,7 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 
     newnumber = ++cat.ntotal;
 /*-- update segmentation map */
-    if ((check=prefs.check[CHECK_SEGMENTATION]) && prefs.clean_flag)
+    if (check=prefs.check[CHECK_SEGMENTATION])
       {
        USHORT	*pix;
        USHORT	newsnumber = newnumber,

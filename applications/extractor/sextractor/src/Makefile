@@ -2,7 +2,7 @@
 #
 # general makefile
 #
-# E.BERTIN 12/07/1998
+# E.BERTIN 28/08/1998
 # P.W.Draper 24/11/1998: Remove copy to home directory.
 #
 include Macrodefs.$(SEXMACHINE)
@@ -12,8 +12,8 @@ ALL   = analyse.o assoc.o astrom.o back.o bpro.o catout.o check.o clean.o \
 	extract.o field.o filter.o fitscat.o fitsconv.o fitshead.o fitskey.o \
 	fitsmisc.o fitsread.o fitstab.o fitsutil.o fitswrite.o flag.o graph.o \
 	growth.o image.o interpolate.o main.o makeit.o manobjlist.o misc.o \
-	neurro.o photom.o plist.o poly.o prefs.o psf.o readimage.o refine.o \
-	retina.o scan.o som.o weight.o libwcs_c.a
+	neurro.o pc.o photom.o plist.o poly.o prefs.o psf.o readimage.o \
+	refine.o retina.o scan.o som.o weight.o libwcs_c.a
 STDH  = define.h globals.h types.h
 STDO  = 
 
@@ -24,8 +24,8 @@ clean:
 	$(RM) $(ALL) sex
 	($(CD) wcs && $(MAKE) clean)
 
-analyse.o: $(STDH) $(STDO) analyse.c back.h check.h assoc.h photom.h plist.h \
-		growth.h psf.h
+analyse.o: $(STDH) $(STDO) analyse.c assoc.h back.h check.h growth.h image.h \
+		photom.h plist.h growth.h psf.h
 	$(CC) $(COPTS) -c analyse.c
 
 assoc.o: $(STDH) $(STDO) assoc.c assoc.h
@@ -55,7 +55,7 @@ extract.o: $(STDH) $(STDO) extract.c extract.h plist.h
 field.o: $(STDH) $(STDO) field.c field.h interpolate.h
 	$(CC) $(COPTS) -c field.c
 
-filter.o: $(STDH) $(STDO) filter.c filter.h
+filter.o: $(STDH) $(STDO) filter.c bpro.h filter.h image.h
 	$(CC) $(COPTS) -c filter.c
 
 fitscat.o: $(STDH) $(STDO) fitscat.c fitscat_defs.h fitscat.h
@@ -116,6 +116,9 @@ misc.o: $(STDH) $(STDO) misc.c
 neurro.o: $(STDH) $(STDO) neurro.c neurro.h
 	$(CC) $(COPTS) -c neurro.c         
 
+pc.o: $(STDH) $(STDO) pc.c image.h psf.h
+	$(CC) $(COPTS) -c pc.c
+
 photom.o: $(STDH) $(STDO) photom.c photom.h
 	$(CC) $(COPTS) -c photom.c
 
@@ -128,7 +131,7 @@ poly.o: $(STDH) $(STDO) poly.c poly.h
 prefs.o: $(STDH) $(STDO) prefs.c prefs.h
 	$(CC) $(COPTS) -c prefs.c
 
-psf.o: $(STDH) $(STDO) psf.c psf.h
+psf.o: $(STDH) $(STDO) psf.c image.h psf.h
 	$(CC) $(COPTS) -c psf.c
 
 readimage.o: $(STDH) $(STDO) readimage.c check.h interpolate.h weight.h
@@ -137,7 +140,7 @@ readimage.o: $(STDH) $(STDO) readimage.c check.h interpolate.h weight.h
 refine.o: $(STDH) $(STDO) refine.c extract.h plist.h
 	$(CC) $(COPTS) -c refine.c
 
-retina.o: $(STDH) $(STDO) retina.c retina.h fitscat.h
+retina.o: $(STDH) $(STDO) retina.c image.h retina.h fitscat.h
 	$(CC) $(COPTS) -c retina.c
 
 scan.o: $(STDH) $(STDO) scan.c check.h clean.h extract.h plist.h

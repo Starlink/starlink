@@ -3,7 +3,19 @@ This version slightly modified by Peter W. Draper 24 November 1998.
 - Changed ASCII_SKYCAT to output correct column names (fixed id, ra,
   dec and mag no longer needed).
 
-This is V2.0.15 (August 20 1998). New features include:
+This is V2.0.19 (January 13 1999). New features include:
+- SEGMENTATION numbering problem fixed.
+- New Makefile macro-definitions.
+
+This is V2.0.18 (December 28 1998). New features include:
+- lint warnings fixed.
+- new ASSOC_TYPE NEAREST option.
+- MAP_RMS measurement mode and FLAG_TYPE MAX bugs fixed.
+- new BACK_TYPE, BACK_VALUE and THRESH_TYPE parameters.
+- FLUX_RADIUS does no longer require FLUX_AUTO.
+- documentation slightly improved.
+
+/*- Previous notes for V2.0.15 (August 20 1998) */
 - ``Purify'' warnings and memory leaks fixed in several parts of the program.
 - BLANKing bug of CLEANed pixels fixed.
 
@@ -13,7 +25,7 @@ This is V2.0.15 (August 20 1998). New features include:
 
 /*- Previous notes for V2.0.13 (July 23 1998) */
 - 2 small (but fatal on some machines) bug fixes.
-- Comments (beginning with #) now allowed at every line in .param files
+- Comments (beginning with #) now allowed at every line in .param files.
 - Default parameters updated in the config files (reflecting the increase
   of processing power during the last years!!)
 
