@@ -26,10 +26,34 @@ AC_PROG_LIBTOOL
 AC_HEADER_STDC
 AC_PATH_XTRA
 
+AC_ARG_WITH([motif], 
+             AC_HELP_STRING([--with-motif[=path]],
+             [use XMotif (default location /usr/X11R6)]),
+  [if test "$withval" = "yes"; then
+    # Default place
+    LIBS="$LIBS -L/usr/X11R6/lib"
+    CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
+  elif test "$withval" = "no"; then
+    : # We do nothing
+  else
+    XMLIBDIR=$withval/lib
+    XMINCDIR=$withval/include
+    LIBS="$LIBS -L$XMLIBDIR"
+    CPPFLAGS="$CPPFLAGS -I$XMINCDIR"
+  fi])
+
+AC_CHECK_HEADER([Xm/XmP.h], set have_xmheader = "yes" ) 
+AC_CHECK_LIB(Xm, xmp_PrependWidget, set have_xmlib = "yes" )
+AM_CONDITIONAL( HAVE_XMOTIF, \
+   [test "$have_xmheader" = "yes" && test "$test_xmlib" = "yes"] )
+     
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl    Should investigate whether we really need this for a non-starlink
+dnl    encumbered pgplot
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

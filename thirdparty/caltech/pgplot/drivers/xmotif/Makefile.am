@@ -1,15 +1,16 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libXmPgplot.la
-libXmPgplot_la_SOURCES = $(C_ROUTINES)
+if HAVE_XMOTIF
+  lib_LTLIBRARIES = libXmPgplot.la
+  libXmPgplot_la_SOURCES = $(C_ROUTINES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+  include_HEADERS = $(PUBLIC_INCLUDES)
 
-C_ROUTINES = XmPgplot.c
+  C_ROUTINES = XmPgplot.c
+ 
+  PUBLIC_INCLUDES = XmPgplot.h
+  PRIVATE_INCLUDES = XmPgplotP.h
 
-PUBLIC_INCLUDES = XmPgplot.h
-PRIVATE_INCLUDES = XmPgplotP.h
+  AM_CFLAGS = -DPG_PPU -I../
 
-AM_CFLAGS = -DPG_PPU -I../
-
-# testing
+endif
