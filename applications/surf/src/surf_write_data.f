@@ -79,10 +79,6 @@
 *     SHIFT_DY = REAL (Read)
 *        The pointing shift (in Y) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinate frame.
-*     USE_SECTION = LOGICAL (Read)
-*        If you wish to discard the data specified by the SCUBA Section
-*        then select 'no'. If you wish to rebin a map using only
-*        the specified section select 'yes'.
 *     WEIGHT = REAL (Read)
 *        The relative weight that should be assigned to each dataset.
 
@@ -94,13 +90,15 @@
 *     Data is still returned if Variance is bad.
 *     - The REF and IN parameters accept ASCII text files as input. These
 *     text files may contain comments (signified by a #), NDF names,
-*     values for the parameters WEIGHT, SHIFT_DX, SHIFT_DY and USE_SECTION,
+*     values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
 *     and names of other ASCII files. There is one data file per line.
-*     An example entry is:
+*     An example file is:
 *
-*         file1{b5}   1.0   0.5   0.0  YES
-*         # This is file2
-*         file2       0.9   0.0   0.0  # No section needed
+*         file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
+*         file2                        # Read file 2 but you will still be
+*                                      # prompted fro WEIGHT, and shifts.
+*         file3{i3}-  1.0   0.0   0.0  # Use everything except int 3
+*         test.bat                     # Read in another text file
 *
 *     Note that the parameters are position dependent and are not necessary.
 *     Missing parameters are requested. This means it is not possible to
