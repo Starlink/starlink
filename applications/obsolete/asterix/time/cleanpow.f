@@ -90,17 +90,18 @@
       REAL            TIMRES, TIMDIF, TMAX, TMIN,
      &                HPBW, HPBWR, NPHPBW, TWOMOM, FORMOM
 
-      INTEGER         NOPRT,  LGFXL, LGFYL
-*
+      INTEGER         NOPRT
       REAL			FREST
 *
 *    Local data :
+*
       DATA CHAINT/'0','1','2','3','4','5','6','7','8','9'/
+*
 *    Version :
-      CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'CLEANPOW  version 1.8-0')
+*
+      CHARACTER*30		VERSION
+        PARAMETER               ( VERSION = 'CLEANPOW  version 1.8-0' )
 *-
-      IF (STATUS .NE. SAI__OK) RETURN
 
 *  Initialise
       CALL MSG_PRNT(VERSION)
@@ -395,10 +396,10 @@ C        IF(LGXFL.EQ.1)XMIN =0.5*NUFREQ(1)
 
          INTEGER    N, NN, MAXITE, NOAVER, NOPRT,
      +              KMIN, KMAX, MAXBIN, DMAX, SMOOTH,
-     +              ITECNT,ITEFLG, OVERFR, DIST1, DIST2
+     +              ITECNT,ITEFLG, DIST1, DIST2
 
          REAL       T(N), X(N), W(N), CLNLIM, WIDTH, MAXFR, MINFR,
-     +              FREQST, NFREQ, POWR, WIND0, WI, CNST,
+     +              FREQST, NFREQ, POWR, WI, CNST,
      +              MAXFRE, TLRG, TSML, RK
 
          DOUBLEPRECISION  GAIN, FREQ, FRSTEP, FRSTP, ANGLE,
