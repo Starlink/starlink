@@ -5,6 +5,7 @@ Makefile
 manifest
 manifest
 manifest-omit
+CATALOG-override.header
 README
 SGML.RCS
 starlink.decl.diff
