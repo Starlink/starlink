@@ -381,8 +381,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
-      INCLUDE 'NUM_DEC_CVT'
-      INCLUDE 'NUM_DEF_CVT'
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'CCD1_PAR'         ! General CCDPACK constants
       INCLUDE 'CCD1_MOSPR'       ! Constants specific to MAKEMOS & DRIZZLE
@@ -499,6 +497,9 @@
       LOGICAL SWCS                   ! WCS component present if .TRUE. 
       LOGICAL VAR                    ! Variance array present?
 
+*  Internal references:
+      INCLUDE 'NUM_DEC_CVT'      ! Conversion declarations
+      INCLUDE 'NUM_DEF_CVT'      ! Conversion definitions
 *.
 
 *  Check inherited global status.
