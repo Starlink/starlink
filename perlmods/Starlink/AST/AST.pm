@@ -10,7 +10,7 @@ require DynaLoader;
 use base qw| DynaLoader |;
 
 
-$VERSION = '0.01';
+$VERSION = '0.03';
 
 bootstrap Starlink::AST $VERSION;
 
@@ -302,6 +302,17 @@ sub Copy {
   return bless $new, ref($self);
 }
 
+# Converts a generic Starlink::AST object into the true
+# underlying class. Useful when we have extracted a pointer
+# from AST but do not yet know what type of object it is
+
+sub _rebless {
+  my $self = shift;
+  my $ast_class = $self->GetC( "Class" );
+  my $perl_class = "Starlink::AST::" . $ast_class;
+  return bless $self, $perl_class;
+}
+
 package Starlink::AST::Axis;
 use base qw/ Starlink::AST /;
 
@@ -319,9 +330,7 @@ sub Read {
   my $new = $self->_Read();
   return if !defined $new;
   return if ! keys %$new; # Nothing returned from FitsChan
-  my $ast_class = $new->GetC( "Class" );
-  my $perl_class = "Starlink::AST::" . $ast_class;
-  return bless $new, $perl_class;
+  return $new->_rebless();
 }
 
 
@@ -330,6 +339,26 @@ use base qw/ Starlink::AST::Channel /;
 
 package Starlink::AST::XmlChan;
 use base qw/ Starlink::AST::Channel /;
+
+# Not clear why we need this class in the Perl API since we can
+# just use a perl hash
+package Starlink::AST::KeyMap;
+use base qw/ Starlink::AST /;
+
+# Need to convert the returned object(s) into a real object(s)
+
+sub MapGet0A {
+  my $self = shift;
+  my $obj = $self->_MapGet0A( $_[0] );
+  return if !defined $obj;
+  return $obj->_rebless();
+}
+
+sub MapGet1A {
+  my $self = shift;
+  my @obj = $self->_MapGet1A( $_[0] );
+  return map { $_->_rebless() } @obj;
+}
 
 package Starlink::AST::Mapping;
 use base qw/ Starlink::AST /;
@@ -364,6 +393,9 @@ use base qw/ Starlink::AST::Mapping /;
 package Starlink::AST::PolyMap;
 use base qw/ Starlink::AST::Mapping /;
 
+package Starlink::AST::RateMap;
+use base qw/ Starlink::AST::Mapping /;
+
 package Starlink::AST::ShiftMap;
 use base qw/ Starlink::AST::Mapping /;
 
@@ -390,6 +422,12 @@ use base qw/ Starlink::AST::Mapping /;
 
 package Starlink::AST::Frame;
 use base qw/ Starlink::AST::Mapping /;
+
+package Starlink::AST::Region;
+use base qw/ Starlink::AST::Frame /;
+
+package Starlink::AST::FluxFrame;
+use base qw/ Starlink::AST::Frame /;
 
 package Starlink::AST::FrameSet;
 use base qw/ Starlink::AST::Frame /;
@@ -572,5 +610,7 @@ use base qw/ Starlink::AST::Frame /;
 package Starlink::AST::DSBSpecFrame;
 use base qw/ Starlink::AST::SpecFrame /;
 
+package Starlink::AST::SpecFluxFrame;
+use base qw/ Starlink::AST::CmpFrame /;
 
 1;
