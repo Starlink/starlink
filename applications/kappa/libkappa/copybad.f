@@ -89,6 +89,8 @@
 *        - Make the grammar of the NBAD message dependant on the value of
 *          NBAD, and include the name of the output NDF.
 *        - Sort local variable declarations into alphabetical order.
+*     20-SEP-2000 (DSB):
+*        - Correct mapping mode for output NDF from WRITE to UPDATE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -148,7 +150,7 @@
 
 * Map the NDF DATA arrays.
       CALL NDF_MAP( REF, 'Data', TY_IN, 'READ', P_REF, NEL, STATUS )
-      CALL NDF_MAP( OUT, 'Data', TY_IN, 'WRITE', P_OUT, NEL, STATUS )
+      CALL NDF_MAP( OUT, 'Data', TY_IN, 'UPDATE', P_OUT, NEL, STATUS )
       
 *  If required, map the VARIANCE array.
       CALL NDF_STATE( IN, 'Variance', VAR, STATUS )
