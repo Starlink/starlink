@@ -114,6 +114,9 @@
       GXY( 2 ) = DBLE( YC )
       CALL AST_TRANN( MAP, 1, 2, 1, GXY, .TRUE., NAX, 1, CXY, STATUS )
 
+*  Normalise the position.
+      CALL AST_NORM( FRM, CXY, STATUS )
+
 *  Assume all axis values are good in the required Frame.
       GOOD = .TRUE.
 
