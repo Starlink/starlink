@@ -104,6 +104,13 @@
 *  Check the inherited global status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
+       WRITE(*,*) '-----------------------'
+      DO I = 1, CTM__NAMED
+         write(*,*) CTM_NAM( I )
+      END DO
+
+
+
 *  Make a version of the name in uppercase less leading blanks.
       CNAME = NAME
       CALL CHR_UCASE( CNAME )
@@ -211,6 +218,7 @@
 *  increment the colour counter.
             MATCH = CNAME( :LEN ) .EQ. CTM_NAM( I )( :LEN )
             IF( MATCH ) THEN
+      write(*,*) 'Match!!!'
                R = CTM_RGB( 1, I )
                G = CTM_RGB( 2, I )
                B = CTM_RGB( 3, I )

@@ -1,0 +1,46 @@
+*  Purpose:
+*     Declares common block used to communicate the KAPPA standard
+*     colour set.
+
+*  Notes:
+*     -  CTM_PAR must be included in routines that access the CTM
+*     common block.
+*     -  In BLOCK DATA the RGB array is broken into two because of the
+*     restriction of 19 continuation lines.  It therefore does not
+*     include this routine, and any changes here must be reflected in
+*     CTM_XCOLS.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1991 July 19 (MJC):
+*        Original version.
+*     1992 March 16 (MJC):
+*        Split the common block from CTM_COLOURSET to CTM_COLNM and
+*        CTM_COLIN in order to separate the characters from the
+*        floating-point values as permitted by the standard.
+*     1992 March 27 (MJC):
+*        Increased the size of the names to twenty for the MIT colour
+*        set, and also added facility prefix to the common variables.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Common block /CTM_COLIN/
+*
+*        CTM_RGB( 3, CTM__NAMED ) = REAL
+*           The normalised RGB intensities of the named colours.
+*
+*  Common block /CTM_COLNM/
+*
+*        CTM_NAM( CTM__NAMED ) = CHARACTER * 20
+*           The names of each of the predefined colours.
+
+      REAL	      CTM_RGB( 3, CTM__NAMED )
+      CHARACTER * 20  CTM_NAM( CTM__NAMED )
+
+      COMMON /CTM_COLIN/  CTM_RGB
+      COMMON /CTM_COLNM/  CTM_NAM

@@ -5,13 +5,15 @@ lib_LTLIBRARIES = libkpg.la
 libkpg_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(PRIVATE_INCLUDES) \
+	$(BLOCK_DATA_FILES) \
 	$(F_ROUTINES) \
 	$(C_ROUTINES) 
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-PUBLIC_INCLUDES = KPG_AST HLPCMD
+PUBLIC_INCLUDES = KPG_AST HLPCMD CTM_COM CTM_PAR
 PRIVATE_INCLUDES = KPG_PAR
+BLOCK_DATA_FILES = ctm_xcols.f
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c  kpg1_trmsz.c \
 kpg1_ieeer.c  kpg1_isfinr.c  kpg1_tkast.c

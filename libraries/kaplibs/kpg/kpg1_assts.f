@@ -141,6 +141,8 @@
 *  Set the attribute in the Plot. If required, check that the attribute 
 *  is not already set in the Plot.
             IF( OVER .OR. .NOT. AST_TEST( IPLOT, NAME, STATUS ) ) THEN
+      write(*,*) 'AST_SETC: '//NAME( : CHR_LEN( NAME ) )//' = '//
+     :           VALUE( : CHR_LEN( VALUE ) )
                CALL AST_SETC( IPLOT, NAME( : CHR_LEN( NAME ) ), 
      :                        VALUE( : CHR_LEN( VALUE ) ), STATUS )
             END IF
