@@ -93,7 +93,7 @@ void adamprint( FILE *file, char *fmt, ... )
 /* Check for any remainder of format */
    if ( p != pstart ) {
 /* Remove any escape sequences and write to token */
-/* N.B. ASSUMED 4 CHARACTER SEQUENCE */
+/* N.B. ASSUMED 4 CHARACTER SEQUENCE -- PWD: overrun here somewhere*/
       for ( i=pstart,j=tok; *i; *j++=*i++ )
          if ( *i == '\33' ) i = i+4;
       *j = '\0';

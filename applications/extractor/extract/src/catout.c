@@ -13,6 +13,10 @@
 *                       23/10/98 (AJC):
 *                          Make SKYCAT header have correct column headings
 *                          Assume 1 block header for FITS.
+*                       25/11/98 (PWD):
+*                          SKYCAT_ASCII files where closed before the
+*                          skycattail string was written, this crashed 
+*                          on Linux.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -449,12 +453,13 @@ void	endcat()
       break;
 
     case ASCII_SKYCAT:
+      /* PWD: move fprintf to before fclose */
+      fprintf(ascfile, skycattail);
       if (!prefs.pipe_flag)
         fclose(ascfile);
       objtab->key = NULL;
       objtab->nkey = 0;
       free_tab(objtab);
-      fprintf(ascfile, skycattail);
       break;
 
     case FITS_LDAC:
