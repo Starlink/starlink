@@ -324,7 +324,7 @@ export:
 prepare:
 
 check_packages:
-[available] Jan 2, 2004 5:19:55 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jan 3, 2004 5:20:00 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -655,6 +655,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/jsky-2.0.zip
