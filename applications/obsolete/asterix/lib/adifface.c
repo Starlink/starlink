@@ -588,7 +588,7 @@ F77_SUBROUTINE(adifn(defrep))( CHARACTER(name), INTEGER(id),
   _ERR_OUT;
   }
 
-F77_SUBROUTINE(dervd)( INTEGER(id), CHARACTER(name), LOGICAL(der),
+F77_SUBROUTINE(adifn(dervd))( INTEGER(id), CHARACTER(name), LOGICAL(der),
 		       INTEGER(status) TRAIL(name) )
   {
   GENPTR_INTEGER(id)
