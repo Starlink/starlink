@@ -101,10 +101,6 @@
 *
       INTEGER STATUS
 *
-*    Function declarations :
-*
-      INTEGER                	CHR_LEN
-*
 *    Local constants :
 *
       INTEGER                	ASM__MXLEV            	! Maximum data levels

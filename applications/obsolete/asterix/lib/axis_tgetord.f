@@ -61,7 +61,6 @@
       INTEGER                         IDIMS(ADI__MXDIM)    ! Input dimensions
       INTEGER                         MIAX                 ! Moved axis index
 
-      LOGICAL                         DOMOVES              ! Move axes?
       LOGICAL                         USED(ADI__MXDIM)     ! Dimension used?
 *-
 
@@ -79,62 +78,57 @@
           END DO
 
 *      Locate each axis whose order is specified
-          IF ( DOMOVES ) THEN
-            IAX = 1
-            DO IAX = 1, LEN(AXORD)
+          IAX = 1
+          DO IAX = 1, LEN(AXORD)
 
-*          Try to locate next axis quantity
-              IF ( CHR_ISDIG( AXORD(IAX:IAX) ) ) THEN
-                CALL CHR_CTOI( AXORD(IAX:IAX), MIAX, STATUS )
-              ELSE
-                CALL BDI0_FNDAXC( FID, AXORD(IAX:IAX), MIAX, STATUS )
-              END IF
-              IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*          Store axis no
-              MAXOR(IAX) = MIAX
-              MDIMS(IAX) = IDIMS(MIAX)
-              USED(MIAX) = .TRUE.
-
-            END DO
-
-*        Any dimensions not covered by specification
-            IF ( IAX .LT. NDIM ) THEN
-              MIAX = IAX + 1
-              DO IAX = 1, NDIM
-                IF ( .NOT. USED(IAX) ) THEN
-                  MAXOR(MIAX) = IAX
-                  MDIMS(MIAX) = IDIMS(IAX)
-                  MIAX = MIAX + 1
-                END IF
-              END DO
+*        Try to locate next axis quantity
+            IF ( CHR_ISDIG( AXORD(IAX:IAX) ) ) THEN
+              CALL CHR_CTOI( AXORD(IAX:IAX), MIAX, STATUS )
+            ELSE
+              CALL BDI0_FNDAXC( FID, AXORD(IAX:IAX), MIAX, STATUS )
             END IF
+            IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-          ELSE
+*        Store axis no
+            MAXOR(IAX) = MIAX
+            MDIMS(IAX) = IDIMS(MIAX)
+            USED(MIAX) = .TRUE.
+
+          END DO
+
+*      Any dimensions not covered by specification
+          IF ( IAX .LT. NDIM ) THEN
+            MIAX = IAX + 1
             DO IAX = 1, NDIM
-              MAXOR(IAX) = IAX
-              MDIMS(IAX) = IDIMS(IAX)
-            END DO
-
-          END IF
-
-*      Pad output dimensions to 7D
-          IF ( NDIM .LT. ADI__MXDIM ) THEN
-            DO IAX = NDIM + 1, ADI__MXDIM
-              MAXOR(IAX) = IAX
-              MDIMS(IAX) = 1
+              IF ( .NOT. USED(IAX) ) THEN
+                MAXOR(MIAX) = IAX
+                MDIMS(MIAX) = IDIMS(IAX)
+                MIAX = MIAX + 1
+              END IF
             END DO
           END IF
 
-*      Any axis moves required?
-          NEED_MOVES = .FALSE.
-          IF ( DOMOVES ) THEN
-            DO IAX = 1, NDIM
-              NEED_MOVES = ( NEED_MOVES .OR. ( MAXOR(IAX) .NE. IAX ) )
-            END DO
-          END IF
+        ELSE
+          DO IAX = 1, NDIM
+            MAXOR(IAX) = IAX
+            MDIMS(IAX) = IDIMS(IAX)
+          END DO
 
         END IF
+
+*    Pad output dimensions to 7D
+        IF ( NDIM .LT. ADI__MXDIM ) THEN
+          DO IAX = NDIM + 1, ADI__MXDIM
+            MAXOR(IAX) = IAX
+            MDIMS(IAX) = 1
+          END DO
+        END IF
+
+*    Any axis moves required?
+        NEED_MOVES = .FALSE.
+        DO IAX = 1, NDIM
+          NEED_MOVES = ( NEED_MOVES .OR. ( MAXOR(IAX) .NE. IAX ) )
+        END DO
 
 *    Report error
   99    IF ( STATUS .NE. SAI__OK ) THEN
