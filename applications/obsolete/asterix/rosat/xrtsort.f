@@ -1362,6 +1362,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *   Check status - return if bad
       IF (STATUS .NE. SAI__OK) RETURN
 
+	print*,mdim1,mdim2
+
       SCALE(1)=-HEAD.PIXEL*MRES/3600.0
       SCALE(2)=HEAD.PIXEL*MRES/3600.0
       BASE(1)=-MDIM1/2*SCALE(1)+SCALE(1)/2.0
@@ -1396,6 +1398,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 
         ENDDO
       ENDDO
+
+	print*,imin,imax,jmin,jmax
 
       XC=XTOT/REAL(NPIX)
       YC=YTOT/REAL(NPIX)
