@@ -109,7 +109,7 @@
 *            Check returned value
               IF ( MIAX .EQ. 0 ) THEN
                 STATUS = SAI__ERROR
-                CALL MSG_SETC( 'AX', AXORD(BEG:END)) )
+                CALL MSG_SETC( 'AX', AXORD(BEG:END) )
                 CALL ERR_REP( ' ', 'Unable to find axis ^AX', STATUS )
 
               ELSE IF ( MIAX .LT. 0 ) THEN
