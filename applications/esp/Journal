@@ -1,4 +1,3 @@
-!-*-Mode: Text; fill-prefix: "  ";-*-
 
 18-20 August 1998
 
@@ -83,10 +82,26 @@ Oct-Nov 1999
 	sources:
 
 	  * Export the appropriate version of the source set.
+	  * LaTeX the documentation.
 	  * Build the HTML version of the documentation, using
-	    `star2html sun180', and bundle that into a tar file using
+	    `star2html -aux sun180', and bundle that into a tar file using
 	    `tar cf sun180.htx_tar sun180.htx'.
-	  * Make a new source bundle with `./mk new_esp_source.tar'
-	    then `./mk export_source' (the precise reason for the
+	  * Make a new source bundle with
+		./mk new_esp_source.tar
+		mv new_esp_source.tar esp_source.tar
+		./mk export_source
+	    (the precise reason for the
 	    extra step is lost in the mists of time, but something
 	    goes wrong if you don't do it).
+
+5 December 1999
+
+	Assorted tweaks and bug fixes were required by the GAIA
+	interface.  This takes ESP to 0.10-2.
+
+
+
+Local Variables:
+mode: text
+fill-prefix: "  "
+End:

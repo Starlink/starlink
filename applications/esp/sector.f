@@ -2017,8 +2017,8 @@
             CALL MSG_SETI('ELEMS',ELEMS)
             CALL ERR_REP(' ','AUTOL: pixel (^XCO,^YCO) out of range'
      :           //' for array size ^ELEMS',STATUS)
-            GOTO 9999
             OCOUNT=VAL__BADR
+            GOTO 9999
          ELSE
             OCOUNT=ARRAY(ARRAYIDX)
          ENDIF

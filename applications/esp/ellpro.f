@@ -6410,7 +6410,9 @@ c     :              '^DEV   ^POI  ^STAT'
       include 'SAE_PAR'
       
       
-      if (status .ne. sai__ok) return
+      if (status .ne. sai__ok) then
+         elp1_median = 0.0
+         goto 9999
       
 *   First, copy the good elements of the array to the workspace
       l = 0
