@@ -3117,17 +3117,17 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       END IF
 
-*    Annul response
+*  Annul response
       IF ( IN_DATASET ) THEN
         CALL DAT_ANNUL( SLOC, STATUS )
       ELSE
-        CALL USI_TANNUL( SID, STATUS )
+        CALL USI_ANNUL( 'MASK', STATUS )
       END IF
 
-*    Reset workspace
+*  Reset workspace
       RF_RESPTR(SLOT) = 0
 
-*    Abort point
+*  Abort point
  99   CONTINUE
 
       END

@@ -490,7 +490,7 @@
 
 *    Release OUTPUT
       CALL BDI_RELEASE( OFID, STATUS )
-      CALL USI_TANNUL( OFID, STATUS )
+      CALL USI_ANNUL( 'OUT', STATUS )
 
 *    Release input
       IF ( SSDS ) THEN
@@ -498,7 +498,7 @@
       ELSE
         CALL BDI_RELEASE( IFID, STATUS )
       END IF
-      CALL USI_TANNUL( IFID, STATUS )
+      CALL USI_ANNUL( 'INP', STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()

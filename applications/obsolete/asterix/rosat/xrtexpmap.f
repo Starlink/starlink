@@ -322,7 +322,7 @@ c	From INTEGER to improve exposure time evaluation
         CALL BDI_MAPDATA( MFID, 'WRITE', MPTR, STATUS )
         CALL ARR_COP1R( DIMS(1)*DIMS(2), RMAP, %VAL(MPTR), STATUS )
         CALL BDI_RELEASE( MFID, STATUS )
-        CALL USI_TANNUL( 'DETMAP', STATUS )
+        CALL USI_ANNUL( 'DETMAP', STATUS )
       END IF
 
 *    Center the instrument map, invert the Y-axis, and turn it real.
