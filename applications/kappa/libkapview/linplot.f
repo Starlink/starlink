@@ -772,7 +772,7 @@
          XSIGMA = ABS( XSIGMA )
 
 *  Tell the user what XSIGMA value we are using.
-         CALL MSG_SETC( 'XS', XSIGMA )
+         CALL MSG_SETR( 'XS', XSIGMA )
          CALL MSG_OUT( 'LINPLOT_MSG1', '  Errors in position will be '//
      :                 'displayed as ^XS sigma errors.', STATUS )
 
@@ -837,7 +837,7 @@
          YSIGMA = ABS( YSIGMA )
 
 *  Tell the user what YSIGMA value we are using.
-         CALL MSG_SETC( 'YS', YSIGMA )
+         CALL MSG_SETR( 'YS', YSIGMA )
          CALL MSG_OUT( 'LINPLOT_MSG2', '  Errors in data value will '//
      :                 'be displayed as ^YS sigma errors.', STATUS )
 
