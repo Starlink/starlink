@@ -1381,6 +1381,7 @@
       INCLUDE 'elp_par'               ! ELLPRO constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
+      INCLUDE 'PAR_ERR'               ! PAR constants
 
 
 *  Status:     
@@ -1775,31 +1776,20 @@ C      END IF
 
          END IF     
       
-*      Output a text file containing results if required.
+*      Output a text file containing results if required.  This is done
+*      only once, rather than once for each source as in elp1_fmode.
          CALL ELP1_TEXTO(0,NDF1,VALIDP,ZEROP,
      :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
      :        SIGMA,PSIZE,LBND,.TRUE.,FIOD,EXCLAIM,STATUS)
          
          CALL ERR_MARK
-         CALL PAR_STATE ('OUTCAT',I,STATUS)
-         IF (STATUS .EQ. SAI__OK) THEN
-            CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
-     :           RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
-     :           SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
-         ELSE
-            IF (STATUS .EQ. SUBPAR__NULL) THEN
-*            that's OK: do nothing except annul the `error'
-               CALL ERR_ANNUL (STATUS)
-            ENDIF
+         CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
+     :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
+     :        SIGMA,PSIZE,LBND,.TRUE.,STATUS)
+         IF (STATUS .EQ. PAR__NULL) THEN
+            CALL ERR_ANNUL (STATUS)
          ENDIF
          CALL ERR_RLSE
-
-c         CALL PAR_STATE ('OUTCAT',I,STATUS)
-c         IF (I .NE. SUBPAR__NULL) THEN
-c            CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
-c     :           RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
-c     :           SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
-c         ENDIF
 
 *      An appropriate place to exit to if the dynamic memory has already
 *      been allocated.
@@ -2734,6 +2724,7 @@ c         ENDIF
       LOGICAL FRZORI                  ! Is the galaxy origin frozen?
       LOGICAL INOKAY                  ! Was the most recent input value okay
                                       ! scale length regression
+      LOGICAL WRITECAT                ! Output a catalogue?
       INTEGER ELEMS                   ! Total number of pixels in the NDF
       INTEGER FIOD                    ! Output FIO file descriptor
       INTEGER FIOID                   ! Input FIO file descriptor
@@ -2804,6 +2795,14 @@ c         ENDIF
 
 *   Get the WCS frameset for the NDF.
       CALL NDF_GTWCS(NDF1,IWCS,STATUS)
+
+*   Are we to write a catalogue output file?
+      CALL PAR_STATE ('OUTCAT',I,STATUS)
+      IF (I .NE. SUBPAR__NULL) THEN
+         WRITECAT = .TRUE.
+      ELSE
+         WRITECAT = .FALSE.
+      ENDIF
 
 *   Get the image bounds and also the size of the axes in pixels.
       CALL NDF_BOUND(NDF1,2,LBND,UBND,NDIM,STATUS)
@@ -2998,11 +2997,18 @@ c         ENDIF
       CALL PSX_FREE(POINT3(1),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
      
-*   Open a file.
+*   Open a text output file.
       CALL ELP1_TEXTO(1,NDF1,VALIDP,ZEROP,
      :     RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
      :     SIGMA,PSIZE,LBND,.TRUE.,FIOD,EXCLAIM,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998                         
+      
+*   If requested, open a catalogue output file, too
+      IF (WRITECAT) THEN
+         CALL ELP1_CATO(1, NDF1, 0, 0.0,
+     :        RESULT, 0, 0, 0.0, 0.0, BACK,
+     :        0.0, 0.0, 0, .TRUE., STATUS)
+      ENDIF
 
 *   Look at each of the image location found in the text file.
       CALL MSG_BLANK(STATUS)
@@ -3039,6 +3045,12 @@ c         ENDIF
      :           FIOD,EXCLAIM,STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 9998                         
          END IF
+         
+         IF (WRITECAT) THEN
+            CALL ELP1_CATO(2, NDF1, VALIDP, ZEROP,
+     :           RESULT, ELP__NRES, ELP__MXPOI, XCO, YCO, BACK,
+     :           SIGMA, PSIZE, LBND, .TRUE.,STATUS)
+         ENDIF
 
 *      Tell the user what happened.
          IF (VALIDP.LT.1) THEN 
@@ -3054,18 +3066,21 @@ c         ENDIF
      
 *   Close the opened file.
       IF (.NOT.EXCLAIM) THEN
-        CALL ELP1_TEXTO(3,NDF1,VALIDP,ZEROP,
-     :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACKS(I),
-     :        SIGMA,PSIZE,LBND,.TRUE.,
-     :        FIOD,EXCLAIM,STATUS)
+*      The only required arguments in mode=3 are mode, fiod and status, so 
+*      pass suitably-typed dummys for the others.
+        CALL ELP1_TEXTO(3,0,0,0.0,RESULT,0,0,0.0,0.0,BACKS(1),
+     :        0.0,0.0,0,.TRUE.,FIOD,.FALSE.,STATUS)
+C        CALL ELP1_TEXTO(3,NDF1,VALIDP,ZEROP,
+C     :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACKS(I),
+C     :        SIGMA,PSIZE,LBND,.TRUE.,
+C     :        FIOD,EXCLAIM,STATUS)
         IF (STATUS.NE.SAI__OK) GOTO 9998                         
       END IF
 
-      CALL PAR_STATE ('OUTCAT',I,STATUS)
-      IF (I .NE. SUBPAR__NULL) THEN
-      CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
-     :     RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
-     :     SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
+      IF (WRITECAT) THEN
+         CALL ELP1_CATO(3, NDF1, 0, 0.0,
+     :        RESULT, 0, 0, 0.0, 0.0, BACK,
+     :        0.0, 0.0, 0, .TRUE., STATUS)
       ENDIF
 
 *   An appropriate place to exit to if the dynamic memory has already
@@ -3087,6 +3102,10 @@ c         ENDIF
 
 *   End the NDF context.
       CALL NDF_END(STATUS)                              
+
+*   Debug the HDS system
+      CALL HDS_SHOW ('FILES', STATUS)
+      CALL HDS_SHOW ('LOCATORS', STATUS)
 
       END
 
@@ -4278,6 +4297,7 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
       INCLUDE 'elp_par'               ! ELLPRO constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
+      INCLUDE 'PAR_ERR'               ! PAR constants
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -4583,12 +4603,14 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
      :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,SIGMA,
      :        PSIZE,LBND,.TRUE.,FIOD,EXCLAIM,STATUS)
 
-         CALL PAR_STATE ('OUTCAT',I,STATUS)
-         IF (I .NE. SUBPAR__NULL) THEN
-            CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
-     :           RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
-     :           SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
+         CALL ERR_MARK
+         CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
+     :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
+     :        SIGMA,PSIZE,LBND,.TRUE.,STATUS)
+         IF (STATUS .EQ. PAR__NULL) THEN
+            CALL ERR_ANNUL (STATUS)
          ENDIF
+         CALL ERR_RLSE
 
 *      An appropriate place to exit to if the dynamic memory has already
 *      been allocated.

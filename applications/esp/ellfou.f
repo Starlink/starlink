@@ -1929,9 +1929,9 @@
      :        SIGMA,PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
 
          CALL ERR_MARK
-         CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
+         CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
      :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
-     :        SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
+     :        SIGMA,PSIZE,LBND,.FALSE.,STATUS)
          IF (STATUS .EQ. PAR__NULL) THEN
             CALL ERR_ANNUL (STATUS)
          ENDIF
@@ -2717,6 +2717,7 @@
       LOGICAL FILINP                  ! Was a file name input?
       LOGICAL FRZORI                  ! Is the galaxy origin frozen?
       LOGICAL INOKAY                  ! Was the most recent input value okay
+      LOGICAL WRITECAT                ! Output a catalogue?
       INTEGER ELEMS                   ! Total number of pixels in the NDF
       INTEGER FIOD                    ! Output FIO file descriptor
       INTEGER FIOID                   ! Input FIO file descriptor
@@ -2781,6 +2782,14 @@
 
 *   Get the WCS component for the NDF.
       CALL NDF_GTWCS(NDF1,IWCS,STATUS)
+
+*   Are we to write a catalogue output file?
+      CALL PAR_STATE ('OUTCAT',I,STATUS)
+      IF (I .NE. SUBPAR__NULL) THEN
+         WRITECAT = .TRUE.
+      ELSE
+         WRITECAT = .FALSE.
+      ENDIF
 
 *   Get the image bounds and also the size of the axes in pixels.
       CALL NDF_BOUND(NDF1,2,LBND,UBND,NDIM,STATUS)
@@ -2935,11 +2944,18 @@
       CALL PSX_FREE(POINT3(1),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
-*   Open a file.
+*   Open a text output file.
       CALL ELP1_TEXTO(1,NDF1,VALIDP,ZEROP,
      :     RESULT,17,ELF__MXPOI,XCO,YCO,BACK,SIGMA,
      :     PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998                         
+
+*   If requested, open a catalogue output file, too
+      IF (WRITECAT) THEN
+         CALL ELP1_CATO(1, NDF1, 0, 0.0,
+     :        RESULT, 0, 0, 0.0, 0.0, BACK,
+     :        0.0, 0.0, 0, .FALSE., STATUS)
+      ENDIF
 
 *   Look at each of the image location found in the text file.
       CALL MSG_BLANK(STATUS)
@@ -2976,6 +2992,12 @@ D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
             IF (STATUS.NE.SAI__OK) GOTO 9998                         
          END IF
 
+         IF (WRITECAT) THEN
+            CALL ELP1_CATO(2, NDF1, VALIDP, ZEROP,
+     :           RESULT, 17, ELF__MXPOI, XCO, YCO, BACK,
+     :           SIGMA, PSIZE, LBND, .FALSE.,STATUS)
+         ENDIF
+
 *      Tell the user what happened.
          IF (VALIDP.LT.1) THEN 
             CALL MSG_OUT(' ','FAILED!!!',STATUS)
@@ -2996,14 +3018,11 @@ D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
          IF (STATUS.NE.SAI__OK) GOTO 9998                         
       END IF
 
-      CALL ERR_MARK
-      CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
-     :     RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
-     :     SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
-      IF (STATUS .EQ. PAR__NULL) THEN
-         CALL ERR_ANNUL (STATUS)
+      IF (WRITECAT) THEN
+         CALL ELP1_CATO(3, NDF1, 0, 0.0,
+     :        RESULT, 0, 0, 0.0, 0.0, BACK,
+     :        0.0, 0.0, 0, .FALSE., STATUS)
       ENDIF
-      CALL ERR_RLSE
 
 *   An appropriate place to exit to if the dynamic memory has already
 *   been allocated.
@@ -4340,9 +4359,9 @@ D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
      :        SIGMA,PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
 
          CALL ERR_MARK
-         CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
+         CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
      :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
-     :           SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
+     :           SIGMA,PSIZE,LBND,.FALSE.,STATUS)
          IF (STATUS .EQ. PAR__NULL) THEN
             CALL ERR_ANNUL (STATUS)
          ENDIF

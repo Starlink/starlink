@@ -24,9 +24,9 @@
 *     most recent galaxy profile/fit generated.
 *
 *     The parameter MODE is used as follows:
-*         MODE=0  Do the actions described below.
+*         MODE=0  Do all the actions in modes 1, 2 and 3.
 *         MODE=1  Open file
-*         MODE=2  Save headings, save data  and close the file.
+*         MODE=2  Save headings and data.
 *         MODE=3  Close the file.
 *
 *     All radii values output are measured in pixels.
