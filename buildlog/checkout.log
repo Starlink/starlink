@@ -7323,6 +7323,7 @@ U java/source/table/src/main/uk/ac/starlink/table/ColumnScratchTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
+U java/source/table/src/main/uk/ac/starlink/table/EditableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomStarTable.java
@@ -7340,6 +7341,7 @@ U java/source/table/src/main/uk/ac/starlink/table/UCD.java
 U java/source/table/src/main/uk/ac/starlink/table/UnknownTableFormatException.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfoMapGroup.java
+U java/source/table/src/main/uk/ac/starlink/table/WrapperColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
@@ -7357,6 +7359,7 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableSaver.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/TableRowHeader.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/ValueInfoCellEditor.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/ValueInfoCellRenderer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/WriterFileFilter.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/package.html
@@ -7589,6 +7592,7 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/GridPlotter.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HDSDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HDUDataNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/HDXDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLDocComponentMaker.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLProcessor.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLViewer.java
