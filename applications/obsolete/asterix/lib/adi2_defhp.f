@@ -95,6 +95,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU identifier
       INTEGER			LUN			! Logical unit
 *.
@@ -109,7 +110,9 @@
       CALL ADI2_GETLUN( FID, LUN, STATUS )
 
 *  Set the heap size
+      FSTAT = 0
       CALL FTPTHP( LUN, NBYTES, FSTAT )
+      IF ( FSTAT .NE. 0 ) CALL ADI2_FITERP( FSTAT, STATUS )
 
 *  Flag HDU as defined and release it
       CALL ADI_CPUT0L( HID, '.DEF_END', .TRUE., STATUS )
