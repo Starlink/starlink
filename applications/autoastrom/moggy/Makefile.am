@@ -17,4 +17,4 @@ moggy_SOURCES = \
 moggy_LDADD = $(LIBOBJS) -lm -lcnf
 #moggy_LDADD = $(LIBOBJS) -lm `cnf_link`
 
-EXTRA_DIST = moggy-doc.txt LICENCE
+EXTRA_DIST = moggy-doc.txt LICENCE t
