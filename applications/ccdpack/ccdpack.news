@@ -2,6 +2,16 @@
  
   This is a minor update to CCDPACK. 
 
+  The MEDIAN combination method is now much faster when combining many 
+  images. This equates to a speed up of 100% when combining 50 images
+  with variances. Combining 15 images or less remains at the same speed as
+  before.
+
+  A even faster combination method FASTMED has been introduced. This
+  is a plain median which does not use weights. This is about 50%
+  faster than MEDIAN when combining 50 images and is within 10% of
+  MEAN for this number of images. 
+
   The CCDALIGN application has been changed so that images of
   different sizes are displayed at different scales.
 
@@ -11,10 +21,11 @@
   The FINDOBJ application has been changed so that the error resulting 
   from not detecting objects on an image may be overriden.
 
+
   CCDPACK is fully described in SUN/139 and can be viewed on-line using 
   the "showme sun139" command. The latest information about CCDPACK 
   problems is always available at:
 
      <URL: http://star-www.dur.ac.uk/~pdraper/ccdpack>
 
-  Peter Draper 10 November 1998, (P.W.Draper@durham.ac.uk).
+  Peter Draper 18 November 1998, (P.W.Draper@durham.ac.uk).

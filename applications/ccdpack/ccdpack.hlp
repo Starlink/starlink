@@ -149,16 +149,26 @@
 
 1 Changes_this_release
 
- This is a minor update to CCDPACK (v2.2-3).
+  This is a minor update to CCDPACK. 
 
- The CCDALIGN application has been changed so that images of different
- sizes are displayed at different scales. 
+  The MEDIAN combination method is now much faster when combining many 
+  images. This equates to a speed up of 100% when combining 50 images
+  with variances. Combining 15 images or less remains at the same speed as
+  before.
 
- The FLATCOR application has been changed to trap divide by zero
- on Linux and OSF/1.
+  A even faster combination method FASTMED has been introduced. This
+  is a plain median which does not use weights. This is about 50%
+  faster than MEDIAN when combining 50 images and is within 10% of
+  MEAN for this number of images. 
 
- The FINDOBJ application has been changed so that the error resulting 
- from not detecting objects on an image may be overridden.
+  The CCDALIGN application has been changed so that images of
+  different sizes are displayed at different scales.
+
+  The FLATCOR application has been changed to trap divide by zero
+  on Linux and OSF/1.
+
+  The FINDOBJ application has been changed so that the error resulting 
+  from not detecting objects on an image may be overriden.
 
 1 CALCOR
 Subtracts a scaled dark or flash calibration image from a series of
@@ -3824,7 +3834,7 @@ METHOD = LITERAL (Read)
 
       -  MEAN      -- Mean of the input data values
 
-      -  MEDIAN    -- Median of the input data values
+      -  MEDIAN    -- Weighted median of the input data values
 
       -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
                       alpha of the values are removed from
@@ -3846,6 +3856,8 @@ METHOD = LITERAL (Read)
 
       -  CLIPMED   -- A sigma clipped median (like SIGMA except
                       that the median of the clipped values is used)
+
+      -  FASTMED    -- Unweighted median of the input data values
    [MEDIAN]
 3 MIN
 MIN = _REAL (Read)
@@ -4139,7 +4151,7 @@ METHOD = LITERAL (Read)
 
       -  MEAN      -- Mean of the input data values
 
-      -  MEDIAN    -- Median of the input data values
+      -  MEDIAN    -- Weighted median of the input data values
 
       -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
                       alpha/2 of the values are removed from
@@ -4161,6 +4173,8 @@ METHOD = LITERAL (Read)
 
       -  CLIPMED   -- A sigma clipped median (like SIGMA except
                       that the median of the clipped values is used)
+
+      -  FASTMED    -- Unweighted median of the input data values
    [MEDIAN]
 3 MIN
 MIN = _REAL (Read)
@@ -4422,7 +4436,7 @@ METHOD = LITERAL (Read)
 
       -  MEAN      -- Mean of the input data values
 
-      -  MEDIAN    -- Median of the input data values
+      -  MEDIAN    -- Weighted median of the input data values
 
       -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
                       alpha of the values are removed from
@@ -4444,6 +4458,8 @@ METHOD = LITERAL (Read)
 
       -  CLIPMED   -- A sigma clipped median (like SIGMA except
                       that the median of the clipped values is used)
+
+      -  FASTMED    -- Unweighted median of the input data values
    [MEDIAN]
 3 MIN
 MIN = _REAL (Read)
@@ -4732,7 +4748,7 @@ METHOD = LITERAL (Read)
 
       -  MEAN      -- Mean of the input data values
 
-      -  MEDIAN    -- Median of the input data values
+      -  MEDIAN    -- Weighted median of the input data values
 
       -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
                       alpha of the values are removed from
@@ -4754,6 +4770,8 @@ METHOD = LITERAL (Read)
 
       -  CLIPMED   -- A sigma clipped median (like SIGMA except
                       that the median of the clipped values is used)
+
+      -  FASTMED    -- Unweighted median of the input data values
    [MEDIAN]
 3 MIN
 MIN = _REAL (Read)

@@ -17,10 +17,10 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {139.9}
 \newcommand{\stardocauthors}   {Peter W. Draper}
-\newcommand{\stardocdate}      {10 November 1998}
+\newcommand{\stardocdate}      {18 November 1998}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
-\newcommand{\stardocversion}   {Version 2.2-3}
+\newcommand{\stardocversion}   {Version 2.3-0}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {
 CCDPACK is a package of programs for reducing CCD-like data. They
@@ -3278,7 +3278,7 @@ output mosaics.
 CCDPACK supports many different methods of data combination:
 \begin{itemize}
 \item MEAN
-\item MEDIAN
+\item WEIGHTED MEDIAN
 \item TRIMMED MEAN
 \item MODE
 \item SIGMA CLIPPED MEAN
@@ -3286,6 +3286,7 @@ CCDPACK supports many different methods of data combination:
 \item MINIMUM AND MAXIMUM EXCLUSION MEAN
 \item BROADENED MEDIAN
 \item SIGMA CLIPPED MEDIAN
+\item UNWEIGHTED MEDIAN
 \end{itemize}
 
 The aim is to provide you with a fairly exhaustive list of ways in which
@@ -3296,9 +3297,10 @@ follows:
 \begin{myquote}
 \begin{description}
 \item[MEAN] a weighted mean.
-\item[MEDIAN] a weighted median. The weighted average of the values nearest to
-the half weight value. A more even handed estimator than the ordinary median
-which takes no account of the errors in the individual measurements.
+\item[WEIGHTED MEDIAN] a weighted median. The weighted average of the
+values nearest to the half weight value. A more even handed estimator
+than the ordinary median which takes no account of the errors in the
+individual measurements.
 \item[TRIMMED MEAN] Alpha trimmed mean. The final estimate is the mean of the
 values excluding the alpha (a fraction between 0 and 0.5) upper and lower
 values.
@@ -3326,6 +3328,10 @@ after rejecting those outside of a given number of standard deviations
 of the initial mean. The standard deviation is derived from data
 variances if available, otherwise a standard deviation based on the
 variation of the data is used.
+\item[UNWEIGHTED MEDIAN] an unweighted median. A simple median of the 
+data values. No weighting is taken into account. This is significantly 
+faster than the weighted median, but takes no account of the known
+errors in the measurements.
 \end{description}
 \end{myquote}
 
@@ -7817,7 +7823,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                MEAN      -- Mean of the input data values
 
             \sstitem
-               MEDIAN    -- Median of the input data values
+               MEDIAN    -- Weighted median of the input data values
 
             \sstitem
                TRIMMED   -- An \qt{alpha trimmed mean} in which a fraction
@@ -7844,6 +7850,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                                number of central values)
             \sstitem
                CLIPMED   -- A sigma clipped median
+
+            \sstitem
+               FASTMED   -- Unweighted median of the input data values
 
             [MEDIAN]
          }
@@ -8185,7 +8194,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                MEAN      -- Mean of the input data values
 
             \sstitem
-               MEDIAN    -- Median of the input data values
+               MEDIAN    -- Weighted median of the input data values
 
             \sstitem
                TRIMMED   -- An \qt{alpha trimmed mean} in which a fraction
@@ -8214,6 +8223,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             \sstitem
                CLIPMED   -- A sigma clipped median
 
+            \sstitem
+               FASTMED   -- Unweighted median of the input data values
             [MEDIAN]
          }
       }
@@ -8528,7 +8539,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                MEAN      -- Mean of the input data values
 
             \sstitem
-               MEDIAN    -- Median of the input data values
+               MEDIAN    -- Weighted median of the input data values
 
             \sstitem
                TRIMMED   -- An \qt{alpha trimmed mean} in which a fraction
@@ -8556,6 +8567,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             \sstitem
                CLIPMED   -- A sigma clipped median
 
+            \sstitem
+               FASTMED   -- Unweighted median of the input data values
             [MEDIAN]
          }
       }
@@ -8901,7 +8914,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                MEAN      -- Mean of the input data values
 
             \sstitem
-               MEDIAN    -- Median of the input data values
+               MEDIAN    -- Weighted median of the input data values
 
             \sstitem
                TRIMMED   -- An \qt{alpha trimmed mean} in which a fraction
@@ -8929,6 +8942,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             \sstitem
                CLIPMED   -- A sigma clipped median
 
+            \sstitem
+               FASTMED   -- Unweighted median of the input data values
             [MEDIAN]
          }
       }
@@ -12762,16 +12777,29 @@ The propagation of QUALITY in the \xroutine{MAKEBIAS},
 \xroutine{TRANNDF} when
 propagating QUALITY has been corrected.
 
-\subsection{This release 2.2-3}
+\subsection{This release 2.3-0}
+A minor update to CCDPACK.
+\begin{itemize}
+\item  The MEDIAN combination method is now much faster when combining many 
+  images. This equates to a speed up of 100\% when combining 50 images
+  with variances. Combining 15 images or less remains at the same speed as
+  before.
 
-The CCDALIGN application has been changed so that images of different
-sizes are displayed at different scales.
+\item  A even faster combination method FASTMED has been introduced. This
+  is a plain median which does not use weights. This is about 50\%
+  faster than MEDIAN when combining 50 images and is within 10\% of
+  MEAN for this number of images. 
 
-The FLATCOR application has been changed to trap divide by zero on
-Linux and OSF/1.
+\item  The \xroutine{CCDALIGN} application has been changed so that images of
+  different sizes are displayed at different scales.
 
-The FINDOBJ application has been changed so that the error resulting 
-from not detecting objects on an image may be overridden.
+\item  The \xroutine{FLATCOR} application has been changed to trap 
+  divide by zero on Linux and OSF/1.
+
+\item  The \xroutine{FINDOBJ} application has been changed so that the
+  error resulting from not detecting objects on an image may be
+  overriden. 
+\end{itemize}
 
 \begin{latexonly}
 
