@@ -48,6 +48,9 @@
 #        Merged GaiaImage into this class. This removes the need to
 #        modify RtdImageCtrl. All code relating to float_panel is
 #        removed as are changes for with_warp.
+#     24-NOV-1999 (PDRAPER):
+#        Added zoom to selected region changes (bound to Shift-1 and 
+#        Shift-2).
 #     {enter_changes_here}
 
 #-
@@ -69,6 +72,10 @@ itcl::class gaia::GaiaImageCtrl {
       lappend tags mytag$this
       bindtags $canvas_ $tags
 
+      #  Add bindings to zoom the main window about the cursor position.
+      $canvas_ bind $imageId_ <Shift-1> [code $this zoomin]
+      $canvas_ bind $imageId_ <Shift-2> [code eval $this zoomout]
+
       #  Create an object for handling image names.
       set namer_ [GaiaImageName \#auto]
 
@@ -79,7 +86,6 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Initialise all options.
       eval itk_initialize $args
-
    }
 
    #  Destructor. Remove temporary image if necessary. Withdraw
@@ -97,7 +103,7 @@ itcl::class gaia::GaiaImageCtrl {
          catch {after cancel $after_id_}
       }
 
-      if { $namer_ != {} } { 
+      if { $namer_ != {} } {
 	 catch {delete object $namer_}
       }
    }
@@ -113,7 +119,6 @@ itcl::class gaia::GaiaImageCtrl {
          -image $this \
          -defaultcursor $itk_option(-cursor)
    }
-
 
    #  Make the panel info subwindow. Override to use GaiaImagePanel,
    #  rather than RtdImagePanel. Also remove the make_grid_item capability.
@@ -380,7 +385,7 @@ itcl::class gaia::GaiaImageCtrl {
 
 	 #  Parse name to deal with slices etc. and make this current.
 	 $namer_ configure -imagename $file
-	 if { [$namer_ exists] } { 
+	 if { [$namer_ exists] } {
             configure -file [$namer_ fullname]
          } else {
             error_dialog "There is no file named '$file'" $w_
@@ -608,6 +613,76 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
+   #  Select a region of the image and zoom to show as much of it as
+   #  possible. 
+   public method zoomin {} {
+
+      #  Record current zoom.
+      save_zoom_
+
+      #  Now start drawing out the region.
+      $itk_component(draw) set_drawing_mode region [code $this zoom_to_region_]
+   }
+
+   #  Zoom to a displayed region.
+   protected method zoom_to_region_ {canvas_id x0 y0 x1 y1} {
+      set dw [$image_ dispwidth]
+      set dh [$image_ dispheight]
+      set cw [winfo width $canvas_]
+      set ch [winfo height $canvas_]
+      if {$cw != 1 && $dw && $dh} {
+
+         #  Zoom image to fit the marked region. Keep in range and
+         #  make sure it is never zero.
+         set rw [expr abs($x1-$x0)]
+         set rh [expr abs($y1-$y0)]
+         set xs [expr int(0.75*$dw/$rw)]
+         set ys [expr int(0.75*$dh/$rh)]
+         set scale [max $itk_option(-min_scale) [min $xs $ys $itk_option(-max_scale)]]
+         if { $scale == 0 } { 
+            set scale 1
+         }
+         scale $scale $scale
+
+         #  Now scroll to new position. Re-get bbox of item.
+         lassign [$canvas_ bbox $canvas_id] x0 y0 x1 y1
+         set x [expr ($x1+$x0)/2.0] 
+         set y [expr ($y1+$y0)/2.0]
+         set dw [$image_ dispwidth]
+         set dh [$image_ dispheight]
+         $canvas_ xview moveto [expr (($x-$cw/2.0)/$dw)]
+         $canvas_ yview moveto [expr (($y-$ch/2.0)/$dh)]
+      } 
+
+      #  Remove region item.
+      $itk_component(draw) delete_object $canvas_id
+   }
+
+   #  Reset zoom and scroll to value set by last zoomin.
+   public method zoomout {} {
+      if { [info exists lastzoom_] } {
+         incr nlastzoom_ -1
+         set nlastzoom_ [max 0 $nlastzoom_]
+         scale $lastzoom_($nlastzoom_,Z) $lastzoom_($nlastzoom_,Z)
+         $canvas_ xview moveto $lastzoom_($nlastzoom_,XS) 
+         $canvas_ yview moveto $lastzoom_($nlastzoom_,YS) 
+         maybe_center
+         if { $nlastzoom_ != 0 } {
+            unset lastzoom_($nlastzoom_,Z)
+            unset lastzoom_($nlastzoom_,XS)
+            unset lastzoom_($nlastzoom_,YS)
+         }
+      }
+   }
+
+   #  Save zoom and scroll for reseting.
+   protected method save_zoom_ {} {
+      lassign [$image_ scale] lastzoom_($nlastzoom_,Z) dummy
+      lassign [$canvas_ xview] lastzoom_($nlastzoom_,XS) dummy
+      lassign [$canvas_ yview] lastzoom_($nlastzoom_,YS) dummy
+      incr nlastzoom_
+   }
+
    #  Configuration options.
    #  ======================
 
@@ -697,12 +772,13 @@ itcl::class gaia::GaiaImageCtrl {
    #  Name of image names handler.
    protected variable namer_ {}
 
+   #  Last zoom factor stack.
+   protected variable lastzoom_
+   protected variable nlastzoom_ 0
+
    #  Common variables:
    #  =================
 
    #  Name of fileselection dialog window. Shared between all instances.
    common fileselect_ .imagectrlfs
 }
-
-
-
