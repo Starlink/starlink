@@ -172,29 +172,52 @@ save gap, u;
 u := 80bp;
 long = 2 short = 2u;
 gap = 1/10u;
-squodge = (2gap, 2.5gap);
+squodge = (1/4long, 1/2short);
 yellow = (1,1,0);
 
-ccd2.orig - ccd1.orig = (long, 0) + squodge;
+ccd1.dir = 0;
+ccd2.dir = ccd1.dir + 180;
+ccd2.orig - ccd1.orig = (2long+2gap, -2short-gap) + squodge;
 ccd1.orig = (0, long+gap) + (gap, gap);
 
 grey1 = .4[white,yellow];
 grey2 = .8[white,yellow];
 
+pair a.orig, b.orig, c.orig;
+path a, b, c;
+x0a = x3a = 0;
+y0a = y1a = 0;
+x1a - x0a = x2a - x3a = short;
+y0a - y3a = y1a - y2a = long;
+a = (z0a -- z1a -- z2a -- z3a -- cycle);
+b = a rotated 90 shifted (short+gap,-short);
+c = b shifted (0,-short-gap);
+a.orig = z0a;
+b.orig = z0a + (short+gap,0);
+c.orig = b.orig - (0,short+gap);
+
 forsuffixes t=1,2:
-   x0t = x3t = xpart ccd.t.orig;
-   y0t = y1t = ypart ccd.t.orig;
-   x1t - x0t = x2t - x3t = short;
-   y0t - y3t = y1t - y2t = long;
-   ccd.t.a = z0t -- z1t -- z2t -- z3t -- cycle;
-   ccd.t.b = ccd.t.a shifted (-ccd.t.orig)
-                     rotated 90
-                     shifted (ccd.t.orig+(short+gap,-short));
-   ccd.t.c = ccd.t.b shifted (0, -gap-short);
-   ccd.t.a.orig = ccd.t.orig;
-   ccd.t.b.orig = ccd.t.orig + (short+gap, 0);
-   ccd.t.c.orig = ccd.t.b.orig - (0, short+gap);
+   forsuffixes s=a,b,c:
+      ccd.t.s = s rotated ccd.t.dir shifted ccd.t.orig;
+      ccd.t.s.orig = s.orig rotated ccd.t.dir shifted ccd.t.orig;
+   endfor;
 endfor;
+
+% forsuffixes t=1,2:
+%    x0t = x3t = xpart ccd.t.orig;
+%    y0t = y1t = ypart ccd.t.orig;
+%    x1t - x0t = x2t - x3t = short;
+%    y0t - y3t = y1t - y2t = long;
+%    ccd.t.a = (z0t -- z1t -- z2t -- z3t -- cycle) 
+%                   shifted (-ccd.t.orig) rotated ccd.t.dir shifted ccd.t.orig;
+%    ccd.t.b = (ccd.t.a shifted (-ccd.t.orig)
+%                       rotated 90
+%                       shifted (ccd.t.orig+(short+gap,-short)));
+%    ccd.t.c = (ccd.t.b shifted (0, -gap-short));
+%    ccd.t.a.orig = ccd.t.orig;
+%    ccd.t.b.orig = ccd.t.orig + (short+gap, 0);
+%    ccd.t.c.orig = ccd.t.b.orig - (0, short+gap);
+% endfor;
 
 forsuffixes t=1,2:
    fill ccd.t.a withcolor grey1;
@@ -202,8 +225,9 @@ forsuffixes t=1,2:
    fill ccd.t.c withcolor grey1;
 endfor;
 
-fill buildcycle(ccd1b, ccd2a) withcolor grey2;
-fill buildcycle(ccd1c, ccd2a) withcolor grey2;
+fill buildcycle(ccd1b, ccd2c) withcolor grey2;
+fill buildcycle(ccd1c, ccd2b) withcolor grey2;
+fill buildcycle(ccd1b, ccd2b) withcolor grey2;
 
 forsuffixes t=1,2:
    draw ccd.t.a;
@@ -214,9 +238,9 @@ endfor;
 label.lrt("1a", ccd1a.orig);
 label.lrt("1b", ccd1b.orig);
 label.lrt("1c", ccd1c.orig);
-label.lrt("2a", ccd2a.orig);
-label.lrt("2b", ccd2b.orig);
-label.lrt("2c", ccd2c.orig);
+label.ulft("2a", ccd2a.orig);
+label.ulft("2b", ccd2b.orig);
+label.ulft("2c", ccd2c.orig);
 
 
 endfig;
