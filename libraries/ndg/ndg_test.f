@@ -10,10 +10,10 @@
 *     Starlink Fortran 77
 
 *  Type of Module:
-*     PROGRAM
+*     Program
 
 *  Invocation:
-*     RUN NDG_TEST
+*     ndg_test
 
 *  Description:
 *     This program tests the installation of the  NDG
@@ -107,8 +107,8 @@
 
 *  Get a group containing the three sdf names.
       IGRP2 = GRP__NOID
-      CALL NDG1_ASEXP( 'TOM,DICK,HARRY', GRP__NOID, IGRP2, SIZE, FLAG, 
-     :                 STATUS )
+      CALL NDG1_ASEXP( 'TOM,DICK,HARRY', .TRUE., GRP__NOID, IGRP2, 
+     :                 SIZE, FLAG, STATUS )
 
 *  Delete the original group.
       CALL GRP_DELET( IGRP, STATUS )
