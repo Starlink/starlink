@@ -18,6 +18,10 @@
 #        Modified Save to avoid long integer image identifiers (i.e. IMGID
 #        values) producing "integer value too large to represent" message.
 #        Added RestoreMask and DumpMask procedures.
+#     3-NOV-1998 (DSB):
+#        LoadTask now writes error messages to the terminal screen as well
+#        as a Tk window. DrawGwm modified to use KAPPA V0.13 version of
+#        DISPLAY. 
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -2761,7 +2765,7 @@ proc DrawGwm {} {
    } {
       set cx [lindex $centre 0]
       set cy [lindex $centre 1]
-      set centre "\[$cx,$cy\]"
+      set centre "$cx,$cy"
    
 # Decide on the scaling to use. Check for the user having locked the
 # scaling. If the data range being very low, use "flash" mode (otherwise
@@ -2785,9 +2789,11 @@ proc DrawGwm {} {
          }
       }
 
+      puts $centre
+
 # Display the image section centred correctly. 
       if { [Obey kapview display "in=\"$data\" $pars badcol=0 device=$DEVICE \
-                                  cosys=world xmagn=! ymagn=! centre=$centre" ] } {
+                                  axes=no centre=\"$centre\"" ] } {
 
 # Indicate that the image has been displayed.
          set ok 1
@@ -8014,6 +8020,7 @@ proc LoadTask {task file} {
 # Load the task.
    set taskload [list adamtask $task $file ]
    if {[catch $taskload error] != 0} {
+      puts "Error loading task $task (file $file): \"$error\". Aborting..."
       Message "Error loading task $task (file $file): \"$error\". Aborting..."
       exit 1
    }
@@ -8024,6 +8031,7 @@ proc LoadTask {task file} {
       after 100
       incr count
       if {$count > 100} {
+         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
          Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
          $task kill
          exit 1
@@ -8042,6 +8050,7 @@ proc LoadTask {task file} {
    }
 
    if { ![info exists RENDEVOUS($task)] } {
+      puts "Cannot find the rendevous file for $task."
       Message "Cannot find the rendevous file for $task."
       exit 1
    }

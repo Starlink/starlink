@@ -53,6 +53,9 @@
 #        Options/Mapping Types/OE Mapping menu when dealing with
 #        polarimetric data. Added sub-menus to File/Dump and File/Restore
 #        menus.
+#     3-NOV-1998 (DSB):
+#        Ensure the current WCS Frame in the copies of the supplied input
+#        images is PIXEL. 
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -901,9 +904,11 @@
       }
 
 # Make a copy of the supplied image (ensuring it is in NDF format), and
-# push it onto the image's IMAGE_STACK.
+# push it onto the image's IMAGE_STACK. Ensure the current WCS Frame in the
+# NDF is pixel co-ordinates.
       set copy [UniqueFile]
       Obey ndfpack ndfcopy "in=$imsec out=$copy" 1
+      Obey ndfpack wcsframe "ndf=$copy frame=pixel"
       set IMAGE_STACK($image) $copy
       set EFFECTS_MAPPINGS($image) ""
       set EFFECTS_STACK($image) ""
