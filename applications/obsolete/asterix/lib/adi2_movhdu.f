@@ -124,21 +124,17 @@
       CALL ADI2_GETLUN( FID, LUN, STATUS )
       FSTAT = 0
       CALL ADI_CGET0L( ID, 'Created', CREATED, STATUS )
-      IF ( CREATED ) THEN
-        CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
-        IF ( FSTAT .EQ. 107 ) FSTAT = 0
+      IF ( .NOT. CREATED ) THEN
         CALL FTCRHD( LUN, FSTAT )
         IF ( FSTAT .NE. 0 ) THEN
           CALL ADI2_FITERP( FSTAT, STATUS )
         END IF
         CALL ADI_CPUT0L( ID, 'Created', .TRUE., STATUS )
-      ELSE
-        CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
       END IF
-      IF ( (FSTAT.NE.0) .AND. (FSTAT.NE.107) ) THEN
+      CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
+      IF ( FSTAT .EQ. 107 ) FSTAT = 0
+      IF ( FSTAT .NE. 0 ) THEN
         CALL ADI2_FITERP( FSTAT, STATUS )
-      ELSE IF ( FSTAT .EQ. 107 ) THEN
-        FSTAT = 0
       END IF
 
 *  Report any errors
