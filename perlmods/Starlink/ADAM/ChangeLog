@@ -1,3 +1,9 @@
+1999-05-20  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* ADAM.pm: Tidy up POD
+
+	* Makefile.PL: Use Starlink::Config
+
 1998-10-14  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* ADAM.xs: Tidy up autoload so that it uses int rather than double 

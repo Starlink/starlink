@@ -2,7 +2,7 @@ package Starlink::ADAM;
 
 =head1 NAME
 
-  Starlink::ADAM - Perl extension for the ADAM messaging system
+Starlink::ADAM - Perl extension for the ADAM messaging system
 
 =head1 SYNOPSIS
 
@@ -14,25 +14,26 @@ package Starlink::ADAM;
 
 =head1 DESCRIPTION
 
-  This module provides an interface to the ADAM messaging system. 
+This module provides an interface to the ADAM messaging system. 
 The AMS C library routines are accessible directly or they can be 
 accessed via wrapper routines that handle the most commonly used
 combinations.
 
-  The Starlink::AMS::Task module can be used to provide higher level
+The Starlink::AMS::Task module can be used to provide higher level
 access to AMS.
 
 =head1 Exported functions
 
 The AMS library routines are:
 
-    ams_astint ams_astmsg ams_exit ams_extint ams_getreply ams_init
-    ams_path ams_plookup ams_receive ams_reply ams_send
+ams_astint() ams_astmsg() ams_exit() ams_extint() ams_getreply() ams_init()
+ams_path() ams_plookup() ams_receive() ams_reply() ams_send()
 
 The wrapper routines are:
 
-    adam_getreply adam_receive adam_reply adam_send adam_start adam_path
-    adam_exit adam_strtocont adam_strtostatus adam_appendstatus
+adam_getreply() adam_receive() adam_reply() adam_send() adam_start()
+adam_path() adam_exit() adam_strtocont() adam_strtostatus()
+adam_appendstatus()
 
 =head1 Function Descriptions
 
@@ -48,7 +49,7 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $AUTOLOAD);
 # This module requires the Starlink::EMS module to translate
 # the facility error status.
 
-use Starlink::EMS;
+use Starlink::EMS qw/ ems1_get_facility_error /;
 
 require Exporter;
 require DynaLoader;
@@ -73,7 +74,7 @@ require DynaLoader;
 
 Exporter::export_tags('ams','adam');
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -274,8 +275,8 @@ sub adam_process_message {
 Wait for an adam message to arrive on the given path and messid.
 This routine returns an array containing:
 
-   ($command, $task, $inmsg_name, $path, $messid, $facerr, $inmsg_value,
-    $status)
+   ($command, $task, $inmsg_name, $path, $messid, $facerr,
+    $inmsg_value, $status)
 
 where $command is the message type (eg endmsg, inform, paramreq),
 $task is the name of the task (eg kappa), $inmsg_name is the action
@@ -354,8 +355,8 @@ sub adam_getreply {
 Wait for any adam message to arrive - the routine will wait forever if
 necessary. This routine returns an array containing:
 
-   ($command, $task, $inmsg_name, $path, $messid, $facerr, $inmsg_value,
-    $status)
+   ($command, $task, $inmsg_name, $path, $messid, $facerr,
+    $inmsg_value, $status)
 
 where $command is the message type (eg endmsg, inform, paramreq),
 $task is the name of the task (eg kappa), $inmsg_name is the action
@@ -713,11 +714,11 @@ sub adam_strtostatus {
 The adam status is converted to a text string and the message is
 returned. Three arguments are returned in an array context:
 
- $facility is the facility error name (eg NDF)
+$facility is the facility error name (eg NDF)
  
- $ident is the error identifier.
+$ident is the error identifier.
 
- $text is the text of the error message.
+$text is the text of the error message.
 
 =cut
 
@@ -770,15 +771,16 @@ They can be accessed as subroutines eg
 
 =head1 Other requirements
 
-The Starlink::EMS module is also required.
+The Starlink::EMS module is required.
+
+=head1 SEE ALSO
+
+perl(1). L<Starlink::EMS>, L<Starlink::AMS::Task>
+
 
 =head1 AUTHOR
 
 Tim Jenness (timj@jach.hawaii.edu), 
 Copyright (c) PPARC and Tim Jenness 1997, 1998.
-
-=head1 SEE ALSO
-
-perl(1). Starlink::EMS, Starlink::AMS::Task
 
 =cut
