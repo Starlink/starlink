@@ -501,6 +501,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     19-JAN-2004 (DSB):
 *        - When reading a FITS-WCS header, allow all keywords to be defaulted 
 *        as decribed in paper I.
+*     27-JAN-2004 (DSB):
+*        - Modify FitLine to use correlation between actual and estimated
+*        axis value as the test for linearity.
 *class--
 */
 
@@ -928,6 +931,7 @@ static int FindKeyCard( AstFitsChan *, const char *, const char *, const char * 
 static int FindLonLatAxes( FitsStore *, char, int *, int *, const char *, const char * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int FitsEof( AstFitsChan * );
+static int FitOK( int, double *, double * );
 static int FitsFromStore( AstFitsChan *, FitsStore *, int, const char *, const char * );
 static int FitsGetCF( AstFitsChan *, const char *, double * );
 static int FitsGetCI( AstFitsChan *, const char *, int * );
@@ -5789,6 +5793,153 @@ static int MakeBasisVectors( AstMapping *map, int nin, int nout,
    return ret;
 }
 
+static int FindBasisVectors( AstMapping *map, int nin, int nout, 
+                             double *dim, AstPointSet *psetg, 
+                             AstPointSet *psetw ){
+/*
+*  Name:
+*     FindBasisVectors
+
+*  Purpose:
+*     Find the a set of basis vectors in grid coordinates
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int FindBasisVectors( AstMapping *map, int nin, int nout, 
+*                           double *dim, AstPointSet *psetg, 
+*                           AstPointSet *psetw )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     This function returns a set of unit vectors in grid coordinates,
+*     one for each grid axis. Each unit vector is parallel to the
+*     corresponding grid axis, and rooted at a specified grid position
+*     ("g0"). The IWC coordinates corresponding to "g0" and to the end of 
+*     each of the unit vectors are also returned, together with a flag
+*     indicating if all the IWC coordinate values are good.
+
+*  Parameters:
+*     map
+*        A pointer to a Mapping which transforms grid coordinates into
+*        intermediate world coordinates (IWC). The number of outputs must 
+*        be greater than or equal to the number of inputs.
+*     nin
+*        The number of inputs for "map" (i.e. the number of grid axes).
+*     nout
+*        The number of outputs for "map" (i.e. the number of IWC axes).
+*     dim
+*        Array dimensions, in pixels, if known (otherwise supplied a NULL
+*        pointer to values of AST__BAD).
+*     psetg
+*        A pointer to a PointSet which can be used to hold the required
+*        grid position. This should have room for nin+1 positions. On
+*        return, the first position holds the "root" position and the 
+*        subsequent "nin" positions hold are offset from root position 
+*        by unit vectors along the corresponding grid axis. 
+*     psetw
+*        A pointer to a PointSet which can be used to hold the required
+*        IWC position. This should also have room for nin+1 positions. On
+*        return, the values are the IWC coordinates corresponding to the
+*        grid positions returned in "psetg".
+
+*  Returned Value:
+*     A value of 1 is returned if a set of basis vectors was found
+*     succesfully. Zero is returned otherwise.
+
+*  Notes:
+*     -  Zero is returned if an error occurs.
+*/
+
+/* Local Variables: */
+   double *g0;
+   double dd;
+   double ddlim;
+   int i;
+   int ii;
+   int ret;               
+
+/* Initialise */
+   ret = 0;
+
+/* Check the inherited status. */
+   if( !astOK ) return ret;
+
+/* Allocate an array to store the candidate root position. */
+   g0 = astMalloc( sizeof( double )*(size_t) nin );
+   if( astOK ) {
+
+/* First try the grid centre, if known. */
+      ddlim = 0;
+      ret = 0;
+      if( dim ) {
+         ret = 1;
+         for( i = 0; i < nin; i++ ) {
+            if( dim[ i ] != AST__BAD ) {
+               g0[ i ] = 0.5*dim[ i ];
+               if( dim[ i ] > ddlim ) ddlim = dim[ i ];               
+            } else {
+               ret = 0;
+               break;
+            }
+         }
+      }
+
+      if( ret ) ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
+       
+/* If this did not produce a set of good IWC positions, try grid position
+   (1,1,1...). */
+      if( !ret ) {
+         for( i = 0; i < nin; i++ ) g0[ i ] = 1.0;
+         ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
+      }       
+
+/* If this did not produce a set of good IWC positions, try a sequence of
+   grid positions which move an increasing distance along each grid axis
+   from (1,1,1,...). Stop when we get further than "ddlim" from the
+   origin. */
+      dd = 10.0;
+      if( ddlim == 0.0 ) ddlim = 10240.0;
+      while( !ret && dd <= ddlim ) {
+
+/* First try positions which extend across the middle of the data set.
+   If the image dimensions are known, make the line go from the "bottom
+   left corner" towards the "top right corner", taking the aspect ratio
+   of the image into account. Otherise, just use a vector of (1,1,1,..) */
+         for( i = 0; i < nin; i++ ) {
+            if( dim && dim[ i ] != AST__BAD ) {
+               g0[ i ] = dd*dim[ i ]/ddlim;
+            } else {
+               g0[ i ] = dd;
+            }
+         }
+         ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
+
+/* If the above didn't produce good positions, try moving out along each
+   grid axis in turn. */
+         for( ii = 0; !ret && ii < nin; ii++ ) {
+            for( i = 0; i < nin; i++ ) g0[ i ] = 1.0;
+            g0[ ii ] = dd;
+            ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
+         }
+
+/* Go further out from the origin for the next set of tests (if any). */
+         dd *= 2.0;
+      }       
+
+   }
+
+/* Free resources. */
+   g0 = astFree( g0 );
+
+/* Return the result. */
+   return ret;
+}
+
 static int FindLonLatAxes( FitsStore *store, char s, int *axlon, int *axlat, 
                            const char *method, const char *class ) {
 /*
@@ -6140,6 +6291,107 @@ static int FindString( int n, const char *list[], const char *test,
    }
 
 /* Return the answer. */
+   return ret;
+}
+
+static int FitOK( int n, double *act, double *est ) {
+/*
+*  Name:
+*     FitOK
+
+*  Purpose:
+*     See if a fit is usable.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int FitOK( int n, double *act, double *est )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     This function is supplied with a set of actual data values, and the
+*     corresponding values estimated by some fitting process. It tests
+*     the correlation between these two sets of data and returns 1 if the
+*     correlation is very close to +1. Otherwise it returns zero.
+
+*  Parameters:
+*     n
+*        Number of data points.
+*     act
+*        Pointer to the start of the actual data values.
+*     est
+*        Pointer to the start of the estimated data values.
+
+*  Returned Value:
+*     A value of 1 is returned if the two sets of values agree. Zero is
+*     returned otherwise.
+
+*  Notes:
+*     -  Zero is returned if an error occurs.
+*/
+
+/* Local Variables: */
+   int ret, i;   
+   double s1, s2, s3, s4, s5, s6;
+   double *px, *py, den1, den2, denom, r;
+
+/* Initialise */
+   ret = 0;
+
+/* Check the inherited status. */
+   if( !astOK ) return ret;
+
+/* Form the sums needed to calculate the correlation coefficient between
+   the actual and estimated values. */
+   s1 = 0.0;
+   s2 = 0.0;
+   s3 = 0.0;
+   s4 = 0.0;
+   s5 = 0.0;
+   s6 = 0.0;
+
+   px = act;
+   py = est;
+   for( i = 0; i < n; i++, px++, py++ ){
+      if( *px!= AST__BAD && *py != AST__BAD ) {
+         s1 += *px;
+         s2 += *py;
+         s3 += (*px)*(*py);
+         s4 += (*px)*(*px);
+         s5 += (*py)*(*py);
+         s6 += 1.0;
+      }
+   }
+
+/* Normalise the values unless no good points were found. */
+   if( s6 > 0 ) {
+      s1 /= s6;
+      s2 /= s6;
+      s3 /= s6;
+      s4 /= s6;
+      s5 /= s6;
+
+/* If the actual and estimated values are effectively constant, assume the
+   fit is linear. */
+      den1 = ( s4 - s1*s1 );
+      den2 = ( s5 - s2*s2 );
+      denom = den1*den2;
+      if( den1 <= 1.0E-10*fabs( s1 ) && den2 <= 1.0E-10*fabs( s2 ) ) {
+         ret = 1;
+
+/* Otherwise, check the correlation coefficient between the actual and
+   estimates values is sufficiently high. */
+      } else if( denom > 0.0 ) {
+         r = ( s3 - s1*s2 )/sqrt( denom );
+         ret = ( r > 0.999999 );
+      }
+   } 
+
+/* Return the result. */
    return ret;
 }
 
@@ -8406,8 +8658,8 @@ static AstMapping *GrismSpecWcs( char *algcode, FitsStore *store, int i,
       fs = astAnnul( fs );
 
 /* Get the CRVAL value for the spectral axis (this will be in the S system). */
-      crv = GetItem( &(store->crval), i, 0, s, FormatKey( "CRVAL", i + 1, -1, s ),
-                     method, class );
+      crv = GetItem( &(store->crval), i, 0, s, NULL, method, class );
+      if( crv == AST__BAD ) crv = 0.0;
 
 /* Convert it to the wavelength system (vacuum or air) in metres. */
       astTran1( smap, 1, &crv, 1, &wcrv );
@@ -9056,24 +9308,11 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
    double *voffset;
    double dax;
    double denom;
-   double denom2;
-   double e;       
    double gap;
-   double rmsdev;
    double sd2;
    double sd;
    double sdw;
-   double sse;
    double sw;
-   double top;
-   double vdenom;         
-   double vi;
-   double vp;
-   double vsd2;
-   double vsd;
-   double vsdw;
-   double vsw;
-   double vtop;
    int i;
    int j;
    int n;
@@ -9148,62 +9387,33 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
          sd2 = 0.0;
          n = 0;
          
-         vsdw = 0.0;
-         vsw = 0.0;
-         vsd = 0.0;
-         vsd2 = 0.0;
-
          for( i = -NPO2; i <= NPO2; i++, pax++ ) {
             if( *pax != AST__BAD ) {
 
-/* Assume some values for the variance in "i" and in "*pax". */
-               vi = fabs(i)*DBL_EPSILON;
-               vp = 100*fabs(*pax)*DBL_EPSILON;
-
 /* Increment the required sums. */
                sdw += i*(*pax);           
-               vsdw += vi*(*pax)*(*pax) + vp*i*i;
-               
                sw += (*pax);           
-               vsw += vp;
-
                sd += i;
-               vsd += vi;
-
                sd2 += i*i;
-               vsd2 += 2*vi*i*i;
-
                n++;
             }
          }
 
 /* If a reasonable number of good points were found, find the component of 
-   the returned vector (excluding a scale factor of 1/gap). We also
-   estimate the variance in the offset term. */
+   the returned vector (excluding a scale factor of 1/gap). */
          denom = sd2*n - sd*sd;
-         vdenom = vsd2*n + 2*vsd*sd*sd;
-
          if( n > NP/4 && denom != 0.0 ) {
 
 /* Find the constant scale factor to return for this axis. */
-            top = (sdw*n - sw*sd);
-            ret[ j ] = top/denom;
+            ret[ j ] = (sdw*n - sw*sd)/denom;
 
-/* Now find the constant offset for this axis, together with the variance
-   on it. */
-            top = (sw*sd2 - sdw*sd);
-            offset[ j ] = top/denom;
-            vtop = vsw*sd2*sd2 + vsd2*sw*sw + 
-                   vsdw*sd*sd + vsd*sdw*sdw;
-            denom2 = denom*denom;
-            voffset[ j ] = (vtop + ( vdenom*top*top )/denom2)/denom2;
-            if( voffset[ j ] < 0.0 ) voffset[ j ] = 0.0;
+/* Now find the constant offset for this axis. */
+            offset[ j ] = (sw*sd2 - sdw*sd)/denom;
 
          } else {
             ok = 0;
             break;
          }
-
       }
 
 /* Now check that the fit is good enough. Each axis is checked separately.
@@ -9211,29 +9421,21 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
       if( ok ) {
          for( j = 0; j < nout; j++ ) {
 
-/* Form the RMS deviation of the actual axis values from the axis values 
-   implied by the linear fit. */
-            n = 0;
-            sse = 0.0;
-            pax = ptr2[ j ];
+/* Store the axis values implied by the linear fit in the now un-needed ptr1[0]
+   array. */
+            pax = ptr1[ 0 ];
             for( i = -NPO2; i <= NPO2; i++, pax++ ) {
-               if( *pax != AST__BAD ) {
-                  e = *pax - ( i*ret[ j ] + offset[ j ] );
-                  sse += e*e;
-                  n++;
-               }
+               *pax = i*ret[ j ] + offset[ j ];
             }
-            rmsdev = sqrt( sse/n );
 
-/* If the RMS deviation is larger than 100 times the uncertainty in the 
-   constant term of the fit, indicate that the returned vector is unusable. 
-   Otherwise, scale the returned value from units of "per gap" to
-   units of "per pixel". */
-            if( rmsdev > 100*sqrt( voffset[ j ] ) ){
+/* Test the fit to see if we beleive that the mapping is linear. If
+   it is, scale the returned value from units of "per gap" to units of 
+   "per pixel". Otherwise,indicate that he returned vector is unusable. */
+            if( FitOK( NP, ptr2[ j ], ptr1[ 0 ] ) ) {
+               ret[ j ] /= gap;
+            } else {
                ok = 0; 
                break;
-            } else {
-               ret[ j ] /= gap;
             }
          }
       }
@@ -9245,8 +9447,7 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
 
 /* Free memory. */
    offset = astFree( offset );
-   voffset = astFree( offset );
-
+   
 /* If an error has occurred, or if the returned vector is unusable, 
    free any returned memory */
    if( !astOK || !ok ) ret = astFree( ret );
@@ -29644,156 +29845,6 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
    this->card = cardo;
 }
 */
-
-
-
-static int FindBasisVectors( AstMapping *map, int nin, int nout, 
-                             double *dim, AstPointSet *psetg, 
-                             AstPointSet *psetw ){
-/*
-*  Name:
-*     FindBasisVectors
-
-*  Purpose:
-*     Find the a set of basis vectors in grid coordinates
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fitschan.h"
-*     int FindBasisVectors( AstMapping *map, int nin, int nout, 
-*                           double *dim, AstPointSet *psetg, 
-*                           AstPointSet *psetw )
-
-*  Class Membership:
-*     FitsChan member function.
-
-*  Description:
-*     This function returns a set of unit vectors in grid coordinates,
-*     one for each grid axis. Each unit vector is parallel to the
-*     corresponding grid axis, and rooted at a specified grid position
-*     ("g0"). The IWC coordinates corresponding to "g0" and to the end of 
-*     each of the unit vectors are also returned, together with a flag
-*     indicating if all the IWC coordinate values are good.
-
-*  Parameters:
-*     map
-*        A pointer to a Mapping which transforms grid coordinates into
-*        intermediate world coordinates (IWC). The number of outputs must 
-*        be greater than or equal to the number of inputs.
-*     nin
-*        The number of inputs for "map" (i.e. the number of grid axes).
-*     nout
-*        The number of outputs for "map" (i.e. the number of IWC axes).
-*     dim
-*        Array dimensions, in pixels, if known (otherwise supplied a NULL
-*        pointer to values of AST__BAD).
-*     psetg
-*        A pointer to a PointSet which can be used to hold the required
-*        grid position. This should have room for nin+1 positions. On
-*        return, the first position holds the "root" position and the 
-*        subsequent "nin" positions hold are offset from root position 
-*        by unit vectors along the corresponding grid axis. 
-*     psetw
-*        A pointer to a PointSet which can be used to hold the required
-*        IWC position. This should also have room for nin+1 positions. On
-*        return, the values are the IWC coordinates corresponding to the
-*        grid positions returned in "psetg".
-
-*  Returned Value:
-*     A value of 1 is returned if a set of basis vectors was found
-*     succesfully. Zero is returned otherwise.
-
-*  Notes:
-*     -  Zero is returned if an error occurs.
-*/
-
-/* Local Variables: */
-   double *g0;
-   double dd;
-   double ddlim;
-   int i;
-   int ii;
-   int ret;               
-
-/* Initialise */
-   ret = 0;
-
-/* Check the inherited status. */
-   if( !astOK ) return ret;
-
-/* Allocate an array to store the candidate root position. */
-   g0 = astMalloc( sizeof( double )*(size_t) nin );
-   if( astOK ) {
-
-/* First try the grid centre, if known. */
-      ddlim = 0;
-      ret = 0;
-      if( dim ) {
-         ret = 1;
-         for( i = 0; i < nin; i++ ) {
-            if( dim[ i ] != AST__BAD ) {
-               g0[ i ] = 0.5*dim[ i ];
-               if( dim[ i ] > ddlim ) ddlim = dim[ i ];               
-            } else {
-               ret = 0;
-               break;
-            }
-         }
-      }
-
-      if( ret ) ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
-       
-/* If this did not produce a set of good IWC positions, try grid position
-   (1,1,1...). */
-      if( !ret ) {
-         for( i = 0; i < nin; i++ ) g0[ i ] = 1.0;
-         ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
-      }       
-
-/* If this did not produce a set of good IWC positions, try a sequence of
-   grid positions which move an increasing distance along each grid axis
-   from (1,1,1,...). Stop when we get further than "ddlim" from the
-   origin. */
-      dd = 10.0;
-      if( ddlim == 0.0 ) ddlim = 10240.0;
-      while( !ret && dd <= ddlim ) {
-
-/* First try positions which extend across the middle of the data set.
-   If the image dimensions are known, make the line go from the "bottom
-   left corner" towards the "top right corner", taking the aspect ratio
-   of the image into account. Otherise, just use a vector of (1,1,1,..) */
-         for( i = 0; i < nin; i++ ) {
-            if( dim && dim[ i ] != AST__BAD ) {
-               g0[ i ] = dd*dim[ i ]/ddlim;
-            } else {
-               g0[ i ] = dd;
-            }
-         }
-         ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
-
-/* If the above didn't produce good positions, try moving out along each
-   grid axis in turn. */
-         for( ii = 0; !ret && ii < nin; ii++ ) {
-            for( i = 0; i < nin; i++ ) g0[ i ] = 1.0;
-            g0[ ii ] = dd;
-            ret = MakeBasisVectors( map, nin, nout, g0, psetg, psetw );
-         }
-
-/* Go further out from the origin for the next set of tests (if any). */
-         dd *= 2.0;
-      }       
-
-   }
-
-/* Free resources. */
-   g0 = astFree( g0 );
-
-/* Return the result. */
-   return ret;
-}
-
 
 
 
