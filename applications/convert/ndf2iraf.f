@@ -199,7 +199,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! Standard HDS constants
       INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
