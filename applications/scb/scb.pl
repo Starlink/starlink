@@ -37,9 +37,10 @@
 
 #-
 
-#  Index file location.
+#  File locations.
 
 $indexfile = "/local/devel/scb/index";
+$taskfile  = "/local/devel/scb/tasks";
 
 #  Directory locations.
 
@@ -72,6 +73,7 @@ sub hprint;
 #  Determine operating environment.
 
 $cgi = defined $ENV{'SERVER_PROTOCOL'};
+print "Content-Type: text/html\n\n" if ($cgi);
 $html = $cgi;
 
 #  Name of source module to locate.
@@ -118,9 +120,25 @@ sub query_form {
           Name of source module:
           <input name=module size=24 value=''>
       </form>
+      <hr>
    END
    ;
-
+   open TASKS, $taskfile or error "Couldn't open $taskfile";
+   while (<TASKS>) {
+      ($package, @tasks) = split;
+      # next unless @tasks;
+      $package =~ s/:?$//;
+      print "<h3>$package</h3>\n";
+      foreach $task (@tasks) {
+         print "<a href='$scb?$task#$task'>$task</a>\n";
+      }
+   }
+   print "<hr>\n";
+   hprint "
+      This list of tasks is generated automatically and is probably
+      not comprehensive.  Just because a task does not appear on this
+      list does not mean it doesn't exist.
+   ";
    footer;
 }
    
@@ -155,7 +173,12 @@ sub get_module {
 #  Get logical path name from database.
 
    $location = $locate{$module};
-   error "Failed to find $module; index may be outdated." unless $location;
+   unless ($location) {
+      error "Failed to find module $module",
+         "Probably this is a result of a deficiency in the source
+          code indexing program, but it may be because the index 
+          database <code>$indexfile</code> has become out of date.";
+   }
 
 #  Substitute in base directory name.
 
@@ -198,7 +221,14 @@ sub output {
 
 #  Arguments.
 
-   my $file = shift;
+   my $file = shift;              #  Filename of file to output.
+
+#  Get file type.
+
+   $file =~ m%\.([^/]*)$%;
+   my $ftype = $1;
+   $ftype = 'f'   if ($ftype eq 'gen');
+   $ftype = 'c'   if ($ftype eq 'h');
 
 #  Open module source file.
 
@@ -207,8 +237,13 @@ sub output {
 
 #  Output appropriate header text.
 
-   header $file;
-   print "<pre>\n" if ($html);
+   if ($html) {
+      header $locate{$module};
+      print "<pre>\n" if ($html);
+   }
+   else {
+      print STDERR $location;
+   }
 
    my ($body, $name, @names, $include, $sub);
    while (<FILE>) {
@@ -216,12 +251,22 @@ sub output {
 
 #        Identify active part of line.
 
-         $body = /^[cC*]/ ? '' : $_;     #  Ignore comments.
-         if ($body) {
-            $body =~ s/^......//;        #  Discard first six characters.
-            $body =~ s/!.*//;            #  Discard inline comments.
-            $body =~ s/\s//g;             #  Discard spaces.
-            $body =~ y/a-z/A-Z/;         #  Fold to upper case.
+         if ($ftype eq 'f') {
+
+            $body = /^[cC*]/ ? '' : $_;     #  Ignore comments.
+            if ($body) {
+               $body =~ s/^......//;        #  Discard first six characters.
+               $body =~ s/!.*//;            #  Discard inline comments.
+               $body =~ s/\s//g;            #  Discard spaces.
+               $body =~ y/a-z/A-Z/;         #  Fold to upper case.
+            }
+         }
+
+         elsif ($ftype eq 'c') {
+
+            $body = $_;
+            $body =~ s%/\*.*\*/%%g;         #  Discard comments fully inline.
+            $body =~ s%/\*.*%%;             #  Discard started comments.
          }
 
 #        Substitute for HTML meta-characters.
@@ -233,11 +278,11 @@ sub output {
 
 #           Identify and deal with lines beginning modules.
 
-            if ($name = module_name) {
+            if ($name = module_name $ftype, $_) {
 
 #              Embolden module name.
 
-               s%($name)%<b>$1</b>%;
+               s%($name)%<b>$1</b>%i;
 
 #              Add anchors (multiple ones if generic function).
 
@@ -252,20 +297,39 @@ sub output {
 
             }
 
-#           Identify and deal with fortran includes.
+            if ($ftype eq 'f') {
 
-            if ($body =~ /\bINCLUDE['"]([^'"]+)['"]/) {
-               $include = $1;
-               s%$include%<a href='$scb?$include'>$include</a>%;
+#              Identify and deal with fortran includes.
+
+               if ($body =~ /\bINCLUDE['"]([^'"]+)['"]/) {
+                  $include = $1;
+                  s%$include%<a href='$scb?$include'>$include</a>%;
+               }
+
+#              Identify and deal with fortran subroutine calls.
+
+               if ($body =~ /\bCALL(\w+)[^=]*$/) {
+                  $sub = $1;
+                  s%$sub%<a href='$scb?$sub#$sub'>$sub</a>%;
+               }
             }
+            elsif ($ftype eq 'c') {
 
-#           Identify and deal with fortran subroutine calls.
+#              Identify and deal with C calls to fortran routines.
 
-            if ($body =~ /\bCALL(\w+)[^=]*$/) {
-               $sub = $1;
-               s%$sub%<a href='$scb?$sub#$sub'>$sub</a>%;
+               if ($body =~ /F77_CALL\s*\(\s*(\w+)\s*\)/) {
+                  $sub = $1;
+                  $module = uc $sub;
+                  s%$sub%<a href='$scb?$module#$module'>$sub</a>%;
+               }
+
+#              Identify and deal with C includes.
+
+               if ($body =~ /#include\s*"\s*(\S+)\s*"/) {
+                  $include = $1;
+                  s%$include%<a href='$scb?$include'>$include</a>%;
+               }
             }
-
          }
       }
 
@@ -287,12 +351,13 @@ sub error {
 
 #  Arguments.
 
-   my $message = shift;
+   my ($message, $more) = @_;
 
    if ($html) {
       header "Error";
       print "<h1>Error</h1>\n";
-      print "$message\n";
+      hprint "<b>$message</b>\n";
+      hprint "<p>\n$more\n" if $more;
       footer;
       exit 1;
    }
@@ -310,9 +375,6 @@ sub header {
 
    my $title = shift;
 
-   if ($cgi) {
-      print "Content-Type: text/html\n\n";
-   }
    if ($html) {
       print "<html>\n";
       print "<head><title>$title</title></head>\n";
@@ -330,9 +392,9 @@ sub footer {
 ########################################################################
 sub hprint {
 
-#  Utility routine - this just prints a string of which each of the 
-#  lines may have a load of leading spaces.  Its only purpose is to
-#  allow here documents which don't mess up the indenting of the 
+#  Utility routine - this just prints a string after first stripping 
+#  leading whitespace from each line.  Its only purpose is to
+#  allow here-documents which don't mess up the indenting of the 
 #  perl source.
 
    local $_ = shift;

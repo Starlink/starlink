@@ -1,13 +1,31 @@
 #!/usr/local/bin/perl -w
 
 package libscb;
+
+#  This perl module contains some of the general routines used by 
+#  the source code index generator (scbindex.pl) and the browser itself
+#  (scb.pl).  The routines are documented separately.
+#
+#  It requires a routine "error" (which should do something like "die")
+#  to be available in the calling (main::) package.
+#  The point of this is so that the calling package can intercept 
+#  exceptions.
+
 require Exporter;
 @ISA = qw/Exporter/;
+
+#  Names of routines defined here to be exported.
+
 @EXPORT = qw/tarxf popd pushd module_name/;
 
-use Cwd;
+
+########################################################################
+sub error {
+   main::error (@_);
+}
 
 
+########################################################################
 sub tarxf {
 
 #  Extracts from a (optionally compressed) tar archive.
@@ -44,16 +62,16 @@ sub tarxf {
 
    my $command = "$filter{$ext} $tarfile | $tar xvf - " . join ' ', @files;
    my @extracted;
-   open TAR, "$command|" or die "$command failed\n";
+   open TAR, "$command|" or error "$command failed";
    while (<TAR>) {
       chomp;
       push @extracted, $_;
    }
-   close TAR             or die "Error terminating tar\n";
+   close TAR             or error "Error terminating tar";
 
 #  Check we got them all.
 
-   die "Failed to extract all requested files\n"
+   error "Failed to extract all requested files"
       if (@files && @files != @extracted);
 
 #  Eliminate any directories from the list.
@@ -69,45 +87,82 @@ sub tarxf {
 }
 
 ########################################################################
+
+#  Constants used by module_name.
+
+@ftypes = qw/INTEGER REAL DOUBLEPRECISION COMPLEX LOGICAL CHARACTER
+             BYTE UBYTE WORD UWORD/;
+$ftypdef = '(' . join ('|', @ftypes) . ')\**(\([^\)]\))?[0-9]*';
+
 sub module_name {
 
 #  Examines a line of source code to see whether it identifies the 
 #  start of an indexable module (e.g. Fortran SUBROUTINE or FUNCTION).
 #  Returns the name if so, or undef otherwise.
 #
-#  Note the parsing is not perfect - it would be fooled for instance
-#  by a subroutine definition in which the name of the subroutine was
-#  split between continuation lines.
+#  Note the parsing is not perfect - the main limitation is that since
+#  the routine is called once for each line (and is stateless) it will 
+#  not cope with module declarations whose important parts are split
+#  across lines.
 #
-#  Probably this could be made (much) more efficient, but it's not
-#  expected that this code should have to be run very often.
+#  Currently handles Fortran (including Generic) and C source.
+#  Currently, the C parser only identifies functions defined using the
+#  macros in /star/include/f77.h as Fortran-callable routines.
+#
+#  Probably this could be made (much) more efficient.
 
 #  Arguments.
 
+   my $filetype = shift;      #  'f' for fortran, 'c' for C.
    local $_ = shift || $_;    #  $_ used if none specified.
 
-#  Local constants.
+   my ($type, $name);
 
-   my @ftypes = qw/INTEGER REAL DOUBLEPRECISION COMPLEX LOGICAL
-                    CHARACTER BYTE UBYTE WORD UWORD/;
-   my $ftypdef = '(' . join ('|', @ftypes) . ')\**(\([^\)]\))?[0-9]*';
+#  Fortran source file.
 
-#  Strip lines of syntactically uninteresting parts.
+   if ($filetype eq 'f') {
 
-   return (undef) if (/^[*cC]/);     # Ignore F77 comments.
-   s/!.*$//;                         # Discard inline comments.
-   chomp;                            # Discard end of line character.
-   s/^......//;                      # Discard first six characters.
-   s/ //g;                           # Remove spaces.
-   return (undef) unless ($_);       # Ignore empty lines.
-   tr/a-z/A-Z/;                      # Fold case to upper.
-   s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
+#     Strip lines of syntactically uninteresting parts.
 
-   ($type, $name) = /^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(]+)/;
+      return (undef) if (/^[*cC]/);     # Ignore F77 comments.
+      s/!.*$//;                         # Discard inline comments.
+      chomp;                            # Discard end of line character.
+      s/^......//;                      # Discard first six characters.
+      s/ //g;                           # Remove spaces.
+      return (undef) unless ($_);       # Ignore empty lines.
+      tr/a-z/A-Z/;                      # Fold case to upper.
+      s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
+
+      ($type, $name) = /^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(]+)/;
+   }
+
+#  C source file.
+
+   elsif ($filetype eq 'c') {
+
+#     Very feeble attempt to strip comments.
+
+      chomp;
+      s%/\*.*\*/%%g;       #  discard comments contained in this line.
+      s%/\*.*%%;           #  discard text from any comment which starts here.
+      return undef unless ($_);
+
+#     Check for macro flagging start of Fortran-callable routine.
+
+      ($type, $name) =
+         /^\s*F77_(SUBROUTINE|[A-Z]+_FUNCTION|EXTERNAL_NAME) *\(\s*(\w+)\s*\)/;
+      $name =~ tr/a-z/A-Z/ if $name;
+
+   }
 
    return $name;
 }
 
+
+########################################################################
+# include for pushd and popd.
+
+use Cwd;
 
 ########################################################################
 sub pushd {
@@ -116,7 +171,7 @@ sub pushd {
 
    my $dir = shift;
    push @dirstack, cwd;
-   chdir $dir or die "Couldn't change directory to $dir\n";
+   chdir $dir or error "Couldn't change directory to $dir";
 }
 
 ########################################################################
@@ -125,7 +180,7 @@ sub popd {
 #  Popd does the same thing as its C-shell namesake.
 
    my $dir = pop @dirstack;
-   chdir $dir or die "Couldn't change directory to $dir\n";
+   chdir $dir or error "Couldn't change directory to $dir";
 }
 
 
