@@ -44,6 +44,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,6 +53,8 @@
 *     11-MAR-1991 (RFWS):
 *        Changed to return the total number of bad pixels in the output
 *        array.
+*     1996 May 20 (MJC):
+*        Replaced LIB$ESTABLISH and LIB$REVERT calls.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,7 +107,7 @@
 
 *  Establish a numerical error handler and initialise the error flag
 *  and error count.
-      CALL LIB$ESTABLISH( NUM_TRAP )
+      CALL NUM_HANDL( NUM_TRAP )
       NUM_ERROR = SAI__OK
       NBAD = 0
 
@@ -150,6 +153,6 @@
       END IF
 
 *  Remove the numerical error handler.
-      CALL LIB$REVERT
+      CALL NUM_REVRT
 
       END
