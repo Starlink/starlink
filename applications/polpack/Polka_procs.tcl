@@ -10293,6 +10293,11 @@ proc Save {} {
          set old_safe $SAFE
          set SAFE $top
 
+# Open a text file to receive the name of all the aligned intensity images
+# create below.
+         set intfiles [UniqueFile]
+         set intfiles_id [open $intfiles w]            
+
 # Process each of the input images in turn.
          set ok 1
          foreach imsec $IMSECS {
@@ -10554,6 +10559,11 @@ proc Save {} {
                   set ok 0
                   break            
                }
+
+#  Write the name of the output image just created to the text file
+#  opened earlier. 
+               puts $intfiles_id $outim
+
             }
 
 # Now re-apply the effects of the effects mappings to the positions lists
@@ -10579,13 +10589,22 @@ proc Save {} {
 
          }
 
+#  Close the text file to which were written the names of all the created
+#  output images.
+         close $intfiles_id
+
 # If required calculate Stokes parameters.
          if { $STOKES } {
 
 # Highlight the "Producing Stokes parameters" label in red.
             Wop $stoklb configure -foreground red
             update idletasks
-            after 2000
+
+#  Create the Stokes cube.
+            if { ![Obey polpack polcal "in=^$intfiles mode=$POLMODE out=$STKOUT"] } {
+               set ok 0
+               break
+            }
 
 # Make the "Producing Stokes parameters" label (and associated tick mark) in 
 # the progress dialog box revert to black.
