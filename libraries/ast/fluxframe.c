@@ -44,8 +44,10 @@ f     following routines may also be applied to all FluxFrames:
 *     DSB: David S. Berry (Starlink)
 
 *  History:
-*     4-NOV-2002 (DSB):
+*     6-DEC-2004 (DSB):
 *        Original version.
+*     14-DEC-2004 (DSB):
+*        Added AST__SBRIGHT and AST__SBRIGHTW systems.
 *class--
 */
 
@@ -58,7 +60,7 @@ f     following routines may also be applied to all FluxFrames:
 
 /* Define the first and last acceptable System values. */
 #define FIRST_SYSTEM AST__FLUXDEN
-#define LAST_SYSTEM AST__FLUXDENW
+#define LAST_SYSTEM AST__SBRIGHTW
 
 /* Macros which return the maximum and minimum of two values. */
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
@@ -128,10 +130,16 @@ static void (* parent_clearunit)( AstFrame *, int );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstSpecFrame *GetSpecFrame( AstFluxFrame * );
+static AstSystemType DensitySystem( AstSystemType );
 static AstSystemType GetAlignSystem( AstFrame * );
+static AstSystemType GetDensitySystem( AstFluxFrame * );
 static AstSystemType SystemCode( AstFrame *, const char * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
 static const char *DefUnit( AstSystemType, const char *, const char * );
+static const char *DensityUnit( AstSystemType );
+static const char *FluxSystemString( AstSystemType );
+static const char *GetDensityUnit( AstFluxFrame * );
 static const char *GetDomain( AstFrame * );
 static const char *GetLabel( AstFrame *, int );
 static const char *GetSymbol( AstFrame *, int );
@@ -139,12 +147,12 @@ static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const char *SystemLabel( AstSystemType );
 static const char *SystemString( AstFrame *, AstSystemType );
-static const char *FluxSystemString( AstSystemType );
 static int GetActiveUnit( AstFrame * );
 static int MakeFluxMapping( AstFluxFrame *, AstFluxFrame *, AstSystemType, AstMapping ** );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int TestActiveUnit( AstFrame * );
+static int UnitsOK( AstSystemType, const char *, int, const char *, const char * );
 static void ClearUnit( AstFrame *, int );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
@@ -153,8 +161,6 @@ static void Overlay( AstFrame *, const int *, AstFrame * );
 static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
 static void SetUnit( AstFrame *, int, const char * );
-static AstSpecFrame *GetSpecFrame( AstFluxFrame * );
-static int UnitsOK( AstSystemType, const char *, int, const char *, const char * );
 
 static AstSystemType GetSystem( AstFrame * );
 static void SetSystem( AstFrame *, AstSystemType );
@@ -421,11 +427,142 @@ static const char *DefUnit( AstSystemType system, const char *method,
    } else if( system == AST__FLUXDENW ) {
       result = "W/m^2/Angstrom";
 
+   } else if( system == AST__SBRIGHT ) {
+      result = "W/m^2/Hz/arcmin**2";
+
+   } else if( system == AST__SBRIGHTW ) {
+      result = "W/m^2/Angstrom/arcmin**2";
+
 /* Report an error if the coordinate system was not recognised. */
    } else {
       astError( AST__SCSIN, "%s(%s): Corrupt %s contains illegal System "
                 "identification code (%d).", method, class, class, 
                 (int) system );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static AstSystemType DensitySystem( AstSystemType sys ) {
+/*
+*  Name:
+*     DensitySystem
+
+*  Purpose:
+*     Obtain the System describing the spectral density for a FluxFrame
+*     system.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fluxframe.h"
+*     AstSystemType DensitySystem( AstSystemType sys )
+
+*  Class Membership:
+*     FluxFrame member function.
+
+*  Description:
+*     This function returns AST__FREQ if the FluxFrame system describes
+*     a quantity measured per unit frequency, and returns AST__WAVELEN if 
+*     the FluxFrame system describes a quantity measured per unit wavelength.
+
+*  Parameters:
+*     sys
+*        A System value appropriate to a FluxFrame.
+
+*  Returned Value:
+*     The density System value.
+
+*  Notes:
+*     - AST__BADSYSTEM is returned if this function is invoked with
+*     the global error status set or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSystemType result;         /* Value to return */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Categorise the supplied system. */
+   if( sys == AST__FLUXDEN || sys == AST__SBRIGHT ) {
+      result = AST__FREQ;
+
+   } else if( sys == AST__FLUXDENW || sys == AST__SBRIGHTW ) {
+      result = AST__WAVELEN;
+
+   } else if( astOK ) {
+      astError( AST__INTER, "DensitySystem(FluxFrame): The "
+                "DensitySystem method does not yet support "
+                "FluxFrame system %d (AST internal programming error).",
+                sys );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static const char *DensityUnit( AstSystemType sys ) {
+/*
+*  Name:
+*     DensityUnit
+
+*  Purpose:
+*     Obtain the default units for the spectral density of a FluxFrame
+*     system.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fluxframe.h"
+*     const char *DensityUnit( AstSystemType sys )
+
+*  Class Membership:
+*     FluxFrame member function.
+
+*  Description:
+*     This function returns "Hz" if the FluxFrame system describes
+*     a quantity measured per unit frequency, and returns "Angstrom" if 
+*     the FluxFrame system describes a quantity measured per unit wavelength.
+
+*  Parameters:
+*     sys
+*        A FluxFrame system value.
+
+*  Returned Value:
+*     A pointer to a null-terminated string containing the Unit value.
+
+*  Notes:
+*     -  A NULL pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   const char *result;           /* Pointer value to return */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Categorise the supplied FluxFrame system. */
+   if( sys == AST__FLUXDEN || sys == AST__SBRIGHT ) {
+      result = "Hz";
+
+   } else if( sys == AST__FLUXDENW || sys == AST__SBRIGHTW ) {
+      result = "Angstrom";
+
+   } else if( astOK ) {
+      astError( AST__INTER, "DensityUnit(FluxFrame): The DensityUnit "
+                "method does not yet support FluxFrame system %d (AST "
+                "internal programming error).", sys );
    }
 
 /* Return the result. */
@@ -490,6 +627,14 @@ static const char *FluxSystemString( AstSystemType system ) {
 
    case AST__FLUXDENW:
       result = "FLXDNW";
+      break;
+
+   case AST__SBRIGHT:
+      result = "SFCBR";
+      break;
+
+   case AST__SBRIGHTW:
+      result = "SFCBRW";
       break;
 
    }
@@ -632,6 +777,94 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Undefine macros local to this function. */
 #undef BUFF_LEN
+}
+
+static AstSystemType GetDensitySystem( AstFluxFrame *this ) {
+/*
+*+
+*  Name:
+*     astGetDensitySystem
+
+*  Purpose:
+*     Obtain the System describing the spectral density of a FluxFrame.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "fluxframe.h"
+*     AstSystemType astGetDensitySystem( AstFluxFrame *this )
+
+*  Class Membership:
+*     FluxFrame method.
+
+*  Description:
+*     This function returns AST__FREQ if the FluxFrame system describes
+*     a quantity measured per unit frequency, and returns AST__WAVELEN if 
+*     the FluxFrame system describes a quantity measured per unit wavelength.
+
+*  Parameters:
+*     this
+*        Pointer to the FluxFrame.
+
+*  Returned Value:
+*     The System value.
+
+*  Notes:
+*     - AST__BADSYSTEM is returned if this function is invoked with
+*     the global error status set or if it should fail for any reason.
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BADSYSTEM;
+
+/* Get the FluxFrame system and categorise it. */
+   return DensitySystem( astGetSystem( this ) );
+}
+
+static const char *GetDensityUnit( AstFluxFrame *this ) {
+/*
+*+
+*  Name:
+*     astGetDensityUnit
+
+*  Purpose:
+*     Obtain the default units for the spectral density of a FluxFrame.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "fluxframe.h"
+*     const char *astGetDensityUnit( AstFluxFrame *this )
+
+*  Class Membership:
+*     FluxFrame method.
+
+*  Description:
+*     This function returns "Hz" if the FluxFrame system describes
+*     a quantity measured per unit frequency, and returns "Angstrom" if 
+*     the FluxFrame system describes a quantity measured per unit wavelength.
+
+*  Parameters:
+*     this
+*        Pointer to the FluxFrame.
+
+*  Returned Value:
+*     A pointer to a null-terminated string containing the Unit value.
+
+*  Notes:
+*     -  A NULL pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Get the FluxFrame system and categorise it. */
+   return DensityUnit( astGetSystem( this ) );
 }
 
 static const char *GetDomain( AstFrame *this_frame ) {
@@ -861,21 +1094,8 @@ static AstSpecFrame *GetSpecFrame( AstFluxFrame *this ) {
 /* Otherwise, create a SpecFrame appropriate to the FluxFrames System. */
    } else {
       result = astSpecFrame( "" );
-
-      sys = astGetSystem( this );
-      if( sys == AST__FLUXDEN ) {
-         astSetSystem( result, AST__FREQ );
-         astSetUnit( result, 0, "Hz" );
-
-      } else if( sys == AST__FLUXDENW ) {
-         astSetSystem( result, AST__WAVELEN );
-         astSetUnit( result, 0, "Angstrom" );
-
-      } else {
-         astError( AST__INTER, "GetSpecFrame(FluxFrame): GetSpecFrame "
-                   "does not yet support FluxFrame system %d (AST "
-                   "internal programming error).", sys );
-      }
+      astSetSystem( result, astGetDensitySystem( this ) );
+      astSetUnit( result, 0, astGetDensityUnit( this ) );
    }
 
 /* Annul the result if an error occurred. */
@@ -957,8 +1177,15 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
 
          if( system == AST__FLUXDEN ) {
 	    result = "S_nu";
+
          } else if( system == AST__FLUXDENW ) {
 	    result = "S_lambda";
+
+         } else if( system == AST__SBRIGHT ) {
+	    result = "mu_nu";
+
+         } else if( system == AST__SBRIGHTW ) {
+	    result = "mu_lambda";
 
 /* Report an error if the coordinate system was not recognised. */
          } else {
@@ -1093,7 +1320,10 @@ static AstSystemType GetSystem( AstFrame *this_frame ) {
 
 /* Local Variables: */
    AstFluxFrame *this;           /* Pointer to FluxFrame structure */
+   AstMapping *map;              /* Pointer to unit Mapping */
+   AstSystemType i;              /* System to check */
    AstSystemType result;         /* Value to return */
+   const char *units;            /* FluxFrame units */
    int unitSet;                  /* Has a value been supplied for Unit? */
 
 /* Initialise. */
@@ -1117,23 +1347,22 @@ static AstSystemType GetSystem( AstFrame *this_frame ) {
    system based on the units. */
    } else if( unitSet ){
 
-/* If a Mapping can be found from the current units to the default units
-   for flux density, then use flux density as the default system. */
-      if( astUnitMapper( astGetUnit( this_frame, 0 ),
-                         DefUnit( AST__FLUXDEN, "astGetSystem", 
-                                  astGetClass( this ) ), NULL, NULL ) ) {
-         result = AST__FLUXDEN;
-
-/* Otherwise, if a Mapping can be found from the current units to the default 
-   units for flux wavelength density, then use flux wavelength density as the 
-   default system. */
-      } else if( astUnitMapper( astGetUnit( this_frame, 0 ),
-                                DefUnit( AST__FLUXDENW, "astGetSystem", 
-                                         astGetClass( this ) ), NULL, NULL ) ) {
-         result = AST__FLUXDENW;
+/* Loop round each known system value. If a Mapping can be found from the 
+   current units to the default units for the system, then use the system as 
+   the default system. */
+      units = astGetUnit( this_frame, 0 );
+      for( i = FIRST_SYSTEM; i <= LAST_SYSTEM; i++ ) {
+         map = astUnitMapper( units, DefUnit( i, "astGetSystem", 
+                                    astGetClass( this ) ), NULL, NULL );
+         if( map ) {
+            map = astAnnul( map );
+            result = i;
+            break;
+         }
+      }
 
 /* Otherwise, report an error. */
-      } else if( astOK ) {
+      if( result == AST__BADSYSTEM && astOK ) {
          astError( AST__BADUN, "astGetSystem(%s): The current units (%s) "
                    "cannot be used with any of the supported flux systems.", 
                    astGetClass( this ), astGetUnit( this_frame, 0 ) );
@@ -1376,6 +1605,8 @@ void astInitFluxFrameVtab_(  AstFluxFrameVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
+   vtab->GetDensitySystem = GetDensitySystem;
+   vtab->GetDensityUnit = GetDensityUnit;
 
    vtab->ClearSpecVal = ClearSpecVal;
    vtab->TestSpecVal = TestSpecVal;
@@ -1531,6 +1762,8 @@ static int MakeFluxMapping( AstFluxFrame *target, AstFluxFrame *result,
    AstSpecFrame *sfin2;
    AstSpecFrame *sfout1;
    AstSpecFrame *sfout2;
+   AstSystemType rsys_in; 
+   AstSystemType rsys_out; 
    AstSystemType sys_in; 
    AstSystemType sys_out; 
    double specval2;
@@ -1539,6 +1772,8 @@ static int MakeFluxMapping( AstFluxFrame *target, AstFluxFrame *result,
    double specval_out;
    double zoom;
    int match;                     
+   int sb_in;
+   int sb_out;
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -1552,33 +1787,70 @@ static int MakeFluxMapping( AstFluxFrame *target, AstFluxFrame *result,
    map2 = NULL;
    map3 = NULL;
 
+/* Note the target and result System */
+   rsys_in = astGetSystem( target );
+   rsys_out = astGetSystem( result );
+
+/* First get a Mapping which converts from the units used in the target
+   to the default units associated with the target's system. 
+   ---------------------------------------------------------------------- */
+   map1 = astUnitMapper( astGetUnit( target, 0 ), 
+                         DefUnit( rsys_in, "MakeFluxMapping", "FluxFrame" ), 
+                         NULL, NULL );
+
+/* If the target system is surface brightness, change it to the
+   corresponding flux density system. We are effectively converting from
+   surface brightness to the flux density normalised to unit area. Also
+   set flags indicating if the systems are surface brightness systems. */
+   if( rsys_in == AST__SBRIGHT ) {
+      sys_in = AST__FLUXDEN;
+      sb_in = 1;
+      
+   } else if( rsys_in == AST__SBRIGHTW ) {
+      sys_in = AST__FLUXDENW;
+      sb_in = 1;
+
+   } else {
+      sys_in = rsys_in;
+      sb_in = 0;
+   }
+
+/* Likewise if the result system is surface brightness, change it to the
+   corresponding flux density system. */
+   if( rsys_out == AST__SBRIGHT ) {
+      sys_out = AST__FLUXDEN;
+      sb_out = 1;
+
+   } else if( rsys_out == AST__SBRIGHTW ) {
+      sys_out = AST__FLUXDENW;
+      sb_out = 1;
+
+   } else {
+      sys_out = rsys_out;
+      sb_out = 0;
+   }
+
 /* Assume at this point in the chain of coversions that we have target values 
    in some form of flux density system (either frequency or wavelength). The 
    precise units do not matter at this point (so long as they are
    dimensionally correct for describing the relevant form of flux density). 
    When other systems are added (e.g. antenna temperature), some code
    will have to come before this point which produces a Mapping from (e.g.)
-   antenna temperatureto fluix density. */
+   antenna temperature to flux density. */
 
-/* Note the target and result System */
-   sys_in = astGetSystem( target );
-   sys_out = astGetSystem( result );
-
-/* First get a Mapping which converts from the units used in the target
-   to the default units associated with the terget's system (assumed for
-   now to be a flux density system). 
-   ---------------------------------------------------------------------- */
-   map1 = astUnitMapper( astGetUnit( target, 0 ), 
-                         DefUnit( sys_in, "MakeFluxMapping", "FluxFrame" ), 
-                         NULL, NULL );
 
 /* Get a Mapping from the default units for the input flux density system 
    to the default units for the output flux density system.
    ---------------------------------------------------------------------- */
 
+/* If one but not both of the systems represent surface brightness, then
+   we cannot form a Mapping. */
+   if( sb_in != sb_out ) {
+      zoom = AST__BAD;
+
 /* If the input and output flux density systems are the same, then the 
    required Mapping is a UnitMap. */
-   if( sys_in == sys_out ) {
+   } else if( sys_in == sys_out ) {
       zoom = 1.0;
 
 /* Otherwise, the required Mapping is a zoom map in which the scale factor is 
@@ -1595,23 +1867,13 @@ static int MakeFluxMapping( AstFluxFrame *target, AstFluxFrame *result,
    } else {
       sfin1 = GetSpecFrame( target );
       sfin2 = astCopy( sfin1 );
-      if( sys_in == AST__FLUXDEN ) {
-         astSetSystem( sfin2, AST__FREQ );
-         astSetUnit( sfin2, 0, "Hz" );
-      } else {
-         astSetSystem( sfin2, AST__WAVELEN );
-         astSetUnit( sfin2, 0, "Angstrom" );
-      }
+      astSetSystem( sfin2, DensitySystem( sys_in ) );
+      astSetUnit( sfin2, 0, DensityUnit( sys_in ) );
    
       sfout1 = GetSpecFrame( result );
       sfout2 = astCopy( sfout1 );
-      if( sys_out == AST__FLUXDEN ) {
-         astSetSystem( sfout2, AST__FREQ );
-         astSetUnit( sfout2, 0, "Hz" );
-      } else {
-         astSetSystem( sfout2, AST__WAVELEN );
-         astSetUnit( sfout2, 0, "Angstrom" );
-      }
+      astSetSystem( sfout2, DensitySystem( sys_out ) );
+      astSetUnit( sfout2, 0, DensityUnit( sys_out ) );
       
 /* Indicate we do not yet have a zoom factor */
       zoom = AST__BAD;
@@ -1701,7 +1963,7 @@ static int MakeFluxMapping( AstFluxFrame *target, AstFluxFrame *result,
 /* Now get a Mapping which converts from the default units associated with 
    the results's system, to the units used in the result. 
    ----------------------------------------------------------------------- */
-   map3 = astUnitMapper( DefUnit( sys_out, "MakeFluxMapping", "FluxFrame" ), 
+   map3 = astUnitMapper( DefUnit( rsys_out, "MakeFluxMapping", "FluxFrame" ), 
                          astGetUnit( result, 0 ), NULL, NULL );
 
 /* Indicate a match was found and combine all Mapings in series. */
@@ -1714,12 +1976,14 @@ static int MakeFluxMapping( AstFluxFrame *target, AstFluxFrame *result,
       *map = astSimplify( map5 );
 
 /* Free resources. */
-      map1 = astAnnul( map1 );
-      map2 = astAnnul( map2 );
-      map3 = astAnnul( map3 );
       map4 = astAnnul( map4 );
       map5 = astAnnul( map5 );
    }
+
+/* Free resources. */
+   if( map1 ) map1 = astAnnul( map1 );
+   if( map2 ) map2 = astAnnul( map2 );
+   if( map3 ) map3 = astAnnul( map3 );
 
 /* If an error occurred, annul the returned Mapping and clear the returned 
    values. */
@@ -2699,6 +2963,12 @@ static AstSystemType SystemCode( AstFrame *this, const char *system ) {
    } else if ( astChrMatch( "FLXDNW", system ) ) {
       result = AST__FLUXDENW;
 
+   }else if ( astChrMatch( "SFCBR", system ) ) {
+      result = AST__SBRIGHT;
+
+   } else if ( astChrMatch( "SRCBR", system ) ) {
+      result = AST__SBRIGHTW;
+
    }
 
 /* Return the result. */
@@ -2762,6 +3032,14 @@ static const char *SystemLabel( AstSystemType system ) {
 
    case AST__FLUXDENW:
       result = "flux wavelength density";
+      break;
+
+   case AST__SBRIGHT:
+      result = "surface brightness";
+      break;
+
+   case AST__SBRIGHTW:
+      result = "surface brightness (per wavelength)";
       break;
 
    }
@@ -3730,6 +4008,17 @@ AstFluxFrame *astLoadFluxFrame_( void *mem, size_t size, AstFluxFrameVtab *vtab,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+AstSystemType astGetDensitySystem_( AstFluxFrame *this ){
+   if ( !astOK ) return AST__BADSYSTEM;
+   return (**astMEMBER(this,FluxFrame,GetDensitySystem))(this);
+}
+
+const char *astGetDensityUnit_( AstFluxFrame *this ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,FluxFrame,GetDensityUnit))(this);
+}
+
 
 /* Special public interface functions. */
 /* =================================== */

@@ -238,7 +238,6 @@ static AstSpecFrame *GetSpecFrame( AstSpecFluxFrame *this, int std ){
    AstFluxFrame *ff;
    AstSpecFrame *ret;
    AstSpecFrame *sf;
-   AstSystemType fsys;
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -252,26 +251,11 @@ static AstSpecFrame *GetSpecFrame( AstSpecFluxFrame *this, int std ){
 /* The FluxFrame is always the second Frame in the parent CmpFrame. */
       ff = (AstFluxFrame *) ((AstCmpFrame *)this)->frame2;
 
-/* See what flux system it represents. */
-      fsys = astGetSystem( ff );
-
 /* Produce a copy of the SpecFrame and set its System and Units
    appropriate to the flux system (expressed in default units). */
       ret = astCopy( sf );
-
-      if( fsys == AST__FLUXDEN ) {
-         astSetSystem( ret, AST__FREQ );
-         astSetUnit( ret, 0, "Hz" );
-
-      } else if( fsys == AST__FLUXDENW ) {
-         astSetSystem( ret, AST__WAVELEN );
-         astSetUnit( ret, 0, "Angstrom" );
-
-      } else if( astOK ) {
-         astError( AST__INTER, "GetSpecFrame(SpecFluxFrame): GetSpecFrame "
-                   "does not yet support FluxFrame system %d (AST "
-                   "internal programming error).", fsys );
-      }
+      astSetSystem( ret, astGetDensitySystem( ff ) );
+      astSetUnit( ret, 0, astGetDensityUnit( ff ) );
 
 /* If we are not standardising the SpecFrame, just return a clone of the
    pointer in the parent CmpFrame. */

@@ -47,6 +47,8 @@
 /* Values used to represent different System attribute values. */
 #define AST__FLUXDEN       1
 #define AST__FLUXDENW      2
+#define AST__SBRIGHT       3
+#define AST__SBRIGHTW      4
 
 #endif
 
@@ -82,6 +84,9 @@ typedef struct AstFluxFrameVtab {
 
 /* Unique flag value to determine class membership. */
    int *check;                   /* Check value */
+
+   AstSystemType (* GetDensitySystem)( AstFluxFrame * );
+   const char *(* GetDensityUnit)( AstFluxFrame * );
 
    double (* GetSpecVal)( AstFluxFrame * );
    int (* TestSpecVal)( AstFluxFrame * );
@@ -125,6 +130,9 @@ AstFluxFrame *astLoadFluxFrame_( void *, size_t,
 /* -------------------------------- */
 
 #if defined(astCLASS)            /* Protected */
+
+AstSystemType astGetDensitySystem_( AstFluxFrame * );
+const char *astGetDensityUnit_( AstFluxFrame * );
 
 double astGetSpecVal_( AstFluxFrame * );
 int astTestSpecVal_( AstFluxFrame * );
@@ -185,6 +193,9 @@ astINVOKE(O,astLoadFluxFrame_(mem,size,vtab,name,astCheckChannel(channel)))
    the wrong sort of object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
+
+#define astGetDensitySystem(this) astINVOKE(V,astGetDensitySystem_(astCheckFluxFrame(this)))
+#define astGetDensityUnit(this) astINVOKE(V,astGetDensityUnit_(astCheckFluxFrame(this)))
 
 #define astGetSpecVal(this) astINVOKE(V,astGetSpecVal_(astCheckFluxFrame(this)))
 #define astTestSpecVal(this) astINVOKE(V,astTestSpecVal_(astCheckFluxFrame(this)))
