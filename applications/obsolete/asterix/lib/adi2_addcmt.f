@@ -117,7 +117,7 @@
 
 *    Mark as updated
         CALL ADI2_MRKCHG( HDUID, CID, STATUS )
-        CALL ADI_CPUT0L( KID, '.New', .TRUE., STATUS )
+        CALL ADI_CPUT0L( CID, '.New', .TRUE., STATUS )
 
       ELSE
 
