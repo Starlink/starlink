@@ -11,7 +11,7 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_ADFRM( IWCS, ADDFS, DOMAIN, ROT, FITROT, NCARD, IPFITS,
+*     CALL CCD1_ADFRM( FSET, FSET2, DOMAIN, ROT, FITROT, NCARD, IPFITS,
 *                      STATUS )
 
 *  Description:
@@ -141,7 +141,7 @@
          GO TO 99
       END IF
 
-*  Get the Base->Currentt mapping from FSET2.
+*  Get the Base->Current mapping from FSET2.
       MAP = AST_GETMAPPING( FSET2, AST__BASE, AST__CURRENT, STATUS )
 
 *  Set the additional rotation angle.
@@ -187,8 +187,11 @@
 *  Simplify the mapping.
       MAP = AST_SIMPLIFY( MAP, STATUS )
 
-*  Get the frame to be added from FSET2.
-      FRM = AST_GETFRAME( FSET2, AST__CURRENT, STATUS )
+*  Get the frame to be added from FSET2.  Note that we need a 'deep'
+*  copy, since we will modify it and do not wish to upset the original
+*  frameset.
+      FRM = AST_COPY( AST_GETFRAME( FSET2, AST__CURRENT, STATUS ),
+     :                STATUS )
 
 *  Change its domain name as required.
       CALL AST_SETC( FRM, 'Domain', DOMAIN( 1:CHR_LEN( DOMAIN ) ),
