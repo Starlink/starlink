@@ -84,6 +84,10 @@
 *      3 Jun 94 : V1.7-5   A few changes to allow spectral images with one
 *                          energy bin to be searched (DJA)
 *     24 Nov 94 : V1.8-0   Now use USI for user interface (DJA)
+*      5 Jan 1996 V2.0-0 (DJA):
+*        ADI port
+*     12 Apr 1996 V2.0-1 (DJA):
+*        Changed to use psf field size hint if available
 *
 *    Type definitions :
 *

@@ -99,8 +99,9 @@
 *.
 
 *  Report initialisation flag
+      CALL MSG_BLNK()
       CALL MSG_SETL('IN',DYN_ISINIT)
-      CALL ADP_OUT('Initialisation flag: ^IN')
+      CALL MSG_PRNT('Initialisation flag: ^IN')
 
 *  Look for a filled slots
       N=0
@@ -110,11 +111,11 @@
           CALL MSG_SETI('NI',DYS_NITEM(I))
           CALL MSG_SETI('NB',DYS_NBYTE(I))
           CALL MSG_SETI('PT',DYS_PTR(I))
-          CALL MSG_SETI('FI',DYS_PTR(I))
-          CALL ADP_OUT('^NI items / ^NB bytes at ^PT with FID ^FI')
+          CALL MSG_SETI('FI',DYS_FID(I))
+          CALL MSG_PRNT('^NI items / ^NB bytes at ^PT with FID ^FI')
         ENDIF
       ENDDO
       CALL MSG_SETI('N',N)
-      CALL ADP_OUT('Total slots allocated: ^N')
+      CALL MSG_PRNT('Total slots allocated: ^N')
 
       END

@@ -50,14 +50,8 @@
         ELSEIF (MODE.EQ.'PUS') THEN
           CALL GCB_ATTACH('IMAGE',STATUS)
           CALL IMG_2DGCB(STATUS)
-	print *,'a',status
-	call flush(6)
           CALL IMG_GETCACHE(I_VOK,I_QOK,STATUS)
-	print *,'aa',status
-	call flush(6)
           CALL IMG_CACHE(STATUS)
-	print *,'aaa',status
-	call flush(6)
           I_MEM=.TRUE.
         ELSEIF (MODE.EQ.'TOG') THEN
           IF (I_MEM) THEN
