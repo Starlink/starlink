@@ -110,7 +110,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Locate the HDU
-      ADI2_LOCHDU1( FID, HDU, .TRUE., ID, CREATED, STATUS )
+      CALL ADI2_LOCHDU1( FID, HDU, .TRUE., ID, CREATED, STATUS )
 
 *  Did we create the structure?
       IF ( CREATED ) THEN
