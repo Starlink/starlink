@@ -149,7 +149,7 @@
           CALL ADI_CLASS( KID, CLASS, STATUS )
           IF ( CLASS(1:1) .EQ. 'D' ) THEN
             CALL ADI_GET0D( KID, DVALUE, STATUS )
-            CALL FTPKYD( LUN, KEY, DVALUE, CMT, FSTAT )
+            CALL FTPKYG( LUN, KEY, DVALUE, 8, CMT, FSTAT )
           ELSE
             CALL ADI_GET0C( KID, CVALUE, STATUS )
             CALL FTPKYS( LUN, KEY, CVALUE, CMT, FSTAT )
