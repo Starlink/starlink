@@ -1,0 +1,50 @@
+## NDF2IRAF - Converts an NDF to an IRAF (OIF) image.
+
+#+
+#  Name:
+#     NDF2IRAF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-AUG-1992 (RAHM):
+#     	 Original version.
+#     1992 September 29 (MJC):
+#     	 Added help library.  Used global association for IN.  Renamed
+#	 the parameteres to IN and OUT.  Removed unused parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2IRAF
+
+   helplib        'CONVERT_DIR:CONVERT'
+
+   parameter      IN            # The input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT           # The output IRAF name
+      position    2
+      type        '_CHAR'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Name of IRAF image to be produced'
+      helpkey     '*'
+   endparameter
+
+endinterface
+
