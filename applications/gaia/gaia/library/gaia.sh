@@ -63,14 +63,6 @@ if test -x $GAIA_DIR/gaia_swish; then
 #  Make sure we remove this all on exit.
   trap 'rm -r -f $ADAM_USER;exit' 0 1 2 3 9 15
 
-#  Add the local catalogue configuration file. Do not use old 
-#  broken CURSA version.
-  if test -z "$SKYCAT_CONFIG" -o \
-   "$SKYCAT_CONFIG" = "http://ledas-www.star.le.ac.uk/arnieV4/SkyCatConfig.pl"; then
-    SKYCAT_CONFIG=file:${GAIA_DIR}/skycat2.0.cfg
-    export SKYCAT_CONFIG
-  fi
-
 #  Set the BLT_LIBRARY variable. This is needed to locate some .pro files.
   BLT_LIBRARY=$GAIA_DIR
   export BLT_LIBRARY
