@@ -31,8 +31,19 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+# If filelist is null, and a file runtests.filelist exists, use that
+# file's contents as the value of filelist.  This is somewhat hacky,
+# but means that we can make it easy to do a subset of the tests
+# repeatedly while testing.
+if [ -z "$filelist" -a -f runtests.filelist ]; then
+    echo "Reading filelist from runtests.filelist"
+    filelist=`cat runtests.filelist`
+fi
+
 # Check filelist is non-null, and make it t* if it is.
-test -n "$filelist" || filelist=`$LS | grep '^t[0-9]*$'`
+if [ -z "$filelist" ]; then
+    filelist=`$LS | grep '^t[0-9]*$'`
+fi
 
 
 
