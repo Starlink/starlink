@@ -442,6 +442,7 @@
                      CALL ERR_ANNUL( STATUS )
                      CALL AST_SETC( SFRM, 'SYSTEM', 'FREQ', STATUS )
                      CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
+                     JUNK = AST_FINDFRAME( SFRM, TEMPLT, ' ', STATUS )
                                
 *  If an error occurred setting the unit, annul it and try optical
 *  velocity.
