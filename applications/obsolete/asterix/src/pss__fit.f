@@ -121,6 +121,8 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
       DOUBLE PRECISION         STATMIN                 ! Best fit value
       REAL                     XERR, YERR              ! X,Y pos errors
 
+      DOUBLE PRECISION         LNDFAC
+
       INTEGER                  CP                      ! Loop over cache
       INTEGER                  EITER                   ! # error iterations
       INTEGER                  FITERR                  ! Fitting error code
@@ -263,8 +265,8 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
 
 *    Find optimum fit
       CALL FIT_MIN( 1, IMOD, MCTRL, .FALSE., 0,
-     :              PSS__FITNPAR, LB, UB, FROZEN, PSCALE, ISTAT,
-     :              PSS_FIT_GENMODEL, PARAM, DPAR,
+     :              PSS__FITNPAR, LB, UB, FROZEN, PSCALE, LNDFAC,
+     :              ISTAT, PSS_FIT_GENMODEL, PARAM, DPAR,
      :              PEGGED, STATMIN, FINISHED, FITERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         STATUS = SAI__OK
@@ -294,7 +296,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
 *    First guess at errors by inverting matrix
       CALL FIT_PARERR( 1, IMOD, PSS__FITNPAR, PARAM, LB, UB,
      :        DPAR, FROZEN, PEGGED, PSCALE, ISTAT, PSS_FIT_GENMODEL,
-     :        PERR, STATUS )
+     :        PERR, LNDFAC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         CALL MSG_SETI( 'N', GE_EXEC_NSRC )
@@ -330,7 +332,8 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
           CALL FIT_PARCON( 1, IMOD, MCTRL, SOFF, 0, 1, P__F,
      :                     PSS__FITNPAR, LB, UB, FROZEN, PSCALE, DPAR,
      :                     ISTAT, PSS_FIT_GENMODEL, STATMIN,
-     :                     PARAM, PEGGED, PLO, PHI, PEGCODE, STATUS )
+     :                     PARAM, PEGGED, PLO, PHI, PEGCODE, LNDFAC
+     :                     STATUS )
 
 *        Fit error?
           IF ( STATUS .EQ. USER__001 ) THEN
@@ -403,7 +406,8 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
           CALL FIT_PARCON( 1, IMOD, MCTRL, SOFF, 0, 2,
      :                     PPARS, PSS__FITNPAR, LB, UB, FROZEN,
      :                     PSCALE, DPAR, ISTAT, PSS_FIT_GENMODEL,
-     :            STATMIN, PARAM, PEGGED, PLO, PHI, PEGCODE, STATUS )
+     :                     STATMIN, PARAM, PEGGED, PLO, PHI,
+     :                     PEGCODE, LNDFAC, STATUS )
 
           IF ( STATUS .EQ. USER__001 ) THEN
             STATUS = SAI__OK
@@ -461,7 +465,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
 *  Evaluate Cash statistic at zero flux
       PARAM(P__F) = 0.0
       CALL FIT_STAT( 1, 0, PARAM, ISTAT,
-     :               PSS_FIT_GENMODEL, STAT0, STATUS )
+     :               PSS_FIT_GENMODEL, STAT0, LNDFAC, STATUS )
 
 *  To get significance
       S_DSTAT(ID) = REAL(STAT0-STATMIN)
