@@ -35161,6 +35161,10 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
             {\tt "}Pixel{\tt "}      - The axis centres are set to pixel
                            co-ordinates.  This is only available when
                            COMP={\tt "}Data{\tt "} or {\tt "}Centre{\tt "}.
+            {\tt "}WCS{\tt "}       - The axis centres are set to the values 
+                           of the selected axis in the current co-ordinate 
+                           Frame of the NDF. This is only available when
+                           COMP={\tt "}Data{\tt "} or {\tt "}Centre{\tt "}.
 
          The suggested default is the current value.
       }
@@ -44178,6 +44182,14 @@ The following applications have been modified:
       \begin{itemize}
          \item A new parameter called PROFOUT has been added. It which allows 
          the displayed profile to be saved in a 1-dimensional NDF.
+      \end{itemize}
+
+   \item [\htmlref{SETAXIS}{SETAXIS}] \mbox{}
+      \begin{itemize}
+         \item The MODE parameter can now take the new value ``WCS'',
+         which causes the AXIS centre values to be copied from the 
+         corresponding axis of the current coordinate Frame in the 
+         WCS component of the NDF.
       \end{itemize}
 
    \item [\htmlref{THRESH}{THRESH}] \mbox{}

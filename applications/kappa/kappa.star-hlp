@@ -26349,6 +26349,10 @@ MODE = LITERAL (Read)
       "Pixel"      - The axis centres are set to pixel
                      co-ordinates.  This is only available when
                      COMP="Data" or "Centre".
+      "WCS"        - The axis centres are set to the values of the 
+                     selected axis in the current co-ordinate Frame
+                     of the NDF. This is only available when
+                     COMP="Data" or "Centre".
 
    MODE is only accessed if a null (!) value is supplied for
    parameter LIKE. The suggested default is the current value.

@@ -111,6 +111,10 @@
 *           "Pixel"      - The axis centres are set to pixel
 *                          co-ordinates.  This is only available when
 *                          COMP="Data" or "Centre".
+*           "WCS"        - The axis centres are set to the values of the 
+*                          selected axis in the current co-ordinate Frame
+*                          of the NDF. This is only available when
+*                          COMP="Data" or "Centre".
 *
 *        MODE is only accessed if a null (!) value is supplied for 
 *        parameter LIKE. The suggested default is the current value.
@@ -216,8 +220,10 @@
 *  History:
 *     1995 April 24 (MJC):
 *        Original version.
-*     16 MAY 2000 (DSB):
+*     16-MAY-2000 (DSB):
 *        Parameter LIKE added.
+*     23-AUG-2001 (DSB):
+*        Added mode WCS.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -235,6 +241,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ error constants
       INCLUDE 'PAR_PAR'          ! PAR__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -249,45 +256,57 @@
       PARAMETER ( SZEXP = 132 )
 
 *  Local Variables:
+      CHARACTER ATTR*10          ! AST attribute name
+      CHARACTER COMP*8           ! Name of array component to analyse
+      CHARACTER CVAL*100         ! AST attribute value
+      CHARACTER CVALUE*( VAL__SZD )  ! Replacement value as obtained
+      CHARACTER DEFTYP*( NDF__SZTYP )! Default processing type
+      CHARACTER EXPRS*( SZEXP )  ! Variance expression
+      CHARACTER FOR( 1 )*( SZEXP + 22 ) ! Forward transformation
+      CHARACTER INV( 2 )*6       ! Inverse transformation
+      CHARACTER LOCTR*( DAT__SZLOC ) ! Transformation locator
+      CHARACTER MCOMP*8          ! Component name for mapping arrays
+      CHARACTER MODE*10          ! Mode of the modification
+      CHARACTER SUGDEF*4         ! Suggested default
+      CHARACTER TYPE*( NDF__SZTYP )  ! Numeric type for processing
+      DOUBLE PRECISION CONST( NDF__MXDIM )! Constant axis values
+      DOUBLE PRECISION DVALUE    ! Replacement value for d.p. data
       INTEGER ACTVAL             ! State of parameter NEWVAL
       INTEGER AXPNTR( 1 )        ! Pointer to mapped array component
-      CHARACTER * ( VAL__SZD ) CVALUE ! Replacement value as obtained
-      CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
-      CHARACTER * ( NDF__SZTYP ) DEFTYP ! Default processing type
-      DOUBLE PRECISION DVALUE    ! Replacement value for d.p. data
       INTEGER EL                 ! Number of mapped values
-      CHARACTER * ( SZEXP ) EXPRS ! Variance expression
       INTEGER FD                 ! File descriptor
-      CHARACTER * ( SZEXP + 22 ) FOR( 1 ) ! Forward transformation
-      INTEGER FPNTR              ! Pointer to work array for reading the
-                                 ! file
+      INTEGER FPNTR              ! Pointer to work array for reading the file
+      INTEGER I                  ! Loop count
+      INTEGER IAT                ! Used length of a string
       INTEGER IAXIS              ! Dimension to modify
       INTEGER IERR               ! First conversion error (dummy=0)
       INTEGER IMAP               ! Compiled mapping identifier
-      CHARACTER * ( 6 ) INV( 2 ) ! Inverse transformation
+      INTEGER INPRM( NDF__MXDIM )! Input axis permutation array
+      INTEGER IWCS               ! AST pointer to WCS FrameSet from NDF
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the NDF
       INTEGER LCOMP              ! Length of component name
       INTEGER LEXP               ! Length of expression
-      CHARACTER * ( DAT__SZLOC ) LOCTR ! Transformation locator
-      LOGICAL LOOP               ! Loop for another section to replace
-      CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
-      CHARACTER * ( 10 ) MODE    ! Mode of the modification
+      INTEGER MAP                ! Base->Current Mapping (1->1)
+      INTEGER MAP0               ! Base->Current Mapping (nin->nout)
+      INTEGER NBAD               ! No. of bad values produced
       INTEGER NDF                ! Input NDF identifier
       INTEGER NDF2               ! NDF identifier for the LIKE parameter
       INTEGER NDIM               ! Number of dimensions of NDF
       INTEGER NERR               ! Number of conversion errors (dummy=0)
-      INTEGER NIN                ! Number of inverse expressions
+      INTEGER NIN                ! Number of inverse expressions or input axes
+      INTEGER NOUT               ! Number of output axes for MAP0
       INTEGER NSUBS              ! Number of token substitutions
+      INTEGER OUTPRM( NDF__MXDIM )! Output axis permutation array
       INTEGER PIND               ! Pixel index of element to change
-      INTEGER PNTRW              ! Pointer to mapped pixel indices
-                                 ! and/or axis centres (work space)
-      REAL RVALUE                ! Replacement value for real data
+      INTEGER PMAP1              ! PermMap to select 1 input axis from MAP0
+      INTEGER PMAP2              ! PermMap to select 1 output axis from MAP0
+      INTEGER PNTRW              ! Pointer to mapped pixel indices and/or axis centres (work space)
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF
+      LOGICAL LOOP               ! Loop for another section to replace
       LOGICAL SUBCEN             ! Substitute array centres in exprs?
       LOGICAL SUBIND             ! Substitute pixel indices in exprs?
-      CHARACTER * ( 4 ) SUGDEF   ! Suggested default
       LOGICAL THERE              ! Axis system or component exists?
-      CHARACTER * ( NDF__SZTYP ) TYPE ! Numeric type for processing
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF
+      REAL RVALUE                ! Replacement value for real data
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -297,6 +316,9 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Start an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Start a NDF context.
       CALL NDF_BEGIN
@@ -338,7 +360,7 @@
 *  is only available for the axis centres.
          IF ( COMP .EQ. 'CENTRE' .OR. COMP .EQ. 'DATA' ) THEN
             CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
-     :                      /'Expression,File,Pixel', .FALSE., MODE,
+     :                      /'Expression,File,Pixel,WCS', .FALSE., MODE,
      :                      STATUS )
          ELSE
             CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
@@ -768,19 +790,153 @@
 
 *  Free the work array.
             CALL PSX_FREE( FPNTR, STATUS )
+
+*  WCS mode.
+*  =========
+         ELSE IF ( MODE .EQ. 'WCS' ) THEN
+
+*  Get the WCS FrameSet from the NDF.
+            CALL KPG1_GTWCS( NDF, IWCS, STATUS )
+
+*  Get the Mapping from GRID (Base) Frame to the Current Frame.
+            MAP0 = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, 
+     :                             STATUS )
+
+*  Get the number of input and output axes.
+            NIN = AST_GETI( MAP0, 'NIN', STATUS )
+            NOUT = AST_GETI( MAP0, 'NOUT', STATUS )
+
+*  Abort if the output Frame does not include the requested axis index.
+            IF( NOUT .LT. IAXIS .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'NOUT', NOUT )
+               IF( NOUT .EQ. 1 ) THEN
+                  CALL MSG_SETC( 'NOUT', ' axis' )
+               ELSE
+                  CALL MSG_SETC( 'NOUT', ' axes' )
+               END IF
+               CALL MSG_SETI( 'IAX', IAXIS )
+               CALL NDF_MSG( 'NDF', NDF )
+               CALL ERR_REP( 'SETAXIS_ERR', 'The current Frame of the'//
+     :                       ' NDF ''NDF'' has only ^NOUT, so the '//
+     :                       'requested axis (^IAX) cannot be used.', 
+     :                       STATUS )
+               GO TO 999
+            END IF
+
+*  Create an AST PermMap which will feed values into the selected input
+*  axis of the above Mapping, using a value equal to half the axis length 
+*  on all other axes.
+            INPRM( 1 ) = IAXIS
+            DO I = 1, NIN
+               OUTPRM( I ) = -I
+               CONST( I ) = 0.5D0*( UBND( I ) - LBND( I ) + 1 )
+            END DO
+            OUTPRM( IAXIS ) = 1
+            PMAP1 = AST_PERMMAP( 1, INPRM, NIN, OUTPRM, 1.0D0, ' ',
+     :                           STATUS )
+
+*  Create an AST PermMap which will extract values for the selected output
+*  axis of the above Mapping.
+            OUTPRM( 1 ) = IAXIS
+            DO I = 1, NOUT
+               INPRM( I ) = 0
+            END DO
+            INPRM( IAXIS ) = 1
+            PMAP2 = AST_PERMMAP( NOUT, INPRM, 1, OUTPRM, 0.0D0, ' ',
+     :                           STATUS )
+
+*  Combine the Mappings together to get a Mapping within 1 input and 1
+*  output.
+            MAP = AST_SIMPLIFY( AST_CMPMAP( PMAP1, 
+     :                                      AST_CMPMAP( MAP0, PMAP2, 
+     :                                                  .TRUE., ' ', 
+     :                                                  STATUS ),
+     :                                      .TRUE., ' ', STATUS ),
+     :                          STATUS )
+           
+*  Obtain the number of elements.
+            EL = UBND( IAXIS ) - LBND( IAXIS ) + 1
+
+*  Get some workspace for the grid centres.
+            CALL PSX_CALLOC( NIN*EL, '_DOUBLE', PNTRW, STATUS )
+
+*  Fill the first EL elements with the grid coordinate at the centre of
+*  each pixel.
+            CALL KPG1_ELNMD( 1, EL, EL, %VAL( PNTRW ), STATUS )
+
+*  Calculate new AXIS centres by transforming the grid centre values into
+*  the current Frame.
+            CALL AST_TRAN1( MAP, EL, %VAL( PNTRW ), .TRUE., 
+     :                      %VAL( PNTRW ), STATUS )
+
+*  Count the good values in the transformed array.
+            CALL KPG1_NBADD( EL, %VAL( PNTRW ), NBAD, STATUS )
+
+*  Report an error if they are all bad.
+            IF( NBAD .EQ. EL .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'I', IAXIS )
+               CALL NDF_MSG( 'NDF', NDF )
+               CALL ERR_REP( 'SETAXIS_ERR', 'No axis centre values '//
+     :                       'for axis ^I can be derived from the '//
+     :                       'current coordinate Frame in ''^NDF''.',
+     :                       STATUS )
+
+*  If any values are not bad, copy them into the AXIS array.
+            ELSE
+
+*  Set the data type of any pre-existing axis-array component to _DOUBLE.
+               CALL NDF_ASTYP( '_DOUBLE', NDF, COMP, IAXIS, STATUS )
+
+*  Map the array component for write access.
+               CALL NDF_AMAP( NDF, MCOMP, IAXIS, '_DOUBLE', 'WRITE', 
+     :                        AXPNTR, EL, STATUS )
+
+*  Copy the centre values from the work array to the axis array.
+               CALL KPG1_CPNDD( 1, 1, EL, %VAL( PNTRW ), 1, EL, 
+     :                          %VAL( AXPNTR( 1 ) ), EL, STATUS )
+
+*  Set up the axis label and units.
+               ATTR = 'LABEL('
+               IAT = 6
+               CALL CHR_PUTI( IAXIS, ATTR, IAT )
+               CALL CHR_APPND( ')', ATTR, IAT )
+               CVAL = AST_GETC( IWCS, ATTR( : IAT ), STATUS )
+               IF( CVAL .NE. ' ' ) CALL NDF_ACPUT( CVAL, NDF, 'LABEL', 
+     :                                          IAXIS, STATUS )
+               ATTR = 'UNIT('
+               IAT = 6
+               CALL CHR_PUTI( IAXIS, ATTR, IAT )
+               CALL CHR_APPND( ')', ATTR, IAT )
+               CVAL = AST_GETC( IWCS, ATTR( : IAT ), STATUS )
+               IF( CVAL .NE. ' ' ) CALL NDF_ACPUT( CVAL, NDF, 'UNITS', 
+     :                                          IAXIS, STATUS )
+
+            END IF
+
+*  Free the workspace.
+            CALL PSX_FREE( PNTRW, STATUS )
+
+*  Unmap the array.  
+            CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
+
          END IF
+
       END IF
 
   999 CONTINUE
 
-*  Free the NDF resources.
+*  End the NDF context.
       CALL NDF_END( STATUS )
+
+*  End the AST context.
+      CALL AST_END( STATUS )
 
 *  Write the closing error message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'SETAXIS_ERR',
-     :     'SETAXIS: Error modifying an axis array component of an '/
-     :     /'NDF.', STATUS )
+         CALL ERR_REP( 'SETAXIS_ERR', 'SETAXIS: Error modifying an '//
+     :                 'axis array component of an NDF.', STATUS )
       END IF
 
       END
