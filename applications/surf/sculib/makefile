@@ -256,7 +256,7 @@ sculib_power2.o:
 sculib_put_fits_c.o: SAE_PAR
 sculib_put_fits_d.o: SAE_PAR
 sculib_put_fits_i.o: SAE_PAR
-sculib_ranged.o:
+sculib_ranged.o: SAE_PAR
 sculib_read_jiggle.o: SAE_PAR
 sculib_read_numbers.o: SAE_PAR
 sculib_read_sky.o: PRM_PAR SAE_PAR
