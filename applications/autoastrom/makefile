@@ -339,14 +339,9 @@ LINK = ln
 #  null command.
 RANLIB = :
 
-##  Commands for adding to and extracting from an archive file (.tar).
-##  We depend on the `h' option here, since the catlib source file
-##  $(CATLIB_DISTRIBUTION) is included in the tarred up source
-##  directory as a link (note that pax can't do this, and
-##  single-unix tar doesn't have this option; all the platforms we
-##  support do have it, however).
-#TAR_IN = tar chf
-#TAR_OUT = tar xf
+#  Commands for adding to and extracting from an archive file (.tar).
+TAR_IN = tar cf
+TAR_OUT = tar xf
 
 #  Commands for adding, deleting and extracting files to/from an object 
 #  archive (.a).
@@ -394,11 +389,6 @@ PKG_LINK = AUTOASTROM
 
 # %%VERSION%%
 PKG_VERS = 0.3
-
-##  Catlib distribution is originally from
-##  ftp://ftp.eso.org/pub/archive/skycat/README.html  
-##  If this is a path, it must be relative to the unpacked source directory.
-#CATLIB_DISTRIBUTION = catlib.tar.gz
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1085,6 +1075,7 @@ moggy/moggy: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a
 	cd moggy && unset INSTALL; make
 
 moggy/Makefile: moggy
+	test -d $(CATLIBINSTALLDIR) || mkdir $(CATLIBINSTALLDIR)
 	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd moggy && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$INST
 
 #  Build and install the SkyCat cat library.  We install it into the
