@@ -28,7 +28,5 @@ $(HYPERTEXT_DOCS): sun152.htx/sun152.html
 # The LaTeX2html commands needs some preprocessing.  The .tex file has
 # the magic within it.
 sun152.htx/sun152.html: sun152.tex
-	sed -n 's/^%%S2HPOST//p' sun152.tex | csh -f
-#	sed -n -e '1s+.*+cd '`pwd`+p -e 's/^%%S2HPOST//p' sun152.tex | csh -f
-
+	sed -n 's/^%%S2HPOST//p' sun152.tex | sh
 
