@@ -35,11 +35,18 @@
 #  Local constants:
       set exclude_files {
          CCDMain.tcl 
+         CCDGeometryMain.tcl
+         CCDBindings.tcl
+         CCDOptions.tcl
          mkindex.tcl 
          ccdalign.tcl
          idicurs.tcl
          pairndf.tcl
          raisehack.tcl
+         ccdpack_red.tcl
+         ccdpack_reg.tcl
+         ccdpack_res.tcl
+         ccdpack_scr.tcl
       }
 
 #  Withdraw the top level window for tidiness.  A secondary purpose of 
