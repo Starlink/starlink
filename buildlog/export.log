@@ -324,7 +324,7 @@ export:
 prepare:
 
 check_packages:
-[available] Jan 5, 2004 5:20:11 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jan 6, 2004 5:39:07 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -842,8 +842,9 @@ dist:
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/splat-2.0.zip
- /apps/cvsbuild/starjava/bin/ant: line 239: 18985 Killed                  "$JAVACMD" $ANT_OPTS -classpath "$LOCALCLASSPATH" -Dant.home="${ANT_HOME}" org.apache.tools.ant.Main $ANT_ARGS "$@"
-r.bz2
+      [tar] Building tar: /apps/cvsbuild/java/source/splat/splat-2.0.tar
+     [gzip] Building: /apps/cvsbuild/export/splat-2.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/splat-2.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/splat/splat-2.0.tar
      [echo] Executing Mirage target: export
 
@@ -1051,4 +1052,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
 
 BUILD SUCCESSFUL
-Total time: 12 minutes 43 seconds
+Total time: 20 minutes 8 seconds
