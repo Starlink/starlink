@@ -116,7 +116,7 @@
       CALL BDI_AXPUT0C( BID, 2, 'Label', 'Y position', STATUS )
       CALL BDI_AXPUT0C( BID, 1, 'Units', UNITS, STATUS )
       CALL BDI_AXPUT0C( BID, 2, 'Units', UNITS, STATUS )
-      CALL BDI_PUT0C( OFID, 'units', 'Probability/pixel', STATUS )
+      CALL BDI_PUT0C( OFID, 'Units', 'Probability/pixel', STATUS )
 
 *    Image position
       CALL USI_GET0R( 'X0', X0, STATUS )
