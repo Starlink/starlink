@@ -66,9 +66,10 @@ FileByteStream::FileByteStream(string& filename,
 			       bool preload)
     throw (InputByteStreamError)
 {
-    cerr << "FileByteStream(" << filename << ","
-	 << tryext << ","
-	 << preload << ")" << endl;
+    if (getVerbosity() > normal)
+	cerr << "FileByteStream(name=" << filename
+	     << ",ext=" << tryext
+	     << ",preload=" << (preload?"yes":"no") << ")" << endl;
     int newfd = -1;
     try {
 	newfd = openSourceSpec("<osfile>" + filename);
@@ -82,22 +83,6 @@ FileByteStream::FileByteStream(string& filename,
 	filename += tryext;
     }
     assert(newfd >= 0);
-
-//     int newfd = open (filename.c_str(), O_RDONLY);
-//     if (newfd < 0 && tryext.length() > 0)
-//     {
-// 	string tfilename = filename + tryext;
-// 	newfd = open (tfilename.c_str(), O_RDONLY);
-// 	if (newfd >= 0)
-//             // If this succeeds in opening the file, then modify the filename.
-// 	    filename = tfilename;
-//     }
-//     if (newfd < 0)
-//     {
-// 	string errstr = strerror (errno);
-// 	throw InputByteStreamError ("can\'t open file " + filename
-//                                     + " to read (" + errstr + ")");
-//     }
 
     struct stat S;
     if (fstat (newfd, &S))
@@ -144,6 +129,9 @@ void FileByteStream::seek(int pos)
 	    string errmsg = strerror(errno);
 	    throw InputByteStreamError("Can't seek (" + errmsg + ")");
 	}
+	if (getVerbosity() > normal)
+	    cerr << "FileByteStream::seek(" << pos << "=>" << offset
+		 << ") ok" << endl;
 	reloadBuffer();
     }
 }
