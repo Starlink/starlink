@@ -164,13 +164,13 @@ itcl::class gaia::GaiaPhotomObject {
             }
          }
          optimal {
-            if { ! $psf } {
-               lassign $args \
-                  index xpos ypos mag magerr sky signal code positions
-            } else {
+            if { $psf } {
                lassign $args \
                   index xpos ypos fwhm1 fwhm2 angle code major seeing positions
                set index 0
+            } else {
+               lassign $args \
+                  index xpos ypos mag magerr sky signal code positions
             }
          }
       }
@@ -196,6 +196,43 @@ itcl::class gaia::GaiaPhotomObject {
       #  Convert the angle into a canvas one.
       set angle [canvas_angle $angle]
 
+      #  Now redraw the object with these parameters.
+      redraw_object
+   }
+
+   #  Set all values in one go after object is created (more efficient 
+   #  than repeated configures). The values set are:
+   #
+   #     index xpos ypos mag magerr sky signal code major eccen angle 
+   #     positions shape fwhm1 fwhm2 seeing
+   #
+   #  All fields must be supplied, just set unnecesary ones to {}.
+   public method setallvalues {args} {
+      lassign $args \
+         index xpos ypos mag magerr sky signal code major eccen \
+         angle positions shape fwhm1 fwhm2 seeing
+
+      #  Pretend this object has been measured (for now).
+      set measured_ 1
+      
+      #  Convert image positions into canvas positions for X and Y.
+      lassign [canvas_coord $xpos $ypos] xpos ypos
+      
+      #  Convert major axis into a canvas scale.
+      set major [canvas_dist $major]
+      
+      #  Modify minor and eccen if shape is circular, otherwise set
+      #  minor axis to correct value.
+      if { $shape == "circle" } {
+         set minor $major
+         set eccen 0.0
+      } else {
+         set minor [expr $major*sqrt(1.0-$eccen*$eccen)]
+      }
+      
+      #  Convert the angle into a canvas one.
+      set angle [canvas_angle $angle]
+      
       #  Now redraw the object with these parameters.
       redraw_object
    }
@@ -267,9 +304,9 @@ itcl::class gaia::GaiaPhotomObject {
          return [getapvals_ $mode]
       } else {
          if { $psf } {
-            return [getpsfvals_]
+            return [getpsfvals_ $mode]
          } else {
-            return [getoptvals_]
+            return [getoptvals_ $mode]
          }
       }
    }
@@ -293,7 +330,7 @@ itcl::class gaia::GaiaPhotomObject {
    }
 
    #  Return a list of current psf object values. Only index 0 is allowed.
-   protected method getpsfvals_ {} {
+   protected method getpsfvals_ {mode} {
       lassign [image_coord $xpos $ypos] x y
       set maj [image_dist $major]
       set ang [image_angle $angle]
@@ -301,17 +338,21 @@ itcl::class gaia::GaiaPhotomObject {
       set description \
          "[format {%10d %10f %10f %10f %10f %10f %10s %10f %10f %10s} \
              $index $x $y $fwhm1 $fwhm2 $ang $code $maj $seeing $positions]"
-      append description "\n[list_sky_]"
+      if { $mode == "all" } { 
+         append description "\n[list_sky_]"
+      }
       return $description
    }
 
    #  Return a list of optimal photometry values.
-   protected method getoptvals_ {} {
+   protected method getoptvals_ {mode} {
       lassign [image_coord $xpos $ypos] x y
       set description \
          "[format {%10d %10f %10f %10f %10f %10f %10f %10s %10s} \
              $index $x $y $mag $magerr $sky $signal $code $positions]"
-      append description "\n[list_sky_]"
+      if { $mode == "all" } { 
+         append description "\n[list_sky_]"
+      }
       return $description
    }
 
@@ -1330,6 +1371,12 @@ itcl::class gaia::GaiaPhotomObject {
    #  Command to execute if object is deleted.
    public variable notify_delete_cmd {} {}
 
+   #  Set colour of parts of object.
+   public variable selected_colour white
+   public variable deselected_colour green
+   public variable selected_sky_colour yellow
+   public variable deselected_sky_colour blue
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -1382,13 +1429,6 @@ itcl::class gaia::GaiaPhotomObject {
 
    #  Number of Photom objects created.
    common number_of_objects 0
-
-   #  Set colour of parts of object.
-   common selected_colour white
-   common deselected_colour green
-
-   common selected_sky_colour yellow
-   common deselected_sky_colour blue
 
    #  Private variables: only visible here.
    #  ==================

@@ -79,14 +79,6 @@
 #        -linewidth integer
 #
 #     Sets the width of any lines drawn.
-#
-#        -outlinecolor colour
-#
-#     Sets the colour of the outlines.
-#
-#        -constrain boolean
-#
-#     Controls whether changes of property apply to all objects or not.
 
 #  Methods:
 #     public:
@@ -223,7 +215,8 @@ itcl::class gaia::GaiaOptPhotom {
                         -phottype optimal \
                         -psf 1 \
                         -semimajor 5.0 \
-                        -allow_resize 0]
+                        -allow_resize 0 \
+                        -notify_changed_cmd [code $this changed_psf]]
       
       #  Create the GaiaPhotomList object to deal with the details of
       #  the objects that are being measured.
@@ -276,6 +269,8 @@ itcl::class gaia::GaiaOptPhotom {
       configure_menubutton File -underline 0
       set Options [add_menubutton "Options" left]
       configure_menubutton Options -underline 0
+      set Colours [add_menubutton "Colours" left]
+      configure_menubutton Colours -underline 0
 
       #  Add window help.
       global gaia_library
@@ -333,6 +328,10 @@ itcl::class gaia::GaiaOptPhotom {
          -command [code $this set_sky_shape]
       add_menu_short_help $Options {Use circular sky apertures}  \
          {Toggle to get elliptical sky apertures, when not in annuli}
+
+
+      #  Control of various colours.
+      make_colours_menu_ $Colours
 
       #  Sky zero point and frame exposure time.
       if { $usemags_ } {
@@ -453,7 +452,7 @@ itcl::class gaia::GaiaOptPhotom {
       }
       $itk_component(DefinePSF) configure -highlightbackground black
       add_short_help $itk_component(DefinePSF) \
-      {Select object for PSF determination}
+         {Select object for PSF determination}
 
       #  Define sky regions (only used if skymethod is set to regions).
       itk_component add DefinePSFSky  {
@@ -577,10 +576,15 @@ itcl::class gaia::GaiaOptPhotom {
       if { $filename == "" } {
 	 set w [FileSelect .\#auto -title "Choose PHOTOM file"]
 	 if {[$w activate]} {
-	    $object_list_ read_file [$w get] $update
+            set filename [$w get]
+	    $psf_list_ read_file $filename $update
+            $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
+	    $object_list_ read_file $filename $update
 	 }
 	 destroy $w
       } else {
+	 $psf_list_ read_file $filename $update
+         $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
 	 $object_list_ read_file $filename $update
       }
    }
@@ -660,13 +664,13 @@ itcl::class gaia::GaiaOptPhotom {
       if { $filename == "" } {
 	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
 	 if {[$w activate]} {
-            set file [$w get]
-	    $psf_list_ write_file $file
-	    $object_list_ append_file "" $file
+            set filename [$w get]
+	    $psf_list_ write_file $filename
+	    $object_list_ append_file "" $filename
 	 }
 	 destroy $w
       } else {
-         $psf_list_ write_file $file
+         $psf_list_ write_file $filename
 	 $object_list_ append_file "" $filename
       }
    }
@@ -683,7 +687,7 @@ itcl::class gaia::GaiaOptPhotom {
 	 }
 	 destroy $w
       } else {
-         $psf_list_ append_file $comment [$w get]
+         $psf_list_ append_file $comment $filename
 	 $object_list_ append_file "" $filename
       }
    }
@@ -711,11 +715,20 @@ itcl::class gaia::GaiaOptPhotom {
       $itk_component(DefinePSF) configure -relief raised
    }
 
+   #  Notification that the PSF object has changed shape (we just
+   #  allow the radius to be modified). All normal apertures need to
+   #  reflect this.
+   private method changed_psf {} {
+      $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
+      $object_list_ config_all major [$psf_list_ cget -semimajor]
+   }
+
    #  The measurements are made, read in the results.
    private method measured_objects {} {
       blt::busy release $w_
       if { [file exists GaiaPhotomOut.Dat] } {
          $psf_list_ read_file GaiaPhotomOut.Dat 1
+         $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
          $object_list_ read_file GaiaPhotomOut.Dat 1
       }
    }
@@ -758,6 +771,62 @@ itcl::class gaia::GaiaOptPhotom {
    private method sky_zero_changed {value} {
       if { $value != $skymag_ } {
          measure_objects
+      }
+   }
+
+   #  Add a menu for controlling the aperture colours.
+   protected method make_colours_menu_ {m} {
+      
+      #  Object & PSF colours.
+      $m add cascade -label Objects -menu [menu $m.objcol]
+      $m add cascade -label PSF -menu [menu $m.psfcol]
+      set objmen $m.objcol
+      set psfmen $m.psfcol
+      
+      set psf {}
+      foreach men "$m.objcol $m.psfcol" { 
+
+         #  Add the menus
+         foreach {label name} {{Selected colour}   selcol 
+            {Deselected colour} descol
+            {Selected sky colour} selskycol
+            {Deselected sky colour} desskycol} {
+            $men add cascade -label $label -menu [menu $men.$name]
+         }
+
+         foreach i $itk_option(-colors) {
+            $men.selcol add radiobutton \
+               -value $i \
+               -background $i \
+               -command [code $this configure -${psf}selected_colour $i] \
+               -variable [scope itk_option(-${psf}selected_colour)]
+         }
+         configure -${psf}selected_colour $itk_option(-${psf}selected_colour)
+         foreach i $itk_option(-colors) {
+            $men.descol add radiobutton \
+               -value $i \
+               -background $i \
+               -command [code $this configure -${psf}deselected_colour $i] \
+               -variable [scope itk_option(-${psf}deselected_colour)]
+         }
+         configure -${psf}deselected_colour $itk_option(-${psf}deselected_colour)
+         foreach i $itk_option(-colors) {
+            $men.selskycol add radiobutton \
+               -value $i \
+               -background $i \
+               -command [code $this configure -${psf}selected_sky_colour $i] \
+               -variable [scope itk_option(-${psf}selected_sky_colour)]
+         }
+         configure -${psf}selected_sky_colour $itk_option(-${psf}selected_sky_colour)
+         foreach i $itk_option(-colors) {
+            $men.desskycol add radiobutton \
+               -value $i \
+               -background $i \
+               -command [code $this configure -${psf}deselected_sky_colour $i] \
+               -variable [scope itk_option(-${psf}deselected_sky_colour)]
+         }
+         configure -${psf}deselected_sky_colour $itk_option(-${psf}deselected_sky_colour)
+         set psf psf_
       }
    }
 
@@ -806,19 +875,46 @@ itcl::class gaia::GaiaOptPhotom {
       }
    }
 
-   #  Colour of lines (interactive shape only).
-   itk_option define -outlinecolor outlinecolor OutlineColor {white} {
+   #  Colours.
+   itk_option define -selected_colour selected_colour Selected_colour {white} {
       if { $object_list_ != {} } {
-         $object_list_ configure -outlinecolour $itk_option(-outlinecolour)
+         $object_list_ configure -selected_colour $itk_option(-selected_colour)
+      }
+   }
+   itk_option define -deselected_colour deselected_colour Deselected_colour {green} {
+      if { $object_list_ != {} } {
+         $object_list_ configure -deselected_colour $itk_option(-deselected_colour)
+      }
+   }
+   itk_option define -selected_sky_colour selected_sky_colour Selected_skycolour {yellow} {
+      if { $object_list_ != {} } {
+         $object_list_ configure -selected_sky_colour $itk_option(-selected_sky_colour)
+      }
+   }
+   itk_option define -deselected_sky_colour deselected_sky_colour Deselected_skycolour {blue} {
+      if { $object_list_ != {} } {
+         $object_list_ configure -deselected_sky_colour $itk_option(-deselected_sky_colour)
       }
    }
 
-   #  Whether operations to graphics objects are global or not.
-   itk_option define -constrain constrain Constrain {0} {
-      if { $itk_option(-constrain) } {
-         if { $object_list_ != {} } {
-            $object_list_ adjust_all_objects
-         }
+   itk_option define -psf_selected_colour psf_selected_colour Psf_selected_colour {green} {
+      if { $object_list_ != {} } {
+         $psf_list_ configure -selected_colour $itk_option(-psf_selected_colour)
+      }
+   }
+   itk_option define -psf_deselected_colour psf_deselected_colour Psf_deselected_colour {green} {
+      if { $object_list_ != {} } {
+         $psf_list_ configure -deselected_colour $itk_option(-psf_deselected_colour)
+      }
+   }
+   itk_option define -psf_selected_sky_colour psf_selected_sky_colour Psf_selected_skycolour {red} {
+      if { $object_list_ != {} } {
+         $psf_list_ configure -selected_sky_colour $itk_option(-psf_selected_sky_colour)
+      }
+   }
+   itk_option define -psf_deselected_sky_colour psf_deselected_sky_colour Psf_deselected_skycolour {red} {
+      if { $object_list_ != {} } {
+         $psf_list_ configure -deselected_sky_colour $itk_option(-psf_deselected_sky_colour)
       }
    }
 
@@ -827,6 +923,11 @@ itcl::class gaia::GaiaOptPhotom {
 
    #  Command to execute to create a new instance of this object.
    itk_option define -clone_cmd clone_cmd Clone_Cmd {}
+
+   #  Possible colours.
+   itk_option define -colors colors Colors {
+       red green blue cyan magenta yellow white grey90 grey40 grey10 black
+   }
 
    #  Protected variables: (only available to instance)
    #  --------------------

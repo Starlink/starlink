@@ -433,7 +433,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -from 0.1 \
-            -to $itk_option(-maxsemimajor) \
+            -to [expr $itk_option(-maxsemimajor)*0.1] \
             -increment 0.1 \
             -resolution 0.1 \
             -show_arrows 1 \
@@ -802,7 +802,13 @@ itcl::class gaia::GaiaPhotomDetails {
    itk_option define -usemags usemags UseMags 1 {}
 
    #  Optimal photometry parameters (clip is semimajor axis).
-   itk_option define -seeing seeing Seeing 2.0 {}
+   itk_option define -seeing seeing Seeing 2.0 {
+      if { $itk_option(-object_list) != {} } {
+         if { $propagate_ } {
+            $itk_option(-object_list) configure -seeing $itk_option(-seeing)
+         }
+      }
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------

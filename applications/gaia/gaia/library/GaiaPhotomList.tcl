@@ -145,6 +145,11 @@
 #
 #     If phottype is optimal then this decides if the list of objects#
 #     are PSF reference ones, or not.
+#
+#        -notify_changed_cmd
+#
+#     Command to execute when the semimajor axis is changed (use this
+#     to track PSF to optimal object size).
 
 #  Methods:
 #     public:
@@ -158,6 +163,9 @@
 #
 #        config_selected item value
 #           Configure all the selected objects with the given item
+#           value configuration.
+#        config_all item value
+#           Configure all the objects with the given item
 #           value configuration.
 #        copy
 #           Create a new object that is a copy of the currently
@@ -255,7 +263,7 @@ itcl::class gaia::GaiaPhotomList {
    #  --------
 
    #  Create a new GaiaPhotomObject with all the current
-   #  configurations and an arbitrary name. 
+   #  configurations and an arbitrary name.
    public method new_object {index} {
       set object [GaiaPhotomObject \#auto \
                      -index $index \
@@ -274,7 +282,11 @@ itcl::class gaia::GaiaPhotomList {
                      -fwhm2 $fwhm2 \
                      -seeing $seeing \
                      -phottype $phottype \
-                     -psf $psf]
+                     -psf $psf \
+                     -selected_colour $selected_colour \
+                     -deselected_colour $deselected_colour \
+                     -selected_sky_colour $selected_sky_colour \
+                     -deselected_sky_colour $deselected_sky_colour]
       set modified 1
       return $object
    }
@@ -317,14 +329,13 @@ itcl::class gaia::GaiaPhotomList {
 
    #  Create an object on the canvas. If PSF then index can only be 0.
    public method create_object {} {
-      if { $phottype != "aperture" && $psf } { 
-         set selected_ 0
-         if { [info exists objects_(0)] } { 
+      if { $phottype != "aperture" && $psf } {
+         if { [info exists objects_(0)] } {
             delete object $objects_(0)
          }
+         set selected_ 0
       } else {
-         incr highest_index_
-         set selected_ $highest_index_
+         set selected_ [incr highest_index_]
       }
       set objects_($selected_) [new_object $selected_]
 
@@ -400,58 +411,65 @@ itcl::class gaia::GaiaPhotomList {
          #  Extract the index from the list and keep the rest for later.
          set trail [lassign $args index]
 
+         #  Set default configuration to reflect the given
+         #  values. Also add defaults for unused parameters.
+         set selected_ $index
+         if { [llength $args] != 1 } {
+            if { $phottype == "aperture" } {
+               lassign $args selected_ xpos ypos mag magerr sky \
+                  signal code semimajor eccentricity angle positions shape
+            } else {
+               if { $psf } {
+                  lassign $args selected_ xpos ypos fwhm1 fwhm2 angle \
+                     code semimajor seeing positions
+                  set mag 0.0
+                  set magerr 0.0
+                  set sky 0.0
+                  set signal 0.0
+               } else {
+                  lassign $args selected_ xpos ypos mag magerr sky \
+                     signal code positions
+               }
+            }
+         }
+
          #  Create a new object if it doesn't exist already, otherwise
          #  just update the existing object.
          if { ! [info exists objects_($index)] } {
-
-            #  Need to create a new object with the given parameters.
-            #  One problem is that we cannot change the shape of an
-            #  aperture so we must initialise this correctly. Solution
-            #  is to parse the whole string before passing this on.
-            if { [llength $args] != 1 } {
-               set selected_ $index
-               if { $phottype == "aperture" } { 
-                  lassign $args selected_ xpos ypos mag magerr sky \
-                     signal code semimajor eccentricity angle positions shape
-               } else {
-                  if { $psf } { 
-                     lassign $args selected_ xpos ypos fwhm1 fwhm2 angle \
-                        code semimajor seeing positions
-                  } else {
-                     lassign $args selected_ xpos ypos mag magerr sky \
-                        signal code positions
-                  }
-               }
-               set objects_($selected_) [new_object $selected_]
-               set modified 1
-               $objects_($selected_) draw_object
-               eval $objects_($selected_) setvalues $args
-            }
+            set objects_($selected_) [new_object $selected_]
+            $objects_($selected_) draw_object
+            $objects_($selected_) setallvalues \
+               $selected_ $xpos $ypos $mag $magerr $sky $signal $code \
+               $semimajor $eccentricity $angle $positions $shape \
+               $fwhm1 $fwhm2 $seeing
             if { $selected_ > $highest_index_ } {
                set highest_index_ $selected_
             }
             set id [$objects_($selected_) canvas_id]
             set objects_ids_($id) $selected_
-
+            
             #  Notify command when this object is changed.
             $objects_($selected_) configure -notify_change_cmd \
                [code $this changed_ $selected_]
-
+            
             #  Notify command when this object is deleted.
             $objects_($selected_) configure -notify_delete_cmd \
                [code $this deleted_ $selected_]
-         } elseif { $update } {
+            set modified 1
 
+         } elseif { $update } {
+            
             #  Object exists and update is allowed so modify the
             #  current values.
             if { [llength $args] != 1 } {
-               eval $objects_($index) setvalues $args
-               set modified 1
+               $objects_($selected_) setallvalues \
+                  $selected_ $xpos $ypos $mag $magerr $sky $signal $code \
+                  $semimajor $eccentricity $angle $positions $shape \
+                  $fwhm1 $fwhm2 $seeing
             }
             if { $index > $highest_index_ } {
                set highest_index_ $index
             }
-            set selected_ $index
             set id [$objects_($selected_) canvas_id]
             set objects_ids_($id) $selected_
          }
@@ -467,7 +485,7 @@ itcl::class gaia::GaiaPhotomList {
    public method read_file {filename update} {
       if { [file readable $filename] } {
          set fid [open $filename r]
-         if { $phottype == "aperture" } { 
+         if { $phottype == "aperture" } {
             read_apfile_ $fid $filename $update
          } else {
             if { $psf } {
@@ -477,22 +495,22 @@ itcl::class gaia::GaiaPhotomList {
             }
          }
          close $fid
-         
+
          #  Finally update the scrollbox and the selected object details.
          update_scrollbox_
          update_details_
-         
+
          #  Objects have changed, so update modified flag.
          set modified 1
       } else {
          error "Cannot read file: $filename."
       }
    }
-   
+
    #  Read back an aperture file.
-   protected method read_apfile_ {fid filename update} { 
+   protected method read_apfile_ {fid filename update} {
       set ok 1
-      
+
       #  Loop over non-blank lines. If line starts with # it is
       #  either a comment or a sky region spec. Sky region specs
       #  start with '#SKY' or '#ANN'.
@@ -523,12 +541,12 @@ itcl::class gaia::GaiaPhotomList {
          }
       }
    }
-   
+
    #  Read an optimal photometry file. This is a special case as the
    #  reference PSF star, with index 0, is ignored.
-   protected method read_optfile_ {fid filename update} { 
+   protected method read_optfile_ {fid filename update} {
       set ok 1
-         
+
       #  Loop over non-blank lines. If line starts with # it is
       #  either a comment or a sky region spec. Sky region specs
       #  start with '#SKY' or '#ANN'.
@@ -539,7 +557,7 @@ itcl::class gaia::GaiaPhotomList {
                \#SKY* {
                   if { ! $update } {
                      set rest [lassign $line comment index]
-                     if { $index != 0 } { 
+                     if { $index != 0 } {
                         eval $objects_($index) setsky SKY $rest
                      }
                   }
@@ -547,7 +565,7 @@ itcl::class gaia::GaiaPhotomList {
                \#ANN* {
                   if { $update } {
                      set rest [lassign $line comment index]
-                     if { $index != 0 } { 
+                     if { $index != 0 } {
                         eval $objects_($index) setsky ANN $rest
                      }
                   }
@@ -556,7 +574,7 @@ itcl::class gaia::GaiaPhotomList {
                   }
                default {
                   lassign $line index
-                  if { $index != 0} { 
+                  if { $index != 0} {
                      eval add $update $line
                   }
                }
@@ -568,9 +586,9 @@ itcl::class gaia::GaiaPhotomList {
    }
 
    #  Read a PSF object entry. This is the one with index 0.
-   protected method read_psffile_ {fid filename update} { 
+   protected method read_psffile_ {fid filename update} {
       set ok 1
-         
+
       #  Loop over non-blank lines. If line starts with # it is
       #  either a comment or a sky region spec. Sky region specs
       #  start with '#SKY' or '#ANN'. Note in this case index is 0.
@@ -582,7 +600,7 @@ itcl::class gaia::GaiaPhotomList {
                \#SKY* {
                   if { ! $update } {
                      set rest [lassign $line comment index]
-                     if { $index == 0 } { 
+                     if { $index == 0 } {
                         eval $objects_($index) setsky SKY $rest
                      }
                   }
@@ -590,7 +608,7 @@ itcl::class gaia::GaiaPhotomList {
                \#ANN* {
                   if { $update } {
                      set rest [lassign $line comment index]
-                     if { $index == 0 } { 
+                     if { $index == 0 } {
                         eval $objects_($index) setsky ANN $rest
                      }
                   }
@@ -599,7 +617,7 @@ itcl::class gaia::GaiaPhotomList {
                   }
                default {
                   lassign $line index
-                  if { $index == 0} { 
+                  if { $index == 0} {
                      eval add $update $line
                   }
                }
@@ -646,7 +664,7 @@ itcl::class gaia::GaiaPhotomList {
    public method append_file {comment filename} {
       set ok 0
       set fid [open $filename a+]
-      if { $comment != {} } { 
+      if { $comment != {} } {
          puts $fid "# $comment"
       }
       for { set i $lowest_index_ } { $i <= $highest_index_ } { incr i } {
@@ -669,6 +687,15 @@ itcl::class gaia::GaiaPhotomList {
                   $objects_($objects_ids_($id)) configure -$item $value
                }
             }
+         }
+      }
+   }
+
+   #  Set a configuration option for all objects.
+   public method config_all {item value} {
+      for {set i $lowest_index_} {$i <= $highest_index_} {incr i} {
+         if { [info exists objects_($i)] } {
+            $objects_($i) configure -$item $value
          }
       }
    }
@@ -750,12 +777,12 @@ itcl::class gaia::GaiaPhotomList {
       # These values now become the default (for creation of
       # new objects without resize).
       if { [info exists objects_($index)] } {
-         if { $phottype == "aperture" } { 
+         if { $phottype == "aperture" } {
             lassign [$objects_($index) object_details] \
                index x y mag magerr sky signal code semimajor \
                eccentricity angle positions innerscale outerscale
          } else {
-            if { $psf } { 
+            if { $psf } {
                lassign [$objects_($index) object_details] \
                   index x y fwhm1 fwhm2 angle code semimajor seeing \
                   positions innerscale outerscale
@@ -774,14 +801,14 @@ itcl::class gaia::GaiaPhotomList {
 
    #  Type pf photometry objects we're dealing with.
    public variable phottype aperture {
-      if { $phottype != "aperture" && $psf } { 
+      if { $phottype != "aperture" && $psf } {
          set lowest_index_ 0
       } else {
          set lowest_index_ 1
       }
    }
    public variable psf 0 {
-      if { $phottype != "aperture" && $psf } { 
+      if { $phottype != "aperture" && $psf } {
          set lowest_index_ 0
       } else {
          set lowest_index_ 1
@@ -816,7 +843,7 @@ itcl::class gaia::GaiaPhotomList {
          }
          update_scrollbox_
       } else {
-         if { [winfo exists $scrollbox] } { 
+         if { [winfo exists $scrollbox] } {
             pack forget $scrollbox
             delete object $scrollbox
          }
@@ -842,19 +869,38 @@ itcl::class gaia::GaiaPhotomList {
    }
 
    #  Default semimajor axis (radius) of apertures. Change the value
-   #  of the current object if available.
+   #  of the current object if available. This is special for PSF
+   #  objects as there can only be one, which is permanently "selected".
    public variable semimajor 5.0 {
       config_selected major $semimajor
+      if { $phottype != "aperture" } {
+         if { $psf } {
+            config_all major $semimajor
+         }
+      }
+      if { $notify_changed_cmd != {} } {
+         eval $notify_changed_cmd
+      }
    }
 
    #  Default inner scale of apertures.
    public variable innerscale 1.5 {
       config_selected innerscale $innerscale
+      if { $phottype != "aperture" } {
+         if { $psf } {
+            config_all innerscale $innerscale
+         }
+      }
    }
 
    #  Default outer scale of apertures.
    public variable outerscale 2.0 {
       config_selected outerscale $outerscale
+      if { $phottype != "aperture" } {
+         if { $psf } {
+            config_all outerscale $outerscale
+         }
+      }
    }
 
    #  Default boolean for annular or region sky methods.
@@ -867,11 +913,21 @@ itcl::class gaia::GaiaPhotomList {
    }
    public variable positions annulus {
       config_selected positions $positions
+      if { $phottype != "aperture" } {
+         if { $psf } {
+            config_all positions $positions
+         }
+      }
    }
 
    #  Default line width of graphical objects.
    public variable linewidth 1 {
       config_selected linewidth $linewidth
+      if { $phottype != "aperture" } {
+         if { $psf } {
+            config_all linewidth $linewidth
+         }
+      }
    }
 
    #  Default eccentricity of apertures.
@@ -886,34 +942,48 @@ itcl::class gaia::GaiaPhotomList {
 
    #  Default seeing.
    public variable seeing 2.0 {
-      config_selected seeing $seeing
+      config_all seeing $seeing
    }
 
    #  Default fwhm1 and fwhm2.
    public variable fwhm1 0.0 {
-      config_selected fwhm1 $fwhm1
+      config_all fwhm1 $fwhm1
    }
    public variable fwhm2 0.0 {
-      config_selected fwhm2 $fwhm2
+      config_all fwhm2 $fwhm2
    }
 
    #  Whether objects in list can be interactively resized or not.
    public variable allow_resize {1} {
-       $canvasdraw configure -show_selection_grips $allow_resize
+      $canvasdraw configure -show_selection_grips $allow_resize
    }
 
    #  Command to execute when a new object is created.
    public variable notify_created_cmd {} {}
 
-   #  Command to execute when an object is modified.
+   #  Command to execute when an object semimajor axis is modified.
    public variable notify_changed_cmd {} {}
 
    #  Whether calculations are in magnitudes or counts.
    public variable usemags 1 {}
 
+   #  Control of the various colours (effects all apertures).
+   public variable selected_colour white {
+      config_all selected_colour $selected_colour
+   }
+   public variable deselected_colour green {
+      config_all deselected_colour $deselected_colour
+   }
+   public variable selected_sky_colour yellow {
+      config_all selected_sky_colour $selected_sky_colour
+   }
+   public variable deselected_sky_colour blue {
+      config_all deselected_sky_colour $deselected_sky_colour
+   }
+
    #  Protected variables: (available to instance)
    #  --------------------
-   
+
    #  Lowest index of objects, set to 0 for PSF, otherwise 1.
    protected variable lowest_index_ 1
 
