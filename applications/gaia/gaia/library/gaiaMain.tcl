@@ -21,14 +21,16 @@
 #     of the GAIA package.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
-#     21-NOV-1996 (PDRAPER):
+#     21-NOV-1996 (PWD):
 #        Original version
-#     12-MAR-1999 (PDRAPER):
+#     12-MAR-1999 (PWD):
 #        Updated to work with GAIA plugin.
+#     15-JUL-2003 (PWD):
+#        Modified to also start the tabbed version of interface.
 #     {enter_changes_here}
 
 #-
@@ -97,6 +99,14 @@ if { $argc >= 1 } {
    }
 }
 
+#  See if this is the tabbed interface.
+set usetabbed 0
+set tindex [lsearch -exact $argv "-tabbedgaia"]
+if { $tindex != -1 } { 
+   incr tindex
+   set usetabbed [lindex $argv $tindex]
+}
+
 #  Restore any properties of the Gaia object that have been set last
 #  time around (and explicity saved), these go before other options so
 #  that these may be overridden on the command-line.
@@ -132,6 +142,18 @@ incr argc 2
 #  (i.e. not the plugin).
 set env(NATIVE_GAIA) 1
 
-#  Start up the main window.
-gaia::Gaia::startGaia
-exit
+if { $usetabbed } {
+
+   #  We don't want the HDU chooser.
+   lappend argv "-show_hdu_chooser"
+   lappend argv "0"
+   incr argc 2
+
+   #  Start up the tabbed main window.
+   gaia::TabbedGaia .\#auto
+
+} else {
+
+   #  Start up the plain main window.
+   gaia::Gaia::startGaia
+}

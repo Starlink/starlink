@@ -1767,7 +1767,7 @@ window gives you access to this."
 
    #  The default percentage cut used for new files.
    itk_option define -default_cut default_cut Default_Cut 100.0
-
+ 
    # -- Protected variables --
 
    #  Application name.
