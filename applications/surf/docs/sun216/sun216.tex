@@ -47,7 +47,7 @@
                                 Joint Astronomy Centre, Hilo, Hawaii}
 \newcommand{\stardocdate}      {4 November 1999}
 \newcommand{\stardoctitle}     {SURF -- SCUBA User Reduction Facility}
-\newcommand{\stardocversion}   {1.4}
+\newcommand{\stardocversion}   {1.5}
 \newcommand{\stardocmanual}    {User's manual}
 \newcommand{\stardocabstract}  {%
 \scusoft\ is a set of ADAM tasks necessary for reducing demodulated 
@@ -177,6 +177,7 @@ descriptions of each task.
 \newcommand{\polbin}{\xref{\task{polbin}}{sun223}{POLBIN}}
 \newcommand{\polvec}{\xref{\task{polvec}}{sun223}{POLVEC}}
 \newcommand{\polplot}{\xref{\task{polplot}}{sun223}{POLPLOT}}
+\newcommand{\polstack}{\xref{\task{polstack}}{sun223}{POLSTACK}}
 
 \newcommand{\catselect}{\xref{\task{catselect}}{sun190}{}}
 
@@ -724,13 +725,12 @@ descriptions of each task.
 
 \section{\xlabel{introduction}Introduction\label{introduction}}
 
-The Submillimetre Common-User Bolometer Array (SCUBA) \cite{spiewsh,mnscu} 
-is a continuum
-instrument on the \htmladdnormallinkfoot{James Clerk Maxwell
-Telescope}{http://www.jach.hawaii.edu/JCMT/}, Mauna Kea, Hawaii.  SCUBA has two
-arrays and can observe simultaneously at two wavelengths (three wavelengths
-when using the photometry pixels) -- the layout of the SCUBA arrays is shown
-in Fig.\ \ref{arrays}.
+The Submillimetre Common-User Bolometer Array (SCUBA) \cite{spiewsh,mnscu} is
+a continuum instrument on the \htmladdnormallinkfoot{James Clerk Maxwell
+Telescope}{http://www.jach.hawaii.edu/JACpublic/JCMT/}, Mauna Kea, Hawaii.
+SCUBA has two arrays and can observe simultaneously at two wavelengths (three
+wavelengths when using the photometry pixels) -- the layout of the SCUBA
+arrays is shown in Fig.\ \ref{arrays}.
 
 The on-line system produces data in the Starlink \ndf\ format \cite{ndf}.
 Both the raw demodulated data (signified by `\_dem\_' in the file name) and a
@@ -829,7 +829,7 @@ photometry data \cite{S97} and the other dealing with the reduction of
 map data \cite{SANDELL97}.
 
 Alternatively the JCMT software group can be contacted directly via the
-\htmladdnormallinkfoot{World-Wide-Web}{http://www.jach.hawaii.edu/jcmt\_sw/}.
+\htmladdnormallinkfoot{World-Wide-Web}{http://www.jach.hawaii.edu/JACpublic/JCMT/software}.
 Information on known bugs and updates will be available there.
 
 A mailing list now exists for discussing SCUBA data reduction techniques.  The
@@ -2709,8 +2709,8 @@ size (quarter beam width) can accommodate large gradient changes towards
 point sources but in general these errors are smoothed out by the average
 taken over the whole array. An alternative approach is to \rebin\ the input
 data on a fine grid (e.g.\ 1 arcsec or finer) and use that as the input model
-(with the restriction that the number of pixels in the model must match the
-number of pixels chosen by \rebin\ as the default).
+(this is especially useful for scan maps since \calcsky\ can add the dual
+beam response to the data when calculating the model)
 
 Once the source has been removed a sky signal is calculated from the residual
 signal by finding the average signal across the array for each time. 
@@ -2885,7 +2885,7 @@ position:
 \scusoft\ provides a suitable import table.
 
 The next stage is to generate the I, Q and U images from these individual
-waveplate images. This can be done by the \polcal\ task:
+waveplate images. This can be done by the \polcal\ task directly:
 
 \begin{myquote}
 \begin{verbatim}
@@ -2912,7 +2912,8 @@ OUT - Output Stokes cube > omc1_cube
 
 
 In this case, we use WEIGHTS=3 to generate the variance information
-from the fit since the SCUBA variances are unreliable.
+from the fit since the SCUBA variances are unreliable, although in many
+cases these variances are not under-estimated.
 \polcal\ can combine images from separate overlapping fields all in one go
 if desired. If the intention is to mosaic separate fields within \polcal\
 \intrebin\ should be run with the TRIM parameter set to some non-zero
@@ -2922,6 +2923,16 @@ This can be achieved using the \Kappa\ \wcsalign\ command but it is easier
 to do this in \intrebin\ by making sure that all images are regridded
 relative to the same RA/Dec centre -- the resulting images will all
 be aligned to the same pixel grid.
+
+In many cases, a more reliable approach to calculating the IQU cubes with
+satisfactory variance information is to use the \polstack\ task on a set of 16
+images and use that to generate 4 images with associated variances. These
+variances are determined directly from the data rather than from the
+fitting. We have found that running \polcal\ on the resulting 4 images (with
+WEIGHTS=1 since we now wish to use the supplied variance information) and then
+mosaicking the resultant IQU cubes (e.g.\ via \ccdpack\ \makemos) to improve
+signal-to-noise gives the most robust results and provides variance
+information that agrees with theory.
 
 Once the IQU cube is made \polvec\ can be used to generate the vectors:
 
@@ -2976,7 +2987,10 @@ Upgrades currently on the work list are:
 
 If you wish to suggest new tasks or write your own extensions to the 
 software please consult the \htmladdnormallinkfoot{SCUBA software
-wish-list}{http://www.jach.hawaii.edu/jcmt\_sw/bin/scuba\_wish.pl}.
+wish-list}{http://www.jach.hawaii.edu/JACpublic/JCMT/software/bin/scuba\_wish.pl}.
+Additional information on writing \scusoft\ extensions can be found
+in SSN/72 \cite{ssn72}.
+
 
 \section{\xlabel{relnotes}Release Notes\label{relnotes}}
 
@@ -3009,7 +3023,6 @@ import image of arbritrary coordinates and automatically add chop functions.
 
 \item Scripts are now compatible with \Kappa\ version 0.14.
 
-\item 
 
 \end{itemize}
 
@@ -3045,6 +3058,9 @@ SURF.
     (ie calibration units are not lost after \rebin\ or \scuphot)
 
 \item \scusoft\ version number is now written to history information
+
+\item \scanrlb: Area to use for baseline removal can now be specified
+     as a SCUBA section.
 
 \item \remdbm\ : The \texttt{-filter} option will filter out high frequencies
            before inverting the Fourier transform.
@@ -3402,7 +3418,7 @@ Holland~W.~S, Cunningham~C.~R., Gear~W.K., Jenness~T., Laidlaw~K.,
 Lightfoot~J.~F., Robson~E.~I., 1998, \textit{``SCUBA -- A submillimetre camera
 operating on the James Clerk Maxwell Telescope''} in \textit{Advanced
 Technology MMW, Radio and Terahertz Telescopes}, Philips~T.~G. (ed),
-Proc. SPIE \textbf{3357}, in press
+Proc. SPIE \textbf{3357}, 305
 
 \bibitem{mnscu}
 Holland~W.~S., Robson~E.I., Gear~W.K., Lightfoot~J.~F., Jenness~T.,
@@ -3510,8 +3526,12 @@ Hook~R.~N., Bushouse~H.~A. (eds), ASP Conference Series, \textbf{145}, 195
 
 \bibitem{polpack}
 Berry~D.~S., Gledhill~T.~M., 1999, 
-\textit{Polpack -- An imaging polarimetry reduction package}
+\textit{Polpack -- An imaging polarimetry reduction package},
 \xref{Starlink User Note 223}{sun223}{}
+
+\bibitem{ssn72}
+Jenness~T., Lightfoot~J.~F., 1999, {\it The SURF Programming Interface},
+\xref{Starlink System Note 72}{ssn72}{}
 
 \bibitem{SR94}
 Stevens~J.~A.,  Robson~E.~I.,  1994, {\it  MNRAS}, {\bf 270}, L75
@@ -3837,10 +3857,11 @@ The \scusoft\ routines are described in the following pages:
       }{
          Message filter level. Options are QUIET, NORMAL and
          VERBOSE. Default is NORM.
-      \sstsubsection{
+     } 
+     \sstsubsection{
          NBEAMS = INTEGER (Read)
       }{
-   *        When NBEAMS=2 a dual-beam response is calculated. When
+        When NBEAMS=2 a dual-beam response is calculated. When
         NBEAMS=3 a triple-beam response is calculated. Default 
         is 3.      
       }
@@ -3876,7 +3897,7 @@ The \scusoft\ routines are described in the following pages:
          resulting image to dbm\_out.sdf.
       }
       \sstexamplesubsection{
-         add\_dbm image 90 45 3bm_out nbeams=3
+         add\_dbm image 90 45 3bm\_out nbeams=3
       }{
        Generate a triple-beam image with throw 45 and position angle
        90 degrees.
@@ -4459,7 +4480,6 @@ Astrometry information is stored in the WCS component and not
       SURF: \remsky
    }
 }
-
 
 
 
@@ -8144,6 +8164,165 @@ menu.
 }
 
 
+\newpage
+\label{surf:scuba2mem}
+\sstroutine{
+   SCUBA2MEM
+}{
+   Calculate bolometer positions as tangent plane offsets
+}{
+   \sstdescription{
+      This routine reads in SCUBA demodulated data and writes it
+      out along with the positions of the bolometers on the sky
+      for each sample. The positions of the
+      chop beams can be requested as well as the positions of the tracking
+      centre. Returns tangent plane offsets from the map centre in arcseconds.
+      Additionally, the LST of each sample is stored as axis information.
+   }
+   \sstusage{
+      scuba2mem in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = CHAR (Read)
+      }{
+         The name ofthe input files to be processed. This is a demodulated
+         data file. RESTORE should not have been run on it. Multiple
+         file names can be specified (see the documentation on GRP).
+         All the input files are referenced to the same output coordinate
+         frame.
+      }
+      \sstsubsection{
+         LAT = CHAR (Read)
+      }{
+         The latitude of the output map centre. The supplied default value
+         is that of the map centre of the observation in the output
+         coordinates.
+      }
+      \sstsubsection{
+         LONG = CHAR (Read)
+      }{
+         The longitude of the output map centre. The supplied default value
+         is that of the map centre of the observation in the output
+         coordinates.
+      }
+      \sstsubsection{
+         MSG\_FILTER = CHAR (Read)
+      }{
+         Message filter level. Default is NORM.
+      }
+      \sstsubsection{
+         NBEAMS = INTEGER (Read)
+      }{
+         Number of output beams to be written to file. NBEAMS=1 just
+         writes the Middle beam, NBEAMS=2 writes the Left (negative)
+         and Right beams, NBEAMS=3 writes Middle, Left and Right beams.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         This parameter specifies the name of the output file to be used
+         to store the positional information.
+         The file format is described below.
+      }
+      \sstsubsection{
+         OUT\_COORDS = CHAR (Read)
+      }{
+         The coordinate system of the output map. Available coordinate
+         systems are:
+         \sstitemlist{
+
+            \sstitem
+            AZ:  Azimuth/elevation offsets
+
+            \sstitem
+            NA:  Nasmyth offsets
+
+            \sstitem
+            PL:  RA/Dec Offsets from moving centre (eg Planets)
+
+            \sstitem
+            RB:  RA/Dec (B1950)
+
+            \sstitem
+            RJ:  RA/Dec (J2000)
+
+            \sstitem
+            RD:  RA/Dec (epoch of observation)
+
+            \sstitem
+            GA:  Galactic coordinates (J2000)
+         }
+      }
+      \sstsubsection{
+         SHIFT = REAL( 2 ) (Read)
+      }{
+         The pointing shift [X,Y] to be applied that would bring the
+         map into the correct position.
+         This is a shift in the output coordinate frame. CHANGE\_POINTING
+         should be used to add Az/El pointing offsets.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         scuba2mem out\_coords=GA o34\_lon\_ext o34\_mem nbeams=1 $\backslash$$\backslash$
+      }{
+         Calculate the coordinates of all bolometer positions
+         in tangent plane offsets from the GA map centre.
+      }
+      \sstexamplesubsection{
+         scuba2mem o34\_lon\_ext nbeams=3 $\backslash$$\backslash$
+      }{
+         Calculate all chop positions for o34\_lon\_ext. Use RJ coordinates.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Can be used on JIGGLE and SCAN data.
+
+         \sstitem
+         The coordinates of the selected output frame are written
+           to the output FITS extension in keywords OUT\_CRDS, OUTLONG and
+           OUTLAT. The full FITS header of the observation itself is still
+           available.
+      }
+   }
+   \sstdiytopic{
+      Format of output file
+   }{
+      SCUBA DBMEM requires the data, positions of every beam and the
+      LST for every point. This information (along with a standard FITS
+      header) is stored as a standard NDF. The data array is constructed
+      as follows:
+
+          3 dimensional: N\_BOL $*$ N\_POS $*$ ((N\_BEAM $*$ 2) $+$ 1)
+
+          where N\_BOL is the number of bolometers,
+                N\_POS is the number of samples for each bolometer (time axis),
+                N\_BEAM is the number of beams.
+
+          The 3rd dimension contains the actual data value plus positions
+          of every beam associated with the data point. Each beam has two
+          positions (X offset and Y offset)
+          Axis components store bolometer number, LST and beam weight.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      SURF: \extdata, \rebin \\
+      DBMEM, PIXON
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+
+
 
 \newpage
 \label{surf:scucat}
@@ -10510,6 +10689,10 @@ extension (called REDS for historical reasons) contains beam weights for
 chopping, and pointing corrections. In general this extension is created for
 PHOTOMetry observations and by the \chgpnt\ task.
 
+A more detailed description of the file format can be found in
+\xref{Starlink System Note 72}{ssn72}{}.
+
+
 \section{\xlabel{fits}FITS keywords\label{fits}}
 
 FITS information is stored in the NDF FITS extension of all SCUBA NDFs. This
@@ -11256,7 +11439,7 @@ the \xref{Perl NDF module}{sun222}{} \cite{ndfperl}  and therefore require at le
 perl NDF binary will be installed as /star/bin/ndfperl on Starlink sites.
 \xref{NDFPERL}{sun222}{} is distributed by Starlink and 
 can also be obtained from
-\htmladdnormallinkfoot{JCMT software web pages}{http://www.jach.hawaii.edu/jcmt\_sw/perl/}.
+\htmladdnormallinkfoot{JCMT software web pages}{http://www.jach.hawaii.edu/JACpublic/JCMT/software/perl/}.
 
 The \sdip, \scuplot\ and \scupa\ scripts are written in C-shell.
 

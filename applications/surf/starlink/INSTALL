@@ -72,9 +72,9 @@ must contain:
       Where $install is the root directory used for the installation (ie
 put the value of $INSTALL into the file and not $install.) 
 
-    7.If necessary the NDFPERL module should also be installed.
+    7.If necessary the STARPERL package should also be installed.
 
       This is available separately from the Starlink software store.
-      (SUN/222)
+      (SUN/222 and SUN/228)
 
 

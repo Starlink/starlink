@@ -1,8 +1,8 @@
 1 SURF - SCUBA User Reduction Facility
                                                      Expires: 99.**.**
 
-  This is the fifth public release of SURF (v1.4). It will be 
-  distributed on the Autumn 1999 Starlink CD-ROM.
+  This is the fifth public release of SURF (v1.5). It will be 
+  distributed on the Spring 2000 Starlink CD-ROM.
 
   The SCUBA User Reduction Facility (SURF) is a collection of applications
   for use in reducing mapping and photometry data from the Submillimetre
@@ -18,9 +18,9 @@
 
   ***
   ***  In order to obtain the full functionality described in SUN/216 it 
-  ***  is also necessary to install the Starlink PERL and PERLMODS
-  ***  packages from Starlink. See SUN/228 for more details on the
-  ***  PERLMODS distribution.
+  ***  is also necessary to install the Starlink PERL, PERLMODS and
+  ***  STARPERL packages from Starlink. See SUN/228 for more details on the
+  ***  STARPERL distribution.
   ***
 
   More information can be found in document SUN/216 (use `findme surf'
@@ -32,63 +32,33 @@
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
 
-2 Changes in version 1.4
+2 New_in_version_1_5
 
-  The major change in this release is support for the SCUBA polarimeter.
+Minor update.
 
-  The changes can be grouped into three categories:
- 
-New_Tasks
+3 New_Tasks
 
-  - REMIP can be used to remove instrumental polarisation
-  - ADD_DBM can be used to generate simulated dual beam images
-  - SCUSETENV for setting environment variables at the JAC
- 
-Changes_to_existing_tasks
+  - SCUBA2MEM officially released (previously it was available
+    but undocumented.
 
-  - Units should now be propagated correctly through all tasks
-    (ie calibration units are not lost after REBIN or SCUPHOT)
- 
-  - SURF version number is now written to history information
+  - The SURF Programming Guide (SSN/72) now available
 
-  - SCAN_RLB: Area to use for baseline removal can now be specified
-    as a SCUBA section.
+3 Changes_to_existing_tasks
 
-  - REMDBM: The -filter option will filter out high frequencies
-           before inverting the Fourier transform.
+  - SCULOG and related tools rewritten to handle data from
+    multiple UT dates in a single directory. Extended support for
+    POLMAP and POLPHOT observing modes.
 
-  - REBIN: Add TRIM parameter to trim edge regions from rebinned
-           images (useful when trying to mosaic)
+  - Improve support of external data model in CALCSKY. Can now
+    import image of arbritrary coordinates and automatically add 
+    chop functions.
 
-  - REBIN: Astrometry information is now entirely contained in 
-           the AST/WCS component. No longer written to FITS or
-           IRAS90 extensions. Also, the pixel origin is now centred
-           on the specified RA/Dec centre of the image and not
-           the bottom left hand corner.
+  - ADD_DBM can now be used to addd a triple beam
 
-  - REBIN: REFPIX parameter has been added to make it easier to specify
-           the reference pixel location when changing the map size
-           (in the past the reference pixel was always the middle of the
-           map when specifying the map size)
+  - Scripts now compatible with KAPPA version 0.14
 
-  - REBIN: The output file is now propagated from the input when
-           processing a single file (keeps history intact)
+3 Bug_fixes
 
-  - INTREBIN: Waveplate position and sky rotation angle are now
-        written to the fits headers for polarimetry observations.
-
-  - EXTINCTION: Can process FAST_AXIS polarimetry information correctly
-
-  - SKYDIP: Add preliminary support for RASTER mode (not yet stable)
-  
-  - OBSSUM/SCULOG: POLMAP and POLPHOT are now supported modes.
-
-  - SCUPHOT now recognizes measurements as well as integrations
-      (required for polarimetry observing)
-
-  - SCUOVER: Now reads astrometry from WCS/AST component.
-
-  - SCUMAKEWT: Now can make a weights image like a reference image
-     (ie same size, chop throw and position angle). See the LIKE parameter.
-
+  - Fix bug in REMDBM when using filtering when data have a pixel
+    origin that is not in the middle of the array.
 
