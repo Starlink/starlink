@@ -975,14 +975,12 @@ IRAF_DATA =
 
 #  Lists of Latex and hypertext documents.
 
-#LATEX_DOCS = sun95.tex \
-#             sun95_gd1.eps sun95_gd2.eps sun95_gd3.eps sun95_gd4.eps \
-#             sun95_gd5.eps sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps \
-#             sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps \
-#             sun95_ardwork.eps sun221.tex sun95_gd9.eps
-#HYPERTEXT_DOCS = sun95.htx sun221.htx
-LATEX_DECS = 
-HYPERTEXT_DOCS = 
+LATEX_DOCS = sun95.tex \
+             sun95_gd1.eps sun95_gd2.eps sun95_gd3.eps sun95_gd4.eps \
+             sun95_gd5.eps sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps \
+             sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps \
+             sun95_ardwork.eps sun221.tex sun95_gd9.eps
+HYPERTEXT_DOCS = sun95.htx sun221.htx
 
 #  List of documentation files.
 
