@@ -59,6 +59,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.16  1997/05/27 22:21:33  timj
+*     BOL_LIST now ' ' - Alpha does not like null strings
+*
 *     Revision 1.15  1997/05/22 21:01:45  timj
 *     Allow for 200 components in an input NDF.
 *     (Necessary when using the ALLBOLS parameter in SCUPHOT)
@@ -285,7 +288,7 @@ c
                
 *     Sort the bolometer list
 
-               BOL_LIST = ''
+               BOL_LIST = ' '
                IPOSN = 0
                DO I =  1, N_PHOT
                   IF(IPOSN.GT.0) CALL CHR_APPND(', ',BOL_LIST,IPOSN)
