@@ -172,7 +172,6 @@
       INTEGER            HLEN                   ! Length of a history string
       INTEGER            I                      ! Dummy variable for loops.
       INTEGER            N
-      INTEGER            L
       INTEGER            NDATA                  ! No.of data points
       INTEGER            IERR                   ! Error flag from TIM_FOLD
       INTEGER            NBINS                  ! No. of phase bins
@@ -200,9 +199,8 @@
       INTEGER            IDIM(ADI__MXDIM)       ! Size of each dimension
       INTEGER            ODIM(ADI__MXDIM)
       INTEGER            OAX(ADI__MXDIM)
-      INTEGER            AXDIM
+      INTEGER            	AXDIM			! Time axis number
       INTEGER            INBINS                 ! Number of input bins/ period.
-      INTEGER            SIZ
       INTEGER            	USED                   	! # history text lines
 
       BYTE               	MASK                   	! Quality mask

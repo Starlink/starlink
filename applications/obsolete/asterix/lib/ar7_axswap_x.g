@@ -1,40 +1,104 @@
-*+  AR7_AXSWAP_<T> - Swap <TYPE> array about specified axes
       SUBROUTINE AR7_AXSWAP_<T>( DIMS, IN, SAX, ODIMS, OUT, STATUS )
-*    Description :
-*    Method :
-*
-*    Authors :
-*
-*     David J. Allan ( BHVAD::DJA )
-*
-*    History :
-*
-*     13 Dec 89 : Original (DJA)
-*      6 Jun 94 : Code made generic (DJA)
-*
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*
-*    Import :
-*
-      INTEGER              DIMS(DAT__MXDIM)
-      <TYPE>               IN(*)
-      INTEGER              SAX(DAT__MXDIM)
-      INTEGER              ODIMS(DAT__MXDIM)
+*+
+*  Name:
+*     AR7_AXSWAP_<T>
 
-*    Export :
-      <TYPE>               OUT(*)
-*    Status :
-      INTEGER STATUS
+*  Purpose:
+*     Swap <COMM> array about specified axes
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL AR7_AXSWAP_<T>( DIMS, IN, SAX, ODIMS, OUT, STATUS )
+
+*  Description:
+*     Changes the order of the dimensions of a 7-D array.
+
+*  Arguments:
+*     DIMS[7] = INTEGER (given)
+*        The dimensions of the 7-D input array
+*     IN[] = <TYPE> (given)
+*        The input array
+*     SAX[7] = INTEGER (given)
+*        The required new axis order
+*     ODIMS[7] = INTEGER (given)
+*        The output dimensions of the 7-D output array
+*     OUT[] = <TYPE> (returned)
+*        The output array
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     IN and OUT must not overlap in memory
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Timing:
+*     {routine_timing}
+
+*  References:
+*     AR7 Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/ar7.html
+
+*  Keywords:
+*     package:ar7, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Dec 1989 (DJA):
+*        Original version.
+*      6 Jun 1994 (DJA):
+*        Code made generic
+*     14 Dec 1995 (DJA):
+*        Header tidied up
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Check status
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER			DIMS(7), SAX(7), ODIMS(7)
+      <TYPE>                    IN(*)
+
+*  Arguments Returned:
+      <TYPE>                    OUT(*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+*.
+
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Call internal routine
+*  Call internal routine to expand out dimensions arrays
       CALL AR7_AXSWAP_<T>_INT( DIMS, DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :                         DIMS(5), DIMS(6), DIMS(7), IN, SAX,
      :                         ODIMS(1), ODIMS(2), ODIMS(3), ODIMS(4),
@@ -44,52 +108,88 @@
 
 
 
-*+  AR7_AXSWAP_<T>_INT - Swap <TYPE> array about specified axes
-      SUBROUTINE AR7_AXSWAP_<T>_INT( DIMS, L1, L2, L3, L4, L5, L6, L7, IN,
-     :                            SAX, O1, O2, O3, O4, O5, O6, O7, OUT )
-*    Description :
-*    Method :
-*    Authors :
-*
-*     David J. Allan ( BHVAD::DJA )
-*
-*    History :
-*
-*     13 Dec 89 : Original (DJA)
-*
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*
-*    Import :
-*
-      INTEGER              DIMS(DAT__MXDIM)
-      INTEGER              L1,L2,L3,L4,L5,L6,L7
-      INTEGER              SAX(DAT__MXDIM)
-      <TYPE>               IN(L1,L2,L3,L4,L5,L6,L7)
-      INTEGER              O1,O2,O3,O4,O5,O6,O7
-*
-*    Export :
-*
-      <TYPE>               OUT(O1,O2,O3,O4,O5,O6,O7)
-*
-*    Local variables :
-*
-      INTEGER              II(DAT__MXDIM)
-      INTEGER              SI(DAT__MXDIM)
-      INTEGER              A,B,C,D,E,F,G
+      SUBROUTINE AR7_AXSWAP_<T>_INT( DIMS, L1, L2, L3, L4, L5, L6, L7,
+     :                      IN, SAX, O1, O2, O3, O4, O5, O6, O7, OUT )
+*+
+*  Name:
+*     AR7_AXSWAP_<T>_INT
+
+*  Purpose:
+*     Swap <COMM> array about specified axes
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL AR7_AXSWAP_<T>_INT( DIMS, L1, L2, L3, L4, L5, L6, L7, IN,
+*                              SAX, O1, O2, O3, O4, O5, O6, O7, OUT )
+
+*  Description:
+*     Changes the order of the dimensions of a 7-D array.
+
+*  Arguments:
+*     DIMS[7] = INTEGER (given)
+*        The dimensions of the 7-D input array
+*     L1..L7 = INTEGER (given)
+*        The individual elements of DIMS
+*     IN[L1,..,L7 ] = <TYPE> (given)
+*        The input array
+*     SAX[7] = INTEGER (given)
+*        The required new axis order
+*     O1..O7 = INTEGER (given)
+*        The individual elements of ODIMS
+*     OUT[O1,..,O7] = <TYPE> (returned)
+*        The output array
+
+*  Keywords:
+*     package:ar7, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Dec 1989 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Store position of old axis in new object
-      DO A = 1, DAT__MXDIM
-         DO B = 1, DAT__MXDIM
-            IF ( SAX(B) .EQ. A ) SI(A) = B
-         END DO
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER			DIMS(7), SAX(7)
+      INTEGER              	L1,L2,L3,L4,L5,L6,L7
+      <TYPE>                    IN(L1,L2,L3,L4,L5,L6,L7)
+      INTEGER              	O1,O2,O3,O4,O5,O6,O7
+
+*  Arguments Returned:
+      <TYPE>                    OUT(O1,O2,O3,O4,O5,O6,O7)
+
+*  Local Variables:
+      INTEGER              	II(7)
+      INTEGER              	SI(7)
+      INTEGER              	A,B,C,D,E,F,G
+*.
+
+*  Store position of old axis in new object
+      DO A = 1, 7
+        DO B = 1, 7
+         IF ( SAX(B) .EQ. A ) SI(A) = B
+        END DO
       END DO
 
-*    Perform data transfer
+*  Perform data transfer
       II(SI(7)) = 1
       DO G = 1, L7
        II(SI(6)) = 1
