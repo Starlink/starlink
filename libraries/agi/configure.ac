@@ -28,7 +28,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 AC_FC_CHECK_INTRINSICS([SLEEP EXIT])
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf psx gks sae hds par])
+STAR_DECLARE_DEPENDENCIES(build, [cnf psx gks sae hds par idi])
 dnl    agi_link_adam depends on {pgp,sgs}_link_adam, which are in
 dnl    graphpar
 STAR_DECLARE_DEPENDENCIES(link,  [ref trn sgs pgp idi hds graphpar])
