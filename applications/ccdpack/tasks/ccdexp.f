@@ -23,7 +23,7 @@
 *     This application places the values of components of the CCDPACK
 *     extension into the FITS extension within the same NDF.  This
 *     operation is needed if auxiliary data are to appear in the header
-*     of a foreign data file converted from the NDF.  The extensionm
+*     of a foreign data file converted from the NDF.  The extension
 *     items, FITS keyword names and optional FITS inline comment
 *     are specified in a "keyword translation table" held in a separate
 *     text file.
@@ -68,6 +68,13 @@
 *     with an exclamation mark.  The remainder of the line will then be
 *     ignored.
 
+*  Notes:
+*     Before an export occurs all existing CCDPACK items are removed
+*     from the headers. This may cause the occasional unexpected
+*     behaviour (if for instance you wanted to run this in sequence
+*     rather than just once for each export), but is generally the
+*     correct thing to do.
+
 *  Authors:
 *     PDRAPER: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
@@ -77,6 +84,9 @@
 *        Original version.
 *     12-NOV-1997 (PDRAPER):
 *        Modified to switch off NDF format conversion.
+*     14-NOV-1997 (PDRAPER):
+*        Added changes to clear any existing CCDPACK parameters from the
+*        headers, before adding the new set.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -126,8 +136,8 @@
       INTEGER LAST              ! Last value in range
       INTEGER LSTAT             ! Local status variable
       INTEGER NC                ! Number of characters
-      INTEGER NDFID             ! NDF identifer
       INTEGER NTOK              ! Number of tokens on line
+      INTEGER N                 ! Number of header items
       INTEGER DOCVT             ! Current foreign data conversion state
       LOGICAL LVAL              ! Logical FITS value
       LOGICAL SKIP              ! Skip over rest
@@ -149,6 +159,31 @@
 
 *  Open the export table.
       CALL FIO_ASSOC( 'TABLE', 'READ', 'LIST', 0, FD, STATUS )
+
+*  Clear any CCDPKnnn keywords from the headers before adding new ones.
+      CALL HDR_NUMB( 'IN', 'FITS', '*', N, STATUS )
+      IF ( N .GT. 0 ) THEN
+         I = 1
+ 4       CONTINUE                   ! Do until loop
+
+*  Get the name of the I'th header item (note that deleting a header
+*  reorders the remaining ones).
+            CALL HDR_NAME( 'IN', ' ', I, KEYWRD, STATUS )
+            write(*,*)'keyword = ', keywrd
+            IF ( KEYWRD .NE. ' ' ) THEN 
+               IF ( KEYWRD( 1 : 5 ) .EQ. 'CCDPK' ) THEN 
+                  CALL HDR_DELET( 'IN', 'FITS', KEYWRD, 1, STATUS )
+               ELSE 
+                  I = I + 1         ! Next header, if deleted reshuffle
+                                    ! keeps same I
+               END IF
+            ELSE
+               GO TO 5              ! No more items
+            END IF
+            IF ( I .GT. N ) GO TO 5 ! No more items
+         GO TO 4                    ! Next item
+      END IF
+ 5    CONTINUE
 
 *  Read the table and copy over the items.
       ILINE = 0
