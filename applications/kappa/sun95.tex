@@ -14,9 +14,9 @@
 \newcommand{\stardocsource}    {sun95.16}
 \newcommand{\stardocnumber}    {95.16}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {20 October 2000}
+\newcommand{\stardocdate}      {31 October 2000}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.15-9}
+\newcommand{\stardocversion}   {0.16}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -11346,6 +11346,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Draws a colour-table key.}
 \menuitem{LUTZEBRA}{
  Loads a pseudo-contour lookup table.}
+\menuitem{LUTWARM}{
+ Loads the {\it warm} lookup table.}
 \menuitem{MAKESURFACE}{
  Creates a 2-dimensional NDF from the coefficients of a polynomial surface.}
 \menuitem{MANIC}{
@@ -11723,6 +11725,8 @@ functions as follows.
  Tweaks a colour table of an image-display device.
 \classitem{LUTVIEW}
  Draws a colour-table key.
+\classitem{LUTWARM}
+ Loads the {\it warm\/} lookup table.
 \classitem{LUTZEBRA}
  Loads a pseudo-contour lookup table.
 \end{description}
@@ -28875,6 +28879,35 @@ plot (10k).
    }
 }
 \sstroutine{
+   LUTWARM
+}{
+   Loads the {\it warm} lookup table
+}{
+   \sstdescription{
+      This procedure loads the {\it warm\/} lookup table with linear scaling
+      into the current image-display device.  It is a continuous LUT
+      going from black to white, passing through warm shades of yellow
+      and brown.
+   }
+   \sstusage{
+      lutwarm
+   }
+   \sstparameters{
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         Name of the image display whose colour table is to be changed.
+         {\tt [}Current image-display device{\tt ]}
+      }
+   }
+   \sstnotes{
+      This is a procedure that calls LUTABLE.  Therefore, the
+      parameter cannot be specified on the command line.  You will 
+      only be prompted for the DEVICE parameter if the current
+      image display is not suitable or not available.
+   }
+}
+\sstroutine{
    LUTZEBRA
 }{
    Loads a pseudo-contour lookup table
@@ -45584,7 +45617,7 @@ name is defined.
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V0.15-9\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V0.15-9}
 
 More applications have been changed to enable them to make use
 of the NDF WCS component, which stores descriptions of world
@@ -45877,6 +45910,13 @@ The following applications have been modified:
 
 \end{description}
 
+\section{\xlabel{se_changes}Release Notes---V0.16\label{se:changes}}
+
+\subsection{New applications}
+A new command called \htmlref{LUTWARM}{LUTWARM} has been added. It loads a
+colour table which goes from black to white, passing through warm shades
+of yellow and brown, as popularised by \GAIAref\@.
+
 \begin{latexonly}
 \newpage
 \pagestyle{empty}
@@ -46068,6 +46108,8 @@ functions as follows.
  Tweaks a colour table of an image-display device.
 \classitem{LUTVIEW}
  Draws a colour-table key.
+\classitem{LUTWARM}
+ Loads the {\it warm\/} lookup table.
 \classitem{LUTZEBRA}
  Loads a pseudo-contour lookup table.
 \end{description}

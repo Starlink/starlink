@@ -914,7 +914,7 @@ NDFS = $(LUTS) $(TEST_FILES)
 #  Define the standard colour tables.
 
 LUTS = \
-bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf brown_lut.sdf \
+bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf warm_lut.sdf \
 ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf grey_lut.sdf logo_lut.sdf
 
 #  Define the package test data (NDFs only!).
@@ -990,7 +990,7 @@ IRAF_HELP_FILES = _$(PKG_NAME).hd $(PKG_NAME).hd $(PKG_NAME).men \
 IRAF_AUX_SCRIPTS = fitsexist.cl fitsval.cl fitswrite.cl \
                    lutbgyrw.cl lutcol.cl lutcont.cl lutfc.cl lutgrey.cl \
                    lutheat.cl lutikon.cl lutneg.cl lutramps.cl lutread.cl \
-                   lutspec.cl lutzebra.cl \
+                   lutspec.cl lutwarm.cl lutzebra.cl \
                    picbase.cl picdata.cl picframe.cl picgrid.cl piclast.cl \
                    picxy.cl
 
