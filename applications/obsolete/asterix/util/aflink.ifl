@@ -11,7 +11,7 @@ INTERFACE AFLINK
 
   PARAMETER LINK
     POSITION 2
-    TYPE 'CHAR'
+    TYPE '_CHAR'
     PROMPT 'Link name'
     HELP 'ASTERIX knows about BGND,VIGN,RESP,RMF,ARF and PRIMARY'
   ENDPARAMETER
@@ -19,7 +19,7 @@ INTERFACE AFLINK
   PARAMETER LFILE
     POSITION 3
     TYPE 'UNIV'
-    PROMPT 'Background'
+    PROMPT 'Associated dataset'
     HELP 'Name of associated dataset - "!" will delete existing reference'
   ENDPARAMETER
 
