@@ -867,7 +867,7 @@
       integer j
 *-
 
-        open(1,file='lp.lis',status=new)
+        open(1,file='lp.lis',status='NEW')
         do j=1,nbin
           write(1,'(1x,2(g15.6,4x))') bnds(1,j,1),bnds(2,j,1)
         enddo
