@@ -12331,7 +12331,7 @@ this limit ({\em{e.g.}}\ a Frame title can be of arbitrary length). If
 this occurs, the long string will be split over two or more header cards.
 Each ``continuation'' card will have the keyword {\tt CONTINUE} in
 columns 1 to 8, and will contain a space in column 9 (instead of the
-usual equals sign). An ampersand (``{\tt&}'') is appended to the end of
+usual equals sign). An ampersand (``{\tt \&}'') is appended to the end of
 each of the strings (except the last one) to indicate that the string is
 continued on the next card. 
 
@@ -12344,7 +12344,7 @@ c-
 
 f+
 Note, this splitting of long strings over several cards only occurs when
-writing AST Objects to a FitsChan using the AST_WRITE routine and the
+writing AST Objects to a FitsChan using the AST\_WRITE routine and the
 {\em native} encoding. If a long string is stored in a FitsChan using
 (for instance) the AST_PUTFITS routine, it will simply be truncated.
 f- 
@@ -12725,7 +12725,7 @@ f+
 Since the {\em native} encoding is being used, any long strings involved
 in the object description will have been split into two or more adjacent
 contuation cards when the Object was stored in the header using routine
-AST_WRITE. The AST_READ routine reverses this process by concatenating
+AST\_WRITE. The AST\_READ routine reverses this process by concatenating
 any such adjacent continuation cards to re-create the original long
 string.
 f-
@@ -13867,7 +13867,7 @@ significant conflict between the FITS keywords used by the different
 encodings\footnote{In practice, this means you should avoid mixing
 FITS-IRAF, FITS-WCS, FITS-AIPS and FITS-PC encodings since they share
 many keywords.}.  Adopting this approach would simply require multiple
-calls to AST_WRITE, rewinding the FitsChan and changing its Encoding value
+calls to AST\_WRITE, rewinding the FitsChan and changing its Encoding value
 before each one.
 f-
 
