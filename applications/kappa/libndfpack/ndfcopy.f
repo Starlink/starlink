@@ -69,7 +69,7 @@
 *        of the output NDF. If TRIMWCS=YES, then the current Frame in the 
 *        output NDF will have the same number of axes as there are pixel
 *        axes in the output NDF. If this involves removing axes, then the
-*        axes to ratain are specified by parameter USEAXIS. If TRIMWCS=NO
+*        axes to retain are specified by parameter USEAXIS. If TRIMWCS=NO
 *        then all axes are retained in the current WCS Frame of the
 *        output NDF. Using the example in the description of the TRIM
 *        parameter, if the input NDF "stokes" has a 3D current WCS Frame 

@@ -989,6 +989,14 @@ package kappa {
             default TRUE
           }
 
+          parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {The WCS axes to retain in the output}
+            helpkey *
+          }
       }
 
       action ndftrace {
