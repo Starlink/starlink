@@ -54,7 +54,6 @@ is( Starlink::AST::PGPLOT::_GText( "Testing", 2, 6, "CC", 0.5, 0.5),
     1, "Calling _GText()" );
 
 # _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
-my ( $status, $xb, $yb );
 ($status, $xb, $yb ) =
       Starlink::AST::PGPLOT::_GTxExt( "Testing", 2, 6, "CC", 0.5, 0.5);
 is( $status, 1, "Calling _GTxtEx()" );
