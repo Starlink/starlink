@@ -9,8 +9,10 @@
 #include <iostream>
 
 #if HAVE_CSTD_INCLUDE
+#include <cstdio>
 #include <cstdlib>
 #else
+#include <stdio.h>
 #include <stdlib.h>
 #endif
 #include <fcntl.h>
@@ -174,8 +176,17 @@ int exercise_FBS(FileByteStream& FBS)
 
 	teststring.clear();
 	FBS.seek(-10);
-	for (i=0; i<10; i++)
-	    teststring += FBS.getByte();
+        block = FBS.getBlock(10);
+        for (i=0; i<10; i++)
+            teststring += *block++;
+	compareStrings("!end:56789", teststring, nfails);
+	if (! FBS.eof())
+	    cerr << "Expected EOF, didn't get it" << endl;
+	
+	teststring.clear();
+	FBS.seek(-10);
+        for (i=0; i<10; i++)
+            teststring += getByte();
 	compareStrings("!end:56789", teststring, nfails);
 	if (! FBS.eof())
 	    cerr << "Expected EOF, didn't get it" << endl;
