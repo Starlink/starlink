@@ -9428,6 +9428,7 @@ U java/source/util/src/testcases/uk/ac/starlink/util/PipeReaderThreadTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/ReaderThreadTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/SourceReaderTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/TestCaseTest.java
+U java/source/util/src/testcases/uk/ac/starlink/util/URLUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/XMLUtilTest.java
 cvs checkout: Updating java/source/util/src/testcases/uk/ac/starlink/util/gui
 U java/source/util/src/testcases/uk/ac/starlink/util/gui/RendererTest.java
