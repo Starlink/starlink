@@ -116,7 +116,11 @@ sub AUTOLOAD {
  
     my $constname;
     ($constname = $AUTOLOAD) =~ s/.*:://;
-    my $val = constant($constname, @_ ? $_[0] : 0);
+    # Note that the default autoloader expects integer argument
+    # if @_ contains something (this can be @_ from the calling routine!)
+    # Since these routines only expect a single argument just pass a 0.
+    my $val = constant($constname);
+
     if ($! != 0) {
         if ($! =~ /Invalid/) {
             $AutoLoader::AUTOLOAD = $AUTOLOAD;
@@ -953,7 +957,7 @@ action if $status is not set to SAI__OK on entry.
 Either the  $ADAM_USER or $HOME environment variable must be set so that
 the location of the parameter files can be determined.
 
-For direct access to ADAM monoliths and parameters see L<Starlink::ADAMTASK (3)>.
+For direct access to ADAM monoliths and parameters see L<Starlink::AMS::Task>.
 
 =head1 Implemented routines
 
@@ -1032,7 +1036,7 @@ Module created by T. Jenness, timj@jach.hawaii.edu
 
 =head1 COPYRIGHT
 
-Copyright (C) Tim Jenness, Frossie Economou 1997-1999.
+Copyright (C) Tim Jenness, Frossie Economou 1997-2000.
 All Rights Reserved.
 
 =head1 STARLINK
@@ -1045,8 +1049,8 @@ See Starlink User Note 33 for details on using the NDF library routines.
 
 =head1 SEE ALSO
 
-L<perl(1)> for an introduction to Perl,
-L<perlfunc(1))> for a description of the pack and unpack commands,
-L<perlxs(1)> for details of how this module accesses external libraries.
+L<perl> for an introduction to Perl,
+L<perlfunc> for a description of the pack and unpack commands,
+L<perlxs> for details of how this module accesses external libraries.
 
 =cut
