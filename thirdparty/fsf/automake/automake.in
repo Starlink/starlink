@@ -2202,7 +2202,7 @@ sub handle_programs
     var ('LDADD') && &handle_lib_objects ('', 'LDADD');
 
   foreach my $pair (@proglist)
-    {
+   {
       my ($where, $one_file) = @$pair;
 
       my $seen_libobjs = 0;
@@ -2282,6 +2282,179 @@ sub handle_programs
 	}
     }
 }
+
+# handle_monoliths ()
+# -------------------
+# Handle Starlink monoliths.  This is very similar to handle_programs.
+# Declarations in Makefile.am look like:
+#   bin_MONOLITHS = sst_mon
+#   sst_mon_SOURCES = \
+# 	sst_mon.f \
+# 	$(sst_mon_TASKS:=.f) \
+# 	blah...
+#   sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
+sub handle_monoliths
+{
+  my @proglist = &am_install_var ('monoliths', 'MONOLITHS', 'bin');
+  return if ! @proglist;
+
+  my $seen_global_libobjs =
+    var ('LDADD') && &handle_lib_objects ('', 'LDADD');
+
+  my @all_tasks;
+  my @task_monolith_pairs;
+
+  foreach my $pair (@proglist) 
+    {
+      my ($where, $one_file) = @$pair;
+
+      my $seen_libobjs = 0;
+      my $obj = &get_object_extension ($one_file);
+      
+      # Strip any $(EXEEXT) suffix the user might have added, or this
+      # will confuse &handle_source_transform and &check_canonical_spelling.
+      # We'll add $(EXEEXT) back later anyway.
+      $one_file =~ s/\$\(EXEEXT\)$//;
+
+      # Canonicalize names and check for misspellings.
+      my $xname = &check_canonical_spelling ($one_file, 
+                                             '_SOURCES', '_TASKS',
+                                             '_LDADD', '_LDFLAGS',
+                                             '_LIBADD',
+                                             '_OBJECTS', '_DEPENDENCIES');
+
+      $where->push_context ("while processing program `$one_file'");
+      $where->set (INTERNAL->get);
+
+      my $linker = &handle_source_transform ($xname, $one_file, $obj, $where);
+
+      # Ought we to support _LDADD for monoliths?  Might as well, I suppose.
+      if (var ($xname . "_LDADD"))
+        {
+          $seen_libobjs = &handle_lib_objects ($xname, $xname . '_LDADD');
+        }
+      else
+        {
+          # User didn't define prog_LDADD override.  So do it.
+          &define_variable ($xname . '_LDADD', '$(LDADD)', $where);
+      
+          # This does a bit too much work.  But we need it to
+          # generate _DEPENDENCIES when appropriate.
+          if (var ('LDADD'))
+            {
+              $seen_libobjs = &handle_lib_objects ($xname, 'LDADD');
+            }
+        }
+
+      reject_var ($xname . '_LIBADD',
+                  "use `${xname}_LDADD', not `${xname}_LIBADD'");
+
+      set_seen ($xname . '_DEPENDENCIES');
+
+      # If this monolith's LDFLAGS variable is _not_ defined, then define
+      # to be the default @LDFLAGS@ (is this the correct thing to do?
+      # What is it that I've done that means this doesn't happen by default?)
+      my $ldflagsvar = var ($xname . '_LDFLAGS');
+      if (!$ldflagsvar)
+        {
+          Automake::Variable::define ($xname . '_LDFLAGS',
+                                      VAR_CONFIGURE, '', TRUE,
+                                      subst ('LDFLAGS'),
+                                      '', INTERNAL, VAR_ASIS);
+      }
+      set_seen ($xname . '_LDFLAGS');
+
+      # Determine program to use for link -- we just force this
+      # to be `alink', which is the correct value.
+      my $xlink = 'ALINK';
+      # Define ALINK as a configure variable
+      # (define_configure_variable seems not to work)
+      Automake::Variable::define ('ALINK', VAR_CONFIGURE, '', TRUE,
+                                  subst ('ALINK'),
+                                  '', INTERNAL, VAR_ASIS);
+      require_variables ($where,
+                         "Monolith $xname seen -- did you call STAR_MONOLITHS",
+                         TRUE,
+                         'ALINK');
+
+      # If the resulting program lies into a subdirectory,
+      # make sure this directory will exist.
+      my $dirstamp = require_build_directory_maybe ($one_file);
+    
+      $output_rules .= &file_contents ('program',
+                                       $where,
+                                       PROGRAM => $one_file,
+                                       XPROGRAM => $xname,
+                                       XLINK => $xlink,
+                                       DIRSTAMP => $dirstamp,
+                                       EXEEXT => '$(EXEEXT)');
+
+      if ($seen_libobjs || $seen_global_libobjs)
+        {
+          if (var ($xname . '_LDADD'))
+            {
+              &check_libobjs_sources ($xname, $xname . '_LDADD');
+            }
+          elsif (var ('LDADD'))
+            {
+              &check_libobjs_sources ($xname, 'LDADD');
+            }
+        }
+
+      # Now handle the list of tasks associated with this monolith.
+      # We want to express that: (1) there is a .ifl file for each of
+      # the tasks; (2) there is a rule for compiling .ifl to .ifc; (3)
+      # installing the monolith requires these .ifc files, too; and (4) the
+      # .ifl files should be in the distribution.  Some of this is handled
+      # in template monoliths.am rather than here.
+      my $tasklist = var ($xname . '_TASKS');
+      if ($tasklist)
+        {
+          # Set the {compifl} key in %starlink_seen_features, so that
+          # handle_starlink adds the right rules.
+          $starlink_seen_features{compifl} = 1;
+
+          # Define a variable $xname_IFCS which contains the names of
+          # each of the .ifc files.  As a side-effect, add each of the
+          # .ifl files to the dist_common list.  $resvar is returned
+          # as the $xname_IFC variable.
+          my $resvar =
+            transform_variable_recursively
+               ($xname . '_TASKS', $xname . '_IFC', 'star__ifc', 0, $where,
+               # The transform code to run on each filename.
+               sub {
+                 my ($subvar, $val, $cond, $full_cond) = @_;
+                 my @r;
+                 push (@r, $val . '.ifc');
+                 push_dist_common ($val . '.ifl');
+                 push (@task_monolith_pairs, "$val:$xname");
+                 return @r;
+               });
+          push (@all_tasks, $resvar);          
+        }
+      else 
+        {
+          err_am "$xname declared as a _MONOLITH, but there is no ${xname}_TASKS variable";
+        }
+    }
+
+  Automake::Variable::define ('bin_MONOLITH_IFCS', VAR_AUTOMAKE, '', TRUE,
+                              "@all_tasks",
+                              '', INTERNAL, VAR_PRETTY);
+  Automake::Variable::define ('TASK_MONOLITH_PAIRS', VAR_AUTOMAKE, '', TRUE,
+                              "@task_monolith_pairs",
+                              '', INTERNAL, VAR_PRETTY);
+  # Template monoliths.am refers to variables INSTALL_MONOLITH{,_ENV},
+  # so define these to be the same as the corresponding PROGRAM ones.
+  Automake::Variable::define ('INSTALL_MONOLITH', VAR_AUTOMAKE, '', TRUE,
+                              '$(INSTALL_PROGRAM)',
+                              '', INTERNAL, VAR_PRETTY);
+  Automake::Variable::define ('INSTALL_MONOLITH_ENV', VAR_AUTOMAKE, '', TRUE,
+                              '$(INSTALL_PROGRAM_ENV)',
+                              '', INTERNAL, VAR_PRETTY);
+  
+}
+
 
 
 # handle_libraries ()
@@ -4411,20 +4584,11 @@ sub handle_minor_options
 
 sub handle_starlink
 {
-#     my $wantmanifest = 
-#       defined($starlink_seen_features{star_defaults})
-#         && $starlink_seen_features{star_defaults};
     my $manifestdir = var ('STAR_MANIFEST_DIR');
-    my $wantmanifest = $manifestdir;
+    my $want_manifest = defined($manifestdir);
     my $havelatex =
       defined($starlink_seen_features{latexdocs})
         && $starlink_seen_features{latexdocs};
-
-    $output_rules .= &file_contents ('starlink',
-                                     new Automake::Location,
-                                     INSTALLMANIFEST => $wantmanifest,
-                                     LATEXDOCS => $havelatex,
-                                    );
 
     if (defined($starlink_seen_features{messgen}))
       {
@@ -4486,6 +4650,25 @@ sub handle_starlink
     &define_variable ('INSTALL_STARDATA',
                       '$(INSTALL_DATA)',
                       INTERNAL);
+
+    # Do we need to compile .ifl files?
+    # $starlink_seen_features{compifl} was possibly set in
+    # handle_monoliths.
+    my $want_compifl = 0;
+    if (defined($starlink_seen_features{compifl})
+        && $starlink_seen_features{compifl})
+      {
+        $want_compifl = 1;
+        register_suffix_rule (INTERNAL, '.ifl', '.ifc');
+      }
+
+    $output_rules .= &file_contents ('starlink',
+                                     new Automake::Location,
+                                     INSTALLMANIFEST => $want_manifest,
+                                     LATEXDOCS => $havelatex,
+                                     COMPIFL => $want_compifl
+                                    );
+
 }
 
 ################################################################
@@ -7056,6 +7239,7 @@ sub generate_makefile ($$)
   handle_libraries;
   handle_ltlibraries;
   handle_programs;
+  handle_monoliths;             # Starlink monoliths
   handle_scripts;
 
   # This must run first so that the ANSI2KNR definition is generated
@@ -7424,10 +7608,13 @@ exit $exit_code;
 ## perl-brace-imaginary-offset: 0
 ## perl-label-offset: -2
 ## cperl-indent-level: 2
-## cperl-brace-offset: 0
+## cperl-brace-offset: 2
+## xxxcperl-brace-offset: 0
 ## cperl-continued-brace-offset: 0
 ## cperl-label-offset: -2
 ## cperl-extra-newline-before-brace: t
 ## cperl-merge-trailing-else: nil
-## cperl-continued-statement-offset: 2
+## cperl-continued-statement-offset: 0
+## xxcperl-continued-statement-offset: 2
+## cperl-auto-newline: t
 ## End:
