@@ -173,7 +173,7 @@
 *    Derive the type for axes and errors. This must be floating point.
 *    Use single precision normalling, but double if that's the maain
 *    dataset type
-        IF ( TYPE .EQ. 'DOUBLE' ) THEN
+        IF ( TYPE .EQ. '_DOUBLE' ) THEN
           RTYPE = TYPE
         ELSE
           RTYPE = '_REAL'
