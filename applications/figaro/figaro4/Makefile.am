@@ -8,10 +8,9 @@ bin_MONOLITHS = figaro4
 figaro4_SOURCES = figaro4.f \
                   $(figaro4_TASKS:=.f)
 
-figaro4_TASKS = \
-arcdisp arcgendb arcident arclocat ascin ascout bbody correl editext \
-evalfit fillcube fitbb fitgauss fitpoly fittri grow moments movie \
-resamp speccont specgrid specplot subset xtract 
+figaro4_TASKS = arcdisp arcgendb arcident arclocat ascin ascout bbody \
+correl editext evalfit fillcube fitbb fitgauss fitpoly fittri grow    \
+moments movie resamp speccont specgrid specplot subset xtract
 
 figaro4_LDADD = $(LDADD) \
 ../appcb/libappcb.la \
