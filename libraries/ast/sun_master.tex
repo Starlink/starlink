@@ -16740,20 +16740,19 @@ many digits when formatting floating point values for inclusion in a
 FITS header if the numerical value was in the range -0.00099999\ldots
 to -0.0001.
 
-\item a bug has been fixed which could cause a FitsChan to lose the
+\item A bug has been fixed which could cause a FitsChan to lose the
 comment associated with a string value in a FITS header.
 
 \item A bug has been fixed which could cause a program to crash if
 FrameSets were nested inside each other (for example, if one FrameSet
 had another FrameSet added to it for use as a Frame or Mapping). The
-problem only occured if the nested structure was loaded from a data
+problem could only occur if the nested structure was loaded from a data
 c+
-file (using astRead) and happened to be the first instance of that
+file (using astRead).
 c-
 f+
-file (using AST\_READ) and happened to be the first instance of that
+file (using AST\_READ).
 f-
-class of Object.
 
 \item Further improvements have been made to the simplification of
 compound Mappings, including fixes for several bugs which could cause
