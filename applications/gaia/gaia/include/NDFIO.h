@@ -86,7 +86,7 @@ public:
    const char* classname() const { return "NDFIO"; }
    
    //  Write the data to a new NDF.
-   int write( const char *filename ) const;
+   int write( const char *filename );
    
    //  Find and set value for the given FITS keyword and return 0 if
    //  OK (found).

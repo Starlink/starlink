@@ -189,7 +189,8 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
 //+
 //  Create a new NDF with a copy of the current data.
 //-
-int NDFIO::write( const char *pathname ) const {
+int NDFIO::write( const char *pathname ) 
+{
    char *error_mess;
    if ( rtdWriteNDF( pathname, bitpix_, width_, height_, data_.ptr(),
                      ndfid_, component(), (char *) header_.ptr(),

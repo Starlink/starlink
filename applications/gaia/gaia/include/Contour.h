@@ -84,7 +84,7 @@ public:
   int getCareful() { return careful_;}
 
   //  Set whether image data is byte swapped
-  int setSwap( const int swap ) { swap_ = swap; }
+  void setSwap( const int swap ) { swap_ = swap; }
 
  protected:
   //  Pointer to imageIO object. This has the image data and its type.

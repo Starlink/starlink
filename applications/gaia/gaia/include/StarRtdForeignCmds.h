@@ -86,7 +86,7 @@ int centroidCmd( struct StarImageInfo *infoPtr, char *args, char **errStr );
 static struct StarRtdForeignCmds {
          
    /*  Command name (as passed to RTD foreign method) */
-   char *name;       
+   const char *name;       
 
    /*  Ptr to foreign function */
    int (*fptr)( StarImageInfo *infoPtr, char *args, char **errStr );   
