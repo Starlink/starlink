@@ -28,7 +28,7 @@
     </p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build>
+    <build>parsecon</build><build>dtask</build><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -41,7 +41,7 @@
       <uname>pwd</uname>
     </person>
   </developers>
-  <!-- <documentation></documentation> -->
+  <!-- <documentation> sun139</documentation> -->
   <bugreports>ccdpack@starlink.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
