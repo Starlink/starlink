@@ -82,3 +82,9 @@ chart_params: chart_params.in
 	 $(srcdir)/chart_params.in > chart_params.tmp
 	mv chart_params.tmp chart_params
 	chmod +x chart_params
+
+chartpar.ascii: chartpar.ascii.in
+	rm -f chartpar.tmp chartpar.ascii
+	$(edit) \
+	 $(srcdir)/chartpar.ascii.in > chartpar.tmp
+	mv chartpar.tmp chartpar.ascii

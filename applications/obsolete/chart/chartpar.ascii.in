@@ -3,7 +3,7 @@ S SAREA             2.0
 S EQUINOX           1950.0
 S EPOCH             1950.0
 S MODE              CSI
-S INPUT             /star/etc/chart/astrom84.cat
+S INPUT             @staretcdir@/astrom84.cat
 S SELECTION         ALL
 S NUMBER            2000
 S MAGNITUDE         26.0
