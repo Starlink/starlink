@@ -1,0 +1,147 @@
+#!/bin/tcsh
+# Name:
+#    make_unix_release
+#
+# Purpose:
+#    Do unix specific bits required to make a release of atools.
+#
+# Type of Module:
+#    Shell script
+#
+# Description:
+#    This command creates a compressed tar file containing a release of the 
+#    atools package. It is called from within the make_release script. 
+#    
+# Invocation:
+#    make_unix_release
+#
+# Authors:
+#    DSB: David S. Berry (STARLINK)
+#    {enter_new_authors_here}
+#
+# History:
+#    17-JAN-2001 (DSB):
+#       Original version, based on KAPPA equivalent.
+#    {enter_changes_here}
+#
+# Bugs:
+#    {note_any_bugs_here}
+#-
+
+#  Ensure the sdt grp command is available.
+      source $SDT_DIR/startup.csh
+
+#  Store the name of the release directory, and go there.
+      set REL_DIR = ${TEMPDIR}/atools_${SYSTEM}
+      cd ${REL_DIR}
+      echo "Moved to $PWD"
+
+#  Copy the hypertext docs to the release directory.
+#      echo "Copying the hypertext docs to the release directory."
+#      cp ${ATOOLS_DEV}/../sun95.htx_tar ${REL_DIR}
+#      cp ${ATOOLS_DEV}/../sun221.htx_tar ${REL_DIR}
+
+#  Ensure all files are accessable.
+      echo "Setting protection for all files"
+      chmod 777 *
+
+#  Create the on-line help file.
+      foreach file (`grp user_tasks`)
+         prohlp in=$file out=$file.help
+      end
+      cat atools.star-hlp *.help > new.hlp
+      mv new.hlp atools.star-hlp
+      rm *.help
+
+#  Generate the ifl files, and the icl and csh start-up scripts. 
+      echo "Generating ifl files, etc form the ifd file"
+      ifd2star atools
+
+#  Generate the IRAF files.
+      echo "Generating iraf files"
+      ifd2iraf atools
+
+#  Generate the IRAF documentation.
+      mv atools.star-hlp atools.hlp
+      ifd_irafhlpgen atools
+
+#  Create a CL script which will create the help database on sa1.
+      cat > temp.cl << FOO
+set atools = /sa1/home/dsb/iraf/atools/
+so
+mkhelpdb atools\$root.hd helpdb.mip
+lo
+FOO
+
+#  Create a tcsh script to set things up on sa1 and activate the CL script.
+      cat > atliraf << FOO2
+#!/usr/local/bin/tcsh
+cd iraf
+rm -rf atools
+mkdir atools
+cd atools
+ftp -v sl5 << FOO3
+ascii
+cd ${REL_DIR}
+get root.hd
+get _atools.hd
+get atools.hd
+get temp.cl
+bye
+FOO3
+mv temp.cl ..
+cd ..
+cl < temp.cl
+FOO2
+      chmod u+x atliraf
+
+#  FTP this file to sa1.
+      ftp -v sa1 << FOO4
+ascii
+put atliraf
+bye
+FOO4
+      rm atliraf 
+
+#  Ask the user to execute the script on sa1. Why wont rsh do this?
+      alert "\nNow log into sa1 and do 'source atliraf'\nPress OK when done ..."
+
+#  Now FTP the helpdb.mip file back from sa1.
+      ftp -v sa1 << FOO5
+binary
+cd iraf
+get helpdb.mip
+bye
+FOO5
+      rm temp.cl
+
+#  Create each of the tar files. First do the system-independant ones
+#  listed in group TAR_FILES_A...
+      foreach file (`grp tar_files_a`)
+         echo "Creating ${file}.tar"
+         chmod 644 `grp ${file}`
+         chmod 755 `find . -type d`
+         tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
+         rm -f `grp ${file}`
+         mv ${TEMPDIR}/${file}.tar ${REL_DIR}
+      end
+
+#  Tar up all the release files and then remove them.
+      echo "Creating atools.tar"
+      chmod 644 `grp unix_total`
+      chmod 755 `find . -type d`
+      chmod 755 mk
+      tar -cvh -f ${TEMPDIR}/atools.tar `grp unix_total` 
+      rm `grp unix_total` 
+      mv ${TEMPDIR}/atools.tar ${REL_DIR}
+      rm -rf doc atools.ifd
+
+#  Compress it.
+      echo "Compressing atools.tar"
+      compress atools.tar
+
+# Remove any spare .f files created by the expansion of generic source
+# files but not included in the release. Also remove grp.make.
+      rm -f *.f grp.make
+
+      exit
