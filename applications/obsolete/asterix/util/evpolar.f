@@ -133,9 +133,7 @@
       INTEGER                   OQPTR            ! Output quality pointer
       INTEGER                   WPTR             ! Pointer to workspace array
 
-      LOGICAL                   INPRIM           ! Input primitive?
       LOGICAL                   NORMALISE        ! Normalise output bins?
-      LOGICAL                   OK               ! General validity test
       LOGICAL                   QKEEP            ! If true produce output
                                                  ! quality array.
       LOGICAL                   QUALITY          ! Is QUALITY list present?
