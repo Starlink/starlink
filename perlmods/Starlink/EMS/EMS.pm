@@ -25,6 +25,13 @@ require DynaLoader;
 			  ems_stat ems_syser
 			  get_facility_error
 			  /],
+		'Ems' => [qw/
+			  emsAnnul emsBegin emsEload emsEnd
+			  emsErrno emsFacer emsFmtc emsFmtd emsFmti
+			  emsFmtl emsFmtr emsLevel emsMark emsMload
+			  emsRenew emsRep emsRlse emsSetc emsSetd
+			  emsSeti emsSetl emsSetr emsStat emsSyser
+			  /],
 		'emserr' => [qw/
 			     EMS__NOMSG
 			     /],
@@ -33,7 +40,7 @@ require DynaLoader;
 			     /]
 	       );
 
-Exporter::export_tags('ems','emserr','sai');
+Exporter::export_tags('ems','emserr','sai','Ems');
 
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
@@ -144,11 +151,11 @@ $Id$
 
 =head1 AUTHOR
 
-Tim Jenness (t.jenness@jach.hawaii.edu)
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) Particle Physics and Astronomy Research Council 1998,1999.
+Copyright (C) Particle Physics and Astronomy Research Council 1998-2000.
 All Rights Reserved.
 
 =cut
