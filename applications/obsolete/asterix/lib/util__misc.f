@@ -1,6 +1,7 @@
 *+  UTIL_QUALSPLIT - Splits data array into good and bad pixels
       SUBROUTINE UTIL_QUALSPLIT(LP2,LP3,LP4,DIM1,DIM2,DIM3,DIM4,
-     &             QUAL,BADBITS,DATA,NGOOD,GOODX,GOODY,NBAD,BADX)
+     &             QUAL,BADBITS,DATA,NGOOD,GOODX,GOODY,NBAD,BADX,
+     :             STATUS)
 * Description :
 *     Takes an array of data with its corresponding quality array, and
 *    indices to define a slice of this array.
@@ -27,20 +28,25 @@
       REAL GOODY(DIM1)                ! Corresponding data values
       INTEGER NBAD                    ! Number of bad points in slice
       INTEGER BADX(DIM1)              !"Bad" points in 1st dimension
+* Status:
+      INTEGER	STATUS
 * Local constants :
       BYTE BIT_ANDUB
 * Local variables :
       INTEGER LP1
       LOGICAL LBAD                            !Bad pixel ?
 *-
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
       NGOOD=0
       NBAD=0
-*
+
 * Test each point in this slice of data
       DO LP1=1,DIM1
-*
+
 * Test quality of point
-        LBAD= BIT_ANDUB(QUAL(LP1,LP2,LP3,LP4) .AND. BADBITS)
+        LBAD = BIT_ANDUB(QUAL(LP1,LP2,LP3,LP4),BADBITS)
 *
         IF (LBAD .NE. QUAL_GOOD) THEN
             NBAD=NBAD+1
