@@ -106,9 +106,10 @@ public class GenerateDependencies {
             }
             System.out.println();
             System.out.print("\tcd " + c.componentPath());
-            if (c.isBuildsupport()) {
+            if (c.getBuildsupport() != Component.BUILDSUPPORT_NO) {
                 System.out.print(" \\\n\t\t&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log");
-                allbuildsupport.add(c);
+                if (c.getBuildsupport() == Component.BUILDSUPPORT_AUTO)
+                    allbuildsupport.add(c);
             }
             System.out.println(" \\\n\t\t&& make>make.log && make install-manifest>>make.log");
             System.out.println();
@@ -132,6 +133,22 @@ public class GenerateDependencies {
         private Map allDeps;
         private String name;
 
+        /**
+         * This component is a buildsupport component, and should be
+         * built automatically.  Value returned by getBuildsupport.
+         */
+        public static final int BUILDSUPPORT_AUTO = 1;
+        /**
+         * This component is a buildsupport component, but should not be
+         * built automatically.  Value returned by getBuildsupport.
+         */
+        public static final int BUILDSUPPORT_NOAUTO = 2;
+        /**
+         * This component is not a buildsupport component.
+         * Value returned by getBuildsupport.
+         */
+        public static final int BUILDSUPPORT_NO = 3;
+
         public Component(Element el) {
             this.el = el;
             allDeps = new java.util.HashMap();
@@ -144,13 +161,22 @@ public class GenerateDependencies {
             return name;
         }
 
-        /** 
-         * Tests whether the buildsupport=yes attribute is present on
-         * the component element.
+        /** Retrieves the effective of the buildsupport attribute.
+         * @return one of the values <code>BUILDSUPPORT_AUTO</code>,
+         * <code>BUILDSUPPORT_NOAUTO</code> or <code>BUILDSUPPORT_NO</code>.
          */
-        public boolean isBuildsupport() {
+        public int getBuildsupport() {
             String s = el.getAttribute("buildsupport");
-            return (s.equals("yes"));
+            int ret;
+            
+            if (s.equals("yes"))
+                ret = BUILDSUPPORT_AUTO;
+            else if (s.equals("noauto"))
+                ret = BUILDSUPPORT_NOAUTO;
+            else
+                // everything else: should be "no" or blank
+                ret = BUILDSUPPORT_NO;
+            return ret;
         }
 
         /**
