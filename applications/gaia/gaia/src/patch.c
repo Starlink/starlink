@@ -427,7 +427,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
             if ( haveQual == F77_TRUE ) {
                 F77_IMPORT_POINTER( fqual, qual );
                 copyWorktoImage( BYTE_IMAGE, (void *)qualPtr, 
-                                 (void *) fqual, 0, info->nx, 
+                                 (void *) qual, 0, info->nx, 
                                  xs1, ys1, xs2, ys2 );
             }
         }
