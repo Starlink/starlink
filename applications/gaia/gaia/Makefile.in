@@ -98,7 +98,6 @@ LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
 #       using a C++ compiler.
 # ------------------------------------------------------------------------
 F77_LIBS = -L./ @F77_LIBS@
-TCLADAM  = @DESTDIR@/lib/tclAdam.o
 STAR_LIB = @STARLINK@/lib
 STAR_INC = @STARLINK@/include
 COMPIFL  = @STARLINK@/bin/compifl
@@ -155,14 +154,14 @@ $(demo_wish): normallib tkAppInit.o FORCE
 	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
 	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \
 	       $(RTD_LIB_STATIC) $(ASTROTCL_LIB_STATIC) \
-	       $(TCLUTIL_LIB_STATIC) $(TCLADAM) $(LOCAL_LIBRARY) \
+	       $(TCLUTIL_LIB_STATIC) $(LOCAL_LIBRARY) \
 	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(EXTRA_LIBS)
 
 $(demo_tcl): normallib tclAppInit.o FORCE
 	@echo "linking \"$(demo_tcl)\"..."
 	$(CXX) $(CC_SWITCHES)  tclAppInit.o -o $(demo_tcl) \
-	       $(LD_SEARCH_FLAGS) $(TCLADAM) $(LOCAL_LIBRARY) $(ADAM_LIBS) \
+	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(ADAM_LIBS) \
 	       $(TCLTKLIBS) $(EXTRA_LIBS)
 
 $(ardstat): normallib ardstat.o
