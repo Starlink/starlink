@@ -96,6 +96,7 @@
       EXTERNAL			HSI1_ADD
       EXTERNAL			HSI1_COPY
       EXTERNAL			HSI1_NEW
+      EXTERNAL			HSI1_OK
       EXTERNAL			HSI1_PTXT
 
       EXTERNAL			ADI_DEFMTH
@@ -116,6 +117,12 @@
 
 *    Define history copiers
         CALL ADI_DEFMTH( 'CopyHistory(HDSfile,HDSfile)', HSI1_COPY,
+     :                   DID, STATUS )
+
+*    Data extractors
+
+*    Checkers
+        CALL ADI_DEFMTH( 'ChkHistory(HDSfile)', HSI1_OK,
      :                   DID, STATUS )
 
 *    Creators of new history

@@ -105,6 +105,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Check initialised
+      IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
+
 *  Invoke method
       CALL ADI_EXEC( 'ChkHistory', 1, IFID, OARG, STATUS )
 
