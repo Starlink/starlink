@@ -663,14 +663,13 @@
 *  Get a mapping from the position list as read (PIXEL-domain
 *  coordinates) to the values to be used for comparison (coordinates
 *  of the Current domain of each NDF).
-               JCUR = AST_GETI( IWCS, 'Current', STATUS )
                CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
-               MAP1 = AST_GETMAPPING( IWCS, JPIX, JCUR, STATUS )
+               MAP1 = AST_GETMAPPING( IWCS, JPIX, AST__CURRENT, STATUS )
                MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
 
 *  Get the Current frame of the WCS component (used for formatting 
 *  coordinate output).
-               FRMS( I ) = AST_GETFRAME( IWCS, JCUR, STATUS )
+               FRMS( I ) = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
             END IF
 
 *  Write message about NDF name and domain.
@@ -1276,6 +1275,7 @@
 *  mapping.
          IF ( .NOT. USEWCS ) THEN
             CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
+            CALL AST_SETI( IWCS, 'Current', JPIX, STATUS )
          END IF
                      
 *  Add the new output frame, with the appropriate mapping, to the 
@@ -1324,7 +1324,6 @@
 *  Release the NDF.
          CALL NDF_ANNUL( ID, STATUS )
       END IF
-
 
 *  Exit with error label. Tidy up after this.
  99   CONTINUE

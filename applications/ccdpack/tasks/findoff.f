@@ -524,7 +524,6 @@
       INTEGER IPYO2( CCD1__MXLIC ) ! Pointer to list 2 output Y coords
       INTEGER IPYT              ! Pointer to temporary Y coords
       INTEGER J                 ! Loop variable
-      INTEGER JCUR              ! Index of Current frame in AST frameset
       INTEGER JPIX              ! Index of frame in Pixel domain
       INTEGER LBND( 2 )         ! Lower pixel-index bounds of NDF 
       INTEGER LOOPS             ! Number of comparison loops
@@ -681,14 +680,13 @@
 *  Get a mapping from the position list as read (PIXEL-domain
 *  coordinates) to the values to be used for comparison (coordinates
 *  of the Current domain of each NDF).
-               JCUR = AST_GETI( IWCS, 'Current', STATUS )
                CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
-               MAP1 = AST_GETMAPPING( IWCS, JPIX, JCUR, STATUS )
+               MAP1 = AST_GETMAPPING( IWCS, JPIX, AST__CURRENT, STATUS )
                MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
 
 *  Get the Current frame of the WCS component (used for formatting 
 *  coordinate output).
-               FRMS( I ) = AST_GETFRAME( IWCS, JCUR, STATUS )
+               FRMS( I ) = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Get NDF bounding box in pixel coordinates.
                CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )

@@ -578,13 +578,14 @@
             DMBAS = AST_GETC( FSMAT, 'Domain', STATUS )
             CALL AST_INVERT( FSMAT, STATUS )
             CALL CCD1_FRDM( IWCS, DMBAS, JCUR, STATUS )
-            IF ( JCUR .EQ. 0 ) THEN
+            IF ( JCUR .EQ. AST__NOFRAME ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'DMBAS', DMBAS )
                CALL ERR_REP( 'ASTIMP_NODMN', 
      :         'ASTIMP: NDF does not contain frame in domain ^DMBAS',
      :         STATUS )
             END IF
+            CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
 
 *  Get the mapping represented by the import frameset.
             MAP = AST_GETMAPPING( FSMAT, AST__BASE, AST__CURRENT, 

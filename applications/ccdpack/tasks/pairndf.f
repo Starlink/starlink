@@ -385,7 +385,6 @@
       INTEGER IPY2( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to Y position lists
       INTEGER IPYO( CCD1__MXNDF ) ! Pointers to output Y positions
       INTEGER IWCS( CCD1__MXNDF ) ! AST pointers to WCS framesets
-      INTEGER JCUR              ! Frame index of current frame
       INTEGER JPIX              ! Frame index of pixel frame
       INTEGER MAXCNV            ! Initial maximum dimension of display region
       INTEGER NDFGR             ! Input NDF group identifier
@@ -496,7 +495,7 @@
 
 *  Get the WCS frameset and the current frame for each NDF.
          DO I = 1, NNDF
-            CALL NDF_GTWCS( INDF( I ), IWCS( I ), STATUS )
+            CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
             FRM( I ) = AST_GETFRAME( IWCS( I ), AST__CURRENT, STATUS )
          END DO
 
@@ -540,9 +539,9 @@
             CALL CCD1_MALL( NOUT( I ), '_DOUBLE', IPYP, STATUS )
 
 *  Convert the positions to Pixel coordinates.
-            JCUR = AST_GETI( IWCS( I ), 'Current', STATUS )
-            CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
-            IMAP = AST_GETMAPPING( IWCS( I ), JCUR, JPIX, STATUS )
+            CALL CCD1_FRDM( IWCS( I ), 'Pixel', JPIX, STATUS )
+            IMAP = AST_GETMAPPING( IWCS( I ), AST__CURRENT, JPIX,
+     :                             STATUS )
             CALL AST_TRAN2( IMAP, NOUT( I ), %VAL( IPXO( I ) ), 
      :                      %VAL( IPYO( I ) ), 1, %VAL( IPXP ),
      :                      %VAL( IPYP ), STATUS )

@@ -236,6 +236,7 @@
       CHARACTER * ( CCD1__BLEN ) BUFFER ! Output buffer
       CHARACTER * ( CCD1__BLEN ) DMNLST ! Comma-separated domain list
       CHARACTER * ( FIO__SZFNM ) FNAME ! Name of NDF
+      INTEGER FRM                ! AST pointer to frame
       INTEGER I                  ! Loop variable
       INTEGER INDF( CCD1__MXNDF ) ! NDF identifiers for input NDFs
       INTEGER INGRP              ! GRP identifier for group IN 
@@ -246,7 +247,6 @@
       INTEGER IPWK4              ! Pointer to workspace array
       INTEGER IWCS( CCD1__MXNDF ) ! AST pointers to WCS components of NDFs
       INTEGER J                  ! Loop variable
-      INTEGER JLST               ! Index of frame in DMNLST in reference NDF
       INTEGER JNEW               ! Index of the newly added output frame
       INTEGER JREF               ! Index of reference frame in reference NDF
       INTEGER MAP                ! AST pointer to mapping between framesets
@@ -349,9 +349,10 @@
      :               STATUS )
 
 *  Check that the reference NDF has at least one frame in the supplied
-*  domain list.
-      CALL CCD1_FRDM( IWCS( REFPOS ), DMNLST, JLST, STATUS )
-      IF ( JLST .EQ. 0 ) THEN
+*  domain list (as a side effect this resets the Current frame).
+      FRM = AST_FINDFRAME( IWCS( REFPOS ), AST_FRAME( 2, ' ', STATUS ),
+     :                     DMNLST, STATUS )
+      IF ( FRM .EQ. AST__NULL ) THEN
 
 *  No frame with a domain in the domain list could be found in the 
 *  reference NDF.  Output error message and exit with error status.

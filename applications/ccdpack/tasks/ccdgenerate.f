@@ -393,10 +393,11 @@
 
 *  Modify WCS component.
          CALL CCD1_GTWCS( IDO, IWCS, STATUS )
-         FRGEN = AST_FRAME( 2, 'Domain=CCD_GEN', STATUS )
-         CALL AST_SETC( FRGEN, 'Title', 
-     :                  'Alignment of CCDGENERATE test data', STATUS )
+         FRGEN = AST_FRAME( 2, 'Domain=CCD_GEN,' //
+     :                      'Title=Alignment of CCDGENERATE test data',
+     :                      STATUS )
          CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
+         CALL AST_SETI( IWCS, 'Current', JPIX, STATUS )
          CALL AST_ADDFRAME( IWCS, JPIX, MAPTFM, FRGEN, STATUS )
 
 *  Write the frameset back to the WCS component of the NDF.  The Current
