@@ -19,11 +19,23 @@ SCRIPTS_GAIA = gaia.csh gaiadisp.csh tabbedgaia.csh .gaFilters
 
 ## Things we need to create from the various sub-components.
 
-## Components of Tcl that are not built into the single binary.
+## Components of Tcl that are not built into the single binary, plus files
+## that represent proper completion of each tcl component.
 TCL_FILES = bltCanvEps.pro bltGraph.pro
+
+TCL_TEST_FILES = built/lib/itclConfig.sh \
+ built/lib/tclConfig.sh \
+ built/lib/tkConfig.sh \
+ built/lib/itkConfig.sh \
+ built/lib/tclxConfig.sh  \
+ built/lib/tkxConfig.sh \
+ built/lib/libBLT.a \
+ built/lib/libtkhtml.a
 
 ## Binaries used for real time display.
 SKYCAT_FILES = rtdServer rtdClient rtdCubeDisplay
+
+SKYCAT_TEST_FILES = built/lib/skycatConfig.sh
 
 ## Files needed from gaia/library.
 GAIA_LIB_FILES =  \
@@ -59,7 +71,7 @@ SCRIPT_PLACES = \
         ./built/lib/blt2.4/*.pro
 
 ##  Build Tcl component.
-$(TCL_FILES):
+$(TCL_FILES) $(TCL_TEST_FILES): 
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./tcl; \
@@ -73,7 +85,7 @@ $(TCL_FILES):
 	done
 
 ##  Build Skycat component.
-$(SKYCAT_FILES): $(TCL_FILES)
+$(SKYCAT_FILES) $(SKYCAT_TEST_FILES): $(TCL_FILES) $(TCL_TEST_FILES)
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./skycat; \
@@ -89,9 +101,8 @@ $(SKYCAT_FILES): $(TCL_FILES)
 	cp -p ./built/include/rtd/rtdImageEvent.h .
 	cp -p ./built/lib/librtdImgEvt.a .
 
-
 ##  Build GAIA component.
-$(GAIA_FILES): $(TCL_FILES) $(SKYCAT_FILES)
+$(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./gaia; \
@@ -110,17 +121,19 @@ $(GAIA_FILES): $(TCL_FILES) $(SKYCAT_FILES)
 
 ##  Clean recurses into these directories.
 clean-local:
-	(cd tcl; make clean )
-	(cd skycat; make clean )
-	(cd gaia; make clean )
+	- rm -r -f built
+	- (cd tcl; make clean )
+	- (cd skycat; make clean )
+	- (cd gaia; make clean )
 
 distclean-local:
-	(cd tcl; make distclean )
-	(cd skycat; make distclean )
-	(cd gaia; make distclean )
+	- rm -r -f built
+	- (cd tcl; make distclean )
+	- (cd skycat; make distclean )
+	- (cd gaia; make distclean )
 
-## Clean up extra generated files.
-MAINTAINERCLEANFILES =
+## Clean up extra generated files (ones in built should be already gone).
+MAINTAINERCLEANFILES = $(TCL_FILES) $(SKYCAT_FILES) $(GAIA_FILES)
 
 ##  Need all the source code in the sub-directories.
 EXTRA_DIST = gaia skycat tcl gaia.news sun214fig.ps
