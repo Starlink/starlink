@@ -691,6 +691,7 @@ SHLIB_SUFFIX=".so.${bltMajor}"
 SHLIB_TARGET=""
 SHLIB_CFLAGS=""
 SHLIB_LD_LIBS=""
+EXT_LDFLAGS="$LDFLAGS"
 LDFLAGS=""
 
 buildShared="yes"
@@ -912,6 +913,8 @@ case $target in
     ;;
 
 esac
+
+LDFLAGS="$EXT_LDFLAGS $LDFLAGS"
 
 # If we're running gcc, then change the C flags for compiling shared
 # libraries to the right flags for gcc, instead of those for the
