@@ -114,8 +114,8 @@
                             # Labelling position
             type LITERAL
             access READ
-            vpath DYNAMIC CURRENT DEFAULT
-            ppath DYNAMIC CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
             default NN
             prompt {Label positioning (2 characters each Near Centre or Far)}
             helpkey *
