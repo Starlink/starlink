@@ -2989,7 +2989,7 @@
 
 *    Set default axis ranges
         I_X1_1D = 0.0
-        I_X2_1D = ABS(I_XSCALE)*REAL(I_N_1D)
+        I_X2_1D = ABS(I_XSCALE_1D)*REAL(I_N_1D)
         CALL ARR_RANG1RQ( I_N_1D, %VAL(I_DPTR_1D), %VAL(I_QPTR_1D),
      :                    QUAL__MASK, I_Y1_1D, I_Y2_1D, STATUS )
         I_Y2_1D = I_Y2_1D + 0.1*(I_Y2_1D-I_Y1_1D)
