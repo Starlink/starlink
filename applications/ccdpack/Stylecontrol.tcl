@@ -69,9 +69,9 @@
          itk_component add menu {
             menu $menubutton.menu
          }
-         lappend atts { drawaxes "Draw axes" "drawaxes=0" "drawaxes=1" }
          lappend atts { grid "Draw grid" "grid=0" "grid=1" }
-         lappend atts { numlab "Label axes" "numlab=0" "numlab=1" }
+         lappend atts { numlab "Label axes" "numlab=0" \
+                        "numlab=1,labelling=interior" }
          set i 0
          foreach att $atts {
             set name [ lindex $att 0 ]
@@ -91,7 +91,7 @@
          pack $itk_component(control)
 
          eval itk_initialize $args
-         configure -value $value
+         setval
       }
 
 
@@ -116,7 +116,7 @@
 
 
 #-----------------------------------------------------------------------
-      public variable value {drawaxes=1,drawgrid=0,numlab=0} {
+      public variable value {drawgrid=0,numlab=0} {
 #-----------------------------------------------------------------------
 
 #  If we have been given a value for the style, modify the current status
