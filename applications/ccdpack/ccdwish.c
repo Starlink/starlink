@@ -60,6 +60,7 @@
 #include "tk.h"
 #include "mers.h"
 #include "sae_par.h"
+#include "cnf.h"
 
 #define BUFLENG 4096
 
