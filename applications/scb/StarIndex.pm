@@ -3,7 +3,7 @@
 package Directory;
 
 use Scb;
-use SDBM_File;
+use NDBM_File;
 
 
 ########################################################################
@@ -12,8 +12,8 @@ sub new {
    my ($pkg, $indexfile, $mode) = @_;
    my %locate;
 
-   tie %locate, SDBM_File, $indexfile, $mode, 0644
-      or die "Failed to open $indexfile\n";
+   tie %locate, NDBM_File, $indexfile, $mode, 0644
+      or die "Failed to open dbm file $indexfile - may be corrupted.\n";
 
    return bless \%locate, $pkg;
 }
@@ -52,6 +52,13 @@ sub get {
 
 
 ########################################################################
+sub tarlevel {
+
+   return $_[0] =~ tr/>/>/;
+}
+
+
+########################################################################
 sub put {
 
    my ($rlocate, $name, $location) = @_;
@@ -61,15 +68,15 @@ sub put {
 
    my $package = starpack $location;
    if ($rlocate->{$name}) {
-      my ($loc, %loc, $oldloc);
+      my ($loc, %loc, $oldloc, $lev, $olev);
       foreach $loc (split ' ', $rlocate->{$name}) {
          $loc{starpack $loc} = $loc;
       }
       $oldloc = $loc{$package};
       $loc{$package} = $location
          if (!$oldloc ||
-             (($oleng = length $oldloc) > ($leng = length $location)) ||
-             ($oleng == $leng && $oldloc =~ /\.gen$/ && $location !~ /\.gen$/)
+             (($olev = tarlevel $oldloc) < ($lev = tarlevel $location)) ||
+             ($olev == $lev && $oldloc =~ /\.gen$/ && $location !~ /\.gen$/)
             );
       $rlocate->{$name} = join ' ', values %loc;
    }
