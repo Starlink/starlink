@@ -116,6 +116,7 @@
       CHARACTER*7		TYPE			! Mapping type
 
       INTEGER			ITID			! Invented data item
+      INTEGER			NDIM, DIMS(DAT__MXDIM)	! Object model dims
       INTEGER			NELM			! # mapped items
       INTEGER			PSID			! Private item storage
       INTEGER			PTR			! Mapped data address
@@ -135,7 +136,7 @@
 
 *  Ensure objects satisfy mapping requirement
       CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, (MODE(1:1).EQ.'W'),
-     :                 CLOC, STATUS )
+     :                 CLOC, NDIM, DIMS, STATUS )
 
 *  Everything ok?
       IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN
@@ -144,7 +145,7 @@
         CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *    Map the array
-        CALL BDI1_ARYMAP( CLOC, TYPE, MODE, PSID, PTR,
+        CALL BDI1_ARYMAP( CLOC, TYPE, MODE, NDIM, DIMS, PSID, PTR,
      :                    NELM, STATUS )
 
 *  Object doesn't exist?
