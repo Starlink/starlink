@@ -17,6 +17,7 @@
 #include "itk.h"
 #include "tclAdam.h"
 #include "tkGwm.h"
+#include <stdlib.h>
 /* #include "blt.h" */
 
 /* include tclInt.h for access to namespace API */
@@ -72,6 +73,8 @@ int
 Tcl_AppInit(interp)
     Tcl_Interp *interp;		/* Interpreter for application. */
 {
+    char *ccdpackdir;
+
     if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
@@ -181,6 +184,10 @@ Tcl_AppInit(interp)
      * then no user-specific startup file will be run under any conditions.
      */
 
-    Tcl_SetVar(interp, "tcl_rcFileName", ".ccdwishrc", TCL_GLOBAL_ONLY);
+    if ( ( ccdpackdir = getenv( "CCDPACK_DIR" ) ) != NULL ) {
+       Tcl_SetVar( interp, "tcl_rcFileName", ccdpackdir, TCL_GLOBAL_ONLY );
+       Tcl_SetVar( interp, "tcl_rcFileName", "/ccdwishrc", TCL_GLOBAL_ONLY | 
+                                                           TCL_APPEND_VALUE );
+    }
     return TCL_OK;
 }
