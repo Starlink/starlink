@@ -10,6 +10,7 @@
 *      5 Feb 93 : V1.7-1 closes device if only one graphics context (RJV)
 *     25 Nov 93 : V1.7-2 used BDA_ANNUL (RJV)
 *      6 Jan 95 : V1.8-0 closes ARD group (RJV)
+*     10 Apr 95 : V1.8-1 closes position group (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -27,7 +28,7 @@
       LOGICAL ACTIVE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICLOSE Version 1.8-0')
+      PARAMETER (VERSION = 'ICLOSE Version 1.8-1')
 *-
       CALL USI_INIT()
 
@@ -38,6 +39,11 @@
       CALL BDA_ANNUL(I_LOC,STATUS)
 
       CALL ARX_CLOSE(I_ARD_ID,STATUS)
+
+      IF (I_NPOS.GT.0) THEN
+        CALL GRP_DELET(I_POS_ID,STATUS)
+        I_NPOS=0
+      ENDIF
 
       CALL GCB_ATTACH('IMAGE',STATUS)
       CALL GCB_DETACH(STATUS)
