@@ -91,7 +91,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGERT			PSID, XAX, YAX, EAX, TAX
+      INTEGER			PSID, XAX, YAX, EAX, TAX
 
 *  Status:
       INTEGER 			STATUS             	! Global status
