@@ -357,8 +357,17 @@
 *            structure.
                ELSE
 
-*               Copy the component to the Figaro structure.
-                  CALL DAT_COPY( NXFIGI, LF, MFNAM, STATUS )
+*               Before performing the copy, ensure that the object does
+*               not exist. Ideally, one would like to cope with the
+*               non-standard objects by going down a level and
+*               processing them individually.  It's only a problem if
+*               there is a .OBS or .Z component.
+                  CALL DAT_THERE( LF, MFNAM, EXIST, STATUS )
+                  IF ( .NOT. EXIST ) THEN
+
+*                  Copy the component to the Figaro structure.
+                     CALL DAT_COPY( NXFIGI, LF, MFNAM, STATUS )
+                  END IF
                END IF
             END DO
 
