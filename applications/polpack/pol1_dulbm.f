@@ -890,8 +890,15 @@
 *  If required, trim the output NDF to exclude any margins of bad pixels.
       CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
       IF( TRIM ) THEN
+
+*  Find the new bounds.
          CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
      :                    LBND( 3 ), UBND( 3 ), %VAL( IPDOUT ), STATUS )
+
+*  Unmap the output NDF so that the call to NDF_SBND below works.
+         CALL NDF_UNMAP( NDFOUT, '*', STATUS )
+
+*  Set the new bounds.
          CALL NDF_SBND( 3, LBND, UBND, NDFOUT, STATUS ) 
       END IF
 

@@ -539,12 +539,21 @@
       END IF
 
 *  If required, trim the output NDF (and co-variance NDF) to exclude
-*  ant margins of bad pixels.
+*  any margins of bad pixels.
       IF( TRIM ) THEN
+
+*  Find the new bounds.
          CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
      :                    LBND( 3 ), UBND( 3 ), %VAL( IPDOUT ), STATUS )
+
+*  Unmap the output NDFs so that the calls to NDF_SBND below work.
+         CALL NDF_UNMAP( INDFO, '*', STATUS )
+         IF( OUTVAR ) CALL NDF_UNMAP( INDFC, '*', STATUS )
+
+*  Set the new bounds.
          CALL NDF_SBND( 3, LBND, UBND, INDFO, STATUS ) 
          IF( OUTVAR ) CALL NDF_SBND( 2, LBND, UBND, INDFC, STATUS ) 
+
       END IF
 
 *  Tidy up
