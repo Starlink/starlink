@@ -43,11 +43,14 @@ public class GSDObject {
     private ByteBuffer contents;
 
     // Global meta data from the file
+    // Should be marked as final but we can not do this
+    // because the values are set in a submethod and not a constructor
+    // even though that method is called from the constructor.
     private int maxitems;
     private int no_items;
     private String label;
     private float version;
-    private String filename;
+    private final String filename;
     private int start_data;
     private int end_data;
     private int size;
@@ -122,7 +125,10 @@ public class GSDObject {
      * @return GSDItem[] array indexed from zero.
      */
     public GSDItem[] items() {
-	return this.items;
+	// Make sure we return a copy of the array so that the contents
+	// and ordering of the items associated with this object can
+	// not be tweaked.
+	return (GSDItem[])this.items.clone();
     }
 
    /**
