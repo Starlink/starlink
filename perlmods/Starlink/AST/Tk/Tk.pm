@@ -32,7 +32,7 @@ are shown below,
 
 The following helper methods are also provided,
 
-   my ( $status, $alpha, $beta ) = _GAxScale( $w )
+   my ( $status, $alpha, $beta ) = _GScales( $w )
 
 =head1 DESCRIPTION
   
@@ -226,7 +226,7 @@ sub _GText {
 }            
 
 
-=item B<_GAxScale>
+=item B<_GScales>
 
 This function returns two values (one for each axis) which scale
 increments on the corresponding axis into a "normal" coordinate system in
@@ -234,15 +234,15 @@ which: The axes have equal scale in terms of (for instance) millimetres
 per unit distance, X values increase from left to right and the Y values 
 increase from bottom to top.
 
-   my ( $status, $alpha, $beta ) = _GAxScale( $w )
+   my ( $status, $alpha, $beta ) = _GScales( $w )
 
 =cut
 
-sub _GAxScale {
+sub _GScales {
     my $canvas = shift;
     my $alpha = shift;
     my $beta = shift;
-    print "_GAxScale: Placeholder routine called\n";
+    print "_GScales: Placeholder routine called\n";
     
     my ( $nx1, $nx2, $ny1, $ny2, $wx1, $wx2, $wy1, $wy2, $ret );
     
@@ -261,8 +261,8 @@ sub _GAxScale {
        $beta = ( $ny2 - $ny1 ) / ( $wy2 - $wy1 );
        $ret = 1
     } else {
-       print "_GAxScale: The graphics window has zero size\n";
-       $ret = 0;
+       ReportGrfError("_GScales: The graphics window has zero size");
+       return (0);
     }
     return ( $ret, $alpha, $beta );   
 }       
@@ -398,6 +398,67 @@ sub _GAttr {
    return ( 1, undef );
 }   
 
+
+=item B<_GCap>
+
+This function is called by the AST Plot class to determine if the
+grf module has a given capability, as indicated by the "cap"
+argument.
+
+  $has_cap = _GCap( $cap, $value );
+
+The capability string should be one of the following constants
+provided in the Starlink::AST::Grf namespace:
+
+GRF__SCALES: This function should return a non-zero value if
+it implements the astGScales function, and zero otherwise. The
+supplied "value" argument should be ignored.
+
+GRF__MJUST: This function should return a non-zero value if
+the astGText and astGTxExt functions recognise "M" as a
+character in the justification string. If the first character of
+a justification string is "M", then the text should be justified
+with the given reference point at the bottom of the bounding box.
+This is different to "B" justification, which requests that the
+reference point be put on the baseline of the text, since some
+characters hang down below the baseline. If the astGText or
+astGTxExt function cannot differentiate between "M" and "B",
+then this function should return zero, in which case "M"
+justification will never be requested by Plot. The supplied
+"value" argument should be ignored.
+
+GRF__ESC: This function should return a non-zero value if the
+astGText and astGTxExt functions can recognise and interpret
+graphics escape sequences within the supplied string. These
+escape sequences are described below. Zero should be returned
+if escape sequences cannot be interpreted (in which case the
+Plot class will interpret them itself if needed). The supplied
+"value" argument should be ignored only if escape sequences cannot
+be interpreted by astGText and astGTxExt. Otherwise, "value"
+indicates whether astGText and astGTxExt should interpret escape
+sequences in subsequent calls. If "value" is non-zero then
+escape sequences should be interpreted by astGText and
+astGTxExt. Otherwise, they should be drawn as literal text.
+
+Zero should be returned if the supplied capability is not recognised.
+
+=cut
+
+sub _GCap {
+  my $cap = shift;
+  my $value = shift;
+   print "_GCap: Placeholder routine called [assume lack capability]\n";
+  return 0;
+}
+
+# Internal error setting routine
+sub ReportGrfError {
+  my $text = shift;
+  warn "Generated AST error in perl PGPLOT callback: $text\n";
+  Starlink::AST::_Error( &Starlink::AST::Status::AST__GRFER(), $text);
+}
+
+
 =back
 
 =head1 COPYRIGHT
@@ -432,7 +493,10 @@ sub tk {
   $self->GTxExt(\&Starlink::AST::Tk::_GTxExt);
   $self->GQch(\&Starlink::AST::Tk::_GQch);
   $self->GAttr(\&Starlink::AST::Tk::_GAttr);
-  
+  $self->GScales(\&Starlink::AST::Tk::_GScales);
+  $self->GCap(\&Starlink::AST::Tk::_GCap);
+
+
   return 1; 
 }
 
