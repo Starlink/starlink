@@ -1564,7 +1564,7 @@
 
 *      Find axis base
         IF ( IP .EQ. P__F ) THEN
-          IF ( DIM .NE. DEFAULTDIM ) DIM = 100
+          IF ( DIM .EQ. DEFAULTDIM ) DIM = 100
         ELSE IF ( IP .EQ. P__X ) THEN
           SCALE = SCALE*AX_DR(1)
           BASE = PARAM(P__X) - SCALE*REAL(DIM)/2.0
