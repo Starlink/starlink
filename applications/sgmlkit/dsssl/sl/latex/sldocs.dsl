@@ -37,8 +37,13 @@ stdout, then generates an entity which contains the entire LaTeX file.
 <misccode>
 <description>These are the document element types.
 <codebody>
+(element sug (process-latex-document))
 (element sun (process-latex-document))
 (element ssn (process-latex-document))
+(element mud (process-latex-document))
+(element sc  (process-latex-document))
+(element sg  (process-latex-document))
+(element sgp (process-latex-document))
 (element mud (process-latex-document))
 
 

@@ -1,5 +1,5 @@
 <!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<![ ignore [ $Id$ ]]>
+<!-- $Id$ -->
 
 <docblock>
 <title>Inter- and Intra-document cross references for LaTeX
@@ -24,11 +24,17 @@ Check that the target is a member of the list <funcname/target-element-list/.
 <codebody>
 (element ref
   (let ((target (element-with-id (attribute-string (normalize "id")
-						   (current-node)))))
+						   (current-node))))
+	(linktext (attribute-string (normalize "text")
+				    (current-node))))
     (if (member (gi target) (target-element-list))
 	(make command name: "textit"
-	      (with-mode section-reference
-		(process-node-list target)))
+	      (if linktext
+		  (literal linktext)	;override generation of link text
+		  (if (member (gi target) (section-element-list))
+		      (make-section-reference target: target specify-type: #t)
+		      (with-mode section-reference
+			(process-node-list target)))))
 	(error (string-append
 	     "The stylesheet is presently unable to link to elements of type "
 	          (gi target))))))
