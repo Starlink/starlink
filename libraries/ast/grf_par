@@ -1,0 +1,59 @@
+*+
+*  Name:
+*     GRF_PAR
+
+*  Purpose:
+*     Define the constants needed to implement Fortran GRF routines.
+
+*  Language:
+*     Fortran 77
+
+*  Type of Module:
+*     Include file.
+
+*  Description:
+*     This file contains definitions which are required by Fortran 77
+*     programs which implement their own grf routines (routines for
+*     drawing graphics primitive used by the AST Plot class).
+
+*  Copyright:
+*     <COPYRIGHT_STATEMENT>
+
+*  Authors:
+*     DSB: David S. Berry (Starlink)
+
+*  History:
+*     13-JUN-2001 (DSB):
+*        Original version.
+*-
+
+*  Values identifying different graphics attributes.
+      INTEGER GRF__STYLE  
+      PARAMETER ( GRF__STYLE  = 0 )
+
+      INTEGER GRF__WIDTH  
+      PARAMETER ( GRF__WIDTH  = 1 )
+
+      INTEGER GRF__SIZE   
+      PARAMETER ( GRF__SIZE   = 2 )
+
+      INTEGER GRF__FONT   
+      PARAMETER ( GRF__FONT   = 3 )
+
+      INTEGER GRF__COLOUR 
+      PARAMETER ( GRF__COLOUR = 4 )
+
+*  Values identifying different graphics primatives.
+      INTEGER GRF__TEXT 
+      PARAMETER ( GRF__TEXT = 0 )
+
+      INTEGER GRF__LINE 
+      PARAMETER ( GRF__LINE = 1 )
+
+      INTEGER GRF__MARK 
+      PARAMETER ( GRF__MARK = 2 )
+
+*  The number of different graphics attributes.
+      INTEGER GRF__NATTR 
+      PARAMETER ( GRF__NATTR = 5 )
+
