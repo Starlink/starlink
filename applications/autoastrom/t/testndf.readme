@@ -1,0 +1,91 @@
+
+testndf2 was created with
+
+goedel:t> creframe xdim=1 ydim=1 typed=fl mean=0 outpic=testndf2
+goedel:t> wcscopy testndf2 $Z/playpen/south
+goedel:t> fitstext ndf=testndf2 file=$Z/playpen/south.fitslist
+
+$Z/playpen/south.sdf was a file sent to me by PWD:
+
+goedel:t> ndftrace $Z/playpen/south
+
+   NDF structure /scratch/goedel/norman/playpen/south:
+      Title:  dss15239
+
+   Shape:
+      No. of dimensions:  2
+      Dimension size(s):  353 x 353
+      Pixel bounds     :  1:353, 1:353
+      Total pixels     :  124609
+
+   Axes:
+      Axis 1:
+         Label : RA---TAN
+         Extent: 150.08340533221 to 149.91662533277
+
+      Axis 2:
+         Label : DEC--TAN
+         Extent: -30.08353 to -29.91674
+
+   Data Component:
+      Type        :  _REAL
+      Storage form:  SIMPLE
+      There are no bad pixels present
+
+   World Coordinate Systems:
+      Number of coordinate Frames: 4
+
+      Current coordinate Frame:
+        Title               : "FK5 equatorial coordinates; mean equinox J20..."
+        Domain              : SKY
+
+   Extensions:
+      FITS             <_CHAR*80>
+
+The FITS extension in south.sdf seemed corrupt, with a keyword SKEW
+which had two values in it.  The list which I inserted into testndf2
+had this card image commented out.  testndf2.ccdcat.munged was
+scavenged after a run of autoastrom on south.  The colour in --obsdata 
+for this image in t9 is a complete guess.
+
+
+
+
+testndf1 created the same way, but from file r106282xx.sdf:
+
+goedel:playpen> ndftrace r106282xx
+
+   NDF structure /local3/export/scratch/norman/playpen/r106282xx:
+      Title:  r220a V 900s
+      Units:  ADU
+
+   Shape:
+      No. of dimensions:  2
+      Dimension size(s):  2048 x 4097
+      Pixel bounds     :  1:2048, 1:4097
+      Total pixels     :  8390656
+
+   Axes:
+      Axis 1:
+         Extent: 0 to 2048
+
+      Axis 2:
+         Extent: 0 to 4097
+
+   Data Component:
+      Type        :  _REAL
+      Storage form:  SIMPLE
+      Bad pixels may be present
+
+   World Coordinate Systems:
+      Number of coordinate Frames: 4
+
+      Current coordinate Frame:
+        Title               : "FK5 equatorial coordinates; mean equinox J20..."
+        Domain              : SKY
+
+   Extensions:
+      CCDPACK          <CCDPACK_>
+      FITS             <_CHAR*80>
+
+
