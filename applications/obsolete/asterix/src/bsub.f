@@ -107,6 +107,8 @@
 	INTEGER   SRCMAP_PTR			!
 
 	INTEGER   COMPX_PTR, COMPY_PTR,AXPTR
+
+	LOGICAL 		  ISTATUS
 *-
 
 *  Check status
@@ -2518,7 +2520,7 @@ d		  E(M+1)=1.D0
 *
 *+  subroutine to do gaussian elimination
 *
-	INTEGER FUNCTION BSUB_GAUSS_ELIM(A,N,NP,B,M,MP,STATUS)
+	LOGICAL FUNCTION BSUB_GAUSS_ELIM(A,N,NP,B,M,MP,STATUS)
 
 	INCLUDE 'SAE_PAR'
 
@@ -2745,7 +2747,7 @@ d		  E(M+1)=1.D0
       ELSE
 	CALL CHR_UCASE( UNITS )
 
-	IF ( INDEX(UNITS,'/C') ) THEN
+	IF ( INDEX(UNITS,'/C') .GT. 0 ) THEN
 
 *        Exposure correct
           CALL ADI_CGET0R( TIMID, 'Exposure', EXPOSURE_TIME, STATUS )
@@ -3176,9 +3178,9 @@ d		  E(M+1)=1.D0
 
 	INTEGER J, K, IHIT, KK			!internal counters
 
-	INTEGER ISTATUS_G
+	LOGICAL ISTATUS_G
 
-	INTEGER BSUB_GAUSS_ELIM
+	LOGICAL BSUB_GAUSS_ELIM
 
 	INCLUDE 'BSUB_CMN'
 *
