@@ -4690,7 +4690,7 @@ f     This function
 *     by this function combines all three integers together into a single 
 *     integer using the expresion:
 *
-*     (major version)*1.0E6+(minor version)*1.0E3+(release)
+*     (major version)*1E6 + (minor version)*1E3 + (release)
 
 *  Returned Value:
 c     astVersion
@@ -4706,5 +4706,5 @@ f        This routine applies to all Objects.
 *--
 */
 
-   return ;
+   return AST__VMAJOR*1E6 + AST_VMINOR*1E3 + AST__RELEASE;
 }
