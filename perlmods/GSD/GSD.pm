@@ -162,6 +162,9 @@ sub new ($$) {
   # Return undef on error
   return undef if $status != 0;
 
+  # Strip trsiling space 
+  $label =~ s/\s+$//;
+
   # Create the object (an anon hash) and populate it
   my $gsd = {
 	     FILENAME => $file,
@@ -440,6 +443,31 @@ sub InqSize ($$) {
   }
 }
 
+=item B<DESTROY>
+
+Automatic destructor. This tidies up the object and frees
+memory when the object goes out of scope. It is not 
+necessary to run this method explicitly.
+
+This methods runs C<gsdClose> so that the user does not
+need to.
+
+=cut
+
+sub DESTROY {
+  # Since this is called when the GLOB is tidied up
+  # we need check that we have an argument on the stack
+  # from an object
+  if (scalar(@_) && ref($_[0]) eq 'HASH' ) {
+    gsdClose($_[0]->{FPTR},
+	     $_[0]->{FILE_DSC},
+	     $_[0]->{ITEM_DSC},
+	     $_[0]->{DATA_PTR}
+	    );
+  }
+}
+
+
 =back
 
 =head2 Wrapper Methods
@@ -539,27 +567,6 @@ sub _getTypedData {
 
   } else {
     return undef;
-  }
-}
-
-=item B<DESTROY>
-
-Automatic destructor. This tidies up the object and frees
-memory when the object goes out of scope. It is not 
-necessary to run this method explicitly.
-
-=cut
-
-sub DESTROY {
-  # Since this is called when the GLOB is tidied up
-  # we need check that we have an argument on the stack
-  # from an object
-  if (scalar(@_) && ref($_[0]) eq 'HASH' ) {
-    gsdClose($_[0]->{FPTR},
-	     $_[0]->{FILE_DSC},
-	     $_[0]->{ITEM_DSC},
-	     $_[0]->{DATA_PTR}
-	    );
   }
 }
 
