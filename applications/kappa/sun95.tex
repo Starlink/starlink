@@ -37830,7 +37830,6 @@ withdrawn, two to enable {\footnotesize KAPPA} to be NAG-free.
     \htmlref{TRANSFORMER}{TRANSFORMER}.
 
 \end{itemize}
-\end{htmlonly}
 
 \section{Release Notes---V0.12}
 V0.12 introduces limited support for the NDF WCS component which allows
@@ -37896,6 +37895,301 @@ CONVOLVE CSUB DISPLAY DIV ERRCLIP FFCLEAN FILLBAD FLIP GAUSMOOTH GREYPLOT
 HISTEQ INSPECT LUCY MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY
 NOMAGIC NORMALIZE PASTE PIXDUPE RIFT ROTATE SEGMENT SETMAGIC SHADOW SUB
 SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
+\end{htmlonly}
+
+\section{Release Notes---V0.13}
+Several applications have been changed to enable them to make use of the
+NDF WCS component, which stores descriptions of world coordinate systems 
+within NDF data structures. In some cases, this has involved major
+changes, including the removal of existing parameters and the addition of
+new parameters.
+
+\begin{quote}
+\emph{ Scripts which make use of any of the removed or modified parameters
+will fail when run with KAPPA V0.13. Such scripts will need to be changed
+to take account of the new features introduced in this release. Check the
+lists below for details.}
+\end{quote}
+
+Several new applications have also been written to support the use of the 
+WCS component. If no WCS component is present within an NDF, applications
+which read the WCS component will attempt to find suitable WCS information 
+in one of two other sources. Firstly, any IRAS90 astrometry structure 
+contained within an NDF extension will be used. If no such structure can 
+be found, any FITS header cards in the FITS extension will be used.
+Applications which write WCS information to an NDF will always write it
+in the form of a WCS component.
+
+One of the major changes is that graphics applications which previously had 
+many parameters to control the appearance of the plot (ABSLAB, ORDLAB,
+FONT, PLTITL, etc), now use a single STYLE parameter instead. The value
+supplied for a STYLE parameter should be a group of {\em plotting
+attributes}. Defaults for unspecified plotting attributes are read from the
+text file \verb+$KAPPA_DIR/style.def+. A different defaults file may be
+specified by assigning the name of the defaults file to the environment
+variable {\tt KAPPA\_STYLE}.
+
+Another major change is that the new and modified applications no longer
+use the global COSYS parameter to select \emph{data} (i.e. axis) or
+\emph{world} (i.e. pixel) co-ordinates. Instead, each NDF carries around
+with it knowledge of several co-ordinate ``Frames'', one of which is
+nominated as the \emph{current} co-ordinate Frame. This information is
+stored in the WCS component of each NDF. All interaction with a given NDF
+uses the current co-ordinate Frame when referring to positions within the
+NDF. The new application \htmlref{WCSFRAME}{WCSFRAME}] can be used to
+change the current co-ordinate Frame in an NDF.
+
+A more minor change is that the PXSIZE and PYSIZE parameters have been
+removed from the modified graphics applications. These parameters were
+previously used to specify the absolute size of the picture in metres.
+PICDEF can now be used to do this, using the new SIZE parameter. A picture
+of the required size should be created before running the appropriate 
+plotting application.
+
+\subsection{Modified applications}
+   \begin{description}
+      \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
+         \begin{itemize}
+            \item Axes are now annotated with values in the current co-ordinate
+                  Frame of the supplied NDF.
+            \item If the screen is not cleared before plotting a contour
+                  map (i.e. by setting the parameter CLEAR to FALSE), then
+                  an attempt will be made to align the new contour map 
+                  spatially with any existing DATA picture. This alignment
+                  occurs by preference in the current co-ordinate Frame
+                  of the supplied NDF, but may occur in another Frame if
+                  the existing DATA picture does not have suitable WCS 
+                  information stored with it.
+            \item There is now much greater control over the appearance
+                  of the map. This is provided through the STYLE and
+                  KEYSTYLE parameters which allow plotting attributes to
+                  be set.
+            \item The position of the key can now be controlled both
+                  vertically and horizontally.
+
+            \item The following parameters have been removed: COSYS, PXSIZE, 
+                  PYSIZE, ABSLAB, BORDER, CONCOL, DASHED, FONT, MAJTIC, 
+                  MINTIC, ORDLAB, OUTTIC, PLTITL, THICK.
+
+            \item The following new parameters have been added: KEYPOS, 
+                  KEYSTYLE, MARGIN, PENS, STYLE, USEAXIS.
+         
+            \item The following parameters have been modified:
+               \begin{description}
+                  \item [AXES] Axes are now annotated with the current
+                               co-ordinate Frame of the NDF.
+                  \item [CLEAR] Setting CLEAR=FALSE cause the new contour map
+                               to be aligned spatially with any existing DATA 
+                               picture (if possible).
+                  \item [KEY] The appearance of the key can now be controlled
+                              using parameter KEYSTYLE, and the position of the
+                              key can be controlled using parameter KEYPOS.
+               \end{description}
+
+         \end{itemize}
+
+      \item [\htmlref{CURSOR}{CURSOR}] \mbox{} 
+         \begin{itemize}
+            \item The positions are now reported in a current co-ordinate
+                  Frame of the picture (by default). This can be changed
+                  using the new parameter FRAME.
+
+            \item The format of the reported positions has changed (axis
+                  symbols and units are now included, and the picture 
+                  comment, name and label are displayed on a separate
+                  line).
+
+            \item There are now more options for marking the positions
+                  on the screen, with detailed control over the appearance
+                  of these graphics being provided through the new STYLE 
+                  parameter.
+
+            \item Control is now available over the minimum and maximum number 
+                  of position which may be supplied.
+
+            \item The following parameters have been removed: COSYS, DOUBLE,
+                  COLOUR, XC, YC, XP, YP.
+
+            \item The following new parameters have been added: DESCRIBE,
+                  EPOCH, FRAME, GEODESIC, INFO, LASTDIM, LASTPOS, MARKER,
+                  MAXPOS, MINPOS, OUTLIST, QUIET, STYLE.
+         
+            \item The following parameters have been modified:
+               \begin{description}
+                  \item [PLOT] Option ``Cross'' has been withdrawn, and 
+                               the new options ``Mark'' and ``Chain''
+                               have been added.
+               \end{description}
+
+         \end{itemize}
+
+      \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{} 
+         \begin{itemize}
+            \item Axes are now annotated with values in the current co-ordinate
+                  Frame of the supplied NDF.
+
+            \item There is now much greater control over the appearance
+                  of the axes or border. This is provided through the STYLE and
+                  BORSTYLE parameters which allow plotting attributes to
+                  be set.
+
+            \item The following parameters have been removed: COSYS, SQUASH,
+                  ABSLAB, BCOLOUR, BWIDTH, FONT, MAJTIC, MINTIC, ORDLAB, 
+                  OUTTIC, PLTITL, THICK.
+
+            \item The following new parameters have been added: BORSTYLE, 
+                  MARGIN, STYLE, USEAXIS.
+         
+            \item The following parameters have been modified:
+               \begin{description}
+                  \item [AXES] Axes are now annotated with the current
+                               co-ordinate Frame of the NDF. The default
+                               value is now the current value (initially
+                               TRUE) instead of FALSE.
+                  \item [BORDER] The default value is now the current value 
+                               (initially FALSE) instead of FALSE.
+                  \item [CENTRE] This is now a literal string value which
+                               supplies the co-ordinates of the central
+                               point within the current co-ordinate Frame
+                               of the NDF.
+                  \item [FILL] The default value is now TRUE if the input
+                               NDF is 1-dimensional, and FALSE otherwise.
+                  \item [XMAGN] This used to be the number of device
+                               pixels per NDF pixel along the horizontal
+                               axis. It is now a scaling factor, with a
+                               value of 1.0 producing an image which just
+                               fills the available width on the screen.
+                  \item [YMAGN] This has been changed in the same way as
+                               XMAGN.
+                 \end{description}
+
+         \end{itemize}
+
+      \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{} 
+         \begin{itemize}
+            \item NDFs in which the current co-ordinate Frame has more
+                  than 1 dimension can now be handled. For example, a 1-d 
+                  trace through a 2-d image will in general have a 2-d current 
+                  co-ordinate Frame, even though the pixel array itself is 
+                  only 1-d. In this case, the current co-ordinate Frame gives 
+                  the position of each pixel within the original 2-d image.
+
+            \item The horizontal axis is now annotated with values in the 
+                  current co-ordinate Frame of the supplied NDF. This can
+                  either be values on one of the Frame axes, or distance 
+                  from the starting point.
+
+            \item There is now much greater control over the appearance
+                  of the plot. This is provided through the STYLE
+                  parameter.
+
+            \item A key can now be produced indicating the starting and ending 
+                  points of the plot within the current co-ordinate Frame
+                  of the NDF. Its appearance can be controlled using the
+                  KEYSTYLE parameter.
+
+            \item The following parameters have been removed: AXLIM, ABSLIM, 
+                  COSYS, ORDLIM, PXSIZE, PYSIZE, ABSLAB, ERRCOL, FONT,
+                  LINCOL, MAJTIC, MINTIC, ORDLAB, OUTTIC, PLTITL, SYMCOL, 
+                  THICK, XLOG.
+
+            \item The following new parameters have been added: ALIGN,
+                  AXES, KEY, KEYSTYLE, MARGIN, MARKER, STYLE, USEAXIS,
+                  XLEFT, XRIGHT, XSIGMA, YTOP, YBOT, YSIGMA.
+         
+            \item The following parameters have been modified:
+               \begin{description}
+                  \item [MODE] The option of supplying an integer value
+                               has been removed (replaced by parameter MARKER).
+                               Options ``Mark'' and ``Chain'' have been added.
+                  \item [YLOG] Logarithmic data values are now
+                               represented as equally spaced values of 
+                               $\log(data)$, instead of logarithmically
+                               spaced values of $data$.
+               \end{description}
+
+         \end{itemize}
+
+      \item [\htmlref{NDFTRACE}{NDFTRACE}] \mbox{} 
+         \begin{itemize}
+            \item This now displays the available WCS information within
+                  an NDF. If a WCS component is not present within the 
+                  NDF, then it will display WCS information derived from
+                  an IRAS90 astrometry structure or FITS extension (if
+                  possible) as described earlier.
+
+            \item No parameters have been removed.
+
+            \item The following new parameters have been added: CURRENT, FDIM,
+                  FDOMAIN, FTITLE, FULLFRAME, FULLWCS, WCS.
+         
+            \item No parameters have been modified.
+
+         \end{itemize}
+
+      \item [\htmlref{PICDEF}{PICDEF}] \mbox{} 
+         \begin{itemize}
+            \item This now allows the picture size to be specified in
+                  absolute units (centimetres).
+
+            \item No parameters have been removed.
+
+            \item The following new parameters have been added: SIZE
+         
+            \item No parameters have been modified.
+
+         \end{itemize}
+
+   \end{description}
+
+\subsection{New applications}
+\begin{description}
+   \item [\htmlref{LISTMAKE}{LISTMAKE}] Creates a text file holding a
+         \emph{positions list}. These are used to communicate positions,
+         together with associated WCS information, between applications. 
+         In addition to numerical axis values, they also contain an
+         integer identifier for each position, and comments describing the
+         available co-ordinate Frames. The positions are supplied by the
+         user in a file or in response to parameter prompts. 
+
+   \item [\htmlref{LISTSHOW}{LISTSHOW}] This shows the positions
+         contained within a \emph{positions list} text file, in any 
+         of the co-ordinate Frames described within the file. It can also
+         extract a subset of a positions list and write it to a new
+         positions list. The positions are displayed on the screen, and
+         can also be marker on the current graphics device in a variety
+         of ways.
+
+   \item [\htmlref{PROFILE}{PROFILE}] Produces a 1-dimensional NDF
+         containing a profile through an N-dimensional NDF, retaining the
+         current co-ordinate Frame of the n-dimensional NDF. The data
+         values in the output NDF are samples taken along a specified
+         1-dimensional curve in the input NDF. 
+    
+   \item [\htmlref{WCSADD}{WCSADD}] Allows a new co-ordinate Frame to be
+         added into the WCS component of an NDF. The new Frame must be
+         related linearly to an existing Frame.
+
+   \item [\htmlref{WCSALIGN}{WCSALIGN}] Resamples a group of
+         2-dimensional NDFs in order to align them with a specified
+         reference NDF. The WCS information within the NDFs is used to
+         determine the transformations required to achieve alignment.
+
+   \item [\htmlref{WCSATTRIB}{WCSATTRIB}] Allows attributes within the
+         WCS component of an NDF to be examined or changed.
+
+   \item [\htmlref{WCSCOPY}{WCSCOPY}] Copies the WCS component from one
+         NDF to another. One use of this is to allow WCS information to
+         be re-instated in an NDF after being stripped out by an
+         application which does not propagate WCS information.
+
+   \item [\htmlref{WCSFRAME}{WCSFRAME}] Allows the current co-ordinate
+         Frame within an NDF to be examined and changed.
+   
+   \item [\htmlref{WCSREMOVE}{WCSREMOVE}] Removes one or more co-ordinate
+         Frames from the WCS component of an NDF.
+
+\end{description}
 
 \begin{latexonly}
 \newpage
