@@ -206,7 +206,7 @@
 *
 *        This parameter is ignored if USEWCS is FALSE.
 *        [FALSE]
-*     USECOM = LOGICAL (Read)
+*     USECOMP = LOGICAL (Read)
 *        This parameter specifies whether the completeness value will
 *        be used to weight the number of matches between a pair, when
 *        determining the graph connecting all input datasets. Using
@@ -347,7 +347,7 @@
 *     findoff fast nofailsafe
 *        In this example the only the FAST algorithm is used.
 *
-*     findoff usecom=false
+*     findoff usecomp=false
 *        In this example the completeness factor is derived but not used
 *        to weight the edges of the spanning tree.
 *

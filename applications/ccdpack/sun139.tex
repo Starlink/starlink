@@ -9221,7 +9221,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [FALSE]
       }
       \sstsubsection{
-         USECOM = LOGICAL (Read)
+         USECOMP = LOGICAL (Read)
       } {
          This parameter specifies whether the completeness value will
          be used to weight the number of matches between a pair, when
@@ -9267,7 +9267,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          In this example the only the FAST algorithm is used.
       }
       \sstexamplesubsection{
-         findoff usecom=false
+         findoff usecomp=false
       } {
          In this example the completeness factor is derived but not used
          to weight the edges of the spanning tree.
@@ -16305,7 +16305,7 @@ bugs reported during 1994/1995 should be fixed.
 CCDPACK has been updated to fix several outstanding problems.
 \begin{itemize}
 
-\item The USECOM parameter of \xroutine{FINDOFF} was mispelt as USECOM in the
+\item The USECOMP parameter of \xroutine{FINDOFF} was mispelt as USECOM in the
 documentation.
 
 \item   The \xroutine{FINDOBJ} application failed with an error message about not
