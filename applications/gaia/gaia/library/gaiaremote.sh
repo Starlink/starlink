@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh    
 # The next line is executed by /bin/sh, but not Tcl \
 exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #+
@@ -31,74 +31,72 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #-
 #.
 
+#  Add GAIA_DIR to autopath for some GAIA classes.
+lappend auto_path $env(GAIA_DIR)
+
 #  Open a socket to a GAIA application and return the file descriptor
 #  for remote commands. If a GAIA isn't found then start one up.
 proc connect_to_gaia {} {
    global env
 
-   #  Get the hostname and port info from the file ~/.rtd-remote, 
+   #  Get the hostname and port info from the file ~/.rtd-remote,
    #  which is created by rtdimage when the remote subcommand is
-   #  used. 
+   #  used.
    set tries 0
-   while { $tries < 1000 } {
+   while { 1 } {
       set needed 0
 
-      #  Open the file containing the process id and read it.
+      #  Open the file containing the GAIA process information and read it.
       if {[catch {set fd [open $env(HOME)/.rtd-remote]} msg]} {
          set needed 1
+      } else {
+         lassign [read $fd] pid host port
+         close $fd
       }
-      lassign [read $fd] pid host port
-      close $fd
-      
-      #  See if the process exists.
-      if { ! $needed } { 
-         if {[catch {exec kill -0 $pid} msg]} {
+
+      #  See if the process is listening to this socket.
+      if { ! $needed } {
+         if {[catch {socket $host $port} msg]} {
             set needed 1
+         } else {
+            fconfigure $msg -buffering line
+            return $msg
          }
       }
 
       #  If the process doesn't exist and we've not been around the
       #  loop already, then start a new GAIA.
-      if { $needed && $tries == 0 } { 
-         puts "Starting a new GAIA instance. Please wait..."
+      if { $needed && $tries == 0 } {
+         puts stderr "Failed to connect to GAIA, starting new instance..."
          exec $env(GAIA_DIR)/gaia.sh &
-         #      exec $env(GAIA_DIR)/tgaia &
+         #exec $env(GAIA_DIR)/tgaia &
       }
 
       #  Now either wait and try again or give up if waited too long.
-      if { $needed && $tries < 1000 } { 
+      if { $needed && $tries < 500 } {
          #  Wait for a while and then try again.
          incr tries
-         after 1000 
-      } elseif { $needed } { 
-         puts stderr "Failed to create a new GAIA"
+         after 1000
+      } elseif { $needed } {
+         puts stderr "Sorry timed out: failed to display image in GAIA"
          exit 1
-      } else {
-
-         #  Worked. Break out of loop and proceed.
-         break;
       }
    }
-
-   #  Make the connection.
-   set fd [server_connect -nobuf $host $port]
-   return $fd
 }
 
 #  Send the command to GAIA and return the results or generate an error.
-
 proc send_to_gaia {args} {
-    global gaia_fd
-    puts $gaia_fd $args
-    lassign [gets $gaia_fd] status length
-    set result {}
-    if {$length > 0} {
-	set result [read $gaia_fd $length]
-    }
-    if {$status != 0} {
-	error $result
-    }
-    return $result
+   global gaia_fd
+   puts $gaia_fd "$args"
+   lassign [gets $gaia_fd] status length
+   set result {}
+   if {$length > 0} {
+      set result [read $gaia_fd $length]
+   }
+   if {$status != 0} {
+      error "$result"
+   }
+   return "$result"
 }
 
 if { $argc == 0 } { 
@@ -114,4 +112,5 @@ set result [eval send_to_gaia $argv]
 if { $result != {} } { 
     puts stderr "gaiaremote: $result"
 }
+close $gaia_fd
 exit
