@@ -2940,7 +2940,6 @@ c       WRITE(*,*)
                 PARAMS(LLNGTH+1:LLNGTH+4) = '.ESTK'
                 LLNGTH = LLNGTH + 4
              END IF
-             CALL DTOUPP(PARAMS)
               CLOSE(34)
               OPEN (UNIT=34,FILE=PARAMS(1:80),STATUS='OLD',
      :        FORM='UNFORMATTED',IOSTAT=IHX)
