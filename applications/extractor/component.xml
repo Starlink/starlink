@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="extractor">
+  <version>2.3</version>
+  <path>applications/extractor</path>
+  <description>EXTRACTOR - An Astronomical Source Detection Program</description>
+  <abstract><p>
+EXTRACTOR will detect sources in an astronomical image and build a catalogue
+listing them. It is based on the popular SExtractor program, has very
+flexible configuration facilities and can handle images and catalogues in a
+variety of formats.
+</p></abstract>
+  <dependencies >
+    <build>ast</build><build>ndf</build><build>sae</build><link>ndf</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun226</documentation>
+  <bugreports>extractor@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
