@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_KPSV( PARAM, KEY, STATUS )
+      SUBROUTINE CCD1_KPSV( PARAM, KEY, SLOC, STATUS )
 *+
 *  Name:
 *     CCD1_KPSV
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_KPSV( PARAM, KEY, STATUS )
+*     CALL CCD1_KPSV( PARAM, KEY, SLOC, STATUS )
 
 *  Description:
 *     This routine saves the version of a parameter keyed by an integer
@@ -25,6 +25,9 @@
 *     KEY = INTEGER (Given)
 *        The key to be used.  The value of the parameter will be saved
 *        keyed by this value in the ADAM parameter file.
+*     SLOC = CHARACTER * ( * ) (Given)
+*        A locator to the keyed parameters structure.  Should be opened 
+*        for UPDATE access.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -65,15 +68,14 @@
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
       INTEGER KEY
+      CHARACTER * ( DAT__SZLOC ) SLOC
       
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( DAT__SZLOC ) ALOC ! HDS locator for associative array
-      CHARACTER * ( DAT__SZLOC ) GLOC ! HDS locator for GLOBAL parameter file
+      CHARACTER * ( DAT__SZLOC ) ALOC ! HDS locator for keyed parameter
       CHARACTER * ( DAT__SZNAM ) KEYNAM ! Name of key component
-      CHARACTER * ( DAT__SZLOC ) SLOC ! HDS locator for keyed parameters struct
       CHARACTER * ( DAT__SZLOC ) VLOC ! HDS locator for matched value
       INTEGER LENG               ! Length of string
       LOGICAL THERE              ! Does HDS component exist?
@@ -90,10 +92,6 @@
          CALL DAT_ANNUL( VLOC, STATUS )
          CALL ERR_ANNUL( STATUS )
       ELSE
-
-*  Get locators for the GLOBAL database file and the keyed parameters
-*  structure within it.
-         CALL CCD1_GPARF( 'UPDATE', .TRUE., GLOC, SLOC, STATUS )
 
 *  Get a locator for the component of the keyed parameters structure 
 *  representing the parameter we are interested in; if none exists,
@@ -120,9 +118,7 @@
          CALL DAT_COPY( VLOC, ALOC, KEYNAM, STATUS )
 
 *  Release locators.
-         CALL DAT_ANNUL( SLOC, STATUS )
          CALL DAT_ANNUL( ALOC, STATUS )
-         CALL DAT_ANNUL( GLOC, STATUS )
          CALL DAT_ANNUL( VLOC, STATUS )
       END IF
 
