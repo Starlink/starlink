@@ -34,6 +34,16 @@ interface POLSTACK
       helpkey  '*'
    endparameter
 
+   parameter ILEVEL
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Screen information level'
+      default  1
+      helpkey  '*'
+   endparameter
+
    parameter IN                  
       position 1
       type     NDF
@@ -54,6 +64,16 @@ interface POLSTACK
       helpkey  '*'
    endparameter
 
+   parameter ORIGIN
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Analysis angle at start of first bin, in degrees'
+      default  0.0
+      helpkey  '*'
+   endparameter
+
    parameter OUT
       position 2
       type     NDF
@@ -61,16 +81,6 @@ interface POLSTACK
       vpath    'PROMPT '
       association '->GLOBAL.DATA_ARRAY'
       prompt   'Output intensity images'
-      helpkey  '*'
-   endparameter
-
-   parameter QUIET
-      type     _LOGICAL
-      access   READ
-      vpath    'DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      prompt   'Run quietly?'
-      default  FALSE
       helpkey  '*'
    endparameter
 

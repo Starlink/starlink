@@ -1,6 +1,6 @@
-      SUBROUTINE POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, BIN, 
-     :                       ANGRT, WORK, NOUT, PHI, LBND, UBND, 
-     :                       STATUS )
+      SUBROUTINE POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, 
+     :                       ORIGIN, BIN, ANGRT, WORK, NOUT, PHI, LBND, 
+     :                       UBND, STATUS )
 *+
 *  Name:
 *     POL1_SRTIM
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SRTIM( RANGE, MININ, IGRP1, NNDF, NBIN, BIN, ANGRT, 
-*                      WORK, NOUT, PHI, LBND, UBND, STATUS )
+*     CALL POL1_SRTIM( ILEVEL, RANGE, MININ, IGRP1, NNDF, NBIN, ORIGIN, 
+*                      BIN, ANGRT, WORK, NOUT, PHI, LBND, UBND, STATUS )
 
 *  Description:
 *     This routine identifies the analysis angle bin to which each 
@@ -22,9 +22,10 @@
 *     include in each output NDF.
 
 *  Arguments:
+*     ILEVEL = INTEGER (Given)
+*        If 2 or more, details of each input NDF are displayed.
 *     RANGE = REAL (Given)
-*        The upper limit of the binning range. Should be either 180.0 or
-*        360.0.
+*        The binning range. Should be either 180.0 or 360.0.
 *     MININ = INTEGER (Given)
 *        The minimum number of input NDFs required to produce an output
 *        NDF.
@@ -35,6 +36,8 @@
 *        The number of NDFs in the supplied group.
 *     NBIN = INTEGER (Given)
 *        The number of analysis angle bins.
+*     ORIGIN = REAL (Given)
+*        The analysis angle at the start of the first bin, in degrees.
 *     BIN = REAL (Given)
 *        The size of each analysis angle bin, in degrees.
 *     ANGRT = REAL (Returned)
@@ -54,9 +57,11 @@
 *        The acw angle from output ref. direction (see ANGRT) to the 
 *        effective analyser position in each input NDF, in degrees.
 *     LBND( 3 ) = INTEGER (Given)
-*        Lower pixel index bounds which span all the input images.
+*        Lower pixel index bounds which span all the input images. The
+*        third axis is set to 1.
 *     UBND( 3 ) = INTEGER (Given)
-*        Upper pixel index bounds which span all the input images.
+*        Upper pixel index bounds which span all the input images. The
+*        third axis is set to NOUT.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -72,6 +77,8 @@
 *        Original version.
 *     26-MAY-1999 (DSB):
 *        Added RANGE argument.
+*     1-JUL-1999 (DSB):
+*        Added ORIGIN and ILEVEL arguments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,13 +93,16 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Arguments Given:
+      INTEGER ILEVEL
       REAL RANGE
       INTEGER MININ
       INTEGER IGRP1
       INTEGER NNDF
       INTEGER NBIN
+      REAL ORIGIN
       REAL BIN
 
 *  Arguments Returned:
@@ -107,6 +117,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER NDFNAM*(GRP__SZFNM)! NDF name from supplied group
       CHARACTER RAY*1            ! Dual beam ray identification 
       CHARACTER XLOC*(DAT__SZLOC)! Locator to POLPACK extension
       INTEGER I                  ! Index of current input NDF
@@ -147,6 +158,9 @@
       LBND( 2 ) = VAL__MAXI
       UBND( 1 ) = VAL__MINI
       UBND( 2 ) = VAL__MINI
+
+*  Display a blank line if details of the input NDFs are to be displayed.
+      IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
 
 *  Initialise the number of NDFs which were not included in a bin.
       IGNORE = 0
@@ -228,16 +242,27 @@
             IF( RAY .EQ. 'E' ) PHI( I ) = PHI( I ) + 90.0
          END IF           
 
-*  Map the analysis angle into the range 0 to RANGE.
-         PHI( I ) = PHI( I ) - RANGE*INT( PHI( I )/RANGE )
-         IF( PHI( I ) .LT. 0.0 ) PHI( I ) = PHI( I ) + RANGE 
+*  Map the analysis angle into the range ORIGIN to RANGE+ORIGIN.
+         PHI( I ) = PHI( I ) - RANGE*INT( ( PHI( I ) - ORIGIN )/RANGE )
+         IF( PHI( I ) .LT. ORIGIN ) PHI( I ) = PHI( I ) + RANGE 
 
 *  Find the index of the bin which encompasses this analysis angle.
-         IBIN = 1 + INT( PHI( I ) / BIN )
+         IBIN = 1 + INT( ( PHI( I ) - ORIGIN ) / BIN )
 
 *  Ignore illegal bin numbers.
          IF( IBIN .GT. 0 .AND. IBIN .LE. NBIN .AND. 
      :       STATUS .EQ. SAI__OK ) THEN
+
+*  Display details of this input NDF if required.
+            IF( ILEVEL .GT. 1 ) THEN
+               CALL GRP_GET( IGRP1, I, 1, NDFNAM, STATUS ) 
+               CALL MSG_SETC( 'NDF', NDFNAM )
+               CALL MSG_SETI( 'I', I )
+               CALL MSG_SETR( 'PHI', PHI( I ) )
+               CALL MSG_SETI( 'BIN', IBIN )
+               CALL MSG_OUT( ' ', '  Image ^I:  angle=^PHI  bin=^BIN '//
+     :                       ' (^NDF)', STATUS )
+            END IF
 
 *  Increment the number of input images in this bin.
             NIN = WORK( IBIN, 0 ) + 1
@@ -259,7 +284,18 @@
 
 *  Increment the number of illegal bin numbers.
          ELSE
-           IGNORE = IGNORE + 1
+            IGNORE = IGNORE + 1
+
+*  Display details of this input NDF if required.
+            IF( ILEVEL .GT. 1 ) THEN
+               CALL NDF_MSG( 'NDF', INDF )
+               CALL MSG_SETI( 'I', I )
+               CALL MSG_SETR( 'PHI', PHI( I ) )
+               CALL MSG_SETI( 'BIN', IBIN )
+               CALL MSG_OUT( ' ', '  Image ^I:  angle=^PHI  <not '//
+     :                       'included>  (^NDF)', STATUS )
+            END IF
+
          END IF
 
 *  Annul the FrameSet pointer.
@@ -275,6 +311,8 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
       END DO
+
+      IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
 
 *  See how many bins contain sufficient input images.
       DO I = 1, NBIN
