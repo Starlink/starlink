@@ -45,7 +45,7 @@
           L=7
         ELSE
           TEXT=' '
-          L=1
+          L=2
         ENDIF
 
         IF (EXCLUDE) THEN
@@ -58,12 +58,9 @@
         CALL MSG_SETR('XC',XC)
         CALL MSG_SETR('YC',YC)
         CALL MSG_SETR('RAD',RAD)
-        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD ',TEXT,L)
-        L=L+1
+        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD )',TEXT,L)
         IF (EXCLUDE) THEN
-          TEXT(L:)='))'
           L=L+1
-        ELSE
           TEXT(L:L)=')'
         ENDIF
 
