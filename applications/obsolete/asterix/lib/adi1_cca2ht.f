@@ -131,9 +131,6 @@
       ELSE IF ( CLASS(1:6) .EQ. 'DOUBLE' ) THEN
         CALL ADI1_CCA2HD( ID, MEMBER, LOC, CMP, STATUS )
 
-      ELSE
-        CALL ADI1_CCA2HC( ID, MEMBER, LOC, CMP, STATUS )
-
       END IF
 
 *  Report any errors

@@ -102,6 +102,8 @@
 *  Local Variables:
       <TYPE>			VALUE			! Intermediate value
 
+      INTEGER			MID			! Member identifier
+
       LOGICAL			THERE			! Object exists?
 *.
 
@@ -109,7 +111,15 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Does the member exist?
-      CALL ADI_THERE( ID, MEMBER, THERE, STATUS )
+      IF ( MEMBER .GT. ' ' ) THEN
+        CALL ADI_THERE( ID, MEMBER, THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_FIND( ID, MEMBER, MID, STATUS )
+        END IF
+      ELSE
+        THERE = .TRUE.
+        MID = ID
+      END IF
 
 *  Try to copy if it exists
       IF ( THERE ) THEN
@@ -124,11 +134,16 @@
         CALL DAT_NEW0<T>( LOC, CMP, STATUS )
 
 *    Read the ADI data
-        CALL ADI_CGET0<T>( ID, MEMBER, VALUE, STATUS )
+        CALL ADI_GET0<T>( MID, VALUE, STATUS )
 
 *    Write to HDS
         CALL CMP_PUT0<T>( LOC, CMP, VALUE, STATUS )
 
+      END IF
+
+*  Free the member identifier
+      IF ( MEMBER .GT. ' ' ) THEN
+        CALL ADI_ERASE( MID, STATUS )
       END IF
 
 *  Report any errors

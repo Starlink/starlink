@@ -118,7 +118,11 @@
         CALL CMP_GET0<T>( LOC, CMP, VALUE, STATUS )
 
 *    Write to ADI
-        CALL ADI_NEWV0<T>( ID, MEMBER, VALUE, STATUS )
+        IF ( MEMBER .GT. ' ' ) THEN
+          CALL ADI_CNEWV0<T>( ID, MEMBER, VALUE, STATUS )
+        ELSE
+          CALL ADI_NEWV0<T>( VALUE, ID, STATUS )
+        END IF
 
       END IF
 
