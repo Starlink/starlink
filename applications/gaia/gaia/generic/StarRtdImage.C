@@ -150,9 +150,7 @@
 //        Changed method for estimating contour region.
 //     08-AUG-2001 (PWD):
 //        Fixed problem with native objects being written at start of
-//        FITS headers (there is a remaining issue with native cards
-//        being written in a non-contiguous fashion that remains
-//        unresolved, hence the "#if 0" sections of code in dumpCmd).
+//        FITS headers (actually turned out to be an AST bug).
 //-
 
 #include <string.h>
