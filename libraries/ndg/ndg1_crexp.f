@@ -105,15 +105,15 @@
 
 *  Local Variables:
       CHARACTER ALTTYP*20          ! Second choice file type from NDF_FORMATS_OUT
-      CHARACTER BN1*50             ! Supplied file base name
+      CHARACTER BN1*(GRP__SZNAM)   ! Supplied file base name
       CHARACTER DEFTYP*20          ! First choice file type from NDF_FORMATS_OUT
       CHARACTER DIR*(GRP__SZNAM)   ! Directory path 
       CHARACTER DIR1*(GRP__SZFNM)  ! Supplied directory path 
       CHARACTER FMTOUT*(NDG__SZFMT)! List of output NDF formats
       CHARACTER NAME*(GRP__SZNAM)  ! Current name
       CHARACTER PATH*(GRP__SZNAM)  ! HDS component path 
-      CHARACTER SEC1*50            ! Supplied NDF section (ignored)
-      CHARACTER SUF1*100           ! Supplied file suffix
+      CHARACTER SEC1*(GRP__SZNAM)  ! Supplied NDF section (ignored)
+      CHARACTER SUF1*(GRP__SZNAM)  ! Supplied file suffix
       CHARACTER TYP*(GRP__SZNAM)   ! File type 
       CHARACTER TYPS( MXTYP )*(SZTYP)! Known foreign file types
       INTEGER ADDED              ! No. of names added to the group

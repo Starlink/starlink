@@ -119,7 +119,7 @@
       CHARACTER VLOC*(DAT__SZLOC)! Locator to vectorised array
       CHARACTER XLOC*(DAT__SZLOC)! Locator to next object to be checked
       CHARACTER DIR2*(GRP__SZFNM)! Full directory spec
-      CHARACTER BN2*50           ! File base name 
+      CHARACTER BN2*(GRP__SZNAM) ! File base name 
       CHARACTER SEC2*1           ! NDF section (should always be blank)
       CHARACTER SUF2*(GRP__SZFNM)! Suffix (eg HDS comp. path)
       INTEGER DIM( DAT__MXDIM )  ! Dimensions of array component
