@@ -26,7 +26,7 @@ are shown below,
    $status = _GLine( \@x, \@y );
    $status = _GMark( \@x, \@y, $type );
    $status = _GText( $text, $x, $y, $just, $upx, $upy );
-   ( $status, $xb, $yb ) = _GTxtExt( $text, $x, $y, $just, $upx, $upy );
+   ( $status, $xb, $yb ) = _GTxExt( $text, $x, $y, $just, $upx, $upy );
    ( $status, $chv, $chh ) = _GQch();
    ( $status, $old_value ) = _GAttr( $attr, $value, $prim );
 
@@ -235,6 +235,7 @@ sub _GText {
       my $tbg;
       pgqtbg( $tbg );
       pgstbg( 0 );
+      print "_GText: ($x,$y) $text\n";
       pgptxt( $x, $y, $angle, $fjust, $text ); 
       pgstbg( $tbg );
    }
@@ -321,12 +322,12 @@ Notes:
 
 =cut
 
-sub _GTxtEx {
+sub _GTxExt {
    my ( $text, $x, $y, $just, $upx, $upy ) = @_;
    
    # initalise @$xb and @$yb
    my ( @xb, @yb );
-   foreach my $i ( 0 ... 4 ) {
+   foreach my $i ( 0 ... 3 ) {
       $xb[$i] = 0.0;
       $yb[$i] = 0.0;
    }   
@@ -357,7 +358,7 @@ sub _GTxtEx {
       
       # get the axis scaling
       my ( $ret, $alpha, $beta ) = _GAxScale();
-      return 0 if $ret == 0;
+      return ( 0, undef, undef ) if $ret == 0;
       
       # If either axis is reversed, reverse the supplied up-vector 
       # components so that they refer to the world-coordinates axes.
@@ -375,7 +376,7 @@ sub _GTxtEx {
          $uy /= $uplen;
       } else {
          print "_GTxtExt: Zero length up-vector supplied.";
-         return 0;
+         return ( 0, undef, undef );
       }
  
       # Form the base-line vector by rotating the up-vector by 90 degrees 
