@@ -85,7 +85,7 @@
           ELSE
 
 *          Open the file
-            CALL AFIO_OPEN1( FILENAME, 'READ', 'LIST', 0, ID, STATUS )
+            CALL AIO_FOPEN1( FILENAME, 'READ', 'LIST', 0, ID, STATUS )
 
 *          Initialise channel
             IF ( STATUS .EQ. SAI__OK ) THEN
