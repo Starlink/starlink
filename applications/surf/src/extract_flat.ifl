@@ -1,0 +1,52 @@
+## EXTRACT_FLAT - Extract the flatfield of a file to ascii file
+ 
+#+
+#  Name:
+#     EXTRACT_FLAT.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1997 October 27 (TimJ)
+#      Original version
+#     {enter_further_changes_here}
+ 
+#-
+ 
+   INTERFACE EXTRACT_FLAT
+
+      HELPLIB 'SURF_HELP:'
+
+
+      PARAMETER   IN
+         POSITION 1
+         PROMPT   'Name of input file'
+         TYPE     'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+	 PPATH    'GLOBAL'
+	 ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER FILE
+         TYPE 'FILENAME'
+	 POSITION 2
+         PROMPT 'Name of output ASCII file'
+         HELPKEY '*'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
