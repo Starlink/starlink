@@ -14,4 +14,15 @@ gsd1_getval.c    gsd1_rdhead.c  gsdClose.c  gsdGet0x.c    gsdItem.c \
 gsd1_rddata.c    gsd2_copya.c   gsd_f77.c   gsdGet1x.c    gsdOpenRead.c \
 gsd1_rdfildsc.c  gsd2_nativx.c  gsdFind.c   gsdInqSize.c
 
-TEST_ROUTINES = gsd_print.c
+
+# Testing. Just build gsd_print although we can not really test
+# it unless we ask it to default to the test GSD file
+
+TESTS = gsd_print
+check_PROGRAMS = gsd_print
+
+gsd_print_SOURCES = gsd_print.c
+gsd_print: $(gsd_print_OBJECTS)
+	$(LIBTOOL) --mode=link $(CC) -o gsd_print \
+	       $(gsd_print_OBJECTS) -lgsd -lm `cnf_link`
+

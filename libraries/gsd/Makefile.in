@@ -17,7 +17,7 @@
 
 
 
-SOURCES = $(libgsd_la_SOURCES)
+SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -40,6 +40,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
+check_PROGRAMS = gsd_print$(EXEEXT)
 DIST_COMMON = README $(am__configure_deps) $(include_HEADERS) \
 	$(srcdir)/../config.guess $(srcdir)/../config.sub \
 	$(srcdir)/../depcomp $(srcdir)/../install-sh \
@@ -68,6 +69,9 @@ am__objects_1 = gsd1_getval.lo gsd1_rdhead.lo gsdClose.lo gsdGet0x.lo \
 	gsdInqSize.lo
 am_libgsd_la_OBJECTS = $(am__objects_1)
 libgsd_la_OBJECTS = $(am_libgsd_la_OBJECTS)
+am_gsd_print_OBJECTS = gsd_print.$(OBJEXT)
+gsd_print_OBJECTS = $(am_gsd_print_OBJECTS)
+gsd_print_LDADD = $(LDADD)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -83,7 +87,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/gsdGet0x.Plo ./$(DEPDIR)/gsdGet1x.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/gsdInqSize.Plo ./$(DEPDIR)/gsdItem.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/gsdOpenRead.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/gsd_f77.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/gsd_f77.Plo ./$(DEPDIR)/gsd_print.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -92,8 +96,8 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libgsd_la_SOURCES)
-DIST_SOURCES = $(libgsd_la_SOURCES)
+SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES)
+DIST_SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES)
 stardocsDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(stardocs_DATA)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
@@ -239,7 +243,11 @@ gsd1_getval.c    gsd1_rdhead.c  gsdClose.c  gsdGet0x.c    gsdItem.c \
 gsd1_rddata.c    gsd2_copya.c   gsd_f77.c   gsdGet1x.c    gsdOpenRead.c \
 gsd1_rdfildsc.c  gsd2_nativx.c  gsdFind.c   gsdInqSize.c
 
-TEST_ROUTINES = gsd_print.c
+
+# Testing. Just build gsd_print although we can not really test
+# it unless we ask it to default to the test GSD file
+TESTS = gsd_print
+gsd_print_SOURCES = gsd_print.c
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -341,6 +349,13 @@ clean-libLTLIBRARIES:
 	done
 libgsd.la: $(libgsd_la_OBJECTS) $(libgsd_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(libgsd_la_LDFLAGS) $(libgsd_la_OBJECTS) $(libgsd_la_LIBADD) $(LIBS)
+
+clean-checkPROGRAMS:
+	@list='$(check_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -384,6 +399,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsdItem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsdOpenRead.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsd_f77.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsd_print.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -504,6 +520,79 @@ GTAGS:
 
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+
+check-TESTS: $(TESTS)
+	@failed=0; all=0; xfail=0; xpass=0; skip=0; \
+	srcdir=$(srcdir); export srcdir; \
+	list='$(TESTS)'; \
+	if test -n "$$list"; then \
+	  for tst in $$list; do \
+	    if test -f ./$$tst; then dir=./; \
+	    elif test -f $$tst; then dir=; \
+	    else dir="$(srcdir)/"; fi; \
+	    if $(TESTS_ENVIRONMENT) $${dir}$$tst; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *" $$tst "*) \
+		xpass=`expr $$xpass + 1`; \
+		failed=`expr $$failed + 1`; \
+		echo "XPASS: $$tst"; \
+	      ;; \
+	      *) \
+		echo "PASS: $$tst"; \
+	      ;; \
+	      esac; \
+	    elif test $$? -ne 77; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *" $$tst "*) \
+		xfail=`expr $$xfail + 1`; \
+		echo "XFAIL: $$tst"; \
+	      ;; \
+	      *) \
+		failed=`expr $$failed + 1`; \
+		echo "FAIL: $$tst"; \
+	      ;; \
+	      esac; \
+	    else \
+	      skip=`expr $$skip + 1`; \
+	      echo "SKIP: $$tst"; \
+	    fi; \
+	  done; \
+	  if test "$$failed" -eq 0; then \
+	    if test "$$xfail" -eq 0; then \
+	      banner="All $$all tests passed"; \
+	    else \
+	      banner="All $$all tests behaved as expected ($$xfail expected failures)"; \
+	    fi; \
+	  else \
+	    if test "$$xpass" -eq 0; then \
+	      banner="$$failed of $$all tests failed"; \
+	    else \
+	      banner="$$failed of $$all tests did not behave as expected ($$xpass unexpected passes)"; \
+	    fi; \
+	  fi; \
+	  dashes="$$banner"; \
+	  skipped=""; \
+	  if test "$$skip" -ne 0; then \
+	    skipped="($$skip tests were not run)"; \
+	    test `echo "$$skipped" | wc -c` -gt `echo "$$banner" | wc -c` && \
+	      dashes="$$skipped"; \
+	  fi; \
+	  report=""; \
+	  if test "$$failed" -ne 0 && test -n "$(PACKAGE_BUGREPORT)"; then \
+	    report="Please report to $(PACKAGE_BUGREPORT)"; \
+	    test `echo "$$report" | wc -c` -gt `echo "$$banner" | wc -c` && \
+	      dashes="$$report"; \
+	  fi; \
+	  dashes=`echo "$$dashes" | sed s/./=/g`; \
+	  echo "$$dashes"; \
+	  echo "$$banner"; \
+	  test -n "$$skipped" && echo "$$skipped"; \
+	  test -n "$$report" && echo "$$report"; \
+	  echo "$$dashes"; \
+	  test "$$failed" -eq 0; \
+	else :; fi
 
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
@@ -668,6 +757,8 @@ distcleancheck: distclean
 	       $(distcleancheck_listfiles) ; \
 	       exit 1; } >&2
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
 all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(DATA) $(HEADERS) config.h
 installdirs:
@@ -698,8 +789,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
-	mostlyclean-am
+clean-am: clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -752,13 +843,14 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-stardocsDATA
 
-.PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
-	clean-generic clean-libLTLIBRARIES clean-libtool ctags dist \
-	dist-all dist-bzip2 dist-gzip dist-shar dist-tarZ dist-zip \
-	distcheck distclean distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags distcleancheck \
-	distdir distuninstallcheck dvi dvi-am html html-am info \
-	info-am install install-am install-binSCRIPTS install-data \
+.PHONY: CTAGS GTAGS all all-am am--refresh check check-TESTS check-am \
+	clean clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool ctags dist dist-all dist-bzip2 dist-gzip \
+	dist-shar dist-tarZ dist-zip distcheck distclean \
+	distclean-compile distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-binSCRIPTS install-data \
 	install-data-am install-exec install-exec-am \
 	install-includeHEADERS install-info install-info-am \
 	install-libLTLIBRARIES install-man install-stardocsDATA \
@@ -770,6 +862,9 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-stardocsDATA
 
+gsd_print: $(gsd_print_OBJECTS)
+	$(LIBTOOL) --mode=link $(CC) -o gsd_print \
+	       $(gsd_print_OBJECTS) -lgsd -lm `cnf_link`
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
