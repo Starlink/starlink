@@ -28,6 +28,7 @@
 
 extern int yy_flex_debug;
 extern int yydebug;
+int strict;
 
    main( int argc, char **argv ) {
 /*
@@ -37,6 +38,16 @@ extern int yydebug;
 *
 *  Purpose:
 *     Harness routine for calling the yacc-generated parser.
+*
+*  Flags:
+*     -s
+*        If present, this enforces strict parsing; any parse errors lead
+*        to program termination.  By default, parse errors are silently
+*        tolerated.
+*     -d
+*        Debugging.  It may be followed immediately by the letters 'l',
+*        'y' or both.  This turns on the debugging messages in the lex
+*        part and/or the yacc part of the processor respectively.
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -51,16 +62,18 @@ extern int yydebug;
       int yyparse();
 
 /* Declare local variables. */
-      char *name;
+      char *name, *usagef;
       char c;
 
-/* Get name of program. */
+/* Get name of program etc. */
       name = *(argv++);
       argc--;
+      usagef = "Usage: %s [-d[l][y]] [-s] [ in [ out ] ]\n";
 
 /* Work through any command line flags. */
       yy_flex_debug = 0;
       yydebug = 0;
+      strict = 0;
       while ( argc > 0 && **argv == '-' ) {
          switch( *(++(*argv)) ) {
             case 'd':
@@ -74,8 +87,11 @@ extern int yydebug;
                         break;
                   };
                break;
+            case 's':
+               strict = 1;
+               break;
             default:
-               printf( "Usage: %s [ -d[l][y] ] [ in [ out ] ]\n", name );
+               printf( usagef, name );
                exit( 1 );
          }
          argv++;
@@ -98,7 +114,7 @@ extern int yydebug;
          case 0:
             break;
          default:
-            printf( "Usage: %s [ in [ out ] ]\n", name );
+            printf( usagef, name );
             exit( 1 );
       }
          

@@ -22,6 +22,14 @@
 *        - The characters '<', '>' and '&' are replaced by their HTML
 *          entity reference equivalents.
 *
+*     The space pointed to by yylvals has been malloc'd.  It should be
+*     freed by the parser or memory will leak.
+*
+*     Additionally, the first line_leng characters of the static buffer 
+*     line_text contains all the text so far encountered since the last
+*     LINE_START token.  This is required by the parser for proper
+*     error recovery.
+*
 *  Timing:
 *     Probably the C output by lex would be considerably smaller, and 
 *     perhaps more efficient, if the BLANKs were not scooped up as part
@@ -80,15 +88,18 @@ Z			[Zz]
 
 
 %START	FIRST
+
 %{
 
 void count();
+void line_start();
 
 %}
 
 %%
 
-^[0-9 ]{5,5}[ 0]{BLANK}		{ count(); BEGIN FIRST; return( LINE_START ); }
+^[0-9 ]{5,5}[ 0]{BLANK}		{ line_start(); BEGIN FIRST; 
+				  count(); return( LINE_START ); }
 ^[0-9 ]{5,5}[ 0]{BLANK}\n	{ count(); return( BLANK_LINE ); }
 ^{BLANK}\n			{ count(); return( BLANK_LINE ); }
 ^[CcDd!*].*\n			{ count(); return( COMMENT_LINE ); }
@@ -147,6 +158,11 @@ void count();
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_LINELENG 2048
+   char line_text[ MAX_LINELENG + 1 ];
+   int line_length;
+
+
    int yywrap() {
 /*
 *+ 
@@ -183,13 +199,22 @@ void count();
 *     SGML-like entity references are substituted in where necessary.
 *-
 */
+
+/* Local variables. */
       char *entity, c;
       int leng, wleng, i, j;
 
+/* Allocate the amount of space we will probably need (this may be an 
+   underestimate, if so it will get extended later). */
       leng = yyleng;
       yylval = malloc( leng + 1 );
+
+/* Go through token text a character at a time transferring to storage at
+   yyllval. */
       for ( i = j = 0; i < yyleng; i++ ) {
          c = yytext[ i ];
+
+/* Arrange for entity reference substitution if necessary. */
          switch( c ) {
             case '<':
                entity = "&lt;";
@@ -206,9 +231,14 @@ void count();
             default:
                wleng = 1;
          }
+
+/* Either copy a single character */
          if ( wleng == 1 ) {
             yylval[ j++ ] = c;
          }
+
+/* Or copy a string (the entity reference) in which case we need to extend
+   the memory allocated for the purpose. */
          else {
             wleng = strlen( entity );
             leng += wleng;
@@ -217,8 +247,42 @@ void count();
             j += wleng;
          }
       }
+
+/* Finish off the string. */
       yylval[ j ] = '\0';
+
+/* Append the new token text to the line buffer.  It's unlikely to be longer
+   than the buffer length; if it is, it just gets truncated. */
+      strncpy( line_text + line_length, yylval, MAX_LINELENG - line_length );
+      line_length += j;
+      if ( line_length > MAX_LINELENG ) line_length = MAX_LINELENG;
+
+/* Set the 'first token in the line' lex start state. */
       BEGIN 0;
    }
 
 
+   void line_start() {
+/*
+*+
+*  Name:
+*     line_start
+*
+*  Purpose:
+*     Assert that a line is starting.
+*
+*  Description:
+*     This routine resets the line_text buffer.  The line_text buffer 
+*     contains everything since the last LINE_START token was encountered.
+*     For most purposes it is not used, but if the parser encounters a
+*     syntax error, it's the only place that it can find the text which
+*     has been read (since yacc discards states in this case).
+*-
+*/
+      *line_text = '\0';
+      line_length = 0;
+   }
+
+
+
+/* $Id$ */

@@ -92,6 +92,8 @@ line
 			{ $$ = $1; }
 	| BLANK_LINE
 			{ $$ = $1; }
+	| error LINE_END
+			{ $$ = ""; handle_error(); }
 	;
 
 module_start_line
@@ -358,10 +360,7 @@ token_brac
 
    extern char *yytext;
 
-   yyerror(char *s) {
-      fflush(stdout);
-      printf("\n%s\n", s);
-   }
+   yyerror(char *s) { /* No action. */ }
 
 
 #include <string.h>
@@ -773,5 +772,53 @@ token_brac
       listfirst->next = (ELEMENT *) NULL;
    }
 
+
+   extern int strict;
+   extern char line_text[];
+   extern int line_length;
+
+   void handle_error() {
+/*
+*+
+*  Name:
+*     handle_error
+*
+*  Purpose:
+*     Deal with a line which the grammar cannot parse.
+*
+*  Description:
+*     This routine takes over when the yacc 'error' state is detected.
+*
+*     The desired behaviour is either to print the line unaltered 
+*     (if the external variable 'strict' is false), or to terminate
+*     processing with an error message (if strict is true).  Either
+*     way we need the text which could not be parsed.
+*
+*     Since yacc pops everything off the stack before we are able to
+*     intercept this and discards all the associated state, we cannot
+*     use yylval as usual.  Instead, we use a buffer set up by the lexer
+*     for this purpose, which stores all the text of the line since the
+*     last LINE_START.  Note that because of this interrelation between
+*     lex and yacc, it is not OK to put an error token anywhere else
+*     in the grammar.
+*
+*  Bugs:
+*     Note that in case of a syntax error the malloc'd storage for the
+*     tokens which formed part of the error is never free'd.  Thus there
+*     is a memory leak here.
+*-
+*/
+      if ( strict ) {
+         fprintf( stderr, "\nError at this line:\n%s\n", line_text );
+         exit( 1 );
+      }
+      else {
+         line_text[ line_length ] = '\0';
+         printf( line_text );
+         yyerrok;
+         yyclearin;
+      }
+   }
+      
 
 /* $Id$ */
