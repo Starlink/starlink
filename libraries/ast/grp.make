@@ -48,7 +48,7 @@ funitmap.c \
 fwcsmap.c \
 fshiftmap.c \
 fwinmap.c \
-fxmlchan.c 
+fxmlchan.c \
 fzoommap.c \
 grf_null.c \
 grf_pgplot.c \
