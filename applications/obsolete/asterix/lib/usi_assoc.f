@@ -117,7 +117,6 @@
 
       INTEGER			EP, PPOS		! Character pointers
       INTEGER			FLEN			! Length of FNAME
-      INTEGER			FSTAT			! Fortran i/o status
       INTEGER			NDIG			! Chars used in SSTR
       INTEGER			SCL			! Length of scalar data
       INTEGER			TFID			! Temp ADI object
