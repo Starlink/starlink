@@ -299,7 +299,7 @@ STREAM)
    case $1 in
    from)
       appl=DA2NDF
-      echo "$NDF_FROM_UNF0_PARS" | grep -i 'shape *=' >/dev/null || \
+      echo "$NDF_FROM_STREAM_PARS" | grep -i 'shape *=' >/dev/null || \
        (echo ""
         echo "!! ** Error converting NDF from $2 format using $appl"
         D=`echo $1 | tr '[a-z]' '[A-Z]'`
@@ -309,8 +309,8 @@ STREAM)
         echo ""
         exit 1
        ) || exit 1
-      $CONVERT_DIR/da2ndf fits=f in=$3$4$5 out=$6 noperec=! \
-      $NDF_FROM_UNF0_PARS \
+      $CONVERT_DIR/da2ndf in=$3$4$5 out=$6 noperec=! \
+      $NDF_FROM_STREAM_PARS \
       </dev/null 2>&1 | \
       sed 's/^\!\!/\! /' | \
       awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
