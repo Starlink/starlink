@@ -4722,6 +4722,16 @@ package kappa {
 
       action lutedit {
          helplib {$KAPPA_HELP}
+
+         parameter device {
+            position 3
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of display device}
+            helpkey *
+          }
          parameter lut {
             position 1
             type NDF
