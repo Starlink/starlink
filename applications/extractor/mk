@@ -255,7 +255,7 @@
             alpha_OSF1)
                AR_IN='ar -r'
                CC='cc'
-               CFLAGS='-I$(STAR_INC) -O -std1'
+               CFLAGS='-I$(STAR_INC) -O -std1 -DDEC_ALPHA'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -272,7 +272,7 @@
             mips)
                AR_IN='ar -r'
                CC='c89'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-I$(STAR_INC) -O -DBSWAP'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -289,7 +289,7 @@
             sun4)
                AR_IN='ar r'
                CC='gcc'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-I$(STAR_INC) -O -DSUN_OS'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -304,7 +304,7 @@
             sun4_Solaris)
                AR_IN='ar -r'
                CC='cc'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-I$(STAR_INC) -O -DSUN_SOLARIS'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -320,7 +320,7 @@
             ix86_Linux)
                AR_IN='ar r'
                CC='gcc'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-I$(STAR_INC) -O -DPC_LINUX'
                FC='g77'
                FFLAGS='-fno-second-underscore -O'
                LINK='ln -s'
