@@ -1,0 +1,10 @@
+1 Help
+ This is the CONVERT online help system.  It invokes the VMS HELP
+ Facility to display information about a CONVERT command or topic.  If
+ you need assistance using this help library, enter "Using_help" in
+ response to the "Topic?" prompt.
+
+ CONVERT is a package for converting common data formats to and from
+ the Starlink standard data format---the NDF.  CONVERT commands are
+ available from ICL and DCL.
+
