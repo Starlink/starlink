@@ -16,6 +16,7 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      REAL GFX_FUNC_FUNC
 *    Local constants :
       INTEGER NVAL		! number of points
       PARAMETER (NVAL=500)
@@ -24,7 +25,7 @@
       CHARACTER*6 TYPE
       REAL X1,X2
       REAL XW1,XW2,YW1,YW2
-      REAL XX,YY
+      REAL X,Y,XX,YY
       REAL XINC
       REAL PAR(6)
       INTEGER I
