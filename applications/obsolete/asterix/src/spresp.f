@@ -144,7 +144,6 @@
       CHARACTER*(DAT__SZLOC) SLOC           	! SPATIAL_RESP object
       CHARACTER*40           UNITS              ! Axis units
 
-      REAL			BASE, SCALE		!
       REAL                   	CUTOFF			! Cutoff amplitude
       REAL 		     	DX, DY		! Psf data bin widths in radians
       REAL                   	E, R, X, Y         	!
@@ -152,6 +151,7 @@
       REAL                   	ELO, EHI           	! Energy axis extrema
       REAL                   	ERES           		! Spectral resolution
       REAL                   	MAXR               	! Maximum off-axis angle
+      REAL			PXSCALE, PYSCALE
       REAL                   	SRES           		! Spatial resolution
       REAL                   TOR 		! Units to radians conversion
       REAL                   XBASE, XSCALE      ! X axis attributes
@@ -360,8 +360,10 @@
         CALL MSG_SETI( 'NR', DIMS(3) )
         CALL MSG_PRNT( 'There will be ^NR radial bins' )
       ELSE
-        DIMS(3) = 20
-        DIMS(4) = 20
+        DIMS(3) = INT(ABS(XHI - XLO)/SRES) + 1
+        DIMS(4) = INT(ABS(YHI - YLO)/SRES) + 1
+        PXSCALE = SIGN(SRES,XSCALE)
+        PYSCALE = SIGN(SRES,YSCALE)
       END IF
       IF ( E_AX .GT. 0 ) THEN
         DIMS(NDIM) = ONEBIN
@@ -396,14 +398,12 @@
      :                     DIMS(3), STATUS )
       ELSE
         CALL BDI_PUTAXTEXT( SID, 3, 'X_CORR', 'radian', STATUS )
-        CALL BDI_GETAXVAL( IFID, X_AX, BASE, SCALE, DIMS(3), STATUS )
         CALL BDI_CREAXVAL( SID, 3, .TRUE., DIMS(3), STATUS )
-        CALL BDI_PUTAXVAL( SID, 3, BASE*TOR, SCALE*TOR, DIMS(3),
+        CALL BDI_PUTAXVAL( SID, 3, XBASE*TOR, PXSCALE*TOR, DIMS(3),
      :                      STATUS )
         CALL BDI_PUTAXTEXT( SID, 4, 'Y_CORR', 'radian', STATUS )
-        CALL BDI_GETAXVAL( IFID, Y_AX, BASE, SCALE, DIMS(4), STATUS )
         CALL BDI_CREAXVAL( SID, 4, .TRUE., DIMS(4), STATUS )
-        CALL BDI_PUTAXVAL( SID, 4, BASE*TOR, SCALE*TOR, DIMS(4),
+        CALL BDI_PUTAXVAL( SID, 4, YBASE*TOR, PYSCALE*TOR, DIMS(4),
      :                      STATUS )
       END IF
       IF ( E_AX .GT. 0 ) THEN
@@ -470,11 +470,14 @@
 *        Loop over Y psf bins
           DO YBIN = 1, DIMS(3)
 
-*          This radius in radians
-            Y = (REAL(YBIN)-1.0) * SRES * TOR
+*          This Y position in radians
+            X = (YBASE + (REAL(YBIN)-1.0) * PYSCALE) * TOR
 
 *          Loop over X psf bins
             DO XBIN = 1, DIMS(4)
+
+*            This X position in radians
+              X = (XBASE + (REAL(XBIN)-1.0) * PXSCALE) * TOR
 
 *            Evaluate the psf
               CALL PSF_2D_DATA( IPSF, X, Y, 0.0, 0.0, DX, DY, .TRUE.,
