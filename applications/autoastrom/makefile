@@ -1082,7 +1082,7 @@ $(PKG_NAME)_source.tar: unbuild
 	cd moggy && make -f Makefile.in configure
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
-	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib t
+	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib plugin-*.pl t
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
@@ -1125,14 +1125,14 @@ unbuild: clean
 
 #------------------------------------------------------------------------------
 #
-# Documentation
+# Documentation.  Make hard links to files in doc directory.
 sun242.tar-htx sun242.tar-tex: doc/sun242.xml
 	cd doc; make
 	$(RMF) $@
-	$(LINK) doc/$@ $@
+	ln doc/$@ $@
 
 sun242.xml: doc/sun242.xml
-	$(LINK) doc/$@ $@
+	ln doc/$@ $@
 
 #------------------------------------------------------------------------------
 #
