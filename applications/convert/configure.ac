@@ -25,7 +25,7 @@ dnl    Setup for building monoliths.
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [ast sae chr hds fio cnf grp mers prm ndf ndg par psx subpar shl])
+STAR_DECLARE_DEPENDENCIES([build], [ast sae chr hds fio cnf grp mers prm ndf ndg par psx subpar shl figaro])
 
 dnl    Progs needed for gif2ndf, ndf2gif and tiff2ndf
 STAR_CHECK_PROGS(ppmtogif)

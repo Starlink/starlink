@@ -5,7 +5,7 @@ SUBDIRS = @subdirs@
 ## We need the internal Figaro libraries. These are not currently generally
 ## available so this separation is a reminder this dependency will generally
 ## fail. 
-FIGLIBS = -lfigdta -lfigich
+FIGLIBS = -ldta -lfigich
 
 bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf mtfits2ndf.tcsh\
  convertndf convertawk
