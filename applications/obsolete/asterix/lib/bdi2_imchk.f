@@ -73,8 +73,7 @@
 *  History:
 *     9 Aug 1995 (DJA):
 *        Original version.
-*     {enter_changes_here}
-
+*     7 Nov 96: argument missing from adi2_fndhdu (rjv)
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -114,8 +113,10 @@
 *  Extract the arguments
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
+
 *  Locate the IMAGE hdu
-      CALL ADI2_FNDHDU( ARGS(2), ' ', IMHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), ' ', .FALSE.,IMHDU, STATUS )
+
 
 *  Switch on the various items
 *  Primary data
