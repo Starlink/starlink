@@ -1,0 +1,145 @@
+*  Name:
+*     IRQ_PAO
+
+*  Purpose:
+*     Defines scalar parameters describing the logical operators
+*     available within IRQ.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Parameters are defined which describe the logical operations 
+*     which can be used to evaluate the quality expression.
+*     
+*     LDQ tests a single bit from a QUALITY value, and puts TRUE on the
+*     evaluation stack if the bit is set, and FALSE otherwise. The bit
+*     to be tested is defined by the next mask in an array of masks.
+*
+*     RET signals the end of the calculation. The value on the top of 
+*     the evaluation stack is returned as the expressions value.
+*
+*     LDF puts the value FALSE on the top of the evaluation stack.
+*
+*     LDT puts the value TRUE on the top of the evaluation stack.
+*
+*     CLS represents the end of a nesting level (eg a closing 
+*     parenthesis). This has no effect on the evaluation stack.
+*
+*     OPN represents the start of a nesting level (eg an opening
+*     parenthesis). This has no effect on the evaluation stack.
+*
+*     EQV removes two values from the evaluation stack. If they are the
+*     same, the value TRUE is put back on the stack. Otherwise, the
+*     value FALSE is put back on the stack.
+*
+*     XOR removes two values from the evaluation stack. If they are 
+*     different, the value TRUE is put back on the stack. Otherwise, the
+*     value FALSE is put back on the stack.
+*
+*     OR removes two values from the evaluation stack. If either one is
+*     TRUE, the value TRUE is put back on the stack. Otherwise, the
+*     value FALSE is put back on the stack.
+*
+*     AND removes two values from the evaluation stack. If they are both
+*     true, the value TRUE is put back on the stack. Otherwise, the
+*     value FALSE is put back on the stack.
+*
+*     NOT removes one value from the evaluation stack. If it is TRUE, 
+*     the value FALSE is put back on the stack. Otherwise, the value 
+*     TRUE is put back on the stack.
+*
+*     LDQE tests two bits from a QUALITY value, and puts TRUE on the
+*     evaluation stack if both bits are in the same state, and FALSE 
+*     otherwise. The bits to be tested are defined by the next mask in
+*     an array of masks.
+*
+*     LDQX tests two bits from a QUALITY value, and puts FALSE on the
+*     evaluation stack if both bits are in the same state, and TRUE
+*     otherwise. The bits to be tested are defined by the next mask in
+*     an array of masks.
+*
+*     LDQO tests any number of bits from a QUALITY value, and puts TRUE
+*     on the evaluation stack if any bits are set, and FALSE otherwise.
+*     The bits to be tested are defined by the next mask in an array of
+*     masks.
+*
+*     LDQA tests any number of bits from a QUALITY value, and puts TRUE
+*     on the evaluation stack if all bits are set, and FALSE otherwise.
+*     The bits to be tested are defined by the next mask in an array of 
+*     masks.
+*
+*     LDQN tests a single bit from a QUALITY value, and puts FALSE on 
+*     the evaluation stack if the bit is set, and TRUE otherwise. The 
+*     bit to be tested is defined by the next mask in an array of 
+*     masks.
+*
+*     NULL does nothing. The evaluation stack is uneffected.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-MAY-1991 (DSB):
+*        Original version. 
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  General constants:
+      INTEGER OPC__MAXOP           ! Maximum number of operands for a 
+                                   ! single instruction.
+      INTEGER OPC__MXSSZ           ! Maximum no. of characters in a 
+                                   ! recognised symbol.
+      PARAMETER (
+     :        OPC__MAXOP = 2, 
+     :        OPC__MXSSZ = 7 )  
+
+*  Constants representing instructions:
+      INTEGER OPC__LDQ	           ! Load single quality bit.
+      INTEGER OPC__RET             ! End evaluation.
+      INTEGER OPC__LDF             ! Load constant .FALSE.
+      INTEGER OPC__LDT             ! Load constant .TRUE.
+      INTEGER OPC__CLS             ! Close parenthesis.
+      INTEGER OPC__OPN             ! Open parenthesis.
+      INTEGER OPC__EQV             ! Equivalence operator.
+      INTEGER OPC__XOR             ! Exclusive OR operator.
+      INTEGER OPC__OR              ! OR operator.
+      INTEGER OPC__AND             ! AND operator.
+      INTEGER OPC__NOT             ! NOT oeprator.
+      INTEGER OPC__LDQE	           ! Load two quality bits with built in
+                                   ! EQV operation.
+      INTEGER OPC__LDQX	           ! Load two quality bits with built in
+                                   ! XOR operation.
+      INTEGER OPC__LDQO	           ! Load multiple quality bits with 
+                                   ! built in OR operation.
+      INTEGER OPC__LDQA	           ! Load multiple quality bits with 
+                                   ! built in AND operation.
+      INTEGER OPC__LDQN	           ! Load single quality bit with built
+                                   ! in NOT operation.
+      INTEGER OPC__NULL            ! Null operation.
+
+      PARAMETER (
+     :        OPC__LDQ = 1,
+     :        OPC__RET = 2,
+     :        OPC__LDF = 3,
+     :        OPC__LDT = 4,
+     :        OPC__CLS = 5,
+     :        OPC__OPN = 6,
+     :        OPC__EQV = 7,
+     :        OPC__XOR = 8,
+     :        OPC__OR  = 9,
+     :        OPC__AND = 10,
+     :        OPC__NOT = 11,
+     :        OPC__LDQE = 12,
+     :        OPC__LDQX = 13,
+     :        OPC__LDQO = 14,
+     :        OPC__LDQA = 15,
+     :        OPC__LDQN = 16,
+     :        OPC__NULL = 17 )
+
+*.

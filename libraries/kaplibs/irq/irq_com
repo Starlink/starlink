@@ -1,0 +1,132 @@
+*+
+*  Name:
+*     IRQ_COM
+
+*  Purpose:
+*     Define IRQ_ common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which describe the state of
+*     IRQ, and properties of each compiled quality expression known to 
+*     IRQ. Information describing each quality expression is stored in 
+*     arrays in common. The same element from different arrays holds 
+*     information for the same quality expression. Different elements 
+*     within each array hold information for different quality 
+*     expressions.  The identifiers used by IRQ to identify each 
+*     quality expression are just the index into these common arrays at 
+*     which the information describing the quality expression is stored.
+*     The arrays have a lower bound of 1 and an upper bound given by 
+*     symbolic constant IRQ__MAXQ.
+*
+*     Note, the op. codes and quality masks which actually form the
+*     quality expression are not stored in common, but are stored in a
+*     temporary HDS structure.
+
+*  Prior Requirements:
+*     The SAE_PAR and IRQ_PAR include files should be included before
+*     this file, in order to define constants used here.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-JUL-1991 (DSB):
+*        Original version.
+*     19-MAY-1991 (DSB):
+*        Re-structured to use one common block per data type.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  NDF identifiers.
+*  ================
+*  Each quality expression refers to a particular NDF. QCM_INDF holds
+*  cloned NDF identifiers for each such NDF.
+      INTEGER QCM_INDF( IRQ__MAXQ )
+
+*  Variable quality masks
+*  ======================
+*  The number of masks needed to evaluate each compiled quality
+*  expression. Each such mask is combined with a QUALITY value to
+*  determine some logical value required to evaluate the quality
+*  expression.
+      INTEGER QCM_NMASK( IRQ__MAXQ )
+
+*  Maximum stack size needed to evaluate the quality expression.
+*  ============================================================
+*  The maximum size of the "First In Last Out" stack used to evaluate
+*  the quality expression, using Reverse Polish representation.
+      INTEGER QCM_MXSTK( IRQ__MAXQ )
+
+*  The number of op codes required to represent the quality expression.
+*  ===================================================================
+*  The quality expression is compiled, to produce a list of "operation
+*  codes" describing the steps that must be performed to evaluate the
+*  expression. This is the number of steps in the process.
+      INTEGER QCM_NOPC( IRQ__MAXQ )
+
+*  QEXP array locator.
+*  ===================
+*  The locator to the array of structures holding compiled quality 
+*  expressions. Each QEXP structure is one cell of this array.
+      CHARACTER QCM_LOC*( DAT__SZLOC )
+
+*  QEXP structure locators.
+*  ========================
+*  This array holds the HDS locators to each individual compiled 
+*  quality expression structure.
+      CHARACTER QCM_LOCQ( IRQ__MAXQ )*( DAT__SZLOC )
+
+*  Locators to QEXP components. 
+*  ============================
+*  Each QEXP structure has 2 primative array components, called MASKS
+*  and OPCODES. These hold the masks and op codes described above.
+      CHARACTER QCM_LOCMS( IRQ__MAXQ )*( DAT__SZLOC )
+      CHARACTER QCM_LOCOP( IRQ__MAXQ )*( DAT__SZLOC )
+
+*  Pointers to mapped arrays.
+*  ==========================
+*  The 2 array components of each QEXP structure are kept permanently
+*  mapped (until the IRQ identifier is annulled).
+      INTEGER QCM_MSPNT( IRQ__MAXQ )
+      INTEGER QCM_OPPNT( IRQ__MAXQ )
+
+*  State of the IRQ system.
+*  =======================
+*  This character scalar is used to indicate that IRQ has been
+*  initialised. On initialisation, it is set to the value of the
+*  symbolic constant IRQ__GOING. When IRQ is closed it is set to a
+*  blank value.
+      CHARACTER QCM_STATE*( IRQ__SZSTA )
+
+*  Which slots have been used.
+*  ==========================
+*  Each element of this array is .TRUE. if the corresponding element of 
+*  the other arrays holds information describing a currently defined
+*  compiled quality expression.
+      LOGICAL QCM_VALID( IRQ__MAXQ )
+
+
+
+
+*  Declare the common block /IRQ_CMI/, to hold integer variables.
+      COMMON /IRQ_CMI/ QCM_NMASK, QCM_MXSTK, QCM_NOPC, QCM_MSPNT,
+     :                 QCM_OPPNT, QCM_INDF
+
+*  Declare the common block /IRQ_CML/, to hold logical variables.
+      COMMON /IRQ_CML/ QCM_VALID
+
+*  Declare the common block /IRQ_CMC/, to hold character variables.
+      COMMON /IRQ_CMC/ QCM_LOC, QCM_LOCQ, QCM_LOCMS, QCM_LOCOP,
+     :                 QCM_STATE
+
+*.
