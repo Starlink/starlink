@@ -77,12 +77,16 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Constants:
       DOUBLE PRECISION RTOAS     ! Radians to arc-seconds conversion factor
       PARAMETER ( RTOAS = 57.295779513082320876798*3600.0 )
 
 *  Local Variables:
       CHARACTER DOM*20           ! DOMAIN of input current Frame
+      CHARACTER UNIT*20          ! UNITS string
       DOUBLE PRECISION C( 2 )    ! Cur. Frame co-ords at centre of input image
       DOUBLE PRECISION CIN( 2 )  ! GRID co-ords at centre of input image
       DOUBLE PRECISION COUT( 2 ) ! GRID co-ords at centre of output image
@@ -135,7 +139,7 @@
          SHIFT( 2 ) = COUT( 2 ) - CIN( 2 )
 
 *  Find the corresponding Current Frame position.
-         CALL AST_TRAN2( MAP, NP, CIN( 1 ), CIN( 2 ), .TRUE., 
+         CALL AST_TRAN2( MAP, 1, CIN( 1 ), CIN( 2 ), .TRUE., 
      :                   C( 1 ), C( 2 ), STATUS ) 
 
 *  Store the input GRID co-ordinates along a row of points passing
@@ -234,12 +238,18 @@
             CALL AST_SETC( NEWFRM, 'UNIT(2)', 'Arc-seconds', STATUS )
 
          ELSE
-            CALL AST_SETC( NEWFRM, 'UNIT(1)', AST_GETC( FRM, 'UNIT(1)',
-     :                                                       STATUS ), 
-     :                     STATUS )
-            CALL AST_SETC( NEWFRM, 'UNIT(2)', AST_GETC( FRM, 'UNIT(2)',
-     :                                                       STATUS ), 
-     :                     STATUS )
+            UNIT = AST_GETC( FRM, 'UNIT(1)', STATUS )
+            IF( UNIT .NE. ' ' ) THEN
+               CALL AST_SETC( NEWFRM, 'UNIT(1)', 
+     :                        UNIT( : CHR_LEN( UNIT ) ), STATUS )
+            END IF
+
+            UNIT = AST_GETC( FRM, 'UNIT(2)', STATUS )
+            IF( UNIT .NE. ' ' ) THEN
+               CALL AST_SETC( NEWFRM, 'UNIT(2)', 
+     :                        UNIT( : CHR_LEN( UNIT ) ), STATUS )
+            END IF
+
          END IF
 
          CALL AST_SETC( NEWFRM, 'LABEL(1)', 'Offset on axis 1', STATUS )

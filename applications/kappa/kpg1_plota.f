@@ -134,6 +134,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
       CHARACTER MODE*6           ! Device access mode
       INTEGER FRM                ! Pointer to AGI world co-ordinates Frame
@@ -252,7 +255,8 @@
 *  use a default 2D Frame with the specified Domain name.
             IF( FRM .EQ. AST__NULL ) THEN
                FRM = AST_FRAME( 2, ' ', STATUS )
-               CALL AST_SETC( FRM, 'DOMAIN', DOMAIN, STATUS )
+               CALL AST_SETC( FRM, 'DOMAIN', 
+     :                        DOMAIN( : CHR_LEN( DOMAIN ) ), STATUS )
             END IF
    
          END IF

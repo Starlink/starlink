@@ -91,6 +91,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
       CHARACTER ATTR*20          ! Attribute name
       CHARACTER LAB*80           ! Label text string
@@ -171,7 +174,8 @@
 
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
          IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
-     :                                       DUNIT, STATUS )
+     :                                      DUNIT( : CHR_LEN( DUNIT ) ), 
+     :                                      STATUS )
 
       ELSE
          TEXT = ' '
@@ -186,7 +190,8 @@
 
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
          IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
-     :                                       DUNIT, STATUS )
+     :                                      DUNIT( : CHR_LEN( DUNIT ) ), 
+     :                                      STATUS )
 
       END IF
 

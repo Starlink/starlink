@@ -68,11 +68,15 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Constants:
       DOUBLE PRECISION EPS       ! Max range for insignificant axes
       PARAMETER ( EPS = 100*VAL__EPSD )
 
 *  Local Variables:
+      CHARACTER TTL*80           ! Title
       DOUBLE PRECISION AXVAL( NDF__MXDIM )! Constant axis values
       DOUBLE PRECISION CLBND     ! Lower Current Frame bounds
       DOUBLE PRECISION CUBND     ! Upper Current Frame bounds
@@ -83,6 +87,7 @@
       INTEGER DUMMY              ! Unused PermMap 
       INTEGER INPRM( NDF__MXDIM )! Input axis permutation array
       INTEGER J                  ! Axis index
+      INTEGER LTTL               ! Used length of TTL
       INTEGER MAP                ! GRID -> Current Frame Mapping
       INTEGER NAXC               ! No. of axes in original Current Frame
       INTEGER NEWCUR             ! Pointer to new Current Frame
@@ -183,8 +188,9 @@
 *  copy the original Frame's Title to the new Frame.
          IF( AST_TEST( IWCS, 'TITLE', STATUS ) .AND.
      :       .NOT. AST_TEST( NEWCUR, 'TITLE', STATUS ) ) THEN
-            CALL AST_SETC( NEWCUR, 'TITLE', AST_GETC( IWCS, 'TITLE',
-     :                                                STATUS ), STATUS )
+            TTL = AST_GETC( IWCS, 'TITLE', STATUS )
+            LTTL = MAX( 1, CHR_LEN( TTL ) )
+            CALL AST_SETC( NEWCUR, 'TITLE', TTL( : LTTL ), STATUS )
          END IF
 
 *  Add this new Frame into the FrameSet. It becomes the Current Frame.

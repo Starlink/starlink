@@ -458,17 +458,24 @@
      :                     ' ', STATUS )
 
 *  Set the default value for the axis labels.
-      CALL AST_SETC( IFRM, 'LABEL(1)', XLAB( : CHR_LEN( XLAB ) ), 
-     :               STATUS )
-      CALL AST_SETC( IFRM, 'LABEL(2)', YLAB( : CHR_LEN( YLAB ) ), 
-     :               STATUS )
+      IF( XLAB .NE. ' ' ) CALL AST_SETC( IFRM, 'LABEL(1)', 
+     :                                   XLAB( : CHR_LEN( XLAB ) ), 
+     :                                   STATUS )
+      IF( YLAB .NE. ' ' ) CALL AST_SETC( IFRM, 'LABEL(2)', 
+     :                                   YLAB( : CHR_LEN( YLAB ) ), 
+     :                                   STATUS )
 
 *  Set the default plot title.
-      CALL AST_SETC( IFRM, 'TITLE', TTL, STATUS )
+      IF( TTL .NE. ' ' ) CALL AST_SETC( IFRM, 'TITLE', 
+     :                                 TTL( : CHR_LEN( TTL ) ), STATUS )
 
 *  Set the default value for the axis symbols.
-      CALL AST_SETC( IFRM, 'SYMBOL(1)', XSYM, STATUS )
-      CALL AST_SETC( IFRM, 'SYMBOL(2)', YSYM, STATUS )
+      IF( XSYM .NE. ' ' ) CALL AST_SETC( IFRM, 'SYMBOL(1)', 
+     :                                   XSYM( : CHR_LEN( XSYM ) ), 
+     :                                   STATUS )
+      IF( YSYM .NE. ' ' ) CALL AST_SETC( IFRM, 'SYMBOL(2)', 
+     :                                   YSYM( : CHR_LEN( YSYM ) ), 
+     :                                   STATUS )
 
 *  Atempt to open a graphics workstation, obtaining an AST Plot for 
 *  drawing in a new DATA picture using PGPLOT.

@@ -321,7 +321,8 @@
       IAT = IAT + 1
       CALL CHR_APPND( 'value', TEXT, IAT )
       CALL AST_SETC( WWGOT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-      IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWGOT, 'UNIT(2)', DUNIT,
+      IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWGOT, 'UNIT(2)', 
+     :                                    DUNIT( : CHR_LEN( DUNIT ) ),
      :                                    STATUS )
 
 *  Clear the Domain and Title values which will have been inherited from the
@@ -385,7 +386,8 @@
 
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
          IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
-     :                                       DUNIT, STATUS )
+     :                                      DUNIT( : CHR_LEN( DUNIT ) ), 
+     :                                       STATUS )
 
       ELSE
          TEXT = ' '
@@ -400,7 +402,8 @@
 
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
          IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
-     :                                       DUNIT, STATUS )
+     :                                      DUNIT( : CHR_LEN( DUNIT ) ), 
+     :                                      STATUS )
 
       END IF
 

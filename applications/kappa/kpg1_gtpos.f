@@ -312,7 +312,9 @@
                CALL CHR_PUTI( I, ATT, IAT )
                CALL CHR_APPND( ')', ATT, IAT )
 
-               CALL AST_SETC( CURFRM, ATT, OLDFMT( I ), STATUS )
+               CALL AST_SETC( CURFRM, ATT, 
+     :                        OLDFMT( I )( : CHR_LEN( OLDFMT( I ) ) ), 
+     :                        STATUS )
             END IF
          END DO
 

@@ -174,6 +174,7 @@
       INTEGER NBAX                 ! Number of axes in GRID Frame
       INTEGER J                    ! Axis index
       INTEGER LBND( NDF__MXDIM )   ! Original NDF bounds
+      INTEGER LTTL                 ! Used length of TTL
       INTEGER NC                   ! No. of characters in text buffer
       INTEGER NCP                  ! No. of characters in PAXIS text buffer
       INTEGER NCQ                  ! No. of characters in QAXIS text buffer
@@ -498,8 +499,9 @@
 *  copy the original Frame's Title to the new Frame.
             IF( AST_TEST( IWCS, 'TITLE', STATUS ) .AND.
      :          .NOT. AST_TEST( NEWCUR, 'TITLE', STATUS ) ) THEN
-               CALL AST_SETC( NEWCUR, 'TITLE', AST_GETC( IWCS, 'TITLE',
-     :                                                STATUS ), STATUS )
+               TTL = AST_GETC( IWCS, 'TITLE', STATUS )
+               LTTL = MAX( 1, CHR_LEN( TTL ) )
+               CALL AST_SETC( NEWCUR, 'TITLE', TTL( : LTTL ), STATUS )
             END IF
 
 *  Add this new Frame into the FrameSet. It becomes the Current Frame.
@@ -537,7 +539,8 @@
       CALL NDF_CGET( INDF, 'TITLE', TTL, STATUS )
       IF( TTL .NE. ' ' .AND. 
      :    .NOT. AST_TEST( IWCS, 'TITLE', STATUS ) ) THEN
-         CALL AST_SETC( IWCS, 'TITLE', TTL, STATUS )
+         LTTL = CHR_LEN( TTL )
+         CALL AST_SETC( IWCS, 'TITLE', TTL( : LTTL ), STATUS )
       END IF
 
 *  Report an error if the inverse mapping is required, but is not
