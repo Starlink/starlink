@@ -10,7 +10,7 @@ sst_mon_SOURCES = \
 	$(SUBCSRC) \
 	$(PRIVATE_INCLUDES)
 sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
-sst_mon_LDFLAGS = $(LDFLAGS) `fio_link`
+sst_mon_LDADD = $(LDADD) `fio_link`
 
 
 SUBSRC = sst_clean.f sst_fwild.f sst_latex.f sst_puts.f  sst_trcvt.f \
