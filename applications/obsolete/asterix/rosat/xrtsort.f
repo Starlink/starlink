@@ -1367,6 +1367,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       BASE(1)=-MDIM1/2*SCALE(1)+SCALE(1)/2.0
       BASE(2)=-MDIM2/2*SCALE(2)+SCALE(2)/2.0
 
+	print*,base(1),scale(1),base(2),scale(2)
 
       IMIN=MDIM1
       IMAX=1
@@ -1737,6 +1738,8 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 
         CALL XRTSORT_SCAN_MASK(HEAD,MDIM(1),MDIM(2),%val(SMPTR),MRES,
      :                                  XW,YW,XW1,XW2,YW1,YW2,STATUS)
+
+	print*,xw,yw,xw1,xw2,yw1,yw2
 
 *   Get nominal centre of sort region in RA and DEC degrees
         CALL MSG_PRNT('Specify nominal centre of region:-')
