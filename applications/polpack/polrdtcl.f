@@ -38,6 +38,25 @@
 *        stored in the output catalogue.
 *     OUT = LITERAL (Read)
 *        The name of the output catalogue.
+*     I = LITERAL (Read)
+*        The name of the column within REF holding the I data. The 
+*        corresponding column in the output catalogue will be re-named as
+*        "I". To avoid any renaming of columns, retain the default value 
+*        for all the following parameters. ["I"]
+*     DI = LITERAL (Read)
+*        The name of the column within REF holding the DI data. ["DI"]
+*     Q = LITERAL (Read)
+*        The name of the column within REF holding the Q data. ["Q"]
+*     DQ = LITERAL (Read)
+*        The name of the column within REF holding the DQ data. ["DQ"]
+*     U = LITERAL (Read)
+*        The name of the column within REF holding the U data. ["U"]
+*     DU = LITERAL (Read)
+*        The name of the column within REF holding the DU data. ["DU"]
+*     V = LITERAL (Read)
+*        The name of the column within REF holding the V data. ["V"]
+*     DV = LITERAL (Read)
+*        The name of the column within REF holding the DV data. ["DV"]
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
@@ -69,10 +88,18 @@
       INTEGER CHR_LEN            ! Returns used length of a string
 
 *  Local Variables:
-      CHARACTER FILE*255         ! Name of input text file
       CHARACTER CLASS*50         ! Text class
+      CHARACTER DI*20            ! Name of the column in REF holding DI values
+      CHARACTER DQ*20            ! Name of the column in REF holding DQ values
+      CHARACTER DU*20            ! Name of the column in REF holding DU values
+      CHARACTER DV*20            ! Name of the column in REF holding DV values
       CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
+      CHARACTER FILE*255         ! Name of input text file
+      CHARACTER I*20             ! Name of the column in REF holding I values
+      CHARACTER Q*20             ! Name of the column in REF holding Q values
       CHARACTER TEXT*255         ! Text
+      CHARACTER U*20             ! Name of the column in REF holding U values
+      CHARACTER V*20             ! Name of the column in REF holding V values
       INTEGER CIOUT              ! CAT identifier for output catalogue
       INTEGER CIREF              ! CAT identifier for reference catalogue
       INTEGER IWCS               ! Pointer to AST Object
@@ -92,15 +119,28 @@
 *  Open the reference catalogue.
       CALL CTG_ASSO1( 'REF', VERB, 'READ', CIREF, FIELDS, STATUS )
 
+*  Get the names of the columns holding the Stokes parameters and their
+*  errors.
+      CALL PAR_GET0C( 'I', I, STATUS )
+      CALL PAR_GET0C( 'Q', Q, STATUS )
+      CALL PAR_GET0C( 'U', U, STATUS )
+      CALL PAR_GET0C( 'V', V, STATUS )
+      CALL PAR_GET0C( 'DI', DI, STATUS )
+      CALL PAR_GET0C( 'DQ', DQ, STATUS )
+      CALL PAR_GET0C( 'DU', DU, STATUS )
+      CALL PAR_GET0C( 'DV', DV, STATUS )
+
 *  Create the output catalogue, propagating all meta data from the 
 *  reference catalogue.
-      CALL POL1_CTPRP( 'OUT', CIREF, CIOUT, STATUS )
+      CALL POL1_CTPRP( 'OUT', CIREF, I, Q, U, V, DI, DQ, DU, DV, CIOUT, 
+     :                 STATUS )
 
 *  Get the name of the input text file.
       CALL PAR_GET0C( 'IN', FILE, STATUS )
 
 *  Copy all data from the input text file tot he output catalogue.
-      CALL POL1_RDTCL( FILE, CIREF, CIOUT, STATUS )
+      CALL POL1_RDTCL( FILE, CIREF, CIOUT, I, Q, U, V, DI, DQ, DU, DV, 
+     :                 STATUS )
 
 *  Reset the pointer for the next item of textual information to be read
 *  from the reference catalogue.

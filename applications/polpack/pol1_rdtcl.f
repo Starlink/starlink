@@ -1,4 +1,5 @@
-      SUBROUTINE POL1_RDTCL( FILE, CIREF, CIOUT, STATUS )
+      SUBROUTINE POL1_RDTCL( FILE, CIREF, CIOUT, I, Q, U, V, DI, DQ, DU, 
+     :                       DV, STATUS )
 *+
 *  Name:
 *     POL1_RDTCL
@@ -11,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     POL1_RDTCL( FILE, CIREF, CIOUT, STATUS )
+*     POL1_RDTCL( FILE, CIREF, CIOUT, I, Q, U, V, DI, DQ, DU, DV, STATUS )
 
 *  Description:
 *     This routine reads a Tcl list holding the column data in a 
@@ -24,6 +25,22 @@
 *        A CAT identifier for the reference catalogue.
 *     CIOUT = INTEGER (Given)
 *        A CAT identifier for the output catalogue.
+*     I = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing I values.
+*     Q = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing Q values.
+*     U = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing U values.
+*     V = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing V values.
+*     DI = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing DI values.
+*     DQ = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing DQ values.
+*     DU = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing DU values.
+*     DV = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing DV values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -56,6 +73,14 @@
       CHARACTER FILE*(*)
       INTEGER CIREF
       INTEGER CIOUT
+      CHARACTER I*(*)
+      CHARACTER Q*(*)
+      CHARACTER U*(*)
+      CHARACTER V*(*)
+      CHARACTER DI*(*)
+      CHARACTER DQ*(*)
+      CHARACTER DU*(*)
+      CHARACTER DV*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -72,7 +97,7 @@
       INTEGER DECCOL             ! Zero based index of DEC column in Tcl file
       INTEGER GI( MXCOL )        ! Column identifier in ref catalogue
       INTEGER GOTWCS             ! Non-zero if Tcl file has RA/DEC columns 
-      INTEGER I                  ! Column index in ref catalogue
+      INTEGER L                  ! Column index in ref catalogue
       INTEGER II                 ! CAT identifier for a parameter
       INTEGER J                  ! Column index in tcl file
       INTEGER COLID( MXCOL )     ! Output column ID for for each tcl col
@@ -106,10 +131,29 @@
          GO TO 999
       END IF
 
-*  Get the column names and identifiers from the output catalogue
-      DO I = 1, NCOLCI
-         CALL CAT_TNDNT( CIOUT, CAT__FITYP, I, GI( I ), STATUS ) 
-         CALL CAT_TIQAC( GI( I ), 'NAME', CNAMCI( I ), STATUS ) 
+*  Get the column names and identifiers from the output catalogue.
+*  Translate them into the corresponding column names in the reference
+*  catalogue.
+      DO L = 1, NCOLCI
+         CALL CAT_TNDNT( CIOUT, CAT__FITYP, L, GI( L ), STATUS ) 
+         CALL CAT_TIQAC( GI( L ), 'NAME', CNAMCI( L ), STATUS ) 
+         IF( CNAMCI( L ) .EQ. 'I' ) THEN
+            CNAMCI( L ) = I
+         ELSE IF( CNAMCI( L ) .EQ. 'Q' ) THEN
+            CNAMCI( L ) = Q
+         ELSE IF( CNAMCI( L ) .EQ. 'U' ) THEN
+            CNAMCI( L ) = U
+         ELSE IF( CNAMCI( L ) .EQ. 'V' ) THEN
+            CNAMCI( L ) = V
+         ELSE IF( CNAMCI( L ) .EQ. 'DI' ) THEN
+            CNAMCI( L ) = DI
+         ELSE IF( CNAMCI( L ) .EQ. 'DQ' ) THEN
+            CNAMCI( L ) = DQ
+         ELSE IF( CNAMCI( L ) .EQ. 'DU' ) THEN
+            CNAMCI( L ) = DU
+         ELSE IF( CNAMCI( L ) .EQ. 'DV' ) THEN
+            CNAMCI( L ) = DV
+         END IF
       END DO
 
 *  Create a Tcl interpreter and execute the script in the supplied file.
@@ -154,18 +198,18 @@
          COLID( J ) = -1
       END DO
 
-      DO I = 1, NCOLCI
-         JCOLCI( I ) = 0
+      DO L = 1, NCOLCI
+         JCOLCI( L ) = 0
          DO J = 1, NCOL
-            IF( CNAM( J ) .EQ. CNAMCI( I ) ) THEN
-               JCOLCI( I ) = J 
-               COLID( J ) = GI( I )
+            IF( CNAM( J ) .EQ. CNAMCI( L ) ) THEN
+               JCOLCI( L ) = J 
+               COLID( J ) = GI( L )
             END IF
          END DO
 
-         IF( JCOLCI( I ) .EQ. 0 ) THEN
+         IF( JCOLCI( L ) .EQ. 0 ) THEN
             STATUS = SAI__ERROR
-            CALL MSG_SETC( 'C', CNAMCI( I ) )
+            CALL MSG_SETC( 'C', CNAMCI( L ) )
             CALL ERR_REP( 'POL1_RDTCL_ERR3', 'Column ''^C'' is '//
      :                    'required, but is not available in the '//
      :                    'supplied data.', STATUS )
@@ -201,9 +245,9 @@
 
 *  See if the RA and DEC columns are needed in the output catalogue.
          USEWCS = .FALSE.
-         DO I = 1, NCOLCI
-            IF( JCOLCI( I ) .EQ. RACOL .OR. 
-     :          JCOLCI( I ) .EQ. DECCOL ) THEN
+         DO L = 1, NCOLCI
+            IF( JCOLCI( L ) .EQ. RACOL .OR. 
+     :          JCOLCI( L ) .EQ. DECCOL ) THEN
                USEWCS = .TRUE.
             END IF
          END DO
@@ -266,8 +310,8 @@
       CALL POL1_TCLDL( STATUS )
 
 *  Release column identifiers.
-      DO I = 1, NCOLCI
-         CALL CAT_TRLSE( GI( I ), STATUS )
+      DO L = 1, NCOLCI
+         CALL CAT_TRLSE( GI( L ), STATUS )
       END DO
 
 *  End the current error reporting environment.

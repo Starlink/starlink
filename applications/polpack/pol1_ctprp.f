@@ -1,4 +1,5 @@
-      SUBROUTINE POL1_CTPRP( PARAM, CI1, CI2, STATUS )
+      SUBROUTINE POL1_CTPRP( PARAM, CI1, I, Q, U, V, DI, DQ, DU, DV, 
+     :                       CI2, STATUS )
 *+
 *  Name:
 *     POL1_CTPRP
@@ -10,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_CTPRP( PARAM, CI1, CI2, STATUS )
+*     CALL POL1_CTPRP( PARAM, CI1,  I, Q, U, V, DI, DQ, DU, DV, CI2, 
+*                      STATUS )
 
 *  Description:
 *     This routine creates a new catalogue using the supplied environment
@@ -28,6 +30,22 @@
 *        The name of the environment parameter to use.
 *     CI1 = INTEGER (Given)
 *        A CAT identifier for an existing catalogue.
+*     I = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing I values.
+*     Q = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing Q values.
+*     U = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing U values.
+*     V = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing V values.
+*     DI = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing DI values.
+*     DQ = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing DQ values.
+*     DU = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing DU values.
+*     DV = CHARACTER * ( * ) (Given) 
+*        The name of the column within CI1 containing DV values.
 *     CI2 = INTEGER (Returned)
 *        A CAT identifier for the newly created catalogue.
 *     STATUS = INTEGER (Given and Returned)
@@ -60,6 +78,14 @@
 *  Arguments Given:
       CHARACTER PARAM*(*)
       INTEGER CI1
+      CHARACTER I*(*)
+      CHARACTER Q*(*)
+      CHARACTER U*(*)
+      CHARACTER V*(*)
+      CHARACTER DI*(*)
+      CHARACTER DQ*(*)
+      CHARACTER DU*(*)
+      CHARACTER DV*(*)
 
 *  Arguments Returned:
       INTEGER CI2
@@ -83,7 +109,7 @@
       INTEGER DTYPE              ! Component data type
       INTEGER GI1                ! Component identifier in input catalogue
       INTEGER GI2                ! Component identifier in output catalogue
-      INTEGER I                  ! Component index
+      INTEGER J                  ! Component index
       INTEGER IVAL               ! Component value
       INTEGER*2 WVAL             ! Component value
       LOGICAL DONE               ! Finish looping?
@@ -102,13 +128,13 @@
 
 *  Loop round until all parameters in the input catalogue have been
 *  copied to the output catalogue.
-      I = 0
+      J = 0
       DONE = .FALSE.
       DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
 
 *  Get an identifier for the next parameter
-         I = I + 1
-         CALL CAT_TNDNT( CI1, CAT__QITYP, I, GI1, STATUS )      
+         J = J + 1
+         CALL CAT_TNDNT( CI1, CAT__QITYP, J, GI1, STATUS )      
 
 *  Abort the loop if not found.
          IF( GI1 .EQ. CAT__NOID ) THEN
@@ -173,13 +199,13 @@
 
 *  Loop round until all columns in the input catalogue have been
 *  copied to the output catalogue.
-      I = 0
+      J = 0
       DONE = .FALSE.
       DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
 
 *  Get an identifier for the next column.
-         I = I + 1
-         CALL CAT_TNDNT( CI1, CAT__FITYP, I, GI1, STATUS )      
+         J = J + 1
+         CALL CAT_TNDNT( CI1, CAT__FITYP, J, GI1, STATUS )      
 
 *  Abort the loop if not found.
          IF( GI1 .EQ. CAT__NOID ) THEN
@@ -217,6 +243,26 @@
                CALL ERR_ANNUL( STATUS )
             END IF
 
+*  Translate foreign column names into polpack column names.
+            IF( NAME .EQ. I ) THEN
+               NAME = 'I'
+            ELSE IF( NAME .EQ. Q ) THEN
+               NAME = 'Q'
+            ELSE IF( NAME .EQ. U ) THEN
+               NAME = 'U'
+            ELSE IF( NAME .EQ. V ) THEN
+               NAME = 'V'
+            ELSE IF( NAME .EQ. DI ) THEN
+               NAME = 'DI'
+            ELSE IF( NAME .EQ. DQ ) THEN
+               NAME = 'DQ'
+            ELSE IF( NAME .EQ. DU ) THEN
+               NAME = 'DU'
+            ELSE IF( NAME .EQ. DV ) THEN
+               NAME = 'DV'
+            END IF
+
+*  Create the output column.
             CALL CAT_CNEWS( CI2, NAME, DTYPE, CSIZE, UNITS, EXFMT, 
      :                      COMM, GI2, STATUS ) 
 

@@ -74,6 +74,31 @@
 *        if none is provided.
 *     OUT = LITERAL (Read)
 *        The name of the output text file.
+*     I = LITERAL (Read)
+*        The name to be given to the column within the output text file 
+*        holding the I data. To avoid any renaming of columns, retain the 
+*        default value for all the following parameters. ["I"]
+*     DI = LITERAL (Read)
+*        The name to be given to the column within the output text file 
+*        holding the DI data. ["DI"]
+*     Q = LITERAL (Read)
+*        The name to be given to the column within the output text file 
+*        holding the Q data. ["Q"]
+*     DQ = LITERAL (Read)
+*        The name to be given to the column within the output text file 
+*        holding the DQ data. ["DQ"]
+*     U = LITERAL (Read)
+*        The name to be given to the column within the output text file 
+*        holding the U data. ["U"]
+*     DU = LITERAL (Read)
+*        The name to be given to the column within the output text file 
+*        holding the DQ data. ["DU"]
+*     V = LITERAL (Read)
+*        The name to be given to the column within the output text file 
+*        holding the V data. ["V"]
+*     DV = LITERAL (Read)
+*        The name to be given to the column within the output text file 
+*        holding the DV data. ["DV"]
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
@@ -141,13 +166,23 @@
 
 *  Local Variables:
       CHARACTER BJ*1             ! Besselian or Julian epoch
+      CHARACTER DI*20            ! Name of the column in REF holding DI values
+      CHARACTER DQ*20            ! Name of the column in REF holding DQ values
+      CHARACTER DU*20            ! Name of the column in REF holding DU values
+      CHARACTER DV*20            ! Name of the column in REF holding DV values
       CHARACTER EPOCH*50         ! Epoch specifier in i/p catalogue
       CHARACTER EQN*50           ! Equinox specifier in i/p catalogue
       CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
+      CHARACTER FNAME*80
+      CHARACTER H*15             ! A translated column name
       CHARACTER HEAD( MXCOL + 2 )*15! Column names within the output catalogue
+      CHARACTER I*20             ! Name of the column in REF holding I values
+      CHARACTER Q*20             ! Name of the column in REF holding Q values
       CHARACTER TEXT*512         ! O/p text buffer
-      DOUBLE PRECISION DEQN      ! Input equinox
+      CHARACTER U*20             ! Name of the column in REF holding U values
+      CHARACTER V*20             ! Name of the column in REF holding V values
       DOUBLE PRECISION DEPOCH    ! Epoch
+      DOUBLE PRECISION DEQN      ! Input equinox
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
       INTEGER CI                 ! CAT identifier for input catalogue
       INTEGER DECCOL            ! Index of DEC column within output catalogue 
@@ -178,7 +213,6 @@
       LOGICAL VERB               ! Verose errors required?
       REAL LBND( 2 )             ! Lower bounds of X/Y bounding box
       REAL UBND( 2 )             ! Upper bounds of X/Y bounding box
-      CHARACTER FNAME*80
 *.
 
 *  Check the inherited global status.
@@ -547,13 +581,46 @@
       CALL CHR_PUTI( NCOL, TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
-*  Write a list of the column headings out to the text file.
+*  Get the names of the output columns to hold the Stokes parameters and 
+*  their errors.
+      CALL PAR_GET0C( 'I', I, STATUS )
+      CALL PAR_GET0C( 'Q', Q, STATUS )
+      CALL PAR_GET0C( 'U', U, STATUS )
+      CALL PAR_GET0C( 'V', V, STATUS )
+      CALL PAR_GET0C( 'DI', DI, STATUS )
+      CALL PAR_GET0C( 'DQ', DQ, STATUS )
+      CALL PAR_GET0C( 'DU', DU, STATUS )
+      CALL PAR_GET0C( 'DV', DV, STATUS )
+
+*  Write a list of the column headings out to the text file, translating
+*  the column names.
       CALL FIO_WRITE( FD, 'set headings_ { \\', STATUS )
 
       DO ICOL = 1, NCOL
          TEXT = '   '
          IAT = 3
-         CALL CHR_APPND( HEAD( ICOL ), TEXT, IAT )
+
+         IF( HEAD( ICOL ) .EQ. 'I' ) THEN 
+            H = I
+         ELSE IF( HEAD( ICOL ) .EQ. 'DI' ) THEN 
+            H = DI
+         ELSE IF( HEAD( ICOL ) .EQ. 'Q' ) THEN 
+            H = Q
+         ELSE IF( HEAD( ICOL ) .EQ. 'DQ' ) THEN 
+            H = DQ
+         ELSE IF( HEAD( ICOL ) .EQ. 'U' ) THEN 
+            H = U
+         ELSE IF( HEAD( ICOL ) .EQ. 'DU' ) THEN 
+            H = DU
+         ELSE IF( HEAD( ICOL ) .EQ. 'V' ) THEN 
+            H = V
+         ELSE IF( HEAD( ICOL ) .EQ. 'DV' ) THEN 
+            H = DV
+         ELSE
+            H = HEAD( ICOL )
+         END IF
+
+         CALL CHR_APPND( H, TEXT, IAT )
          CALL CHR_APPND( ' \\', TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
       END DO

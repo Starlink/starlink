@@ -38,4 +38,68 @@ interface POLWRTCL
       helpkey     '*'
    endparameter
 
+   parameter      I
+      type        LITERAL
+      prompt      'I column name'
+      vpath       'DEFAULT'
+      default     'I'
+      helpkey     '*'
+   endparameter
+
+   parameter      DI
+      type        LITERAL
+      prompt      'DI column name'
+      vpath       'DEFAULT'
+      default     'DI'
+      helpkey     '*'
+   endparameter
+
+   parameter      Q
+      type        LITERAL
+      prompt      'Q column name'
+      vpath       'DEFAULT'
+      default     'Q'
+      helpkey     '*'
+   endparameter
+
+   parameter      DQ
+      type        LITERAL
+      prompt      'DQ column name'
+      vpath       'DEFAULT'
+      default     'DQ'
+      helpkey     '*'
+   endparameter
+
+   parameter      U
+      type        LITERAL
+      prompt      'U column name'
+      vpath       'DEFAULT'
+      default     'U'
+      helpkey     '*'
+   endparameter
+
+   parameter      DU
+      type        LITERAL
+      prompt      'DU column name'
+      vpath       'DEFAULT'
+      default     'DU'
+      helpkey     '*'
+   endparameter
+
+   parameter      V
+      type        LITERAL
+      prompt      'V column name'
+      vpath       'DEFAULT'
+      default     'V'
+      helpkey     '*'
+   endparameter
+
+   parameter      DV
+      type        LITERAL
+      prompt      'DV column name'
+      vpath       'DEFAULT'
+      default     'DV'
+      helpkey     '*'
+   endparameter
+
 endinterface
