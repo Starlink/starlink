@@ -1,13 +1,13 @@
 *+  DYN_CMN - internal common blocks for DYN_ system
 
-      INTEGER 			DYN_NMAX
-        PARAMETER 		( DYN_NMAX = 500 )
+      INTEGER 			DYN__NMAX
+        PARAMETER 		( DYN__NMAX = 500 )
 
       LOGICAL			DYN_ISINIT		! Sub-system initialised?
 
-      INTEGER			DYS_PTR(DYN_NMAX)	! Section pointers
-      INTEGER			DYS_NBYTE(DYN_NMAX)	! Section total bytes
-      INTEGER			DYS_FID(DYN_NMAX)	! Section file handle
+      INTEGER			DYS_PTR(DYN__NMAX)	! Section pointers
+      INTEGER			DYS_NBYTE(DYN__NMAX)	! Section total bytes
+      INTEGER			DYS_FID(DYN__NMAX)	! Section file handle
 
 *  Word aligned items
       COMMON /DYN_CMN_1/	DYN_ISINIT, DYS_PTR, DYS_NBYTE, DYS_FID
