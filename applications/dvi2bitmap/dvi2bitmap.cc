@@ -3,8 +3,10 @@
 
 #include "dvi2bitmap.h"
 #include <iostream>
+#include <vector>
 #include <cstdlib>
 #include <cstdarg>
+#include <cctype>
 
 #if VSPRINTF_IN_STDIO
 #include <cstdio>
@@ -15,6 +17,10 @@
 #include "Bitmap.h"
 #include "version.h"
 
+typedef vector<string> string_list;
+
+string_list *tokenise_string (string s);
+string *get_ofn_pattern (string dviname);
 void Usage (void);
 char *progname;
 
@@ -23,6 +29,9 @@ main (int argc, char **argv)
     string dviname;
     int resolution = 72;	// in pixels-per-inch
     int show_font_list = 0;
+    bool blur_bitmap = false;
+    bool make_transparent = true;
+    const char *ofn_pattern = 0;
 
     bool debug_ = false;
     DviFile::debug(1);
@@ -72,6 +81,18 @@ main (int argc, char **argv)
 	      case 'L':		// show all fonts
 		show_font_list = 2;
 		break;
+	      case 'b':
+		blur_bitmap = !blur_bitmap;
+		break;
+	      case 't':
+		make_transparent = !make_transparent;
+		break;
+	      case 'o':
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		ofn_pattern = *argv;
+		break;
 	      case 'v':		// version
 		cout << version_string << '\n';
 		break;
@@ -87,6 +108,16 @@ main (int argc, char **argv)
 
     if (dviname.length() == 0)
 	Usage();
+
+    if (ofn_pattern == 0)
+	ofn_pattern = get_ofn_pattern (dviname)->c_str();
+    if (ofn_pattern == 0)
+    {
+	cout << "Can't make output filename pattern from " << dviname << '\n';
+	std::exit(0);
+    }
+    else
+	cout << "ofn_pattern="<<ofn_pattern<<'\n';
 
     try
     {
@@ -113,11 +144,12 @@ main (int argc, char **argv)
 	DviFilePostamble *post;
 	DviFileEvent *ev;
 	const PkFont *curr_font;
+	int pagenum = 0;
+	string output_filename = "";
 	do
 	{
 	    PkGlyph *glyph;
 	    Bitmap *bitmap;
-	    int pagenum = 0;
 
 	    ev = dvif->getEvent();
 	    if (debug_)
@@ -129,11 +161,21 @@ main (int argc, char **argv)
 		{
 		    pagenum++;
 		    bitmap->crop();
-		    bitmap->blur();
-		    bitmap->setTransparent();
-		    char fn[100];
-		    sprintf (fn, "page%d.gif", pagenum);
-		    bitmap->write(fn);
+		    if (blur_bitmap)
+			bitmap->blur();
+		    if (make_transparent)
+			bitmap->setTransparent();
+		    if (output_filename.length() > 0)
+		    {
+			bitmap->write (output_filename);
+			output_filename = "";
+		    }
+		    else
+		    {
+			char fn[100];
+			sprintf (fn, ofn_pattern, pagenum);
+			bitmap->write(fn);
+		    }
 		    delete bitmap;
 		    bitmap = 0;
 		}
@@ -165,9 +207,20 @@ main (int argc, char **argv)
 		curr_font = fc->font;
 	    else if (DviFileSpecial* special =
 		     dynamic_cast<DviFileSpecial*>(ev))
-		cout << "Unrecognised special: "
-		     << special->specialString
-		     << '\n';
+	    {
+		string_list *l = tokenise_string (special->specialString);
+		if (l->size() > 2
+		    && (*l)[0] == "dvi2bitmap"
+		    && (*l)[1] == "outputfile")
+		{
+		    output_filename = (*l)[2];
+		}
+		else
+		    cout << "Warning: unrecognised special: "
+			 << special->specialString
+			 << '\n';
+		delete l;
+	    }
 
 	    delete ev;
 	}
@@ -207,8 +260,51 @@ DviBug::DviBug(char *fmt,...)
     delete[] p;
 }
 
+string *get_ofn_pattern (string dviname)
+{
+    // strip path and extension from filename
+    int string_index = dviname.rfind(path_separator);
+    string dvirootname;
+    if (string_index < 0)
+	dvirootname = dviname;
+    else
+	dvirootname = dviname.substr(string_index+1);
+    string_index = dvirootname.rfind('.');
+    if (string_index >= 0) // it's there
+	dvirootname = dvirootname.substr(0,string_index);
+
+    string *patt = new string(dvirootname + "-page%d.gif");
+    return patt;
+}
+
+// Tokenise string at whitespace.  There's a more C++-ish way of doing
+// this, I'm sure....
+string_list *tokenise_string (string str)
+{
+    cout << "tokenise_string: string=<" << str << ">\n";
+    string_list *l = new string_list();
+    int i=0, wstart;
+    // skip leading whitespace
+    while (i < str.length() && isspace(str[i]))
+	i++;
+    while (i < str.length())
+    {
+	wstart = i;
+	while (i < str.length() && !isspace(str[i]))
+	    i++;
+	string t = str.substr(wstart,i-wstart);
+	cout << "tokenise:" << t << ":\n";
+	l->push_back(t);
+	while (i < str.length() && isspace(str[i]))
+	    i++;
+    }
+    cout << "tokenized!\n";
+    return l;
+}
+
+
 void Usage (void)
 {
-    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] [-g[dpr]] [-lLv] dvifile" << '\n';
+    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] [-g[dpr]] [-lLvbt] [-o outfile-pattern] dvifile" << '\n';
     exit (1);
 }
