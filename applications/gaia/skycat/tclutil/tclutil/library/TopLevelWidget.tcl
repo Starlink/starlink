@@ -17,6 +17,9 @@
 #                 10 Mar 99  Added fix to split up args in
 #                            setup_menuitem. This makes the
 #                            accelerator code work.
+#                 28 Apr 00  short_help method scoped to public from
+#                            protected, this is needed so that canvas
+#                            items can trigger short_help changes.
 
 itk::usual TopLevelWidget {}
 
@@ -494,7 +497,7 @@ itcl::class util::TopLevelWidget {
     #
     # The optional mf arg is the "%m" value for the Enter/Leave event.
 
-    protected method short_help {msg {mf ""}} {
+    public method short_help {msg {mf ""}} {
 	if {[info exists itk_component(short_help)]} {
 	    if {"$mf" == "NotifyGrab" || "$mf" == "NotifyUngrab"} {
 		return
