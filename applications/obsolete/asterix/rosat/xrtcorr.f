@@ -1775,7 +1775,7 @@ D        WRITE(*,*) RLP
       ENDIF
 *
 * Access header info from the datafile
-      CALL ADI1_GETHEAD( IFID, .FALSE., HLOC, STATUS )
+      CALL ADI1_LOCHEAD( IFID, .FALSE., HLOC, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('Error getting locator to header structure')
           GOTO 999
