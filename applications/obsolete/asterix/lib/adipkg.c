@@ -840,6 +840,8 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
       if ( _ok(status) ) {
 	lstx_inscel( nid, &ADI_G_pkglisti, status );
 	}
+      else
+        adic_setecs( *status, "Error loading package %*s", status, nlen, name );
       }
     else {
       adix_erase( &nid, 1, status );

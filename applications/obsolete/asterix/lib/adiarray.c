@@ -186,16 +186,16 @@ ADIobj ADIaryNew( int ndim, int dims[], ADIobj dataobj, ADIobj parent,
 void ADIaryAlter( ADIobj id, char *name, int nlen, int ndim,
 		  int dims[], ADIstatus status )
   {
-  ADIobj      	*lid;
+  ADIobjRequest	objreq;			/* Object specification */
 
   _chk_init_err; _chk_stat;
 
 /* Find data address */
-  adix_locdat( &id, name, nlen, DA__ARRAY, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__ARRAY, &objreq, status );
 
 /* Check not accessed, not a slice */
   if ( _ok(status) ) {
-    ADIobj 	hid = _han_id(*lid);	/* Locate handled object */
+    ADIobj 	hid = _han_id(*objreq.data);	/* Locate handled object */
 
     if ( _ary_q(hid) ) {              	/* Array object? */
       ADIarray		*ary;

@@ -81,7 +81,6 @@
  *
  *
  *     does adix_name work on slices/cells,putid'd objects?
- *     merge cerase and delcmp,delprp?
  *     encapsulate global variables in a ADIinterpreter object
  *     method specialiation on linking class, eg. Write(RMF,Array->HDSfile)
  *     remove direct references to stderr in err.lib
@@ -2429,8 +2428,7 @@ ADIobj adix_cmnC( char *str, ADIstatus status )
  *  Locate insertion point for named item in a property list
  */
 void adix_pl_findi( ADIobj pobj, ADIobj *plist, ADIobj property,
-		    ADIlogical create, ADIobj **value, ADIobj *parid,
-		    ADIobj *namid, ADIstatus status )
+		    ADIlogical create, ADIobjRequest *objreq,ADIstatus status )
   {
   ADIobj        hnode;                  /* New element for table hash list */
   ADIobj	*lcar; 			/* &_CAR(*lentry) if found */
@@ -2439,11 +2437,12 @@ void adix_pl_findi( ADIobj pobj, ADIobj *plist, ADIobj property,
 
   _chk_stat;                            /* Check status */
 
-  *value = NULL;                        /* Default return value */
+/* Default return value */
+  objreq->data = NULL;
 
 /* Look along list for string. Simply return address if present */
   if ( tblx_scani( plist, property, &lentry, &lcar, status ) )
-    *value = &_CDR(*lcar);
+    objreq->data = &_CDR(*lcar);
 
 /* Create the property if we have permission */
   else if ( create ) {
@@ -2455,7 +2454,7 @@ void adix_pl_findi( ADIobj pobj, ADIobj *plist, ADIobj property,
     *lentry = lstx_cell( hnode, *lentry, status );
 
 /* The data address is the CDR of the string.value dotted pair */
-    *value = &_CDR(hnode);
+    objreq->data = &_CDR(hnode);
 
 /* Component creation sets parent data */
     if ( _ok(status) && _valid_q(pobj) )
@@ -2467,16 +2466,14 @@ void adix_pl_findi( ADIobj pobj, ADIobj *plist, ADIobj property,
     parent = ADI__nullid;
 
 /* Set parent and name values */
-  if ( _ok(status) ) {
-    if ( parid ) *parid = parent;
-    if ( namid ) *namid = property;
-    }
+  objreq->parent = parent;
+  objreq->name = property;
+  objreq->lentry = lentry;
   }
 
 
 void adix_pl_find( ADIobj pobj, ADIobj *plist, char *property, int plen,
-		   ADIlogical create, ADIobj **value, ADIobj *parid,
-		   ADIobj *namid, ADIstatus status )
+		   ADIlogical create, ADIobjRequest *objreq, ADIstatus status )
   {
   ADIobj	name;			/* Property name */
 
@@ -2486,7 +2483,7 @@ void adix_pl_find( ADIobj pobj, ADIobj *plist, char *property, int plen,
   name = adix_cmn( property, plen, status );
 
 /* Look for property */
-  adix_pl_findi( pobj, plist, name, create, value, parid, namid, status );
+  adix_pl_findi( pobj, plist, name, create, objreq, status );
 
 /* Release name string */
   adix_erase( &name, 1, status );
@@ -2498,107 +2495,46 @@ void adix_pl_find( ADIobj pobj, ADIobj *plist, char *property, int plen,
  */
 ADIobj adix_pl_geti( ADIobj obj, ADIobj prop, ADIstatus status )
   {
-  ADIobj	*value;
+  ADIobjRequest	objreq;			/* Object specification */
 
   _chk_stat_ret(ADI__nullid);           /* Check status */
 
-  adix_pl_findi( obj, &_han_pl(obj), prop, ADI__false, &value, NULL, NULL, status );
+  adix_pl_findi( obj, &_han_pl(obj), prop, ADI__false, &objreq, status );
 
-  return (value && _ok(status)) ? *value : ADI__nullid;
+  return (objreq.data && _ok(status)) ? *objreq.data : ADI__nullid;
   }
 
 ADIobj adix_pl_fgeti( ADIobj *pobj, ADIobj prop, ADIstatus status )
   {
-  ADIobj	*value;
+  ADIobjRequest	objreq;			/* Object specification */
 
   _chk_stat_ret(ADI__nullid);           /* Check status */
 
-  adix_pl_findi( ADI__nullid, pobj, prop, ADI__false, &value, NULL, NULL, status );
+  adix_pl_findi( ADI__nullid, pobj, prop, ADI__false, &objreq, status );
 
-  return (value && _ok(status)) ? *value : ADI__nullid;
+  return (objreq.data && _ok(status)) ? *objreq.data : ADI__nullid;
   }
 
 
 void adix_pl_seti( ADIobj obj, ADIobj prop, ADIobj valid, ADIstatus status )
   {
-  ADIobj	*vaddr;
+  ADIobjRequest	objreq;			/* Object specification */
 
 /* Check status */
   _chk_stat;
 
-  adix_pl_findi( obj, &_han_pl(obj), prop, ADI__true, &vaddr, NULL, NULL, status );
+  adix_pl_findi( obj, &_han_pl(obj), prop, ADI__true, &objreq, status );
 
 /* Value address is defined? */
-  if ( vaddr ) {
-    if ( *vaddr != valid ) {
-      if ( _valid_q(*vaddr) )
-	adix_erase( vaddr, 1, status );
-      *vaddr = valid;
+  if ( objreq.data ) {
+    if ( *objreq.data != valid ) {
+      if ( _valid_q(*objreq.data) )
+	adix_erase( objreq.data, 1, status );
+      *objreq.data = valid;
       }
     }
   }
 
-
-void adix_delprp( ADIobj id, char *pname, int plen, ADIstatus status )
-  {
-  ADIobj	*lcar; 			/* &_CAR(*lentry) if found */
-  ADIobj        *lentry;                /* List insertion point */
-  ADIobj        *plist;                 /* Property list address */
-  ADIlogical    there;                  /* String in list? */
-  ADIobj        old_dp;
-  ADIobj        tstr;                   /* Temp string descriptor */
-
-  _chk_init_err; _chk_han(id); _chk_stat;              /* Has to be a handled object */
-
-/* Get name in table */
-  tstr = adix_cmn( pname, plen, status );
-
-  plist = &_han_pl(id);                 /* Locate the property list */
-
-/* Look along list for string */
-  there = tblx_scani( plist, tstr, &lentry, &lcar, status );
-
-  adix_erase( &tstr, 1, status );       /* Free temporary string */
-
-/* Present in list? */
-  if ( there ) {
-    ADIobj	*odp_car, *odp_cdr;
-
-/* The dotted pair to be deleted */
-    old_dp = *lentry;
-
-/* By-pass old list element */
-    *lentry = _CDR(*lentry);
-
-/* Locate addresses of old_dp's car and cdr cells */
-    _GET_CARCDR_A(odp_car,odp_cdr,old_dp);
-
-/* Delete old property and value */
-    adix_erase( odp_car, 1, status );
-    *odp_cdr = ADI__nullid;
-    adix_erase( &old_dp, 1, status );
-    }
-  }
-
-void adix_locprp( ADIobj id, char *pname, int plen, ADIobj *pid,
-		  ADIstatus status )
-  {
-  ADIobj        *vaddr;                 /* Address of property value */
-
-/* Must be initialised */
-  _chk_init_err;
-
-  _chk_han(id); _chk_stat;              /* Has to be a handled object */
-
-  adix_pl_find( id, &_han_pl(id), pname, plen, ADI__false,
-		&vaddr, NULL, NULL, status );
-
-  if ( vaddr )
-    *pid = *vaddr;
-  else
-    adic_setecs( ADI__NOPROP, "Property with name /%*s/ not found",
-	status, plen, pname );
-  }
 
 void adix_nprp( ADIobj id, int *nprp, ADIstatus status )
   {
@@ -2652,77 +2588,6 @@ void adix_indprp( ADIobj id, int index, ADIobj *pid, ADIstatus status )
 /*
  * Structures
  */
-void adix_delcmp( ADIobj id, char *cname, int clen, ADIstatus status )
-  {
-  ADIobj	*lcar; 			/* &_CAR(*lentry) if found */
-  ADIobj        *lentry;                /* List insertion point */
-  ADIobj        *clist;                 /* Component list address */
-  ADIlogical    there;                  /* String in list? */
-  ADIobj        old_dp;
-  ADIobj        tstr;                   /* Temp string descriptor */
-
-  _chk_init_err; _chk_stat;
-
-  if ( ! _struc_q(id) )                 /* Check this is a structure */
-    adic_setecs( ADI__ILLOP, "Object is not of type STRUC", status );
-
-  _chk_stat;                            /* Has to be a handled object */
-
-/* Get name in table */
-  tstr = adix_cmn( cname, clen, status );
-
-/* Locate the component list */
-  clist = _struc_data(id);
-
-/* Look along list for string */
-  there = tblx_scani( clist, tstr, &lentry, &lcar, status );
-
-/* Free temporary string */
-  adix_erase( &tstr, 1, status );
-
-/* Present in list? */
-  if ( there ) {
-    ADIobj	*odp_car, *odp_cdr;
-
-/* The dotted pair to be deleted */
-    old_dp = *lentry;
-
-/* By-pass old list element */
-    *lentry = _CDR(*lentry);
-
-/* Delete old component and value */
-    _GET_CARCDR_A(odp_car,odp_cdr,old_dp);
-
-    adix_erase( odp_car, 1, status );
-    *odp_cdr = ADI__nullid;
-    adix_erase( &old_dp, 1, status );
-    }
-  }
-
-void adix_loccmp( ADIobj id, char *cname, int clen, ADIobj *cid,
-		  ADIstatus status )
-  {
-  ADIobj        *vaddr;                 /* Address of property value */
-
-/* Must be initialised */
-  _chk_init_err; _chk_stat;
-
-  if ( ! _struc_q(id) )                 /* Check this is a structure */
-    adic_setecs( ADI__ILLOP, "Object is not of type STRUC", status );
-
-  _chk_stat;                            /* Has to be a handled object */
-
-/* Find object address */
-  adix_pl_find( id, _struc_data(id), cname, clen, ADI__false,
-		&vaddr, NULL, NULL, status );
-
-  if ( vaddr )
-    *cid = *vaddr;
-  else
-    adic_setecs( ADI__NOCOMP, "Component with name /%*s/ not found",
-	status, clen, cname );
-  }
-
 void adix_ncmp( ADIobj id, int *ncmp, ADIstatus status )
   {
   ADIobj        clist;                  /* The structure component list */
@@ -3071,8 +2936,8 @@ void adix_mtaid( ADIobj id, ADImta *mta, ADIstatus status )
     }
   }
 
-void adix_findmem( ADIobj id, char *mem, int mlen, ADIobj **mad,
-		   ADIobj *parid, ADIobj *namid, ADIstatus status )
+void adix_findmem( ADIobj id, char *mem, int mlen,
+		   ADIobjRequest *objreq, ADIstatus status )
   {
   ADIobj                curmem;
   ADIlogical            found = ADI__false;
@@ -3081,7 +2946,8 @@ void adix_findmem( ADIobj id, char *mem, int mlen, ADIobj **mad,
 
   _chk_stat;
 
-  _GET_NAME(mem,mlen);                  /* Import member name */
+/* Import member name */
+  _GET_NAME(mem,mlen);
 
   tdef = _DTDEF(id);
   curmem = tdef->members;
@@ -3093,16 +2959,16 @@ void adix_findmem( ADIobj id, char *mem, int mlen, ADIobj **mad,
       }
     else {
       found = ADI__true;
-      *parid = id;
-      *namid = _mdef_aname(curmem);
-      *mad = _class_data(id) + imem - 1;
+      objreq->parent = id;
+      objreq->name = _mdef_aname(curmem);
+      objreq->data = _class_data(id) + imem - 1;
       }
     }
 
 /* No such member? */
   if ( ! found )
     adic_setecs( ADI__NOMEMB, "Class %s has no member called %*s",
-		status, tdef->name, mlen, mem );
+		 status, tdef->name, mlen, mem );
   }
 
 
@@ -3168,116 +3034,115 @@ void adix_chkput( ADIobj *id, ADIobj **lid, ADIstatus status )
   }
 
 
-/*
- * Locate data given name and access mode. The parent object and object
- * name are returned if the user requires them (by making parid/namid non
- * null.
- */
-void adix_locdat( ADIobj *id, char *name, int nlen, int flgs,
-		  ADIobj **did, ADIobj *parid, ADIobj *namid,
-		  ADIstatus status )
+void ADIkrnlLocDat( ADIobj *id, char *name, int nlen, int flgs,
+		    ADIobjRequest *objreq, ADIstatus status )
   {
-  int           mode = ADI__AC_VALUE;   /* Default values */
-  char          *lname = name;
-  int           lnlen = nlen;
+  char          *lname = name;		/* Local copies of name address */
+  int           lnlen = nlen;		/* and length */
   ADIlogical    iscreate =              /* Create access requested? */
 		    (flgs & DA__CREATE);
-  ADIobj	parent = ADI__nullid;
-  ADIobj	obname = ADI__nullid;
 
+/* Check inherited global status on entry */
+  _chk_stat;
+
+/* Default field values
+  objreq->data = id;
+  objreq->parent = ADI__nullid;
+  objreq->name = ADI__nullid;
+  objreq->lentry = NULL;
+
+/* Decide on component access type from name string. Note we can't */
+/* distinguish between class members and structure components yet */
+  objreq->ctype = ADIcmpValue;
   if ( name ) {                         /* Decide on mode */
     if ( *name == '.' ) {               /* Property name preceded by period */
-      mode = ADI__AC_PROPERTY;
+      objreq->ctype = ADIcmpProperty;
       lname++;
       if ( lnlen > 0 ) lnlen--;
       }
     else if ( *name )                   /* Don't allow null strings */
-      mode = ADI__AC_MEMBER;
+      objreq->ctype = ADIcmpMember;
 
 /* Removes trailing spaces */
     _GET_NAME(lname,lnlen);
     }
 
-  if ( mode == ADI__AC_VALUE ) {        /* Simple value */
+/* Simple value? */
+  if ( objreq->ctype == ADIcmpValue ) {
+
+/* Check write operation ok */
     if ( iscreate )
-      adix_chkput( id, did, status );   /* Check write operation ok */
+      adix_chkput( id, &objreq->data, status );
+
+/* Check read operation ok */
     else if ( flgs & DA__SET )
-      adix_chkget( id, did, status );   /* Check read operation ok */
-    else
-      *did = id;
+      adix_chkget( id, &objreq->data, status );
     }
 
-  else if ( mode == ADI__AC_MEMBER ) {  /* Named component */
+  else if ( objreq->ctype == ADIcmpMember ) {  /* Named component */
 
 /* Input object is a structure? */
     if ( _struc_q(*id) ) {
 
 /* Find component insertion point */
       adix_pl_find( *id, _struc_data(*id), lname, lnlen, iscreate,
-		    did, &parent, &obname, status );
+		    objreq, status );
 
-      if ( (flgs & DA__SET) && ! *did )
+      if ( (flgs & DA__SET) && ! objreq->data )
 	adic_setecs( ADI__NOCOMP, "Structure component /%*s/ does not exist",
 			status, lnlen, lname );
       }
 
 /* Find member insertion point */
     else
-      adix_findmem( *id, lname, lnlen, did, &parent, &obname, status );
+      adix_findmem( *id, lname, lnlen, objreq, status );
     }
 
 /* Property access */
-  else if ( mode == ADI__AC_PROPERTY ) {
+  else if ( objreq->ctype == ADIcmpProperty ) {
 
 /* Find property insertion point */
-    adix_pl_find( *id, &_han_pl(*id), lname, lnlen, iscreate,
-		  did, &parent, &obname, status );
+    adix_pl_find( *id, &_han_pl(*id), lname, lnlen, iscreate, objreq, status );
 
-    if ( (flgs & DA__SET) && ! *did )
+    if ( (flgs & DA__SET) && ! objreq->data )
       adic_setecs( ADI__NOPROP, "Property %*s does not exist", status,
 		lnlen, lname );
     }
 
-  if ( _ok(status) && (*did) ) {        /* Ok so far and address defined? */
+/* Ok so far and address defined? */
+  if ( _ok(status) && objreq->data ) {
 
 /* Object is required to be an array */
-    if ( _valid_q(**did) && (flgs & DA__ARRAY)) {
+    if ( _valid_q(*objreq->data) && (flgs & DA__ARRAY)) {
       ADIlogical	isarray = ADI__false;
-      if ( _han_q(**did) )
-	isarray = _ary_q(_han_id(**did));
+      if ( _han_q(*objreq->data) )
+	isarray = _ary_q(_han_id(*objreq->data));
 
       if ( ! isarray )
 	adic_setecs( ADI__INVARG, "Array object expected", status );
       }
     }
-
-/* Set require parent and name objects if caller wants them */
-  if ( _ok(status) ) {
-    if ( parid ) *parid = parent;
-    if ( namid ) *namid = obname;
-    }
-
-/* If bad status set return value to real address to prevent further hassle */
-  else
-    *did = id;
   }
+
+
 
 /*
  * Does a component exist?
  */
 ADIlogical adix_there( ADIobj id, char *name, int nlen, ADIstatus status )
-   {
-   ADIobj        *lid;
+  {
+  ADIobjRequest	objreq;
 
 /* Error if not initialised */
   _chk_init_err; _chk_stat_ret(ADI__false);
 
 /* Find data insertion point */
-  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__DEFAULT, &objreq, status );
 
-  if ( _ok(status) ) {                  /* Status good if component exists */
-    if ( lid )
-      return _valid_q(*lid) ? ADI__true : ADI__false;
+/* Status good if component exists */
+  if ( _ok(status) ) {
+    if ( objreq.data )
+      return _valid_q(*objreq.data) ? ADI__true : ADI__false;
     else
       return ADI__false;
     }
@@ -3292,20 +3157,20 @@ ADIlogical adix_there( ADIobj id, char *name, int nlen, ADIstatus status )
  */
 ADIobj adix_find( ADIobj id, char *name, int nlen, ADIstatus status )
   {
-  ADIobj        *lid;
+  ADIobjRequest	objreq;
 
 /* Error if not initialised */
   _chk_init_err; _chk_stat_ret(ADI__nullid);
 
 /* Find data insertion point */
-  adix_locdat( &id, name, nlen, DA__SET, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__SET, &objreq, status );
 
-  if ( _ok(status) && lid ) {
+  if ( _ok(status) && objreq.data ) {
 
 /* Bump up reference count unless it's a kernel object */
-    if ( _han_q(*lid) )
-      adix_refadj( *lid, 1, status );
-    return *lid;
+    if ( _han_q(*objreq.data) )
+      adix_refadj( *objreq.data, 1, status );
+    return *objreq.data;
     }
   else {
     adix_erranl( status );
@@ -3343,12 +3208,12 @@ ADIobj adix_clone( ADIobj id, ADIstatus status )
 void adix_slice( ADIobj id, char *name, int nlen, int ndim,
 		 int diml[], int dimu[], ADIobj *sid, ADIstatus status )
   {
-  ADIobj        *lid;
+  ADIobjRequest	objreq;
 
   _chk_init_err; _chk_stat;
 
 /* Find the data address. Must be an array, and its data must be defined */
-  adix_locdat( &id, name, nlen, DA__ARRAY|DA__SET, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__ARRAY|DA__SET, &objreq, status );
 
 /* Check not accessed */
 
@@ -3356,7 +3221,7 @@ void adix_slice( ADIobj id, char *name, int nlen, int ndim,
   if ( _ok(status) ) {
 
 /* Locate the array block */
-    ADIarray         	*ary = _ary_data(_han_id(*lid));
+    ADIarray         	*ary = _ary_data(_han_id(*objreq.data));
     int                 idim;
 
 /* Check slice dimensionality */
@@ -3415,12 +3280,12 @@ void adix_slice( ADIobj id, char *name, int nlen, int ndim,
 void adix_cell( ADIobj id, char *name, int nlen, int ndim,
 		int index[], ADIobj *cid, ADIstatus status )
   {
-  ADIobj        *lid;
+  ADIobjRequest	objreq;
 
   _chk_init_err; _chk_stat;
 
 /* Find data address */
-  adix_locdat( &id, name, nlen, DA__ARRAY|DA__SET, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__ARRAY|DA__SET, &objreq, status );
 
   /* Check not accessed */
 
@@ -3428,9 +3293,11 @@ void adix_cell( ADIobj id, char *name, int nlen, int ndim,
     ADIarray         	*ary;
     int                 idim;
 
-    ary = _ary_data(_han_id(*lid));     /* Locate the array block */
+/* Locate the array block */
+    ary = _ary_data(_han_id(*objreq.data));
 
-    if ( ndim > ary->ndim )             /* Check slice dimensionality */
+/* Check slice dimensionality */
+    if ( ndim > ary->ndim )
       adic_setecs( ADI__INVARG, "Index dimensionality exceeds that of object",
 		   status );
     else {
@@ -3472,15 +3339,15 @@ void adix_cell( ADIobj id, char *name, int nlen, int ndim,
 void adix_shape( ADIobj id, char *name, int nlen, int mxndim, int dims[],
 		 int *ndim, ADIstatus status )
   {
-  ADIobj        *lid;
+  ADIobjRequest	objreq;
 
   _chk_init_err; _chk_stat;
 
 /* Find data address */
-  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__DEFAULT, &objreq, status );
 
   if ( _ok(status) ) {
-    ADIobj              hid = _han_id(*lid);
+    ADIobj              hid = _han_id(*objreq.data);
     int         idim;
 
     if ( _ary_q(hid) ) {                /* Array object? */
@@ -3510,15 +3377,15 @@ void adix_shape( ADIobj id, char *name, int nlen, int mxndim, int dims[],
 
 void adix_size( ADIobj id, char *name, int nlen, int *nelm, ADIstatus status )
   {
-  ADIobj        *lid;
+  ADIobjRequest	objreq;
 
   _chk_init_err; _chk_stat;
 
 /* Find data address */
-  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__DEFAULT, &objreq, status );
 
   if ( _ok(status) ) {
-    ADIobj              hid = _han_id(*lid);
+    ADIobj              hid = _han_id(*objreq.data);
 
 /* Array object? */
     if ( _ary_q(hid) ) {
@@ -3541,7 +3408,7 @@ void adix_get_n( int clang, ADIobj id, char *name, int nlen,
   {
   int		idim;			/* Loop over dimensions */
   ADImta        imta;                   /* MTA for the object */
-  ADIobj        *lid;                   /* Object to be accessed */
+  ADIobjRequest	objreq;			/* Object request data */
   ADImta        omta;     		/* Output value MTA */
   ADIclassDef	*vtdef;
 
@@ -3552,10 +3419,10 @@ void adix_get_n( int clang, ADIobj id, char *name, int nlen,
   vtdef = _cdef_data(*clsid);
 
 /* Find data insertion point */
-  adix_locdat( &id, name, nlen, DA__SET, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__SET, &objreq, status );
 
 /* Set input channel */
-  adix_mtaid( *lid, &imta, status );
+  adix_mtaid( *objreq.data, &imta, status );
 
 /* Set output channel */
   ADIkrnlMtaInit( 0, ndim, mxdims, vsize, value, vtdef, clang, &omta, status );
@@ -3725,9 +3592,9 @@ void adix_map_n( int clang, ADIobj id, char *name, int nlen,
   {
   ADIacmode     imode;                  /* Mapping mode */
   ADImta        imta;                   /* MTA for the object */
-  ADIobj        *lid;                   /* Object to be accessed */
   int           damode;                 /* Data access mode */
   ADIobj        mctrl;                  /* Map control object */
+  ADIobjRequest	objreq;			/* Object request data */
   ADImta        omta;     		/* Output value MTA */
   ADIclassDef	*vtdef;
 
@@ -3747,14 +3614,14 @@ void adix_map_n( int clang, ADIobj id, char *name, int nlen,
     damode = DA__SET;
 
 /* Find data insertion point */
-  adix_locdat( &id, name, nlen, damode, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, damode, &objreq, status );
 
   if ( _ok(status) ) {
     size_t      nbyte = 0;
     ADIlogical  dynamic = ADI__false;
 
 /* Set input channel */
-    adix_mtaid( *lid, &imta, status );
+    adix_mtaid( *objreq.data, &imta, status );
 
 /* Need dynamic memory if different types or if mapped object is */
 /* non-contiguous in memory */
@@ -3764,7 +3631,7 @@ void adix_map_n( int clang, ADIobj id, char *name, int nlen,
       }
 
 /* Create the mapping control object */
-    mctrl = adix_add_mapctrl( *lid, imode, vtdef, nbyte, dynamic, status );
+    mctrl = adix_add_mapctrl( *objreq.data, imode, vtdef, nbyte, dynamic, status );
 
 /* Perform data conversion if dynamic, otherwise just point to the input */
 /* data object */
@@ -3805,16 +3672,16 @@ void adix_unmap_n( ADIobj id, char *name, int nlen,
 		   void *vptr, ADIstatus status )
   {
   ADIobj        *ipoint;
-  ADIobj        *lid;                   /* Object to be accessed */
+  ADIobjRequest	objreq;			/* Object data specification */
   ADIobj        lobj;                   /* The object lock */
 
 /* Error if not initialised */
   _chk_init_err; _chk_stat;
 
 /* Find data address */
-  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__DEFAULT, &objreq, status );
 
-  lobj = adix_loc_mapctrl( *lid, 0, vptr, &ipoint, status );
+  lobj = adix_loc_mapctrl( *objreq.data, 0, vptr, &ipoint, status );
 
   if ( _valid_q(lobj) ) {
     ADImapCtrl  *mctrl = _mapctrl_data(lobj);
@@ -3832,7 +3699,7 @@ void adix_unmap_n( ADIobj id, char *name, int nlen,
 	ADImta  imta;                   /* MTA describing mapped data */
 	ADImta  omta;                   /* MTA describing mapping object */
 
-	adix_mtaid( *lid, &omta, status );  /* Set output channel */
+	adix_mtaid( *objreq.data, &omta, status );  /* Set output channel */
 
 	imta = omta;
 	imta.tdef = mctrl->type;
@@ -3843,7 +3710,7 @@ void adix_unmap_n( ADIobj id, char *name, int nlen,
 
 /* If the mapping mode was write, the data is now set */
       if ( mctrl->mode == ADI__write )
-	_han_set(*lid) = ADI__true;
+	_han_set(*objreq.data) = ADI__true;
 
 /* Keep a copy of the next lock object in the chain */
       linkobj = _CDR(*ipoint);
@@ -3872,8 +3739,10 @@ void adix_unmap_n( ADIobj id, char *name, int nlen,
  *    ENDIF
  *
  */
-void adix_wdata( ADIobj parid, ADIobj namid, ADIobj *id, ADImta *mta, ADIstatus status )
+void adix_wdata( ADIobjRequest *objreq, ADImta *mta, ADIstatus status )
   {
+  ADIobj	*id = objreq->data;
+
 /* If the data slot is empty create the data object using the class */
 /* definition of the data transfer object */
   if ( _null_q(*id) ) {
@@ -3881,8 +3750,8 @@ void adix_wdata( ADIobj parid, ADIobj namid, ADIobj *id, ADImta *mta, ADIstatus 
 
 /* Set parent object and name if object created ok */
     if ( _ok(status) ) {
-      _han_pid(*id) = parid;
-      _han_name(*id) = namid;
+      _han_pid(*id) = objreq->parent;
+      _han_name(*id) = objreq->name;
       }
     }
 
@@ -3897,8 +3766,8 @@ void adix_wdata( ADIobj parid, ADIobj namid, ADIobj *id, ADImta *mta, ADIstatus 
     if ( _ok(status) && _han_q(*id) ) {                /* Everything ok? */
 
       _han_set(*id) = ADI__true;
-      if ( _valid_q(parid) )
-	_han_set(parid) = ADI__true;
+      if ( _valid_q(objreq->parent) )
+	_han_set(objreq->parent) = ADI__true;
       }
     }
   }
@@ -3911,9 +3780,7 @@ void adix_new_n( ADIlogical clang, ADIobj pid, char *name, int nlen,
 		 int vsize, ADIobj *id, ADIstatus status )
   {
   ADImta        imta;     		/* MTA for the object */
-  ADIobj        *newid = NULL;          /* The newly created object */
-  ADIobj        parid = ADI__nullid;	/* Object parent */
-  ADIobj        namid = ADI__nullid;	/* Object name */
+  ADIobjRequest	objreq;			/* Object data specification */
   ADIclassDef	*tdef;
 
 /* Check initialised & ok */
@@ -3924,22 +3791,23 @@ void adix_new_n( ADIlogical clang, ADIobj pid, char *name, int nlen,
 
 /* Find data insertion point */
   if ( _valid_q(pid) )                  /* If structured data */
-    adix_locdat( &pid, name, nlen, DA__CREATE, &newid, &parid, &namid,
-		 status );
+    ADIkrnlLocDat( &pid, name, nlen, DA__CREATE, &objreq, status );
   else {
     *id = ADI__nullid;
-    newid = id;
+    objreq.data = id;
+    objreq.parent = ADI__nullid;
+    objreq.name = ADI__nullid;
     }
 
 /* Set up the input channel */
   ADIkrnlMtaInit( 1, ndim, dims, vsize, value, tdef, clang, &imta, status );
 
 /* Write the data */
-  adix_wdata( parid, namid, newid, &imta, status );
+  adix_wdata( &objreq, &imta, status );
 
 /* Everything went ok, and the caller wants the object address back? */
   if ( _ok(status) && id )
-    *id = *newid;
+    *id = *objreq.data;
   }
 
 
@@ -3950,9 +3818,7 @@ void adix_put_n( int clang, ADIobj id, char *name, int nlen,
 		 int vsize, void *value, ADIstatus status )
   {
   ADImta        imta;     		/* Input value MTA */
-  ADIobj        *lid;                   /* Object to be accessed */
-  ADIobj        parid = ADI__nullid;	/* Object parent */
-  ADIobj        namid = ADI__nullid;	/* Object name */
+  ADIobjRequest	objreq;			/* Object data specification */
   ADIclassDef	*tdef;
 
 /* Error if not initialised */
@@ -3971,13 +3837,13 @@ void adix_put_n( int clang, ADIobj id, char *name, int nlen,
     tdef = _cdef_data(*clsid);
 
 /* Find the data insertion point */
-    adix_locdat( &id, name, nlen, DA__CREATE, &lid, &parid, &namid, status );
+    ADIkrnlLocDat( &id, name, nlen, DA__CREATE, &objreq, status );
 
 /* Set up the input channel */
     ADIkrnlMtaInit( 1, ndim, dims, vsize, value, tdef, clang, &imta, status );
 
 /* Write the data */
-    adix_wdata( parid, namid, lid, &imta, status );
+    adix_wdata( &objreq, &imta, status );
     }
   }
 
@@ -4149,29 +4015,26 @@ ADIlogical adix_equal( ADIobj id1, ADIobj id2, ADIstatus status )
 void adix_ccopy( ADIobj in, char *inmem, int inmlen, ADIobj out,
 		 char *outmem, int outmlen, ADIstatus status )
   {
-  ADIobj	*inad;
-  ADIobj	*outad;
+  ADIobjRequest	inreq,outreq;
 
   _chk_init_err; _chk_stat;
 
-  adix_locdat( &in, inmem, inmlen, DA__SET, &inad, NULL, NULL, status );
+/* Locate input and output data slots */
+  ADIkrnlLocDat( &in, inmem, inmlen, DA__SET, &inreq, status );
+  ADIkrnlLocDat( &out, outmem, outmlen, DA__DEFAULT, &outreq, status );
 
 /* Input data located ok? */
   if ( _ok(status) ) {
 
-/* Locate output data slot */
-    adix_locdat( &out, outmem, outmlen, DA__DEFAULT, &outad, NULL,
-		  NULL, status );
-
 /* Non-null copy? */
-    if ( *inad != *outad ) {
+    if ( *inreq.data != *outreq.data ) {
 
 /* Erase existing data */
-      if ( _valid_q(*outad) )
-	adix_erase( outad, 1, status );
+      if ( _valid_q(*outreq.data) )
+	adix_erase( outreq.data, 1, status );
 
 /* Make copy of input */
-      *outad = adix_copy( *inad, status );
+      *outreq.data = adix_copy( *inreq.data, status );
       }
     }
   }
@@ -4597,30 +4460,30 @@ void adix_name( ADIobj id, ADIlogical clang, char *buf, int blen, ADIstatus stat
 
 ADIobj adix_qcls( ADIobj id, char *member, int mlen, ADIstatus status )
   {
-  ADIobj	     *lid;
+  ADIobjRequest	     objreq;
 
   _chk_init_err; _chk_stat_ret(ADI__nullid);
 
 /* Locate data address. Place no requirements on contents */
-  adix_locdat( &id, member, mlen, DA__DEFAULT, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, member, mlen, DA__DEFAULT, &objreq, status );
 
   if ( _ok(status) )
-    return _DTDEF(*lid)->aname;
+    return _DTDEF(*objreq.data)->aname;
   else
     return ADI__nullid;
   }
 
 ADIlogical adix_state( ADIobj id, char *member, int mlen, ADIstatus status )
   {
-  ADIobj	     *lid;
+  ADIobjRequest		objreq;
 
   _chk_init_err; _chk_stat_ret(ADI__nullid);
 
 /* Locate data address. Place no requirements on contents */
-  adix_locdat( &id, member, mlen, DA__DEFAULT, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, member, mlen, DA__DEFAULT, &objreq, status );
 
   if ( _ok(status) )
-    return _krnl_q(*lid) ? _han_set(*lid) : ADI__true;
+    return _krnl_q(*objreq.data) ? _han_set(*objreq.data) : ADI__true;
   else
     return ADI__false;
   }
@@ -4628,17 +4491,49 @@ ADIlogical adix_state( ADIobj id, char *member, int mlen, ADIstatus status )
 
 void adix_cerase( ADIobj id, char *member, int mlen, ADIstatus status )
   {
-  ADIobj        *mid;
+  ADIobjRequest	objreq;			/* Object data specification */
 
   _chk_init_err; _chk_stat;
 
 /* Locate data address. Place no requirements on contents */
-  adix_locdat( &id, member, mlen, DA__DEFAULT,
-		  &mid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, member, mlen, DA__DEFAULT, &objreq, status );
 
-  if ( _valid_q(*mid) ) {
-    adix_erase( mid, 1, status );
-    *mid = ADI__nullid;
+/* Data exists? */
+  if ( _valid_q(*objreq.data) ) {
+
+/* Simple data or class member */
+    if ( objreq.ctype == ADIcmpValue || objreq.ctype == ADIcmpMember ) {
+      adix_erase( objreq.data, 1, status );
+      *objreq.data = ADI__nullid;
+      }
+
+/* Property or structure component */
+    else if ( objreq.ctype == ADIcmpProperty ||
+              objreq.ctype == ADIcmpStruct ) {
+      ADIobj	*odp_car, *odp_cdr, old_dp;
+
+/* The dotted pair to be deleted */
+      old_dp = *objreq.lentry;
+
+/* By-pass old list element */
+      *objreq.lentry = _CDR(*objreq.lentry);
+
+/* Locate addresses of old_dp's car and cdr cells */
+      _GET_CARCDR_A(odp_car,odp_cdr,old_dp);
+
+/* Delete old property and value */
+/*      adix_erase( odp_car, 1, status );
+      adix_erase( odp_cdr, 1, status ); */
+
+/* Delete the list cell, annulling the links first */
+      *odp_car = ADI__nullid;
+      *odp_cdr = ADI__nullid;
+      adix_erase( &old_dp, 1, status );
+      }
+
+/* Structure component */
+    else if ( objreq.ctype == ADIcmpStruct ) {
+      }
     }
   }
 
@@ -4647,29 +4542,27 @@ void adix_putid( ADIobj id, char *name, int nlen, ADIobj value,
 		 ADIstatus status )
   {
   ADImta	imta;
-  ADIobj        *lid;
-  ADIobj        namid;
-  ADIobj        parid;                  /* Parent object identifier */
+  ADIobjRequest	objreq;			/* Object data specification */
 
   _chk_init_err; _chk_stat;
 
 /* Find data insertion point */
-  adix_locdat( &id, name, nlen, DA__CREATE, &lid, &parid, &namid, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__CREATE, &objreq, status );
 
 /* Located ok? */
   if ( _ok(status) ) {
 
 /* Set object slot */
-    if ( _null_q(*lid) ) {
-      *lid = value;
+    if ( _null_q(*objreq.data) ) {
+      *objreq.data = value;
 
       if ( _han_ref(value) == 1 ) {
-	_han_pid(value) = parid;
-	_han_name(value) = namid;
+	_han_pid(value) = objreq.parent;
+	_han_name(value) = objreq.name;
 	}
 
-      if ( _valid_q(parid) )
-	_han_set(parid) = ADI__true;
+      if ( _valid_q(objreq.parent) )
+	_han_set(objreq.parent) = ADI__true;
       }
     else {
 
@@ -4677,7 +4570,7 @@ void adix_putid( ADIobj id, char *name, int nlen, ADIobj value,
       adix_mtaid( value, &imta, status );
 
 /* Write the data */
-      adix_wdata( parid, namid, lid, &imta, status );
+      adix_wdata( &objreq, &imta, status );
       }
     }
   }
@@ -5529,14 +5422,14 @@ ADIobj adix_execi2( ADIobj func, ADIobj arg1, ADIobj arg2,
 
 void adix_id_flush( char *grp, int glen, ADIstatus status )
   {
-  ADIobj        *lvalue;
+  ADIobjRequest	objreq;			/* Object specification */
 
   _chk_init_err; _chk_stat;
 
   adix_pl_find( ADI_G_grplist, &ADI_G_grplist, grp, glen, ADI__false,
-		&lvalue, NULL, NULL, status );
+		&objreq, status );
 
-  if ( lvalue && _ok(status) ) {
+  if ( objreq.data && _ok(status) ) {
     }
   else
     adic_setecs( ADI__INVARG, "Invalid identifier group /%*s/",
@@ -5545,14 +5438,14 @@ void adix_id_flush( char *grp, int glen, ADIstatus status )
 
 void adix_id_link( ADIobj id, char *grp, int glen, ADIstatus status )
   {
-  ADIobj        *lvalue;
+  ADIobjRequest	objreq;			/* Object specification */
 
   _chk_init_err; _chk_stat;
 
   adix_pl_find( ADI_G_grplist, &ADI_G_grplist, grp, glen, ADI__true,
-		&lvalue, NULL, NULL, status );
+		&objreq, status );
 
-  if ( lvalue && _ok(status) ) {
+  if ( objreq.data && _ok(status) ) {
     }
   else
     adic_setecs( ADI__INVARG, "Invalid identifier group /%*s/",
@@ -5675,26 +5568,25 @@ ADIobj adix_newref( ADIobj id, ADIstatus status )
 void adix_putref( ADIobj id, char *name, int nlen, ADIobj rid, ADIstatus status )
   {
   ADIobj	*rdata;
-  ADIobj	*lid;
-  ADIobj	parid,namid;
+  ADIobjRequest	objreq;			/* Object data specification */
 
   _chk_init_err; _chk_stat;
 
 /* Find data insertion point */
-  adix_locdat( &id, name, nlen, DA__CREATE, &lid, &parid, &namid, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__CREATE, &objreq, status );
 
 /* Located ok? */
   if ( _ok(status) ) {
 
-    if ( _obj_q(id) ) {
-      rdata = _obj_data(id);
+    if ( _obj_q(*objreq.data) ) {
+      rdata = _obj_data(*objreq.data);
 
       if ( _valid_q(*rdata) )
 	adix_erase( rdata, 1, status );
 
       *rdata = adix_clone( rid, status );
 
-      _han_set(id) = _valid_q(rid);
+      _han_set(*objreq.data) = _valid_q(rid);
       }
     else
       adic_setecs( ADI__INVARG, "Object is not an object reference", status );
@@ -5704,18 +5596,18 @@ void adix_putref( ADIobj id, char *name, int nlen, ADIobj rid, ADIstatus status 
 
 ADIobj adix_getref( ADIobj id, char *name, int nlen, ADIstatus status )
   {
-  ADIobj	*lid;
+  ADIobjRequest	objreq;			/* Object data specification */
   ADIobj	robj = ADI__nullid;
 
   _chk_init_err; _chk_stat_ret(ADI__nullid);
 
 /* Find data insertion point */
-  adix_locdat( &id, name, nlen, DA__SET, &lid, NULL, NULL, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__SET, &objreq, status );
 
-  if ( _ok(status) && lid ) {
+  if ( _ok(status) && objreq.data ) {
 
-    if ( _obj_q(*lid) )
-      robj = *_obj_data(*lid);
+    if ( _obj_q(*objreq.data) )
+      robj = *_obj_data(*objreq.data);
     else
       adic_setecs( ADI__INVARG, "Object is not an object reference", status );
     }

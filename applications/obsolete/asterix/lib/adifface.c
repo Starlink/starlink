@@ -25,15 +25,11 @@
 *
 *      Property handling :
 *
-*	adi_delprp	 - Delete named property
-*	adi_locprp	 - Locate named property
 *       adi_nprp	 - Return number of properties
 *       adi_indprp	 - Locate property by number
 *
 *      Structure handling :
 *
-*	adi_delcmp	 - Delete named structure component
-*	adi_loccmp	 - Locate named structure component
 *	adi_ncmp	 - Number of components in structure
 *	adi_indcmp	 - Locate structure component by number
 *
@@ -251,35 +247,6 @@ F77_SUBROUTINE(adifn(errctx))( CHARACTER(buf) TRAIL(buf) )
  * Property handling
  * -------------------------------------------------------------------------
  */
-F77_SUBROUTINE(adifn(delprp))( INTEGER(id), CHARACTER(pname), INTEGER(status)
-			    TRAIL(pname) )
-  {
-  GENPTR_INTEGER(id)
-  GENPTR_CHARACTER(pname)
-  GENPTR_INTEGER(status)
-
-  _chk_stat;
-
-  adix_delprp( (ADIobj) *id, pname, pname_length, status );
-
-  _ERR_REP("ADI_DELPRP",Estr__DelObjPrp);
-  }
-
-F77_SUBROUTINE(adifn(locprp))( INTEGER(id), CHARACTER(pname), INTEGER(pid),
-			    INTEGER(status) TRAIL(pname) )
-  {
-  GENPTR_INTEGER(id)
-  GENPTR_CHARACTER(pname)
-  GENPTR_INTEGER(pid)
-  GENPTR_INTEGER(status)
-
-  _chk_stat;
-
-  adix_locprp( (ADIobj) *id, pname, pname_length, (ADIobj *) pid, status );
-
-  _ERR_REP("ADI_DELPRP",Estr__LocObjPrp);
-  }
-
 F77_SUBROUTINE(adifn(nprp))( INTEGER(id), INTEGER(nprp), INTEGER(status) )
   {
   GENPTR_INTEGER(id)
@@ -313,35 +280,6 @@ F77_SUBROUTINE(adifn(indprp))( INTEGER(id), INTEGER(index), INTEGER(pid),
  * Component handling
  * -------------------------------------------------------------------------
  */
-F77_SUBROUTINE(adifn(delcmp))( INTEGER(id), CHARACTER(cname), INTEGER(status)
-			       TRAIL(cname) )
-  {
-  GENPTR_INTEGER(id)
-  GENPTR_CHARACTER(cname)
-  GENPTR_INTEGER(status)
-
-  _chk_stat;
-
-  adix_delcmp( (ADIobj) *id, cname, cname_length, status );
-
-  _ERR_REP( "ADI_DELCMP", Estr__DelStrCmp );
-  }
-
-F77_SUBROUTINE(adifn(loccmp))( INTEGER(id), CHARACTER(cname), INTEGER(cid),
-			       INTEGER(status) TRAIL(cname) )
-  {
-  GENPTR_INTEGER(id)
-  GENPTR_CHARACTER(cname)
-  GENPTR_INTEGER(cid)
-  GENPTR_INTEGER(status)
-
-  _chk_stat;
-
-  adix_loccmp( (ADIobj) *id, cname, cname_length, (ADIobj *) cid, status );
-
-  _ERR_REP( "ADI_LOCCMP", Estr__LocStrCmp );
-  }
-
 F77_SUBROUTINE(adifn(ncmp))( INTEGER(id), INTEGER(ncmp), INTEGER(status) )
   {
   GENPTR_INTEGER(id)

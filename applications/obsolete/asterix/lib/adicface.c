@@ -25,15 +25,11 @@
 *
 *      Property handling :
 *
-*	adic_delprp	- Delete named property
-*	adic_locprp	- Locate named property
 *       adic_nprp	- Return number of properties
 *       adic_indprp	- Locate property by number
 *
 *      Structure handling :
 *
-*	adic_delcmp	- Delete named structure component
-*	adic_loccmp	- Locate named structure component
 *	adic_ncmp	- Number of components in structure
 *	adic_indcmp	- Locate structure component by number
 *
@@ -233,24 +229,6 @@ void adic_errctx( char *buf, int buflen )
  * Property handling
  * -------------------------------------------------------------------------
  */
-void adic_delprp( ADIobj id, char *pname, ADIstatus status )
-  {
-  _chk_stat;
-
-  adix_delprp( id, pname, _CSM, status );
-
-  _ERR_REP("adic_delprp",Estr__DelObjPrp);
-  }
-
-void adic_locprp( ADIobj id, char *pname, ADIobj *pid, ADIstatus status )
-  {
-  _chk_stat;
-
-  adix_locprp( id, pname, _CSM, pid, status );
-
-  _ERR_REP("adic_locprp",Estr__LocObjPrp);
-  }
-
 void adic_nprp( ADIobj id, int *nprp, ADIstatus status )
   {
   _chk_stat;
@@ -273,24 +251,6 @@ void adic_indprp( ADIobj id, int index, ADIobj *pid, ADIstatus status )
  * Structure handling
  * -------------------------------------------------------------------------
  */
-void adic_delcmp( ADIobj id, char *cname, ADIstatus status )
-  {
-  _chk_stat;
-
-  adix_delcmp( id, cname, _CSM, status );
-
-  _ERR_REP("adic_delcmp",Estr__DelStrCmp);
-  }
-
-void adic_loccmp( ADIobj id, char *cname, ADIobj *cid, ADIstatus status )
-  {
-  _chk_stat;
-
-  adix_loccmp( id, cname, _CSM, cid, status );
-
-  _ERR_REP("adic_loccmp",Estr__LocStrCmp);
-  }
-
 void adic_ncmp( ADIobj id, int *ncmp, ADIstatus status )
   {
   _chk_stat;
