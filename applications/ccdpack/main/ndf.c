@@ -493,7 +493,7 @@
                   int one = 1;
                   int icard;
                   F77_POINTER_TYPE ipfits;
-                  DECLARE_CHARACTER( fkey, keyleng );
+                  DECLARE_CHARACTER( fkey, 80 );
                   DECLARE_CHARACTER( fvalue, 80 );
                   cnfExprt( key, fkey, keyleng );
                   ipfits = cnfFptr( ndf->fits.data );
