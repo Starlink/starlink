@@ -73,9 +73,19 @@ ira_dtoc1.f ira_exprt.f ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f \
 ira_gtscs.f ira_init.f ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f \
 ira_seteq.f ira_trans.f ira_write.f ira_read.f
 
-# The contents of the kapgen_sub.tar file:
+# The source RCS files needed to create the kapgen_sub.tar file:
+KAPGEN_SOURCES = $(KAPGEN_NONGEN) $(KAPGEN_GEN)
 
-KAPGEN_SUB = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
+# The contents of the kapgen_sub.tar file (including expanded generic
+# files and the generic source files):
+KAPGEN_SUB = $(KAPGEN_SOURCES) kpg1_darar.f kpg1_darad.f kpg1_darai.f \
+kpg1_daraw.f kpg1_darab.f kpg1_daraub.f kpg1_darauw.f
+
+# Generic source files needed for kapsub_sub.tar:
+KAPGEN_GEN = kpg1_dara.gen
+
+# Non-generic source files needed for kapgen_sub.tar:
+KAPSUB_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
 bad2dr.f bad2dub.f bad2duw.f bad2dw.f bttn3.f chvalb.f chvali.f chvall.f \
 chvalr.f chvalw.f copad.f copai.f copar.f copy1d.f copy2d.f copy3d.f \
 cpsecr.f creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f elnmbr.f \
@@ -381,7 +391,7 @@ kps1_sparub.f kps1_sparuw.f kps1_sparw.f kps1_pgftb.f kps1_pgftd.f kps1_pgfti.f 
 kps1_pgftr.f kps1_pgftub.f kps1_pgftuw.f kps1_pgftw.f 
 
 # Generic source files needed for kapsub_sub.tar:
-KAPSUB_GEN = kps1_sparx.gen kps1_pgftx.gen
+KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen
 
 # Non-generic source files needed for kapsub_sub.tar:
 KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
