@@ -453,14 +453,10 @@ sub par_get ($$$) {
 
 sub fits_read_header ($) {
 
-  use strict;
-
-  croak 'Usage: ($hashref, $status) = fits_read_header($file)'
-    if $#_!=0;
+#  Usage: ($hashref, $status) = fits_read_header($file)
 
   # Variable declarations
-  my ($indf, $xloc, %fitsitem, $status);
-  
+  my ($indf, %fitsitem, $status);
   my $task = "NDF::fits_read_header";
 
   my $file = shift;
@@ -480,9 +476,9 @@ sub fits_read_header ($) {
   ndf_find(&DAT__ROOT(), $file, $indf, $status);
 
   if ($status == $good) {
-    
+
     # Find the FITS extension
-    ndf_xloc($indf, 'FITS', 'READ', $xloc, $status);
+    ndf_xloc($indf, 'FITS', 'READ', my $xloc, $status);
 
     if ($status == $good) {
 
@@ -495,7 +491,7 @@ sub fits_read_header ($) {
       dat_shape($xloc, $maxdim, \@dim, $ndim, $status);
 
       if ($status == $good) {
- 
+
 	if ($ndim != 1) {
 	  $status = &SAI__ERROR;
 	  err_rep(' ',"$task: Dimensionality of FITS array should be 1 but is $ndim", $status);
@@ -510,13 +506,17 @@ sub fits_read_header ($) {
       # Read the FITS extension
       dat_get1c($xloc, $dim[0], \@fits, $nfits, $status);
 
+      # Annul the locator
+      dat_annul($xloc, $status);
+
       # Check status and read into hash
       if ($status == $good) {
 
-	my $i = 0;
-
-	for ($i = 0; $i < $nfits; $i++) {
-	  my ($item, $value, $comment) = fits_get_nth_item(\@fits,$i);
+	# Could use map{} if we were not worried about null keys
+	# or the END FITS tag
+	for (@fits) {
+	  my ($item, $value, $comment) = fits_extract_key_val($_);
+	  next if $item eq 'END';
 	  $fitsitem{$item} = $value if defined $value;
 	}
 
@@ -525,9 +525,6 @@ sub fits_read_header ($) {
 	err_rep(' ',"$task: Error reading FITS array", $status);
 
       }
-
-      # Anull the locator
-      dat_annul($xloc, $status);
 
     } else {
 
@@ -541,7 +538,7 @@ sub fits_read_header ($) {
     ndf_annul($indf, $status);
 
   } else {
-    
+
     # An error message to make sure we got here
     err_rep(' ',"$task: Error opening NDF file", $status);
 
@@ -565,20 +562,10 @@ sub fits_read_header ($) {
 #  Input:   Array reference to FITS array
 #           Number of FITS item in array
 
-#  Return:  Keyword and value
+#  Return:  Keyword and value and comment
 
 sub fits_get_nth_item (\@$) {
-
-  my ($keyword, $value, $comment);
-  my ($fitsref, $n) = @_;
-
-  # Split up keyword and value
-
-  ($keyword, $value, $comment) = fits_extract_key_val($$fitsref[$n]);
-
-  # Now return keyword and value
-  return ($keyword, $value, $comment);
-
+  return fits_extract_key_val($_[0]->[$_[1]]);
 }
 
 # Routine to find FITS value corresponding to given keyword
@@ -608,21 +595,14 @@ sub fits_get_item (\@$) {
 }
 
 # Routine to extract a value and keyword from a FITS-like string
- 
+
 sub fits_extract_key_val ($) {
 
-  my $fits_entry = shift;
-  my ($keyword, $value, $comment);
-
-  undef $value;
-
-  $keyword = $value = $comment = undef;
   # Extract the value
-  ($keyword, $value, $comment) = split(/=|\s\//,$fits_entry);
+  my ($keyword, $value, $comment) = split(/=|\s\//,$_[0]);
 
   # Return if no value
   return ($keyword, '', '') unless defined $value;
-
 
   # Tidy up the keyword
   $keyword =~ s/\s//g;    # Remove white space
@@ -632,8 +612,8 @@ sub fits_extract_key_val ($) {
   $value =~ s/^\s+//;  # Remove leading whitespace
   $value =~ s/\s+$//;  # Remove trailing whitespace
 
-  $value = '' unless ($value =~ /./);
-  $keyword = "NONE" unless ($keyword =~ /./);
+  $value = '' unless length($value);
+  $keyword = "NONE" unless length($keyword);
 
   return($keyword, $value, $comment);
 }
@@ -848,7 +828,7 @@ via fits_get_item and fits_get_nth_item.
 For example, to list all the values and keywords:
 
 
-   for ($i=0; $i <= $#fits; $i++) {
+   for my $i (0..$#fits) {
     ($keyword, $value, $comment) = fits_get_nth_item(@fits, $i);
     print "$i: $keyword\t $value\n";
    }
@@ -884,7 +864,7 @@ reads the FITS extension and returns the reference to a hash array:
 
 The FITS entries can then be accessed as $$hashref{'ITEM'}.
 This takes the filename as an argument and returns the Starlink status.
-
+This routine ignores the FITS header END record.
 
 =head1 NOTES
 
