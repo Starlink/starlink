@@ -75,10 +75,17 @@ dnl   Find working tools
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PATH_PROG(PERL, perl)
+AC_PATH_PROG(ACLOCAL, aclocal, unknown)
 AC_PROG_AWK
 
 AC_PATH_PROG([JAVAC], [javac], [NOJAVAC])
 AC_ARG_VAR([JAVAC], [Location of java compiler])
+
+if test "$ACLOCAL" = unknown; then
+    AC_MSG_ERROR([Can't find aclocal -- have the autotools been installed?])
+fi
+AUTOCONF_MACRO_DIR=`$ACLOCAL --print-ac-dir`
+AC_SUBST(AUTOCONF_MACRO_DIR)
 
 
 # Convert the version number in PACKAGE_VERSION into an integer

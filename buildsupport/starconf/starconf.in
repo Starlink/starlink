@@ -19,7 +19,8 @@ ln_s="@LN_S@"
 versionint="@PACKAGE_VERSIONINT@"
 version="@PACKAGE_VERSION@"
 finder=@bindir@/starconf-finder
-autoconf_aclocal=@ACLOCAL@
+
+progname=$0
 
 # Default all the variables which can be inherited from the environment.
 : ${STARCONF_DEFAULT_STARLINK=@STARCONF_DEFAULT_STARLINK@}
@@ -56,16 +57,16 @@ if test $# -gt 0; then
     --help)
         echo "starconf @PACKAGE_VERSION@: configure Starlink build directories"
         echo "Usage:"
-        echo "    $0"
+        echo "    $progname"
         echo "        Configure directory"
-        echo "    $0 --show [--all | variable ...]"
+        echo "    $progname --show [--all | variable ...]"
         echo "        List configuration information:"
         echo "        [variables:$allshowvars]"
-        echo "    $0 [--help | --version]"
+        echo "    $progname [--help | --version]"
         echo "        Show help/version"
         exit 0
         ;;
-    *)  echo "Usage: $0 [--show variable...]"
+    *)  echo "Usage: $progname [--show variable...]"
         exit 1
         ;;
     esac
@@ -80,7 +81,7 @@ fi
 if test -r configure.ac -a Makefile.am; then
     : OK
 else
-    echo "$0: can't find readable configure.ac and Makefile.am"
+    echo "$progname: can't find readable configure.ac and Makefile.am"
     echo "    ...see $buildsupportdata for templates"
     exit 1
 fi
@@ -95,41 +96,40 @@ if test -x $buildsupportbin/starconf-validate; then
     if $buildsupportbin/starconf-validate --force .; then
         : OK
     else
-        echo "$0: Configuration not valid -- fix above errors first"
+        echo "$progname: Configuration not valid -- fix above errors first"
         exit 1
     fi
 fi
 
 # Scan configure.ac, examining all the used STAR_* macros
 found_star_defaults=false
-sed -n 's/^\(STAR[_A-Z]*\).*/\1/p' configure.ac | \
-    while read macro
-    do
-        # Certain macros depend on certain additional files.  Scan the list of
-        # used macros, and add the required files to $extrachunks.  There are
-        # currently no macros in starconf.m4.in which require such files, but
-        # if they are added, the dependencies should be documented here.
-        case $macro in
-            STAR_DEFAULTS)
-                found_star_defaults=true
-                ;;
-            *) ;;
-        esac
-    done
+for macro in `sed -n 's/^\(STAR[_A-Z]*\).*/\1/p' configure.ac`
+do
+    # Certain macros depend on certain additional files.  Scan the list of
+    # used macros, and add the required files to $extrachunks.  There are
+    # currently no macros in starconf.m4.in which require such files, but
+    # if they are added, the dependencies should be documented here.
+    case $macro in
+        STAR_DEFAULTS)
+            found_star_defaults=:
+            ;;
+        *) ;;
+    esac
+done
 
 # Check that we did find a STAR_DEFAULTS macro in the configure.ac,
 # and object if we didn't.
-if $found_star_default; then
+if $found_star_defaults; then
     : OK
 else
-    echo "$0: configure.ac has no STAR_DEFAULTS macro"
+    echo "$progname: configure.ac has no STAR_DEFAULTS macro"
     exit 1
 fi
 
 # Similarly, scan Makefile.am and check that it NO LONGER includes
 # Makefile.starconf
 if grep 'include .*Makefile.starconf' Makefile.am >/dev/null; then
-    echo "$0: Makefile.am still includes \$(srcdir)/Makefile.starconf"
+    echo "$progname: Makefile.am still includes \$(srcdir)/Makefile.starconf"
     exit 1
 else
     : OK -- should not be there
@@ -143,19 +143,33 @@ test -e componentinfo.dtd || {
     $ln_s $buildsupportdata/componentinfo.dtd componentinfo.dtd
 }
 
-
-
-# We would like to check here that the default prefix/starlink which
-# autoconf will configure in (because of the starconf.m4 macro set
-# that aclocal has included) matches the prefix/starlink corresponding
-# to this installation of starconf.  However, there's no realistic way
-# to do this, since the user could always subvert it by deliberately
-# or accidentally using a completely different autoconf; thus avoid
-# trying, on the grounds that this is preferable to the false security
-# of reporting a wrong result.  This is a job for a separate
-# starconf-validate or starconf-status tool, which reports this sort
-# of stuff by inspection of the configured files in a directory.
-
+# Find aclocal, and confirm that "aclocal --print-ac-dir" is the same
+# directory in which starconf.m4 was installed (@AUTOCONF_MACRO_DIR@).
+#
+# The user can still subvert this, by changing their aclocal path
+# afterwards, but we can check that nothing is outrageously wrong here.
+# Either starconf-validate or a separate starconf-status script could
+# probably do better.
+set `IFS=:; echo $PATH`
+aclocalpath=
+for bindir
+do
+    if test -x "$bindir/aclocal"; then
+        aclocalpath="$bindir/aclocal"
+        break
+    fi
+done
+if test -z "$aclocalpath"; then
+    echo "Error: I can't find aclocal in the path!" >&2
+    exit 1
+elif test "`$aclocalpath --print-ac-dir`" != "@AUTOCONF_MACRO_DIR@"; then
+    echo "Error: The \$PATH aclocal ($aclocalpath)" >&2
+    echo "  looks for extension macros in" `$aclocalpath --print-ac-dir` >&2
+    echo "  but starconf extension were installed in" >&2
+    echo "  @AUTOCONF_MACRO_DIR@." >&2
+    echo "  You need to fix your path and rerun starconf" >&2
+    exit 1
+fi
 
 
 # Start writing the starconf.status file; send output to FD 4
@@ -247,19 +261,19 @@ if test -e bootstrap; then
         # do nothing -- file has been modified
         unpack_this=false
     elif test -n "$file_version" -a "$file_version" -lt @PACKAGE_VERSIONINT@; then
-        unpack_this=true
+        unpack_this=:
     else
         # no need to do anything
         unpack_this=false
     fi
 else
     # file doesn't exist, so unpack it
-    unpack_this=true
+    unpack_this=:
 fi
 if $unpack_this; then
     echo "Creating bootstrap"
     cat >bootstrap <<\_STARCONF_EOD
-##INCLUDE bootstrap.installed
+XXXINCLUDE bootstrap.installed
 _STARCONF_EOD
     chmod +x bootstrap
 else

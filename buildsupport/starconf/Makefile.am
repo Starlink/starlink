@@ -14,6 +14,8 @@ pkgdata_DATA = \
 # True?
 # CLEANFILES=starconf
 
+AUTOCONF_MACRO_DIR = @AUTOCONF_MACRO_DIR@
+
 # The edits of replacement variables (prefix and co) in
 # starlink.m4.in and starconf.in must be done at `make' time rather
 # than configure time (ie, not using AC_OUTPUT).  Do these by hand.
@@ -32,29 +34,31 @@ edit = @PERL@ -p \
 	-e 's,\@STARCONF_DEFAULT_STARLINK\@,@STARCONF_DEFAULT_STARLINK@,g;' \
 	-e 's,\@STARCONF_DEFAULT_PREFIX\@,@STARCONF_DEFAULT_PREFIX@,g;' \
 	-e 's,\@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g;' \
-	-e 's,\@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g;'
+	-e 's,\@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g;'\
+	-e 's,\@AUTOCONF_MACRO_DIR\@,$(AUTOCONF_MACRO_DIR),g;' \
+	-e '/^XXXINCLUDE *(\S*)/ && do { open (F, "<$$1") || die "Unable to open $$1"; while(<F>) { print; } close (F); };'
 starconf: starconf.in bootstrap.installed
 	rm -f starconf starconf.tmp
-	$(edit) \
-	    -e '/^##INCLUDE *(\S*)/ && do { open (F, "<$$1") || die "Unable to open $$1"; while(<F>) { print; } close (F); };' \
-	    $(srcdir)/starconf.in >starconf.tmp
+	$(edit) $(srcdir)/starconf.in >starconf.tmp
 	mv starconf.tmp starconf
 	chmod +x starconf
 
 
 # The starconf.m4 file should be installed in the place where aclocal
-# expects to find macro files.
+# expects to find macro files.  The result of "aclocal --print-ac-dir"
+# is substituted in $(MACRO_AC_DIR).  Check this directory exists
+# before we install things there, but don't create it if not -- if it
+# isn't there, something else is wrong, since aclocal should be
+# installed before starconf is.
 install-data-local: starconf.m4
-	test -x $(bindir)/aclocal || { \
-	    echo "No $(bindir)/aclocal found" >&2; \
+	test -d $(AUTOCONF_MACRO_DIR) || { \
+	    echo "No aclocal directory $(AUTOCONF_MACRO_DIR) found -- has automake been installed?" >&2; \
 	    false; \
 	}
-	inst=`$(bindir)/aclocal --print-ac-dir`; \
-	    test -n "$$inst" && \
-	    $(INSTALL_DATA) starconf.m4 $$inst && \
-	    if test -n "$$MANIFEST_FILE"; then \
-	        echo $$inst/starconf.m4 >>$$MANIFEST_FILE; \
-	    else :; fi
+	$(INSTALL_DATA) starconf.m4 $(AUTOCONF_MACRO_DIR)
+	if test -n "$$MANIFEST_FILE"; then \
+	    echo $(AUTOCONF_MACRO_DIR)/starconf.m4 >>$$MANIFEST_FILE; \
+	else :; fi
 
 # Magic: If there exists a bin directory at
 # @STARCONF_DEFAULT_PREFIX@/bin, then install links to the starconf
