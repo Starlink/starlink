@@ -242,8 +242,10 @@
 
       IF (N_GOOD .EQ. 0) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP (' ', 'SCULIB_FIT_2D_PARABOLA: no valid data',
-     :     STATUS)
+         CALL MSG_SETI('N', N)
+         CALL ERR_REP (' ', 'SCULIB_FIT_2D_PARABOLA: no valid data '//
+     :        ' in ^N input points',STATUS)
+
       ELSE
 
 *  construct matrix
