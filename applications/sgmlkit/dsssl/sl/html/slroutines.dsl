@@ -492,9 +492,7 @@ $Id$
 	(make element gi: "dt"
 	      (make element gi: "strong"
 		    (process-node-list name)
-		    (literal (string-append " = " 
-                                            (data type)
-                                            " ("
+		    (literal (string-append " = " (data type) " ("
 					    (cond
 					     ((and given-att returned-att)
 					      "Given and Returned")
@@ -502,10 +500,9 @@ $Id$
 					     (returned-att "Returned")
 					     (else ;default is given
 					      "Given"))
-                                            ")"
 					    (if opt-att
-						(string-append ", " opt-att)
-						"")))))
+						(string-append "), " opt-att)
+						")")))))
 	(make element gi: "dd"
 	      (with-mode routine-ref-plain
 		(process-node-list desc))))))
@@ -726,7 +723,19 @@ $Id$
 
 (element coderef
   (let* ((cc (node-list-or-false
-	      (element-with-id (attribute-string (normalize "collection")))))
+	      ;; If there's a collection attribute, then it
+	      ;; provides the ID of a codecollection element.  If
+	      ;; this attribute isn't present, then use instead
+	      ;; the _first_ (which includes the only)
+	      ;; codecollection element in the document.
+	      (if (attribute-string (normalize "collection"))
+		  (element-with-id
+		   (attribute-string (normalize "collection")))
+		  (node-list-first
+		   (select-elements
+		    (select-by-class (descendants (getdocbody))
+				     'element)
+		    'codecollection)))))
 	 (ccdoc (and cc
 		     (document-element-from-entity
 		      (attribute-string (normalize "doc") cc))))
@@ -748,9 +757,12 @@ $Id$
 		  (with-mode section-reference
 		    (process-node-list targetroutine))
 		  (literal linktext)))
-	(error (string-append "Can't locate routine "
+	(error (string-append "Can't locate routine with ID "
 			      (attribute-string (normalize "id"))
-			      " within collection "
-			      (attribute-string (normalize "collection"))
-			      )))))
+			      (if (attribute-string (normalize "collection"))
+				  (string-append
+				   " within codecollection with ID "
+				   (attribute-string
+				    (normalize "collection")))
+				  " in default codecollection"))))))
 
