@@ -65,8 +65,10 @@
           ENDIF
 
         ELSE
-          CALL MSG_PRNT('AST_ERR: invalid graphics context -'//CONTEXT)
+          CALL MSG_SETC( 'C', CONTEXT )
           STATUS=SAI__ERROR
+          CALL ERR_REP( ' ', 'Invalid graphics context - ^C',
+     :                  STATUS )
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -545,7 +547,7 @@ C        ENDIF
         CALL PSX_GETPID(PID,STATUS)
 
 *  Ignores bits 16-31 and converts to unsigned by ignoring sign bit
-        PID = IAND(PID,LOW16)
+        PID = AND(PID,LOW16)
         NAME(1:1) = CHAR(PID/256)
         NAME(2:2) = CHAR(MOD(PID,256))
         NAME(3:) = 'CONTROL'			! For [C]ontrol block

@@ -421,7 +421,8 @@
 
       ELSE
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Unknown psf hint /'//HINT//'/', STATUS )
+        CALL MSG_SETC( 'H', HINT )
+        CALL ERR_REP( ' ', 'Unknown psf hint /^H/', STATUS )
 
       END IF
 
@@ -979,8 +980,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Local data :
 *
       REAL			RADS(NRAD)		! Radial bnds (arcmin)
-        DATA                	RADS/2.0,4.0,6.0,8.0,13.0,17.0/
       INTEGER			AZIM(NRAD)
+        DATA                	RADS/2.0,4.0,6.0,8.0,13.0,17.0/
         DATA			AZIM/5,10,9,35,0,0/
 *-
 
@@ -1146,13 +1147,14 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
 *    Local variables :
 *
-      CHARACTER*20		HDUTYPE			! HDU type
+      CHARACTER*132             PFILE                   ! Psf file name
 
       REAL			SUM			! Normalisation
 
       INTEGER			BSIZE			! FITS block factor
       INTEGER			CPTR			! Cursor over data
       INTEGER			FSTAT			! FITSIO status
+      INTEGER                   HDUTYPE                 ! HDU type from FITSIO
       INTEGER			IE			! Loop over energy
       INTEGER			LUN			! Logical unit
 
@@ -1167,10 +1169,11 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *    Open file
       FSTAT = 0
-      CALL FTOPEN( LUN, AS_CALDB(:AS_CALDBL)//'/data/asca/'//FORM/
-     : /'/bcf/psf/'//FILE(:CHR_LEN(FILE)), 0, BSIZE, FSTAT )
-      CALL MSG_SETC( 'FILE', AS_CALDB(:AS_CALDBL)//'/data/asca/'//FORM/
-     :               /'/bcf/psf/'//FILE )
+      PFILE = AS_CALDB(:AS_CALDBL)//'/data/asca/'//FORM/
+     :              /'/bcf/psf/'//FILE(:CHR_LEN(FILE))
+
+      CALL FTOPEN( LUN, PFILE, 0, BSIZE, FSTAT )
+      CALL MSG_SETC( 'FILE', PFILE )
       IF ( FSTAT .NE. 0 ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Unable to open calibration file ^FILE',
@@ -1413,7 +1416,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
       ELSE
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Unknown psf hint /'//HINT//'/', STATUS )
+        CALL MSG_SETC( 'H', HINT )
+        CALL ERR_REP( ' ', 'Unknown psf hint /^H/', STATUS )
 
       END IF
 
@@ -2891,7 +2895,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       ELSE
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Unknown psf hint /'//HINT//'/', STATUS )
+        CALL MSG_SETC( 'H', HINT )
+        CALL ERR_REP( ' ', 'Unknown psf hint /^H/', STATUS )
 
       END IF
 
@@ -5082,7 +5087,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       ELSE
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Unknown psf hint /'//HINT//'/', STATUS )
+        CALL MSG_SETC( 'H', HINT )
+        CALL ERR_REP( ' ', 'Unknown psf hint /^H/', STATUS )
 
       END IF
 

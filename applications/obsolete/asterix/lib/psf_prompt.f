@@ -657,6 +657,8 @@
 *
 *    Local variables :
 *
+      CHARACTER*40             RSN
+
       INTEGER                  BEG, IC                 ! Character pointer
       INTEGER                  IR                      ! Loop over r bins
       INTEGER                  N1, N2                  ! More pointers
@@ -697,14 +699,14 @@
 *    Locate bracket
       IC = INDEX( STR, '(' ) + 1
 
-*    Next item is the psf name
+*  Next item is the psf name
       CALL CHR_FIWS( STR, IC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
 	CALL MSG_SETC( 'REASON', 'Missing psf name' )
 	GOTO 99
       END IF
 
-*    Find end of psf name, and look for psf in tables
+*  Find end of psf name, and look for psf in tables
       BEG = IC
       DO WHILE ( CHR_ISALF(STR(IC:IC)) .OR. (STR(IC:IC).EQ.'_') )
 	IC = IC + 1
@@ -713,11 +715,12 @@
       CALL PSF_CHKLIBRTN( ' ', STR(BEG:IC), P_LIBID(SLOT),
      :                             P_MODID(SLOT), STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
-	CALL MSG_SETC( 'REASON', 'Unknown psf /'//STR(BEG:IC) )
+        RSN = 'Unknown psf /'//STR(BEG:IC)//'/'
+        CALL MSG_SETC( 'REASON', RSN )
 	GOTO 99
       END IF
 
-*    Locate comma
+*  Locate comma
       IC = IC + 1
       IF ( STR(IC:IC) .NE. ',' ) THEN
 	CALL MSG_SETC( 'REASON', 'Comma expected' )
