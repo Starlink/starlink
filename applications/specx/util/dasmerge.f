@@ -43,6 +43,8 @@
 *      4 Jun 1997 (rpt):
 *          added poor-mans support for wideband: uses concatsp
 *          and three merges rather than one merge on all quadrants
+*     12 April 2004 (timj):
+*          Tidy up header
 *     {enter_further_changes_here}
  
 *
@@ -53,6 +55,12 @@
       
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
+
+* Returned variables:
+      INTEGER NDROP             ! Number of channels to drop
+      LOGICAL ADJQUAD           ! Adjust quadrant offsets?
+      LOGICAL WIDEBAND          ! Wideband mode?
+
  
 * Local variables:
       INTEGER FINC               ! Frequency increment (Hz)
@@ -60,12 +68,9 @@
       INTEGER NOVER              ! Size of overlap
       INTEGER NUSE               ! Half number of channels to drop
       INTEGER JDEF               ! Returned by GENLIB
-      INTEGER NDROP              ! Number of channels to drop
       REAL*8  FEDGE(2)           ! Frequency boundaries of overlap
-      LOGICAL ADJQUAD            ! Adjust quadrant offsets?
-      LOGICAL WIDEBAND           ! Wideband mode?
 
-* Global variables:
+* Given and returned:
       INTEGER IFAIL              ! Don't know what to do with this'
 
 
@@ -74,6 +79,11 @@
       INCLUDE 'FLAGCOMM'         ! Needed for ILOUT
 
 
+      IF (IFAIL .NE. 0) RETURN
+
+      JDEF = 0
+      ADJQUAD = .FALSE.
+      WIDEBAND = .FALSE.
 
       IF (NQUAD .GT. 1) THEN
 
@@ -98,8 +108,10 @@
          NUSE = INT(0.5 * NOVER)
          CALL GEN_GETI4('Number of overlap channels to use? ',
      +        NUSE,'I4',NUSE,JDEF)
+         JDEF = 0
          CALL GEN_YESNO ('Adjust any DC offset quadrants? ', .FALSE.,
      +        ADJQUAD, JDEF)
+         JDEF = 0
          CALL GEN_YESNO ('Wideband mode (also merge Y spectrum)? ',
      +        .FALSE., WIDEBAND, JDEF)
 
@@ -161,17 +173,27 @@ C---------------------------------------------------------------------
       SUBROUTINE DODASMERGE( NDROP , ADJQUAD, WIDEBAND, IFAIL )
 
       IMPLICIT NONE
+
+*  Arguments Given
       INTEGER NDROP
-      INTEGER IFAIL
-      INTEGER NQ
-      INTEGER ICHECK
-      INTEGER ISLCTQ
       LOGICAL ADJQUAD
       LOGICAL WIDEBAND
- 
+
+*  Arguments Given & Returned
+      INTEGER IFAIL
+
+*  Global variables
       INCLUDE 'FLAGCOMM'
       INCLUDE 'SPECX_PARS'
       REAL XSCALE (2*LSPMAX)
+
+*  Local Variables
+      INTEGER NQ
+      INTEGER ICHECK
+      INTEGER ISLCTQ
+
+*  External subroutine
+      EXTERNAL MERGE
 
 C First check status
       IF(ICHECK(1,IFAIL).NE.1) THEN
