@@ -1,5 +1,5 @@
 /* To do:
-      o Look at implementing other bitwise operators.
+      o Prototype user docs for expression syntax.
       o Implement random number generators.
       o Add Seed attribute for above.
       o Write Fortran interface.
@@ -80,6 +80,7 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* Module Variables. */
@@ -99,80 +100,108 @@ static void (* parent_setattrib)( AstObject *, const char * );
 /* This declaration enumerates the operation codes recognised by the
    virtual machine which evaluates arithmetic expressions. */
 typedef enum {
-   OP_NULL,                      /* Null operation */
+
+/* User-supplied constants and variables. */
    OP_LDCON,                     /* Load constant */
    OP_LDVAR,                     /* Load variable */
+
+/* System constants. */
    OP_LDBAD,                     /* Load bad value (AST__BAD) */
+   OP_LDDIG,                     /* Load # decimal digits (DBL_DIG) */
+   OP_LDEPS,                     /* Load relative precision (DBL_EPSILON) */
+   OP_LDMAX,                     /* Load largest value (DBL_MAX) */
+   OP_LDMAX10E,                  /* Max. decimal exponent (DBL_MAX_10_EXP) */
+   OP_LDMAXE,                    /* Load maximum exponent (DBL_MAX_EXP) */
+   OP_LDMDIG,                    /* Load # mantissa digits (DBL_MANT_DIG) */
+   OP_LDMIN,                     /* Load smallest value (DBL_MIN) */
+   OP_LDMIN10E,                  /* Min. decimal exponent (DBL_MIN_10_EXP) */
+   OP_LDMINE,                    /* Load minimum exponent (DBL_MIN_EXP) */
    OP_LDRAD,                     /* Load floating radix (FLT_RADIX) */
    OP_LDRND,                     /* Load rounding mode (FLT_ROUNDS) */
-   OP_LDMDIG,                    /* Load # mantissa digits (DBL_MANT_DIG) */
-   OP_LDDIG,                     /* Load # decimal digits (DBL_DIG) */
-   OP_LDMINE,                    /* Load minimum exponent (DBL_MIN_EXP) */
-   OP_LDMIN10E,                  /* Min. decimal exponent (DBL_MIN_10_EXP) */
-   OP_LDMAXE,                    /* Load maximum exponent (DBL_MAX_EXP) */
-   OP_LDMAX10E,                  /* Max. decimal exponent (DBL_MAX_10_EXP) */
-   OP_LDMAX,                     /* Load largest value (DBL_MAX) */
-   OP_LDEPS,                     /* Load relative precision (DBL_EPSILON) */
-   OP_LDMIN,                     /* Load smallest value (DBL_MIN) */
-   OP_LDPI,                      /* Load pi */
+
+/* Mathematical constants. */
    OP_LDE,                       /* Load e (base of natural logarithms) */
-   OP_NOT,                       /* Boolean NOT */
-   OP_NEG,                       /* Negate (change sign) */
+   OP_LDPI,                      /* Load pi */
+
+/* Functions with one argument. */
+   OP_ABS,                       /* Absolute value (sign removal) */
+   OP_ACOS,                      /* Inverse cosine (radians) */
+   OP_ACOSD,                     /* Inverse cosine (degrees) */
+   OP_ASIN,                      /* Inverse sine (radians) */
+   OP_ASIND,                     /* Inverse sine (degrees) */
+   OP_ATAN,                      /* Inverse tangent (radians) */
+   OP_ATAND,                     /* Inverse tangent (degrees) */
+   OP_CEIL,                      /* C ceil function (round up) */
+   OP_COS,                       /* Cosine (radians) */
+   OP_COSD,                      /* Cosine (degrees) */
+   OP_COSH,                      /* Hyperbolic cosine */
+   OP_EXP,                       /* Exponential function */
+   OP_EXP2,                      /* Exponent of 2 from C frexp function */
+   OP_FLOOR,                     /* C floor function (round down) */
+   OP_FR2,                       /* Normalised fraction from C frexp fn */
+   OP_INT,                       /* Integer value (round towards zero) */
    OP_ISBAD,                     /* Test for bad value */
-   OP_SQRT,                      /* Square root */
    OP_LOG,                       /* Natural logarithm */
    OP_LOG10,                     /* Base 10 logarithm */
-   OP_EXP,                       /* Exponential */
-   OP_SIN,                       /* Sine (radians) */
-   OP_COS,                       /* Cosine (radians) */
-   OP_TAN,                       /* Tangent (radians) */
-   OP_SIND,                      /* Sine (degrees) */
-   OP_COSD,                      /* Cosine (degrees) */
-   OP_TAND,                      /* Tangent (degrees) */
-   OP_ASIN,                      /* Inverse sine (radians) */
-   OP_ACOS,                      /* Inverse cosine (radians) */
-   OP_ATAN,                      /* Inverse tangent (radians) */
-   OP_ASIND,                     /* Inverse sine (degrees) */
-   OP_ACOSD,                     /* Inverse cosine (degrees) */
-   OP_ATAND,                     /* Inverse tangent (degrees) */
-   OP_SINH,                      /* Hyperbolic sine */
-   OP_COSH,                      /* Hyperbolic cosine */
-   OP_TANH,                      /* Hyperbolic tangent */
-   OP_ABS,                       /* Absolute value (sign removal) */
-   OP_INT,                       /* Integer value (round towards zero) */
-   OP_CEIL,                      /* C ceil function (round up) */
-   OP_FLOOR,                     /* C floor function (round down) */
    OP_NINT,                      /* Fortran NINT function (round to nearest) */
-   OP_OR,                        /* Boolean OR */
-   OP_AND,                       /* Boolean AND */
-   OP_XOR,                       /* Boolean exclusive OR */
-   OP_EQV,                       /* Fortran logical .EQV. operation */
-   OP_BITOR,                     /* Bit-wise OR */
-   OP_BITXOR,                    /* Bit-wise exclusive OR */
-   OP_BITAND,                    /* Bit-wise AND */
-   OP_EQ,                        /* Relational equal */
-   OP_NE,                        /* Not equal */
-   OP_LT,                        /* Less than */
-   OP_LE,                        /* Less than or equal */
-   OP_GT,                        /* Greater than */
-   OP_GE,                        /* Greater than or equal */
-   OP_SHFTL,                     /* Shift bits left */
-   OP_SHFTR,                     /* Shift bits right */
-   OP_ADD,                       /* Add */
-   OP_SUB,                       /* Subtract */
-   OP_MUL,                       /* Multiply */
-   OP_DIV,                       /* Divide */
-   OP_POW,                       /* Raise to power */
-   OP_POW2,                      /* Value times power of 2 (ldexp function) */
-   OP_FREXPON,                   /* Exponent of 2 for fraction below */
-   OP_FREXP,                     /* Normalised fraction (frexp function) */
-   OP_MIN,                       /* Minimum of 2 or more values */
-   OP_MAX,                       /* Maximum of 2 or more values */
+   OP_SIN,                       /* Sine (radians) */
+   OP_SIND,                      /* Sine (degrees) */
+   OP_SINH,                      /* Hyperbolic sine */
+   OP_SQRT,                      /* Square root */
+   OP_TAN,                       /* Tangent (radians) */
+   OP_TAND,                      /* Tangent (degrees) */
+   OP_TANH,                      /* Hyperbolic tangent */
+
+/* Functions with two arguments. */
+   OP_ATAN2,                     /* Inverse tangent (2 arguments, radians) */
+   OP_ATAN2D,                    /* Inverse tangent (2 arguments, degrees) */
    OP_DIM,                       /* Fortran DIM (positive difference) fn. */
    OP_MOD,                       /* Modulus function */
+   OP_POW,                       /* Raise to power */
+   OP_RAND,                      /* Uniformly distributed random number */
    OP_SIGN,                      /* Transfer of sign function */
-   OP_ATAN2,                     /* Inverse tangent (2 arguments, radians) */
-   OP_ATAN2D                     /* Inverse tangent (2 arguments, degrees) */
+
+/* Functions with variable numbers of arguments. */
+   OP_MAX,                       /* Maximum of 2 or more values */
+   OP_MIN,                       /* Minimum of 2 or more values */
+
+/* Unary arithmetic operators. */
+   OP_NEG,                       /* Negate (change sign) */
+
+/* Unary boolean operators. */
+   OP_NOT,                       /* Boolean NOT */
+
+/* Binary arithmetic operators. */
+   OP_ADD,                       /* Add */
+   OP_DIV,                       /* Divide */
+   OP_MUL,                       /* Multiply */
+   OP_SUB,                       /* Subtract */
+
+/* Bit-shift operators. */
+   OP_SHFTL,                     /* Shift bits left */
+   OP_SHFTR,                     /* Shift bits right */
+
+/* Relational operators. */
+   OP_EQ,                        /* Relational equal */
+   OP_GE,                        /* Greater than or equal */
+   OP_GT,                        /* Greater than */
+   OP_LE,                        /* Less than or equal */
+   OP_LT,                        /* Less than */
+   OP_NE,                        /* Not equal */
+
+/* Bit-wise operators. */
+   OP_BITAND,                    /* Bit-wise AND */
+   OP_BITOR,                     /* Bit-wise OR */
+   OP_BITXOR,                    /* Bit-wise exclusive OR */
+
+/* Binary boolean operators. */
+   OP_AND,                       /* Boolean AND */
+   OP_EQV,                       /* Fortran logical .EQV. operation */
+   OP_OR,                        /* Boolean OR */
+   OP_XOR,                       /* Boolean exclusive OR */
+
+/* Null operation. */
+   OP_NULL,                      /* Null operation */
 } Oper;
 
 /* This structure holds a description of each symbol which may appear
@@ -193,109 +222,142 @@ typedef struct {
 } Symbol;
 
 /* This initialises an array of Symbol structures to hold data on all
-   the supported symbols. The order is not important except that earlier
-   symbols should not be abbreviations of later ones. The end of the
-   array is indicated by an element with a NULL "text" component. */
+   the supported symbols. The order is not important, but symbols are
+   arranged here in approximate order of descending evaluation
+   priority. The end of the array is indicated by an element with a NULL
+   "text" component. */
 static const Symbol symbol[] = {
-   { ""            ,  0,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDVAR    },
-   { ""            ,  0,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDCON    },
-   { "<bad>"       ,  5,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDBAD    },
-   { "<radix>"     ,  7,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDRAD    },
-   { "<rounds>"    ,  8,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDRND    },
-   { "<mant_dig>"  , 10,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMDIG   },
-   { "<dig>"       ,  5,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDDIG    },
-   { "<min_exp>"   ,  9,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMINE   },
-   { "<min_10_exp>", 12,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMIN10E },
-   { "<max_exp>"   ,  9,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMAXE   },
-   { "<max_10_exp>", 12,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMAX10E },
-   { "<max>"       ,  5,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMAX    },
-   { "<epsilon>"   ,  9,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDEPS    },
-   { "<min>"       ,  5,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMIN    },
-   { "<pi>"        ,  4,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDPI     },
-   { "<e>"         ,  3,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDE      },
-   { "(int)"       ,  5,  0,  1,  1,  0, 16, 15,  0,  0,  0,  OP_INT      },
-   { ")"           ,  1,  1,  0,  0,  0,  2, 18, -1,  0,  0,  OP_NULL     },
-   { "("           ,  1,  0,  1,  1,  0, 18,  1,  1,  0,  0,  OP_NULL     },
-   { "<<"          ,  2,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_SHFTL    },
-   { ">>"          ,  2,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_SHFTR    },
+
+/* User-supplied constants and variables. */
+   { ""            ,  0,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDCON    },
+   { ""            ,  0,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDVAR    },
+
+/* System constants. */
+   { "<bad>"       ,  5,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDBAD    },
+   { "<dig>"       ,  5,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDDIG    },
+   { "<epsilon>"   ,  9,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDEPS    },
+   { "<mant_dig>"  , 10,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDMDIG   },
+   { "<max>"       ,  5,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDMAX    },
+   { "<max_10_exp>", 12,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDMAX10E },
+   { "<max_exp>"   ,  9,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDMAXE   },
+   { "<min>"       ,  5,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDMIN    },
+   { "<min_10_exp>", 12,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDMIN10E },
+   { "<min_exp>"   ,  9,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDMINE   },
+   { "<radix>"     ,  7,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDRAD    },
+   { "<rounds>"    ,  8,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDRND    },
+
+/* Mathematical constants. */
+   { "<e>"         ,  3,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDE      },
+   { "<pi>"        ,  4,  0,  0,  0,  0, 19, 19,  0,  1,  0,  OP_LDPI     },
+
+/* Functions with one argument. */
+   { "abs("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ABS      },
+   { "acos("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ACOS     },
+   { "acosd("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ACOSD    },
+   { "aint("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_INT      },
+   { "asin("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASIN     },
+   { "asind("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASIND    },
+   { "atan("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ATAN     },
+   { "atand("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ATAND    },
+   { "ceil("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_CEIL     },
+   { "cos("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COS      },
+   { "cosd("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COSD     },
+   { "cosh("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COSH     },
+   { "exp("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_EXP      },
+   { "exp2("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_EXP2     },
+   { "fabs("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ABS      },
+   { "floor("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_FLOOR    },
+   { "fr2("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_FR2      },
+   { "int("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_INT      },
+   { "isbad("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ISBAD    },
+   { "log("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_LOG      },
+   { "log10("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_LOG10    },
+   { "nint("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_NINT     },
+   { "sin("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SIN      },
+   { "sind("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SIND     },
+   { "sinh("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SINH     },
+   { "sqrt("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SQRT     },
+   { "tan("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_TAN      },
+   { "tand("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_TAND     },
+   { "tanh("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_TANH     },
+
+/* Functions with two arguments. */
+   { "atan2("      ,  6,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_ATAN2    },
+   { "atan2d("     ,  7,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_ATAN2D   },
+   { "dim("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_DIM      },
+   { "fmod("       ,  5,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_MOD      },
+   { "mod("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_MOD      },
+   { "pow("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_POW      },
+   { "rand("       ,  5,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_RAND     },
+   { "sign("       ,  5,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_SIGN     },
+
+/* Functions with variable numbers of arguments. */
+   { "max("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1, -2,  OP_MAX      },
+   { "min("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1, -2,  OP_MIN      },
+
+/* Parenthesised expressions. */
+   { ")"           ,  1,  1,  0,  0,  0,  2, 19, -1,  0,  0,  OP_NULL     },
+   { "("           ,  1,  0,  1,  1,  0, 19,  1,  1,  0,  0,  OP_NULL     },
+
+/* Unary arithmetic operators. */
+   { "+"           ,  1,  0,  1,  1,  1, 17, 16,  0,  0,  0,  OP_NULL     },
+   { "-"           ,  1,  0,  1,  1,  1, 17, 16,  0,  0,  0,  OP_NEG      },
+
+/* Unary boolean operators. */
+   { "!"           ,  1,  0,  1,  1,  0, 17, 16,  0,  0,  0,  OP_NOT      },
+   { ".not."       ,  5,  0,  1,  1,  0, 17, 16,  0,  0,  0,  OP_NOT      },
+
+/* Binary arithmetic operators. */
+   { "**"          ,  2,  1,  1,  1,  0, 18, 15,  0, -1,  0,  OP_POW      },
+   { "*"           ,  1,  1,  1,  1,  0, 14, 14,  0, -1,  0,  OP_MUL      },
+   { "/"           ,  1,  1,  1,  1,  0, 14, 14,  0, -1,  0,  OP_DIV      },
+   { "+"           ,  1,  1,  1,  1,  0, 13, 13,  0, -1,  0,  OP_ADD      },
+   { "-"           ,  1,  1,  1,  1,  0, 13, 13,  0, -1,  0,  OP_SUB      },
+
+/* Bit-shift operators. */
+   { "<<"          ,  2,  1,  1,  1,  0, 12, 12,  0, -1,  0,  OP_SHFTL    },
+   { ">>"          ,  2,  1,  1,  1,  0, 12, 12,  0, -1,  0,  OP_SHFTR    },
+
+/* Relational operators. */
+   { "<"           ,  1,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_LT       },
+   { ".lt."        ,  4,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_LT       },
+   { "<="          ,  2,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_LE       },
+   { ".le."        ,  4,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_LE       },
+   { ">"           ,  1,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_GT       },
+   { ".gt."        ,  4,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_GT       },
+   { ">="          ,  2,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_GE       },
+   { ".ge."        ,  4,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_GE       },
+   { "=="          ,  2,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_EQ       },
+   { ".eq."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_EQ       },
+   { "!="          ,  2,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_NE       },
+   { ".ne."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_NE       },
+
+/* Bit-wise operators. */
+   { "&"           ,  1,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_BITAND   },
+   { "^"           ,  1,  1,  1,  1,  0,  8,  8,  0, -1,  0,  OP_BITXOR   },
+   { "|"           ,  1,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_BITOR    },
+
+/* Binary boolean operators. */
+   { "&&"          ,  2,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_AND      },
+   { ".and."       ,  5,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_AND      },
+   { "^^"          ,  2,  1,  1,  1,  0,  5,  5,  0, -1,  0,  OP_XOR      },
+   { "||"          ,  2,  1,  1,  1,  0,  4,  4,  0, -1,  0,  OP_OR       },
+   { ".or."        ,  4,  1,  1,  1,  0,  4,  4,  0, -1,  0,  OP_OR       },
    { ".eqv."       ,  5,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_EQV      },
    { ".neqv."      ,  6,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_XOR      },
    { ".xor."       ,  5,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_XOR      },
-   { "||"          ,  2,  1,  1,  1,  0,  4,  4,  0, -1,  0,  OP_OR       },
-   { ".or."        ,  4,  1,  1,  1,  0,  4,  4,  0, -1,  0,  OP_OR       },
-   { "&&"          ,  2,  1,  1,  1,  0,  5,  5,  0, -1,  0,  OP_AND      },
-   { ".and."       ,  5,  1,  1,  1,  0,  5,  5,  0, -1,  0,  OP_AND      },
-   { "|"           ,  1,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_BITOR    },
-   { "^"           ,  1,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_BITXOR   },
-   { "&"           ,  1,  1,  1,  1,  0,  8,  8,  0, -1,  0,  OP_BITAND   },
-   { "=="          ,  2,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_EQ       },
-   { ".eq."        ,  4,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_EQ       },
-   { "!="          ,  2,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_NE       },
-   { ".ne."        ,  4,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_NE       },
-   { "<="          ,  2,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_LE       },
-   { ".le."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_LE       },
-   { "<"           ,  1,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_LT       },
-   { ".lt."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_LT       },
-   { ">="          ,  2,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_GE       },
-   { ".ge."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_GE       },
-   { ">"           ,  1,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_GT       },
-   { ".gt."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_GT       },
-   { "-"           ,  1,  1,  1,  0,  0, 11, 12,  0, -1,  0,  OP_SUB      },
-   { "+"           ,  1,  1,  1,  0,  0, 11, 12,  0, -1,  0,  OP_ADD      },
-   { "**"          ,  2,  1,  1,  1,  0, 17, 14,  0, -1,  0,  OP_POW      },
-   { "*"           ,  1,  1,  1,  1,  0, 13, 13,  0, -1,  0,  OP_MUL      },
-   { "/"           ,  1,  1,  1,  1,  0, 13, 13,  0, -1,  0,  OP_DIV      },
-   { "%"           ,  1,  1,  1,  1,  0, 13, 13,  0, -1,  0,  OP_MOD      },
+
+/* Separators. */
    { ","           ,  1,  1,  1,  1,  0,  2,  2,  0,  0,  0,  OP_NULL     },
-   { "!"           ,  1,  0,  1,  1,  0, 16, 15,  0,  0,  0,  OP_NOT      },
-   { ".not."       ,  5,  0,  1,  1,  0, 16, 15,  0,  0,  0,  OP_NOT      },
-   { "-"           ,  1,  0,  1,  0,  1, 16, 15,  0,  0,  0,  OP_NEG      },
-   { "+"           ,  1,  0,  1,  0,  1, 16, 15,  0,  0,  0,  OP_NULL     },
-   { "isbad("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ISBAD    },
-   { "sqrt("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_SQRT     },
-   { "log("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_LOG      },
-   { "log10("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_LOG10    },
-   { "exp("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_EXP      },
-   { "sin("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_SIN      },
-   { "cos("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_COS      },
-   { "tan("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_TAN      },
-   { "sind("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_SIND     },
-   { "cosd("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_COSD     },
-   { "tand("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_TAND     },
-   { "asin("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ASIN     },
-   { "acos("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ACOS     },
-   { "atan("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ATAN     },
-   { "asind("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ASIND    },
-   { "acosd("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ACOSD    },
-   { "atand("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ATAND    },
-   { "sinh("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_SINH     },
-   { "cosh("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_COSH     },
-   { "tanh("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_TANH     },
-   { "abs("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ABS      },
-   { "fabs("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ABS      },
-   { "int("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_INT      },
-   { "ceil("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_CEIL     },
-   { "floor("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_FLOOR    },
-   { "nint("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_NINT     },
-   { "frexpon("    ,  8,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_FREXPON  },
-   { "frexp("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_FREXP    },
-   { "pow("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_POW      },
-   { "ldexp("      ,  6,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_POW2     },
-   { "dim("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_DIM      },
-   { "mod("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_MOD      },
-   { "fmod("       ,  5,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_MOD      },
-   { "sign("       ,  5,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_SIGN     },
-   { "atan2("      ,  6,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_ATAN2    },
-   { "atan2d("     ,  7,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_ATAN2D   },
-   { "min("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1, -2,  OP_MIN      },
-   { "max("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1, -2,  OP_MAX      },
+
+/* End of symbol data. */
    { NULL          ,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  OP_NULL     }
 };
 
 /* These variables identify indices in the above array which hold
    special symbols used explicitly in the code. */
-static const int symbol_ldvar = 0; /* Load a variable */
-static const int symbol_ldcon = 1; /* Load a constant */
+static const int symbol_ldcon = 0; /* Load a constant */
+static const int symbol_ldvar = 1; /* Load a variable */
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -338,6 +400,111 @@ static void VirtualMachine( int, int, const double **, const int *, const double
 
 /* Member functions. */
 /* ================= */
+static double Ran2( void ) {
+   const int ntab = 32;
+   const int nwarm = 8;
+   const long a1 = 40014;
+   const long a2 = 40692;
+   const long m1 = 2147483563;
+   const long m2 = 2147483399;
+   const long q1 = 53668;
+   const long q2 = 52774;
+   const long r1 = 12211;
+   const long r2 = 3791;
+   int itab;
+   long k;
+   static long rand1 = -94638137; // Arbitrary negative number
+   static long rand2 = -94638137;
+   static long table[ 32 ];
+   static long random_int = 0;
+
+   long ran[ 2 ];
+   int iloop;
+   double result;
+
+   static double alpha;
+   static double scale0;
+   static double scale1;
+   static int init = 0;
+   
+/* Perform initialisation, if not already done. */
+   if ( !init ) {
+
+/* Loop to fill the shuffle table with an initial set of random
+   values. We generate more values than required in order to "warm up"
+   the generator before recording values in the table. */
+      for ( itab = ntab + nwarm - 1; itab >= 0; itab-- ) {
+
+/* Repeatedly update "rand1" from the expression "(rand1*a1)%m1" while
+   avoiding overflow. */
+         k = rand1 / q1;
+         rand1 = a1 * ( rand1 - k * q1 ) - k * r1;
+         if ( rand1 < 0 ) rand1 += m1;
+
+/* After warming up, start recording values in the table. */
+         if ( itab < ntab ) table[ itab ] = rand1;
+      }
+
+/* Store the last entry in the table as the "previous" random
+   integer. */
+      random_int = table[ 0 ];
+
+/* Calculate the scale factors required to convert a pair of random
+   integers lying between 1 and "m1" (inclusive) into a single double
+   value lying between 0.0 and 1.0 (also inclusive). */
+      alpha = (double) ( m1 - 2 ) / (double) ( m1 - 1 );
+      alpha *= alpha;
+      scale0 = 1.0 / (double) ( m1 - 2 );
+      scale1 = scale0 * scale0;
+
+/* Note when initialisation has been done. */
+      init = 1;
+   }
+
+/* Loop to generate sufficient random integers to combine into a
+   single double value. */
+   for ( iloop = 0; iloop < 2; iloop++ ) {
+
+/* Update the first generator "rand1" from the expression
+   "(a1*rand1)%m1" while avoiding overflow. */
+      k = rand1 / q1;
+      rand1 = a1 * ( rand1 - k * q1 ) - k * r1;
+      if ( rand1 < 0 ) rand1 += m1;
+
+/* Similarly, update the second generator "rand2" from the expression
+   "(a2*rand2)%m2". */
+      k = rand2 / q2;
+      rand2 = a2 * ( rand2 - k * q2 ) - k * r2;
+      if ( rand2 < 0 ) rand2 += m2;
+
+/* Use the previous random integer to generate an index into the
+   shuffle table. */
+      itab = random_int / ( 1 + ( m1 - 1 ) / ntab );
+
+/* Extract the table entry and replace it with a new random value from
+   the first generator "rand1". */
+      random_int = table[ itab ];
+      table[ itab ] = rand1;
+
+/* Combine the extracted value with the latest value from the second
+   generator "rand2" and ensure positivity. */
+      random_int -= rand2;
+      if ( random_int < 1 ) random_int += m1 - 1;
+
+/* Save the random integers produced until we have enough for a random
+   double value. */
+      ran[ iloop ] = random_int;
+   }
+
+/* Combine the separate integer results into a double value. */
+   result = alpha * ( scale0 * (double) ( ran[ 0 ] - 1 ) +
+                      scale1 * (double) ( ran[ 1 ] - 1 ) );
+
+   printf( "%.20g\n", result );
+
+/* Return the result. */
+   return result;
+}
 static void CleanFunctions( int nfun, const char *fun[], char ***clean ) {
 /*
 *  Name:
@@ -608,11 +775,13 @@ static void CompileExpression( const char *method, const char *exprs,
    int found;                    /* Standard symbol identified? */
    int iend;                     /* Ending index in the expression string */
    int istart;                   /* Staring index in the expression string */
+   int isym;                     /* Loop counter for symbols */
    int ivar;                     /* Index of variable name */
    int lpar;                     /* Parenthesis level */
    int ncon;                     /* Number of constants generated */
    int nsym;                     /* Number of symbols identified */
    int opernext;                 /* Next symbol an operator (from left)? */
+   int size;                     /* Size of symbol matched */
    int sym;                      /* Index of symbol in static "symbol" array */
    int unarynext;                /* Next symbol may be unary +/- ? */
 
@@ -644,10 +813,12 @@ static void CompileExpression( const char *method, const char *exprs,
    for ( istart = 0; astOK && exprs[ istart ]; istart = iend + 1 ) {
 
 /* Compare each of the symbols in the symbol data with the next
-   section of the expression, stopping if a match is found (or if a NULL
-   "text" value is found, which acts as the end flag). */
+   section of the expression, looking for the longest symbol text which
+   will match. Stop if a NULL "text" value is found, which acts as the
+   end flag. */
       found = 0;
-      for ( sym = 0; symbol[ sym ].text; sym++ ) {
+      size = 0;
+      for ( isym = 0; symbol[ isym ].text; isym++ ) {
 
 /* Only consider symbols which have text associated with them and
    which look like operators or operands from the left, according to the
@@ -655,20 +826,26 @@ static void CompileExpression( const char *method, const char *exprs,
    missing from the input expression, the next symbol will not be
    identified, because it will be of the wrong type. Also exclude unary
    +/- operators if they are out of context. */
-         if ( symbol[ sym ].size &&
-              ( symbol[ sym ].operleft == opernext ) &&
-              ( !symbol[ sym ].unaryoper || unarynext ) ) {
+         if ( symbol[ isym ].size &&
+              ( symbol[ isym ].operleft == opernext ) &&
+              ( !symbol[ isym ].unaryoper || unarynext ) ) {
 
 /* Test if the text of the symbol matches the expression at the
-   current position. */
-            found = !strncmp( exprs + istart, symbol[ sym ].text,
-                              (size_t) symbol[ sym ].size );
+   current position. If so, note that a match has been found. */
+            if ( !strncmp( exprs + istart, symbol[ isym ].text,
+                           (size_t) symbol[ isym ].size ) ) {
+               found = 1;
 
-/* If so, calculate the index of the last symbol character in the
-   expression string and quit searching. */
-            if ( found ) {
-               iend = istart + symbol[ sym ].size - 1;
-               break;
+/* If this symbol matches more characters than any previous symbol,
+   then store the symbol's index and note its size. */
+               if ( symbol[ isym ].size > size ) {
+                  sym = isym;
+                  size = symbol[ isym ].size;
+
+/* Calculate the index of the last symbol character in the expression
+   string. */
+                  iend = istart + size - 1;
+               }
             }
          }
       }
@@ -3001,8 +3178,8 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
    double frac;                  /* Sole normalised fraction */
    double newexp;                /* New power of 2 exponent value */
    double pi;                    /* Value of PI */
+   double ran;                   /* Random number */
    double result;                /* Function result value */
-   double tmp;                   /* Temporary variable */
    double unscale;               /* Factor for removing scaling */
    double value;                 /* Value to be assigned to stack vector */
    double x1;                    /* First argument value */
@@ -3463,7 +3640,7 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
    fraction bits of floating point numbers. It also offers greater
    precision (the first 53 or so significant bits of the result being
    preserved for typical IEEE floating point implementations). */
-#define BIT_OPER_2( oper, x1, x2 ) \
+#define BIT_OPER( oper, x1, x2 ) \
 \
 /* Convert each argument to a normalised fraction in the range \
    [0.5,1.0) and a power of two exponent, removing any sign \
@@ -3593,6 +3770,8 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 
 /* Otherwise, perform the required vector operation on the stack... */
 
+/* User-supplied constants and variables. */
+/* -------------------------------------- */
 /* Loading a constant involves incrementing the constant count and
    assigning the next constant's value to the top of stack element. */
             ARG_0( OP_LDCON,    value = con[ icon++ ], *y = value )
@@ -3603,118 +3782,145 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
             ARG_0( OP_LDVAR,    ivar = (int) ( con[ icon++ ] + 0.5 ),
                                 *y = ptr_in[ ivar ][ point ] )
 
+/* System constants. */
+/* ----------------- */
 /* Loading a "bad" value simply means assigning AST__BAD to the top of
    stack element. */
             ARG_0( OP_LDBAD,    , *y = AST__BAD )
 
 /* The following load constants associated with the (double) floating
    point representation into the top of stack element. */
+            ARG_0( OP_LDDIG,    , *y = (double) DBL_DIG )
+            ARG_0( OP_LDEPS,    , *y = DBL_EPSILON )
+            ARG_0( OP_LDMAX,    , *y = DBL_MAX )
+            ARG_0( OP_LDMAX10E, , *y = (double) DBL_MAX_10_EXP )
+            ARG_0( OP_LDMAXE,   , *y = (double) DBL_MAX_EXP )
+            ARG_0( OP_LDMDIG,   , *y = (double) DBL_MANT_DIG )
+            ARG_0( OP_LDMIN,    , *y = DBL_MIN )
+            ARG_0( OP_LDMIN10E, , *y = (double) DBL_MIN_10_EXP )
+            ARG_0( OP_LDMINE,   , *y = (double) DBL_MIN_EXP )
             ARG_0( OP_LDRAD,    , *y = (double) FLT_RADIX )
             ARG_0( OP_LDRND,    , *y = (double) FLT_ROUNDS )
-            ARG_0( OP_LDMDIG,   , *y = (double) DBL_MANT_DIG )
-            ARG_0( OP_LDDIG,    , *y = (double) DBL_DIG )
-            ARG_0( OP_LDMINE,   , *y = (double) DBL_MIN_EXP )
-            ARG_0( OP_LDMIN10E, , *y = (double) DBL_MIN_10_EXP )
-            ARG_0( OP_LDMAXE,   , *y = (double) DBL_MAX_EXP )
-            ARG_0( OP_LDMAX10E, , *y = (double) DBL_MAX_10_EXP )
-            ARG_0( OP_LDEPS,    , *y = DBL_EPSILON )
-            ARG_0( OP_LDMIN,    , *y = DBL_MIN )
-            ARG_0( OP_LDMAX,    , *y = DBL_MAX )
 
+/* Mathematical constants. */
+/* ----------------------- */
 /* The following load mathematical constants into the top of stack
    element. */
-            ARG_0( OP_LDPI,     , *y = pi )
             ARG_0( OP_LDE,      value = exp( 1.0 ), *y = value )
+            ARG_0( OP_LDPI,     , *y = pi )
 
-/* The following 1-argument operations simply evaluate a function of
-   the top of stack element and assign the result to the same element. */
-            ARG_1( OP_NOT,      *y = ( x == 0.0 ) )
-            ARG_1( OP_NEG,      *y = -x )
-            ARG_1B( OP_ISBAD,   *y = ( x == AST__BAD ) )
-            ARG_1( OP_SQRT,     *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
-            ARG_1( OP_LOG,      *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
-            ARG_1( OP_LOG10,    *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
-            ARG_1( OP_EXP,      *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
-            ARG_1( OP_SIN,      *y = sin( x ) )
-            ARG_1( OP_COS,      *y = cos( x ) )
-            ARG_1( OP_TAN,      *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
-            ARG_1( OP_SIND,     *y = sin( x * d2r ) )
-            ARG_1( OP_COSD,     *y = cos( x * d2r ) )
-            ARG_1( OP_TAND,     *y = tan( x * d2r ) )
-            ARG_1( OP_ASIN,     *y = ( ABS( x ) <= 1.0 ) ?
-                                     asin( x ) : AST__BAD )
+/* Functions with one argument. */
+/* ---------------------------- */
+/* The following simply evaluate a function of the top of stack
+   element and assign the result to the same element. */
+            ARG_1( OP_ABS,      *y = ABS( x ) )
             ARG_1( OP_ACOS,     *y = ( ABS( x ) <= 1.0 ) ?
                                      acos( x ) : AST__BAD )
-            ARG_1( OP_ATAN,     *y = atan( x ) )
-            ARG_1( OP_ASIND,    *y = ( ABS( x ) <= 1.0 ) ?
-                                     asin( x ) * r2d : AST__BAD )
             ARG_1( OP_ACOSD,    *y = ( ABS( x ) <= 1.0 ) ?
                                      acos( x ) * r2d : AST__BAD )
+            ARG_1( OP_ASIN,     *y = ( ABS( x ) <= 1.0 ) ?
+                                     asin( x ) : AST__BAD )
+            ARG_1( OP_ASIND,    *y = ( ABS( x ) <= 1.0 ) ?
+                                     asin( x ) * r2d : AST__BAD )
+            ARG_1( OP_ATAN,     *y = atan( x ) )
             ARG_1( OP_ATAND,    *y = atan( x ) * r2d )
-            ARG_1( OP_SINH,     *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
-            ARG_1( OP_COSH,     *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
-            ARG_1( OP_TANH,     *y = tanh( x ) )
-            ARG_1( OP_ABS,      *y = ABS( x ) )
-            ARG_1( OP_INT,      *y = INT( x ) )
             ARG_1( OP_CEIL,     *y = ceil( x ) )
+            ARG_1( OP_COS,      *y = cos( x ) )
+            ARG_1( OP_COSD,     *y = cos( x * d2r ) )
+            ARG_1( OP_COSH,     *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
+            ARG_1( OP_EXP,      *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
+            ARG_1( OP_EXP2,     (void) frexp( x, &expon );
+                                *y = (double) expon )
             ARG_1( OP_FLOOR,    *y = floor( x ) )
+            ARG_1( OP_FR2,      *y = frexp( x, &expon ) )
+            ARG_1( OP_INT,      *y = INT( x ) )
+            ARG_1B( OP_ISBAD,   *y = ( x == AST__BAD ) )
+            ARG_1( OP_LOG,      *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
+            ARG_1( OP_LOG10,    *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
             ARG_1( OP_NINT,     *y = ( x >= 0 ) ?
                                      floor( x + 0.5 ) : ceil( x - 0.5 ) )
-            ARG_1( OP_FREXP,    *y = frexp( x, &expon ) )
-            ARG_1( OP_FREXPON,  (void) frexp( x, &expon );
-                                *y = (double) expon )
+            ARG_1( OP_SIN,      *y = sin( x ) )
+            ARG_1( OP_SIND,     *y = sin( x * d2r ) )
+            ARG_1( OP_SINH,     *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
+            ARG_1( OP_SQRT,     *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
+            ARG_1( OP_TAN,      *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
+            ARG_1( OP_TAND,     *y = tan( x * d2r ) )
+            ARG_1( OP_TANH,     *y = tanh( x ) )
 
-/* These 2-argument operations evaluate a function of the top two
-   entries on the stack. */
-            ARG_2( OP_EQV,      *y = ( ( x1 != 0.0 ) == ( x2 != 0.0 ) ) )
-            ARG_2( OP_XOR,      *y = ( ( x1 != 0.0 ) != ( x2 != 0.0 ) ) )
-            ARG_2B( OP_OR,      *y = TRISTATE_OR( x1, x2 ) )
-            ARG_2B( OP_AND,     *y = TRISTATE_AND( x1, x2 ) )
-            ARG_2( OP_BITOR,    BIT_OPER_2( |, x1, x2 ); *y = result )
-            ARG_2( OP_BITXOR,   BIT_OPER_2( ^, x1, x2 ); *y = result )
-            ARG_2( OP_BITAND,   BIT_OPER_2( &, x1, x2 ); *y = result )
-            ARG_2( OP_EQ,       *y = ( x1 == x2 ) )
-            ARG_2( OP_NE,       *y = ( x1 != x2 ) )
-            ARG_2( OP_LE,       *y = ( x1 <= x2 ) )
-            ARG_2( OP_LT,       *y = ( x1 < x2 ) )
-            ARG_2( OP_GE,       *y = ( x1 >= x2 ) )
-            ARG_2( OP_GT,       *y = ( x1 > x2 ) )
-            ARG_2( OP_SHFTL,    *y = SHIFT_BITS( x1, x2 ) )
-            ARG_2( OP_SHFTR,    *y = SHIFT_BITS( x1, -x2 ) )
-            ARG_2( OP_ADD,      *y = SAFE_ADD( x1, x2 ) )
-            ARG_2( OP_SUB,      *y = SAFE_SUB( x1, x2 ) )
-            ARG_2( OP_MUL,      *y = SAFE_MUL( x1, x2 ) )
-            ARG_2( OP_DIV ,     *y = SAFE_DIV( x1, x2 ) )
-            ARG_2( OP_POW,      *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
-            ARG_2( OP_POW2,     tmp = INT( x2 );
-                                *y = ( ( tmp < (double) -INT_MAX ) ? 0.0 :
-                                     ( ( tmp > (double) INT_MAX ) ? AST__BAD :
-                                     CATCH_MATHS_OVERFLOW( ldexp( x1,
-                                                           (int) tmp ) ) ) ) )
-            ARG_2( OP_SIGN,     *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
-                                     x1 : -x1 )
+/* Functions with two arguments. */
+/* ----------------------------- */
+/* These evaluate a function of the top two entries on the stack. */
+            ARG_2( OP_ATAN2,    *y = atan2( x1, x2 ) )
+            ARG_2( OP_ATAN2D,   *y = atan2( x1, x2 ) * r2d )
             ARG_2( OP_DIM,      *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
             ARG_2( OP_MOD,      *y = ( x2 != 0.0 ) ?
                                      fmod( x1, x2 ) : AST__BAD )
-            ARG_2( OP_ATAN2,    *y = atan2( x1, x2 ) )
-            ARG_2( OP_ATAN2D,   *y = atan2( x1, x2 ) * r2d )
+            ARG_2( OP_POW,      *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
+            ARG_2( OP_RAND,     ran = Ran2();
+                                *y = x1 * ran + x2 * ( 1.0 - ran ); )
+            ARG_2( OP_SIGN,     *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
+                                     x1 : -x1 )
 
+/* Functions with variable numbers of arguments. */
+/* --------------------------------------------- */
 /* These operations take a variable number of arguments, the actual
    number being determined by consuming a constant. We then loop to
    perform a 2-argument operation on the stack (as above) the required
    number of times. */
-         case OP_MAX:
-            narg = (int) ( con[ icon++ ] + 0.5 );
-            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
-               DO_ARG_2( *y = ( x1 >= x2 ) ? x1 : x2 )
-            }
-            break;
-         case OP_MIN:
-            narg = (int) ( con[ icon++ ] + 0.5 );
-            for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
-               DO_ARG_2( *y = ( x1 <= x2 ) ? x1 : x2 )
-            }
-            break;
+            case OP_MAX:
+               narg = (int) ( con[ icon++ ] + 0.5 );
+               for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
+                  DO_ARG_2( *y = ( x1 >= x2 ) ? x1 : x2 )
+               }
+               break;
+            case OP_MIN:
+               narg = (int) ( con[ icon++ ] + 0.5 );
+               for ( iarg = 0; iarg < ( narg - 1 ); iarg++ ) {
+                  DO_ARG_2( *y = ( x1 <= x2 ) ? x1 : x2 )
+               }
+               break;
+
+/* Unary arithmetic operators. */
+/* --------------------------- */
+            ARG_1( OP_NEG,      *y = -x )
+
+/* Unary boolean operators. */
+/* ------------------------ */
+            ARG_1( OP_NOT,      *y = ( x == 0.0 ) )
+
+/* Binary arithmetic operators. */
+/* ---------------------------- */
+            ARG_2( OP_ADD,      *y = SAFE_ADD( x1, x2 ) )
+            ARG_2( OP_SUB,      *y = SAFE_SUB( x1, x2 ) )
+            ARG_2( OP_MUL,      *y = SAFE_MUL( x1, x2 ) )
+            ARG_2( OP_DIV ,     *y = SAFE_DIV( x1, x2 ) )
+
+/* Bit-shift operators. */
+/* -------------------- */
+            ARG_2( OP_SHFTL,    *y = SHIFT_BITS( x1, x2 ) )
+            ARG_2( OP_SHFTR,    *y = SHIFT_BITS( x1, -x2 ) )
+
+/* Relational operators. */
+/* --------------------- */
+            ARG_2( OP_EQ,       *y = ( x1 == x2 ) )
+            ARG_2( OP_GE,       *y = ( x1 >= x2 ) )
+            ARG_2( OP_GT,       *y = ( x1 > x2 ) )
+            ARG_2( OP_LE,       *y = ( x1 <= x2 ) )
+            ARG_2( OP_LT,       *y = ( x1 < x2 ) )
+            ARG_2( OP_NE,       *y = ( x1 != x2 ) )
+
+/* Bit-wise operators. */
+/* ------------------- */
+            ARG_2( OP_BITOR,    BIT_OPER( |, x1, x2 ); *y = result )
+            ARG_2( OP_BITXOR,   BIT_OPER( ^, x1, x2 ); *y = result )
+            ARG_2( OP_BITAND,   BIT_OPER( &, x1, x2 ); *y = result )
+
+/* Binary boolean operators. */
+/* ------------------------- */
+            ARG_2B( OP_AND,     *y = TRISTATE_AND( x1, x2 ) )
+            ARG_2( OP_EQV,      *y = ( ( x1 != 0.0 ) == ( x2 != 0.0 ) ) )
+            ARG_2B( OP_OR,      *y = TRISTATE_OR( x1, x2 ) )
+            ARG_2( OP_XOR,      *y = ( ( x1 != 0.0 ) != ( x2 != 0.0 ) ) )
          }
       }
    }
@@ -3744,6 +3950,7 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 #undef SAFE_SUB
 #undef SAFE_MUL
 #undef SAFE_DIV
+#undef BIT_OPER
 }
 
 /* Functions which access class attributes. */
