@@ -4032,7 +4032,7 @@ proc Effects {im effect nodisp} {
                      } {
                         set out [UniqueFile]
                         set desc "Align (with image $ALIMG)"
-                        if { [TranImage $image $m21 $out ""] } {
+                        if { [TranImage $image $m21 $out "" 5] } {
 
 # Modify things (like positions lists, etc) to take account of the
 # mapping just applied to the image. If anything goes wrong with this,
@@ -4772,7 +4772,7 @@ proc MappingMod {image map undo} {
 
 }
 
-proc MakeTrn {map} {
+proc MakeTrn {map fittype} {
 #+
 #  Name:
 #     MakeTrn
@@ -4784,6 +4784,9 @@ proc MakeTrn {map} {
 #  Arguments:
 #     map
 #        A set of 6 linear mapping parameters, or "ref" for a unit mapping.
+#     fittype
+#        The numerical fit type (1-5) as used by the FITTYPE parameter of
+#        KAPPA:TRANMAKE.
 #
 #  Returned Value:
 #     The HDS path to the TRANSFORM structure, or a null string if the 
@@ -4815,7 +4818,7 @@ proc MakeTrn {map} {
 
 # Create the new structure. Return the name of the TRANSFORM structure if
 # succesful.
-         if { [Obey kappa tranmake "trtype=bilin transform=$trfile comment=polka tr=$coeffs"] } {
+         if { [Obey kappa tranmake "trtype=bilin transform=$trfile comment=polka tr=$coeffs fittype=$fittype"] } {
             set ret ${trfile}.TRANSFORM
          }
       }
@@ -10433,7 +10436,7 @@ proc Save {} {
                   }         
 
 # Transform the mask area using the mapping (if defined). 
-                  if { ![TranImage $maskarea $map $outndf $sect] } {
+                  if { ![TranImage $maskarea $map $outndf $sect 5] } {
                      set ok 0
                      break
                   }
@@ -12846,7 +12849,7 @@ proc TotalMap {image} {
    return $tot_map
 }
 
-proc TranImage {data map trandata section} {
+proc TranImage {data map trandata section fittype} {
 #+
 #  Name:
 #     TranImage
@@ -12865,6 +12868,9 @@ proc TranImage {data map trandata section} {
 #        The required section of the output image. If this is a null
 #        string, then the output image is just big enough to contain the 
 #        entire input image.
+#     fittype
+#        The numerical fit type (1-5) as used by the FITTYPE parameter of
+#        KAPPA:TRANMAKE.
 #
 #  Returned Value:
 #     One for success, zero if CCDPACK:TRANNDF failed.
@@ -12889,7 +12895,7 @@ proc TranImage {data map trandata section} {
 
 # For any other mapping, construct a TRANSFORM structure.
    } {
-      set trn [MakeTrn $map]
+      set trn [MakeTrn $map $fittype]
       if { $trn != "" } {
 
 # If only part of the output image is required, set up the relevant
