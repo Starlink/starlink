@@ -682,7 +682,7 @@ itcl::class gaia::GaiaAstTable {
          error_dialog "No rows are selected" $w_
          return
       }
-      StarEnterObject $w_.ef \
+      GaiaEnterObject $w_.ef \
          -title {Please edit the data for the object below:} \
          -image $itk_option(-image) \
          -labels [$itk_component(table) cget -headings] \
@@ -742,7 +742,7 @@ itcl::class gaia::GaiaAstTable {
          catch {destroy $enter_object_}
       }
       set enter_object_ \
-         [StarEnterObject $w_.ef \
+         [GaiaEnterObject $w_.ef \
              -title {Please enter the data for a new object below:} \
              -image $itk_option(-image) \
              -labels [$itk_component(table) cget -headings] \
@@ -1570,7 +1570,7 @@ itcl::class gaia::GaiaAstTable {
    protected variable selectmode_ extended
    protected variable exportselection_ 0
 
-   #  StarEnterObject reference.
+   #  GaiaEnterObject reference.
    protected variable enter_object_ {}
 
    #  Common variables: (shared by all instances)

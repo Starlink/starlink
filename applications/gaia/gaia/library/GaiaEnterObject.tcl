@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     StarEnterObject
+#     GaiaEnterObject
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -11,9 +11,9 @@
 
 #  Invocations:
 #
-#        StarEnterObject object_name [configuration options]
+#        GaiaEnterObject object_name [configuration options]
 #
-#     This creates an instance of a StarEnterObject object. The return is
+#     This creates an instance of a GaiaEnterObject object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -51,7 +51,7 @@
 
 #.
 
-itcl::class gaia::StarEnterObject {
+itcl::class gaia::GaiaEnterObject {
    
    #  Inheritances:
    #  -------------
