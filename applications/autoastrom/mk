@@ -274,6 +274,7 @@
       export FC
       export FFLAGS
       export LINK
+      export ADDNETLIBS
       export SOURCE_VARIANT
       export RANLIB
       export SHARE
@@ -366,6 +367,11 @@
                FC='f77'
                FFLAGS='-O -PIC'
                LINK='ln -s'
+	       # Additional libraries needed to link against cfitsio
+	       # (cfitsio_link apparently can't include these on Suns for
+	       # complicated reasons which Martin will explain to you if
+	       # you ask him nicely).
+	       ADDNETLIBS='-lnsl -lsocket'
                SHARE='.so'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
