@@ -1,3 +1,6 @@
+star_grexec.f
+pgxwin_server
+grexec.f
 .deps
 .libs
 *.la
