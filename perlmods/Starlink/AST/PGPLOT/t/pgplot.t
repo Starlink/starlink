@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 16;
+use Test::More tests => 8;
 
 require_ok("PGPLOT");
 require_ok("Starlink::AST::PGPLOT");
@@ -30,24 +30,9 @@ is( Starlink::AST::PGPLOT::_GText( "Testing", 2, 4, "CC", 0, 1),
 # _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
 is( Starlink::AST::PGPLOT::_GTxtEx( "Testing", 2, 4, "CC", 0, 1, \@x, \@y), 
     1, "Calling _GTxtEx()" );
-is( sprintf( "%.5", $x[ 0 ]), 
-    sprintf( "%.5", 2.00000000000000), "X co-ord bottom left" );
-is( sprintf( "%.5", $y[ 0 ]), 
-    sprintf( "%.5", 3.76923082023859), "Y co-ord bottom left" );
-is( sprintf( "%.5", $x[ 1 ]), 
-    sprintf( "%.5", 2.03543463296149), "X co-ord bottom right" );
-is( sprintf( "%.5", $y[ 1 ]), 
-    sprintf( "%.5", 3.76923082023859), "Y co-ord bottom right" );
-is( sprintf( "%.5", $x[ 2 ]), 
-    sprintf( "%.5", 2.03543463296149), "X co-ord top right" );
-is( sprintf( "%.5", $y[ 2 ]), 
-    sprintf( "%.5", 4.12499997764826), "Y co-ord top right" );
-is( sprintf( "%.5", $x[ 3 ]), 
-    sprintf( "%.5", 2.00000000000000), "X co-ord top left" );
-is( sprintf( "%.5", $y[ 3 ]), 
-    sprintf( "%.5", 4.12499997764826), "Y co-ord top left" );
 
-PGPLOT::pgline( $#x, \@x, \@y );
+$x[4] = $x[0]; $y[4] = $y[0];
+PGPLOT::pgline( $#x+1, \@x, \@y );
 
 # _GFlush();
 is( Starlink::AST::PGPLOT::_GFlush(), 1, "Calling _GFlush()" );

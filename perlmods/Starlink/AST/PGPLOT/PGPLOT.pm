@@ -192,8 +192,8 @@ sub _GText {
          # Get the bounding box of the string. Note, only the size of the box 
          # is significant here, not its position. Also note, leading and 
          # trailing spaces are not included in the bounding box.
-         my ( $xbox, $ybox );
-         pgqtxt( $x, $y, $angle, $fjust, $text, $xbox, $ybox );
+         my ( @xbox, @ybox );
+         pgqtxt( $x, $y, $angle, $fjust, $text, \@xbox, \@ybox );
 
          # Normalise the up-vector in world coordinates.
          my $uplen = sqrt( $upx*$upx + $upy*$upy );
@@ -211,7 +211,7 @@ sub _GText {
          # in the direction of the supplied up-vector. */
          my $hu = 0.0;
          for my $i ( 0 ... 4 ) {
-            my $test = $upx*( $$xbox[$i] - $x ) + $upy*( $$ybox[$i] - $y );
+            my $test = $upx*( $xbox[$i] - $x ) + $upy*( $ybox[$i] - $y );
             $hu = $test if $test > $hu;
          }
 
@@ -382,13 +382,13 @@ sub _GTxtEx {
 
       # Get the bounding box of the string drawn with its bottom left corner
       # at the origin.
-      my ( $xbox, $ybox );
-      pgqtxt( 0.0, 0.0, $angle, 0.0, $text, $xbox, $ybox );
+      my ( @xbox, @ybox );
+      pgqtxt( 0.0, 0.0, $angle, 0.0, $text, \@xbox, \@ybox );
 
       # Convert the returned bounding box world coordinates into millimetres.
       for my $i ( 0 ... 4 ){
-         $$xbox[ $i ] *= $alpha;
-         $$ybox[ $i ] *= $beta;
+         $xbox[ $i ] *= $alpha;
+         $ybox[ $i ] *= $beta;
       }
 
       # Find the height of the bounding box, in millimetres. Note, 
@@ -402,7 +402,7 @@ sub _GTxtEx {
       my $hu = -(FLT_MAX);
       my $hd = FLT_MAX;
       foreach my $i ( 0 ... 4 ) {
-         my $test = $ux*$$xbox[ $i ] + $uy*$$ybox[ $i ];
+         my $test = $ux*$xbox[ $i ] + $uy*$ybox[ $i ];
          $hu = $test if $test > $hu; 
          $hd = $test if $test < $hd;
       }
@@ -431,7 +431,7 @@ sub _GTxtEx {
       # The pglen function returns a value which is slightly smaller than
       # the area cleared to hold the text when written using pgptxt. Increase
       # the text width so that it is about equal to the area cleared. 
-      my $width += 0.2*$hu;
+      $width += 0.2*$hu;
 
       # Scale the base-line vector so that its length is equal to the width
       # of the bounding box (including spaces). 
@@ -461,10 +461,10 @@ sub _GTxtEx {
          $yc -= 0.5*$uyu;
       }
 
-      if( $just2 == 'L' ) {
+      if( $just2 eq 'L' ) {
          $xc += 0.5*$vx;
          $yc += 0.5*$vy;
-      } elsif( $just2 == 'R' ) {
+      } elsif( $just2 eq 'R' ) {
          $xc -= 0.5*$vx;
          $yc -= 0.5*$vy;
       }
