@@ -1,4 +1,4 @@
-      SUBROUTINE CON_DST2N( FIGFIL, NDFFIL, FORM, STATUS )
+      SUBROUTINE CON_DST2N( FIGFIL, NDFFIL, FORM, NLEV, PATH, STATUS )
 *+ 
 *  Name:
 *     CON_DST2N
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CON_DST2N( FIGFIL, NDFFIL, FORM, STATUS )
+*     CALL CON_DST2N( FIGFIL, NDFFIL, FORM, NLEV, PATH, STATUS )
 
 *  Description:
 *     This routine reads through a file in Figaro version 2 format.
@@ -36,6 +36,13 @@
 *        The storage form of the data and variance arrays.  It can take
 *        one of two values.  "SIMPLE" gives the simple form, and
 *        "PRIMITIVE" gives the primitive form.
+*     NLEV = INTEGER (Given)
+*        The number of path levels to locate the NDF within the
+*        container file.  This is needed in case the NDF is not the
+*        top-level object in the container file.
+*     PATH = CHARACTER * ( * ) (Given)
+*        The path to the NDF within the output container file.
+*        This is ignored when NLEV is 1.
 *     STATUS = INTEGER (Given annd Returned)
 *        Global status. If passed as non-zero, this routine returns
 *        immediately.  If returned as zero, indicates Conversion
@@ -195,9 +202,12 @@
       INCLUDE 'DYNAMIC_MEMORY'   ! Dynamic memory support (defines %VAL)
 
 *  Arguments Given:
-      CHARACTER FIGFIL * ( * )   ! Name of input file
+      character FIGFIL * ( * )   ! Name of input file
       CHARACTER FORM * ( * )     ! NDF storage format
       CHARACTER NDFFIL * ( * )   ! Name of output file
+      INTEGER NLEV               ! Number of structure levels in output
+                                 ! file
+      CHARACTER PATH * ( * )     ! Internal path to NDF in output file
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -215,19 +225,21 @@
                                  ! created
       LOGICAL   AXMFEX(NDSTAX)   ! TRUE if AXIS(1...6).MORE.FIGARO
                                  ! exists
-      CHARACTER AXMOR*40         ! AXIS.MORE name
-      CHARACTER AXMORF*40        ! AXIS.MORE.FIGARO name
-      CHARACTER AXNAME*32        ! Axis structure element name
-      CHARACTER AXOUT*32         ! Name of output axis 
-      CHARACTER AXOUTD*50        ! Name of output axis data array
-      CHARACTER AXOUTV*50        ! Name of output axis variance array
-      CHARACTER AXOUTW*50        ! Name of output axis width array
+      CHARACTER AXMOR*80         ! AXIS.MORE name
+      CHARACTER AXMORF*80        ! AXIS.MORE.FIGARO name
+      CHARACTER AXNAME*80        ! Axis structure element name
+      CHARACTER AXOUT*80         ! Name of output axis 
+      CHARACTER AXOUTD*80        ! Name of output axis data array
+      CHARACTER AXOUTV*80        ! Name of output axis variance array
+      CHARACTER AXOUTW*80        ! Name of output axis width array
       BYTE      BARRAY(100)      ! Used to read in BYTE type data items
       INTEGER   CDIMS(7)         ! Dimensions of character objects
       CHARACTER COMMENT*50       ! FITS item comment
       DOUBLE PRECISION DARRAY(100) ! Used to read in DP type data items
       INTEGER   DIMS(7)          ! Dimensions of output data
       INTEGER   DSTAT            ! DTA_ routine returned status
+      CHARACTER ENVIRN * ( 80 )  ! Environment structure name
+      CHARACTER EPATH * ( 80 )   ! The effective path
       CHARACTER ERROR*64         ! Error description
       LOGICAL   ERPRES           ! True if .Z.ERRORS is present
       LOGICAL   EXIST            ! True if a FITS item has an comment
@@ -257,6 +269,7 @@
       INTEGER   LENAME           ! Length of name
       CHARACTER LEVEL1*80        ! Full name of environment at 1st level
       CHARACTER LEVEL2*80        ! Full name of environment at 2nd level
+      INTEGER   MINLEN           ! Minimum length of input FITS string
       LOGICAL   MORE             ! Determine necessity for .MORE
       LOGICAL   MOREFG           ! Determine necessity for .MORE.FIGARO
       LOGICAL   MORFGO           ! Determine necessity for
@@ -266,19 +279,27 @@
       CHARACTER MORNAM*80        ! Name of item in .MORE structure
       INTEGER   N                ! Loop variable
       CHARACTER NAME*64          ! Name of data object
-      CHARACTER NAME1*40         ! 1st level object
-      CHARACTER NAME2*40         ! 2nd level object
+      CHARACTER NAME1*80         ! 1st level object
+      CHARACTER NAME2*80         ! 2nd level object
       CHARACTER NAMOUT*80        ! Name in output structure
       INTEGER   NAXIS            ! Axis number
       INTEGER   NBYTES           ! No. of BYTES
       INTEGER   NC               ! Number of characters
       INTEGER   NCC              ! Column from where the comment
                                  ! appears in the FITS card image
+      INTEGER   NCI              ! Column in input FITS character value
+      INTEGER   NCPC             ! Number of characters in path comp.
+      INTEGER   NCO              ! Column in output FITS character value
       INTEGER   NCOM             ! Length of FITS comment
+      INTEGER   NCQ              ! Position of a quote in an input FITS
+                                 ! value
       INTEGER   NDATA            ! No. of data values
+      CHARACTER NDFNAM * ( 15 )  ! Name of the NDF structure
+      CHARACTER NDFPAT * ( 80 )  ! Path to the NDF structure
       INTEGER   NDIM             ! No of dimensions
       LOGICAL   NEEDAX           ! True if axis data present
       INTEGER   NERR             ! Count of numerical errors 
+      INTEGER   NF               ! Length of string
       INTEGER   NFITS            ! No. of FITS items
       INTEGER   NMSTAT           ! Status from 1st-level call to
                                  ! DTA_NMVAR
@@ -286,11 +307,18 @@
                                  ! DTA_NMVAR
       INTEGER   NMSTA3           ! Status from call to DTA_NMVAR with
                                  ! .MORE
-      INTEGER   NSTR             ! Length of string
-      INTEGER   NF               ! Length of string
+      INTEGER   NPC              ! Number of characters in output name
+      INTEGER   NSTRT            ! True length of string
+      INTEGER   NSTR             ! Effective length of string
       LOGICAL   OBOPEN           ! Flags output file as opened
       LOGICAL   OUOPEN           ! Flags output file as opened
+      CHARACTER OUTNDF*80        ! Name of the NDF including the path in
+                                 ! the container file
       INTEGER   OTQPTR           ! Pointer to output quality array
+      INTEGER   PATHHI           ! Character column of the end of a
+                                 ! structure level in the path
+      INTEGER   PATHLO           ! Character column of the start of a
+                                 ! structure level in the path
       LOGICAL   PRIM             ! True if output data array has
                                  ! primitive form (as opposed to simple)
       LOGICAL   QUPRES           ! True if .Z.QUALITY is present
@@ -324,11 +352,28 @@
       END IF
       OBOPEN = .TRUE.
 
-*   Open output file with the extension .SDF.
+*   Open the output container file.  An NDF at the top level requires a
+*   new HDS file to be created.  Should the file already exist and the
+*   the NDF will reside in a larger container file, use access mode of
+*   read (OLD in DTA speak).  Also create the name to the output NDF for
+*   creating the output NDF's structures, and find the string length.
+*   Note the the top-level name is not required.
       NSTR = CHR_LEN( NDFFIL )
-      CALL DTA_ASFNAM( 'OUTPUT', NDFFIL( :NSTR ), 
-     :                 'NEW', 10, 'NDF', DSTAT )
-      IF (DSTAT .NE. 0) THEN
+      IF ( NLEV .EQ .1 ) THEN
+         CALL DTA_ASFNAM( 'OUTPUT', NDFFIL( :NSTR ), 
+     :                    'NEW', 10, 'NDF', DSTAT )
+         OUTNDF = 'OUTPUT'
+         NPC = 6
+      ELSE
+         CALL DTA_ASFNAM( 'OUTPUT', NDFFIL( :NSTR ), 
+     :                    'OLD', 10, 'NDF', DSTAT )
+         EPATH = PATH( INDEX( PATH, '.' ) : )
+         OUTNDF = 'OUTPUT'//EPATH
+         NPC = CHR_LEN( OUTNDF )
+      END IF
+
+*   Exit if anything has gone wrong.
+      IF ( DSTAT .NE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'FILNAM', NDFFIL )
          CALL ERR_REP( 'DST2NDF_FNF',
@@ -337,15 +382,52 @@
       END IF
       OUOPEN = .TRUE.
 
+*  Create the intermediate `environments' for a nested NDF.
+*  ========================================================
+
+      IF ( NLEV .GT. 1 ) THEN
+
+*  All the objects exist except the NDF to be created.  Therefore, we
+*  must extract the path of the environment structure to contain
+*  the NDF, and the name of the NDF in order to create the NDF
+*  structure.
+
+*  Initialise the substring delimiters.
+         PATHHI = 1
+         PATHLO = 0
+         NCPC = 0
+
+*  Loop for each level in the file, excluding the top (zeroth) level.
+         DO I = 2, NLEV
+
+*  Increment the counter of the column.
+            NCPC = NCPC + PATHHI - 1
+
+*  Find the next structure delimiter, a fullstop.
+            CALL CHR_DELIM( EPATH( PATHHI: ), '.', PATHLO, PATHHI )
+
+         END DO
+
+*  Extract the path component.  The last level does not have a
+*  terminating fullstop, so there is no need to exclude it.
+         ENVIRN = 'OUTPUT'//EPATH( :NCPC + PATHLO - 1 )
+         NDFNAM = EPATH( NCPC + PATHLO + 1: NCPC + PATHHI )
+
+*   Create the NDF structure of type NDF.
+         CALL DTA_CRNAM( ENVIRN, NDFNAM( 1:CHR_LEN( NDFNAM ) ), 0, 1,
+     :                   NDFPAT, DSTAT )
+         CALL DTA_CRVAR( NDFPAT, 'NDF', DSTAT )
+      END IF
+
 *  Determine which structures need to be created in the output NDF.
 *  ================================================================
 
 *  Before copying anything to the output structure we ascertain 
-*  a) what dimensionality is necessary for the OUTPUT.AXIS(N) structure,
-*  b) whether or not an OUTPUT.MORE structure is needed, 
-*  c) whether or not an OUTPUT.MORE.FITS structure is needed, 
-*  d) whether or not an OUTPUT.MORE.FIGARO structure is needed, 
-*  e) and whether or not an OUTPUT.DATA_ARRAY structure is needed (in
+*  a) what dimensionality is necessary for the OUTNDF.AXIS(N) structure,
+*  b) whether or not an OUTNDF.MORE structure is needed, 
+*  c) whether or not an OUTNDF.MORE.FITS structure is needed, 
+*  d) whether or not an OUTNDF.MORE.FIGARO structure is needed, 
+*  e) and whether or not an OUTNDF.DATA_ARRAY structure is needed (in
 *  other words determine the form of the output data array).
 *
 *  Initialise some counters and flags.
@@ -451,12 +533,10 @@
 *               Create the composite name at level 2.
                   CALL DTA_CRNAM( LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT )
 
-*               Find the form of the NDF.
-*               =========================
+*               Find which ancillary-data information is present.
+*               =================================================
 
-*               Find which type of NDF form is required by finding out
-*               whether bad pixels and/or quality are present in the
-*               DST file.
+*               Find out whether bad pixels are present in the DST file.
 
 *               Test for the structure containing the data array.
                   IF ( NAME1 .EQ. 'Z' ) THEN
@@ -482,7 +562,7 @@
 *               ==================================
 
 *               Check to determine if any second-level objects require
-*               OUTPUT.MORE or OUTPUT.MORE.FIGARO.
+*               OUTNDF.MORE or OUTNDF.MORE.FIGARO.
                   IF ( ( .NOT. MOREFG .OR. .NOT. FITS ) .AND.
      :                   .NOT. ANAXIS ) THEN
 
@@ -556,7 +636,8 @@
 
 *      Create an axis structure of the appropriate dimensions, first
 *      generating the name.
-         CALL DTA_CRNAM( 'OUTPUT', 'AXIS', 1, NAXIS, AXNAME, DSTAT )
+         CALL DTA_CRNAM( OUTNDF( :NPC ), 'AXIS', 1, NAXIS, AXNAME,
+     :                   DSTAT )
          CALL DTA_CRVAR( AXNAME, 'AXIS', DSTAT )
 
 *      Report what has happened should something have gone wrong.
@@ -571,7 +652,7 @@
 
 *   Create the .DATA_ARRAY structure, if necessary.
       IF ( .NOT. PRIM ) THEN
-         CALL DTA_CRVAR( 'OUTPUT.DATA_ARRAY', 'ARRAY', DSTAT )
+         CALL DTA_CRVAR( OUTNDF( :NPC )//'.DATA_ARRAY', 'ARRAY', DSTAT )
       END IF
       IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
@@ -583,7 +664,7 @@
 
 *   Create the .VARIANCE structure, if necessary.
       IF ( .NOT. PRIM .AND. ERPRES ) THEN
-         CALL DTA_CRVAR( 'OUTPUT.VARIANCE', 'ARRAY', DSTAT )
+         CALL DTA_CRVAR( OUTNDF( :NPC )//'VARIANCE', 'ARRAY', DSTAT )
       END IF
       IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
@@ -595,7 +676,7 @@
 
 *   Create the .MORE structure, if necessary.
       IF ( MORE ) THEN
-         CALL DTA_CRVAR( 'OUTPUT.MORE', 'EXT', DSTAT )
+         CALL DTA_CRVAR( OUTNDF( :NPC )//'.MORE', 'EXT', DSTAT )
       END IF
       IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
@@ -607,7 +688,7 @@
 
 *   Create the .MORE.FIGARO structure, if necessary.
       IF ( MOREFG ) THEN
-         CALL DTA_CRVAR( 'OUTPUT.MORE.FIGARO', 'EXT', DSTAT )
+         CALL DTA_CRVAR( OUTNDF( :NPC )//'.MORE.FIGARO', 'EXT', DSTAT )
       END IF
       IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
@@ -667,10 +748,10 @@
 *                  the NDF is simple or primitive. In the former case
 *                  the data array lies within the DATA_ARRAY structure.
                      IF ( PRIM ) THEN
-                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.DATA_ARRAY',
-     :                                  DSTAT )
+                        CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )/
+     :                                  /'.DATA_ARRAY', DSTAT )
                      ELSE
-                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.'/
+                        CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )//'.'/
      :                                  /'DATA_ARRAY.DATA', DSTAT )
                      END IF
 
@@ -679,9 +760,11 @@
 *                  Add the BAD_PIXEL flag in the simple NDF, where
 *                  valid.
                      IF ( .NOT. PRIM .AND. FLAGGD ) THEN
-                        CALL DTA_CRVAR( 'OUTPUT.DATA_ARRAY.BAD_PIXEL',
+                        CALL DTA_CRVAR( OUTNDF( :NPC )/
+     :                                  /'.DATA_ARRAY.BAD_PIXEL',
      :                                  '_LOGICAL', DSTAT )
-                        CALL DTA_WRVARI( 'OUTPUT.DATA_ARRAY.BAD_PIXEL',
+                        CALL DTA_WRVARI( OUTNDF( :NPC )/
+     :                                   /'.DATA_ARRAY.BAD_PIXEL',
      :                                   1, IFLAG, DSTAT )
                      END IF
 
@@ -706,9 +789,9 @@
 *                  the former case the data array lies within the
 *                  VARIANCE structure.
                      IF ( PRIM ) THEN
-                        NAMOUT = 'OUTPUT.VARIANCE'
+                        NAMOUT = OUTNDF( :NPC )//'.VARIANCE'
                      ELSE
-                        NAMOUT = 'OUTPUT.VARIANCE.DATA'
+                        NAMOUT = OUTNDF( :NPC )//'.VARIANCE.DATA'
                      END IF
 
 *                  Copy the input error array to the output primitive
@@ -756,15 +839,17 @@
      :                      .NOT. FLAGGD ) THEN
 
 *                  Create a structure .QUALITY of type QUALITY.
-                     CALL DTA_CRVAR( 'OUTPUT.QUALITY', 'QUALITY',
-     :                               DSTAT )  
+                     CALL DTA_CRVAR( OUTNDF( :NPC )//'.QUALITY',
+     :                               'QUALITY', DSTAT )  
 
 *                  Create and assign a BADBITS item to indicate that 1
 *                  is the bad quality.
-                     CALL DTA_CRVAR( 'OUTPUT.QUALITY.BADBITS', 
-     :                               'BYTE', DSTAT )  
+                     CALL DTA_CRVAR( OUTNDF( :NPC )/
+     :                               /'.QUALITY.BADBITS', 'BYTE',
+     :                               DSTAT )  
                      BARRAY( 1 ) = 255
-                     CALL DTA_WRVARB ('OUTPUT.QUALITY.BADBITS', 1, 
+                     CALL DTA_WRVARB( OUTNDF( :NPC )/
+     :                                /'.QUALITY.BADBITS', 1, 
      :                                BARRAY, DSTAT )
 
 *                  Inquire the type of the input QUALITY array.
@@ -773,7 +858,7 @@
 *                  The type must be BYTE.  If it is, merely copy the
 *                  QUALITY array to the NDF's QUALITY structure.
                      IF ( TYPE .EQ. 'BYTE' ) THEN
-                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.'/
+                        CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )//'.'/
      :                                  /'QUALITY.QUALITY', DSTAT )
                         IF ( DSTAT .NE. 0 ) GOTO 400
 
@@ -783,9 +868,10 @@
 
 *                     Generate a destination quality array of the
 *                     required dimensions and BYTE data type.
-                        CALL DTA_CRNAM( 'OUTPUT.QUALITY', 'QUALITY', 
-     :                                  NDIM, DIMS, namout, DSTAT )
-                        CALL DTA_CRVAR( namout, 'BYTE', DSTAT )
+                        CALL DTA_CRNAM( OUTNDF( :NPC )//'.QUALITY',
+     :                                  'QUALITY', NDIM, DIMS, NAMOUT,
+     :                                  DSTAT )
+                        CALL DTA_CRVAR( NAMOUT, 'BYTE', DSTAT )
 
 *                     Find the total number of elements in the quality
 *                     array.
@@ -813,7 +899,8 @@
                         END IF
 
 *                     Map the output quality array.
-                        CALL DTA_MUVARB( 'OUTPUT.QUALITY.QUALITY', 
+                        CALL DTA_MUVARB( OUTNDF( :NPC )/
+     :                                   /'.QUALITY.QUALITY', 
      :                                   NDATA, OTQPTR, DSTAT )
 
 *                     Report error conditions.
@@ -827,13 +914,13 @@
 
 *                     Copy the quality.
                         NBYTES = NDATA
-                        CALL CON_MOVE (NBYTES, %VAL( INQPTR ), 
+                        CALL CON_MOVE( NBYTES, %VAL( INQPTR ), 
      :                                 %VAL( OTQPTR ), STATUS )
 
 *                     Unmap the quality arrays.
                         CALL DTA_FRVAR( LEVEL2, DSTAT )
-                        CALL DTA_FRVAR( 'OUTPUT.QUALITY.QUALITY', 
-     :                                  DSTAT )
+                        CALL DTA_FRVAR( OUTNDF( :NPC )/
+     :                                  /'.QUALITY.QUALITY', DSTAT )
                         IF ( DSTAT .NE. 0 ) THEN
                            CALL ERR_REP( 'DST2NDF_UMPQUA ', 
      :                      'DST2NDF: Error unmapping the output '/
@@ -852,8 +939,8 @@
 *                  Inquire the dimensions and object name.  Generate the
 *                  full component name.
                      CALL DTA_SZVAR( LEVEL2, 7, NDIM, CDIMS, DSTAT )
-                     CALL DTA_CRNAM( 'OUTPUT', NAME2, NDIM, CDIMS, 
-     :                               NAMOUT, DSTAT )
+                     CALL DTA_CRNAM( OUTNDF( :NPC ), NAME2, NDIM,
+     :                               CDIMS, NAMOUT, DSTAT )
                      CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
 
 *                  The .Z.LABEL and .Z.UNITS are copied to .LABEL
@@ -862,7 +949,7 @@
 *                  NDF, and writing the value to it.
                      NDATA = CDIMS( 1 )
                      CALL DTA_RDVARC( LEVEL2, NDATA, STRING, DSTAT )
-                     CALL DTA_CRNAM( 'OUTPUT', NAME2, 0, 0, 
+                     CALL DTA_CRNAM( OUTNDF( :NPC ), NAME2, 0, 0, 
      :                               NAMOUT, DSTAT )
                      CALL DTA_WRVARC( NAMOUT, NDATA, STRING, DSTAT )
 
@@ -873,8 +960,9 @@
      :                 'WARNING: Imaginary data are not copied.', 
      :                 STATUS )
 *                     CALL DTA_CYVAR( LEVEL2, 
-*     :                             'OUTPUT.DATA_ARRAY.IMAGINARY_DATA', 
-*     :                              DSTAT )
+*     :                               OUTNDF( :NPC )/
+*     :                               /'.DATA_ARRAY.IMAGINARY_DATA', 
+*     :                               DSTAT )
                      IF ( DSTAT .NE. 0 ) GOTO 400
 
 *               Ignore FLAGGED as this information has been used
@@ -888,8 +976,8 @@
 *               extension.
                   ELSE IF ( NAME2 .EQ. 'MAGFLAG' .OR.
      :                      NAME2 .EQ. 'RANGE' ) THEN
-                     CALL DTA_CYVAR( LEVEL2, 'OUTPUT.MORE.FIGARO.'/
-     :                               /NAME2, DSTAT )
+                     CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )/
+     :                               /'.MORE.FIGARO.'//NAME2, DSTAT )
 
 *               Must be a non-standard component.
                   ELSE
@@ -897,16 +985,16 @@
 *                  Create the extension for these non-standard objects,
 *                  if not already done so.
                      IF ( .NOT. MORFGZ ) THEN
-                        CALL DTA_CRVAR( 'OUTPUT.MORE.FIGARO.Z', 
-     :                                  'STRUCT', DSTAT )
+                        CALL DTA_CRVAR( OUTNDF( :NPC )/
+     :                                  /'.MORE.FIGARO.Z', 'STRUCT',
+     :                                  DSTAT )
                         MORFGZ = .TRUE.
                      END IF                                           
 
 *                  Copy the non-standard object to the FIGARO.Z
 *                  extension.
-                     CALL DTA_CYVAR( LEVEL2, 
-     :                               'OUTPUT.MORE.FIGARO.Z.'//NAME2, 
-     :                               DSTAT )
+                     CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )/
+     :                               /'.MORE.FIGARO.Z.'//NAME2, DSTAT )
                   END IF
                   IF ( DSTAT .NE. 0 ) GOTO 400
 111               CONTINUE
@@ -934,7 +1022,8 @@
 *                  INPUT.OBS.OBJECT is copied into OUTPUT.TITLE provided
 *                  it is not a structure.
                      IF ( NAME2 .EQ. 'OBJECT' .AND. .NOT. STRUCT ) THEN
-                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.TITLE', DSTAT )
+                        CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )/
+     :                                  /'.TITLE', DSTAT )
                         IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                  Test for the airmass or time.  These are not copied
@@ -942,24 +1031,25 @@
 *                  at the top level of the Figaro extension.
                      ELSE IF ( NAME2 .EQ. 'SECZ' .OR.
      :                         NAME2 .EQ. 'TIME' ) THEN
-                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.MORE.FIGARO.'/
-     :                                  /NAME2, DSTAT )
+                        CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )/
+     :                                  /'.MORE.FIGARO.'//NAME2, DSTAT )
                            
                      ELSE
 
 *                     Create the Figaro OBS extension for other
 *                     ancillary data.
                         IF ( .NOT. MORFGO ) THEN
-                           CALL DTA_CRVAR( 'OUTPUT.MORE.FIGARO.OBS', 
-     :                                     'OBS', DSTAT )
+                           CALL DTA_CRVAR( OUTNDF( :NPC )/
+     :                                     /'.MORE.FIGARO.OBS', 'OBS',
+     :                                     DSTAT )
                            MORFGO = .TRUE.
                         END IF
 
 *                     Any other items in the .OBS structure are copied
 *                     into the .MORE.FIGARO.OBS structure.
-                        CALL DTA_CYVAR( LEVEL2,
-     :                                  'OUTPUT.MORE.FIGARO.OBS.'/
-     :                                  /NAME2, DSTAT )
+                        CALL DTA_CYVAR( LEVEL2, OUTNDF( :NPC )/
+     :                                  /'.MORE.FIGARO.OBS.'//NAME2,
+     :                                  DSTAT )
 
                      END IF
                      IF ( DSTAT .NE. 0 ) GOTO 400
@@ -988,7 +1078,7 @@
                END IF
 
 *            Generate the full component name.
-               CALL DTA_CRNAM( 'OUTPUT', 'AXIS', 1, IAXIS, AXOUT,
+               CALL DTA_CRNAM( OUTNDF( :NPC ), 'AXIS', 1, IAXIS, AXOUT,
      :                         DSTAT )
 
 *            Loop through all the components of the axis structure.
@@ -1270,7 +1360,8 @@
 *               NDF.MORE.
                   IF ( NMSTA3 .EQ. 0 ) THEN
                      CALL DTA_CYVAR( 'INPUT.MORE.'//MORNAM, 
-     :                               'OUTPUT.MORE.'//MORNAM, DSTAT )
+     :                               OUTNDF( :NPC )//'.MORE.'//MORNAM,
+     :                               DSTAT )
                   END IF
                END DO
                IF ( DSTAT .NE. 0 ) GO TO 400
@@ -1281,9 +1372,8 @@
 
 *            TABLE used for FIGARO SPIKETRUM routines. Copy this to 
 *            .MORE.FIGARO.TABLE extension.
-               CALL DTA_CYVAR( 'INPUT.TABLE', 
-     :                         'OUTPUT.MORE.FIGARO.TABLE', 
-     :                         DSTAT )
+               CALL DTA_CYVAR( 'INPUT.TABLE', OUTNDF( :NPC )/
+     :                         /'.MORE.FIGARO.TABLE', DSTAT )
                IF ( DSTAT .NE. 0 ) GOTO 400
 
 *         Deal with FITS objects in the FITS and COMMENTS structures.
@@ -1297,8 +1387,8 @@
             ELSE
 
 *            Any other data objects are copied into .MORE.FIGARO
-               CALL DTA_CYVAR( LEVEL1, 'OUTPUT.MORE.FIGARO.'//NAME1, 
-     :                         DSTAT )
+               CALL DTA_CYVAR( LEVEL1, OUTNDF( :NPC )//'.MORE.FIGARO.'/
+     :                         /NAME1, DSTAT )
                IF ( DSTAT .NE. 0 ) GOTO 400
             END IF
          END IF
@@ -1325,7 +1415,8 @@
 *   Create a .MORE.FITS array of 80-character card images.
       FDIMS( 1 ) = 80
       FDIMS( 2 ) = NFITS
-      CALL DTA_CRNAM( 'OUTPUT.MORE', 'FITS', 2, FDIMS, NAMOUT, DSTAT )
+      CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS, NAMOUT,
+     :                DSTAT )
       CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
 
 *   Now deal with the FITS items one by one.
@@ -1438,7 +1529,8 @@
 *           o  Columns 31 and 33 are spaces.
 
 *         Find the lengths of the value and keyword.
-            NSTR = CHR_LEN( FITVAL )
+            NSTRT = CHR_LEN( FITVAL )
+            NSTR = NSTRT
             NF = CHR_LEN( NAME2 )
 
 *         Start to build the FITS card image.
@@ -1454,8 +1546,72 @@
 *            Insert the leading quote, the value, and then the trailing
 *            quote.
                FITSTR( 11:11 ) = ''''
-               FITSTR( 12:11 + NSTR ) = FITVAL( 1:NSTR )
-               FITSTR( NSTR+12:NSTR+12 ) = ''''
+
+*            The valued can be extracted verbatim when it does not
+*            contain any quotes.  If it does include quotes these
+*            must be doubled in the FITS character value.  So first look
+*            for a quote.
+               NCQ = INDEX( FITVAL, '''' )
+               IF ( NCQ .EQ. 0 ) THEN
+                  FITSTR( 12:11 + NSTR ) = FITVAL( 1:NSTR )
+
+*               Insert the trailing quote.
+                  FITSTR( NSTR+12:NSTR+12 ) = ''''
+
+*            Search for the quotes, and form the FITS value string
+*            piecemeal, adding an extra quote and appending the text
+*            between the quotes.
+               ELSE
+
+*               Start the search at the first column of the input value,
+*               but in column 12 of the FITS card image.
+                  NCI = 1
+                  NCO = 12
+                  MINLEN = 8
+
+*               Loop until there are no more quotes in the string.
+                  DO WHILE ( NCQ .NE. 0 )
+
+*                  Extract the portion of the value up to and including
+*                  the quote.
+                     FITSTR( NCO:NCO + NCQ - 1 ) =
+     :                       FITVAL( NCI:NCI + NCQ - 1 )
+
+*                  Move the counters to the character after the quote.
+                     NCO = NCO + NCQ
+                     NCI = NCI + NCQ
+
+*                  Add the extra quote to the FITS value and moving the
+*                  character counter along.
+                     FITSTR( NCO:NCO ) = ''''
+                     NCO = NCO + 1
+
+*                  Look for the next quote.
+                     NCQ = INDEX( FITVAL( NCI: ), '''' )
+
+*                  We do not want trailing blanks when the original
+*                  value had less than eight characters.  So decrement
+*                  the effective length of the value so we have replaced
+*                  trailing blanks with second quotes.
+                     IF ( NSTRT .LT. MINLEN ) THEN
+                        NSTR = NSTR - 1
+                        MINLEN = MINLEN - 1
+                     END IF
+                  END DO
+
+*               Append the remainder of the text that follows the last
+*               quote.  Increment the character counter.
+                  FITSTR( NCO:NCO + NSTR - NCI ) = FITVAL( NCI: )
+                  NCO = NCO + NSTR - NCI + 1
+
+*               Insert the trailing quote.
+                  FITSTR( NCO:NCO ) = ''''
+
+*               Revise the length, which will be used to specify the
+*               location of the comment field.
+                  NSTR = NCO - 12
+               END IF
+
             ELSE
 
 *            Insert the non-character value, right justified.
@@ -1498,7 +1654,7 @@
 *         loop?---MJC.)
             FDIMS( 1 ) = 1
             FDIMS( 2 ) = NFITS
-            CALL DTA_CRNAM( 'OUTPUT.MORE', 'FITS', 2, FDIMS, 
+            CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS, 
      :                      NAMOUT, DSTAT )
 
 *         Write the FITS card image to the FITS extension.
@@ -1524,7 +1680,7 @@
 
 *            Generate the full name of the output axis data-array
 *            structure.
-               CALL DTA_CRNAM( 'OUTPUT', 'AXIS', 1, IAXIS, AXOUT,
+               CALL DTA_CRNAM( OUTNDF( :NPC ), 'AXIS', 1, IAXIS, AXOUT,
      :                         DSTAT )
                CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 1, DIMS( IAXIS ), 
      :                         AXOUTD, DSTAT )
