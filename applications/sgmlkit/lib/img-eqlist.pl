@@ -174,6 +174,7 @@ sub LaTeXHeader {
     my $fh = shift;
     print $fh <<'EOT';
 \documentclass[fleqn]{article}
+\usepackage{concmath} % concrete maths fonts
 \pagestyle{empty}
 \oddsidemargin=10pt
 \hoffset=0pt
