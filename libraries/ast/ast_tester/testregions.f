@@ -3260,12 +3260,18 @@ C
       if( ast_overlap( r3, r3, status ) .ne. 5 ) call stopit( status, 
      :                                                    'Prism 1' )
 
+      r4 = ast_Simplify( r3, status )
+      if( .not. ast_isabox( r4, status ) ) call stopit( status, 
+     :                                                    'Prism 1b' )
+      if( hasframeset( r4, status ) ) call stopit( status, 'Prism 1c' )
+      if( ast_overlap( r3, r4, status ) .ne. 5 ) call stopit( status, 
+     :                                                    'Prism 1d' )
+
 
       lbnd( 1 ) = 5500.0
       ubnd( 1 ) = 5800.0
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
       r4 = ast_prism( r1, r2, ' ', status )
-
 
       if( ast_overlap( r3, r4, status ) .ne. 3 ) call stopit( status, 
      :                                                    'Prism 2' )

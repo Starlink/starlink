@@ -79,6 +79,8 @@ f     The Interval class does not define any new routines beyond those
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mappings */
 #include "cmpmap.h"              /* Compound Mappings */
+#include "cmpframe.h"            /* Compound Frames */
+#include "prism.h"               /* Prism regions */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -114,6 +116,7 @@ AstInterval *astIntervalId_( void *, const double[], const double[], void *, con
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstInterval *MergeInterval( AstInterval *, AstRegion * );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *BndBaseMesh( AstRegion *, double *, double * );
 static AstPointSet *RegBaseMesh( AstRegion * );
@@ -606,6 +609,248 @@ static AstRegion *GetDefUnc( AstRegion *this_region ) {
    return result;
 }
 
+static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
+/*
+*+
+*  Name:
+*     astMergeInterval
+
+*  Purpose:
+*     Merge a Region with an Interval to form an Interval of higher 
+*     dimensionality.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "interval.h"
+*     AstInterval *astMergeInterval( AstInterval *this, AstRegion *reg )
+
+*  Class Membership:
+*     Interval virtual function.
+
+*  Description:
+*     This function attempts to combine the supplied Regions together
+*     into an Interval of higher dimensiomality. This is only possible if
+*     "reg" is a Box or Interval and if both have the same value for
+*     their Negated attribute. Otherwise a NULL pointer is returned
+*     without error.
+
+*  Parameters:
+*     this
+*        Pointer to an Interval.
+*     reg
+*        Pointer to a Box or Interval.
+
+*  Returned Value:
+*     A pointer to a new Interval. The number of axes spanned by this
+*     Interval will equal the sum of the number of axes spanned by the two
+*     supplied Regions. The lower indexed axes will be the axes of the
+*     Box or Interval pointer to by "reg", and the higher indexed axes
+*     will be the axes of "this". NULL is returned if the Regions cannot
+*     be merged or if an error occurs.
+
+*-
+*/
+
+/* Local Variables: */
+   AstFrame *frm;            /* Pointer to Frame for "result" */
+   AstFrame *frm_reg;        /* Pointer to Frame from "reg" */
+   AstFrame *frm_this;       /* Pointer to Frame from "this" */
+   AstInterval *new;         /* Pointer to new Interval in base Frame */
+   AstInterval *result;      /* Pointer to returned Interval in current Frame */
+   AstMapping *map;          /* Base->current Mapping for "result" */
+   AstMapping *map_reg;      /* Base->current Mapping from "reg" */
+   AstMapping *map_this;     /* Base->current Mapping from "this" */
+   AstPrism *punc;           /* Unsimplified uncertainty Region for "result" */
+   AstRegion *unc;           /* Uncertainty Region for "result" */
+   AstRegion *unc_reg;       /* Uncertainty Region from "reg" */
+   AstRegion *unc_this;      /* Uncertainty Region from "this" */
+   double *lbnd;             /* Array to hold lower axis bounds */
+   double *ubnd;             /* Array to hold upper axis bounds */
+   double fac_reg;           /* Ratio of used to default MeshSize for "reg" */
+   double fac_this;          /* Ratio of used to default MeshSize for "this" */
+   double lb;                /* Lower axis bound */
+   double ub;                /* Upper axis bound */
+   int closed;               /* Closed attribute value for returned Interval */
+   int i;                    /* Loop count */
+   int msz_reg;              /* Original MeshSize for "reg" */
+   int msz_reg_set;          /* Was MeshSize originally set for "reg"? */
+   int msz_this;             /* Original MeshSize for "this" */
+   int msz_this_set;         /* Was MeshSize originally set for "this"? */
+   int nax;                  /* Number of axes in "result" */
+   int nax_reg;              /* Number of axes in "reg" */
+   int nax_this;             /* Number of axes in "this" */
+   int neg;                  /* Negated attribute value for returned Interval */
+   int ok;                   /* Can supplied Regions be merged? */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the local error status. */
+   if ( !astOK ) return result;
+
+/* Get the number of axes in the two supplied Regions. */
+   nax_reg = astGetNaxes( reg );
+   nax_this = astGetNaxes( this );
+
+/* Allocate memory to store the bounds of the returned Interval. */
+   nax = nax_reg + nax_this;
+   lbnd = astMalloc( sizeof( double )*(size_t) nax );
+   ubnd = astMalloc( sizeof( double )*(size_t) nax );
+
+/* Check pointers can be used safely. */
+   if( astOK ) {
+
+/* Get the base Frame bounds for "reg". How this is done depends on whether 
+   "reg" is an Interval or a Box. */
+      ok =1;
+
+      if( astIsAInterval( reg ) ) {
+         for( i = 0; i < nax_reg; i++ ) {
+            lb = ((AstInterval *) reg )->lbnd[ i ];
+            ub = ((AstInterval *) reg )->ubnd[ i ];
+            if( lb == -DBL_MAX ) lb = AST__BAD;
+            if( ub == DBL_MAX ) ub = AST__BAD;
+            lbnd[ i ] = lb;
+            ubnd[ i ] = ub;
+         }
+
+      } else if( astIsABox( reg ) ) {
+         astRegBaseBox( reg, lbnd, ubnd );
+
+      } else {
+         ok = 0;
+      }
+
+/* Check they have the same Negated and Closed value.·*/
+      neg = astGetNegated( this );
+      if( neg != astGetNegated( reg ) ) ok = 0;
+
+      closed = astGetClosed( this );
+      if( closed != astGetClosed( reg ) ) ok = 0;
+
+/* If OK, append the axis limits for "this". */
+      if( ok ) {
+         for( i = 0; i < nax_this; i++ ) {
+            lb = this->lbnd[ i ];
+            ub = this->ubnd[ i ];
+            if( lb == -DBL_MAX ) lb = AST__BAD;
+            if( ub == DBL_MAX ) ub = AST__BAD;
+            lbnd[ i + nax_reg ] = lb;
+            ubnd[ i + nax_reg ] = ub;
+         }
+ 
+/* Get the base Frames from the two Regions and combine them into a
+   CmpFrame. */
+         frm_reg = astGetFrame( ((AstRegion *) reg )->frameset, AST__BASE );
+         frm_this = astGetFrame( ((AstRegion *) this )->frameset, AST__BASE );
+         frm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "" );
+         frm_reg = astAnnul( frm_reg );
+         frm_this = astAnnul( frm_this );
+
+/* If either supplied Region has a set uncertainty, get the uncertainty
+   Regions from the two Regions (in their base Frame) and combine them into 
+   a Prism. Then simplify the Prism. */
+         if( astTestUnc( reg ) || astTestUnc( this ) ) {
+            unc_reg = astGetUnc( reg, AST__BASE );
+            unc_this = astGetUnc( this, AST__BASE );
+            punc = astPrism( unc_reg, unc_this, "" );
+            unc = astSimplify( punc );
+            unc_reg = astAnnul( unc_reg );
+            unc_this = astAnnul( unc_this );
+            punc = astAnnul( punc );
+
+         } else {
+            unc = NULL;
+         }
+
+/* Create the merged Interval representing an area within the base
+   Frames of the supplied Regions. */
+         new = astInterval( frm, lbnd, ubnd, unc, "" );
+         frm = astAnnul( frm );
+         if( unc ) unc = astAnnul( unc );
+
+/* Set values for the Negated and Closed attributes. */
+         astSetNegated( new, neg );
+         astSetClosed( new, closed );
+
+/* If either of the supplied Regions has a specified FillFactor set the
+   FillFactor of the new Interval to the product of the two FillFactors. */
+         if( astTestFillFactor( this ) || astTestFillFactor( reg ) ) {
+            astSetFillFactor( new, astGetFillFactor( this )*
+                                      astGetFillFactor( reg ) );
+         }
+
+/* If the MeshSize value is set in either supplied Region, set a value
+   for the returned Interval which scales the default value by the
+   product of the scaling factors for the two supplied Regions. First see
+   if either MeshSize value is set. */
+         msz_this_set = astTestMeshSize( this );
+         msz_reg_set = astTestMeshSize( reg );
+         if( msz_this_set || msz_reg_set ) {
+
+/* If so, get the two MeshSize values (one of which may be a default
+   value), and then clear them so that the default value willbe returned
+   in future. */
+            msz_this = astGetMeshSize( this );
+            msz_reg = astGetMeshSize( reg );
+            astClearMeshSize( this );
+            astClearMeshSize( reg );
+
+/* Get the ratio of the used MeshSize to the default MeshSize for both
+   Regions. */
+            fac_this = (double)msz_this/(double)astGetMeshSize( this );
+            fac_reg = (double)msz_reg/(double)astGetMeshSize( reg );
+
+/* The MeshSize of the returned Interval is the default value scaled by
+   the product of the two ratios found above. */
+            astSetMeshSize( new, fac_this*fac_reg*astGetMeshSize( new ) );
+
+/* Re-instate the original MeshSize values for the supplied Regions (if
+   set) */
+            if( msz_this_set ) astSetMeshSize( this, msz_this );
+            if( msz_reg_set ) astSetMeshSize( reg, msz_reg );
+         }
+
+/* Map the new Interval from the base Frames by the supplied Regions
+   to their current Frames. First obtain and combine the base->current
+   Mappings from the two supplied Regions. Then obtain and combine the 
+   current Frames from the two supplied Regions. Then remap the new
+   Interval. */
+         map_reg = astGetMapping( ((AstRegion *) reg )->frameset, AST__BASE, AST__CURRENT );
+         map_this = astGetMapping( ((AstRegion *) this )->frameset, AST__BASE, AST__CURRENT );
+         map = (AstMapping *) astCmpMap( map_reg, map_this, 0, "" );
+
+         frm_reg = astGetFrame( ((AstRegion *) reg )->frameset, AST__CURRENT );
+         frm_this = astGetFrame( ((AstRegion *) this )->frameset, AST__CURRENT );
+         frm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "" );
+
+         result = astMapRegion( new, map, frm );
+
+/* Free remaining resources. */
+         frm_this = astAnnul( frm_this );
+         frm_reg = astAnnul( frm_reg );
+         frm = astAnnul( frm );
+         map_this = astAnnul( map_this );
+         map_reg = astAnnul( map_reg );
+         map = astAnnul( map );
+         new = astAnnul( new );
+
+      }
+   }
+
+/* Free resources. */
+   lbnd = astFree( lbnd );
+   ubnd = astFree( ubnd );
+
+/* If an error has occurred, annul the returned pointer. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
+
 void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
 /*
 *+
@@ -663,6 +908,7 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+   vtab->MergeInterval = MergeInterval;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2822,4 +3068,8 @@ AstInterval *astLoadInterval_( void *mem, size_t size, AstIntervalVtab *vtab,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
+AstInterval *astMergeInterval_( AstInterval *this, AstRegion *reg ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Interval,MergeInterval))( this, reg );
+}
 

@@ -8144,7 +8144,7 @@ astMAKE_TEST(Region,RegionFS,( this->regionfs != -INT_MAX ))
 *     which data is available.
 *
 *     The supplied value must be in the range 0.0 to 1.0, and the default
-*     value is 1.0.
+*     value is 1.0 (except as noted below).
 
 *  Applicability:
 *     Region
@@ -8152,6 +8152,9 @@ astMAKE_TEST(Region,RegionFS,( this->regionfs != -INT_MAX ))
 *     CmpRegion
 *        The default FillFactor for a CmpRegion is the FillFactor of its
 *        first component Region.
+*     Prism
+*        The default FillFactor for a Prism is the product of the
+*        FillFactors of its two component Regions.
 *     Stc
 *        The default FillFactor for an Stc is the FillFactor of its
 *        encapsulated Region.

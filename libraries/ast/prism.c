@@ -104,10 +104,9 @@ static AstMapping *(* parent_simplify)( AstMapping * );
 static int (* parent_equal)( AstObject *, AstObject * );
 static void (* parent_setclosed)( AstRegion *, int );
 static void (* parent_setmeshsize)( AstRegion *, int );
-static void (* parent_setfillfactor)( AstRegion *, double );
 static void (* parent_clearclosed)( AstRegion * );
 static void (* parent_clearmeshsize)( AstRegion * );
-static void (* parent_clearfillfactor)( AstRegion * );
+static double (*parent_getfillfactor)( AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -122,6 +121,7 @@ static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *GetUnc( AstRegion *, int );
+static double GetFillFactor( AstRegion * );
 static int Equal( AstObject *, AstObject * );
 static int GetBounded( AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
@@ -133,10 +133,8 @@ static void Dump( AstObject *, AstChannel * );
 static void GetRegions( AstPrism *, AstRegion **, AstRegion **, int * );
 static void RegBaseBox( AstRegion *, double *, double * );
 static void SetRegFS( AstRegion *, AstFrame * );
-static void SetFillFactor( AstRegion *, double );
 static void SetClosed( AstRegion *, int );
 static void SetMeshSize( AstRegion *, int );
-static void ClearFillFactor( AstRegion * );
 static void ClearClosed( AstRegion * );
 static void ClearMeshSize( AstRegion * );
 
@@ -320,9 +318,8 @@ static void Set##attribute( AstRegion *this_region, type value ) { \
    astSet##attribute( this->region2, value ); \
 }
 
-/* Use the above macro to create accessors for the MeshSize, Closed and
-   FillFactor attributes. */
-MAKE_SET(FillFactor,fillfactor,double)
+/* Use the above macro to create accessors for the MeshSize and Closed 
+   attributes. */
 MAKE_SET(MeshSize,meshsize,int)
 MAKE_SET(Closed,closed,int)
 
@@ -381,9 +378,8 @@ static void Clear##attribute( AstRegion *this_region ) { \
    astClear##attribute( this->region2 ); \
 }
 
-/* Use the above macro to create accessors for the MeshSize, Closed and
-   FillFactor attributes. */
-MAKE_CLEAR(FillFactor,fillfactor)
+/* Use the above macro to create accessors for the MeshSize and Closed 
+   attributes. */
 MAKE_CLEAR(MeshSize,meshsize)
 MAKE_CLEAR(Closed,closed)
 
@@ -477,6 +473,74 @@ static int GetBounded( AstRegion *this_region ) {
    if( !astOK ) result = 0;
 
 /* Return the required pointer. */
+   return result;
+}
+
+static double GetFillFactor( AstRegion *this_region ) {
+/*
+*  Name:
+*     GetFillFactor
+
+*  Purpose:
+*     Obtain the value of the FillFactor attribute for a Prism.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "prism.h"
+*     double GetFillFactor( AstRegion *this )
+
+*  Class Membership:
+*     Prism member function (over-rides the astGetFillFactor method inherited
+*     from the Region class).
+
+*  Description:
+*     This function returns the value of the FillFactor attribute for a
+*     Prism.  A suitable default value is returned if no value has
+*     previously been set.
+
+*  Parameters:
+*     this
+*        Pointer to the Prism.
+
+*  Returned Value:
+*     The FillFactor value to use.
+
+*/
+
+/* Local Variables: */
+   AstPrism *this;
+   double f1;
+   double f2;
+   double result; 
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Obtain a pointer to the Prism structure. */
+   this = (AstPrism *) this_region;
+
+/* See if a FillFactor value has been set. If so, use the parent
+   astGetFillFactor  method to obtain it. */
+   if ( astTestFillFactor( this ) ) {
+      result = (*parent_getfillfactor)( this_region );
+
+/* Otherwise, we will generate a default value equal to the product of
+   the FillFactor values of the two component Regions. */
+   } else {
+      f1 = astGetFillFactor( this->region1 );
+      f2 = astGetFillFactor( this->region2 );
+      if( f1 != AST__BAD && f2 != AST__BAD ) result = f1*f2;
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
    return result;
 }
 
@@ -770,17 +834,14 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
    parent_clearmeshsize = region->ClearMeshSize;
    region->ClearMeshSize = ClearMeshSize;
 
-   parent_clearfillfactor = region->ClearFillFactor;
-   region->ClearFillFactor = ClearFillFactor;
-
    parent_setclosed = region->SetClosed;
    region->SetClosed = SetClosed;
 
    parent_setmeshsize = region->SetMeshSize;
    region->SetMeshSize = SetMeshSize;
 
-   parent_setfillfactor = region->SetFillFactor;
-   region->SetFillFactor = SetFillFactor;
+   parent_getfillfactor = region->GetFillFactor;
+   region->GetFillFactor = GetFillFactor;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -1481,6 +1542,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    AstMapping *nmap2;            /* Reg2->current Mapping */
    AstMapping *result;           /* Result pointer to return */
    AstPrism *new;                /* New Prism */
+   AstRegion *new2;              /* New Interval or Box */
    AstRegion *newreg1;           /* Reg1 mapped into current Frame */
    AstRegion *newreg2;           /* Reg2 mapped into current Frame */
    AstRegion *reg1;              /* First component Region */
@@ -1570,9 +1632,11 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       newreg2 = astMapRegion( reg2, nmap2, newfrm2 );
       snewreg2 = astSimplify( newreg2 );      
 
-/* If either component Region was simplified, then create a new Prism
-   from the simplified Regions. */
-      if( snewreg1 != newreg1 || snewreg2 != newreg2 ) { 
+/* If either component Region was simplified, and if the simplified
+   second Region is an Interval, then create a new Prism from the 
+   simplified Regions. */
+      if( ( snewreg1 != newreg1 || snewreg2 != newreg2 ) &&
+          astIsAInterval( snewreg2 ) ) { 
          astAnnul( new );
          new = astPrism( snewreg1, snewreg2, "" );
 
@@ -1595,8 +1659,20 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       newfrm2 = astAnnul( newfrm2 );
       newreg1 = astAnnul( newreg1 );
       newreg2 = astAnnul( newreg2 );
-      snewreg1 = astAnnul( newreg1 );
-      snewreg2 = astAnnul( newreg2 );
+      snewreg1 = astAnnul( snewreg1 );
+      snewreg2 = astAnnul( snewreg2 );
+   }
+
+/* The second component Region in the Prism is known to be an Interval. 
+   If the first component Region is also an Interval, or is a Box, we
+   can replace the Prism by a single Interval defined within a CmpFrame.
+   Attempt to do this. If succesful, attempt to simplify the new Region
+   and use it in place of the original. */
+   new2 = astMergeInterval( new->region2, new->region1 );
+   if( new2 ) {
+      astAnnul( new );
+      new = astSimplify( new2 );
+      new2 = astAnnul( new2 );
    }
 
 /* Now invoke the parent Simplify method inherited from the Region class. 
@@ -2130,7 +2206,7 @@ f     AST_PRISM
 
 *  Synopsis:
 c     #include "prism.h"
-c     AstPrism *astPrism( AstRegion *region1, AstRegion *region2, 
+c     AstPrism *astPrism( AstRegion *region1, AstInterval *region2, 
 c                         const char *options, ... )
 f     RESULT = AST_PRISM( REGION1, REGION2, OPTIONS, STATUS )
 
@@ -2188,11 +2264,6 @@ f     AST_PRISM = INTEGER
 *        A pointer to the new Prism.
 
 *  Notes:
-*     - If one of the supplied Regions has an associated uncertainty,
-*     that uncertainty will also be used for the returned Prism.
-*     If both supplied Regions have associated uncertainties, the
-*     uncertainty associated with the first Region will be used for the 
-*     returned Prism.
 *     - Deep copies are taken of the supplied Regions. This means that
 *     any subsequent changes made to the component Regions using the 
 *     supplied pointers will have no effect on the Prism.

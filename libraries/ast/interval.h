@@ -94,6 +94,8 @@ typedef struct AstIntervalVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   AstInterval *(* MergeInterval)( AstInterval *, AstRegion * );
+
 } AstIntervalVtab;
 #endif
 
@@ -130,6 +132,7 @@ AstInterval *astLoadInterval_( void *, size_t, AstIntervalVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
+AstInterval *astMergeInterval_( AstInterval *, AstRegion * );
 #endif
 
 /* Function interfaces. */
@@ -178,5 +181,6 @@ astINVOKE(O,astLoadInterval_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
+#define astMergeInterval(this,reg) astINVOKE(O,astMergeInterval_(astCheckInterval(this),astCheckRegion(reg)))
 #endif
 #endif
