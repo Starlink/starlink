@@ -950,4 +950,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/frog/build.xml:388: Compile failed; see the compiler error output for details.
 
-Total time: 6 minutes 3 seconds
+Total time: 5 minutes 59 seconds

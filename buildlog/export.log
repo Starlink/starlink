@@ -234,7 +234,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/diva-0.3.zip
@@ -955,4 +954,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/frog/build.xml:388: Compile failed; see the compiler error output for details.
 
-Total time: 19 minutes 53 seconds
+Total time: 20 minutes 46 seconds
