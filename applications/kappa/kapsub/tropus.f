@@ -29,6 +29,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +41,8 @@
 *        Modified to allow use of external arrays.
 *     1995 April 7 (MJC):
 *        Minor stylistic changes, and shortened long lines.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -54,6 +57,7 @@
       INCLUDE 'ME_COM'           ! Common blocks required by MEMSYS3.
       INCLUDE 'C1_COM'           ! Common blocks use to communicate with
                                  ! MEM2D
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER  J
@@ -66,8 +70,9 @@
 *  internal memory within common block /MECOMS/.  Area <3> holds the FFT
 *  of the PSF.
       IF ( C1_WEXT ) THEN
-         CALL KPS1_TROP1( %VAL( C1_IP( 3 ) ), %VAL( C1_IP( K ) ), 
-     :                    %VAL( C1_IP( J ) ) ) 
+         CALL KPS1_TROP1( %VAL( CNF_PVAL( C1_IP( 3 ) ) ), 
+     :                    %VAL( CNF_PVAL( C1_IP( K ) ) ),
+     :                    %VAL( CNF_PVAL( C1_IP( J ) ) ) )
 
 *  Pad the external area out with zeros.  This puts zeros between the
 *  last image pixel and the end of the area (areas can be bigger than
@@ -75,7 +80,7 @@
 *  each area).  This simulates a response function of zero at these
 *  pixels.
          CALL KPS1_MEMFX( ME_MK * ME_NK, C1_NPX * C1_NLN, 
-     :                    %VAL( C1_IP( J ) ) )
+     :                    %VAL( CNF_PVAL( C1_IP( J ) ) ) )
 
       ELSE 
          CALL KPS1_TROP1( ME_ST( ME_KB( 3 ) ), ME_ST( ME_KB( K ) ), 

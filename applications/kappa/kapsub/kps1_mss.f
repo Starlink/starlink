@@ -40,11 +40,15 @@
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     4-DEC-2001 (MBT):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
 
 *-
 
@@ -57,6 +61,7 @@
       INCLUDE 'GRP_PAR'          ! GRP public constants
       INCLUDE 'NDF_PAR'          ! NDF system constants
       INCLUDE 'PRM_PAR'          ! VAL__BADx constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Arguments Given:
       INTEGER IGRP
@@ -227,7 +232,8 @@
      :                    EL, STATUS )
 
 *  Extract the single pixel value.
-            CALL KPG1_RETRD( EL, 1, %VAL( IPCOMP ), PIXS( NGOOD + 1 ), 
+            CALL KPG1_RETRD( EL, 1, %VAL( CNF_PVAL( IPCOMP ) ), 
+     :                       PIXS( NGOOD + 1 ),
      :                       STATUS )
 
 *  Check if this pixel is good.

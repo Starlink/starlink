@@ -114,11 +114,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-SEP-1998 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,6 +136,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants 
       INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER MODE*(*)
@@ -281,11 +285,12 @@
 *  Find NN positions evenly spaced (in the Current Frame) along the profile.
          DELTA = CLEN/DBLE( NN - 1 )
          CALL KPG1_ASSMP( CFRM, ARRDIM, NCAX, NPOS, POS, GEO, NN,
-     :                    DELTA, %VAL( IPCPOS ), STATUS )
+     :                    DELTA, %VAL( CNF_PVAL( IPCPOS ) ), STATUS )
 
 *  Transform these positions into the GRID Frame.
-         CALL AST_TRANN( SMAP, NN, NCAX, NN, %VAL( IPCPOS ), 
-     :                   .FALSE., NDIM, NN, %VAL( IPGPOS ), STATUS ) 
+         CALL AST_TRANN( SMAP, NN, NCAX, NN, %VAL( CNF_PVAL( IPCPOS ) ),
+     :                   .FALSE., NDIM, NN, %VAL( CNF_PVAL( IPGPOS ) ), 
+     :                   STATUS )
 
 *  Store a pointer to the Base Frame of the supplied FrameSet.
          BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
@@ -299,7 +304,8 @@
 
          DO I = 2, NN
 
-            INTVL = KPG1_ASDIS( BFRM, NN, NDIM, %VAL( IPGPOS ), 
+            INTVL = KPG1_ASDIS( BFRM, NN, NDIM, 
+     :                          %VAL( CNF_PVAL( IPGPOS ) ),
      :                          I - 1, I, .FALSE., STATUS )
 
             IF( INTVL .NE. AST__BAD ) THEN
@@ -332,7 +338,7 @@
 *  positions into GRID Frame.
       IF( MODE .EQ. 'POINTS' ) THEN
          CALL AST_TRANN( SMAP, NP, NCAX, ARRDIM, POS, .FALSE., NDIM, NP,
-     :                   %VAL( IPGPOS ), STATUS ) 
+     :                   %VAL( CNF_PVAL( IPGPOS ) ), STATUS )
 
 *  In CURVE mode we need to find the sample positions.
       ELSE      
@@ -349,11 +355,12 @@
 
 *  Find the required NP positions in the Current Frame.
          CALL KPG1_ASSMP( CFRM, ARRDIM, NCAX, NPOS, POS, GEO, NP, DELTA,
-     :                    %VAL( IPCPOS ), STATUS )
+     :                    %VAL( CNF_PVAL( IPCPOS ) ), STATUS )
 
 *  Transform these positions into the GRID Frame.
-         CALL AST_TRANN( SMAP, NP, NCAX, NP, %VAL( IPCPOS ), 
-     :                   .FALSE., NDIM, NP, %VAL( IPGPOS ), STATUS ) 
+         CALL AST_TRANN( SMAP, NP, NCAX, NP, %VAL( CNF_PVAL( IPCPOS ) ),
+     :                   .FALSE., NDIM, NP, %VAL( CNF_PVAL( IPGPOS ) ), 
+     :                   STATUS )
       END IF
 
 *  Allocate memory to hold the returned data values, at the NP positions.
@@ -371,8 +378,10 @@
 
 *  Sample the input array using nearest-neighbour interpolation at each
 *  of the GRID positions.
-      CALL KPS1_PRFSM( NDIM, DIM, INDAT, VAR, INVAR, NP, %VAL( IPGPOS ),
-     :                 %VAL( IPPDAT ), %VAL( IPPVAR ), BADD, BADV, 
+      CALL KPS1_PRFSM( NDIM, DIM, INDAT, VAR, INVAR, NP, 
+     :                 %VAL( CNF_PVAL( IPGPOS ) ),
+     :                 %VAL( CNF_PVAL( IPPDAT ) ), 
+     :                 %VAL( CNF_PVAL( IPPVAR ) ), BADD, BADV,
      :                 STATUS )
 
 *  Re-map the Base Frame of the supplied FrameSet so that it describes the 
@@ -383,14 +392,16 @@
 *  array into values on the first Base Frame axis. On return, the row
 *  within %VAL( IPGPOS ) holding the LUT values is replaced by an array
 *  of GRID co-ordinate values within the LUT (i.e. 1.0, 2.0, 3.0, etc).
-      CALL KPS1_PRFLT( 1, NP, NDIM, %VAL( IPGPOS ), MAP, STATUS )
+      CALL KPS1_PRFLT( 1, NP, NDIM, %VAL( CNF_PVAL( IPGPOS ) ), 
+     :                 MAP, STATUS )
 
 *  Loop round all remaining Base Frame axes.
       DO I = 2, NDIM
 
 *  Create a LutMap which transforms 1-D GRID position in the returned 1-D
 *  array into values on the current Base Frame axis.
-         CALL KPS1_PRFLT( I, NP, NDIM, %VAL( IPGPOS ), LUTMAP, STATUS )
+         CALL KPS1_PRFLT( I, NP, NDIM, %VAL( CNF_PVAL( IPGPOS ) ), 
+     :                    LUTMAP, STATUS )
 
 *  Combine the current total Mapping with this LutMaps in parallel, and then 
 *  annul the individual pointers.
@@ -461,7 +472,8 @@
       END IF
 
 *  Create the positions list itself.
-      CALL KPG1_WRLST( PARAM, NP, NP, 1, %VAL( IPGPOS ), AST__BASE,
+      CALL KPG1_WRLST( PARAM, NP, NP, 1, %VAL( CNF_PVAL( IPGPOS ) ), 
+     :                 AST__BASE,
      :                 IWCS, TTL( : IAT ), 1, 0, .TRUE., STATUS )
 
 *  Tidy up.

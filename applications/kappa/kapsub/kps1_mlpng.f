@@ -84,6 +84,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -91,6 +92,8 @@
 *        Original version.
 *     15-FEB-2000 (DSB):
 *        Modified to take account of new KPG1_GTAXV argument list.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +109,7 @@
       INCLUDE 'AST_PAR'          ! AST constants 
       INCLUDE 'PRM_PAR'          ! VAL__ constants 
       INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER ABSDIM
@@ -370,15 +374,18 @@
       A( 1 ) = DBLE( LBNDL )
       A( 2 ) = DBLE( UBNDL )
       CALL KPG1_ASSMP( AST__NULL, 2, 1, 2, A, .FALSE., LUTLEN, 
-     :                 1.0D0, %VAL( IPG ), STATUS )
+     :                 1.0D0, %VAL( CNF_PVAL( IPG ) ), STATUS )
 
 *  Transform these GRID positions into values for the required annotated
 *  axis.
-      CALL KPS1_MLPMP( NAX, CFRM, MAP2, LUTLEN, %VAL( IPG ), .TRUE., 
-     :                 IAXIS, %VAL( IPLUT ), %VAL( IPWORK ), STATUS )
+      CALL KPS1_MLPMP( NAX, CFRM, MAP2, LUTLEN, %VAL( CNF_PVAL( IPG ) ), 
+     :                 .TRUE.,
+     :                 IAXIS, %VAL( CNF_PVAL( IPLUT ) ), 
+     :                 %VAL( CNF_PVAL( IPWORK ) ), STATUS )
 
 *  Create the LutMap.
-      LUTMAP = AST_LUTMAP( LUTLEN, %VAL( IPLUT ), 1.0D0, 1.0D0, ' ', 
+      LUTMAP = AST_LUTMAP( LUTLEN, %VAL( CNF_PVAL( IPLUT ) ), 
+     :                     1.0D0, 1.0D0, ' ',
      :                     STATUS )
 
 *  Report an error and abort if the inverse transformation is not defined
@@ -419,7 +426,7 @@
       A( 1 ) = 1.0D0
       A( 2 ) = DBLE( ABSDIM )
       CALL KPG1_ASSMP( AST__NULL, 2, 1, 2, A, .FALSE., ABSDIM, 
-     :                 1.0D0, %VAL( IPGL ), STATUS )
+     :                 1.0D0, %VAL( CNF_PVAL( IPGL ) ), STATUS )
 
 *  Loop round each line.
       DO I = 1, NDISP
@@ -444,20 +451,25 @@
 
 *  Use this Mapping to get the annotated axis value at the centre of each
 *  pixel in this line. 
-         CALL KPS1_MLPMP( NAX, CFRM, MAP3, ABSDIM, %VAL( IPGL ), .TRUE., 
-     :                    IAXIS, %VAL( IPAXL ), %VAL( IPWORK ), STATUS )
+         CALL KPS1_MLPMP( NAX, CFRM, MAP3, ABSDIM, 
+     :                    %VAL( CNF_PVAL( IPGL ) ), .TRUE.,
+     :                    IAXIS, %VAL( CNF_PVAL( IPAXL ) ), 
+     :                    %VAL( CNF_PVAL( IPWORK ) ), STATUS )
 
 *  Set bad any values which are outside the required range of the
 *  annotated axis given by XLEFT and XRIGHT.
-         CALL KPG1_THRSD( .TRUE., ABSDIM, %VAL( IPAXL ), MIN( XL, XR ), 
+         CALL KPG1_THRSD( .TRUE., ABSDIM, %VAL( CNF_PVAL( IPAXL ) ), 
+     :                    MIN( XL, XR ),
      :                    MAX( XR, XL ), AST__BAD, AST__BAD, 
-     :                    %VAL( IPAXL ), NREPLO, NREPHI, STATUS )
+     :                    %VAL( CNF_PVAL( IPAXL ) ), 
+     :                    NREPLO, NREPHI, STATUS )
 
 *  Now use the inverse Transformation of the LutMap created earlier to 
 *  transform the annotated axis values into the nominal GRID value at 
 *  the centre of each pixel in this line. 
-         CALL AST_TRAN1( LUTMAP, ABSDIM, %VAL( IPAXL ), .FALSE., 
-     :                   %VAL( IPNOM + ( I - 1 )*ABSDIM*VAL__NBD ), 
+         CALL AST_TRAN1( LUTMAP, ABSDIM, %VAL( CNF_PVAL( IPAXL ) ), 
+     :                   .FALSE.,
+     :   %VAL( CNF_PVAL( IPNOM ) + ( I - 1 )*ABSDIM*VAL__NBD ),
      :                   STATUS ) 
 
 *  Annul the Mappings related to this line.

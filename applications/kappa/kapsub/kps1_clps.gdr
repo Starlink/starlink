@@ -71,6 +71,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -88,6 +89,8 @@
 *        To avoid impractical memory requirements, estimate the output median 
 *        variances rather than calculating them properly for sample sizes 
 *        larger than 300.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,6 +105,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER AXIS
@@ -313,20 +317,26 @@
             CALL CCG1_CM1<T><T>( WORK1, NEL2, NLIN, WORK2, IMETH, 
      :                       MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
      :                       7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT, 
-     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
-     :                       %VAL( IPPP ), %VAL( IPCOV ), NMAT, 
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL (IPUSED ), STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPPP ) ), 
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT,
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL (CNF_PVAL(IPUSED) ), STATUS )
 
 *  If the collapse axis is the last axis, we can use the original input
          ELSE 
             CALL CCG1_CM1<T><T>( DIN( START ), NEL2, NLIN, VIN( START ), 
      :                       IMETH, MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
      :                       7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT, 
-     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
-     :                       %VAL( IPPP ), %VAL( IPCOV ), NMAT, 
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL(IPUSED ), STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPPP ) ), 
+     :                       %VAL( CNF_PVAL( IPCOV ) ), NMAT,
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL(CNF_PVAL(IPUSED) ), STATUS )
          END IF
 
          CALL PSX_FREE( IPPP, STATUS )
@@ -337,26 +347,33 @@
 *  variances will be created.
       ELSE
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPVAR, STATUS )
-         CALL KPG1_FILLD( 1.0D0, NLIN, %VAL( IPVAR ), STATUS )
+         CALL KPG1_FILLD( 1.0D0, NLIN, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    STATUS )
 
 *  If the axis along which the input array was collapsed was not the last
 *  axis, we need to use the re-ordered data in the work arrays.
          IF( USEWRK ) THEN   
-            CALL CCG1_CM3<T><T>( WORK1, NEL2, NLIN, %VAL( IPVAR ), IMETH,
+            CALL CCG1_CM3<T><T>( WORK1, NEL2, NLIN, 
+     :                           %VAL( CNF_PVAL( IPVAR ) ), IMETH,
      :                       MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
      :                       7, 4.0, 0.0, 0.0, 0.0,
-     :                       DOUT, %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL (IPUSED ), STATUS )
+     :                       DOUT, %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL (CNF_PVAL(IPUSED) ), STATUS )
 
 *  If the collapse axis is the last axis, we can use the original input data.
          ELSE 
-            CALL CCG1_CM3<T><T>( DIN( START ), NEL2, NLIN, %VAL( IPVAR ), 
+            CALL CCG1_CM3<T><T>( DIN( START ), NEL2, NLIN, 
+     :                           %VAL( CNF_PVAL( IPVAR ) ),
      :                       IMETH, MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
      :                       7, 4.0, 0.0, 0.0, 0.0,
-     :                       DOUT, %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
-     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL (IPUSED ), STATUS )
+     :                       DOUT, %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                       %VAL( CNF_PVAL( IPNCON ) ), 
+     :                       %VAL( CNF_PVAL( IPPNT ) ),
+     :                       %VAL (CNF_PVAL(IPUSED) ), STATUS )
          END IF
 
          CALL PSX_FREE( IPVAR, STATUS )

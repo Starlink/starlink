@@ -79,6 +79,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -89,6 +90,10 @@
 *     18-OCT-1999 (DSB):
 *        Added arguments DLO and DHI, and moved assignment to output
 *        parameters SCALOW and SCAHIGH into display.f.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
+
 *-
 
 *  Type Definitions:
@@ -189,6 +194,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 *.
 
 *  Initialise.
@@ -280,14 +286,18 @@
 *  propagated to the averaged array unless all pixels in a
 *  BLAVF*BLAVF-sized bin are bad.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CMAVR( 2, SDIMS, %VAL( PNTRI( 1 ) ), BLAVF, 1,
-     :                       %VAL( SAPNT ), %VAL( SAPNT1 ),
-     :                       %VAL( SAPNT2 ), STATUS )
+            CALL KPG1_CMAVR( 2, SDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       BLAVF, 1,
+     :                       %VAL( CNF_PVAL( SAPNT ) ), 
+     :                       %VAL( CNF_PVAL( SAPNT1 ) ),
+     :                       %VAL( CNF_PVAL( SAPNT2 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CMAVD( 2, SDIMS, %VAL( PNTRI( 1 ) ), BLAVF, 1,
-     :                       %VAL( SAPNT ), %VAL( SAPNT1 ),
-     :                       %VAL( SAPNT2 ), STATUS )
+            CALL KPG1_CMAVD( 2, SDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       BLAVF, 1,
+     :                       %VAL( CNF_PVAL( SAPNT ) ), 
+     :                       %VAL( CNF_PVAL( SAPNT1 ) ),
+     :                       %VAL( CNF_PVAL( SAPNT2 ) ), STATUS )
 
          END IF
 
@@ -379,32 +389,37 @@
 *  =============================================================
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_FAINR( BAD, NX, NY, 
-     :                       %VAL( PNTRI( 1 ) ), SIGRNG, LP, UP,
-     :                       BPCI, .FALSE., %VAL( IP ), RLO,
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       SIGRNG, LP, UP,
+     :                       BPCI, .FALSE., %VAL( CNF_PVAL( IP ) ), RLO,
      :                       RHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_FAIND( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), SIGRNG, LP, UP,
-     :                       BPCI, .FALSE., %VAL( IP ), DLO,
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       SIGRNG, LP, UP,
+     :                       BPCI, .FALSE., %VAL( CNF_PVAL( IP ) ), DLO,
      :                       DHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_FAINI( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), SIGRNG, LP, UP,
-     :                       BPCI, .FALSE., %VAL( IP ), ILO,
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       SIGRNG, LP, UP,
+     :                       BPCI, .FALSE., %VAL( CNF_PVAL( IP ) ), ILO,
      :                       IHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_FAINW( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), SIGRNG, LP, UP,
-     :                       BPCI, .FALSE., %VAL( IP ), WLO,
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       SIGRNG, LP, UP,
+     :                       BPCI, .FALSE., %VAL( CNF_PVAL( IP ) ), WLO,
      :                       WHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_FAINB( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), SIGRNG, LP, UP,
-     :                       BPCI, .FALSE., %VAL( IP ), BLO,
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       SIGRNG, LP, UP,
+     :                       BPCI, .FALSE., %VAL( CNF_PVAL( IP ) ), BLO,
      :                       BHI, STATUS )
 
          END IF
@@ -420,7 +435,8 @@
          IF ( ITYPE .EQ. '_REAL' ) THEN
 
 *  Obtain the maximum and minimum values.
-            CALL KPG1_MXMNR( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+            CALL KPG1_MXMNR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       NINVAL,
      :                       RHI, RLO, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -437,13 +453,16 @@
 *  cell array.
 
             CALL KPG1_ISCLR( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., RLO, RHI,
-     :                       LP, UP, BPCI, %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., RLO, RHI,
+     :                       LP, UP, BPCI, %VAL( CNF_PVAL( IP ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
 *  Obtain the maximum and minimum values.
-            CALL KPG1_MXMND( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+            CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       NINVAL,
      :                       DHI, DLO, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -459,13 +478,16 @@
 *  Scale the data values using the extreme values into the
 *  cell array.
             CALL KPG1_ISCLD( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., DLO, DHI,
-     :                       LP, UP, BPCI, %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., DLO, DHI,
+     :                       LP, UP, BPCI, %VAL( CNF_PVAL( IP ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
 
 *  Obtain the maximum and minimum values.
-            CALL KPG1_MXMNI( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+            CALL KPG1_MXMNI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       NINVAL,
      :                       IHI, ILO, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -481,13 +503,16 @@
 *  Scale the data values using the extreme values into the
 *  cell array.
             CALL KPG1_ISCLI( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., ILO, IHI,
-     :                       LP, UP, BPCI, %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., ILO, IHI,
+     :                       LP, UP, BPCI, %VAL( CNF_PVAL( IP ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
 
 *  Obtain the maximum and minimum values.
-            CALL KPG1_MXMNW( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+            CALL KPG1_MXMNW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       NINVAL,
      :                       WHI, WLO, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -503,13 +528,16 @@
 *  Scale the data values using the extreme values into the
 *  cell array.
             CALL KPG1_ISCLW( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., WLO, WHI,
-     :                       LP, UP, BPCI, %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., WLO, WHI,
+     :                       LP, UP, BPCI, %VAL( CNF_PVAL( IP ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
 
 *  Obtain the maximum and minimum values.
-            CALL KPG1_MXMNB( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+            CALL KPG1_MXMNB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       NINVAL,
      :                       BHI, BLO, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -525,8 +553,10 @@
 *  Scale the data values using the extreme values into the
 *  cell array.
             CALL KPG1_ISCLB( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., BLO, BHI,
-     :                       LP, UP, BPCI, %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., BLO, BHI,
+     :                       LP, UP, BPCI, %VAL( CNF_PVAL( IP ) ), 
+     :                       STATUS )
          END IF
 
 *  Do scaling with limits from the environment.
@@ -555,7 +585,8 @@
             ELSE
 
 *  Obtain the maximum and minimum values to be used as dynamic defaults.
-               CALL KPG1_MXMNR( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMNR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          RMAXV, RMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be possible to 
@@ -566,9 +597,10 @@
 *  Obtain the scaling limits from the environment and do the scaling into 
 *  the cell array.
             CALL KPS1_DSCLR( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., 'LOW', 'HIGH',
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., 'LOW', 'HIGH',
      :                       LP, UP, BPCI, RMINV, RMAXV, .TRUE.,
-     :                       %VAL( IP ), RLO, RHI, STATUS )
+     :                       %VAL( CNF_PVAL( IP ) ), RLO, RHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
@@ -579,7 +611,8 @@
             ELSE
 
 *  Obtain the maximum and minimum values to be used as dynamic defaults.
-               CALL KPG1_MXMND( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          DMAXV, DMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -590,9 +623,10 @@
 *  Obtain the scaling limits from the environment and do the
 *  scaling into the cell array.
             CALL KPS1_DSCLD( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., 'LOW', 'HIGH',
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., 'LOW', 'HIGH',
      :                       LP, UP, BPCI, DMINV, DMAXV, .TRUE.,
-     :                       %VAL( IP ), DLO, DHI, STATUS )
+     :                       %VAL( CNF_PVAL( IP ) ), DLO, DHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
 
@@ -603,7 +637,8 @@
             ELSE
 
 *  Obtain the maximum and minimum values to be used as dynamic defaults.
-               CALL KPG1_MXMNI( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMNI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          IMAXV, IMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -614,9 +649,10 @@
 *  Obtain the scaling limits from the environment and do the
 *  scaling into the cell array.
             CALL KPS1_DSCLI( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., 'LOW', 'HIGH',
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., 'LOW', 'HIGH',
      :                       LP, UP, BPCI, IMINV, IMAXV, .TRUE.,
-     :                       %VAL( IP ), ILO, IHI, STATUS )
+     :                       %VAL( CNF_PVAL( IP ) ), ILO, IHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
 
@@ -627,7 +663,8 @@
             ELSE
 
 *  Obtain the maximum and minimum values to be used as dynamic defaults.
-               CALL KPG1_MXMNW( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMNW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          WMAXV, WMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -638,9 +675,10 @@
 *  Obtain the scaling limits from the environment and do the
 *  scaling into the cell array.
             CALL KPS1_DSCLW( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., 'LOW', 'HIGH',
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., 'LOW', 'HIGH',
      :                       LP, UP, BPCI, WMINV, WMAXV, .TRUE.,
-     :                       %VAL( IP ), WLO, WHI, STATUS )
+     :                       %VAL( CNF_PVAL( IP ) ), WLO, WHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
 
@@ -652,7 +690,8 @@
 
 *  Obtain the maximum and minimum values to be used as
 *  dynamic defaults.
-               CALL KPG1_MXMNB( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMNB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          BMAXV, BMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -663,9 +702,10 @@
 *  Obtain the scaling limits from the environment and do the
 *  scaling into the cell array.
             CALL KPS1_DSCLB( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), .FALSE., 'LOW', 'HIGH',
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       .FALSE., 'LOW', 'HIGH',
      :                       LP, UP, BPCI, BMINV, BMAXV, .TRUE.,
-     :                       %VAL( IP ), BLO, BHI, STATUS )
+     :                       %VAL( CNF_PVAL( IP ) ), BLO, BHI, STATUS )
          END IF
 
 *  Do scaling with percentile limits.
@@ -704,7 +744,8 @@
 
 *  Obtain the maximum and minimum values to define the bounds
 *  of the histogram.
-               CALL KPG1_MXMNR( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMNR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          RMAXV, RMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -712,7 +753,7 @@
                BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
 *  Generate the histogram between those bounds.
-               CALL KPG1_GHSTR( BAD, EL, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NUMBIN, RMAXV, RMINV, HIST, STATUS )
 
 *  Estimate the values at the percentiles.
@@ -737,15 +778,17 @@
                RLO = PERVAL( 1 )
                RHI = PERVAL( 2 )
                CALL KPG1_ISCLR( BAD, NX, NY,
-     :                          %VAL( PNTRI( 1 ) ), .FALSE., RLO,
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          .FALSE., RLO,
      :                          RHI, LP, UP, BPCI,
-     :                          %VAL( IP ), STATUS )
+     :                          %VAL( CNF_PVAL( IP ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
 *  Obtain the maximum and minimum values to define the bounds
 *  of the histogram.
-               CALL KPG1_MXMND( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          DMAXV, DMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -753,7 +796,7 @@
                BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
 *  Generate the histogram between those bounds.
-               CALL KPG1_GHSTD( BAD, EL, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NUMBIN, DMAXV, DMINV, HIST, STATUS )
 
 *  Estimate the values at the percentiles.
@@ -779,15 +822,17 @@
                DLO = DBLE( PERVAL( 1 ) )
                DHI = DBLE( PERVAL( 2 ) )
                CALL KPG1_ISCLD( BAD, NX, NY,
-     :                          %VAL( PNTRI( 1 ) ), .FALSE., DLO,
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          .FALSE., DLO,
      :                          DHI, LP, UP, BPCI, 
-     :                          %VAL( IP ), STATUS )
+     :                          %VAL( CNF_PVAL( IP ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
 
 *  Obtain the maximum and minimum values to define the bounds
 *  of the histogram.
-               CALL KPG1_MXMNI( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMNI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          IMAXV, IMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -795,7 +840,7 @@
                BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
 *  Generate the histogram between those bounds.
-               CALL KPG1_GHSTI( BAD, EL, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_GHSTI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NUMBIN, IMAXV, IMINV, HIST, STATUS )
 
 *  Estimate the values at the percentiles.
@@ -821,15 +866,17 @@
                ILO = IFIX( PERVAL( 1 ) )
                IHI = IFIX( PERVAL( 2 ) )
                CALL KPG1_ISCLI( BAD, NX, NY,
-     :                          %VAL( PNTRI( 1 ) ), .FALSE., ILO,
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          .FALSE., ILO,
      :                          IHI, LP, UP, BPCI,
-     :                          %VAL( IP ), STATUS )
+     :                          %VAL( CNF_PVAL( IP ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
 
 *  Obtain the maximum and minimum values to define the bounds
 *  of the histogram.
-               CALL KPG1_MXMNW( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMNW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          WMAXV, WMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -837,7 +884,7 @@
                BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
 *  Generate the histogram between those bounds.
-               CALL KPG1_GHSTW( BAD, EL, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_GHSTW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NUMBIN, WMAXV, WMINV, HIST, STATUS )
 
 *  Estimate the values at the percentiles.
@@ -863,15 +910,17 @@
                WLO = NUM_RTOW( PERVAL( 1 ) )
                WHI = NUM_RTOW( PERVAL( 2 ) )
                CALL KPG1_ISCLW( BAD, NX, NY,
-     :                          %VAL( PNTRI( 1 ) ), .FALSE., WLO,
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          .FALSE., WLO,
      :                          WHI, LP, UP, BPCI,
-     :                          %VAL( IP ), STATUS )
+     :                          %VAL( CNF_PVAL( IP ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
 
 *  Obtain the maximum and minimum values to define the bounds
 *  of the histogram.
-               CALL KPG1_MXMNB( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+               CALL KPG1_MXMNB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          NINVAL,
      :                          BMAXV, BMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -879,7 +928,7 @@
                BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
 *  Generate the histogram between those bounds.
-               CALL KPG1_GHSTB( BAD, EL, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_GHSTB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NUMBIN, BMAXV, BMINV, HIST, STATUS )
 
 *  Estimate the values at the percentiles.
@@ -905,9 +954,10 @@
                BLO = NUM_RTOB( PERVAL( 1 ) )
                BHI = NUM_RTOB( PERVAL( 2 ) )
                CALL KPG1_ISCLB( BAD, NX, NY,
-     :                          %VAL( PNTRI( 1 ) ), .FALSE., BLO,
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          .FALSE., BLO,
      :                          BHI, LP, UP, BPCI,
-     :                          %VAL( IP ), STATUS )
+     :                          %VAL( CNF_PVAL( IP ) ), STATUS )
             END IF
 
 *  End of status check.
@@ -923,28 +973,33 @@
 *  =============================================================
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPG1_FLASR( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), LP, UP, .FALSE.,
-     :                       .TRUE., %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       LP, UP, .FALSE.,
+     :                       .TRUE., %VAL( CNF_PVAL( IP ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_FLASD( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), LP, UP, .FALSE.,
-     :                       .TRUE., %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       LP, UP, .FALSE.,
+     :                       .TRUE., %VAL( CNF_PVAL( IP ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_FLASI( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), LP, UP, .FALSE.,
-     :                       .TRUE., %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       LP, UP, .FALSE.,
+     :                       .TRUE., %VAL( CNF_PVAL( IP ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPG1_FLASW( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), LP, UP, .FALSE.,
-     :                       .TRUE., %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       LP, UP, .FALSE.,
+     :                       .TRUE., %VAL( CNF_PVAL( IP ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPG1_FLASB( BAD, NX, NY,
-     :                       %VAL( PNTRI( 1 ) ), LP, UP, .FALSE.,
-     :                       .TRUE., %VAL( IP ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       LP, UP, .FALSE.,
+     :                       .TRUE., %VAL( CNF_PVAL( IP ) ), STATUS )
          END IF
 
       END IF

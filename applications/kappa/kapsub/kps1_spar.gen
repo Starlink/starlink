@@ -126,6 +126,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -170,6 +171,8 @@
 *     5-SEP-2000 (DSB):
 *        Modify LIMIT and RANGE to take into account restrictions imposed on WIDTH
 *        (RANGE is now "Given and Returned").
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,6 +187,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER CFRM
@@ -702,10 +706,17 @@
 
          CALL KPS1_RPRF<T>( DIM1, DIM2, ARRAY, LBND, SIG0, AXISR, THETA,
      :                     RANGE, GAUSS, NXY, POS, SIG( 1, 5 ), RSCALE,
-     :                     RSCL2, NBIN1, NBIN2, BINPTS, %VAL( MOPTR ),
-     :                     %VAL( MRPTR ), %VAL( LLPTR ), %VAL( NPPTR ),
-     :                     %VAL( DAPTR ), %VAL( IAPTR ), %VAL( NAPTR ),
-     :                     %VAL( PVPTR ), %VAL( PRPTR ), %VAL( PWPTR ),
+     :                     RSCL2, NBIN1, NBIN2, BINPTS, 
+     :                     %VAL( CNF_PVAL( MOPTR ) ),
+     :                     %VAL( CNF_PVAL( MRPTR ) ), 
+     :                     %VAL( CNF_PVAL( LLPTR ) ), 
+     :                     %VAL( CNF_PVAL( NPPTR ) ),
+     :                     %VAL( CNF_PVAL( DAPTR ) ), 
+     :                     %VAL( CNF_PVAL( IAPTR ) ), 
+     :                     %VAL( CNF_PVAL( NAPTR ) ),
+     :                     %VAL( CNF_PVAL( PVPTR ) ), 
+     :                     %VAL( CNF_PVAL( PRPTR ) ), 
+     :                     %VAL( CNF_PVAL( PWPTR ) ),
      :                     FWHM, AMP, BACK, SIGMA, GAMMA, AMP1, STATUS )
 
 *  Optionally plot the mean radial profile. 
@@ -723,8 +734,11 @@
 
 *  Plot the profile.
          CALL KPS1_PSPLT( NBIN2, SIGMA, AXISR, AMP, GAMMA, BACK, SCALE,
-     :                    YSCALE, FWHMUN, YUNITS, PNMIN, %VAL( PVPTR ), 
-     :                    %VAL( PRPTR ), %VAL( PWPTR ), %VAL( PDW ), 
+     :                    YSCALE, FWHMUN, YUNITS, PNMIN, 
+     :                    %VAL( CNF_PVAL( PVPTR ) ),
+     :                    %VAL( CNF_PVAL( PRPTR ) ), 
+     :                    %VAL( CNF_PVAL( PWPTR ) ), 
+     :                    %VAL( CNF_PVAL( PDW ) ),
      :                    STATUS )
 
 *  Tidy up the workspace.

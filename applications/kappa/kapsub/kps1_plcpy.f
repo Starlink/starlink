@@ -84,6 +84,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -93,6 +94,8 @@
 *        Used modern-style variable declarations.  Minor stylistic
 *        changes and documentation improved.  Renamed variable INDEX to
 *        avoid name clash with intrinsic function.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +109,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF1
@@ -195,27 +199,32 @@
 *  Copy the appropriate value into the output NDF.
          IF ( ITYPE .EQ. '_UBYTE' ) THEN
             FILLUB = VAL_DTOUB( .TRUE., FILL, STATUS )
-            CALL KPS1_PLCPUB( EL, NEL, %VAL( IPIN ), USE, FILLUB,
-     :                        %VAL( IPOUT( 1 ) ), STATUS )
+            CALL KPS1_PLCPUB( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                        USE, FILLUB,
+     :                        %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             FILLW = VAL_DTOW( .TRUE., FILL, STATUS )
-            CALL KPS1_PLCPW( EL, NEL, %VAL( IPIN ), USE, FILLW,
-     :                       %VAL( IPOUT( 1 ) ), STATUS )
+            CALL KPS1_PLCPW( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                       USE, FILLW,
+     :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             FILLI = VAL_DTOI( .TRUE., FILL, STATUS )
-            CALL KPS1_PLCPI( EL, NEL, %VAL( IPIN ), USE, FILLI,
-     :                       %VAL( IPOUT( 1 ) ), STATUS )
+            CALL KPS1_PLCPI( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                       USE, FILLI,
+     :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             FILLR = VAL_DTOR( .TRUE., FILL, STATUS )
-            CALL KPS1_PLCPR( EL, NEL, %VAL( IPIN ), USE, FILLR,
-     :                       %VAL( IPOUT( 1 ) ), STATUS )
+            CALL KPS1_PLCPR( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                       USE, FILLR,
+     :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_PLCPD( EL, NEL, %VAL( IPIN ), USE, FILL,
-     :                       %VAL( IPOUT( 1 ) ), STATUS )
+            CALL KPS1_PLCPD( EL, NEL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                       USE, FILL,
+     :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
          END IF
 
       END DO

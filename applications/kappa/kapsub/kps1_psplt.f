@@ -83,6 +83,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -106,6 +107,8 @@
 *        Added YUNITS argument.
 *     10-JUL-2001 (DSB):
 *        Added facilities for creating an 1D output NDF holding the profile.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,6 +125,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'NDF_PAR'          ! NDF constants 
       INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NBIN
@@ -260,18 +264,19 @@
          CALL NDF_MAP( INDF, 'DATA', '_DOUBLE', 'WRITE', IPDAT, EL, 
      :                 STATUS ) 
          CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 1 ), 0, NDATA, 
-     :                    %VAL( IPDAT ), EL, STATUS )
+     :                    %VAL( CNF_PVAL( IPDAT ) ), EL, STATUS )
 
 *  Map the VARIANCE array, and copy the squared residuals into it.
          CALL NDF_MAP( INDF, 'VARIANCE', '_DOUBLE', 'WRITE', IPVAR, EL, 
      :                 STATUS ) 
          CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 2 ), 0, NDATA, 
-     :                    %VAL( IPVAR ), EL, STATUS )
+     :                    %VAL( CNF_PVAL( IPVAR ) ), EL, STATUS )
 
 *  Map the AXIS CENTRE array, and copy the radii values to it.
          CALL NDF_AMAP( INDF, 'CENTRE', 1, '_REAL', 'WRITE', IPAX, EL, 
      :                  STATUS ) 
-         CALL KPG1_CPNDR( 1, 0, NDATA, PROFR, 0, NDATA, %VAL( IPAX ),
+         CALL KPG1_CPNDR( 1, 0, NDATA, PROFR, 0, NDATA, 
+     :                    %VAL( CNF_PVAL( IPAX ) ),
      :                    EL, STATUS )
 
       END IF

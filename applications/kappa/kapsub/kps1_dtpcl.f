@@ -38,6 +38,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +47,8 @@
 *     1995 April 12 (MJC):
 *        Used modern-style variable declaration.  Transposed the LBND
 *        and UBND arguments.  Minor stylistic changes.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -60,6 +63,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -128,7 +132,8 @@
       CALL NDF_BAD( INDFS, 'DATA', .FALSE., BAD, STATUS )
 
 *  Compute the statistics.
-      CALL KPG1_STATR( BAD, EL, %VAL( PNTR ), 4, CLIP, NGOOD, IMIN, 
+      CALL KPG1_STATR( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), 
+     :                 4, CLIP, NGOOD, IMIN,
      :                 DMIN, IMAX, DMAX, SUM, MEAN, STDEV, NGOODC, 
      :                 IMINC, DMINC, IMAXC, DMAXC, SUMC, MEANC, STDEVC,
      :                 STATUS )

@@ -133,6 +133,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -141,6 +142,8 @@
 *     4-DEC-2001 (DSB):
 *        Retain error messages if only a single position is being
 *        centroided.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,6 +159,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF 
@@ -319,45 +323,59 @@
 *  Call the subroutine that does the actual work for the required data type.
 *  The position is returned in pixel co-ordinates.
             IF( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL KPG1_LOCTI( NDIMS, SLBND, SUBND, %VAL( IPDIN ), 
+               CALL KPG1_LOCTI( NDIMS, SLBND, SUBND, 
+     :                          %VAL( CNF_PVAL( IPDIN ) ),
      :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, %VAL( IPW2 ), 
+     :                          TOLER, SEL, PFINAL, 
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_LOCTR( NDIMS, SLBND, SUBND, %VAL( IPDIN ), 
+               CALL KPG1_LOCTR( NDIMS, SLBND, SUBND, 
+     :                          %VAL( CNF_PVAL( IPDIN ) ),
      :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, %VAL( IPW2 ), 
+     :                          TOLER, SEL, PFINAL, 
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_LOCTD( NDIMS, SLBND, SUBND, %VAL( IPDIN ), 
+               CALL KPG1_LOCTD( NDIMS, SLBND, SUBND, 
+     :                          %VAL( CNF_PVAL( IPDIN ) ),
      :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, %VAL( IPW2 ), 
+     :                          TOLER, SEL, PFINAL, 
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_WORD' ) THEN
-               CALL KPG1_LOCTW( NDIMS, SLBND, SUBND, %VAL( IPDIN ), 
+               CALL KPG1_LOCTW( NDIMS, SLBND, SUBND, 
+     :                          %VAL( CNF_PVAL( IPDIN ) ),
      :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, %VAL( IPW2 ), 
+     :                          TOLER, SEL, PFINAL, 
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
-               CALL KPG1_LOCTUW( NDIMS, SLBND, SUBND, %VAL( IPDIN ), 
+               CALL KPG1_LOCTUW( NDIMS, SLBND, SUBND, 
+     :                           %VAL( CNF_PVAL( IPDIN ) ),
      :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, %VAL( IPW2 ), 
+     :                          TOLER, SEL, PFINAL, 
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
-               CALL KPG1_LOCTB( NDIMS, SLBND, SUBND, %VAL( IPDIN ), 
+               CALL KPG1_LOCTB( NDIMS, SLBND, SUBND, 
+     :                          %VAL( CNF_PVAL( IPDIN ) ),
      :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, %VAL( IPW2 ), 
+     :                          TOLER, SEL, PFINAL, 
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
-               CALL KPG1_LOCTUB( NDIMS, SLBND, SUBND, %VAL( IPDIN ), 
+               CALL KPG1_LOCTUB( NDIMS, SLBND, SUBND, 
+     :                           %VAL( CNF_PVAL( IPDIN ) ),
      :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER, 
-     :                          TOLER, SEL, PFINAL, %VAL( IPW2 ), 
+     :                          TOLER, SEL, PFINAL, 
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          STATUS )
 
             ELSE IF( STATUS .EQ. SAI__OK ) THEN
@@ -476,78 +494,101 @@
 *  Copy the required area from the data array to the workspace, and
 *  add gaussian noise.
                      CALL KPS1_CENAI( NDIMS, SLBND, SUBND, 
-     :                                %VAL( IPDIN ), %VAL( IPVIN ), 
-     :                                VLBND, VUBND, %VAL( IPW1 ), 
+     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+     :                                %VAL( CNF_PVAL( IPVIN ) ),
+     :                                VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
       
 *  Find the new centroid after the noise has been added. The position is
 *  returned in pixel co-ordinates.
-                     CALL KPG1_LOCTI( NDIMS, VLBND, VUBND, %VAL( IPW1 ), 
+                     CALL KPG1_LOCTI( NDIMS, VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
      :                                MXITER, TOLER, SEL, EFINAL, 
-     :                                %VAL( IPW2 ), STATUS )
+     :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Now do the same for the other data types.
                   ELSE IF( ITYPE .EQ. '_REAL' ) THEN
                      CALL KPS1_CENAR( NDIMS, SLBND, SUBND, 
-     :                                %VAL( IPDIN ), %VAL( IPVIN ), 
-     :                                VLBND, VUBND, %VAL( IPW1 ), 
+     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+     :                                %VAL( CNF_PVAL( IPVIN ) ),
+     :                                VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-                     CALL KPG1_LOCTR( NDIMS, VLBND, VUBND, %VAL( IPW1 ), 
+                     CALL KPG1_LOCTR( NDIMS, VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
      :                                MXITER, TOLER, SEL, EFINAL, 
-     :                                %VAL( IPW2 ), STATUS )
+     :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
                   ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPS1_CENAD( NDIMS, SLBND, SUBND, 
-     :                                %VAL( IPDIN ), %VAL( IPVIN ), 
-     :                                VLBND, VUBND, %VAL( IPW1 ), 
+     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+     :                                %VAL( CNF_PVAL( IPVIN ) ),
+     :                                VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-                     CALL KPG1_LOCTD( NDIMS, VLBND, VUBND, %VAL( IPW1 ), 
+                     CALL KPG1_LOCTD( NDIMS, VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
      :                                MXITER, TOLER, SEL, EFINAL, 
-     :                                %VAL( IPW2 ), STATUS )
+     :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
   
                   ELSE IF( ITYPE .EQ. '_WORD' ) THEN
                      CALL KPS1_CENAW( NDIMS, SLBND, SUBND, 
-     :                                %VAL( IPDIN ), %VAL( IPVIN ), 
-     :                                VLBND, VUBND, %VAL( IPW1 ), 
+     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+     :                                %VAL( CNF_PVAL( IPVIN ) ),
+     :                                VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-                     CALL KPG1_LOCTW( NDIMS, VLBND, VUBND, %VAL( IPW1 ), 
+                     CALL KPG1_LOCTW( NDIMS, VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
      :                                MXITER, TOLER, SEL, EFINAL, 
-     :                                %VAL( IPW2 ), STATUS )
+     :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
   
                   ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
                      CALL KPS1_CENAUW( NDIMS, SLBND, SUBND, 
-     :                                 %VAL( IPDIN ), %VAL( IPVIN ), 
-     :                                 VLBND, VUBND, %VAL( IPW1 ), 
+     :                                 %VAL( CNF_PVAL( IPDIN ) ), 
+     :                                 %VAL( CNF_PVAL( IPVIN ) ),
+     :                                 VLBND, VUBND, 
+     :                                 %VAL( CNF_PVAL( IPW1 ) ),
      :                                 STATUS )
                      CALL KPG1_LOCTUW( NDIMS, VLBND, VUBND, 
-     :                                 %VAL( IPW1 ), PFINAL, SEARCH, 
+     :                                 %VAL( CNF_PVAL( IPW1 ) ), 
+     :                                 PFINAL, SEARCH,
      :                                 POSTVE, MXSHFT, MXITER, TOLER, 
-     :                                 SEL, EFINAL, %VAL( IPW2 ), 
+     :                                 SEL, EFINAL, 
+     :                                 %VAL( CNF_PVAL( IPW2 ) ),
      :                                 STATUS )
   
                   ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
                      CALL KPS1_CENAB( NDIMS, SLBND, SUBND, 
-     :                                %VAL( IPDIN ), %VAL( IPVIN ), 
-     :                                VLBND, VUBND, %VAL( IPW1 ), 
+     :                                %VAL( CNF_PVAL( IPDIN ) ), 
+     :                                %VAL( CNF_PVAL( IPVIN ) ),
+     :                                VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                STATUS )
-                     CALL KPG1_LOCTB( NDIMS, VLBND, VUBND, %VAL( IPW1 ), 
+                     CALL KPG1_LOCTB( NDIMS, VLBND, VUBND, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
      :                                PFINAL, SEARCH, POSTVE, MXSHFT, 
      :                                MXITER, TOLER, SEL, EFINAL, 
-     :                                %VAL( IPW2 ), STATUS )
+     :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
   
                   ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
                      CALL KPS1_CENAUB( NDIMS, SLBND, SUBND, 
-     :                                 %VAL( IPDIN ), %VAL( IPVIN ), 
-     :                                 VLBND, VUBND, %VAL( IPW1 ), 
+     :                                 %VAL( CNF_PVAL( IPDIN ) ), 
+     :                                 %VAL( CNF_PVAL( IPVIN ) ),
+     :                                 VLBND, VUBND, 
+     :                                 %VAL( CNF_PVAL( IPW1 ) ),
      :                                 STATUS )
                      CALL KPG1_LOCTUB( NDIMS, VLBND, VUBND, 
-     :                                 %VAL( IPW1 ), PFINAL, SEARCH, 
+     :                                 %VAL( CNF_PVAL( IPW1 ) ), 
+     :                                 PFINAL, SEARCH,
      :                                 POSTVE, MXSHFT, MXITER, TOLER, 
-     :                                 SEL, EFINAL, %VAL( IPW2 ), 
+     :                                 SEL, EFINAL, 
+     :                                 %VAL( CNF_PVAL( IPW2 ) ),
      :                                 STATUS )
 
                   ELSE IF( STATUS .EQ. SAI__OK ) THEN

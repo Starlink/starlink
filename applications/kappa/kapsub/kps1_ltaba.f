@@ -35,6 +35,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -42,6 +43,8 @@
 *        Original version, extracted from lutable.f. Also added check that
 *        greyscale colour tables do not have a hint of colour about them due 
 *        to different resolutions on the three primarty colours.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -61,6 +64,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_ERR'          ! NDF error definitions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NINTS
@@ -394,11 +398,15 @@
 
 *  Obtain the maximum and minimum values.
                IF( ITYPE .EQ. '_REAL' ) THEN
-                   CALL KPG1_MXMNR( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+                   CALL KPG1_MXMNR( BAD, EL, 
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                              NINVAL,
      :                              RMAXV, RMINV, MAXPOS, MINPOS,
      :                              STATUS )
                ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-                   CALL KPG1_MXMND( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+                   CALL KPG1_MXMND( BAD, EL, 
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                              NINVAL,
      :                              DMAXV, DMINV, MAXPOS, MINPOS,
      :                              STATUS )
                END IF
@@ -442,13 +450,13 @@
 *  the appropriate type.  The d.p. verson of the range is needed for the
 *  percentile routine.
             IF( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_GHSTR( BAD, EL, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NUMBIN, RMAXV, RMINV, HIST, STATUS )
                DMAXV = DBLE( RMAXV )
                DMINV = DBLE( RMINV )
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_GHSTD( BAD, EL, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NUMBIN, DMAXV, DMINV, HIST, STATUS )
             END IF
 
@@ -479,18 +487,24 @@
 *  Call a routine appropriate for the data type.
             CALL ERR_MARK
             IF( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_HEQPR( BAD, EL, %VAL( PNTRI( 1 ) ), SHADE,
+               CALL KPS1_HEQPR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          SHADE,
      :                          REAL( PERVAL( 2 ) ),
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
-     :                          %VAL( WPNTR1 ), %VAL( WPNTR2 ),
-     :                          %VAL( WPNTR3 ), %VAL( WPNTR4 ), STATUS )
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                          %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR4 ) ), STATUS )
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_HEQPD( BAD, EL, %VAL( PNTRI( 1 ) ), SHADE,
+               CALL KPS1_HEQPD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          SHADE,
      :                          REAL( PERVAL( 2 ) ),
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
-     :                          %VAL( WPNTR1 ), %VAL( WPNTR2 ),
-     :                          %VAL( WPNTR3 ), %VAL( WPNTR4 ), STATUS )
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                          %VAL( CNF_PVAL( WPNTR3 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR4 ) ), STATUS )
             END IF
 
             IF( STATUS .NE. SAI__OK ) THEN
@@ -720,7 +734,8 @@
                ELSE
 
 *  If the structure was found then read in the lookup table.
-                  CALL KPG1_LUTIN( LDIMS( 2 ), %VAL( LPNTR( 1 ) ),
+                  CALL KPG1_LUTIN( LDIMS( 2 ), 
+     :                             %VAL( CNF_PVAL( LPNTR( 1 ) ) ),
      :                             ANINTS, NN, IMDSET, STATUS )
                END IF
 

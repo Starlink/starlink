@@ -133,11 +133,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-AUG-1998 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,6 +155,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants 
       INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NX
@@ -257,7 +261,8 @@
 *  log of the data if required. Statistics for the data are returned.
 *  Only pixels with valid horizontal positions are used.
          CALL KPS1_MLPCP( NX, NY, DATA, ABSDIM, INDX, ABSAXS, YLOG, 
-     :                    %VAL( IPNOM + BOFF ), %VAL( IPDAT + BOFF ), 
+     :                    %VAL( CNF_PVAL( IPNOM ) + BOFF ), 
+     :                    %VAL( CNF_PVAL( IPDAT ) + BOFF ),
      :                    MN( I ), MX( I ), MEAN( I ), STATUS )
 
 *  Set a flag indicating if any good data was found for this line. Count
@@ -273,9 +278,11 @@
 *  error bar. Also, update MN and MX to include the error bars.
             IF( USEVAR ) THEN
                CALL KPS1_MLPCV( NX, NY, VAR, SIGMA, ABSDIM, INDX, 
-     :                          ABSAXS, YLOG, %VAL( IPDAT + BOFF ), 
+     :                          ABSAXS, YLOG, 
+     :                          %VAL( CNF_PVAL( IPDAT ) + BOFF ),
      :                          MN( I ), MX( I ), 
-     :                          %VAL( IPBAR + 2*BOFF ), STATUS )
+     :                          %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ), 
+     :                          STATUS )
 
             END IF
 
@@ -490,14 +497,18 @@
 
                BOFF = ( I - 1 )*ABSDIM*VAL__NBD
 
-               CALL KPG1_CADDD( .TRUE., ABSDIM, %VAL( IPDAT + BOFF ), 
-     :                          OFFSET( I ), %VAL( IPDAT + BOFF ), NERR, 
+               CALL KPG1_CADDD( .TRUE., ABSDIM, 
+     :                          %VAL( CNF_PVAL( IPDAT ) + BOFF ),
+     :                          OFFSET( I ), 
+     :                          %VAL( CNF_PVAL( IPDAT ) + BOFF ), NERR,
      :                          STATUS )
 
                IF( USEVAR ) THEN
                   CALL KPG1_CADDD( .TRUE., 2*ABSDIM, 
-     :                             %VAL( IPBAR + 2*BOFF ), OFFSET( I ), 
-     :                             %VAL( IPBAR + 2*BOFF ), NERR, 
+     :                             %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ), 
+     :                             OFFSET( I ),
+     :                             %VAL( CNF_PVAL( IPBAR ) + 2*BOFF ), 
+     :                             NERR,
      :                             STATUS )
                END IF
             END IF

@@ -48,11 +48,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     31-OCT-1994 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -68,6 +71,7 @@
 
 *  Global Variables:
       INCLUDE 'SFT_COM'          ! Used for communicating with KPS1_SKYFT
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        IPWA = INTEGER (Read)
 *           Pointer to work space containing sky longitude values.
 *        IPWB = INTEGER (Read)
@@ -97,8 +101,11 @@
       
 *  Call a lower level routine to do the work, passing the work arrays
 *  using %VAL so that their contents can be accessed.
-      CALL KPS1_SKYF3( M, N, NPOSC, XC, %VAL( IPWA ), %VAL( IPWB ),
-     :                 %VAL( IPWX ), %VAL( IPWY ),  %VAL( IPWXO ),
-     :                 %VAL( IPWYO ), FVECC, ISTAT )
+      CALL KPS1_SKYF3( M, N, NPOSC, XC, %VAL( CNF_PVAL( IPWA ) ), 
+     :                 %VAL( CNF_PVAL( IPWB ) ),
+     :                 %VAL( CNF_PVAL( IPWX ) ), 
+     :                 %VAL( CNF_PVAL( IPWY ) ),  
+     :                 %VAL( CNF_PVAL( IPWXO ) ),
+     :                 %VAL( CNF_PVAL( IPWYO ) ), FVECC, ISTAT )
 
       END 

@@ -198,6 +198,7 @@
       INCLUDE 'SAE_PAR'        ! SSE global definitions
       INCLUDE 'DAT_PAR'        ! Data-system constants
       INCLUDE 'PAR_ERR'        ! parameter-system errors
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *    Status :
 
@@ -431,8 +432,8 @@
 *          Form locus of x-y points that is the histogram.
 
             CALL HSTLO( HIST, NUMBIN, MINIM, MAXIM, NULL,
-     :                  XLOG, YLOG, YNULL, NPOS, %VAL(HPPTR1),
-     :                  %VAL(HPPTR2), STATUS )
+     :                  XLOG, YLOG, YNULL, NPOS, %VAL(CNF_PVAL(HPPTR1)),
+     :                  %VAL(CNF_PVAL(HPPTR2)), STATUS )
 
             XLAB = ABSLAB
 
@@ -471,7 +472,8 @@
 *          Plot locus just computed within annotated axes.  Both axes'
 *          limits are defined.
 
-            CALL LINPLT( %VAL(HPPTR1), %VAL(HPPTR2), NPOS, .TRUE.,
+            CALL LINPLT( %VAL(CNF_PVAL(HPPTR1)), %VAL(CNF_PVAL(HPPTR2)), 
+     :                   NPOS, .TRUE.,
      :                   .TRUE., XLOW, YLOW, XHIGH, YHIGH, PTITLE,
      :                   XLAB, ORDLAB, MINTIC, MAJTIC, XLOG, YLOG,
      :                   OUTTIC, THICK, STATUS )
@@ -529,7 +531,8 @@
 *    Write the slice to the NDF.
 
       CALL VEC_ITOI( .FALSE., NUMBIN, HIST,
-     :               %VAL( OUTPTR( 1 ) ), IERR, NERR, STATUS )
+     :               %VAL( CNF_PVAL( OUTPTR( 1 ) ) ), 
+     :               IERR, NERR, STATUS )
 
 *    Write a label for the NDF.  The histogram is unitless.
 
@@ -565,7 +568,7 @@
 
       BINWID = DBLE( MAXIM - MINIM ) / DBLE( NUMBIN )
       CALL KPG1_SSCOF( NUMBIN, BINWID, DBLE( MINIM ) + 0.5D0 * BINWID,
-     :                 %VAL( AXPNTR( 1 ) ), STATUS )
+     :                 %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), STATUS )
 
 *    Handle the null case invisibly.
 

@@ -64,6 +64,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,8 @@
 *        Modified to allow use of external work arrays.
 *     1995 April 7 (MJC):
 *        Minor stylistic changes.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,6 +96,7 @@
 *  Global Variables:
       INCLUDE 'ME_COM'           ! MEMSYS3 common blocks
       INCLUDE 'C1_COM'           ! MEM2D internal communication.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER SUMP*(*)
@@ -167,8 +171,10 @@
 *  Smooth the mask with the ICF. NB, files <4> and <5> are used as
 *  work space. 
       IF ( C1_WEXT ) THEN
-         CALL KPS1_ICBLU( C1_ICF, .FALSE., %VAL( C1_IP( 4 ) ),
-     :                    %VAL( C1_IP( 5 ) ), FILE2, STATUS )
+         CALL KPS1_ICBLU( C1_ICF, .FALSE., 
+     :                    %VAL( CNF_PVAL( C1_IP( 4 ) ) ),
+     :                    %VAL( CNF_PVAL( C1_IP( 5 ) ) ), 
+     :                    FILE2, STATUS )
       ELSE
          CALL KPS1_ICBLU( C1_ICF, .FALSE., ME_ST( ME_KB( 4 ) ),
      :                    ME_ST( ME_KB( 5 ) ), FILE2, STATUS )

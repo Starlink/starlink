@@ -66,11 +66,14 @@
 
 *  Authors:
 *    DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *    {enter_new_authors_here}
 
 *  History:   
 *    4-SEP-2001 (DSB):
 *       Total re-write for AST/PGPLOT.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,6 +87,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE definitions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IPLOT
@@ -145,7 +149,9 @@
 
          CALL KPG1_PGCUR( INFO, ' ', 2, ACTDES, 'AX', X1, X2, Y1, Y2, 
      :                    0, XCUR, YCUR, MAXPNT, 0, LINES, 0, 2, IPLOT,
-     :                    %VAL( IPX ), %VAL( IPY ), %VAL( IPACT ), NP, 
+     :                    %VAL( CNF_PVAL( IPX ) ), 
+     :                    %VAL( CNF_PVAL( IPY ) ), 
+     :                    %VAL( CNF_PVAL( IPACT ) ), NP,
      :                    STATUS )
          INFO = .FALSE.
 
@@ -153,9 +159,11 @@
          IF( NP .GT. 0 ) THEN 
  
 *  Convert the single precision values to double precision values.
-            CALL VEC_RTOD( .FALSE., NP, %VAL( IPX ), X, IERR, NERR, 
+            CALL VEC_RTOD( .FALSE., NP, %VAL( CNF_PVAL( IPX ) ), 
+     :                     X, IERR, NERR,
      :                     STATUS )
-            CALL VEC_RTOD( .FALSE., NP, %VAL( IPY ), Y, IERR, NERR, 
+            CALL VEC_RTOD( .FALSE., NP, %VAL( CNF_PVAL( IPY ) ), 
+     :                     Y, IERR, NERR,
      :                     STATUS )
 
 *  Remove duplicate points (less than 0.5 millimetres apart)..

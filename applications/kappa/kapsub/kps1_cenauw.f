@@ -51,11 +51,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-JUN-1999 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +71,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDIMS
@@ -103,10 +107,11 @@
 *  Copy the N-dimensional section from the input variance array to the 
 *  work array.
       CALL KPG1_CPNDUW( NDIMS, SLBND, SUBND, VIN, VLBND, VUBND, 
-     :                   %VAL( IPW ), EL, STATUS )
+     :                   %VAL( CNF_PVAL( IPW ) ), EL, STATUS )
 
 *  Add Gaussian noise to the returned data section.
-      CALL KPG1_NOISUW( .TRUE., EL, %VAL( IPW ), OUT, STATUS )
+      CALL KPG1_NOISUW( .TRUE., EL, %VAL( CNF_PVAL( IPW ) ), 
+     :                  OUT, STATUS )
 
 *  Free the work array.
       CALL PSX_FREE( IPW, STATUS )

@@ -40,11 +40,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     7-MAR-2000 (DSB):
 *        Initial version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -58,6 +61,7 @@
 *  Global Constants: 
       INCLUDE 'SAE_PAR'        ! Global SSE parameters 
       INCLUDE 'PRM_PAR'        ! VAL__ constants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER LBND1
@@ -99,7 +103,7 @@
 
 *  Store the pixel positions in the memory.
             CALL KPS1_GLIDR( LBND1, LBND2, UBND1, UBND2, DIN, 
-     :                       NPOS, %VAL( IPPIX ), STATUS ) 
+     :                       NPOS, %VAL( CNF_PVAL( IPPIX ) ), STATUS )
 
          END IF
 

@@ -86,6 +86,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -100,6 +101,8 @@
 *        Change tolerance used in PDA routine from 1.0D-8 to 1.0D-3 (the 
 *        smaller value usually prevented the PDA routine from finding a
 *        solution).
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,6 +121,7 @@
 *  Global Variables:
       INCLUDE 'SFT_COM'          ! Used for communicating with PDA
                                  ! routine
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        EPOCHC = DOUBLE PRECISION (Write)
 *           The epoch of the observations.
 *        IPWA = INTEGER (Write)
@@ -259,8 +263,10 @@
 *  and get an initial guess at the projection parameters (returned in
 *  P).
       CALL KPS1_SKYF2( IGRP, ORIENT, PSIZE, TILT, REFIMG, REFSKY, SCS,
-     :                 NP, NPOS, P, PC, %VAL( IPWA ), %VAL( IPWB ),
-     :                 %VAL( IPWX ), %VAL( IPWY ), STATUS )
+     :                 NP, NPOS, P, PC, %VAL( CNF_PVAL( IPWA ) ), 
+     :                 %VAL( CNF_PVAL( IPWB ) ),
+     :                 %VAL( CNF_PVAL( IPWX ) ), 
+     :                 %VAL( CNF_PVAL( IPWY ) ), STATUS )
 
 *  Get a list of the supported projections, and find the indices of the
 *  first and last character in the first one in the list.  Each pair of
@@ -340,8 +346,10 @@
 
 *  Do the search.  The tolerance value is fairly arbitrary.
                CALL PDA_LMDIF1( KPS1_SKYFN, 2 * NPOS, N, XC,
-     :                          %VAL( IPWFV ), 1.0D-3, IFAIL,
-     :                          %VAL( IPWNA1 ), %VAL( IPWNA2 ), LW )
+     :                          %VAL( CNF_PVAL( IPWFV ) ), 
+     :                          1.0D-3, IFAIL,
+     :                          %VAL( CNF_PVAL( IPWNA1 ) ), 
+     :                          %VAL( CNF_PVAL( IPWNA2 ) ), LW )
 
 *  If an error occurred in the PDA service routine (KPS1_SKYFN), add a
 *  context message, and then flush the error (so that other projections
@@ -373,7 +381,8 @@
 *  Compute the sum of the squared residuals.  Since the array of
 *  residuals is dynamic it is obtained as workspace therefore a
 *  subroutine must be called to evaluate its sum.
-                  CALL KPG1_SQSUD( 2 * NPOS, %VAL( IPWFV ), FS, STATUS )
+                  CALL KPG1_SQSUD( 2 * NPOS, %VAL( CNF_PVAL( IPWFV ) ), 
+     :                             FS, STATUS )
 
 *  If the sum of the squared residuals for this projection is better
 *  than the best so far, record the projection type and parameter
@@ -468,9 +477,13 @@
 
 *  Log the results and residuals if required.
       IF ( LOG )
-     :  CALL KPS1_SKYF4( PROJEC, NP, P, SCS, EPOCH, NPOS, %VAL( IPWA ),
-     :                   %VAL( IPWB ), %VAL( IPWX ), %VAL( IPWY ), RMS,
-     :                   LOGFD, %VAL( IPWXO ), %VAL( IPWYO ), STATUS )
+     :  CALL KPS1_SKYF4( PROJEC, NP, P, SCS, EPOCH, NPOS, 
+     :                   %VAL( CNF_PVAL( IPWA ) ),
+     :                   %VAL( CNF_PVAL( IPWB ) ), 
+     :                   %VAL( CNF_PVAL( IPWX ) ), 
+     :                   %VAL( CNF_PVAL( IPWY ) ), RMS,
+     :                   LOGFD, %VAL( CNF_PVAL( IPWXO ) ), 
+     :                   %VAL( CNF_PVAL( IPWYO ) ), STATUS )
       
 *  Jump to here if an error occurs.
  999  CONTINUE

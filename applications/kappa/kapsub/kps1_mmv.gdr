@@ -35,6 +35,7 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *     8-MAY-2002 (DSB):
 *        Modified to use N-1 instead of N when calculating
 *        standard deviation.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -56,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__BADx constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NARR
@@ -90,7 +94,8 @@
          SUM2 = 0<CONST>
          NUSE<T> = 0<CONST>
          DO J = 1, NARR
-            CALL KPG1_RETR<T>( NARR, I, %VAL( IPTRS( J ) ), DATUM,
+            CALL KPG1_RETR<T>( NARR, I, %VAL( CNF_PVAL( IPTRS( J ) ) ), 
+     :                         DATUM,
      :                         STATUS )
             IF ( DATUM .NE. VAL__BAD<T> ) THEN
                SUM = SUM + DATUM

@@ -55,6 +55,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,6 +69,8 @@
 *        Modified to allow use of external work arrays.
 *     1995 April 7 (MJC):
 *        Minor stylistic changes.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,6 +89,7 @@
       INCLUDE 'C1_COM'           ! Used to communicate with OPUS and
                                  ! TROPUS
       INCLUDE 'ME_COM'           ! Common blocks etc required by MEMSYS3
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER     INDF
@@ -171,20 +175,27 @@
 *  being used.  Copy the data from the NDF extension to the work array
 *  allocated within KPS1_MEMCP.
       IF ( C1_WEXT ) THEN
-         CALL CMP_GET1R( ALOC, 'FILE1', SZAREA, %VAL( C1_IP( 1 ) ),
+         CALL CMP_GET1R( ALOC, 'FILE1', SZAREA, 
+     :                   %VAL( CNF_PVAL( C1_IP( 1 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE3', SZAREA, %VAL( C1_IP( 3 ) ),
+         CALL CMP_GET1R( ALOC, 'FILE3', SZAREA, 
+     :                   %VAL( CNF_PVAL( C1_IP( 3 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE21', SZAREA, %VAL( C1_IP( 21 ) ),
+         CALL CMP_GET1R( ALOC, 'FILE21', SZAREA, 
+     :                   %VAL( CNF_PVAL( C1_IP( 21 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE22', SZAREA, %VAL( C1_IP( 22 ) ),
+         CALL CMP_GET1R( ALOC, 'FILE22', SZAREA, 
+     :                   %VAL( CNF_PVAL( C1_IP( 22 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE23', SZAREA, %VAL( C1_IP( 23 ) ),
+         CALL CMP_GET1R( ALOC, 'FILE23', SZAREA, 
+     :                   %VAL( CNF_PVAL( C1_IP( 23 ) ) ),
      :                   NEL, STATUS )
-         CALL CMP_GET1R( ALOC, 'FILE24', SZAREA, %VAL( C1_IP( 24 ) ),
+         CALL CMP_GET1R( ALOC, 'FILE24', SZAREA, 
+     :                   %VAL( CNF_PVAL( C1_IP( 24 ) ) ),
      :                   NEL, STATUS )
          IF ( ME_M1 .EQ. 1 ) CALL CMP_GET1R( ALOC, 'FILE20', SZAREA, 
-     :                                       %VAL( C1_IP( 20 ) ), NEL,
+     :                                       
+     :   %VAL( CNF_PVAL( C1_IP( 20 ) ) ), NEL,
      :                                       STATUS )
 
 *  If internal storage is being used, copy the areas from the NDF 

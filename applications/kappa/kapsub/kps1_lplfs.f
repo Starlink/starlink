@@ -121,6 +121,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -137,6 +138,8 @@
 *        axis label.
 *     7-FEB-2004 (DSB):
 *        Replaced YLOG parameter by XMAP and YMAP parameters.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,6 +153,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -301,12 +305,13 @@
       POS( 1 ) = 1.0D0
       POS( 2 ) = DBLE( DIM )
       CALL KPG1_ASSMP( AST__NULL, 2, 1, 2, POS, .FALSE., DIM, 
-     :                 1.0D0, %VAL( IPG ), STATUS )
+     :                 1.0D0, %VAL( CNF_PVAL( IPG ) ), STATUS )
 
 *  Transform these GRID positions into the Current Frame in the supplied
 *  FrameSet.
-      CALL AST_TRANN( SMAP, DIM, 1, DIM, %VAL( IPG ), .TRUE., NAX, 
-     :                DIM, %VAL( IPW ), STATUS ) 
+      CALL AST_TRANN( SMAP, DIM, 1, DIM, %VAL( CNF_PVAL( IPG ) ), 
+     :                .TRUE., NAX,
+     :                DIM, %VAL( CNF_PVAL( IPW ) ), STATUS )
 
 *  Indicate we have found no bad axis values yet.
       BAD = .FALSE.
@@ -319,11 +324,13 @@
 *  position, measured along the profile. If the axes of the current Frame do 
 *  not all have the same Unit, normalise the distances to a maximum value of 
 *  1.0.
-         CALL KPG1_ASDSV( CFRM, DIM, NAX, %VAL( IPW ), .NOT. SAMEUN, 
-     :                    %VAL( IPD ), BAD, STATUS )
+         CALL KPG1_ASDSV( CFRM, DIM, NAX, %VAL( CNF_PVAL( IPW ) ), 
+     :                    .NOT. SAMEUN,
+     :                    %VAL( CNF_PVAL( IPD ) ), BAD, STATUS )
 
 *  Create the LutMap. 
-         LUT0 = AST_LUTMAP( DIM, %VAL( IPD ), 1.0D0, 1.0D0, ' ', 
+         LUT0 = AST_LUTMAP( DIM, %VAL( CNF_PVAL( IPD ) ), 
+     :                      1.0D0, 1.0D0, ' ',
      :                      STATUS )
 
 *  If we need to find a default value for XMAP, and the axis is being annotated
@@ -332,16 +339,21 @@
          IF( XMAP .EQ. 'DEFAULT' .AND. DIST ) THEN
 
 *  First find the RMS deviation of a stright line fitted to the axis value
-            CALL KPG1_FIT1D( 1, DIM, %VAL( IPD ), %VAL( IPG ), M, C, 
+            CALL KPG1_FIT1D( 1, DIM, %VAL( CNF_PVAL( IPD ) ), 
+     :                       %VAL( CNF_PVAL( IPG ) ), M, C,
      :                       RMSLIN, STATUS )
 
 *  Now take the log base 10 of the axis values and find the new RMS
 *  deviation.
-            CALL KPG1_LOGAD( .TRUE., DIM, %VAL( IPD ), .FALSE., 
-     :                        %VAL( IPD ), 10.0D0, %VAL( IPD ),
-     :                        %VAL( IPD ), NERR, NERRV, STATUS ) 
+            CALL KPG1_LOGAD( .TRUE., DIM, %VAL( CNF_PVAL( IPD ) ), 
+     :                       .FALSE.,
+     :                        %VAL( CNF_PVAL( IPD ) ), 10.0D0, 
+     :                       %VAL( CNF_PVAL( IPD ) ),
+     :                        %VAL( CNF_PVAL( IPD ) ), 
+     :                       NERR, NERRV, STATUS )
             IF( NERR .LT. 0.5*DIM ) THEN
-               CALL KPG1_FIT1D( 1, DIM, %VAL( IPD ), %VAL( IPG ), M, C, 
+               CALL KPG1_FIT1D( 1, DIM, %VAL( CNF_PVAL( IPD ) ), 
+     :                          %VAL( CNF_PVAL( IPG ) ), M, C,
      :                          RMSLOG, STATUS )
 
 *  Choose the mapping which gives the smallest rms (i.e. spreads the
@@ -368,11 +380,13 @@
 *  Normalise the axis values using AST_NORM and copy the values on the 
 *  required axis to a new 1-d array. Note if there are any bad values in this 
 *  array.
-         CALL KPS1_LPLNM( CFRM, IAXIS, DIM, NAX, %VAL( IPW ),
-     :                    %VAL( IPD ), BAD, STATUS )
+         CALL KPS1_LPLNM( CFRM, IAXIS, DIM, NAX, 
+     :                    %VAL( CNF_PVAL( IPW ) ),
+     :                    %VAL( CNF_PVAL( IPD ) ), BAD, STATUS )
 
 *  Create the LutMap. 
-         LUTI = AST_LUTMAP( DIM, %VAL( IPD ), 1.0D0, 1.0D0, ' ', 
+         LUTI = AST_LUTMAP( DIM, %VAL( CNF_PVAL( IPD ) ), 
+     :                      1.0D0, 1.0D0, ' ',
      :                      STATUS )
 
 
@@ -381,16 +395,21 @@
          IF( XMAP .EQ. 'DEFAULT' ) THEN
 
 *  First find the RMS deviation of a stright line fitted to the axis value
-            CALL KPG1_FIT1D( 1, DIM, %VAL( IPD ), %VAL( IPG ), M, C, 
+            CALL KPG1_FIT1D( 1, DIM, %VAL( CNF_PVAL( IPD ) ), 
+     :                       %VAL( CNF_PVAL( IPG ) ), M, C,
      :                       RMSLIN, STATUS )
 
 *  Now take the log base 10 of the axis values and find the new RMS
 *  deviation.
-            CALL KPG1_LOGAD( .TRUE., DIM, %VAL( IPD ), .FALSE., 
-     :                        %VAL( IPD ), 10.0D0, %VAL( IPD ),
-     :                        %VAL( IPD ), NERR, NERRV, STATUS ) 
+            CALL KPG1_LOGAD( .TRUE., DIM, %VAL( CNF_PVAL( IPD ) ), 
+     :                       .FALSE.,
+     :                        %VAL( CNF_PVAL( IPD ) ), 10.0D0, 
+     :                       %VAL( CNF_PVAL( IPD ) ),
+     :                        %VAL( CNF_PVAL( IPD ) ), 
+     :                       NERR, NERRV, STATUS )
             IF( NERR .LT. 0.5*DIM ) THEN
-               CALL KPG1_FIT1D( 1, DIM, %VAL( IPD ), %VAL( IPG ), M, C, 
+               CALL KPG1_FIT1D( 1, DIM, %VAL( CNF_PVAL( IPD ) ), 
+     :                          %VAL( CNF_PVAL( IPG ) ), M, C,
      :                          RMSLOG, STATUS )
 
 *  Choose the mapping which gives the smallest rms (i.e. spreads the

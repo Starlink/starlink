@@ -77,6 +77,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -97,6 +98,8 @@
 *        Minor stylistic changes.  Stripped trailing blanks.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +118,7 @@
       INCLUDE 'C1_COM'           ! Used to communicate with OPUS and
                                  ! TROPUS.
       INCLUDE 'ME_COM'           ! Common blocks etc required by MEMSYS3
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
@@ -250,22 +254,29 @@
 
 *  MEMSYS3 areas:
          IF ( C1_WEXT ) THEN
-            CALL CMP_PUT1R( LOC1, 'FILE1', SZAREA, %VAL( C1_IP( 1 ) ), 
+            CALL CMP_PUT1R( LOC1, 'FILE1', SZAREA, 
+     :                      %VAL( CNF_PVAL( C1_IP( 1 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE3', SZAREA, %VAL( C1_IP( 3 ) ), 
+            CALL CMP_PUT1R( LOC1, 'FILE3', SZAREA, 
+     :                      %VAL( CNF_PVAL( C1_IP( 3 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE21', SZAREA, %VAL( C1_IP( 21 ) ),
+            CALL CMP_PUT1R( LOC1, 'FILE21', SZAREA, 
+     :                      %VAL( CNF_PVAL( C1_IP( 21 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE22', SZAREA, %VAL( C1_IP( 22 ) ),
+            CALL CMP_PUT1R( LOC1, 'FILE22', SZAREA, 
+     :                      %VAL( CNF_PVAL( C1_IP( 22 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE23', SZAREA, %VAL( C1_IP( 23 ) ),
+            CALL CMP_PUT1R( LOC1, 'FILE23', SZAREA, 
+     :                      %VAL( CNF_PVAL( C1_IP( 23 ) ) ),
      :                      STATUS )
-            CALL CMP_PUT1R( LOC1, 'FILE24', SZAREA, %VAL( C1_IP( 24 ) ),
+            CALL CMP_PUT1R( LOC1, 'FILE24', SZAREA, 
+     :                      %VAL( CNF_PVAL( C1_IP( 24 ) ) ),
      :                      STATUS )
 
             IF ( ME_KB(20) .GT. 0 ) CALL CMP_PUT1R( LOC1, 'FILE20', 
      :                                              SZAREA, 
-     :                                              %VAL( C1_IP( 20 ) ),
+     :                                              
+     :   %VAL( CNF_PVAL( C1_IP( 20 ) ) ),
      :                                              STATUS )
 
          ELSE
@@ -358,23 +369,31 @@
 *  the ICF, to get the required deconvolved image. Files <2> and <4> 
 *  are used as work space. (The "hidden" image must be left in file <1>
 *  for analysis/continuation).
-         CALL VEC_RTOR( .FALSE., SZAREA, %VAL( C1_IP( 1 ) ),
-     :                  %VAL( C1_IP( 5 ) ), IERR, NERR, STATUS )
-         CALL KPS1_ICBLU( C1_ICF, .FALSE., %VAL( C1_IP( 2 ) ),
-     :                    %VAL( C1_IP( 4 ) ), %VAL( C1_IP( 5 ) ),
+         CALL VEC_RTOR( .FALSE., SZAREA, %VAL( CNF_PVAL( C1_IP( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( C1_IP( 5 ) ) ), 
+     :                  IERR, NERR, STATUS )
+         CALL KPS1_ICBLU( C1_ICF, .FALSE., 
+     :                    %VAL( CNF_PVAL( C1_IP( 2 ) ) ),
+     :                    %VAL( CNF_PVAL( C1_IP( 4 ) ) ), 
+     :                    %VAL( CNF_PVAL( C1_IP( 5 ) ) ),
      :                    STATUS )
 
 *  Copy the deconvolved image from file <5> to the output NDF.
          IF ( ME_KB( 20 ) .GT. 0) THEN
-            CALL KPS1_MEMOU( %VAL( C1_IP( 5 ) ), %VAL( C1_IP( 22 ) ),
+            CALL KPS1_MEMOU( %VAL( CNF_PVAL( C1_IP( 5 ) ) ), 
+     :                       %VAL( CNF_PVAL( C1_IP( 22 ) ) ),
      :                       C1_DIM( 1 ), C1_DIM( 2 ), 
-     :                       %VAL( C1_IP( 20 ) ), C1_NPX, C1_NLN, 
-     :                       C1_XMG, C1_YMG, %VAL( IPOUT ), BAD, 
+     :                       %VAL( CNF_PVAL( C1_IP( 20 ) ) ), 
+     :                       C1_NPX, C1_NLN,
+     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                       BAD,
      :                       STATUS )
          ELSE
-            CALL KPS1_MEMOU( %VAL( C1_IP( 5 ) ), %VAL( C1_IP( 22 ) ),
+            CALL KPS1_MEMOU( %VAL( CNF_PVAL( C1_IP( 5 ) ) ), 
+     :                       %VAL( CNF_PVAL( C1_IP( 22 ) ) ),
      :                       C1_DIM( 1 ), C1_DIM( 2 ), DEF, 1, 1, 
-     :                       C1_XMG, C1_YMG, %VAL( IPOUT ), BAD, 
+     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                       BAD,
      :                       STATUS )
          END IF
 
@@ -392,12 +411,14 @@
             CALL KPS1_MEMOU( ME_ST( ME_KB( 5 ) ), ME_ST( ME_KB( 22 ) ),
      :                       C1_DIM( 1 ), C1_DIM( 2 ), 
      :                       ME_ST( ME_KB( 20 ) ), C1_NPX, C1_NLN, 
-     :                       C1_XMG, C1_YMG, %VAL( IPOUT ), BAD, 
+     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                       BAD,
      :                       STATUS )
          ELSE
             CALL KPS1_MEMOU( ME_ST( ME_KB( 5 ) ), ME_ST( ME_KB( 22 ) ),
      :                       C1_DIM( 1 ), C1_DIM( 2 ), DEF, 1, 1, 
-     :                       C1_XMG, C1_YMG, %VAL( IPOUT ), BAD, 
+     :                       C1_XMG, C1_YMG, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                       BAD,
      :                       STATUS )
          END IF
 

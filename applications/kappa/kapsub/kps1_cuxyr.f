@@ -52,6 +52,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +62,8 @@
 *        Some tidying of the prologue.  Used modern-style variable
 *        declarations.  Called modern KPG1_PRCUR.  Improved the
 *        cursor instructions.  Called renamed retrieval routine.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,6 +77,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) COSYS
@@ -173,17 +177,22 @@
 *  Obtain the vertices.
       CALL CURPTS( MXVERT, .FALSE., MXCHO, MARK, .FALSE., DELTA,
      :             POLY, .TRUE., VAL__MINR, VAL__MAXR, VAL__MINR,
-     :             VAL__MAXR, XIN, YIN, NVERT, %VAL( IPX ), %VAL( IPY ),
+     :             VAL__MAXR, XIN, YIN, NVERT, %VAL( CNF_PVAL( IPX ) ), 
+     :             %VAL( CNF_PVAL( IPY ) ),
      :             STATUS )
 
 *  If the vertices have been joined by straight lines, complete the 
 *  polygon by joining the first vertex to the last vertex.  The
 *  co-ordinates are extracted from the work arrays.
       IF ( POLY .AND. NVERT .GT. 2 ) THEN
-         CALL KPG1_RETRR( NVERT, 1, %VAL( IPX ), X1, STATUS )
-         CALL KPG1_RETRR( NVERT, 1, %VAL( IPY ), Y1, STATUS )
-         CALL KPG1_RETRR( NVERT, NVERT, %VAL( IPX ), X2, STATUS )
-         CALL KPG1_RETRR( NVERT, NVERT, %VAL( IPY ), Y2, STATUS )
+         CALL KPG1_RETRR( NVERT, 1, %VAL( CNF_PVAL( IPX ) ), 
+     :                    X1, STATUS )
+         CALL KPG1_RETRR( NVERT, 1, %VAL( CNF_PVAL( IPY ) ), 
+     :                    Y1, STATUS )
+         CALL KPG1_RETRR( NVERT, NVERT, %VAL( CNF_PVAL( IPX ) ), 
+     :                    X2, STATUS )
+         CALL KPG1_RETRR( NVERT, NVERT, %VAL( CNF_PVAL( IPY ) ), 
+     :                    Y2, STATUS )
          CALL SGS_LINE( X1, Y1, X2, Y2 )
          CALL SGS_FLUSH
       END IF
@@ -199,8 +208,10 @@
          IF ( COSYS .EQ. 'DATA' ) THEN
             CALL PSX_CALLOC( NVERT, '_REAL', IPXX, STATUS )
             CALL PSX_CALLOC( NVERT, '_REAL', IPYY, STATUS )
-            CALL AGI_TWTOD( -1, NVERT, %VAL( IPX ), %VAL( IPY ),
-     :                      %VAL( IPXX ), %VAL( IPYY ), STATUS )
+            CALL AGI_TWTOD( -1, NVERT, %VAL( CNF_PVAL( IPX ) ), 
+     :                      %VAL( CNF_PVAL( IPY ) ),
+     :                      %VAL( CNF_PVAL( IPXX ) ), 
+     :                      %VAL( CNF_PVAL( IPYY ) ), STATUS )
             CALL PSX_FREE( IPX, STATUS )
             CALL PSX_FREE( IPY, STATUS )
             IPX = IPXX

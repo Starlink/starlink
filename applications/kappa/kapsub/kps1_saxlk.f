@@ -27,11 +27,14 @@
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
 *     16 MAY 2000 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
  
 *  Bugs:
@@ -45,6 +48,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
  
 *  Arguments Given:
       INTEGER INDF1
@@ -122,32 +126,39 @@
 
 *  Copy the source array to the destination array.
                IF( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., EL, %VAL( IP2 ), %VAL( IP1 ), 
+                  CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
+     :                           %VAL( CNF_PVAL( IP1 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( .FALSE., EL, %VAL( IP2 ), %VAL( IP1 ), 
+                  CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
+     :                           %VAL( CNF_PVAL( IP1 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOI( .FALSE., EL, %VAL( IP2 ), %VAL( IP1 ), 
+                  CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
+     :                           %VAL( CNF_PVAL( IP1 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOW( .FALSE., EL, %VAL( IP2 ), %VAL( IP1 ), 
+                  CALL VEC_WTOW( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
+     :                           %VAL( CNF_PVAL( IP1 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-                  CALL VEC_UWTOUW( .FALSE., EL, %VAL( IP2 ), 
-     :                             %VAL( IP1 ), IERR, NERR, STATUS )
+                  CALL VEC_UWTOUW( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ),
+     :                             %VAL( CNF_PVAL( IP1 ) ), 
+     :                             IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_BTOB( .FALSE., EL, %VAL( IP2 ), %VAL( IP1 ), 
+                  CALL VEC_BTOB( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
+     :                           %VAL( CNF_PVAL( IP1 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOUB( .FALSE., EL, %VAL( IP2 ), 
-     :                             %VAL( IP1 ), IERR, NERR, STATUS )
+                  CALL VEC_UBTOUB( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ),
+     :                             %VAL( CNF_PVAL( IP1 ) ), 
+     :                             IERR, NERR, STATUS )
                END IF
 
             END IF

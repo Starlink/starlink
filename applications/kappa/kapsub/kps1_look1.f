@@ -47,11 +47,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     22-OCT-2001 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +70,7 @@
       INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -216,7 +220,8 @@
 *  bounds are given within the ARDPIXCO Frame.
          RV = 2
          CALL ARD_WORK( IGRP, 2, WLBND, WUBND, VAL__BADR, .FALSE., 
-     :                  RV, %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :                  RV, %VAL( CNF_PVAL( IPMASK ) ), 
+     :                  LBNDI, UBNDI, LBNDE, UBNDE,
      :                  STATUS )
 
 *  Report an error if the region contains no data.
@@ -264,7 +269,8 @@
 *  bounds are given within the PIXEL Frame.
       RV = 2
       CALL ARD_WORK( IGRP, 2, WLBND, WUBND, VAL__BADR, .FALSE., 
-     :               RV, %VAL( IPMASK ), RLBND, RUBND, LBNDE, UBNDE,
+     :               RV, %VAL( CNF_PVAL( IPMASK ) ), 
+     :               RLBND, RUBND, LBNDE, UBNDE,
      :               STATUS )
 
 *  Allocate the returned array.
@@ -285,9 +291,11 @@
 
 *  Copy the masked NDF array into the returned array.
       CALL KPS1_LOOK2( WLBND( 1 ), WUBND( 1 ), WLBND( 2 ), WUBND( 2 ), 
-     :                 %VAL( IPMASK ), ( VAL__MAXD - 1.0D0 ), 
+     :                 
+     :   %VAL( CNF_PVAL( IPMASK ) ), ( VAL__MAXD - 1.0D0 ),
      :                 RLBND( 1 ), RUBND( 1 ), RLBND( 2 ), RUBND( 2 ), 
-     :                 %VAL( IPIN ), %VAL( IPDAT ), STATUS )
+     :                 %VAL( CNF_PVAL( IPIN ) ), 
+     :                 %VAL( CNF_PVAL( IPDAT ) ), STATUS )
 
 *  Tidy up.
  999  CONTINUE

@@ -66,6 +66,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,6 +81,8 @@
 *        argument to .false.
 *     31-OCT-2002 (DSB):
 *        Make N-dimensional.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,6 +99,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDIM2
@@ -362,65 +366,79 @@
 *  Call the appropriate resampling routine
       IF ( TY_IN .EQ. '_INTEGER' ) THEN
          BAD_PIXELS = AST_RESAMPLEI( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
+     :                               %VAL( CNF_PVAL( IPD1 ) ), 
+     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADI, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( IPD2 ), %VAL( IPV2 ), 
+     :                               %VAL( CNF_PVAL( IPD2 ) ), 
+     :                               %VAL( CNF_PVAL( IPV2 ) ),
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
          BAD_PIXELS = AST_RESAMPLER( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
+     :                               %VAL( CNF_PVAL( IPD1 ) ), 
+     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADR, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( IPD2 ), %VAL( IPV2 ), 
+     :                               %VAL( CNF_PVAL( IPD2 ) ), 
+     :                               %VAL( CNF_PVAL( IPV2 ) ),
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
          BAD_PIXELS = AST_RESAMPLED( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
+     :                               %VAL( CNF_PVAL( IPD1 ) ), 
+     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADD, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( IPD2 ), %VAL( IPV2 ), 
+     :                               %VAL( CNF_PVAL( IPD2 ) ), 
+     :                               %VAL( CNF_PVAL( IPV2 ) ),
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_BYTE' ) THEN 
          BAD_PIXELS = AST_RESAMPLEB( MAP5, NDIM1, LGRID1, UGRID1, 
-     :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
+     :                               %VAL( CNF_PVAL( IPD1 ) ), 
+     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADB, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( IPD2 ), %VAL( IPV2 ), 
+     :                               %VAL( CNF_PVAL( IPD2 ) ), 
+     :                               %VAL( CNF_PVAL( IPV2 ) ),
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_UBYTE' ) THEN
          BAD_PIXELS = AST_RESAMPLEUB( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
+     :                               %VAL( CNF_PVAL( IPD1 ) ), 
+     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADUB, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( IPD2 ), %VAL( IPV2 ), 
+     :                               %VAL( CNF_PVAL( IPD2 ) ), 
+     :                               %VAL( CNF_PVAL( IPV2 ) ),
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_WORD' ) THEN 
          BAD_PIXELS = AST_RESAMPLEW( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
+     :                               %VAL( CNF_PVAL( IPD1 ) ), 
+     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADW, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( IPD2 ), %VAL( IPV2 ), 
+     :                               %VAL( CNF_PVAL( IPD2 ) ), 
+     :                               %VAL( CNF_PVAL( IPV2 ) ),
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_UWORD' ) THEN 
          BAD_PIXELS = AST_RESAMPLEUW( MAP5, NDIM1, LGRID1, UGRID1,
-     :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
+     :                               %VAL( CNF_PVAL( IPD1 ) ), 
+     :                               %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADUW, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
-     :                               %VAL( IPD2 ), %VAL( IPV2 ), 
+     :                               %VAL( CNF_PVAL( IPD2 ) ), 
+     :                               %VAL( CNF_PVAL( IPV2 ) ),
      :                               STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
@@ -452,10 +470,12 @@
 
 *  Do the resampling.
          RESULT = AST_RESAMPLEUW( MAP5, NDIM1, LGRID1, UGRID1, 
-     :                            %VAL( IPQ1 ), DUMMY, METHOD, AST_NULL, 
+     :                            %VAL( CNF_PVAL( IPQ1 ) ), 
+     :                            DUMMY, METHOD, AST_NULL,
      :                            PARAMS, FLAGS, TOL, MAXPIX, 
      :                            VAL__BADUW, NDIM2, LGRID2, UGRID2, 
-     :                            LGRID2, UGRID2, %VAL( IPQ2 ), DUMMY, 
+     :                            LGRID2, UGRID2, 
+     :                            %VAL( CNF_PVAL( IPQ2 ) ), DUMMY,
      :                            STATUS )
       
       END IF

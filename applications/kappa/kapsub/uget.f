@@ -33,11 +33,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     20-MAR-1995 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -52,6 +55,7 @@
       INCLUDE 'ME_COM'           ! MEMSYS3 common blocks
       INCLUDE 'C1_COM'           ! Common blocks used to communicate
                                  ! with MEM2D.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Arguments Given:
       INTEGER J
@@ -60,7 +64,7 @@
 
 *.
 
-      CALL KPS1_MEMTR( N, J, %VAL( C1_IP0 ), K, ME_ST )
+      CALL KPS1_MEMTR( N, J, %VAL( CNF_PVAL( C1_IP0 ) ), K, ME_ST )
 
 
       END
