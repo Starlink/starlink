@@ -799,10 +799,10 @@ then a link should be made, using the URL in <code/cdr/.
 	(cons (string-append "The element with id " id
 			     " has not been exported, so may not be linked to")
 	      #f)
-	(case urlpolicy
-	  (((normalize "none"))
+	(case (case-fold-down urlpolicy) ;compare case-insensitively
+	  (("none")
 	   (cons #f #f))	; policy satisfied - no link
-	  (((normalize "explicit"))
+	  (("explicit")
 	   (if urlpath
 	       (cons #f (or no-urls
 			    (string-append %starlink-document-server%
@@ -812,7 +812,7 @@ then a link should be made, using the URL in <code/cdr/.
 	       (cons (string-append "element with id " id
 				    " has no URLPATH attribute")
 		     #f)))
-	  (((normalize "automatic"))
+	  (("automatic")
 	   (if urlpath
 	       (cons (string-append "element with id " id
 				    " has an URLPATH attribute present")
