@@ -37,10 +37,10 @@
 *     AVERAGE  = LOGICAL( READ )
 *         If true overlap regions are averaged, alternatively, they are
 *           summed
-*     INPICn  =  IMAGE( READ )
+*     INPn  =  IMAGE( READ )
 *         nth IMAGE structure containing a data array to be a
 *           constituent of a mosaic
-*     OUTPIC  =  IMAGE( WRITE )
+*     OUT  =  IMAGE( WRITE )
 *         Output IMAGE structure containing the merged data array
 *     OTITLE  =  CHAR( READ )
 *         Label for the output IMAGE structure
@@ -367,7 +367,7 @@ c                              ! spacecraft co-ordinates.
 
 *      Construct parameter name
         CALL MSG_SETI( 'N', I )
-        CALL MSG_MAKE( 'INPIC^N', PARM, LPARM )
+        CALL MSG_MAKE( 'INP^N', PARM, LPARM )
 
 *      Tell user which number frame is required
         CALL MSG_SETI( 'FRAMENO', I )
@@ -827,7 +827,7 @@ c                              ! spacecraft co-ordinates.
       END DO
 
 *    Now get the output array
-      CALL USI_ASSOCO( 'OUTPUT', 'IMAGE', OLOC, STATUS )
+      CALL USI_ASSOCO( 'OUT', 'IMAGE', OLOC, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

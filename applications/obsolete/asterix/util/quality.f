@@ -196,7 +196,7 @@
       CALL AST_INIT()
 
 *    Overwrite?
-      CALL USI_GET0L( 'OVERWRITE', OVERWRITE, STATUS )
+      CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
 
 *    Get input
       IF ( OVERWRITE ) THEN
