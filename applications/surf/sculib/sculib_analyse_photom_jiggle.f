@@ -195,15 +195,17 @@
                T_QUALITY (J) = QUALITY (BOL,J)
             END DO
 
-            CALL SCULIB_FIT_2D_PARABOLA (J_COUNT, T_DATA, T_VARIANCE,
-     :        T_QUALITY, JIGGLE_X, JIGGLE_Y, A0, A1, X0, Y0, RESULT_D,
-     :        RESULT_V, BADBIT, STATUS)
-
             IF (STATUS .EQ. SAI__OK) THEN
-               RESULT_Q = 0
-            ELSE
-               RESULT_Q = 1
-               CALL ERR_FLUSH (STATUS)
+               CALL SCULIB_FIT_2D_PARABOLA (J_COUNT, T_DATA, T_VARIANCE,
+     :              T_QUALITY, JIGGLE_X, JIGGLE_Y, A0, A1, X0, Y0, 
+     :              RESULT_D, RESULT_V, BADBIT, STATUS)
+               
+               IF (STATUS .EQ. SAI__OK) THEN
+                  RESULT_Q = 0
+               ELSE
+                  RESULT_Q = 1
+                  CALL ERR_FLUSH (STATUS)
+               END IF
             END IF
          END IF
       END IF
