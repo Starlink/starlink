@@ -343,7 +343,7 @@ class StarRtdImage : public Skycat {
    StarWCS* getStarWCSPtr(ImageData* image = (ImageData*)NULL);
 
    //  Create a basic GRID/PIXEL coordinates domain FrameSet.
-   AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image = NULL );
+   AstFrameSet* makeGridWCS( ImageData *image = NULL );
 
    //  Create AST plot for drawing grids and contours to canvas.
    AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset,
