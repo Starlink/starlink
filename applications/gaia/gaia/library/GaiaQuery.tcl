@@ -58,10 +58,6 @@
 
 itk::usual GaiaQuery {}
 
-#  This class extends the SkySearch catalog widget browser class (see
-#  SkySearch (n) and AstroCat(n) to add support for plotting objects
-#  and displaying images.
-
 itcl::class gaia::GaiaQuery {
    inherit skycat::SkyQuery
 
@@ -211,7 +207,4 @@ itcl::class gaia::GaiaQuery {
    }
 
 }
-
-
-
 

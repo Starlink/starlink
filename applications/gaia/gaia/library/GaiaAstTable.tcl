@@ -170,6 +170,10 @@ itcl::class gaia::GaiaAstTable {
        bind $itk_component(table).listbox <2> \
           [code $this centre_selected_object_]
 
+       #  Set table binding to label the current object.
+       bind $itk_component(table).listbox <3> \
+          [code $this label_selected_object_]
+
        #  Add a button to grab the catalogues entries from an
        #  AstroCatalog window (which must already exist).
        itk_component add grab {
@@ -304,7 +308,7 @@ itcl::class gaia::GaiaAstTable {
    }
    public method new_info {} {
       $itk_component(table) new_info
-   } 
+   }
 
    #  Grab a catalogue of objects from an AstroCat window.
    public method grab {} {
@@ -939,7 +943,15 @@ itcl::class gaia::GaiaAstTable {
    public method write_to_file {} {
       set w [FileSelect .\#auto -title "Write positions to file"]
       if {[$w activate]} {
-         save_positions [$w get]
+         set filename [$w get]
+         if { [file exists $filename] } {
+            if { ! [ confirm_dialog \
+                     "$filename exists - do you want to overwrite?"] } {
+               destroy $w
+               return
+            }
+         }
+         save_positions $filename
       }
       destroy $w
    }
@@ -1176,6 +1188,32 @@ itcl::class gaia::GaiaAstTable {
       }
    }
 
+   #  Label the selected object using its identifier. Labels are text
+   #  strings that can be moved, but not editted.
+   protected method label_selected_object_ {} {
+      set line [lindex [$itk_component(table) get_selected] 0]
+      lassign $line id ra dec x y
+      set id [lindex $line 0]
+      set canvas $itk_option(-canvas)
+      set image $itk_option(-rtdimage)
+      if {"$id" == "" || $canvas == "" || $image == ""} {
+         return
+      }
+      $image convert coords $x $y image cx cy canvas
+
+      set tags [list objects ${this}_label label$id]
+      $canvas delete label$id
+      set labelid [$canvas create text $cx $cy \
+                      -text "$id" \
+                      -anchor sw \
+                      -fill white \
+                      -font $itk_option(-canvasfont) \
+                      -tags $tags]
+
+      [$itk_option(-image) component draw] add_object_bindings $labelid
+      ct_add_bindings $canvas $labelid
+   }
+
    #  Configuration options
    #  =====================
 
@@ -1317,6 +1355,10 @@ itcl::class gaia::GaiaAstTable {
    #  Whether to add <Any-Enter> bindings (these can cause confusion for
    #  some applications).
    itk_option define -bind_enters bind_enters Bind_enters 0
+
+   #  Font used in canvas to mark objects
+   itk_option define -canvasfont canvasFont CanvasFont \
+      "-*-courier-bold-r-*-*-*-120-*-*-*-*-*-*"
 
    #  Protected variables: (available to instance)
    #  --------------------

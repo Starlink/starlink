@@ -138,10 +138,6 @@ itcl::class gaia::GaiaPositions {
       #  Initialisations after widget creation.
       auto_centroid_changed_
       configure -iqesize $itk_option(-iqesize)
-
-      # XXX debug code.
-      $itk_component(table) read_positions "temp.ast"
-      
    }
 
    #  Destructor:
