@@ -57,7 +57,6 @@
       INTEGER          X_DIM, Y_DIM           ! Axis dimensions
       INTEGER          X_PTR, Y_PTR           ! Axis data pointers
 
-      LOGICAL          VALID                  ! Good locator?
       LOGICAL          X_REG, Y_REG	      ! Axes regular
 *-
 

@@ -1,15 +1,5 @@
-      SUBROUTINE PSF_GETSLOT( ID, SLOT, STATUS )
-      IMPLICIT NONE
-      INCLUDE 'DAT_PAR'
-      CHARACTER*(DAT__SZLOC) LOC
-      INTEGER   ID,SLOT,STATUS
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
-      CALL PSF_GETSLOTL( LOC, SLOT, STATUS )
-
-      END
-
 *+  PSF_GETSLOTL - Grab a slot in the PSF common block
-      SUBROUTINE PSF_GETSLOTL( LOC, SLOT, STATUS )
+      SUBROUTINE PSF_GETSLOTL( FID, SLOT, STATUS )
 *
 *    Author :
 *
@@ -42,11 +32,11 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)	LOC
+      INTEGER			FID			! Input dataset id
 *
 *    Export :
 *
-      INTEGER          SLOT                   ! Slot
+      INTEGER          		SLOT                   	! Slot
 *
 *    Local variables :
 *
@@ -65,7 +55,7 @@
       SLOT = 0
       I = 1
       DO WHILE ( (I.LE.PSF_NMAX) .AND. (SLOT.EQ.0) )
-        IF ( LOC .EQ. P_LOC(I) ) THEN
+        IF ( FID .EQ. P_FID(I) ) THEN
           SLOT = I
         ELSE IF ( P_USED(I) ) THEN
           I = I + 1
@@ -87,7 +77,7 @@
         P_MODEL(SLOT) = .FALSE.
         P_INST(SLOT) = 0
         P_GOTAX(SLOT) = .FALSE.
-        P_LOC(SLOT) = LOC
+        P_FID(SLOT) = FID
 
 *      Mark slot in use
         P_USED(SLOT) = .TRUE.

@@ -1,5 +1,5 @@
 *+  PSF_PUT_MODEL - Write details of psf model to file
-      SUBROUTINE PSF_PUT_MODEL( LOC, SLOT, STATUS )
+      SUBROUTINE PSF_PUT_MODEL( SLOT, STATUS )
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -28,7 +28,6 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)       LOC                ! Dataset locator
       INTEGER                      SLOT               ! Psf handle
 *
 *    Status :
@@ -38,21 +37,13 @@
 *    Local variables :
 *
       CHARACTER*(DAT__SZLOC)       PLOC               ! PSF data structure
-
-      INTEGER                      BDA                ! BDA identifier
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Try to create psf structure
-      CALL BDA_FIND( LOC, BDA, STATUS )
-      CALL BDA_CREPSF_INT( BDA, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL MSG_PRNT( '! Unable to create PSF structure in output' )
-      ELSE
-        CALL BDA_LOCPSF_INT( BDA, PLOC, STATUS )
-      END IF
+*    Locate PSF structure, creating if necessary
+      CALL ADI1_LOCPSF( P_FID(SLOT), .TRUE., PLOC, STATUS )
 
 *    Create sub-components
       CALL DAT_NEW0C( PLOC, 'ROUTINE_NAME', 20, STATUS )
