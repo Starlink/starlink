@@ -105,7 +105,7 @@ exit
 
 *+
 *  Name:
-*    SCUPA
+*    SCUSETENV
 *
 *  Purpose:
 *    Set the startup environment variables for SURF
@@ -134,7 +134,7 @@ exit
 
 *  Notes:
 *    - Currently this routine only works for the JAC and JCMT systems.
-*      This is because the location of the data is stored in standard
+*      This is because the data are stored in standard
 *      directories and indexed by YYYYMMDD UT date.
 *    - ORAC_DATA_IN environment variable is also set (only relevant
 *      for users of the ORAC-DR pipeline)
@@ -151,6 +151,9 @@ exit
 
 *  History:
 *    $Log$
+*    Revision 1.2  1999/06/18 03:19:50  timj
+*    Documentation patch
+*
 *    Revision 1.1  1999/01/26 19:32:41  timj
 *    New script.
 *
