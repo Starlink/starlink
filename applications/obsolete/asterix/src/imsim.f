@@ -185,6 +185,7 @@
 
 *    Version
       CALL MSG_PRNT( VERSION )
+      CALL NAG_MISSING ( 'G05ECF, G05EYF, C05ADF', STATUS )
 
 *    Initialise Asterix
       CALL AST_INIT()
