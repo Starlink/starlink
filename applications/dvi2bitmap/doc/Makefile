@@ -7,12 +7,13 @@ doc.tar: dvi2bitmap.html.stamp dvi2bitmap.latex.stamp ps.stamp dvi2bitmap.single
 			*.manifest Makefile dvi2bitmap.sgml; do \
 		echo doc/$$f >>tar.list; \
 	done
-	ROOT=`awk -F: '{print $$1}' dvi2bitmap.html.stamp`; \
-	test -r $$ROOT.imgeq.sgml && \
-		sed -n "s/^.*sysid='\(.*\)'.*$$/doc\/\1/p" $$ROOT.imgeq.sgml \
-		| sort | uniq >> tar.list
+	# Following not necessary now image gifs are included in manifest
+	#ROOT=`awk -F: '{print $$1}' dvi2bitmap.html.stamp`; \
+	#test -r $$ROOT.imgeq.sgml && \
+	#	sed -n "s/^.*sysid='\(.*\)'.*$$/doc\/\1/p" $$ROOT.imgeq.sgml \
+	#	| sort | uniq >> tar.list
 	echo doc/dvi2bitmap.single.html >>tar.list
-	cd ..; tar cf doc.tar `cat doc/tar.list`
+	cd ..; tar cf doc.tar `sort doc/tar.list | uniq`
 	rm -f tar.list
 	mv ../doc.tar .
 
