@@ -88,6 +88,7 @@
 *        ADI port
 *     12 Apr 1996 V2.0-1 (DJA):
 *        Changed to use psf field size hint if available
+*     30 Oct 00 : V2.2-1   New PSFs added (DGED)
 *
 *    Type definitions :
 *

@@ -73,6 +73,8 @@
 *        Fixed convolution option
 *     23 Jun 1997 V2.1-0 (RB):
 *        Replace NAG with ASTPDA
+*     30 Oct 0000 V2.1-1 (DGED):
+*        New PSFs added
 *
 *    Type definitions :
 *

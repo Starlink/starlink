@@ -120,6 +120,8 @@
 *        Fixed bug in energy axis copying
 *     13 May 1996 V2.0-5 (DJA):
 *        Added perturbation option
+*     30 Oct 2000 V2.0-6 (DGED):
+*        New PSFs added
 *     {enter_changes_here}
 
 *  Bugs:

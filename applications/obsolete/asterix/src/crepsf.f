@@ -37,6 +37,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     28 Mar 95 : V1.8-1 Use new data interface (DJA)
 *     15 Nov 95 : V2.0-0 Full ADI port (DJA)
+*     30 Oct 00 : V2.0-1 New PSFs added (DGED)
 *
 *    Type definitions :
 *
@@ -77,7 +78,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-         PARAMETER      ( VERSION = 'CREPSF Version 2.2-0' )
+         PARAMETER      ( VERSION = 'CREPSF Version 2.2-1' )
 *-
 
 *    Check status
