@@ -133,7 +133,7 @@
         CALL EDI_IDX( ARGS(1), I, LID, STATUS )
 
 *    Get its name
-        CALL ADI_NAME( LID, NAME, STATUS )
+        CALL ADI_CGET0C( LID, 'Name', NAME, STATUS )
 
 *    Is it mapped?
         CALL ADI_THERE( LID, '.MappedComponent', THERE, STATUS )
