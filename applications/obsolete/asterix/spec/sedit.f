@@ -74,7 +74,6 @@
       INTEGER                	COMP(NPAMAX)     	! List of components
       INTEGER			FID			! Fit model dataset id
       INTEGER                	IOPT             	! Integer key code
-      INTEGER                	NLEV             	! Number of levels from HDS_TRACE
       INTEGER                	OCH              	! Output channel id
       INTEGER                	PAR(NPAMAX)      	! List of parameters
       INTEGER                	PARTOT           	! Total number of parameters
@@ -82,7 +81,6 @@
 
       LOGICAL                	QUIT             	! Quit program?
       LOGICAL                	SNEW             	! New fit_model object?
-      LOGICAL                	UPDATE			! Update screen?
 *
 *    Version :
 *
@@ -628,7 +626,6 @@
       INTEGER MNPAR				! No of pmodel parameters
       INTEGER NMCOMP				! No of pmodels in cmodel
       INTEGER I,J,K                             ! Counters
-      INTEGER IL                                ! Current line number
       INTEGER NTIE				! Tied parameters
       INTEGER TSTART(MAXTIE)
       INTEGER TGROUP(NPAMAX)
