@@ -91,6 +91,7 @@ F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 *     PWD: Peter W. Draper (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     MBT: Mark B. Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     26-AUG-1999 (DSB):
@@ -113,6 +114,8 @@ F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 *     29-AUG-2000 (MBT):
 *        Added a check for the parent process catching a (probably SIGCHLD)
 *        signal while attempting a read() from the child.
+*     15-AUG-2004 (TIMJ):
+*        use cnfMalloc and cnfCptr/cnfFptr
 */
    GENPTR_CHARACTER(FileSpec) /* Pointer to file specification. Length is
                                  FileSpec_length */
@@ -188,8 +191,8 @@ F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 
 /* Allocate ourselves enough space for the context structure we will use 
    to hold its address. */
-      ContextPtr = (ContextStruct *) malloc( 2 * sizeof(ContextStruct) );
-      if ( (int) ContextPtr == 0 ) {
+      ContextPtr = cnfMalloc( 2 * sizeof(ContextStruct) );
+      if ( ContextPtr == NULL ) {
          Status = NDG__WMER;
       } else {
          Fdptr = ContextPtr->Fds;
@@ -248,7 +251,7 @@ F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 /* This is the parent process, continuing after forking off. Here we set 
    Context to be the address of the pair of file descriptors being used 
    for the pipe, and carry on. */
-               *Context = (F77_POINTER_TYPE) ContextPtr;
+               *Context = cnfFptr( ContextPtr );
 
 /* Close the writing end of the pipe. */
                close( Fdptr[1] );
@@ -267,7 +270,7 @@ F77_INTEGER_FUNCTION(ndg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
    the reading end of the pipe to which our forked process is writing a set 
    of file names. The names are separated by spaces and/or newlines. */
 
-   ContextPtr = (ContextStruct *) *Context;
+   ContextPtr = cnfCptr(*Context);
    Fdptr = ContextPtr->Fds;
    if ( FileName_length < 1 ) {
       Status = NDG__WLER;
@@ -373,14 +376,14 @@ F77_INTEGER_FUNCTION(ndg1_ewild)( POINTER(Context) ) {
    process is closed down neatly. */
    if (*Context != 0) {
 
-      ContextPtr = (ContextStruct *) *Context;
+      ContextPtr = cnfCptr(*Context);
 
       waitpid(ContextPtr->pid, &status, 0 );
 
       while (read(ContextPtr->Fds[0],&Char,1) > 0);
       (void) close (ContextPtr->Fds[0]);
       (void) close (ContextPtr->Fds[1]);
-      (void) free ((char *) ContextPtr);
+      cnfFree( ContextPtr );
    }
 
    return (NDG__OK);
