@@ -179,7 +179,7 @@
 *        the order - bottom, right, top, left. If less than four values are 
 *        given, extra values are used equal to the first supplied value. If 
 *        these margins are too narrow any axis annotation may be clipped. The 
-*        dynamic default (for all edges) is; 0.16 if annotated axes are 
+*        dynamic default (for all edges) is; 0.2 if annotated axes are 
 *        being produced; 0.06, if a simple border is being produced; and 
 *        0.0 if neither border nor axes are being produced. []
 *     MODE = LITERAL (Read)
@@ -636,7 +636,7 @@
 *  two margins in one any dimension must be greater than -1.0. Therefore
 *  limit each margin to be greater than -0.49.
       IF( AXES ) THEN
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.16, STATUS )
+         CALL PAR_DEF1R( 'MARGIN', 1, 0.2, STATUS )
       ELSE IF( BORDER ) THEN
          CALL PAR_DEF1R( 'MARGIN', 1, 0.06, STATUS )
       ELSE

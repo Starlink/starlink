@@ -6121,7 +6121,7 @@ optical image within it, including annotated axes:
    % picdef mode=xy lbound=\[0.0,0.0\] ubound=\[0.6,0.6\] outline=no
    % piclabel main
    % display m31 axes mode=perc percentiles=\[30,99\] style="'colour=black,size=0.6'" \
-             margin=\[0.16,0.02\] 
+             margin=\[0.2,0.02\] 
 \end{verbatim}
 \normalsize
 
@@ -6131,9 +6131,9 @@ parameter. This is done for all applications which produce graphical
 output. We also request text which 0.6 of the default size. We specified
 the MARGIN parameter when running DISPLAY in order to reduce the margin
 on the right hand side of the image. By default, DISPLAY leaves a
-margin equal to 0.16 of the width of the DATA picture. We reduced this to
+margin equal to 0.2 of the width of the DATA picture. We reduced this to
 0.02 to make more room for the other components of the plot (the first
-value supplied for MARGIN is the bottom margin and is left at 0.16).
+value supplied for MARGIN is the bottom margin and is left at 0.2).
 
 If you now do:
 
@@ -16472,7 +16472,7 @@ default value.
          the order - bottom, right, top, left. If less than four values are
          given, extra values are used equal to the first supplied value. If
          these margins are too narrow any axis annotation may be clipped. The
-         dynamic default (for all edges) is; 0.16 if annotated axes are
+         dynamic default (for all edges) is; 0.2 if annotated axes are
          being produced; 0.06, if a simple border is being produced; and
          0.0 if neither border nor axes are being produced. {\tt []}
       }
