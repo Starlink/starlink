@@ -234,6 +234,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/diva-0.3.zip
@@ -854,13 +855,18 @@ javadocs:
 webstart:
 
 dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/bin
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/etc/topcat
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
+     [copy] Copying 54 files to /apps/cvsbuild/java/source/topcat/docs/topcat
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/docs/topcat
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/topcat-1.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/topcat-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/topcat-1.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-1.0.tar
+      [zip] Building zip: /apps/cvsbuild/export/topcat-1.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-1.1.tar
+     [gzip] Building: /apps/cvsbuild/export/topcat-1.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/topcat-1.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-1.1.tar
      [echo] Executing Treeview target: export
 
 export:
@@ -879,6 +885,8 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/treeview/lib/treeview/showndx.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/showndx.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
 
@@ -889,6 +897,10 @@ javadocs:
 webstart:
 
 dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/bin
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/etc/treeview
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/treeview/bin
+     [copy] Copying 14 files to /apps/cvsbuild/java/source/treeview/etc/treeview
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/treeview-2.2.zip
@@ -994,6 +1006,10 @@ javadocs:
 webstart:
 
 dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/bin/frog
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/etc/frog
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/bin/frog
+     [copy] Copying 7 files to /apps/cvsbuild/java/source/frog/docs/frog
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 create_archives:
@@ -1004,4 +1020,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 22 minutes 55 seconds
+Total time: 23 minutes 58 seconds

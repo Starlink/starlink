@@ -731,9 +731,12 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/topcat
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 148 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 79 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copied 2 empty directories to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 53 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
@@ -763,6 +766,9 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/treeview
+    [mkdir] Created dir: /apps/cvsbuild/starjava/etc/treeview
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/treeview
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 131 files to /apps/cvsbuild/starjava/docs
@@ -788,6 +794,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/coco
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/coco
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
      [echo] Executing RV target: install
@@ -811,6 +819,8 @@ webstart:
 dist:
 
 install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/rv
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/rv
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
      [echo] Executing FROG target: install
@@ -835,9 +845,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
+     [exec] g77: temp/*.o: No such file or directory
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -856,6 +866,10 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/bin/frog
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/frog
+    [mkdir] Created dir: /apps/cvsbuild/starjava/etc/frog
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/frog
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
@@ -866,4 +880,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 42 seconds
+Total time: 7 minutes 16 seconds
