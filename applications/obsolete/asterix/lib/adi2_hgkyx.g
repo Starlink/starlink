@@ -130,7 +130,7 @@
 *  Keyword exists
       ELSE
         CALL ADI_CGET0<T>( CID, 'Value', VALUE, STATUS )
-        CALL ADI_FIND( CID, 'Comment', THERE, STATUS )
+        CALL ADI_THERE( CID, 'Comment', THERE, STATUS )
         IF ( THERE ) THEN
           CALL ADI_CGET0C( CID, 'Comment', CMNT, STATUS )
         ELSE
