@@ -127,6 +127,7 @@ typedef struct configInfo {
   int font;
   int colour;
   char tag[TAGLEN+14];
+  int smooth;
 } configInfo;
 
 static configInfo ConfigInfo;
@@ -248,6 +249,7 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
   ConfigInfo.size = 1.0;
   ConfigInfo.font = 0;
   ConfigInfo.colour = 0;
+  ConfigInfo.smooth = 0;
   (void) strcpy( ConfigInfo.tag, "ast_element ");
 
   /*  Need a line segment item. */
@@ -303,14 +305,14 @@ void astTk_Tag( const char *newtag ) {
   NewSegment = 1;
 }
 
-void astTk_LineType( int segments ) {
+void astTk_LineType( int segments, int smooth ) {
 /*
  *+
  *  Name:
  *     astTk_LineType
 
  *  Purpose:
- *     Sets line type used to draw graphics
+ *     Sets line type used to draw graphics.
 
  *  Synopsis:
  *     include "grf_tkcan.h"
@@ -324,22 +326,34 @@ void astTk_LineType( int segments ) {
  *     graphics being drawn, lots of short lines are best represented
  *     using line segments (which is optimised so handle many of these
  *     per canvas item) and long lines by polylines (which look better
- *     when scaled).
+ *     when scaled). 
+ *
+ *     If a polyline is drawn then the extra argument smooth may be
+ *     used to determine if bsplines are used to smooth out the lines.
+ *     Normally this is set to false.
 
  *  Parameters:
  *     int segment
  *        Which type of canvas lines to draw, 1 for segments and 0 for 
  *        polylines.
+ *
+ *     int smooth
+ *        Whether polylines are to be drawn with smoothing or not. Has 
+ *        no effect for line-segments.
+ *- 
+ */
+  if ( smooth ) {
+    ConfigInfo.smooth = 1;
+  } else {
+    ConfigInfo.smooth = 0;
+  }
 
- *- */
   if ( segments ) {
     LineType = SEGMENTS;
   } else {
     LineType = POLYLINE;
   }
 }
-
-
 
 int astGFlush( void ){
 /*
@@ -547,9 +561,9 @@ int astGLine( int n, const float *x, const float *y ) {
       
       /*  Configure the command by adding the canvas name and all the
           required options. */
-      (void) sprintf( buffer, " -fill %s -width %f -tag {%s} \n",
+      (void) sprintf( buffer, " -fill %s -width %f -tag {%s} -smooth %d\n",
                       Colours[ConfigInfo.colour], ConfigInfo.width,
-                      ConfigInfo.tag );
+                      ConfigInfo.tag, ConfigInfo.smooth );
       if ( Tcl_VarEval( Interp, Canvas, " create rtd_polyline ",
                         coords, buffer, (char *) NULL ) != TCL_OK ) {
         

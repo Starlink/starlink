@@ -314,8 +314,8 @@ int Contour::drawContours()
   int ylower = ylower_;
   if ( xsize <= 0 || xsize > nx ) xsize = nx;
   if ( ysize <= 0 || ysize > ny ) ysize = ny;
-  if ( xlower <= 0 ) xlower = 1;
-  if ( ylower <= 0 ) ylower = 1;
+  if ( xlower <= 0 || xlower > nx ) xlower = 1;
+  if ( ylower <= 0 || ylower > ny ) ylower = 1;
 
   //  Get some workspace for locating pixels that have already been
   //  "done".

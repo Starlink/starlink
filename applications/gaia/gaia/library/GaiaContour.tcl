@@ -137,10 +137,17 @@ itcl::class gaia::GaiaContour {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
 
-      #  Add an option plot carefully, or not.
+      #  Add an option to plot carefully, or not.
       $Options add checkbutton \
          -label {Draw contours using geodesics (slow, but precise)} \
          -variable [scope careful_] \
+         -onvalue 1 \
+         -offvalue 0
+
+      #  Add an option to plot smooth polyline.
+      $Options add checkbutton \
+         -label {Draw smooth contours} \
+         -variable [scope smooth_] \
          -onvalue 1 \
          -offvalue 0
 
@@ -275,7 +282,7 @@ itcl::class gaia::GaiaContour {
       destroy $w
    }
 
-   #  Write the current configuration to a named file. This is written 
+   #  Write the current configuration to a named file. This is written
    #  in a the format:
    #
    #     level  colour width
@@ -298,7 +305,7 @@ itcl::class gaia::GaiaContour {
 
             #  Get the level attributes.
             set levatts [get_levels_and_atts_]
-            
+
             puts $fid [format "\# %-26s %-10s %-10s" level colour width]
             foreach line $levatts {
                lassign $line level colour width
@@ -306,9 +313,9 @@ itcl::class gaia::GaiaContour {
             }
 
             #  Add the contour image name (use the disk file, not the
-            #  rtdimage). 
+            #  rtdimage).
             set image [get_diskimage_]
-            if { $image != {} } { 
+            if { $image != {} } {
                puts $fid "\#  Image name"
                puts $fid "image = $image"
             }
@@ -316,7 +323,8 @@ itcl::class gaia::GaiaContour {
             #  Add the contouring speed.
             puts $fid "\#  Contouring speed"
             puts $fid "careful = $careful_"
-            
+            puts $fid "smooth = $smooth_"
+
             #  Add the parameters describing the image region.
             puts $fid "\#  Image region"
             puts $fid "whole = $whole_"
@@ -326,6 +334,7 @@ itcl::class gaia::GaiaContour {
             #  Add the parameters describing the level key.
             puts $fid "\#  Key parameters"
             puts $fid "drawkey = $itk_option(-drawkey)"
+            puts $fid "keytitle = \{[$itk_component(keytitle) get]\}"
             puts $fid "xkeypos = [$itk_component(xkeypos) get]"
             puts $fid "ykeypos = [$itk_component(ykeypos) get]"
             puts $fid "keyfont = [$itk_component(keyfont) get]"
@@ -363,7 +372,7 @@ itcl::class gaia::GaiaContour {
                         #  Comment do nothing.
                      }
                      default {
-                        if { [llength $line] == 3 } { 
+                        if { [llength $line] == 3 } {
                            eval add_contour_ [incr count] $line
                         } else {
                            warning_dialog \
@@ -372,7 +381,7 @@ itcl::class gaia::GaiaContour {
                      }
                   }
                } elseif { $llen < 0 } {
-                  
+
                   # End of file.
                   set ok 0
                }
@@ -403,13 +412,16 @@ itcl::class gaia::GaiaContour {
          careful {
             set careful_ $value
          }
+         smooth {
+            set smooth_ $value
+         }
          whole {
             set whole_ $value
          }
          drawkey {
             configure -drawkey $value
          }
-         xfrac - 
+         xfrac -
          yfrac {
             $itk_component($param) configure -value $value
          }
@@ -419,6 +431,7 @@ itcl::class gaia::GaiaContour {
             $itk_component($param) configure -value $indexcol_($value)
             set itk_option(-drawkey) $orig
          }
+         keytitle -
          xkeypos -
          ykeypos -
          keyfont -
@@ -617,6 +630,9 @@ itcl::class gaia::GaiaContour {
 
          #  Check the image to be contoured.
          set rtdimage [get_rtdimage_]
+         if { $rtdimage == 0 } {
+            return
+         }
 
          #  Clear existing contours.
          if { $all } {
@@ -661,11 +677,10 @@ itcl::class gaia::GaiaContour {
                   "$itk_option(-contour_tag) $leveltags_($ncont)"
 
                #  Draw the contour (return value is number of points).
-               puts "time = [time {
                set drawn_($ncont) \
                   [$itk_option(-rtdimage) contour \
-                      $value $rtdimage $careful_ \
-                      $att $bounds] }]"
+                      $value $rtdimage $careful_ $smooth_ \
+                      $att $bounds]
 
                #  Add/update the key.
                draw_key_
@@ -677,11 +692,10 @@ itcl::class gaia::GaiaContour {
                "$itk_option(-contour_tag) $leveltags_($index)"
 
             #  Draw the contour.
-            puts "time = [time {
-               set drawn_($index) \
-                  [$itk_option(-rtdimage) contour \
-                      $levels $rtdimage $careful_ \
-                      $atts $bounds] }]"
+            set drawn_($index) \
+               [$itk_option(-rtdimage) contour \
+                   $levels $rtdimage $careful_ $smooth_ \
+                   $atts $bounds]
 
             #  Add/update the key.
             draw_key_
@@ -749,7 +763,7 @@ itcl::class gaia::GaiaContour {
       }
       return $atts
    }
-      
+
    #  Get the levels and attributes as a single string.
    protected method get_levels_and_atts_ {} {
       set atts {}
@@ -801,14 +815,15 @@ itcl::class gaia::GaiaContour {
 
    #  Get the rtdimage that is needed for contouring. This can be the
    #  current image, a one displayed elsewhere or an image in a disk
-   #  file. A filename takes preference over a one displayed already.
+   #  file. A filename takes preference over a one displayed
+   #  already. If an error occurs then rtdimage is set to 0.
    protected method get_rtdimage_ {} {
       if { $imagefile_ != {} } {
 
          #  Displayed on disk, create an rtdimage and return this.
-         if { [catch {image create rtdimage -file $imagefile_} rtdimage] != 0} {
-            error_dialog "Failed to access image: $imagefile_, for contouring ($rtdimage)"
-            set rtdimage {}
+         if {[catch {image create rtdimage -file $imagefile_} rtdimage] != 0} {
+            error "Failed to access image: $imagefile_, for contouring"
+            set rtdimage 0
          }
 
       } else {
@@ -816,8 +831,8 @@ itcl::class gaia::GaiaContour {
          #  Name of an rtdimage, just check that this isn't the
          #  current one and that it exists.
          if { [catch {$target_ get_image} rtdimage] != 0 }  {
-            error "Failed to locate the displayed image for contouring"
-            set rtdimage {}
+            error_dialog "Failed to locate the displayed image for contouring"
+            set rtdimage 0
          } else {
             if { $rtdimage == $itk_option(-rtdimage) } {
                set rtdimage {}
@@ -838,7 +853,7 @@ itcl::class gaia::GaiaContour {
       } else {
 
          #  Name of an rtdimage, if this is the current image return
-         #  blank. 
+         #  blank.
          if { [catch {$target_ get_image} rtdimage] == 0 }  {
             set image [$rtdimage cget -file]
          }
@@ -1010,7 +1025,7 @@ itcl::class gaia::GaiaContour {
          LabelRule $w.keyrule -text "Key configuration:"
       }
       pack $itk_component(keyrule) -side top -fill x
- 
+
       #  Whether to draw key or not.
       itk_component add drawkey {
          StarLabelCheck $w.drawkey \
@@ -1024,6 +1039,18 @@ itcl::class gaia::GaiaContour {
       pack $itk_component(drawkey) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(drawkey) \
 	  {Toggle if a contour level key is to be displayed}
+
+      #  Title for key.
+      itk_component add keytitle {
+         LabelEntry $w.keytitle \
+            -text "Title:" \
+            -labelwidth 15 \
+            -value "Contour key" \
+            -command [code $this draw_key_]
+      }
+      pack $itk_component(keytitle) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(keytitle) \
+	  {Title for contour key}
 
       #  Position of key relative to top right hand corner.
       itk_component add xkeypos {
@@ -1148,6 +1175,7 @@ itcl::class gaia::GaiaContour {
        } else {
 	   set state disabled
        }
+       $itk_component(keytitle) configure -state $state
        $itk_component(xkeypos) configure -state $state
        $itk_component(ykeypos) configure -state $state
        $itk_component(keycolour) configure -state $state
@@ -1192,14 +1220,17 @@ itcl::class gaia::GaiaContour {
 
       #  Title.
       lassign [get_att_ 1] colour width
-      $itk_option(-canvas) create text [expr $x+$dx] $y \
-         -text "Contour key" \
-         -anchor w \
-         -fill $keycol \
-         -tags "$keytag_ $texttag_" \
-         -width 0 \
-         -font $font
-      set y [expr $y+$dy]
+      set title [$itk_component(keytitle) get]
+      if { $title != {} } { 
+         $itk_option(-canvas) create text [expr $x+$dx] $y \
+            -text "$title" \
+            -anchor w \
+            -fill $keycol \
+            -tags "$keytag_ $texttag_" \
+            -width 0 \
+            -font $font
+         set y [expr $y+$dy]
+      }
 
       #  Now add each line and level.
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
@@ -1360,7 +1391,6 @@ itcl::class gaia::GaiaContour {
       set $which $value
    }
 
-
    #  Configuration options: (public variables)
    #  ----------------------
    #  Name of canvas.
@@ -1392,6 +1422,11 @@ itcl::class gaia::GaiaContour {
       set careful_ $itk_option(-careful)
    }
 
+   #  Whether contours are plotted using smooth polylines.
+   itk_option define -smooth smooth Smooth 0 {
+      set smooth_ $itk_option(-smooth)
+   }
+
    #  Global canvas tag used to control redraws etc. Individual
    #  tags are used within this class.
    itk_option define -contour_tag contour_tag Contour_Tag {} {
@@ -1411,8 +1446,11 @@ itcl::class gaia::GaiaContour {
 
    #  Protected variables: (available to instance)
    #  --------------------
-   #  Whether contours are plotted carefully, used for checkbutton var.
+   #  Whether contours are plotted carefully.
    protected variable careful_ 0
+
+   #  Whether contours are smoothed.
+   protected variable smooth_ 0
 
    #  Name of rtdimage that we are contouring or the filename to use.
    protected variable target_ {}

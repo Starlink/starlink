@@ -172,7 +172,7 @@ public:
   { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
   { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
   { "clone",         &StarRtdImage::cloneCmd,        1, 2 },
-  { "contour",       &StarRtdImage::contourCmd,      1, 5 },
+  { "contour",       &StarRtdImage::contourCmd,      1, 6 },
   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
   { "origin",        &StarRtdImage::originCmd,       2, 2 },
@@ -3127,7 +3127,7 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 //      Contour an image
 //
 //    Return:
-//       TCL status and result (the number of points drawn). 
+//       TCL status and result (the number of points drawn).
 //       Plots contours on canvas.
 //
 //    Notes:
@@ -3142,8 +3142,12 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 //       The third parameter is a boolean indicating whether to use
 //       the careful drawing scheme (using geodesics, essential for
 //       complex astrometries) or not.
+//      
+//       The fourth parameter is a boolean indicating whether to use
+//       smooth polylines (note this is completementary to parameter
+//       three) or not.
 //
-//       The fourth parameter to this routine is a list that contains
+//       The fifth parameter to this routine is a list that contains
 //       strings of the curve attributes (see the AST documentation) in
 //       a pre-formatted manner (such as can be passed directly to the
 //       astSet routine). This allows maximum flexibility in the
@@ -3164,7 +3168,7 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 //       For 5 contours. Note that the style attribute is currently
 //       ignored by the Tk canvas AST interface.
 //
-//       The fifth parameter passed to this member should be a list of
+//       The sixth parameter passed to this member should be a list of
 //       the bounds, in canvas coordinates, of the region to be
 //       drawn. If NULL then the whole canvas is used.
 //
@@ -3184,8 +3188,8 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
   char **levelsArgv;
   int nlevels = 0;
   double *levels;
-  if ( argc > 5 || argc == 0 ) {
-    error( "wrong # args: contour levels [rtdimage] [careful] [options_list] [canvas_area]" );
+  if ( argc > 6 || argc == 0 ) {
+    error( "wrong # args: contour levels [rtdimage] [careful] [smooth] [options_list] [canvas_area]" );
     inerror = 1;
   } else {
     if ( Tcl_SplitList( interp_, argv[0], &nlevels, &levelsArgv ) != TCL_OK ) {
@@ -3227,11 +3231,20 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     }
   }
 
+  //  Get whether using smooth polylines (must be fast).
+  int smooth = 0;
+  if ( argc >= 4 ) {
+    if ( Tcl_GetBoolean(interp_, argv[3], &smooth)  != TCL_OK ) {
+      error( "sorry: failed to decode smooth preference" );
+      inerror = 1;
+    }
+  }
+  
   //  Get the preferences, if given
   char **prefs;
   int nprefs = 0;
-  if ( argc >= 4 ) {
-    if ( Tcl_SplitList( interp_, argv[3], &nprefs, &prefs ) != TCL_OK ) {
+  if ( argc >= 5 ) {
+    if ( Tcl_SplitList( interp_, argv[4], &nprefs, &prefs ) != TCL_OK ) {
       error( "sorry: failed to decode line attributes" );
       nprefs = 0;
       inerror = 1;
@@ -3240,14 +3253,14 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
   //  Get the region coordinates. Note just use Contour native
   //  facilities for this, not the plot (this potentially much
-  //  more efficient). These may be given as "" in which case they are 
+  //  more efficient). These may be given as "" in which case they are
   //  ignored.
   char **coordArgv;
   int ncoords = 0;
   double region[4];
-  if ( argc == 5 ) {
-    if ( *argv[4] != '\0' ) {
-      if ( Tcl_SplitList( interp_, argv[4], &ncoords, &coordArgv ) != TCL_OK ) {
+  if ( argc == 6 ) {
+    if ( *argv[5] != '\0' ) {
+      if ( Tcl_SplitList( interp_, argv[5], &ncoords, &coordArgv ) != TCL_OK ) {
         error( "sorry: failed to decode region of image to contour" );
         ncoords = 0;
         inerror = 1;
@@ -3265,7 +3278,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
               break;
             }
           }
-          
+
           //  Transform these positions into image coordinates.
           swap( region[1], region[3] );
           canvasToImageCoords( region[0], region[1], 0 );
@@ -3330,6 +3343,10 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     //  routines.
     astTk_Init( interp_, canvasName_ );
 
+    //  We want to draw polylines, not line segments. Polylines may be
+    //  smooth.
+    astTk_LineType( 0, smooth );
+
     //  Define a tag for all items created in the plot.
     astTk_Tag( ast_tag() );
 
@@ -3337,14 +3354,15 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
       //  Create a contour object, setting the contour levels, and
       //  line attributes.
-      Contour contour( imageIO, plot, levels, nlevels, prefs, nprefs );
+      Contour contour( imageIO, plot, levels, nlevels, 
+                       (const char **)prefs, nprefs );
 
       //  Establish if plotting is careful or fast.
       contour.setCareful( careful );
 
       //  Set the region of image to contour (tuned to match grid plots).
       if ( ncoords > 0 ) {
-        contour.setRegion( (int) (region[0] + 1), (int)(region[1] + 1),
+        contour.setRegion( (int)(region[0] + 1), (int)(region[1] + 1),
                            (int)(region[2] - region[0] + 1 ),
                            (int)(region[3] - region[1] + 1 ) );
       }
@@ -3359,6 +3377,9 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
     //  Reset the tag associated with AST grid items.
     astTk_Tag( NULL );
+
+    //  Switch line type back to default.
+    astTk_LineType( 1, 0 );
   }
 
   //  Free the lists.

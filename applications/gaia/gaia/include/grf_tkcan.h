@@ -43,7 +43,7 @@ extern "C" {
 
 int astTk_Init( Tcl_Interp *, const char * );
 int astTk_Tag( const char * );
-void astTk_LineType( int );
+void astTk_LineType( int, int );
 
 #ifdef __cplusplus
 }
