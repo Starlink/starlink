@@ -59,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
       INTEGER FRAME
@@ -77,6 +78,7 @@
 *  Local Variables:
       CHARACTER SYMBL*60           ! Axis symbol
       CHARACTER ATTR*20            ! Attribute name
+      DOUBLE PRECISION LPOS( NDF__MXDIM )! Normalised position
       INTEGER I                    ! Axis index
       INTEGER JAT                  ! Character index
       INTEGER TLEN                 ! Length of character variable
@@ -84,6 +86,12 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Normalise the supplied position.
+      DO I = 1, NAX
+         LPOS( I ) = POS( I )
+      END DO
+      CALL AST_NORM( FRAME, LPOS, STATUS )
 
 *  Save the declared length of the text.
       TLEN = LEN( TEXT )
@@ -111,7 +119,7 @@
          END IF
 
 *  Format the axis value.
-         CALL CHR_APPND( AST_FORMAT( FRAME, I, POS( I ), STATUS ),
+         CALL CHR_APPND( AST_FORMAT( FRAME, I, LPOS( I ), STATUS ),
      :                   TEXT, IAT )
 
 *  Append a separator unless this is the last axis.
