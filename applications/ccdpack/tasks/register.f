@@ -46,15 +46,16 @@
 *     transform only two lists may be registered at any time.
 *
 *     The results from REGISTER are reported via the logging system
-*     and then coded either as new frames with the domain name 'CCD_REG'
-*     in the WCS component of the NDFs, or as TRANSFORM structures,
-*     containing the final algebraic solutions for each input list. 
-*     Transform structures may be stored in the CCDPACK exensions of
-*     the associated NDFs or within a named HDS container file if no
-*     associated NDFs exist.  Whether TRANSFORM structures or frames
-*     within the WCS components are chosen, they can be used by the
-*     applications TRANLIST and TRANNDF to transform position lists 
-*     and resample the actual datasets respectively.
+*     and then coded either as new frames with a domain name given
+*     by the OUTDOMAIN parameter in the WCS component of the NDFs, 
+*     or as TRANSFORM structures, containing the final algebraic 
+*     solutions for each input list.  Transform structures may be 
+*     stored in the CCDPACK exensions of the associated NDFs or within 
+*     a named HDS container file if no associated NDFs exist.  Whether 
+*     TRANSFORM structures or frames within the WCS components are 
+*     chosen, they can be used by the applications TRANLIST and 
+*     TRANNDF to transform position lists and resample the actual 
+*     datasets respectively.
 
 *  Usage:
 *     register inlist fittype refpos
@@ -192,6 +193,16 @@
 *        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
 *        [TRUE]
+*     OUTDOMAIN = LITERAL (Read)
+*        If OUTFORMAT is 'WCS', the transformation information is 
+*        written as a new frame to the WCS component of the NDF.
+*        The frame normally has a Domain name of 'CCD_REG', but 
+*        that can be overridden with this parameter.  When this
+*        frame is added, any previously existing frame which has
+*        the same Domain is removed.
+*
+*        The name is converted to upper case, and whitespace is removed.
+*        [CCD_REG]
 *     OUTFORMAT = LITERAL (Read)
 *        If NDFNAMES is TRUE, or PLACEIN is 'NDF', then this parameter
 *        specifies how the transformation is to be written into the 
@@ -201,12 +212,12 @@
 *           - TRANSFORM -- written as a TRANSFORM structure into the 
 *                          .MORE.CCDPACK extension of the NDF
 *
-*        If WCS is chosen, then a new frame, with a Domain value of
-*        'CCD_REG', is inserted into the WCS extension of the NDF
+*        If WCS is chosen, then a new frame, with a Domain value given
+*        by OUTDOMAIN, is inserted into the WCS extension of the NDF
 *        (a new WCS extension is created if none previously existed).
 *        A mapping between this and the 'PIXEL' domain is defined,
 *        which is the unit mapping in the case that the NDF in question
-*        is the reference set.  If any frame in the domain 'CCD_REG'
+*        is the reference set.  If any frame in the domain OUTDOMAIN
 *        already exists in the WCS component, it will be erased, so
 *        that after successful processing by REGISTER it will contain 
 *        only one such frame.
@@ -310,10 +321,11 @@
 *        NDFs.  Actual registration of the images can then be achieved
 *        by aligning all the NDFs in the CCD_REG domain.
 *
-*     register inlist='*' trtype=5
+*     register inlist='*' trtype=5 outdomain=result-set1
 *        This example works as above but this time the global
 *        transformations are derived for a full 6-parameter linear fit
 *        (which allows offset, rotation, magnification and shear).
+*        The results are coded as frames in the Domain 'RESULT-SET1'.
 *
 *     register inlist='"myndf1,myndf2"' fittype=4 refpos=2
 *        In this example a solid body fit is performed between the
@@ -398,9 +410,10 @@
 *       are to be used for registration.
 *
 *       On exit, if OUTFORMAT is "WCS" then a new frame with domain
-*       "CCD_REG" will be added to the .WCS component of input NDFs.
-*       Taken together these contain the registration information 
-*       and can be inspected using NDFTRACE or WCSSHOW (SUN/95).
+*       name given by the OUTDOMAIN parameter will be added to the 
+*       .WCS component of input NDFs.  Taken together these contain the 
+*       registration information and can be inspected using NDFTRACE 
+*       or WCSSHOW (SUN/95).
 *
 *       If OUTFORMAT is "TRANSFORM" then an item "TRANSFORM" will be 
 *       added to the .MORE.CCDPACK structure of the input NDFs.
@@ -481,6 +494,7 @@
       CHARACTER * ( 16 ) INAME  ! Name for object in container file
       CHARACTER * ( 12 ) OUTFM  ! Output format (WCS or TRANSFORM)
       CHARACTER * ( 4 ) PLACE   ! Place to store transformations
+      CHARACTER * ( AST__SZCHR) OUTDM ! Name of domain for new output WCS frame
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for reading data
       CHARACTER * ( CCD1__MTRNP ) ALPBET ! Characters which may follow P to indicate a parameter
       CHARACTER * ( CCD1__STRNP ) NAME ! Parameter name
@@ -504,11 +518,11 @@
       DOUBLE PRECISION RMS      ! Root mean square difference in fitted lists and reference list
       DOUBLE PRECISION TOLER    ! Tolerance in RMS devations
       DOUBLE PRECISION TR( 6, CCD1__MXLIS ) ! The transformation coefficients
-      DOUBLE PRECISION TRCR( 6 ) ! Approx coefficients for Current->CCD_REG map
+      DOUBLE PRECISION TRCR( 6 ) ! Approx coefficients for Current->OUTDM map
       INTEGER FDIN              ! FIO file descriptors
       INTEGER FDREFO            ! Output reference set descriptor
       INTEGER FIOGR             ! IRH group of input list names
-      INTEGER FRREG             ! AST pointer to frame in CCD_REG domain
+      INTEGER FRREG             ! AST pointer to frame in OUTDM domain
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position within string
       INTEGER ID                ! NDF identifier
@@ -531,8 +545,8 @@
       INTEGER J                 ! Loop variable
       INTEGER JCUR              ! Incdex of (original) Current frame in frameset
       INTEGER JPIX              ! Index of Pixel domain frame in frameset
-      INTEGER JREG              ! Index of CCD_REG domain frame in frameset
-      INTEGER MAPTFM            ! AST pointer for Pixel - CCD_REG mapping
+      INTEGER JREG              ! Index of OUTDM domain frame in frameset
+      INTEGER MAPTFM            ! AST pointer for Pixel - OUTDM mapping
       INTEGER MAXIN             ! Maximum number of input lists
       INTEGER MININ             ! Minimum number of input lists
       INTEGER NCLASS            ! Number of classifications
@@ -684,6 +698,13 @@
       IF ( PLACE .EQ. 'NDF' .AND. IFIT .LE. 5 ) THEN
          CALL PAR_CHOIC( 'OUTFORMAT', 'WCS', 'WCS,TRANSFORM',
      :                   .TRUE., OUTFM, STATUS )
+
+*  Get name of domain for new frame in WCS frameset.  Spaces are 
+*  removed and it is folded to upper case since this is how the 
+*  AST system will treat it.
+         CALL PAR_GET0C( 'OUTDOMAIN', OUTDM, STATUS )
+         CALL CHR_RMBLK( OUTDM )
+         CALL CHR_UCASE( OUTDM )
       ELSE
          OUTFM = 'TRANSFORM'
       END IF
@@ -757,9 +778,9 @@
 *  Report where the transformation structures will be stored.
       IF ( PLACE .EQ. 'NDF' ) THEN
          IF ( OUTFM .EQ. 'WCS' ) THEN
-            CALL CCD1_MSG( ' ', '  Transformation information will be'//
-     :      ' written as WCS frames in domain "CCD_REG"',
-     :      STATUS )
+            CALL MSG_SETC( 'OUTDM', OUTDM )
+            CALL CCD1_MSG( ' ', '  Transformations will be'//
+     :      ' written as WCS frames in domain ^OUTDM', STATUS )
          ELSE
             CALL CCD1_MSG( ' ', '  Transformation structures will be'//
      :      ' written to .MORE.CCDPACK components of NDFs', STATUS )
@@ -828,19 +849,25 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Prepare to output mappings between (previous) current frames and
-*  CCD_REG domain frames.
+*  OUTDM domain frames.
             IF ( OUTFM .EQ. 'WCS' ) THEN
                CALL CCD1_MSG( ' ', ' ', STATUS )
+               CALL MSG_SETC( 'OUTDM', OUTDM )
                CALL CCD1_MSG( ' ', '    Transformation coefficients '//
-     :'(mappings between Current and CCD_REG frames)', STATUS )
+     :'(mappings between Current and ^OUTDM frames)', STATUS )
                CALL CCD1_MSG( ' ', '    ----------------------------'//
      :'---------------------------------------------', STATUS )
-               CALL CCD1_WRTPA( 
-     : 'The following are linear approximations to the mappings '//
-     : 'between the original Current and new CCD_REG frames.  '//
-     : 'The difference between them indicates the error in the '//
-     : 'alignment implied by the supplied WCS components.',
-     :                          75, 7, .TRUE., STATUS )
+               CALL CCD1_MSG( ' ', '      '//
+     : 'The following are linear approximations to the mappings',
+     :                        STATUS )
+               CALL MSG_SETC( 'OUTDM', OUTDM )
+               CALL CCD1_MSG( ' ', '      '//
+     : 'between the original Current and new ^OUTDM frames.', STATUS )
+               CALL CCD1_MSG( ' ', '      '//
+     : 'The difference between them indicates the error in the ',
+     :                        STATUS )
+               CALL CCD1_MSG( ' ', '      '//
+     : 'alignment implied by the supplied WCS components.', STATUS )
                CALL CCD1_MSG( ' ', ' ', STATUS )
             END IF
 
@@ -870,22 +897,23 @@
 *  Get the index of the Pixel domain frame in the WCS component.
                      CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
 
-*  Generate a frame in domain called 'CCD_REG', the purpose of which is to 
+*  Generate a frame in domain called OUTDM, the purpose of which is to 
 *  group the frames produced by this application.
-                     FRREG = AST_FRAME( 2, 'Domain=CCD_REG', STATUS )
+                     FRREG = AST_FRAME( 2, ' ', STATUS )
+                     CALL AST_SETC( FRREG, 'Domain', OUTDM, STATUS )
                      CALL AST_SETC( FRREG, 'Title', 
      :                              'Alignment by REGISTER', STATUS )
 
-*  Add the CCD_REG domain frame, with the appropriate mapping, to the 
+*  Add the OUTDM domain frame, with the appropriate mapping, to the 
 *  WCS component of the NDF.  This will become the current frame.
                      CALL AST_ADDFRAME( IWCS, JPIX, MAPTFM, FRREG, 
      :                                  STATUS )
 
-*  Get the index of the CCD_REG frame.
+*  Get the index of the OUTDM frame.
                      JREG = AST_GETI( IWCS, 'Current', STATUS )
 
 *  Prepare to output a linear approximation to the mapping between the
-*  original Current frame and the CCD_REG domain frame.  This gives an 
+*  original Current frame and the OUTDM domain frame.  This gives an 
 *  indication of how far wrong the original alignment was.  First report 
 *  the name of the NDF and which frames the mapping is between. 
                      CALL NDF_MSG( 'NDF', ID )
@@ -893,8 +921,9 @@
                      CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
                      CALL MSG_SETC( 'DMCUR', AST_GETC( IWCS, 'Domain', 
      :                                                 STATUS ) )
+                     CALL MSG_SETC( 'OUTDM', OUTDM )
                      CALL CCD1_MSG( ' ', 
-     : '    Domain ^DMCUR (Current) -> Domain CCD_REG', STATUS )
+     : '    Domain ^DMCUR (Current) -> Domain ^OUTDM', STATUS )
 
 *  Obtain the mapping coefficients and output them to the user, unless
 *  there is a problem.
@@ -910,22 +939,13 @@
                      END IF
                      CALL CCD1_MSG( ' ', ' ', STATUS )
 
-*  Now remove any previously existing frames in the CCD_REG domain;
-*  the output frameset should contain only one, to prevent confusion.
-                     DO 31 J = JREG - 1, 1, -1
-                        CALL AST_SETI( IWCS, 'Current', J, STATUS )
-                        IF ( AST_GETC( IWCS, 'Domain', STATUS ) .EQ.
-     :                       'CCD_REG' ) 
-     :                     CALL AST_REMOVEFRAME( IWCS, J, STATUS )
- 31                  CONTINUE
+*  Now remove any previously existing frames in the OUTDM domain;
+*  the output frameset should contain only one, to prevent confusion
+*  (note CCD1_DMPRG updates JREG if necessary).
+                     CALL CCD1_DMPRG( IWCS, OUTDM, JREG, STATUS )
 
-*  Finally ensure that the CCD_REG domain (the last added, and so
-*  highest numbered) is the Current one.  Be slightly careful about 
-*  this, since its index might have changed if we've removed any
-*  frames.
-                     CALL AST_SETI( IWCS, 'Current', 
-     :                              AST_GETI( IWCS, 'Nframe', STATUS ),
-     :                              STATUS )
+*  Finally ensure that the registration domain is the Current one.
+                     CALL AST_SETI( IWCS, 'Current', JREG, STATUS )
 
 *  Write the modified WCS component back to NDF.
                      CALL NDF_PTWCS( IWCS, ID, STATUS )
