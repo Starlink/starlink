@@ -512,7 +512,7 @@
       END IF
 
 *  History
-      CALL HSI_ADD( OFID, VERSION, MODEL )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *  Tidy up
  99   CALL PSF_CLOSE( STATUS )
