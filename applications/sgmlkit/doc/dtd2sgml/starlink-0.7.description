@@ -989,7 +989,13 @@ the time; sometimes you will need to help it out.  You may prefer, on
 the other hand, to specify the link text (almost) every time; in this
 case, I'm sure you don't need me to remind you that link text like
 `<code>more details &lt;ref id="somewhere" >here&lt;/ref></code>' is
-unlikely to be terrifically useful in a paper version of the document.</p>
+unlikely to be terrifically useful in a paper version of the
+document.</p>
+
+<p>Should you want to include different link text depending on the
+target medium, you will have to have more than one <elemref gi="ref"
+self="self"/> element, each inside a suitable <elemref gi="span"/>
+element.</p>
 
 <p>You cannot link to code prologues using this mechanism.  For that,
 see the <elemref gi='coderef'/> element.</p>
