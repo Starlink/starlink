@@ -133,13 +133,11 @@
       CALL XRTSORT_RANGESELECT(HEAD,SRT,BSRT,SDIM,BDIM,NRBIN,NAZBIN,
      :                                                      STATUS)
 
-	call usi_associ('SRCFILE',srt.dtype,locs,status)
-c      CALL USI_TASSOCO('SRCFILE',SRT.DTYPE,SID,STATUS)
-c      CALL ADI1_GETLOC(SID,LOCS,STATUS)
+      CALL USI_TASSOCO('SRCFILE',SRT.DTYPE,SID,STATUS)
+      CALL ADI1_GETLOC(SID,LOCS,STATUS)
       IF (SRT.BCKGND) THEN
-	call usi_associ('BCKFILE',srt.dtype,locb,status)
-c        CALL USI_TASSOCO('BCKFILE',SRT.DTYPE,BID,STATUS)
-c        CALL ADI1_GETLOC(BID,LOCB,STATUS)
+        CALL USI_TASSOCO('BCKFILE',SRT.DTYPE,BID,STATUS)
+        CALL ADI1_GETLOC(BID,LOCB,STATUS)
       ENDIF
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -285,26 +283,20 @@ c        CALL ADI1_GETLOC(BID,LOCB,STATUS)
       ENDIF
 
 *   History
-      CALL HIST_NEW(LOCS, STATUS)
-      CALL HIST_ADD(LOCS, VERSION, STATUS)
-c      CALL HSI_NEW(SID, STATUS)
-c      CALL HSI_ADD(SID, VERSION, STATUS)
+      CALL HSI_NEW(SID, STATUS)
+      CALL HSI_ADD(SID, VERSION, STATUS)
 
       IF (SRT.BCKGND) THEN
-         CALL HIST_NEW(LOCB, STATUS)
-         CALL HIST_ADD(LOCB, VERSION, STATUS)
-c         CALL HSI_NEW(BID, STATUS)
-c         CALL HSI_ADD(BID, VERSION, STATUS)
+         CALL HSI_NEW(BID, STATUS)
+         CALL HSI_ADD(BID, VERSION, STATUS)
       ENDIF
 *
 999   CONTINUE
 *
 *   Tidy up
-       call usi_annul(locs,status)
-c      CALL USI_TANNUL(SID,STATUS)
+      CALL USI_TANNUL(SID,STATUS)
       IF (SRT.BCKGND) THEN
-        call usi_annul(locb,status)
-c         CALL USI_TANNUL(BID,STATUS)
+         CALL USI_TANNUL(BID,STATUS)
       ENDIF
       CALL AST_CLOSE()
 *
@@ -1048,8 +1040,10 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL(STATUS)
 *
 * Get directory name
+        CALL MSG_BLNK()
 	CALL USI_DEF0C('RAWDIR', RAWDIR, STATUS)
 	CALL USI_GET0C('RAWDIR', RAWDIR, STATUS)
+        CALL MSG_BLNK()
 *
 	IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -1073,17 +1067,17 @@ C     CALL BDA_ANNUL(LIV, STATUS)
           IF (LISTDIR) THEN
 
             CALL MSG_PRNT('The following header files are present:')
-            CALL MSG_BLNK()
             DO LP=1,NFILES
               CALL MSG_SETC('FILE', FILE(LP))
               CALL MSG_PRNT(' ^FILE')
             ENDDO
+            CALL MSG_BLNK()
 
           ENDIF
 *
 *  Get root-name
           CALL STR_ROOT(FILE(1), RTNAME)
-          K = INDEX(RTNAME, '.')
+          K = INDEX(RTNAME, '_hdr.')
           CALL USI_DEF0C('ROOTNAME', RTNAME(1:K-1), STATUS)
           CALL USI_GET0C('ROOTNAME', RTNAME, STATUS)
 *
