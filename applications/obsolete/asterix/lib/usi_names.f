@@ -143,11 +143,7 @@
           CALL CHR_ITOC( NLINE, FSTR, FNDIG )
 
 *      Perform trace
-          IF ( DS(I).ADIFPN ) THEN
-            CALL ADI_FTRACE( DS(I).ADI_ID, LEVELS, PATH, NAME, STATUS )
-          ELSE
-            CALL HDS_TRACE( DS(I).LOC, LEVELS, PATH, NAME, STATUS )
-          END IF
+          CALL ADI_FTRACE( DS(I).ADI_ID, LEVELS, PATH, NAME, STATUS )
 
 *      Locate character array cell
           CALL ADI_CELL( STRNGS, 1, NLINE, CID, STATUS )
