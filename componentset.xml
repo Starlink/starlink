@@ -1,0 +1,782 @@
+<!DOCTYPE componentset SYSTEM "componentinfo.dtd">
+<componentset>
+
+<component id="messgen">
+  <version>1.2</version>
+  <path>applications/messgen</path>
+  <description>Starlink Facility Error Message Generation</description>
+  <abstract>
+    <p>The MESSGEN program creates files
+      required for proper operation of the system for associating messages with
+      Starlink facility status values on UNIX platforms.
+      The utility program CREMSG can be used to produce
+      source files for MESSGEN.</p>
+  </abstract>
+  <dependencies>
+    <build></build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>B K McIlwrath</name>
+      <uname>bkm</uname>
+      <email>B.K.McIlwrath@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="starconf">
+  <description>Starlink autoconf support</description>
+  <path>buildsupport/starconf</path>
+  <dependencies/>  <!-- none -->
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+</component>
+
+
+<component id="chr">
+  <version>2.2-5</version>
+  <path>libraries/chr</path>
+  <description>Character Handling Routines</description>
+  <abstract><p>The CHR library augments the limited character handling
+      facilities provided by the Fortran 77 standard.  It offers a
+      range of character handling facilities: from formatting Fortran
+      data types into text strings and the reverse, to higher level
+      functions such as wild card matching, string sorting, paragraph
+      reformatting and justification.  The library may be used simply
+      for building text strings for interactive applications or as a
+      basis for more complex text processing applications.
+    </p></abstract>
+  <dependencies>
+    <build> sae cnf</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Anne C Charles</name>
+      <uname>acc</uname>
+    </person>
+    <person>
+      <name>P C T Rees</name>
+      <uname>pctr</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun40</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="cnf">
+  <version>4.0-2</version>
+  <path>libraries/cnf</path>
+  <description>Mixed Language Programming -- FORTRAN and C</description>
+  <abstract><p>The CNF package comprises two sets of software which
+      ease the task of writing portable programs in a mixture of
+      FORTRAN and C.  F77 is a set of C macros for handling the
+      FORTRAN/C subroutine linkage in a portable way, and CNF is a set
+      of functions to handle the difference between FORTRAN and C
+      character strings, logical values and pointers to dynamically
+      allocated memory.</p></abstract>
+  <dependencies>
+    <build></build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney F Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>Peter M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun209</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="ems">
+  <version>2.0-7</version>
+  <path>libraries/ems</path>
+  <description>EMS -- Error Message Service</description>
+  <abstract><p>The purpose of EMS is to provide facilities for
+      constructing and storing error messages for future delivery to
+      the user -- usually via the Starlink Error Reporting System, ERR
+      (see SUN/104).  EMS can be regarded as a simplified version of
+      ERR without the binding to any software environment (e.g., for
+      message output or access to the parameter and data
+      systems).</p></abstract>
+  <dependencies>
+    <build> sae cnf messgen</build>
+    <use> cnf ems</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> ssn4</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="fio">
+  <version>1.5-3</version>
+  <path>libraries/fio</path>
+  <description>FORTRAN file I/O routines</description>
+  <abstract>FIO/RIO is a subroutine package that allows a FORTRAN
+      programmer to access sequential and direct access data files in
+      a machine independent manner. The package consists of stand
+      alone FIO and RIO routines, which can be used independently of
+      the Starlink software environment, plus routines to interface to
+      the Starlink parameter system.</abstract>
+  <dependencies>
+    <build> sae par messgen</build>
+    <use> chr ems mers subpar</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter M Allan</name>
+      <uname>NONE</uname>
+      <email>P.M.Allan@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun143</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="hds">
+  <version>4.3-4</version>
+  <path>libraries/hds</path>
+  <description>Hierarchical Data System</description>
+  <abstract>
+    <p>HDS is a file-based hierarchical data system designed for the
+      storage of a wide variety of information. It is particularly
+      suited to the storage of large multi-dimensional arrays (with
+      their ancillary data) where efficient access is needed.</p>
+    <p>HDS organises data into hierarchies, broadly similar to the
+      directory structure of a hierarchical filing system, but
+      contained within a single HDS container file.  The
+      structures stored in these files are self-describing and
+      flexible; HDS supports modification and extension of structures
+      previously created, as well as deletion, copying, renaming, etc..</p>
+    <p>All information stored in HDS files is portable between the
+      machines on which HDS is implemented. Thus, there are no format
+      conversion problems when moving between machines.</p>
+    <p>The routines in this package may be used to perform operations
+      on any HDS data. In addition, HDS forms a toolkit for the
+      construction of higher level (more specialised) data structures
+      and the software which accesses them.  HDS routines are
+      therefore invoked indirectly by many other items of Starlink
+      software.</p>
+  </abstract>
+  <dependencies>
+    <build> sae cnf ems messgen</build>
+    <use> chr</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R. F. Warren-Smith</name>
+    </person>
+    <person>
+      <name>M. D. Lawden</name>
+    </person>
+  </developers>
+  <documentation> sun92</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="mers">
+  <version>1.8</version>
+  <path>libraries/mers</path>
+  <description>Message and Error Reporting Systems</description>
+  <abstract><p>This package contains two Fortran subroutine libraries,
+      MSG and ERR, which can be used to provide informational text to
+      the user from any application program.  It also contains a
+      preliminary C interface for the two libraries -- this may be
+      subject to change in the light of experience.</p>
+    <p>The Message Reporting System, MSG, is used for reporting
+      non-error information and the Error Reporting System, ERR, is
+      used specifically for reporting error messages.</p>
+  </abstract>
+  <dependencies>
+    <build> ems sae cnf messgen messgen</build>
+    <use> chr psx subpar</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun104</documentation> 
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="par">
+  <version>2.3</version>
+  <path>libraries/par</path>
+  <description>Interface to the ADAM Parameter System</description>
+ <abstract><p>PAR is a library of Fortran subroutines that provides
+      convenient mechanisms for applications to exchange information
+      with the outside world, through input-output channels called
+      parameters.  Parameters enable a user to control an
+      application's behaviour.  PAR supports numeric, character, and
+      logical parameters, and is currently implemented only on top of
+      the ADAM parameter system.</p>
+    <p>The PAR library permits parameter values to be obtained,
+      without or with a variety of constraints.  Results may be put into
+      parameters to be passed onto other applications.  Other
+      facilities include setting a prompt string, and suggested defaults.</p>
+    <p>This document also introduces a preliminary C interface for the PAR
+      library -- this may be subject to change in the light of experience.</p>
+  </abstract>
+  <dependencies>
+    <build> cnf sae mers subpar messgen</build>
+    <use> chr</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+      <email>M.J.Currie@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun114</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="adam">
+  <version>3.0</version>
+  <path>libraries/pcs/adam</path>
+  <description>ADAM -- The Control Subsystem</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build> sae messys</build>
+    <use> chr psx ems messys mers</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>John Cooke (REVAD::JAC)</name>
+    </person>
+    <person>
+      <name>Charlie Richardson (REVA::DCR)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>ssn77 sun115 </documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Part of the PCS system.</p></notes>
+</component>
+
+<component id="lex">
+  <version>1.2-1</version>
+  <path>libraries/pcs/lex</path>
+  <description>SUBPAR lexical analyser</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build> sae messgen</build>
+    <use> ems</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Jeremy Bailey (AAOEPP::JAB)</name>
+    </person>
+    <person>
+      <name>Alan Chipperfield (RLVAD::AJC)</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Tim Jenness (JACH::TIMJ)</name>
+      <email>t.jenness@jach.hawaii.edu</email>
+    </person>
+  </developers>
+  <!-- documentation is maintained in the parent package -->
+  <documentation>ssn29 </documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Part of the PCS package</p></notes>
+</component>
+
+<component id="pcs">
+  <version>4.1-1</version>
+  <path>libraries/pcs</path>
+  <description>The Parameter and Communication Subsystems</description>
+  <abstract><p>Application programs often need to obtain parameter
+      values from a variety of sources and to communicate with other
+      programs. The Parameter and Communication Subsystems (PCS) are a
+      set of closely-related subroutine libraries which provide these
+      facilities for many Starlink applications and the associated
+      user-interfaces.</p>
+    <p>The PCS libraries will not generally be called directly by
+      application programs, but form a basic part of the Starlink
+      Software Environment</p></abstract>
+  <dependencies>
+    <build> adam ams dtask hdspar lex messys misc msp parsecon sock string subpar task</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="messys">
+  <version>3.0</version>
+  <path>libraries/pcs/messys</path>
+  <description>Message system</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build> sae messgen</build>
+    <use> mers ams</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly (REVAD::BDK)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield (RLVAD::AJC)</name>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Part of the PCS system</p></notes>
+</component>
+
+<component id="subpar">
+  <version>2.1</version>
+  <path>libraries/pcs/subpar</path>
+  <description>Parameter subsystem</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build> sae messys chr adam lex ems hds messgen</build>
+    <use> chr dat ems ams hds hlp icl lex parsecon psx</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="ams">
+  <version>1.3</version>
+  <path>libraries/pcs/ams</path>
+  <description>ADAM Message System</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build> sae cnf dtask atimer messys msp adam</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person><name>Ian Jenkins (IRJ)</name></person>
+    <person><name>Dennis Kelly (BDK)</name></person>
+    <person><name>Brian McIlwrath (BKM)</name></person>
+    <person><name>Alan Chipperfield (AJC)</name></person>
+    <person><name>David Terrett (DLT)</name></person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="dtask">
+  <version>3.0</version>
+  <path>libraries/pcs/dtask</path>
+  <description>DTASK linking library</description>
+  <abstract><p>ADD DETAILS!</p></abstract>
+  <dependencies>
+    <build> sae cnf psx subpar messys adam messgen</build>
+    <use> chr ams hds msg psx atimer string</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="adamnet">
+  <version>1.0</version>
+  <path>libraries/pcs/adamnet</path>
+  <description>Implements the ADAM networking process. It interfaces
+  the ADAM intertask communication software on unix to TCP/IP, thereby
+  allowing ADAM tasks on different machines to communicate with one
+  another. </description>
+  <dependencies>
+    <build> sae messys adam ams msp sock messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B.D.Kelly (REVAD::BDK)</name>
+    </person>
+    <person>
+      <name>Brian K McIlwrath</name>
+      <uname>bkm</uname>
+      <email>b.k.mcilwrath@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="hdspar">
+  <version>1.0-1</version>
+  <path>libraries/pcs/hdspar</path>
+  <description>Part of the HDS system.  HDSPAR declares bulk data
+    parameters.</description>
+  <dependencies>
+    <build> sae</build>
+    <use> subpar</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly, ROE</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Documented in SUN/224, handled in pcs directory</p></notes>
+</component>
+
+<component id="misc">
+  <version>1.4</version>
+  <path>libraries/pcs/misc</path>
+  <description>Miscellaneous routines required for the Unix build of
+    ADAM/HDS</description>
+  <abstract><p>Miscellaneous routines which do not fit into other
+      libraries.  Two handle terminal I/O for programs running
+      directly from a Unix shell and others provide a Fortran
+      interface into the C library for platforms (notably Linux) which
+      do not include them as part of the system.</p></abstract>
+  <dependencies>
+    <build> cnf</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Documented in SUN/144 in PCS</p></notes>
+</component>
+
+<component id="msp">
+  <version>2.3</version>
+  <path>libraries/pcs/msp</path>
+  <description>Message System Primitives library</description>
+  <abstract><p>MSP uses a single STREAM socket (path) in the INET
+      domain to communicate between any two tasks and a STREAM socket pair
+      in the UNIX domain to send/receive local (internal)
+      messages. Messages on the sockets specify a `queue' in the
+      receiving task for which they are intended and a queue in the
+      sending task to which replies should be sent.</p></abstract>
+  <dependencies>
+    <build> sae sock messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly (ROE)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@ral.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Documented in SUN/241 in PCS system</p></notes>
+</component>
+
+<component id="parsecon">
+  <version>1.3</version>
+  <path>libraries/pcs/parsecon</path>
+  <description>Parsing of the interface files associated with
+    SUBPAR</description>
+  <abstract><p>Parsing of the interface files associated with SUBPAR.
+      The package also includes the interface file compiler,
+      COMPIFL.</p></abstract>
+  <dependencies>
+    <build> sae hds hlp subpar ems chr string messgen</build>
+    <use> chr ems string subpar</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly (ROE)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Documented in passing in SSN/29</p></notes>
+</component>
+
+<component id="sock">
+  <version>1.0</version>
+  <path>libraries/pcs/sock</path>
+  <description>Provides a Unix-socket-based message transport system
+    for the MSP system</description>
+  <dependencies>
+    <build> sae messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly</name>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Described in SSN/29</p></notes>
+</component>
+
+<component id="task">
+  <version>2.0</version>
+  <path>libraries/pcs/task</path>
+  <description>TASK -- an interface between the
+  application code and the DTASK layer</description>
+  <abstract><p>This library provides an interface between the
+      application code and the DTASK layer so that an application can
+      find out some information about its own status. It also enables
+      programs to control other co-operating programs using the ADAM
+      message protocol and includes subroutines for encoding and
+      decoding data values in messages.  For examples of use, see
+      SUN/134.</p></abstract>
+  <dependencies>
+    <build> sae adam dtask messys subpar messgen</build>
+    <use> chr dtask ems mers string subpar</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Described in SSN/29, with examples in SUN/134</p></notes>
+</component>
+
+<component id="string">
+  <version>1.1-1</version>
+  <path>libraries/pcs/string</path>
+  <description>Fortran string manipulation subroutines</description>
+  <abstract><p>Fortran string manipulation subroutines. These
+      subroutines are also used by software items outside the
+      parameter system, but the library has no published
+      interface</p></abstract>
+  <dependencies>
+    <build> sae chr</build>
+    <use> chr ems</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Described in SSN/29, but has no published interface</p></notes>
+</component>
+
+<component id="atimer">
+  <version>1.0</version>
+  <path>libraries/pcs/atimer</path>
+  <description>ATIMER -- millisecond interval timers</description>
+  <abstract><p>This library provides a system of millisecond interval
+      timers used by the message system and DTASK.  Each timer has an
+      associated handler which is invoked when the timer expires.  The
+      library is written in C but a Fortran interface, FATIMER, is
+      provided.</p></abstract>
+  <dependencies>
+    <build> sae cnf messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Described in SSN/29</p></notes>
+</component>
+
+<component id="sae">
+  <version>1.0</version>
+  <path>libraries/sae</path>
+  <description>Starlink Applications Environment special files</description>
+  <abstract>
+    <p>The SAE package brings together some include files, a facility
+      error file and a shell script needed for development of software
+      in the Starlink environment, and for building the USSC.</p>
+  </abstract>
+  <dependencies>
+    <build> messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin J Bly</name>
+      <uname>bly</uname>
+      <email>NONE</email>
+    </person>
+  </developers>
+ <documentation> sun191</documentation> 
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="psx">
+  <version>0.4</version>
+  <path>libraries/psx</path>
+  <description>POSIX interface routines</description>
+   <abstract><p>PSX is a FORTRAN subroutine library that allows
+      programmers to use the functionality provided by the POSIX and
+      X/OPEN libraries. The use of this library will enable
+      programmers to make use of operating system facilities in a
+      machine independent way.</p></abstract> 
+  <dependencies>
+    <build> sae messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun121</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="hlp">
+  <version>3.3-2</version>
+  <path>libraries/hlp</path>
+  <description>HLP -- interactive help system</description>
+  <abstract><p>The Starlink HLP system allows an application program
+      to retrieve named items from a hierarchically-arranged library
+      of text.  The facility resembles VAX/VMS HELP.  It consists of a
+      library plus utility programs for creating, listing and reading
+      help libraries.</p></abstract>
+  <dependencies>
+    <build></build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P T Wallace</name>
+      <uname>ptw</uname>
+      <email>ptw@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun124</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="sla">
+  <version>2.4-11</version>
+  <path>libraries/sla</path>
+  <description>SLALIB --- Positional Astronomy Library</description>
+  <abstract><p>SLALIB is a library used by writers of
+      positional-astronomy applications.  Most of the
+      routines are concerned with astronomical position and time, but
+      a number have wider trigonometrical, numerical or general
+      applications.</p></abstract>
+  <dependencies>
+    <build></build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Patrick Wallace</name>
+      <uname>ptw</uname>
+      <email>ptw@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun67</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+</componentset>

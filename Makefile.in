@@ -1,0 +1,38 @@
+# Process this file with autoconf to generate the Makefile
+# @configure_input@
+
+# TOP_LEVEL_TARGETS is the list of targets built by default
+# Trivial at the moment
+TOP_LEVEL_TARGETS=sst
+
+## prefix=@prefix@
+
+# Java support: need a java runtime
+JAVA=@JAVA@
+
+# MANIFEST must match the value defaulted in starconf
+# XXX tie these together in future?
+MANIFEST=$(prefix)/manifests
+
+all: $(TOP_LEVEL_TARGETS)
+
+# FIXME: this depends on the xt jar being handy; either check this in or,
+# better, write a 10-line Java application under buildsupport to replace it,
+# using the XSLT support (JAXP) present in Java 1.4+.
+Makefile.dependencies: componentset.xml
+	$(JAVA) com.jclark.xsl.sax.Driver \
+		$< buildsupport/starconf/make-dependencies.xslt $@
+
+componentset.xml:
+	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >$@
+	echo '<componentset>' >>$@
+#	cat `find . -name component.xml` | sed -e '/^<?/d' -e '/^<!/d' >>$@
+	find . -name component.xml -exec cat '{}' ';' | \
+		sed -e '/^<?/d' -e '/^<!/d' >>$@
+	echo '</componentset>' >>$@
+
+# Makefile.dependencies expresses all the dependencies between components.
+# It expects the current file to define variable MANIFEST to be the directory
+# which holds the manifest files, typically /star/manifests
+include Makefile.dependencies
+
