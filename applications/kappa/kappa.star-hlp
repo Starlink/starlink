@@ -260,7 +260,7 @@ Creates a text file describing selected regions of an image.
 
 Usage:
 
-   ardgen ardout shape option [device] [startup] [palnum] [poicol]
+   ardgen ardout shape option [device] [startup]
       { operands=? operator=?
       { regions=?
       option
@@ -268,7 +268,7 @@ Usage:
 Description:
 
    This is an interactive tool for selecting regions of a displayed
-   image using a cursor, and then stores a description of the
+   image using a cursor, and then storing a description of the
    selected regions in a text file in the form of an `ARD
    Description' (see SUN/183).  This text file may subsequently be
    used in conjunction with packages such as CCDPACK or ESP.
@@ -352,6 +352,8 @@ OPTION= LITERAL (Read)
                list of defined regions.
    "Delete"  - Delete previously defined regions, see parameter
                REGIONS.
+   "Draw"    - Draw the outline of the union of one or more previously
+               defined regions, see parameter REGIONS.
    "Exit"    - Write out the currently defined regions to a text
                file and exit the application.
    "List"    - List the textual descriptions of the currently
@@ -378,18 +380,17 @@ OPTION= LITERAL (Read)
    "Shape"   - Change the shape of the regions created by the
                "Single" and "Multi" options.  This causes a new
                value for parameter SHAPE to be obtained.
+   "Style"   - Change the drawing style by providing a new value
+               for parameter STYLE.
    "Quit"    - Quit the application without saving the currently
                defined regions.
-3 PALNUM
-PALNUM= _INTEGER (Read)
-   The pen number with which to outline the selected regions. [3]
-3 POICOL
-POICOL = _INTEGER (Read)
-   The pen number used to mark the cursor positions which define
-   each region.  [2]
+   "Undo"    - Undo the changes made to the list of ARD regions by
+               the previous option. Note, the undo list can contain
+               upto 30 entries. Entries are only stored for options
+               which actually produce a change in the list of regions.
 3 REGIONS
 REGIONS() = LITERAL (Read)
-   The list of regions to be deleted.  Regions are numbered
+   The list of regions to be deleted or drawn.  Regions are numbered
    consecutively from 1 and can be listed using the "List" option
    (see parameter OPTION).  Single regions or a set of adjacent
    regions may be specified, e.g. assigning [4,6-9,12,14-16] will
@@ -399,8 +400,8 @@ REGIONS() = LITERAL (Read)
    when there is only one item.)  The numbers need not be in
    ascending order.
 
-   If you wish to delete all the regions enter the wildcard *.
-   5-* will delete from 5 to the last region.
+   If you wish to delete or draw all the regions enter the wildcard *.
+   5-* will delete or draw from 5 to the last region.
 3 SHAPE
 SHAPE = LITERAL (Read)
    The shape of the regions to be defined using the cursor.
@@ -410,10 +411,11 @@ SHAPE = LITERAL (Read)
    below.
 
    "Box"       - A rectangular box with sides parallel to the
-                 image axes, defined by its centre and one of its
+                 co-ordinate axes, defined by its centre and one of its
                  corners.
    "Circle"    - A circle, defined by its centre and radius.
-   "Column"    - A single column of pixels.
+   "Column"    - A single value on axis 1, spanning all values on
+                 axis 2.
    "Ellipse"   - An ellipse, defined by its centre, one end of
                  the major axis, and one other point which can be
                  anywhere on the ellipse.
@@ -423,16 +425,22 @@ SHAPE = LITERAL (Read)
    "Polygon"   - Any general polygonal region, defined by up to
                  200 vertices.
    "Rectangle" - A rectangular box with sides parallel to the
-                 image axes, defined by a pair of diagonally
+                 co-ordinate axes, defined by a pair of diagonally
                  opposite corners.
    "Rotbox"    - A rotated box, defined by both ends of an edge,
                  and one point on the opposite edge.
-   "Row"       - A single row of pixels.
+   "Row"       - A single value on axis 2, spanning all values on
+                 axis 1.
    "Whole"     - The whole of the displayed image.
 3 STARTUP
 STARTUP = LITERAL (Read)
    Determines if the application starts up in "Multi" or "Single"
    mode (see parameter OPTION). ["Multi"]
+3 UNDO
+UNDO = _LOGICAL (Read)
+   Used to confirm that it is OK to proceed with an "Undo" option.
+   The consequences of proceeding are described before the parameter
+   is obtained.
 2 Examples
 ardgen extract.txt circle exit startup=single
    This example allows you to create a text file (extract.txt)
@@ -446,16 +454,16 @@ ardgen extract.txt circle exit startup=single
 device.
 
 -  The arguments for the textual description of each shape are as
-follows  (all co-ordinates are pixel, i.e. world co-ordinates):
+follows :
 
 "Box"       - The co-ordinates of the centre, followed by the
               lengths of the two sides.
 "Circle"    - The co-ordinates of the centre, followed by the
               radius.
-"Column"    - The x co-ordinate of the column.
+"Column"    - The axis 1 co-ordinate of the column.
 "Ellipse"   - The co-ordinates of the centre, followed by the
               lengths of the semi-major and semi-minor axes,
-              followed by the angle between the x axis and the
+              followed by the angle between axis 1 and the
               semi-major axis (in radians).
 "Frame"     - The width of the border.
 "Point"     - The co-ordinates of the pixel.
@@ -463,9 +471,20 @@ follows  (all co-ordinates are pixel, i.e. world co-ordinates):
 "Rectangle" - The co-ordinates of two diagonally opposite corners.
 "Rotbox"    - The co-ordinates of the box centre, followed by the
               lengths of the two sides, followed by the angle
-              between the first side and the x axis (in radians).
-"Row"       - The y co-ordinate of the row.
+              between the first side and axis 1 (in radians).
+"Row"       - The axis 2 co-ordinate of the row.
 "Whole"     - No arguments.
+
+ -  The shapes are defined within the current co-ordinate
+ Frame of the displayed NDF. For instance, if the current
+ co-ordinate Frame of the displayed NDF is RA/DEC, then "COLUMN"
+ regions will be curves of constant DEC, "ROW" regions will be curves
+ of constant RA (assuming axis 1 is RA and axis 2 is DEC), straight
+ lines will correspond to geodesics, etc. Numerical values will be
+ stored in the output text file in the current coordinate Frame of
+ the NDF. WCS information will also be stored in the output text
+ file allowing the stored positions to be converted to other systems
+ (pixel coordinates, for instance).
 2 Related_Applications
    KAPPA: ARDMASK; CCDPACK; ESP.
 2 Authors
@@ -497,6 +516,12 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1995 December 16 (MJC):
     Devices with a mouse can use it instead of the keyboard.
+
+ 30-AUG-1999 (DSB):
+    Do not cancel DEVICE when the graphics system is closed down.
+
+ 30-AUG-2001 (DSB):
+    Modify to use AST/PGPLOT and ARD V2. Added options Draw.
 1 ARDMASK
 Uses an ARD file to set some pixels of an NDF to be bad.
 

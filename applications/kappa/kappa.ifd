@@ -2721,7 +2721,8 @@ package kappa {
             type FILENAME
             access READ
             vpath PROMPT
-            ppath CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <->GLOBAL.DATA_ARRAY
             prompt {ARD file}
             default ardfile.dat
             helpkey *
@@ -6745,11 +6746,12 @@ package kappa {
             position 1
             type FILENAME
             vpath PROMPT
-            ppath CURRENT DEFAULT
             prompt {Name of the output text file}
             default ardfile.dat
+            ppath GLOBAL CURRENT DEFAULT
+            association ->GLOBAL.DATA_ARRAY
             helpkey *
-          }
+         }
 
          parameter device {
             position 4
@@ -6759,7 +6761,7 @@ package kappa {
             association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Name of graphics device}
             helpkey *
-          }
+         }
  
          parameter operands {
             size *
@@ -6768,7 +6770,7 @@ package kappa {
             ppath DYNAMIC
             vpath PROMPT
             helpkey *
-          }
+         }
 
          parameter operator {
             type LITERAL
@@ -6777,7 +6779,7 @@ package kappa {
             vpath PROMPT
             default AND
             helpkey *
-          }
+         }
  
          parameter option {
             position 3
@@ -6787,35 +6789,17 @@ package kappa {
             vpath PROMPT
             default MULTI
             helpkey *
-          }
+         }
 
-         parameter palnum {
-            position 6
-            type _INTEGER
-            prompt {Pen number}
-            ppath CURRENT DEFAULT
-            vpath DEFAULT
-            default 3
-            helpkey *
-          }
-
-         parameter poicol {
-            position 7
-            type _INTEGER
-            prompt {Points pen number?}
-            ppath CURRENT DEFAULT
-            vpath DEFAULT
-            default 2
-            helpkey *
-          }
- 
          parameter regions {
             size *
             type LITERAL
             vpath PROMPT
-            prompt {Give a list of the indices of the regions to be deleted}
+            ppath DYNAMIC DEFAULT
+            prompt {A list of region indices}
+            default '*'
             helpkey *
-          }
+         }
 
          parameter shape {
             position 2
@@ -6825,7 +6809,7 @@ package kappa {
             vpath PROMPT
             default CIRCLE
             helpkey *
-          }
+         }
 
          parameter startup {
             position 5
@@ -6835,8 +6819,24 @@ package kappa {
             vpath DEFAULT PROMPT
             default Multi
             helpkey *
-          }
- 
+         }
+
+         parameter style {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style}
+            helpkey *
+            default !
+         }
+
+         parametet undo {
+            type _LOGICAL
+            ppath DEFAULT
+            default FALSE
+            prompt {Undo the previous changes to the list of regions?}
+            helpkey *
+         }
       }
 
       action ardmask {
@@ -6849,8 +6849,9 @@ package kappa {
             type FILENAME
             access READ
             vpath PROMPT
-            ppath CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
             prompt {Masking ARD file}
+            association <->GLOBAL.DATA_ARRAY
             default ardfile.dat
             helpkey *
           }
