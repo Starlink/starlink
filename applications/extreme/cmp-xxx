@@ -17,7 +17,7 @@
 #     This script checks an original source code file against a version
 #     of it run through the one of the source code filter programs in
 #     the EXTREME package.  It should be invoked under the name `cmp-xxx'
-#     check the effects of the filter `xxx'.
+#     to check the effects of the filter `xxx'.
 #
 #     The available filters xxx are:
 #        - inscnf -- Wrap %VAL invocations in CNF_PVAL calls

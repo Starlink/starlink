@@ -13,7 +13,7 @@
 #  Description:
 #     This is a simple filter which takes a Starlink mk file as input and
 #     writes as output a file which should provide the additional 
-#     functionality required by the EXTREME package, i.e. it adds new 
+#     functionality required for EXTREME use, i.e. it adds new 
 #     SYSTEM types of alpha_OSF1_64 and sun4_Solaris_64, provides 
 #     for use of the INTEGER8 macro to preprocess Fortran source code
 #     before compilation, and modifies the C compilation flags for 

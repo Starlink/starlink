@@ -34,8 +34,8 @@
 #        - Checks that the input file and output file don't look different
 #          in any unexpected ways, and writes a warning if they do.
 #        - For Fortran files, checks that no lines have been extended 
-#          beyond 72 characters (this shouldn't happen, it's just an
-#          extra precaution).
+#          beyond 72 characters (this should not be possible, it's just
+#          an extra precaution).
 #
 #     It then writes a short summary of the run, including a report of
 #     whether any files gained new dependencies on include files.
@@ -43,8 +43,8 @@
 #     human attention is written to standard output while modified
 #     files are written to a new directory.
 #
-#     As part of its checking, it invokes a script called cmp-xxx
-#     on each pair of (original, changed) files; these scripts are 
+#     As part of its checking, it invokes a script called cmp-xxx on
+#     each pair of (original, changed) files; these scripts are 
 #     crude checks that the changes made have not done anything to the
 #     source code to change its intention other than what should have 
 #     been done.  They have been written in a fairly quick and dirty 

@@ -25,7 +25,7 @@
 *     `argc', then this will be left alone too, and a warning written
 *     to standard error to the effect that it is not being changed.
 *
-*     Additionally, references to the limit.h macros INT_MAX, INT_MIN 
+*     Additionally, references to the <limits.h> macros INT_MAX, INT_MIN 
 *     and UINT_MAX are replaced by INT_BIG_MAX, INT_BIG_MIN and 
 *     UINT_BIG_MAX respectively.  If any of these substitutions are
 *     made, then a line `#include "extreme.h"' is added after the 
@@ -73,14 +73,14 @@
 *          omitted or old style function declarations are used then the
 *          ANSI C machinery for doing type conversion at function call
 *          time will not work.  Gcc's `-Wstrict-prototypes' and 
-*          `-Wimplicit' flags are useful for this.
+*          `-Wimplicit-function-declaration' flags are useful for this.
 *        - Implicit declarations, which are implicitly of type int.
 *          If a name is declared simply by mentioning it without any type
 *          or type qualifiers, it is implicitly of type int, and so 
 *          should become delcared as INT_BIG.  This program does not 
 *          find these.  Such implicit declarations (only?) occur in 
 *          function declarations.  The Tru64 Unix C compiler's `-protois'
-*          flag or gcc's `-Wimplicit' flag are useful for identifying 
+*          flag or gcc's `-Wimplicit-int' flag are useful for identifying 
 *          these.
 *
 *     The program tries to adjust padding whitespace outside comments 
@@ -89,6 +89,9 @@
 *     No changes are made to comment lines so that, for instance, the 
 *     Synopsis stanza of function prologues will not have formal argument 
 *     types changed from `int' to `INT_BIG'.
+*
+*     Source code which makes sufficiently inventive use of the C 
+*     will stand a good chance of confusing this program.
 *       
 *  Notes:
 *     Although this program behaves as a filter, it is written on
