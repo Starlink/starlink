@@ -575,6 +575,8 @@
 
 *  Distortion coefficient and saved value before any fitting
       DOUBLE PRECISION DISTOR,DISTO
+*   Distortion coefficient in units of deg^{-2} (DISTOR has units rad^{-2})
+      DOUBLE PRECISION DISTORD2
 
 *  Approximately flag (applies to telescope type and plate centre only)
       LOGICAL APPROX
@@ -738,7 +740,6 @@
      :                 SUMR2,FNORM,DX,DY,
      :                 R,D,DR,SCALE,XE,YE,XX,YY,XY,W,RR,XP,YP,
      :                 WMAX,WRATIO,SUMSQ,SUMSQO,DDI,SEP,X1,Y1,X2,Y2
-      DOUBLEPRECISION SUM2PX
       CHARACTER NMORSP*2
       LOGICAL ILLCNO
 
@@ -1976,17 +1977,19 @@
                   IF (FITDI) THEN
                      DDI=DISTE-DISTOR
 *NORMAN
-                     write (*,'("diste=",f10.3," distor=",f10.3,
-     :                    " ddi=",f10.3," sigdi=",f10.3)') 
-     :                    diste,distor,ddi,sigdi
+*                     write (*,'("diste=",f10.3," distor=",f10.3,
+*     :                    " ddi=",f10.3," sigdi=",f10.3)') 
+*     :                    diste,distor,ddi,sigdi
                      IF (ABS(DDI).LT.1000D0.AND.SIGDI.LT.100D0) THEN
                         WRITE (LUR,1060) DDI,DISTE,SIGDI
                         WRITE (LUS,1060) DDI,DISTE,SIGDI
-                        IF (LUX.GT.0) WRITE (LUX, 1061) DDI,DISTE,SIGDI
  1060                   FORMAT (1X,'Radial distortion has changed by',
      :                     SP,F8.2,' to',F8.2,'  (std dev',SS,F6.2,')'/)
- 1061               FORMAT ('WARNING 005 Radial distortion changed by ',
-     :                       F8.2,' to',F8.2,'  (std dev',SS,F6.2,')')
+                        IF (LUX.GT.0) WRITE (LUX,
+     :                       '("INFO 005 Radial distortion changed by ",
+     :                       F8.2," to",F8.2,
+     :                       "  (std dev",SS,F6.2,")")')
+     :                       DDI,DISTE,SIGDI
                         DISTOR=DISTE
                      ELSE
                         WRITE (LUR,1062)
@@ -2017,10 +2020,11 @@
                            WRITE (LUS,
      :                       '(1X,''Plate centre has moved by'',F7.1,'//
      :             ''' arcsec  (std dev'',F6.1,'' arcsec)''/)') SEP,SIGR
-                           IF (LUX.GT.0) WRITE (LUS,
-     :                       '(''INFO 007 Plate centre has moved by'',
+                           IF (LUX.GT.0) WRITE (LUX,
+     :                          '(''INFO 007 Plate centre has moved by'',
      :                          F7.1,'//
-     :             ''' arcsec  (std dev'',F6.1,'' arcsec)''/)') SEP,SIGR
+     :                          ''' arcsec  (std dev'',
+     :                          F6.1,'' arcsec)'')') SEP,SIGR
                            WRITE (LUR,
      :      '(1X,''Plate centre has moved from'',I6.2,2I3.2,''.'',I1,'//
      :   '3X,A,I2.2,2I3.2,5X,''Equinox '',A,F6.1,5X,''Epoch '',A,F8.3)')
@@ -2069,8 +2073,25 @@
      :             '(9X,sp,G15.7,'' * Xmeas'',24X,G15.7,'' * Xmeas''/'//
      :                '9X,G15.7,'' * Ymeas'',24X,G15.7,'' * Ymeas''//)')
      :          (PLTCON(I,NSOL)/FNORM,PLTCON(I+MAXSOL,NSOL)/FNORM,I=2,3)
-               IF (LUX.GT.0) WRITE (LUX, '("FIT ",I3)') NSOL
-               
+*            Write out a block of results (terminated by `ENDFIT' below)
+*            corresponding to one successful fit.
+               IF (LUX.GT.0) THEN
+                  WRITE (LUX, '("FIT ",I3)') NSOL
+
+                  IF (NSOL.GT.2) THEN
+                     IF (FITDI) THEN
+                        WRITE (LUX, 1081) "deltaq", DDI,
+     :                       "change in radial distortion, arcsec"
+                        WRITE (LUX, 1081) "deltaqsd", SIGDI, "s.d."
+                     ENDIF
+                     IF (FITPC) THEN
+                        WRITE (LUX, 1081) "deltapc", SEP,
+     :                       "change in plate centre, arcsec"
+                        WRITE (LUX, 1081) "deltapcsd", SIGR, "s.d."
+                     ENDIF
+                  ENDIF
+               ENDIF
+
 *           Report the backwards solution
                CALL sla_INVF(PLTCON(1,NSOL),PLTCON(1,NSOL+MAXSOL),J)
                IF (J.NE.0) THEN
@@ -2083,11 +2104,10 @@
      :                        '9X,G15.7,'' * Y'',28X,G15.7,'' * Y''//)')
      : (FNORM*PLTCON(I,NSOL+MAXSOL),FNORM*PLTCON(I+3,NSOL+MAXSOL),I=1,3)
 
-*NORMAN
                IF (FITSOP) THEN
 *               Write a FITS-WCS file.  See Calabretta and Greisen (C&G),
 *               `Representations of Celestial Coordinates in FITS'
-*               (still draft).
+*               (still draft, but due to appear in A&A).
                   FTSTAT = 0
 
 *               First, generate a filename from FTPREF and solution number NSOL
@@ -2125,7 +2145,6 @@
                   WRITE (LUS, '(" FITS-WCS header for",I3,
      :                 "-component solution in file ",
      :                 A)') NTERMS, FITSFN(:FTI)
-                  IF (LUX.GT.0) WRITE (LUX, '("WCS ",A)') FITSFN(:FTI)
                   FTNAXS(1)=1
                   FTNAXS(2)=1
 
@@ -2214,44 +2233,48 @@
 *               \rho^2 into Q, then Q into itself, and expand, keeping
 *               terms to O(r^6), to obtain Q=1 - qr^2 + 3q^2r^4 -
 *               12q^3r^6 + O(r^8), and the distortion functions become
-*               \xi=Q(r)x, \eta=Q(r)y
+*               \xi=Q(r)x, \eta=Q(r)y.  The parameter q in this program
+*               has units rad^{-2} (I'm pretty sure), but since the FITS 
+*               files work in degrees, we need to convert it to deg^{-2}.
                   WRITE (FTWS,'("Projection geometry: ",A)') KPROJ
                   CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
-                  WRITE (FTWS, '("ASTROM q=",F10.4)') DISTOR
+                  DISTORD2 = DISTOR*(D2R**2)
+                  WRITE (FTWS, '("ASTROM q=",F10.4,"rad**-2 = ",
+     :                 F10.4,"deg**-2")') DISTOR, DISTORD2
                   CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
 
                   CALL FTPKYD (FTUNIT, 'PV1_0', 0D0, 7,
      :                 'Distortion function for x: a_0=0', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'PV1_1', 1D0, 7,
-     :                 'a_1 x', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_7', -DISTOR, 7,
-     :                 'a_7 x^3', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_9', -DISTOR, 7,
-     :                 'a_9 xy^2', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_17', 3*DISTOR**2, 7,
-     :                 'a_17 x^5', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_21', 3*DISTOR**2, 7,
-     :                 'a_21 xy^4', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_31', -12*DISTOR**3, 7,
-     :                 'a_31 x^7', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV1_37', -12*DISTOR**3, 7,
-     :                 'a_37 xy^6', FTSTAT)
+     :                 'a_1 x     = 1', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_7', -DISTORD2, 7,
+     :                 'a_7 x^3   = -q', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_9', -DISTORD2, 7,
+     :                 'a_9 xy^2  = -q', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_17', 3*DISTORD2**2, 7,
+     :                 'a_17 x^5  = 3q^2', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_21', 3*DISTORD2**2, 7,
+     :                 'a_21 xy^4 = 3q^2', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_31', -12*DISTORD2**3, 7,
+     :                 'a_31 x^7  = -12q^3', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_37', -12*DISTORD2**3, 7,
+     :                 'a_37 xy^6 = -12q^3', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'PV2_0', 0D0, 7,
      :                 'Distortion function for y: b_0=0', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'PV2_1', 1D0, 7,
-     :                 'b_1 y', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_7', -DISTOR, 7,
-     :                 'b_7 y^3', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_9', -DISTOR, 7,
-     :                 'b_9 yx^2', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_17', 3*DISTOR**2, 7,
-     :                 'b_17 y^5', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_21', 3*DISTOR**2, 7,
-     :                 'b_21 yx^4', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_31', -12*DISTOR**3, 7,
-     :                 'b_31 y^7', FTSTAT)
-                  CALL FTPKYD (FTUNIT, 'PV2_37', -12*DISTOR**3, 7,
-     :                 'b_37 yx^6', FTSTAT)
+     :                 'b_1 y     = 1', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_7', -DISTORD2, 7,
+     :                 'b_7 y^3   = -q', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_9', -DISTORD2, 7,
+     :                 'b_9 yx^2  = -q', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_17', 3*DISTORD2**2, 7,
+     :                 'b_17 y^5  = 3q^2', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_21', 3*DISTORD2**2, 7,
+     :                 'b_21 yx^4 = 3q^2', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_31', -12*DISTORD2**3, 7,
+     :                 'b_31 y^7  = -12q^3', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_37', -12*DISTORD2**3, 7,
+     :                 'b_37 yx^6 = -12q^3', FTSTAT)
 
 *               Write date of observation
                   IF (GOTPEP) THEN
@@ -2270,7 +2293,7 @@
      :                    "T",I2.2,":",I2.2,")")')
      :                    KPPCG, EPPCG,
      :                    IUTY, IUTMO, IUTD, IUTH, IUTM
-                     CALL FTPKYD (FTUNIT, 'MJD-OBS', UTMJD, 7,
+                     CALL FTPKYG (FTUNIT, 'MJD-OBS', UTMJD, 7,
      :                    FTWS, FTSTAT)
                   ELSE
                      CALL FTPCOM (FTUNIT, 'no plate epoch available!!',
@@ -2347,8 +2370,6 @@
                CALL sla_PXY(NREF,REFXYE,REFXYM,PLTCON(1,NSOL),
      :                                            REFXYP,XRMS,YRMS,RRMS)
 
-               SUM2PX=0D0
-
 *           Look at each reference star in turn
                DO I=1,NREF
 
@@ -2357,10 +2378,6 @@
                   YM=REFXYM(2,I)
                   XP=REFXYP(1,I)
                   YP=REFXYP(2,I)
-
-*               Calculate sum of squares of pixel residuals.
-*               Note this is not a directly comparable statistic to RRMS.
-                  SUM2PX = SUM2PX + (XM-XP)**2 + (YM-YP)**2
 
 *              Residuals
                   DX=(XP-REFXYE(1,I))/AS2R
@@ -2412,10 +2429,63 @@
                RRMS=RRMS/AS2R
                WRITE (LUR,'(/82X,''RMS :'',3F10.3/)') XRMS,YRMS,RRMS
                WRITE (LUS,'(/16X,''RMS :'',3F10.3)') XRMS,YRMS,RRMS
-               IF (LUX.GT.0) WRITE (LUX, '("STAT ",I5,4F14.6)')
-     :              NREF,XRMS,YRMS,RRMS,SUM2PX
+*            Report overall results to log file
+               IF (LUX.GT.0) THEN
+*               Write out a selection of important results,
+*               for parsing by the caller.
 
-               IF (LUX.GT.0) WRITE (LUX, '("ENDFIT")')
+*               Fit details:
+                  WRITE (LUX, 1083) "nstars",NREF,"no. ref stars"
+                  WRITE (LUX, 1080) "xrms", XRMS, "arcsec"
+                  WRITE (LUX, 1080) "yrms", YRMS, "arcsec"
+                  WRITE (LUX, 1080) "rrms", RRMS, "arcsec"
+                  WRITE (LUX, 1080) "plate", SCALE,
+     :                 "(mean) plate scale, arcsec"
+                  WRITE (LUX, 1080) "prms", RRMS/SCALE,
+     :                 "RRMS in pixels"
+
+*               Write out the plate centre coordinates (RAPCG, DCPCG) 
+*               in radians as well as sexagesimal.
+                  CALL sla_DR2TF(3,sla_DRANRM(RAPCG),KSRA,IRAVEC)
+*               Because of the dranrm, KSRA is always '+'
+                  CALL sla_DR2AF(3,sla_DRANGE(DCPCG),KSDC,IDCVEC)
+*               Write out the distortion coefficient DISTE 
+*               in the units ASTROM uses (rad^{-2}) rather than the
+*               units we carefully converted it to above (deg^{-2}),
+*               since this will principally be used to control a future
+*               invocation of ASTROM.
+                  WRITE (LUX, 1083) "nterms", NTERMS, "no. terms in fit"
+                  WRITE (LUX, 1081) "q", DISTE, "distortion, q"
+                  WRITE (LUX, 1082) "rarad", RAPCG,
+     :                 "projection pole RA, radians"
+                  WRITE (LUX, 1082) "decrad",DCPCG,
+     :                 "projection pole Dec, radians"
+                  WRITE (LUX,'("RESULT ",A10, 1X,
+     :                 I3,":",I2.2,":",I2.2,".",I3.3," # ",A)')
+     :                 "rasex", IRAVEC,
+     :                 "projection pole RA, sexagesimal"
+                  WRITE (LUX,'("RESULT ",A10, 1X,
+     :                 A,I2.2,":",I2.2,":",I2.2,".",I3.3," # ",A)')
+     :                 "decsex",
+     :                 KSDC, IDCVEC,
+     :                 "projection pole Dec, sexagesimal"
+ 1080             FORMAT ("RESULT ",A10, 1X, F20.6, " # ", A)
+ 1081             FORMAT ("RESULT ",A10, 1X, F20.2, " # ", A)
+ 1082             FORMAT ("RESULT ",A10, 1X, F20.9, " # ", A)
+ 1083             FORMAT ("RESULT ",A10, 1X, I20,   " # ", A)
+
+*               Name of the FITS file containing the astrometry (if there
+*               was an error writing the FITS file, FITSOP will have been
+*               set to false above).
+                  IF (FITSOP) WRITE (LUX,'("RESULT ",A10,1X,A," # ",A)')
+     :                 "wcs",
+     :                 FITSFN(:FTI),
+     :                 "FITS-WCS output file"
+
+*               Indicate the end of the list of results for this fit
+                  WRITE (LUX, '("ENDFIT")')
+               ENDIF
+
 *            End of IF(FITOK)
             END IF
          END IF
