@@ -142,9 +142,11 @@
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*   Create spatial masks
-      CALL XRTSORT_CRE_MASK(HEAD,SRT,BSRT,SDIM,NRBIN,
+*   Create spatial masks where needed
+      IF (SRT.IMAGE.OR.SRT.SHAPE.EQ.'I') THEN
+        CALL XRTSORT_CRE_MASK(HEAD,SRT,BSRT,SDIM,NRBIN,
      :                      MDIM,MRES,SMPTR,BMPTR,STATUS)
+      ENDIF
 
 *  Sorting to a binned data set ?
       IF ( SRT.DTYPE .EQ. 'BinDS') THEN
@@ -207,8 +209,10 @@
          CALL XRTSORT_PHOTONCNT(HEAD, SRT, BSRT, MAPLIM, STATUS)
 *
 *   Create & map the output Event data set.
+	print *,1
          CALL XRTSORT_CRE_EVENT(HEAD, SRT , MAPLIM, LOCS,
      &                                       ELOCS, SEVPTR, STATUS )
+	print *,2
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 *
 *   Create background file if wanted
@@ -228,6 +232,7 @@
          ENDIF
 *
 *   Do the sort
+	print *,3
          CALL XRTSORT_SORT_EVE(SRT, BSRT, MAPLIM,
      &          %val(SEVPTR(1)), %val(SEVPTR(2)), %val(SEVPTR(3)),
      &          %val(SEVPTR(4)), %val(SEVPTR(5)), %val(SEVPTR(6)),
@@ -237,6 +242,8 @@
      &          MDIM(1),MDIM(2),MRES,%val(SMPTR),%val(BMPTR),
      &          TOTEV_SRC,TOTEV_BCK, STATUS )
 *
+	print *,4
+
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *   Tidy up and shrink lists to the number of events recorded
@@ -265,19 +272,10 @@
 *   Put SORT box into output files
       CALL XRTSORT_WRISORT(LOCS, SRT, STATUS)
 *
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error writing source file SORT box')
-         GOTO 999
-      ENDIF
 
 *   Background sort box
       IF (SRT.BCKGND) THEN
          CALL XRTSORT_WRISORT(LOCB, BSRT, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error writing SORT box')
-            GOTO 999
-         ENDIF
       ENDIF
 
 *   History
@@ -1324,8 +1322,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       IF (STATUS .NE. SAI__OK) RETURN
 *
 *  if output contains an image - create mask of same dimensions
-      IF (SRT.DTYPE.EQ.'BinDS'.AND.
-     :         SDIM(1).GT.1.AND.SDIM(2).GT.1.AND.NRBIN.EQ.1) THEN
+      IF (SRT.IMAGE) THEN
         MDIM(1)=SDIM(1)
         MDIM(2)=SDIM(2)
         PTOD = HEAD.PIXEL/3600.
@@ -2358,6 +2355,9 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       SRT.NDATA=SDIM(1)*SDIM(2)*SDIM(3)*SDIM(4)*SDIM(5)*SDIM(6)*SDIM(7)
      &                      *NRBIN*NAZBIN
 *
+      SRT.IMAGE=(SRT.DTYPE.EQ.'BinDS'.AND.
+     &              SDIM(1).GT.1.AND.SDIM(2).GT.1.AND.NRBIN.EQ.1)
+
 * Is a background file wanted ? Not possible if source file contains
 * radial bins.
       IF ( INDEX(BIN_AXES,'8') .EQ. 0) THEN
@@ -2700,6 +2700,10 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
             BDIM(LP)=1
          ENDDO
       ENDIF
+
+      BSRT.IMAGE=(BSRT.DTYPE.EQ.'BinDS'.AND.
+     &              BDIM(1).GT.1.AND.BDIM(2).GT.1)
+
 *
 999   CONTINUE
 *
@@ -2976,7 +2980,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
              DO LP3=1,SDIM3
 
 *       If an image then use spatial mask as well
-               IF (SDIM1.GT.1.AND.SDIM2.GT.1.AND.NRBIN.EQ.1) THEN
+               IF (SRT.IMAGE) THEN
                  DO LP2=1,SDIM2
                     DO LP1=1,SDIM1
                        IF (.NOT. QVAL .OR. SMASK(LP1,LP2).EQ.0) THEN
@@ -3117,7 +3121,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       LOGICAL LHRI                           ! Is it an HRI file ?
       LOGICAL SOK,BOK
       LOGICAL OK
-      LOGICAL IMAGE			     ! Output contains image(s)
       INTEGER IX,YMAX                        ! Counter
 
 *-
@@ -3130,8 +3133,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 ***   Test if this is an HRI file
       LHRI = (INDEX(HEAD.DETECTOR, 'HRI') .NE. 0)
 
-*     Does the output contain image(s)
-      IMAGE=(SDIM1.GT.1.AND.SDIM2.GT.1.AND.NRBIN.EQ.1)
 
 ***   Calculate the pixel centres of each box
       SCEN_X = (SRT.MIN_X + SRT.MAX_X) / 2.0
@@ -3282,7 +3283,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             ELSEIF (SRT.SHAPE.EQ.'I') THEN
 
 *  find position within spatial mask
-              IF (IMAGE) THEN
+              IF (SRT.IMAGE) THEN
                 MEL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
                 IF (HEAD.ORIGIN.EQ.'MPE') THEN
                   MEL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
@@ -3312,7 +3313,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 *  The first two dimensions of the array can be either
 *  X and Y pixel or RADIAL and AZIMUTHAL bin, depending on
 *  the user selection.
-            IF (IMAGE) THEN
+            IF (SRT.IMAGE) THEN
 *
 *  X,Y bins:
               EL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
@@ -3518,6 +3519,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      NELEMS,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
 
+	print *,'a'
 ***      Check them against the sort parameters
          CALL XRTSORT_DOIT_EVE(HEAD, SRT, BSRT,%val(PTRA(1)),
      &      %val(PTRA(2)),
@@ -3527,6 +3529,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      BEVE_T, BEVE_P, BEVE_E, MDIM1,MDIM2,MRES,SMASK,BMASK,
      &      TOTEV_SRC, TOTEV_BCK, SRT.QUAL_MORE,
      &      MAXBAD, NBAD, STBAD, ENBAD, BADEV)
+	print *,'b'
 
 ***      unmap the arrays & memory
          CALL RAT_UNMAPEVE(SLOCA, STATUS)
