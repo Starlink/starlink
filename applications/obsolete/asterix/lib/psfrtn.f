@@ -3600,7 +3600,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CHARACTER*20             MASK              	! Mask name
 
       INTEGER                  IDUM,CDIMS(3)          	! XRT pf cube dimensions
-
+      INTEGER                  L
       LOGICAL                  OK		      	!
       LOGICAL                  PHADEF		      	! PHA band defined?
 *
@@ -3655,7 +3655,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         IF ( .NOT. RX_CB_OPEN ) THEN
 
 *        Translate environment symbol
-          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
+C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
+          CALL AST_PATH('AST_ETC','AST_XRT_PSF_CUBE','pspc_psf_cube',
+     :                                                FNAME,L,STATUS)
 
 *        Open the file
           CALL ADI_FOPEN( FNAME, 'BinDS', 'READ', RX_CB_ID, STATUS )
