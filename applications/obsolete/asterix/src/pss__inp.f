@@ -51,7 +51,7 @@
       IF ( CP_MULTI ) THEN
         CALL ADI_FCLOSE( IM_ID, STATUS )
       ELSE
-        CALL USI_TANNUL( IM_ID, STATUS )
+        CALL USI_ANNUL( 'INP', STATUS )
       END IF
 
 *    Restore error context

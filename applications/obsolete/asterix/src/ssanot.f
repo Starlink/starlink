@@ -271,8 +271,8 @@
       END IF
 
 *    Release files
-      CALL USI_TANNUL( SID, STATUS )
-      CALL USI_TANNUL( IFID, STATUS )
+      CALL USI_ANNUL( 'LIST', STATUS )
+      CALL USI_ANNUL( 'INP', STATUS )
 
 *    Shutdown sub-systems
  99   CALL AST_CLOSE

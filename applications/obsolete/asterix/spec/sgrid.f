@@ -670,13 +670,14 @@
         IF ( AUTO ) THEN
           CALL ADI_FCLOSE( GFID(I), STATUS )
         ELSE
-          CALL USI_TANNUL( GFID(I), STATUS )
+          WRITE( PC, '(I1.1)' ) I
+          CALL USI_ANNUL( 'OUT'//PC, STATUS )
         END IF
       END DO
 
 *    Tidy up & exit
- 99   CALL USI_TANNUL( MFID, STATUS )
-      CALL USI_TANNUL( IFID, STATUS )
+ 99   CALL USI_ANNUL( 'MODEL', STATUS )
+      CALL USI_ANNUL( 'INP', STATUS )
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 

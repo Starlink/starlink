@@ -64,13 +64,13 @@
 *    Close the file
       IF ( BG_DYNAMIC ) THEN
         IF ( .NOT. CP_MULTI ) THEN
-          CALL USI_TANNUL( BG_ID, STATUS )
+          CALL USI_ANNUL( 'BGND', STATUS )
         END IF
       ELSE
         IF ( CP_MULTI ) THEN
           CALL ADI_FCLOSE( BG_ID, STATUS )
         ELSE
-          CALL USI_TANNUL( BG_ID, STATUS )
+          CALL USI_ANNUL( 'BGND', STATUS )
         END IF
       END IF
 

@@ -665,10 +665,8 @@
       ENDIF
 
 *  Shut input and output files
-      CALL BDA_RELEASE(INLOC, STATUS)
-      CALL USI_TANNUL( IFID, STATUS )
-      CALL BDA_RELEASE(OUTLOC, STATUS)
-      CALL USI_TANNUL( OFID, STATUS )
+      CALL USI_ANNUL( 'INP', STATUS )
+      CALL USI_ANNUL( 'OUT', STATUS )
 
 *  Exit point
       CALL AST_CLOSE()
