@@ -195,7 +195,7 @@ in passing, responding to suggestions.
 <p>Specific tasks, with timings in weeks:
 <ul>
 <li>Integration of routinecode into documents (see <ref id=routinecode>) (1)
-<li>Maths (1)
+<li>Maths (see <ref id="maths">) (1)
 <li>Tables and figures (0.5)
 <li>Print stylesheets (1.5)
 <li>Indexes, notes, bibliographic support (0.5)
@@ -217,13 +217,9 @@ probably need some substantial rewriting of the
 
 <subsubsect id=maths>Incorporating maths
 
-<p>Here is some maths.  Inline: <m/E=mc^2/ and displayed:
-<meqnarray>
-I(s(t),\phi(t)) &=&amp \int_0^\infty I(r)\tilde A_I(r;s,\phi)\ddd r,\qquad
-	\qquad\tilde A_I=r\int_0^{2\pi} A(r,\chi;s,\phi)\ddd \chi \\
-Q(s(t),\phi(t)) &=& \int_0^\infty P(r)\tilde A_Q(r;s,\phi)\ddd r,\qquad
-	\qquad\tilde A_Q=-r\int_0^{2\pi} \cos2\chi A(r,\chi;s,\phi)\ddd\chi
-</meqnarray>.
+<p>I've added a maths stylesheet, which uses <webref
+url="http://hutchinson.belmont.ma.us/tth/">tth</webref> to transform
+&LaTeX equations into HTML.
 
 
 <subsect id=nextver>For the future
