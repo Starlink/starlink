@@ -435,7 +435,6 @@ my %ppfc_sources = ();
 # Extra Starlink features, as found when tracing
 my %starlink_seen_features = ();
 my %starlink_predist_sources = ();
-my %starlink_extra_dist = ();
 
 
 ################################################################
@@ -3738,6 +3737,10 @@ sub handle_starlink_dist ()
             }
         }
     }
+  Automake::Variable::define ('STAR_EXTRA_DIST',
+                              VAR_CONFIGURE, '', TRUE,
+                              subst('STAR_EXTRA_DIST'),
+                              '', INTERNAL, VAR_ASIS);
 }
 
 # &handle_subdirs ()
@@ -4945,7 +4948,6 @@ sub scan_autoconf_traces ($)
                 STAR_MONOLITHS => 0,
                 STAR_PREDIST_SOURCES => 1,
                 STAR_SPECIAL_INSTALL_COMMAND => 1,
-                _STAR_EXTRA_DIST => 1,
 	      );
 
   my $traces = ($ENV{AUTOCONF} || 'autoconf') . " ";
@@ -5147,20 +5149,6 @@ sub scan_autoconf_traces ($)
       elsif ($macro eq 'STAR_SPECIAL_INSTALL_COMMAND')
         {
           $starlink_seen_features{'special-install'} = $args[1];
-        }
-      elsif ($macro eq '_STAR_EXTRA_DIST')
-        {
-          foreach my $src (split(' ', $args[1]))
-            {
-              if (defined($starlink_extra_dist{$src}))
-                {
-                  print STDERR "_STAR_EXTRA_DIST called twice on $src\n";
-                }
-              else
-                {
-                  $starlink_extra_dist{$src} = 1;
-                }
-            }
         }
     }
 
@@ -7462,8 +7450,6 @@ sub generate_makefile ($$)
   # Variables used by distdir.am and tags.am.
   define_pretty_variable ('SOURCES', TRUE, INTERNAL, @sources);
   define_pretty_variable ('DIST_SOURCES', TRUE, INTERNAL, @dist_sources);
-  define_pretty_variable ('STAR_EXTRA_DIST', TRUE, INTERNAL,
-                          keys(%starlink_extra_dist));
 
   handle_multilib;
   handle_texinfo;
