@@ -66,16 +66,16 @@
 *
       IF( IARGC() .GT. 6 ) THEN
          CALL GETARG( 4, TEXT )
-         READ( TEXT, '*' ) PBOX( 1 )
+         READ( TEXT, * ) PBOX( 1 )
 
          CALL GETARG( 5, TEXT )
-         READ( TEXT, '*' ) PBOX( 2 )
+         READ( TEXT, * ) PBOX( 2 )
 
          CALL GETARG( 6, TEXT )
-         READ( TEXT, '*' ) PBOX( 3 )
+         READ( TEXT, * ) PBOX( 3 )
 
          CALL GETARG( 7, TEXT )
-         READ( TEXT, '*' ) PBOX( 4 )
+         READ( TEXT, * ) PBOX( 4 )
 
 *  Otherwise use NAXISi keywords in the header.
       ELSE
