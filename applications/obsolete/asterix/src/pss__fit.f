@@ -180,7 +180,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
 
 *  Create minimisation control object
       CALL FCI_CURFMC( 2*PSS__FITMXIT, 0, PSS__FITMINSLO,
-     :                 'CURFIT', MCTRL, STATUS )
+     :                 .FALSE., MCTRL, STATUS )
 
 *  Restart point for re-fit
  10   ITER = ITER + 1
@@ -1687,7 +1687,7 @@ c     RECORD /GRID_AXIS/       	GAX(MAXAX)              ! The grid axes
       CALL BDI_PUT0C( GID, 'Units', UNITS, STATUS )
 
 *  Create minimisation control
-      CALL FCI_CURFMC( PSS__FITMXIT, 0, 0.0, MCTRL, STATUS )
+      CALL FCI_CURFMC( PSS__FITMXIT, 0, 0.0, .FALSE., MCTRL, STATUS )
 
 *  Grid the statistic over the cube
       CALL FIT_GRID( 1, IMOD, MCTRL, 0, NAX, GAX, 1, LGPAR,
