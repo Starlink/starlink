@@ -1,3 +1,8 @@
+2000-05-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* util/tran_date.f (TRAN_DATE): Fix problem with loss of precision 
+	when translating, for example, 1999.0722. Came out as 23-Jul-99
+
 2000-01-10  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* starlink/makefile (F_SUB1): move DECDAT from util to astro
