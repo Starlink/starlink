@@ -1,5 +1,5 @@
 *+  FIT_CREGRIDAX - Create a dataset axis structure from grid axis blocks
-      SUBROUTINE FIT_CREGRIDAX( FID, NAX, GAX, STATUS )
+      SUBROUTINE FIT_CREGRIDAX( FID, NAX, STATUS )
 *
 *    Description :
 *
@@ -30,7 +30,7 @@
 *
       INTEGER			FID			! Dataset id
       INTEGER                   NAX                     ! Number of grid axes
-      RECORD /GRID_AXIS/        GAX(NAX)                ! Grid axis block
+c     RECORD /GRID_AXIS/        GAX(NAX)                ! Grid axis block
 *
 *    Status :
 *
@@ -54,9 +54,10 @@
       DO IAX = 1, NAX
 
 *    Write parameters
-        IF ( GAX(IAX).REGULAR .AND. .NOT. GAX(IAX).LOGARITHMIC ) THEN
-          SPARR(1) = GAX(IAX).BASE
-          SPARR(2) = GAX(IAX).SCALE
+        IF ( GRID_AXIS_REGULAR(IAX) .AND.
+     :       .NOT. GRID_AXIS_LOGARITHMIC(IAX) ) THEN
+          SPARR(1) = GRID_AXIS_BASE(IAX)
+          SPARR(2) = GRID_AXIS_SCALE(IAX)
           CALL BDI_AXPUT1R( FID, IAX, 'SpacedData', 2, SPARR, STATUS )
 
         ELSE
@@ -66,12 +67,14 @@
           CALL BDI_AXMAPR( FID, IAX, 'Width', 'WRITE', WPTR, STATUS )
 
 *      Find axis values and widths and store in axis arrays
-          DO IBIN = 1, GAX(IAX).NVAL
-            CALL FIT_GRID_AXVAL( GAX(IAX), IBIN, AVAL, STATUS )
-            CALL ARR_SELEM1R( PTR, GAX(IAX).NVAL, IBIN, AVAL, STATUS )
-            AWID = ( 10.0**(LOG10(AVAL)+GAX(IAX).SCALE/2.0) -
-     :               10.0**(LOG10(AVAL)-GAX(IAX).SCALE/2.0) )
-            CALL ARR_SELEM1R( WPTR, GAX(IAX).NVAL, IBIN, AWID, STATUS )
+          DO IBIN = 1, GRID_AXIS_NVAL(IAX)
+            CALL FIT_GRID_AXVAL( IAX, IBIN, AVAL, STATUS )
+            CALL ARR_SELEM1R( PTR, GRID_AXIS_NVAL(IAX), IBIN, AVAL,
+     :                        STATUS )
+            AWID = ( 10.0**(LOG10(AVAL)+GRID_AXIS_SCALE(IAX)/2.0) -
+     :               10.0**(LOG10(AVAL)-GRID_AXIS_SCALE(IAX)/2.0) )
+            CALL ARR_SELEM1R( WPTR, GRID_AXIS_NVAL(IAX), IBIN, AWID,
+     :                        STATUS )
           END DO
 
 *      Unmap axis data and widths

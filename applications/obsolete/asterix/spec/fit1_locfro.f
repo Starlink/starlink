@@ -1,5 +1,5 @@
 *+  FIT1_LOCFRO - Generate local frozen array for high level FIT routines
-      SUBROUTINE FIT1_LOCFRO( MODEL, NPAR, FROZEN, LFROZEN, STATUS )
+      SUBROUTINE FIT1_LOCFRO( IMOD, NPAR, FROZEN, LFROZEN, STATUS )
 *
 *    Description :
 *
@@ -35,7 +35,8 @@
 *
 *    Import :
 *
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
       INTEGER 		  NPAR			! No of parameters
       LOGICAL 		  FROZEN(*)		! Frozen parameter flag
 *
@@ -61,14 +62,14 @@
       END DO
 
 *    Any model constraints?
-      IF ( MODEL.NTIE .GT. 0 ) THEN
+      IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
 
 *      Loop over parameters
         DO J = 1, NPAR
-          IF ( MODEL.TGROUP(J) .GT. 0 ) THEN
-            K = MODEL.TSTART(MODEL.TGROUP(J))
+          IF ( MODEL_SPEC_TGROUP(IMOD,J) .GT. 0 ) THEN
+            K = MODEL_SPEC_TSTART(IMOD,MODEL_SPEC_TGROUP(IMOD,J))
             IF ( J .NE. K ) THEN
-              IF ( FROZEN(J) .NE. FROZEN(K) ) THEN
+              IF ( FROZEN(J) .NEQV. FROZEN(K) ) THEN
                  STATUS = SAI__ERROR
                  CALL ERR_REP( ' ', 'Parameters in a tie must have '/
      :                           /'same FROZEN state, ie. either '/

@@ -1,4 +1,4 @@
-      SUBROUTINE FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
+      SUBROUTINE FIT1_NDOF( NGOOD, IMOD, FROZEN, NDOF, STATUS )
 *+
 *  Name:
 *     FIT1_NDOF
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
+*     CALL FIT1_NDOF( NGOOD, FROZEN, NDOF, STATUS )
 
 *  Description:
 *     The number of degrees of freedom is given by the number of good
@@ -78,7 +78,8 @@
 
 *  Arguments Given:
       INTEGER			NGOOD			! # of good data points
-      RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+      INTEGER			IMOD
       LOGICAL			FROZEN(*)		! Frozen parameters?
 
 *  Arguments Returned:
@@ -95,10 +96,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Initially the number of good data values less the number of parameters
-      NDOF = NGOOD - MODEL.NPAR
+      NDOF = NGOOD - MODEL_SPEC_NPAR(IMOD)
 
 *    Loop over parameters
-      DO J = 1, MODEL.NPAR
+      DO J = 1, MODEL_SPEC_NPAR(IMOD)
 
 *      Parameter frozen?
         IF ( FROZEN(J) ) THEN
@@ -106,13 +107,15 @@
           NDOF = NDOF + 1
 
 *      Ties present?
-	ELSE IF ( MODEL.NTIE .GT. 0 ) THEN
+	ELSE IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
 
 *        In a tie group?
-          IF ( MODEL.TGROUP(J) .GT. 0 ) THEN
+          IF ( MODEL_SPEC_TGROUP(IMOD,J) .GT. 0 ) THEN
 
 *          Not the base parameter of the group
-            IF ( MODEL.TSTART(MODEL.TGROUP(J)) .NE. J ) THEN
+            IF ( MODEL_SPEC_TSTART(IMOD,
+     :                             MODEL_SPEC_TGROUP(IMOD,J))
+     :         .NE. J ) THEN
               NDOF = NDOF + 1
             END IF
 

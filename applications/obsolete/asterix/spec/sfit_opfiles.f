@@ -1,5 +1,5 @@
 *+  SFIT_OPFILES - Write output file list to fit output stream
-      SUBROUTINE SFIT_OPFILES( FSTAT, NDS, OBDAT, MODEL, OCI, STATUS )
+      SUBROUTINE SFIT_OPFILES( FSTAT, NDS, IMOD, OCI, STATUS )
 *
 *    Description :
 *
@@ -47,8 +47,9 @@
 *
       INTEGER			FSTAT			! Fit statistic
       INTEGER			NDS			! Number of datasets
-      RECORD /DATASET/    	OBDAT(NDS)		! Observed datasets
-      RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+c     RECORD /DATASET/    	OBDAT(NDS)		! Observed datasets
+c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+      INTEGER			IMOD
       INTEGER			OCI			! AIO stream id
 *
 *    Local variables :
@@ -66,13 +67,13 @@
 *  Write list of files
       CALL AIO_WRITE( OCI, 'Fitting to datasets:', STATUS )
       DO I = 1, NDS
-        CALL MSG_SETC( 'DFILE', OBDAT(I).DATNAME )
+        CALL MSG_SETC( 'DFILE', DATASET_DATNAME(I) )
         CALL AIO_IWRITE( OCI, 21, '^DFILE', STATUS )
 
 *    Likelihood mode?
         IF ( FSTAT .EQ. FIT__LOGL ) THEN
-          IF ( OBDAT(I).B_ID .NE. ADI__NULLID ) THEN
-            CALL ADI_FTRACE( OBDAT(I).B_ID, NLEV, PATH, FILE, STATUS )
+          IF ( DATASET_B_ID(I) .NE. ADI__NULLID ) THEN
+            CALL ADI_FTRACE( DATASET_B_ID(I), NLEV, PATH, FILE, STATUS )
           ELSE
             FILE = '** Unable to find bgnd - assumed negligible **'
           END IF
@@ -81,15 +82,15 @@
         END IF
 
 *    Vignetting file present?
-        IF ( OBDAT(I).V_ID .NE. ADI__NULLID ) THEN
-          CALL ADI_FTRACE( OBDAT(I).V_ID, NLEV, PATH, FILE, STATUS )
+        IF ( DATASET_V_ID(I) .NE. ADI__NULLID ) THEN
+          CALL ADI_FTRACE( DATASET_V_ID(I), NLEV, PATH, FILE, STATUS )
           CALL MSG_SETC( 'VFILE', FILE )
           CALL AIO_IWRITE( OCI, 14, 'vign : ^VFILE', STATUS )
         END IF
 
 *    Grouping defined?
-        IF ( OBDAT(I).GFLAG ) THEN
-          CALL MSG_SETI( 'NG', OBDAT(I).NGDAT )
+        IF ( DATASET_GFLAG(I) ) THEN
+          CALL MSG_SETI( 'NG', DATASET_NGDAT(I) )
           CALL AIO_IWRITE( OCI, 14, 'Grouped into ^NG bins', STATUS )
         END IF
 
@@ -97,9 +98,10 @@
       END DO
 
 *  Write model prescription
-      CALL MSG_SETC( 'MODEL', MODEL.SPEC )
+      CALL MSG_SETC( 'MODEL', MODEL_SPEC_SPEC(IMOD) )
       CALL AIO_WRITE( OCI, 'Using model  : ^MODEL', STATUS )
-      CALL ADI_FTRACE( MODEL.M_ID, NLEV, PATH, FILE, STATUS )
+      CALL ADI_FTRACE( MODEL_SPEC_M_ID(IMOD), NLEV, PATH, FILE,
+     :                 STATUS )
       CALL MSG_SETC( 'MFILE', FILE )
       CALL AIO_WRITE( OCI, 'From dataset : ^MFILE', STATUS )
 

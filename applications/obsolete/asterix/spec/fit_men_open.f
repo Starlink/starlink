@@ -28,7 +28,7 @@
 *
 *    Import :
 *
-      CHARACTER*(*)		GENUS			! Model genus
+      CHARACTER*4		GENUS			! Model genus
 *
 *    Export :
 *

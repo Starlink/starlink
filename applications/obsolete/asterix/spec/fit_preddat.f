@@ -1,6 +1,5 @@
 *+  FIT_PREDDAT - Computes a single predicted dataset from current model
-      SUBROUTINE FIT_PREDDAT( FSTAT, NDS, OBDAT, INSTR, PREDDAT, MODEL,
-     :                        PARAM, N, PRED, STATUS )
+      SUBROUTINE FIT_PREDDAT( FSTAT, NDS, IMOD, PARAM, N, PRED, STATUS )
 *
 *    Description :
 *
@@ -60,27 +59,29 @@
 *
 *    Import :
 *
-	INTEGER FSTAT			! Fit statistic flag (1=chisq, 2=l'hood)
-	INTEGER NDS			! Number of observed datasets
-	RECORD/DATASET/OBDAT(NDS)	! Observed datasets
-	RECORD/INSTR_RESP/INSTR(NDS)	! Instrument responses
-	RECORD/MODEL_SPEC/MODEL		! Model specification
-	RECORD/PREDICTION/PREDDAT(NDS)	! Data predicted by model
-	REAL PARAM(NPAMAX)		! Model parameters
-	INTEGER N			! Dataset no
+      INTEGER FSTAT			! Fit statistic flag (1=chisq, 2=l'hood)
+      INTEGER NDS			! Number of observed datasets
+c     RECORD/DATASET/OBDAT(NDS)		! Observed datasets
+c     RECORD/INSTR_RESP/INSTR(NDS)	! Instrument responses
+c     RECORD/MODEL_SPEC/MODEL		! Model specification
+      INTEGER IMOD
+c     RECORD/PREDICTION/PREDDAT(NDS)	! Data predicted by model
+      REAL PARAM(NPAMAX)		! Model parameters
+      INTEGER N				! Dataset no
 *
 *    Export :
 *
-	REAL PRED(*)			! Array of predicted data
+      REAL PRED(*)			! Array of predicted data
 *
 *    Status :
 *
-	INTEGER STATUS
+      INTEGER STATUS
 *
 *    Local variables :
 *
-	LOGICAL COUNTMODEL		! Predicted data required in counts
-	INTEGER IERR,NERR		! Error arguments for VEC_* routines
+      LOGICAL COUNTMODEL		! Predicted data required in counts
+      INTEGER IERR,NERR			! Error arguments for VEC_* routines
+      INTEGER IDIMM(FIT__MXDIM),I
 *-
 
 *  Check inherited global status
@@ -89,42 +90,50 @@
 *  Check if raw count model is required
       COUNTMODEL = ( FSTAT .EQ. FIT__LOGL )
 
+*  Copy out the axis pointers
+      DO I = 1, FIT__MXDIM
+        IDIMM(I) = PREDICTION_IDIMM(N, I)
+      END DO
+
 *  Convolution with instrument response required
-      IF ( PREDDAT(N).CONVOLVE ) THEN
+      IF ( PREDICTION_CONVOLVE(N) ) THEN
 
 *    Generate model space data
-	CALL FIT_MCALC( MODEL, PARAM, N, PREDDAT(N).NMDIM,
-     :                  PREDDAT(N).IDIMM, PREDDAT(N).NMDAT,
-     :                  PREDDAT(N).NMBOUND,%VAL(PREDDAT(N).MLBNDPTR),
-     :                  %VAL(PREDDAT(N).MUBNDPTR),%VAL(MODEL.STACKPTR),
-     :                  %VAL(PREDDAT(N).MPTR),STATUS)
+	CALL FIT_MCALC( IMOD, PARAM, N, PREDICTION_NMDIM(N),
+     :                  IDIMM, PREDICTION_NMDAT(N),
+     :                  PREDICTION_NMBOUND(N),
+     :                  %VAL(PREDICTION_MLBNDPTR(N)),
+     :                  %VAL(PREDICTION_MUBNDPTR(N)),
+     :                  %VAL(MODEL_SPEC_STACKPTR(IMOD)),
+     :                  %VAL(PREDICTION_MPTR(N)),STATUS)
 
 *    Fold through instrument response. Test for new style response
-        CALL ERI_FOLD( PREDDAT(N).NMDAT, %VAL(PREDDAT(N).MPTR),
-     :                 OBDAT(N).NDAT, INSTR(N).R_ID, INSTR(N).A_ID,
-     :                 PRED, STATUS )
+        CALL ERI_FOLD( PREDICTION_NMDAT(N), %VAL(PREDICTION_MPTR(N)),
+     :                 DATASET_NDAT(N), INSTR_RESP_R_ID(N),
+     :                 INSTR_RESP_A_ID(N), PRED, STATUS )
 
       ELSE
 
 *    No convolution required (i.e. model space = data space )
-	CALL FIT_MCALC( MODEL, PARAM, N, PREDDAT(N).NMDIM,
-     :                  PREDDAT(N).IDIMM, PREDDAT(N).NMDAT,
-     :                  PREDDAT(N).NMBOUND, %VAL(PREDDAT(N).MLBNDPTR),
-     :                  %VAL(PREDDAT(N).MUBNDPTR),
-     :                  %VAL(MODEL.STACKPTR), PRED, STATUS )
+	CALL FIT_MCALC( IMOD, PARAM, N, PREDICTION_NMDIM(N),
+     :                  IDIMM, PREDICTION_NMDAT(N),
+     :                  PREDICTION_NMBOUND(N),
+     :                  %VAL(PREDICTION_MLBNDPTR(N)),
+     :                  %VAL(PREDICTION_MUBNDPTR(N)),
+     :                  %VAL(MODEL_SPEC_STACKPTR(N)), PRED, STATUS )
 
       END IF
 
 *  Scale by vignetting array if present
 c      IF ( OBDAT(N).V_ID .NE. ADI__NULLID ) THEN
-c	CALL VEC_MULR( .FALSE., OBDAT(N).NDAT, %VAL(OBDAT(N).VIGPTR),
+c       CALL VEC_MULR( .FALSE., DATASET_NDAT(N), %VAL(DATASET_VIGPTR(N)),
 c     :                 PRED, PRED, IERR, NERR, STATUS )
 c      END IF
 
 *  Scale up by TEFF and add background if count model is required
       IF ( COUNTMODEL ) THEN
-	CALL ARR_MULTR( OBDAT(N).TEFF, OBDAT(N).NDAT, PRED, STATUS )
-	CALL VEC_ADDR( .FALSE., OBDAT(N).NDAT, %VAL(OBDAT(N).BPTR),
+	CALL ARR_MULTR( DATASET_TEFF(N), DATASET_NDAT(N), PRED, STATUS )
+	CALL VEC_ADDR( .FALSE., DATASET_NDAT(N), %VAL(DATASET_BPTR(N)),
      :                 PRED, PRED, IERR, NERR, STATUS )
       END IF
 

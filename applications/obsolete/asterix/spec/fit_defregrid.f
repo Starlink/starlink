@@ -1,6 +1,6 @@
 *+  FIT_DEFREGRID - Define values in a regular grid axis block
       SUBROUTINE FIT_DEFREGRID( PAR, NVAL, LOGARITHMIC, BASE, SCALE,
-     :                                                 GAX, STATUS )
+     :                                                 IAX, STATUS )
 *
 *    Description :
 *
@@ -36,7 +36,8 @@
 *
 *    Export :
 *
-      RECORD /GRID_AXIS/       GAX                     ! Grid axis block
+c     RECORD /GRID_AXIS/       GAX                     ! Grid axis block
+      INTEGER                  IAX
 *
 *    Status :
 *
@@ -47,11 +48,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Fill in fields
-      GAX.PAR = PAR
-      GAX.REGULAR = .TRUE.
-      GAX.NVAL = NVAL
-      GAX.LOGARITHMIC = LOGARITHMIC
-      GAX.BASE = BASE
-      GAX.SCALE = SCALE
+      GRID_AXIS_PAR(IAX) = PAR
+      GRID_AXIS_REGULAR(IAX) = .TRUE.
+      GRID_AXIS_NVAL(IAX) = NVAL
+      GRID_AXIS_LOGARITHMIC(IAX) = LOGARITHMIC
+      GRID_AXIS_BASE(IAX) = BASE
+      GRID_AXIS_SCALE(IAX) = SCALE
 
       END

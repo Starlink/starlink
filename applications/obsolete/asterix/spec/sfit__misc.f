@@ -1,5 +1,5 @@
 *+  SFIT_MAPMODSTK - Allocate space for model stack
-      SUBROUTINE SFIT_MAPMODSTK( NDS, PREDDAT, SPTR, STATUS )
+      SUBROUTINE SFIT_MAPMODSTK( NDS, SPTR, STATUS )
 *
 *    Description :
 *
@@ -37,7 +37,7 @@
 *    Import :
 *
       INTEGER               NDS                    ! # observed datasets
-      RECORD /PREDICTION/   PREDDAT(NDS)           ! Data predicted by model
+c     RECORD /PREDICTION/   PREDDAT(NDS)           ! Data predicted by model
 *
 *    Export :
 *
@@ -52,7 +52,7 @@
 *    Find length of longest data array
       NMAX=0
       DO N = 1, NDS
-	IF ( PREDDAT(N).NMDAT .GT. NMAX ) NMAX = PREDDAT(N).NMDAT
+	IF ( PREDICTION_NMDAT(N) .GT. NMAX ) NMAX = PREDICTION_NMDAT(N)
       ENDDO
       CALL DYN_MAPR( 1, NMAX*MAXSTACK, SPTR, STATUS )
 

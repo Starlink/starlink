@@ -1,6 +1,6 @@
 *+  FIT_PARERR - Estimates 1 sigma errors in best fit parameters
-      SUBROUTINE FIT_PARERR(NDS,OBDAT,INSTR,MODEL,NPAR,PARAM,LB,UB,DPAR,
-     :       FROZEN,PEGGED,SSCALE,FSTAT,PREDICTOR,PREDDAT,PARSIG,STATUS)
+      SUBROUTINE FIT_PARERR(NDS,IMOD,NPAR,PARAM,LB,UB,DPAR,
+     :       FROZEN,PEGGED,SSCALE,FSTAT,PREDICTOR,PARSIG,STATUS)
 *
 *    Description :
 *
@@ -65,9 +65,10 @@
 *    Import :
 *
       INTEGER             NDS			! Number of observed datasets
-      RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
-      RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
+c     RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
+c     RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
       INTEGER             NPAR			! No of parameters
       REAL                PARAM(NPAMAX)		! Model parameters
       REAL                LB(NPAR)		! Parameter lower bounds
@@ -81,7 +82,7 @@
 *
 *    Import/export :
 *
-      RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
+c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
                                                 ! (actually only the data
 *                                               ! pointed to are updated)
 *    Export :
@@ -120,7 +121,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Extend FROZEN array to handle constrained parameters
-      CALL FIT1_LOCFRO( MODEL, NPAR, FROZEN, LFROZEN, STATUS )
+      CALL FIT1_LOCFRO( IMOD, NPAR, FROZEN, LFROZEN, STATUS )
 
 *    Set up upper and lower increments for parameters (taking bounds into
 *    account) and parameter scale factors
@@ -181,10 +182,10 @@
 	  UPAR(JP1)=PARAM(JP1)+DPUP(JP1)
 
 *        Find derivative at -+ve deviations
-	  CALL FIT_STATDERIV(NDS,OBDAT,INSTR,MODEL,NPAR,LPAR,LB,UB,JP2,
-     :             DPAR(JP2),FSTAT,PREDICTOR,PREDDAT,LSTATDERIV,STATUS)
-	  CALL FIT_STATDERIV(NDS,OBDAT,INSTR,MODEL,NPAR,UPAR,LB,UB,JP2,
-     :             DPAR(JP2),FSTAT,PREDICTOR,PREDDAT,USTATDERIV,STATUS)
+	  CALL FIT_STATDERIV(NDS,IMOD,NPAR,LPAR,LB,UB,JP2,
+     :             DPAR(JP2),FSTAT,PREDICTOR,LSTATDERIV,STATUS)
+	  CALL FIT_STATDERIV(NDS,IMOD,NPAR,UPAR,LB,UB,JP2,
+     :             DPAR(JP2),FSTAT,PREDICTOR,USTATDERIV,STATUS)
           IF(STATUS.NE.SAI__OK) GO TO 9000
 
 *        Form alpha matrix (derivs of reduced chisq in terms of scaled params)
@@ -219,8 +220,8 @@
 	END DO
 
 *      Copy errors to dependent parameters
-        IF ( MODEL.NTIE .GT. 0 ) THEN
-          CALL FIT1_COPDEP( MODEL, PARSIG, STATUS )
+        IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
+          CALL FIT1_COPDEP( IMOD, PARSIG, STATUS )
         END IF
 
       ELSE

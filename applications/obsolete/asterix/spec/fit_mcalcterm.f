@@ -1,8 +1,8 @@
 *+  FIT_MCALCTERM - Evaluate additive term of a compound model
-      SUBROUTINE FIT_MCALCTERM( MODEL, NTERM, TERMS, SIGNS, ITERM,
+      SUBROUTINE FIT_MCALCTERM( IMOD, NTERM, TERMS, SIGNS, ITERM,
      :                          PARAM, ND, NMDIM, IDIMM, NMDAT,
      :                          NMBOUND, MLBOUND, MUBOUND, STACK,
-     :                          TMODEL, PRED, STATUS )
+     :                          TMOD, PRED, STATUS )
 *
 *    Description :
 *
@@ -43,7 +43,8 @@
 *
 *    Import :
 *
-      RECORD /MODEL_SPEC/	MODEL			! Model specification
+c     RECORD /MODEL_SPEC/	MODEL			! Model specification
+      INTEGER			IMOD
       INTEGER			NTERM			! No. additive terms
       INTEGER			TERMS(MAXCOMP,NTERM)	! Additive terms
       INTEGER			SIGNS(NTERM)		! Signs on terms (+-1)
@@ -60,7 +61,8 @@
 *    Export :
 *
       REAL   			STACK(NMDAT,MAXSTACK)	! Model stack
-      RECORD /MODEL_SPEC/	TMODEL			! Term model spec
+c     RECORD /MODEL_SPEC/	TMODEL			! Term model spec
+      INTEGER			TMOD
       REAL			PRED(*)			! Output data
 *
 *    Status :
@@ -90,66 +92,69 @@
 
 *    Construct term specification from TERMS array
       FOUND = .FALSE.
-      TMODEL.SPEC = ' '
+      MODEL_SPEC_SPEC(TMOD) = ' '
       TLEN = 1
       ICOMP = 1
       DO WHILE ( (ICOMP.LE.MAXCOMP) .AND. .NOT. FOUND )
         IF ( TERMS(ICOMP,ITERM) .EQ. 0 ) THEN
           FOUND = .TRUE.
         ELSE
-          KLEN = CHR_LEN(MODEL.KEY(TERMS(ICOMP,ITERM)))
-          TMODEL.SPEC = TMODEL.SPEC(:TLEN)//'*'/
-     :                 /MODEL.KEY(TERMS(ICOMP,ITERM))(:KLEN)
+          KLEN = CHR_LEN(MODEL_SPEC_KEY(IMOD,TERMS(ICOMP,ITERM)))
+          MODEL_SPEC_SPEC(TMOD) = MODEL_SPEC_SPEC(TMOD)(:TLEN)//'*'//
+     :                 MODEL_SPEC_KEY(IMOD,TERMS(ICOMP,ITERM))(:KLEN)
           TLEN = TLEN + KLEN + 1
           ICOMP = ICOMP + 1
         END IF
       END DO
-      TMODEL.SPEC = TMODEL.SPEC(3:TLEN)
+      MODEL_SPEC_SPEC(TMOD) = MODEL_SPEC_SPEC(TMOD)(3:TLEN)
 
 *    Number of components in term model
-      TMODEL.NCOMP = ICOMP - 1
+      MODEL_SPEC_NCOMP(TMOD) = ICOMP - 1
 
 *    Calculate the polish string. Something seriously wrong if this doesn't
 *    work!
-      CALL FIT_POLTRAN( TMODEL.SPEC, TMODEL.POLISH, STATUS )
+      CALL FIT_POLTRAN( MODEL_SPEC_SPEC(TMOD), MODEL_SPEC_POLISH(TMOD),
+     :                  STATUS )
 
 *    Top-level MODEL components
-      TMODEL.GENUS = MODEL.GENUS
-      TMODEL.STACKPTR = MODEL.STACKPTR
+      MODEL_SPEC_GENUS(TMOD) = MODEL_SPEC_GENUS(IMOD)
+      MODEL_SPEC_STACKPTR(TMOD) = MODEL_SPEC_STACKPTR(IMOD)
 
 *    Copy parameter stuff from MODEL
-      TMODEL.NPAR = 0
-      DO ICOMP = 1, TMODEL.NCOMP
+      MODEL_SPEC_NPAR(TMOD) = 0
+      DO ICOMP = 1, MODEL_SPEC_NCOMP(TMOD)
 
 *      Original model component number
         MCOMP = TERMS(ICOMP,ITERM)
 
 *      First the stuff which is stored for each pmodel
-        TMODEL.KEY(ICOMP) = MODEL.KEY(MCOMP)
-        TMODEL.ADDITIVE(ICOMP) = MODEL.ADDITIVE(MCOMP)
+        MODEL_SPEC_KEY(TMOD,ICOMP) = MODEL_SPEC_KEY(IMOD,MCOMP)
+        MODEL_SPEC_ADDITIVE(TMOD,ICOMP) =
+     :                                  MODEL_SPEC_ADDITIVE(IMOD,MCOMP)
 
 *      Last MODEL parameter in this pmodel
-        IF ( MCOMP .EQ. MODEL.NCOMP ) THEN
-          LASTPAR = MODEL.NPAR
+        IF ( MCOMP .EQ. MODEL_SPEC_NCOMP(IMOD) ) THEN
+          LASTPAR = MODEL_SPEC_NPAR(IMOD)
         ELSE
-          LASTPAR = MODEL.ISTART(MCOMP+1)-1
+          LASTPAR = MODEL_SPEC_ISTART(IMOD,MCOMP+1)-1
         END IF
 
 *      First parameter for this pmodel
-        TMODEL.ISTART(ICOMP) = TMODEL.NPAR + 1
+        MODEL_SPEC_ISTART(TMOD,ICOMP) = MODEL_SPEC_NPAR(TMOD) + 1
 
 *      Copy parameters into local array
-        CALL ARR_COP1R( LASTPAR-MODEL.ISTART(MCOMP)+1,
-     :                  PARAM(MODEL.ISTART(MCOMP)),
-     :                  TPARAM(TMODEL.ISTART(ICOMP)), STATUS )
+        CALL ARR_COP1R( LASTPAR-MODEL_SPEC_ISTART(IMOD,MCOMP)+1,
+     :                  PARAM(MODEL_SPEC_ISTART(IMOD,MCOMP)),
+     :                  TPARAM(MODEL_SPEC_ISTART(TMOD,ICOMP)), STATUS )
 
 *      Increment local parameter counter
-        TMODEL.NPAR = TMODEL.NPAR + LASTPAR - MODEL.ISTART(MCOMP) + 1
+        MODEL_SPEC_NPAR(TMOD) = MODEL_SPEC_NPAR(TMOD) + LASTPAR -
+     :                          MODEL_SPEC_ISTART(IMOD,MCOMP) + 1
 
       END DO
 
 *    Perform the calculation
-      CALL FIT_MCALC( TMODEL, TPARAM, ND, NMDIM, IDIMM, NMDAT, NMBOUND,
+      CALL FIT_MCALC( TMOD, TPARAM, ND, NMDIM, IDIMM, NMDAT, NMBOUND,
      :                MLBOUND, MUBOUND, STACK, PRED, STATUS )
 
 *    Does model have a negative sign?

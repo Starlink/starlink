@@ -116,7 +116,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'FOLDGRID Version 2.2-0' )
+        PARAMETER		( VERSION = 'FOLDGRID Version 2.2-1' )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	ILOC			! Input grid locator

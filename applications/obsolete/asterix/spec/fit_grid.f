@@ -1,8 +1,8 @@
 *+  FIT_GRID - Make a grid of the fit statistic and/or free pars vs grid pars
-      SUBROUTINE FIT_GRID( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
-     :                     NAXIS, GRID, NGRID, GRIDPAR, NPAR, LB, UB,
-     :                     FROZEN, SSCALE, FSTAT, PREDICTOR, PREDDAT,
-     :                   PARAM, STATMIN, GDATA, GQUAL, GQMASK, STATUS )
+      SUBROUTINE FIT_GRID( NDS, IMOD, MCTRL, OPCHAN,
+     :                     NAXIS, NGRID, GRIDPAR, NPAR, LB, UB,
+     :                     FROZEN, SSCALE, FSTAT, PREDICTOR, PARAM,
+     :                     STATMIN, GDATA, GQUAL, GQMASK, STATUS )
 *
 *    Description :
 *
@@ -83,14 +83,15 @@
 *    Import :
 *
       INTEGER             NDS			! Number of observed datasets
-      RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
-      RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
-      INTEGER			MCTRL
+c     RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
+c     RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
+      INTEGER		  MCTRL
       INTEGER 		  OPCHAN		! Output channel for diagnostic
 						! messages ( <1 for no messages)
       INTEGER             NAXIS                 ! Number of grid axes
-      RECORD /GRID_AXIS/  GRID(*)               ! Grid axis definitions
+c     RECORD /GRID_AXIS/  GRID(*)               ! Grid axis definitions
       INTEGER             NGRID                 ! # of grids
       INTEGER             GRIDPAR(NGRID)        ! Quantity for grids (0->NPAR)
       INTEGER 		  NPAR			! No of parameters
@@ -103,7 +104,7 @@
 *
 *    Import-Export :
 *
-      RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
+c     RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
                                                 ! (actually only the data
                                                 ! pointed to are updated)
       REAL 		  PARAM(NPAMAX)		! Model parameters
@@ -171,7 +172,7 @@
 
 *    Construct grid dimensions and pad to 7D
       DO IAX = 1, NAXIS
-        DIMS(IAX) = GRID(IAX).NVAL
+        DIMS(IAX) = GRID_AXIS_NVAL(IAX)
         USED(IAX) = .TRUE.
       END DO
       DO IAX = NAXIS + 1, ADI__MXDIM
@@ -180,12 +181,12 @@
       END DO
 
 *    Invoke internal routine
-      CALL FIT_GRID_INT( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
-     :                   NAXIS, GRID, NGRID, GRIDPAR, NPAR, LB, UB,
+      CALL FIT_GRID_INT( NDS, IMOD, MCTRL, OPCHAN,
+     :                   NAXIS, NGRID, GRIDPAR, NPAR, LB, UB,
      :                   FROZEN, SSCALE, FSTAT, PREDICTOR,
-     :           PREDDAT, PARAM, DIMS(1), DIMS(2), DIMS(3), DIMS(4),
-     :           DIMS(5), DIMS(6), DIMS(7),
-     :           USED, STATMIN, GDATA, GQUAL, GQMASK, STATUS )
+     :                   PARAM, DIMS(1), DIMS(2), DIMS(3), DIMS(4),
+     :                   DIMS(5), DIMS(6), DIMS(7), USED,
+     :                   STATMIN, GDATA, GQUAL, GQMASK, STATUS )
 
 *    Exit
  9000 IF ( STATUS .NE. SAI__OK ) THEN
@@ -196,7 +197,7 @@
 
 
 *+  FIT_GRID_AXVAL - Extract the N'th grid axis value from an axis description
-      SUBROUTINE FIT_GRID_AXVAL( AXIS, N, PARAM, STATUS )
+      SUBROUTINE FIT_GRID_AXVAL( IAX, N, PARAM, STATUS )
 *
 *    Description :
 *
@@ -230,7 +231,8 @@
 *
 *    Import :
 *
-      RECORD /GRID_AXIS/  AXIS                  ! The grid axis
+c     RECORD /GRID_AXIS/  AXIS                  ! The grid axis
+      INTEGER             IAX
       INTEGER             N                     ! Index of value required
 *
 *    Import / Export :
@@ -246,21 +248,21 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Select on axis type
-      IF ( AXIS.REGULAR ) THEN
-        PARAM = AXIS.BASE + (N-1)*AXIS.SCALE
+      IF ( GRID_AXIS_REGULAR(IAX) ) THEN
+        PARAM = GRID_AXIS_BASE(IAX) + (N-1)*GRID_AXIS_SCALE(IAX)
       ELSE
-        CALL ARR_ELEM1R( AXIS.VPTR, AXIS.NVAL, N, PARAM, STATUS )
+        CALL ARR_ELEM1R( GRID_AXIS_VPTR(IAX), GRID_AXIS_NVAL(IAX), N,
+     :                   PARAM, STATUS )
       END IF
-      IF ( AXIS.LOGARITHMIC ) PARAM = 10.0**PARAM
+      IF ( GRID_AXIS_LOGARITHMIC(IAX) ) PARAM = 10.0**PARAM
 
       END
 
 
 *+  FIT_GRID_INT - Produce a grid of the fit statistic vs parameters
-      SUBROUTINE FIT_GRID_INT( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
-     :             NAXIS, GRID, NGRID, GRIDPAR, NPAR, LB, UB, FROZEN,
-     :             SSCALE,
-     :             FSTAT, PREDICTOR, PREDDAT, PARAM,
+      SUBROUTINE FIT_GRID_INT( NDS, IMOD, MCTRL, OPCHAN,
+     :             NAXIS, NGRID, GRIDPAR, NPAR, LB, UB, FROZEN,
+     :             SSCALE, FSTAT, PREDICTOR, PARAM,
      :             L1, L2, L3, L4, L5, L6, L7, USED,
      :             STATMIN, GDATA, GQUAL, GQMASK, STATUS )
 *
@@ -312,14 +314,15 @@
 *    Import :
 *
       INTEGER             NDS			! Number of observed datasets
-      RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
-      RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
-      INTEGER			MCTRL
+c     RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
+c     RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
+      INTEGER		  MCTRL
       INTEGER 		  OPCHAN		! Output channel for diagnostic
 						! messages ( <1 for no messages)
       INTEGER             NAXIS                 ! Number of grid axes
-      RECORD /GRID_AXIS/  GRID(*)               ! Grid axis definitions
+c     RECORD /GRID_AXIS/  GRID(*)               ! Grid axis definitions
       INTEGER             NGRID                 ! # of grids
       INTEGER             GRIDPAR(NGRID)        ! Quantity for grids (0->NPAR)
       INTEGER 		  NPAR			! No of parameters
@@ -334,7 +337,7 @@
 *
 *    Import-Export :
 *
-      RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
+c     RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
                                                 ! (actually only the data
                                                 ! pointed to are updated)
       REAL 		  PARAM(NPAMAX)		! Model parameters. On output
@@ -412,7 +415,7 @@
         LOCPAR(I) = PARAM(I)
       END DO
       DO I = 1, NAXIS
-        LOCFRO(GRID(I).PAR) = .TRUE.
+        LOCFRO(GRID_AXIS_PAR(I)) = .TRUE.
       END DO
 
 *    Total number of elements
@@ -468,7 +471,7 @@
 
 *    Set up parameter values
       DO I = 1, NAXIS
-        CALL FIT_GRID_AXVAL( GRID(I), GI(I), LOCPAR(GRID(I).PAR),
+        CALL FIT_GRID_AXVAL( I, GI(I), LOCPAR(GRID_AXIS_PAR(I)),
      :                                                   STATUS )
       END DO
 
@@ -479,8 +482,8 @@
       IF ( NUNFROZEN .EQ. 0 ) THEN
 
 *      Just evaluate statistic
-        CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, LOCPAR, FSTAT,
-     :                       PREDICTOR, PREDDAT, STAT, STATUS )
+        CALL FIT_STAT( NDS, IMOD, LOCPAR, FSTAT, PREDICTOR, STAT,
+     :                 STATUS )
 
 *      Ok?
         IF ( STATUS .EQ. SAI__OK ) THEN
@@ -493,9 +496,9 @@
 
 *    Minimise with respect to parameters not on the grid
         CALL FCI_RESET( MCTRL, STATUS )
-        CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0, .FALSE.,
+        CALL FIT_MIN( NDS, IMOD, MCTRL, 0, .FALSE.,
      :                NPAR, LB, UB, LOCFRO, SSCALE,
-     :                FSTAT, PREDICTOR, PREDDAT, LOCPAR, DPAR, PEGGED,
+     :                FSTAT, PREDICTOR, LOCPAR, DPAR, PEGGED,
      :                STAT, FINISHED, FITERR, STATUS )
 
 *    Severe fitting error?
@@ -542,7 +545,7 @@
         ELSE IF ( GRIDPAR(IGR) .EQ. 99 ) THEN
 
 *        Calculate fit probability
-          CALL FIT_MPROB( NDS, OBDAT, FSTAT, SSCALE, PREDDAT, STAT,
+          CALL FIT_MPROB( NDS, FSTAT, SSCALE, STAT,
      :                    PROB, STATUS )
 
 *        Store in grid

@@ -123,7 +123,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SDATA Version 2.2-0' )
+        PARAMETER		( VERSION = 'SDATA Version 2.2-1' )
 
 *  Local Variables:
       CHARACTER*132		FNAME 			! Referenced file name

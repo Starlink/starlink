@@ -1,8 +1,8 @@
 *+  FIT_PARCON - Evaluates confidence intervals for some model parameters
-      SUBROUTINE FIT_PARCON( NDS, OBDAT, INSTR, MODEL, MCTRL, SOFF,
+      SUBROUTINE FIT_PARCON( NDS, IMOD, MCTRL, SOFF,
      :                       OPCHAN, NEPAR, EPAR, NPAR, LB,
      :                       UB, FROZEN, SSCALE, DPAR, FSTAT, PREDICTOR,
-     :                       PREDDAT, STATMIN, PARAM, PEGGED, LE, UE,
+     :                       STATMIN, PARAM, PEGGED, LE, UE,
      :                       PEGCODE, STATUS )
 *
 *    Description :
@@ -124,10 +124,11 @@
 *    Import :
 *
       INTEGER             NDS			! Number of observed datasets
-      RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
-      RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
-      INTEGER			MCTRL			!
+c     RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
+c     RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
+      INTEGER		  MCTRL			!
       REAL                SOFF			! Stat offset for conf. limit
       INTEGER             OPCHAN		! Output channel for diagnostic
 	                                        ! messages ( <1 for no messages)
@@ -144,7 +145,7 @@
 *
 *    Import-Export  :
 *
-      RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
+c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
                                                 ! (actually only the data
                                                 ! pointed to are updated)
       DOUBLE PRECISION    STATMIN		! Statistic at minimum     { only updated
@@ -179,7 +180,7 @@
       IF ( STATUS.NE.SAI__OK ) RETURN
 
 *  Local frozen array
-      CALL FIT1_LOCFRO( MODEL, NPAR, FROZEN, LFROZEN, STATUS )
+      CALL FIT1_LOCFRO( IMOD, NPAR, FROZEN, LFROZEN, STATUS )
 
 *  Initialise
       NUNFROZEN = 0
@@ -245,12 +246,11 @@
 	    END IF
 
 *        Ensure dependencies are up to date
-            CALL FIT1_COPDEP( MODEL, FPAR, STATUS )
-            CALL FIT1_COPDEPL( MODEL, FFROZEN, STATUS )
+            CALL FIT1_COPDEP( IMOD, FPAR, STATUS )
+            CALL FIT1_COPDEPL( IMOD, FFROZEN, STATUS )
 
 *        Get initial value of statistic
-	    CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, FPAR, FSTAT,
-     :                         PREDICTOR, PREDDAT, STAT, STATUS )
+	    CALL FIT_STAT( NDS, IMOD, FPAR, FSTAT, PREDICTOR, STAT, STATUS )
 
 *        Catch case where there is only one parameter (no minimisation needed)
 	    IF ( NUNFROZEN .EQ. 1 ) THEN
@@ -262,9 +262,9 @@
 
 *        Find minimum
             CALL FCI_RESET( MCTRL, STATUS )
-	    CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0, .FALSE.,
+	    CALL FIT_MIN( NDS, IMOD, MCTRL, 0, .FALSE.,
      :                    NPAR, LB, UB, FFROZEN, SSCALE, FSTAT,
-     :                    PREDICTOR, PREDDAT, FPAR, DPAR, FPEGGED, STAT,
+     :                    PREDICTOR, FPAR, DPAR, FPEGGED, STAT,
      :                    FINISHED, FITERR, STATUS )
 	      IF(FITERR.NE.0)THEN
 	        CALL MSG_SETI('FERR',FITERR)
@@ -344,12 +344,11 @@ D	      print *,'new le: ',le(j)
 	      ENDIF
 
 *            Ensure dependencies are up to date
-              CALL FIT1_COPDEP( MODEL, FPAR, STATUS )
-              CALL FIT1_COPDEPL( MODEL, FFROZEN, STATUS )
+              CALL FIT1_COPDEP( IMOD, FPAR, STATUS )
+              CALL FIT1_COPDEPL( IMOD, FFROZEN, STATUS )
 
 *        Get initial chi-squared value
-	      CALL FIT_STAT(NDS,OBDAT,INSTR,MODEL,FPAR,FSTAT,
-     :                          PREDICTOR,PREDDAT,STAT,STATUS)
+	      CALL FIT_STAT(NDS,IMOD,FPAR,FSTAT,PREDICTOR,STAT,STATUS)
 
 *        Catch case where there is only one parameter (no minimisation needed)
 	      IF(NUNFROZEN.EQ.1)THEN
@@ -361,9 +360,9 @@ D	      print *,'new le: ',le(j)
 
 *        Find minimum
               CALL FCI_RESET( MCTRL, STATUS )
-	      CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0,
+	      CALL FIT_MIN( NDS, IMOD, MCTRL, 0,
      :                      .FALSE., NPAR, LB, UB, FFROZEN, SSCALE,
-     :                      FSTAT, PREDICTOR, PREDDAT, FPAR, DPAR,
+     :                      FSTAT, PREDICTOR, FPAR, DPAR,
      :                      FPEGGED, STAT, FINISHED, FITERR, STATUS )
 	      IF(FITERR.NE.0)THEN
 	        CALL MSG_SETI('FERR',FITERR)
@@ -436,8 +435,8 @@ D	      print *,'new le: ',le(j)
       END DO
 
 *  Ensure dependent parameters are set up
-      CALL FIT1_COPDEP( MODEL, LE, STATUS )
-      CALL FIT1_COPDEP( MODEL, UE, STATUS )
+      CALL FIT1_COPDEP( IMOD, LE, STATUS )
+      CALL FIT1_COPDEP( IMOD, UE, STATUS )
 
 *  Exit
  9000 IF ( (STATUS.NE.SAI__OK) .AND. (STATUS.NE.USER__001) ) THEN

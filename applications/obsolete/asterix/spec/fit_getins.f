@@ -1,5 +1,5 @@
 *+  FIT_GETINS - Gets instrument energy response and checks against axis values
-      SUBROUTINE FIT_GETINS( ID, INDEX, E_AX, FOUND, INSTR, STATUS )
+      SUBROUTINE FIT_GETINS( ID, INDEX, E_AX, FOUND, IRESP, STATUS )
 *
 *    Description :
 *
@@ -29,13 +29,17 @@
 *
 *    Type definitions :
       IMPLICIT NONE
+
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'FIT_PAR'
+
 *    Global variables :
+
 *    Structure definitions :
       INCLUDE 'FIT_STRUC'
+
 *    Import :
       INTEGER			ID			! Dataset identifier
       INTEGER 			INDEX			! Position in spectral set (0 if not)
@@ -43,12 +47,14 @@
 *
 *    Export :
 *
-	LOGICAL FOUND			! Instrument energy response found?
-	RECORD /INSTR_RESP/ INSTR	! Instrument response
+      LOGICAL			FOUND			! Instrument energy response found?
+c     RECORD /INSTR_RESP/	INSTR			! Instrument response
+      INTEGER			IRESP
 *
 *    Status :
 *
-	INTEGER STATUS
+      INTEGER STATUS
+
 *    Local variables :
       CHARACTER*10		MTH			! Storage method
 
@@ -69,7 +75,8 @@
       FOUND = .FALSE.
 
 *  Locate the response data
-      CALL ERI_GETIDS( ID, INDEX, INSTR.R_ID, INSTR.A_ID, STATUS )
+      CALL ERI_GETIDS( ID, INDEX, INSTR_RESP_R_ID(IRESP),
+     :                 INSTR_RESP_A_ID(IRESP), STATUS )
 
 *  Input is a binned dataset?
       CALL ADI_DERVD( ID, 'BinDS', ISBIN, STATUS )
@@ -85,7 +92,8 @@
           CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
 
 *    Response dimensions must
-          CALL ADI_CSIZE( INSTR.R_ID, 'ChannelSpec', NCC, STATUS )
+          CALL ADI_CSIZE( INSTR_RESP_R_ID(IRESP), 'ChannelSpec', NCC,
+     :                    STATUS )
           IF ( NCC .NE. DIMS(E_AX) ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Number of dataset energy axis bins '/
@@ -93,12 +101,13 @@
 
 *    ChannelSpec exists?
           ELSE
-            CALL ADI_CGET0C( INSTR.R_ID, 'CompressMethod', MTH, STATUS )
+            CALL ADI_CGET0C( INSTR_RESP_R_ID(IRESP), 'CompressMethod',
+     :                        MTH, STATUS )
             IF ( MTH(1:7) .EQ. 'ASTERIX' ) THEN
 
 *      Map channel centres field and check against axis values
-              CALL ADI_CMAPR( INSTR.R_ID, 'ChannelSpec', 'READ',
-     :                        RCPTR, STATUS )
+              CALL ADI_CMAPR( INSTR_RESP_R_ID(IRESP), 'ChannelSpec',
+     :                        'READ', RCPTR, STATUS )
 
 *      Map in axis values
               CALL BDI_AXMAPR( ID, E_AX, 'Data', 'READ', AXPTR, STATUS )
@@ -108,7 +117,7 @@
      :                                %VAL(RCPTR), STATUS )
 
 *      Release the axis and spec array
-              CALL ADI_CUNMAP( INSTR.R_ID, 'ChannelSpec',
+              CALL ADI_CUNMAP( INSTR_RESP_R_ID(IRESP), 'ChannelSpec',
      :                          RCPTR, STATUS )
               CALL BDI_AXUNMAP( ID, E_AX, 'Data', AXPTR, STATUS )
 
@@ -131,8 +140,8 @@
      :            /'channels are assumed to be energy in keV' )
         CALL MSG_PRNT( '          and data 10**30 erg/s/bin. Data '/
      :                     /'will be compared directly with model' )
-        INSTR.R_ID = ADI__NULLID
-        INSTR.A_ID = ADI__NULLID
+        INSTR_RESP_R_ID(IRESP) = ADI__NULLID
+        INSTR_RESP_A_ID(IRESP) = ADI__NULLID
 
       END IF
 

@@ -1,5 +1,5 @@
 *+  FIT_PREDSET - Sets up components of <PREDICTION> structure
-	SUBROUTINE FIT_PREDSET( DID, NDS, WORKSPACE, OBDAT, PREDDAT,
+	SUBROUTINE FIT_PREDSET( DID, NDS, WORKSPACE, IDAT, IPRED,
      :                          STATUS )
 *    Description :
 *     All components of the FORTRAN structure PREDDAT (of type <PREDICTION>),
@@ -49,9 +49,10 @@
         INTEGER			DID			! Dataset identifier
 	INTEGER NDS			! Current dataset number
 	LOGICAL WORKSPACE		! Set up chisq gradient workspace?
-	RECORD /DATASET/ OBDAT		! Observed datasets
+c	RECORD /DATASET/ OBDAT		! Observed datasets
 *    Import-Export :
-	RECORD /PREDICTION/ PREDDAT	! Data predicted by model
+c	RECORD /PREDICTION/ PREDDAT	! Data predicted by model
+        INTEGER IDAT, IPRED
 *    Export :
 *    Status :
 	INTEGER STATUS
@@ -60,92 +61,111 @@
 	INTEGER MBNDPTR			! Pointer to bounds in response object
 	INTEGER I			! Index
       INTEGER			RMFID, ARFID
+      INTEGER			IDIMM(FIT__MXDIM)
 *-
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Instrument folding case (model space bins taken from response structure)
-      IF ( PREDDAT.CONVOLVE ) THEN
+      IF ( PREDICTION_CONVOLVE(IPRED) ) THEN
 
 *    Locate response
-        CALL ERI_GETIDS( DID, OBDAT.SETINDEX, RMFID, ARFID, STATUS )
+        CALL ERI_GETIDS( DID, DATASET_SETINDEX(IDAT), RMFID, ARFID,
+     :                   STATUS )
 
 *    Size of model space energy axis
-        CALL ADI_CGET0I( RMFID, 'NENERGY', PREDDAT.NMDAT, STATUS )
+        CALL ADI_CGET0I( RMFID, 'NENERGY', PREDICTION_NMDAT(IPRED),
+     :                   STATUS )
 
 *    This is 1-D specific
-	PREDDAT.NMDIM = 1
-	PREDDAT.IDIMM(1) = PREDDAT.NMDAT
-	PREDDAT.NMBOUND = PREDDAT.NMDAT
+	PREDICTION_NMDIM(IPRED) = 1
+	PREDICTION_IDIMM(IPRED,1) = PREDICTION_NMDAT(IPRED)
+	PREDICTION_NMBOUND(IPRED) = PREDICTION_NMDAT(IPRED)
 
 *    Set up model space bounds
-	CALL DYN_MAPR( 1, PREDDAT.NMBOUND, PREDDAT.MLBNDPTR, STATUS )
-	CALL DYN_MAPR( 1, PREDDAT.NMBOUND, PREDDAT.MUBNDPTR, STATUS )
+	CALL DYN_MAPR( 1, PREDICTION_NMBOUND(IPRED),
+     :                 PREDICTION_MLBNDPTR(IPRED), STATUS )
+	CALL DYN_MAPR( 1, PREDICTION_NMBOUND(IPRED),
+     :                 PREDICTION_MUBNDPTR(IPRED), STATUS )
 	IF(STATUS.NE.SAI__OK) GOTO 99
 
 *    Map energy bounds, decompose into lower and upper arrays
         CALL ADI_CMAPR( RMFID, 'Energy', 'READ', MBNDPTR, STATUS )
-	CALL FIT_PREDSET_LUBND( PREDDAT.NMBOUND, %VAL(MBNDPTR),
-     :          %VAL(PREDDAT.MLBNDPTR),%VAL(PREDDAT.MUBNDPTR))
+	CALL FIT_PREDSET_LUBND( PREDICTION_NMBOUND(IPRED),
+     :                          %VAL(MBNDPTR),
+     :                          %VAL(PREDICTION_MLBNDPTR(IPRED)),
+     :                          %VAL(PREDICTION_MUBNDPTR(IPRED)))
         CALL ADI_CUNMAP( RMFID, 'Energy', MBNDPTR, STATUS )
 
 *    Storage for predicted model array
-	CALL DYN_MAPR( 1, PREDDAT.NMDAT, PREDDAT.MPTR, STATUS )
+	CALL DYN_MAPR( 1, PREDICTION_NMDAT(IPRED),
+     :                 PREDICTION_MPTR(IPRED), STATUS )
 
 *  No convolution - model space is identical to data space. Set up only
 *  those components of PREDDAT required (not MPTR), using data axis values.
       ELSE
 
-	PREDDAT.MPTR=0			! Flag for `not set'
-	PREDDAT.NMDIM=OBDAT.NDIM
-	PREDDAT.NMBOUND=0
-	DO I=1,OBDAT.NDIM
-	  PREDDAT.IDIMM(I) = OBDAT.IDIM(I)
-	  PREDDAT.NMBOUND = PREDDAT.NMBOUND+PREDDAT.IDIMM(I)
+	PREDICTION_MPTR(IPRED)=0			! Flag for `not set'
+	PREDICTION_NMDIM(IPRED)=DATASET_NDIM(IDAT)
+	PREDICTION_NMBOUND(IPRED)=0
+	DO I=1,DATASET_NDIM(IDAT)
+	  PREDICTION_IDIMM(IPRED,I) = DATASET_IDIM(IDAT,I)
+	  PREDICTION_NMBOUND(IPRED) = PREDICTION_NMBOUND(IPRED)+
+     :                                  PREDICTION_IDIMM(IPRED,I)
 	END DO
-	PREDDAT.NMDAT = OBDAT.NDAT
+	PREDICTION_NMDAT(IPRED) = DATASET_NDAT(IDAT)
 
 *    Set up model bounds using axis values from observed data
-	CALL DYN_MAPR(1,PREDDAT.NMBOUND,PREDDAT.MLBNDPTR,STATUS)
-	CALL DYN_MAPR(1,PREDDAT.NMBOUND,PREDDAT.MUBNDPTR,STATUS)
+        DO I = 1, PREDICTION_NMDIM(IPRED)
+          IDIMM(I) =  PREDICTION_IDIMM(IPRED, I)
+        END DO
+	CALL DYN_MAPR(1,PREDICTION_NMBOUND(IPRED),
+     :                                PREDICTION_MLBNDPTR(IPRED),STATUS)
+	CALL DYN_MAPR(1,PREDICTION_NMBOUND(IPRED),
+     :                                PREDICTION_MUBNDPTR(IPRED),STATUS)
 
-	CALL FIT_PREDSET_AXBOUND( DID, NDS,PREDDAT.NMDIM,
-     :    PREDDAT.IDIMM,PREDDAT.NMBOUND,%VAL(PREDDAT.MLBNDPTR),
-     :    %VAL(PREDDAT.MUBNDPTR),STATUS)
+	CALL FIT_PREDSET_AXBOUND( DID, NDS,PREDICTION_NMDIM(IPRED),
+     :    IDIMM,PREDICTION_NMBOUND(IPRED),
+     :    %VAL(PREDICTION_MLBNDPTR(IPRED)),
+     :    %VAL(PREDICTION_MUBNDPTR(IPRED)),STATUS)
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 * Storage for predicted data and if necessary workspace for chisq gradient
-      CALL DYN_MAPR(1,OBDAT.NDAT,PREDDAT.DPTR,STATUS)
+      CALL DYN_MAPR(1,DATASET_NDAT(IDAT),PREDICTION_DPTR(IPRED),STATUS)
       IF ( WORKSPACE ) THEN
-	CALL DYN_MAPR(1,PREDDAT.NMDAT,PREDDAT.PREDPTR(1),STATUS)
-        IF ( .NOT. OBDAT.GFLAG ) THEN
-	  CALL DYN_MAPR(1,PREDDAT.NMDAT,PREDDAT.PREDPTR(2),STATUS)
+	CALL DYN_MAPR(1,PREDICTION_NMDAT(IPRED),
+     :                               PREDICTION_PREDPTR(IPRED,1),STATUS)
+        IF ( .NOT. DATASET_GFLAG(IDAT) ) THEN
+	  CALL DYN_MAPR(1,PREDICTION_NMDAT(IPRED),
+     :                               PREDICTION_PREDPTR(IPRED,2),STATUS)
         END IF
-        PREDDAT.DFDPPTR = VAL__BADI
+        PREDICTION_DFDPPTR(IPRED) = VAL__BADI
 
 *  Set explicitly to zero as a flag for `workspace not mapped'
       ELSE
-	PREDDAT.PREDPTR(1) = 0
-	PREDDAT.PREDPTR(2) = 0
-	PREDDAT.DFDPPTR = 0
+	PREDICTION_PREDPTR(IPRED,1) = 0
+	PREDICTION_PREDPTR(IPRED,2) = 0
+	PREDICTION_DFDPPTR(IPRED) = 0
 
       END IF
 
 *  Grouping? Set up array for grouped predicted model data
       DO I = 1, 2
-        IF ( OBDAT.GFLAG ) THEN
-          CALL DYN_MAPR( 1, OBDAT.NGDAT, PREDDAT.PGDPTR(I), STATUS )
+        IF ( DATASET_GFLAG(IDAT) ) THEN
+          CALL DYN_MAPR( 1, DATASET_NGDAT(IDAT),
+     :                   PREDICTION_PGDPTR(IPRED,I), STATUS )
         ELSE
-          PREDDAT.PGDPTR(I) = PREDDAT.PREDPTR(I)
+          PREDICTION_PGDPTR(IPRED,I) = PREDICTION_PREDPTR(IPRED,I)
         END IF
       END DO
-      IF ( OBDAT.GFLAG ) THEN
-        CALL DYN_MAPR( 1, OBDAT.NGDAT, PREDDAT.GDPTR, STATUS )
+      IF ( DATASET_GFLAG(IDAT) ) THEN
+        CALL DYN_MAPR( 1, DATASET_NGDAT(IDAT),
+     :                 PREDICTION_GDPTR(IPRED), STATUS )
       ELSE
-        PREDDAT.GDPTR = PREDDAT.DPTR
+        PREDICTION_GDPTR(IPRED) = PREDICTION_DPTR(IPRED)
       END IF
 
 *  Exit

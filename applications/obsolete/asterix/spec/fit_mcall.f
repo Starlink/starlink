@@ -58,11 +58,12 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'USER_ERR'
+      INCLUDE 'FIT_PAR'
 *
 *    Import :
 *
-	CHARACTER*(*) GENUS			! Model genus - SPEC, STAT etc.
-	CHARACTER*(*) KEY			! Keyword of pmodel
+	CHARACTER*4 GENUS			! Model genus - SPEC, STAT etc.
+	CHARACTER*(MAXKEYLEN) KEY		! Keyword of pmodel
 	INTEGER NPAR				! Position of 1st parameter
 	REAL PARAM(NPAR)			! Array of model parameters
 	INTEGER ND				! Current dataset number

@@ -1,5 +1,5 @@
 *+  FIT1_COPDEP -  Copy dependent parameter values blindly
-      SUBROUTINE FIT1_COPDEP( MODEL, PARAM, STATUS )
+      SUBROUTINE FIT1_COPDEP( IMOD, PARAM, STATUS )
 *
 *    Description :
 *
@@ -35,7 +35,8 @@
 *
 *    Import :
 *
-      RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+      INTEGER			IMOD
 *
 *    Import / Export
 *
@@ -54,19 +55,23 @@
       IF ( STATUS.NE.SAI__OK ) RETURN
 
 *    If there are any ties
-      IF ( MODEL.NTIE .GT. 0 ) THEN
+      IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
 
 *      Loop over all parameters
-        DO IPAR = 1, MODEL.NPAR
+        DO IPAR = 1, MODEL_SPEC_NPAR(IMOD)
 
 *        Part of tie?
-          IF ( MODEL.TGROUP(IPAR) .GT. 0 ) THEN
+          IF ( MODEL_SPEC_TGROUP(IMOD,IPAR) .GT. 0 ) THEN
 
 *          Is this other than the first parameter in a tie?
-            IF ( IPAR .NE. MODEL.TSTART(MODEL.TGROUP(IPAR)) ) THEN
+            IF ( IPAR .NE.
+     :           MODEL_SPEC_TSTART(IMOD,
+     :                             MODEL_SPEC_TGROUP(IMOD,IPAR)) ) THEN
 
 *            Copy dependent value
-              PARAM(IPAR) = PARAM(MODEL.TSTART(MODEL.TGROUP(IPAR)))
+              PARAM(IPAR) =
+     :          PARAM(MODEL_SPEC_TSTART(IMOD,
+     :                                  MODEL_SPEC_TGROUP(IMOD,IPAR)))
 
 *          End of dependant parameter test
             END IF
@@ -89,7 +94,7 @@
 
 
 *+  FIT1_COPDEPL -  Copy logical dependent parameter values blindly
-      SUBROUTINE FIT1_COPDEPL( MODEL, LPARAM, STATUS )
+      SUBROUTINE FIT1_COPDEPL( IMOD, LPARAM, STATUS )
 *
 *    Description :
 *
@@ -125,7 +130,8 @@
 *
 *    Import :
 *
-      RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+      INTEGER			IMOD
 *
 *    Import / Export
 *
@@ -144,19 +150,23 @@
       IF ( STATUS.NE.SAI__OK ) RETURN
 
 *    If there are any ties
-      IF ( MODEL.NTIE .GT. 0 ) THEN
+      IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
 
 *      Loop over all parameters
-        DO IPAR = 1, MODEL.NPAR
+        DO IPAR = 1, MODEL_SPEC_NPAR(IMOD)
 
 *        Part of tie?
-          IF ( MODEL.TGROUP(IPAR) .GT. 0 ) THEN
+          IF ( MODEL_SPEC_TGROUP(IMOD,IPAR) .GT. 0 ) THEN
 
 *          Is this other than the first parameter in a tie?
-            IF ( IPAR .NE. MODEL.TSTART(MODEL.TGROUP(IPAR)) ) THEN
+            IF ( IPAR .NE.
+     :           MODEL_SPEC_TSTART(IMOD,
+     :                             MODEL_SPEC_TGROUP(IMOD,IPAR)) ) THEN
 
 *            Copy dependent value
-              LPARAM(IPAR) = LPARAM(MODEL.TSTART(MODEL.TGROUP(IPAR)))
+              LPARAM(IPAR) =
+     :          LPARAM(MODEL_SPEC_TSTART(IMOD,
+     :                                   MODEL_SPEC_TGROUP(IMOD,IPAR)))
 
 *          End of dependant parameter test
             END IF

@@ -1,4 +1,4 @@
-      SUBROUTINE FIT_PRGRS( NIT, PARAM, FROZEN, PEGGED, MODEL,
+      SUBROUTINE FIT_PRGRS( NIT, PARAM, FROZEN, PEGGED, IMOD,
      :                      FINISHED, STATUS )
 *+
 *  Name:
@@ -99,7 +99,8 @@
 
 *  Arguments Given:
       INTEGER			NIT
-      RECORD /MODEL_SPEC/	MODEL
+c     RECORD /MODEL_SPEC/	MODEL
+      INTEGER			IMOD
       REAL			PARAM(*)
       LOGICAL			FINISHED, FROZEN(*), PEGGED(*)
 
@@ -122,7 +123,7 @@
       CALL MSG_SETI( 'NIT', NIT )
       CALL MSG_PRNT( '* Iteration ^NIT *' )
       NFREE = 0
-      DO J = 1, MODEL.NPAR
+      DO J = 1, MODEL_SPEC_NPAR(IMOD)
 
 *    Describe parameter state
 	IF ( FROZEN(J) ) THEN
@@ -132,9 +133,15 @@
           CALL MSG_SETC( 'STATE', 'pegged' )
 
 	ELSE
-          IF ( (MODEL.NTIE.GT.0) .AND. (MODEL.TGROUP(J).GT.0) ) THEN
-            IF ( J .NE. MODEL.TSTART(MODEL.TGROUP(J)) ) THEN
-              CALL CHR_ITOC( MODEL.TSTART(MODEL.TGROUP(J)), SPAR, NC )
+          IF ( (MODEL_SPEC_NTIE(IMOD).GT.0) .AND.
+     :         (MODEL_SPEC_TGROUP(IMOD,J).GT.0) ) THEN
+            IF ( J .NE. MODEL_SPEC_TSTART(IMOD,
+     :                                    MODEL_SPEC_TGROUP(IMOD,
+     :                                                      J)) ) THEN
+              CALL CHR_ITOC( MODEL_SPEC_TSTART(IMOD,
+     :                                         MODEL_SPEC_TGROUP(IMOD,
+     :                                                           J)),
+     :                       SPAR, NC )
               CALL MSG_SETC( 'STATE', 'free (tied to '/
      :                                     /SPAR(:NC)//')' )
             ELSE
@@ -149,7 +156,7 @@
 
 *    Report parameter
         CALL MSG_FMTR( 'PVAL', '1PG14.6', PARAM(J) )
-        CALL MSG_PRNT( MODEL.PARNAME(J)//' ^PVAL   ^STATE' )
+        CALL MSG_PRNT( MODEL_SPEC_PARNAME(IMOD,J)//' ^PVAL   ^STATE' )
 
 *  Next parameter
       END DO
@@ -169,8 +176,9 @@
       CALL MSG_BLNK()
       CALL MSG_PRNT( '** Updating model spec - do not exit '/
      :                                  /'until completed **' )
-      CALL FIT_MODUP( MODEL.M_ID, MODEL.NCOMP, MODEL.NPAR,
-     :                PARAM, 0.0, 0.0, -99.0, STATUS )
+      CALL FIT_MODUP( MODEL_SPEC_M_ID(IMOD), MODEL_SPEC_NCOMP(IMOD),
+     :                MODEL_SPEC_NPAR(IMOD), PARAM, 0.0, 0.0, -99.0,
+     :                STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
 	CALL ERR_FLUSH(STATUS)
       ELSE

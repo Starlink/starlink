@@ -1,4 +1,4 @@
-      SUBROUTINE SFIT_PRECHK( NDS, Z, PREDDAT, STATUS )
+      SUBROUTINE SFIT_PRECHK( NDS, Z, STATUS )
 *+
 *  Name:
 *     SFIT_PRECHK
@@ -93,7 +93,7 @@
 *  Arguments Given:
       INTEGER			NDS
       REAL			Z
-      RECORD /PREDICTION/    	PREDDAT(NDS)
+c     RECORD /PREDICTION/    	PREDDAT(NDS)
 
 *  Status:
       INTEGER			STATUS             	! Global status
@@ -109,12 +109,12 @@
       DO N = 1, NDS
 
 *    Apply redshift to model space energy bounds
-        CALL SFIT_APPRED( Z, PREDDAT(N).NMBOUND,
-     :                    %VAL(PREDDAT(N).MLBNDPTR),
-     :                    %VAL(PREDDAT(N).MUBNDPTR), STATUS )
+        CALL SFIT_APPRED( Z, PREDICTION_NMBOUND(N),
+     :                    %VAL(PREDICTION_MLBNDPTR(N)),
+     :                    %VAL(PREDICTION_MUBNDPTR(N)), STATUS )
 
 *    Report on success in finding instrument response if appropriate
-	IF ( PREDDAT(N).CONVOLVE ) THEN
+	IF ( PREDICTION_CONVOLVE(N) ) THEN
 	  IF ( NDS .EQ. 1 ) THEN
 	    CALL MSG_PRNT('Instrument response found')
           ELSE

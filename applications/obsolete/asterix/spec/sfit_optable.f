@@ -1,6 +1,6 @@
 *+  SFIT_OPTABLE - Write a table with parameters & approx errors
       SUBROUTINE SFIT_OPTABLE( NPAR, PARAM, FROZEN, PEGGED, PARSIG,
-     :                                         MODEL, OCI, STATUS )
+     :                                         IMOD, OCI, STATUS )
 *
 *    Description :
 *
@@ -45,8 +45,9 @@
       LOGICAL               FROZEN(NPAR)  ! Parameter frozen?
       LOGICAL               PEGGED(NPAR)  ! Parameter pegged?
       REAL                  PARSIG(NPAR)  ! Parameter values
-      RECORD /MODEL_SPEC/   MODEL	  ! Model specification
-      INTEGER			OCI			! AIO stream id
+c     RECORD /MODEL_SPEC/   MODEL	  ! Model specification
+      INTEGER		    IMOD
+      INTEGER		    OCI		  ! AIO stream id
 *
 *    Local variables :
 *
@@ -77,8 +78,8 @@
       DO J = 1, NPAR
 
 *      Format to use for value printing
-        IF ( MODEL.FORMAT(J) .GT. ' ' ) THEN
-          PFMT = MODEL.FORMAT(J)
+        IF ( MODEL_SPEC_FORMAT(IMOD,J) .GT. ' ' ) THEN
+          PFMT = MODEL_SPEC_FORMAT(IMOD,J)
         ELSE
           PFMT = '1PG12.5'
         END IF
@@ -89,8 +90,11 @@
 	ELSE IF ( PEGGED(J) ) THEN
 	  WRITE ( OPSTRING,'(''   pegged'')' )
 	ELSE
-          IF ( (MODEL.NTIE.GT.0) .AND. (MODEL.TGROUP(J).GT.0) ) THEN
-            IF ( J .NE. MODEL.TSTART(MODEL.TGROUP(J)) ) THEN
+          IF ( (MODEL_SPEC_NTIE(IMOD).GT.0) .AND.
+     :         (MODEL_SPEC_TGROUP(IMOD,J).GT.0) ) THEN
+            IF ( J .NE.
+     :           MODEL_SPEC_TSTART(IMOD,
+     :                             MODEL_SPEC_TGROUP(IMOD,J)) ) THEN
 	      WRITE( OPSTRING, '('//PFMT//',1X,A)' ) PARSIG(J),
      :                                    '(constrained)'
             ELSE
@@ -103,13 +107,14 @@
 
 *      Format the parameter information. Only write model component name
 *      for the first component in each model.
-        IF ( J .EQ. MODEL.ISTART(NC) ) THEN
-          WRITE(OTXT,'(A4,3X,A25,'//PFMT//',2X,A)') MODEL.KEY(NC),
-     :               MODEL.PARNAME(J), PARAM(J),OPSTRING
+        IF ( J .EQ. MODEL_SPEC_ISTART(IMOD,NC) ) THEN
+          WRITE(OTXT,'(A4,3X,A25,'//PFMT//',2X,A)')
+     :               MODEL_SPEC_KEY(IMOD,NC),
+     :               MODEL_SPEC_PARNAME(IMOD,J), PARAM(J),OPSTRING
           NC = NC + 1
         ELSE
-          WRITE(OTXT,'(7X,A25,'//PFMT//',2X,A)') MODEL.PARNAME(J),
-     :              PARAM(J), OPSTRING
+          WRITE(OTXT,'(7X,A25,'//PFMT//',2X,A)')
+     :              MODEL_SPEC_PARNAME(IMOD,J), PARAM(J), OPSTRING
         END IF
 
 *      Write line describing parameters

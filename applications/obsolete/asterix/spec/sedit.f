@@ -86,7 +86,7 @@
 *    Version :
 *
       CHARACTER*30         	VERSION            	! Version id
-        PARAMETER               ( VERSION = 'SEDIT Version 2.2-0' )
+        PARAMETER               ( VERSION = 'SEDIT Version 2.2-1' )
 *-
 
 *    Check status

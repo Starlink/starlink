@@ -1,5 +1,5 @@
 *+  FIT_MSPECFLAT - Flatten a model specification
-      SUBROUTINE FIT_MSPECFLAT( MODEL, MAXTERM, NTERM, TERMS,
+      SUBROUTINE FIT_MSPECFLAT( IMOD, MAXTERM, NTERM, TERMS,
      :                          SIGNS, STATUS )
 *
 *    Description :
@@ -71,7 +71,8 @@
 *
 *    Import :
 *
-      RECORD /MODEL_SPEC/	MODEL			! Model specification
+c     RECORD /MODEL_SPEC/	MODEL			! Model specification
+      INTEGER			IMOD
       INTEGER			MAXTERM			! Max no additive terms
 *
 *    Export :
@@ -130,21 +131,21 @@
 
 *    Specification same as last one?
       SAME = .FALSE.
-      MLEN = CHR_LEN(MODEL.SPEC)
+      MLEN = CHR_LEN(MODEL_SPEC_SPEC(IMOD))
       IF ( (MLEN.EQ.SLEN) .AND. (MLEN.GT.1) ) THEN
-        SAME = ( MODEL.SPEC(:MLEN) .EQ. STORED_SPEC(:SLEN) )
+        SAME = ( MODEL_SPEC_SPEC(IMOD)(:MLEN) .EQ. STORED_SPEC(:SLEN) )
       END IF
 
 *    If it is the same, return stored values
       IF ( .NOT. SAME ) THEN
 
 *      Store specification
-        STORED_SPEC = MODEL.SPEC
+        STORED_SPEC = MODEL_SPEC_SPEC(IMOD)
         SLEN = MLEN
 
 *      Flatten the expression
-        CALL FIT_MSPECFLAT_INT( MODEL.SPEC, STORED_NTERM, STORED_TERMS,
-     :                          STORED_SIGNS, STATUS )
+        CALL FIT_MSPECFLAT_INT( MODEL_SPEC_SPEC, STORED_NTERM,
+     :                          STORED_TERMS, STORED_SIGNS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Order the elements of each term so that the multiplicative bits
@@ -166,7 +167,7 @@
               FOUND = .TRUE.
 
 *          Found the additive component?
-            ELSE IF ( MODEL.ADDITIVE(MODCOMP) ) THEN
+            ELSE IF ( MODEL_SPEC_ADDITIVE(IMOD, MODCOMP) ) THEN
 
 *            Make sure its the only one
               IF ( AMODCOMP .GT. 0 ) THEN

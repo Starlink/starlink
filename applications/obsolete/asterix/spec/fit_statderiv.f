@@ -1,6 +1,6 @@
 *+  FIT_STATDERIV - Calculates deriv of statistic w.r.t. a parameter
-      SUBROUTINE FIT_STATDERIV(NDS,OBDAT,INSTR,MODEL,NPAR,PARAM,LB,UB,
-     :	PARNO,DELTAP,FSTAT,PREDICTOR,PREDDAT,DERIV,STATUS)
+      SUBROUTINE FIT_STATDERIV(NDS,IMOD,NPAR,PARAM,LB,UB,
+     :	PARNO,DELTAP,FSTAT,PREDICTOR,DERIV,STATUS)
 *
 *    Description :
 *
@@ -44,9 +44,10 @@
 *    Import :
 *
       INTEGER             NDS			! Number of observed datasets
-      RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
-      RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
+c     RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
+c     RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
       INTEGER             NPAR			! No of parameters
       REAL                PARAM(NPAMAX)		! Model params at which deriv is centred
       REAL                LB(NPAMAX)		! Parameter lower bounds
@@ -58,7 +59,7 @@
 *
 *    Import/export :
 *
-      RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
+c     RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
                                                 ! (actually only the data
 *						! pointed to are updated)
 *    Export :
@@ -111,17 +112,17 @@
 
 *  Calculate statistic at +ve and -ve deviates in parameter PARNO
       PARCAL(PARNO) = PARAM(PARNO) + DPUP
-      IF ( MODEL.NTIE .GT. 0 ) THEN
-        CALL FIT_APPTIE( MODEL, .FALSE., PARCAL, LB, UB, STATUS )
+      IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
+        CALL FIT_APPTIE( IMOD, .FALSE., PARCAL, LB, UB, STATUS )
       END IF
-      CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARCAL, FSTAT, PREDICTOR,
-     :                                         PREDDAT, STATUP, STATUS )
+      CALL FIT_STAT( NDS, IMOD, PARCAL, FSTAT, PREDICTOR,
+     :                                         STATUP, STATUS )
       PARCAL(PARNO) = PARAM(PARNO) - DPDOWN
-      IF ( MODEL.NTIE .GT. 0 ) THEN
-        CALL FIT_APPTIE( MODEL, .FALSE., PARCAL, LB, UB, STATUS )
+      IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
+        CALL FIT_APPTIE( IMOD, .FALSE., PARCAL, LB, UB, STATUS )
       END IF
-      CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARCAL, FSTAT, PREDICTOR,
-     :                                       PREDDAT, STATDOWN, STATUS )
+      CALL FIT_STAT( NDS, IMOD, PARCAL, FSTAT, PREDICTOR,
+     :                                       STATDOWN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
 *  Form difference approximation to derivative

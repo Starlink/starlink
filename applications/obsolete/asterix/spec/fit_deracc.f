@@ -1,9 +1,9 @@
 *+  FIT_DERIVS_ACCUM - Accumulate derivatives in statistic
-      SUBROUTINE FIT_DERIVS_ACCUM( NDS, OBDAT, INSTR, MODEL, FSTAT,
-     :             PREDICTOR, PREDDAT, NPAR, PARAM, LB, UB, FROZEN,
+      SUBROUTINE FIT_DERIVS_ACCUM( NDS, IMOD, FSTAT,
+     :             PREDICTOR, NPAR, PARAM, LB, UB, FROZEN,
      :             DPUP, DPDOWN, N, NDAT, OBS, WT, QOK, OBSQ, PRED,
      :             DDERIV1, DDERIV2, DFDP, PREDTMP, PREDUP, PREDDOWN,
-     :              STATUS )
+     :             STATUS )
 *
 *    Description :
 *
@@ -50,10 +50,11 @@
 *    Import :
 *
       INTEGER             NDS			! Number of observed datasets
-      RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
-      RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
-      RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
+c     RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
+c     RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
+c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
       INTEGER             NPAR			! No of parameters
       REAL                PARAM(NPAMAX)		! Model parameters
       REAL                LB(NPAMAX)		! Model lower bounds
@@ -128,35 +129,31 @@
 	  LOPAR(J) = PARAM(J) - DPDOWN(J)
 
 *      Keep constrained parameters up to date
-          IF ( MODEL.NTIE .GT. 0 ) THEN
-            CALL FIT_APPTIE( MODEL, .FALSE., LOPAR, LB, UB, STATUS )
-            CALL FIT_APPTIE( MODEL, .FALSE., UPPAR, LB, UB, STATUS )
+          IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
+            CALL FIT_APPTIE( IMOD, .FALSE., LOPAR, LB, UB, STATUS )
+            CALL FIT_APPTIE( IMOD, .FALSE., UPPAR, LB, UB, STATUS )
           END IF
 
 *      Grouping?
-          IF ( OBDAT(N).GFLAG ) THEN
+          IF ( DATASET_GFLAG(N) ) THEN
 
 *        Compute and group upper perturbation
-	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,UPPAR,N,
-     :                                                 PREDTMP, STATUS)
-            CALL UTIL_GRPWR( OBDAT(N).NDAT, PREDTMP, .FALSE., 0.0, QOK,
-     :                       %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
-     :                       NDAT, PREDUP,
-     :                       0.0, %VAL(OBDAT(N).GQPTR), STATUS )
+	    CALL PREDICTOR(FSTAT,NDS,IMOD,UPPAR,N,PREDTMP, STATUS)
+            CALL UTIL_GRPWR( DATASET_NDAT(N), PREDTMP, .FALSE., 0.0,
+     :                       QOK, %VAL(DATASET_QPTR(N)),
+     :                       %VAL(DATASET_GPTR(N)), NDAT, PREDUP,
+     :                       0.0, %VAL(DATASET_GQPTR(N)), STATUS )
 
 *        Compute and group lower perturbation
-	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,LOPAR,N,
-     :                                                 PREDTMP, STATUS)
-            CALL UTIL_GRPWR( OBDAT(N).NDAT, PREDTMP, .FALSE., 0.0, QOK,
-     :                       %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
-     :                       NDAT, PREDDOWN,
-     :                       0.0, %VAL(OBDAT(N).GQPTR), STATUS )
+	    CALL PREDICTOR(FSTAT,NDS,IMOD,LOPAR,N,PREDTMP, STATUS)
+            CALL UTIL_GRPWR( DATASET_NDAT, PREDTMP, .FALSE., 0.0, QOK,
+     :                       %VAL(DATASET_QPTR(N)),
+     :                       %VAL(DATASET_GPTR(N)), NDAT, PREDDOWN,
+     :                       0.0, %VAL(DATASET_GQPTR(N)), STATUS )
 
           ELSE
-	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,UPPAR,N,
-     :                                                   PREDUP,STATUS)
-	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,LOPAR,N,
-     :                                                 PREDDOWN,STATUS)
+	    CALL PREDICTOR(FSTAT,NDS,IMOD,UPPAR,N,PREDUP,STATUS)
+	    CALL PREDICTOR(FSTAT,NDS,IMOD,LOPAR,N,PREDDOWN,STATUS)
           END IF
 
 *      Find derivatives of Cash statistic?

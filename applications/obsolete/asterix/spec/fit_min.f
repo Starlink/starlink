@@ -1,6 +1,6 @@
-      SUBROUTINE FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
+      SUBROUTINE FIT_MIN( NDS, IMOD, MCTRL, OPCHAN,
      :                    PRGRES, NPAR, LB, UB, FROZEN, SSCALE,
-     :                    FSTAT, PREDICTOR, PREDDAT, PARAM, DPAR,
+     :                    FSTAT, PREDICTOR, PARAM, DPAR,
      :                    PEGGED, STAT, FINISHED, FITERR, STATUS )
 *+
 *  Name:
@@ -133,16 +133,17 @@
 
 *  Arguments Given:
       INTEGER			NDS, OPCHAN, MCTRL, NPAR, SSCALE, FSTAT
-      RECORD /DATASET/    	OBDAT(NDS)
-      RECORD /INSTR_RESP/ 	INSTR(NDS)
-      RECORD /MODEL_SPEC/ 	MODEL
+c     RECORD /DATASET/    	OBDAT(NDS)
+c     RECORD /INSTR_RESP/ 	INSTR(NDS)
+c     RECORD /MODEL_SPEC/ 	MODEL
+      INTEGER			IMOD
       REAL			LB(*), UB(*)
       LOGICAL			PRGRES, FROZEN(*)
       EXTERNAL			PREDICTOR
 
 *  Arguments Given and Returned:
       LOGICAL			PEGGED(*)
-      RECORD /PREDICTION/	PREDDAT(NDS)
+c     RECORD /PREDICTION/	PREDDAT(NDS)
       REAL			PARAM(*), DPAR(*)
       DOUBLE PRECISION	  	STAT
 
@@ -166,9 +167,9 @@
       IF ( STYLE .EQ. 'CURFIT'  )THEN
 
 *    CURFIT algorithm
-	CALL FIT_MIN1( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
+	CALL FIT_MIN1( NDS, IMOD, MCTRL, OPCHAN,
      :                 PRGRES, NPAR, LB, UB, FROZEN, SSCALE,
-     :                 FSTAT, PREDICTOR, PREDDAT, PARAM, DPAR,
+     :                 FSTAT, PREDICTOR, PARAM, DPAR,
      :                 PEGGED, STAT, FINISHED, FITERR, STATUS )
 
 *  Otherwise unknown

@@ -110,7 +110,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SBG Version 2.2-0' )
+        PARAMETER		( VERSION = 'SBG Version 2.2-1' )
 
 *  Local Variables:
       INTEGER			IFID			! Source dataset

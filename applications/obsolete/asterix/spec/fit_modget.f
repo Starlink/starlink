@@ -1,5 +1,5 @@
 *+ FIT_MODGET - Extracts model specification from fit_model object
-      SUBROUTINE FIT_MODGET(FID,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,
+      SUBROUTINE FIT_MODGET(FID,IMOD,NPAR,PARAM,LB,UB,LE,UE,FROZEN,
      :             STATUS)
 *
 *    Description :
@@ -54,7 +54,8 @@
 *
 *    Export
 *
-      RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+      INTEGER			IMOD
       INTEGER 			NPAR			! Total no of cmodel parameters
       REAL 			PARAM(NPAMAX)		! Complete set of cmodel parameters
       REAL 			LB(NPAMAX)		! Parameter lower bounds
@@ -84,6 +85,9 @@
 
       CHARACTER*14		TYPE			! pmodel type
 
+      INTEGER           	TSTART(MAXTIE)
+      INTEGER           	TGROUP(NPAMAX)
+
       INTEGER 			JPAR			! No. pmodel parameters
       INTEGER 			I,J
 
@@ -94,7 +98,7 @@
       IF ( STATUS.NE.SAI__OK ) RETURN
 
 *    Store identifier
-      MODEL.M_ID = FID
+      MODEL_SPEC_M_ID(IMOD) = FID
 
 *    Extract locator from identifier
       CALL ADI1_GETLOC( FID, FLOC, STATUS )
@@ -109,16 +113,16 @@
 	CALL DISP_FILENAM( FID,'Input model',STATUS)
       END IF
 
-      CALL CMP_GET0C(FLOC,'SPEC',MODEL.SPEC,STATUS)
-      IF(STATUS.NE.SAI__OK.OR.CHR_LEN(MODEL.SPEC).EQ.0)THEN
+      CALL CMP_GET0C(FLOC,'SPEC',MODEL_SPEC_SPEC(IMOD),STATUS)
+      IF(STATUS.NE.SAI__OK.OR.CHR_LEN(MODEL_SPEC_SPEC(IMOD)).EQ.0)THEN
 	STATUS = SAI__ERROR
 	CALL ERR_REP('NOMOD','Existing fit_model object contains no'
      :    //' model',STATUS)
 	GOTO 99
       ENDIF
-      CALL CMP_GET0C(FLOC,'POLISH',MODEL.POLISH,STATUS)
-      CALL CMP_GET0I(FLOC,'NCOMP',MODEL.NCOMP,STATUS)
-      IF ( MODEL.NCOMP .GT. MAXCOMP ) THEN
+      CALL CMP_GET0C(FLOC,'POLISH',MODEL_SPEC_POLISH(IMOD),STATUS)
+      CALL CMP_GET0I(FLOC,'NCOMP',MODEL_SPEC_NCOMP(IMOD),STATUS)
+      IF ( MODEL_SPEC_NCOMP(IMOD) .GT. MAXCOMP ) THEN
 	STATUS = SAI__ERROR
 	CALL ERR_REP('MANYCOMP','Maximum number of model components'//
      :    ' exceeded',STATUS)
@@ -130,18 +134,18 @@
 *    Step through model components finding their keys,counting the parameters,
 *    setting initial values and lower and upper bounds
       NPAR = 0
-      DO I=1,MODEL.NCOMP
+      DO I=1,MODEL_SPEC_NCOMP(IMOD)
 
 *      Get locator to ith pmodel
 	CALL DAT_CELL(PMLOC,1,I,MILOC,STATUS)
-	CALL CMP_GET0C(MILOC,'KEY',MODEL.KEY(I),STATUS)
+	CALL CMP_GET0C(MILOC,'KEY',MODEL_SPEC_KEY(IMOD,I),STATUS)
 	CALL CMP_GET0I(MILOC,'NPAR',JPAR,STATUS)
 	CALL CMP_GET0C(MILOC,'TYPE',TYPE,STATUS)
 	CALL DAT_FIND(MILOC,'PAR',MIPLOC,STATUS)
-	MODEL.ISTART(I)=NPAR+1
+	MODEL_SPEC_ISTART(IMOD,I)=NPAR+1
 
 *      Model is additive?
-        MODEL.ADDITIVE(I) = ( TYPE(1:8) .EQ. 'additive' )
+        MODEL_SPEC_ADDITIVE(IMOD,I) = ( TYPE(1:8) .EQ. 'additive' )
 
 *        Loop through parameters of ith pmodel
 	  DO J=1,JPAR
@@ -150,16 +154,16 @@
 *          Get locator to jth parameter of pmodel i
 	    CALL DAT_CELL(MIPLOC,1,J,MIPJLOC,STATUS)
 	    CALL CMP_GET0C(MIPJLOC,'NAME',CBUF,STATUS)
-            MODEL.PARNAME(NPAR) = CBUF
+            MODEL_SPEC_PARNAME(IMOD,NPAR) = CBUF
 	    CALL CMP_GET0C(MIPJLOC,'UNITS',CBUF,STATUS)
-            MODEL.UNITS(NPAR) = CBUF
+            MODEL_SPEC_UNITS(IMOD,NPAR) = CBUF
             CALL DAT_THERE(MIPJLOC,'FORMAT',THERE,STATUS)
             IF ( THERE ) THEN
 	      CALL CMP_GET0C(MIPJLOC,'FORMAT',CBUF,STATUS)
             ELSE
               CBUF = ' '
             END IF
-            MODEL.FORMAT(NPAR) = CBUF
+            MODEL_SPEC_FORMAT(IMOD,NPAR) = CBUF
 	    CALL CMP_GET0R(MIPJLOC,'VAL',PARAM(NPAR),STATUS)
 	    CALL CMP_GET0R(MIPJLOC,'LOW',LB(NPAR),STATUS)
 	    CALL CMP_GET0R(MIPJLOC,'HI',UB(NPAR),STATUS)
@@ -208,15 +212,23 @@
      :    ' exceeded',STATUS)
 	GOTO 99
       ELSE
-        MODEL.NPAR = NPAR
+        MODEL_SPEC_NPAR(IMOD) = NPAR
       END IF
 
+*    Copy over local copies of tie
+      DO I = 1, MAXTIE
+        TSTART(I) = MODEL_SPEC_TSTART(IMOD, I)
+      END DO
+      DO I = 1, NPAMAX
+        TGROUP(I) = MODEL_SPEC_TGROUP(IMOD, I)
+      END DO
+
 *    Get constraints
-      CALL FIT_MODGET_TIES( FLOC, MODEL.NTIE, MODEL.TSTART,
-     :                      MODEL.TGROUP, STATUS )
+      CALL FIT_MODGET_TIES( FLOC, MODEL_SPEC_NTIE(IMOD),
+     :                      TSTART, TGROUP, STATUS )
 
 *    Initialise stack pointer to 0 (flag for pointer not set)
-      MODEL.STACKPTR = 0
+      MODEL_SPEC_STACKPTR(IMOD) = 0
 
 *    Exit
  99   IF ( STATUS.NE.SAI__OK ) THEN

@@ -44,7 +44,7 @@
 
 *+  FIT_DEFIRREGRID - Define values in an irregular grid axis block
       SUBROUTINE FIT_DEFIRREGRID( PAR, NVAL, LOGARITHMIC, VALUES,
-     :                                              GAX, STATUS )
+     :                                              IAX, STATUS )
 *
 *    Description :
 *
@@ -79,7 +79,8 @@
 *
 *    Export :
 *
-      RECORD /GRID_AXIS/       GAX                     ! Grid axis block
+c     RECORD /GRID_AXIS/       GAX                     ! Grid axis block
+      INTEGER                  IAX
 *
 *    Status :
 *
@@ -90,16 +91,16 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Fill in fields
-      GAX.PAR = PAR
-      GAX.REGULAR = .FALSE.
-      GAX.NVAL = NVAL
-      GAX.LOGARITHMIC = LOGARITHMIC
+      GRID_AXIS_PAR(IAX) = PAR
+      GRID_AXIS_REGULAR(IAX) = .FALSE.
+      GRID_AXIS_NVAL(IAX) = NVAL
+      GRID_AXIS_LOGARITHMIC(IAX) = LOGARITHMIC
 
 *    Make space for copy
-      CALL DYN_MAPR( 1, NVAL, GAX.VPTR, STATUS )
+      CALL DYN_MAPR( 1, NVAL, GRID_AXIS_VPTR(IAX), STATUS )
 
 *    Copy values
-      CALL ARR_COP1R( NVAL, VALUES, %VAL(GAX.VPTR), STATUS )
+      CALL ARR_COP1R( NVAL, VALUES, %VAL(GRID_AXIS_VPTR(IAX)), STATUS )
 
       END
 *+  FIT_LOGL_ACCUM - Accumulate max-likilihood over dataset

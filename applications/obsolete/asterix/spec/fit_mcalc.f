@@ -1,7 +1,7 @@
 *+  FIT_MCALC - Computes model-space dataset from composite model
-      SUBROUTINE FIT_MCALC( MODEL, PARAM, ND, NMDIM, IDIMM, NMDAT,
-     :                      NMBOUND,
-     :                      MLBOUND, MUBOUND, STACK, PRED, STATUS )
+      SUBROUTINE FIT_MCALC( IMOD, PARAM, ND, NMDIM, IDIMM, NMDAT,
+     :                      NMBOUND, MLBOUND, MUBOUND, STACK, PRED,
+     :                      STATUS )
 *
 *    Description :
 *
@@ -111,7 +111,8 @@
 *
 *    Import :
 *
-      RECORD /MODEL_SPEC/       MODEL			! Model specification
+c     RECORD /MODEL_SPEC/       MODEL			! Model specification
+      INTEGER			IMOD
       REAL			PARAM(*)		! Model parameters
       INTEGER 			ND			! Current dataset number
       INTEGER 			NMDIM			! No of model dimensions
@@ -139,6 +140,7 @@
       CHARACTER*80 		CLEAN			! CLEANed version of MODEL.POLISH
       CHARACTER*(MAXKEYLEN)	LASTMOD(MAXCOMP)	! Last model keys
         SAVE 			LASTMOD
+      CHARACTER*(MAXKEYLEN)	SYMBOLS
       CHARACTER*1 		SYM			! Current symbol
 
       REAL 		PARSAVE(NPAMAX)			! Previous parameter values
@@ -188,13 +190,13 @@
       NMST=0
       MSTACKPT=0
       STACKPT=0
-      CLEAN=MODEL.POLISH
+      CLEAN=MODEL_SPEC_POLISH(IMOD)
       CALL CHR_CLEAN(CLEAN)		! Zero extend since CHR_LEN counts
       LSTRING=CHR_LEN(CLEAN)		! ASCII nulls but not blanks
       IF(LSTRING.EQ.0) THEN
 	STATUS=SAI__ERROR
 	CALL ERR_REP('EMPTY_STRING','Polish string is empty',STATUS)
-      ELSE IF ( MODEL.NCOMP .GT. MAXSTACK ) THEN
+      ELSE IF ( MODEL_SPEC_NCOMP(IMOD) .GT. MAXSTACK ) THEN
 	STATUS=SAI__ERROR
 	CALL ERR_REP('TOOBIG','Too many pmodel for model stack',STATUS)
       ENDIF
@@ -202,21 +204,21 @@
 
 *    Is the model spec the same as the last one?
       SAME_MODEL = .TRUE.
-      DO NM = 1, MODEL.NCOMP
-        IF ( MODEL.KEY(NM) .NE. LASTMOD(NM) ) THEN
+      DO NM = 1, MODEL_SPEC_NCOMP(IMOD)
+        IF ( MODEL_SPEC_KEY(IMOD,NM) .NE. LASTMOD(NM) ) THEN
           SAME_MODEL = .TRUE.
-          LASTMOD(NM) = MODEL.KEY(NM)
+          LASTMOD(NM) = MODEL_SPEC_KEY(IMOD,NM)
         END IF
       END DO
 
 *    Compute and stack all pmodels where they differ from previous call
-      DO NM = 1, MODEL.NCOMP
+      DO NM = 1, MODEL_SPEC_NCOMP(IMOD)
 
 *      Index of last parameter for this component
-	IF ( NM .LT. MODEL.NCOMP ) THEN
-	  ISTOP = MODEL.ISTART(NM+1)-1
+	IF ( NM .LT. MODEL_SPEC_NCOMP(IMOD) ) THEN
+	  ISTOP = MODEL_SPEC_ISTART(IMOD,NM+1)-1
 	ELSE
-	  ISTOP = MODEL.NPAR
+	  ISTOP = MODEL_SPEC_NPAR(IMOD)
 	END IF
 
 *      Check that dataset is same as for last call (and it's not the first call)
@@ -224,7 +226,7 @@
 
 *        Check whether parameters are unchanged for this pmodel
 	  UNCHANGED=.TRUE.
-	  DO J = MODEL.ISTART(NM), ISTOP
+	  DO J = MODEL_SPEC_ISTART(IMOD,NM), ISTOP
 	    IF(PARAM(J).NE.PARSAVE(J))THEN
 	      UNCHANGED=.FALSE.
 	      PARSAVE(J)=PARAM(J)		! Reset for next time
@@ -236,9 +238,9 @@
 
 *      If necessary, compute new model and stack in position NM
 	IF ( .NOT. UNCHANGED ) THEN
-	  CALL FIT_MCALL( MODEL.GENUS, MODEL.KEY(NM),
-     :                    ISTOP - MODEL.ISTART(NM) + 1,
-     :                    PARAM(MODEL.ISTART(NM)), ND,
+	  CALL FIT_MCALL( MODEL_SPEC_GENUS(IMOD), MODEL_SPEC_KEY(IMOD,NM),
+     :                    ISTOP - MODEL_SPEC_ISTART(IMOD,NM) + 1,
+     :                    PARAM(MODEL_SPEC_ISTART(IMOD,NM)), ND,
      :                    NMDIM, LDIMS, NMDAT, NMBOUND, MLBOUND,
      :                    MUBOUND, STACK(1,NM), SLICE_DEF(NM),
      :                    SLICE(1,1,NM), STATUS )
@@ -247,12 +249,13 @@
 
       END DO
       NDCURR = ND
-      STOFF = MODEL.NCOMP
-      STACKPT = MODEL.NCOMP
+      STOFF = MODEL_SPEC_NCOMP(IMOD)
+      STACKPT = MODEL_SPEC_NCOMP(IMOD)
 
 *    Loop through string elements
       DO I=1,LSTRING
-	SYM=MODEL.POLISH(I:I)
+        SYMBOLS=MODEL_SPEC_POLISH(IMOD)
+	SYM=SYMBOLS(I:I)
 	IF(SYM.EQ.'M')THEN
 	  NMST=NMST+1
 	  MSTACKPT=MSTACKPT+1

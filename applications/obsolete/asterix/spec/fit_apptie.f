@@ -1,5 +1,5 @@
 *+  FIT_APPTIE -  Apply parameter constraints to parameter set
-      SUBROUTINE FIT_APPTIE( MODEL, FORCE, PARAM, LB, UB, STATUS )
+      SUBROUTINE FIT_APPTIE( IMOD, FORCE, PARAM, LB, UB, STATUS )
 *
 *    Description :
 *
@@ -35,7 +35,8 @@
 *
 *    Import :
 *
-      RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
+      INTEGER			IMOD
       LOGICAL			FORCE			! Force dependant bounds
 *
 *    Import / Export
@@ -59,19 +60,23 @@
       IF ( STATUS.NE.SAI__OK ) RETURN
 
 *    If there are any ties
-      IF ( MODEL.NTIE .GT. 0 ) THEN
+      IF ( MODEL_SPEC_NTIE(IMOD) .GT. 0 ) THEN
 
 *      Loop over all parameters
-        DO IPAR = 1, MODEL.NPAR
+        DO IPAR = 1, MODEL_SPEC_NPAR(IMOD)
 
 *        Part of tie?
-          IF ( MODEL.TGROUP(IPAR) .GT. 0 ) THEN
+          IF ( MODEL_SPEC_TGROUP(IMOD,IPAR) .GT. 0 ) THEN
 
 *          Is this other than the first parameter in a tie?
-            IF ( IPAR .NE. MODEL.TSTART(MODEL.TGROUP(IPAR)) ) THEN
+            IF ( IPAR .NE.
+     :           MODEL_SPEC_TSTART(IMOD,
+     :                             MODEL_SPEC_TGROUP(IMOD,IPAR)) ) THEN
 
 *            Get new value
-              VALUE = PARAM(MODEL.TSTART(MODEL.TGROUP(IPAR)))
+              VALUE = PARAM(MODEL_SPEC_TSTART(IMOD,
+     :                                        MODEL_SPEC_TGROUP(IMOD,
+     :                                                          IPAR)))
 
 *            Is it out of range?
               IF ( (VALUE.LT.LB(IPAR)) .OR. (VALUE.GT.UB(IPAR)) ) THEN
@@ -80,9 +85,15 @@
                 IF ( FORCE ) THEN
 
                   IF ( VALUE .LT. LB(IPAR) ) THEN
-                    LB(IPAR) = LB(MODEL.TSTART(MODEL.TGROUP(IPAR)))
+                    LB(IPAR) =
+     :                LB(MODEL_SPEC_TSTART(IMOD,
+     :                                     MODEL_SPEC_TGROUP(IMOD,
+     :                                                       IPAR)))
                   ELSE
-                    UB(IPAR) = UB(MODEL.TSTART(MODEL.TGROUP(IPAR)))
+                    UB(IPAR) =
+     :                UB(MODEL_SPEC_TSTART(IMOD,
+     :                                     MODEL_SPEC_TGROUP(IMOD,
+     :                                                       IPAR)))
                   END IF
                   PARAM(IPAR) = VALUE
 
@@ -94,7 +105,7 @@
                     CALL MSG_SETC( 'BOUND', 'upper' )
                   END IF
                   CALL MSG_SETI( 'PAR', IPAR )
-                  CALL MSG_SETI( 'TIE', MODEL.TGROUP(IPAR) )
+                  CALL MSG_SETI( 'TIE', MODEL_SPEC_TGROUP(IMOD,IPAR) )
                   STATUS = SAI__ERROR
                   CALL ERR_REP( ' ', 'Parameter ^PAR ^BOUND bound '/
      :                 /'violation due to constraint ^TIE', STATUS )

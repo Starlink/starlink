@@ -1,6 +1,6 @@
 *+  FIT_STAT - Evaluates statistical fit between predicted and observed data
-      SUBROUTINE FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARAM, FSTAT,
-     :                          PREDICTOR, PREDDAT, STAT, STATUS )
+      SUBROUTINE FIT_STAT( NDS, IMOD, PARAM, FSTAT,
+     :                          PREDICTOR, STAT, STATUS )
 *    Description :
 *
 *     Evaluates current predicted data (storing the result in PREDDAT) and
@@ -71,16 +71,17 @@
 *    Import :
 *
       INTEGER             NDS			! Number of observed datasets
-      RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
-      RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
+c     RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
+c     RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
       REAL                PARAM(NPAMAX)		! Model parameters
       INTEGER             FSTAT                 ! Statistic to use
       EXTERNAL            PREDICTOR             ! Model data predictor
 *
 *    Import-Export :
 *
-      RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
+c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
                                                 ! (actually only the data
 *                                               ! pointed to are updated)
 *    Export :
@@ -110,39 +111,43 @@
       DO N = 1, NDS
 
 *    Check dataset
-	IF ( (OBDAT(N).WPTR.EQ.0) .AND. .NOT. MAXL ) THEN
+	IF ( (DATASET_WPTR(N).EQ.0) .AND. .NOT. MAXL ) THEN
 	  STATUS = SAI__ERROR
 	  CALL ERR_REP( 'NOWTS','No data weights available', STATUS )
 	  GOTO 99
-	ELSE IF ( PREDDAT(N).DPTR .EQ. 0 ) THEN
+	ELSE IF ( PREDICTION_DPTR(N) .EQ. 0 ) THEN
 	  STATUS = SAI__ERROR
 	  CALL ERR_REP( ' ','No space set up for predicted data',STATUS)
 	  GOTO 99
 	END IF
 
 *    Evaluate model
-	CALL PREDICTOR( FSTAT, NDS, OBDAT, INSTR, PREDDAT, MODEL,
-     :                  PARAM, N, %VAL(PREDDAT(N).DPTR), STATUS )
+	CALL PREDICTOR( FSTAT, NDS, IMOD, PARAM, N,
+     :                  %VAL(PREDICTION_DPTR(N)), STATUS )
 
 *    Group the predicted data?
-        IF ( OBDAT(N).GFLAG ) THEN
-          CALL UTIL_GRPWR( OBDAT(N).NDAT, %VAL(PREDDAT(N).DPTR),
-     :                    .FALSE., 0.0, OBDAT(N).QFLAG,
-     :                    %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
-     :                    OBDAT(N).NGDAT, %VAL(PREDDAT(N).GDPTR),
-     :                    0.0, %VAL(OBDAT(N).GQPTR), STATUS )
+        IF ( DATASET_GFLAG(N) ) THEN
+          CALL UTIL_GRPWR( DATASET_NDAT(N), %VAL(PREDICTION_DPTR(N)),
+     :                    .FALSE., 0.0, DATASET_QFLAG(N),
+     :                    %VAL(DATASET_QPTR(N)), %VAL(DATASET_GPTR(N)),
+     :                    DATASET_NGDAT(N), %VAL(PREDICTION_GDPTR(N)),
+     :                    0.0, %VAL(DATASET_GQPTR(N)), STATUS )
         END IF
 
 *    Accumulate statistic
         IF ( MAXL ) THEN
-	  CALL FIT_LOGL_ACCUM( OBDAT(N).NGDAT, %VAL(OBDAT(N).GDPTR),
-     :                      OBDAT(N).QFLAG, %VAL(OBDAT(N).GQPTR),
-     :                      %VAL(PREDDAT(N).GDPTR), DSTAT, STATUS )
+	  CALL FIT_LOGL_ACCUM( DATASET_NGDAT(N), %VAL(DATASET_GDPTR(N)),
+     :                         DATASET_QFLAG(N), %VAL(DATASET_GQPTR(N)),
+     :                         %VAL(PREDICTION_GDPTR(N)), DSTAT,
+     :                         STATUS )
         ELSE
-	  CALL FIT_CHISQ_ACCUM( OBDAT(N).NGDAT, %VAL(OBDAT(N).GDPTR),
-     :                         OBDAT(N).QFLAG, %VAL(OBDAT(N).GQPTR),
-     :          %VAL(OBDAT(N).GWPTR), %VAL(PREDDAT(N).GDPTR), DSTAT,
-     :             STATUS )
+	  CALL FIT_CHISQ_ACCUM( DATASET_NGDAT(N),
+     :                          %VAL(DATASET_GDPTR(N)),
+     :                          DATASET_QFLAG(N),
+     :                          %VAL(DATASET_GQPTR(N)),
+     :                          %VAL(DATASET_GWPTR(N)),
+     :                          %VAL(PREDICTION_GDPTR(N)), DSTAT,
+     :                          STATUS )
         END IF
 
       END DO

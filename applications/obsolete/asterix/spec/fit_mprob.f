@@ -1,6 +1,5 @@
 *+  FIT_MPROB - Finds probability that observed data is drawn from model
-      SUBROUTINE FIT_MPROB( NDS, OBDAT, FSTAT, SSCALE, PREDDAT,
-     :                      STATMIN, FPROB, STATUS )
+      SUBROUTINE FIT_MPROB( NDS, FSTAT, SSCALE, STATMIN, FPROB, STATUS )
 *
 *    Description :
 *
@@ -41,10 +40,10 @@
 *    Import :
 *
       INTEGER             	NDS			! Number of observed datasets
-      RECORD /DATASET/    	OBDAT(NDS)		! Observed datasets
+c     RECORD /DATASET/    	OBDAT(NDS)		! Observed datasets
       INTEGER             	SSCALE			! Statistic scale factor
       INTEGER             	FSTAT                 	! Statistic to use
-      RECORD /PREDICTION/ 	PREDDAT(NDS)	        ! Data predicted by
+c     RECORD /PREDICTION/ 	PREDDAT(NDS)	        ! Data predicted by
 							! model
       DOUBLE PRECISION    	STATMIN			! Statistic at minimum
 *
@@ -95,9 +94,9 @@
         DO N = 1, NDS
 
 *        Accumulate likelihood probability
-          CALL FIT_MPROB1( OBDAT(N).NDAT, %VAL(OBDAT(N).DPTR),
-     :                     OBDAT(N).QFLAG, %VAL(OBDAT(N).QPTR),
-     :                     %VAL(PREDDAT(N).DPTR), LFPM, LFPD,
+          CALL FIT_MPROB1( DATASET_NDAT(N), %VAL(DATASET_DPTR(N)),
+     :                     DATASET_QFLAG(N), %VAL(DATASET_QPTR(N)),
+     :                     %VAL(DATASET_DPTR(N)), LFPM, LFPD,
      :                     LFPDV, LFPT, STATUS )
 
         END DO

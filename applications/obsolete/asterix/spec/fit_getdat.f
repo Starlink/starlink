@@ -1,6 +1,5 @@
       SUBROUTINE FIT_GETDAT( MPCID, ID, GENUS, FSTAT, WORKSPACE,
-     :                       WEIGHTS, NDS, OBDAT, NGOOD, SSCALE,
-     :                       PREDDAT, INSTR, STATUS )
+     :                       WEIGHTS, NDS, NGOOD, SSCALE, STATUS )
 *+
 *  Name:
 *     FIT_GETDAT
@@ -203,11 +202,11 @@
 
 *  Arguments Returned:
       INTEGER 			NDS                     ! No of datasets
-      RECORD /DATASET/ 		OBDAT(NDSMAX)  		! Observed datasets
+c     RECORD /DATASET/ 		OBDAT(NDSMAX)  		! Observed datasets
       INTEGER 			NGOOD                   ! No of good data elements
       INTEGER 			SSCALE                  ! Factor for scaling fitstat
-      RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
-      RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
+c     RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
+c     RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -285,6 +284,9 @@
 	LIKSTAT = .FALSE.
 	CHISTAT = .TRUE.
       END IF
+
+*  Initialize variables
+      NDUFVAR = 0
 
 *  Find datasets - get identifiers
       IF ( .NOT. REF ) THEN
@@ -540,7 +542,8 @@ c DCFID(I)
  100	        FORMAT(' Using component number: ',I3)
 	      ELSE
 	        WRITE(*,110) (DETSEL(I,N),I=1,SETSIZE)
- 110	        FORMAT(' Using numbers: ',<SETSIZE>(I3))
+ 110	        FORMAT(' Using numbers: ',(I3))
+c110	        FORMAT(' Using numbers: ',<SETSIZE>(I3))
 	      END IF
 	    ELSE
 	      SETSIZE = DIMS(2)
@@ -569,7 +572,7 @@ c DCFID(I)
 	    END IF
 
 *       Set up name, locator and set position
-            CALL ADI_CLONE( DCFID(N), OBDAT(NDS).D_ID, STATUS )
+            CALL ADI_CLONE( DCFID(N), DATASET_D_ID(NDS), STATUS )
 
 	    IF (SPECSET(N)) THEN
 	      INDEX=INDEX+1
@@ -579,74 +582,75 @@ c DCFID(I)
 	        SPECNO=INDEX
 	      END IF
 	      CALL CHR_ITOC(SPECNO,SPECH,NCH)
-	      OBDAT(NDS).DATNAME=FILE(1:CHR_LEN(FILE))//' Spectrum '/
-     :                         /SPECH
+	      DATASET_DATNAME(NDS)=
+     :          FILE(1:CHR_LEN(FILE))//' Spectrum '//SPECH
 	    ELSE
 	      SPECNO=0
-	      OBDAT(NDS).DATNAME = FILE
+	      DATASET_DATNAME(NDS) = FILE
 	    END IF
-	    OBDAT(NDS).SETINDEX = SPECNO
+	    DATASET_SETINDEX(NDS) = SPECNO
 
 *       Map the data array
-            CALL BDI_MAPR( OBDAT(NDS).D_ID, 'Data', 'READ', TPTR,
+            CALL BDI_MAPR( DATASET_D_ID(NDS), 'Data', 'READ', TPTR,
      :                     STATUS )
 
 *       Find and map data array
 	    IF ( SPECSET(N) ) THEN
 
 *          Map dynamic memory for slice
-              CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).DPTR, STATUS )
+              CALL DYN_MAPR( 1, DIMS(1), DATASET_DPTR(NDS), STATUS )
 
 *          Define the slice
 	      LDIM(1) = 1
 	      LDIM(2) = SPECNO
 	      UDIM(1) = DIMS(1)
 	      UDIM(2) = SPECNO
-	      OBDAT(NDS).NDIM = 1
-	      OBDAT(NDS).IDIM(1) = DIMS(1)
-	      OBDAT(NDS).NDAT = DIMS(1)
+	      DATASET_NDIM(NDS) = 1
+	      DATASET_IDIM(NDS,1) = DIMS(1)
+	      DATASET_NDAT(NDS) = DIMS(1)
 
 *          Copy the slice
               CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
-     :                         %VAL(OBDAT(NDS).DPTR), STATUS )
+     :                         %VAL(DATASET_DPTR(NDS)), STATUS )
 
 	    ELSE
 
 *          Simple mapping
-	      OBDAT(NDS).NDIM = NDIM
-	      DO I = 1,OBDAT(NDS).NDIM
-	        OBDAT(NDS).IDIM(I) = DIMS(I)
+	      DATASET_NDIM(NDS) = NDIM
+	      DO I = 1,DATASET_NDIM(NDS)
+	        DATASET_IDIM(NDS,I) = DIMS(I)
 	      END DO
-              OBDAT(NDS).DPTR = TPTR
-              CALL ARR_SUMDIM( NDIM, DIMS, OBDAT(NDS).NDAT )
+              DATASET_DPTR(NDS) = TPTR
+              CALL ARR_SUMDIM( NDIM, DIMS, DATASET_NDAT(NDS) )
 
 	    END IF
 	    IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *         For likelihood case scale to give raw counts, & accumulate SSCALE
 	    IF ( LIKSTAT ) THEN
-	      PTR = OBDAT(NDS).DPTR
-	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).DPTR,STATUS)
-	      CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
-     :        %VAL(OBDAT(NDS).DPTR),STATUS)
+	      PTR = DATASET_DPTR(NDS)
+	      CALL DYN_MAPR(1,DATASET_NDAT(NDS),DATASET_DPTR(NDS),
+     :                                                          STATUS)
+	      CALL ARR_COP1R(DATASET_NDAT(NDS),%VAL(PTR),
+     :        %VAL(DATASET_DPTR(NDS)),STATUS)
 	      IF (STATUS.NE.SAI__OK) GOTO 99
-	      CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,
-     :           %VAL(OBDAT(NDS).DPTR),STATUS )
+	      CALL ARR_MULTR(TEFF,DATASET_NDAT(NDS),
+     :           %VAL(DATASET_DPTR(NDS)),STATUS )
 	    END IF
 
 *       Map variance and quality and use to set up array of data weights
 
 *          Get variance (slice in case of spectral set)
-            CALL BDI_CHK( OBDAT(NDS).D_ID, 'Variance', OK, STATUS )
+            CALL BDI_CHK( DATASET_D_ID(NDS), 'Variance', OK, STATUS )
 	    IF ( OK ) THEN
-	      CALL BDI_MAPR(OBDAT(NDS).D_ID,'Variance','READ',TPTR,
+	      CALL BDI_MAPR(DATASET_D_ID(NDS),'Variance','READ',TPTR,
      :                      STATUS)
 	      IF (SPECSET(N)) THEN
-                CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).VPTR, STATUS )
+                CALL DYN_MAPR( 1, DIMS(1), DATASET_VPTR(NDS), STATUS )
                 CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
-     :                           %VAL(OBDAT(NDS).VPTR), STATUS )
+     :                           %VAL(DATASET_VPTR(NDS)), STATUS )
 	      ELSE
-                OBDAT(NDS).VPTR = TPTR
+                DATASET_VPTR(NDS) = TPTR
 	      END IF
 	    ELSE
 	      IF ( WEIGHTS ) THEN
@@ -655,30 +659,30 @@ c DCFID(I)
 	        CALL ERR_REP( ' ', 'No error information available '//
      :          'in dataset ^NDS',STATUS)
 	      ELSE
-	        OBDAT(NDS).VPTR=0			! Flag
+	        DATASET_VPTR(NDS)=0			! Flag
 	      END IF
 	    END IF
 	    IF (STATUS.NE.SAI__OK) GOTO 99
 
 *        Get quality
-            CALL BDI_CHK( OBDAT(NDS).D_ID, 'Quality', QUAL, STATUS )
+            CALL BDI_CHK( DATASET_D_ID(NDS), 'Quality', QUAL, STATUS )
 	    IF (QUAL) THEN
-	      CALL BDI_MAPL( OBDAT(NDS).D_ID, 'LogicalQuality',
+	      CALL BDI_MAPL( DATASET_D_ID(NDS), 'LogicalQuality',
      :                       'READ', TPTR, STATUS )
 	      IF (SPECSET(N)) THEN
-                CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).QPTR, STATUS )
+                CALL DYN_MAPR( 1, DIMS(1), DATASET_QPTR(NDS), STATUS )
                 CALL ARR_SLCOPL( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
-     :                           %VAL(OBDAT(NDS).QPTR), STATUS )
+     :                           %VAL(DATASET_QPTR(NDS)), STATUS )
 	      ELSE
-                OBDAT(NDS).QPTR = TPTR
+                DATASET_QPTR(NDS) = TPTR
 	      END IF
 
 *          Set quality flag
-	      OBDAT(NDS).QFLAG = .TRUE.
+	      DATASET_QFLAG(NDS) = .TRUE.
 
 	    ELSE
-	      OBDAT(NDS).QFLAG=.FALSE.
-	      OBDAT(NDS).QPTR=0
+	      DATASET_QFLAG(NDS)=.FALSE.
+	      DATASET_QPTR(NDS)=0
 	    END IF
 	    IF (STATUS.NE.SAI__OK) THEN
 	      CALL ERR_ANNUL(STATUS)
@@ -686,159 +690,165 @@ c DCFID(I)
 	    END IF
 
 *        Check grouping?
-            CALL BDI_CHK( OBDAT(NDS).D_ID, 'Grouping', GROUPS, STATUS )
+            CALL BDI_CHK( DATASET_D_ID(NDS), 'Grouping', GROUPS,
+     :                    STATUS )
             IF ( GROUPS ) THEN
 
-	      CALL BDI_MAPI( OBDAT(NDS).D_ID, 'Grouping',
+	      CALL BDI_MAPI( DATASET_D_ID(NDS), 'Grouping',
      :                       'READ', TPTR, STATUS )
 	      IF (SPECSET(N)) THEN
-                CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).GPTR, STATUS )
+                CALL DYN_MAPR( 1, DIMS(1), DATASET_GPTR(NDS), STATUS )
                 CALL ARR_SLCOPI( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
-     :                           %VAL(OBDAT(NDS).GPTR), STATUS )
+     :                           %VAL(DATASET_GPTR(NDS)), STATUS )
 	      ELSE
-                OBDAT(NDS).GPTR = TPTR
+                DATASET_GPTR(NDS) = TPTR
 
 	      END IF
 
 *          Count number of groups
-              CALL UTIL_CNTGRP( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).GPTR),
-     :                          OBDAT(NDS).NGDAT, STATUS )
+              CALL UTIL_CNTGRP( DATASET_NDAT(NDS),
+     :                          %VAL(DATASET_GPTR(NDS)),
+     :                          DATASET_NGDAT(NDS), STATUS )
               IF ( .NOT. SLAVE ) THEN
-                CALL MSG_SETI( 'NG', OBDAT(NDS).NGDAT )
+                CALL MSG_SETI( 'NG', DATASET_NGDAT(NDS) )
 	        CALL MSG_PRNT('    Loaded grouping array with '/
      :                         /'^NG groups')
               END IF
 
 *          Create workspace for grouped data
-              CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GDPTR,
-     :                       STATUS )
-              IF ( OBDAT(NDS).QFLAG ) THEN
-                CALL DYN_MAPL( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GQPTR,
-     :                         STATUS )
+              CALL DYN_MAPR( 1, DATASET_NGDAT(NDS),
+     :                       DATASET_GDPTR(NDS), STATUS )
+              IF ( DATASET_QFLAG(NDS) ) THEN
+                CALL DYN_MAPL( 1, DATASET_NGDAT(NDS),
+     :                         DATASET_GQPTR(NDS), STATUS )
               END IF
-              IF ( OBDAT(NDS).VPTR .NE. 0 ) THEN
-                CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GVPTR,
-     :                         STATUS )
+              IF ( DATASET_VPTR(NDS) .NE. 0 ) THEN
+                CALL DYN_MAPR( 1, DATASET_NGDAT(NDS),
+     :                         DATASET_GVPTR(NDS), STATUS )
               END IF
 
 *          Set grouping flag
-	      OBDAT(NDS).GFLAG = .TRUE.
+	      DATASET_GFLAG(NDS) = .TRUE.
 
 *        In the absence of grouping make the group data pointers point
 *        to the input data
             ELSE
-	      OBDAT(NDS).GFLAG = .FALSE.
-              OBDAT(NDS).GDPTR = OBDAT(NDS).DPTR
-              OBDAT(NDS).GVPTR = OBDAT(NDS).VPTR
-              OBDAT(NDS).GQPTR = OBDAT(NDS).QPTR
-              OBDAT(NDS).NGDAT = OBDAT(NDS).NDAT
+	      DATASET_GFLAG(NDS) = .FALSE.
+              DATASET_GDPTR(NDS) = DATASET_DPTR(NDS)
+              DATASET_GVPTR(NDS) = DATASET_VPTR(NDS)
+              DATASET_GQPTR(NDS) = DATASET_QPTR(NDS)
+              DATASET_NGDAT(NDS) = DATASET_NDAT(NDS)
 
             END IF
 
 *        Map weights as 1D array
 	    IF ( WEIGHTS ) THEN
-	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).WPTR,STATUS)
-              IF ( OBDAT(NDS).GFLAG ) THEN
-                CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GWPTR,
-     :                         STATUS )
+	      CALL DYN_MAPR(1,DATASET_NDAT(NDS),DATASET_WPTR(NDS),
+     :                      STATUS)
+              IF ( DATASET_GFLAG(NDS) ) THEN
+                CALL DYN_MAPR( 1, DATASET_NGDAT(NDS),
+     :                         DATASET_GWPTR(NDS), STATUS )
               ELSE
-                OBDAT(NDS).GWPTR = OBDAT(NDS).WPTR
+                DATASET_GWPTR(NDS) = DATASET_WPTR(NDS)
               END IF
 	      IF (STATUS.NE.SAI__OK) GOTO 99
 	    ELSE
-	      OBDAT(NDS).WPTR = 0				! Flag
-              OBDAT(NDS).GWPTR = 0
+	      DATASET_WPTR(NDS) = 0				! Flag
+              DATASET_GWPTR(NDS) = 0
 	    END IF
 
 *        Default value for vignetting object
-            OBDAT(NDS).V_ID = ADI__NULLID
+            DATASET_V_ID(NDS) = ADI__NULLID
             IF ( VIG ) THEN
 
 *        Store identifier
-              OBDAT(NDS).V_ID = VFID(N)
+              DATASET_V_ID(NDS) = VFID(N)
 
 *        Map vignetting array
-              CALL BDI_MAPR( VFID(N), 'Data', 'READ', OBDAT(N).VIGPTR,
+              CALL BDI_MAPR( VFID(N), 'Data', 'READ', DATASET_GPTR(NDS),
      :                          STATUS )
 	      CALL MSG_PRNT('    Loaded associated vignetting array')
 
             END IF
 
 *        Default value for background object
-            OBDAT(NDS).B_ID = ADI__NULLID
+            DATASET_B_ID(NDS) = ADI__NULLID
 
 *        For likelihood case, Set up OBDAT.TEFF and get background data
 	    IF ( LIKSTAT ) THEN
-	      OBDAT(NDS).TEFF=TEFF
+	      DATASET_TEFF(NDS)=TEFF
 	      IF (BG) THEN
 
 *            Store background object
-                OBDAT(NDS).B_ID = BFID(N)
+                DATASET_B_ID(NDS) = BFID(N)
 
 *            Map background data
 	        CALL BDI_MAPR( BFID(N), 'Data', 'READ', TPTR, STATUS )
 
 *            Find and map b/g data array
 	        IF (SPECSET(N)) THEN
-                  CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).BPTR, STATUS )
+                  CALL DYN_MAPR( 1, DIMS(1), DATASET_BPTR(NDS), STATUS )
                   CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
-     :                             %VAL(OBDAT(NDS).BPTR), STATUS )
+     :                             %VAL(DATASET_BPTR(NDS)), STATUS )
 	        ELSE
-                  OBDAT(NDS).BPTR = TPTR
+                  DATASET_BPTR(NDS) = TPTR
 
 	        END IF
 
 *           Scale b/g to give raw counts if it has been exposure corrected
 	        IF ( BGCOR ) THEN
-	          PTR=OBDAT(NDS).BPTR
-	          CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).BPTR,STATUS)
-	          CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
-     :            %VAL(OBDAT(NDS).BPTR),STATUS)
+	          PTR=DATASET_BPTR(NDS)
+	          CALL DYN_MAPR(1,DATASET_NDAT(NDS),DATASET_BPTR(NDS),
+     :                          STATUS)
+	          CALL ARR_COP1R(DATASET_NDAT(NDS),%VAL(PTR),
+     :                           %VAL(DATASET_BPTR(NDS)),STATUS)
 	          IF (STATUS.NE.SAI__OK) GOTO 99
-	          CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,
-     :        %VAL(OBDAT(NDS).BPTR),STATUS)
+	          CALL ARR_MULTR(TEFF,DATASET_NDAT(NDS),
+     :                           %VAL(DATASET_BPTR(NDS)),STATUS)
 	        END IF
 
 *            If b/g has been subtracted then add it back into data and SSCALE
 	        IF ( BGSUB ) THEN
-	          CALL VEC_ADDR(.FALSE.,OBDAT(N).NDAT,%VAL(OBDAT(N).BPTR),
-     :            %VAL(OBDAT(N).DPTR),%VAL(OBDAT(N).DPTR),IERR,NERR,
+	          CALL VEC_ADDR(.FALSE.,DATASET_NDAT(N),%VAL(DATASET_BPTR(N)),
+     :            %VAL(DATASET_DPTR(N)),%VAL(DATASET_DPTR(N)),IERR,NERR,
      :            STATUS)
 	        END IF
 
 *         No background data - set up array of zeros
 	      ELSE
-	        CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).BPTR,STATUS)
-	        CALL ARR_INIT1R(0.0,OBDAT(NDS).NDAT,
-     :                      %VAL(OBDAT(NDS).BPTR),STATUS)
+	        CALL DYN_MAPR(1,DATASET_NDAT(NDS),DATASET_BPTR(NDS),STATUS)
+	        CALL ARR_INIT1R(0.0,DATASET_NDAT(NDS),
+     :                      %VAL(DATASET_BPTR(NDS)),STATUS)
 	      END IF
 
 	    END IF
 
 *        Grouping specified?
-            IF ( OBDAT(NDS).GFLAG ) THEN
-              CALL UTIL_GRPVR( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
-     :                 (OBDAT(NDS).VPTR.NE.0), %VAL(OBDAT(NDS).VPTR),
-     :                 OBDAT(NDS).QFLAG, %VAL(OBDAT(NDS).QPTR),
-     :                 %VAL(OBDAT(NDS).GPTR), OBDAT(NDS).NGDAT,
-     :                 %VAL(OBDAT(NDS).GDPTR), %VAL(OBDAT(NDS).GVPTR),
-     :                 %VAL(OBDAT(NDS).GQPTR), STATUS )
+            IF ( DATASET_GFLAG(NDS) ) THEN
+              CALL UTIL_GRPVR( DATASET_NDAT(NDS),
+     :               %VAL(DATASET_DPTR(NDS)),
+     :               (DATASET_VPTR(NDS).NE.0), %VAL(DATASET_VPTR(NDS)),
+     :               DATASET_QFLAG(NDS), %VAL(DATASET_QPTR(NDS)),
+     :               %VAL(DATASET_GPTR(NDS)), DATASET_NGDAT(NDS),
+     :               %VAL(DATASET_GDPTR(NDS)), %VAL(DATASET_GVPTR(NDS)),
+     :               %VAL(DATASET_GQPTR(NDS)), STATUS )
             END IF
 
 *        Enter weights (=inverse variances)
             IF ( WEIGHTS ) THEN
-	      CALL FIT_GETDAT_WTS( OBDAT(NDS).NGDAT,
-     :                   %VAL(OBDAT(NDS).GVPTR), OBDAT(NDS).QFLAG,
-     :                   %VAL(OBDAT(NDS).GQPTR),
-     :                   %VAL(OBDAT(NDS).GWPTR), NDUFVAR, STATUS )
+	      CALL FIT_GETDAT_WTS( DATASET_NGDAT(NDS),
+     :                   %VAL(DATASET_GVPTR(NDS)), DATASET_QFLAG(NDS),
+     :                   %VAL(DATASET_GQPTR(NDS)),
+     :                   %VAL(DATASET_GWPTR(NDS)), NDUFVAR, STATUS )
             END IF
 
 *        Compute number of good points
-            IF ( OBDAT(NDS).QFLAG ) THEN
-              CALL ARR_CNT1L( OBDAT(NDS).NGDAT, %VAL(OBDAT(NDS).GQPTR),
+            IF ( DATASET_QFLAG(NDS) ) THEN
+              CALL ARR_CNT1L( DATASET_NGDAT(NDS),
+     :                        %VAL(DATASET_GQPTR(NDS)),
      :                        .TRUE., CNGOOD, STATUS )
             ELSE
-              CNGOOD = OBDAT(NDS).NGDAT
+              CNGOOD = DATASET_NGDAT(NDS)
             END IF
             CNGOOD = CNGOOD - NDUFVAR
             IF ( CNGOOD .GT. 0 ) THEN
@@ -855,12 +865,12 @@ c DCFID(I)
             IF ( LIKSTAT ) THEN
 
 *          Accumulate counts for data
-              IF ( OBDAT(NDS).QFLAG ) THEN
-	        CALL FIT_GETDAT_COUNTSQ(OBDAT(NDS).NDAT,
-     :                      %VAL(OBDAT(NDS).DPTR),
-     :                      %VAL(OBDAT(NDS).QPTR),SSCALE)
+              IF ( DATASET_QFLAG(NDS) ) THEN
+	        CALL FIT_GETDAT_COUNTSQ(DATASET_NDAT(NDS),
+     :                      %VAL(DATASET_DPTR(NDS)),
+     :                      %VAL(DATASET_QPTR(NDS)),SSCALE)
               ELSE
-	        CALL ARR_SUM1R( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
+	        CALL ARR_SUM1R( DATASET_NDAT(NDS), %VAL(DATASET_DPTR(NDS)),
      :                          RSUM, STATUS )
                 SSCALE = SSCALE + NINT(RSUM)
               END IF
@@ -871,18 +881,18 @@ c DCFID(I)
 
 *    Hardwire CONVOLVE flag false in cluster fitting.
             IF ( GENUS .EQ. 'CLUS' ) THEN
-              PREDDAT(N).CONVOLVE = .FALSE.
+              PREDICTION_CONVOLVE(N) = .FALSE.
             ELSE
 *      Look for instrument response, set up INSTR if found, and report
-	      CALL FIT_GETINS( OBDAT(NDS).D_ID, SPECNO, 1,
-     :               PREDDAT(NDS).CONVOLVE, INSTR(NDS), STATUS )
+	      CALL FIT_GETINS( DATASET_D_ID(NDS), SPECNO, 1,
+     :               PREDICTION_CONVOLVE(NDS), NDS, STATUS )
 	      IF (STATUS.NE.SAI__OK) GOTO 99
             END IF
 
-	    IF (PREDDAT(NDS).CONVOLVE) THEN
+	    IF (PREDICTION_CONVOLVE(NDS)) THEN
 
 *      Check that data are 1D
-	      IF (OBDAT(NDS).NDIM.GT.1) THEN
+	      IF (DATASET_NDIM(NDS).GT.1) THEN
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP(' ','Convolution with instrument response'
      :          //' is only supported for 1D data at present',STATUS)
@@ -891,8 +901,8 @@ c DCFID(I)
 	    END IF
 
 *      Find remaining components of PREDDAT(NDS)
-	  CALL FIT_PREDSET( OBDAT(NDS).D_ID, NDS, WORKSPACE,
-     :                      OBDAT(NDS), PREDDAT(NDS), STATUS )
+	  CALL FIT_PREDSET( DATASET_D_ID(NDS), NDS, WORKSPACE,
+     :                      NDS, NDS, STATUS )
 
 	END DO
 

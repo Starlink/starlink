@@ -1,6 +1,6 @@
 *+  FIT_DERIVS - Evaluates 1st and 2nd derivs of fit statistic wrt. model params
-      SUBROUTINE FIT_DERIVS(NDS,OBDAT,INSTR,MODEL,NPAR,PARAM,LB,UB,
-     :    DPAR,FROZEN,FSTAT,PREDICTOR,PREDDAT,DERIV1,DERIV2,STATUS)
+      SUBROUTINE FIT_DERIVS(NDS,IMOD,NPAR,PARAM,LB,UB,
+     :    DPAR,FROZEN,FSTAT,PREDICTOR,DERIV1,DERIV2,STATUS)
 *
 *    Description :
 *
@@ -87,9 +87,10 @@
 *    Import :
 *
       INTEGER             NDS			! Number of observed datasets
-      RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
-      RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
-      RECORD /MODEL_SPEC/ MODEL			! Model specification
+c     RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
+c     RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
+c     RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER		  IMOD
       INTEGER             NPAR			! No of parameters
       REAL                PARAM(NPAMAX)		! Model parameters
       REAL                LB(NPAMAX)		! Parameter lower bounds
@@ -101,7 +102,7 @@
 *
 *    Import-Export :
 *
-      RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
+c     RECORD /PREDICTION/ PREDDAT(NDS)	        ! Data predicted by model
                                                 ! (actually only the data
 *						! pointed to are updated)
 *    Export :
@@ -153,19 +154,20 @@
       DO N = 1, NDS
 
 *    Derivatives array wasn't pre-allocated
-        IF ( PREDDAT(N).DFDPPTR .EQ. VAL__BADI ) THEN
-          CALL DYN_MAPR( 1, PREDDAT(N).NMDAT*NPAR, PREDDAT(N).DFDPPTR,
-     :                   STATUS )
+        IF ( PREDICTION_DFDPPTR(N) .EQ. VAL__BADI ) THEN
+          CALL DYN_MAPR( 1, PREDICTION_NMDAT(N)*NPAR,
+     :                   PREDICTION_DFDPPTR(N), STATUS )
         END IF
 
 *    Accumulate derivates for this dataset
-	CALL FIT_DERIVS_ACCUM(NDS,OBDAT,INSTR,MODEL,FSTAT,PREDICTOR,
-     :    PREDDAT,NPAR,PARAM,LB,UB,FROZEN,DPUP,DPDOWN,N,OBDAT(N).NGDAT,
-     :    %VAL(OBDAT(N).GDPTR), %VAL(OBDAT(N).GWPTR),
-     :    OBDAT(N).QFLAG, %VAL(OBDAT(N).GQPTR),
-     :    %VAL(PREDDAT(N).GDPTR),DERIV1,DERIV2,%VAL(PREDDAT(N).DFDPPTR),
-     :    %VAL(PREDDAT(N).PREDPTR(1)),
-     :    %VAL(PREDDAT(N).PGDPTR(1)),%VAL(PREDDAT(N).PGDPTR(2)),
+	CALL FIT_DERIVS_ACCUM(NDS,IMOD,FSTAT,PREDICTOR,
+     :    NPAR,PARAM,LB,UB,FROZEN,DPUP,DPDOWN,N,DATASET_NGDAT(N),
+     :    %VAL(DATASET_GDPTR(N)), %VAL(DATASET_GWPTR(N)),
+     :    DATASET_QFLAG(N), %VAL(DATASET_GQPTR(N)),
+     :    %VAL(PREDICTION_GDPTR(N)),DERIV1,DERIV2,
+     :    %VAL(PREDICTION_DFDPPTR(N)),
+     :    %VAL(PREDICTION_PREDPTR(N,1)),
+     :    %VAL(PREDICTION_PGDPTR(N,1)),%VAL(PREDICTION_PGDPTR(N,2)),
      :    STATUS)
 
       END DO
