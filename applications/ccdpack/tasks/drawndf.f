@@ -253,6 +253,7 @@
       LOGICAL LABIND             ! Use labelling INDEX option?
       LOGICAL LABDOT             ! Use labelling DOT option?
       LOGICAL PENROT             ! Rotate pen styles for different outlines?
+      LOGICAL NOINV              ! Has coordinate system been reflected?
       REAL XCH                   ! Vertical baseline text character height
       REAL YCH                   ! Horizontal baseline text character height
       REAL UP( 2 )               ! Up direction for text
@@ -260,14 +261,14 @@
       DOUBLE PRECISION DOT       ! Dot product
       DOUBLE PRECISION GLBND( 2 ) ! Lower GRID-like coordinate bounds
       DOUBLE PRECISION GUBND( 2 ) ! Upper GRID-like coordinate bounds
-      DOUBLE PRECISION IXUP( 4 ) ! Input X up-direction coordinate vector
-      DOUBLE PRECISION IYUP( 4 ) ! Input Y up-direction coordinate vector
+      DOUBLE PRECISION IXUN( 4 ) ! Input X corners of the unit square 
+      DOUBLE PRECISION IYUN( 4 ) ! Input Y corners of the unit square
       DOUBLE PRECISION LPOS( 2 ) ! Dummy low position
       DOUBLE PRECISION OFS       ! Offset length for text label
       DOUBLE PRECISION OLBND( 2 ) ! Upper common coordinate bounds
       DOUBLE PRECISION OUBND( 2 ) ! Upper common coordinate bounds
-      DOUBLE PRECISION OXUP( 4 ) ! Output X up-direction coordinate vector
-      DOUBLE PRECISION OYUP( 4 ) ! Output X up-direction coordinate vector
+      DOUBLE PRECISION OXUN( 4 ) ! Output X corners of the unit square
+      DOUBLE PRECISION OYUN( 4 ) ! Output Y corners of the unit square
       DOUBLE PRECISION TPOS( 2 ) ! Text reference position
       DOUBLE PRECISION UPOS( 2 ) ! Dummy high position
       DOUBLE PRECISION VERTEX( 5, 2 ) ! GRID-like coordinates of array corners
@@ -294,6 +295,8 @@
       DATA PAXES / 1, 2 /
       DATA BGCOL / 0 /
       DATA LBGCOL / -1 /
+      DATA IXUN / 1D0, 0D0, 1D0, 0D0 /
+      DATA IYUN / 0D0, 1D0, 1D0, 0D0 /
 
 *.
 
@@ -639,18 +642,7 @@ c        CALL PGSCLP( 0 )
 
 *  Set the length of the offset vector for text labels.
       CALL PGQCS( 4, XCH, YCH )
-      OFS = XCH * 0.5D0
-
-*  Set up points allowing calculation of unit vectors in the plot Base
-*  frame for positioning of the text labels.
-      IXUP( 1 ) = 0D0
-      IYUP( 1 ) = 0D0
-      IXUP( 2 ) = IXUP( 1 )
-      IYUP( 2 ) = IYUP( 1 ) + 1D0
-      IXUP( 3 ) = IXUP( 1 ) + 1D0
-      IYUP( 3 ) = IYUP( 1 ) + 1D0
-      IXUP( 4 ) = IXUP( 1 ) + 1D0
-      IYUP( 4 ) = IYUP( 1 )
+      OFS = XCH * 0.8D0
 
 *  Loop for each NDF.
       DO I = 1, NNDF
@@ -685,32 +677,47 @@ c        CALL PGSCLP( 0 )
             CALL PGSLW( LW )
          END IF
 
-*  We now want to plot the name of the NDF near the origin of its outline.
-*  Calculate the origin position and 'up' direction in plot base 
-*  coordinates.
+*  Check if we need to write any text.
          IF ( LFMT .NE. ' ' ) THEN
-            CALL AST_TRAN2( PLOT, 4, IXUP, IYUP, .FALSE., OXUP, OYUP,
+
+*  Calculate the transformed corners of the unit square.
+            CALL AST_TRAN2( PLOT, 4, IXUN, IYUN, .FALSE., OXUN, OYUN,
      :                      STATUS )
-            UP( 1 ) = REAL( OXUP( 2 ) - OXUP( 1 ) )
-            UP( 2 ) = REAL( OYUP( 2 ) - OYUP( 1 ) )
+
+*  Convert these into the X, Y and diagonal unit vectors for convenience.
+            DO J = 1, 3
+               OXUN( J ) = OXUN( J ) - OXUN( 4 )
+               OYUN( J ) = OYUN( J ) - OYUN( 4 )
+            END DO
+
+*  Find out whether the coordinate system has suffered a reflection, by
+*  testing the sense of the cross-product of the transformed unit X 
+*  and Y vectors.
+            NOINV = OXUN( 1 ) * OYUN( 2 ) - OYUN( 1 ) * OXUN( 2 )
+     :              .GT. 0D0
+
+*  Get 'up' direction normal to which to write the text.  This the 
+*  direction of the transformed X unit vector rotated by plus or
+*  minus 90 degrees.
+            IF ( NOINV ) THEN
+               UP( 1 ) = - REAL( OYUN( 1 ) )
+               UP( 2 ) =   REAL( OXUN( 1 ) )
+            ELSE
+               UP( 1 ) =   REAL( OYUN( 1 ) )
+               UP( 2 ) = - REAL( OXUN( 1 ) )
+            END IF
 
 *  Get the position of the outline origin, plus a small offset in the 
-*  direction of the plot Current coordinate (1,1) diagonal.
-            DIMOD = SQRT( ( OXUP( 3 ) - OXUP( 1 ) ) ** 2 +
-     :                    ( OYUP( 3 ) - OYUP( 1 ) ) ** 2 )
-            TPOS( 1 ) = OXUP( 1 ) + OFS * ( OXUP( 3 ) - OXUP( 1 ) )
-     :                / DIMOD
-            TPOS( 2 ) = OYUP( 1 ) + OFS * ( OYUP( 3 ) - OYUP( 1 ) )
-     :                / DIMOD
+*  direction of the transformed diagonal unit vector.
+            DIMOD = SQRT( OXUN( 3 ) ** 2 + OYUN( 3 ) ** 2 )
+            TPOS( 1 ) = OXUN( 4 ) + OFS * OXUN( 3 ) / DIMOD
+            TPOS( 2 ) = OYUN( 4 ) + OFS * OYUN( 3 ) / DIMOD
 
 *  Arrange for the text to sit inside the outline regardless of which
-*  direction the coordinates increase in.  This is done by rotating the
-*  UP vector by 90 degrees in the graphics frame, and seeing if the
-*  result is parallel or anti-parallel to the NDF's positive X direction
-*  in the graphics frame.
-            DOT = ( OYUP( 2 ) - OYUP( 1 ) ) * ( OXUP( 4 ) - OXUP( 1 ) )
-     :          + ( OXUP( 1 ) - OXUP( 2 ) ) * ( OYUP( 4 ) - OYUP( 1 ) )
-            IF ( DOT .GT. 0D0 ) THEN
+*  direction the coordinates increase in.  This is done setting 
+*  justification so that either the bottom left or bottom right corner
+*  of the text bounding box is near the origin.
+            IF ( NOINV ) THEN
                JUST = 'BL'
             ELSE
                JUST = 'BR'
