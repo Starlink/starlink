@@ -3,6 +3,7 @@ proc p4Plot {taskname} {
 # Sends "obey lut" and "obey plot" to the p4 task.
 #-
     global P4Widgets
+    global P4NoticeBoard
 
 # Check that there is a data set specified.
     set data [string trim [$P4Widgets(DATA) get]]
@@ -14,9 +15,11 @@ proc p4Plot {taskname} {
 
 # Get the root name of the notice board items
     cgs4drCursor pirate orange black
-    global P4NoticeBoard
     set port $P4Widgets(PORT_NO)
     set root ${P4NoticeBoard}.port_${port}.
+
+# Suck the present nbs items into a temporary array
+    if {$P4Widgets(RESETPLOT) == 1} {p4GetNbs $root}
 
 # Set autoscaling options
     set autoscale $P4Widgets(AUTOSCALE)
@@ -45,7 +48,6 @@ proc p4Plot {taskname} {
 # Set the plot style.
     set display_type $P4Widgets(DISPLAY_TYPE)
     nbs put ${root}display_type $display_type
-
 
 # Set any style specific options.
     switch $display_type {
@@ -115,10 +117,15 @@ proc p4Plot {taskname} {
     if {[$taskname path] != 0} {
       cgs4drCursor watch red white
       $taskname obey lut "port=$port" -inform "cgs4drInform $taskname %V"
-      $taskname obey display "data=$data port=$port" -inform "cgs4drInform $taskname %V"
+      set display_status -1
+      $taskname obey display "data=$data port=$port" -inform "cgs4drInform $taskname %V" -endmsg {set display_status 1}
+      tkwait variable display_status
     } else {
       cgs4drClear $taskname
       cgs4drInform $taskname "p4Plot error : No path to the plotting task - reload software?!"
     }
+
+# Restore the previous nbs items and exit script
+    if {$P4Widgets(RESETPLOT) == 1} {p4PutNbs $root}
     cgs4drCursor arrow green black
 }

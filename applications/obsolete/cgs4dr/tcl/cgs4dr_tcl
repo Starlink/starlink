@@ -1,4 +1,4 @@
-#!STAR_BIN/awish -file
+#!/star/bin/awish -file
 #+
 # tcl/tk interface to the cgs4dr system.
 #-
@@ -8,10 +8,10 @@
     global cgs4drBitmaps
 
 # Path and file names that may need to be cutomised
-    set tclAdamLib    STAR_LIB/tk/adam
+    set tclAdamLib    /star/lib/tk/adam
     set cgs4drTclLib  $env(CGS4DR_ROOT)/tcl
     set cgs4drBitmaps $env(CGS4DR_ROOT)/tcl
-    set cgs4drHtml    STAR_DOCS/sun27.htx
+    set cgs4drHtml    /star/docs/sun27.htx
 
 # Set up library search path
     lappend auto_path $tclAdamLib [exec /usr/bin/pwd] $cgs4drTclLib 
@@ -218,6 +218,8 @@
       .p4.mb.options.menu.colours add command -underline 4 -label "Set Widget Colours" -command "p4Colours $P4Task"
       .p4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $P4Task $P4NoticeBoard"
       .p4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $P4Task $P4NoticeBoard"
+      .p4.mb.options.menu add separator
+      .p4.mb.options.menu add checkbutton -underline 0 -label "Reset Autoplot" -variable P4Widgets(RESETPLOT)
       .p4.mb.options.menu add separator
       .p4.mb.options.menu add checkbutton -underline 0 -label "Verbose Output" -variable P4Widgets(VERBOSE)
       .p4.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $P4Task"

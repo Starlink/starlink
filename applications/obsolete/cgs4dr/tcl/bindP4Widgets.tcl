@@ -18,6 +18,7 @@ proc bindP4Widgets {taskname} {
 # Trace verbose output
     trace variable P4Widgets(VERBOSE) w "cgs4drVerbose $taskname"
     set P4Widgets(VERBOSE) 0
+    set P4Widgets(RESETPLOT) 1
 
 # Put a trace on the port number variable to load all the attribute widgets
 # when the port is changed.
