@@ -1,0 +1,214 @@
+CPGPLOT - An ANSI-C interface to the FORTRAN PGPLOT library.
+-----------------------------------------------------------
+
+Background
+----------
+Calling PGPLOT directly from C is a messy, difficult and unportable
+exercise. This is due to the lack of a universal set of inter-language
+calling conventions, and to the lack of a standard on how FORTRAN
+LOGICAL and CHARACTER types are represented in terms of basic machine
+types. Furthermore, since C implements call-by-value argument passing
+semantics, whereas FORTRAN uses pass-by-reference, there is the added
+complication that literal values must be sent indirectly by way of
+references to dummy variables.
+
+The CPGPLOT library adds an intermediate level of wrapper functions
+between C programs and the PGPLOT library. These functions hide the
+system dependencies of calling PGPLOT behind a system independent
+interface.
+
+USING THE LIBRARY
+-----------------
+The most important thing to remember when using the CPGPLOT interface
+library is to include the library header file, cpgplot.h at the top of
+all C files containing calls to the library. Without this file, the
+functions will not be correctly prototyped and your code will not
+work.
+
+IMPORTANT CONVENTIONS:
+
+1. The names of the C interface library functions are the same as
+   their PGPLOT counterparts, but are prefixed with a 'c' and written
+   in lower case.
+
+2. The interface implements pass-by-value argument passing semantics.
+   This removes the need for dummy variables, except where arguments
+   are used to return values.
+
+3. Where PGPLOT expects LOGICAL arguments, the C interface requires
+   (int) arguments. Integral zero is interpreted as FORTRAN .FALSE.
+   and non-zero as FORTRAN .TRUE..
+
+    FORTRAN call.       C equivalent call(s).
+    --------------      ----------------------------
+    PGASK(.FALSE.)      cpgask(0)
+    PGASK(.TRUE.)       cpgask(1) or cpgask(2) etc..
+
+4. Functions that take strings as input require normal C '\0'
+   terminated (char *) strings.
+
+5. Arguments that are used to return FORTRAN strings, must be treated
+   with care. FORTRAN doesn't understand '\0' termination of strings
+   and instead requires that the dimension of the character array be
+   specified along with the array. The interface handles this
+   transparently for input-only strings by using strlen() to determine
+   the length of the string, but for return string arguments it needs
+   to be told the length available in the passed char array.
+   Fortunately all PGPLOT routines that return such strings also have
+   an argument to return the unpadded length of the return string. In
+   CPGPLOT, you must initialize this argument with the dimension of
+   the string array that has been sent. In the prototypes listed in
+   cpgplot.h the length arguments are distinguishable by virtue of
+   their having the name of the string to which they relate, postfixed
+   with "_length". For example, the PGPLOT routine PGQINF() is
+   prototyped as:
+
+     void cpgqinf(char *item, char *value, int *value_length);
+
+   Where the 'value_length' argument is the length argument for the
+   string argument 'value'.
+
+   For example, to write a C function to return 1 if a PGPLOT device
+   is open, or 0 otherwise, one could write.
+
+     #include "cpgplot.h"
+     int pgplot_is_open(void)
+     {
+       char answer[10];                 /* The PGQINF return string */
+       int answer_len = sizeof(answer); /* allocated size of answer[] */
+       cpgqinf("STATE", answer, &answer_len);
+       return strcmp(answer, "YES") == 0;
+     }
+
+   Note that the dimension, sent as the third argument, is the total
+   number of characters allocated to the answer[] array. The
+   interface function actually subtracts one from this when it tells
+   PGPLOT how long the string is. This leaves room for the interface
+   function to terminate the returned string with a '\0'. All returned
+   strings are terminated in this manner at the length returned by
+   PGPLOT in the length argument.
+
+LIMITATIONS
+-----------
+Note that PGPLOT procedures that take FORTRAN SUBROUTINEs or FUNCTIONs
+as arguments are not represented in the CPGPLOT library. Such
+procedures can not be handled on most systems.
+
+RESIDUAL MACHINE DEPENDENCIES
+-----------------------------
+Many system vendors say that if you call FORTRAN functions that do any
+I/O, you should have a FORTRAN main program, so that the FORTRAN I/O
+module gets correctly initialized. Since PGPLOT uses FORTRAN I/O, this
+applies to C programs that call PGPLOT.
+
+Linking a C PGPLOT program.
+--------------------------
+Since FORTRAN usually has to be linked with a lot of support
+libraries, it is usually most convenient to use the FORTRAN compiler
+to link your C program. If your compiler is not the system-supplied
+compiler, then it is unlikely that the FORTRAN compiler will cite the
+correct C run-time library to the linker. This means that you will
+have to do it yourself. For instance under SunOS 4.x, I use gcc, because
+the the native C compiler is a pre-ANSI variant. Code generated by
+this compiler must be linked with libgcc.a. Where this library is
+located is system dependent, but is often placed in either
+/usr/local/lib or /usr/local/lib/gcc-lib/machine_type/gcc_version/.
+
+In either case, under SunOS/Solaris, if both this path and the path of
+the installation directory of the pgplot libraries exist in your
+LD_LIBRARY_PATH environment variable, you can link your program with a
+statement like:
+
+ f77 -o blob *.o -lcpgplot -lpgplot -lX11 -lgcc -lm
+
+Other systems will have a different name for the LD_LIBRARY_PATH
+variable, but in general it would be set with something like:
+
+ "/usr/local/pgplot:/usr/local/lib/gcc-lib/sparc-sun-solaris2.3/2.5.8/"
+
+Under csh or tcsh, use the setenv command to set this:
+
+  setenv LD_LIBRARY_PATH "..."
+
+Under sh, bash, ksh:
+
+  LD_LIBRARY_PATH="..."
+  export LD_LIBRARY_PATH
+
+On systems that don't support such a variable, you will have to
+explicitly specify both the libraries and their paths. For example,
+under SunOS:
+
+  f77 -o blob *.o -L/usr/local/pgplot -lcpgplot -lpgplot -lX11 \
+-L/usr/local/lib/gcc-lib/sparc-sun-solaris2.3/2.5.8/ -lgcc -lm
+
+PORTING TO A NEW SYSTEM
+-----------------------
+Not all systems are supported by the interface library. This is both
+because we don't have many of the systems here that we would need to
+create and test any such configuration, and because not all systems
+can be supported.
+
+The program that creates the library for each system is called pgbind
+(situated in the pgplot/cpg/ directory). To determine whether your
+system can be supported by this program, compile it with an ANSI-C
+compiler and run it with no arguments. It will list the available
+configuration options.
+
+If the current version of pgbind does not provide sufficient options
+to support your system, send us details of how your FORTRAN compiler
+acts. We need to know:
+
+1. In what form does the FORTRAN compiler export FORTRAN symbol names
+   to the linker. Are the symbol names exported in lower-case, upper
+   case, or in the case that FORTRAN symbols are declared with, and
+   does it prefix or postfix any character or string to symbol names?
+
+2. If you EQUIVALENCE a FORTRAN LOGICAL variable with a FORTRAN
+   INTEGER variable, what are the values of the integer variable when
+   the logical variable is set first to .FALSE. and then to .TRUE.?
+
+3. How does your FORTRAN compiler pass strings?
+
+UNIX CONFIGURATION
+------------------
+If your system is a UNIX system, configured using the makemake script,
+and it is possible to support your system with one of the available
+templates, plus zero or more feature overrides, then list the option
+arguments as the string assigned to the optional PGBIND_FLAGS variable
+in your system configuration file, re-run the makemake script and type:
+
+  make cpg
+
+This should create the cpgplot.a library, its header file cpgplot.h
+and a demo program called cpgdemo. If the demo program runs, you are
+in business. Please tell us what PGBIND_FLAGS string you used so that
+we can incorporate it in the system configuration file for the next
+PGPLOT release.
+
+NON-UNIX SYSTEMS
+----------------
+If your system is not a UNIX system, then you will need to find a way
+to extract specific lines from the PGPLOT source code. Most of the pg*.f
+files in the src PGPLOT subdirectory contain one or more lines that
+start with C%. These are C prototypes, which should be extracted
+complete with the C% prefix and placed, one line after another in a
+single file. The result of processing this file with pgbind will be a
+set of C files - one per interface function - and the cpgplot.h
+library header. Compile the functions and place them in an
+appropriately named library.
+
+PROBLEMS
+--------
+The cpgplot library has not been thoroughly tested, and the
+pgbind configurations of some systems have not been tested at all. If
+you have any problems, please send me a list of symptoms, and I will
+endeavor to solve them through modifications to the pgbind program.
+
+HISTORY
+-------
+The pgbind program that creates the library header and interface
+functions was written by Martin Shepherd. This followed in the
+footsteps of an earlier program called cbind, written by Jim Morgan.
+
+Martin Shepherd  (mcs@astro.caltech.edu)

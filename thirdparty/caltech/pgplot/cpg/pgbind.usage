@@ -1,0 +1,38 @@
+Usage: pgbind template [-w ] [-h ] [-suffix string] [-case upper|lower] [-false integer] [-true integer] [files]
+
+ Where template must be one of:
+  bsd        BSD f77 template. C string pointers are passed directly, but
+             the length of each string is appended as an extra argument to
+             the FORTRAN procedure call.
+             Default options:  -suffix "_" -case lower -false 0 -true 1
+  cray2      Cray-2 FORTRAN template. C string pointers and lengths are
+             combined into a single argument with the Cray fortran.h
+             _cptofcd(pointer,length) macro.
+             Default options:  -suffix "" -case upper -false 0 -true 1
+  vms        VMS FORTRAN template. C strings are passed via FORTRAN string
+             descriptors.
+             Default options:  -suffix "" -case lower -false 0 -true -1
+  ms         Microsoft Powerstation Fortran + Visual C++. Each string
+             argument is passed to the FORTRAN procedure as two adjacent
+             arguments. The first argument is the C char * pointer of the
+             string. The second is an int argument that contains the
+             length of the string. In addition, the C prototype of the
+             FORTRAN function contains a __stdcall qualifier
+             Default options:  -suffix "" -case upper -false 0 -true 1
+
+ Options:
+  -w                     Write wrapper files.
+  -h                     Write a new wrapper-library header file.
+  -suffix  string        The suffix appended to FORTRAN symbols by the
+                         linker.
+  -case    upper|lower   The typographical case given to FORTRAN symbols
+                         by the linker.
+  -false   integer       The numerical value of FORTRAN .FALSE.
+  -true    integer       The numerical value of FORTRAN .TRUE.
+
+Prototype input files:
+  files  Each file can contain zero or more C prototypes. Each prototype
+         consists of one or more lines, each line marked with C% in
+         columns 1-2. Continuation lines are heralded by a '\' character
+         at the end of the line being continued.
+         If no files are specified, standard input is read.
