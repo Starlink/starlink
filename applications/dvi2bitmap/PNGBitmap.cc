@@ -405,7 +405,8 @@ static void png_error_fn (png_structp png_ptr,
 static void png_warning_fn (png_structp png_ptr,
 			    png_const_charp warning_msg)
 {
-    cerr << "PNG warning: " << warning_msg;
+    if (verbosity_ > quiet)
+	cerr << "PNG warning: " << warning_msg;
 }
 
 // A row-transform function which inverts the greyscale.  Bitmaps are
