@@ -52,7 +52,7 @@ HELP 'Name of effective area file, default is standard file for your obs.'
               PPATH   'DEFAULT'
               VPATH   'PROMPT'
               HELP 'Name of detector response matrix - default is standard file'
-              DEFAULT 'XRTCAL:DRMPSPC'
+              DEFAULT '$XRTCAL/drmpspc'
             ENDPARAMETER
 
      PARAMETER EXPMAP
