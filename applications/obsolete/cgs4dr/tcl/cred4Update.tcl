@@ -77,7 +77,7 @@ proc cred4Update {item value} {
     } else {
       set new_item [string toupper [string trim ${value}]]
       $Cred4Widgets($new_item) delete 0 end
-      $Cred4Widgets($new_item) insert 0 "OVERGRAPH CUT=X SPOS= EPOS= COLOUR="
+      $Cred4Widgets($new_item) insert 0 "OVERGRAPH PORT= CUT=X SPOS= EPOS= COLOUR="
     }
 
   } elseif {[string trim ${item}] == "cred4Polysky"} {
