@@ -95,7 +95,7 @@ done
 case $SGMLSRC in
 	'') echo $USAGE; exit 1 ;;
 	/*) ;;
-	*) SGMLSRC=`pwd`/$SGMLSRC ;;
+	*) SGMLSRC=$PWD/$SGMLSRC ;;
 esac
 
 echo "Processing $SGMLSRC..."
@@ -112,8 +112,13 @@ esac
 SRCDIR=`dirname $SGMLSRC`
 test -n "$PACKAGEDIR" \
     || PACKAGEDIR=`basename $SGMLSRC | sed 's/\(\.sgml\)\?$/'$PACKAGEEXT/`
+
+# Make sure the TARNAME variable has been set, and make sure it's
+# an abosulte pathname
 test -n "$TARNAME" \
     || TARNAME=`echo $SGMLSRC | sed 's/\(\.sgml\)\?$/.tar/'`
+TARNAME=`expr $TARNAME : '\(/.*\)' \| $PWD/$TARNAME`
+
 
 # Make a work directory.  Can't use mktemp, as that only creates files.
 # Fail if the directory already exists.
@@ -153,12 +158,13 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # generate $ROOT.imgeq.list and convert it to a set of bitmaps
     echo "Pre-processing..."
     $JADE -t sgml -iOnly.web $JADEFLAGS \
-	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main $SGMLSRC \
+	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main \
+	    $DECL $SGMLSRC \
 	    > tmp.stamp
     ROOT=`awk -F: '{print $1}' tmp.stamp`
 
     # If there are no maths-mode elements, there's no list file generated
-    if [ -r $ROOT.imgeq.list ]; then
+    if [ -r "$ROOT.imgeq.list" ]; then
 	$IMGEQ $ROOT.imgeq.list
 
 	echo "LaTeXing maths..."
@@ -179,13 +185,16 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # Generate the destination file
     echo "Generating output..."
     $JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
-	    -d $STYLESHEET/html/sl.dsl#html $SGMLSRC > tmp.stamp
+	    -d $STYLESHEET/html/sl.dsl#html \
+	    $DECL $SGMLSRC \
+	    > tmp.stamp
 
     test -r HTML.manifest && ln -s HTML.manifest MANIFEST
 
 elif [ $TARGETFORMAT -eq 1 ]; then
 
-    $JADE -t sgml -d $STYLESHEET/latex/slback.dsl#back.main $SGMLSRC \
+    $JADE -t sgml -d $STYLESHEET/latex/slback.dsl#back.main \
+	$DECL $SGMLSRC \
 	> tmp.stamp
     ROOT=`awk -F: '{print $1}' tmp.stamp`
 
@@ -196,7 +205,9 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 
     # Generate the final file
     $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
-		-d $STYLESHEET/latex/sl.dsl#latex $SGMLSRC > tmp.stamp
+	    -d $STYLESHEET/latex/sl.dsl#latex \
+	    $DECL $SGMLSRC \
+	    > tmp.stamp
 
     test -r LaTeX.manifest && ln -s LaTeX.manifest MANIFEST
 
@@ -214,8 +225,22 @@ fi
 # the first is the sysid of the figure as referred to by the
 # generated material, which will have no path, and the second is the sysid as
 # declared in the entity, which may have a path.
+#
+# hlink gets confused by Jade's way of generating elements.  To help
+# it out, find lines in HTML files which end in `<a', and stitch the
+# start-tag into a single line.
 if [ -r MANIFEST ]; then
-    mv `awk 'NF==1 {print $1}' MANIFEST` $PACKAGEDIR
+    #mv `awk 'NF==1 {print $1}' MANIFEST` $PACKAGEDIR
+    for f in `awk 'NF==1 {print $1}' MANIFEST`; do
+	case $f in
+	*.html)
+	    sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f
+	    ;;
+	*)
+	    mv $f $PACKAGEDIR
+	    ;;
+	esac
+    done
     (cd $SRCDIR; \
 	eval `awk "NF==2 {printf \"cp %s $WORKDIR/$PACKAGEDIR/%s\n\","'$2,$1}' $WORKDIR/MANIFEST`)
     cp MANIFEST $PACKAGEDIR
