@@ -40,7 +40,7 @@ INCLUDES	= -I../../rtdevt/include \
 		  $(BUILD_INCLUDES) \
 		  -I$(TOPDIR)/include/tclutil
 
-CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES	= $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 LIBRARIES       = ../../rtdevt/lib/librtdImgEvt.a \
 		  $(TCLUTIL_LIB_STATIC)

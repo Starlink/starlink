@@ -25,7 +25,7 @@ PROGS 		=  tMem tHTTP tShellCommand
 
 INCLUDES	= -I../include 
 
-CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES	= $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 LIBRARIES       = ../lib/libutil.a
 

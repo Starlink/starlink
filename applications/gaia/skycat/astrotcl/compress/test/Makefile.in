@@ -30,7 +30,7 @@ INCLUDES	= -I../include \
 		  $(BUILD_INCLUDES) \
 		  -I$(TOPDIR)/include/tclutil
 
-CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES	= $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 LIBRARIES       = ../lib/libcompress.a $(TCLUTIL_LIB)
 

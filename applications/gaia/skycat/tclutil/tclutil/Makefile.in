@@ -60,7 +60,7 @@ demo_wish    = bin/tclutil_wish
 INCLUDES     = -I. -Isrc $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 
 # compiler flags
-CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES  = $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 # local library base names
 TCLUTIL_LIB  = tclutil

@@ -36,7 +36,7 @@ INCLUDES	= -I../include \
 		  -I$(TOPDIR)/include/astrotcl \
 		  -I$(TOPDIR)/include/tclutil
 
-CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES	= $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 LIBRARIES       = ../lib/libcastrocat.a \
 		  ../../astrocat/lib/libastrocat.a \
