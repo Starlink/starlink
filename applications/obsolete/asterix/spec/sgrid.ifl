@@ -9,7 +9,7 @@ INTERFACE SGRID
 
    PARAMETER INP
       POSITION 1
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_DATA'
@@ -28,7 +28,7 @@ INTERFACE SGRID
 
    PARAMETER MODEL
       POSITION 2
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_MODEL'
@@ -280,32 +280,32 @@ INTERFACE SGRID
    ENDPARAMETER
 
    PARAMETER OUT
-      TYPE  'UNIV'
+      TYPE  'LITERAL'
       VPATH 'PROMPT'
       ASSOCIATION '->GLOBAL.BINDS'
       PROMPT 'Output filename'
    ENDPARAMETER
 
    PARAMETER OUT2
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'PROMPT'
       PROMPT 'Output filename for 2nd grid'
    ENDPARAMETER
 
    PARAMETER OUT3
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'PROMPT'
       PROMPT 'Output filename for 3rd grid'
    ENDPARAMETER
 
    PARAMETER OUT4
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'PROMPT'
       PROMPT 'Output filename for 4th grid'
    ENDPARAMETER
 
    PARAMETER OUT5
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'PROMPT'
       PROMPT 'Output filename for 5th grid'
    ENDPARAMETER
