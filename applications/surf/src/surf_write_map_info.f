@@ -98,6 +98,9 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.1  2004/07/14 02:57:34  timj
+* no fpp in there
+*
 * Revision 1.18  2003/04/02 01:02:42  timj
 * - Units for FITS headers now appear at the start of the comment
 * - Use PSX_GMTIME rather than GMTIME
