@@ -7,6 +7,18 @@
   <!ENTITY autoconfhtml "&autoconfman;/html_node">
   <!ENTITY automakeman "http://www.gnu.org/software/automake/manual">
   <!ENTITY automakehtml "&automakeman;/html_node">
+  <!ENTITY fig-autoheader-gif SYSTEM "ssn78-1.gif" NDATA gif89a>
+  <!ENTITY fig-autoheader-eps SYSTEM "ssn78-1.eps" NDATA eps>
+  <!ENTITY fig-autoheader-pdf SYSTEM "ssn78-1.pdf" NDATA pdf>
+  <!ENTITY fig-autoconf-gif   SYSTEM "ssn78-2.gif" NDATA gif89a>
+  <!ENTITY fig-autoconf-eps   SYSTEM "ssn78-2.eps" NDATA eps>
+  <!ENTITY fig-autoconf-pdf   SYSTEM "ssn78-2.pdf" NDATA pdf>
+  <!ENTITY fig-automake-gif   SYSTEM "ssn78-3.gif" NDATA gif89a>
+  <!ENTITY fig-automake-eps   SYSTEM "ssn78-3.eps" NDATA eps>
+  <!ENTITY fig-automake-pdf   SYSTEM "ssn78-3.pdf" NDATA pdf>
+  <!ENTITY fig-configure-gif  SYSTEM "ssn78-4.gif" NDATA gif89a>
+  <!ENTITY fig-configure-eps  SYSTEM "ssn78-4.eps" NDATA eps>
+  <!ENTITY fig-configure-pdf  SYSTEM "ssn78-4.pdf" NDATA pdf>
 ]>
 
 <ssn>
@@ -69,7 +81,7 @@
         set.  This includes the problem of abiding by long-standing
         Starlink conventions on documentation, auxiliary tools and
         installation locations.  The build system at present is
-        concerned primarily with the `classic' applications: the
+        concerned primarily with the `classic' applications, which are the
         large volume of legacy Starlink code which, though it is no
         longer being developed, must still be maintained and be
         buildable by the community.  It has no contact with the large
@@ -97,10 +109,15 @@
         makefiles.  This does the same as <code>make install</code>,
         but additionally creates a manifest file which is then installed in
         the <code>manifests/</code> subdirectory under the Starlink
-        installation directory.</p>
+        installation directory.  The building of the whole tree from
+        scratch is described in <ref id="bootstrapping"/>, and the
+        procedure to build a single component, though little more
+        complicated than described here, is discussed in more detail
+        in <ref id="buildingcomponents"/>.</p>
 
-      <p>Secondly, it handles the construction of portable source-code
-        sets, so that individual components can be built by users,
+      <p>Secondly, the build system handles the construction of
+        portable source-code sets -- distribution tarballs -- so that
+        individual components can be built by users,
         from source, as straightforwardly as possible.  Since we are
         using the GNU autotools, much of this functionality comes for
         free, and we simply have to do the relatively small amount of
@@ -115,7 +132,10 @@
 % make install
         </verbatim>
         with the usual options available for <code>./configure</code>
-        and the usual relocations available for GNU-style makefiles.</p>
+        and the usual relocations available for GNU-style makefiles.
+        This document does not discuss building from a distribution
+        tarball in any more detail than this, since there is really
+        very little more detail to discuss.</p>
 
       <p>The system does not cover the precise mechanism by which these
         tarballs are distributed to users, nor the means by which they
@@ -123,6 +143,16 @@
         between components; but in generating manifests and assembling
         the component dependency graph, it provides the information
         which such a distribution portal would need.</p>
+
+      <p>In other sections of this document, we discuss the tools used
+        to support developing within the CVS tree, including the
+        specific starconf tools and an overview of the GNU autotools
+        autoconf, automake and libtool (<ref id="tools"/>); we discuss
+        the procedure for building applications within the repository
+        (<ref id="building"/>); and we describe the process of
+        adapting a currently working package to the build system's
+        conventions (<ref id="autoconfing"/>).</p>
+
     </sect>
 
     <sect id="tools" export="export">
@@ -144,11 +174,14 @@
       <p>The build system is based on the GNU `autotools', autoconf,
         automake and libtool.  We use (at the time of writing) an
         unmodified libtool, a moderately extended autoconf, and an
-        extended and customised automake.  The description below
+        extended and customised automake.  In <ref id="tooloverview"/>
+        there is an introduction to these tools, covering their
+        interrelationships, and basic usage.  The description below
         explains the use of these tools as modified; see <ref
           id="gnutools"/> for details of the differences from the
         stock autotools.</p>
 
+<!--
       <p>Though the autoconf program is installed without any Starlink
         extensions, there are Starlink extensions available, through the
         standard autoconf extension mechanism.  You don't need to worry
@@ -163,6 +196,7 @@
         available to autoconf when it is run.  See <ref
           id="autoreconf"/> for the details of how <code>aclocal</code>
         runs.</p>
+-->
 
       <subsect id="starconf" export="export">
         <subhead>
@@ -180,17 +214,28 @@
                 They should be installed in <code
                   type="fspath">/star/buildsupport/bin</code>, or its
                 equivalent if you have installed a set of tools in a
-                different location.  Since they have been extended and
+                tree other than <code>/star</code>.  Since they have
+                been extended and
                 customised, they are essential; you cannot build the
-                Starlink collection without them.  These tools are
-                described in some detail in <ref id="tooloverview"/></p>
+                Starlink collection without them.  There is an
+                introduction to the autotools in <ref id="tooloverview"/>.</p>
             </dd>
 
             <dt>The Starlink autoconf macros</dt>
             <dd>
+
+              <p>There is an extensive set of autoconf macros which
+                support building Starlink applications.  You use these
+                as you would any of the standard autoconf macros, by
+                invoking them within the <code>configure.ac</code> file.</p>
+
+              <p>The macros are described in detail in <ref
+                  id="starconfmacros"/>.</p>
+
+<!--
               <p>The autoconf program which is used is not itself
-                customised for Starlink use.  Instead, autoconf is
-                extended on the fly using the standard autoconf
+                customised for Starlink use.  Instead, the macros are
+                installed using the standard autoconf
                 extension mechanism, which consists of placing
                 additional macros in a file <code>acinclude.m4</code>
                 in the build directory, and letting them be
@@ -203,9 +248,7 @@
                 your behalf by the <em>starconf</em> application, via
                 the <em>autoreconf</em> application (<ref
                   id="autoreconf"/>).</p>
-
-              <p>The macros are described in detail in <ref
-                  id="starconfmacros"/>.</p>
+-->
             </dd>
 
             <dt>starconf</dt>
@@ -496,7 +539,140 @@
           <title>Overview of the Autotools</title>
         </subhead>
 
-        <p>The details of the autotools are to be found in their
+        <p>The autotools as a group help you create software
+          distributions which will build reliably on a large variety
+          of platforms.  They are most obviously associated with unix
+          systems, but in fact support the larger class of POSIX
+          systems which have an implementation of <code>/bin/sh</code>
+          available -- a class which includes Windows machines,
+          through the <webref url="http://www.cygwin.com/" >cygwin
+            environment</webref>.</p>
+
+        <p>Having said that, if all you need to do is work with a set
+          of sources already in the repository, and don't need to add
+          or remove any files, then you probably won't have to do any
+          reconfiguration, and don't have to worry at all about the
+          autotools (this might change, if we decide not to keep
+          generated files such as <code>./configure</code> checked in
+          to the repository -- see <ref id="developments"/>).  Given
+          that you do, here's how.</p>
+
+        <p>The aim of the notes below is to give you an overview of
+          autoconf and automake functionality, enough to make it
+          possible for you to roughly understand the existing
+          configuration files, and to make it easier to approach the full
+          autoconf and automake documentation.  We start off with a
+          broad overview, and provide a few further details in the
+          subsections which follow.</p>
+
+        <p>The two most obvious and important files are
+          <code>configure.ac</code> and <code>Makefile.am</code>.  The
+          first tells autoconf how to make the
+          <code>./configure</code> script which does the actual
+          configuration work, and which will be distributed with your
+          package, the second (assuming you're using automake rather
+          than hand-maintaining the input Makefile) tells automake how
+          to create the template makefile <code>Makefile.in</code>,
+          which is also distributed with your package, and which is
+          edited by the <code>./configure</code> script to (finally!)
+          produce the <code>Makefile</code> which (finally!) builds the
+          code on the user's system.</p>
+
+        <p>It's useful to illustrate the inputs and outputs of the
+          various tools.  First are autoconf and automake:</p>
+
+        <figure float="nofloat">
+          <caption><px>Inputs to, and outputs from, autoconf</px></caption>
+          <figurecontent image="fig-autoconf-gif"/>
+          <figurecontent image="fig-autoconf-eps"/>
+          <figurecontent image="fig-autoconf-pdf"/>
+        </figure>
+
+        <figure float="nofloat">
+          <caption><px>Inputs to, and outputs from, automake</px></caption>
+          <figurecontent image="fig-automake-gif"/>
+          <figurecontent image="fig-automake-eps"/>
+          <figurecontent image="fig-automake-pdf"/>
+        </figure>
+
+        <p>As you can see, although <code>configure.ac</code> is most
+          associated with autoconf, automake reads it, too, to
+          discover for example whether you have invoked
+          <code>AC_PROG_LIBTOOL</code> or <code>STAR_MONOLITHS</code>,
+          and so whether it needs to add the appropriate support in
+          the generated <code>Makefile.in</code>.</p>
+
+        <p>Once the <code>./configure</code> script is created, it is
+          able to interrogate the system (the user's system, that is,
+          not the developer's), and based on that edit the various
+          <code>.in</code> files to produce their corresponding
+          outputs.</p>
+
+        <figure float="nofloat">
+          <caption>
+            <px>Inputs and outputs to configure</px>
+          </caption>
+          <figurecontent image="fig-configure-gif"/>
+          <figurecontent image="fig-configure-eps"/>
+          <figurecontent image="fig-configure-pdf"/>
+        </figure>
+
+        <p>This diagram for <code>./configure</code> shows a file
+          <code>config.h.in</code> being edited.  This file -- which
+          we will have more to say about in <ref
+            id="autoconfoverview"/> -- is a template list of C
+          preprocessor definitions, which can be
+          <code>#include</code>d in a C source file, and so used to
+          configure the use of functions and definitions there.  Like
+          any of the other <code>.in</code> files, it is possible to
+          maintain this by hand, but it is more reliable to maintain
+          it using another application <em>autoheader</em>, which
+          looks as follows.</p>
+
+        <figure float="nofloat">
+          <caption>
+            <px>Inputs and outputs to autoheader</px>
+          </caption>
+          <figurecontent image="fig-autoheader-gif"/>
+          <figurecontent image="fig-autoheader-eps"/>
+          <figurecontent image="fig-autoheader-pdf"/>
+        </figure>
+
+        <p>The other file we have not mentioned yet is
+          <code>acinclude.m4</code>.  This file contains macros (in
+          the implementation language of autoconf, m4) which can be
+          used to extend autoconf's functionality locally.  You will
+          not typically have anything to do with this file, and we
+          mention it only because it is through this file that we
+          extend autoconf's functionality to support Starlink-specific
+          behaviour.  This file is automatically maintained for you, by the
+          <em>starconf</em> application described in <ref
+            id="starconf"/>.</p>
+
+        <p>We have elided some details here, for simplicity, and we
+          could possibly have elided more, since you generally don't
+          have to concern yourself with autoheader or
+          <code>acinclude.m4</code>.  You don't even have to worry
+          about the dependencies between these files and applications,
+          since the <code>Makefile.in</code> which automake generates
+          knows about these dependencies and will generally keep
+          things up to date for you.  If you wish to be sure things
+          are up to date, then you can simply run application
+          <em>autoreconf</em> (see <ref id="autoreconf"/>), which
+          knows enough about the relationships between them to run
+          each of the required ones in the correct order.  This is
+          likely the only one of the autotools commands which you will
+          run yourself.</p>
+
+        <p>For more details on the relationships between these
+          applications, and fuller diagrams, see the online copy of the
+          book <webref url="http://sources.redhat.com/autobook/" >`GNU
+            Autoconf, Automake, and Libtool'</webref>, and in particular
+          <webref
+            url="http://sources.redhat.com/autobook/autobook/autobook_276.html"
+            >Appendix C: Generated file dependencies</webref>.</p>
+
+        <p>Comprehensive details of the autotools are to be found in their
           respective manuals, which are available online at
           <ul>
             <li>
@@ -520,12 +696,6 @@
           have to look at it, you already know your future holds pain,
           and the manual isn't going to make things better or worse.
         </p>
-
-        <p>The aim of the notes below is to give you an overview of
-          autoconf and automake functionality, enough to make it
-          possible for you to roughly understand the existing
-          configuration files, and to make it easier to approach the full
-          autoconf and automake documentation.</p>
 
         <subsubsect id="autoconfoverview">
           <subhead>
@@ -555,82 +725,90 @@
             exist or not, testing whether required functions are
             available and working as expected, and managing some
             configuration by the user, such as allowing them to
-            specify where the package is to be installed.  The script
-            communicates this information to your source code in two
-            ways.  Firstly, you can create template files which are
-            edited by the <code>./configure</code> script.  For
-            example, you might have a version header file
+            specify where the package is to be installed.</p>
+
+          <p>This information is only useful if it can be communicated
+            to your program in some way.  This is done by the
+            configure script by editing the values of certain
+            `substitution variables' into a list of template files.</p>
+
+          <p>For example, you might have a version header file
             <code>version.h.in</code>, containing the line
             <verbatim>
 const char version[] = "@PACKAGE_VERSION@";
 </verbatim>
             The configure variable <code>PACKAGE_VERSION</code> is one of those
             substituted by default, and if this file were listed as
-            one of those to be substituted, by mentioning it in the
-            autoconf macro <code>AC_CONFIG_FILES(version.h)</code>,
+            one of those to be substituted (by mentioning it in the
+            autoconf macro <code>AC_CONFIG_FILES(version.h)</code>),
             then a file <code>version.h</code> would be created
             containing the contents of the <code>version.h.in</code>
             file with the <code>@PACKAGE_VERSION@</code> substituted by the
             version number declared within the
             <code>configure</code> file.</p>
 
-          <p>There are two ways that this information is most
-            typically used, modifying a makefile through a
-            <code>Makefile.in</code> and allowing code to configure
-            itself using <code>config.h</code>.</p>
+          <p>Although this substitution process can be done for any
+            template file, there are two template files which are used
+            particularly often.</p>
 
-          <p>A <code>Makefile.in</code> is a skeleton makefile which
-            you might write yourself (though see the discussion of
+          <p>The first is <code>Makefile.in</code>, which is a
+            skeleton makefile which
+            you might write by hand (though see the discussion of
             automake in <ref id='automakeoverview'/>).  There is an
             example of this at the top level of the Starlink build
             tree.  A typical <code>Makefile.in</code> might include
             lines like
             <verbatim>
-SPECIALINSTALLDIR=@prefix@/goodies
-@SET_MAKE@
 LN_S=@LN_S@
-.java.class:
-	@JAVAC@ $<
-src/libcomplicated.a:
-        cd src; $(MAKE) libcomplicated.a
+myfile.o: myfile.c
+        @CC@ -o myfile.o myfile.c
 </verbatim>
             That, combined with autoconf macros
-            <code>AC_PROG_MAKE_SET</code>,
-            <code>AC_PATH_PROGS(javac)</code> and
-            <code>AC_PROG_LN_S</code>, would allow you to produce a
-            file <code>Makefile</code> which was customised to the
-            local environment, and which had the makefile variable
-            <code>SPECIALINSTALLDIR</code> set to the
-            installation location.</p>
+            <code>AC_PROG_CC</code> and <code>AC_PROG_LN_S</code>,
+            would allow you to produce a file <code>Makefile</code>
+            which was customised to use the C compiler appropriate to
+            the local environment, and which had, in the makefile
+            variable <code>$(LN_S)</code> a command which makes links
+            between files if the local platform supports that, or
+            makes hard links or simple copies if that is all that is
+            possible.</p>
 
           <p>As well as configuring the makefile, you may also want to
             configure the source code, so that you can take different
             actions in your code depending on whether certain
-            functions or headers are available.  We don't use this
-            functionality much at present, but it is part of the point
-            of autoconf.</p>
-
-          <p>This is most
+            functions or headers are available.  That is is most
             often done via a particular configured file,
             conventionally named <code>config.h</code>.  This second
             way of communicating with your source code has the
             <code>config.h</code> file substituted with a number of C
-            preprocessor <code>#define</code> statements, such as 
+            preprocessor <code>#define</code> statements.  For
+            example, if you included in your <code>configure.ac</code>
+            file the lines
+            <verbatim>
+AC_CHECK_HEADERS([sys/wait.h])
+AC_CHECK_FUNCS([strchr])
+</verbatim>
+            then the configure script generated from that source would
+            include a test of whether the <code>sys/wait.h</code>
+            header file was available, and whether the
+            <code>strchr</code> function was available in the C
+            library.  If so, the resulting <code>config.h</code> file
+            would include the lines
             <verbatim>
 #define HAVE_SYS_WAIT_H 1
 #define HAVE_STRCHR 1
 </verbatim>
-            if the build system does have a
-            <code>&lt;sys/wait.h&gt;</code> header file available, and
-            has the function <code>strchr()</code> available.  The
-            tests for these features are triggered by autoconf macros
-            such as <code>AC_CHECK_HEADERS([sys/wait.h])</code>.  After
-            including this file into your source code with 
+            After including this file into your source code with 
             <verbatim>
 #include &lt;config.h&gt;
 </verbatim>
             you can adjust the compiled code with suitable
-            <code>#ifdef</code> preprocessor conditionals.</p>  
+            <code>#if</code> preprocessor conditionals, such as
+            <verbatim>
+#if HAVE_SYS_WAIT_H
+#include &lt;sys/wait.h&gt;
+#endif
+</verbatim></p>  
 
           <p>It is possible to maintain the <code>config.h.in</code>
             file by hand, but generally better to generated it by using
@@ -1334,8 +1512,8 @@ autoconf (GNU Autoconf) 2.59
         <p>Line 9: build the entire tree.  The make builds all the
           components in an order which ensures that each component is
           build after the components it depends on, as declared in
-          <ref id="macro-declare-dependencies"
-            ><code>STAR_DECLARE_DEPENDENCIES</code></ref> invocations in
+          <code><ref id="macro-declare-dependencies"
+              >STAR_DECLARE_DEPENDENCIES</ref></code> invocations in
           those components' <code>configure.ac</code> files.  The set
           of dependencies can be examined (if you're interested) in
           the file <code>componentset.xml</code>, which is built up
@@ -1495,9 +1673,9 @@ autoconf (GNU Autoconf) 2.59
           stage, you must define these two variables <em>as environment
             variables</em> before running the <code>./bootstrap</code>
           script.  This will cause the tools to be installed in the
-          directory <code type="fspath"
-            >$STARCONF_DEFAULT_PREFIX/buildsupport/bin</code>, and the
-          configured starconf to configure components, when it is
+          directory
+          <code>$STARCONF_DEFAULT_PREFIX/buildsupport/bin</code>, and
+          the configured starconf to configure components, when it is
           itself invoked, so that the default value of
           <code>STARCONF_DEFAULT_PREFIX</code> is the value given
           here, as described in the previous section.</p>
@@ -1848,10 +2026,10 @@ configure.ac: installing `./missing'
 
         <subsect id='macro-check-progs' export='export'>
           <subhead>
-            <title>STAR_CHECK_PROGS(progs-to-check-for)</title>
+            <title>STAR_CHECK_PROGS(progs-to-check-for, [package=''])</title>
           </subhead>
 
-          <p><strong><code>STAR_CHECK_PROGS(progs-to-check-for)</code></strong></p>
+          <p><strong><code>STAR_CHECK_PROGS(progs-to-check-for, [package=''])</code></strong></p>
 
           <p><strong>Note: The functionality of this macro is very likely to change.</strong></p>
 
@@ -1867,6 +2045,11 @@ configure.ac: installing `./missing'
             program outside of the set of alphanumerics and
             underscores are normalised to underscores.</p>
 
+          <p>The optional second argument gives the name of the
+            package containing the program in question.  Some packages
+            install their binaries in package-specific directories, and
+            this argument allows this macro to look there as well.</p>
+
           <p>For example: <code>STAR_CHECK_PROGS(messgen)</code>
             would define the variable <code>MESSGEN</code> to have the
             full path to the messgen application.</p>
@@ -1876,16 +2059,8 @@ configure.ac: installing `./missing'
 
           <p>This is the analogue of <code>AC_CHECK_PROG</code>,
             except that: (1) the variable name defaults to the program
-            name, (2) the variable value if the program is not found
-            is the path to the anticipated installation location of
-            the program, so that the macro does not fail in this case.
-            This is useful for locating Starlink programs, as it means
-            we can use this macro to produce absolute paths to
-            programs, even before they have been installed (in this
-            case we are presumably doing a top-level configure of the
-            Starlink tree, and the Makefile will ensure that the
-            required files are installed before the current package
-            actually uses it.</p>
+            name, (2) if the program is not found, the variable value
+            is the program's name without any path at all.</p>
 
           <p>The current value of the <code>PATH</code> variable is
             augmented by the location of the binary installation
@@ -1894,19 +2069,6 @@ configure.ac: installing `./missing'
             component being configured is installed, but it's the best
             we can do at configure time); and by the
             <code>$STARLINK/bin</code> directory.</p>
-
-          <p>The default, if the program isn't in the augmented
-            path, is bare program-name otherwise.  Is this the best
-            default?  Would the `starconf-finder' program be better?
-            The program may not be in the augmented path for two
-            reasons: (1) we are doing the global configuration done
-            during bootstrapping, and noting has been installed yet;
-            or (2) the program is one of those installed in a
-            subdirectory of the `bindir'.  In case (2), there's not a
-            lot we can do, short of grubbing round manifest files at
-            some point, but the starconf-finder, which is the eventual
-            default, knows about this case, and could take care of
-            it.</p>
 
         </subsect>
 
@@ -2474,11 +2636,12 @@ configure.ac: installing `./missing'
               <p>The files generated by autoconf and automake are
                 currently checked in to the repository.  Though this
                 is good practice in general, since we use extended or
-                customised versions of autoconf and automake, we can
+                customised versions of autoconf and automake we can
                 always control what versions of those applications are
                 being used, which possibly makes the disadvantages of
                 this policy outweigh the advantages.  This affects the
-                discussion in <ref id="buildingcomponents"/>.</p>
+                discussion in <ref id="buildingcomponents"/> and the
+                overview in <ref id="tooloverview"/>.</p>
             </li>
 
             <li>
