@@ -1,3 +1,12 @@
+2004-04-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* term/velencode.f (VELENCODE): Now use first 3 characters of
+	frame such that HELI and HEL both match HELIOCENTRIC.
+
+	* command/do_command.f (DO_COMMAND): Fix DAS-MERGE calling
+	arguments (which were causing ADJQUAD and WIDEBAND to refer to the
+	same LOGICAL
+
 2003-12-05  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* specx.news: Release v6.8-3
