@@ -96,6 +96,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      REAL SLA_RANGE             ! Put angle into range [-PI,+PI]
+
 *  Local Constants:
       INTEGER MAXIN              ! Maximim number of input images
       PARAMETER ( MAXIN = 1024 )
@@ -104,6 +107,8 @@
       CHARACTER * ( 1 ) LEFT     ! Determines the order of the O and E
                                  ! ray in the calculations.
       PARAMETER ( LEFT = 'O' )
+      REAL DTOR                  ! Degrees to radians conversion factor
+      PARAMETER( DTOR = 1.7453293E-2 )
 
 *  Local Variables:
       INTEGER NDFIN( MAXIN )     ! Input NDF identifiers
@@ -154,6 +159,7 @@
                                  ! of I, Q and U
       INTEGER IWCS               ! Identifier for the WCS information
        
+      REAL ANGROT( MAXIN )       ! Position angle of WPLATE=0.0 axis
       REAL WPLATE( MAXIN )       ! Waveplate positions of images 
       REAL TOLS, TOLZ            ! tolerances for image intercomparisons
       REAL SKYSUP                ! sky supression factor
@@ -252,6 +258,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
          IMGID( IVAL ) = ' '
          RAY( IVAL ) = ' '
          DESCOK = .FALSE.
+         ANGROT( IVAL ) = VAL__BADR
 
 *  Get the descriptor items for this image.
          CALL NDF_XGT0R( NDFIN( I ), 'POLPACK', 'WPLATE',
@@ -260,12 +267,15 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
      :                   IMGID( IVAL ), STATUS )
          CALL NDF_XGT0C( NDFIN( I ), 'POLPACK', 'RAY', RAY( IVAL ),
      :                   STATUS )
+         CALL NDF_XGT0R( NDFIN( I ), 'POLPACK', 'ANGROT', 
+     :                   ANGROT( I ), STATUS )
 
 *  If the descriptors were obtained, check them for validity. The
 *  WPLATE descriptor is checked against a constant array containing
 *  the accepted values. The RAY descriptor should be either O or E
 *  (corresponding to Ordinary and Extraordinary rays). The IMGID should
-*  simply be a non-null character identifier.
+*  simply be a non-null character identifier. The ANGROT value should all
+*  be very close to the the first value.
          IF ( STATUS .EQ. SAI__OK ) THEN
 
             DO IPOS = 1, NPOS
@@ -288,6 +298,17 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
                DESCOK = .FALSE.
                CALL MSG_SETC( 'I', 'IMGID' )
                CALL MSG_SETC( 'V', ' ' )
+
+            ELSE IF( ABS( SLA_RANGE( DTOR*( ANGROT( IVAL ) - ANGROT( 1 )
+     :                   ) ) ) .GT. 0.008 ) THEN
+               DESCOK = .FALSE.
+
+               CALL MSG_OUT( ' ', 'POLCAL: The analysis angle '//
+     :                       '(ANGROT) must be the same in all '//
+     :                       'input frames.', STATUS )
+
+               CALL MSG_SETC( 'I', 'ANGROT' )
+               CALL MSG_SETR( 'V', ANGROT( IVAL ) )
 
             END IF
 
@@ -727,10 +748,14 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       CALL AST_ANNUL( IWCS, STATUS )
 
 *  Create a POLPACK extension containing a character array identifying the
-*  quantities stored in each plane of the DATA array.
+*  quantities stored in each plane of the DATA array, and the angle
+*  between the first pixel axis and the analyser (i.e. WPLATE=0.0) axis.
+*  This angle is just copied from the first input NDF, since there can be
+*  no rotation between input images.
       CALL NDF_XNEW( NDFOUT, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS )
       CALL NDF_XPT0C( PLANES( : UBND( 3 ) - LBND( 3 ) + 1 ), NDFOUT, 
      :                'POLPACK', 'STOKES', STATUS ) 
+      CALL NDF_XPT0R( ANGROT( 1 ), NDFOUT, 'POLPACK', 'ANGROT', STATUS ) 
       CALL DAT_ANNUL( XLOC, STATUS )         
 
 * Map the output DATA array and if necessary, the VARIANCE array.

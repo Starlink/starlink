@@ -61,7 +61,8 @@
 *           Q     : The Stokes Q parameter.
 *           U     : The Stokes U parameter.
 *           P     : The percentage polarisation.
-*           THETA : The polarisation angle (in degrees).
+*           THETA : The polarisation angle (anti-clockwise from the X axis
+*                   to the plane of polarisation - in degrees).
 *           PI    : The polarised intensity.
 *
 *        If VAR is TRUE, then the catalogue will also contain 
@@ -71,7 +72,9 @@
 *        start of the column names listed above.
 *
 *        When measuring circular polarisation, the columns describing Q
-*        and U will be replaced by equivalent columns describing V.
+*        and U will be replaced by equivalent columns describing V; and
+*        the THETA value will be zero if the normalised Stokes parameter V 
+*        is positive, and 90 otherwise. 
 *
 *        The coordinates contained in columns X and Y refer to pixel
 *        coordinates after any binning (i.e. to the pixel coordinate
@@ -125,7 +128,8 @@
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
 *     THETA = NDF (Write)
-*        An output NDF holding the polarisation angle in degrees. In the
+*        An output NDF holding the polarisation angle (anti-clockwise from 
+*        the pixel X axis to the plane of polarisation - in degrees). In the
 *        the case of circular polarisation, a value of zero is stored 
 *        if the normalised Stokes parameter V is positive, and a value
 *        of 90 is stored otherwise. A null value can be supplied if this 
@@ -233,6 +237,7 @@
       LOGICAL MAKEP              ! % polarisation output required?
       LOGICAL MAKET              ! Angle output required?
       LOGICAL VAR                ! Output variances required?
+      REAL ANGROT                ! ACW angle from X axis to analyser axis (degs)
       REAL NSIGMA                ! No. of sigmas to clip at
       REAL TR2( 4 )              ! Coeffs. of mapping from cell indices to coordinates
       REAL WLIM                  ! Min. fraction of good input pixels per bin
@@ -270,6 +275,12 @@
      :                 'Stokes parameter values.', STATUS )
          GO TO 999
       END IF
+
+*  Get the value of the ANGROT component in the POLPACK extension. 
+*  This is the anti-clockwise angle from the first axis of the image to
+*  the analyser axis (i.e. WPLATE=0.0 axis), in degrees.
+      ANGROT = 0.0
+      CALL NDF_XGT0R( INDF1, 'POLPACK', 'ANGROT', ANGROT, STATUS ) 
 
 *  See if the VARIANCE component is defined.
       CALL NDF_STATE( INDF1, 'VARIANCE', VAR, STATUS )
@@ -589,7 +600,8 @@
 
 *  Call the routine to do the work.
       CALL POL1_PLVEC( TR2, NXBIN, NYBIN, DIM( 3 ), %VAL( IPDBIN ), 
-     :                 %VAL( IPVBIN ), STOKES, DEBIAS, VAR, MAKEI, 
+     :                 %VAL( IPVBIN ), ANGROT, STOKES, DEBIAS, VAR, 
+     :                 MAKEI, 
      :                 MAKEP, MAKET, MAKEIP, MAKECT, CI, %VAL( IPI ), 
      :                 %VAL( IPP ), %VAL( IPT ), %VAL( IPIP ), 
      :                 %VAL( IPIV ), %VAL( IPPV ), %VAL( IPTV ), 

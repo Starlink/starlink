@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
+      SUBROUTINE POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, ANG,
      :                       STKID, DEBIAS, VAR, MAKEI, MAKEP, MAKET, 
      :                       MAKEIP, MAKECT, CI, AI, AP, AT, AIP, AIV, 
      :                       APV, ATV, AIPV, STATUS )
@@ -13,9 +13,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, STKID, 
-*                       DEBIAS, VAR, MAKEI, MAKEP, MAKET, MAKEIP, MAKECT, 
-*                       CI, AI, AP, AT, AIP, AIV, APV, ATV, AIPV, STATUS )
+*     CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, ANG, STOKE, VSTOKE, ANG, 
+*                     STKID, DEBIAS, VAR, MAKEI, MAKEP, MAKET, MAKEIP, MAKECT, 
+*                     CI, AI, AP, AT, AIP, AIV, APV, ATV, AIPV, STATUS )
 
 *  Description:
 *     This routine calculates the polarisation parameters and (if
@@ -38,6 +38,8 @@
 *     VSTOKE( NPIX, NROW, NPLANE ) = REAL (Given)
 *        The variance on the Stokes parameters. It is ignored if VAR is 
 *        .FALSE..
+*     ANG = REAL (Given)
+*        ACW angle in degrees from pixel X axis to analyser angle.
 *     STKID = CHARACTER * ( * ) (Given)
 *        A string of characters identifying each plane of the input arrays.
 *        The first character applies to plane 1, the second to plane 2, 
@@ -67,7 +69,8 @@
 *     AP( NPIX, NROW ) = REAL (Returned)
 *        An array holding percentage polarisation values.
 *     AT( NPIX, NROW ) = REAL (Returned)
-*        An array holding polarisation angles (in degrees).
+*        An array holding polarisation angles (ACW from X axis to the
+*        plane of polarization - in degrees)
 *     AIP( NPIX, NROW ) = REAL (Returned)
 *        An array holding polarised intensity values.
 *     AIV( NPIX, NROW ) = REAL (Returned)
@@ -109,6 +112,7 @@
       INTEGER NPLANE
       REAL STOKE( NPIX, NROW, NPLANE )
       REAL VSTOKE( NPIX, NROW, NPLANE )
+      REAL ANG
       CHARACTER STKID*(*)
       LOGICAL DEBIAS
       LOGICAL VAR
@@ -175,7 +179,6 @@
 *  CAT identifiers for catalogue columns.
       INTEGER XCAT, YCAT, ICAT, PCAT, THCAT, PICAT, VCAT, QCAT, UCAT,
      :        DICAT, DPCAT, DTHCAT, DPICAT, DVCAT, DQCAT, DUCAT
-
 
 *.
 
@@ -397,7 +400,15 @@
 *  Store the required values in the output arrays.
                IF ( MAKEI ) AI( PIX, ROW ) = I
                IF ( MAKEP ) AP( PIX, ROW ) = P
-               IF ( MAKET ) AT( PIX, ROW ) = T
+
+               IF ( MAKET ) THEN
+                  IF( T .NE. VAL__BADR ) THEN
+                     AT( PIX, ROW ) = ANG - T
+                  ELSE
+                     AT( PIX, ROW ) = VAL__BADR
+                  END IF
+               END IF
+
                IF ( MAKEIP ) AIP( PIX, ROW ) = IP
       
                IF ( VAR ) THEN
@@ -429,8 +440,15 @@
      :                            STATUS )
                   CALL CAT_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( THCAT,  T, ( T .EQ. VAL__BADR ), 
-     :                            STATUS )
+
+                  IF( T .NE. VAL__BADR ) THEN
+                     CALL CAT_PUT0R( THCAT,  ANGROT - T, .FALSE., 
+     :                               STATUS )
+                  ELSE
+                     CALL CAT_PUT0R( THCAT,  VAL__BADR, .TRUE., 
+     :                               STATUS )
+                  END IF
+
                   CALL CAT_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ),
      :                            STATUS )
 

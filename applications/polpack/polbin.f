@@ -152,6 +152,7 @@
       INTEGER CIIN               ! CAT identifier for input catalogue
       INTEGER CIOUT              ! CAT identifier for output catalogue
       INTEGER GI( 8 )            ! CAT identifiers for columns to be read
+      INTEGER GTHETA             ! CAT identifiers for THETA column
       INTEGER IP                 ! Pointers to arrays to be filled
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
       INTEGER IPCOV              ! Pointer to workspace
@@ -190,6 +191,7 @@
       INTEGER IPWRK2             ! Pointer to workspace
       INTEGER IPX                ! Pointer to i/p X values
       INTEGER IPY                ! Pointer to i/p Y values
+      INTEGER IROW               ! Row index
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
       INTEGER MAXPOS             ! Position of maximum value
       INTEGER MINPOS             ! Position of minimum value
@@ -207,13 +209,21 @@
       LOGICAL CIRC               ! Doing circular polarimetry?
       LOGICAL DEBIAS             ! Statistical de-biassing required?
       LOGICAL GOTWCS             ! Was a FrameSet read from the input catalogue?
+      LOGICAL NULL1              ! Null value flag
+      LOGICAL NULL2              ! Null value flag
+      LOGICAL NULL3              ! Null value flag
       LOGICAL VAR                ! Producing variances?
+      REAL ANGROT                ! ACW angle from X pixel axis to analyser axis (degs)
       REAL BOX( 2 )              ! Bin size
       REAL NSIGMA                ! No. of sigmas to clip at
+      REAL RTOD                  ! Conversion factor; radians to degrees
       REAL SXHI                  ! Upper bound of used region of X axis 
       REAL SXLO                  ! Lower bound of used region of X axis 
       REAL SYHI                  ! Upper bound of used region of Y axis 
       REAL SYLO                  ! Lower bound of used region of Y axis 
+      REAL Q                     ! Stored Q in input catalogue
+      REAL U                     ! Stored U in input catalogue
+      REAL THETA                 ! Stored angle in input catalogue
       REAL TR( 4 )               ! Coeff.s of (X,Y) -> cell indices mapping
       REAL TR2( 4 )              ! Coeff.s of cell indices -> (X,Y) mapping
       REAL X0                    ! X at bottom left of bottom left cell
@@ -341,6 +351,45 @@
             CALL POL1_SQUAR( NCIN, %VAL( IPVQ ), STATUS )
             CALL POL1_SQUAR( NCIN, %VAL( IPVU ), STATUS )
          END IF          
+      END IF
+
+*  Derive the position angle of the analyser by comparing values of
+*  theta stored in the supplied catalogues with the value of theta
+*  implied by the corresponding Q and U values. This only needs to be
+*  done for linear polarisation. The theta value stored in the catalogue
+*  is the anti-clockwise angle from the X pixel axis to the plane of
+*  polarisation (in degrees). ANGROT is the anti-clockwise angle from the 
+*  X pixel axis to the analyser axis (in degrees). The angle implied by Q 
+*  and U ( 0.5*ATAN( U, Q ) ) is the clockwise angle from the analyser axis
+*  to the plane of polarisation.
+      IF( .NOT. CIRC ) THEN
+         RTOD = 180.0 / ACOS( -1.0 )
+
+*  Get the CAT identifier for the THETA column in the input catalogue.
+         CALL CAT_TIDNT( CIIN, 'THETA', GTHETA, STATUS )       
+
+*  Go through the catalogue until a row is found which has good values
+*  for Q, U and THETA. Use ANGROT = 0.0 if no such row is found.
+         ANGROT = 0.0
+         DO IROW = 1, NCIN
+
+*  Get the Q, U and THETA values from the input catalogue for the current
+*  row.
+            CALL FGT0R( CIIN, IROW, GTHETA, THETA, NULL1, STATUS )
+            CALL FGT0R( CIIN, IROW, GI( Q_ID ), Q, NULL2, STATUS )
+            CALL FGT0R( CIIN, IROW, GI( U_ID ), U, NULL3, STATUS )
+
+*  If they are all good, work out the implied value of ANGROT, and leave
+*  the loop.
+            IF( .NOT. NULL1 .AND. .NOT. NULL2 .AND. NOT. NULL3 ) THEN
+               ANGROT = THETA + RTOD*0.5*ATAN2( U, Q )
+               GO TO 10            
+            END IF
+
+         END DO
+
+ 10      CONTINUE
+
       END IF
 
 *  Decide whether or not a bias correction is needed and possible.
@@ -689,7 +738,8 @@
 *  are not wanted here, but pointers still have to be given even though
 *  they are ignored. Use IPI as a safe pointer.
       CALL POL1_PLVEC( TR2, NXBIN, NYBIN, NSTOKE, %VAL( IPBIN ), 
-     :                 %VAL( IPVBIN ), STOKES, DEBIAS, VAR, .FALSE., 
+     :                 %VAL( IPVBIN ), ANGROT, STOKES, DEBIAS, VAR, 
+     :                 .FALSE., 
      :                 .FALSE., .FALSE., .FALSE., .TRUE., CIOUT, 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
