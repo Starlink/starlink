@@ -896,7 +896,16 @@
       END DO
 
 *     Also store int+1 so that I can easily calculate end of data
+*     This must be zero if the preceeding value is zero
+*     since this indicates an aborted data set.
       INT_LIST(N_FILE, DATA_OFFSET) = N_POS + 1
+
+      IF (DATA_OFFSET .EQ. 1) INT_LIST(N_FILE, DATA_OFFSET) = 0
+      IF (DATA_OFFSET .GT. 1) THEN
+         IF (INT_LIST(N_FILE, DATA_OFFSET-1) .EQ. 0) THEN
+            INT_LIST(N_FILE, DATA_OFFSET) = 0
+         END IF
+      END IF
 
 *     annul locators and array identifiers and close the file
 
