@@ -461,7 +461,7 @@
 *  Set the Style of the FrameSet using the STYLE parameter. This is done so
 *  that the Format of each axis value (for instance) can be controlled 
 *  using STYLE.
-      CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IWCS, STATUS )
+      CALL KPG1_ASSET( 'KAPPA_LISTSHOW', 'STYLE', IWCS, STATUS )
 
 *  See if Frame descriptions are required.
       CALL PAR_GET0L( 'DESCRIBE', DESC, STATUS )
@@ -566,7 +566,7 @@
          CALL KPG1_ASMRG( IPLOT, IWCS, 'PIXEL', QUIET, 2, STATUS )
 
 *  Set the plotting style.
-         CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IPLOT, STATUS )
+         CALL KPG1_ASSET( 'KAPPA_LISTSHOW', 'STYLE', IPLOT, STATUS )
 
 *  Produce the graphics.
          CALL KPS1_LSHPL( IPLOT, NDISP, NRAX, %VAL( IPW2 ), PLOT,

@@ -1227,7 +1227,7 @@
 *  graphical output.
 *  =================================================================
 *  Set the attributes of the Plot to give the required Plotting style.     
-      CALL KPG1_ASSET( 'LINPLOT', 'STYLE', IPLOT, STATUS )
+      CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'STYLE', IPLOT, STATUS )
 
 *  Generate a reference for the NDF to be stored in the graphics
 *  database.
@@ -1365,7 +1365,7 @@
      :                      STATUS )
 
 *  Set the style for plotting in the key picture. 
-         CALL KPG1_ASSET( 'LINPLOT', 'KEYSTYLE', IPLOTK, STATUS )
+         CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'KEYSTYLE', IPLOTK, STATUS )
 
 *  Format the text for the first line of the key.
          KEYLN1 = 'From:  '

@@ -47,8 +47,8 @@
 *        are determined by BOX. Otherwise, the size and extent of the new
 *        DATA picture are set equal to the existing DATA picture.
 *     APP = CHARACTER * ( * ) (Given)
-*        The name of the calling application. A comment of the form
-*        "KAPPA_<APP>" is stored with all new AGI pictures. 
+*        The name of the calling application in the form
+*        <package>_<application> (eg "KAPPA_DISPLAY").
 *     MARGIN( 4 ) = REAL (Given)
 *        The width of the borders to leave round the new DATA picture, given
 *        as fractions of the corresponding dimension of the DATA picture. 
@@ -161,7 +161,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER COMMNT*30        ! Comment for AGI pictures
       INTEGER I                  ! Loop count
       INTEGER IAT                ! No. of characters in string
       REAL DX1                   ! X coord at left of window
@@ -188,11 +187,6 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Create a comment to store with any new AGI pictures.
-      COMMNT = 'KAPPA_'
-      IAT = 6
-      CALL CHR_APPND( APP, COMMNT, IAT )
-
 *  First deal with cases where the new DATA picture is to be aligned with
 *  an existing DATA picture.
       IF( IPICD .NE. -1 ) THEN
@@ -201,7 +195,7 @@
 *  ancillary pictures), aligning the new DATA picture with an existing
 *  DATA picture. On exit, the PGPLOT viewport matches the DATA picture, 
 *  and has the same (AGI) world co-ordinates.
-         CALL KPG1_GDOLD( MARGIN, COMMNT, NP, PNAME, PSIDE, PSIZE,
+         CALL KPG1_GDOLD( MARGIN, APP, NP, PNAME, PSIDE, PSIZE,
      :                    IPICD, IPICD0, IPICF, IPIC, STATUS )
 
 *  If the new DATA picture is not to be aligned with an existing DATA
@@ -212,7 +206,7 @@
 *  ancillary pictures). The DATA picture has the AGI world co-ordinate 
 *  bounds specified by BOX. On exit, the PGPLOT viewport matches the DATA 
 *  picture, and has the same (AGI) world co-ordinates.
-         CALL KPG1_GDNEW( COMMNT, MARGIN, NP, PNAME, PSIDE, PSIZE,
+         CALL KPG1_GDNEW( APP, MARGIN, NP, PNAME, PSIDE, PSIZE,
      :                    ASPECT, BOX, IPICD0, IPICF, IPIC, STATUS )
 
       END IF

@@ -111,7 +111,8 @@
 *        every second point", etc. Not accessed if XERROR and YERROR are 
 *        both .FALSE.
 *     APP = CHARACTER * ( * ) (Given)
-*        The name of the calling application.
+*        The name of the calling application in the form
+*        <package>_<application> (eg "KAPPA_DISPLAY").
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

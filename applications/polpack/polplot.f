@@ -703,15 +703,17 @@
          MARGIN( 2 ) = KEYPOS( 1 )
 
 *  Start up the graphics system, creating a KEY picture.
-         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPLOT', ' ', MARGIN, 1, 
-     :                   'KEY', 'R', 0.25, ASPECT, DOMAIN, BOX, IPICD, 
-     :                   IPICF, IPICK, IPLOT, NFRM, ALIGN, STATUS )
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ', 
+     :                   MARGIN, 1, 'KEY', 'R', 0.25, ASPECT, DOMAIN, 
+     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
+     :                   STATUS )
 
 *  Otherwise, start up the graphics system, creating no KEY picture.
       ELSE
-         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPLOT', ' ', MARGIN, 0, 
-     :                   ' ', ' ', 0.0, ASPECT, DOMAIN, BOX, IPICD, 
-     :                   IPICF, IPICK, IPLOT, NFRM, ALIGN, STATUS )
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ', 
+     :                   MARGIN, 0, ' ', ' ', 0.0, ASPECT, DOMAIN, BOX, 
+     :                   IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
+     :                   STATUS )
       END IF
 
 *  Find the index of the Frame within the Plot corresponding to the 
@@ -877,7 +879,7 @@
          CALL KPG1_ASPSY( '(TEXT)', '(STRINGS)', STATUS )
 
 *  Set the style for plotting in the key picture.
-         CALL KPG1_ASSET( 'POLPLOT', 'KEYSTYLE', IPLOTK, STATUS )
+         CALL KPG1_ASSET( 'POLPACK_POLPLOT', 'KEYSTYLE', IPLOTK, STATUS )
 
 *  Now produce the key.
          CALL POL1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, YKEY,

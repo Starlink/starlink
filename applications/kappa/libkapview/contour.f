@@ -681,17 +681,17 @@
          MARGIN( 2 ) = KEYPOS( 1 )
   
 *  Start up the graphics system, creating a KEY picture.
-         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'CONTOUR', NDFNAM( : NC ), 
-     :                   MARGIN, 1, 'KEY', 'R', 0.5, ASPECT, 
-     :                   'PIXEL', BOX, IPICD, IPICF, IPICK, IPLOT, 
-     :                   NFRM, ALIGN, STATUS )
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'KAPPA_CONTOUR', 
+     :                   NDFNAM( : NC ), MARGIN, 1, 'KEY', 'R', 0.5, 
+     :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
+     :                   IPLOT, NFRM, ALIGN, STATUS )
 
 *  Otherwise, start up the graphics system, creating no KEY picture.
       ELSE
-         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'CONTOUR', NDFNAM( : NC ), 
-     :                   MARGIN, 0, ' ', ' ', 0.0, ASPECT, 'PIXEL', BOX,
-     :                   IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
-     :                   STATUS )
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'KAPPA_CONTOUR', 
+     :                   NDFNAM( : NC ), MARGIN, 0, ' ', ' ', 0.0, 
+     :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
+     :                   IPLOT, NFRM, ALIGN, STATUS )
       END IF
 
 *  If the user did not specify a Plot title (as indicated by the Plot title

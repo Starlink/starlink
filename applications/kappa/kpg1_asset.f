@@ -62,7 +62,8 @@
 *
 *  Arguments:
 *     APP = CHARACTER * ( * ) (Given)
-*        The name of the calling application, for use in messages.
+*        The name of the calling application in the form
+*        <package>_<application> (eg "KAPPA_DISPLAY"), for use in messages.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter to use for getting the group expression.
 *     IOBJ = INTEGER (Given and Returned)

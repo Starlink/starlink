@@ -597,7 +597,7 @@
 
 *  If we are producing graphics, set its style. 
       IF( PLOT .NE. 'NONE' ) THEN
-         CALL KPG1_ASSET( 'CURSOR', 'STYLE', IPLOTB, STATUS )
+         CALL KPG1_ASSET( 'KAPPA_CURSOR', 'STYLE', IPLOTB, STATUS )
       END IF
 
 *  Set the PGPLOT viewport and AST Plot for the initially selected picture.
@@ -836,7 +836,7 @@
 *  Set the Style of the Plot using the STYLE parameter. This is done so
 *  that the Format of each axis value (for instance) can be controlled 
 *  using STYLE.
-               CALL KPG1_ASSET( 'CURSOR', 'STYLE', IPLOT, STATUS )
+               CALL KPG1_ASSET( 'KAPPA_CURSOR', 'STYLE', IPLOT, STATUS )
 
 *  Get the number of axes in the selected Frame.
                NAX = AST_GETI( IPLOT, 'NAXES', STATUS )

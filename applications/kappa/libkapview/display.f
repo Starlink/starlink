@@ -881,9 +881,9 @@
 *  Base (GRAPHICS) Frame in the Plot corresponds to millimetres from the 
 *  bottom left corner of the view surface, and the Current Frame is 
 *  inherited form the NDF's WCS FrameSet.
-      CALL KPG1_PLOT( IWCS, 'NEW', 'DISPLAY', NDFNAM( : NC ), MARGIN,
-     :                0, ' ', ' ', 0.0, ASPECT, 'PIXEL', BOX, IPICD, 
-     :                IPICF, IDUMMY, IPLOT, NFRM, ALIGN, STATUS )
+      CALL KPG1_PLOT( IWCS, 'NEW', 'KAPPA_DISPLAY', NDFNAM( : NC ), 
+     :                MARGIN,0, ' ', ' ', 0.0, ASPECT, 'PIXEL', BOX, 
+     :                IPICD, IPICF, IDUMMY, IPLOT, NFRM, ALIGN, STATUS )
 
 *  If the user did not specify a Plot title (as indicated by the Plot title
 *  being the same as the WCS title), make the NDF Title the default Title for 

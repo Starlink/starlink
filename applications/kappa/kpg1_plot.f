@@ -92,8 +92,10 @@
 *               picture is aligned with any existing DATA picture, but no 
 *               error is reported if no DATA picture exists.
 *     APP = CHARACTER * ( * ) (Given)
-*        The name of the calling application. A comment of the form
-*        "KAPPA_<APP>" is stored with all new AGI pictures. 
+*        The name of the calling application, in the form
+*        <package>_<application> (eg "KAPPA_DISPLAY", "POLPACK_POLPLOT",
+*        etc). The supplied string is stored as a comment with all new AGI 
+*        pictures. 
 *     DATREF = CHARACTER * ( * ) (Given)
 *        A string describing the source of the data being displayed,
 *        which will be stored in the AGI database with the new DATA
