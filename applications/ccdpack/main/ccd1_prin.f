@@ -59,6 +59,9 @@
 *        Added dark and pre-flash arguments.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     27-JUN-2001 (MBT):
+*        Replaced use of CCD1__MXNDF by CCD1__MXINS (I think the original
+*        was a mistake).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -143,13 +146,13 @@
          END IF
 
 *  Check that the number of values returned. This has to be between the
-*  the limits 5 and 5*CCD1__MXNDF. If the continuation character has
+*  the limits 5 and 5*CCD1__MXINS. If the continuation character has
 *  been used then reprompt if appropriate. etc.
          AGAIN = .FALSE.
-         IF ( NRET .GT. 5 * CCD1__MXNDF ) THEN
+         IF ( NRET .GT. 5 * CCD1__MXINS ) THEN
 
 *  Comment on this and try again.
-            CALL MSG_SETI( 'MAXVAL', 5 * CCD1__MXNDF  )
+            CALL MSG_SETI( 'MAXVAL', 5 * CCD1__MXINS )
             CALL MSG_OUT( ' ',
      :'Too many values given only ^MAXVAL allowed - try again', STATUS )
 
