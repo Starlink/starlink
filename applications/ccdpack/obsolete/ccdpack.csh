@@ -178,7 +178,7 @@
 #   is already set. In this case we assume that the user knows what
 #   they are doing.
       if ( ! $?NDF_TO_IRAF_PARS ) then
-         setenv NDF_TO_IRAF_PARS "FILLBAD=!"
+         setenv NDF_TO_IRAF_PARS 'FILLBAD=\!'
       endif
 #
 # end
