@@ -49,13 +49,16 @@
 *               and P is in use)
 *        "DANG" - Std. devn. on ANG (mandatory only if variances are requested 
 *               and P is in use)
+*        "ID" - Identifier for the row (optional)
 
 *  Arguments:
 *     INAME = CHARACTER * ( * ) (Given)
 *        The name of the quantity (e.g. X, Y, RA, DEC, I, Q, U, V, DI, DQ, 
-*        DU, DV, P, DP, ANG, DANG, PI, DPI, etc)
+*        DU, DV, P, DP, ANG, DANG, PI, DPI, ID, etc). If INAME is blank,
+*        the config file is re-read, but no ENAME value is returned.
 *     ENAME = CHARACTER * ( * ) (Returned)
-*        The catalogue column name to use for the given quantity.
+*        The catalogue column name to use for the given quantity. Not
+*        accessed if INAME is blank.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -98,7 +101,7 @@
 
 *  Local Constants:
       INTEGER MXCOL              ! Max number of column definitions
-      PARAMETER ( MXCOL = 18 )
+      PARAMETER ( MXCOL = 19 )
 
 *  Local Variables:
       CHARACTER BUF*255          ! Buffer for line read from config file
@@ -122,7 +125,7 @@
       DATA INIT /.FALSE./,
      :     NAMES / 'X', 'Y', 'RA', 'DEC', 'I', 'Q', 'U', 'V', 'DI', 
      :             'DQ', 'DU', 'DV', 'P', 'PI', 'ANG', 'DP', 'DPI', 
-     :             'DANG' /
+     :             'DANG', 'ID' /
 
 
 *  Ensure the necessary variale values are retained between invocations
@@ -131,15 +134,13 @@
 
 *.
 
-*  Initialize
-      ENAME = ' '
-
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If the column names have not yet been read from the polpack
 *  configuration file, do so now.
-      IF ( .NOT. INIT .AND. STATUS .EQ. SAI__OK ) THEN
+      IF ( ( .NOT. INIT .OR. INAME .EQ. ' ' ) .AND. 
+     :      STATUS .EQ. SAI__OK ) THEN
          NCOL = 0
 
 *  See if the environment variable POLPACKRC is defined. If it is, is is
@@ -244,34 +245,42 @@
 
       END IF
 
+*  Return without action if the initialization failed, or if no quantity
+*  name was given.
+      IF( INIT .AND. INAME .NE. ' ' ) THEN 
+         ENAME = ' '
+
 *  Check the supplied internal name is known.
-      DO I = 1, MXCOL         
-         IF( INAME .EQ. NAMES( I ) ) THEN 
-            GO TO 20
-         END IF
-      END DO
+         DO I = 1, MXCOL         
+            IF( INAME .EQ. NAMES( I ) ) THEN 
+               GO TO 20
+            END IF
+         END DO
 
 *  Arrive here if the internal name is not known.
-      STATUS = SAI__ERROR
-      CALL MSG_SETC( 'Q', INAME )
-      CALL ERR_REP( 'POL1_COLNM_ERR1', 'POL1_COLNM: Unknown quantity '//
-     :              '''^Q'' supplied (programming error).', STATUS )
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'Q', INAME )
+         CALL ERR_REP( 'POL1_COLNM_ERR1', 'POL1_COLNM: Unknown '//
+     :                 'quantity ''^Q'' supplied (programming error).', 
+     :                 STATUS )
 
- 20   CONTINUE
-      IF( STATUS .EQ. SAI__OK ) THEN      
+ 20      CONTINUE
+         IF( STATUS .EQ. SAI__OK ) THEN      
 
 *  Find and return the external column name for the given internal column 
 *  name. If no matching internal column name was included in the config
 *  file, use the internal name.
-         ENAME = INAME 
-         DO I = 1, NCOL
-            IF( NAME( I ) .EQ. INAME ) THEN
-               ENAME = COL( I )
-               GO TO 30
-            END IF
-         END DO
+            ENAME = INAME 
+            DO I = 1, NCOL
+               IF( NAME( I ) .EQ. INAME ) THEN
+                  ENAME = COL( I )
+                  GO TO 30
+               END IF
+            END DO
 
- 30      CONTINUE
+ 30         CONTINUE
+
+         END IF
 
       END IF
 
