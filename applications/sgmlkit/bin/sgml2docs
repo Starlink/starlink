@@ -81,14 +81,14 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #
 #  <examplelist>
 #     <example>
-#       sgml2docs --html --tarball mydocs.tar docfile.sgml
+#       sgml2docs --html --tarball=mydocs.tar docfile.sgml
 #     <examplenote>
 #       This converts the document <code>docfile.sgml</code> to a set of
 #       HTML files, bundling the result into a tarball
 #       <code>mydocs.tar</code>, rather than the default based on the
 #       source file's name.
 #     <example>
-#       sgml2docs --latex --options cts-sect,cts-appx docfile.sgml
+#       sgml2docs --latex --options=cts-sect,cts-appx docfile.sgml
 #     <examplenote>
 #       Converts the document to a bundle of files which may be
 #       LaTeXed.  The page breaks between sections are suppressed.
