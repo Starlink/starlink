@@ -267,10 +267,6 @@
 *     -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 *     position where there are no pictures of the selected name, the
 *     co-ordinates in the BASE picture are reported.
-*     -  Pixel co-ordinates are formatted with 1 decimal place unless a
-*     format has already been specified by setting the Format attributes
-*     for the axes of the PIXEL co-ordinate Frame (eg using application
-*     WCSATTRIB).
 *     -  Positions can be removed (the instructions state how), starting
 *     from the most-recent one.  Such positions are excluded from the 
 *     output positions list and log file (if applicable). If graphics
@@ -1150,7 +1146,7 @@
                CALL GRP_SETSZ( IGRP, NP, STATUS )
 
 *  We now need to decide whether the position should also be removed from 
-*  the list of positions to write to the ouptput positions list. This is 
+*  the list of positions to write to the output positions list. This is 
 *  only the case if the position lies within the first selected picture.
 
 *  In ANCHOR or CURRENT mode, the position must be in the original picture
