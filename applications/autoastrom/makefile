@@ -1103,7 +1103,7 @@ astrom/astrom.x: astrom
 moggy astrom:
 	if test ! -f $(PKG_NAME)_source.tar; then \
 		echo "Eh!? Don't have source, and don't have source tarball"; \
-		exit 1;
+		exit 1; \
 	fi
 	test -d moggy -a -d astrom || $(TAR_OUT) $(PKG_NAME)_source.tar
 
