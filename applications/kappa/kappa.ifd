@@ -2722,7 +2722,7 @@ package kappa {
             access READ
             vpath PROMPT
             ppath GLOBAL CURRENT DEFAULT
-            association <->GLOBAL.DATA_ARRAY
+            association <->GLOBAL.ARDFILE
             prompt {ARD file}
             default ardfile.dat
             helpkey *
@@ -6691,7 +6691,7 @@ package kappa {
             prompt {Name of the output text file}
             default ardfile.dat
             ppath GLOBAL CURRENT DEFAULT
-            association ->GLOBAL.DATA_ARRAY
+            association ->GLOBAL.ARDFILE
             helpkey *
          }
 
@@ -6793,7 +6793,7 @@ package kappa {
             vpath PROMPT
             ppath GLOBAL CURRENT DEFAULT
             prompt {Masking ARD file}
-            association <->GLOBAL.DATA_ARRAY
+            association <->GLOBAL.ARDFILE
             default ardfile.dat
             helpkey *
           }
