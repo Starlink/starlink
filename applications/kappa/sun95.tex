@@ -11257,7 +11257,7 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
 \menuitem{GDSTATE}{
  Shows the current status of a graphics device.}
 \menuitem{GLITCH}{
- Replaces bad pixels in a 2-d data array with  the local median.}
+ Replaces bad pixels in a 2-d image with  the local median.}
 \menuitem{GLOBALS}{
  Displays the values of the KAPPA global parameters.}
 \menuitem{HISCOM}{
@@ -12033,7 +12033,7 @@ functions as follows.
 \classitem{FILLBAD}
  Removes regions of bad values from a 2-dimensional NDF.
 \classitem{GLITCH}
- Replaces bad pixels in a 2-d data array with the local median.
+ Replaces bad pixels in a 2-d image with the local median.
 \classitem{NOMAGIC}
  Replaces all occurrences of magic value pixels in an NDF array with
  a new value.
@@ -22321,82 +22321,165 @@ plot (101k).
       KAPPA: IDSTATE.
    }
 }
-\manroutine {{\manheadstyle{GLITCH}}}{ Replaces bad pixels in a 2-d data array with
-  the local median.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This application removes bad pixels from a 2-d data array, stored
-  in the input {\mantt{IMAGE}} structure, and replaces them with the local
-  median of the eight (or less at the edges) neighbouring pixels.
-  At least three defined pixels must be in the neighbourhood,
-  otherwise the resultant pixel becomes bad.
+\sstroutine{
+   GLITCH
+}{
+   Replaces bad pixels in a 2-d NDF with the local median
+}{
+   \sstdescription{
+      This routine removes bad pixels from a 2-d NDF, replacing them with
+      the median of the eight (or less at the edges) neighbouring pixels.
+      At least three of these eight neighbouring pixels must have good
+      values (that is, they must not set to the bad value) otherwise the
+      resultant pixel becomes bad.
 
-  There are three modes of use:
-\begin{manenumerate}
-\manenumerateitem {1.}
-  The application can be used interactively until the user is
-  finished cleaning his array. The user specifies the position of
-  `glitches' or bad pixels by their {$x$} and {$y$} pixel indices.
-\manenumerateitem {2.}
-  The user can give the name of a file which contains a free-format
-  list giving the {$x$} and {$y$} positions of the pixels to be
-  deglitched. The glitch list file should look like the following
-  example:
+      The positions of the pixels to be removed can be supplied in four
+      ways (see parameter MODE):
 
-\begin{verbatim}
-        Glitch list for SBRC FPA #005
-        22  45
-        19  56
-        2  30
-        .  .
-        .  .
-        .  .
-        <EOF>
-\end{verbatim}
+      \sstitemlist{
 
-  {\it i.e.}\ a header string that is output to the user, followed by
-  integer {$x$}-{$y$} pixel position pairs, terminated just by the
-  end-of-file marker. The header string is output to the user.
-\manenumerateitem {3.}
-  The bad (undefined/magic) pixels are automatically deglitched.
-  (Edge, especially corner pixels will need checking if the
-  density of bad pixels is high, because of the constraints
-  mentioned above. Such conditions may require a repeat dose of
-  this application, probably with option 1 or 2.)
+         \sstitem
+         In response to parameter prompts. A single bad pixel position is
+         supplied at each prompt, and the user is re-prompted until a null value
+         is supplied.
 
-\end{manenumerate}
-  The magic-value method is used for processing bad data.
+         \sstitem
+         Within a positions list such as produced by applications CURSOR,
+         LISTMAKE, \emph{etc}.
 
-\manroutineitem {Invocation }{}
-  GLITCH
+         \sstitem
+         Within a simple text file. Each line contains the position of a
+         pixel to be replaced.
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  {\mantt{IMAGE}} structure containing the 2-d data array to be deglitched.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure containing the deglitched version of
-  the data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title for the output {\mantt{IMAGE}} structure.
-  \mbox{\mantt ['KAPPA - Glitch']}
-\manparameterentry {{\mantt{READ}} }{{\mantt{WHERE}}  }{{\mantt{\_CHAR}}}
-  Source of glitch positions - {\mantt Interface} or {\mantt File} or
-  {\mantt Bad}.
-\manparameterentry {{\mantt{READ}} }{{\mantt{FILENAME}}  }{{\mantt{\_CHAR}}}
-  File containing the free-format glitch list.
-\manparameterentry {{\mantt{READ}} }{{\mantt{XCOORD}}  }{{\mantt{\_INTEGER}}}
-  {$x$} pixel index of the pixel to be deglitched.
-\manparameterentry {{\mantt{READ}} }{{\mantt{YCOORD}}  }{{\mantt{\_INTEGER}}}
-  {$y$} pixel index of the pixel to be deglitched.
-\manparameterentry {{\mantt{READ}} }{{\mantt{AGAIN}}  }{{\mantt{\_LOGICAL}}}
-  Whether or not user is prompted for another pixel.
-\end{manparametertable}
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         \sstitem
+         Alternatively, each bad pixel in the input NDF can be used
+         (subject to the above requirement that at least three out of the
+         eight neighbouring pixels are not bad).
+      }
+   }
+   \sstusage{
+      glitch in out [title]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN  =  NDF (Read)
+      }{
+         The input image.
+      }
+      \sstsubsection{
+         INCAT = FILENAME (Read)
+      }{
+         A catalogue containing a positions list giving the pixels
+         to be replaced, such as produced by applications CURSOR, LISTMAKE,
+         \emph{etc}. Only accessed if parameter MODE is given the value {\tt "}Catalogue{\tt "}.
+      }
+      \sstsubsection{
+         INFILE = FILENAME (Read)
+      }{
+         The name of a text file containing the positions of the pixels
+         to be replaced. The positions should be given in the current
+         co-ordinate Frame of the input NDF, one per line. Spaces or
+         commas can be used as delimiters between axis values. The file
+         may contain comment lines with the first character \# or !. This
+         parameter is  only used if parameter MODE is set to {\tt "}File{\tt "}.
+      }
+      \sstsubsection{
+         MODE =  LITERAL (Read)
+      }{
+         The method used to obtain the positions of the pixels to be
+         replaced. The supplied string can be one of the following:
 
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Bad{\tt "}: The bad pixels in the input NDF are used.
+
+            \sstitem
+            {\tt "}Catalogue{\tt "}: positions are obtained from a positions list
+               using parameter INCAT.
+
+            \sstitem
+            {\tt "}File{\tt "}: The pixel positions are read from a text file specified
+               by parameter INFILE.
+
+            \sstitem
+            {\tt "}Interface{\tt "}: The position of each pixel is obtained using
+               parameter PIXPOS. The number of positions supplied must not
+               exceed 200.
+
+         }
+         {\tt [current value]}
+      }
+      \sstsubsection{
+         OUT  =  NDF (Write)
+      }{
+         The output image.
+      }
+      \sstsubsection{
+         PIXPOS = LITERAL (Read)
+      }{
+         The position of a pixel to be replaced, in the current
+         co-ordinate Frame of the input NDF. Axis values should be
+         separated by spaces or commas. This parameter is only used if
+         parameter MODE is set to {\tt "}Interface{\tt "}. If a value is supplied on
+         the command line, then the application exits after processing the
+         single specified pixel. Otherwise, the application loops to
+         obtain multiple pixels to replace, until a null (!) value is
+         supplied. Entering a colon ({\tt "}:{\tt "}) will result in a description of
+         the required co-ordinate Frame being displayed, followed by a
+         prompt for a new value.
+      }
+      \sstsubsection{
+         TITLE  =  LITERAL (Read)
+      }{
+         Title for the output image.  A null value (!) propagates the title
+         from the input image to the output image. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         glitch m51 cleaned mode=cat incat=badpix.FIT
+      }{
+         Reads pixel positions from the positions list stored in the FITS
+         file badpix.FIT, and replaces the corresponding pixels in the
+         2-d NDF m51.sdf by the median of the surrounding neighbouring
+         pixels. The cleaned image is written to cleaned.sdf.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the current co-ordinate Frame of the input NDF is not PIXEL,
+         then the supplied positions are first mapped into the PIXEL Frame
+         before being used.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: ARDMASK, CHPIX, FILLBAD, ZAPLIN, NOMAGIC, SEGMENT,
+      SETMAGIC; Figaro: CSET, ICSET, NCSET, TIPPEX.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
+         input NDF and propagates all extensions.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         Only single and double precision floating point data can be
+         processed directly. All integer data will be converted to floating
+         point before being processed.
+      }
+   }
+}
  
 \sstroutine{
    GLOBALS
@@ -41621,29 +41704,29 @@ plot (7k).
          on each axis.
       }
       \sstexamplesubsection{
-         wcscopy m51\_glitch m51 [-51,1,0,-51,0,1]
+         wcscopy m51\_pow m51 [-51,1,0,-51,0,1]
       }{
-         The application GLITCH has been used to replace bad pixels in a
+         The application POW has been used to process a
          2-dimensional NDF called m51, producing a new NDF called
-         m51\_glitch. Since GLITCH has not yet been updated to support the
-         full NDF structure, the output NDF m51\_glitch will not have a WCS
-         component. More than this, GLITCH also throws away the pixel origin
+         m51\_pow. Since POW has not yet been updated to support the
+         full NDF structure, the output NDF m51\_pow will not have a WCS
+         component. More than this, POW also throws away the pixel origin
          information, effectively resetting the output origin to (1,1). You
          can use WCSCOPY to rectify this by copying the WCS component from
-         the original NDF m51 to the de-glitched NDF m51\_glitch, modifying it
+         the original NDF m51 to the processed NDF m51\_pow, modifying it
          in the process to take account of the resetting of the pixel origin
-         produced by GLITCH. To do this, you to work out the transformation
-         in pixel co-ordinates produced by GLITCH, and specify this when
+         produced by POW. To do this, you to work out the transformation
+         in pixel co-ordinates produced by POW, and specify this when
          running WCSCOPY using the TR parameter. Let{\tt '}s assume the first axis
          of NDF m51 has pixel index bounds of I1:I2 (these values can be
-         found using NDFTRACE). GLITCH will produce an image with the
+         found using NDFTRACE). POW will produce an image with the
          same number of pixels along the axis but the first pixel will have
          index 1 instead of I1. Thus the shift in the pixel origin is:
           \[
           SX = ( 1 - I1 )
           \]
          Likewise, the first pixel on the second axis will be reset to 1
-         by GLITCH, and so if the bounds of the second axis in m51 are J1:J2,
+         by POW, and so if the bounds of the second axis in m51 are J1:J2,
          the shift in the pixel origin for the second axis is:
           \[
           SY = ( 1 - J1 )
@@ -45014,6 +45097,43 @@ The following applications have been modified:
 
       \end{itemize}
 
+      \item [\htmlref{GLITCH}{GLITCH}] \mbox{}
+         \begin{itemize}
+
+            \item GLITCH has been rewritten to use the NDF library and 
+            thus can take advantage of NDF facilities including
+            sections and history, and can accept foreign-format files.
+
+            \item Variance information is now propagated from input to
+            output. The variance associated with each replaced pixel
+            is the variance on the median of the corresponding input
+            pixels.
+
+            \item When supplying the positions of bad pixels in a text 
+            file, the first line in no longer treated as an informational
+            header line. Each line in the file must be either a comment 
+            starting with the character \verb+#+ or \verb+!+, or a valid 
+            position in the current co-ordinate Frame of the input NDF.
+
+            \item The supplied pixel positions now refer to the 
+            current co-ordinate Frame of the input NDF, which need not
+            necessarily be pixel co-ordinates.
+
+            \item Pixel positions can now be supplied in a positions list
+	    catalogue such as created by CURSOR, LISTMAKE, etc.
+
+            \item The WHERE parameter has been renamed as MODE, and the 
+            FILENAME parameter has been renamed as INFILE.
+
+            \item The XCOORD and YCOORD parameters have been replaced by
+            the single parameter PIXPOS.
+
+            \item The AGAIN parameter has been removed. Looping now
+            always occurs in Interface mode unless a value for parameter
+            PIXPOS is supplied on the command line.
+
+         \end{itemize}
+
    \item [\htmlref{IDSTATE}{IDSTATE}] The changes made to GDCLEAR have
    also been made to IDCLEAR.
 
@@ -45618,7 +45738,7 @@ functions as follows.
 \classitem{FILLBAD}
  Removes regions of bad values from a 2-dimensional NDF.
 \classitem{GLITCH}
- Replaces bad pixels in a 2-d data array with the local median.
+ Replaces bad pixels in a 2-d image with the local median.
 \classitem{NOMAGIC}
  Replaces all occurrences of magic value pixels in an NDF array with
  a new value.
