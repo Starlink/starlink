@@ -16402,7 +16402,7 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
          input NDF and propagates all extensions.
 
          \sstitem
@@ -27395,7 +27395,7 @@ plot (9k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an NDF
          data structure and propagates all extensions.  Origin information
          becomes undefined by the duplication and so is not propagated.
 
@@ -28171,7 +28171,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 
          \sstitem
          For rotations that are multiples of 90-degrees, VARIANCE,
-         QUALITY, AXIS, HISTORY, LABEL and UNITS components of the input
+         QUALITY, AXIS, HISTORY, LABEL, WCS and UNITS components of the input
          NDF are propagated to the output NDF.  The axis components are
          switched and flipped as appropriate.
 
@@ -35559,6 +35559,8 @@ X displays when using two or more GWM windows under ICL.
   \item \htmlref{PARGET}{PARGET} bug fixed which caused the application
 to terminate if the specified parameter is an array with only a single
 element.
+  \item \htmlref{ROTATE}{ROTATE} bug fixed which prevented 2-D slices
+from n-D cubes being processed.
   \item  \htmlref{TRANMAKE}{TRANMAKE} no longer reports a compilation error 
 if a null value is given for parameter CLASS.
 \end{itemize}
@@ -35567,10 +35569,10 @@ The following applications now propagate the WCS component of an NDF
 structure: 
 
 ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT COMPADD COMPAVE COMPICK
-CONVOLVE CSUB DISPLAY
-ERRCLIP FFCLEAN FILLBAD GAUSMOOTH GREYPLOT HISTEQ INSPECT DIV LUCY
-MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY NOMAGIC NORMALIZE PASTE RIFT
-SEGMENT SETMAGIC SHADOW SUB SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
+CONVOLVE CSUB DISPLAY ERRCLIP FFCLEAN FILLBAD FLIP GAUSMOOTH GREYPLOT
+HISTEQ INSPECT DIV LUCY MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY
+NOMAGIC NORMALIZE PASTE PIXDUPE RIFT ROTATE SEGMENT SETMAGIC SHADOW SUB
+SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
 
 \begin{latexonly}
 \newpage
