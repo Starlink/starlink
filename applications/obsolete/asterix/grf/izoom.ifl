@@ -5,6 +5,12 @@ interface IZOOM
     vpath 'DEFAULT'
     default 'BOX'
   endparameter
+  parameter FACTOR
+    position 2
+    type '_REAL'
+    default 1.0
+    prompt 'Zooming factor'
+  endparameter
   parameter XCENT
     type '_REAL'
     ppath 'DYNAMIC'
