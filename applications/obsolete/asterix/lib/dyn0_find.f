@@ -72,6 +72,8 @@
 *  History:
 *     20 Mar 1995 (DJA):
 *        Original version.
+*     18 Apr 1995 (DJA):
+*        Added duff pointer value to error message.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -126,7 +128,8 @@
         SLOT = I
       ELSE
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Invalid dynamic memory address - '/
+        CAL MSG_SETI( 'PTR', PTR )
+        CALL ERR_REP( ' ', 'Invalid dynamic memory address /^PTR/ - '/
      :                        /'not allocated by DYN', STATUS )
       END IF
 
