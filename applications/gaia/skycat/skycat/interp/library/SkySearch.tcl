@@ -628,12 +628,21 @@ itcl::class skycat::SkySearch {
     public proc add_history {skycat filename} {
 	set catalog $history_catalog_
 	set image [$skycat get_image]
-	
+
+	# check if the directory for the catalog exists
+	set dir [file dirname $catalog]
+	if {! [file isdirectory $dir]} {
+	    if {[catch {exec mkdir $dir} msg]} {
+		warning_dialog $msg
+		return
+	    }
+	}
+
 	# make sure at least an empty catalog exists
 	if {! [file exists $catalog] || [file size $catalog] == 0} {
 	    # If it doesn't exist yet, create an empty catalog file
 	    if {[catch {set fd [::open $catalog w]} msg]} {
-		error_dialog "can't create image history catalog: %msg"
+		warning_dialog "can't create image history catalog: %msg"
 		return
 	    }
 	    puts $fd "Skycat History Catalog v1.0"
