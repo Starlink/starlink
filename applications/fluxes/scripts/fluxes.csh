@@ -1,4 +1,4 @@
-#!/bin/csh
+#!@csh@
 #+
 #  Name:
 #     fluxes.csh
@@ -24,6 +24,7 @@
 #     ACC: A.C. Charles (Starlink, RAL)
 #     BLY: M.J. Bly (Starlink, RAL)
 #     RPT: R.P. Tilanus (JACH)
+#     TIMJ: Tim Jenness (JACH)
 #
 #  History:
 #     13-DEC-1996 (GJP):
@@ -37,6 +38,9 @@
 #     04-SEP-1998 (RPT)
 #       Forward arguments to fluxes executable and print fewer messages
 #       if the arglist contains screen=n.
+#     14-JUL-2004 (TIMJ):
+#       Uses @bindir@ rather than INSTALL_BIN
+#       Uses FLUXES_DIR and JPL_DIR environment variable if set
 #-
 
 # Flag an interrupt for bugging out.
@@ -52,7 +56,17 @@ endif
 
 # Define the location of fluxes and its data files.
 # This is edited into this script during installation.
-setenv FLUXES      INSTALL_BIN
+if ($?FLUXES_DIR) then
+  if (-d $FLUXES_DIR) then
+    setenv FLUXES $FLUXES_DIR
+  else
+    echo FLUXES_DIR environment variable not set to a directory.
+    echo Using default fluxes location
+    setenv FLUXES @bindir@
+  endif
+else
+  setenv FLUXES @bindir@
+endif
 
 # Define a link to the jpleph.dat file in the current directory.
 if ( -f JPLEPH ) then
@@ -62,7 +76,20 @@ if ( -f JPLEPH ) then
    endif
    set jpl_ok = "no"
 else
-   ln -s JPL_DATA/jpleph.dat JPLEPH
+   # Location of JPL ephemeris. JPL_DIR takes precedence
+   set jpl_dir = @staretcdir@
+   if ($?JPL_DIR) then
+     if (-d $JPL_DIR) then
+       set jpl_dir = $JPL_DIR
+     endif
+   endif
+
+   if (! -e $jpl_dir/jpleph.dat) then
+     echo Unable to locate ephemeris in directory $jpl_dir
+     exit
+   endif
+
+   ln -s $jpl_dir/jpleph.dat JPLEPH
    set jpl_ok = "yes"
 endif
 

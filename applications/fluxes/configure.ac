@@ -19,7 +19,7 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 STAR_MONOLITHS
-
+STAR_CHECK_PROGS(csh)
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
