@@ -139,7 +139,8 @@ else
 	echo "DVI2BITMAP_PK_PATH to "
 	echo "  " $d2bpkpath/%f.%dpk
 	echo "for dvi2bitmap to work.  I'll make things work now,"
-	echo "by using dvi2bitmap's -fp option, which has the same effect."
+	echo "by using dvi2bitmap's --font-search=path option,"
+        echo "which has the same effect."
 
 	echo
 	echo "Trying to convert the test file...."
