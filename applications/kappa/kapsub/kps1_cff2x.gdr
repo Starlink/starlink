@@ -1,10 +1,10 @@
-      SUBROUTINE KPS_$CFF2<T>( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ,
+      SUBROUTINE KPS1_CFF2<T>( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ,
      :                         NITER, CLIP, LIMITS, ILEVEL, SAMBAD,
      :                         WLIM, CINARR, OUTARR, OUTVAR, NGOOD,
      :                         SIGMA, ASUM, NSUM, STATUS )
 *+
 *  Name:
-*     KPS_$CFF2x
+*     KPS1_CFF2x
 
 *  Purpose:
 *     Rejects iteratively defects in a substantially smooth 2-d array.
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$CFF2x( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ, NITER,
+*     CALL KPS1_CFF2x( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ, NITER,
 *                      CLIP, LIMITS, ILEVEL, SAMBAD, WLIM, CINARR,
 *                      OUTARR, OUTVAR, NGOOD, SIGMA, ASUM, NSUM,
 *                      STATUS )
@@ -248,7 +248,7 @@
       IF ( NSTART .EQ. 0 ) THEN
          NGOOD = -1
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPS_$CFF2x_NOVAL',
+         CALL ERR_REP( 'KPS1_CFF2x_NOVAL',
      :     'There is no valid pixel in the input image.', STATUS )
          GOTO 999
       END IF
@@ -258,7 +258,7 @@
 
 *  Smooth the 2-d dimensional image using a block average of the
 *  rectangular neighbourhood.
-         CALL KPG_$BLOC<T>( .TRUE., SAMBAD, .FALSE., NX, NY, CINARR,
+         CALL KPG1_BLOC<T>( .TRUE., SAMBAD, .FALSE., NX, NY, CINARR,
      :                      IBOX( 1 ), IBOX( 2 ), NLIM, OUTARR, BAD,
      :                      ASUM, NSUM, STATUS )
 
@@ -388,7 +388,7 @@
 *  If all pixels has been rejected, exit.
          IF ( NGOOD .LE. 0 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'KPS_$CFF2x_ALLREJ',
+            CALL ERR_REP( 'KPS1_CFF2x_ALLREJ',
      :        'All pixels have been rejected.', STATUS )
             GOTO 999
          END IF
