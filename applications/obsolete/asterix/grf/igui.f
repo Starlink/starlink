@@ -210,6 +210,16 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'YMAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+*  window position in NDC
+        CALL NBS_DEFINE_PRIMITIVE(ID,'WXMIN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'WXMAX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'WYMIN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'WYMAX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+
         CALL NBS_DEFINE_PRIMITIVE(ID,'XP','_INTEGER',0,VAL__NBI,SID,
      :                                                         STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'YP','_INTEGER',0,VAL__NBI,SID,
@@ -429,7 +439,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_ERR'
-      INCLUDE 'PRM_PAR'
 *    Import :
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -438,7 +447,6 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      INTEGER ITEMID
       REAL XMIN,XMAX,YMIN,YMAX
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -447,14 +455,16 @@
         XMAX=XMIN+REAL(I_NX)*I_XSCALE
         YMIN=I_YBASE-0.5*I_YSCALE
         YMAX=YMIN+REAL(I_NY)*I_YSCALE
-        CALL NBS_FIND_ITEM(I_NBID,'XMIN',ITEMID,STATUS)
-        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,XMIN,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'XMAX',ITEMID,STATUS)
-        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,XMAX,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'YMIN',ITEMID,STATUS)
-        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,YMIN,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'YMAX',ITEMID,STATUS)
-        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,YMAX,STATUS)
+        CALL IMG_NBPUT0R('XMIN',XMIN,STATUS)
+        CALL IMG_NBPUT0R('XMAX',XMAX,STATUS)
+        CALL IMG_NBPUT0R('YMIN',YMIN,STATUS)
+        CALL IMG_NBPUT0R('YMAX',YMAX,STATUS)
+
+        CALL PGQVP(3,XMIN,XMAX,YMIN,YMAX)
+        CALL IMG_NBPUT0R('WXMIN',XMIN,STATUS)
+        CALL IMG_NBPUT0R('WXMAX',XMAX,STATUS)
+        CALL IMG_NBPUT0R('WYMIN',YMIN,STATUS)
+        CALL IMG_NBPUT0R('WYMAX',YMAX,STATUS)
 
       ENDIF
 
