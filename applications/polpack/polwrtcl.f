@@ -598,6 +598,12 @@
       CALL CHR_PUTI( NCOL + 1, TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
+*  Write out the equinox.
+      TEXT = 'set equinox_ '
+      IAT = 13
+      CALL CHR_PUTD( DEQNOX, TEXT, IAT )
+      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+
 *  Determine the size of each batch.
       SZBAT = MIN( NROW, MXBAT )
 
@@ -619,12 +625,6 @@
       CALL PSX_FREE( IPW1, STATUS )
       CALL PSX_FREE( IPW2, STATUS )
       CALL PSX_FREE( IPW3, STATUS )
-
-*  Write out the equinox.
-      TEXT = 'set equinox_ '
-      IAT = 13
-      CALL CHR_PUTD( DEQNOX, TEXT, IAT )
-      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Write the bounding box out to the output text file.
       TEXT = 'set xlo_ '
