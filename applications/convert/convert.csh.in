@@ -37,7 +37,7 @@
 #        Added DA2NDF, FITS2NDF, and NDF2DA tasks.  Added automatic
 #        conversions for STREAM and GZIP.  Added FITS and STREAM synonym
 #        file extensions.  Some reordering of NDF_FORMATS_IN/OUT; also
-#        write one format per line for clarity.  Corrected con_tiff2ndf
+#        used multi-line creation for clarity.  Corrected con_tiff2ndf
 #        and con_ndf2tiff aliases.
 #     {enter_further_changes_here}
 #
@@ -130,66 +130,35 @@ alias con_ndf2unf    $CONVERT_DIR/ndf2unf
 #  Formats recognised when accessing pre-existing datasets.  There are
 #  numerous products in FITS each uses a different file extension.
 setenv NDF_FORMATS_IN \
-'FITS(.fit),\
-FIGARO(.dst),\
-IRAF(.imh),\
-STREAM(.da),\
-UNFORMATTED(.unf),\
-UNF0(.dat),\
-ASCII(.asc),\
-TEXT(.txt),\
-GIF(.gif),\
-TIFF(.tif)\,
-GASP(.hdr),\
-COMPRESSED(.sdf.Z),\
-GZIP(.sdf.gz),\
-FITS(.fits),\
-FITS(.fts),\
-FITS(.FTS),\
-FITS(.FITS),\
-FITS(.FIT),\
-FITS(.lilo),\
-FITS(.lihi),\
-FITS(.silo),\
-FITS(.sihi),\
-FITS(.mxlo),\
-FITS(.rilo),\
-FITS(.rihi),\
-FITS(.vdlo),\
-FITS(.vdhi),\
-STREAM(.str)'
+'FITS(.fit),FIGARO(.dst),IRAF(.imh),STREAM(.da),UNFORMATTED(.unf)'
+
+setenv NDF_FORMATS_IN \
+$NDF_FORMATS_IN',UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif)'
+
+setenv NDF_FORMATS_IN \
+$NDF_FORMATS_IN',GASP(.hdr),COMPRESSED(.sdf.Z),GZIP(.sdf.gz),FITS(.fits)'
+
+setenv NDF_FORMATS_IN \
+$NDF_FORMATS_IN',FITS(.fts),FITS(.FTS),FITS(.FITS),FITS(.FIT)'
+
+setenv NDF_FORMATS_IN \
+$NDF_FORMATS_IN',FITS(.lilo),FITS(.lihi),FITS(.silo),FITS(.sihi)'
+
+setenv NDF_FORMATS_IN \
+$NDF_FORMATS_IN',FITS(.mxlo),FITS(.rilo),FITS(.rihi),FITS(.vdlo)'
+
+setenv NDF_FORMATS_IN \
+$NDF_FORMATS_IN',FITS(.vdhi),STREAM(.str)'
 
 #  Formats recognised when creating new datasets.
 setenv NDF_FORMATS_OUT \
-'.,\
-'FITS(.fit),\
-FIGARO(.dst),\
-IRAF(.imh),\
-STREAM(.da),\
-UNFORMATTED(.unf),\
-UNF0(.dat),\
-ASCII(.asc),\
-TEXT(.txt),\
-GIF(.gif),\
-TIFF(.tif)\,
-GASP(.hdr),\
-COMPRESSED(.sdf.Z),\
-GZIP(.sdf.gz),\
-FITS(.fits),\
-FITS(.fts),\
-FITS(.FTS),\
-FITS(.FITS),\
-FITS(.FIT),\
-FITS(.lilo),\
-FITS(.lihi),\
-FITS(.silo),\
-FITS(.sihi),\
-FITS(.mxlo),\
-FITS(.rilo),\
-FITS(.rihi),\
-FITS(.vdlo),\
-FITS(.vdhi),\
-STREAM(.str)'
+'.,FITS(.fit),FIGARO(.dst),IRAF(.imh),STREAM(.da),UNFORMATTED(.unf)'
+
+setenv NDF_FORMATS_OUT \
+$NDF_FORMATS_OUT',UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif)'
+
+setenv NDF_FORMATS_OUT \
+$NDF_FORMATS_OUT',GASP(.hdr),COMPRESSED(.sdf.Z),GZIP(.sdf.gz)'
 
 #  Define format conversion commands.
 #  =================================
@@ -371,6 +340,7 @@ echo " "
 echo "   Defaults for automatic NDF conversion are set."
 echo " "
 echo "   Type conhelp for help on CONVERT commands."
+echo '   Type "showme sun55" to browse the hypertext documentation.'
 echo " "
 #
 #  Exit the procedure.
