@@ -554,6 +554,14 @@
          NOUT( I ) = 0
       END DO
 
+*  Create and fill auxiliary arrays for output list generation.
+      DO I = 1, COUNT
+         CALL CCD1_MALL( NMAT( I ), '_INTEGER', IPRAN1( I ), STATUS )
+         CALL CCD1_MALL( NMAT( I ), '_INTEGER', IPRAN2( I ), STATUS )
+         CALL CCD1_GISEQ( 1, 1, NMAT( I ), %VAL( IPRAN1( I ) ), STATUS )
+         CALL CCD1_GISEQ( 1, 1, NMAT( I ), %VAL( IPRAN2( I ) ), STATUS )
+      END DO
+
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and final merging all positions for each node.
       CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, TOTNOD, IPX1, IPY1, IPRAN1,
