@@ -388,6 +388,7 @@ Compilers and Preprocessors
 * C Compiler::                  Checking its characteristics
 * C++ Compiler::                Likewise
 * Fortran Compiler::            Likewise
+* Preprocessing Fortran::       How to preprocess Fortran
 
 Writing Tests
 
@@ -5183,6 +5184,7 @@ compiling.
 * C Compiler::                  Checking its characteristics
 * C++ Compiler::                Likewise
 * Fortran Compiler::            Likewise
+* Preprocessing Fortran::       How to preprocess Fortran
 @end menu
 
 @node Specific Compiler Characteristics
@@ -5975,6 +5977,177 @@ calls @ovar{action-if-success} (defaults to nothing). If it fails, it
 calls @ovar{action-if-failure} (defaults to exiting with an error
 message).
 @end defmac
+
+@defmac AC_F77_HAVE_OPEN_READONLY
+@acindex AC_F77_HAVE_OPEN_READONLY
+
+If the Fortran compiler has the (common) extension which
+supports a @samp{READONLY} specifier with the @samp{OPEN} statement,
+then define @samp{F77_HAVE_OPEN_READONLY}.
+@end defmac
+
+@node Preprocessing Fortran
+@subsection Preprocessing Fortran
+
+It is both possible and useful to use Fortran which has cpp-style
+directives within it.  Some Fortran compilers, such as @code{g77}, can
+process these directives internally, and so need no separate
+preprocessing stage; in other cases, the code must be compiled
+indirectly, with a preprocessor producing pure Fortran code which is
+only then passed to the compiler.
+
+Because of the syntactical differences in the underlying languages,
+it is not always possible to do this using the @code{cpp}
+program, and you may need help from a separate Fortran-specific
+preprocessor.
+
+@comment XXX Add Automake version number when AC_PROG_FPP was introduced
+
+The @code{AC_PROG_FPP} macro, combined with the corresponding support in
+Automake (starting with version XXX), will work out how to compile
+Fortran source containing such directives.
+
+@defmac AC_PROG_FPP (@ovar{feature-list}, @ovar{fpp-src-ext})
+@acindex AC_PROG_FPP
+
+@ovar{feature-list} is a space-separated list of features that the Fortran
+preprocessor must have for the code to compile.  See below for details.
+It is up to the package maintainer to properly set these requirements.
+
+@ovar{fpp-src-ext} is an optional specification of the file extension
+for preprocessable Fortran source files (without a leading dot).  It
+defaults to @code{fpp}, which is better than @code{F} in general, since
+extensions @file{.F} and @file{.f} are indistinguishable on
+case-insensitive filesystems (such as HFS+ on MacOS X).
+
+You should also call the macro @samp{AC_PROG_FC} before you call this macro.
+
+@end defmac
+
+There is no formal standard for Fortran preprocessor directives, and so
+you introduce an element of non-portability into your code when you use
+them.  However they can (paradoxically) help make your code more
+portable by allowing you to use useful and common extensions (such as
+the @code{READONLY} qualifier on the @code{OPEN} statement) without
+having the code break on those few compilers which support nothing
+beyond the formal standard.
+
+Different preprocessors support different subsets of the range of
+possibilities.  If your code requires only a very basic set of features
+--- such as @code{#if...#endif} and nothing more --- then you can make
+use of a relatively primitive preprocessor, perhaps even one as simple
+as a script.  It is for this reason that this macro, unusually for
+Autoconf macros, allows you to specify a set of needed features, and the macro
+will find a preprocessor which not only exists and runs, but has at
+least these features available.  @footnote{Sun have produced a Fortran
+preprocessor @command{fpp}, which is described at
+@url{http://wwws.sun.com/software/sundev/previous/studio7/documentation/mr/READMEs/fpp_readme.html}
+and available for download at @url{http://www.netlib.org/fortran}; it is
+available for no cost, though it is not Free.  The description on that
+page is, in effect, a useful specification of a Fortran preprocessor
+syntax.}
+
+The macro will fall back on @command{cpp} if no more specific preprocessor
+can be found.  This will @emph{usually} work, but because Fortran and C
+have such different syntaxes, there will be a few cases where the
+@command{cpp} command becomes quite legitimately confused.
+
+The supported features are as follows:
+
+@table @samp
+@item include
+Correctly process @code{#include} directives and the command-line option
+@option{-I}.
+
+@item define
+Correctly process option @option{-D}.
+
+@item substitute
+Substitute macros in Fortran code (some preprocessors touch only lines
+starting with @samp{#}).
+
+@item wrap
+Wrap lines that become too long through macro substitution.
+@command{fpp} is probably the only preprocessor that does this.  Without
+this, you can run into trouble if your macro substitutions cause code
+lines to move beyond Fortran 77's 72-character limit.
+
+@item cstyle
+Do not suppress C style comments (@option{-C} option in @command{cpp}).
+
+@item CSTYLE
+@emph{Do} suppress C style comments
+(for example, the code contains C-style comments, and the compiler may not
+know how to handle them).
+
+@end table
+
+Features can be abbreviated, so that @samp{i}, @samp{in}, @samp{inc} etc. are equivalent to @samp{include}.
+Features can be deselected, if the feature is not needed, by prepending
+@samp{no}; for example @samp{nodefine}.
+
+The default for the feature list is 
+@samp{[include define substitute nowrap nocstyle noCSTYLE]}, and
+feature requirements corresponding to the defaults may be omitted.
+
+Note that @samp{wrap} implies @samp{substitute}, and @samp{CSTYLE} and
+@samp{cstyle} cannot be requested at the same time. The macro adjusts
+this automatically.
+
+The macro works out if the Fortran compiler discovered by macro
+@samp{AC_PROG_FC} has the requested set of features.  If so, it arranges
+for the compilation to be done `directly'; if not, it arranges for
+`indirect' compilation, where the preprocessable Fortran code is
+converted to pure Fortran code and only subsequently passed to the
+Fortran compiler.
+
+This macro sets and substitutes the following variables.
+
+@table @samp
+@item FPP
+The name of the preprocessor which will be used
+
+@item FPPFLAGS
+The flags which will be given to the compiler (in direct mode) or
+preprocessor (in indirect mode)
+
+@item FPP_MAKE_FLAGS
+This is used to pass flags to the @command{cpp} or @command{fpp} command
+if we compile directly, and leave them out otherwise.
+
+@item FPP_SRC_EXT
+This is the file extension (without a dot) of preprocessable
+Fortran files; by default this is @code{fpp}, but @code{F} is also
+common.  It is set by the second argument of the @samp{AC_PROG_FPP}
+macro.
+
+@item FPP_COMPILE_EXT
+This contains the file extension which the Fortran compiler will accept.
+It is the same as @samp{FPP_SRC_EXT} if the compiler itself can do
+preprocessing (`direct' compilation), or a dummy value if it cannot, and
+the file must be preprocessed separately (`indirect').  The dummy value
+in this latter case is not @file{.f}, since that would conflict with the
+pre-existing rule for compiling Fortran.
+
+@item FPP_PREPROCESS_EXT
+The partner of @samp{FPP_COMPILE_EXT}.  This is @samp{FPP_SRC_EXT} for
+indirect compilation, or a dummy value for direct compilation, when the
+corresponding preprocessing rule should be ignored.
+
+@item FPP_OUTPUT
+This is used to redirect @command{fpp} output to the @file{.f} file in those
+cases where the preprocessor writes to @samp{stdout} rather than to a
+file: it is either blank or something like @samp{>$@@}.
+
+@end table
+
+These macros are used in the correct way by the @file{Makefile.in} rules
+generated by Automake.
+
+The macro depends on both @samp{FC} and @samp{CPP}, because we may
+possibly need to fall back on @command{cpp} for preprocessing.
+
+
 
 @node System Services
 @section System Services
