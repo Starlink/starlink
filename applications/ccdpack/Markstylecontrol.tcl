@@ -37,10 +37,11 @@
 #           - thickness  -- Approximate thickness of lines in pixels.
 #           - shape      -- One of Plus, Cross, Circle, Square, Diamond
 #           - showindex  -- 1 to show index numbers, 0 not to do so.
-
-
-#        opaque value, and other than reading and writing it, client code
-#        cannot do anything useful with it.
+#
+#        When modifying this value using the configure method, not all
+#        of the values have to be supplied; any that are supplied will
+#        supplant the old values, and any that are not will remain the
+#        same.
 #
 #     Markstylecontrol also inherits all the public variables of the
 #        Control widget.
