@@ -393,6 +393,14 @@ f     - Title: The Plot title drawn using AST_GRID
 *        the max number of decimal places when estimating label priorities.
 *        - Modified Overlap to ensure that axis labels are speced by at 
 *        least two spaces.
+*     22-JAN-2003 (DSN):
+*        - Modified PlotLabels so that labels are rejected in a regular
+*        pattern rather than semi-random.
+*        - Modified the way PlotLabels abbreviates leading fields.
+*        - Introdued the skipbad parameter for the Crv function, in order
+*        to provide some degree of protection against the Crv algorithm
+*        skipping over small sections of valid coordinates (such as when
+*        a curve crosses the plot very close to a corner of the plot).
 *class--
 */
 
@@ -1177,6 +1185,7 @@ typedef struct LabelList {
    double val;
    int priority;
    const char *atext;
+   int saved_prio;
 } LabelList;
 
 /* Structure holding information about curves drawn by astGridLine and 
@@ -1310,9 +1319,6 @@ static const char *xedge[4] = { "left", "top", "right", "bottom" };
 
 /* Text values used to represent Labelling externally. */
 static const char *xlbling[2] = { "interior", "exterior" };
-
-/* Index of root label used by PlotLabel */
-static int PlotLabel_Root_Index;
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -1513,7 +1519,6 @@ static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, 
 static int CheckLabels( AstFrame *, int, double *, int, int, char **, double );
 static int ChrLen( const char * );
 static int Compare_LL( const void *, const void * );
-static int Compare_LL2( const void *, const void * );
 static int Compared( const void *, const void * );
 static int CountGood( int, double * );
 static int Cross( float, float, float, float, float, float, float, float );
@@ -1548,7 +1553,7 @@ static void BoundingBox( AstPlot *, float[2], float[2] );
 static void Bpoly( AstPlot *, float, float, const char *, const char * );
 static void Clip( AstPlot *, int, const double [], const double [] );
 static void Copy( const AstObject *, AstObject * );
-static void Crv( AstPlot *this, double *, double *, double *, const char *, const char * );
+static void Crv( AstPlot *this, double *, double *, double *, int, const char *, const char * );
 static void CrvLine( AstPlot *this, double, double, double, double, const char *, const char * );
 static void Curve( AstPlot *, const double [], const double [] );
 static void CurvePlot( AstPlot *, const double *, const double *, int , CurveData *, const char *, const char * );
@@ -3569,7 +3574,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map1 to draw the curve. */
-      Crv( this, d, x, y, method, class );
+      Crv( this, d, x, y, 0, method, class );
 
 /* End the current poly line. */
       Opoly( this, method, class );
@@ -6102,82 +6107,6 @@ static int Compare_LL( const void *elem1, const void *elem2 ){
 
 }
 
-static int Compare_LL2( const void *elem1, const void *elem2 ){
-/*
-*  Name:
-*     Compare_LL2
-
-*  Purpose:
-*     Compare two LabelList structures as used by function PlotLabels.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot.h"
-*     int Compare_LL2( const void *elem1, const void *elem2 )
-
-*  Class Membership:
-*     Plot method.
-
-*  Description:
-*     This function compares two "LabelList" structures as used by function
-*     PlotLabels, and returns an integer indicating which has a larger 
-*     "priority" value. This function is intended to be used with the C 
-*     Run-Time-Library sorting function "qsort". 
-
-*  Parameters:
-*     elem1
-*        Pointer to the first LabelList.
-*     elem2
-*        Pointer to the second LabelList. 
-
-*  Returned Value:
-*     Zero is returned if the priorities are equal. If the first is larger
-*     than the second then -1 is returned. Otherwise, +1 is returned.
-
-*  Notes:
-*     -  This function executes even if an error has occurred.
-
-*/
-
-/* Local Variables: */
-   LabelList *ll1;           /* Pointer to the first LabelList */
-   LabelList *ll2;           /* Pointer to the second LabelList */
-   int off1;                 /* Index offset from root to label 1 */
-   int off2;                 /* Index offset from root to label 2 */
-   int ret;                  /* The returned value */
-   
-/* Get pointers to the two LabelList structures. */
-   ll1 = (LabelList *) elem1;
-   ll2 = (LabelList *) elem2;
-
-/* Compare the priority for the two label's. */
-   if( ll1->priority < ll2->priority ){
-      ret = 1;
-
-   } else if( ll1->priority > ll2->priority ){
-      ret = -1;
-
-/* If priorities are equal, compare the distances from the root label,
-   giving higher priority to those which are nearer to the root label. */
-   } else {
-      off1 = abs( ll1->index - PlotLabel_Root_Index );
-      off2 = abs( ll2->index - PlotLabel_Root_Index );
-      if( off1 > off2 ) {
-         ret = 1;
-      } else if( off1 < off2 ) {
-         ret = -1;
-      } else {
-         ret = 0;
-      }
-   }
-
-/* Return the answer. */
-   return ret;
-
-}
-
 static int CountGood( int n, double *data ){
 /*
 *  Name:
@@ -6334,7 +6263,7 @@ static int Cross( float ax, float ay, float bx, float by,
 }
 
 static void Crv( AstPlot *this, double *d, double *x, double *y, 
-                 const char *method, const char *class ){
+                 int skipbad, const char *method, const char *class ){
 /*
 *  Name:
 *     Crv
@@ -6347,8 +6276,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Crv( AstPlot *this, double *d, double *x, double *y, const char *method, 
-*               const char *class  )
+*     void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
+*               const char *method, const char *class  )
 
 *  Class Membership:
 *     Plot member function.
@@ -6392,6 +6321,16 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
 *        Pointer to an array of CRV_NPNT values giving the graphics Y
 *        coordinate for the positions supplied in the array pointed to by 
 *        parameter "d". 
+*     skipbad
+*        Controls what happens if all the supplied points are bad or 
+*        outside the plotting area. If skipbad is non-zero, then it is
+*        assumed that the supplied points represent an entirely bad (or
+*        out of bounds) section of the curve, and this function will
+*        return without attempt to sub-divide any of the supplied points.
+*        If skipbad is zero, then it is assumed that we may be able to find
+*        some good points between the supplied bad points, and therefore
+*        this function will attempt to sub-divide the supplied points.
+*        Should be supplied as zero on the initial invocation.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -6680,8 +6619,12 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    function, or if every supplied point was bad or outside the plotting
    area, or if all the segments were very short in graphics space, we will 
    not be attempting to subdivide any segments which cannot be drawn directly 
-   as a straight line. */
-   subdivide = ( Crv_nent < CRV_MXENT && !all_bad && dl2_max > limit2 );
+   as a straight line. If "skipbad" was supplied as zero, we ignore the 
+   restriction which says that we must have some good points (since we
+   may find some good poits by a further sub-division). */
+   subdivide = ( Crv_nent < CRV_MXENT && 
+                 ( !all_bad || !skipbad ) &&
+                 dl2_max > limit2 );
 
 /* Initialise some pointers to the data defineding the subsegments. */
    dd = NULL;
@@ -6752,9 +6695,12 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    not very short, we call this function recursively to draw the segment.
    Increment pointers into the "xx", "yy" and "dd" arrays so that they
    point to the start of the subsegment information for the next segment
-   to be subdivided. */
+   to be subdivided. If all the graphics positions at this level were 
+   bad or outside the plot, tell the next invocation of Crv to do no
+   further sub-divisions if it too finds all graphics positions to be bad or
+   outside the plot. */
          } else if( subdivide ) {
-            Crv( this, pd, px, py, method, class );
+            Crv( this, pd, px, py, all_bad, method, class );
             pd += CRV_NSEG + 1;
             px += CRV_NSEG + 1;
             py += CRV_NSEG + 1;
@@ -7475,7 +7421,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Map3( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map3 to draw the curve. */
-      Crv( this, d, x, y, method, class );
+      Crv( this, d, x, y, 0, method, class );
 
 /* End the current poly line. */
       Opoly( this, method, class );
@@ -10850,7 +10796,7 @@ f        The global status.
       Map4( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map4 to draw the curve. */
-      Crv( this, d, x, y, method, class );
+      Crv( this, d, x, y, 0, method, class );
 
 /* End the current poly line. */
       Opoly( this, method, class );
@@ -16279,7 +16225,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 
 /* Use Crv and Map2 to draw the intersection of the straight line with
    the region containing valid physical coordinates. */
-   Crv( this, d, x, y, method, class );
+   Crv( this, d, x, y, 0, method, class );
 
 /* End the current poly line. */
    Opoly( this, method, class );
@@ -17686,7 +17632,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 */
 
 /* Local Variables: */
-   static int nbox = 0;   /* Number of boxes stored in "work" */
+   int nbox = 0;          /* Number of boxes stored in "work" */
    int ret;               /* Does the new label overlap a previous label? */
    int i;                 /* Box index */
    float *cx;             /* Pointer to next corner's X value */
@@ -17697,13 +17643,23 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 /* Initialise the returned value to indicate no overlap has been found. */
    ret = 0;
 
+/* Get the number of bounding boxes in the supplied work array. */   
+   if( work && *work ) {
+      nbox = (*work)[ 0 ];
+   } else {
+      nbox = 0;
+   }
+
 /* If required, return the number of bounding boxes currently stored. */
    if( mode == -2 ) return nbox;
 
 /* If required, reset the number of bounding boxes currently stored, and
    return the new number. */
    if( mode >= 0 ) {
-      if( mode < nbox ) nbox = mode;
+      if( mode < nbox && work && *work ) {
+         nbox = mode;
+         (*work)[ 0 ] = nbox;
+      }
       return nbox;
    }
 
@@ -17712,9 +17668,12 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
    X graphics coordinates at the 4 corners are stored in the first 4 floats, 
    and the corresponding Y graphics coordinates in the second group of 4 
    floats. */
-   if( !(*work) ){
-      nbox = 0;
-      *work = (float *) astMalloc( 80*sizeof(float) );
+   if( work && !(*work) ) {
+      *work = (float *) astMalloc( 81*sizeof(float) );
+      if( astOK ) {
+         nbox = 0;
+         (*work)[ 0 ] = 0;
+      }
    }
 
 /* Check the global status. */
@@ -17728,8 +17687,8 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
    if( astOK ) {
 
 /* Check for an overlap between the box and each of the previous boxes. */
-      cx = *work;
-      cy = *work + 4;
+      cx = *work + 1;
+      cy = cx + 4;
       for( i = 0; i < nbox; i++ ){
 
          if( BoxCheck( xbn, ybn, cx, cy ) ) {
@@ -17745,13 +17704,14 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 
 /* If no overlap was found, add the new box to the list. */
       if( !ret ){
-         *work = (float *) astGrow( (void *) *work, nbox + 1, 8*sizeof(float) );
-         cx = *work + 8*(nbox++);
+         *work = (float *) astGrow( (void *) *work, 8*nbox + 9, sizeof(float) );
+         cx = *work + 1 + 8*nbox;
          cy = cx + 4;
          for( i = 0; i < 4; i++ ){
             cx[ i ] = xbn[ i ];
             cy[ i ] = ybn[ i ];
          }
+         (*work)[ 0 ]++;
 
 /* Extend the bounds of the global bounding box held externally to include 
    the new box. */
@@ -17761,9 +17721,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
             Box_lbnd[ 1 ] = MIN( ybn[ i ], Box_lbnd[ 1 ] );
             Box_ubnd[ 1 ] = MAX( ybn[ i ], Box_ubnd[ 1 ] );
          }
-
       }
-
    }
 
 /* If an error has occur, return a value of 0. */
@@ -17790,7 +17748,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void PlotLabels( AstPlot *this, AstFrame *frame, int axis, 
+*     void AstPlot *this, AstFrame *frame, int axis, 
 *                      LabelList *list, char *fmt, int nlab, float **box, 
 *                      const char *method, const char *class ) 
 
@@ -17835,30 +17793,74 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 
 /* Local Variables: */
    LabelList *ll;         /* Pointer to next label structure */
+   LabelList *llhi;       /* Pointer to higher neighbouring label structure */
+   LabelList *lllo;       /* Pointer to lower neighbouring label structure */
    char *a;               /* Pointer to next character */
    char *b;               /* Pointer to next character */
    char *c;               /* Pointer to next character */
    char *text;            /* Pointer to label text */
+   const char *texthi;    /* Pointer to text abbreviated with higher neighbour */
+   const char *textlo;    /* Pointer to text abbreviated with lower neighbour */
    float xbn[ 4 ];        /* X coords at corners of new label's bounding box */
    float ybn[ 4 ];        /* Y coords at corners of new label's bounding box */
+   float tolx;            /* Min allowed X interval between labels */
+   float toly;            /* Min allowed Y interval between labels */
    int dp;                /* Number of decimal places */
+   int found;             /* Non-zero digit found? */
+   int hilen;             /* Length of texthi */
    int i;                 /* Label index */
-   int ioff;              /* Distance from this label to root label */
-   int ipri;              /* Priority of label i */
    int j;                 /* Label index offset */
-   int jpri;              /* Priority of label i+j */
+   int jgap;              /* Gap in index between rejected labels */
    int lab0;              /* Index of middle label */
+   int lolen;             /* Length of textlo */
    int mxdp;              /* Maximum number of decimal places */
-   int nbox;              /* The number of bounding boxes stored previously */
-   int nremove;           /* No. of labels rejected by the current loop */
+   int nbox;              /* The number of boinding boxes supplied */
+   int nexti;             /* Index of next label to retain */
    int nz;                /* Number of trailing zeros in this label */
    int nzmax;             /* Max. number of trailing zeros */
+   int olap;              /* Any overlap found? */
+   int prio;              /* Current priority */
    int root;              /* Index of unabbreviated label */
+   int root_found;        /* Has the root label been decided on? */
    int rootoff;           /* Distance from middle to root label */
 
 /* Return without action if an error has occurred, or there are no labels to 
    draw. */
    if( !astOK || nlab == 0 || !list || !astGetNumLab( this, axis ) ) return;
+
+/* Get the number of bounding boxes describing the labels already drawn
+   (this will be non-zero only if this is the second axis to be labelled). */
+   nbox = Overlap( this, -2, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, method, 
+                   class );
+
+/* Ensure the labels are sorted into increasing index order. */
+   qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
+
+/* For some reason, it seems that the same label can sometimes be included
+   more than once in the supplied list (at the same (x,y) position). Purge 
+   duplicate labels by setting their priority to -1. Initialise the
+   priority of the remaining labels to zero. */
+   tolx = 0.001*fabs( this->xhi - this->xlo );
+   toly = 0.001*fabs( this->yhi - this->ylo );
+   ll = list;
+   ll->priority = 0;
+   ll->saved_prio = 0;
+
+   for( i = 1; i < nlab; i++ ) {
+      ll++;
+      ll->priority = 0;
+      ll->saved_prio = 0;
+      for( j = 0; j < i; j++ ){
+         if( !strcmp( ll->text, list[ j ].text ) ) {
+            if( fabs( ll->x - list[ j ].x ) < tolx && 
+                fabs( ll->y - list[ j ].y ) < toly ) {
+               ll->priority = -1;
+               ll->saved_prio = -1;
+               break;
+            }
+         } 
+      }
+   }
 
 /* Find the maximum number of decimal places in any label. */
    mxdp = 0;
@@ -17866,7 +17868,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    for( i = 0; i < nlab; i++ ) {
       ll++;
       c = strchr( ll->text, '.' );
-      if( c ) {
+      if( c && ll->priority > -1 ) {
          b = c + 1;
          while( ( c = strchr( b, '.' ) ) ) b = c + 1;
 
@@ -17881,83 +17883,101 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
       }
    }
 
-/* Sort the labels into increasing index order. */
-   qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
-
-/* Assign a priority to each label, equal to the number of trailing zeros
-   in the label text. If the text has fewer tan the maximum number of
-   decimal places, pretend the text is padded with trailing zeros to
-   bring the number of decimal places up to the maximum. At the same time, 
-   find the highest priority label, giving preference to labels which occur
-   in the middle of the index order. This label will be the "root" label -
-   a label which is guaranteed not to be abbreviated. At the same time, 
-   initialize the abbreviated text for each label to be equal to the 
-   unabbreviated text. */
-   lab0 = ( nlab + 1 )/2;
+/* Find the highest priority label (the "root" label). This label is
+   never abbreviated to remove leading fields, and is never omitted due to
+   overlaps with other labels. To find this label, each label is assigned a 
+   priority equal to the number of trailing zeros in the label text. If the 
+   text has fewer than the maximum number of decimal places, pretend the text 
+   is padded with trailing zeros to bring the number of decimal places up to 
+   the maximum. The root label is the highest priority label, giving 
+   preference to labels which occur in the middle of the index order. At the 
+   same time, initialize the abbreviated text for each label to be equal to 
+   the unabbreviated text. */
+   lab0 = nlab/2;
    nzmax = -1;
    ll = list - 1;
+   root = -1;
+   root_found = 0;
    for( i = 0; i < nlab; i++ ) {
       ll++;
-      text = ll->text;
-      nz = 0;
+      if( ll->priority > -1 ) {
+         text = ll->text;
+         nz = 0;
 
 /* Get a pointer to the final decimal point. */
-      b = strchr( text, '.' );
-      while( b && ( c = strchr( b + 1, '.' ) ) ) b = c;
+         b = strchr( text, '.' );
+         while( b && ( c = strchr( b + 1, '.' ) ) ) b = c;
 
 /* Get a pointer to the first character beyond the end of the string, ignoring 
    any exponent. */
-      a = strchr( text, 'E' );
-      if( !a ) a = strchr( text, 'e' );
-      if( !a ) a = text + strlen( text );
+         a = strchr( text, 'E' );
+         if( !a ) a = strchr( text, 'e' );
+         if( !a ) a = text + strlen( text );
 
 /* Initialise the number of trailing zeros to be the difference between
    the number of decimal places in this label and the maximum numberof
    decimal places in any label. */
-      if( b && mxdp != -1 ) {
-         dp = a - b - 1;
-         nz = mxdp - dp;
-      } else {
-         nz = mxdp;
-      }
+         if( b && mxdp != -1 ) {
+            dp = a - b - 1;
+            nz = mxdp - dp;
+         } else {
+            nz = mxdp;
+         }
 
-/* Now add on any actual trailing zeros in the label. */
-      for( a = a-1; a >= text; a-- ) {
-         if( isdigit( (int) *a ) && *a != '0' ) break;
-         nz++;
-      }
+/* Now add on any actual trailing zeros in the label. Note if a non-zero 
+   digit was found in the label. */
+         found = 0;
+         for( a = a-1; a >= text; a-- ) {
+            if( isdigit( (int) *a ) && *a != '0' ) {
+               found = 1;
+               break;
+            }
+            nz++;
+         }
 
 /* Store the priority for this label. */
-      ll->priority = nz;
+         ll->priority = nz;
+         ll->saved_prio = nz;
 
-/* Choose the root label. */
-      if( nz > nzmax ) {
-         nzmax = nz;
-         root = i;
-         rootoff = abs( i - lab0 );
-         PlotLabel_Root_Index = ll->index;
-      } else if( nz == nzmax ) {
-         ioff = abs( i - lab0 );
-         if( ioff < rootoff ) {
-            root = i;
-            rootoff = ioff;
-            PlotLabel_Root_Index = ll->index;
+/* Note the highest priority of any label. */
+         if( nz > nzmax ) nzmax = nz;
+
+/* We will use this label as the root label if:
+
+   - We have not already found the root label
+
+   AND
+   
+   - We do not currently have a candidate root label, or
+   - The priority for this label is higher than the priority of the current
+   root label, or
+   - The priority for this label is equal to the priority of the current
+   root label and this label is closer to the centre of the axis, or
+   - The label value is zero.  */
+
+         if( root == -1 ||
+             nz > list[ root ].priority ||
+             ( nz == list[ root ].priority && abs( i - lab0 ) < rootoff ) ||
+             !found ) {
+
+            if( !root_found ) {
+               root = i;
+               rootoff = abs( i - lab0 );
+
+/* If the label value was zero, we will use label as the root label,
+   regardless of the priorities of later labels. */
+               if( !found ) root_found = 1;
+            }
          }
+
+/* Initialise the abbreviated text to be the same as the full text. */   
+         ll->atext = ll->text;
       }
-
-      ll->atext = ll->text;
-
    }
 
-/* Add one to the priority of the root label to ensure that it is larger 
-   than any other label priority. This ensures the root label will not be
-   abbreviated since the choice of which labels to abbreviate is based on
-   label priority (lower priority labels are abbreviated). */
-   (list[ root ].priority)++;
-
-/* Store the number of bounding boxes stored for previous axes. */
-   nbox = Overlap( this, -2, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, NULL, 
-                   method, class );
+/* Assign a priority higher than any other priority to the root label. */
+   list[ root ].priority = nzmax + 1;
+   list[ root ].saved_prio = nzmax + 1;
 
 /* The following process may have removed some labels which define the
    missing fields in neighbouring abbreviated fields, so that the user
@@ -17965,124 +17985,210 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    should have. We therefore loop back and perform the abbreviation
    process again, omitting the removed labels this time. Continue doing
    this until no further labels are removed. */
-   nremove = 1;
-   while( nremove > 0 ) {
+   jgap = 1;
+   olap = 1;
+   while( olap ) {
 
-/* We now attempt to abbreviate the labels (i.e. remove leading fields which
-   are the same as in the neighbouring labels)... Pass through the labels in
-   index order (except the last one since the last one can have no "next 
-   label"). */
-      ll = list - 1;
-      for( i = 0; i < nlab-1; i++ ) {
-         ll++;
+/* We now attempt to abbreviate the remaining labels (i.e. those which
+   have not been rejected on an earlier pass through this loop). Labels
+   are abbreviated in order of their priority. Higher priority labels are 
+   abbreviated first (except that the root label, which has the highest
+   priority, is never abbreviated). Each label is abbreviated by comparing 
+   it with the nearest label with a higher priority. */
 
-/* If this label has been rejected on a previous pass throught the outer
-   "while" loop (because it overlapped a higher priority label), continue 
-   with the next label. */
-         if( ll->priority < 0 ) continue;
+/* Loop through all the priority values, starting with the highest
+   priority (excluding the root label so that the root label is never 
+   abbreviated), and working downwards to finish with zero priority. */
+      prio = nzmax + 1;
+      while( prio-- > 0 ) {
+      
+/* Look for labels which have the current priority. */
+         ll = list - 1;
+         for( i = 0; i < nlab; i++ ) {
+            ll++;
+            if( ll->priority == prio ) {
 
-/* We consider the pair of labels formed by the current label and the next
-   non-rejected label. Find the next non-rejected label. Leave the loop if
-   there are no more non-rejected labels. */
-         j = 1;
-         while( (ll+j)->priority < 0 && i+j < nlab ) j++;
-         if( i+j >= nlab ) break;
+/* Find the closest label to this one on the high index side which has a
+   higher priority. */
+               llhi = NULL;
+               for( j = i + 1; j < nlab; j++ ) {
+                  if( list[ j ].priority > prio ) {
+                     llhi = list + j;
+                     break;
+                  }
+               }
 
-/* If one label in this pair has a higher priority than the other, abbreviate
-   only the lower priority label. If the priorities are equal, abbreviate
-   both labels. In any case, do not abbreviate labels if they have
-   already been abbreviated. If a label would be completely removed by this
-   abbreviation, do not abbreviate the label at all. */
-         ipri = ll->priority;
-         jpri = (ll+j)->priority;
-         if( ipri > jpri ) {
-            if( (ll+j)->atext == (ll+j)->text ) {
-               (ll+j)->atext = astAbbrev( frame, axis, ll->text, (ll+j)->text );
-               if( !((ll+j)->atext)[0] ) (ll+j)->atext = (ll+j)->text;
-            }
-   
-         } else if( ipri < jpri ) {
-            if( ll->atext == ll->text ) {
-               ll->atext = astAbbrev( frame, axis, (ll+j)->text, ll->text );
-               if( !(ll->atext)[0] ) ll->atext = ll->text;
-            }
-   
-         } else {
-            if( ll->atext == ll->text ) {
-               ll->atext = astAbbrev( frame, axis, (ll+j)->text, ll->text );
-               if( !(ll->atext)[0] ) ll->atext = ll->text;
-            }
-            if( (ll+j)->atext == (ll+j)->text ) {
-               (ll+j)->atext = astAbbrev( frame, axis, ll->text,(ll+j)->text );
-               if( !((ll+j)->atext)[0] ) (ll+j)->atext = (ll+j)->text;
+/* If no higher priority neighbour was found on the high index side, 
+   use the nearest label with the current priority on the high index side. */
+               if( !llhi ) {
+                  for( j = i + 1; j < nlab; j++ ) {
+                     if( list[ j ].priority == prio ) {
+                        llhi = list + j;
+                        break;
+                     }
+                  }
+               }
+
+/* Find the closest label to this one on the low index side which has a
+   higher priority. */
+               lllo = NULL;
+               for( j = i - 1; j >= 0; j-- ) {
+                  if( list[ j ].priority > prio ) {
+                     lllo = list + j;
+                     break;
+                  }
+               }
+
+/* If no higher priority neighbour was found on the low index side, 
+   use the nearest label with the current priority on the low index side. */
+               if( !lllo ) {
+                  for( j = i - 1; j >= 0; j-- ) {
+                     if( list[ j ].priority == prio ) {
+                        lllo = list + j;
+                        break;
+                     }
+                  }
+               }
+
+/* If only one of these two neighbouring labels was found, we abbreviate the 
+   current label by comparing it with the one found neighbouring label. */
+               if( !lllo ) {
+                  ll->atext = astAbbrev( frame, axis, llhi->text, ll->text );
+                  if( !(ll->atext)[0] ) ll->atext = ll->text;
+
+               } else if( !llhi ) {
+                  ll->atext = astAbbrev( frame, axis, lllo->text, ll->text );
+                  if( !(ll->atext)[0] ) ll->atext = ll->text;
+
+/* If two neighbouring labels were found, we abbreviate the current label
+   by comparing it with both neighbouring labels, and choosing the shorter
+   abbreviation. */
+               } else {
+                  textlo = astAbbrev( frame, axis, lllo->text, ll->text );
+                  texthi = astAbbrev( frame, axis, llhi->text, ll->text );
+
+                  lolen = strlen( textlo );
+                  hilen = strlen( texthi );
+                  if( lolen > 0 && lolen < hilen ) {
+                     ll->atext = textlo;
+                  } else {
+                     ll->atext = texthi;
+                  }
+                  if( !(ll->atext)[0] ) ll->atext = ll->text;
+               } 
             }
          }
       }
 
-/* We now look for labels which overlap, removing labels with lower
-   priority if they are overlapped by labels of higher priority. First
-   sort the labels into decreasing priority order. Previouslty rejected 
-   labels (with negative priority) will be placed at he end of the list.*/
-      qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL2 );
-
-/* Now pass through the labels in priority order. For each one we find
-   the bounding box which the drawn label would have. If this box
-   overlaps any of the boxes of the previously checked (higher priority)
-   labels, then set the labels priority to -1 to indicate that the label 
-   should not be drawn. Count the number of removed labels. Leave the
-   loop as soon as a previously rejected label is encountered. */
-      ll = list - 1;
-      nremove = 0;
-      for( i = 0; i < nlab-1; i++ ) {
-         ll++;
-         if( ll->priority < 0 ) break;
-         if( Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+/* Find the bounding box of the root label and add it to the list of bounding 
+   boxes. */
+      ll = list + root;
+      olap = Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
                       ll->just, (float) ll->upx, (float) ll->upy, box, 
-                      method, class ) ){
-            ll->priority = -1;
-            nremove++;
+                      method, class );
+
+/* Now look for labels which would overlap. First, check labels above the root 
+   label. */
+      ll = list + root;
+      for( i = root + 1; i < nlab; i++ ) {
+         ll++;
+         if( ll->priority >= 0 ) {
+            if( Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+                         ll->just, (float) ll->upx, (float) ll->upy, box, 
+                         method, class ) ){
+               olap++;
+            }
          }
       }
 
-/* If any labels were removed, we will be doing another abbreviation and
-   rejection loop. Sort the labels into increasing index order in
-   preparation for the next loop. Also restore the number of bounding boxes 
-   stored for previous axes, and reset the abbreviated text to be the
-   full text. */
-      if( nremove > 0 ) {
-         qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
-         (void) Overlap( this, nbox, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, NULL, 
-                         method, class );
-         for( i = 0; i < nlab-1; i++ ) list[i].atext = list[i].text;
+/* Now check the labels below the root label. */
+      ll = list + root;
+      for( i = root - 1; i >= 0; i-- ) {
+         ll--;
+         if( ll->priority >= 0 ) {
+            if( Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+                         ll->just, (float) ll->upx, (float) ll->upy, box, 
+                         method, class ) ){
+               olap++;
+            }
+         }
       }
+
+/* If only one overlap was found, and this is the second axis, ignore it
+   since it is probably caused by the crossing of the two axes. */
+      if( axis == 1 && olap == 1 ) olap = 0;
+
+/* If any labels overlapped, re-instate the priority of all previously
+   excluded labels (using the copy of the label's real priority stored in 
+   "saved_prio"), and then remove labels (by setting their priorities
+   negative) to increase the gap between labes, and try again. */
+      if( olap ) {
+         jgap++;
+
+         nexti = root + jgap;
+         for( i = root + 1; i < nlab; i++ ) {
+            if( i == nexti ) {
+               nexti += jgap;
+               list[ i ].priority = list[ i ].saved_prio;
+            } else {
+               list[ i ].priority = -1;
+            }
+         }
+
+         nexti = root - jgap;
+         for( i = root - 1; i >= 0; i-- ) {
+            if( i == nexti ) {
+               nexti -= jgap;
+               list[ i ].priority = list[ i ].saved_prio;
+            } else {
+               list[ i ].priority = -1;
+            }
+         }
+
+/* Reset the abbreviated text to be the full text. */
+         for( i = 0; i < nlab - 1; i++ ) list[ i ].atext = list[ i ].text;
+
+      }
+
+/* Rest the list of bounding boxes to exclude the boxes added above. */
+      Overlap( this, nbox, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, method, 
+               class );
    }
-   
+ 
 /* We can now draw the abbreviated labels (ignoring rejected labels). */
    ll = list-1;
    for( i = 0; i < nlab; i++ ) {
       ll++;
       if( ll->priority >= 0 ) {
 
+/* Check that this label does not overlap any labels drawn for previous
+   axes (we know from the above processing that it will not overlap any
+   other label on the current axis). */
+         if( !Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+                       ll->just, (float) ll->upx, (float) ll->upy, box, 
+                       method, class ) ) {
+
+
 /* Draw the abbreviated label text. */
-         GText( this, ll->atext, (float) ll->x, (float) ll->y, ll->just, 
+            GText( this, ll->atext, (float) ll->x, (float) ll->y, ll->just, 
                    (float) ll->upx, (float) ll->upy, method, class );
 
 /* Get the bounds of the box containing the new label. */
-         BoxText( this, 0, ll->atext, (float) ll->x, (float) ll->y, 
-                  ll->just, (float) ll->upx, (float) ll->upy, xbn,
-                  ybn, method, class );
+            BoxText( this, 0, ll->atext, (float) ll->x, (float) ll->y, 
+                     ll->just, (float) ll->upx, (float) ll->upy, xbn,
+                     ybn, method, class );
 
 /* Extend the bounds of the global bounding box held externally to include 
    the new box. */
-         for( j = 0; j < 4; j++ ){
-            Box_lbnd[ 0 ] = MIN( xbn[ j ], Box_lbnd[ 0 ] );
-            Box_ubnd[ 0 ] = MAX( xbn[ j ], Box_ubnd[ 0 ] );
-            Box_lbnd[ 1 ] = MIN( ybn[ j ], Box_lbnd[ 1 ] );
-            Box_ubnd[ 1 ] = MAX( ybn[ j ], Box_ubnd[ 1 ] );
+            for( j = 0; j < 4; j++ ){
+               Box_lbnd[ 0 ] = MIN( xbn[ j ], Box_lbnd[ 0 ] );
+               Box_ubnd[ 0 ] = MAX( xbn[ j ], Box_ubnd[ 0 ] );
+               Box_lbnd[ 1 ] = MIN( ybn[ j ], Box_lbnd[ 1 ] );
+               Box_ubnd[ 1 ] = MAX( ybn[ j ], Box_ubnd[ 1 ] );
+            }
          }
       }
    }
-
 }
 
 static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim, 
@@ -18336,7 +18442,7 @@ f        The global status.
                Map3( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map3 to draw the curve segment. */
-               Crv( this, d, x, y, method, class );
+               Crv( this, d, x, y, 0, method, class );
 
 /* If no part of the curve could be drawn, set the number of breaks and the 
    length of the drawn curve to zero. */

@@ -93,6 +93,8 @@ typedef struct AstSpecFrame {
    double refra;                 /* RA (FK5 J2000) of source */
    double restfreq;              /* Rest frequency (Hz)*/
    double sourcevel;             /* Source velocity (heliocentric, m/s) */
+   int nuunits;                  /* Size of usedunits array */
+   char **usedunits;             /* Last used units for each system */
 } AstSpecFrame;
 
 /* Virtual function table. */
