@@ -1610,7 +1610,7 @@ void adic_erase( ADIobj *id, ADIstatus status )
   {
   _chk_stat;             		/* Standard entry checks */
 
-  adix_erase( id, 1, status );
+  adix_erase( id, status );
 
   _ERR_REP( "adic_erase", Estr__DelObj );
   }
@@ -1642,50 +1642,52 @@ void adic_reqpkg( char *pkg, ADIstatus status )
  * Object references
  * -------------------------------------------------------------------------
  */
-void adic_cgetref( ADIobj rid, char *name, ADIobj *id, ADIstatus status )
+void adic_cgetref( ADIobj id, char *name, ADIobj *rid, ADIstatus status )
   {
   _chk_stat;
 
-  *id = adix_getref( rid, name, _CSM, status );
+  adix_get_n( 1, id, name, _CSM, 0, NULL, &UT_cid_ref, sizeof(ADIobj),
+	      rid, NULL, status );
 
   _ERR_REP( "adic_cgetref", Estr__GetRefObj );
   }
 
-void adic_cputref( ADIobj rid, char *name, ADIobj id, ADIstatus status )
+void adic_cputref( ADIobj id, char *name, ADIobj rid, ADIstatus status )
   {
   _chk_stat;
 
-  adix_putref( rid, name, _CSM, id, status );
+  adix_put_n( 1, id, name, _CSM, 0, NULL, &UT_cid_ref,
+	      sizeof(ADIobj), &rid, status );
 
   _ERR_REP( "adic_cputref", Estr__PutRefObj );
   }
 
-void adic_getref( ADIobj rid, ADIobj *id, ADIstatus status )
+void adic_getref( ADIobj id, ADIobj *rid, ADIstatus status )
   {
   _chk_stat;
 
-  *id = adix_getref( rid, NULL, 0, status );
+  adix_get_n( 1, id, NULL, 0, 0, NULL, &UT_cid_ref, sizeof(ADIobj),
+	      rid, NULL, status );
 
   _ERR_REP( "adic_getref", Estr__GetRefObj );
   }
 
-void adic_newref( ADIobj id, ADIobj *rid, ADIstatus status )
+void adic_newref( ADIobj rid, ADIobj *id, ADIstatus status )
   {
   _chk_stat;
 
-  *rid = adix_newref( id, status );
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, 0, &rid, &UT_cid_ref,
+	      sizeof(ADIobj), id, status );
 
   _ERR_REP( "adic_newref", Estr__CreRef );
   }
 
-void adic_putref( ADIobj rid, ADIobj id, ADIstatus status )
+void adic_putref( ADIobj id, ADIobj rid, ADIstatus status )
   {
   _chk_stat;
 
-  adix_putref( rid, NULL, 0, id, status );
-
-/*  adix_put_n( 1, rid, NULL, 0, 0, NULL, &UT_cid_ref,
-	      sizeof(id), &id, status ); */
+  adix_put_n( 1, id, NULL, 0, 0, NULL, &UT_cid_ref,
+	      sizeof(ADIobj), &rid, status );
 
   _ERR_REP( "adic_putref", Estr__PutRefObj );
   }

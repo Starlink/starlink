@@ -135,6 +135,38 @@ void ADIcnvNew( ADIclassDef *from, ADIclassDef *to,
 
 
 /*
+ *  Convert REF -> REF
+ */
+void ADIcnvREFREF( ADImta *idd, int nval, char *in, ADImta *odd,
+		   char *out, int *nerr, ADIstatus status )
+  {
+  int		inobj, outobj;		/* Input/output from/to object? */
+  ADIobj	*iptr = (ADIobj *) in;	/* Input cursor */
+  ADIobj	*optr = (ADIobj *) out;	/* Output cursor */
+  int           ival = nval;            /* Loop over input values */
+
+  _chk_stat;                            /* Check status on entry */
+
+  inobj = _valid_q(idd->id);
+  outobj = _valid_q(odd->id);
+
+/* Loop over items to be moved */
+  for( ; ival--; ) {
+
+/* Is destination an object? If so, decrement reference count on referenced object */
+    if ( outobj && _valid_q(*optr) )
+      adix_erase( optr, status );
+
+/* Write clone of input referenced object (if valid) to output, otherwise null */
+    if ( _valid_q(*iptr) )
+      *optr++ = adix_clone( *iptr++, status );
+    else
+      *optr++ = ADI__nullid;
+    }
+  }
+
+
+/*
  *  Convert CHAR -> CHAR
  */
 void ADIcnvCC( ADImta *idd, int nval, char *in, ADImta *odd,
@@ -158,7 +190,7 @@ void ADIcnvCC( ADImta *idd, int nval, char *in, ADImta *odd,
       if ( ! osptr->data && ! osptr->len ) {
         if ( i_blen > 0 ) {
           osptr->data = strx_alloc( i_blen, status );
-          if ( _ok(status) )
+	  if ( _ok(status) )
             osptr->len = i_blen;
           }
         }
@@ -629,7 +661,7 @@ void ADIcnvRD( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, 
 
 
 typedef
-  enum {ub=0,b=1,uw=2,w=3,i=4,r=5,d=6,c=7,l=8,p=9}
+  enum {ub=0,b=1,uw=2,w=3,i=4,r=5,d=6,c=7,l=8,p=9,ref=10}
   tcode;
 
 void ADIcnvInit( ADIstatus status )
@@ -707,13 +739,15 @@ void ADIcnvInit( ADIstatus status )
     { i, d, ADIcnvID },
     { r, d, ADIcnvRD },
 
+    {ref,ref,ADIcnvREFREF},
+
 #ifdef ADI_F77
     { l, l, ADIcnvLL },
 #endif
     {ub,ub,NULL}
     };
 
-  ADIclassDef	*cdef[10];
+  ADIclassDef	*cdef[11];
   int		it;
 
   cdef[ub] = _cdef_data(UT_cid_ub);
@@ -726,10 +760,11 @@ void ADIcnvInit( ADIstatus status )
   cdef[c]  = _cdef_data(UT_cid_c);
   cdef[l]  = _cdef_data(UT_cid_l);
   cdef[p]  = _cdef_data(UT_cid_p);
+  cdef[ref]  = _cdef_data(UT_cid_ref);
 
 /* Define convertor functions */
   for( it=0; ctable[it].func; it++ )
     ADIcnvNew( cdef[ctable[it].t1], cdef[ctable[it].t2],
 	       ctable[it].func, status );
-
   }
+

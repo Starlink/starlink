@@ -2212,7 +2212,7 @@ F77_SUBROUTINE(adifn(erase))( INTEGER(id), INTEGER(status) )
 
   _chk_stat;             	/* Standard entry checks */
 
-  adix_erase( (ADIobj *) id, 1, status );
+  adix_erase( (ADIobj *) id, status );
 
   _ERR_REP( "ADI_ERASE", Estr__DelObj );
   }
@@ -2254,7 +2254,7 @@ F77_SUBROUTINE(adifn(reqpkg))( CHARACTER(pkg), INTEGER(status) TRAIL(pkg) )
  */
 
 F77_SUBROUTINE(adifn(cgetref))( INTEGER(id), CHARACTER(name),
-                                INTEGER(rid), INTEGER(status) TRAIL(name) )
+				INTEGER(rid), INTEGER(status) TRAIL(name) )
   {
   GENPTR_INTEGER(id)
   GENPTR_CHARACTER(name)
@@ -2263,7 +2263,8 @@ F77_SUBROUTINE(adifn(cgetref))( INTEGER(id), CHARACTER(name),
 
   _chk_stat;
 
-  *((ADIobj *) rid) = adix_getref( (ADIobj) *id, name, name_length, status );
+  adix_get_n( 1, *id, name, name_length, 0, NULL, &UT_cid_ref, sizeof(ADIobj),
+	      rid, NULL, status );
 
   _ERR_REP( "ADI_CGETREF", Estr__GetRefObj );
   }
@@ -2278,7 +2279,8 @@ F77_SUBROUTINE(adifn(cputref))( INTEGER(id), CHARACTER(name), INTEGER(rid),
 
   _chk_stat;
 
-  adix_putref( (ADIobj) *id, name, name_length, (ADIobj) *rid, status );
+  adix_put_n( 1, *id, name, name_length, 0, NULL, &UT_cid_ref,
+	      sizeof(ADIobj), rid, status );
 
   _ERR_REP( "ADI_CPUTREF", Estr__PutRefObj );
   }
@@ -2291,7 +2293,8 @@ F77_SUBROUTINE(adifn(getref))( INTEGER(id), INTEGER(rid), INTEGER(status) )
 
   _chk_stat;
 
-  *((ADIobj *) rid) = adix_getref( (ADIobj) *id, NULL, 0, status );
+  adix_get_n( 1, *id, NULL, 0, 0, NULL, &UT_cid_ref, sizeof(ADIobj),
+	      rid, NULL, status );
 
   _ERR_REP( "ADI_GETREF", Estr__GetRefObj );
   }
@@ -2304,7 +2307,8 @@ F77_SUBROUTINE(adifn(newref))( INTEGER(rid), INTEGER(id), INTEGER(status) )
 
   _chk_stat;
 
-  *((ADIobj *) id) = adix_newref( (ADIobj) *rid, status );
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, 0, rid, &UT_cid_ref,
+	      sizeof(ADIobj), id, status );
 
   _ERR_REP( "ADI_NEWREF", Estr__CreRef );
   }
@@ -2317,7 +2321,8 @@ F77_SUBROUTINE(adifn(putref))( INTEGER(id), INTEGER(rid), INTEGER(status) )
 
   _chk_stat;
 
-  adix_putref( (ADIobj) *id, NULL, 0, (ADIobj) *rid, status );
+  adix_put_n( 1, *id, NULL, 0, 0, NULL, &UT_cid_ref,
+	      sizeof(ADIobj), rid, status );
 
   _ERR_REP( "ADI_PUTREF", Estr__PutRefObj );
   }

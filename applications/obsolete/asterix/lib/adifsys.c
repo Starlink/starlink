@@ -46,12 +46,12 @@ void adix_base_null1( ADIobj id, ADIstatus status )
 
 void adix_base_NewLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
-  adic_cputid( id, "ADIlink", adix_newref( lid, status ), status );
+  adic_cputref( id, "ADIlink", lid, status );
   }
 
 void adix_base_SetLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
-  adic_cputid( id, "ADIlink", adix_newref( lid, status ), status );
+  adic_cputref( id, "ADIlink", lid, status );
   }
 
 void adix_base_UnLink( ADIobj id, ADIobj lid, ADIstatus status )

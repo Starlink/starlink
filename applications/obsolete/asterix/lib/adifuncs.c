@@ -137,7 +137,7 @@ ADIobj ADIsysGetEnv_i( int narg, ADIobj args[], ADIstatus status )
     estr = NULL;
 
 /* Delete temporary string */
-  adix_erase( &tstr, 1, status );
+  adix_erase( &tstr, status );
 
   if ( estr )
     adic_newv0c( estr, &rval, status );
@@ -222,7 +222,7 @@ ADIobj ADIgenDoWhile_i( int narg, ADIobj args[], ADIstatus status )
 
 /* Destroy result */
     if ( _valid_q(robj) )
-      adix_erase( &robj, 1, status );
+      adix_erase( &robj, status );
 
 /* Evaluate test expression */
     test = ADIexprEval( vs_base[1], ADI__nullid, ADI__false, status );
@@ -233,7 +233,7 @@ ADIobj ADIgenDoWhile_i( int narg, ADIobj args[], ADIstatus status )
       if ( isbool )
 	tval = _LVAL(test);
 
-      adix_erase( &test, 1, status );
+      adic_erase( &test, status );
 
       if ( ! isbool )
 	ADIexecRaiseI( EXC_BoolExp, ADI__INVARG,
@@ -261,7 +261,7 @@ ADIobj ADIgenGet_i( int narg, ADIobj args[], ADIstatus status )
     ADIstrmExtendFile( ADI_G_curint->StdIn, tstr, fp, status );
   else {
 /* Delete temporary string */
-    adix_erase( &tstr, 1, status );
+    adix_erase( &tstr, status );
 
     ADIexecRaiseI( EXC_InvalidArg, ADI__INVARG, "No such file %O\n", _CSM,
 		status, args[0] );
@@ -329,7 +329,7 @@ ADIobj ADIgenIf_i( int narg, ADIobj args[], ADIstatus status )
 	isbool = _logical_q(test);
 	if ( isbool )
 	  tval = _LVAL(test);
-	adix_erase( &test, 1, status );
+	adix_erase( &test, status );
 
 	if ( isbool ) {
 
@@ -346,14 +346,14 @@ ADIobj ADIgenIf_i( int narg, ADIobj args[], ADIstatus status )
 	    robj = ADIexprEvalList( *vptr, ADI__nullid, status );
 
 	    if ( _valid_q(robj) )                 /* Destroy result */
-	      adix_erase( &robj, 1, status );
+	      adix_erase( &robj, status );
 	    }
 	  }
 	else
 	  ADIexecRaiseI( EXC_BoolExp, ADI__INVARG,
 		"Logical expression expected in if..else..endif", _CSM, status );
 
-	adix_erase( &test, 1, status );       /* Remove test result protected */
+	adix_erase( &test, status );       /* Remove test result protected */
 	}
       }
     nleft--; vptr++;
@@ -520,7 +520,7 @@ ADIobj ADIgenSet_i( int narg, ADIobj args[], ADIstatus status )
 /* If it exists, delete definition object from existing binding */
   if ( _valid_q(dbind) ) {
     ADIobj	*daddr = &_sbind_defn(dbind);
-    adix_erase( daddr, 1, status );
+    adix_erase( daddr, status );
     *daddr = rval;
     }
 
@@ -573,7 +573,7 @@ ADIobj ADIgenTimeIt_i( int narg, ADIobj args[], ADIstatus status )
 
   while ( ic-- ) {
     res = ADIexprEval( args[0], ADI__nullid, ADI__false, status );
-    adix_erase( &res, 1, status );
+    adix_erase( &res, status );
     }
 
 #ifdef __MSDOS__
@@ -629,7 +629,7 @@ ADIobj ADIgenWhile_i( int narg, ADIobj args[], ADIstatus status )
       tval = _LVAL(test);
 
 /* Destroy test result */
-    adix_erase( &test, 1, status );
+    adix_erase( &test, status );
 
 /* Result was correct type? */
     if ( isbool ) {
@@ -639,7 +639,7 @@ ADIobj ADIgenWhile_i( int narg, ADIobj args[], ADIstatus status )
 
 	robj = ADIexprEvalList( vs_base[1], ADI__nullid, status );
 
-	adix_erase( &robj, 1, status );
+	adix_erase( &robj, status );
 	}
       }
     else if ( _ok(status) ) {
@@ -2023,7 +2023,7 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "AtomQ(_)",				ADIgenAtomQ_i,	FA_L ),
     FUNC_TENTRY( "Break()",				ADIgenBreak_i,	0 ),
     FUNC_TENTRY( "DefProc(_,_)",			ADIgenDefProc_i,FA_A ),
-    FUNC_TENTRY( "DefRep(_CHAR)",			ADIgenDefRep_i, FA_A ),
+    FUNC_TENTRY( "DefRep(_CHAR,_)",			ADIgenDefRep_i, FA_A ),
     FUNC_TENTRY( "DoWhile(__)",				ADIgenDoWhile_i,FA_A ),
     FUNC_TENTRY( "Global(__Symbol)",			ADIgenGlobal_i,	FA_L1 ),
     FUNC_TENTRY( "Local(__Symbol)",			ADIgenLocal_i,	FA_L1 ),

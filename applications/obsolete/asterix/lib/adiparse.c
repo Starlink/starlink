@@ -28,7 +28,7 @@
 #include "adi_err.h"                    /* ADI error codes */
 #include "adisyms.h"
 
-#define FILEBUF 256
+#define FILEBUF 40
 
 
 /*
@@ -257,8 +257,10 @@ ADIobj prsx_cvalue( ADIobj stream, ADIstatus status )
     case TOK__SYM:
       if ( ADIparseScanLog( stream, &lval, status ) )
 	adic_newv0l( lval, &rval, status );
-      else
-	next = ADI__false;
+      else {
+	adic_newv0c( str->ctok.dat, &rval, status );
+	}
+/*	next = ADI__false; */
       break;
 
     default:
@@ -1448,7 +1450,7 @@ void ADIstrmCBprintf( char *buf, int blen, char *fmt, va_list ap, int *used,
   buf[*used] = 0;
 
 /* Scrub stream object */
-  adix_erase( &estr, 1, status );
+  adix_erase( &estr, status );
   }
 
 
@@ -1468,7 +1470,7 @@ void ADIdropDeviceInt( ADIstream *str, ADIstatus status )
 	  fclose( dev->f );
 	}
       if ( dev->name )
-	adix_erase( &dev->name, 1, status );
+	adix_erase( &dev->name, status );
       str->dev = dev->last;
       if ( dev != &str->basedev )
 	ADImemFree( dev->buf, sizeof(ADIdevice), status );
@@ -2294,6 +2296,10 @@ ADIlogical ADIparseScanLog( ADIobj stream, ADIlogical *lval,
   else if ( ADIisTokenCstring( stream, "False", status ) )
     *lval = ADI__false;
   else if ( ADIisTokenCstring( stream, "No", status ) )
+    *lval = ADI__false;
+  else if ( ADIisTokenCstring( stream, "Y", status ) )
+    *lval = ADI__true;
+  else if ( ADIisTokenCstring( stream, "N", status ) )
     *lval = ADI__false;
   else
     rval = ADI__false;

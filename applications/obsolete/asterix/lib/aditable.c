@@ -309,24 +309,6 @@ ADIobj tblx_add( ADIobj *table, char *str, int slen,
   }
 
 
-ADIobj tblx_find( ADIobj *table, char *str, int slen, ADIstatus status )
-  {
-  ADIobj	*head;			/* Head of list */
-  ADIobj        *lentry;                /* List insertion point */
-
-  if ( !_ok(status) )                   /* Check status */
-    return ADI__nullid;
-
-/* Locate list head */
-  head = tblx_lochead( table, str, slen, status );
-
-/* Look along list for string */
-  if ( tblx_scan( head, str, slen, &lentry, status ) )
-    return _CAR(*lentry);
-  else
-    return ADI__nullid;
-  }
-
 
 ADIobj tblx_findi( ADIobj *table, ADIobj str, ADIstatus status )
   {

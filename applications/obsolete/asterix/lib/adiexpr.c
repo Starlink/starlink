@@ -83,7 +83,7 @@ ADIstackFrame	*fs_top;		/* Frame stack top */
 void ADIexprPopFS( ADIstatus status )
   {
   if ( _valid_q(fs_top->syms) )
-    adix_erase( &fs_top->syms, 1, status );
+    adix_erase( &fs_top->syms, status );
 
   ss_top -= fs_top->nslot;
   fs_top--;
@@ -204,9 +204,9 @@ void ADIexecReset( ADIstatus status )
     *status = SAI__OK;
 
   if ( _valid_q(ADI_G_curint->exec.errtext) )
-    adix_erase( &ADI_G_curint->exec.errtext, 1, status );
+    adix_erase( &ADI_G_curint->exec.errtext, status );
 
-  adix_erase( &ADI_G_curint->exec.name, 1, status );
+  adix_erase( &ADI_G_curint->exec.name, status );
 
   ADI_G_curint->exec.name = ADI__nullid;
   }
@@ -707,7 +707,7 @@ ADIobj ADIexprEvalMapList( ADIobj head, int narg, ADIobj args[],
     newval = ADIexprEvalInt( *rcar, symlist, level+1, &cachanged, status );
 
     if ( cachanged ) {
-      adix_erase( rcar, 1, status );
+      adix_erase( rcar, status );
       *rcar = newval;
       }
 
@@ -860,7 +860,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, ADIobj symlist, int level, ADIlogical *chang
 	  if ( argchanged ) {
 
 /* Replace stacked object with result of expression evaluation */
-	    adix_erase( vs_ptr, 1, status );
+	    adix_erase( vs_ptr, status );
 	    *vs_ptr = newval;
 
 /* Mark arg list as changed */
@@ -1022,7 +1022,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, ADIobj symlist, int level, ADIlogical *chang
 	    if ( *raddr > 1 )
 	      (*raddr)--;
 	    else
-	      adix_erase( vs_ptr, 1, status );
+	      adix_erase( vs_ptr, status );
 	    }
 	  }
 
@@ -1091,7 +1091,7 @@ ADIobj ADIexprEval( ADIobj expr, ADIobj symlist, ADIlogical ownres, ADIstatus st
   if ( ownres && _valid_q(res) ) {
     if ( _han_ref(res) > 1 ) {
       rval = adix_copy( res, status );
-      adix_erase( &res, 1, status );
+      adix_erase( &res, status );
       }
     }
 
@@ -1117,7 +1117,7 @@ ADIobj ADIexprEvalList( ADIobj elist, ADIobj symlist, ADIstatus status )
       robj = ADI__nullid;
 
     if ( _valid_q(curp) && _valid_q(robj) )
-      adix_erase( &robj, 1, status );
+      adix_erase( &robj, status );
     }
 
   return robj;
@@ -1314,7 +1314,7 @@ ADIobj adix_fexec( char *func, int flen, int narg, ADIobj args[],
       if ( *raddr > 1 )
 	(*raddr)--;
       else
-	adix_erase( vs_ptr, 1, status );
+	adix_erase( vs_ptr, status );
     }
 
 /* Remove binding list if defined */

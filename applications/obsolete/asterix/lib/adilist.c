@@ -43,6 +43,24 @@
 ADIclassDef	*cdef_lst;
 ADIobj       UT_cid_list;             /* _List object allocator */
 
+
+
+ADIobj lstx_erase( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	*car, *cdr;
+
+  _GET_CARCDR_A(car,cdr,args[0]);
+
+  if ( _valid_q(*car) )
+    adix_erase( car, status );
+  if ( _valid_q(*cdr) )
+    adix_erase( cdr, status );
+
+  return ADI__nullid;
+  }
+
+
+
 ADIinteger ADIostrmLst( ADIstream *stream, ADIobj id, char *data, int wmode,
 			ADIstatus status )
   {
@@ -123,6 +141,9 @@ void lstx_init( ADIstatus status )
   ADIkrnlAddPtypes( ptable, status );
 
   cdef_lst = _cdef_data(UT_cid_list);
+
+/* Destructor for reference type */
+  ADIkrnlDefDestrucKint( cdef_lst, lstx_erase, status );
 
   ADIcnvNew( cdef_lst, cdef_lst, ADIlstCnv, status );
   }
@@ -299,7 +320,7 @@ void lstx_sperase( ADIobj *list, ADIstatus status )
     *car = ADI__nullid;
     curp = *cdr;
     *cdr = ADI__nullid;
-    adix_erase( &last, 1, status );
+    adix_erase( &last, status );
     }
 
   *list = ADI__nullid;

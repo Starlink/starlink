@@ -89,7 +89,6 @@
  *     use printf convertors for conv -> C?
  *     free list created in method lookup
  *     grouping of identifiers
- *     distinguish annuling and erasing?
  *     string slicing
  *     string mapping
  *     string allocation using byte type?
@@ -417,35 +416,43 @@ ADIobj adix_cls_alloc( ADIclassDef *cdef, ADIstatus status )
   return adix_cls_nallocd( cdef, 0, 0, NULL, status );
   }
 
-void adix_erase( ADIobj *id, int nval, ADIstatus status )
+
+void adix_merase( ADIobj *id, ADIinteger nval, ADIstatus status )
   {
-  ADIclassDef        *tdef;             /* Class definition data */
+  ADIobj		lid = *id;
+  ADIinteger		ival = nval;
+  ADIclassDef           *tdef;          /* Class definition data */
 
   _chk_init_err; _chk_stat;
 
-  if ( _valid_q(*id) )                  /* Valid handle? */
-    {
-    tdef = _ID_TYPE(*id);               /* Locate class definition block */
+/* Valid handle? */
+  if ( _valid_q(lid) ) {
+
+/* Locate class definition block */
+    tdef = _ID_TYPE(lid);
 
 /* Destructor defined? */
     if ( _valid_q(tdef->destruc) ) {
-      int	ival;
-      ADIobj	oid = *id;
-      for( ival=nval; ival; ) {
-
-	adix_exemth( ADI__nullid, tdef->destruc, 1, &oid, status );
-	if ( --ival )
-	  oid = ADImemIdAddOff( oid, 1, status );
+      for( ; ival-- ; ) {
+	adix_exemth( ADI__nullid, tdef->destruc, 1, id, status );
+	lid = ADImemIdAddOff( lid, 1, status );
 	}
       }
 
     else if ( ! tdef->prim ) {          /* Class instance? */
-      ADIobj    *optr = _class_data(*id);
+      ADIobj    *optr;
       int       i;
 
-      for( i=0; i<tdef->nslot; i++, optr++ )
-	if ( _valid_q(*optr) )
-	  adix_erase( optr, 1, status );
+      for( ; ival-- ; ) {
+	optr = _class_data(lid);
+	for( i=0; i<tdef->nslot; i++, optr++ )
+	  if ( _valid_q(*optr) ) {
+	    if ( _han_q(*optr) )
+              _han_name(*optr) = ADI__nullid;
+	    adix_merase( optr, 1, status );
+	    }
+	lid = ADImemIdAddOff( lid, 1, status );
+	}
       }
 
     if ( *status == ADI__NOTDEL )       /* Didn't delete data? */
@@ -455,13 +462,18 @@ void adix_erase( ADIobj *id, int nval, ADIstatus status )
     }
   }
 
+void adix_erase( ADIobj *id, ADIstatus status )
+  {
+  adix_merase( id, 1, status );
+  }
+
 
 ADIobj adix_delobj( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj  *optr = _obj_data(args[0]);
 
   if ( _valid_q(*optr) )
-    adix_erase( optr, 1, status );
+    adix_erase( optr, status );
 
   return ADI__nullid;
   }
@@ -491,7 +503,7 @@ ADIobj adix_delhan( int narg, ADIobj args[], ADIstatus status )
   else {
     if ( hptr->slice ) {              /* Is this a slice? */
       if ( _ary_q(hptr->id) )         /* Vector slice? */
-	adix_erase( &hptr->id, 1,     /* Delete array block ignoring data */
+	adix_erase( &hptr->id,     /* Delete array block ignoring data */
 		      status );
 
       adix_refadj( hptr->pid, -1, status );
@@ -500,14 +512,25 @@ ADIobj adix_delhan( int narg, ADIobj args[], ADIstatus status )
       if ( hptr->dataset )
 	_han_set(hptr->pid) = ADI__true;
       }
-    else
 
 /* Not sliced data */
-      adix_erase( &hptr->id, 1, status );
+    else {
+
+/* Check that object has been unhooked from parent. If not, its most likely an */
+/* illegal delete where the user has got an identifier to an object component  */
+/* and is trying to delete it more times than he is allowed. The correct way to */
+/* do this is handled by adix_cerase which resets the name field appropriately */
+      if ( _valid_q(hptr->name) ) {
+	adic_setecs( ADI__INTGTY, "Attempt to delete object component with using primitive erase", status );
+	}
+      else {
+	adix_erase( &hptr->id, status );
+	}
+      }
 
 /* Property list defined? */
     if ( _valid_q(hptr->pl) )
-      adix_erase( &hptr->pl, 1, status );
+      adix_erase( &hptr->pl, status );
     }
 
   return ADI__nullid;
@@ -816,8 +839,7 @@ ADIlogical adix_filt_classes_mtest( ADIobj x, ADIobj y, ADIstatus status )
  * Construct a list of those classes which do *not* appear as the second
  * element in any of the precedence pairs
  */
-ADIobj adix_filt_classes( ADIobj classes, ADIobj ppairs,
-			  ADIstatus status )
+ADIobj adix_filt_classes( ADIobj classes, ADIobj ppairs, ADIstatus status )
   {
   ADIobj        cls,cdr;
   ADIobj        curp = classes;
@@ -962,10 +984,10 @@ ADIobj adix_delgen( int narg, ADIobj args[], ADIstatus status )
   {
   ADIgeneric	*gen = _gnrc_data(args[0]);
 
-  adix_erase( &gen->name, 1, status );
-  adix_erase( &gen->args, 1, status );
-  adix_erase( &gen->cdisp, 1, status );
-  adix_erase( &gen->fdisp, 1, status );
+  adix_erase( &gen->name, status );
+  adix_erase( &gen->args, status );
+  adix_erase( &gen->cdisp, status );
+  adix_erase( &gen->fdisp, status );
 
   return ADI__nullid;
   }
@@ -1045,10 +1067,10 @@ void adix_prs_namarg( ADIobj stream, char *thing, ADIobj *head, int *narg,
       *aadr = ADI__nullid;
 
 /* Destroy expression node */
-      adix_erase( &aspec, 1, status );
+      adix_erase( &aspec, status );
       }
     else {
-      adix_erase( &aspec, 1, status );
+      adix_erase( &aspec, status );
       adic_setecs( ADI__SYNTAX, "Error parsing %s definition", status, thing );
       }
     }
@@ -1754,14 +1776,12 @@ void adix_delcls( ADIclassDef **cvar, ADIstatus status )
 
   if ( _valid_q(tdef->members) ) {      /* Members list */
     for( cur = tdef->members; _valid_q(cur); cur = _mdef_next(cur) )
-      adix_erase( &_mdef_aname(cur),
-		  1, status );
+      adix_erase( &_mdef_aname(cur), status );
     }
 
   if ( _valid_q(tdef->superclasses) ) { /* Parents list */
     for( cur = tdef->superclasses; _valid_q(cur); cur = _pdef_next(cur) )
-      adix_erase( &_pdef_name(cur),
-		  1, status );
+      adix_erase( &_pdef_name(cur), status );
     }
 
 /*  strx_free( tdef->name, status );      The class name */
@@ -1947,7 +1967,7 @@ void adix_exit()
 /* While more to delete */
   while ( *dobj ) {
     if ( _valid_q(**dobj) )             /* Referenced object is defined? */
-      adix_erase( *dobj, 1, &status );
+      adix_erase( *dobj, &status );
 
     dobj++;                             /* Next element of dlist */
     }
@@ -2321,7 +2341,7 @@ ADIclassDef *ADIkrnlFindClsInt( char *cls, int clen, ADIstatus status )
 /* Loop over classes comparing class name string with that supplied */
     while ( tdef && ! found ) {
       if ( _valid_q(tdef->aname) ) {
-        if ( ! strx_cmpc( cls, clen, tdef->aname ) )
+	if ( ! strx_cmpc( cls, clen, tdef->aname ) )
 	  found = ADI__true;
         else
 	  tdef = tdef->link;
@@ -2485,7 +2505,7 @@ void adix_pl_find( ADIobj pobj, ADIobj *plist, char *property, int plen,
   adix_pl_findi( pobj, plist, name, create, objreq, status );
 
 /* Release name string */
-  adix_erase( &name, 1, status );
+  adix_erase( &name, status );
   }
 
 
@@ -2528,7 +2548,7 @@ void adix_pl_seti( ADIobj obj, ADIobj prop, ADIobj valid, ADIstatus status )
   if ( objreq.data ) {
     if ( *objreq.data != valid ) {
       if ( _valid_q(*objreq.data) )
-	adix_erase( objreq.data, 1, status );
+	adix_erase( objreq.data, status );
       *objreq.data = valid;
       }
     }
@@ -4028,9 +4048,9 @@ void adix_ccopy( ADIobj in, char *inmem, int inmlen, ADIobj out,
 /* Non-null copy? */
     if ( *inreq.data != *outreq.data ) {
 
-/* Erase existing data */
+/* Erase existing data. Should erase name in member */
       if ( _valid_q(*outreq.data) )
-	adix_erase( outreq.data, 1, status );
+	adix_erase( outreq.data, status );
 
 /* Make copy of input */
       *outreq.data = adix_copy( *inreq.data, status );
@@ -4452,7 +4472,7 @@ void adix_name( ADIobj id, ADIlogical clang, char *buf, int blen, ADIstatus stat
 
   if ( _ok(status) ) {
     ADIstrngExport( nid, clang, buf, blen, status );
-    adix_erase( &nid, 1, status );
+    adix_erase( &nid, status );
     }
   }
 
@@ -4488,6 +4508,10 @@ ADIlogical adix_state( ADIobj id, char *member, int mlen, ADIstatus status )
   }
 
 
+/* Delete an object component. The component is always removed from its parent's */
+/* structure, although the object data will not itself be deleted unless it */
+/* reference count is already one */
+
 void adix_cerase( ADIobj id, char *member, int mlen, ADIstatus status )
   {
   ADIobjRequest	objreq;			/* Object data specification */
@@ -4500,38 +4524,33 @@ void adix_cerase( ADIobj id, char *member, int mlen, ADIstatus status )
 /* Data exists? */
   if ( _valid_q(*objreq.data) ) {
 
+/* Reset handled object's name */
+    if ( _han_q(*objreq.data) )
+      _han_name(*objreq.data) = ADI__nullid;
+
 /* Simple data or class member */
     if ( objreq.ctype == ADIcmpValue || objreq.ctype == ADIcmpMember ) {
-      adix_erase( objreq.data, 1, status );
+      adix_erase( objreq.data, status );
       *objreq.data = ADI__nullid;
       }
 
 /* Property or structure component */
     else if ( objreq.ctype == ADIcmpProperty ||
-              objreq.ctype == ADIcmpStruct ) {
-      ADIobj	*odp_car, *odp_cdr, old_dp;
+	      objreq.ctype == ADIcmpStruct ) {
+      ADIobj	*o_car, *o_cdr, old_lc;
 
-/* The dotted pair to be deleted */
-      old_dp = *objreq.lentry;
+/* The list cell pointing to dotted pair */
+      old_lc = *objreq.lentry;
 
 /* By-pass old list element */
       *objreq.lentry = _CDR(*objreq.lentry);
 
-/* Locate addresses of old_dp's car and cdr cells */
-      _GET_CARCDR_A(odp_car,odp_cdr,old_dp);
+/* Nullify the list cell field which points to the rest of the association list */
+      _GET_CARCDR_A(o_car,o_cdr,old_lc);
+      *o_cdr = ADI__nullid;
 
-/* Delete old property and value */
-/*      adix_erase( odp_car, 1, status );
-      adix_erase( odp_cdr, 1, status ); */
-
-/* Delete the list cell, annulling the links first */
-      *odp_car = ADI__nullid;
-      *odp_cdr = ADI__nullid;
-      adix_erase( &old_dp, 1, status );
-      }
-
-/* Structure component */
-    else if ( objreq.ctype == ADIcmpStruct ) {
+/* Delete the list cell */
+      adix_erase( &old_lc, status );
       }
     }
   }
@@ -4541,9 +4560,29 @@ void adix_putid( ADIobj id, char *name, int nlen, ADIobj value,
 		 ADIstatus status )
   {
   ADImta	imta;
+  ADIobjHan	*hdata = NULL;
   ADIobjRequest	objreq;			/* Object data specification */
 
   _chk_init_err; _chk_stat;
+
+/* Check we can write the object. If its already named then we have problems */
+  if ( _valid_q(value) ) {
+
+/* Check non-kernel object */
+    if ( _han_q(value) ) {
+      hdata = _han_data(value);
+
+      if ( _valid_q(hdata->pid) || _valid_q(hdata->pid) ) {
+	adic_setecs( ADI__INTGTY,
+	"Object is already part of a name hierarchy, and cannot become part of another hierarchy", status );
+	return;
+	}
+      }
+    else {
+/*      adic_setecs( ADI__INVARG, "Cannot write kernel object as data member", status );
+      return; */
+      }
+    }
 
 /* Find data insertion point */
   ADIkrnlLocDat( &id, name, nlen, DA__CREATE, &objreq, status );
@@ -4555,10 +4594,11 @@ void adix_putid( ADIobj id, char *name, int nlen, ADIobj value,
     if ( _null_q(*objreq.data) ) {
       *objreq.data = value;
 
-      if ( _han_ref(value) == 1 ) {
-	_han_pid(value) = objreq.parent;
-	_han_name(value) = objreq.name;
-
+      if ( hdata ) {
+	if ( _han_ref(value) == 1 ) {
+	  _han_pid(value) = objreq.parent;
+	  _han_name(value) = objreq.name;
+	  }
 	}
 
       if ( _valid_q(objreq.parent) )
@@ -4642,8 +4682,8 @@ ADIobj adix_delmco( int narg, ADIobj args[], ADIstatus status )
   {
   ADImethComb  *dptr = _mco_data(args[0]);
 
-  adix_erase( &dptr->name, 1, status );
-  adix_erase( &dptr->cexec, 1, status );
+  adix_erase( &dptr->name, status );
+  adix_erase( &dptr->cexec, status );
 
   return ADI__nullid;
   }
@@ -4997,7 +5037,7 @@ void adix_rep_nomf( ADIstatype ecode, char *whats, ADIobj name, int narg,
 	ADIstrmFprintf( estr, ",", status );
       }
 
-    adix_erase( &estr, 1, status );
+    adix_erase( &estr, status );
     ems_end_c( status );
     }
   else
@@ -5309,7 +5349,7 @@ ADIobj adix_exemth( ADIobj generic, ADIobj eproc,
 
     res = ADIexprEvalList( eproc, ADI__nullid, status );
 
-    adix_erase( &res, 1, status );
+    adix_erase( &res, status );
 
     ADIexprPopFS( status );
 
@@ -5551,70 +5591,6 @@ void ADIkrnlExecOO( ADIobj rtn, ADIobj arg1, ADIobj arg2, ADIstatus status )
     }
   }
 
-ADIobj adix_newref( ADIobj id, ADIstatus status )
-  {
-  ADIobj	newid;
-
-  _chk_init_err; _chk_stat_ret(ADI__nullid);
-
-  newid = adix_cls_nallocd( _cdef_data(UT_cid_ref), 0, 0, NULL, status );
-
-  if ( _ok(status) )
-    *_obj_data(newid) = adix_clone( id, status );
-
-  return newid;
-  }
-
-void adix_putref( ADIobj id, char *name, int nlen, ADIobj rid, ADIstatus status )
-  {
-  ADIobj	*rdata;
-  ADIobjRequest	objreq;			/* Object data specification */
-
-  _chk_init_err; _chk_stat;
-
-/* Find data insertion point */
-  ADIkrnlLocDat( &id, name, nlen, DA__CREATE, &objreq, status );
-
-/* Located ok? */
-  if ( _ok(status) ) {
-
-    if ( _obj_q(*objreq.data) ) {
-      rdata = _obj_data(*objreq.data);
-
-      if ( _valid_q(*rdata) )
-	adix_erase( rdata, 1, status );
-
-      *rdata = adix_clone( rid, status );
-
-      _han_set(*objreq.data) = _valid_q(rid);
-      }
-    else
-      adic_setecs( ADI__INVARG, "Object is not an object reference", status );
-    }
-  }
-
-
-ADIobj adix_getref( ADIobj id, char *name, int nlen, ADIstatus status )
-  {
-  ADIobjRequest	objreq;			/* Object data specification */
-  ADIobj	robj = ADI__nullid;
-
-  _chk_init_err; _chk_stat_ret(ADI__nullid);
-
-/* Find data insertion point */
-  ADIkrnlLocDat( &id, name, nlen, DA__SET, &objreq, status );
-
-  if ( _ok(status) && objreq.data ) {
-
-    if ( _obj_q(*objreq.data) )
-      robj = *_obj_data(*objreq.data);
-    else
-      adic_setecs( ADI__INVARG, "Object is not an object reference", status );
-    }
-
-  return robj;
-  }
-
 
 void adix_defvar( char *name, int nlen, ADIlogical global, ADIobj value,
 		  ADIstatus status )
@@ -5637,7 +5613,7 @@ void adix_setvar( ADIobj name, ADIlogical global, ADIobj value,
 /* If it exists, delete definition object from existing binding */
   if ( _valid_q(dbind) ) {
     ADIobj      *daddr = &_sbind_defn(dbind);
-    adix_erase( daddr, 1, status );
+    adix_erase( daddr, status );
     *daddr = value;
     }
 

@@ -210,21 +210,28 @@ ADIobj adix_prs_defproc( int narg, ADIobj args[], ADIstatus status )
 
 ADIobj adix_prs_defrep( int narg, ADIobj args[], ADIstatus status )
   {
+  ADIobj	extlist = ADI__nullid;
   ADIobj	repname;
   ADIobj	pstream = args[0];
 
 /* Skip the DEFREP keyword */
   ADInextToken( pstream, status );
 
-/* Optional data */
-  if ( ADIcurrentToken(pstream,status) == TOK__CONST )
+/* Representation name */
+  if ( ADIcurrentToken(pstream,status) == TOK__CONST ) {
     repname = prsx_cvalue( pstream, status );
+
+/* Parse optional list of associated file extensions */
+    if ( ADIifMatchToken( pstream, TOK__LBRACE, status ) )
+      extlist = ADIparseComDelList( pstream, ADI__nullid, TOK__RBRACE,
+						  ADI__true, status );
+    }
   else
     ADIparseError( pstream, ADI__SYNTAX, "Representation name expected", status );
 
 /* Create the expression node */
   return ADIetnNew( adix_clone( K_DefRep, status ),
-		    lstx_cell( repname, ADI__nullid, status ),
+		    lstx_new2( repname, extlist, status ),
 		    status );
   }
 
@@ -844,14 +851,14 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
         adic_setecs( *status, "Error loading package %*s", status, nlen, name );
       }
     else {
-      adix_erase( &nid, 1, status );
+      adic_erase( &nid, status );
       adic_setecs( ADI__INVARG, "Package /%*s/ not found", status, nlen, name );
       }
     }
 
 /* Release temporary string */
   else {
-    adix_erase( &nid, 1, status );
+    adic_erase( &nid, status );
     }
   }
 

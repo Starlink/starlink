@@ -141,12 +141,13 @@ ADIobj ADIaryDel( int narg, ADIobj args[], ADIstatus status )
 /* How many objects to free */
   naval = ADIaryCountNelm( adata->ndim, adata->dims );
 
+/* Remove parent object */
   if ( _valid_q(adata->parent) )
-    adix_erase( &adata->parent, 1,	/* Remove parent object */
-		  status );
+    adix_erase( &adata->parent, status );
+
   else
-    adix_erase( &adata->data, naval,  /* Remove array elements */
-		  status );
+/* Remove array elements */
+    adix_merase( &adata->data, naval, status );
 
   return ADI__nullid;
   }
