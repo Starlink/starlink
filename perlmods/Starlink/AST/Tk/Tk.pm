@@ -157,7 +157,7 @@ sub _GMark {
          my $y2 = $y[$i] + $scale*Starlink::AST::Grf::GRF__SIZE(); 
 
          # RECTANGLE
-         if ( $type == 0 || $type == 6 || $type == 19 ) {
+         if ( ($type == 0) || ($type == 6) || ($type == 19) ) {
             $canvas->createRectangle( $x1, $y1, $x2, $y2 );
          
          # CIRCLE
