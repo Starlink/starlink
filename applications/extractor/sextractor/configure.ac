@@ -129,7 +129,9 @@ AC_TYPE_UID_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
+dnl  Do not check for malloc, this actually checks for GNU compatible one
+dnl  which can produce some surprises.
+#AC_FUNC_MALLOC
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
