@@ -3,10 +3,7 @@
 lib_LTLIBRARIES = libspext.la
 
 libspext_la_SOURCES = \
-	$(PRIVATE_INCLUDES) \
 	$(F_ROUTINES)
-
-PRIVATE_INCLUDES = SPD_EPAR
 
 F_ROUTINES = \
 spd_eaaa.f spd_eaba.f spd_eabb.f spd_eaea.f spd_eaec.f spd_eaed.f \
