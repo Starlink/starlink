@@ -1,0 +1,210 @@
+.help wcscopy Starlink kappa
+.nf
+Copies WCS information from one NDF to another.
+
+Usage:
+
+   wcscopy ndf like [tr] [confirm]
+
+Description:
+
+   This application copies the WCS component from one NDF to
+   another, optionally modifying it to take account of a linear
+   mapping between the pixel co-ordinates in the two NDFs. It can be
+   used, for instance, to rectify the loss of WCS information produced
+   by older applications which do not propagate the WCS component.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CONFIRM
+
+CONFIRM = _LOGICAL (Read)
+   If TRUE, the user is asked for confirmation before replacing any
+   existing WCS component within the input NDF. No confirmation is
+   required if the there is no WCS component in the input NDF. [TRUE]
+
+LIKE
+
+LIKE = NDF (Read)
+   The reference NDF data structure from which WCS information is to be
+   copied.
+
+NDF
+
+NDF = NDF (Read and Write)
+   The input NDF data structure in which the WCS information is to be
+   stored. Any existing WCS component is over-written (see parameter
+   CONFIRM).
+
+OK
+
+OK = _LOGICAL (Read)
+   This parameter is used to get a confirmation that an existing
+   WCS component within the input NDF can be over-written.
+
+TR
+
+TR( ) = _DOUBLE (Read)
+   The values of this parameter are the coefficients of a linear
+   transformation from pixel co-ordinates in the reference NDF given
+   for parameter LIKE, to pixel co-ordinates in the input NDF given
+   for parameter NDF. For instance, if a feature has pixel co-ordinates
+   (X,Y,Z,...) in the reference NDF, and pixel co-ordinates
+   (U,V,W,...) in the input NDF, then the following transformations
+   would be used, depending on how many axes each NDF has:
+
+   - 1-dimensional:
+
+         U = TR(1) + TR(2)*X
+
+   - 2-dimensional:
+
+         U = TR(1) + TR(2)*X + TR(3)*Y
+
+         V = TR(4) + TR(5)*X + TR(6)*Y
+
+   - 3-dimensional:
+
+         U = TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z
+
+         V = TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z
+
+         W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
+
+   If a null value (!) is given it is assumed that the pixel co-ordinates
+   of a given feature are identical in the two NDFs. [!]
+
+Examples
+
+wcscopy m51_sim m51
+   This copies the WCS component from the NDF called m51 to the NDF
+   called m51_sim, which may hold the results of a numerical simulation
+   for instance. It is assumed that the two NDFs are aligned (i.e. the
+   pixel co-ordinates of any feature are the same in both NDFs).
+
+wcscopy m51_sqorst m51 [125,0.5,0.0,125,0.0,0.5]
+   This example assumes that the application SQORST has previously
+   been used to change the size of a 2-dimensional NDF called m51,
+   producing a new NDF called m51_sqorst. Since SQORST has not yet
+   been updated to support the full NDF structure, the output NDF
+   m51_sqorst will not have a WCS component. More than this, SQORST
+   also throws away the pixel origin information, effectively
+   resetting the output origin to (1,1). This example shows how
+   WCSCOPY can be used to rectify this by copying the WCS component
+   from the original NDF m51 to the squashed NDF m51_sqorst,
+   modifying it in the process to take account of both the
+   squashing and the resetting of the pixel origin produced by
+   sqorst. To do this, you need to work out the transformation in
+   pixel co-ordinates produced by SQORST, and specify this when
+   running WCSCOPY using the TR parameter. Let's assume the first
+   axis of NDF m51 has pixel index bounds of I1:I2 (these values
+   can be found using NDFTRACE). If the first axis in the squashed
+   NDF m51_sqorst spans M pixels (where M is the value assigned to
+   SQORST parameter XDIM), then it will have pixel index bounds of
+   1:M. Note, the lower bound is 1 since the pixel origin has been
+   reset by SQORST. The squashing factor for the first axis is
+   then:
+
+    FX = M/(I2 - I1 + 1)
+
+   and the shift in the pixel origin is:
+
+    SX = FX*( 1 - I1 )
+
+   Likewise, if the bounds of the second axis in m51 are J1:J2, and
+   SQORST parameter YDIM is set to N, then the squashing factor for
+   the second axis is:
+
+    FY = N/(J2 - J1 + 1)
+
+   and the shift in the pixel origin is:
+
+    SY = FY*( 1 - J1 )
+
+   You would then use the following values for parameter TR when
+   running WCSCOPY:
+
+    TR = [SX, FX, 0.0, SY, 0.0, FY]
+
+   Note, the zero terms indicate that the axes are independent (i.e.
+   there is no rotation of the image). The numerical values in the
+   example are for an image with pixel index bounds of 52:251 on both
+   axes which was squashed by SQORST to produce an image with 100 pixels
+   on each axis.
+
+wcscopy m51_glitch m51 [-51,1,0,-51,0,1]
+   The application GLITCH has been used to replace bad pixels in a
+   2-dimensional NDF called m51, producing a new NDF called
+   m51_glitch. Since GLITCH has not yet been updated to support the
+   full NDF structure, the output NDF m51_sqorst will not have a WCS
+   component. More than this, GLITCH also throws away the pixel origin
+   information, effectively resetting the output origin to (1,1). You
+   can use WCSCOPY to rectify this by copying the WCS component from
+   the original NDF m51 to the de-glitched NDF m51_glitch, modifying it
+   in the process to take account of the resetting of the pixel origin
+   produced by GLITCH. To do this, you to work out the transformation
+   in pixel co-ordinates produced by GLITCH, and specify this when
+   running WCSCOPY using the TR parameter. Let's assume the first axis
+   of NDF m51 has pixel index bounds of I1:I2 (these values can be
+   found using NDFTRACE). GLITCH will produce an image with the
+   same number of pixels along the axis but the first pixel will have
+   index 1 instead of I1. Thus the shift in the pixel origin is:
+
+    SX = ( 1 - I1 )
+
+   Likewise, the first pixel on the second axis will be reset to 1
+   by GLITCH, and so if the bounds of the second axis in m51 are J1:J2,
+   the shift in the pixel origin for the second axis is:
+
+    SY = ( 1 - J1 )
+
+   You would then use the following values for parameter TR when
+   running WCSCOPY:
+
+    TR = [SX, 1.0, 0.0, SY, 0.0, 1.0]
+
+   Note, the zero terms indicate that the axes are independent (i.e.
+   there is no rotation of the image), and the 1.0 terms indicate
+   that the pixels are not changed in size. The numerical values in the
+   example are for an image with pixel index bounds of 52:251 on both
+   axes. Another (maybe simpler) way to rectify the loss of origin
+   information is to use application SETORIGIN to restore the pixel
+   origin, and then use WCSCOPY, accepting the default null value for
+   the parameter TR.
+
+Notes
+
+-  It is not necessary to use this application after running
+KAPPA applications such as ROTATE or PIXDUPE, since all KAPPA
+applications which produce a linear transformation in pixel
+co-ordinates correctly copy WCS information from input to output.
+
+-  An error is reported if the transformation supplied using parameter
+TR is singular.
+
+-  The pixel with pixel index I spans a range of pixel co-ordinate
+from (I - 1.0) to (I).
+
+-  The pixel indices of the bottom left pixel in an NDF is called
+the "pixel origin" of the NDF, and can take any value. The pixel
+origin can be examined using application NDFTRACE and set using
+application SETORIGIN. WCSCOPY takes account of the pixel origins in
+the two NDFs when modifying the WCS component. Thus, if a null
+value is given for parameter TR, the supplied WCS component may still
+be modified if the two NDFs have different pixel origins.
+
+Related_Applications
+
+   KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSADD, WCSATTRIB
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+History
+
+ 13-AUG-1998 (DSB):
+    Original version.
+.endhelp

@@ -1,0 +1,62 @@
+.help wcsremove Starlink kappa
+.nf
+Remove co-ordinate Frames from the WCS component of an NDF.
+
+Usage:
+
+   wcsremove ndf frames
+
+Description:
+
+   This application allows you to remove one or more co-ordinate Frames
+   from the WCS component in an NDF. The indices of any remaining Frames
+   are "shuffled down" to fill the gaps left by the removed Frames.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+FRAMES
+
+FRAMES()  = LITERAL (Read
+   The list of the indices (within the WCS component of the supplied NDF)
+   of the Frames to be removed. Any indices outside the range of the
+   available Frames are ignored. Single Frames or a set of adjacent
+   Frames may be specified, e.g. typing [4,6-9,12,14-16] will remove
+   Frames 4,6,7,8,9,12,14,15,16. (Note that the brackets are required to
+   distinguish this array of characters from a single string including
+   commas.  The brackets are unnecessary when there only one item.) If
+   you wish to remove all the files enter the wildcard *. 5-* will
+   remove from 5 to the last Frame.
+
+NDF
+
+NDF = NDF (Read and Write)
+   The NDF data structure.
+
+Examples
+
+wcsremove m51 "3-5"
+   This removes Frames 3, 4 and 5 from the NDF "m51". Any remaining
+   Frames with indices higher than 5 will be re-numbered to fill the
+   gaps left by the removed Frames (i.e. the original Frame 6 will
+   become Frame 3, etc).
+
+Notes
+
+- The Frames within the WCS component of an NDF may be examined
+using application NDFTRACE.
+
+Related_Applications
+
+   KAPPA: NDFTRACE, WCSADD, WCSFRAME, WCSATTRIB, WCSCOPY
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+History
+
+ 2-APR-1998 (DSB):
+    Original version.
+.endhelp
