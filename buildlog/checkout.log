@@ -2345,6 +2345,7 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStyleBox.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTicks.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTitle.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AxesControls.java
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AxisLabelControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AxisNumLabControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/BorderControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ColourIcon.java
@@ -5614,6 +5615,7 @@ U java/source/frog/src/main/uk/ac/starlink/frog/iface/AboutFrame.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/ArithmeticDialog.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/ColourIconLine.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/CombineSeriesDialog.java
+U java/source/frog/src/main/uk/ac/starlink/frog/iface/DebugConsole.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/DetrendDataDialog.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/DialogListener.java
@@ -5623,6 +5625,7 @@ U java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrameListener.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/GramCreationDialog.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java
+U java/source/frog/src/main/uk/ac/starlink/frog/iface/GramMetaDataPopup.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/LineRenderer.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/LookAndFeelManager.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/MetaDataPopup.java
@@ -9106,125 +9109,11 @@ cvs checkout: Updating java/uk/ac
 cvs checkout: Updating java/uk/ac/starlink
 cvs checkout: Updating java/uk/ac/starlink/ast
 cvs checkout: Updating java/uk/ac/starlink/ast/grf
-U java/uk/ac/starlink/ast/grf/DefaultGrf.java
-U java/uk/ac/starlink/ast/grf/DefaultGrfContainer.java
-U java/uk/ac/starlink/ast/grf/DefaultGrfFontManager.java
-U java/uk/ac/starlink/ast/grf/DefaultGrfMarker.java
-U java/uk/ac/starlink/ast/grf/DefaultGrfState.java
 cvs checkout: Updating java/uk/ac/starlink/ast/xml
-U java/uk/ac/starlink/ast/xml/README
-U java/uk/ac/starlink/ast/xml/XAstNames.java
-U java/uk/ac/starlink/ast/xml/XAstReader.java
-U java/uk/ac/starlink/ast/xml/XAstTester.java
-U java/uk/ac/starlink/ast/xml/XAstWriter.java
-U java/uk/ac/starlink/ast/xml/makefile
 cvs checkout: Updating java/uk/ac/starlink/hdx
-U java/uk/ac/starlink/hdx/BridgeNdx.java
-U java/uk/ac/starlink/hdx/DomNdxImpl.java
-U java/uk/ac/starlink/hdx/HdsNdxImpl.java
-U java/uk/ac/starlink/hdx/HdsWCSChannel.java
-U java/uk/ac/starlink/hdx/HdxContainer.java
-U java/uk/ac/starlink/hdx/HdxContainerFactory.java
-U java/uk/ac/starlink/hdx/HdxDomImpl.java
-U java/uk/ac/starlink/hdx/HdxException.java
-U java/uk/ac/starlink/hdx/HdxResourceType.java
-U java/uk/ac/starlink/hdx/HdxTester.java
-U java/uk/ac/starlink/hdx/HdxWCSTester.java
-U java/uk/ac/starlink/hdx/NdfMaker.java
-U java/uk/ac/starlink/hdx/Ndx.java
-U java/uk/ac/starlink/hdx/NdxDomImpl.java
-U java/uk/ac/starlink/hdx/NdxFactory.java
-U java/uk/ac/starlink/hdx/NdxImpl.java
-U java/uk/ac/starlink/hdx/VERSION
-U java/uk/ac/starlink/hdx/makefile
 cvs checkout: Updating java/uk/ac/starlink/hdx/array
-U java/uk/ac/starlink/hdx/array/ArrayImpl.java
-U java/uk/ac/starlink/hdx/array/BadHandler.java
-U java/uk/ac/starlink/hdx/array/BridgeNDArray.java
-U java/uk/ac/starlink/hdx/array/BufferAccessor.java
-U java/uk/ac/starlink/hdx/array/CHANGES
-U java/uk/ac/starlink/hdx/array/ChunkIterator.java
-U java/uk/ac/starlink/hdx/array/Container.java
-U java/uk/ac/starlink/hdx/array/ConvertWorker.pl
-U java/uk/ac/starlink/hdx/array/ConvertWrapperArrayImpl.java
-U java/uk/ac/starlink/hdx/array/Converter.java
-U java/uk/ac/starlink/hdx/array/DefaultAccess.java
-U java/uk/ac/starlink/hdx/array/DeterministicArrayImpl.java
-U java/uk/ac/starlink/hdx/array/FitsContainer.java
-U java/uk/ac/starlink/hdx/array/Function.java
-U java/uk/ac/starlink/hdx/array/HDSArrayImpl.java
-U java/uk/ac/starlink/hdx/array/HDSContainer.java
-U java/uk/ac/starlink/hdx/array/MouldWrapperArrayImpl.java
-U java/uk/ac/starlink/hdx/array/NDArray.java
-U java/uk/ac/starlink/hdx/array/NDArrayFactory.java
-U java/uk/ac/starlink/hdx/array/NDArrayTester.java
-U java/uk/ac/starlink/hdx/array/NDArrays.java
-U java/uk/ac/starlink/hdx/array/NDShape.java
-U java/uk/ac/starlink/hdx/array/NdxAccess.java
-U java/uk/ac/starlink/hdx/array/NioArrayImpl.java
-U java/uk/ac/starlink/hdx/array/Order.java
-U java/uk/ac/starlink/hdx/array/OrderedNDShape.java
-U java/uk/ac/starlink/hdx/array/ReadableFitsArrayImpl.java
-U java/uk/ac/starlink/hdx/array/Requirements.java
-U java/uk/ac/starlink/hdx/array/SimpleFuncAccess.java
-U java/uk/ac/starlink/hdx/array/SimpleNdxFunction.java
-U java/uk/ac/starlink/hdx/array/Type.java
-U java/uk/ac/starlink/hdx/array/TypeConverter.java
-U java/uk/ac/starlink/hdx/array/TypedNdxFunction.java
-U java/uk/ac/starlink/hdx/array/UnsupportedAccessException.java
-U java/uk/ac/starlink/hdx/array/WindowWrapperArrayImpl.java
-U java/uk/ac/starlink/hdx/array/WrapAccess.java
-U java/uk/ac/starlink/hdx/array/WrapperArrayImpl.java
-U java/uk/ac/starlink/hdx/array/WritableFitsArrayImpl.java
-U java/uk/ac/starlink/hdx/array/makefile
 cvs checkout: Updating java/uk/ac/starlink/hdx/array/test
-U java/uk/ac/starlink/hdx/array/test/int4.fits
-U java/uk/ac/starlink/hdx/array/test/reduced_data1.sdf
 cvs checkout: Updating java/uk/ac/starlink/hdx/jai
-U java/uk/ac/starlink/hdx/jai/HDXCodec.java
-U java/uk/ac/starlink/hdx/jai/HDXDecodeParam.java
-U java/uk/ac/starlink/hdx/jai/HDXDecoder.java
-U java/uk/ac/starlink/hdx/jai/HDXEncodeParam.java
-U java/uk/ac/starlink/hdx/jai/HDXEncoder.java
-U java/uk/ac/starlink/hdx/jai/HDXImage.java
-U java/uk/ac/starlink/hdx/jai/ImageDisplay.java
-U java/uk/ac/starlink/hdx/jai/JAIHelloWorld.java
-U java/uk/ac/starlink/hdx/jai/MyTileCache.java
-U java/uk/ac/starlink/hdx/jai/NDArrayData.java
-U java/uk/ac/starlink/hdx/jai/NDArrayDataByte.java
-U java/uk/ac/starlink/hdx/jai/NDArrayDataDouble.java
-U java/uk/ac/starlink/hdx/jai/NDArrayDataFloat.java
-U java/uk/ac/starlink/hdx/jai/NDArrayDataInt.java
-U java/uk/ac/starlink/hdx/jai/NDArrayDataShort.java
-U java/uk/ac/starlink/hdx/jai/README
-U java/uk/ac/starlink/hdx/jai/SimpleRenderedImage.java
-U java/uk/ac/starlink/hdx/jai/makefile
-U java/uk/ac/starlink/hdx/jai/temp.xml
 cvs checkout: Updating java/uk/ac/starlink/hdx/support
-U java/uk/ac/starlink/hdx/support/normalize-hdx.xslt
-U java/uk/ac/starlink/hdx/support/xslt.psgmldtd
 cvs checkout: Updating java/uk/ac/starlink/hdx/t
-U java/uk/ac/starlink/hdx/t/Makefile
-U java/uk/ac/starlink/hdx/t/dummy.fits
-U java/uk/ac/starlink/hdx/t/hdx.prop
-U java/uk/ac/starlink/hdx/t/reduced_data1.sdf
-U java/uk/ac/starlink/hdx/t/runtests
-U java/uk/ac/starlink/hdx/t/spectrum.sdf
-U java/uk/ac/starlink/hdx/t/t1-test1.xml
-U java/uk/ac/starlink/hdx/t/t1-test2.xml
-U java/uk/ac/starlink/hdx/t/t1-test3.xml
-U java/uk/ac/starlink/hdx/t/t1.correct
-U java/uk/ac/starlink/hdx/t/t1.java
-U java/uk/ac/starlink/hdx/t/t1.java-old
-U java/uk/ac/starlink/hdx/t/t2.correct
-U java/uk/ac/starlink/hdx/t/t2.java
-U java/uk/ac/starlink/hdx/t/t3.correct
-U java/uk/ac/starlink/hdx/t/t3.java
 cvs checkout: Updating java/uk/ac/starlink/util
-U java/uk/ac/starlink/util/GenericNioBuffer.java
-U java/uk/ac/starlink/util/MappedFile.java
-U java/uk/ac/starlink/util/SwingWorker.java
-U java/uk/ac/starlink/util/Tester.java
-U java/uk/ac/starlink/util/UtilTester.java
-U java/uk/ac/starlink/util/makefile
-U java/uk/ac/starlink/util/package.html

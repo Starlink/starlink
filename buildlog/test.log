@@ -32,44 +32,44 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.402 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.562 sec
 
-    [junit] Testcase: testGetChildElementByName took 0.174 sec
-    [junit] Testcase: testGetTextContent took 0.02 sec
-    [junit] Testcase: testNewDocument took 0.011 sec
-    [junit] Testcase: testRelativizeDOM took 0.193 sec
+    [junit] Testcase: testGetChildElementByName took 0.205 sec
+    [junit] Testcase: testGetTextContent took 0.105 sec
+    [junit] Testcase: testNewDocument took 0.017 sec
+    [junit] Testcase: testRelativizeDOM took 0.23 sec
     [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.001 sec
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 7.772 sec
 
-    [junit] Testcase: testData took 0.762 sec
-    [junit] Testcase: testIntro took 0.725 sec
-    [junit] Testcase: testStream took 0.424 sec
-    [junit] Testcase: testHybridStream took 0.522 sec
-    [junit] Testcase: testCombo1 took 1.181 sec
-    [junit] Testcase: testResourceStream took 0.381 sec
+    [junit] Testcase: testData took 1.867 sec
+    [junit] Testcase: testIntro took 1.399 sec
+    [junit] Testcase: testStream took 0.855 sec
+    [junit] Testcase: testHybridStream took 1.112 sec
+    [junit] Testcase: testCombo1 took 2.009 sec
+    [junit] Testcase: testResourceStream took 0.526 sec
     [junit] Testsuite: uk.ac.starlink.util.IOUtilsTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.026 sec
 
-    [junit] Testcase: testDataInput took 0.011 sec
-    [junit] Testcase: testInputStream took 0.001 sec
+    [junit] Testcase: testDataInput took 0.01 sec
+    [junit] Testcase: testInputStream took 0.013 sec
     [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.121 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.356 sec
 
-    [junit] Testcase: testTraversal took 0.117 sec
+    [junit] Testcase: testTraversal took 0.352 sec
     [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.221 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.731 sec
 
-    [junit] Testcase: testGetDOM took 0.217 sec
+    [junit] Testcase: testGetDOM took 0.728 sec
     [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
-    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.274 sec
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.627 sec
 
-    [junit] Testcase: testFlags took 0.223 sec
-    [junit] Testcase: testAssertSource took 0.012 sec
-    [junit] Testcase: testValidation took 0.036 sec
+    [junit] Testcase: testFlags took 0.563 sec
+    [junit] Testcase: testAssertSource took 0.02 sec
+    [junit] Testcase: testValidation took 0.039 sec
     [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.115 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.245 sec
 
-    [junit] Testcase: testXMLEncodeAndDecode took 0.112 sec
+    [junit] Testcase: testXMLEncodeAndDecode took 0.242 sec
 
 test:
      [echo] Executing Task target: test
@@ -219,30 +219,30 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.ast.AstTest
-    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 8.323 sec
+    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 6.976 sec
     [junit] ------------- Standard Output ---------------
     [junit] AST V2.0-9; JNIAST native V2.0-4; JNIAST java V2.0-4
     [junit] ------------- ---------------- ---------------
 
-    [junit] Testcase: testAstObject took 0.133 sec
-    [junit] Testcase: testChannel took 0.007 sec
-    [junit] Testcase: testFitsChan took 0.021 sec
-    [junit] Testcase: testFrame took 0.011 sec
+    [junit] Testcase: testAstObject took 0.342 sec
+    [junit] Testcase: testChannel took 0.003 sec
+    [junit] Testcase: testFitsChan took 0.019 sec
+    [junit] Testcase: testFrame took 0.008 sec
     [junit] Testcase: testFrameSet took 0.003 sec
-    [junit] Testcase: testGeometry took 0.003 sec
-    [junit] Testcase: testMapping took 0.037 sec
-    [junit] Testcase: testPlot took 8.081 sec
+    [junit] Testcase: testGeometry took 0.002 sec
+    [junit] Testcase: testMapping took 0.036 sec
+    [junit] Testcase: testPlot took 6.541 sec
     [junit] Testcase: testAstConstants took 0.012 sec
     [junit] Testcase: testSpecMap took 0.002 sec
-    [junit] Testcase: testSpecFrame took 0.004 sec
-    [junit] Testcase: testException took 0 sec
+    [junit] Testcase: testSpecFrame took 0.003 sec
+    [junit] Testcase: testException took 0.001 sec
     [junit] Testsuite: uk.ac.starlink.ast.xml.XAstTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.258 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.384 sec
 
-    [junit] Testcase: testReadWriteElement took 0.217 sec
-    [junit] Testcase: testReadWriteSource took 0.015 sec
+    [junit] Testcase: testReadWriteElement took 0.341 sec
+    [junit] Testcase: testReadWriteSource took 0.016 sec
     [junit] Testcase: testExceptions took 0.013 sec
-    [junit] Testcase: testDefault took 0.01 sec
+    [junit] Testcase: testDefault took 0.011 sec
 
 test:
      [echo] Executing ASTGUI target: test
@@ -255,50 +255,23 @@ prepare:
 check_packages:
 
 build_classes:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jnihds/build/classes
-    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/jnihds/build/classes
 
 assemble_jni:
-     [copy] Copying 4 files to /apps/cvsbuild/java/source/jnihds/build/jni
     [javah] ClassArgument.name=uk.ac.starlink.hds.HDSObject
     [javah] [Search path = /apps/j2sdk1.4.1_06/jre/lib/rt.jar:/apps/j2sdk1.4.1_06/jre/lib/i18n.jar:/apps/j2sdk1.4.1_06/jre/lib/sunrsasign.jar:/apps/j2sdk1.4.1_06/jre/lib/jsse.jar:/apps/j2sdk1.4.1_06/jre/lib/jce.jar:/apps/j2sdk1.4.1_06/jre/lib/charsets.jar:/apps/j2sdk1.4.1_06/jre/classes:/apps/cvsbuild/java/source/jnihds/build/classes]
     [javah] [Loaded /apps/cvsbuild/java/source/jnihds/build/classes/uk/ac/starlink/hds/HDSObject.class]
     [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Object.class)]
     [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/nio/ByteBuffer.class)]
     [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/nio/Buffer.class)]
-    [javah] [Creating file /apps/cvsbuild/java/source/jnihds/build/jni/uk_ac_starlink_hds_HDSObject.h]
+    [javah] [No need to update file /apps/cvsbuild/java/source/jnihds/build/jni/uk_ac_starlink_hds_HDSObject.h]
 
 build_jni:
 
 execute_mk_script:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jnihds/lib/i386
      [echo] java.home=/apps/j2sdk1.4.1_06/jre
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e shared
-     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c HDSObject.c
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]            for f in `../jnihds_libraries` ""; do \
-     [exec]            echo "Processing $f"; \
-     [exec]            if test -n "$f"; then \
-     [exec]               ar x $f; \
-     [exec]            fi;\
-     [exec]         done)
-     [exec] Processing /apps/cvsbuild/star/lib/libhds.a
-     [exec] Processing /apps/cvsbuild/star/lib/libchr.a
-     [exec] Processing /apps/cvsbuild/star/lib/libemsf.a
-     [exec] Processing /apps/cvsbuild/star/lib/libems.a
-     [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
-     [exec] Processing /apps/cvsbuild/star/lib/liberr.a
-     [exec] Processing /apps/cvsbuild/star/lib/liberr_standalone.a
-     [exec] Processing /apps/cvsbuild/star/lib/libpsx.a
-     [exec] Processing /apps/cvsbuild/star/lib/libchr.a
-     [exec] Processing /apps/cvsbuild/star/lib/libemsf.a
-     [exec] Processing /apps/cvsbuild/star/lib/libems.a
-     [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/jnihds/lib/i386/libjnihds.so 'HDSObject.o  temp/*.o' '';\
-     [exec] rm -r -f temp
+     [exec] make: Nothing to be done for `shared'.
 
 build:
 
@@ -308,16 +281,16 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.hds.HDSObjectTest
-    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.178 sec
+    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.473 sec
 
-    [junit] Testcase: testConstants took 0.055 sec
+    [junit] Testcase: testConstants took 0.241 sec
     [junit] Testcase: testFileOperations took 0.008 sec
     [junit] Testcase: testObject took 0 sec
-    [junit] Testcase: testProperties took 0.001 sec
-    [junit] Testcase: testGet took 0.017 sec
-    [junit] Testcase: testPut took 0.07 sec
-    [junit] Testcase: testWrite took 0.001 sec
-    [junit] Testcase: testMap took 0.02 sec
+    [junit] Testcase: testProperties took 0.002 sec
+    [junit] Testcase: testGet took 0.121 sec
+    [junit] Testcase: testPut took 0.075 sec
+    [junit] Testcase: testWrite took 0 sec
+    [junit] Testcase: testMap took 0.021 sec
 
 test:
      [echo] Executing HDX target: test
@@ -327,10 +300,6 @@ prepare:
 check_packages:
 
 build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/hdx/build/classes
-    [javac] Compiling 17 source files to /apps/cvsbuild/java/source/hdx/build/classes
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/hdx/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/hdx/lib/hdx
 
 compile-tests:
     [mkdir] Created dir: /apps/cvsbuild/java/source/hdx/build/testcases
@@ -338,81 +307,193 @@ compile-tests:
 
 run-tests:
     [junit] Running uk.ac.starlink.hdx.HdxTest
-    [junit] Tests run: 11, Failures: 0, Errors: 11, Time elapsed: 0.039 sec
+    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 1.445 sec
     [junit] Testsuite: uk.ac.starlink.hdx.HdxTest
-    [junit] Tests run: 11, Failures: 0, Errors: 11, Time elapsed: 0.039 sec
+    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 1.445 sec
 
-    [junit] Testcase: testURIResolution(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.ExceptionInInitializerError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
-    [junit] Caused by: uk.ac.starlink.hdx.PluginException: Failed to find class uk.ac.starlink.hds.NDFNdxHandler (java.lang.ClassNotFoundException: uk.ac.starlink.hds.NDFNdxHandler)
-    [junit] 	at uk.ac.starlink.hdx.HdxFactory.<clinit>(HdxFactory.java:178)
-    [junit] 	... 10 more
+    [junit] Running uk.ac.starlink.hdx.ResourceTypeTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.997 sec
+    [junit] Testsuite: uk.ac.starlink.hdx.ResourceTypeTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.997 sec
 
 
-    [junit] Testcase: testHdxDocumentImportNode(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+test:
+     [echo] Executing NDArray target: test
 
+prepare:
 
-    [junit] Testcase: testTreeManipulations(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+check_packages:
 
+assemble_java:
 
-    [junit] Testcase: testText(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+build_classes:
 
+build:
 
-    [junit] Testcase: testBackingElements(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/array/build/testcases
+    [javac] Compiling 13 source files to /apps/cvsbuild/java/source/array/build/testcases
 
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.array.AccessModeTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.006 sec
 
-    [junit] Testcase: testBackingElementNamespaced(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+    [junit] Testcase: testRead took 0.005 sec
+    [junit] Testcase: testWrite took 0 sec
+    [junit] Testcase: testUpdate took 0 sec
+    [junit] Testsuite: uk.ac.starlink.array.ArrayImplTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.138 sec
 
+    [junit] Testcase: testDeterministic took 0.088 sec
+    [junit] Testcase: testNio took 0.049 sec
+    [junit] Testsuite: uk.ac.starlink.array.BadHandlerTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.027 sec
 
-    [junit] Testcase: testNamespaceParsing(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+    [junit] Testcase: testBadHandler took 0.021 sec
+    [junit] Testcase: testNullBadHandler took 0.004 sec
+    [junit] Testsuite: uk.ac.starlink.array.ChunkStepperTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.017 sec
 
+    [junit] Testcase: testValidateArguments took 0.002 sec
+    [junit] Testcase: testIteration took 0.015 sec
+    [junit] Testsuite: uk.ac.starlink.array.CombineArrayImplTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.124 sec
 
-    [junit] Testcase: testToSource(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+    [junit] Testcase: testCombine took 0.123 sec
+    [junit] Testsuite: uk.ac.starlink.array.NDArrayTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 3.132 sec
 
+    [junit] Testcase: testTiles took 0.237 sec
+    [junit] Testcase: testDummy took 0.042 sec
+    [junit] Testcase: testMoulded took 0.21 sec
+    [junit] Testcase: testWindow took 0.098 sec
+    [junit] Testcase: testOffset took 0.031 sec
+    [junit] Testcase: testToRequired took 2.235 sec
+    [junit] Testcase: testNDArrays took 0.278 sec
+    [junit] Testsuite: uk.ac.starlink.array.OrderTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.006 sec
 
-    [junit] Testcase: testHashCode(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+    [junit] Testcase: testOrder took 0.004 sec
+    [junit] Testsuite: uk.ac.starlink.array.RequirementsTest
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.02 sec
 
+    [junit] Testcase: testBlank took 0.002 sec
+    [junit] Testcase: testSettings took 0.015 sec
+    [junit] Testcase: testBad took 0.001 sec
+    [junit] Testcase: testExceptions took 0.001 sec
+    [junit] Testsuite: uk.ac.starlink.array.ShapeTest
+    [junit] Tests run: 9, Failures: 0, Errors: 0, Time elapsed: 0.044 sec
 
-    [junit] Testcase: testCloneNode(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+    [junit] Testcase: testNDShapeObject took 0.003 sec
+    [junit] Testcase: testOrderedNDShapeObject took 0.003 sec
+    [junit] Testcase: testOrigins took 0.001 sec
+    [junit] Testcase: testNDShapeFunctions took 0 sec
+    [junit] Testcase: testOrderedNDShapeFunctions took 0.032 sec
+    [junit] Testcase: testIntsToLongs took 0.002 sec
+    [junit] Testcase: testLongsToInts took 0.002 sec
+    [junit] Testcase: testNDShapeExceptions took 0 sec
+    [junit] Testcase: testOrderedNDShapeExceptions took 0.001 sec
+    [junit] Testsuite: uk.ac.starlink.array.TypeConverterTest
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.25 sec
 
+    [junit] Testcase: testConversionSame took 0.09 sec
+    [junit] Testcase: testConversionDown took 0.041 sec
+    [junit] Testcase: testConversionUp took 0.014 sec
+    [junit] Testcase: testConversionFunc took 0.104 sec
+    [junit] Testsuite: uk.ac.starlink.array.TypeTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.021 sec
 
-    [junit] Testcase: testObjectOverrides(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
-    [junit] null
-    [junit] java.lang.NoClassDefFoundError
-    [junit] 	at uk.ac.starlink.hdx.HdxTest.setUp(HdxTest.java:61)
+    [junit] Testcase: testBad took 0.019 sec
+    [junit] Testcase: testTypeSet took 0.001 sec
+    [junit] Testcase: testCheckArray took 0 sec
+    [junit] Testcase: testNewArray took 0.001 sec
+    [junit] Testcase: testCharacteristics took 0 sec
+    [junit] Testcase: testMinMax took 0 sec
+    [junit] Testcase: testGetType took 0 sec
+
+test:
+     [echo] Executing NDX target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/ndx/build/testcases
+    [javac] Compiling 4 source files to /apps/cvsbuild/java/source/ndx/build/testcases
+    [javac] Note: /apps/cvsbuild/java/source/ndx/src/testcases/uk/ac/starlink/ndx/CopyNdx.java uses or overrides a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+
+run-tests:
+    [junit] Running uk.ac.starlink.ndx.NdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.846 sec
+    [junit] Testsuite: uk.ac.starlink.ndx.NdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.846 sec
+
+    [junit] Testcase: testNdx took 1.53 sec
+    [junit] Testcase: testNdxs took 0.311 sec
+    [junit] Running uk.ac.starlink.ndx.XmlNdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.71 sec
+    [junit] Testsuite: uk.ac.starlink.ndx.XmlNdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.71 sec
+
+    [junit] Testcase: testNoNS took 0.628 sec
+    [junit] Testcase: testMultiNS took 0.075 sec
+
+test:
+     [echo] Executing Table target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/testcases
+    [javac] Compiling 4 source files to /apps/cvsbuild/java/source/table/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.table.FormatsTest
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 7.333 sec
+
+    [junit] Testsuite: uk.ac.starlink.table.TableTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.023 sec
+
+    [junit] Testsuite: uk.ac.starlink.table.gui.StarTableNodeChooserTest
+    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 0.861 sec
+
+    [junit] Testcase: testChooserAvailability(uk.ac.starlink.table.gui.StarTableNodeChooserTest):	Caused an ERROR
+    [junit] uk/ac/starlink/treeview/WCSChannel
+    [junit] java.lang.NoClassDefFoundError: uk/ac/starlink/treeview/WCSChannel
+    [junit] 	at java.lang.Class.forName0(Native Method)
+    [junit] 	at java.lang.Class.forName(Class.java:140)
+    [junit] 	at uk.ac.starlink.treeview.DataNodeFactory.class$(DataNodeFactory.java:83)
+    [junit] 	at uk.ac.starlink.treeview.DataNodeFactory.getDefaultClassList(DataNodeFactory.java:580)
+    [junit] 	at uk.ac.starlink.treeview.DataNodeFactory.<init>(DataNodeFactory.java:104)
+    [junit] 	at uk.ac.starlink.treeview.TreeNodeChooser.<init>(TreeNodeChooser.java:74)
+    [junit] 	at uk.ac.starlink.treeview.TreeNodeChooser.<init>(TreeNodeChooser.java:229)
+    [junit] 	at uk.ac.starlink.treeview.TableNodeChooser.<init>(TableNodeChooser.java:40)
+    [junit] 	at uk.ac.starlink.treeview.TableNodeChooser.<init>(TableNodeChooser.java:62)
+    [junit] 	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+    [junit] 	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:39)
+    [junit] 	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:27)
+    [junit] 	at java.lang.reflect.Constructor.newInstance(Constructor.java:274)
+    [junit] 	at uk.ac.starlink.table.gui.StarTableNodeChooser.newInstance(StarTableNodeChooser.java:53)
+    [junit] 	at uk.ac.starlink.table.gui.StarTableNodeChooserTest$1.run(StarTableNodeChooserTest.java:34)
+    [junit] 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:171)
+    [junit] 	at java.awt.EventQueue.dispatchEvent(EventQueue.java:448)
+    [junit] 	at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:197)
+    [junit] 	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
+    [junit] 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:144)
+    [junit] 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:136)
+    [junit] 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:99)
 
 
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/hdx/build.xml:959: Test uk.ac.starlink.hdx.HdxTest failed
+file:/apps/cvsbuild/java/source/table/build.xml:936: Test uk.ac.starlink.table.gui.StarTableNodeChooserTest failed
 
-Total time: 49 seconds
+Total time: 1 minute 43 seconds
