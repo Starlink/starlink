@@ -48,7 +48,7 @@
 
 *    Get oversampling
       IF ( CP_EXPERT ) THEN
-        CALL PAR_GET0I( 'SAMPLE', SUBPIX, STATUS )
+        CALL USI_GET0I( 'SAMPLE', SUBPIX, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
       ELSE
         SUBPIX = 1

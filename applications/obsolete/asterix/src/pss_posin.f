@@ -37,7 +37,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(POI_STR)'
+      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -96,7 +96,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get source lists
-      CALL PAR_GET0C( 'PLIST', PLIST, STATUS )
+      CALL USI_GET0C( 'PLIST', PLIST, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Initialise
@@ -186,7 +186,7 @@
         IF ( FTHERE ) THEN
 
 *        Does user want to use it?
-          CALL PAR_GET0L( 'USEFLUX', USEFLUX, STATUS )
+          CALL USI_GET0L( 'USEFLUX', USEFLUX, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
           GOT_FLUX = USEFLUX
 
@@ -224,8 +224,8 @@
 
         CALL MSG_PRNT('Enter RA and DEC at prompts, ! to terminate')
         DO WHILE ( STATUS .EQ. SAI__OK)
-          CALL PAR_GET0C( 'RA', RAS, STATUS )
-          CALL PAR_GET0C( 'DEC', DECS, STATUS )
+          CALL USI_GET0C( 'RA', RAS, STATUS )
+          CALL USI_GET0C( 'DEC', DECS, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
             CALL CONV_RADEC( RAS, DECS, RA, DEC, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
@@ -243,8 +243,8 @@
               CALL ERR_ANNUL( STATUS )
 
             END IF
-            CALL PAR_CANCL( 'RA', STATUS )
-            CALL PAR_CANCL( 'DEC', STATUS )
+            CALL USI_CANCL( 'RA', STATUS )
+            CALL USI_CANCL( 'DEC', STATUS )
           END IF
         END DO
         IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
@@ -263,9 +263,9 @@
         END IF
 
 *      User has fluxes too?
-        CALL PAR_PROMT( 'USEFLUX', 'Use fluxes in this file if present',
+        CALL USI_PROMT( 'USEFLUX', 'Use fluxes in this file if present',
      :                                                          STATUS )
-        CALL PAR_GET0L( 'USEFLUX', USEFLUX, STATUS )
+        CALL USI_GET0L( 'USEFLUX', USEFLUX, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      While more records

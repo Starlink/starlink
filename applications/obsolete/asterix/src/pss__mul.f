@@ -96,7 +96,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get file list
-      CALL PAR_GET0C( 'MLIST', MLIST, STATUS )
+      CALL USI_GET0C( 'MLIST', MLIST, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Open multi-file

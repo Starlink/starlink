@@ -103,7 +103,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(POI_STR)'
+      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *

@@ -174,7 +174,7 @@
 *
 *    Standard statistic arguments, constants and variables :
 *
-      INCLUDE 'SRCLIB(PSS_STAT_BIT0)'
+      INCLUDE 'PSS_STAT_BIT0'
 *
 *    Status :
 *
@@ -198,7 +198,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Standard statistic loop entry
-      INCLUDE 'SRCLIB(PSS_STAT_BIT1)'
+      INCLUDE 'PSS_STAT_BIT1'
 
 *      Guess flux
         IF ( I .EQ. 1 ) THEN
@@ -265,7 +265,7 @@
  19     LASTFLUX = FLUX
 
 *    Standard statistic loop exit. Contains pixel abort label 50
-      INCLUDE 'SRCLIB(PSS_STAT_BIT2)'
+      INCLUDE 'PSS_STAT_BIT2'
 
 *    Store spot value parameters
       IF ( GR_NELM .EQ. 1 ) THEN
@@ -323,7 +323,7 @@
 *
 *    Standard statistic arguments, constants and variables :
 *
-      INCLUDE 'SRCLIB(PSS_STAT_BIT0)'
+      INCLUDE 'PSS_STAT_BIT0'
 *
 *    Functions :
 *
@@ -356,7 +356,7 @@
       END IF
 
 *    Standard statistic loop entry
-      INCLUDE 'SRCLIB(PSS_STAT_BIT1)'
+      INCLUDE 'PSS_STAT_BIT1'
 
 *      Initialise
         CASHSIG = 0.0
@@ -414,7 +414,7 @@
         LASTBSCALE = BSCALE
 
 *    Standard statistic loop exit. Contains pixel abort label 50
-      INCLUDE 'SRCLIB(PSS_STAT_BIT2)'
+      INCLUDE 'PSS_STAT_BIT2'
 
 *    Store parameters - correct for single point
       IF ( GR_NELM .EQ. 1 ) THEN
@@ -474,7 +474,7 @@
 *
 *    Standard statistic arguments, constants and variables :
 *
-      INCLUDE 'SRCLIB(PSS_STAT_BIT0)'
+      INCLUDE 'PSS_STAT_BIT0'
 *
 *    Status :
 *
@@ -507,7 +507,7 @@
       END IF
 
 *    Standard statistic header
-      INCLUDE 'SRCLIB(PSS_STAT_BIT1)'
+      INCLUDE 'PSS_STAT_BIT1'
 
 *      Find optimum flux and background
         CALL PSS_STAT_CASH_OPTFB( FLUX, BSCALE, GOT_OPT )
@@ -525,7 +525,7 @@
         IF ( DOMAP ) WRITE( RMAP, '(1X,2I4,1X,F10.4)' ) I,J,BSCALE
 
 *    Standard statistic loop exit. Contains pixel abort label 50
-      INCLUDE 'SRCLIB(PSS_STAT_BIT2)'
+      INCLUDE 'PSS_STAT_BIT2'
 
 *    Single value?
       IF ( GR_NELM .EQ. 1 ) THEN
@@ -603,7 +603,7 @@
 *
 *    Standard statistic arguments, constants and variables :
 *
-      INCLUDE 'SRCLIB(PSS_STAT_BIT0)'
+      INCLUDE 'PSS_STAT_BIT0'
 *
 *    Status :
 *
@@ -625,7 +625,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Standard statistic loop entry
-      INCLUDE 'SRCLIB(PSS_STAT_BIT1)'
+      INCLUDE 'PSS_STAT_BIT1'
 
 *      Find mean background and sum of psf squares
         BMEAN = 0.0
@@ -675,7 +675,7 @@
         SMAP(I,J) = FLUX
 
 *    Standard statistic loop exit. Contains pixel abort label 50
-      INCLUDE 'SRCLIB(PSS_STAT_BIT2)'
+      INCLUDE 'PSS_STAT_BIT2'
 
       END
 
@@ -722,7 +722,7 @@
 *
 *    Standard statistic arguments, constants and variables :
 *
-      INCLUDE 'SRCLIB(PSS_STAT_BIT0)'
+      INCLUDE 'PSS_STAT_BIT0'
 *
 *    Status :
 *
@@ -741,7 +741,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Standard statistic loop entry
-      INCLUDE 'SRCLIB(PSS_STAT_BIT1)'
+      INCLUDE 'PSS_STAT_BIT1'
 
 *      Guess flux
         IF ( I .EQ. 1 ) THEN
@@ -796,7 +796,7 @@
  19     LASTFLUX = FLUX
 
 *    Standard statistic loop exit. Contains pixel abort label 50
-      INCLUDE 'SRCLIB(PSS_STAT_BIT2)'
+      INCLUDE 'PSS_STAT_BIT2'
 
       END
 
@@ -845,7 +845,7 @@
 *
 *    Standard statistic arguments, constants and variables :
 *
-      INCLUDE 'SRCLIB(PSS_STAT_BIT0)'
+      INCLUDE 'PSS_STAT_BIT0'
 *
 *    Status :
 *
@@ -870,7 +870,7 @@
       S_BSCALE(BOX) = 1.0
 
 *    Standard statistic loop entry
-      INCLUDE 'SRCLIB(PSS_STAT_BIT1)'
+      INCLUDE 'PSS_STAT_BIT1'
 
 *      Iterate to find optimum Cash flux
         CALL PSS_STAT_CASH_OPTF( FLUX, GOT_OPT )
@@ -883,7 +883,7 @@
      :                                                 SMAP(I,J) )
 
 *    Standard statistic loop exit. Contains pixel abort label 50
-      INCLUDE 'SRCLIB(PSS_STAT_BIT2)'
+      INCLUDE 'PSS_STAT_BIT2'
 
 *    Get flux
       IF ( GR_NELM .EQ. 1 ) THEN
@@ -1417,7 +1417,7 @@
 *
 *    Standard header :
 *
-      INCLUDE 'SRCLIB(PSS_STAT_BIT0)'
+      INCLUDE 'PSS_STAT_BIT0'
 *
 *    Status :
 *
@@ -1434,7 +1434,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Standard statistic loop entry
-      INCLUDE 'SRCLIB(PSS_STAT_BIT1)'
+      INCLUDE 'PSS_STAT_BIT1'
 
 *      Accumulate the statistic
         CORR = 0.0
@@ -1450,7 +1450,7 @@
         SMAP(I,J) = CORR
 
 *    Standard statistic loop exit. Contains pixel abort label 50
-      INCLUDE 'SRCLIB(PSS_STAT_BIT2)'
+      INCLUDE 'PSS_STAT_BIT2'
 
 *    Single point?
       IF ( GR_NELM .EQ. 1 ) THEN
@@ -1516,7 +1516,7 @@
 *
 *    Standard statistic stuff :
 *
-      INCLUDE 'SRCLIB(PSS_STAT_BIT0)'
+      INCLUDE 'PSS_STAT_BIT0'
 *
 *    Status :
 *
@@ -1532,7 +1532,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Standard statistic loop entry
-      INCLUDE 'SRCLIB(PSS_STAT_BIT1)'
+      INCLUDE 'PSS_STAT_BIT1'
 
 *      Accumulate statistic
         CORR = 0.0
@@ -1546,7 +1546,7 @@
         SMAP(I,J) = CORR
 
 *    Standard statistic loop exit. Contains pixel abort label 50
-      INCLUDE 'SRCLIB(PSS_STAT_BIT2)'
+      INCLUDE 'PSS_STAT_BIT2'
 
 *    Store parameters - correct for single point
       IF ( GR_NELM .EQ. 1 ) THEN

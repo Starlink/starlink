@@ -50,7 +50,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Set prompt
-      CALL PAR_PROMT( EPAR, EPROMPT, STATUS )
+      CALL USI_PROMT( EPAR, EPROMPT, STATUS )
       MP_PAR = EPAR
       MP_ENVIR = .TRUE.
       MP_MODE = MODE(1:1)
@@ -130,7 +130,7 @@
 
 *      Environment map?
         IF ( MP_ENVIR ) THEN
-          CALL PAR_CANCL( MP_PAR, STATUS )
+          CALL USI_CANCL( MP_PAR, STATUS )
         ELSE
           CALL HDS_CLOSE( MP_LOC, STATUS )
         END IF
@@ -171,7 +171,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -322,7 +321,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :

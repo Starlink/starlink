@@ -30,7 +30,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(POI_STR)'
+      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -122,7 +122,7 @@
       IF ( CP_MULTI ) THEN
         RESTART = .FALSE.
       ELSE
-        CALL PAR_GET0L( 'RESTART', RESTART, STATUS )
+        CALL USI_GET0L( 'RESTART', RESTART, STATUS )
       END IF
 
 *    Initialise grid
@@ -223,8 +223,8 @@
  49   IF ( IFILE .EQ. 1 ) THEN
 
 *      Get threshold(s) for search
-        CALL PAR_GET1R( 'SIGMIN', 2, SIGMIN, NSIG, STATUS )
-        CALL PAR_CANCL( 'SIGMIN', STATUS )
+        CALL USI_GET1R( 'SIGMIN', 2, SIGMIN, NSIG, STATUS )
+        CALL USI_CANCL( 'SIGMIN', STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      If only one threshold, copy to second
@@ -244,8 +244,8 @@
         IF ( CP_MULTI ) THEN
           TRY_AGAIN = .FALSE.
         ELSE
-          CALL PAR_GET0L( 'TRY_AGAIN', TRY_AGAIN, STATUS )
-          CALL PAR_CANCL( 'TRY_AGAIN', STATUS )
+          CALL USI_GET0L( 'TRY_AGAIN', TRY_AGAIN, STATUS )
+          CALL USI_CANCL( 'TRY_AGAIN', STATUS )
         END IF
         IF ( STATUS .NE. SAI__OK ) THEN
           GOTO 99
@@ -260,13 +260,13 @@
       ELSE IF ( LI_NSRC .GT. TOO_MANY_SRC ) THEN
         CALL MSG_SETI( 'N', LI_NSRC )
         CALL MSG_PRNT( 'Found a lot of sources! ( ^N )' )
-        CALL PAR_PROMT( 'TRY_AGAIN', 'Try again with a'/
+        CALL USI_PROMT( 'TRY_AGAIN', 'Try again with a'/
      :       /' higher significance threshold', STATUS )
         IF ( CP_MULTI ) THEN
           TRY_AGAIN = .FALSE.
         ELSE
-          CALL PAR_GET0L( 'TRY_AGAIN', TRY_AGAIN, STATUS )
-          CALL PAR_CANCL( 'TRY_AGAIN', STATUS )
+          CALL USI_GET0L( 'TRY_AGAIN', TRY_AGAIN, STATUS )
+          CALL USI_CANCL( 'TRY_AGAIN', STATUS )
         END IF
         IF ( ( STATUS .EQ. SAI__OK ) .AND. TRY_AGAIN ) THEN
 
@@ -295,7 +295,7 @@
 
 *    Get multiplier for critical radius
       IF ( IFILE .EQ. 1 ) THEN
-        CALL PAR_GET0R( 'MULREJ', MULREJ, STATUS )
+        CALL USI_GET0R( 'MULREJ', MULREJ, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -366,7 +366,7 @@
 *    Symmetric errors?
       IF ( CP_EXPERT ) THEN
         IF ( IFILE .EQ. 1 ) THEN
-          CALL PAR_GET0L( 'ASYMMETRIC', ASYMET, STATUS )
+          CALL USI_GET0L( 'ASYMMETRIC', ASYMET, STATUS )
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
       ELSE
@@ -385,7 +385,7 @@
         IF ( CP_EXPERT ) THEN
 
 *        Flux errors
-          CALL PAR_PROMT( 'FERL', 'Flux error confidence level',
+          CALL USI_PROMT( 'FERL', 'Flux error confidence level',
      :                                                  STATUS )
           CALL PSS_GET_CONF('FERL', PSS__MXEL, TEXT, FLEV, NFLEV,
      :                                                   STATUS )
@@ -772,7 +772,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       CALL PSS_GRID_INIT( STATUS )
 
 *    Sensitivity significance
-      CALL PAR_GET0R( 'SENSIG', SENSIG, STATUS )
+      CALL USI_GET0R( 'SENSIG', SENSIG, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Define significance and flux convergence to absolute 0.05. Cannot
@@ -940,7 +940,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(POI_STR)'
+      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -1041,7 +1041,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 
 *      Symmetric errors?
         IF ( CP_EXPERT ) THEN
-          CALL PAR_GET0L( 'ASYMMETRIC', ASYMET, STATUS )
+          CALL USI_GET0L( 'ASYMMETRIC', ASYMET, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
         ELSE
           ASYMET = .FALSE.
@@ -1059,7 +1059,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
           IF ( CP_EXPERT ) THEN
 
 *          Flux errors
-            CALL PAR_PROMT( 'FERL', 'Flux error confidence level',
+            CALL USI_PROMT( 'FERL', 'Flux error confidence level',
      :  						  STATUS )
             CALL PSS_GET_CONF( 'FERL', PSS__MXEL, TEXT, FLEV, NFLEV,
      :                                                      STATUS )
@@ -1077,7 +1077,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 *    Upper limit mode?
       ELSE IF ( CP_EXPERT .AND. .NOT. CP_OPT ) THEN
 
-        CALL PAR_PROMT( 'FERL', 'Upper limit confidence level', STATUS )
+        CALL USI_PROMT( 'FERL', 'Upper limit confidence level', STATUS )
         CALL PSS_GET_CONF( 'FERL', 1, UPSTR, CONF, NFLEV, STATUS )
 
       END IF
@@ -1414,7 +1414,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 
 *    Get confidence level for upper limit map
       IF ( CP_EXPERT ) THEN
-        CALL PAR_PROMT( 'FERL', 'Confidence level for upper'/
+        CALL USI_PROMT( 'FERL', 'Confidence level for upper'/
      :                                /' limit map', STATUS )
         CALL PSS_GET_CONF( 'FERL', 1, STR, CONF, IDUMMY, STATUS )
       ELSE

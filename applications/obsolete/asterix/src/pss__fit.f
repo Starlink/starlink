@@ -505,7 +505,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(POI_STR)'
+      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -1335,7 +1335,7 @@
 *    Structure definitions :
 *
       INCLUDE 'FIT_STRUC'
-      INCLUDE 'SRCLIB(POI_STR)'
+      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *

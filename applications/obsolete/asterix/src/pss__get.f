@@ -225,7 +225,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get string from user and capitalise
- 10   CALL PAR_GET0C( PARAM, TEXT, STATUS )
+ 10   CALL USI_GET0C( PARAM, TEXT, STATUS )
 
 *    Trap the ! case
       IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -236,7 +236,7 @@
       ELSE IF ( STATUS .NE. SAI__OK ) THEN
         GOTO 99
       END IF
-      CALL PAR_CANCL( PARAM, STATUS )
+      CALL USI_CANCL( PARAM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Insert marker at end of string
@@ -401,7 +401,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get processing mode
-      CALL PAR_GET0C( MPAR, MODE, STATUS )
+      CALL USI_GET0C( MPAR, MODE, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Look up in list
@@ -499,7 +499,7 @@
 *    If spot mode accept default automatically
       IF ( CP_SPOT ) THEN
 
-        CALL PAR_DEF0C( 'SLICE', '*:*,*:*', STATUS )
+        CALL USI_DEF0C( 'SLICE', '*:*,*:*', STATUS )
 
       ELSE
 
@@ -514,10 +514,10 @@
 
 *      Change prompt for upper limit mapping
         IF ( CP_MODE .EQ. PSS__M_UPMAP ) THEN
-          CALL PAR_PROMT( 'SLICE', 'Slice for upper limit mapping',
+          CALL USI_PROMT( 'SLICE', 'Slice for upper limit mapping',
      :                                                     STATUS )
         ELSE IF ( CP_MODE .EQ. PSS__M_SENMAP ) THEN
-          CALL PAR_PROMT( 'SLICE', 'Slice for sensitivity mapping',
+          CALL USI_PROMT( 'SLICE', 'Slice for sensitivity mapping',
      :                                                     STATUS )
         END IF
 
@@ -541,7 +541,7 @@
         OK = ( (RNGS(2,IAX)-RNGS(1,IAX))*SIGN(1.0,AX_DR(IAX))
      :                                                 .GT. 0.0 )
         IF ( .NOT. OK ) THEN
-          CALL PAR_CANCL( 'SLICE', STATUS )
+          CALL USI_CANCL( 'SLICE', STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
             CALL MSG_SETI( 'A', IAX )
             CALL MSG_PRNT( 'Axis ^A ranges are inverted - re-enter' )

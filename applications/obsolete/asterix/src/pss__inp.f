@@ -89,7 +89,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(POI_STR)'
+      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -169,7 +169,7 @@
 
 *      Which way to use quality if present?
         IF ( BDS_QUAL_OK ) THEN
-          CALL PAR_GET0L( 'QBAD', CP_NOBADQSRC, STATUS )
+          CALL USI_GET0L( 'QBAD', CP_NOBADQSRC, STATUS )
         END IF
 
       END IF

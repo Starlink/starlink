@@ -320,7 +320,7 @@
 
 *      Release the dataset
 	CALL BDA_RELEASE_INT( SBDA, STATUS )
-	CALL PAR_CANCL( 'SSUB', STATUS )
+	CALL USI_CANCL( 'SSUB', STATUS )
 
 *      Tidy up
  99     IF ( STATUS .NE. SAI__OK ) THEN

@@ -262,8 +262,8 @@
       IF ( CP_EXPERT ) THEN
 
 *      Set default
-        CALL PAR_DEF0L( 'PSF_CON', (.NOT. POSVAR), STATUS )
-        CALL PAR_GET0L( 'PSF_CON', PSF_CONSTANT, STATUS )
+        CALL USI_DEF0L( 'PSF_CON', (.NOT. POSVAR), STATUS )
+        CALL USI_GET0L( 'PSF_CON', PSF_CONSTANT, STATUS )
 
       ELSE
         PSF_CONSTANT = (.NOT. POSVAR)
@@ -343,7 +343,7 @@
         CALL MSG_PRNT( ' ' )
 
 *      Set default to 68% energy
-        CALL PAR_DEF1I( 'PSFPIX', NIPOS, R68, STATUS )
+        CALL USI_DEF1I( 'PSFPIX', NIPOS, R68, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Loop to get box spec
@@ -351,8 +351,8 @@
         DO WHILE ( (STATUS.EQ.SAI__OK) .AND. .NOT. GOT_RADII )
 
 *        Get list of radii
-          CALL PAR_GET1I( 'PSFPIX', NIPOS, PSF_PPS, NUR, STATUS )
-          CALL PAR_CANCL( 'PSFPIX', STATUS )
+          CALL USI_GET1I( 'PSFPIX', NIPOS, PSF_PPS, NUR, STATUS )
+          CALL USI_CANCL( 'PSFPIX', STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *        Right number?

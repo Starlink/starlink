@@ -74,7 +74,7 @@
 *    Get the statistic option
       IF ( IFILE .EQ. 1 ) THEN
         IF ( CP_OPT .AND. .NOT. CP_SPOT ) THEN
-          CALL PAR_GET0C( 'SOPT', SOPT, STATUS )
+          CALL USI_GET0C( 'SOPT', SOPT, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             GOTO 99
           ELSE IF ( STR_ABBREV(SOPT,'CASH') ) THEN
@@ -207,11 +207,11 @@
         IF ( CP_CASH .AND. CP_EXPERT ) THEN
 
 *        Rescaling the background?
-          CALL PAR_GET0L( 'RESCALE', CP_RESCALE, STATUS )
+          CALL USI_GET0L( 'RESCALE', CP_RESCALE, STATUS )
           IF ( CP_RESCALE .AND. ( STATUS .EQ. SAI__OK ) ) THEN
 
 *          Get starting value for scale factor
-            CALL PAR_GET0R( 'ISCALE', CP_IBSCALE, STATUS )
+            CALL USI_GET0R( 'ISCALE', CP_IBSCALE, STATUS )
 
 *          and choose routine
             GR_ROUTINE = PSS_RTN_SEL( PSS_STAT_CASHR,
