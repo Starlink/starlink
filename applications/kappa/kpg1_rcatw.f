@@ -39,6 +39,9 @@
 *        Original version.
 *     26-MAY-1999 (DSB):
 *        Only read the required length from each GRP element.
+*     8-DEC-1999 (DSB):
+*        Put in hack to allow for CAT changing WCS text class from
+*        COMMENT to AST.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -130,7 +133,8 @@
      :                   %VAL( LEN( CLASS ) ), %VAL( LINESZ ) )
 
 *  Ignore it if the class is not COMMENT.
-         IF( .NOT. DONE .AND. CLASS .EQ. 'COMMENT' ) THEN
+         IF( .NOT. DONE .AND. ( CLASS .EQ. 'COMMENT' .OR.
+     :       CLASS .EQ. 'AST' ) ) THEN
 
 *  Find "!!" in the string. This is added to the start of each line of AST
 *  information when it is written to the catalogue. It marks the start of the
