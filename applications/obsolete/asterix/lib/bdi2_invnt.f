@@ -82,6 +82,7 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmnigham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -91,6 +92,8 @@
 *        Added LoError and HiError invention
 *     31 May 1996 (DJA):
 *        Had forgotten to divide ASCALE by two for LoWidth and HiWidth
+*     14 Feb 1997 (RB):
+*        Add code for Axis_n_Bounds
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,22 +135,18 @@ C      EXTERNAL			BDI2_WBWID
       CHARACTER*72		CMNT			! Keyword comment
 
       REAL			AXVAL			! Axis scale
-      REAL			RPIX, RVAL, PIXW	! Axis keyword values
+      REAL			RPIX, PIXW		! Axis keyword values
 
       INTEGER			I			! Loop variable
       INTEGER			IAX			! Axis number
-c     INTEGER			IERR, NERR		! Error info from VEC_
-c     INTEGER			NELM			! # invented elements
       INTEGER			PHDU			! Primary HDU id
       INTEGER			PSID			! Private item storage
-c     INTEGER			PTR, PTR2		! Mapped data address
-c     INTEGER			TNDIM, TDIMS(ADI__MXDIM)! Temp dims
       INTEGER			WPTR			! Workspace
-
-      BYTE			MASK			! Quality mask
+      INTEGER			BDIMS(2)		! Axis bounds dimension
+      INTEGER			BPTR			! Axis bounds values
+      INTEGER			BITID			! Axis bounds item ID
 
       LOGICAL			RMODE			! READ mode?
-c     LOGICAL			STHERE			! Axis scale defined?
       LOGICAL			WMODE			! WRITE mode?
 *.
 
@@ -163,7 +162,8 @@ c     LOGICAL			STHERE			! Axis scale defined?
       WMODE = (MODE(1:1).EQ.'W')
 
 *  Axis data?
-      IF ( (ITEM(1:5).EQ.'Axis_') .AND. (ITEM(8:).EQ.'Data') ) THEN
+      IF ( ITEM(1:5) .EQ. 'Axis_' .AND.
+     :     ( ITEM(8:) .EQ. 'Data' .OR. ITEM(8:) .EQ. 'Bounds' ) ) THEN
 
 *    Get dimensions of BinDS
         CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
@@ -173,8 +173,7 @@ c     LOGICAL			STHERE			! Axis scale defined?
         CALL CHR_CTOI( CAX, IAX, STATUS )
 
 *    Private storage for axis data
-        CALL ADI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
-     :                    STATUS )
+        CALL ADI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *    Create invented object and attempt to fill values unless write mode
         CALL ADI_NEW1R( DIMS(IAX), ITID, STATUS )
@@ -200,7 +199,7 @@ c     LOGICAL			STHERE			! Axis scale defined?
           ELSE
             CALL ERR_ANNUL( STATUS )
             CALL ADI2_HGKYR( PHDU, 'CRPIX'//CAX, RPIX, CMNT, STATUS )
-            CALL ADI2_HGKYR( PHDU, 'CRVAL'//CAX, RVAL, CMNT, STATUS )
+c           CALL ADI2_HGKYR( PHDU, 'CRVAL'//CAX, RVAL, CMNT, STATUS )
             CALL ADI2_HGKYR( PHDU, 'CDELT'//CAX, PIXW, CMNT, STATUS )
 
 *        Standard keywords there?
@@ -217,20 +216,47 @@ c     LOGICAL			STHERE			! Axis scale defined?
 
           END IF
 
+*      Now check the item is catered for
+          IF ( ITEM(8:) .EQ. 'Data' ) THEN
+            CALL ADI_UNMAP( ITID, WPTR, STATUS )
+
+          ELSE IF ( ITEM(8:) .EQ. 'Bounds' ) THEN
+            BDIMS(1) = 2
+            BDIMS(2) = DIMS(IAX)
+            CALL ADI_NEW( TYPE, 2, BDIMS, BITID, STATUS )
+            CALL ADI_MAPR( BITID, 'WRITE', BPTR, STATUS )
+
+*        Construct the bounds
+            CALL BDI2_INVNT_VW2B( BDIMS(2), %VAL(WPTR), .FALSE., 0.0,
+     :                       %VAL(BPTR), STATUS )
+
+*        Swap the item IDs over
+            CALL ADI_UNMAP( ITID, WPTR, STATUS )
+            ITID = BITID
+            CALL ADI_UNMAP( ITID, BPTR, STATUS )
+          END IF
+
 *      Release HDU
           CALL ADI_ERASE( PHDU, STATUS )
-
-          CALL ADI_UNMAP( ITID, WPTR, STATUS )
         END IF
 
 *    Set dimensions
-        DIMS(1) = DIMS(IAX)
-        NDIM = 1
+        IF ( ITEM(8:) .EQ. 'Bounds' ) THEN
+          DIMS(1) = 2
+          DIMS(2) = BDIMS(2)
+          NDIM = 2
+        ELSE
+          DIMS(1) = DIMS(IAX)
+          NDIM = 1
+        END IF
 
 *    Set the WriteBack function
         IF ( .NOT. RMODE ) THEN
           WBPTR = UTIL_PLOC( BDI2_AXWB )
         END IF
+
+      ELSE IF ( ITEM .EQ. 'Title' ) THEN
+        CALL ADI_NEWV0C( ' ', ITID, STATUS )
 
       ELSE
 
