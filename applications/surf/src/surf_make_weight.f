@@ -55,7 +55,7 @@
 *     PA = REAL (Read)
 *        Position angle of chop throw. Positive is anti-clockwise starting
 *        from North. The angle should be specified in degrees.
-*     PIXSIZE = INTEGER (Read)
+*     PIXSIZE = REAL (Read)
 *        Pixel size to be used for output images. Should be in arcseconds
 *        (ie same units as used for the CHOP parameter)
 *     SIZE( 2 ) = INTEGER (Read)
