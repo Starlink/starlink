@@ -143,22 +143,41 @@ char copyright_string[] = "Copyright 1988, 1991, 1992, 1995, 2004, 2005, Council
     * are defined also 
     */
 #else
-#  define INT8_MAX  SCHAR_MAX
-#  define INT8_MIN  SCHAR_MIN
-#  define UINT8_MAX UCHAR_MAX
-#  if SIZEOF_SHORT_INT == 2
-#    define INT16_MAX  SHRT_MAX
-#    define INT16_MIN  SHRT_MIN
-#    define UINT16_MAX USHRT_MAX
+   /* Avoid redefining any values */
+#  ifndef INT8_MAX
+#    define INT8_MAX  SCHAR_MAX
+#  endif
+#  ifndef INT8_MIN
+#    define INT8_MIN  SCHAR_MIN
+#  endif
+#  ifndef UINT8_MAX
+#    define UINT8_MAX UCHAR_MAX
+#  endif
+#    if SIZEOF_SHORT_INT == 2
+#  ifndef INT16_MAX
+#      define INT16_MAX  SHRT_MAX
+#  endif
+#  ifndef INT16_MIN
+#      define INT16_MIN  SHRT_MIN
+#  endif
+#  ifndef UINT16_MAX
+#      define UINT16_MAX USHRT_MAX
+#  endif
 #  else
      /*
       * That's a surprise -- this machine's short integers are something
       * other than two bytes long.  So use specific values (these
       * particlar ones are taken from gcc limits.h).
       */
-#    define INT16_MAX  0x7fff
-#    define INT16_MIN  (-32767-1)
-#    define UINT16_MAX 0xffff
+#    ifndef INT16_MAX
+#      define INT16_MAX  0x7fff
+#    endif
+#    ifndef INT16_MIN
+#      define INT16_MIN  (-32767-1)
+#    endif
+#    ifndef UINT16_MAX
+#      define UINT16_MAX 0xffff
+#    endif
 #  endif
    /*
     * The tests below are somewhat artificial, since correct output
@@ -166,18 +185,36 @@ char copyright_string[] = "Copyright 1988, 1991, 1992, 1995, 2004, 2005, Council
     * less to do if we do have to change this in future.
     */
 #  if SIZEOF_INT == 4
-#    define INT32_MAX  INT_MAX
-#    define INT32_MIN  INT_MIN
-#    define UINT32_MAX UINT_MAX
+#    ifndef INT32_MAX
+#      define INT32_MAX  INT_MAX
+#    endif
+#    ifndef INT32_MIN
+#      define INT32_MIN  INT_MIN
+#    endif
+#    ifndef UINT32_MAX
+#      define UINT32_MAX UINT_MAX
+#    endif
 #  elif SIZEOF_LONG_INT == 4
-#    define INT32_MAX  LONG_MAX
-#    define INT32_MIN  LONG_MIN
-#    define UINT32_MAX ULONG_MAX
+#    ifndef INT32_MAX
+#      define INT32_MAX  LONG_MAX
+#    endif
+#    ifndef INT32_MIN
+#      define INT32_MIN  LONG_MIN
+#    endif
+#    ifndef UINT32_MAX
+#      define UINT32_MAX ULONG_MAX
+#    endif
 #  else
      /* What sort of machine is this?! */
-#    define INT32_MAX  0x7fffffff
-#    define INT32_MIN  (-2147483647-1)
-#    define UINT32_MAX 0xffffffff
+#    ifndef INT32_MAX
+#      define INT32_MAX  0x7fffffff
+#    endif
+#    ifndef INT32_MIN
+#      define INT32_MIN  (-2147483647-1)
+#    endif
+#    ifndef UINT32_MAX
+#      define UINT32_MAX 0xffffffff
+#    endif
 #  endif
 #  if !HAVE_INT32_T
 /*
