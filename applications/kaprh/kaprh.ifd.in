@@ -1,5 +1,5 @@
 package kaprh {
-   version PKG_VERS
+   version @PACKAGE_VERSION@
    prefix krh
 
    executable kaprh_mon {
@@ -3055,7 +3055,7 @@ iraf! {
 
    display {
 
-     KAPRH commands are now available -- (Version PKG_VERS)
+     KAPRH commands are now available -- (Version @PACKAGE_VERSION@)
 
      Type krhhelp for help on KAPRH commands.
      Type "showme sun239" to browse the hypertext documentation.
