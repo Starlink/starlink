@@ -108,7 +108,7 @@ $TIMEOUT = 30;
  
 Exporter::export_tags('Func');
  
-$VERSION = '0.01';
+$VERSION = '1.00';
 
 
 ############# Subroutines #############################
@@ -118,8 +118,6 @@ $VERSION = '0.01';
 =head1 FUNCTIONS
 
 =over 4
-
-=cut
 
 =item adamtask_init
 

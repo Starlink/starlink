@@ -36,7 +36,7 @@ use Carp;
 
 use vars qw/$VERSION $AMSRUNNING $debug $NOBJECTS $AMS_OBJECT/;
 
-$VERSION = '0.01';
+$VERSION = '1.00';
 $debug = 0;
 $AMS_OBJECT = undef;
 
