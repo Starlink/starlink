@@ -1070,40 +1070,12 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
 
           <p>This <code>Makefile.am</code> also declares a single
             monolith (this and the <code>TASKS</code> primary below
-            are obviously part of the Starlink
-            extensions to automake) and its associated
-            <code>SOURCES</code>.  However it also declares a set of
-            <code>TASKS</code>.  This primary indicates to automake
-            that there will be <code>.ifl</code> files in the
-            directory corresponding to the six tasks, that these
-            <code>.ifl</code> files should be distributed, and that
-            the appropriate extra links should be made, in the binary
-            directory, when the monolith is installed.  The tasks
-            variable is also used in the <code>sst_mon_SOURCES</code>
-            variable to declare the dependence of the monolith on the
-            Fortran files corresponding to the tasks (it would be
-            possible to automake to have inferred this last step, but
-            it seems clearer overall to have this dependency at least
-            made explicit).  This incidentally illustrates that
-            automake allows variable reuse and rewriting very similar
-            to that supported by make.</p>
-
-          <p>If you are building an ATASK, then the task is the same
-            name as the program, so you should simply
-            declare the <code>..._TASKS</code> variable to be empty:
-<verbatim>
-foo_TASKS =
-</verbatim></p>
-
-          <p>The <code>MONOLITH</code> primary allows the prefixes
-            <code>bin</code>, <code>check</code> and
-            <code>noinst</code>, rather like <code>PROGRAMS</code>.</p>
-
-          <p>In order to use the monolith support, you need to request
-            this by including the declaration
-            <code>STAR_MONOLITHS</code> in the
-            <code>configure.ac</code> file, most rationally near the
-            <code>AC_PROG_CC</code>-style declarations.</p>
+            are obviously part of the Starlink extensions to automake)
+            and its associated <code>SOURCES</code>, along with its
+            component tasks.  For fuller details of the monoliths
+            support, see <ref id="monoliths"/>.  This incidentally
+            illustrates that automake allows variable reuse and
+            rewriting very similar to that supported by make.</p>
 
           <p>When we are linking this monolith, we need to add a
             couple of link options, and we do this with a
@@ -2340,9 +2312,71 @@ autoconf (GNU Autoconf) 2.59
 
       </subsect>
 
+      <subsect id="monoliths" export="export">
+        <subhead>
+          <title>Building monoliths</title>
+        </subhead>
+
+        <p>As illustrated in <ref id="automakeoverview"/>, you can
+          build monoliths in an analogous way to the way you build
+          programs, by declaring the monoliths as the value of the
+          <code>bin_MONOLITHS</code> variable.</p>
+
+        <p>Along with the <code>bin_MONOLITHS</code> variable, a
+          Makefile must also declare a set of tasks using the
+          <code>TASKS</code> primary, and this set will be empty if
+          the monolith is an ATASK.</p>
+
+        <p>The <code>foo_TASKS</code> primary indicates to automake
+          that there will be <code>.ifl</code> files in the local
+          directory corresponding to each of the tasks in the
+          monolith, that these <code>.ifl</code> files should be
+          distributed, and that the appropriate extra links should
+          be made, in the binary directory, when the monolith is
+          installed.  The tasks variable is also used in the
+          <code>foo_SOURCES</code> variable to declare the
+          dependence of the monolith on the Fortran files
+          corresponding to the tasks (it would be possible to
+          automake to have inferred this last step, but it seems
+          clearer overall to have this dependency at least made
+          explicit).</p>
+
+        <p>The generated <code>Makefile.in</code> will install each of
+          the task <code>.ifc</code> files, plus the monolith
+          <code>.ifc</code> file.  The monolith <code>.ifl</code> file
+          is constructed by appending each of the task
+          <code>.ifl</code> files, wrapped in <code>begin
+          monolith</code> and <code>end monolith</code>, and this
+          generated <code>.ifl</code> file should not be included in
+          the repository or the distribution.</p>
+
+        <p>If you are building an ATASK, then the task is the same
+          name as the program, so you should simply
+          declare the <code>..._TASKS</code> variable to be empty:
+<verbatim>
+foo_TASKS =
+</verbatim>
+          In this case, the only <code>.ifl</code> file is that for
+          the ATASK, and automake checks that this file does in fact
+          exist.  This is not a generated file, and should be checked
+          in and distributed.</p>
+
+        <p>The <code>MONOLITH</code> primary allows the prefixes
+          <code>bin</code>, <code>check</code> and
+          <code>noinst</code>, rather like <code>PROGRAMS</code>.</p>
+        
+        <p>In order to use the monolith support, you must to request
+          this by including the declaration
+          <code>STAR_MONOLITHS</code> in the <code>configure.ac</code>
+          file, most rationally near the <code>AC_PROG_CC</code>-style
+          declarations.</p>
+
+      </subsect>
+
       <subsect id="bootstrappingonly" export="export">
         <subhead>
-          <title>Bootstrapping without building, and configuring starconf</title>
+          <title>Bootstrapping without building, and configuring
+          starconf</title>
         </subhead>
 
         <p>If you intend to work only on a single component, then you
@@ -4673,6 +4707,8 @@ STAR_MANIFEST_INSTALL_COMMAND = cd unix; \
             the (currently unexploited) possibility that the tasks and
             <code>.ifl</code> files longer have the one-task-per-file
             relationship they have now.</p>
+
+          <p>See <ref id="monoliths"/> for discussion.</p>
 
         </subsect>
 
