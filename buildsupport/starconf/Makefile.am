@@ -28,17 +28,11 @@ CLEANFILES=starconf make-starconf starconf.m4
 # recent file in the directory; those without are only
 # unpacked if there is no file present (again, this is now an empty set).
 starconf: make-starconf \
-		install-with-manifest.in \
 		starconf.m4 \
-		Makefile.starconf \
-		bootstrap.installed \
-		extra-fortran.m4
+		bootstrap.installed
 	./make-starconf \
-		!install-with-manifest.in \
 		!starconf.m4 \
-		!Makefile.starconf \
-		*?bootstrap:bootstrap.installed \
-		?extra-fortran.m4
+		*?bootstrap:bootstrap.installed
 
 # The edits of replacement variables (prefix and co) in
 # starlink.m4.in and starconf.in must be done at `make' time rather
@@ -46,15 +40,16 @@ starconf: make-starconf \
 # See the `Installation Directory Variables' section of the autoconf
 # manual for discussion.
 #
-# We substitute LN_S at the same time.  This could legitimately be
-# done at configure time -- it does not have to be done this late --
-# but that would require us to have more than one substitution step,
-# which would be too confusing and messy.
+# We substitute LN_S, DEFAULT_STARLINK... at the same time.  These
+# could legitimately be done at configure time -- it does not have to
+# be done this late -- but that would require us to have more than one
+# substitution step, which would be too confusing and messy.
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@datadir\@,$(datadir),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
 	-e 's,@DEFAULT_STARLINK\@,@DEFAULT_STARLINK@,g' \
+	-e 's,@DEFAULT_PREFIX\@,@DEFAULT_PREFIX@,g' \
 	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g' \
 	-e 's,@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g'
 make-starconf: make-starconf.in

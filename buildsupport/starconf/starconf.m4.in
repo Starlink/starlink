@@ -8,51 +8,64 @@
 # -------------
 # Defaults for Starlink configure.ac files
 AC_DEFUN([STAR_DEFAULTS],
-[AC_REQUIRE([_STAR_BOILERPLATE])dnl
-# Everything depends on where /star is.  Declare STARLINK as a
-# `precious variable'.  Amongst other things, this will make
-# ./configure squeal if the package is re-configured with an
-# inconsistent value of this variable.
-# XXXNO_AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])dnl
-
-# AC_SUBST the STARLINK variable.  Macro AC_ARG_VAR does this anyway,
-# but automake doesn't know that (in 1.6 at least): however any
-# variable that automake finds has been AC_SUBSTed, it includes in
-# Makefile.in, and that is useful to us.
-# XXXNO_AC_SUBST(STARLINK)
-
+[#
 # Ensure that STARLINK has a value, defaulting to !!DEFAULT_STARLINK!!.
 # Note that this directory may be different from /star, and reflects the
 # value of DEFAULT_STARLINK that the `starconf' package was configured with
 # before its installation.
-## test -n "$STARLINK" || STARLINK=!!DEFAULT_STARLINK!!
-
-# Install software in !!DEFAULT_STARLINK!! by default
-AC_PREFIX_DEFAULT(!!DEFAULT_STARLINK!!)dnl
-
-##    Note: Don't be tempted to modify this macro to include a dependency
-##    of acinclude.m4 on this .m4 file, or on
-##    starconf.status: we can't have it depending on starconf.status,
-##    since that isn't distributed (only its products are
-##    distributed), and we can't just have an empty dependency with
-##    ./starconf.status as the rule, since this file must exist
-##    before any Makefile is run.  Another way of putting this is
-##    that, in order for this rule to be discovered and included in a
-##    Makefile, we must _already_ have an up-to-date acinclude.m4,
-##    which means that the rule is completely redundant.
 #
-# Always create a manifest-install target
-_STAR_MAKE_MANIFEST
+# We use $STARLINK as the location of any other Starlink tools we need
+# to use during the building of our packages, and for the location of
+# any manifests we need to check.  It is permissable for it to be
+# different from $(prefix): this is partly because we have no way of
+# enforcing that the two be the same, since the user can set
+# prefix=xxx on the `make install' command line, and partly so that it
+# is possible to make a test version of a new package, using tools
+# from an old installation, but installing in a new place.
+#
+# However, we install software in !!DEFAULT_PREFIX!! by default.  This is so
+# even if $STARLINK and DEFAULT_STARLINK are different, because in
+# this case we are planning to use a previous installation in
+# $STARLINK or $DEFAULT_STARLINK, but install the newly built tool
+# elsewhere.
+#
+# In most cases, including the most important case where we are
+# building the tree from scratch, in a checked out directory,
+# STARLINK, DEFAULT_STARLINK and DEFAULT_PREFIX will all be the same.
+# That's OK because a separate aspect of the build process, respecting
+# the various dependencies expresses in source directories, ensures that
+# we don't use (and install) any Starlink tools in one component before that
+# component has been build and installed.
 
+test -n "$STARLINK" || STARLINK=!!DEFAULT_STARLINK!!
+AC_PREFIX_DEFAULT(!!DEFAULT_PREFIX!!)dnl
+
+# Everything depends on where /star is.  Declare STARLINK as a
+# `precious variable'.  Amongst other things, this will make
+# ./configure squeal if the package is re-configured with an
+# inconsistent value of this variable.
+AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])dnl
+
+# AC_SUBST the STARLINK variable.  Macro AC_ARG_VAR does this anyway,
+# but automake doesn't know that (in 1.6 at least): however any
+# variable that automake finds has been AC_SUBSTed, it includes in
+# Makefile.in, and we need that.
+AC_SUBST(STARLINK)
+
+# Use the above information: $STARLINK indicates a preexisting
+# Starlink tree.
+FFLAGS="$FFLAGS -I$STARLINK/include"
+CFLAGS="$CFLAGS -I$STARLINK/include"
+LDFLAGS="$LDFLAGS -L$STARLINK/lib"
 # Note that the following imply that we are expecting to find
 # pre-installed versions of includes and libraries in the same
 # locations we plan to install new ones.  That is, I think, what we
 # expect.
-FFLAGS="$FFLAGS -I${includedir}"
-CFLAGS="$CFLAGS -I${includedir}"
-LDFLAGS="$LDFLAGS -L${libdir}"
+#FFLAGS="$FFLAGS -I$STARLINK/include${includedir}"
+#CFLAGS="$CFLAGS -I${includedir}"
+#LDFLAGS="$LDFLAGS -L${libdir}"
 
-# Dependencies declarations and checks (see macros
+# Dependency declarations and checks (see macros
 # [STAR_DECLARE_BUILD_DEPENDENCIES] and [STAR_DECLARE_USE_DEPENDENCIES])
 # Everything is dependent on starconf, so we don't have to declare that 
 # for each package separately.
@@ -61,62 +74,58 @@ AC_SUBST(STAR_BUILD_DEPENDENCIES)dnl
 STAR_USE_DEPENDENCIES=''
 AC_SUBST(STAR_USE_DEPENDENCIES)dnl
 
+# List of message files.  Used to signal to automake
+STAR_MESSGEN_SOURCES=
+AC_SUBST(STAR_MESSGEN_SOURCES)
+
+# List of documentation.  See [STAR_LATEX_DOCUMENTATION].
+# STAR_DOCUMENTATION is a list of document codes,
+STAR_DOCUMENTATION=
+AC_SUBST([STAR_DOCUMENTATION])
+
+# Extra files to be distributed.  This is for files added to the
+# distribution list by starconf; files which the user wishes to add
+# should be specified in the usual way, through the automake
+# EXTRA_DIST variable.
+STAR_EXTRA_DIST=
+AC_SUBST(STAR_EXTRA_DIST)
+
 # Create a PACKAGE_VERSIONINT variable, which contains the
 # package's version number as an integer major*1e6+minor*1e3+release.
 ## NB hairy quoting: quadrigraph @S|@ is replaced by $ after m4 has run.
 PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print @S|@1*1000000+@S|@2*1000+(NF>2 ? @S|@3 : 0)}'`]
 AC_SUBST(PACKAGE_VERSIONINT)
 
+# When we do dependency checking, using the dependencies declared in
+# the package's configure.ac, we do so by looking at what tools have
+# already been installed in the Starlink tree.  The tree in question
+# is to be found under $STARLINK (see above), so we check that a
+# package is installed by checking that its manifest can be found in
+# $STARLINK/manifests.  We don't AC_SUBST this.
+current_MANIFESTS=$STARLINK/manifests
 
-dnl    Note: the following adds an EXTRA_DIST variable to the
-dnl    generated Makefile.  automake generates Makefile.in in such a
-dnl    way that that the contents of the $(EXTRA_DIST) variable is
-dnl    added to the distribution; thus we are making use of
-dnl    undocumented behaviour here.  However it's safe, since automake
-dnl    is documented to support the EXTRA_DIST variable being used, in
-dnl    such a way that (I think) it would always be present as a
-dnl    Makefile.in variable.
-dnl
-dnl    Create a shell variable EXTRA_DIST, and call AC_SUBST on it.
-dnl    This means that automake will create a Make variable in
-dnl    Makefile.in, of the form `EXTRA_DIST = @EXTRA_DIST@', _unless_
-dnl    the variable EXTRA_DIST is declared in Makefile.am, in which
-dnl    case it will have that value.  Therefore in this case, the
-dnl    Makefile.am should declare `EXTRA_DIST = XXX @EXTRA_DIST@' so
-dnl    that the extra files built up here are appended to the list.
-dnl    Needs to be prominently documented!
-EXTRA_DIST=
-AC_SUBST(EXTRA_DIST)
-BUILT_SOURCES=
-AC_SUBST(BUILT_SOURCES)
+# When we install manifests, however, they should go in the
+# installation directory.
+STAR_MANIFEST_DIR='$(prefix)/manifests'
+AC_SUBST(STAR_MANIFEST_DIR)
 
-dnl NO -- CHANGED -- now mandate that users use STAR_EXTRA_DIST instead
-dnl _STAR_EXTRA_DIST_TARGETS=
-dnl AC_SUBST([_STAR_EXTRA_DIST_TARGETS])
-dnl _STAR_BUILT_SOURCES_TARGETS=
-dnl AC_SUBST([_STAR_BUILT_SOURCES_TARGETS])
-dnl cat >>$STAR_BOILERPLATE <<\_EOD
-dnl EXTRA_DIST = $(_STAR_EXTRA_DIST_TARGETS) $(STAR_EXTRA_DIST)
-dnl BUILT_SOURCES = $(_STAR_BUILT_SOURCES_TARGETS) $(STAR_BUILT_SOURCES)
-dnl _EOD
-dnl    The following are hooks in Makefile.starconf
-
-_STAR_INSTALL_DATA_LOCAL=
-AC_SUBST(_STAR_INSTALL_DATA_LOCAL)
-_STAR_INSTALL_DATA_HOOK=
-AC_SUBST(_STAR_INSTALL_DATA_HOOK)
+# Although PACKAGE_VERSION is a default output variable, it isn't
+# added as a Makefile variable by default.  We need it below, however,
+# so add it now.
+AC_SUBST(PACKAGE_VERSION)
 ])# STAR_DEFAULTS
 
 
 
-# STAR_MESSGEN([msgfile=$PACKAGE_err.msg])
+# STAR_MESSGEN(msgfile-list)
 # ----------------------------------------
 #
 # Handle generating message, error, and facility files.
 #
-# The argument is the name of one or more files with the message declarations
-# in it, in the format prescribed by the messgen utility.  This
-# defaults to ${PACKAGE}_err.msg.  The macro may be called more than
+# The argument is a space-separated list of files, each of which has a
+# set of message declarations in it, in the format prescribed by the
+# messgen utility.  There is no default, though the usual name for
+# this file is ${PACKAGE}_err.msg.  The macro may be called more than
 # once if you have more than one .msg file in the directory.
 #
 # This adds Makefile rules to create the appropriate _err, _ERR,
@@ -130,11 +139,22 @@ AC_SUBST(_STAR_INSTALL_DATA_HOOK)
 # package also implicitly declares a build-time dependency on the
 # messgen package.
 #
+## Note that, apart from declaring the dependency on messgen, this is
+## a configure-time no-op.  All the configuration work is done within
+## (the Starlink additions to) automake, and a complete set of make
+## rules is emitted into Makefile.in.
+## NOAC_DEFUN([STAR_MESSGEN],
+##         [STAR_DECLARE_BUILD_DEPENDENCIES(messgen)])dnl
+
+
 AC_DEFUN([STAR_MESSGEN],
-         [AC_REQUIRE([_STAR_BOILERPLATE])dnl
-          _s_facfile="m4_ifval([$1], [$1], [${PACKAGE}_err.msg])"
-          for infile in $_s_facfile
+         [#
+          m4_ifval([$1], [], [AC_FATAL([$0: called with no message file])])dnl
+          for infile in $1
           do
+              expr "x$infile" : 'x.*\.msg$' >/dev/null || \
+                { echo "ERROR: facility file $infile does not end in .msg";
+                  exit 1; }
               if test -r $infile; then
                   : OK
               else
@@ -146,16 +166,7 @@ AC_DEFUN([STAR_MESSGEN],
               AC_MSG_CHECKING([facility and code in $infile])
               eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/_s_facname=\1; _s_faccode=\2;/p;q;}' $infile`]
               _s_facname=[`echo $_s_facname | tr '[A-Z]' '[a-z]'`]
-              _s_FACNAME=[`echo $_s_facname | tr '[a-z]' '[A-Z]'`]
               AC_MSG_RESULT([$_s_facname/$_s_faccode])
-              cat >>$STAR_BOILERPLATE <<EOD
-#  Rules for generating files built by the error message system.
-#  ------------------------------------------------------------
-${_s_FACNAME}_ERR:     $infile; \$(STARLINK)/bin/messgen -F $infile
-${_s_facname}_err:     $infile; \$(STARLINK)/bin/messgen -f $infile
-${_s_facname}_err.h:   $infile; \$(STARLINK)/bin/messgen -c $infile
-fac_${_s_faccode}_err: $infile; \$(STARLINK)/bin/messgen -e $infile
-EOD
               STAR_HELP_FILES(fac_${_s_faccode}_err)
               _STAR_EXTRA_DIST(fac_${_s_faccode}_err)
           done
@@ -163,131 +174,37 @@ EOD
 ])# STAR_MESSGEN
 
 
+## NOAC_DEFUN([STAR_MESSGEN],
+##          [#
+##           _s_facfile="m4_ifval([$1], [$1], [${PACKAGE}_err.msg])"
+##           AC_SUBST(MESSGEN_DEPENDENCIES)
+##           for infile in $_s_facfile
+##           do
+##               expr "x$infile" : 'x.*\.msg$' >/dev/null || \
+##                 { echo "ERROR: facility file $infile does not end in .msg";
+##                   exit 1; }
+##               if test -r $infile; then
+##                   : OK
+##               else
+##                   echo "Facility file $infile missing or not readable"
+##                   exit 1
+##               fi
+##               # Extract the facility name and code from the .msg file
+##               # Format is `.FACILITY name,code/PREFIX=xxx'
+##               AC_MSG_CHECKING([facility and code in $infile])
+##               eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/_s_facname=\1; _s_faccode=\2;/p;q;}' $infile`]
+##               _s_facname=[`echo $_s_facname | tr '[A-Z]' '[a-z]'`]
+##               _s_FACNAME=[`echo $_s_facname | tr '[a-z]' '[A-Z]'`]
+##               AC_MSG_RESULT([$_s_facname/$_s_faccode])
+##               # Note quoting below: doubly escaped newline
+##               MESSGEN_DEPENDENCIES="${MESSGEN_DEPENDENCIES}${_s_FACNAME}_ERR ${_s_facname}_err ${_s_facname}_err.h fac_${_s_faccode}_err: ${infile}_stamp\\
+## "
+##               STAR_HELP_FILES(fac_${_s_faccode}_err)
+##               _STAR_EXTRA_DIST(fac_${_s_faccode}_err)
+##           done
+##           STAR_DECLARE_BUILD_DEPENDENCIES(messgen)
+## ])# STAR_MESSGEN
 
-## # STAR_FACILITY_CODE(code, [fac=$PACKAGE], [msgfile=$fac_err.msg])
-## # ----------------------------------------------------------------
-## # Declare the facility code corresponding to this package.
-## #
-## # Arg 1 is numeric facility code, set to ERR_FACILITY_CODE and AC_SUBSTed
-## #
-## # Arg 2 is the facility name, set to ERR_FACILITY_NAME and
-## # AC_SUBSTed.  This defaults to the package name.
-## #
-## # Arg 3 is the name of the source .msg file, which defaults to
-## # $fac_err.msg, and thus defaults to $PACKAGE_err.msg if argument 2 is
-## # unspecified.
-## #
-## # About the only time when you need to use non-default arguments here
-## # is when you have more than one facility file in a directory, at
-## # least one of which (necessarily) has a facility name different from
-## # the package.
-## #
-## # In either case, the message file should be made available in a
-## # message source file (default $PACKAGE_err.msg.in) which has the
-## # facility code as @ERR_FACILITY_CODE@, and this should be listed in a
-## # AC_CONFIG_FILES line.
-## #
-## # The generated _err files should be listed as sources in the
-## # Makefile.am if they are used in code, or are to be installed.
-## #
-## # As a side-effect of this macro, the file fac_code_err is installed
-## # in the help directory, and added to the distribution.
-## #
-## dnl AC_DEFUN([STAR_FACILITY_CODE],
-## dnl 	 [AC_REQUIRE([_STAR_BOILERPLATE])dnl
-## dnl ERR_FACILITY_CODE=$1
-## dnl AC_SUBST(ERR_FACILITY_CODE)dnl
-## dnl ERR_FACILITY_FILES="${PACKAGE}_err ${PACKAGE}_err.h fac_$1_err"
-## dnl AC_SUBST(ERR_FACILITY_FILES)dnl
-## dnl _star_tmp=m4_ifval([$2], [$2], [${PACKAGE}_err.msg])
-## dnl _star_tmp2=`echo ${PACKAGE}_err | tr '[a-z]' '[A-Z]'`
-## dnl cat >>$STAR_BOILERPLATE <<EOD
-## dnl #  Rules for generating files built by the error message system.
-## dnl #  ------------------------------------------------------------
-## dnl $_star_tmp2:      $_star_tmp; \$(STARLINK)/bin/messgen -F $_star_tmp
-## dnl ${PACKAGE}_err:   $_star_tmp; \$(STARLINK)/bin/messgen -f $_star_tmp
-## dnl ${PACKAGE}_err.h: $_star_tmp; \$(STARLINK)/bin/messgen -c $_star_tmp
-## dnl fac_$1_err:       $_star_tmp; \$(STARLINK)/bin/messgen -e $_star_tmp
-## dnl EOD
-## dnl STAR_DECLARE_BUILD_DEPENDENCIES(messgen)
-## dnl STAR_HELP_FILES(fac_$1_err)
-## dnl _STAR_EXTRA_DIST(fac_$1_err)
-## dnl ])# STAR_FACILITY_CODE
-
-
-
-# STAR_FPP_SOURCES(fpp-sources)
-# -----------------------------
-#
-# Declares one or more files as Fortran files which should be
-# processed by being run through a Fortran preprocessor.  The source
-# files should have the extension .fpp, but should be listed here
-# without any extension.
-#
-# To use the FPP facilities, you must do several things: (i) call the
-# autoconf macros AC_PROG_FPP, AC_PROG_F77 and AC_PROG_LIBTOOL, before
-# calling this macro; (ii) you must declare in _Makefile.am_ that
-# the suffix .fpp exists, by including the line `.fpp.f:' somewhere in
-# the file; (iii) the object you are building must have a
-# dependency on at least one .f file, in order to prompt automake to
-# do its Fortran magic.  For example, the following is a suitable set
-# of declarations
-#
-#    bin_PROGRAMS = example
-#    example_SOURCES = example1.fpp example2.f example3.c
-#    .fpp.f:
-#
-# Requirements (ii) and (iii) are undeniably ugly, but it is difficult
-# to avoid them without patching automake.  They should be regarded as
-# temporary measures, as we may find a way to fix this in future.  See
-# <http://sources.redhat.com/ml/automake/2000-07/msg00043.html> for
-# Martin Wilck's automake patches.
-#
-# Dependency: AC_PROG_FPP, and variables like FPP, depend on the
-# macros in extra-fortran.m4 being extracted by starconf, and
-# make-starconf.in scans for this macro name to tell it to extract the
-# file.
-#
-AC_DEFUN([STAR_FPP_SOURCES],
-         [AC_REQUIRE([_STAR_BOILERPLATE])dnl
-          AC_REQUIRE([AC_PROG_FPP])dnl
-          m4_ifval([$1], [], [AC_FATAL([$0: called with no sources])])dnl
-          if test "$FPP_SOURCE_EXT" = f; then
-              # Preprocessor must be run separately before invoking the
-              # F77 compiler, and we need to declare that the objects
-              # depend on the generated .f files
-	      cat >>$STAR_BOILERPLATE <<\_EOD
-# Build rules for compiling .fpp files indirectly,
-# by calling the preprocessor separately
-_EOD
-              for _t in $1
-              do
-                  cat >>$STAR_BOILERPLATE <<EOD
-$_t.o: $_t.f
-$_t.lo: $_t.f
-EOD
-              done
-              cat >>$STAR_BOILERPLATE <<\_EOD
-.fpp.f:
-	$(FPP) $(DEFS) $(INCLUDES) $(FPPFLAGS) $(CPPFLAGS) $< $(FPP_OUTPUT)
-_EOD
-          else
-              # The compiler can handle .fpp files directly, so add rules
-              # expressing this.  Add DEFAULT_INCLUDES to the compile
-              # flags so that -I. is added -- is this OK? (this really
-              # would be better fixed by automake patches...)
-              dnl Use quadrigraph for dollar, to avoid m4 interpreting $[]@
-              cat >>$STAR_BOILERPLATE <<\_EOD
-# Build rules for compiling .fpp files direct to objects
-.fpp.o:
-	$(F77COMPILE) $(DEFAULT_INCLUDES) -c -o @S|@@ `test -f '$<' || echo '$(srcdir)/'`$<
-.fpp.obj:
-	$(F77COMPILE) $(DEFAULT_INCLUDES) -c -o @S|@@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
-.fpp.lo:
-	$(LTF77COMPILE) $(DEFAULT_INCLUDES) -c -o @S|@@ `test -f '$<' || echo '$(srcdir)/'`$<
-_EOD
-          fi
-])# STAR_FPP_SOURCES
 
 
 # STAR_HAVE_F77_OPEN_READONLY
@@ -312,127 +229,43 @@ AC_DEFUN([STAR_HAVE_F77_OPEN_READONLY],
 ])
 
 
-dnl # STAR_F77_C_SYMBOLS
-dnl # ------------------
-dnl AC_DEFUN([STAR_F77_C_SYMBOLS],
-dnl 	 [AC_REQUIRE([AC_PROG_F77])dnl
-dnl           AC_REQUIRE([AC_PROG_CC])dnl
-dnl AC_MSG_CHECKING([how to make Fortran produce C-compatible symbols])
-dnl AC_LANG_PUSH([C])
-dnl AC_LANG_CONFTEST(
-dnl   [AC_LANG_SOURCE([void testfunc() {}])])
-dnl if (eval $ac_compile) 2>&5; then
-dnl   mv conftest.$ac_objext c-conftest.$ac_objext
-dnl else
-dnl   AC_MSG_ERROR([cannot compile a C program!])
-dnl fi
-dnl AC_LANG_POP([C])
-dnl AC_LANG_PUSH([Fortran 77])
-dnl AC_LANG_CONFTEST(
-dnl   [AC_LANG_PROGRAM([], [      CALL testfunc])])
-dnl star_f77_c_symbols=X
-dnl for opt in "" "-fno-second-underscore"
-dnl do
-dnl   echo "Trying opt=$opt"
-dnl   if $F77 $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5; then
-dnl     star_f77_c_symbols=$opt
-dnl     break
-dnl   else
-dnl     echo "opt=$opt didn't work"
-dnl   fi
-dnl done
-dnl if test "$star_f77_c_symbols" = X; then
-dnl         for x in conftest*; do cp $x saved-$x;done
-dnl   AC_MSG_ERROR([cannot work out how])
-dnl else
-dnl   AC_MSG_RESULT([option <$star_f77_c_symbols>])
-dnl fi
-dnl AC_LANG_POP([Fortran 77])
-dnl ])# STAR_F77_C_SYMBOLS
-
-# _STAR_MAKE_MANIFEST
-# ------------------
-#
-# At install time, also make a manifest, by adding the install target
-# `manifest-install'.  This wraps the autodiscovered install command
-# using the script install-with-manifest.  Internal macro, called from
-# within STAR_DEFAULTS.
-#
-# This isn't completely satisfactory, since the install-with-manifest
-# script (currently) simply appends names to a file called MANIFEST,
-# and it has no way of either clearing that file before the
-# installation starts or renaming it away after it completes (automake
-# has install hooks, but the configuration work here is being done on
-# the Makefile.in _after_ automake completes).  This problem is dealt
-# with to some extent by creating the `manifest-install' target.
-#
-# As a separate problem, there's nothing to stop a parallelised make
-# setting off two copies of the script, so that two processes try to
-# append to the file simultaneously.  A fix to this would probably
-# need to be sophisticated enough that it could fix the other problem
-# as well.
-#
-# Dependency: the makefile fragment below relies on starconf correctly
-# including install-with-manifest.in
-AC_DEFUN([_STAR_MAKE_MANIFEST],
-[#
-AC_REQUIRE([_STAR_BOILERPLATE])
-# Declare where the manifests should live.  This is slightly
-# complicated: we want to use this at configure time to check that
-# dependencies have in fact been installed, but it ought to depend on
-# $(prefix), since the user has the freedom to install things
-# elsewhere, and will expect the manifests to go in the same place.
-# We can't do anything other than accept, and document, that the user
-# can confuse things here.  It doesn't matter too much, really, as the
-# dependency check isn't crucial.  XXX revisit this.
-#
-# Ooooh, bad, this logic is probably mildly implementation dependent
-if test x$prefix = xNONE; then
-    current_MANIFESTS=$ac_default_prefix/manifests
-else
-    current_MANIFESTS=$prefix/manifests
-fi
-STAR_MANIFESTDIR='$(prefix)/manifests'
-AC_SUBST(STAR_MANIFESTDIR)
-# Although PACKAGE_VERSION is a default output variable, it isn't
-# added as a Makefile variable by default.  We need it below, however,
-# so add it now.
-AC_SUBST(PACKAGE_VERSION)
-dnl   The $[]@ quoting below is because $@ means rest-of-args to m4
-cat >>$STAR_BOILERPLATE <<\_EOD
-# Create an install manifest, and install it in the required manifest location
-# Create install-manifest.xml file, using the MANIFEST file generated
-# by install-with-manifest
-install-manifest.xml: install-with-manifest
-	rm -f MANIFEST; touch MANIFEST
-	$(MAKE) INSTALL=./install-with-manifest install
-	rm -f $[]@
-	echo "<?xml version='1.0'?>"                     >$[]@
-	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >>$[]@
-	echo "<manifest component='$(PACKAGE)'>"         >>$[]@
-	echo "<version>$(PACKAGE_VERSION)</version>"     >>$[]@
-	echo "<files>"                                   >>$[]@
-	cat MANIFEST                                     >>$[]@
-	echo "</files>"                                  >>$[]@
-	echo "</manifest>"                               >>$[]@
-	rm -f MANIFEST
-# Install the install-manifest.xml into the $(STAR_MANIFESTDIR) directory.
-# We should respect $(DESTDIR), but needn't worry about $(srcdir),
-# since we know that the file was created in the current directory.
-install-manifest: install-manifest.xml
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(STAR_MANIFESTDIR)
-	$(INSTALL_DATA) install-manifest.xml \
-		$(DESTDIR)$(STAR_MANIFESTDIR)/$(PACKAGE)
-# The following rule is redundant (install-with-manifest.in must exist
-# in order for ./configure to run without error), but leave it in for
-# its documentation value.
-install-with-manifest.in:
-	./starconf.status
-_EOD
-AC_CONFIG_FILES(install-with-manifest, [chmod +x install-with-manifest])
-])# _STAR_MAKE_MANIFEST
-
+## # STAR_F77_C_SYMBOLS
+## # ------------------
+## NOTAC_DEFUN([STAR_F77_C_SYMBOLS],
+## 	 [AC_REQUIRE([AC_PROG_F77])dnl
+##           AC_REQUIRE([AC_PROG_CC])dnl
+## AC_MSG_CHECKING([how to make Fortran produce C-compatible symbols])
+## AC_LANG_PUSH([C])
+## AC_LANG_CONFTEST(
+##   [AC_LANG_SOURCE([void testfunc() {}])])
+## if (eval $ac_compile) 2>&5; then
+##   mv conftest.$ac_objext c-conftest.$ac_objext
+## else
+##   AC_MSG_ERROR([cannot compile a C program!])
+## fi
+## AC_LANG_POP([C])
+## AC_LANG_PUSH([Fortran 77])
+## AC_LANG_CONFTEST(
+##   [AC_LANG_PROGRAM([], [      CALL testfunc])])
+## star_f77_c_symbols=X
+## for opt in "" "-fno-second-underscore"
+## do
+##   echo "Trying opt=$opt"
+##   if $F77 $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5; then
+##     star_f77_c_symbols=$opt
+##     break
+##   else
+##     echo "opt=$opt didn't work"
+##   fi
+## done
+## if test "$star_f77_c_symbols" = X; then
+##         for x in conftest*; do cp $x saved-$x;done
+##   AC_MSG_ERROR([cannot work out how])
+## else
+##   AC_MSG_RESULT([option <$star_f77_c_symbols>])
+## fi
+## AC_LANG_POP([Fortran 77])
+## ])# STAR_F77_C_SYMBOLS
 
 
 # STAR_LATEX_DOCUMENTATION(documentcode, [targets])
@@ -450,103 +283,50 @@ AC_CONFIG_FILES(install-with-manifest, [chmod +x install-with-manifest])
 # anything complicated done, they should use this second argument and
 # provide rules for satisfying the given targets.
 AC_DEFUN([STAR_LATEX_DOCUMENTATION],
-[AC_REQUIRE([_STAR_BOILERPLATE])dnl
-m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
-m4_ifval([$2],
-         [dnl non-empty second argument -- just add to variable
-	  _STAR_EXTRA_DIST($2)
-	  STAR_DOC_FILES($2)],
-	 [dnl second arg empty -- use defaults
-	  for d in $1; do
-              docno=`basename $d .tex`
-              cat >>$STAR_BOILERPLATE <<EOD
-$docno.dvi: $docno.tex
-	latex $docno
-$docno.ps: $docno.dvi
-	dvips -o $docno.ps $docno.dvi
-$docno.htx: $docno.tex
-	star2html $docno.tex
-$docno.htx_tar: $docno.htx
-	tar cf $docno.htx_tar $docno.htx
-EOD
-              _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
-	      STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
-	  done
-	  dnl STAR_DECLARE_BUILD_DEPENDENCIES(star2html)
-])dnl
+         [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
+          STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
+          m4_ifval([$2],
+                   [dnl non-empty second argument -- just add to variable
+                    _STAR_EXTRA_DIST($2)
+                    STAR_DOC_FILES($2)],
+                   [dnl second arg empty -- use defaults
+                    for d in $1
+                    do
+                        docno=[`basename $d .tex`]
+                        _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
+                        STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
+                    done
+                    dnl STAR_DECLARE_BUILD_DEPENDENCIES(star2html)
+                   ])dnl
 ])# STAR_LATEX_DOCUMENTATION
 
 
 
 # STAR_HELP_FILES(helpfiles)
 # --------------------------
-#
 # Declare a list of files to be installed into the Starlink help
 # directory.  This can be used both internally and in user
 # configure.ac files.
-#
 AC_DEFUN([STAR_HELP_FILES],
-	 [_STAR_EXTRADIR_BOILERPLATE([help],[HELP])
-          _STAR_INSTALL_HELP="$_STAR_INSTALL_HELP $1"
-])# STAR_HELP_FILES
+	 [_STAR_EXTRADIR_COMMON([help], [$1])])
 
 
 # STAR_ETC_FILES(etcfiles)
 # ------------------------
-#
 # Declare a list of files to be installed into the Starlink etc
 # directory.  This can be used both internally and in user
 # configure.ac files.
-#
 AC_DEFUN([STAR_ETC_FILES],
-         [_STAR_EXTRADIR_BOILERPLATE([etc],[ETC])
-          _STAR_INSTALL_ETC="$_STAR_INSTALL_ETC $1"
-])# STAR_ETC_FILES
+         [_STAR_EXTRADIR_COMMON([etc], [$1])])
 
 
 # STAR_DOC_FILES(docfiles)
 # ------------------------
-#
 # Declare a list of files to be installed into the Starlink
 # documentation directory.  This can be used both internally and in
 # user configure.ac files.
-#
 AC_DEFUN([STAR_DOC_FILES],
-         [_STAR_EXTRADIR_BOILERPLATE([docs],[DOCS])
-          _STAR_INSTALL_DOCS="$_STAR_INSTALL_DOCS $1"
-])# STAR_DOC_FILES
-
-
-# _STAR_EXTRADIR_BOILERPLATE(dirname,DIRNAME)
-# -------------------------------------------
-#
-# Add the boilerplate for installing stuff in the appropriate
-# directory.  Arguments are the directory name in both lower and upper
-# case -- for example `etc' and `ETC'.
-#
-AC_DEFUN([_STAR_EXTRADIR_BOILERPLATE],
-[AC_REQUIRE([_STAR_BOILERPLATE])dnl
-m4_ifval([$1], [], [AC_FATAL([$0: called with no args])])dnl
-m4_ifval([$2], [], [AC_FATAL([$0: called with only one arg])])dnl
-if test "X$_STAR_INSTALL_$2" = X; then
-    # First time
-    STAR_$2DIR='$(prefix)/$1'
-    AC_SUBST(STAR_$2DIR)
-    AC_SUBST(_STAR_INSTALL_$2)
-    cat >>$STAR_BOILERPLATE <<\_EOD
-install-star$1: $(_STAR_INSTALL_$2) 
-	@ $(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(STAR_$2DIR)
-	@ list='$(_STAR_INSTALL_$2)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_$2DIR)/$$f"; \
-	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_$2DIR)/$$f; \
-	done
-_EOD
-    _STAR_INSTALL_DATA_LOCAL="$_STAR_INSTALL_DATA_LOCAL install-star$1"
-fi
-])# _STAR_EXTRADIR_BOILERPLATE
+         [_STAR_EXTRADIR_COMMON([docs], [$1])])
 
 
 # STAR_DECLARE_BUILD_DEPENDENCIES(packagelist)
@@ -554,10 +334,8 @@ fi
 #
 # Declare a space-separated list of packages/components which the
 # build of this package depends on.  The packages here are tested to
-# ensure thay do exist (XXX possibly precarious, for the reasons
-# mentioned in _STAR_MAKE_MANIFEST -- should revisit this), and the
-# list is available for substitution in the AC_SUBST-ed variable
-# [@STAR_BUILD_DEPENDENCIES@].
+# ensure thay do exist, and the list is available for substitution in
+# the AC_SUBST-ed variable [@STAR_BUILD_DEPENDENCIES@]. 
 #
 # For libraries, this refers to packages which provide include files
 # which must be present for this package to compile, or libraries
@@ -627,8 +405,8 @@ AC_DEFUN([STAR_DECLARE_USE_DEPENDENCIES],
 # PLATFORM-LIST based on the value of [AC_CANONICAL_BUILD].  Both
 # lists are space-separated lists.
 #
-# For each of the platforms, p, in platform-list, there should be a
-# file `<target-file>p'.  There should always be a file
+# For each of the platforms, <p>, in platform-list, there should be a
+# file `<target-file><p>'.  There should always be a file
 # `<target-file>default', and if none of the platform-list strings
 # matches, this is the file which is used.  If the `default' file is
 # listed in the `platform-list', then it is matched in the normal run
@@ -688,10 +466,10 @@ if test -z "$_star_tmp"; then
     AC_MSG_WARN([build platform $build does not match any of ($2): using `default'])
     _star_tmp=default
 fi    
-AC_MSG_RESULT([using $_star_tmp])
 if test $_star_tmp = NONE; then
     AC_MSG_RESULT([none required])
 else
+    AC_MSG_RESULT([using $_star_tmp])
     for _t in $1
     do
         if test -e $srcdir/$_t$_star_tmp; then
@@ -708,6 +486,39 @@ fi
 # starconf internal macros
 
 
+# _STAR_UPCASE(string)
+# --------------------
+# Expands to STRING with all letters translated to uppercase
+AC_DEFUN([_STAR_UPCASE],
+         [m4_translit([$1],
+                      [abcdefghijklmnopqrstuvwxyz],
+                      [ABCDEFGHIJKLMNOPQRSTUVWXYZ])])
+
+
+# _STAR_EXTRADIR_COMMON(dir-type, file-list)
+# ------------------------------------------
+#
+# Common handler for STAR_HELP_FILES, etc.  DIR-TYPE is one of `help',
+# `etc', `docs', and `FILE-LIST' is a list of files to be installed in
+# the directory STAR_[DIR-TYPE]_DIR.  This works by defining and
+# AC_SUBSTing the variables `starX_STARDATA and
+# starXdir for X=dir-type (eg, `stardocs_STARDATA' and `stardocdir').
+# The form of these variables is governed by the data.am template in automake.
+# Starlink-automake recognises the `primary' STARDATA and handles it
+# appropriately.
+AC_DEFUN([_STAR_EXTRADIR_COMMON],
+         [m4_ifval([$1], [], [AC_FATAL([$0: called with zero args])])dnl
+          m4_ifval([$2], [], [AC_FATAL([$0: called with only one arg])])dnl
+          if test "X[$]star$1_STARDATA" = X; then
+              # First time
+##              [STAR_]_STAR_UPCASE($1)[_DIR]='$(prefix)/$1'
+##              AC_SUBST([STAR_]_STAR_UPCASE($1)[_DIR])dnl
+              AC_SUBST(star$1_STARDATA)dnl
+              AC_SUBST(star$1[]dir, '$(prefix)/$1')dnl
+          fi
+          star$1_STARDATA="[$]star$1_STARDATA $2"
+])# _STAR_EXTRADIR_COMMON
+
 
 # _STAR_EXTRA_DIST(filelist)
 # --------------------------
@@ -716,71 +527,18 @@ fi
 # the distribution.  This has the same function as automake's
 # EXTRA_DIST rule, and the way it should be used is as follows
 #
-# If there is no EXTRA_DIST variable set in the Makefile.am, then a
-# variable is created in Makefile.in, of the form `EXTRA_DIST =
-# @EXTRA_DIST@', and it is the accumulated value of EXTRA_DIST which
-# is substituted in.  If you use EXTRA_DIST in the Makefile.am, you
-# should use it as `EXTRA_DIST = xxx @EXTRA_DIST@', so that the values
-# here will be appended to it
+# #If there is no EXTRA_DIST variable set in the Makefile.am, then a
+# #variable is created in Makefile.in, of the form `EXTRA_DIST =
+# #@EXTRA_DIST@', and it is the accumulated value of EXTRA_DIST which
+# #is substituted in.  If you use EXTRA_DIST in the Makefile.am, you
+# #should use it as `EXTRA_DIST = xxx @EXTRA_DIST@', so that the values
+# #here will be appended to it
 #
 AC_DEFUN([_STAR_EXTRA_DIST],
 	 [m4_ifval([$1], [], 
                          [AC_FATAL([$0: called with empty filelist])])dnl
-          EXTRA_DIST="$EXTRA_DIST $1"
+          STAR_EXTRA_DIST="$STAR_EXTRA_DIST $1"
 ])# _STAR_EXTRA_DIST
-
-
-
-# _STAR_BUILT_SOURCES(filelist)
-# ----------------------------
-#
-# Declare a space-separated list of files which are `generated
-# sources', in automake parlance, and so should be built early.
-#
-# This has a similar status to, and is used in the same way as
-# EXTRA_DIST -- see _STAR_EXTRA_DIST for details.
-#
-AC_DEFUN([_STAR_BUILT_SOURCES],
-	 [m4_ifval([$1], [], 
-                         [AC_FATAL([$0: called with empty filelist])])dnl
-          BUILT_SOURCES="$BUILT_SOURCES $1"
-])# _STAR_BUILT_SOURCES
-
-
-
-# _STAR_BOILERPLATE
-# -----------------------
-# Utility macro.  If the variable STAR_BOILERPLATE is not already defined,
-# define it to be a file which will contain boilerplate fragments of
-# makefile, which will be appended to the Makefile at the end of the
-# configuration run.
-# 
-# Any macros which need to write boilerplate should [AC_REQUIRE] this
-# macro, then write their boilerplate to the file $STAR_BOILERPLATE
-AC_DEFUN([_STAR_BOILERPLATE],
-[if test -z "$STAR_BOILERPLATE"; then
-  STAR_BOILERPLATE=Makefile.starconfextras
-  cat >$STAR_BOILERPLATE <<\_EOD
-# Starlink boilerplate additions to Makefile
-# Generated by ./configure and starconf
-#
-_EOD
-  # XXX Is this the best way of manipulating DISTCLEANFILES,
-  # or is it an automake special variable?
-  DISTCLEANFILES="$DISTCLEANFILES $STAR_BOILERPLATE"
-  AC_CONFIG_COMMANDS([star_boilerplate],
-                     [#
-    if test -n "$_star_boilerplate" -a -e "$_star_boilerplate"; then
-        echo ""                                         >>Makefile
-        cat $_star_boilerplate                          >>Makefile
-        # Don't delete the boilerplate file -- we need it around for 
-        # when config.status is run
-    else
-        echo "Ooops, the file $_star_boilerplate seems to have disappeared"
-        # but carry on regardless....
-    fi], [_star_boilerplate=$STAR_BOILERPLATE])
-fi])# _STAR_BOILERPLATE
-
 
 
 # end of starconf macros

@@ -20,23 +20,36 @@ dnl   macro).  If you wish to relocate this starconf package to match
 dnl   STARLINK, do so with --prefix=$STARLINK/buildsupport
 AC_PREFIX_DEFAULT(/star/buildsupport)
 
-dnl   Specify the default prefix of components configured by this tool.
-dnl   This can be specified either by giving DEFAULT_STARLINK=xxx as a
-dnl   parameter to the ./configure command, or by letting it be
-dnl   defaulted from the current value of STARLINK.  This need not be
-dnl   the same as the definition of AC_PREFIX_DEFAULT above.
-AC_ARG_VAR(DEFAULT_STARLINK, [Default installation directory of components])
-dnl test -n "$STARLINK" || STARLINK=/star
-dnl test -n "$DEFAULT_STARLINK" || DEFAULT_STARLINK=$STARLINK
-if test -z "$DEFAULT_STARLINK"; then
-    if test -n "$STARLINK"; then
-        DEFAULT_STARLINK=$STARLINK
-    else
-        DEFAULT_STARLINK=/star
-    fi
-fi
+dnl   Specify the default location of a currently installed Starlink
+dnl   tree.  This is where we will look for any Starlink tools we need
+dnl   to use while we are building the software.  This can be
+dnl   specified either by giving DEFAULT_STARLINK=xxx as a parameter to
+dnl   the ./configure command, or by letting it be defaulted from the
+dnl   current value of $DEFAULT_STARLINK, $STARLINK or "/star"
+dnl   (whichever is non-empty)
+AC_ARG_VAR(DEFAULT_STARLINK,
+           [Default location of a currently installed Starlink tree])
+for s in "$DEFAULT_STARLINK" "$STARLINK" /star
+do
+        echo "default_starlink=$s ???"
+    test -n "$s" && DEFAULT_STARLINK=$s && break
+done
 
-dnl Find working install and ln programs
+dnl   Specify the default intallation prefix of components configured
+dnl   by this tool.  This can be specified either by giving
+dnl   DEFAULT_PREFIX=xxx as a parameter to the ./configure command, or
+dnl   by letting it be defaulted from the current value of
+dnl   DEFAULT_PREFIX, DEFAULT_STARLINK, STARLINK or "/star".  This
+dnl   need not be the same as the definition of AC_PREFIX_DEFAULT
+dnl   above.
+AC_ARG_VAR(DEFAULT_PREFIX,
+           [Default installation directory of components])
+for s in "$DEFAULT_PREFIX" "$DEFAULT_STARLINK" "$STARLINK" /star
+do
+    test -n "$s" && DEFAULT_PREFIX="$s" && break
+done
+
+dnl   Find working tools
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PATH_PROG(PERL, perl)

@@ -173,4 +173,18 @@ Makefile variable, for example in an EXTRA_DIST Makefile.am line.  If
 users need anything complicated done, they should probably not use
 this standard target.
 
+Do NOT use AC_CHECK_LIB to check for the presence of Starlink
+libraries.  This is because (a) the configuration work should presume
+that all Starlink dependencies are satisfied, and (b) this sort of
+dependency checking is done by the master Makefile, so LDFLAGS and co
+are made correct, and it's confusing if other scripts try to do it as
+well.  If it's appropriate, feel free to check for the presence of
+non-Starlink libraries elsewhere than in the Starlink tree.
 
+Although automake wants you to add linker flags to LDADD or
+<program>_LDADD, this does not work if you are using the *_link or
+*_link_adam scripts (automake gets confused and tries to look for a
+dependency `xxx_link_adam`).  Instead, use the <program>_LDFLAGS
+variable, which is provided expressly for such uninterpreted linker
+options and flags.  The parsecon library, and its build of compifl, is
+a good model here.
