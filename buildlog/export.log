@@ -259,4 +259,4 @@ create_archives:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/task/build.xml:516: /apps/cvsbuild/java/source/task/bin not found.
 
-Total time: 4 minutes 52 seconds
+Total time: 4 minutes 51 seconds
