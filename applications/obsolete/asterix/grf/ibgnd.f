@@ -1962,19 +1962,15 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	print *,'region type = ',i_reg_type
-
-
 *  Region definition exists?
-      REGEX = (I_REG_TYPE .NE. 'NONE')
+      REGEX = (I_REG_TYPE .EQ. 'COMPLEX')
 
 *  If no region defined, and no data quality present
-      IF ( (I_REG_TYPE .EQ. 'NONE') .AND. .NOT. (I_QOK.AND.I_BAD) ) THEN
+      IF ( (.NOT. REGEX) .AND. .NOT. (I_QOK.AND.I_BAD) ) THEN
         CALL ARR_INIT1I( 1, NX*NY, IDX, STATUS )
 
 *  Otherwise must test each pixel
       ELSE
-	print *,'Using quality'
 
 *    Loop over whole image
         DO J = 1, NY
@@ -1998,7 +1994,6 @@
         END DO
 
       END IF
-	call flush(6)
 
 *  Force pixels inside source circles to bad
       DO S = 1, I_BGM_NSRC
