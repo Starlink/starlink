@@ -123,7 +123,7 @@
       INTEGER                   NOBJ
         PARAMETER               ( NOBJ = 6 )
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AXFLIP Version V2.1-0' )
+        PARAMETER		( VERSION = 'AXFLIP Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*80            	HTXT			! History text
