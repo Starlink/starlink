@@ -455,7 +455,8 @@ CATLIBINSTALLDIR=catlib-install
 PUBLIC_SCRIPTS = autoastrom autoastrom.pm
 
 #  List of other library files which will be installed.
-LIBRARY_FILES = moggy/Moggy.pm misc/extractor.config misc/extractor.param
+LIBRARY_FILES = moggy/Moggy.pm misc/extractor.config misc/extractor.param \
+	plugin-match-match.pl
 
 #  List of documentation files.
 DOCUMENTATION = $(PKG_NAME).news sun242.tar-htx sun242.tar-tex sun242.xml
