@@ -141,6 +141,7 @@ void	readimagehead(picstruct *field)
       } else {
         as->wcs_flag = 1;
       }
+      if ( status != SAI__OK ) errAnnul( &status );
     } 
     else {
       /*  No WCS */
