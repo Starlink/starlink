@@ -1,4 +1,4 @@
-      SUBROUTINE ADI1_LOCAST( ID, ALOC, STATUS )
+      SUBROUTINE ADI1_LOCAST( ID, CREATE, ALOC, STATUS )
 *+
 *  Name:
 *     ADI1_LOCAST
@@ -10,15 +10,18 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI1_LOCAST( ID, ALOC, STATUS )
+*     CALL ADI1_LOCAST( ID, CREATE, ALOC, STATUS )
 
 *  Description:
 *     Locate ASTERIX structure given HDS object. The routine first
-*     checks that the object has not already been found.
+*     checks that the object has not already been found, but only creates
+*     it if CREATE is specified true.
 
 *  Arguments:
 *     ID = INTEGER (given)
 *        ADI identifier referencing HDS object
+*     CREATE = LOGICAL (given)
+*        Create component if it doesn't exist?
 *     ALOC = CHARACTER*(DAT__SZLOC) (returned)
 *        Locate to ASTERIX object
 *     STATUS = INTEGER (given and returned)
@@ -88,6 +91,7 @@
 
 *  Arguments Given:
       INTEGER			ID			! ADI identifier
+      LOGICAL			CREATE			! Create if not there?
 
 *  Arguments Returned:
       CHARACTER*(DAT__SZLOC)	ALOC			! HEADER locator
@@ -101,6 +105,7 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Object locator
+      CHARACTER*(DAT__SZLOC)	MLOC			! MORE box locator
 
       LOGICAL			THERE			! Property exists?
 *.
@@ -113,8 +118,12 @@
       IF ( THERE ) THEN
         CALL ADI_CGET0C( ID, APROPN, ALOC, STATUS )
       ELSE
-        CALL ADI1_GETLOC( ID, LOC, STATUS )
-        CALL ADI1_FIND( LOC, 'MORE.ASTERIX', ALOC, STATUS )
+        CALL ADI1_LOCMORE( ID, CREATE, MLOC, STATUS )
+        CALL DAT_THERE( MLOC, 'ASTERIX', THERE, STATUS )
+        IF ( CREATE .AND. .NOT. THERE ) THEN
+          CALL DAT_NEW( MLOC, 'ASTERIX', 'EXTENSION', 0, 0, STATUS )
+        END IF
+        CALL ADI1_FIND( MLOC, 'ASTERIX', ALOC, STATUS )
         CALL ADI_CPUT0C( ID, APROPN, ALOC, STATUS )
       END IF
 
