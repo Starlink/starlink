@@ -2,7 +2,7 @@
 
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libfig.la
+noinst_LTLIBRARIES = libfig.la
 
 libfig_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) 
 
