@@ -4,7 +4,7 @@
 #elif HAVE_INTRINSIC_ANINT
 #  define xNINT ANINT
 #else
-#  error Neither NINT nor ANINT is available
+ error Neither NINT nor ANINT is available
 #endif
 
 *+

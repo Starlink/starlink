@@ -138,10 +138,10 @@ NORMAL_INCLUDES = \
 PLATFORM_INCLUDES = NUM_DEF_D NUM_DEF_R NUM_DEF_CVT NUM_CMN
 
 # Here are the dependencies for these files
-NUM_CMN: NUM_CMN.fpp
-NUM_DEF_D: NUM_DEF_D.fpp
-NUM_DEF_R: NUM_DEF_R.fpp
-NUM_DEF_CVT: NUM_DEF_CVT.fpp
+#NUM_CMN: NUM_CMN.fpp
+#NUM_DEF_D: NUM_DEF_D.fpp
+#NUM_DEF_R: NUM_DEF_R.fpp
+#NUM_DEF_CVT: NUM_DEF_CVT.fpp
 
 # These files are created by being run through the Fortran preprocessor.
 # Define the rule to do this.
