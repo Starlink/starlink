@@ -1,0 +1,11 @@
+
+ This is the news file for the starX environment package.
+
+ StarX is the X11 library link-compatability package to allow system
+ independent linking against the X11 libraries.  This system allows
+ for system dependencies in the X11 link requirements, particularly for
+ Solaris 2.4 and above.
+
+ It should be built in the Starlink Software Environment Library system,
+ before any systems that require X11 linking.
+

@@ -1,0 +1,1 @@
+echo -lXext -lX11 -lstarXext -lstarX11
