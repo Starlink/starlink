@@ -58,6 +58,7 @@ C
 C     Functions
 C
       INTEGER DYN_ELEMENT
+      EXTERNAL DYN_ELEMENT
 C
 C     Local variables
 C
