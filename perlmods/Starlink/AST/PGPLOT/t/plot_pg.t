@@ -105,6 +105,17 @@ $plot->Mark( 6, [0.6,0.5,0.4], [0.3, 0.2,0.2]  );
 $plot->Set( Colour => 2, Width => 5 );
 $plot->PolyCurve( [0.2,0.3,0.25], [0.8,0.5,0.5]);
 
+# Plot some RA/Dec points
+my $ra1 = $wcsinfo->Unformat( 1, "0:40:00" );
+my $dec1 = $wcsinfo->Unformat( 2, "41:30:00" );
+my $ra2 = $wcsinfo->Unformat( 1, "0:44:00" );
+my $dec2 = $wcsinfo->Unformat( 2, "42:00:00" );
+$plot->Set(Current => 3);
+print "\n# Current Frame " . $plot->Get( "Domain" ) . "\n";
+print "# Plotting at $ra1, $dec1\n";
+print "# Plotting at $ra2, $dec2\n";
+
+$plot->Mark(24, [$ra1, $ra2],[$dec1,$dec2]);
 
 # Done!
 sleep(2);
