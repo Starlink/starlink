@@ -510,11 +510,12 @@
 
 #  Check whether the window exists and is out of date.  If so, destroy
 #  it preparatory to generating a new one.
-         if { [ array names itk_component info$index ] != "" && \
-              ( $noted($index,domain) != $domain || \
-                $noted($index,showfits) != $showfits ) } {
-            destroy $itk_component(info$index)
-            unset itk_component(info$index)
+         if { [ array names itk_component info$index ] != "" } {
+            if { $noted($index,domain) != $domain || \
+                 $noted($index,showfits) != $showfits } {
+               destroy $itk_component(info$index)
+               unset itk_component(info$index)
+            }
          }
 
 #  Check whether the window already exists.  If it does not, all we need
@@ -551,12 +552,13 @@
                itk_component add info$index:val_percentile {
                   percentilecontrol [ \
                      $itk_component(info$index:key_percentile) childsite ].val \
-                     -allowcustom 1 \
-                     -value $percentiles \
-                     -command [ code $this refresh $index ]
+                     -allowcustom 1
                }
                set percentilecontrol($index) \
                   $itk_component(info$index:val_percentile)
+               $percentilecontrol($index) configure \
+                  -value $percentiles \
+                  -command [ code $this refresh $index ]
                lappend controls $percentilecontrol($index)
                pack $itk_component(info$index:val_percentile)
             }
@@ -598,7 +600,6 @@
 #  Pack and align the labeled widgets.
             eval pack $lws -side top -anchor w
             eval iwidgets::Labeledwidget::alignlabels $lws
-
 
 #  Store characteristics of this info window so that we know whether 
 #  subsequent info window requests are out of date.
