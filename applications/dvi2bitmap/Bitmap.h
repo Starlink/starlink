@@ -126,6 +126,28 @@ class Bitmap {
      */
     static void logBitmapInfo (bool b) { logBitmapInfo_ = b; };
 
+    class iterator 
+    {
+    public:
+	Byte* operator*() throw (DviError);
+	iterator& operator++() throw (DviError);
+	bool operator==(const iterator& it) const;
+	bool operator!=(const iterator& it) const;
+	~iterator();
+    private:
+	iterator();
+	void init(Byte* b, int height, int width);
+	Byte* b_;
+	int rowLength_;
+	int rowNumber_;
+	int lastRow_;
+	friend class Bitmap;
+    };
+    iterator runningIterator_;
+    static iterator endIterator_;
+    iterator begin();
+    iterator end() const;
+
  private:
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
     Byte *B;

@@ -47,11 +47,13 @@
 #ifdef HAVE_STD_NAMESPACE
 using std::cout;
 using std::cerr;
+using std::endl;
 #endif
 
 #include "Bitmap.h"
 #include "BitmapImage.h"
 
+// Declare static variables
 verbosities Bitmap::verbosity_ = normal;
 int  Bitmap::cropMarginDefault[4] = { 0, 0, 0, 0 };
 bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
@@ -60,7 +62,7 @@ Bitmap::BitmapColour Bitmap::def_bg_ = {255, 255, 255};
 bool Bitmap::def_customRGB_ = false;
 bool Bitmap::logBitmapInfo_ = false;
 
-
+Bitmap::iterator Bitmap::endIterator_;
 
 // Indecision: Within scaleDown, it seems sensible to average the
 // pixel values over the complete factor*factor square, even when
@@ -69,8 +71,16 @@ bool Bitmap::logBitmapInfo_ = false;
 // then go for consistency, rather than this fudge.
 #define SCALEDOWN_COMPLETE_AVERAGE 1
 
-// Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
-// with point (0,0) in the top left corner.
+/**
+ * Create a new bitmap with the given parameters.
+ *
+ * <p>Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
+ * with point (0,0) in the top left corner.
+ *
+ * @param w the width of the bitmap, in pixels
+ * @param h the height of the bitmap, in pixels
+ * @param bpp the number of bits-per-pixel
+ */
 Bitmap::Bitmap (const int w, const int h, const int bpp)
     : W(w), H(h), frozen_(false), transparent_(false),
       customRGB_(false), bpp_(bpp)
@@ -109,7 +119,7 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
 		 << static_cast<int>(fg_.blue) << '/'
 		 << static_cast<int>(bg_.red) << ','
 		 << static_cast<int>(bg_.green) << ','
-		 << static_cast<int>(bg_.blue) << '\n';
+		 << static_cast<int>(bg_.blue) << endl;
 	customRGB_ = true;
     }
 
@@ -120,7 +130,7 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
     max_colour_ = static_cast<Byte>((1<<bpp_) - 1);
 
     if (verbosity_ > normal)
-	cerr << "new Bitmap(" << W << ',' << H << ',' << bpp_ << ")\n";
+	cerr << "new Bitmap(" << W << ',' << H << ',' << bpp_ << ")" << endl;
 }
 
 Bitmap::~Bitmap()
@@ -173,7 +183,7 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
 	     << w << ",0:" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
 	     << "). BB now [" << bbL << ':' << bbR << "), ["
-	     << bbT << ':' << bbB << ")\n";
+	     << bbT << ':' << bbB << ")" << endl;
 }
 
 
@@ -207,7 +217,7 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
 	     << w << "x" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
 	     << "). BB now [" << bbL << ':' << bbR << "), ["
-	     << bbT << ':' << bbB << ")\n";
+	     << bbT << ':' << bbB << ")" << endl;
 }
 
 // Strut is just the same as rule, except that it doesn't draw in any
@@ -238,7 +248,7 @@ void Bitmap::strut (const int x, const int y,
 
     if (verbosity_ > normal)
 	cerr << "BB now [" << bbL << ':' << bbR << "), ["
-	     << bbT << ':' << bbB << ")\n";
+	     << bbT << ':' << bbB << ")" << endl;
 }
 
 // Freeze the bitmap and bounding box, simply by setting the frozen_ flag
@@ -487,7 +497,7 @@ void Bitmap::scaleDown (const int factor)
     if (verbosity_ > normal)
 	cerr << "Bitmap::scaleDown: factor=" << factor
 	     << ". BB now [" << bbL << ':' << bbR << "), ["
-	     << bbT << ':' << bbB << ")\n";
+	     << bbT << ':' << bbB << ")" << endl;
 }
 
 void Bitmap::write (const string filename, const string format)
@@ -507,7 +517,7 @@ void Bitmap::write (const string filename, const string format)
 	     << " cropT=" << cropT
 	     << " cropB=" << cropB
 	     << " W="<<W<<" H="<<H
-	     << '\n';
+	     << endl;
 
     if (empty())
 	throw BitmapError ("attempt to write empty bitmap");
@@ -522,7 +532,7 @@ void Bitmap::write (const string filename, const string format)
 		 << format
 		 << ".  Trying format "
 		 << deffmt
-		 << " instead\n";
+		 << " instead" << endl;
 	bi = BitmapImage::newBitmapImage
 	    (deffmt, hsize, vsize, bpp_);
 	if (bi == 0)
@@ -541,7 +551,7 @@ void Bitmap::write (const string filename, const string format)
     else
 	bi->setBitmap (B);
     if (verbosity_ > normal)
-	cerr << "Bitmap: transparent=" << transparent_ << '\n';
+	cerr << "Bitmap: transparent=" << transparent_ << endl;
     bi->setTransparent (transparent_);
     if (customRGB_)
     {
@@ -552,7 +562,7 @@ void Bitmap::write (const string filename, const string format)
 		 << static_cast<int>(fg_.blue) << '/'
 		 << static_cast<int>(bg_.red) << ','
 		 << static_cast<int>(bg_.green) << ','
-		 << static_cast<int>(bg_.blue) << '\n';
+		 << static_cast<int>(bg_.blue) << endl;
 	bi->setRGB (true,  &fg_);
 	bi->setRGB (false, &bg_);
     }
@@ -564,12 +574,12 @@ void Bitmap::write (const string filename, const string format)
 	if (extlen > outfilename.length() ||
 	    outfilename.substr(outfilename.length()-extlen, extlen) != fileext)
 	    outfilename += '.' + fileext;
-	//cerr << "file extension="<<fileext<<": new file="<<outfilename<<'\n';
+	//cerr << "file extension="<<fileext<<": new file="<<outfilename<<endl;
     }
     bi->write (outfilename);
 
     if (logBitmapInfo_)
-	cout << "Qbitmaps " << outfilename << ' ' << hsize << ' ' << vsize << '\n';
+	cout << "Qbitmaps " << outfilename << ' ' << hsize << ' ' << vsize << endl;
 
     delete bi;
 }
@@ -582,7 +592,7 @@ void Bitmap::setRGB (const bool fg, const BitmapColour* rgb) {
 	     << " RGB="
 	     << static_cast<int>(rgb->red) << ','
 	     << static_cast<int>(rgb->green) << ','
-	     << static_cast<int>(rgb->blue) << '\n';
+	     << static_cast<int>(rgb->blue) << endl;
     if (fg)
     {
 	fg_.red = rgb->red;
@@ -603,7 +613,7 @@ void Bitmap::setDefaultRGB (const bool fg, const BitmapColour* rgb) {
 	     << " RGB="
 	     << static_cast<int>(rgb->red) << ','
 	     << static_cast<int>(rgb->green) << ','
-	     << static_cast<int>(rgb->blue) << '\n';
+	     << static_cast<int>(rgb->blue) << endl;
     if (fg)
     {
 	def_fg_.red = rgb->red;
@@ -616,3 +626,61 @@ void Bitmap::setDefaultRGB (const bool fg, const BitmapColour* rgb) {
     }
     def_customRGB_ = true;
 }
+
+Bitmap::iterator::iterator()
+{
+    // empty
+}
+Bitmap::iterator::~iterator()
+{
+    // empty
+}
+void Bitmap::iterator::init(Byte* b, int height, int width)
+{
+    b_ = b;
+    rowLength_ = width;
+    lastRow_ = height;
+    rowNumber_ = 0;
+}
+Byte* Bitmap::iterator::operator*()
+    throw (DviError)
+{
+    if (rowNumber_ < 0 || rowNumber_ >= lastRow_) {
+	throw new DviError("Out-of-range dereference of iterator");
+    }
+    return &b_[rowNumber_ * rowLength_];
+}
+Bitmap::iterator& Bitmap::iterator::operator++()
+    throw (DviError)
+{
+    if (rowNumber_ < 0 || rowNumber_ >= lastRow_) {
+	throw new DviError("Out-of-range increment of iterator");
+    }
+    ++rowNumber_;
+    if (rowNumber_ == lastRow_)
+	rowNumber_ = -1;	// matches endIterator_
+    return *this;
+}
+bool Bitmap::iterator::operator==(const Bitmap::iterator& it)
+    const
+{
+    return (rowNumber_ == it.rowNumber_);
+}
+bool Bitmap::iterator::operator!=(const Bitmap::iterator& it)
+    const
+{
+    return rowNumber_ != it.rowNumber_;
+}
+Bitmap::iterator Bitmap::begin()
+{
+    runningIterator_.init(B,H,W);
+    return runningIterator_;
+}
+Bitmap::iterator Bitmap::end()
+    const
+{
+    if (Bitmap::endIterator_.rowNumber_ == 0) // initialisation
+	Bitmap::endIterator_.rowNumber_ = -1;
+    return Bitmap::endIterator_;
+}
+
