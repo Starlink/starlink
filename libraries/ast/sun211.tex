@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {211.6}
+\newcommand{\stardocnumber}    {211.7}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {2nd April 2000}
+\newcommand{\stardocdate}      {23rd May 2000}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -19327,10 +19327,6 @@ Object            - Base class for all AST Objects
          string {\tt{"}}BEGAST{\tt{"}}, then NATIVE encoding is used,
 
          \sstitem
-         Otherwise, if the FitsChan contains the {\tt{"}}PLTRAH{\tt{"}} keyword, then
-         DSS encoding is used,
-
-         \sstitem
          Otherwise, if the FitsChan contains a keyword of the form
          {\tt{"}}PCiiijjj{\tt{"}}, where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits, then
          FITS-PC encoding is used,
@@ -19365,6 +19361,10 @@ Object            - Base class for all AST Objects
          Otherwise, if the FitsChan contains a keyword of the form
          CRVALi, where {\tt{"}}i{\tt{"}} is a single digit, then FITS-WCS encoding is
          used.
+
+         \sstitem
+         Otherwise, if the FitsChan contains the {\tt{"}}PLTRAH{\tt{"}} keyword, then
+         DSS encoding is used,
 
          \sstitem
          Otherwise, if none of these conditions is met (as would be the
@@ -22369,6 +22369,93 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   Warnings\sstlabel{Warnings}
+}{
+   Controls the use issuing of warnings about various conditions
+}{
+   \sstdescription{
+      This attribute controls the issuing of warnings about selected
+      conditions when an \htmlref{Object}{Object} is read from or written to a \htmlref{FitsChan}{FitsChan}.
+      The value supplied for the Warnings attribute should consist of a
+      space separated list of condition names chosen from the list below.
+      Each name indicates a condition which should be reported. The default
+      value for Warnings is the string {\tt{"}}Tnx Zpx BadCel{\tt{"}}.
+
+      The text of any warning will be stored within the FitsChan in the
+      form of one or more new header cards with keyword ASTWARN. If
+      required, applications can check the FitsChan for ASTWARN cards
+      (using \htmlref{astFindFits}{astFindFits}) after the call to \htmlref{astRead}{astRead} or \htmlref{astWrite}{astWrite} has been
+      performed, and report the text of any such cards to the user. ASTWARN
+      cards will be propagated to any output header unless they are
+      deleted from the FitsChan using \htmlref{astDelFits}{astDelFits}.
+   }
+   \sstattributetype{
+      String
+   }
+   \sstapplicability{
+      \sstsubsection{
+         FitsChan
+      }{
+         All FitsChans have this attribute.
+      }
+   }
+   \sstdiytopic{
+      Conditions
+   }{
+      The following conditions are currently recognised (all are
+      case-insensitive):
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}BadCel{\tt{"}}: This condition arises when reading a \htmlref{FrameSet}{FrameSet} from a
+         non-Native encoded FitsChan if an unknown celestial co-ordinate
+         system is specified by the CTYPE keywords.
+
+         \sstitem
+         {\tt{"}}NoEquinox{\tt{"}}: This condition arises if a default equinox value is used
+         within astRead, due to no value being present in the supplied FitsChan.
+         This condition is only tested for when using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoRadesys{\tt{"}}: This condition arises if a default reference frame is
+         used for an equatorial co-ordinate system within astRead, due to no
+         value being present in the supplied FitsChan. This condition is only
+         tested for when using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoLonpole{\tt{"}}: This condition arises if a default value is used for
+         the LONPOLE keyword within astRead, due to no value being present
+         in the supplied FitsChan. This condition is only tested for when
+         using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoLatpole{\tt{"}}: This condition arises if a default value is used for
+         the LATPOLE keyword within astRead, due to no value being present
+         in the supplied FitsChan. This condition is only tested for when
+         using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoMjd-obs{\tt{"}}: This condition arises if a default value is used for
+         the date of observation within astRead, due to no value being present
+         in the supplied FitsChan. This condition is only tested for when using
+         non-Native encodings.
+
+         \sstitem
+         {\tt{"}}Tnx{\tt{"}}: This condition arises if a FrameSet is read from a FITS
+         header containing an IRAF {\tt{"}}TNX{\tt{"}} projection which includes terms
+         not supproted by AST. Such terms are ignored and so the resulting
+         FrameSet may be inaccurate.
+
+         \sstitem
+         {\tt{"}}Zpx{\tt{"}}: This condition arises if a FrameSet is read from a FITS
+         header containing an IRAF {\tt{"}}ZPX{\tt{"}} projection which includes {\tt{"}}lngcor{\tt{"}}
+         or {\tt{"}}latcor{\tt{"}} correction terms. These terms are not supported by AST
+         and are ignored. The resulting FrameSet may therefore be inaccurate.
+      }
+   }
+}
+\sstroutine{
    WcsAxis(lonlat)\sstlabel{WcsAxislonlat}
 }{
    FITS-WCS projection axes
@@ -22823,6 +22910,9 @@ Object            - Base class for all AST Objects
 
          \sstitem
          \htmlref{Ncard}{Ncard}: Number of FITS header cards in a FitsChan
+
+         \sstitem
+         \htmlref{Warnings}{Warnings}: Produces warnings about defaulted keywords
       }
    }
    \sstdiytopic{
@@ -24717,13 +24807,19 @@ conforms to the FITS-WCS model has been improved so that FrameSets
 including more complex mixtures of parallel and serial Mappings
 can be written out using the FITS-WCS encoding.
 
-\item The FitsChan class has been changed so that long strings included in 
+\item The FitsChan class has been changed so that long strings included in
 the description of an \htmlref{Object}{Object} can be saved and restored without truncation
 when using the NATIVE encoding. Previously, very long \htmlref{Frame}{Frame} titles,
 mathematical expressions, {\em etc.} were truncated if they exceeded the
 capacity of a single FITS header card. They are now split over several
 header cards so that they can be restored without truncation. Note, this
 facility is only available when using NATIVE encoding.
+
+\item The FitsChan class has a new attribute called \htmlref{Warnings}{Warnings} which
+can be used to select potentially dangerous conditions under which
+warnings should be issued. These conditions include (for instance)
+unsupported features within non-standard projections, missing keywords
+for which default values will be used, {\em etc}.
 
 \item The \htmlref{WcsMap}{WcsMap} class has been changed to support the changes made to the
 FITS-WCS encoding in the FitsChan class:
