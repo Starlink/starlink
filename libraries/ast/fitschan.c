@@ -380,8 +380,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     29-NOV-2001 (DSB):
 *        Corrected use of "_" and "-" characters when referring to FK4-NO-E
 *        system in function SkySys.
-*     20-FEB-2001 (DSB)
+*     20-FEB-2002 (DSB)
 *        Added CarLin attribute.
+*     8-MAY-2002 (DSB):
+*        Correct DSSToStore to ignore trailing blanks in the PLTDECSN
+*        keyword value.
 *class--
 */
 
@@ -3731,7 +3734,8 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
 */
 
 /* Local Variables: */
-   char *pltdecsn;     /* PLTDECSN keyword value */
+   char *text;         /* Pointer to textual keyword value */
+   char pltdecsn[11];  /* First 10 non-blank characters from PLTDECSN keyword */
    char keyname[10];   /* Buffer for keyword name */
    double amdx[20];    /* AMDXi keyword value */
    double amdy[20];    /* AMDYi keyword value */
@@ -3769,7 +3773,11 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
    GetValue( this, "PLTDECM", AST__FLOAT, &pltdecm, 1, method, class );
    GetValue( this, "PLTDECS", AST__FLOAT, &pltdecs, 1, method, class );
 
-   GetValue( this, "PLTDECSN", AST__STRING, &pltdecsn, 1, method, class );
+/* Copy the first 10 non-blank characters from the PLTDECSN keyword. */
+   GetValue( this, "PLTDECSN", AST__STRING, &text, 1, method, class );
+   text += strspn( text, " " );
+   text[ strcspn( text, " " ) ] = 0;
+   strncpy( pltdecsn, text, 10 );
 
 /* Read other related keywords. We do not need these, but we read them
    so that they are not propagated to any output FITS file. */
