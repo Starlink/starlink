@@ -155,7 +155,7 @@
 
 *  Object containing energy response
       CALL USI_ASSOC( 'RESP', 'BinDS', 'READ', RFID, STATUS )
-      CALL ERI_GETIDS( RFID, 1, RMFID, ARFID, STATUS )
+      CALL ERI_GETIDS( RFID, 0, RMFID, ARFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Grid dimensions, hence number of spectra
