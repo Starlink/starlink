@@ -613,7 +613,7 @@
 *
 *   Release all the files
       CALL USI_ANNUL('SOURCE',STATUS)
-      CALL USI_ANNUL('BGKGND',STATUS)
+      CALL USI_ANNUL('BCKGND',STATUS)
       CALL USI_ANNUL('OUT',STATUS)
 
       IF (LBMOD) THEN
