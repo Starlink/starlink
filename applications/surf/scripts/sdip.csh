@@ -76,6 +76,8 @@ endif
 if ($newkappa == 0) then
   set old_lincol = `parget lincol linplot`
   set old_symcol = `parget symcol linplot`
+else
+  set old_style  = `parget style linplot`
 endif
 
 # Now display the result with linplot
@@ -167,6 +169,8 @@ endif
 # Reset linplot parameters
 if ($newkappa == 0) then
   linplot device=! ndf=! lincol=$old_lincol symcol=$old_symcol > /dev/null
+else
+  linplot device=! ndf=! style=$old_style > /dev/null
 endif
 
 # Remove the intermediate files
