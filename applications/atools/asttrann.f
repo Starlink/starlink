@@ -325,8 +325,8 @@
       UBNDO( 1 ) = UBND( 1 )
       UBNDO( 2 ) = UBND( 2 )
       DO I = 1, NAXOUT
-         LBNDO( 1 ) = MIN( LBNDO( 1 ), OUTCOL( 1 ) )
-         UBNDO( 1 ) = MAX( UBNDO( 1 ), OUTCOL( 1 ) )
+         LBNDO( 1 ) = MIN( LBNDO( 1 ), OUTCOL( I ) )
+         UBNDO( 1 ) = MAX( UBNDO( 1 ), OUTCOL( I ) )
       END DO
 
 *  Create the output NDF by propagating the input NDF, including the values
