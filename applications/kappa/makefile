@@ -699,7 +699,11 @@ scatter.f snapshot.f turbocont.f vecplot.f
 KAPPA_F2_ROUTINES = kap_div.f kap_pow.f
 KAPPA_F2_IFLS = div.ifl pow.ifl
 
-KAPPA_F_ROUTINES = \
+#  Kappa f files for which there are no corresponding iraf .par files.
+KAPPA_F3_ROUTINES = kaphelp.f
+
+#  All other kappa .f files.
+KAPPA_F1_ROUTINES = \
 add.f aperadd.f ardgen.f ardmask.f \
 block.f cadd.f calc.f calpol.f cdiv.f \
 centroid.f chpix.f cmult.f compadd.f \
@@ -709,7 +713,7 @@ expon.f ffclean.f \
 fillbad.f fitsurface.f flip.f fourier.f \
 gausmooth.f glitch.f globals.f \
 histat.f histeq.f histogram.f \
-kaphelp.f laplace.f kstest.f \
+laplace.f kstest.f \
 logar.f look.f lucy.f manic.f \
 makesurface.f maths.f median.f \
 mosaic.f mstats.f mult.f noglobals.f nomagic.f \
@@ -720,6 +724,10 @@ sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f traninvert.f tranjoin.f tranmake.f \
 transformer.f trantrace.f trig.f wiener.f zaplin.f \
 listmake.f listshow.f profile.f wcsalign.f wcstran.f 
+
+#  kappa routines for which the atask action name can be derived from the 
+#  the f file name by remving the .f file suffix.
+KAPPA_F_ROUTINES = $(KAPPA_F1_ROUTINES) $(KAPPA_F3_ROUTINES)
 
 KAPSUB_F_ROUTINES = \
 apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f ftsize.f ftsizt.f \
@@ -853,7 +861,7 @@ GRF_C_ROUTINES = grf_kappa.c
 #  Define the set of all interface files.
 
 IFL_FILES = $(KAPPA_IFL_FILES) $(KAPVIEW_IFL_FILES) $(NDFPACK_IFL_FILES) \
-            $(MEM_IFL)
+            $(MEM_IFL) $(MONO_IFL)
 
 #  Define the interface files required for compilation.
 
@@ -905,7 +913,7 @@ IRAF_PKG_PAR = $(PKG_NAME).par
 
 #  IRAF tasks
 
-IRAF_PAR_FILES = $(KAPPA_F_ROUTINES:.f=.par) $(KAPPA_F2_IFLS:.ifl=.par) \
+IRAF_PAR_FILES = $(KAPPA_F1_ROUTINES:.f=.par) $(KAPPA_F2_IFLS:.ifl=.par) \
                  $(KAPVIEW_F_ROUTINES:.f=.par) $(NDFPACK_F_ROUTINES:.f=.par) \
                  $(MEM_F_ROUTINES:.f=.par)
 
@@ -1001,7 +1009,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  the export target).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
-              $(MONOLITH) $(MONO_IFL) $(IFC_FILES) $(HELP_FILES) \
+              $(MONOLITH) $(IFC_FILES) $(HELP_FILES) \
               $(ICL_SCRIPT) $(STARTUP_SCRIPT) $(DATA_FILES) \
               $(IRAF_STARTUP) $(IRAF_PKG_PAR) $(IRAF_IFC_FILES) \
               $(IRAF_OUTPAR_FILES) $(IRAF_PAR_FILES) $(IRAF_HELP_FILES) \
@@ -1330,7 +1338,7 @@ $(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o ls
 
 #  List of the interface files to be built and rules for compiling them.
 
-IFC_FILES = $(IFL_FILES:.ifl=.ifc) $(MONO_IFL:.ifl=.ifc)
+IFC_FILES = $(IFL_FILES:.ifl=.ifc) 
 #
 .ifl.ifc:
 	$(STAR_BIN)/compifl $< 
@@ -1594,7 +1602,7 @@ install:
         done
 #
 #  Install the interface files, giving them world-read permission.
-	for f in $(IFC_FILES) $(MONO_IFL) ""; do \
+	for f in $(IFC_FILES) ""; do \
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_BIN);\
               chmod 644 $(INSTALL_BIN)/$$f;\
@@ -1927,7 +1935,7 @@ do_deinstall:
         done
 #
 #  Deinstall the interface files, if installed versions exist.
-	- for f in $(IFC_FILES) $(MONO_IFL) ""; do \
+	- for f in $(IFC_FILES) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_BIN)/$$f .;\
