@@ -504,7 +504,7 @@ HELP_SOURCES =
 
 IRAF_HELP = gaia.hlp gaiadisp.hlp
 
-ONLINE_HELP = gaia.htx_tar
+ONLINE_DOCS = gaia.htx
 
 #  List of ancilliary data files.
 
@@ -517,7 +517,8 @@ HYPERTEXT_DOCS = sun214.htx
 
 #  List of documentation files.
 
-DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
+DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
+                $(PKG_NAME).news $(ONLINE_DOCS:.htx=.htx_tar)
 
 #  List of files that should be created and copied into the runtime
 #  directory for a sucessful built of GAIA.
@@ -1024,7 +1025,7 @@ install:
 #   $GAIA_DIR/gaia.htx, but this could be $STAR_HELP in future).
 	if test -n "$(ONLINE_DOCS)"; then \
            pwd=`pwd`;\
-           (cd $(INSTALL_ONLINE_DOCS);\
+           (cd $(INSTALL_BIN);\
            for f in $(ONLINE_DOCS) ""; do \
               if test -n "$$f"; then\
                  $(TAR_OUT) $$pwd/$${f}_tar;\
@@ -1227,8 +1228,8 @@ do_deinstall:
 #  Deinstall any on-line help documents.
 	- if test -n "$(ONLINE_DOCS)"; then \
 	   for f in $(ONLINE_DOCS) ""; do \
-	      if test -n "$$f" -a -d $(ONLINE_DOCS)/$$f; then \
-	         rm -f -r $(ONLINE_DOCS)/$$f;\
+	      if test -n "$$f" -a -d $(INSTALL_BIN)/$$f; then \
+	         rm -f -r $(INSTALL_BIN)/$$f;\
 	      else :; fi;\
 	   done;\
 	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP):$(INSTALL_BIN)';\
@@ -1358,7 +1359,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) $(PUBLIC_SCRIPTS) $(RUNTIME_FILES)  \
-		$(DATE_STAMP) $(IRAF_SCRIPTS) $(ONLINE_HELP) \
+		$(DATE_STAMP) $(IRAF_SCRIPTS) \
 		$(IRAF_HELP) helpdb.mip .BUILT .gaia.built \
 		.skycat.built .tcl.built \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
@@ -1396,7 +1397,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(PUBLIC_SCRIPTS) \
-	   $(RUNTIME_FILES) $(DATA_FILES) $(ONLINE_HELP) \
+	   $(RUNTIME_FILES) $(DATA_FILES) \
 	   $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
