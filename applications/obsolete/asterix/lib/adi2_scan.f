@@ -210,6 +210,9 @@
 *    Blank? Do nothing
         ELSE IF ( KEYWRD .LE. ' ' ) THEN
 
+*      Next keyword
+          IKEY = IKEY + 1
+
         ELSE
           MORE = .FALSE.
 
