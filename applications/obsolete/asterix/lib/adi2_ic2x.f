@@ -82,7 +82,7 @@
 
 *-
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
       INTEGER			PTR
@@ -128,7 +128,7 @@
 *
       SUBROUTINE ADI2_ICB2R( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       BYTE			DIN(*)
       REAL			DOUT(*)
@@ -148,7 +148,7 @@
 *
       SUBROUTINE ADI2_ICW2R( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INTEGER*2			DIN(*)
       REAL			DOUT(*)
@@ -168,7 +168,7 @@
 *
       SUBROUTINE ADI2_ICI2R( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INTEGER			DIN(*)
       REAL			DOUT(*)
@@ -188,7 +188,7 @@
 *
       SUBROUTINE ADI2_ICR2R( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       REAL			DIN(*)
       REAL			DOUT(*)
@@ -208,7 +208,7 @@
 *
       SUBROUTINE ADI2_ICD2R( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       DOUBLE PRECISION		DIN(*)
       REAL			DOUT(*)
@@ -308,7 +308,7 @@
 
 *-
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
       INTEGER			PTR
@@ -354,7 +354,7 @@
 *
       SUBROUTINE ADI2_ICB2D( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       BYTE			DIN(*)
       DOUBLE PRECISION			DOUT(*)
@@ -374,7 +374,7 @@
 *
       SUBROUTINE ADI2_ICW2D( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INTEGER*2			DIN(*)
       DOUBLE PRECISION			DOUT(*)
@@ -394,7 +394,7 @@
 *
       SUBROUTINE ADI2_ICI2D( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INTEGER			DIN(*)
       DOUBLE PRECISION			DOUT(*)
@@ -414,7 +414,7 @@
 *
       SUBROUTINE ADI2_ICR2D( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       REAL			DIN(*)
       DOUBLE PRECISION			DOUT(*)
@@ -434,7 +434,7 @@
 *
       SUBROUTINE ADI2_ICD2D( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       DOUBLE PRECISION		DIN(*)
       DOUBLE PRECISION			DOUT(*)
@@ -534,7 +534,7 @@
 
 *-
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
       INTEGER			PTR
@@ -580,7 +580,7 @@
 *
       SUBROUTINE ADI2_ICB2I( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       BYTE			DIN(*)
       INTEGER			DOUT(*)
@@ -600,7 +600,7 @@
 *
       SUBROUTINE ADI2_ICW2I( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INTEGER*2			DIN(*)
       INTEGER			DOUT(*)
@@ -620,7 +620,7 @@
 *
       SUBROUTINE ADI2_ICI2I( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INTEGER			DIN(*)
       INTEGER			DOUT(*)
@@ -640,7 +640,7 @@
 *
       SUBROUTINE ADI2_ICR2I( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       REAL			DIN(*)
       INTEGER			DOUT(*)
@@ -660,7 +660,7 @@
 *
       SUBROUTINE ADI2_ICD2I( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       DOUBLE PRECISION		DIN(*)
       INTEGER			DOUT(*)
@@ -760,7 +760,7 @@
 
 *-
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
       INTEGER			PTR
@@ -806,7 +806,7 @@
 *
       SUBROUTINE ADI2_ICB2B( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       BYTE			DIN(*)
       BYTE			DOUT(*)
@@ -826,7 +826,7 @@
 *
       SUBROUTINE ADI2_ICW2B( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INTEGER*2			DIN(*)
       BYTE			DOUT(*)
@@ -846,7 +846,7 @@
 *
       SUBROUTINE ADI2_ICI2B( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INTEGER			DIN(*)
       BYTE			DOUT(*)
@@ -866,7 +866,7 @@
 *
       SUBROUTINE ADI2_ICR2B( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       REAL			DIN(*)
       BYTE			DOUT(*)
@@ -886,7 +886,7 @@
 *
       SUBROUTINE ADI2_ICD2B( DIN, DOUT, NELM, STATUS )
 
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       DOUBLE PRECISION		DIN(*)
       BYTE			DOUT(*)
