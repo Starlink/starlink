@@ -1,0 +1,8 @@
+## This is part of starconf, version @PACKAGE_VERSION@
+## DO NOT EDIT: your changes will be overwritten
+
+# Automake boilerplate required by starconf
+
+install-data-local: $(_STAR_INSTALL_DATA_LOCAL)
+install-data-hook:  $(_STAR_INSTALL_DATA_HOOK)
+
