@@ -89,7 +89,10 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 
 *  History:
 *     10-SEP-1999 (DSB):
-*        - First version, based on NDG1_WILD.
+*        First version, based on NDG1_WILD.
+*     8-OCT-1999 (DSB):
+*        Modified so that the shell run in the child process does not
+*        execute a (t)csh start up script (eg .cshrc).
 */
    GENPTR_CHARACTER(FileSpec) /* Pointer to file specification. Length is
                                  FileSpec_length */
@@ -105,6 +108,7 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
    char Line[LINE_LEN];  /* String into which line is read */
    const char *shell_exe;/* The path to the shell to use */
    const char *shell_name;/* The name of the shell to use */
+   const char *shell_options;/* The shell start-up options to use */
    glob_t *pglob;        /* Results oflooking for a shell */
    int *Fdptr;           /* Pointer to array of two integer file descriptors */
    int Bytes;            /* Number of bytes read from pipe */
@@ -131,14 +135,17 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
    Otherwise, use sh. */
       shell_exe = "/bin/tcsh";
       shell_name = "tcsh";
+      shell_options = "-fc";
    
       if( glob( shell_exe, 0, NULL, pglob ) ) {
          shell_exe = "/bin/csh";
          shell_name = "csh";
+         shell_options = "-fc";
    
          if( glob( shell_exe, 0, NULL, pglob ) ) {
             shell_exe = "/bin/sh";
             shell_name = "sh";
+            shell_options = "-c";
          }
    
       }
@@ -201,7 +208,7 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 /*  And now we execute the command.  This will write the set of files to 
     our pipe, and the process will close down when all the files are 
     listed. */
-               execlp( shell_exe, shell_name, "-c", command, NULL );
+               execlp( shell_exe, shell_name, shell_options, command, NULL );
 
 /* This part should never be reached unless there are problems with the 
    shell execution. Exit using _exit in this unlikely case. This terminates 
