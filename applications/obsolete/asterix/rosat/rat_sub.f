@@ -364,7 +364,6 @@
       INTEGER STATUS
 *    Functions :
       INTEGER CHR_LEN
-         EXTERNAL CHR_LEN
 *    Local constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
@@ -372,7 +371,9 @@
 
       IF (STATUS.NE.SAI__OK) RETURN
 
+	print *,'opening header file',rtname(1:chr_len(rtname))//'_hdr'
       CALL HDS_OPEN(RTNAME(1:CHR_LEN(RTNAME))//'_hdr','READ',LOC,STATUS)
+	print *,'getting header'
       CALL RAT_GETHEAD(LOC, 'HEAD', HEAD, STATUS)
       CALL HDS_CLOSE(LOC, STATUS)
 
