@@ -77,6 +77,10 @@
 *     21-JUN-1999 (DSB):
 *        Move assignment to SAXIS so that it is conditional on INDFT
 *        being supplied.
+*     1-JUL-1999 (DSB):
+*        Replaced argument QUIET with ILEVEL, and added extra reporting
+*        options. Create output NDF by propagation from first contributing
+*        input NDF (so that history is propagated).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -169,15 +173,27 @@
      :                     STATUS )
          END IF
 
+
+*  Get an identifier for the first input NDF contributing to this output
+*  NDF.
+         CALL NDG_NDFAS( IGRP1, WORK( IBIN, 1 ), 'READ', INDF, STATUS )
+
+*  Create the output NDF by propagation from this input NDF, so that we
+*  can retain the history information. We will correct the shape later.
+         CALL NDG_NDFPR( INDF, 'NOEXT(IRAS90,FITS,POLPACK)', IGRP2, 
+     :                   IOUT, INDFO, STATUS )
+
+*  Annul the input NDF identifier.
+         CALL NDF_ANNUL( INDF, STATUS )
+
 *  Get the pixel bounds for the output image.
          LBND( 1 ) = WORK( IBIN, -1 ) 
          LBND( 2 ) = WORK( IBIN, -2 ) 
          UBND( 1 ) = WORK( IBIN, -3 ) 
          UBND( 2 ) = WORK( IBIN, -4 ) 
 
-*  Create the output NDF.
-         CALL NDG_NDFCR( IGRP2, IOUT, '_REAL', 2, LBND, UBND, INDFO,
-     :                   STATUS )
+*  Set the shape of the output NDF.
+         CALL NDF_SBND( 2, LBND, UBND, INDFO, STATUS )
 
 *  Map the DATA and VARIANCE arrays.
          CALL NDF_MAP( INDFO, 'DATA', '_REAL', 'WRITE', IPDOUT, EL, 
