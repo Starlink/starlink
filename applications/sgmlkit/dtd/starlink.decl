@@ -29,6 +29,8 @@
 		turned it back off (XML again).
 	SUBDOC YES: we use subdocuments (not conformant with XML).
 	APPINFO "ArcBase": we use HyTime, but not "SGML Document Access".
+	NET/NESCT: Changed to match XML, allowing empty elements as <empty/>
+		and making short elements <short/content>.
 --
 
 CHARSET
