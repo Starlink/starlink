@@ -25,7 +25,7 @@
 *     undefined.
 *
 *     Note, write or update access must be available for the NDF (as
-*     set up by routine NDF_ASSOC for instance), and the QUALITY
+*     set up by routine LPG_ASSOC for instance), and the QUALITY
 *     component must not be mapped on entry to this routine.
 *
 *  Arguments:

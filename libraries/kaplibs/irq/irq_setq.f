@@ -19,7 +19,7 @@
 *     undefined within the NDF.
 *
 *     Note, write or update access must be available for the NDF (as
-*     set up by routine NDF_ASSOC for instance).
+*     set up by routine LPG_ASSOC for instance).
 *
 *  Arguments:
 *     LOCS(5) = CHARACTER * ( * ) (Given)
