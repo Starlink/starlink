@@ -4,20 +4,49 @@
 *     crepint
 *
 *  Purpose:
-*     Replace int declarations by INT_BIG declarations in C source code.
+*     Replace int by INT_BIG in C.
 *
 *  Usage:
 *     crepint [ in [ out ] ]
 *
 *  Description:
 *     This program is a filter which takes C source code and replaces 
-*     any occurrences of the type specifier `int' by the value
-*     `INT_BIG'.  This should then be assigned a preprocessor value 
-*     at compile time using a -DINT_BIG=int or -DINT_BIG=long flag on
-*     the C compiler.
+*     any occurrences of the type specifier `int' by the identifier
+*     `INT_BIG'.  This identifier should then be assigned a preprocessor 
+*     value of a suitable integral type (int or long) either using an
+*     include file or with a -DINT_BIG=xxx flag on the C compiler.
 *
-*     It's not quite as simple as replacing every occurrence; `short int'
-*     and `long int' type specifiers will be left alone.
+*     It's not quite as simple as replacing every semantically significant
+*     occurrence of the `int' identifier; `short int' and `long int' type 
+*     specifiers will be left alone.
+*
+*     If a use of int appears to be declaring a symbol called `main' or
+*     `argc', then this will be left alone too, and a message written
+*     to standard error to the effect that it is not being changed.
+*
+*     Additionally, references to the limit.h macros INT_MAX, INT_MIN 
+*     and UINT_MAX are replaced by INT_BIG_MAX, INT_BIG_MIN and 
+*     UINT_BIG_MAX respectively.  These may be defined on the compiler
+*     command line, or using a suitable header file (extreme.h), which
+*     would sensibly be included immediately after limit.h.
+*
+*     The program will write a warning on standard error for certain 
+*     constructinons in the code which are likely to cause trouble after
+*     the mass redeclaration of int as INT_BIG has occurred.
+*     These constructions are:
+*        - Declarations of functions with variable argument lists
+*        - Use of format strings in formatted I/O which may need changes
+*
+*     In the case of potentially dangerous format strings, for
+*     convenience a comment is inserted in the output code on the line
+*     before the format string is used.  The comment will contain the
+*     character string `crepint: '.
+*
+*  Notes:
+*     Although this program behaves as a filter, it is written on
+*     the assumption that it will be run on a file of a finite length:
+*     it may buffer large amounts of input before writing output, and
+*     it may not free up memory.
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -242,6 +271,48 @@
    }
 
 
+   struct tokitem *funcofarg( struct tokitem *ptok ) {
+/*
+*+
+*  Name:
+*     funcofarg
+*
+*  Purpose:
+*     Find the name of the function of which the given token is an argument.
+*
+*  Description:
+*     Given a pointer to a token which represents an argument, or an
+*     unbracketed element of an argument, of a function call or
+*     declaration, this function works back through the token stream
+*     to find the token containing the identifier of the function.
+*     This is the first token at a lower level of bracketing in the
+*     backwards direction from the starting position.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        Pointer to a token which is an unbracketed token in an actual
+*        or formal argument list of a function call/declaration.
+*
+*  Return value:
+*     funcofarg = struct tokitem *
+*        Pointer to the token giving the function name identifier.
+*-
+*/
+      int lev = 1;
+      while ( (--ptok)->tokval && lev ) {
+         switch( ptok->tokval ) {
+            case '(':
+               lev--;
+               break;
+            case ')':
+               lev++;
+               break;
+         }
+      }
+      return ptok;
+   }
+
+
    int idmatch( struct tokitem *ptok, char *ident ) {
 /*
 *+
@@ -326,6 +397,8 @@
 *     program).  It will be placed at the previous line break to the
 *     token specified by the argument ptok.
 *
+*     The contents of the message are also written to standard error.
+*
 *  Arguments:
 *     ptok = struct tokitem *
 *        This gives the position into which to interpolate the comment.
@@ -345,7 +418,10 @@
       int done = 0;
       int incomm;
       int tleng;
-      
+
+/* Write message to standard error. */
+      fprintf( stderr, "%s: %s (comment inserted)\n", name, message );
+
 /* Build the text of the comment itself. */
       sprintf( text, "/* %s: %-60s */\n", name, message );
       tleng = strlen( text );
@@ -474,9 +550,8 @@
                        && tbuf[ i - 1 ].tokval != LONG )
             if ( idmatch( tbuf + i + 1, "argc" ) || 
                  idmatch( tbuf + i + 1, "main" ) ) {
-               sprintf( line, "Type of %s not changed from int.", 
-                        tbuf[ i + 1 ].strmat );
-               comment( tbuf + i + 1, line );
+               fprintf( stderr, "%s: Type of %s not changed from int\n", 
+                                name, tbuf[ i + 1 ].strmat );
             }
             else {
                subst( tbuf + i, "INT_BIG" );
@@ -492,7 +567,8 @@
 
 /* Check for and warn about variable argument lists. */
          if ( t == DOTDOTDOT && t1 == ')' ) {
-            comment( tbuf + i, "Function with variable arguments." );
+            fprintf( stderr, "%s: Variable argument list for %s()\n",
+                             name, funcofarg( tbuf + i )->strmat );
          }
 
 /* Check for, and warn about if necessary, printf (etc) format strings.
@@ -539,14 +615,14 @@
                   }
                }
                if ( lost )
-                  warn = "Failed to parse format string.";
+                  warn = "Failed to parse format string";
                else if ( hasintp )
-                  warn = "Format string contains %n.";
+                  warn = "Format string has %n";
                else if ( hasint )
-                  warn = "Format string contains %[cdiouxX*].";
+                  warn = "Format string has %[cdiouxX*]";
             }
             else {
-               warn = "Non-literal format string.";
+               warn = "Format string non-literal";
             }
             if ( *warn ) comment( tbuf + i, warn );
          }
@@ -592,12 +668,12 @@
                   }
                }
                if ( lost )
-                  warn = "Failed to parse format string.";
+                  warn = "Failed to parse format string";
                else if ( hasintp )
-                  warn = "Format string contains pointers to int.";
+                  warn = "Format string implies int *";
             }
             else {
-               warn = "Non-literal format string.";
+               warn = "Format string non-literal";
             }
             if ( *warn ) comment( tbuf + i, warn );
          }
