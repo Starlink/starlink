@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: HTTP.C,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $
+ * $Id: HTTP.C,v 1.2 2001/08/29 16:14:23 norman Exp $
  *
  * HTTP.C - method definitions for class HTTP
  *          (based on code from DSS:HTTP.c by Miguell Albrecht)
@@ -12,7 +12,7 @@
  * Allan Brighton  26 Sep 95  Created
  * Peter W. Draper 16 Jun 98  Added support for web proxy servers.
  */
-static const char* const rcsId="@(#) $Id: HTTP.C,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $";
+static const char* const rcsId="@(#) $Id: HTTP.C,v 1.2 2001/08/29 16:14:23 norman Exp $";
 
 
 #include <stdio.h>
@@ -518,10 +518,13 @@ int HTTP::addAuthFileEntry(const char* server, const char* realm)
     os << newentry << endl << ends;
     
     // create the auth file with -rw------- perms
-    ofstream f(auth_file_, ios::out, 0600);
+    // Modified: gcc3 loses permission argument! (NG, following PWD, 2003-02-20)
+    ofstream f(auth_file_, ios::out);
     if (f) 
 	f << os.str();
     delete os.str();
+    //  Change permissions `by hand'
+    chmod( auth_file_, 0600 );
 
     return 0;
 }
