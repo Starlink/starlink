@@ -370,7 +370,7 @@ PKG_NAME = dvi2bitmap
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0-6
+PKG_VERS = 0.7
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -741,27 +741,27 @@ test:
 #
 #  The export target depends on the resulting compressed tar file being
 #  up to date.
-export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+export: $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z
 	@ echo
 	@ echo '*** Export copy of the built $(PACK_NAME) package'
 	@ echo '    is in the compressed tar file'
-	@ echo '    $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+	@ echo '    $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	test -f .TESTED_$(SYSTEM) || \
 	    echo;\
 	    echo '*** Warning: the $(PACK_NAME) package has not been tested';\
 	    echo
 	#  Remove any pre-existing tar files before creating new ones.
-	test ! -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z || \
-		rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z
 	$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
-		| compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+		| compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z
 
 #  export_run: Export the built system (without source).
 #  -----------------------------------------------------
@@ -770,11 +770,11 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  The export_run target depends on the resulting compressed tar file being
 #  up to date.
-export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+export_run: $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
 	@ echo
 	@ echo '*** Export copy of the "runtime" $(PACK_NAME) package'
 	@ echo '    is in the compressed tar file'
-	@ echo '    $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+	@ echo '    $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
@@ -783,7 +783,7 @@ export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 #
 #  Include version.h in this bundle.  The presence of this stops the
 #  makefile attempting to unpack the source (see notes below).
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
+$(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
 		$(DATE_STAMP) $(BUILT_FILES)
 	#  Issue a warning if the package has not been tested.
 	test -f .TESTED_$(SYSTEM) || \
@@ -791,11 +791,11 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
 	    echo '*** Warning: the $(PACK_NAME) package has not been tested';\
 	    echo
 #	#  Remove any pre-existing tar files before creating new ones.
-	test ! -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z || \
-		rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
 	$(TAR_IN) - mk Makefile.starlink $(NEWS) $(BUILT_FILES) \
 		$(DATE_STAMP) $(DOCUMENTATION) version.h .BUILT  \
-		| compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+		| compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -804,21 +804,21 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
 
 #  This target depends on the resulting compressed tar file being up to
 #  date.
-export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+export_source: $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 	@ echo
 	@ echo '*** Export copy of the $(PACK_NAME) package source'
 	@ echo '    is in the compressed tar file'
-	@ echo '    $(EXPORT)/$(PKG_NAME).tar.Z'
+	@ echo '    $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files.
-$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+$(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z: $(SOURCE_FILES)
 	# Remove any pre-existing tar files before creating new ones.
-	test ! -f $(EXPORT)/$(PKG_NAME).tar.Z || \
-		rm -f $(EXPORT)/$(PKG_NAME).tar.Z
+	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 	$(TAR_IN) - $(SOURCE_FILES) \
-		| compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+		| compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 
 # Use the unconfigured Makefile.in here, since this target could be
 # built at a time when the directory has not been configured.
