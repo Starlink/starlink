@@ -971,6 +971,7 @@
       INTEGER			I			! Loop over selections
       INTEGER			ICMP			! Loop over selectors
       INTEGER			ITXT			! Loop over ARD text
+      INTEGER			L			! Length of ARDIN used
       INTEGER			NCMP			! # selectors
       INTEGER			NREC			! # selection records
       INTEGER			SELID			! Selection identifier
