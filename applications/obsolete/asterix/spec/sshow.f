@@ -52,7 +52,7 @@
 *    Version :
 *
       CHARACTER*30         	VERSION
-        PARAMETER           	( VERSION = 'SSHOW Version 1.8-1' )
+        PARAMETER           	( VERSION = 'SSHOW Version 2.1-0' )
 *-
 
 *    Check status

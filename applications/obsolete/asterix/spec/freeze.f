@@ -61,7 +61,7 @@
 *    Local data :
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION = 'FREEZE Version 1.8-1')
+	PARAMETER		(VERSION = 'FREEZE Version 2.1-0')
 *-
 
         CALL AST_INIT()

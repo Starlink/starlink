@@ -182,7 +182,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SPLOT Version V2.0-0' )
+        PARAMETER		( VERSION = 'SPLOT Version 2.1-0' )
 
 *  Local Variables:
       RECORD /DATASET/ 		OBDAT(NDSMAX)		! Observed datasets

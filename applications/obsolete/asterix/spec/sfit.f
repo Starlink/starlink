@@ -214,7 +214,7 @@
 	PARAMETER 		( OPCHAN = 6 )		! messages ( <1 for no messages)
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SFIT Version V2.0-2' )
+        PARAMETER		( VERSION = 'SFIT Version 2.1-0' )
 
 *  Local Variables:
       RECORD /DATASET/    	OBDAT(NDSMAX)		! Observed datasets

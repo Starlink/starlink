@@ -180,7 +180,7 @@
 	PARAMETER	     	( PROB_REPLY = 99 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SGRID Version V2.0-1' )
+        PARAMETER		( VERSION = 'SGRID Version V2.1-0' )
 
 *  Local Variables:
       RECORD /GRID_AXIS/     	GAX(ADI__MXDIM)    	! Grid axes

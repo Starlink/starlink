@@ -151,7 +151,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-	PARAMETER		(VERSION = 'SMODEL Version 1.8-1')
+	PARAMETER		(VERSION = 'SMODEL Version 2.1-0')
 *-
 
 *    Announce version
