@@ -4,8 +4,7 @@
 *     MAKEMOS
 
 *  Purpose:
-*     Make a mosaic by combining and (optionally) normalising a set of
-*     NDFs.
+*     Makes a mosaic by combining and normalising a set of NDFs.
 
 *  Language:
 *     Starlink Fortran 77

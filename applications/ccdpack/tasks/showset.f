@@ -4,7 +4,7 @@
 *     SHOWSET
 
 *  Purpose:
-*     Output NDF Set membership attributes.
+*     Outputs NDF Set header information.
 
 *  Language:
 *     Starlink Fortran 77

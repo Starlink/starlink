@@ -4,7 +4,7 @@
 *     CCDIMP
 
 *  Purpose:
-*     Re-import FITS information into the CCDPACK extension.
+*     Re-imports FITS information into the CCDPACK extension.
 
 *  Language:
 *     Starlink Fortran 77

@@ -4,7 +4,7 @@
 *     TRANLIST
 
 *  Purpose:
-*     Transform lists of positions.
+*     Transforms lists of positions.
 
 *  Language:
 *     Starlink Fortran 77

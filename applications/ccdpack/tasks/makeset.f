@@ -4,7 +4,7 @@
 *     MAKESET
 
 *  Purpose:
-*     Group NDFs together into a Set.
+*     Writes Set header information to NDFs.
 
 *  Language:
 *     Starlink Fortran 77
