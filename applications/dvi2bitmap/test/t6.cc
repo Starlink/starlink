@@ -48,6 +48,13 @@ int do_stream_tests();
 int do_pipe_tests();
 void Usage();
 
+// clear() method is standard, but not all compilers support it
+#if HAVE_STRING_CLEAR
+#  define CLEARSTRING(s) (s).clear()
+#else
+// Let's hope we have erase() (following is the standard's def'n of clear())
+#  define CLEARSTRING(s) (s).erase((s).begin(), (s).end())
+#endif
 
 void compareStrings(string expected, string actual, int& nfails)
 {
@@ -89,6 +96,7 @@ string report_on_status(int status)
     return SS_STRING(res);
 }
 
+
 int exercise_IBS(InputByteStream& IBS)
 {
     string teststring;
@@ -104,21 +112,21 @@ int exercise_IBS(InputByteStream& IBS)
 	checkEOF(IBS);
 	compareStrings("!000:56789", teststring, nfails);
 	
-	teststring.clear();
+	CLEARSTRING(teststring);
 	IBS.skip(85);		// now at pos 95
 	for (i=0; i<10; i++)
 	    teststring += IBS.getByte(); // read over buffer end
 	checkEOF(IBS);
 	compareStrings("56789!100:", teststring, nfails);
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	IBS.skip(45);		// skip to buffer end
 	for (i=0; i<10; i++)
 	    teststring += IBS.getByte();
 	checkEOF(IBS);
 	compareStrings("!150:56789", teststring, nfails);
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	IBS.skip(35);		// now at pos 195
 	block = IBS.getBlock(10);
 	for (i=0; i<10; i++)
@@ -126,7 +134,7 @@ int exercise_IBS(InputByteStream& IBS)
 	checkEOF(IBS);
 	compareStrings("56789!200:", teststring, nfails);
 	
-	teststring.clear();
+	CLEARSTRING(teststring);
 	IBS.skip(5);		// to 210
 	block = IBS.getBlock(10); // to 220
 	for (i=0; i<10; i++)
@@ -134,7 +142,7 @@ int exercise_IBS(InputByteStream& IBS)
 	checkEOF(IBS);
 	compareStrings("!210:56789", teststring, nfails);
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	block = IBS.getBlock(120); // block bigger than bufsize; to 340
 	checkEOF(IBS);
 	for (i=0; i<10; i++)
@@ -142,7 +150,7 @@ int exercise_IBS(InputByteStream& IBS)
 	compareStrings("!220:56789", teststring, nfails);
 	
     
-	teststring.clear();
+	CLEARSTRING(teststring);
 	IBS.skip(55);		// to 395
 	block = IBS.getBlock(10); // to 405
 	checkEOF(IBS);
@@ -150,13 +158,13 @@ int exercise_IBS(InputByteStream& IBS)
 	    teststring += *block++;
 	compareStrings("56789!400:", teststring, nfails);
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	for (i=0; i<10; i++)
 	    teststring += IBS.getByte(); // to 415
 	checkEOF(IBS);
 	compareStrings("56789!410:", teststring, nfails);
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	IBS.skip(75);		// to 490
 	for (i=0; i<10; i++)
 	    teststring += IBS.getByte();
@@ -178,21 +186,21 @@ int exercise_FBS(FileByteStream& FBS)
     const Byte* block;
 
     try {
-	teststring.clear();
+	CLEARSTRING(teststring);
 	FBS.seek(0);
 	for (i=0; i<10; i++)
 	    teststring += FBS.getByte();
 	checkEOF(FBS);
 	compareStrings("!000:56789", teststring, nfails);
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	FBS.seek(45);
 	for (i=0; i<10; i++)
 	    teststring += FBS.getByte();
 	checkEOF(FBS);
 	compareStrings("56789!050:", teststring, nfails);
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	FBS.seek(40);
 	block = FBS.getBlock(20);
 	checkEOF(FBS);
@@ -200,14 +208,14 @@ int exercise_FBS(FileByteStream& FBS)
 	    teststring += *block++;
 	compareStrings("!040:56789!050:56789", teststring, nfails);
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	FBS.seek(-10);
         block = FBS.getBlock(10);
         for (i=0; i<10; i++)
             teststring += *block++;
 	compareStrings("!end:56789", teststring, nfails);
 	
-	teststring.clear();
+	CLEARSTRING(teststring);
 	FBS.seek(-10);
         for (i=0; i<10; i++)
             teststring += FBS.getByte();
@@ -223,7 +231,7 @@ int exercise_FBS(FileByteStream& FBS)
 	    nfails++;
 	}
 
-	teststring.clear();
+	CLEARSTRING(teststring);
 	FBS.seek(0);
 	for (i=0; i<10; i++)
 	    teststring += FBS.getByte();
