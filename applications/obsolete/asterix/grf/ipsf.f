@@ -56,7 +56,6 @@
 
 *  get PSF if none yet loaded
         IF (I_PSF.EQ.0) THEN
-          CALL PSF_INIT(STATUS)
           CALL PSF_ASSOCI(I_LOC,I_PSF,STATUS)
         ELSE
 *  or see if different PSF to be loaded

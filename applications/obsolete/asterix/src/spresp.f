@@ -197,7 +197,6 @@
 
 *    Initialise ASTERIX
       CALL AST_INIT()
-      CALL PSF_INIT( STATUS )
 
 *    Version annoucement
       CALL MSG_PRNT( VERSION )

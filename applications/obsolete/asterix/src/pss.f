@@ -118,7 +118,6 @@
 *    Initialise sub-systems
       CALL AST_INIT()
       CALL SSO_INIT()
-      CALL PSF_INIT( STATUS )
 
 *    Zero the common block
       CALL PSS_CMN_INIT( STATUS )
