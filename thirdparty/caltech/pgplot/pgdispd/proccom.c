@@ -94,7 +94,9 @@ static char rcsid[]="@(#)$Id$";
 #include <netinet/in.h>
 
 #ifndef VMS
-#include <values.h>
+#  if HAVE_VALUES_H
+#    include <values.h>
+#  endif
 #endif
 
 #ifdef sun

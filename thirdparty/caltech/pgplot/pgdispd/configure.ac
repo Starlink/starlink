@@ -24,6 +24,7 @@ AC_PROG_LIBTOOL
 
 AC_HEADER_STDC
 AC_PATH_XTRA
+AC_CHECK_HEADER(values.h)
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
