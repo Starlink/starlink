@@ -26,7 +26,7 @@
 *        Parameters frozen?
 *     PEGGED[] = LOGICAL (given)
 *        Parameters frozen?
-*     MODEL = /MODEL/ (given)
+*     MODEL = /MODEL_SPEC/ (given)
 *        Model description
 *     FINISHED = LOGICAL (given)
 *        Finished fitting?
@@ -99,7 +99,7 @@
 
 *  Arguments Given:
       INTEGER			NIT
-      RECORD /MODEL/		MODEL
+      RECORD /MODEL_SPEC/	MODEL
       REAL			PARAM(*)
       LOGICAL			FINISHED, FROZEN(*), PEGGED(*)
 
