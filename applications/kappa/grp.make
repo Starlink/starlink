@@ -448,7 +448,7 @@ UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
 $(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
 $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
-$(NDFPACK_SUB) $(KAPPA_IRAF) $(IRAF_DOCS) 
+$(NDFPACK_SUB) 
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_gd1.eps \
