@@ -103,7 +103,7 @@ install-manifest:
 ?!STANDARDMANIFEST?	      export DESTDIR prefix; \
 ?!STANDARDMANIFEST?	      %MANIFESTMAKEINSTALL% ) || MF_INST_OK=false ; \
 ?!STANDARDMANIFEST?	  if $$MF_INST_OK; then \
-?!STANDARDMANIFEST?	    $(mkdir_p) $(DESTDIR)$(prefix) ; \
+?!STANDARDMANIFEST?	    test -d $(DESTDIR)$(prefix) || $(mkdir_p) $(DESTDIR)$(prefix) ; \
 ## Find all the files in the staging area $STG, add any final installation
 ## location, append each of these to the manifest FD, and delete each
 ## (installed) file, so that the cp below will work.  The copy below will not
@@ -123,7 +123,7 @@ install-manifest:
 ?!STANDARDMANIFEST?	      done ); \
 ?!STANDARDMANIFEST?	    if test -d "$$STG$(prefix)"; then \
 ?!STANDARDMANIFEST?	      echo "(cd $$STG$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix))"; \
-?!STANDARDMANIFEST?	      (cd $$STG$(prefix) && $(CP_RECURSIVE) . $$DESTDIR$(prefix)) || MF_INST_OK=false; \
+?!STANDARDMANIFEST?	      (realdest=`cd $$DESTDIR$(prefix) && pwd`; cd $$STG$(prefix) && $(CP_RECURSIVE) . $$realdest ) || MF_INST_OK=false; \
 ?!STANDARDMANIFEST?	    else echo "NOTE: no files installed">&2; fi; \
 ?!STANDARDMANIFEST?	  fi; \
 ?!STANDARDMANIFEST?	  rm -Rf $$STG; \
