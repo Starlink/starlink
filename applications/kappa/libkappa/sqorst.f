@@ -115,10 +115,6 @@
 *        which has 50 pixels along each side.  The same region of sky
 *        is represented, but the input image is squashed along both
 *        axes to fit the specified dimensions.
-*     sqorst cygnus1 exp1 [501,501] [1500,1500]
-*        This turns the same input NDF into one called exp1 which has
-*        1000 pixels along each side, with a pixel index origin of
-*        (501,501).
 
 *  Sub-Pixel Interpolation Schemes:
 *     When squashing or stretching an NDF, a separate one-dimensional 

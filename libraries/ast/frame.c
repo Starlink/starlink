@@ -4627,15 +4627,7 @@ static void NewUnit( AstAxis *ax, const char *old_units, const char *new_units,
             astSetAxisLabel( ax, new_lab );
             new_lab = astFree( new_lab );
          }
-
-/* Report an error if no Mapping could be found from the old units to the
-   new units. */
-      } else if( astOK ) {
-         astError( AST__BADUN, "%s(%s): Cannot convert between "
-                   "existing axis units '%s' and new axis units '%s'.", 
-                    method, class, old_units, new_units );
       }
-
    }
 
 /* Do the same for the axis symbol. */
@@ -4648,10 +4640,6 @@ static void NewUnit( AstAxis *ax, const char *old_units, const char *new_units,
             astSetAxisSymbol( ax, new_lab );
             new_lab = astFree( new_lab );
          }
-      } else if( astOK ) {
-         astError( AST__BADUN, "%s(%s): Cannot convert between "
-                   "existing axis units '%s' and new axis units '%s'.", 
-                    method, class, old_units, new_units );
       }
    }
 
