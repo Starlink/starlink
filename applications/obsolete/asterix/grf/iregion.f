@@ -951,8 +951,8 @@
         CALL MSG_SETR('YC',YSC)
         CALL MSG_SETR('LN',SLENGTH)
         CALL MSG_SETR('WD',SWIDTH)
-        ANGLE=ANGLE*I_XSCALE/ABS(I_XSCALE)*I_YSCALE/ABS(I_YSCALE)
-        CALL MSG_SETR('AN',ANGLE)
+        CALL MSG_SETR('AN',
+     :          ANGLE*I_XSCALE/ABS(I_XSCALE)*I_YSCALE/ABS(I_YSCALE))
         CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^LN , ^WD , ^AN ',
      :                                                    TEXT,L)
         TEXT(L:L)=')'
