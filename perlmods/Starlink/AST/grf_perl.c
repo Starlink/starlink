@@ -102,17 +102,27 @@ int astGFlush( void ){
   if (astOK) {
     if ( cb != NULL ) {
       int count;
+      int flags = G_SCALAR | G_EVAL;
       ENTER;
       SAVETMPS;
+
+      /* Always need PUSHMARK/PUTBACK even if no args */
+      PUSHMARK(sp);
 
       /* If we have a registered external object, push that on as
 	 a first argument. */
       external = Perl_getPlotAttr( "_gexternal" );
+
       if ( external != NULL ) {
 	XPUSHs( external );
+      } else {
+	/* No arguments */
+	flags |= G_NOARGS;
       }
 
-      count = perl_call_sv( SvRV(cb), G_SCALAR | G_EVAL);
+      PUTBACK;
+
+      count = perl_call_sv( SvRV(cb), flags);
 
       retval = ReportPerlError( AST__GRFER );
 
@@ -221,8 +231,73 @@ int astGLine( int n, const float *x, const float *y ){
 }
 
 int astGQch( float *chv, float *chh ){
-   Report( "astGQch" );
-   return 0;
+  dSP;
+  SV * cb;
+  SV * external;
+  int retval;
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
+
+  cb = Perl_getPlotAttr( "_gqch" );
+ 
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      int flags = G_ARRAY | G_EVAL;
+      ENTER;
+      SAVETMPS;
+
+      /* Always need PUSHMARK/PUTBACK even if no args */
+      PUSHMARK(sp);
+
+      /* If we have a registered external object, push that on as
+	 a first argument. Else, in this case set NOARGS flag */
+      external = Perl_getPlotAttr( "_gexternal" );
+
+      if ( external != NULL ) {
+	XPUSHs( external );
+      } else {
+	/* No arguments */
+	flags |= G_NOARGS;
+      }
+      PUTBACK;
+
+      count = perl_call_sv( SvRV(cb), flags);
+      retval = ReportPerlError( AST__GRFER );
+
+      SPAGAIN;
+
+      if (astOK) {
+	if (count != 3) {
+	  astError( AST__GRFER, 
+		    "Must return 3 args from GQch callback");
+	  retval = 0;
+	} else {
+	  /* pop results off the stack */
+	  *chh = (float) POPn;
+	  *chv = (float) POPn;
+	  retval = POPi;
+	}
+      } else {
+	retval = 0;
+      }
+
+      PUTBACK;
+
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGQch");
+    }
+  } else {
+    retval = 0;
+  }
+  return retval;
 }
 
 int astGMark( int n, const float *x, const float *y, int type ){
