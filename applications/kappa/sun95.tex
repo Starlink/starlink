@@ -14,9 +14,9 @@
 \newcommand{\stardocsource}    {sun95.15}
 \newcommand{\stardocnumber}    {95.15}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {9 December 1999}
+\newcommand{\stardocdate}      {27 January 2000}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.14-3}
+\newcommand{\stardocversion}   {0.14-4}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1102,7 +1102,7 @@ only be issued once per login session.  Thus you will see
 
 \small
 \begin{verbatim}
-      KAPPA commands are now available -- (Version 0.14-3)
+      KAPPA commands are now available -- (Version 0.14-4)
  
       Type kaphelp for help on KAPPA commands
 \end{verbatim}
@@ -40675,7 +40675,7 @@ plot (7k).
          {\tt "}V0.14-1{\tt "}, and sets the RESULT parameter appropriately. For
          instance, if the installed package was {\tt "}V0.13-6{\tt "} then RESULT
          would be set to -1. If the installed package was {\tt "}V0.14-1{\tt "},
-         RESULT would be set to 0. If the installed package was {\tt "}V0.14-3{\tt "}
+         RESULT would be set to 0. If the installed package was {\tt "}V0.14-4{\tt "}
          RESULT would be set to $+$1.
       }
    }
@@ -44221,7 +44221,7 @@ section \ref{se:style} the use of graphical style parameters.
 \end{itemize}
 \end{htmlonly}
 
-\section{\xlabel{se_changes}Release Notes---V0.14-3\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V0.14-4\label{se:changes}}
 
 More applications have been changed to enable them to make use
 of the NDF WCS component, which stores descriptions of world
@@ -44234,7 +44234,7 @@ new parameters.
 
 \begin{quote}
 \emph{ Scripts which make use of any of the removed or modified parameters
-will fail when run with KAPPA V0.14-3. Such scripts will need to be changed
+will fail when run with KAPPA V0.14-4. Such scripts will need to be changed
 to take account of the new features introduced in this release. Check the
 lists below for details.}
 \end{quote}
@@ -44876,6 +44876,12 @@ This is a rather unlikely thing to want to do however!
 
 \item A bug has been fixed which could prevent numerical axis labels from
 appearing when a set of annotated axes is drawn.
+
+\item The example C-shell script, {\tt multiplot.csh} (see 
+\latexelsehtml{section~\ref{se:cshscript}}{\htmlref{here}{se:cshscript}})
+has been updated to work with the current version of KAPPA. It now also
+uses the Starlink version of \PSMERGEref\ even if another command of that
+name is defined.
 
 \end{itemize}
 
