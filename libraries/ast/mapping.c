@@ -5569,7 +5569,7 @@ f     AST_LINEARAPPROX
 *     #include "mapping.h"
 c     int astLinearApprox( AstMapping *this, const double *lbnd, 
 c                          const double *ubnd, double tol, double *fit )
-f     RESULT = AST_LINEARAPPROX( THIS, LBND, UBND, TOL, FIT )
+f     RESULT = AST_LINEARAPPROX( THIS, LBND, UBND, TOL, FIT, STATUS )
 
 *  Class Membership:
 *     Mapping function.
@@ -5634,6 +5634,8 @@ f     AST_LINEARAPPOX = LOGICAL
 c        a non-zero value is returned. Otherwise zero is returned 
 f        .TRUE is returned. Otherwise .FALSE. is returned
 *        and the fit co-efficients are set to AST__BAD.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
 
 *  Notes:
 *     - This function fits the Mapping's forward transformation. To fit
