@@ -10,103 +10,63 @@
 #  Language:
 #     Perl 5
 
+#  Invocation:
+#     scbindex.pl [package-location [package-location ...]]
+
 #  Description:
 #     This program attempts to find all the source code files which form
 #     part of the USSC.  Given a base directory $srcdir, typically
-#     /star/sources, it looks underneath it for anything which
-#     looks like a source file, specifically files with the following 
-#     extensions: 
-#        .f .gen .c .h
+#     /star/sources, it examines all files underneath it.
+#
 #     These files may be sitting 'naked' in one of the subordinate 
 #     directories, or may be in a (compressed or uncompressed) tar file,
 #     or may be in a tar file within such a tar file (nested to an 
 #     arbitrary level, although not usually deeper than 2).
+#     For every file, its name and location are written to a StarIndex
+#     object.
 #
-#     When such a file is found, it is searched for program modules
-#     which could be referred to by other programs (e.g. functions and
-#     subroutines).  For each instance of such a module, the name of 
-#     the module and information about its location is written to a 
-#     DBM file ($func_indexfile).
+#     Other actions may be taken according to the kind of file:
 #
-#     The resulting DBM file $func_indexfile can then be read by a separate 
-#     program to locate the source code for a module, using no 
-#     information other than its name, and perhaps what package it is
-#     part of.
+#     If a language-specific tagging routine exists for that file type, 
+#     it is tagged and any modules (functions or subroutines) defined 
+#     in it are written by name and location of the file into a 
+#     StarIndex object (a different one from the one in which filenames
+#     are stored, so that the namespaces are independent).
+#     
+#     If a .hlp file is found, it is used to try to identify the names
+#     of 'tasks' within the package.  Future versions may examine other
+#     files to gain more indexable information about the packages.
 #
-#     Additionally a list of packages, and tasks within each package,
+#     Finally a list of packages, and tasks within each package,
 #     is written out to a second file ($taskfile).
+#     What constitutes a task is not well defined, but means something
+#     like the name of an executable or alias which can be typed from
+#     the user environment to do something useful in the package, and
+#     for which an identifiable piece of source code exists.
+#     As well as the method described above, some more poking around
+#     in $bindir (typically /star/bin) is done to try to locate more
+#     tasks.
 #
-#  Invocation:
-#     scbindex.pl [package-location package-location ...]
+#     Each line in the task file is of the format:
 #
+#           package: task1 task2 task3 ...
+#
+#     with each indexed package for which any entries appear in a 
+#     StarIndex object appearing exactly once.
+#     Although the task file is plain text, some of the lines may be 
+#     quite long.
+
 #  Arguments:
+#     package-location = string (optional).
+#        Each package-location is either a directory called by the 
+#        name of the package, or a tarfile called 'package.tar', 
+#        'package.tar.Z' or 'package.tar.gz'.
+#
 #     If no arguments are specified, the program indexes all the packages
-#     under the default source directory as specified in libscb.pm 
-#     (typically /star/sources).  If any arguments are specified, 
-#     then instead these are taken as package locations.
-#
-#  Index DBM file format.
-#     The index file is named $func_indexfile and stored as a Perl SDBM file.  
-#     This resembles a Unix dbm(3) file and is therefore an unordered 
-#     set of (key, value) pairs.
-#
-#     For each record, the key is just the name of the module 
-#     (usually, just the name of the subroutine, or the include file).
-#
-#     The value is a 'location', that is, a string containing one or
-#     more space-separated 'logical pathnames'.
-#     A logical pathname resembles an ordinary pathname except that
-#     it starts with the sequence "package#", where "package" is the
-#     name of a Starlink package.  Furthermore, a logical path 
-#     may contain the special character '>' which indicates
-#     inclusion in a (possibly compressed) tar file.  Thus some
-#     example logical pathnames would be:
-#
-#         AST#ast_source.tar>frame.f
-#         FIGARO#figaro_applic.tar.Z>applic/bclean.f
-#
-#     A 'package' is identified as a directory
-#     immediately below the base directory ($srcdir) or a (possibly 
-#     compressed) tar file in the base directory.  Thus the tar file
-#     AST#ast_source.tar may be stored either in the directory 
-#     $srcdir/ast, or in the tar file $srcdir/ast.tar.Z.
-#     No distinction between the two is made; so that an index will
-#     remain valid if a package is compressed or extracted according
-#     to this scheme.
-#
-#     A 'location' can contain more than one logical pathname because
-#     there may be modules in different packages which share the 
-#     same name.  There ought not to be more than one pathname per
-#     package in a given location.
-#
-#     If there are any other files in $srcdir apart from directories 
-#     and tar files (there shouldn't be) then they will be indexed 
-#     with the pseudo-package name 'SOURCE'.
-#
-#     As well as scanning all files under $srcdir, the program also
-#     indexes all modules (presumed to be include files) from a second 
-#     specified directory (typically /star/include), by filename 
-#     (capitalised if it looks like a fortran include) rather than 
-#     module name.  These packages are indexed with the pseudo-
-#     package name 'INCLUDE'.
-#
-#  Task file format.
-#     An file name $taskfile is also written containing names of
-#     all packages, and the tasks within each package.  Althought the
-#     file is plain text, some of the lines may be quite long.
-#
-#     Each line is of the form
-#
-#        package: task1 task2 task3 ...
-#
-#     where 'package' is a package name as defined above (every task
-#     containing at least one module indexed in $func_indexfile is included
-#     exactly once) and the tasks are supposed to be modules of 
-#     particular importance.  Their meaning is not defined other than 
-#     that, but they should typically be commands which can be invoked
-#     from the command line.  Identifying them is a haphazard business,
-#     and the method for this is explained elsewhere in this source
-#     file.
+#     under the default source directory $srcdir as specified in Scb.pm 
+#     (typically /star/sources).  
+
+#  Notes:
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -122,18 +82,17 @@
 
 #-
 
-$| = 1;
-
 #  Flags.
 
 $verbose = 1;
+$| = 1;
 
 #  Required libraries.
 
 use Fcntl;
 use Cwd;
 use Scb;
-use Directory;
+use StarIndex;
 
 #  Declarations.
 
@@ -144,10 +103,10 @@ sub index_tar;
 sub index_hlp;
 sub index_source;
 sub index_files;
-sub indexinc_dir;
 sub write_entry;
 sub uniq;
 sub tidyup;
+sub error;
 
 #  Set up scratch directory.
 
@@ -162,10 +121,11 @@ system "mkdir -p $tmpdir" and error "Couldn't create $tmpdir: $?\n";
 
 $SIG{'INT'} = sub {tidyup; exit;};
 
-#  Initialise index object containing locations of all modules.
+#  Initialise index objects.
 
-$func_index = Directory->new($func_indexfile, O_CREAT | O_RDWR);
-$file_index = Directory->new($file_indexfile, O_CREAT | O_RDWR);
+my $fmode = @ARGV ? 'update' : 'new';
+$func_index = StarIndex->new($func_indexfile, $fmode);
+$file_index = StarIndex->new($file_indexfile, $fmode);
 
 #  If task file exists, read values from it into @tasks.
 
@@ -178,7 +138,7 @@ if (open TASKS, "$taskfile") {
    close TASKS;
 }
 
-#  Index packages named on command line.
+#  If packages are named on the command line, index just those.
 
 if (@ARGV) {
    foreach $package_file (@ARGV) {
@@ -186,10 +146,11 @@ if (@ARGV) {
    }
 }
 
-#  Or index all packages under $srcdir, and include files under $incdir.
+#  If no packages are named on the command line, index all packages 
+#  under $srcdir, and include files under $incdir.
 
 else {
-   indexinc_dir "INCLUDE#", $incdir;
+   index_pack $incdir, "INCLUDE";
    foreach $package_file (glob "$srcdir/*") {
       index_pack $package_file;
    }
@@ -203,7 +164,6 @@ else {
 my ($line, $module);
 open TASKS, ">$taskfile" or error "Couldn't open $taskfile\n";
 foreach $pack (sort keys %tasks) {
-   $npackages++;
    $line = "$pack:";
    foreach $task (uniq sort @{$tasks{$pack}}) {
 
@@ -216,24 +176,8 @@ foreach $pack (sort keys %tasks) {
       $line .= " $module"  if ($func_index->get($module, packmust => $pack));
    }
    print TASKS "$line\n";
-   print       "$line\n" if $verbose;
 }
 close TASKS;
-
-#  Print statistics
-
-if ($verbose) {
-   printf "\nSTATISTICS ($npackages packages):\n";
-   printf "%20s %10s %10s\n\n", "File type", "Files", "Lines";
-   foreach $ftype (keys %nfiles) {
-      $nfiles += $nfiles{$ftype};
-      $nlines{$ftype} ||= 0;
-      $nlines += $nlines{$ftype};
-      printf "%20s %10d %10d\n", $ftype, $nfiles{$ftype}, $nlines{$ftype};
-   }
-   printf "%20s %10s %10s\n", ' ', '--------', '--------';
-   printf "%20s %10d %10d\n", ' ', $nfiles, $nlines;
-}
 
 #  Terminate processing.
 
@@ -248,19 +192,64 @@ exit;
 ########################################################################
 sub index_pack {
 
-#  Given the location of a package, examine all files in it and write 
-#  index entries for each indexable module.
+#+
+#  Name:
+#     index_pack
 
-#  Arguments.
+#  Purpose:
+#     Index all files and modules found in a given package.
 
-   my $pack_file = shift;             #  Tar file or directory
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     index_pack ($pack_file);
+
+#  Description:
+#     Given the location (tarfile or directory) of a Starlink package,
+#     index all indexable modules and files in it by writing entries 
+#     to StarIndex objects.
+
+#  Arguments:
+#     $pack_file = string.
+#        Location of package.  Either the pathname of a directory having 
+#        the name of the package, or the pathname of a tarfile. 
+#     $package = string (optional).
+#        Name of package.  If absent it will be inferred from $pack_file
+#        which is assumed to be of the form 'package', 'package.tar',
+#        'package.tar.Z' or 'package.tar.gz'.  If present the package 
+#        is forced to be named as given.  This can be used to index
+#        pseudopackages like INCLUDE.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my $pack_file = shift;
+   $package = shift;
 
 #  Get name of package.
 
    $pack_file =~ m%^(.*/)?([^.]+)(\.tar.*)?%;
-   my ($dir, $tarext);
-   ($dir, $package, $tarext) = ($1, $2, $3);
-   print "PACKAGE: $package\n";
+   my ($dir, $tarext) = ($1, $3);
+   $package ||= $2;
+   print "\nPACKAGE: $package\n";
    $file_index->put("$package#", $pack_file);
 
 #  If any records for this package already exist in the function index, 
@@ -277,10 +266,10 @@ sub index_pack {
 #  Perform the indexing.
 
    if (-d $pack_file) {
-      index_dir "$package#", "$dir$package";
+      index_dir "$package#", $pack_file;
    }
    elsif ($tarext) {
-      index_tar "$package#", "$dir$package$tarext";
+      index_tar "$package#", $pack_file;
    }
    else {
       error "Arguments must be package tar files or directories\n";
@@ -304,15 +293,53 @@ sub index_pack {
 ########################################################################
 sub index_list {
 
-#  Examine and index a list of source files; identify each file as a 
-#  naked file of an interesting type, a tar file, or a directory, and 
-#  hand off to a routine designed to deal with that type.  
-#  Any other files are ignored.
+#+
+#  Name:
+#     index_list
 
-#  Arguments.
+#  Purpose:
+#     Perform appropriate indexing operations on a list of files.
 
-   my $path = shift;      #  Logical pathname of current directory.
-   my @files = @_;        #  Files in current directory to be indexed.
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     index_list ($path, @files);
+
+#  Description:
+#     This routine examines a list of files in a Starlink package;
+#     each file is identified as a naked file of an interesting type,
+#     a tar file, or a directory, and handed off to a routine designed
+#     to deal with that type.  If it falls into none of these 
+#     categories it is ignored.
+
+#  Arguments:
+#     $path = string.
+#        Logical pathname of current directory.
+#     @files = list of strings.
+#        Each element is a filename in the current directory to be indexed.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my ($path, @files) = @_;
 
    my ($file, $ext);
    foreach $file (@files) {
@@ -328,7 +355,6 @@ sub index_list {
          index_hlp "$path$file", $file;
       }
       elsif (defined $tagger{$ext}) {    #  source file in taggable language
-         $nfiles{$ext}++;
          index_source "$path$file", $file;
       }
    }
@@ -338,12 +364,52 @@ sub index_list {
 ########################################################################
 sub index_dir {
 
-#  Examine and index a directory file.
+#+
+#  Name:
+#     index_dir
 
-#  Arguments.
+#  Purpose:
+#     Perform appropriate indexing operations on a directory.
 
-   my $path = shift;      #  Logical pathname of directory to be indexed.
-   my $dir = shift;       #  Directory in current directory to be indexed.
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     index_dir $path, $file;
+
+#  Description:
+#     This routine indexes all files in a directory.
+
+#  Arguments:
+#     $path = string.
+#        Logical pathname of directory.
+#     $dir = string.
+#        Name of directory in current directory to be indexed.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my ($path, $dir) = @_;
+
+#  Change directory, and pass list of files in (now) current directory
+#  to index_list.
 
    pushd $dir;
    index_list $path, glob "*";
@@ -353,12 +419,57 @@ sub index_dir {
 ########################################################################
 sub index_tar {
 
-#  Examine and index a (possibly compressed) tar file.
+#+
+#  Name:
+#     index_tar
 
-#  Arguments.
+#  Purpose:
+#     Perform appropriate indexing operations on a tar file.
 
-   my $path = shift;      #  Logical pathname of tar file.
-   my $tarfile = shift;   #  Tarfile to be indexed.
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     index_tar ($path, $tarfile);
+
+#  Description:
+#     This routine extracts all files from a (possibly compressed) tar 
+#     file and indexes them.  As well as passing them to the source code
+#     tagging and indexing routine, which attempts to tag them in a 
+#     language-specific way, this routine is where all the filenames
+#     are indexed in the 'file' StarIndex object.  It is done here rather
+#     than elsewhere since it is expected that all the files worth
+#     indexing will be in at least one level of tarfile, and conversely
+#     most things which are not in a tarfile will be not worth indexing,
+#     e.g. large numbers of object files generated by package building.
+
+#  Arguments:
+#     $path = string.
+#        Logical pathname of tarfile.
+#     $tarfile = string.
+#        Name of tarfile in current directory to be indexed.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my ($path, $tarfile) = @_;
 
 #  Define fully qualified pathname for file.
 
@@ -389,35 +500,54 @@ sub index_tar {
 
 
 ########################################################################
-sub index_files {
-
-#  Get parameters.
-
-   my ($path, @files) = @_;
-
-   my ($file, $dir, $name, $location);
-   foreach $file (@files) {
-      $file =~ m%^(.*/)?([^/]+)%;
-      ($dir, $name) = ($1, $2);
-      $location = "$path$file";
-      $file_index->put($name, $location);
-
-#  Optionally log entry to stdout.
-
-      printf "%-20s =>  %s\n", $name, $location if ($verbose);
-   }
-}
-
-
-########################################################################
 sub index_source {
 
-#  Tag and index a source code file.
+#+
+#  Name:
+#     index_source
 
-#  Arguments.
+#  Purpose:
+#     Perform appropriate indexing on a source file.
 
-   my $path = shift;          #  Logical pathname of file to be indexed.
-   my $file = shift;          #  File in current directory to be indexed.
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     index_source $path, $file;
+
+#  Description:
+#     This routine passes a source file to a language-specific tagging
+#     routine, and examines the tagged result for the names of any
+#     modules (functions or subroutines) defined in the file.  If any
+#     are found they are written to the 'func' StarIndex object.
+
+#  Arguments:
+#     $path = string.
+#        Logical pathname of source file to be indexed.
+#     $file = string.
+#        Name of source file in current directory.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my ($path, $file) = @_;
 
 #  Get file extension.
 
@@ -444,28 +574,65 @@ sub index_source {
       }
    }
 
-   $nlines{$ext} += ($tagged =~ tr/\n/\n/);
 }
 
 
 ########################################################################
 sub index_hlp {
 
-#  Examine and index a .hlp (Starlink interactive help) file.
-#  This routine is a bit hit-and-miss; it uses the (package).hlp file
-#  to guess the names of the top level A-tasks in the package.
-#  It makes the assumption that the help file is called (package).hlp,
-#  and furthermore that all the A-tasks have level-1 entries in the
-#  help file.
-#  If it guesses wrong of course it's not too bad, that is it will not
-#  inhibit any correctly-named modules from being found; the index file
-#  by this routine is only used to generate the top-level menu for the
-#  browser if no module name is entered.
+#+
+#  Name:
+#     index_hlp
 
-#  Arguments.
+#  Purpose:
+#     Perform appropriate indexing on a Starlink HLP file.
 
-   my $path = shift;      #  Logical pathname of .hlp file.
-   my $file = shift;      #  .hlp file in current directory to be indexed.
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     index_hlp ($path, $file);
+
+#  Description:
+#     This routine pokes around in a Starlink .hlp file for clues to
+#     what might be a task name.  It adopts a fairly unsophisticated
+#     approach: any help topic which appears at the base level of 
+#     a .hlp file is taken as a candidate, on the basis that probably
+#     there will be a help topic for each task.  Many of these will be 
+#     false candidates, but they should get weeded out later, when the
+#     tasks file is being written.
+#
+#     Starlink HLP files are not the only things with .hlp extensions,
+#     IRAF help files have them too, so an attempt is made to check
+#     that we're looking at the right thing.
+
+#  Arguments:
+#     $path = string.
+#        Logical pathname of help file to be indexed.
+#     $file = string.
+#        Name of help file in current directory.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my ($path, $file) = @_;
 
    open HLP, $file or error "Couldn't open $file in directory ".cwd."\n";
    my ($level, $baselevel);
@@ -475,13 +642,19 @@ sub index_hlp {
 
       last if (/^\.help/);
 
-#     Identify a header line and store it in the hash of lists %tasks.
+#     Examine only header lines from file.
 
       next unless (/^([0-9]) *(\S+)/); 
+
+#     Identify the base level of the help file.
+
       ($level, $topic) = ($1, $2);
       unless (defined $baselevel) {
          $baselevel = $level;
       }
+
+#     Store any topic just above the base level as a candidate task.
+
       if ($level == $baselevel+1) {
          push @{$tasks{$package}}, lc ($topic);
       }
@@ -491,38 +664,59 @@ sub index_hlp {
 
 
 ########################################################################
-sub indexinc_dir {
-
-#  Examine and index a directory of files containing include files.
-
-#  Arguments.
-
-   my $path = shift;      #  Logical pathname of directory to be indexed.
-   my $dir = shift;       #  Directory to be indexed.
-
-   $file_index->put("INCLUDE#", $incdir);
-   pushd $dir;
-   index_files $path, glob "*";
-   popd;
-}
-
-
-########################################################################
 sub write_entry {
 
-#  Write index entry to database.
+#+
+#  Name:
+#     write_entry
+
+#  Purpose:
+#     Write entry to StarIndex object.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     write_entry ($name, $location);
+
+#  Description:
+#     Writes an entry to the func StarIndex object and logs to standard
+#     output.
+
+#  Arguments:
+#     $name = string.
+#        Key of record (name of module).
+#     $location = string.
+#        Value of record (logical pathname of module).
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
 
 #  Arguments.
 
-   my $name = shift;      #  Name of module.
-   my $location = shift;  #  Logical pathname of module.
+   my ($name, $location) = @_;
 
 #  Tidy path string.
 
    $location =~ s%([#>/])\./%$1%g;
    $location =~ s%//+%/%g;
 
-#  Write entry to database.
+#  Write entry to StarIndex object.
 
    $func_index->put($name, $location);
 
@@ -534,9 +728,117 @@ sub write_entry {
 
 
 ########################################################################
+sub index_files {
+
+#+
+#  Name:
+#     index_files
+
+#  Purpose:
+#     Writes locations of files to StarIndex object.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     index_files ($path, @files);
+
+#  Description:
+#     Takes a list of files and writes index entries for their locations
+#     to the file StarIndex object.
+
+#  Arguments:
+#     $path = string.
+#        Logical pathname head of files.
+#     @files = list of strings.
+#        Filenames within $path to be indexed.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+
+#  Get parameters.
+
+   my ($path, @files) = @_;
+
+   my ($file, $dir, $name, $location);
+   foreach $file (@files) {
+
+#     Split file location into path head and actual name.
+
+      $file =~ m%^(.*/)?([^/]+)%;
+      ($dir, $name) = ($1, $2);
+      $location = "$path$file";
+
+#     Write entry
+
+      $file_index->put($name, $location);
+
+#     Optionally log entry to stdout.
+
+      printf "%-20s =>  %s\n", $name, $location if ($verbose);
+   }
+}
+
+
+########################################################################
 sub uniq {
 
-#  Removes adjacent duplicate values from a list.
+#+
+#  Name:
+#     uniq
+
+#  Purpose:
+#     Remove adjacent duplicate entries from a list.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     @list = uniq @dlist;
+
+#  Description:
+#     This routine removes adjacent duplicate entries from a list, 
+#     analogously to the Unix command of the same name.
+
+#  Arguments:
+#     @list = list of strings.
+#        Sorted list of items to be deduplicated.
+
+#  Return value:
+#     @dlist = list of strings.
+#        Same as list but without adjacent duplicate items.
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
 
    my ($last, $val, @ans);
    foreach $val (@_) {
@@ -549,16 +851,102 @@ sub uniq {
 
 ########################################################################
 sub tidyup {
+
+#+
+#  Name:
+#     tidyup
+
+#  Purpose:
+#     Tidy up on exit from source code indexer.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     tidyup;
+
+#  Description:
+#     If any temporary files have been created, remove them, and ensure
+#     that the StarIndex objects are properly synced to disk.  This
+#     routine should only be necessary in an abnormal exit situation.
+
+#  Arguments:
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Sync StarIndex objects to disk.
+
    $func_index->finish();
    $file_index->finish();
+
+#  Remove any straggling temporary files.
+
    rmrf $tmpdir;
 }
 
 ########################################################################
 sub error {
 
+#+
+#  Name:
+#     error
+
+#  Purpose:
+#     Present error text and exit cleanly.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     error (@messages).
+
+#  Description:
+#     Prints an error message to standard error, tidies up, and exits 
+#     with an error status.
+
+#  Arguments:
+#     @messages = list of strings.
+#        Error text to be printed.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Do things which have to be done before exiting.
+
    tidyup;
-   $_ = shift;
-   chomp;
-   die "$_\n";
+
+#  Print error text and exit.
+
+   die @_;
 }
