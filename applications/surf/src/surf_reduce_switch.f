@@ -48,6 +48,20 @@
 *     SWITCH = INTEGER (Read)
 *        Parameter to indicate which switch to extract. A value of 0 means
 *        that all switches should be reduced. Default is 0.
+*     TARRAY = LOGICAL (Read)
+*        Controls whether the T_COLD parameters are read as an array
+*        of values (true) or read as a sequence of scalars (false) . 
+*        This parameter is useful if the command is to be run in batch mode.
+*        Default is false.
+*     T_COLD = REAL (Read)
+*        Cold load temperatures for each of the sub-instruments present
+*        in the data file. If TARRAY is true, the values are read as an
+*        array. If it is false, values are read in one at a time, with the
+*        parameter annulled between reads.
+*     T_HOT = REAL (Read)
+*        Hot load temperature. The default value is read from the T_HOT
+*        header item. For data taken prior to 19980204 the default value
+*        is read from the T_AMB header item.
 *     USE_CALIBRATOR = LOGICAL (Read)
 *        Yes, if you want the data for each bolometer measurement
 *        divided by the corresponding internal calibrator signal.
@@ -132,6 +146,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.31  2000/05/11 19:58:41  timj
+*     Add TARRAY, T_HOT and T_COLD to header documentation
+*
 *     Revision 1.30  1999/08/19 03:32:55  timj
 *     use SCUBA__N_TEMPS
 *
