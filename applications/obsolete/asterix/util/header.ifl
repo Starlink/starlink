@@ -1,6 +1,6 @@
 interface HEADER
   parameter INP
-    type 'UNIV'
+    type 'LITERAL'
     position 1
     prompt 'Dataset'
     help 'Name of a binned or event dataset whose header is to be displayed'
