@@ -4982,8 +4982,8 @@ f     AST_OFFSET2
 
 *  Synopsis:
 c     #include "frame.h"
-c     double Offset2( AstFrame *this, const double point1[2], double angle,
-c                   double offset, double point2[2] );
+c     double astOffset2( AstFrame *this, const double point1[2], double angle,
+c                        double offset, double point2[2] );
 f     RESULT = AST_OFFSET2( THIS, POINT1, ANGLE, OFFSET, POINT2, STATUS )
 
 *  Class Membership:
