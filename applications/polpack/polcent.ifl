@@ -18,14 +18,12 @@
 
 interface POLCENT
 
-   parameter DEVICE
+   parameter INFILE
+      position 2
       access   READ
-      vpath    'GLOBAL,CURRENT,PROMPT '
-      ppath    'GLOBAL,CURRENT,DEFAULT'
-      association '<->GLOBAL.GRAPHICS_DEVICE'
-      default  xwindows
-      ptype    DEVICE
-      prompt   'Name of device'
+      type     LITERAL
+      prompt   'Text file containing initial positions'
+      helpkey  '*'
    endparameter
 
    parameter NDF                 # Input NDF 
@@ -89,15 +87,6 @@ interface POLCENT
       helpkey  '*'
    endparameter
 
-   parameter      XIN                # Initial X co-ordinate
-      position    2
-      type        '_REAL'
-      ppath       'CURRENT'
-      vpath       'PROMPT'
-      prompt      'Guess at X co-ordinate of feature'
-      helpkey     '*'
-   endparameter
-
    parameter      XOUT               # X centroid position
       access      'WRITE'
       type        '_REAL'
@@ -113,15 +102,6 @@ interface POLCENT
       vpath       'DEFAULT'
       prompt      'Object to contain the x an y centroid positions'
       default     ' '
-      helpkey     '*'
-   endparameter
-
-   parameter      YIN                # Initial Y co-ordinate
-      position    3
-      type        '_REAL'
-      ppath       'CURRENT'
-      vpath       'PROMPT'
-      prompt      'Guess at Y co-ordinate of feature'
       helpkey     '*'
    endparameter
 

@@ -56,18 +56,17 @@
 *        centroiding process just stops after the permitted number of 
 *        iterations (MAXITER).
 *        [0.05]
-*     XIN() = _REAL (Read)
-*        A vector of X positions to be used as the initial guess at
-*        accurate positions.
+*     INFILE = LITERAL (Read)
+*        The name of a text file containing the the X and Y values to 
+*        be used as the initial guess at accurate positions. Each line
+*        should hold the X value followed by the Y value separated by
+*        spaces.
 *     XOUT() = _REAL (Write)
 *        A vector holding the accurate X positions. Positions which
 *        cannot be found are set to -100000.
 *     XYOUT = LITERAL (Write)
 *        A string holding the last accurate X and Y values, separated by
 *        a space. 
-*     YIN() = _REAL (Read)
-*        A vector of Y positions to be used as the initial guess at
-*        accurate positions.
 *     YOUT() = _REAL (Write)
 *        A vector holding the accurate Y positions. Positions which
 *        cannot be found are set to -100000.
@@ -97,6 +96,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'FIO_ERR'          ! FIO_ error constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
 
 *  Status:
@@ -128,15 +128,15 @@
       INTEGER NDIM               ! Dimensionality of input NDF
       INTEGER NLINE              ! Second dimension of input NDF
       INTEGER NPNT               ! No. of points to centroid
-      INTEGER NPNTX              ! No. of X values given
-      INTEGER NPNTY              ! No. of Y values given
       INTEGER UBND( 2 )          ! Upper bounds of NDF data component
       LOGICAL SIGN               ! If true features are positive
       REAL XIN( MXPNT )          ! Original guess at input position
       REAL XOUT( MXPNT )         ! Accurate position
       REAL YIN( MXPNT )          ! Original guess at input position
       REAL YOUT( MXPNT )         ! Accurate position
-
+      INTEGER FD, NBUFF
+      CHARACTER BUFFER*80 
+      LOGICAL TOPEN
 *.
 
 *  Check inherited global status.
@@ -155,10 +155,22 @@
 
 *  Get the other parameter values...
 
-*  The initial position guesses.
-      CALL PAR_GET1R( 'XIN', MXPNT, XIN, NPNTX, STATUS )
-      CALL PAR_GET1R( 'YIN', MXPNT, YIN, NPNTY, STATUS )
-      NPNT = MIN( NPNTX, NPNTY )
+*  The initial position guesses. 
+      CALL CCD1_ASFIO( 'INFILE', 'READ', 'LIST', 0, FD, TOPEN, STATUS )
+
+      NPNT = 0
+      DO WHILE( NPNT .LT. MXPNT .AND. STATUS .EQ. SAI__OK )
+         CALL FIO_READ( FD, BUFFER , NBUFF, STATUS )
+         IF( STATUS .EQ. SAI__OK .AND. BUFFER .NE. ' ' ) THEN
+            NPNT = NPNT + 1
+            READ( BUFFER, * ) XIN( NPNT ), YIN( NPNT )
+         END IF
+      END DO
+
+      IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
+
+*  Close the file.
+      CALL FIO_CLOSE( FD, STATUS )
 
 *  Size of the search box. Larger than 3 and odd.
       CALL PAR_GET0I( 'ISIZE', ISIZE, STATUS )
@@ -227,6 +239,10 @@
 
 *  Annul the NDF identifier.
  999  CALL NDF_ANNUL( INDF, STATUS )
+
+*  Release the memory holding the input guesses.
+      CALL PSX_FREE( IPINX, STATUS )
+      CALL PSX_FREE( IPINY, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

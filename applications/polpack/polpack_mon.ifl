@@ -257,14 +257,12 @@ endinterface
 
 interface POLCENT
 
-   parameter DEVICE
+   parameter INFILE
+      position 2
       access   READ
-      vpath    'GLOBAL,CURRENT,PROMPT '
-      ppath    'GLOBAL,CURRENT,DEFAULT'
-      association '<->GLOBAL.GRAPHICS_DEVICE'
-      default  xwindows
-      ptype    DEVICE
-      prompt   'Name of device'
+      type     LITERAL
+      prompt   'Text file containing initial positions'
+      helpkey  '*'
    endparameter
 
    parameter NDF                 # Input NDF 

@@ -3285,6 +3285,20 @@ proc Dump {file} {
             puts $fd ""
          }
 
+# Dump the mapping protection flags.
+         if { [info exists PROT_OEMAP($image)] } {
+            puts $fd $PROT_OEMAP($image)
+         } {
+            puts $fd ""
+         }
+         
+         if { [info exists PROT_IMMAP($image)] } {
+            puts $fd $PROT_IMMAP($image)
+         } {
+            puts $fd ""
+         }
+         
+
 # Loop round each object type...
          foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
                               $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
@@ -5765,29 +5779,27 @@ proc GetFeature {cx cy rlabel} {
    set rlabs $rlabel
 
 # Get the NDF pixel coordinates at the supplied canvas positions.
-# Form text strings which can be used as the XIN adn YIN parameters for
-# the POLCENT ATASK.
-   set xin "\["
-   set yin "\["
    for {set i 0} {$i < $np} {incr i} {
       set pxy [CanToNDF [lindex $cx $i] [lindex $cy $i] ]
       set ppx [lindex $pxy 0]
       set ppy [lindex $pxy 1]
       lappend px $ppx
       lappend py $ppy
-      if { $i == 0 } {
-         append xin "$ppx"
-         append yin "$ppy"
-      } {
-         append xin ",$ppx"
-         append yin ",$ppy"
-      }
    }
-   append xin "\]"
-   append yin "\]"
 
 # If the positions are to be centroided...
    if { $PSF_SIZE > 0 } {
+
+#  Write out the initiali pixel coordinates to a text file to be passed 
+#  to POLCENT.
+      set tfile [UniqueFile]
+      set ifile_id [open $tfile w]
+
+      for {set i 0} {$i < $np} {incr i} {
+         puts $tfile_id "[lindex $px $i] [lindex $py $i]"
+      }            
+
+      close $tfile_id
 
 # Calculate the box size and max shift values.
       set isize [expr 2 * $PSF_SIZE]
@@ -5795,7 +5807,7 @@ proc GetFeature {cx cy rlabel} {
 
 # Attempt to centroid them. 
       set imsec "[Top IMAGE_STACK($IMAGE_DISP)]$SECTION_DISP"
-      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize xin=$xin yin=$yin"] } {
+      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize infile=$tfile"] } {
 
 # If succesful, read the accurate feature coordinates from the output
 # parameters. Convert the parameter vector value into a Tcl list
@@ -9794,6 +9806,29 @@ proc Restore {file} {
             } 
          } {
             catch { unset IMMAP($image) }
+         }
+
+# Restore the mapping protection flags.
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+
+         if { $line != "" } {
+            set PROT_OEMAP($image) $line
+         } {
+            catch { unset PROT_OEMAP($image) }
+         }
+         
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+
+         if { $line != "" } {
+            set PROT_IMMAP($image) $line
+         } {
+            catch { unset PROT_IMMAP($image) }
          }
 
 # Loop round each object type...
