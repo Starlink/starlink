@@ -563,6 +563,7 @@ webstart:
 dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/bin/jsky
@@ -885,7 +886,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Nov 6, 2004 5:16:59 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Nov 7, 2004 5:17:07 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -904,4 +905,4 @@ Xlib: No protocol specified
 BUILD FAILED
 file:/apps/cvsbuild/java/source/topcat/build.xml:1118: Fatal error during transformation
 
-Total time: 3 minutes 40 seconds
+Total time: 3 minutes 47 seconds
