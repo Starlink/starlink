@@ -24,7 +24,7 @@ AC_SEARCH_LIBS(Tcl_CreateCommand,[tcl$TCL_VERSION tcl],,
 AC_SEARCH_LIBS(Tk_MakeWindowExist,[tk$TCL_VERSION tk],,
                AC_MSG_ERROR([libtk not found]))
 
-STAR_DECLARE_DEPENDENCIES(build, [starx pcs ems gwm mers tcl tk sae])
+STAR_DECLARE_DEPENDENCIES(build, [starx pcs ems gwm mers tcl tk nbs sae])
 
 STAR_LATEX_DOCUMENTATION(sun186)
 STAR_LATEX_DOCUMENTATION(sun219)
