@@ -448,8 +448,6 @@ double slaDvdv( double va[3], double vb[3] ) {
    DECLARE_DOUBLE_ARRAY(VB,3);
    double result;
    int i;
-
-   int i;
    for ( i = 0; i < 3; i++ ) {
       VA[ i ] = va[ i ];
       VB[ i ] = vb[ i ];
