@@ -6,6 +6,14 @@
 
 \usepackage{adassconf}
 
+%%% XXX comment this out, too
+\def\urlbreakingslash{\discretionary{/}{}{/}}
+{\catcode`\/=\active
+  \gdef\beginurlcodes{\makeusletter
+    \def~{\raisebox{-0.2\normalbaselineskip}{\char126}}%
+    \catcode`\/=\active \let/\urlbreakingslash
+}}
+
 % NB: wierdo conference style has \title and co typeset material,
 % rather than store it, so \begin{document} must go here, and there's no
 % \maketitle
@@ -15,29 +23,31 @@
 \contact{Norman Gray}
 \email{norman@astro.gla.ac.uk}
 
-\title{Porting the Starlink Software Collection to GNU Autoconf}
+\title{Porting the Starlink Software Collection to GNU Autotools}
 % XXX Comment out
 \marginpar{[v\RCSRevision]}
 \titlemark{Starlink/GNU Autoconf}
 
 \author{Norman Gray\altaffilmark{1}}
 \affil{Starlink Project,
-        Rutherford Appleton Laboratory,
-        Chilton,
-        Didcot,
-        OX11 0QX,
-        UK}
+    Rutherford Appleton Laboratory,
+    Chilton,
+    Didcot,
+    OX11 0QX,
+    UK.
+    \texttt{<}\htmladdURL{http://www.astro.gla.ac.uk/users/norman/}\texttt{>}}
 \author{Tim Jenness}
 \affil{Joint Astronomy Centre,
-       660 North A'ohoku Place
-       University Park
-       Hilo, HI 96720,
-       USA}
+    660 North A'ohoku Place,
+    University Park,
+    Hilo, HI 96720,
+    USA.
+    \texttt{<}\htmladdURL{http://www.jach.hawaii.edu/~timj/}\texttt{>}}
 \author{Alasdair Allan\altaffilmark{1},
-        David S. Berry\altaffilmark{1},
-        Malcolm J. Currie,
-        Peter W. Draper\altaffilmark{1},
-        Mark B. Taylor\altaffilmark{1}}
+    David S. Berry\altaffilmark{1},
+    Malcolm J. Currie,
+    Peter W. Draper\altaffilmark{1},
+    Mark B. Taylor\altaffilmark{1}}
 \affil{Starlink}
 \author{Brad Cavanagh}
 \affil{Joint Astronomy Centre}
@@ -89,215 +99,270 @@ MBT,
 
 
 
-\keywords{lkajsfs}
+\keywords{Starlink, autoconf, automake}
 
 \begin{abstract}
-
-The Classic Starlink Software Collection (aka `USSC', see below)
-currently runs on three different Unix platforms and contains
-approximately 130 separate software items, totalling millions of lines
-of code, in a mix of Fortran, C, C++, Tcl, Perl and others.  We get requests
-to port to an increasing range of platforms, while suffering a
-decrease in the funding support for the classic collection.  We have
-therefore changed the build system from a hand-maintained collection
-of makefiles with hard-wired OS configurations to a scheme involving
+The Starlink software collection currently runs on three different
+Unix platforms and contains around 100 separate software items,
+totalling millions of lines of code, in a mixture of languages.  We
+have changed the build system from a hand-maintained collection of
+makefiles with hard-wired OS variants to a scheme involving
 feature-discovery via GNU Autoconf.
 
-As a result of this work, we have already ported the USSC to Mac OSX
-and Cygwin.  This had some unexpected benefits and costs, and
+As a result of this work, we have already ported the collection to
+Mac\,OS\,X and Cygwin.  This had some unexpected benefits and costs, and
 valuable lessons.
 \end{abstract}
 
-\section{The Problems}
-
-\begin{itemize}
-\item It's Big!  About 130 items, with around 1700 kSLOC of our
-  multi-language legacy code, 300 kSLOC of Java (not included in
-  this build system), plus another 600 kSLOC of thirdparty code, some
-  tweaked, and all built at the same time.
-
-\item According to David A Wheeler's SLOCCount,
-  that's \$110M worth, by the way.  And it works out larger than
-  everything in the RH7.1 distribution except the kernel, Mozilla and XFree86
-  \htmladdURL{http://www.dwheeler.com/sloc/redhat71-v1/redhat71sloc.html}.
-  Busy types, aren't we?
-
-\item It (was) weird!  Our legacy build system was idiosyncratic.  It
-  worked, but was unusual both in the way the code was distributed and
-  built.  This presented a barrier to potential developers and
-  maintainers, and an ongoing and unsustainable cost.
-
-\item It's Crusty!  Some of that code dates back quite a long way, and
-  some of it comes from community donations.  While the majority of it
-  is well-written, there are a few\dots gems in there.
-
-%\item It (was) Scattered!  For historical reasons, the master copies
-%  of all our code weren't kept in the one place.  Simply
-%  \emph{finding} all our code was slightly harder than we expected.
-
-\item Did I mention funding problems?
-
-\end{itemize}
-
-\section{History}
 
 
-Starlink was set up originally in the late seventies, as a way of
-supplying UK astronomy with hardware (`astronomers will never need
-more than six VAXes\dots'), naturally along with the data-analysis
-software to go with them, and the system management to make it all
-work smoothly.
+The Starlink Software Collection is a large set of data reduction
+applications, written over about two decades in a variety of
+languages.  Until recently the source code was managed, and the
+products distributed, using a system which worked, but which was
+rather ad hoc and opaque, and which was correspondingly rather
+expensive to maintain.  For a variety of technical, political, and financial
+reasons we made the decision to overhaul this build system, resulting
+in an CVS-plus-autoconf setup which is much more familiar to users and
+developers.   In section~\ref{s:background} we elaborate the
+motivations for this and the problems we faced; in
+section~\ref{s:result} we briefly describe the resulting system; and
+in section~\ref{s:lessons} we list some of the lessons we learned, in
+the hope that these will be of use to other projects considering the
+same important move.
+
+
+
+\section{Background\label{s:background}}
+
+% Ought this section to be shorter -- folk are interested in the
+% solutions, not the original problems.
+
+\htmladdnormallinkfoot{Starlink}{http://www.starlink.ac.uk} was set up
+originally in the late seventies, as a way of supplying UK astronomy
+with hardware (`astronomers will never need more than six
+VAXes\dots'), naturally along with the data-analysis software to go
+with it, and the system management to make it all work smoothly.
 
 We switched the hardware to Unix in the early nineties -- ending up
 supporting specifically SunOS and Ultrix.  We then shifted to Solaris
 and Digital Unix (our first 64-bit OS), and ended up, last year,
-working with Solaris, Alpha and RedHat, at which point we had managed
-to drop dependence on NAG.  We also ported the software
-collection then, renamed to the USSC, the `Unix Starlink Software
-Collection'.  That meant that some software was dropped, and the rest
+working with Solaris, Digital Unix and RedHat.
+%, at which point we had managed to drop dependence on NAG.
+At the same time we ported the software
+collection to unix.  That meant that some software was dropped, and the rest
 preened quite extensively.  The build system we are now moving away
 from was designed in this period.
 
 In the late nineties, Starlink slimmed down, dropped the hardware and
 management provision, and focused on maintaining and developing the
-large legacy codebase.
+large legacy codebase -- now renamed the `Classic' collection, in the
+best marketing traditions -- and on developing new software, in tune with
+more recent developments in astronomical software.  As a result, we
+need to make the classic software as accessible and maintainable as
+possible, since we expect the community will have to take a larger
+role in its curation.
 
-Now we're concentrating on new software, we need to make the classic
-software as accessible and maintainable as possible, since we expect
-the community will have to take a larger role in its curation.
+The biggest problem with the software was that there was an awful lot
+of it!  Even with ongoing pruning, we have ended up with about 100
+components, totalling around 1700 kSLOC, in various languages
+including Fortran, C, C++, Perl and Tcl/Tk.  We add to this another
+600 kSLOC of thirdparty code, some tweaked, and all built at the same
+time.  Not included in this total is about 300 kSLOC of Java, which is
+built separately.  Just to put this in context, by the way, David A
+Wheeler's \texttt{SLOCCount} would have us believe that that's worth
+\$110M and, according to his analysis of the RH7.1 distribution
+(Wheeler 2001), it appears that 1700kSLOC is larger than anything in
+that distribution except the kernel, Mozilla and XFree86.  Busy types,
+aren't we?
 
+As mentioned above, the build system we had was idiosyncratic, with
+code scattered amongst the distributed developers, and a set of source
+and compiled build products maintained by cut-and-paste of template
+makefiles.  This system did work, and was a reasonable design for the
+early nineties, but it required discipline and effort to maintain, and
+worked largely because most users obtained their software through
+pre-built tape and CD distributions, in many cases installed by system
+managers who were also at that time employed by the Starlink project
+(whose complaints could therefore be bought off by donations of beer).
+As Starlink's role changes, it is important that this software set
+appear more normal, and be maintainable (without medication) by a
+broader range of developers.
 
-\section{The Outcome}
+One of the reasons the build system was odd was because the collection
+had a large number of conventions about installation locations, plus
+documentation and code-generation tools, all of which had to be
+catered for when building software.  In order to avoid major rewrites
+of the code base, it was necessary to duplicate these conventions and
+tool support in the new build system.
 
+Portability was not expected to be a major problem (and wasn't in
+fact), since the software was already being supported on three unix
+platforms; as well, some of the older applications had already been
+through a port from VMS to unix.  Also, the project has benefited from
+generally good software practices over the years, so the code is
+mostly clean, conservative, and well documented; the project's
+long-standing obsessions with code-standards has certainly paid off,
+with interest.  Known portability issues were isolated, though these
+were handled by including platform-specific versions of key routines,
+selected by the user at build-time; this limited the target platforms
+to those explicitly supported by the project.
 
-\begin{itemize}
-\item The project now uses `standard' tools for all its source code
-  maintainance and distribution.  This makes the code much more
-  maintainable by community developers.
-
-\item As of October 2004, we have 2300kSLOC building unattended on
-  Linux (RHEL), Solaris, Cygwin (incomplete), and OSX (almost).  Other
-  platforms should be easy (but we can only cope with so much pain at
-  one time).
-
-\item All available in one place for the first time, via anonymous CVS
-  (see `Contacts' box).
-
-\item Unexpected but valuable preening, refactoring, bugfixing.
-
-\item We extended the autoconf support for Fortran, and this will be
-  offered back to the autoconf mainline.
-
-\item GPLed wherever possible.
-
-\item The project has always obsessed about coding standards and
-  coding discipline.  This concern paid off, with interest, here.
-
-\end{itemize}  
-
-
-\section{Patching autoconf and automake}
-
-We have a number of project-specific code and installation
-conventions, which we wanted to preserve, and a few build tools which
-need special makefile rules.  This is what \texttt{automake} is for.
-
-We tried doing everything with autoconf macros, but that quickly
-became far too precarious -- this route isn't suitable for more than
-light customisation.
-
-Since, for safety, we had to have \texttt{autoconf}, \texttt{automake}
-and \texttt{libtool} snapshots in our repository in any case, it was a
-natural (though nerve-wracking) move to start using patched versions
-of those tools.
-
-We needed more Fortran support (checking for open specifiers,
-intrinsics, record lengths and the like) than was 
-available in standard \texttt{autoconf}.  This group of modifications
-are due to be contributed back to the \texttt{autoconf} maintainers.
-
-The \texttt{automake} source code isn't an easy read, but it's pretty
-well written, and reasonably easy to patch.  The result is robust and
-portable distributed Makefiles.
+% Do we need to mention the age of the software -- crustiness?
 
 
 
-\section{Lessons and Warnings}
+\section{The Outcome\label{s:result}}
 
-\begin{itemize}
-\item The Fortran support in autoconf is rather slim.
+With this project now largely complete, we have made a number of
+significant improvements to the collection.
 
-\item The port to OSX was easier, in some ways, than we expected,
-  partly because the OSX system compiler is a modified GCC.  We needed
-  the Fink/OpenDarwin port of \texttt{g77}, and that causes lots of
-  linking problems (the whole \texttt{restFP/saveFP} saga).  Be
-  warned: the OSX linker has some very fixed ideas about things.
+All the source code is now conveniently available in a single place,
+in a CVS repository (anonymous CVS, at
+\texttt{:pserver:anonymous@cvs.starlink.ac.uk:/cvs} with password
+`starlink').
 
-\item Let's say that again.  The OSX linker will find more duplicated
-  symbols than you thought you had symbols.  It doesn't like common
-  blocks at all.  And it has very certain opinions about how libraries
-  should be put together.  GNU \texttt{libtool} can hide many of the
-  details from you, but be prepared to spend time tweaking your library code.
+The code now uses the GNU autotools throughout.  Libtool handles the
+mind-bending details of building static and shared libraries, with the
+result that the collection now builds and installs the shared
+libraries which were too much trouble before.  Automake generates the
+makefiles, respecting all of our installation conventions and
+generating support for our internal build tools.  And autoconf
+generates the \texttt{./configure} scripts which test the capabilities
+of the build system and adapt the makefiles and other files
+appropriately.  It turned out to be impractical to use standard
+autoconf and automake, and so the former was extended with new macros,
+and the latter adapted with new logic.  Because we are using automake,
+the amount of text we have to put into a \texttt{Makefile.am} is
+substantially reduced, with very little cut-and-pasted boilerplate.
 
-\item We couldn't automatically convert our old build system to the
-  new one, because it was mostly hand-maintained.  But that turned out
-  not to be a problem in fact: disciplined coding in the past meant
-  that packages could
-  generally be ported to the new system with little thought, and this
-  turned out to be a small part of the effort.
-
-\item The original plan was to autoconf everything with only necessary
-  code changes.  However it was impossible to stop ourselves
-  refactoring and tidying, sometimes rather extensively.  This is
-  both a warning to other projects that they won't be able to stop
-  developers doing this, and a benefit, in the sense that a lot of
-  code-hygiene tasks which have been too boring, confusing or risky in
-  the past, become a lot less so when you're adjusting everything
-  anyway.
-
-\item Simply finding all our code turned out to be tricky.  For
-  historical reasons, including the fact that CVS wasn't really around
-  ten years ago, the master copies of code were held by the
-  (distributed) developers.  Collecting all the code into one
-  repository was a valuable exercise, making better curation easy.
-  This also meant that we separated out generated code and sources, and
-  rescued some code from oblivion, as developers retired or left the
-  project.
-
-\item We should have bowed to the inevitable, and started tweaking the
-  autotools earlier.  Delaying this meant some functionality had to be
-  implemented twice.
-
-\item GPLing was harder than we expected.  This is largely because of
-  the donations in the past, of code written in gentler times, with
-  bizarre `licences'.
-
-\item It tool a \emph{lot} longer than we expected (surprise!).  Around 6
-  person-months to get the initial system up and running, and then
-  another 6 to put the remainder into the system.
-
-\end{itemize}
+As a result of using the autotools, the entire 2.3~MSLOC collection
+now builds successfully on Linux (RHEL), Solaris, Windows (using
+Cygwin), and Mac\,OS\,X, even though the latter two were not explicit
+goals of this porting project.  It should work on other platforms
+also, but we have not yet tested it there.
 
 
 
-\section{Contacts}
+\section{Lessons and Warnings\label{s:lessons}}
 
-\begin{itemize}
-\item Norman Gray: \texttt{norman@astro.gla.ac.uk},
-  \htmladdURL{http://www.astro.gla.ac.uk/users/norman/}
+The Fortran support in autoconf is rather slim.  A large proportion of the
+autoconf extensions addressed the rather inadequate support for
+Fortran in the standard autoconf distribution, and these new macros -- for
+testing for intrinsics, open specifiers, support for \texttt{\%val}
+and the like -- will be offered back to the autoconf mainline.
 
-\item Tim Jenness: \texttt{t.jenness@jach.hawaii.edu},
-  \htmladdURL{http://www.jach.hawaii.edu/~timj/}
+The port to OS\,X was easier, in some ways, than we expected, partly
+because the OS\,X system compiler is a modified GCC.  However Apple's
+GCC installation does not include \texttt{g77}, so we needed to
+install the Fink/OpenDarwin port of that.  This causes a number of
+linking problems because of slight differences in the code generated
+by the two GCC back-ends.  This is the \texttt{restFP/saveFP} problem:
+see (Gray 2004) for a summary.  Be warned: the OSX linker has some
+very fixed ideas about the organisation of code.
 
-\item Starlink: \htmladdURL{http://www.starlink.ac.uk} and
-  \htmladdURL{http://dev.starlink.ac.uk}
+Let's say that again.  The OSX linker will find more duplicated
+symbols than you thought you had symbols.  It doesn't like common
+blocks at all.  And it has very certain opinions about how libraries
+should be put together.  GNU \texttt{libtool} can hide many of the
+details from you, but be prepared to spend time tweaking your library
+code.
 
-\item AnonCVS: access at
-  \texttt{:pserver:anonymous@cvs.starlink.ac.uk:/cvs} 
-  with password `starlink'
+We couldn't automatically convert our old build system to the new one,
+because it was mostly hand-maintained.  But that turned out not to be
+a problem in fact: disciplined coding in the past meant that packages
+could generally be ported to the new system with little thought, and
+this turned out to be a small part of the effort.
 
-\item CVS browser: \htmladdURL{http://cvsweb.starlink.ac.uk}
-\end{itemize}
+The original plan was to autoconf everything with only necessary code
+changes.  However it was impossible to stop ourselves refactoring and
+tidying, sometimes rather extensively.  This is both a warning to
+other projects that they won't be able to stop developers doing this,
+and a benefit, in the sense that a lot of code-hygiene tasks which
+have been too boring, confusing or risky in the past, become a lot
+less so when you're adjusting everything anyway.
 
+%% Simply finding all our code turned out to be tricky.  For historical
+%% reasons, including the fact that CVS wasn't really around ten years
+%% ago, the master copies of code were held by the (distributed)
+%% developers.  Collecting all the code into one repository was a
+%% valuable exercise, making better curation easy.  This also meant that
+%% we separated out generated code and sources, and rescued some code
+%% from oblivion, as developers retired or left the project.
+
+We should have bowed to the inevitable, and started patching the
+autotools earlier, since delaying this meant some functionality had to be
+implemented twice.  Our initial expectation was that we could provide
+all of our extra boilerplate using autoconf macros (using the now
+partly deprecated \texttt{aclocal} extension mechanism), but as soon as
+this boilerplate consisted of extra makefile rules, the scripting
+involved in supporting this became extremely complicated and obviously
+fragile.  Patching automake is not a trivial undertaking, but the
+resulting increase in robustness, and the control it gave us over the
+build system, made it worthwhile.  Though it is undeniably
+complicated, the automake code is well written, and reasonably easy to
+patch.  Even if we had not patched it, it
+would probably be wise, in a project of this size, to keep a
+repository copy of the automake and autoconf distributions and mandate
+their use when bootstrapping the source tree; apart from the increase
+in long-term security, there are a number of potentially nasty
+version-skew problems which this practice evades.  This admittedly adds
+an extra step for a developer interested in working on CVS sources,
+but since the bootstrapping of the CVS sources is necessarily
+elaborate anyway, and since it is only the more sophisticated
+developers who would work on CVS rather than distributed sources, this
+is probably not too much of a disadvantage in fact.
+
+As a general point, we can recommend the use of automake.  Though
+there is a rather steep learning curve, and one does naturally suspect
+it of being dangerously clever, this turns out not to be a problem in
+fact \emph{as long as} you are willing to build your project the way
+automake things it ought to be built.  Since the (GNU) coding
+standards it implements are both conventional and reasonably sensible,
+this is not the imposition it appears.  However it follows that
+adapting a pre-existing makefile to automake can be frustrating and hard,
+and it is better in this case to start again, and produce the much
+shorter \texttt{Makefile.am} automake source file from scratch.
+
+In parallel with this porting project, we worked through the
+bureaucracy involved in applying a GPL licence to the code where
+possible.  This turned out to be harder than we expected, largely
+because of the donations, in the past, of code written in gentler
+times, with bizarre licences (such as `public domain, for academic use
+only'!).  We ended up conceding defeat on this, as it would clearly be
+a huge effort to work through all the contributed code, identifying
+first authors then consistent conditions for each module.
+
+The project took a \emph{lot} longer than we expected (surprise!).  It
+took around six person-months to get the initial system up and
+running, and then another six to adapt the bulk of our code to the new
+system.
+
+
+
+\begin{references}
+\reference Gray, Norman 2004, `restFP/saveFP and
+\texttt{-lcc\textunderscore dynamic} -- why?'.  Thread on
+\texttt{fortran-dev@lists.apple.com}, archived at
+% let the URL break (no global defs allowed, and presumably no
+% \usepackage{url}, or else we could improve the definition of
+% \makeURL in adassconf.sty)
+%{\def\/{\discretionary{/}{}{/}}%
+%  \htmladdnormallink
+%    {\makeURL{http:/\/lists.apple.com\/archives\/fortran-dev\/2004\/Jul\/msg00036.html}}
+%    {http://lists.apple.com/archives/fortran-dev/2004/Jul/msg00036.html}}
+\htmladdURL{http://lists.apple.com/archives/fortran-dev/2004/Jul/msg00036.html}
+(cited November 2004).
+
+\reference Wheeler, David A.\ 2001 (updated 2002), `More than a
+Gigabuck: Estimating GNU/Linux's Size'.  Web page:
+%{\def\/{\discretionary{/}{}{/}}%
+%  \htmladdnormallink
+%    {\makeURL{http:/\/www.dwheeler.com\/sloc\/redhat71-v1\/redhat71sloc.html}}
+%    {http://www.dwheeler.com/sloc/redhat71-v1/redhat71sloc.html}}
+\htmladdURL{http://www.dwheeler.com/sloc/redhat71-v1/redhat71sloc.html}
+(cited November 2004).
+
+\end{references}
 
 \end{document}
