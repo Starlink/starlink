@@ -51,11 +51,14 @@
 *     stored in the keyword is shown in parentheses (see POLIMP for a 
 *     description of these extension items):
 *        -  PPCKANGR  (ANGROT)
+*        -  PPCKANLA  (ANLANG)
+*        -  PPCKEPS   (EPS)
 *        -  PPCKFILT  (FILTER)
 *        -  PPCKIMID  (IMGID)     
-*        -  PPCKWPLT  (WPLATE)
 *        -  PPCKRAY   (RAY)
 *        -  PPCKSTOK  (STOKES)
+*        -  PPCKT     (T)
+*        -  PPCKWPLT  (WPLATE)
 
 *  Examples:
 *     polexp in=^names.lis
@@ -93,7 +96,7 @@
 
 *  Local Constants:
       INTEGER NITEM              ! The number of POLPACK extension items
-      PARAMETER( NITEM = 6 )
+      PARAMETER( NITEM = 9 )
 
 *  Local Variables:
       CHARACTER CARD*80                    ! A FITS header card
@@ -121,17 +124,21 @@
       LOGICAL THERE              ! Does FITS extension exist?
 
       DATA FTNAM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
-     :             'PPCKRAY',  'PPCKSTOK' /,
+     :             'PPCKRAY',  'PPCKSTOK', 'PPCKT', 'PPCKEPS', 
+     :             'PPCKANLA' /,
 
      :     ITNAM / 'ANGROT',   'FILTER',   'IMGID',    'WPLATE', 
-     :             'RAY',      'STOKES' /,
+     :             'RAY',      'STOKES', 'T', 'EPS', 'ANLANG' /,
 
-     :     COMMNT / 'POLPACK: X-axis -> analyser angle (degs)',
+     :     COMMNT / 'POLPACK: (X-axis) to (zero analyser posn) in degs',
      :              'POLPACK: Filter',
      :              'POLPACK: Image identifier',
      :              'POLPACK: Waveplate position (degs)',
      :              'POLPACK: Ray (O or E)',
-     :              'POLPACK: Identifiers for planes of data'/
+     :              'POLPACK: Identifiers for planes of data',
+     :              'POLPACK: Analyser transmission factor',
+     :              'POLPACK: Analyser efficiency factor',
+     :              'POLPACK: Analyser angle'/
 
 *.
 
