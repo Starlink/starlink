@@ -284,7 +284,7 @@
                           -title "PAIRNDF: Confirm exit" \
                           -text $confirmtext ]
       $quitdialog buttonconfigure Cancel -text "Exit"
-      $quitdialog buttonconfigure OK -text "Continue"
+      $quitdialog buttonconfigure OK -text "Continue pairing"
       $quitdialog hide Help
 
 #  Create a warning dialog for unsuccessful use of the aligner widget.
