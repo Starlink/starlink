@@ -241,8 +241,10 @@
           CALL BDI_CREVAR( OFID, 1, ODIMS, STATUS )
           CALL BDI_MAPVAR( OFID, 'WRITE', OVPTR, STATUS )
 
-*        Copy widths and square
+*        Copy widths, divide by 2 and square
           CALL ARR_COP1R( ODIMS(1), %VAL(IWPTR), %VAL(OVPTR), STATUS )
+          CALL ARR_MULT1R( ODIMS(1), %VAL(OVPTR), 0.5, %VAL(OVPTR),
+     :                     STATUS )
           CALL ARR_SQR1R( %VAL(OVPTR), ODIMS(1), STATUS )
 
         END IF
