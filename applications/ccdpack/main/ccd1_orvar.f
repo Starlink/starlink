@@ -64,6 +64,10 @@
 *        place to create it).
 *     24-FEB-1997 (PDRAPER):
 *        Removed unnecessary EXP1 and EXP2 estimates
+*     28-JAN-1998 (PDRAPER):
+*        Added check for normal scores with a population of 2. 
+*        The second score isn't calculated as it is the negative
+*        of the first score.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,6 +124,7 @@
 *  Get the expected values of the normal order statistics.
             N2 = I/2
             CALL PDA_NSCOR( PP, I, N2, IFAIL )
+            IF ( N2 .EQ. 1 ) PP( 2 ) = -PP( 1 )
 
 *  Form sum of squares of the expected values of the normal order
 *  statistics
