@@ -165,6 +165,8 @@
 *        Original version.
 *     15-MAY-1998 (DSB):
 *        Prologue re-written.
+*     02-JUN-1998 (TMG):
+*        Added extra workspace array IPID to hold character identifiers
 *     {enter_changes_here}
 
 *  Bugs:
@@ -234,6 +236,7 @@
       INTEGER ILEVEL             ! user information level
       INTEGER IPFEST, IPVFEST    ! workspace for F factor estimates
       INTEGER IPTI1, IPTI2       ! workspace for total intensity images
+      INTEGER IPID               ! workspace for identifiers
       INTEGER IPEEST, IPZEST     ! workspace for E factor and zero
                                  ! shift estimates
       INTEGER IPDE               ! workspace for E factor convergence
@@ -724,12 +727,16 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
          IPVEEST = IPEEST
          IPVZEST = IPZEST
       ENDIF
+
+* Allocate Space to hold a character identifer for each pair.
+      CALL PSX_CALLOC( NPAIR, '_CHAR', IPID, STATUS )
       
 *  Calculate the time-dependent instrumental efficiency (E factor). This
 *  gives the relative efficiency of the instrument between exposures.
 *  This routine also produces E and F factor corrected output images.
       CALL POL_CALE( NEL, NSET, NPOS, NPAIR,  IPDIN, IPVIN, NSTATE,
-     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, ID, ILEVEL, F,
+     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, ID, %VAL( IPID ),
+     :               ILEVEL, F,
      :               ETOL, %VAL( IPWEIGHT ), IPDCOR, IPVCOR,
      :               %VAL( IPEEST ), %VAL( IPZEST ), %VAL( IPVEEST ),
      :               %VAL( IPVZEST ), %VAL( IPDE ), %VAL( IPTI1 ),
@@ -741,6 +748,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       CALL PSX_FREE( IPEEST, STATUS )
       CALL PSX_FREE( IPZEST, STATUS )
       CALL PSX_FREE( IPDE, STATUS )
+      CALL PSX_FREE( IPID, STATUS )
       IF ( VAR ) THEN
          CALL PSX_FREE( IPVEEST, STATUS )
          CALL PSX_FREE( IPVZEST, STATUS )

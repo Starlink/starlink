@@ -1,6 +1,6 @@
       SUBROUTINE POL_CALE( NEL, NSET, NPOS, NPAIR, IPDIN, IPVIN,
      :                     NSTATE, VAR, TOLS, TOLZ, MAXIT, SKYSUP,
-     :                     IMGID, ILEVEL, F, ETOL, WEIGHT,  IPDOU,
+     :                     IMGID, ID, ILEVEL, F, ETOL, WEIGHT,  IPDOU,
      :                     IPVOU, EEST, ZEST, VE, VZ, DE, TI1, TI2,
      :                     STATUS )
 *+
@@ -16,9 +16,9 @@
 
 *  Invocation:
 *     CALL POL_CALE( NEL, NSET, NPOS, NPAIR, IPDIN, IPVIN, NSTATE, VAR,
-*                    TOLS, TOLZ,  MAXIT, SKYSUP, IMGID, ILEVEL, F, ETOL,
-*    :               WEIGHT, IPDOU, IPVOU, EEST,
-*    :               ZEST, VE, VZ, DE, TI1, TI2, STATUS )
+*                    TOLS, TOLZ,  MAXIT, SKYSUP, IMGID, ID, ILEVEL, F, 
+*                    ETOL, WEIGHT, IPDOU, IPVOU, EEST, ZEST, VE, VZ, DE, 
+*                    TI1, TI2, STATUS )
 
 *  Description:
 *     This routine calculates the scale factors (E factors) that relate
@@ -50,11 +50,11 @@
 *        Number of waveplate positions. 4 for linear and 2 for circular.
 *     NPAIR = INTEGER (Given)
 *        The number of polarimetric pairs.
-*     IPDIN( 2 * NPOS, NSET ) =  (Given)
+*     IPDIN( 8, NSET ) =  (Given)
 *        An array of memory pointers to reference the mapped
 *        polarisation data, sorted according to waveplate position and
 *        polarisation set.
-*     IPVIN( 2 * NPOS, NSET ) = INTEGER (Given)
+*     IPVIN( 8, NSET ) = INTEGER (Given)
 *        {An array of memory pointers to reference the mapped
 *        polarisation data VARIANCES, sorted according to waveplate
 *        position and polarisation set.
@@ -73,8 +73,10 @@
 *     SKYSUP = REAL (Given)
 *        Sky level suppression factor to use when performing image
 *        intercomparisons. Also used here for the E factor refinement.
-*     IMGID( NPOS, NSET ) = CHARACTER * ( 10 ) (Given)
+*     IMGID( 4, NSET ) = CHARACTER * ( 10 ) (Given)
 *        Image identifiers.
+*     ID( NPAIR ) = CHARACTER * ( 10 ) (Given)
+*        Image Identifiers.
 *     ILEVEL = INTEGER (Given)
 *        Specifies the level of information to be output.
 *        ILEVEL=0 (no output); ILEVEL=1 (normal output); ILEVEL=2
@@ -85,9 +87,9 @@
 *        Convergence criterion for E factors.
 *     WEIGHT( NPAIR ) = DOUBLE PRECISION (Given)
 *        Weights used when combining the total intensity images.
-*     IPDOU( 2 * NPOS, NSET ) = INTEGER (Returned)
+*     IPDOU( 8, NSET ) = INTEGER (Returned)
 *        Pointers to the output data, corrected for E and F factors.
-*     IPVOU( 2 * NPOS, NSET ) = INTEGER (Returned)
+*     IPVOU( 8, NSET ) = INTEGER (Returned)
 *        Pointers to variances on the output data.
 *     EEST( NPAIR ) = REAL (Returned)
 *        E factor estimates for each pair.
@@ -125,6 +127,9 @@
 *        order of the arguments to CCD1_CMPRR (previously the data arrays were 
 *        passed the other way round, resulting in the calculated E factors
 *        being the reciprocal of the correct values).
+*     02-JUN-1998 (TMG):
+*        Correctly dimension IPDIN, IPVIN, IMGID, IPVOUT, IPDOUT. Add extra
+*        passed array ID.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -155,9 +160,10 @@
       INTEGER MAXIT
       REAL F
       REAL ETOL
-      INTEGER IPDIN( 2 * NPOS, NSET )
-      INTEGER IPVIN( 2 * NPOS, NSET )
-      CHARACTER * ( 10 ) IMGID( NPAIR )
+      INTEGER IPDIN( 8, NSET )
+      INTEGER IPVIN( 8, NSET )
+      CHARACTER * ( 10 ) IMGID( 4, NSET )
+      CHARACTER * ( 10 ) ID( NPAIR )
       DOUBLE PRECISION WEIGHT( NPAIR )
       INTEGER ILEVEL
       
@@ -171,8 +177,8 @@
       REAL TI2( NEL, NPAIR )
       
 *  Arguments Returned:
-      INTEGER IPDOU( 2 * NPOS, NSET )
-      INTEGER IPVOU( 2 * NPOS, NSET )
+      INTEGER IPDOU( 8, NSET )
+      INTEGER IPVOU( 8, NSET )
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -279,6 +285,7 @@
                CALL POL_CALTI( NEL, %VAL( IPDIN( 2 * IPOS - 1, ISET ) ),
      :                        %VAL( IPDIN( 2 * IPOS, ISET ) ), F,
      :                        TI1( 1, IPAIR ), STATUS )
+               ID( IPAIR ) = IMGID( IPOS, ISET )
             ENDIF
          ENDDO
       ENDDO
@@ -415,7 +422,7 @@
             DO IPAIR = 1, NPAIR
               WRITE( STRING,
      :           '( 5X, A10, 5X, F6.4, 4X, F6.4 )' )
-     :           IMGID( IPAIR ), EEST( IPAIR ), ZEST( IPAIR )
+     :           ID( IPAIR ), EEST( IPAIR ), ZEST( IPAIR )
               CALL MSG_OUT( ' ', STRING, STATUS )
             ENDDO
 
@@ -459,7 +466,7 @@
    
             DO IPAIR = 1, NPAIR
                WRITE( STRING, '( 3X, A10, 2X, F6.4 )' )
-     :                IMGID( IPAIR ), EEST( IPAIR )
+     :                ID( IPAIR ), EEST( IPAIR )
                CALL MSG_OUT( ' ', STRING, STATUS )
             ENDDO
          ELSE

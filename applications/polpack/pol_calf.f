@@ -44,11 +44,11 @@
 *     NPOS = INTEGER (Given) 
 *        The number of waveplate positions recorded. This will be 4 for
 *        linear polarimetry and 2 for circular polarimetry.
-*     IPDIN( 2 * NPOS, NSET ) =  (Given)
+*     IPDIN( 8, NSET ) =  (Given)
 *        An array of memory pointers to reference the mapped
 *        polarisation data, sorted according to waveplate position and
 *        polarisation set.
-*     IPVIN( 2 * NPOS, NSET ) = INTEGER (Given)
+*     IPVIN( 8, NSET ) = INTEGER (Given)
 *        {An array of memory pointers to reference the mapped
 *        polarisation data VARIANCES, sorted according to waveplate
 *        position and polarisation set.
@@ -67,7 +67,7 @@
 *     SKYSUP = REAL (Given)
 *        Sky level suppression factor to use when performing image
 *        intercomparisons.
-*     IMGID( NPOS, NSET ) = CHARACTER * ( 10 ) (Given)
+*     IMGID( 4, NSET ) = CHARACTER * ( 10 ) (Given)
 *        Image identifiers.
 *     ILEVEL = INTEGER (Given)
 *        Specifies the level of information to be output.
@@ -98,6 +98,8 @@
 *        Reversed order of data arrays passed to CCD1_CMPRR. Previously
 *        the returned scale factor was the reciprocal of the required
 *        value.
+*     02-JUN-1998 (TMG):
+*        Dimension IPDIN, IPVIN and IMGID correctly.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,15 +121,15 @@
       INTEGER NEL
       INTEGER NSET
       INTEGER NPOS
-      INTEGER IPDIN( 2 * NPOS, NSET )
-      INTEGER IPVIN( 2 * NPOS, NSET )
+      INTEGER IPDIN( 8, NSET )
+      INTEGER IPVIN( 8, NSET )
       INTEGER NSTATE( NPOS )
       LOGICAL VAR
       REAL TOLS
       REAL TOLZ
       INTEGER MAXIT
       REAL SKYSUP
-      CHARACTER * ( 10 ) IMGID( NPOS, NSET )
+      CHARACTER * ( 10 ) IMGID( 4, NSET )
       INTEGER ILEVEL
       
 *  Arguments Given and Returned:

@@ -40,9 +40,9 @@
 *        for circular
 *     NPAIR = INTEGER (Given)
 *        Number of polarimetric pairs
-*     IPDCOR( 2 * NPOS, NSET ) = INTEGER (Given)
+*     IPDCOR( 8, NSET ) = INTEGER (Given)
 *        Pointers to the corrected input polarisation images
-*     IPVCOR( 2 * NPOS, NSET ) = INTEGER (Given)
+*     IPVCOR( 8, NSET ) = INTEGER (Given)
 *        Pointers to variances on the input images
 *     NSTATE( NPOS ) = INTEGER (Given)
 *        the number of images at each waveplate position
@@ -87,7 +87,8 @@
 *     16-JAN-1998 (DSB):
 *        Added missing IERR argument to VEC_RTOR calls. Added call to
 *        CCD1_ORVAR to initialise the co-variance matrix.
-
+*     02-JUN-1998 (TMG):
+*        Correctly dimension IPDCOR and IPVCOR
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -104,8 +105,8 @@
       INTEGER NSET
       INTEGER NPOS
       INTEGER NPAIR
-      INTEGER IPDCOR( 2 * NPOS, NSET )
-      INTEGER IPVCOR( 2 * NPOS, NSET )
+      INTEGER IPDCOR( 8, NSET )
+      INTEGER IPVCOR( 8, NSET )
       INTEGER NSTATE( NPOS )
       LOGICAL VAR
       
