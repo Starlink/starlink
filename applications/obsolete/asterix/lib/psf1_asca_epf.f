@@ -154,7 +154,7 @@
 	HI_R = MAXR
         DO WHILE ( ABS(HI_R-LO_R) .GT. 0.001 * HI_R )
 	  MID_R = (LO_R+HI_R)/2.0
-	  ET = PSF1_ASCA_EEF( E, (LO_R+HI_R)/2.0, OFF, 0.0 )
+	  ET = PSF1_ASCA_EEF( E, MID_R, OFF, 0.0 )
 	  IF ( ET .GT. TEEF ) THEN
 	    HI_R = MID_R
 	  ELSE
@@ -163,7 +163,7 @@
 	END DO
 
 *    Set radius
-        RADII(I) = MM2AM*MATH__DTOR*60.0*(LO_R+HI_R)/2.0
+        RADII(I) = MM2AM*MATH__DTOR*(1.0/60.0)*(LO_R+HI_R)/2.0
 
 *  Next EEF value
       END DO
