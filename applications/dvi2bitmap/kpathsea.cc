@@ -50,9 +50,16 @@ using std::cerr;
 
 // The Kpathsea library interface has to be isolated in this class because the
 // kpathsea headers typedef a `string' type, which conflicts with C++ string.
-// It would be more appropriate to put this into a namespace, but egcs
+//
+// This WAS: ''It would be more appropriate to put this into a namespace, but egcs
 // doesn't support that, so fake it by putting them in a class with only
-// static methods.
+// static methods.''  Well, we do have namespaces now (or rather, I
+// don't want to support C++ compilers which don't have them), so the
+// kpse stuff is now in a kpse namespace.  It might be that this
+// should prompt a redesign of this class, into something more
+// object-oriented.  We need to use namespacing, now, since we need to
+// include PkFont.h, and that in turn includes <string.h>, which
+// messes things up royally unless we finally use namespaces.
 // 
 // The headers here use HAVE_ASSERT_H, so that might need to be configured.
 // They also test HAVE_PROTOTYPES and STDC_HEADERS, both of which should be 
@@ -72,13 +79,22 @@ using std::cerr;
 #define STDC_HEADERS
 #define KPATHSEA_C_STD_H 1
 #include <stdio.h>
-extern "C" {
+namespace kpse {
+    extern "C" {
 #include <kpathsea/progname.h>
 #include <kpathsea/debug.h>
 #include <kpathsea/proginit.h>
 #include <kpathsea/tex-glyph.h>
 
-    kpse_format_info_type kpse_format_info[kpse_last_format] = { 0 };
+        // Initialise kpse_format_info.  This array is elaborately
+        // initialised at run-time in kpse_init_format (tex-file.c in
+        // web2c sources).  If, however, it isn't initialised at
+        // compile time, then it can cause linking errors on OSX.  See thread
+        // <http://tug.org/pipermail/tex-k/2003-June/000717.html>,
+        // where I reported what I thought was a non-initialisation
+        // bug, for more details.
+        kpse_format_info_type kpse_format_info[kpse_last_format] = { 0 };
+    }
 }
 #undef STDC_HEADERS
 #undef HAVE_PROTOTYPES
@@ -135,13 +151,12 @@ void kpathsea::init (const char *program_name, const int basedpi)
     // In any case, this is supposed to be not much more than a hack to avoid
     // being bitten by arguably misconfigured texmf.cnf files, so don't lose
     // sleep over it.
-    program_name = program_invocation_name = FAKE_PROGNAME;
+    program_name = kpse::program_invocation_name = FAKE_PROGNAME;
 #endif
 
-    kpse_set_program_name (program_name, "dvi2bitmap");
+    kpse::kpse_set_program_name (program_name, "dvi2bitmap");
 
-    //kpse_init_prog ("TEX", basedpi, "localfont", "cmr10");
-    kpse_init_prog ("TEX", basedpi, NULL, NULL);
+    kpse::kpse_init_prog ("TEX", basedpi, NULL, NULL);
     initialised_ = true;
 }
 /**
@@ -167,9 +182,16 @@ const char *kpathsea::find (const char *fontname, int resolution)
 	init("tex", PkFont::dpiBase());
     }
 
-    kpse_glyph_file_type glyph_info;
+    kpse::kpse_glyph_file_type glyph_info;
     char *fname;
-    fname = kpse_find_pk (fontname, resolution, &glyph_info);
+    // This next line is really 
+    //    fname = kpse::kpse_find_pk (fontname, resolution, &glyph_info);
+    // but kpse_find_pk is really a macro (grrr), so we have to unpack it
+    // if the namespacing is to work.
+    fname = kpse::kpse_find_glyph(fontname,
+                                  resolution,
+                                  kpse::kpse_pk_format,
+                                  &glyph_info);
 
     if (verbosity_ > normal)
 	if (fname)
@@ -195,9 +217,9 @@ verbosities kpathsea::verbosity (const verbosities level)
     verbosities oldv = verbosity_;
     verbosity_ = level;
     if (level > debug)
-	kpathsea_debug = ~0;	// all debugging
+	kpse::kpathsea_debug = ~0; // all debugging
     else
-	kpathsea_debug = 0;	// none
+	kpse::kpathsea_debug = 0; // none
     return oldv;
 }
 
