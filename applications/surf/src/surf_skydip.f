@@ -100,6 +100,10 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.16  1997/06/20 21:46:10  timj
+*     Add printout of the LST of the observation since this is useful for
+*     EXTINCTION.
+*
 *     Revision 1.15  1997/06/13 00:19:45  timj
 *     Use MSG_OUTIF
 *     Change name to SURF
@@ -401,6 +405,38 @@ c
          END IF
       END IF
 
+*     Get Sidereal time start and end.
+*     (Should probably merge this with the identical code 
+*     found in EXTINCTION)
+ 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STSTART',
+     :  STEMP, STATUS)
+      DO I = 1, 2
+         ITEMP = INDEX (STEMP,':')
+         IF (ITEMP .NE. 0) THEN
+            STEMP (ITEMP:ITEMP) = ' '
+         END IF
+      END DO
+      ITEMP = INDEX (STEMP, '.') ! Remove the decimal places
+      STEMP = STEMP(:ITEMP-1)
+      
+      CALL MSG_SETC ('START_LST', STEMP)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STEND',
+     :  STEMP, STATUS)
+      DO I = 1, 2
+         ITEMP = INDEX (STEMP,':')
+         IF (ITEMP .NE. 0) THEN
+            STEMP (ITEMP:ITEMP) = ' '
+         END IF
+      END DO
+      ITEMP = INDEX (STEMP, '.') ! Remove the decimal places
+      STEMP = STEMP(:ITEMP-1)
+
+      CALL MSG_SETC ('END_LST', STEMP)
+      CALL MSG_SETC ('PKG', PACKAGE)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: observation started at sidereal '//
+     :     'time ^START_LST and ended at ^END_LST', STATUS)
 
 *  find and report the sub instruments used and filters for this observation
  
