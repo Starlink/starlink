@@ -322,7 +322,7 @@
       IF ( NITMAX .EQ. 0 ) THEN
 
 *    Evaluate the statistic
-        CALL FIT_APPTIE( MODEL, .FALSE, PARAM, LB, UB, STATUS )
+        CALL FIT_APPTIE( MODEL, .FALSE., PARAM, LB, UB, STATUS )
         CALL FIT_STAT( NDS, OBDAT, INSTR, MODEL, PARAM, FSTAT,
      :                    FIT_PREDDAT, PREDDAT, STAT, STATUS )
 
