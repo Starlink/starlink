@@ -26,6 +26,10 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     - This routine attempts to execute even if STATUS is set to an
+*     error on entry.
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -57,11 +61,8 @@
       CHARACTER ENV*40           ! Value of KAPPA_VERBOSE env. variable
 *.
 
-*  Initialise.
-      VERB = .FALSE.
-
-*  Check the inherited status. 
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Begin a new error reporting context.
+      CALL ERR_BEGIN( STATUS )
 
 *  Attempt to get the value of the anvironment variable KAPPA_VERBOSE.
       CALL PSX_GETENV( 'KAPPA_VERBOSE', ENV, STATUS )
@@ -76,5 +77,8 @@
          VERB = .TRUE.
 
       END IF
+
+*  End the error reporting context.
+      CALL ERR_END( STATUS )
 
       END
