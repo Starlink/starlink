@@ -41,8 +41,7 @@
 *        "_DOUBLE", "_UBYTE", "_UWORD" corresponding to signed byte,
 *        signed word, real, integer, double precision, unsigned byte,
 *        and unsigned word.  See SUN/92 for further details.  An
-*        unambiguous abbreviation may be given.  The default is the
-*        type corresponding to that of the BDF.  []
+*        unambiguous abbreviation may be given. ["_REAL"]
 *     DESCRIP = _LOGICAL (Read)
 *        If true the descriptors in the BDF are reported as they are
 *        copied to the FITS extension within the output NDF. [FALSE]
@@ -57,13 +56,13 @@
 *     BDF2NDF OLD NEW
 *        This converts the BDF called OLD (in file OLD.BDF) to the NDF
 *        called NEW (in file NEW.SDF).  NEW's data array will have
-*        the same data type as that of OLD.  Descriptors are copied
-*        to the FITS extension but are not reported.
+*        the _REAL data type.  Descriptors are copied to the FITS
+*        extension but are not reported.
 *     BDF2NDF OLD NEW DESCRIP
 *        This converts the BDF called OLD (in file OLD.BDF) to the NDF
 *        called NEW (in file NEW.SDF).  NEW's data array will have
-*        the same data type as that of OLD.  Descriptors are copied
-*        to the FITS extension and are reported.
+*        the _REAL data type.  Descriptors are copied to the FITS
+*        extension and are reported.
 *     BDF2NDF HORSE HORSE TYPE="_WORD"
 *        This converts the BDF called HORSE (in file HORSE.BDF) to the
 *        NDF also called HORSE (in file HORSE.SDF).  The NDF's data
@@ -73,8 +72,7 @@
 *  Notes:
 *     -  The conversion rules can be summarised as follow:
 *        o  the BDF data array is copied to the NDF main data array;
-*        by default the output data array has the data type
-*        corresponding to that of the BDF.
+*        by default the output data array has the data type _REAL.
 *        o  The BLANK descriptor is not used to flag pixels in the NDF
 *        with the bad value.  Use KAPPA's SETMAGIC to flag another
 *        value.
@@ -178,6 +176,9 @@
 *     1992 July 17 (MJC):
 *        Removed loop when obtaining the type as PAR routine validates
 *        the data types.
+*     1993 January 27 (MJC):
+*        Corrected the description of the default value of parameter
+*        TYPE, and hence modified the examples.
 *     {enter_further_changes_here}
 
 *  Bugs:
