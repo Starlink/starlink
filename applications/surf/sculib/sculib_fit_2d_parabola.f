@@ -1,6 +1,6 @@
 *+ SCULIB_FIT_2D_PARABOLA - fit 2d parabola to data
       SUBROUTINE SCULIB_FIT_2D_PARABOLA (N, DATA, VARIANCE, QUALITY,
-     :  X, Y, A0, A1, X0, Y0, Z_PEAK, Z_PEAK_VAR, STATUS)
+     :  X, Y, A0, A1, X0, Y0, Z_PEAK, Z_PEAK_VAR, BADBIT, STATUS)
 *    Description :
 *     This routine performs a least-squares fit of a 2d parabola to a set
 *     of data. The form of the parabola is:-
@@ -53,7 +53,7 @@
 *     on the data then very strange numbers can result.
 *    Invocation :
 *     CALL SCULIB_FIT_2D_PARABOLA (N, DATA, VARIANCE, QUALITY,
-*    :  X, Y, A0, A1, X0, Y0, Z_PEAK, Z_PEAK_VAR, STATUS)
+*    :  X, Y, A0, A1, X0, Y0, Z_PEAK, Z_PEAK_VAR, BADBIT, STATUS)
 *    Parameters :
 *     N                      = INTEGER (Given)
 *           number of data points
@@ -61,7 +61,7 @@
 *           the data
 *     VARIANCE (N)           = REAL (Given)
 *           variance on the data
-*     QUALITY (N)            = INTEGER (Given)
+*     QUALITY (N)            = BYTE (Given)
 *           the quality on the data
 *     X (N)                  = REAL (Given)
 *           the x offsets of the data
@@ -79,6 +79,8 @@
 *           the value of the parabola apex
 *     Z_PEAK_VAR             = REAL (Returned)
 *           the variance on Z_PEAK
+*     BADBIT                 = BYTE (Given)
+*           bad bit mask
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 *    Method :
@@ -95,10 +97,11 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Import :
+      BYTE BADBIT
       INTEGER N
       REAL DATA (N)
       REAL VARIANCE (N)
-      INTEGER QUALITY (N)
+      BYTE QUALITY (N)
       REAL X (N)
       REAL Y (N)
 *    Import-Export :
@@ -139,6 +142,8 @@
       REAL             SUM_Z         ! sum of data / variance
 *    Internal References :
 *    Local data :
+*    Local functions:
+      INCLUDE 'NDF_FUNC'
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -164,11 +169,11 @@
          SUM_X2Y2Z = 0.0
 
          DO I = 1, N
-            IF ((QUALITY(I) .EQ. 0)    .AND.
+            IF ((NDF_QMASK(QUALITY(I),BADBIT))    .AND.
      :          (VARIANCE(I) .GT. 0.0)) THEN
                N_GOOD = N_GOOD + 1
 
-	print *, data(i), variance(i), x(i), y(i), i
+*	print *, data(i), variance(i), x(i), y(i), i
                SUM_INVAR = SUM_INVAR + 1.0 / VARIANCE(I)
                SUM_X = SUM_X + X(I) / VARIANCE(I)
                SUM_Y = SUM_Y + Y(I) / VARIANCE(I)
@@ -266,5 +271,5 @@
          END IF
       END IF
             
-      print *, 'fit ', z_peak, z_peak_var, x0, y0
+*      print *, 'fit ', z_peak, z_peak_var, x0, y0
       END
