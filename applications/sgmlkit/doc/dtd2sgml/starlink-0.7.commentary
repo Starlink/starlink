@@ -1,0 +1,1153 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE commentaries SYSTEM "commentaries.dtd" [
+	<!NOTATION XML SYSTEM ''>
+	<!ENTITY descrip SYSTEM 'starlink-0.7.description' NDATA XML>
+]>
+
+<commentaries targetdocument='descrip'>
+
+<commentary label='backmatter'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 15 Oct 1999 17:22:27 +0100 (BST)</date>
+<subject>Re: DTD topics for discussion</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Tue Mar 28 18:21:53 2000</otherheader>
+<body>
+[...]
+
+> o Is the bibliography system adequate.
+> 
+>    My opinion is that it's not feasible to force people to use BibTeX.
+>    We could do one of the following:
+> 
+>     - Provide no special handling for bibliographies and just use 
+>       something like
+>         &lt;sect>Bibliography
+>         &lt;p>
+>         &lt;dl>
+>            &lt;dt>Book title &lt;dd>Book authors, date, publication info
+>         &lt;/dl>
+> 
+>     - Provide a rudimentary bibliography element
+>         &lt;bibliography>
+>         &lt;bibentry>
+>            &lt;bibtitle>Book title
+>            &lt;bibauthors>Mr A and Mr B et al.
+>            &lt;bibextra>2nd edition, (1999)
+>         &lt;/bibliography>
+> 
+>     - Provide an all-singing all-dancing bibliography element.
+> 
+>    I'd be inclined towards the second choice at least as a first go.
+>    The complexity which BibTeX allows suggests that it could be 
+>    easy prey to creeping featurism but I'd advocate a general policy of 
+>    resisting this, since on the whole Starlink documents don't seem
+>    to have very complex requirements for bibliographies.
+
+My thought here was to mirror the BibTeX definitions, and more-or-less
+refer folk to the BibTeX manual for details.  That way, we have
+complete bibliography support, plus easy implementation.
+
+[...]
+
+Norman
+
+
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+</body>
+</commentary>
+<commentary label='docxref'>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Wed, 24 May 2000 10:32:32 +0100 (BST)</date>
+<subject>Conformance with &lt;ref&gt;</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Wed May 24 10:32:36 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+docxref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 24 May 2000 10:32:36 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12uXWl-0005ej-00 for sgml-starlink-0.7+docxref@astro.gla.ac.uk; Wed, 24 May 2000 10:32:35 +0100</otherheader>
+<otherheader name='Received'>from puce.csi.cam.ac.uk ([131.111.8.40] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12uXWo-0005yE-00 for sgml-starlink-0.7+docxref@astro.gla.ac.uk; Wed, 24 May 2000 10:32:38 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by puce.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12uXWj-0004ty-00 for sgml-starlink-0.7+docxref@astro.gla.ac.uk; Wed, 24 May 2000 10:32:33 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id KAA12419 for &lt;sgml-starlink-0.7+docxref@astro.gla.ac.uk&gt;; Wed, 24 May 2000 10:32:33 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id KAA01299 for &lt;sgml-starlink-0.7+docxref@astro.gla.ac.uk&gt;; Wed, 24 May 2000 10:32:32 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10005241031260.1293-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+When we come to a decision about how the &lt;ref&gt; element is going to look,
+it would probably be a good idea to make the &lt;docxref&gt; element work
+the same way except so far as there are good reasons for differences.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary label='em'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 15 Oct 1999 17:22:27 +0100 (BST)</date>
+<subject>Re: DTD topics for discussion</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Tue Mar 28 18:21:53 2000</otherheader>
+<body>
+[...]
+
+> o What is the best model for italics, bold, underline, et al.
+> 
+>    I'm staying well out of this one.
+
+Ach, coward!
+
+My feeling is that we should keep the functional and presentation
+markup separate, so that we have complete control in the
+down-conversion about which bits of presentational markup we should
+map functional markup to. 
+
+For example, at present the `kbd' element is mapped to the underline
+element, as it seems quite important to distinguish that from other
+`code' material.  If authors could appropriate the underline element
+for that, we wouldn't have the freedom within the down-converter to
+use it for something else.  We really have quite a small palette of
+target elements -- just `i', `b', `code' and `u', I think (`blink' is
+OUT, and `font' is probably dodgy in portability terms).  If we have
+more things to express than four, we have to choose which source
+elements we can affort not to distinguish, and in any case we don't
+have enough to afford letting authors appropriate some of these.
+
+[...]
+
+Norman
+
+
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+</body>
+</commentary>
+<commentary label='m'>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Tue, 4 Apr 2000 12:53:44 +0100 (BST)</date>
+<subject>latex2eqn</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Tue Apr 04 12:53:47 2000</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12cRty-0007nO-00; Tue, 04 Apr 2000 12:53:46 +0100</otherheader>
+<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12cRu1-0000xr-00; Tue, 04 Apr 2000 12:53:49 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12cRty-0002Jf-00; Tue, 04 Apr 2000 12:53:46 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29.ast.cam.ac.uk [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id MAA26070; Tue, 4 Apr 2000 12:53:45 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id MAA21352; Tue, 4 Apr 2000 12:53:45 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10004041221470.21160-100000@cass29></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+Have we any ideas what to do with math content for help downconverters
+(or any other downconverters to non-graphical output)?
+A latex -> eqn (eqn is a roff preprocessor) converter would be a good start, 
+though it obviously couldn't cope with everything; however a quick 
+search doesn't reveal that any such thing exists.  
+
+As things stand the only robust alternative I can see is spitting out the
+latex content, but this is not very friendly to help file readers.
+
+Maybe we need a mechanism which can contain an alternative 
+ascii-art representation of the latex-notation content.  
+This probably needs to be an optional, verbatim-like, element rather 
+than an attribute since it may need line breaks to make sense.
+In practice, as far as I can see, this is only going to
+be a problem for programcode not main document text, since only 
+programcode gets converted to an ascii-like format (unless we envisage
+people reading SUNs with lynx??).  But if we make a modification,
+it's probably best to programcode and main DTDs alike.
+
+Or is this something we've come up with a solution for already and I've
+just forgotten?
+
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+</body>
+</commentary>
+<commentary label='em'>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Fri, 2 Jun 2000 11:14:34 +0100 (BST)</date>
+<subject>Use with span element</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Fri Jun 02 11:14:39 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+m@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 02 Jun 2000 11:14:39 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xoTP-0003EM-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 11:14:39 +0100</otherheader>
+<otherheader name='Received'>from navy.csi.cam.ac.uk ([131.111.8.49] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12xoTR-0000og-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 11:14:41 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by navy.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12xoTM-0002De-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 11:14:36 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id LAA16868 for &lt;sgml-starlink-0.7+m@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 11:14:35 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id LAA26746 for &lt;sgml-starlink-0.7+m@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 11:14:35 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006021106160.26664-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+I think use of the new &lt;span&gt; element can cover this.
+You will be able to write
+
+   &lt;span media='screen,print'&gt;&lt;m&gt;(x^2 + y^2)&lt;/m&gt;&lt;/span&gt;
+   &lt;span media='tty'&gt;(x**2 + y**2)&lt;/span&gt;
+
+which does the job nicely I think.
+
+For displayed maths you'd typically want to do something like:
+
+   &lt;span media='screen,print'&gt;
+   &lt;mequation&gt;
+      x^n + y^n = z^n
+   &lt;/mequation&gt;
+   &lt;/span&gt;
+   &lt;span media='tty&gt;
+   &lt;verbatim&gt;
+      x**n + y**n = z**n
+   &lt;/verbatim&gt;
+   &lt;/span&gt;
+
+unfortunately with the current implementation of span this is not 
+possible, since it cannot contain a verbatim.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary label='em'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 2 Jun 2000 15:25:42 +0100 (BST)</date>
+<subject>Use with span element</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Fri Jun 02 15:25:43 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+m@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 02 Jun 2000 15:25:43 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xsOM-0003eo-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 15:25:42 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12xsOM-0004wf-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 15:25:42 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10006021523420.17541-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+I've altered the content model of the span element, so that it can now
+include all the elements which can be in a paragraph, specifically
+including &lt;verbatim&gt; and &lt;m&gt;.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+<commentary label='ref'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Wed, 19 Apr 2000 16:25:30 +0100 (BST)</date>
+<subject>&lt;ref> substructure</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Wed Apr 19 16:25:26 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk></otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 19 Apr 2000 16:25:26 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12hwM1-00013Y-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 19 Apr 2000 16:25:25 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12hwM6-00026n-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 19 Apr 2000 16:25:30 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10004181428500.6333-100000@goedel.astro.gla.ac.uk></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+The model for the ref element is, as one might expect, a little more
+subtle than first thoughts suggested.
+
+The most obvious model is version 1:
+
+   See &lt;ref id=x>
+     &lt;reftext media=screen>this section&lt;/reftext>
+     &lt;reftext media=print>section &lt;refinfo>secnum&lt;/refinfo>&lt;/reftext>
+   &lt;/ref>
+
+That could be compressed somewhat using tag omission features, and
+shortrefs, with &lt;refinfo>secnum&lt;/refinfo> being written as, say, %secnum%
+(this would apply to SGML only, not to XML).  The media types could be
+those in HTML4[1].  I would propose that a ref with no content (that is,
+either &lt;ref id=x>&lt;/ref> or &lt;ref id=x/> be formatted as a parenthetical
+reference with magic text (as an author, _I_ want to use this).
+
+This has the advantage of being nicely self-contained.  However,
+the problem I perceive with this is that the reftext element is less
+general than it could be, which is unattractive; it means that the only
+place in which one can specify alternate text is within a reference
+rather than anywhere else (if we ignore the possibilities of using
+&lt;![%Only.paper[...]]&gt; marked sections, which we probably should as it
+has that fatal combination of flexibility and screwupability which makes
+it so attractive as a hack); and it means that there's one more element
+to learn about.
+
+
+Version 2:
+
+    See &lt;ref id=x>
+     &lt;span media=screen>this section&lt;/span>
+     &lt;span media=print>section &lt;refinfo>secnum&lt;/refinfo>&lt;/span>
+   &lt;/ref>
+
+This appears identical except for the change reftext->span: the difference
+is that span would be an element which is not specific to ref elements,
+but could be used elsewhere in the document, to mark out text, such as a
+sentence, which is specific to a particular media type.  It's available
+in HTML4[2], though it doesn't have a media attribute there.  It could
+have other attributes added in future, if we wanted.
+
+The media attribute could be added to elements like p, or even sect,
+to indicate paragraphs or complete sections which were for one media
+type alone.
+
+This, I think, is a nice idea.  The problem with this appears when you
+consider span's content model.  Given that we want the span element to
+be able to delimit whole sentences, at least, span should probably be
+included in the set %simplephrase (see [3]), with a (fairly comprehensive)
+content model of %phrase.  However, this means that a ref could contain
+a span, which could contain another ref, at which point things get very
+complicated.  This means we either give span a very restricted content
+model, which makes it not really different from reftext above and loses
+general usefulness, or...
+
+
+Version 3:
+
+    See
+     &lt;span media=screen>&lt;ref id=x>this section&lt;/ref>&lt;/span>
+     &lt;span media=print>&lt;ref id=x>section &lt;refinfo>secnum&lt;/refinfo>&lt;/ref>&lt;/span>
+
+This has the disadvantage that you have to type the ref element twice
+(though that's no great hardship really, and the closing tags
+could be omitted in most cases).  What it gains us is that the span
+element now sits at the most appropriate point in the element
+hierarchy, and ref can have a content model of '(#pcdata | refinfo)*',
+which is nice and simple, and specifically doesn't allow refs within
+refs.
+
+
+So:
+
+In what sort of situations would we actually _want_ to specify
+alternate text?  If we do actually want flexibility at a finer
+granularity than we'd get by adding media attributes to sections and
+paragraphs, then I believe version 3 is what we want (I think the
+marked section route should be sat on pretty firmly).  If we don't
+need that much flexibility, so that the only time we'd want
+alternating text is within references, then version 1 is the one to go
+for.  Version 2 is too much of a hybrid: I already find it confusing
+and I've just invented it!
+
+Norman
+
+
+
+[1] <url>http://www.w3.org/TR/html4/types.html#h-6.13</url>
+[2] <url>http://www.w3.org/TR/html4/struct/global.html#h-7.5.4</url>
+[3] <url>http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ELEMENTS%20Starlink%20Paragraph%20Elements%200.7//EN</url>
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+</body>
+</commentary>
+<commentary label='ref'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 12 May 2000 17:40:58 +0100 (BST)</date>
+<subject>&lt;ref&gt; now has content</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Fri May 12 17:40:59 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 12 May 2000 17:40:59 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12qIUl-0004qw-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Fri, 12 May 2000 17:40:59 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12qIUk-0005OI-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Fri, 12 May 2000 17:40:58 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005121740400.18710-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+As an intermediate measure, I've made the &lt;ref&gt; content model
+`(#PCDATA)', so that any text inside a &lt;ref&gt; forms the link text.  If
+there's no such text -- if the element is empty -- then link text is
+generated.  At present, the link text is as it was before, `Section 2'
+for example; it might be worth making this generated text fully
+parenthetical in future, such as `[Section 2]', or even `[see Section
+2]' (probably the former, for my money).
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+
+</body>
+</commentary>
+<commentary label='ref'>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Mon, 15 May 2000 15:09:20 +0100 (BST)</date>
+<subject>ref content</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Mon May 15 15:09:27 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Mon, 15 May 2000 15:09:27 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12rLYk-0001zT-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Mon, 15 May 2000 15:09:26 +0100</otherheader>
+<otherheader name='Received'>from navy.csi.cam.ac.uk ([131.111.8.49] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12rLYm-0005ax-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Mon, 15 May 2000 15:09:28 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by navy.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12rLYh-00049w-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Mon, 15 May 2000 15:09:23 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id PAA19400 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk&gt;; Mon, 15 May 2000 15:09:22 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id PAA11098 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk&gt;; Mon, 15 May 2000 15:09:21 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10005151458120.11010-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+I think I agree, option 3 is the best way to go.
+
+Although &lt;ref&gt; elements may be the most common time that alternate 
+text is required for different output media, it is not the only time,
+and so providing a general mechanism for this is necessary.
+Given that, incorporating such a mechanism into the &lt;ref&gt; element 
+would seem like unnecessary complication.
+
+I don't much like the form of the &lt;refinfo&gt; element in the above examples,
+it looks like 'secnum' is literal text to get output; wouldn't 
+
+   See &lt;ref id=x&gt;section &lt;refinfo secnum&gt;&lt;/ref&gt;
+
+or (equivalently?)
+
+   See &lt;ref id=x&gt;section &lt;refinfo type=secnum&gt;&lt;/ref&gt;
+
+or
+
+   See &lt;ref id=x&gt;section &lt;refsecnum&gt;&lt;/ref&gt;
+   
+be preferable?
+
+Some discussion of the form of the details of the &lt;span&gt; element, 
+if that's what it's going to be called, will be in order, but not 
+just here.
+
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary label='ref'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Tue, 16 May 2000 15:37:42 +0100 (BST)</date>
+<subject>&lt;refinfo&gt;</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Tue May 16 15:37:43 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Tue, 16 May 2000 15:37:43 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12riTe-0007bu-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Tue, 16 May 2000 15:37:42 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12riTe-0000pm-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Tue, 16 May 2000 15:37:42 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005161532410.2432-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+When written in the form &lt;refinfo&gt;secnum&lt;/refinfo&gt;, I agree.  This does
+look more clumsy than the more natural &lt;refinfo secnum/&gt;.  The reason
+I wrote it like that is so that cunning use of shortrefs would make it
+writable like %secnum%, or something similar, which looks more natural
+still.
+
+However, the disadvantage is that it's only superficially natural --
+because of (possibly fragile in principle) shortref tricksiness.  
+
+I'm not wedded to either form -- I'm quite happy to go with the any
+consensus here.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+<commentary label='ref'>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Wed, 24 May 2000 14:05:22 +0100 (BST)</date>
+<subject>ref EMPTY again?</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Wed May 24 14:05:26 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 24 May 2000 14:05:26 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12uaqj-0006HM-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:05:25 +0100</otherheader>
+<otherheader name='Received'>from puce.csi.cam.ac.uk ([131.111.8.40] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12uaqn-0001Y8-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:05:29 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by puce.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12uaqi-0000Xv-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:05:24 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id OAA15658 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk&gt;; Wed, 24 May 2000 14:05:24 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id OAA03057 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk&gt;; Wed, 24 May 2000 14:05:23 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10005241401450.3032-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+If we're going to implement the media-sensitive content using a mechanism
+(&lt;span&gt;) which is entirely separate from the &lt;ref&gt; element, should
+we put the &lt;ref&gt; element back to being EMPTY, with text optionally
+supplied using a 'text' attribute?  This is what it was like previously
+(and is what the &lt;docxref&gt; element currently looks like).
+
+Or possibly there was some other reason for making the reference text
+to be content, e.g. so that you could have a more complex content
+model than just PCDATA, which is what it is at the moment?
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary label='ref'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Wed, 24 May 2000 14:24:31 +0100 (BST)</date>
+<subject>Ref content could consist of section number/name placeholders</subject>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 24 May 2000 14:24:32 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12ub9D-0006Js-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:24:31 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12ub9E-0004kA-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:24:32 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005241413270.17079-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+The original modivation for making the &lt;ref&gt; elements non-empty was to
+have `placeholder' elements within them, such as &lt;refinfo secnum/&gt; or
+whatever (details to be argued about).  It would be possible to have
+these placeholders as magic text inside a `text' attribute of the
+&lt;ref&gt; element, but that would involve the down-converter parsing the
+attribute string, which is a real fuss in both DSSSL and XSL, apart
+from any other considerations of good design.
+
+Given that specifying overriding &lt;ref&gt; text will be deemed to be
+`normal', as opposed to leaving the element empty and having the
+down-converter generate it, having this overriding text as element
+content rather than an attribute value seems more natural.  The
+generation of text in the latter case will continue to be supported,
+not least because it's how I'll prefer to write documents.
+
+If we continue to allow the element to have content, but hold off
+designing the &lt;refinfo&gt; element (or whatever) until after June, that
+shouldn't have any effect on Mark's current upconverter work, since there
+is no structure corresponding to &lt;refinfo&gt; in the LaTeX source.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+<commentary label='span'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Sat, 3 Jun 2000 15:16:31 +0100 (BST)</date>
+<subject>How do you say `everything else'?</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Sat Jun 03 15:16:33 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+span@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Sat, 03 Jun 2000 15:16:33 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12yEj2-0004Pf-00 for sgml-starlink-0.7+span@astro.gla.ac.uk; Sat, 03 Jun 2000 15:16:32 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12yEj1-0005c0-00 for sgml-starlink-0.7+span@astro.gla.ac.uk; Sat, 03 Jun 2000 15:16:31 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10006031458460.21375-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+At present, you can't say that one &lt;span&gt; is for everything _except_
+one media type.  For example, you could say
+
+&lt;span media='screen,print'&gt;&lt;m&gt;r^2=x^2+y^2&lt;/m&gt;&lt;/span&gt;
+&lt;span media='tty'&gt;&lt;code&gt;r**2 = x**2 + y**2&lt;/code&gt;&lt;/span&gt;
+
+But that leaves you out in the cold if and when we implement a
+`3d-glasses' media type.  This is a limitation in the HTML4 definition
+of the span element, which I've merely copied.
+
+How about either (or both???) of:
+
+&lt;span media='!tty'&gt;&lt;m&gt;r^2=x^2+y^2&lt;/m&gt;&lt;/span&gt;
+&lt;span media='tty'&gt;&lt;code&gt;r**2 = x**2 + y**2&lt;/code&gt;&lt;/span&gt;
+
+so that the first one matches whenever the media type is _not_ tty, or
+
+&lt;spanset&gt;
+&lt;span media='tty'&gt;&lt;code&gt;r**2 = x**2 + y**2&lt;/code&gt;&lt;/span&gt;
+&lt;span media='all'&gt;&lt;m&gt;r^2=x^2+y^2&lt;/m&gt;&lt;/span&gt;
+&lt;/spanset&gt;
+
+with the understanding that only the first matching span is selected.
+The &lt;spanset&gt; start tag looks like it would be omissable, but isn't.
+
+Of the two, the logic of the second appeals to me more, but the extra
+tag is ugly, and takes us away from the picture of the span element as
+a general-purpose mechanism (though currently used only for
+media-selection) for delimiting areas of text.  The first one
+wouldn't be hard to implement.
+
+While we're on the subject, how about a &lt;div&gt; element, functioning just
+like &lt;span&gt;, but at a higher level in the hierarchy, so that it can
+include sections and/or paragraphs?
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+<commentary label='webref'>
+<from>Rodney Warren-Smith</from>
+<email>rfws@star.rl.ac.uk</email>
+<date>Tue, 25 Jan 2000 17:20:25 +0000 (GMT)</date>
+<subject>More XSL testing</subject>
+<otherheader name='From '>rfws@star.rl.ac.uk Tue Mar 28 18:29:33 2000</otherheader>
+<body>
+Norman, Mark,
+
+[...]
+
+   There are also some confusing things. Like &lt;WEBREF> has &lt;KBD> as
+part of its content, while &lt;KBD> has &lt;WEBREF> as part of its
+content. I can see that one might want to use them either way around,
+but presumably you wouldn't want to nest them recursively. Quite how
+that maps on to XSL I haven't bothered to work out yet. Whatever
+behaviour we decide we want should be documented before I tackle that
+challenge.
+
+[...]
+
+Rod.
+
+-------------------------------------------------------------------------------
+      This email represents the opinion of the author only and
+      should not be construed as reflecting CCLRC's corporate view.
+-------------------------------------------------------------------------------
+
+</body>
+</commentary>
+<commentary label='webref'>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Thu, 30 Mar 2000 18:19:08 +0100 (BST)</date>
+<subject>Mmm, that is an anomaly</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Thu Mar 30 18:19:08 2000</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12aib6-00076k-00 for general-0.6+webref@astro.gla.ac.uk; Thu, 30 Mar 2000 18:19:08 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12aib7-0006yc-00 for general-0.6+webref@astro.gla.ac.uk; Thu, 30 Mar 2000 18:19:09 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10003301808581.25679-100000@goedel.astro.gla.ac.uk></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+This is indeed a bit of an anomaly.  Originally, code and kbd had only
+plain data (#PCDATA) content, and the verbatim element had only `simple
+phrase' elements (#PCDATA | em | strong | quote | code | kbd | cite |
+m | angle | foreign).  Then I explicitly added the references elements
+(ref | docxref | webref | url ) to them both, so that you could make links
+between example text in a document and its documentation.  For example:
+`Now type &lt;kbd>% &lt;ref id=cmd.sect text='cmd'> argument&lt;/kbd>'.
+
+The latter seems very useful, and though it's an anomaly that you can
+have kbd inside webref inside kbd, I'm inclined to leave it, as I don't
+see it causing too many problems.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+</body>
+</commentary>
+<commentary label="li">
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Mon, 5 Jun 2000 12:32:25 +0100 (BST)</date>
+<subject>ID attribute?</subject>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk></otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+li@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Mon, 05 Jun 2000 12:32:36 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12yv7S-0005ba-00 for sgml-starlink-0.7+li@astro.gla.ac.uk; Mon, 05 Jun 2000 12:32:34 +0100</otherheader>
+<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12yv7U-0008UG-00 for sgml-starlink-0.7+li@astro.gla.ac.uk; Mon, 05 Jun 2000 12:32:36 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12yv7L-0005jP-00 for sgml-starlink-0.7+li@astro.gla.ac.uk; Mon, 05 Jun 2000 12:32:27 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id MAA18190 for &lt;sgml-starlink-0.7+li@astro.gla.ac.uk>; Mon, 5 Jun 2000 12:32:26 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id MAA08903 for &lt;sgml-starlink-0.7+li@astro.gla.ac.uk>; Mon, 5 Jun 2000 12:32:26 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006051227240.8896-100000@cass29></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+It might be desirable to have an `id' attribute on the &lt;li&gt; element 
+so that steps within an &lt;ol&gt; can be referred to, in the same way
+as is possible by using \label, \ref with LaTeX enumerate environments, 
+e.g.:
+
+   &lt;ol&gt;
+   &lt;li&gt;Put your left foot in
+   &lt;li&gt;Put your left foot out
+   &lt;li id=step.inout&gt;In, out, in, out
+   &lt;li&gt;Shake it all about
+   &lt;/ol&gt;
+   &lt;p&gt;Step &lt;ref id=step.inout /&gt; may be prolonged as required.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+</body>
+</commentary>
+<commentary label="span">
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Mon, 5 Jun 2000 10:26:43 +0100 (BST)</date>
+<subject>Re: How do you say `everything else'?</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Mon Jun 05 10:26:52 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk></otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+span@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Mon, 05 Jun 2000 10:26:52 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12yt9n-0005G0-00 for sgml-starlink-0.7+span@astro.gla.ac.uk; Mon, 05 Jun 2000 10:26:51 +0100</otherheader>
+<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12yt9p-0005xq-00 for sgml-starlink-0.7+span@astro.gla.ac.uk; Mon, 05 Jun 2000 10:26:53 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12yt9h-0002dg-00 for sgml-starlink-0.7+span@astro.gla.ac.uk; Mon, 05 Jun 2000 10:26:45 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id KAA16393 for &lt;sgml-starlink-0.7+span@astro.gla.ac.uk>; Mon, 5 Jun 2000 10:26:45 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id KAA08165 for &lt;sgml-starlink-0.7+span@astro.gla.ac.uk>; Mon, 5 Jun 2000 10:26:44 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='In-Reply-To'>&lt;Pine.LNX.4.10.10006031458460.21375-100000@goedel.astro.gla.ac.uk></otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006051010040.8063-100000@cass29></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+I *think* I prefer the former of these suggestions since it is 
+less markup heavy, but perhaps more clumsy.  
+If we use it, we have to be clear what, for instance, 
+`media="!tty,screen"' would mean.  I had considered suggesting 
+something similar, but using a `nomedia' attribute.
+
+An improvement on the latter might be to write something like
+
+&lt;spanset&gt;
+&lt;span media='tty'&gt;&lt;code&gt;r**2 = x**2 + y**2&lt;/code&gt;&lt;/span&gt;
+&lt;m&gt;r^2 = x^2 + y^2&lt;/m&gt;
+&lt;/spanset&gt;
+
+the semantics being that if a matching span element can be found then
+it should be used, otherwise the non-span content of the spanset should
+be used.  This is a bit closer to the way HTML4 handles media types
+in OBJECT elements.  It may however present more difficulties in the
+implementation than simply requiring a (span +) content model?
+
+Unless we're going to decide quickly on the second form, implementing
+the first at the next convenient opportunity would seem like a good
+idea, even if the second is to be adopted at a later date.
+
+&gt; While we're on the subject, how about a &lt;div&gt; element, functioning just
+&gt; like &lt;span&gt;, but at a higher level in the hierarchy, so that it can
+&gt; include sections and/or paragraphs?
+
+Yes it should be possible to allow media-conditional content selection
+at any level (well, maybe excepting docinfo etc).  I don't suppose it's
+possible to do this with a single element?  Using two elements to do 
+this job does not seem to have any benefits for the author.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+</body>
+</commentary>
+<commentary label="ref">
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Fri, 9 Jun 2000 10:34:05 +0100 (BST)</date>
+<subject>Output of empty &lt;ref> elements</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Fri Jun 09 10:34:08 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk></otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 09 Jun 2000 10:34:08 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 130LB1-0005aT-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Fri, 09 Jun 2000 10:34:07 +0100</otherheader>
+<otherheader name='Received'>from puce.csi.cam.ac.uk ([131.111.8.40] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 130LB5-0001kC-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Fri, 09 Jun 2000 10:34:11 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by puce.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 130LB1-00056Y-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Fri, 09 Jun 2000 10:34:07 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id KAA03299 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk>; Fri, 9 Jun 2000 10:34:06 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id KAA00132 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk>; Fri, 9 Jun 2000 10:34:06 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006091032480.126-100000@cass29></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+I suggest making sure that an empty ref element
+always gives text of the form '[element-type] [element-number]',
+e.g. 'section 3.4', 'item 2', 'appendix A' and document this in the
+documentation of ref.  Unless it's going to produce consistent and
+predictable text an empty ref element is very difficult to use
+because you don't know what it's going to come out like.
+This goes against the former suggestion of making an empty ref
+produce parenthesised text, but for my money this is better
+because it's easier to parenthesise something than unparenthesise it.
+
+I seem to remember we're kind of deprecating empty ref elements anyway,
+but for the moment they are more or less essential since we don't
+have any magic text elements for numbers.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+</body>
+</commentary>
+<commentary label="coderef">
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Thu, 6 Jul 2000 17:59:43 +0100 (BST)</date>
+<subject>Make coderef less unwieldy</subject>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+coderef@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Thu, 06 Jul 2000 17:59:46 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 13AF05-0003hQ-00 for sgml-starlink-0.7+coderef@astro.gla.ac.uk; Thu, 06 Jul 2000 17:59:45 +0100</otherheader>
+<otherheader name='Received'>from puce.csi.cam.ac.uk ([131.111.8.40] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 13AF06-00070E-00 for sgml-starlink-0.7+coderef@astro.gla.ac.uk; Thu, 06 Jul 2000 17:59:46 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by puce.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 13AF05-00013Z-00 for sgml-starlink-0.7+coderef@astro.gla.ac.uk; Thu, 06 Jul 2000 17:59:45 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id RAA08731 for &lt;sgml-starlink-0.7+coderef@astro.gla.ac.uk&gt;; Thu, 6 Jul 2000 17:59:44 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id RAA08723 for &lt;sgml-starlink-0.7+coderef@astro.gla.ac.uk&gt;; Thu, 6 Jul 2000 17:59:44 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10007061738060.8699-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+The large majority of of Starlink documents which need to refer to 
+routine elements 
+
+(a) will have only a single codecollection element, and
+(b) will use the name of the task/routine as the ID of the element in question 
+    (i.e. you'll have something like &lt;routinename id='NDG_CREAT'&gt;NDG_CREAT&lt;/&gt;
+
+At the moment to refer to something like this you have to write a 
+reference which looks like
+
+   &lt;coderef collection=allroutines id=NDG_CREAT&gt;NDG_CREAT&lt;/coderef&gt;
+
+I propose that the `collection' attribute be IMPLIED and if absent
+be taken to refer to a codecollection element with an absent `id' attribute.  
+(An alternative, although I think it's probably not such a good one, 
+would be making the collection attribute CURRENT).  
+
+I propose also an attribute called `idtext' or some such, which indicates
+that the content of the element is the same as the value of the id
+attribute (or can you do some magic with CONREF attributes to take care
+of this automatically?  I had to take my Goldfarb back to the library).
+
+Taking these two together would allow the above element to be written 
+instead:
+
+   &lt;coderef id=NDG_CREAT idtext /&gt;
+
+which is easier on the fingers and offers one less opportunity for a typo
+in the name of the routine.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary label="sect">
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Fri, 16 Jun 2000 16:25:14 +0100 (BST)</date>
+<subject>Mixing routinelist with other content</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Fri Jun 16 16:33:10 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+sect@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 16 Jun 2000 16:33:10 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 132y7J-0002nE-00 for sgml-starlink-0.7+sect@astro.gla.ac.uk; Fri, 16 Jun 2000 16:33:09 +0100</otherheader>
+<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 132y7N-00087Q-00 for sgml-starlink-0.7+sect@astro.gla.ac.uk; Fri, 16 Jun 2000 16:33:13 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 132xzf-0003xP-00 for sgml-starlink-0.7+sect@astro.gla.ac.uk; Fri, 16 Jun 2000 16:25:15 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id QAA21573 for &lt;sgml-starlink-0.7+sect@astro.gla.ac.uk&gt;; Fri, 16 Jun 2000 16:25:15 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id QAA12127 for &lt;sgml-starlink-0.7+sect@astro.gla.ac.uk&gt;; Fri, 16 Jun 2000 16:25:14 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006161619030.12069-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+What's the reasoning behind having the content model for &lt;sect&gt; and
+friends such that you can only have EITHER a &lt;routinelist&gt; OR other
+text in the section?
+
+One might commonly want to write a little bit of introductory text:
+
+  &lt;sect&gt;&lt;title&gt;Descriptions of routines
+  &lt;p&gt;Here is a list of the routines used to do such-and-such:
+  &lt;routinelist&gt;&lt;codecollection ...&gt;
+  &lt;p&gt;You might also want to look at ...
+  &lt;/sect&gt;
+
+If you just need to put text before the codecollection, which is 
+probably usually the case, then you can do it within the routinelist 
+element itself.  However, I can't think of any good semantic 
+reason why a section should be barred from containing text content
+as well as a routinelist (there may be a technical reason I don't
+know of).
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary label="sect">
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Tue, 8 Aug 2000 18:02:04 +0100 (BST)</date>
+<subject>Re: Mixing routinelist with other content</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Tue Aug 08 18:02:02 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+sect@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Tue, 08 Aug 2000 18:02:02 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 13MClN-0005yP-00 for sgml-starlink-0.7+sect@astro.gla.ac.uk; Tue, 08 Aug 2000 18:02:01 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 13MClQ-0004MM-00 for sgml-starlink-0.7+sect@astro.gla.ac.uk; Tue, 08 Aug 2000 18:02:04 +0100</otherheader>
+<otherheader name='In-Reply-To'>&lt;Pine.GSO.4.10.10006161619030.12069-100000@cass29&gt;</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10008081757120.15997-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+On Fri, 16 Jun 2000, Mark Taylor wrote:
+
+&gt; What's the reasoning behind having the content model for &lt;sect&gt; and
+&gt; friends such that you can only have EITHER a &lt;routinelist&gt; OR other
+&gt; text in the section?
+
+There's nothing really deep here -- it's essentially for convenience
+of implementation.
+
+The processing of programcode documents turned out to be so different from
+that of `ordinary' text, that it made their processing substantially
+easier if I/we imposed this dichotomy.  It would be possible to make
+this more general, but at the cost of some probably nasty rewriting.
+
+&gt; If you just need to put text before the codecollection, which is 
+&gt; probably usually the case, then you can do it within the routinelist 
+&gt; element itself.
+
+Indeed.  This does force you to have codecollections in
+(sub)*sections by themselves.  Avoiding this would be a bit of a
+programming nightmare.  It's probably good style anyway.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+<commentary label="coderef">
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Wed, 9 Aug 2000 18:28:08 +0100 (BST)</date>
+<subject>Re: Make coderef less unwieldy</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Wed Aug 09 18:28:06 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+coderef@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 09 Aug 2000 18:28:06 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 13MZe9-0007YE-00 for sgml-starlink-0.7+coderef@astro.gla.ac.uk; Wed, 09 Aug 2000 18:28:05 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 13MZeC-00057Z-00 for sgml-starlink-0.7+coderef@astro.gla.ac.uk; Wed, 09 Aug 2000 18:28:08 +0100</otherheader>
+<otherheader name='In-Reply-To'>&lt;Pine.GSO.4.10.10007061738060.8699-100000@cass29&gt;</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10008091819090.17898-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+&gt; At the moment to refer to something like this you have to write a 
+&gt; reference which looks like
+&gt; 
+&gt;    &lt;coderef collection=allroutines id=NDG_CREAT&gt;NDG_CREAT&lt;/coderef&gt;
+
+I've altered this so that 
+
+  - if the element is empty (ie, is given as &lt;coderef .../&gt;), then the
+    generated text is the name of the function (which need not be the
+    same as the ID);
+
+  - If the `collection' attribute is omitted, the `coderef' is taken
+    to refer to the first codecollection element in the document.
+
+It turned out that I had already catered for the first point,
+patterning it after the support for empty `ref' elements, but oddly
+enough only added the support in the LaTeX downconverter, and not the
+HTML one.
+
+&gt; attribute (or can you do some magic with CONREF attributes to take care
+
+A CONREF attribute on an element is the name of an entity, the contents
+of which are taken to be the content of the element, at the parse
+stage, I theeeenk, so that the application doesn't have to do anything
+else.  This wouldn't really have helped, since CONREF is one of those
+potentially useful features which is omitted from XML (I'm pretty
+sure).
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+<commentary label="docxref">
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Sun, 13 Aug 2000 17:03:15 +0100 (BST)</date>
+<subject>Conformance with &lt;ref&gt;</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Sun Aug 13 17:03:13 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+docxref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Sun, 13 Aug 2000 17:03:13 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 13O0EC-0004Sj-00 for sgml-starlink-0.7+docxref@astro.gla.ac.uk; Sun, 13 Aug 2000 17:03:12 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 13O0EF-0006Vb-00 for sgml-starlink-0.7+docxref@astro.gla.ac.uk; Sun, 13 Aug 2000 17:03:15 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10008131657400.23979-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+I've changed the declaration of docxref so that, just like &lt;ref&gt;, link
+text is specified as element content, rather than via a `text'
+attribute.  I've deprecated that attribute in the documentation, but
+not removed support for it from either the DTD or the down-converter,
+since we're a bit close to the release date for me to be asking Mark to make
+up-converter changes.
+
+The documentation now describes the `parse the public ID' failover
+method, when no document summaries are present.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+<commentary label="figure">
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Wed, 19 Sep 2001 13:34:26 +0100 (BST)</date>
+<subject>Inline figures</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Wed Sep 19 13:34:26 2001</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+figure@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 19 Sep 2001 13:34:26 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.33 #1) id 15jgYc-00035Q-00 for sgml-starlink-0.7+figure@astro.gla.ac.uk; Wed, 19 Sep 2001 13:34:26 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 15jgYc-0003PM-00 for sgml-starlink-0.7+figure@astro.gla.ac.uk; Wed, 19 Sep 2001 13:34:26 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.30.0109191331010.12716-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+Peter Draper mailed me to ask how to include a number of inline
+figures (a list of icons plus explanations, I think).  It turns out
+that this is not supported, since the &lt;figure&gt; element is implicitly
+intended for _floating_ figures.
+
+There's therefore a need for either an analogue of the HTML &lt;img&gt;
+element, or perhaps an `inline' attribute to &lt;figure&gt;, and perhaps some
+review of the place of figure in the element hierarchy.
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+</commentaries>
