@@ -177,6 +177,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.35  1997/06/05 22:56:33  timj
+*     Reset pointers if good status.
+*
 *     Revision 1.34  1997/06/05 22:50:41  timj
 *     Initialise pointers
 *
@@ -982,13 +985,15 @@ c
 
                   N_PTS(I) = N_POS(I)
 *     Initialise pointers
-                  ABOL_DATA_PTR(I) = 0
-                  ABOL_DATA_END(I) = 0
-                  ABOL_VAR_PTR(I) = 0
-                  ABOL_VAR_END(I) = 0
-                  ABOL_RA_PTR(I) = 0
-                  ABOL_RA_END(I) = 0
-                  ABOL_DEC_END(I) = 0
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     ABOL_DATA_PTR(I) = 0
+                     ABOL_DATA_END(I) = 0
+                     ABOL_VAR_PTR(I) = 0
+                     ABOL_VAR_END(I) = 0
+                     ABOL_RA_PTR(I) = 0
+                     ABOL_RA_END(I) = 0
+                     ABOL_DEC_END(I) = 0
+                  END IF
 
 *     Extract EACHBOL from each file
 *     Need IN_DATA_PTR, BOL_RA_PTR and BOL_DEC_PTR
