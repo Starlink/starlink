@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_WTFN_REBIN (METHOD, BOLREBIN, STATUS)
+      SUBROUTINE REDS_WTFN_REBIN (METHOD, TSKNAME, STATUS)
 *+
 *  Name:
 *     (BOL)REBIN
@@ -19,9 +19,8 @@
 *  Arguments:
 *     METHOD = CHARACTER * ()  (Given)
 *        The rebin method (BESSEL or LINEAR)
-*     BOLREBIN = LOGICAL (Given)
-*        Am I rebinning each bolometer independently (yes) or making a
-*        single map.
+*     TSKNAME = CHARACTER * () (Given)
+*        Name of task so that I can distinguish REBIN, BOLREBIN and INTREBIN
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -119,6 +118,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.30  1997/04/09 20:45:13  timj
+*     Add INTREBIN
+*     Add extra security to new call to NDF_OPEN (include DUMMY parameter)
+*
 *     Revision 1.29  1997/04/08 22:06:13  timj
 *     Use SCUBA sections instead of specifying INTS with parameters.
 *     Remove printing of integration count.
@@ -205,7 +208,7 @@ c
       INCLUDE 'SAE_PAR'                ! SSE global definitions
 
 * Arguments Given:
-      LOGICAL          BOLREBIN
+      CHARACTER * (*)  TSKNAME
       CHARACTER * (*)  METHOD
 
 * Status:
@@ -255,8 +258,7 @@ c
                                        ! Pointer to bolometer var end
       INTEGER          ABOL_VAR_PTR(MAX_FILE)
                                        ! Pointer to bolometer variance
-      INTEGER          BAD_INTS        ! Number of bad integrations in file
-      CHARACTER * (5)  MAPNAME         ! Name of each bolometer
+      LOGICAL          BOLREBIN        ! Am I rebinning bols separately?
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
                                        ! input file
@@ -287,15 +289,13 @@ c
                                           ! selected in data-spec, 0 otherwise
       CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! bolometer types
-      CHARACTER*10     CTYPE1          ! Coordinate type of output FITS
-      CHARACTER*10     CTYPE2          ! Coordinate type of output FITS
+      INTEGER          COUNT           ! Number of ints in INTREBIN
       INTEGER          CURLY           ! index of { in IN
+      INTEGER          CURR_FILE       ! Current file in INTREBIN loop
+      INTEGER          CURR_INT        ! Current int in INTREBIN loop
       INTEGER          DATA_OFFSET     ! Offset for pointer arrays
       CHARACTER*80     DATA_SPEC          ! data-spec part of IN
-      CHARACTER*12     DATEOBS         ! Date of map obs
       INTEGER          DIM (MAX_DIM)   ! array dimensions
-      INTEGER          DUMMY_QUALITY (MAX__INT)
-                                       ! Dummy quality array
       DOUBLE PRECISION DTEMP           ! scratch double
       DOUBLE PRECISION DTEMP1          ! scratch double
       INTEGER          DUMMY_ENDVAR_PTR (MAX_FILE)
@@ -303,11 +303,9 @@ c
       INTEGER          DUMMY_VARIANCE_PTR (MAX_FILE)
                                        ! Pointer to dummy variance
       INTEGER          EACHBOL         ! Bolometer loop counter
-      INTEGER          EXP_END         ! end index of data for an exposure
       INTEGER          EXP_S (MAX__EXP)   ! array containing 1 for
                                           ! exposures selected in
                                           ! data-spec, 0 otherwise
-      INTEGER          EXP_START       ! start index of data for an exposure
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
       INTEGER          FILE            ! number of input files read
@@ -319,34 +317,25 @@ c
                                        ! pointer to variance array in input file
       CHARACTER*80     FITS (SCUBA__MAX_FITS) 
                                        ! array of FITS keywords
-      REAL             FITS_OUT_PIXEL  ! size of pixels in output map (degrees)
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
-      INTEGER          GOOD_INTS       ! Total number of good ints per
-                                       ! file
+      LOGICAL          GOODNDF         ! Have we read file successfully
       INTEGER          HMSF (4)        ! holds converted angle information from
                                        ! SLA routine
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
                                        ! in units of hours rather than degrees
       INTEGER          I               ! DO loop index
-      INTEGER          ID              ! day of an input observation
       INTEGER          IERR            ! Position of error from VEC_
-      INTEGER          IM              ! month in which observation started
       CHARACTER*80     IN                 ! input filename and data-spec
-      CHARACTER*40     INSTRUMENT      ! FITS instrument entry
       INTEGER          INTEGRATION     ! integration index in DO loop
       LOGICAL          INTREBIN        ! Am I rebinning ints separately?
-      INTEGER          INT_BAD (MAX__INT)
-                                       ! Numbers of integrations to be
-                                       ! ignored
-      INTEGER          INT_PTR(MAX_FILE)! Pointer to array of integration posns
-      INTEGER          INT_PTR_END(MAX_FILE)! Pointer to end of INT_PTR
-      INTEGER          INT_QUAL        ! Scratch quality
-      INTEGER          INT_QUALITY(MAX__INT)
-                                       ! Integration quality (modify)
-      INTEGER          INT_S (MAX__INT)   ! array containing 1 for
-                                          ! integration selected by
-                                          ! data-spec, 0 otherwise
+      INTEGER          INT_LIST(MAX_FILE, MAX__INT)
+                                ! Pointer to integration posns
+      INTEGER          INT_NEXT        ! Position of start of next int
+      INTEGER          INT_S (MAX__INT)! array containing 1 for
+                                       ! integration selected by
+                                       ! data-spec, 0 otherwise
+      INTEGER          INT_START       ! Position of start of int
       INTEGER          INT_TIME        ! Number of good jiggles
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
@@ -403,10 +392,9 @@ c
       INTEGER          IN_VARIANCE_PTR (MAX_FILE)
                                        ! pointer to scratch space holding
                                        ! data variance from input files
-      INTEGER          IPAR            ! ID for DUMMY  parameter
+      INTEGER          IPAR            ! Parameter ID
       INTEGER          IPOSN           ! Position in string
       INTEGER          ITEMP           ! scratch integer
-      INTEGER          IY              ! year in which input observation started
       INTEGER          I_CENTRE        ! I index of central pixel in output
                                        ! map
       INTEGER          JIGGLE_COUNT    ! number of jiggles in pattern
@@ -419,8 +407,6 @@ c
                                        ! y jiggle offsets (arcsec)
       INTEGER          J_CENTRE        ! J index of central pixel in output
                                        ! map
-      INTEGER          KEEP            ! Quality flag for DUMMY_QUALITY
-      LOGICAL          KEEP_INT        ! Keep the specified ints
       INTEGER          LAST_EXP        ! exposure during which abort
                                        ! occurred
       INTEGER          LAST_INT        ! integration during which abort
@@ -429,6 +415,7 @@ c
                                        ! occurred
       INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left 
                                        ! corner of output image
+      CHARACTER * (5)  MAPNAME         ! Name of each bolometer
       REAL             MAP_X           ! x offset of map centre from telescope
                                        ! centre (radians)
       REAL             MAP_Y           ! y offset of map centre from telescope
@@ -442,7 +429,7 @@ c
                                        ! measured positions are calculated
       INTEGER          NDIM            ! the number of dimensions in an array
       INTEGER          NERR            ! Number of errors from VEC_
-      INTEGER          NP              ! size of P array in call to IRA_CREAT
+      INTEGER          NFILES          ! Number of files in INTREBIN/REBIN
       INTEGER          NREC            ! number of history records in input
                                        ! file
       INTEGER          NX_OUT          ! x dimension of output map
@@ -451,12 +438,11 @@ c
                                        ! files
       INTEGER          N_EXPOSURES     ! number of exposures per integration
                                        ! in input file
+      INTEGER          N_FILE_LOOPS    ! Number of loops for INTREBIN/REBIN
       INTEGER          N_FITS          ! number of items in FITS array
       INTEGER          N_INTEGRATIONS  ! number of integrations per measurement
                                        ! in input file
       INTEGER          N_INTS(MAX_FILE)! Number of integrations per input file
-      INTEGER          N_INT_BAD       ! the number of integrations
-                                       ! with data to be ignored
       INTEGER          N_MEASUREMENTS  ! number of measurements in input file
       INTEGER          N_POINT         ! dimension of pointing correction 
                                        ! array in input file
@@ -467,18 +453,11 @@ c
                                        ! input file
       CHARACTER*40     OBJECT          ! name of object
       CHARACTER*40     OBSERVING_MODE  ! observing mode of input file
-      DOUBLE PRECISION OBSRA           ! RA of output map (degrees)
-      DOUBLE PRECISION OBSDEC          ! Dec of output map (degrees)
       CHARACTER*(132)  OUT             ! Output file name
-      INTEGER          OUT_A_PTR       ! pointer to axis in output file
       CHARACTER*40     OUT_COORDS      ! coordinate system of output map
       INTEGER          OUT_DATA_PTR    ! pointer to output map data array
       DOUBLE PRECISION OUT_DEC_CEN     ! apparent Dec of output map centre
                                        ! (radians)
-      DOUBLE PRECISION OUT_EPOCH       ! epoch of output map
-      CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
-                                       ! locator of FITS extension in output
-                                       ! file
       DOUBLE PRECISION OUT_LAT         ! longitude of output map centre 
                                        ! (radians)
       CHARACTER*(DAT__SZLOC) OUT_LOC   ! locator of HDS item in output file
@@ -493,8 +472,6 @@ c
                                        ! output coord system (radians)
       CHARACTER * (132)OUT_TITLE       ! Title of output NDF
       INTEGER          OUT_VARIANCE_PTR! pointer to output map variance array
-      CHARACTER*(DAT__SZLOC) OUT_XLOC  ! locator of IRAS item in output file
-      DOUBLE PRECISION P (8)           ! input array to IRA_CREAT
       CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
       INTEGER          PLACE           ! Place holder for output NDF
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
@@ -508,13 +485,11 @@ c
                                           ! specified by P=....
       INTEGER          POS_S_END          ! end of VM holding POS_S
       INTEGER          POS_S_PTR          ! start of VM holding POS_S
-      CHARACTER*5      RADECSYS        ! Type of coordinate system
       LOGICAL          READING         ! .TRUE. while reading input files
       LOGICAL          REBIN           ! .TRUE. if REBIN application has 
                                        ! been run on input file
       LOGICAL          REDUCE_SWITCH   ! .TRUE. if REDUCE_SWITCH application
                                        ! has been run on input file
-      REAL             RDEPOCH         ! Epoch of observation
       REAL             RTEMP           ! scratch real
       INTEGER          RUN_NUMBER      ! run number of input file
       CHARACTER*15     SAMPLE_COORDS   ! coordinate system of sample offsets
@@ -522,11 +497,9 @@ c
       REAL             SAMPLE_PA       ! position angle of sample x axis
                                        ! relative to x axis of SAMPLE_COORDS
                                        ! system
-      CHARACTER*30     SCS             ! name of sky coordinate system
       CHARACTER*80     SCUCD_STATE     ! 'state' of SCUCD at the end of
                                        ! the observation
       LOGICAL          SECTION         ! Am I processing a SCUBA section?
-      LOGICAL          SELECT_INTS     ! Choose some integrations
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
@@ -547,14 +520,10 @@ c
                                           ! array that has 1 for
                                           ! switches selected by
                                           ! data-spec, 0 otherwise
-      CHARACTER*10     TELESCOPE       ! FITS telescope entry
-      CHARACTER*10     TSKNAME         ! Name of task
+      INTEGER          TOT(MAX_FILE)   ! Number of integrations per input file
       INTEGER          TOTAL_BOLS      ! Number of bolometers
-      INTEGER          TOTAL_INTS      ! Total number of ints per file
       INTEGER          UBND (MAX_DIM)  ! pixel indices of top right corner
                                        ! of output image
-      LOGICAL          USE_INT (SCUBA__MAX_INT)
-                                       ! To use or not to use
       LOGICAL          USE_INTS        ! How to use the specified ints
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
       REAL             WEIGHT (MAX_FILE)
@@ -566,8 +535,6 @@ c
       INTEGER          WEIGHTSIZE      ! Radius of weighting function
       REAL             WTFN (WTFNRAD * WTFNRAD * WTFNRES * WTFNRES + 1)
                                        ! Weighting function
-      CHARACTER* 20    XLAB            ! X label for output map
-      CHARACTER* 20    YLAB            ! Y label for output map
 
 * Local data:
 
@@ -579,12 +546,14 @@ c
       INT_TIME = 0
       SUM_GOOD_INTS = 0
       INTREBIN = .FALSE.
+      BOLREBIN = .FALSE.
 
-* Setup taskname
-      IF (BOLREBIN) THEN
-         TSKNAME = 'BOLREBIN'
-      ELSE
-         TSKNAME = 'REBIN'
+* Setup taskname (can never have BOLREBIN and INTREBIN)
+
+      IF (TSKNAME .EQ. 'BOLREBIN') THEN
+         BOLREBIN = .TRUE.
+      ELSE IF (TSKNAME .EQ. 'INTREBIN') THEN
+         INTREBIN = .TRUE.
       END IF
 
 
@@ -693,37 +662,61 @@ c
 *            IF (FILE.GT.2) CALL PAR_CANCL(PARAM, STATUS)
          END IF
 
-*       Read in the file and, if required, a section
- 
-         CALL PAR_GET0C (PARAM, IN, STATUS)
- 
-         IF (STATUS .NE. PAR__NULL) THEN
-         
-            CURLY = INDEX (IN,'{')
-            IF (STATUS .EQ. SAI__OK) THEN
-               IF (CURLY .EQ. 0) THEN
-*     No section so select all data
-                  FILENAME(FILE) = IN
-                  SECTION = .FALSE.
-                  CURLY = '{}'  ! select all data
-               ELSE IF (CURLY .EQ. 1) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETC ('TASK', TSKNAME)
-                  CALL ERR_REP (' ', '^TASK: no filename specified',
-     :                 STATUS)
-               ELSE
-                  FILENAME(FILE) = IN (:CURLY-1)
-                  DATA_SPEC = IN (CURLY:)
-                  SECTION = .TRUE.
-               END IF
-            END IF
-  
-*     open the data NDF
- 
-            CALL NDF_OPEN (DAT__ROOT, FILENAME(FILE), 'READ', 'OLD', 
-     :           IN_NDF, ITEMP, STATUS)
- 
+         GOODNDF = .FALSE.
+         DO WHILE (.NOT.GOODNDF)
+
+*       Set the default to GLOBAL first (have to do it this way since
+*       the GLOBAL value MUST be associated with an NDF parameter
+         IF (FILE .EQ. 1) THEN
+            CALL SUBPAR_FINDPAR( 'DUMMY', IPAR, STATUS)
+            CALL SUBPAR_GETNAME(IPAR, STEMP, STATUS)
+            CALL PAR_DEF0C('REF', STEMP, STATUS)
          END IF
+
+*       Read in the file and, if required, a section
+            CALL PAR_GET0C (PARAM, IN, STATUS)
+ 
+            IF (STATUS .NE. PAR__NULL) THEN
+         
+               CURLY = INDEX (IN,'{')
+               IF (STATUS .EQ. SAI__OK) THEN
+                  IF (CURLY .EQ. 0) THEN
+*     No section so select all data
+                     FILENAME(FILE) = IN
+                     SECTION = .FALSE.
+                     CURLY = '{}' ! select all data
+                  ELSE IF (CURLY .EQ. 1) THEN
+                     STATUS = SAI__ERROR
+                     CALL MSG_SETC ('TASK', TSKNAME)
+                     CALL ERR_REP (' ', '^TASK: no filename specified',
+     :                    STATUS)
+                  ELSE
+                     FILENAME(FILE) = IN (:CURLY-1)
+                     DATA_SPEC = IN (CURLY:)
+                     SECTION = .TRUE.
+                  END IF
+               END IF
+               
+*     open the data NDF
+               CALL NDF_OPEN (DAT__ROOT, FILENAME(FILE), 'READ', 'OLD', 
+     :              IN_NDF, ITEMP, STATUS)
+ 
+*       If STATUS is bad (maybe no file) then we need to ask again
+               IF (STATUS .NE. SAI__OK) THEN
+                  CALL MSG_SETC('TASK',TSKNAME)
+                  CALL MSG_SETC('FILE',FILENAME(FILE))
+                  CALL ERR_REP(' ', '^TASK: Error opening file ^FILE',
+     :                 STATUS)
+                  CALL ERR_FLUSH(STATUS)
+                  CALL PAR_CANCL(PARAM, STATUS)
+               ELSE 
+                  GOODNDF = .TRUE.
+               END IF
+
+            ELSE
+               GOODNDF = .TRUE.
+            END IF
+         END DO
  
          IF (IN_NDF .EQ. NDF__NOID .OR. STATUS .EQ. PAR__NULL) THEN
             FILE = FILE - 1
@@ -976,7 +969,6 @@ c
             IF (FILE .EQ. 1) THEN
                MJD_STANDARD = IN_UT1 
                SOBJECT = OBJECT        ! Store first object name
-               RDEPOCH = RTEMP
 
 *  These are only needed to inform user of UT for RD rebinning
                CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
@@ -1240,10 +1232,7 @@ c
 
             N_INTS(FILE) = N_MEASUREMENTS * N_INTEGRATIONS
 
-            CALL SCULIB_MALLOC ((1+ N_INTS(FILE)) * VAL__NBI,
-     :           INT_PTR(FILE), INT_PTR_END(FILE), STATUS)
-
-            DATA_OFFSET = 0
+            DATA_OFFSET = 1
 
             DO MEASUREMENT = 1, N_MEASUREMENTS
                DO INTEGRATION = 1, N_INTEGRATIONS
@@ -1251,8 +1240,7 @@ c
                   CALL SCULIB_FIND_SWITCH(%VAL(IN_DEM_PNTR_PTR),
      :                 1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
      :                 N_POS(FILE), 1, 1, INTEGRATION,MEASUREMENT,
-     :                 %VAL(INT_PTR(FILE)+ DATA_OFFSET * VAL__NBI), 
-     :                 ITEMP, STATUS)
+     :                 INT_LIST(FILE, DATA_OFFSET), ITEMP, STATUS)
 
                   DATA_OFFSET = DATA_OFFSET + 1
 
@@ -1260,9 +1248,7 @@ c
             END DO
 
 *     Also store int+1 so that I can easily calculate end of data
-            CALL VEC_ITOI(.FALSE., 1, N_POS(FILE) +1,
-     :           %VAL(INT_PTR(FILE) + DATA_OFFSET * VAL__NBI),
-     :           IERR, NERR, STATUS)
+            INT_LIST(FILE, DATA_OFFSET) = N_POS(FILE) + 1
 
 *  get the weight to be assigned to this dataset and any shift that is to
 *  be applied to it in the output map
@@ -1312,8 +1298,8 @@ c
 *  OK, all the data required should have been read in by now, check that
 *  there is some input data
 
-      IF (FILE .LE. 0) THEN
-         IF (STATUS .EQ. SAI__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (FILE .LE. 0) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: there is no '//
@@ -1459,18 +1445,20 @@ c
 
       IF (BOLREBIN) THEN
          TOTAL_BOLS = N_BOL(1)
-
-*  create the output file that will contain the reduced data in NDFs
- 
-         CALL PAR_GET0C ('OUT', OUT, STATUS)
-         CALL HDS_NEW (OUT, OUT, 'REDS_BOLMAPS', 0, 0, OUT_LOC, STATUS)
-
          CALL MSG_SETC('PKG', PACKAGE)
          CALL MSG_SETC('NB', TOTAL_BOLS)
          CALL MSG_OUTIF(MSG__NORM, ' ',
      :        '^PKG: Processing ^NB bolometers', STATUS)
       ELSE
-         TOTAL_BOLS = 1     ! Loop once if REBIN
+         TOTAL_BOLS = 1
+      END IF
+
+      IF (BOLREBIN .OR. INTREBIN) THEN
+*  create the output file that will contain the reduced data in NDFs
+ 
+         CALL PAR_GET0C ('OUT', OUT, STATUS)
+         CALL HDS_NEW (OUT, OUT, 'REDS_BOLMAPS', 0, 0, OUT_LOC, STATUS)
+
       END IF
 
 *     Start looping on each bolometer
@@ -1581,348 +1569,185 @@ c
 *     into separate images (INTREBIN).
 
             IF (INTREBIN) THEN
+*     INTREBIN needs to loop through each integraion
+               N_FILE_LOOPS = FILE
+               DO I = 1, FILE
+                  TOT(I) = N_INTS(I)
+               END DO
+
+               NFILES = 1       ! All lower subroutines assume one input file
 
             ELSE
+*     Normal rebin just needs to loop once
+               N_FILE_LOOPS = 1
+               DO I = 1, FILE
+                  TOT(I) = 1
+               END DO
 
+               NFILES = FILE    ! Lower subroutines see all FILES
             END IF
+
+*     Start looping over integrations if necessary
+            COUNT = 0
+
+            DO CURR_FILE = 1, N_FILE_LOOPS
+
+*     Report some info for INTREBIN
+               IF (INTREBIN) THEN
+                  CALL MSG_SETC('PKG', PACKAGE)
+                  CALL MSG_SETC('FILE', FILENAME(CURR_FILE))
+                  CALL MSG_OUTIF(MSG__NORM, ' ','^PKG: Processing '//
+     :                 'file ^FILE', STATUS)
+               END IF
+
+               DO CURR_INT = 1, TOT(CURR_FILE)
+
+                  IF (INTREBIN) THEN
+
+                     COUNT = COUNT + 1 ! How many ints from all files
+*     Need to loop through INT_LIST retrieving section
+                     INT_START = INT_LIST(CURR_FILE, CURR_INT)
+                     INT_NEXT  = INT_LIST(CURR_FILE, CURR_INT + 1)
+                     N_PTS(1)  = (INT_NEXT - INT_START) * 
+     :                    N_BOL(CURR_FILE)
+
+
+*     Print some information concerning the regrid
+                     CALL MSG_SETC('PKG', PACKAGE)
+                     CALL MSG_SETI('INT', COUNT)
+                     CALL MSG_OUTIF(MSG__NORM, ' ',' --^PKG: '//
+     :                    'Processing integration ^INT', STATUS)
+
+*     Now set up the pointers for the start of each integration
+                     ABOL_DATA_PTR(1)= IN_DATA_PTR(CURR_FILE)
+     :                    + (INT_START-1) * N_BOL(CURR_FILE) * VAL__NBR
+                     ABOL_VAR_PTR(1) = IN_VARIANCE_PTR(CURR_FILE)
+     :                    + (INT_START-1) * N_BOL(CURR_FILE) * VAL__NBR
+                     ABOL_DEC_PTR(1) = BOL_DEC_PTR(CURR_FILE)
+     :                    + (INT_START-1) * N_BOL(CURR_FILE) * VAL__NBD
+                     ABOL_RA_PTR(1)  = BOL_RA_PTR(CURR_FILE)
+     :                    + (INT_START-1) * N_BOL(CURR_FILE) * VAL__NBD
+
+*     Work out mapname
+                     MAPNAME = 'I'
+                     CALL CHR_ITOC(COUNT, STEMP, ITEMP)
+                     CALL CHR_APPND(STEMP, MAPNAME, CHR_LEN(MAPNAME))
+
+                  END IF
+
 
 *     OK, create the output file, map the arrays
 
-            LBND (1) = 1
-            LBND (2) = 1
-            UBND (1) = NX_OUT
-            UBND (2) = NY_OUT
+                  LBND (1) = 1
+                  LBND (2) = 1
+                  UBND (1) = NX_OUT
+                  UBND (2) = NY_OUT
 
-            IF (BOLREBIN) THEN
-               CALL NDF_PLACE(OUT_LOC, MAPNAME, PLACE, STATUS)
-               CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, OUT_NDF,
-     :              STATUS)
-            ELSE
-               CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, OUT_NDF, 
-     :              STATUS)
-            END IF
+                  IF (BOLREBIN.OR.INTREBIN) THEN
+                     CALL NDF_PLACE(OUT_LOC, MAPNAME, PLACE, STATUS)
+                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
+     :                    OUT_NDF, STATUS)
+                  ELSE
+                     CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, 
+     :                    OUT_NDF, STATUS)
+                  END IF
 
-            CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-     :           OUT_QUALITY_PTR, ITEMP, STATUS)
-            CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE/ZERO', 
-     :           OUT_DATA_PTR, ITEMP, STATUS)
-            CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE/ZERO',
-     :           OUT_VARIANCE_PTR, ITEMP, STATUS)
+                  CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :                 OUT_QUALITY_PTR, ITEMP, STATUS)
+                  CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE/ZERO', 
+     :                 OUT_DATA_PTR, ITEMP, STATUS)
+                  CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 
+     :                 'WRITE/ZERO', OUT_VARIANCE_PTR, ITEMP, STATUS)
 
 *     Fill Quality array with bad data
 
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_CFILLB (NX_OUT * NY_OUT, 1, 
-     :              %val(OUT_QUALITY_PTR))
-            END IF
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL SCULIB_CFILLB (NX_OUT * NY_OUT, 1, 
+     :                    %val(OUT_QUALITY_PTR))
+                  END IF
 
 *     There will be bad pixels in the output map.
 
-            CALL NDF_SBAD (.TRUE., OUT_NDF, 'Data,Variance', STATUS)
-            CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
+                  CALL NDF_SBAD (.TRUE., OUT_NDF, 'Data,Variance', 
+     :                 STATUS)
+                  CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 
 *     Create HISTORY
-            CALL NDF_HCRE(OUT_NDF, STATUS)
+                  CALL NDF_HCRE(OUT_NDF, STATUS)
 
 *     Now time for regrid
-            IF (METHOD .EQ. 'BESSEL' .OR. METHOD .EQ. 'LINEAR') THEN
+                  IF ((METHOD .EQ. 'BESSEL') .OR. 
+     :                 (METHOD .EQ. 'LINEAR')) THEN
 
 *     Rebin the data using weighting function
-               CALL SCULIB_WTFN_REGRID( FILE, N_PTS, WTFNRAD, WTFNRES,
-     :              WEIGHTSIZE, DIAMETER, WAVELENGTH, OUT_PIXEL, NX_OUT,
-     :              NY_OUT, I_CENTRE, J_CENTRE, WTFN, WEIGHT, 
-     :              ABOL_DATA_PTR,ABOL_VAR_PTR, 
-     :              ABOL_RA_PTR,ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
-     :              %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
-     :              STATUS )
+                     CALL SCULIB_WTFN_REGRID( NFILES, N_PTS, WTFNRAD, 
+     :                    WTFNRES, WEIGHTSIZE, DIAMETER, WAVELENGTH, 
+     :                    OUT_PIXEL, NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, 
+     :                    WTFN, WEIGHT, ABOL_DATA_PTR, ABOL_VAR_PTR, 
+     :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
+     :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
+     :                    STATUS )
 
-            ELSE IF (METHOD .EQ. 'SPLINE') THEN
+                  ELSE IF (METHOD .EQ. 'SPLINE') THEN
 
 *     Regrid with SPLINE interpolaion
-               CALL SCULIB_SPLINE_REGRID(FILE, N_POS, N_BOL, N_INTS,
-     :              DIAMETER, WAVELENGTH,
-     :              OUT_PIXEL, NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, 
-     :              WEIGHT, INT_PTR, ABOL_DATA_PTR,ABOL_VAR_PTR, 
-     :              ABOL_RA_PTR,ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
-     :              %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
-     :              STATUS )
+                     CALL SCULIB_SPLINE_REGRID(NFILES, N_POS, N_BOL,
+     :                    MAX__INT, N_INTS, DIAMETER, WAVELENGTH,
+     :                    OUT_PIXEL, NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, 
+     :                    WEIGHT, INT_LIST, ABOL_DATA_PTR, ABOL_VAR_PTR, 
+     :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
+     :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
+     :                    STATUS )
 
 
-            ELSE
+                  ELSE
 
 *     This shouldnt happen
-               IF (STATUS .EQ. SAI__OK) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETC('TASK', TSKNAME)
-                  CALL ERR_REP(' ','^TASK: Unknow regrid method', 
-     :                 STATUS)
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        STATUS = SAI__ERROR
+                        CALL MSG_SETC('TASK', TSKNAME)
+                        CALL ERR_REP(' ','^TASK: Unknown regrid method', 
+     :                       STATUS)
 
-               END IF
-            END IF
-
-*     set up the output axes
-
-            IF (OUT_COORDS .EQ. 'GA') THEN
-               XLAB = 'Longitude offset'
-               YLAB = 'Latitude offset'
-            ELSE IF (OUT_COORDS .EQ. 'NA') THEN
-               XLAB = 'X Nasmyth offset'
-               YLAB = 'Y Nasmyth offset'
-            ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
-               XLAB = 'Azimuth offset'
-               YLAB = 'Elevation offset'
-            ELSE
-               XLAB = 'R.A. offset'
-               YLAB = 'Declination offset'
-            END IF
-
-            CALL NDF_AMAP (OUT_NDF, 'CENTRE', 1, '_REAL', 'WRITE',
-     :           OUT_A_PTR, ITEMP, STATUS)
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_NFILLR (NX_OUT, %val(OUT_A_PTR))
-               CALL SCULIB_ADDCAR (NX_OUT, %val(OUT_A_PTR), 
-     :              REAL(-I_CENTRE), %val(OUT_A_PTR))
-               CALL SCULIB_MULCAR (NX_OUT, %val(OUT_A_PTR), 
-     :              -OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
-            END IF
-            CALL NDF_ACPUT (XLAB, OUT_NDF, 'LABEL', 1, STATUS)
-            CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 1, STATUS)
-            CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 1, STATUS)
-
-            CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
-     :           OUT_A_PTR, ITEMP, STATUS)
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_NFILLR (NY_OUT, %val(OUT_A_PTR))
-               CALL SCULIB_ADDCAR (NY_OUT, %val(OUT_A_PTR), 
-     :              REAL(-J_CENTRE), %val(OUT_A_PTR))
-               CALL SCULIB_MULCAR (NY_OUT, %val(OUT_A_PTR),
-     :              OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
-            END IF
-            CALL NDF_ACPUT (YLAB, OUT_NDF, 'LABEL', 2, STATUS)
-            CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 2, STATUS)
-            CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
+                     END IF
+                  END IF
 
 *     and a title
 
-            OUT_TITLE = OBJECT
-            IF (BOLREBIN .OR. INTREBIN) THEN
-               IPOSN = CHR_LEN(OUT_TITLE)
-               CALL CHR_APPND('_', OUT_TITLE, IPOSN)
-               CALL CHR_APPND(MAPNAME, OUT_TITLE, IPOSN)
-            END IF
-            
-            CALL NDF_CPUT(OUT_TITLE, OUT_NDF, 'Title', STATUS)
-            CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
+                  OUT_TITLE = OBJECT
+                  IF (BOLREBIN .OR. INTREBIN) THEN
+                     IPOSN = CHR_LEN(OUT_TITLE)
+                     CALL CHR_APPND('_', OUT_TITLE, IPOSN)
+                     CALL CHR_APPND(MAPNAME, OUT_TITLE, IPOSN)
+                  END IF
+                  
+*     Now write the axis
 
-*     create the IRAS astrometry structure
-
-            IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ') THEN
-
-               CALL IRA_INIT (STATUS)
-
-               P (1) = OUT_LONG
-               P (2) = OUT_LAT
-               P (3) = DBLE (I_CENTRE) - 0.5D0
-               P (4) = DBLE (J_CENTRE) - 0.5D0
-               P (5) = DBLE (OUT_PIXEL)
-               P (6) = DBLE (OUT_PIXEL)
-               P (7) = 0.0D0
-               P (8) = 0.0D0
-
-               IF (OUT_COORDS .EQ. 'RB') THEN
-                  SCS = 'EQUATORIAL(1950.0)'
-                  OUT_EPOCH = 1950.0D0
-                  RADECSYS  = 'FK4'
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-               ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
-                  SCS = 'EQUATORIAL(2000.0)'
-                  OUT_EPOCH = 2000.0D0
-                  RADECSYS  = 'FK5'
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-               ELSE IF (OUT_COORDS .EQ. 'RD') THEN
-                  SCS = 'EQUATORIAL(J'
-                  CALL CHR_RTOC(RDEPOCH, STEMP, ITEMP)
-                  CALL CHR_APPND(STEMP, SCS, CHR_LEN(SCS))
-                  CALL CHR_APPND(')', SCS, CHR_LEN(SCS))
-                  OUT_EPOCH = RDEPOCH
-                  RADECSYS  = 'FK5'
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-               ELSE IF (OUT_COORDS .EQ. 'EQ') THEN ! We dont use EQ...
-                  SCS = 'ECLIPTIC(2000.0)'
-                  OUT_EPOCH = 2000.D0
-                  RADECSYS  = 'GAPPT'
-                  CTYPE1 = 'RA---TAN'
-                  CTYPE2 = 'DEC--TAN'
-               ELSE IF (OUT_COORDS .EQ. 'GA') THEN
-                  SCS = 'GALACTIC'
-                  OUT_EPOCH = 2000.0D0
-                  CTYPE1 = 'GLON-TAN'
-                  CTYPE2 = 'GLAT-TAN'
-               END IF
-
-               CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0,0,
-     :              OUT_XLOC, STATUS)
-               NP = 8
-               CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, 
-     :              OUT_NDF, ITEMP, STATUS)
-
-               CALL IRA_CLOSE (STATUS)
-               CALL DAT_ANNUL(OUT_XLOC, STATUS)
-
-            END IF
-
-*     Get telescope and instrument from FITS
-
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'INSTRUME', INSTRUMENT, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'TELESCOP', TELESCOPE, STATUS)
-
-*     and write out the same information to a .MORE.FITS section
-
-            N_FITS = 0
-            CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'OBJECT', OBJECT, 'name of object', STATUS)
-
-            DO I = 1, FILE
-               STEMP = 'FILE_'
-               ITEMP = 5
-               CALL CHR_PUTI (I, STEMP, ITEMP)
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              STEMP,FILENAME(I), 'name of input datafile', STATUS)
-            END DO
-
-            IF (OUT_COORDS.NE.'GA' .AND. OUT_COORDS.NE.'NA'
-     :           .AND.OUT_COORDS.NE.'AZ') THEN
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'RADECSYS', RADECSYS, 'Frame of reference', STATUS)
-            END IF
-
-            IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ') THEN
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'SYSTEM', SCS, 'sky coordinate system', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :              'LONG', OUT_LONG, 'centre longitude (radians)', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :              'LAT', OUT_LAT, 'centre latitude (radians)', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :              'EPOCH', OUT_EPOCH, 'epoch of map', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS,FITS,
-     :              'EQUINOX', OUT_EPOCH, 
-     :              'epoch of mean equator and equinox', STATUS)
-
-            END IF
-
-            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'MJD-OBS', MJD_STANDARD, 'MJD of first observation', 
-     :           STATUS)
-
-            CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'TELESCOP', TELESCOPE, 'name of telescope', STATUS)
-            CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'INSTRUME', INSTRUMENT, 'name of instrument', STATUS)
-
-*     Store SCUBA projection name
-
-            CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :           'SCUPROJ',OUT_COORDS, 'SCUBA output coordinate system', 
-     :           STATUS)
-
-*     Put in a DATE-OBS field, converting MJD to DATE
-
-            CALL SLA_DJCL(MJD_STANDARD, IY, IM, ID, DTEMP, ITEMP)
-
-            ITEMP = 0
-            CALL CHR_PUTI(IY, DATEOBS, ITEMP)
-            CALL CHR_APPND('/',DATEOBS, ITEMP)
-            CALL CHR_PUTI(IM, DATEOBS, ITEMP)
-            CALL CHR_APPND('/',DATEOBS, ITEMP)
-            CALL CHR_PUTI(ID, DATEOBS, ITEMP)
-
-            CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'DATE-OBS', DATEOBS, 'Date of first observation', 
-     :           STATUS)
-
-
-*     Now need to calculate the FITS Axis info
-*     If this is NA then NDF2FITS will do this for us
-
-            IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ') THEN
-
-               OBSRA = OUT_LONG * 180.0D0 / PI
-               OBSDEC= OUT_LAT  * 180.0D0 / PI
-               FITS_OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
-
-               IF (OUT_COORDS.NE.'GA') THEN
-                  CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :                 'OBSRA',OBSRA,
-     :                 'RA of map centre (degrees; deprecated)', STATUS)
-                  CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS, 
-     :                 'OBSDEC', OBSDEC, 
-     :                 'Dec. of map centre (degrees; deprecated)',
-     :                 STATUS)
-               END IF
-
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CTYPE1', CTYPE1,'TAN projection used', STATUS)
-               CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CRPIX1', I_CENTRE, 'I of centre (ref) pixel', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CRVAL1', OBSRA, 'Map centre (degrees)', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CDELT1',DBLE(-FITS_OUT_PIXEL), 
-     :              'increment per pixel (degrees)', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CUNIT1', 'deg','physical units of axis 1', STATUS)
-
-
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CTYPE2', CTYPE2,'TAN projection used', STATUS)
-               CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CRPIX2', J_CENTRE, 'J of centre (ref) pixel', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CRVAL2', OBSDEC, 'Map centre (degrees)', STATUS)
-               CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CDELT2', DBLE(FITS_OUT_PIXEL), 
-     :              'increment per pixel (degrees)', 
-     :              STATUS)
-               CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'CUNIT2','deg','physical units of axis 2', STATUS)
-
-            END IF
-
-*     write out the FITS extension
-
-            NDIM =1 
-            DIM (1) = N_FITS
-            CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', NDIM, DIM, 
-     :           OUT_FITSX_LOC, STATUS)
-            CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
-            CALL DAT_ANNUL (OUT_FITSX_LOC, STATUS)
-
+                  CALL REDS_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
+     :                 OUT_TITLE, MJD_STANDARD, FILE, FILENAME, 
+     :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
+     :                 NX_OUT, NY_OUT, N_FITS, FITS, STATUS )
+                  
 *     Tidy up each loop
 
-            IF (BOLREBIN) THEN
-               DO I = 1, FILE
-                  CALL SCULIB_FREE('BOL_DATA', ABOL_DATA_PTR(I),
-     :                 ABOL_DATA_END(I), STATUS)
-                  CALL SCULIB_FREE('BOL_VAR', ABOL_VAR_PTR(I),
-     :                 ABOL_VAR_END(I), STATUS)
-                  CALL SCULIB_FREE('BOL_RA', ABOL_RA_PTR(I),
-     :                 ABOL_RA_END(I), STATUS)
-                  CALL SCULIB_FREE('BOL_DEC', ABOL_DEC_PTR(I),
-     :                 ABOL_DEC_END(I), STATUS)
-               END DO
-            END IF
+                  IF (BOLREBIN) THEN
+                     DO I = 1, FILE
+                        CALL SCULIB_FREE('BOL_DATA', ABOL_DATA_PTR(I),
+     :                       ABOL_DATA_END(I), STATUS)
+                        CALL SCULIB_FREE('BOL_VAR', ABOL_VAR_PTR(I),
+     :                       ABOL_VAR_END(I), STATUS)
+                        CALL SCULIB_FREE('BOL_RA', ABOL_RA_PTR(I),
+     :                       ABOL_RA_END(I), STATUS)
+                        CALL SCULIB_FREE('BOL_DEC', ABOL_DEC_PTR(I),
+     :                       ABOL_DEC_END(I), STATUS)
+                     END DO
+                  END IF
 
-            CALL NDF_ANNUL(OUT_NDF, STATUS)
+                  CALL NDF_ANNUL(OUT_NDF, STATUS)
+
+               END DO
+            END DO
+            
          END DO
       END IF
 
