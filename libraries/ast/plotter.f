@@ -140,7 +140,9 @@
             END IF
 
             CALL GETARG( 2, ATTR )
-            PL = AST_PLOT( FS, GBOX, PBOX, ATTR, STATUS )
+            PL = AST_PLOT( FS, GBOX, PBOX, 'title = A FITS test,'//
+     :                     'tol=0.01', STATUS )
+            CALL AST_SET( PL, ATTR, STATUS )
 
 *
 * Draw the grid.
