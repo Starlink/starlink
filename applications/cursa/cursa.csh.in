@@ -152,7 +152,7 @@ setenv  CATREM_URLREADER @bindir@/geturl
 #  Specify the configuration file to be used.  The URL given here is the
 #  the CURSA default.
 
-setenv  CATREM_CONFIG  http://www.roe.ac.uk/acdwww/catremote/cursa.cfg
+setenv  CATREM_CONFIG  http://harris.roe.ac.uk/~acd/catremote/cursa.cfg
 
 #
 #  Define the maximum number of objects which may be included in the
