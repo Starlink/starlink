@@ -134,7 +134,7 @@ IFC_FILES = $(IFL_FILES:.ifl=)
 
 INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
 
-CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES  = $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 # these objects are only needed to make the gaia_wish binary for the demos
 OBJECTS      = tkAppInit.o tclAppInit.o

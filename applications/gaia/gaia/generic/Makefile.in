@@ -1,4 +1,4 @@
- #*******************************************************************************
+#*******************************************************************************
 # E.S.O. - VLT project
 #
 # "@(#) $Id$"
@@ -92,7 +92,7 @@ DEFINES         = \
                 -DIWIDGETS_VERSION=\"@IWIDGETS_VERSION@\" \
                 -DIWIDGETS_LIBRARY=\"@IWIDGETS_LIBRARY@\"
 
-CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES	= $(DEFINES) $(INCLUDES) $(CFLAGS)
 DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
 INSTALL  	= @INSTALL@
 INSTALL_DATA  	= @INSTALL_DATA@

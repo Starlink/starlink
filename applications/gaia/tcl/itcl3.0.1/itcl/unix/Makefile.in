@@ -157,8 +157,8 @@ UNIX_DIR = 		$(TOP_DIR)/unix
 #----------------------------------------------------------------
 
 CC = @CC@
-CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I$(UNIX_DIR) -I$(GENERIC_DIR) \
--I$(TCL_SRC_DIR)/generic $(AC_FLAGS) $(PROTO_FLAGS) $(MEM_DEBUG_FLAGS) \
+CC_SWITCHES = $(SHLIB_CFLAGS) -I$(UNIX_DIR) -I$(GENERIC_DIR) \
+-I$(TCL_SRC_DIR)/generic $(CFLAGS) $(AC_FLAGS) $(PROTO_FLAGS) $(MEM_DEBUG_FLAGS) \
 -DITCL_LIBRARY=\"$(ITCL_LIBRARY)\"
 
 SRCS = 	$(GENERIC_DIR)/itcl_bicmds.c \

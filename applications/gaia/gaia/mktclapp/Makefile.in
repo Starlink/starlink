@@ -107,7 +107,7 @@ MKTCLAPP = bin/mktclapp
 
 INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 
-CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES  = $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 #  List of all object files and intermediary sources (used to clean)
 OBJECTS      = mktclapp.o gaia_swish.o gaia_stcl.o tkAppInit.o tclAppInit.o
