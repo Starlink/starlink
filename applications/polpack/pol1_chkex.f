@@ -94,9 +94,9 @@
       CHARACTER IMGID*256
       CHARACTER NDFNAM*256
       CHARACTER WPLATE*10
-      DOUBLE PRECISION COS  
+      DOUBLE PRECISION ANGCOS  
       DOUBLE PRECISION MAT( NDF__MXDIM*NDF__MXDIM )
-      DOUBLE PRECISION SIN
+      DOUBLE PRECISION ANGSIN
       INTEGER DIM( NDF__MXDIM )
       INTEGER FRAME                  
       INTEGER I
@@ -104,11 +104,13 @@
       INTEGER ICURR
       INTEGER INDX
       INTEGER IPIXEL
+      INTEGER IPOLAN
       INTEGER IWCS
       INTEGER LC
       INTEGER MAP
       INTEGER NDIM
       LOGICAL THERE
+      REAL ANGROT
 *.
 
 *  Check inherited global status.
@@ -273,13 +275,13 @@
       CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
 *  Note the original Current frame.
-      ICURR = AST_GETI( IWCS, 'CURRENT' )
+      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Remove any existing POLANL Frame.
       IF( AST_FINDFRAME( IWCS, AST_FRAME( NDIM, 'MINAXES=1, MAXAXES=20',
      :                STATUS ), 'POLANL', STATUS ) .NE. AST__NULL ) THEN
 
-         IPOLAN = AST_GETI( IWCS, 'CURRENT' )
+         IPOLAN = AST_GETI( IWCS, 'CURRENT', STATUS )
          CALL AST_REMOVEFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Correct the original index of the Current Frame to take account of the
@@ -318,13 +320,13 @@
          END DO
 
 *  Store the  trig terms describing the rotation of the first 2 axes.
-         COS = COS( DTOR*DBLE( ANGROT ) )
-         SIN = SIN( DTOR*DBLE( ANGROT ) )
+         ANGCOS = COS( DTOR*DBLE( ANGROT ) )
+         ANGSIN = SIN( DTOR*DBLE( ANGROT ) )
 
-         MAT( 1 ) = COS
-         MAT( 2 ) = SIN
-         MAT( 1 + NDIM ) = -SIN
-         MAT( 2 + NDIM ) = COS
+         MAT( 1 ) = ANGCOS
+         MAT( 2 ) = ANGSIN
+         MAT( 1 + NDIM ) = -ANGSIN
+         MAT( 2 + NDIM ) = ANGCOS
 
 *  Create the MatrixMap.
          MAP = AST_MATRIXMAP( NDIM, NDIM, 0, MAT, ' ', STATUS )
@@ -350,7 +352,7 @@
 
 *  Reinstate the original Current Frame (if it still exists).
          IF( ICURR .NE. AST__NOFRAME ) THEN
-            CALL AST_SETI( IWCS, 'Current', ICURR )
+            CALL AST_SETI( IWCS, 'Current', ICURR, STATUS )
          END IF
 
 *  Store the new FrameSet back in the NDF.
