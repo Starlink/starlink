@@ -33,7 +33,7 @@ interface NDF2DST
       type	  'NDF'
       ppath       'GLOBAL,CURRENT'
       prompt      'NDF to be converted'
-      association '<-GLOBAL.DATA_ARRAY'
+      association '<->GLOBAL.DATA_ARRAY'
       helpkey     '*'
    endparameter
 

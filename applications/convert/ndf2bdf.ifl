@@ -40,7 +40,7 @@ interface         NDF2BDF
       vpath       'PROMPT'
       ppath       'GLOBAL,CURRENT'
       prompt      'NDF to be converted'
-      association '<-GLOBAL.DATA_ARRAY'
+      association '<->GLOBAL.DATA_ARRAY'
       helpkey     '*'
    endparameter
 
