@@ -487,7 +487,7 @@ new( class, disco, pcdcen, options )
   double * cpcdcen;
  CODE:
   len = av_len( pcdcen );
-  if (len != 2 ) {
+  if (len != 1 ) {
     Perl_croak(aTHX_ "Must supply two values to PcdCen");
   }
   cpcdcen = pack1D(newRV_noinc((SV*)pcdcen), 'd');
