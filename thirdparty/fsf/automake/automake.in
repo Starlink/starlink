@@ -435,6 +435,12 @@ my %ppfc_sources = ();
 # Extra Starlink features, as found when tracing
 my %starlink_seen_features = ();
 my %starlink_predist_sources = ();
+
+# Override rules file for given prefix_PRIMARY targets.
+# That is, $special_rules_file{share_DATA}='foo' would cause foo.am,
+# rather than data.am, to be the file substituted when generating the
+# Makefile.in fragments for the share_DATA targets and variables.
+my %special_rules_file = ();
 
 
 ################################################################
@@ -3441,6 +3447,7 @@ sub handle_data
 {
     # Starlink extension:
     my @stardirs = qw( stardocs staretc starhelp starexamples );
+    $special_rules_file{stardocs_DATA} = 'starlink_stardocs';
     if (defined $starlink_seen_features{'per-package-dirs'})
       {
         # Two magic things happen in this case.  Neither of these is a
@@ -3450,9 +3457,9 @@ sub handle_data
         # intellectuals to the fields!  Except for me, obviously, and
         # people I like, and people with other virtues, and I don't
         # think I really have the temperament to be a revolutionary.
-        # But aaaaanyway: installing into .../bin is supported (because if I
-        # don't, the users will do it anyway, and probably botch it),
-        # and version.dat is back.
+        # But aaaaanyway: installing data into .../bin is supported
+        # (because if I don't, the users will do it anyway, and probably
+        # botch it), and version.dat is back.
 
         # Allow data installs into the bin directory.  bin_DATA is a
         # user variable, am__bin_DATA is ours (is this the right way
@@ -4871,7 +4878,7 @@ sub handle_starlink
                                      new Automake::Location,
                                      LATEXDOCS => $havelatex,
                                      COMPIFL => $want_compifl,
-                                     VERSIONDAT => $want_version_dat
+                                     VERSIONDAT => $want_version_dat,
                                     );
 }
 
@@ -6986,7 +6993,11 @@ sub am_install_var
 
       # Singular form of $PRIMARY.
       (my $one_primary = $primary) =~ s/S$//;
-      $output_rules .= &file_contents ($file, $where,
+      # substitute filel '$file', unless there's an overriding entry
+      # in %special_rules_file.
+      $output_rules .= &file_contents (($special_rules_file{$X.'_'.$primary}
+                                        || $file),
+                                       $where,
 					 FIRST => $first,
 
 					 PRIMARY     => $primary,
