@@ -144,6 +144,8 @@
       END DO
       IF ( OBDAT.GFLAG ) THEN
         CALL DYN_MAPR( 1, OBDAT.NGDAT, PREDDAT.GDPTR, STATUS )
+      ELSE
+        PREDDAT.GDPTR = PREDDAT.DPTR
       END IF
 
 *  Exit

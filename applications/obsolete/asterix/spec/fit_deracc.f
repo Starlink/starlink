@@ -2,7 +2,8 @@
       SUBROUTINE FIT_DERIVS_ACCUM( NDS, OBDAT, INSTR, MODEL, FSTAT,
      :             PREDICTOR, PREDDAT, NPAR, PARAM, LB, UB, FROZEN,
      :             DPUP, DPDOWN, N, NDAT, OBS, WT, QOK, OBSQ, PRED,
-     :             DDERIV1, DDERIV2, DFDP, PREDUP, PREDDOWN, STATUS )
+     :             DDERIV1, DDERIV2, DFDP, PREDTMP, PREDUP, PREDDOWN,
+     :              STATUS )
 *
 *    Description :
 *
@@ -30,6 +31,8 @@
 *     15 Jun 92 : Added FSTAT argument (DJA)
 *     24 Jun 92 : Proofed against PRED<=0 (DJA)
 *     19 May 94 : Added handling of constraints (DJA)
+*      5 Mar 1996 (DJA):
+*        Handle grouping
 *
 *    Type definitions :
 *
@@ -38,7 +41,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -77,6 +79,7 @@
 *    Export :
 *
       REAL                DFDP(NDAT,NPAR)	! Data derivs w.r.t. parameters
+      REAL                PREDTMP(NDAT)		! Upper & lower predicted datasets
       REAL                PREDUP(NDAT)		! Upper & lower predicted datasets
       REAL                PREDDOWN(NDAT)	! for derivative evaluation
 *
@@ -102,43 +105,65 @@
       LOGICAL             POK                   ! Model value is ok?
 *-
 
-*    Status check
+*  Check inherited global status
       IF ( STATUS.NE.SAI__OK ) RETURN
 
-*    Using maximum likelihood
+*  Using maximum likelihood?
       MAXL = (FSTAT .EQ. FIT__LOGL)
 
-*    Initialise parameter arrays and accumulators
+*  Initialise parameter arrays and accumulators
       DO J = 1, NPAR
 	UPPAR(J) = PARAM(J)
 	LOPAR(J) = PARAM(J)
       END DO
 
-*    Evaluate predicted data for upper and lower increments
-*    in each unfrozen param
+*  Evaluate predicted data for upper and lower increments in each unfrozen param
       DO J = 1, NPAR
+
+*    Free parameter?
 	IF ( .NOT. FROZEN(J) ) THEN
 
-*        Create parameter sets for lower and upper deviates of parameter J
+*      Create parameter sets for lower and upper deviates of parameter J
 	  UPPAR(J) = PARAM(J) + DPUP(J)
 	  LOPAR(J) = PARAM(J) - DPDOWN(J)
 
-*        Keep constrained parameters up to date
+*      Keep constrained parameters up to date
           IF ( MODEL.NTIE .GT. 0 ) THEN
             CALL FIT_APPTIE( MODEL, .FALSE., LOPAR, LB, UB, STATUS )
             CALL FIT_APPTIE( MODEL, .FALSE., UPPAR, LB, UB, STATUS )
           END IF
 
-	  DP = DPUP(J) + DPDOWN(J)
-	  CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,UPPAR,N,
-     :                                                 PREDUP,STATUS)
-	  CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,LOPAR,N,
-     :                                               PREDDOWN,STATUS)
+*      Grouping?
+          IF ( OBDAT(N).GFLAG ) THEN
 
-*        Find derivatives of Cash statistic?
+*        Compute and group upper perturbation
+	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,UPPAR,N,
+     :                                                 PREDTMP, STATUS)
+            CALL FIT_GROUP( OBDAT(N).NDAT, PREDTMP, .FALSE., 0.0, QOK,
+     :                      %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
+     :                      NDAT, PREDUP,
+     :                      0.0, %VAL(OBDAT(N).GQPTR), STATUS )
+
+*        Compute and group lower perturbation
+	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,LOPAR,N,
+     :                                                 PREDTMP, STATUS)
+            CALL FIT_GROUP( OBDAT(N).NDAT, PREDTMP, .FALSE., 0.0, QOK,
+     :                      %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
+     :                      NDAT, PREDDOWN,
+     :                      0.0, %VAL(OBDAT(N).GQPTR), STATUS )
+
+          ELSE
+	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,UPPAR,N,
+     :                                                   PREDUP,STATUS)
+	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,LOPAR,N,
+     :                                                 PREDDOWN,STATUS)
+          END IF
+
+*      Find derivatives of Cash statistic?
+	  DP = DPUP(J) + DPDOWN(J)
           IF ( MAXL ) THEN
 
-*          Quality present?
+*        Quality present?
             IF ( QOK ) THEN
 
 	      DO I = 1, NDAT

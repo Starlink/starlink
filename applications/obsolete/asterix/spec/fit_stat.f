@@ -129,7 +129,7 @@
           CALL FIT_GROUP( OBDAT(N).NDAT, %VAL(PREDDAT(N).DPTR),
      :                    .FALSE., 0.0, OBDAT(N).QFLAG,
      :                    %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
-     :                    OBDAT(N).NGDAT, %VAL(PREDDAT(N).GDPTR(1)),
+     :                    OBDAT(N).NGDAT, %VAL(PREDDAT(N).GDPTR),
      :                    0.0, %VAL(OBDAT(N).GQPTR), STATUS )
         END IF
 
@@ -137,11 +137,11 @@
         IF ( MAXL ) THEN
 	  CALL FIT_LOGL_ACCUM( OBDAT(N).NDAT, %VAL(OBDAT(N).GDPTR),
      :                      OBDAT(N).QFLAG, %VAL(OBDAT(N).GQPTR),
-     :                      %VAL(PREDDAT(N).GDPTR(1)), DSTAT, STATUS )
+     :                      %VAL(PREDDAT(N).GDPTR), DSTAT, STATUS )
         ELSE
 	  CALL FIT_CHISQ_ACCUM( OBDAT(N).NDAT, %VAL(OBDAT(N).GDPTR),
      :                         OBDAT(N).QFLAG, %VAL(OBDAT(N).GQPTR),
-     :          %VAL(OBDAT(N).GWPTR), %VAL(PREDDAT(N).GDPTR(1)), DSTAT,
+     :          %VAL(OBDAT(N).GWPTR), %VAL(PREDDAT(N).GDPTR), DSTAT,
      :             STATUS )
         END IF
 
