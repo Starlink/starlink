@@ -12,6 +12,8 @@
 #  History:
 #     13-APR-1999 (MBT):
 #        Original version.
+#     27-APR-1999 (MBT):
+#        Added OVERRIDE parameter.
 #     {enter_further_changes_here}
 
 #-
@@ -57,6 +59,16 @@ interface WCSREG
       ppath       'CURRENT,DEFAULT'
       default     1
       prompt      'Position of reference set'
+      helpkey     '*'
+   endparameter
+
+   parameter OVERRIDE
+      type        _LOGICAL
+      access      READ
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      default     FALSE
+      prompt      'Continue when not all NDFs can be aligned'
       helpkey     '*'
    endparameter
 

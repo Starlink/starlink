@@ -111,6 +111,16 @@
 *        in the WCS component, they are removed.  The name is converted
 *        to upper case, and whitespace is removed.
 *        [CCD_WCSREG]
+*     OVERRIDE = _LOGICAL (Read)
+*        If not all the NDFs can be aligned using the domains given in
+*        DOMAINS then the application will report on which sets of NDFs
+*        form connectable subsets of the IN list.  In this case, if this
+*        parameter is set FALSE, then the application will exit with an
+*        error message.  If it is set TRUE however, it will continue and
+*        insert new frames in those NDFs which can be reached from the 
+*        one indicated by REFPOS, making no change to the others, except
+*        to remove any frames in the domain OUTDOMAIN which already exist.
+*        [FALSE]
 *     REFPOS = _INTEGER (Read)
 *        The position within the IN list which corresponds to the 
 *        reference NDF.  For each domain in DOMAINLIST, alignment will
@@ -168,6 +178,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
+      INCLUDE 'FIO_PAR'          ! Standard FIO constants
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
 
 *  Status:
@@ -182,10 +193,15 @@
       CHARACTER * ( AST__SZCHR ) OUTDM ! Name of domain for output frames
       CHARACTER * ( CCD1__BLEN ) BUFFER ! Output buffer
       CHARACTER * ( CCD1__BLEN ) DMNLST ! Comma-separated domain list
+      CHARACTER * ( FIO__SZFNM ) FNAME ! Name of NDF
       INTEGER I                  ! Loop variable
       INTEGER INDF( CCD1__MXNDF ) ! NDF identifiers for input NDFs
       INTEGER INGRP              ! GRP identifier for group IN 
       INTEGER IPGRA              ! Pointer to graph array
+      INTEGER IPWK1              ! Pointer to workspace array
+      INTEGER IPWK2              ! Pointer to workspace array
+      INTEGER IPWK3              ! Pointer to workspace array
+      INTEGER IPWK4              ! Pointer to workspace array
       INTEGER IWCS( CCD1__MXNDF ) ! AST pointers to WCS components of NDFs
       INTEGER J                  ! Loop variable
       INTEGER JLST               ! Index of frame in DMNLST in reference NDF
@@ -202,6 +218,8 @@
       INTEGER WCSOUT             ! WCS component with new frame added
       INTEGER WORK( 4, CCD1__MXNDF ) ! Workspace array
       INTEGER WORK2( CCD1__MXNDF ) ! Workspace array
+      LOGICAL COMPL              ! Completeness of graph
+      LOGICAL OVERRD             ! Whether to continue if graph is incomplete
 
 *.
 
@@ -221,6 +239,24 @@
       NNDF = 0
       CALL CCD1_NDFGR( 'IN', 'UPDATE', INGRP, NNDF, STATUS )
 
+*  Write the names and node indices of the NDFs to the user.
+*  Write the names of the associated NDFs out to the user.
+      CALL CCD1_MSG( ' ', ' ', STATUS )
+      CALL CCD1_MSG( ' ', '    NDFs with graph node indices', STATUS )
+      CALL CCD1_MSG( ' ', '    ----------------------------', STATUS )
+      DO 6 I = 1, NNDF
+         CALL IRH_GET( INGRP, I, 1, FNAME, STATUS )
+         CALL MSG_SETC( 'FNAME', FNAME )
+         CALL MSG_SETI( 'N', I )
+         IF ( I .EQ. REFPOS ) THEN 
+            CALL MSG_SETC( 'REF', '(reference)' )
+         ELSE
+            CALL MSG_SETC( 'REF', ' ' )
+         END IF
+         CALL CCD1_MSG( ' ', '  ^N) ^FNAME ^REF', STATUS )
+ 6    CONTINUE
+      CALL CCD1_MSG( ' ', ' ', STATUS )
+ 
 *  Get the list of domains and normalise to upper case without blanks.
       CALL PAR_GET1C( 'DOMAINS', MXDMN, DMNS, NDMN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -277,10 +313,10 @@
 *  reference NDF.  Output error message and exit with error status.
          CALL MSG_SETC( 'DMNLST', DMNLST )
          STATUS = SAI__ERROR
-         CALL CCD1_ERREP( 'WCSREG_NOREFDMN', 
+         CALL ERR_REP( 'WCSREG_NOREFDMN', 
      : 'WCSREG: No frame in any of the domains ^DMNLST', STATUS )
          CALL NDF_MSG( 'IRNDF', INDF( REFPOS ) )
-         CALL CCD1_ERREP( ' ', 
+         CALL ERR_REP( ' ', 
      : '        could be found in the reference NDF ^IRNDF.', STATUS )
          GO TO 99
       END IF
@@ -296,6 +332,36 @@
       CALL CCD1_CNVGR( IWCS, NNDF, DMNS, NDMN, %VAL( IPGRA ), NEDGE,
      :                 STATUS )
 
+*  Allocate some temporary workspace.
+      CALL CCD1_MALL( 4 * NEDGE, '_INTEGER', IPWK1, STATUS )
+      CALL CCD1_MALL( NNDF, '_INTEGER', IPWK2, STATUS )
+      CALL CCD1_MALL( NNDF, '_LOGICAL', IPWK3, STATUS )
+      CALL CCD1_MALL( NNDF, '_LOGICAL', IPWK4, STATUS )
+
+*  Check the graph for completeness and report accordingly.
+      CALL CCD1_GRREP( %VAL( IPGRA ), NEDGE, NNDF, REFPOS, 
+     :                 %VAL( IPWK1 ), %VAL( IPWK2 ), %VAL( IPWK3 ),
+     :                 %VAL( IPWK4 ), COMPL, STATUS )
+
+*  Free temporary workspace.
+      CALL CCD1_MFREE( IPWK1, STATUS )
+      CALL CCD1_MFREE( IPWK2, STATUS )
+      CALL CCD1_MFREE( IPWK3, STATUS )
+      CALL CCD1_MFREE( IPWK4, STATUS )
+
+*  If the graph is not complete, we may wish to exit.
+      IF ( .NOT. COMPL ) THEN
+         OVERRD = .FALSE.
+         CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
+         IF ( .NOT. OVERRD ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'WCSREG_NOCOMPL', 
+     :'WCSREG: Graph incomplete: ' //
+     :'not all the NDFs could be linked by WCS components.', STATUS )
+            GO TO 99
+         END IF
+      END IF
+
 *  Construct the new frame.
       OUTFR = AST_FRAME( 2, ' ', STATUS )
       CALL AST_SETC( OUTFR, 'Title', 'Added by WCSREG', STATUS )
@@ -310,8 +376,10 @@
 
 *  Output the name of the NDF being considered.
          CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL NDF_MSG( 'NDF', INDF( I ) )
-         CALL CCD1_MSG( ' ', '  ^NDF:', STATUS )
+         CALL IRH_GET( INGRP, I, 1, FNAME, STATUS )
+         CALL MSG_SETI( 'I', I )
+         CALL MSG_SETC( 'NDF', FNAME )
+         CALL CCD1_MSG( ' ', '  ^I) ^NDF:', STATUS )
 
 *  Find the best path through the graph from the Current frame of this
 *  frameset to the reference (Current) frame in the reference frameset.
@@ -339,13 +407,12 @@
 
 *  Output a message indicating how the alignment was achieved.
             IF ( I .EQ. REFPOS ) THEN
-               CALL CCD1_MSG( ' ', '        (reference NDF)', STATUS )
+               CALL CCD1_MSG( ' ', '          (reference NDF)', STATUS )
             ELSE
                DO 5 J = 1, NSTEP
-                  CALL NDF_MSG( 'NDF', INDF( PATH( 2, J ) ) )
-                  BUFFER = '        ' // DMNS( PATH( 3, J ) )
-                  CALL CCD1_MSG( ' ', BUFFER( 1:30 ) // '   ^NDF', 
-     :                           STATUS )
+                  WRITE( BUFFER, '( 8X, I4, ''  ->'', I4, 12X, A )' )
+     :               PATH( 1, J ), PATH( 2, J ), DMNS( PATH( 3, J ) )
+                  CALL CCD1_MSG( ' ', BUFFER, STATUS )
  5             CONTINUE
             END IF
          ELSE
@@ -368,11 +435,11 @@
 
  4    CONTINUE
 
-*  Release graph memory.
-      CALL CCD1_MFREE( IPGRA, STATUS )
-     
 *  Error exit label.
  99   CONTINUE
+
+*  Release allocated memory.
+      CALL CCD1_MFREE( -1, STATUS )
 
 *  End NDF context.
       CALL NDF_END( STATUS )
