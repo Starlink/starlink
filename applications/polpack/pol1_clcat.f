@@ -40,6 +40,9 @@
 *  History:
 *     26-JAN-1998 (DSB):
 *        Original version.
+*     12-NOV-1998 (DSB):
+*        Do not store a GRID Frame in the catalogue, since no data grid
+*        is defined in a catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -65,11 +68,24 @@
 
 *  Local Variables:
       INTEGER FRM                ! Pointer to Base Frame
+      INTEGER IFRM               ! Index of GRID Frame
+      INTEGER LWCS               ! Pointer to local copy of the FrameSet
 *.
 
 *  Copy the supplied FrameSet into the textual information associated
 *  with the catalogue (if supplied), and if no error has already occurred ...
       IF( STATUS .EQ. SAI__OK .AND. IWCS .NE. AST__NULL ) THEN
+
+*  Copy the supplied FrameSet so that we do not alter the supplied
+*  FrameSet.
+         LWCS = AST_COPY( IWCS, STATUS ) 
+
+*  Find the GRID Frame.
+         CALL KPG1_ASFFR( LWCS, 'GRID', IFRM, STATUS )
+
+*  If found, remove the GRID Frame.
+         IF( IFRM .NE. AST__NOFRAME ) CALL AST_REMOVEFRAME( LWCS, IFRM,
+     :                                                      STATUS )         
 
 *  Routine POL1_MKCAT creates the X and Y catalogue columns with names
 *  X and Y. Applications which access the WCS information in the
@@ -78,7 +94,7 @@
 *  order for this to succeed, we ensure that he symbols on axes 1 and 2
 *  of the Base Frame correspond to the names of the catalogue columns (i.e.
 *  "X" and "Y").
-         FRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
+         FRM = AST_GETFRAME( LWCS, AST__BASE, STATUS )
          CALL AST_SETC( FRM, 'Symbol(1)', 'X', STATUS )
          CALL AST_SETC( FRM, 'Symbol(2)', 'Y', STATUS )
          CALL AST_ANNUL( FRM, STATUS )
@@ -96,7 +112,10 @@
          CALL CAT_PUTXT( CI, 'COMMENT', ' ', STATUS )
 
 *  Write out the WCS information.
-         CALL KPG1_WCATW( IWCS, CI, STATUS )
+         CALL KPG1_WCATW( LWCS, CI, STATUS )
+
+*  Annul the local copy of the FrameSet.
+         CALL AST_ANNUL( LWCS, STATUS )
 
       END IF
 
