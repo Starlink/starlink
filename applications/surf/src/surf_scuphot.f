@@ -145,6 +145,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.20  1997/11/06 23:43:20  timj
+*     Add the verbose suffix option.
+*
 *     Revision 1.19  1997/09/04 19:04:03  timj
 *     Automatically supply default for 'OUT'. Also fix null response to 'OUT'
 *
@@ -472,7 +475,7 @@ c
       REAL             YSPACE          ! spacing between y jiggle offsets
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'_pht','p'/
+      DATA SUFFIX_STRINGS /'!_pht','p','_pht'/
 
 *.
 
