@@ -369,7 +369,7 @@
 *     -  Tidy graphics and NDF.
 
 *  Related Applications:
-*     KAPPA: CONTOUR, CONTOVER; Figaro: ICONT; SPECDRE: SPECCONT.
+*     KAPPA: CONTOUR; Figaro: ICONT; SPECDRE: SPECCONT.
 
 *  Implementation Status:
 *     -  Only real data can be processed directly.  Other non-complex
