@@ -22,16 +22,22 @@
 #      Original version
 #    30-SEP-1999 (NG):
 #      Remove sgml2* aliases and define PATH
+#    4-JUN-2000 (NG):
+#      Add test of whether SGML_CATALOG_FILES is already defined,
+#      and append if so.
 #
 # $Id$
 #-
 
-# Don't bother making the thing particularly sophisticated.  We don't
-# check if environment variables are already defined.
+# No need to make the thing particularly sophisticated.
 
 setenv STARLINK_SGML_DIR ((STARLINK_SGML_DIR))
 
-setenv SGML_CATALOG_FILES ./CATALOG:$STARLINK_SGML_DIR/dtd/CATALOG:$SGML_CATALOG_FILES
+if ($?SGML_CATALOG_FILES) then
+    setenv SGML_CATALOG_FILES ./CATALOG:$STARLINK_SGML_DIR/dtd/CATALOG:$SGML_CATALOG_FILES
+else
+    setenv SGML_CATALOG_FILES ./CATALOG:$STARLINK_SGML_DIR/dtd/CATALOG
+endif
 
 setenv PATH ((SGML_BINDIR)):$PATH
 
