@@ -95,5 +95,6 @@ GBDIN           <grid bounds invalid>
 MPIIN           <maximum pixel interval invalid>
 NGDIN           <number of grid dimensions invalid>
 PATIN           <positional accuracy tolerance invalid>
+SISIN           <sub-pixel interpolation scheme invalid>
 
 .END

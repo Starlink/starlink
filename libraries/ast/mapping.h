@@ -250,39 +250,17 @@
 /* These macros identify standard sub-pixel interpolation algorithms
    for use by astResample<X>. They are used by giving the macro's
    value for the "interp" argument. */
-#if defined(astFORTRAN77)        /* Only needed for Fortran interface */
-#define AST__UINTERP ( (void *) 0 ) /* Use user-supplied function (F77 only) */
-#endif
-#define AST__NEAREST ( (void *) 1 ) /* Use pixel with nearest centre */
-#define AST__LINEAR ( (void *) 2 ) /* Simple linear interpolation */
-#define AST__SINC ( (void *) 3 ) /* Sinc interpolation */
-#define AST__SQRSINC ( (void *) 4 ) /* Squared sinc interpolation */
-#define AST__SINCSINC ( (void *) 4 ) /* sinc(x)sinc(x/2) interpolation */
-#define AST__GAUSINC ( (void *) 5 ) /* Gaussian * sinc interpolation */
+#define AST__UINTERP (1)         /* Use user-supplied interpolation function */
+#define AST__UKERN1 (2)          /* Use user-supplied interpolation kernel */
+#define AST__NEAREST (3)         /* Use pixel with nearest centre */
+#define AST__LINEAR (4)          /* Simple linear interpolation */
+#define AST__SINC (5)            /* Sinc interpolation */
+#define AST__SQRSINC (6)         /* Squared sinc interpolation */
+#define AST__SINCSINC (7)        /* sinc(x)sinc(x/2) interpolation */
+#define AST__GAUSINC (8)         /* Gaussian * sinc interpolation */
 
 /* Type Definitions. */
 /* ================= */
-/* Interpolation function pointer type. */
-/* ------------------------------------ */
-/* This defines a shorthand for the type of a pointer to an
-   interpolation function which may be passed to astResample<X> as the
-   "interp" argument. There is a separate function pointer type for
-   each type of gridded data to be resampled. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
-typedef int (* AstInterpolateLD)( int, const int [], const int [], const long double [], const long double [], int, const int [], const double *const [], const double [], int, long double, long double [], long double [] );
-#endif
-
-typedef int (* AstInterpolateB)( int, const int [], const int [], const signed char [], const signed char [], int, const int [], const double *const [], const double [], int, signed char, signed char [], signed char [] );
-typedef int (* AstInterpolateD)( int, const int [], const int [], const double [], const double [], int, const int [], const double *const [], const double [], int, double, double [], double [] );
-typedef int (* AstInterpolateF)( int, const int [], const int [], const float [], const float [], int, const int [], const double *const [], const double [], int, float, float [], float [] );
-typedef int (* AstInterpolateI)( int, const int [], const int [], const int [], const int [], int, const int [], const double *const [], const double [], int, int, int [], int [] );
-typedef int (* AstInterpolateL)( int, const int [], const int [], const long int [], const long int [], int, const int [], const double *const [], const double [], int, long int, long int [], long int [] );
-typedef int (* AstInterpolateS)( int, const int [], const int [], const short int [], const short int [], int, const int [], const double *const [], const double [], int, short int, short int [], short int [] );
-typedef int (* AstInterpolateUB)( int, const int [], const int [], const unsigned char [], const unsigned char [], int, const int [], const double *const [], const double [], int, unsigned char, unsigned char [], unsigned char [] );
-typedef int (* AstInterpolateUI)( int, const int [], const int [], const unsigned int [], const unsigned int [], int, const int [], const double *const [], const double [], int, unsigned int, unsigned int [], unsigned int [] );
-typedef int (* AstInterpolateUL)( int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, const int [], const double *const [], const double [], int, unsigned long int, unsigned long int [], unsigned long int [] );
-typedef int (* AstInterpolateUS)( int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, const int [], const double *const [], const double [], int, unsigned short int, unsigned short int [], unsigned short int [] );
-
 /* Mapping structure. */
 /* ------------------ */
 /* This structure contains all information that is unique to each
@@ -316,7 +294,7 @@ typedef struct AstMappingVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
-   int (* ResampleLD)( AstMapping *, int, const int [], const int [], const long double [], const long double [], AstInterpolateLD, const double [], double, int, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
+   int (* ResampleLD)( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 #endif
 
    AstMapping *(* Simplify)( AstMapping * );
@@ -328,16 +306,16 @@ typedef struct AstMappingVtab {
    int (* GetTranForward)( AstMapping * );
    int (* GetTranInverse)( AstMapping * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int ** );
-   int (* ResampleB)( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], AstInterpolateB, const double [], double, int, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
-   int (* ResampleD)( AstMapping *, int, const int [], const int [], const double [], const double [], AstInterpolateD, const double [], double, int, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
-   int (* ResampleF)( AstMapping *, int, const int [], const int [], const float [], const float [], AstInterpolateF, const double [], double, int, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
-   int (* ResampleI)( AstMapping *, int, const int [], const int [], const int [], const int [], AstInterpolateI, const double [], double, int, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
-   int (* ResampleL)( AstMapping *, int, const int [], const int [], const long int [], const long int [], AstInterpolateL, const double [], double, int, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [] );
-   int (* ResampleS)( AstMapping *, int, const int [], const int [], const short int [], const short int [], AstInterpolateS, const double [], double, int, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [] );
-   int (* ResampleUB)( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], AstInterpolateUB, const double [], double, int, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [] );
-   int (* ResampleUI)( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], AstInterpolateUI, const double [], double, int, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [] );
-   int (* ResampleUL)( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], AstInterpolateUL, const double [], double, int, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
-   int (* ResampleUS)( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], AstInterpolateUS, const double [], double, int, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
+   int (* ResampleB)( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
+   int (* ResampleD)( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
+   int (* ResampleF)( AstMapping *, int, const int [], const int [], const float [], const float [], int, void (*)(), const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
+   int (* ResampleI)( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)(), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
+   int (* ResampleL)( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)(), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [] );
+   int (* ResampleS)( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)(), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [] );
+   int (* ResampleUB)( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)(), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [] );
+   int (* ResampleUI)( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)(), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [] );
+   int (* ResampleUL)( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
+   int (* ResampleUS)( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
    int (* TestInvert)( AstMapping * );
    int (* TestReport)( AstMapping * );
    void (* ClearInvert)( AstMapping * );
@@ -378,20 +356,20 @@ AstMapping *astLoadMapping_( void *, size_t, int, AstMappingVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
-int astResampleLD_( AstMapping *, int, const int [], const int [], const long double [], const long double [], AstInterpolateLD, const double [], double, int, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
+int astResampleLD_( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 #endif
 
 AstMapping *astSimplify_( AstMapping * );
-int astResampleB_( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], AstInterpolateB, const double [], double, int, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
-int astResampleD_( AstMapping *, int, const int [], const int [], const double [], const double [], AstInterpolateD, const double [], double, int, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
-int astResampleF_( AstMapping *, int, const int [], const int [], const float [], const float [], AstInterpolateF, const double [], double, int, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
-int astResampleI_( AstMapping *, int, const int [], const int [], const int [], const int [], AstInterpolateI, const double [], double, int, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
-int astResampleL_( AstMapping *, int, const int [], const int [], const long int [], const long int [], AstInterpolateL, const double [], double, int, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [] );
-int astResampleS_( AstMapping *, int, const int [], const int [], const short int [], const short int [], AstInterpolateS, const double [], double, int, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [] );
-int astResampleUB_( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], AstInterpolateUB, const double [], double, int, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [] );
-int astResampleUI_( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], AstInterpolateUI, const double [], double, int, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [] );
-int astResampleUL_( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], AstInterpolateUL, const double [], double, int, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
-int astResampleUS_( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], AstInterpolateUS, const double [], double, int, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
+int astResampleB_( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
+int astResampleD_( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
+int astResampleF_( AstMapping *, int, const int [], const int [], const float [], const float [], int, void (*)(), const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
+int astResampleI_( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)(), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
+int astResampleL_( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)(), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [] );
+int astResampleS_( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)(), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [] );
+int astResampleUB_( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)(), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [] );
+int astResampleUI_( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)(), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [] );
+int astResampleUL_( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
+int astResampleUS_( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
 void astInvert_( AstMapping * );
 void astTran1_( AstMapping *, int, const double [], int, double [] );
 void astTran2_( AstMapping *, int, const double [], const double [], int, double [], double [] );
@@ -460,32 +438,32 @@ astINVOKE(O,astLoadMapping_(mem,size,init,vtab,name,astCheckChannel(channel)))
    pointers before use. This provides a contextual error report if a
    pointer to the wrong sort of object is supplied. */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
-#define astResampleLD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleLD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleLD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleLD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
 #endif
 
 #define astInvert(this) \
 astINVOKE(V,astInvert_(astCheckMapping(this)))
-#define astResampleD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleF(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleF_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleL(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleUL(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleUL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleI(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleUI(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleUI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleS(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleUS(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleUS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleB(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
-#define astResampleUB(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astResampleUB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,tol,maxpix,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleF(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleF_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleL(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleUL(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleI(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleUI(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleS(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleUS(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleB(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleUB(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
 #define astSimplify(this) astINVOKE(O,astSimplify_(astCheckMapping(this)))
 #define astTran1(this,npoint,xin,forward,xout) \
 astINVOKE(V,astTran1_(astCheckMapping(this),npoint,xin,forward,xout))

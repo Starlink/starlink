@@ -54,16 +54,16 @@
 
 /* Module Variables. */
 /* ================= */
-/* Pointer to user-supplied (FORTRAN 77) sub-pixel interpolation
-   function for use by AST_RESAMPLE<X>. */
-static F77_INTEGER_TYPE (* ast_resample_UINTERP)();
+/* Pointer to user-supplied (FORTRAN 77) interpolation function for
+   use by AST_RESAMPLE<X>. */
+static void (* ast_resample_FINTERP)();
 
 /* Interpolation function interface. */
 /* ================================= */
 /* These functions are associated with allowing FORTRAN 77
-   implementations of sub-pixel interpolation functions to be passed
-   to AST_RESAMPLE<X> via the FORTRAN 77 interface and then to be
-   invoked when necessary by the C code in the main implementation of
+   implementations of interpolation functions to be passed to
+   AST_RESAMPLE<X> via the FORTRAN 77 interface and then to be invoked
+   when necessary by the C code in the main implementation of
    astResample<X>. */
 
 /* Define a macro which defines an interface function called
@@ -73,57 +73,56 @@ static F77_INTEGER_TYPE (* ast_resample_UINTERP)();
    passed as an interpolation function to the C interface
    (astResample<X>). In turn, it invokes the user-supplied FORTRAN 77
    interpolation function, a pointer to which should previously have
-   been stored in the static variable "ast_resample_UINTERP". */
-#define MAKE_AST_RESAMPLE_INTERP(X,Xtype,Ftype) \
-static int ast_resample_interp##X( int ndim, \
-                                   const int lbnd[], const int ubnd[], \
-                                   const Xtype in[], const Xtype in_var[], \
-                                   int npoint, const int offset[], \
-                                   const double *const coords[], \
-                                   const double params[], int flags, \
-                                   Xtype badval, \
-                                   Xtype *out, Xtype *out_var ) { \
+   been stored in the static variable "ast_resample_FINTERP". */
+#define MAKE_AST_RESAMPLE_UINTERP(X,Xtype,Ftype) \
+static void ast_resample_uinterp##X( int ndim, \
+                                     const int lbnd[], const int ubnd[], \
+                                     const Xtype in[], const Xtype in_var[], \
+                                     int npoint, const int offset[], \
+                                     const double *const coords[], \
+                                     const double params[], int flags, \
+                                     Xtype badval, \
+                                     Xtype *out, Xtype *out_var, \
+                                     int *nbad ) { \
    DECLARE_INTEGER(STATUS); \
-   int result; \
 \
 /* Obtain the C status and then invoke the FORTRAN 77 interpolation \
    function via the stored pointer. Note that the "coords" array we \
    pass to FORTRAN has to be a contiguous 2-d array, so we must \
    de-reference one level of pointer compared to the C case. */ \
    STATUS = astStatus; \
-   result = ( *ast_resample_UINTERP )( INTEGER_ARG(&ndim), \
-                                       INTEGER_ARRAY_ARG(lbnd), \
-                                       INTEGER_ARRAY_ARG(ubnd), \
-                                       Ftype##_ARRAY_ARG(in), \
-                                       Ftype##_ARRAY_ARG(in_var), \
-                                       INTEGER_ARG(&npoint), \
-                                       INTEGER_ARRAY_ARG(offset), \
-                                       DOUBLE_ARRAY_ARG(coords[ 0 ]), \
-                                       DOUBLE_ARRAY_ARG(params), \
-                                       INTEGER_ARG(flags), \
-                                       Ftype##_ARG(&badval), \
-                                       Ftype##_ARRAY_ARG(out), \
-                                       Ftype##_ARRAY_ARG(out_var), \
-                                       INTEGER_ARG(&STATUS) ); \
+   ( *ast_resample_FINTERP )( INTEGER_ARG(&ndim), \
+                              INTEGER_ARRAY_ARG(lbnd), \
+                              INTEGER_ARRAY_ARG(ubnd), \
+                              Ftype##_ARRAY_ARG(in), \
+                              Ftype##_ARRAY_ARG(in_var), \
+                              INTEGER_ARG(&npoint), \
+                              INTEGER_ARRAY_ARG(offset), \
+                              DOUBLE_ARRAY_ARG(coords[ 0 ]), \
+                              DOUBLE_ARRAY_ARG(params), \
+                              INTEGER_ARG(flags), \
+                              Ftype##_ARG(&badval), \
+                              Ftype##_ARRAY_ARG(out), \
+                              Ftype##_ARRAY_ARG(out_var), \
+                              INTEGER_ARG(nbad), \
+                              INTEGER_ARG(&STATUS) ); \
 \
-/* Set the C status to the returned FORTRAN 77 status and return the \
-   function result. */ \
+/* Set the C status to the returned FORTRAN 77 status. */ \
    astSetStatus( STATUS ); \
-   return result; \
 }
 
 /* Invoke the above macro to define an interface function for each
    required data type. */
-MAKE_AST_RESAMPLE_INTERP(D,double,DOUBLE)
-MAKE_AST_RESAMPLE_INTERP(F,float,REAL)
-MAKE_AST_RESAMPLE_INTERP(I,int,INTEGER)
-MAKE_AST_RESAMPLE_INTERP(S,short int,WORD)
-MAKE_AST_RESAMPLE_INTERP(US,unsigned short int,UWORD)
-MAKE_AST_RESAMPLE_INTERP(B,signed char,BYTE)
-MAKE_AST_RESAMPLE_INTERP(UB,unsigned char,UBYTE)
+MAKE_AST_RESAMPLE_UINTERP(D,double,DOUBLE)
+MAKE_AST_RESAMPLE_UINTERP(F,float,REAL)
+MAKE_AST_RESAMPLE_UINTERP(I,int,INTEGER)
+MAKE_AST_RESAMPLE_UINTERP(S,short int,WORD)
+MAKE_AST_RESAMPLE_UINTERP(US,unsigned short int,UWORD)
+MAKE_AST_RESAMPLE_UINTERP(B,signed char,BYTE)
+MAKE_AST_RESAMPLE_UINTERP(UB,unsigned char,UBYTE)
 
 /* Undefine the macro. */
-#undef MAKE_AST_RESAMPLE_INTERP
+#undef MAKE_AST_RESAMPLE_UINTERP
 
 /* FORTRAN interface functions. */
 /* ============================ */
@@ -191,11 +190,11 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
                                        Ftype##_ARRAY(IN), \
                                        Ftype##_ARRAY(IN_VAR), \
                                        INTEGER(INTERP), \
-                                       F77_INTEGER_TYPE (* UINTERP)(), \
+                                       void (* FINTERP)(), \
                                        DOUBLE_ARRAY(PARAMS), \
+                                       INTEGER(FLAGS), \
                                        DOUBLE(TOL), \
                                        INTEGER(MAXPIX), \
-                                       INTEGER(FLAGS), \
                                        Ftype(BADVAL), \
                                        INTEGER(NDIM_OUT), \
                                        INTEGER_ARRAY(LBND_OUT), \
@@ -213,9 +212,9 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
    GENPTR_##Ftype##_ARRAY(IN_VAR) \
    GENPTR_INTEGER(INTERP) \
    GENPTR_DOUBLE_ARRAY(PARAMS) \
+   GENPTR_INTEGER(FLAGS) \
    GENPTR_DOUBLE(TOL) \
    GENPTR_INTEGER(MAXPIX) \
-   GENPTR_INTEGER(FLAGS) \
    GENPTR_##Ftype(BADVAL) \
    GENPTR_INTEGER(NDIM_OUT) \
    GENPTR_INTEGER_ARRAY(LBND_OUT) \
@@ -226,9 +225,9 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
    GENPTR_##Ftype##_ARRAY(OUT_VAR) \
    GENPTR_INTEGER(STATUS) \
 \
-   AstInterpolate##X interp; \
-   const Xtype *in_var; \
    Xtype *out_var; \
+   const Xtype *in_var; \
+   void (* finterp)(); \
    F77_INTEGER_TYPE RESULT; \
 \
    astAt( "AST_RESAMPLE"#F, NULL, 0 ); \
@@ -236,28 +235,23 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
 \
 /* If *INTERP is set to AST__UINTERP, store a pointer to the \
    user-supplied FORTRAN 77 interpolation function and use the \
-   "ast_resample_interp<X>" C wrapper function to invoke it. */ \
-      if ( *INTERP == (F77_INTEGER_TYPE) AST__UINTERP ) { \
-         ast_resample_UINTERP = UINTERP; \
-         interp = ast_resample_interp##X; \
-\
-/* Otherwise, use the *INTERP value to select a built-in interpolation \
-   method. */ \
-      } else { \
-         interp = (AstInterpolate##X) *INTERP; \
+   "ast_resample_uinterp<X>" C wrapper function to invoke it. */ \
+      if ( *INTERP == AST__UINTERP ) { \
+         ast_resample_FINTERP = FINTERP; \
+         finterp = (void (*)()) ast_resample_uinterp##X; \
       } \
 \
 /* If the AST__USEVAR flag is set, use the input and output variance \
    arrays, otherwise pass NULL pointers. */ \
       in_var = out_var = NULL; \
       if ( AST__USEVAR & *FLAGS ) { \
-         in_var = (const Xtype *) IN_VAR; \
-         out_var = (Xtype *) OUT_VAR; \
+         in_var = IN_VAR; \
+         out_var = OUT_VAR; \
       } \
       RESULT = astResample##X( astI2P( *THIS ), *NDIM_IN, \
                                LBND_IN, UBND_IN, IN, in_var, \
-                               interp, PARAMS, *TOL, *MAXPIX, \
-                               *FLAGS, *BADVAL, \
+                               *INTERP, finterp, PARAMS, *FLAGS, \
+                               *TOL, *MAXPIX, *BADVAL, \
                                *NDIM_OUT, LBND_OUT, UBND_OUT, \
                                LBND, UBND, OUT, out_var ); \
    ) \
