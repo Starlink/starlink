@@ -431,6 +431,14 @@
           IF (NABIN .LT. 1) NABIN=1
           ABIN = 360.0/REAL(NABIN)
 
+*      If an azimuthal axis is wanted get the start position from the user
+          IF ( NABIN .NE. 1 ) THEN
+            CALL USI_GET0R('AZSTART', AZANG, STATUS)
+            IF (STATUS .NE. SAI__OK) GOTO 99
+          ELSE
+            AZANG = 0.0
+          END IF
+
 *      Tell user the binning being used.
           CALL MSG_SETI( 'NRBIN', NRBIN )
           IF ( NABIN .EQ. 1 ) THEN
@@ -444,13 +452,8 @@
 *      Map grouping array
           CALL BDI_MAPI( IFID, 'Grouping', 'WRITE', GPTR, STATUS )
 
-*      If an azimuthal axis is wanted get the start position from the user
-          IF ( NABIN .NE. 1 ) THEN
-            CALL USI_GET0R('AZSTART', AZANG, STATUS)
-            IF (STATUS .NE. SAI__OK) GOTO 99
-          ELSE
-            AZANG = 0.0
-          END IF
+*      In irregular case adjust bounds count
+          IF ( .NOT. REG ) NRBIN = NRBIN - 1
 
 *      Polar index the first slice
           CALL IMG_POLIDX( DIMS(1), DIMS(2), PXCENT, PYCENT, REG,
