@@ -721,6 +721,7 @@
             ELSE
 	      OBDAT(NDS).GFLAG = .FALSE.
               OBDAT(NDS).GDPTR = OBDAT(NDS).DPTR
+              OBDAT(NDS).GVPTR = OBDAT(NDS).VPTR
               OBDAT(NDS).GQPTR = OBDAT(NDS).QPTR
               OBDAT(NDS).NGDAT = OBDAT(NDS).NDAT
 
