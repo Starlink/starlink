@@ -15,7 +15,7 @@
 *     library.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
@@ -30,6 +30,8 @@
 *        Added SLA_DD2TF, SLA_DJCL.
 *     21-JUN-2001 (DSB):
 *        Added SLA_DBEAR, SLA_DVDV.
+*     23-AUG-2001 (DSB):
+*        Added SLA_SVD and SLA_SVDSOL
 */
 
 /* Macros */
@@ -842,3 +844,154 @@ void slaSupgal ( double dsl, double dsb, double *dl, double *db ) {
    *dl = DL;
    *db = DB;
 }
+
+
+
+F77_SUBROUTINE(sla_svd)( INTEGER(M),
+                         INTEGER(N),
+                         INTEGER(MP),
+                         INTEGER(NP),
+                         DOUBLE_ARRAY(A),
+                         DOUBLE_ARRAY(W),
+                         DOUBLE_ARRAY(V),
+                         DOUBLE_ARRAY(WORK),
+                         INTEGER(JSTAT) );
+
+void slaSvd ( int m, int n, int mp, int np,
+              double *a, double *w, double *v, double *work,
+              int *jstat ){
+   DECLARE_INTEGER(M);
+   DECLARE_INTEGER(N);
+   DECLARE_INTEGER(MP);
+   DECLARE_INTEGER(NP);
+   F77_DOUBLE_TYPE *A;
+   F77_DOUBLE_TYPE *W;
+   F77_DOUBLE_TYPE *V;
+   F77_DOUBLE_TYPE *WORK;
+   DECLARE_INTEGER(JSTAT);
+
+
+   int i;
+   int j;
+
+   A = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) ( mp * np ) );
+   W = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) n );
+   V = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) ( np * np ) );
+   WORK = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) n );
+
+   if ( astOK ) {
+      M = m;
+      N = n;
+      MP = mp;
+      NP = np;
+
+      for ( i = 0; i < m; i++ ) {
+         for ( j = 0; j < n; j++ ) A[ i + mp * j ] = a[ np * i + j ];
+      }
+
+      F77_CALL(sla_svd)( INTEGER_ARG(&M),
+                         INTEGER_ARG(&N),
+                         INTEGER_ARG(&MP),
+                         INTEGER_ARG(&NP),
+                         DOUBLE_ARRAY_ARG(A),
+                         DOUBLE_ARRAY_ARG(W),
+                         DOUBLE_ARRAY_ARG(V),
+                         DOUBLE_ARRAY_ARG(WORK),
+                         INTEGER_ARG(&JSTAT) );
+
+
+      for ( i = 0; i < m; i++ ) {
+         for ( j = 0; j < n; j++ ) a[ np * i + j ] = A[ i + mp * j ];
+      }
+
+      for ( i = 0; i < n; i++ ) {
+         w[ i ] = W[ i ];
+         work[ i ] = WORK[ i ];
+         for ( j = 0; j < n; j++ ) v[ np * i + j ] = V[ i + np * j ];
+      }
+
+      *jstat = JSTAT;
+   }
+
+   A = astFree( A );
+   W = astFree( W );
+   V = astFree( V );
+   WORK = astFree( WORK );
+}
+
+F77_SUBROUTINE(sla_svdsol)( INTEGER(M),
+                         INTEGER(N),
+                         INTEGER(MP),
+                         INTEGER(NP),
+                         DOUBLE_ARRAY(B),
+                         DOUBLE_ARRAY(U),
+                         DOUBLE_ARRAY(W),
+                         DOUBLE_ARRAY(V),
+                         DOUBLE_ARRAY(WORK),
+                         DOUBLE_ARRAY(X) );
+
+void slaSvdsol ( int m, int n, int mp, int np,
+                 double *b, double *u, double *w, double *v,
+                 double *work, double *x ){
+
+   DECLARE_INTEGER(M);
+   DECLARE_INTEGER(N);
+   DECLARE_INTEGER(MP);
+   DECLARE_INTEGER(NP);
+   F77_DOUBLE_TYPE *B;
+   F77_DOUBLE_TYPE *U;
+   F77_DOUBLE_TYPE *W;
+   F77_DOUBLE_TYPE *V;
+   F77_DOUBLE_TYPE *WORK;
+   F77_DOUBLE_TYPE *X;
+
+   int i;
+   int j;
+
+   B = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) ( m ) );
+   U = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) ( mp * np ) );
+   W = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) n );
+   V = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) ( np * np ) );
+   WORK = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) n );
+   X = astMalloc( sizeof( F77_DOUBLE_TYPE ) * (size_t) n );
+
+   if ( astOK ) {
+      M = m;
+      N = n;
+      MP = mp;
+      NP = np;
+
+      for ( i = 0; i < m; i++ ) {
+         B[ i ] = b[ i ];
+         for ( j = 0; j < n; j++ ) U[ i + mp * j ] = u[ np * i + j ];
+      }
+      for ( i = 0; i < n; i++ ) {
+         W[ i ] = w[ i ];
+         for ( j = 0; j < n; j++ ) V[ i + np * j ] = v[ np * i + j ];
+      }
+
+      F77_CALL(sla_svdsol)( INTEGER_ARG(&M),
+                         INTEGER_ARG(&N),
+                         INTEGER_ARG(&MP),
+                         INTEGER_ARG(&NP),
+                         DOUBLE_ARRAY_ARG(B),
+                         DOUBLE_ARRAY_ARG(U),
+                         DOUBLE_ARRAY_ARG(W),
+                         DOUBLE_ARRAY_ARG(V),
+                         DOUBLE_ARRAY_ARG(WORK),
+                         DOUBLE_ARRAY_ARG(X) );
+
+      for ( i = 0; i < n; i++ ) {
+         x[ i ] = X[ i ];
+         work[ i ] = WORK[ i ];
+      }
+   }
+
+   B = astFree( B );
+   U = astFree( U );
+   W = astFree( W );
+   V = astFree( V );
+   WORK = astFree( WORK );
+   X = astFree( X );
+}
+
