@@ -20,14 +20,30 @@ $(LATEX_DOCS): sc3.tex
 	tar cf $@ sc3.tex sc3*eps
 
 $(HYPERTEXT_DOCS): sc$(VERSION).htx_tar
+	if test -e $@; then rm -f $@; fi
 	ln -s $< $@
 
 sc$(VERSION).htx_tar: sc3.htx/sc3.html
 	tar cf $@ sc3.htx
 
-sc3.htx/sc3.html: sc3.tex
+sc3.htx/sc3.html: sc3.tex sc3-scripts.tex
+	if test -e sc3.htx; then rm -Rf sc3.htx; fi
 	star2html sc3
-	for f in scripts/*; do if test -f $$f; then cp $$f sc3.htx; fi; done
+	mkdir sc3.htx/scripts
+	for f in scripts/*; do \
+	    if test -f $$f; then cp $$f sc3.htx/scripts; fi; \
+	done
+
+sc3-scripts.tex: scripts
+	cd scripts; \
+	for f in *; do if test -f $$f; then \
+	    echo $$f | sed 's/\([a-z0-9_]*\).*/\\subsection{\\label{se_\1_source}\\xlabel{\1}\1}/'; \
+	    echo "\htmladdnormallink{Download $$f}{scripts/$$f}"; \
+	    echo ''; \
+	    echo '\begin{verbatim}'; \
+	    cat $$f; \
+	    echo '\end{verbatim}'; \
+	fi; done > ../$@
 
 sc$(VERSION)-scripts.tar:
 	DN=sc$(VERSION)-scripts; \
