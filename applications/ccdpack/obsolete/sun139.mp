@@ -1,11 +1,11 @@
 
 input boxes;
-prologues:=1;
+% prologues:=1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 beginfig(4);
 
-defaultfont:="Times-Roman";
+defaultfont:="cmr10";
 save gap, u;
 
 w = 12bp;
@@ -91,7 +91,7 @@ over = (0,h);
 object.grp - pairndf.desc =
 geom.grp - 1/2[astimp.desc, wcsedit.desc] = 3over;
 
-defaultfont := "Helvetica";
+defaultfont := "cmss10";
 defaultscale := 0.8textsize;
 
 label("automatic", findobj.desc);
@@ -160,7 +160,7 @@ endfig;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 beginfig(3); 
 
-defaultfont:="Courier";
+defaultfont:="cmtt10";
 defaultscale:=1.6;
 
 path ccd[]a, ccd[]b, ccd[]c;
