@@ -85,6 +85,7 @@
 *     29 Jun 94 : V1.8-0  Put bias to make LOG spacing more useful (DJA)
 *     24 Nov 94 : V1.8-1  Now use USI for user interface (DJA)
 *     26 Mar 95 : V1.8-2  Use new data interface (DJA)
+*       7 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type definitions :
 *
@@ -159,7 +160,7 @@
 *    Version :
 *
       CHARACTER*30           	VERSION
-        PARAMETER            	( VERSION = 'ASMOOTH Version 1.8-1')
+        PARAMETER            	( VERSION = 'ASMOOTH Version 2.0-0')
 *-
 
 *  Check status
@@ -172,7 +173,7 @@
       CALL AST_INIT()
 
 *  Get input and output files
-      CALL USI_ASSOC( 'INP', 'BinDS|Array', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
       CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
