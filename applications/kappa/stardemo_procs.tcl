@@ -901,10 +901,11 @@ proc Obey {task action params args} {
    global ATASK_OUTPUT
    global CAN
    global CANCEL_OP
-   global ALPHA
+   global ALPHATEXT
    global LOGFILE_ID
    global STATUS
    global DOING
+   global AF
 
 # Return without action if the opoeration was canceleed.
    if { $CANCEL_OP } { return 0 }
@@ -1005,7 +1006,12 @@ proc Obey {task action params args} {
    if { !$ok && $abort } {exit 1}
 
 #  Re-congigure the canvas item containing the atask standard output text.
-   $CAN itemconfigure $ALPHA -text "$ATASK_OUTPUT"
+   if { [info exists ALPHATEXT] } {
+      $ALPHATEXT configure -state normal
+      $ALPHATEXT delete 1.0 end
+      $ALPHATEXT insert end "$ATASK_OUTPUT"
+      $ALPHATEXT configure -state disabled
+   }
 
 # Indicate that we are no longer executing an ADAM action.
    set ACTION ""
@@ -1694,6 +1700,7 @@ proc Demo {name body} {
 # If the demo is to be executed, first load the global link texts,
 # and demo information for this demo.
    if { !$CHECK_DEMO } {
+      Diag "Locating link texts within demo $name..."
 
 # Remove any existing links with "demo" or "step" scope.
       RemoveLinks demo
@@ -1703,6 +1710,7 @@ proc Demo {name body} {
 
       for {set i 0} { $i < [llength $body] } { incr i } {
          set element [string tolower [lindex $body $i]]
+         Diag "   $element"
 
          if { $ABORT_DEMO } { break }
          if { $PAUSE_DEMO } { tkwait variable PAUSE_DEMO }
@@ -1727,9 +1735,16 @@ proc Demo {name body} {
       }
    }
 
+   if { $CHECK_DEMO } {
+      Diag "Checking the syntax of the current step..."
+   } {
+      Diag "Executing the current step..."
+   }
+
 # Now run the demo, or check the demo.
    for {set i 0} { $i < [llength $body] } { incr i } {
       set element [string tolower [lindex $body $i]]
+      Diag "   $element"
 
       if { $ABORT_DEMO } { break }
       if { $PAUSE_DEMO } { tkwait variable PAUSE_DEMO }
@@ -1797,6 +1812,7 @@ proc Step {demo body} {
 
 #-
    global DEMO_FILE
+   global ABORT_DEMO
    global PAUSE_DEMO
    global CHECK_DEMO
    global STEP_LINKS
@@ -1807,13 +1823,16 @@ proc Step {demo body} {
 
 # If the step is to be executed, first check for step link texts.
    if { !$CHECK_DEMO } {
+      Diag "Locating link texts within current step..."
 
 # Remove any existing links with "step" scope.
       RemoveLinks step
 
       for {set i 0} { $i < [llength $body] } {incr i} {
          set element [string tolower [lindex $body $i]]
+         Diag "   $element"
    
+         if { $ABORT_DEMO } { break }
          if { $PAUSE_DEMO } { tkwait variable PAUSE_DEMO }
    
          if { $element == "command" } {
@@ -1843,9 +1862,17 @@ proc Step {demo body} {
    }
 
 # Now execute or check the step.
+   if { $CHECK_DEMO } {
+      Diag "Checking the syntax of the current step..."
+   } {
+      Diag "Executing the current step..."
+   }
+
    for {set i 0} { $i < [llength $body] } {incr i} {
       set element [string tolower [lindex $body $i]]
+      Diag "   $element"
 
+      if { $ABORT_DEMO } { break }
       if { $PAUSE_DEMO } { tkwait variable PAUSE_DEMO }
 
       if { $element == "command" } {
@@ -1928,6 +1955,8 @@ proc Package {demo body} {
    global PACKAGE_TITLE
 
    set ret 1
+
+   Diag "Loading package information for $demo..."
 
 # Do nothing if the demo is being executed.
    if { $CHECK_DEMO } {
@@ -2012,6 +2041,9 @@ proc Command {command} {
 #-
    global CHECK_DEMO
    global ABORT_DEMO
+
+   Diag "      $command"
+
    if { !$CHECK_DEMO && !$ABORT_DEMO } { 
       if { [catch {eval $command} mess] } {
          Message "Error executing command \"$command\" - $mess"
@@ -2077,6 +2109,8 @@ proc Pause {time} {
    global CONTINUE
    global CONLAB
    global SPEED
+
+   Diag "      $time"
 
 #  Ensure the demo is being run, not just checked.
    if { !$CHECK_DEMO && !$ABORT_DEMO } {
@@ -2771,27 +2805,39 @@ proc SetCom {com args} {
 }
 
 proc Alpha {state} {
-   global ALPHA
    global CAN
+   global CHECK_DEMO
+   global DEMO_FILE
+   global ALPHATEXT
+
+   Diag "      $state"
 
    set ret 1
 
-   if { $state == "on" } {   
-      $CAN raise alpha
+   if { !$CHECK_DEMO } {
 
-   } elseif { $state == "off" } {   
-      $CAN lower alpha
+      if { $state == "on" } {   
+         if { [$CAN find withtag alpha] == "" } {
+            MakeAlpha 
+         } { 
+            $ALPHATEXT delete 1.0 end
+         }
 
-   } {
-      if { [info exists DEMO_FILE] } {
-         set mess "Illegal alpha state \"$state\" found in demonstration file $DEMO_FILE"
+      } elseif { $state == "off" } {   
+         if { [$CAN find withtag alpha] != "" } {
+            $CAN delete alpha
+         }
+
       } {
-         set mess "Illegal alpha state \"$state\" found in demonstration file."
+         if { [info exists DEMO_FILE] } {
+            set mess "Illegal alpha state \"$state\" found in demonstration file $DEMO_FILE"
+         } {
+            set mess "Illegal alpha state \"$state\" found in demonstration file."
+         }
+         Message $mess
+         set ret 0
       }
-      Message $mess
-      set ret 0
    }
-
    return $ret
 }
 
@@ -2859,24 +2905,18 @@ proc ShowLink {scope link} {
    global DEMO_LINKS
    global STEP_LINKS
 
-# If this is a URL, display it using showme.
+# If this is a URL, display it.
    if { $scope == "url" } {
-      if { [catch {exec showme -u $link &} mess] } {
-         Message "Failed to display the URL $link - $mess."
-      }
+      CCDShowHelp $link 
 
 # If this is a link to an htx document, split the link up into doc and
-# label (delimited by a vertical bar), and display it using showme.
+# label (delimited by a vertical bar), and display it.
    } elseif { $scope == "htx" } {
 
       if { [regexp {(.*)\|(.*)} $link match doc label] } {
-         if { [catch {exec showme $doc $label &} mess] } {
-            Message "Failed to display document $doc (label $label) using the showme command - $mess."
-         }
+         ShowMe $doc $label 
       } {
-         if { [catch {exec showme $link &} mess] } {
-            Message "Failed to display document $link using the showme command - $mess."
-         }
+         ShowMe $link 
       }
 
 #  Otherwise...
@@ -3238,7 +3278,7 @@ proc InsertText {widget text tags} {
             set htxtag [SetHtxTag $widget "htx:$SUN|$label"]
             if { $htxtag != "" } { lappend tags $htxtag }
          } { 
-            puts "Failed to find htx target $SUN $label - $mess"
+            Diag "Failed to find htx target $SUN $label - $mess"
          }
 
       } elseif { [lsearch -exact $tags DOC] != -1 } {
@@ -3248,7 +3288,7 @@ proc InsertText {widget text tags} {
                set htxtag [SetHtxTag $widget "htx:$doc"]
                if { $htxtag != "" } { lappend tags $htxtag }
             } { 
-               puts "Failed to find htx target $doc - $mess"
+               Diag "Failed to find htx target $doc - $mess"
             }
          }
 
@@ -3336,3 +3376,179 @@ proc SetHtxTag {widget tag} {
    return $newtag
 
 }
+
+proc MakeAlpha {} {
+   global CAN
+   global ALPHATEXT
+   global TT_FONT
+   global AF
+
+#  Create a frame containing a text widget and a scroll bar if this has
+#  not already been done.
+   if { ![info exists AF] } {
+
+# Create the Frame.
+      set AF [frame $CAN.fr]      
+
+# Create the scroll bar.
+      set sc [scrollbar $AF.sc -command "$AF.lab yview" -width 15 -relief sunken]
+
+# Create the text widget.
+      set ALPHATEXT [text $AF.lab -state disabled -relief flat -wrap word -bd 0 \
+                   -highlightthickness 0 -font $TT_FONT \
+                   -background black -foreground white -yscrollcommand "$AF.sc set"]
+
+# Pack the text widget and scroll par into the parent frame.
+      pack $sc -side right -fill y
+      pack $ALPHATEXT -side left -fill both -expand 1 
+
+#      pack $AF -expand 1 -fill both
+
+# Adjust the width of the frame so that it occupies exactly the
+# full width available.
+   update idletasks
+      $AF configure -height [winfo height $CAN]
+      $AF configure -width [winfo width $CAN]
+
+   }
+
+# Add the frame to the canvas as a window canvas item.
+   $CAN create window 0 0 -anchor nw -tags alpha -window $AF \
+        -height [winfo height $CAN] -width [winfo width $CAN] 
+
+}
+
+proc Diag {mess} {
+   global DEBUG
+   if { $DEBUG } {
+      puts "$mess"
+   }
+}
+
+proc ShowMe {doc args} {
+   set ret 0
+
+   if { $args != "" } {
+      if { ![catch {exec showme -n $doc $args} mess] } {
+         set ret [CCDShowHelp $mess]
+      } { 
+         Daig "Failed to find document $doc (label $args) - $mess."
+      }
+   } {
+      if { ![catch {exec showme -n $doc} mess] } {
+         set ret [CCDShowHelp $mess]
+      } { 
+         Diag "Failed to find document $doc - $mess"
+      }
+   }
+
+   return $ret
+
+}
+
+   proc CCDShowHelp {url} {
+#+
+#  Name:
+#     CCDShowHelp
+
+#  Purpose:
+#     Displays a help file in a WWW browser.
+
+#  Description:
+#     This routine controls the display of help pages in a HTML WWW
+#     browser. The argument is simply the URL of a local file to be
+#     displayed. The type of browser used is controlled by the
+#     CCDbrowser variable. This should be set to the name of the
+#     executable (short name if on the PATH otherwise a full name).
+#     If CCDbrowser isn't set it defaults to "Mosaic".
+
+#  Arguments:
+#     url = string (read)
+#        The URL of the help page to be displayed.
+ 
+#  Authors:
+#     DLT: D L Terrett (Starlink, RAL)
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     DSB: David Berry (STARLINK- Manchester University)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-NOV-1993 (DLT):
+#     	 Original version.
+#     21-MAR-1995 (PDRAPER):
+#        Brought into CCDPACK from Xadam (was named gethelp).
+#     22-MAR-1995 (PDRAPER):
+#        Added facility to use netscape (1.1) as well as Mosaic.
+#     29-JUN-1997 (DSB):
+#        Brought into POLPACK from CCDPACK. Calls to CCDIssueInfo changed 
+#        to Message. Check environment variable HTX_BROWSER instead of
+#        Tcl variable CCDbrowser to determine the browser to use.
+#        Supplied argument changed from a file name to a URL (and the 
+#        netscape remote openFILE command changed to openURL).
+#     6-JUL-1998 (DSB):
+#        Modified to use HTX_BROWSER as supplied instead of only using
+#        "netscape" or "mosaic".
+#     {enter_further_changes_here}
+
+#-
+
+#  Global variables.
+      global env
+      global netscapepid
+      global mosaicpid
+      
+      set ret 1
+
+#  Check the browser to use. If HTX_BROWSER doesn't exist use Netscape.
+#  If it does, use it.
+      if { ! [info exists env(HTX_BROWSER)] } { 
+         set CCDbrowser netscape
+      } {
+         set CCDbrowser $env(HTX_BROWSER)
+      }
+
+      switch -glob $CCDbrowser {
+	 *[Mm]osaic* {
+
+#  Use Mosaic. This relies on the remote-command mechanisms prior to CCI.
+	    set mosaicpid 0
+	    catch {
+	       set in [open ~/.mosaicpid r]
+	       gets $in mosaicpid
+	       close $in
+	    }
+	    if { $mosaicpid != 0 } {
+	       set fid [open /tmp/Mosaic.$mosaicpid w]
+	       puts $fid "goto"
+	       puts $fid $url
+	       close $fid
+	       if { [catch {exec kill -USR1 $mosaicpid}] } {
+		  set mosaicpid 0
+	       }
+	    } 
+	    if { $mosaicpid == 0 } {
+	       exec  $CCDbrowser $url &
+	    }
+	 }
+
+	 *[Nn]etscape* {
+	       
+#  Use Mozilla. This uses the NCAPIs methods as of netscape 1.1b1.
+#  Attempt to make browser goto the required page. If this fails then the 
+#  browser has exited for some reason, so restart it.
+            if { ! [info exists netscapepid] } { set netscapepid 1 }
+	    if { [catch {exec $CCDbrowser -remote openURL($url)} mess] } {
+	       set netscapepid 0
+	    }
+            if { $netscapepid == 0 } { 
+               if { [catch { set netscapepid [exec $CCDbrowser $url &]} mess] } {
+                  Message "Failed to start $CCDbrowser - $mess"
+                  set ret 0
+               }
+	    }
+	 }
+      }
+
+      return $ret
+   }
+

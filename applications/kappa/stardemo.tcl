@@ -8,7 +8,7 @@
 #
 #  Invocation:
 #     stardemo.tcl [demo] [-dir <demo_dir>] [-(no)paging] [-(no)loop]
-#                         [-(no)net]
+#                         [-(no)net] [-debug]
 #
 #  Command Line Arguments:
 #     demo: An optional name of a demonstration to be selected and run
@@ -34,6 +34,9 @@
 #     will not cause a web browser to be created to view the url. Use
 #     this option if there is no access to the net. Access to the net is
 #     assumed to be available by default.
+#
+#     -debug: If specified, messages are displayed on standard output
+#     giving various diagnostics. This is intended to help debug demo scripts.
 #
 #  Copyright:
 #     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -119,6 +122,7 @@
    set autorun ""
    set LOOPING 1
    set PAGING 0
+   set DEBUG 0
 
    set userr 0
 
@@ -137,6 +141,9 @@
                set userr 1
             }
          }
+
+      } elseif { $arg == "-debug" } {
+         set DEBUG 1
 
       } elseif { $arg == "-paging" } {
          set PAGING 1
@@ -185,8 +192,10 @@
    source $STARDEMO_DIR/dialog.tcl
    source $STARDEMO_DIR/stardemo_procs.tcl
 
-# Quit when control-c is pressed.
+# Quit when control-c or Q is pressed.
    bind . <Control-c> {Finish 0}
+   bind . <q> {Finish 0}
+   bind . <Q> {Finish 0}
 
 # Get the pixels per inch on the screen.
    set dpi [winfo fpixels . "1i"]
@@ -469,13 +478,13 @@ display will not."
 
 # Set up the main frame (F2). It is made up from two columns arranged 
 # horizontally...
-      set col1 [frame $F2.col1 -bd 1]   
-      set col2 [frame $F2.col2 -bd 1]
-      pack $col1 -side left -fill y -anchor w -ipadx 1m -ipady 1m
-      pack $col2 -side left -fill both -expand 1
+      set COL1 [frame $F2.col1 -bd 1]   
+      set COL2 [frame $F2.col2 -bd 1]
+      pack $COL1 -side left -fill y -anchor w -ipadx 1m -ipady 1m
+      pack $COL2 -side left -fill both -expand 1
 
 # Create and pack a frame containing the demo controls.
-      set con [frame $col1.con -bd 2 -relief groove ]
+      set con [frame $COL1.con -bd 2 -relief groove ]
       pack $con -fill both -expand 1 -ipady 2m
 
 # Create a label showing the demo currently being run.
@@ -595,7 +604,7 @@ display will not."
       HelpArea
 
 # Create the canvas in column 2...
-      set CAN [canvas $col2.can1]
+      set CAN [canvas $COL2.can1 -background black]
       pack $CAN  -side right -anchor e -fill both -expand 1
 
 # Pack the top level frame. This make it appear on the screen.
@@ -634,13 +643,6 @@ display will not."
 #  Set a flag if the GWM canvas item was created succesfully.
       } {
          set gotgwm 1
-
-# Create a label for display within the canvas which will hold standard
-# output from each demo command. 
-         $CAN create rectangle 4 4 [expr 4 + $CANWID] [expr 4 + $CANHGT] \
-              -tags alpha -fill black -outline "" 
-         set ALPHA [$CAN create text 20 20 -width [expr $CANWID - 20] -tags alpha \
-              -anchor nw -text $ATASK_OUTPUT -justify left -fill white -font $FONT]
       }
 
    }
