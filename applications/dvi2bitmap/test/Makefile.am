@@ -48,9 +48,9 @@ t8.test: t8.pl
 	$(LN_S) t8.pl t8.test
 
 # Test 5 depends on its DVI file; test 7 uses it, too
-t5.test t7.test: t5.dvi
+t5.test$(EXEEXT) t7.test$(EXEEXT): t5.dvi
 # Test 6 generates its own test data
-t6.data: t6.test
+t6.data: t6.test$(EXEEXT)
 	./t6.test -g 500 >$@
 
 pathtest: hello.dvi
