@@ -127,11 +127,18 @@
 #include	<string.h>
 #include        <setjmp.h>
 
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
 #include	"define.h"
 #include	"globals.h"
 #include        "sae_par.h"
 #include        "par.h"
 #include        "ndf.h"
+#include        "prefs.h"
+#include        "preflist.h"
 
 /* Maximum number of NAME/VALUE pairs */
 #define MAXARGS 20

@@ -66,7 +66,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
   {
    FILE          *infile;
    char          *cp, str[MAXCHAR], *keyword, *value, **dp, *name;
-   int           i, ival, nkey, warn, argi, flagc, flagd, flate, flagz;
+   int           i, ival, nkey, warn, argi, flagc, flagd, flage, flagz;
    float         dval;
 #ifndef	NO_ENVVAR
    static char	value2[MAXCHAR],envname[MAXCHAR];

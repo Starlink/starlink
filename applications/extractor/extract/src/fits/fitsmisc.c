@@ -23,9 +23,15 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include        <setjmp.h>
 
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
+
+#include        "merswrap.h"
+#include        "sae_par.h"
+
+extern jmp_buf          env;
 
 /********************************* error ************************************/
 /*

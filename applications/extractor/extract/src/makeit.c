@@ -317,7 +317,7 @@ void	makeit()
           error(EXIT_FAILURE, "*Internal Error*: Date string too long ","");
       if (!strftime(thecat.ext_time, 10, "%H:%M:%S", localtime(&thetime2)))
           error(EXIT_FAILURE, "*Internal Error*: Time/date string too long ","");
-      cat.ext_elapsed = difftime(thetime2, thetime1);
+      thecat.ext_elapsed = difftime(thetime2, thetime1);
       
   }
 

@@ -2,7 +2,8 @@
 # Copyright (C) 2002 Emmanuel Bertin.
 SUBDIRS			= fits wcs
 bin_PROGRAMS		= sex
-sex_SOURCES		= analyse.c assoc.c astrom.c back.c bpro.c catout.c \
+sex_SOURCES		= extractor.c adamprint.c userradii.c userradii.h \
+                          analyse.c assoc.c astrom.c back.c bpro.c catout.c \
 			  check.c clean.c extract.c field.c filter.c \
 			  flag.c graph.c growth.c image.c interpolate.c \
 			  main.c makeit.c manobjlist.c misc.c neurro.c pc.c \

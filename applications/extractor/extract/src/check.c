@@ -304,7 +304,7 @@ void	reinitcheck(picstruct *field, checkstruct *check)
      ndfMap( check->ndf, "DATA", "_REAL", "WRITE", 
              pntr, &check->nel, &status );
      check->map = pntr[0];
-     if (check_type==CHECK_MINIBACKRMS)
+     if (check->type==CHECK_MINIBACKRMS)
         memcpy(check->map, field->sigma, check->npix*sizeof(float));
      else
         memcpy(check->map, field->back, check->npix*sizeof(float));
@@ -369,7 +369,6 @@ void	reendcheck(picstruct *field, checkstruct *check)
   {
    char		*buf;
    size_t	padsize;
-   int          status = SAI__OK;
 
   switch(check->type)
     {
@@ -429,6 +428,7 @@ close check-image.
 */
 void	endcheck(checkstruct *check)
   {
+  int status = SAI__OK;
   free(check);
   ndfAnnul( &check->ndf, &status );
   return;
