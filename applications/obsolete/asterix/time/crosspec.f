@@ -125,12 +125,11 @@
         DO WHILE ( INPUT )
           INPUT = .FALSE.
           WRITE (PAR, '(A3,I1)') 'INP', I
-          CALL USI_TASSOCI( PAR, 'READ', IFID(I), INPRIM(I), STATUS)
-
-*        Check status
+          CALL USI_TASSOCI( PAR, '*', 'READ', IFID(I), STATUS)
           IF (STATUS .NE. SAI__OK) GOTO 99
 
 *        Check not primitive
+          CALL BDI_PRIM( IFID(I), INPRIM(I), STATUS )
           CALL BDI_CHKDATA (IFID(I), OK, NDIM(I), DIMS(1,I), STATUS)
 
           IF (.NOT. OK) THEN
