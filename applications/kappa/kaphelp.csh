@@ -128,5 +128,5 @@
 
 #-
 
-   $STARHELP_DIR/starhelp $KAPPA_HELP $1 $2 $3 $4
+   $STARHELP_DIR/starhelp HELPFILE=$KAPPA_HELP $1 $2 $3 $4
 
