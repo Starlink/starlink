@@ -70,13 +70,13 @@ BUILT_SOURCES = hdstools.csh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:
 
 ##  Simple check.
 edit = sed \
-        -e 's,@bindir\@,$(bindir),g'
+       -e 's,@bindir\@,$(bindir),g'
 
 TESTS = htest
 
 htest: htest.in
-        -rm -f htest.tmp htest
-        $(edit) \
-        $(srcdir)/htest.in >htest.tmp
-        mv htest.tmp htest
-        chmod 0755 htest
+	-rm -f htest.tmp htest
+	$(edit) \
+	$(srcdir)/htest.in >htest.tmp
+	mv htest.tmp htest
+	chmod 0755 htest
