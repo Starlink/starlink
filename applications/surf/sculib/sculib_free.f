@@ -17,8 +17,8 @@
 *        will be checked against the values they were set to by 
 *        SCULIB_MALLOC.
 *      - PSX_FREE will be called to free the virtual memory. If 
-*        that's successful START_PTR and END_PTR will be set to
-*        the bad value.
+*        that's successful START_PTR and END_PTR will be cleared.
+*        END_PTR will be set to bad.
 *      - If either of the sentinel integers was corrupted then an
 *        error will be reported and bad status returned.
 
@@ -26,14 +26,15 @@
 *     CALL SCULIB_FREE (NAME, START_PTR, END_PTR, STATUS)
 
 *  Arguments:
-*     NAME                = CHARACTER*(*) (Given)
-*           name associated with VM
-*     START_PTR           = INTEGER (Given and returned)
-*           pointer to beginning of virtual memory
-*     END_PTR             = INTEGER (Given and returned)
-*           pointer to end of virtual memory
-*     STATUS              = INTEGER (Given and returned)
-*           global status
+*     NAME = CHARACTER*(*) (Given)
+*        name associated with VM
+*     START_PTR = INTEGER (Given and returned)
+*        pointer to beginning of virtual memory, as returned by SCULIB_MALLOC
+*     END_PTR = INTEGER (Given and returned)
+*        pointer to end of virtual memory, as returned by SCULIB_MALLOC.
+*        Note that this is not guaranteed to be a valid pointer.
+*     STATUS = INTEGER (Given and returned)
+*        global status
 
 *  Authors:
 *     J.Lightfoot (ROE::JFL)
@@ -64,6 +65,7 @@
 *  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                    ! for VAL__NBI
+      INCLUDE 'CNF_PAR'                    ! for CNF_PVAL
 
 *  Arguments Given:
       CHARACTER*(*) NAME
@@ -85,7 +87,8 @@
 *  Local Constants:
       INTEGER BOUNDARY                     ! Number of bytes
       PARAMETER (BOUNDARY = VAL__NBD)      ! Used for sentinel integers
-
+      INTEGER SENTINEL                     ! Sentinel integer value
+      PARAMETER (SENTINEL = 37 )
 
 *  Local variables:
       LOGICAL LOWER                        ! .FALSE. if lower sentinel 
@@ -115,16 +118,41 @@
 *  check sentinel integers, calls to VAL routines are just a way of
 *  accessing the VM
 
-         RTEMP = VAL_ITOR (.FALSE., %val(START_PTR-BOUNDARY), STATUS)
-         LOWER = (INT(RTEMP) .EQ. 37)
-         RTEMP = VAL_ITOR (.FALSE., %val(END_PTR+1), STATUS)
-         UPPER = (INT(RTEMP) .EQ. 37) 
 
-*  release the memory
+*  this is the lower sentinel.
+*  Currently disabled because CNF_PVAL can not be used to register
+*  the malloced pointer and the offset.
 
-         CALL PSX_FREE (START_PTR - BOUNDARY, STATUS)
+C         RTEMP = VAL_ITOR (.FALSE., %val(START_PTR-BOUNDARY), STATUS)
+C         LOWER = (INT(RTEMP) .EQ. SENTINEL)
+
+*  Check the upper sentinel if END_PTR is non-zero and non-bad
+*  Note that END_PTR may or may not be a CNF pointer
+         IF (END_PTR .NE. VAL__BADI .AND. END_PTR .NE. 0) THEN
+
+            IF (CNF_PVAL(END_PTR) .GT. 0) THEN
+*     valid CNF pointer
+               RTEMP = VAL_ITOR (.FALSE., %VAL(CNF_PVAL(END_PTR)+1),
+     :              STATUS)
+            ELSE
+*     assume we have the size of the allocated memory in bytes
+               RTEMP = VAL_ITOR (.FALSE.,
+     :              %VAL(CNF_PVAL(START_PTR)+END_PTR), STATUS)
+            END IF
+            UPPER = (INT(RTEMP) .EQ. SENTINEL)
+         ELSE
+            UPPER = .TRUE.
+         END IF
+
+*  release the memory.
+*  Currently no sentinel at the start
+
+C         CALL PSX_FREE (START_PTR - BOUNDARY, STATUS)
+         CALL PSX_FREE (START_PTR, STATUS)
+
+*  clear the pointer integers
          START_PTR = 0
-         END_PTR = 0
+         END_PTR = VAL__BADI
 
 *  report sentinel corruption
 
