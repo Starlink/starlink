@@ -96,8 +96,10 @@
           GOTO 999
       ENDIF
 *
+	print *,'getting cal dir...'
 * Set the default for the detector response file
       CALL XRT_CALDEF(CALDIR, STATUS)
+	print *,'got cal dir!'
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Warning: XRT cal directory not found')
