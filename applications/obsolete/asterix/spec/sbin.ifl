@@ -1,13 +1,13 @@
 interface SBIN
   parameter INP
     position 1
-    type 'UNIV'
+    type 'LITERAL'
     prompt 'Input'
     help 'Name of HDS dataset or structure containing input spectrum'
   endparameter
   parameter OUT
     position 2
-    type 'UNIV'
+    type 'LITERAL'
     prompt 'Output'
     help 'HDS file to contain rebinned output spectrum'
   endparameter
