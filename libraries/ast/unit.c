@@ -46,6 +46,13 @@
 *        astStore will then read beyond the end of the "data" area.
 *     15-FEB-2005 (DSB):
 *        - Modified CleanExp to fix up some common units mistakes.
+*     21-FEB-2005 (DSB):
+*        - Modified CleanExp to accept <word><digit> as equivalent to 
+*        <word>^<digit>.
+*        - Modified MakeTree to do case insensitive checking if case
+*        sensitive checking failsto produce a match to a multiplier/unit
+*        symbol combination. If this still produces no match, do a case
+*        insensitive match for multiplier/unit label.
 */
 
 /* Module Macros. */
@@ -69,6 +76,12 @@
    compare bad values directory because of the danger of floating point
    exceptions, so bad values are dealt with explicitly. */
 #define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
+
+/* The number of basic dimension quantities used for dimensional analysis. 
+   In addition to the usual M, L and T, this includes pseudo-dimensions 
+   describing strictly dimensionless quantities such as plane angle, 
+   magnitude, etc. */
+#define NQUANT 6
 
 /* Include files. */
 /* ============== */
@@ -142,6 +155,7 @@ typedef struct KnownUnit {
    const char *sym;         /* Unit symbol string (null terminated) */
    const char *label;       /* Unit label string (null terminated) */
    int symlen;              /* Length of symbol (without trailing null ) */
+   int lablen;              /* Length of label (without trailing null ) */
    struct UnitNode *head;   /* Head of definition tree (NULL for basic units) */
    struct KnownUnit *next;  /* Next KnownUnit in linked list */
 } KnownUnit;
@@ -152,6 +166,10 @@ typedef struct KnownUnit {
 /* A pointer to the KnownUnit structure at the head of a linked list of
    such structures containing definitions of all known units. */
 static KnownUnit *known_units = NULL;
+
+/* An array of pointers to KnownUnits which list the basic quantities
+used in dimensional analysis. */
+static KnownUnit *quant_units[ NQUANT ];
 
 /* A pointer to the Multiplier structure at the head of a linked list of
    such structures containing definitions of all known multipliers. */
@@ -185,6 +203,9 @@ static int ComplicateTree( UnitNode ** );
 static int ReplaceNode( UnitNode *, UnitNode *, UnitNode * );
 static void FindFactors( UnitNode *, UnitNode ***, double **, int *, double * );
 static const char *MakeExp( UnitNode *, int, int );
+static int DimAnal( UnitNode *, double[NQUANT], double * );
+static int Ustrncmp( const char *, const char *, size_t );
+static int SplitUnit( const char *, int, const char *, int, Multiplier **, int * );
 
 /*  Debug functions... 
 */
@@ -243,15 +264,17 @@ static const char *CleanExp( const char *exp ) {
 
 /* Local Variables: */
    char **tok;
+   char *p;
    char *r;
    char *result;
    char *t;
    char *w;
-   char *p;
    const char *start;
+   int changed;
    int i;
    int l;
    int len;
+   char *tt;
    int ntok;
    int po;
    int ps;
@@ -306,9 +329,14 @@ static const char *CleanExp( const char *exp ) {
    which has more of these common units mistakes. AST has to be a bit
    more conservative than SPLAT though because of its wider remit. */
    len = 0;
-   if( tok ) {
+   changed = 1;
+   tt = NULL;
+   while( tok && changed ) {
+      changed = 0;
       for( i = 0; i < ntok; i++ ) {
          t = tok[ i ];
+         l = strlen( t );
+         tt = astStore( tt, t, l + 1 );
 
 /* "A" is strictly Ampere, but is more likely to mean Angstrom. */
          if( strstr( t, "Ang" ) == t ||
@@ -316,11 +344,17 @@ static const char *CleanExp( const char *exp ) {
              !strcmp( t, "A" ) ) {
             tok[ i ] = astStore( t, "Angstrom", 9 ) ;
 
-         } else if( !strcmp( t, "cm2" ) ) {
-            tok[ i ] = astStore( t, "cm^2", 5 ) ;
-
-         } else if( !strcmp( t, "m2" ) ) {
-            tok[ i ] = astStore( t, "m^2", 4 ) ;
+/* Any word followed by a digit is taken as <word>^<digit> */
+         } else if( l > 1 && isdigit( t[ l - 1 ] ) && 
+                    !isdigit( t[ l - 2 ] ) && t[ l - 2 ] != '^' ) {
+            tok[ i ] = astMalloc( l + 2 );
+            if( tok[ i ] ) {
+               strcpy( tok[ i ], t );
+               tok[ i ][ l + 1 ] = 0;
+               tok[ i ][ l ] = t[ l - 1 ];
+               tok[ i ][ l - 1 ] = '^';
+               t = astFree( t );
+            }
 
          } else if( !strcmp( t, "M" ) ) {
             t[ 0 ] = 'm';
@@ -353,8 +387,13 @@ static const char *CleanExp( const char *exp ) {
 
 /* Update the total length of the string. */
          len += strlen( tok[ i ] );
+
+/* Note if a change has been made to the token. */
+         if( strcmp( tt, tok[ i ] ) ) changed = 1;
+
       }
    }
+   tt = astFree( tt );
 
 /* Concatentate the tokens into a single string, freeing the individual
    strings. */
@@ -819,7 +858,7 @@ static int ComplicateTree( UnitNode **node ) {
 
 /* Replace "(A**-1)*B" with "B/A" */
       } else if( (*node)->arg[ 0 ]->opcode == OP_POW &&
-                 EQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con, 1.0 )) {      
+                 EQUAL( (*node)->arg[ 0 ]->arg[ 1 ]->con, -1.0 )) {      
          newnode = NewNode( NULL, OP_DIV );
          if( astOK ) {
             newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 1 ] );             
@@ -828,7 +867,7 @@ static int ComplicateTree( UnitNode **node ) {
 
 /* Replace "B*(A**-1)" with "B/A" */
       } else if( (*node)->arg[ 1 ]->opcode == OP_POW &&
-                 EQUAL( (*node)->arg[ 1 ]->arg[ 1 ]->con, 1.0 )) {      
+                 EQUAL( (*node)->arg[ 1 ]->arg[ 1 ]->con, -1.0 )) {      
          newnode = NewNode( NULL, OP_DIV );
          if( astOK ) {
             newnode->arg[ 0 ] = CopyTree( (*node)->arg[ 0 ] );             
@@ -1174,6 +1213,153 @@ static UnitNode *CreateTree( const char *exp ){
    return result;
 }
 
+static int DimAnal( UnitNode *node, double powers[NQUANT], double *scale ) {
+/*
+*  Name:
+*     DimAnal
+
+*  Purpose:
+*     Perform a dimensional analysis of a unit tree.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     int DimAnal( UnitNode *node, double powers[NQUANT], double *scale )
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     This function returns a set of powers and a scaling factor which 
+*     represent the units tree.
+
+*  Parameters:
+*     node
+*        Pointer to the UnitNode at the head of the unit tree.
+*     powers
+*        An array in which are returned the powers for each of the following 
+*        basic units (in the order shown): kilogramme, metre, second, radian, 
+*        Kelvin, magnitude. If the supplied unit does not depend on a given 
+*        basic unit a value of 0.0 will be returned in the array. The
+*        returns values represent a system of units which is a scaled form
+*        of the supplied units, expressed in the basic units of m, kg, s,
+*        rad, K and mag. For instance, a returned array of [1,0,-2,0,0,0]
+*        would represent "m/s**2".
+*     scale
+*        Pointer to a location at which to return a scaling factor for the 
+*        supplied units. The is the value, in the units represented by the 
+*        returned powers, which corresponds to a value of 1.0 in the supplied 
+*        units.
+
+*  Returned Value:
+*     Non-zero if the tree was analysed succesfully. Zero otherwise.
+
+*  Notes:
+*     -  Zero is returned if this function is invoked with the
+*     global error status set or if it should fail for any reason.
+*/
+
+/* Local Variables; */
+   Oper oper;
+   int result;
+   int i;
+   double p0[ NQUANT ];
+   double p1[ NQUANT ];
+   double s0;
+   double s1;
+
+/* Check inherited status */
+   if( !astOK ) return 0;
+
+/* Initialise the powers of all dimensions to zero, and set the scaling
+   factor to unity. */
+   result = 1;
+   *scale = 1.0;
+   for( i = 0; i < NQUANT; i++ ) powers[ i ] = 0.0;
+
+/* Load constant: constant is dimensionaless so leave powers unchanged,
+   and set the scaling factor. */
+   oper = node->opcode;
+   if( oper == OP_LDCON ) {
+      *scale = 1.0/node->con;
+
+/* Load variable: check it is one of the basic known dimensional
+   quantities. If so, set the power of the quantity to unity and store
+   the scale factor. If the unit is "g" modify the scale factor so that
+   the analysis quantity is "kg". */
+   } else if( oper == OP_LDVAR ) {
+      result = 0;
+      for( i = 0; i < NQUANT; i++ ) {
+         if( node->unit == quant_units[ i ] ) {
+            powers[ i ] = 1.0;
+            *scale = node->mult ? 1.0/node->mult->scale : 1.0;
+            if( !strcmp( node->unit->sym, "g" ) ) *scale *= 0.001;
+            result = 1;
+            break;
+         }
+      }
+
+/* How does dimensional analysis handle log or exp units?*/
+   } else if( oper == OP_LOG ) {
+      result= 0;
+
+   } else if( oper == OP_LN ) {
+      result= 0;
+
+   } else if( oper == OP_EXP ) {
+      result= 0;
+
+/* Get the powers for the child unit and then multiply each by 0.5 and
+   take the square root of the scale factor. */
+   } else if( oper == OP_SQRT ) {
+      result = DimAnal( node->arg[0], powers, scale );
+      if( result ) {
+         for( i = 0; i < NQUANT; i++ ) powers[ i ]*= 0.5;
+         *scale = sqrt( *scale );
+      }
+
+/* Similarly for pow nodes. */
+   } else if( oper == OP_POW ) {
+      result = DimAnal( node->arg[0], powers, scale );
+      if( result ) {
+         double power = node->arg[1]->con;
+         for( i = 0; i < NQUANT; i++ ) powers[ i ]*= power;
+         *scale = pow( *scale, power );
+      }
+
+/* Binary operators. Analyses the operands dimensions and combine. */
+   } else if( oper == OP_DIV ) {
+      if( DimAnal( node->arg[0], p0, &s0 ) &&
+          DimAnal( node->arg[1], p1, &s1 ) ) {
+         for( i = 0; i < NQUANT; i++ ) powers[ i ] = p0[ i ] - p1[ i ];
+         *scale = s0/s1;
+      } else {
+         result = 0;
+      }
+
+   } else if( oper == OP_MULT ) {
+      if( DimAnal( node->arg[0], p0, &s0 ) &&
+          DimAnal( node->arg[1], p1, &s1 ) ) {
+         for( i = 0; i < NQUANT; i++ ) powers[ i ] = p0[ i ] + p1[ i ];
+         *scale = s0*s1;
+      } else {
+         result = 0;
+      }
+
+/* Named constants are dimensionless */
+   } else if( oper == OP_LDPI ) {
+      *scale = 1.0/PI;
+
+   } else if( oper == OP_LDE ) {
+      *scale = 1.0/E;
+   
+   }
+
+   return result;
+
+}
 
 static int EndsWith( const char *c, int nc, const char *test ){
 /*
@@ -1811,6 +1997,7 @@ static KnownUnit *GetKnownUnits() {
 */
 
 /* Local Variables: */
+   int iq;
    KnownUnit *result;
 
 /* Initialise. */
@@ -1824,14 +2011,24 @@ static KnownUnit *GetKnownUnits() {
    linked list is put into the static variable "known_units". */
    if( !known_units ) {
 
+/* At the same time we store pointers to the units describing the basic 
+   quantities used in dimensional analysis. Initialise th index of the
+   next such unit. */
+      iq = 0;
+
 /* Create definitions for the known units. First do all IAU basic units.
    We include "g" instead of "kg" because otherwise we would have to
    refer to a gramme as a milli-kilogramme. */
-      MakeKnownUnit( "m", "metre", NULL );
       MakeKnownUnit( "g", "gram", NULL );
+      quant_units[ iq++ ] = known_units;
+      MakeKnownUnit( "m", "metre", NULL );
+      quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "s", "second", NULL );
+      quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "rad", "radian", NULL );
+      quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "K", "Kelvin", NULL );
+      quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "A", "Ampere", NULL );
       MakeKnownUnit( "mol", "mole", NULL );
       MakeKnownUnit( "cd", "candela", NULL );
@@ -1882,11 +2079,19 @@ static KnownUnit *GetKnownUnits() {
       MakeKnownUnit( "ph", "photon", NULL );
       MakeKnownUnit( "Jy", "Jansky", "1.0E-26 W /m**2 /Hz" );
       MakeKnownUnit( "mag", "magnitude", NULL );
+      quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "G", "Gauss", "1.0E-4 T" );
       MakeKnownUnit( "pixel", "pixel", NULL );
       MakeKnownUnit( "pix", "pixel", NULL );
       MakeKnownUnit( "barn", "barn", "1.0E-28 m**2" );
       MakeKnownUnit( "D", "Debye", "(1.0E-29/3) C.m" );
+
+      if( iq != NQUANT && astOK ) {
+         astError( AST__INTER, "unit(GetKnownUnits): %d basic quantities "
+                   "noted but this should be %d (internal AST programming "
+                   "error).", iq, NQUANT );
+      }
+
    }
 
 /* If succesful, return the pointer to the head of the list. */
@@ -2745,6 +2950,9 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp )
 /* Store the length of the symbol (without the trailing null character). */
       result->symlen = strlen( sym );
 
+/* Store the length of the label (without the trailing null character). */
+      result->lablen = strlen( label );
+
 /* Create a tree of UnitNodes describing the unit if an expression was
    supplied. */
       result->head = exp ? CreateTree( exp ) : NULL;
@@ -3183,6 +3391,7 @@ static UnitNode *MakeTree( const char *exp, int nc ){
 /* Local Variables: */
    KnownUnit *munit;
    KnownUnit *unit;
+   Multiplier *mmult;
    Multiplier *mult;
    Oper op;
    UnitNode *result;
@@ -3192,6 +3401,7 @@ static UnitNode *MakeTree( const char *exp, int nc ){
    double con;
    int depth;
    int i;
+   int l;                
    int maxlen;
    int n;           
    int oplen;
@@ -3488,41 +3698,58 @@ static UnitNode *MakeTree( const char *exp, int nc ){
 
 /* See if the string ends with the symbol for any of the known basic
    units. If it matches more than one basic unit, choose the longest. 
-   First ensure descriptions of the known units are available. */
+   First ensure descriptions of the known units are  available. */
             unit = GetKnownUnits();
 
             maxlen = -1;
             munit = NULL;
             while( unit ) {
-               if( !strncmp( exp + nc - unit->symlen, unit->sym, unit->symlen ) ) {
-                  if( unit->symlen > maxlen ) {
-                     maxlen = unit->symlen;
+               if( SplitUnit( exp, nc, unit->sym, 1, &mult, &l ) ) {
+                  if( l > maxlen ) {
+                     maxlen = l;
                      munit = unit;
+                     mmult = mult;
                   }
-               }
+               } 
                unit = unit->next;
             }
 
-/* If a known unit was found, but did not account for the entire string, 
-   ensure anything which preceeds it is a known multiplier prefix. */
-            mult = NULL;
-            unit = munit;
-            if( unit && unit->symlen < nc ) {
-               mult = GetMultipliers();
-               while( mult ) {
-                  if( !strncmp( exp, mult->sym, nc - unit->symlen ) ) {
-                     break;
-                  }
-                  mult = mult->next;
+/* If the above did not produce a match, try matching the unit symbol
+   case insensitive. */
+            if( !munit ) {
+               unit = GetKnownUnits();
+               while( unit ) {
+                  if( SplitUnit( exp, nc, unit->sym, 0, &mult, &l ) ) {
+                     if( l > maxlen ) {
+                        maxlen = l;
+                        munit = unit;
+                        mmult = mult;
+                     }
+                  } 
+                  unit = unit->next;
                }
+            }
 
-/* If the multiplier was not known, assume the whole string is the name
-   of a new user-defined basic unit. */
-               if( !mult ) unit = NULL;
+/* If the above did not produce a match, try matching the unit label
+   case insensitive. */
+            if( !munit ) {
+               unit = GetKnownUnits();
+               while( unit ) {
+                  if( SplitUnit( exp, nc, unit->label, 0, &mult, &l ) ) {
+                     if( l > maxlen ) {
+                        maxlen = l;
+                        munit = unit;
+                        mmult = mult;
+                     }
+                  } 
+                  unit = unit->next;
+               }
             }
 
 /* If a known unit and multiplier combination was found, create an
    OP_LDVAR node from it. */
+            unit = munit;
+            mult = mmult;
             if( unit ) {
                result = NewNode( NULL, OP_LDVAR );
                if( astOK ) {
@@ -4183,6 +4410,93 @@ static int SimplifyTree( UnitNode **node, int std ) {
 
 }
 
+double astUnitAnalyser_( const char *in, double powers[6] ){
+/*
+*+
+*  Name:
+*     astUnitAnalyser
+
+*  Purpose:
+*     Perform a dimensional analysis of a unti string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     double astUnitAnalyser_( const char *in, double powers[6] )
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     This function parses the supplied units string if possible, and
+*     returns a set of pwoers and a scaling factor which represent the 
+*     units string. 
+
+*  Parameters:
+*     in
+*        A string representation of the units, for instance "km/h". 
+*     powers
+*        An array in which are returned the powers for each of the following 
+*        basic units (in the order shown): kilogramme, metre, second, radian, 
+*        Kelvin, magnitude. If the supplied unit does not depend on a given 
+*        basic unit a value of 0.0 will be returned in the array. The
+*        returns values represent a system of units which is a scaled form
+*        of the supplied units, expressed in the basic units of m, kg, s,
+*        rad, K and mag. For instance, a returned array of [0,1,-2,0,0,0]
+*        would represent "m/s**2".
+
+*  Returned Value:
+*     A scaling factor for the supplied units. The is the value, in the
+*     units represented by the returned powers, which corresponds to a
+*     value of 1.0 in the supplied units.
+
+*  Notes:
+*     -  An error will be reported if the units string cannot be parsed
+*     or refers to units or functions which cannot be analysed in this way.
+*     -  AST__BAD is returned if this function is invoked with the
+*     global error status set or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   UnitNode *in_tree;
+   double result;
+
+/* Initialise */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Parse the input units string, producing a tree of UnitNodes which
+   represents the input units. A pointer to the UnitNode at the head of
+   the tree is returned if succesfull. Report a context message if this 
+   fails. */
+   in_tree = CreateTree( in );
+   if( in_tree ) {
+
+/* Analyse the tree */
+      if( !DimAnal( in_tree, powers, &result ) && astOK ) {
+         result = AST__BAD;
+         astError( AST__BADUN, "astUnitAnalyser: Error analysing input "
+                   "units string '%s' (it may contain unsupported "
+                   "functions or dimensionless units).", in );
+      }
+
+/* Free the tree. */
+      in_tree = FreeTree( in_tree );
+
+   } else if( astOK ) {
+      astError( AST__BADUN, "astUnitAnalyser: Error parsing input "
+                "units string '%s'.", in );
+   }
+
+/* Return the result */
+   return result;
+}
+
 const char *astUnitLabel_( const char *sym ){
 /*
 *+
@@ -4307,6 +4621,8 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     The string supplied for "in" and "out" should represent a system of
 *     units following the recommendations of the FITS WCS paper I
 *     "Representation of World Coordinates in FITS" (Greisen & Calabretta).
+*     Various commonly used variants are also allowed.
+*
 *     To summarise, a string describing a system of units should be an
 *     algebraic expression which combines one or more named units. The
 *     following functions and operators may be used within these algebraic 
@@ -4755,6 +5071,97 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 
 }
 
+static int Ustrncmp( const char *a, const char *b, size_t n ){
+/*
+*  Name:
+*     Ustrncmp
+
+*  Purpose:
+*     A case blind version of strncmp.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     static int Ustrncmp( const char *a, const char *b, size_t n )
+
+*  Class Membership:
+*     UNit member function.
+
+*  Description:
+*     Returns 0 if there are no differences between the first "n"
+*     characters of the two strings, and 1 otherwise. Comparisons are
+*     case blind.
+
+*  Parameters:
+*     a
+*        Pointer to first string.
+*     b
+*        Pointer to second string.
+*     n
+*        The maximum number of characters to compare.
+
+*  Returned Value:
+*     Zero if the strings match, otherwise one.
+
+*  Notes:
+*     -  This function does not consider the sign of the difference between
+*     the two strings, whereas "strncmp" does.
+*     -  This function attempts to execute even if an error has occurred. 
+
+*/
+
+/* Local Variables: */
+   const char *aa;         /* Pointer to next "a" character */
+   const char *bb;         /* Pointer to next "b" character */
+   int i;                  /* Character index */
+   int ret;                /* Returned value */
+
+
+/* Initialise the returned value to indicate that the strings match. */
+   ret = 0;
+
+/* Check pointer have been supplied. */
+   if( !a || !b ) return ret;   
+
+/* Initialise pointers to the start of each string. */
+   aa = a;
+   bb = b;
+
+/* Compare up to "n" characters. */
+   for( i = 0; i < (int) n; i++ ){
+
+/* We leave the loop if either of the strings has been exhausted. */
+      if( !(*aa ) || !(*bb) ){
+
+/* If one of the strings has not been exhausted, indicate that the
+   strings are different. */
+         if( *aa || *bb ) ret = 1;
+
+/* Break out of the loop. */
+         break;
+
+/* If neither string has been exhausted, convert the next characters to
+   upper case and compare them, incrementing the pointers to the next
+   characters at the same time. If they are different, break out of the
+   loop. */
+      } else {
+
+         if( toupper( (int) *(aa++) ) != toupper( (int) *(bb++) ) ){
+            ret = 1;
+            break;
+         }
+
+      }
+
+   }
+
+/* Return the result. */
+   return ret;
+
+}
+
 
 
 
@@ -4939,3 +5346,102 @@ static const char *TreeExp( UnitNode *node ) {
 
    return astStore( NULL, buff, strlen( buff ) + 1 );
 }
+
+
+
+
+
+static int SplitUnit( const char *str, int ls, const char *u, int cs, 
+                      Multiplier **mult, int *l ) {
+/*
+*  Name:
+*     SplitUnit
+
+*  Purpose:
+*     Split a given string into unit name and multiplier.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     int SplitUnit( const char *str, int ls, const char *u, int cs, 
+*                    Multiplier **mult, int *l  ) 
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     Returns non-zer0 if the supplied string ends with the supplied unit
+*     name or label, and any leading string is a known multiplier.
+
+*  Parameters:
+*     str
+*        The string to test, typically containing a multiplier and a unit
+*        symbol or label.
+*     ls
+*        Number of characters to use from "str".
+*     u
+*        Pointer to the unit label or symbol string to be searched for.
+*     cs 
+*        If non-zero, the test for "u" is case insensitive.
+*     mult
+*        Address of a location at which to return the multiplier at the
+*        start of the supplied string. NULL is returned if the supplied
+*        string does not match the supplied unit, or if the string
+*        includes no multiplier.
+*     l
+*        Address of an int in which to return the length of "u".
+
+*  Returned Value:
+*     Non-zero if "str" ends with "u" and starts with a null string or a
+*     known multiplier string.
+
+*/
+
+/* Local Variables: */
+   int ret;                
+   int lm;
+   int lu;
+
+/* Initialise */
+   ret = 0;
+   *mult = NULL;
+   *l = 0;
+
+/* Check inherited status. */
+   if( !astOK ) return ret;   
+
+/* Find the number of characters in the supplied unit label or symbol. The 
+   difference between lu and ls must be the length of the multiplier. */
+   lu = strlen( u );
+   lm = ls - lu;
+
+/* Make sure "str" is not shorter than "u" */
+   if( lm >= 0 ) {
+
+/* Compare the end of "str" against "u" */
+      if( cs ? !strncmp( str + lm, u, lu ) : 
+               !Ustrncmp( str + lm, u, lu ) ) {
+         ret = 1;
+
+/* If "str" ends with "u", see if it starts with a known multiplier */
+         if( lm > 0 ) {
+            ret = 0;
+            *mult = GetMultipliers();
+            while( *mult ) {
+               if( (*mult)->symlen == lm && !strncmp( str, (*mult)->sym, lm ) ) {
+                  ret = 1;
+                  break;
+               }
+               *mult = (*mult)->next;
+            }
+         }
+      }
+   }
+
+   *l = lu;
+   return ret;
+} 
+
+
