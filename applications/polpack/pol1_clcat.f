@@ -43,6 +43,10 @@
 *     12-NOV-1998 (DSB):
 *        Do not store a GRID Frame in the catalogue, since no data grid
 *        is defined in a catalogue.
+*     17-JUL-2000 (DSB):
+*        Reinstate the GRID Frame in the catalogue, to facilitiate
+*        alignment with systems that do not know about PIXEL co-ords 
+*        (eg GAIA).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,7 +72,6 @@
 
 *  Local Variables:
       INTEGER FRM                ! Pointer to Base Frame
-      INTEGER IFRM               ! Index of GRID Frame
       INTEGER LWCS               ! Pointer to local copy of the FrameSet
 *.
 
@@ -79,13 +82,6 @@
 *  Copy the supplied FrameSet so that we do not alter the supplied
 *  FrameSet.
          LWCS = AST_COPY( IWCS, STATUS ) 
-
-*  Find the GRID Frame.
-         CALL KPG1_ASFFR( LWCS, 'GRID', IFRM, STATUS )
-
-*  If found, remove the GRID Frame.
-         IF( IFRM .NE. AST__NOFRAME ) CALL AST_REMOVEFRAME( LWCS, IFRM,
-     :                                                      STATUS )         
 
 *  Routine POL1_MKCAT creates the X and Y catalogue columns with names
 *  X and Y. Applications which access the WCS information in the
