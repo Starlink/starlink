@@ -12,7 +12,7 @@ BEGIN {
    plan skip_all => "PGPLOT module not installed.";
    exit;
  } else {
-   plan tests => 16;
+   plan tests => 18;
  }  
  
 };
@@ -46,7 +46,22 @@ my ( $status, $xb, $yb );
 is( $status, 1, "Calling _GTxtEx()" );
 
 $$xb[4] = $$xb[0]; $$yb[4] = $$yb[0];
-PGPLOT::pgline( $#$xb+1, $xb, $yb );
+Starlink::AST::PGPLOT::_GLine( $xb, $yb );
+
+
+# _GText( $text, $x, $y, $justification, $upx, $upy );
+is( Starlink::AST::PGPLOT::_GText( "Testing", 2, 6, "CC", 0.5, 0.5),
+    1, "Calling _GText()" );
+
+# _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
+my ( $status, $xb, $yb );
+($status, $xb, $yb ) =
+      Starlink::AST::PGPLOT::_GTxExt( "Testing", 2, 6, "CC", 0.5, 0.5);
+is( $status, 1, "Calling _GTxtEx()" );
+
+$xb->[4] = $xb->[0]; $yb->[4] = $yb->[0];
+Starlink::AST::PGPLOT::_GLine( $xb, $yb );
+
 
 # _GQch()
 my ( $chv, $chh );
