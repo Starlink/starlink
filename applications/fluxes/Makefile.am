@@ -12,9 +12,6 @@ fluxes_LDADD = `$(srcdir)/fluxes_link_adam`
 fluxesnewsdir = $(datadir)/doc/fluxes-@PACKAGE_VERSION@
 fluxesnews_DATA = FLUXES_CONDITIONS starlink/fluxes.news
 
-# Tasks
-fluxes_TASKS =
-
 # The path here is ignored for the install location
 filterdir = $(bindir)
 filter_DATA = data/scuba.dat data/ukt14.dat data/ukt14_old.dat
