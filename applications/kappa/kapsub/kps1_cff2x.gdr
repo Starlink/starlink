@@ -119,6 +119,9 @@
 *        and replaced by SAMBAD and NLIM, ditto DIMS( 2 ) by NX and NY.
 *        Added error reporting.  Renamed from REJCT and made generic.
 *        Added range limits.
+*     1992 December 17 (MJC):
+*        Fixed bug that caused the variance array to be accessed when it
+*        did not exist.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -317,9 +320,13 @@
      :                 CINARR( I ) .LE. RANGE( 2 ) ) THEN
 
 *  If the variance component exists and the value corresponding to the
-*  pixel is valid, set threshold according to it.
-                     IF ( VAR .AND. INVAR( I ) .NE. VAL__BAD<T> ) THEN
-                        THRESH = CLIPSQ * INVAR( I )
+*  pixel is valid, set threshold according to it.  Note that these tests
+*  cannot be combined because the input variance array would be accessed
+*  whether or not it existed.
+                     IF ( VAR ) THEN
+                        IF ( INVAR( I ) .NE. VAL__BAD<T> ) THEN
+                           THRESH = CLIPSQ * INVAR( I )
+                        END IF
                      ELSE
 
 *  Otherwise set the threshold according to the estimated variance.
