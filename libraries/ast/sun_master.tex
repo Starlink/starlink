@@ -7080,7 +7080,7 @@ longitude axis and two latitude axes. Which latitude axis should be
 associated with the longitude axis?}
 f-
 
-\subsection{\label{ss:distanceandoffset}Calculating Distances, angles and Offsets}
+\subsection{\label{ss:distanceandoffset}Calculating Distances, Angles and Offsets}
 Some complementary 
 c+
 functions 
@@ -7088,16 +7088,19 @@ c-
 f+
 routines 
 f-
-are provided for use with Frames to allow you to find the distance
-between two points, to offset a specified distance along a line joining
-two points, {\em{etc.}} In essence, these 
+are provided for use with Frames to allow you to perform geometric
+operations without needing to know the nature of the coordinate system
+represented by the Frame.
+
 c+
-functions 
+Functions 
 c-
 f+
-routines 
+Routines 
 f-
-define the metric of the coordinate space which the Frame represents. In
+are avilable to find the distance between two points, and to offset a 
+specified distance along a line joining two points, {\em{etc.}} In essence, 
+these define the metric of the coordinate space which the Frame represents. In
 the case of a basic Frame, this is a Cartesian metric.
 
 c+
