@@ -48,7 +48,7 @@
    <!ENTITY sgp28  PUBLIC "-//Starlink//DOCUMENT Summary SGP/28//EN" SUBDOC>
    <!ENTITY sgp47  PUBLIC "-//Starlink//DOCUMENT Summary SGP/47//EN" SUBDOC>
    <!ENTITY sgp50  PUBLIC "-//Starlink//DOCUMENT Summary SGP/50//EN" SUBDOC>
-   <!ENTITY sug0   PUBLIC "-//Starlink//DOCUMENT Summary SUG/0//EN" SUBDOC>
+   <!ENTITY sug    PUBLIC "-//Starlink//DOCUMENT Summary SUG//EN" SUBDOC>
    <!ENTITY sun1   PUBLIC "-//Starlink//DOCUMENT Summary SUN/1//EN" SUBDOC>
    <!ENTITY sun9   PUBLIC "-//Starlink//DOCUMENT Summary SUN/9//EN" SUBDOC>
    <!ENTITY sun11  PUBLIC "-//Starlink//DOCUMENT Summary SUN/11//EN" SUBDOC>
@@ -174,7 +174,7 @@ id='s.astro'/>).
 
 
 <p>Everyone should start with the
-<docxref doc=sug0 text="Starlink User's Guide">, which should be
+<docxref doc=sug text="Starlink User's Guide">, which should be
 available at your site, and is on the web at
 <url>http://star-www.rl.ac.uk/star/docs/sug.htx/sug.html</url>.
 
@@ -2990,7 +2990,7 @@ audience.  Where possible, I have included a reference to a relevant
 section of this document.
 
 <p>An overall reference for all Starlink users is the
-<docxref doc=sug0 text="Starlink User's Guide">.
+<docxref doc=sug text="Starlink User's Guide">.
 
 <p><tabular frame=top>
 <tgroup cols=3>
@@ -3031,9 +3031,9 @@ section of this document.
 <p>
 <tabular frame=top>
 <tgroup cols=3>
-<colspec>
-<colspec colwidth=4in>
-<colspec align=right>
+<colspec colname=col0>
+<colspec colwidth=4in colname=col1>
+<colspec align=right colname=col2>
 <thead>
 <row rowsep=1><entry colsep=1 namest=col0 nameend=col2 align=center>Starlink General Papers
 
@@ -3045,9 +3045,9 @@ section of this document.
 <p>
 <tabular frame=top>
 <tgroup cols=3>
-<colspec>
-<colspec colwidth=4in>
-<colspec align=right>
+<colspec colname=col0>
+<colspec colwidth=4in colname=col1>
+<colspec align=right colname=col2>
 <thead>
 <row rowsep=1><entry colsep=1 namest=col0 nameend=col2 align=center>Starlink Cookbooks
 
@@ -3059,9 +3059,9 @@ section of this document.
 <p>
 <tabular frame=top>
 <tgroup cols=3>
-<colspec>
-<colspec colwidth=4in>
-<colspec align=right>
+<colspec colname=col0>
+<colspec colwidth=4in colname=col1>
+<colspec align=right colname=col2>
 <thead>
 <row rowsep=1><entry colsep=1 namest=col0 nameend=col2 align=center>Starlink Guides
 
@@ -3076,9 +3076,9 @@ the Starlink project. Copies may be available at other Starlink
 nodes. Ask your Site Manager if you want one.<p>
 <tabular frame=top>
 <tgroup cols=3>
-<colspec>
-<colspec colwidth=4in>
-<colspec align=right>
+<colspec colname=col0>
+<colspec colwidth=4in colname=col1>
+<colspec align=right colname=col2>
 <thead>
 <row rowsep=1><entry colsep=1 namest=col0 nameend=col2 align=center>Miscellaneous User Documents
 
