@@ -26,12 +26,12 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ mud162.tex mud167.tex mud166.tex
 
 # Headers and example sources are made within cfitsio
 $(include_HEADERS) $(EXAMPLE_SOURCES):
-	(cd cfitsio; unset CFLAGS; $(MAKE))
+	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE))
 
 # Must be a separate target from above, otherwise automake doesn't notice,
 # and adds its own, conflicting, target.
 cfitsio/libcfitsio.a:
-	(cd cfitsio; unset CFLAGS; $(MAKE))
+	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE))
 
 #  Clean recurses into cfitsio.
 clean-local:
