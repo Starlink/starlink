@@ -111,9 +111,11 @@
 
 *  Authors:
 *     Dave Mills STARLINK (ZUVAD::DMILLS)
+*     Norman Gray, Starlink (norman@astro.gla.ac.uk)
 
 *  History:
 *     1992 Sept 1 : Initial release
+*     2004 Aug 20 : Removed reference to Figaro routine (NG)
 
 *-
 
@@ -150,7 +152,8 @@
 
 *  Local Variables:
       REAL XVALS( 5000 )
-      REAL WORK( BOXMAX * BOXMAX )
+      REAL WORK( BOXMAX )
+      INTEGER WORKI( BOXMAX )
       REAL SHIST( 0: HIHIST )
       REAL ULIMIT
       REAL XCUR
@@ -180,8 +183,11 @@
 
       LOGICAL DONE
       LOGICAL INTERPOLATE
+      LOGICAL BADOUT            ! for call to KPG1_BMEDR
 
       CHARACTER*1 CH
+
+      INCLUDE 'SAE_PAR'         ! For SAI__OK
 
 *  Functions Called:
       LOGICAL ECH_FATAL_ERROR
@@ -194,6 +200,15 @@
 *  Report routine entry if enabled.
       IF ( IAND( REPORT_MODE, RPM_FULL + RPM_CALLS ) .GT. 0 )
      :   CALL ECH_REPORT( REPORT_MODE, ECH__MOD_ENTRY )
+
+      IF ( IXBOX .GT. BOXMAX .OR. IYBOX .GT. BOXMAX ) THEN
+*      Work arrays are too small
+         CALL ECH_REPORT( 0, 'ech_decosmic_1: Work arrays too small!' )
+*      I have no idea what the correct error return is here.
+*      This one is a guess.
+         STATUS = ECH__DIM_CONFLICT
+         RETURN
+      ENDIF
 
 *  If cosmic ray cleaning enabled (TUNE_TRCRC=YES) then.
       IF ( CRCLEAN ) THEN
@@ -215,10 +230,33 @@
          END DO
 
 *     Calculate X- and Y-median images.
+*     This used to call Figaro's GEN_MEDFLT routine, with arguments
+*         CALL GEN_MEDFLT( IMAGE, NX, NY, IXBOX, 1, WORK, IMAGE2 )
+*         CALL GEN_MEDFLT( IMAGE, NX, NY, 1, IYBOX, WORK, IMAGE3 )
+*     The kaplibs routine has a slightly different way of specifying the
+*     size of the box, but since gen_medflt actually used a box with a
+*     width rounded down to the next odd number, the result is the same
+*     whether ixbox is even or odd.
          CALL ECH_REPORT( 0, ' Calculating X-median image.' )
-         CALL LGEN_MEDFLT( IMAGE, NX, NY, IXBOX, 1, WORK, IMAGE2 )
+         CALL KPG1_BMEDR( .FALSE., .FALSE., .FALSE.,
+     :        NX, NY, IMAGE, 
+     :        IXBOX/2, 0,       ! specifies half-width of smoothing box
+     :        1,                ! need have only 1 good pixel in box
+     :        IMAGE2, BADOUT, 
+     :        WORK, WORKI, 
+     :        STATUS )
          CALL ECH_REPORT( 0, ' Calculating Y-median image.' )
-         CALL LGEN_MEDFLT( IMAGE, NX, NY, 1, IYBOX, WORK, IMAGE3 )
+         CALL KPG1_BMEDR( .FALSE., .FALSE., .FALSE.,
+     :        NX, NY, IMAGE,
+     :        0, IYBOX/2, 
+     :        1, 
+     :        IMAGE3, BADOUT,
+     :        WORK, WORKI,
+     :        STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ECH_REPORT( 0, ' Error doing median filtering' )
+            GOTO 9999
+         ENDIF
 
 *     If minimum cosmic ray intensity not specified then
 *     determine min intensity (as mean of +ve pixels).
@@ -488,6 +526,9 @@
  1005 FORMAT ( 1X, 'Limiting excess value is ',F12.2 )
  1006 FORMAT ( 1X, 'Replaced ',I5,' pixels on line ',I5 )
 
+*   Error exit
+ 9999 CONTINUE
+
       END
 
       REAL FUNCTION DECOSMIC_INTERP( IMAGE, XS, YS, NX, NY, QUALITY )
@@ -589,101 +630,3 @@ C
       END
 
 
-C+
-      SUBROUTINE LGEN_MEDFLT (IN,NX,NY,BSIZX,BSIZY,WORK,OUT)
-C
-C     G E N _ M E D F L T
-C
-C     Median filters a 2D real array, using a box of a given size.
-C     That is, each pixel of the result array is set to the median
-C     value of a box of pixels centered on the corresponding pixel
-C     in the input array.
-C
-C     Parameters -  (">" input, "<" output, "W" workspace)
-C
-C     (>) IN     (Real array IN(NX,NY)) The input array.
-C     (>) NX     (Integer) First dimension if IN.
-C     (>) NY     (Integer) Second dimension of IN.
-C     (>) BSIZX  (Integer) Size of median box in X (first dimension).
-C     (>) BSIZY  (Integer) Size of median box in Y (first dimension).
-C                NOTE: If BSIZX or BSIZY are even, they will be treated
-C                as if they were one less.
-C     (W) WORK   (Real array (BSIZX*BSIZY)) Work array.
-C     (<) OUT    (Real array OUT(NX,NY)) Output array.
-C                NOTE: IN and OUT must NOT be the same array in the
-C                calling routine.
-C
-C     Common variables used -  None
-C
-C     Subroutines / functions used -
-C
-C     GEN_QFMED  (GEN_ package) Quicksort of a real array
-C
-C     With a fair amount of work, this routine could be made much
-C     faster - it really shouldn't have to start from scratch each
-C     time it finds a median, for example.
-C
-C                                           KS / CIT 30th Jan 1984
-C+
-      IMPLICIT NONE
-C
-C     Parameters
-C
-      INTEGER NX,NY,BSIZX,BSIZY
-      REAL IN(NX,NY),OUT(NX,NY),WORK(BSIZX*BSIZY)
-C
-C     Function used
-C
-      REAL GEN_QFMED
-C
-C     Local variables
-C
-      INTEGER ISIDX,ISIDY,IX,IXEN,IXPT,IXST
-      INTEGER IY,IYEN,IYPT,IYST,IWPT
-C
-C     Half sides of median box
-C
-      ISIDY= (BSIZY-1)/2
-      ISIDX= (BSIZX-1)/2
-      IF ( bsizx .EQ. 1 .AND. bsizy .EQ. 1 ) THEN
-       DO iy = 1, ny
-            DO ix = 1, nx
-               out ( ix,iy ) = in ( ix,iy )
-            END DO
-       END DO
-      ELSE
-C
-C      Loop round rows of array
-C
-       DO IY=1,NY
-         IYST=MAX(1,IY-ISIDY)
-         IYEN=MIN(NY,IY+ISIDY)
-C
-C        Loop round columns of array
-C
-         DO IX=1,NX
-            IXST=MAX(1,IX-ISIDX)
-            IXEN=MIN(NX,IX+ISIDX)
-C
-C           Get data values from median box
-C
-            IWPT=0
-            DO IYPT=IYST,IYEN
-               DO IXPT=IXST,IXEN
-                 IF ( in ( ixpt, iypt ) .GT. 0.0 ) THEN
-                  IWPT=IWPT+1
-                  WORK(IWPT)=IN(IXPT,IYPT)
-                 ENDIF
-               END DO
-            END DO
-C
-C           Determine median value and set element of result array
-C
-            OUT(IX,IY)=GEN_QFMED(WORK,IWPT)
-C
-         END DO
-       END DO
-
-      ENDIF
-C
-      END
