@@ -155,6 +155,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.26  1999/05/15 04:19:49  timj
+*     Add STATUS checking to SCULIB_COADD
+*
 *     Revision 1.25  1999/05/15 03:48:45  timj
 *     Initialise MAP_N_PTR.
 *
@@ -1324,49 +1327,47 @@ c
 
 *     coadd the jiggle data for the integration into that for the measurement
                         
-                        IF (STATUS .EQ. SAI__OK) THEN
-                           CALL SCULIB_COADD (JIGGLE_COUNT,
-     :                          %val(INT_D_PTR(BEAM) 
-     :                          + INT_OFFSET*VAL__NBR),
-     :                          %val(INT_V_PTR(BEAM) 
-     :                          + INT_OFFSET*VAL__NBR),
-     :                          %val(INT_Q_PTR(BEAM)
-     :                          + INT_OFFSET*VAL__NBUB),
-     :                          MEAS_D(1,BEAM), MEAS_V(1,BEAM),
-     :                          MEAS_Q(1,BEAM), MEAS_N(1,BEAM),
-     :                          MEAS_D(1,BEAM), MEAS_V(1,BEAM),
-     :                          MEAS_Q(1,BEAM), MEAS_N(1,BEAM), BADBIT,
-     :                          .TRUE.)
+                        CALL SCULIB_COADD (JIGGLE_COUNT,
+     :                       %val(INT_D_PTR(BEAM) 
+     :                       + INT_OFFSET*VAL__NBR),
+     :                       %val(INT_V_PTR(BEAM) 
+     :                       + INT_OFFSET*VAL__NBR),
+     :                       %val(INT_Q_PTR(BEAM)
+     :                       + INT_OFFSET*VAL__NBUB),
+     :                       MEAS_D(1,BEAM), MEAS_V(1,BEAM),
+     :                       MEAS_Q(1,BEAM), MEAS_N(1,BEAM),
+     :                       MEAS_D(1,BEAM), MEAS_V(1,BEAM),
+     :                       MEAS_Q(1,BEAM), MEAS_N(1,BEAM), BADBIT,
+     :                       .TRUE., STATUS)
                         
 *     derive the measured signal for this integration
 
-                           CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (ANALYSIS,
-     :                          1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-     :                          %val(INT_D_PTR(BEAM) 
-     :                          + INT_OFFSET*VAL__NBR),
-     :                          %val(INT_V_PTR(BEAM) 
-     :                          + INT_OFFSET*VAL__NBR),
-     :                          %val(INT_Q_PTR(BEAM)
-     :                          + INT_OFFSET*VAL__NBUB),
-     :                          PEAK_D(NUM_INTS,BEAM), 
-     :                          PEAK_V(NUM_INTS,BEAM),
-     :                          PEAK_Q(NUM_INTS,BEAM), RTEMP, RTEMP,
-     :                          PEAK_X(NUM_INTS,BEAM),
-     :                          PEAK_Y(NUM_INTS,BEAM), BADBIT, STATUS)
+                        CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (ANALYSIS,
+     :                       1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
+     :                       %val(INT_D_PTR(BEAM) 
+     :                       + INT_OFFSET*VAL__NBR),
+     :                       %val(INT_V_PTR(BEAM) 
+     :                       + INT_OFFSET*VAL__NBR),
+     :                       %val(INT_Q_PTR(BEAM)
+     :                       + INT_OFFSET*VAL__NBUB),
+     :                       PEAK_D(NUM_INTS,BEAM), 
+     :                       PEAK_V(NUM_INTS,BEAM),
+     :                       PEAK_Q(NUM_INTS,BEAM), RTEMP, RTEMP,
+     :                       PEAK_X(NUM_INTS,BEAM),
+     :                       PEAK_Y(NUM_INTS,BEAM), BADBIT, STATUS)
                            
 *     coadd the fitted peak into the running mean
 
-                           CALL SCULIB_COADD (1, 
-     :                          PEAK_D(NUM_INTS,BEAM), 
-     :                          PEAK_V(NUM_INTS,BEAM),
-     :                          PEAK_Q(NUM_INTS,BEAM),
-     :                          MEAS_2_D(BEAM), MEAS_2_V(BEAM), 
-     :                          MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
-     :                          MEAS_2_D(BEAM), MEAS_2_V(BEAM),
-     :                          MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
-     :                          BADBIT, .TRUE.)
-                           
-                        END IF
+                        CALL SCULIB_COADD (1, 
+     :                       PEAK_D(NUM_INTS,BEAM), 
+     :                       PEAK_V(NUM_INTS,BEAM),
+     :                       PEAK_Q(NUM_INTS,BEAM),
+     :                       MEAS_2_D(BEAM), MEAS_2_V(BEAM), 
+     :                       MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
+     :                       MEAS_2_D(BEAM), MEAS_2_V(BEAM),
+     :                       MEAS_2_Q(BEAM), MEAS_2_N(BEAM),
+     :                       BADBIT, .TRUE., STATUS)
+                        
                      END DO
                   END DO
 
