@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {sun139.7}
 \newcommand{\stardocnumber}    {139.7}
 \newcommand{\stardocauthors}   {Peter W. Draper}
-\newcommand{\stardocdate}      {10 November 1997}
+\newcommand{\stardocdate}      {29 January 1998}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
 \newcommand{\stardocversion}   {Version 2.2}
@@ -146,13 +146,13 @@
                          \parbox{0.6in}{\pageref{#3}}
                          \vspace*{0.2in}}
 
-% Quotes for SST.
+% Quotes for SST. Note latex2html renews no longer needed.
 \newcommand{\qt}[1]{{\tt "}#1{\tt "}}
 \newcommand{\qs}[1]{{\tt '}#1{\tt '}}
-\begin{htmlonly}
-   \renewcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
-   \renewcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
-\end{htmlonly}
+%\begin{htmlonly}
+%   \renewcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
+%   \renewcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
+%\end{htmlonly}
 
 % Routines with descriptions in the appendix.
 \newcommand{\routine}[1]{{\sc #1}}
@@ -694,7 +694,7 @@ use data in these formats you should initialise the CONVERT package
 \end{myquote}
 and the necessary facilities will be setup. All you should now need to
 do is specify your files using their full names, see
-\hyperref{later}{section \S}{}{ndflists}) for more about specifying
+\hyperref{later}{section \S}{}{ndflists} for more about specifying
 image names.
 
 One point that you should take note of is that not all formats are as
@@ -10543,6 +10543,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [FALSE]
       }
    }
+\newpage
    \sstexamples{
       \sstexamplesubsection{
          present simple in=\qs{$*$} modify
@@ -12110,6 +12111,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          }
       }
       \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output images.
+         [Output from TRANNDF]
+      }
+      \sstsubsection{
          TRANSFORM = TRN (Read)
       }{
          If INEXT is FALSE then this parameter specifies the
@@ -12201,6 +12208,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
    }
+\newpage
+
    \sstimplementationstatus{
       \sstitemlist{
 
@@ -12619,6 +12628,10 @@ CCDPACK can now also be used from the IRAF/CL command interpreter.
 
 More minor changes include:
 \begin{itemize}
+\item An error in calculating the variances when median stacking
+      2 images has been corrected (previous values where an
+      underestimate).
+
 \item The restoration output from CCDSETUP is fixed to work
       correctly when just recording two bias strip bounds.
 
@@ -12646,8 +12659,6 @@ More minor changes include:
 
 \begin{latexonly}
 
-\newpage
-\vspace*{4in}
 \newpage
 
 
