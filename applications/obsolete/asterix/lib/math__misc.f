@@ -67,6 +67,9 @@
 *    Export :
       DOUBLE PRECISION    ANSWER            ! value of the integral
 
+*    Fucntions
+      INTEGER		  SPIX2
+
 *    Local variables :
       Integer             size              ! 2^k
       Integer             k                 ! 2^k panels
@@ -304,7 +307,7 @@
       DO J = 1, MNY
 
 *      Find Y sub-pixelling
-        YSUB = SPIX( YP0 + DY*REAL(J-1), DY )
+        YSUB = SPIX2( YP0 + DY*REAL(J-1), DY )
         SDY = DY / YSUB
 
         DO I = 1, MNX
@@ -313,7 +316,7 @@
           SUM = 0.0
 
 *        Find X sub-pixelling
-          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
+          XSUB = SPIX2( XP0 + DX*REAL(I-1), DX )
           SDX = DX / XSUB
 
 *        X contribution to normalisation - hence total normalisation
@@ -459,11 +462,11 @@
 
 
 
-      INTEGER FUNCTION SPIX( DEL, PIX )
+      INTEGER FUNCTION SPIX2( DEL, PIX )
 
       REAL                     DEL,PIX
 
-      SPIX = MAX( 1,
+      SPIX2 = MAX( 1,
      :            NINT( ABS( 10.0 * PIX ) /
      :                  RC / MAX( 1.0, SQRT( ABS( DEL / RC ) ) ) ) )
 

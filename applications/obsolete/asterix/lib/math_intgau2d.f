@@ -71,7 +71,7 @@
 *    Functions :
 *
       REAL			MATH_EXPR
-      INTEGER			SPIX
+      INTEGER			SPIX1
 *
 *    Local variables :
 *
@@ -122,7 +122,7 @@
       DO J = 1, MNY
 
 *      Find Y sub-pixelling
-        YSUB = SPIX( YP0 + DY*REAL(J-1), DY, YSIG )
+        YSUB = SPIX1( YP0 + DY*REAL(J-1), DY, YSIG )
         SDY = DY / YSUB
 
 *      Y contribution to normalisation
@@ -134,7 +134,7 @@
           SUM = 0.0
 
 *        Find X sub-pixelling
-          XSUB = SPIX( XP0 + DX*REAL(I-1), DX, XSIG )
+          XSUB = SPIX1( XP0 + DX*REAL(I-1), DX, XSIG )
           SDX = DX / XSUB
 
 *        X contribution to normalisation - hence total normalisation
@@ -198,11 +198,11 @@
 
 
 
-      INTEGER FUNCTION SPIX( DEL, SIG, PIX )
+      INTEGER FUNCTION SPIX1( DEL, SIG, PIX )
 
       REAL                     DEL,SIG,PIX
 
-      SPIX = MAX( 1,
+      SPIX1 = MAX( 1,
      :            NINT( ABS( 10.0 * PIX ) /
      :                  SIG / MAX( 1.0, SQRT( ABS( DEL / SIG ) ) ) ) )
 
