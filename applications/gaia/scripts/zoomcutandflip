@@ -1,4 +1,4 @@
-#!/bin/sh    
+#!/bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
 exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #+
@@ -25,7 +25,7 @@ if { $argc == 1 } {
    set zoom [lindex $argv 0]
    set cut {}
    set flip {}
-} elseif { $argc == 2 } { 
+} elseif { $argc == 2 } {
    set zoom [lindex $argv 0]
    set cut [lindex $argv 1]
    set flip {}
@@ -34,7 +34,7 @@ if { $argc == 1 } {
       set flip $cut
       set cut {}
    }
-} elseif { $argc == 3 } { 
+} elseif { $argc == 3 } {
    set zoom [lindex $argv 0]
    set cut [lindex $argv 1]
    set flip [lindex $argv 2]
@@ -51,15 +51,29 @@ lappend auto_path $env(GAIA_DIR)
 proc connect_to_gaia {} {
    global env
 
-   #  Get the hostname and port info from the file ~/.rtd-remote,
-   #  which is created by rtdimage when the remote subcommand is
-   #  used.
+   #  Get the hostname and port info from the file .rtd-remote, which is
+   #  created by rtdimage when the remote subcommand is used. Normally the
+   #  .rtd-remote file lives in the $HOME directory, but this can be changed
+   #  using the environment variable RTD_REMOTE_DIR. GAIA doesn't create the
+   #  RTD_REMOTE_DIR directory so neither should we, which means if it doesn't
+   #  exist we should give up now as no contact file will be written.
+   if { [info exists env(RTD_REMOTE_DIR)] } {
+      if { ! [file isdirectory $env(RTD_REMOTE_DIR)] } {
+         puts stderr "Remote access to GAIA is currently disabled.\
+The RTD_REMOTE_DIR directory: $env(RTD_REMOTE_DIR), does not exist."
+         exit 1
+      }
+      set rtd-remote "$env(RTD_REMOTE_DIR)/.rtd-remote"
+   } else {
+      set rtd-remote "$env(HOME)/.rtd-remote"
+   }
+
    set tries 0
    while { 1 } {
       set needed 0
 
       #  Open the file containing the GAIA process information and read it.
-      if {[catch {set fd [open $env(HOME)/.rtd-remote]} msg]} {
+      if {[catch {set fd [open ${rtd-remote}]} msg]} {
          set needed 1
       } else {
          lassign [read $fd] pid host port
@@ -118,7 +132,7 @@ set gaia_fd [connect_to_gaia]
 set cmd "skycat::SkyCat::get_skycat_images"
 set images [send_to_gaia remotetcl $cmd]
 
-#  Got list so select first and ask about the parent (should be 
+#  Got list so select first and ask about the parent (should be
 #  top-level GAIA).
 set ctrlwidget [lindex $images 0]
 set cmd "$ctrlwidget get_image"
@@ -129,7 +143,7 @@ set cmd "$ctrlwidget scale $zoom $zoom"
 set ret [send_to_gaia remotetcl $cmd]
 
 #  The cut command.
-if { "$cut" != {} } { 
+if { "$cut" != {} } {
    set cmd "$rtdwidget autocut -percent $cut"
    set ret [send_to_gaia remotetcl $cmd]
 }
