@@ -1,0 +1,66 @@
+ INTERFACE XPSSCORR
+
+     PARAMETER INPUT
+               POSITION 1
+               TYPE    '_UNIV'
+               KEYWORD 'INP'
+               PROMPT  'Input dataset name'
+               PPATH   'GLOBAL,CURRENT'
+               ASSOCIATION '<->GLOBAL.SSDS'
+               VPATH   'PROMPT'
+               HELP 'Enter dataset name without an extension'
+            ENDPARAMETER
+
+            PARAMETER MODE
+               POSITION 2
+               TYPE    '_CHAR'
+               PROMPT  'Correction mode ("C"alculate or "E"xposure map)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+HELP 'Calculate the exposure time from the vignetting or use the Exposure map ?'
+            ENDPARAMETER
+
+            PARAMETER WIRES
+               TYPE    '_LOGICAL'
+               PROMPT  'Apply a correction for wire absorption'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  YES
+    HELP 'Apply a 1.0/0.79 correction to countrates for the wire absorption ?'
+            ENDPARAMETER
+
+            PARAMETER ENERGY
+               TYPE    '_REAL'
+               PROMPT  'The mean photon energy reaching the detector (keV)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT '0.2'
+               HELP 'The photon energy used in searching the image'
+            ENDPARAMETER
+
+     PARAMETER EFFILE
+               TYPE    '_CHAR'
+               PROMPT  'Name of effective area file'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+HELP 'Name of effective area file, default is standard file for your obs.'
+            ENDPARAMETER
+
+     PARAMETER RESPFILE
+              TYPE    '_CHAR'
+              PROMPT  'Name of response file'
+              PPATH   'DEFAULT'
+              VPATH   'PROMPT'
+              HELP 'Name of detector response matrix - default is standard file'
+              DEFAULT 'XRTCAL:DRMPSPC'
+            ENDPARAMETER
+
+     PARAMETER EXPMAP
+               TYPE    '_CHAR'
+               PROMPT  'Name of exposure map'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+HELP 'This may include a directory spec e.g.  S:[RDS.DATA]LMCX1_MEX'
+            ENDPARAMETER
+
+         ENDINTERFACE

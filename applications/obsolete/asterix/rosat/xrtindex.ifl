@@ -1,0 +1,25 @@
+interface  XRTINDEX
+  parameter INPUT
+    position 1
+    type     '_CHAR'
+    prompt   'Name of FITS event datafile'
+    ppath    'CURRENT'
+    vpath   'PROMPT'
+  endparameter
+  parameter ORIGIN
+    type     '_CHAR'
+    prompt   'FITS file type (US/RDF/MPE)'
+    ppath    'CURRENT'
+    vpath    'PROMPT'
+    help     'file is (US) style, (RDF) Rationalised or (MPE)'
+    in       'US','RDF','MPE'
+  endparameter
+  parameter OUTPUT
+    position 2
+    type     '_CHAR'
+    prompt   'Rootname of event datafile'
+    vpath    'PROMPT,DEFAULT'
+    default  'sa'
+    help     'without an extension'
+  endparameter
+endinterface

@@ -1,0 +1,85 @@
+ INTERFACE XSPOKES
+
+            PARAMETER NEW
+               TYPE    '_LOGICAL'
+               PROMPT  'Create a new file (Y) or append to an old file (N)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  Y
+ HELP    'Enter NO to add the spoke structure into an existing ARD file'
+            ENDPARAMETER
+
+            PARAMETER ARDFILE
+               TYPE    '_CHAR'
+               PROMPT  'Name of output text file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+            PARAMETER ROOTNAME
+               TYPE    '_CHAR'
+               PROMPT  'Rootname of datafiles'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER ATTFIL
+               TYPE    '_CHAR'
+               PROMPT  'Name of attitude file'
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER OUTSIDE
+               TYPE    '_LOGICAL'
+               PROMPT  'Include the region outside the field of view'
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT  Y
+HELP    'This may be used to set pixels outside the circular field of view bad'
+            ENDPARAMETER
+
+     PARAMETER  DOPLOT
+               TYPE    '_LOGICAL'
+               PROMPT  'Display the spoke structure on an image ?'
+               PPATH   'DEFAULT'
+               VPATH   'INTERNAL'
+               DEFAULT Y
+HELP    'If running in batch this could be useful'
+            ENDPARAMETER
+
+     PARAMETER MODE
+               TYPE    '_CHAR'
+               PROMPT  '"C"alculate or "I"nteractive'
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT  'C'
+HELP 'C - uses the roll angle from the attitude file, I - define with cursor'
+            ENDPARAMETER
+
+     PARAMETER TRAD
+               TYPE    '_REAL'
+               PROMPT  'Radius of the circular field of view'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  0.95
+               HELP 'Can use this to set pixels beyond a certain radius false'
+            ENDPARAMETER
+
+     PARAMETER EXTRA_WIDTH
+               TYPE    '_REAL'
+               PROMPT  'Extra width to give ring and spokes'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  0.0
+HELP 'Sometimes the ring isnt wide enough. Enter in degrees, roughly ~0.01'
+            ENDPARAMETER
+
+     PARAMETER TIMRANGE
+               TYPE    '_CHAR'
+               PROMPT  'Time ranges'
+               PPATH   'DYNAMIC,CURRENT,DEFAULT'
+               HELP    'e.g. 130.6:140.7 or M47890.4:M47891.0 or TIMES.DAT'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+ ENDINTERFACE

@@ -1,0 +1,299 @@
+ INTERFACE XRTHK
+
+     PARAMETER RAWDIR
+               POSITION 1
+               TYPE    '_CHAR'
+               PROMPT  'Raw data directory'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Directory containing raw data files'
+            ENDPARAMETER
+
+     PARAMETER ROOTNAME
+               POSITION 2
+               TYPE    '_CHAR'
+               PROMPT  'Rootname of the calibration files'
+               PPATH   'DYNAMIC,CURRENT'
+               HELP    'Enter without any extension'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER HKPAR1
+               POSITION 3
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+            ENDPARAMETER
+
+     PARAMETER PMIN1
+               POSITION 4
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX1
+               POSITION 5
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER FNAME
+               POSITION 6
+               TYPE    '_CHAR'
+               PROMPT  'Name of output time window file'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT 'xrt_times.lis'
+               HELP    'A name for the text file to hold the output MJDs'
+            ENDPARAMETER
+
+     PARAMETER HKPAR2
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT  !
+            ENDPARAMETER
+
+     PARAMETER PMIN2
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX2
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER HKPAR3
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT  !
+            ENDPARAMETER
+
+     PARAMETER PMIN3
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX3
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER HKPAR4
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT  !
+            ENDPARAMETER
+
+     PARAMETER PMIN4
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX4
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER HKPAR5
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT  !
+            ENDPARAMETER
+
+     PARAMETER PMIN5
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX5
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER HKPAR6
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT  !
+            ENDPARAMETER
+
+     PARAMETER PMIN6
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX6
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER HKPAR7
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT 'ASP_ERR'
+            ENDPARAMETER
+
+     PARAMETER PMIN7
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX7
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER HKPAR8
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT 'ASP_ERR'
+            ENDPARAMETER
+
+     PARAMETER PMIN8
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX8
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER HKPAR9
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT 'ASP_ERR'
+            ENDPARAMETER
+
+     PARAMETER PMIN9
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX9
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER HKPAR10
+               TYPE    '_CHAR'
+               PROMPT  'Name of HK parameter (! to finish)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'The Name of the array in the _EVR or _ATT file'
+               DEFAULT 'ASP_ERR'
+            ENDPARAMETER
+
+     PARAMETER PMIN10
+               TYPE    '_REAL'
+               PROMPT  'Minimum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER PMAX10
+               TYPE    '_REAL'
+               PROMPT  'Maximum value for this parameter'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP for advice'
+            ENDPARAMETER
+
+     PARAMETER DIR
+               TYPE    '_LOGICAL'
+               PROMPT  'List files on the directory'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  Y
+            ENDPARAMETER
+
+     PARAMETER INTERVAL
+               TYPE    '_REAL'
+               PROMPT  'Minimum length of a GOOD time window'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  10.0
+               HELP    'Small chunks of apparently good data can be corrupt'
+            ENDPARAMETER
+
+ ENDINTERFACE

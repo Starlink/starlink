@@ -1,0 +1,19 @@
+ INTERFACE XRTHOT
+
+     PARAMETER INPUT
+               POSITION 1
+               TYPE    '_CHAR'
+               PROMPT  'Name of HOTSPOT fits file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER ROOTNAME
+               POSITION 2
+               TYPE    '_CHAR'
+               PROMPT  'Rootname of HDS datafiles'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+ ENDINTERFACE

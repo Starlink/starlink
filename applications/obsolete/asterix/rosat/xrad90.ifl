@@ -1,0 +1,26 @@
+ INTERFACE XRAD90
+
+     PARAMETER OFFAX
+               POSITION 1
+               TYPE    '_REAL'
+               PROMPT  'OFF-axis angle (arcminutes)'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'Distance from the optical axis in arcminutes'
+            ENDPARAMETER
+
+     PARAMETER DISP
+               TYPE    '_LOGICAL'
+               PROMPT  'Display result ?'
+               PPATH   'CURRENT'
+               VPATH   'DEFAULT'
+               DEFAULT YES
+               HELP 'Write result to the screen ?'
+            ENDPARAMETER
+
+     PARAMETER PSFRAD
+               TYPE    '_REAL'
+               VPATH   'INTERNAL,NOPROMPT'
+            ENDPARAMETER
+
+ ENDINTERFACE

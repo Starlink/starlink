@@ -1,0 +1,199 @@
+ INTERFACE XRTCORR
+
+     PARAMETER INPUT
+               POSITION 1
+               TYPE    '_UNIV'
+               KEYWORD 'INP'
+               PROMPT  'Input dataset name'
+               PPATH   'GLOBAL,CURRENT'
+               ASSOCIATION '<->GLOBAL.BINDS'
+               VPATH   'PROMPT'
+               HELP 'Enter dataset name without an extension'
+            ENDPARAMETER
+
+     PARAMETER OUTPUT
+               POSITION 2
+               TYPE    '_UNIV'
+               KEYWORD 'OUT'
+               PROMPT  'Output dataset name'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               ASSOCIATION '->GLOBAL.BINDS'
+               HELP 'Enter dataset name without an extension'
+            ENDPARAMETER
+
+     PARAMETER RTNAME
+               TYPE    '_CHAR'
+               PROMPT  'Rootname for the other calibration files'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'This may include a directory spec.'
+            ENDPARAMETER
+
+     PARAMETER EFFILE
+               TYPE    '_CHAR'
+               PROMPT  'Name of effective area file'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+HELP 'Name of effective area file, default is standard file for your obs.'
+            ENDPARAMETER
+
+     PARAMETER RESPFILE
+              TYPE    '_CHAR'
+              PROMPT  'Name of response file'
+              PPATH   'DYNAMIC,DEFAULT'
+              VPATH   'PROMPT'
+              HELP 'Name of detector response matrix - default is standard file'
+              DEFAULT 'XRTCAL:DRMPSPC'
+            ENDPARAMETER
+
+            PARAMETER ENERGY
+               TYPE    '_REAL'
+               PROMPT  'The mean photon energy reaching the detector (keV)'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT '0.2'
+               HELP '%AST_HELP:ASTHELP A ROSAT XRT XRTCORR PARAM ENERGY'
+            ENDPARAMETER
+
+     PARAMETER OVER
+               TYPE    '_LOGICAL'
+               PROMPT  'Overwrite the input file'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  N
+               HELP 'Enter "NO" to produce a new file'
+            ENDPARAMETER
+
+     PARAMETER AXTYPE
+               TYPE    '_INTEGER'
+               PROMPT  'Axis type: X=1, Y=2, Time=3, Corr_PH=4, Other=5'
+               VPATH   'PROMPT'
+               HELP 'Enter the integer code for the axis'
+            ENDPARAMETER
+
+     PARAMETER DCORR
+               TYPE    '_LOGICAL'
+               PROMPT  'Perform dead time correction'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  Y
+                HELP 'Enter NO to ignore the dead time correction'
+            ENDPARAMETER
+
+     PARAMETER WCORR
+               TYPE    '_LOGICAL'
+               PROMPT  'Perform correction for the wires'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  Y
+               HELP 'Enter NO to ignore the thin and thick wire correction'
+            ENDPARAMETER
+
+     PARAMETER VCORR
+               TYPE    '_LOGICAL'
+               PROMPT  'Perform vignetting correction'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  Y
+               HELP 'Enter NO to ignore the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER PCORR
+               TYPE    '_LOGICAL'
+               PROMPT  'Perform scattering correction'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  Y
+               HELP 'Enter NO to ignore the PSF correction'
+            ENDPARAMETER
+
+     PARAMETER OFFAX1
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 1st radial bin (arcmins)'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+HELP 'The angle used in determining the vignetting correction (arcmins)'
+            ENDPARAMETER
+
+     PARAMETER OFFAX2
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 2nd radial bin (amin)'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+HELP 'The angle used in determining the vignetting correction (arcmins)'
+            ENDPARAMETER
+
+     PARAMETER OFFAX3
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 3rd radial bin'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+               HELP 'The angle used in determining the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER OFFAX4
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 4th radial bin'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+               HELP 'The angle used in determining the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER OFFAX5
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 5th radial bin'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+               HELP 'The angle used in determining the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER OFFAX6
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 6th radial bin'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+               HELP 'The angle used in determining the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER OFFAX7
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 7th radial bin'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+               HELP 'The angle used in determining the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER OFFAX8
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 8th radial bin'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+               HELP 'The angle used in determining the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER OFFAX9
+               TYPE    '_REAL'
+               PROMPT  'The off-axis angle of the 9th radial bin'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+               HELP 'The angle used in determining the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER OFFAX10
+               TYPE    '_REAL'
+           PROMPT  'The off-axis angle of the 10th (or subsequent) radial bin'
+               PPATH   'DYNAMIC'
+               VPATH   'DYNAMIC'
+               HELP 'The angle used in determining the vignetting correction'
+            ENDPARAMETER
+
+     PARAMETER USFILE
+               TYPE    '_CHAR'
+               PROMPT  'Name of US FITS file'
+               PPATH   'CURRENT'
+               HELP    'Include the extension'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+ ENDINTERFACE

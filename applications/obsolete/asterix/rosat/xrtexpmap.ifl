@@ -1,0 +1,63 @@
+INTERFACE XRTEXPMAP
+
+  PARAMETER RAWDIR
+    POSITION 1
+    TYPE    '_CHAR'
+    PROMPT  'Raw data directory'
+    PPATH   'DYNAMIC'
+    VPATH   'PROMPT'
+    HELP    'Directory containing raw data files'
+  ENDPARAMETER
+
+  PARAMETER ROOTNAME
+    POSITION 2
+    TYPE    '_CHAR'
+    PROMPT  'Rootname of files to sort'
+    PPATH   'DYNAMIC,CURRENT'
+    HELP    'Enter name of files without the extension'
+    VPATH   'PROMPT'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    TYPE    'UNIV'
+    POSITION 3
+    ASSOCIATION '->GLOBAL.BINDS'
+    VPATH   'PROMPT'
+    PROMPT  'Exposure map file'
+  ENDPARAMETER
+
+  PARAMETER DETMAP
+    TYPE    'UNIV'
+    DEFAULT !
+    PPATH   'DEFAULT'
+    VPATH   'PROMPT'
+    PROMPT  'Detector map output filename'
+    HELP    'For diagnostic purposes'
+  ENDPARAMETER
+
+  PARAMETER IFILE
+    TYPE    '_INTEGER'
+    DEFAULT 12
+    PPATH   'DEFAULT'
+    VPATH   'PROMPT'
+    PROMPT  'Det map no.'
+  ENDPARAMETER
+
+  PARAMETER TIMRANGE
+    TYPE    '_CHAR'
+    PROMPT  'List of good times'
+    DEFAULT !
+    PPATH   'DEFAULT'
+    VPATH   'PROMPT'
+    HELP    'If not supplied then all times considered good'
+  ENDPARAMETER
+
+  PARAMETER DIR
+    TYPE    '_LOGICAL'
+    PROMPT  'List files on the directory'
+    PPATH   'DEFAULT'
+    VPATH   'DEFAULT'
+    DEFAULT  Y
+  ENDPARAMETER
+
+ENDINTERFACE
