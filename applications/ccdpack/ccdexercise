@@ -66,7 +66,7 @@
       endif
 
 #  Does the user want to see image display activity?
-      echo -n "DISPLAY - Display device (! for none) > "
+      echo -n "DISPLAY - Display device (xw for xwindows; ! for none) > "
       set device = $<
       if ( "$device" == "$abort" || "$device" == "" ) then
          goto EXIT

@@ -72,7 +72,7 @@
       endif
 
 #  Does the user want to see image display activity?
-      echo -n "DISPLAY - Display device (! for none) > "
+      echo -n "DISPLAY - Display device (xw for xwindows; ! for none) > "
       set device = $<
       if ( "$device" == "$abort" || "$device" == "" ) then
          goto EXIT
@@ -356,6 +356,22 @@
          outdomain=TEST_DATA \
          reset accept
 #     end astexp
+
+#  Plot the outlines.
+      if ( "$device" != "NONE" ) then
+         echo " "
+         echo "  Registration is complete: display the alignment of the"
+         echo "  images on the graphics device prior to generating the"
+         echo "  mosaic."
+         echo " "
+         gdclear \\
+         outline \
+            in='data-??' \
+            clear \
+            reset accept
+#        end outline
+      endif
+      echo " "
 
 #  Resample the data.
       echo " "
