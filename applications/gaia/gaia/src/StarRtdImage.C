@@ -399,7 +399,8 @@ int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
 // of the default implementation (SAOWCS).
 //
 // The arguments are the filename and an optional slice string for NDFIO.
-// (17.03.98, ALLAN)
+// (17.03.98, ALLAN), note all image with slices, must be processed by 
+// the NDF library.
 //-
 ImageData* StarRtdImage::getStarImage(const char* filename, const char* slice)
 {
@@ -407,31 +408,33 @@ ImageData* StarRtdImage::getStarImage(const char* filename, const char* slice)
   // (excluding FITS). If not then pass the image to be read using
   // the FitsIO or NDFIO classes as appropriate. These are then passed
   // to ImageData via which any further control is made.
-  const char* type = fileSuffix(filename);
+  const char* type = fileSuffix( filename );
 
   ImageIO imio;
 
-  // allan: fileSuffix(filename) might return just "Z" or "gz" for
-  // a compressed FITS file.
-  char* p = strchr(filename, '.');
+  //  ALLAN: fileSuffix(filename) might return just "Z" or "gz" for
+  //  a compressed FITS file.
+  char* p = strchr( filename, '.' );
   int isfits = 1;
-  if (p && ! strstr(p, ".fit"))
+  if ( p && ! strstr(p, ".fit") ) {
       isfits = 0;
-
-  if (!isfits && (isNDFtype( type ) || slice)) {
-    imio = NDFIO::read( filename, component() );
-  }  else {
-    // Note: since some starlink routines access the raw data and expect
-    // it to be already byte-swapped, if needed, we have to use a special
-    // class that makes a memory copy of the image, if needed.
-    imio = StarFitsIO::read( filename, Mem::FILE_PRIVATE|Mem::FILE_RDWR );
-
   }
-  if (imio.status() != 0)
-    return (ImageData*)NULL;
 
-  // return the new image
-  return makeImage(imio);
+  if ( ( !isfits && isNDFtype( type ) ) || slice ) {
+    imio = NDFIO::read( file(), component() );
+  }  else {
+    //  Note: since some Starlink routines access the raw data and
+    //  expect it to be already byte-swapped, if needed, we have to
+    //  use a special class that makes a memory copy of the image, if
+    //  needed.
+    imio = StarFitsIO::read( file(), Mem::FILE_PRIVATE | Mem::FILE_RDWR );
+  }
+  if ( imio.status() != 0 ) {
+    return (ImageData *) NULL;
+  }
+
+  //  Return the new image.
+  return makeImage( imio );
 }
 
 
@@ -527,11 +530,11 @@ int StarRtdImage::loadFile()
 
   // Check that name is a file.
   struct stat buf;
-  if ( stat(name, &buf) != 0 || S_ISREG(buf.st_mode) == 0 ) {
+  if ( stat( name, &buf ) != 0 || S_ISREG( buf.st_mode ) == 0 ) {
     return error( file(), " is not an image" );
   }
 
-  ImageData* image = getStarImage(name, slice);
+  ImageData* image = getStarImage( name, slice );
   delete name;
   delete slice;
 
