@@ -1,0 +1,69 @@
+*+ IMPORT_CMN - Common block definition file for IMPORT
+*-
+
+*    Data column defined?
+      LOGICAL             USE_DATA
+      LOGICAL             USE_VAR
+      LOGICAL             USE_QUAL
+      LOGICAL             USE_LOERR
+      LOGICAL             USE_UPERR
+      LOGICAL             USE_AX_DATA(DAT__MXDIM)
+      LOGICAL             USE_AX_WID(DAT__MXDIM)
+      LOGICAL             USE_AX_AWIDLO(DAT__MXDIM)
+      LOGICAL             USE_AX_AWIDHI(DAT__MXDIM)
+
+*    Column position
+      INTEGER             POS_DATA
+      INTEGER             POS_VAR
+      INTEGER             POS_QUAL
+      INTEGER             POS_LOERR
+      INTEGER             POS_UPERR
+      INTEGER             POS_AX_DATA(DAT__MXDIM)
+      INTEGER             POS_AX_WID(DAT__MXDIM)
+      INTEGER             POS_AX_AWIDLO(DAT__MXDIM)
+      INTEGER             POS_AX_AWIDHI(DAT__MXDIM)
+
+*    Column data pointer
+      INTEGER             PTR_DATA
+      INTEGER             PTR_VAR
+      INTEGER             PTR_QUAL
+      INTEGER             PTR_LOERR
+      INTEGER             PTR_UPERR
+      INTEGER             PTR_AX_DATA(DAT__MXDIM)
+      INTEGER             PTR_AX_WID(DAT__MXDIM)
+      INTEGER             PTR_AX_AWIDLO(DAT__MXDIM)
+      INTEGER             PTR_AX_AWIDHI(DAT__MXDIM)
+
+*    Constants
+      INTEGER             MAXCMT		! Max no. of comments
+        PARAMETER         ( MAXCMT = 40 )
+
+      INTEGER             MAXWRD         	! Maximum no. of words on a line
+         PARAMETER        (MAXWRD = 25)
+
+*    Word scanner variables
+      INTEGER             WD_NUM            	! Number of words used
+      CHARACTER*85        WD_DATA(MAXWRD)       ! The word data
+      INTEGER             WD_LEN(MAXWRD)        ! Their lengths
+      LOGICAL             WD_USED(MAXWRD)       ! Set TRUE once word is used
+
+*    Comment
+      LOGICAL             CMT_BUF            	! Buffer comments?
+      INTEGER             CMT_N              	! Number of buffered comments
+      CHARACTER*80        CMT(MAXCMT)       	! Comments
+
+*    Character string common block
+      COMMON /IMPORT_CMN_C/ 	WD_DATA, CMT
+
+*    Non-character common block
+      COMMON /IMPORT_CMN/ WD_NUM, WD_LEN, WD_USED,
+     :                    CMT_BUF, CMT_N,
+     :                    USE_DATA, USE_VAR, USE_QUAL, USE_LOERR,
+     :                      USE_UPERR, USE_AX_DATA, USE_AX_WID,
+     :                      USE_AX_AWIDLO, USE_AX_AWIDHI,
+     :                    POS_DATA, POS_VAR, POS_QUAL, POS_LOERR,
+     :                      POS_UPERR, POS_AX_DATA, POS_AX_WID,
+     :                      POS_AX_AWIDLO, POS_AX_AWIDHI,
+     :                    PTR_DATA, PTR_VAR, PTR_QUAL, PTR_LOERR,
+     :                      PTR_UPERR, PTR_AX_DATA, PTR_AX_WID,
+     :                      PTR_AX_AWIDLO, PTR_AX_AWIDHI

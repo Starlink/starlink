@@ -1,0 +1,28 @@
+INTERFACE PROJECT
+
+  PARAMETER INP
+    POSITION    1
+    TYPE        'UNIV'
+    PPATH       'GLOBAL'
+    ASSOCIATION '<-GLOBAL.BINDS'
+    PROMPT      'Input'
+    HELP        'Name of input dataset (binned)'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    POSITION    2
+    TYPE        'UNIV'
+    KEYWORD     'OUT'
+    ASSOCIATION '->GLOBAL.BINDS'
+    PROMPT      'Output'
+    HELP        'Name of output dataset'
+  ENDPARAMETER
+
+  PARAMETER AXIS
+    POSITION 3
+    TYPE        '_INTEGER'
+    PROMPT      'Axis to be projected'
+    HELP        'eg. 1 to project along (ie collapse) axis 1'
+  ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,57 @@
+Interface EVCSUBSET
+   Parameter INP
+      position    1
+      type        'UNIV'
+      keyword     'INP'
+      ppath       'GLOBAL'
+      association '<-GLOBAL.EVDS'
+      prompt      'Enter name of input dataset'
+      help        'This must be an ASTERIX88 event dataset'
+   EndParameter
+
+   Parameter OUT
+      position    2
+      type        'UNIV'
+      keyword     'OUT'
+      association '->GLOBAL.EVDS'
+      prompt      'Enter name of output dataset'
+      help        'A new event dataset will be created'
+   EndParameter
+
+   Parameter ANNULUS
+      type        '_LOGICAL'
+      default      N
+      vpath       'DEFAULT'
+      prompt      'Annular region?'
+      help        'YES for annular region, NO for circular region'
+   EndParameter
+
+   parameter XCENT
+      position 3
+      type '_REAL'
+      prompt 'X-coordinate'
+      help 'X-coordinate of centre of region to be selected'
+   endparameter
+
+   parameter YCENT
+      position 4
+      type '_REAL'
+      prompt 'Y-coordinate'
+      help 'Y-coordinate of centre of region to be selected'
+   endparameter
+
+   Parameter OUTER
+      position 5
+      type        '_REAL'
+      prompt      'Outer radius of region?'
+      help        'If a circular region is required, this will be its radius'
+   EndParameter
+
+   Parameter INNER
+      position 6
+      type        '_REAL'
+      prompt      'Inner radius of region?'
+      help        'The inner radius of an annular region'
+   EndParameter
+
+EndInterface

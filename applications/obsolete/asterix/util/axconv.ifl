@@ -1,0 +1,10 @@
+interface AXCONV
+  parameter INP
+    type 'UNIV'
+    position 1
+    prompt 'Input dataset'
+    ppath  'current'
+    vpath  'prompt'
+    help 'Dataset to be converted - without the .SDF extension'
+  endparameter
+endinterface

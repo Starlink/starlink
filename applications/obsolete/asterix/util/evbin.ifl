@@ -1,0 +1,326 @@
+INTERFACE EVBIN
+
+  PARAMETER INP
+    POSITION    1
+    TYPE        'UNIV'
+    PPATH       'GLOBAL'
+    ASSOCIATION '<-GLOBAL.EVDS'
+    PROMPT      'Enter name of input dataset'
+    HELP        'This must be an EVENT dataset.'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    POSITION    2
+    TYPE        'UNIV'
+    ASSOCIATION '->GLOBAL.BINDS'
+    PROMPT      'Enter name of the output dataset'
+    HELP        'This will be a binned dataset.'
+  ENDPARAMETER
+
+  PARAMETER LISTS
+    POSITION    3
+    TYPE        'LITERAL'
+    PROMPT      'Index numbers'
+    HELP        'The selected lists will become dimensions in the output dataset'
+  ENDPARAMETER
+
+  PARAMETER OPT1
+    TYPE        '_LOGICAL'
+    VPATH       'default'
+    DEFAULT     NO
+    PROMPT      'Allow irregular binning?'
+    HELP        'Saying NO means all output axes must be regularly spaced.'
+  ENDPARAMETER
+
+  PARAMETER OPT2
+    TYPE        '_LOGICAL'
+    VPATH       'default'
+    DEFAULT     NO
+    PROMPT      'Individually select how regular axes are to be specified?'
+    HELP        'NO means that OPT3 determines how they will be specified.'
+  ENDPARAMETER
+
+  PARAMETER OPT3
+    TYPE        '_LOGICAL'
+    VPATH       'default'
+    DEFAULT     NO
+    PROMPT      'Specify all regular axes by the No of bins? (y/n)'
+    HELP        'NO means they are all specified by bin width'
+  ENDPARAMETER
+
+  PARAMETER QVAL
+    TYPE        '_INTEGER'
+    VPATH       'default'
+    DEFAULT     0
+    PROMPT      'Enter maximum GOOD QUALITY value.'
+    HELP        'All events with QUALITY greater this value have BAD QUALITY'
+  ENDPARAMETER
+
+  PARAMETER QKEEP
+    TYPE        '_LOGICAL'
+    VPATH       'default'
+    DEFAULT     NO
+    PROMPT      'Keep BAD QUALITY events?'
+    HELP        'If NO all BAD QUALITY events are omitted from the output dataset.'
+  ENDPARAMETER
+
+  PARAMETER REG1
+    TYPE        '_LOGICAL'
+    PROMPT      'Is this axis to be regularly spaced? (y/n)'
+  ENDPARAMETER
+
+  PARAMETER REG2
+    TYPE        '_LOGICAL'
+    PROMPT      'Is this axis to be regularly spaced? (y/n)'
+  ENDPARAMETER
+
+  PARAMETER REG3
+    TYPE        '_LOGICAL'
+    PROMPT      'Is this axis to be regularly spaced? (y/n)'
+  ENDPARAMETER
+
+  PARAMETER REG4
+    TYPE        '_LOGICAL'
+    PROMPT      'Is this axis to be regularly spaced? (y/n)'
+  ENDPARAMETER
+
+  PARAMETER REG5
+    TYPE        '_LOGICAL'
+    PROMPT      'Is this axis to be regularly spaced? (y/n)'
+  ENDPARAMETER
+
+  PARAMETER REG6
+    TYPE        '_LOGICAL'
+    PROMPT      'Is this axis to be regularly spaced? (y/n)'
+  ENDPARAMETER
+
+  PARAMETER REG7
+    TYPE        '_LOGICAL'
+    PROMPT      'Is this axis to be regularly spaced? (y/n)'
+  ENDPARAMETER
+
+  PARAMETER USEBINSIZE1
+    TYPE        '_LOGICAL'
+    PROMPT      'Specify bin width ? (y/n)'
+    HELP        'If NO, then you will be asked to specify the number of output bins'
+  ENDPARAMETER
+
+  PARAMETER USEBINSIZE2
+    TYPE        '_LOGICAL'
+    PROMPT      'Specify bin width ? (y/n)'
+    HELP        'If NO, then you will be asked to specify the number of output bins'
+  ENDPARAMETER
+
+  PARAMETER USEBINSIZE3
+    TYPE        '_LOGICAL'
+    PROMPT      'Specify bin width ? (y/n)'
+    HELP        'If NO, then you will be asked to specify the number of output bins'
+  ENDPARAMETER
+
+  PARAMETER USEBINSIZE4
+    TYPE        '_LOGICAL'
+    PROMPT      'Specify bin width ? (y/n)'
+    HELP        'If NO, then you will be asked to specify the number of output bins'
+  ENDPARAMETER
+
+  PARAMETER USEBINSIZE5
+    TYPE        '_LOGICAL'
+    PROMPT      'Specify bin width ? (y/n)'
+    HELP        'If NO, then you will be asked to specify the number of output bins'
+  ENDPARAMETER
+
+  PARAMETER USEBINSIZE6
+    TYPE        '_LOGICAL'
+    PROMPT      'Specify bin width ? (y/n)'
+    HELP        'If NO, then you will be asked to specify the number of output bins'
+  ENDPARAMETER
+
+  PARAMETER USEBINSIZE7
+    TYPE        '_LOGICAL'
+    PROMPT      'Specify bin width ? (y/n)'
+    HELP        'If NO, then you will be asked to specify the number of output bins'
+  ENDPARAMETER
+
+  PARAMETER BASE1
+    TYPE        '_REAL'
+    DEFAULT     !
+    PROMPT      'Enter axis base value'
+    VPATH       'prompt'
+    PPATH       'dynamic,default'
+    HELP        'Lower bound of lowest bin, in axis units'
+  ENDPARAMETER
+
+  PARAMETER BASE2
+    TYPE        '_REAL'
+    DEFAULT     !
+    VPATH       'prompt'
+    PPATH       'dynamic,default'
+    HELP        'Lower bound of lowest bin, in axis units'
+    PROMPT      'Enter axis base value'
+  ENDPARAMETER
+
+  PARAMETER BASE3
+    TYPE        '_REAL'
+    DEFAULT     !
+    VPATH       'prompt'
+    PPATH       'dynamic,default'
+    HELP        'Lower bound of lowest bin, in axis units'
+    PROMPT      'Enter axis base value'
+  ENDPARAMETER
+
+  PARAMETER BASE4
+    TYPE        '_REAL'
+    DEFAULT     !
+    PROMPT      'Enter axis base value'
+    VPATH       'prompt'
+    PPATH       'dynamic,default'
+    HELP        'Lower bound of lowest bin, in axis units'
+  ENDPARAMETER
+
+  PARAMETER BASE5
+    TYPE        '_REAL'
+    DEFAULT     !
+    PROMPT      'Enter axis base value'
+    VPATH       'prompt'
+    PPATH       'dynamic,default'
+    HELP        'Lower bound of lowest bin, in axis units'
+  ENDPARAMETER
+
+  PARAMETER BASE6
+    TYPE        '_REAL'
+    DEFAULT     !
+    PROMPT      'Enter axis base value'
+    VPATH       'prompt'
+    PPATH       'dynamic,default'
+    HELP        'Lower bound of lowest bin, in axis units'
+  ENDPARAMETER
+
+  PARAMETER BASE7
+    TYPE        '_REAL'
+    DEFAULT     !
+    PROMPT      'Enter axis base value'
+    VPATH       'prompt'
+    PPATH       'dynamic,default'
+    HELP        'Lower bound of lowest bin, in axis units'
+  ENDPARAMETER
+
+  PARAMETER BINSIZE1
+    TYPE        '_REAL'
+    PROMPT      'Enter binsize'
+    HELP        'This is in the same units as the axis'
+  ENDPARAMETER
+
+  PARAMETER BINSIZE2
+    TYPE        '_REAL'
+    PROMPT      'Enter binsize'
+    HELP        'This is in the same units as the axis'
+  ENDPARAMETER
+
+  PARAMETER BINSIZE3
+    TYPE        '_REAL'
+    PROMPT      'Enter binsize'
+    HELP        'This is in the same units as the axis'
+  ENDPARAMETER
+
+  PARAMETER BINSIZE4
+    TYPE        '_REAL'
+    PROMPT      'Enter binsize'
+    HELP        'This is in the same units as the axis'
+  ENDPARAMETER
+
+  PARAMETER BINSIZE5
+    TYPE        '_REAL'
+    PROMPT      'Enter binsize'
+    HELP        'This is in the same units as the axis'
+  ENDPARAMETER
+
+  PARAMETER BINSIZE6
+    TYPE        '_REAL'
+    PROMPT      'Enter binsize'
+    HELP        'This is in the same units as the axis'
+  ENDPARAMETER
+
+  PARAMETER BINSIZE7
+    TYPE        '_REAL'
+    PROMPT      'Enter binsize'
+    HELP        'This is in the same units as the axis'
+  ENDPARAMETER
+
+  PARAMETER NBINS1
+    TYPE        '_INTEGER'
+    PROMPT      'Enter the number of output bins required'
+  ENDPARAMETER
+
+  PARAMETER NBINS2
+    TYPE        '_INTEGER'
+    PROMPT      'Enter the number of output bins required'
+  ENDPARAMETER
+
+  PARAMETER NBINS3
+    TYPE        '_INTEGER'
+    PROMPT      'Enter the number of output bins required'
+  ENDPARAMETER
+
+  PARAMETER NBINS4
+    TYPE        '_INTEGER'
+    PROMPT      'Enter the number of output bins required'
+  ENDPARAMETER
+
+  PARAMETER NBINS5
+    TYPE        '_INTEGER'
+    PROMPT      'Enter the number of output bins required'
+  ENDPARAMETER
+
+  PARAMETER NBINS6
+    TYPE        '_INTEGER'
+    PROMPT      'Enter the number of output bins required'
+  ENDPARAMETER
+
+  PARAMETER NBINS7
+    TYPE        '_INTEGER'
+    PROMPT      'Enter the number of output bins required'
+  ENDPARAMETER
+
+  PARAMETER RANGES1
+    TYPE        'LITERAL'
+    PROMPT      'Enter irregular bin ranges'
+    HELP        'See ASTHELP SPECIFYING_RANGES'
+  ENDPARAMETER
+
+  PARAMETER RANGES2
+    TYPE        'LITERAL'
+    PROMPT      'Enter irregular bin ranges'
+    HELP        'See ASTHELP SPECIFYING_RANGES'
+  ENDPARAMETER
+
+  PARAMETER RANGES3
+    TYPE        'LITERAL'
+    PROMPT      'Enter irregular bin ranges'
+    HELP        'See ASTHELP SPECIFYING_RANGES'
+  ENDPARAMETER
+
+  PARAMETER RANGES4
+    TYPE        'LITERAL'
+    PROMPT      'Enter irregular bin ranges'
+    HELP        'See ASTHELP SPECIFYING_RANGES'
+  ENDPARAMETER
+
+  PARAMETER RANGES5
+    TYPE        'LITERAL'
+    PROMPT      'Enter irregular bin ranges'
+    HELP        'See ASTHELP SPECIFYING_RANGES'
+  ENDPARAMETER
+
+  PARAMETER RANGES6
+    TYPE        'LITERAL'
+    PROMPT      'Enter irregular bin ranges'
+    HELP        'See ASTHELP SPECIFYING_RANGES'
+  ENDPARAMETER
+
+  PARAMETER RANGES7
+    TYPE        'LITERAL'
+    PROMPT      'Enter irregular bin ranges'
+    HELP        'See ASTHELP SPECIFYING_RANGES'
+  ENDPARAMETER
+
+ENDINTERFACE

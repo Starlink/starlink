@@ -1,0 +1,127 @@
+INTERFACE CQUALITY
+
+  PARAMETER INP
+    TYPE      'UNIV'
+    PPATH     'GLOBAL'
+    ASSOCIATION '<->GLOBAL.BINDS'
+    POSITION  1
+    PROMPT    'Input dataset'
+    HELP      'This must be a binned dataset'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    TYPE      'UNIV'
+    ASSOCIATION '->GLOBAL.BINDS'
+    POSITION  2
+    PROMPT    'Output dataset'
+    HELP      'No file extension allowed'
+  ENDPARAMETER
+
+  PARAMETER IGNORE
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Run in IGNORE mode?'
+    HELP      'i.e. set temporary bad quality values'
+  ENDPARAMETER
+
+  PARAMETER RESTORE
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Run in RESTORE mode?'
+    HELP      'i.e. clear temporary bad quality values'
+  ENDPARAMETER
+
+  PARAMETER SET
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Run in SET mode?'
+    HELP      'i.e. set quality to a specified value'
+  ENDPARAMETER
+
+  PARAMETER AND
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Run in AND mode?'
+    HELP      'i.e. AND existing quality with a specified value'
+  ENDPARAMETER
+
+  PARAMETER OR
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Run in OR mode?'
+    HELP      'i.e. OR existing quality with a specified value'
+  ENDPARAMETER
+
+  PARAMETER EOR
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Run in EOR mode?'
+    HELP      'i.e. EOR existing quality with a specified value'
+  ENDPARAMETER
+
+  PARAMETER NOT
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Run in NOT mode?'
+    HELP      'i.e. Complement existing quality values'
+  ENDPARAMETER
+
+  PARAMETER OVERWRITE
+    KEYWORD   OVER
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Overwrite existing dataset?'
+    HELP      'If no, a new dataset will be created'
+  ENDPARAMETER
+
+  PARAMETER QSEL
+    TYPE      '_LOGICAL'
+    VPATH     'DEFAULT'
+    DEFAULT   F
+    PROMPT    'Enable selection of quality value?'
+    HELP      'Only quality with specified existing value will be altered.'
+  ENDPARAMETER
+
+  PARAMETER MODQUAL
+    TYPE      '_CHAR'
+    PROMPT    'Enter value of quality to modify'
+    HELP      'Only quality values matching this value will be altered'
+  ENDPARAMETER
+
+  PARAMETER QVAL
+    TYPE      '_CHAR'
+    PPATH     'DYNAMIC'
+    PROMPT    'Specify quality value'
+    HELP      'In binary, or GOOD,BAD,ARITH,MISSING,IGNORE or PATCHED'
+  ENDPARAMETER
+
+  PARAMETER CX
+    TYPE      '_REAL'
+    VPATH     'PROMPT'
+    PROMPT    'X centre(s) of circular regions'
+    HELP      'In axis units'
+  ENDPARAMETER
+
+  PARAMETER CY
+    TYPE      '_REAL'
+    VPATH     'PROMPT'
+    PROMPT    'Y centre(s) of circular regions'
+    HELP      'In axis units, same number as X centres'
+  ENDPARAMETER
+
+  PARAMETER CR
+    TYPE      '_REAL'
+    VPATH     'PROMPT'
+    PROMPT    'Radius of circular regions'
+    HELP      'In axis units, one radius or one per circular region'
+  ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,208 @@
+INTERFACE REBIN
+   PARAMETER INP
+      POSITION    1
+      TYPE        'UNIV'
+      PPATH       'GLOBAL'
+      ASSOCIATION '<-GLOBAL.BINDS'
+      PROMPT      'Input'
+      HELP        'Name of input dataset (binned)'
+   ENDPARAMETER
+
+   PARAMETER OUT
+      POSITION    2
+      TYPE        'UNIV'
+      KEYWORD     'OUT'
+      ASSOCIATION '->GLOBAL.BINDS'
+      PROMPT      'Output'
+      HELP        'Name of output dataset'
+   ENDPARAMETER
+
+   PARAMETER CLONE
+      TYPE        'UNIV'
+      PROMPT      'Clone'
+      HELP        'Name of dataset to clone axes from'
+   ENDPARAMETER
+
+   PARAMETER AXES
+      TYPE '_CHAR'
+      DEFAULT '*'
+      PROMPT 'Axes to rebin'
+      HELP 'List axis numbers to be rebinned'
+   ENDPARAMETER
+
+   PARAMETER OPT
+      TYPE '_INTEGER'
+      DEFAULT 1
+      PROMPT 'Operating mode option'
+      HELP '1=grouping ratio 2=no. of bins 3=bin width 4=bin bounds 5=clone'
+   ENDPARAMETER
+
+   PARAMETER WID1
+      TYPE        '_REAL'
+      PROMPT      'Axis 1 bin width'
+      HELP        'The spacing between the (regularly spaced) output bins'
+   ENDPARAMETER
+
+   PARAMETER WID2
+      TYPE        '_REAL'
+      PROMPT      'Axis 2 bin width'
+      HELP        'The spacing between the (regularly spaced) output bins'
+   ENDPARAMETER
+
+   PARAMETER WID3
+      TYPE        '_REAL'
+      PROMPT      'Axis 3 bin width'
+      HELP        'The spacing between the (regularly spaced) output bins'
+   ENDPARAMETER
+
+   PARAMETER WID4
+      TYPE        '_REAL'
+      PROMPT      'Axis 4 bin width'
+      HELP        'The spacing between the (regularly spaced) output bins'
+   ENDPARAMETER
+
+   PARAMETER WID5
+      TYPE        '_REAL'
+      PROMPT      'Axis 5 bin width'
+      HELP        'The spacing between the (regularly spaced) output bins'
+   ENDPARAMETER
+
+   PARAMETER WID6
+      TYPE        '_REAL'
+      PROMPT      'Axis 6 bin width'
+      HELP        'The spacing between the (regularly spaced) output bins'
+   ENDPARAMETER
+
+   PARAMETER WID7
+      TYPE        '_REAL'
+      PROMPT      'Axis 7 bin width'
+      HELP        'The spacing between the (regularly spaced) output bins'
+   ENDPARAMETER
+
+   PARAMETER NBIN1
+      TYPE '_INTEGER'
+      PROMPT 'Number of bins for axis 1'
+      HELP 'Number of equal bins to divide axis into'
+   ENDPARAMETER
+
+   PARAMETER NBIN2
+      TYPE '_INTEGER'
+      PROMPT 'Number of bins for axis 2'
+      HELP 'Number of equal bins to divide axis into'
+   ENDPARAMETER
+
+   PARAMETER NBIN3
+      TYPE '_INTEGER'
+      PROMPT 'Number of bins for axis 3'
+      HELP 'Number of equal bins to divide axis into'
+   ENDPARAMETER
+
+   PARAMETER NBIN4
+      TYPE '_INTEGER'
+      PROMPT 'Number of bins for axis 4'
+      HELP 'Number of equal bins to divide axis into'
+   ENDPARAMETER
+
+   PARAMETER NBIN5
+      TYPE '_INTEGER'
+      PROMPT 'Number of bins for axis 5'
+      HELP 'Number of equal bins to divide axis into'
+   ENDPARAMETER
+
+   PARAMETER NBIN6
+      TYPE '_INTEGER'
+      PROMPT 'Number of bins for axis 6'
+      HELP 'Number of equal bins to divide axis into'
+   ENDPARAMETER
+
+   PARAMETER NBIN7
+      TYPE '_INTEGER'
+      PROMPT 'Number of bins for axis 7'
+      HELP 'Number of equal bins to divide axis into'
+   ENDPARAMETER
+
+   PARAMETER BOUNDS1
+      TYPE        '_CHAR'
+      PROMPT      'Axis 1 bin boundaries'
+      HELP        'Pairs of numbers are required, e.g. 1.5:2.5 2.5:10.'
+   ENDPARAMETER
+
+   PARAMETER BOUNDS2
+      TYPE        '_CHAR'
+      PROMPT      'Axis 2 bin boundaries'
+      HELP        'Pairs of numbers are required, e.g. 1.5:2.5 2.5:10.'
+   ENDPARAMETER
+
+   PARAMETER BOUNDS3
+      TYPE        '_CHAR'
+      PROMPT      'Axis 3 bin boundaries'
+      HELP        'Pairs of numbers are required, e.g. 1.5:2.5 2.5:10.'
+   ENDPARAMETER
+
+   PARAMETER BOUNDS4
+      TYPE        '_CHAR'
+      PROMPT      'Axis 4 bin boundaries'
+      HELP        'Pairs of numbers are required, e.g. 1.5:2.5 2.5:10.'
+   ENDPARAMETER
+
+   PARAMETER BOUNDS5
+      TYPE        '_CHAR'
+      PROMPT      'Axis 5 bin boundaries'
+      HELP        'Pairs of numbers are required, e.g. 1.5:2.5 2.5:10.'
+   ENDPARAMETER
+
+   PARAMETER BOUNDS6
+      TYPE        '_CHAR'
+      PROMPT      'Axis 6 bin boundaries'
+      HELP        'Pairs of numbers are required, e.g. 1.5:2.5 2.5:10.'
+   ENDPARAMETER
+
+   PARAMETER BOUNDS7
+      TYPE        '_CHAR'
+      PROMPT      'Axis 7 bin boundaries'
+      HELP        'Pairs of numbers are required, e.g. 1.5:2.5 2.5:10.'
+   ENDPARAMETER
+
+   PARAMETER RAT1
+      TYPE       '_INTEGER'
+      PROMPT     'Rebinning ratio for axis 1'
+      HELP 'Number of old bins to group into each new one'
+   ENDPARAMETER
+
+   PARAMETER RAT2
+      TYPE       '_INTEGER'
+      PROMPT     'Rebinning ratio for axis 2'
+      HELP 'Number of old bins to group into each new one'
+   ENDPARAMETER
+
+   PARAMETER RAT3
+      TYPE       '_INTEGER'
+      PROMPT     'Rebinning ratio for axis 3'
+      HELP 'Number of old bins to group into each new one'
+   ENDPARAMETER
+
+   PARAMETER RAT4
+      TYPE       '_INTEGER'
+      PROMPT     'Rebinning ratio for axis 4'
+      HELP 'Number of old bins to group into each new one'
+   ENDPARAMETER
+
+   PARAMETER RAT5
+      TYPE       '_INTEGER'
+      PROMPT     'Rebinning ratio for axis 5'
+      HELP 'Number of old bins to group into each new one'
+   ENDPARAMETER
+
+   PARAMETER RAT6
+      TYPE       '_INTEGER'
+      PROMPT     'Rebinning ratio for axis 6'
+      HELP 'Number of old bins to group into each new one'
+   ENDPARAMETER
+
+   PARAMETER RAT7
+      TYPE       '_INTEGER'
+      PROMPT     'Rebinning ratio for axis 7'
+      HELP 'Number of old bins to group into each new one'
+   ENDPARAMETER
+
+ENDINTERFACE

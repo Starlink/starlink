@@ -1,0 +1,24 @@
+interface BINLIST
+  parameter INP
+    type 'UNIV'
+    position 1
+    ppath 'GLOBAL'
+    association '<->GLOBAL.BINDS'
+    prompt 'Dataset'
+    help 'Name of 1D binned dataset'
+  endparameter
+  parameter DEV
+    type '_CHAR'
+    vpath 'DEFAULT'
+    default 'TERMINAL'
+    prompt 'Output to'
+    help 'T)erminal P)rinter O)ldfile N)ewfile'
+  endparameter
+  parameter SLICE
+    type '_CHAR'
+    vpath 'DEFAULT'
+    default '*'
+    prompt 'Slice'
+    help 'Specification of slice of arrays to be output eg 10:20 '
+  endparameter
+endinterface

@@ -1,0 +1,93 @@
+INTERFACE EVMERGE
+
+ PARAMETER INP1
+  TYPE        'UNIV'
+  PROMPT      'Input dataset 1'
+ ENDPARAMETER
+
+ PARAMETER INP2
+  TYPE        'UNIV'
+  PROMPT      'Input dataset 2'
+ ENDPARAMETER
+
+ PARAMETER INP3
+  TYPE        'UNIV'
+  DEFAULT     !
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  PROMPT      'Input dataset 3'
+  HELP        'Enter null (!) to signify no more input datasets'
+ ENDPARAMETER
+
+ PARAMETER INP4
+  TYPE        'UNIV'
+  DEFAULT     !
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  PROMPT      'Input dataset 4'
+  HELP        'Enter null (!) to signify no more input datasets'
+ ENDPARAMETER
+
+ PARAMETER INP5
+  TYPE        'UNIV'
+  DEFAULT     !
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  PROMPT      'Input dataset 5'
+  HELP        'Enter null (!) to signify no more input datasets'
+ ENDPARAMETER
+
+ PARAMETER INP6
+  TYPE        'UNIV'
+  DEFAULT     !
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  PROMPT      'Input dataset 6'
+  HELP        'Enter null (!) to signify no more input datasets'
+ ENDPARAMETER
+
+ PARAMETER INP7
+  TYPE        'UNIV'
+  DEFAULT     !
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  PROMPT      'Input dataset 7'
+  HELP        'Enter null (!) to signify no more input datasets'
+ ENDPARAMETER
+
+ PARAMETER INP8
+  TYPE        'UNIV'
+  DEFAULT     !
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  PROMPT      'Input dataset 8'
+  HELP        'Enter null (!) to signify no more input datasets'
+ ENDPARAMETER
+
+ PARAMETER INP9
+  TYPE        'UNIV'
+  DEFAULT     !
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  PROMPT      'Input dataset 9'
+  HELP        'Enter null (!) to signify no more input datasets'
+ ENDPARAMETER
+
+ PARAMETER INP10
+  TYPE        'UNIV'
+  DEFAULT     !
+  VPATH       'PROMPT'
+  PPATH       'DEFAULT'
+  PROMPT      'Input dataset 10'
+  HELP        'Enter null (!) to signify no more input datasets'
+ ENDPARAMETER
+
+ PARAMETER OUT
+  POSITION    1
+  TYPE        'UNIV'
+  KEYWORD     'OUT'
+  PROMPT      'Output dataset'
+  ASSOCIATION '->GLOBAL.EVDS'
+ ENDPARAMETER
+
+ENDINTERFACE

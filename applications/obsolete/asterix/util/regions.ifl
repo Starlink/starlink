@@ -1,0 +1,353 @@
+	INTERFACE REGIONS
+
+	    PARAMETER NEW
+               TYPE    '_LOGICAL'
+               PROMPT  'Create a new file (Y) or append to an old file (N)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT  Y
+               HELP    'Enter NO to add an entry into an existing ARD file'
+            ENDPARAMETER
+
+	    PARAMETER ARDFILE
+               POSITION 1
+               TYPE    'FILENAME'
+               PROMPT  'Name of ARD file'
+               PPATH   'GLOBAL,CURRENT'
+               VPATH   'PROMPT'
+               Association '<-GLOBAL.ARDFILE'
+               HELP    'Name of the spatial description text file'
+            ENDPARAMETER
+
+	    PARAMETER EXCLUDE
+               TYPE    '_LOGICAL'
+               PROMPT  'is this an EXCLUDE region'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT  N
+               HELP    'Enter YES to enter this as an EXCLUDE area'
+            ENDPARAMETER
+
+	    PARAMETER SHAPE
+               TYPE    '_CHAR'
+               PROMPT  'Shape of the region'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT 'CIRCLE'
+               HELP    'e.g. circle, box, column, line, ellipse'
+            ENDPARAMETER
+
+	    PARAMETER XCENT
+               TYPE    '_REAL'
+               PROMPT  'X Centre of region'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Shape centre on the 1st axis'
+            ENDPARAMETER
+
+	    PARAMETER YCENT
+               TYPE    '_REAL'
+               PROMPT  'Y Centre of region'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Shape centre on the 2nd axis'
+            ENDPARAMETER
+
+	    PARAMETER XWIDTH
+               TYPE    '_REAL'
+               PROMPT  'Width of the box on the X axis'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Box width on the 1st axis'
+            ENDPARAMETER
+
+	    PARAMETER YWIDTH
+               TYPE    '_REAL'
+               PROMPT  'Width of the box on the Y axis'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Box width on the 2nd axis'
+            ENDPARAMETER
+
+	    PARAMETER RADIUS
+               TYPE    '_REAL'
+               PROMPT  'Radius of the circle'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in the same units as XCENT and YCENT'
+            ENDPARAMETER
+
+	    PARAMETER SMINOR_AXIS
+               TYPE    '_REAL'
+               PROMPT  'Semi-minor axis size'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in the same units as XCENT and YCENT'
+            ENDPARAMETER
+
+	    PARAMETER SMAJOR_AXIS
+               TYPE    '_REAL'
+               PROMPT  'Semi-major axis size'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in the same units as XCENT and YCENT'
+            ENDPARAMETER
+
+	    PARAMETER ORIENT
+               TYPE    '_REAL'
+               PROMPT  'Orientation angle (degrees)'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Anti-clockwise from the X axis'
+            ENDPARAMETER
+
+	    PARAMETER NPTS
+               TYPE    '_INTEGER'
+               PROMPT  'Number of points in the polygon'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Use up to ten points to define the polygon'
+            ENDPARAMETER
+
+	    PARAMETER X1
+               TYPE    '_REAL'
+               PROMPT  'X value of point 1'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y1
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 1'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X2
+               TYPE    '_REAL'
+               PROMPT  'X value of point 2'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y2
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 2'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X3
+               TYPE    '_REAL'
+               PROMPT  'X value of point 3'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y3
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 3'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X4
+               TYPE    '_REAL'
+               PROMPT  'X value of point 4'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y4
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 4'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X5
+               TYPE    '_REAL'
+               PROMPT  'X value of point 5'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y5
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 5'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X6
+               TYPE    '_REAL'
+               PROMPT  'X value of point 6'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y6
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 6'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X7
+               TYPE    '_REAL'
+               PROMPT  'X value of point 7'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y7
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 7'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X8
+               TYPE    '_REAL'
+               PROMPT  'X value of point 8'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y8
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 8'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X9
+               TYPE    '_REAL'
+               PROMPT  'X value of point 9'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y9
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 9'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER X10
+               TYPE    '_REAL'
+               PROMPT  'X value of point 10'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER Y10
+               TYPE    '_REAL'
+               PROMPT  'Y value of point 10'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as YCENT'
+            ENDPARAMETER
+
+	    PARAMETER NCOL
+               TYPE    '_INTEGER'
+               PROMPT  'Number of columns to be specified'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'You may specify up to 10 columns'
+            ENDPARAMETER
+
+	    PARAMETER NROW
+               TYPE    '_INTEGER'
+               PROMPT  'Number of rows to be specified'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'You may specify up to 10 rows'
+            ENDPARAMETER
+
+	    PARAMETER XEND1
+               TYPE    '_REAL'
+               PROMPT  'X coordinate of one end of the line'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    ' '
+            ENDPARAMETER
+
+	    PARAMETER YEND1
+               TYPE    '_REAL'
+               PROMPT  'Y coordinate of one end of the line'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    ' '
+            ENDPARAMETER
+
+	    PARAMETER XEND2
+               TYPE    '_REAL'
+               PROMPT  'X coordinate of the other end of the line'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    ' '
+            ENDPARAMETER
+
+	    PARAMETER YEND2
+               TYPE    '_REAL'
+               PROMPT  'Y coordinate of the other end of the line'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    ' '
+            ENDPARAMETER
+
+	    PARAMETER NPIX
+               TYPE    '_INTEGER'
+               PROMPT  'Number of pixels'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'You may specify up to 10 pixels'
+            ENDPARAMETER
+
+	    PARAMETER INNRAD
+               TYPE    '_REAL'
+               PROMPT  'Inner radius of annulus'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER OUTRAD
+               TYPE    '_REAL'
+               PROMPT  'Outer radius of annulus'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Same units as XCENT'
+            ENDPARAMETER
+
+	    PARAMETER MORE
+               TYPE    '_LOGICAL'
+               PROMPT  'Enter another shape '
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT  NO
+               HELP    'Extend the spatial description by adding a further shape ?'
+            ENDPARAMETER
+
+        ENDINTERFACE

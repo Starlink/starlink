@@ -1,0 +1,41 @@
+ INTERFACE SCATTERGRAM
+
+    PARAMETER INP1
+       POSITION 1
+       TYPE 'UNIV'
+       PROMPT 'First input dataset'
+       HELP 'Either a DATA_ARRAY object or a primitive object'
+    ENDPARAMETER
+
+    PARAMETER INP2
+       POSITION 2
+       TYPE 'UNIV'
+       PROMPT 'Second input dataset'
+       HELP 'Either a DATA_ARRAY object or a primitive object'
+    ENDPARAMETER
+
+    PARAMETER SUBSET
+       POSITION 3
+       TYPE '_INTEGER'
+       KEYWORD 'SUBSET'
+       PROMPT 'Subset and spacing of items to be used'
+       HELP '2 or 3 numbers, e.g. 1,500 or 1,100000,100'
+    ENDPARAMETER
+
+    PARAMETER MARKER
+       TYPE '_LOGICAL'
+       DEFAULT Y
+       VPATH 'DEFAULT'
+       PPATH 'DEFAULT'
+       PROMPT 'Set graphics style to markers'
+       HELP 'Otherwise points will be joined up using a poly-line'
+    ENDPARAMETER
+
+    PARAMETER OUT
+       POSITION 4
+       TYPE 'UNIV'
+       ASSOCIATION '->GLOBAL.GRAFDS'
+       PROMPT 'Output dataset'
+       HELP 'This will be a 1D DATA_ARRAY object'
+    ENDPARAMETER
+ ENDINTERFACE

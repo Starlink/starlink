@@ -1,0 +1,25 @@
+INTERFACE IMPORT
+
+ PARAMETER INP
+  POSITION 1
+  TYPE     'FILENAME'
+  PROMPT   'Name of input text file'
+ ENDPARAMETER
+
+ PARAMETER OUT
+  POSITION 2
+  TYPE     'UNIV'
+  VPATH    'PROMPT'
+  ASSOCIATION '->GLOBAL.BINDS'
+  PROMPT   'Output dataset'
+ ENDPARAMETER
+
+ PARAMETER SORT
+  TYPE '_LOGICAL'
+  VPATH 'DEFAULT,PROMPT'
+  DEFAULT Y
+  PROMPT 'Sort the data about each axis'
+  HELP 'Specify NO for scattered data, otherwise YES'
+ ENDPARAMETER
+
+ENDINTERFACE

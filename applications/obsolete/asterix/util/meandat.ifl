@@ -1,0 +1,380 @@
+INTERFACE MEANDAT
+
+	    PARAMETER NFILES
+               POSITION 1
+               TYPE    '_INTEGER'
+               PROMPT  'Number of raw files to average'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT  2
+               HELP    'Enter 2 or more'
+            ENDPARAMETER
+
+	    PARAMETER FILE1
+               POSITION 2
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'GLOBAL,CURRENT'
+               VPATH   'PROMPT'
+               ASSOCIATION '<-GLOBAL.BINDS'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE2
+               POSITION 3
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE3
+               POSITION 4
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE4
+               POSITION 5
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE5
+               POSITION 6
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE6
+               POSITION 7
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE7
+               POSITION 8
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE8
+               POSITION 9
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE9
+               POSITION 10
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE10
+               POSITION 11
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE11
+               POSITION 12
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE12
+               POSITION 13
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE13
+               POSITION 14
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE14
+               POSITION 15
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE15
+               POSITION 16
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE16
+               POSITION 17
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE17
+               POSITION 18
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE18
+               POSITION 19
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE19
+               POSITION 20
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER FILE20
+               POSITION 21
+               TYPE    '_UNIV'
+               PROMPT  'Enter filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER WTMETH
+               TYPE    '_CHAR'
+               PROMPT  'Weighting method (N,V,U)'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Either "N"o weighting, "V"ariances or "U"ser input'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT1
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT2
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT3
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT4
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT5
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT6
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT7
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT8
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT9
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT10
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT11
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT12
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT13
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT14
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT15
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT16
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT17
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT18
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT19
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER WEIGHT20
+               TYPE    '_REAL'
+               PROMPT  'Weight for this file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'The final value is normalised to a weighting factor of 1.0'
+            ENDPARAMETER
+
+	    PARAMETER AVERAGE
+               TYPE    '_LOGICAL'
+               PROMPT  'Do you wish to average the files (Y) or sum them (N)'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               HELP    'Enter Yes or NO'
+               DEFAULT  Y
+            ENDPARAMETER
+
+	    PARAMETER OUTPUT
+               TYPE    '_UNIV'
+               PROMPT  'Enter output filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               ASSOCIATION '->GLOBAL.BINDS'
+               HELP    'Dont include the .SDF extension'
+            ENDPARAMETER
+
+ENDINTERFACE

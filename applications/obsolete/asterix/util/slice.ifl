@@ -1,0 +1,39 @@
+INTERFACE SLICE
+
+   PARAMETER INP
+      POSITION 1
+      TYPE     'UNIV'
+      PPATH    'GLOBAL'
+      ASSOCIATION '<->GLOBAL.BINDS'
+      PROMPT   'Input data object'
+      HELP     'Either an Asterix88 dataset or a primitive data array'
+   ENDPARAMETER
+
+   PARAMETER RANGE_MIN
+      POSITION 2
+      TYPE     '_REAL'
+      KEYWORD  'MIN'
+      PPATH    'GLOBAL'
+      PROMPT   'Lowest data value to display'
+      HELP     'Only data points within values in range MIN to MAX are shown.'
+   ENDPARAMETER
+
+   PARAMETER RANGE_MAX
+      POSITION 3
+      TYPE     '_REAL'
+      KEYWORD  'MAX'
+      PPATH    'GLOBAL'
+      PROMPT   'Highest data value to display'
+      HELP     'Only data points within values in range MIN to MAX are shown.'
+   ENDPARAMETER
+
+  PARAMETER DEVICE
+    TYPE        'LITERAL'
+    KEYWORD     'DEV'
+    VPATH       'DEFAULT,PROMPT'
+    DEFAULT     'TERMINAL'
+    PROMPT      'Output device'
+    HELP        'Type C=Console,P=Printer,O=Oldfile,N=Newfile ; anything else = filename'
+  ENDPARAMETER
+
+ENDINTERFACE

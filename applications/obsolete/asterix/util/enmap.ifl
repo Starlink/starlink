@@ -1,0 +1,42 @@
+	INTERFACE ENMAP
+
+	    PARAMETER INPUT
+               POSITION 1
+               KEYWORD 'INP'
+               TYPE    'UNIV'
+               PPATH   'GLOBAL,CURRENT'
+               VPATH   'PROMPT'
+               ASSOCIATION '<-GLOBAL.BINDS'
+               PROMPT  'Name of three dimensional datafile'
+               HELP 'Enter the name of the spectral image without the extension'
+            ENDPARAMETER
+
+	    PARAMETER OUTPUT
+               POSITION 2
+               KEYWORD 'OUT'
+               TYPE    'UNIV'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               ASSOCIATION '->GLOBAL.BINDS'
+               PROMPT  'Name of output datafile'
+               HELP 'Enter the name of the output image without the extension'
+            ENDPARAMETER
+
+	    PARAMETER THRESH
+               TYPE    '_REAL'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               PROMPT  'Minimum counts in pixel'
+               DEFAULT 0.0
+               HELP 'Pixels containing less cnts than this will be set to zero'
+            ENDPARAMETER
+
+	    PARAMETER ENAXIS
+               TYPE    '_INTEGER'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               PROMPT  'Which of these is the energy axis'
+               HELP 'Enter an integer from the above list'
+            ENDPARAMETER
+
+	ENDINTERFACE

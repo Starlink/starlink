@@ -1,0 +1,102 @@
+Interface EVPOLAR
+   Parameter INP
+      position    1
+      type        'UNIV'
+      keyword     'INP'
+      ppath       'GLOBAL'
+      association '<-GLOBAL.EVDS'
+      prompt      'Enter name of input dataset'
+      help        'This must be an EVENT dataset.'
+   EndParameter
+
+   Parameter OUT
+      position    2
+      type        'UNIV'
+      keyword     'OUT'
+      association '->GLOBAL.BINDS'
+      prompt      'Enter name of the output dataset'
+      help        'This will be a binned dataset.'
+   EndParameter
+
+   Parameter LISTS
+      position    3
+      type        'literal'
+      prompt      'Index numbers'
+      help        'Either one or two list numbers'
+   EndParameter
+
+   PARAMETER X0
+      TYPE '_REAL'
+      DEFAULT     0.0
+      PPATH       'DEFAULT'
+      VPATH       'PROMPT'
+      PROMPT 'X axis value of pole'
+   ENDPARAMETER
+
+   PARAMETER Y0
+      TYPE '_REAL'
+      DEFAULT     0.0
+      PPATH       'DEFAULT'
+      VPATH       'PROMPT'
+      PROMPT 'Y axis value of pole'
+   ENDPARAMETER
+
+   Parameter QVAL
+      type        '_INTEGER'
+      vpath       'default'
+      default     0
+      prompt      'Enter maximum GOOD QUALITY value.'
+      help        'All events with QUALITY greater this value have BAD QUALITY'
+   Endparameter
+
+   Parameter QKEEP
+      type        '_LOGICAL'
+      vpath       'default'
+      default     NO
+      prompt      'Keep BAD QUALITY events?'
+      help        'If NO all BAD QUALITY events are omitted from the output dataset.'
+   EndParameter
+
+   PARAMETER REG
+      TYPE        '_LOGICAL'
+      PROMPT      'Radial axis to be regularly spaced'
+      DEFAULT     Y
+      PPATH       'DEFAULT'
+      VPATH       'PROMPT'
+   ENDPARAMETER
+
+   Parameter ABINSIZE
+      type        '_REAL'
+      default     360
+      prompt      'Azimuthal binsize (degrees)'
+   EndParameter
+
+   Parameter RBINSIZE
+      type        '_REAL'
+      prompt      'Radial binsize'
+      help        'This is in the same units as the selected lists'
+   EndParameter
+
+   PARAMETER NRAD
+      TYPE        '_INTEGER'
+      PROMPT      'Number of radial bins'
+      PPATH       'DYNAMIC'
+      VPATH       'PROMPT'
+   ENDPARAMETER
+
+   Parameter RRANGE
+      type        'literal'
+      prompt      'Enter irregular bin ranges'
+      help        'See ASTHELP SPECIFYING_RANGES'
+   EndParameter
+
+   PARAMETER NORM
+      TYPE        '_LOGICAL'
+      PROMPT      'Normalise output array'
+      HELP        'This will account for different bins having different areas'
+      DEFAULT     Y
+      PPATH       'DEFAULT'
+      VPATH       'PROMPT'
+   ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,39 @@
+INTERFACE EVSORT
+
+  PARAMETER INP
+    TYPE        'UNIV'
+    POSITION    1
+    PPATH       'GLOBAL'
+    ASSOCIATION '<-GLOBAL.EVDS'
+    PROMPT      'Enter name of input dataset'
+    HELP        'This must be an event dataset'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    TYPE        '_UNIV'
+    POSITION    2
+    ASSOCIATION '->GLOBAL.EVDS'
+    PROMPT      'Enter name of output dataset'
+    HELP        'This will be an event dataset sorted by a list''s value'
+  ENDPARAMETER
+
+  PARAMETER SLIST
+    TYPE        'LITERAL'
+    POSITION    3
+    VPATH       'PROMPT'
+    PPATH       'DYNAMIC,CURRENT'
+    PROMPT      'List to sort by'
+    HELP        'Up to 10 LISTs may have ranges imposed simultaneously.'
+  ENDPARAMETER
+
+  PARAMETER ASCEND
+    TYPE        '_LOGICAL'
+    VPATH       'PROMPT'
+    DEFAULT     Y
+    VPATH       'PROMPT'
+    PPATH       'DEFAULT'
+    PROMPT      'Sort into ascending order'
+    HELP        'Sort in ascending order, otherwise descending'
+  ENDPARAMETER
+
+ENDINTERFACE

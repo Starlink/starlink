@@ -1,0 +1,387 @@
+INTERFACE TEXT2HDS
+
+  PARAMETER 'INFILE'
+    POSITION 1
+    TYPE    '_CHAR'
+    PROMPT  'Name of input text file'
+    PPATH   'CURRENT'
+    VPATH   'PROMPT'
+    HELP    'Enter the name including the extension'
+  ENDPARAMETER
+
+  PARAMETER OUTFILE
+    POSITION 2
+    TYPE    '_UNIV'
+    PROMPT  'Name of output HDS file'
+    PPATH   'CURRENT'
+    VPATH   'PROMPT'
+    ASSOCIATION '->GLOBAL.BINDS'
+    HELP    'Enter the name without the extension'
+  ENDPARAMETER
+
+	    PARAMETER NCOLS
+               POSITION 3
+               TYPE    '_INTEGER'
+               PROMPT  'Number of columns in the text file'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT 1
+               HELP    'e.g. if youve got an X, Y and data colummn enter 3'
+            ENDPARAMETER
+
+	    PARAMETER NROWS
+               POSITION 4
+               TYPE    '_INTEGER'
+               PROMPT  'Maximum number of lines in input file'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Number of lines in file - better to overestimate slightly'
+            ENDPARAMETER
+
+	    PARAMETER CNAME1
+               POSITION 5
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 1st column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME2
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 2nd column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME3
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 3rd column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME4
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 4th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME5
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 5th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME6
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 6th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME7
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 7th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME8
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 8th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME9
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 9th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME10
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 10th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME11
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 11th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME12
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 12th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME13
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 13th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME14
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 14th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME15
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 15th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME16
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 16th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME17
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 17th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME18
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 18th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME19
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 19th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME20
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 20th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME21
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 21th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME22
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 22th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME23
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 23th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME24
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 24th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME25
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 25th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME26
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 26th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME27
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 27th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME28
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 28th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME29
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 29th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME30
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 30th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME31
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 31th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME32
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 32th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME33
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 33th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME34
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 34th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME35
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 35th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME36
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 36th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME37
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 37th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME38
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 38th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME39
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 39th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER CNAME40
+               TYPE    '_CHAR'
+               PROMPT  'Name of array to hold 40th column'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Name of HDS object for this data e.g. X_ARRAY'
+            ENDPARAMETER
+
+	    PARAMETER SCAR
+               TYPE    '_LOGICAL'
+               PROMPT  'Is there a SCAR descriptor file available'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  N
+               HELP    'Enter NO if there is no accompanying descriptor file'
+            ENDPARAMETER
+
+  PARAMETER DSCFILE
+    TYPE    '_CHAR'
+    PROMPT  'Name of SCAR descriptor file'
+    PPATH   'CURRENT'
+    VPATH   'PROMPT'
+  ENDPARAMETER
+
+  PARAMETER EVENT
+    TYPE    '_LOGICAL'
+    PROMPT  'Produce an EVENT dataset'
+    PPATH   'CURRENT,DEFAULT'
+    VPATH   'DEFAULT'
+    DEFAULT  N
+    HELP    'Enter NO to produce a file of HDS arrays'
+  ENDPARAMETER
+
+ENDINTERFACE

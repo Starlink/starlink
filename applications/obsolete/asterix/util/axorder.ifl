@@ -1,0 +1,30 @@
+ INTERFACE AXORDER
+
+    PARAMETER INP
+       POSITION 1
+       TYPE 'UNIV'
+       KEYWORD 'INP'
+       PPATH 'GLOBAL'
+       ASSOCIATION '<-GLOBAL.BINDS'
+       PROMPT 'Input object'
+       HELP 'Must be structured, not primitive'
+    ENDPARAMETER
+
+    PARAMETER OUT
+       POSITION 2
+       TYPE 'UNIV'
+       KEYWORD 'OUT'
+       ASSOCIATION '->GLOBAL.BINDS'
+       PROMPT 'Output dataset'
+       HELP 'Input dataset with axes re-ordered'
+    ENDPARAMETER
+
+    PARAMETER SELAX
+       POSITION 3
+       TYPE 'UNIV'
+       VPATH 'PROMPT'
+       PROMPT 'New order of axes - separate by spaces'
+       HELP 'Number must be same as input dimensionality. eg. 1 3 for 2D image'
+    ENDPARAMETER
+
+ ENDINTERFACE

@@ -1,0 +1,28 @@
+ INTERFACE BINSUM
+
+    PARAMETER INP
+       POSITION 1
+       TYPE 'UNIV'
+       PPATH 'GLOBAL'
+       ASSOCIATION '<-GLOBAL.BINDS'
+       PROMPT 'Input object'
+       HELP 'Can be primitive, e.g 1,2,3,4,5 or structured, e.g. an image'
+    ENDPARAMETER
+
+    PARAMETER OUT
+       POSITION 2
+       TYPE 'UNIV'
+       ASSOCIATION '->GLOBAL.BINDS'
+       PROMPT 'Dataset to receive cumulative distribution'
+       HELP 'This will be a binned dataset, same shape as input'
+    ENDPARAMETER
+
+    PARAMETER REVERSE
+       TYPE '_LOGICAL'
+       DEFAULT N
+       VPATH 'DEFAULT'
+       PPATH 'DEFAULT'
+       PROMPT 'Perform summation from back to front'
+    ENDPARAMETER
+
+ ENDINTERFACE

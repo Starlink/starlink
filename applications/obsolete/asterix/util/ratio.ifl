@@ -1,0 +1,52 @@
+INTERFACE RATIO
+
+  PARAMETER INP
+    POSITION    1
+    TYPE        'UNIV'
+    PPATH       'GLOBAL'
+    ASSOCIATION '<-GLOBAL.BINDS'
+    PROMPT      'Input dataset'
+    HELP        'Must be an ASTERIX binned dataset, or a primitive array.'
+  ENDPARAMETER
+
+  PARAMETER AXIS
+    POSITION    2
+    TYPE        '_INTEGER'
+    VPATH       'PROMPT'
+    PROMPT      'Axis to ratio on'
+    HELP        'Axis number less than or equal to dimensionality of data'
+  ENDPARAMETER
+
+  PARAMETER BANDS
+    POSITION    3
+    TYPE        '_CHAR'
+    PROMPT      'Two ranges to divide'
+    HELP        'Denominator and then numerator, eg. 10:20 25:30'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    POSITION    4
+    TYPE        'UNIV'
+    PROMPT      'Output dataset'
+    ASSOCIATION '->GLOBAL.BINDS'
+    HELP        'Enter null (!) if you dont want to create a dataset'
+  ENDPARAMETER
+
+  PARAMETER NORMAL
+    TYPE        '_LOGICAL'
+    PROMPT      'Normalise output data'
+    DEFAULT     N
+    VPATH       'PROMPT'
+    PPATH       'DEFAULT'
+    HELP        'If selected the output data is normalised wrt the RATIOed axis'
+  ENDPARAMETER
+
+  PARAMETER WEIGHT
+    TYPE        '_LOGICAL'
+    PROMPT      'Weight data using variances'
+    DEFAULT     N
+    VPATH       'DEFAULT,PROMPT'
+    HELP        'Controls whether RATIO uses mean or weighted average over bands'
+  ENDPARAMETER
+
+ENDINTERFACE

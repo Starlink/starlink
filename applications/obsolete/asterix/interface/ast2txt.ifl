@@ -1,0 +1,25 @@
+INTERFACE EXPORT
+
+ PARAMETER INP
+  POSITION 1
+  TYPE     'UNIV'
+  ASSOCIATION '<-GLOBAL.BINDS'
+  PROMPT   'Input binned dataset'
+  HELP     'May be primitive, up to 7 dimensions'
+ ENDPARAMETER
+
+ PARAMETER OUT
+  POSITION 2
+  TYPE     'FILENAME'
+  VPATH    'PROMPT'
+  PROMPT   'Name of output text file'
+ ENDPARAMETER
+
+ PARAMETER IMPREAD
+  TYPE '_LOGICAL'
+  VPATH 'DEFAULT,PROMPT'
+  DEFAULT Y
+  PROMPT 'Write an IMPORT compatible header'
+ ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,43 @@
+Interface OPERATE
+   Parameter INP
+      position    1
+      type        'UNIV'
+      ppath       'GLOBAL'
+      association '<-GLOBAL.BINDS'
+      prompt      'Input data object'
+      help        'Can be NDF, primitive, or scalar number'
+   EndParameter
+
+   Parameter OUT
+      position    2
+      type        'UNIV'
+      association '->GLOBAL.BINDS'
+      prompt      'Output data object'
+      help        'Can be same as input'
+   EndParameter
+
+   Parameter OPER
+      position    3
+      type        'LITERAL'
+      keyword     'OPER'
+      prompt      'Required operation'
+      help        '-, Abs, Log, Log10, Sqrt, Exp, or 10**'
+   EndParameter
+
+   Parameter OVER
+      type        '_LOGICAL'
+      default     N
+      keyword     'OVER'
+      vpath       'DEFAULT'
+      prompt      'Overwrite existing output object?'
+      help        'If yes then you will only be prompted for one dataset'
+   EndParameter
+
+   Parameter ERR
+      type        '_DOUBLE'
+      default     !
+      vpath       'DEFAULT'
+      prompt      'Error value'
+   EndParameter
+
+EndInterface

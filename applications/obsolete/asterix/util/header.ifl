@@ -1,0 +1,120 @@
+interface HEADER
+  parameter INP
+    type 'UNIV'
+    position 1
+    prompt 'Dataset'
+    help 'Name of a binned or event dataset whose header is to be displayed'
+  endparameter
+  parameter DEV
+    TYPE '_CHAR'
+    POSITION 2
+    DEFAULT 'TERMINAL'
+    VPATH 'DEFAULT'
+    PPATH 'DEFAULT'
+    PROMPT 'Output device'
+    HELP '(T)ERMINAL, (P)RINTER, (O)LDFILE, (N)EWFILE - otherwise filename'
+  endparameter
+  parameter EDIT
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Edit mode'
+    help 'Allows individual HEADER components to be edited'
+  endparameter
+  parameter TARGET
+    type '_CHAR'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter OBSERVER
+    type '_CHAR'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter OBSERVATORY
+    type '_CHAR'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter INSTRUMENT
+    type '_CHAR'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter AXIS_RA
+    type '_DOUBLE'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter AXIS_DEC
+    type '_DOUBLE'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter POSITION_ANGLE
+    type '_DOUBLE'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter FIELD_RA
+    type '_DOUBLE'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter FIELD_DEC
+    type '_DOUBLE'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter EQUINOX
+    type '_INTEGER'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter BASE_DATE
+    type '_CHAR'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter BASE_MJD
+    type '_INTEGER'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter BASE_UTC
+    type '_DOUBLE'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter BASE_TAI
+    type '_DOUBLE'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter OBS_LENGTH
+    type '_REAL'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+  parameter EXPOSURE_TIME
+    type '_REAL'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DYNAMIC,DEFAULT'
+  endparameter
+endinterface

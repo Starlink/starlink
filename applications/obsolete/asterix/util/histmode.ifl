@@ -1,0 +1,48 @@
+INTERFACE HISTMODE
+
+  PARAMETER INP
+    POSITION    1
+    TYPE        'UNIV'
+    PPATH       'GLOBAL'
+    ASSOCIATION '<->GLOBAL.BINDS'
+    PROMPT      'Dataset'
+    HELP        'Dataset whose history mode is to be altered/displayed'
+  ENDPARAMETER
+
+  PARAMETER DISABLED
+    TYPE        '_LOGICAL'
+    DEFAULT     N
+    PPATH       'DEFAULT'
+    VPATH       'DEFAULT,PROMPT'
+    PROMPT      'Set update mode to DISABLED'
+    HELP        'ASTERIX applications never write history with this mode'
+  ENDPARAMETER
+
+  PARAMETER QUIET
+    TYPE        '_LOGICAL'
+    DEFAULT     N
+    PPATH       'DEFAULT'
+    VPATH       'DEFAULT,PROMPT'
+    PROMPT      'Set update mode to QUIET'
+    HELP        'ASTERIX applications simply write version & time stamp'
+  ENDPARAMETER
+
+  PARAMETER NORMAL
+    TYPE        '_LOGICAL'
+    DEFAULT     N
+    PPATH       'DEFAULT'
+    VPATH       'DEFAULT,PROMPT'
+    PROMPT      'Set update mode to NORMAL'
+    HELP        'Normal level of history update'
+  ENDPARAMETER
+
+  PARAMETER VERBOSE
+    TYPE        '_LOGICAL'
+    DEFAULT     N
+    PPATH       'DEFAULT'
+    VPATH       'DEFAULT,PROMPT'
+    PROMPT      'Set update mode to VERBOSE'
+    HELP        'Treated as NORMAL by ASTERIX programs, but maybe not be other packages'
+  ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,37 @@
+interface MAGIC
+  parameter INP
+    type 'UNIV'
+    position 1
+    ppath 'GLOBAL'
+    association '<-GLOBAL.BINDS'
+    prompt 'Input dataset'
+    help 'Name of binned dataset'
+  endparameter
+  parameter OUT
+    type 'UNIV'
+    position 2
+    association '->GLOBAL.BINDS'
+    prompt 'Output dataset'
+    help 'Name of output binned dataset to be created'
+  endparameter
+  parameter OVER
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Overwrite input'
+    help 'Otherwise new file will be created'
+  endparameter
+  parameter MAGIC
+    type '_REAL'
+    vpath 'DEFAULT'
+    default !
+    prompt 'Magic value to use'
+    help 'Use for values other than standard magic values'
+  endparameter
+  parameter MASK
+    type '_CHAR'
+    vpath 'DYNAMIC'
+    prompt 'Quality mask'
+    help 'Used to mask bad quality'
+  endparameter
+endinterface

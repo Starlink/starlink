@@ -1,0 +1,99 @@
+Interface BINSUBSET
+   Parameter INP
+      position    1
+      type        'UNIV'
+      ppath       'GLOBAL'
+      association '<-GLOBAL.BINDS'
+      prompt      'Input dataset'
+      help        'Must be a binned dataset'
+   EndParameter
+
+   Parameter OUT
+      position    2
+      type        'UNIV'
+      association '->GLOBAL.BINDS'
+      prompt      'Output dataset'
+      help        'Will produce a binned dataset'
+   EndParameter
+
+   Parameter KEEP
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      default     Y
+      prompt      'Is data within the selected AXIS ranges to be kept?'
+      help        'YES to keep data in the defined AXIS ranges, NO to discard it.'
+   EndParameter
+
+   parameter SLICE
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      default Y
+      prompt 'Is slicing required?'
+      help 'Are dimensions reduced to one bin to be collapsed'
+   endparameter
+
+   parameter INDEX
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      default N
+      prompt 'Select on index numbers'
+      help 'ie use index numbers instead of physical axis values'
+   endparameter
+
+   Parameter AXES
+      type        '_CHAR'
+      position 3
+      prompt      'Axis numbers to select on'
+      help        'Enter list of axis numbers eg. 1,3'
+   EndParameter
+
+   Parameter AXIS1
+      type        '_CHAR'
+      vpath       'PROMPT,DYNAMIC'
+      prompt      'Axis 1 ranges to subset'
+      help        'Must be an even number of ascending values, e.g. 1:2 7:8'
+   EndParameter
+
+   Parameter AXIS2
+      type        '_CHAR'
+      vpath       'PROMPT,DYNAMIC'
+      prompt      'Axis 2 ranges to subset'
+      help        'Must be an even number of ascending values, e.g. 1:2 7:8'
+   EndParameter
+
+   Parameter AXIS3
+      type        '_CHAR'
+      vpath       'PROMPT,DYNAMIC'
+      prompt      'Axis 3 ranges to subset'
+      help        'Must be an even number of ascending values, e.g. 1:2 7:8'
+   EndParameter
+
+   Parameter AXIS4
+      type        '_CHAR'
+      vpath       'PROMPT,DYNAMIC'
+      prompt      'Axis 4 ranges to subset'
+      help        'Must be an even number of ascending values, e.g. 1:2 7:8'
+   EndParameter
+
+   Parameter AXIS5
+      type        '_CHAR'
+      vpath       'PROMPT,DYNAMIC'
+      prompt      'Axis 5 ranges to subset'
+      help        'Must be an even number of ascending values, e.g. 1:2 7:8'
+   EndParameter
+
+   Parameter AXIS6
+      type        '_CHAR'
+      vpath       'PROMPT,DYNAMIC'
+      prompt      'Axis 6 ranges to subset'
+      help        'Must be an even number of ascending values, e.g. 1:2 7:8'
+   EndParameter
+
+   Parameter AXIS7
+      type        '_CHAR'
+      vpath       'PROMPT,DYNAMIC'
+      prompt      'Axis 7 ranges to subset'
+      help        'Must be an even number of ascending values, e.g. 1:2 7:8'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,66 @@
+	INTERFACE INTERP
+
+	    PARAMETER OVER
+		POSITION 	1
+		TYPE 		'_LOGICAL'
+		PROMPT  	'Overwrite Input datafile (Y/N) ?'
+                PPATH           'DEFAULT'
+		VPATH		'DEFAULT'
+                DEFAULT         N
+	    ENDPARAMETER
+
+	    PARAMETER INPUT
+		POSITION 	2
+		TYPE 		'UNIV'
+                KEYWORD         'INP'
+		PROMPT  	'Input datafile'
+                PPATH           'GLOBAL,CURRENT'
+                HELP            'File to interpolate bad points'
+                ASSOCIATION     '<->GLOBAL.BINDS'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER OUTPUT
+		POSITION 	3
+		TYPE 		'UNIV'
+                KEYWORD         'OUT'
+		PROMPT  	'Output datafile'
+                PPATH           'CURRENT'
+                ASSOCIATION     '->GLOBAL.BINDS'
+		VPATH		'PROMPT'
+                HELP            'Output filename'
+	    ENDPARAMETER
+
+	    PARAMETER APP_DIM
+		POSITION 	4
+		TYPE 		'_INTEGER'
+		PROMPT  	'Dimension to be interpolated '
+		VPATH		'PROMPT'
+                HELP            'Enter code of the dimension to fit spline over'
+	    ENDPARAMETER
+
+	    PARAMETER LOWER
+		POSITION 	5
+		TYPE 		'_REAL'
+		PROMPT  	'Lower bound for this parameter '
+		VPATH		'PROMPT'
+                HELP            'Minimum value of range to fit spline over'
+	    ENDPARAMETER
+
+	    PARAMETER UPPER
+		POSITION 	6
+		TYPE 		'_REAL'
+		PROMPT  	'Upper bound for this parameter '
+		VPATH		'PROMPT'
+                HELP            'Maximum value of range to fit spline over'
+	    ENDPARAMETER
+
+	    PARAMETER KWIDTH
+		POSITION 	7
+		TYPE 		'_INTEGER'
+		PROMPT  	'Number of bins between knots'
+		VPATH		'PROMPT'
+                HELP   'Minimum of 5; the fewer the no., the closer the fit'
+	    ENDPARAMETER
+
+	ENDINTERFACE

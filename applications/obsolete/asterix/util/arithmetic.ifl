@@ -1,0 +1,65 @@
+Interface ARITHMETIC
+   Parameter INP1
+      position    1
+      type        'UNIV'
+      prompt      'First input data object'
+      help        'May be scalar number, primitive or NDF object'
+   EndParameter
+
+   Parameter INP2
+      position    2
+      type        'UNIV'
+      prompt      'Second input data object'
+      help        'May be scalar number, primitive or NDF object'
+   EndParameter
+
+   Parameter OUT
+      position    3
+      type        'UNIV'
+      keyword     'OUT'
+      prompt      'Output dataset'
+      help        'This may be the same as either input data object, if not prim.'
+   EndParameter
+
+   Parameter OPER
+      position    4
+      type        '_CHAR'
+      keyword     'OPER'
+      prompt      'Operator (+,-,*,/)'
+      help        'Enter one of above options'
+      in          '+','-','*','/'
+   EndParameter
+
+   Parameter ERR1
+      type        'UNIV'
+      keyword     'ERROR1'
+      prompt      'Error value(s) for first object'
+      help        'Enter ''!'' if no errors required, otherwise a primitive HDS data object or a scalar number'
+   EndParameter
+
+   Parameter ERR2
+      type        'UNIV'
+      keyword     'ERROR2'
+      prompt      'Error value(s) for second object'
+      help        'Enter ''!'' if no errors required, otherwise a primitive HDS data object or a scalar number'
+   EndParameter
+
+   Parameter OVER
+      type        '_LOGICAL'
+      keyword     'OVER'
+      default      N
+      vpath       'DEFAULT'
+      prompt      'Overwrite first input data object?'
+      help        'If TRUE output object overwrites first input object'
+   EndParameter
+
+   Parameter ERRORS
+      type        '_LOGICAL'
+      keyword     'ERRORS'
+      default      N
+      vpath       'DEFAULT'
+      prompt      'Prompt for errors for primitive input?'
+      help        'If TRUE user will be prompted for errors for primitive input'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,47 @@
+Interface BINMERGE
+   Parameter INP1
+      type        'UNIV'
+      prompt      'Input dataset 1'
+      help        'Enter null (!) to signify no more input datasets'
+   EndParameter
+
+   Parameter INP2
+      type        'UNIV'
+      prompt      'Input dataset 2'
+      help        'Enter null (!) to signify no more input datasets'
+   EndParameter
+
+   Parameter INP3
+      type        'UNIV'
+      prompt      'Input dataset 3'
+      help        'Enter null (!) to signify no more input datasets'
+   EndParameter
+
+   Parameter INP4
+      type        'UNIV'
+      prompt      'Input dataset 4'
+      help        'Enter null (!) to signify no more input datasets'
+   EndParameter
+
+   Parameter INP5
+      type        'UNIV'
+      prompt      'Input dataset 5'
+      help        'Enter null (!) to signify no more input datasets'
+   EndParameter
+
+   Parameter OUT
+      position    1
+      type        'UNIV'
+      keyword     'OUT'
+      association '->GLOBAL.BINDS'
+      prompt      'Output dataset'
+   EndParameter
+
+   Parameter CONT
+      type        'LOGICAL'
+      ppath       'DEFAULT'
+      prompt      'Continue?'
+      help        'Do you want to go on?'
+   EndParameter
+
+EndInterface

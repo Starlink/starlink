@@ -1,0 +1,17 @@
+interface MASK
+  parameter INP
+    type 'UNIV'
+    position 1
+    ppath 'GLOBAL'
+    association '<->GLOBAL.BINDS'
+    prompt 'Dataset'
+    help 'Name of binned dataset'
+  endparameter
+  parameter MASK
+    type '_CHAR'
+    position 2
+    ppath 'DYNAMIC'
+    prompt 'Quality mask'
+    help 'Used to mask bad quality'
+  endparameter
+endinterface

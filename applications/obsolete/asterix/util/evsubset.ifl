@@ -1,0 +1,193 @@
+INTERFACE EVSUBSET
+
+  PARAMETER INP
+    TYPE        'UNIV'
+    POSITION    1
+    PPATH       'GLOBAL'
+    ASSOCIATION '<-GLOBAL.EVDS'
+    PROMPT      'Enter name of input dataset'
+    help        'This must be an event dataset'
+  EndPARAMETER
+
+  PARAMETER INDEX
+    TYPE        '_LOGICAL'
+    DEFAULT     N
+    PPATH       'DEFAULT'
+    VPATH       'DEFAULT'
+    PROMPT      'Select events by position in list'
+  ENDPARAMETER
+
+  PARAMETER EVENTS
+    TYPE        '_CHAR'
+    PPATH       'DYNAMIC'
+    VPATH       'PROMPT'
+    PROMPT      'Event ranges to select'
+    HELP        'Use standard Asterix list notation, eg. 100:* or 1:10,20:30'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    TYPE        'UNIV'
+    POSITION    2
+    ASSOCIATION '->GLOBAL.EVDS'
+    PROMPT      'Enter name of output dataset'
+    HELP        'This will be an event dataset'
+  EndPARAMETER
+
+  PARAMETER LISTS
+    TYPE        'LITERAL'
+    POSITION    3
+    PROMPT      'Index numbers'
+    HELP        'Up to 10 LISTs may have ranges imposed simultaneously.'
+  EndPARAMETER
+
+  PARAMETER KEEP1
+    TYPE        '_LOGICAL'
+    VPATH       'DEFAULT'
+    DEFAULT     y
+    PROMPT      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES1
+    TYPE        'LITERAL'
+    POSITION    4
+    PROMPT      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP2
+    TYPE        '_LOGICAL'
+    VPATH       'DEFAULT'
+    DEFAULT     y
+    PROMPT      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES2
+    TYPE        'LITERAL'
+    POSITION    5
+    PROMPT      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP3
+    type        '_logical'
+    vpath       'default'
+    default     Y
+    prompt      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES3
+    type        'literal'
+    position    6
+    prompt      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP4
+    type        '_logical'
+    vpath       'default'
+    default     Y
+    prompt      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES4
+    type        'literal'
+    position    7
+    prompt      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP5
+    type        '_logical'
+    vpath       'default'
+    default     Y
+    prompt      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES5
+    type        'literal'
+    position    8
+    prompt      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP6
+    type        '_logical'
+    vpath       'default'
+    default     Y
+    prompt      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES6
+    type        'literal'
+    position    9
+    prompt      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP7
+    type        '_logical'
+    vpath       'default'
+    default     Y
+    prompt      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES7
+    type        'literal'
+    position    10
+    prompt      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP8
+    TYPE        '_LOGICAL'
+    VPATH       'DEFAULT'
+    DEFAULT     Y
+    PROMPT      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES8
+    TYPE        'LITERAL'
+    POSITION    11
+    PROMPT      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP9
+    TYPE        '_LOGICAL'
+    VPATH       'DEFAULT'
+    DEFAULT     y
+    PROMPT      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES9
+    TYPE        'LITERAL'
+    POSITION    12
+    PROMPT      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+  PARAMETER KEEP10
+    TYPE        '_LOGICAL'
+    VPATH       'DEFAULT'
+    DEFAULT     y
+    PROMPT      'Keep events within specified ranges?'
+    HELP        'If no, then keep events outside specified ranges'
+  EndPARAMETER
+
+  PARAMETER RANGES10
+    TYPE        'LITERAL'
+    POSITION    13
+    PROMPT      'Enter ranges for this list'
+    HELP        'Must be in increasing order eg 100:200 (& not 200:100)'
+  EndPARAMETER
+
+ENDINTERFACE

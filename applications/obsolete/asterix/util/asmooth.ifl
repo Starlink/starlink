@@ -1,0 +1,99 @@
+INTERFACE ASMOOTH
+
+ PARAMETER INP
+  POSITION 1
+  TYPE    'UNIV'
+  PROMPT  'Input binned dataset'
+  PPATH   'GLOBAL,CURRENT'
+  ASSOCIATION  '<-GLOBAL.BINDS'
+  VPATH   'PROMPT'
+  HELP    'Datafile to smooth'
+ ENDPARAMETER
+
+ PARAMETER OUT
+  POSITION 2
+  TYPE    'UNIV'
+  PROMPT  'Output dataset'
+  ASSOCIATION  '->GLOBAL.BINDS'
+  VPATH   'PROMPT'
+  HELP    'Smoothed datafile'
+ ENDPARAMETER
+
+ PARAMETER OPT
+  TYPE    '_INTEGER'
+  PROMPT  'Data level option (1,2,3)'
+  VPATH   'PROMPT'
+  PPATH   'DEFAULT'
+  DEFAULT 1
+  HELP    '1) Linear spacing, 2) Log spacing, 3) User selected levels'
+ ENDPARAMETER
+
+ PARAMETER SDIMS
+  TYPE    '_INTEGER'
+  PROMPT  'Axes to smooth'
+  VPATH   'PROMPT'
+  PPATH   'DYNAMIC,DEFAULT'
+  DEFAULT 1
+  HELP    'The data will be smoothed over these axes'
+ ENDPARAMETER
+
+ PARAMETER NLEV
+  TYPE    '_INTEGER'
+  PROMPT  'Number of levels'
+  DEFAULT 10
+  PPATH   'DEFAULT'
+  VPATH   'PROMPT'
+  HELP    'This number of slices in your input will be smoothed and co-added to create the output '
+ ENDPARAMETER
+
+ PARAMETER BIAS
+  TYPE    '_REAL'
+  PROMPT  'Bias to make all data values positive'
+  PPATH   'DYNAMIC'
+  VPATH   'PROMPT'
+  HELP    'The default is |DMIN| + 1% of the data range. Use ! to quit'
+ ENDPARAMETER
+
+ PARAMETER FILTER
+  TYPE    '_INTEGER'
+  PROMPT  'Mask form'
+  DEFAULT 1
+  PPATH   'DEFAULT'
+  VPATH   'PROMPT'
+  HELP    '1) Gauss, 2) Box, 3) Cosine'
+ ENDPARAMETER
+
+ PARAMETER WSTART
+  TYPE    '_INTEGER'
+  DEFAULT 3
+  PROMPT  'Initial starting mask width in pixels'
+  PPATH   'DEFAULT'
+  VPATH   'DEFAULT,PROMPT'
+ ENDPARAMETER
+
+ PARAMETER WMAXSZ
+  TYPE    '_INTEGER'
+  DEFAULT 30
+  PROMPT  'Maximum mask width in pixels'
+  PPATH   'DEFAULT'
+  VPATH   'DEFAULT,PROMPT'
+ ENDPARAMETER
+
+ PARAMETER SNR
+  TYPE    '_REAL'
+  PROMPT  'Target signal to noise for smooth'
+  VPATH   'PROMPT'
+  DEFAULT 3
+  PPATH   'DEFAULT'
+  HELP    'ASMOOTH selects mask width to achieve this SNR at each data level'
+ ENDPARAMETER
+
+ PARAMETER LEVS
+  TYPE    'REAL'
+  PROMPT  'Data levels where smoothing takes place'
+  VPATH   'PROMPT'
+  HELP    'List of data levels, separated by commas or spaces'
+ ENDPARAMETER
+
+
+ENDINTERFACE

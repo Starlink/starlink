@@ -1,0 +1,28 @@
+ INTERFACE AXCENTROID
+
+    PARAMETER INP
+       POSITION    1
+       TYPE        'UNIV'
+       PPATH       'GLOBAL'
+       ASSOCIATION '<-GLOBAL.BINDS'
+       PROMPT      'Input dataset'
+       HELP        'Must be an ASTERUX binned dataset, or a primitive array.'
+    ENDPARAMETER
+
+    PARAMETER OUT
+       POSITION    2
+       TYPE        'UNIV'
+       PROMPT      'Output dataset'
+       ASSOCIATION '->GLOBAL.BINDS'
+    ENDPARAMETER
+
+    PARAMETER AXIS
+       POSITION    3
+       TYPE        '_INTEGER'
+       KEYWORD     'AXIS'
+       VPATH       'PROMPT'
+       PROMPT      'Axis to centroid on'
+       HELP        'Axis number less than or equal to dimensionality of data'
+    ENDPARAMETER
+
+ ENDINTERFACE

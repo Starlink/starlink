@@ -1,0 +1,17 @@
+interface AXSHOW
+  parameter INP
+    type 'UNIV'
+    position 1
+    ppath 'GLOBAL'
+    association '<->GLOBAL.BINDS'
+    prompt 'Dataset'
+    help 'Name of binned dataset'
+  endparameter
+  parameter DEV
+    type '_CHAR'
+    vpath 'DEFAULT'
+    default 'TERMINAL'
+    prompt 'Output to'
+    help 'T)erminal P)rinter O)ldfile N)ewfile'
+  endparameter
+endinterface

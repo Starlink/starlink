@@ -1,0 +1,49 @@
+Interface POLYFIT
+   Parameter    INP
+      position    1
+      type        'UNIV'
+      ppath       'GLOBAL'
+      association '<-GLOBAL.BINDS'
+      prompt      'Input file'
+      help        'This may be a binned dataset or a primative object.'
+   EndParameter
+
+   Parameter    OUT
+      position    2
+      type        'UNIV'
+      association '->GLOBAL.BINDS'
+      prompt      'Output file'
+   EndParameter
+
+   Parameter    POLY_DEGREE
+      position    3
+      type        '_INTEGER'
+      keyword     'DEGREE'
+      prompt      'Degree of polynomial'
+      help        'This must be an integer number between 0 - 10 inclusive'
+   EndParameter
+
+   Parameter    POLYFIT
+      type      '_LOGICAL'
+      keyword   'FIT'
+      vpath     'DEFAULT'
+      default   T
+      prompt    'FIT (T) or DTREND (F) mode ?'
+      help      'ie produce a fit to the dataset; or also subtract it from the dataset'
+   EndParameter
+
+   Parameter    DTREND
+      type      '_LOGICAL'
+      vpath     'DEFAULT'
+      default   F
+      prompt    'DTREND (T) or FIT (F) mode ?'
+      help      'ie produce a fit to the dataset; or also subtract it from the dataset'
+   EndParameter
+   Parameter    OVER
+      type      '_LOGICAL'
+      keyword   'OVERWRITE'
+      vpath     'DEFAULT'
+      default   FALSE
+      help      'Allows input file/object to be overwritten'
+   EndParameter
+EndInterface

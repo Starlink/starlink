@@ -1,0 +1,38 @@
+INTERFACE SPLINEFIT
+  PARAMETER INP
+    TYPE '_UNIV'
+    POSITION 1
+    PPATH 'GLOBAL'
+    ASSOCIATION '<-GLOBAL.BINDS'
+    PROMPT 'Input file name'
+  ENDPARAMETER
+  PARAMETER PREC
+    TYPE 'LITERAL'
+    DEFAULT 'SINGLE'
+    PPATH 'DEFAULT'
+    VPATH 'PROMPT'
+    PROMPT 'Use SINGLE or DOUBLE precision fit'
+    HELP 'Single is about 4 times faster'
+  ENDPARAMETER
+  PARAMETER USEW
+    TYPE '_LOGICAL'
+    DEFAULT Y
+    PPATH 'DEFAULT'
+    VPATH 'PROMPT'
+    PROMPT 'Use data errors/quality present in input'
+    HELP 'Much slower than ignoring errors and quality'
+  ENDPARAMETER
+  PARAMETER OUT
+    TYPE '_UNIV'
+    POSITION 2
+    ASSOCIATION '->GLOBAL.BINDS'
+    PROMPT 'Output file name'
+  ENDPARAMETER
+  PARAMETER SQ_RES
+    TYPE '_DOUBLE'
+    POSITION 3
+    VPATH 'PROMPT'
+    PPATH 'DYNAMIC'
+    PROMPT 'Accuracy factor'
+  ENDPARAMETER
+ENDINTERFACE

@@ -1,0 +1,192 @@
+	INTERFACE SMOOTH
+
+	    PARAMETER INPUT
+               POSITION 1
+               KEYWORD 'INP'
+               TYPE    'UNIV'
+               PROMPT  'Input Data File '
+               PPATH   'GLOBAL,CURRENT'
+               ASSOCIATION  '<->GLOBAL.BINDS'
+               VPATH   'PROMPT'
+               HELP    'Datafile to smooth'
+            ENDPARAMETER
+
+	    PARAMETER OUTPUT
+               POSITION 2
+               KEYWORD 'OUT'
+               TYPE    'UNIV'
+               PROMPT  'Output Data File '
+               ASSOCIATION  '->GLOBAL.BINDS'
+               VPATH   'PROMPT'
+               HELP    'Smoothed datafile'
+            ENDPARAMETER
+
+	    PARAMETER MSK_IDIM
+               POSITION 3
+               TYPE    '_INTEGER'
+               PROMPT  'First dimension to smooth over'
+               VPATH   'PROMPT'
+               HELP    'Enter the axis code for the smoothing direction'
+            ENDPARAMETER
+
+	    PARAMETER MSK_IDIM1
+               POSITION 4
+               TYPE    '_INTEGER'
+               PROMPT  'Second dimension to smooth ("0" if none wanted)'
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT '0'
+               HELP    'Enter code for second smoothing direction if wanted'
+            ENDPARAMETER
+
+	    PARAMETER MSK_DO
+               POSITION 5
+               TYPE    '_CHAR'
+               PROMPT  'Should gaps in the data be set to zero (Y/N)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT 'N'
+               HELP    'Bad points are interpolated across. Set them to zero?'
+            ENDPARAMETER
+
+	    PARAMETER MSK_MASK
+               POSITION 6
+               TYPE    '_CHAR'
+               PROMPT  'Mask type'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Three letter code'
+            ENDPARAMETER
+
+	    PARAMETER MSK_WIDTH
+               POSITION 7
+               TYPE    '_REAL'
+               PROMPT  'Mask width (pixels)'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP    'See ASTHELP SMOOTH - for the mask definitions'
+            ENDPARAMETER
+
+	    PARAMETER MSK_NEWUNITS
+               POSITION 8
+               TYPE    '_CHAR'
+               PROMPT  'Enter new data units'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Enter units if they have been changed by smoothing op.'
+            ENDPARAMETER
+
+	    PARAMETER MSK_LGAU
+               TYPE    '_INTEGER'
+               PROMPT  'Length of Gaussian mask'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'i.e. the total number of pixels in the mask'
+            ENDPARAMETER
+
+	    PARAMETER OVER
+               TYPE    '_LOGICAL'
+               PROMPT  'Overwrite input file (Y/N) '
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  N
+            ENDPARAMETER
+
+	    PARAMETER ENDS
+               TYPE    '_CHAR'
+               PROMPT  'Enter end extend option (? for options)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT 'ENDAVERAGE'
+               HELP 'See ASTHELP entry - but try "ENDAV" as a first go'
+            ENDPARAMETER
+
+	    PARAMETER NUMPIX
+               TYPE    '_INTEGER'
+               PROMPT  'number of end pixels to average'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'the ends will be extended by the average of these pixels'
+            ENDPARAMETER
+
+	    PARAMETER DVALUE
+               TYPE    '_REAL'
+               PROMPT  'value to give the extended array'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'the ends will be extended and set to this value before smoothing'
+            ENDPARAMETER
+
+	    PARAMETER EVALUE
+               TYPE    '_REAL'
+               PROMPT  'error on this value'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'will be used in calculating the error on the smoothed file'
+            ENDPARAMETER
+
+	    PARAMETER START1
+               TYPE    '_REAL'
+               PROMPT  'first pixel in left hand side average'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'ends will be set to the mean of the pixels you specify'
+            ENDPARAMETER
+
+	    PARAMETER END1
+               TYPE    '_REAL'
+               PROMPT  'last pixel in left hand side average'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'ends will be set to the mean of the pixels you specify'
+            ENDPARAMETER
+
+	    PARAMETER START2
+               TYPE    '_REAL'
+               PROMPT  'first pixel in right hand side average'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'ends will be set to the mean of the pixels you specify'
+            ENDPARAMETER
+
+	    PARAMETER END2
+               TYPE    '_REAL'
+               PROMPT  'last pixel in right hand side average'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'ends will be set to the mean of the pixels you specify'
+            ENDPARAMETER
+
+	    PARAMETER VAL1
+               TYPE    '_REAL'
+               PROMPT  'value for the left hand side extension'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'the left hand side end will be extended and set to this value'
+            ENDPARAMETER
+
+	    PARAMETER ERR1
+               TYPE    '_REAL'
+               PROMPT  'error on this value'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'this will be used in calculating the error on each point'
+            ENDPARAMETER
+
+	    PARAMETER VAL2
+               TYPE    '_REAL'
+               PROMPT  'value for the right hand side extension'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'the right hand side end will be extended and set to this value'
+            ENDPARAMETER
+
+	    PARAMETER ERR2
+               TYPE    '_REAL'
+               PROMPT  'error on this value'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'this will be used in calculating the error on each point'
+            ENDPARAMETER
+
+	ENDINTERFACE

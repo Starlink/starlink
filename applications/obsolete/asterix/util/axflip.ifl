@@ -1,0 +1,30 @@
+ INTERFACE AXFLIP
+
+    PARAMETER INP
+       POSITION 1
+       TYPE 'UNIV'
+       KEYWORD 'INP'
+       PPATH 'GLOBAL'
+       ASSOCIATION '<-GLOBAL.BINDS'
+       PROMPT 'Input object'
+       HELP 'Must be structured, not primitive'
+    ENDPARAMETER
+
+    PARAMETER SELAX
+       POSITION 2
+       TYPE 'UNIV'
+       VPATH 'PROMPT'
+       PROMPT 'Axis numbers to flip - separate by spaces'
+       HELP 'The direction of these axes will reversed. eg. 1 3'
+    ENDPARAMETER
+
+    PARAMETER OUT
+       POSITION 3
+       TYPE 'UNIV'
+       KEYWORD 'OUT'
+       ASSOCIATION '->GLOBAL.BINDS'
+       PROMPT 'Output for flipped data'
+       HELP 'This will be a binned dataset, same shape as input'
+    ENDPARAMETER
+
+ ENDINTERFACE
