@@ -1736,8 +1736,8 @@
 
 /* Do the mapping. */
          ASTCALL(
-            astTranN( imap, npos, nin, npos, (const double (*)[]) inpos, 
-                      1, nout, npos, (double (*)[]) outpos );
+            astTranN( imap, npos, nin, npos, (const double *) inpos, 
+                      1, nout, npos, outpos );
          )
 
 /* Turn the translated coordinates into Tcl Objects for return. */
@@ -2054,8 +2054,8 @@
       bfrm = astGetFrame( wcs, AST__BASE );
       ffrm = astGetFrame( wcs, iframe );
       map = astGetMapping( wcs, AST__BASE, iframe );
-      astTranN( map, 2, astGetI( map, "Nin" ), 2, (const double (*)[]) bpoint, 
-                1, astGetI( map, "Nout" ), 2, fpoint );
+      astTranN( map, 2, astGetI( map, "Nin" ), 2, (const double *) bpoint, 
+                1, astGetI( map, "Nout" ), 2, (double *) fpoint );
 
 /* Work out the ratio of distances. */
       if ( *status == SAI__OK ) {
