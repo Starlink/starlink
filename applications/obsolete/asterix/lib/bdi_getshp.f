@@ -107,6 +107,11 @@
 
 *  External References:
       EXTERNAL			BDI0_BLK		! Ensures inclusion
+
+*  Local Variables:
+      INTEGER			IDIM			! Loop over dimensions
+
+      LOGICAL			SCALAR			! Input is scalar?
 *.
 
 *  Check inherited global status.
@@ -115,12 +120,26 @@
 *  Check initialised
       IF ( .NOT. BDI_INIT ) CALL BDI0_INIT( STATUS )
 
-*  Read dimensions
-      CALL ADI_CGET1I( ID, 'SHAPE', MAXNDIM, DIMS, NDIM, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( 'BDI_GETSHP_1', 'Unable to read data object'/
+*  Object is derived from Scalar?
+      CALL ADI_DERVD( ID, 'Scalar', SCALAR, STATUS )
+      IF ( SCALAR ) THEN
+
+*    Set dimensions
+        NDIM = 0
+        DO IDIM = 1, MAXNDIM
+          DIMS(IDIM) = 0
+        END DO
+
+      ELSE
+
+*    Read dimensions
+        CALL ADI_CGET1I( ID, 'SHAPE', MAXNDIM, DIMS, NDIM, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( 'BDI_GETSHP_1', 'Unable to read data object'/
      :                /' dimensions', STATUS )
+        END IF
+
       END IF
 
 *  Report any errors

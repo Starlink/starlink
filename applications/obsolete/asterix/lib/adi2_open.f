@@ -88,12 +88,13 @@
 
 *  Local Variables:
       CHARACTER*132		ERRTEXT			! FITS error text
+      CHARACTER*80		FPATH			! Sub-file stuff
       CHARACTER*200		FSPEC			! File name
-      CHARACTER*80		KEYWRD			! Keyword name
       CHARACTER*6		MODE			! Access mode
 
       INTEGER			BSIZE			! FITS block size
       INTEGER			FITSTAT			! FITS inherited status
+      INTEGER			FPLEN			! Length of FPATH
       INTEGER			HDU			! HDU number
       INTEGER			HDUTYP			! HDU type
       INTEGER			IMODE			! FITSIO mode
@@ -101,34 +102,34 @@
       INTEGER			LUN			! Logical unit number
 *.
 
-*    Check inherited global status.
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Extract name and access mode
+*  Extract name and access mode
       CALL ADI_GET0C( FID, FSPEC, STATUS )
       CALL ADI_GET0C( MID, MODE, STATUS )
 
-*    Parse the file name
-      CALL ADI2_PARSE( FSPEC, LFILEC, HDU, KEYWRD, STATUS )
+*  Parse the file name
+      CALL ADI2_PARSE( FSPEC, LFILEC, HDU, FPATH, FPLEN, STATUS )
 
-*    Get a logical unit from the system
+*  Get a logical unit from the system
       CALL FIO_GUNIT( LUN, STATUS )
 
-*    Allocated ok?
+*  Allocated ok?
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Parse access mode
+*    Parse access mode
         IF ( (MODE(1:1) .EQ. 'R') .OR. (MODE(1:1) .EQ. 'r') ) THEN
           IMODE = 0
         ELSE IF ( (MODE(1:1) .EQ. 'U') .OR. (MODE(1:1) .EQ. 'u') ) THEN
           IMODE = 1
         END IF
 
-*      Try to open file
+*    Try to open file
         FITSTAT = 0
         CALL FTOPEN( LUN, FSPEC(:LFILEC), MODE, BSIZE, FITSTAT )
 
-*      Opened ok?
+*    Opened ok?
         IF ( FITSTAT .EQ. 0 ) THEN
 
 *      Create the new object
@@ -137,6 +138,11 @@
 *      Write HDU number
           CALL ADI_CPUT0I( ID, 'UserHDU', HDU, STATUS )
 
+*      Write path info if supplied
+          IF ( FPLEN .GT. 0 ) THEN
+            CALL ADI_CPUT0C( ID, 'Fpath', FPATH(:FPLEN), STATUS )
+          END IF
+
 *      Write extra info into the file handle object
           CALL ADI_CPUT0I( ID, 'Lun', LUN, STATUS )
           CALL ADI_CPUT0I( ID, 'BlockSize', BSIZE, STATUS )
@@ -144,13 +150,10 @@
 *      Initialise
           CALL ADI_CPUT0I( ID, '.CurHdu', -1, STATUS )
 
-*        Skip to HDU if specified
+*      Skip to HDU if specified
           IF ( HDU .GT. 0 ) THEN
             CALL ADI2_MVAHDU( ID, LUN, HDU, HDUTYP, STATUS )
           END IF
-
-*        Initialise FITSfile structure
-c          CALL ADI2_FOINIT( ID, STATUS )
 
 *    Failed to open
         ELSE
