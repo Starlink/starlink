@@ -96,7 +96,7 @@
 
 *  Local Constants:
       INTEGER NSAMP                ! No. of samples to test axis linearity
-      PARAMETER ( NSAMP = 500 )
+      PARAMETER ( NSAMP = 200 )
 
 *  Local Variables:
       CHARACTER MODE*6             ! Access mode for picture's MORE structure
@@ -240,17 +240,17 @@
             CALL KPG1_FIT1D( 1, NSAMP, XD, XW, SCALE( 1 ), OFFSET( 1 ), 
      :                       RMS, STATUS )
 
-*  Consider the fit good if the RMS error is less than 0.1 of the increment
+*  Consider the fit good if the RMS error is less than 0.05 of the increment
 *  in XD between samples.
-            XDLIN = ( RMS .LT. ABS( 0.1D0*SCALE( 1 )*DX ) )
+            XDLIN = ( RMS .LT. ABS( 0.05D0*SCALE( 1 )*DX ) )
 
 *  Attempt to fit a straight line through the YD and YW values.
             CALL KPG1_FIT1D( 1, NSAMP, YD, YW, SCALE( 2 ), OFFSET( 2 ), 
      :                       RMS, STATUS )
 
-*  Consider the fit good if the RMS error is less than 0.1 of the increment
+*  Consider the fit good if the RMS error is less than 0.05 of the increment
 *  in XD between samples.
-            YDLIN = ( RMS .LT. ABS( 0.1D0*SCALE( 2 )*DY ) )
+            YDLIN = ( RMS .LT. ABS( 0.05D0*SCALE( 2 )*DY ) )
 
 *  If succesful, and both are linear, and the two co-ordinate systems are 
 *  not identical...
