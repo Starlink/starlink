@@ -348,12 +348,11 @@ the Starlink tree in more or less the usual way.
 There are some environment variables which affect the
 installation, determining for instance the locations of the 
 indexes and temporary directories.  
-All default to sensible values, but if you are building the package
-you can tailor them to your requirements by setting them at build time.
-If you have a pre-built version of the package for your system,
-the default values will be as recorded in the {\tt scb\_datestamp} file,
-but they can be
-overridden by setting the same environment variables at run time.
+All default to sensible values, but
+you can tailor them to your requirements by setting them at 
+installation time.
+Additionally, the install-time values can be overridden by
+setting the same environment variables at run time.
 These variables are as follows:
 \begin{description}
 \item[SCB\_SOURCES]
@@ -405,28 +404,17 @@ An example site installation from source files might go as follows:
 \begin{quote}
 \begin{verbatim}
 % zcat scb.tar.Z | tar xf -
-% setenv SCB_BROWSER_TMP /scratch/scb/browser
-% setenv SCB_INDEXER_TMP /scratch/scb/indexer
-% setenv INSTALL /star
-% setenv MIMETYPES_FILE /usr/local/etc/httpd/conf/mime.types
 % mk build
     ...
+% setenv SCB_BROWSER_TMP /scratch/scb/browser
+% setenv SCB_INDEXER_TMP /scratch/scb/indexer
+% setenv MIMETYPES_FILE /usr/local/etc/httpd/conf/mime.types
+% setenv INSTALL /star
 % mk install
     ...
 % mk test
     ...
 *** Installation test for the SCB package has been run
-\end{verbatim}
-\end{quote}
-or from a pre-built package:
-\begin{quote}
-\begin{verbatim}
-% zcat scb_ix86_Linux_run.tar.Z | tar xf -
-% setenv INSTALL /star
-% mk install
-    ...
-% mk test
-    ...
 \end{verbatim}
 \end{quote}
 

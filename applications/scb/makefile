@@ -355,13 +355,9 @@ PUBLIC_SCRIPTS = scb.pl scbindex.pl dbmcat.pl scbcp.pl
 #  List of CGI scripts.  These are executables which will be installed
 #  in the $(INSTALL_CGI) directory with execute permission set and may
 #  be executed as CGI programs if an HTTP server is set up appropriately.
+#  Any file in CGI_SCRIPTS must also be in PUBLIC_SCRIPTS.
 
 CGI_SCRIPTS = scb.pl
-
-#  List of all scripts including $(CGI_SCRIPTS) and $(PUBLIC_SCRIPTS)
-#  (but without duplicated entries).
-
-ALL_SCRIPTS = scb.pl scbindex.pl dbmcat.pl scbcp.pl
 
 #  List of Perl modules.  These are library modules required by the 
 #  public script files $(PUBLIC_SCRIPTS) and will be installed in the
@@ -395,42 +391,21 @@ TEST_FILES = $(PKG_NAME)_test.tar
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(ALL_SCRIPTS) $(PERL_MODULES)
+BUILT_FILES = $(PUBLIC_SCRIPTS) $(PERL_MODULES)
 
 #  Rules for extracting source files from the source archive.
 
-$(ALL_SCRIPTS):
+$(PUBLIC_SCRIPTS):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
-	mv $@ $@.gen
-	$(VARLIB_SUBST) $@.gen > $@
 	chmod 755 $@
-	rm -f $@.gen
 
 $(PERL_MODULES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
-	mv $@ $@.gen
-	$(VAR_SUBST) $@.gen > $@
 	chmod 644 $@
-	rm -f $@.gen
-
-#  The build is done by filtering through the following sed commands, which
-#  substitute makefile macros for some of the variables in the scripts.
-
-VAR_SUBST = sed \
-            -e 's%"$$STARLINK"%"$(STARLINK)"%' \
-            -e 's%"$$SCB_INDEX"%"$(SCB_INDEX)"%' \
-            -e 's%"$$SCB_SOURCES"%"$(SCB_SOURCES)"%' \
-            -e 's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
-            -e 's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
-            -e 's%"$$HTX_SERVER"%"$(HTX_SERVER)"%' \
-            -e 's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
-
-VARLIB_SUBST = $(VAR_SUBST) \
-            -e '1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5) -I$(PERL_MOD_DIR)%'
 
 #  Name of the date stamp file. This is used to record the time of the
 #  most recent build for use in subsequent operations that require it.
@@ -576,13 +551,6 @@ build:
 	@ echo '   PERL5           : $(PERL5)'            >>$(DATE_STAMP)
 	@ echo '   PERL_MOD_DIR    : $(PERL_MOD_DIR)'     >>$(DATE_STAMP)
 	@ echo ''                                         >>$(DATE_STAMP)
-	@ echo '   SCB_SOURCES     : $(SCB_SOURCES)'      >>$(DATE_STAMP)
-	@ echo '   SCB_INDEX       : $(SCB_INDEX)'        >>$(DATE_STAMP)
-	@ echo '   SCB_BROWSER_TMP : $(SCB_BROWSER_TMP)'  >>$(DATE_STAMP)
-	@ echo '   SCB_INDEXER_TMP : $(SCB_INDEXER_TMP)'  >>$(DATE_STAMP)
-	@ echo '   HTX_SERVER      : $(HTX_SERVER)'       >>$(DATE_STAMP)
-	@ echo '   MIMETYPES_FILE  : $(MIMETYPES_FILE)'   >>$(DATE_STAMP)
-	@ echo ''                                         >>$(DATE_STAMP)
 #
 #  Record completion of the build.
 	@ echo '$(SYSTEM)' > .BUILT
@@ -637,8 +605,22 @@ install:
         fi
 
 #  The .INSTALLED_$(SYSTEM) target copies each file from the source
-#  directory using "cp -p" to preserve its date, and replaces each
-#  original file by a link to the installed copy.
+#  directory.  The files must be edited to substitute some of the
+#  install-time configuration options.  The originals are left in 
+#  place.  The following macros give the sed filters to do the 
+#  stream editing.
+
+VAR_SUBST = sed \
+            -e 's%"$$STARLINK"%"$(STARLINK)"%' \
+            -e 's%"$$SCB_INDEX"%"$(SCB_INDEX)"%' \
+            -e 's%"$$SCB_SOURCES"%"$(SCB_SOURCES)"%' \
+            -e 's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
+            -e 's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
+            -e 's%"$$HTX_SERVER"%"$(HTX_SERVER)"%' \
+            -e 's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
+
+VARLIB_SUBST = $(VAR_SUBST) \
+            -e '1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5) -I$(PERL_MOD_DIR)%'
 
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS)
 #
@@ -649,30 +631,25 @@ install:
 #  Install the public scripts, giving them world execute permission.
 	for f in $(PUBLIC_SCRIPTS) ""; do \
            if test -n "$$f"; then \
-              cp -p $$f $(INSTALL_BIN);\
+              $(VARLIB_SUBST) $$f > $(INSTALL_BIN)/$$f;\
               chmod 755 $(INSTALL_BIN)/$$f;\
-              rm -f $$f;\
-              $(LINK) $(INSTALL_BIN)/$$f $$f;\
            else :; fi;\
         done
 #
 #  Install the Perl modules, giving them world read permission.
 	for f in $(PERL_MODULES) ""; do \
            if test -n "$$f"; then \
-              cp -p $$f $(INSTALL_PERL_MOD);\
+              $(VAR_SUBST) $$f > $(INSTALL_PERL_MOD)/$$f;\
               chmod 644 $(INSTALL_PERL_MOD)/$$f;\
-              rm -f $$f;\
-              $(LINK) $(INSTALL_PERL_MOD)/$$f $$f;\
            else :; fi;\
         done
 #
-#  Install the CGI binaries, giving them world execute permission.
+#  Install the CGI binaries (copying from the INSTALL_BIN directory), 
+#  giving them world execute permission.
 	for f in $(CGI_SCRIPTS) ""; do \
            if test -n "$$f"; then \
-              cp -p $$f $(INSTALL_CGI);\
+              cp -p $(INSTALL_BIN)/$$f $(INSTALL_CGI);\
               chmod 755 $(INSTALL_CGI)/$$f;\
-              rm -f $$f;\
-              $(LINK) $(INSTALL_CGI)/$$f $$f;\
            else :; fi;\
         done
 #
@@ -765,26 +742,22 @@ do_deinstall:
 #  Deinstall the public script files, if installed versions exist.
 	- for f in $(PUBLIC_SCRIPTS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
-              rm -f $$f;\
-              cp -p $(INSTALL_BIN)/$$f .;\
               rm -f $(INSTALL_BIN)/$$f;\
+              $(MAKE) $$f;\
            else :; fi;\
         done
 #
 #  Deinstall the Perl module files, if installed versions exist.
 	- for f in $(PERL_MODULES) ""; do \
            if test -n "$$f" -a -f $(INSTALL_PERL_MOD)/$$f; then \
-              rm -f $$f;\
-              cp -p $(INSTALL_PERL_MOD)/$$f .;\
               rm -f $(INSTALL_PERL_MOD)/$$f;\
+              $(MAKE) $$f;\
            else :; fi;\
         done
 #
 #  Deinstall the CGI binary files, if installed versions exist.
 	- for f in $(CGI_SCRIPTS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_CGI)/$$f; then \
-              rm -f $$f;\
-              cp -p $(INSTALL_CGI)/$$f .;\
               rm -f $(INSTALL_CGI)/$$f;\
            else :; fi;\
         done
