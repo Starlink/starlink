@@ -119,9 +119,13 @@ itcl::class skycat::SkyCatHduChooser {
 	add_short_help $itk_component(table) \
 	    {Table: Click to select HDU, double-click to display image or table}
 
-	add_short_help $itk_component(buttons).open {Open and display the selected HDU image or table}
+	add_short_help $itk_component(buttons).open \
+           {Open and display the selected HDU image or table}
 	add_short_help $itk_component(buttons).close {Close the selected HDU}
-	add_short_help $itk_component(buttons).delete {Delete the selected HDU from the FITS file}
+	add_short_help $itk_component(buttons).delete \
+           {Delete the selected HDU from the FITS file}
+	add_short_help $itk_component(buttons).settings \
+           {Set the cut levels and colormap for the preview images to the one used in the main image}
     }
 
     
