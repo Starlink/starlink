@@ -800,7 +800,10 @@ register_language ('name' => 'f77',
 		   'lder' => 'F77LD',
 		   'ld' => '$(F77)',
 		   'pure' => 1,
-                   'extensions' => ['.f', '.for']);
+                   'extensions' => ['.for']
+                   #'extensions' => ['.f', '.for']
+                   # .f made a FC extension -- modification for Starlink
+                  );
 
 # Fortran
 register_language ('name' => 'fc',
@@ -815,7 +818,10 @@ register_language ('name' => 'fc',
                    'lder' => 'FCLD',
                    'ld' => '$(FC)',
                    'pure' => 1,
-                   'extensions' => ['.f90', '.f95']);
+                   'extensions' => ['.f', '.f90', '.f95']
+                   # .f made a FC extension -- modification for Starlink
+                   #'extensions' => ['.f90', '.f95']
+                  );
  
 # Preprocessed Fortran
 #
@@ -5258,7 +5264,7 @@ sub resolve_linker
 {
     my (%linkers) = @_;
 
-    foreach my $l (qw(GCJLINK CXXLINK F77LINK OBJCLINK))
+    foreach my $l (qw(GCJLINK CXXLINK F77LINK FCLINK OBJCLINK))
     {
 	return $l if defined $linkers{$l};
     }
