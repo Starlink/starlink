@@ -15,8 +15,11 @@ phase. The Starlink environment is determined by looking at
 environment variables.
 
 The location of the starlink system is determined by first looking for
-$STARLINK, else $INSTALL else failling back to '/star'. An error is
-raised if the Starlink base directory does not actually exist.
+$STARCONF_DEFAULT_STARLINK, then $STARLINK, then
+$STARCONF_DEFAULT_PREFIX and finally $INSTALL else failling back to
+'/star' (if found) and then '/stardev'. An error is raised if the
+Starlink base directory determined in this manner does not actually
+exist.
 
 See the pod documentation for more information:
 

@@ -8,18 +8,32 @@ $| =1;
 # and then derive everything from that. If $STARLINK
 # is not defined use $INSTALL. If that is not defined
 # use /star as a guess
+# Extended to use the Autoconf variables STARCONF_DEFAULT_PREFIX
+# and STARCONF_DEFAULT_STARLINK
+# Priority is given to the autoconf forms in each case.
 
 my $pkg = "Starlink::Config";
 my $base;
-if (exists $ENV{STARLINK}) {
+if (exists $ENV{STARCONF_DEFAULT_STARLINK}) {
+  $base = $ENV{STARCONF_DEFAULT_STARLINK};
+  print "$pkg - Reading Starlink location from \$STARCONF_DEFAULT_STARLINK\n";
+} elsif (exists $ENV{STARLINK}) {
   $base = $ENV{STARLINK};
   print "$pkg - Reading Starlink location from \$STARLINK\n";
+} elsif (exists $ENV{STARCONF_DEFAULT_PREFIX}) {
+  $base = $ENV{STARCONF_DEFAULT_PREFIX};
+  print "$pkg - Reading Starlink location from \$STARCONF_DEFAULT_PREFIX\n";
 } elsif (exists $ENV{INSTALL}) {
   $base = $ENV{INSTALL};
   print "$pkg - Reading Starlink location from \$INSTALL\n";
-} else {
+} elsif (-d '/star') {
   $base = '/star';
   print "$pkg - Guessing Starlink location to be /star\n";
+} elsif (-d '/stardev') {
+  $base = '/stardev';
+  print "$pkg - Guessing Starlink location to be /stardev\n";
+} else {
+  die "Unable to determine or guess at the location of the Starlink software";
 }
 
 # Once we have decoded $STARLINK check for the existence
@@ -109,9 +123,10 @@ for this information to be placed in a single place
 rather than in every single Starlink module.
 
 The locations of the relevant directories are set during build time.
-The location of the Starlink directory is determined using 
-environment variables: $STARLINK is used if present, else $INSTALL
-is used, else C</star> is tried. If none of these directories
+The location of the starlink system is determined by first looking for
+$STARCONF_DEFAULT_STARLINK, then $STARLINK, then
+$STARCONF_DEFAULT_PREFIX and finally $INSTALL else failling back to
+'/star' (if found) and then '/stardev'. If none of these directories
 exists the build fails.
 
 When used, a hash is imported into the current namespace called
@@ -155,12 +170,25 @@ the state of the environment variables at that moment.
 
 =head1 AUTHOR
 
-Tim Jenness (t.jenness@jach.hawaii.edu)
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) Particle Physics and Astronomy Research Council 1999.
+Copyright (C) Particle Physics and Astronomy Research Council 1999-2004.
 All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
 
 =cut
 
