@@ -24,6 +24,7 @@
 *  Authors:
 *     rp: Rachael Padman (UCB, MRAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -53,6 +54,10 @@
 *        Complete review for map version 4.1, and the mv4 library.
 *     01 Sep 1994 (hme):
 *        Don't report garbage unit number on open success.
+*     10 June 2003 (timj):
+*        Compare NSPEC and NPTS1 from POSN with that from header.
+*        This was added because some people have maps where NSPEC is not equal
+*        to the number of spectra in the map itself!
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,6 +81,7 @@
 *  Local Variables:
       INTEGER ISTAT
       INTEGER I, J
+      INTEGER TMPNSPEC, TMPNPTS1
 
 *  Internal References:
       INTEGER GEN_ILEN
@@ -97,11 +103,19 @@
 
 *  Open the map file. This also maps the cube and the index.
 *  (If the open routine fails, it will close the file itself.)
+      NSPEC = 0
+      NPTS1 = 0
       CALL MV4_MAPOPN( IFAIL )
       IF ( IFAIL .NE. 0 ) GO TO 999
       WRITE( *, * )
       WRITE( *, '('' Map file '', A, '' opened.'')' )
      :   NAMEMP(:GEN_ILEN(NAMEMP))
+
+*  Need to store a copy of NSPEC and NPTS1 from the map read
+*  so that we can compare it with the header read. This is twisted
+*  because the data array is read before the header is read
+      TMPNSPEC = NSPEC
+      TMPNPTS1 = NPTS1
 
 *  Read the map header.
       CALL MV4_HEADRD( )
@@ -111,6 +125,20 @@
       IF ( IHEAD .EQ. 1 ) THEN
          CALL MV4_PROTRD( )
          IF ( NPTS1 .EQ. 0 ) NPTS1 = NPTS(1)
+      END IF
+
+*  Make sure everything is in order with the POSN array to prevent
+*  buffer overruns
+      IF (TMPNSPEC .NE. NSPEC) THEN
+         print *,'Header inconsistency. SPECX.NSPEC [',NSPEC,
+     :        '] != DIMS(POSN) [',TMPNSPEC,']. Correcting error.'
+         NSPEC = TMPNSPEC
+      END IF
+
+      IF (TMPNPTS1 .NE. NPTS1) THEN
+         print *,'Header inconsistency. SPECX.NPTS1 [',NSPEC,
+     :        '] != DIMS(POSN) [',TMPNPTS1,']. Correcting error.'
+         NSPEC = TMPNPTS1
       END IF
 
 *  Reset some flags.
