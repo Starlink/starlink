@@ -89,17 +89,13 @@
  *     parameters that you can enter in the default.sex and
  *     default.param files. 
  
- *  Implementation Status:
- *     - lacks BAD pixel support.
- 
  *  Implementation deficiencies:
  *     - uses setjmp/longjmp to work around program error flow
  *       problems. This may leave open files and unfreed memory
  *       allocations. 
  
  *  References:
- *     -  MUD/???
- *     -  MUD/???
+ *     -  MUD/165, SExtractor User's Guide (v2.0).
  
  *  Copyright:
  *     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -112,6 +108,9 @@
  *  History:
  *     25-NOV-1998 (PDRAPER):
  *        Added prologue and comments, removed print statements.
+ *     20-MAY-1999 (PDRAPER):
+ *        Now deals with NDF sections as inputs (previously split at
+ *        comma in parentheses)
  *     {enter_changes_here}
  
  *  Bugs:
@@ -146,6 +145,7 @@ void extractor( int *status ) {
   int i;
   int nim;              /*  Number of images given (max=2) */
   char *str;
+  char *ptr;
   
   if ( setjmp( env ) == 0 ) {
     
@@ -197,6 +197,14 @@ void extractor( int *status ) {
     if ( *status == SAI__OK ) {
       for (nim = 0; (str=strtok( nim?NULL:argstr, notokstr ))!=NULL; nim++) {
         if (nim<MAXIMAGE) {
+          /*  Check for trailing slice. This is indicated by a 
+              "(" in the string */
+          if ( strstr( str, "(" ) != NULL ) {
+            /*  Access up to next token and use this as final part 
+                of name */
+            ptr = strtok( NULL, notokstr );
+            *(--ptr) = ',';
+          }
           prefs.image_name[nim] = str;
         } else {
           error(EXIT_FAILURE, "*Error*: Too many input images: ", str);
