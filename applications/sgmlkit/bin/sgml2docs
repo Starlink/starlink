@@ -1,0 +1,237 @@
+#! /bin/sh -
+#
+# $Id$
+#
+#+
+#  Name:
+#     sgml2docs
+#
+#  Purpose:
+#     Generate HTML or LaTeX files from an SGML source file, marked up using
+#     one of the Starlink DTDs.
+#
+#  Description:
+#     Given a single argument, specifying an SGML source file, this
+#     uses the Starlink DSSSL stylesheets to process this into a
+#     collection of HTML files and GIFs, or LaTeX and EPS files
+#     places them in a subdirectory named after the source file, and
+#     then creates a tarball in the source directory holding the
+#     generated files.
+#
+#  Environment:
+#     Requires that the environment variable STARLINK_SGML_DIR is
+#     properly set, pointing to the root of the Starlink SGML kit.  It
+#     also requires that dvi2bitmap is in the PATH.
+#
+#     The script creates a work directory and does its processing
+#     there.  If it is necessary to run BibTeX, it will be done with
+#     that temporary directory as the current directory, so that it
+#     might be necessary to set BIBINPUTS (for example) to let the
+#     system find the bibliography database.
+#
+#  Arguments:
+#     SGML file to be processed.
+#
+#  Options:
+#     --html: generate HTML (the default)
+#     --latex: generate LaTeX
+#     --package-dir my-dir: package up the generated files into a
+#           directory called `my-dir'.
+#     --tarball my.tar: bundle the package-dir into a tarball named `my.tar'
+#     --jadeflags flags: add the given flags to the invocation of Jade
+#
+#  Authors:
+#     NG: Norman Gray (Starlink, Glasgow)
+#
+#  History:
+#     29-SEP-1999 (NG):
+#        Initial version.
+#-
+
+LIBDIR=${STARLINK_SGML_DIR}/lib
+DECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
+STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
+
+JADE=jade
+JADEFLAGS=
+IMGEQ=$LIBDIR/img-eqlist.pl
+DVI2BITMAP=dvi2bitmap
+LATEX=latex
+BIBTEX=bibtex
+
+TARGETFORMAT=0			# html
+
+tidy-up ()
+{
+    if [ -w "$WORKDIR" ]; then
+	rm -Rf $WORKDIR
+    fi
+    if [ -d "$WORKDIR" ]; then
+	echo "Couldn't delete work directory $WORKDIR"
+    fi
+}
+trap tidy-up 0
+
+# Start parsing the arguments
+
+USAGE="Usage: $0 [--latex] [--html] [--package-dir directory] [--tarball file.tar] [--jadeflags flags] sgml-file"
+
+PROGNAME=`basename $0`
+while [ $# -gt 0 ]; do
+    case $1 in
+	--html) TARGETFORMAT=0 ;;
+	--latex) TARGETFORMAT=1 ;;
+	--package-dir) PACKAGEDIR=$2; shift ;;
+	--tarball) TARNAME=$2; shift ;;
+	--jadeflags) JADEFLAGS=$2; shift ;;
+	-*) echo $USAGE; exit 1 ;;
+	*) SGMLSRC=$1 ;;
+    esac
+    shift
+done
+
+# Check that the SGMLSRC argument is present, and prepend `pwd` if it isn't
+# an absolute file name.
+case $SGMLSRC in
+	'') echo $USAGE; exit 1 ;;
+	/*) ;;
+	*) SGMLSRC=`pwd`/$SGMLSRC ;;
+esac
+
+echo "Processing $SGMLSRC..."
+case $TARGETFORMAT in
+    0)  echo "Target HTML...";
+	PACKAGEEXT='.htx' ;;
+    1)  echo "Target LaTeX...";
+	PACKAGEEXT='.latex' ;;
+    *) echo $USAGE; exit 1 ;;
+esac
+
+# Set the PACKAGEDIR and TARNAME variables, unless they've already
+# been set by options above.
+SRCDIR=`dirname $SGMLSRC`
+test -n "$PACKAGEDIR" \
+    || PACKAGEDIR=`basename $SGMLSRC | sed 's/\(\.sgml\)\?$/'$PACKAGEEXT/`
+test -n "$TARNAME" \
+    || TARNAME=`echo $SGMLSRC | sed 's/\(\.sgml\)\?$/.tar/'`
+
+# Make a work directory.  Can't use mktemp, as that only creates files.
+# Fail if the directory already exists.
+WORKDIR=/tmp/$PROGNAME.$$
+if [ -d $WORKDIR -o -f $WORKDIR ]; then
+	echo "$0: temp dir $WORKDIR already exists - not overwriting"
+	exit 1
+fi
+
+mkdir -p $WORKDIR
+if [ $? -ne 0 ]; then
+    echo "$0: Can't make temp dir $WORKDIR"
+    exit 1
+fi
+
+cd $WORKDIR
+if [ $? -ne 0 ]; then
+    echo "$0: Can't cd to temp dir $WORKDIR"
+    exit 1
+fi
+
+# We'll package up the generated files into a tarball, after moving them into
+# a subdirectory.
+
+# Before we do anything else, create the package directory.
+mkdir $PACKAGEDIR
+if [ ! -d $PACKAGEDIR ]; then
+    echo "$0: Can't create subdir $WORKDIR/$PACKAGEDIR"
+    exit 1
+fi
+
+
+
+# Start processing
+
+if [ $TARGETFORMAT -eq 0 ]; then
+    # generate $ROOT.imgeq.list and convert it to a set of bitmaps
+    echo "Pre-processing..."
+    $JADE -t sgml -iOnly.web $JADEFLAGS \
+	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main $SGMLSRC \
+	    > tmp.stamp
+    ROOT=`awk -F: '{print $1}' tmp.stamp`
+
+    # If there are no maths-mode elements, there's no list file generated
+    if [ -r $ROOT.imgeq.list ]; then
+	$IMGEQ $ROOT.imgeq.list
+
+	echo "LaTeXing maths..."
+	$LATEX $ROOT.imgeq
+
+	echo "dvi2bitmap..."
+	$DVI2BITMAP -m 2 -s 2 -Pt -t gif $ROOT.imgeq.dvi
+    fi
+
+    # Generate backmatter.  Don't fail if no .aux file was generated
+    if [ -r "$ROOT.htmlbib.aux" ]; then
+	echo "Backmatter..."
+	BSTINPUTS=$LIBDIR $BIBTEX $ROOT.htmlbib
+	sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
+	mv t.bbl $ROOT.htmlbib.bbl
+    fi
+
+    # Generate the destination file
+    echo "Generating output..."
+    $JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
+	    -d $STYLESHEET/html/sl.dsl#html $SGMLSRC > tmp.stamp
+
+    test -r HTML.manifest && ln -s HTML.manifest MANIFEST
+
+elif [ $TARGETFORMAT -eq 1 ]; then
+
+    $JADE -t sgml -d $STYLESHEET/latex/slback.dsl#back.main $SGMLSRC \
+	> tmp.stamp
+    ROOT=`awk -F: '{print $1}' tmp.stamp`
+
+    # If there was no backmatter, then don't invoke BibTeX
+    if [ -r $ROOT.latexbib.aux ]; then
+	BSTINPUTS=$LIBDIR $BIBTEX $ROOT.latexbib
+    fi
+
+    # Generate the final file
+    $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
+		-d $STYLESHEET/latex/sl.dsl#latex $SGMLSRC > tmp.stamp
+
+    test -r LaTeX.manifest && ln -s LaTeX.manifest MANIFEST
+
+else
+
+    echo "Illegal TARGETFORMAT=$TARGETFORMAT !"
+    exit 1
+
+fi
+
+# Package up the generated files into a tarball named after the source
+# file.  There are either one or two fields on each line of the
+# manifest (see file .../{html,latex}/sl.dsl).  If there is only one field,
+# then this is a generated file.  If there are two fields, then
+# the first is the sysid of the figure as referred to by the
+# generated material, which will have no path, and the second is the sysid as
+# declared in the entity, which may have a path.
+if [ -r MANIFEST ]; then
+    mv `awk 'NF==1 {print $1}' MANIFEST` $PACKAGEDIR
+    (cd $SRCDIR; \
+	eval `awk "NF==2 {printf \"cp %s $WORKDIR/$PACKAGEDIR/%s\n\","'$2,$1}' $WORKDIR/MANIFEST`)
+    cp MANIFEST $PACKAGEDIR
+else
+    # It's not clear what to do here, since _something_ has clearly
+    # gone wrong.  However, package up all (?) the generated files and
+    # hope for the best.
+    echo "$0: Can't find manifest -- something's gone wrong:  I'm tarring up everything and hoping for the best!"
+    mv * $PACKAGEDIR
+fi
+tar cf $TARNAME $PACKAGEDIR
+
+
+# No need to remove the workdir, as that'll be done through the exit trap
+
+echo "Created $TARNAME"
+
+exit 0
+
