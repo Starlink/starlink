@@ -42,6 +42,7 @@
 *      1 Aug 95 : Apply vignetting correction if available (DJA)
 *     11 Mar 1996 (DJA):
 *        Removed old style convolution.
+*      6 Nov 00 : Bug fix
 *
 *    Type definitions :
 *
@@ -142,7 +143,8 @@ c      END IF
 	CALL VEC_ADDR( .FALSE., DATASET_NDAT(N), %VAL(DATASET_BPTR(N)),
      :                 PRED, PRED, IERR, NERR, STATUS )
       ELSE
-        CALL ARR_MULTR( DATASET_SCALE(N), DATASET_NDAT(N), PRED, STATUS)
+        IF( DATASET_SCALE(N) .NE. 0)
+     :  CALL ARR_MULTR( DATASET_SCALE(N), DATASET_NDAT(N), PRED, STATUS)
       END IF
 
 *  Exit
