@@ -5,7 +5,7 @@
    o  The NDFTRACE application now displays the bounds of the NDF within 
    each WCS Frame if FULLFRAME is set to YES. Also, the bounds of the NDF 
    within the current WCS Frame are written to the new output parameters 
-   DLBND and FUBND.
+   FLBND and FUBND.
 
 
 Changes introduced in version 1.4-1
