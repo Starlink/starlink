@@ -132,7 +132,7 @@ asc2tab = bin/asc2tab
 # TAB2ASC
 tab2asc = bin/tab2asc
 
-INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
 
 CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
 

@@ -1,8 +1,8 @@
-/* 
- * tkAppInit.C -- 
+/*
+ * tkAppInit.C --
  *
  * ---------------------------------------------------------------------
- * NOTE: This file was modified by adding the rtdimage extension 
+ * NOTE: This file was modified by adding the rtdimage extension
  *       as well as the BLT, Itcl and TclX extensions.
  *       It was also modified to be compiled with a C++ compiler,
  *       although this is not strictly necessary. It is only required
@@ -64,9 +64,19 @@ int *tclDummyMathPtr = (int *) matherr;
  *----------------------------------------------------------------------
  */
 
+extern "C" {
+#include "ndf.h"                 /* Define NDF interface */
+#include "sae_par.h"             /* Define SAI__OK */
+}
+
 int
 main(int argc, char** argv)
 {
+    /*  Initialise the NDF library, needed to make sure history works,
+     *	must do this here to access argc and argv */
+    int status = SAI__OK;
+    ndfInit( argc, argv, &status );
+
     Tk_Main(argc, argv, Tcl_AppInit);
     return 0;			/* Needed only to prevent compiler warning. */
 }

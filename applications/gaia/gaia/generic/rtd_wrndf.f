@@ -65,8 +65,12 @@
 *     03-DEC-1997 (PDRAPER):
 *        Now accepts the name of the component to replace.
 *     28-JUL-1999 (PDRAPER):
-*        Added control of the NDF history component. This is because the 
-*        command-line args may not exist (compiler dependent).
+*        Added control of the NDF history component. This is because the
+*        command-line args may not exist (compiler dependent). 
+*     04-AUG-1999 Followup to above.
+*        There is now a call ndfInit(argc,argv,status), that will do
+*        this job correctly. Left new code in place as more informative
+*        than default.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -232,7 +236,7 @@
 
 *  Look for a WCS that can be saved in the NDF WCS component.
          CALL RTD1_DEWCS( HEAD, NHEAD, IWCS, STATUS )
-         IF ( IWCS .NE. AST__NULL ) THEN 
+         IF ( IWCS .NE. AST__NULL ) THEN
             CALL NDF_PTWCS( IWCS, IDNEW, STATUS )
             CALL AST_ANNUL( IWCS, STATUS )
          END IF
@@ -246,7 +250,7 @@
          IF ( STATUS .EQ. PSX__NOENV ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
          TEXT( 1 ) = 'Created by GAIA save command'
-         CALL NDF_HPUT( 'QUIET', APPN, .TRUE., 1, TEXT, .FALSE., 
+         CALL NDF_HPUT( 'QUIET', APPN, .TRUE., 1, TEXT, .FALSE.,
      :                  .FALSE., .FALSE., IDNEW, STATUS )
       END IF
 
