@@ -418,20 +418,47 @@ sub index_list {
 
    my ($path, @files) = @_;
 
+#  Sort the file list so that tar files are indexed before anything else.
+#  If the same files exist inside and outside a tar file, they only get 
+#  tagged once, since the second time round the taggable() routine spots 
+#  them as having already been done.
+#  Thus by doing this sort, if the file exists both inside and outside 
+#  its tar archive, the one inside is the one that gets indexed.  
+#  The purpose of this is so that the file location recorded is the one 
+#  inside the tar file - this gives more information about where to find 
+#  it than if its unpacked location is recorded (since the unpacked 
+#  location can be inferred from the packed one, but not vice versa).
+
+   @files = sort { index ($b, '.tar') <=> index ($a, '.tar') } @files;
+
+#  Go through files in list, dealing appropriately with certain types.
+
    my ($file, $ext);
    foreach $file (@files) {
       $ext = '';
       $ext = $1 if ($file =~ /\.([^.]+)$/);
-      if (-d $file) {                    #  directory.
+
+#     Directory.
+
+      if (-d $file) {
          index_dir "$path$file/", $file; 
       }
-      elsif ($file =~ /\.tar\b/) {       #  tar archive (possibly compressed)
+
+#     Tar archive (possibly compressed).
+
+      elsif ($file =~ /\.tar\b/) {
          index_tar "$path$file>", $file;
       }
-      elsif ($ext eq 'hlp') {            #  starlink help file
+
+#     Starlink help file.
+
+      elsif ($ext eq 'hlp') {
          index_hlp "$path$file", $file;
       }
-      elsif (taggable "$path$file") {    #  source file in taggable language
+
+#     Source file appropriate for tagging.
+
+      elsif (taggable "$path$file") {
          index_source "$path$file", $file;
       }
    }
