@@ -27,7 +27,7 @@ interface NDF2UNF
       type        'LITERAL'
       vpath       'DEFAULT'
       ppath       'CURRENT,DYNAMIC'
-      prompt      'Array component to copy to the ASCII file'
+      prompt      'Array component to copy to the unformatted file'
       helpkey     '*'
 #     in          'Data', 'Quality', 'Variance'
       default     'Data'
