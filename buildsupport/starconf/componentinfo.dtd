@@ -5,15 +5,30 @@
      component, used in, for example, <dependencies> elements of other
      components.  The ID should be the same as the package variable
      declared as the first argument of the configure.ac AC_INIT macro. -->
-<!ELEMENT component     (description, path, dependencies, developers?, notes?)>
+<!ELEMENT component     (version,
+                         path, 
+                         description,
+                         abstract?, 
+                         dependencies,
+                         developers?,
+                         documentation?,
+                         bugreports?,
+                         notes?)>
 <!ATTLIST component
         id      ID      #REQUIRED
         >
 
+<!-- Version number of this component, which should be the same as the
+     version declared in configure.ac AC_INIT -->
+<!ELEMENT version       (#PCDATA)>
+
 <!-- Brief description of this component -->
 <!ELEMENT description   (#PCDATA)>
 
-<!-- Path to this component in CVS tree -->
+<!-- Optional longer description of the component's functionality -->
+<!ELEMENT abstract     (p+)>
+
+<!-- Path to this component in CVS tree, for example libraries/ast -->
 <!ELEMENT path          (#PCDATA)>
 
 <!-- List components this component depends on, both those
@@ -28,10 +43,29 @@
 
 <!-- A list of developers with an interest in this component -->
 <!ELEMENT developers    (person+)>
-<!ELEMENT person        (name, email, role?)>
+<!ELEMENT person        (name, uname, email, role?)>
+
+<!-- A developer's name -->
 <!ELEMENT name          (#PCDATA)>
+
+<!-- A username on the repository machine, as appears in CVS commit
+     messages and Id lines -->
+<!ELEMENT uname         (#PCDATA)>
+
+<!-- An email address -->
 <!ELEMENT email         (#PCDATA)>
+
+<!-- A role.  This isn't specified yet, but it might include strings
+     like `owner' for the codeline owner, `noinform' to be omitted
+     from mailings about commits, and so on. -->
 <!ELEMENT role          (#PCDATA)>
+
+<!-- A list of document numbers, such as sun123, which describe this
+     component -->
+<!ELEMENT documentation (#PCDATA)>
+
+<!-- An email address where bug reports should be sent -->
+<!ELEMENT bugreports    (#PCDATA)>
 
 <!-- Any other notes -->
 <!ELEMENT notes         (p+)>
@@ -41,7 +75,7 @@
      must be the ID attribute of a <component> element.  However it is
      not declared as an IDREF below, as the <manifest> element is
      sometimes used as a top-level document type. -->
-<!ELEMENT manifest      (files)>
+<!ELEMENT manifest      (version, files)>
 <!ATTLIST manifest
         component       CDATA   #REQUIRED
         >
