@@ -12,7 +12,7 @@ interface IMOSAIC
 
    parameter      INP1
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       vpath       'PROMPT'
       ppath       'CURRENT'
       prompt      'Image to be added'
@@ -21,7 +21,7 @@ interface IMOSAIC
 
    parameter      INP2
       position    3
-      type        'UNIV'
+      type        'LITERAL'
       ppath       'CURRENT'
       vpath       'PROMPT'
       prompt      'Image to be added'
@@ -29,7 +29,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP3
-      type        'UNIV'
+      type        'LITERAL'
       ppath       'CURRENT'
       vpath       'PROMPT'
       prompt      'Image to be added'
@@ -37,7 +37,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP4
-      type        'UNIV'
+      type        'LITERAL'
       ppath       'CURRENT'
       vpath       'PROMPT'
       prompt      'Image to be added'
@@ -45,7 +45,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP5
-      type        'UNIV'
+      type        'LITERAL'
       ppath       'CURRENT'
       vpath       'PROMPT'
       prompt      'Image to be added'
@@ -53,7 +53,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP6
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -62,7 +62,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP7
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -71,7 +71,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP8
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -80,7 +80,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP9
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -89,7 +89,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP10
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -98,7 +98,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP11
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -107,7 +107,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP12
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -116,7 +116,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP13
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -125,7 +125,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP14
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -134,7 +134,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP15
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -143,7 +143,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP16
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -152,7 +152,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP17
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -161,7 +161,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP18
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -170,7 +170,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP19
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -179,7 +179,7 @@ interface IMOSAIC
    endparameter
 
    parameter      INP20
-      type        'UNIV'
+      type        'LITERAL'
       access      'READ'
       ppath       'CURRENT'
       vpath       'PROMPT'
@@ -204,7 +204,7 @@ interface IMOSAIC
    endparameter
 
    parameter      OUT
-      type        'UNIV'
+      type        'LITERAL'
       vpath       'PROMPT'
       prompt      'Mosaic image'
       help        'Name given to the IMAGE structure to hold the mosaic data array'
