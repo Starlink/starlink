@@ -8,8 +8,8 @@
 # history:
 #   29-may-95: original version (pnd@jach.hawaii.edu)
 #   05-Jul-95: modified (caa@jach.hawaii.edu)
-#   07-Nov-95: modified for Starlink use (caa@jach.hawaii.edu)
-#   05-Dec-95: modified for ukirt use (caa@jach.hawaii.edu)
+#   29-Nov-95: modified env. vars + added some aliases (caa@jach)
+#   05-Dec-95: modified for ukirt operation (caa@jach.hawaii.edu)
 # endhistory
 # parameters: $1 is a directory /$HOME/
 #             $2 is a UT-date   /UT=today/
@@ -20,35 +20,21 @@ if ( ${?IRCAMDR_ROOT} == 0 ) then
   setenv IRCAMDR_ROOT /ukirt_sw/ircamdr
 endif
 
-# Print out a welcome message
-echo ""
-echo "Welcome to IRCAM_CLRED/Portable-IRCAMDR V1.0-1"
-
 # Set some default values
 echo ""
-set defdatadir = "`pwd`"
 set defutdate  = "`date -u +%y%m%d`"
+set defdatadir = "/ukirtdata/ircam_data/19${defutdate}/rodir"
 
 # If not arguments supplied, get them all
 if ( ${#argv} == 0 ) then
-  # Get data directory
-  echo -n "Working directory /${defdatadir}/ > "
-  set datadir = $<
-  if ( "${datadir}" == "" ) set datadir = "${defdatadir}"
-  # Get the UT date
-#  echo -n "UT date?  /${defutdate}/ > "
-#  set utdate = $<
-  set utdate = ""
-  if ( "${utdate}" == "" ) set utdate = "${defutdate}"
+  # Set data directory
+  set datadir = "${defdatadir}"
+  set utdate = "${defutdate}"
 
 else if ( ${#argv} == 1 ) then
   # Get data directory
   set datadir = "${argv[1]}"
-  # Get the UT date
-#  echo -n "UT date?  /${defutdate}/ > "
-#  set utdate = $<
-  set utdate = ""
-  if ( "${utdate}" == "" ) set utdate = "${defutdate}"
+  set utdate = "${defutdate}"
 
 else if ( ${#argv} >= 2 ) then
   # Get data directory
@@ -77,8 +63,11 @@ if ( -r "${datadir}"  && -w "${datadir}" ) then
 #  echo "cd ${datadir}"
   cd ${datadir}
 else
-  echo "${0}-f-norread, ${datadir} is not readable or writeable from `uname -n`\!"
-  exit 1
+  echo "-------------------------------------------------------"
+  echo "WARNING : The data disk does not seem to be readable or"
+  echo "          or writeable at the present time."
+  echo "-------------------------------------------------------"
+#  exit 1
 endif
 
 # Make sure ADAM_USER is defined
@@ -87,11 +76,6 @@ setenv ADAM_USER "`echo ${HOME}`/adam"
 
 # Environment variables for ircam-clred operation
 setenv LIRCAMDIR      ${IRCAMDR_ROOT}
-#setenv LIRCAMDIR_BIN  ${IRCAMDR_ROOT} 
-#setenv LIRCAMDIR_DOCS ${IRCAMDR_ROOT}
-#setenv LIRCAMDIR_ICL  ${IRCAMDR_ROOT}
-#setenv LIRCAMDIR_IFL  ${IRCAMDR_ROOT}
-#setenv LIRCAMDIR_MISC ${IRCAMDR_ROOT}
 
 # More specific env vars
 if ( "`uname -m`" =~ [Ss][Uu][Nn]* ) then
@@ -111,6 +95,10 @@ setenv HDS_MAP 1
 set path = ( $path ${IRCAMDR_ROOT} )
 rehash
 
+# Print out a welcome message
+echo ""
+echo "Welcome to IRCAM_CLRED/Portable-IRCAMDR V1.0-0 at UKIRT"
+
 # Start icl and invoke ircamdr
-icl ${IRCAMDR_ROOT}/god_ircamdr_starlink.icl
+icl ${IRCAMDR_ROOT}/god_ircamdr_ukirt.icl
 echo ""
