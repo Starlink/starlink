@@ -50,7 +50,7 @@
 *-
 */
 
-
+#include <stdio.h>
 #include <signal.h>
 #include <setjmp.h>
 #include "f77.h"
