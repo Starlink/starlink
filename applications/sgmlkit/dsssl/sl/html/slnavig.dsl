@@ -12,6 +12,7 @@ redundant functions in here which I don't yet have the time to
 winnow out.
 <authorlist>
 <author id=ng affiliation='Glasgow'>Norman Gray
+<author id=mbt>Mark Taylor
 <otherauthors>
 <author id=nw>Norman Walsh
 <authornote>The general structure of this file, plus some of the code,
@@ -40,7 +41,8 @@ when processing an instance of the summary DTD.  (2) the list
 must be a subset of the return value of <funcname/section-element-list/.
 <codebody>
 (define (chunk-element-list)
-  (list (normalize "sect")
+  (list (normalize "abstract")
+        (normalize "sect")
 	(normalize "subsect")
 	(normalize "appendices")
 	(normalize "routinelist")
@@ -238,6 +240,94 @@ there are none.
   (node-list-filter-by-gi (select-by-class (children nd) 'element)
 			  (chunk-element-list)))
 
+
+<routine>
+<routinename>html-contents
+<purpose>Processing mode for html-contents lines
+<description>The <funcname/section-reference/ processing mode is not
+quite appropriate for HTML contents lines, since we don't want all
+the numbers in that case.  This mode is based on that mode however,
+and passes control explicitly to that mode for those elements which
+it processes suitably for our purposes.  For the others it lets
+<funcname/make-html-contents-line/ do the hard work.
+<p>This mode should contain construction rules for all the elements 
+in <funcname/section-element-list/.
+<codebody>
+(mode html-contents
+  (element abstract
+     (make-html-contents-line))
+  (element sect
+     (make-html-contents-line))
+  (element subsect
+     (make-html-contents-line))
+  (element subsubsect
+     (make-html-contents-line))
+  (element subsubsubsect
+     (make-html-contents-line))
+  (element appendices
+     (make-html-contents-line))
+  (element routinelist
+     (make-html-contents-line))
+  (element codecollection
+     (make-html-contents-line))
+  (element title
+     (with-mode section-reference (process-node-list (current-node))))
+  (element docbody
+     (with-mode section-reference (process-node-list (current-node))))
+  (element subhead
+     (with-mode section-reference (process-node-list (current-node))))
+  )
+
+
+<routine>
+<routinename>make-html-contents-line
+<purpose>Generate a line for inclusion in the HTML table of contents.
+<description>This generates a line for inclusion in the HTML table
+of contents; it consists of the child-number of the section, formatted
+as appropriate, followed by its title or something else which serves
+as such.
+<p>It operates on the current node.
+<returnvalue type=sosofo>A sosofo suitable for use as the content of a li 
+element.
+<codebody>
+(define (make-html-contents-line)
+   (let* ((el-gi (gi (current-node))) 
+          (seclev (cond 
+                    ((equal? el-gi (normalize "subsubsubsect")) 3)
+                    ((equal? el-gi (normalize "subsubsect")) 2)
+                    ((equal? el-gi (normalize "subsect")) 1)
+                    ((equal? el-gi (normalize "sect")) 0)
+                    (else #f)))
+          (fmt-type (cond 
+                      (seclev (list-ref 
+                                 (if (have-ancestor? (normalize "appendices"))
+                                    %appendix-fmts
+                                    %section-fmts)
+                                  seclev))
+                      ((equal? el-gi (normalize "routinelist")) #f)
+                      ((equal? el-gi (normalize "codecollection")) "1")
+                      (else #f))))
+    (sosofo-append
+       (make element gi: "a" 
+             attributes: (list (list "href" (href-to (current-node))))
+         (if fmt-type
+            (literal 
+               (format-number (child-number (current-node)) fmt-type) ". ")
+            (empty-sosofo))
+         (cond 
+            (seclev (process-first-descendant (normalize "title")))
+            ((equal? el-gi (normalize "appendices")) 
+                (literal "Appendices"))
+            ((equal? el-gi (normalize "routinelist"))
+                (literal "Routine list"))
+            ((equal? el-gi (normalize "abstract"))
+                (literal "Abstract"))
+            ((equal? el-gi (normalize "codecollection"))
+                (with-mode routine-ref-get-reference
+                   (process-codecollection 
+                      (attribute-string (normalize "doc"))))))))))
+
+
 <routine>
 <routinename>make-contents
 <description>
@@ -279,11 +369,7 @@ list their children.  It does not supply any header.
 		  (sosofo-append
 		   last
 		   (make element gi: "li"
-			 (make element gi: "a"
-			       attributes: (list (list "href"
-						       (href-to el)))
-			       (with-mode section-reference
-				 (process-node-list el)))
+                         (with-mode html-contents (process-node-list el))
 			 (make-contents el (- depth 1)))))
 		(empty-sosofo))
 	       (if (and include-backmatter-contents
