@@ -9,7 +9,7 @@
 *
 *	Contents:	Simplified versin of the LDACTools: main include file
 *
-*	Last modify:	07/02/2003
+*	Last modify:	04/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -94,7 +94,7 @@ typedef	long			KINGLONG;	/* better than nothing */
 
 /*------------------------------- constants ---------------------------------*/
 
-static int	t_size[] = {1, 2, 4, 4, 8, 1};	/* size in bytes per t_type */
+extern const int	t_size[]; /* size in bytes per t_type (see fitshead.c) */
 
 /*---------------------------------- key ------------------------------------*/
 
@@ -138,6 +138,8 @@ typedef struct structtab
   int		bitsgn;			/* = 0 if unsigned data */
   double	bscale;			/* data scale factor */
   double	bzero;			/* data offset parameter */
+  int		blank;			/* integer code for undefined values */
+  int		blankflag;		/* set if a blank keyword was found */
   enum {COMPRESS_NONE, COMPRESS_BASEBYTE, COMPRESS_PREVPIX}
 		compress_type;		/* image compression type */
   char		*compress_buf;		/* de-compression buffer */
@@ -180,9 +182,7 @@ extern tabstruct	*asc2bin_tab(catstruct *catin, char *tabinname,
 			*init_readobj(tabstruct *tab),
 			*name_to_tab(catstruct *cat, char *tabname, int seg),
 			*new_tab(char *tabname),
-			*pos_to_tab(catstruct *cat, int pos, int seg),
-			*asc2bin_tab(catstruct *catin, char *tabinname,
-				catstruct *catout, char *taboutname);
+			*pos_to_tab(catstruct *cat, int pos, int seg);
 
 extern keystruct	*name_to_key(tabstruct *tab, char *keyname),
 			*new_key(char *keyname),
@@ -265,6 +265,7 @@ extern int	about_cat(catstruct *cat, FILE *stream),
 		init_cat(catstruct *cat),
 		map_cat(catstruct *cat),
 		open_cat(catstruct *cat, access_type at),
+		pad_tab(catstruct *cat, KINGSIZE_T size),
 		prim_head(tabstruct *tab),
 		readbintabparam_head(tabstruct *tab),
 		read_field(tabstruct *tab, char **keynames, keystruct **keys,
@@ -275,6 +276,7 @@ extern int	about_cat(catstruct *cat, FILE *stream),
 		remove_keys(tabstruct *tab),
 		remove_tab(catstruct *cat, char *tabname, int seg),
 		remove_tabs(catstruct *cat),
+		save_head(catstruct *cat, tabstruct *tab),
 		set_maxram(size_t maxram),
 		set_maxvram(size_t maxvram),
 		set_swapdir(char *dirname),

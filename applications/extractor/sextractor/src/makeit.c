@@ -9,7 +9,7 @@
 *
 *	Contents:	main program.
 *
-*	Last modify:	16/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -21,12 +21,15 @@
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
+#include	<string.h>
 #include	<time.h>
 
 #include	"define.h"
 #include	"globals.h"
 #include	"prefs.h"
 #include	"fits/fitscat.h"
+#include	"assoc.h"
+#include	"back.h"
 #include	"check.h"
 #include	"field.h"
 #include	"filter.h"
@@ -288,7 +291,7 @@ void	makeit()
 /*-- Update the CHECK-images */
     if (prefs.check_flag)
       for (i=0; i<MAXCHECK; i++)
-        if (check=prefs.check[i])
+        if ((check=prefs.check[i]))
           reinitcheck(field, check);
 
 /*-- Initialize PSF contexts and workspace */
@@ -324,13 +327,13 @@ void	makeit()
 /*-- Finish the current CHECK-image processing */
     if (prefs.check_flag)
       for (i=0; i<MAXCHECK; i++)
-        if (check=prefs.check[i])
+        if ((check=prefs.check[i]))
           reendcheck(field, check);
 
 /*-- Final time measurements*/
     if (time(&thetime2)!=-1)
       {
-      if (!strftime(thecat.ext_date, 10, "%d/%m/%y", localtime(&thetime2)))
+      if (!strftime(thecat.ext_date, 12, "%d/%m/%Y", localtime(&thetime2)))
         error(EXIT_FAILURE, "*Internal Error*: Date string too long ","");
       if (!strftime(thecat.ext_time, 10, "%H:%M:%S", localtime(&thetime2)))
         error(EXIT_FAILURE, "*Internal Error*: Time/date string too long ","");
@@ -369,7 +372,7 @@ void	makeit()
   if (prefs.check_flag)
     for (i=0; i<MAXCHECK; i++)
       {
-      if (check=prefs.check[i])
+      if ((check=prefs.check[i]))
         endcheck(check);
       prefs.check[i] = NULL;
       }

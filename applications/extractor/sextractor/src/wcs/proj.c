@@ -198,8 +198,13 @@
 #include	"config.h"
 #endif
 
+#ifdef HAVE_MATHIMF_H
+#include <mathimf.h>
+#else
 #include <math.h>
+#endif
 #include <stdio.h>
+#include <stdlib.h>
 #include "poly.h"
 #include "proj.h"
 #include "tnx.h"
@@ -221,11 +226,7 @@ const char *prjrev_errmsg[] = {
    "Invalid projection parameters",
    "Invalid value of (x,y)"};
 
-
-#ifdef COPYSIGN
 #define wcs_copysign(X, Y) ((Y) < 0.0 ? -fabs(X) : fabs(X))
-#endif
-
 
 /*============================================================================
 *   AZP: zenithal/azimuthal perspective projection.
@@ -2816,7 +2817,7 @@ double *x, *y;
       eta =  n;
       x0  =  6.0;
       y0  =  0.0;
-   } else if (face == 5) {
+   } else {
       xi  =  m;
       eta =  l;
       x0  =  0.0;
@@ -2988,7 +2989,7 @@ double *phi, *theta;
       m = -1.0/sqrt(a*a + b*b + 1.0);
       l = -a*m;
       n = -b*m;
-   } else if (face == 5) {
+   } else {
       n = -1.0/sqrt(a*a + b*b + 1.0);
       l = -b*n;
       m = -a*n;
@@ -3148,7 +3149,7 @@ double *x, *y;
       }
       x0  =  6;
       y0  =  0.0;
-   } else if (face == 5) {
+   } else {
       xi  =  m;
       eta =  l;
       if (rhu < 1.0e-8) {
@@ -3178,7 +3179,7 @@ double *x, *y;
       chi = 1.0 + psi*psi;
       yf  = -sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
       xf  = (yf/15.0)*(wcs_atand(psi) - wcs_asind(psi/sqrt(chi+chi)));
-   } else if (eta > fabs(xi)) {
+   } else {
       psi = xi/eta;
       chi = 1.0 + psi*psi;
       yf  =  sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
@@ -3352,7 +3353,7 @@ double *phi, *theta;
          if (yf < 0.0) n = -n;
          l = n*psi;
       }
-   } else if (face == 5) {
+   } else {
       n = -rho;
       if (direct) {
          m = w;
@@ -3473,7 +3474,7 @@ double *x, *y;
       yf =  n/rho;
       x0 =  6.0;
       y0 =  0.0;
-   } else if (face == 5) {
+   } else {
       xf =  m/rho;
       yf =  l/rho;
       x0 =  0.0;

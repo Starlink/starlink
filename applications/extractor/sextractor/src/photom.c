@@ -9,7 +9,7 @@
 *
 *	Contents:	Compute magnitudes and other photometrical parameters.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	27/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -27,6 +27,8 @@
 #include	"photom.h"
 #include	"plist.h"
 
+static  obj2struct	*obj2 = &outobj2;
+
 /***************************** computeaperflux********************************/
 /*
 Compute the total flux within a circular aperture.
@@ -43,10 +45,11 @@ void  computeaperflux(picstruct *field, picstruct *wfield,
 			fymin,fymax, pflag,corrflag, gainflag;
    long			pos;
    PIXTYPE		*strip,*stript, *wstrip,*wstript,
-			wthresh;
+			wthresh = 0.0;
 
   if (wfield)
     wthresh = wfield->weight_thresh;
+  wstrip = wstript = NULL;
   mx = obj->mx;
   my = obj->my;
   w = field->width;
@@ -209,7 +212,7 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
 			pflag, corrflag, gainflag, pos;
    PIXTYPE		*strip,*stript, *dstrip,*dstript, *wstrip,*wstript,
 			*dwstrip,*dwstript,
-			pix, wthresh,dwthresh;
+			pix, wthresh=0.0, dwthresh=0.0;
 
 
 /* Let's initialize some variables */
@@ -217,6 +220,7 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
     dfield = field;
   if (dwfield)
     dwthresh = dwfield->weight_thresh;
+  wstrip = dwstrip = NULL;
   if (wfield)
     wthresh = wfield->weight_thresh;
   wstript = dwstript = NULL;

@@ -138,14 +138,19 @@
 *   leak will result.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: lin.c,v 1.1.1.1 2002/03/15 16:33:26 bertin Exp $
+*   $Id: lin.c,v 1.1.1.1 2003/07/09 19:06:26 bertin Exp $
 *===========================================================================*/
 
 #ifdef HAVE_CONFIG_H
 #include	"config.h"
 #endif
 
+#ifdef HAVE_MATHIMF_H
+#include <mathimf.h>
+#else
 #include <math.h>
+#endif
+#include <stdlib.h>
 #include "lin.h"
 
 /* Map error number to error message for each function. */
@@ -163,13 +168,6 @@ const char *linrev_errmsg[] = {
    0,
    "Memory allocation error",
    "PC matrix is singular"};
-
-
-#ifdef __convexc__
-#include <stdlib.h>
-#else
-#include <malloc.h>
-#endif
 
 int linset(lin)
 

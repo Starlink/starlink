@@ -9,7 +9,7 @@
 *
 *       Contents:       log of changes made to the SExtractor source
 *
-*       Last modify:    03/04/2003
+*       Last modify:    03/12/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -390,3 +390,11 @@ EB      02/04/2003      makeback()      Fixed a memory leak on weight histo.
                         som.c           Added dummy return to please insure++.
 
 EB      03/04/2003      endastrom()     2 arrays were freed twice sometimes.
+
+EB      28/11/2003      -               Fixed gcc -Wall warnings
+                        -               Updated the fitscat and wcs libraries
+                                        to the latest versions.
+
+EB      03/12/2003      add_tab()       Removed confusing seg section, fixing
+                                        the SEXNDET header bug with MEFs.
+                        save_head()     Add saving of headpos file position.

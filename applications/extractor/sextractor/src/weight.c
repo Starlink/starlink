@@ -9,7 +9,7 @@
 *
 *	Contents:	Handling of weight maps.
 *
-*	Last modify:	14/12/2002
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -70,6 +70,7 @@ picstruct	*newweight(char *filename, picstruct *reffield,
 	"*Error*: measured frame and weight map have different sizes","");
       break;
     default:
+      wfield = NULL;			/* To avoid gcc -Wall warnings */
       error(EXIT_FAILURE,
 	"*Internal Error*: Unknown weight-map type in ", "makeit()");
       break;

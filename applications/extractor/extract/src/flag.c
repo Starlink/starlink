@@ -9,7 +9,7 @@
 *
 *	Contents:	Function related to external flagging.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -20,6 +20,7 @@
 
 #include	<limits.h>
 #include	<stdlib.h>
+#include	<string.h>
 
 #include	"define.h"
 #include	"globals.h"
@@ -54,7 +55,7 @@ void	getflags(objstruct *obj, pliststruct *pixel)
       case FLAG_OR:
         for (pixt=pixel+obj->firstpix;pixt>=pixel;
 		pixt=pixel+PLIST(pixt,nextpix))
-          if (cimaflag = PLISTFLAG(pixt,flag[i]))
+          if ((cimaflag = PLISTFLAG(pixt,flag[i])))
             {
             imaflag |= cimaflag;
             nmax++;
@@ -63,7 +64,7 @@ void	getflags(objstruct *obj, pliststruct *pixel)
       case FLAG_AND:
         for (pixt=pixel+obj->firstpix;pixt>=pixel;
 		pixt=pixel+PLIST(pixt,nextpix))
-          if (cimaflag = PLISTFLAG(pixt,flag[i]))
+          if ((cimaflag = PLISTFLAG(pixt,flag[i])))
             {
             imaflag &= cimaflag;
             nmax++;
@@ -73,7 +74,7 @@ void	getflags(objstruct *obj, pliststruct *pixel)
         imaflag = UINT_MAX;
         for (pixt=pixel+obj->firstpix;pixt>=pixel;
 		pixt=pixel+PLIST(pixt,nextpix))
-          if (cimaflag = PLISTFLAG(pixt,flag[i]))
+          if ((cimaflag = PLISTFLAG(pixt,flag[i])))
             {
             if (cimaflag<imaflag)
               {
@@ -90,7 +91,7 @@ void	getflags(objstruct *obj, pliststruct *pixel)
         imaflag = 0;
         for (pixt=pixel+obj->firstpix;pixt>=pixel;
 		pixt=pixel+PLIST(pixt,nextpix))
-          if (cimaflag = PLISTFLAG(pixt,flag[i]))
+          if ((cimaflag = PLISTFLAG(pixt,flag[i])))
             {
             if (cimaflag>imaflag)
               {
@@ -111,7 +112,7 @@ void	getflags(objstruct *obj, pliststruct *pixel)
 /*------ Count flag values */
         for (pixt=pixel+obj->firstpix;pixt>=pixel;
 		pixt=pixel+PLIST(pixt,nextpix))
-          if (cimaflag = PLISTFLAG(pixt,flag[i]))
+          if ((cimaflag = PLISTFLAG(pixt,flag[i])))
             {
             for (n=nflag, fs=flagstack, nfs=nflagstack; n-- && *nfs; nfs++)
               if (*(fs++) == cimaflag)

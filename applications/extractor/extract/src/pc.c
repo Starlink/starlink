@@ -9,7 +9,7 @@
 *
 *	Contents:	Stuff related to Principal Component Analysis (PCA).
 *
-*	Last modify:	02/04/2003
+*	Last modify:	27/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -31,6 +31,8 @@
 #include	"image.h"
 #include	"poly.h"
 #include	"psf.h"
+
+static  obj2struct	*obj2 = &outobj2;
 
 /****** pc_end ***************************************************************
 PROTO   void pc_end(pcstruct *pc)
@@ -91,7 +93,7 @@ pcstruct	*pc_load(catstruct *cat)
   QCALLOC(pc, pcstruct, 1);
 
 /* Store a short copy of the PC filename */
-  if (ci=strrchr(filename, '/'))
+  if ((ci=strrchr(filename, '/')))
     strcpy(pc->name, ci+1);
   else
     strcpy(pc->name, filename);
@@ -195,15 +197,15 @@ void	pc_fit(psfstruct *psf, double *data, double *weight,
    checkstruct	*check;
    codestruct	*code;
    double	*basis,*basis0, *cpix,*cpix0, *pcshift,*wpcshift,
-		*spix,*wspix, *w, *sumopc,*sumopct, *sumwspix, *checkbuf,
-		*sol,*solt, *cxm2,*cym2,*cxym,*cflux, *datat,
+		*spix,*wspix, *w, *sumopc,*sumopct, *checkbuf,
+		*sol,*solt, *datat,
 		*mx2t, *my2t, *mxyt,
 		val,val2, xm2,ym2,xym,flux, temp,temp2, theta, pmx2,pmy2,
 		wnorm, ellip, norm, snorm;
    float	**param, *ppix, *ospix, *cpc,*cpc2, *fparam,
 		pixstep, fval, fvalmax, fscale, dparam;
    int		*parammod,
-		i,c,n,p, npix,npix2,nopix, ncoeff, nparam, nmax,nmax2, ncode;
+		c,n,p, npix,npix2,nopix, ncoeff, nparam, nmax,nmax2, ncode;
 
   pc = psf->pc;
 /* Build the "local PCs", using the basis func. coeffs computed in psf_fit() */
@@ -282,7 +284,7 @@ void	pc_fit(psfstruct *psf, double *data, double *weight,
   for (c=npc; c--;)
     *(solt++) /= snorm;
 
-  if (code = pc->code)
+  if ((code = pc->code))
     {
     ncode = code->ncode;
 /*-- Codebook search */
@@ -434,13 +436,13 @@ void	pc_fit(psfstruct *psf, double *data, double *weight,
       ppix = checkmask;
       for (p=npix2; p--;)
         *(ppix++) = (PIXTYPE)*(spix++);
-      if (check = prefs.check[CHECK_SUBPCPROTOS])
+      if ((check = prefs.check[CHECK_SUBPCPROTOS]))
         addcheck(check, checkmask, width,height, ix,iy, -*solt);
-      if (check = prefs.check[CHECK_PCPROTOS])
+      if ((check = prefs.check[CHECK_PCPROTOS]))
         addcheck(check, checkmask, width,height, ix,iy, *solt);
       }
     }
-  if (check = prefs.check[CHECK_PCOPROTOS])
+  if ((check = prefs.check[CHECK_PCOPROTOS]))
     {
 /*- Reconstruct the unconvolved profile */
     nopix = pc->omasksize[0]*pc->omasksize[1];

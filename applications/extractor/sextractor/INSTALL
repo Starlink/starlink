@@ -14,6 +14,17 @@ The simplest way to compile this package is:
   3. Type `make install' to install the programs and any data files and
      documentation.
 
+Optional Features
+=================
+The executable is dynamically linked by default. If you have the necessary
+static libraries installed, you might want to turn on static linking by typing
+
+     ./configure --enable-static
+
+A statically-linked executable takes more disk and memory space; however it
+runs generally faster and it will work on any similar system independently of
+the libraries available.
+
 Compilers and Options
 =====================
 

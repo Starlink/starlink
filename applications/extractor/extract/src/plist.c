@@ -9,7 +9,7 @@
 *
 *	Contents:	functions dealing with the handling of pixel lists.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	27/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -35,7 +35,7 @@ INPUT   objlist number,
 OUTPUT  RETURN_OK if success, RETURN_FATAL_ERROR otherwise (memory overflow).
 NOTES   -.
 AUTHOR  E. Bertin (IAP & Leiden & ESO)
-VERSION 30/11/98
+VERSION 27/11/2003
  ***/
 int	createblank(objliststruct *objlist, int no)
 
@@ -47,6 +47,7 @@ int	createblank(objliststruct *objlist, int no)
 
   obj = objlist->obj+no;
   pixel = objlist->plist;
+  dpix = NULL;			/* To avoid gcc -Wall warnings */
   dflag = prefs.dimage_flag;
 
   obj->subx = xmin = obj->xmin;

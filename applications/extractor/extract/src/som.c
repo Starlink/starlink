@@ -9,7 +9,7 @@
 *
 *	Contents:	Implementation of Kohonen's Self Organizing Map (V3.0).
 *
-*	Last modify:	02/04/2003
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -66,6 +66,7 @@ void	som_phot(somstruct *som, float back, float backnoise, float gain,
     som->vector[i] = (som->neursize[i]-1)/2.0;
 */
   errmin=BIG;
+  jmin = 0;
   for (j=0; j<som->nneur; j++)
     {
     if ((err=som_err(som, (float)j, SOM_NODE))<errmin)
@@ -164,6 +165,8 @@ float	som_err(somstruct *som, float dist, int flags)
    float	*psft, *dxt, *wt,*xt,*yt,xi,yi,wi,wxi,wyi, diff,dd;	
    int		i,j,k,n, nd, *nx, *mult, ix, pos,post, nima;
 
+  yt = NULL;			/* To avoid gcc -Wall warnings */
+  n = nd = pos = 0;		/* To avoid gcc -Wall warnings */
 /* Is the requested position lying on a node? */
   if (flags & SOM_NODE)
 /*-- Yes: just use the prototype at that node */
@@ -361,6 +364,7 @@ float	som_linmin(somstruct *som)
       *(dvt++) /= dum;
     }
 */
+  d = 0.0;			/* To avoid gcc -Wall warnings */
 /* Begin by bracketing a minimum of the function */
   ax = 0.0;	/* Initial guesses */
   bx = 1.0;

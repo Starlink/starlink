@@ -9,7 +9,7 @@
 *
 *	Contents:	Command-line parsing.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -43,11 +43,9 @@ int	main(int argc, char *argv[])
 
   if (argc<2)
     {
-    fprintf(OUTPUT, "\n         %s  Version %s (%s)\n", BANNER,MYVERSION,DATE);
+    fprintf(OUTPUT, "\n         %s  version %s (%s)\n", BANNER,MYVERSION,DATE);
     fprintf(OUTPUT, "\nby %s\n", COPYRIGHT);
-    fprintf(OUTPUT, "\nFor more information: %s\n", WEBSITE);
-    fprintf(OUTPUT, "Questions or suggestions: %s\n", MAILINGLIST);
-    fprintf(OUTPUT, "Mailing-list requests: %s\n", MAILINGLISTREQ);
+    fprintf(OUTPUT, "visit %s\n", WEBSITE);
     error(EXIT_SUCCESS, "SYNTAX: ", SYNTAX);
     }
   QMALLOC(argkey, char *, argc);
@@ -80,11 +78,8 @@ int	main(int argc, char *argv[])
             exit(EXIT_SUCCESS);
             break;
           case 'v':
-            fprintf(OUTPUT, "\n         %s  Version %s (%s)\n",
-			BANNER,MYVERSION,DATE);
-            fprintf(OUTPUT, "\nFor information, please contact: %s\n",
-			COPYRIGHT);
-            error(EXIT_SUCCESS, "SYNTAX: ", SYNTAX);
+            printf("%s version %s (%s)\n", BANNER,MYVERSION,DATE);
+            exit(0);
             break;
           case 'h':
           default:
@@ -102,7 +97,7 @@ int	main(int argc, char *argv[])
       {
 /*---- The input image filename(s) */
       for(; (a<argc) && (*argv[a]!='-'); a++)
-        for (str=NULL;str=strtok(str?NULL:argv[a], notokstr); nim++)
+        for (str=NULL;(str=strtok(str?NULL:argv[a], notokstr)); nim++)
           if (nim<MAXIMAGE)
             prefs.image_name[nim] = str;
           else

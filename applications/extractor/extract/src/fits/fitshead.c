@@ -9,7 +9,7 @@
 *
 *	Contents:	general functions for handling FITS file headers.
 *
-*	Last modify:	19/12/2002
+*	Last modify:	09/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -25,6 +25,8 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
+extern	char	histokeys[][12];
+const int	t_size[] = {1, 2, 4, 4, 8, 1};	/* size in bytes per t_type */
 
 /******* get_head *************************************************************
 PROTO	int get_head(tabstruct *tab)
@@ -86,7 +88,7 @@ INPUT	pointer to catstruct.
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP)
-VERSION	29/06/2002
+VERSION	09/11/2003
  ***/
 void	readbasic_head(tabstruct *tab)
 
@@ -151,6 +153,9 @@ void	readbasic_head(tabstruct *tab)
   fitsread(tab->headbuf, "BSCALE ", &tab->bscale, H_FLOAT, T_DOUBLE);
   tab->bzero = 0.0;
   fitsread(tab->headbuf, "BZERO  ", &tab->bzero, H_FLOAT, T_DOUBLE);
+  tab->blankflag =
+    (fitsread(tab->headbuf,"BLANK   ",&tab->blank,H_INT,T_LONG) == RETURN_OK)?
+	1 : 0;
 
 /* Custom basic FITS parameters */
   tab->bitsgn = 1;
@@ -312,14 +317,14 @@ INPUT	Table structure.
 OUTPUT	RETURN_OK if tab is a binary table, or RETURN_ERROR otherwise.
 NOTES	The headbuf pointer in the tabstruct might be reallocated.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	19/12/2002
+VERSION	15/08/2003
  ***/
 int	update_head(tabstruct *tab)
 
   {
    keystruct	*key;
    tabstruct	*ctab;
-   int		i,j,n,nk, naxis1;
+   int		i,j,n,naxis1;
    static char	strk[82], str[82];
    char		*buf;
 
@@ -529,7 +534,7 @@ int	addkeyto_head(tabstruct *tab, keystruct *key)
   }
 
 
-/****** addkeyto_head *********************************************************
+/****** addkeywordto_head *****************************************************
 PROTO	int addkeywordto_head(tabstruct *tab, char *keyword, char *comment)
 PURPOSE	Add a keyword and a comment to a table header.
 INPUT	Table structure,
@@ -539,14 +544,15 @@ OUTPUT	Line position in the FITS header.
 NOTES	The headbuf pointer in the tabstruct might be reallocated.
 	Pre-existing keywords are overwritten (but not their comments).
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	11/05/2002
+VERSION	21/04/2003
  ***/
 int	addkeywordto_head(tabstruct *tab, char *keyword, char *comment)
 
   {
    int	n;
 
-  if (fitsfind(tab->headbuf, keyword) == RETURN_ERROR
+  if ((fitsfind(tab->headbuf, keyword) == RETURN_ERROR
+	|| findkey(keyword, (char *)histokeys, 12)!=RETURN_ERROR)
 	&& (fitsfind(tab->headbuf, "END     ")+1)*80 >= tab->headnblock*FBSIZE)
     {
     tab->headnblock++;

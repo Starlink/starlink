@@ -241,7 +241,11 @@
 #include	"config.h"
 #endif
 
+#ifdef HAVE_MATHIMF_H
+#include <mathimf.h>
+#else
 #include <math.h>
+#endif
 #include <string.h>
 #include "wcstrig.h"
 #include "cel.h"
@@ -546,7 +550,7 @@ double *x, *y;
    sphfwd(lng, lat, cel->euler, phi, theta);
 
    /* Apply forward projection. */
-   if (err = cel->prjfwd(*phi, *theta, prj, x, y)) {
+   if ((err = cel->prjfwd(*phi, *theta, prj, x, y))) {
       return err == 1 ? 2 : 3;
    }
 
@@ -572,7 +576,7 @@ double *lng, *lat;
    }
 
    /* Apply reverse projection. */
-   if (err = cel->prjrev(x, y, prj, phi, theta)) {
+   if ((err = cel->prjrev(x, y, prj, phi, theta))) {
       return err == 1 ? 2 : 3;
    }
    if (fabs(*phi)>180.0 || fabs(*theta)>90.0)

@@ -10,7 +10,7 @@
 *	Contents:       Handle TNX astrometric format (from IRAF).
 *
 *
-*	Last modify:	11/04/2000
+*	Last modify:	15/08/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -19,7 +19,11 @@
 #include	"config.h"
 #endif
 
-#include	<math.h>
+#ifdef HAVE_MATHIMF_H
+#include <mathimf.h>
+#else
+#include <math.h>
+#endif
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -33,7 +37,7 @@ INPUT	String containing the TNX info.
 OUTPUT	TNXAXIS structure if OK, or NULL in case of error.
 NOTES	-.
 AUTHOR	E. Bertin (IAP)
-VERSION	28/03/2000
+VERSION	15/08/2003
  ***/
 
 tnxaxisstruct	*read_tnxaxis(char *tnxstr)
@@ -44,7 +48,7 @@ tnxaxisstruct	*read_tnxaxis(char *tnxstr)
    double	min, max;
    int		i, order;
 
-  if (pstr=strpbrk(tnxstr, "1234567890-+."))
+  if ((pstr=strpbrk(tnxstr, "1234567890-+.")))
     {
     if (!(tnxaxis=malloc(sizeof(tnxaxisstruct))))
       return NULL;
@@ -98,6 +102,48 @@ tnxaxisstruct	*read_tnxaxis(char *tnxstr)
   }
 
 
+/******* copy_tnxaxis *********************************************************
+PROTO	tnxaxisstruct *copy_tnxaxis(tnxaxisstruct *axis)
+PURPOSE	Copy a TNX axis mapping structure.
+INPUT	TNXAXIS structure pointer.
+OUTPUT	-.
+NOTES	-.
+AUTHOR	E. Bertin (IAP)
+VERSION	28/11/2003
+ ***/
+
+tnxaxisstruct	*copy_tnxaxis(tnxaxisstruct *axis)
+
+  {
+   tnxaxisstruct	*tnxaxis;
+   int			i;
+
+  if (axis)
+    {
+    if (!axis->ncoeff)
+      return NULL;
+    if (!(tnxaxis=malloc(sizeof(tnxaxisstruct))))
+      return NULL;
+    *tnxaxis = *axis;
+    if (!(tnxaxis->coeff=malloc(tnxaxis->ncoeff*sizeof(double))))
+      return NULL;
+    for (i=0; i<tnxaxis->ncoeff; i++)
+      tnxaxis->coeff[i] = axis->coeff[i];
+    if (!(tnxaxis->xbasis=malloc(tnxaxis->xorder*sizeof(double))))
+      return NULL;
+    for (i=0; i<tnxaxis->xorder; i++)
+      tnxaxis->xbasis[i] = axis->xbasis[i];
+    if (!(tnxaxis->ybasis=malloc(tnxaxis->yorder*sizeof(double))))
+      return NULL;
+    for (i=0; i<tnxaxis->yorder; i++)
+      tnxaxis->ybasis[i] = axis->ybasis[i];
+    return tnxaxis;
+    }
+
+  return NULL;
+  }
+
+
 /******* free_tnxaxis *********************************************************
 PROTO	void free_tnxaxis(tnxaxisstruct *axis)
 PURPOSE	Free a TNX axis mapping structure.
@@ -113,6 +159,7 @@ void	free_tnxaxis(tnxaxisstruct *axis)
   {
   if (axis)
     {
+    
     free(axis->coeff);
     free(axis->xbasis);
     free(axis->ybasis);

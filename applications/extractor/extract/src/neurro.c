@@ -9,7 +9,7 @@
 *
 *	Contents:	run only version of the neural network.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -110,6 +110,7 @@ void    getnnw()
     error(EXIT_FAILURE, prefs.nnw_name, " is NOT a NNW table!");
 
   step = 1;
+  i=j=0;			/* To avoid gcc -Wall warnings */
   while (fgets(str, MAXCHAR, infile))
     {
     sstr = &str[(int)strspn(str," \t")];

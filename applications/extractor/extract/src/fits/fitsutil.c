@@ -25,7 +25,7 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
-static char	histokeys[][12] = {"COMMENT ", "HISTORY ", "        ", ""};
+char	histokeys[][12] = {"COMMENT ", "HISTORY ", "        ", ""};
 
 /****** fitsadd ***************************************************************
 PROTO	int fitsadd(char *fitsbuf, char *keyword, char *comment)
@@ -160,14 +160,14 @@ NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory),
 	E.R. Deul
         E.R. Deul - Handling of NaN
-VERSION	07/08/2001
+VERSION	21/04/2003
  ***/
 int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
 		t_type *ttype, char *comment)
 
   {
-   char *fptr, *cptr;
-   int	i;
+   char *fptr, *cptr, c, *lastspace;
+   int	i, toggle;
 
   *((char *)ptr) = 0;
 /*First, get the keyword*/
@@ -193,8 +193,17 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
   if ((int)fitsline[10] == '\'')
     {
     cptr = ptr;
-    for (fptr = fitsline + (i=11); i<80 && *fptr!=(char)'\''; i++)
+    for (fptr = fitsline + (i=11); i<80; i++)
+      {
+      if (*fptr==(char)'\'')
+        {
+        if (i++>=79 || *(fptr+1)!=(char)'\'')
+          break;
+        else
+          fptr++;
+        }
       *cptr++ = *fptr++;
+      }
     *cptr = 0;
 /*-- Check if there is a trailing space */
     *htype = (cptr != ptr && *(cptr-1)==' ') ? H_STRINGS: H_STRING;
@@ -239,19 +248,30 @@ int	fitspick(char *fitsline, char *keyword, void *ptr, h_type *htype,
     }
 
 /*Store comment if it is found*/
-  for (fptr = fitsline + (i=30); i<80; i++)
-    if (*(fptr++) == (char)'/')
+  toggle = 0;
+  lastspace = NULL;
+  for (fptr = fitsline + (i=10); i<80; i++)
+    {
+    if (*fptr == (char)'\'')
+      toggle^=toggle;
+    if (*(fptr++) == (char)'/' && !toggle)
       {
       while (++i<80 && *fptr<=' ')
         fptr++;
       i--;
       while (++i<80)
-        if (*fptr>= ' ')
-          *(comment++) = *(fptr++);
-         else
-           fptr++;
+        if ((c=*(fptr++))>= ' ')
+	  {
+          *(comment++) = c;
+          if (c>' ')
+            lastspace = comment;
+          }
       }
-  *comment = 0;
+    }
+  if (lastspace)
+    *lastspace = '\0';
+  else
+    *comment = '\0';
 
   return RETURN_OK;
   }
@@ -393,7 +413,7 @@ OUTPUT	RETURN_OK if the keyword was found, RETURN_ERROR otherwise.
 NOTES	The buffer MUST contain the ``END     '' keyword.
 	The keyword must already exist in the buffer (use fitsadd()).
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	26/07/2000
+VERSION	21/04/2003
  ***/
 int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 		t_type ttype)
@@ -471,6 +491,9 @@ int	fitswrite(char *fitsbuf, char *keyword, void *ptr, h_type htype,
 			    i++;
 			    }
 		        sprintf(str, "'%s'", str2);
+                        for (i+=2;i<20; i++)
+                          str[i]=' ';
+                        str[i] = '\0';
 			break;
 
     case H_COMMENT:	sprintf(str, "%-70s", (char *)ptr);

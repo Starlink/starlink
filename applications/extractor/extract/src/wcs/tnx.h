@@ -10,7 +10,7 @@
 *	Contents:       Include to handle TNX astrometric format (from IRAF).
 *
 *
-*	Last modify:	28/03/2000
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -50,7 +50,8 @@ typedef struct tnxaxis
 
 /*------------------------------- functions ---------------------------------*/
 
-tnxaxisstruct	*read_tnxaxis(char *tnxstr);
+tnxaxisstruct	*copy_tnxaxis(tnxaxisstruct *axis),
+		*read_tnxaxis(char *tnxstr);
 
 double		raw_to_tnxaxis(tnxaxisstruct *axis, double x, double y);
 

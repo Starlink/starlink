@@ -9,7 +9,7 @@
 *
 *	Contents:	low-level functions for handling LDAC FITS catalogs.
 *
-*	Last modify:	14/12/2002
+*	Last modify:	15/08/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -96,7 +96,7 @@ INPUT	A pointer to catalog structure, and the character string to insert.
 OUTPUT	RETURN_OK if everything went as expected, RETURN_ERROR otherwise.
 NOTES	The pointer to the primary header might be reallocated if necessary.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	20/03/96
+VERSION	15/08/2003
  ***/
 int	addhistoryto_cat(catstruct *cat, char *str)
 
@@ -119,7 +119,7 @@ int	addhistoryto_cat(catstruct *cat, char *str)
   if (time(&thetime)==-1)
     warning("No time available for history","");
 
-  if (!strftime(str2, 16, "%d/%m/%y %H:%M", localtime(&thetime)))
+  if (!strftime(str2, 16, "%d/%m/%Y %H:%M", localtime(&thetime)))
     error(EXIT_FAILURE, "*Internal Error*: Time/date string too long in ",
 	"addhistoryto_cat()");
   sprintf(str2, "%s %.65s", str2, str);

@@ -9,7 +9,7 @@
 *
 *       Contents:       Functions related to file integrity
 *
-*       Last modify:    13/06/2002
+*       Last modify:    15/08/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -189,7 +189,7 @@ INPUT	Pointer to the tab,
 OUTPUT	The computed checksum.
 NOTES	-.
 AUTHOR	E. Bertin (IAP)
-VERSION	13/06/2002
+VERSION	15/08/2003
  ***/
 unsigned int	compute_bodysum(tabstruct *tab, unsigned int sum)
   {
@@ -207,7 +207,7 @@ unsigned int	compute_bodysum(tabstruct *tab, unsigned int sum)
     buf = (char *)tab->bodybuf;
     for (n=nblock-1; n--; buf+=FBSIZE)
       sum = compute_blocksum(buf, sum);
-    if (size=PADEXTRA(tab->tabsize))
+    if ((size=PADEXTRA(tab->tabsize)))
       {
       QCALLOC(buf, char, FBSIZE);
       size = FBSIZE-size;

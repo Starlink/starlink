@@ -9,7 +9,7 @@
 *
 *	Contents:	Simplified version of the LDACTools: internal defs
 *
-*	Last modify:	13/12/2002
+*	Last modify:	04/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -17,7 +17,7 @@
 /* Check if we are using a configure script here */
 #ifndef HAVE_CONFIG_H
 #define		VERSION		"2.0"
-#define		DATE		"2002-x-x"
+#define		DATE		"2003-x-x"
 #define		HAVE_SYS_MMAN_H	1
 #endif
 
@@ -43,6 +43,7 @@ extern int	bswapflag;		/* != 0 if bytes are swapped/IEEE */
 #define	BODY_DEFVRAM	(1.9*GBYTE)	/* a fair number by 1999 standards */
 #define	BODY_DEFSWAPDIR	"/tmp"		/* OK at least for Unix systems */
 
+#define	BIG		1e+30		/* a huge number */
 #ifndef PI
 #define	PI		3.14159265359	/* never met before? */
 #endif
@@ -92,7 +93,7 @@ typedef	int		LONG;			/* for DEC-Alpha... */
 		   error(EXIT_FAILURE, "*Error* while writing ", fname);;}
 
 #define	QFSEEK(file, offset, pos, fname) \
-		{if (FSEEKO(file, (long)(offset), pos)) \
+		{if (FSEEKO(file, offset, pos)) \
 		   error(EXIT_FAILURE,"*Error*: File positioning failed in ", \
 			fname);;}
 

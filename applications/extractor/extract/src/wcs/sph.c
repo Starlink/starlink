@@ -93,7 +93,11 @@
 #include	"config.h"
 #endif
 
+#ifdef HAVE_MATHIMF_H
+#include <mathimf.h>
+#else
 #include <math.h>
+#endif
 #include "wcstrig.h"
 #include "sph.h"
 
@@ -103,9 +107,7 @@
 #endif
 #endif
 
-#ifdef COPYSIGN
 #define wcs_copysign(X, Y) ((Y) < 0.0 ? -fabs(X) : fabs(X))
-#endif
 
 const double tol = 1.0e-5;
 

@@ -9,7 +9,7 @@
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	02/04/2003
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -40,15 +40,15 @@ void	makeback(picstruct *field, picstruct *wfield)
 
   {
    backstruct	*backmesh,*wbackmesh, *bm,*wbm;
-   PIXTYPE	*buf,*wbuf, *buft,*wbuft, *bufpos;
+   PIXTYPE	*buf,*wbuf, *buft,*wbuft;
    OFF_T	fcurpos,wfcurpos, wfcurpos2,fcurpos2, bufshift, jumpsize;
    size_t	bufsize, bufsize2,
 		size,meshsize;
-   int		i,j,k,m,n, bin, step, nlines,
-		lastbite, w,bw,bwx, bh, nx,ny,nb, x,y,h, offset, nlevels,
+   int		i,j,k,m,n, step, nlines,
+		w,bw, bh, nx,ny,nb,
 		lflag, nr;
    float	*ratio,*ratiop, *weight, *sigma,
-		qscale, cste, sratio;
+		sratio;
 
 /* If the weight-map is not an external one, no stats are needed for it */
   if (wfield && wfield->flags&(INTERP_FIELD|BACKRMS_FIELD))
@@ -69,6 +69,7 @@ void	makeback(picstruct *field, picstruct *wfield)
 
 /* Save current positions in files */
 
+  wfcurpos = wfcurpos2 = 0;		/* to avoid gcc -Wall warnings */
   QFTELL(field->file, fcurpos, field->filename);
   if (wfield)
     QFTELL(wfield->file, wfcurpos, wfield->filename);
@@ -86,6 +87,8 @@ void	makeback(picstruct *field, picstruct *wfield)
     bufshift = (step/2)*(OFF_T)w;
     jumpsize = (step-1)*(OFF_T)w;
     }
+  else
+    bufshift = jumpsize = 0;		/* to avoid gcc -Wall warnings */
 
 /* Allocate some memory */
   QMALLOC(backmesh, backstruct, nx);		/* background information */
@@ -375,7 +378,8 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
   {
    backstruct	*bm, *wbm;
    double	pix,wpix, sig, mean,wmean, sigma,wsigma, step;
-   PIXTYPE	*buft,*wbuft, *bufpos, lcut,wlcut, hcut,whcut;
+   PIXTYPE	*buft,*wbuft,
+		lcut,wlcut, hcut,whcut;
    int		m,h,x,y, npix,wnpix, offset, lastbite, ngood;
 
   h = bufsize/w;
@@ -383,6 +387,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
   wbm = wbackmesh;
   offset = w - bw;
   step = sqrt(2/PI)*QUANTIF_NSIGMA/QUANTIF_AMIN;
+  wmean = wsigma = wlcut = whcut = 0.0;	/* to avoid gcc -Wall warnings */
   for (m = n; m--; bm++,buf+=bw)
     {
     if (!m && (lastbite=w%bw))
@@ -393,10 +398,10 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
     mean = sigma = 0.0;
     buft=buf;
 /*-- We separate the weighted case at this level to avoid penalty in CPU */
+     ngood = 0;
     if (wbackmesh)
       {
       wmean = wsigma = 0.0;
-      ngood = 0;
       wbuft = wbuf;
       for (y=h; y--; buft+=offset,wbuft+=offset)
         for (x=bw; x--;)
@@ -446,12 +451,11 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
     lcut = bm->lcut = (PIXTYPE)(mean - 2.0*sigma);
     hcut = bm->hcut = (PIXTYPE)(mean + 2.0*sigma);
     mean = sigma = 0.0;
-    npix = 0;
+    npix = wnpix = 0;
     buft = buf;
     if (wbackmesh)
       {
       wmean = wsigma = 0.0;
-      wnpix = 0;
       wbuft=wbuf;
       for (y=h; y--; buft+=offset, wbuft+=offset)
         for (x=bw; x--;)
@@ -617,7 +621,7 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
 
   sig = 10.0*nlevelsm1;
   sig1 = 1.0;
-  mea = 0.0;
+  mea = med = bkg->mean;
   for (n=100; n-- && (sig>=0.1) && (fabs(sig/sig1-1.0)>EPS);)
     {
     sig1 = sig;
@@ -693,6 +697,7 @@ void	filterback(picstruct *field)
 
   back = field->back;
   sigma = field->sigma;
+  val = sval = 0.0;			/* to avoid gcc -Wall warnings */
 
 /* Look for `bad' meshes and interpolate them if necessary */
   for (i=0,py=0; py<ny; py++)

@@ -9,7 +9,7 @@
 *
 *	Contents:	handling of "check-images".
 *
-*	Last modify:	15/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -288,8 +288,8 @@ void	reinitcheck(picstruct *field, checkstruct *check)
       fitswrite(check->fitshead, "NAXIS1  ", &check->width, H_INT, T_LONG);
       check->height = field->nbacky;
       fitswrite(check->fitshead, "NAXIS2  ", &check->height, H_INT, T_LONG);
-/* Scale the WCS information if present */
-      if (as=field->astrom)
+/*---- Scale the WCS information if present */
+      if ((as=field->astrom))
         {
         dval = as->cdelt[0]*field->backw;
         fitswrite(check->fitshead, "CDELT1  ", &dval, H_EXPO, T_DOUBLE);
@@ -399,6 +399,7 @@ void	reendcheck(picstruct *field, checkstruct *check)
    char		*buf;
    size_t	padsize;
 
+  padsize = 0;				/* To avoid gcc -Wall warnings */
   switch(check->type)
     {
     case CHECK_MINIBACKGROUND:

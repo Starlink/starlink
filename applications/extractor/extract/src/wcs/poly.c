@@ -9,7 +9,7 @@
 *
 *	Contents:	Polynomial fitting
 *
-*	Last modify:	25/05/2000
+*	Last modify:	28/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -18,7 +18,11 @@
 #include	"config.h"
 #endif
 
-#include	<math.h>
+#ifdef HAVE_MATHIMF_H
+#include <mathimf.h>
+#else
+#include <math.h>
+#endif
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>

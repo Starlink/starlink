@@ -9,7 +9,7 @@
 *
 *	Contents:	Fit the PSF to a detection.
 *
-*	Last modify:	02/04/2003
+*	Last modify:	27/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -38,7 +38,6 @@
 
 extern keystruct	objkey[];
 extern objstruct	outobj;
-extern obj2struct	outobj2;
 
 /********************************* psf_init **********************************/
 /*
@@ -61,7 +60,7 @@ Free memory occupied by the PSF-fitting stuff.
 */
 void	psf_end(psfstruct *psf)
   {
-   int	i, d, ndim;
+   int	d, ndim;
 
   if (psf->pc)
     pc_end(psf->pc);
@@ -113,7 +112,7 @@ psfstruct	*psf_load(char *filename)
   QCALLOC(psf, psfstruct, 1);
 
 /* Store a short copy of the PSF filename */
-  if (ci=strrchr(filename, '/'))
+  if ((ci=strrchr(filename, '/')))
     strcpy(psf->name, ci+1);
   else
     strcpy(psf->name, filename);
@@ -302,27 +301,33 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
 		objstruct *obj)
   {
    checkstruct		*check;
-   static double	x2[PSF_NPSFMAX],y2[PSF_NPSFMAX],xy[PSF_NPSFMAX],
-			sum[PSF_NPSFMAX], deltax[PSF_NPSFMAX],
+   static double	/* x2[PSF_NPSFMAX],y2[PSF_NPSFMAX],xy[PSF_NPSFMAX],
+			sum[PSF_NPSFMAX], */ deltax[PSF_NPSFMAX],
 			deltay[PSF_NPSFMAX],flux[PSF_NPSFMAX],
 			deltaxb[PSF_NPSFMAX],deltayb[PSF_NPSFMAX],
 			fluxb[PSF_NPSFMAX],
-			sol[PSF_NTOT], covmat[PSF_NTOT*PSF_NTOT],
+			sol[PSF_NTOT], /*covmat[PSF_NTOT*PSF_NTOT], */
 			vmat[PSF_NTOT*PSF_NTOT], wmat[PSF_NTOT];
    double		**psfmasks, **psfmaskx,**psfmasky,
 			*data, *data2, *data3, *weight, *mat, *checkdata,
-			*d, *m, *w, *ps,*dps,*pps,*px, *py,
-			dx,dy, x1,y1, mx,my,mflux,pix,pix2, wthresh,val,dflux,
-			backnoise2, gain, radmin2,radmax2,satlevel, chi2, mr,
+			*d, *m, *w, *ps, /* *dps,*pps, */ *px, *py,
+			dx,dy, /* x1,y1, mx,my,mflux, */
+			pix,pix2, wthresh,val, /* dflux, */
+			backnoise2, gain, radmin2,radmax2,satlevel,
+			/* chi2, mr, */
 			r2, valmax, psf_fwhm;
    float		*dh, *wh,
 			pixstep;
    PIXTYPE		*datah, *weighth, *cpix;
    int			i,j,k,p, npsf,npsfmax, npix, nppix, ix,iy,niter,
-			width, height, pwidth,pheight,hw,hh,
-			x,y,yb,xmax,ymax, wbad, gainflag, convflag, npsfflag,
+			width, height, pwidth,pheight, /* hw,hh, */
+			x,y, /* yb, */
+			xmax,ymax, wbad, gainflag, convflag, npsfflag,
 			ival;
 
+  checkdata = NULL;			/* To avoid gcc -Wall warnings */
+  dx = dy = 0.0;
+  niter = 0;
   npsfmax = prefs.psf_npsfmax;
   pixstep = 1.0/psf->pixstep;
   gain = prefs.gain;
@@ -677,7 +682,7 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
         var += 3*PSF_NA+3;
       }
     }
-
+*/
 /* CHECK images */
   if (prefs.check[CHECK_SUBPSFPROTOS] || prefs.check[CHECK_PSFPROTOS])
     for (j=0; j<npsf; j++)
@@ -689,9 +694,9 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
       d = checkdata;
       for (p=nppix; p--;)
         *(cpix++) = (PIXTYPE)*(d++);
-      if (check = prefs.check[CHECK_SUBPSFPROTOS])
+      if ((check = prefs.check[CHECK_SUBPSFPROTOS]))
         addcheck(check, checkmask, pwidth,pheight, ix,iy,-flux[j]);
-      if (check = prefs.check[CHECK_PSFPROTOS])
+      if ((check = prefs.check[CHECK_PSFPROTOS]))
         addcheck(check, checkmask, pwidth,pheight, ix,iy,flux[j]);
       }
 
@@ -840,6 +845,7 @@ void svdfit(double *a, double *b, int m, int n, double *sol,
   
   QMALLOC(rv1, double, n);
   QMALLOC(tmp, double, n);
+  l = nm = nml = 0;			/* To avoid gcc -Wall warnings */
   for (i=0;i<n;i++)
     {
     l = i+1;

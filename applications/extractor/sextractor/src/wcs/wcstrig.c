@@ -37,7 +37,11 @@
 #include	"config.h"
 #endif
 
+#ifdef HAVE_MATHIMF_H
+#include <mathimf.h>
+#else
 #include <math.h>
+#endif
 #include "wcstrig.h"
 
 #ifndef PI	/* EB 02/06/97 */
@@ -45,6 +49,8 @@
 #endif		/* EB 02/06/97 */
 const double d2r = PI / 180.0;
 const double r2d = 180.0 / PI;
+
+#ifndef HAVE_MATHIMF_H
 
 double wcs_cosd(angle)
 
@@ -188,3 +194,5 @@ const double x, y;
 
    return atan2(y,x)*r2d;
 }
+
+#endif

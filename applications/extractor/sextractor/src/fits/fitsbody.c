@@ -9,7 +9,7 @@
 *
 *	Contents:       Handle memory allocation for FITS bodies.
 *
-*	Last modify:	03/02/2003
+*	Last modify:	06/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -78,7 +78,7 @@ PIXTYPE	*alloc_body(tabstruct *tab, void (*func)(PIXTYPE *ptr, int npix))
   if (size < body_ramleft)
     {
 /*-- There should be enough RAM left: try to do a malloc() */
-    if (tab->bodybuf = malloc(size))
+    if ((tab->bodybuf = malloc(size)))
       {
       QFSEEK(tab->cat->file, tab->bodypos, SEEK_SET, tab->cat->filename);
       read_body(tab, (PIXTYPE *)tab->bodybuf, npix);
@@ -192,22 +192,29 @@ INPUT	A pointer to the tab structure,
 OUTPUT	-.
 NOTES	.
 AUTHOR	E. Bertin (IAP)
-VERSION	03/02/2003
+VERSION	06/11/2003
  ***/
 void	read_body(tabstruct *tab, PIXTYPE *ptr, size_t size)
   {
-  catstruct	*cat;
-  char		*bufdata;
-  short		val16;
-  int		curval, dval;
+  catstruct		*cat;
+  unsigned char		cuval, cublank;
+  char			*bufdata,
+			cval, cblank;
+  unsigned short	suval, sublank;
+  short			val16, sval, sblank;
+  unsigned int		iuval, iublank;
+  int			curval, dval, blankflag, ival, iblank;
+  
   size_t	i, bowl, spoonful, npix;
   PIXTYPE	bs,bz;
 
-  bs = (PIXTYPE)tab->bscale;
-  bz = (PIXTYPE)tab->bzero;
 /* a NULL cat structure indicates that no data can be read */
   if (!(cat = tab->cat))
     return;
+
+  bs = (PIXTYPE)tab->bscale;
+  bz = (PIXTYPE)tab->bzero;
+  blankflag = tab->blankflag;
 
   switch(tab->compress_type)
     {
@@ -224,48 +231,120 @@ void	read_body(tabstruct *tab, PIXTYPE *ptr, size_t size)
         switch(tab->bitpix)
           {
           case BP_BYTE:
-            if (tab->bitsgn)
-              for (i=spoonful; i--;)
-                *(ptr++) = *(bufdata++)*bs + bz;
+            if (blankflag)
+	      {
+              if (tab->bitsgn)
+	        {
+                cblank = (char)tab->blank;
+                for (i=spoonful; i--;)
+                  *(ptr++) = ((cval = *(bufdata++)) == cblank)?
+			-BIG : cval*bs + bz;
+		}
+              else
+	        {
+                cublank = (unsigned char)tab->blank;
+                for (i=spoonful; i--;)
+                  *(ptr++) = ((cuval=*((unsigned char *)bufdata++))==cublank)?
+			-BIG : cuval*bs + bz;
+		}
+	      }
             else
-              for (i=spoonful; i--;)
-                *(ptr++) = *((unsigned char *)bufdata++)*bs + bz;
+	      {
+              if (tab->bitsgn)
+                for (i=spoonful; i--;)
+                  *(ptr++) = *(bufdata++)*bs + bz;
+              else
+                for (i=spoonful; i--;)
+                  *(ptr++) = *((unsigned char *)bufdata++)*bs + bz;
+	      }
             break;
 
           case BP_SHORT:
             if (bswapflag)
               swapbytes(bufdata, 2, spoonful);
-            if (tab->bitsgn)
-              for (i=spoonful; i--; bufdata += sizeof(short))
-                *(ptr++) = *((short *)bufdata)*bs + bz;
+            if (blankflag)
+	      {
+              if (tab->bitsgn)
+                {
+                sblank = (short)tab->blank;
+                for (i=spoonful; i--; bufdata += sizeof(short))
+                  *(ptr++) = ((sval = *((short *)bufdata)) == sblank)?
+			-BIG : sval*bs + bz;
+                }
+              else
+                {
+                sublank = (unsigned short)tab->blank;
+                for (i=spoonful; i--; bufdata += sizeof(unsigned short))
+                  *(ptr++) = ((suval=*((unsigned short *)bufdata)) == sublank)?
+			-BIG : suval*bs + bz;
+                }
+              }
             else
-              for (i=spoonful; i--; bufdata += sizeof(unsigned short))
-                *(ptr++) = *((unsigned short *)bufdata)*bs + bz;
+	      {
+              if (tab->bitsgn)
+                for (i=spoonful; i--; bufdata += sizeof(short))
+                  *(ptr++) = *((short *)bufdata)*bs + bz;
+              else
+                for (i=spoonful; i--; bufdata += sizeof(unsigned short))
+                  *(ptr++) = *((unsigned short *)bufdata)*bs + bz;
+	      }
             break;
 
           case BP_LONG:
             if (bswapflag)
               swapbytes(bufdata, 4, spoonful);
-            if (tab->bitsgn)
-              for (i=spoonful; i--; bufdata += sizeof(int))
-                *(ptr++) = *((int *)bufdata)*bs + bz;
+            if (blankflag)
+	      {
+              if (tab->bitsgn)
+                {
+                iblank = (int)tab->blank;
+                for (i=spoonful; i--; bufdata += sizeof(int))
+                  *(ptr++) = ((ival = *((int *)bufdata)) == iblank)?
+			-BIG : ival*bs + bz;
+                }
+              else
+                {
+                iublank = (unsigned int)tab->blank;
+                for (i=spoonful; i--; bufdata += sizeof(unsigned int))
+                  *(ptr++) = ((iuval = *((unsigned int *)bufdata)) == iublank)?
+			-BIG : iuval*bs + bz;
+                }
+	      }
             else
-              for (i=spoonful; i--; bufdata += sizeof(unsigned int))
-                *(ptr++) = *((unsigned int *)bufdata)*bs + bz;
-              break;
+	      {
+              if (tab->bitsgn)
+                for (i=spoonful; i--; bufdata += sizeof(int))
+                  *(ptr++) = *((int *)bufdata)*bs + bz;
+              else
+                for (i=spoonful; i--; bufdata += sizeof(unsigned int))
+                  *(ptr++) = *((unsigned int *)bufdata)*bs + bz;
+	      }
+            break;
 
           case BP_FLOAT:
             if (bswapflag)
               swapbytes(bufdata, 4, spoonful);
             for (i=spoonful; i--; bufdata += sizeof(float))
-              *(ptr++) = *((float *)bufdata)*bs + bz;
+              *(ptr++) = ((0x7f800000&*(unsigned int *)bufdata) == 0x7f800000)?
+			-BIG : *((float *)bufdata)*bs + bz;
             break;
 
           case BP_DOUBLE:
             if (bswapflag)
+	      {
               swapbytes(bufdata, 8, spoonful);
-            for (i=spoonful; i--; bufdata += sizeof(double))
-              *(ptr++) = *((double *)bufdata)*bs + bz;
+              for (i=spoonful; i--; bufdata += sizeof(double))
+                *(ptr++) = ((0x7ff00000 & *(unsigned int *)(bufdata+4))
+			== 0x7ff00000)?
+			-BIG : *((double *)bufdata)*bs + bz;
+              }
+            else
+              {
+              for (i=spoonful; i--; bufdata += sizeof(double))
+                *(ptr++) = ((0x7ff00000 & *(unsigned int *)bufdata)
+			== 0x7ff00000)?
+			-BIG : *((double *)bufdata)*bs + bz;
+	      }
             break;
 
           default:

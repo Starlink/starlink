@@ -42,6 +42,15 @@ extern "C" {
 #endif
 
 #if __STDC__ || defined(__cplusplus)
+#ifdef HAVE_MATHIMF_H
+#define wcs_cosd cosd
+#define wcs_sind sind
+#define wcs_tand tand
+#define wcs_acosd acosd
+#define wcs_asind asind
+#define wcs_atand atand
+#define wcs_atan2d atan2d
+#else
    double wcs_cosd(const double);
    double wcs_sind(const double);
    double wcs_tand(const double);
@@ -49,6 +58,7 @@ extern "C" {
    double wcs_asind(const double);
    double wcs_atand(const double);
    double wcs_atan2d(const double, const double);
+#endif
 #else
    double wcs_cosd();
    double wcs_sind();

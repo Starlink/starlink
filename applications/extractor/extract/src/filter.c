@@ -10,7 +10,7 @@
 *	Contents:	functions dealing with on-line filtering of the image
 *			(for detection).
 *
-*	Last modify:	13/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -63,6 +63,7 @@ void	convolve(picstruct *field, PIXTYPE *mscan)
     me = mw*thefilter->convh;
 
   memset(mscan, 0, sw*sizeof(PIXTYPE));
+  s0 = NULL;				/* To avoid gcc -Wall warnings */
   mask = thefilter->conv+m0;
   for (m = m0, mx = 0; m<me; m++, mx++)
     {
@@ -142,7 +143,7 @@ int	getconv(char *filename)
         if (i>MAXMASK)
           error(EXIT_FAILURE, "*Error*: Convolution mask too large in ",
 		filename);
-        }	while (sstr = strtok(null, " \t\n"));
+        }	while ((sstr = strtok(null, " \t\n")));
     if (j>n)
       n = j;
     }
@@ -288,12 +289,15 @@ void	neurfilter(picstruct *field, PIXTYPE *mscan)
    int		i,x, tflag;
 
   sig = field->backsig;
-  if (tflag = (prefs.nfilter_thresh>0))
+  if ((tflag = (prefs.nfilter_thresh>0)))
     {
     threshlow = prefs.filter_thresh[0]*field->backsig;
     threshhigh = (prefs.nfilter_thresh<2)?
 		BIG : prefs.filter_thresh[1]*field->backsig;
     }
+  else
+    threshlow = threshhigh = 0.0;	/* To avoid gcc -Wall warnings */
+
   for (x=0;x<field->width;x++)
     {
     if (tflag)
@@ -305,7 +309,6 @@ void	neurfilter(picstruct *field, PIXTYPE *mscan)
         continue;
 	}
       }
-
 /*-- Copy the surrounding image area to the retina */
     copyimage(field, thefilter->conv, thefilter->convw, thefilter->convh,
 		x, field->y);
@@ -344,6 +347,7 @@ void	convolve_image(picstruct *field, double *vig1,
     memcpy(vig2, vig1, width*height*sizeof(double));
     return;
     }    
+  s0 = NULL;				/* To avoid gcc -Wall warnings */
   mw = thefilter->convw;
   mw2 = mw/2;
   memset(vig2, 0, width*height*sizeof(double));

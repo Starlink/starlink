@@ -9,7 +9,7 @@
 *
 *	Contents:	global declarations.
 *
-*	Last modify:	02/04/2003
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -23,7 +23,6 @@ picstruct		thefield1,thefield2, thewfield1,thewfield2;
 objstruct		flagobj;
 obj2struct		flagobj2;
 extern obj2struct	outobj2;
-static obj2struct	*obj2 = &outobj2;
 float			ctg[37], stg[37];
 char			gstr[MAXCHAR];
 

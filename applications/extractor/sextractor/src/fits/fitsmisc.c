@@ -9,7 +9,7 @@
 *
 *	Contents:	miscellaneous functions.
 *
-*	Last modify:	13/06/2002
+*	Last modify:	14/05/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -23,6 +23,10 @@
 #include	<stdlib.h>
 #include	<string.h>
 
+#ifdef HAVE_MPI
+#include	<mpi.h>
+#endif
+
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
@@ -32,6 +36,10 @@ I hope it will never be used!
 */
 void	error(int num, char *msg1, char *msg2)
   {
+#ifdef HAVE_MPI
+  MPI_Finalize();
+#endif
+
   fprintf(stderr, "\n> %s%s\n\n",msg1,msg2);
   exit(num);
   }

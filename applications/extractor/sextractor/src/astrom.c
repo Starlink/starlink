@@ -9,7 +9,7 @@
 *
 *	Contents:	Astrometrical computations.
 *
-*	Last modify:	03/04/2003
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -20,6 +20,7 @@
 
 #include	<math.h>
 #include	<stdlib.h>
+#include	<string.h>
 
 #include 	"wcs/wcs.h"
 #include	"define.h"
@@ -27,6 +28,7 @@
 #include	"prefs.h"
 #include	"astrom.h"
 
+static obj2struct	*obj2 = &outobj2;
 
 /****************************** initastrom **********************************/
 /*
@@ -243,8 +245,8 @@ double	*compute_wcs(picstruct *field, double mx, double my)
   pixpos[0] = mx;
   pixpos[1] = my;
 
-  if (rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
-	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos0))
+  if ((rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
+	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos0)))
     error(EXIT_FAILURE, "*Error* in WCSlib: ", (char *)wcsrev_errmsg[rcode]);
 
 /* Compute the local distortion matrix */
@@ -254,8 +256,8 @@ double	*compute_wcs(picstruct *field, double mx, double my)
 /* Get world coordinates for vector 1,0 */
   pixpos[0] = mx + 1;
   pixpos[1] = my;
-  if (rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
-	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos))
+  if ((rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
+	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos)))
     error(EXIT_FAILURE, "*Error* in WCSlib: ", (char *)wcsrev_errmsg[rcode]);
 
   da = wcspos[0]-al;
@@ -271,8 +273,8 @@ double	*compute_wcs(picstruct *field, double mx, double my)
 /* Second one */
   pixpos[0] = mx;
   pixpos[1] = my + 1;
-  if (rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
-	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos))
+  if ((rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
+	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos)))
     error(EXIT_FAILURE, "*Error* in WCSlib: ", (char *)wcsrev_errmsg[rcode]);
 
   da = wcspos[0]-al;
