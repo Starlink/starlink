@@ -22,7 +22,7 @@
 
 use strict;
 
-my $VERSION = '0.5';		# %%VERSION%%
+my $VERSION = '0.5-1';		# %%VERSION%%
 my $RCSInfo = '$Revision$ $Date$ ';
 
 my $Usage = "$0 [OPTIONS] <NDF> or $0 --help";
@@ -1006,7 +1006,7 @@ while ($iterno < $iterationsleft) {
 # $astromfits.
 if ($insertwcs) {
     my $astcopyarg = sprintf ('this=%s result=%s', $lastastrom{wcs}, $NDF);
-    wmessaage ('info',
+    wmessage ('info',
 	       "Inserting derived WCS information into WCS component of $NDF");
     printf STDERR ("Inserting WCS information from %s into %s\n\tastcopyarg=%s\n",
 		   $lastastrom{wcs}, $NDF, $astcopyarg)
