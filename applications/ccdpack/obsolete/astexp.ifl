@@ -1,0 +1,68 @@
+interface ASTEXP
+
+   helplib 'CCDPACK_HELP:'
+
+   parameter IN
+      position    1
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'NDFs containing coordinate information'
+      helpkey     '*'
+   endparameter
+
+   parameter ASTFILE
+      position    2
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File containing AST frameset information'
+      helpkey     '*'
+   endparameter
+
+   parameter OUTDOMAIN
+      position 3
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Name for registration domain AST file (e.g. instrument name)'
+      default     'CCD_EXPORT'
+      helpkey     '*'
+   endparameter
+
+   parameter FITSID
+      type        LITERAL
+      access      READ
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'FITS header keyword to identify frameset in ASTFILE file'
+      helpkey     '*'
+   endparameter
+
+   parameter LOGTO              # Logging system interaction level
+      type        LITERAL
+      access      UPDATE
+      vpath       'GLOBAL,CURRENT,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logto'
+      prompt      'Write log to (Logfile,Terminal,Neither,Both)'
+      default     'Both'
+      helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      type        LITERAL
+      access      READ
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,CURRENT,DEFAULT'
+      association '<-global.ccdpack_logfile'
+      prompt      'Logfile name'
+      default     'CCDPACK.LOG'
+      helpkey  '*'
+   endparameter
+
+endinterface
+# $Id$
