@@ -357,7 +357,7 @@
           CALL MSG_SETD( 'A', PNT(1) )
           CALL MSG_SETD( 'B', PNT(2) )
         END IF
-        CALL AIO_IWRITE( OCH, 6, 'Axis origin : ^A ^B', STATUS )
+        CALL AIO_IWRITE( OCH, 6, 'Axis origin     : ^A ^B', STATUS )
 
 *    Centre of f.o.v
         CALL ADI_THERE( PRJID, 'NPOINT', THERE, STATUS )
@@ -374,7 +374,7 @@
             CALL MSG_SETD( 'A', PNT(1) )
             CALL MSG_SETD( 'B', PNT(2) )
           END IF
-          CALL AIO_IWRITE( OCH, 6, 'FOV position : ^A ^B', STATUS )
+          CALL AIO_IWRITE( OCH, 6, 'FOV position    : ^A ^B', STATUS )
         END IF
 
       ELSE

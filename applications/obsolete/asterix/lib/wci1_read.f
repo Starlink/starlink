@@ -109,7 +109,6 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! Object header
       CHARACTER*80		LABEL			! X,Y axis labels
-      CHARACTER*(DAT__SZLOC)	LOC			! Object locator
       CHARACTER*3		PRJ			! Projection name
       CHARACTER*3		SYS			! Coord system name
       CHARACTER*40		UNITS(2)		! X,Y axis units
@@ -145,9 +144,6 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Extract the locator
-      CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
 
 *  Initialise flags
       EPOK = .FALSE.
