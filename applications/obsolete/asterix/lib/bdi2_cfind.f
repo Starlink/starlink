@@ -88,11 +88,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *      3 Jun 1996 (DJA):
 *        General purpose FITS version derived from BDI1_CFIND
+*     30 Jan 1997 (RB):
+*        Hunt for the axis units and alter for ROSAT images
 *     {enter_changes_here}
 
 *  Bugs:
@@ -127,6 +130,7 @@
 *  Local Variables:
       CHARACTER*1		CAX			! Axis digit character
       CHARACTER*40		CRECOM			! Keyword comment
+      CHARACTER*40		UNITS			! Axis units if need changing
       CHARACTER*15		CREOBJ			! Created object
       CHARACTER*15		RTYPE, TYPE		! Data types
 
@@ -338,6 +342,17 @@ c     LOGICAL			ISBIND			! Binned dataset
           CALL ADI2_CFIND( FITID, ' ', '.AUNIT'//CAX, ' ', CREATE,
      :                     DELETE, 'CHAR', 0, 0, DIDCRE, CACHEID,
      :                     STATUS )
+
+*      If ROSAT image next best keyword and alter comment for value replacement
+          IF ( CACHEID .EQ. ADI__NULLID ) THEN
+            CALL ADI2_CFIND( FITID, ' ', '.CRVAL'//CAX, ' ', CREATE,
+     :                       DELETE, 'CHAR', 0, 0, DIDCRE, CACHEID,
+     :                       STATUS )
+            CALL ADI_CGET0C( CACHEID, 'Comment', UNITS, STATUS )
+            IF ( INDEX( UNITS, 'deg' ) .GT. 0 ) UNITS = 'degrees'
+            CALL ADI_CERASE( CACHEID, 'Value', STATUS )
+            CALL ADI_CNEWV0C( CACHEID, 'Value', UNITS, STATUS )
+          END IF
 
 *      Add extra info if we created the keyword
           IF ( DIDCRE ) THEN
