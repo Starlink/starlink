@@ -17,6 +17,115 @@
 
    The updated applications include: 
 
+   - GDSTATE:
+      o The bounds of the current picture can now be reported
+        in any of the co-ordinate Frames included in the WCS
+        information stored with the picture.
+
+      o The graphical attributes of the box drawn round the
+        current picture can now be controlled using the new STYLE 
+        parameter.
+
+      o The Domain of the current Frame associated with the
+        picture is now writen to an output parameter.
+
+      o The following parameters have been removed (alternatives to 
+        using these old parameters are indicated):
+
+        NCX1, NCX2, etc. -- Set FRAME=BASEPIC and use X1, X2, etc., 
+                remembering that NCX1 etc., referred to a Frame in
+	        which the longer axis had unit length, where-as the 
+                shorter axis has unit length in the BASEPIC Frame.
+
+        WCX1, WCX2, etc. -- Set FRAME=! and use X1, X2, etc.
+
+      o The following new parameters have been added: DESCRIBE,
+	EPOCH, FRAME, STYLE.
+
+   - IDSTATE: The changes made to GDSTATE have also been made to IDSTATE.
+
+   - SEGMENT:
+      o Input positions may now be supplied in the form of positions 
+        lists as produced by CURSOR, LISTMAKE, etc.
+
+      o In "Interface" and "File" modes, co-ordinates are now required 
+        in the current Frame of the first supplied input NDF.
+
+      o A wider range of graphics are now available to mark the supplied 
+        positions when using cursor mode, and the attributes of these 
+        graphics can now be controlled using the new STYLE parameter.
+
+      o The following parameters have been removed (alternatives to using 
+        these old parameters are indicated):
+
+        AXES -- Use new parameter USEAXIS. Note, if the data array has 
+                more than 2 dimensions and the axes of the current 
+                co-ordinate Frame are not parallel to the pixel axes, 
+                it is usually advisable to set the current co-ordinate
+                Frame to PIXEL before using SEGMENT.
+
+        CLEAR -- Use command "gdclear current" before runnning SEGMENT.
+
+        COLOUR -- Use the new STYLE parameter to set the Colour attribute.
+
+        COSYS -- Use application WCSFRAME to set the required co-ordinate 
+                 Frame first.
+
+      o The following new parameters have been added: INCAT1 - INCAT20, 
+        MARKER, STYLE, USEAXIS. 
+
+      o The following parameters have been changed:
+
+        COORDS -- Now has type LITERAL instead of _REAL. The position 
+                should be given as a pair of formatted axis value within 
+                the current co-ordinate Frame of the first specified 
+                input NDF.
+
+        MODE -- Now recognizes ``Catalogue'' as a valid value.
+
+        PLOT -- New values ``Chain'' and ``Mark'' replace the old 
+                value ``Cross''.
+
+        POLY1-POLY20 -- The supplied files should now contain positions 
+                in the current co-ordinate Frame of the first specified 
+                input NDF.
+
+   - ZAPLIN:
+      o Positions are now supplied and reported in the current co-ordinate 
+        Frame of the input NDF.
+
+      o A wider range of graphics are now available to mark the supplied 
+        image areas when using cursor mode, and the attributes of these 
+        graphics can now be controlled using the new STYLE parameter.
+
+      o The following parameters have been removed (alternatives to using 
+        these old parameters are indicated):
+
+        COSYS -- Use application WCSFRAME to set the required co-ordinate 
+                 Frame first.
+
+        MARK -- Use new parameter PLOT to specify the type of graphics to 
+                mark each position with.
+
+      o The following new parameters have been added: MARKER, PLOT, STYLE, 
+        USEAXIS. 
+
+      o The following parameters have been changed:
+
+        COLIN -- The text file supplied for parameter COLIN should now 
+                 contain axis values in the current co-ordinate Frame of 
+                 the input NDF.
+
+        COLOUT -- The created text file contains axis values in the current 
+                 co-ordinate Frame of the input NDF.
+
+        COLUMNS -- The supplied values should now refer to the first axis 
+                 in the current co-ordinate Frame of the input NDF.
+
+        LINES -- The suuplied values should now refer to the second axis in 
+                 the current co-ordinate Frame of the input NDF.
+
+
    Several other applications have been changed to PGPLOT but with
    no changes in the parameter list or visible functionality (e.g.
    , etc).
@@ -24,14 +133,64 @@
 
    Other changes include:
 
-     - 
+     - FITSDIN and FITSIN: Include support the new FITS WCS standards 
+       based on keywords CDi_j, PVj_m, etc., plus explicit support for 
+       the previous draft standard (based on PCjjjiii keywords), and  
+       the AIPS WCS system (based on keywords CDELTj and CROTAj).
 
-     - 
+     - GAUSMOOTH: The FWHM parameter can now accept values up to 10000.0.
 
+     - GLITCH:
+        o GLITCH has been rewritten to use the NDF library and 
+          thus can take advantage of NDF facilities including
+          sections and history, and can accept foreign-format files.
+
+        o Variance information is now propagated from input to
+          output. The variance associated with each replaced pixel
+          is the variance on the median of the corresponding input
+          pixels.
+
+        o When supplying the positions of bad pixels in a text 
+          file, the first line in no longer treated as an informational
+          header line. Each line in the file must be either a comment 
+          starting with the character \verb+#+ or \verb+!+, or a valid 
+          position in the current co-ordinate Frame of the input NDF.
+
+        o The supplied pixel positions now refer to the current 
+          co-ordinate Frame of the input NDF, which need not necessarily 
+          be pixel co-ordinates.
+
+        o Pixel positions can now be supplied in a positions list
+          catalogue such as created by CURSOR, LISTMAKE, etc.
+
+        o The WHERE parameter has been renamed as MODE, and the 
+          FILENAME parameter has been renamed as INFILE.
+
+        o The XCOORD and YCOORD parameters have been replaced by
+          the single parameter PIXPOS.
+
+        o The AGAIN parameter has been removed. Looping now always 
+          occurs in Interface mode unless a value for parameter
+          PIXPOS is supplied on the command line.
+
+     - NDFCOPY: New parameters TRIM, TRIMWCS and USEAXIS control the
+       removal of output axes which span only a single pixel. Thus,
+       NDFCOPY can now be used to extract a single plane from a cube
+       and create a genuinely 2 dimensional output image (previously,
+       the third pixel axis was retain with bounds spanning a single
+       pixel). 
+
+     - SURFIT: A new output parameter called RMS has been added. The 
+       RMS deviation of the fit from the original data (per pixel) is 
+       stored in this output parameter on exit.
 
    Various bugs have been fixed, the most noticable being:
 
-     - 
+     - PSF: bug fixed which caused PSF to fail if the search area contained 
+       any bad pixels.
 
-     - 
+     - GAUSMOOTH: bug fixed which could cause a segmentation violation.
+
+     - NDFTRACE: corrected the value written to the WCS output parameter.
+
 
