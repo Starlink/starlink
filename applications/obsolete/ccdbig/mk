@@ -10,18 +10,18 @@
 #     Application, Mk IVb
 #
 #  Purpose:
-#     Invoke make to build and install the CCDPACK package.
+#     Invoke make to build and install the CCDBIG package.
 #
 #  Type of Module:
 #     Shell script.
 #
 #  Description:
 #     This script should normally be used to invoke the make utility
-#     to build and install the CCDPACK package and to perform other
+#     to build and install the CCDBIG package and to perform other
 #     housekeeping tasks.  It invokes the make utility after first
 #     defining appropriate environment variables and macros for the
 #     computer system in use.  This file also serves to document the
-#     systems on which CCDPACK is implemented.
+#     systems on which CCDBIG is implemented.
 #
 #  Invocation:
 #     The user of this script should normally first define the SYSTEM
@@ -44,12 +44,6 @@
 #        alpha_OSF1
 #           DEC Alpha machines running OSF1
 #
-#        mips
-#           DECstations running Ultrix
-#
-#        sun4
-#           SUN Sparcstations running SunOS 4.x
-#
 #        sun4_Solaris
 #           SUN Sparcstations running SunOS 5.x (Solaris)
 #
@@ -71,9 +65,11 @@
 #
 #  Notes on Porting:
 #     If your machine or system setup does not appear in this script,
-#     then it should be possible to build and install CCDPACK by
+#     then it should be possible to build and install CCDBIG by
 #     adding a new case to this script with appropriate definitions
 #     (probably based on one of the existing implementations).
+#     Some of the scripts in the CCDBIG package however are quite 
+#     system-dependent and some care may be needed in porting them.
 #
 #  make Macros:
 #     The following "global" make macros are used in the associated
@@ -199,6 +195,7 @@
 #     AJC: A.J.Chipperfield (Starlink, RAL)
 #     PDRAPER: P.W.Draper (Starlink, Durham University)
 #     BKM: B.K.McIlwrath (Starlink, RAL)
+#     MBT: M.B.Taylor (Starlink, Cambridge University)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -222,6 +219,8 @@
 #        Converted for use in CCDPACK.
 #     7-AUG-1996 (BKM):
 #        Linux support added.
+#     16-JUN-1998 (MBT):
+#        Adapted for use in CCDBIG.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -240,12 +239,6 @@
       export RANLIB
       export TAR_IN
       export TAR_OUT
-
-#  CCDPACK specific definitions.
-      export TCL_SCRIPTS
-      export STANDALONE_SCRIPTS
-      export PLATFORM_TCLBINARIES
-      export HAVE_NAG
 
 #  Check that the SYSTEM environment variable is defined.
       if test "$SYSTEM" = ""; then
@@ -271,41 +264,6 @@
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xmf'
-               HAVE_NAG=1
-               echo "mk: Environment variables defined for $SYSTEM system"
-               ;;
-
-#  DECstations:
-#  ===========
-#  DECstations running Ultrix.
-#  --------------------------
-            mips)
-               AR_IN='ar -r'
-               CC='c89'
-               CFLAGS='-I$(STAR_INC) -I. -O'
-               FC='f77'
-               FFLAGS='-O'
-               LINK='ln -s'
-               RANLIB='ranlib'
-               TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xmf'
-               echo "mk: Environment variables defined for $SYSTEM system"
-               ;;
-
-#  SUN4 systems:
-#  ============
-#  SUN Sparcstations running SunOS 4.x.
-#  -----------------------------------
-            sun4)
-               AR_IN='ar r'
-               CC='gcc'
-               CFLAGS='-I$(STAR_INC) -I. -O'
-               FC='f77'
-               FFLAGS='-O'
-               LINK='ln -s'
-               RANLIB='ranlib'
-               TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xmf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -320,7 +278,6 @@
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xmf'
-               HAVE_NAG=1
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -338,9 +295,6 @@
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xmf'
-#               TCL_SCRIPTS=''
-#               STANDALONE_SCRIPTS=''
-#               PLATFORM_TCLBINARIES=''
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
