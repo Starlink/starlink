@@ -37,9 +37,9 @@
 *        It should be set to 6.
 *     CMPTHE( NFLAGS ) = LOGICAL (Returned)
 *        The flags when set to true indicate that certain optional NDF
-*        components have been used to write descriptors to the BDF.
-*        In order they are 1) CRVARn and CDELTn, 2) CRTYPEn, 3) CTYPEn,
-*        4) TITLE, 5) LABEL, and 6) UNITS.
+*        components have been used to write descriptors to the NDF.
+*        In order they are 1) CRVARn, CDELTn, and CRPIXn 2) CTYPEn,
+*        3) CUNITn, 4) TITLE, 5) LABEL, and 6) UNITS.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -50,7 +50,7 @@
 *           the NDF data array.
 *        -  The TITLE, LABEL, and BUNITS descriptors are derived from
 *           the TITLE, LABEL, and UNITS NDF components respectively.
-*        -  The CDELTn, CRVALn, CRTYPEn and CTYPEn descriptors are
+*        -  The CDELTn, CRVALn, CTYPEn and CUNITn descriptors are
 *           derived from a set of linear NDF AXIS structures. 
 *        -  The standard order of the FITS keywords is preserved.
 *           No FITS comments are written following the values of the
@@ -74,7 +74,10 @@
 *  History:
 *     1992 September 15 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1996 September 16 (MJC):
+*        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
+*        for axis units.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -263,11 +266,12 @@
 *  ====================
 *      
 *  For any axis structure present, the routine checks to see if each
-*  axis data array is linear. If it is, the start value and incremental
-*  value are written to the appropriate CRVALn and CDELTn headers,
-*  as are the label and units, if present, to CRTYPEn and CTYPEn
-*  respectively.  This is rather crude, as it deals with the axis 
-*  system as a whole, and that the flags to indicate presence of 
+*  axis data array is linear.  If it is, the start value and
+*  incremental value are written to the appropriate CRVALn and CDELTn
+*  keywords defined at a reference pixel 1.0 written to the CRPIXn
+*  keyword, as are the label and units, if present, to CTYPEn and
+*  CUNITn respectively.  This is rather crude, as it deals with the
+*  axis system as a whole, and that the flags to indicate presence of
 *  components are for any of the axes.
       DO I = 1, NDIM 
          CALL NDF_ASTAT( NDF, 'Centre', I, THERE, STATUS )
@@ -364,8 +368,35 @@
      :              /'^IOSTAT.', STATUS )
                END IF
 
-*  Write the label value to header CRTYPEn.
-*  ========================================
+*  Write the incremental value to header CRPIXn.
+*  =============================================
+
+*  Form a FITS-like card image for the ASCII file.  Right justify the
+*  value.
+               CALL CHR_RTOC( INCREM, CVALUE, NCHAR )      
+               VALUE = ' '
+               VALUE( SZVAL-NCHAR+1:SZVAL ) = CVALUE( 1:NCHAR )
+               DESCR = ' '
+               CALL CHR_ITOC( I, C, NCD )
+               DESCR( 1:8 ) = 'CRPIX'//C( 1:NCD )
+               DESCR( 9: ) = '= '//VALUE( :SZVAL )//' / Axis '/
+     :                       /C( 1:NCD )//' reference pixel'
+
+               IF ( ASCII ) THEN
+
+*  Write this header to the ASCII file.
+                  CALL FIO_WRITE( FD, DESCR, STATUS )
+               ELSE
+
+*  Write this header to the unformatted file.
+                  WRITE( LUN, IOSTAT=FIOSTA ) DESCR
+                  CALL FIO_REP( LUN, ' ', FIOSTA, 'Error writing a '/
+     :              /'header record to file ^FNAME.  Reason was '/
+     :              /'^IOSTAT.', STATUS )
+               END IF
+
+*  Write the label value to header CTYPEn.
+*  =======================================
 
 *  See whether an axis label is present or not.
                AXLFND = .FALSE.
@@ -381,7 +412,7 @@
                   IF ( NCT .GT. 0 ) THEN
                      DESCR = ' '
                      CALL CHR_ITOC( I, C, NCD )
-                     DESCR( 1:8 ) = 'CRTYPE'//C( 1:NCD )
+                     DESCR( 1:8 ) = 'CTYPE'//C( 1:NCD )
 
 *  Look to see if the axis-label string is longer than a normal
 *  character value (18 characters).  If it is not, append a comment in
@@ -428,7 +459,7 @@
                   END IF
                END IF
 
-*  Write the units value to header CTYPEn.
+*  Write the units value to header CUNITn.
 *  =======================================
 
 *  See whether an axis units is present or not.
@@ -445,7 +476,7 @@
                   IF ( NCT .GT. 0 ) THEN
                      DESCR = ' '
                      CALL CHR_ITOC( I, C, NCD )
-                     DESCR( 1:8 ) = 'CTYPE'//C( 1:NCD )
+                     DESCR( 1:8 ) = 'CUNIT'//C( 1:NCD )
 
 *  Look to see if the axis-units string is longer than a normal
 *  character value (18 characters).  If it is not, append a comment in
