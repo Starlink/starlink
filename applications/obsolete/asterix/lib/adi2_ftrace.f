@@ -78,6 +78,8 @@
 *        Get the full path name properly.
 *      8 May 1997 (RB):
 *        Put in a proper PATH value.
+*     25 Jun 1997 (RB):
+*        Trim out any remaining relative FILE bits.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -111,7 +113,7 @@
 
       INTEGER			FSTAT			! I/o status code
       INTEGER			LUN			! Logical unit number
-      INTEGER			I
+      INTEGER			I, J			! String positions
 *.
 
 *  Check inherited global status.
@@ -141,6 +143,18 @@
       IF ( FILE(1:1) .NE. '/') THEN
         FILE = PWD(:CHR_LEN(PWD)) // '/' // FILE(:CHR_LEN(FILE))
       END IF
+
+*  Trim the returned FILE of any relative (../) directions
+      I = INDEX( FILE, '../' )
+      DO WHILE ( I .GT. 0 )
+        J = I + 3
+        I = I - 2
+        DO WHILE ( FILE(I:I) .NE. '/' )
+          I = I - 1
+        END DO
+        FILE = FILE(1:I) // FILE(J:CHR_LEN(FILE))
+        I = INDEX( FILE, '../' )
+      END DO
 
 *  Extract PATH from the end of FILE
       PATH = FILE

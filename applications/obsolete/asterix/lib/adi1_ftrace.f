@@ -68,11 +68,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     20 Mar 1995 (DJA):
 *        Original version.
+*     25 Jun 1997 (RB):
+*        Trim relative FILE names.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -106,6 +109,7 @@
       CHARACTER*(DAT__SZLOC)	LOC			! Object locator
 
       INTEGER			NLEV			! Levels of structure
+      INTEGER			I, J			! String positions
 *.
 
 *  Check inherited global status.
@@ -116,6 +120,18 @@
 
 *  Invoke the HDS trace routine
       CALL HDS_TRACE( LOC, NLEV, PATH, FILE, STATUS )
+
+*  Trim the returned FILE of any relative (../) directions
+      I = INDEX( FILE, '../' )
+      DO WHILE ( I .GT. 0 )
+        J = I + 3
+	I = I - 2
+	DO WHILE ( FILE(I:I) .NE. '/' )
+          I = I - 1
+        END DO
+        FILE = FILE(1:I) // FILE(J:CHR_LEN(FILE))
+        I = INDEX( FILE, '../' )
+      END DO
 
 *  Create return object and poke HDS values into it
       IF ( STATUS .EQ. SAI__OK ) THEN
