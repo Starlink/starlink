@@ -332,6 +332,12 @@ main (int argc, char **argv)
 #ifdef FAKE_PROGNAME
 		cout << "FAKE_PROGNAME=" << FAKE_PROGNAME << '\n';
 #endif
+#ifdef DEFAULT_MFMODE
+		cout << "DEFAULT_MFMODE=" << DEFAULT_MFMODE << '\n';
+#endif
+#ifdef DEFAULT_RESOLUTION
+		cout << "DEFAULT_RESOLUTION=" << DEFAULT_RESOLUTION << '\n';
+#endif
 		if (*++*argv == 'V')
 		    cout << RCSID << '\n';
 		exit(0);	// ...and exit
