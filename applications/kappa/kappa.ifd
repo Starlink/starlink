@@ -10659,6 +10659,8 @@ package kappa {
 
       }
 
+iraf! {
+
       icl {defstring kaph(elp) !$KAPPA_DIR/kaphelp}
       icl {defstring kap_kaph(elp) !$KAPPA_DIR/kaphelp}
       action kaphelp {
@@ -10707,6 +10709,7 @@ package kappa {
           }
 
       }
+}
 
       action laplace {
          alias {lapl(ace)}
@@ -13861,16 +13864,6 @@ package kappa {
             ppath CURRENT
             prompt {File of x-y positions}
             helpkey *
-          }
-
-         parameter cosys {
-            type LITERAL
-            vpath GLOBAL DEFAULT
-            ppath GLOBAL DYNAMIC
-            prompt {Co-ordinate system}
-            association <->GLOBAL.COORD_SYSTEM
-            helpkey *
-            default World
           }
 
          parameter cut {
@@ -17525,7 +17518,13 @@ package kappa {
    command picgrid {
       alias {picg(rid)}
       task picdef {
+         taskinherit current
          taskinherit device
+         taskinherit fill
+         taskinherit labelno
+         taskinherit outline
+         taskinherit xpic
+         taskinherit ypic
          taskparam mode=array
          taskparam fraction=1.0
          taskparam prefix=""
@@ -17543,7 +17542,11 @@ package kappa {
    command picxy {
       alias {picx(y)}
       task picdef {
+         taskinherit current
          taskinherit device
+         taskinherit lbound
+         taskinherit outline
+         taskinherit ubound
          taskparam mode=xy
          taskparam fraction=1.0
       }
