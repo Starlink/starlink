@@ -360,8 +360,8 @@
         CALL ADI_CGET0C( SYSID, 'NAME', SYS, STATUS )
 
 *    Name of projection
-        CALL ADI_CGET0C( PRJID, 'NAME', PRJ, STATUS )
-        CALL AIO_IWRITE( OCH, 6, 'Projection name : '//PRJ, STATUS )
+        CALL ASHOW_OB( PRJID, 'NAME', 'C', 'Projection name', ' ',
+     :                'np', OCH, STATUS )
 
 *    Axis origin
         CALL ADI_CGET1D( PRJID, 'SPOINT', 2, PNT, NVAL, STATUS )
