@@ -23,7 +23,7 @@
       REAL DEGTOMIN,SECTOMIN
       PARAMETER (DEGTOMIN=60.0,SECTOMIN=1.0/60.0)
 *    Local variables :
-      CHARACTER*1 ESC,U,D
+      CHARACTER*1 ESC
       CHARACTER RALBL*25,DECLBL*25
       CHARACTER*20 XOPT,YOPT
       DOUBLE PRECISION DECRAD
@@ -216,8 +216,6 @@
 
 *  fix for linux as it doesn't like backslash in string litorals
           ESC=CHAR(92)
-          U=CHAR(92)//'u'
-          D=CHAR(92)//'d'
 
 *  x-axis numbers
           IF (RA1.GT.RA2) THEN
@@ -228,10 +226,10 @@
               SS=NINT(MOD(POS*60.0,60.0))
               IF (XSEC) THEN
                 WRITE(RALBL,'(I2,A,I2.2,A,I2.2)',IOSTAT=DUMMY)
-     :                HH,U//'h'//D,MM,U//'m'//D,SS
+     :            HH,ESC//'uh'//ESC//'d',MM,ESC//'um'//ESC//'d',SS
               ELSE
                 WRITE(RALBL,'(I2,A,I2.2)',IOSTAT=DUMMY)
-     :                               HH,U//'h'//D,MM
+     :                               HH,ESC//'uh'//ESC//'d',MM
               ENDIF
               RELPOS=(RA1-POS)/RARAN
               CALL PGMTEXT('B',1.3,RELPOS,0.5,RALBL)
