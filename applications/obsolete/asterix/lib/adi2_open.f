@@ -92,15 +92,17 @@
       INTEGER			ID
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
       CHARACTER*132		ERRTEXT			! FITS error text
+      CHARACTER*20		HDUTYPE			! HDU type
       CHARACTER*80		KEYWRD			! Keyword name
 
       INTEGER			BSIZE			! FITS block size
       INTEGER			FITSTAT			! FITS inherited status
       INTEGER			HDU			! HDU number
+      INTEGER			MODE			! FITSIO mode
       INTEGER			LFILEC			! Last char in filename
       INTEGER			LUN			! Logical unit number
 *.
@@ -117,6 +119,13 @@
 *    Allocated ok?
       IF ( STATUS .EQ. SAI__OK ) THEN
 
+*      Parse access mode
+        IF ( (MODE(1:1) .EQ. 'R') .OR. (MODE(1:1) .EQ. 'r') ) THEN
+          IMODE = 0
+        ELSE IF ( (MODE(1:1) .EQ. 'U') .OR. (MODE(1:1) .EQ. 'u') ) THEN
+          IMODE = 1
+        END IF
+
 *      Try to open file
         FITSTAT = 0
         CALL FTOPEN( LUN, FSPEC(:LFILEC), MODE, BSIZE, FITSTAT )
@@ -126,6 +135,16 @@
 
 *        Skip to HDU if specified
           IF ( HDU .GT. 0 ) THEN
+            CALL FTMRHD( LUN, HDU, HDUTYPE, FITSTAT )
+            IF ( FITSTAT .NE. 0 ) THEN
+              STATUS = SAI__ERROR
+              CALL MSG_SETI( 'HDU', HDU )
+              CALL ERR_REP( ' ', 'Unable to move to HDU ^HDU', STATUS )
+              CALL FTGERR( FITSTAT, ERRTEXT )
+              CALL MSG_SETC( 'REASON', ERRTEXT )
+              CALL ERR_REP( ' ', '^REASON', STATUS )
+            END IF
+
           END IF
 
 *        Write HDU number
