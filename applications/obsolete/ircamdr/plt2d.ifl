@@ -1,0 +1,2595 @@
+interface PLT2D
+
+# PARAMETERS FOR ICL VERSION
+#---------------------------
+
+parameter HOST
+  type '_char'
+  vpath 'internal'
+  default 'VAX'
+endparameter
+       
+parameter IDIR_PREFIX
+  type '_char'
+  vpath 'internal'
+  default 'IDIR:I'
+endparameter
+       
+parameter QUADMAG
+  type '_real'
+  vpath 'internal'
+  default 1.0
+endparameter
+      
+parameter DISP_AP1
+  type '_real'
+  vpath 'internal'
+  default 5.0
+endparameter
+
+parameter DISP_AP2
+  type '_real'
+  vpath 'internal'
+  default 7.0
+endparameter
+      
+parameter DISP_AP3
+  type '_real'
+  vpath 'internal'
+  default 9.0
+endparameter
+      
+parameter JUMBO
+  type '_integer'
+  vpath 'internal'
+  default 5
+endparameter
+      
+parameter ROSUF
+  type '_char'
+  vpath 'internal'
+  default 'NONE'
+endparameter
+      
+parameter ZEROJ
+  type '_real'
+  vpath 'internal'
+  default 0.0
+endparameter
+      
+parameter ZEROH
+  type '_real'
+  vpath 'internal'
+  default 0.0
+endparameter
+
+parameter ZEROK
+  type '_real'
+  vpath 'internal'
+  default 0.0
+endparameter
+      
+parameter ZERONBL
+  type '_real'
+  vpath 'internal'
+  default 0.0
+endparameter
+      
+parameter ZEROLP
+  type '_real'
+  vpath 'internal'
+  default 0.0
+endparameter
+      
+parameter ZERONBM
+  type '_real'
+  vpath 'internal'
+  default 0.0
+endparameter
+      
+parameter DISP_MAG
+  type '_real'
+  vpath 'internal'
+  default 2.0
+endparameter
+      
+parameter DISP_NS
+  type '_integer'
+  vpath 'internal'
+  default 5
+endparameter
+      
+parameter FILETYPE
+  type '_integer'
+  vpath 'internal'
+  default 1
+endparameter
+                    
+parameter CONTNAME
+  type '_char'
+  vpath 'internal'
+  default 'UNDEFINED'
+endparameter
+
+parameter CONTAINER
+  type 'structure'
+  vpath 'internal'
+endparameter
+
+parameter IMAGE_NO
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter OBJECT_NAME
+  type '_char'
+  vpath 'internal'
+  default 'UNDEFINED'
+endparameter
+
+parameter FILTER
+  type '_char'
+  vpath 'internal'
+  default 'UNDEFINED'
+endparameter
+
+parameter AIRMASS_START
+  type '_real'
+  vpath 'internal'
+  default -999.99
+endparameter
+
+parameter AIRMASS
+  type '_real'
+  vpath 'internal'
+  default -999.99
+endparameter
+
+parameter AIRMASS_END
+  type '_real'
+  vpath 'internal'
+  default -999.99
+endparameter
+
+parameter NUMBER_EXP
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter NUMBER_COADDS
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter EXPOSURE_TIME
+  type '_real'
+  vpath 'internal'
+  default -999.99
+endparameter
+
+parameter RA_OFF
+  type '_real'
+  vpath 'internal'
+  default -999.99
+endparameter
+
+parameter DEC_OFF
+  type '_real'
+  vpath 'internal'
+  default -999.99
+endparameter
+
+parameter PIX_SIZE
+  type '_real'
+  vpath 'internal'
+  default 0.286
+endparameter
+
+parameter MAGNIFIER
+  type '_char'
+  vpath 'internal'
+  default 'OUT'
+endparameter
+
+parameter FITS_AMST
+  type '_integer'
+  vpath 'internal'
+  default 25
+endparameter
+
+parameter FITS_AMEND
+  type '_integer'
+  vpath 'internal'
+  default 26
+endparameter
+
+parameter FITS_EXP
+  type '_integer'
+  vpath 'internal'
+  default 8
+endparameter
+
+parameter FITS_NEXP
+  type '_integer'
+  vpath 'internal'
+  default 6
+endparameter
+
+parameter FITS_FILTER
+  type '_integer'
+  vpath 'internal'
+  default 36
+endparameter
+
+parameter FITS_OBJECT
+  type '_integer'
+  vpath 'internal'
+  default 2
+endparameter
+
+parameter FITS_RAOFF
+  type '_integer'
+  vpath 'internal'
+  default 21
+endparameter
+
+parameter FITS_DECOFF
+  type '_integer'
+  vpath 'internal'
+  default 22
+endparameter
+
+parameter FITS_PIXSIZE
+  type '_integer'
+  vpath 'internal'
+  default 40
+endparameter
+
+parameter FITS_MAGNIFY
+  type '_integer'
+  vpath 'internal'
+  default 39
+endparameter
+
+parameter WORKNUM
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter WORKNAM
+  type '_char'
+  vpath 'internal'
+  default 'UNDEFINED'
+endparameter
+
+parameter IMAGE_WORKSTN
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter CURSOR_WORKSTN
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter HARD_WORKSTN
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter HARD_DEVICE
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter WORKXCEN
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter WORKYCEN
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter LAST_LUT
+  type '_char'
+  vpath 'internal'
+  default 'LIRCAMDIR:GREY'
+endparameter
+
+parameter NAME_IMAGE
+  type '_char'
+  vpath 'internal'
+  default 'LIRCAMDIR:LOGO'
+endparameter
+
+parameter LAST_PLOT
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter CUR_POS
+  type '_integer'
+  vpath 'internal'
+  default 1
+endparameter
+
+parameter NAME_PREFIX
+  type '_char'
+  vpath 'internal'
+  default 'UNKNOWN'
+endparameter
+
+parameter PLATSCAL
+  type '_real'
+  vpath 'internal'
+  default 1.0
+endparameter
+
+parameter CONT_FLAG
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter CUT_FLAG
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+parameter LAST_LINE
+  type '_integer'
+  vpath 'internal'
+  default 0
+endparameter
+
+parameter TEKLINE
+  type '_char'
+  vpath 'internal'
+  default 'UNKNOWN'
+endparameter
+
+parameter COLOUR_STATE
+  type '_integer'
+  vpath 'internal'
+  default -999
+endparameter
+
+# DEVICE TYPE
+# -----------
+
+parameter DEVICE_NAME
+  type '_char'
+  vpath 'internal'
+  default '5688'
+endparameter
+
+parameter TEK_LINE
+  type '_char'
+  vpath 'internal'
+  default 'LOCAL'
+endparameter
+
+parameter DEVICE_OPENED
+  type '_char'
+  vpath 'internal'
+  default 'NO'
+endparameter
+
+parameter NUM_LINECOL
+  type '_integer'
+  vpath 'internal'
+  default 32
+endparameter
+
+parameter LPENMIN
+  type '_integer'
+  vpath 'internal'
+  default 255
+endparameter
+
+parameter LPENMAX
+  type '_integer'
+  vpath 'internal'
+  default 255
+endparameter
+
+# GPX WINDOW POSN/SIZE
+# --------------------
+
+parameter GPX_XORIG
+  type '_real'
+  vpath 'internal'
+  default 2.0
+endparameter
+
+parameter GPX_YORIG
+  type '_real'
+  vpath 'internal'
+  default 2.0
+endparameter
+
+parameter GPX_XSIZE
+  type '_integer'
+  vpath 'internal'
+  default 800
+endparameter
+
+parameter GPX_YSIZE
+  type '_integer'
+  vpath 'internal'
+  default 700
+endparameter
+
+# IMAGE PARAMETERS
+# ----------------
+
+parameter IMAGE_NAME
+  type 'image'
+  default LIRCAMDIR:LOGO
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_IMAGE
+  type 'image'
+  default LIRCAMDIR:LOGO
+  vpath 'internal'
+endparameter
+
+parameter CUT_IMAGE
+  type 'image'
+  default LIRCAMDIR:LOGO
+  vpath 'internal'
+endparameter
+
+parameter CURSOR_IMAGE
+  type 'image'
+  default LIRCAMDIR:LOGO
+  vpath 'internal'
+endparameter
+
+parameter CT_NAME
+  type 'colourtable'
+  default LIRCAMDIR:HEAT
+  vpath 'internal'
+endparameter
+
+parameter SCRATCH_NAME
+  type 'image'
+  default ADAM_USER:PLT2D_SCRATCH
+  vpath 'internal'
+endparameter
+
+parameter NUM_IMAGES
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter BUFFER_CODE
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter WAIT_FLAG
+  type '_char'
+  default 'WAIT'
+  vpath 'internal'
+endparameter
+
+parameter DUMPFILE
+  type '_char'
+  default 'QUICKY.DAT'
+  vpath 'internal'
+endparameter
+
+parameter PLOT_WHICH
+  type '_char'
+  default 'PLOT'
+  vpath 'internal'
+endparameter
+
+parameter IMAGE_ORIENT
+  type '_char'
+  default 'OTHER'
+  vpath 'internal'
+endparameter
+
+parameter USE_CURSOR
+  type '_char'
+  default 'NO'
+  vpath 'internal'
+endparameter
+
+parameter FF_FILE
+  type '_char'
+  default 'NO'
+  vpath 'internal'
+endparameter
+
+
+# MAXIMUM AND MINIMUM VALUES
+# --------------------------
+
+parameter MINIMUM
+  type '_real'
+  default 0
+  vpath 'internal'
+endparameter
+
+parameter MAXIMUM
+  type '_real'
+  default 0
+  vpath 'internal'
+endparameter
+
+parameter CALCULATED_MIN
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CALCULATED_MAX
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter IMAGE_CALMAG
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_CALMAG
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter POLAX_CALMAG
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CUT_CALMAG
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter MAX_XSIZE
+  type '_integer'
+  default 512
+  vpath 'internal'
+endparameter
+
+parameter MAX_YSIZE
+  type '_integer'
+  default 512
+  vpath 'internal'
+endparameter
+
+
+# IMAGE POSITION VALUES
+# ---------------------
+
+parameter IM_XCEN
+  type '_real'
+  default 0
+  vpath 'internal'
+endparameter
+
+parameter IM_YCEN
+  type '_real'
+  default 0
+  vpath 'internal'
+endparameter
+
+parameter IM_XST
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter IM_XEN
+  type '_real'
+  default 768.0
+  vpath 'internal'
+endparameter
+
+parameter IM_YST
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter IM_YEN
+  type '_real'
+  default 512.0
+  vpath 'internal'
+endparameter
+
+# IMAGE SECTION VARIABLES
+# -----------------------
+
+parameter SUBIM_OPTION
+  type '_char'
+  default 'A'
+  vpath 'internal'
+endparameter
+
+parameter SUBIM_XST
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter SUBIM_YST
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter SUBIM_XEN
+  type '_integer'
+  default 32
+  vpath 'internal'
+endparameter
+
+parameter SUBIM_YEN
+  type '_integer'
+  default 32
+  vpath 'internal'
+endparameter
+
+
+# NSIGMA SECTION VARIABLES
+# ------------------------
+
+parameter SIGMA_LEVEL
+  type '_real'
+  default 3
+  vpath 'internal'
+endparameter
+
+parameter SIGMA_UP
+  type '_real'
+  default 5
+  vpath 'internal'
+endparameter
+
+parameter SIGMA_DOWN
+  type '_real'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter NSIGMA_SORT
+  type '_char'
+  default 'SAME'
+  vpath 'internal'
+endparameter
+
+parameter NSIGMA_CALC
+  type '_char'
+  default 'FULL'
+  vpath 'internal'
+endparameter
+
+parameter NSIGMA_XST
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter NSIGMA_YST
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter NSIGMA_XSZ
+  type '_integer'
+  default 16
+  vpath 'internal'
+endparameter
+
+parameter NSIGMA_YSZ
+  type '_integer'
+  default 16
+  vpath 'internal'
+endparameter
+
+parameter PLOT_RANGE
+  type '_real'
+  default 100.0
+  vpath 'internal'
+endparameter
+
+parameter VARGREY_XPC
+  type '_real'
+  default 50.0
+  vpath 'internal'
+endparameter
+
+parameter VARGREY_YPC
+  type '_real'
+  default 50.0
+  vpath 'internal'
+endparameter
+
+
+# IMAGE SIZE VARIABLES
+# --------------------
+
+parameter ARCSEC_PIXEL
+  type '_real'
+  default 1.0
+  vpath 'internal'
+endparameter
+
+parameter IM_XSIZE
+  type '_integer'
+  default 58
+  vpath 'internal'
+endparameter
+
+parameter IM_YSIZE
+  type '_integer'
+  default 62
+  vpath 'internal'
+endparameter
+
+parameter MAGNIFICATION
+  type '_real'
+  default 1.0
+  vpath 'internal'
+endparameter
+
+
+# PEN VARIABLES
+# -------------
+
+parameter PEN_NUMBER
+  type '_integer'
+  default 0
+  vpath 'internal'
+endparameter
+
+parameter GUN_SPEC
+  type '_char'
+  default 'COLOUR'
+  vpath 'internal'
+endparameter
+
+parameter GUN_1
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter GUN_2
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter GUN_3
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter COLBLOCK_PEN
+  type '_integer'
+  default 199
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_PENANN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_PENAXE
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_PENNUM
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_PENTIC
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_PENCON
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_PENCON1
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_PENCON2
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CROSS_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CUT_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CUT_PENANNOT
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter ANNOTATE_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter DEFANN_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter LABEL_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter BORDER_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter BOX_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CIRCLE_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter COMMENT_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter ELLIPSE_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter LINE_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter GRID_PEN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PEN1
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PEN2
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PEN3
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PEN4
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PEN5
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PENANN
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PENAXE
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PENNUM
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PENTIC
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_PENVEC
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+
+# COLOUR VARIABLES
+# ----------------
+
+parameter PEN_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter COLBLOCK_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CUT_COLANNOT
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter COMMENT_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CIRCLE_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CROSS_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter DEFANN_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter ELLIPSE_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter GRID_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter BORDER_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter BOX_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter LABEL_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter LINE_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter ANNOTATE_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CUT_COLOUR
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COL1
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COL2
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COLANN
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COLAXE
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COLNUM
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COLTIC
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COLCON
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COLCON1
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COLCON2
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+
+# COLOUR TABLE VARIABLES
+# ----------------------
+
+parameter CT_DIRECTION
+  type '_char'
+  default 'CORRECT'
+  vpath 'internal'
+endparameter
+
+parameter CT_XCEN
+  type '_integer'
+  default 505
+  vpath 'internal'
+endparameter
+
+parameter CT_YCEN
+  type '_integer'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter CT_SCALE
+  type '_integer'
+  default 2
+  vpath 'internal'
+endparameter
+
+parameter CT_ORIENTATION
+  type '_char'
+  default 'VERTICAL'
+  vpath 'internal'
+endparameter
+
+parameter CT_ANNOTATION
+  type '_char'
+  default 'NO_ANNOTATION'
+  vpath 'internal'
+endparameter
+
+parameter BLOCKNUM_WHERE
+  type '_char'
+  default 'WHO_KNOWS'
+  vpath 'internal'
+endparameter
+
+
+# COMMENT VARIABLES
+# -----------------
+
+parameter COMMENT_WORD
+  type '_char'
+  default 'RUBBISH'
+  vpath 'internal'
+endparameter
+
+parameter COMMENT_SIZE
+  type '_real'
+  default 10.0
+  vpath 'internal'
+endparameter
+
+parameter COMMENT_ORIENT
+  type '_char'
+  default 'HR'
+  vpath 'internal'
+endparameter
+
+parameter COMMENT_FONT
+  type '_integer'
+  default 106
+  vpath 'internal'
+endparameter
+
+parameter COMMENT_PREC
+  type '_integer'
+  default 2
+  vpath 'internal'
+endparameter
+
+parameter COMMENT_XPOS
+  type '_real'
+  default 384.0
+  vpath 'internal'
+endparameter
+
+parameter COMMENT_YPOS
+  type '_real'
+  default 256.0
+  vpath 'internal'
+endparameter
+
+
+# LABEL VARIABLES
+# ---------------
+
+parameter LABEL_FILENAME
+  type '_char'
+  default 'LABEL.LIS'
+  vpath 'internal'
+endparameter
+
+parameter LABEL_SIZE
+  type '_real'
+  default 10.0
+  vpath 'internal'
+endparameter
+
+
+# CIRCLE VARIABLES
+# ----------------
+
+parameter CIRCLE_XCEN
+  type '_integer'
+  default 384
+  vpath 'internal'
+endparameter
+
+parameter CIRCLE_YCEN
+  type '_integer'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter CIRCLE_DIAM
+  type '_integer'
+  default 256
+  vpath 'internal'
+endparameter
+
+
+# ELLIPSE VARIABLES
+# -----------------
+
+parameter ELLIPSE_XCEN
+  type '_integer'
+  default 384
+  vpath 'internal'
+endparameter
+
+parameter ELLIPSE_YCEN
+  type '_integer'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter ELLIPSE_MAJOR
+  type '_integer'
+  default 10
+  vpath 'internal'
+endparameter
+
+parameter ELLIPSE_ECC
+  type '_real'
+  default 0.5
+  vpath 'internal'
+endparameter
+
+parameter ELLIPSE_ANG
+  type '_real'
+  default 45.0
+  vpath 'internal'
+endparameter
+
+
+# CROSS VARIABLES
+# ---------------
+
+parameter CROSS_XCEN
+  type '_integer'
+  default 384
+  vpath 'internal'
+endparameter
+
+parameter CROSS_YCEN
+  type '_integer'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter CROSS_SIZE
+  type '_real'
+  default 256.0
+  vpath 'internal'
+endparameter
+
+
+# DEFAULT ANNOTATION VARIABLES
+# ----------------------------
+
+parameter DEFANN_TITLE
+  type '_char'
+  default 'IRCAM - the Ultimate Instrument'
+  vpath 'internal'
+endparameter
+
+parameter ANNOTATE_SIZE
+  type '_real'
+  default 15.0
+  vpath 'internal'
+endparameter
+
+
+# GRID VARIABLES
+# --------------
+
+parameter GRID_X_INC
+  type '_real'
+  default 10.0
+  vpath 'internal'
+endparameter
+
+parameter GRID_Y_INC
+  type '_real'
+  default 10.0
+  vpath 'internal'
+endparameter
+
+
+# CURSOR VARIABLES
+# ----------------
+
+parameter X_CUR_PIXEL
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter Y_CUR_PIXEL
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter X_CUR_REAL
+  type '_real'
+  default 384.0
+  vpath 'internal'
+endparameter
+
+parameter Y_CUR_REAL
+  type '_real'
+  default 256.0
+  vpath 'internal'
+endparameter
+
+parameter CURSOR_VALUE
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CURSOR_WHERE
+  type '_char'
+  default 'CENTRE'
+  vpath 'internal'
+endparameter
+
+parameter CURSOR_CROSS
+  type '_char'
+  default 'YES'
+  vpath 'internal'
+endparameter
+
+parameter DISK_FILENAME
+  type '_char'
+  default 'GLITCHMARK.LIS'
+  vpath 'internal'
+endparameter
+
+
+# BORDER VARIABLES
+# ----------------
+
+parameter BORDER_WIDTH
+  type '_integer'
+  default 3
+  vpath 'internal'
+endparameter
+
+
+# BOX VARIABLES
+# -------------
+
+parameter BOX_POSITION
+  type '_char'
+  default 'CENTRE'
+  vpath 'internal'
+endparameter
+
+parameter BOX_XCEN
+  type '_real'
+  default 384
+  vpath 'internal'
+endparameter
+
+parameter BOX_YCEN
+  type '_real'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter BOX_XSIZE
+  type '_real'
+  default 20
+  vpath 'internal'
+endparameter
+
+parameter BOX_YSIZE
+  type '_real'
+  default 20
+  vpath 'internal'
+endparameter
+
+
+# LINE VARIABLES
+# --------------
+
+parameter LINE_XST
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter LINE_YST
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter LINE_XEN
+  type '_real'
+  default 768.0
+  vpath 'internal'
+endparameter
+
+parameter LINE_YEN
+  type '_real'
+  default 512.0
+  vpath 'internal'
+endparameter
+
+
+# CUT VARIABLES
+# -------------
+
+parameter CUT_ANNOTATION
+  type '_char'
+  default 'FULL'
+  vpath 'internal'
+endparameter
+
+parameter CUT_TITLE
+  type '_char'
+  default 'IRCAM : 1-dimensional cut/slice'
+  vpath 'internal'
+endparameter
+
+parameter CUT_XST
+  type '_real'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CUT_XEN
+  type '_real'
+  default 58
+  vpath 'internal'
+endparameter
+
+parameter CUT_YST
+  type '_real'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CUT_YEN
+  type '_real'
+  default 62
+  vpath 'internal'
+endparameter
+
+parameter CUT_YMAX
+  type '_real'
+  default 300.0
+  vpath 'internal'
+endparameter
+
+parameter CUT_YMIN
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CUT_LINETYPE
+  type '_char'
+  in 'L','B','H','M'
+  default 'L'
+  vpath 'internal'
+endparameter
+
+parameter CUT_MARKTYPE
+  type '_char'
+  in '*','+','.','X','O'
+  default '*'
+  vpath 'internal'
+endparameter
+
+parameter CUT_MARKINC
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CUT_MARKSIZ
+  type '_real'
+  default 5.0
+  vpath 'internal'
+endparameter
+
+parameter CUT_XTICST
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CUT_XTICINT
+  type '_real'
+  default 10.0
+  vpath 'internal'
+endparameter
+
+parameter CUT_SCALING
+  type '_char'
+  in 'M','A','R'
+  default 'A'
+  vpath 'internal'
+endparameter
+
+parameter CUT_RANGE
+  type '_real'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter CUT_HISTOGRAM
+  type '_char'
+  default 'NO'
+  vpath 'internal'
+endparameter
+
+parameter CUT_XCEN
+  type '_real'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter CUT_YCEN
+  type '_real'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter CUT_MAGNIF
+  type '_real'
+  default 6.0
+  vpath 'internal'
+endparameter
+
+parameter CUT_POSITIONING
+  type '_char'
+  default 'KEY'
+  vpath 'internal'
+endparameter
+
+parameter CUT_AXISRATIO
+  type '_real'
+  default 1.0
+  vpath 'internal'
+endparameter
+
+parameter CUT_USE_CURSOR
+  type '_char'
+  default 'N'
+  vpath 'internal'
+endparameter
+
+parameter CUT_NUMYTIC
+  type '_integer'
+  default 6
+  vpath 'internal'
+endparameter
+
+parameter CUT_OUTFF
+  type '_char'
+  default 'PLT2DCUT.DAT'
+  vpath 'internal'
+endparameter
+
+parameter CUT_YNUMORI
+  type '_char'
+  default 'NORMAL'
+  vpath 'internal'
+endparameter
+
+
+# CONTOUR VARIABLES
+# -----------------
+
+parameter CONTOUR_NUMBER
+  type '_integer'
+  default 10
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_MAGNIF
+  type '_real'
+  default 8.0
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_XCEN
+  type '_integer'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_YCEN
+  type '_integer'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_BASE
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_STEP
+  type '_real'
+  default 25
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_SPLIT
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_TYPE
+  type '_char'
+  in '1','2','3','4','A','S','C','T'
+  default 'A'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_LEVELS
+  type '_char'
+  default '0.0,10.0,20.0,30.0,40.0,50.0'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_COLTYPE
+  type '_char'
+  in 'D','S'
+  default 'D'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_TITLE
+  type '_char'
+  default '2D IRCAM Image'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_POSN
+  type '_char'
+  default 'KEY'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_ANNOTAT
+  type '_char'
+  default 'NO_ANNOTATION'
+  vpath 'internal'
+endparameter
+
+parameter BLUE_SWITCH
+  type '_char'
+  default 'YES'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_TICKSPA
+  type '_integer'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_TICKINT
+  type '_real'
+  default 10.0
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_YTICKIN
+  type '_real'
+  default 10.0
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_AUTO
+  type '_char'
+  default 'MANUAL'
+  in 'AUTO','MANUAL'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_TICKLEN
+  type '_char'
+  default 'SMALL'
+  in 'SMALL','FULL'
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_AXRAT
+  type '_real'
+  default 1.0
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_XOFF
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter CONTOUR_YOFF
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter X_ZERO
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter Y_ZERO
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter TICK_INOUT
+  type '_char'
+  default 'INSIDE'
+  vpath 'internal'
+endparameter
+
+parameter NUMBER_TYPE
+  type '_char'
+  default 'OFFSET'
+  vpath 'internal'
+endparameter
+
+parameter NUMBER_SIGN
+  type '_char'
+  default 'ASTRO'
+  vpath 'internal'
+endparameter
+
+parameter NUMBER_ORIENT
+  type '_char'
+  default 'UP'
+  vpath 'internal'
+endparameter
+
+parameter RA_ZERO
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter DEC_ZERO
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter NUM_SCALE
+  type '_real'
+  default 1.0
+  vpath 'internal'
+endparameter
+  
+parameter LINFAC
+  type '_real'
+  default 1.0
+  vpath 'internal'
+endparameter
+  
+parameter TICK_SCALE
+  type '_real'
+  default 1.0
+  vpath 'internal'
+endparameter
+  
+parameter ANNOTATE_SOURCE
+  type '_char'
+  default 'FILE'
+  vpath 'internal'
+endparameter
+
+parameter ANNOTATE_FILEN
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANNOTATE_TITLE
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING1
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING2
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING3
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING4
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING5
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING6
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING7
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING8
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING9
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING10
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING11
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING12
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING13
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING14
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING15
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING16
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING17
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING18
+  type '_char'
+  vpath 'internal'
+endparameter
+
+parameter ANN_STRING19
+  type '_char'
+  vpath 'internal'
+endparameter
+
+
+# POLARIZATION VECTOR MAP VARIABLES
+# ---------------------------------
+
+parameter QUORPT
+  type '_char'
+  default 'PT'
+  vpath 'internal'
+endparameter
+
+parameter POLTITLE
+  type '_char'
+  default 'IRCAM'
+  vpath 'internal'
+endparameter
+
+parameter POLANN
+  type '_char'
+  default 'ANNOTATE'
+  vpath 'internal'
+endparameter
+
+parameter POL_COLCH
+  type '_char'
+  default 'STANDARD'
+  in 'STANDARD','CHOOSE'
+  vpath 'internal'
+endparameter
+
+parameter POL_COLTYPE
+  type '_char'
+  default 'SAME'
+  vpath 'internal'
+endparameter
+
+parameter POL_COLANN
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COLAXE
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COLNUM
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COLTIC
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COLVEC
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COL1
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COL2
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COL3
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COL4
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_COL5
+  type '_char'
+  default 'W'
+  vpath 'internal'
+endparameter
+
+parameter POL_POSITIONING
+  type '_char'
+  default 'KEY'
+  vpath 'internal'
+endparameter
+
+parameter INPICQP
+  type 'structure'
+  default LIRCAMDIR:P
+  vpath 'internal'
+endparameter
+
+parameter INPICUT
+  type 'structure'
+  default LIRCAMDIR:T
+  vpath 'internal'
+endparameter
+
+parameter POLPOS
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter POLVEC
+  type '_real'
+  default 10.0
+  vpath 'internal'
+endparameter
+
+parameter POLCLIP
+  type '_logical'
+  default Y
+  vpath 'internal'
+endparameter
+
+parameter POLAXRAT
+  type '_real'
+  default 1.0
+  vpath 'internal'
+endparameter
+
+parameter POL_COLST
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter POL_COLINT
+  type '_real'
+  default 20.0
+  vpath 'internal'
+endparameter
+
+parameter POLMAG
+  type '_real'
+  default 6.0
+  vpath 'internal'
+endparameter
+
+parameter POLDEN
+  type '_real'
+  default 1
+  vpath 'internal'
+endparameter
+
+parameter POL_XCEN
+  type '_real'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter POL_YCEN
+  type '_real'
+  default 256
+  vpath 'internal'
+endparameter
+
+parameter POL_XTICKINT
+  type '_real'
+  default 10
+  vpath 'internal'
+endparameter
+
+parameter POL_YTICKINT
+  type '_real'
+  default 10
+  vpath 'internal'
+endparameter
+
+parameter POL_XOFF
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+parameter POL_YOFF
+  type '_real'
+  default 0.0
+  vpath 'internal'
+endparameter
+
+
+# ==============================================================================
+
+
+# PLT2D action list
+# -----------------
+
+action ANNOTATE
+   obey
+     needs X_ZERO
+     needs Y_ZERO
+   endobey
+endaction
+
+action BLOCK
+   obey
+     needs CT_XCEN
+     needs CT_YCEN
+     needs CT_SCALE
+     needs CT_ORIENTATION
+     needs CT_ANNOTATION
+   endobey
+endaction
+
+action BORDER
+   obey
+     needs BORDER_WIDTH
+   endobey
+endaction
+
+action BOX
+   obey
+     needs BOX_XCEN
+     needs BOX_YCEN
+     needs BOX_XSIZE
+     needs BOX_YSIZE
+     needs BOX_POSITION
+   endobey
+endaction
+
+action CIRCLE
+   obey
+     needs CIRCLE_XCEN
+     needs CIRCLE_YCEN
+     needs CIRCLE_DIAM
+   endobey
+endaction
+
+action CLEAR
+   obey
+   endobey
+endaction
+
+action CLEARIT
+   obey
+     needs IM_XST
+     needs IM_YST
+     needs IM_XEN
+     needs IM_YEN
+   endobey
+endaction
+
+action CLOSE
+   obey
+   endobey
+endaction
+
+action COLTAB
+   obey
+     needs CT_NAME
+     needs CT_DIRECTION
+   endobey
+endaction
+
+action COMMENT
+   obey
+     needs COMMENT_WORD
+     needs COMMENT_XPOS
+     needs COMMENT_YPOS
+     needs COMMENT_SIZE
+     needs COMMENT_COLOUR
+   endobey
+endaction
+
+action ROPARS
+   obey
+   needs IMAGE_NAME
+   endobey
+endaction
+
+action RONEXT
+   obey
+   needs IMAGE_NAME
+   endobey
+endaction
+
+action CONTOUR
+   obey
+     needs CONTOUR_IMAGE
+     needs CONTOUR_XCEN
+     needs CONTOUR_YCEN
+     needs CONTOUR_MAGNIF
+     needs CONTOUR_NUMBER
+     needs CONTOUR_BASE
+     needs CONTOUR_STEP
+     needs CONTOUR_TYPE
+   endobey
+endaction
+
+action CONVAL
+   obey
+     needs X_CUR_PIXEL
+     needs Y_CUR_PIXEL
+   endobey
+endaction
+
+action CROSS
+   obey
+     needs CROSS_XCEN
+     needs CROSS_YCEN
+     needs CROSS_SIZE
+   endobey
+endaction
+
+action CURBLOCK
+   obey
+     needs CT_SCALE
+     needs CT_ORIENTATION
+     needs CT_ANNOTATION
+   endobey
+endaction
+
+action CURBOX
+   obey
+     needs BOX_XSIZE
+     needs BOX_YSIZE
+     needs BOX_POSITION
+   endobey
+endaction
+
+action CURCIR
+   obey
+     needs CIRCLE_DIAM
+     needs CIRCLE_COLOUR
+   endobey
+endaction
+
+action CURCOM
+   obey
+     needs COMMENT_WORD
+     needs COMMENT_SIZE
+     needs COMMENT_COLOUR
+   endobey
+endaction
+
+action CURCUT
+   obey
+     needs CUT_IMAGE
+   endobey
+endaction
+
+action CURELLIPSE
+   obey
+     needs ELLIPSE_MAJOR
+     needs ELLIPSE_ECC
+     needs ELLIPSE_ANG
+     needs ELLIPSE_PEN
+     needs ELLIPSE_COLOUR
+   endobey
+endaction
+
+action CURLIN
+   obey
+     needs LINE_COLOUR
+   endobey
+endaction
+
+action CURCRO
+   obey
+     needs CROSS_SIZE
+     needs CROSS_COLOUR
+   endobey
+endaction
+
+action CURNSIGMA
+   obey
+     needs IMAGE_NAME
+     needs SIGMA_LEVEL
+     needs MAGNIFICATION
+     needs SUBIM_OPTION
+     needs SUBIM_XST
+     needs SUBIM_YST
+     needs SUBIM_XEN
+     needs SUBIM_YEN
+   endobey
+endaction
+
+action CURPLOT
+   obey
+     needs IMAGE_NAME
+     needs MAGNIFICATION
+     needs MINIMUM
+     needs MAXIMUM
+     needs SUBIM_OPTION
+     needs SUBIM_XST
+     needs SUBIM_YST
+     needs SUBIM_XEN
+     needs SUBIM_YEN
+   endobey
+endaction
+
+action CURANPLOT
+   obey
+     needs IMAGE_NAME
+     needs PLOT_RANGE
+     needs MAGNIFICATION
+     needs SUBIM_OPTION
+     needs SUBIM_XST
+     needs SUBIM_YST
+     needs SUBIM_XEN
+     needs SUBIM_YEN
+   endobey
+endaction
+
+action CURVARGREY
+   obey
+     needs IMAGE_NAME
+     needs VARGREY_XPC
+     needs VARGREY_YPC
+     needs MAGNIFICATION
+     needs SUBIM_OPTION
+     needs SUBIM_XST
+     needs SUBIM_YST
+     needs SUBIM_XEN
+     needs SUBIM_YEN
+   endobey
+endaction
+
+action CURSOR
+   obey
+     needs X_CUR_REAL
+     needs Y_CUR_REAL
+   endobey
+endaction
+
+action CURPOS
+   obey
+     needs X_CUR_REAL
+     needs Y_CUR_REAL
+   endobey
+endaction
+
+action CUT
+   obey
+     needs CUT_IMAGE
+     needs CUT_XST
+     needs CUT_YST
+     needs CUT_XEN
+     needs CUT_YEN
+     needs CUT_XCEN
+     needs CUT_YCEN
+     needs CUT_MAGNIF
+   endobey
+endaction
+
+action DEFANN
+   obey
+     needs DEFANN_TITLE
+     needs DEFANN_COLOUR
+   endobey
+endaction
+
+action ELLIPSE
+   obey
+     needs ELLIPSE_XCEN
+     needs ELLIPSE_YCEN
+     needs ELLIPSE_MAJOR
+     needs ELLIPSE_ECC
+     needs ELLIPSE_ANG
+     needs ELLIPSE_PEN
+     needs ELLIPSE_COLOUR
+   endobey
+endaction
+
+action FLASH
+   obey
+     needs IMAGE_NAME
+   endobey
+endaction
+
+action GLITCHMARK
+   obey
+    needs DISK_FILENAME
+   endobey
+endaction
+
+action GRID
+   obey
+     needs GRID_X_INC
+     needs GRID_Y_INC
+     needs GRID_COLOUR
+   endobey
+endaction
+
+action IMCLEAR
+   obey
+     needs IM_XCEN
+     needs IM_YCEN
+     needs MAGNIFICATION
+   endobey
+endaction
+
+action LABEL
+   obey
+     needs LABEL_FILENAME
+     needs LABEL_SIZE
+     needs LABEL_COLOUR
+   endobey
+endaction
+
+action LINE
+   obey
+     needs LINE_XST
+     needs LINE_YST
+     needs LINE_XEN
+     needs LINE_YEN
+     needs LINE_COLOUR
+   endobey
+endaction
+
+action LINE_WIDTH
+   obey
+     needs LINFAC
+   endobey
+endaction
+
+action NSIGMA
+   obey
+     needs IMAGE_NAME
+     needs SIGMA_LEVEL
+     needs IM_XCEN
+     needs IM_YCEN
+     needs MAGNIFICATION
+     needs SUBIM_OPTION
+     needs SUBIM_XST
+     needs SUBIM_YST
+     needs SUBIM_XEN
+     needs SUBIM_YEN
+   endobey
+endaction
+
+action CONTPARS
+   obey
+   needs IMAGE_NO
+   endobey
+endaction
+
+action OPEN
+   obey
+     needs DEVICE_NAME
+   endobey
+endaction
+
+action PLOT
+   obey
+     needs IMAGE_NAME
+     needs IM_XCEN
+     needs IM_YCEN
+     needs MAGNIFICATION
+     needs MINIMUM
+     needs MAXIMUM
+     needs SUBIM_OPTION
+     needs SUBIM_XST
+     needs SUBIM_YST
+     needs SUBIM_XEN
+     needs SUBIM_YEN
+   endobey
+endaction
+
+action POLAX
+    obey
+     needs INPICQP
+     needs INPICUT
+    endobey
+endaction
+
+action RANPLOT
+   obey
+     needs IMAGE_NAME
+     needs PLOT_RANGE
+     needs IM_XCEN
+     needs IM_YCEN
+     needs MAGNIFICATION
+     needs SUBIM_OPTION
+     needs SUBIM_XST
+     needs SUBIM_YST
+     needs SUBIM_XEN
+     needs SUBIM_YEN
+   endobey
+endaction
+
+action SETCOL
+   obey
+     needs PEN_NUMBER
+     needs PEN_COLOUR
+   endobey
+endaction
+
+action SETCOL2
+   obey
+     needs PEN_NUMBER
+     needs PEN_COLOUR
+   endobey
+endaction
+
+action SURROUND
+   obey
+     needs X_ZERO
+     needs Y_ZERO
+   endobey
+endaction
+
+action VARGREY
+   obey
+     needs IMAGE_NAME
+     needs VARGREY_XPC
+     needs VARGREY_YPC
+     needs IM_XCEN
+     needs IM_YCEN
+     needs MAGNIFICATION
+     needs SUBIM_OPTION
+     needs SUBIM_XST
+     needs SUBIM_YST
+     needs SUBIM_XEN
+     needs SUBIM_YEN
+   endobey
+endaction
+
+action WELCOME
+   obey
+   endobey
+endaction
+
+endinterface
