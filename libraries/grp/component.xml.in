@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/grp</path>
+  <description>GRP - Routines for Managing Groups of Objects</description>
+  <abstract><p>GRP provides facilities for handling groups of objects which
+      can be described by character strings (e.g. file names, astronomical
+      objects, numerical values, etc). Facilities are provided for storing
+      and retrieving such character strings within groups, and for passing
+      groups of character strings between applications by means of a text
+      file. It also allows the creation of groups in which each element
+      is a modified version of an element in another group.</p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
