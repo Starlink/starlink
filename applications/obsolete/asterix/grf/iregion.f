@@ -431,6 +431,7 @@
           FLAG='00'X
         ELSE
           FLAG='01'X
+        ENDIF
 
         DO J=1,I_NY
           DO I=1,I_NX
