@@ -3,7 +3,12 @@
 *
 *    Description :
 *
-*     Allows manipulation of QUALITY values. Availible options are:
+*     Allows manipulation of QUALITY values. The user has control over
+*     both the values to be operated upon, and the operation to be
+*     performed. The former is controlled by the MAGIC,DATSEL,AXSEL,QSEL
+*     and FSEL options which may be ANDed together to define complex
+*     selection criteria. The available options for changing the
+*     selected values are,
 *
 *       IGNORE  - Set temporary bad quality bit
 *       RESTORE - Unset temporary bad quality bit
@@ -12,9 +17,6 @@
 *       OR      - OR existing QUALITY with specified QUALITY value
 *       EOR     - EOR existing QUALITY with specified QUALITY value
 *       NOT     - NOT existing QUALITY with specified QUALITY value
-*
-*     Changes are made within specified axis ranges, and or data value
-*     ranges.
 *
 *    Environment Parameters :
 *
@@ -25,11 +27,14 @@
 *     OR        - OR qualiity with specified value?      (Logical(F), read)
 *     EOR       - EOR qualiity with specified value?     (Logical(F), read)
 *     NOT       - NOT existing quality value?            (Logical(F), read)
-*     OVERWRITE - Overwrite input file?                  (Logical(T), read)
+*
 *     AXSEL     - Specify axis ranges for change?        (Logical(T), read)
 *     DATSEL    - Specify data ranges for change?        (Logical(T), read)
+*     FSEL      - Select values in ARD file region       (Logical(T), read)
 *     QSEL      - Specify a quality value to alter?      (Logical(F), read)
 *     MAGIC     - Select on magic values                 (Logical(F), read)
+*
+*     OVERWRITE - Overwrite input file?                  (Logical(T), read)
 *     INP       - Input file name.                       (Univ, read)
 *     AUXIN     - Input file name.                       (Univ, read)
 *     OUT       - Output filename                        (Univ, write)
@@ -77,7 +82,8 @@
 *     31 Aug 94 : V1.8-2  Fixed another missing initialisation in ARD mode,
 *                         which stopped it working on UNIX (DJA)
 *     24 Nov 94 : V1.8-3  Now use USI for user interface (DJA)
-*      5 Dec 94 : V1.8-4  ARD and other modes no longer exclusive (DJA)
+*      5 Dec 94 : V1.8-4  ARD and other modes no longer exclusive. Made
+*                         selection mechanism a bit more modular (DJA)
 *
 *    Type Definitions :
 *
@@ -129,6 +135,8 @@
       INTEGER                AXPTR(DAT__MXDIM)      ! Mapped axes
       INTEGER                CPTR                   ! Pointer to dynamic
                                                     ! array
+      INTEGER                TCPTR                   ! Pointer to dynamic
+                                                    ! array
       INTEGER                DIMS(DAT__MXDIM)       ! Length of each dimension
       INTEGER                DPTR                   ! Pointer to mapped
                                                     ! data array
@@ -144,7 +152,6 @@
       INTEGER                NELM                   ! Number of data points
       INTEGER                NFROM                  ! # user selected points
       INTEGER                NLINES                 ! Number of TEXT lines
-      INTEGER                NMOD                   ! # modified points
       INTEGER                PIXRNG(2,MX_BNDS,DAT__MXDIM)    ! Pixel ranges
       INTEGER                QDIMS(DAT__MXDIM)      ! Length of each dimension
       INTEGER                QNDIM                  ! Number of dimensions
@@ -318,6 +325,7 @@
 
 *    Set up temporary array for flagging selections
       CALL DYN_MAPL( 1, NELM, CPTR, STATUS )
+      CALL DYN_MAPL( 1, NELM, TCPTR, STATUS )
 
 *    Auxilliary data object?
       IF ( DATSEL .OR. MAGIC ) THEN
@@ -334,20 +342,8 @@
         END IF
       END IF
 
-*    Initialise selection array
-      CALL ARR_INIT1L( ( .NOT. MAGIC), NELM, %VAL(CPTR), STATUS )
-
-*    Initialise number selected
-      IF ( .NOT. (FSEL.OR.AXSEL) ) THEN
-        CALL ARR_INIT1L( ( .NOT. MAGIC), NELM, %VAL(CPTR), STATUS )
-        IF ( MAGIC ) THEN
-          NMOD = 0
-        ELSE
-          NMOD = NELM
-        END IF
-      ELSE
-        NMOD = 0
-      END IF
+*    We start out with all values selected
+      CALL ARR_INIT1L( .TRUE., NELM, %VAL(CPTR), STATUS )
 
 *    Select on axis values?
       IF ( AXSEL ) THEN
@@ -358,11 +354,11 @@
 
 *      Construct allowed ranges
         DO I = 1, DAT__MXDIM
-          NAXRANGES(I)  = 1
+          NAXRANGES(I) = 1
           AXRANGES(1,1,I) = AXLO(I)
           AXRANGES(2,1,I) = AXHI(I)
-          PIXRNG(1,1,I)=1
-          PIXRNG(2,1,I)=DIMS(I)
+          PIXRNG(1,1,I) = 1
+          PIXRNG(2,1,I) = DIMS(I)
           SEL(I) = .FALSE.
         END DO
 
@@ -406,9 +402,10 @@
 
         END DO
 
-*      Set up selection array
-        CALL QUALITY_SETAXSEL(NDIM, DIMS, NAXRANGES, PIXRNG, %VAL(CPTR),
-     :                                                    NMOD, STATUS )
+*      Set up selection array. Because this is the first selection we don't
+*      need to bother with ANDing it with our existing array
+        CALL QUALITY_SETAXSEL( NDIM, DIMS, NAXRANGES, PIXRNG,
+     :                         %VAL(CPTR), STATUS )
 
 *    End of axis selection option
       END IF
@@ -424,13 +421,18 @@
 
 *      Read ARD file and set pixel values wanted
         CALL QUALITY_SETFSEL( ILOC, NDIM, DIMS, AXLO, AXHI,
-     :                                 NMOD, CPTR, STATUS )
+     :                                %VAL(TCPTR), STATUS )
+
+*      AND it with our existing array
+        CALL QUALITY_ANDSEL( NELM, %VAL(TCPTR), %VAL(CPTR), STATUS )
 
 *    End of ARD file selection option
       END IF
 
 *    Get data value selection
       IF ( DATSEL ) THEN
+
+*      Map data and get its range (ignoring quality)
         CALL BDA_MAPDATA( DLOC, 'READ', DPTR, STATUS )
         CALL ARR_RANG1R( NELM, %VAL(DPTR), DMIN, DMAX, STATUS )
 
@@ -440,7 +442,7 @@
         CALL MSG_PRNT( 'Data values range from ^MIN to ^MAX' )
         CALL MSG_SETR( 'MIN', DMIN )
         CALL MSG_SETR( 'MAX', DMAX )
-        CALL MSG_MAKE(' ^MIN:^MAX', DEF, JUNK)
+        CALL MSG_MAKE(' ^MIN:^MAX', DEF, JUNK )
         CALL USI_DEF0C( 'DATRNG', DEF, STATUS )
         CALL PRS_GETRANGES( 'DATRNG', MX_BNDS, 1, DMIN, DMAX, DRANGES,
      :                                              NDRANGES, STATUS )
@@ -448,7 +450,7 @@
 *      Check status
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      if ranges go to limits adjust slightly to ensure inclusion
+*      If ranges go to limits adjust slightly to ensure inclusion
         IF ( DRANGES(1,1)*(1.0-VAL__EPSR) .LE. DMIN ) THEN
           DRANGES(1,1) = MIN(DRANGES(1,1),DMIN * (1.0 - VAL__EPSR))
         END IF
@@ -457,23 +459,46 @@
      :                              DMAX* (1.0 + VAL__EPSR))
         END IF
 
+*      Set up selection array based on data values
         CALL QUALITY_SETDSEL( NELM, NDRANGES, DRANGES, %VAL(DPTR),
-     :                                  %VAL(CPTR), NMOD, STATUS )
+     :                                       %VAL(TCPTR), STATUS )
+
+*      AND it with our existing array
+        CALL QUALITY_ANDSEL( NELM, %VAL(TCPTR), %VAL(CPTR), STATUS )
 
       END IF
 
 *    Selecting on magic values
       IF ( MAGIC ) THEN
+
+*      Set up selection array
         CALL BDA_MAPDATA( DLOC, 'READ', DPTR, STATUS )
-        CALL QUALITY_SETMSEL( NELM, %VAL(DPTR), %VAL(CPTR), NMOD,
-     :                                                   STATUS )
+        CALL QUALITY_SETMSEL( NELM, %VAL(DPTR), %VAL(TCPTR), STATUS )
+
+*      AND it with our existing array
+        CALL QUALITY_ANDSEL( NELM, %VAL(TCPTR), %VAL(CPTR), STATUS )
+
       END IF
 
-*    Get quality value to modify
+*    Selection on basis of quality value
       IF ( QSEL ) THEN
+
+*      Get quality value to modify
         CALL QUALITY_GETQV( 'MODQUAL', ' ', MODQUAL, BQVAL, STATUS )
-        CALL QUALITY_SETQSEL( NELM, BQVAL, %VAL(QPTR), %VAL(CPTR),
-     :                                              NMOD, STATUS )
+        CALL QUALITY_SETQSEL( NELM, BQVAL, %VAL(QPTR), %VAL(TCPTR),
+     :                                                     STATUS )
+
+*      AND it with our existing array
+        CALL QUALITY_ANDSEL( NELM, %VAL(TCPTR), %VAL(CPTR), STATUS )
+
+      END IF
+
+*    Count number of values in range
+      CALL QUALITY_CNTSEL( NELM, %VAL(CPTR), NFROM, STATUS )
+      IF ( NFROM .EQ. 0 ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'No values in ranges specified', STATUS )
+        GOTO 99
       END IF
 
 *    Write the output quality
@@ -530,10 +555,10 @@
 
       END IF
 
+*    Write output quality
       CALL BDA_UNMAPQUAL( OLOC, STATUS )
 
 *    Inform user of altered points
-      NFROM = NMOD
       IF ( AXSEL .AND. DATSEL ) THEN
         CALL MSG_SETC( 'FROM', 'axis/data range' )
       ELSE IF ( AXSEL .AND. FSEL ) THEN
@@ -546,9 +571,9 @@
         CALL MSG_SETC( 'FROM', 'data range' )
       END IF
       CALL MSG_SETI( 'NCH', NCH )
-      CALL MSG_SETI( 'NMOD', NFROM )
+      CALL MSG_SETI( 'NFROM', NFROM )
       CALL MSG_PRNT( '^NCH points had quality altered out of'/
-     :                               /' ^NMOD points in ^FROM' )
+     :                            /' ^NFROM points in ^FROM' )
 
 *    Write history
       CALL HIST_ADD( OLOC, VERSION, STATUS )
@@ -675,8 +700,6 @@
        END
 
 
-
-
 *+  QUALITY_AXRAN - Converts selected axis range to pixel values
       SUBROUTINE QUALITY_AXRAN (DIM,NRANGE,RANGES,AXIS,DIR,PIXRNG,
      :                                                    STATUS )
@@ -722,7 +745,7 @@
 
 *+  QUALITY_SETAXSEL - Use axis ranges to select valid output pixels
       SUBROUTINE QUALITY_SETAXSEL(NDIM,DIMS,NRANGE,AXRANGE,SELECT,
-     :                                              NMOD, STATUS )
+     :                                                    STATUS )
 *    Description :
 *    History :
 *    Type definitions :
@@ -744,23 +767,30 @@
 *    Export :
 *
       LOGICAL                SELECT(*)
-      INTEGER                NMOD               ! # points modified
 *
 *    Status :
 *
       INTEGER STATUS
+*
+*    Local variables :
+*
+      INTEGER			NELM
 *-
       IF (STATUS.NE.SAI__OK) RETURN
 
+*    Initialise
+      CALL ARR_SUMDIM( DAT__MXDIM, DIMS, NELM )
+      CALL ARR_INIT1L( .FALSE., NELM, SELECT, STATUS )
+
       CALL QUALITY_SETAXSEL_INT(DIMS(1),DIMS(2),DIMS(3),DIMS(4),DIMS(5),
-     :                       DIMS(6),DIMS(7),NRANGE,AXRANGE,SELECT,NMOD)
+     :                       DIMS(6),DIMS(7),NRANGE,AXRANGE,SELECT)
 
       END
 
 
 
       SUBROUTINE QUALITY_SETAXSEL_INT (D1,D2,D3,D4,D5,D6,D7,
-     :                        NRANGE, AXRANGE, SELECT, NMOD)
+     :                        NRANGE, AXRANGE, SELECT )
 *    Description :
 *     Loops over input data array setting SELECT = .TRUE. if values lie
 *     within selected ranges.
@@ -777,7 +807,6 @@
 
 *    Export :
       LOGICAL                SELECT(D1,D2,D3,D4,D5,D6,D7)
-      INTEGER                NMOD                 ! # points modified
 
 *    Local variables :
       INTEGER                A,B,C,D,E,F,G,H,I,J,K,L,M,N !Loop counters
@@ -797,11 +826,7 @@
                             DO L = AXRANGE(1,K,2), AXRANGE(2,K,2)
                               DO M = 1, NRANGE(1)
                                 DO N = AXRANGE(1,M,1), AXRANGE(2,M,1)
-                                  IF ( .NOT. SELECT(N,L,J,H,F,D,B) )THEN
-                                    SELECT(N,L,J,H,F,D,B) = .TRUE.
-
-                                    NMOD = NMOD + 1
-                                  END IF
+                                  SELECT(N,L,J,H,F,D,B) = .TRUE.
                                 END DO
                               END DO
                             END DO
@@ -821,31 +846,41 @@
 
 
 
-*+  QUALITY_SETDSEL - Alter SELECT according to data ranges
-      SUBROUTINE QUALITY_SETDSEL(LEN,NDRANGES,DRANGES,DATA,SELECT,
-     :                                              NMOD, STATUS )
+*+  QUALITY_SETDSEL - Create selection array on data values
+      SUBROUTINE QUALITY_SETDSEL( LEN, NDRANGES, DRANGES, DATA, SELECT,
+     :                                                         STATUS )
 *    Description :
+*
 *     Sets the SELECT array to FALSE if data values are outside specified
 *     ranges
+*
 *    Type Definitions :
+*
       IMPLICIT NONE
+*
 *    Global constants :
+*
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+*
 *    Import :
+*
       INTEGER                LEN                    ! Number of data points
       INTEGER                NDRANGES               ! Number of data ranges
 
       REAL                   DRANGES(2,*)           ! data ranges bounds
       REAL                   DATA(*)                ! Data values
-
+*
 *    Import-Export :
+*
       LOGICAL                SELECT(*)              ! Copy to output?
-      INTEGER                NMOD                   ! # points modified
-
+*
 *    Status :
+*
       INTEGER STATUS
+*
 *    Local variables :
+*
       INTEGER                I, J                   ! Loop counters
       LOGICAL                FOUND
 *-
@@ -854,28 +889,20 @@
 
       DO I = 1, LEN
 
-*  only take points already selected
-        IF (SELECT(I)) THEN
-
-*  see if data point lies within one of specified ranges
-          FOUND = .FALSE.
-          J     = 1
-          DO WHILE (.NOT.FOUND.AND.J.LE.NDRANGES)
-            IF (DATA(I).GE.DRANGES(1,J) .AND.
-     :          DATA(I).LE.DRANGES(2,J))     THEN
-              FOUND = .TRUE.
-            ELSE
-              J=J+1
-            END IF
-          END DO
-
-*  if not within specified ranges then deselect it
-          IF (.NOT. FOUND) THEN
-            SELECT(I) = .FALSE.
-            NMOD = NMOD - 1
+*      See if data point lies within one of specified ranges
+        FOUND = .FALSE.
+        J = 1
+        DO WHILE (.NOT.FOUND.AND.J.LE.NDRANGES)
+          IF ( (DATA(I).GE.DRANGES(1,J)) .AND.
+     :         (DATA(I).LE.DRANGES(2,J)) ) THEN
+            FOUND = .TRUE.
+          ELSE
+            J = J + 1
           END IF
+        END DO
 
-        END IF
+*      Data value in range?
+        SELECT(I) = FOUND
 
       END DO
 
@@ -898,8 +925,6 @@
       BYTE                   QUAL(LEN)
 *    Import-Export :
       LOGICAL                SELECT(LEN)
-      INTEGER                NMOD                   ! # points modified
-
 *    Status :
       INTEGER STATUS
 *    Local variables :
@@ -909,12 +934,7 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
       DO I = 1, LEN
-        IF ( SELECT(I) ) THEN
-          IF ( QVAL .NE. QUAL(I) ) THEN
-            SELECT(I) = .FALSE.
-            NMOD = NMOD - 1
-          END IF
-        END IF
+        SELECT(I) = ( QVAL .EQ. QUAL(I) )
       END DO
 
       END
@@ -922,7 +942,7 @@
 
 
 *+  QUALITY_SETMSEL - Alter SELECT according to magic values in data
-      SUBROUTINE QUALITY_SETMSEL (LEN,D,SELECT,NMOD,STATUS)
+      SUBROUTINE QUALITY_SETMSEL( LEN, D, SELECT, STATUS )
 *    Description :
 *    Type Definitions :
 *
@@ -941,7 +961,6 @@
 *    Import-Export :
 *
       LOGICAL                SELECT(*)
-      INTEGER                NMOD                   ! # points modified
 *
 *    Status :
 *
@@ -955,10 +974,7 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
       DO I = 1, LEN
-        IF ( D(I) .EQ. VAL__BADR ) THEN
-          SELECT(I) = .TRUE.
-          NMOD = NMOD + 1
-        END IF
+        SELECT(I) = ( D(I) .EQ. VAL__BADR )
       END DO
 
       END
@@ -1283,8 +1299,8 @@
 
 
 *+  QUALITY_SETFSEL - Reads a spatial descriptor file and sets a mask
-	SUBROUTINE QUALITY_SETFSEL( LOC, NDIM, DIM, AXLO, AXHI, NAREA,
-     :                              CPTR, STATUS )
+	SUBROUTINE QUALITY_SETFSEL( LOC, NDIM, DIM, AXLO, AXHI,
+     :                              SELECT, STATUS )
 *    Description :
 *     Reads a description of a spatial region from a spatial file
 *     and sets a mask with the pixels defined in the file good and
@@ -1307,19 +1323,21 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC) LOC              ! Locator to datafile
-      INTEGER NDIM                            ! No. of data dimensions
-      INTEGER DIM(DAT__MXDIM)                 ! Data dimensions
-      REAL AXLO(NDIM),AXHI(NDIM)              ! Axis ranges
-      INTEGER CPTR                            ! Pointer to mask array
-*    Import-Export :
+      CHARACTER*(DAT__SZLOC)	LOC              	! Locator to datafile
+      INTEGER 			NDIM                    ! # of data dimensions
+      INTEGER 			DIM(DAT__MXDIM)         ! Data dimensions
+      REAL 			AXLO(NDIM),AXHI(NDIM)   ! Axis ranges
+*
 *    Export :
-      INTEGER NAREA
+*
+      LOGICAL			SELECT(*)		! Selection array
+*
 *    Status :
-      INTEGER STATUS
-*    Function declarations :
-*    Local constants :
+*
+      INTEGER 			STATUS
+*
 *    Local variables :
+*
       INTEGER AUNIT                           ! logical unit of ARD file
       INTEGER EPNTR,WPNTR                     ! workspace pointers
       CHARACTER*20 UNITS(2)                   ! units of each data axis
@@ -1328,11 +1346,15 @@
       INTEGER IMAX(2)                         ! Axis numbers of the X,Y axis
       INTEGER MPNTR                           ! Pointer to image mask
       INTEGER MDIM(2)                         ! Dimensions of image mask
-      INTEGER LP
+      INTEGER LP,NELM
 *-
 
+*    Initialise
+      CALL ARR_SUMDIM( DAT__MXDIM, DIM, NELM )
+      CALL ARR_INIT1L( .FALSE., NELM, SELECT, STATUS )
+
 *    Get name of ARD file and open it
-      CALL USI_GET0C('ARDFILE',AFILE,STATUS)
+      CALL USI_GET0C( 'ARDFILE', AFILE, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Open the ARD file
@@ -1340,9 +1362,9 @@
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Find the X and Y axis dimensions
-      CALL AXIS_GET(LOC, 'X pos', 'XDIM', NDIM, IMAX(1), STATUS)
+      CALL AXIS_GET( LOC, 'X pos', 'XDIM', NDIM, IMAX(1), STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-      CALL AXIS_GET(LOC, 'Y pos', 'YDIM', NDIM, IMAX(2), STATUS)
+      CALL AXIS_GET( LOC, 'Y pos', 'YDIM', NDIM, IMAX(2), STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Create a dynamic array to hold the mask for the image region
@@ -1389,7 +1411,7 @@
       CALL QUALITY_SETFSEL_ADDMASK( MDIM(1), MDIM(2), %val(MPNTR),
      :                              IMAX(1),
      :         IMAX(2), DIM(1), DIM(2), DIM(3), DIM(4), DIM(5), DIM(6),
-     :         DIM(7), %val(CPTR), NAREA )
+     :         DIM(7), SELECT )
 
 *    Close the ARD file
       CALL FIO_CLOSE(AUNIT, STATUS)
@@ -1566,9 +1588,6 @@
      :                      STATUS )
          IF ( EOF .OR. STATUS .NE. SAI__OK ) GO TO 1
 
-*  Write it out.
-c         WRITE(*,*)LINNUM,':',LINE(:NCHAR)
-
 *  Find out if the line is a valid statement.
 *  Look for a DIMENSION statement, PROJECT or COMPOSITE-END COMPOSITE.
 *  DIMENSION must be 2, PROJECT and COMPOSITE are disabled for now.
@@ -1639,7 +1658,6 @@ c         WRITE(*,*)LINNUM,':',LINE(:NCHAR)
 *  included.
             CALL ARD_KEYW( LINE, LINNUM, INCOM, FIRST, KEYWRD, EXCLUD,
      :                     UNIOP, BINOP, NITEM, ISTART, STATUS )
-c            WRITE(*,*)KEYWRD,'-',EXCLUD,'-',UNIOP,'-',BINOP,'-',NITEM
 
 *  Set FIRST to FALSE. If FIRST was true then next line is not the first
 *  in the composite block, otherwise no effect.
@@ -1656,7 +1674,7 @@ c            WRITE(*,*)KEYWRD,'-',EXCLUD,'-',UNIOP,'-',BINOP,'-',NITEM
             CALL ARD_EXVAL( KEYWRD, LINE, LINNUM, ISTART, NITEM,
      :                       NUMDIM, %VAL( IPVAL ), ALLINT, NCOORD,
      :                       STATUS )
-c            WRITE(*,*)'All integers =',ALLINT
+
 *
 * !RDS - convert ARD values into pixels if none_integer trailing values
             IF (.NOT. ALLINT) THEN
@@ -1793,7 +1811,7 @@ c            WRITE(*,*)'All integers =',ALLINT
 *+QUALITY_SETFSEL_ADDMASK - includes a 2-d mask in an n-d mask
       SUBROUTINE QUALITY_SETFSEL_ADDMASK(MDIM1, MDIM2, IMASK, IMAX1,
      &               IMAX2, DIM1, DIM2, DIM3, DIM4, DIM5, DIM6, DIM7,
-     &               MASK,NAREA)
+     &               MASK )
 *    Description :
 *     <description of what the subroutine does - for user info>
 *    Method :
@@ -1822,44 +1840,76 @@ c            WRITE(*,*)'All integers =',ALLINT
 *    Import-Export :
 *
       LOGICAL MASK(DIM1,DIM2,DIM3,DIM4,DIM5,DIM6,DIM7) ! The full mask
-      INTEGER NAREA
 *
 *    Local variables :
 *
       INTEGER LP1,LP2,LP3,LP4,LP5,LP6,LP7,LPVAL(DAT__MXDIM)
 *-
 
-      NAREA = 0
-
       DO LP7=1,DIM7
-         LPVAL(7) = LP7
-       DO LP6=1,DIM6
+        LPVAL(7) = LP7
+        DO LP6=1,DIM6
           LPVAL(6) = LP6
-        DO LP5=1,DIM5
-           LPVAL(5) = LP5
-         DO LP4=1,DIM4
-            LPVAL(4) = LP4
-          DO LP3=1,DIM3
-             LPVAL(3) = LP3
-           DO LP2=1,DIM2
-              LPVAL(2) = LP2
-            DO LP1=1,DIM1
-               LPVAL(1) = LP1
-*
-               IF ( .NOT. MASK(LP1,LP2,LP3,LP4,LP5,LP6,LP7) ) THEN
-                 MASK(LP1,LP2,LP3,LP4,LP5,LP6,LP7) =
+          DO LP5=1,DIM5
+            LPVAL(5) = LP5
+            DO LP4=1,DIM4
+              LPVAL(4) = LP4
+              DO LP3=1,DIM3
+                LPVAL(3) = LP3
+                DO LP2=1,DIM2
+                  LPVAL(2) = LP2
+                  DO LP1=1,DIM1
+                    LPVAL(1) = LP1
+                    MASK(LP1,LP2,LP3,LP4,LP5,LP6,LP7) =
      :                   IMASK(LPVAL(IMAX1),LPVAL(IMAX2))
-                 IF ( IMASK(LPVAL(IMAX1),LPVAL(IMAX2)) ) THEN
-                   NAREA = NAREA + 1
-                 END IF
-               END IF
-*
+                  ENDDO
+                ENDDO
+              ENDDO
             ENDDO
-           ENDDO
           ENDDO
-         ENDDO
         ENDDO
-       ENDDO
       ENDDO
 *
+      END
+
+
+*+ AND two selection arrays
+      SUBROUTINE QUALITY_ANDSEL( N, NEWSEL, SEL, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER N,STATUS,I
+      LOGICAL NEWSEL(*), SEL(*)
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        DO I = 1,  N
+          SEL(I) = SEL(I) .AND. NEWSEL(I)
+        END DO
+      END IF
+      END
+
+*+ OR two selection arrays
+      SUBROUTINE QUALITY_ORSEL( N, NEWSEL, SEL, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER N,STATUS,I
+      LOGICAL NEWSEL(*), SEL(*)
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        DO I = 1,  N
+          SEL(I) = SEL(I) .OR. NEWSEL(I)
+        END DO
+      END IF
+      END
+
+
+*+ Count number of selected pixels
+      SUBROUTINE QUALITY_CNTSEL( N, SEL, CNT, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER N,STATUS,I,CNT
+      LOGICAL SEL(*)
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        CNT = 0
+        DO I = 1,  N
+          IF ( SEL(I) ) CNT = CNT + 1
+        END DO
+      END IF
       END
