@@ -297,8 +297,8 @@
       END IF
 
 *    Pad dimensions to 7D
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
       DO IAX = NDIM+1, ADI__MXDIM
-        DIMS(IAX) = 1
         AOK(IAX) = .FALSE.
         AWOK(IAX) = .FALSE.
       END DO

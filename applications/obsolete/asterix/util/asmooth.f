@@ -356,9 +356,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Pad dimensions to 7D
-      DO I = NDIM+1, ADI__MXDIM
-        DIMS(I) = 1
-      END DO
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
 
 *    Get list of axis numbers into string
       CALL STR_DIMTOC( NSDIM, SDIMS, STR )

@@ -213,9 +213,7 @@
       END IF
 
 *    Pad extra dimensions to 7D
-      DO IAX = NDIM+1, ADI__MXDIM
-        DIMS(IAX) = 1
-      END DO
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
 
 *    Do the statistics
       CALL STATISTIX_INT( NELM, %VAL(IDPTR), %VAL(WPTR), VAROK,

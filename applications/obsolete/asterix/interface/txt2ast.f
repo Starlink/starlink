@@ -1696,9 +1696,7 @@
       DO I = 1, NAXES
         DIMS(I) = AX_SIZE(I)
       END DO
-      DO I = NAXES+1, ADI__MXDIM
-        DIMS(I) = 1
-      END DO
+      CALL AR7_PAD( NAXES, DIMS, STATUS )
 
 *    How many elements in output data array
       CALL ARR_SUMDIM( NAXES, DIMS, NELM )

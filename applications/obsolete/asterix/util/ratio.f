@@ -451,9 +451,7 @@
       END IF
 
 *    Transform input dimensions
-      DO I = NDIM+1, ADI__MXDIM
-        IDIMS(I) = 1
-      END DO
+      CALL AR7_PAD( NDIM, IDIMS, STATUS )
 
 *    Give user an idea what is going to happen
       CALL MSG_PRNT( 'RATIO will divide two ranges on this '
@@ -609,9 +607,7 @@
       END IF
 
 *    Transform these into the 7D system
-      DO I = ONDIM+1, ADI__MXDIM
-        ODIMS(I) = 1
-      END DO
+      CALL AR7_PAD( ONDIM, ODIMS, STATUS )
       CALL ARR_SUMDIM( ONDIM, ODIMS, ONELM )
 
 *    Create components in output

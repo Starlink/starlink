@@ -206,12 +206,8 @@ C        VOK = .FALSE.
       END IF
 
 *    Pad dimensions to 7D
-      DO IAX = NDIM + 1, ADI__MXDIM
-        DIMS(IAX) = 1
-      END DO
-      DO IAX = ONDIM + 1, ADI__MXDIM
-        ODIMS(IAX) = 1
-      END DO
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
+      CALL AR7_PAD( ONDIM, ODIMS, STATUS )
 
 *    Act on data
       IF ( NDIM .GT. 1 ) THEN

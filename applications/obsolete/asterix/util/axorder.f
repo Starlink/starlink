@@ -293,13 +293,11 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Pad out dimensions for 7D
-        IF ( NDIM .LT. ADI__MXDIM ) THEN
-          DO I = NDIM + 1, ADI__MXDIM
-            DIMS(I) = 1
-            ODIMS(I) = 1
-            SELAX(I) = I
-          END DO
-        END IF
+        CALL AR7_PAD( NDIM, DIMS, STATUS )
+        CALL AR7_PAD( NDIM, ODIMS, STATUS )
+        DO I = NDIM + 1, ADI__MXDIM
+          SELAX(I) = I
+        END DO
 
 *      Swap the appropriate axes
         CALL AR7_AXSWAP_R( DIMS, %VAL(IDPTR), SELAX, ODIMS,

@@ -217,11 +217,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Pad out dimensions for 7D
-      IF ( NDIM .LT. ADI__MXDIM ) THEN
-        DO I = NDIM + 1, ADI__MXDIM
-          DIMS(I) = 1
-        END DO
-      END IF
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
 
 *    Flip the appropriate axes
       CALL AR7_AXFLIP_R( DIMS, %VAL(IDPTR), FLIP, %VAL(ODPTR), STATUS )

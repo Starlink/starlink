@@ -332,9 +332,7 @@
             IF ( AXNORM ) THEN
 
 *            Pad dimensions to 7D
-              DO I = NDIM+1, ADI__MXDIM
-                DIMS(I) = 1
-              END DO
+              CALL AR7_PAD( NDIM, DIMS, STATUS )
 
 *            Issue warning
               CALL MSG_PRNT( 'Denormalising wrt time axis...' )
