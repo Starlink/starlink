@@ -49,7 +49,7 @@
 *        fraction of counts is intended to make sure that the image
 *        histogram is well sampled. This increases the robustness of
 *        mode estimates made from the histogram but decreases the
-*        accuracy.
+*        accuracy.  Only used if USEPER is FALSE.
 *        [2.5]
 *     COUNTS = _INTEGER (Write)
 *        On exit this parameter contains a list of the number of objects
@@ -131,7 +131,7 @@
 *        recommended that wildcards are also used for the position list
 *        names (the order of input names is not guaranteed).
 *
-*        The output files contain a integer index for each image
+*        The output files contain an integer index for each image
 *        feature followed by the X and Y centroid (formed using all the
 *        intensity information) and finally the mean intensity of
 *        pixels in the group.
@@ -147,7 +147,8 @@
 *        making the initial histogram mean count OVERSAMP times
 *        smaller than the mean count which would give BINFRAC in every
 *        bin. Increasing the oversample will increase the probability
-*        that only one bin will meet the BINFRAC criterion.
+*        that only one bin will meet the BINFRAC criterion.  Only used
+*        if USEPER is FALSE.
 *        [5]
 *     PERCENTILE = _DOUBLE (Read)
 *        The percentage point in the data histogram which is to be used
@@ -197,6 +198,27 @@
 *  Notes:
 *     - Threshold estimation.
 *
+*       The algorithm used for calculating the values of percentiles
+*       for threshold determination should give good results even in the 
+*       presence of pixel values which lie very far away from the bulk
+*       of the data.  However, the sampling of the histogram used to 
+*       estimate the mode and standard deviation may be poor in the 
+*       presence of extreme outliers.  If there are extreme outliers 
+*       therefore, the percentile method (USEPER set to TRUE) of 
+*       determining the threshold should be used.
+*
+*       The histogram used by FINDOBJ when USEPER is FALSE is formed by 
+*       (if necessary) re-binning until the BINFRAC criterion is met, 
+*       it is expected that this will always result in a well sampled 
+*       histogram. The background value is the mode of this histogram 
+*       and is not refined during the gaussian fitting. The gaussian 
+*       fitting just estimates the standard deviation of the background 
+*       and uses a fixed peak value and position (the mode of the 
+*       histogram) and iterates rejecting bins whose counts fall below 
+*       20 percent of the peak value, stopping when either 3 iterations
+*       have been performed or the standard deviation does not change 
+*       by more than one bin width in data values.
+*
 *       FINDOBJ is optimised to determine a reliable detection threshold
 *       and is not concerned with the accurate determination of the
 *       background value on a frame (as it performs no photometric
@@ -206,20 +228,6 @@
 *       purposes). FINDOBJ should not be used in a manner for which it
 *       is not suited without understanding how if differs from other
 *       more specialized routines.
-*
-*     - Histogram formation and gaussian fitting. 
-*
-*       The histogram used by FINDOBJ is formed by (if necessary)
-*       re-binning until the BINFRAC criterion is met, it is expected
-*       that this will always result in a well sampled histogram. The
-*       background value is the mode of this histogram and is not
-*       refined during the gaussian fitting. The gaussian fitting just
-*       estimates the standard deviation of the background and uses a
-*       fixed peak value and position (the mode of the histogram) and
-*       iterates rejecting bins whose counts fall below 20 percent of
-*       the peak value, stopping when either 3 iterations have been
-*       performed or the standard deviation does not change by more than
-*       one bin width in data values.
 *
 *     - NDF extension items. 
 *
@@ -248,7 +256,6 @@
 *       coordinates.
 
 *  Behaviour of parameters:
-*
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
