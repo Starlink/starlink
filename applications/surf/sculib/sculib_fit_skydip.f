@@ -1,5 +1,5 @@
 *+  SCULIB_FIT_SKYDIP - fit the SKYDIP data
-      SUBROUTINE SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, DATA,
+      SUBROUTINE SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, J_MEASURED,
      :  VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
      :  T_AMB, SUB_ETA_TEL, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
 *    Description :
@@ -39,7 +39,10 @@
 *     preprint and `Inversion of Sky Dips', SCU/WDD/31.1/1093 for further 
 *     details.
 *
-*        The fit allows B and ETA_TEL to vary - Free is negative, else fixed.
+*        Two fits are made; the first with ETAtel fixed and varying only b 
+*     and tau, the second allowing all 3 to vary. The first fit will give the 
+*     measurement of tau to be used and a value for b, the second will give 
+*     values for ETA_tel, tau and b to be used for long-term sky statistics.
 *        The fitting is done using the NAG routine E04UPF, which needs several
 *     work arrays whose size depends on the number of measurements taken.
 *
@@ -54,23 +57,34 @@
 *        SCULIB_SET_USER is called to fill with appropriate information the 
 *        USER array which communicates it to routines called by E04UPF.
 *
-*        The constraints are:
+*        For fit 1 -
+*
+*           An initial guess for the solution is set; eta_tel to the 
+*           current value used, b = 0.9 and tau = 0.1
+*
+*           Constraints on the values are set such that -
+*
+*              eta_tel  = fixed
 *               0.9999 >= b   >= 0.0001
 *              15      >= tau >= 0.0001
-*               0.9999 >= eta_tel >= 0.0001
+*               0.9999 >= eta_tel * b >= 0.0001
 *
 *           E04UPF is called to perform the fit. If no satisfactory fit can
-*           be achieved a warning will be issued and the routine will
-*           complete with bad status. Otherwise, the fitted results and 
+*           be achieved a warning will be issued but the routine will
+*           complete with good status. Otherwise, the fitted results and 
 *           the chi-squared achieved will be reported. 
+*
+*        Fit 2 is done in exactly the same way but eta_tel is allowed to
+*        vary subject to the constraint -
+*
+*               0.9999 >= eta_tel >= 0.0001
 *
 *        Lastly, the virtual memory used as work arrays by E04UPF is freed.
 *
 *    Invocation :
 *     CALL SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, DATA,
 *    :  VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
-*    :  T_AMB, SUB_ETA_TEL, B_FIT1, TAUZ_FIT1, ETA_TEL_FIT2, B_FIT2,
-*    :  TAUZ_FIT2, STATUS)
+*    :  T_AMB, SUB_ETA_TEL, B_FIT1, TAUZ_FIT, STATUS)
 *    Parameters :
 *     N_MEASUREMENTS            = INTEGER (Given)
 *              the number of SKYDIP measurements
@@ -92,14 +106,10 @@
 *              the ambient temperature (K)
 *     SUB_ETA_TEL               = REAL (Given)
 *              current value of eta_tel for this sub-instrument/filter
-*     B_IN                      = REAL (Returned)
-*              current value of B to be used for fit
-*     ETA_TEL_FIT               = REAL (Returned)
-*              fitted value of eta_tel
 *     B_FIT                     = REAL (Returned)
-*              fitted value of b with eta_tel
-*     TAUZ_FIT                  = REAL (Returned)
-*              fitted value of tauz with eta_tel
+*              fitted value of b with eta_tel fixed at SUB_ETA_TEL
+*     TAUZ_FIT                 = REAL (Returned)
+*              fitted value of tauz with eta_tel fixed at SUB_ETA_TEL
 *     STATUS                    = INTEGER (Given and returned)
 *              Global status
 *    Method :
@@ -112,11 +122,6 @@
 *      7-FEB-1996: split off from SCUDR_SKYDIP_SWITCH.
 *     23-JUL-1996: renamed SCULIB_ from SCUDR_ and made to fit the correct
 *                  function (JFL).
-*     $Log$
-*     Revision 1.2  1996/08/16 15:36:00  timj
-*     Now only does one fit (for off-line SKYDIP). Accepts B and ETA_TEL as free
-*     or fixed paramters. Returns bad status if fit fails.
-*
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -126,7 +131,7 @@
 *    Import :
       INTEGER N_MEASUREMENTS
       REAL    AIRMASS (N_MEASUREMENTS)
-      REAL    DATA (N_MEASUREMENTS)
+      REAL    J_MEASURED (N_MEASUREMENTS)
       REAL    VARIANCE (N_MEASUREMENTS)
       REAL    SUB_WAVELENGTH
       CHARACTER*(*) SUB_INSTRUMENT
@@ -143,214 +148,199 @@
 *    Status :
       INTEGER STATUS
 *    External references :
-      EXTERNAL SCULIB_SKYCON_1       ! CONFUN routine for E04UPF
-      EXTERNAL SCULIB_SKYFUNC_1      ! OBJFUN routine for E04UPF
-      REAL SCULIB_JNU                ! brightness temperature function
+      REAL     SCULIB_JNU            ! brightness temperature function
+      EXTERNAL SCULIB_SKYFUNC        ! Skydip function
+      EXTERNAL SCULIB_SKYFUNCD       ! Partial derivatives of skydip fn
 *    Global variables :
 *    Local Constants :
-      REAL LIGHT                     ! velocity of light
+      REAL             LAB           ! Mixing parameter of fit
+      PARAMETER (LAB = 0.01)
+      REAL             LIGHT         ! velocity of light
       PARAMETER (LIGHT = 2.997929E8)
+      INTEGER          MAX_ITER      ! Maximum number of allowed iterations
+      PARAMETER (MAX_ITER = 1000)
+      INTEGER          MAX_PTS       ! Maximum number of data points for fit
+      PARAMETER (MAX_PTS = 100)
+      REAL             MIN_VAR       ! Minimum variance for weighting
+      PARAMETER (MIN_VAR = 1.0E-5)
+      INTEGER          NUM_PARS      ! Number of parameters
+      PARAMETER (NUM_PARS = 5)   
+      REAL             TOL           ! Tolerance of fit
+      PARAMETER (TOL = 1.0E-5)
 *    Local variables :
-      DOUBLE PRECISION BL (4)        ! BL array in E04UPF, holds lower limits
-                                     ! of constraints on fitted parameters
-      DOUBLE PRECISION BU (4)        ! BU array in E04UPF, holds upper limits
-                                     ! of constraints on fitted parameters
       CHARACTER*80     BUFFER        ! buffer to hold results of fit
-      DOUBLE PRECISION C (1)         ! C array in E04UPF
-      DOUBLE PRECISION CHISQ         ! OBJF in E04UPF (the chi-squared of the
-                                     ! fit
-      DOUBLE PRECISION CJAC (1,3)    ! CJAC array in E04UPF
-      DOUBLE PRECISION CLAMBDA (4)   ! CLAMBDA array in E04UPF
-      DOUBLE PRECISION DIGNORE       ! unused parameter of E04UPF
-      INTEGER          IFAIL         ! NAG IFAIL parameter
-      INTEGER          ISTATE (4)    ! ISTATE array in E04UPF
-      INTEGER          ITER          ! number of iterations performed by E04UPF
-      INTEGER          IUSER (1)     ! IUSER array in E04UPF
+      REAL             CHISQ         ! the reduced chi-squared of the fit
+      REAL             ERR_PARS(NUM_PARS) ! error in parameters
+      INTEGER          I             ! Loop variable
       REAL             J_AMB         ! brightness temperature of ambient air
       REAL             J_TEL         ! brightness temperature of telescope 
-      INTEGER          LIWORK        ! dimension of IWORK array
-      INTEGER          LWORK         ! dimension of WORK array
-      INTEGER          L_STATUS      ! local status
-      INTEGER          NAG_FJAC_END  ! pointer to end of FJAC array in E04UPF
-      INTEGER          NAG_FJAC_PTR  ! pointer to FJAC array in E04UPF
-      INTEGER          NAG_F_END     ! pointer to end of array F in E04UPF 
-      INTEGER          NAG_F_PTR     ! pointer to array F in E04UPF 
-      INTEGER          NAG_IWORK_END ! pointer to end of IWORK array in E04UPF
-      INTEGER          NAG_IWORK_PTR ! pointer to IWORK array in E04UPF
-      INTEGER          NAG_USER_END  ! pointer to end of USER array in E04UPF
-      INTEGER          NAG_USER_PTR  ! pointer to USER array in E04UPF
-      INTEGER          NAG_WORK_END  ! pointer to end of WORK array in E04UPF
-      INTEGER          NAG_WORK_PTR  ! pointer to WORK array in E04UPF
-      INTEGER          NCLIN         ! the number of linear constraints to the
-                                     ! sky-dip fit in E04UPF
-      INTEGER          NCNLN         ! the number of non-linear constraints
-                                     ! to the sky-dip fit in E04UPF (see NAG
-                                     ! manual)
+      REAL             LOWER(NUM_PARS)! Lower limit of parameters
+      INTEGER          NRT           ! Number of iterations for fit (-ve=err)
       REAL             NU            ! frequency
-      DOUBLE PRECISION R (3,3)       ! R array in E04UPF
-      DOUBLE PRECISION X (3)         ! X array in E04UPF, the initial guess on
-                                     ! input and fitted result on output of the
-                                     ! fitted parameters
+      INTEGER          NUM_DOF       ! Number of degrees of freedom for CHISQ
+      INTEGER          MASK(NUM_PARS)! Parameter mask (free or fixed)
+      REAL             PARS(NUM_PARS)! Initial value of each parameter
+      REAL             UPPER(NUM_PARS)! Upper limit of parameters
+      REAL             VALUE         ! Value of skydip function
+      REAL             WEIGHTS(MAX_PTS)! Weight of each data point
+
 *    Internal References :
 *    Local data :
+      DATA ERR_PARS/0.,0.,0.,0.,0./  ! No errors on input parameters
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*  get VM for work arrays
+* Check number of data points for fit
 
-      CALL SCULIB_MALLOC (N_MEASUREMENTS * VAL__NBD, NAG_F_PTR, 
-     :  NAG_F_END, STATUS)
-      CALL SCULIB_MALLOC (N_MEASUREMENTS * 3 * VAL__NBD, NAG_FJAC_PTR, 
-     :  NAG_FJAC_END, STATUS)
-      LIWORK = 2 + 9 + N_MEASUREMENTS * 6 
-      CALL SCULIB_MALLOC (LIWORK * VAL__NBI, NAG_IWORK_PTR, 
-     :  NAG_IWORK_END, STATUS)
-      LWORK = 18 + 6 + 60 + 21 + N_MEASUREMENTS * 6
-      CALL SCULIB_MALLOC (LWORK * VAL__NBD, NAG_WORK_PTR, NAG_WORK_END, 
-     :  STATUS)
-      CALL SCULIB_MALLOC ((N_MEASUREMENTS * 3 + 3) * VAL__NBD,
-     :  NAG_USER_PTR, NAG_USER_END, STATUS)
+      IF (N_MEASUREMENTS .GT. MAX_PTS) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP('','SCULIB_FIT_SKYDIP: Too many data points',
+     :        STATUS)
+         RETURN
+      END IF
 
-*  turn off printing inside E04UPF and set tolerance of fit
+* Calculate J_TEL and J_AMB
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL E04URF ('Nolist')
-         CALL E04URF ('Major print level    0')
-         CALL E04URF ('Minor print level    0')
-         CALL E04URF ('Optimality tolerance 1.0E-3')
-         CALL E04URF ('Derivative level   3')
+      NU = LIGHT / (SUB_WAVELENGTH * 1.0E-6)
+      J_TEL = SCULIB_JNU (NU, T_TEL, STATUS)
+      J_AMB = SCULIB_JNU (NU, T_AMB, STATUS)
 
-*  fill USER array with appropriate numbers
+* Calculate weight
 
-         NU = LIGHT / (SUB_WAVELENGTH * 1.0E-6)
-         J_TEL = SCULIB_JNU (NU, T_TEL, STATUS)
-         J_AMB = SCULIB_JNU (NU, T_AMB, STATUS)
+      DO I = 1, N_MEASUREMENTS
+         IF (VARIANCE(I) .LT. 0.0) THEN 
+            WEIGHTS(I) = 0.0
+         ELSE IF (VARIANCE(I) .GT. MIN_VAR) THEN
+            WEIGHTS(I) = 1.0 / SQRT(VARIANCE(I))
+         ELSE
+            WEIGHTS(I) = 1.0 / SQRT(MIN_VAR)
+         ENDIF
+      END DO
 
-         CALL SCULIB_SET_USER (J_TEL, J_AMB, N_MEASUREMENTS,
-     :     AIRMASS, DATA, VARIANCE, %val(NAG_USER_PTR))
-
-         NCLIN = 0
-         NCNLN = 1
-   
-*  Set initial guess on tau
-
-         X (3) = 0.1D0
-
-*  set arrays holding limits and constraints for fitted values:-
+*  set arrays holding details of each parameter:-
 *
-*      index 1 = ETA_TEL
+*      index 1 = ETA_TEL 
 *      index 2 = B
 *      index 3 = TAU
-*      index 4 = non-linear constraint  - ETA_TEL * B
+*            4 = J_AMB
+*            5 = J_TEL
+*       J_AMB and J_TEL are always fixed. Use parameters to avoid COMMON
+*
+* Need to set initial guess for parameter (PARS) and
+* whether the parameter is fixed(0) or free(1) via MASK
+* upper and lower bounds are set via the UPPER and LOWER arrays
 
-*  lower and upper limits
+*  Deal with ETA_TEL
+      IF (SUB_ETA_TEL .LT. 0.0) THEN
+         MASK(1) = 1
+         PARS(1) = 0.99
+         NUM_DOF = NUM_DOF + 1
+      ELSE
+         MASK(1) = 0
+         PARS(1) = SUB_ETA_TEL
+      ENDIF
 
-         BL (3) = 0.0001D0
-         BL (4) = 0.0001D0
+      UPPER(1) = 0.9999
+      LOWER(1) = 0.0001
 
-         BU (3) = 15.0D0
-         BU (4) = 0.9999D0
+*  The second parameter is B
+      IF (B_IN .LT. 0.0) THEN
+         MASK(2) = 1
+         PARS(2) = 0.99
+         NUM_DOF = NUM_DOF + 1
+      ELSE
+         MASK(2) = 0
+         PARS(2) = B_IN
+      ENDIF
 
+      UPPER(2) = 0.9999
+      LOWER(2) = 0.0001
 
-         IF (SUB_ETA_TEL .LT. 0.0) THEN
-            X(1)  = 0.99D0
-            BL(1) = 0.0001D0
-            BU(1) = 0.9999D0
-         ELSE
-            X(1)  = DBLE (SUB_ETA_TEL)
-            BL(1) = DBLE (SUB_ETA_TEL)
-            BU(1) = DBLE (SUB_ETA_TEL)
-         ENDIF
+* TAU
+      MASK(3) = 1      ! Free parameter
+      PARS(3) = 0.5    ! Initial guess
+      NUM_DOF = 1
+      UPPER(3) = 15.00
+      LOWER(3) = 0.0001
 
-         IF (B_IN .LT. 0.0) THEN
-            X(2)  = 0.99D0
-            BL(2) = 0.0001D0
-            BU(2) = 0.9999D0
-         ELSE
-            X(2)  = DBLE (B_IN)
-            BL(2) = DBLE (B_IN)
-            BU(2) = DBLE (B_IN)
-         ENDIF
+* J_AMB
+      MASK(4) = 0
+      PARS(4) = J_AMB
 
-
+* J_TEL
+      MASK(5) = 0
+      PARS(5) = J_TEL
+      
 * Now try to fit this
+      IF (STATUS .EQ. SAI__OK) THEN
 
-         IF (STATUS .EQ. SAI__OK) THEN
-            IFAIL = 1
+         CALL LSQ_FIT (AIRMASS, 1, J_MEASURED, WEIGHTS,
+     :        N_MEASUREMENTS, PARS, ERR_PARS, NUM_PARS, TOL,
+     :        MAX_ITER, LAB, MASK, .TRUE., LOWER, UPPER, NRT,
+     :        SCULIB_SKYFUNC, SCULIB_SKYFUNCD)
 
-            CALL E04UPF (N_MEASUREMENTS, 3, 0, 1, 1, 1, 
-     :        N_MEASUREMENTS, 3, DIGNORE, BL, BU, 
-     :        SCULIB_SKYCON_1, SCULIB_SKYFUNC_1, ITER, 
-     :        ISTATE, C, CJAC, %val(NAG_F_PTR), 
-     :        %val(NAG_FJAC_PTR), CLAMBDA, CHISQ, R, X, 
-     :        %val(NAG_IWORK_PTR), LIWORK, 
-     :        %val(NAG_WORK_PTR), LWORK, IUSER, 
-     :        %val(NAG_USER_PTR), IFAIL)
+         ETA_TEL_FIT = PARS(1)
+         B_FIT = PARS(2)
+         TAUZ_FIT = PARS(3)
 
-            IF (IFAIL .NE. 0) THEN
-               CALL MSG_SETI ('IFAIL', IFAIL)
-               CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
-               CALL MSG_SETC ('FILT', SUB_FILTER)
-               STATUS = SAI__WARN
+         IF (NRT .LT. 0) THEN
+            CALL MSG_SETI ('IFAIL', NRT)
+            CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
+            CALL MSG_SETC ('FILT', SUB_FILTER)
+            STATUS = SAI__WARN
 *     I didnt flush ERR before returning...
-               CALL ERR_OUT (' ', 'SCULIB_FIT_SKYDIP: '//
-     :           'E04UPF has failed to fit ETA_TEL, B and '//
+            CALL ERR_OUT (' ', 'SCULIB_FIT_SKYDIP: '//
+     :           'LSQFIT has failed to fit ETA_TEL, B and '//
      :           'TAUZ for filter = ^FILT and sub-instrument '//
      :           '^SUB with IFAIL = ^IFAIL', STATUS)
 
-               STATUS = SAI__WARN
-               ETA_TEL_FIT = REAL (X(1))
-               B_FIT = REAL (X(2))
-               TAUZ_FIT = REAL (X(3))
-            ELSE
-               CALL MSG_SETC ('FILT', SUB_FILTER)
-               CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
-               CALL MSG_OUT (' ', 'SCULIB: fit for filter '//
+            STATUS = SAI__WARN
+*     Report the FIT error message
+            IF (NRT .EQ. -4) THEN
+               CALL ERR_REP(' ','Determinant of the coefficient '//
+     :              'matrix is zero', STATUS)
+            ELSE IF (NRT .EQ. -3) THEN
+               CALL ERR_REP(' ','Diagonal of matrix contains '//
+     :              'elements which are zero or almost zero', STATUS)
+            ELSE IF (NRT .EQ. -2) THEN
+               CALL ERR_REP(' ','Maximum number of iterations '//
+     :              'too small to obtain a solution which satisfies '//
+     :              'the required tolerance', STATUS)
+            ENDIF
+
+         ELSE
+
+*     Calculate CHISQ by hand
+            CHISQ = 0.0
+            DO I = 1, N_MEASUREMENTS
+               IF (VARIANCE(I) .GT. 0.0) THEN
+                  CALL SCULIB_SKYFUNC(VALUE, AIRMASS(I), PARS, 5)
+                  CHISQ = CHISQ + (J_MEASURED(I) - VALUE)**2 
+     :                 / VARIANCE(I)
+                  NUM_DOF = NUM_DOF + 1
+               ENDIF
+            END DO
+* Reduced Chi Sq - num of free parameters
+            CHISQ = CHISQ / REAL(NUM_DOF - 1)
+
+
+*  Print out answer
+            CALL MSG_SETC ('FILT', SUB_FILTER)
+            CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
+            CALL MSG_OUT (' ', 'SCULIB: fit for filter '//
      :           '^FILT and sub-instrument ^SUB with ETA '//
      :           'varying', STATUS)
-
-               ETA_TEL_FIT = REAL (X(1))
-               B_FIT = REAL (X(2))
-               TAUZ_FIT = REAL (X(3))
-
-               WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
-     :           REAL(CHISQ), ITER
- 20            FORMAT ('eta = ', F6.2, '          b = ', F6.2,
+            
+            WRITE (BUFFER, 20) PARS(1), PARS(2), PARS(3), 
+     :           CHISQ, NRT
+ 20         FORMAT ('eta = ', F6.2, '          b = ', F6.2,
      :           '  tau = ', F6.2, '  X = ', F7.1, '  N = ', I4)
- 
-               CALL MSG_SETC ('BUFFER', BUFFER)
-               CALL MSG_OUT (' ', ' ^BUFFER', STATUS)
-            END IF
+
+            CALL MSG_SETC ('BUFFER', BUFFER)
+            CALL MSG_OUT (' ', ' ^BUFFER', STATUS)
          END IF
       END IF
 
-*  free VM for work arrays
-
-      L_STATUS = SAI__OK
-      CALL SCULIB_FREE ('NAG_F', NAG_F_PTR, NAG_F_END, L_STATUS)
-      IF (L_STATUS .NE. SAI__OK) THEN
-         CALL ERR_FLUSH (L_STATUS)
-      END IF
-      CALL SCULIB_FREE ('NAG_FJAC', NAG_FJAC_PTR, NAG_FJAC_END, 
-     :  L_STATUS)
-      IF (L_STATUS .NE. SAI__OK) THEN
-         CALL ERR_FLUSH (L_STATUS)
-      END IF
-      CALL SCULIB_FREE ('NAG_IWORK', NAG_IWORK_PTR, NAG_IWORK_END, 
-     :  L_STATUS)
-      IF (L_STATUS .NE. SAI__OK) THEN
-         CALL ERR_FLUSH (L_STATUS)
-      END IF
-      CALL SCULIB_FREE ('NAG_WORK', NAG_WORK_PTR, NAG_WORK_END, 
-     :  L_STATUS)
-      IF (L_STATUS .NE. SAI__OK) THEN
-         CALL ERR_FLUSH (L_STATUS)
-      END IF
-      CALL SCULIB_FREE ('NAG_USER', NAG_USER_PTR, NAG_USER_END, 
-     :  L_STATUS)
-      IF (L_STATUS .NE. SAI__OK) THEN
-         CALL ERR_FLUSH (L_STATUS)
-      END IF
-
       END
+
