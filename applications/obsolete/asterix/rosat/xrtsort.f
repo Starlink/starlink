@@ -85,6 +85,7 @@
       INTEGER                 BQPTR             ! Pointer to bckgnd quality
       INTEGER                 SMPTR             ! Pointer to src image mask
       INTEGER                 BMPTR             ! Pointer to bckgnd image mask
+      INTEGER                 S2MPTR,B2MPTR     ! Secondary masks
       INTEGER                 SEVPTR(7)         ! Pointers to source lists
       INTEGER                 BEVPTR(7)         ! Pointers to bckgnd lists
       INTEGER                 WPNTR1,WPNTR2     ! Pointer to workspace arrays
@@ -148,14 +149,14 @@
 
 *  Create the output data set and get a pointer to mapped data array.
          CALL XRTSORT_CRE_BINNED (HEAD, SRT, LOCS, SDIM, NRBIN,
-     &                                   SRCPTR, SQPTR, STATUS )
+     &                                   SRCPTR, SQPTR, S2MPTR, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 *
 *  Create a background dataset if required
          IF (SRT.BCKGND) THEN
 *
             CALL XRTSORT_CRE_BINNED (HEAD, BSRT, LOCB, BDIM, 1,
-     &                                   BCKPTR, BQPTR, STATUS )
+     &                                   BCKPTR, BQPTR, B2MPTR, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 *
          ELSE
@@ -184,14 +185,20 @@
      &          SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
      &          BDIM(1), BDIM(2), BDIM(3), BDIM(4), BDIM(5), BDIM(6),
      &          BDIM(7), NRBIN, NAZBIN, MDIM(1), MDIM(2),
-     &          MRES,%val(SMPTR), %val(BMPTR),
+     &          MRES,%val(SMPTR),%val(BMPTR),%val(S2MPTR),%val(B2MPTR),
      &          %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
      &          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
 *
 *
          CALL DYN_UNMAP(SMPTR,STATUS)
+         IF (SRT.IMAGE) THEN
+           CALL DYN_UNMAP(S2MPTR,STATUS)
+         ENDIF
          IF (SRT.BCKGND) THEN
            CALL DYN_UNMAP(BMPTR,STATUS)
+           IF (BSRT.IMAGE) THEN
+             CALL DYN_UNMAP(B2MASK,STATUS)
+           ENDIF
          ENDIF
          CALL DYN_UNMAP(WPNTR1,STATUS)
          CALL DYN_UNMAP(WPNTR2,STATUS)
@@ -295,7 +302,7 @@
 
 *+XRTSORT_AXES   Writes the axes info into the output datafile
 	SUBROUTINE XRTSORT_AXES(LOC,NELS,NRBIN,NAXES,AXES,HIGH,LOW,
-     :                                                       STATUS)
+     :                                      BASE,SCALE,UNITS,STATUS)
 * Description :
 *        This routine writes axes structures into an output datafile
 * Method :
@@ -320,17 +327,17 @@
       INTEGER NAXES                     !Number of axes of output array
       INTEGER AXES(8)                   !Code for each axis (1-8)
       REAL HIGH(8),LOW(8)               !Extreme values for each dimension
+      REAL BASE(8)                      ! Zero point for each axis
+      REAL SCALE(8)                     ! Scale value for each axis
+      CHARACTER*(*) UNITS(8)            ! Axes units
 * Export :
 * Status :
       INTEGER STATUS
 * Local variables :
       CHARACTER*6 VARIANT(8)               ! The type of data-array
       INTEGER DIMENSION(8)                 ! Length of each axis
-      REAL BASE(8)                         ! Zero point for each axis
-      REAL SCALE(8)                        ! Scale value for each axis
       LOGICAL NORMALISED(8)                ! Data normalised to this axis ?
       CHARACTER*30 LABEL(8)                ! Axes labels
-      CHARACTER*30 UNITS(8)                ! Axes units
       INTEGER PNTR,LP,AXLP
       INTEGER SELS(8)                      ! An array of dimensions
 *-
@@ -716,7 +723,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 
 *+XRTSORT_CRE_BINNED - Create output binned dataset
       SUBROUTINE XRTSORT_CRE_BINNED(HEAD, SRT, OUTLOC, SDIM, NRBIN,
-     &                                      ARRPTR, QPTR, STATUS )
+     &                                    ARRPTR, QPTR, MPTR, STATUS)
 *    Description :
 *    Environment parameters :
 *       OUTPUT             UNIV             Name of binned output file
@@ -747,12 +754,15 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *    Export :
       INTEGER ARRPTR                            ! Pointer to mapped array
       INTEGER QPTR                              ! Pointer to quality array
+      INTEGER MPTR				! Pointer to mask array
 *    Status :
       INTEGER STATUS
 *    Local variables :
       CHARACTER*(DAT__SZTYP)  TYPE
+      CHARACTER*40 UNITS(8)
       INTEGER IDIMS(7)                          ! Dimensions of output array
       REAL LOW(8),HIGH(8)                       ! Range of each axis
+      REAL BASE(8),SCALE(8)
       REAL PTOD                                 ! Pixels to degrees conversion
       INTEGER TOTELS,LP
 *-
@@ -794,6 +804,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
          GOTO 999
       ENDIF
 *
+
 *   Initialise data and quality
       CALL ARR_INIT1R(0.0, TOTELS, %val(ARRPTR),STATUS)
       CALL ARR_INIT1B(0, TOTELS, %val(QPTR),STATUS)
@@ -829,8 +840,15 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *
 *   Create and fill axis data
       CALL XRTSORT_AXES( OUTLOC, SDIM, NRBIN, SRT.NAXES, SRT.BINAXIS,
-     &                                            HIGH, LOW, STATUS)
-*
+     &                          HIGH, LOW, BASE, SCALE, UNITS, STATUS)
+
+*  create sort mask for images
+      IF (SRT.IMAGE) THEN
+        CALL DYN_MAPI(2,SDIM,MPTR,STATUS)
+        CALL ARX_MASK(SRT.ARDID,SDIM,BASE,SCALE,UNITS,%val(MPTR),
+     :                                                     STATUS)
+      ENDIF
+
 *   Now create the ASTERIX box
       CALL XRTSORT_CRE_ASTERIX( OUTLOC, SRT, HEAD, STATUS )
 *
@@ -2826,7 +2844,8 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
      &           SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDIM1,
      &           BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
      &           NRBIN, NAZBIN, MDIM1,MDIM2,MRES,SMASK, BMASK,
-     &           ELIPA2, ELIPB2, SDATA, BDATA, SQUAL, BQUAL, STATUS)
+     &           S2MASK,B2MASK,ELIPA2,ELIPB2,SDATA,BDATA,SQUAL,BQUAL,
+     &                                                        STATUS)
 *    Description :
 *        Sorts events from an XRT hds event datafile into a temporary
 *       array of 7 dimensions.
@@ -2859,6 +2878,8 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       REAL MRES					  ! Resolution of mask
       INTEGER SMASK(MDIM1,MDIM2)                  ! Source spatial mask
       INTEGER BMASK(MDIM1,MDIM2)                  ! Bckgnd spatial mask
+      INTEGER S2MASK(SDIM1,SDIM2)
+      INTEGER B2MASK(BDIM1,BDIM2)
 *
 *    Import-Export :
       REAL ELIPA2(NRBIN)                          ! Square of elliptical
@@ -3091,7 +3112,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                IF (SRT.IMAGE) THEN
                  DO LP2=1,SDIM2
                     DO LP1=1,SDIM1
-                       IF (.NOT. QVAL .OR. SMASK(LP1,LP2).EQ.0) THEN
+                       IF (.NOT. QVAL .OR. S2MASK(LP1,LP2).EQ.0) THEN
                          SQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=
      :                                                  QUAL__MISSING
                        ENDIF
@@ -3112,7 +3133,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                  IF (BDIM1.GT.1.AND.BDIM2.GT.1.AND.NRBIN.EQ.1) THEN
                    DO LP2=1,BDIM2
                      DO LP1=1,BDIM1
-                       IF (.NOT. QVAL .OR. BMASK(LP1,LP2).EQ.0) THEN
+                       IF (.NOT. QVAL .OR. B2MASK(LP1,LP2).EQ.0) THEN
                          BQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=
      :                                                QUAL__MISSING
                        ENDIF
