@@ -187,7 +187,7 @@ endif
 
 #
 #  CHART
-if ( -e @bindir@/chart/chart ) then
+if ( -e @bindir@/chart/chart.csh ) then
    setenv CHART_DIR @bindir@/chart
 endif
 
