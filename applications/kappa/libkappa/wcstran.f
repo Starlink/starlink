@@ -93,7 +93,7 @@
 *        spaces or commas. 
 *     QUIET = _LOGICAL (Read)
 *        If TRUE, the transformed position is not written to the screen
-*        (it is still written to the output parameter POSOUT). [FALSE]
+*        (it is still written to the output parameter OUTPOS). [FALSE]
 
 *  Examples:
 *     wcstran m51 "100.1 21.5" pixel
@@ -228,6 +228,7 @@
 
 *  Display the text, between blank lines.
          CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC( 'TEXT', TEXT )
          CALL MSG_OUT( 'WCSTRAN_MSG', '  ^TEXT', STATUS )
          CALL MSG_BLANK( STATUS )
 
