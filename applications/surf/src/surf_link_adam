@@ -49,6 +49,8 @@
 #        Added PDA and ARD.
 #     1997 June 12 (TJ)
 #        Convert from KAPPA to SURF
+#     1997 October (TJ)
+#        Add the PGPLOT librarry.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -68,6 +70,7 @@ fi
       echo $iras -L/star/lib `ndf_link_adam` `fio_link_adam` \
            `sla_link_adam` `hlp_link_adam` `pda_link_adam` \
            `prm_link_adam` `agi_link_adam` `sgs_link_adam` \
+           `pgp_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
