@@ -45,8 +45,23 @@ whole system to be a little tighter (no bad thing), this helps pave
 the way for an eventual XML version of the DTD (XML has a fixed
 declaration which makes documents case-sensitive).
 
+<li>The paragraph-content parts of the General DTD was split off into
+a separate DTD fragment, <code/paracontent-0.6.dtd/, and the
+programcode DTD was modified to incorporate that, so that all of this
+structure is now available within the programcode DTD.
+
+<li>The paracontent and General DTDs were made fully compatible with
+XML, by use of suitably cunning parameter entities (MOO, MXX, etc, and
+Full.SGML.Only) in the DTD.
+
 <li>The &latex; down-converter now supports the most important of the
 Oasis Table attributes.  The HTML down-converter should follow soon.
+
+<li>The dtddescription DTD and associated utilities (in <code
+type="fspath">doc/dtd2sgml</code>) have been converted to XML, and a
+system for including comments on the DTD has been implemented.  This
+isn't <em/quite/ live yet, but should be available immediately after
+this release, to support discussion on the release 0.7 DTDs.
 
 </ul>
 
@@ -196,6 +211,66 @@ affected by a distribution bug, and RH 6.1 is already available.
 <dd>Done
 
 </dl>
+
+<subsubsect>Decisions from 1999 October meeting, RAL
+
+<p>This is the subset of decisions from that meeting which refer to
+the DTD specifically.
+<dl compact>
+
+<dt>The "publicity" level of a prologue should be indicated by the
+number of + and - signs at the beginning and end as follows:
+`*+'   = private
+`*++'  = protected (i.e. for internal docs)
+`*+++' = public (i.e. for external docs)
+<dd>
+Not done yet, but half-hour's work for me, probably less for Mark.
+
+<dt>"givenandreturned" should become two separate attributes "given" and
+"returned", defaulting to "given" if neither are specified.
+<dd>Done.
+
+<dt>"othernote" should be renamed "diytopic"
+We need to be able to include "diytopics" anywhere in the prologue,
+not just within a "notelist". This will probably mean doing away with
+"notelists".
+<dd>Done.  It's not particluarly pretty, but it's done.
+
+<dt>We need to be able to classify prologues using keywords. This
+requires a "keywordlist" element in the codeprologue DTD. One or zero
+of these should be allowed in each prologue, and they should provide
+two name spaces (e.g. using "keyword" elements for public keywords,
+and "group" elements for private keywords). 
+
+<dd>Done.  See <ref id=el.programcode.softwarekeywords
+text='softwarekeywords'> and <ref id=el.programcode.userkeywords
+text='userkeywords'> elements.
+
+<dt>The design for obsolete IDs in release 0.3 was accepted.
+<dd>Implemented.  See <ref id='el.sun.mapidlist' text='mapidlist'>.
+
+<dt>Including graphics files in-line in the main document is not needed.
+<dd>OK -- although not terribly useful, it's reasonably easy in fact, and
+if you include MetaPost source as a graphics format, it's implemented!
+
+<dt>Foreign words to be introduced using the <code>foreign</code> tag.
+Non-"full stop" dot to be "&dot;"
+<dd>Done.  See <ref id=el.sun.foreign text='foreign'> element.
+
+<dt>"docxref" should not generate any "magic" text, and they should be
+allowed in code prologues.
+<dd>Further discussed at March 2000 Cambridge meeting.
+
+</dl>
+
+<subsubsect>Decisions from 2000 March 23 meeting, Cambridge
+
+<p>One of the decisions was to make a snapshot release as quickly as
+possible, so no other decisions from this meeting have been
+implemented yet.  There was a decision to implement a system for
+commenting on DTD elements.  That has been almost done, and it will
+appear ready for the discussion on releasee 0.7 elements.
+
 
 
 <subsubsect>Outstanding issues
