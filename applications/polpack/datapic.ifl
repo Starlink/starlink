@@ -1,0 +1,104 @@
+#+
+#  Name:
+#     DATAPIC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: D. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-APR-1997 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface DATAPIC
+
+   parameter DEVICE
+      position 1
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT '
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  xwindows
+      ptype    DEVICE
+      prompt   'Name of device'
+   endparameter
+
+   parameter      NCX1           # Picture lower x NDC
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      NCX2           # Picture upper x NDC
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      NCY1           # Picture lower y NDC
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      NCY2           # Picture upper y NDC
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      WCX1           # Picture lower x world co-ordinate
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      WCX2           # Picture upper x world co-ordinate
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      WCY1           # Picture lower y world co-ordinate
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      WCY2           # Picture upper y world co-ordinate
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      RESULT         # All results in a single string
+      type        _CHAR
+      access      WRITE
+      vpath       'DEFAULT'
+      default     ' '
+      helpkey     '*'
+   endparameter
+
+endinterface

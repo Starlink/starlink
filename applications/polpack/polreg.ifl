@@ -1,0 +1,246 @@
+#+
+#  Name:
+#     POLREG.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-APR-1997 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface POLREG
+
+   helplib 'POLPACK_HELP'
+
+   parameter BADCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'CYAN'
+      prompt   'Colour with which to mark missing pixel data'
+      helpkey  '*'
+   endparameter
+
+   parameter CURCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'RED'
+      prompt   'Colour with which to mark current objects'
+      helpkey  '*'
+   endparameter
+
+   parameter DPI                
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Screen dots per inch'
+      helpkey  '*'
+   endparameter
+
+   parameter DUALBEAM
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Run in dual-beam mode?"
+      helpkey  '*'
+   endparameter
+
+   parameter FITTYPE
+      type     _INTEGER
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      prompt   'Fit type (1-5) for aligning images'
+      helpkey  '*'
+   endparameter
+
+   parameter HELPAREA           
+      type     _LOGICAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Display the help area?'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'Input images'
+      helpkey  '*'
+   endparameter
+
+   parameter ITEMS
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '.0'
+      prompt   'Required items in the status area (private)'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE
+      type     _CHAR
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'The name of a file in which to store all ATASK messages.'
+      helpkey  '*'
+   endparameter
+
+   parameter NEWCOLMAP
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  NO
+      prompt   'Use a private colour map?'
+      helpkey  '*'
+   endparameter
+
+   parameter OEFITTYPE
+      type     _INTEGER
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      prompt   'Fit type (1-5) for aligning O and E rays'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      ppath    'CURRENT,DEFAULT'
+      default  '*_A'
+      prompt   'Aligned output images '
+      helpkey  '*'
+   endparameter
+
+   parameter OUT_E
+      position 3
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      ppath    'CURRENT,DEFAULT'
+      default  '*_E'
+      prompt   'Aligned output images holding E-ray areas'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT_O
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      ppath    'CURRENT,DEFAULT'
+      default  '*_O'
+      prompt   'Aligned output images holding O-ray areas'
+      helpkey  '*'
+   endparameter
+
+  parameter PERCENTILES
+      type     '_REAL'
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  5,95
+      prompt   'Percentiles for scaling'
+      helpkey  '*'
+   endparameter
+
+   parameter PSFSIZE
+      type     _INTEGER
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  3
+      prompt   'Typical size of star-like image features (in pixels)'
+      helpkey  '*'
+   endparameter
+
+   parameter REFCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'GREEN'
+      prompt   'Colour with which to mark reference objects'
+      helpkey  '*'
+   endparameter
+
+   parameter SELCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'RED'
+      prompt   'Colour with which to mark the selected area'
+      helpkey  '*'
+   endparameter
+
+   parameter STATUSAREA           
+      type     _LOGICAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Display the status area?'
+      helpkey  '*'
+   endparameter
+
+   parameter VIEW
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'Zoomed'
+      prompt   'View new images zoomed or unzoomed?'
+      helpkey  '*'
+   endparameter
+
+   parameter XHAIR
+      type     _LOGICAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Use a cross-hair over the image display area?"
+      helpkey  '*'
+   endparameter
+
+   parameter XHAIRCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'YELLOW'
+      prompt   'Colour with which to draw the cross-hair (if required)'
+      helpkey  '*'
+   endparameter
+
+endinterface

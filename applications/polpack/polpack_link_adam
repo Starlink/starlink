@@ -1,0 +1,51 @@
+
+#  N.B. the previous line should be blank.
+
+#+
+#  Name:
+#     polpack_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against adam POLPACK.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use POLPACK in order to generate the correct arguments for the 
+#     compiler (or ld) command. The arguments generated are written to 
+#     the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a makefile command to
+#     create a monolith in Satrlink standard makefiles, thus:
+#
+#         $(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
+#             -L$(STAR_LIB) `./polpack_link_adam`
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     DSB: David Berry (Starlink - University of Manchester)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-JUN-1997 (DSB):
+#        Original version, based on ircampack_link_adam
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lfits -lkapgen -lsla `fio_link_adam` `nbs_link_adam` \
+                   `gwm_link_adam` `agi_link_adam` \
+                   `grp_link_adam` `ndf_link_adam` `hlp_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

@@ -1,0 +1,463 @@
+0 Help
+ Welcome to the POLPACK online help system.  Here you can display
+ details about a specific POLPACK command or more-general information
+ such as what POLPACK can do and how to use it.  If you need assistance
+ using this help system, enter "Using_help" in response to the
+ "Topic?" prompt. 
+
+1 Changes_to_POLPACK
+
+The main changes made to POLPACK at each release are described in the
+following sub-topics.
+
+1 POLHELP
+Gives help about POLPACK.
+
+Usage:
+
+   polhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
+
+Description:
+
+   Displays help about POLPACK. The help information and alphabetical
+   lists of commands, general information about POLPACK and related
+   material; it describes individual commands in detail.
+
+   Here are some of the main options.
+      polhelp
+         No parameter is given so the introduction and the top-level
+         help index is displayed.
+      polhelp application/topic
+         This gives help about the specified application or topic.
+      polhelp application/topic subtopic
+         This lists help about a subtopic of the specified
+         application or topic. The hierarchy of topics has a maximum
+         of four levels.
+
+   See the Section "Navigating the Help Library" for details how to
+   move around the help information, and to select the topics you
+   want to view.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 TOPIC
+TOPIC = LITERAL (Read)
+   Topic for which help is to be given. [" "]
+3 SUBTOPIC
+SUBTOPIC = LITERAL (Read)
+   Subtopic for which help is to be given. [" "]
+3 SUBSUBTOPIC
+SUBSUBTOPIC = LITERAL (Read)
+   Subsubtopic for which help is to be given. [" "]
+3 SUBSUBSUBTOPIC
+SUBSUBSUBTOPIC = LITERAL (Read)
+   Subsubsubtopic for which help is to be given. [" "]
+2 Navigating_the_Help_Library
+   The help information is arranged hierarchically.  You can move
+   around the help information whenever POLHELP prompts.  This
+   occurs when it has either presented a screen's worth of text or
+   has completed displaying the previously requested help.  The
+   information displayed by POLHELP on a particular topic includes a
+   description of the topic and a list of subtopics that further
+   describe the topic.
+
+   At a prompt you may enter:
+      o  a topic and/or subtopic name(s) to display the help for that
+         topic or subtopic, so for example, "polreg parameters dpi"
+         gives help on DPI, which is a subtopic of Parameters, which
+         in turn is a subtopic of POLREG;
+
+      o  a <CR> to see more text at a "Press RETURN to continue ..."
+         request;
+
+      o  a <CR>} at topic and subtopic prompts to move up one level
+         in the hierarchy, and if you are at the top level it will
+         terminate the help session;
+
+      o  a CTRL/D (pressing the CTRL and D keys simultaneously) in
+         response to any prompt will terminate the help session;
+
+      o  a question mark "?" to redisplay the text for the current
+         topic, including the list of topic or subtopic names; or
+
+      o  an ellipsis "..." to display all the text below the
+         current point in the hierarchy.  For example, "POLREG..."
+         displays information on the POLREG topic as well as
+         information on all the subtopics under POLREG.
+
+   You can abbreviate any topic or subtopic using the following
+   rules.
+
+      o  Just give the first few characters, e.g. "PARA" for
+         Parameters.
+
+      o  Some topics are composed of several words separated by
+         underscores.  Each word of the keyword may be abbreviated,
+         e.g. "Colour_Set" can be shortened to "C_S".
+
+      o  The characters "%" and "*" act as wildcards, where the
+         percent sign matches any single character, and asterisk
+         matches any sequence of characters.  Thus to display
+         information on all available topics, type an asterisk in
+         reply to a prompt.
+
+      o  If a word contains, but does end with an asterisk wildcard,
+         it must not be truncated.
+
+      o  The entered string must not contain leading or embedded
+         spaces.
+
+   Ambiguous abbreviations result in all matches being displayed.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+DSB: David S. Berry (STARLINK)
+2 History
+ 1997 July 1 (DSB):
+    Original, copied from the equivalent KAPPA file (written by MJC).
+
+2 Implementation_Status
+   -  Uses the portable help system.
+
+1 POLPACK
+
+POLPACK comprises applications which facilitiate the reduction of imaging
+polarimetry data. Both dual-beam and single beam data can be processed.
+POLPACK handles bad pixels, and processes quality, variance, and other
+information stored within NDFs (cf. SUN/33). It can also process
+data in other formats, such as FITS and IRAF, using an automatic-data
+conversion facility (SUN/55, SSN/20).
+
+POLPACK commands are available from both the UNIX C-shell (and
+variants) and from the ICL command language.  
+
+Type ? to see the main help topics.
+
+1 Using_Help
+ You are situated in a portable HELP library which contains help
+ information about POLPACK arranged in an hierarchical structure.  The
+ help system enables you to navigate the library by prompting when it
+ has completed displaying the previously requested help.  The
+ information displayed by the help system on a particular topic
+ includes a description of the topic and a list of subtopics that
+ further describe the topic.  These topic names are called keywords. 
+
+ At a prompt you may enter:
+
+   o  a topic or subtopic name to display the help for that topic or
+      subtopic;
+
+   o  just a <CR> to move up one level in the hierarchy, and if you
+      are at the top level it will terminate the help session;
+
+   o  a CTRL/D will terminate the help session;
+
+   o  a question mark "?" to redisplay the text for the current topic,
+      including the list of topic or subtopic names; or
+
+   o  an ellipsis "..." to display all the text below the current point 
+      in the hierarchy.  For example, "GLITCH..." displays information 
+      on the GLITCH topic as well as information on all the subtopics
+      under GLITCH.
+
+ You can abbreviate any keyword using the following rules:
+
+   1) Just give the first few characters, e.g. "PARA" for
+   "Parameters".
+
+   2) Some keywords are composed of several words separated by
+   underscores.  Each word of the keyword may be abbreviated,
+   e.g. "Colour_Set" can be shortened to "C_S".
+
+   3) The characters "%" and "*" act as wildcards, where the percent
+   sign matches any single character, and asterisk matches any
+   sequence of characters.  Thus to display information on all
+   available topics, type an asterisk (*) in reply to a hrlp prompt.
+
+   4) If a word contains but does end with an asterisk wildcard, it
+   must not be truncated.
+
+   5) The entered string must not contain leading or embedded spaces.
+
+ Ambiguous abbreviations result in all matches being displayed. 
+ 
+2 Help_Parameters
+
+ keyword ...
+
+  Specifies one or more keywords that refer to the topic  or  subtopic
+  on  which you  want  information from the help library.  Information
+  within the help library is arranged in a hierarchical  manner.   The
+  levels are:
+
+  1.  None--- If you do not specify a keyword,  POLHELP introduces the 
+      help system  and  lists the  top-level topics.  Each item in the
+      list is a keyword in the first level of the hierarchy.
+
+  2.  Topic-name---If you specify  a keyword  by naming  a topic,  the
+      help facility  describes  the  topic.  Keywords  for  additional
+      information available on this topic are listed.
+
+  3.  Topic-name subtopic---If you  specify  a  subtopic  following  a
+      topic, the help facility provides a description of the specified
+      subtopic.
+
+1 POLREG
+Extract and align O and E ray areas from a set of images.
+
+Usage:
+
+   polreg in out_o out_e
+
+Description:
+
+   This routine extacts and aligns areas containing corresponding rays
+   from a set of images containing dual or single beam polarimetry data.
+
+   In dual-beam mode, two output images are created for each
+   supplied input image, one containing the O-ray areas and the other
+   containing the E-ray areas from the corresponding input image. All
+   output images are aligned pixel-for-pixel. In single-beam mode, only
+   one output image is created for each input image.
+
+   The mappings between rays and images are determined from a set of
+   fiducial positions supplied by the user, using an integrated
+   graphical user interface (GUI) which activates various applications
+   from the KAPPA, CCDPACK and POLPACK packages. The same GUI is used to
+   specify masks enclosing the O and E ray areas of each image (each mask
+   comprises one or more polygonal areas). For each input image, the
+   contents of the O-ray mask is copied to the corresponding "O-ray"
+   output, and the contents of the E-ray mask is copied to the corresponding
+   "E-ray" output. In single-beam mode only a single mask is used
+   (notionally the "O-ray" mask), but the user has the option of not
+   supplying any mask at all, in which case the whole input image is
+   copied to the output.
+
+   Various options controlling the behaviour of the GUI can be set on
+   the command line by assigning values to the parameters listed below.
+   Alternatively, they can be set using the "Options" menu in the menu
+   bar at the top of the GUI. If not supplied on the command line, these
+   parameters usually adopt the values they had on the previous
+   invocation of PolReg. The values shown in square brackets in the
+   parameter descriptions below are the initial default values.
+
+   Detailed information on the operation of PolReg and how to use the GUI
+   is available by clicking on the "Help" button at the right hand end of
+   the menu bar.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BADCOL
+BADCOL = LITERAL (Update)
+   The colour with which to represent missing data. This should be
+   one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
+   unambiguous abbreviation can be supplied, and the value is
+   case-insensitive. [CYAN]
+3 CURCOL
+CURCOL = LITERAL (Update)
+   The colour with which to mark the objects (i.e. image features
+   or masks) currently being entered by the user. This should be
+   one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
+   unambiguous abbreviation can be supplied, and the value is
+   case-insensitive. [RED]
+3 DPI
+DPI = _INTEGER (Read)
+   The dots per inch on the display screen. Some X servers fail to
+   supply the correct value, resulting in the GUI being unplesantly
+   small or large. For this reason, an explicit value may be supplied
+   using this parameter. If a null (!) value is supplied, then the
+   DPI value returned by the X server is used. This parameter may
+   also be used to adjust the size of the GUI to the user's
+   preference, even if the DPI value returned by the X server is correct.
+   Note, this value cannot be set from the GUI's "Options" menu. [!]
+3 DUALBEAM
+DUALBEAM = _LOGICAL (Read)
+   If a true value is suplied, then PolReg will operate in
+   dual-beam mode, producing two output images for each input image.
+   Otherwise, it will operate in single-beam mode, with one output
+   image being produced for each input image. In single-beam mode,
+   the output image is notionally referred to as the "O-ray" image,
+   and all the GUI controls related to the E-ray areas are disabled.
+   Note, this parameter cannot be set from the GUI's "Options"
+   menu. [TRUE]
+3 FITTYPE
+FITTYPE = _INTEGER (Update)
+   The type of mapping which should be used between images. This
+   may take the following values:
+
+   1 - Shift of origin.
+
+   2 - Shift of origin and rotation.
+
+   3 - Shift of origin and magnification.
+
+   4 - Shift of origin, rotation and magnification.
+
+   5 - A full 6 parameter mapping of the form:
+
+         X_out = C1  +  C2 * X_in  +  C3 * Y_in
+         Y_out = C4  +  C5 * X_in  +  C6 * Y_in
+
+       This form of mapping allows the rotation and magnification
+       to be different for each axis, and is unlikely to be of use
+       with most polarimetry data. [1]
+3 HELPAREA
+HELPAREA = _LOGICAL (Update)
+   If a true value is supplied, then dynamic help information will be
+   displayed in a box at the bottom of the GUI. This information
+   describes the component of the GUI currently under the mouse
+   pointer. [TRUE]
+3 IN
+IN = NDF (Read)
+   A list of input images. Note, the input images cannot be
+   specified within the GUI.
+3 LOGFILE
+LOGFILE = LITERAL (Read)
+   The name of a log file to which will be written all the messages
+   generated by the applications activated by the GUI. If "stdout"
+   is supplied, then the messages will be directed to standard
+   output (usually the screen). If a null (!) value is supplied, then
+   no log file will be created. Note, this parameter cannot be set
+   from the GUI's "Options" menu. [!]
+3 NEWCOLMAP
+NEWCOLMAP = _LOGICAL (Read)
+   If a true value is supplied for NEWCOLMAP, then the GUI will use
+   its own private colour map. Otherwise it will share the standard
+   colour map. Note, with a false value for NEWCOLMAP, there may
+   be insufficient free colours in the standard colour map (i.e. if
+   other X applications are running). In this case polreg will report
+   an error and abort. If this happens, try re-running with a true
+   value for NEWCOLMAP. [FALSE]
+3 OEFITTYPE
+OEFITTYPE = _INTEGER (Update)
+   The type of mapping which should be used between O and E rays. See
+   parameter FITTYPE for a description of the allowed values. [1]
+3 OUT
+OUT = LITERAL (Write)
+   A list of the names of the output images to create in single-beam
+   mode. These should correspond one-for-one to the input images
+   supplied using parameter IN. This parameter is only accessed if
+   parameter DUALBEAM is given a false value. Note, the output images
+   cannot be specified within the GUI.
+3 OUT_E
+OUT_E = LITERAL (Write)
+   A list of the names of the E-ray output images to create in dual-beam
+   mode. These should correspond one-for-one to the input images
+   supplied using parameter IN. This parameter is only accessed if
+   parameter DUALBEAM is given a true value. Note, the output images
+   cannot be specified within the GUI.
+3 OUT_O
+OUT_O = LITERAL (Write)
+   A list of the names of the O-ray output images to create in dual-beam
+   mode. These should correspond one-for-one to the input images
+   supplied using parameter IN. This parameter is only accessed if
+   parameter DUALBEAM is given a true value. Note, the output images
+   cannot be specified within the GUI.
+3 PERCENTILES
+PERCENTILES( 2 ) = _REAL (Update)
+   The percentiles that define the scaling limits for the displayed
+   images. For example, [25,75] would scale between the quartile
+   values. [5,95]
+3 PSFSIZE
+PSFSIZE = _INTEGER (Update)
+   This value controls the centroiding process which is used to find
+   accurate centres for the features identified using the mouse.
+   It should be set roughly to the width (in pixels) of the
+   features which are to be used to align the images. If the
+   accurate positions wander too far from the original position, then
+   a smaller value should be supplied. If it is set to zero, then
+   no centroiding is performed, and the raw feature positions are
+   used as supplied. [3]
+3 REFCOL
+REFCOL = LITERAL (Update)
+   The colour with which to mark the reference objects (i.e. image
+   features or masks). This should be one of RED, BLUE, GREEN, CYAN,
+   MAGENTA, YELLOW, BLACK. Any unambiguous abbreviation can be supplied,
+   and the value is case-insensitive. [GREEN]
+3 SELCOL
+SELCOL = LITERAL (Update)
+   The colour with which to mark the selected area of the image (if any).
+   This should be one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK.
+   Any unambiguous abbreviation can be supplied, and the value is
+   case-insensitive. [RED]
+3 STATUSAREA
+STATUSAREA = _LOGICAL (Update)
+   If a true value is supplied, then information describing the
+   currently displayed image, current options values, etc, will be
+   displayed in a box underneath the displayed image. The contents
+   of this box can be selected using the "Options" menu in the GUI.
+   [TRUE]
+3 VIEW
+VIEW = LITERAL (Update)
+   This controls how images are placed within the image display
+   area of the GUI when a new image is selected using the "Images"
+   menu. It may take one of the following values:
+
+   ZOOMED - The new image is displayed with the curremt zoom factor
+   and image centre.
+
+   UNZOOMED - The zoom factor and image centre are reset so that
+   the new image just fills the image display area in at least one
+   dimension. [ZOOMED]
+3 XHAIR
+XHAIR = _LOGICAL (Update)
+   If a true value is supplied, then a cross hair will be used
+   instead of a pointer while the mouse is over the image display
+   area. [TRUE]
+3 XHAIRCOL
+XHAIRCOL = LITERAL (Update)
+   The colour with which to draw the cross-hair (if required). This
+   should be one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
+   unambiguous abbreviation can be supplied, and the value is
+   case-insensitive. [YELLOW]
+2 Examples
+polreg 'im1,im2' '*_o' '*_e'
+   This example aligns and extracts the O and E ray areas from the two
+   images `im1` and `im2`, and stores them in the images `im1_o`,
+   `im1_e`, `im2_o` and `im2_e`. The current values for all other
+   parameters are used.
+
+polreg ^in_files.lis out=^out_files.lis dualbeam=no reset
+   This example uses single-beam mode. It reads the names of input
+   images from the text file `in_files.lis`, aligns them and stores
+   them in the images named in the text file `out_files.lis`. All
+   other parameters are reset to their initial default values listed
+   in the parameter descriptions above.
+2 Notes
+- The following components are added to the POLPACK extension in the
+output images (the extension is first created if it does not
+already exist):
+
+ROTATION (_REAL): The clockwise rotation from the input
+image to the output image (in degrees). If the input image already
+contains a POLPACK extension, then the value of ROTATION written to the
+output image is the sum of the input image value and the value
+implied by the new mapping.
+
+YROTATION (_REAL): This component is only written to the extension
+if the output image may contain shear. It is the clockwise
+rotation from the input image Y axis to the output image Y axis (in
+degrees). In this case the ROTATION component (see above) is understood
+as giving the rotation of the X axis. If the input image already
+contains a POLPACK extension, then the value of YROTATION written to the
+output image is the sum of the input image value and the value
+implied by the new mapping.
+
+RAY (_CHAR): A label identifying which of the two rays the image
+contains. This will be either "O" or "E". This is only written in
+dual-beam mode (see parameter DUALBEAM).
+
+PLATE (_CHAR): The name of the input image from which the output image
+was derived. This does not include a directory path. If the input
+image already contains a POLPACK extension with a PLATE value, then
+the PLATE value is copied unchanged to the corresponding output
+images.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 18-APR-1997 (DSB):
+    Original version.
+2 Implementation_Status
+   - The output images are created from the input images using KAPPA
+   application SEGMENT (to extract the mask areas), and the CCDPACK
+   application TRANNDF (to align them). The documentation for these
+   applications should be consulted for details of which NDF components
+   are processed, what numerical data types are used for the processing,
+   etc.

@@ -1,0 +1,863 @@
+Monolith polpack_mon
+
+
+#+
+#  Name:
+#     DATAPIC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: D. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-APR-1997 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface DATAPIC
+
+   parameter DEVICE
+      position 1
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT '
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  xwindows
+      ptype    DEVICE
+      prompt   'Name of device'
+   endparameter
+
+   parameter      NCX1           # Picture lower x NDC
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      NCX2           # Picture upper x NDC
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      NCY1           # Picture lower y NDC
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      NCY2           # Picture upper y NDC
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      WCX1           # Picture lower x world co-ordinate
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      WCX2           # Picture upper x world co-ordinate
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      WCY1           # Picture lower y world co-ordinate
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      WCY2           # Picture upper y world co-ordinate
+      type        _REAL
+      access      WRITE
+      vpath       'DEFAULT'
+      default     0.0D0
+      helpkey     '*'
+   endparameter
+
+   parameter      RESULT         # All results in a single string
+      type        _CHAR
+      access      WRITE
+      vpath       'DEFAULT'
+      default     ' '
+      helpkey     '*'
+   endparameter
+
+endinterface
+
+#+
+#  Name:
+#     POLCENT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-MAY-1997 (DSB):
+#     	 Original version, derived from CCDPACK:FINDCENT.IFL
+#     {enter_changes_here}
+
+#-
+
+interface POLCENT
+
+   helplib 'POLPACK_HELP'
+
+   parameter DEVICE
+      access   READ
+      vpath    'GLOBAL,CURRENT,PROMPT '
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  xwindows
+      ptype    DEVICE
+      prompt   'Name of device'
+   endparameter
+
+   parameter NDF                 # Input NDF 
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'Input image'
+      helpkey  '*'
+   endparameter
+
+   parameter ISIZE               # Search box size
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  9
+      prompt   'Size of search box'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXSHIFT            # Maximum shift in feature position
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  5.5D0
+      prompt   'Maximum shift in position'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXITER             # Maximum number of iterations
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3
+      prompt   'Maximum number of refining iterations'
+      helpkey  '*'
+   endparameter
+
+   parameter TOLER               # Required tolerance
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.05D0
+      prompt   'Positional tolerance in centroid'
+      helpkey  '*'
+   endparameter
+
+   parameter POSITIVE            # Sign of features
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  TRUE
+      prompt   'Features have positive signal'
+      helpkey  '*'
+   endparameter
+
+   parameter      XIN                # Initial X co-ordinate
+      position    2
+      type        '_REAL'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Guess at X co-ordinate of feature'
+      helpkey     '*'
+   endparameter
+
+   parameter      XOUT               # X centroid position
+      access      'WRITE'
+      type        '_REAL'
+      vpath       'DEFAULT'
+      prompt      'Object to contain the x centroid position'
+      default     0.0
+      helpkey     '*'
+   endparameter
+
+   parameter      XYOUT              # X and Y centroid positions
+      access      'WRITE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Object to contain the x an y centroid positions'
+      default     ' '
+      helpkey     '*'
+   endparameter
+
+   parameter      YIN                # Initial Y co-ordinate
+      position    3
+      type        '_REAL'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Guess at Y co-ordinate of feature'
+      helpkey     '*'
+   endparameter
+
+   parameter      YOUT               # Y centroid position
+      access      'WRITE'
+      type        '_REAL'
+      vpath       'DEFAULT'
+      prompt      'Object to contain the y centroid position'
+      default     0.0
+      helpkey     '*'
+   endparameter
+
+endinterface
+
+#+
+#  Name:
+#     POLHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1997 July 1 (DSB):
+#	 Original version, copied from kaphelp.ifl written by MJC.
+#     {enter_further_changes_here}
+
+#-
+
+
+interface POLHELP
+
+   helplib        POLPACK_HELP:
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+endinterface
+
+#+
+#  Name:
+#     POLREG.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-APR-1997 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface POLREG
+
+   helplib 'POLPACK_HELP'
+
+   parameter BADCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'CYAN'
+      prompt   'Colour with which to mark missing pixel data'
+      helpkey  '*'
+   endparameter
+
+   parameter CURCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'RED'
+      prompt   'Colour with which to mark current objects'
+      helpkey  '*'
+   endparameter
+
+   parameter DPI                
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Screen dots per inch'
+      helpkey  '*'
+   endparameter
+
+   parameter DUALBEAM
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Run in dual-beam mode?"
+      helpkey  '*'
+   endparameter
+
+   parameter FITTYPE
+      type     _INTEGER
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      prompt   'Fit type (1-5) for aligning images'
+      helpkey  '*'
+   endparameter
+
+   parameter HELPAREA           
+      type     _LOGICAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Display the help area?'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'Input images'
+      helpkey  '*'
+   endparameter
+
+   parameter ITEMS
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '.0'
+      prompt   'Required items in the status area (private)'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE
+      type     _CHAR
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'The name of a file in which to store all ATASK messages.'
+      helpkey  '*'
+   endparameter
+
+   parameter NEWCOLMAP
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  NO
+      prompt   'Use a private colour map?'
+      helpkey  '*'
+   endparameter
+
+   parameter OEFITTYPE
+      type     _INTEGER
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      prompt   'Fit type (1-5) for aligning O and E rays'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      ppath    'CURRENT,DEFAULT'
+      default  '*_A'
+      prompt   'Aligned output images '
+      helpkey  '*'
+   endparameter
+
+   parameter OUT_E
+      position 3
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      ppath    'CURRENT,DEFAULT'
+      default  '*_E'
+      prompt   'Aligned output images holding E-ray areas'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT_O
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      ppath    'CURRENT,DEFAULT'
+      default  '*_O'
+      prompt   'Aligned output images holding O-ray areas'
+      helpkey  '*'
+   endparameter
+
+  parameter PERCENTILES
+      type     '_REAL'
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  5,95
+      prompt   'Percentiles for scaling'
+      helpkey  '*'
+   endparameter
+
+   parameter PSFSIZE
+      type     _INTEGER
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  3
+      prompt   'Typical size of star-like image features (in pixels)'
+      helpkey  '*'
+   endparameter
+
+   parameter REFCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'GREEN'
+      prompt   'Colour with which to mark reference objects'
+      helpkey  '*'
+   endparameter
+
+   parameter SELCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'RED'
+      prompt   'Colour with which to mark the selected area'
+      helpkey  '*'
+   endparameter
+
+   parameter STATUSAREA           
+      type     _LOGICAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Display the status area?'
+      helpkey  '*'
+   endparameter
+
+   parameter VIEW
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'Aligned'
+      prompt   'View the images aligned or stacked?'
+      helpkey  '*'
+   endparameter
+
+   parameter XHAIR
+      type     _LOGICAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  NO
+      prompt   'Use a cross-hair over the image display area?"
+      helpkey  '*'
+   endparameter
+
+   parameter XHAIRCOL
+      type     _CHAR
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'YELLOW'
+      prompt   'Colour with which to draw the cross-hair (if required)'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     SEGMENT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-OCT-1993 (DSB):
+#        Original NDF version.
+#     {enter_further_changes_here}
+
+#-
+
+interface SEGMENT
+
+   helplib        'KAPPA_HELP:'
+
+   parameter AXES
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      prompt      'Indices of the axes spanning the polygon plane'
+      helpkey     '*'
+   endparameter
+
+   parameter      COSYS          # Co-ordinate system
+      type        'LITERAL'
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DYNAMIC'
+      prompt      'Co-ordinate system'
+      association '<->GLOBAL.COORD_SYSTEM'
+      helpkey     '*'
+      default     'World'
+   endparameter
+
+   parameter      IN1            # First input NDF 
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL'
+      association '<-GLOBAL.DATA_ARRAY'
+      prompt      'NDF holding data to be put inside the polygon'
+      helpkey     '*'
+   endparameter
+
+   parameter      IN2            # Second input NDF 
+      position    2
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'DEFAULT'
+      prompt      'NDF holding data to be put outside the polygon'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # Name of log file
+      type        'FILENAME'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'File to store co-ordinates of polygon vertices'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter MAXPOLY
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Maximum number of polygons'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter MINPOLY
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Minimum number of polygons'
+      default     1
+      helpkey     '*'
+   endparameter
+
+   parameter      MODE           # Interaction mode
+      type        'LITERAL'
+      vpath       'GLOBAL'
+      ppath       'GLOBAL,DYNAMIC,DEFAULT'
+      prompt      'Mode to obtain polygon vertices'
+      association '<->GLOBAL.INTERACTIONMODE'
+      default     'Interface'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    3
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      POLY1
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 1'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY2
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 2'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY3
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 3'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY4
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 4'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY5
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 5'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY6
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 6'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY7
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 7'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY8
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 8'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY9
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 9'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY10
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 10'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY11
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 11'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY12
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 12'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY13
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 13'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY14
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 14'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY15
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 15'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY16
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 16'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY17
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 17'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY18
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 18'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY19
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 19'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY20
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 20'
+      helpkey     '*'
+   endparameter
+              
+   parameter QUALITY
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     'YES'
+      prompt      'Should quality values be copied to the output NDF?'
+      helpkey     '*'
+   endparameter
+
+   parameter VARIANCE
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     'YES'
+      prompt      'Should variance values be copied to the output NDF?'
+      helpkey     '*'
+   endparameter
+
+   parameter XY
+      type        '_REAL'
+      access      'READ'
+      prompt      'Co-ordinates of next polygon vertex'
+      helpkey     '*'
+   endparameter
+
+endinterface
+
+endmonolith

@@ -1,0 +1,32 @@
+#!/bin/csh
+#+
+#  Name:
+#     polpack_test
+#
+#  Purpose:
+#     Test the installation of the polpack package.
+#
+#  Type of Module:
+#     C shell script.
+#
+#  Invocation:
+#     polpack_test
+#
+#  Description:
+#     Starts up the POLPACK package and runs the ??????? application.
+#
+#  Authors:
+#     DSB: D.S. Berry (Starlink)
+#     {enter_new_authors_here}
+#
+#  History:
+#     29-JUN-1997 (DSB):
+#       Original Version based on ircampack_test.
+#     {enter_changes_here}
+#
+#-
+#
+source INSTALL_BIN/polpack.csh
+??????
+echo "  POLPACK test script completed."
+#      End of shell script.

@@ -1,0 +1,4 @@
+#define vertex_width 7
+#define vertex_height 7
+static unsigned char vertex_bits[] = {
+   0x08, 0x36, 0x22, 0x41, 0x22, 0x36, 0x08};

@@ -1,0 +1,6 @@
+#define blank_width 1
+#define blank_height 1
+#define blank_x_hot 0
+#define blank_y_hot 0
+static unsigned char blank_bits[] = {
+   0x00};
