@@ -146,8 +146,7 @@
 *  Call the initialisation routine depending on the tag
       CALL ADI_CGET0C( P_PSID(SLOT), 'Tag', TAG, STATUS )
       CALL ADI_CGET0I( P_PLIST, TAG, RTNPTR, STATUS )
-      CALL PSF_INIT_EXEC( %VAL(RTNPTR), P_PSID(SLOT), P_FID(SLOT),
-     :                    P_INST(SLOT), STATUS )
+      CALL PSF_INIT_EXEC( %VAL(RTNPTR), P_PSID(SLOT), STATUS )
 
 *  Abort point
  99   CONTINUE
@@ -157,7 +156,7 @@
 
 
 *+  PSF_INIT_EXEC - Call initialisation routine for a given slot
-      SUBROUTINE PSF_INIT_EXEC( ROUTINE, PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_INIT_EXEC( ROUTINE, PSID, STATUS )
 *
 *    Authors :
 *
@@ -184,14 +183,12 @@
 *
       EXTERNAL			ROUTINE			! Psf initialiser
       INTEGER			PSID
-      INTEGER			FID			! Dataset id
-      INTEGER          		INST                   	! Internal data
 *-
 
 *  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Invoke initialisation routine
-      CALL ROUTINE( PSID, FID, INST, STATUS )
+      CALL ROUTINE( PSID, STATUS )
 
       END
