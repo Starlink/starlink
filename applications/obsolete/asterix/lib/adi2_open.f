@@ -153,6 +153,7 @@
 *        Write extra info into the file handle object
           CALL ADI_CPUT0I( ID, '.LUN', LUN, STATUS )
           CALL ADI_CPUT0I( ID, '.BLOCK_SIZE', BSIZE, STATUS )
+          CALL ADI_CPUT0I( ID, '.NHDU', 0, STATUS )
 
 *      Failed to open
         ELSE
