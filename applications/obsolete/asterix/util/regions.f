@@ -53,7 +53,7 @@
         PARAMETER (MAXLST = 20)
 *  Local Variables:
       CHARACTER*80 TEXT                  ! ARD text
-      CHARACTER*80 AFILE                 ! ARD filename
+      CHARACTER*132 AFILE                 ! ARD filename
       CHARACTER*20 SHAPE                 ! Shape of structure
       CHARACTER*2 CLP                    ! The loop variable as a character
       CHARACTER*3 XPARAM,YPARAM          ! Parameter variables
@@ -94,11 +94,14 @@
 *  Enquire whether a new ARD file is to be created
       CALL USI_GET0L('NEW', LNEW, STATUS)
 
+*  Get filename
+      CALL USI_GET0C('ARDFILE',AFILE,STATUS)
+
 *  Open the ARD file as required
       IF (LNEW) THEN
-         CALL FIO_ASSOC('ARDFILE', 'WRITE', 'LIST' , 0, AUNIT, STATUS)
+         CALL FIO_OPEN(AFILE, 'WRITE', 'LIST' , 0, AUNIT, STATUS)
       ELSE
-         CALL FIO_ASSOC('ARDFILE', 'APPEND', 'LIST' , 0, AUNIT, STATUS)
+         CALL FIO_OPEN(AFILE, 'APPEND', 'LIST' , 0, AUNIT, STATUS)
       ENDIF
 
       IF (STATUS .NE. SAI__OK) THEN
