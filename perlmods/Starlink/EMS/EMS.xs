@@ -15,11 +15,6 @@ extern "C" {
 #include "ems_err.h"
 #include "ems.h"
 
-/* Add my own prototype */
-void ems1_get_facility_error( unsigned int errcode, char **facility_name,
-			      char **error_ident, char **error_text);
-
-
 MODULE = Starlink::EMS		PACKAGE = Starlink::EMS		
 
 # Try some real EMS library calls as an experiment
@@ -29,20 +24,24 @@ MODULE = Starlink::EMS		PACKAGE = Starlink::EMS
 # ems_annul_c
 
 void
-ems_annul( status )
+emsAnnul( status )
   int status
+ ALIAS:
+  Starlink::EMS::ems_annul = 2
  CODE:
-  ems_annul_c( &status );
+  emsAnnul( &status );
  OUTPUT:
   status
 
 # ems_begin_c
 
 void
-ems_begin( status )
+emsBegin( status )
   int status
+ ALIAS:
+  Starlink::EMS::ems_begin = 2
  CODE:
-  ems_begin_c( &status );
+  emsBegin( &status );
  OUTPUT:
   status
 
@@ -50,15 +49,17 @@ ems_begin( status )
 # Return (param, opstr, status) as an array
 
 void
-ems_eload()
+emsEload()
  PREINIT:
   char param[EMS__SZPAR+1];
   int  parlen;
   char opstr[EMS__SZMSG+1];
   int  oplen;
   int  status;
+ ALIAS:
+  Starlink::EMS::ems_eload = 2
  PPCODE:
-  ems_eload_c(param, &parlen, opstr, &oplen, &status);
+  emsEload(param, &parlen, opstr, &oplen, &status);
   EXTEND(sp,3);
   PUSHs(sv_2mortal( newSVpv( (char *)param, parlen ) ));
   PUSHs(sv_2mortal( newSVpv( (char *)opstr, oplen  ) ));
@@ -68,24 +69,30 @@ ems_eload()
 # ems_end_c
 
 void
-ems_end( status )
+emsEnd( status )
   int status
+ ALIAS:
+  Starlink::EMS::ems_end = 2
  CODE:
-  ems_end_c( &status );
+  emsEnd( &status );
 
 void
-ems_errno( token, errval )
+emsErrno( token, errval )
   char * token
   int errval
+ ALIAS:
+  Starlink::EMS::ems_errno = 2
  CODE:
-  ems_errno_c(token, errval);
+  emsErrno(token, errval);
 
 void
-ems_facer( token, facerr )
+emsFacer( token, facerr )
   char * token
   int facerr
+ ALIAS:
+  Starlink::EMS::ems_facer = 2
  CODE:
-   ems_facer_c(token, facerr);
+   emsFacer(token, facerr);
 
 
 
@@ -93,161 +100,198 @@ ems_facer( token, facerr )
 # since perl can just insert into the string
 
 void
-ems_fmtc(token, format, value)
+emsFmtc(token, format, value)
   char * token
   char * format
   char * value
+ ALIAS:
+  Starlink::EMS::ems_fmtc = 2
  PREINIT:
   int maxchar;
  CODE:
   maxchar = EMS__SZTOK;
-  ems_fmtc_c(token, format, value, maxchar);
+  emsFmtc(token, format, value, maxchar);
 
 void
-ems_fmtd(token, format, value)
+emsFmtd(token, format, value)
   char * token
   char * format
   double value
+ ALIAS:
+  Starlink::EMS::ems_fmtd = 2
  CODE:
-  ems_fmtd_c(token, format, value);
+  emsFmtd(token, format, value);
 
 void
-ems_fmti(token, format, value)
+emsFmti(token, format, value)
   char * token
   char * format
   int value
+ ALIAS:
+  Starlink::EMS::ems_fmti = 2
  CODE:
-  ems_fmti_c(token, format, value);
+  emsFmti(token, format, value);
 
 void
-ems_fmtl(token, format, value)
+emsFmtl(token, format, value)
   char * token
   char * format
   int value
+ ALIAS:
+  Starlink::EMS::ems_fmtl= 2
  CODE:
-  ems_fmtl_c(token, format, value);
+  emsFmtl(token, format, value);
 
 void
-ems_fmtr(token, format, value)
+emsFmtr(token, format, value)
   char * token
   char * format
   float value
+ ALIAS:
+  Starlink::EMS::ems_fmtr = 2
  CODE:
-  ems_fmtr_c(token, format, value);
+  emsFmtr(token, format, value);
 
 
 # Note that we return ems_level rather than use a variable
 
 int
-ems_level()
+emsLevel()
+ ALIAS:
+  Starlink::EMS::ems_level = 2
  CODE:
-  ems_level_c(&RETVAL);
+  emsLevel(&RETVAL);
  OUTPUT:
   RETVAL
 
 
 void
-ems_mark( )
+emsMark( )
+ ALIAS:
+  Starlink::EMS::ems_mark = 2
  CODE:
-  ems_mark_c();
+  emsMark();
 
 char *
-ems_mload(param, text, status)
+emsMload(param, text, status)
   char * param
   char * text
   int status
+ ALIAS:
+  Starlink::EMS::ems_mload = 2
  PREINIT:
   int oplen;
+  char STR[256];
  CODE:
-  RETVAL = malloc(256);
-  ems_mload_c(param, text, RETVAL, &oplen, &status);
+  RETVAL = STR;
+  emsMload(param, text, RETVAL, &oplen, &status);
   *(RETVAL + oplen) = '\0';
  OUTPUT:
   RETVAL
 
 void
-ems_renew()
+emsRenew()
+ ALIAS:
+  Starlink::EMS::ems_renew = 2
  CODE:
-  ems_renew_c();
+  emsRenew();
 
 
 void
-ems_rep( param, text, status )
+emsRep( param, text, status )
   char * param
   char * text
   int status
+ ALIAS:
+  Starlink::EMS::ems_rep = 2
  CODE:
-  ems_rep_c(param, text, &status);
+  emsRep(param, text, &status);
  OUTPUT:
   status
 
 
 
 void
-ems_rlse( )
+emsRlse( )
+ ALIAS:
+  Starlink::EMS::ems_rlse = 2
  CODE:
-  ems_rlse_c();
+  emsRlse();
 
 
 # Assign values to tokens - not really all that helpful
 # since perl can just insert into the string
 
 void
-ems_setc(token, value)
+emsSetc(token, value)
   char * token
   char * value
+ ALIAS:
+  Starlink::EMS::ems_setc = 2
  PREINIT:
   int maxchar;
  CODE:
   maxchar = EMS__SZTOK;
-  ems_setc_c(token, value, maxchar);
+  emsSetc(token, value, maxchar);
 
 void
-ems_setd(token, value)
+emsSetd(token, value)
   char * token
   double value
+ ALIAS:
+  Starlink::EMS::ems_setd = 2
  CODE:
-  ems_setd_c(token, value);
+  emsSetd(token, value);
 
 void
-ems_seti(token, value)
+emsSeti(token, value)
   char * token
   int value
+ ALIAS:
+  Starlink::EMS::ems_seti = 2
  CODE:
-  ems_seti_c(token, value);
+  emsSeti(token, value);
 
 void
-ems_setl(token, value)
+emsSetl(token, value)
   char * token
   int value
+ ALIAS:
+  Starlink::EMS::ems_setl = 2
  CODE:
-  ems_setl_c(token, value);
+  emsSetl(token, value);
 
 void
-ems_setr(token, value)
+emsSetr(token, value)
   char * token
   float value
+ ALIAS:
+  Starlink::EMS::ems_setr = 2
  CODE:
-  ems_setr_c(token, value);
+  emsSetr(token, value);
 
 
 
 # Note return value
 
 int
-ems_stat()
+emsStat()
+ ALIAS:
+  Starlink::EMS::ems_stat = 2
  CODE:
-  ems_stat_c( &RETVAL );
+  emsStat( &RETVAL );
  OUTPUT:
   RETVAL
 
 
 void
-ems_syser( token, systat )
+emsSyser( token, systat )
   char * token
   int systat
+ ALIAS:
+  Starlink::EMS::ems_syser = 2
  CODE:
-  ems_syser_c(token, systat);
+  emsSyser(token, systat);
 
 
 # Get facility error information
