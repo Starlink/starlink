@@ -33,8 +33,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Global variables :
-      INCLUDE 'IMG_CMN'
+      INCLUDE 'MATH_PAR'
 *    Structure definitions :
       INCLUDE 'INC_XRTHEAD'
 *    Status :
@@ -42,9 +41,8 @@
 *    Function declarations :
       INTEGER CHR_LEN
         EXTERNAL CHR_LEN
-*    Local constants :
-      DOUBLE PRECISION PI
-        PARAMETER (PI=3.1415926535)
+      EXTERNAL IMG_ISOPEN
+        LOGICAL IMG_ISOPEN
 *    Local variables :
       RECORD /XRT_HEAD/ HEAD          ! Header structure for subsequent use
       CHARACTER CH
@@ -127,7 +125,7 @@
 *     Find if plotting required in Calculate mode, should be yes by default
       IF (MODE .EQ. 'C') THEN
 *        plot is image processing system active
-         CALL USI_DEF0L('DOPLOT', I_OPEN, STATUS)
+         CALL USI_DEF0L('DOPLOT', IMG_ISOPEN( STATUS ), STATUS)
          CALL USI_GET0L('DOPLOT', LPLOT, STATUS)
       ELSE
          LPLOT = .TRUE.
@@ -208,7 +206,7 @@
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
-         THETA = (RMEAN * PI) / 180.0
+         THETA = (RMEAN * MATH__PI) / 180.0
          CALL MSG_SETR('ANG', RMEAN)
          CALL MSG_PRNT('Rotation angle = ^ANG degrees')
 *
@@ -353,7 +351,7 @@
          CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
 *
 *  Calculate the angle of the next spoke to south
-         THETA = THETA + PI/4.
+         THETA = THETA + MATH__PI/4.0
 *
       ENDDO
 *
@@ -363,14 +361,11 @@
       CALL FIO_CLOSE(SUNIT,STATUS)
 
       IF (MODE .EQ. 'C') CALL HDS_CLOSE(ALOC, STATUS)
-*
-999   CONTINUE
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from XSPOKES',STATUS)
-      ENDIF
-*
-      CALL AST_CLOSE()
+
+*  Tidy up
+ 999  CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
       END
 
 *+ XSPOKES_MEANROLL - calculates the mean roll angle

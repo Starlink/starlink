@@ -678,6 +678,33 @@
 
 
 
+*+ IMG_ISOPEN
+	LOGICAL FUNCTION IMG_ISOPEN( STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+*  Export :
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+*-
+
+
+      IF (STATUS.EQ.SAI__OK) THEN
+        IMG_ISOPEN = I_OPEN
+      ELSE
+        IMG_ISOPEN = .FALSE.
+      ENDIF
+
+      END
+
+
 *+ IMG_CLEAR - clear current image
 	SUBROUTINE IMG_CLEAR(HALF,STATUS)
 

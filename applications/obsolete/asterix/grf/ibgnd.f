@@ -544,10 +544,14 @@
       INTEGER			I, J			! Loop over image
 
       LOGICAL			GOOD			! Good input pixel?
+      LOGICAL			REGEX			! Region exists?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Region definition exists?
+      REGEX = (I_REG_TYPE .NE. 'NONE')
 
 *  If no region defined, and no data quality present
       IF ( (I_REG_TYPE .EQ. 'NONE') .AND. .NOT. I_BAD ) THEN
@@ -565,10 +569,11 @@
               GOOD = .TRUE.
             END IF
             IF ( GOOD ) THEN
-              IF ( IMG_INREG( I, J ) ) THEN
-                BQ(I,J) = QUAL__GOOD
-              ELSE
-                BQ(I,J) = QUAL__MISSING
+              BQ(I,J) = QUAL__GOOD
+              IF ( REGEX ) THEN
+                IF ( .NOT. IMG_INREG( I, J ) ) THEN
+                  BQ(I,J) = QUAL__MISSING
+                END IF
               END IF
             ELSE
               BQ(I,J) = QUAL__BAD
