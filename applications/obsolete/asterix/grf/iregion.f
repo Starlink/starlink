@@ -455,7 +455,7 @@
 
 
 *+
-      SUBROUTINE IREGION_ARD(STATUS)
+      SUBROUTINE IREGION_ARD(EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -470,6 +470,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -485,7 +486,7 @@
         CALL DYN_MAPI(1,I_NX*I_NY,MPTR,STATUS)
         CALL ARR_INIT1I(0.0,I_NX*I_NY,%val(MPTR),STATUS)
         CALL IMG_GETARD('TEXT',%val(MPTR),I1,I2,J1,J2,STATUS)
-        CALL IMG_SETARD(%val(MPTR),I1,I2,J1,J2,STATUS)
+        CALL IMG_SETARD(%val(MPTR),I1,I2,J1,J2,EXCLUDE,STATUS)
         CALL DYN_UNMAP(MPTR,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN

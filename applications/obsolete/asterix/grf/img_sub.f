@@ -2900,7 +2900,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+ IMG_SETCIRC
-	SUBROUTINE IMG_SETCIRC(X,Y,R,STATUS)
+	SUBROUTINE IMG_SETCIRC(X,Y,R,EXCLUDE,STATUS)
 
         IMPLICIT NONE
 
@@ -2911,6 +2911,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         INCLUDE 'IMG_CMN'
 *  Import :
         REAL X,Y,R
+        LOGICAL EXCLUDE
 *  Export :
 *  Status :
         INTEGER STATUS
@@ -2918,14 +2919,21 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *  Local variables :
         INTEGER I1,I2,J1,J2
         REAL XX,XP,YP
+        BYTE FLAG
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get range of pixels containing circle
         CALL IMG_CIRCTOBOX(X,Y,R,I1,I2,J1,J2,STATUS)
 
+        IF (EXCLUDE) THEN
+          FLAG='00'X
+        ELSE
+          FLAG='01'X
+        ENDIF
+
 *  set region mask
-        CALL IMG_SETCIRC_SUB(X,Y,R,I1,I2,J1,J2,%val(I_REG_PTR))
+        CALL IMG_SETCIRC_SUB(X,Y,R,I1,I2,J1,J2,FLAG,%val(I_REG_PTR))
         IF (I_REG_TYPE.EQ.'NONE') THEN
           I_REG_TYPE='CIRCLE'
         ELSE
@@ -2936,7 +2944,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       END
 
-      SUBROUTINE IMG_SETCIRC_SUB(X,Y,R,I1,I2,J1,J2,REG)
+      SUBROUTINE IMG_SETCIRC_SUB(X,Y,R,I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -2944,6 +2952,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       REAL X,Y,R
       INTEGER I1,I2,J1,J2
+      BYTE FLAG
       BYTE REG(I_NX,I_NY)
 
       LOGICAL IMG_INCIRC
@@ -2953,7 +2962,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       DO J=J1,J2
         DO I=I1,I2
           IF (IMG_INCIRC(I,J,X,Y,R)) THEN
-            REG(I,J)='01'X
+            REG(I,J)=FLAG
           ENDIF
         ENDDO
       ENDDO
@@ -2963,7 +2972,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+ IMG_SETARD
-	SUBROUTINE IMG_SETARD(MASK,I1,I2,J1,J2,STATUS)
+	SUBROUTINE IMG_SETARD(MASK,I1,I2,J1,J2,EXCLUDE,STATUS)
 
         IMPLICIT NONE
 
@@ -2975,13 +2984,21 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *  Import :
         INTEGER MASK(I_NX,I_NY)
         INTEGER I1,I2,J1,J2
+        LOGICAL EXCLUDE
 *  Export :
 *  Status :
         INTEGER STATUS
 *  Local constants :
 *  Local variables :
+      BYTE FLAG
 *-
       IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (EXCLUDE) THEN
+          FLAG='00'X
+        ELSE
+          FLAG='01'X
+        ENDIF
 
 *  set region mask
         CALL IMG_SETARD_SUB(MASK,I1,I2,J1,J2,%val(I_REG_PTR))
@@ -2992,7 +3009,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       END
 
-      SUBROUTINE IMG_SETARD_SUB(MASK,I1,I2,J1,J2,REG)
+      SUBROUTINE IMG_SETARD_SUB(MASK,I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -3000,6 +3017,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       INTEGER MASK(I_NX,I_NY)
       INTEGER I1,I2,J1,J2
+      BYTE FLAG
       BYTE REG(I_NX,I_NY)
 
 
@@ -3008,7 +3026,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       DO J=J1,J2
         DO I=I1,I2
           IF (MASK(I,J).GT.0) THEN
-            REG(I,J)='01'X
+            REG(I,J)=FLAG
           ENDIF
         ENDDO
       ENDDO
@@ -3021,7 +3039,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+ IMG_SETANNULUS
-	SUBROUTINE IMG_SETANNULUS(X,Y,IRAD,ORAD,STATUS)
+	SUBROUTINE IMG_SETANNULUS(X,Y,IRAD,ORAD,EXCLUDE,STATUS)
 
         IMPLICIT NONE
 
@@ -3032,6 +3050,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         INCLUDE 'IMG_CMN'
 *  Import :
         REAL X,Y,IRAD,ORAD
+        LOGICAL EXCLUDE
 *  Export :
 *  Status :
         INTEGER STATUS
@@ -3039,15 +3058,22 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *  Local variables :
         REAL XX,XP,YP
         INTEGER I1,I2,J1,J2
+        BYTE FLAG
 *-
       IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (EXCLUDE) THEN
+          FLAG='00'X
+        ELSE
+          FLAG='01'X
+        ENDIF
 
 *  get range of pixels containing outer circle
         CALL IMG_CIRCTOBOX(X,Y,ORAD,I1,I2,J1,J2,STATUS)
 
 *  set region mask
         CALL IMG_SETANNULUS_SUB(X,Y,IRAD,ORAD,I1,I2,J1,J2,
-     :                                     %val(I_REG_PTR))
+     :                                FLAG,%val(I_REG_PTR))
         IF (I_REG_TYPE.EQ.'NONE') THEN
           I_REG_TYPE='ANNULUS'
         ELSE
@@ -3058,7 +3084,8 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       END
 
-      SUBROUTINE IMG_SETANNULUS_SUB(X,Y,IRAD,ORAD,I1,I2,J1,J2,REG)
+      SUBROUTINE IMG_SETANNULUS_SUB(X,Y,IRAD,ORAD,I1,I2,J1,J2,
+     :                                               FLAG,REG)
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -3066,6 +3093,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       REAL X,Y,IRAD,ORAD
       INTEGER I1,I2,J1,J2
+      BYTE FLAG
       BYTE REG(I_NX,I_NY)
 
       LOGICAL IMG_INANNULUS
@@ -3075,7 +3103,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       DO J=J1,J2
         DO I=I1,I2
           IF (IMG_INANNULUS(I,J,X,Y,IRAD,ORAD)) THEN
-            REG(I,J)='01'X
+            REG(I,J)=FLAG
           ENDIF
         ENDDO
       ENDDO
@@ -3086,7 +3114,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+ IMG_SETPOLY
-	SUBROUTINE IMG_SETPOLY(NV,XV,YV,STATUS)
+	SUBROUTINE IMG_SETPOLY(NV,XV,YV,EXCLUDE,STATUS)
 
         IMPLICIT NONE
 
@@ -3098,17 +3126,24 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *  Import :
         INTEGER NV
         REAL XV(*),YV(*)
+        LOGICAL EXCLUDE
 *  Export :
 *  Status :
         INTEGER STATUS
 *  Local constants :
 *  Local variables :
+      BYTE FLAG
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+        IF (EXCLUDE) THEN
+          FLAG='00'X
+        ELSE
+          FLAG='01'X
+        ENDIF
 
 *  set region mask
-        CALL IMG_SETPOLY_SUB(NV,XV,YV,%val(I_REG_PTR))
+        CALL IMG_SETPOLY_SUB(NV,XV,YV,FLAG,%val(I_REG_PTR))
         IF (I_REG_TYPE.EQ.'NONE') THEN
           I_REG_TYPE='POLYGON'
         ELSE
@@ -3119,7 +3154,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       END
 
-      SUBROUTINE IMG_SETPOLY_SUB(NV,XV,YV,REG)
+      SUBROUTINE IMG_SETPOLY_SUB(NV,XV,YV,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -3127,6 +3162,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       INTEGER NV
       REAL XV,YV
+      BYTE FLAG
       BYTE REG(I_NX,I_NY)
 
       LOGICAL IMG_INPOLY
@@ -3140,7 +3176,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       DO J=I_IY1,I_IY2
         DO I=I_IX1,I_IX2
           IF (IMG_INPOLY(I,J,NV,XV,YV)) THEN
-            REG(I,J)='01'X
+            REG(I,J)=FLAG
           ENDIF
         ENDDO
       ENDDO
@@ -3276,7 +3312,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+ IMG_SETBOX
-	SUBROUTINE IMG_SETBOX(X,Y,DX,DY,STATUS)
+	SUBROUTINE IMG_SETBOX(X,Y,DX,DY,EXCLUDE,STATUS)
 
         IMPLICIT NONE
 
@@ -3287,20 +3323,28 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         INCLUDE 'IMG_CMN'
 *  Import :
         REAL X,Y,DX,DY
+        LOGICAL EXCLUDE
 *  Export :
 *  Status :
         INTEGER STATUS
 *  Local constants :
 *  Local variables :
       INTEGER I1,I2,J1,J2
+      BYTE FLAG
 *-
       IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (EXCLUDE) THEN
+          FLAG='00'X
+        ELSE
+          FLAG='01'X
+        ENDIF
 
 *  get range of pixels containing box
         CALL IMG_BOXTOBOX(X,Y,DX,DY,I1,I2,J1,J2,STATUS)
 
 *  set region mask
-        CALL IMG_SETBOX_SUB(I1,I2,J1,J2,%val(I_REG_PTR))
+        CALL IMG_SETBOX_SUB(I1,I2,J1,J2,FLAG,%val(I_REG_PTR))
         IF (I_REG_TYPE.EQ.'NONE') THEN
           I_REG_TYPE='BOX'
         ELSE
@@ -3311,13 +3355,14 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       END
 
 
-      SUBROUTINE IMG_SETBOX_SUB(I1,I2,J1,J2,REG)
+      SUBROUTINE IMG_SETBOX_SUB(I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'IMG_CMN'
 
       INTEGER I1,I2,J1,J2
+      BYTE FLAG
       BYTE REG(I_NX,I_NY)
 
 
@@ -3325,7 +3370,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       DO J=J1,J2
         DO I=I1,I2
-          REG(I,J)='01'X
+          REG(I,J)=FLAG
         ENDDO
       ENDDO
 
@@ -3334,7 +3379,8 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+ IMG_SETSLICE
-	SUBROUTINE IMG_SETSLICE(XC,YC,ANGLE,LENGTH,WIDTH,STATUS)
+	SUBROUTINE IMG_SETSLICE(XC,YC,ANGLE,LENGTH,WIDTH,EXCLUDE,
+     :                                                     STATUS)
 
         IMPLICIT NONE
 
@@ -3345,14 +3391,22 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         INCLUDE 'IMG_CMN'
 *  Import :
         REAL XC,YC,ANGLE,LENGTH,WIDTH
+        LOGICAL EXCLUDE
 *  Export :
 *  Status :
         INTEGER STATUS
 *  Local constants :
 *  Local variables :
       INTEGER I1,I2,J1,J2
+      BYTE FLAG
 *-
       IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (EXCLUDE) THEN
+          FLAG='00'X
+        ELSE
+          FLAG='01'X
+        ENDIF
 
 *  get range of pixels containing slice
         CALL IMG_SLICETOBOX(XC,YC,ANGLE,LENGTH,WIDTH,I1,I2,J1,J2,
@@ -3360,7 +3414,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 *  set region mask
         CALL IMG_SETSLICE_SUB(XC,YC,ANGLE,LENGTH,WIDTH,I1,I2,J1,J2,
-     :                                              %val(I_REG_PTR))
+     :                                         FLAG,%val(I_REG_PTR))
         I_REG_TYPE='COMPLEX'
       ENDIF
 
@@ -3368,7 +3422,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
       SUBROUTINE IMG_SETSLICE_SUB(XC,YC,ANGLE,LENGTH,WIDTH,
-     :                                      I1,I2,J1,J2,REG)
+     :                                   I1,I2,J1,J2,FLAG,REG)
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
@@ -3376,6 +3430,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       REAL XC,YC,ANGLE,LENGTH,WIDTH
       INTEGER I1,I2,J1,J2
+      BYTE FLAG
       BYTE REG(I_NX,I_NY)
 
       LOGICAL IMG_INSLICE
@@ -3385,7 +3440,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       DO J=J1,J2
         DO I=I1,I2
           IF (IMG_INSLICE(I,J,XC,YC,ANGLE,LENGTH,WIDTH)) THEN
-            REG(I,J)='01'X
+            REG(I,J)=FLAG
           ENDIF
         ENDDO
       ENDDO
@@ -4309,6 +4364,8 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           CALL PAR_GET0R(PAR3,RAD,STATUS)
         ENDIF
 
+        CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
+
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IMG_GETCIRC',STATUS)
         ENDIF
@@ -4377,6 +4434,8 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           ELSE
             IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ENDIF
+          CALL IMG_CIRCLE(XC,YC,IRAD,STATUS)
+
           CALL MSG_SETR('RAD',I_R)
           CALL MSG_PRNT('Select outer radius/^RAD/...')
           XR=XC
@@ -4387,6 +4446,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           ELSE
             ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ENDIF
+          CALL IMG_CIRCLE(XC,YC,ORAD,STATUS)
 
 *  keyboard mode
         ELSE
@@ -4394,10 +4454,13 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           CALL PAR_GET0R(PAR1,XC,STATUS)
           CALL PAR_DEF0R(PAR2,I_Y,STATUS)
           CALL PAR_GET0R(PAR2,YC,STATUS)
+          CALL PGPOINT(1,XC,YC,2)
           CALL PAR_DEF0R(PAR3,I_R,STATUS)
           CALL PAR_GET0R(PAR3,IRAD,STATUS)
+          CALL IMG_CIRCLE(XC,YC,IRAD,STATUS)
           CALL PAR_DEF0R(PAR4,I_R,STATUS)
           CALL PAR_GET0R(PAR4,ORAD,STATUS)
+          CALL IMG_CIRCLE(XC,YC,ORAD,STATUS)
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
