@@ -3,7 +3,7 @@
 #     polimp.tab
 #
 #  Purpose:
-#     The default control table for use with POLIMP.
+#     The POLIMP control table used for foreign data conversions.
 #
 #  Description:
 #     This table contains a description of how to set values for the 
@@ -20,10 +20,10 @@
 #        Original version.
 #     {enter_changes_here}
 #
-ANGROT      PPCKANGR         # The orientation of the analyser.
-FILTER      PPCKFILT         # The filter.
-IMGID       PPCKIMID         # The image idenrtifier.
+ANGROT?     PPCKANGR         # The orientation of the analyser.
+FILTER?     PPCKFILT         # The filter.
+IMGID?      PPCKIMID         # The image idenrtifier.
 RAY?        PPCKRAY          # The ray "O" or "E" (optional)
 ROTATION?   PPCKROT          # The rotation of the aligned image (optional)
-WPLATE      PPCKWPLT         # The waveplate position
+WPLATE?     PPCKWPLT         # The waveplate position
 YROTATION?  PPCKYROT         # The rotation of the Y axis (optional)

@@ -358,7 +358,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar ndg.tar makefile mk $(DOCUMENTATION)
 #  set.
 
 PUBLIC_SCRIPTS = PolMap.tcl PolMap_procs.tcl PolReg.tcl PolReg_procs.tcl \
-CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay ndg_wild
+CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay ndg_wild 
 
 # List of StarTcl files which must reside in the POLPACK binary directory.
 # These should be in the STARTCL_DIR directory.
@@ -487,7 +487,7 @@ HELP_SOURCES = polpack.hlp
 #  List of ancilliary data files.
 
 DATA_FILES = blank.bit feature.bit vertex.bit rfeature.bit rvertex.bit \
-left_arrow.bit right_arrow.bit tick.bit
+left_arrow.bit right_arrow.bit tick.bit polimp.tab
 
 #  Name of test script.
 

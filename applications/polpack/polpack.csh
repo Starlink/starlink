@@ -83,7 +83,7 @@ else
    setenv NDF_XTN POLPACK
 endif
 #
-setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp in=^ndf quiet=y'
+setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp in=^ndf quiet=y table=INSTALL_BIN/polimp.tab'
 setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp in=^ndf quiet=y'
 #
 setenv NDF_IMP_POLPACK_COMPRESSED ' '

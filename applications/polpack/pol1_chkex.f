@@ -121,21 +121,23 @@
 
 *  Report an error if the WPLATE extension item does not exist.
       CALL DAT_THERE( LOC, 'WPLATE', THERE, STATUS )
-      IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
+      IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK .AND. NOT. QUIET ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLIMP_NOWPL', 'Mandatory extension item '//
      :                 'WPLATE has no value.', STATUS )
       END IF
 
 *  Report an error if the WPLATE extension item now has an illegal value.
-      CALL CMP_GET0C( LOC, 'WPLATE', WPLATE, STATUS )
-      IF( WPLATE .NE. '0.0' .AND. WPLATE .NE. '45.0' .AND.
-     :    WPLATE .NE. '22.5' .AND. WPLATE .NE. '67.5' .AND.
-     :    STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'WP', WPLATE )
-         CALL ERR_REP( 'POLIMP_BADWPL', 'Extension item WPLATE has '//
-     :                 'the illegal value ''^WP''.', STATUS )
+      IF( THERE ) THEN
+         CALL CMP_GET0C( LOC, 'WPLATE', WPLATE, STATUS )
+         IF( WPLATE .NE. '0.0' .AND. WPLATE .NE. '45.0' .AND.
+     :       WPLATE .NE. '22.5' .AND. WPLATE .NE. '67.5' .AND.
+     :       STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'WP', WPLATE )
+            CALL ERR_REP( 'POLIMP_BADWPL', 'Extension item WPLATE has'//
+     :                    ' the illegal value ''^WP''.', STATUS )
+         END IF
       END IF
 
 *  Get the value of the IMGID component, creating it with a blank value if  
