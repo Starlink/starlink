@@ -385,6 +385,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     8-MAY-2002 (DSB):
 *        Correct DSSToStore to ignore trailing blanks in the PLTDECSN
 *        keyword value.
+*     9-MAY-2002 (DSB):
+*        Correct GetCard to avoid infinite loop if the current card has
+*        been marked as deleted.
 *class--
 */
 
@@ -8523,9 +8526,11 @@ static int GetCard( AstFitsChan *this ){
    astClearCard( this );
 
 /* Count through the list of FitsCards in the FitsChan until the original
-   current card is reached. */
+   current card is reached. If the current card is not found (for instance 
+   if it has been marked as deleted and we are currently skipping such cards), 
+   this->card will be left null (end-of-file). */
    index = 1;
-   while( this->card != card0 ){
+   while( this->card != card0 && astOK && this->card ){
 
 /* Increment the card count and move on to the next card. */
       index++;
