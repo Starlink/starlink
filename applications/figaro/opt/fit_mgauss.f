@@ -189,9 +189,9 @@
       integer wptr,nwork,bptr,gptr,dptr,varptr
       integer k,heslptr,pstat,nfree
       external grfun,mgmon
-      include 'sae_par'
-      include 'prm_par'
-      include 'dynamic_memory_inc'
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'DYNAMIC_MEMORY'
       integer len1
       character*8 istatus(-3:-1)
       data istatus/'constant','lower','upper'/

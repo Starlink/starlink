@@ -39,7 +39,7 @@
 *
       implicit none
       include 'opt_cmn'
-      include 'sae_par'
+      include 'SAE_PAR'
 
       DOUBLE PRECISION d_probst
 *-

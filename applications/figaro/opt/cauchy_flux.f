@@ -34,7 +34,7 @@
 * ---------------------------------------------------------------
 *-
       implicit none
-      include 'prm_par'
+      include 'PRM_PAR'
 
 * import
 

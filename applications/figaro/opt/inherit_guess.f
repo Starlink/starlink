@@ -84,7 +84,7 @@
       integer direction
       real factors(5)
       integer icount,ocount,ref
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       data factors/1.0,0.9,0.7,0.5,0.3/
 
 * Look in block given by direction if possible, otherwise in current

@@ -42,7 +42,7 @@
       double precision fjac(ldfjac,n)
       integer iflag
       include 'opt_cmn'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 
 *
 

@@ -50,8 +50,8 @@
       implicit none
       integer status,bytes,ptr,total
       include 'opt_cmn'
-      include 'sae_par'
-      include 'prm_par'
+      include 'SAE_PAR'
+      include 'PRM_PAR'
 *
 *   Get virtual memory, 3 double precision arrays of M elements, plus
 *   whatever else is asked for.

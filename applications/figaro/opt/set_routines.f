@@ -22,7 +22,7 @@
 *-
       implicit none
       integer flag,status
-      include 'sae_par'
+      include 'SAE_PAR'
       include 'status_inc'
       integer NDICT, OPT_EXIT, NDICT2
       parameter (NDICT = 4, OPT_EXIT = NDICT, NDICT2 = 5)

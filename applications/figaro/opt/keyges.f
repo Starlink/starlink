@@ -36,7 +36,7 @@
 
       implicit none
       include 'opt_cmn'
-      include 'prm_par'
+      include 'PRM_PAR'
       integer MAX_PARS
       parameter (MAX_PARS  = 4)
 *-

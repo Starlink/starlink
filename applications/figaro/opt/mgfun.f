@@ -52,7 +52,7 @@
       integer iw(liw)
       double precision fc1,gc1(n)
       double precision g(max_parms)
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 * ---------------------------------------------------------------------
 
 * set gradient vector to zero

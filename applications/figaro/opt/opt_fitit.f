@@ -64,7 +64,7 @@
 *    TNW: 29th June 1993, New version of perform_fit (in C).
 *-
       implicit none
-      include 'sae_par'
+      include 'SAE_PAR'
       include 'status_inc'
       include 'fit_coding_inc'
       include 'opt_cmn'
@@ -86,7 +86,7 @@
 
       integer fit_handler
       external fit_handler
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 
 * Return if not ok on entry
 

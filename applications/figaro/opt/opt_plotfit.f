@@ -67,7 +67,7 @@
 *-
       implicit none
       include 'status_inc'
-      include 'sae_par'
+      include 'SAE_PAR'
       real fitpar(*)
       real x(*)
       real y(*)
@@ -86,8 +86,8 @@
       include 'opt_cmn'
       include 'arc_dims'
       include 'fit_coding_inc'
-      include 'prm_par'
-      include 'dynamic_memory_inc'
+      include 'PRM_PAR'
+      include 'DYNAMIC_MEMORY'
       real y1(3),pltpar(6)
       integer vbase5,work2,work3,nbad,cnv_fmtcnv
 

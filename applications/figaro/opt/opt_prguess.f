@@ -34,7 +34,7 @@
       implicit none
       include 'status_inc'
       include 'opt_cmn'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       real work(*)
       integer npcmp(0:5),ppcmp
       data npcmp/1,4,5,5,4,4/

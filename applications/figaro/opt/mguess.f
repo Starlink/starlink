@@ -112,7 +112,7 @@
 *-
       implicit none
       include 'opt_cmn'
-      include 'sae_par'
+      include 'SAE_PAR'
       integer diags(3)
       integer ncomp,ngauss
       integer plot_flag

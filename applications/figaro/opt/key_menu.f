@@ -32,7 +32,7 @@
 *   TNW: 8,9/3/94 More can be handled by KEY_MENU
 *-
       implicit none
-      include 'sae_par'
+      include 'SAE_PAR'
       integer iopt,diags(3),NICON
       parameter (NICON = 10)
       real factor,x,y,curfac,icons(4,NICON),x1,y1

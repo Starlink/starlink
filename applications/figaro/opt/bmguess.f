@@ -78,7 +78,7 @@
       include 'opt_cmn'
       include 'status_inc'
       include 'fit_coding_inc'
-      include 'prm_par'
+      include 'PRM_PAR'
       integer MAX_PARS
       real sigred
       parameter (MAX_PARS=4)
@@ -97,7 +97,7 @@
       integer i,left,right,idiff,icentre,pstat,maic,len1
       integer ngauss,cnv_fmtcnv,status,nbad,itmp
       real aic,bstaic,test,factor
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       data smaxsig,sminht/0.2,0.1/
 
 * Store maximum allowed number of components

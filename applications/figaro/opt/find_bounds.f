@@ -37,7 +37,7 @@
 *
 
       implicit none
-      include 'sae_par'
+      include 'SAE_PAR'
       include 'status_inc'
       include 'fit_coding_inc'
       include 'opt_cmn'
@@ -58,7 +58,7 @@
       parameter (EFOLD=2.35482004)
       character*54 chars
       logical qstat,par_qnum,ok,duml
-      include 'prm_par'
+      include 'PRM_PAR'
       integer NDICT,iopt,status,ul,i,np,len1
       integer PWIDTH, PHEIGHT, PCENTRE
       parameter (PWIDTH = 2, PHEIGHT = 3, PCENTRE = 4)

@@ -28,10 +28,10 @@
 * History:
 *     Argonne National Laboratory. MINPACK Project. June 1983.
 *     Burton S. Garbow, Kenneth E. Hillstrom, Jorge J. More
-*     T.N.Wilkins, Durham. Use prm_par. Sep 29 1993
+*     T.N.Wilkins, Durham. Use PRM_PAR. Sep 29 1993
 *-
 *     **********
-      include 'prm_par'
+      include 'PRM_PAR'
 
       if(i.eq.1) then
          dpmpar = VAL__EPSD

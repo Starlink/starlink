@@ -62,7 +62,7 @@
       integer i
       double precision sorted(max_cmp)
 
-      include 'sae_par'
+      include 'SAE_PAR'
 
       do i = 1,n_gauss
         sort_centres(i)=guess_store(4,i,times)

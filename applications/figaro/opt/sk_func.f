@@ -51,7 +51,7 @@
       double precision wn(niw),ajc(ljc,n)
       double precision rc(m),xc(n)
       integer miw(liw)
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 
       call sk_fun(m,n,xc,rc,ajc,dynamic_mem(dataptr)
      :            ,dynamic_mem(densptr),dynamic_mem(weightptr) )

@@ -85,7 +85,7 @@
 * These are just added to make in compile, unlikely to be right!
 
       double precision start(5),end(5)
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 
 * ---------------------------------------------------------------------
 * Each line is assumed to have the same REDSHIFT and WIDTH

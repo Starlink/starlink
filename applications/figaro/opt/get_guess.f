@@ -52,8 +52,8 @@
       include 'arc_dims'
       include 'opt_cmn'
       include 'fit_coding_inc'
-      include 'dynamic_memory_inc'
-      include 'sae_par'
+      include 'DYNAMIC_MEMORY'
+      include 'SAE_PAR'
       real work(*)
       real minht
       integer line,xsect,nwindow,iy

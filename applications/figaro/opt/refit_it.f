@@ -46,7 +46,7 @@
 *   TNW 16/11/89 to call QMENU directly
 *
       implicit none
-      include 'prm_par'
+      include 'PRM_PAR'
       integer MAX_PARS
       parameter (MAX_PARS = 4)
 *-

@@ -55,7 +55,7 @@
 *-
 * ----------------------------------------------------------------------
       implicit none
-      include 'sae_par'
+      include 'SAE_PAR'
       include 'opt_cmn'
       integer MAX_PARS
       parameter (MAX_PARS=4)

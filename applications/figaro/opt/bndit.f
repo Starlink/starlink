@@ -91,9 +91,9 @@
       real dumr
       character dumc
       character*42 bndmenu(9)
-      include 'prm_par'
-      include 'sae_par'
-      include 'dynamic_memory_inc'
+      include 'PRM_PAR'
+      include 'SAE_PAR'
+      include 'DYNAMIC_MEMORY'
       data bndmenu/
      :     'NONE : No Bounds (unconstrained)',
      :     'EQUAL : All L_bounds/U_bounds same',

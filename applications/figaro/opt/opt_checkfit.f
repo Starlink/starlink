@@ -72,7 +72,7 @@
       include 'opt_cmn'
       include 'status_inc'
       include 'fit_coding_inc'
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
       real fitpar(*),fiterr(*)
       real res_store(*)
       real x(mpts),y(mpts)

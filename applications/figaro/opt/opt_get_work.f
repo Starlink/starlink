@@ -63,7 +63,7 @@
       include 'opt_cmn'
       include 'status_inc'
       include 'fit_coding_inc'
-      include 'prm_par'
+      include 'PRM_PAR'
       integer wavdim
       integer n
       integer status,nbytes,work,vbase

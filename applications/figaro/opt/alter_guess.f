@@ -130,7 +130,7 @@
 *-
       implicit none
       integer status
-      include 'sae_par'
+      include 'SAE_PAR'
       include 'arc_dims'
       include 'gr_inc'
       include 'status_inc'
@@ -165,7 +165,7 @@
       parameter (LEFT = 0.05, RIGHT = 0.9)
       real gaussian, lorentz
       external gaussian, lorentz
-      include 'dynamic_memory_inc'
+      include 'DYNAMIC_MEMORY'
 
       if((status.ne.SAI__OK).or.(fstat.ne.0)) return
       ncomp = 1

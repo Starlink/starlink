@@ -38,7 +38,7 @@
 *  IMIN renamed STATUS, TNW/CAVAD 17-JUN-91
 *-
       implicit none
-      include 'sae_par'
+      include 'SAE_PAR'
       integer istart
       integer iend
       real l(*)

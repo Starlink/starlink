@@ -82,7 +82,7 @@
 *   GMODE argument added, with changes corresponding to it TNW 19-20/3/91
 *-
       implicit none
-      include 'prm_par'
+      include 'PRM_PAR'
       logical anyok
       integer ok
       real sdens(*)

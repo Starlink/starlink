@@ -54,7 +54,7 @@
 *  JWP: Jan 1997 Removed NAG and used PDA
 *-
       implicit none
-      include 'sae_par'
+      include 'SAE_PAR'
 
       integer lh
       integer n1

@@ -35,7 +35,7 @@
 *   TNW/Durham, 28/5/93 Workspace passed from above.
 *-
       implicit none
-      include 'prm_par'
+      include 'PRM_PAR'
       integer m
       real sdata(m)
       real resid(m)
