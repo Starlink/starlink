@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w 
+#!/stardev/Perl/bin/perl -w
 
 #+
 #  Name:
