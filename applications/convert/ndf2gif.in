@@ -39,12 +39,17 @@
 #        into a GIF file horse.gif.
 
 #  Notes:
-#     This initial version of the script handles only 256 grey 
+#     -  This initial version of the script handles only 256 grey 
 #     levels and does not use the image colour lookup table so
 #     absolute data values may be lost.
 #
-#     The PBMPLUS utilities tifftopnm and ppmtogif must be available
+#     -  The PBMPLUS utilities tifftopnm and ppmtogif must be available
 #     on your PATH.
+
+#     -  At the time of writing, this utility uses a special Netpbm version
+#     of tifftopnm on alpha OSF/1 due to a problem with tifftopnm in the
+#     standard release of PBMPLUS.  Netpbm is based on PBMPLUS but
+#     contains many improvements and additions.
 
 #  Related Applications:
 #     CONVERT: GIF2NDF
@@ -66,11 +71,6 @@
 #     1997 July 15 (MJC):
 #        Used a special tifftopnm for alpha_OSF1.
  
-#  Notes:
-#     At the time of writing, this utility uses a special Netpbm version
-#     of tifftopnm on alpha OSF/1 to a problem with tifftopnm in the
-#     standard release of PBMPLUS.  Netpbm is based on PBMPLUS but
-#     contains many improvements and additions.
 #-
  
 # Set required output file name
