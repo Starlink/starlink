@@ -373,8 +373,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        of conditions is supplied.
 *     12-OCT-2001 (DSB):
 *        - Added DefB1950 attribute.
-*        - Corrected sign in equations which calculate CROTA when writing 
+*        - Corrected equations which calculate CROTA when writing 
 *        FITS-AIPS encodings.
+*        - Corrected equations which turn a CROTA value into a CD matrix.
 *class--
 */
 
@@ -1174,6 +1175,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
    double p1, p2;      /* Projection parameters */
    double rho_a;       /* First estimate of CROTA */
    double rho_b;       /* Second estimate of CROTA */
+   double sincro;      /* Sin( CROTA ) */
    double val;         /* General purpose value */
    int i;              /* Axis index */
    int ihmsf[ 4 ];     /* Hour, minute, second, fractional second */
@@ -1323,8 +1325,22 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Find the CROTA and CDELT values for the celestial axes. */
    if( ok && axlon >= 0 && axlat >= 0 ) {
-      rho_a = atan2( cdlat_lon, cdelt[ axlon ] );
-      rho_b = atan2( -cdlon_lat, cdelt[ axlat ] );
+
+      if( cdlat_lon > 0.0 ) {
+         rho_a = atan2( cdlat_lon, cdelt[ axlon ] );
+      } else if( cdlat_lon == 0.0 ) {
+         rho_a = 0.0;
+      } else {
+         rho_a = atan2( -cdlat_lon, -cdelt[ axlon ] );
+      }
+
+      if( cdlon_lat > 0.0 ) {
+         rho_b = atan2( cdlon_lat, -cdelt[ axlat ] );
+      } else if( cdlon_lat == 0.0 ) {
+         rho_b = 0.0;
+      } else {
+         rho_b = atan2( -cdlon_lat, cdelt[ axlat ] );
+      }
 
       if( fabs( slaDrange( rho_a - rho_b ) ) < 1.0E-3 ){
          crota = 0.5*( slaDranrm( rho_a ) + slaDranrm( rho_b ) );
@@ -1335,7 +1351,9 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
             cdelt[ axlon ] /= coscro;
             crota *= AST__DR2D;
          } else {
-            ok = 0;
+            sincro = sin( crota );
+            cdelt[ axlat ] = -cdlon_lat/sincro;
+            cdelt[ axlon ] = cdlat_lon/sincro;
          }      
 
       } else {
@@ -13571,11 +13589,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Now do the non-zero off-diagonal terms. */
             if( encoding == FITSPC_ENCODING || 
                 encoding == FITSAIPS_ENCODING ){
-               dval = -cdeltj*sinrota;
+               dval = cdelti*sinrota;
                SetValue( ret, FormatKey( "CD", axlat + 1, axlon + 1, ' ' ),
                          (void *) &dval, AST__FLOAT, NULL );
  
-               dval = cdelti*sinrota;
+               dval = -cdeltj*sinrota;
                SetValue( ret, FormatKey( "CD", axlon + 1, axlat + 1, ' ' ),
                          (void *) &dval, AST__FLOAT, NULL );
             }

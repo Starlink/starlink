@@ -17,13 +17,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.10}
+\newcommand{\stardocnumber}    {211.11}
 c-
 f+
-\newcommand{\stardocnumber}    {210.10}
+\newcommand{\stardocnumber}    {210.11}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {1th September 2001}
+\newcommand{\stardocdate}      {23rd October 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -17612,6 +17612,10 @@ reference frame or equinox.
 \item A bug has been fixed in the FitsChan class which could prevent
 astWrite from creating a set of FITS headers from an otherwise valid
 FrameSet, when when using FITS-AIPS encoding.
+
+\item A bug has been fixed in the FitsChan class which could cause
+astRead to mis-interpret the FITS CROTA keyword when using FITS-AIPS 
+encoding.
 
 \end{enumerate}
 
