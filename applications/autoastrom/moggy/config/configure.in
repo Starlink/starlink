@@ -46,7 +46,7 @@ AC_CHECK_FUNCS(setenv)
 dnl   Check whether we need to include `-lnsl -lsocket' to use the
 dnl   socket() call and friends (catlib needs these functions, and you
 dnl   do need these on Solaris)
-AC_CHECK_FUNC(gethostname,,
+AC_CHECK_FUNC(gethostbyname,,
   AC_CHECK_LIB(nsl, gethostbyname))
 AC_CHECK_FUNC(socket,,
   AC_CHECK_LIB(socket, socket,,,-lnsl))
