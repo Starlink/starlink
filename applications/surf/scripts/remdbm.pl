@@ -1,6 +1,6 @@
 #!/star/bin/ndfperl
 
-# scan.pl
+# remdbm.pl
 #
 #   Script to automate scan/map data reduction.
 #   Design it such that it can be used in ORACDR
@@ -8,17 +8,34 @@
 use Getopt::Long;                       # Command line options
 use NDF;                                # to access NDF headers
 
-# Would like to make it such that it sees whether
-# ADAM messaging is available and uses it if it is.
-#use ORAC::Msg::ADAM::Control;           # messaging control for ADAM
-#use ORAC::Msg::ADAM::Task;              # monolith control for ADAM
-
 $use_ams = 0;   # We are not using AMS
+
+# See if perl/AMS is available
+eval 'use Starlink::AMS::Init';
+if (! $@) {
+  $use_ams = 1;
+
+  # Load in the rest of the modules
+  eval 'use Starlink::ADAM ()';
+  die "Error loading Starlink messaging:\n $@" if $@;
+  eval 'use Starlink::AMS::Task';
+  die "Error loading Starlink messaging:\n $@" if $@;
+
+  # Cant put this inside the packages since they
+  # do not seem to be evaluated.
+  $SAI__OK = &Starlink::ADAM::SAI__OK;
+  $DTASK__ACTCOMPLETE = 142115659;
+} 
 
 # Need to uncomment if we are using external ORAC classes
 #use ORAC::Msg::ADAM::Shell;             # monolith control via shell
 #use ORAC::Frame::JCMT;
 #use ORAC::Group::JCMT;
+# Would like to make it such that it sees whether
+# ADAM messaging is available and uses it if it is.
+#use ORAC::Msg::ADAM::Control;           # messaging control for ADAM
+#use ORAC::Msg::ADAM::Task;              # monolith control for ADAM
+
 
 
 # Unbuffered
@@ -29,23 +46,27 @@ $| = 1;
 # Read the standard options from the command line
 $result = GetOptions("help"    => \$h,
 		     "version" => \$v,
-		     "out=s"   => \$outfile
+		     "out=s"   => \$outfile,
+                     "noams"   => \$noams
 		     );
 
 $h = 1 unless $result == 1;  # Print help info if unknown option
 
+# Allow for Override AMS flag (only relevant if $use_ams is already true.)
+$use_ams = 0 if $noams;
 
 # Print a help message
- 
  
 ($h) && do {
   print qq/
 Usage:
-  remdbm [-h] [-v] [-out=s] files
+  remdbm [-h] [-v] [-out=s] [-noams] files
 Options:
 \t-h[elp]   \tThis message.
 \t-v[ersion]\tPrint version number of program.
 \t-out=s    \tSpecify output filename. Default is "final".
+\t-noams    \tTurn off ADAM messaging (default is false if ADAM
+\t          \tmessaging is allowed)
 \t"files"   \tList of files to be processed.
 Description:
 \tThis program should be used to reduce SCAN-MAP data taken
@@ -67,14 +88,25 @@ Description:
 # Print version number
 
 ($v) && do {
-  print qq/remdbm: version 0.99 (1998)
-Starlink version. AMS communication disabled.
-/;
+  print "remdbm: version 0.99 (1998)\nStarlink Version: ";
+  if ($use_ams) {
+    print "AMS communication enabled\n";
+  } else {
+    print "AMS communication disabled\n";    
+  }
   exit;
 };
 
 # Check for Starlink
 die "Must execute a Starlink login" unless (exists $ENV{SURF_DIR});  
+
+
+if ($use_ams) {
+  print "Perl/ADAM messaging is present. Good\n";
+} else {
+  print "Perl/ADAM messaging not available. Using system() instead\n";
+}
+
 
 
 # Setup default output filename
@@ -97,7 +129,8 @@ if ($use_ams) {
 
   # Start ADAM messaging
   $adam = new ORAC::Msg::ADAM::Control;
-  $adam->init;
+  $status = $adam->init;
+  check_status($status))
   $adam->timeout(120);     # task timeout
 
   
@@ -291,12 +324,13 @@ check_status($status);
 # Remove the weight
 unlink "$wt$ext", "$re$ext", "$im$ext";
 
+print "Running inverse FFT...\n";
 # Inverse fourier
 $status = $Mon{kappa_mon}->obeyw("fourier","inverse realin=rediv imagin=imdiv out=$output reset");
 check_status($status);
 
 # Remove the final junk files
-#unlink "rediv$ext", "imdiv$ext";
+unlink "rediv$ext", "imdiv$ext";
 
 print "Result stored in $output\n";
 
@@ -323,10 +357,7 @@ package ORAC::Group::JCMT;
 use 5.004;
 use Carp;
 use strict;
-use vars qw/$VERSION/;
 use NDF;
-
-$VERSION = '0.10';
 
 # Setup the object structure
 
@@ -730,11 +761,6 @@ package ORAC::Frame::JCMT;
 
 use strict;
 use Carp;
-use vars qw/$VERSION/;
-
-$VERSION = undef; # -w protection
-$VERSION = '0.10';
-
 
 use NDF; # For fits reading
 
@@ -1552,132 +1578,9 @@ sub uhdr {
   return ${$self->userheader}{$keyword};
 }
 
-
-
-# Private method for removing file extensions from the filename strings
-
-=back
-
-=head1 PRIVATE METHODS
-
-The following methods are intended for use inside the module.
-They are included here so that authors of derived classes are 
-aware of them.
-
-=cut
-
-# Private method for removing file extensions from the filename strings
-# In the base class this does nothing. It is up to the derived classes
-# To do something special with this.
-
-=over 4
-
-
-
-package ORAC::Constants;
-
-
-
-require Exporter;
-
-use vars qw/@ISA %EXPORT_TAGS @EXPORT_OK/;
-
-@ISA = qw/Exporter/;
-
-@EXPORT_OK = qw/ORAC__OK ORAC__ERROR/;
-
-%EXPORT_TAGS = (
-		'status'=>[qw/ ORAC__OK ORAC__ERROR/]
-	       );
-
-Exporter::export_tags('status');
-
-=head1 CONSTANTS
-
-The following constants are available from this module:
-
-=over 4
-
-=item ORAC__OK
-
-This constant contains the definition of good ORAC status.
-
-=cut
-
-use constant ORAC__OK => 0;
-
-
-=item ORAC__ERROR
-
-This constant containst the definition of bad ORAC status.
-
-=cut
-
-use constant ORAC__ERROR => -1;
-
-# Did want to try implementing constants like this but
-# is easier to use the constant module.
-# *ORAC__OK = \0;
-
-
-=back
-
-=head1 TAGS
-
-Individual sets of constants can be imported by 
-including the module with tags. For example:
-
-  use ORAC::Constants qw/:status/;
-
-will import all constants associated with ORAC status checking.
-
-The available tags are:
-
-=over 4
-
-=item :status
-
-Constants associated with ORAC status checking: ORAC__OK and ORAC__ERROR.
-
-=back
-
-=head1 USAGE
-
-The constants can be used as if they are subroutines.
-For example, if I want to print the value of ORAC__ERROR I can
-
-  use ORAC::Constants;
-  print ORAC_ERROR;
-
-or
-
-  use ORAC::Constants ();
-  print ORAC::Constants::ORAC__ERROR;
-
-
-=head1 AUTHOR
-
-Tim Jenness (t.jenness@jach.hawaii.edu) and
-Frossie Economou (frossie@jach.hawaii.edu)
-
-
-=head1 REQUIREMENTS
-
-The C<constants> package must be available. This is a standard
-perl package.
-
-=head1 See Also
-
-L<constants>
-
-=cut
-
-
-
-
 package ORAC::Msg::ADAM::Shell;
 
-use strict;
+use strict 'vars';
 no strict 'subs';
 use Carp;
 
@@ -1691,23 +1594,9 @@ use File::Basename;
 use Cwd qw/getcwd/;
 
 # Retrieve the status constants
-import ORAC::Constants qw/ORAC__OK ORAC__ERROR/;
+use constant ORAC__OK => 0;
+use constant ORAC__ERROR => -1;
 
-use vars qw/$VERSION/;
- 
-
-=item new
-
-Create a new instance of a ORAC::Msg::ADAM::Shell object.
-
-  $obj = new ORAC::Msg::ADAM::Task;
-  $obj = new ORAC::Msg::ADAM::Task("name_in_message_system","monolith");
-
-If supplied with arguments (matching those expected by load() ) the
-specified task will be loaded upon creating the object. If the load()
-fails then undef is returned (which will not be an object reference).
-
-=cut
 
 sub new {
   my $proto = shift;
@@ -2064,6 +1953,455 @@ L<perl>,
 L<ORAC::Msg::ADAM::Task>
 
 =cut
+
+package ORAC::Msg::ADAM::Control;
+
+use Carp;
+use strict;
+
+# This needs to Starlink module
+# use Starlink::AMS::Init;
+# use Starlink::ADAM ();
+
+# Derive all methods from the Starlink module since this
+# behaves in exactly the same way.
+
+#@ORAC::Msg::ADAM::Control::ISA = qw/Starlink::AMS::Init/;
+
+# Just include the methods that we need to run remdbm.pl
+
+sub new {
+ 
+  my $proto = shift;
+  my $class = ref($proto) || $proto;
+ 
+  my $task = {};  # Anon hash
+ 
+  $task->{OBJ} = new Starlink::AMS::Init;
+ 
+  # Bless this ams into class
+  bless($task, $class);
+ 
+  # Allow for the messaging system to be initiated automatically
+  # if a true  argument '1' is passed
+  if (@_) {
+    my $value = shift;
+    if ($value) {
+      my $status = $task->obj->init;
+      my $errhand = $task->obj->stderr;
+      print $errhand "Error initialising messaging system\n"
+        unless $status == &Starlink::ADAM::SAI__OK;
+    }
+  }
+ 
+  # Return to caller
+  return $task;
+};
+
+
+sub obj {
+  my $self = shift;
+  return $self->{OBJ};
+}
+
+
+sub messages {
+  my $self = shift;
+  if (@_) { 
+    my $val = shift;
+    $self->obj->messages($val);
+  }
+  return $self->obj->messages;
+}
+
+
+sub timeout {
+  my $self = shift;
+  if (@_) { 
+    my $val = shift;
+    $self->obj->timeout($val);
+  }
+  return $self->obj->timeout;
+}
+
+sub init {
+  my $self = shift;
+  my $status = $self->obj->init;
+  return $status;
+}
+
+
+
+
+package  ORAC::Msg::ADAM::Task;
+
+
+use strict;
+use Carp;
+
+no strict 'subs';
+# Import ORAC constants
+use constant ORAC__OK => 0;
+use constant ORAC__ERROR => -1;
+
+
+# I need to import good Starlink status from the ADAM module
+#use Starlink::ADAM ();
+
+use vars qw/$DTASK__ACTCOMPLETE $SAI__OK/;
+
+# Access the AMS task code
+# use Starlink::AMS::Task;
+
+# Local definition of DTASK__ACT_COMPLETE. Probably should
+# try to get it from Starlink::ADAM but currently broken
+
+$DTASK__ACTCOMPLETE = 142115659;
+
+$SAI__OK = &Starlink::ADAM::SAI__OK;
+
+# Cannot subclass methods since I need to change most of them
+# anyway.
+
+=item new
+
+Create a new instance of a ORAC::Msg::ADAM::Task object.
+ 
+  $obj = new ORAC::Msg::ADAM::Task;
+  $obj = new ORAC::Msg::ADAM::Task("name_in_message_system","monolith");
+ 
+If supplied with arguments (matching those expected by load() ) the
+specified task will be loaded upon creating the object. If the load()
+fails then undef is returned (which will not be an object reference).
+
+=cut
+
+
+sub new {
+  my $proto = shift;
+  my $class = ref($proto) || $proto;
+ 
+  my $task = {};  # Anon hash
+ 
+  # Since we are really simply handling another object
+  # Create the new object (Starlink::AMS::Task) and store it.
+  $task->{Obj} = new Starlink::AMS::Task;  # Name in AMS
+ 
+  # Bless task into class
+  bless($task, $class);
+
+  # If we have arguments then we are trying to do a load
+  # as well
+  if (@_) { $task->load(@_); };
+ 
+  return $task;
+}
+
+
+# Private method for handling the Starlink::AMS::Task object
+
+sub obj {
+  my $self = shift;
+  if (@_) { $self->{Obj} = shift; }
+  return $self->{Obj};
+}
+
+
+=item load
+
+Load a monolith and set up the name in the messaging system.
+This task is called by the 'new' method.
+
+  $status = $obj->load("name","monolith_binary");
+
+If the second argument is omitted it is assumed that the binary
+is already running and can be called by "name".   
+
+If a path to a binary with name "name" already exists then the monolith
+is not loaded.
+
+=cut
+
+sub load {
+  
+  my $self = shift;
+  # initialise
+  my $status = $main::SAI__OK;
+
+  if (@_) { $status = $self->obj->load(@_); }
+
+  # Convert from ADAM to ORAC status
+  # Probably should put in a subroutine
+  if ($status == $main::SAI__OK) {
+    $status = ORAC__OK;
+  }
+
+  return $status;
+}
+
+
+=item obeyw
+
+Send an obey to a task and wait for a completion message
+
+  $status = $obj->obeyw("action","params");
+
+=cut
+
+sub obeyw {
+  my $self = shift;
+
+  my $status;
+
+  # Pass arguments directly to the object
+  if (@_) { $status = $self->obj->obeyw(@_); }
+
+  # Should now change status from the obeyw (DTASK__ACTCOMPLETE)
+  # to good ORAC status
+
+  if ($status == $main::DTASK__ACTCOMPLETE) {
+    $status = ORAC__OK;
+  }
+  return $status;
+
+}
+
+
+=item get
+
+Obtain the value of a parameter
+
+ ($status, @values) = $obj->get("task", "param");
+
+Note that this is a different order to that returned by the
+Standard ADAM interface and follows the ORAC definition.
+
+=cut
+
+sub get {
+  # Check number of arguments
+  if (scalar(@_) != 3) { 
+    croak 'get: Wrong number of arguments. Usage: $task->get(\'task\', \'param\')';
+  }
+
+  my $self = shift;
+
+  # Now need to construct the arguments for the AMS layer
+  
+  my $task = shift;
+  my $param = shift;
+
+  my $arg = $task .":" . $param;
+
+  my ($result, $status) = $self->obj->get($arg);
+
+  # Convert $result to an array
+  my @values = ();
+
+  # an array of values if we have a square bracket at the start
+  # something and a square bracket at the end 
+
+  if ($result =~ /^\s*\[.*\]\s*$/) {
+    # Remove the brackets
+    $result =~ s/^\s*\[(.*)]\s*/$1/;
+  
+    # Now split on comma
+    @values = split(/,/, $result);
+
+  } else {
+    push(@values, $result);
+  }
+
+  # DOUBLE precision values are not handled by perl as numbers
+  # We need to change all parameters values of form "numberD+-number"
+  # to "numberE+-number"
+  # not clear whether I should be doing this in the ADAM module
+  # itself or here. For now do it in the ORAC interface
+
+  map { s/(\d)D(\+|-\d)/${1}E$2/g; } @values;
+
+  # Convert from ADAM to ORAC status
+  # Probably should put in a subroutine
+  if ($status == $main::SAI__OK) {
+    $status = ORAC__OK;
+  }
+
+  return ($status, @values);
+}
+
+=item set
+
+Set the value of a parameter
+
+  $status = $obj->set("task", "param", "newvalue");
+
+=cut
+
+sub set {
+  # Check number of arguments
+  if (scalar(@_) != 4) { 
+    croak 'get: Wrong number of arguments. Usage: $task->set(\'task\', \'param\', \'newvalue\')';
+  }
+
+  my $self = shift;
+
+  # Now need to construct the arguments for the AMS layer
+  
+  my $task = shift;
+  my $param = shift;
+  my $value = shift;
+
+  my $arg = $task .":" . $param;
+
+  my $status = $self->obj->set($arg, $value);
+
+  # Convert from ADAM to ORAC status
+  # Probably should put in a subroutine
+  if ($status == $main::SAI__OK) {
+    $status = ORAC__OK;
+  }
+
+  return $status;
+}
+
+
+=item control
+
+Send CONTROL messages to the monolith. The type of control
+message is specified via the first argument. Allowed values are:
+
+  default:  Return or set the current working directory
+  par_reset: Reset all parameters associated with the monolith.
+
+  ($current, $status) = )$obj->control("type", "value")
+
+"value" is only relevant for the "default" type and is used
+to specify a new working directory. $current is always returned
+even if it is undefined.
+
+These commands are synonymous with the cwd() and resetpars()
+methods.
+
+=cut
+
+sub control {
+
+  my ($value, $status);
+  my $self = shift;
+  
+  if (@_) { 
+    ($value, $status) = $self->obj->control(@_);
+
+    # Convert from ADAM to ORAC status
+    # Probably should put in a subroutine
+    if ($status == $main::SAI__OK) {
+      $status = ORAC__OK;
+    }
+  }
+  return ($value, $status);
+}
+
+# Stop the monolith from being killed on exit
+
+sub forget {
+  my $self = shift;
+  $self->obj->forget;
+}
+
+=item resetpars
+
+Reset all parameters associated with a monolith
+
+  $status = $obj->resetpars;
+
+=cut
+
+sub resetpars {
+  my $self = shift;
+
+  my ($junk, $status) = $self->obj->control("par_reset");
+
+  # Convert from ADAM to ORAC status
+  # Probably should put in a subroutine
+  if ($status == $main::SAI__OK) {
+    $status = ORAC__OK;
+  }
+
+  return $status;
+
+}
+
+
+=item cwd
+
+Set and retrieve the current working directory of the monolith
+
+  ($cwd, $status) = $obj->cwd("newdir");
+
+=cut
+
+sub cwd {
+  my $self = shift;
+  my $newdir = shift;
+
+  my ($value, $status) = $self->obj->control("default", $newdir);
+
+  # Convert from ADAM to ORAC status
+  # Probably should put in a subroutine
+  if ($status == $main::SAI__OK) {
+    $status = ORAC__OK;
+  }
+  return $status;
+
+}
+
+
+=item contactw
+
+This method will not return unless the monolith can be contacted.
+It only returns with a timeout. Returns a '1' if we contacted okay
+and a '0' if we timed out. It will timeout if it takes longer than
+specified in ORAC::Msg::ADAM::Control->timeout.
+
+=cut
+
+
+sub contactw {
+  my $self = shift;
+  return $self->obj->contactw;
+}
+
+
+=item contact
+
+This method can be used to determine whether the object can
+contact a monolith. Returns a 1 if we can contact a monolith and
+a zero if we cant.
+
+=cut
+
+sub contact {
+  my $self = shift;
+  return $self->obj->contact;
+}
+
+=back
+
+=head1 REQUIREMENTS
+
+This module requires the Starlink::AMS::Task module.
+
+=head1 SEE ALSO
+
+L<Starlink::AMS::Task>
+
+=head1 AUTHORS
+
+Tim Jenness (t.jenness@jach.hawaii.edu)
+and Frossie Economou (frossie@jach.hawaii.edu)    
+
+=cut
+
 
 __END__
 
