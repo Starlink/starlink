@@ -6,7 +6,7 @@
 
 \title{Starlink Software Developments}
 
-\author{Martin Bly, David Giaretta}
+\author{Martin Bly, David Giaretta, Malcolm Currie}
 \affil{Starlink, Space Science and Technology Department,
 Rutherford Appleton Laboratory, Chilton, Didcot, Oxon, OX11 0QX, UK}
 
@@ -17,16 +17,17 @@ Tyndall Avenue, Bristol University, Bristol, BS8 1TL, UK}
 \contact{Mark Taylor}
 \email{m.b.taylor@bristol.ac.uk}
 
-\keywords{software, grid, Java, treeview, splat, sog}
+\paindex{Bly, M. }
+\aindex{Giaretta, D. }
+\aindex{Currie, M. }
+\aindex{Taylor, M. }
 
-\paindex{Bly, M. J.}
-\aindex{Giaretta, D. L.}
-\aindex{Taylor, M. B.}
+\keywords{Starlink, software, grid, Java, Treeview, VOTable}
 
 \begin{abstract}
-Some current and upcoming software products from Starlink were demonstrated.
+Some current and upcoming software developments from Starlink were demonstrated.
 These included invoking traditional Starlink applications via
-web services, the current state of the ORAC-DR reduction pipeline,
+web services, the current version of the ORAC-DR reduction pipeline,
 and some new Java-based tools including Treeview, an
 interactive explorer of hierarchical data structures.
 \end{abstract}
@@ -49,30 +50,30 @@ Up to date details of all Starlink software, including information for
 obtaining it, can be found at 
 \htmladdnormallinkfoot{the Starlink web site}{http://www.starlink.ac.uk/}.
 
-\section{New features of Existing Software}
+\section{New Features of Existing Software}
 
-A number of packages were on display with major new facilities.
+A number of packages were on display with major new facilities,
+including the following:
 \begin{description}
 
-\item[CCDPACK] --- CCD data reduction package.
+\item[CCDPACK] --- CCD data reduction package
    \begin{itemize}
-   \item Much improved facilities for graphical display and 
-         interactive image registration
+   \item Graphical display and interactive registration are greatly improved
    \item Integrated support for reduction and registration of frames 
-         from mosaic cameras
+         from mosaic cameras has been added
    \end{itemize}
 
-\item[GAIA] --- image display and analysis tool
+\item[GAIA] --- multi-purpose interactive image display and analysis tool
    \begin{itemize}
-   \item Display of multi-extension FITS files
-   \item Interactive display of linear polarization maps
-   \item Recording positions from an image
+   \item Multi-extension FITS files can be displayed
+   \item Linear polarization maps can be displayed
+   \item Positions can be recorded from an image
    \end{itemize}
 
 \item[KAPPA] --- generic analysis and display package
    \begin{itemize}
    \item After many years, version 1.0 is finally released!
-   \item All tasks now use the standard Starlink NDF structure instead of
+   \item All tasks now use the Starlink NDF structure instead of
          the old IMAGE format
    \item All applications are now WCS-aware
    \item All graphics are now produced using native PGPLOT
@@ -81,8 +82,10 @@ A number of packages were on display with major new facilities.
 
 \item[ORAC-DR] --- general purpose automatic data reduction pipeline
    \begin{itemize}
-   \item An improved graphical front end
-   \item A graphical FITS header editor
+   \item More instruments are supported (Cavanagh et al., 2002)
+   \item Data error handling is more accurate
+   % \item Object masking is more efficient
+   \item A graphical front end is provided
    \end{itemize}
 
 \item[POLPACK] --- polarimetry data reduction package
@@ -95,27 +98,28 @@ Additionally a new package DATACUBE consisting of A-tasks, shell scripts
 and a cookbook for IFU data reduction has been introduced.
 
 
-\section{New tools}
+\section{New Tools}
 
 New Starlink software development is being done using Java.
 We are developing an array data access layer called HDX/NDX
 (Giaretta et al., 2002)
 which permits network-transparent and (largely) portable 
-access to data stored in a number of ways.  In this way the 
+access to data stored in a variety of forms.  In this way the 
 application software does not need to worry about the source
 (local or remote) or the format (FITS, NDF, XML) of a data array.
 
 New tools written using this framework, 
 demonstrated at the conference, are described in the following sections.
-All are undergoing active development and will offer new features
+All are undergoing active development and will offer new facilities
 in the near future.
 
 \subsection{Treeview}
+\label{sec:treeview}
 
 Treeview is an interactive graphical browser for hierarchical structures
 which knows about astronomical data formats.
 It resembles Windows Explorer in representing a hierarchical structure
-as a list of nodes which the user may expand or collapse, 
+as a tree of nodes which the user may expand or collapse, 
 but as well as displaying directory trees
 containing files, it can look inside files to display
 their structure in a hierarchical fashion to whatever depth 
@@ -130,7 +134,7 @@ or view it as an image or a table of pixel values.
 Operation is extremely intuitive.
 \begin{figure}
 \plotone{D1_1.eps}
-\caption{Treeview displaying NDFs in a directory}
+\caption{Treeview displaying various files in a directory}
 \end{figure}
 
 Treeview understands many kinds of structure, and more are being added.
@@ -153,9 +157,9 @@ photometry on images
 is best delegated to external applications.
 For nodes of a suitable type, Treeview allows invocation of 
 external applications to do this; currently 
-Splat (section \ref{sec:splat}) for spectrum analysis
+SPLAT (section \ref{sec:splat}) for spectra
 and
-SoG (section \ref{sec:sog}) for image analysis.
+SoG (section \ref{sec:sog}) for images.
 Communication between the applications is done via SOAP, 
 serialising data array references using NDX.
 This permits very flexible deployment of resources; for instance the 
@@ -167,7 +171,7 @@ Treeview itself is written entirely in Java, but for WCS-related tasks
 and display of Starlink HDS/NDF files it uses some platform-specific 
 shared library code (JNI wraps of the Starlink AST and HDS
 libraries respectively).  These are currently available for 
-Linux, Solaris and Tru64 Unix, though Windows versions should be
+Linux, Solaris and Tru64 Unix, while Windows versions should be
 available shortly.
 However, if these libraries 
 are not detected at runtime, Treeview will run happily with some 
@@ -176,20 +180,23 @@ run anywhere that a J2SE1.4 Java Runtime Environment is installed,
 which makes it highly portable.
 Installation is simply a case of unpacking a single tar or zip archive.
 
-\subsection{Splat}
+\subsection{SPLAT}
 \label{sec:splat}
 
-Splat (SPectraL Analysis Tool) is an interactive Java tool for 
-displaying, comparing and analysing astronomical spectra.
-One or many spectra can be viewed in a highly customisable
-display, and publication quality plots can be produced.
-It provides facilities for fitting spectral lines using a wide
-variety of profile models and doing spectrum arithmetic.
-It can be controlled from the command line, or using sockets or 
+SPLAT (SPectraL Analysis Tool) is an interactive Java application for 
+display, comparison and analysis of astronomical spectra.
+Spectra can be viewed singly, together or as an animated sequence;
+the display is highly configurable and publication quality plots
+can be produced.
+Facilities are provided for fitting spectral lines using a
+variety of profile models, 
+fitting background levels using polynomials,
+and doing spectrum arithmetic.
+The program can be controlled from the command line, or using sockets or 
 via SOAP messages.
 \begin{figure}
 \plotone{D1_2.eps}
-\caption{The Splat spectral analysis tool}
+\caption{The SPLAT spectral analysis tool}
 \end{figure}
 
 \subsection{SoG}
@@ -199,13 +206,13 @@ SoG (``Son of Gaia'') is an extension of JSkycat which can display
 NDX images, and is planned in due course to provide toolkits interfacing
 with other software.
 By taking advantage of grid technologies it will be able to provide
-similar functionality to the existing Gaia tool, while providing
+similar functionality to the existing Gaia tool, while offering
 platform independence and network transparency.
 
 
 \begin{references}
-% \reference Cavanagh, B., Hirst, P., Currie, M.\ J., Jenness, T., Economou, F.,
-%            Ryder, S. \& Todd, S.\ P. 2002, \adassxii, \paperref{P6.4}
+\reference Cavanagh, B., Hirst, P., Currie, M.\ J., Jenness, T., Economou, F.,
+           Ryder, S. \& Todd, S.\ P. 2002, \adassxii, \paperref{P6.4}
 % \reference Draper, P.\ W.\ 2000, \adassix, 615
 % \reference Economou, F., Bridger, A., Wright, G.\ S., Jenness, T., 
 %            Currie, M.\ J. \& Adamson, A.\ 1999, \adassviii
