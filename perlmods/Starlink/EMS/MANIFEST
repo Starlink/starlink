@@ -2,6 +2,7 @@ EMS.pm
 EMS.xs
 Makefile.PL
 MANIFEST
+typemap
 t/sai.t
-
+t/ems.t
 
