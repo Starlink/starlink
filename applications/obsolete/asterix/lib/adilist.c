@@ -230,7 +230,7 @@ void lstx_sperase( ADIobj *list, ADIstatus status )
 
   while ( _valid_q(curp) ) {
     _CAR(curp) = ADI__nullid;
-    curp = _CDR(curp)
+    curp = _CDR(curp);
     }
 
   adic_erase( list, status );
@@ -240,7 +240,7 @@ void lstx_addtoset( ADIobj *list, ADIobj obj, ADIstatus status )
   {
   ADIobj curp = list;
   ADIobj *ipoint = list;
-  ADIobj	test = -1;
+  ADIobj	test = (-1);
 
   if ( _ok(status) ) {
     while ( _valid_q(curp) && (test<0) ) {
