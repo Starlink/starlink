@@ -367,6 +367,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - Re-write LinearMap to use a least squares fit.
 *        - Check that CDj_i is not AST__BAD within WcsWithWcs when
 *        forming the increments along each physical axis.
+*     28-SEP-2001 (DSB):
+*        GoodWarns changed so that no error is reported if a blank list
+*        of conditions is supplied.
 *class--
 */
 
@@ -6414,7 +6417,7 @@ static int GoodWarns( const char *value ){
 
 *  Description:
 *     This function checks the supplied string to ensure it contains a space
-*     separated list of one or more recognised warning conditions. An
+*     separated list of zero or more recognised warning conditions. An
 *     error is reported if it does not.
 
 *  Parameters:
@@ -6502,14 +6505,6 @@ static int GoodWarns( const char *value ){
 /* If we are in a word, copy the lowercase character to the buffer. */
       if( inword ) *(b++) = tolower( *c );
       
-   }
-
-/* Report an error no conditions were supplied. */
-   if( n == 0 && astOK ){
-      ret = 0;
-      astError( AST__ATTIN, "%s(fitschan): Blank conditions "
-                "list supplied for the Warnings attribute.",
-                "astSetWarnings" );
    }
 
    return ret;
