@@ -75,7 +75,8 @@ Bitmap::iterator Bitmap::endIterator_;
  * Create a new bitmap with the given parameters.
  *
  * <p>Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
- * with point (0,0) in the top left corner.
+ * with point (0,0) in the top-left corner, the <em>x</em>-axis
+ * increasing to the right, and the <em>y</em>-axis increasing downwards.
  *
  * @param w the width of the bitmap, in pixels
  * @param h the height of the bitmap, in pixels
@@ -138,15 +139,39 @@ Bitmap::~Bitmap()
     delete[] B;
 }
 
-// Paint the bitmap b, which is w x h pixels in size onto the master bitmap, 
-// starting with pixel (x,y).
-// Update bb? as a side-effect.
-// Set to max_colour_ any pixels in the master which are non-zero in the 
-// new bitmap, and crop any parts of the new bitmap
-// falling outside the boundary of the master
+/**
+ * Paint a bitmap onto the master bitmap.  The bitmap to be added is
+ * given in a one-dimensional array <code>b</code>, which is
+ * <code>w</code> pixels wide and <code>h</code> high.  Like the
+ * master bitmap, the <em>x</em>
+ * axis runs horizontally and the <em>y</em> axis vertically downwards.
+ *
+ * <p>The pixel at position <em>(x,y)</em> on the new bitmap is at position
+ * <code>b[y*w+x]</code> in the input bitmap array.  This new bitmap is
+ * painted onto the master bitmap with its bottom left corner pixel
+ * (namely position <em>(0,0)</em>) occupying pixel <em>(x,y)</em> on
+ * the master bitmap.
+ *
+ * <p>Any parts of the new bitmap falling outside the boundary of the
+ * master are cropped.
+ *
+ * @param x the pixel in the top-left corner of the new bitmap (coordinate
+ * <em>(0,0)</em>) is located at position <em>(x,y)</em> of the master
+ * bitmap
+ * @param y (see parameter <em>x</em>)
+ * @param w the width of the new bitmap, in pixels
+ * @param h the height of the new bitmap, in pixels
+ * @param b the new bitmap, as a one-dimensional array
+ * @throws BitmapError if this is called after method <code>freeze()</code>
+ */
 void Bitmap::paint (const int x, const int y, const int w, const int h,
 		    const Byte *b)
+    throw (BitmapError)
 {
+    // Set to max_colour_ any pixels in the master which are non-zero in the 
+    // new bitmap, and crop any parts of the new bitmap
+    // falling outside the boundary of the master
+    // Update bb? as a side-effect.
     if (frozen_)
 	throw BitmapError ("paint() called after freeze()");
 
@@ -187,13 +212,24 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
 }
 
 
-// Draw a block of height h and width w pixels, with its bottom left corner
-// occupying pixel (x,y).
-// Update bb? as a side-effect.
-// OR the new pixels into place, and crop any parts of the new bitmap
-// falling outside the boundary of the master
+/**
+ * Draws on the master bitmap a block (a `rule' in TeX terms) of
+ * height h and width w pixels. The bottom left corner of the rule
+ * occupies pixel (x,y) on the master bitmap.
+ *
+ * @param x the (pixel in the) bottom-left corner of the rule
+ * is located at position <em>(x,y)</em> of the master bitmap
+ * @param y (see parameter <em>x</em>)
+ * @param w the width of the new rule, in pixels
+ * @param h the height of the new rule, in pixels
+ * @throws BitmapError if this is called after method <code>freeze()</code>
+ */
 void Bitmap::rule (const int x, const int y, const int w, const int h)
+    throw (BitmapError)
 {
+    // Update bb? as a side-effect.
+    // OR the new pixels into place, and crop any parts of the new bitmap
+    // falling outside the boundary of the master
     if (frozen_)
 	throw BitmapError ("rule() called after freeze()");
 
@@ -220,16 +256,34 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
 	     << bbT << ':' << bbB << ")" << endl;
 }
 
-// Strut is just the same as rule, except that it doesn't draw in any
-// pixels.  Its only effect is to make sure that the boundingbox is at
-// least larger than the box specified [x-l,x+r], [y-t,y+b].  l, r, t,
-// and b must all be positive.
+/**
+ * Draws a `strut' on the master bitmap.  This is essentially the same
+ * as the <code>rule()</code> method, except that it doesn't draw in
+ * any pixels.  Its only effect is to make sure that the boundingbox
+ * includes at least the <em>x</em>-values <em>[x-l,x+r]</em>, and the
+ * <em>y</em>-values <em>[y-t,y+b]</em>.  The parameters l, r, t, and
+ * b must all be non-negative.
+ *
+ * @param x the x-coordinate of the reference point of the strut
+ * @param y the y-coordinate of the reference point of the strut
+ * @param l bounding box must be leftwards of <code>x-l</code>
+ * @param r bounding box must be rightwards of <code>x+r</code>
+ * @param t bounding box must be above <code>y-t</code>
+ * @param b bounding box must be below <code>y+b</code>
+ * @throws BitmapError if this is called after method
+ * <code>freeze()</code>, or if one of l, r, t, b is negative
+ */
 void Bitmap::strut (const int x, const int y,
 		    const int l, const int r,
 		    const int t, const int b)
+    throw (BitmapError)
 {
     if (frozen_)
 	throw BitmapError ("strut() called after freeze()");
+
+    if (l < 0 || r < 0 || t < 0 || b < 0)
+	throw BitmapError
+		("Bitmap::strut all of l, r, t, b must be non-negative");
 
     if (verbosity_ > normal)
 	cerr << "Strut @ (" << x << ',' << y << "): (x-"
@@ -251,43 +305,65 @@ void Bitmap::strut (const int x, const int y,
 	     << bbT << ':' << bbB << ")" << endl;
 }
 
-// Freeze the bitmap and bounding box, simply by setting the frozen_ flag
-// to be true.  At the same time, normalise the bounding box by requiring
-// that (0 <= bbL < bbR <= W) and (0 <= bbT < bbB <= H).  If, however, the 
-// bitmap is empty (according to empty()), then don't change anything.
-// Code following this may therefore take these assertions to be valid 
-// as long as empty() is false.
-//
-// Code before this in this file should be called only when the bitmap
-// is unfrozen, code afterwards freezes the bitmap if it is not frozen already.
+/**
+ * Freeze the bitmap and bounding box.  This prevents any further
+ * changes to the bitmap by the methods <code>paint()</code>,
+ * <code>rule()</code> and <code>strut()</code>.  Other methods in this
+ * class such as <code>crop()</code> and <code>blur()</code> call
+ * this method implicitly.
+ *
+ * <p>If method <code>boundingBox()</code> is called before this
+ * method, it is possible for it to report a size larger than the
+ * bitmap, if rules or bitmaps have been placed so that they overlap
+ * the bitmap's boundaries.  The call to <code>freeze</code>
+ * normalises the bounding box so that this is no longer the case.
+ */
 void Bitmap::freeze()
 {
+    // Freeze the bitmap and bounding box, simply by setting the frozen_ flag
+    // to be true.  At the same time, normalise the bounding box by requiring
+    // that (0 <= bbL < bbR <= W) and (0 <= bbT < bbB <= H).  If, however, the 
+    // bitmap is empty (according to empty()), then don't change anything.
+    // Code following this may therefore take these assertions to be valid 
+    // as long as empty() is false.
+    //
+    // Code before this in this file should be called only when the bitmap
+    // is unfrozen, code afterwards freezes the bitmap if it is not
+    // frozen already.
     if (frozen_)
 	return;			// idempotent
 
-    if (!empty())		// do nothing if the bitmap is empty
-    {
-	if (bbL < 0) bbL = 0;
-	if (bbR > W) bbR = W;
-	if (bbT < 0) bbT = 0;
-	if (bbB > H) bbB = H;
-
-	if ((bbL >= bbR) || (bbT >= bbB))
-	    throw BitmapError
-		("Bitmap::freeze bitmap not empty, but bounds crossed");
-    }
-
-#if 0
-    bbL = (ibbL < 0 ? 0 : ibbL);
-    bbR = (ibbR > W ? W : ibbR);
-    bbT = (ibbT < 0 ? 0 : ibbT);
-    bbB = (ibbB > H ? H : ibbB);
-#endif
+    normalizeBB_(bbL, bbR, bbT, bbB);
 
     frozen_ = true;
 }
 
-void Bitmap::crop ()
+/**
+ * Normalizes the bounding box, so that it is no bigger than the bitmap.
+ */
+void Bitmap::normalizeBB_(int& L, int& R, int& T, int& B)
+{
+    if (!empty())		// do nothing if the bitmap is empty
+    {
+	if (L < 0) L = 0;
+	if (R > W) R = W;
+	if (T < 0) T = 0;
+	if (B > H) B = H;
+
+	if ((L >= R) || (T >= B))
+	    // eh?  this is really an assertion failure, I think
+	    throw BitmapError
+		("Bitmap::normalizeBB_: bitmap not empty, but bounds crossed");
+    }
+}
+
+/**
+ * Crops the bitmap.  This applies the cropping specified in methods
+ * {@link #crop(Margin,int,bool)} and {@link #cropDefault}.
+ *
+ * <p>Freezes the bitmap as a side-effect.
+ */
+void Bitmap::crop()
 {
     // Not idempotent, since scaleDown() requires to be able to
     // re-call this function after scaling, which will happen only if
@@ -305,13 +381,47 @@ void Bitmap::crop ()
     cropB = (cropMarginAbs[Bottom]	? cropMargin[Bottom]
 					: bbB + cropMargin[Bottom]);
 
+    // Ensure that the cropping hasn't pushed the margins out of the bitmap
+    normalizeBB_(cropL, cropR, cropT, cropB);
+    
     cropped_ = true;
 }
 
+/**
+ * Specifies a crop.  If the <code>absolute</code> flag is true, then
+ * set up a crop for the margin specified in <code>spec</code>: for
+ * the left and right margins, the crop in <code>pixels</code> is a
+ * distance from the <em>left</em> margin; for the top and bottom
+ * crops, it is from the <em>top</em> margin.  If the
+ * <code>absolute</code> flag is false, then the distance in the
+ * <code>pixels</code> parameter is the distance `outward' of the
+ * eventual bounding-box, or at the edge of the bitmap, whichever
+ * comes first.
+ *
+ * <p>Since the implication of this is that a call
+ * <pre>
+ *   .crop(All, x, true);
+ * </pre>
+ * would set the crop box to be zero size, this combination is forbidden.
+ *
+ * @param spec the margin the crop is being specified for
+ * @param pixels the size of the margin, or the position when
+ * <code>absolute</code> is true
+ * @param absolute if true, then the margin specified is an absolute
+ * position relative to the left or top margin as appropriate; if
+ * false, then it is relative to the eventual size and position of the
+ * bounding box
+ * @throws BitmapError if <code>spec=All</code> when
+ * <code>absolute</code> is true
+ */
 void Bitmap::crop (Margin spec, int pixels, bool absolute)
+    throw (BitmapError)
 {
     if (spec == All)
     {
+	if (absolute)
+	    throw new BitmapError("Bitmap::crop(All,x,true): illegal call");
+
 	cropMargin[Left] = pixels;
 	cropMarginAbs[Left] = absolute;
 	cropMargin[Right] = pixels;
@@ -328,11 +438,32 @@ void Bitmap::crop (Margin spec, int pixels, bool absolute)
 	cropMarginAbs[spec] = absolute;
     }
 }	
-	
+
+/**
+ * Specifies a default crop.  This is exactly the same as {@link
+ * #crop(Margin,int,bool)}, except that it specifies this for all the
+ * bitmaps subsequently created by this class.
+ *
+ * @param spec the margin the crop is being specified for
+ * @param pixels the size of the margin, or the position when
+ * <code>absolute</code> is true
+ * @param absolute if true, then the margin specified is an absolute
+ * position relative to the left or top margin as appropriate; if
+ * false, then it is relative to the eventual size and position of the
+ * bounding box
+ * @throws BitmapError if <code>spec=All</code> when
+ * <code>absolute</code> is true
+ * @see #crop(Margin,int,bool)
+ */	
 void Bitmap::cropDefault (Margin spec, int pixels, bool absolute)
+    throw (BitmapError)
 {
     if (spec == All)
     {
+	if (absolute)
+	    throw new BitmapError
+		    ("Bitmap::cropDefault(All,x,true): illegal call");
+
 	cropMarginDefault[Left] = pixels;
 	cropMarginAbsDefault[Left] = absolute;
 	cropMarginDefault[Right] = pixels;
@@ -350,7 +481,72 @@ void Bitmap::cropDefault (Margin spec, int pixels, bool absolute)
     }
 }	
 	
+/**
+ * Does the bitmap overlap its canvas?  This can only be true before a
+ * (implicit or explicit) call to {@link #freeze}, since that
+ * normalizes the bounding box variables.
+ *
+ * @return true if the bitmap overlaps its canvas; always false after
+ * any call to <code>freeze()</code>
+ */
+bool Bitmap::overlaps ()
+    const
+{
+    return (bbL < 0 || bbR > W || bbT < 0 || bbB > H);
+}
 
+/**
+ * Obtain a bounding box for the current bitmap.  This returns a
+ * four-element array consisting of the coordinate of the
+ * leftmost blackened pixel, the topmost pixel, the rightmost
+ * pixel and the bottommost pixel.  If the bitmap has been cropped,
+ * this bounding box reflects the crop margins.
+ *
+ * <p>The returned array occupies
+ * static storage, and is always current as of the last time this
+ * method was called.
+ *
+ * <p>It is possible for this to be bigger than the bitmap, if rules
+ * or bitmaps have been painted on the bitmap in such a way that they
+ * overlap the boundaries of the bitmap, <em>and</em> if it is
+ * called before an explicit or implicit call to
+ * <code>freeze()</code>.  This can also be detected by a call to
+ * <code>overlaps()</code> before any call to <code>freeze()</code>.
+ * It is never bigger than the bitmap after the bitmap is frozen.
+ *
+ * <p>Note that the order of the four dimensions is not that of
+ * the Postscript BoundingBox, which is (llx, lly, urx, ury)
+ * rather than here, effectively, (ulx, uly, lrx, lry).  This is
+ * because the position of the upper-left corner (ulx, uly) is
+ * the natural TeX reference point.
+ *
+ * @return the position of the bitmap bounding-box, in the order
+ * (ulx, uly, lrx, lry)
+ */
+int *Bitmap::boundingBox ()
+{
+    if (cropped_) {
+	BB[0] = cropL;
+	BB[1] = cropT;
+	BB[2] = cropR;
+	BB[3] = cropB;
+    } else {
+	BB[0]=bbL;
+	BB[1]=bbT;
+	BB[2]=bbR;
+	BB[3]=bbB;
+    }
+    return &BB[0];
+}
+
+/**
+ * Makes a very simple-minded attempt to antialias the bitmap by
+ * blurring it.  Opening the DVI file with a magnification setting,
+ * and then calling {@link #scaleDown} will generally produce a much
+ * better effect.
+ *
+ * <p>Freezes the bitmap as a side-effect.
+ */
 void Bitmap::blur ()
 {
     if (!frozen_)
@@ -390,7 +586,24 @@ void Bitmap::blur ()
     B = newB;
 }
 
+/**
+ * Scales down the bitmap by a numerical factor.  The resulting bitmap
+ * has a linear dimension smaller than the original by the given
+ * factor.  The pixels in the resulting bitmap are resampled so that
+ * this gives a basic anti-aliasing effect.
+ *
+ * <p>We throw an exception if you try to scale down an empty bitmap,
+ * simply on the grounds that this is probably an error, and you want
+ * to know about it.
+ *
+ * <p>Freezes the bitmap as a side-effect.
+ *
+ * @param factor the scaling factor, in the range 2..8
+ * @throws BitmapError if the scaling factor is outside the range
+ * 2..8, or if the bitmap is empty
+ */
 void Bitmap::scaleDown (const int factor)
+    throw (BitmapError)
 {
     if (!frozen_)
 	freeze();
@@ -500,7 +713,26 @@ void Bitmap::scaleDown (const int factor)
 	     << bbT << ':' << bbB << ")" << endl;
 }
 
+/**
+ * Writes the bitmap out to the specified file.  The
+ * <code>format</code> parameter specifies the format of this file,
+ * and should be one of the bitmap types listed in the sequence
+ * starting with {@link BitmapImage.firstBitmapImageFormat}; if this
+ * is not available, we try writing out in the default format, and if
+ * that fails in turn (something is clearly badly wrong) we throw an
+ * error.
+ * 
+ * <p>Freezes the bitmap as a side-effect.
+ *
+ * @param filename the name of the output filename
+ * @param format one of the format names known to class
+ * <code>BitmapImage</code>
+ * @throws BitmapError if we cannot write out a bitmap even in the
+ * default format
+ * @see BitmapImage
+ */
 void Bitmap::write (const string filename, const string format)
+    throw (BitmapError)
 {
     if (!frozen_)
 	freeze();
@@ -584,7 +816,12 @@ void Bitmap::write (const string filename, const string format)
     delete bi;
 }
 
-
+/**
+ * Sets the foreground or background colour.
+ *
+ * @param fg if true, sets the foreground colour; if false, the background
+ * @param rgb the colour the ground is set to
+ */
 void Bitmap::setRGB (const bool fg, const BitmapColour* rgb) {
     if (verbosity_ > normal)
 	cerr << "setRGB: "
@@ -606,6 +843,14 @@ void Bitmap::setRGB (const bool fg, const BitmapColour* rgb) {
     customRGB_ = true;
 }
 
+/**
+ * Sets the default foreground or background colours.
+ * This is just like <code>setRGB</code>, except that it applies to
+ * all bitmaps subsequently created by this class.
+ *
+ * @param fg if true, sets the foreground colour; if false, the background
+ * @param rgb the colour the ground is set to
+ */
 void Bitmap::setDefaultRGB (const bool fg, const BitmapColour* rgb) {
     if (verbosity_ > normal)
 	cerr << "setDefaultRGB: "
@@ -627,6 +872,37 @@ void Bitmap::setDefaultRGB (const bool fg, const BitmapColour* rgb) {
     def_customRGB_ = true;
 }
 
+
+/**
+ * Returns the beginning of a sequence of bitmap rows.
+ * <p>Freezes the bitmap as a side-effect.
+ */
+Bitmap::iterator Bitmap::begin()
+{
+    if (!frozen_)
+	freeze();
+    runningIterator_.init(B,
+			  (cropped_ ? cropL : 0),
+			  (cropped_ ? cropT : 0),
+			  W,
+			  //(cropped_ ? cropR-cropL : W),
+			  (cropped_ ? cropB-cropT : H));
+//     rowLength_ = (cropped_ ? cropR-cropL : width);
+//     lastRow_ =   (cropped_ ? cropB-cropT : height);
+//     rowNumber_ = (cropped_ ? cropT : 0);
+//    runningIterator_.init(B,H,W);
+    return runningIterator_;
+}
+/**
+ * Returns the end of a sequence of bitmap rows.
+ */
+Bitmap::iterator Bitmap::end()
+    const
+{
+    if (Bitmap::endIterator_.rowNumber_ == 0) // initialisation
+	Bitmap::endIterator_.rowNumber_ = -1;
+    return Bitmap::endIterator_;
+}
 Bitmap::iterator::iterator()
 {
     // empty
@@ -635,20 +911,38 @@ Bitmap::iterator::~iterator()
 {
     // empty
 }
-void Bitmap::iterator::init(Byte* b, int height, int width)
+void Bitmap::iterator::init(Byte* b,
+			    int startx, int starty,
+			    int width, int nrows)
 {
     b_ = b;
     rowLength_ = width;
-    lastRow_ = height;
-    rowNumber_ = 0;
+    lastRow_ = startx + nrows;
+    rowNumber_ = starty;
+    startColumn_ = startx;
+//     rowLength_ = (cropped_ ? cropR-cropL : width);
+//     lastRow_ =   (cropped_ ? cropB-cropT : height);
+//     rowNumber_ = (cropped_ ? cropT : 0);
 }
+/**
+ * Returns the current member of the set of rows returned by the
+ * iterator.  This returns a pointer to an array of
+ * <code>Byte</code>, with elements <code>[0..W-1]</code> being
+ * guaranteed to be valid, where <code>W</code> is the width of the
+ * bitmap.  This width is the difference of the [2] and [0] elements
+ * (or equivalently the [3] and [1] elements) of the array returned by
+ * {@link #boundingBox}.
+ *
+ * @return pointer to an array of <code>Byte</code>
+ */
 Byte* Bitmap::iterator::operator*()
     throw (DviError)
 {
     if (rowNumber_ < 0 || rowNumber_ >= lastRow_) {
 	throw new DviError("Out-of-range dereference of iterator");
     }
-    return &b_[rowNumber_ * rowLength_];
+    return &b_[rowNumber_ * rowLength_ + startColumn_];
+    //return &b_[rowNumber_ * rowLength_];
 }
 Bitmap::iterator& Bitmap::iterator::operator++()
     throw (DviError)
@@ -670,17 +964,5 @@ bool Bitmap::iterator::operator!=(const Bitmap::iterator& it)
     const
 {
     return rowNumber_ != it.rowNumber_;
-}
-Bitmap::iterator Bitmap::begin()
-{
-    runningIterator_.init(B,H,W);
-    return runningIterator_;
-}
-Bitmap::iterator Bitmap::end()
-    const
-{
-    if (Bitmap::endIterator_.rowNumber_ == 0) // initialisation
-	Bitmap::endIterator_.rowNumber_ = -1;
-    return Bitmap::endIterator_;
 }
 

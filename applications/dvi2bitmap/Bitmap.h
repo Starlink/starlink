@@ -46,16 +46,22 @@ class Bitmap {
     enum Margin { Left=0, Right=1, Top=2, Bottom=3, All};
 
     void paint (const int x, const int y, const int w, const int h,
-		const Byte* b);
-    void rule (const int x, const int y, const int w, const int h);
+		const Byte* b)
+	    throw (BitmapError);
+    void rule (const int x, const int y, const int w, const int h)
+	    throw (BitmapError);
     void strut (const int x, const int y,
 		const int l, const int r,
-		const int t, const int b);
-    void write (const string filename, const string format);
+		const int t, const int b)
+	    throw (BitmapError);
+    void write (const string filename, const string format)
+	    throw (BitmapError);
     void freeze ();
     void crop ();
-    static void cropDefault (Margin spec, int pixels, bool absolute=false);
-    void crop (Margin spec, int pixels, bool absolute=false);
+    static void cropDefault (Margin spec, int pixels, bool absolute=false)
+	    throw (BitmapError);
+    void crop (Margin spec, int pixels, bool absolute=false)
+	    throw (BitmapError);
     void blur ();
     /**
      * Sets the current bitmap to be transparent, if possible.
@@ -67,7 +73,8 @@ class Bitmap {
     } BitmapColour;
     void setRGB (const bool fg, const BitmapColour*);
     static void setDefaultRGB (const bool fg, const BitmapColour*);
-    void scaleDown (const int factor);
+    void scaleDown (const int factor)
+	    throw (BitmapError);
     /**
      * Is the bitmap empty?  If nothing has (yet) been written to the
      * bitmap, or if everything that was written was out of
@@ -77,36 +84,8 @@ class Bitmap {
      */
     bool empty () const
 	{ return (bbL > W || bbR < 0 || bbT > H || bbB < 0); }
-    /**
-     * Does the bitmap overlap its canvas?  This can only be true before a
-     * call to {@link #freeze}, since that normalizes the bounding box
-     * variables.
-     */
-    bool overlaps () const
-	{ if (frozen_)
-	    throw BitmapError
-		("Bitmap::overlaps called after freeze() when it is always true");
-	else
-	    return (bbL < 0 || bbR > W || bbT < 0 || bbB > H); }
-    /**
-     * Obtain a bounding box for the current bitmap.  This returns a
-     * four-element array consisting of the coordinate of the
-     * leftmost blackened pixel, the topmost pixel, the rightmost
-     * pixel and the bottommost pixel.  The returned array occupies
-     * static storage, and is always current as of the last time this
-     * method was called.
-     *
-     * <p>Note that the order of the four dimensions is not that of
-     * the Postscript BoundingBox, which is (llx, lly, urx, ury)
-     * rather than here, effectively, (ulx, uly, lrx, lry).  This is
-     * because the position of the upper-left corner (ulx, uly) is
-     * the natural TeX reference point.
-     *
-     * @return the position of the bitmap bounding-box, in the order
-     * (ulx, uly, lrx, lry)
-     */
-    int *boundingBox ()
-	{ BB[0]=bbL; BB[1]=bbT; BB[2]=bbR; BB[3]=bbB; return &BB[0]; }
+    bool overlaps() const;
+    int* boundingBox();
     /**
      * Sets the verbosity of the current class.
      * @param level the required verbosity
@@ -136,10 +115,11 @@ class Bitmap {
 	~iterator();
     private:
 	iterator();
-	void init(Byte* b, int height, int width);
+	void init(Byte* b, int startx, int starty, int width, int nrows);
 	Byte* b_;
 	int rowLength_;
 	int rowNumber_;
+	int startColumn_;
 	int lastRow_;
 	friend class Bitmap;
     };
@@ -149,18 +129,19 @@ class Bitmap {
     iterator end() const;
 
  private:
+    void normalizeBB_(int& l, int& r, int& t, int& b);
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
     Byte *B;
     // width and height of bitmap
     int W, H;
-    // bounding box - 
-    // bbL and bbT are the leftmost and topmost blackened pixels,
-    // bbR and bbB are one more than the rightmost and lowest blackened pixels.
-    // Until a call to freeze(), bb? may go outside the canvas (ie, may
-    // be negative or greater than W or H); afterwards they are bounded by
-    // 0..W and 0..H.  (they were distinct variables until
-    // Bitmap.cc 1.13 and Bitmap.h 1.11).
-    // XXX make bb? references to BB[]
+    // bounding box - bbL and bbT are the leftmost and topmost
+    // blackened pixels, bbR and bbB are one more than the rightmost
+    // and lowest blackened pixels.  Until a call to freeze(), bb? may
+    // go outside the canvas (ie, may be negative or greater than W or
+    // H); afterwards they are bounded by 0..W and 0..H.  These
+    // remain the edges of the blackened pixels even after cropping,
+    // and so it is the responsibiligy of the boundingBox() method to
+    // take cropping into account.
     int bbL, bbR, bbT, bbB;
     int BB[4];			// holds return values for boundingBox()
     bool frozen_;
