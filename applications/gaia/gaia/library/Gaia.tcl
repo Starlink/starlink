@@ -107,7 +107,7 @@ Options:
  -default_itt <itt>       - default intensity transfer table.
  -file <file>             - image file to load.
  -float_panel <bool>      - put info panel in a popup window (default: 0).
- -focus_follows_mouse <bool> - entry focus follows mouse (default: 1)
+ -focus_follows_mouse <bool> - entry focus follows mouse (default: 0)
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
@@ -1271,7 +1271,7 @@ itcl::class gaia::Gaia {
    
    #  Set focus following policy (can only set once, then stuck with it).
    itk_option define -focus_follows_mouse focus_follows_mouse \
-      Focus_Follows_Mouse 1 {
+      Focus_Follows_Mouse 0 {
          if { $itk_option(-focus_follows_mouse) } {
             tk_focusFollowsMouse
          }

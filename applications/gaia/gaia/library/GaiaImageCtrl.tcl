@@ -22,7 +22,7 @@
 #     GAIA package.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     {enter_new_authors_here}
 
 #  Inherits:
@@ -32,25 +32,28 @@
 #     Copyright (C) 1998-1999 Central Laboratory of the Research Councils
 
 #  History:
-#     24-SEP-1997 (PDRAPER):
+#     24-SEP-1997 (PWD):
 #        Original version
-#     15-NOV-1997 (PDRAPER):
+#     15-NOV-1997 (PWD):
 #        Commented out code relating to grid control. This is now
 #        replaced by the AST grid (the code is left in place in case a
 #        comparison of the two methods is helpful).
-#     05-FEB-1998 (PDRAPER):
+#     05-FEB-1998 (PWD):
 #        Removed commented out sections, added -with_warp override.
-#     07-APR-1998 (PDRAPER):
+#     07-APR-1998 (PWD):
 #        Added code to control temporary status of image (this was
 #        previously performed at the Gaia level, which proved to be
 #        problematic).
-#     26-FEB-1999 (PDRAPER):
+#     26-FEB-1999 (PWD):
 #        Merged GaiaImage into this class. This removes the need to
 #        modify RtdImageCtrl. All code relating to float_panel is
 #        removed as are changes for with_warp.
-#     24-NOV-1999 (PDRAPER):
+#     24-NOV-1999 (PWD):
 #        Added zoom to selected region changes (bound to Shift-1 and
 #        Shift-2).
+#     28-JAN-2000 (PWD):
+#        Override focus_ method to control default CDE window manager
+#        behaviour somewhat better.
 #     {enter_changes_here}
 
 #-
@@ -118,6 +121,9 @@ itcl::class gaia::GaiaImageCtrl {
       gaia::GaiaImageMBand $w_.newmband \
          -image $this \
          -defaultcursor $itk_option(-cursor)
+
+      #  Clicking in main window gives it focus.
+      $canvas_ bind $image_ <1> +[code $this focus_ in]
    }
 
    #  Make the panel info subwindow. Override to use GaiaImagePanel,
@@ -182,7 +188,40 @@ itcl::class gaia::GaiaImageCtrl {
       set_drawing_area
 
       # Clicking on the image or image background deselects other objects.
-      $canvas_ bind $image_ <1> [code $itk_component(draw) deselect_objects]
+      $canvas_ bind $image_ <1> +[code $itk_component(draw) deselect_objects]
+   }
+
+   # Control the focussing of the canvas. Only take focus if the
+   # top-level window associated with this canvas has the focus
+   # (i.e. it's not in another toplevel somewhere). If this isn't
+   # done then mysterious raises of the main image window can occur
+   # with some window managers (mainly CDE, with click-to-focus & 
+   # autoraise).
+   #
+   # allan: 19.6.98: disabled the above behavior, since it causes
+   # problems with mouse warping and confuses people. Can't verify
+   # the CDE behavior...
+   #
+   # PWD: back again the CDE window manager is really naff at
+   # controlling transients, which allows the main window to
+   # autoraise above them! Add <1> binding to get focus back to image.
+   protected method focus_ {way} {
+      global ::$w_.focus
+      set top [winfo toplevel $w_]
+      set focus [focus -displayof $top]
+      if { $focus != {} } {
+         if {[winfo toplevel $focus] == "$top" } { 
+            
+            #  This toplevel has the focus (or at least a child of it
+            #  has), so it's ok to proceed.
+            if { $way == "in" } { 
+               set $w_.focus [focus -displayof .]
+               catch {focus $canvas_}
+            } else {
+               catch {focus [set $w_.focus]}
+            }
+         }
+      }
    }
 
    #  This method is redefined here to also rescale pixel-width
@@ -458,6 +497,12 @@ itcl::class gaia::GaiaImageCtrl {
 	   set fileselect_ [FileSelect $w_.select -dir $dir -filter $pattern \
 				-transient 1 -withdraw 1 -filter_types $types]
 	   wm transient $fileselect_ [winfo toplevel $w_]
+       } else {
+          
+          #  It's a transient so shouldn't need to do this... but CDE
+          #  needs it.
+          wm deiconify $fileselect_
+          raise $fileselect_
        }
        if {[$fileselect_ activate]} {
 	   return [$fileselect_ get]
