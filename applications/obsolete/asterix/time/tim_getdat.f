@@ -194,7 +194,7 @@
         END IF
 
 *    Count the number of bad points
-        CALL ARR_NBAD( NTOT, %VAL(IQPTR), NBAD, STATUS )
+        CALL ARR_CNT1L( NTOT, %VAL(IQPTR), .FALSE., NBAD, STATUS )
 
 *    If all quality values are good then dont bother quality checking.
         IF ( NBAD .EQ. 0 ) THEN

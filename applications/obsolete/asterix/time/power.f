@@ -233,7 +233,7 @@
         CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
           CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
-          CALL ARR_NBAD( DIMS(1), %VAL(QPTR), NBAD, STATUS )
+          CALL ARR_CNT1L( DIMS(1), %VAL(QPTR), .FALSE., NBAD, STATUS )
           IF ( NBAD .GT. 0 ) THEN
             CALL MSG_SETI( 'NBAD', NBAD )
             STATUS = SAI__ERROR

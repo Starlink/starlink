@@ -36,7 +36,7 @@
 *
 *    Export :
 *
-      INTEGER 			INDEX(NRAD,NSECTOR)     ! Workspace
+      INTEGER 			INDEX(NX,NY)
 *
 *    Status :
 *

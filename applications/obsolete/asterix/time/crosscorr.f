@@ -157,7 +157,6 @@
       INTEGER                	NDIM            	! Dimensionality of data
       INTEGER                   NELM(2)                 ! # points per input
       INTEGER                	NL              	! Total number of lag values
-      INTEGER                	NLINE           	! Line no. of HISTORY text
       INTEGER                   QPTR                    ! Input quality pointer
       INTEGER                	TLEN         		! Length of text string
       INTEGER                   VPTR(2)                 ! Mapped input errors

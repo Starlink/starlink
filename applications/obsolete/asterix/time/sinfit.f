@@ -172,7 +172,7 @@
       CALL BDI_CHK( IFID, 'Quality', QUALOK, STATUS )
       IF ( QUALOK ) THEN
         CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
-        CALL ARR_NBAD( NDATA, %VAL(QPTR), NBAD, STATUS )
+        CALL ARR_CNT1L( NDATA, %VAL(QPTR), .FALSE., NBAD, STATUS )
         IF ( NBAD .GT. 0 ) THEN
           CALL MSG_SETI( 'NBAD', NBAD )
           CALL MSG_PRNT( 'There are ^NBAD bad quality points'/
