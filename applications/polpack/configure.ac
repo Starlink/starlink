@@ -33,6 +33,7 @@ STAR_DECLARE_DEPENDENCIES([build], [fio prm par sae hds kaplibs ard pgplot])
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun223)
+STAR_PREDIST_SOURCES(polka.tex)
 
 AC_CONFIG_SUBDIRS([polsub ccdpack])
 

@@ -95,3 +95,5 @@ edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@VERSION\@,$(VERSION),g'
 
+@PREDIST@polka.htx_tar: polka.tex
+starhelp_DATA = polka.htx_tar
