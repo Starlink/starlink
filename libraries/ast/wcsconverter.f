@@ -59,6 +59,13 @@
 
  10   CLOSE( 10 )
 
+
+* 
+* Set the value of CDMatrix 
+*
+      CALL AST_SETL( FC, 'CDMATRIX', AST_GETL( FC, 'CDMATRIX', STATUS ),
+     :               STATUS )     
+
 *
 * Attempt to read an Object form the FIitsChan.
 *

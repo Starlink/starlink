@@ -18357,6 +18357,9 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
    Otherwise store -1. */
    if( !astFitsGetI( this, "NAXIS", &naxis ) ) naxis = -1;
 
+/* Find the first WCS related card. */
+   FindWcs( this, 0, method, class );
+
 /* Loop round all co-ordinate versions */
    sup = GetMaxS( &(store->crval) );
    for( s = ' '; s <= sup && astOK; s++ ){      
@@ -18370,13 +18373,11 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
       val = GetItem( &(store->wcsaxes), 0, 0, s, NULL, method, class );
       if( val != AST__BAD ) {
          nwcs = (int) ( val + 0.5 );
-         FindWcs( this, 0, method, class );
          SetValue( this, FormatKey( "WCSAXES", -1, -1, s ),
                    &nwcs, AST__INT, "Number of WCS axes" );
       } else {
          nwcs = GetMaxJM( &(store->crpix) ) + 1;
          if( nwcs != naxis ) {
-            FindWcs( this, 0, method, class );
             SetValue( this, FormatKey( "WCSAXES", -1, -1, s ),
                       &nwcs, AST__INT, "Number of WCS axes" );
          }
