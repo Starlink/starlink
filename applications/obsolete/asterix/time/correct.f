@@ -112,7 +112,6 @@
       LOGICAL			ANYBAD			! Any bad points?
       LOGICAL			AXNORM			! T axis normalised?
       LOGICAL			GOT_TEXP		! Got an exposure time?
-      LOGICAL			INPRIM			! Input is primitive?
       LOGICAL 			L_ON, L_OFF, L_DUR	! LIVE_TIME components?
       LOGICAL			LIVE_OK			! LIVE_TIME ok?
       LOGICAL			OK			! General validity test
