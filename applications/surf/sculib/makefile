@@ -59,7 +59,7 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_copyb.f sculib_cfillb.f sculib_bits.f\
 	sculib_bessel_wtinit.f sculib_linear_wtinit.f sculib_set_quality.f \
 	sculib_extract_2dim_b.f sculib_extract_2dim_r.f \
-	sculib_extract_2dim_d.f 
+	sculib_extract_2dim_d.f sculib_skyfunc.f sculib_skyfuncd.f
 
 
 OBJS = ${FSOURCES:.f=.o}
