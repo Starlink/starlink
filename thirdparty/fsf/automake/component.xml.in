@@ -10,7 +10,7 @@
   <dependencies>
     <!-- hard-code these, rather than requiring us to put
          STAR_DEFAULTS in configure.ac -->
-    <build>starlink-autoconf</build>
+    <build>autoconf</build>
     <build>libtool</build>
   </dependencies>
   <developers>
