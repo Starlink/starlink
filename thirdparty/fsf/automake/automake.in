@@ -433,6 +433,8 @@ my %ppfc_sources = ();
 
 # Extra Starlink features, as found when tracing
 my %starlink_seen_features = ();
+my %starlink_predist_sources = ();
+my %starlink_extra_dist = ();
 
 
 ################################################################
@@ -3623,8 +3625,31 @@ sub handle_dist ()
   $output_rules .= &file_contents ('distdir',
 				   new Automake::Location,
 				   %transform);
+  &handle_starlink_dist;
 }
 
+
+# handle_starlink_dist
+# --------------------
+# Extra distribution work for Starlink.
+sub handle_starlink_dist ()
+{
+  # Make sure that the DISTFILES files do not include any of the files
+  # mentioned in STAR_PREDIST_SOURCES.
+  my $distfiles = var ('DISTFILES');
+  if ($distfiles)
+    {
+      foreach my $distsrc ($distfiles->value_as_list_recursive())
+        {
+          if (defined($starlink_predist_sources{$distsrc}))
+            {
+              my $where = new Automake::Location;
+              msg ('syntax', $where,
+                   "distributed file $distsrc listed in STAR_PREDIST_SOURCES");
+            }
+        }
+    }
+}
 
 # &handle_subdirs ()
 # ------------------
@@ -4673,7 +4698,6 @@ sub handle_starlink
                                      LATEXDOCS => $havelatex,
                                      COMPIFL => $want_compifl
                                     );
-
 }
 
 ################################################################
@@ -4782,6 +4806,8 @@ sub scan_autoconf_traces ($)
                 STAR_DEFAULTS => 0,
                 STAR_LATEX_DOCUMENTATION => 1,
                 STAR_MESSGEN => 1,
+                STAR_PREDIST_SOURCES => 1,
+                _STAR_EXTRA_DIST => 1,
 	      );
 
   my $traces = ($ENV{AUTOCONF} || 'autoconf') . " ";
@@ -4813,6 +4839,7 @@ sub scan_autoconf_traces ($)
 	}
 
       # Alphabetical ordering please.
+      # But all Starlink ones at the end.
       if ($macro eq 'AC_CANONICAL_HOST')
 	{
 	  if (! $seen_canonical)
@@ -4961,7 +4988,35 @@ sub scan_autoconf_traces ($)
                   $starlink_seen_features{messgen} = $args[1];
               }
         }
-  }
+      elsif ($macro eq 'STAR_PREDIST_SOURCES')
+        {
+          foreach my $src (split(' ', $args[1]))
+            {
+              if (defined($starlink_predist_sources{$src}))
+                {
+                  print STDERR "Predist source $src seen twice\n";
+                }
+              else
+                {
+                  $starlink_predist_sources{$src} = 1;
+                }
+            }
+        }
+      elsif ($macro eq '_STAR_EXTRA_DIST')
+        {
+          foreach my $src (split(' ', $args[1]))
+            {
+              if (defined($starlink_extra_dist{$src}))
+                {
+                  print STDERR "_STAR_EXTRA_DIST called twice on $src\n";
+                }
+              else
+                {
+                  $starlink_extra_dist{$src} = 1;
+                }
+            }
+        }
+    }
 
   $tracefh->close;
 }
@@ -7261,6 +7316,8 @@ sub generate_makefile ($$)
   # Variables used by distdir.am and tags.am.
   define_pretty_variable ('SOURCES', TRUE, INTERNAL, @sources);
   define_pretty_variable ('DIST_SOURCES', TRUE, INTERNAL, @dist_sources);
+  define_pretty_variable ('STAR_EXTRA_DIST', TRUE, INTERNAL,
+                          keys(%starlink_extra_dist));
 
   handle_multilib;
   handle_texinfo;
