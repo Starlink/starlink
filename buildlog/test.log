@@ -40,101 +40,1492 @@ run-tests:
     [junit] Testcase: testQuery took 0.147 sec
     [junit] Testcase: testBroken took 0 sec
     [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.226 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.232 sec
 
-    [junit] Testcase: testGetChildElementByName took 0.058 sec
-    [junit] Testcase: testGetTextContent took 0.04 sec
-    [junit] Testcase: testNewDocument took 0.03 sec
-    [junit] Testcase: testRelativizeDOM took 0.093 sec
+    [junit] Testcase: testGetChildElementByName took 0.076 sec
+    [junit] Testcase: testGetTextContent took 0.032 sec
+    [junit] Testcase: testNewDocument took 0.022 sec
+    [junit] Testcase: testRelativizeDOM took 0.098 sec
     [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 3.863 sec
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.242 sec
 
-    [junit] Testcase: testData took 0.701 sec
-    [junit] Testcase: testIntro took 0.988 sec
-    [junit] Testcase: testStream took 0.627 sec
-    [junit] Testcase: testHybridStream took 0.482 sec
-    [junit] Testcase: testCombo1 took 0.851 sec
-    [junit] Testcase: testResourceStream took 0.207 sec
+    [junit] Testcase: testData took 1.071 sec
+    [junit] Testcase: testIntro took 0.808 sec
+    [junit] Testcase: testStream took 0.74 sec
+    [junit] Testcase: testHybridStream took 0.687 sec
+    [junit] Testcase: testCombo1 took 0.757 sec
+    [junit] Testcase: testResourceStream took 0.175 sec
     [junit] Testsuite: uk.ac.starlink.util.IOUtilsTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.034 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.021 sec
 
-    [junit] Testcase: testDataInput took 0.016 sec
-    [junit] Testcase: testInputStream took 0.014 sec
+    [junit] Testcase: testDataInput took 0.01 sec
+    [junit] Testcase: testInputStream took 0.008 sec
     [junit] Testsuite: uk.ac.starlink.util.LoaderTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.844 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.743 sec
     [junit] ------------- Standard Error -----------------
-    [junit] Jan 26, 2005 5:20:25 AM uk.ac.starlink.util.Loader warn
+    [junit] Jan 27, 2005 5:22:02 AM uk.ac.starlink.util.Loader warn
     [junit] WARNING: Class no.class.here.mate not found
-    [junit] Jan 26, 2005 5:20:25 AM uk.ac.starlink.util.Loader warn
+    [junit] Jan 27, 2005 5:22:02 AM uk.ac.starlink.util.Loader warn
     [junit] WARNING: Class uk.ac.starlink.util.LoaderTest is not a java.lang.Comparable
     [junit] ------------- ---------------- ---------------
 
-    [junit] Testcase: testLoader took 0.836 sec
-    [junit] Testcase: testGetClassInstances took 0.004 sec
+    [junit] Testcase: testLoader took 0.735 sec
+    [junit] Testcase: testGetClassInstances took 0.003 sec
     [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.079 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.076 sec
 
-    [junit] Testcase: testTraversal took 0.075 sec
+    [junit] Testcase: testTraversal took 0.066 sec
     [junit] Testsuite: uk.ac.starlink.util.PipeReaderThreadTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.073 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.06 sec
 
-    [junit] Testcase: testPipe1 took 0.044 sec
-    [junit] Testcase: testPipeBlock took 0.025 sec
+    [junit] Testcase: testPipe1 took 0.027 sec
+    [junit] Testcase: testPipeBlock took 0.029 sec
     [junit] Testsuite: uk.ac.starlink.util.ReaderThreadTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.017 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.025 sec
 
-    [junit] Testcase: testThread took 1.013 sec
+    [junit] Testcase: testThread took 1.021 sec
     [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.657 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.72 sec
 
-    [junit] Testcase: testGetDOM took 0.653 sec
+    [junit] Testcase: testGetDOM took 0.717 sec
     [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
-    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.271 sec
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.272 sec
 
-    [junit] Testcase: testFlags took 0.177 sec
-    [junit] Testcase: testAssertSource took 0.044 sec
-    [junit] Testcase: testValidation took 0.047 sec
+    [junit] Testcase: testFlags took 0.198 sec
+    [junit] Testcase: testAssertSource took 0.024 sec
+    [junit] Testcase: testValidation took 0.045 sec
     [junit] Testsuite: uk.ac.starlink.util.URLUtilsTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.019 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.018 sec
 
-    [junit] Testcase: testMakeURL took 0.013 sec
-    [junit] Testcase: testUrlToUri took 0.003 sec
+    [junit] Testcase: testMakeURL took 0.012 sec
+    [junit] Testcase: testUrlToUri took 0.002 sec
     [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
-    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 6.763 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.011 sec
 
-    [junit] Testcase: testXMLEncodeDecode took 6.756 sec
-    [junit] 	Caused an ERROR
-    [junit] Can't connect to X11 window server using 'europa:0.0' as the value of the DISPLAY variable.
-    [junit] java.lang.InternalError: Can't connect to X11 window server using 'europa:0.0' as the value of the DISPLAY variable.
-    [junit] 	at sun.awt.X11GraphicsEnvironment.initDisplay(Native Method)
-    [junit] 	at sun.awt.X11GraphicsEnvironment.<clinit>(X11GraphicsEnvironment.java:125)
-    [junit] 	at java.lang.Class.forName0(Native Method)
-    [junit] 	at java.lang.Class.forName(Class.java:140)
-    [junit] 	at java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment(GraphicsEnvironment.java:62)
-    [junit] 	at java.awt.Font.initializeFont(Font.java:309)
-    [junit] 	at java.awt.Font.<init>(Font.java:345)
-    [junit] 	at uk.ac.starlink.util.XMLUtilTest$TestXMLEncodeDecode.<init>(XMLUtilTest.java:55)
-    [junit] 	at uk.ac.starlink.util.XMLUtilTest.testXMLEncodeDecode(XMLUtilTest.java:36)
-    [junit] 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-    [junit] 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
-    [junit] 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-    [junit] 	at java.lang.reflect.Method.invoke(Method.java:324)
-    [junit] 	at junit.framework.TestCase.runTest(TestCase.java:166)
-    [junit] 	at junit.framework.TestCase.runBare(TestCase.java:140)
-    [junit] 	at junit.framework.TestResult$1.protect(TestResult.java:106)
-    [junit] 	at junit.framework.TestResult.runProtected(TestResult.java:124)
-    [junit] 	at junit.framework.TestResult.run(TestResult.java:109)
-    [junit] 	at junit.framework.TestCase.run(TestCase.java:131)
-    [junit] 	at junit.framework.TestSuite.runTest(TestSuite.java:173)
-    [junit] 	at junit.framework.TestSuite.run(TestSuite.java:168)
-    [junit] 	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:289)
-    [junit] 	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:656)
-    [junit] 	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:558)
+    [junit] Testcase: testXMLEncodeDecode took 1.008 sec
+    [junit] Testsuite: uk.ac.starlink.util.gui.RendererTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 7.103 sec
+
+    [junit] Testcase: testRenderer took 7.099 sec
+
+test:
+     [echo] Executing Task target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/task/build/testcases
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/task/build/testcases
+
+run-tests:
+
+test:
+     [echo] Executing JNIAST target: test
+
+prepare:
+
+check_packages:
+
+build_classes:
+
+unpack_jni:
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/i386/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/i386
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/sparc/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/sparc
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/x86/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/x86
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/ppc/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/ppc
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/testcases
+    [javac] Compiling 11 source files to /apps/cvsbuild/java/source/jniast/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.ast.AstTest
+    [junit] Tests run: 22, Failures: 0, Errors: 0, Time elapsed: 11.631 sec
+    [junit] ------------- Standard Output ---------------
+    [junit] AST V3.5-6; JNIAST native V3.5-0; JNIAST java V3.5-0
+    [junit] ------------- ---------------- ---------------
+
+    [junit] Testcase: testAstObject took 0.158 sec
+    [junit] Testcase: testChannel took 0.003 sec
+    [junit] Testcase: testXmlChan took 0.003 sec
+    [junit] Testcase: testFitsChan took 0.023 sec
+    [junit] Testcase: testFrame took 0.005 sec
+    [junit] Testcase: testFrameSet took 0.005 sec
+    [junit] Testcase: testSkyRef took 0.002 sec
+    [junit] Testcase: testFluxFrame took 0.03 sec
+    [junit] Testcase: testSpecFluxFrame took 0.007 sec
+    [junit] Testcase: testDSBSpecFrame took 0.006 sec
+    [junit] Testcase: testGeometry took 0.001 sec
+    [junit] Testcase: testMapping took 0.042 sec
+    [junit] Testcase: testPolyMap took 0.001 sec
+    [junit] Testcase: testGrismMap took 0.003 sec
+    [junit] Testcase: testShiftMap took 0.001 sec
+    [junit] Testcase: testRateMap took 0.002 sec
+    [junit] Testcase: testTranMap took 0.002 sec
+    [junit] Testcase: testPlot took 11.315 sec
+    [junit] Testcase: testAstConstants took 0.011 sec
+    [junit] Testcase: testSpecMap took 0.001 sec
+    [junit] Testcase: testSpecFrame took 0.001 sec
+    [junit] Testcase: testException took 0.001 sec
+    [junit] Testsuite: uk.ac.starlink.ast.DecomposeTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.101 sec
+
+    [junit] Testcase: testFrame took 0.091 sec
+    [junit] Testcase: testMapping took 0.007 sec
+    [junit] Testsuite: uk.ac.starlink.ast.EscapeTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 1.033 sec
+
+    [junit] Testcase: testPlotEscapes took 1.001 sec
+    [junit] Testcase: testEscapes took 0.003 sec
+    [junit] Testcase: testFindEscapes took 0.001 sec
+    [junit] Testcase: testGetText took 0 sec
+    [junit] Testcase: testCodes took 0.001 sec
+    [junit] Testcase: testMore took 0.002 sec
+    [junit] Testcase: testSet took 0.02 sec
+    [junit] Testsuite: uk.ac.starlink.ast.KeyMapTest
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.065 sec
+
+    [junit] Testcase: testMap took 0.035 sec
+    [junit] Testcase: testStrings took 0 sec
+    [junit] Testcase: testObjects took 0.001 sec
+    [junit] Testcase: testVectors took 0.023 sec
+    [junit] Testcase: testErrors took 0 sec
+    [junit] Testsuite: uk.ac.starlink.ast.XmlChanTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.433 sec
+
+    [junit] Testcase: testEncoding took 0.085 sec
+    [junit] Testcase: testConstants took 0 sec
+    [junit] Testcase: testNamespace took 0.343 sec
+    [junit] Testsuite: uk.ac.starlink.ast.xml.OldXAstTest
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.593 sec
+
+    [junit] Testcase: testReadWriteElement took 0.383 sec
+    [junit] Testcase: testReadWriteSource took 0.022 sec
+    [junit] Testcase: testToXmlChan took 0.084 sec
+    [junit] Testcase: testFromXmlChan took 0.09 sec
+    [junit] Testcase: testDefault took 0.011 sec
+    [junit] Testsuite: uk.ac.starlink.ast.xml.XAstTest
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.721 sec
+
+    [junit] Testcase: testReadWriteElement took 0.566 sec
+    [junit] Testcase: testReadWriteSource took 0.054 sec
+    [junit] Testcase: testToXmlChan took 0.061 sec
+    [junit] Testcase: testFromXmlChan took 0.017 sec
+    [junit] Testcase: testDefault took 0.018 sec
+
+test:
+     [echo] Executing DIVA target: test
+
+test:
+     [echo] Executing HELP target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/help/build/testcases
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/help/build/testcases
+
+run-tests:
+
+test:
+     [echo] Executing ASTGUI target: test
+
+test:
+     [echo] Executing JNIHDS target: test
+
+prepare:
+
+check_packages:
+
+build_classes:
+
+unpack_jni:
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/i386/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/i386
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/sparc/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/sparc
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/x86/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/x86
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/ppc/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/ppc
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/i386/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/i386
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jnihds/build/testcases
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/jnihds/build/testcases
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/jnihds/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.hds.HDSObjectTest
+    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.209 sec
+
+    [junit] Testcase: testConstants took 0.076 sec
+    [junit] Testcase: testFileOperations took 0.009 sec
+    [junit] Testcase: testObject took 0 sec
+    [junit] Testcase: testProperties took 0.002 sec
+    [junit] Testcase: testGet took 0.018 sec
+    [junit] Testcase: testPut took 0.079 sec
+    [junit] Testcase: testWrite took 0 sec
+    [junit] Testcase: testMap took 0.019 sec
+
+test:
+     [echo] Executing HDX target: test
+
+prepare:
+
+check_packages:
+
+build_sources:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/hdx/build/testcases
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/hdx/build/testcases
+
+run-tests:
+    [junit] Running uk.ac.starlink.hdx.HdxTest
+    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.573 sec
+    [junit] Testsuite: uk.ac.starlink.hdx.HdxTest
+    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.573 sec
+
+    [junit] Running uk.ac.starlink.hdx.ResourceTypeTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.714 sec
+    [junit] Testsuite: uk.ac.starlink.hdx.ResourceTypeTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.714 sec
 
 
-BUILD FAILED
-/apps/cvsbuild/java/source/build.xml:680: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/build.xml:135: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/util/build.xml:933: Test uk.ac.starlink.util.XMLUtilTest failed
+test:
+     [echo] Executing NDArray target: test
 
-Total time: 35 seconds
+prepare:
+
+check_packages:
+
+assemble_java:
+
+do_assemble_java:
+
+build_classes:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/array/build/testcases
+    [javac] Compiling 13 source files to /apps/cvsbuild/java/source/array/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.array.AccessModeTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.007 sec
+
+    [junit] Testcase: testRead took 0.005 sec
+    [junit] Testcase: testWrite took 0 sec
+    [junit] Testcase: testUpdate took 0 sec
+    [junit] Testsuite: uk.ac.starlink.array.ArrayImplTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.158 sec
+
+    [junit] Testcase: testDeterministic took 0.115 sec
+    [junit] Testcase: testNio took 0.041 sec
+    [junit] Testsuite: uk.ac.starlink.array.BadHandlerTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.025 sec
+
+    [junit] Testcase: testBadHandler took 0.02 sec
+    [junit] Testcase: testNullBadHandler took 0.005 sec
+    [junit] Testsuite: uk.ac.starlink.array.ChunkStepperTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.018 sec
+
+    [junit] Testcase: testValidateArguments took 0.001 sec
+    [junit] Testcase: testIteration took 0.016 sec
+    [junit] Testsuite: uk.ac.starlink.array.CombineArrayImplTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.114 sec
+
+    [junit] Testcase: testCombine took 0.114 sec
+    [junit] Testsuite: uk.ac.starlink.array.NDArrayTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 2.146 sec
+
+    [junit] Testcase: testTiles took 0.25 sec
+    [junit] Testcase: testDummy took 0.044 sec
+    [junit] Testcase: testMoulded took 0.29 sec
+    [junit] Testcase: testWindow took 0.101 sec
+    [junit] Testcase: testOffset took 0.033 sec
+    [junit] Testcase: testToRequired took 1.224 sec
+    [junit] Testcase: testNDArrays took 0.202 sec
+    [junit] Testsuite: uk.ac.starlink.array.OrderTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.002 sec
+
+    [junit] Testcase: testOrder took 0.001 sec
+    [junit] Testsuite: uk.ac.starlink.array.RequirementsTest
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.019 sec
+
+    [junit] Testcase: testBlank took 0.002 sec
+    [junit] Testcase: testSettings took 0.015 sec
+    [junit] Testcase: testBad took 0.001 sec
+    [junit] Testcase: testExceptions took 0.001 sec
+    [junit] Testsuite: uk.ac.starlink.array.ShapeTest
+    [junit] Tests run: 9, Failures: 0, Errors: 0, Time elapsed: 0.05 sec
+
+    [junit] Testcase: testNDShapeObject took 0.003 sec
+    [junit] Testcase: testOrderedNDShapeObject took 0.003 sec
+    [junit] Testcase: testOrigins took 0 sec
+    [junit] Testcase: testNDShapeFunctions took 0 sec
+    [junit] Testcase: testOrderedNDShapeFunctions took 0.037 sec
+    [junit] Testcase: testIntsToLongs took 0.003 sec
+    [junit] Testcase: testLongsToInts took 0.002 sec
+    [junit] Testcase: testNDShapeExceptions took 0 sec
+    [junit] Testcase: testOrderedNDShapeExceptions took 0 sec
+    [junit] Testsuite: uk.ac.starlink.array.TypeConverterTest
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.157 sec
+
+    [junit] Testcase: testConversionSame took 0.092 sec
+    [junit] Testcase: testConversionDown took 0.045 sec
+    [junit] Testcase: testConversionUp took 0.015 sec
+    [junit] Testcase: testConversionFunc took 0.004 sec
+    [junit] Testsuite: uk.ac.starlink.array.TypeTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.021 sec
+
+    [junit] Testcase: testBad took 0.014 sec
+    [junit] Testcase: testTypeSet took 0.001 sec
+    [junit] Testcase: testCheckArray took 0.001 sec
+    [junit] Testcase: testNewArray took 0 sec
+    [junit] Testcase: testCharacteristics took 0 sec
+    [junit] Testcase: testMinMax took 0 sec
+    [junit] Testcase: testGetType took 0 sec
+
+test:
+     [echo] Executing NDX target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/ndx/build/testcases
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/ndx/build/testcases
+    [javac] Note: /apps/cvsbuild/java/source/ndx/src/testcases/uk/ac/starlink/ndx/CopyNdx.java uses or overrides a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+
+run-tests:
+    [junit] Running uk.ac.starlink.ndx.NdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.854 sec
+    [junit] Testsuite: uk.ac.starlink.ndx.NdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.854 sec
+
+    [junit] Testcase: testNdx took 1.635 sec
+    [junit] Testcase: testNdxs took 0.215 sec
+    [junit] Running uk.ac.starlink.ndx.XmlNdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.142 sec
+    [junit] Testsuite: uk.ac.starlink.ndx.XmlNdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.142 sec
+
+    [junit] Testcase: testNoNS took 1.043 sec
+    [junit] Testcase: testMultiNS took 0.09 sec
+
+test:
+     [echo] Executing Table target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/testcases
+    [javac] Compiling 9 source files to /apps/cvsbuild/java/source/table/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.table.BeanTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.085 sec
+
+Jan 27, 2005 5:23:22 AM uk.ac.starlink.table.storage.DiskRowStore finalize
+INFO: Deleting temporary file /tmp/DiskRowStore25860.bin
+    [junit] Testsuite: uk.ac.starlink.table.FormatsTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 6.292 sec
+
+    [junit] ------------- Standard Error -----------------
+    [junit] Jan 27, 2005 5:23:21 AM uk.ac.starlink.table.storage.DiskRowStore acceptMetadata
+    [junit] INFO: Storing table data in /tmp/DiskRowStore25860.bin
+    [junit] Jan 27, 2005 5:23:21 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: Offset type is variable
+    [junit] Jan 27, 2005 5:23:21 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: 200 rows stored in 58562 bytes
+    [junit] Jan 27, 2005 5:23:22 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25861t1.fits" prior to overwriting
+    [junit] Jan 27, 2005 5:23:22 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25862t2.fits" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25863t3.fits" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25864t4.vota" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25865t5.vota" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25866t6.vota" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25867t7.vota" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25868t8.vota" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25869t9.text" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25870t10.asci" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25871t11.csv" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25872t12.html" prior to overwriting
+    [junit] Jan 27, 2005 5:23:23 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25873t13.html" prior to overwriting
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25874t14.late" prior to overwriting
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25875t15.late" prior to overwriting
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25876t16.mira" prior to overwriting
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25877in-td.vot" prior to overwriting
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/decltest25878.xml" prior to overwriting
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25879ex-fits.vot" prior to overwriting
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:24 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/decltest25880.xml" prior to overwriting
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25881in-fits.vot" prior to overwriting
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/decltest25882.xml" prior to overwriting
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25883ex-bin.vot" prior to overwriting
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/decltest25884.xml" prior to overwriting
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25885in-bin.vot" prior to overwriting
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:26 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/decltest25886.xml" prior to overwriting
+    [junit] Jan 27, 2005 5:23:26 AM uk.ac.starlink.table.StarTableOutput getOutputStream
+    [junit] INFO: Deleting file "/tmp/table25887t.fits" prior to overwriting
+    [junit] Jan 27, 2005 5:23:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:23:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] ------------- ---------------- ---------------
+    [junit] Testsuite: uk.ac.starlink.table.RowListTableTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.007 sec
+
+    [junit] Testsuite: uk.ac.starlink.table.RowSubsetTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.043 sec
+
+    [junit] Testsuite: uk.ac.starlink.table.TableTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.025 sec
+
+    [junit] Testsuite: uk.ac.starlink.table.formats.TextTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.272 sec
+
+    [junit] Testsuite: uk.ac.starlink.table.gui.StarTableNodeChooserTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.896 sec
+
+    [junit] ------------- Standard Error -----------------
+    [junit] Jan 27, 2005 5:23:29 AM uk.ac.starlink.util.Loader starjavaDirectory
+    [junit] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
+    [junit] Jan 27, 2005 5:23:29 AM uk.ac.starlink.util.Loader starjavaDirectory
+    [junit] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
+    [junit] ------------- ---------------- ---------------
+    [junit] Testsuite: uk.ac.starlink.table.storage.StorageTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.49 sec
+
+    [junit] ------------- Standard Error -----------------
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore acceptMetadata
+    [junit] INFO: Storing table data in /tmp/DiskRowStore25888.bin
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: Offset type is fixed
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: 100 rows stored in 3100 bytes
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore acceptMetadata
+    [junit] INFO: Storing table data in /tmp/DiskRowStore25889.bin
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: Offset type is fixed
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: 100 rows stored in 5100 bytes
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore acceptMetadata
+    [junit] INFO: Storing table data in /tmp/DiskRowStore25890.bin
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: Offset type is variable
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: 100 rows stored in 4496 bytes
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore acceptMetadata
+    [junit] INFO: Storing table data in /tmp/DiskRowStore25891.bin
+    [junit] Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.Codec getCodec
+    [junit] INFO: No codec available for class java.lang.Object
+    [junit] ------------- ---------------- ---------------
+
+test:
+     [echo] Executing NDTools target: test
+Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore finalize
+INFO: Deleting temporary file /tmp/DiskRowStore25890.bin
+Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore finalize
+INFO: Deleting temporary file /tmp/DiskRowStore25889.bin
+Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore finalize
+INFO: Deleting temporary file /tmp/DiskRowStore25891.bin
+Jan 27, 2005 5:23:30 AM uk.ac.starlink.table.storage.DiskRowStore finalize
+INFO: Deleting temporary file /tmp/DiskRowStore25888.bin
+
+test:
+     [echo] No tests defined
+     [echo] Executing HDS target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/hds/build/testcases
+    [javac] Compiling 4 source files to /apps/cvsbuild/java/source/hds/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.hds.HDSNDArrayTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.209 sec
+
+    [junit] Testcase: testBuilder took 0.205 sec
+    [junit] Testsuite: uk.ac.starlink.hds.HDSTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.134 sec
+
+    [junit] Testcase: testHDSReference took 0.093 sec
+    [junit] Testcase: testArrayStructure took 0.036 sec
+    [junit] Testcase: testHDSType took 0 sec
+    [junit] Testsuite: uk.ac.starlink.hds.NDFNdxTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 1.834 sec
+    [junit] ------------- Standard Error -----------------
+    [junit] Jan 27, 2005 5:23:37 AM uk.ac.starlink.ndx.XMLNdxHandler makeNdx
+    [junit] INFO: Non-element node #text=
+    [junit]    ignored
+    [junit] Jan 27, 2005 5:23:37 AM uk.ac.starlink.ndx.XMLNdxHandler makeNdx
+    [junit] INFO: Non-element node #text=
+    [junit]  ignored
+    [junit] ------------- ---------------- ---------------
+
+    [junit] Testcase: testHandler took 1.616 sec
+    [junit] Testcase: testHdsAsHdx took 0.111 sec
+    [junit] Testcase: testHdxXML took 0.103 sec
+    [junit] Testsuite: uk.ac.starlink.hds.NdfMakerTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.975 sec
+
+    [junit] Testcase: testNdfMaker took 0.972 sec
+
+test:
+     [echo] Executing FITS target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/testcases
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/fits/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.fits.FitsNDArrayTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.515 sec
+
+    [junit] Testcase: testBuilder took 0.511 sec
+    [junit] Testsuite: uk.ac.starlink.fits.FitsNdxTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.795 sec
+    [junit] ------------- Standard Error -----------------
+    [junit] Jan 27, 2005 5:23:47 AM uk.ac.starlink.ndx.XMLNdxHandler makeNdx
+    [junit] INFO: Non-element node #text=
+    [junit]    ignored
+    [junit] Jan 27, 2005 5:23:47 AM uk.ac.starlink.ndx.XMLNdxHandler makeNdx
+    [junit] INFO: Non-element node #text=
+    [junit]  ignored
+    [junit] Jan 27, 2005 5:23:48 AM uk.ac.starlink.fits.FitsArrayBuilder makeNewNDArray
+    [junit] INFO: Deleted existing file /apps/cvsbuild/java/source/fits/build/testcases/copy-data.fits prior to rewriting
+    [junit] Jan 27, 2005 5:23:48 AM uk.ac.starlink.fits.FitsNdxHandler outputNdx
+    [junit] INFO: Deleted existing file /apps/cvsbuild/java/source/fits/build/testcases/copy.fits prior to rewriting
+    [junit] BridgeNDArrayHdxFacade returning this=uk.ac.starlink.array.BridgeNDArray$BridgeNDArrayHdxFacade@e28b9
+    [junit] BridgeNDArrayHdxFacade returning this=uk.ac.starlink.array.BridgeNDArray$BridgeNDArrayHdxFacade@e28b9
+    [junit] BridgeNDArrayHdxFacade returning this=uk.ac.starlink.array.BridgeNDArray$BridgeNDArrayHdxFacade@93d6bc
+    [junit] BridgeNDArrayHdxFacade returning this=uk.ac.starlink.array.BridgeNDArray$BridgeNDArrayHdxFacade@93d6bc
+    [junit] BridgeNDArrayHdxFacade returning this=uk.ac.starlink.array.BridgeNDArray$BridgeNDArrayHdxFacade@1f6df4c
+    [junit] BridgeNDArrayHdxFacade returning this=uk.ac.starlink.array.BridgeNDArray$BridgeNDArrayHdxFacade@1f6df4c
+    [junit] ------------- ---------------- ---------------
+
+    [junit] Testcase: testHandler took 1.647 sec
+    [junit] Testcase: testDOM took 0.141 sec
+    [junit] Testsuite: uk.ac.starlink.fits.FitsURLTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.134 sec
+
+    [junit] Testcase: testValid took 0.017 sec
+    [junit] Testcase: testInvalid took 0.001 sec
+    [junit] Testcase: testExtensions took 0.109 sec
+
+test:
+     [echo] Executing AstroGrid target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/astrogrid/build/testcases
+    [javac] Compiling 2 source files to /apps/cvsbuild/java/source/astrogrid/build/testcases
+
+run-tests:
+     [echo] Ignore AstroGrid tests for now
+     [echo] - they require connections which can't be made (no service)
+
+test:
+     [echo] Executing JSky target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+
+test:
+     [echo] Executing Pal target: test
+
+test:
+     [echo] Executing VOTable target: test
+
+prepare:
+
+check_packages:
+
+build_sources:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/testcases
+    [javac] Compiling 7 source files to /apps/cvsbuild/java/source/votable/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.votable.DOMTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.528 sec
+
+    [junit] Testsuite: uk.ac.starlink.votable.FitsPlusTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.906 sec
+
+    [junit] Testsuite: uk.ac.starlink.votable.LinkTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.669 sec
+
+    [junit] Testsuite: uk.ac.starlink.votable.ParameterTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.629 sec
+
+    [junit] Testsuite: uk.ac.starlink.votable.ReferenceTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.683 sec
+
+    [junit] Testsuite: uk.ac.starlink.votable.SerializerTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.601 sec
+
+    [junit] Testsuite: uk.ac.starlink.votable.VOTableTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.854 sec
+
+    [junit] ------------- Standard Error -----------------
+    [junit] Jan 27, 2005 5:24:10 AM uk.ac.starlink.table.storage.DiskRowStore acceptMetadata
+    [junit] INFO: Storing table data in /tmp/DiskRowStore29666.bin
+    [junit] Jan 27, 2005 5:24:11 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: Offset type is variable
+    [junit] Jan 27, 2005 5:24:11 AM uk.ac.starlink.table.storage.DiskRowStore endRows
+    [junit] INFO: 3 rows stored in 168 bytes
+    [junit] ------------- ---------------- ---------------
+
+test:
+     [echo] Executing VO target: test
+
+prepare:
+
+check_packages:
+
+ws_sources_check:
+
+ws_sources:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/vo/build/testcases
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/vo/build/testcases
+    [javac] Compiling 2 source files to /apps/cvsbuild/java/source/vo/build/testcases
+
+run-net-tests:
+
+run-tests:
+
+test:
+     [echo] Executing DATANODE target: test
+
+test:
+     [echo] Executing JAIUtil target: test
+
+test:
+     [echo] Executing SOAPSERVER target: test
+
+test:
+     [echo] Executing SOG target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/build/testcases
+    [javac] Compiling 4 source files to /apps/cvsbuild/java/source/sog/build/testcases
+    [javac] Note: /apps/cvsbuild/java/source/sog/src/testcases/RemoteClientNDX.java uses or overrides a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+
+run-tests:
+
+test:
+     [echo] Executing SPLAT target: test
+
+prepare:
+
+check_packages:
+
+build:
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/splat/build/classes
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] make: Nothing to be done for `build'.
+
+compile-tests:
+
+test:
+     [echo] Executing Mirage target: test
+
+test:
+     [echo] No tests defined
+     [echo] Executing TOPCAT target: test
+
+prepare:
+
+check_packages:
+
+build_demo:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/demo_list
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/demo_list
+    [bzip2] Nothing to do: /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/6dfgs_mini.xml.bz2 is up to date.
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/testcases
+    [javac] Compiling 8 source files to /apps/cvsbuild/java/source/topcat/build/testcases
+
+docs_check:
+
+docs:
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.topcat.DemoTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.839 sec
+
+    [junit] Testsuite: uk.ac.starlink.topcat.DocTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1,089.872 sec
+
+    [junit] ------------- Standard Output ---------------
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/sun252/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/sun252/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.gnu.org/copyleft/gpl.html
+    [junit] Bad remote link: http://www.gnu.org/copyleft/gpl.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Bad remote link: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.ivoa.net/
+    [junit] Bad remote link: http://www.ivoa.net/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.ivoa.net/Documents/latest/VOT.html
+    [junit] Bad remote link: http://www.ivoa.net/Documents/latest/VOT.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.ivoa.net/Documents/latest/VOT.html
+    [junit] Bad remote link: http://www.ivoa.net/Documents/latest/VOT.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.w3c.org/TR/REC-html32
+    [junit] Bad remote link: http://www.w3c.org/TR/REC-html32#table
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.bell-labs.com/project/mirage/index.html
+    [junit] Bad remote link: http://www.bell-labs.com/project/mirage/index.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/javadocs/uk/ac/starlink/table/join/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/javadocs/uk/ac/starlink/table/join/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.2dfquasar.org/
+    [junit] Bad remote link: http://www.2dfquasar.org/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www-wfau.roe.ac.uk/sss/
+    [junit] Bad remote link: http://www-wfau.roe.ac.uk/sss/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/splat/splat.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/splat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/sog/sog.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/sog/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/sog/sog.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/sog/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://galaxy.fzu.cz/JEL/
+    [junit] Bad remote link: http://galaxy.fzu.cz/JEL/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://java.sun.com/products/javawebstart/
+    [junit] Bad remote link: http://java.sun.com/products/javawebstart/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/sun252/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/sun252/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/
+    [junit] Bad remote link: http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/
+    [junit] Bad remote link: http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.mysql.org/
+    [junit] Bad remote link: http://www.mysql.org/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.mysql.com/products/connector/j/
+    [junit] Bad remote link: http://www.mysql.com/products/connector/j/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.postgresql.org/
+    [junit] Bad remote link: http://www.postgresql.org/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://jdbc.postgresql.org/
+    [junit] Bad remote link: http://jdbc.postgresql.org/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://servlet.java.sun.com/products/jdbc/drivers
+    [junit] Bad remote link: http://servlet.java.sun.com/products/jdbc/drivers
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/
+    [junit] Bad remote link: http://www.star.bristol.ac.uk/~mbt/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/
+    [junit] Bad remote link: http://www.star.bristol.ac.uk/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://cm.bell-labs.com/who/tkh/mirage/index.html
+    [junit] Bad remote link: http://cm.bell-labs.com/who/tkh/mirage/index.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://vo.iucaa.ernet.in/~voi/voplot.htm
+    [junit] Bad remote link: http://vo.iucaa.ernet.in/~voi/voplot.htm
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://galaxy.fzu.cz/JEL/
+    [junit] Bad remote link: http://galaxy.fzu.cz/JEL/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://ptolemy.eecs.berkeley.edu/java/ptplot5.2/ptolemy/plot/doc/index.htm
+    [junit] Bad remote link: http://ptolemy.eecs.berkeley.edu/java/ptplot5.2/ptolemy/plot/doc/index.htm
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.sdss.jhu.edu/htm/
+    [junit] Bad remote link: http://www.sdss.jhu.edu/htm/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.jibble.org/epsgraphics/
+    [junit] Bad remote link: http://www.jibble.org/epsgraphics/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.acme.com/java/software/Acme.JPM.Encoders.GifEncoder.html
+    [junit] Bad remote link: http://www.acme.com/java/software/Acme.JPM.Encoders.GifEncoder.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://skyservice.pha.jhu.edu/develop/vo/ivoafits/
+    [junit] Bad remote link: http://skyservice.pha.jhu.edu/develop/vo/ivoafits/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/treeview/
+    [junit] Bad remote link: http://www.starlink.ac.uk/treeview/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/sun253/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/sun253/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/treeview/
+    [junit] Bad remote link: http://www.starlink.ac.uk/treeview/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.astro.ex.ac.uk/people/aa/starlink/frog.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/frog/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Bad remote link: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/treeview/
+    [junit] Bad remote link: http://www.starlink.ac.uk/treeview/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/sog/sog.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/sog/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://java.sun.com/products/java-media/jai/
+    [junit] Bad remote link: http://java.sun.com/products/java-media/jai/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/splat/splat.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/splat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/sun253/sun253.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/sun253/sun253.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/sun253.pdf
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/sun253.pdf
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Bad remote link: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://cdsweb.u-strasbg.fr/
+    [junit] Bad remote link: http://cdsweb.u-strasbg.fr/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/sun252/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/sun252/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.gnu.org/copyleft/gpl.html
+    [junit] Bad remote link: http://www.gnu.org/copyleft/gpl.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Bad remote link: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.ivoa.net/
+    [junit] Bad remote link: http://www.ivoa.net/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.ivoa.net/Documents/latest/VOT.html
+    [junit] Bad remote link: http://www.ivoa.net/Documents/latest/VOT.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.ivoa.net/Documents/latest/VOT.html
+    [junit] Bad remote link: http://www.ivoa.net/Documents/latest/VOT.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.w3c.org/TR/REC-html32
+    [junit] Bad remote link: http://www.w3c.org/TR/REC-html32#table
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.bell-labs.com/project/mirage/index.html
+    [junit] Bad remote link: http://www.bell-labs.com/project/mirage/index.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/javadocs/uk/ac/starlink/table/join/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/javadocs/uk/ac/starlink/table/join/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.2dfquasar.org/
+    [junit] Bad remote link: http://www.2dfquasar.org/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www-wfau.roe.ac.uk/sss/
+    [junit] Bad remote link: http://www-wfau.roe.ac.uk/sss/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/splat/splat.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/splat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/sog/sog.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/sog/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/sog/sog.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/sog/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://galaxy.fzu.cz/JEL/
+    [junit] Bad remote link: http://galaxy.fzu.cz/JEL/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://java.sun.com/products/javawebstart/
+    [junit] Bad remote link: http://java.sun.com/products/javawebstart/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/sun252/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/sun252/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/
+    [junit] Bad remote link: http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/
+    [junit] Bad remote link: http://java.sun.com/j2se/1.4.2/docs/guide/jdbc/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.mysql.org/
+    [junit] Bad remote link: http://www.mysql.org/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.mysql.com/products/connector/j/
+    [junit] Bad remote link: http://www.mysql.com/products/connector/j/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.postgresql.org/
+    [junit] Bad remote link: http://www.postgresql.org/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://jdbc.postgresql.org/
+    [junit] Bad remote link: http://jdbc.postgresql.org/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://servlet.java.sun.com/products/jdbc/drivers
+    [junit] Bad remote link: http://servlet.java.sun.com/products/jdbc/drivers
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/
+    [junit] Bad remote link: http://www.star.bristol.ac.uk/~mbt/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/
+    [junit] Bad remote link: http://www.star.bristol.ac.uk/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://cm.bell-labs.com/who/tkh/mirage/index.html
+    [junit] Bad remote link: http://cm.bell-labs.com/who/tkh/mirage/index.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://vo.iucaa.ernet.in/~voi/voplot.htm
+    [junit] Bad remote link: http://vo.iucaa.ernet.in/~voi/voplot.htm
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://galaxy.fzu.cz/JEL/
+    [junit] Bad remote link: http://galaxy.fzu.cz/JEL/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://ptolemy.eecs.berkeley.edu/java/ptplot5.2/ptolemy/plot/doc/index.htm
+    [junit] Bad remote link: http://ptolemy.eecs.berkeley.edu/java/ptplot5.2/ptolemy/plot/doc/index.htm
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.sdss.jhu.edu/htm/
+    [junit] Bad remote link: http://www.sdss.jhu.edu/htm/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.jibble.org/epsgraphics/
+    [junit] Bad remote link: http://www.jibble.org/epsgraphics/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.acme.com/java/software/Acme.JPM.Encoders.GifEncoder.html
+    [junit] Bad remote link: http://www.acme.com/java/software/Acme.JPM.Encoders.GifEncoder.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://skyservice.pha.jhu.edu/develop/vo/ivoafits/
+    [junit] Bad remote link: http://skyservice.pha.jhu.edu/develop/vo/ivoafits/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/treeview/
+    [junit] Bad remote link: http://www.starlink.ac.uk/treeview/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/sun253/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/sun253/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/stil/
+    [junit] Bad remote link: http://www.starlink.ac.uk/stil/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/treeview/
+    [junit] Bad remote link: http://www.starlink.ac.uk/treeview/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.astro.ex.ac.uk/people/aa/starlink/frog.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/frog/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Bad remote link: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/treeview/
+    [junit] Bad remote link: http://www.starlink.ac.uk/treeview/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/sog/sog.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/sog/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://java.sun.com/products/java-media/jai/
+    [junit] Bad remote link: http://java.sun.com/products/java-media/jai/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://star-www.dur.ac.uk/~pdraper/splat/splat.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/splat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/sun253/sun253.html
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/sun253/sun253.html
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/sun253.pdf
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/sun253.pdf
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Bad remote link: http://vizier.u-strasbg.fr/doc/UCD.htx
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://cdsweb.u-strasbg.fr/
+    [junit] Bad remote link: http://cdsweb.u-strasbg.fr/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] Connection failed: java.io.IOException: Connection timed out: http://www.star.bristol.ac.uk/~mbt/topcat/
+    [junit] Bad remote link: http://www.starlink.ac.uk/topcat/
+    [junit] ------------- ---------------- ---------------
+    [junit] Testsuite: uk.ac.starlink.topcat.HelpTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.063 sec
+
+    [junit] Testsuite: uk.ac.starlink.topcat.MethodDocTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.134 sec
+
+    [junit] Testsuite: uk.ac.starlink.topcat.ResourceTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 1.143 sec
+
+    [junit] Testsuite: uk.ac.starlink.topcat.func.FuncTest
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.66 sec
+
+    [junit] Testsuite: uk.ac.starlink.topcat.plot.MarkerTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 4.066 sec
+
+
+test:
+     [echo] Executing Treeview target: test
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build_demo:
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/treeview/lib/treeview/apache-tar.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 133 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/testcases
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/treeview/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.treeview.ModelTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 12.521 sec
+
+    [junit] ------------- Standard Error -----------------
+    [junit] Jan 27, 2005 5:43:05 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Character conversion error: "Malformed UTF-8 char -- is an XML encoding declaration missing?" (line number may be too low).)
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - null
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:06 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:08 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:08 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:08 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:08 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - null
+    [junit] Jan 27, 2005 5:43:08 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:08 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] ------------- ---------------- ---------------
+    [junit] Testsuite: uk.ac.starlink.treeview.TreeChooserTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.934 sec
+
+    [junit] Testsuite: uk.ac.starlink.treeview.TreeviewTest
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 5.97 sec
+
+    [junit] ------------- Standard Error -----------------
+    [junit] Jan 27, 2005 5:43:22 AM uk.ac.starlink.util.Loader starjavaDirectory
+    [junit] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Character conversion error: "Malformed UTF-8 char -- is an XML encoding declaration missing?" (line number may be too low).)
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - null
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - null
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:25 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.util.Loader starjavaDirectory
+    [junit] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Character conversion error: "Malformed UTF-8 char -- is an XML encoding declaration missing?" (line number may be too low).)
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - null
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:26 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:27 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:27 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:27 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:27 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS-plus - null
+    [junit] Jan 27, 2005 5:43:27 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not FITS - Doesn't look like a FITS file
+    [junit] Jan 27, 2005 5:43:27 AM uk.ac.starlink.table.StarTableFactory makeStarTable
+    [junit] INFO: Table not VOTable - XML parse error (Document root element is missing.)
+    [junit] Jan 27, 2005 5:43:27 AM uk.ac.starlink.util.Loader starjavaDirectory
+    [junit] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
+    [junit] ------------- ---------------- ---------------
+
+test:
+     [echo] Executing Coco target: test
+
+test:
+     [echo] Executing RV target: test
+
+test:
+     [echo] Executing FROG target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/build/testcases
+
+test:
+
+BUILD SUCCESSFUL
+Total time: 21 minutes 47 seconds

@@ -128,6 +128,13 @@ deinstall:
   [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
 
 real_deinstall:
+     [echo] Executing DATANODE target: deinstall
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+deinstall:
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+real_deinstall:
      [echo] Executing JAIUtil target: deinstall
 
 deinstall:
@@ -255,6 +262,10 @@ clean:
   [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
 
 clean:
+     [echo] Executing DATANODE target: clean
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+clean:
      [echo] Executing JAIUtil target: clean
 
 clean:
@@ -369,7 +380,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/ndx/build/java
-     [copy] Copying 13 files to /apps/cvsbuild/java/source/ndx/build/java
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/ndx/build/java
      [echo] Executing Table target: javadoc-sources
 
 javadoc-sources:
@@ -419,6 +430,12 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/vo/build/java
      [copy] Copying 17 files to /apps/cvsbuild/java/source/vo/build/java
+     [echo] Executing DATANODE target: javadoc-sources
+  [taskdef] Could not load definitions from resource axis-tasks.properties. It could not be found.
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/datanode/build/java
+     [copy] Copying 91 files to /apps/cvsbuild/java/source/datanode/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -469,11 +486,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 2276 files to /apps/cvsbuild/java/source/build/java
-     [copy] Copied 67 empty directories to 5 empty directories under /apps/cvsbuild/java/source/build/java
+     [copy] Copying 2455 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copied 72 empty directories to 5 empty directories under /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 44 seconds
+Total time: 46 seconds

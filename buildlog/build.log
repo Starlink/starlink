@@ -194,7 +194,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/ndx/build/classes
-    [javac] Compiling 12 source files to /apps/cvsbuild/java/source/ndx/build/classes
+    [javac] Compiling 11 source files to /apps/cvsbuild/java/source/ndx/build/classes
      [echo] Executing Table target: build
 
 prepare:
@@ -293,6 +293,20 @@ ws_sources:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/vo/build/classes
     [javac] Compiling 100 source files to /apps/cvsbuild/java/source/vo/build/classes
+     [echo] Executing DATANODE target: build
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/datanode/build/classes
+    [javac] Compiling 90 source files to /apps/cvsbuild/java/source/datanode/build/classes
+     [copy] Copying 68 files to /apps/cvsbuild/java/source/datanode/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/datanode/lib/datanode
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/datanode/lib/datanode
      [echo] Executing JAIUtil target: build
 
 prepare:
@@ -388,13 +402,15 @@ prepare:
 check_packages:
 
 build_demo:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
-    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
-     [gzip] Building: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz
-      [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/demo_list
+    [bzip2] Building: /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/6dfgs_mini.xml.bz2
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo
+     [gzip] Building: /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/tables.fit.gz
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/etc/demo/uk/ac/starlink/topcat/demo/demo.tar.bz2
 
 build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
     [javac] Compiling 109 source files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 65 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 3 empty directories to 2 empty directories under /apps/cvsbuild/java/source/topcat/build/classes
@@ -459,4 +475,4 @@ build:
      [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/lib/frog
 
 BUILD SUCCESSFUL
-Total time: 1 minute 20 seconds
+Total time: 1 minute 25 seconds

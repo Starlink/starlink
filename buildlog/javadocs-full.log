@@ -78,7 +78,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/ndx/build/java
-     [copy] Copying 13 files to /apps/cvsbuild/java/source/ndx/build/java
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/ndx/build/java
      [echo] Executing Table target: javadoc-sources
 
 javadoc-sources:
@@ -124,6 +124,11 @@ javadoc-sources:
 
 javadoc-sources:
      [copy] Copying 17 files to /apps/cvsbuild/java/source/vo/build/java
+     [echo] Executing DATANODE target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/datanode/build/java
+     [copy] Copying 91 files to /apps/cvsbuild/java/source/datanode/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -200,6 +205,10 @@ javadoc-sources:
   [javadoc] Loading source files for package Sesame_pkg...
   [javadoc] Loading source files for package org.us_vo.www...
   [javadoc] Loading source files for package uk.ac.starlink.vo...
+  [javadoc] Loading source files for package uk.ac.starlink.datanode.factory...
+  [javadoc] Loading source files for package uk.ac.starlink.datanode.nodes...
+  [javadoc] Loading source files for package uk.ac.starlink.datanode.tree...
+  [javadoc] Loading source files for package uk.ac.starlink.datanode.viewers...
   [javadoc] Loading source files for package uk.ac.starlink.hdx...
   [javadoc] Loading source files for package uk.ac.starlink.jaiutil...
   [javadoc] Loading source files for package uk.ac.starlink.mirage...
@@ -1545,4 +1554,4 @@ javadoc-sources:
   [javadoc] 576 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 17 seconds
+Total time: 1 minute 18 seconds

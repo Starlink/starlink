@@ -5544,6 +5544,187 @@ cvs checkout: Updating java/source/coco/src/main/uk/ac/starlink/coco
 U java/source/coco/src/main/uk/ac/starlink/coco/Coco.java
 U java/source/coco/src/main/uk/ac/starlink/coco/CocoPanel.java
 U java/source/coco/src/main/uk/ac/starlink/coco/CoordinateConversion.java
+cvs checkout: Updating java/source/datanode
+U java/source/datanode/.properties
+U java/source/datanode/build.xml
+cvs checkout: Updating java/source/datanode/src
+cvs checkout: Updating java/source/datanode/src/lib
+U java/source/datanode/src/lib/apache-tar.jar
+U java/source/datanode/src/lib/commons-net-1.0.0.jar
+cvs checkout: Updating java/source/datanode/src/main
+cvs checkout: Updating java/source/datanode/src/main/uk
+cvs checkout: Updating java/source/datanode/src/main/uk/ac
+cvs checkout: Updating java/source/datanode/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/datanode/src/main/uk/ac/starlink/datanode
+U java/source/datanode/src/main/uk/ac/starlink/datanode/package.html
+cvs checkout: Updating java/source/datanode/src/main/uk/ac/starlink/datanode/factory
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/CreationState.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/DataNodeBuilder.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/DataNodeFactory.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/DocumentDataNodeBuilder.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/FileDataNodeBuilder.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/SimpleDataNodeBuilder.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/SourceDataNodeBuilder.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/StringDataNodeBuilder.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/VODataNodeBuilder.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/factory/XMLDataNodeBuilder.java
+cvs checkout: Updating java/source/datanode/src/main/uk/ac/starlink/datanode/nodes
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ARYDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ArrayContainer.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ColumnsMetamapGroup.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ComponentMaker.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/CompressedDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/DataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/DataObjectException.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/DataType.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/DefaultDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/DetailViewer.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/DocumentDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/EmptyDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ErrorDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ExceptionComponentMaker.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/FITSDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/FITSFileDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/FITSStreamDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/FileDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/FrameDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/FtpDirectoryDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/FtpLocation.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/HDSDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/HDUDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/HDXDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/HTMLDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/HistoryDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/IconFactory.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ImageHDUDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/JDBCDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/MetaTable.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/MetamapGroup.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/MyspaceContainerDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/NDArrayDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/NDFDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/NdxDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/NoSuchDataException.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/NodeEntityResolver.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/NodeUtil.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/PlainDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ResourceListDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ScalarDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/StarTableDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/StringComparator.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/SwitchDataSource.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/TableHDUDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/TarBranchDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/TarStreamDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/VOComponentDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/VOTableDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/VOTableTableDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ValueInfoMetamapGroup.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/WCSChannel.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/WCSDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/XMLDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/XMLDocument.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ZipArchiveDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ZipBranchDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ZipFileDataNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/nodes/ZipStreamDataNode.java
+cvs checkout: Updating java/source/datanode/src/main/uk/ac/starlink/datanode/tree
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/BasicDropHandler.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/BasicTransferable.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/DataNodeJTree.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/DataNodeTransferHandler.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/DataNodeTransferable.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/DataNodeTreeCellRenderer.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/DataNodeTreeModel.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/InfoPanel.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/NdxNodeChooser.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/NodeAncestorComboBox.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/NodeExpander.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/TableNodeChooser.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/TreeModelNode.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/TreeNodeChooser.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/tree/TreeTableLoadDialog.java
+cvs checkout: Updating java/source/datanode/src/main/uk/ac/starlink/datanode/viewers
+U java/source/datanode/src/main/uk/ac/starlink/datanode/viewers/ArrayBrowser.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/viewers/AstFITSShower.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/viewers/AstTextShower.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/viewers/StyledTextArea.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/viewers/TextViewer.java
+U java/source/datanode/src/main/uk/ac/starlink/datanode/viewers/TreeviewLAF.java
+cvs checkout: Updating java/source/datanode/src/resources
+cvs checkout: Updating java/source/datanode/src/resources/uk
+cvs checkout: Updating java/source/datanode/src/resources/uk/ac
+cvs checkout: Updating java/source/datanode/src/resources/uk/ac/starlink
+cvs checkout: Updating java/source/datanode/src/resources/uk/ac/starlink/datanode
+cvs checkout: Updating java/source/datanode/src/resources/uk/ac/starlink/datanode/images
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/AGlogo.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Down.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Frame.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Help2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Home24.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Minus.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/MinusMinus.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Plus.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/PlusPlus.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Sheet.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Sheets.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/SplitHorizontal.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/SplitVertical.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Stop.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/TREE27.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/TREE28.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/TileCascade.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/TopCat2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/Up.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/archgreen.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/archyellow.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/axes42.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/axes62.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/axes81.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/ball.black.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/book2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/box7.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/branchgreen.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/branchyellow.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/burst.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/cell.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/closed.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/dir4.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/file1.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/fuzz2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/fuzz3.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/gstar2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/handle1.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/handle2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/jsky2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/madsmiley.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/mini-doc.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/multi8.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/multidisplay.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/multiply3.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/open3.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/plaindat.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/redoy2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/row.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/smallbox1.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/sogimage.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/squishdat.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/star_gold.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/starlinklogo1b.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/starlinklogo3.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/sxtree6.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/table10.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/telescope2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/trasha2.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/world1.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/xml_comm.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/xml_doc.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/xml_dtd.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/xml_el.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/xml_eref.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/xml_pi.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/xml_txt.gif
+U java/source/datanode/src/resources/uk/ac/starlink/datanode/images/xtree5.gif
 cvs checkout: Updating java/source/diva
 U java/source/diva/.properties
 U java/source/diva/build.xml
@@ -8474,7 +8655,6 @@ U java/source/ndx/src/main/uk/ac/starlink/ndx/DefaultMutableNdx.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/DomNdxImpl.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/MutableNdx.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/Ndx.java
-U java/source/ndx/src/main/uk/ac/starlink/ndx/NdxChooser.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/NdxHandler.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/NdxIO.java
 U java/source/ndx/src/main/uk/ac/starlink/ndx/NdxImpl.java
@@ -8487,7 +8667,6 @@ cvs checkout: Updating java/source/ndx/src/testcases/uk
 cvs checkout: Updating java/source/ndx/src/testcases/uk/ac
 cvs checkout: Updating java/source/ndx/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/ndx/src/testcases/uk/ac/starlink/ndx
-U java/source/ndx/src/testcases/uk/ac/starlink/ndx/ChooseNdx.java
 U java/source/ndx/src/testcases/uk/ac/starlink/ndx/CopyNdx.java
 U java/source/ndx/src/testcases/uk/ac/starlink/ndx/NdxTest.java
 U java/source/ndx/src/testcases/uk/ac/starlink/ndx/XmlNdxTest.java
@@ -8972,6 +9151,7 @@ U java/source/splat/src/docs/sun243.htx/labels.pl
 U java/source/splat/src/docs/sun243.htx/line.gif
 U java/source/splat/src/docs/sun243.htx/linefitplotwindow.gif
 U java/source/splat/src/docs/sun243.htx/linefitwindow.gif
+U java/source/splat/src/docs/sun243.htx/location.gif
 U java/source/splat/src/docs/sun243.htx/mainfigure3.gif
 U java/source/splat/src/docs/sun243.htx/mainfigure4.gif
 U java/source/splat/src/docs/sun243.htx/modify.gif
@@ -9017,6 +9197,11 @@ U java/source/splat/src/docs/sun243.htx/node4.html
 U java/source/splat/src/docs/sun243.htx/node40.html
 U java/source/splat/src/docs/sun243.htx/node41.html
 U java/source/splat/src/docs/sun243.htx/node42.html
+U java/source/splat/src/docs/sun243.htx/node43.html
+U java/source/splat/src/docs/sun243.htx/node44.html
+U java/source/splat/src/docs/sun243.htx/node45.html
+U java/source/splat/src/docs/sun243.htx/node46.html
+U java/source/splat/src/docs/sun243.htx/node47.html
 U java/source/splat/src/docs/sun243.htx/node5.html
 U java/source/splat/src/docs/sun243.htx/node6.html
 U java/source/splat/src/docs/sun243.htx/node7.html
@@ -9058,6 +9243,8 @@ U java/source/splat/src/docs/sun243.htx/select.gif
 U java/source/splat/src/docs/sun243.htx/source.gif
 U java/source/splat/src/docs/sun243.htx/special.gif
 U java/source/splat/src/docs/sun243.htx/splatmovie.gif
+U java/source/splat/src/docs/sun243.htx/ssap.gif
+U java/source/splat/src/docs/sun243.htx/ssapwindow.gif
 U java/source/splat/src/docs/sun243.htx/sun243.css
 U java/source/splat/src/docs/sun243.htx/sun243.html
 U java/source/splat/src/docs/sun243.htx/table.gif
@@ -9072,6 +9259,7 @@ U java/source/splat/src/docs/sun243.htx/whiteball.gif
 U java/source/splat/src/docs/sun243.htx/xrange.gif
 U java/source/splat/src/docs/sun243.htx/xunits.gif
 U java/source/splat/src/docs/sun243.htx/yellowball.gif
+U java/source/splat/src/docs/sun243.htx/yunits.gif
 cvs checkout: Updating java/source/splat/src/docs/sun243_figures
 U java/source/splat/src/docs/sun243_figures/.cvsignore
 U java/source/splat/src/docs/sun243_figures/animate.eps
@@ -10028,14 +10216,13 @@ cvs checkout: Updating java/source/topcat/src/etc
 cvs checkout: Updating java/source/topcat/src/etc/demo
 cvs checkout: Updating java/source/topcat/src/etc/demo/fits
 U java/source/topcat/src/etc/demo/fits/863sub.fits
-U java/source/topcat/src/etc/demo/fits/gliese2.FIT
 U java/source/topcat/src/etc/demo/fits/tables.fit
 cvs checkout: Updating java/source/topcat/src/etc/demo/others
 U java/source/topcat/src/etc/demo/others/text1.txt
 U java/source/topcat/src/etc/demo/others/text2.txt
 cvs checkout: Updating java/source/topcat/src/etc/demo/votable
+U java/source/topcat/src/etc/demo/votable/6dfgs_mini.xml
 U java/source/topcat/src/etc/demo/votable/cover.xml
-U java/source/topcat/src/etc/demo/votable/gliese2.vot
 U java/source/topcat/src/etc/demo/votable/vizier.xml.gz
 cvs checkout: Updating java/source/topcat/src/etc/demo/wdc
 U java/source/topcat/src/etc/demo/wdc/sunspots.wdc
