@@ -21,8 +21,6 @@
 *           IMGID       PPCKIMID
 *           WPLATE      PPCKWPLT
 *           RAY?        PPCKRAY 
-*           ROTATION?   PPCKROT 
-*           YROTATION?  PPCKYROT
 *           STOKES?     PPCKSTOK
 
 *  Arguments:
@@ -67,10 +65,10 @@
 
 *  Local Constants:
       INTEGER NFITS              ! No. of FITS keywords used in table
-      PARAMETER ( NFITS = 8 ) 
+      PARAMETER ( NFITS = 6 ) 
 
       INTEGER NEXT               ! No. of extension items specified in table
-      PARAMETER ( NEXT = 8 ) 
+      PARAMETER ( NEXT = 6 ) 
 
 *  Local Variables:
       CHARACTER * ( 20 ) FITSNM( NFITS ) ! Names of FITS keywords
@@ -81,19 +79,19 @@
 
 *  Define the default control table information.
       DATA FITSNM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
-     :              'PPCKRAY', 'PPCKROT', 'PPCKYROT', 'PPCKSTOK' /,
+     :              'PPCKRAY', 'PPCKSTOK' /,
 
      :     FITSTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 
-     :             '_REAL', '_REAL', '_CHAR' /,
+     :             '_CHAR' /,
 
      :     EXTNM / 'ANGROT', 'FILTER', 'IMGID', 'WPLATE', 'RAY?', 
-     :             'ROTATION?', 'YROTATION?', 'STOKES?' /,
+     :             'STOKES?' /,
 
-     :     EXTTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', '_REAL',
-     :             '_REAL', '_CHAR' /,
+     :     EXTTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 
+     :             '_CHAR' /,
 
      :     EXTFUN / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
-     :              'PPCKRAY', 'PPCKROT', 'PPCKYROT', 'PPCKSTOK' /
+     :              'PPCKRAY', 'PPCKSTOK' /
 
 *.
 

@@ -4,7 +4,7 @@
 *     polka
 
 *  Purpose:
-*     Extract and align O and E ray areas from a set of images.
+*     Create Stokes vectors from a set of intensity frames.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,55 +20,80 @@
 *        The global status.
 
 *  Description:
-*     This routine extracts and aligns areas containing corresponding rays 
-*     from a set of images containing dual or single beam polarimetry data. 
-*     It can also perform sky subtraction based either on a set of
-*     supplied sky frames, or on user-specified background areas within
-*     the object frames.
+*     This application converts a set of intensity frames into a cube
+*     containing a Stokes vector for every measured pixel on the sky. It
+*     may also be used as an image alignment tool for non-polarimetric 
+*     data (see parameter POL).
 *
-*     In dual-beam mode, two output images are created for each
-*     supplied input image, one containing the O-ray areas and the other
-*     containing the E-ray areas from the corresponding input image. All
-*     output images are aligned pixel-for-pixel. In single-beam mode, only 
-*     one output image is created for each input image.
+*     The main processes applied to the data are:
+*
+*     1) Extraction of the required sub-regions from each input frame.
+*
+*     2) Sky subtraction within each aligned sub-region.
+*
+*     3) Alignment of all extracted sub-regions using stars within the field.
+*
+*     4) Calculation of a Stokes vector for each pixel.
+*
+*     In the current version of POLKA, step 4) is only available when
+*     processing dual-beam data (see parameter DUALBEAM). It is hoped that
+*     the next release will remove this restriction.
+*
+*     The inputs to this application are a set of intensity frames which
+*     should have been corrected to remove any instrumental effects
+*     introduced by the detector (such as de-biassing, flat-fielding, etc).
+*     Output Stokes vectors can only be produced if all input frames contain
+*     a POLPACK extension (see application POLIMP). In dual-beam mode, each 
+*     input frame contains two images of the sky (the O and E ray images). 
+*     In single-beam mode, each input frame contains only a single image of 
+*     the sky.
+*
+*     The outputs from this application consist of the aligned,
+*     sky-subtracted intensity images, and the cube holding the Stokes 
+*     vectors. In dual beam mode two output intensity frames are created 
+*     for each input frame, one containing the O ray image, and the other
+*     containing the E ray image. In single-beam mode one output intensity
+*     frame is created for each input frame, holding the usable area of
+*     the corresponding input frame. The user may choose not to create
+*     any or all of these outputs. For instance, the Stokes vectors may
+*     be produced without retaining the aligned intensity images (see
+*     parameters OUT_S, OUT_E, OUT_O and OUT).
+*
+*     Use of this application divides into two stages. In the first stage, a
+*     Graphical User Interface (GUI) is used to obtain all the information
+*     required to produce the output data files from the user. This includes
+*     identifying stars, masks and sky regions on each of the supplied input
+*     images. This is the labout-intensive bit. Once this has been completed to
+*     the satisfaction of the user, the second stage is entered in which the
+*     output data files are created. Once initiated, no further interaction on
+*     the part of the user is required. This is the computationally intensive
+*     bit. The GUI makes use of various applications from POLPACK, KAPPA and 
+*     CCDPACK to perform all its tasks.
 *     
-*     The mappings between rays and images are determined from a set of 
-*     fiducial positions supplied by the user, using an integrated 
-*     graphical user interface (GUI) which activates various applications 
-*     from the KAPPA, CCDPACK and POLPACK packages. The same GUI is used to 
-*     specify masks enclosing the O and E ray areas of each image (each mask
-*     comprises one or more polygonal areas). For each input image, the 
-*     contents of the O-ray mask is copied to the corresponding "O-ray"
-*     output, and the contents of the E-ray mask is copied to the corresponding
-*     "E-ray" output. In single-beam mode only a single mask is used
-*     (notionally the "O-ray" mask), but the user has the option of not
-*     supplying any mask at all, in which case the whole input image is 
-*     copied to the output.
-*
-*     Various options controlling the behaviour of the GUI can be set on
-*     the command line by assigning values to the parameters listed below.
-*     Alternatively, they can be set using the "Options" menu in the menu 
-*     bar at the top of the GUI. If not supplied on the command line, these 
-*     parameters usually adopt the values they had on the previous
-*     invocation of Polka. The values shown in square brackets in the
-*     parameter descriptions below are the initial default values.
-*
-*     Detailed information on the operation of Polka and how to use the GUI 
-*     is available by clicking on the "Help" button at the right hand end of 
-*     the menu bar.
+*     A step-by-step tutorial on the use of the GUI is available within the
+*     "Help" menu at the right hand end of the menu bar (see also the STARTHELP
+*     parameter).
+*     
+*     Various options controlling the behaviour of the GUI can be set on the
+*     command line by assigning values to the parameters listed below.
+*     Alternatively, most of them can be set using the "Options" menu in the
+*     menu bar at the top of the GUI. If not supplied on the command line,
+*     these parameters usually adopt the values they had on the previous
+*     invocation of POLKA. The values shown in square brackets in the parameter
+*     descriptions below are the initial default values.
 
 *  Usage:
 *     polka in out_s [skyframes]
 
 *  ADAM Parameters:
 *     BADCOL = LITERAL (Update)
-*        The colour with which to represent missing data. This should be
-*        one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
-*        unambiguous abbreviation can be supplied, and the value is
-*        case-insensitive. [CYAN]
+*        The colour with which to represent missing data in the image
+*        display. This should be one of RED, BLUE, GREEN, CYAN, MAGENTA, 
+*        YELLOW, BLACK. Any unambiguous abbreviation can be supplied, and 
+*        the value is case-insensitive. [CYAN]
 *     CURCOL = LITERAL (Update)
-*        The colour with which to mark the objects (i.e. image features
-*        or masks) currently being entered by the user. This should be
+*        The colour with which to mark objects (i.e. image features and
+*        masks) currently being entered by the user. This should be
 *        one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
 *        unambiguous abbreviation can be supplied, and the value is
 *        case-insensitive. [RED]
@@ -82,14 +107,15 @@
 *        preference, even if the DPI value returned by the X server is correct.
 *        Note, this value cannot be set from the GUI's "Options" menu. [!]
 *     DUALBEAM = _LOGICAL (Read)
-*        If a true value is suplied, then Polka will operate in
+*        If a true value is suplied, then POLKA will operate in
 *        dual-beam mode, producing two output images for each input image.
 *        Otherwise, it will operate in single-beam mode, with one output
 *        image being produced for each input image. In single-beam mode,
 *        the output image is notionally referred to as the "O-ray" image,
 *        and all the GUI controls related to the E-ray areas are disabled.
-*        Note, this parameter cannot be set from the GUI's "Options"
-*        menu. [TRUE]
+*        This parameter is only used when processing polarimeter data
+*        (see parameter POL). It's value cannot be set from the 
+*        "Options" menu within the GUI. [TRUE]
 *     FITTYPE = _INTEGER (Update)
 *        The type of mapping which should be used between images. This
 *        may take the following values:
@@ -107,17 +133,16 @@
 *              X_out = C1  +  C2 * X_in  +  C3 * Y_in
 *              Y_out = C4  +  C5 * X_in  +  C6 * Y_in
 *
-*            This form of mapping allows the rotation and magnification
-*            to be different for each axis, and is unlikely to be of use 
-*            with most polarimetry data. [1]
+*        Only mapping types 1 and 3 are available when processing
+*        polarimeter data (see parameter POL). [1]
 *     HELPAREA = _LOGICAL (Update)
 *        If a true value is supplied, then dynamic help information will be
 *        displayed in a box at the bottom of the GUI. This information
-*        describes the component of the GUI currently under the mouse 
-*        pointer. [TRUE]
+*        is continuously updated to describe the control or area currently 
+*        under the mouse pointer. [TRUE]
 *     IN = NDF (Read)
-*        A list of input images. Note, the input images cannot be
-*        specified within the GUI.
+*        A group specifying the names of the input intensity frames. Note, 
+*        the input frames cannot be specified within the GUI.
 *     LOGFILE = LITERAL (Read)
 *        The name of a log file to which will be written all the messages
 *        generated by the applications activated by the GUI. If "stdout"
@@ -135,47 +160,54 @@
 *        its own private colour map. Otherwise it will share the standard 
 *        colour map. Note, with a false value for NEWCOLMAP, there may 
 *        be insufficient free colours in the standard colour map (i.e. if
-*        other X applications are running). In this case polka will report 
+*        other X applications are running). In this case POLKA will report 
 *        an error and abort. If this happens, try re-running with a true
 *        value for NEWCOLMAP. [FALSE]
 *     OEFITTYPE = _INTEGER (Update)
 *        The type of mapping which should be used between O and E rays. See
-*        parameter FITTYPE for a description of the allowed values. [1]
+*        parameter FITTYPE for a description of the allowed values. This
+*        parameter is only accessed when processing polarimeter data (see
+*        parameter POL). [1]
 *     OUT_S = NDF (Write)
 *        The name of the output cube to hold the Stokes parameters 
 *        calculated from the input images. If a null value is given then
-*        no Stokes parameters are calculated. Note, the output images 
-*        cannot be specified within the GUI. 
+*        no Stokes parameters are calculated. Note, the output cube
+*        cannot be specified within the GUI. This parameter is only
+*        accessed when processing polarimeter data (see parameter POL).
 *     OUT = LITERAL (Write)
-*        This parameter is only used if parameter DUALBEAM
-*        is given a false value. It is a list of the names of the 
-*        output images to create in single-beam mode, holding aligned
-*        intensity values from the input images. These should correspond 
+*        A group specifying the names of the output intensity images to 
+*        create in single-beam mode, or when processing non-polarimeter 
+*        data (see parameters DUALBEAM and POL). These should correspond 
 *        one-for-one to the input images supplied using parameter IN. If 
 *        a null (!) value is given, then the intensity images are not
 *        saved. Note, the output images cannot be specified within the GUI. 
 *     OUT_E = LITERAL (Write)
-*        This parameter is only used if parameter DUALBEAM is given a 
-*        true value. It is a list of the 
-*        names of the E-ray output images to create in dual-beam mode, 
-*        holding aligned E-ray intensity values from the input images. These 
-*        should correspond one-for-one to the input images supplied using 
-*        parameter IN. If  a null (!) value is given, then the E-ray intensity
-*        images are not saved. Note, the output images cannot be specified 
-*        within the GUI. 
+*        A group specifying the names of the E-ray output intensity images to 
+*        create in dual-beam mode (see parameter DUALBEAM). These should 
+*        correspond one-for-one to the input images supplied using parameter 
+*        IN. If a null (!) value is given, then the E-ray intensity images 
+*        are not saved. Note, the output images cannot be specified within 
+*        the GUI. 
 *     OUT_O = LITERAL (Write)
-*        This parameter is only used if parameter DUALBEAM is given a 
-*        true value. It is a list of the 
-*        names of the O-ray output images to create in dual-beam mode, 
-*        holding aligned O-ray intensity values from the input images. These 
-*        should correspond one-for-one to the input images supplied using 
-*        parameter IN. If a null (!) value is given, then the O-ray intensity
-*        images are not saved. Note, the output images cannot be specified 
-*        within the GUI. 
+*        A group specifying the names of the O-ray output intensity images to 
+*        create in dual-beam mode (see parameter DUALBEAM). These should 
+*        correspond one-for-one to the input images supplied using parameter 
+*        IN. If a null (!) value is given, then the O-ray intensity images 
+*        are not saved. Note, the output images cannot be specified within 
+*        the GUI. 
 *     PERCENTILES( 2 ) = _REAL (Update)
 *        The percentiles that define the scaling limits for the displayed
 *        images. For example, [25,75] would scale between the quartile 
 *        values. [5,95]
+*     POL = _LOGICAL (Read)
+*        Do the input frames contain polarimeter data? Input frames containing 
+*        non-polarimeter data may be aligned and sky subtracted using POLKA 
+*        if parameter POL is assigned a false value. This indicates that the 
+*        input intensity frames are not to be treated as polarimeter data. In 
+*        this case, a wider range of mappings are available (see parameter 
+*        FITTYPE) when aligning the input frames, but Stokes vectors may not 
+*        be produced (see parameter OUT_S). The use of the GUI is the same as 
+*        in single-beam mode (see parameter DUALBEAM). [TRUE]
 *     PSFSIZE = _INTEGER (Update)
 *        This value controls the centroiding process which is used to find 
 *        accurate centres for the features identified using the mouse.
@@ -196,15 +228,15 @@
 *        Any unambiguous abbreviation can be supplied, and the value is 
 *        case-insensitive. [RED]
 *     SKYFRAMES = NDF (Read)
-*        A list of sky frames. These frames are subtracted from the
-*        supplied object frames before the output images are created. If only 
-*        one sky frame is supplied, then it is used for all the object
-*        frames. Otherwise, the number of sky frames must equal the
-*        number of supplied object frames, and must be given in the same
-*        order. If a null value (!) is given for SKYFRAMES, then the sky
-*        background to be subtracted from each output image is determined 
-*        by fitting a surface to sky areas identified by the user within
-*        the supplied object frames. [!]
+*        A group specifying the sky frames to use. These frames are subtracted 
+*        from the supplied object frames before the output images are created. 
+*        If only one sky frame is supplied, then it is used for all the object
+*        frames. Otherwise, the number of sky frames must equal the number of 
+*        supplied object frames, and must be given in the same order. If a 
+*        null value (!) is given for SKYFRAMES, then the sky background to be 
+*        subtracted from each output image is determined by fitting a surface 
+*        to sky areas identified by the user within the supplied object 
+*        frames. [!]
 *     SKYPAR = _INTEGER (Update)
 *        If no sky frames are supplied using parameter SKYFRAMES, then
 *        the sky in each output image will be fitted using a polynomial 
@@ -220,7 +252,7 @@
 *        the SKYFRAMES parameter. [TRUE]
 *     STARTHELP = _LOGICAL (Read)
 *        If a true value is supplied, then a hyper-text browser will be
-*        created with the GUI, displaying the tutorial page of the Polka
+*        created with the GUI, displaying the tutorial page of the POLKA
 *        on-line help documentation. Otherwise, the browser is only created
 *        if the user accesses the on-line help information explicitly
 *        from within the GUI by using the "Help" menu or the F1 key on 
@@ -236,7 +268,7 @@
 *        area of the GUI when a new image is selected using the "Images"
 *        menu. It may take one of the following values:
 *    
-*        ZOOMED - The new image is displayed with the curremt zoom factor 
+*        ZOOMED - The new image is displayed with the current zoom factor 
 *        and image centre. 
 *
 *        UNZOOMED - The zoom factor and image centre are reset so that
@@ -254,39 +286,25 @@
 *        case-insensitive. [YELLOW]
 
 *  Examples:
-*     polka 'im1,im2' '*_o' '*_e' 
-*        This example aligns and extracts the O and E ray areas from the two 
-*        images `im1` and `im2`, subtracts a sky background (estimated
-*        from areas within the object frames), and stores the results in 
-*        the images `im1_o`, `im1_e`, `im2_o` and `im2_e`. The current 
-*        values for all other parameters are used.
-*     polka ^in.lis out=^out.lis dualbeam=no skyframes=^sky.lis reset
+*     polka 'im1,im2,im3,im4' cube out_o=! out_e=!
+*        This example aligns and extracts the O and E ray areas from the
+*        four images 'im1' to 'im4', subtracts a sky background from each
+*        (estimated from areas within the object frames), and stores the 
+*        corresponding Stokes vectors in 'cube'. The aligned intensity
+*        images are not saved.
+*     polka ^in.lis out=^out.lis out_s=! dualbeam=no skyframes=^sky.lis reset
 *        This example uses single-beam mode. It reads the names of input 
-*        images from the text file `in.lis`, subtracts the sky frames
-*        read from the text file `sky.lis`, aligns them and stores 
-*        them in the images named in the text file `out.lis`. All
+*        images from the text file 'in.lis', subtracts the sky frames
+*        read from the text file 'sky.lis', aligns them and stores 
+*        them in the images named in the text file 'out.lis'. All
 *        other parameters are reset to their initial default values listed 
-*        in the parameter descriptions above.
+*        in the parameter descriptions above. No STokes vectors are
+*        produced.
 
 *  Notes:
 *     - The following components are added to the POLPACK extension in the 
 *     output intensity images (the extension is first created if it does 
 *     not already exist): 
-*
-*     ROTATION (_REAL): The clockwise rotation from the input 
-*     image to the output image (in degrees). If the input image already
-*     contains a POLPACK extension, then the value of ROTATION written to the
-*     output image is the sum of the input image value and the value
-*     implied by the new mapping.
-*
-*     YROTATION (_REAL): This component is only written to the extension
-*     if the output image may contain shear. It is the clockwise
-*     rotation from the input image Y axis to the output image Y axis (in
-*     degrees). In this case the ROTATION component (see above) is understood 
-*     as giving the rotation of the X axis. If the input image already
-*     contains a POLPACK extension, then the value of YROTATION written to the
-*     output image is the sum of the input image value and the value
-*     implied by the new mapping.
 *
 *     RAY (_CHAR): A label identifying which of the two rays the image
 *     contains. This will be either "O" or "E". This is only written in
@@ -297,6 +315,11 @@
 *     POLPACK extension with a IMGID value, then the IMGID value is copied
 *     unchanged to the corresponding output images. Otherwise, the name of
 *     the input image (without a directoty path) is used.
+*
+*     ANGROT (_REAL): The anti-clockwise angle from the first axis of the
+*     image to the analyser axis. This value is only written if the input 
+*     image already contains an ANGROT value, in which case the input value
+*     is modified to take account of any rotation introduced by the mapping. 
 *
 *     - The following components are added to the POLPACK extension in the 
 *     output cube holding Stokes parameter (the extension is first created 
@@ -372,6 +395,7 @@
      :        NEWCM,             ! Use a new colour map?
      :        DBEAM,             ! Run in Dual-beam mode?
      :        HAREA,             ! Is the help area to be displayed?
+     :        POL,               ! Are we processing polarimetry data?
      :        SAREA,             ! Is the status area to be displayed?
      :        SKYOFF,            ! Should a sky background be subtracted?
      :        STHLP,             ! Display a WWW browser at start-up?
@@ -385,10 +409,15 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  See if we are processing polarimetry data.
+      CALL PAR_GET0L( 'POL', POL, STATUS )
+
 *  Get a group containing the names of the object frames to be used.
 *  Tell the user how many are found.
       CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            SIZE, STATUS )
+
+*  Tell the user how many images were supplied.
       CALL MSG_SETI( 'I', SIZE )
       CALL MSG_OUT( 'POLKA_MSG_1', '  Using ^I input images.', STATUS ) 
 
@@ -426,12 +455,31 @@
          END IF
       END DO
 
-*  See if we should run in dual-beam mode.
-      CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
+*  If we are handling polarimetry data...
+      IF( POL ) THEN
+
+*  See if we should run in dual-beam mode. 
+         CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
 
 *  Get a group holding the name of the output cube to hold Stokes parameters.
-      CALL WRNDF( 'OUT_S', GRP__NOID, 1, 0, ' ', IGRP4, SIZEO,
-     :             STATUS )
+         CALL WRNDF( 'OUT_S', GRP__NOID, 1, 0, ' ', IGRP4, SIZEO,
+     :                STATUS )
+
+*  Report an error if stokes vectors are equested in single beam mode.
+         IF( IGRP4 .NE. GRP__NOID .AND. .NOT. DBEAM .AND. 
+     :       STATUS .EQ. SAI__OK ) THEN
+            CALL ERR_REP( 'POLKA_ERR_1', 'The current version of '//
+     :                    'POLKA cannot produce Stokes vectors in '//
+     :                    'single-beam mode.', STATUS )
+            GO TO 999
+         END IF
+
+*  If not processing polarimetry data, always use single-beam mode, and do
+*  not produce Stokes vectors.
+      ELSE
+         DBEAM = .FALSE.
+         IGRP4 = GRP__NOID
+      END IF
 
 *  If we are producing Stokes parameters...
       IF( IGRP4 .NE. GRP__NOID ) THEN
@@ -546,7 +594,7 @@
 *  See if the status area is to be displayed.
       CALL PAR_GET0L( 'STATUSAREA', SAREA, STATUS )
 
-*  See if a WWW browser displaying the Polka manual contents page should
+*  See if a WWW browser displaying the POLKA manual contents page should
 *  be created at start-up.
       CALL PAR_GET0L( 'STARTHELP', STHLP, STATUS )
 
@@ -561,7 +609,7 @@
          SKYPAR = 0
       END IF
 
-*  Get the dots per inch to assume for the screen. A null valu means
+*  Get the dots per inch to assume for the screen. A null value means
 *  use the normal TK value. Annull the error if it occurs.
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL PAR_GET0I( 'DPI', DPI, STATUS )
@@ -586,13 +634,15 @@
          END IF
       END IF
 
-* Get the fit types to be used when aligning images, and the 
-* O and E rays.
-      CALL PAR_GET0I( 'FITTYPE', FIT, STATUS )
-      FIT = MIN( 5, MAX( 1, FIT ) )
-
-      CALL PAR_GET0I( 'OEFITTYPE', OEFIT, STATUS )
-      OEFIT = MIN( 5, MAX( 1, OEFIT ) )
+*  Get the fit types to be used when aligning images, and the 
+*  O and E rays. Only allow mappings with rotation if not processing
+*  polarimetry data.
+      IF( POL ) THEN
+         CALL PAR_GODD( 'FITTYPE', 1, 1, 3, .FALSE., FIT, STATUS )
+         CALL PAR_GODD( 'OEFITTYPE', 1, 1, 3, .FALSE., OEFIT, STATUS )
+      ELSE
+         CALL PAR_GDR0I( 'FITTYPE', 1, 1, 5, .FALSE., FIT, STATUS )
+      END IF
 
 *  Get the colours to use for various parts of the display.
       CALL PAR_CHOIC( 'BADCOL', 'CYAN', COLS, .FALSE., BADCOL, STATUS )
@@ -622,7 +672,7 @@
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
      :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, 
      :             IGRPS, SSIZE, SKYOFF, SKYPAR, IGRP4, DBEAM, 
-     :             MODE( : CHR_LEN( MODE ) ), STATUS )
+     :             MODE( : CHR_LEN( MODE ) ), POL, STATUS )
 
 *  The various options values may have been altered by the use of the 
 *  "Options" menu in the GUI. Write them back to the parameter file in case.
@@ -633,7 +683,7 @@
       CALL PAR_PUT0I( 'PSFSIZE', PSF, STATUS )    
       CALL PAR_PUT0C( 'ITEMS', SI( : CHR_LEN( SI ) ), STATUS )
       CALL PAR_PUT0I( 'FITTYPE', FIT, STATUS )
-      CALL PAR_PUT0I( 'OEFITTYPE', OEFIT, STATUS )
+      IF( POL ) CALL PAR_PUT0I( 'OEFITTYPE', OEFIT, STATUS )
       CALL CHR_UCASE( BADCOL )
       CALL PAR_PUT0C( 'BADCOL', BADCOL, STATUS )
       CALL CHR_UCASE( CURCOL )

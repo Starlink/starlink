@@ -370,6 +370,11 @@
    set IMSECS $in_list
    set nin [llength $IMSECS]
 
+# The atask should have set a value for global POL (which indicates if
+# the input frames contain polarimeter data). If we are not running from
+# the atask, we need to define POL now.
+   if { ![info exists POL] } { set POL 0 }
+
 # Store a flag indicating if Stokes parameter cube should be created, and
 # if so, store the name of the cube to create.
    if { [info exists stokes] && $stokes != "" } {
@@ -737,12 +742,14 @@
 
    SetHelp $skymenu ".  The order of the polynomial fit used on each axis when fitting sky surfaces. Larger values allow more flexibility in the fitted surfaces."
 
-# Add items to the "Mapping Types" sub-menu.
+# Add items to the "Mapping Types" sub-menu. The available mapping types
+# depend on whether or not we are processing polarimeter data (as
+# specified by global POL - set by the atask).
    set mapmenu [menu $OPTSMENU.map]
    for {set type 1} {$type < 6} {incr type} {
       $mapmenu add radiobutton -label $MAPTYPE($type) -variable FITTYPE \
                                -selectcolor $RB_COL -value $MAPTYPE($type) \
-                               -state $MAPSTATE($type,$DBEAM)
+                               -state $MAPSTATE($type,$POL)
       MenuHelp $mapmenu $MAPTYPE($type) ".  Align images using \"$MAPTYPE($type)\"."
    }
    $mapmenu add separator

@@ -10577,14 +10577,6 @@ proc Save {} {
                      if { $MAPTYPE($oefittype) == $OEFITTYPE } { break }
                   }
 
-# If either of these fit types allows shear, then the concatenated
-# mapping may involve shear.
-                  if { $oefittype == 5 || $fittype == 5 } { 
-                     set shear 1
-                  } {
-                     set shear 0
-                  }
-
 # Calculate the rotations, magnifications and shifts corresponding to the
 # mapping.
                   DescMap $map
@@ -10599,42 +10591,16 @@ proc Save {} {
                      }
                   }
 
-# The axis rotations. If the input image already has an X axis rotation,
-# add the new rotation onto it.
-                  if { ![Extension $outndf ROTATION _REAL "" old_rot] } { 
+# Modify the value of ANGROT by subtracting the rotation introduced by the 
+# alignement process.
+                  if { ![Extension $outndf ANGROT _REAL "" old_angrot] } { 
                      set ok 0 
                      break
                   }
 
-                  if { $old_rot != "" } {
-                     set rot [expr $old_rot + $MAP_RX]
-                  } {
-                     set rot $MAP_RX
-                  }
-
-# Write out the X axis rotation.
-                  if { ![Extension $outndf ROTATION _REAL $rot ""] } {
-                     set ok 0
-                     break
-                  }
-
-# If the input image already has an Y axis rotation, add the new rotation 
-# onto it (and note that the output may contain shear).
-                  if { ![Extension $outndf YROTATION _REAL "" old_rot] } { 
-                     set ok 0 
-                     break
-                  }
-
-                  if { $old_rot != "" } {
-                     set yrot [expr $old_rot + $MAP_RY]
-                     set shear 1
-                  } {
-                     set yrot $MAP_RY
-                  }
-
-# If the output image may contain shear, write out the YROTATION keyword.
-                  if { $shear } {
-                     if { ![Extension $outndf YROTATION _REAL $yrot ""] } {
+                  if { $old_angrot != "" } {
+                     set angrot [expr $old_angrot - $MAP_RX]
+                     if { ![Extension $outndf ANGROT _REAL $angrot ""] } {
                         set ok 0
                         break
                      }

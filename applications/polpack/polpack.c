@@ -363,8 +363,8 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         CHARACTER(VIEW), REAL(PLO), REAL(PHI), LOGICAL(NEWCM),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
-                        INTEGER(SKYPAR), LOGICAL(IGRP4), LOGICAL(DBEAM),
-                        CHARACTER(MODE), INTEGER(STATUS) 
+                        INTEGER(SKYPAR), INTEGER(IGRP4), LOGICAL(DBEAM),
+                        CHARACTER(MODE), LOGICAL(POL), INTEGER(STATUS) 
                         TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
                         TRAIL(VIEW) TRAIL(XHRCOL) TRAIL(MODE) ){
@@ -458,6 +458,9 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        Run in dual-beam mode?
 *     MODE = CHARACTER (Given and Returned)
 *        The type of polarisation being measured; Linear or Circular.
+*     POL = LOGICAL (Given)
+*        Are we processing polarimeter data? This controls the types of 
+*        mappings available.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -502,6 +505,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_LOGICAL(STHLP)
    GENPTR_INTEGER(IGRP4)
    GENPTR_LOGICAL(DBEAM)
+   GENPTR_LOGICAL(POL)
    GENPTR_INTEGER(STATUS)
    GENPTR_CHARACTER(MODE)
 
@@ -609,6 +613,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    SetIVar( interp, "ATASK_OEFIT", *OEFIT, STATUS );
    SetRVar( interp, "ATASK_PLO", *PLO, STATUS );
    SetRVar( interp, "ATASK_PHI", *PHI, STATUS );
+   SetLVar( interp, "POL", POL, STATUS );
    if( LOGFIL_length > 0 ) {
       SetSVar( interp, "ATASK_LOGFILE", LOGFIL, LOGFIL_length, STATUS );
    }

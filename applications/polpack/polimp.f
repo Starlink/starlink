@@ -69,8 +69,6 @@
 *           IMGID       PPCKIMID
 *           WPLATE      PPCKWPLT
 *           RAY?        PPCKRAY 
-*           ROTATION?   PPCKROT 
-*           YROTATION?  PPCKYROT
 *           STOKES?     PPCKSTOK
 *        [!]
 
@@ -234,12 +232,6 @@
 *        identifies which ray the image is derived from, and can take the 
 *        two values "O" and "E" (upper case). Left undefined by default.
 *
-*        ROTATION (_REAL):  This item should only be specified in the 
-*        control table if the images being imported are partially processed 
-*        images which have already been aligned. It is the clockwise 
-*        rotation introduced into the image in order to align it with other 
-*        images, in degrees. Left undefined by default.
-*
 *        STOKES (_CHAR):  This item should only be specified in the 
 *        control table if the images being imported are partially processed 
 *        images containing Stokes parameters. It is a string containing one 
@@ -251,14 +243,6 @@
 *        WPLATE (_CHAR):  The wave-plate position, in degrees. Must be one 
 *        of; "0.0", "22.5", "45.0", "67.5". There is no default (an error 
 *        is reported if no value is supplied).
-*
-*        YROTATION (_REAL): This item should only be specified in the 
-*        control table if the images being imported are partially processed 
-*        images which have already been aligned, and if the final map may 
-*        contain shear. It gives the clockwise rotation in degrees of the 
-*        Y axis introduced into the image in order to align it with other 
-*        images. In this case the ROTATION item (see above) is understood 
-*        as giving the rotation of the X axis. Left undefined by default.
 
 *  Examples:
 *     polimp in='*' table=mytable.dat
