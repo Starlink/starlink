@@ -27,13 +27,13 @@ srcdir = @srcdir@
 #------------------------------------------------------------------------------
 # Local macros.
 #
-CC_SWITCHES = ${CPPFLAGS} ${XCFLAGS} ${CFLAGS} ${SYSCFLAGS} \
+CC_SWITCHES = ${CPPFLAGS} ${XCFLAGS} ${SYSCFLAGS} \
               ${TK_DEFS} ${TCL_DEFS}\
 	      -I${TKX_GENERIC_DIR} -I${TKX_UNIX_SRC_DIR} \
 	      -I${TK_GENERIC_DIR} -I${TK_UNIX_DIR} \
 	      -I${TCLX_GENERIC_DIR} -I${TCLX_UNIX_SRC_DIR} \
 	      -I${TKX_UNIX_BLD_DIR} -I${TCLX_UNIX_BLD_DIR} \
-	      -I${TCL_GENERIC_DIR} -I${TCL_UNIX_DIR} ${TK_XINCLUDES}
+	      -I${TCL_GENERIC_DIR} -I${TCL_UNIX_DIR} ${CFLAGS} ${TK_XINCLUDES}
 
 LD_SWITCHES = ${LDFLAGS} ${TCL_LD_FLAGS} ${XLDFLAGS} ${XCFLAGS} ${CFLAGS}
 
