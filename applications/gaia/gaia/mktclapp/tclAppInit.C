@@ -76,5 +76,21 @@ Et_AppInit(Tcl_Interp *interp)
   if (Tcladam_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }
+
+  //  Add GAIA_LIBRARY to auto_path
+  char* libDir = Tcl_GetVar(interp, "gaia_library", TCL_GLOBAL_ONLY);
+  if (libDir == NULL) {
+      libDir = Tcl_GetVar2(interp, "env", "GAIA_LIBRARY", TCL_GLOBAL_ONLY);
+  }
+  if (libDir == NULL) {
+      libDir = GAIA_LIBRARY;
+  } 
+  Tcl_SetVar(interp, "gaia_library", libDir, TCL_GLOBAL_ONLY);
+  char cmd[1048];
+  sprintf(cmd, "set auto_path [linsert $auto_path 0 %s]", libDir );
+  if (Tcl_Eval(interp, cmd) != TCL_OK) {
+      return TCL_ERROR;
+  }
+  
   return TCL_OK;
 }

@@ -20,7 +20,8 @@ LDFLAG1 =
 LDFLAG2 =
 
 #  -D flags
-DEFINES      = -DSHARED=@SHARED@ @TCLUTIL_DEFS@
+DEFINES      = -DSHARED=@SHARED@ @TCLUTIL_DEFS@ \
+               -DGAIA_LIBRARY=\"@GAIA_BUILD_LIBRARY@\"
 
 #  Other flags to pass to compiler
 CFLAGS       = @CXXDEBUGFLAGS@
