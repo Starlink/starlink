@@ -361,6 +361,9 @@ BLD_SHR = :
 # Force-delete
 RMF = rm -f
 
+#  Environment settings for calls to ./configure
+CONFENVS = INSTALL= LINK= CFLAGS= CXX=$(CXX) CC=$(CC) F77=$(FC) FFLAGS="$(FFLAGS)"
+
 #------------------------------------------------------------------------------
 ###############################################################################
 #
@@ -737,14 +740,21 @@ install:
 		fi; \
 	done
 	for f in $(BUILT_FILES) $(LIBRARY_FILES) ""; do \
-		DEST=$(INSTALL_BIN)/`echo $$f|sed s+.*/++`; \
-		if test -n "$$f"; then \
-			cp -p $$f $$DEST; \
-			chmod 755 $$DEST; \
-			$(RMF) $$f; \
-			$(LINK) $$DEST $$f; \
-		else :; fi; \
+	    if test -n "$$f"; then \
+		DEST=$(INSTALL_BIN)/`echo $$f | sed s+.*/++`; \
+		cp -p $$f $$DEST; \
+		chmod 755 $$DEST; \
+	    else :; fi; \
 	done
+#	for f in $(BUILT_FILES) $(LIBRARY_FILES) ""; do \
+#		DEST=$(INSTALL_BIN)/`echo $$f|sed s+.*/++`; \
+#		if test -n "$$f"; then \
+#			cp -p $$f $$DEST; \
+#			chmod 755 $$DEST; \
+#			$(RMF) $$f; \
+#			$(LINK) $$DEST $$f; \
+#		else :; fi; \
+#	done
 #
 #  Install the package startup script.  The name of the directory
 #  containing the installed public include files must be edited into
@@ -769,9 +779,9 @@ install:
 	    cd $(INSTALL_DOCS) && \
 	    test -n "$(LATEX_DOCS)" && test -f $(LATEX_DOCS) && $(RMF) -R $(LATEX_DOCS); \
 	    $(TAR_OUT) $$pwd/$(LATEX_TARBALL); \
-                 chmod 755 `find $$f -type d -print`;\
-                 chmod 644 `find $$f ! -type d -print`;\
-                 touch $$f;\
+            chmod 755 `find $(LATEX_DOCS) -type d -print`;\
+            chmod 644 `find $(LATEX_DOCS) ! -type d -print`;\
+            touch $(LATEX_DOCS);\
 	else :; fi
 #	if test -n "$(LATEX_TARBALL)"; then \
 #           pwd=`pwd`;\
@@ -785,7 +795,7 @@ install:
 #              else :; fi;\
 #           done);\
 #        fi;
-
+#
 #  Install any hypertext documents, giving world read access to all the files
 #  they contain and linking with other documents.
 	if test -n "$(HYPERTEXT_DOCS)"; then \
@@ -877,28 +887,35 @@ deinstall:
            fi;\
         fi
 
-#  The do_deinstall target (which should never exist) checks that an
+#  XXX The do_deinstall target (which should never exist) checks that an
 #  installed version of each file exists (in case an install failed
 #  part of the way through) and returns it to the source directory,
 #  using "cp -p" to preserve file dates.  Links are removed from the
 #  source directory before copying.
+#  We don't have to copy these back to the source directory, since we
+#  installed them by copying them, rather than move-and-link.
 
 do_deinstall:
 #
 #  Note the package will need to be tested again.
 	@- if test -f .TESTED_$(SYSTEM); then $(RMF) .TESTED_$(SYSTEM); else :; fi
 #  Deinstall the executables and library files.
-	for f in $(PUBLIC_SCRIPTS) ""; do \
-		if test -n "$$f"; then $(RMF) $$f; fi; \
+	for f in $(PUBLIC_SCRIPTS) $(BUILT_FILES) $(LIBRARY_FILES) ""; do \
+	    if test -n "$$f"; then \
+		$(RMF) $(INSTALL_BIN)/`echo $$f | sed s+.*/++`; \
+	    else :; fi; \
 	done
-	for f in $(BUILT_FILES) $(LIBRARY_FILES) ""; do \
-		DEST=$(INSTALL_BIN)/`echo $$f|sed s+.*/++`; \
-		if test -n "$$f"; then \
-			$(RMF) $$f; \
-			cp -p $$DEST $$f; \
-			$(RMF) $$DEST; \
-		else :; fi; \
-	done
+#	for f in $(PUBLIC_SCRIPTS) ""; do \
+#		if test -n "$$f"; then $(RMF) $$f; fi; \
+#	done
+#	for f in $(BUILT_FILES) $(LIBRARY_FILES) ""; do \
+#		DEST=$(INSTALL_BIN)/`echo $$f|sed s+.*/++`; \
+#		if test -n "$$f"; then \
+#			$(RMF) $$f; \
+#			cp -p $$DEST $$f; \
+#			$(RMF) $$DEST; \
+#		else :; fi; \
+#	done
 #
 #  Deinstall the package startup file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
@@ -911,8 +928,6 @@ do_deinstall:
 #        else :; fi
 #
 #  Deinstall the LaTeX and XML documentation, if installed versions exist.
-#  We don't have to copy these back to the source directory, since we
-#  installed them by copying them, rather than move-and-link.
 	- for f in $(LATEX_DOCS) $(XML_DOCS) ""; do \
            if test -n "$$f" -a -w $(INSTALL_DOCS)/$$f; then \
               $(RMF) -R $(INSTALL_DOCS)/$$f;\
@@ -1214,8 +1229,7 @@ build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a \
 # Creating moggy/Makefile configures the moggy package
 moggy/Makefile: moggy/Makefile.in  $(CATLIBINSTALLDIR)/lib/libcat.a
 	CLDIR=`cd $(CATLIBINSTALLDIR);pwd`; \
-		cd moggy && unset INSTALL; \
-		CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$CLDIR
+		cd moggy && $(CONFENVS) ./configure --with-catlib=$$CLDIR
 
 # Creating astrom/makefile configures the astrom package.  The version
 # of astrom currently in the astrom directory is the _same_ as the
@@ -1243,7 +1257,7 @@ astrom/makefile: astrom/makefile.in
 	else \
 	    echo "AST < 2.0-7"; echo DEFWCSSTYLE=xtan >conftest.tanresult; \
 	fi
-	cd astrom && ./configure `cat ../conftest.tanresult`
+	cd astrom && $(CONFENVS) ./configure `cat ../conftest.tanresult`
 	$(RMF) conftest*
 
 #  Build and install the SkyCat cat library.  We install it into the
@@ -1268,7 +1282,9 @@ $(CATLIBINSTALLDIR)/lib/libcat.a: $(CATLIBINSTALLDIR)/stamp catlib/Makefile
 
 #  Target to configure catlib
 catlib/Makefile: $(CATLIBINSTALLDIR)/stamp
-	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --prefix=$$INST --with-notcl
+	INST=`cd $(CATLIBINSTALLDIR);pwd`; \
+		cd catlib && \
+		$(CONFENVS) ./configure --prefix=$$INST --with-notcl
 
 #  We have to create the installation directories `by hand', since the catlib
 #  installation script is a bit stupid.
@@ -1282,12 +1298,11 @@ $(CATLIBINSTALLDIR)/stamp:
 	done
 	touch $(CATLIBINSTALLDIR)/stamp
 
-# Unpack match.  Undefine troublesome environment variables, 
-# but leave CXX and CC
+# Unpack match.
 $(MATCHPROG)/Makefile:
 	test -f $(MATCHPROG).tar
 	test -d $(MATCHPROG) || $(TAR_OUT) $(MATCHPROG).tar
-	cd $(MATCHPROG) && LINK= INSTALL= RANLIB= CFLAGS= ./configure
+	cd $(MATCHPROG) && $(CONFENVS) ./configure
 
 #  Unpack the source tarball.  The extra test is because the makefile
 #  (always/sometimes?) wants to execute this twice.  Things get
