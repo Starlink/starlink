@@ -45,11 +45,18 @@
 *      16-AUG-2004 (TIMJ):
 *        (re-)Add in calculation of pointer size for 64 bit systems
 *        that was removed during the initial autoconfing.
+*      17-AUG-2004 (TIMJ):
+*        Add CNF_PREG declaration
 *     {enter_further_changes_here}
 
 *-
 
 *   The Fortran INTEGER to C pointer conversion function
       INTEGER*SIZEOF_VOIDP CNF_PVAL
+
+*   The %LOC pointer to INTEGER conversion function
+      INTEGER CNF_PREG
+      EXTERNAL CNF_PREG
+
 
 *.
