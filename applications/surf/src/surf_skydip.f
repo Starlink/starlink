@@ -69,7 +69,12 @@
 *  Notes:
 *     If the input file is not found in the current directory, the directory
 *     specified by the DATADIR environment variable is searched. This means
-*     that the raw data does not have to be in the working directory.
+*     that the raw data does not have to be in the working directory. In 
+*     addition 'IN' accepts a number. This number is converted to a demodulated
+*     data filename by prepending it with information specified in 
+*     the SCUBA_PREFIX environment variable. This filename expansion only works
+*     for demodulated data (ie data containing '_dem_'). The '_dem_' is 
+*     assumed and should not be present in $SCUBA_PREFIX.
 *     
 
 *  Related Applications:
@@ -104,6 +109,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.20  1997/07/19 02:41:47  timj
+*     Add header information to describe SCUBA_PREFIX.
+*
 *     Revision 1.19  1997/07/19 00:26:49  timj
 *     Change SEARCH_DATADIR so that it passes PACKAGE.
 *
