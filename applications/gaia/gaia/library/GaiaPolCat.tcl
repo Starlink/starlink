@@ -733,10 +733,18 @@ itcl::class gaia::GaiaPolCat {
       set exp0 $exp
 
 #  Identify the variables referenced in the expression. Loop round each
-#  columns heading.
+#  column heading. Slightly tricky as we may see occurances of $P and
+#  $PI, for which the $PI match must be attempted before the $P.
+      set headings ""
       set i -1
-      foreach head [$data_ getHeadings] {
+      foreach head "[$data_ getHeadings]" {
          incr i
+         lappend headings [list $head $i]
+      }
+      set headings [lsort -decreasing $headings]
+
+      foreach head $headings {
+         lassign $head head i
 
 #  Look for references to this column within the expression (i.e. the
 #  column name preceeded with a dollar), replacing them with a lindex 
