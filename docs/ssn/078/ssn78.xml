@@ -1740,14 +1740,15 @@ autoconf (GNU Autoconf) 2.59
         any code-generation tools either as separate packages or as
         local scripts, and it is this source set which is
         used for nightly builds and the like.  If you need tools to
-        generate some of the distributed sources, they should be
-        checked in, and your component should declare a `sourceset' on
-        the required tool (see <ref
+        generate some of the distributed sources, and they cannot be
+        included in the package for some reason, they should be
+        checked in, and your component should declare a `sourceset'
+        dependency on the required tool (see <ref
           id="macro-declare-dependencies"/>).</p>
 
       <p>With these remarks out of the way, the following is a
-        description of the steps involved in bringing an application
-        into the new fold.</p>
+        description of the steps involved in bringing first an application
+        into the new fold, and then a third-party component.</p>
 
       <subsect id="autoconfingexample" export="export">
         <subhead>
@@ -1774,7 +1775,23 @@ Directory /cvs/libraries/pcs/adam added to the repository
           <code>/star/sources/pcs/adam</code> (as it happens).  Note,
           however, that we <em>don't</em> add the <code>mk</code> script
           or the old <code>makefile</code>, since we're about to make
-          both of these redundant.  The <code>adam_source.tar</code>
+          both of these redundant.</p>
+
+        <p>In this case, the <code>adam_source.tar</code> distribution
+          tarball is a suitable set of sources.  This is not always
+          true, since some Starlink distributions -- especially some of
+          the larger libraries and applications -- do quite elaborate
+          processing of their sources in the process of creating this
+          `source' tarball; in these cases, you should attempt to obtain
+          a more fundamental set of sources from the package's developer
+          (if that is not you).  Ideally, that developer may have a CVS
+          or RCS repository holding the sources, and in that case you
+          should follow the CVS manual's instructions on importing such
+          repositories (in the CVS case, just place the new CVS tree in
+          your target repository, and for RCS, use the <kbd>cvs
+            import</kbd> command).</p>
+
+        <p>In this present case, the <code>adam_source.tar</code>
           file includes a Fortran include file containing error codes,
           <code>adam_err</code>; there are two problems with this.</p>
 
@@ -1839,7 +1856,7 @@ libadam_adam_la_SOURCES = $(PUBLIC_INCLUDES) $(F_ROUTINES)
 include_HEADERS = $(PUBLIC_INCLUDES)
 PUBLIC_INCLUDES = ADAM_ERR ADAM_DEFNS adam_defns.h
 F_ROUTINES = \
-	adm_acknow.f adm_getreply.f adm_getreplyt.f adm_path.f \
+        adm_acknow.f adm_getreply.f adm_getreplyt.f adm_path.f \
         adm_prcnam.f adm_receive.f adm_reply.f adm_send.f \
         adm_sendonly.f adm_sendt.f adm_trigger.f
 </verbatim>
@@ -1980,6 +1997,234 @@ configure.ac: installing `./missing'
           <code>make</code>.  That might just work.</p>
 
         <p>Iterate until success.</p>
+      </subsect>
+
+      <subsect id="importing-thirdparty" export="export">
+        <subhead>
+          <title>Importing third-party sources</title>
+        </subhead>
+
+        <p>If an application needs to rely on a non-Starlink
+          application, and especially if it relies on a modified
+          version, then the sources for that application should be
+          checked in to the <code>thirdparty/</code> part of the
+          tree.  The example here is the GNU m4 distribution, which is
+          one of the buildsupport tools necessary on Solaris, which
+          has a non-GNU m4 (autoconf relies on language extensions in
+          GNU m4, which is therefore required).</p>
+
+        <p>First, we get and import the sources (see the fuller
+          details in the <webref
+            url="http://www.cvshome.org/docs/manual/" >CVS manual</webref>):
+          <verbatim>
+% cd /tmp
+% wget http://ftp.gnu.org/pub/gnu/m4/m4-1.4.tar.gz
+% tar xzf m4-1.4.tar.gz
+% cd m4-1.4
+% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs import \
+    -ko -m "Import of GNU m4 1.4" \
+    thirdparty/fsf/m4 FSF m4-1-4
+</verbatim></p>
+
+        <p>The <code>-ko</code> option turns off any keyword expansion
+          for the newly-imported files.  Thus they will retain the
+          values they had when they were imported.  This appears to be
+          the practice recommended by the CVS manual, though it is not
+          absolutely clear that it is best, and this should not be
+          taken as a firm recommendation.</p>
+
+        <p>The <code>thirdparty/fsf/m4</code> argument is the location
+          of the new component within <em>our</em> repository, the
+          path to which will be created for you if necessary.  FSF --
+          the `Free Software Foundation' -- is the `vendor' in this
+          case, and this is used for the location within the
+          <code>thirdparty/</code> tree as well as the next CVS
+          argument.  CVS uses this vendor argument as the name of the
+          branch this new import is nominally located on.</p>
+
+        <p>Finally, this import command tags the imported files with
+          the tag you give as the last argument.  This should use the
+          same convention as other tags within the Starlink
+          repository, namely the component name and version
+          number.</p>
+
+        <p>Now that the source set is in the repository, you can go
+          back to your checkout tree and check the new component out:
+          <verbatim>
+% cd &lt;checkout-tree&gt;
+% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs co thirdparty/fsf/m4
+[blah...]
+% cd thirdparty/fsf/m4
+% cvs status -v configure.in
+===================================================================
+File: configure.in      Status: Up-to-date
+
+   Working revision:    1.1.1.1
+   Repository revision: 1.1.1.1 /cvs/thirdparty/fsf/m4/configure.in,v
+   Sticky Tag:          (none)
+   Sticky Date:         (none)
+   Sticky Options:      -ko
+
+   Existing Tags:
+        m4-1-4                          (revision: 1.1.1.1)
+        FSF                             (branch: 1.1.1)
+</verbatim>
+          We see that the newly-imported files have been put on the
+          1.1.1 branch, named <code>FSF</code>.  Any files we add to
+          this component, and any files we modify, will go on the trunk.</p>
+
+        <p>We need to add such a file now, a
+          <code>component.xml.in</code> file:
+          <verbatim>
+% cp `starconf --show buildsupportdata`/template-component.xml.in \
+    component.xml.in
+</verbatim>
+          after which we edit <code>component.xml.in</code>
+          appropriately.  This turns out to be more intricate than
+          usual: the <code>configure.in</code> file is old-fashioned
+          enough that it does not define the substitution variables
+          that <code>component.xml.in</code> is expecting, and it
+          requires a slightly closer inspection of
+          <code>configure.in</code> to determine what these should be
+          (<code>@PRODUCT@</code> and <code>@VERSION@</code> in this
+          case).  Although this step seems redundant, it is best to
+          have this file configured rather than completely static, so
+          that the generated <code>component.xml</code> will remain
+          correct when and if a new version of the `m4' component were
+          imported.  Having said that, ensure that the
+          <code>&lt;bugreports&gt;</code> element in the
+          <code>component.xml.in</code> file points to a Starlink
+          address -- we don't want bugs in <em>our</em> modifications to
+          be reported to the original maintainers.</p>
+
+        <p>Note that it is the now-deprecated
+          <code>configure.in</code> file that is the autoconf source in
+          this component, and that it has now-deprecated syntax; there
+          is no need to update this.  When we run autoreconf, we
+          discover that this is not the only obsolete feature, and we
+          have to do some futher mild editing of
+          <code>configure.in</code> before it is acceptable to the
+          repository version of autoconf, though it still produces a
+          good number of warnings.  These don't matter for our present
+          purposes: the <code>./configure</code> which autoreconf
+          produces still works, and the component builds and runs
+          successfully.</p>
+
+        <p>In order for the new component to be a good citizen in the
+          Starlink build tree, it needs to have an `install-manifest'
+          target.  Add to the <code>configure.in</code> file the lines
+          <verbatim>
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+AC_SUBST(STAR_MANIFEST_DIR)
+</verbatim>
+          If we were using Starlink automake, this would be enough to
+          prompt it to include an `install-manifest' target in the
+          <code>Makefile.in</code> it generates.  The GNU m4
+          distribution does not, however, use automake, so we need to
+          add this by hand.  The following additions to
+          <code>Makefile.in</code> do the right thing, though they are
+          rather clumsier than the support that Starlink automake adds:
+          <verbatim>
+STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
+
+[...]
+
+install-manifest: install-manifest.xml
+        $(srcdir)/mkinstalldirs $(STAR_MANIFEST_DIR)
+        $(INSTALL_DATA) install-manifest.xml \
+            $(STAR_MANIFEST_DIR)/$(PACKAGE_NAME)
+
+install-manifest.xml: all
+        $(MAKE) install
+        rm -rf STAGING
+        mkdir STAGING
+        $(MAKE) prefix=`pwd`/STAGING install
+        rm -f $@
+        echo "&lt;?xml version='1.0'?>"                            >$@
+        echo "&lt;!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
+        echo "&lt;manifest component='$(PACKAGE_NAME)'>"           >>$@
+        echo "&lt;version>$(PACKAGE_VERSION)&lt;/version>"            >>$@
+        echo "&lt;files>"                                          >>$@
+        find STAGING -type f | sed 's,^.*STAGING,$(prefix),'    >>$@
+        echo "&lt;/files>"                                         >>$@
+        echo "&lt;/manifest>"                                      >>$@
+        rm -rf STAGING
+</verbatim>
+          (if you look at <code>thirdparty/fsf/m4/Makefile.in</code>
+          you will see that we actually need to have <code>PRODUCT</code> and
+          <code>VERSION</code> there instead of the more general
+          <code>PACKAGE_NAME</code> and <code>PACKAGE_VERSION</code>
+          above).  Note that the actual installation happens within
+          the rule for <code>install-manifest.xml</code> -- this
+          guarantees that the <code>$(prefix)</code> stored in the
+          manifest is the same as the <code>$(prefix)</code> actually
+          used for the installation.</p>
+
+        <p>We add the <code>component.xml.in</code> file to the
+          repository, and look at what we have.
+          <verbatim>
+% cvs add component.xml.in
+% cvs -n update
+</verbatim>
+          This tells us that <code>configure</code>,
+          <code>configure.in</code> and <code>config.h.in</code> have
+          been modified, and <code>component.xml.in</code> added, but
+          we also discover that files <code>stamp-h.in</code>,
+          <code>doc/stamp-vti</code> and <code>doc/version.texi</code>
+          have also been modified, as part of the regeneration of the
+          <code>./configure</code> script.  The modification to the
+          stamp file <code>stamp-h.in</code> we should probably
+          commit, to avoid dependency niggles in the future, but the
+          meaningless changes to the two <code>doc/</code> files we
+          can just discard:
+          <verbatim>
+% cvs commit -m "Add component.xml template" component.xml.in 
+% cvs commit -m "...blah..." configure configure.in config.h.in 
+% cvs commit -m "Stamp file regenerated by autoreconf" stamp-h.in
+% rm doc/stamp-vti doc/version.texi 
+% cvs update doc
+</verbatim></p>
+
+        <p>We can see
+          <verbatim>
+% cvs status configure.in
+===================================================================
+File: configure.in      Status: Up-to-date
+
+   Working revision:    1.2
+   Repository revision: 1.2     /cvs/thirdparty/fsf/m4/configure.in,v
+   Sticky Tag:          (none)
+   Sticky Date:         (none)
+   Sticky Options:      -ko
+</verbatim>
+          that the changes to <code>configure.in</code> are now on the
+          trunk for this component, rather than the FSF branch.</p>
+
+      </subsect>
+
+      <subsect id="autoconfing-final" export="export">
+        <subhead>
+          <title>Adding components: the final step</title>
+        </subhead>
+
+        <p>In both cases, the final step, after you have committed your
+          changes, is to go to the top level of a <em>full checkout</em>
+          of the repository, make sure your new component is checked out
+          there, then delete <code>componentset.xml</code> and remake
+          <code>Makefile.dependencies</code>
+          <verbatim>
+% rm componentset.xml
+% make Makefile.dependencies
+# ... remakes componentset.xml, and from that Makefile.dependencies
+% cvs -n update
+M componentset.xml
+M Makefile.dependencies
+</verbatim>
+          (you might need to run <kbd>./configure --no-recursion</kbd>
+          to bring the <code>Makefile</code> there up to date with
+          respect to <code>Makefile.in</code>).  Check, with
+          <kbd>cvs diff Makefile.dependencies</kbd>, that the right
+          material has been added, before committing these two files.</p>
       </subsect>
 
     </sect>
