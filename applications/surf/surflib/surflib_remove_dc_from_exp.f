@@ -67,6 +67,9 @@
 *     1998 April 7 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.3  1999/06/16 21:10:24  timj
+*     Check for bad values
+*
 *     Revision 1.2  1998/06/17 07:42:56  timj
 *     Correct MAX_BOLS typo
 *
@@ -260,9 +263,17 @@
 
 *     The value for the DC level depends on method
                            IF (METHOD .EQ. 'MEDIAN') THEN
-                              DCVALUE = REAL(MEDIAN)
+                              IF (MEDIAN .NE. VAL__BADD) THEN
+                                 DCVALUE = REAL(MEDIAN)
+                              ELSE
+                                 DCVALUE = VAL__BADR
+                              END IF
                            ELSE IF (METHOD .EQ. 'MEAN') THEN
-                              DCVALUE = REAL(MEAN)
+                              IF (MEAN .NE. VAL__BADD) THEN
+                                 DCVALUE = REAL(MEAN)
+                              ELSE
+                                 DCVALUE = VAL__BADR
+                              END IF
                            END IF
 
 *     Loop over points in scan
