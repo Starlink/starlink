@@ -106,12 +106,14 @@
          VPATH 'DYNAMIC,PROMPT'
          PPATH 'DYNAMIC'
          PROMPT 'Radius of weighting function in scale lengths'
+	 HELPKEY  '*'
       ENDPARAMETER  
 
       PARAMETER SCALE
          TYPE '_REAL'
          VPATH 'DYNAMIC,PROMPT'
          PPATH 'DYNAMIC'
+	 HELPKEY  '*'
       ENDPARAMETER  
 
  
