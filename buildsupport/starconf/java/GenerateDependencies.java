@@ -521,7 +521,27 @@ public class GenerateDependencies {
                 // implies ssdeps is empty, too
                 flatdeps.println("<!-- no dependencies for " + c + " -->");
             } else {
-                flatdeps.println("<component id='" + c + "'>");
+                flatdeps.println("<component id='" + c + "'");
+                int bs = c.getBuildsupport();
+                switch (bs) {
+                  case Component.BUILDSUPPORT_AUTO:
+                    flatdeps.println("\tbuildsupport='yes'"); break;
+                  case Component.BUILDSUPPORT_NOAUTO:
+                    flatdeps.println("\tbuildsupport='noauto'"); break;
+                  case Component.BUILDSUPPORT_NO:
+                    flatdeps.println("\tbuildsupport='no'"); break;
+                  default:
+                    // Component.extractBuildsupport should have guaranteed
+                    // that this is impossible
+                    assert(false);
+                    break;
+                }
+                flatdeps.println("\tstatus='"
+                                 + (c.getStatus() == Component.STATUS_OBSOLETE
+                                    ? "obsolete"
+                                    : "current")
+                                 + "'");
+                flatdeps.println("\t>");
                 flatdeps.println("<dependencies>");
                 if (! ssdeps.isEmpty())
                     flatdeps.println("<sourceset>"
@@ -690,14 +710,19 @@ public class GenerateDependencies {
 
         private int extractBuildsupport(Element el) {
             String s = el.getAttribute("buildsupport");
-            int ret;
+            int ret = -1;       // invalid value
             if (s.equals("yes"))
                 ret = BUILDSUPPORT_AUTO;
             else if (s.equals("noauto"))
                 ret = BUILDSUPPORT_NOAUTO;
-            else
-                // everything else: should be "no" or blank
+            else if (s.equals("no") || (s.length() == 0))
                 ret = BUILDSUPPORT_NO;
+            else {
+                System.err.println("Element " + el
+                                   + " has bad buildsupport attribute: " + s);
+                System.exit(1);
+            }
+                
             return ret;
         }
 
