@@ -5,23 +5,33 @@
 
   $Id$
 -->
-<!element dtdelementlist  - - (dtdelement+)>
-<!element dtdelement	  - - (dtdparents, dtdcontent, dtdattribute*)>
-<!element dtdparents	  - - (dtdelemref*)>
-<!element dtdcontent	  - - (dtdcontentmodel, dtdcontenttree?)>
-<!element dtdcontentmodel - - (#pcdata | dtdelemref)*>
-<!element dtdcontenttree  - - (#pcdata)>
-<!element dtdattribute	  - - (#pcdata)>
-<!element dtdelemref	  - o empty>
+<!ELEMENT dtdelementlist  - - (dtdelement+)>
+<!ELEMENT dtdelement	  - - (dtdparents, dtdcontent, dtdattribute*)>
+<!ELEMENT dtdparents	  - - (dtdelemref*)>
+<!ELEMENT dtdcontent	  - - (dtdcontentmodel, dtdcontenttree?)>
+<!ELEMENT dtdcontentmodel - - (#PCDATA | dtdelemref)*>
+<!ELEMENT dtdcontenttree  - - (#PCDATA)>
+<!ELEMENT dtdattribute	  - - (#PCDATA)>
+<!ELEMENT dtdelemref	  - O EMPTY>
 
-<!attlist dtdelementlist 
-  sysid cdata #required
-  top cdata #required
-  description cdata #implied
-  >
-<!attlist dtdelement gi id #required>
-<!attlist dtdattribute 
-  name cdata #required
-  default cdata #required
-  type cdata #implied>
-<!attlist dtdelemref gi idref #required>
+<!ATTLIST dtdelementlist 
+	sysid 		-- sysid of summarised DTD --
+		CDATA
+		#REQUIRED
+	top		-- name of document-element --
+		CDATA
+		#REQUIRED
+	desc		-- entity containing document marked up using
+			   dtddescription DTD --
+		CDATA
+		#IMPLIED
+	description CDATA #IMPLIED
+			-- now redundant, but kept for compatibility --
+	>
+<!ATTLIST dtdelement gi ID #REQUIRED>
+<!ATTLIST dtdattribute 
+	name CDATA #REQUIRED
+	default CDATA #REQUIRED
+	type CDATA #IMPLIED
+	>
+<!ATTLIST dtdelemref gi IDREF #REQUIRED>
