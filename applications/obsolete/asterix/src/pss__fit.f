@@ -601,7 +601,7 @@
 *      Create data, quality and axis
         CALL BDI_CREDATA( SID, 1, MAXWID+1, STATUS )
         CALL BDI_CREQUAL( SID, 1, MAXWID+1, STATUS )
-        CALL BDI_PUTMASK( SID, QUAL_MASK, STATUS )
+        CALL BDI_PUTMASK( SID, QUAL__MASK, STATUS )
         CALL BDI_CREAXES( SID, 1, STATUS )
         CALL BDI_CREAXVAL( SID, 1, .FALSE., MAXWID+1, STATUS )
 
@@ -635,7 +635,7 @@
         IF ( DI_SIG_V_CRAD ) THEN
           CALL ARR_COP1R( 1, TWID(I), %VAL(APTR+I*VAL__NBR), STATUS )
           CALL ARR_COP1R( 1, TSIG(I), %VAL(DPTR+I*VAL__NBR), STATUS )
-          CALL ARR_COP1B( 1, QUAL_GOOD, %VAL(QPTR+I*VAL__NBUB), STATUS )
+          CALL ARR_COP1B( 1, QUAL__GOOD, %VAL(QPTR+I*VAL__NBUB), STATUS )
         END IF
 
       END DO
@@ -827,7 +827,7 @@
           DO II = GR_RNG_LO(1), GR_RNG_HI(1)
             CP = CP + 1
             DC_BGND(CP) = BGND(II,JJ)
-            DC_Q(CP) = (IMQ(II,JJ).EQ.QUAL_GOOD)
+            DC_Q(CP) = (IMQ(II,JJ).EQ.QUAL__GOOD)
             DC_IMD(CP) = IMD(II,JJ)
           END DO
         END DO
@@ -1823,9 +1823,13 @@
 *
       INTEGER STATUS
 *
+*    Functions :
+*
+      BYTE			BIT_ANDUB
+*
 *    Local variables :
 *
-      REAL                     CMIN                    ! Minimum value in DELC
+      REAL                     CMIN, CMAX              ! Extreme values of DELC
       REAL                     PTOT                    ! Normalisation constant
 
       INTEGER                  I                       ! Loop over DELC
@@ -1835,17 +1839,12 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Find minimum
-      CMIN = VAL__MAXR
-      DO I = 1, N
-        IF ( (QUAL(I) .AND. QUAL_MASK) .EQ. QUAL_GOOD ) THEN
-          IF ( DELC(I) .LT. CMIN ) CMIN = DELC(I)
-        END IF
-      END DO
+      CALL ARR_RANG1RQ( N, DELC, QUAL, QUAL__MASK, CMIN, CMAX, STATUS )
 
 *    Convert to probability
       PTOT = 0.0
       DO I = 1, N
-        IF ( (QUAL(I).AND.QUAL_MASK) .EQ. QUAL_GOOD ) THEN
+        IF ( BIT_ANDUB(QUAL(I),QUAL__MASK) .EQ. QUAL__GOOD ) THEN
           DELC(I) = REAL(DEXP(DBLE(-(DELC(I)-CMIN)/2.0D0)))
           PTOT = PTOT + DELC(I)
         END IF
@@ -1853,7 +1852,7 @@
 
 *    Normalise
       DO I = 1, N
-        IF ( (QUAL(I).AND.QUAL_MASK) .EQ. QUAL_GOOD )
+        IF ( BIT_ANDUB(QUAL(I),QUAL_MASK) .EQ. QUAL_GOOD )
      :                            DELC(I) = DELC(I)/PTOT
       END DO
 
