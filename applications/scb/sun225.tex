@@ -567,7 +567,7 @@ The error message in this case should give an indication of what has
 gone wrong and how to fix it.
 
 
-\subsubsection{Creating a personalised index}
+\subsubsection{\label{sec:personal}Creating a personalised index}
 
 As well as examining all the source files from their natural home
 in the main Starlink source tree (the SCB\_SOURCES directory),
@@ -601,6 +601,34 @@ Note that for this usage of {\tt scbindex.pl} at least one `/' character
 must appear in the package name, otherwise it will be interpreted
 as a reference to the copy of the package in the SCB\_SOURCES directory.
 The personalised index files will be written in the SCB\_INDEX directory.
+
+To make use of the personalised index, rather than the one set as
+the default at install time, the following must be done:
+\begin{itemize}
+\item {\bf Command line use}:
+For using the extractor program {\tt scb.pl} from the command line, 
+set the environment variable SCB\_INDEX to the directory containing
+the indexes, in the same way as during the index build as described
+above.
+\item {\bf CGI browser use}:
+For using {\tt scb.pl} in HTML mode, then append 
+`{\tt ?indexdir=directoryname}' to the script's URL.
+Thus if your index is in {\tt /home/user/star/etc/scb}
+and the browser is installed in {\tt /cgi-bin/star/} on server
+host.domain, then to use the default index you should point
+your browser at
+\begin{quote}
+\begin{verbatim}
+http://host.domain/cgi-bin/star/scb.pl
+\end{verbatim}
+\end{quote}
+and to use your personal index you should point it at
+\begin{quote}
+\begin{verbatim}
+http://host.domain/cgi-bin/star/scb.pl?indexdir=/home/user/star/etc/scb
+\end{verbatim}
+\end{quote}
+\end{itemize}
 
 
 \section{Viewing the source code}
@@ -799,7 +827,9 @@ The best way to see how it works is to play around with it.
 
 The URL of the source code browser will depend on exactly how
 the installation has been performed, but it will look something
-like {\tt http://host.domain/cgi-bin/star/scb.pl}.
+like {\tt http://host.domain/cgi-bin/star/scb.pl} 
+(although see the note in section \ref{sec:personal} 
+if you have built your own index).
 
 
 \subsubsection{Locating a source file}
