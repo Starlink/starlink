@@ -829,8 +829,7 @@ C	   END IF
      &        OFF_Y,N_AZIMP2,N_ELEVP2,PSF_STORE,STATUS)
 
 	      IF(STATUS.NE.SAI__OK)THEN
-	        CALL ERR_REP(' ','Error in BSUB_GET_PSF_GRID - returning
-     & to top level',STATUS)
+	        CALL ERR_REP(' ','Error in BSUB_GET_PSF_GRID', STATUS )
 	        RETURN
 	      ENDIF
 
@@ -861,9 +860,7 @@ C	   END IF
 	    END IF
 
 	    IF(STATUS.NE.SAI__OK)THEN
-	      CALL ERR_REP(' ','Error in BSUB_GET_PSF_GRID - returning to top
-     & level',STATUS)
-	      RETURN
+	      CALL ERR_REP(' ','Error in BSUB_GET_PSF_GRID', STATUS )
 	    ENDIF
 *
 *  now fit this template plus a sloping background
@@ -909,8 +906,7 @@ C	   END IF
      &  %VAL(MAXCT_PTR),IMAXP10,%VAL(P_PTR),%VAL(PQ_PTR),QUALITY,STATUS)
 
 	IF(STATUS.NE.SAI__OK.AND.STATUS.NE.-200)THEN
-	    CALL ERR_REP(' ','Error in GET_MEANS - returning to top level',
-     &STATUS)
+	    CALL ERR_REP(' ','Error in BSUB_GET_MEANS', STATUS )
 	    RETURN
 	ENDIF
 
@@ -1536,35 +1532,37 @@ d		  E(M+1)=1.D0
 	  CALL MSG_PRNT(' ')
 	  CALL MSG_FMTR('MIN','F8.2',MIN_DIFF)
 	  CALL MSG_FMTR('MAX','F8.2',MAX_DIFF)
-	  CALL MSG_PRNT(' For background subtracted image, minimum= ^MIN :
-     + maximum= ^MAX cts ')
+	  CALL MSG_PRNT(' For background subtracted image, '/
+     :                 /'minimum= ^MIN : maximum= ^MAX cts ')
 
 	  CALL MSG_FMTR('DM','F9.3',IMAGE_MEAN)
 	  CALL MSG_FMTR('SM','F9.3',SMOOTH_MEAN)
-	  CALL MSG_PRNT(' Mean of image= ^DM  Mean of smoothed image = ^SM ')
+	  CALL MSG_PRNT(' Mean of image= ^DM  Mean of smoothed'/
+     :               /' image = ^SM ')
 
 	  CALL MSG_FMTR('MDIFF','F8.4',MEAN_IMAGE_DIFF)
 	  CALL MSG_FMTR('RMS','F8.4',RMS_IMAGE)
-	  CALL MSG_PRNT(' Mean difference over image= ^MDIFF : RMS= ^RMS ')
+	  CALL MSG_PRNT(' Mean difference over image= ^MDIFF '/
+     :                        /': RMS= ^RMS ')
 
 	  WORST_BOX_DIFF=WORST_BOX_DIFF*100.
 	  CALL MSG_FMTR('WD','F7.1',WORST_BOX_DIFF)
 	  CALL MSG_FMTI('WB','I3',IWORST)
-	  CALL MSG_PRNT(' Worst % deviation (data-smooth) in a box
-     + is ^WD % in box ^WB ')
+	  CALL MSG_PRNT(' Worst % deviation (data-smooth) in a box'/
+     :                  /' is ^WD % in box ^WB ')
 
 	  AV_BOX_DIFf=AV_BOX_DIFF*100./NBOX_USED
 	  RMS_BOX_DIFF=100.*SQRT(RMS_BOX_DIFF/NBOX_USED)
 	  CALL MSG_FMTR('AVDEV','F7.2',AV_BOX_DIFF)
 	  CALL MSG_FMTR('RMS','F6.1',RMS_BOX_DIFF)
-	  CALL MSG_PRNT(' Average of box (data-smooth) variations = ^AVDEV %
-     + RMS = ^RMS % ')
+	  CALL MSG_PRNT(' Average of box (data-smooth) variations '/
+     :         /'= ^AVDEV % RMS = ^RMS % ')
 *
 	ELSE
 
 	  CALL MSG_PRNT(' ')
-	  CALL MSG_PRNT(' Input image was all zero. Output image is therefore
-     + also zero. ')
+	  CALL MSG_PRNT(' Input image was all zero. Output image'/
+     :    /' is thereforE also zero.')
 
 	END IF
 
@@ -2485,8 +2483,7 @@ d		  E(M+1)=1.D0
 	  CALL BSUB_MIN_FUNC(X,Y,E,N,2,COVAR,ALPHA,A,MA,LISTA,MFIT,
      &	  CHISQ,ALAMBDA,STATUS)
 	  IF(STATUS.NE.SAI__OK.AND.STATUS.NE.-300)THEN
-	    CALL ERR_REP(' ','Error in BSUB_MIN_FUNC - returning to
-     : top level', STATUS)
+	    CALL ERR_REP(' ','Error in BSUB_MIN_FUNC', STATUS )
 	    RETURN
 	  ELSE IF(STATUS.EQ.-300)THEN
 	    RETURN
@@ -2537,8 +2534,7 @@ d		  E(M+1)=1.D0
 	CALL BSUB_MIN_FUNC(X,Y,E,N,2,COVAR,ALPHA,A,MA,LISTA,MFIT,CHISQ,
      &  ALAMBDA,STATUS)
 	IF(STATUS.NE.SAI__OK)THEN
-	  CALL ERR_REP(' ','Error in BSUB_MIN_FUNC - returning to '/
-     :                                        /'top level', STATUS )
+	  CALL ERR_REP(' ','Error in BSUB_MIN_FUNC', STATUS )
 	  RETURN
 	END IF
 *
@@ -2996,8 +2992,7 @@ d		  E(M+1)=1.D0
      &    D_AZIM, D_ELEV, .TRUE.,N_AZIM,N_ELEV,%VAL(PTR),STATUS)
 
 	IF(STATUS.NE.SAI__OK)THEN
-	  CALL ERR_REP(' ','Error in PSF system - returning to top
-     & level',STATUS)
+	  CALL ERR_REP(' ','Error in PSF system', STATUS )
 	  RETURN
 	END IF
 
@@ -3111,8 +3106,7 @@ d		  E(M+1)=1.D0
 *      Work out poisson distribution
 	  CALL BSUB_POISSON(X(I),A,YMOD,DYDA,MA,STATUS)
 	  IF(STATUS.EQ.-100)THEN
-	    CALL ERR_REP(' ','Error in BSUB_POISSON - returning '/
-     :                                    /'to top level', STATUS)
+	    CALL ERR_REP(' ','Error in BSUB_POISSON', STATUS )
 	    RETURN
 	  ELSE IF(STATUS.EQ.-200)THEN
 	    RETURN
@@ -3241,8 +3235,7 @@ d		  E(M+1)=1.D0
               LISTA(KK)=J
               KK=KK+1
             ELSE IF (IHIT.GT.1) THEN
-              CALL ERR_REP(' ','Improper permutation in LISTA',
-     &STATUS)
+              CALL ERR_REP(' ','Improper permutation in LISTA', STATUS )
 	      STATUS=-200
 	      RETURN
             END IF
@@ -3262,8 +3255,7 @@ d		  E(M+1)=1.D0
 	  CALL BSUB_MARQ_COEF(X,Y,EY,NDATA,A,MA,LISTA,MFIT,ALPHA,BETA,NCA,
      &         CHISQ,STATUS)
 	  IF(STATUS.NE.SAI__OK.AND.STATUS.NE.-300)THEN
-	    CALL ERR_REP(' ','Error in BSUB_MARQ_COEF - returning '/
-     :                                      /'to top level', STATUS)
+	    CALL ERR_REP(' ','Error in BSUB_MARQ_COEF', STATUS )
 	    RETURN
 	  ELSE IF(STATUS.EQ.-300)THEN
 	    RETURN
@@ -3316,8 +3308,7 @@ d		  E(M+1)=1.D0
 	CALL BSUB_MARQ_COEF(X,Y,EY,NDATA,ATRY,MA,LISTA,MFIT,COVAR,DA,NCA,
      &CHISQ,STATUS)
 	IF(STATUS.NE.SAI__OK.AND.STATUS.NE.-300)THEN
-	  CALL ERR_REP(' ','Error in BSUB_MARQ_COEF - returning '/
-     :                                    /'to top level', STATUS)
+	  CALL ERR_REP(' ','Error in BSUB_MARQ_COEF', STATUS )
 	  RETURN
 	ELSE IF(STATUS.EQ.-300)THEN
 	  RETURN
@@ -4070,8 +4061,8 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 	CALL MSG_FMTI('XHI','I4',MAX_XPOS)
 	CALL MSG_FMTI('YLOW','I4',MIN_YPOS)
 	CALL MSG_FMTI('YHI','I4',MAX_YPOS)
-	CALL MSG_PRNT(' NON-ZERO image limits are ^XLOW : ^XHI
-     + (in X) and ^YLOW : ^YHI (in Y) ')
+	CALL MSG_PRNT(' NON-ZERO image limits are ^XLOW : ^XHI'/
+     :        /' (in X) and ^YLOW : ^YHI (in Y) ')
 *
 
         IF ( STATUS .NE. SAI__OK ) THEN
