@@ -67,6 +67,9 @@
 *     1998 April 7 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.4  1999/07/17 02:48:48  timj
+*     Check for DCVALUE == VAL__BADR before subtracting it.
+*
 *     Revision 1.3  1999/06/16 21:10:24  timj
 *     Check for bad values
 *
@@ -286,10 +289,14 @@
 
                                  IF (IN_DATA(BOL,POS) .NE. 
      :                                VAL__BADR) THEN
-                                    
-                                    OUT_DATA(BOL,POS) = 
-     :                                   IN_DATA(BOL,POS) - DCVALUE
-                                    
+
+                                    IF (DCVALUE .NE. VAL__BADR) THEN
+                                       OUT_DATA(BOL,POS) = 
+     :                                      IN_DATA(BOL,POS) - DCVALUE
+                                    ELSE
+                                       OUT_DATA(BOL,POS) = VAL__BADR
+                                    END IF
+
                                  ELSE
                                     OUT_DATA(BOL,POS) = 
      :                                   IN_DATA(BOL,POS)

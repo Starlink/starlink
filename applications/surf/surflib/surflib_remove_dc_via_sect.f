@@ -73,6 +73,9 @@
 *     1998 April 7 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.2  1999/07/17 02:48:49  timj
+*     Check for DCVALUE == VAL__BADR before subtracting it.
+*
 *     Revision 1.1  1999/06/16 21:10:31  timj
 *     First version
 *
@@ -216,8 +219,6 @@
 
       END DO
 
-      print *,'BITNUM = ',BITNUM, BADBIT
-
 *     If BITNUM is still -1 that means there was no valid quality
 *     in this case we do not want to bother copying the quality in
 *     just use the raw mask information and set the local badbit
@@ -350,8 +351,6 @@
                            DCVALUE = VAL__BADR
                         END IF
 
-                        print *,INTEGRATION, BOL, DCVALUE,NGOOD
-
 *     Loop over points in scan
                         DO POS = SCAN_START, SCAN_END
 
@@ -359,13 +358,16 @@
 *     Remove it even if quality is bad
                            IF (DORLB) THEN
                                  
-
                               IF (IN_DATA(BOL,POS) .NE. 
      :                             VAL__BADR) THEN
                                  
-                                 OUT_DATA(BOL,POS) = 
-     :                                IN_DATA(BOL,POS) - DCVALUE
-                                    
+                                 IF (DCVALUE .NE. VAL__BADR) THEN
+                                    OUT_DATA(BOL,POS) = 
+     :                                   IN_DATA(BOL,POS) - DCVALUE
+                                 ELSE
+                                    OUT_DATA(BOL,POS) = VAL__BADR
+                                 END IF
+
                               ELSE
                                  OUT_DATA(BOL,POS) = 
      :                                IN_DATA(BOL,POS)
