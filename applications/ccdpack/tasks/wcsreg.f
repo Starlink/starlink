@@ -279,7 +279,7 @@
 *  Report an error if the domain list is empty.
       IF ( DMNLST .EQ. ' ' ) THEN
          STATUS = SAI__ERROR
-         CALL CCD1_ERREP( 'WCSREG_NODMNS', 
+         CALL ERR_REP( 'WCSREG_NODMNS', 
      :        'WCSREG: No valid domains were specified.', STATUS )
          GO TO 99
       END IF
@@ -452,7 +452,7 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( 'WCSREG','WCSREG: Alignment failed.',
+          CALL CCD1_ERREP( 'WCSREG_ERR','WCSREG: Alignment failed.',
      :     STATUS )
       END IF
 
