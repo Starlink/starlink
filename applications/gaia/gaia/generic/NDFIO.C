@@ -47,6 +47,9 @@
 //        Added changes to support NDF "HDUs". This is just a way of
 //        accessing NDF data components and NDFs within container
 //        files and is provided to match the FITS HDU concept.
+//     07-FEB-2000 (PWD):
+//        Added changes to get back writable data components when
+//        needed (for image patching).
 //     {enter_changes_here}
 
 //-
@@ -86,7 +89,7 @@ NDFIO::~NDFIO() {
 
    //  Release all resources accessed in current NDF and related.
    if ( NDFinfo_ ) {
-      rtdReleaseNDF( NDFinfo_ );
+      gaiaReleaseMNDF( NDFinfo_ );
    }
 }
 
@@ -131,26 +134,22 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
    //  that describes the NDFs (of a list of NDFs if more than one are
    //  available at the given HDS path). Displayable array components
    //  of each NDF are known as "displayables".
-   if ( rtdInitNDF( filename, &NDFinfo, &error_mess ) ) {
+   if ( gaiaInitMNDF( filename, &NDFinfo, &error_mess ) ) {
 
       //  Now check that the first NDF contains a displayable that
       //  corresponds to the given component.
-      if ( rtdCheckDisplayable( NDFinfo, 1, component ) ) {
+      if ( gaiaCheckMNDF( NDFinfo, 1, component ) ) {
 
          //  NDF we can display something so get the NDF information
          //  we need.
-         rtdGetNDFInfo( NDFinfo, 1, &name, &bitpix, &width, &height,
-                        &inheader, &header_records, &ndfid, &hasv, &hasq );
+         gaiaGetInfoMNDF( NDFinfo, 1, &name, &bitpix, &width, &height, 
+                          &inheader, &header_records, &ndfid, &hasv, &hasq ); 
 
          //  Create a Mem object to hold the displayable data.
          int tsize = width * height * ( abs( bitpix ) / 8 );
-         //data = Mem( tsize, useShm );
-         //indata = data.ptr();
-         void *indata;
 
-         // Now copy the data into it.
-         if ( rtdCopyDisplayable( NDFinfo, 1, component, &indata,
-                                  &error_mess ) ) {
+         // Now map the data and initialise with this pointer.
+         if ( gaiaGetMNDF( NDFinfo, 1, component, &indata, &error_mess ) ) {
 
             data = Mem( indata, tsize, 0 );
 
@@ -192,9 +191,9 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
 int NDFIO::write( const char *pathname ) 
 {
    char *error_mess;
-   if ( rtdWriteNDF( pathname, bitpix_, width_, height_, data_.ptr(),
-                     ndfid_, component(), (char *) header_.ptr(),
-                     header_.size(), &error_mess ) ) {
+   if ( gaiaWriteNDF( pathname, bitpix_, width_, height_, data_.ptr(),
+                      ndfid_, component(), (char *) header_.ptr(),
+                      header_.size(), &error_mess ) ) {
       return OK;
    } else {
 
@@ -354,7 +353,7 @@ char* NDFIO::get(const char* keyword) const {
 //
 int NDFIO::getNumNDFs()
 {
-   return rtdCountNDFs( NDFinfo_ );
+   return gaiaCountMNDFs( NDFinfo_ );
 }
 
 //
@@ -362,11 +361,11 @@ int NDFIO::getNumNDFs()
 //
 int NDFIO::checkComponent( int index, const char *component )
 {
-   return rtdCheckDisplayable( NDFinfo_, index, component );
+   return gaiaCheckMNDF( NDFinfo_, index, component );
 }
 
 //
-//  Set the current displayable.
+//  Set the current displayable. Do nothing if already current.
 //
 int NDFIO::setDisplayable( int index, const char *component )
 {
@@ -374,9 +373,24 @@ int NDFIO::setDisplayable( int index, const char *component )
    if ( index == curd_ && component[0] == component_[0] ) {
       return 1;
    }
+   return makeDisplayable( index, component );
+}
 
+//
+//  Reset the displayable NDF component.
+//
+int NDFIO::resetDisplayable()
+{
+   return makeDisplayable( curd_, component_ );
+}
+
+//
+//  Make given displayable the current image.
+//
+int NDFIO::makeDisplayable( int index, const char *component )
+{
    //  Check component and NDF are available.
-   if ( rtdCheckDisplayable( NDFinfo_, index, component ) ) {
+   if ( gaiaCheckMNDF( NDFinfo_, index, component ) ) {
 
       //  Ok, get NDF information and displayable data.
       Mem data;
@@ -385,8 +399,6 @@ int NDFIO::setDisplayable( int index, const char *component )
       char *inheader;
       char *name;
       const int header_length = 80;
-      double bscale = 1.0;
-      double bzero = 0.0;
       int bitpix = 0;
       int header_records = 0;
       int height = 0;
@@ -395,24 +407,32 @@ int NDFIO::setDisplayable( int index, const char *component )
       int hasv;
       int hasq;
       void *indata;
-      rtdGetNDFInfo( NDFinfo_, index, &name, &bitpix, &width, &height,
-                     &inheader, &header_records, &ndfid, &hasv, &hasq );
+      gaiaGetInfoMNDF( NDFinfo_, index, &name, &bitpix, &width,
+                       &height, &inheader, &header_records, &ndfid,
+                       &hasv, &hasq ); 
 
       //  Create a Mem object to hold the displayable data.
       int tsize = width * height * ( abs( bitpix ) / 8 );
-      // data = Mem( tsize, data_.shared() );
-      //indata = data.ptr();
 
       //  Release existing displayable.
       if ( curd_ != 0 ) {
-         rtdFreeDisplayable( NDFinfo_, curd_ );
+         gaiaFreeMNDF( NDFinfo_, curd_ );
+      }
+
+      //  If NDF is marked writable then we need to allocate some
+      //  memory to store the image.
+      int readonly = gaiaGetReadMNDF( NDFinfo_, index );
+      if ( ! readonly ) {
+         data = Mem( tsize, 0 );
+         indata = data.ptr();
       }
 
       // Now copy the data into it.
-      if ( rtdCopyDisplayable( NDFinfo_, index, component, &indata,
-                               &error_mess ) ) {
-
-         data = Mem( indata, tsize, 0 );
+      if ( gaiaGetMNDF( NDFinfo_, index, component, &indata, &error_mess ) ) {
+         if ( readonly ) {
+            //  Mem object just accepts pointer to mapped memory.
+            data = Mem( indata, tsize, 0 );
+         }
 
          // Copy the header.
          header = Mem( header_length * header_records + 1, header_.shared() );
@@ -462,8 +482,8 @@ void NDFIO::getNDFInfo( int index, char *name, char *naxis1, char *naxis2,
    int hasq;
    int hasv;
 
-   rtdGetNDFInfo( NDFinfo_, index, &named, &bitpix, &width, &height,
-                  &header, &hlen, &ndfid, &hasv, &hasq );
+   gaiaGetInfoMNDF( NDFinfo_, index, &named, &bitpix, &width, &height,
+                    &header, &hlen, &ndfid, &hasv, &hasq );
 
    strcpy( name, named );
    sprintf( naxis1, "%d", width );
@@ -478,4 +498,22 @@ void NDFIO::getNDFInfo( int index, char *name, char *naxis1, char *naxis2,
    } else {
       strcpy( hasqual, "false" );
    }
+}
+
+//
+//  Return if the current NDF has readonly status (i.e. it's data
+//  shouldn't be modified).
+//
+int NDFIO::getReadonly()
+{
+   return gaiaGetReadMNDF( NDFinfo_, curd_ );
+}
+
+//
+//  Set the readonly status of the current NDF. To get data in new
+//  mode do resetDisplayable.
+//
+void NDFIO::setReadonly( int status )
+{
+   gaiaSetReadMNDF( NDFinfo_, curd_, status );
 }

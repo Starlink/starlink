@@ -36,7 +36,7 @@
 #include "fitshead.h"
 
 #include "ImageIO.h"
-#include "rtdNDF.h"
+#include "gaiaNDF.h"
 
 class NDFIO : public ImageIORep {
 
@@ -54,11 +54,11 @@ protected:
    //  Current NDF data component.
    char component_[20];
    
-   //  Current NDF index.
-   int curd_;
-   
    //  Information structure for NDF displayables.
    void *NDFinfo_;
+   
+   //  Current NDF index.
+   int curd_;
    
 public:
    
@@ -121,12 +121,24 @@ public:
    //  Check in NDF has the specified component.
    int checkComponent( int index, const char *component );
    
-   //  Set the current NDF and component.
+   //  Set the current NDF and component (not if current already)
    int setDisplayable( int index, const char *component );
+   
+   //  Set the current NDF and component.
+   int makeDisplayable( int index, const char *component );
+
+   //  Reset the current NDF and component.
+   int resetDisplayable();
    
    //  Get printable NDF information.
    void getNDFInfo( int index, char *name, char *naxis1, char *naxis2,
                     char *hasvar, char *hasqual );
+
+   //  Get readonly status of current displayable.
+   int getReadonly();
+
+   //  Set readonly status of current displayable.
+   void setReadonly( int status );
 };
 
 #endif // _NDFIO_h_

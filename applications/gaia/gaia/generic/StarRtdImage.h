@@ -204,13 +204,16 @@ class StarRtdImage : public Skycat {
    int hduCmd( int argc, char *argv[] );
 
    //  Replacement mband command, also allows for pixels and non-celestial.
-   gbandCmd( int argc, char *argv[] );
+   int gbandCmd( int argc, char *argv[] );
 
    //  Fullname command.
    int fullNameCmd( int argc, char *argv[] );
 
    //  "isfits" command.
    int isfitsCmd( int argc, char *argv[] );
+
+   //  Readonly command (used to make NDF writeable).
+   int readonlyCmd( int argc, char *argv[] );
 
   protected:
 

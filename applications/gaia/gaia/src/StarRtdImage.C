@@ -209,6 +209,7 @@ public:
    { "origin",        &StarRtdImage::originCmd,       2, 2 },
    { "percentiles",   &StarRtdImage::percentCmd,      1, 1 },
    { "plotgrid",      &StarRtdImage::plotgridCmd,     0, 2 },
+   { "readonly",      &StarRtdImage::readonlyCmd,     0, 1 },
    { "remote",        &StarRtdImage::remoteCmd,       0, 1 },
    { "slice",         &StarRtdImage::sliceCmd,       11, 11},
    { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
@@ -933,7 +934,7 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
        } else {
           int dsize = abs( imptr->bitpix() ) / 8;
           FITS_LONG l = 1;
-          if ( ntohl( l ) == l || dsize == 1 ) {
+          if ( (FITS_LONG) ntohl( l ) == l || dsize == 1 ) {
              info->swap = 0;
           } else {
              info->swap = 1;
@@ -3514,7 +3515,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
       } else {
          int dsize = abs( imptr->bitpix() ) / 8;
          FITS_LONG l = 1;
-         if ( ntohl( l ) == l || dsize == 1 ) {
+         if ( (FITS_LONG)ntohl( l ) == l || dsize == 1 ) {
             swap = 0;
          } else {
             swap = 1;
@@ -3967,7 +3968,7 @@ int StarRtdImage::ndfHduCmd( const ImageIO &imio, int argc, char *argv[] )
 //     This displays the required NDF and its component from the list
 //     of NDFs available in the current container file.
 //-
-int StarRtdImage::ndfCmdSet(int argc, char** argv, NDFIO* ndf)
+int StarRtdImage::ndfCmdSet( int argc, char** argv, NDFIO* ndf )
 {
 
    //  First argument is an optional "set".
@@ -4039,8 +4040,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
    //  Loop though all NDFs getting the required information.
    ostrstream os;
    for ( int i = 1; i <= numNDFs; i++ ) {
-      char name[80], naxis[32], naxis1[32], naxis2[32];
-      char hasvar[32], hasqual[32];
+      char name[80], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
       ndf->getNDFInfo( i, name, naxis1, naxis2, hasvar, hasqual );
       os << "{"
          << i
@@ -4720,8 +4720,7 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
       int nndf = ndf->getNDFNum();
       
       //  Need NDF path
-      char ndfpath[80], naxis[32], naxis1[32], naxis2[32];
-      char hasvar[32], hasqual[32];
+      char ndfpath[80], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
       ndf->getNDFInfo( nndf, ndfpath, naxis1, naxis2, hasvar, hasqual );
       char buffer[1024];
 
@@ -4802,7 +4801,6 @@ int StarRtdImage::remoteCmd( int argc, char *argv[] )
    }
 
    //  Get port number (0 means that one is chosen for us).
-   char *cmd = "";
    int port = 0;
    if ( Tcl_GetInt(interp_, argv[0], &port) == TCL_ERROR ) {
       return TCL_ERROR;
@@ -4821,4 +4819,52 @@ int StarRtdImage::remoteCmd( int argc, char *argv[] )
       return remote_->status();
    }
    return TCL_ERROR;
+}
+
+//+
+//   StarRtdImage::readonlyCmd
+//
+//   Purpose:
+//      Implement the "readonly" command. This allows a readonly
+//      displayed NDF to be switched to writable mode and the current
+//      readonly status of the image to be determined. FITS images are
+//      always (XXX) mapped as read-write.
+//
+//-
+int StarRtdImage::readonlyCmd( int argc, char *argv[] )
+{
+   int readonly = 1;
+   int isndf = 0;
+   NDFIO *ndf;
+   ImageIO imio = image_->image();
+   
+   //  Inquire image readonly status.
+   if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
+      ndf = (NDFIO *) imio.rep();
+      readonly = ndf->getReadonly();
+      isndf = 1;
+   } else {
+
+      //  FITS images are writable.
+      readonly = 0;
+      isndf = 0;
+   }
+
+   //  If just inquiring then return value.
+   if ( argc == 0 ) {
+      return set_result( readonly );
+   }
+
+   //  Get new value.
+   int value;
+   if ( Tcl_GetInt( interp_, argv[0], &value ) != TCL_OK ) {
+      return error( argv[0], " is not an integer");
+   }
+
+   //  If readonly status changed then re-read image.
+   if ( value != readonly && isndf ) {
+      ndf->setReadonly( value );
+      ndf->resetDisplayable();
+   }
+   return set_result( value );
 }

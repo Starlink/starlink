@@ -64,6 +64,7 @@ struct NDFinfo {
       int type;             /*  NDF data type (as bitpix) */
       int nx;               /*  First dimension of NDF */
       int ny;               /*  Second dimension of NDF */
+      int readonly;         /*  Readonly access */
       int havevar;          /*  Variance component exists */
       int havequal;         /*  Quality array exists */
       char *header;         /*  Pointer to FITS headers */
@@ -71,7 +72,6 @@ struct NDFinfo {
       struct NDFinfo *next; /*  Pointer to next NDF with displayables */
 };
 typedef struct NDFinfo NDFinfo;
-
 
 /*  Prototypes for external Fortran routines */
 extern void F77_EXTERNAL_NAME(rtd_rdndf)( CHARACTER(ndfname),
@@ -142,7 +142,7 @@ static char *errMessage( int *status );
  *     returning. Make sure status is set before calling this and
  *     release the memory used for the string when complete. On
  *     return status is reset to SAI__OK and the error stack is
- *     empty.  
+ *     empty.
  */
 static char *errMessage( int *status )
 {
@@ -175,7 +175,7 @@ static char *errMessage( int *status )
  *  Purpose:
  *     Access an NDF by name.
  *
- * Description: 
+ * Description:
  *     Accesses an NDF by name (filename or HDS pathname) returning
  *     its data type (as FITS bitpix), width and height, a pseudo FITS
  *     header (including any WCS information) and the NDF identifier.
@@ -184,16 +184,13 @@ static char *errMessage( int *status )
  *     Releasing the header is also the caller's responsibility.
  */
 int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
-                  char **header, int *header_length, int *ndfid,
-                  char **error_mess )
+                   char **header, int *header_length, int *ndfid,
+                   char **error_mess )
 {
    DECLARE_CHARACTER(ndfname, MXNAME);   /* Local copy of filename (F77) */
    DECLARE_CHARACTER(tmpname, MXNAME);   /* Local copy of filename (F77) */
    DECLARE_INTEGER(status);              /* Global status */
    DECLARE_POINTER(charPtr);             /* Pointer to F77 character array */
-   char *opStr;
-   char *opPtr;
-   int used, i, j, errcount;
 
    /* Convert the file name into an F77 string */
    strcpy( tmpname, filename );
@@ -234,8 +231,8 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
  *     component with the data given.
  */
 int gaiaWriteNDF( const char *filename, int type, int width, int height,
-                 void *data , int ndfid, const char *component,
-                 const char *header, int lheader, char **error_mess )
+                  void *data , int ndfid, const char *component,
+                  const char *header, int lheader, char **error_mess )
 {
    DECLARE_CHARACTER(ndfname,MXNAME);   /* Local copy of filename (F77) */
    DECLARE_CHARACTER(tmpname,MXNAME);   /* Local copy of filename (F77) */
@@ -243,9 +240,6 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
    DECLARE_INTEGER(status);             /* Global status */
    DECLARE_POINTER(dataPtr);            /* Pointer to F77 memory */
    DECLARE_CHARACTER_ARRAY_DYN(fhead);
-   char *opStr;
-   char *opPtr;
-   int used, i, j, errcount;
    int dims[1];
 
    /* Convert the file name into an F77 string */
@@ -271,7 +265,7 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
 
    /* Attempt to open the NDF. */
    emsMark();
-   F77_CALL( gaia_wrndf )( CHARACTER_ARG(ndfname),
+   F77_CALL( rtd_wrndf )( CHARACTER_ARG(ndfname),
                           INTEGER_ARG(&type),
                           INTEGER_ARG(&ndfid),
                           POINTER_ARG(&dataPtr),
@@ -303,7 +297,7 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
  *     gaiaFreeNDF
  *
  *  Purpose:
- *     Free an NDF, by anulling it's identifier and freeing any
+ *     Free an NDF, by anulling its identifier and freeing any
  *     locally allocated resources.
  */
 int gaiaFreeNDF( int ndfid )
@@ -317,7 +311,7 @@ int gaiaFreeNDF( int ndfid )
    emsMark();
 
    /*  Free any quality associated with this NDF (should be safe under
-    *  any circumstances).  
+    *  any circumstances).
     */
    if ( ndfid != 0 ) {
       F77_CALL( rtd1_aqual)( INTEGER_ARG(&ndfid), LOGICAL_ARG(&grab),
@@ -337,39 +331,114 @@ int gaiaFreeNDF( int ndfid )
 /*
  *   Name:
  *      gaiaCopyNDF
- * 
+ *
  *   Purpose:
  *      Copy an NDF data component into an array of previously
  *      allocated memory. The routine uses NDF chunking to minimize
  *      the total memory footprint.
  */
 int gaiaCopyNDF( int ndfid, void **data, const char* component,
-                char **error_mess )
+                 char **error_mess )
 {
-   char *opPtr;
-   char *opStr;
    char dtype[NDF__SZTYP+1];
    int chunkid;
    int el;
-   int errcount;
    int i;
    int j;
    int nchunk;
    int status = SAI__OK;
-   int used;
    void *ptr[1];
 
    /* Get the type of the NDF component. */
    emsMark();
    ndfBegin();
    ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
-   
-   /*  Trap _DOUBLE and really map _REAL */
+
+   /*  Determine the number of chunks needed to copy the data. */
+   ndfNchnk( ndfid, MXPIX, &nchunk, &status );
+
+   /*  Using the appropriate data type, access the NDF chunks and copy
+    *  data.
+    */
    if ( strncmp( dtype, "_DOUBLE", 7 ) == 0 ) {
-      strcpy( dtype, "_REAL" );
+
+      /*  Double type not available, so use float, check for values that
+          cannot be represented and set bad */
+      double *fromPtr;
+      float *toPtr = *data;
+      double hi = FLT_MAX;
+      double lo = -FLT_MAX;
+      for ( i = 1; i <= nchunk; i++ ) {
+         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
+         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
+         fromPtr = (double *) ptr[0];
+         for( j = 0; j < el; j++ ) {
+            if ( *fromPtr <= hi && *fromPtr > lo ) {
+               *toPtr++ = (float)*fromPtr++;
+            } else {
+               *toPtr++ = -FLT_MAX;
+            }
+         }
+      }
+   } else if ( strncmp( dtype, "_REAL", 5 ) == 0 ) {
+      float *fromPtr;
+      float *toPtr = *data;
+      for ( i = 1; i <= nchunk; i++ ) {
+         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
+         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
+         fromPtr = ptr[0];
+         for( j = 0; j < el; j++ ) {
+            *toPtr++ = *fromPtr++;
+         }
+      }
+   } else if ( strncmp( dtype, "_INTEGER", 8 ) == 0 ) {
+      int *fromPtr;
+      int *toPtr = *data;
+      for ( i = 1; i <= nchunk; i++ ) {
+         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
+         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
+         fromPtr = ptr[0];
+         for( j = 0; j < el; j++ ) {
+            *toPtr++ = *fromPtr++;
+         }
+      }
+   } else if ( strncmp( dtype, "_WORD", 5 ) == 0 ||
+               strncmp( dtype, "_UWORD", 6 ) == 0 ) {
+      unsigned short *fromPtr;
+      unsigned short *toPtr = *data;
+      for ( i = 1; i <= nchunk; i++ ) {
+         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
+         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
+         fromPtr = (unsigned short *) ptr[0];
+         for( j = 0; j < el; j++ ) {
+            *toPtr++ = *fromPtr++;
+         }
+      }
+   } else if ( strncmp( dtype, "_BYTE", 5 ) == 0 ) {
+      unsigned char *fromPtr;
+      unsigned char *toPtr = *data;
+      for ( i = 1; i <= nchunk; i++ ) {
+         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
+         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
+         fromPtr = (unsigned char *) ptr[0];
+         for( j = 0; j < el; j++ ) {
+            *toPtr++ = *fromPtr++;
+         }
+      }
+   } else if ( strncmp( dtype, "_UBYTE", 6 ) == 0 ) {
+
+      /*  Cannot represent this type, so mapping is to short */
+      unsigned char *fromPtr;
+      unsigned short *toPtr = *data;
+      for ( i = 1; i <= nchunk; i++ ) {
+         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
+         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
+         fromPtr = (unsigned char *) ptr[0];
+         for( j = 0; j < el; j++ ) {
+            *toPtr++ = (unsigned short) *fromPtr++;
+         }
+      }
    }
-   ndfMap( ndfid, component, dtype, "READ", ptr, &el, &status ); 
-   *data = ptr[0];
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
@@ -386,43 +455,35 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
 /*
  *   Name:
  *      gaiaMapNDF
- * 
+ *
  *   Purpose:
  *      Map an NDF data component for READ access, returning a pointer
  *      to the mapped memory. The memory must be unmapped either
  *      directly or by annuling the NDF identifier, before the program
- *      exits.  
+ *      exits.
  *
  *   Note:
- *      If the data values require modification, then a copy should be 
+ *      If the data values require modification, then a copy should be
  *      made instead.
  */
-int gaiaMap NDF( int ndfid, void **data, const char* component,
+int gaiaMapNDF( int ndfid, void **data, const char* component,
                 char **error_mess )
 {
-   char *opPtr;
-   char *opStr;
    char dtype[NDF__SZTYP+1];
-   int chunkid;
    int el;
-   int errcount;
-   int i;
-   int j;
-   int nchunk;
    int status = SAI__OK;
-   int used;
    void *ptr[1];
 
    /* Get the type of the NDF component. */
    emsMark();
    ndfBegin();
    ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
-   
+
    /*  Trap _DOUBLE and really map _REAL */
    if ( strncmp( dtype, "_DOUBLE", 7 ) == 0 ) {
       strcpy( dtype, "_REAL" );
    }
-   ndfMap( ndfid, component, dtype, "READ", ptr, &el, &status ); 
+   ndfMap( ndfid, component, dtype, "READ", ptr, &el, &status );
    *data = ptr[0];
 
    /* If an error occurred return an error message */
@@ -438,8 +499,44 @@ int gaiaMap NDF( int ndfid, void **data, const char* component,
 }
 
 /*
- *  Set the state of an NDFinfo object.
- *  Queries the NDF about the existence of components.
+ *   Name:
+ *      gaiaNDFUnmap
+ *
+ *   Purpose:
+ *      Unmaps the named NDF component.
+ *
+ *   Notes:
+ *      Component name can be "*" which unmaps everything.
+ */
+int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
+{
+   int status = SAI__OK;
+   emsMark();
+   ndfUnmap( ndfid, component, &status );
+   if ( status != SAI__OK ) {
+      *error_mess = errMessage( &status );
+      ndfEnd( &status );
+      emsRlse();
+      return 0;
+   }
+   ndfEnd( &status );
+   emsRlse();
+   return 1;
+}
+
+/*  ===================================== */
+/*  Multiple NDFs per container interface */
+/*  ===================================== */
+
+/*
+ *   Name:
+ *      setState
+ *
+ *   Purpose:
+ *      Set the state of an NDFinfo object.
+ *
+ *   Notes:
+ *      Actually queries the NDF about the existence of components.
  */
 static void setState( struct NDFinfo *state, int ndfid, const char *name,
                       int type, int nx, int ny, char *header,
@@ -453,6 +550,7 @@ static void setState( struct NDFinfo *state, int ndfid, const char *name,
    state->type = type;
    state->nx = nx;
    state->ny = ny;
+   state->readonly = 1;
    state->header = header;
    state->hlen = hlen;
 
@@ -481,18 +579,56 @@ static void setState( struct NDFinfo *state, int ndfid, const char *name,
 }
 
 /*
- *  Categorise and store displayable information for the given NDF and
- *  any related ones.
+ *  Name:
+ *     getNDFInfo
  *
- *  Displayables in this context are either array components of the
- *  given NDF, or the components of any other NDFs which are stored at
- *  the same "level" (i.e. HDS path) within a HDS container file.
- *
- *  The return from this function is a pointer to an initialised
- *  information structure about the NDFs and displayables
- *  available. If this fails then zero is returned.
+ *  Purpose:
+ *     Locate NDF in the given info structure. Returns pointer, or
+ *     NULL if not found.
  */
-int gaiaInitNDF( const char *name, void **handle, char **error_mess )
+static NDFinfo *getNDFInfo( const void *handle, const int index )
+{
+   NDFinfo *current = (NDFinfo *) handle;
+   int count = 0;
+   int status = 1;
+   if ( current ) {
+      for ( count = 1; count < index; count++ ) {
+         current = current->next;
+         if ( current == NULL ) {
+            status = 0;
+            break;
+         }
+      }
+      if ( status ) {
+         return current;
+      }
+   }
+   return NULL;
+}
+
+/*
+ *  Name:
+ *     gaiaInitMNDF
+ *
+ *  Purpose:
+ *     Initialise access to an NDF and/or any related NDFs. This
+ *     routine should be called before any others in the multiple
+ *     NDFs per container file interface.
+ *
+ *  Description:
+ *     Categorise and store displayable information for the given NDF and
+ *     any related ones.
+ *
+ *     Displayables in this context are either array components of the
+ *     given NDF, or the components of any other NDFs which are stored at
+ *     the same "level" (i.e. HDS path) within a HDS container file.
+ *
+ *     The return from this function is a pointer to an initialised
+ *     information structure about the NDFs and displayables
+ *     available. If this fails then zero is returned.
+ *
+ */
+int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 {
    NDFinfo *head = (NDFinfo *) NULL;
    NDFinfo *newstate = (NDFinfo *) NULL;
@@ -511,7 +647,6 @@ int gaiaInitNDF( const char *name, void **handle, char **error_mess )
    char slice[MXNAME];
    char tmploc[DAT__SZLOC];
    int baseid = 0;
-   int count = 0;
    int first;
    int height;
    int hlen;
@@ -545,7 +680,7 @@ int gaiaInitNDF( const char *name, void **handle, char **error_mess )
       ndfLoc( ndfid, "READ", tmploc, &status );
       datParen( tmploc, baseloc, &status );
 
-      /*  See if the NDF has a slice. If so all components and NDFs in 
+      /*  See if the NDF has a slice. If so all components and NDFs in
           this file will also have that slice applied */
       left = strrchr( name, '(');
       right = strrchr( name, ')');
@@ -646,7 +781,7 @@ int gaiaInitNDF( const char *name, void **handle, char **error_mess )
 
             /*  Check that this isn't the base NDF by another name */
             if ( ndfid != 0 && baseid != 0 ) {
-               ndfSame( baseid, ndfid, &same, &isect, &status ); 
+               ndfSame( baseid, ndfid, &same, &isect, &status );
             } else {
                same = 0;
             }
@@ -676,7 +811,7 @@ int gaiaInitNDF( const char *name, void **handle, char **error_mess )
    } else {
 
       /*  Initialisation failed (no such NDF, or container file/path
-       *  doesn't have any NDFs in it). 
+       *  doesn't have any NDFs in it).
        */
       if ( emess ) {
          *error_mess = emess;
@@ -694,126 +829,122 @@ int gaiaInitNDF( const char *name, void **handle, char **error_mess )
 }
 
 /*
- *  See if the given NDF contains a named displayable component.
+ *  Name:
+ *     gaiaCheckMNDF
  *
- *  If not found then a 0 is returned.
- *
+ *  Purpose:
+ *     See if the given NDF (specified by its index) contains the
+ *     required component. If not found then a 0 is returned.
  */
-int gaiaCheckDisplayable( const void *handle, int index, const char *component )
+int gaiaCheckMNDF( const void *handle, int index, const char *component )
 {
-   NDFinfo *current = (NDFinfo *) handle;
-   int count = 0;
+   NDFinfo *current = NULL;
    int status = 1;
 
+   /*  Get pointer to relevant NDF */
+   current = getNDFInfo( handle, index );
+
+   /*  See if the component exists */
    if ( current ) {
-
-      /*  Offset into the structure by the given amount. */
-      for ( count = 1; count < index; count++ ) {
-         current = current->next;
-         if ( current == NULL ) {
-            status = 0;
-            break;
+      switch ( component[0] ) {
+         case 'd':
+         case 'D': {
+            status = 1;
          }
-      }
-      if ( status ) {
-
-         /*  See if the component exists */
-         switch ( component[0] ) {
-            case 'd':
-            case 'D': {
+         break;
+         
+         case 'v':
+         case 'V': {
+            if ( current->havevar ) {
                status = 1;
-            }
-            break;
-
-            case 'v':
-            case 'V': {
-               if ( current->havevar ) {
-                  status = 1;
-               } else {
-                  status = 0;
-               }
-            }
-            break;
-
-            case 'q':
-            case 'Q': {
-               if ( current->havequal ) {
-                  status = 1;
-               } else {
-                  status = 0;
-               }
-            }
-            break;
-
-            default: {
+            } else {
                status = 0;
             }
-            break;
          }
+         break;
+         
+         case 'q':
+         case 'Q': {
+            if ( current->havequal ) {
+               status = 1;
+            } else {
+               status = 0;
+            }
+         }
+         break;
+         
+         default: {
+            status = 0;
+         }
+         break;
       }
    } else {
+
+      /*  Bad NDF index */
       status = 0;
    }
    return status;
 }
 
 /*
- *  Return useful information about an NDF.
+ *  Name:
+ *     gaiaGetInfoMNDF
+ *
+ *  Purpose:
+ *     Get information about a particular NDF.
  */
-void gaiaGetNDFInfo( const void *handle, int index,
-                    char **name, int *type, int *width,
-                    int *height, char **header, int *hlen,
-                    int *ndfid, int *hasvar, int *hasqual )
+void gaiaGetInfoMNDF( const void *handle, int index, char **name,
+                      int *type, int *width, int *height, 
+                      char **header, int *hlen, int *ndfid, 
+                      int *hasvar, int *hasqual ) 
 {
-   NDFinfo *current = (NDFinfo *) handle;
-   int count = 0;
-   int status = 1;
+   NDFinfo *current = NULL;
+   current = getNDFInfo( handle, index );
    if ( current ) {
-
-      /*  Offset into the structure by the given amount. */
-      for ( count = 1; count < index; count++ ) {
-         current = current->next;
-         if ( current == NULL ) {
-            status = 0;
-            break;
-         }
-      }
-      if ( status ) {
-         *name = current->name;
-         *type = current->type;
-         *width = current->nx;
-         *height = current->ny;
-         *header = current->header;
-         *hlen = current->hlen;
-         *ndfid = current->ndfid;
-         *hasvar = current->havevar;
-         *hasqual = current->havequal;
-      }
+      *name = current->name;
+      *type = current->type;
+      *width = current->nx;
+      *height = current->ny;
+      *header = current->header;
+      *hlen = current->hlen;
+      *ndfid = current->ndfid;
+      *hasvar = current->havevar;
+      *hasqual = current->havequal;
    }
 }
 
 /*
- *  Copy a displayables data component into some memory.
+ *  Name:
+ *     gaiaGetMNDF
+ *
+ *  Purpose:
+ *     Obtained a copy of an NDF data component. 
+ *
+ *  Description:
+ *     This routine obtains access to a named NDF data component and
+ *     returns either a copy or a pointer to mapped memory depending
+ *     the readonly state of the NDF. 
+ *
+ *     If readonly is true then a mapped pointer is returned,
+ *     otherwise a copy is made into some supplied memory (may want to 
+ *     offer malloc version?).
  */
-int gaiaCopyDisplayable( const void *handle, int index, const char *component,
-                        void **data, char **error_mess )
+int gaiaGetMNDF( const void *handle, int index, const char *component,
+                 void **data, char **error_mess )
 {
-   /*  Access the appropriate NDF information structure */
-   NDFinfo *current = (NDFinfo *) handle;
-   int count = 0;
-   int status = 1;
+   NDFinfo *current = NULL;
+   current = getNDFInfo( handle, index );
+
    if ( current ) {
-      for ( count = 1; count < index; count++ ) {
-         current = current->next;
-         if ( current == NULL ) {
-            status = 0;
-            break;
-         }
-      }
-      if ( status ) {
-         /*  Copy the data */
-         return gaiaCopyNDF( current->ndfid, data, component,
+
+      /*  Either copy the data or obtained a mapped pointer according
+       *  to the readonly status */
+      if ( current->readonly ) {
+         return gaiaMapNDF( current->ndfid, data, component,
                             error_mess );
+      } else {
+         return gaiaCopyNDF( current->ndfid, data, component,
+                             error_mess );
       }
    }
 
@@ -822,10 +953,54 @@ int gaiaCopyDisplayable( const void *handle, int index, const char *component,
    return 0;
 }
 
-/*
- *  Return the number of NDFs available.
+/*  
+ *  Name:
+ *     gaiaSetReadMNDF
+ *
+ *  Purpose:
+ *     Set the access method for the NDF data components.
+ *     The value is 1 for readonly and 0 for writable memory.
+ *  
+ *  Notes:
+ *     Existing memory is not affected by this call, you will need to
+ *     recall gaiaFreeMNDF and gaiaGetMNDF make the change.
  */
-int gaiaCountNDFs( const void *handle )
+void gaiaSetReadMNDF( const void *handle, int index, int readonly )
+{
+   NDFinfo *current = getNDFInfo( handle, index );
+   if ( current ) {
+      current->readonly = readonly;
+   }
+}
+
+/*  
+ *  Name:
+ *     gaiaGetReadMNDF
+ *
+ *  Purpose:
+ *     Get the access method for the NDF data components.
+ *  
+ *  Notes:
+ *     Existing memory is not affected by this call, you will need to
+ *     recall gaiaFreeMNDF and gaiaGetMNDF make the change.
+ */
+int gaiaGetReadMNDF( const void *handle, int index )
+{
+   NDFinfo *current = getNDFInfo( handle, index );
+   if ( current ) {
+      return current->readonly;
+   }
+   return -1;
+}
+
+/*
+ *  Name:
+ *     gaiaCountMNDFs
+ *
+ *  Purpose:
+ *     Return the number of NDFs available.
+ */
+int gaiaCountMNDFs( const void *handle )
 {
    NDFinfo *current = (NDFinfo *) handle;
    int count = 0;
@@ -837,12 +1012,15 @@ int gaiaCountNDFs( const void *handle )
 }
 
 /*
- *  Release all NDF resources.
+ *  Name:
+ *     gaiaReleaseMNDF
+ * 
+ *  Purpose:
+ *     Release all NDF resources associated with given handle.
  */
-void gaiaReleaseNDF( const void *handle )
+void gaiaReleaseMNDF( const void *handle )
 {
    NDFinfo *current = (NDFinfo *) handle;
-   int count = 0;
    if ( current ) {
       for ( ; current->next; current = current->next ) {
          gaiaFreeNDF( current->ndfid );
@@ -854,33 +1032,24 @@ void gaiaReleaseNDF( const void *handle )
 }
 
 /*
- *  Release displayables accessed for an NDF.
+ *  Name:
+ *     gaiaFreeMNDF
+ *
+ *  Purpose:
+ *     Release components accessed for an NDF.
  */
-void gaiaFreeDisplayable( void *handle, int index ) 
-{   
-   /*  Access the appropriate NDF information structure */
-   NDFinfo *current = (NDFinfo *) handle;
-   int count = 0;
-   int located = 1;
+void gaiaFreeMNDF( void *handle, int index )
+{
    int status = SAI__OK;
 
+   /*  Access the appropriate NDF information structure */
+   NDFinfo *current = getNDFInfo( handle, index );
    if ( current ) {
-      for ( count = 1; count < index; count++ ) {
-         current = current->next;
-         if ( current == NULL ) {
-            located = 0;
-            break;
-         }
-      }
-      if ( located ) {
-         
-         /*  Free the NDF array components */
-         emsMark();
-         ndfUnmap( current->ndfid, "*", &status );
-         emsRlse();
-      }
+      emsMark();
+      ndfUnmap( current->ndfid, "*", &status );
+      emsRlse();
    }
-} 
+}
 
 /*  ============ */
 /*  HDS wrappers */
@@ -900,7 +1069,7 @@ void gaiaFreeDisplayable( void *handle, int index )
 extern void F77_EXTERNAL_NAME(dat_annul)( CHARACTER(loc),
                                           INTEGER(status)
                                           TRAIL(loc) );
-                                          static void datAnnul( const char *loc, int *status )
+static void datAnnul( const char *loc, int *status )
 {
    DECLARE_CHARACTER(floc, DAT__SZLOC);  /* Fortran locator */
 
@@ -925,6 +1094,14 @@ extern void F77_EXTERNAL_NAME(dat_annul)( CHARACTER(loc),
  *     status = global status
  *
  */
+extern void F77_EXTERNAL_NAME( hds_open )(
+   CHARACTER( fname ),
+   CHARACTER( fmode ),
+   CHARACTER( floc ),
+   INTEGER( fstatus )
+   TRAIL( fname )
+   TRAIL( fmode )
+   TRAIL( floc ) );
 static void hdsOpen( const char *name, const char *mode, char *loc,
                      int *status )
 {
@@ -968,6 +1145,14 @@ static void hdsOpen( const char *name, const char *mode, char *loc,
  *     status = global status
  *
  */
+extern void F77_EXTERNAL_NAME( dat_find )(
+   CHARACTER( floc1 ),
+   CHARACTER( fname ),
+   CHARACTER( floc2 ),
+   INTEGER( fstatus )
+   TRAIL( floc1 )
+   TRAIL( fname )
+   TRAIL( floc2 ) );
 static void datFind( const char *loc1, const char *name, char *loc2,
                      int *status )
 {
@@ -1008,6 +1193,12 @@ static void datFind( const char *loc1, const char *name, char *loc2,
  *     status = global status
  *
  */
+extern void F77_EXTERNAL_NAME( dat_paren )(
+   CHARACTER( floc1 ),
+   CHARACTER( floc2 ),
+   INTEGER( fstatus )
+   TRAIL( floc1 )
+   TRAIL( floc2 ) );
 static void datParen( const char *loc1, char *loc2, int *status )
 {
    DECLARE_CHARACTER(floc1,DAT__SZLOC);
@@ -1041,6 +1232,11 @@ static void datParen( const char *loc1, char *loc2, int *status )
  *     status = global status
  *
  */
+extern void F77_EXTERNAL_NAME( dat_ncomp )(
+   CHARACTER( floc ),
+   INTEGER( fncomp ),
+   INTEGER( fstatus )
+   TRAIL( floc ) );
 static void datNcomp( const char *loc, int *ncomp, int *status )
 {
    DECLARE_CHARACTER(floc,DAT__SZLOC);
@@ -1074,6 +1270,13 @@ static void datNcomp( const char *loc, int *ncomp, int *status )
  *     status = global status
  *
  */
+extern void F77_EXTERNAL_NAME( dat_index )(
+   CHARACTER( floc1 ),
+   INTEGER( findex ),
+   CHARACTER( floc2 ),
+   INTEGER( fstatus )
+   TRAIL( floc1 )
+   TRAIL( floc2 ) );
 static void datIndex( const char *loc1, int index, char *loc2,
                       int *status )
 {
@@ -1097,6 +1300,7 @@ static void datIndex( const char *loc1, int index, char *loc2,
    F77_IMPORT_INTEGER( fstatus, *status );
    return;
 }
+
 /*
  *  Name:
  *     hdsTrace
@@ -1112,6 +1316,15 @@ static void datIndex( const char *loc1, int index, char *loc2,
  *     status = global status
  *
  */
+extern void F77_EXTERNAL_NAME( hds_trace )(
+   CHARACTER( floc ),
+   INTEGER( flevel ),
+   CHARACTER( fpath ),
+   CHARACTER( ffile ),
+   INTEGER( fstatus )
+   TRAIL( floc )
+   TRAIL( fpath )
+   TRAIL( ffile ) );
 static void hdsTrace( const char *loc, int *level, char *path,
                       int path_len, char *file, int file_len,
                       int *status )
@@ -1128,7 +1341,7 @@ static void hdsTrace( const char *loc, int *level, char *path,
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL( hds_trace )( CHARACTER_ARG( floc ),
-                          INTEGER_ARG( flevel ),
+                          INTEGER_ARG( &flevel ),
                           CHARACTER_ARG( fpath ),
                           CHARACTER_ARG( ffile ),
                           INTEGER_ARG( &fstatus )
@@ -1156,6 +1369,12 @@ static void hdsTrace( const char *loc, int *level, char *path,
  *     status = global status
  *
  */
+extern void F77_EXTERNAL_NAME( dat_clone )(
+   CHARACTER( floc1 ),
+   CHARACTER( floc2 ),
+   INTEGER( fstatus )
+   TRAIL( floc1 )
+   TRAIL( floc2 ) );
 static void datClone( const char *loc1, char *loc2, int *status )
 {
    DECLARE_CHARACTER(floc1,DAT__SZLOC);

@@ -743,7 +743,7 @@ itcl::class gaia::Gaia {
    #  Make a patch toolbox.
    public method make_patch_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarPatch $w_.\#auto \
+         GaiaPatch $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
