@@ -1925,7 +1925,7 @@ C         CALL CAL_CLOSE( IGNORE )
 
 
 *+  PSF_WFC_LOADD - Load detector info from file and store in PSID
-      SUBROUTINE PSF_PWFC_LOADD( FID, ISSUR, PSID, STATUS )
+      SUBROUTINE PSF_WFC_LOADD( FID, ISSUR, PSID, STATUS )
 *
 *    Description :
 *
