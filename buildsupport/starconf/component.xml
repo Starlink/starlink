@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentlist.dtd">
+
+<component id="starconf">
+  <description>Starlink autoconf support</description>
+  <path>/buildsupport/starconf</path>
+  <dependencies/>  <!-- none -->
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+</component>
+

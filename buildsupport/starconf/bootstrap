@@ -1,0 +1,16 @@
+#! /bin/sh -
+
+# Run this script in a freshly checked-out directory to bring the
+# system to the point where you can just type ./configure;make
+
+# Echo a command then run it.
+echorun() { echo $*; eval $* || exit 1; }
+
+#if test ! -e acinclude.m4; then
+#  # Hmm, `cp' isn't good, but `ln -s' isn't portable
+#  echorun cp starlink.m4 acinclude.m4
+#fi
+
+echorun aclocal
+echorun automake --add-missing --foreign
+echorun autoconf
