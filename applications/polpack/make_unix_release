@@ -67,12 +67,12 @@
       rm *.help
 
 # Create the monolith interface file.
-      echo "Monolith polpack_mon" > polpack_mon.ifl_new
+      rm -f polpack_mon.ifl
+      echo "Monolith polpack_mon" > polpack_mon.ifl
       foreach file (*.ifl)
-         cat $file >> polpack_mon.ifl_new
+         cat $file >> polpack_mon.ifl
       end
-      echo "endmonolith" >> polpack_mon.ifl_new
-      mv -f polpack_mon.ifl_new polpack_mon.ifl
+      echo "endmonolith" >> polpack_mon.ifl
 
 #  Tar up the source files and then remove them.
       tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` 
