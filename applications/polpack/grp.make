@@ -12,11 +12,11 @@ extract_htx.eps polext_htx.eps map2_htx.eps polka_htx.eps
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
-USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f polmap.f \
+USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f \
 polvec.f polplot.f polbin.f
 
 #  The contents of polpack_source.tar. 
-UNIX_SOURCE =  CCDShowHelp.tcl PolMap.tcl PolMap_procs.tcl Polka.tcl Polka_procs.tcl \
+UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl \
 adamMessageRelay adamtask.tcl dialog.tcl blank.bit tick.bit feature.bit \
 ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
 kpg1_flcor.f kpg1_rfcor.f kpg1_scrsz.f kpg1_trmsz.c kps1_flxyr.f \
@@ -26,7 +26,7 @@ polcent.ifl polhelp.f polhelp.ifl polpack.csh polpack.hlp polpack.icl \
 polpack_link_adam polpack_mon.f polpack_mon.ifl polpack_test polka.f \
 polka.ifl pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit \
 segment.f segment.ifl sread.f vertex.bit wrndf.f datapic.ifl polpack.c \
-gui.gif hlpcmd polmap.f polmap.ifl polcal.f polcal.ifl ndfac.f pol_cale.f \
+gui.gif hlpcmd polcal.f polcal.ifl ndfac.f pol_cale.f \
 pol_calf.f pol_calp.f pol_calti.f ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f \
 ccd1_skysr.f ccg1_cenr.f ccg1_cmltr.f ccg1_is2r.f ccg1_is3r.f ccg1_is4d.f \
 ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f pol1_sto0.glrdic \
@@ -56,14 +56,14 @@ kpg1_odrst.f kpg1_asrep.f ccd1_repc.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
-UNIX_OTHERS = polpack.news mk makefile polka.tex polmap.tex sun223.tex
+UNIX_OTHERS = polpack.news mk makefile polka.tex sun223.tex
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_SOURCE) $(UNIX_OTHERS) $(FIGS)
 
 #  The contents of polpack.tar.
-UNIX_TOTAL = polka.htx_tar polmap.htx_tar ndg_source.tar polpack_source.tar \
+UNIX_TOTAL = polka.htx_tar ndg_source.tar polpack_source.tar \
 $(UNIX_OTHERS) sun223_figures
 
 #  Target for use by the grp command.
