@@ -196,11 +196,8 @@
       INTEGER			RMFID, ARFID		! I/p response objects
       INTEGER 			SLICE			! Energy slice wanted
       INTEGER			TIMID			! Timing info
-      INTEGER			TNDIM			! Spare dimensionality
-      INTEGER			TDIMS(ADI__MXDIM)	! Spare dimensions
       INTEGER			WPTR			! Workspace pointer
 
-      LOGICAL			ANYBAD			! Any bad points?
       LOGICAL			ERROK			! Errors present?
       LOGICAL			EXPCOR			! Corrected spectrum?
       LOGICAL			LVAL			! Spectral bin bad?
@@ -226,7 +223,7 @@
       CALL AST_INIT()
 
 *  Get input file name
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
 
 *  Find name of input file
       CALL ADI_FTRACE( IFID, NLEV, PATH, INFILE, STATUS )
@@ -267,7 +264,8 @@
       END IF
 
 *  Get data dimensions
-      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, 2, DIMS, NDIM, STATUS )
       IF (STATUS .NE. SAI__OK .OR. .NOT. OK) THEN
         CALL MSG_PRNT('Error reading data array')
         GOTO 99
@@ -317,18 +315,11 @@
 
       END IF
 
-*  Check axes present
-      CALL BDI_CHKAXES( IFID, NDIM, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', 'Error finding Asterix axes', STATUS )
-        GOTO 99
-      ENDIF
-
 * Locate response elements
       CALL ERI_GETIDS( IFID, SLICE, RMFID, ARFID, STATUS )
 
 * Get the base and scale values of the PHA axis
-C      CALL BDI_MAPAXVAL( IFID, 'READ', E_AX, EAPTR, STATUS )
+C      CALL BDI_MAPR( IFID, 'E_Axis_Data', 'READ', EAPTR, STATUS )
 C      IF (STATUS .NE. SAI__OK) THEN
 C        CALL ERR_REP( ' ', 'Error reading spectral axis values',
 C     :                STATUS )
@@ -411,12 +402,12 @@ C	  STPTIME = 1.1E6
       END IF
 
 *  Map the data array
-      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
+      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
 
 *  Map error array if present
-      CALL BDI_CHKVAR( IFID, ERROK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHK( IFID, 'Variance', ERROK, STATUS )
       IF ( ERROK ) THEN
-        CALL BDI_MAPERR( IFID, 'READ', IEPTR, STATUS )
+        CALL BDI_MAPR( IFID, 'Error', 'READ', IEPTR, STATUS )
         IF (STATUS .NE. SAI__OK) THEN
           CALL ERR_REP( ' ', 'Error reading errors from input', STATUS )
           GOTO 99
@@ -424,15 +415,13 @@ C	  STPTIME = 1.1E6
       END IF
 
 *  Map quality array if present
-      CALL BDI_CHKQUAL( IFID, QUALOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHK( IFID, 'Quality', QUALOK, STATUS )
       IF ( QUALOK ) THEN
-        CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, IQPTR, STATUS )
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( ' ', 'Error reading quality from input',
      :                  STATUS )
           GOTO 99
-        ELSE IF ( .NOT. ANYBAD ) THEN
-          QUALOK = .FALSE.
         END IF
       END IF
 
@@ -497,7 +486,7 @@ C	  STPTIME = 1.1E6
 *  Create table names, types and units
       TTYPE(1) = 'CHANNEL'
       TFORM(1) = 'I'
-      CALL BDI_GETAXUNITS( IFID, E_AX, TUNIT(1), STATUS )
+      CALL BDI_AXGET0C( IFID, E_AX, 'Units', TUNIT(1), STATUS )
       IF ( EXPCOR ) THEN
         TTYPE(2) = 'RATE'
         TFORM(2) = 'E'
@@ -505,7 +494,7 @@ C	  STPTIME = 1.1E6
         TTYPE(2) = 'COUNTS'
         TFORM(2) = 'I'
       END IF
-      CALL BDI_GETUNITS( IFID, TUNIT(2), STATUS )
+      CALL BDI_GET0C( IFID, 'Units', TUNIT(2), STATUS )
       NFIELDS = 2
       IF ( ERROK ) THEN
         NFIELDS = NFIELDS + 1
