@@ -720,6 +720,11 @@ this overrides the program's notion of where the configuration should
 be.  You can find this file using the command <kbd/kpsewhich cnf
 texmf.cnf>.
 
+<p>Secondly, it's possible to break the configuration file.
+Certain &tex; distributions (the ones that came with early RedHat 6.x
+distributions are ones I know about) are broken in an unfortunate way.
+See <ref id=usage.fonts.notfinding/> for a discussion.
+
 <!--
 <p>If the program cannot find a font, it may generate it.  If the
 <code/kpathsea> library was found and enabled at configuration time
@@ -728,7 +733,7 @@ If not, font-generation is disabled, by default, but can be re-enabled
 using the configuration switch <code/&ddash;enable-fontgen>.
 -->
 
-<subsubsect>Not finding fonts
+<subsubsect id=usage.fonts.notfinding>Not finding fonts
 
 <p>It can sometimes happen that <code/dvi2bitmap> fails to find fonts,
 successfully calls <code/mktexpk> to build them, but then <em/still>
@@ -737,7 +742,7 @@ should be.  There are (at least) three possible reasons for this.
 
 <p>If you are using the <code/kpathsea> library, there might be some
 misconfiguration which is confusing it.  You can trace
-<code/kpathsea>'s deliberations in great detail by giving the option
+<code/kpathsea>'s deliberations in massive detail by giving the option
 <code/-ggp> (<ref id=usage.options.g/>).
 
 <p>Perhaps you do not have the <code/kpathsea> library installed, or
@@ -783,13 +788,13 @@ you've fallen foul of this, then you can either
 second example above; or
 <li>install <code/dvi2bitmap> along with the other &tex;ware.
 </ul>
-I'd prefer the first alternative, myself.
+I'd much prefer the first alternative, myself.
 
 <p>A third option is to get <code/dvi2bitmap> to work around the
 problem, by telling it to claim to be some program which <em/is>
 installed along with the other dvi-ware.  You do this with the
 <code/&ddash;enable-fake-progname> option to the configuration
-script.  See <ref id=install.nonstarlink/> for details.
+script (see <ref id=conf.enable-fake-progname/>).
 
 
 <subsubsect>Generating fonts by hand
@@ -1024,26 +1029,30 @@ software, such as this.  You probably shouldn't enable GIF support
 when you build this program unless you're in that category as well.
 But don't listen to me: there's a much fuller account of the whole
 sorry business in the <webref
-url='http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html'
->comp.graphics.misc FAQ</webref>
+url="ftp://rtfm.mit.edu/pub/usenet/news.answers/graphics/fileformats-faq"
+>Graphics File Formats FAQ</webref>
+(<webref url="http://www.oreilly.com/centers/gff/gff-faq/gff-faq1.htm" 
+>HTML</webref>).
 
-<dt><code/&ddash;enable-fake-progname>
+<dt id=conf.enable-fake-progname><code/&ddash;enable-fake-progname>
 
 <dd>This option enables a workaround which allows <code/dvi2bitmap> to
 have the expected behaviour when (a) you do not install
 <code/dvi2bitmap> along with the other dvi-ware, <em/and> (b) your
-<code/texmf.cnf> file has <code/VARTEXFONTS> or similar dependence on one
+<code/texmf.cnf> file has <code/VARTEXFONTS> (or a similar variable)
+depending on one
 of the <code/SELFAUTO...> variables (such a <code/texmf.cnf> file is
 probably broken, but that may not be your problem, or within your
 power to fix).  This option makes
 <code/dvi2bitmap> claim to be a different DVI-reading program which
 <em/is> installed in the standard place.  See <ref
-id=usage.fonts.finding/> for discussion.  The configuration script uses
+id=usage.fonts.notfinding/> for discussion.  The configuration script uses
 the location of the <code/xdvi> program by default, but you can
 override this by giving the full path to an alternative as an argument
-to this option.
+to this option (that is,
+<code>&ddash;enable-fake-progname=/path/to/dviprog</code>). 
 <p>Since this uses undocumented behaviour of the library (`use the
-source, Luke!'), you probably shouldn't enable it unless you have to.
+source, Luke!'), you almost certainly shouldn't enable it unless you have to.
 
 </dl>
 
