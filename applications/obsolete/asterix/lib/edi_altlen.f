@@ -120,7 +120,7 @@
       CALL ADI_NEWV0I( NEVENT, ARGS(3), STATUS )
 
 *  Invoke the list altering method
-      CALL ADI_FEXEC( 'ListAlterLength', 3, ARGS, OARG, STATUS )
+      CALL ADI_EXEC( 'ListAlterLength', 3, ARGS, OARG, STATUS )
 
 *  Release the list length
       CALL ADI_ERASE( ARGS(3), STATUS )

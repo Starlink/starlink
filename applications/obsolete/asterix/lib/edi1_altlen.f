@@ -124,7 +124,7 @@
       CALL EDI_GETNS( ARGS(1), NEVENT, NLIST, STATUS )
 
 *  Get new list length
-      CALL ADI_CGET0I( ARGS(3), NEVENT, STATUS )
+      CALL ADI_GET0I( ARGS(3), NEVENT, STATUS )
 
 *  Loop over lists, unmapping those which are still mapped
       DO I = 1, NLIST
