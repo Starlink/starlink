@@ -4258,10 +4258,12 @@ c        REAL XX,XP,YP
         DISP=SQRT((XP-XPC)**2 + (YP-YPC)**2)
 
 *  get distance to ellipse along same line
-        THETA=ATAN2((YP-YPC),(XP-XPC))
+        THETA=ATAN2((YP-YPC),(XP-XPC))/DTOR
         ALPHA=THETA-ANGLE
-        XP=XPC + AP*COS(ALPHA)*COS(ANGLE) - BP*SIN(ALPHA)*SIN(ANGLE)
-        YP=YPC + AP*COS(ALPHA)*SIN(ANGLE) + BP*SIN(ALPHA)*COS(ANGLE)
+        XP=XPC + AP*COSD(ALPHA)*COSD(ANGLE) -
+     :                    BP*SIND(ALPHA)*SIND(ANGLE)
+        YP=YPC + AP*COSD(ALPHA)*SIND(ANGLE) +
+     :                    BP*SIND(ALPHA)*COSD(ANGLE)
         RAD=SQRT((XP-XPC)**2 + (YP-YPC)**2)
 
 
