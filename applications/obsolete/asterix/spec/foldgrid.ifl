@@ -10,7 +10,7 @@ INTERFACE FOLDGRID
    PARAMETER RESP
       POSITION 2
       TYPE 'LITERAL'
-      VPATH 'GLOBAL,PROMPT'
+      VPATH 'PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<-GLOBAL.FIT_DATA'
       PROMPT 'Name of object containing response'
