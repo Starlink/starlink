@@ -42134,6 +42134,11 @@ section \ref{se:style} the use of graphical style parameters.
 \item COMPAVE now traps zero variance values, preventing a divide by 
     zero error.
 
+\item CONTOUR no longer draws contours in the background colour if the
+    requested contour colour is not available on the selected device.
+    This previously could cause contours to be invisible when using a
+    monochrome postscript device.
+
 \item History information written to NDFs now contain the up-to-date
     KAPPA package version number.
 

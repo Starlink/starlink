@@ -19,6 +19,9 @@
 *     set, and SAI__ERROR status is returned if it is not.  If the
 *     named colour is not present the index of the colour nearest to
 *     the requested colour is returned.  A city-block metric is used.
+*
+*     A close colour is only accepted if the close colour is not equal to
+*     the background colour. This avoids pens becoming invisible.
 
 *  Arguments:
 *     COLOUR = CHARACTER * ( * ) (Given)
@@ -46,6 +49,9 @@
 *     27-FEB-1998 (DSB):
 *        Changed for use with PGPLOT instead of GKS. Re-formatted to
 *        modern style.
+*     9-JUN-1999 (DSB):
+*        Avoid accepting close colours which are equal to the background
+*        colour, and thus invisible.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,13 +87,17 @@
       INTEGER CI2                ! Highest available colour index
       INTEGER HI                 ! Highest palette colour index
       INTEGER I                  ! Loop counter
+      LOGICAL BACKG              ! Is this the background colour?
       LOGICAL MATCH              ! A colour match found?
       REAL B                     ! Blue intensity
+      REAL B0                    ! Blue intensity of background
       REAL CLOMET                ! Closest metric
       REAL G                     ! Green intensity
+      REAL G0                    ! Green intensity of background
       REAL METRIC                ! Metric for a colour in the colour set
       REAL PALETT( NPRICL, 0:CTM__RSVPN - 1 ) ! Palette colours
       REAL R                     ! Red intensity
+      REAL R0                    ! Red intensity of background
 *.
 
 *  Check the inherited global status.
@@ -122,6 +132,11 @@
      :                  PALETT( 3, I ) )
          END DO
 
+*  Note the background colour.
+         R0 = PALETT( 1, 0 )
+         G0 = PALETT( 2, 0 )
+         B0 = PALETT( 3, 0 )
+
 *  Loop to find a colour corresponding to the input colour's RGB.
 *  ==============================================================
 
@@ -132,12 +147,24 @@
          MATCH = .FALSE.
          I = 0
          CLOMET = 3.0
+         COLIND = HI
+
          DO WHILE ( .NOT. MATCH .AND. I .LE. HI )
             METRIC = ABS( R - PALETT( 1, I ) ) +
      :               ABS( G - PALETT( 2, I ) ) +
      :               ABS( B - PALETT( 3, I ) )
 
-            IF ( METRIC .LT. 3 * COPREC ) THEN
+*  Set a flag if this colour is close to the background colour, and thus
+*  would be difficult to see if used.
+            BACKG = ( ABS( R0 - PALETT( 1, I ) ) +
+     :                ABS( G0 - PALETT( 2, I ) ) +
+     :                ABS( B0 - PALETT( 3, I ) ) .LE. 0.5 )
+
+*  Accept this colour if it matches the requested colour exactly, or if
+*  it is close to the requested colour and is not close to the background
+*  colour.
+            IF ( METRIC .EQ. 0 .OR.
+     :           METRIC .LT. 3 * COPREC .AND. .NOT. BACKG ) THEN
 
 *  A match is found so exit and record the colour index.
                MATCH = .TRUE.
@@ -147,7 +174,7 @@
 
 *  Look to see whether or not the latest colour is nearer than the 
 *  previous nearest.
-               IF ( METRIC .LT. CLOMET ) THEN
+               IF ( METRIC .LT. CLOMET .AND. .NOT. BACKG ) THEN
                   CLOMET = METRIC
                   COLIND = I
                END IF
@@ -156,5 +183,5 @@
             END IF
          END DO
       END IF
-      
+
       END
