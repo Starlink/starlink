@@ -122,6 +122,8 @@
 *        equal-valued pixels, and correcting generic arithmetic.
 *     1-NOV-2001 (DSB):
 *        Removed use of VAL_<T>TOI calls on MAXV and MINV.
+*     2002 July 25 (MJC)
+*        Allow for integer-spaced data.
 *     {enter_further_changes_here}
 
 *-
@@ -187,6 +189,7 @@
       INTEGER HIST( NUMBIN )   ! Histogram for finding fractional 
                                ! values
       INTEGER I                ! Loop counter
+      DOUBLE PRECISION INCR    ! Increment between adjacent values
       LOGICAL INTVAL           ! Data are integers?
       INTEGER J                ! Loop counter for lower histogram bins
       INTEGER K                ! Loop counter for upper histogram bins
@@ -253,11 +256,13 @@
             INTVAL = .FALSE.
          ELSE
 
-*  Test the pixel values until any is not an integer.  The test in fact
-*  has a wide margin of tolerance.  We are just trying to ensure that
-*  the histogram is not artificially sparse.  Therefore the limiting
-*  sparseness fraction is adequate.  This does break down for real
-*  values greater than about +/-8dex6 to the integer-value limits.
+*  Test the pixel values until any is not an integer or is not an
+*  integer increment from its neighbour (to identify integer data with
+*  a real constant added).  The test in fact has a wide margin of
+*  tolerance.  We are just trying to ensure that the histogram is not
+*  artificially sparse.  Therefore the limiting sparseness fraction is
+*  adequate.  This does break down for real values greater than about
+*  +/-8dex6 to the integer-value limits.
             INTVAL = .TRUE.
             I = 0
             IF ( BAD ) THEN
@@ -266,6 +271,10 @@
                   IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
                      INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
      :                        NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM 
+                     INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                      ARRAY( MIN( I + 1, EL ) ) ) )
+                     INTVAL = INTVAL .OR.
+     :                        ( INT( INCR - INT( INCR ) ) .LT. FILLIM )
                   END IF
                END DO
 
@@ -274,7 +283,11 @@
                DO WHILE ( INTVAL .AND. I .LT. EL )
                   I = I + 1
                   INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                     NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM 
+     :                     NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM
+                  INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                   ARRAY( MIN( I + 1, EL ) ) ) )
+                  INTVAL = INTVAL .OR.
+     :                     ( INT( INCR - INT( INCR ) ) .LT. FILLIM )
                END DO
             END IF
          END IF
@@ -419,12 +432,13 @@
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Count the number of empty bins with the histogram.
+*  Count the number of occupied bins with the histogram.
          CALL KPG1_NUMBI( .FALSE., .FALSE., .TRUE., CLNBIN, HIST, 0,
      :                    NUMBER, STATUS )
 
 *  Is the histogram too sparse, suggesting outliers.
-         IF ( DBLE( NUMBER ) / DNBIN .LT. FILLIM ) THEN
+         IF ( DNBIN .GT. 1 .AND.
+     :        DBLE( NUMBER ) / DNBIN .LT. FILLIM ) THEN
 
 *  Obtain the bin width for this iteration.
             BINSIZ = ( NUM_<T>TOD( DATLIM( 2 ) ) -
