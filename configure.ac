@@ -2,7 +2,6 @@ dnl    Process this file with autoconf to produce a configure script
 
 dnl    This `package name' is a dummy
 AC_INIT(dummy-startree, 1.0, ussc@star.rl.ac.uk)
-AC_CONFIG_AUX_DIR(config)
 AC_PREREQ(2.50)
 
 AC_CONFIG_SRCDIR(Makefile.dependencies)
@@ -25,7 +24,8 @@ dnl    Leave out thirdparty for the moment -- the only directories
 dnl    there are fsf (which contains buildsupport tools which are
 dnl    configured as part of the bootstrap process) and eso (which
 dnl    contains libraries which haven't yet been brought within the
-dnl    Starlink build system).
+dnl    Starlink build system).  In fact buildsupport doesn't really
+dnl    need configured either, but keep it in this list for consistency.
 AC_CONFIG_SUBDIRS(applications libraries buildsupport)
 dnl AC_CONFIG_SUBDIRS(applications libraries buildsupport thirdparty)
 
