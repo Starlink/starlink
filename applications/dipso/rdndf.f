@@ -530,8 +530,7 @@
 *  the Unit attribute.
             IF( STATUS .EQ. SAI__OK .AND. UNIT .NE. ' ' ) THEN
                CALL AST_SETC( SFRM, 'UNIT', UNIT, STATUS )
-               IF( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_ANNUL( STATUS )
+               IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
                   CALL AST_CLEAR( SFRM, 'UNIT', STATUS )
                   REPORT = .TRUE.
                END IF
