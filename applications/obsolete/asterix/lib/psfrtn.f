@@ -2589,7 +2589,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       REAL                    TOR               ! Conversion to radians
 
       INTEGER                 APTR              ! Ptr to axis data
-      INTEGER                 BDA               ! BDA identifier
       INTEGER                 DIMS(DAT__MXDIM)  ! Size of data array
       INTEGER                 DPTR              ! Ptr to data
       INTEGER                 NDIM              ! Dimensionality
@@ -3202,6 +3201,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       CHARACTER*1		DAXC			! Axis character
       CHARACTER*40		EUNITS			! Energy axis units
+      CHARACTER*(DAT__SZLOC)  	LOC              	! Dataset locator
       CHARACTER*(DAT__SZLOC)  	SLOC              	! Response locator
       CHARACTER*80		TEXT			! AUX prompt
       CHARACTER*30		VERSION			! SPRESP version
@@ -3217,8 +3217,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER			FSTAT			! i/o status code
       INTEGER                 	IAX			! Loop over axes
       INTEGER                 	NELM 			! Number of elements mapped
-      INTEGER			PSLOT			! First SLOT element
       INTEGER			REVISION		! Creator revision no.
+      INTEGER			SID			! Response identifier
       INTEGER			TLEN			! Prompt length
       INTEGER			X_AX, Y_AX, E_AX, T_AX	! Axis identifiers
 
@@ -3229,14 +3229,15 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Extract psf number
-      PSLOT = SLOT(1)
+*    Extract locator
+      CALL ADI1_GETLOC( FID, LOC, STATUS )
 
 *    Does the dataset have an attached spatial response?
       CALL HDX_FIND( LOC, 'MORE.ASTERIX.SPATIAL_RESP', SLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         CALL MSG_PRNT( 'Found spatial response in dataset...' )
         IN_DATASET = .TRUE.
+        CALL ADI1_PUTLOC( SLOC, SID, STATUS )
 
       ELSE
 
@@ -3246,7 +3247,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *      Get response name by prompting
         CALL USI_PROMT( 'MASK', 'Name of Asterix spatial response file',
      :                  STATUS )
-        CALL USI_ASSOCI( 'MASK', 'READ', SLOC, INPRIM, STATUS )
+        CALL USI_TASSOCI( 'MASK', '*', 'READ', SID, INPRIM, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         CALL USI_CANCL( 'MASK', STATUS )
         IN_DATASET = .FALSE.
@@ -3254,25 +3255,25 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
 *    Get expanded response dimensions
-      CALL CMP_GET1I( SLOC, 'DIMS', 5, RF_DIMS(1,PSLOT), RF_NDIM(PSLOT),
+      CALL CMP_GET1I( SLOC, 'DIMS', 5, RF_DIMS(1,SLOT), RF_NDIM(SLOT),
      :                STATUS )
 
 *    Map the index
       CALL CMP_MAPV( SLOC, 'INDEX', '_INTEGER', 'READ',
-     :               RF_IPTR(PSLOT), NELM, STATUS )
+     :               RF_IPTR(SLOT), NELM, STATUS )
 
 *    Map the data
       CALL CMP_MAPV( SLOC, 'DATA_ARRAY', '_REAL', 'READ',
-     :               RF_DPTR(PSLOT), NELM, STATUS )
+     :               RF_DPTR(SLOT), NELM, STATUS )
 
 *    Is it compressed?
-      CALL CMP_GET0L( SLOC, 'COMPRESSED', RF_PIXCENT(PSLOT), STATUS )
+      CALL CMP_GET0L( SLOC, 'COMPRESSED', RF_PIXCENT(SLOT), STATUS )
 
 *    Is it pixel centred?
-      CALL CMP_GET0L( SLOC, 'PIXCENT', RF_PIXCENT(PSLOT), STATUS )
+      CALL CMP_GET0L( SLOC, 'PIXCENT', RF_PIXCENT(SLOT), STATUS )
 
 *    Is it a radial response?
-      CALL CMP_GET0L( SLOC, 'RADIAL', RF_RADIAL(PSLOT), STATUS )
+      CALL CMP_GET0L( SLOC, 'RADIAL', RF_RADIAL(SLOT), STATUS )
 
 *    Get creator version id
       CALL CMP_GET0C( SLOC, 'VERSION', VERSION, STATUS )
@@ -3285,7 +3286,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( MAJOR .GE. 1.73 ) THEN
 
 *      Identify spatial axes
-        CALL PSF1_GETAXID( SLOT(2), X_AX, Y_AX, E_AX, T_AX, STATUS )
+        CALL PSF1_GETAXID( INST, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *      Get X and Y axis parameters, and compare with dataset
         DO IAX = 1, 2
@@ -3300,11 +3301,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           END IF
 
 *        Get response axis attributes
-          CALL BDA_GETAXVAL( SLOC, IAX, R_BASE, R_SCALE, DIM, STATUS )
+          CALL BDI_GETAXVAL( SID, IAX, R_BASE, R_SCALE, DIM, STATUS )
 
 *        Get dataset axis attributes
-          D_SCALE = PSF1_GETAXDR( SLOT(2), X_AX, STATUS )
-          TOR = PSF1_GETAXTOR( SLOT(2), X_AX, STATUS )
+          D_SCALE = PSF1_GETAXDR( INST, X_AX, STATUS )
+          TOR = PSF1_GETAXTOR( INST, X_AX, STATUS )
 
 *        Compare bin sizes
           IF ( ABS((ABS(R_SCALE)-ABS(D_SCALE/TOR))/R_SCALE)
@@ -3323,26 +3324,26 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
 *    Get axis info
-      IF ( RF_RADIAL(PSLOT) ) THEN
+      IF ( RF_RADIAL(SLOT) ) THEN
         DO IAX = 3, 4
-          CALL BDA_GETAXVAL( SLOC, IAX, RF_BASE(IAX,PSLOT),
-     :                       RF_SCALE(IAX,PSLOT), DIM, STATUS )
+          CALL BDI_GETAXVAL( SID, IAX, RF_BASE(IAX,SLOT),
+     :                       RF_SCALE(IAX,SLOT), DIM, STATUS )
         END DO
       ELSE
         DO IAX = 3, 5
-          CALL BDA_GETAXVAL( SLOC, IAX, RF_BASE(IAX,PSLOT),
-     :                       RF_SCALE(IAX,PSLOT), DIM, STATUS )
+          CALL BDI_GETAXVAL( SID, IAX, RF_BASE(IAX,SLOT),
+     :                       RF_SCALE(IAX,SLOT), DIM, STATUS )
         END DO
       END IF
 
 *    If the PHA band is not defined, and the response has a significant
 *    energy dimension, then we need a mean photon energy to index that
 *    energy dimension.
-      IF ( (RF_DIMS(RF_NDIM(PSLOT),PSLOT).GT.1) .AND.
-     :                     .NOT. RF_PHA_DEF(PSLOT) ) THEN
+      IF ( (RF_DIMS(RF_NDIM(SLOT),SLOT).GT.1) .AND.
+     :                     .NOT. RF_PHA_DEF(SLOT) ) THEN
 
 *      Construct prompt
-        CALL BDA_GETAXUNITS( SLOC, RF_NDIM(PSLOT), EUNITS, STATUS )
+        CALL BDI_GETAXUNITS( SID, RF_NDIM(SLOT), EUNITS, STATUS )
         CALL MSG_SETC( 'UNITS', EUNITS )
         CALL MSG_MAKE( 'Mean photon energy in ^UNITS', TEXT, TLEN )
         CALL USI_PROMT( 'AUX', TEXT(:TLEN), STATUS )
@@ -3354,9 +3355,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *      Validate
 
 *      Set PHA band
-        RF_PHALO(PSLOT) = ENERGY
-        RF_PHAHI(PSLOT) = ENERGY
-        RF_PHA_DEF(PSLOT) = .TRUE.
+        RF_PHALO(SLOT) = ENERGY
+        RF_PHAHI(SLOT) = ENERGY
+        RF_PHA_DEF(SLOT) = .TRUE.
 
       END IF
 
@@ -3364,11 +3365,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( IN_DATASET ) THEN
         CALL DAT_ANNUL( SLOC, STATUS )
       ELSE
-        CALL USI_ANNUL( SLOC, STATUS )
+        CALL USI_TANNUL( SID, STATUS )
       END IF
 
 *    Reset workspace
-      RF_RESPTR(PSLOT) = 0
+      RF_RESPTR(SLOT) = 0
 
 *    Abort point
  99   CONTINUE
@@ -5267,7 +5268,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_XRT_PSPC_INIT - XRT PSPC psf initialisation
-      SUBROUTINE PSF_XRT_PSPC_INIT( PSLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_XRT_PSPC_INIT( SLOT, FID, INST, STATUS )
 *
 *    Description :
 *

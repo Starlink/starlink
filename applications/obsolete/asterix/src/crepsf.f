@@ -145,7 +145,7 @@
      :                                                  STATUS )
 
 *    Create PSF structure and associate with PSF system
-      CALL PSF_TASSOCO( OFID, PSLOT, STATUS )
+      CALL PSF_ASSOCO( OFID, PSLOT, STATUS )
 
 *    Map data
       CALL BDI_CREDATA( OFID, 2, DIMS, STATUS )
