@@ -1956,9 +1956,6 @@
                VARX=CVM(7,7)/W
                VARY=CVM(8,8)/W
                SIGR=SQRT(VARX+VARY)
-*NORMAN
-               write (*,'("varx,y=(",2d12.5,"), sigr=",f10.3)')
-     :              varx,vary,sigr
             END IF
          END IF
 
@@ -2017,6 +2014,11 @@
      :                       'cannot be reliably determined!')
                         FITOK=.FALSE.
                      END IF
+                  ELSE
+*                  If not FITDI, write q to the log anyway, so as to
+*                  propagate the value to the output.
+                     WRITE (LUX, 1081) "q", DISTE, 
+     :                    "distortion, q (rad^{-2})"
                   END IF
 
 *              Report plate centre and update if OK
@@ -2123,6 +2125,39 @@
      :                         '9X,G15.7,'' * X'',28X,G15.7,'' * X''/'//
      :                        '9X,G15.7,'' * Y'',28X,G15.7,'' * Y''//)')
      : (FNORM*PLTCON(I,NSOL+MAXSOL),FNORM*PLTCON(I+3,NSOL+MAXSOL),I=1,3)
+
+*           Plate scale(s), nonperpendicularity and orientation
+               CALL sla_DCMPF(PLTCON(1,NSOL),
+     :                            XZERO,YZERO,XSCALE,YSCALE,PERP,ORIENT)
+               XSCALE=(XSCALE/FNORM)/AS2R
+               YSCALE=(YSCALE/FNORM)/AS2R
+               SCALE=SQRT((XSCALE*XSCALE+YSCALE*YSCALE)/2D0)
+               IF (NSOL.EQ.1) THEN
+                  WRITE (LUR,
+     :   '(6X,''Plate scale (in measuring units):'',F18.4,'' arcsec'')')
+     :                                                             SCALE
+               ELSE
+                  WRITE (LUR,
+     :                   '(5X,''Plate scales (in measuring units):'','//
+     :                                   '6X,''X'',F11.4,'' arcsec''/'//
+     :                                  '45X,''Y'',F11.4,'' arcsec''/'//
+     :                               '42X,''mean'',F11.4,'' arcsec''/'//
+     :               '19X,''Nonperpendicularity:'',SP,F17.3,''  deg'')')
+     :                            ABS(XSCALE),ABS(YSCALE),SCALE,PERP/D2R
+               END IF
+               IF (XSCALE*YSCALE.GE.0D0) THEN
+                  WRITE (LUR,
+     :         '(27X,''Orientation:'',SP,F17.3,''  deg''//)') ORIENT/D2R
+               ELSE
+                  WRITE (LUR,'(27X,''Orientation:'',SP,F17.3,'//
+     :                 '''  deg and laterally inverted''//)') ORIENT/D2R
+               END IF
+               WRITE (LUR,
+     :                 '(1X,''Reference stars:''/29X,''Mean RA,Dec'','//
+     :              '9X,''Equinox'',1X,A,F6.1,6X,''Epoch'',1X,A,F8.3,'//
+     :                                   '11X,''Residuals (arcsec)''/'//
+     :          '16X,''n'',4X,A,14X,''catalogue'',21X,''calculated'','//
+     :        '17X,''dX'',8X,''dY'',8X,''dR''/)') KQR,EQR,KPR,EPR,NMORSP
 
                IF (FITSOP) THEN
 *               Write a FITS-WCS file.  See Calabretta and Greisen (C&G),
@@ -2231,6 +2266,13 @@
      :                 'RA always given in degrees', FTSTAT)
                   CALL FTPKYS (FTUNIT, 'CUNIT2', 'deg', 
      :                 'Dec always given in degrees', FTSTAT)
+*               Write a comment, summarising the transformation matrix.
+*               Reuse the results of the sla_DCMPF call above.
+                  WRITE (FTWS,'("Mean scale",F6.2,"arcsec, nonperp",
+     :                 F6.2,", angle",F6.2,", inv? ",L1)') 
+     :                 SCALE, PERP/D2R, ORIENT/D2R,
+     :                 (XSCALE*YSCALE.LT.0D0)
+                  CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
 *               Transformation matrix, again in units of degrees, not radians
                   CALL FTPKYD (FTUNIT, 'CD1_1',
      :                 PLTCON(2,NSOL)/FNORM/D2R, 7,
@@ -2352,40 +2394,8 @@
 *            End of FITS writing -- error exit
  1070          CONTINUE
 
-*           Plate scale(s), nonperpendicularity and orientation
-               CALL sla_DCMPF(PLTCON(1,NSOL),
-     :                            XZERO,YZERO,XSCALE,YSCALE,PERP,ORIENT)
-               XSCALE=(XSCALE/FNORM)/AS2R
-               YSCALE=(YSCALE/FNORM)/AS2R
-               SCALE=SQRT((XSCALE*XSCALE+YSCALE*YSCALE)/2D0)
-               IF (NSOL.EQ.1) THEN
-                  WRITE (LUR,
-     :   '(6X,''Plate scale (in measuring units):'',F18.4,'' arcsec'')')
-     :                                                             SCALE
-               ELSE
-                  WRITE (LUR,
-     :                   '(5X,''Plate scales (in measuring units):'','//
-     :                                   '6X,''X'',F11.4,'' arcsec''/'//
-     :                                  '45X,''Y'',F11.4,'' arcsec''/'//
-     :                               '42X,''mean'',F11.4,'' arcsec''/'//
-     :               '19X,''Nonperpendicularity:'',SP,F17.3,''  deg'')')
-     :                            ABS(XSCALE),ABS(YSCALE),SCALE,PERP/D2R
-               END IF
-               IF (XSCALE*YSCALE.GE.0D0) THEN
-                  WRITE (LUR,
-     :         '(27X,''Orientation:'',SP,F17.3,''  deg''//)') ORIENT/D2R
-               ELSE
-                  WRITE (LUR,'(27X,''Orientation:'',SP,F17.3,'//
-     :                 '''  deg and laterally inverted''//)') ORIENT/D2R
-               END IF
                WRITE (LUS,
      :           '(1X,''Residuals,'',I2,''-coefficient fit:''/)') NTERMS
-               WRITE (LUR,
-     :                 '(1X,''Reference stars:''/29X,''Mean RA,Dec'','//
-     :              '9X,''Equinox'',1X,A,F6.1,6X,''Epoch'',1X,A,F8.3,'//
-     :                                   '11X,''Residuals (arcsec)''/'//
-     :          '16X,''n'',4X,A,14X,''catalogue'',21X,''calculated'','//
-     :        '17X,''dX'',8X,''dY'',8X,''dR''/)') KQR,EQR,KPR,EPR,NMORSP
                WRITE (LUS,'(16X,''n'',11X,''dX'',8X,''dY'',8X,''dR''/)')
 
 *           Compute predicted positions, residuals and statistics
@@ -2472,12 +2482,6 @@
                   CALL sla_DR2TF(1,sla_DRANRM(RAPCX),KSRA,IRAVEC)
 *               Because of the dranrm, KSRA is always '+'
                   CALL sla_DR2AF(0,sla_DRANGE(DCPCX),KSDC,IDCVEC)
-*               Write out the distortion coefficient DISTE 
-*               in the units ASTROM uses (rad^{-2}) rather than the
-*               units we carefully converted it to above (deg^{-2}),
-*               since this will principally be used to control a future
-*               invocation of ASTROM.
-*                  WRITE (LUX, 1081) "q", DISTE, "distortion, q"
                   WRITE (LUX, 1082) "rarad", RAPCX,
      :                 "projection pole RA, radians"
                   WRITE (LUX, 1082) "decrad",DCPCX,
