@@ -38,7 +38,11 @@
 <docnumber>70
 
 <history>
-<version number=0 date='21-APR-1999' author=ng>Initial version
+<version number=0 date='21-APR-1999' author=ng>Initial version</version>
+<distribution string="DR-0.2" date="03-JUN-1999" author=ng>
+First real release to other programmers.  Distribution contains only
+SGML lib stuff: Jade has to be built separately.
+</distribution>
 </history>
 
 <copyright>
@@ -46,7 +50,9 @@ Copyright 1999, Particle Physics and Astronomy Research Council
 </copyright>
 
 <abstract>
-This document describes the Starlink SGML system.  Blah
+<px>This is a developers' release, not production code.
+
+<px>This document describes the Starlink SGML system.
 
 <px>Audience: 
 This document is addressed both at those who need to generate Starlink
