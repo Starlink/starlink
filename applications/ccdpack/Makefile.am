@@ -9,14 +9,19 @@ ccdsupport_DATA = $(DATA_FILES) ccdpack.shl
 
 bin_SCRIPTS = $(PUBLIC_SCR)
 
-# bin_PROGRAMS = ccdwish
+bin_PROGRAMS = ccdwish
 
 noinst_LTLIBRARIES = libgrf_ccdpack.la
 libgrf_ccdpack_la_SOURCES = grf_ccdpack.c grf.h
 
 ccdwish_SOURCES = ccdwish.c
 
-ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/pgp_ccdpack_link_adam`
+STARTCL_OBJ = $(libdir)/tkGwm.o $(libdir)/tkGwmCanv.o \
+              $(libdir)/tkGwmPrint.o $(libdir)/tclAdam.o
+
+ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) $(STARTCL_OBJ) \
+                `$(srcdir)/pgp_ccdpack_link_adam` \
+                -lpar_adam `dtask_link_adam` -ljpeg @FCLIBS@
 
 bin_MONOLITHS = ccdpack_red ccdpack_reg ccdpack_res ccdpack_scr \
                 ccdhelp
