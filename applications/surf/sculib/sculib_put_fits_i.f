@@ -13,6 +13,9 @@
 *     An error will be reported and bad status returned if the name of the
 *     FITS item is blank or more than 8 characters long. An error will also
 *     occur if the FITS character array is full.
+*     The FITS array must contain a final entry of simply 'END' unless 
+*     N_FITS is 0. The END entry is automatically moved to the last field
+*     as entries are added to the FITS array.
 
 *  Invocation:
 *     CALL SCULIB_PUT_FITS_I (MAX_FITS, N_FITS, FITS, NAME, VALUE,
@@ -22,7 +25,11 @@
 *     MAX_FITS                       = INTEGER (Given)
 *           the size of the FITS array
 *     N_FITS                         = INTEGER (Given and returned)
-*           the number of FITS items currently in the FITS array
+*           the number of FITS items currently in the FITS array.
+*           This should include an 'END' entry. If N_FITS is 1 it will
+*           be assumed to be an array with just an 'END'. If N_FITS=0
+*           on entry the array will be empty and N_FITS will be changed to 2
+*           on exit (the entry and the END card).
 *     FITS (MAX_FITS)                = CHARACTER*80 (Given and returned)
 *           array containing the FITS items
 *     NAME                           = CHARACTER*(*) (Given)
@@ -97,14 +104,19 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-      IF (N_FITS .LE. 0) THEN
+      IF (N_FITS .LT. 0) THEN
          STATUS = SAI__ERROR
+         CALL MSG_SETI('N',N_FITS)
+         CALL MSG_SETC ('NAME', NAME)
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_I: bad input value of '//
-     :     'N_FITS', STATUS)
+     :     'N_FITS for key ^NAME (N_FITS = ^N)', STATUS)
       ELSE IF (N_FITS+1 .GT. MAX_FITS) THEN
          STATUS = SAI__ERROR
+         CALL MSG_SETI('N',N_FITS+1)
+         CALL MSG_SETI('M',MAX_FITS)
+         CALL MSG_SETC ('NAME', NAME)
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_I: size of FITS array '//
-     :     'has been exceeded', STATUS)
+     :     'has been exceeded with key ^NAME (^N > ^M)', STATUS)
       ELSE IF (CHR_LEN(NAME) .GT. 8) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC ('NAME', NAME)
@@ -114,12 +126,17 @@
          STATUS = SAI__ERROR
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_I: blank name given '//
      :     'for FITS item', STATUS)
-      ELSE IF (FITS(N_FITS) .NE. 'END') THEN
+      ELSE IF (FITS(N_FITS) .NE. 'END' .AND. N_FITS .GT. 0) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP(' ','SCULIB_PUT_FITS_I: Last card was not END',
      :        STATUS)
       ELSE
 
+*     If we have no entries, make sure we are using the first one
+         IF (N_FITS .EQ. 0) N_FITS = 1
+
+*     Copy in the name, value and comment, overwriting 'END' if
+*     necessary
          FITS (N_FITS) = NAME
          FITS (N_FITS)(9:9) = '='
          CALL CHR_ITOC (VALUE, STEMP, NCHAR)
