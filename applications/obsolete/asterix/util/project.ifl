@@ -2,7 +2,7 @@ INTERFACE PROJECT
 
   PARAMETER INP
     POSITION    1
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PPATH       'GLOBAL'
     ASSOCIATION '<-GLOBAL.BINDS'
     PROMPT      'Input'
@@ -11,7 +11,7 @@ INTERFACE PROJECT
 
   PARAMETER OUT
     POSITION    2
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     ASSOCIATION '->GLOBAL.BINDS'
     PROMPT      'Output'
     HELP        'Name of output dataset'
