@@ -1115,6 +1115,8 @@ grep define /usr/include/asm/errno.h | awk '{print "add_line(OutputFile, \""$2"\
 
 	/* Tidy up */
 	fclose(OutputFile);
+
+        exit(0);
 }
 
 /* Insert code for a specific errno constant */
@@ -1131,7 +1133,7 @@ void add_line( FILE * file, char * string, int constant, bool isok) {
   /* the isok argument is used to enable us to fall back
      to a fixed number if we are guessing */
   if (!isok) {
-    fprintf(file, "      * %s was not present. Guessing\n", string);
+    fprintf(file, "*     %s was not present. Guessing\n", string);
   }
   fprintf(file, "      INTEGER ERRNO__%s    ! %s\n"
 	  "      PARAMETER ( ERRNO__%s = %d )\n\n", 
