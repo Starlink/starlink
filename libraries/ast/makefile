@@ -136,6 +136,8 @@
 #     29-MAY-1998 (RFWS):
 #        Modified handling of conditions of use file to adhere to
 #        current standards.
+#     18-AUG-1999 (RFWS):
+#        Added files for the MathMap class.
 #------------------------------------------------------------------------------
 
 #  Help target.
@@ -1373,13 +1375,15 @@ intramap.o: intramap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h unitmap.h intramap.h ast_err.h
 loader.o: loader.c axis.h object.h error.h channel.h cmpframe.h \
  frame.h mapping.h pointset.h frameset.h cmpmap.h dssmap.h fitschan.h \
- intramap.h loader.h lutmap.h matrixmap.h pcdmap.h permmap.h plot.h \
- skyaxis.h skyframe.h slamap.h sphmap.h unitmap.h wcsmap.h proj.h \
- wcstrig.h winmap.h zoommap.h ast_err.h
+ intramap.h loader.h lutmap.h mathmap.h matrixmap.h pcdmap.h permmap.h \
+ plot.h skyaxis.h skyframe.h slamap.h sphmap.h unitmap.h wcsmap.h \
+ proj.h wcstrig.h winmap.h zoommap.h ast_err.h
 lutmap.o: lutmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h winmap.h lutmap.h ast_err.h
 mapping.o: mapping.c error.h memory.h object.h channel.h pointset.h \
  mapping.h ast_err.h
+mathmap.o: mathmap.c error.h memory.h object.h channel.h mapping.h \
+ pointset.h unitmap.h mathmap.h ast_err.h
 matrixmap.o: matrixmap.c error.h memory.h object.h channel.h \
  pointset.h mapping.h matrixmap.h slalib.h permmap.h zoommap.h \
  unitmap.h winmap.h ast_err.h
