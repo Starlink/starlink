@@ -106,7 +106,6 @@
       BYTE BADBITS                              !Mask for quality checking
       INTEGER FIXTOT                            !Total no of interpolated pnts.
       LOGICAL LAX                               !Is axis info present
-      LOGICAL LREG                              !Is axis regularly spaced
 
       CHARACTER*80 PATH(5)                      !Input data path
       CHARACTER*6 TOTCHAR                       !No pixels replaced (char form)

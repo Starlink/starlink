@@ -64,7 +64,7 @@
 *     14 Jul 93 : V1.7-2 Use MATH_RND generator (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     28 Mar 95 : V1.8-1 Use new interface for model (DJA)
-*
+*     12 Dec 1995 : V2.0-0 ADI port (DJA)
 *    Type definitions :
 *
       IMPLICIT NONE
@@ -72,7 +72,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
 *
@@ -92,37 +91,33 @@
 *
 *    Local variables :
 *
-      CHARACTER         OLOC*(DAT__SZLOC)      ! Locator to output dataset
-      CHARACTER         XLOC*(DAT__SZLOC)      ! Locator to X_CORR data
-      CHARACTER         XLLOC*(DAT__SZLOC)     ! Locator to X_CORR list
-      CHARACTER         YLOC*(DAT__SZLOC)      ! Locator to Y_CORR data
-      CHARACTER         YLLOC*(DAT__SZLOC)     ! Locator to Y_CORR list
-      CHARACTER*40      UNITS                  ! Model X axis units
+      CHARACTER*80      	OROOT                  	! Output dataset root
+      CHARACTER*132     	ONAME                  	! Output file name
+      CHARACTER*40      	UNITS                  	! Model X axis units
+      CHARACTER*40		WUN(2)			! WCS units
 
-      CHARACTER*80      MODEL                  ! Background model file
-      CHARACTER*80      OROOT                  ! Output dataset root
-      CHARACTER*132     ONAME                  ! Output file name
+      DOUBLE PRECISION		SPOINT(2)		! Special pointing dir
 
-      DOUBLE PRECISION		SPOINT(2)
-
-      REAL              FSIZE                  ! Size of field
-      REAL              LO, HI                 ! AXIS extrema
-      REAL              MTOT                   ! Total valid data in model
-      REAL              PSIZE                  ! Pixel size - quantum of lists
-      REAL              SPOS(MAXSRC*2)         ! Source positions
-      REAL              TOR                    ! Axis units to radians factor
-      REAL              WIDS(MAXSRC)           ! Source widths
-      REAL              XPOS(MAXSRC),YPOS(MAXSRC)
-      REAL              XBASE, XSCALE          ! Model X axis
-      REAL              YBASE, YSCALE          ! Model Y axis
-      REAL              XLO, XHI, YLO, YHI     ! Output evds bounds
+      REAL              	FSIZE                  	! Size of field
+      REAL              	LO, HI                 	! AXIS extrema
+      REAL              	MTOT                   	! Total valid data in model
+      REAL              	PSIZE                  	! Pixel size - quantum of lists
+      REAL              	SPOS(MAXSRC*2)         	! Source positions
+      REAL              	TOR                    	! Axis units to radians factor
+      REAL              	WIDS(MAXSRC)           	! Source widths
+      REAL			SPARR(2)		! Spaced array info
+      REAL              	XPOS(MAXSRC),YPOS(MAXSRC)
+      REAL              	XBASE, XSCALE          	! Model X axis
+      REAL              	YBASE, YSCALE          	! Model Y axis
+      REAL              	XLO, XHI, YLO, YHI     	! Output evds bounds
 
       INTEGER           ACTSRC                 ! Actual number of sources
       INTEGER           ACTWID                 ! Actual number of widths given
-      INTEGER           DIMS(DAT__MXDIM)       ! Bgnd dimensions
-      INTEGER           FFILE                  ! Index of first file
-      INTEGER           IFILE                  ! Loop over files
-      INTEGER           ISRC                   ! Loop over sources
+      INTEGER           	DIMS(ADI__MXDIM)       	! Bgnd dimensions
+      INTEGER			EVID			! Event interface obj
+      INTEGER                   FFILE                   ! Index of first file
+      INTEGER           	IFILE                  	! Loop over files
+      INTEGER           	ISRC                   	! Loop over sources
       INTEGER           IWID                   ! Loop over widths
       INTEGER			MFID			! Model dataset id
       INTEGER           NPT                    ! No. of points in position lists
@@ -145,57 +140,55 @@
       INTEGER           PSW2                   ! Psf model width in pixels
       INTEGER           MDPTR                  ! Model data ptr
       INTEGER           MIPTR                  ! Model probability index ptr
-      INTEGER           MQNDIM                 ! Model quality dimensionality
-      INTEGER           MQDIMS(DAT__MXDIM)     ! Model quality dimensions
       INTEGER           MQPTR                  ! Model quality ptr
       INTEGER           SCOUNT(MAXSRC)         ! Actual # of source counts
-      INTEGER           SEED                   ! Random number seed
-      INTEGER           XPTR, YPTR             ! Pointers to list data
+      INTEGER           	SEED                   	! Random number seed
+      INTEGER			XLID, YLID		! X & Y list ids
+      INTEGER           	XPTR, YPTR             	! Pointers to list data
 
-      LOGICAL           ANYBAD                 ! Anybad model points?
-      LOGICAL           MOK                    ! Using a model?
-      LOGICAL           OK                     ! Validity check
-      LOGICAL           PDEV                   ! Poisson deviate
-      LOGICAL           PSFCON                 ! Psf constant across field?
-      LOGICAL           SEED_GIVEN             ! Seed supplied?
-      LOGICAL           XDEC, YDEC             ! Axes decreasing?
+      LOGICAL           	MOK                    	! Using a model?
+      LOGICAL           	OK                     	! Validity check
+      LOGICAL           	PDEV                   	! Poisson deviate
+      LOGICAL           	PSFCON                 	! Psf constant across field?
+      LOGICAL           	SEED_GIVEN             	! Seed supplied?
+      LOGICAL           	XDEC, YDEC             	! Axes decreasing?
 *
 *    Version id :
 *
       CHARACTER*30      VERSION
-         PARAMETER      ( VERSION = 'EVSIM Version 1.8-1' )
+         PARAMETER      ( VERSION = 'EVSIM Version 2.0-0' )
 *
 *    Local Data:
 *
       DATA              SPOINT/0D0,0D0/
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version
+*  Version
       CALL MSG_PRNT( VERSION )
 
-*    Initialise Asterix
+*  Initialise Asterix
       CALL AST_INIT()
 
-*    No astrometry by default
+*  No astrometry by default
       PIXID = ADI__NULLID
       PRJID = ADI__NULLID
       SYSID = ADI__NULLID
 
-*    Get number of files
+*  Get number of files
       CALL USI_GET0I( 'NFILE', NFILE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get output dataset root name
+*  Get output dataset root name
       IF ( NFILE .GT. 1 ) THEN
         CALL USI_GET0I( 'FFILE', FFILE, STATUS )
         CALL USI_PROMT( 'OUT', 'Root name for multiple outputs',STATUS )
       END IF
       CALL USI_GET0C( 'OUT', OROOT, STATUS )
 
-*    See if user supplied seed given
+*  See if user supplied seed given
       CALL USI_GET0I( 'SEED', SEED, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
@@ -205,27 +198,25 @@
       END IF
       PDEV = (.NOT.SEED_GIVEN)
 
-*    Create random seed?
+*  Create random seed?
       IF ( .NOT. SEED_GIVEN ) THEN
         CALL PSX_TIME( SEED, STATUS )
         SEED = -MOD(SEED,13234597)
       END IF
 
-*    Set up generator
+*  Set up generator
       CALL MATH_SETRND( SEED )
 
-*    Prompt for the background counts in field
-      CALL USI_GET0C( 'MODEL', MODEL, STATUS )
+*  Prompt for the background counts in field
+      CALL USI_ASSOC( 'MODEL', 'BinDS', 'READ', MFID, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Try to open it
-        CALL ADI_FOPEN( MODEL, '*', 'READ', MFID, STATUS )
-
-*      Check dimensions and map
-        CALL BDI_CHKDATA( MFID, OK, NDIM, DIMS,STATUS )
+*    Check dimensions and map
+        CALL BDI_CHK( MFID, 'Data', OK, STATUS )
+        CALL BDI_GETSHP( MFID, ADI__MXDIM, DIMS, NDIM, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Check dimensionality
+*    Check dimensionality
         IF ( .NOT. OK ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Invalid model data', STATUS )
@@ -235,39 +226,41 @@
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Map model array
+*    Map model array
         NELM = DIMS(1)*DIMS(2)
-        CALL BDI_MAPDATA( MFID, 'READ', MDPTR, STATUS )
+        CALL BDI_MAPR( MFID, 'Data', 'READ', MDPTR, STATUS )
 
-*      Quality present?
-        CALL BDI_CHKQUAL( MFID, OK, MQNDIM, MQDIMS, STATUS )
+*    Quality present?
+        CALL BDI_CHK( MFID, 'Quality', OK, STATUS )
         IF ( OK ) THEN
-          CALL BDI_MAPLQUAL( MFID, 'READ', ANYBAD, MQPTR, STATUS )
-          IF ( ANYBAD ) THEN
-            CALL MSG_PRNT( 'Using model quality array...' )
-          ELSE
-            CALL BDI_UNMAPLQUAL( MFID, STATUS )
-          END IF
+          CALL BDI_MAPL( MFID, 'LogicalQuality', 'READ', MQPTR, STATUS )
+          CALL MSG_PRNT( 'Using model quality array...' )
         END IF
 
-*      Map memory for index
+*    Map memory for index
         CALL DYN_MAPR( 1, NELM+1, MIPTR, STATUS )
 
-*      Normalise
+*    Normalise
         CALL MSG_PRNT( 'Normalising model...' )
-        CALL SIM_MNORM( NELM, %VAL(MDPTR), ANYBAD, %VAL(MQPTR),
+        CALL SIM_MNORM( NELM, %VAL(MDPTR), OK, %VAL(MQPTR),
      :                              %VAL(MIPTR), MTOT, STATUS )
 
-*      Report counts in model
+*    Report counts in model
         CALL MSG_SETR( 'C', MTOT )
         CALL MSG_PRNT( 'Model contains ^C counts' )
 
-*      Get axis details
-        CALL BDI_GETAXVAL( MFID, 1, XBASE, XSCALE, NVAL, STATUS )
-        CALL BDI_GETAXVAL( MFID, 2, YBASE, YSCALE, NVAL, STATUS )
-        CALL BDI_GETAXUNITS( MFID, 1, UNITS, STATUS )
+*    Get axis details
+        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, NVAL,
+     :                    STATUS )
+        XBASE = SPARR(1)
+        XSCALE = SPARR(2)
+        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, NVAL,
+     :                    STATUS )
+        YBASE = SPARR(1)
+        YSCALE = SPARR(2)
+        CALL BDI_AXGET0C( MFID, 1, 'Units', UNITS, STATUS )
 
-*      Describe evds bounds
+*    Describe evds bounds
         XDEC = (XSCALE.LT.0.0)
         LO = XBASE - XSCALE/2.0
         HI = LO + DIMS(1)*XSCALE
@@ -281,19 +274,16 @@
         PSIZE = ABS(XSCALE)
         MOK = .TRUE.
 
-*      Unmap model values
-        CALL BDI_UNMAP( MFID, STATUS )
+*    Get world coordinates
+        CALL WCI_GETIDS( MFID, PIXID, PRJID, SYSID, STATUS )
 
-*      Close the file
-        CALL ADI_FCLOSE( MFID, STATUS )
-
-*    No model
+*  No model
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
 
         MOK = .FALSE.
         CALL ERR_ANNUL( STATUS )
 
-*      Decide on image size etc.
+*    Decide on image size etc.
         CALL USI_GET0R( 'FIELDSIZE', FSIZE, STATUS )
         CALL USI_GET0R( 'PIXSIZE', PSIZE, STATUS )
         UNITS = 'arcmin'
@@ -304,17 +294,20 @@
         XHI = -XLO
         YHI = -YLO
 
-*      Invent some WCS stuff
+*    Invent some WCS stuff
+        WUN(1) = UNITS
+        WUN(2) = UNITS
+        CALL WCI_NEWPX( 0, 0.0, 0.0, WUN, 0.0, PIXID, STATUS )
         CALL WCI_NEWPRJ( 'TAN', 0, 0.0, SPOINT, 180D0, PRJID, STATUS )
         CALL WCI_NEWSYS( 'FK5', 2000.0, 2000D0, SYSID, STATUS )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Convert axis units to radians
+*  Convert axis units to radians
       CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
-*    Get number of background counts
+*  Get number of background counts
  10   CALL USI_GET0I( 'BACK', ONBACK, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
@@ -326,7 +319,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Prompt for the number of source counts
+*  Prompt for the number of source counts
  20   CALL USI_GET1I( 'SOURCEC', MAXSRC, OSCOUNT, NSRC, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
@@ -412,10 +405,10 @@
 
       END IF
 
-*    For each output file
+*  For each output file
       DO IFILE = 1, NFILE
 
-*      Construct file name
+*    Construct file name
         IF ( NFILE .EQ. 1 ) THEN
           ONAME = OROOT
         ELSE
@@ -425,12 +418,7 @@
           CALL MSG_PRNT( 'Creating file ^N' )
         END IF
 
-*      Open file
-        CALL ADI_FCREAT( ONAME(:CHR_LEN(ONAME))//'%hds', ADI__NULLID,
-     :                    OFID, STATUS )
-        CALL ADI1_GETLOC( OFID, OLOC, STATUS )
-
-*      Introduce Poisson noise into source and background
+*    Introduce Poisson noise into source and background
         IF ( PDEV .AND. (ONBACK.GT.0) ) THEN
           NBACK = MATH_POISS(FLOAT(ONBACK))
         ELSE
@@ -446,31 +434,31 @@
           NPT = NPT + SCOUNT(ISRC)
         END DO
 
-*      Create the dataset lists
-        CALL LIST_CREMAP( OLOC, 'X_CORR', '_REAL', NPT, PSIZE,
-     :                    UNITS, XLO+PSIZE/2.0, XHI-PSIZE/2.0,
-     :                    XPTR, XLOC, STATUS )
-        CALL LIST_CREMAP( OLOC, 'Y_CORR', '_REAL', NPT, PSIZE,
-     :                    UNITS, YLO+PSIZE/2.0, YHI-PSIZE/2.0,
-     :                    YPTR, YLOC, STATUS )
+*    Define EventDS
+        CALL ADI_NEW0( 'EventDS', EVID, STATUS )
+        CALL ADI_CPUT0I( EVID, 'NEVENT', NPT, STATUS )
 
-*      Write the decreasing flag
-        IF ( XDEC ) THEN
-          CALL DAT_FIND( OLOC, 'X_CORR', XLLOC, STATUS )
-          CALL HDX_PUTL( XLLOC, 'DECREASING', 1, .TRUE., STATUS )
-          CALL DAT_ANNUL( XLLOC, STATUS )
-        END IF
-        IF ( YDEC ) THEN
-          CALL DAT_FIND( OLOC, 'Y_CORR', YLLOC, STATUS )
-          CALL HDX_PUTL( YLLOC, 'DECREASING', 1, .TRUE., STATUS )
-          CALL DAT_ANNUL( YLLOC, STATUS )
-        END IF
+*    Open file
+        CALL ADI_FCREAT( ONAME(:CHR_LEN(ONAME))//'%hds', EVID,
+     :                   OFID, STATUS )
 
-*      Associate psf if first time through
+*    Create the dataset lists
+        CALL EDI_CREL0R( OFID, 'X_CORR', XDEC, XLO, XHI,
+     :                   0.0, UNITS, XLID, STATUS )
+        CALL EDI_CREL0R( OFID, 'Y_CORR', YDEC, YLO, YHI,
+     :                   0.0, UNITS, YLID, STATUS )
+        CALL EDI_CREAT( OFID, XLID, STATUS )
+        CALL EDI_CREAT( OFID, YLID, STATUS )
+
+*    Map the lists
+        CALL EDI_MAPR( OFID, 'X_CORR', 'WRITE', 0, 0, XPTR, STATUS )
+        CALL EDI_MAPR( OFID, 'Y_CORR', 'WRITE', 0, 0, YPTR, STATUS )
+
+*    Write astrometry
+        CALL WCI_PUTIDS( OFID, PIXID, PRJID, SYSID, STATUS )
+
+*    Associate psf if first time through
         IF ( IFILE .EQ. 1 ) THEN
-
-*      Write astrometry
-          CALL WCI_PUTIDS( OFID, PIXID, PRJID, SYSID, STATUS )
 
 *      Associate psf if first time through
           IF ( NSRC .GT. 0 ) THEN
@@ -480,7 +468,7 @@
 
         END IF
 
-*      Dump counts to user
+*    Dump counts to user
         CALL MSG_SETI( 'NB', NBACK )
         CALL MSG_PRNT( 'Background ^NB counts' )
         DO ISRC = 1, NSRC
@@ -489,7 +477,7 @@
           CALL MSG_PRNT( 'Source ^N ^SC counts' )
         END DO
 
-*      Create events
+*    Create events
         CALL EVSIM_INT( OFID, PSLOT, PSFCON, SEED_GIVEN, SEED,
      :                  NSRC, SCOUNT, WIDS, NBACK, MOK, DIMS(1),
      :                  DIMS(2), %VAL(MIPTR), PSIZE, TOR, XLO, XHI,
@@ -499,32 +487,28 @@
 
         SEED_GIVEN = .FALSE.
 
-*      Unmap lists
-        CALL DAT_UNMAP( XLOC, STATUS )
-        CALL DAT_UNMAP( YLOC, STATUS )
+*    Unmap lists
+        CALL EDI_UNMAP( OFID, 'X_CORR', STATUS )
+        CALL EDI_UNMAP( OFID, 'Y_CORR', STATUS )
 
-*      Lists to be altered
+*    Lists to be altered
         IF ( NOUT .GT. 0 ) THEN
-          CALL DAT_ALTER( XLOC, 1, NPT-NOUT, STATUS )
-          CALL DAT_ALTER( YLOC, 1, NPT-NOUT, STATUS )
+          CALL EDI_ALTLEN( OFID, NPT-NOUT, STATUS )
         END IF
-        CALL DAT_ANNUL( XLOC, STATUS )
-        CALL DAT_ANNUL( YLOC, STATUS )
 
-*      Close if not first file
+*    Close if not first file, or if this is the last file
         IF ( (IFILE.GT.1) .OR. (IFILE.EQ.NFILE) ) THEN
           CALL ADI_FCLOSE( OFID, STATUS )
         END IF
 
       END DO
 
-*    Free model
+*  Free model
       IF ( MOK ) THEN
-        CALL BDI_RELEASE( MFID, STATUS )
-        CALL ADI_FCLOSE( MFID, STATUS )
+        CALL USI_ANNUL( 'MODEL', STATUS )
       END IF
 
-*    Tidy up
+*  Tidy up
  99   CALL PSF_CLOSE( STATUS )
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
@@ -791,7 +775,6 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
