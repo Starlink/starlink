@@ -20,3 +20,4 @@ starconf.status.local
 cpgplot.h
 cpgplot.c
 pgbind
+pgbind_prototypes
