@@ -4574,6 +4574,23 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+3 MARKSTYLE
+MARKSTYLE = LITERAL (Read and Write)
+   A string indicating how markers are initially to be plotted on
+   the image.  It consists of a comma-separated list of 
+   "attribute=value" type strings.  The available attributes are:
+      - colour     -- Colour of the marker in Xwindows format.
+      - size       -- Approximate height of the marker in pixels.
+      - thickness  -- Approximate thickness of lines in pixels.
+      - shape      -- One of Plus, Cross, Circle, Square, Diamond.
+      - showindex  -- 1 to show index numbers, 0 not to do so.
+
+   This parameter only gives the initial marker type; it can be
+   changed interactively while the program is running.
+   If specifying this value on the command line, it is not 
+   necessary to give values for all the attributes; missing ones
+   will be given sensible defaults.
+   ["showindex=1"]
 3 MAXCANV
 MAXCANV = _INTEGER (Read and Write)
    A value in pixels for the maximum initial X or Y dimension of
@@ -4617,14 +4634,6 @@ PERCENTILES( 2 ) = _DOUBLE (Read and Write)
    <= 100.  These values can be changed interactively while the
    program runs.
    [2,98]
-3 SHOWIND
-SHOWIND = _LOGICAL (Read)
-   If true, then the index numbers will be displayed on the image
-   for each point marked, and it will be possible to choose 
-   the index number for each point.  If false, points will not
-   be numbered on the display, and will be written to the 
-   position list in (roughly) the order in which they are entered.
-   [FALSE]
 3 WINX
 WINX = _INTEGER (Read and Write)
    The width in pixels of the window to display the image and
@@ -4668,11 +4677,13 @@ idicurs in=* out=*.pts percentiles=[10,90]
    as the dimmest colour, but this may be changed interactively
    while the program is running.
 
-idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
+idicurs in=gc6253 readlist inlist=found.lis outlist=out.lis
    The image gc6253 will be displayed, with the points stored in
    the position list 'found.lis' already plotted on it.  These 
    may be added to, moved and deleted, and the resulting list
-   will be written to the file out.lis.
+   will be written to the file out.lis.  Points will initially
+   be marked using skyblue markers, and not labelled with index 
+   numbers.
 2 Notes
    - Position list formats.
 
@@ -4731,10 +4742,10 @@ idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.
 
-   Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM)
-   give initial values for quantities which can be modified while
-   the program is running.  Although these may be specified on the
-   command line, it is normally easier to start the program up and
+   Some of the parameters (MARKSTYLE, MAXCANV, PERCENTILES, WINX, WINY,
+   ZOOM) give initial values for quantities which can be modified
+   while the program is running.  Although these may be specified on
+   the command line, it is normally easier to start the program up and
    modify them using the graphical user interface.  If the program
    exits normally, their values at the end of the run will be used
    as defaults next time the program starts up.
@@ -6727,6 +6738,23 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+3 MARKSTYLE
+MARKSTYLE = LITERAL (Read and Write)
+   A string indicating how markers are initially to be plotted in
+   the aligner widget.  It consists of a comma-separated list of 
+   "attribute=value" type strings.  The available attributes are:
+      - colour     -- Colour of the marker in Xwindows format.
+      - size       -- Approximate height of the marker in pixels.
+      - thickness  -- Approximate thickness of lines in pixels.
+      - shape      -- One of Plus, Cross, Circle, Square, Diamond.
+      - showindex  -- 1 to show index numbers, 0 not to do so.
+
+   This parameter only gives the initial marker type; it can be
+   changed interactively while the program is running.
+   If specifying this value on the command line, it is not 
+   necessary to give values for all the attributes; missing ones
+   will be given sensible defaults.
+   [""]
 3 MAXCANV
 MAXCANV = INTEGER (Read and Write)
    A value in pixels for the maximum initial X or Y dimension of 
@@ -6845,12 +6873,15 @@ pairndf * *.dat [1,99]
    percentile, which shows bright detail well.
 
 pairndf in="data1,data2" outlist="d1-pos,d2-pos" zoom=2 maxcanv=0
+        markstyle="shape=circle,size=8,thickness=1,colour=HotPink"
    Only the two images data1 and data2 will be aligned, and the 
    corresponding sets of positions will be written to the
    files d1-pos and d2-pos.  The images will initially be 
    displayed for alignment at a magnification of two screen 
    pixels to each data pixel, even if that results in a very 
-   large display area.
+   large display area.  During alignment, marked points will be
+   shown as little pink circles.
+
 2 Notes
 - NDF extension items.
 
@@ -6893,8 +6924,8 @@ pairndf in="data1,data2" outlist="d1-pos,d2-pos" zoom=2 maxcanv=0
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.
 
-   Some of the parameters (MAXCANV, PERCENTILES, PREVX, PREVY, WINX,
-   WINY)  give initial values for quantities which can be modified 
+   Some of the parameters (MARKSTYLE, MAXCANV, PERCENTILES, PREVX, PREVY,
+   WINX, WINY)  give initial values for quantities which can be modified 
    while the program is running.  Although these may be specified on
    the command line, it is normally easier to start the program up and
    modify them using the graphical user interface.  If the program

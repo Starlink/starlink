@@ -1,7 +1,9 @@
 #include "f77.h"
 #include "sae_par.h"
 #include "tcl.h"
+#include "mers.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include "ccdtcl.h"
 #include "grp_par.h"
 
@@ -9,13 +11,14 @@
 
    F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), DOUBLE_ARRAY(percnt), 
                               INTEGER(count), DOUBLE(zoom), 
-                              INTEGER(maxcanv), INTEGER_ARRAY(windim),
-                              INTEGER_ARRAY(prvdim),
+                              INTEGER(maxcnv), INTEGER_ARRAY(windim),
+                              INTEGER_ARRAY(prvdim), CHARACTER(mstyle),
                               INTEGER_ARRAY(nodes), INTEGER_ARRAY(nmat),
                               DOUBLE_ARRAY(xoff), DOUBLE_ARRAY(yoff),
                               POINTER_ARRAY(ipx1), POINTER_ARRAY(ipy1),
                               POINTER_ARRAY(ipx2), POINTER_ARRAY(ipy2),
-                              INTEGER(status) ) {
+                              INTEGER(status) 
+                              TRAIL(mstyle) ) {
 /*
 *+
 *  Name:
@@ -28,8 +31,9 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_PNDF( NDFGID, PERCNT, COUNT, NODES, NMAT, XOFF, YOFF, 
-*                     STATUS )
+*     CALL CCD1_PNDF( NDFGID, PERCNT, COUNT, ZOOM, MAXCNV, WINDIM, 
+*                     PRVDIM, MSTYLE, NODES, NMAT, XOFF, YOFF, IPX1, 
+*                     IPY1, IPX2, IPY2, STATUS )
 
 *  Description:
 *     This routine calls a Tcl script which presents the user with a
@@ -43,17 +47,19 @@
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
+*     COUNT = INTEGER (Given)
+*        Number of pairings made by the user.
 *     ZOOM = DOUBLE PRECISION (Given and Returned)
-*        The zoom factor for the initial display.  May be limited by MAXCANV.
-*     MAXCANV = INTEGER (Given and Returned)
+*        The zoom factor for the initial display.  May be limited by MAXCNV.
+*     MAXCNV = INTEGER (Given and Returned)
 *        The maximum X or Y dimension of the intial NDF display.
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
 *     PRVDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the preview window for each NDF used in the 
 *        chooser widget.
-*     COUNT = INTEGER (Returned)
-*        The number of pairings which have been made by the user.
+*     MSTYLE = CHARACTER * ( * ) (Given and Returned)
+*        A string indicating how markers are to be plotted on the image.
 *     NODES( 2, * ) = INTEGER (Returned)
 *        For each pairing made, this array contains the indices of the 
 *        NDFs which form the pair.  The index of the first NDF in the
@@ -132,9 +138,10 @@
       GENPTR_INTEGER_ARRAY(nmat)
       GENPTR_DOUBLE_ARRAY(percnt)
       GENPTR_DOUBLE(zoom)
-      GENPTR_INTEGER(maxcanv)
+      GENPTR_INTEGER(maxcnv)
       GENPTR_INTEGER_ARRAY(windim)
       GENPTR_INTEGER_ARRAY(prvdim)
+      GENPTR_CHARACTER(mstyle)
       GENPTR_DOUBLE_ARRAY(xoff)
       GENPTR_DOUBLE_ARRAY(yoff)
       GENPTR_POINTER_ARRAY(ipx1)
@@ -152,6 +159,7 @@
       DECLARE_CHARACTER( fndfname, GRP__SZNAM );
       char ndfname[ GRP__SZNAM + 1 ];
       char buffer[ 1024 ];
+      char *cmstyle;
 
 /* Test the global status. */
       if ( *status != SAI__OK ) return;
@@ -175,15 +183,22 @@
       }
 
 /* Set the value of other Tcl variables to be passed into the script. */
+      if ( ( cmstyle = malloc( mstyle_length + 1 ) ) == NULL ) {
+         *status = SAI__ERROR;
+         errRep( " ", "Memory allocation failed", status );
+         return;
+      }
+      cnfImprt( mstyle, mstyle_length, cmstyle );
       ccdTclSetD( cinterp, "PERCLO", percnt[ 0 ], status );
       ccdTclSetD( cinterp, "PERCHI", percnt[ 1 ], status );
       ccdTclSetI( cinterp, "MAXPOS", 0, status );
       ccdTclSetD( cinterp, "ZOOM", *zoom, status );
-      ccdTclSetI( cinterp, "MAXCANV", *maxcanv, status );
+      ccdTclSetI( cinterp, "MAXCANV", *maxcnv, status );
       ccdTclSetI( cinterp, "WINX", windim[ 0 ], status );
       ccdTclSetI( cinterp, "WINY", windim[ 1 ], status );
       ccdTclSetI( cinterp, "PREVX", prvdim[ 0 ], status );
       ccdTclSetI( cinterp, "PREVY", prvdim[ 1 ], status );
+      ccdTclSetC( cinterp, "MARKSTYLE", cmstyle, status );
 
 /* Execute the Tcl script. */
       ccdTclRun( cinterp, "pairndf.tcl", status );
@@ -231,11 +246,14 @@
          }
       }
       ccdTclGetD( cinterp, "set ZOOM", zoom, status );
-      ccdTclGetI( cinterp, "set MAXCANV", maxcanv, status );
+      ccdTclGetI( cinterp, "set MAXCANV", maxcnv, status );
       ccdTclGetI( cinterp, "set WINX", windim + 0, status );
       ccdTclGetI( cinterp, "set WINY", windim + 1, status );
       ccdTclGetI( cinterp, "set PREVX", prvdim + 0, status );
       ccdTclGetI( cinterp, "set PREVY", prvdim + 1, status );
+      cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ),
+                mstyle, mstyle_length );
+      free( cmstyle );
 
 /* Delete the Tcl interpreter. */
       ccdTclStop( cinterp, status );

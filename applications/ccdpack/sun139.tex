@@ -9370,6 +9370,36 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [BOTH]
       }
       \sstsubsection{
+         MARKSTYLE = LITERAL (Read and Write)
+      }{
+         A string indicating how markers are initially to be plotted on
+         the image.  It consists of a comma-separated list of 
+         `attribute=value' type strings.  The available attributes are:
+          \sstitemlist{
+
+            \sstitem
+              colour     -- Colour of the marker in Xwindows format.
+
+            \sstitem
+              size       -- Approximate height of the marker in pixels.
+
+            \sstitem
+              thickness  -- Approximate thickness of lines in pixels.
+
+            \sstitem
+              shape      -- One of Plus, Cross, Circle, Square, Diamond.
+
+            \sstitem
+              showindex  -- 1 to show index numbers, 0 not to do so.
+         }
+         This parameter only gives the initial marker type; it can be
+         changed interactively while the program is running.
+         If specifying this value on the command line, it is not 
+         necessary to give values for all the attributes; missing ones
+         will be given sensible defaults.
+         [\qt{showindex=1}]
+      }
+      \sstsubsection{
          MAXCANV = \_INTEGER (Read and Write)
       }{
          A value in pixels for the maximum initial X or Y dimension of
@@ -9419,16 +9449,6 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          $<=$ 100.  These values can be changed interactively while the
          program runs.
          [2,98]
-      }
-      \sstsubsection{
-         SHOWIND = \_LOGICAL (Read)
-      }{
-         If true, then the index numbers will be displayed on the image
-         for each point marked, and it will be possible to choose 
-         the index number for each point.  If false, points will not
-         be numbered on the display, and will be written to the 
-         position list in (roughly) the order in which they are entered.
-         [FALSE]
       }
       \sstsubsection{
          WINX = \_INTEGER (Read and Write)
@@ -9485,12 +9505,15 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          while the program is running.
       }
       \sstexamplesubsection{
-         idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
+         idicurs in=gc6253 readlist inlist=found.lis outlist=out.lis
+                 markstyle=\qt{colour=skyblue,showindex=0}
       }{
          The image gc6253 will be displayed, with the points stored in
          the position list `found.lis' already plotted on it.  These
          may be added to, moved and deleted, and the resulting list
-         will be written to the file out.lis.
+         will be written to the file out.lis.  Points will initially
+         be marked using skyblue markers, and not labelled with index 
+         numbers.
       }
    }
    \sstnotes{
@@ -9578,7 +9601,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
 
-      Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM)
+      Some of the parameters (MARKSTYLE, MAXCANV, PERCENTILES, WINX, WINY, ZOOM)
       give initial values for quantities which can be modified while
       the program is running.  Although these may be specified on the
       command line, it is normally easier to start the program up and
@@ -11833,6 +11856,36 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [BOTH]
       }
       \sstsubsection{
+         MARKSTYLE = LITERAL (Read and Write)
+      }{
+         A string indicating how markers are initially to be plotted in
+         the aligner widget.  It consists of a comma-separated list of 
+         `attribute=value' type strings.  The available attributes are:
+          \sstitemlist{
+
+            \sstitem
+              colour     -- Colour of the marker in Xwindows format.
+
+            \sstitem
+              size       -- Approximate height of the marker in pixels.
+
+            \sstitem
+              thickness  -- Approximate thickness of lines in pixels.
+
+            \sstitem
+              shape      -- One of Plus, Cross, Circle, Square, Diamond.
+
+            \sstitem
+              showindex  -- 1 to show index numbers, 0 not to do so.
+         }
+         This parameter only gives the initial marker type; it can be
+         changed interactively while the program is running.
+         If specifying this value on the command line, it is not 
+         necessary to give values for all the attributes; missing ones
+         will be given sensible defaults.
+         [\qt{}]
+      }
+      \sstsubsection{
          MAXCANV = \_INTEGER (Read and Write)
       } {
          A value in pixels for the maximum initial X or Y dimension of 
@@ -11978,14 +12031,15 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          percentile, which shows bright detail well.
       }
       \sstexamplesubsection{
-         pairndf in={\tt "}data1,data2{\tt "} outlist={\tt "}d1-pos,d2-pos{\tt "} zoom=2 maxcanv=0
+         pairndf in={\tt "}data1,data2{\tt "} outlist={\tt "}d1-pos,d2-pos{\tt "} zoom=2 maxcanv=0 markstyle={\tt "}shape=circle,size=8,thickness=1,colour=HotPink{\tt "}
       } {
          Only the two images data1 and data2 will be aligned, and the 
          corresponding sets of positions will be written to the
          files d1-pos and d2-pos.  The images will initially be 
          displayed for alignment at a magnification of two screen 
          pixels to each data pixel, even if that results in a very 
-         large display area.
+         large display area.  During alignment, marked points will be
+         shown as little pink circles.
       }
    }
    \sstnotes{
@@ -12050,8 +12104,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
 
-      Some of the parameters (MAXCANV, PERCENTILES, PREVX, PREVY, WINX,
-      WINY)  give initial values for quantities which can be modified 
+      Some of the parameters (MARKSTYLE, MAXCANV, PERCENTILES, PREVX, PREVY, 
+      WINX, WINY)  give initial values for quantities which can be modified 
       while the program is running.  Although these may be specified on
       the command line, it is normally easier to start the program up and
       modify them using the graphical user interface.  If the program

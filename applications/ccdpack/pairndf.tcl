@@ -13,6 +13,9 @@
 #     user which allows interactive placement of pairs of NDFs.
 #
 #  External Variables:
+#     MARKSTYLE = string (Given and Returned)
+#        A string, in the form of comma-separated att=value pairs,
+#        indicating how markers should be plotted on the image.
 #     MATPTS = list of lists of quads (Returned)
 #        This gives a list of the centroided points for each of the 
 #        pairs of NDFs which the user matched up.  It contains one 
@@ -70,9 +73,9 @@
       global Done
 
 #  Set defaults for some arguments.
-      foreach pair { { MAXCANV 0 } { MAXPOS 100 } { PERCLO 5 } { PERCHI 95 } \
-                     { PREVX 300 } { PREVY 300 } { WINX 300 } { WINY 300 } \
-                     { ZOOM 1 } } {
+      foreach pair { { MARKSTYLE "" } { MAXCANV 0 } { MAXPOS 100 } \
+                     { PERCLO 5 } { PERCHI 95 } { PREVX 300 } { PREVY 300 } \
+                     { WINX 300 } { WINY 300 } { ZOOM 1 } } {
          if { ! [ info exists [ lindex $pair 0 ] ] } {
             eval set $pair
          }
@@ -146,9 +149,9 @@
                          -info "%n (frame %f)" \
                          -watchstatus alignstatus \
                          -zoom $ZOOM \
-                         -uselabels 0 \
                          -maxpoints $MAXPOS \
                          -geometry ${WINX}x${WINY} \
+                         -markstyle $MARKSTYLE
 
       [ $aligner component exit ] configure -balloonstr "Use this alignment"
 
@@ -351,6 +354,7 @@
             set tryagain 0
             $aligner activate
             tkwait variable alignstatus
+            set MARKSTYLE [ $aligner cget -markstyle ]
             set MAXCANV [ $aligner maxcanvas ]
             set ZOOM [ $aligner cget -zoom ]
 

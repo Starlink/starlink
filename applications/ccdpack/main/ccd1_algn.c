@@ -1,5 +1,6 @@
 #include "f77.h"
 #include "sae_par.h"
+#include "mers.h"
 #include "tcl.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,9 +13,10 @@
                               INTEGER(refpos), INTEGER(maxpos), 
                               DOUBLE_ARRAY(percnt), DOUBLE(zoom), 
                               INTEGER(maxcanv), INTEGER_ARRAY(windim), 
+                              CHARACTER(mstyle),
                               INTEGER(npoint), DOUBLE(xpos), DOUBLE(ypos), 
                               INTEGER(index), INTEGER(status)
-                              TRAIL(ndfnms) ) {
+                              TRAIL(ndfnms) TRAIL(mstyle) ) {
    
 /*
 *+
@@ -29,8 +31,8 @@
 *
 *  Invocation:
 *     CALL CCD1_ALGN( NDFNMS, NNDF, REFPOS, MAXPOS, PERCNT, ZOOM, 
-*                     MAXCNV, WINDIM, NPOINT, XPOS, YPOS, INDEX,
-*                     STATUS )
+*                     MAXCNV, WINDIM, MSTYLE, NPOINT, XPOS, YPOS, 
+*                     INDEX, STATUS )
 *
 *  Description:
 *     This routine calls a Tcl script which displays a number of NDFs
@@ -61,6 +63,8 @@
 *        The maximum X or Y dimension of the intial NDF display.
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
+*     MSTYLE = CHARACTER * ( * ) (Given and Returned)
+*        A string indicating how markers are to be plotted on the image.
 *     NPOINT = INTEGER( NNDF ) (Returned)
 *        The number of points contained in each of the output position
 *        lists in the array POINTS.
@@ -94,6 +98,7 @@
       GENPTR_DOUBLE(zoom)
       GENPTR_INTEGER(maxcanv)
       GENPTR_INTEGER_ARRAY(windim)
+      GENPTR_CHARACTER(mstyle)
       GENPTR_INTEGER_ARRAY(npoint)
       GENPTR_DOUBLE_ARRAY(xpos)
       GENPTR_DOUBLE_ARRAY(ypos)
@@ -102,6 +107,7 @@
 
 /* Local Variables. */
       char *fmt;
+      char *cmstyle;
       ccdTcl_Interp *cinterp;
       char buffer[ BUFLENG ];
       int i;
@@ -116,11 +122,17 @@
       cinterp = ccdTclStart( status );
 
 /* Set the value of Tcl variables to be passed into the script. */
+      if ( ( cmstyle = malloc( mstyle_length + 1 ) ) == NULL ) {
+         *status = SAI__ERROR;
+         errRep( " ", "Memory allocation failed", status );
+         return;
+      }
       for ( i = 0; i < *nndf; i++ ) {
          cnfImpn( ndfnms + i * ndfnms_length, ndfnms_length, BUFLENG - 1, 
                   buffer );
          ccdTclAppC( cinterp, "NDFNAMES", buffer, status );
       }
+      cnfImprt( mstyle, mstyle_length, cmstyle );
       ccdTclSetI( cinterp, "REFPOS", *refpos - 1, status );
       ccdTclSetI( cinterp, "MAXPOS", *maxpos, status );
       ccdTclSetD( cinterp, "PERCLO", percnt[ 0 ], status );
@@ -129,6 +141,7 @@
       ccdTclSetI( cinterp, "MAXCANV", *maxcanv, status );
       ccdTclSetI( cinterp, "WINX", windim[ 0 ], status );
       ccdTclSetI( cinterp, "WINY", windim[ 1 ], status );
+      ccdTclSetC( cinterp, "MARKSTYLE", cmstyle, status );
 
 /* Execute the Tcl script. */
       ccdTclRun( cinterp, "ccdalign.tcl", status );
@@ -155,6 +168,9 @@
          ccdTclGetI( cinterp, "set MAXCANV", maxcanv, status );
          ccdTclGetI( cinterp, "set WINX", windim, status );
          ccdTclGetI( cinterp, "set WINY", windim + 1, status );
+         cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ),
+                   mstyle, mstyle_length );
+         free( cmstyle );
       }
 
 /* Delete the Tcl interpreter. */

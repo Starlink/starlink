@@ -94,17 +94,6 @@
             size *
          }
 
-         parameter showind {
-                            # Show point index numbers
-            type _LOGICAL
-            access UPDATE
-            vpath CURRENT PROMPT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Display index numbers for marked points?}
-            helpkey *
-         }
-
          parameter zoom {
                          # Zoom factor
             type _DOUBLE
@@ -146,6 +135,17 @@
             ppath CURRENT DEFAULT
             default 600
             prompt {Height of display window in pixels}
+            helpkey *
+         }
+
+         parameter markstyle {
+                             # Plot marker type
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default {showindex=1}
+            prompt {String giving style of markers to plot}
             helpkey *
          }
             

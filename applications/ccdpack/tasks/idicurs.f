@@ -90,6 +90,22 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
+*     MARKSTYLE = LITERAL (Read and Write)
+*        A string indicating how markers are initially to be plotted on
+*        the image.  It consists of a comma-separated list of 
+*        "attribute=value" type strings.  The available attributes are:
+*           - colour     -- Colour of the marker in Xwindows format.
+*           - size       -- Approximate height of the marker in pixels.
+*           - thickness  -- Approximate thickness of lines in pixels.
+*           - shape      -- One of Plus, Cross, Circle, Square, Diamond.
+*           - showindex  -- 1 to show index numbers, 0 not to do so.
+*
+*        This parameter only gives the initial marker type; it can be
+*        changed interactively while the program is running.
+*        If specifying this value on the command line, it is not 
+*        necessary to give values for all the attributes; missing ones
+*        will be given sensible defaults.
+*        ["showindex=1"]
 *     MAXCANV = _INTEGER (Read and Write)
 *        A value in pixels for the maximum initial X or Y dimension of
 *        the region in which the image is displayed.  Note this is the 
@@ -129,13 +145,6 @@
 *        <= 100.  These values can be changed interactively while the
 *        program runs.
 *        [2,98]
-*     SHOWIND = _LOGICAL (Read)
-*        If true, then the index numbers will be displayed on the image
-*        for each point marked, and it will be possible to choose 
-*        the index number for each point.  If false, points will not
-*        be numbered on the display, and will be written to the 
-*        position list in (roughly) the order in which they are entered.
-*        [FALSE]
 *     WINX = _INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
@@ -177,11 +186,14 @@
 *        as the dimmest colour, but this may be changed interactively
 *        while the program is running.
 *
-*     idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
+*     idicurs in=gc6253 readlist inlist=found.lis outlist=out.lis
+*             markstyle="colour=skyblue,showindex=0"
 *        The image gc6253 will be displayed, with the points stored in
 *        the position list 'found.lis' already plotted on it.  These 
 *        may be added to, moved and deleted, and the resulting list
-*        will be written to the file out.lis.
+*        will be written to the file out.lis.  Points will initially
+*        be marked using skyblue markers, and not labelled with index 
+*        numbers.
 
 *  Notes:
 *     - Position list formats.
@@ -242,10 +254,10 @@
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 *
-*     Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM)
-*     give initial values for quantities which can be modified while
-*     the program is running.  Although these may be specified on the
-*     command line, it is normally easier to start the program up and
+*     Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM,
+*     MARKSTYLE) give initial values for quantities which can be modified 
+*     while the program is running.  Although these may be specified on
+*     the command line, it is normally easier to start the program up and
 *     modify them using the graphical user interface.  If the program
 *     exits normally, their values at the end of the run will be used
 *     as defaults next time the program starts up.
@@ -306,7 +318,6 @@
       LOGICAL INEXT              ! True if input position list is in extension
       LOGICAL LOPEN              ! True if output file is open
       LOGICAL RDLIST             ! True if using initial position lists
-      LOGICAL SHOIND             ! True if index numbers are to be plotted
       DOUBLE PRECISION PERCNT( 2 ) ! Low and high percentiles for display
       DOUBLE PRECISION XPOS( MAXPOS ) ! X coordinates of positions in list
       DOUBLE PRECISION YPOS( MAXPOS ) ! Y coordinates of positions in list
@@ -314,6 +325,7 @@
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for line output to file
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       CHARACTER * ( GRP__SZFNM ) FNAME ! Name of output list file
+      CHARACTER * ( 132 ) MSTYLE ! Marker style string
 
 *.
                      
@@ -366,12 +378,12 @@
       END IF
 
 *  Get display preference parameters from the parameter system.
-      CALL PAR_GET0L( 'SHOWIND', SHOIND, STATUS )
       CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
       CALL PAR_GET0D( 'ZOOM', ZOOM, STATUS )
       CALL PAR_GET0I( 'MAXCANV', MAXCNV, STATUS )
       CALL PAR_GET0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
+      CALL PAR_GET0C( 'MARKSTYLE', MSTYLE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Issue instructions about how to interact with the GUI.
@@ -457,9 +469,9 @@
          
 
 *  Invoke the Tcl code to do the work.
-         CALL CCD1_TCURS( NDFNAM( 1:CHR_LEN( NDFNAM ) ), MAXPOS, SHOIND, 
-     :                    PERCNT, ZOOM, MAXCNV, WINDIM, ID, XPOS, YPOS,
-     :                    NPOS, STATUS )
+         CALL CCD1_TCURS( NDFNAM( 1:CHR_LEN( NDFNAM ) ), MAXPOS,
+     :                    PERCNT, ZOOM, MAXCNV, WINDIM, MSTYLE, ID,
+     :                    XPOS, YPOS, NPOS, STATUS )
 
 *  Access the output file in which to store the positions.  The name
 *  of this file is stored in the OLSTGR list of names.
@@ -515,6 +527,7 @@
       CALL PAR_PUT0I( 'MAXCANV', MAXCNV, STATUS )
       CALL PAR_PUT0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
+      CALL PAR_PUT0C( 'MARKSTYLE', MSTYLE, STATUS )
       CALL PAR_PUT1D( 'PERCENTILES', 2, PERCNT, STATUS )
 
 *  Exit on error label.

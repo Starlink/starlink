@@ -13,6 +13,9 @@
 #     which allows selection of a matching set of points on each one.
 #
 #  External Variables:
+#     MARKSTYLE = string (Given and Returned)
+#        A string, in the form of comma-separated att=value pairs,
+#        indicating how markers should be plotted on the image.
 #     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
 #        NDF is to be displayed.  If zero, there is no limit.
@@ -67,8 +70,8 @@
       set nother [ expr $nndf - 1 ]
 
 #  Set defaults for some arguments.
-      foreach pair { { ZOOM 1 } { WINX 300 } { WINY 300 } \
-                     { PERCLO 5 } { PERCHI 95 } { MAXCANV 0 } } {
+      foreach pair { { ZOOM 1 } { WINX 300 } { WINY 300 } { PERCLO 5 } \
+                     { PERCHI 95 } { MAXCANV 0 } { MARKSTYLE "" } } {
          if { ! [ info exists [ lindex $pair 0 ] ] } { 
             eval set $pair
          }
@@ -100,9 +103,11 @@
                   -percentiles [ list $PERCLO $PERCHI ] \
                   -zoom $ZOOM \
                   -maxpoints $MAXPOS \
+                  -markstyle $MARKSTYLE \
                   -geometry ${WINX}x${WINY}
       [ .vref component exit ] configure \
          -balloonstr "Start marking points on other images"
+      .vref configure -markstyle showindex=1
       catch { unset basichelp }
       lappend basichelp \
    "Use this viewer to mark objects on the image." \
@@ -137,6 +142,7 @@
       set MAXCANV [ .vref maxcanvas ]
       set PERCLO [ lindex [ .vref cget -percentiles ] 0 ]
       set PERCHI [ lindex [ .vref cget -percentiles ] 1 ]
+      set MARKSTYLE [ .vref cget -markstyle ]
 
 #  Allow the user to muck about with the list for the reference NDF 
 #  while the later ones are being modified.
@@ -180,7 +186,8 @@
                  -percentiles [ list $PERCLO $PERCHI ] \
                  -zoom $ZOOM \
                  -maxpoints $MAXPOS \
-                 -geometry $geometry
+                 -geometry $geometry \
+                 -markstyle $MARKSTYLE
       [ .v component exit ] configure -balloonstr "Finish marking this image"
 
 #  Alter the help text somewhat to reflect the current state of play.

@@ -123,6 +123,21 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is 'BOTH'.
 *        [BOTH]
+*     MARKSTYLE = LITERAL (Read and Write)
+*        A string indicating how markers are initially to be plotted on
+*        the image.  It consists of a comma-separated list of
+*        "attribute=value" type strings.  The available attributes are:
+*           - colour     -- Colour of the marker in Xwindows format.
+*           - size       -- Approximate height of the marker in pixels.
+*           - thickness  -- Approximate thickness of lines in pixels.
+*           - shape      -- One of Plus, Cross, Circle, Square, Diamond.
+*
+*        This parameter only gives the initial marker type; it can be
+*        changed interactively while the program is running.
+*        If specifying this value on the command line, it is not
+*        necessary to give values for all the attributes; missing ones
+*        will be given sensible defaults.
+*        [""]
 *     MAXCANV = INTEGER (Read and Write)
 *        A value in pixels for the maximum initial X or Y dimension of 
 *        the region in which the image is displayed.  Note this is the      
@@ -264,6 +279,7 @@
 *  Local Variables:
       CHARACTER * ( 1024 ) LINE ! Output message line (long)
       CHARACTER * ( 256 ) CMD   ! Command string
+      CHARACTER * ( 132 ) MSTYLE ! Marker style string
       CHARACTER * ( 5 ) NULL    ! Parameter NULL symbol
       CHARACTER * ( 30 ) LISTID ! Identifier in filename for list
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
@@ -429,6 +445,7 @@
       CALL PAR_GET0I( 'MAXCANV', MAXCNV, STATUS )
       CALL PAR_GET0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
+      CALL PAR_GET0C( 'MARKSTYLE', MSTYLE, STATUS )
 
 *  Allocate memory for coordinates of position lists.
       CALL CCD1_MALL( MAXPOS * NNDF, '_INTEGER', IPIND, STATUS )
@@ -438,7 +455,7 @@
 *  Call the routine which will do the graphical user interaction to
 *  obtain the position lists for each group of NDFs.
       CALL CCD1_ALGN( NDFNMS, NNDF, REFPOS, MAXPOS, PERCNT, ZOOM, 
-     :                MAXCNV, WINDIM, NPOINT, %VAL( IPXPOS ),
+     :                MAXCNV, WINDIM, MSTYLE, NPOINT, %VAL( IPXPOS ),
      :                %VAL( IPYPOS ), %VAL( IPIND ), STATUS )
 
 *  Write display preference parameters back to the parameter system.
@@ -448,6 +465,7 @@
       CALL PAR_PUT0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_PUT1D( 'PERCENTILES', 2, PERCNT, STATUS )
+      CALL PAR_PUT0C( 'MARKSTYLE', MSTYLE, STATUS )
 
 *  Start up the CCDPACK_REG monolith which is used later in this task.
       CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )

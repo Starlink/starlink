@@ -13,6 +13,9 @@
 #     so that points on it may be indicated.
 #
 #  External Variables:
+#     MARKSTYLE = string (Given and Returned)
+#        A string, in the form of comma-separated att=value pairs, 
+#        indicating how markers should be plotted on the image.
 #     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
 #        NDF is to be displayed.  If zero, there is no limit.
@@ -30,10 +33,6 @@
 #        A list of the pixel coordinates indicated by the user on the NDF.
 #        Each element of the list is of the form {I X Y}, where I is a
 #        unique integer index and X and Y are the coordinates.
-#     SHOWIND = integer (Given)
-#        If true (non-zero), then the index numbers of each point will be
-#        displayed.  Otherwise only markers representing the points 
-#        themselves will be plotted.
 #     WINX = integer (Given and Returned)
 #        X dimension of the window used for NDF display.
 #     WINY = integer (Given and Returned)
@@ -62,9 +61,9 @@
                       -percentiles [ list $PERCLO $PERCHI ] \
                       -watchstatus viewstatus \
                       -zoom $ZOOM \
-                      -uselabels $SHOWIND \
                       -maxpoints $MAXPOS \
-                      -geometry ${WINX}x${WINY}
+                      -geometry ${WINX}x${WINY} \
+                      -markstyle $MARKSTYLE
 
 #  Tinker with cosmetic aspects of the viewer.
       [ .viewer component exit ] configure -balloonstr "Finish adding points"
@@ -73,13 +72,10 @@
       catch { unset helplines }
       lappend helplines \
          "Click with mouse button 1 (left) on the image to add a point" \
-         "Click with mouse button 3 (right) on the image to remove a point"
-      if { $SHOWIND } {
-         lappend helplines \
-        "" \
-        "Use the `Markers' control to change the index of the next point marked"
-      }
-      lappend helplines \
+         "Click with mouse button 3 (right) on the image to remove a point" \
+         "" \
+         "Use the `Markers' controls to set the shape of the markers" \
+         "and change the index of the next point marked." \
          "" \
          "Click the `Done' button to finish marking points and end the program"
       .viewer configure -helptext [ join $helplines "\n" ]
@@ -108,6 +104,7 @@
       regexp {^([0-9]+)x([0-9]+)} [ winfo geometry .viewer ] dummy WINX WINY
       set PERCLO [ lindex [ .viewer cget -percentiles ] 0 ]
       set PERCHI [ lindex [ .viewer cget -percentiles ] 1 ]
+      set MARKSTYLE [ .viewer cget -markstyle ]
 
 #  Set the return variable to contain the list of points selected.  If 
 #  If we were displaying the indices then return the list with the indices
@@ -126,13 +123,9 @@
                                     [ $ndf frameatt Symbol(2) $frame ] ]
          set i 0
          foreach point [ .viewer points ] {
+            set i [ lindex $point 0 ]
             set x [ lindex $point 1 ]
             set y [ lindex $point 2 ]
-            if { $SHOWIND } {
-               set i [ lindex $point 0 ]
-            } else {
-               incr i
-            }
             lappend POINTS [ list $i $x $y ]
             set fpos [ lindex \
                        [ $ndf wcstran -format pixel $frame [ list $x $y ] ] 0 ]

@@ -1,20 +1,24 @@
 #include "f77.h"
 #include "sae_par.h"
+#include "mers.h"
 #include "tcl.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include "ccdtcl.h"
+
 
 
 #define BUFLENG 200
 
 
    F77_SUBROUTINE(ccd1_tcurs)( CHARACTER(ndfnam), INTEGER(maxpos), 
-                               LOGICAL(shoind), DOUBLE_ARRAY(percnt), 
-                               DOUBLE(zoom), INTEGER(maxcanv), INTEGER(windim),
+                               DOUBLE_ARRAY(percnt), DOUBLE(zoom), 
+                               INTEGER(maxcanv), INTEGER(windim),
+                               CHARACTER(mstyle),
                                INTEGER_ARRAY(id), DOUBLE_ARRAY(xpos), 
                                DOUBLE_ARRAY(ypos), INTEGER(npos), 
                                INTEGER(status)
-                               TRAIL(ndfnam) ) {
+                               TRAIL(ndfnam) TRAIL(mstyle) ) {
 /*
 *+
 *  Name:
@@ -27,8 +31,8 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_TCURS( NDFNAM, MAXPOS, SHOIND, PERCNT, ZOOM, MAXCANV,
-*                      WINDIM, XPOS, YPOS, NPOS, STATUS )
+*     CALL CCD1_TCURS( NDFNAM, MAXPOS, PERCNT, ZOOM, MAXCANV,
+*                      WINDIM, MSTYLE, YPOS, NPOS, STATUS )
 
 *  Description:
 *     This routine calls a Tcl script which displays an NDF in a window
@@ -47,8 +51,6 @@
 *        Name of an NDF to use.
 *     MAXPOS = INTEGER (Given)
 *        The size of the XPOS and YPOS arrays.
-*     SHOIND = LOGICAL (Given)
-*        True if index numbers are to be plotted along with the points.
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
@@ -60,6 +62,8 @@
 *        is to be displayed (if zero there is no limit).
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
+*     MSTYLE = CHARACTER * ( * ) (Given and Returned)
+*        A string indicating how markers are to be plotted on the image.
 *     ID( MAXPOS ) = INTEGER (Given and Returned)
 *        The index idenfiers for the positions selected.
 *     XPOS( MAXPOS ) = DOUBLE PRECISION (Given and Returned)
@@ -92,11 +96,11 @@
 /* Arguments. */
       GENPTR_CHARACTER(ndfnam)
       GENPTR_INTEGER(maxpos)
-      GENPTR_LOGICAL(shoind)
       GENPTR_DOUBLE(zoom)
       GENPTR_DOUBLE_ARRAY(percnt)
       GENPTR_INTEGER(maxcanv)
       GENPTR_INTEGER_ARRAY(windim)
+      GENPTR_CHARACTER(mstyle)
       GENPTR_INTEGER_ARRAY(id)
       GENPTR_DOUBLE_ARRAY(xpos)
       GENPTR_DOUBLE_ARRAY(ypos)
@@ -106,6 +110,7 @@
 /* Local variables. */
       ccdTcl_Interp *cinterp;
       char buffer[ BUFLENG ];
+      char *cmstyle;
       int i;
 
 /* Test the global status. */
@@ -116,16 +121,22 @@
       if ( *status != SAI__OK ) return;
 
 /* Set the value of Tcl variables to be passed into the script. */
+      if ( ( cmstyle = malloc( mstyle_length + 1 ) ) == NULL ) {
+         *status = SAI__ERROR;
+         errRep( " ", "Memory allocation failed", status );
+         return;
+      }
       cnfImprt( ndfnam, ndfnam_length, ndfnam );
+      cnfImprt( mstyle, mstyle_length, cmstyle );
       ccdTclSetC( cinterp, "NDFNAME", ndfnam, status );
       ccdTclSetI( cinterp, "MAXPOS", *maxpos, status );
-      ccdTclSetI( cinterp, "SHOWIND", F77_ISTRUE(*shoind) ? 1 : 0, status );
       ccdTclSetD( cinterp, "ZOOM", *zoom, status );
       ccdTclSetD( cinterp, "PERCLO", percnt[ 0 ], status );
       ccdTclSetD( cinterp, "PERCHI", percnt[ 1 ], status );
       ccdTclSetI( cinterp, "MAXCANV", *maxcanv, status );
       ccdTclSetI( cinterp, "WINX", windim[ 0 ], status );
       ccdTclSetI( cinterp, "WINY", windim[ 1 ], status );
+      ccdTclSetC( cinterp, "MARKSTYLE", cmstyle, status );
       for ( i = 0; i < *npos; i++ ) {
          sprintf( buffer, "lappend POINTS [ list %d %lf %lf ]", 
                           id[ i ], xpos[ i ], ypos[ i ] );
@@ -153,6 +164,9 @@
          ccdTclGetI( cinterp, "set MAXCANV", maxcanv, status );
          ccdTclGetI( cinterp, "set WINX", windim, status );
          ccdTclGetI( cinterp, "set WINY", windim + 1, status );
+         cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ), 
+                   mstyle, mstyle_length );
+         free( cmstyle );
       }
 
 /* Delete the Tcl interpreter. */

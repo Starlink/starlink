@@ -163,6 +163,17 @@
             helpkey *
          }
 
+         parameter markstyle {
+                           # Plot marker type
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default {}
+            prompt {String giving style of markers to plot}
+            helpkey *
+         }
+
 
       }
 
