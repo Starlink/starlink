@@ -15785,13 +15785,19 @@ default value.
          place of the value 2). {\tt [current value]}
       }
       \sstsubsection{
-         LABOUT = \_LOGICAL (Read)
+         LABPOS = \_REAL() (Read)
       }{
-         Only used if parameter MODE is set to {\tt "}Good{\tt "} or {\tt "}Bounds{\tt "}. If a TRUE
-         value is supplied then the name of the input NDF is included in
-         the plot as a label. The label is positioned so that its bottom
-         left corner is close to the bottom left pixel in the NDF. The
-         appearance of the label can be set by using the STYLE parameter
+         Only used if parameter MODE is set to {\tt "}Good{\tt "} or {\tt "}Bounds{\tt "}. It
+         specifies the position at which to place a label identifying the
+         input NDF within the plot. The label is drawn parallel to the
+         first pixel axis. Two values should be supplied for LABPOS. The 
+         first value specifies the distance in millimetres along the first
+         pixel axis from the centre of the bottom left pixel to the left 
+         edge of the label. The second value specifies the distance in 
+         millimetres along the second pixel axis from the centre of the 
+         bottom left pixel to the baseline of the label. If a null (!) 
+         value is given, no label is produced. The appearance of the label 
+         can be set by using the STYLE parameter
          (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [current value]}
       }
       \sstsubsection{
@@ -15836,7 +15842,7 @@ default value.
             \sstitem
               {\tt "}Bounds{\tt "} -- A single {\tt "}contour{\tt "} is drawn representing the
               bounds of the input array. A label may also be added (see
-              parameter LABOUT).
+              parameter LABPOS).
 
             \sstitem
               {\tt "}Equalised{\tt "} -- You define the number of equally spaced
@@ -15847,7 +15853,7 @@ default value.
 
             \sstitem
               {\tt "}Good{\tt "} -- A single {\tt "}contour{\tt "} is drawn outlining the good pixel
-              values. A label may also be added (see parameter LABOUT).
+              values. A label may also be added (see parameter LABPOS).
 
             \sstitem
               {\tt "}Linear{\tt "} -- You define the number of contours, the start
@@ -32409,7 +32415,7 @@ plot (9k).
       supplied NDF.
 
       This command is a synonym for {\tt contour mode=bounds penrot=yes
-      labout=yes clear=no}.
+      clear=no}.
    }
    \sstusage{
       outline 
@@ -32431,12 +32437,17 @@ plot (9k).
       \sstsubsection{
          LABOUT = \_LOGICAL (Read)
       }{
-         If a TRUE
-         value is supplied then the name of the input NDF is included in
-         the plot as a label. The label is positioned so that its bottom
-         left corner is close to the bottom left pixel in the NDF. The
-         appearance of the label can be set by using the STYLE parameter
-         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [TRUE]}
+         Specifies the position at which to place a label identifying the
+         input NDF within the plot. The label is drawn parallel to the
+         first pixel axis. Two values should be supplied for LABPOS. The 
+         first value specifies the distance in millimetres along the first
+         pixel axis from the centre of the bottom left pixel to the left 
+         edge of the label. The second value specifies the distance in 
+         millimetres along the second pixel axis from the centre of the 
+         bottom left pixel to the baseline of the label. If a null (!) 
+         value is given, no label is produced. The appearance of the label 
+         can be set by using the STYLE parameter
+         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [current value]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -46093,8 +46104,8 @@ The following applications have been modified:
                will produce a ``contour'' which encloses all the good 
                pixel values. Setting MODE to ``Bounds'' will produce 
                a curve which traces the edges of the array.
-         \item A new parameter LABOUT has been added which controls
-               whether or not labels are produced when drawing outlines 
+         \item A new parameter LABPOS has been added which controls
+               the position of labels produced when drawing outlines 
                using modes ``Good'' and ``Bounds''.
          \item The number of pen colours used in a cycle if PENROT is set 
                TRUE has been increased from 3 to 5.

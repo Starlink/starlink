@@ -4515,14 +4515,20 @@ KEYSTYLE = GROUP (Read)
    be used in place of value 1). Contour values are formatted
    using attributes Format(2), etc (the synonym Value can be used in
    place of the value 2). [current value]
-3 LABOUT
-LABOUT = _LOGICAL (Read)
-   Only used if parameter MODE is set to "Good" or "Bounds". If a TRUE
-   value is supplied then the name of the input NDF is included in
-   the plot as a label. The label is positioned so that its bottom
-   left corner is close to the bottom left pixel in the NDF. The
-   appearance of the label can be set by using the STYLE parameter
-   (for instance "Size(strings)=2"). [current value]
+3 LABPOS
+LABPOS = _REAL() (Read)
+   Only used if parameter MODE is set to "Good" or "Bounds". It
+   specifies the position at which to place a label identifying the
+   input NDF within the plot. The label is drawn parallel to the
+   first pixel axis. Two values should be supplied for LABPOS. The 
+   first value specifies the distance in millimetres along the first
+   pixel axis from the centre of the bottom left pixel to the left 
+   edge of the label. The second value specifies the distance in 
+   millimetres along the second pixel axis from the centre of the 
+   bottom left pixel to the baseline of the label. If a null (!) 
+   value is given, no label is produced. The appearance of the label 
+   can be set by using the STYLE parameter (for instance 
+   "Size(strings)=2"). [current value]
 3 LENGTH
 LENGTH() = _REAL (Write)
    On exit this holds the total length in pixels of the contours at each
@@ -4555,7 +4561,7 @@ MODE = LITERAL (Read)
 
      - "Bounds" -- A single "contour" is drawn representing the
      bounds of the input array. A label may also be added (see
-     parameter LABOUT).
+     parameter LABPOS).
 
      - "Equalised" -- You define the number of equally spaced
      percentiles.
@@ -4563,7 +4569,7 @@ MODE = LITERAL (Read)
      - "Free" -- You specify a series of contour values explicitly.
 
      - "Good" -- A single "contour" is drawn outlining the good pixel
-     values. A label may also be added (see parameter LABOUT).
+     values. A label may also be added (see parameter LABPOS).
 
      - "Linear" -- You define the number of contours, the start
      contour level and linear step between contours.
@@ -4887,7 +4893,7 @@ DSB: David S. Berry (STARLINK)
     of the DATA picture.
 
  25-JAN-2001 (DSB):
-    Added modes Good and Bounds, and parameter LABOUT.
+    Added modes Good and Bounds, and parameter LABPOS.
 2 Implementation_Status
    -  Only real data can be processed directly.  Other non-complex
    numeric data types will undergo a type conversion before the
@@ -22598,8 +22604,7 @@ Description:
    parameter STYLE). The axes show co-ordinates in the current
    co-ordinate Frame of the supplied NDF.
 
-   This command is a synonym for "contour mode=bounds penrot=yes
-   labout=yes".
+   This command is a synonym for "contour mode=bounds penrot=yes".
 
 2 Parameters
 For information on individual parameters, select from the list below:
@@ -22612,14 +22617,19 @@ AXES = _LOGICAL (Read)
 3 DEVICE
 DEVICE = DEVICE (Read)
    The plotting device. [current image-display device]
-3 LABOUT
-LABOUT = _LOGICAL (Read)
-   Only used if parameter MODE is set to "Good" or "Bounds". If a TRUE
-   value is supplied then the name of the input NDF is included in
-   the plot as a label. The label is positioned so that its bottom
-   left corner is close to the bottom left pixel in the NDF. The
-   appearance of the label can be set by using the STYLE parameter
-   (for instance "Size(strings)=2"). [current value]
+3 LABPOS
+LABPOS = _REAL() (Read)
+   Specifies the position at which to place a label identifying the
+   input NDF within the plot. The label is drawn parallel to the
+   first pixel axis. Two values should be supplied for LABPOS. The 
+   first value specifies the distance in millimetres along the first
+   pixel axis from the centre of the bottom left pixel to the left 
+   edge of the label. The second value specifies the distance in 
+   millimetres along the second pixel axis from the centre of the 
+   bottom left pixel to the baseline of the label. If a null (!) 
+   value is given, no label is produced. The appearance of the label 
+   can be set by using the STYLE parameter (for instance 
+   "Size(strings)=2"). [current value]
 3 MARGIN
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave around the outline for
