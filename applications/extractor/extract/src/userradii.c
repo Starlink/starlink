@@ -21,7 +21,7 @@
  *        step[,start,zp]
  *
  *     step being the interval between levels, start being the value
- *     of the first level and zp the data zero poingt (all in
+ *     of the first level and zp the data zero point (all in
  *     magnitudes per square arcsecond). If only one value is given
  *     then the starting point is assumed to be the analysis threshold
  *     and the zero point is derived from the photometric value.
@@ -221,7 +221,11 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
          }
       }
 
-      /*  If image intensities are photographic */
+      /*  Measurements */
+      /*  ============ */
+
+      /*  If image intensities are photographic then convert from
+          plain intensities to densities */
       if ( prefs.detect_type == PHOTO ) {
          for( i = 0; i < NRAD; i++ ) {
             if ( threshs[i] != BIG ) {
@@ -238,7 +242,6 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
            pixt  = pixel + PLIST( pixt, nextpix ) ) {
          for( i = 0, rad = obj->rad, thresht = threshs;
               i < NRAD ; i++, rad++, thresht++ ) {
-            /*if ( PLIST( pixt, value ) >= *thresht && *thresht != BIG ) {*/
             if ( PLIST( pixt, value ) > *thresht && *thresht != BIG ) {
                (*rad)++;
             } else if ( *thresht != BIG ) {
