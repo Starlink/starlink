@@ -835,6 +835,8 @@
                   END IF
                   CALL MSG_SETC( 'DAT', DATAROW(I) )
                   CALL IMPORT_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
+                  STATUS = SAI__ERROR
+                  GOTO 99
                 END IF
 
               END IF
@@ -855,10 +857,16 @@
      :                                              DATAROW(I)
               GOOD_LINE = ( STATUS .EQ. SAI__OK )
               IF ( STATUS .NE. SAI__OK ) THEN
+                IF ( NELM .EQ. 1 ) THEN
+                  CALL MSG_SETC( 'TXT', 'unrecognised header'/
+     :                           /' keyword or bad data' )
+                ELSE
+                  CALL MSG_SETC( 'TXT', 'data =' )
+                END IF
                 CALL MSG_SETC( 'DAT', DATAROW(I) )
-                CALL IMPORT_ERROR( 'Read error data = "^DAT"',
-     :                              CLINE )
-                CALL IMPORT_ERROR( 'Real conversion error', CLINE )
+                CALL IMPORT_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
+                STATUS = SAI__ERROR
+                GOTO 99
               END IF
 
               IF ( SET_DEFAULT ) DEF_VALS(I) = DATAROW(I)
@@ -1241,8 +1249,7 @@
 
 
 *+  IMPORT_EXTQSYM - Gets a keyword-data pair from a word list
-      SUBROUTINE IMPORT_EXTQSYM( KEYWORD, KEY_DATA, KEY_DATA_OK,
-     :                                                  STATUS )
+      SUBROUTINE IMPORT_EXTQSYM( KEYWORD, KDAT, KDAT_OK, STATUS )
 *
 *    Description :
 *
@@ -1280,9 +1287,9 @@
 *
 *    Export :
 *
-      CHARACTER*(*)       KEY_DATA               ! The data for the keyword
+      CHARACTER*(*)       KDAT               ! The data for the keyword
 
-      LOGICAL             KEY_DATA_OK            ! Keyword data found OK
+      LOGICAL             KDAT_OK            ! Keyword data found OK
 *
 *    Function declarations :
 *
@@ -1300,8 +1307,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Search for the keyword
-      KEY_DATA_OK = .FALSE.
-      KEY_DATA = ' '
+      KDAT_OK = .FALSE.
+      KDAT = ' '
 
       I = IMPORT_LOCSYM(KEYWORD)
       KEY_OK = ( I .NE. 0 )
@@ -1312,11 +1319,11 @@
           I2 = WD_LEN(I+1)
 
           IF ( WD_DATA(I+1)(1:1) .EQ. '"' ) THEN
-            KEY_DATA = WD_DATA(I+1)(2:(I2-1))
+            KDAT = WD_DATA(I+1)(2:(I2-1))
           ELSE
-            KEY_DATA = WD_DATA(I+1)(1:I2)
+            KDAT = WD_DATA(I+1)(1:I2)
           END IF
-          KEY_DATA_OK = ( CHR_LEN( KEY_DATA ) .GT. 0 )
+          KDAT_OK = ( CHR_LEN( KDAT ) .GT. 0 )
           WD_USED(I+1) = .TRUE.
         END IF
       END IF
