@@ -32,7 +32,7 @@ That is, <code>(getdocinfo 'title)</code> returns the current document's title
   <type>symbol
   <description>
   <p>Symbol giving the name of one of the children of the docinfo element
-<parameter optional="optional">nd
+<parameter optional default='(current-node)'>nd
   <type>node-list
   <description>
   <p>A node-list which indicates the grove which is to supply the
@@ -50,40 +50,128 @@ That is, <code>(getdocinfo 'title)</code> returns the current document's title
 	dinl)))
 
 <func>
+<routinename>getdocbody
+<description>
+<p>Return a node-list consisting of the specified child of the docbody element
+for the current grove, or false if there is no such child.
+That is, <code>(getdocbody 'abstract)</code> returns the current document's 
+abstract.
+<returnvalue type="node-list">
+<parameter>type
+  <type>symbol
+  <description>
+  <p>Symbol giving the name of one of the children of the docbody element
+<parameter optional default='(current-node)'>nd
+  <type>node-list
+  <description>
+  <p>A node-list which indicates the grove which is to supply the
+  document element.  If omitted, it defaults to the current node, and
+  the document element corresponding to the current grove is obtained
+  and returned.
+<codebody>
+(define (getdocbody type #!optional (nd (current-node)))
+  (let* ((docelem (document-element nd))
+	 (dinl (select-elements (children (select-elements (children docelem)
+							            'docbody))
+				type)))
+    (if (node-list-empty? dinl)
+	#f
+	dinl)))
+
+<func>
 <routinename>getdocnumber
 <description>
-Return the current node's document number as a string, or <code/#f/ if
-unavailable (because DOCNUMBER isn't defined)
-<returnvalue type=string>The document number as a string
-<parameter optional>
+Return the current node's document number as a string.  If the second optional
+argument is true, then return the document number as a longer description
+rather than a code.  That is, as `Starlink Cookbook n.m' rather than `SC/n.m'
+<returnvalue type=string>The document number as a string, or <code/#f/ 
+if <code/docnumber/ isn't defined.
+<parameter optional default='(current-node)'>
   <name>nd
   <type>node-list
   <description>
   <p>If present, this indicates which grove is to be used to find the
-  document element.  Defaults to <code/(current-node)/.
+  document element.
+<parameter optional default='#f'>
+  <name>asString
+  <type>boolean
+  <description>If true, return a longer descriptive string rather than a code.
 <codebody>
-(define (getdocnumber #!optional (nd (current-node)))
+(define (getdocnumber #!optional (nd (current-node)) (asString #f))
   (let* ((dn (getdocinfo 'docnumber nd))
+	 (doctype (and dn
+		       (attribute-string (normalize "documenttype") dn)))
 	 (docelemtype (and dn
-			   (if (attribute-string (normalize "documenttype") dn)
-			       (attribute-string (normalize "documenttype") dn)
+			   (if doctype
+			       (if asString
+				   (string-append (code-to-string doctype)
+						  " ")
+				   (string-append doctype "/"))
 			       (error "DOCNUMBER has no DOCUMENTTYPE")))))
     (if dn
 	(string-append docelemtype
-		       "/"
 		       (if (attribute-string "UNASSIGNED" dn)
 			   "??"
 			   (trim-string (data dn))))
 	#f	
 	)))
 
+<func>
+<routinename>code-to-string
+<description>Map a document code (SC, SUN, etc) to a string
+<returnvalue type=string>Document class
+<parameter>doccode
+  <type>string
+  <description>One of the Starlink document codes
+<codebody>
+(define (code-to-string doccode)
+  (case (normalize doccode)
+    (("SUN") "Starlink User Note")
+    (("SSN") "Starlink System Note")
+    (("MUD") "Miscellaneous User Document")
+    (("SC") "Starlink Cookbook")
+    (("SG") "Starlink Guide")
+    (("SGP") "Starlink General Paper")
+    (("SUG") "Starlink Users' Guide")
+    (else (error (string-append "Unknown document code " doccode)))))
+
+<func>
+<routinename>stringlist->string
+<description>Turn a list of strings into one string, 
+with elements separated by a constant string.
+<returnvalue type=string>Concatenated string
+<parameter>list
+  <type>list of strings
+  <description>List of strings to be joined
+<parameter>begin-string
+  <type>string
+  <description>String to start the list
+<parameter>sep-string
+  <type>string
+  <description>String to be inserted between each of the elements
+  in <code/list/.
+<parameter>end-string
+  <type>string
+  <description>String to end the list
+<codebody>
+(define (stringlist->string list begin-string sep-string end-string)
+  (let loop ((l list)
+	     (allstrings begin-string))
+    (if (null? l)
+	allstrings
+	(loop (cdr l)
+	      (string-append allstrings
+			     (car l)
+			     (if (null? (cdr l))
+				 end-string
+				 sep-string))))))
 
 <misccode>
 <miscprologue>
 <description>
 <p>Section number formatting
 <p>Various routines for obtaining and formatting section headings.
-</description></miscprologue>
+<codebody>
 ; Define the formats for section and appendix numbering, in order
 ; (subsubsubsect, subsubsect, subsect, sect)
 (define %section-fmts '("1" "1" "1" "1"))
@@ -95,15 +183,6 @@ unavailable (because DOCNUMBER isn't defined)
     (if (or (<= (length l) n) (null? l))
 	l
 	(loop (cdr l)))))
-
-; Turn a list of strings into one string, with elements separated by sep
-(define (stringlist->string list sep)
-  (let loop ((l list)
-	     (allstrings ""))
-    (if (null? l)
-	allstrings
-	(loop (cdr l)
-	      (string-append allstrings (car l) sep)))))
 
 ;; Return a sosofo with the title of the current node,
 ;; prefixed by its section number.  If the optional argument ts is given, it
@@ -122,7 +201,7 @@ unavailable (because DOCNUMBER isn't defined)
 			 (if inappendix	; ...formatted appropriately
 			     %appendix-fmts
 			     %section-fmts)))
-	 (sn (stringlist->string hier-strs "."))
+	 (sn (stringlist->string hier-strs "" "." ""))
 	 )
     (make sequence
       (literal ;(if inappendix "Appendix " "Section ")
@@ -139,20 +218,6 @@ unavailable (because DOCNUMBER isn't defined)
    ((equal? (gi sect) (normalize "subsect")) 2)
    ((equal? (gi sect) (normalize "sect")) 1)
    (else 1)))
-
-;; Return a list of elements which are allowable targets for a link.
-;; This will be used when linking to (an ID attribute within) an
-;; object which can't be linked to directly.  It doesn't matter if
-;; there's redundancy in this - the appropriate element is selected as
-;; the first member of this list amongst the target element's ancestors.
-;;
-;; For example, the LABEL
-;; element in the DocumentSummary DTD requires this.
-(define (target-element-list)
-  (list (normalize "sect")
-	(normalize "subsect")
-	(normalize "subsubsect")
-	(normalize "appendices")))
 
 (mode section-reference
   (element sect
@@ -305,6 +370,35 @@ char-property - see notes at
 </misccode>
 
 <func>
+<routinename>root-file-name
+<description>
+Returns the filename to be used for the root HTML file, based on
+document type and DOCNUMBER if present (which need not be the case for
+all document types). Another way to set this might be through a
+processing-instruction.
+<returnvalue type=string>Complete filename for the `entry-point' HTML file.
+<argumentlist>
+<parameter optional default='(current-node)'>
+  nd<type>node-list<description>Node which identifies the grove 
+  we want the root file name of
+<codebody>
+(define (root-file-name #!optional (nd (current-node)))
+  (let* ((dn (getdocinfo 'docnumber nd))
+	 (docelemtype (if dn
+			  (if (attribute-string (normalize "documenttype") dn)
+			      (attribute-string (normalize "documenttype") dn)
+			      (error "DOCNUMBER has no DOCUMENTTYPE"))
+			  (gi (document-element))))
+	 (docref (if dn
+		     (if (attribute-string "UNASSIGNED" dn)
+			 "unassigned"	; is there a better alternative?
+			 (trim-data dn))
+		     (trim-data (getdocinfo 'docdate nd))
+		 )))
+    (string-append docelemtype ;(gi (document-element))
+		   (if docref (string-append "-" docref) ""))))
+
+<func>
 <routinename>document-release-info
 <description>
 <p>
@@ -386,6 +480,134 @@ element really does have the latest date).
 
 
 <func>
+<routinename>get-link-policy-target
+<purpose>Check that the `link policy' is satisfied by a target element.
+<description>This function expresses the `link policy' we wish this
+stylesheet to impose on the element (in a separate document) which is
+the putative target of a link.
+
+<p>Check link policy, and return a pair.  The <code/car/ of the pair
+is <code/#f/ if the policy is satisfied, and a string otherwise (this
+is an error, which should be signalled with the string as an
+explanation, and no link should be made); the <code/cdr/ is a string
+URL giving the URL to be used, or <code/#f/ if the policy is satisfied
+but no link should be made (ie, if the <code/urllinkpolicy/ is NONE).
+
+<p>The link policy is as follows.
+If the <code/documentsummary/ element's <code/exportedlinkpolicy/
+has the value <code/"exportedonly"/, we may only link to targets which
+have the <code/export/ attribute present and set to <code/"export"/:
+that is, if we have <code/"exportedonly"/ but no <code/export/, then
+the policy is trivially satisfied, but we do not return any URL.  If
+the <code/documentsummary/ element's <code/urllinkpolicy/ attribute is
+<code/"automatic"/, then the <code/urlpath/ attribute must not be
+present, and we generate a URL based on the element's location in the
+hierarchy; if it is <code/"explicit"/, the <code/urlpath/ must be
+present; if it is <code/"none"/, then the policy is satisfied, but no URL
+should be returned.
+
+<p>Note that this function is designed to emit URLs as part of its response.
+That is, it is partly specific to the stylesheet which generates HTML.  
+The link policy, however, is <em/not/ specific to HTML, and the link with
+the HTML stylesheet is only because that stylesheet is the most sophisticated
+one, to which is delegated such tasks as checking the link policy by calling
+this function.  For these reasons, this function should indeed be in this
+common set of functions.  It may be called from the LaTeX stylesheet, however,
+in which case the keyed argument <code/no-urls/ should be set true, to
+prevent the function referencing the undefined (in that stylesheet)
+variables <code/%starlink-document-server/ and <code/href-to/ (actually,
+this fails to work, due to what may be either a bug, or
+implementation-defined behaviour in Jade, so the calling file should specify
+dummy values for these two variables).
+
+<returnvalue type=pair>If <code/car/ is true, the policy has been
+violated and the <code/car/ contains an error.  If <code/cdr/ is true,
+then a link should be made, using the URL in <code/cdr/.
+
+<parameter>nd
+  <type>singleton-node-list
+  <description>The node we want to check.
+<parameter keyword default='#f'>no-urls
+  <type>boolean
+  <description>If true, simply return <code/#t/ or <code/#f/ in the <code/cdr/
+  of the pair, rather than returning a URL.
+
+<codebody>
+(define debug
+  (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
+
+(define (get-link-policy-target nd #!key (no-urls #f))
+  (let* (;; onlyexported is true if only exported IDs may be linked to
+	 (onlyexported (string=? (attribute-string (normalize
+						    "exportedlinkpolicy")
+						   (document-element nd))
+				 (normalize "onlyexported")))
+	 ;; If veto-export is false, then we can link to this; if it's
+	 ;; true, that's because this element's ID isn't exported, and
+	 ;; this violates policy.
+	 (ex (attribute-string (normalize "export") nd))
+	 (veto-export (and onlyexported
+			   (not (and ex
+				     (string=? ex
+					       (normalize "export"))))))
+	 (urlpolicy (attribute-string (normalize "urllinkpolicy")
+				      (document-element nd)))
+	 (urlpath (attribute-string (normalize "urlpath") nd)))
+    (if veto-export
+	(cons (string-append "The element with id "
+			     (attribute-string (normalize "id") nd)
+			     " has not been exported, so may not be linked to")
+	      #f)
+	(case urlpolicy
+	  (("NONE")
+	   (cons #f #f))	; policy satisfied - no link
+	  (("EXPLICIT")
+	   (if urlpath
+	       (cons #f (or no-urls
+			    (string-append %starlink-document-server%
+				       urlpath)))
+	       (cons (string-append "element with id "
+				    (attribute-string (normalize "id") nd)
+				    " has no URLPATH attribute")
+		     #f)))
+	  (("AUTOMATIC")
+	   (if urlpath
+	       (cons (string-append "element with id "
+				    (attribute-string (normalize "id") nd)
+				    " has an URLPATH attribute present")
+		     #f)
+	       (cons #f (or no-urls
+			    (href-to nd full-url: #t)))))
+	  (else
+	   (cons (string-append "Unknown URLPOLICY: " urlpolicy) #f))))))
+
+<func>
+<routinename>target-element-list
+<description>
+Return a list of elements which are allowable targets for a link.
+This list primarily expresses those elements which this stylesheet is able
+to generate a link to -- it's more to do with this stylesheet's capabilities
+than with any fundamental property of the document type.
+
+<p>This will be used when linking to (an ID attribute within) an
+object which can't be linked to directly.  It doesn't matter if
+there's redundancy in this - the appropriate element is selected as
+the first member of this list amongst the target element's ancestors.
+
+<p>For example, the LABEL element in the DocumentSummary DTD requires this.
+<returnvalue type='list of strings'>
+<argumentlist none>
+<codebody>
+(define (target-element-list)
+  (list (normalize "sect")
+	(normalize "subsect")
+	(normalize "subsubsect")
+	(normalize "appendices")))
+
+
+
+
+<func>
 <name>document-element
 <description>
 <p>Returns the document element of the document containing the given
@@ -461,16 +683,12 @@ function.  I'd like to use (error) at the end, rather
 than silently returning just d, but I cannot work out how to
 evaluate more than one expression one after another!
 <returnvalue type="string">Formatted into english</returnvalue>
-<argumentlist>
 <parameter>
-<name>d
-<type>string
-<description>
-<p>The string should be in the form dd-MMM-yyyy (two-digit day,
-3-uppercase-character month appreviation, four-digit year)
-</description>
-</parameter>
-</argumentlist>
+  <name>d
+  <type>string
+  <description>
+  <p>The string should be in the form dd-MMM-yyyy (two-digit day,
+  3-uppercase-character month appreviation, four-digit year)
 <history>
 <change author="ng" date="19-MAR-1999">
 <p>Altered from original yyyymmdd format.
@@ -509,9 +727,7 @@ evaluate more than one expression one after another!
 
 <func>
 <codeprologue>
-<routinename>
-<name>format-date-old
-</name></routinename>
+<routinename>format-date-old
 <description>
 <p>Returns a string with the formatted version of the date, which
 should be in the form yyyymmdd.  If the string is not in this format, 
@@ -521,15 +737,12 @@ than silently returning just d, but I cannot work out how to
 evaluate more than one expression one after another!
 <p>Replaced by <code/(format-date)/, which parses dates in the form
 dd-MMM-yyyy.
-</p></description>
 <returnvalue type="string">Formatted into english</returnvalue>
-<argumentlist>
-<parameter>
-<name>d
-<type>string
-<description>
-<p>The string should be in the form yyyymmdd
-</codeprologue>
+<parameter>d
+  <type>string
+  <description>
+  The string should be in the form yyyymmdd
+<codebody>
 (define (format-date-old d)
   (let* ((strok (and d
 		     (string? d)
@@ -621,6 +834,38 @@ dd-MMM-yyyy.
 		   req-not)
 	   (entity-system-id (car ent-list) (current-node)))
 	  (else (loop (cdr ent-list))))))
+
+<func>
+<routinename>table-colno
+<purpose>Return a list of numbers, indicating the current column number and the
+total number of columns.
+<description>Checks only the <code/ENTRY/ and <code/TGROUP/ elements,
+the first to find the column number, and the second to find the total
+number of columns.
+<returnvalue type='list of numbers'><p>A list of numbers, where
+  the <code/car/ is the current column number, 
+  and the <code/cadr/ is the total number of columns.
+  <p>If the argument is not for an <code/ENTRY/ element,
+  then the current column number will be returned as zero.
+  <p>If the node doesn't have a <code/TABLE/ in its ancestry,
+  then return <code/#f/.
+<parameter optional default='(current-node)'>nd
+  <type>singleton node-list<description>Node we want the column number of.
+  If this is not an <code/ENTRY/ element, then the column number will be
+  returned as zero.
+<codebody>
+(define (table-colno #!optional (nd (current-node)))
+  (let ((isentry (string=? (gi nd) (normalize "entry")))
+	(tgroup-cols (inherited-element-attribute-string (normalize "tgroup")
+							 (normalize "cols")
+							 nd)))
+    (if tgroup-cols
+	(list (if isentry
+		   (child-number (current-node))
+		   0)
+	       (string->number tgroup-cols))
+	#f				; we're not in a table
+	)))
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <misccode>
