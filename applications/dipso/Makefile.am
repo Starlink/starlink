@@ -5,7 +5,8 @@ bin_PROGRAMS = dipso
 dipso_SOURCES = run_dipso.c
 
 # C main so we need FCLIBS
-dipso_LDADD = libdipso.la `$(srcdir)/dipso_link` @FCLIBS@
+dipso_LDADD = .libs/libdipso.a `$(srcdir)/dipso_link` @FCLIBS@
+dipso_LDFLAGS =
 
 dist_bin_SCRIPTS = dipsosetup dipsotest dipso_link my_dipso
 
@@ -92,3 +93,14 @@ dipsosupport_DATA = ATLIST.DAT demo2.cmd LWPLO.ABS run_dipso.o user.f \
 staretc_DATA = specdat/*
 
 EXTRA_DIST = specdat $(PRIVATE_INCLUDES) dipsosetup.in my_dipso.in
+
+## Simple installation test.
+
+TESTS = installtest
+
+installtest: installtest.in
+	rm -f installtest.tmp installtest
+	$(edit) \
+	   $(srcdir)/installtest.in > installtest.tmp
+	mv installtest.tmp installtest
+	chmod 755 installtest

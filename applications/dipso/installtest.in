@@ -1,0 +1,18 @@
+
+DIPSODIR=@bindir@
+DIPSOLIB=@bindir@
+DIPSOSTARBIN=@prefix@/bin
+SPECDAT=@staretcdir@
+OWNERDIR=${HOME}
+
+dipso << EOF
+ECHO 3
+DEV xwindows
+ATLIST
+ATLASRD 5000 0
+PM
+Q
+EOF
+
+exit
+
