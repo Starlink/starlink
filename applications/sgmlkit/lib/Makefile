@@ -91,6 +91,11 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 	done
 	touch $@
 
+# The LaTeX stylesheet, like the HTML stylesheet, outputs a stamp.
+%.latex.stamp: %.sgml
+	$(JADE) -t latex -iLaTeX.entities $(JADEFLAGS) \
+		-d $(STYLESHEET)/latex/sl.dsl#latex $< > $@
+
 %.ps: %.dvi
 	dvips $< -o
 
