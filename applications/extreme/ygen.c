@@ -1,13 +1,13 @@
 /*
 *+
 *  Name:
-*     tag.c
+*     ygen.c
 *
 *  Type of module:
 *     C source code.
 *
 *  Purpose:
-*     Common routines used by lex and yacc files for source code tagging.
+*     Common routines used for source code processing.
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -16,7 +16,7 @@
 *     25-NOV-1999 (MBT):
 *        Intial version.
 *     24-JAN-2000 (MBT):
-*        Adapted for use by inscnf.
+*        Adapted for use by EXTREME.
 *-
 */
 
@@ -28,6 +28,59 @@
 #include <stdarg.h>
 
 #include "ygen.h"
+
+
+   char *filter( int argc, char **argv ) {
+/*
+*+
+*  Name:
+*     filter
+*
+*  Purpose:
+*     Process command line arguments to set up filter program.
+*
+*  Return value:
+*     ifilter = char *
+*        The name under which the executable was invoked.  Only the bare
+*        name is returned, not any path information.
+*-
+*/
+
+/* Declare local variables. */
+      char *pc;                         /* Pointer to character              */
+      char *name;                       /* Return value                      */
+      char *usagef;                     /* Usage format string               */
+
+/* Get name of program etc. */
+      name = *(argv++);
+      argc--;
+      if ( ( pc = strrchr( name, '/' ) ) != NULL ) name = pc + 1;
+      usagef = "Usage: %s [ in [ out ] ]\n";
+
+/* Open standard input and output appropriately according to command line
+   arguments, in the normal filter-type way. */
+      switch( argc ) {
+         case 2:
+            if ( freopen( argv[ 1 ], "w", stdout ) == NULL ) {
+               perror( argv[ 1 ] );
+               exit( 1 );
+            }
+         case 1:
+            if ( freopen( argv[ 0 ], "r", stdin ) == NULL ) {
+               perror( argv[ 0 ] );
+               exit( 1 );
+            }
+         case 0:
+            break;
+         default:
+            printf( usagef, name );
+            exit( 1 );
+      }
+
+/* Finish. */
+      return name;
+   }
+
 
 
    void *memok( void *ptr ) {
@@ -130,8 +183,7 @@
 *
 *  Description:
 *     This routine appends a single character to the preval string.
-*     If the character is '<', '>' or '&', then it is replaced in the
-*     preval string by the appropriate HTML entity reference.
+*     The length of the preval buffer is extended if necessary.
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -142,34 +194,16 @@
 *-
 */
 
-/* Switch on the value of the character. */
-      switch( c ) {
-
-/* If it needs to be replaced by an entity reference, do so via sappend. */
-         case '<':
-            sappend( "&lt;" );
-            break;
-         case '>':
-            sappend( "&gt;" );
-            break;
-         case '&':
-            sappend( "&amp;" );
-            break;
-
-/* Otherwise it's just a single character: extend allocation if necessary
-   and add the new character. */
-         default:
-            if ( preleng + 1 > prealloc ) {
-               if ( prealloc == 0 )
-                  preval = (char *) memok( malloc( BUFINC + 1 ) );
-               else
-                  preval = (char *) memok( realloc( preval, 
-                                                    prealloc + BUFINC + 1 ) );
-               prealloc++;
-            }
-            preval[ preleng ] = c;
-            preval[ ++preleng ] = '\0';
+/* Extend allocation if necessary and add the new character. */
+      if ( preleng + 1 > prealloc ) {
+         if ( prealloc == 0 )
+            preval = (char *) memok( malloc( BUFINC + 1 ) );
+         else
+            preval = (char *) memok( realloc( preval, prealloc + BUFINC + 1 ) );
+         prealloc++;
       }
+      preval[ preleng ] = c;
+      preval[ ++preleng ] = '\0';
    }
 
 
