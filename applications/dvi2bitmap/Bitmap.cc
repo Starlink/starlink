@@ -500,16 +500,16 @@ void Bitmap::freeze()
 /**
  * Normalizes the bounding box, so that it is no bigger than the bitmap.
  */
-void Bitmap::normalizeBB_(int& L, int& R, int& T, int& B)
+void Bitmap::normalizeBB_(int& tL, int& tR, int& tT, int& tB)
 {
     if (!empty())		// do nothing if the bitmap is empty
     {
-	if (L < 0) L = 0;
-	if (R > W) R = W;
-	if (T < 0) T = 0;
-	if (B > H) B = H;
+	if (tL < 0) tL = 0;
+	if (tR > W) tR = W;
+	if (tT < 0) tT = 0;
+	if (tB > H) tB = H;
 
-	if ((L >= R) || (T >= B))
+	if ((tL >= tR) || (tT >= tB))
 	    // eh?  this is really an assertion failure, I think
 	    throw BitmapError
 		("Bitmap::normalizeBB_: bitmap not empty, but bounds crossed");
