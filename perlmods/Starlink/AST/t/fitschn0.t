@@ -15,7 +15,7 @@ ok(1, "Write complete");
 
 # Try again, but storing to an array
 my @cards;
-my $ch = new Starlink::AST::FitsChan ( sink => sub {push(@cards, $_[0]) } );
+$ch = new Starlink::AST::FitsChan ( sink => sub {push(@cards, $_[0]) } );
 $ch->Set(Encoding => "FITS-WCS");
 $ch->Write( $obj );
 
