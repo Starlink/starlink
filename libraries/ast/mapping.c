@@ -1,4 +1,3 @@
-xx
 /*
 *class++
 *  Name:
