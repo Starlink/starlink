@@ -160,6 +160,7 @@
       END IF
 
 *    Check and map axes if not primitive
+      CALL BDI_PRIM( IFID, PRIM, STATUS )
       IF ( .NOT. PRIM ) THEN
         DO I = 1, NDIM
           CALL BDI_CHKAXVAL( IFID, I, OK, REG, TDIMS, STATUS )
