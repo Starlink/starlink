@@ -392,7 +392,7 @@
 *     -  There can be an arbitrary number of NDF dimensions.
 
 *  Related Applications:
-*     KAPPA: FLIP, ROTATE, SLIDE, WCSADD.
+*     KAPPA: FLIP, ROTATE, SLIDE, WCSADD, WCSALIGN.
 *     CCDPACK: TRANLIST, TRANNDF, WCSEDIT.
 
 *  Authors:
