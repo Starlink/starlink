@@ -70,6 +70,7 @@
 
 *  Local Variables:
       INTEGER BITPIX             ! FITS BITPIX value (not used)
+      CHARACTER * ( 80 ) BUFFER  ! Used to form error messages
       CHARACTER * ( 48 ) COMENT  ! Keyword comment
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of the NDF
       LOGICAL EXTEND             ! FITS EXTEND value (not used)
@@ -150,9 +151,11 @@
 *  one is not present.
             CALL FTKEYN( KEYROT, I, KEYWRD, FSTAT )
             IF ( FSTAT .NE. FITSOK ) THEN
+               BUFFER = 'FITS keyword for lower bounds is invalid.  '/
+     :           /'Root is '//KEYROT//'. (Probable programming error.)'
+
                CALL COF_FIOER( FSTAT, 'COF_SBND_KEYWORD', 'FTKEYN',
-     :           'FITS keyword for lower bounds is invalid.  Root is '/
-     :           /KEYROT//'. (Probable programming error.)', STATUS )
+     :                         BUFFER, STATUS )
                GOTO 999
             END IF
 

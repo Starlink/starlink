@@ -104,6 +104,7 @@
 
 *  Local Variables:
       BYTE BARRAY( 100 )         ! Used to read in BYTE type data items
+      CHARACTER * ( 256 ) BUFFER ! Used to form error messages and paths
       DOUBLE PRECISION DARRAY( 100 ) ! Used to read in DP type data items
       INTEGER DSTAT              ! DTA_ routine returned status
       REAL FARRAY( 100 )         ! Used to read in FLOAT type data items
@@ -143,6 +144,7 @@
       NFITS = MAX ( NFITS, 0 )
 
 *  Test for a structured component of the DST FITS structure.
+      BUFFER = OUTNDF( :NPC )//'.MORE'
       IF ( STRUCT .AND. STNAME .NE. ' ' ) THEN
 
 *  Write a blank line and comment containing the name of the hierarchy.
@@ -150,8 +152,7 @@
          NFITS = NFITS + 1
          FDIMS( 1 ) = 1
          FDIMS( 2 ) = NFITS
-         CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS,
-     :                   NAMOUT, DSTAT )
+         CALL DTA_CRNAM( BUFFER, 'FITS', 2, FDIMS, NAMOUT, DSTAT )
 
 *  Write the FITS blank card image to the FITS extension.
          FITSTR = ' '
@@ -161,8 +162,7 @@
          NFITS = NFITS + 1
          FDIMS( 1 ) = 1
          FDIMS( 2 ) = NFITS
-         CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS,
-     :                   NAMOUT, DSTAT )
+         CALL DTA_CRNAM( BUFFER, 'FITS', 2, FDIMS, NAMOUT, DSTAT )
          FITSTR = 'COMMENT   Keywords for structure: '//STNAME
          CALL DTA_WRVARC( NAMOUT, 80, FITSTR, DSTAT )
 
@@ -174,8 +174,7 @@
          NFITS = NFITS + 1
          FDIMS( 1 ) = 1
          FDIMS( 2 ) = NFITS
-         CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS,
-     :                   NAMOUT, DSTAT )
+         CALL DTA_CRNAM( BUFFER, 'FITS', 2, FDIMS, NAMOUT, DSTAT )
 
 *  Write the FITS blank card image to the FITS extension, and return.
          FITSTR = ' '
@@ -380,8 +379,7 @@
       NFITS = NFITS + 1
       FDIMS( 1 ) = 1
       FDIMS( 2 ) = NFITS
-      CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS,
-     :                NAMOUT, DSTAT )
+      CALL DTA_CRNAM( BUFFER, 'FITS', 2, FDIMS, NAMOUT, DSTAT )
 
 *  Write the FITS card image to the FITS extension.
       CALL DTA_WRVARC( NAMOUT, 80, FITSTR, DSTAT )
@@ -389,8 +387,9 @@
       GOTO 500
   450 CONTINUE
       STATUS = DSTAT
-      CALL ERR_REP( 'CON_D2NFT_READER',
-     :  'Error reading '//PATH//'.', STATUS )
+      BUFFER = 'Error reading '//PATH//'.'
+
+      CALL ERR_REP( 'CON_D2NFT_READER', BUFFER, STATUS )
   500 CONTINUE
 
       END

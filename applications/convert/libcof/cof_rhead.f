@@ -87,6 +87,7 @@
       PARAMETER( FITSOK = 0 )
 
 *  Local Variables:
+      CHARACTER * ( 256 ) BUFFER ! Used to form error messages
       INTEGER FSTAT              ! FITSIO status
       INTEGER IHEAD              ! Loop counter for headers
       INTEGER NCF                ! Number of characters in the FITS file
@@ -111,9 +112,10 @@
 
 *  Report an contextual error message if something went wrong.
       IF ( FSTAT .NE. FITSOK ) THEN
+         BUFFER = 'Error reading the headers of the FITS file '/
+     :            /FILE( :NCF )//'.'
          CALL COF_FIOER( FSTAT, 'COF_RHEAD_READ', 'FTGREC',
-     :                   'Error reading the headers of the FITS file '/
-     :                   /FILE( :NCF )//'.', STATUS )
+     :                   BUFFER, STATUS )
 
 *  Restore the bad status when something went wrong with the FITSIO
 *  calls.

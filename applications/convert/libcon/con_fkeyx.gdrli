@@ -208,8 +208,10 @@
 *  the card.  Notice that leading blanks are not removed from the
 *  comment in case the user is attempting some clever alignment.  Since
 *  a FITS comment may contain any ASCII character, it has not been
-*  cleaned.
-         CALL CHR_APPND( CMTBGN//' '//COMNT, HEADER, CARDLN )
+*  cleaned.  The CARDLN increment is to allow for a space.
+         CALL CHR_APPND( CMTBGN, HEADER, CARDLN )
+         CARDLN = CARDLN +1
+         CALL CHR_APPND( COMNT, HEADER, CARDLN )
       
       END IF
 

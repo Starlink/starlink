@@ -89,6 +89,7 @@
       PARAMETER( HEDLEN = 80 )
 
 *  Local Variables:
+      CHARACTER * ( 256 ) BUFFER ! Used to form error messages
       CHARACTER * ( 48 ) COMENT  ! Keyword comment
       INTEGER EL                 ! Number of FITS-extension elements
       CHARACTER * ( DAT__SZLOC ) FLOC ! Locator to the FITS extension
@@ -125,9 +126,10 @@
 *  Find the number of headers.
       CALL FTGHSP( FUNIT, NHEAD, KEYADD, FSTAT )
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WFEXT_NHEAD', 'FTGHSP',
-     :     'Error obtaining the number of header cards from FITS '/
-     :     /'file '//FILE( :NCF )//'.', STATUS )
+         BUFFER = 'Error obtaining the number of header cards from '/
+     :            /'the FITS file '//FILE( :NCF )//'.'
+         CALL COF_FIOER( FSTAT, 'COF_WFEXT_NHEAD', 'FTGHSP', BUFFER,
+     :                   STATUS )
          GOTO 999
       END IF
 
@@ -154,9 +156,11 @@
          IF ( FSTAT .NE. FITSOK ) THEN
             CALL MSG_SETI( 'NH', NHEAD + 1 )
             CALL MSG_SETI( 'IH', IHEAD )
+            CALL MSG_SETC( 'FILE', FILE( :NCF ) )
+
             CALL COF_FIOER( FSTAT, 'COF_WFEXT_GHEAD', 'FTGREC',
      :        'Error obtaining a FITS header (^IH of ^NH) from '/
-     :        /'FITS file '//FILE( :NCF )//'.', STATUS )
+     :        /'FITS file ^FILE.', STATUS )
             CALL DAT_ANNUL( FLOC, STATUS )
             GOTO 980
          END IF
@@ -212,9 +216,11 @@
             IF ( FSTAT .NE. FITSOK ) THEN
                CALL MSG_SETI( 'PC', PCOUNT )
                CALL MSG_SETI( 'I', I )
+               CALL MSG_SETC( 'FILE', FILE( :NCF ) )
+      
                CALL COF_FIOER( FSTAT, 'COF_WFEXT_GHEAD', 'FTGGPD',
      :           'Error obtaining a random-group parameter (^I of '/
-     :           /'^PC) from FITS file '//FILE( :NCF )//'.', STATUS )
+     :           /'^PC) from FITS file ^FILE.', STATUS )
                CALL DAT_ANNUL( FLOC, STATUS )
                GOTO 980
             END IF

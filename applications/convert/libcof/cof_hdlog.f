@@ -81,6 +81,7 @@
       PARAMETER( MAXLEN = 80 )
 
 *  Local Variables:
+      CHARACTER * ( 256 ) BUFFER ! Used to form error messages
       CHARACTER * ( MAXLEN ) DUMMY ! Output record
       INTEGER FSTAT              ! FITSIO status
       CHARACTER * ( HEDLEN ) HEADER ! A FITS header
@@ -107,9 +108,11 @@
 *  Find the number of headers.
       CALL FTGHSP( FUNIT, NHEAD, KEYADD, FSTAT )
       IF ( FSTAT .NE. FITSOK ) THEN
+         BUFFER = 'Error obtaining the number of header cards from '/
+     :            /'FITS file '//FILE( :NCF )//'.'
+
          CALL COF_FIOER( FSTAT, 'COF_HDLOG_NHEAD', 'FTGHSP',
-     :     'Error obtaining the number of header cards from FITS '/
-     :     /'file '//FILE( :NCF )//'.', STATUS )
+     :                   BUFFER, STATUS )
          GOTO 999
       END IF
 
@@ -153,9 +156,10 @@
          IF ( FSTAT .NE. FITSOK ) THEN
             CALL MSG_SETI( 'NH', NHEAD )
             CALL MSG_SETI( 'IH', IHEAD )
+            CALL MSG_SETC( 'FILE', FILE( :NCF ) )
             CALL COF_FIOER( FSTAT, 'COF_HDLOG_GHEAD', 'FTGREC',
      :        'Error obtaining a FITS header (^IH of ^NH) from '/
-     :        /'FITS file '//FILE( :NCF )//'.', STATUS )
+     :        /'FITS file ^FILE.', STATUS )
             GOTO 999
          END IF
 

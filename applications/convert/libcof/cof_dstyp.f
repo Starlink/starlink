@@ -87,6 +87,7 @@
       PARAMETER( FITSOK = 0 )
 
 *  Local Variables:
+      CHARACTER * ( 80 ) BUFFER  ! Used to form error messages
       CHARACTER * ( 48 ) COMENT  ! Keyword's comment (not used)
       INTEGER FSTAT              ! FITSIO error status
       DOUBLE PRECISION OFFSET    ! Offset for block floating point
@@ -133,9 +134,10 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_DSTAB', 'FTGKEY',
-     :           'Error obtaining the string value of keyword '/
-     :           /SCAKEY, STATUS )
+               BUFFER = 'Error obtaining the string value of keyword '/
+     :                  /SCAKEY
+               CALL COF_FIOER( FSTAT, 'COF_DSTAB', 'FTGKEY', BUFFER,
+     :                         STATUS )
                GOTO 999
             END IF
 
@@ -161,9 +163,11 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
+               BUFFER = 'Error obtaining the string value of keyword '/
+     :                  /ZERKEY
+      
                CALL COF_FIOER( FSTAT, 'COF_DSTAB', 'FTGKEY',
-     :           'Error obtaining the string value of keyword '/
-     :           /ZERKEY, STATUS )
+     :                         BUFFER, STATUS )
                GOTO 999
             END IF
 

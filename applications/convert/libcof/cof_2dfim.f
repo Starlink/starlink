@@ -137,7 +137,7 @@
       LOGICAL BAD                ! True if bad values may be present in
                                  ! array
       INTEGER BITPIX             ! FITS file's BITPIX
-      CHARACTER * ( 80 ) BUFFER  ! BUFFFER for writing error messages
+      CHARACTER * ( 256 ) BUFFER ! BUFFER for writing error messages
       CHARACTER * ( 8 ) CLASS    ! Observation class 
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to CLASS structure
       CHARACTER * ( DAT__SZLOC ) CLLOC ! Locator to CLASS component
@@ -225,9 +225,10 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_2DFIM_SCOF', 'FTPSCL',
-     :        'Error defaulting the scale and '/
-     :        /'offset for FITS file '//FILE( :NCF )//'.', STATUS )
+            BUFFER = 'Error defaulting the scale and offset for FITS '/
+     :               /'file '//FILE( :NCF )//'.'
+            CALL COF_FIOER( FSTAT, 'COF_2DFIM_SCOF', 'FTPSCL', BUFFER,
+     :                      STATUS )
             GOTO 999
          END IF
 
@@ -247,19 +248,20 @@
 
 *  Report the error context.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'COF_2DFIM_MANDH',
-     :     'Error occurred during accessing headers in the primary '/
-     :     /'header and data unit of FITS file '//FILE( :NCF )//'.',
-     :     STATUS )
+         BUFFER = 'Error occurred during accessing headers in primary '/
+     :     /'header and data unit of FITS file '//FILE( :NCF )//'.'
+
+         CALL ERR_REP( 'COF_2DFIM_MANDH', BUFFER, STATUS )
          GOTO 999
       END IF
 
 *  Cannot processed non-standard files.
       IF ( .NOT. SIMPLE ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'COF_2DFIM_NOTSIM',
-     :     'The FITS file '//FILE( :NCF )//' is not simple and '/
-     :     /'therefore cannot be processed.', STATUS )
+         BUFFER = 'The FITS file '//FILE( :NCF )//' is not simple and '/
+     :            /'therefore cannot be processed.'
+
+         CALL ERR_REP( 'COF_2DFIM_NOTSIM', BUFFER, STATUS )
          GOTO 999
       END IF
 
@@ -319,9 +321,11 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
+            BUFFER = 'Error reading the data array in FITS file '/
+     :               /FILE( :NCF )//'.'
+
             CALL COF_FIOER( FSTAT, 'COF_2DFIM_READ', 'FTGPVx',
-     :        'Error reading the Data array in FITS file '/
-     :        /FILE( :NCF )//'.', STATUS )
+     :                      BUFFER, STATUS )
             CALL NDF_UNMAP( NDF, 'Data', STATUS )
             GOTO 999
          END IF
@@ -370,9 +374,9 @@
             FSTAT = FITSOK
          ELSE
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'COF_2DFIM_WREXT',
-     :        'Error skipping to the extension of the '/
-     :        /'FITS file '//FILE( :NCF )//'.', STATUS )
+            BUFFER = 'Error skipping to the extension of the '/
+     :               /'FITS file '//FILE( :NCF )//'.'
+            CALL ERR_REP( 'COF_2DFIM_WREXT', BUFFER, STATUS )
             CALL COF_FIOER( FSTAT, 'COF_2DFIM_WREXT', 'FTMRHD',
      :                      ' ', STATUS )
          END IF

@@ -129,6 +129,7 @@
       INTEGER APNTR( 1 )         ! Pointer to mapped NDF axis array
       LOGICAL BAD                ! Column array contains bad values?
       CHARACTER * ( 10 ) BTYPE ! Column TFORM data type
+      CHARACTER * ( 256 ) BUFFER ! Used to form error messages
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to extension component
       CHARACTER * ( DAT__SZNAM ) COLNAM ! Column name
       INTEGER COLNUM             ! Column number
@@ -210,9 +211,11 @@
 *  SWS product.
       CALL FTMRHD( FUNIT, 1, HDUTYP, FSTAT )
       IF ( FSTAT .NE. FITSOK ) THEN
+         BUFFER = 'Error skipping to the extension of the SWS FITS '/
+     :            /'file '//FILE( :NCF )//'.'
+
          CALL COF_FIOER( FSTAT, 'COF_SWS_WREXT', 'FTMRHD',
-     :     'Error skipping to the extension of the SWS FITS file '/
-     :     /FILE( :NCF )//'.', STATUS )
+     :                   BUFFER, STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
          STATUS = SAI__ERROR

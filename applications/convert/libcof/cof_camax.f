@@ -104,6 +104,7 @@
 
 *  Local Variables:
       LOGICAL BAD                ! Column value is bad? (not used)
+      CHARACTER * ( 256 ) BUFFER ! Used to form error messages
       INTEGER COLNUM             ! Column number
       CHARACTER * ( 2 ) CON      ! COlumn number
       DOUBLE PRECISION DELT      ! The co-ordinate increment between
@@ -203,10 +204,10 @@
 *  the observation number to a string.
          IF ( FSTAT .NE. FITSOK ) THEN
             CALL CHR_ITOC( OBSNO, CON, NC )
+            BUFFER = 'Error obtaining the axis parameters for FITS '/
+     :        /'file '//FILE( :NCF )//', observation'//CON( :NC )//'.'
             CALL COF_FIOER( FSTAT, 'COF_CAMAX_AXCOL', 'FTGCVx',
-     :                      'Error obtaining the axis parameters '/
-     :                      /'for FITS file '//FILE( :NCF )//', '/
-     :                      /'observation'//CON( :NC )//'.', STATUS )
+     :                      BUFFER, STATUS )
             GOTO 999
          END IF
 

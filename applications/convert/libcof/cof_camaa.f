@@ -233,9 +233,11 @@
 *  Find the number of headers.
          CALL FTGHSP( FUNIT, NHEAD, KEYADD, FSTAT )
          IF ( FSTAT .NE. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_CAMAA_NHEAD', 'FTGHSP',
-     :        'Error obtaining the number of header cards from FITS '/
-     :        /'file '//FILE( :NCF )//'.', STATUS )
+            BUFFER =  'Error obtaining the number of header cards '/
+     :                /'from FITS file '//FILE( :NCF )//'.'
+
+            CALL COF_FIOER( FSTAT, 'COF_CAMAA_NHEAD', 'FTGHSP', BUFFER,
+     :                      STATUS )
             GOTO 999
          END IF
 
@@ -259,9 +261,11 @@
 *  CAMAA product.
       CALL FTMRHD( FUNIT, 1, HDUTYP, FSTAT )
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_CAM_WREXT', 'FTMRHD',
-     :     'Error skipping to the extension of the CAM FITS file '/
-     :     /FILE( :NCF )//'.', STATUS )
+         BUFFER = 'Error skipping to the extension of the CAM FITS '/
+     :            /'file '//FILE( :NCF )//'.'
+
+         CALL COF_FIOER( FSTAT, 'COF_CAM_WREXT', 'FTMRHD', BUFFER,
+     :                   STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
          STATUS = SAI__ERROR
@@ -406,11 +410,12 @@
 
 *  Report an contextual error message if something went wrong.
          IF ( FSTAT .NE. FITSOK ) THEN
+            BUFFER = 'Error obtaining the array shape and scaling '/
+     :               /'parameters for FITS file '//FILE( :NCF )/
+     :               /', observation'//CON( :NC )//'.'
+
             CALL COF_FIOER( FSTAT, 'COF_CAMAA_AXCOL', 'FTGCVx',
-     :                      'Error obtaining the array shape and '/
-     :                      /'scaling parameters for FITS file '/
-     :                      /FILE( :NCF )//', observation'/
-     :                      /CON( :NC )//'.', STATUS )
+     :                      BUFFER, STATUS )
             GOTO 999
          END IF
 
@@ -451,10 +456,11 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
+            BUFFER = 'Error defaulting the scale and offset for FITS '/
+     :        /'file '//FILE( :NCF )//', observation'//CON( :NC )//'.'
+
             CALL COF_FIOER( FSTAT, 'COF_CAMAA_SCOF', 'FTTSCL',
-     :                      'Error defaulting the scale and offset '/
-     :                      /'for FITS file '//FILE( :NCF )//', '/
-     :                      /'observation'//CON( :NC )//'.', STATUS )
+     :                      BUFFER, STATUS )
             GOTO 999
          END IF
 
@@ -473,10 +479,11 @@
 
 *  Report an contextual error message if something went wrong.
          IF ( FSTAT .NE. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_CAMAA_BLANK', 'FTTNUL',
-     :                      'Error assigning the data-blank value '/
-     :                      /'for FITS file '//FILE( :NCF )/
-     :                      /', observation'//CON( :NC )//'.', STATUS )
+            BUFFER = 'Error assigning the data-blank value for FITS '/
+     :        /'file '//FILE( :NCF )//', observation'//CON( :NC )//'.'
+
+            CALL COF_FIOER( FSTAT, 'COF_CAMAA_BLANK', 'FTTNUL', 
+     :                      BUFFER, STATUS )
             GOTO 999
          END IF
 
