@@ -1,57 +1,6 @@
-1 CCDPACK_major_update
+1 CCDPACK_bugfix_update
 
-  Release v4.0 is a major update of CCDPACK; major new facilities have 
-  been added in these areas:
-
-  CCDPACK Sets (mosaic cameras)
-  -----------------------------
-
-     CCDPACK now offers the concept of a Set of image files, which might
-     typically be a group of frames taken from the different CCDs on the
-     same mosaic camera during the same observation.  This makes the
-     data reduction and registration steps much more straightforward
-     when processing this type of data.  Two new applications have been
-     added for explicit handling of Set header information:
-
-      - MAKESET  -- Writes Set header information to images
-      - SHOWSET  -- Outputs image Set header information
-
-     The existing CCDPACK applications have been modified to  
-     be aware of this Set information, but will behave as previously 
-     on data which has not had Set headers explicitly added.  A new
-     test script has been added to show off the new capabilities:
-
-      - SETEXERCISE -- Tests CCDPACK Set functionality
-
-  Interactive registration programs
-  ---------------------------------
-
-     The following programs have been completely rewritten:
-
-      - IDICURS  -- Views and writes position lists interactively
-      - PAIRNDF  -- Aligns images graphically by drag and drop
-      - CCDALIGN -- Aligns images graphically by interactive object selection
-
-     They now feature a much more intuitive, powerful and easy to use
-     graphical interface than in their previous incarnations.  They 
-     will also work on all X displays, rather than requiring a 
-     PseudoColor visual as previously.  Although these programs offer
-     basically the same facilities as they did in previous versions of
-     CCDPACK, parameter usage has in some cases changed considerably.
-
-  New display application
-  -----------------------
-
-     The following new program has been added for viewing images and
-     their alignment:
-
-      - DRAWNDF  -- Draws aligned images or outlines on a graphics display
-
-     It will plot the outline, or the pixels, or both of one or more
-     images on a display device.  This makes it quick and easy to preview
-     the positioning of images in their Current coordinate system, 
-     and to see how they are aligned with each other, for instance prior
-     to resampling and generating a mosaic.
+  Release v4.0-13 is a bugfix update of CCDPACK.
 
   Changes since v4.0-10
   ---------------------
@@ -59,9 +8,12 @@
    - A bug which caused problems with OVERRIDE=TRUE in FINDOFF has been
      fixed.  This is only likely to have caused problems to ORAC-DR users.
 
-  Changes since v4.0-11
-  ---------------------
-
-   - A long-standing bug which prevented REGISTER from working with FITTYPE=6
+   - A bug which prevented REGISTER from working with FITTYPE=6
      has been fixed.
+
+   - A bug in which TRANNDF with linear interpolation failed to apply
+     flux conservation has been fixed.
+
+   - An improvement to the histogram determination routine used by FINDOBJ
+     and DRAWNDF has been made.
 
