@@ -194,7 +194,7 @@
 *        Changed the defaulting for ANGMAJ, RATIO, RMAX, RMIN and WIDTH
 *        to avoid vpath=dynamic parameters.
 *     13-JUN-2001 (DSB):
-*        Added parameter WMEAN.
+*        Added parameter ESTIMATOR.
 *     {enter_further_changes_here}
 
 *  Bugs:

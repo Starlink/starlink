@@ -7476,28 +7476,29 @@ Usage:
 
 Description:
 
-   This application will bin the input image into elliptical annuli,
-   or into a `fan' of adjacent sectors, centred on a specified
-   position.  The mean data values in each bin are found, and stored
-   in a 1-dimensional NDF which can be examined using LINPLOT,
-   DISPLAY, etc.  Options exist to restrict the area binned to a
-   given range of radial distance and/or azimuthal angle.  A
-   2-dimensional mask image can optionally be produced indicating
-   which bin each input pixel was placed in.
+   This application will bin the input image into elliptical
+   annuli, or into a `fan' of adjacent sectors, centred on a
+   specified position. The typical data values in each bin are
+   found (see parameter ESTIMATOR), and stored in a
+   1-dimensional NDF which can be examined using LINPLOT,
+   INSPECT, etc.  A 2-dimensional mask image can optionally be
+   produced indicating which bin each input pixel was placed
+   in.
 
-   If radial binning is selected (the default), then each bin is an
-   elliptical annulus of shape and size determined by parameters
-   RMIN, RMAX, ANGMAJ, RATIO, XC, YC, and WIDTH.  The bins can be
-   restricted to a specified sector of these annuli using parameter
-   ANGLIM.
+   If radial binning is selected (the default), then each bin
+   is an elliptical annulus of shape and size determined by
+   parameters RMIN, RMAX, ANGMAJ, RATIO, XC, YC, and WIDTH.
+   The bins can be restricted to a specified sector of these
+   annuli using parameter ANGLIM.
 
    If azimuthal binning is selected, then each bin is a sector
-   (i.e. a wedge-shape), with its vertex given by parameters XC and
-   YC, and its opening angle given by parameters WIDTH.  The range of
-   azimuthal angles to be binned can be specified by parameter
-   ANGLIM.  The bins can be restricted to the intersection of these
-   sectors with an elliptical annulus by specified values for
-   parameters RMIN, RMAX, ANGMAJ and RATIO.
+   (i.e. a wedge-shape), with its vertex given by parameters XC
+   and YC, and its opening angle given by parameters WIDTH.
+   The range of azimuthal angles to be binned can be specified
+   by parameter ANGLIM.  The bins can be restricted to the
+   intersection of these sectors with an elliptical annulus by
+   specified values for parameters RMIN, RMAX, ANGMAJ and
+   RATIO.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 ANGLIM
@@ -7517,6 +7518,12 @@ ANGMAJ = _REAL (Read)
    positive.  If an azimuthal profile (see parameter RADIAL) is
    being produced a run-time default of zero is used, otherwise
    you will be prompted for a value. []
+3 ESTIMATOR 
+ESTIMATOR = LITERAL (Read)
+   The method to use for estimating the output pixel values.  It
+   can be either "Mean" or "Weighted Mean". If the weighted mean
+   option is selected but no variances are available in the input
+   data, the unweighted mean will be used instead. ["Mean"]
 3 IN
 IN = NDF (Read)
    The input NDF containing the 2-dimensional image from which a
@@ -7644,6 +7651,9 @@ MJC: Malcolm J. Currie (STARLINK)
     modern variable-declaration style and other stylish changes,
     removed long lines, mapped the input arrays together for
     efficiency.
+
+ 13-JUN-2001 (DSB):
+    Added parameter ESTIMATOR.
 2 Implementation_Status
    -  This routine correctly processes the DATA, VARIANCE, TITLE,
    UNITS, and HISTORY components of the input NDF.

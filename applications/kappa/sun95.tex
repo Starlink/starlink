@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.17}
 \newcommand{\stardocnumber}    {95.17}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {22 May 2001}
+\newcommand{\stardocdate}      {13 June 2001}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.0}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -18188,12 +18188,13 @@ plot (101k).
    Creates a radial or azimuthal profile of a 2-dimensional image
 }{
    \sstdescription{
-      This application will bin the input image into elliptical annuli,
-      or into a `fan{\tt '} of adjacent sectors, centred on a specified
-      position.  The mean data values in each bin are found, and stored
-      in a 1-dimensional NDF which can be examined using LINPLOT,
-      \emph{etc}.  A 2-dimensional mask image can optionally be
-      produced indicating which bin each input pixel was placed in.
+     This application will bin the input image into elliptical annuli,
+     or into a ``fan'' of adjacent sectors, centred on a specified
+     position.  The typical data values in each bin are found (see
+     parameter ESTIMATOR), and stored in a 1-dimensional NDF which 
+     can be examined using LINPLOT, INSPECT, \emph{etc}.  A 2-dimensional mask 
+     image can optionally be produced indicating which bin each input 
+     pixel was placed in.
 
       The area of the input image which is to be binned is the annulus
       enclosed between the two concentric ellipses defined by parameter
@@ -18240,6 +18241,15 @@ plot (101k).
          The angle between the x-axis and the major axis of the
          ellipse, in degrees.  Rotation from the x-axis to the y-axis is
          positive.  {\tt [0.0]}
+      }
+
+      \sstsubsection{
+         ESTIMATOR = LITERAL (Read)
+      }{
+        The method to use for estimating the output pixel values.  It
+        can be either ``Mean'' or ``Weighted Mean''. If the weighted mean
+        option is selected but no variances are available in the input
+        data, the unweighted mean will be used instead. [{\tt "}Mean{\tt "}]
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -44129,9 +44139,20 @@ KEY to ``Y''.
 \end{description}
 
 \subsection{Modified Commands}
+The following applications have been modified:
 
+\begin{description}
 
+   \item [\htmlref{ELPROF}{ELPROF}] \mbox{}
+      \begin{itemize}
+         \item A new parameter called ESTIMATOR has been added. It allows
+               the user to select the method to be used to calculate the 
+               output pixel values. At the moment, it gives the choice of 
+               a simple mean or a weighted mean, but other options may be
+               added in the future.
+      \end{itemize}
 
+\end{description}
 
 
 \begin{latexonly}
