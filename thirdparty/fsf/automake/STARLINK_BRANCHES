@@ -53,4 +53,6 @@ DEV-nxg-20040730-fix-ac-canonical
 Automake handling of AC_CANONICAL_* is wrong, I think.  Fix on this
 branch, and the patch offered to automake-patches@gnu.org:
 http://lists.gnu.org/archive/html/automake-patches/2004-07/msg00023.html
-Merged onto trunk 2004 July 30.
+Merged onto trunk 2004 July 30.  Though the code itself didn't make it
+into the automake tree, the test case did, and the bug was fixed, and
+that fix hand-applied to automake.in.  Branch now abandoned.
