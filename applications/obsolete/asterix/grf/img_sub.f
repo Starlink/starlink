@@ -3708,32 +3708,29 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *    Import-Export :
 *    Export :
 *    Status :
-        INTEGER STATUS
 *    Function declarations :
 *    Local variables :
       REAL X,Y
       REAL THETA
       REAL DISP
 *-
-        IF (STATUS.EQ.SAI__OK) THEN
 
 *  get world coord of pixel centre
-          CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
+        CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
 
 *  transform to frame centred on slice
-          X=X-XC
-          Y=Y-YC
+        X=X-XC
+        Y=Y-YC
 
 *  rotate to frame parallel with slice axes
-          THETA=ATAN2(Y,X)
-          DISP=SQRT(X**2 + Y**2)
-          X=DISP*COS(ANGLE-THETA)
-          Y=DISP*SIN(ANGLE-THETA)
+        THETA=ATAN2(Y,X)
+        DISP=SQRT(X**2 + Y**2)
+        X=DISP*COS(ANGLE-THETA)
+        Y=DISP*SIN(ANGLE-THETA)
 
 *  check transformed coord falls within slice
-          IMG_INSLICE=(ABS(X).LE.LENGTH/2.0.AND.ABS(Y).LE.WIDTH/2.0)
+        IMG_INSLICE=(ABS(X).LE.LENGTH/2.0.AND.ABS(Y).LE.WIDTH/2.0)
 
-        ENDIF
 
 	END
 
