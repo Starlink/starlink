@@ -48,7 +48,7 @@
 
 use strict;
 
-my $VERSION = '0.5-4';		# %%VERSION%%
+my $VERSION = '0.5-5';		# %%VERSION%%
 my $RCSInfo = '$Revision$ $Date$ ';
 
 my $Usage = "$0 [OPTIONS] <NDF> or $0 --help";
