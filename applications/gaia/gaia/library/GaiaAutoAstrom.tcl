@@ -103,6 +103,76 @@ itcl::class gaia::GaiaAutoAstromSimple {
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 
+      #  Get the WCS to use as bootstrap. This can come from the
+      #  image, or as a set of fixed parameters.
+      set lwidth 20
+      itk_component add wcssource {
+         StarLabelCheck $w_.wcssource \
+            -text "Initial WCS from image:" \
+            -onvalue Y \
+            -offvalue N \
+            -labelwidth $lwidth \
+            -anchor w \
+            -variable [scope values_(wcssource)] \
+            -command [code $this toggle_wcssource_]
+      }
+      add_short_help $itk_component(wcssource) \
+         {Source of the bootstrap WCS information}
+      set values_(wcssource) N
+      
+      #  If WCS source isn't the image, then we need some parameters.
+      itk_component add racentre {
+         LabelEntry $w_.racentre \
+            -text "RA centre:" \
+            -labelwidth $lwidth \
+            -textvariable [scope values_(racentre)]
+      }
+      add_short_help $itk_component(racentre) \
+         {Centre in Right Ascension (hh:mm:ss.ss/dd.dd)}
+      set values_(racentre) "00:00:00"
+
+      itk_component add deccentre {
+         LabelEntry $w_.deccentre \
+            -text "Dec centre:" \
+            -labelwidth $lwidth \
+            -textvariable [scope values_(deccentre)]
+      }
+      add_short_help $itk_component(deccentre) \
+         {Centre in Declination (dd:mm:ss.ss/dd.dd)}
+      set values_(deccentre) "00:00:00"
+      
+      itk_component add imagescale {
+         LabelEntry $w_.imagescale \
+            -text "Image scale:" \
+            -labelwidth $lwidth \
+            -textvariable [scope values_(imagescale)]
+      }
+      add_short_help $itk_component(imagescale) \
+         {Image scale in arc-seconds per pixel}
+      set values_(imagescale) "1.0"
+
+      #  Choose an calibration catalogue. This should contain
+      #  all the remote reference RA and Dec catalogues.
+      itk_component add refcat {
+         set m [util::LabelMenu $w_.refcat \
+                   -text "Reference catalogue:" \
+                   -relief raised \
+                   -labelwidth $lwidth \
+                   -valuewidth 20 \
+                   -variable [scope values_(refcat)]]
+      }
+      add_short_help $itk_component(refcat) \
+         {Choose a reference catalogue}
+      add_reference_catalogues_
+
+      #  Region for showing the output from AUTOASTROM.
+      itk_component add status {
+         Scrollbox $w_.status
+      }
+      $w_.status configure -height 5
+      add_short_help $itk_component(status) \
+         {Displays output from Autoastrom}
+
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}
 
@@ -138,14 +208,12 @@ itcl::class gaia::GaiaAutoAstromSimple {
       add_short_help $itk_component(reset) \
          {Reset image to the original astrometric calibration}
 
-      itk_component add status {
-         Scrollbox $w_.status
-      }
-      $w_.status configure -height 5
-      add_short_help $itk_component(status) \
-         {Displays output from Autoastrom}
-
       #  Pack widgets into place.
+      pack $itk_component(wcssource) -side top -fill x -expand 1 -pady 5 -padx 5
+      pack $itk_component(racentre) -side top -fill x -expand 1 -pady 5 -padx 5
+      pack $itk_component(deccentre) -side top -fill x -expand 1 -pady 5 -padx 5
+      pack $itk_component(imagescale) -side top -fill x -expand 1 -pady 5 -padx 5
+      pack $itk_component(refcat) -side top -fill x -expand 1 -pady 5 -padx 5
       pack $itk_component(status) -side top -fill both -expand 1 -pady 5 -padx 5
 
       pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
@@ -243,25 +311,28 @@ itcl::class gaia::GaiaAutoAstromSimple {
             catch {::file delete -force "$solution_"} msg
             puts "delete msg = $msg"
 
+            #  Construct WCS bootstrap source.
+            if { $values_(wcssource) == "Y" } {
+               set wcssource "--obsdata=source=AST:FITS"
+            } else {
+               set wcssource "--obsdata=source=USER,ra=$values_(racentre),dec=$values_(deccentre),scale=$values_(imagescale)"
+            }
+
             #  Run program, monitoring output...
 
             set cmd "$autoastrom_ runwith \
+               $wcssource \
                --match=match \
                --skycatconfig=$env(CATLIB_CONFIG) \
-               --catalogue=ngc1275.TAB \
+               --catalogue=$values_(refcat) \
                --noinsert \
                --keepfits=$solution_ \
                --temp=autoastrom_tmp \
-               --keeptemps \
                $diskimage"
+
+            #  Use local SExtractor catalogue...
             #--xxxccdcat=ngc1275.autoext
-
-            # Use local catalogues...
-
-            # --verbose
-
             puts "Running: $cmd"
-            puts "$env(http_proxy)"
             catch {eval $cmd} msg
             puts "msg = $msg"
          }
@@ -300,6 +371,49 @@ itcl::class gaia::GaiaAutoAstromSimple {
       return $output
    }
 
+   #  Configure the reference catalogue window menu to show the
+   #  available catalogues. These are the "remote" catalogues
+   #  available to GAIA. A suitable default is chosen.
+   protected method add_reference_catalogues_ {} {
+
+      #  Get list of catalogues.
+      if { [catch {set catalog_list [lsort [$astrocat_ info "catalog"]]} msg] } {
+         error_dialog $msg
+         return
+      }
+        
+      if {[llength $catalog_list]} {
+         foreach i $catalog_list {
+            set longname [$astrocat_ longname $i]
+            set shortname [$astrocat_ shortname $i]
+            $itk_component(refcat) add \
+               -label $longname \
+               -value $shortname \
+               -command [code $this set_value_ refcat $shortname]
+            puts "$shortname"
+         }
+
+         #  Set the default.
+         set values_(refcat) "usno@eso"
+      }
+   }
+
+   #  Set a values_ array element.
+   protected method set_value_ {element value} {
+      set values_($element) $value
+   }
+
+   protected method toggle_wcssource_ {} {
+      if { $values_(wcssource) == "Y" } {
+         set state "disabled"
+      } else {
+         set state "normal"
+      }
+      $itk_component(racentre) configure -state $state
+      $itk_component(deccentre) configure -state $state
+      $itk_component(imagescale) configure -state $state
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -320,15 +434,24 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
    #  Protected variables: (available to instance)
    #  --------------------
-
+   
+   #  The AUTOASTROM task.
    protected variable autoastrom_ {}
+
+   #  Name resolver.
    protected variable namer_ {}
+
+   #  Values from widgets.
+   protected variable values_
 
    #  Common variables: (shared by all instances)
    #  -----------------
 
    #  Name of file to store the solution.
    common solution_ GaiaAstSolution.fits
+
+   # C++ astrocat object used here to access catalog entries
+   common astrocat_ [astrocat ::gaia::.cat]
 
 #  End of class definition.
 }
