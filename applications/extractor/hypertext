@@ -10,4 +10,4 @@ cp ~/extractor/docs/sexpaper.ps.gz .
 gunzip -f mud165.ps.gz sex1_doc.ps.gz sexpaper.ps.gz 
 cp mud165.ps sex1_doc.ps sexpaper.ps sun226.htx/
 tar cvf sun226.htx_tar sun226.htx
-
+cp sun226.htx_tar ~/extractor/docs/

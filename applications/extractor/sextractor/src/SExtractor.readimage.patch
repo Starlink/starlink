@@ -1,0 +1,122 @@
+*** readimage.c.orig	Tue May 25 09:12:39 1999
+--- readimage.c	Wed Apr 17 08:53:37 2002
+***************
+*** 28,33 ****
+--- 28,36 ----
+  #include	"astrom.h"
+  #include	"weight.h"
+  
++ /* added by DMW */
++ void findextension(FILE *file, char *filename, int which);
++ 
+  /******************************* loadstrip ***********************************/
+  /*
+  Load a new strip of pixel data into the buffer.
+***************
+*** 555,563 ****
+--- 558,586 ----
+     int		j,l, n;
+     char		*buf, st[80], str[80], *point;
+  
++    /* added by DMW */
++    int extension=-1;
++    char *base;
++ 
++    /* parse name[extension].  name,extension is not allowed because SE already
++       uses commas to separate multiple image filenames. */
++    base = strdup(field->filename); /* cheap way of allocing enough space for base */
++    if(sscanf(field->filename,"%[^[][%d]",base,&extension)==2){
++      fprintf(stderr,"base: %s, extension: %d\n",base,extension);
++      strcpy(field->filename,base);
++    }
++    free(base);
++ 
+  /* Open the file */
+    if (!(field->file = fopen(field->filename, "rb")))
+      error(EXIT_FAILURE,"*Error*: cannot open ", field->filename);
++ 
++   if(extension>0){
++     /* fast-forward to that extension */
++     findextension(field->file,field->filename,extension);
++   }
++ 
++ 
+    buf = readfitshead(field->file, field->filename, &n);
+    if(FITSTOI("NAXIS   ", 0) < 2)
+      error(EXIT_FAILURE, field->filename, " does NOT contain 2D-data!");
+***************
+*** 791,797 ****
+        error(EXIT_FAILURE, filename, " is NOT a FITS file!");
+      else
+        {
+!       memset(buf, ' ', 80);
+        strncpy(buf,
+  	"SIMPLE  =                    T / Decompressed by SExtractor", 59);
+        }
+--- 814,820 ----
+        error(EXIT_FAILURE, filename, " is NOT a FITS file!");
+      else
+        {
+! 
+        strncpy(buf,
+  	"SIMPLE  =                    T / Decompressed by SExtractor", 59);
+        }
+***************
+*** 809,811 ****
+--- 832,887 ----
+    }
+  
+  
++ /**** findextension added by DMW *****/
++ 
++ void findextension(FILE *file, char *filename, int which)
++ {
++   char *primarybuf;
++   int nseek,bitpix,bytepix,naxis1,naxis2;  /* refer to pixels or bytes */
++   int this,nextend;  /* refer to extension numbers */
++   int n,nprimary,nblocks; /* refer to FITS blocks */
++   char *buf, st[80], *point;	/* necessary to make FITSTOI work */
++ 
++   
++   /* find number of extensions in this file. the buf/primarybuf switch
++      is required because FITSTOI only works on buf. */
++   buf = readfitshead(file, filename, &n);
++   primarybuf=buf;
++   nprimary=n;
++   
++   /* assume this primary hdu has no extension--I'm not sure if that
++    is part of the fits standard, but it is common practice at least. 
++    Go straight to the next hdu and cycle thru to the desired one. */
++   for(this=1;this<which;this++){
++ 
++     buf = readfitshead(file, filename, &n);
++     bitpix = FITSTOI("BITPIX  ", 0);
++     bytepix = abs(bitpix)/8;
++     naxis1 = FITSTOI("NAXIS1  ", 0);
++     naxis2 = FITSTOI("NAXIS2  ", 0);
++     nseek = bytepix*naxis1*naxis2;
++     if(nseek==0){
++       error(EXIT_FAILURE, "*Error*: Can't calculate extension size ", "findextension()");
++       /* NB. A more robust (but very slow) backup plan is to read in each
++ 	 2880-byte block and see if it is the start of a new hdu. Also, we may in fact
++ 	 want to allow hdus with no extensions. */
++     }
++     nblocks = nseek/FBSIZE;
++     if(nseek%FBSIZE != 0)
++       nblocks += 1;
++     /*fprintf(stderr,"seeking %d blocks...",nblocks);*/
++     if(fseek(file,nblocks*FBSIZE,SEEK_CUR)<0){
++       error(EXIT_FAILURE, "*Error*: fseek failed in ", "findextension()");
++     }
++     free(buf);
++   }
++   
++   /* we should be at the desired extension.  Return, because the
++      calling function (readimagehead) will now read the header as
++      normal.  primarybuf still exists because in theory we can do
++      something fancy with inheritance, but for now I'll just free
++      it. */
++   free(primarybuf);
++ 
++   return;
++ }
