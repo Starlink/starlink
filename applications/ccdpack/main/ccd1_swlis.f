@@ -392,8 +392,10 @@
          END IF
 
 *  Release resources.
-         CALL NDF_ANNUL( INDF, STATUS )
-         CALL AST_ANNUL( IWCS, STATUS )
+         IF ( USESET .OR. USEWCS ) THEN
+            CALL NDF_ANNUL( INDF, STATUS )
+            CALL AST_ANNUL( IWCS, STATUS )
+         END IF
       END DO
 
 *  Record the number of superlists.  If it is the same as the original
