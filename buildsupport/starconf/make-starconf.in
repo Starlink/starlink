@@ -480,7 +480,7 @@ cat >&3 <<\_STARCONF3_EOD
 cat >&4 <<\_STARCONF4_EOD
         # Extract the first word on the second line, and the value of rnum
         eval `sed -n -e '2s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\).*/original=\1; file_version=\2;/p' -e 3q $filename`
-        if test "X\$original" != Xoriginal; then
+        if test "X$original" != Xoriginal; then
             # do nothing -- file has been modified
             unpack_this=false
         elif test -n "$file_version" -a "$file_version" -lt @PACKAGE_VERSIONINT@; then
