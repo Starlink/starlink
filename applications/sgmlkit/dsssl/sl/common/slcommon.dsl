@@ -1,6 +1,7 @@
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
   <!entity sl-gentext.dsl	system "sl-gentext.dsl">
 ]>
+<![ ignore [ $Id$ ]]>
 
 <title>Common functions for the Starlink stylesheets
 
