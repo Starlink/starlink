@@ -1,78 +1,130 @@
-*+  GCB_CSAVE - saves Grafix Control Block direct from cache to HDS component
-      SUBROUTINE GCB_CSAVE(CACHE,LOC,STATUS)
-*    Description :
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-      INCLUDE 'GCB_PAR'
-*    Global variables :
-      INCLUDE 'GCB_CMN'
-*    Structure definitions :
-*    Import :
-      INTEGER CACHE
-      CHARACTER*(DAT__SZLOC) LOC
-*    Import-Export :
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-*    Local constants :
-*    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC,GCBLOC
-      INTEGER GCBPTR
-      INTEGER NSCAL,NSTRUC
-      INTEGER DISP
-      INTEGER NBYTE,BYTES
-      LOGICAL OK
+      SUBROUTINE GCB_CSAVE( CACHE, FID, STATUS )
+*+
+*  Name:
+*     GCB_CSAVE
+
+*  Purpose:
+*     Saves cached Grafix Control Block to file object
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL GCB_CSAVE( CACHE, FID, STATUS )
+
+*  Description:
+*     Saves Grafix Control Block to file object by invoking the SaveGCB
+*     method in the FID argument.
+
+*  Arguments:
+*     CACHE = INTEGER (given)
+*        Address in memory of cached GCB
+*     FID = INTEGER (given)
+*        ADI identifier of file object
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     GCB Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/gcb.html
+
+*  Keywords:
+*     package:gcb, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     12 Oct 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-      IF (STATUS.EQ.SAI__OK) THEN
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
-*  find size required
-        DISP=GCB__SZPTR+1
-        CALL GCB_GETI_SUB(%val(CACHE),DISP,GCB__SZPTR,GCB__PTRFMT,
-     :                                                NSCAL,STATUS)
-        DISP=DISP+GCB__SZPTR
-        CALL GCB_GETI_SUB(%val(CACHE),DISP,GCB__SZPTR,GCB__PTRFMT,
-     :                                                NSTRUC,STATUS)
-        NBYTE=GCB__NHDBLK*GCB__SZPTR+NSCAL+NSTRUC
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'GCB_PAR'
 
-        CALL BDA_CHKGRAF(LOC,OK,STATUS)
-        IF (.NOT.OK) THEN
-          CALL BDA_CREGRAF(LOC,STATUS)
-        ENDIF
-        CALL BDA_LOCGRAF(LOC,GLOC,STATUS)
-*  see if component already there
-        CALL DAT_THERE(GLOC,'GRAFIX_CONTROL',OK,STATUS)
-        IF (OK) THEN
-          CALL DAT_FIND(GLOC,'GRAFIX_CONTROL',GCBLOC,STATUS)
-          CALL DAT_SIZE(GCBLOC,BYTES,STATUS)
-*  alter if necessary
-          IF (BYTES.NE.NBYTE) THEN
-            CALL DAT_ALTER(GCBLOC,1,NBYTE,STATUS)
-          ENDIF
-          CALL DAT_MAP(GCBLOC,'_BYTE','UPDATE',1,NBYTE,GCBPTR,STATUS)
+*  Global Variables:
+      INCLUDE 'GCB_CMN'                                 ! GCB globals
+*        G_MTHINIT = LOGICAL (given and returned)
+*           GCB definitions load attempted?
 
-*  if not then create it
-        ELSE
-          CALL DAT_NEW(GLOC,'GRAFIX_CONTROL','_BYTE',1,NBYTE,STATUS)
-          CALL DAT_FIND(GLOC,'GRAFIX_CONTROL',GCBLOC,STATUS)
-          CALL DAT_MAP(GCBLOC,'_BYTE','WRITE',1,NBYTE,GCBPTR,STATUS)
-        ENDIF
+*  Arguments Given:
+      INTEGER			CACHE, FID
 
-*  copy cache to output
-        CALL ARR_COP1B(NBYTE,%val(CACHE),%val(GCBPTR),STATUS)
+*  Status:
+      INTEGER 			STATUS             	! Global status
 
-*  release output
-        CALL DAT_ANNUL(GCBLOC,STATUS)
+*  External References:
+      EXTERNAL                  GCB0_BLK                ! Ensures inclusion
 
-        IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_CSAVE',STATUS)
-        ENDIF
+*  Local Variables:
+      INTEGER			COBJ			! Cache argument
+      INTEGER			FILID			! Base file object
+      INTEGER                   RESID                   ! Ignored return data
+*.
 
-      ENDIF
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check initialised
+      IF ( .NOT. G_MTHINIT ) CALL GCB0_INIT( STATUS )
+
+*  Get base file object
+      CALL ADI_GETFILE( FID, FILID, STATUS )
+
+*  Create cache address argument
+      CALL ADI_NEWV0I( CACHE, COBJ, STATUS )
+
+*  Simply invoke the method
+      CALL ADI_EXEC2( 'SaveCachedGCB', COBJ, FILID, RESID, STATUS )
+
+*  Destroy cache argument
+      CALL ADI_ERASE( COBJ, STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GCB_CSAVE', STATUS )
 
       END

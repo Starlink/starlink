@@ -92,7 +92,9 @@
 
 *  External References:
       EXTERNAL			GCB1_LOAD
+      EXTERNAL			GCB1_CSAVE
       EXTERNAL			GCB1_SAVE
+      EXTERNAL			GCB2_CSAVE
       EXTERNAL			GCB2_LOAD
       EXTERNAL			GCB2_SAVE
 
@@ -108,8 +110,12 @@
 
 *    Define the methods
         CALL ADI_DEFMTH( 'LoadGCB(_HDSfile)', GCB1_LOAD, DID, STATUS )
+        CALL ADI_DEFMTH( 'SaveCachedGCB(_INTEGER,_HDSfile)',
+     :                      GCB1_CSAVE, DID, STATUS )
         CALL ADI_DEFMTH( 'SaveGCB(_HDSfile)', GCB1_SAVE, DID, STATUS )
         CALL ADI_DEFMTH( 'LoadGCB(_FITSfile)', GCB2_LOAD, DID, STATUS )
+        CALL ADI_DEFMTH( 'SaveCachedGCB(_INTEGER,_FITSfile)',
+     :                      GCB2_CSAVE, DID, STATUS )
         CALL ADI_DEFMTH( 'SaveGCB(_FITSfile)', GCB2_SAVE, DID, STATUS )
 
 *    Now initialised
