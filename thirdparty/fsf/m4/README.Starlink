@@ -1,0 +1,32 @@
+
+This is a slightly patched version of GNU m4.
+
+This was originally imported as m4 1.4, and then updated to 1.4.1 (see
+the FSF vendor branch for details).
+
+The differences consist of those few changes needed to weave the
+package into the Starlink build system, and can be seen with the
+command
+
+    % cvs diff -r FSF
+
+To import a new release, follow the usual instructions for doing a
+CVS import, for example:
+
+    % cd /tmp
+    % tar xzf m4-1.4.1.tar.gz
+    % cd m4-1.4.1
+    % cvs -d $starcvs import -m "Import of m4 1.4.1" \
+        thirdparty/fsf/m4 FSF m4-1-4-1
+    % cd /tmp
+    % cvs -d $starcvs co -jm4-1-4 -jm4-1-4-1 thirdparty/fsf/m4
+    % cd thirdparty/fsf/m4
+
+At this point, resolve any conflicts that have arisen, and regenerate
+configure from configure.in.  This need not be done using the Starlink
+autoconf, but it shouldn't matter.  Use a similar autotools version,
+though (the import of 1.4.1 was done using 2.57, which is the same
+version that Starlink autoconf is based on).  Use autoreconf, and
+ignore the deprecation warnings.
+
+Commit the result.
