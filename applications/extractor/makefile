@@ -534,13 +534,14 @@ TEST_FILES =
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS =
-HYPERTEXT_DOCS =
+LATEX_DOCS = sun225.tex
+HYPERTEXT_DOCS = sun225.htx_tar
+MUD_DOCS = mud165.ps sex1_doc.ps.gz sexpaper.ps.gz
 
 #  List of documentation files.
 
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
-$(PKG_NAME).news $(LICENCE)
+$(PKG_NAME).news $(LICENCE) $(MUD_DOCS)
 
 #  Conditions of use file.
 
@@ -977,7 +978,8 @@ install:
         done
 #
 #  Install any hypertext documents, giving world read access to all the files
-#  they contain and linking with other documents.
+#  they contain and linking with other documents. Note we also include
+#  mud165.ps for reference.
 	if test -n "$(HYPERTEXT_DOCS)"; then \
            pwd=`pwd`;\
            (cd $(INSTALL_DOCS);\
@@ -986,6 +988,7 @@ install:
                  $(TAR_OUT) $$pwd/$${f}_tar;\
                  chmod 755 `find $$f -type d -print`;\
                  chmod 644 `find $$f ! -type d -print`;\
+		 cp -p $$pwd/mud165.ps . ;\
                  touch $$f;\
               else :; fi;\
            done);\
