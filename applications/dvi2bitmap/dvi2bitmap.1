@@ -5,7 +5,7 @@ dvi2bitmap
 .SH SYNOPSIS
 .B dvi2bitmap
 [\-f font-path] [\-r resolution] [\-m magnification] [\-P[bt]]
-[\-s scalefactor] [\-t gif|xbm] [\-o output] [\-lLnqV]
+[\-s scalefactor] [\-t gif|xbm] [\-o output] [-b(h|w) size] [\-lLnqQV]
 dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
@@ -13,6 +13,23 @@ system, converting each page to a single bitmap.
 .PP
 This program is intended to conform to the DVI processing standard.
 .SS OPTIONS
+.TP
+.I "\-bh size, \-bw size"
+Specify the height and width of the canvas on which the output
+bitmap is painted.  The program tries to make an estimate of this
+based on information within the DVI file, but it can't efficiently get
+all the information it needs, so sometimes the estimate is wrong.  If
+you get a warning message like 
+.I "Warning: p.12: bitmap too big: occupies (1183,1072)...(4134,6255). Requested 4100x6200"
+then 
+you'll need to specify a bitmap size.  The numbers
+.I "(1183,1072)...(4134,6255)"
+are the coordinates of the top-left and
+bottom-right of the bitmap: in this case 
+.I "\-bh 6300 \-bw 4200"
+would suffice.  Note that the `h' in
+.I "\-bh"
+stands for height, not horizontal!
 .TP
 .I "\-f font-path"
 Specifies the path to the PK fonts which dvi2bitmap will use.  See
@@ -71,7 +88,10 @@ that's supported by the particular format you choose using option
 .B "\-t"
 .TP
 .I "\-q"
-Quiet mode.  Do not display warnings or errors.
+Quiet mode -- suppress some chatter.
+.TP
+.I "\-Q"
+Silent mode -- do not display warnings or errors.
 .TP
 .I "\-r resolution"
 Specifies the output resolution, in pixels-per-inch.  This is used

@@ -10,6 +10,7 @@
 
 #include <string>
 #include "dvi2bitmap.h"
+#include "verbosity.h"
 
 class InputByteStreamError : public DviError {
  public:
@@ -31,7 +32,7 @@ class InputByteStream {
     void seek (unsigned int);
     int pos ();
     void skip (unsigned int);
-    static void verbosity (int level) { verbosity_ = level; }
+    static void verbosity (const verbosities level) { verbosity_ = level; }
  private:
     int fd_;
     unsigned int filesize_;
@@ -43,7 +44,6 @@ class InputByteStream {
     const bool preloaded_;
     void read_buf_(void);
 
-    // verbosity_ > 1 is debugginf, verbosity_=0 silent
-    static int verbosity_;
+    static verbosities verbosity_;
 };
 #endif // #ifndef INPUT_BYTE_STREAM_HEADER_READ

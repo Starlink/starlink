@@ -53,7 +53,7 @@ installation instructions.
 <verbatim>
 dvi2bitmap 
     [-f font-path] [-r resolution] [-m magnification] [-P[bt]]
-    [-s scalefactor] [-t gif|xbm] [-o output] [-lLnqV]
+    [-s scalefactor] [-t gif|xbm] [-o output] [-b(h|w) size] [-lLnqQV]
     dvi-file
 </verbatim>
 
@@ -62,6 +62,20 @@ dvi2bitmap
 <subsect id=usage.options export>Options
 
 <p><dl>
+<dt><code>-bh size, -bw size</code>
+<dd>Specify the height and width of the canvas on which the output
+bitmap is painted.  The program tries to make an estimate of this
+based on information within the DVI file, but it can't efficiently get
+all the information it needs, so sometimes the estimate is wrong.  If
+you get a warning message like <code>Warning: p.12: bitmap too big:
+occupies (1183,1072)...(4134,6255).  Requested 4100x6200</code>, then 
+you'll need to specify a bitmap size.  The numbers
+<code>(1183,1072)...(4134,6255)</code> are the coordinates of the top-left and
+bottom-right of the bitmap: in this case <code>-bh 6300 -bw
+4200</code> would suffice.  Note that the `h' in <code>-bh</code> stands for
+height, not horizontal!  At some point, I'd like to make the bitmap
+`expandable', obviating the need for these options.
+
 <dt><code>-f font-path</code>
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
 also <ref id=usage.env>.
@@ -114,7 +128,10 @@ that's supported by the particular format you choose using option
 <code/-t/
 
 <dt><code/-q/
-<dd>Quiet mode.  Do not display warnings or errors.
+<dd>Quiet mode -- suppress some chatter.
+
+<dt><code/-Q/
+<dd>Silent mode -- do not display warnings or errors.
 
 <dt><code/-r resolution/
 <dd>Specifies the output resolution, in pixels-per-inch.  This is used
@@ -153,7 +170,7 @@ then the output file used for the current page will be
 Having <em/no/ fonts present counts as a processing error; if there is
 at least one font present, then missing fonts will be replaced by a
 more-or-less randomly chosen alternative, and the program will produce a
-warning if the <code/-q/ option is not present, but it will return
+warning if the <code/-Q/ option is not present, but it will return
 with a zero (success) status.
 See also the <code/-n/ option in <ref id=usage.options>.
 
@@ -168,7 +185,7 @@ magnification factor to 2, so that the program uses a double-size font
 factor of 2 to obtain a bitmap of the correct size.
 
 <p><verbatim>
-% dvi2bitmap -n -l -r 110 -m 1.5 -q hello.dvi
+% dvi2bitmap -n -l -r 110 -m 1.5 -Q hello.dvi
 cmr10 165 110 1.5 localfont
 </verbatim>
 This reads the DVI file to find out what fonts are required, but does
@@ -251,12 +268,10 @@ give the commands
 % ./mk install
 </verbatim>
 
-<p>This build configures support for GIFs, but not for the
-<code/kpathsea/ library, since that requires an additional
-non-Starlink library which is not distributed with this package and
-not present by default on all machines.  I recommend you do configure
-in support for this library -- see the non-Starlink instructions, <ref
-id=install.nonstarlink>, for details.
+<p>This build configures support for GIFs, plus support for the
+<code/kpathsea/ library if that library is present on the system (it
+is not distributed with this package and not present by default on all
+machines).
 
 <subsect id=install.nonstarlink export>General installation and configuration
 <update versionid="upd1">

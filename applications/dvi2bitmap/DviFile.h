@@ -15,6 +15,7 @@
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 #include "PkFont.h"
+#include "verbosity.h"
 
 class DviFileEvent;
 class DviFilePreamble;
@@ -27,7 +28,7 @@ public:
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
-    static void verbosity (int level) { verbosity_ = level; }
+    static void verbosity (const verbosities level) { verbosity_ = level; }
     // currH and currY are current horiz and vert positions in pixel
     // units, including possible drift corrections
     int currH() const { return hh_; }	// device units
@@ -120,8 +121,9 @@ private:
     */
     map<int,PkFont*> fontMap_;
     map<int,PkFont*>::const_iterator fontIter_;
-    // verbosity_ > 1 is debugging, verbosiity_=0 silent
-    static int verbosity_;
+    bool iterOK_;		/* there's some visibility sublety involved 
+				   in setting fontIter_=0 in constructor */
+    static verbosities verbosity_;
 };
 
 

@@ -22,7 +22,7 @@ using std::sprintf;
 #endif
 
 // Static debug switch
-int InputByteStream::verbosity_ = 1;
+verbosities InputByteStream::verbosity_ = normal;
 
 // Open the requested file.  If preload is true, then open the file and
 // read it entire into memory, since the client will be seeking a lot.
@@ -58,7 +58,7 @@ InputByteStream::InputByteStream (string s, bool preload, string tryext)
 	close (fd_);
 	fd_ = -1;
 
-	if (verbosity_ > 1)
+	if (verbosity_ > normal)
 	    cerr << "InputByteStream: preloaded " << filesize_ << " bytes\n";
     }
     else
@@ -67,7 +67,7 @@ InputByteStream::InputByteStream (string s, bool preload, string tryext)
 	buf_ = new Byte[buflen_];
 	eob_ = buf_;	// nothing read in yet - eob at start
 
-	if (verbosity_ > 1)
+	if (verbosity_ > normal)
 	    cerr << "InputByteStream: filesize=" << filesize_
 		 << " buflen=" << buflen_ << '\n';
     }

@@ -857,7 +857,7 @@ unbuild: clean
 # in the distributed directory, so unpack the source bundle and move the
 # files up to the current directory.
 dvi2bitmap: dvi2bitmap.cc
-	CXX=$(CXX) ./configure --enable-gif
+	CXX=$(CXX) ./configure --enable-gif --with-kpathsea
 	$(MAKE) -f Makefile dvi2bitmap
 
 # Don't have this depending dvi2bitmap_source.tar - the latter will usually

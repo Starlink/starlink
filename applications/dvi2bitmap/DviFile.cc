@@ -19,10 +19,12 @@
 #include "InputByteStream.h"
 
 // Static debug switch
-int DviFile::verbosity_ = 1;
+verbosities DviFile::verbosity_ = normal;
 
 DviFile::DviFile (string s, int res, double magmag)
-    : fileName_(s), resolution_(res), magmag_(magmag), magfactor_(1.0)
+    : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0), dvif_(0),
+      current_font_(0), resolution_(res), magmag_(magmag), magfactor_(1.0),
+      iterOK_(false)
 {
     PkFont::setResolution(res);
 
@@ -71,10 +73,12 @@ DviFileEvent *DviFile::getEvent()
     {
 	opcode = getByte();
 	int charno;
-	if (verbosity_ > 1)
+	if (verbosity_ > normal)
 	    cerr << 'O' << static_cast<int>(opcode) << '\n';
 	if (opcode <= 127)	// set character
 	{
+	    if (current_font_ == 0)
+		throw DviError ("current_font undefined");    
 	    pending_hhupdate_ += current_font_->glyph(opcode)->hEscapement();
 	    pending_hupdate_ += charwidth_(opcode);
 	    gotEvent = new DviFileSetChar(opcode, this);
@@ -93,6 +97,8 @@ DviFileEvent *DviFile::getEvent()
 	    {
 	      case 128:		// set1
 		charno = getSIU(1);
+		if (current_font_ == 0)
+		    throw DviError ("current_font undefined");    
 		pending_hhupdate_ +=
 		    current_font_->glyph(charno)->hEscapement();
 		pending_hupdate_ += charwidth_(charno);
@@ -100,6 +106,8 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 129:		// set2
 		charno = getSIU(2);
+		if (current_font_ == 0)
+		    throw DviError ("current_font undefined");    
 		pending_hhupdate_ +=
 		    current_font_->glyph(charno)->hEscapement();
 		pending_hupdate_ += charwidth_(charno);
@@ -107,6 +115,8 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 130:		// set3
 		charno = getSIU(3);
+		if (current_font_ == 0)
+		    throw DviError ("current_font undefined");    
 		pending_hhupdate_ +=
 		    current_font_->glyph(charno)->hEscapement();
 		pending_hupdate_ += charwidth_(charno);
@@ -114,6 +124,8 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 131:		// set4
 		charno = getSIS(4);
+		if (current_font_ == 0)
+		    throw DviError ("current_font undefined");    
 		pending_hhupdate_ +=
 		    current_font_->glyph(charno)->hEscapement();
 		pending_hupdate_ += charwidth_(charno);
@@ -178,7 +190,7 @@ DviFileEvent *DviFile::getEvent()
 		    //posStack_->push(ps);
 		    PosState ps = PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
 		    posStack_.push(ps);
-		    if (verbosity_ > 1)
+		    if (verbosity_ > normal)
 			cerr << ">> "<<h_<<','<<v_<<','
 			     <<w_<<','<<x_<<','
 			     <<y_<<','<<z_<<','
@@ -209,7 +221,7 @@ DviFileEvent *DviFile::getEvent()
 		    //y_ = ps->y;
 		    //z_ = ps->z;
 		    //delete ps;
-		    if (verbosity_ > 1)
+		    if (verbosity_ > normal)
 			cerr << "<< "<<h_<<','<<v_<<','
 			     <<w_<<','<<x_<<','
 			     <<y_<<','<<z_<<','
@@ -544,6 +556,8 @@ int DviFile::pixel_round(int dp)
 // Return width of character in DVIUnits
 int DviFile::charwidth_ (int charno)
 {
+    if (current_font_ == 0)
+	throw DviError ("current_font undefined (charwidth)");
     return static_cast<int>(current_font_->glyph(charno)->tfmWidth()
 			    * dviu_per_pt_);
 #if 0
@@ -585,7 +599,7 @@ void DviFile::updateH_ (int hup, int hhup)
     if (dist > max_drift_)
 	hh_ = Kh + sdist*max_drift_;
 
-    if (verbosity_ > 1)
+    if (verbosity_ > normal)
 	cerr << "updateH_ ("
 	     << hup << ',' << hhup << ") -> ("
 	     << h_ << ',' << hh_ << ")\n";
@@ -615,7 +629,7 @@ void DviFile::updateV_ (int vup)
     }
     if (dist > max_drift_)
 	vv_ = Kv + sdist*max_drift_;
-    if (verbosity_ > 1)
+    if (verbosity_ > normal)
 	cerr << "updateV_ ("
 	     << vup << ") -> ("
 	     << v_ << ',' << vv_ << ',' << y_ << ',' << z_ << ")\n";
@@ -642,7 +656,7 @@ void DviFile::read_postamble()
 	    ("DviFile::read_postamble: post_post not in correct place");
     p++;
     unsigned int q = InputByteStream::getUIU(4, p);
-    if (verbosity_ > 1)
+    if (verbosity_ > normal)
 	cerr << "Postamble address=" << q << '\n';
 
     dvif_->seek(q);
@@ -668,7 +682,7 @@ void DviFile::read_postamble()
 	postamble_.u = static_cast<unsigned int>(postamble_.u
 						 * (double)dvimag / 1000.0);
     }
-    if (verbosity_ > 1)
+    if (verbosity_ > normal)
 	cerr << "Postamble: l=" << postamble_.l
 	     << " u=" << postamble_.u
 	     << " s=" << postamble_.s
@@ -792,7 +806,7 @@ void DviFile::process_preamble(DviFilePreamble* p)
     true_dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
     dviu_per_pt_ = true_dviu_per_pt_ * magfactor_;
     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
-    if (verbosity_ > 1)
+    if (verbosity_ > normal)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
 	     << ", px_per_dviu_ = " << px_per_dviu_
 	     << ", mag=" << p->mag
@@ -909,15 +923,27 @@ void DviFile::PosStateStack::clear()
 PkFont *DviFile::firstFont()
 {
     fontIter_ = fontMap_.begin();
-    return fontIter_->second;
-}
-PkFont *DviFile::nextFont() 
-{
     if (fontIter_ == fontMap_.end())
 	return 0;
     else
     {
-	++fontIter_;
+	iterOK_ = true;
 	return fontIter_->second;
+    }
+}
+PkFont *DviFile::nextFont() 
+{
+    if (!iterOK_)
+	return 0;
+    else
+    {
+	++fontIter_;
+	if (fontIter_ == fontMap_.end())
+	{
+	    iterOK_ = false;	// end of list
+	    return 0;
+	}
+	else
+	    return fontIter_->second;
     }
 }

@@ -33,43 +33,31 @@ extern "C" {
 #endif
 
 bool kpathsea::initialised_ = false;
-int kpathsea::initRes_;
-int kpathsea::verbosity_ = 1;
-const char *kpathsea::program_name_ = "dvi2bitmap";
+verbosities kpathsea::verbosity_ = normal;
 
-void kpathsea::verbosity (int level)
+void kpathsea::init (const char *program_name, const int basedpi)
 {
-    verbosity_ = level;
-    if (level > 2)
-	kpathsea_debug = ~0;	// all debugging
-    else
-	kpathsea_debug = 0;	// none
+    if (initialised_ && verbosity_ > silent)
+	cerr << "Warning: kpathsea doubly initialised.  Ignored\n";
+    kpse_set_program_name (program_name, "dvi2bitmap");
+    //kpse_init_prog ("TEX", basedpi, "localfont", "cmr10");
+    kpse_init_prog ("TEX", basedpi, NULL, NULL);
+    initialised_ = true;
 }
 
 const char *kpathsea::find (const char *fontname, int resolution)
 {
-    if (! initialised_)
+    if (! initialised_ && verbosity_ > silent)
     {
-	kpse_set_program_name (program_name_, "dvi2bitmap");
-	//kpse_init_prog ("TEX", resolution, "localfont", "cmr10");
-	kpse_init_prog ("TEX", resolution, NULL, NULL);
-	initRes_ = resolution;
-	initialised_ = true;
+	cerr << "Warning: kpathsea not initialised\n";
+	return 0;
     }
-    else
-	if (resolution != initRes_)
-	{
-	    if (verbosity_ > 0)
-		cerr << "kpathsea already initialised with resolution "
-		     << initRes_ << '\n';
-	    return 0;
-	}
 
     kpse_glyph_file_type glyph_info;
     char *fname;
     fname = kpse_find_pk (fontname, resolution, &glyph_info);
 
-    if (verbosity_ > 1)
+    if (verbosity_ > normal)
 	if (fname)
 	    cerr << "KPSE found file " << fname << '\n';
 	else
@@ -78,4 +66,15 @@ const char *kpathsea::find (const char *fontname, int resolution)
 
     return fname;
 }
+
+void kpathsea::verbosity (const verbosities level)
+{
+    verbosity_ = level;
+    if (level > debug)
+	kpathsea_debug = ~0;	// all debugging
+    else
+	kpathsea_debug = 0;	// none
+}
+
+
 

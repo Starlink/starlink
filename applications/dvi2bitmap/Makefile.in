@@ -20,23 +20,26 @@ OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 $(EXEC): $(OBJS)
 	$(CXX) $(OBJS) $(LIBS) -o $@
 
-DviFile.o: DviFile.cc DviFile.h InputByteStream.h PkFont.h
+DviFile.o: DviFile.cc DviFile.h InputByteStream.h PkFont.h verbosity.h
 
-InputByteStream.o: InputByteStream.cc InputByteStream.h dvi2bitmap.h
+InputByteStream.o: InputByteStream.cc InputByteStream.h dvi2bitmap.h \
+		verbosity.h
 
-dvi2bitmap.o: dvi2bitmap.cc dvi2bitmap.h DviFile.h PkFont.h Bitmap.h version.h
+dvi2bitmap.o: dvi2bitmap.cc dvi2bitmap.h DviFile.h PkFont.h Bitmap.h \
+		version.h verbosity.h
 
-PkFont.o: PkFont.cc PkFont.h InputByteStream.h dvi2bitmap.h kpathsea.h
+PkFont.o: PkFont.cc PkFont.h InputByteStream.h dvi2bitmap.h kpathsea.h \
+		verbosity.h
 
 BitmapImage.o: BitmapImage.cc BitmapImage.h GIFBitmap.h XBMBitmap.h
 
-Bitmap.o: Bitmap.cc Bitmap.h dvi2bitmap.h BitmapImage.h
+Bitmap.o: Bitmap.cc Bitmap.h dvi2bitmap.h BitmapImage.h verbosity.h
 
 GIFBitmap.o: GIFBitmap.cc GIFBitmap.h Bitmap.h
 
 XBMBitmap.o: XBMBitmap.cc XBMBitmap.h Bitmap.h
 
-kpathsea.o: kpathsea.cc kpathsea.h
+kpathsea.o: kpathsea.cc kpathsea.h verbosity.h
 
 
 # Distribution

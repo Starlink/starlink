@@ -26,7 +26,11 @@ using std::exit;
 #include "PkFont.h"
 #include "Bitmap.h"
 #include "version.h"
+#include "verbosity.h"
 
+#ifdef ENABLE_KPATHSEA
+#include "kpathsea.h"
+#endif
 
 typedef vector<string> string_list;
 
@@ -50,7 +54,9 @@ string get_ofn_pattern (string dviname);
 void Usage (void);
 char *progname;
 
-unsigned int verbosity = 1;
+verbosities verbosity = normal;
+int bitmapH = -1;
+int bitmapW = -1;
 
 main (int argc, char **argv)
 {
@@ -70,10 +76,30 @@ main (int argc, char **argv)
 
     progname = argv[0];
 
+#ifdef ENABLE_KPATHSEA
+    kpathsea::init (progname, resolution);
+#endif
+
     for (argc--, argv++; argc>0; argc--, argv++)
 	if (**argv == '-')
 	    switch (*++*argv)
 	    {
+	      case 'b':
+		switch (*++*argv)
+		{
+		  case 'h':
+		    argc--, argv++; if (argc <= 0) Usage();
+		    bitmapH = atoi (*argv);
+		    break;
+		  case 'w':
+		    argc--, argv++; if (argc <= 0) Usage();
+		    bitmapW = atoi (*argv);
+		    break;
+		  default:
+		    Usage();
+		    break;
+		}
+		break;
 	      case 'f':		// set PK font path
 		argc--, argv++;
 		if (argc <= 0)
@@ -94,7 +120,7 @@ main (int argc, char **argv)
 		break;
 	      case 'g':		// debugging...
 		{
-		    int debuglevel = 2;
+		    verbosities debuglevel = debug;
 		    for (++*argv; **argv != '\0'; ++*argv)
 			switch (**argv)
 			{
@@ -117,7 +143,8 @@ main (int argc, char **argv)
 			    verbosity = debuglevel;
 			    break;
 			  case 'g':
-			    debuglevel++;
+			    if (debuglevel == debug)
+				debuglevel = everything;
 			    break;
 			  default:
 			    Usage();
@@ -125,12 +152,20 @@ main (int argc, char **argv)
 		}
 		break;
 	      case 'q':		// run quietly
-		DviFile::verbosity(0);
-		PkFont::verbosity(0);
-		PkRasterdata::verbosity(0);
-		InputByteStream::verbosity(0);
-		Bitmap::verbosity(0);
-		verbosity = 0;
+		DviFile::verbosity(quiet);
+		PkFont::verbosity(quiet);
+		PkRasterdata::verbosity(quiet);
+		InputByteStream::verbosity(quiet);
+		Bitmap::verbosity(quiet);
+		verbosity = quiet;
+		break;
+	      case 'Q':		// run silently - no warnings or errors
+		DviFile::verbosity(silent);
+		PkFont::verbosity(silent);
+		PkRasterdata::verbosity(silent);
+		InputByteStream::verbosity(silent);
+		Bitmap::verbosity(silent);
+		verbosity = silent;
 		break;
 	      case 'l':		// show missing fonts
 		show_font_list = 1;
@@ -202,7 +237,7 @@ main (int argc, char **argv)
 	bm.ofile_pattern = get_ofn_pattern (dviname);
     if (bm.ofile_pattern.length() == 0)
     {
-	if (verbosity > 0)
+	if (verbosity > silent)
 	    cerr << "Can't make output filename pattern from "
 		 << dviname << '\n';
 	exit(1);
@@ -213,7 +248,7 @@ main (int argc, char **argv)
 	DviFile *dvif = new DviFile(dviname, resolution, magmag);
 	if (dvif->eof())
 	{
-	    if (verbosity > 0)
+	    if (verbosity > silent)
 		cerr << "Can't open file " << dviname << " to read\n";
 	    exit(1);
 	}
@@ -226,7 +261,6 @@ main (int argc, char **argv)
 	     f != 0;
 	     f = dvif->nextFont())
 	{
-	    //string unk = "unknown";
 	    if (f->loaded())
 	    {
 		no_font_present = false;
@@ -243,11 +277,18 @@ main (int argc, char **argv)
 		    if (f->loaded()) // show_font_list is >1
 			cout << "% ";
 		    // write out font name, dpi, base-dpi, mag and MF mode
-		    //string fn = f->fontFilename();
 		    cout << f->name() << ' '
-			 << f->dpi()*magmag << ' '
+			 << f->dpiScaled() << ' '
 			 << f->dpi() << ' '
-			 << magmag << " localfont\n";
+			 << magmag
+			 << " localfont";
+		    if (f->loaded())
+		    {
+			string fn = f->fontFilename();
+			string unk = "unknown";
+			cout << ' ' << (fn.length() > 0 ? fn : unk);
+		    }
+		    cout << '\n';
 		}
 	}
 
@@ -255,7 +296,10 @@ main (int argc, char **argv)
 	if (do_process_file)
 	{
 	    if (no_font_present) // give up!
-		cerr << progname << ": no fonts found!  Giving up\n";
+	    {
+		if (verbosity > silent)
+		    cerr << progname << ": no fonts found!  Giving up\n";
+	    }
 	    else
 		process_dvi_file (dvif, bm, resolution, fallback_font);
 	}
@@ -287,31 +331,78 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
     string output_filename = "";
     Bitmap *bitmap = 0;
     bool end_of_file = false;
+    int outcount = 0;		// characters written to output current line
 
     while (! end_of_file)
     {
 	PkGlyph *glyph;
 
 	ev = dvif->getEvent();
-	if (verbosity > 2)
+	if (verbosity > debug)
 	    ev->debug();
 
 	if (DviFilePage *page = dynamic_cast<DviFilePage*>(ev))
 	    if (page->isStart)
-		bitmap = new Bitmap (dvif->hSize(), dvif->vSize());
+	    {
+		pagenum++;
+		// Request a big-enough bitmap.  hSize and vSize are the
+		// width and height of the widest and tallest pages,
+		// as reported by the DVI file; however, the file doesn't
+		// report the offsets of these pages.  Add an inch to
+		// both and hope for the best.
+		bitmap = new Bitmap
+		    ((bitmapW > 0 ? bitmapW : dvif->hSize() + resolution),
+		     (bitmapH > 0 ? bitmapH : dvif->vSize() + resolution));
+		if (verbosity > quiet)
+		{
+		    int last, i;
+		    // find last non-zero count
+		    for (last=9; last>=0; last--)
+			if (page->count[last] != 0)
+			    break;
+		    if (outcount + 4 + 2*(last-1) > 80)
+		    {
+			cout << '\n';
+			outcount = 0;
+		    }
+		    else
+		    {
+			cout << ' ';
+			outcount++;
+		    }
+		    cout << '[' << page->count[0];
+		    outcount += 2;
+		    for (i=1; i<=last; i++)
+		    {
+			cout << '.' << page->count[i];
+			outcount += 2;
+		    }
+		}
+	    }
 	    else
 	    {
 		if (bitmap == 0)
 		    throw DviBug ("bitmap uninitialised at page end");
-		pagenum++;
 		if (bitmap->empty())
 		{
-		    if (verbosity > 0)
+		    if (verbosity > silent)
 			cerr << "Warning: page " << pagenum
 			     << " empty: nothing written\n";
 		}
 		else
 		{
+		    if (bitmap->overlaps() && verbosity > silent)
+		    {
+			int *bb = bitmap->boundingBox();
+			cerr << "Warning: p." << pagenum
+			     << ": bitmap too big: occupies (" << bb[0] << ','
+			     << bb[1] << ")...(" << bb[2] << ','
+			     << bb[3] << ").  Requested "
+			     << (bitmapW > 0 ? bitmapW : dvif->hSize() + resolution)
+			     << 'x'
+			     << (bitmapH > 0 ? bitmapH : dvif->vSize() + resolution)
+			     << '\n';
+		    }
 		    bitmap->crop();
 		    if (b.blur_bitmap)
 			bitmap->blur();
@@ -331,17 +422,23 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 
 		delete bitmap;
 		bitmap = 0;
+
+		if (verbosity > quiet)
+		{
+		    cout << ']';
+		    outcount++;
+		}
 	    }
 	else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
 	{
 	    if (curr_font == 0 || bitmap == 0)
 		throw DviBug ("curr_font or bitmap not initialised setting char");
 	    glyph = curr_font->glyph(sc->charno);
-	    if (verbosity > 1)
+	    if (verbosity > normal)
 	    {
 		cerr << "glyph `" << glyph->characterChar()
 		     << "\' (" << glyph->characterCode() << ')';
-		if (verbosity > 2)
+		if (verbosity > debug)
 		    cerr << " size " << glyph->w() << 'x' << glyph->h()
 			 << " at position ("
 			 << dvif->currH() << ',' << dvif->currV() << ')';
@@ -377,12 +474,12 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 		&& (*l)[1] == "outputfile")
 	    {
 		output_filename = (*l)[2];
-		if (verbosity > 1)
+		if (verbosity > normal)
 		    cerr << "special: outputfile="
 			 << output_filename << '\n';
 	    }
 	    else
-		if (verbosity > 0)
+		if (verbosity > silent)
 		    cerr << "Warning: unrecognised special: "
 			 << special->specialString
 			 << '\n';
@@ -394,6 +491,9 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 
 	delete ev;
     }
+
+    if (verbosity > quiet)
+	cout << '\n';
 }
 
 DviError::DviError(const char *fmt,...)
@@ -441,7 +541,7 @@ string get_ofn_pattern (string dviname)
 // this, I'm sure....
 string_list *tokenise_string (string str)
 {
-    if (verbosity > 1)
+    if (verbosity > normal)
 	cerr << "tokenise_string: string=<" << str << ">\n";
     string_list *l = new string_list();
     int unsigned i=0, wstart;
@@ -454,7 +554,7 @@ string_list *tokenise_string (string str)
 	while (i < str.length() && !isspace(str[i]))
 	    i++;
 	string t = str.substr(wstart,i-wstart);
-	if (verbosity > 1)
+	if (verbosity > normal)
 	    cerr << "tokenise:" << t << ":\n";
 	l->push_back(t);
 	while (i < str.length() && isspace(str[i]))
@@ -466,7 +566,7 @@ string_list *tokenise_string (string str)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-lLnqV] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-t xbm"
+    cerr << "Usage: " << progname << " [-lLnqQV] [-b(h|w) size] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
 #endif
