@@ -213,7 +213,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
         IF (TAB.GE.1.AND.TAB.LE.6) THEN
-          FILE='$AST_ROOT/data/grafix/'//TABS(TAB)
+          FILE='AST_ROOT/data/grafix/'//TABS(TAB)
         ELSE
           CALL USI_GET0C('FILE',FILE,STATUS)
         ENDIF
