@@ -365,7 +365,7 @@
 *  looks like a spectral axis.
          IF( FS .EQ. AST__NULL ) THEN
             NAX = AST_GETI( IWCS, 'NAXES', STATUS )
-            DEFFRM = AST__NULL;
+            DEFFRM = AST__NULL
 
             I = 0
             MORE = .TRUE.
@@ -490,7 +490,7 @@
 *  If the user specified a system and/or unit, use them.
             IF( USYS .NE. ' ' ) CALL AST_SETC( SFRM, 'SYSTEM', USYS,
      :                                         STATUS )
-            IF( UUNIT .NE. ' ' ) UNIT = UUNIT;
+            IF( UUNIT .NE. ' ' ) UNIT = UUNIT
 
 *  Attempt to set the axis unit. If an error occurs, annul it and clear
 *  the Unit attribute.
