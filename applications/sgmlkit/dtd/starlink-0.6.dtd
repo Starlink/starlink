@@ -781,7 +781,7 @@
 <!ENTITY % table.model '%update caption, tabular'>
 <!ELEMENT table - - (%table.model)>
 <!ATTLIST table
-	float (float|nofloat) #IMPLIED
+	float (float|nofloat) float
 	%export.id.optional;
 	>
 
@@ -826,7 +826,7 @@
 <!ATTLIST figure
 	float		-- may it be unanchored from its position? --
 		(float|nofloat)
-		nofloat
+		float
 	alt		-- descriptive alternative text --
 		CDATA
 		#IMPLIED
