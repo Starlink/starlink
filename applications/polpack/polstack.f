@@ -226,13 +226,18 @@
 
 *  Get the analysis angle at the start of the first bin. 
       CALL PAR_GET0R( 'ORIGIN', ORIGIN, STATUS )
+      IF( ILEVEL .GT. 0 ) THEN
+         CALL MSG_SETR( 'ORG', ORIGIN )
+         CALL MSG_OUT( ' ', '  Using origin of ^ORG degrees',
+     :                 STATUS )
+      END IF
 
 *  Get the bin size.
       CALL PAR_GET0R( 'BIN', BIN, STATUS )
       BIN = MAX( 1.0, MIN( RANGE, ABS( BIN ) ) )
       IF( ILEVEL .GT. 0 ) THEN
          CALL MSG_SETR( 'BIN', BIN )
-         CALL MSG_OUT( ' ', '  Using bin size ^BIN degrees',
+         CALL MSG_OUT( ' ', '  Using bin size of ^BIN degrees',
      :                 STATUS )
       END IF
 
