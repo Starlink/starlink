@@ -54,11 +54,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     14-DEC-1994 (DSB):
 *        Original version.
+*     1997 January 10 (MJC):
+*        Replaced NAG calls.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,37 +77,29 @@
       INCLUDE  'PRM_PAR'       ! VAL__ constants
 
 *  Arguments Given:
-      INTEGER
-     :  EL
-
-      <TYPE>
-     :  INARR( EL )
-
-      DOUBLE PRECISION
-     :  MEAN,
-     :  SIGMA,
-     :  DATMIN,
-     :  DATMAX
-
-      <TYPE>
-     :  OLDVAL
+      INTEGER EL
+      <TYPE> INARR( EL )
+      <TYPE> OLDVAL
+      DOUBLE PRECISION MEAN
+      DOUBLE PRECISION SIGMA
+      DOUBLE PRECISION DATMIN
+      DOUBLE PRECISION DATMAX
 
 *  Arguments Returned:
-      <TYPE>
-     :  OUTARR( EL )
-
-      INTEGER
-     :  NREP
+      <TYPE> OUTARR( EL )
+      INTEGER NREP
 
 *  Status:
-      INTEGER  STATUS
+      INTEGER STATUS             ! Global status
 
 *  External References:
-      DOUBLE PRECISION G05DDF
+      EXTERNAL PDA_RNNOR
+      REAL PDA_RNNOR             ! PDA random-number generator with
+                                 ! Normal distribution for one value
 
 *  Local Constants:
       INTEGER MAXTRY
-      PARAMETER ( MAXTRY = 50 )! Max. no. of samples to be tried
+      PARAMETER ( MAXTRY = 50 )  ! Maximum number of samples to be tried
 
 *  Local Variables:
       DOUBLE PRECISION DIFF      ! Normalised maximum difference between
@@ -117,6 +112,8 @@
       DOUBLE PRECISION LOLIM     ! Lower limit of output data range
       INTEGER NRETRY             ! Total number of re-tries
       INTEGER NTRY               ! No. of re-tries for current pixel
+      INTEGER SEED               ! Random-number seed
+      INTEGER TICKS              ! Clock ticks to randomize initial seed
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
@@ -160,7 +157,9 @@
 
 *  Initialise the random number generator seed to a non-repeatable
 *  value.
-      CALL G05CCF
+      CALL PSX_TIME( TICKS, STATUS )
+      SEED = ( TICKS / 4 ) * 4 + 1
+      CALL PDA_RNSED( SEED )
 
 *  To avoid testing two floating-point values for equality, they are
 *  tested to be different by less than a small fraction of the value to
@@ -175,7 +174,7 @@
       NRETRY = 0
 
 *  Loop through all the pixels.
-      DO  I = 1, EL
+      DO I = 1, EL
 
 *  The halving is done to prevent overflows.
          IF ( ABS( ( NUM_<T>TOD( INARR( I ) ) * 0.5 )
@@ -183,7 +182,7 @@
 
 *  A match has been found.  Get a random sample from a normal
 *  distribution to replace it.
-            DVAL = G05DDF( MEAN, SIGMA ) 
+            DVAL = DBLE( PDA_RNNOR( MEAN, SIGMA ) )
 
 *  Check that this sample is within the allowed data range.  If it is
 *  not, get a new one.  Quit after MAXTRY attempts have been made to
@@ -192,7 +191,7 @@
             DO WHILE ( ( DVAL .GE. HILIM .OR. DVAL .LE. LOLIM ) .AND.
      :                 NTRY .LT. MAXTRY )
                NTRY = NTRY + 1            
-               DVAL = G05DDF( MEAN, SIGMA ) 
+               DVAL = DBLE( PDA_RNNOR( MEAN, SIGMA ) )
             END DO
 
 *  Report an error an abort if too many attempts have been made to get
