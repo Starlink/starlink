@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="autoconf" buildsupport="yes">
-  <version>2.59</version>
+<component id="@PACKAGE@" buildsupport="yes">
+  <version>@PACKAGE_VERSION@</version>
   <path>thirdparty/fsf/autoconf</path>
   <description>Starlink autoconf</description>
   <!-- <abstract><p></p></abstract> -->
