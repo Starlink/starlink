@@ -20,14 +20,11 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'AST_PKG'
 *
 *    Global variables :
 *
       INCLUDE 'PSF_CMN'
-*
-*    External references :
-*
-      EXTERNAL                 PSF_BLK
 *
 *    Import :
 *
@@ -37,20 +34,24 @@
 *
       INTEGER          		SLOT                   	! Slot
 *
+*    External references :
+*
+      EXTERNAL                 PSF_BLK
+      EXTERNAL                  AST_QPKGI
+        LOGICAL                 AST_QPKGI
+*
 *    Local variables :
 *
       INTEGER          I                      ! Loop over slots
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Psf system initialised yet?
-      IF ( .NOT. PSFINIT ) THEN
-        CALL PSF_INIT( STATUS )
-      END IF
+*  Check initialised
+      IF ( .NOT. AST_QPKGI( PSF__PKG ) ) CALL PSF_INIT( STATUS )
 
-*    Scan for an empty slot
+*  Scan for an empty slot
       SLOT = 0
       I = 1
       DO WHILE ( (I.LE.PSF_NMAX) .AND. (SLOT.EQ.0) )
@@ -63,14 +64,14 @@
         END IF
       END DO
 
-*    Make sure there are enough slots left
+*  Make sure there are enough slots left
       IF ( SLOT .EQ. 0 ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'No more psf slots left', STATUS )
 
       ELSE IF ( .NOT. P_USED(SLOT) ) THEN
 
-*      Zero the storage area
+*    Zero the storage area
         P_MODEL(SLOT) = .FALSE.
         P_INST(SLOT) = 0
         P_GOTAX(SLOT) = .FALSE.
@@ -83,12 +84,12 @@
 *    Store file id
         CALL ADI_CPUT0I( P_PSID(SLOT), 'FileID', FID, STATUS )
 
-*      Mark slot in use
+*    Mark slot in use
         P_USED(SLOT) = .TRUE.
 
       END IF
 
-*    Tidy up
+*  Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_GETSLOT', STATUS )
       END IF

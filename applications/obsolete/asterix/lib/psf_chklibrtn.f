@@ -30,6 +30,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'AST_PKG'
 *
 *    Global variables :
 *
@@ -46,10 +47,12 @@
 *    Status :
 *
       INTEGER STATUS
-*
-*    Functions :
-*
-      LOGICAL                	STR_ABBREV
+
+*  External References:
+      EXTERNAL                  AST_QPKGI
+        LOGICAL                 AST_QPKGI
+      EXTERNAL			STR_ABBREV
+        LOGICAL			STR_ABBREV
 *
 *    Local variables :
 *
@@ -63,8 +66,8 @@
 *  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialised?
-      IF ( .NOT. PSFINIT ) CALL PSF_INIT( STATUS )
+*  Check initialised
+      IF ( .NOT. AST_QPKGI( PSF__PKG ) ) CALL PSF_INIT( STATUS )
 
 *  Find number of psfs
       CALL ADI_NCMP( P_PLIST, NPSF, STATUS )
