@@ -63,17 +63,14 @@
 *     string "fred" is given, the HDS file fred.sdf will be searched for
 *     NDFs and the returned group will contain references for all NDFs
 *     found within fred.sdf.
-*     -  If the environment variable NDF_FORMATS_IN is defined (see
-*     SSN/20) then all possible NDFs matching the supplied string are
-*     included in the returned group. For instance, if the string "fred"
-*     is supplied, then the returned group will contain references to all
-*     files with basename fred which also have a file type specified in
-*     NDF_FORMATS_IN. If a FITS file "fred.fit" exists, and HDS file
-*     "fred.sdf" also exists (and contains an NDF), then supplying the
-*     name "fred" will result in both being included in the returned
-*     group. If the file "fred.sdf" contains a component called ".fit",
-*     then this will be included in the returned group in place of 
-*     "fred.sdf".
+*     - If the environment variable NDF_FORMATS_IN is defined (see
+*     SSN/20) then only the highest priority file with any give file name
+*     is included in the returned group. The priority of a file is
+*     determined by its file type. Native NDFs (.sdf) have highest
+*     priority. After that, priority decreases along the list of file
+*     types specified in NDF_FORMATS_OUT. If no file type is given by
+*     the user, the highest priority available file type is used. If an
+*     explicit file type is given, then that file type is used.
 *     -  NDFs contained within HDS files are opened in order to ensure
 *     that they are valid NDFs. The user is notified if there are no 
 *     valid NDFs matching a supplied name, and they are asked to supply 

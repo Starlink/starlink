@@ -548,7 +548,7 @@ ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_match.f ndg1_ndfch.f \
 ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
 ndg_ptsup.f ndg_setsz.f ndg_asso1.f ndg_assoc.f ndg_crea1.f ndg_creat.f \
-ndg_crep1.f ndg_prop1.f
+ndg_crep1.f ndg_prop1.f ndg1_sort.f
 
 F_CTG = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
@@ -3587,6 +3587,7 @@ ndg1_pshdb.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_pshde.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_pshdf.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_sdfex.o:	 SAE_PAR GRP_PAR DAT_PAR
+ndg1_sort.o:	 SAE_PAR GRP_PAR PRM_PAR NDG_CONST
 ndg1_subst.o:	 SAE_PAR
 ndg_asso1.o:	 SAE_PAR GRP_PAR NDF_PAR
 ndg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
