@@ -129,6 +129,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.16  1999/03/24 00:28:03  timj
+*     Increase the common-block for fitting to 500
+*
 *     Revision 1.15  1998/12/03 19:39:04  timj
 *     Check that the number of degrees of freedom is positive.
 *
@@ -181,7 +184,7 @@
 
 *  Global Constants (for COMMON):
       INTEGER MAX_FIT_DATA           ! max number of measurements
-      PARAMETER (MAX_FIT_DATA = 100)
+      PARAMETER (MAX_FIT_DATA = 500)
 
 
 *  Arguments Given:

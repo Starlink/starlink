@@ -66,6 +66,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/03/24 00:28:17  timj
+*     Increase the common-block for fitting to 500
+*
 *     Revision 1.2  1998/12/03 19:38:35  timj
 *     Check for status on entry.
 *     Update header.
@@ -86,7 +89,7 @@
 
 *  Local constants:
       INTEGER MAX_FIT_DATA               ! max number of measurements
-      PARAMETER (MAX_FIT_DATA = 100)        
+      PARAMETER (MAX_FIT_DATA = 500)        
 
 *  Import:
       INTEGER N

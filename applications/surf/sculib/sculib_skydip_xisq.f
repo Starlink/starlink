@@ -52,7 +52,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INTEGER MAX_FIT_DATA               ! max number of measurements
-      PARAMETER (MAX_FIT_DATA = 100)        
+      PARAMETER (MAX_FIT_DATA = 500)        
 *    Import :
       INTEGER N
       DOUBLE PRECISION FIT (N)
