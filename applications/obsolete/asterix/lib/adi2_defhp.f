@@ -68,11 +68,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     1 Mar 1995 (DJA):
 *        Original version.
+*     1 Jan 1997 (RB):
+*        Do it MYYYYYYYYYYYYY way.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -103,8 +106,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate HDU (old call - rb)
-c     CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
+*  Locate HDU
       CALL ADI2_FNDHDU( FID, HDU, .TRUE., HID, STATUS )
 
 *  Get logical unit
@@ -112,14 +114,11 @@ c     CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
 
 *  Set the heap size (my way! - rb)
       FSTAT = 0
-c     CALL FTMKYJ( LUN, 'PCOUNT', NBYTES, '&', FSTAT )
       CALL ADI2_PKEY0I( FID, HDU, 'PCOUNT', NBYTES,
      :                  'size of special data area', STATUS )
-c     CALL FTRDEF( LUN, FSTAT )
       IF ( FSTAT .NE. 0 ) CALL ADI2_FITERP( FSTAT, STATUS )
 
 *  Flag HDU as defined and release it
-c     CALL ADI_CPUT0L( HID, 'DefEnd', .TRUE., STATUS )
       CALL ADI_ERASE( HID, STATUS )
 
 *  Report any errors
