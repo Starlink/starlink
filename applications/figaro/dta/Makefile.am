@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-noinst_LTLIBRARIES = libdta.la
+lib_LTLIBRARIES = libdta.la
 
 libdta_la_SOURCES = \
         $(PRIVATE_INCLUDES) \
