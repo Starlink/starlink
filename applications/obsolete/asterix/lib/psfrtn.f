@@ -2853,6 +2853,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *  Get expanded response dimensions
       CALL CMP_GET1I( SLOC, 'DIMS', 5, DIMS, NDIM, STATUS )
       CALL PSF0_SETID1I( PSID, 'Dims', NDIM, DIMS, STATUS )
+      CALL PSF0_SETID0I( PSID, 'Rnxy', 0, STATUS )
 
 *  Get radial limit so we can use BDI to access the axis structures
       CALL CMP_GET0I( SLOC, 'RLIMIT', RLIM, STATUS )
