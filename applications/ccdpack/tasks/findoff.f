@@ -305,6 +305,10 @@
 *        Removed all NAG calls.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator control (foreign data access upgrade).
+*     23-MAR-1998 (PDRAPER):
+*        Changed to open input formatted files as required (rather than
+*        all at once). This works around the FIO limit of 40 open files
+*        and achieves the CCDPACK limit of 100 instead.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -326,73 +330,73 @@
 
 *  Local Variables:
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer for reading in data
-      CHARACTER * ( FIO__SZFNM ) FNAME   ! Buffer to store filenames
-      DOUBLE PRECISION COMFAC    ! Completeness factor
-      DOUBLE PRECISION ERROR     ! Error in input positions
-      DOUBLE PRECISION MINSEP    ! Minimum input data separation
-      DOUBLE PRECISION NEDFAC    ! Minimum completeness factor required
+      CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer to store filenames
+      DOUBLE PRECISION COMFAC   ! Completeness factor
+      DOUBLE PRECISION ERROR    ! Error in input positions
+      DOUBLE PRECISION MINSEP   ! Minimum input data separation
+      DOUBLE PRECISION NEDFAC   ! Minimum completeness factor required
       DOUBLE PRECISION XOFF( CCD1__MXLIC ) ! Determined X translation
       DOUBLE PRECISION XOFFN( CCD1__MXLIS ) ! Final X translation
       DOUBLE PRECISION YOFF( CCD1__MXLIC ) ! Determined Y translation
       DOUBLE PRECISION YOFFN( CCD1__MXLIS ) ! Final Y translation
-      INTEGER COUNT              ! Dummy loop counter
-      INTEGER FDI( CCD1__MXLIS ) ! Input FIO descriptors
-      INTEGER FDO( CCD1__MXLIS ) ! Output FIO descriptors
-      INTEGER FIOGR              ! Input IRH group identifier
-      INTEGER I                  ! Loop variable
-      INTEGER IAT                ! Dummy 
-      INTEGER IDIN               ! NDF identifier
-      INTEGER IPBEEN             ! Pointer to workspace
-      INTEGER IPDAT              ! Pointer to input data
-      INTEGER IPGRA              ! Pointer to graph
+      INTEGER COUNT             ! Dummy loop counter
+      INTEGER FDIN              ! Input FIO descriptor
+      INTEGER FDOUT             ! Output FIO descriptor
+      INTEGER FIOGR             ! Input IRH group identifier
+      INTEGER I                 ! Loop variable
+      INTEGER IAT               ! Dummy 
+      INTEGER IDIN              ! NDF identifier
+      INTEGER IPBEEN            ! Pointer to workspace
+      INTEGER IPDAT             ! Pointer to input data
+      INTEGER IPGRA             ! Pointer to graph
       INTEGER IPID( CCD1__MXLIS ) ! Pointer to Output X positions
-      INTEGER IPIND              ! Pointer to input indices in file 1
-      INTEGER IPQUE              ! Pointer to workspace
-      INTEGER IPRAN1             ! Pointer to sort ranks (w/s)
-      INTEGER IPRAN2             ! Pointer to sort ranks (w/s)
-      INTEGER IPSPAN             ! Pointer to graph (spanning)
-      INTEGER IPSUB              ! Pointer to sub-graph (spanning)
-      INTEGER IPWRK1             ! Workspace pointers
-      INTEGER IPWRK2             ! Workspace pointers
-      INTEGER IPWRK3             ! Workspace pointers
-      INTEGER IPWRK4             ! Workspace pointers
-      INTEGER IPWRK5             ! Workspace pointers
+      INTEGER IPIND             ! Pointer to input indices in file 1
+      INTEGER IPQUE             ! Pointer to workspace
+      INTEGER IPRAN1            ! Pointer to sort ranks (w/s)
+      INTEGER IPRAN2            ! Pointer to sort ranks (w/s)
+      INTEGER IPSPAN            ! Pointer to graph (spanning)
+      INTEGER IPSUB             ! Pointer to sub-graph (spanning)
+      INTEGER IPWRK1            ! Workspace pointers
+      INTEGER IPWRK2            ! Workspace pointers
+      INTEGER IPWRK3            ! Workspace pointers
+      INTEGER IPWRK4            ! Workspace pointers
+      INTEGER IPWRK5            ! Workspace pointers
       INTEGER IPX( CCD1__MXLIS ) ! Pointer to out/input X positions
-      INTEGER IPXN               ! Pointer to input X positions
+      INTEGER IPXN              ! Pointer to input X positions
       INTEGER IPXO1( CCD1__MXLIC ) ! Pointer to output X positions
       INTEGER IPXO2( CCD1__MXLIC ) ! Pointer to output X positions
       INTEGER IPY( CCD1__MXLIS ) ! Pointer to out/input Y positions
-      INTEGER IPYN               ! Pointer to input Y positions
+      INTEGER IPYN              ! Pointer to input Y positions
       INTEGER IPYO1( CCD1__MXLIC ) ! Pointer to output Y positions
       INTEGER IPYO2( CCD1__MXLIC ) ! Pointer to output Y positions
-      INTEGER J                  ! Loop variable
-      INTEGER LOOPS              ! Number of comparison loops
-      INTEGER MINMAT             ! Minimum number of positions for match
-      INTEGER NDFGR              ! Input NDF IRG group
-      INTEGER NEDGES             ! Number of edges in graph
-      INTEGER NEWED              ! Number of edges in spanning graph
+      INTEGER J                 ! Loop variable
+      INTEGER LOOPS             ! Number of comparison loops
+      INTEGER MINMAT            ! Minimum number of positions for match
+      INTEGER NDFGR             ! Input NDF IRG group
+      INTEGER NEDGES            ! Number of edges in graph
+      INTEGER NEWED             ! Number of edges in spanning graph
       INTEGER NMAT( CCD1__MXLIC ) ! Number of matched positions
-      INTEGER NMATCH             ! Number of matches
-      INTEGER NNODE              ! Number of nodes in spanning graph
-      INTEGER NOPEN              ! Number of input files opened
+      INTEGER NMATCH            ! Number of matches
+      INTEGER NNODE             ! Number of nodes in spanning graph
+      INTEGER NOPEN             ! Number of input files opened
       INTEGER NOUT( CCD1__MXLIS ) ! Number of output positions
-      INTEGER NPOSS              ! Number of possible point pairs
+      INTEGER NPOSS             ! Number of possible point pairs
       INTEGER NREC( CCD1__MXLIS ) ! Number of records
-      INTEGER NRECN              ! Current number of records 
-      INTEGER NRET               ! Dummy variable
-      INTEGER NVAL( CCD1__MXLIS )! Number of values per-record
+      INTEGER NRECN             ! Current number of records 
+      INTEGER NRET              ! Dummy variable
+      INTEGER NVAL( CCD1__MXLIS ) ! Number of values per-record
       INTEGER OFFS( CCD1__MXLIS + 1 ) ! Offsets into extended lists
-      INTEGER OUTGRP             ! Output IRH group identifier
-      INTEGER TOTNOD             ! Total number of nodes in graph
-      LOGICAL ALLOK              ! Trur no input positions removed in preselection phase
-      LOGICAL COMPL              ! True if graph is complete
-      LOGICAL CYCLIC             ! True if graph is cyclic
-      LOGICAL FAILED             ! True if FAST and FSAFe are true and error occurs during match
-      LOGICAL FAST               ! True if n**2 method used
-      LOGICAL FSAFE              ! True if n**4 method used if n**2 fails
-      LOGICAL NDFS               ! True if position list names are stored in NDF extensions
-      LOGICAL OK                 ! Match is ok
-      LOGICAL USECOM             ! Use completeness measure as a weight
+      INTEGER OUTGRP            ! Output IRH group identifier
+      INTEGER TOTNOD            ! Total number of nodes in graph
+      LOGICAL ALLOK             ! Trur no input positions removed in preselection phase
+      LOGICAL COMPL             ! True if graph is complete
+      LOGICAL CYCLIC            ! True if graph is cyclic
+      LOGICAL FAILED            ! True if FAST and FSAFe are true and error occurs during match
+      LOGICAL FAST              ! True if n**2 method used
+      LOGICAL FSAFE             ! True if n**4 method used if n**2 fails
+      LOGICAL NDFS              ! True if position list names are stored in NDF extensions
+      LOGICAL OK                ! Match is ok
+      LOGICAL USECOM            ! Use completeness measure as a weight
 *.
 
 *  Check inherited global status.
@@ -408,8 +412,8 @@
       CALL PAR_GET0L( 'NDFNAMES', NDFS, STATUS )
 
 *  Get the lists of of positions.
-      CALL CCD1_GTLIS( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS,
-     :                 NOPEN, FDI, FIOGR, NDFGR, STATUS )
+      CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS, 
+     :                 NOPEN, FIOGR, NDFGR, STATUS )
 
 *  Get the error in the position measurements.
       CALL PAR_GET0D( 'ERROR', ERROR, STATUS )
@@ -521,19 +525,21 @@
 *  Extract the data present in the input files.
       DO 2 I = 1, NOPEN 
 
-*  Test the input files for the number of entries.
-         CALL CCD1_LTEST( FDI( I ), LINE, CCD1__BLEN, 2, 0, NVAL( I ),
+*  Open the input files and test the number of entries.
+         CALL IRH_GET( FIOGR, I, 1, FNAME, STATUS )
+         CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
+         CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL( I ), 
      :                    STATUS )
          IF ( NVAL( I ) .EQ. 2 ) THEN 
 
 *  Map in X and Y positions only (non-standard file)
-            CALL CCD1_NLMAP( FDI( I ), LINE, CCD1__BLEN, IPDAT,
-     :                       NREC( I ), NVAL( I ), STATUS )
+            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC( I ), 
+     :                       NVAL( I ), STATUS )
          ELSE
 
 *  Standard file format map these in.
-            CALL CCD1_LMAP( FDI( I ), LINE, CCD1__BLEN, IPIND,
-     :                      IPDAT, NREC( I ), NVAL( I ), STATUS )
+            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT, 
+     :                      NREC( I ), NVAL( I ), STATUS )
             CALL CCD1_MFREE( IPIND, STATUS )            
          END IF
 
@@ -601,6 +607,9 @@
 *  Release memory no longer in use.
          CALL CCD1_MFREE( IPRAN1, STATUS )
          CALL CCD1_MFREE( IPDAT, STATUS )
+
+*  And close the file.
+         CALL FIO_CLOSE( FDIN, STATUS )
  2    CONTINUE
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
@@ -967,13 +976,13 @@
       DO I = 1, NOPEN
          IF ( NOUT( I ) .GT. 0 ) THEN 
             CALL IRH_GET( OUTGRP, I, 1, FNAME, STATUS )
-            CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDO( I ),
+            CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT,
      :                       STATUS )
-            CALL CCD1_FIOHD( FDO( I ), 'Output from FINDOFF', STATUS )
-            CALL CCD1_WRIXY( FDO( I ), %VAL( IPID( I ) ),
+            CALL CCD1_FIOHD( FDOUT, 'Output from FINDOFF', STATUS )
+            CALL CCD1_WRIXY( FDOUT, %VAL( IPID( I ) ),
      :                       %VAL( IPX( I ) ), %VAL( IPY( I ) ),
      :                       NOUT( I ), LINE, CCD1__BLEN, STATUS )
-            CALL FIO_CLOSE( FDO( I ), STATUS )
+            CALL FIO_CLOSE( FDOUT, STATUS )
 
 *  Output name.
             CALL MSG_SETC( 'FNAME', FNAME )

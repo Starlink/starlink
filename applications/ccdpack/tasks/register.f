@@ -405,6 +405,9 @@
 *        Removed dependency on NAG calls. This affects fittypes 3,4,5,6.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator control (foreign data access upgrade).
+*     23-MAR-1998 (PDRAPER):
+*        Changed to only open input lists when required. This works
+*        around the FIO limit of 40 open file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -433,8 +436,8 @@
 
 *  Local Variables:
       CHARACTER * ( 12 ) CLASES( TRN__MXCLS ) ! Classification string
-      CHARACTER * ( 16 ) INAME   ! Name for object in container file
-      CHARACTER * ( 4 ) PLACE    ! Place to store transformations
+      CHARACTER * ( 16 ) INAME  ! Name for object in container file
+      CHARACTER * ( 4 ) PLACE   ! Place to store transformations
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for reading data
       CHARACTER * ( CCD1__MTRNP ) ALPBET ! Characters which may follow P to indicate a parameter
       CHARACTER * ( CCD1__STRNP ) NAME ! Parameter name
@@ -455,71 +458,70 @@
       DOUBLE PRECISION FORVAL( CCD1__MTRNP ) ! Forward general coefficients
       DOUBLE PRECISION IDEN( 6 ) ! Identity transformation
       DOUBLE PRECISION INVVAL( CCD1__MTRNP ) ! Inverse general coefficients
-      DOUBLE PRECISION RMS       ! Root mean square difference in fitted lists and reference list
-      DOUBLE PRECISION TOLER     ! Tolerance in RMS devations
-      DOUBLE PRECISION TR( 6, CCD1__MXLIS )   ! The transformation coefficients
-      INTEGER FDS( CCD1__MXLIS ) ! FIO file descriptors
-      INTEGER FDREFO             ! Output reference set descriptor
-      INTEGER FIOGR              ! IRH group of input list names
-      INTEGER I                  ! Loop variable
-      INTEGER IAT                ! Position within string
-      INTEGER ID                 ! NDF identifier
-      INTEGER IFIT               ! The fittype
-      INTEGER IP                 ! Positional pointer into appended lists
+      DOUBLE PRECISION RMS      ! Root mean square difference in fitted lists and reference list
+      DOUBLE PRECISION TOLER    ! Tolerance in RMS devations
+      DOUBLE PRECISION TR( 6, CCD1__MXLIS ) ! The transformation coefficients
+      INTEGER FDIN              ! FIO file descriptors
+      INTEGER FDREFO            ! Output reference set descriptor
+      INTEGER FIOGR             ! IRH group of input list names
+      INTEGER I                 ! Loop variable
+      INTEGER IAT               ! Position within string
+      INTEGER ID                ! NDF identifier
+      INTEGER IFIT              ! The fittype
+      INTEGER IP                ! Positional pointer into appended lists
       INTEGER IPDAT( CCD1__MXLIS + 1 ) ! Pointer to file data
-      INTEGER IPID               ! Pointer to identifier workspace
-      INTEGER IPIDR              ! Pointer to identifier workspace
+      INTEGER IPID              ! Pointer to identifier workspace
+      INTEGER IPIDR             ! Pointer to identifier workspace
       INTEGER IPIND( CCD1__MXLIS + 1 ) ! Pointer to file identifiers
-      INTEGER IPOK               ! Pointer to logical workspace
-      INTEGER IPREF              ! Points to position of reference list
-      INTEGER IPWID              ! Pointer to identifier workspace
-      INTEGER IPWX               ! Pointer to X positions workspace
-      INTEGER IPWY               ! Pointer to Y positions workspace
-      INTEGER IPX                ! Pointer to X positions workspace
-      INTEGER IPXR               ! Pointer to X positions workspace
-      INTEGER IPY                ! Pointer to Y positions workspace
-      INTEGER IPYR               ! Pointer to Y positions workspace
-      INTEGER MAXIN              ! Maximum number of input lists
-      INTEGER MININ              ! Minimum number of input lists
-      INTEGER NCLASS             ! Number of classifications
-      INTEGER NDFGR              ! IRG group of input NDF names
-      INTEGER NNDF               ! Number of NDFs accessed
-      INTEGER NOPEN              ! Number of input lists opened
+      INTEGER IPOK              ! Pointer to logical workspace
+      INTEGER IPREF             ! Points to position of reference list
+      INTEGER IPWID             ! Pointer to identifier workspace
+      INTEGER IPWX              ! Pointer to X positions workspace
+      INTEGER IPWY              ! Pointer to Y positions workspace
+      INTEGER IPX               ! Pointer to X positions workspace
+      INTEGER IPXR              ! Pointer to X positions workspace
+      INTEGER IPY               ! Pointer to Y positions workspace
+      INTEGER IPYR              ! Pointer to Y positions workspace
+      INTEGER MAXIN             ! Maximum number of input lists
+      INTEGER MININ             ! Minimum number of input lists
+      INTEGER NCLASS            ! Number of classifications
+      INTEGER NDFGR             ! IRG group of input NDF names
+      INTEGER NNDF              ! Number of NDFs accessed
+      INTEGER NOPEN             ! Number of input lists opened
       INTEGER NOUT
       INTEGER NREC( CCD1__MXLIS + 1 ) ! Number of records read from file
-      INTEGER NSUBS              ! Number of token substitutions
-      INTEGER NSUBSF             ! Number of token substitutions
-      INTEGER NSUBSI             ! Number of token substitutions
-      INTEGER NTOT               ! Total number of input records
-      INTEGER NTRY               ! Number of attempts to obtain value
-      INTEGER NUMUNI             ! Number of unique parameter names
+      INTEGER NSUBS             ! Number of token substitutions
+      INTEGER NSUBSF            ! Number of token substitutions
+      INTEGER NSUBSI            ! Number of token substitutions
+      INTEGER NTOT              ! Total number of input records
+      INTEGER NTRY              ! Number of attempts to obtain value
+      INTEGER NUMUNI            ! Number of unique parameter names
       INTEGER NVAL( CCD1__MXLIS + 1 ) ! Number of values in file
-      INTEGER NVAL1              ! Number of values in tested file
-      INTEGER NXPAR              ! Number of parameters in X mapping
-      INTEGER NYPAR              ! Number of parameters in Y mapping
-      INTEGER XFORL              ! Length of X mapping string
-      INTEGER XINVL              ! Length of X mapping string
-      INTEGER YFORL              ! Length of Y mapping string
-      INTEGER YINVL              ! Length of Y mapping string
+      INTEGER NVAL1             ! Number of values in tested file
+      INTEGER NXPAR             ! Number of parameters in X mapping
+      INTEGER NYPAR             ! Number of parameters in Y mapping
+      INTEGER XFORL             ! Length of X mapping string
+      INTEGER XINVL             ! Length of X mapping string
+      INTEGER YFORL             ! Length of Y mapping string
+      INTEGER YINVL             ! Length of Y mapping string
       LOGICAL CLASS( TRN__MXCLS ) ! Classification values
-      LOGICAL DOCLAS             ! Perform a classification of general transformation
-      LOGICAL FULL               ! True if a full general transformation is used
-      LOGICAL HAVXXF             ! Flags indicating that mapping
-      LOGICAL HAVXXI             ! Flags indicating that mapping
-      LOGICAL HAVXYF             ! expression contain
-      LOGICAL HAVXYI             ! expression contain
-      LOGICAL HAVYXF             ! references to X and Y
-      LOGICAL HAVYXI             ! references to X and Y
-      LOGICAL HAVYYF             !
-      LOGICAL HAVYYI             !
-      LOGICAL NDFS               ! True if list names came from NDF extensions
-      LOGICAL THERE              ! Flag indicating presence of object
-      LOGICAL OUTREF             ! Output reference required
+      LOGICAL DOCLAS            ! Perform a classification of general transformation
+      LOGICAL FULL              ! True if a full general transformation is used
+      LOGICAL HAVXXF            ! Flags indicating that mapping
+      LOGICAL HAVXXI            ! Flags indicating that mapping
+      LOGICAL HAVXYF            ! expression contain
+      LOGICAL HAVXYI            ! expression contain
+      LOGICAL HAVYXF            ! references to X and Y
+      LOGICAL HAVYXI            ! references to X and Y
+      LOGICAL HAVYYF            !
+      LOGICAL HAVYYI            !
+      LOGICAL NDFS              ! True if list names came from NDF extensions
+      LOGICAL THERE             ! Flag indicating presence of object
+      LOGICAL OUTREF            ! Output reference required
 
 *  Local Data:
       DATA ALPBET/ 'ABCDEFGHIJKLNMOPQRSTUVWXYZ' /
       DATA IDEN/ 0.0D0, 1.0D0, 0.0D0, 0.0D0, 0.0D0, 1.0D0/
-
 *.
 
 *  Check inherited global status.
@@ -552,9 +554,9 @@
       NDFS = .TRUE.
       CALL PAR_GET0L( 'NDFNAMES', NDFS, STATUS )
 
-*  See if the user wants to supply a reference set of positions.
-      CALL CCD1_GTLIS( NDFS, 'CURRENT_LIST', 'INLIST', MININ, MAXIN,
-     :                 NOPEN, FDS, FIOGR, NDFGR, STATUS )
+*  Get the names of all the input lists.
+      CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', MININ, MAXIN,
+     :                 NOPEN, FIOGR, NDFGR, STATUS )
 
 *  Get the position of the reference set in the input lists.
       IPREF = 1
@@ -622,8 +624,8 @@
 
 *  Test the input files for the number of entries, prior to extracting
 *  the position information.
-         CALL CCD1_LTEST( FDS( I ), LINE, CCD1__BLEN, 2, 0, NVAL1,
-     :                    STATUS )
+         CALL CCD1_OPFIO( FNAME( I ), 'READ', 'LIST', 0, FDIN, STATUS )
+         CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL1, STATUS )
 
 *  If the position list has three or more columns of data then interpret
 *  them as a standard list (identifier, x-position, y-position). If the
@@ -632,7 +634,7 @@
          IF ( NVAL1 .EQ. 2 ) THEN
 
 *  Map in X and Y positions.
-            CALL CCD1_NLMAP( FDS( I ), LINE, CCD1__BLEN, IPDAT( I ),
+            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT( I ),
      :                       NREC( I ), NVAL( I ), STATUS )
             CALL CCD1_MALL( NREC( I ), '_INTEGER', IPIND( I ), STATUS )
             CALL CCD1_GISEQ( 1, 1, NREC( I ), %VAL( IPIND( I ) ),
@@ -640,9 +642,12 @@
          ELSE
 
 *  Standard file format...
-            CALL CCD1_LMAP( FDS( I ), LINE, CCD1__BLEN, IPIND( I ),
+            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND( I ),
      :                      IPDAT( I ), NREC( I ), NVAL( I ), STATUS )
          END IF
+
+*  Now close the file.
+         CALL FIO_CLOSE( FDIN, STATUS )
  1    CONTINUE
 
       IF ( IFIT .NE. 6 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -1013,7 +1018,7 @@
                INVVAL( I ) = FORVAL( I )
  13         CONTINUE
             IF ( IPREF .EQ. 2 ) THEN
-               CALL CCD1_FITG( INVMAP, 'XX', 'YY', UNIPAR, NUMUNI, 
+               CALL CCD1_FITG( INVMAP, 'XX', 'YY', UNIPAR, NUMUNI,
      :                         TOLER, IPIND( 2 ), IPX, IPY, NREC( 1 ),
      :                         IPIND( 1 ), IPXR, IPYR, NREC( 2 ),
      :                         INVVAL, STATUS )
@@ -1125,10 +1130,7 @@
 *  Exit with error label. Tidy up after this.
  99   CONTINUE
 
-*  Close opened files.
-      DO 9 I = 1, NOPEN
-         CALL FIO_CLOSE( FDS( I ), STATUS )
- 9    CONTINUE
+*  Close reference positions, if open.
       IF ( OUTREF ) CALL FIO_CLOSE( FDREFO, STATUS )
 
 *  Release all remaining workspace.
