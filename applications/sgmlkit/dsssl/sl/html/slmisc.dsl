@@ -189,7 +189,12 @@ to need explanation or elaboration.
 (element dt
   (make element gi: "dt"
     (make element gi: "strong"
-	  (process-children-trim))))
+	  (if (attribute-string (normalize "id"))
+	      (make element gi: "a"
+		    attributes: `(("name" ,(href-to (current-node)
+						    frag-only: #t)))
+		    (process-children-trim))
+	      (process-children-trim)))))
 
 (element dd
   (make element
@@ -210,8 +215,23 @@ to need explanation or elaboration.
     (process-children-trim)))
 
 (element li
-  (make element
-    (process-children-trim)))
+  (make element gi: "li"
+	(let ((myid (attribute-string (normalize "id"))))
+	  (if myid
+	    (let ((kids (children (current-node))))
+	      (make sequence
+		(make element gi: "a"
+		      attributes: `(("name" , (href-to (current-node)
+						       frag-only: #t)))
+		      (process-node-list (node-list-first kids)))
+		(process-node-list (node-list-rest kids))))
+	    (process-children-trim)))))
+
+(mode section-reference
+  (element dt
+    (process-children))
+  (element li
+    (literal "here")))
 
 
 (element (li p)
