@@ -33,11 +33,15 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-MAY-1993 (PDRAPER):
 *        Original version.
+*     8-NOV-2001 (MBT):
+*        Added additional check that ID is not out of range (else 
+*        uninitialized data can cause segmentation fault).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,7 +98,7 @@
                CCD1_TMPLO( I ) = DAT__NOLOC
             ENDIF
  2       CONTINUE
-      ELSE
+      ELSE IF ( ID .LE. CCD1__MXPNT ) THEN
 
 *  Unmap data.
          IF ( CCD1_TMPPO( ID ) .NE. -1 ) THEN 
