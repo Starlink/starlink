@@ -1,0 +1,239 @@
+*+
+*  Name:
+*     AST_PAR
+
+*  Purpose:
+*     Define the Fortran 77 interface to the AST library.
+
+*  Language:
+*     Fortran 77
+
+*  Type of Module:
+*     Include file.
+
+*  Description:
+*     This file contains definitions which are required by Fortran 77
+*     programs which use the AST library.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+
+*  History:
+*     12-NOV-1996 (RFWS):
+*        Original version.
+*     18-MAR-1998 (RFWS):
+*        Added definitions for the IntraMap class.
+*     19-MAY-1999 (DSB):
+*        Added definitions for the PcdMap class.
+*-
+
+*  Length of character string returned by a character function.
+      INTEGER AST__SZCHR
+      PARAMETER ( AST__SZCHR = 200 )
+
+*  Bad coordinate value.
+      DOUBLE PRECISION AST__BAD
+      PARAMETER ( AST__BAD = -1.79769313486231571D+308 )
+
+*  Error module.
+      LOGICAL AST_OK
+      INTEGER AST_STATUS
+
+*  Object class.
+      EXTERNAL AST_NULL
+      INTEGER AST__NULL
+      PARAMETER ( AST__NULL = 0 )
+
+      CHARACTER * ( AST__SZCHR ) AST_GETC
+      DOUBLE PRECISION AST_GETD
+      INTEGER AST_CLONE
+      INTEGER AST_COPY
+      INTEGER AST_GETI
+      LOGICAL AST_GETL
+      LOGICAL AST_ISAOBJECT
+      LOGICAL AST_TEST
+      REAL AST_GETR
+
+*  Channel class.
+      INTEGER AST_CHANNEL
+      INTEGER AST_READ
+      INTEGER AST_WRITE
+      LOGICAL AST_ISACHANNEL
+
+*  FitsChan class.
+      INTEGER AST_FITSCHAN
+      LOGICAL AST_FINDFITS
+      LOGICAL AST_ISAFITSCHAN
+
+*  Mapping Class.
+      INTEGER AST_RESAMPLEB
+      INTEGER AST_RESAMPLED
+      INTEGER AST_RESAMPLEI
+      INTEGER AST_RESAMPLER
+      INTEGER AST_RESAMPLES
+      INTEGER AST_RESAMPLEUB
+      INTEGER AST_RESAMPLEUS
+      INTEGER AST_RESAMPLEUW
+      INTEGER AST_RESAMPLEW
+      INTEGER AST_SIMPLIFY
+      LOGICAL AST_ISAMAPPING
+
+      INTEGER AST__USEVAR
+      PARAMETER ( AST__USEVAR = 1 )
+      INTEGER AST__USEBAD
+      PARAMETER ( AST__USEBAD = 2 )
+
+      INTEGER AST__UINTERP
+      PARAMETER ( AST__UINTERP = 0 )
+      INTEGER AST__NEAREST
+      PARAMETER ( AST__NEAREST = 1 )
+      INTEGER AST__LINEAR
+      PARAMETER ( AST__LINEAR = 2 )
+
+*  CmpMap class.
+      INTEGER AST_CMPMAP
+      LOGICAL AST_ISACMPMAP
+
+*  Frame class.
+      CHARACTER * ( AST__SZCHR ) AST_FORMAT
+      DOUBLE PRECISION AST_DISTANCE
+      INTEGER AST_CONVERT
+      INTEGER AST_FINDFRAME
+      INTEGER AST_FRAME
+      INTEGER AST_PICKAXES
+      INTEGER AST_UNFORMAT
+      LOGICAL AST_ISAFRAME
+
+*  CmpFrame class.
+      INTEGER AST_CMPFRAME
+      LOGICAL AST_ISACMPFRAME
+
+*  FrameSet class.
+      INTEGER AST__BASE
+      PARAMETER ( AST__BASE = 0 )
+      INTEGER AST__CURRENT
+      PARAMETER ( AST__CURRENT = -1 )
+      INTEGER AST__NOFRAME
+      PARAMETER ( AST__NOFRAME = -99 )
+
+      INTEGER AST_FRAMESET
+      INTEGER AST_GETFRAME
+      INTEGER AST_GETMAPPING
+      LOGICAL AST_ISAFRAMESET
+
+*  IntraMap class.
+      INTEGER AST__NOFWD
+      PARAMETER ( AST__NOFWD = 1 )
+      INTEGER AST__NOINV
+      PARAMETER ( AST__NOINV = 2 )
+      INTEGER AST__SIMPFI
+      PARAMETER ( AST__SIMPFI = 4 )
+      INTEGER AST__SIMPIF
+      PARAMETER ( AST__SIMPIF = 8 )
+      INTEGER AST__ANY
+      PARAMETER ( AST__ANY = -66 )
+
+      INTEGER AST_INTRAMAP
+      LOGICAL AST_ISAINTRAMAP
+
+*  LutMap class.
+      INTEGER AST_LUTMAP
+      LOGICAL AST_ISALUTMAP
+
+*  Plot class.
+      INTEGER AST_PLOT
+      LOGICAL AST_BORDER
+      LOGICAL AST_ISAPLOT
+
+*  SkyFrame class.
+      INTEGER AST_SKYFRAME
+      LOGICAL AST_ISASKYFRAME
+
+*  MatrixMap class.
+      INTEGER AST_MATRIXMAP
+      LOGICAL AST_ISAMATRIXMAP
+
+*  PcdMap class.
+      INTEGER AST_PCDMAP
+      LOGICAL AST_ISAPCDMAP
+
+*  PermMap class.
+      INTEGER AST_PERMMAP
+      LOGICAL AST_ISAPERMMAP
+
+*  SlaMap class.
+      INTEGER AST_SLAMAP
+      LOGICAL AST_ISASLAMAP
+
+*  SphMap class.
+      INTEGER AST_SPHMAP
+      LOGICAL AST_ISASPHMAP
+
+*  UnitMap class.
+      INTEGER AST_UNITMAP
+      LOGICAL AST_ISAUNITMAP
+
+*  WcsMap class.
+      INTEGER AST__AZP
+      PARAMETER ( AST__AZP = 1 )
+      INTEGER AST__TAN
+      PARAMETER ( AST__TAN = 2 )
+      INTEGER AST__SIN
+      PARAMETER ( AST__SIN = 3 )
+      INTEGER AST__STG
+      PARAMETER ( AST__STG = 4 )
+      INTEGER AST__ARC
+      PARAMETER ( AST__ARC = 5 )
+      INTEGER AST__ZPN
+      PARAMETER ( AST__ZPN = 6 )
+      INTEGER AST__ZEA
+      PARAMETER ( AST__ZEA = 7 )
+      INTEGER AST__AIR
+      PARAMETER ( AST__AIR = 8 )
+      INTEGER AST__CYP
+      PARAMETER ( AST__CYP = 9 )
+      INTEGER AST__CAR
+      PARAMETER ( AST__CAR = 10 )
+      INTEGER AST__MER
+      PARAMETER ( AST__MER = 11 )
+      INTEGER AST__CEA
+      PARAMETER ( AST__CEA = 12 )
+      INTEGER AST__COP
+      PARAMETER ( AST__COP = 13 )
+      INTEGER AST__COD
+      PARAMETER ( AST__COD = 14 )
+      INTEGER AST__COE
+      PARAMETER ( AST__COE = 15 )
+      INTEGER AST__COO
+      PARAMETER ( AST__COO = 16 )
+      INTEGER AST__BON
+      PARAMETER ( AST__BON = 17 )
+      INTEGER AST__PCO
+      PARAMETER ( AST__PCO = 18 )
+      INTEGER AST__GLS
+      PARAMETER ( AST__GLS = 19 )
+      INTEGER AST__PAR
+      PARAMETER ( AST__PAR = 20 )
+      INTEGER AST__AIT
+      PARAMETER ( AST__AIT = 21 )
+      INTEGER AST__MOL
+      PARAMETER ( AST__MOL = 22 )
+      INTEGER AST__CSC
+      PARAMETER ( AST__CSC = 23 )
+      INTEGER AST__QSC
+      PARAMETER ( AST__QSC = 24 )
+      INTEGER AST__NCP
+      PARAMETER ( AST__NCP = 25 )
+      INTEGER AST__TSC
+      PARAMETER ( AST__TSC = 26 )
+
+      INTEGER AST_WCSMAP
+      LOGICAL AST_ISAWCSMAP
+
+*  WinMap class.
+      INTEGER AST_WINMAP
+      LOGICAL AST_ISAWINMAP
+
+*  ZoomMap class.
+      INTEGER AST_ZOOMMAP
+      LOGICAL AST_ISAZOOMMAP
