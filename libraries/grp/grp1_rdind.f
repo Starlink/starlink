@@ -68,6 +68,9 @@
 *        Original version.
 *     27-AUG-1999 (DSB):
 *        Added control character escape facility.
+*     27-OCT-2000 (DSB):
+*        Modify loop exit condition so that the last line of the file is
+*        read even if it is terminated with an EOF rather than a newline.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,6 +127,7 @@
       LOGICAL KCLOK              ! Is closing kernel delimiter defined?
       LOGICAL KOPOK              ! Is opening kernel delimiter defined?
       CHARACTER LGEXP*(GRP__SZNAM)! Last times group expression 
+      CHARACTER LINE*(GRP__SZNAM)! A line of text read from the file
       INTEGER TLEN               ! Used length of the group expression
 *.
 
@@ -173,13 +177,14 @@
       END IF
 
 *  Read the first record from the file.
-      CALL GRP1_READF( UNIT, GEXP( GF : ), EOF, STATUS )
+      CALL GRP1_READF( UNIT, LINE, EOF, STATUS )
 
 *  Indicate that no flag character has yet been found.
       FLAG = .FALSE.
 
-*  Loop round until the end of file is reached, or an error occurs.
-      DO WHILE( .NOT. EOF .AND. STATUS .EQ. SAI__OK )
+*  Loop round while text can be read from the file, and no error occurs.
+      DO WHILE( LINE .NE. " " .OR.  .NOT. EOF .AND. STATUS .EQ. SAI__OK )
+         GEXP( GF : ) = LINE
 
 *  If a comment character is defined...
          IF( COMOK ) THEN
@@ -242,7 +247,7 @@
          END IF
 
 *  Read the next record from the file.
-         CALL GRP1_READF( UNIT, GEXP( GF : ), EOF, STATUS )
+         CALL GRP1_READF( UNIT, LINE, EOF, STATUS )
 
       END DO
 
