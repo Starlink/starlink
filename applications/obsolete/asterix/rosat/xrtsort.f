@@ -3529,7 +3529,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       INTEGER TOTEV_BCK                           ! Number of bckgnd events
       INTEGER BADEV                               ! Number of events in hotspots
 *    Functions :
-      INTEGER XRT_HSPOT
+      LOGICAL XRT_HSPOT
          EXTERNAL XRT_HSPOT
 *    Local constants :
 *     <local constants defined by PARAMETER>
