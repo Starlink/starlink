@@ -78,6 +78,8 @@
 *  History:
 *     18-AUG-1998 (DSB):
 *        Original version, based on the V0.12 display.f by MJC.
+*     18-MAY-1999 (DSB):
+*        Use separate compression factors for the two axes.
 
 *-
 
@@ -222,10 +224,10 @@
 *  Calculate the compression factors. Compression is possible when the factor
 *  is two or greater.
       BLOCK = .FALSE.
-      BLAVF( 1 ) = MAX( SDIMS( 1 ) / NXP, SDIMS( 2 ) / NYP )
-      BLAVF( 2 ) = BLAVF( 1 )
+      BLAVF( 1 ) = MAX( 1, SDIMS( 1 ) / NXP )
+      BLAVF( 2 ) = MAX( 1, SDIMS( 2 ) / NYP )
 
-      IF ( BLAVF( 1 ) .GE. 2 ) THEN
+      IF ( BLAVF( 1 ) .GE. 2 .OR. BLAVF( 2 ) .GE. 2 ) THEN
 
 *  The compression routine can only cope with floating-point data, so the 
 *  image section may be converted during mapping. Find the implementation 
