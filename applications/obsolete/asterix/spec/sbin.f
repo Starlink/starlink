@@ -126,6 +126,8 @@
       REAL 			SUM			! Data sum
       REAL 			MINVAL			! Min bin value
 
+      INTEGER			IDUM			! Dummy to BDI_GET
+      INTEGER			IFID			! Input dataset id
       INTEGER 			NDIM,DIMS(ADI__MXDIM)	! I/p dimensions
       INTEGER 			INVAL,ONVAL		! I/p & o/p sizes
       INTEGER 			IDPTR,IAPTR,IWPTR,	! I/p data, axis, widths
@@ -133,7 +135,6 @@
       INTEGER 			TDPTR,TAPTR,TWPTR,TVPTR ! Temp data,axis,widths
 							! and variance
       INTEGER 			OPT			! Rebinning option
-      INTEGER			IFID			! Input dataset id
       INTEGER			OFID			! Output dataset id
       INTEGER			SPID			! Interface object
 
