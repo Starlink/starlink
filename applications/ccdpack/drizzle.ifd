@@ -16,6 +16,8 @@
 #  History:
 #     20-APR-1999 (AALLAN):
 #     	 Original Version
+#     25-OCT-1999 (AALLAN):
+#        Added PRESERVE keyword
 #     {enter_further_changes_here}
 
 #-
@@ -155,6 +157,18 @@
             prompt {Pixel fraction (size of "drop")}
             helpkey *
           }  
+
+         parameter preserve {
+                             # Preserve input data type?
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_preser
+            default FALSE
+            prompt {Preserve input data type?}
+            helpkey *
+          }
 
          parameter ref {
                         # Reference NDF
