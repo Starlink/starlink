@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/convert</path>
+  <description>CONVERT -- format-conversion package</description>
+  <abstract><p>
+The CONVERT package contains utilities for converting data files between
+Starlink's Extensible n-dimensional Data Format (NDF), which is used by most
+Starlink applications, and a number of other common data formats.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+    <person>
+      <name>G.J.Privett</name>
+    </person>
+    <person>
+      <name>A.J.Chipperfield</name>
+    </person>
+    <person>
+      <name>D.S.Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>A.C.Davenhall</name>
+      <uname>acd</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
