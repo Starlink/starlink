@@ -1,0 +1,18 @@
+1 CFITSIO - C FITS I/O functions - update
+                                                   Expires: 2003.05.29
+
+ The CFITSIO function library v2.4.40b is now available.
+
+ CFITSIO provides a C interface for reading and writing FITS files and 
+ conforms to the Y2K FITS standards.  There is also a FORTRAN `wrapper'
+ interface for calling the library from Fortran.  
+ 
+ SUN/227 gives a brief introduction to CFITSIO - a hypertext version is
+ available (`showme sun227' or `findme cfitsio').   There are also two
+ User's Guides for C and Fortran Programmers which have been added to
+ the Starlink Miscellaneous User Documents series as MUD/166 and MUD/167.
+
+ Starlink is grateful to the maintainer of CFITSIO, Dr William Pence of 
+ HEASARC at the NASA Goddard Space Flight Center for permission to release 
+ CFITSIO with the Starlink software.
+
