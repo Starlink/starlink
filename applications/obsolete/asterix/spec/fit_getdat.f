@@ -168,6 +168,8 @@
 *        Added ability to read vignetting file.
 *     29 Nov 1995 (DJA):
 *        ADI port. Use new BDI routines, FSI for spectral set access.
+*      4 Mar 1996 (DJA):
+*        Added group loading capability
 *     {enter_changes_here}
 
 *  Bugs:
@@ -241,6 +243,7 @@
 
       LOGICAL 			BGCOR			! B/g data been exposure corrected?
       LOGICAL 			CHISTAT			! Chi-squared fitting?
+      LOGICAL			GROUPS			! Grouping available
       LOGICAL 			LIKSTAT			! Likelihood fitting?
       LOGICAL 			REF			! Input from ref file?
       LOGICAL 			SPECSET(NDSCMAX)	! I/p is spectral set?
@@ -640,7 +643,7 @@
 	    END IF
 	    IF (STATUS.NE.SAI__OK) GOTO 99
 
-*          Get quality
+*        Get quality
             CALL BDI_CHK( OBDAT(NDS).D_ID, 'Quality', QUAL, STATUS )
 	    IF (QUAL) THEN
 	      CALL BDI_MAPL( OBDAT(NDS).D_ID, 'LogicalQuality',
@@ -652,18 +655,57 @@
                 OBDAT(NDS).QPTR = TPTR
 	      END IF
 
-*         Set quality flag
+*          Set quality flag
 	      OBDAT(NDS).QFLAG = .TRUE.
 
 	    ELSE
 	      OBDAT(NDS).QFLAG=.FALSE.
 	      OBDAT(NDS).QPTR=0
 	    END IF
-
 	    IF (STATUS.NE.SAI__OK) THEN
 	      CALL ERR_ANNUL(STATUS)
 	      QUAL=.FALSE.
 	    END IF
+
+*        Check grouping?
+            CALL BDI_CHK( OBDAT(NDS).D_ID, 'Grouping', GROUPS, STATUS )
+            IF ( GROUPS ) THEN
+
+	      CALL BDI_MAPI( OBDAT(NDS).D_ID, 'Grouping',
+     :                       'READ', TPTR, STATUS )
+	      IF (SPECSET(N)) THEN
+                CALL ARR_SLCOPI( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
+     :                           %VAL(OBDAT(NDS).GPTR), STATUS )
+	      ELSE
+                OBDAT(NDS).GPTR = TPTR
+
+	      END IF
+	      CALL MSG_PRNT('    Loaded grouping array')
+
+*          Create workspace for grouped data
+              CALL DYN_MAPR( 1, OBDAT(NDS).NDAT, OBDAT(NDS).GDPTR,
+     :                       STATUS )
+              IF ( OBDAT(NDS).QFLAG ) THEN
+                CALL DYN_MAPB( 1, OBDAT(NDS).NDAT, OBDAT(NDS).GQPTR,
+     :                         STATUS )
+              END IF
+              IF ( OBDAT(NDS).VPTR .NE. 0 ) THEN
+                CALL DYN_MAPR( 1, OBDAT(NDS).NDAT, OBDAT(NDS).GVPTR,
+     :                         STATUS )
+              END IF
+
+*          Count number of groups
+              CALL FIT_GETDAT_GCNT( OBDAT(NDS).NDAT,
+     :                              %VAL(OBDAT(NDS).GPTR),
+     :                              OBDAT(NDS).NGDAT, STATUS )
+
+*          Set grouping flag
+	      OBDAT(NDS).GFLAG = .TRUE.
+
+            ELSE
+	      OBDAT(NDS).GFLAG = .FALSE.
+
+            END IF
 
 *        Accumulate counts for data in likelihood case
             IF ( LIKSTAT ) THEN
@@ -905,3 +947,29 @@
 	END IF
 
 	END
+
+
+
+*+  FIT_GETDAT_GCNT - Find number of groups defined in group array
+      SUBROUTINE FIT_GETDAT_GCNT( NDAT, G, MAXG, STATUS )
+*    Description :
+*     If WEIGHTS=false then routine only counts the number of good values.
+*    History :
+*      4 Mar 1996 (DJA):
+*        Original version
+*    Type Definitions :
+	IMPLICIT NONE
+*    Import :
+      INTEGER			NDAT, G(*)
+*    Export :
+      INTEGER			MAXG
+*    Local variables :
+	INTEGER I
+*-
+
+      MAXG = 0
+      DO I = 1, NDAT
+        IF ( G(I) .GT. MAXG ) MAXG = G(I)
+      END DO
+
+      END

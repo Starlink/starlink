@@ -16,9 +16,14 @@
 *
 *    History :
 *
-*     21 Jul 94 : Original (DJA)
-*     25 Jul 94 : Converted to use AIO system (DJA)
-*      1 Aug 95 : Added vignetting file report (DJA)
+*     21 Jul 1994 (DJA):
+*        Original version
+*     25 Jul 1994 (DJA):
+*        Converted to use AIO system
+*      1 Aug 1995 (DJA):
+*        Added vignetting file report
+*      4 Mar 1996 (DJA):
+*        Added report of grouping
 *
 *    Type definitions :
 *
@@ -28,7 +33,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -83,17 +87,23 @@
           CALL AIO_IWRITE( OCI, 14, 'vign : ^VFILE', STATUS )
         END IF
 
+*    Grouping defined?
+        IF ( OBDAT(I).GFLAG ) THEN
+          CALL MSG_SETI( 'NG', OBDAT(I).NGDAT )
+          CALL AIO_IWRITE( OCI, 14, 'Grouped into ^NG bins', STATUS )
+        END IF
+
         CALL AIO_BLNK( OCI, STATUS )
       END DO
 
-*    Write model prescription
+*  Write model prescription
       CALL MSG_SETC( 'MODEL', MODEL.SPEC )
       CALL AIO_WRITE( OCI, 'Using model  : ^MODEL', STATUS )
       CALL ADI_FTRACE( MODEL.M_ID, NLEV, PATH, FILE, STATUS )
       CALL MSG_SETC( 'MFILE', FILE )
       CALL AIO_WRITE( OCI, 'From dataset : ^MFILE', STATUS )
 
-*    Terminate with anouther blank
+*  Terminate with anouther blank
       CALL AIO_BLNK( OCI, STATUS )
 
       END
