@@ -362,7 +362,8 @@ C         CALL NDF_HCRE( IDO, STATUS )
          CALL CCDB1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), STATUS )
 
 *    Add bias to it.
-         CALL CCDB1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
+         CALL CCDB1_ABIA( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+     :                    WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
          CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -393,7 +394,8 @@ C            CALL NDF_HCRE( IDB, STATUS )
             CALL CCG1_STVR( 0.0, EL, %VAL( IPBIA ), STATUS )
 
 *    Add bias to it.
-         CALL CCDB1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
+            CALL CCDB1_ABIA( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+     :                       WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
             CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -434,7 +436,8 @@ C            CALL NDF_HCRE( IDF, STATUS )
             CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 1.0, STATUS )
 
 *    Add bias to it.
-            CALL CCDB1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
+            CALL CCDB1_ABIA( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+                             WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
             CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -475,4 +478,4 @@ C            CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdbgen.f,v 1.6 1998/06/17 11:14:54 mbt Exp mbt $
+* $Id: ccdbgen.f,v 1.7 1998/06/17 15:43:04 mbt Exp $
