@@ -21,9 +21,9 @@
 
 *  Description:
 *    This routine applies a flat field correction to a series of images.
-*    If the input data have been saturated using a saturation value  
-*    (instead of using BAD pixel flagging) then the saturation values 
-*    may be protected from modification.
+*    If any of the input data have been flagged as saturated using a
+*    saturation value (instead of being marked as BAD) then the
+*    saturation values may be protected from modification.
 
 *  Usage:
 *     flatcor in out flat
@@ -52,7 +52,7 @@
 *
 *        The default for this parameter is TRUE and this cannot be
 *        overridden except by assignment on the command line or in
-*        reponse to a forced prompt.
+*        response to a forced prompt.
 *        [TRUE]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -267,9 +267,9 @@
       LOGICAL HAVDV              ! Set if have variance component
       LOGICAL HAVFV              ! Set if have variance component (ff)
       LOGICAL HAVFV2             ! Set if data variance and an flatfield variance component
-      LOGICAL OK                 ! Extension item obtained sucessfully
+      LOGICAL OK                 ! Extension item obtained successfully
       LOGICAL PRESER             ! Set if the input type is to be preserved
-      LOGICAL REMAP              ! Controls remapping of flatfield
+      LOGICAL REMAP              ! Controls re-mapping of flatfield
       LOGICAL SETSAT             ! Set if have saturated values
       LOGICAL EXTSAT             ! Saturation value from NDF extension
 
@@ -306,7 +306,7 @@
 *  application
       CALL CCD1_CKTYP( IDFLT, 1, 'MASTER_FLAT', STATUS )
 
-*  Get the filter type of the calibration frame. It is ok for this not
+*  Get the filter type of the calibration frame. It is OK for this not
 *  to be present. If it is present then checks will be made to make sure
 *  that the data to be flatfielded also have this filter.
       CALL CCG1_FCH0C( IDFLT, 'FILTER', FILTER, FCHECK, STATUS )
@@ -341,7 +341,7 @@
 *  Check for presence of a variance component.
          CALL NDF_STATE( IDIN, 'Variance', HAVDV, STATUS )
 
-*  If this input NDf has no variance component then switch off the
+*  If this input NDF has no variance component then switch off the
 *  calibration frame variance if it exists.
          IF ( .NOT. HAVDV ) THEN
             HAVFV2 = .FALSE.
@@ -389,7 +389,7 @@
          CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
 
 *  If the size of the input NDF has changed from the last NDF, then we
-*  require a retrimming of the calibration frame. Trim anyway if this
+*  require a re-trimming of the calibration frame. Trim anyway if this
 *  is the first loop.
          IF ( INDEX .EQ. 1 ) THEN
             REMAP = .TRUE.
@@ -401,7 +401,7 @@
                REMAP = .TRUE.
             ELSE
 
-*  No change in bonds remapping may not be necessary.
+*  No change in bonds re-mapping may not be necessary.
                REMAP = .FALSE.
             END IF
          END IF
@@ -447,7 +447,7 @@
             END IF
          END IF
 
-*  Remapping decisions complete, unmap the old flatfield section
+*  Re-mapping decisions complete, unmap the old flatfield section
 *  and annul the identifier.
          IF ( REMAP ) THEN
 
@@ -481,7 +481,7 @@
          CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )
 
 *  Map in the flatfield data at the processing precision, if required.
-*  Note using new stratedgy of mapping permanent data first, helps stop
+*  Note using new strategy of mapping permanent data first, helps stop
 *  virtual address space fragmentation.
          IF ( REMAP ) THEN
             CALL NDF_MAP( IDFTMP, 'Data', FTYPE, 'READ', IPDFLT, EL,
@@ -555,7 +555,7 @@
          CALL NDF_UNMAP( IDOUT, '*', STATUS )
          CALL NDF_ANNUL( IDOUT, STATUS )
 
-*  Set remapping flag to default.
+*  Set re-mapping flag to default.
          REMAP =.TRUE.
 
 *  Store the present size of the NDFs.
