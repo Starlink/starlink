@@ -541,6 +541,7 @@ itcl::class util::FileSelect {
        set file_temp [glob -nocomplain $itk_option(-dir)/$itk_option(-filter)]
        set filefiller [lsort $file_temp]
        foreach i $filefiller {
+          set tail [file tail $i]
           if { [string match {$*} $tail] || [string match {./~$*} $tail] } {
              continue
           }
@@ -548,7 +549,7 @@ itcl::class util::FileSelect {
              if {$itk_option(-full)} {
                 $fs(files) insert end $i
              } else {
-                $fs(files) insert end [file tail $i]
+                $fs(files) insert end $tail
              }
           }
        }
