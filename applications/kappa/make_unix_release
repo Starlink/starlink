@@ -132,7 +132,7 @@ ascii
 put kapiraf
 bye
 FOO4
-      rm kapiraf
+      rm kapiraf 
 
 #  Ask the user to execute the script on axp0. Why wont rsh do this?
       echo " "
@@ -150,6 +150,7 @@ cd iraf
 get helpdb.mip
 bye
 FOO5
+      rm temp.cl
 
 #  Create each of the tar files. First do the system-independant ones
 #  listed in group TAR_FILES_A...
