@@ -74,11 +74,12 @@ using std::cerr;
 namespace PipeStreamSignalHandling {
     /* Handle SIGCHLDs by maintaining a set of pid/caught-status pairs. */
     struct process_status {
-	pid_t pid;
-	int status;
+	sig_atomic_t pid;
+	sig_atomic_t status;
     };
     struct process_status* procs = 0; // initial value triggers initialisation
-    int nprocs = 8;		// max no of children we can wait for
+    sig_atomic_t nprocs = 8;	// max no of children we can wait for
+    sig_atomic_t nprocs_used = 0;
     bool got_status(pid_t pid, int* status);
     bool init();
     extern "C" void childcatcher(int);
@@ -128,8 +129,8 @@ PipeStream::PipeStream (string cmd, string envs)
      * Implementation here follows useful example in
      * <http://www.erack.de/download/pipe-fork.c> 
      */
-    if (PipeStreamSignalHandling::procs == 0)
-	PipeStreamSignalHandling::init();
+    if (! PipeStreamSignalHandling::init())
+	throw new DviError("PipeStream: can't initialise signal handling, or too many running children");
 
     int fd[2];
 
@@ -256,46 +257,65 @@ void PipeStream::close(void)
     InputByteStream::close();
 
     if (pid_ > 0) {
-	bool keep_waiting = true;
+	// make sure that SIGALRM and SIGCHLD aren't blocked
+	sigset_t alrm_and_chld, oldmask;
+	sigemptyset(&alrm_and_chld);
+	sigaddset(&alrm_and_chld, SIGALRM);
+	sigaddset(&alrm_and_chld, SIGCHLD);
+	sigprocmask(SIG_UNBLOCK, &alrm_and_chld, &oldmask);
+	
 	int status = -1;
+	bool keep_waiting
+	    = !PipeStreamSignalHandling::got_status(pid_, &status);
+	bool process_gone = false;
 	for (int i=0; keep_waiting; i++) {
-	    keep_waiting = !PipeStreamSignalHandling::got_status(pid_, &status);
-	    
+
 	    int sigtosend;
-	    if (keep_waiting) {
+
+	    if (process_gone) {
+		// We weren't able to signal to the process, but we still
+		// can't get its status.  How has this happened?  Give up.
+		keep_waiting = false;
+	    } else {
 		switch (i) {
 		  case 0:
-		    sigtosend = 0;	// checking
+		    sigtosend = SIGINT;
 		    break;
 		  case 1:
-		    sigtosend = SIGHUP;
-		    break;
-		  case 2:
 		    sigtosend = SIGKILL;
 		    break;
 		  default:
-		    keep_waiting = false;
+		    keep_waiting = false; // give up
 		    break;
 		}
 	    }
+
 	    if (keep_waiting) {
+		// temporarily block SIGALRM and SIGCHLD, until we can set
+		// an alarm for ourself
+		sigprocmask(SIG_BLOCK, &alrm_and_chld, 0);
 		if (kill(pid_, sigtosend) == 0) {
-#ifdef HAVE_ALARM
+		    sigset_t zeromask;
+		    sigemptyset(&zeromask);
 		    alarm(1);
-#else
-#error "Don't have alarm() -- fix this"
-#endif
-		    pause();	// wait for alarm or signal
+		    sigsuspend(&zeromask); // unblock and pause
 		    if (getVerbosity() > normal)
 			cerr << "Sent " << sigtosend
 			     << " and waited for child" << endl;
 		} else {
-		    keep_waiting = false; // process wasn't there
+		    // process wasn't there
+		    process_gone = true;
 		}
+
+		keep_waiting
+		    = !PipeStreamSignalHandling::got_status(pid_, &status);
 	    }
 	}
 	pipe_status_ = status;
 	pid_ = 0;
+
+	// restore original signals mask
+	sigprocmask(SIG_SETMASK, &oldmask, 0);
     }
 }
 
@@ -401,10 +421,33 @@ bool PipeStreamSignalHandling::init()
 	    procs[i].pid = 0;
 	    procs[i].status = -1; // sentinel value
 	}
-	signal(SIGCHLD, &PipeStreamSignalHandling::childcatcher);
-	signal(SIGALRM, &PipeStreamSignalHandling::childcatcher); // for pause()
+
+	struct sigaction sa_chld;
+	sa_chld.sa_handler = &PipeStreamSignalHandling::childcatcher;
+	sigemptyset(&sa_chld.sa_mask);
+#ifdef SA_RESTART
+	sa_chld.sa_flags = SA_RESTART;
+#else
+	sa_chld.sa_flags = 0;
+#endif
+	if (sigaction(SIGCHLD, &sa_chld, 0) < 0)
+	    return false;
+
+	struct sigaction sa_alrm;
+	sa_alrm.sa_handler = &PipeStreamSignalHandling::childcatcher;
+	sigemptyset(&sa_alrm.sa_mask);
+#ifdef SA_INTERRUPT
+	sa_alrm.sa_flags = SA_INTERRUPT; // some SunOS
+#else
+	sa_alrm.sa_flags = 0;
+#endif
+	if (sigaction(SIGALRM, &sa_alrm, 0) < 0)
+	    return false;
     }
-    return true;
+    if (nprocs_used >= nprocs)
+	return false;
+    else
+	return true;
 }
 
 /**
@@ -423,8 +466,9 @@ bool PipeStreamSignalHandling::got_status(pid_t pid, int* status)
     for (int i=0; i<nprocs; i++) {
 	if (procs[i].pid == pid) {
 	    // found a slot with the required PID in it
-	    *status = procs[i].status;
+	    *status = static_cast<int>(procs[i].status);
 	    procs[i].pid = 0;	// clear the slot
+	    nprocs_used--;
 	    return true;
 	}
     }
@@ -441,8 +485,9 @@ void PipeStreamSignalHandling::childcatcher(int signum)
 	    pid_t caughtpid = waitpid(0, &status, 0);
 	    for (i=0; i<nprocs; i++) {
 		if (procs[i].pid == 0) { // free slot
-		    procs[i].pid = caughtpid;
-		    procs[i].status = status;
+		    procs[i].pid = static_cast<sig_atomic_t>(caughtpid);
+		    procs[i].status = static_cast<sig_atomic_t>(status);
+		    nprocs_used++;
 		}
 	    }
 	    // If i=nprocs, then there's no space to store this signal.
