@@ -32,6 +32,7 @@
 *      5 Oct 88 : V1.0-1 OVER parameter added to enable user not to overwrite.
 *                        ( dja )
 *     12 Dec 88 : V1.0-1 USIs now used for user interface. (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *   Type Definitions :
 *
@@ -80,7 +81,7 @@
 *    Version id :
 *
       CHARACTER*(22)		VERSION
-	 PARAMETER              (VERSION='SYSERR Version 1.2-0')
+	 PARAMETER              (VERSION='SYSERR Version 1.8-0')
 *-
 
 *    Check status
@@ -93,7 +94,7 @@
       CALL AST_INIT
 
 *    See whether we're going to overwrite
-      CALL PAR_GET0L( 'OVER', OVERWRITE, STATUS )
+      CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
 
 *    Obtain data object, access and check it
       IF ( OVERWRITE ) THEN
@@ -130,7 +131,7 @@
       END IF
 
 *    Obtain size of systematic error
-      CALL PAR_GET0R( 'ERR', PERCERR, STATUS )
+      CALL USI_GET0R( 'ERR', PERCERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       SERR = 0.01 * PERCERR
 
@@ -172,7 +173,7 @@
       CALL HIST_PTXT( OLOC, NREC, ACTION, STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END

@@ -30,6 +30,7 @@
 
 *  History:
 *     19-MAR-1992  - Original version.
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,8 +86,11 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Start ASTERIX
+      CALL AST_INIT()
+
 *  Enquire whether a new ARD file is to be created
-      CALL PAR_GET0L('NEW', LNEW, STATUS)
+      CALL USI_GET0L('NEW', LNEW, STATUS)
 
 *  Open the ARD file as required
       IF (LNEW) THEN
@@ -96,8 +100,8 @@
       ENDIF
 
       IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_OUT(' ','** Error opening spatial description '/
-     &               /'file **', STATUS)
+         CALL ERR_REP(' ','Error opening spatial description '/
+     &               /'file', STATUS)
          GOTO 999
       ENDIF
 
@@ -106,14 +110,14 @@
       DO WHILE (.NOT. JUMPOUT)
 
 *    Enquire whether this is an INCLUDE or EXCLUDE region
-         CALL PAR_GET0L('EXCLUDE', EXCLUDE, STATUS)
-         CALL PAR_CANCL('EXCLUDE', STATUS)
+         CALL USI_GET0L('EXCLUDE', EXCLUDE, STATUS)
+         CALL USI_CANCL('EXCLUDE', STATUS)
 
          IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Get shape.
-         CALL PAR_GET0C('SHAPE', SHAPE, STATUS)
-         CALL PAR_CANCL('SHAPE', STATUS)
+         CALL USI_GET0C('SHAPE', SHAPE, STATUS)
+         CALL USI_CANCL('SHAPE', STATUS)
 
          IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -127,16 +131,16 @@
             NLIST = 4
 
 *       Get coordinates of box centre
-            CALL PAR_GET0R('XCENT', LIST(1), STATUS)
-            CALL PAR_GET0R('YCENT', LIST(2), STATUS)
-            CALL PAR_CANCL('XCENT', STATUS)
-            CALL PAR_CANCL('YCENT', STATUS)
+            CALL USI_GET0R('XCENT', LIST(1), STATUS)
+            CALL USI_GET0R('YCENT', LIST(2), STATUS)
+            CALL USI_CANCL('XCENT', STATUS)
+            CALL USI_CANCL('YCENT', STATUS)
 
 *       Get width of box
-            CALL PAR_GET0R('XWIDTH', LIST(3), STATUS)
-            CALL PAR_GET0R('YWIDTH', LIST(4), STATUS)
-            CALL PAR_CANCL('XWIDTH', STATUS)
-            CALL PAR_CANCL('YWIDTH', STATUS)
+            CALL USI_GET0R('XWIDTH', LIST(3), STATUS)
+            CALL USI_GET0R('YWIDTH', LIST(4), STATUS)
+            CALL USI_CANCL('XWIDTH', STATUS)
+            CALL USI_CANCL('YWIDTH', STATUS)
 
             IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -150,14 +154,14 @@
             NLIST = 3
 
 *       Get coordinates of circle centre
-            CALL PAR_GET0R('XCENT', LIST(1), STATUS)
-            CALL PAR_GET0R('YCENT', LIST(2), STATUS)
-            CALL PAR_CANCL('XCENT', STATUS)
-            CALL PAR_CANCL('YCENT', STATUS)
+            CALL USI_GET0R('XCENT', LIST(1), STATUS)
+            CALL USI_GET0R('YCENT', LIST(2), STATUS)
+            CALL USI_CANCL('XCENT', STATUS)
+            CALL USI_CANCL('YCENT', STATUS)
 
 *       Get radius of circle
-            CALL PAR_GET0R('RADIUS', LIST(3), STATUS)
-            CALL PAR_CANCL('RADIUS', STATUS)
+            CALL USI_GET0R('RADIUS', LIST(3), STATUS)
+            CALL USI_CANCL('RADIUS', STATUS)
 
             IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -171,20 +175,20 @@
             NLIST = 5
 
 *       Get coordinates of ellipse centre
-            CALL PAR_GET0R('XCENT', LIST(1), STATUS)
-            CALL PAR_GET0R('YCENT', LIST(2), STATUS)
-            CALL PAR_CANCL('XCENT', STATUS)
-            CALL PAR_CANCL('YCENT', STATUS)
+            CALL USI_GET0R('XCENT', LIST(1), STATUS)
+            CALL USI_GET0R('YCENT', LIST(2), STATUS)
+            CALL USI_CANCL('XCENT', STATUS)
+            CALL USI_CANCL('YCENT', STATUS)
 
 *       Get semi-minor and semi-major axes
-            CALL PAR_GET0R('SMAJOR_AXIS', LIST(3), STATUS)
-            CALL PAR_GET0R('SMINOR_AXIS', LIST(4), STATUS)
-            CALL PAR_CANCL('SMAJOR_AXIS', STATUS)
-            CALL PAR_CANCL('SMINOR_AXIS', STATUS)
+            CALL USI_GET0R('SMAJOR_AXIS', LIST(3), STATUS)
+            CALL USI_GET0R('SMINOR_AXIS', LIST(4), STATUS)
+            CALL USI_CANCL('SMAJOR_AXIS', STATUS)
+            CALL USI_CANCL('SMINOR_AXIS', STATUS)
 
 *       Get orientation of ellipse
-            CALL PAR_GET0R('ORIENT', LIST(5), STATUS)
-            CALL PAR_CANCL('ORIENT', STATUS)
+            CALL USI_GET0R('ORIENT', LIST(5), STATUS)
+            CALL USI_CANCL('ORIENT', STATUS)
 
             IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -199,8 +203,8 @@
             LEAVE = .FALSE.
             DO WHILE (.NOT. LEAVE)
 
-               CALL PAR_GET0I('NPTS', NPTS, STATUS)
-               CALL PAR_CANCL('NPTS', STATUS)
+               CALL USI_GET0I('NPTS', NPTS, STATUS)
+               CALL USI_CANCL('NPTS', STATUS)
 
                IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -225,10 +229,10 @@
                YPARAM = 'Y' // CLP(1:NCHAR)
 
 *          ask user for each point on the polygon
-               CALL PAR_GET0R(XPARAM, LIST(1+(LP-1)*2), STATUS)
-               CALL PAR_GET0R(YPARAM, LIST(LP*2), STATUS)
-               CALL PAR_CANCL(XPARAM, STATUS)
-               CALL PAR_CANCL(YPARAM, STATUS)
+               CALL USI_GET0R(XPARAM, LIST(1+(LP-1)*2), STATUS)
+               CALL USI_GET0R(YPARAM, LIST(LP*2), STATUS)
+               CALL USI_CANCL(XPARAM, STATUS)
+               CALL USI_CANCL(YPARAM, STATUS)
 
                IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -248,8 +252,8 @@
             LEAVE = .FALSE.
             DO WHILE (.NOT. LEAVE)
 
-               CALL PAR_GET0I('NCOL', NLIST, STATUS)
-               CALL PAR_CANCL('NCOL', STATUS)
+               CALL USI_GET0I('NCOL', NLIST, STATUS)
+               CALL USI_CANCL('NCOL', STATUS)
 
                IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -273,8 +277,8 @@
                XPARAM = 'X' // CLP(1:NCHAR)
 
 *          ask user for each column point
-               CALL PAR_GET0R(XPARAM, LIST(LP), STATUS)
-               CALL PAR_CANCL(XPARAM, STATUS)
+               CALL USI_GET0R(XPARAM, LIST(LP), STATUS)
+               CALL USI_CANCL(XPARAM, STATUS)
 
                IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -291,8 +295,8 @@
             LEAVE = .FALSE.
             DO WHILE (.NOT. LEAVE)
 
-               CALL PAR_GET0I('NROW', NLIST, STATUS)
-               CALL PAR_CANCL('NROW', STATUS)
+               CALL USI_GET0I('NROW', NLIST, STATUS)
+               CALL USI_CANCL('NROW', STATUS)
 
                IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -317,8 +321,8 @@
                YPARAM = 'Y' // CLP(1:NCHAR)
 
 *          ask user for each row point
-               CALL PAR_GET0R(YPARAM, LIST(LP), STATUS)
-               CALL PAR_CANCL(YPARAM, STATUS)
+               CALL USI_GET0R(YPARAM, LIST(LP), STATUS)
+               CALL USI_CANCL(YPARAM, STATUS)
 
                IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -334,14 +338,14 @@
             NLIST = 4
 
 *       Get coordinates of one end of the line
-            CALL PAR_GET0R('XEND1', LIST(1), STATUS)
-            CALL PAR_GET0R('YEND1', LIST(2), STATUS)
-            CALL PAR_GET0R('XEND2', LIST(3), STATUS)
-            CALL PAR_GET0R('YEND2', LIST(4), STATUS)
-            CALL PAR_CANCL('XEND1', STATUS)
-            CALL PAR_CANCL('XEND2', STATUS)
-            CALL PAR_CANCL('YEND1', STATUS)
-            CALL PAR_CANCL('YEND2', STATUS)
+            CALL USI_GET0R('XEND1', LIST(1), STATUS)
+            CALL USI_GET0R('YEND1', LIST(2), STATUS)
+            CALL USI_GET0R('XEND2', LIST(3), STATUS)
+            CALL USI_GET0R('YEND2', LIST(4), STATUS)
+            CALL USI_CANCL('XEND1', STATUS)
+            CALL USI_CANCL('XEND2', STATUS)
+            CALL USI_CANCL('YEND1', STATUS)
+            CALL USI_CANCL('YEND2', STATUS)
 
 *       Write description into ARD file
             CALL AWR_GEN(AUNIT, EXCLUDE, 'LINE', MAXLST,
@@ -354,8 +358,8 @@
             LEAVE = .FALSE.
             DO WHILE (.NOT. LEAVE)
 
-               CALL PAR_GET0I('NPIX', NPTS, STATUS)
-               CALL PAR_CANCL('NPIX', STATUS)
+               CALL USI_GET0I('NPIX', NPTS, STATUS)
+               CALL USI_CANCL('NPIX', STATUS)
 
                IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -380,10 +384,10 @@
                YPARAM = 'Y' // CLP(1:NCHAR)
 
 *          ask user for each pixel position
-               CALL PAR_GET0R(XPARAM, LIST(1+(LP-1)*2), STATUS)
-               CALL PAR_GET0R(YPARAM, LIST(LP*2), STATUS)
-               CALL PAR_CANCL(XPARAM, STATUS)
-               CALL PAR_CANCL(YPARAM, STATUS)
+               CALL USI_GET0R(XPARAM, LIST(1+(LP-1)*2), STATUS)
+               CALL USI_GET0R(YPARAM, LIST(LP*2), STATUS)
+               CALL USI_CANCL(XPARAM, STATUS)
+               CALL USI_CANCL(YPARAM, STATUS)
 
                IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -399,16 +403,16 @@
          ELSEIF (INDEX(SHAPE, 'ANNULUS') .NE. 0) THEN
 
 *       Get coordinates of annulus centre
-            CALL PAR_GET0R('XCENT', XCENT, STATUS)
-            CALL PAR_GET0R('YCENT', YCENT, STATUS)
-            CALL PAR_CANCL('XCENT', STATUS)
-            CALL PAR_CANCL('YCENT', STATUS)
+            CALL USI_GET0R('XCENT', XCENT, STATUS)
+            CALL USI_GET0R('YCENT', YCENT, STATUS)
+            CALL USI_CANCL('XCENT', STATUS)
+            CALL USI_CANCL('YCENT', STATUS)
 
 *       Get inner radius of annulus
-            CALL PAR_GET0R('INNRAD', IRAD, STATUS)
-            CALL PAR_GET0R('OUTRAD', ORAD, STATUS)
-            CALL PAR_CANCL('INNRAD', STATUS)
-            CALL PAR_CANCL('OUTRAD', STATUS)
+            CALL USI_GET0R('INNRAD', IRAD, STATUS)
+            CALL USI_GET0R('OUTRAD', ORAD, STATUS)
+            CALL USI_CANCL('INNRAD', STATUS)
+            CALL USI_CANCL('OUTRAD', STATUS)
 
             IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -434,8 +438,8 @@ C            CALL AWR_NDF( )
          ENDIF
 
 *   Ask if another entry is to be added
-         CALL PAR_GET0L('MORE', MORE, STATUS)
-         CALL PAR_CANCL('MORE', STATUS)
+         CALL USI_GET0L('MORE', MORE, STATUS)
+         CALL USI_CANCL('MORE', STATUS)
 
          IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -447,11 +451,7 @@ C            CALL AWR_NDF( )
 *   Close the ARD file
       CALL FIO_CLOSE(AUNIT, STATUS)
 
-999   CONTINUE
-
-*  If an error occurred, then report a contextual message.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( ' ', 'from REGIONS', STATUS)
-      END IF
+999   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END

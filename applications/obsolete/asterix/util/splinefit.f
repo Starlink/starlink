@@ -28,6 +28,7 @@
 *    History :
 *
 *     11 Jun 91 : Original (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -37,7 +38,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -92,7 +92,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'SPLINEFIT Version 1.5-0')
+        PARAMETER  (VERSION = 'SPLINEFIT Version 1.8-0')
 *-
 
 *    Check status
@@ -192,12 +192,12 @@
       CALL MSG_PRNT( 'There are ^NP valid points in the dataset' )
 
 *    Spline control parameters
-      CALL PAR_GET0R( 'SQ_RES', SQ_RES, STATUS )
+      CALL USI_GET0R( 'SQ_RES', SQ_RES, STATUS )
 
 *    Use weights and quality?
       USE_WEIGHTS = .TRUE.
       IF ( VAR_OK .AND. ( NDIM .GT. 1 ) ) THEN
-        CALL PAR_GET0L( 'USEW', USE_WEIGHTS, STATUS )
+        CALL USI_GET0L( 'USEW', USE_WEIGHTS, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -285,9 +285,7 @@
       CALL BDA_CLOSE( OLOC, STATUS )
 
 *    Tidy up
- 99   CONTINUE
-
-      CALL AST_CLOSE( )
+ 99   CALL AST_CLOSE( )
       CALL AST_ERR( STATUS )
 
       END

@@ -38,6 +38,7 @@
 *                        to N-dimensions (DJA)
 *     28 Jul 94 : V1.7-1 Output using AIO routines - DEV parameter to
 *                        use standard system. (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *   Type Definitions :
 *
@@ -47,7 +48,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 
 *   Status :
       INTEGER			STATUS          ! Run-time status
@@ -89,7 +89,7 @@
 *    Version id:
 *
       CHARACTER*21		VERSION
-	PARAMETER	        ( VERSION='SLICE Version 1.7-1' )
+	PARAMETER	        ( VERSION='SLICE Version 1.8-0' )
 *-
 
 *    Check status
@@ -173,16 +173,16 @@
         CALL MSG_SETC( 'UNITS', UNITS )
         CALL MSG_PRNT( 'Range of good quality data is '//
      :                             '^MIN to ^MAX ^UNITS' )
-        CALL PAR_DEF0R( 'RANGE_MIN', DQMIN, STATUS )
-        CALL PAR_DEF0R( 'RANGE_MAX', DQMAX, STATUS )
+        CALL USI_DEF0R( 'RANGE_MIN', DQMIN, STATUS )
+        CALL USI_DEF0R( 'RANGE_MAX', DQMAX, STATUS )
       ELSE
-        CALL PAR_DEF0R( 'RANGE_MIN', DMIN, STATUS )
-        CALL PAR_DEF0R( 'RANGE_MAX', DMAX, STATUS )
+        CALL USI_DEF0R( 'RANGE_MIN', DMIN, STATUS )
+        CALL USI_DEF0R( 'RANGE_MAX', DMAX, STATUS )
       END IF
 
 *    Get range of data
-      CALL PAR_GET0R('RANGE_MIN',RMIN,STATUS)
-      CALL PAR_GET0R('RANGE_MAX',RMAX,STATUS)
+      CALL USI_GET0R('RANGE_MIN',RMIN,STATUS)
+      CALL USI_GET0R('RANGE_MAX',RMAX,STATUS)
 
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -306,7 +306,7 @@
       CALL AIO_CANCL( 'DEVICE', STATUS )
 
 *    Tidy up & exit
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END

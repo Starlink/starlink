@@ -55,6 +55,7 @@
 *      6 Jul 93 : V1.7-0  Use FIO for file i/o, direct console i/o removed
 *                         and header updated (DJA)
 *     13 Sep 93 : V1.7-1  Allow non-integer widths (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -64,7 +65,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
 *
 *    Status :
@@ -143,7 +143,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'SMOOTH Version 1.7-1')
+        PARAMETER  (VERSION = 'SMOOTH Version 1.8-0')
 *-
 
 *    Check status
@@ -156,7 +156,7 @@
       CALL AST_INIT
 
 *    Should input file be overwritten ?
-      CALL PAR_GET0L( 'OVER', OVER, STATUS )
+      CALL USI_GET0L( 'OVER', OVER, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
         IF (OVER) THEN
@@ -243,14 +243,14 @@ C1000    FORMAT(' Smoothing ',4A)
           JUMPOUT=.FALSE.
           DO WHILE (.NOT. JUMPOUT)
 *
-            CALL PAR_GET0I('MSK_IDIM',IDIM,STATUS)
+            CALL USI_GET0I('MSK_IDIM',IDIM,STATUS)
 *
             IF (STATUS .NE. SAI__OK) GOTO 999
 *
 	    IF ( IDIM.LE.0 .OR. IDIM.GT.NDIMS ) THEN
                CALL MSG_SETI(IDIM, IDIM)
 	       CALL MSG_PRNT('Error: there is no dimension ^IDIM')
-               CALL PAR_CANCL('MSK_IDIM',STATUS)
+               CALL USI_CANCL('MSK_IDIM',STATUS)
             ELSE
                JUMPOUT=.TRUE.
 	    ENDIF
@@ -267,14 +267,14 @@ C1000    FORMAT(' Smoothing ',4A)
           JUMPOUT=.FALSE.
           DO WHILE (.NOT. JUMPOUT)
 *
-            CALL PAR_GET0I('MSK_IDIM1',IDIM1,STATUS)
+            CALL USI_GET0I('MSK_IDIM1',IDIM1,STATUS)
 *
             IF (STATUS .NE. SAI__OK) GOTO 999
 *
 	    IF (IDIM1.LT.0 .OR. IDIM1.GT.NDIMS) THEN
                 CALL MSG_SETI(IDIM, IDIM)
 	        CALL MSG_PRNT('Error: there is no dimension ^IDIM')
-                CALL PAR_CANCL('MSK_IDIM1',STATUS)
+                CALL USI_CANCL('MSK_IDIM1',STATUS)
             ELSE
                 JUMPOUT=.TRUE.
 	    ENDIF
@@ -305,7 +305,7 @@ C1000    FORMAT(' Smoothing ',4A)
 	ENDIF
 
 *    Ask if gaps should be re-instated
-      CALL PAR_GET0C('MSK_DO',DO,STATUS)
+      CALL USI_GET0C('MSK_DO',DO,STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
         CALL CHR_UCASE(DO)
@@ -333,7 +333,7 @@ C1000    FORMAT(' Smoothing ',4A)
           CALL MSG_PRNT('   COSine bell        ')
           CALL MSG_PRNT('   MASk file          ')
 *
-          CALL PAR_GET0C('MSK_MASK',MASK,STATUS)
+          CALL USI_GET0C('MSK_MASK',MASK,STATUS)
 *
           IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -346,7 +346,7 @@ C1000    FORMAT(' Smoothing ',4A)
             JUMPOUT=.FALSE.
             DO WHILE (.NOT. JUMPOUT)
 *
-              CALL PAR_GET0R('MSK_WIDTH',WDTH,STATUS)
+              CALL USI_GET0R('MSK_WIDTH',WDTH,STATUS)
 *
               IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -354,7 +354,7 @@ C1000    FORMAT(' Smoothing ',4A)
 	      LMASK=(LL+1)*2
 	      IF(LMASK.GT.NMASK) THEN
 		 CALL MSG_PRNT('SMOOTH Error mask too big')
-                 CALL PAR_CANCL('MSK_WIDTH',STATUS)
+                 CALL USI_CANCL('MSK_WIDTH',STATUS)
               ELSE
                  JUMPOUT=.TRUE.
 	      ENDIF
@@ -389,14 +389,14 @@ C   Gaussian
                 JUMPOUT=.FALSE.
                 DO WHILE (.NOT. JUMPOUT)
 *
-                   CALL PAR_GET0R('MSK_WIDTH',WDTH,STATUS)
+                   CALL USI_GET0R('MSK_WIDTH',WDTH,STATUS)
 *
                    IF (STATUS .NE. SAI__OK) GOTO 999
 *
 	           IF (WDTH .GT. 25.0)THEN
 		      CALL MSG_PRNT('SMOOTH Error: WIDTH too large '/
      &                           /'must be less than 25')
-                      CALL PAR_CANCL('MSK_WIDTH',STATUS)
+                      CALL USI_CANCL('MSK_WIDTH',STATUS)
                    ELSE
                        JUMPOUT=.TRUE.
 	           ENDIF
@@ -405,8 +405,8 @@ C   Gaussian
 *      Ask user for mask width. Set the default to be 4 times the
 *      standard deviation.
 		LMASK=4.0*WDTH
-                CALL PAR_DEF0I('MSK_LGAU', LMASK, STATUS)
-                CALL PAR_GET0I('MSK_LGAU', LMASK, STATUS)
+                CALL USI_DEF0I('MSK_LGAU', LMASK, STATUS)
+                CALL USI_GET0I('MSK_LGAU', LMASK, STATUS)
 
                 IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -428,7 +428,7 @@ C  Cosine bell
                 JUMPOUT=.FALSE.
                 DO WHILE (.NOT. JUMPOUT)
 *
-                   CALL PAR_GET0R('MSK_WIDTH',WDTH,STATUS)
+                   CALL USI_GET0R('MSK_WIDTH',WDTH,STATUS)
 *
                    IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -436,7 +436,7 @@ C  Cosine bell
 		   LMASK=LM2*2
 		   IF(LMASK.GT.NMASK) THEN
 		       CALL MSG_PRNT('SMOOTH Error mask too wide')
-                       CALL PAR_CANCL('MSK_WIDTH',STATUS)
+                       CALL USI_CANCL('MSK_WIDTH',STATUS)
                    ELSE
                        JUMPOUT=.TRUE.
 	           ENDIF
@@ -460,7 +460,7 @@ C  Cosine bell
 		IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_FLUSH( STATUS )
 		  CALL MSG_PRNT('SMOOTH Error - no such mask')
-                  CALL PAR_CANCL('MSK_MASK',STATUS)
+                  CALL USI_CANCL('MSK_MASK',STATUS)
 		ELSE
 
 *   first record is length of mask in bins , preferably odd !
@@ -495,9 +495,9 @@ C  Cosine bell
 *   Reset status if gone bad.
                    IF (STATUS .NE. SAI__OK) STATUS=SAI__OK
 *
-                   CALL PAR_DEF0C('MSK_NEWUNITS',DUNIT,STATUS)
+                   CALL USI_DEF0C('MSK_NEWUNITS',DUNIT,STATUS)
 *
-                   CALL PAR_GET0C('MSK_NEWUNITS',DUNIT,STATUS)
+                   CALL USI_GET0C('MSK_NEWUNITS',DUNIT,STATUS)
                    CALL BDA_PUTUNITS(OLOC,DUNIT,STATUS)
 *
                    IF (STATUS .NE. SAI__OK) GOTO 999
@@ -828,7 +828,6 @@ C  Cosine bell
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       CHARACTER*(*) EMETH               ! End processing method
       INTEGER START1,END1               ! Pixels to use in finding mean
@@ -978,7 +977,6 @@ C  Cosine bell
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER NVAL
 *    Import-Export :
@@ -1005,7 +1003,7 @@ C  Cosine bell
 *
       DO WHILE ( INPUT )
 *
-         CALL PAR_GET0C( 'ENDS', ENDS, STATUS )
+         CALL USI_GET0C( 'ENDS', ENDS, STATUS )
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -1020,9 +1018,9 @@ C  Cosine bell
      :                   /'each slice', STATUS )
             CALL MSG_OUT( 'MSG', 'Extending each end by averaging over',
      :                                                          STATUS )
-            CALL PAR_PROMT( 'NUMPIX',
+            CALL USI_PROMT( 'NUMPIX',
      :                   'the following number of data points', STATUS )
-            CALL PAR_GET0I( 'NUMPIX', NUMPIX, STATUS )
+            CALL USI_GET0I( 'NUMPIX', NUMPIX, STATUS )
 *
 *  Set start and end pixel position
             START1=1
@@ -1030,11 +1028,11 @@ C  Cosine bell
 *
          ELSE IF ( ENDS(1:5) .EQ. 'ONESP' ) THEN
 *         'Extend' array at both ends using one specified value.
-            CALL PAR_GET0R( 'DVALUE', START_DATA, STATUS )
+            CALL USI_GET0R( 'DVALUE', START_DATA, STATUS )
 *
             END_DATA = START_DATA
 
-            CALL PAR_GET0R( 'EVALUE', START_ERR, STATUS )
+            CALL USI_GET0R( 'EVALUE', START_ERR, STATUS )
 
             END_ERR = START_ERR
 
@@ -1052,26 +1050,26 @@ C  Cosine bell
      :                      'You will specify 2 such regions:', STATUS )
             CALL MSG_OUT( 'MSG',
      :                 'Enter lower bound of region to extend', STATUS )
-            CALL PAR_GET0I( 'START1', START1, STATUS )
+            CALL USI_GET0I( 'START1', START1, STATUS )
 *
             CALL MSG_OUT( 'MSG',
      :             'Enter upper bound of the region to extend', STATUS )
-            CALL PAR_GET0I( 'END1', END1, STATUS )
+            CALL USI_GET0I( 'END1', END1, STATUS )
 *
             CALL MSG_OUT( 'MSG',
      :                 'Enter lower bound of region to extend', STATUS )
-            CALL PAR_GET0I( 'START2', START2, STATUS )
+            CALL USI_GET0I( 'START2', START2, STATUS )
 *
             CALL MSG_OUT( 'MSG',
      :             'Enter upper bound of the region to extend', STATUS )
-            CALL PAR_GET0I( 'END2', END2, STATUS )
+            CALL USI_GET0I( 'END2', END2, STATUS )
 *
          ELSE IF ( ENDS(1:3) .EQ. 'TWO' ) THEN
 *         Specify separatly extend values for each end.
-            CALL PAR_GET0R( 'VAL1', START_DATA, STATUS )
-            CALL PAR_GET0R( 'ERR1', START_ERR, STATUS )
-            CALL PAR_GET0R( 'VAL2', END_DATA, STATUS )
-            CALL PAR_GET0R( 'ERR2', END_ERR, STATUS )
+            CALL USI_GET0R( 'VAL1', START_DATA, STATUS )
+            CALL USI_GET0R( 'ERR1', START_ERR, STATUS )
+            CALL USI_GET0R( 'VAL2', END_DATA, STATUS )
+            CALL USI_GET0R( 'ERR2', END_ERR, STATUS )
 
          ELSE IF ( ENDS(1:5) .EQ. 'ENDVA' ) THEN
 *
@@ -1080,7 +1078,7 @@ C  Cosine bell
          ELSE IF ( STATUS .EQ. SAI__OK ) THEN
             CALL MSG_OUT( 'MSG', 'Incorrect specification of ends '/
      :                                             /'handling' ,STATUS )
-            CALL PAR_CANCL( 'ENDS', STATUS )
+            CALL USI_CANCL( 'ENDS', STATUS )
             INPUT = .TRUE.
 
          END IF

@@ -122,7 +122,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'UTILIB(IMPORT_CMN)'
+      INCLUDE 'IMPORT_CMN'
 *
 *    Local variables :
 *
@@ -1028,7 +1028,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'UTILIB(IMPORT_CMN)'
+      INCLUDE 'IMPORT_CMN'
 *
 *    Import :
 *
@@ -1263,7 +1263,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'UTILIB(IMPORT_CMN)'
+      INCLUDE 'IMPORT_CMN'
 *
 *    Import :
 *
@@ -1344,7 +1344,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'UTILIB(IMPORT_CMN)'
+      INCLUDE 'IMPORT_CMN'
 *
 *    Import :
 *
@@ -1494,7 +1494,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'UTILIB(IMPORT_CMN)'
+      INCLUDE 'IMPORT_CMN'
 *
 *    Import :
 *

@@ -32,6 +32,7 @@
 *
 *      5 May 88 : V1.0-2  Original (LTVAD::RDS)
 *     28 Feb 94 : V1.7-0  Quality handling updated (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -42,7 +43,6 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -129,7 +129,7 @@
 *    Check status :
       IF (STATUS .NE. SAI__OK) RETURN
 *
-      VERSION='INTERP Version 1.7-0'
+      VERSION='INTERP Version 1.8-0'
       CALL MSG_PRNT( VERSION )
 *
 * Initialise the Asterix common blocks.
@@ -144,7 +144,7 @@
 *
 * Ask for input and output filename
 *   Should the input file be overwritten ?
-      CALL PAR_GET0L('OVER',OVER,STATUS)
+      CALL USI_GET0L('OVER',OVER,STATUS)
 *
       IF (OVER) THEN
 *
@@ -358,14 +358,14 @@
 *
       DO WHILE ( .NOT. JUMPOUT)
 *
-         CALL PAR_GET0I('KWIDTH',KWIDTH,STATUS)
+         CALL USI_GET0I('KWIDTH',KWIDTH,STATUS)
 *
          IF (KWIDTH.GT.4) THEN
              JUMPOUT=.TRUE.
          ELSE
              CALL MSG_OUT(' ','Width must be greater than 4 bins',
      :                                   STATUS)
-             CALL PAR_CANCL('KWIDTH',STATUS)
+             CALL USI_CANCL('KWIDTH',STATUS)
          ENDIF
 *
       ENDDO

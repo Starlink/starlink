@@ -71,7 +71,7 @@
 *    History :
 *
 *     Original  VERSION 1.0   15 August 1986
-*                       1.1   29 sept 86 Replace PAR_PUT with DAT_PUT
+*                       1.1   29 sept 86 Replace USI_PUT with DAT_PUT
 *                       1.2   27 Mar 87 Global parameter implemented properly
 *                                                                (BHVAD::RJV)
 *      9 Jul 87 : V0.6-1 Version number changed to ASTERIX standard (TJP)
@@ -82,6 +82,7 @@
 *     15 Dec 88 : V1.0-2 Now writes ranges in text form into SETRANGES's own
 *                        global. (DJA)
 *      6 Aug 93 : V1.7-0 Changed ARR_ call (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -91,7 +92,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -114,7 +114,7 @@
       LOGICAL		      PRIM2      ! Range_object primitive?
       LOGICAL                 OK         ! General validity test
 
-      INTEGER		      ACTVAL     ! Dummy required by PAR_GET
+      INTEGER		      ACTVAL     ! Dummy required by USI_GET
       INTEGER                 I,J        ! Loop counters
       INTEGER		      N          ! Number of values in array of results
       INTEGER                 NDIM
@@ -136,7 +136,7 @@
 *    Version id :
 *
       CHARACTER*23	      VERSION    ! Version id
-	 PARAMETER            ( VERSION = 'SETRANGES Version 1.7-0')
+	 PARAMETER            ( VERSION = 'SETRANGES Version 1.8-0')
 *-
 
 *    Check status
@@ -229,7 +229,7 @@
 
 *    Get required ranges from parameter system and set values of MINVAL
 *    and MAXAVL
-      CALL PAR_GET1R( 'VALUE_RANGES', 2, RANGE, ACTVAL, STATUS )
+      CALL USI_GET1R( 'VALUE_RANGES', 2, RANGE, ACTVAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         GOTO 99
       ELSE
@@ -265,7 +265,7 @@
         END DO
 
 *      Put character equivalents of strings into parameter
-        CALL PAR_PUT0C( 'RANGES', RNGSTR(3:RLEN), STATUS )
+        CALL USI_PUT0C( 'RANGES', RNGSTR(3:RLEN), STATUS )
 
       END IF
 
@@ -312,7 +312,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *

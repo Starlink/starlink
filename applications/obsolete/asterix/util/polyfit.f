@@ -47,6 +47,7 @@
 *      8 Oct 92 : V1.7-0 Changes for alterations in compiler 3 years ago. This
 *                        program is either bug free or never used (DJA)
 *     30 Jun 93 : V1.7-1 Fixed by in above update (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -56,7 +57,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -104,7 +104,7 @@
 *    Version id :
 *
       CHARACTER*22           VERSION
-        PARAMETER            ( VERSION = 'POLYFIT Version 1.7-1' )
+        PARAMETER            ( VERSION = 'POLYFIT Version 1.8-0' )
 *-
 
 *    Check status.
@@ -118,15 +118,15 @@
       CALL ARR_INIT1I( 1, DAT__MXDIM, LDIMS, STATUS )
 
 *    Ask if detrending or polynomial fitting required:
-      CALL PAR_GET0L( 'POLYFIT', POLY, STATUS )
+      CALL USI_GET0L( 'POLYFIT', POLY, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( POLY ) THEN
-        CALL PAR_GET0L( 'DTREND', POLY, STATUS )
+        CALL USI_GET0L( 'DTREND', POLY, STATUS )
         POLY = .NOT. POLY
       END IF
 
 *    Find out if are overwritting input file
-      CALL PAR_GET0L( 'OVER', OVERWRITE, STATUS )
+      CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Open input
@@ -226,7 +226,7 @@
       END IF
 
 *    User input.
-      CALL PAR_GET0I( 'POLY_DEGREE', NDEG, STATUS )
+      CALL USI_GET0I( 'POLY_DEGREE', NDEG, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    NDEG must lie between 0 and 10
@@ -303,7 +303,8 @@
       END IF
       CALL HIST_PTXT( OLOC, I, TEXT, STATUS )
 
- 99   CALL AST_CLOSE
+*    Tidy up
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
@@ -419,7 +420,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER                NDEG               ! Degree of polynomial fitted
       INTEGER                NDIM               ! Dimensionality of data
@@ -555,7 +555,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER                NDEG               ! Degree of polynomial fitted
       INTEGER                NDIM               ! Dimensionality of data
@@ -767,7 +766,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *

@@ -31,6 +31,7 @@
 *    History :
 *
 *      7 Jun 93 : Original (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -44,7 +45,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(HIST_CMN)'
+      INCLUDE 'HIST_CMN'
 *
 *    Status :
 *
@@ -63,7 +64,7 @@
 *    Version :
 *
       CHARACTER*30       VERSION
-        PARAMETER        (VERSION = 'HISTMODE Version 1.7-0')
+        PARAMETER        (VERSION = 'HISTMODE Version 1.8-0')
 *-
 
 *    Initialise
@@ -90,19 +91,19 @@
       QUIET = .FALSE.
       NORMAL = .FALSE.
       VERBOSE = .FALSE.
-      CALL PAR_GET0L( 'DISABLED', DISABLED, STATUS )
+      CALL USI_GET0L( 'DISABLED', DISABLED, STATUS )
       IF ( DISABLED ) THEN
         MODE = 'DISABLED'
       ELSE
-        CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+        CALL USI_GET0L( 'QUIET', QUIET, STATUS )
         IF ( QUIET ) THEN
           MODE = 'QUIET'
         ELSE
-          CALL PAR_GET0L( 'NORMAL', NORMAL, STATUS )
+          CALL USI_GET0L( 'NORMAL', NORMAL, STATUS )
           IF ( NORMAL ) THEN
             MODE = 'NORMAL'
           ELSE
-            CALL PAR_GET0L( 'VERBOSE', VERBOSE, STATUS )
+            CALL USI_GET0L( 'VERBOSE', VERBOSE, STATUS )
             IF ( VERBOSE ) THEN
               MODE = 'VERBOSE'
             ELSE
@@ -158,10 +159,8 @@
 
       END IF
 
-      CALL AST_CLOSE()
-
-
 *    Tidy up
- 99   CALL AST_ERR( STATUS )
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END

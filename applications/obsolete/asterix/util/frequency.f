@@ -82,6 +82,7 @@
 *     14 Apr 93 : V1.7-1 Write data label rather than dataset name to axis
 *                        label (DJA)
 *      9 Feb 94 : V1.7-2 Writes new form GCB attributes (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -91,7 +92,6 @@
 *
       INCLUDE     'SAE_PAR'
       INCLUDE     'DAT_PAR'
-      INCLUDE     'PAR_ERR'
 *
 *    Status :
 *
@@ -143,7 +143,7 @@
 *    Version id :
 *
       CHARACTER              VERSION*30
-        PARAMETER            (VERSION = 'FREQUENCY Version 1.7-2')
+        PARAMETER            (VERSION = 'FREQUENCY Version 1.8-0')
 *-
 
 *    Check status
@@ -231,8 +231,8 @@
       CALL MSG_PRNT( 'The data range is ^DMIN to ^DMAX' )
 
 *    Regularly spaced bins required?
-      CALL PAR_GET0L( 'REG_SPACED', REG, STATUS )
-      CALL PAR_CANCL( 'REG_SPACED', STATUS )
+      CALL USI_GET0L( 'REG_SPACED', REG, STATUS )
+      CALL USI_CANCL( 'REG_SPACED', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( REG ) THEN
@@ -241,8 +241,8 @@
         OK = .FALSE.
         DO WHILE ( (.NOT. OK) .AND. (STATUS .EQ. SAI__OK) )
 
- 10       CALL PAR_GET0R( 'BIN_SPACING', SPACING, STATUS )
-          CALL PAR_CANCL( 'BIN_SPACING', STATUS )
+ 10       CALL USI_GET0R( 'BIN_SPACING', SPACING, STATUS )
+          CALL USI_CANCL( 'BIN_SPACING', STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *        Deduce number of bins
@@ -287,8 +287,8 @@
       END IF
 
 *    Obtain whether normalisation is required
-      CALL PAR_DEF0L( 'NORMALISE', .TRUE., STATUS )
-      CALL PAR_GET0L( 'NORMALISE', NORMALISE, STATUS )
+      CALL USI_DEF0L( 'NORMALISE', .TRUE., STATUS )
+      CALL USI_GET0L( 'NORMALISE', NORMALISE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map data for bins

@@ -19,12 +19,13 @@
 *
 *    History :
 *
-*     28 Jun 90 : V1.3-0  Original
-*      8 Sep 90 : V1.3-1  Extended to allow upto 40 columns and a line width of
-*                         512 characters   (LTVAD::RDS)
-*     31 Aug 93 : V1.3-2  Reads from SCAR-type file into appropriate type
-*                         instead of assuming REAL  (RJV)
-*      7 Nov 93 : V1.7-0  Uses FIO to do all i/o (DJA)
+*     28 Jun 90 : V1.3-0 Original (RDS)
+*      8 Sep 90 : V1.3-1 Extended to allow upto 40 columns and a line width of
+*                        512 characters (RDS)
+*     31 Aug 93 : V1.3-2 Reads from SCAR-type file into appropriate type
+*                        instead of assuming REAL  (RJV)
+*      7 Nov 93 : V1.7-0 Uses FIO to do all i/o (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -34,7 +35,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -76,7 +76,7 @@
       DATA NULL/'                                        '/
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TEXT2HDS - version 1.3-2')
+      PARAMETER (VERSION = 'TEXT2HDS - version 1.8-0')
 *-
 
       CALL AST_INIT(STATUS)
@@ -87,12 +87,12 @@
       END DO
 
 *    Get name of input file
-      CALL PAR_GET0C( 'INFILE', INAME, STATUS )
+      CALL USI_GET0C( 'INFILE', INAME, STATUS )
 
 *    Ask if SCAR descriptor file available and get name of it
-      CALL PAR_GET0L( 'SCAR', SCAR, STATUS )
+      CALL USI_GET0L( 'SCAR', SCAR, STATUS )
       IF ( SCAR ) THEN
-        CALL PAR_GET0C( 'DSCFILE', DFILE, STATUS )
+        CALL USI_GET0C( 'DSCFILE', DFILE, STATUS )
       END IF
       IF (STATUS .NE. SAI__OK) GOTO 999
 
@@ -117,7 +117,7 @@
 
 *      Get the number of text columns from the user
         NCOLS=0
-        CALL PAR_GET0I( 'NCOLS', NCOLS, STATUS )
+        CALL USI_GET0I( 'NCOLS', NCOLS, STATUS )
         IF ( NCOLS .GT. MAXCOL ) THEN
           CALL MSG_SETI('MAXCOL', MAXCOL)
           STATUS = SAI__ERROR
@@ -127,21 +127,21 @@
         END IF
 
 *      Get the upper limit on the number of lines of text in the file
-        CALL PAR_GET0I( 'NROWS', NROWS, STATUS )
+        CALL USI_GET0I( 'NROWS', NROWS, STATUS )
         IF (STATUS .NE. SAI__OK) GOTO 999
 
 *      Get list names from environment
         DO LP=1,NCOLS
           TYPE(LP) = '_REAL'
           CALL CHR_ITOC( LP, STRING, IVAL )
-          CALL PAR_GET0C( 'CNAME'//STRING(1:IVAL), CNAME(LP), STATUS )
+          CALL USI_GET0C( 'CNAME'//STRING(1:IVAL), CNAME(LP), STATUS )
         END DO
         IF ( STATUS .NE. SAI__OK ) GOTO 999
 
       END IF
 
 *    Ask if an event dataset is wanted rather than a list of HDS arrays.
-      CALL PAR_GET0L( 'EVENT', EVENT, STATUS )
+      CALL USI_GET0L( 'EVENT', EVENT, STATUS )
 
 *    Create output arrays and map them
       IF ( EVENT ) THEN

@@ -20,9 +20,11 @@
 *     Richard Saxton   (LTVAD::RDS)
 *
 *    History :
+*
 *      7 Jan 92 : Original
 *      3 Mar 92 : V1.6-1 Brought into Asterix
 *      4 May 93 : V1.7-0 Use FIO for I/O (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -32,7 +34,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'FIO_ERR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -61,10 +62,12 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'SLOTMRG - version 1.7-0')
+      PARAMETER (VERSION = 'SLOTMRG - version 1.8-0')
 *-
       MFLAG = .FALSE.
 *
+
+      CALL AST_INIT()
 
 * Open the i/p files to be merged
       CALL FIO_ASSOC( 'SFILE1', 'READ', 'LIST', 0, IFIL1, STATUS )
@@ -173,14 +176,12 @@
       CALL FIO_CLOSE( OFIL, STATUS )
 
 *    Tidy up
- 999  CONTINUE
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from SLOTMRG',STATUS)
-      ENDIF
-*
+ 999  CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
       END
-**************************************************************8
+
+
 *+SLOTMRG_TMERGE Merge two series of on/off time windows
 	SUBROUTINE SLOTMRG_TMERGE (TS1, TE1, NW1, TS2, TE2,
      &                   NW2, TS12, TE12, NW12)

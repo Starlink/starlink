@@ -27,10 +27,11 @@
 *
 *    History :
 *
-*     15 Nov 89 : V1.0-0  Original (DJA)
-*      5 Dec 90 : V1.3-0  Works on spaced arrays (DJA)
-*      3 Mar 92 : V1.6-0  Renamed from EXPORT (DJA)
-*     30 Mar 92 : V1.6-1  Correct use ERR_ANNUL (DJA)
+*     15 Nov 89 : V1.0-0 Original (DJA)
+*      5 Dec 90 : V1.3-0 Works on spaced arrays (DJA)
+*      3 Mar 92 : V1.6-0 Renamed from EXPORT (DJA)
+*     30 Mar 92 : V1.6-1 Correct use ERR_ANNUL (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -88,7 +89,7 @@
 *    Version :
 *
       CHARACTER*30         VERSION
-        PARAMETER          ( VERSION = 'HDS2TEXT Version 1.6-1' )
+        PARAMETER          ( VERSION = 'HDS2TEXT Version 1.8-0' )
 *-
 
 *    Check status
@@ -232,7 +233,7 @@
       CALL ARR_SUMDIM( NDIM, ODIMS, NELM )
 
 *    Get format
-      CALL PAR_GET0C( 'FMT', OUTF, STATUS )
+      CALL USI_GET0C( 'FMT', OUTF, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         OUTF='1P,G14.6'
         CALL ERR_ANNUL( STATUS )

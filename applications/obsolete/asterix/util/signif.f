@@ -24,12 +24,13 @@
 *
 *    History :
 *
-*     27 Jan 85 : V0.6    Original (BHVAD::JCMP)
-*     20 Jul 88 : V1.0-0  Converted to new STARLINK HDS standards. (BHVAD::DJA)
-*      7 Oct 88 : V1.0-1  Now handles overwriting using OVER hidden
-*                         parameter. ( BHVAD::DJA )
-*     23 Aug 89 : V1.0-2  Quality handling now included. Output variances
-*                         are set to unity ( BHVAD::DJA )
+*     27 Jan 85 : V0.6   Original (BHVAD::JCMP)
+*     20 Jul 88 : V1.0-0 Converted to new STARLINK HDS standards. (DJA)
+*      7 Oct 88 : V1.0-1 Now handles overwriting using OVER hidden
+*                        parameter. (DJA)
+*     23 Aug 89 : V1.0-2 Quality handling now included. Output variances
+*                        are set to unity (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -50,7 +51,7 @@
          PARAMETER (INVAR=1)
 
       CHARACTER*22           VERSION
-         PARAMETER ( VERSION = 'SIGNIF Version 1.0-2' )
+         PARAMETER ( VERSION = 'SIGNIF Version 1.8-0' )
 
       INTEGER                MAXLINES
          PARAMETER           (MAXLINES = 10 )
@@ -88,10 +89,10 @@
       CALL MSG_PRNT( VERSION )
 
 *    Initialise the ASTERIX common blocks
-      CALL AST_INIT( STATUS )
+      CALL AST_INIT()
 
 *    See whether we're going to overwrite
-      CALL PAR_GET0L( 'OVER', OVERWRITE, STATUS )
+      CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
 
 *    Obtain data object, access and check it
       IF ( OVERWRITE ) THEN
@@ -215,7 +216,7 @@
       CALL HIST_PTXT( OLOC, NREC, ACTION, STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END

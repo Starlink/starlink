@@ -52,6 +52,7 @@
 *                        of subset parameters . MARKER keyword added (DJA)
 *     28 Apr 93 : V1.7-0 Handles input quality correctly (DJA)
 *     25 Jun 93 : V1.7-1 Removed superfluous STATUS argument to MSG_MAKE (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -61,7 +62,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -113,7 +113,7 @@
 *    Version id :
 *
       CHARACTER*(30) VERSION
-	 PARAMETER   (VERSION = 'SCATTERGRAM Version 1.7-1')
+	 PARAMETER   (VERSION = 'SCATTERGRAM Version 1.8-0')
 *-
 
 *    Version announcement
@@ -171,21 +171,21 @@
       SUBSET(1)=1
       SUBSET(2)=N
       SUBSET(3)=1
-      CALL PAR_DEF1I( 'SUBSET', 3, SUBSET, STATUS )
+      CALL USI_DEF1I( 'SUBSET', 3, SUBSET, STATUS )
       NSUB=0
       DO WHILE (NSUB.EQ.0.AND.STATUS.EQ.SAI__OK)
-         CALL PAR_GET1I('SUBSET',3,SUBSET,NSUB,STATUS)
+         CALL USI_GET1I('SUBSET',3,SUBSET,NSUB,STATUS)
          IF(NSUB.EQ.2) THEN
             SUBSET(3)=1
          END IF
          IF(NSUB.EQ.1) THEN
             CALL MSG_PRNT( 'At least 2 values required' )
-            CALL PAR_CANCL('SUBSET',STATUS)
+            CALL USI_CANCL('SUBSET',STATUS)
             NSUB=0
          ELSE IF(SUBSET(2).LT.SUBSET(1).OR.SUBSET(1).LT.1
      :                                    .OR.SUBSET(3).LT.1) THEN
             CALL MSG_PRNT( 'Illegal value(s)' )
-            CALL PAR_CANCL('SUBSET',STATUS)
+            CALL USI_CANCL('SUBSET',STATUS)
             NSUB=0
          END IF
       END DO
@@ -198,7 +198,7 @@
       NITEM = (TO-FROM+1)/INCR
 
 *    Set output style to markers?
-      CALL PAR_GET0L( 'MARKER', DOMARKER, STATUS )
+      CALL USI_GET0L( 'MARKER', DOMARKER, STATUS )
 
 *    Create display object
       CALL USI_ASSOCO( 'OUT', 'SCATTERGRAM', DLOC, STATUS )

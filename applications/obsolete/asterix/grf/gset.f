@@ -914,6 +914,8 @@
 *  are all labels to be suppressed
         CALL PAR_PROMT('SUPPRESS','Are all labels to be suppressed',
      :                                                       STATUS)
+        CALL PAR_GET0L('SUPPRESS',SUPPRESS,STATUS)
+
         IF (SUPPRESS) THEN
           TEXT="     "
           SETF=.FALSE.
