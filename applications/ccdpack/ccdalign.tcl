@@ -270,7 +270,7 @@
                   set tryagain 0
                   .v activate
                   tkwait variable status
-                  if { [ llength [ .v points ] ] == 0 } {
+                  if { [ llength [ .v points ] ] == 0 && $ERROR == "" } {
                      $warnbox center .v
                      set tryagain [ $warnbox activate ]
                   }
