@@ -12,6 +12,7 @@
 *
 *	Last modify:	12/11/99
 *                       20/03/00 (PWD): Added userradii function.
+*                       20/02/02 (PWD): Added X_PIXEL and Y_PIXEL calcs.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -535,6 +536,15 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
     compute_myotherparams(obj); 
 
 --*/
+
+    /* PWD: set the NDF pixel coordinates if required. Just add
+     * subtract 0.5 pixels. */
+    if ( FLAG(obj2.ndfposx) ) {
+	obj2->ndfposx = obj2->sposx - 0.5; 
+    }
+    if ( FLAG(obj2.ndfposy) ) {
+	obj2->ndfposy = obj2->sposy - 0.5;
+    }
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 

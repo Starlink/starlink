@@ -19,6 +19,8 @@
 *                         correctly fixed.
 *                       15/02/00 (PWD):
 *                         Added rad_type and rad members.
+*                       20/02/02 (PWD):
+*                         Added ndfposx and ndfposy members and NDF origins.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -154,6 +156,8 @@ typedef struct
   double	posx,posy;			/* "FITS" pos. in pixels */
   double	mamaposx,mamaposy;		/* "MAMA" pos. in pixels */
   float		sposx,sposy;			/* single precision pos. */
+  float		ndfposx,ndfposy;		/* single precision pos. 
+						   NDF Pixel coordinates */
   float		poserr_a, poserr_b,
 		poserr_theta;			/* Error ellips parameters */
   float		poserr_cxx, poserr_cyy,
@@ -342,6 +346,7 @@ typedef struct pic
   void          *map;                   /* pointer to mapped data */
   int           nel;                    /* size of map (pixels) */
   int           file;                   /* next pixel number from map */
+  int           origin[2];              /* NDF origins */
   AstFrameSet   *astwcs;                /* NDF WCS component */
 
   }	picstruct;

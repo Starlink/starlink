@@ -13,6 +13,8 @@
 *	Last modify:	11/11/99
 *                       20/03/00 (PWD): Added various members to
 *                                       support userradii function.
+*                       20/02/02 (PWD): Added ndfposx and ndfposy
+*                                       members.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -147,6 +149,8 @@ typedef struct
   double	posx,posy;			/* "FITS" pos. in pixels */
   double	mamaposx,mamaposy;		/* "MAMA" pos. in pixels */
   float		sposx,sposy;			/* single precision pos. */
+  float		ndfposx,ndfposy;		/* single precision pos. 
+						   NDF Pixel coordinates */
   float		poserr_a, poserr_b,
 		poserr_theta;			/* Error ellips parameters */
   float		poserr_cxx, poserr_cyy,

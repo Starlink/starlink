@@ -16,6 +16,8 @@
 *                       (from %15e). This gets to 0.01 precision in
 *                       arcsec.
 *                       19/07/01 PWD: added BKGSIG for GIM2D people.
+*                       20/01/02 PWD: added X_PIXEL and Y_PIXEL for
+*                                     NDF pixel coordinates.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
@@ -197,6 +199,11 @@ keystruct	objkey[] = {
 	&outobj2.mamaposx, H_FLOAT, T_DOUBLE, "%8.1f", "m**(-6)"},
   {"Y_MAMA", "Barycenter position along MAMA y axis",
 	&outobj2.mamaposy, H_FLOAT, T_DOUBLE, "%8.1f", "m**(-6)"},
+
+  {"X_PIXEL", "Object position along x in NDF pixel coordinates",
+	&outobj2.ndfposx, H_FLOAT, T_FLOAT, "%10.3f", "pixel"},
+  {"Y_PIXEL", "Object position along y in NDF pixel coordinates",
+	&outobj2.ndfposy, H_FLOAT, T_FLOAT, "%10.3f", "pixel"},
 
   {"ALPHA_SKY", "Right ascension of barycenter (native)",
 	&outobj2.alphas, H_FLOAT, T_DOUBLE, "%11.7f", "deg"},

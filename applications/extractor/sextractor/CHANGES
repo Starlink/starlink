@@ -1,3 +1,7 @@
+PWD: 20 February 2002. Added X_PIXEL and Y_PIXEL parameters. These
+are just continous coordinates that differ from FITS by 0.5 pixels.
+So the centre of the first pixel is 0.5,0.5.
+
 This is V2.2.1 (February  8 2001). New features include:
 - Memory allocation bug for large images on Alphas while
   preparing the background-map fixed.

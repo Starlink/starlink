@@ -40,6 +40,7 @@
 #include        "sae_par.h"
 #include        "dat_par.h"
 #include        "ndf.h"
+#include        "merswrap.h"
 
 /******************************* readimagehead *******************************/
 /*
@@ -56,6 +57,8 @@ void	readimagehead(picstruct *field)
    void         *pntr[3];
    int          nel;
    int          placehldr;
+   int          lbnd[NDF__MXDIM];
+   int          ubnd[NDF__MXDIM];
 
 /* Open the file */
   field->file = 0;
@@ -106,6 +109,10 @@ void	readimagehead(picstruct *field)
     field->bitsgn = 0;
 
   ndfCget( field->ndf, "TITLE", field->ident, MAXCHAR, &status );
+
+  ndfBound( field->ndf, NDF__MXDIM, lbnd, ubnd, &ndims, &status );
+  field->origin[0] = lbnd[0];
+  field->origin[1] = lbnd[1];
 
 /*----------------------------- Astrometry ---------------------------------*/
 /* Presently, astrometry is done only on the measurement and detect images */

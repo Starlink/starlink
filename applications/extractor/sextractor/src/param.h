@@ -13,6 +13,9 @@
 *	Last modify:	20/07/99
 *                       20/03/00 (PWD): Added RAD0-RAD15 parameters.
 *                       19/07/01 (PWD): Added BKGSIG parameter for GIM2D.
+*                       20/01/02 (PWD): added X_PIXEL and Y_PIXEL for
+*                                       NDF pixel coordinates, trivial
+*                                       for FITS images.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -195,6 +198,11 @@ keystruct	objkey[] = {
 	&outobj2.mamaposx, H_FLOAT, T_DOUBLE, "%8.1f", "m**(-6)"},
   {"Y_MAMA", "Barycenter position along MAMA y axis",
 	&outobj2.mamaposy, H_FLOAT, T_DOUBLE, "%8.1f", "m**(-6)"},
+
+  {"X_PIXEL", "Object position along x in NDF pixel coordinates",
+	&outobj2.ndfposx, H_FLOAT, T_FLOAT, "%10.3f", "pixel"},
+  {"Y_PIXEL", "Object position along y in NDF pixel coordinates",
+	&outobj2.ndfposy, H_FLOAT, T_FLOAT, "%10.3f", "pixel"},
 
   {"ALPHA_SKY", "Right ascension of barycenter (native)",
 	&outobj2.alphas, H_FLOAT, T_DOUBLE, "%11.7f", "deg"},

@@ -15,13 +15,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.4}
+\newcommand{\stardocnumber}    {226.5}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {14 September 2001}
+\newcommand{\stardocdate}      {20 February 2002}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
-\newcommand{\stardocversion}   {1.2}
 \newcommand{\stardocmanual}    {User Manual}
 \newcommand{\stardocabstract}  {\EXTRACTOR\ will detect sources in
 an astronomical image and build a catalogue listing them. It is based on the
@@ -824,6 +823,10 @@ NDF variance arrays (although these would probably map onto the
 the input NDF to the check image is not done (so WCS calibration, for
 instance, is lost).
 
+NDF pixel coordinates (\textit{i.e.} ones that include the NDF origin)
+can be obtained using the \texttt{X\_PIXEL} and \texttt{Y\_PIXEL}
+parameters.
+
 The \SExtractor\ program has a very large range of processing
 options. Consequently many of these options have not been tried
 extensively in the \EXTRACTOR\ incarnation, so some problems may
@@ -1025,6 +1028,12 @@ A minor update to \EXTRACTOR\ with the following changes:
      \item A bug causing the output from \EXTRACTOR\ to be occasionally 
        garbled has been fixed.
 \end{itemize}
+
+\subsection{Version 1.4-0}
+A minor release of EXTRACTOR, just adding two new parameters:
+\texttt{X\_PIXEL} and \texttt{Y\_PIXEL}. These output NDF pixel
+coordinates.
+
 
 \section{\xlabel{references}References}
 Bailey, J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\

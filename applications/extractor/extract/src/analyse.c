@@ -543,6 +543,15 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
     compute_myotherparams(obj); 
 
 --*/
+    /* PWD: set the NDF pixel coordinates if required. Just add the
+    origin to the FITS positions. */
+    if ( FLAG(obj2.ndfposx) ) {
+	obj2->ndfposx = obj2->sposx - 1.5 + field->origin[0];
+    }
+    if ( FLAG(obj2.ndfposy) ) {
+	obj2->ndfposy = obj2->sposy - 1.5 + field->origin[1];;
+    }
+
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 
