@@ -1226,10 +1226,10 @@ NDFPACK_TASKS = $(NDFPACK_F_ROUTINES:.f=)
 #  not see the opus and tropus modules when they are in a library.
 
 $(MEMTASKS) : $(MEM_F_ROUTINES:.f=.o) opus.o tropus.o uput.o uget.o \
-              $(OBJECT_LIBRARIES) $(LINK_SCRIPT) grf_kappa.o
+              $(OBJECT_LIBRARIES) $(LINK_SCRIPT) 
 	for f in $(MEMTASKS) ;\
 	   do $(ALINK) $$f.o opus.o tropus.o uput.o uget.o $(OBJECT_LIBRARIES) \
-	          $(ADDLIBS) `./$(LINK_SCRIPT)` grf_kappa.o `memsys3_link`;\
+	          $(ADDLIBS) `./$(LINK_SCRIPT)` -last_grf `memsys3_link`;\
 	done
 
 #  Give dependencies and rule for building the pseudo-monoliths.
@@ -1237,17 +1237,17 @@ $(MEMTASKS) : $(MEM_F_ROUTINES:.f=.o) opus.o tropus.o uput.o uget.o \
 $(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK_SCRIPT)
 	$(ALINK) $(KAPPA_MONO_SOURCE:.f=.o) -o $(KAPPA_MON) $(OBJECT_LIBRARIES) \
 	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)` grf_kappa.o
+	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
 $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK_SCRIPT)
 	$(ALINK) $(KAPVIEW_MONO_SOURCE:.f=.o) -o $(KAPVIEW_MON) $(OBJECT_LIBRARIES) \
 	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)` grf_kappa.o
+	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
 $(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o lsfun1.o $(LINK_SCRIPT)
 	$(ALINK) $(NDFPACK_MONO_SOURCE:.f=.o) -o $(NDFPACK_MON) \
 	         lsfun1.o $(OBJECT_LIBRARIES) \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)` grf_kappa.o $(TCLLIBS) $(LDFLAGS)
+	         $(ADDLIBS) `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
 
 #  List of the interface files to be built and rules for compiling them.
 
