@@ -1830,7 +1830,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
    set = TestGrismEps( this );
    dval = set ? GetGrismEps( this ) : astGetGrismEps( this );
-   astWriteDouble( channel, "GrmEps", set, 1, dval, "angle between grating normal and dispersion plane" );
+   astWriteDouble( channel, "GrmEps", set, 1, dval, "Angle between grating normal and dispersion plane" );
 
    set = TestGrismTheta( this );
    dval = set ? GetGrismTheta( this ) : astGetGrismTheta( this );
