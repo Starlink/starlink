@@ -101,19 +101,19 @@
 		  (process-children)))))
 
 (element dtdcontent
-    (make element gi: %subsect-gi%
-	  (make element gi: "title"
-		(literal "Content"))
-	  (make element gi: "p"
-		(process-children))))
+  (make element gi: %subsect-gi%
+	(make element gi: "title"
+	      (literal "Content"))
+	(process-children)))
 
-(element dtdtree
-    (make element gi: %subsect-gi%
-	  (make element gi: "title"
-		(literal "Content tree"))
-	  (make element gi: "p"
-		(make element gi: "verbatim"
-		      (process-children)))))
+(element dtdcontentmodel
+  (make element gi: "p"
+	(process-children)))
+
+(element dtdcontenttree
+  (make element gi: "p"
+	(make element gi: "verbatim"
+	      (process-children))))
 
 (element dtdelemref
   (let ((gi (attribute-string "GI" (current-node))))
@@ -140,10 +140,13 @@
   (element attribute
     (empty-sosofo)))
 (element elemref
-  (let ((gi (attribute-string "GI" (current-node))))
-    (make empty-element gi: "ref"
-	  attributes: (list (list "id" (xref-id gi))
-			    (list "text" gi)))))
+  (let ((gi (attribute-string "GI" (current-node)))
+	(self (attribute-string "SELF" (current-node))))
+    (if self
+	(literal gi)
+	(make empty-element gi: "ref"
+	      attributes: (list (list "id" (xref-id gi))
+				(list "text" gi))))))
 (element example
   (make sequence
     (literal "Example:")

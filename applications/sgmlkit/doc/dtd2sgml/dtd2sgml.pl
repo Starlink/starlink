@@ -59,24 +59,24 @@ foreach $e (@elements) {
     print "</dtdparents>\n";
 
     @content = $dtd->get_base_children ($e, 1);
-    print "<dtdcontent>";
+    print "<dtdcontent>\n<dtdcontentmodel>\n";
     foreach $ce (@content) {
 	$ce = lc($ce);
 	if ($ce =~ /[a-z]+/) {
 	    if (SGML::DTD->is_elem_keyword($ce)) {
-		print "$ce";
+		print "$ce\n";
 	    } else {
-		print "<dtdelemref gi='$ce'>";
+		print "<dtdelemref gi='$ce'>\n";
 	    }
 	} else {
-	    print "$ce ";
+	    print " $ce ";
 	}
     }
-    print "</dtdcontent>\n";
 
-    print "<dtdtree>\n";
+    print "</dtdcontentmodel>\n<dtdcontenttree>\n";
     $dtd->print_tree($e, 2);
-    print "</dtdtree>\n";
+    print "</dtdcontenttree>\n";
+    print "</dtdcontent>\n";
 
     # FIXME -- following doesn't deal with notations properly
     %atts = $dtd->get_elem_attr ($e);

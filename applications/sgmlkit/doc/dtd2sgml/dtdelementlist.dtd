@@ -5,13 +5,15 @@
 
   $Id$
 -->
-<!element dtdelementlist - - (dtdelement+)>
-<!element dtdelement - - (dtdparents, dtdcontent, dtdtree?, dtdattribute*)>
-<!element dtdparents - - (dtdelemref*)>
-<!element dtdcontent - - (#pcdata | dtdelemref)*>
-<!element dtdtree - - (#pcdata)>
-<!element dtdattribute - - (#pcdata)>
-<!element dtdelemref - o empty>
+<!element dtdelementlist  - - (dtdelement+)>
+<!element dtdelement	  - - (dtdparents, dtdcontent, dtdattribute*)>
+<!element dtdparents	  - - (dtdelemref*)>
+<!element dtdcontent	  - - (dtdcontentmodel, dtdcontenttree?)>
+<!element dtdcontentmodel - - (#pcdata | dtdelemref)*>
+<!element dtdcontenttree  - - (#pcdata)>
+<!element dtdattribute	  - - (#pcdata)>
+<!element dtdelemref	  - o empty>
+
 <!attlist dtdelementlist 
   sysid cdata #required
   top cdata #required
