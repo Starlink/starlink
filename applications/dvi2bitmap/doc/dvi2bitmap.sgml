@@ -163,6 +163,10 @@ dvi2bitmap [flags] dvi-file
 
 <p>This program is intended to conform to the DVI processing standard.
 
+<p>The <code>dvi-file</code> argument is the name of a DVI file to be
+converted to a bitmap.  dvi2bitmap looks for the file both with and
+without the default extension <code>.dvi</code>.</p>
+
 <p>The motivation for this program was the need for a helper program
 to produce small bitmaps for inclusion in web pages.  Accordingly, the
 program's underlying usage model is that one would generate a file of
@@ -370,6 +374,10 @@ number.  This can be overridden on a per-page basis by a TeX
 id=usage.special.opf/> in <ref id=usage.special/>).  If there is no
 file extension, or if it does not match the output type, a suitable
 file extension will be added.</p></dd>
+
+<dt><code>&ddash;pipe</code></dt>
+<dd>Indicates that the dvi-file argument is a non-seekable file, such as
+a named pipe</dd>
 
 <dt><code>-p, &ddash;start-page=num</code>,
 <code>-l, &ddash;end-page=num</code>,

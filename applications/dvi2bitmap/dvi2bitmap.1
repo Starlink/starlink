@@ -19,7 +19,15 @@ system, converting each page to a single bitmap.
 This program is intended to conform to the DVI processing standard.
 .PP
 The principal documentation for this package is in the HTML document
-distributed with it.  This man-page may differ from the documentation there.
+distributed with it.  This man-page may differ from the documentation
+there.
+.PP
+The 
+.I dvi-file
+argument is the name of a DVI file to be converted to a bitmap.
+dvi2bitmap looks for the file both with and without the default
+extension
+.I .dvi
 .SS OPTIONS
 .PP
 Various of the options below have common syntax features.
@@ -202,6 +210,10 @@ a TeX
 embedded in the DVI file (see below).  If there is no 
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
+.TP
+.I --pipe
+Indicates that the dvi-file argument is a non-seekable file, such as
+a named pipe
 .TP
 .I "-p, --start-page=num"
 .TP
