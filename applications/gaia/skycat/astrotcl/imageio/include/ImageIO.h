@@ -31,7 +31,7 @@
 
 #include <iostream.h>
 #include <math.h>
-#include "WCS.h"
+#include "WCS.hxx"
 #include "Mem.h"
 
 

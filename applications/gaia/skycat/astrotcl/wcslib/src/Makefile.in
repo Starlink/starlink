@@ -21,13 +21,13 @@ TOPDIR      	= @DESTDIR@
 LIBDIR      	= @LIBDIR@
 DEPEND_TARGET	= @DEPEND_TARGET@
 
-SRCS 		=  HMS.C ImageCoords.C SAOWCS.C WCS.C WorldCoords.C cel.c cotr.c \
+SRCS 		=  HMS.C ImageCoords.C SAOWCS.C WCSCPP.C WorldCoordsCPP.C cel.c cotr.c \
 		   dsspos.c fitsfile.c hget.c hput.c iget.c imio.c iraf2fits.c \
 		   jprec.c lin.c platepos.c proj.c slasubs.c \
 		   sph.c tnxpos.c trigod.c wcs.c wcscon.c wcsinit.c wcslib.c wcstrig.c \
 	 	   worldCoords.C worldpos.c
 
-OBJS 		=  HMS.o ImageCoords.o SAOWCS.o WCS.o WorldCoords.o cel.o cotr.o \
+OBJS 		=  HMS.o ImageCoords.o SAOWCS.o WCSCPP.o WorldCoordsCPP.o cel.o cotr.o \
 		   dsspos.o fitsfile.o hget.o hput.o iget.o imio.o iraf2fits.o \
 		   jprec.o lin.o platepos.o proj.o slasubs.o \
 		   sph.o tnxpos.o trigod.o wcs.o wcscon.o wcsinit.o wcslib.o wcstrig.o \

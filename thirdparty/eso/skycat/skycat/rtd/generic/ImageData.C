@@ -57,7 +57,7 @@ static const char* const rcsId="@(#) $Id: ImageData.C,v 1.36 1999/03/22 21:42:02
 #include <iostream.h>
 #include "error.h"
 #include "define.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 #include "fitshead.h"
 #include "NativeImageData.h"
 #include "ByteImageData.h"

@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include "Mem.h"
 #include "error.h"
-#include "WorldCoords.h"
+#include "WorldCoords.hxx"
 #include "QueryResult.h"
 
 /* 

@@ -34,7 +34,7 @@
 
 
 #include <sys/types.h>
-#include "WCS.h"
+#include "WCS.hxx"
 #include "LookupTable.h"
 #include "ImageIO.h"
 #include "ImageDisplay.h"

@@ -29,7 +29,7 @@ static const char* const rcsId="@(#) $Id: LookupTable.C,v 1.10 1999/03/22 21:42:
 #include "define.h"
 #include "error.h"
 #include "LookupTable.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 
 // borrowed this from saoimage
 extern "C" {

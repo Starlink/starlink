@@ -38,7 +38,7 @@ static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.28 1999/10/25 11:42:03 ab
 #include "SAOWCS.h"
 #include "Compress.h"
 #include "Mem.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 
 // size of a FITS block
 enum {FITSBLOCK=2880};

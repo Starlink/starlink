@@ -24,7 +24,7 @@
 #include "Mem.h"
 #include "rtdImageEvent.h"
 #include "tk.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 #include "Compress.h"
 #include "rtdSem.h"
 #include "config.h"

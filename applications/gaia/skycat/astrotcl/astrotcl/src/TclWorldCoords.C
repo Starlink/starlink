@@ -19,7 +19,7 @@ static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.2 1998/01/29 22:2
 #include <iostream.h>
 #include <stdlib.h>
 #include <strstream>
-#include "WorldCoords.h"
+#include "WorldCoords.hxx"
 #include "TclWorldCoords.h"
 
 

@@ -13,7 +13,7 @@
 #include <iostream.h>
 #include <stdlib.h>
 #include "error.h"
-#include "WorldCoords.h"
+#include "WorldCoords.hxx"
 
 main() 
 {

@@ -24,7 +24,7 @@
 
 
 #include "RtdImage.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 
 /*
  * Class Skycat

@@ -33,7 +33,7 @@ static const char* const rcsId="@(#) $Id: Skycat.C,v 1.18 1999/03/11 21:01:05 ab
 #include "config.h"
 #include "SkySearch.h"
 #include "TcsSkySearch.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 #include "Skycat.h"
 
 // generated code for bitmaps used in tcl scripts

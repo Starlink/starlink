@@ -23,8 +23,8 @@
  */
 
 
-#include "WCS.h"
-#include "WorldCoords.h"
+#include "WCS.hxx"
+#include "WorldCoords.hxx"
 #include "wcs.h"
 
 /* 

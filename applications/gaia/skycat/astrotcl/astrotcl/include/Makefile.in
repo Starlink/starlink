@@ -9,7 +9,7 @@
 TOPDIR      	= @DESTDIR@
 INCDIR      	= @INCDIR@
 
-SRCS 		=  TclWorldCoords.h
+SRCS 		=  TclWorldCoords.hxx
 
 INSTALL  	= @INSTALL@
 INSTALL_DATA  	= @INSTALL_DATA@
