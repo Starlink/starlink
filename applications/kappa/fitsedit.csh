@@ -35,7 +35,7 @@
 #        This allows editing of the FITS headers in the NDF called m51b.
 #
 #  Related Applications:
-#     KAPPA: FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
+#     KAPPA: FITSMOD, FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
 #
 #  Authors:
 #     Malcolm J. Currie (STARLINK)

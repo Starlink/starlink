@@ -8803,7 +8803,7 @@ the editor.  If this variable is undefined vi is assumed.
 editing; and then replaces the former FITS extension with the
 modified version, performing some validation at this stage.
 2 Related_Applications
-   KAPPA: FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
+   KAPPA: FITSMOD, FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
 2 Authors
 Malcolm J. Currie (STARLINK)
 David S. Berry (DSB):
