@@ -548,8 +548,8 @@
 *  Obtain the length in characters of the component and map its values.
                 CALL DAT_LEN( CLOC, STRLEN, STATUS )
                 CALL DAT_MAPV( CLOC, CTYPE, 'READ', OPNTR, EL, STATUS )
-*                CALL CON_TRCHA( NULL, ' ', EL, %VAL( OPNTR ), STATUS,
-*     :                          %VAL( STRLEN ) )
+*                CALL CON_TRCHA( NULL, ' ', EL, %VAL(CNF_PVAL( OPNTR )),
+*     :                          STATUS, %VAL( STRLEN ) )
 
 *  Transfer the values to the binary-table column.
                 CALL FTPCLS( FUNIT, I, 1, 1, EL, 
