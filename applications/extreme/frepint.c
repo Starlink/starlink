@@ -25,11 +25,11 @@
 *     a function name and not an array name.  Only single literal integers
 *     as actual arguments are thus replaced, so that, e.g. the code
 *
-*        L = XXX1_FUNC( X, Y, Z, 0, 3 * 5, STATUS )
+*        L = PKG1_FUNC( X, Y, Z, 0, 3 * 5, STATUS )
 *
 *     will be replaced by 
 *
-*        L = XXX1_FUNC( X, Y, Z, EXT__0, 3 * 5, STATUS )
+*        L = PKG1_FUNC( X, Y, Z, EXT__0, 3 * 5, STATUS )
 *
 *     Attention is paid to fortran 77 source format, so that lines
 *     more than 72 characters long are avoided (unless they were there
