@@ -152,9 +152,15 @@ int main (int argc, char **argv)
 
     try {
 	string cmd = "./t1.sh LOGNAME HOME T TT";
-#ifdef HAVE_SETENV
+#if defined(HAVE_SETENV) && HAVE_DECL_SETENV
+        setenv("TT", "test", 1);
+#elif defined(HAVE_PUTENV) && HAVE_DECL_PUTENV
+        putenv((char*)"TT=test");
+#elif defined(HAVE_SETENV)
+	int setenv(const char* name, const char *value, int overwrite);
         setenv("TT", "test", 1);
 #elif defined(HAVE_PUTENV)
+	int putenv(const char* string);
         putenv((char*)"TT=test");
 #else
 #error "Can't set environment variables"
