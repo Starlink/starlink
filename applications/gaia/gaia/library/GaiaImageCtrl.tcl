@@ -655,20 +655,10 @@ itcl::class gaia::GaiaImageCtrl {
    #  temporary files are retained until all instances are released).
    private method only_user_ {} {
       global ::tcl_version
-      if { $tcl_version >= 8.0 } {
-         foreach inst [itcl::find objects "*" -isa "GaiaImageCtrl"] {
-            if { $inst != $this } {
-               if { $last_file_ == [$inst cget -file] } {
-                  return 0
-               }
-            }
-         }
-      } else {
-         foreach inst [info objects "*" -isa "GaiaImageCtrl"] {
-            if { $inst != $this } {
-               if { $last_file_ == [$inst cget -file] } {
-                  return 0
-               }
+      foreach inst [itcl::find objects "*" -isa "GaiaImageCtrl"] {
+         if { $inst != $this } {
+            if { $last_file_ == [$inst cget -file] } {
+               return 0
             }
          }
       }

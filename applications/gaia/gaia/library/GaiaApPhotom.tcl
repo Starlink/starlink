@@ -156,6 +156,8 @@
 #        a named file.
 #     24-MAY-2000 (PWD):
 #        Added changes so that user can disable exit confirmation.
+#     02-MAY-2003 (PWD):
+#        Added automatic measurement of apertures.
 #     {enter_further_changes_here}
 #-
 
@@ -195,8 +197,8 @@ itcl::class gaia::GaiaApPhotom {
       #  Add tab window for revealing the aperture details,
       #  measurement parameters and possible all results.
       itk_component add TabNoteBook {
-	  iwidgets::tabnotebook $w_.tab \
-	      -angle 0 -tabpos n -width 350 -height 450
+          iwidgets::tabnotebook $w_.tab \
+              -angle 0 -tabpos n -width 350 -height 450
       }
 
       #  Add pane for current aperture details.
@@ -254,14 +256,7 @@ itcl::class gaia::GaiaApPhotom {
                            -coupled $itk_option(-coupled)]
 
       #  Now inform details widget of this name!
-      #  (allan: 21.1.99 added tcl8 check)
-      if {$tcl_version >= 8.0} {
-	  $itk_component(ObjectDetails) configure \
-	      -object_list [code $object_list_]
-      } else {
-	  $itk_component(ObjectDetails) configure \
-	      -object_list [scope $object_list_]
-      }
+      $itk_component(ObjectDetails) configure -object_list [code $object_list_]
 
       #  Create a GaiaPhotomExtras object to deal with any additional
       #  parameters for autophotom.
@@ -346,6 +341,15 @@ itcl::class gaia::GaiaApPhotom {
       add_menu_short_help $Options {Keep apertures same size} \
          {Toggle to keep all apertures the same size}
 
+      #  Whether to measure aperture immediately.
+      $Options add checkbutton \
+         -label {Measure immediately} \
+         -variable [scope auto_measure_] \
+         -onvalue 1 \
+         -offvalue 0
+      add_menu_short_help $Options {Measure immediately} \
+         {Perform measurements immediately after aperture creation}
+
       #  Control of various colours.
       make_colours_menu_ $Colours
 
@@ -367,7 +371,7 @@ itcl::class gaia::GaiaApPhotom {
          LabelFileChooser $w_.results \
             -labelwidth 8 \
             -text "Results:" \
-	    -value "GaiaPhotomLog.Dat"
+            -value "GaiaPhotomLog.Dat"
       }
       add_short_help $itk_component(Results) \
          {Name of file that "Save" and "Append" buttons use}
@@ -434,20 +438,20 @@ itcl::class gaia::GaiaApPhotom {
       #  Save measurements to the results file.
       itk_component add SaveFrame {frame $w_.save}
       itk_component add Save {
-	  button $itk_component(SaveFrame).save \
-	      -text {Save} \
-	      -width 20 \
-	      -command [code $this save_results]
+          button $itk_component(SaveFrame).save \
+              -text {Save} \
+              -width 20 \
+              -command [code $this save_results]
       }
       add_short_help $itk_component(Save) \
          {Save current measurements to results file}
 
       #  Append measurements to the results files.
       itk_component add Append {
-	  button $itk_component(SaveFrame).append \
-	      -text {Append} \
-	      -width 20 \
-	      -command [code $this append_results]
+          button $itk_component(SaveFrame).append \
+              -text {Append} \
+              -width 20 \
+              -command [code $this append_results]
       }
       add_short_help $itk_component(Append) \
          {Append current measurements to results file}
@@ -461,7 +465,7 @@ itcl::class gaia::GaiaApPhotom {
       pack $itk_component(Results) -side top -fill x -ipadx 1m -ipady 1m
       pack $itk_component(TabNoteBook) -fill both -expand 1
       pack $itk_component(ObjectDetails) -fill both -expand true \
-	  -pady 2 -padx 2
+          -pady 2 -padx 2
       pack $itk_component(Extras) -fill both -expand true -pady 2 -padx 2
 
       pack $itk_component(Define) -side top -fill x  -pady 2 -padx 2
@@ -495,7 +499,7 @@ itcl::class gaia::GaiaApPhotom {
          set autophotom_ {}
       }
       if { $namer_ != {} } { 
-	 catch {delete object $namer_}
+         catch {delete object $namer_}
       }
    }
 
@@ -558,13 +562,13 @@ itcl::class gaia::GaiaApPhotom {
    #  Read and display positions from a PHOTOM file.
    method read_file {{filename ""} {update 0}} {
       if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Choose PHOTOM file"]
-	 if {[$w activate]} {
-	    $object_list_ read_file [$w get] $update
-	 }
-	 destroy $w
+         set w [FileSelect .\#auto -title "Choose PHOTOM file"]
+         if {[$w activate]} {
+            $object_list_ read_file [$w get] $update
+         }
+         destroy $w
       } else {
-	 $object_list_ read_file $filename $update
+         $object_list_ read_file $filename $update
       }
    }
 
@@ -575,7 +579,7 @@ itcl::class gaia::GaiaApPhotom {
             #  Start autophotom application.
             global env
             set autophotom_ [GaiaApp \#auto -application \
-		                $env(PHOTOM_DIR)/autophotom \
+                                $env(PHOTOM_DIR)/autophotom \
                                 -notify [code $this measured_objects]]
          }
          if { $usemags_ } {
@@ -585,8 +589,8 @@ itcl::class gaia::GaiaApPhotom {
          }
          set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
-	    $namer_ configure -imagename $image
-	    set image [$namer_ ndfname]
+            $namer_ configure -imagename $image
+            set image [$namer_ ndfname]
 
             #  Get any additional values from itk_component(Extras)
             if { [winfo exists $itk_component(Extras)] } {
@@ -600,11 +604,11 @@ itcl::class gaia::GaiaApPhotom {
                set ok "false"
             }
 
-	    #  If args are given then set the command to be run when
-	    #  the application returns.
-	    if { $args != "" } { 
-	       set complete_cmd_ "$args"
-	    }
+            #  If args are given then set the command to be run when
+            #  the application returns.
+            if { $args != "" } { 
+               set complete_cmd_ "$args"
+            }
 
             #  And run the command.
             blt::busy hold $w_
@@ -619,7 +623,7 @@ itcl::class gaia::GaiaApPhotom {
                skymag=$skymag_ \
                usemags=$ok \
                $more"
-	    
+            
          } else {
             error_dialog "No image is displayed"
          }
@@ -643,13 +647,13 @@ itcl::class gaia::GaiaApPhotom {
    #  Save the measurements to a file.
    method save_objects {{filename ""}} {
       if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
-	 if {[$w activate]} {
-	    $object_list_ write_file [$w get]
-	 }
-	 destroy $w
+         set w [FileSelect .\#auto -title "Write PHOTOM file"]
+         if {[$w activate]} {
+            $object_list_ write_file [$w get]
+         }
+         destroy $w
       } else {
-	 $object_list_ write_file $filename
+         $object_list_ write_file $filename
       }
    }
 
@@ -658,13 +662,13 @@ itcl::class gaia::GaiaApPhotom {
    method append_objects {{filename ""}} {
      set comment "[$itk_option(-rtdimage) fullname]"
      if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
-	 if {[$w activate]} {
-	    $object_list_ append_file $comment [$w get]
-	 }
-	 destroy $w
+         set w [FileSelect .\#auto -title "Write PHOTOM file"]
+         if {[$w activate]} {
+            $object_list_ append_file $comment [$w get]
+         }
+         destroy $w
       } else {
-	 $object_list_ append_file $comment $filename
+         $object_list_ append_file $comment $filename
       }
    }
 
@@ -674,6 +678,9 @@ itcl::class gaia::GaiaApPhotom {
    private method created_object {} {
       toggle_sky_button_
       $itk_component(DefineObject) configure -state normal
+      if { $auto_measure_ } {
+         measure_objects
+      }
    }
    
    #  Toggle the define sky button to reflect the current state.
@@ -692,8 +699,8 @@ itcl::class gaia::GaiaApPhotom {
          $object_list_ read_file GaiaPhotomOut.Dat 1
       }
       if { $complete_cmd_ != {} } { 
-	 eval $complete_cmd_
-	 set complete_cmd_ {}
+         eval $complete_cmd_
+         set complete_cmd_ {}
       }
    }
 
@@ -723,7 +730,7 @@ itcl::class gaia::GaiaApPhotom {
    #  GaiaPhotomList).
    method view {{value ""}} {
       if { $value != "" } {
-	 set view_($this) $value
+         set view_($this) $value
       }
       $object_list_ configure -show_list $view_($this)
    }
@@ -911,6 +918,9 @@ itcl::class gaia::GaiaApPhotom {
 
    #  Name of image control object.
    protected variable namer_ {}
+   
+   #  Whether apertures are automatically measured when created, or not.
+   protected variable auto_measure_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

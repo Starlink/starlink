@@ -51,7 +51,7 @@
 #     10-MAR-1999 (PWD):
 #        Attempt merge of Allan's GAIA plugin differences...
 #     01-MAY-1999 (PWD):
-#        Added contouring photometry toolbox.
+#        Added contouring toolbox.
 #     28-MAY-1999 (PWD):
 #        Added optimal photometry toolbox.
 #     28-JUN-1999 (PWD):

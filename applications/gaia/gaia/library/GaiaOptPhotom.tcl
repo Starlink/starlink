@@ -125,14 +125,16 @@
 #     TopLevelWidget
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     27-MA7-1999 (PDRAPER):
+#     27-MA7-1999 (PWD):
 #        Original version.
 #     24-MAY-2000 (PWD):
 #        Added changes so that user can disable exit confirmation.
+#     02-MAY-2003 (PWD):
+#        Added option to make measurements immediately.
 #     {enter_further_changes_here}
 #-
 
@@ -335,6 +337,15 @@ itcl::class gaia::GaiaOptPhotom {
          -command [code $this sky_method_changed psf]
       add_menu_short_help $Options {Use annular sky regions}  \
          {Toggle to define sky in detached apertures for PSF star}
+
+      #  Whether to measure aperture immediately.
+      $Options add checkbutton \
+         -label {Measure immediately} \
+         -variable [scope auto_measure_] \
+         -onvalue 1 \
+         -offvalue 0
+      add_menu_short_help $Options {Measure immediately} \
+         {Perform measurements immediately after aperture creation}
 
       #  Control of various colours.
       make_colours_menu_ $Colours
@@ -610,7 +621,7 @@ itcl::class gaia::GaiaOptPhotom {
    }
 
    #  Measure the current objects. Note we need the PSF object first.
-   method measure_objects {} {
+   method measure_objects { {silent 0} } {
       if { [$psf_list_ write_file "GaiaPhotomIn.Dat"] } { 
          if { [$object_list_ append_file "" "GaiaPhotomIn.Dat"] } {
          
@@ -657,13 +668,19 @@ itcl::class gaia::GaiaOptPhotom {
                    usemags=$ok \
                   $more"
             } else {
-               error_dialog "No image is displayed"
+               if { ! $silent } { 
+                  error_dialog "No image is displayed"
+               }
             }
          } else {
-            error_dialog "You need to define some object positions"
+            if { ! $silent } {
+               error_dialog "You need to define some object positions"
+            }
          }
       } else {
-         error_dialog "You need to define a PSF object"
+         if { ! $silent } {
+            error_dialog "You need to define a PSF object"
+         }
       }
    }
 
@@ -718,6 +735,9 @@ itcl::class gaia::GaiaOptPhotom {
    private method created_object {} {
       toggle_sky_button_
       $itk_component(DefineObject) configure -state normal
+      if { $auto_measure_ } {  
+         measure_objects 1
+      }
    }
 
    #  Toggle the object define sky button to reflect the current state.
@@ -729,12 +749,14 @@ itcl::class gaia::GaiaOptPhotom {
       }
    }
 
-
    #  Notification that the define_object method has been
    #  completed for a PSF object. 
    private method created_psf {} {
       toggle_psf_sky_button_
       $itk_component(DefinePSF) configure -state normal
+      if { $auto_measure_ } {  
+         measure_objects 1
+      }
    }
 
    #  Toggle the PSF define sky button to reflect the current state.
@@ -1015,6 +1037,9 @@ itcl::class gaia::GaiaOptPhotom {
 
    #  Object to deal with image names.
    protected variable namer_ {}
+
+   #  Whether apertures are automatically measured when created, or not.
+   protected variable auto_measure_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

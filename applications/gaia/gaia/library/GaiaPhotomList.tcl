@@ -216,15 +216,15 @@
 #     This widget inherits no other classes.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     12-MAR-1996 (PDRAPER):
+#     12-MAR-1996 (PWD):
 #        Original version.
-#     8-JUL-1996 (PDRAPER):
+#     8-JUL-1996 (PWD):
 #        Converted to itcl2.0.
-#     29-MAY-1999 (PDRAPER):
+#     29-MAY-1999 (PWD):
 #        Added changes to support optimal photometry.
 #     {enter_further_changes_here}
 
@@ -746,12 +746,7 @@ itcl::class gaia::GaiaPhotomList {
          if { $selected_ != {} && [info exists objects_($selected_)] } {
             set id [$objects_($selected_) canvas_id]
             if { "$id" != "" } {
-	       # allan: 21.1.99, added tcl8 check
-	       if {$tcl_version >= 8.0} {
-                  $details update_display [code $objects_($selected_)]
-	       } else {
-                  $details update_display [scope $objects_($selected_)]
-               }
+               $details update_display [code $objects_($selected_)]
             }
          } else {
             # Reset details.

@@ -114,12 +114,8 @@ itcl::class gaia::StarArdAnnList {
                 -scale $scale]
 
          #  Make sure base classes can use these objects in their
-         #  namespaces. (allan: 21.1.99 added tcl8 check)
- 	 if {$tcl_version >= 8.0} {
-	    set objects_($selected_) [code $local_objects_($selected_)]
-	 } else {
-         set objects_($selected_) [scope $local_objects_($selected_)]
-	 }
+         #  namespaces.
+         set objects_($selected_) [code $local_objects_($selected_)]
 
          #  Create with or without resizing as appropriate.
          if { $resize } { 

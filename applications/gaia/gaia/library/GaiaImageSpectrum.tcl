@@ -94,9 +94,8 @@ itcl::class gaia::GaiaImageSpectrum {
    #  Destructor - clean up when deleted.
    destructor {
       global ::tcl_version _
-      if {$tcl_version >= 8.0} {
-         blt::vector destroy $vVector_ $iVector_ $xVector_ $yVector_
-      }
+      blt::vector destroy $vVector_ $iVector_ $xVector_ $yVector_
+
       #  Trap RtdImageSpectrum destructor as vector names do not seem
       #  available at that scope.
       catch {rtd::RtdImageSpectrum::destructor}
@@ -138,22 +137,13 @@ itcl::class gaia::GaiaImageSpectrum {
       regsub -all {\.} v$graph_.iVector _ iVector_
       regsub -all {\.} v$graph_.vVector _ vVector_
 
-      if {$tcl_version >= 8.0} {
-         $graph_ legend config -hide 1
-         if { ! [info exists $xVector_] && ! [info exists $yVector_] &&
-              ! [info exists $iVector_] && ! [info exists $vVector_] } {
-            blt::vector create $vVector_ $iVector_
-            blt::vector create $xVector_ $yVector_
-         }
-         set symbol {}
-      } else {
-         $graph_ legend config -mapped 0
-         if { ! [info exists $xVector_] && ! [info exists $yVector_] &&
-              ! [info exists $iVector_] && ! [info exists $vVector_] } {
-            uplevel #0 "blt::vector $xVector_ $yVector_ $vVector_ $iVector_"
-         }
-         set symbol none
+      $graph_ legend config -hide 1
+      if { ! [info exists $xVector_] && ! [info exists $yVector_] &&
+           ! [info exists $iVector_] && ! [info exists $vVector_] } {
+         blt::vector create $vVector_ $iVector_
+         blt::vector create $xVector_ $yVector_
       }
+      set symbol {}
       $graph_ element create elem -xdata $iVector_ -ydata $vVector_ -symbol $symbol
 
       # plot the distribution of pixel values
