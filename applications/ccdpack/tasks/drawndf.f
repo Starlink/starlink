@@ -201,9 +201,21 @@
 *        A group of attribute settings describing the plotting style 
 *        to use for the outlines and annotated axes.  This should be
 *        a string consisting of comma-separated `attribute=value'
-*        items, as explained in the `Plotting Styles and Attributes'
+*        items; as explained in the `Plotting Styles and Attributes'
 *        section of SUN/95, except that colours may only be specified
 *        by number, and not by name.
+*
+*        Some attributes which it may be useful to set are the following
+*        (default values given in square brackets):
+*           - width(curves)   -- the thickness of outlines drawn [1]
+*           - colour(curves)  -- colour of the outlines (if PENROT is 
+*                                true, serves as starting value) [1]
+*           - size(strings)   -- font size of text labels [1]
+*           - colour(strings) -- colour of text labels [1]
+*           - colour          -- colour of everything plotted
+*                                (including axes and axis labels) [1]
+*           - grid            -- whether to draw a grid (1=yes, 0=no) [0]
+*
 *        [""]
 *     USESET = _LOGICAL (Read)
 *        If the pen colour is being rotated because PENROT is true,
@@ -362,7 +374,6 @@
       INTEGER MAP                ! AST identifier for a mapping
       INTEGER MAPICK             ! AST identifier for picked frames mapping
       INTEGER MAPU               ! AST identifier for unit mapping
-      INTEGER MLW                ! Line width for drawing origin dot
       INTEGER NAXES              ! Number of axes (dimensions) in a frame
       INTEGER NDIM               ! Number of returned dimensions
       INTEGER NFRM               ! Number of frames in frameset
@@ -984,7 +995,6 @@
 *  Set the size of the marker to plot at the origin (a fraction of a
 *  character height, specified in units of 1/200 inches).
       CALL PGQCS( 1, XCH, YCH )
-      MLW = MAX( 1, INT( MIN( 2D2, XCH * 2D2 * 0.2D0 ) ) )
 
 *  Set the length of the offset vector for text labels.
       CALL PGQCS( 4, XCH, YCH )
@@ -1021,10 +1031,7 @@
 
 *  Plot a marker at the origin of each outline.
             IF ( LABDOT ) THEN
-               CALL PGQLW( LW )
-               CALL PGSLW( MLW )
-               CALL AST_MARK( PLOT, 1, 2, 5, VERTEX, -1, STATUS )
-               CALL PGSLW( LW )
+               CALL AST_MARK( PLOT, 1, 2, 5, VERTEX, 24, STATUS )
             END IF
 
 *  Plot geodesics in the GRID-like coordinate system along the edges
