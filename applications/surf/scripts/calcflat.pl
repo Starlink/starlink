@@ -12,8 +12,8 @@
 
 use PDL;
 use PDL::JAC::Timj qw/:Func/;
-use PDL::Io::NDF qw/:Func/;
-use PDL::Graphics::PG;
+use PDL::IO::NDF qw/:Func/;
+use PDL::Graphics::PGPLOT;
 use NDF;
 
 use Term::ReadLine;
