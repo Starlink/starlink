@@ -1,0 +1,40 @@
+C+
+C     P A R B L K
+C
+C     Parameter system common definition
+C
+C     COM      (Character) Command name
+C     ABORT    (Logical)   Indicates abort requested.
+C     BATCH    (Logical)   Indicates batch mode or not.
+C
+C                                  KS / CIT 1st June 1984
+C     Modified:
+C
+C     1st June 1984.   KS / CIT  Original version.
+C     17th Sept 1985.  KS / AAO  Maximum number of parameters put
+C                      up to 40 from 30.
+C     2nd  May  1986.  KS / AAO  CPARMS added.
+C     13th May  1986.  KS / AAO  PROMPTS added.
+C     2nd June  1986.  KS / AAO  OUTCHAN,OUTFLAG,PARLU,COMCHAN,
+C                      COMFLAG added.
+C     1st Sept  1988.  KS / AAO  ABORT added.
+C     20th Jan  1989.  KS / AAO. Parameters up to 60, internal REAL 
+C                      variables now held as DOUBLE.  Message buffer
+C                      variables added.
+C     3rd March 1991.  KS / AAO. Variables to support repeated input 
+C                      from file added.
+C     11th Mar  1991.  KS / AAO. VPTR added to common.
+C     13th Aug  1992.  HME / UoE, Starlink. Reduce to contain only the
+C                      command name and abort flag.
+C     18th Nov  1992.  HME / UoE, Starlink. Add the batch mode flag.
+C     26th Jul  1994.  HME / UoE, Starlink. Make common blocks SAVE.
+C-
+      CHARACTER COM*16
+      LOGICAL   ABORT
+      LOGICAL   BATCH
+C
+      COMMON /PARBLC/ COM
+      COMMON /PARBLK/ ABORT,BATCH
+      SAVE /PARBLC/
+      SAVE /PARBLK/
+C
