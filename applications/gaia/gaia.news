@@ -4,9 +4,8 @@
   a new toolbox and various enhancements.
 
   The new toolbox displays maps of polarization vectors as produced by
-  the Starlink POLPACK package (SUN/223). It also provides
-  manipulation facilities for selecting map sub-sets and allows the
-  map to be re-binned.
+  the Starlink POLPACK package (SUN/223). It also provides manipulation
+  facilities for selecting map sub-sets and allows the map to be re-binned.
 
   Additional minor changes are:
 
@@ -32,28 +31,28 @@
      - The contour toolbox now has new options to use a single colour
        and/or width for all lines.
 
-     - The contour toolbox now has new option for adding customised
+     - The contour toolbox now has a new option for adding customised
        colours (RGB/CMY/HSV or standard X11) to its drop-down lists.
 
      - You can now get a copy of the colour ramp, annotated with
        levels, for inclusion in diagrams.
 
-     - Importing plain text files of values is now also available as an
-       option for normal catalogue windows (previous this option just
+     - Importing plain text files of values is now available as an
+       option for normal catalogue windows (previously this option just
        imported files into the positions toolbox). This allows files
        that have space, comma, semi-colon and tab separated fields to be
        read, as well as files with fixed-width columns.
 
-     - The conflict with the CURSA setup for the SKYCAT_CONFIG
-       environment variable is now resolved by ignoring
-       SKYCAT_CONFIG. This was causing GAIA to lock up when used behind 
-       web proxy that had not been configured.
+     - The conflict with the CURSA setup for the SKYCAT_CONFIG environment
+       variable is now resolved by ignoring SKYCAT_CONFIG. This was
+       causing GAIA to lock up when used behind a web proxy that had not
+       yet been configured.
 
      - The UKSTU plate library has been removed from the default
-       catalogue list. This facility is no longer unavailable.
+       catalogue list. This facility is no longer available.
 
-     - The "failed to register the shmem:// driver" warning message
-       should now be silent.
+     - The irritating "failed to register the shmem:// driver" warning
+       message should now be silent.
 
      - The pan window should now work with very thin images (1 pixel wide).
 
@@ -72,15 +71,16 @@
        at.
 
      - All image access (that is NDFs and FITS files) is now
-       performed using file mapping. A consequence of this is that 
+       performed using file mapping. A consequence of this is that
        GAIA will now display images up to 2Gb in size on machines with
        more modest physical memory allocations (a 256Mb Linux PC will
-       display such images comfortably). Note that if you attempt this
+       display such images comfortably, but note that any analysis
+       operations may need much more memory). If you attempt this
        you will still require a system whose virtual memory size is
        bigger than 2Gb.
 
      - An error in the RMS fitting estimate for the astrometric
-       toolboxes has been corrected. Previous RMS values were all 
+       toolboxes has been corrected. Previous RMS values were all
        underestimates by a factor 1/sqrt(number_of_positions).
 
   To try out GAIA for yourself type the following command:
@@ -93,7 +93,7 @@
 
       gaia@star.rl.ac.uk
 
-  Peter W. Draper (P.W.Draper@durham.ac.uk) and 
+  Peter W. Draper (P.W.Draper@durham.ac.uk) and
   David S. Berry (dsb@ast.man.ac.uk, Polarimetry toolbox)
 
-  6th April 2001.
+  11th May 2001.

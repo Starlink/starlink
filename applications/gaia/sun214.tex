@@ -1074,14 +1074,14 @@ This is a minor update to GAIA with the following fixes:
      \item The contour toolbox now has new options to use a single colour
        and/or width for all lines.
 
-     \item The contour toolbox now has new option for adding customised
+     \item The contour toolbox now has a new option for adding customised
        colours (RGB/CMY/HSV or standard X11) to its drop-down lists.
 
      \item You can now get a copy of the colour ramp, annotated with
        levels, for inclusion in diagrams.
 
-     \item Importing plain text files of values is now also available as an
-       option for normal catalogue windows (previous this option just
+     \item Importing plain text files of values is now available as an
+       option for normal catalogue windows (previously this option just
        imported files into the positions toolbox). This allows files
        that have space, comma, semi-colon and tab separated fields to be
        read, as well as files with fixed-width columns.
@@ -1089,13 +1089,14 @@ This is a minor update to GAIA with the following fixes:
      \item The conflict with the \xref{CURSA}{sun190}{} setup for the
        \verb+SKYCAT_CONFIG+ environment variable is now resolved by ignoring
        \verb+SKYCAT_CONFIG+. This was causing GAIA to lock up when used behind 
-       web proxy that had not been configured.
+       a web proxy that had not been configured.
 
      \item The UKSTU plate library has been removed from the default
-       catalogue list. This facility is no longer unavailable.
+       catalogue list. This facility is no longer available.
 
-     \item The \verb+failed to register the shmem:// driver+ warning message
-       should now be silent.
+     \item The irritating 
+           \verb+failed to register the shmem:// driver+ 
+       warning message should now be silent.
 
      \item The pan window should now work with very thin images (1 pixel wide).
 
@@ -1117,7 +1118,8 @@ This is a minor update to GAIA with the following fixes:
        performed using file mapping. A consequence of this is that 
        GAIA will now display images up to 2Gb in size on machines with
        more modest physical memory allocations (a 256Mb Linux PC will
-       display such images comfortably). Note that if you attempt this
+       display such images comfortably, but note that any analysis
+       operations may need much more memory). If you attempt this
        you will still require a system whose virtual memory size is
        bigger than 2Gb.
 \end{itemize}
