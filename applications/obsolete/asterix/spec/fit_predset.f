@@ -137,11 +137,14 @@
 *  Grouping? Set up array for grouped predicted model data
       DO I = 1, 2
         IF ( OBDAT.GFLAG ) THEN
-          CALL DYN_MAPR( 1, OBDAT.NGDAT, PREDDAT.GDPTR(I), STATUS )
+          CALL DYN_MAPR( 1, OBDAT.NGDAT, PREDDAT.PGDPTR(I), STATUS )
         ELSE
-          PREDDAT.GDPTR(I) = PREDDAT.PREDPTR(I)
+          PREDDAT.PGDPTR(I) = PREDDAT.PREDPTR(I)
         END IF
       END DO
+      IF ( OBDAT.GFLAG ) THEN
+        CALL DYN_MAPR( 1, OBDAT.NGDAT, PREDDAT.GDPTR, STATUS )
+      END IF
 
 *  Exit
  99   IF ( STATUS .NE. SAI__OK ) THEN
