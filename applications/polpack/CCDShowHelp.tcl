@@ -85,7 +85,6 @@
 	    } 
 	    if { $mosaicpid == 0 } {
 	       exec  $CCDbrowser $url &
-               Message "Starting up $CCDbrowser"
 	    }
 	 }
 
@@ -101,8 +100,6 @@
             if { $netscapepid == 0 } { 
                if { [catch { set netscapepid [exec $CCDbrowser $url &]} mess] } {
                   Message "Failed to start $CCDbrowser - $mess"
-               } {               
-                  Message "Starting up $CCDbrowser"
                }
 	    }
 	 }

@@ -32,6 +32,8 @@
 #        Proc OEMapping changed to avoid expensive search for a default
 #        OEMapping if supplied image has no OEMap. A Default OEMapping is
 #        now stored in global DEF_OEMAP.
+#     29-APR-1999 (DSB):
+#        Added proc SendBack and modified proc exit to call SendBack.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -5456,17 +5458,12 @@ proc exit {args} {
       unset env(AGI_USER)
    }
 
-# We now exit by destroying the main window. We do not use the built -in
-# Tcl "exit" command because "exit" kills the current process, which would 
-# result in the a-task dying in an uncontrolled manner. Note,
-# "adamtask.tcl" may have set up a binding which causes this procedure ("exit")
-# to be called when the main window is destroyed. This would put us into
-# an infinite loop, so delete any <Destroy> binding first.
-   bind . <Destroy> ""
-   destroy .
+# Send the current options values back to the a-task by writing them to
+# the communications file.
+   SendBack
 
-# If we were not actiavted from the polka atask, kill the current process.
-   if { !$ATASK } { tcl_exit }
+# Finally, kill the current process.
+   tcl_exit
 }
 
 proc Extension {ndf comp type value old} {
@@ -7897,7 +7894,7 @@ proc LoadOptions {} {
 #     LoadOptions
 #
 #  Purpose:
-#     Copy the option values supplied by the polka atask (if any)
+#     Copy the option values supplied in the communications file (if any)
 #     to global variables where they can be access and modified.
 #
 #  Arguments:
@@ -11707,6 +11704,75 @@ proc SelectFont {font} {
 
 # Return the font.
    return $rfont
+}
+
+proc SendBack {} {
+#+
+#  Name:
+#     SendBack
+#
+#  Purpose:
+#     Writes the names and values of the global variables holding the
+#     a-task options values to a text file. This procedure should be
+#     called prior to exiting the Polka Tcl script. The a-task will 
+#     read the values in the file and store them in its HDS parameter
+#     file.
+#
+#  Arguments:
+#     None.
+#
+#  Globals:
+#    COMFILE (Read)
+#       The name of the text file in which to store the values of the global
+#       variables to be passed back to the a-task. 
+#
+#-
+   global COMFILE
+   global ATASK_SKYOFF
+   global ATASK_XHAIR
+   global ATASK_HAREA
+   global ATASK_SAREA
+   global ATASK_PSF  
+   global ATASK_SKYPAR
+   global ATASK_SI   
+   global ATASK_VIEW 
+   global ATASK_BADCOL
+   global ATASK_CURCOL
+   global ATASK_REFCOL
+   global ATASK_SELCOL
+   global ATASK_XHRCOL
+   global ATASK_FIT  
+   global ATASK_OEFIT
+   global ATASK_PLO  
+   global ATASK_PHI  
+   global ATASK_POLMODE
+
+   if { $COMFILE != "" } { 
+
+      set fd [open $COMFILE "w"]
+
+      if { [info exists ATASK_SKYOFF] }  { puts $fd "ATASK_SKYOFF $ATASK_SKYOFF"}
+      if { [info exists ATASK_XHAIR] }   { puts $fd "ATASK_XHAIR $ATASK_XHAIR"}
+      if { [info exists ATASK_HAREA] }   { puts $fd "ATASK_HAREA $ATASK_HAREA"}
+      if { [info exists ATASK_SAREA] }   { puts $fd "ATASK_SAREA $ATASK_SAREA"}
+      if { [info exists ATASK_PSF] }     { puts $fd "ATASK_PSF $ATASK_PSF"}
+      if { [info exists ATASK_SKYPAR] }  { puts $fd "ATASK_SKYPAR $ATASK_SKYPAR"}
+      if { [info exists ATASK_SI] }      { puts $fd "ATASK_SI $ATASK_SI"}
+      if { [info exists ATASK_VIEW] }    { puts $fd "ATASK_VIEW $ATASK_VIEW"}
+      if { [info exists ATASK_BADCOL] }  { puts $fd "ATASK_BADCOL $ATASK_BADCOL"}
+      if { [info exists ATASK_CURCOL] }  { puts $fd "ATASK_CURCOL $ATASK_CURCOL"}
+      if { [info exists ATASK_REFCOL] }  { puts $fd "ATASK_REFCOL $ATASK_REFCOL"}
+      if { [info exists ATASK_SELCOL] }  { puts $fd "ATASK_SELCOL $ATASK_SELCOL"}
+      if { [info exists ATASK_XHRCOL] }  { puts $fd "ATASK_XHRCOL $ATASK_XHRCOL"}
+      if { [info exists ATASK_FIT] }     { puts $fd "ATASK_FIT $ATASK_FIT"}
+      if { [info exists ATASK_OEFIT] }   { puts $fd "ATASK_OEFIT $ATASK_OEFIT"}
+      if { [info exists ATASK_PLO] }     { puts $fd "ATASK_PLO $ATASK_PLO"}
+      if { [info exists ATASK_PHI] }     { puts $fd "ATASK_PHI $ATASK_PHI"}
+      if { [info exists ATASK_POLMODE] } { puts $fd "ATASK_POLMODE $ATASK_POLMODE"}
+      
+      close $fd
+
+   }
 }
 
 proc Seq {com delay id count} {

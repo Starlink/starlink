@@ -7,37 +7,23 @@
 #     The main polka tcl script.
 #
 #  Invocation:
-#     1) From the command line:
-#        Polka.tcl <in> <stokes> <out_O> [ <out_E> ]
-#
-#     2) From the polka A-task. 
-#        See the polka A-task documentation.
+#     Polka.tcl comfile
 #
 #  Command Line Arguments:
-#     in    - A list of input images.
-#     stokes- The name of the output cube to hold STokes parameters. 
-#             Not produced if a null value supplied.
-#     out_O - A list of O-ray output images. Not produced if a null value 
-#             supplied.
-#     out_E - An optional list of E-ray output images. If not supplied,
-#             then Polka functions in single-beam mode. If supplied, but
-#             null, then Polka functions in dual-beam mode but throws the 
-#             E-ray output images away. 
-#  
-#  Command Line Examples:
-#
-#     Polka.tcl "a b" "stok" "a_O b_O" "a_E b_E"
-#
-#        Extracts O and E ray areas from the two input images "a" and "b",
-#        aligns them, and stores the O-ray areas in images "a_O" and "b_O",
-#        and the E-ray areas in images "b_O" and "b_E" (dual-beam mode).
-#        The corresponding Stokes parameters are calculated and stored in
-#        "stok".
-#
-#     Polka.tcl "a b" "" "a_R b_R"
-#
-#        Aligns the two input images "a" and "b", and stores them in 
-#        images "a_R" and "b_R" (single-beam mode). Calculate 
+#     comfile - The name of a text file which is used to communicate with
+#               the polka A-task. An error will be reported if no file is
+#               given or if the file does not exist. On entry
+#               the file should contain a valid set of Tcl commands to be
+#               executed before anything else is done. These commands for
+#               instance could initialise option values passed from the 
+#               A-task.
+#             
+#               On exit, the contents of the file are replaced by a set
+#               of lines of the form  "<name> <value>" where name is the
+#               name of a Tcl global variable and <value> is the value of
+#               the variable. The values are stored by the A-task within
+#               the parameter file to provide default options values for 
+#               the next invocation of polka.
 #
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -61,6 +47,12 @@
 #     22-APR-1999 (DSB):
 #        Modified to use a private colour map automatically if a GWM canvas
 #        item cannot be producing without a private colour map.
+#     29-APR-1999 (DSB):
+#        Modified to pass values to and from the A-task using a text file.
+#        This allows this script to run in a different process to the
+#        A-task. This is necessary so that different AMS processes will
+#        be used for the script<->KAPPA/CCDPACK communication, and the 
+#        atask<->ICL (or IRAF) communication. 
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -73,6 +65,33 @@
 #   tclproc $name $args $newbody
 #}
 
+# Report an error if no communications file has been supplied on the
+# command line.
+   if { $argc == 0 } {
+      puts "Polka: No communications file supplied on command line. Aborting..."
+      exit 1
+
+# Otherwise, attempt to source the file, then delete it so that new values
+# can be stored in it for passing back to the a-task when this script
+# terminates.
+   } {
+      set comfile [lindex "$argv" 0]
+      if { [catch {source $comfile} msg] } {
+         puts "Polka: Error sourcing the communications file: $comfile"
+         puts "   $msg"
+         exit 1
+      }
+      
+      if { [catch {exec rm -f $comfile} msg] } {
+         puts "Polka: Error deleting the communications file: $comfile"
+         puts "   $msg"
+         exit 1
+      }
+
+# Store the name of the communications file in a glbal variable.
+      set COMFILE $comfile
+
+   }
 
 # Display a label asking the user to wait while the main interface is
 # constructed.
@@ -138,10 +157,8 @@
    set ADAM_TASKS ""
    set AUTO_MATCH 1
    set ATASK 0
-   set BADCOL cyan
    set BASE_SECTION ""
    set CANCEL_OP 0
-   set CURCOL red
    set CUROBJ_DISP ""
    set CUROBJ_REQ $O_RAY_FEATURES
    set CURRENT_INFO ""
@@ -176,7 +193,6 @@
    set POINTER_CXY ""
    set REDISPLAY_CANCELLED 0
    set REDISPLAY_REQUESTED 0
-   set REFCOL green
    set REFIM_DISP ""
    set REFOBJ_DISP ""
    set REFOBJ_REQ $NONE
@@ -187,7 +203,6 @@
    set SECTION_DISP ""
    set SECTION_REQ ""
    set SECTION_STACK ""
-   set SELCOL red
    set SELECTED_AREA ""
    set SEQ_STOP ""
    set STOP_BLINK ""
@@ -200,7 +215,36 @@
    set XHAIR 0
    set XHAIR_IDH ""
    set XHAIR_IDV ""
-   set XHRCOL "yellow"
+
+   if { [info exists ATASK_BADCOL] } {
+      set BADCOL [string trim  $ATASK_BADCOL]
+   } {
+      set BADCOL "cyan"
+   }
+
+   if { [info exists ATASK_CURCOL] } {
+      set CURCOL [string trim  $ATASK_CURCOL]
+   } {
+      set CURCOL "red"
+   }
+
+   if { [info exists ATASK_REFCOL] } {
+      set REFCOL [string trim  $ATASK_REFCOL]
+   } {
+      set REFCOL "green"
+   }
+
+   if { [info exists ATASK_SELCOL] } {
+      set SELCOL [string trim  $ATASK_SELCOL]
+   } {
+      set SELCOL "red"
+   }
+
+   if { [info exists ATASK_XHRCOL] } {
+      set XHRCOL [string trim  $ATASK_XHRCOL]
+   } {
+      set XHRCOL "yellow"
+   }
 
 # Get the name of the directory containing the Polka files. This TCL
 # variable should have been set in the calling ADAM A-task, but if it
@@ -243,10 +287,6 @@
    source $POLPACK_DIR/dialog.tcl
    source $POLPACK_DIR/Polka_procs.tcl
    source $POLPACK_DIR/CCDShowHelp.tcl
-
-# If the variable START_HELP has been defined (by the polka a-task) then
-# start up a hyper-text browser displaying the polka tutorial page.
-   if { [info exists START_HELP] } { ShowHelp POLKA_TUTORIAL }
 
 # Quit when control-c is pressed.
    bind . <Control-c> {Finish 0}
@@ -362,38 +402,10 @@
       set env(NDF_FORMATS_OUT) $ndf_formats_out
    }
 
-# If this script was activated from the polka A-task, then the variable 
-# "in-list" will be defined, holding a list of input images (the
-# variables "o_list" and "e_list" will also be defined holding the output O
-# and E images). Otherwise, we get the input and output file names from the 
-# command line, and copy them into the variables which would have been used 
-# by the a-task.
+# Check that some input images were supplied in the communications file.
    if { ![info exists in_list] } {
-
-      if { $argc == 0 } {
-         puts "Polka: No input images supplied on command line. Aborting..."
-         exit 1
-      } {
-         set in_list [lindex "$argv" 0]
-         set stokes ""
-         set o_list ""
-         set e_list ""
-
-         if { $argc > 1 } { set stokes [lindex "$argv" 1] }
-         if { $argc > 2 } { set o_list [lindex "$argv" 2] }
-         if { $argc > 3 } {
-            set e_list [lindex "$argv" 3] 
-            set DBEAM 1
-         } {
-            set DBEAM 0
-         }
-
-# Check that there are some output images to create.
-         if { $stokes == "" && ![llength $o_list] && ![llength $e_list] } {
-            puts "Polka: No output images supplied on command line. Aborting..."
-            exit 1
-         }
-      }
+      puts "Polka: No input images supplied in the communications file. Aborting..."
+      exit 1
    }
 
 # Store the list of input image sections, and store how many there are.
@@ -1291,6 +1303,10 @@
    bind Menu <Motion> {+MenuMotionBind %W %y}
 
 # >>>>>>>>>>>>>>>>>  SET UP THE IMAGE DISPLAY <<<<<<<<<<<<<<<<<<<<<
+
+# If the variable START_HELP has been defined (by the polka a-task) then
+# start up a hyper-text browser displaying the polka tutorial page.
+   if { [info exists START_HELP] } { ShowHelp POLKA_TUTORIAL }
 
 # Establish the graphics and image display devices.
    Obey kapview lutable "mapping=linear coltab=grey device=$DEVICE" 1

@@ -20,28 +20,12 @@
 
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "f77.h"
-#include "tcl.h"
-#include "tk.h"
-#include "tclAdam.h"
-#include "tkGwm.h"
-#include "tkNbs.h"
+#include "sae_par.h"
 
-/*
- * The following variable is a special hack that is needed in order for
- * Sun shared libraries to be used for Tcl.
- */
-
-#ifdef NEED_MATHERR
-extern int matherr();
-int *tclDummyMathPtr = (int *) matherr;
-#endif
-
-#define SAI__OK 0
-#define SAI__ERROR 148013867
 #define GRP__NOID 0
 #define PACK_DIR "POLPACK_DIR"
-#define TCL_SCRIPT "/Polka.tcl"
 
 extern F77_SUBROUTINE(grp_grpsz)( INTEGER(igrp), INTEGER(size),
                                   INTEGER(status) );
@@ -51,312 +35,19 @@ extern F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
 extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
                                 INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
 
+char *split( char * );
 void Error( const char *, int * );
 const char *Envir( const char *, int * );
-void SetVar( Tcl_Interp *, char *, char *, int, int * );
-const char *GetVar( Tcl_Interp *, char *, int, int * );
+void SetVar( FILE *, char *, char *, int, int * );
 char *GetName( int, int, int * );
-void SetSVar( Tcl_Interp *, const char *, const char *, int, int * );
-void GetSVar( Tcl_Interp *, const char *, char *, int, int * );
-void SetIVar( Tcl_Interp *, const char *, int, int * );
-void SetRVar( Tcl_Interp *, const char *, float, int * );
-void SetLVar( Tcl_Interp *, const char *, LOGICAL(a), int * );
-void GetLVar( Tcl_Interp *, const char *, LOGICAL(a), int * );
-void GetIVar( Tcl_Interp *, const char *, int *, int * );
-void GetRVar( Tcl_Interp *, const char *, float *, int * );
-
-F77_SUBROUTINE(doplmp)( CHARACTER(CUBE), CHARACTER(IMAGE), INTEGER(DPI), 
-                       LOGICAL(HAREA),
-                       LOGICAL(SAREA), CHARACTER(SI), CHARACTER(LOGFIL),
-                       CHARACTER(BADCOL), CHARACTER(POLCOL), 
-                       CHARACTER(SELCOL), REAL(PLO), REAL(PHI), 
-                       LOGICAL(NEWCM), LOGICAL(XHAIR), CHARACTER(XHRCOL), 
-                       LOGICAL(STHLP), INTEGER(NCONT), CHARACTER(CONCOL), 
-                       CHARACTER(BACK), 
-                       INTEGER(STATUS) TRAIL(CUBE) TRAIL(IMAGE) TRAIL(SI) 
-                       TRAIL(LOGFIL) 
-                       TRAIL(BADCOL) TRAIL(POLCOL) TRAIL(SELCOL) 
-                       TRAIL(XHRCOL) TRAIL(CONCOL) TRAIL(BACK) ){
-/*
-*  Name:
-*     doplmp
-
-*  Purpose:
-*     Activates the main PolMap tcl script.
-
-*  Description:
-*     This C function creates a Tcl interpreter to execute the Tcl script
-*     which implements the GUI for the PolMap application. Values for 
-*     various user preferences are communicated to the Tcl script by 
-*     initialising various Tcl variables to hold the supplied options
-*     values. When the Tcl script terminates, the (potentially modified)
-*     options values are read back from these Tcl variables, and passed 
-*     back to the caller.
-
-*  Parameters:
-*     CUBE = CHARACTER *(*) (Given)
-*        The full specification of the cube holding input Stokes vectors. 
-*     IMAGE = CHARACTER *(*) (Given)
-*        The full specification of the background image. This should be blank
-*        if no background image is available.
-*     DPI = INTEGER (Given)
-*        The screen dots per inch to use. If a zero or negative value
-*        is supplied, then the TK default is used.
-*     HAREA = LOGICAL (Given and Returned)
-*        Should the help area be displayed?
-*     BACK = CHARACTER * ( * ) (Given and Returned)
-*        The method for displaying the background image "CONTOUR", "GREY   "
-*        or "NONE   " (must be 7 characters long).
-*     SAREA = LOGICAL (Given and Returned)
-*        Should the status area be displayed?
-*     SI = CHARACTER * ( * ) (Given and Returned)
-*        A character string specifying which status items to display,
-*        and in what order.
-*     LOGFIL = CHARACTER * ( * ) (Given)
-*        The name of a log file in which to store all messages generated
-*        by any ATASKs activated by the TCL script.
-*     BADCOL = CHARACTER (Given and Returned)
-*        The colour with which to mark missing pixel data. The supplied
-*        variable should be long enough to receive the longest colour name.
-*     POLCOL = CHARACTER (Given and Returned)
-*        The colour with which to mark the polygons.
-*     SELCOL = CHARACTER (Given and Returned)
-*        The colour with which to mark the selected area. The supplied
-*        variable should be long enough to receive the longest colour name.
-*     PLO = REAL (Given and Returned)
-*        The lower percentile for the image display.
-*     PHI = REAL (Given and Returned)
-*        The upper percentile for the image display.
-*     NEWCM = LOGICAL (Given)
-*        Use a private colour map?
-*     XHAIR = LOGICAL (Given and Returned)
-*        Is a cross-hair required over the image display area?
-*     XHRCOL = CHARACTER (Given and Returned)
-*        The colour with which to draw the cross-hair (if required). The 
-*        supplied variable should be long enough to receive the longest 
-*        colour name.
-*     STHLP = LOGICAL (Given)
-*        Should a hyper-text browser be created automatically at start-up
-*        displaying the help system contents?
-*     NCONT = INTEGER (Given and Returned)
-*        No. of contours to use for background image.
-*     CONCOL = CHARACTER (Given and Returned)
-*        The colour with which to draw contours (if required). The 
-*        supplied variable should be long enough to receive the longest 
-*        colour name.
-*     STATUS = INTEGER (Given and Returned)
-*        The inherited global status.
-
-*  Authors:
-*     DSB: David Berry (STARLINK)
-*     {enter_new_authors_here}
-
-*  History:
-*     27-AUG-1997 (DSB):
-*        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*/
-
-   GENPTR_CHARACTER(CUBE)
-   GENPTR_CHARACTER(IMAGE)
-   GENPTR_INTEGER(DPI)
-   GENPTR_LOGICAL(HAREA)
-   GENPTR_LOGICAL(SAREA)
-   GENPTR_CHARACTER(SI)
-   GENPTR_CHARACTER(LOGFIL)
-   GENPTR_CHARACTER(BADCOL)
-   GENPTR_CHARACTER(POLCOL)
-   GENPTR_CHARACTER(SELCOL)
-   GENPTR_REAL(PLO)
-   GENPTR_REAL(PHI)
-   GENPTR_LOGICAL(NEWCM)
-   GENPTR_LOGICAL(XHAIR)
-   GENPTR_CHARACTER(XHRCOL)
-   GENPTR_LOGICAL(STHLP)
-   GENPTR_INTEGER(NCONT)
-   GENPTR_CHARACTER(CONCOL)
-   GENPTR_CHARACTER(BACK)
-   GENPTR_INTEGER(STATUS)
-
-   Tcl_Interp *interp = NULL;
-   char *dir = NULL;
-   char *script = NULL;
-   int code;
-   int dirlen;
-   int i;
-   int j;
-   int n;                      
-   int size;
-
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
-   Tk_Window main;
-#endif
-
-/* Check the global status. */
-   if( *STATUS != SAI__OK ) return;
-
-/* Create a TCL interpreter. */
-   interp = Tcl_CreateInterp ();
-
-/* Store the name of the input Stokes vector cube in Tcl variable "cube". */
-   SetSVar( interp, "cube", CUBE, CUBE_length, STATUS );
-
-/* Store the name of the input image in Tcl variable "in_list". */
-   SetSVar( interp, "in_list", IMAGE, IMAGE_length, STATUS );
-
-/* If a positive value has been supplied, store the screen dots per inch
-   to use in TCL variable "dpi". */
-   if ( *DPI > 0 ) {
-      SetIVar( interp, "dpi", *DPI, STATUS );
-   }
-
-/* If a WWW browser is to be created at start-up define the START_HELP
-   variable. */
-   if( F77_ISTRUE(*STHLP) ) {
-      SetVar( interp, "START_HELP", "1", TCL_LEAVE_ERR_MSG, STATUS );
-   }
-
-/* If required, indicate that a private colour map should be used by
-   Tcl creating the variable NEWCOLMAP. */
-   if( F77_ISTRUE(*NEWCM) ) {
-      SetVar( interp, "NEWCOLMAP", "1", TCL_LEAVE_ERR_MSG, STATUS );
-   }
-
-/* Store values for PolMap options in the appropriate Tcl variables. */
-   SetLVar( interp, "ATASK_XHAIR", XHAIR, STATUS );
-   SetLVar( interp, "ATASK_HAREA", HAREA, STATUS );
-   SetLVar( interp, "ATASK_SAREA", SAREA, STATUS );
-   SetSVar( interp, "ATASK_BACK", BACK, BACK_length, STATUS );
-   SetSVar( interp, "ATASK_SI", SI, SI_length, STATUS );
-   SetSVar( interp, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
-   SetSVar( interp, "ATASK_CONCOL", CONCOL, CONCOL_length, STATUS );
-   SetSVar( interp, "ATASK_POLCOL", POLCOL, POLCOL_length, STATUS );
-   SetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
-   SetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
-   SetRVar( interp, "ATASK_PLO", *PLO, STATUS );
-   SetRVar( interp, "ATASK_PHI", *PHI, STATUS );
-   SetIVar( interp, "ATASK_NCONT", *NCONT, STATUS );
-
-
-   if( LOGFIL_length > 0 ) {
-      SetSVar( interp, "ATASK_LOGFILE", LOGFIL, LOGFIL_length, STATUS );
-   }
-
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
-
-/* Create the main window, and report an error if it fails. */
-   if( *STATUS == SAI__OK ) {
-      main = Tk_CreateMainWindow(interp, NULL, "PolMap", "POLMAP" );
-      if( !main ) {
-         *STATUS = SAI__ERROR;
-         Error( "Unable to create main Tk window.", STATUS );
-         Error( interp->result, STATUS );
-      }
-   }
-
-#endif
-
-/* Get the value of the package directory environment variable, and
-   construct the full name of the TCL script. Also, set the TCL variable
-   POLPACK_DIR to the directory path. */
-   dir = (char *) Envir( PACK_DIR, STATUS );      
-   if( *STATUS == SAI__OK ){
-      dirlen = strlen( dir );
-      script = (char *) malloc( (size_t) ( dirlen + strlen( "/PolMap.tcl" )  
-                                           + 1 ) );
-      if( !script ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to allocate memory for full TCL script name.", 
-                 STATUS );
-      } else {
-         strcpy( script, dir );
-         strcpy( script + dirlen, "/PolMap.tcl" );
-         SetVar( interp, "POLPACK_DIR", dir, TCL_LEAVE_ERR_MSG |
-                 TCL_GLOBAL_ONLY, STATUS );
-      }
-   }
-
-/* Initialise Tcl, Tk and StarTcl commands. */
-   if( *STATUS == SAI__OK ) {
-
-      if( Tcl_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise Tcl commands.", STATUS );
-         Error( interp->result, STATUS );
-
-      } else if( Tk_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise Tk commands.", STATUS );
-         Error( interp->result, STATUS );
-
-      } else if( Tcladam_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise ADAM Tcl commands.", STATUS );
-         Error( interp->result, STATUS );
-
-      } else if( Tkgwm_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise GWM Tk commands.", STATUS );
-         Error( interp->result, STATUS );
-
-      } else if( Tknbs_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise NBS Tk commands.", STATUS );
-         Error( interp->result, STATUS );
-      }
-   }
-
-/* Execute the TCL script. */
-   if( *STATUS == SAI__OK ){
-      if( Tcl_EvalFile( interp, script ) != TCL_OK ){
-         *STATUS = SAI__ERROR;
-         Error( "Failed to execute the TCL script...", STATUS );
-         Error( interp->result, STATUS );
-
-/* If succesfull, loop infinitely, waiting for commands to execute.  When 
-   there are no windows left, the loop exits. NOTE, it seems that an
-   "exit" command in the tcl script causes the current process to be
-   killed. In order to shutdown the script and return control to this
-   procedure, use "destroy ." in the script instead of "exit". */
-      } else {
-         Tk_MainLoop(); 
-      }
-   }
-
-/* Get the current value of the Tcl options variables. */
-   GetLVar( interp, "ATASK_XHAIR", XHAIR, STATUS );
-   GetLVar( interp, "ATASK_HAREA", HAREA, STATUS );
-   GetLVar( interp, "ATASK_SAREA", SAREA, STATUS );
-   GetSVar( interp, "ATASK_SI", SI, SI_length, STATUS );
-   GetIVar( interp, "ATASK_NCONT", NCONT, STATUS );
-   GetRVar( interp, "ATASK_PLO", PLO, STATUS );
-   GetRVar( interp, "ATASK_PHI", PHI, STATUS );
-   GetSVar( interp, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
-   GetSVar( interp, "ATASK_CONCOL", CONCOL, CONCOL_length, STATUS );
-   GetSVar( interp, "ATASK_POLCOL", POLCOL, POLCOL_length, STATUS );
-   GetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
-   GetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
-   GetSVar( interp, "ATASK_BACK", BACK, BACK_length, STATUS );
-
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
-
-/* If an error has occurred, ensure that the main Tk window has been
-   destroyed. */
-   if( *STATUS != SAI__OK && main ) Tk_DestroyWindow( main );
-
-#endif
-
-/* Delete the TCL interpreter. */
-   if( interp && *STATUS == SAI__OK ) Tcl_DeleteInterp( interp );
-
-/* Free the memory holding the TCL script name. */
-   if( script ) free( script );
-
-}
+void SetSVar( FILE *, const char *, const char *, int, int * );
+void GetSVar( const char *, char *, int, int * );
+void SetIVar( FILE *, const char *, int, int * );
+void SetRVar( FILE *, const char *, float, int * );
+void SetLVar( FILE *, const char *, LOGICAL(a), int * );
+void GetLVar( const char *, LOGICAL(a), int * );
+void GetIVar( const char *, int *, int * );
+void GetRVar( const char *, float *, int * );
 
 F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3), 
                         INTEGER(DPI), LOGICAL(HAREA),
@@ -381,13 +72,12 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *     Activates the main Polka tcl script.
 
 *  Description:
-*     This C function creates a Tcl interpreter to execute the Tcl script
-*     which implements the GUI for the Polka application. Values for 
-*     various user preferences are communicated to the Tcl script by 
-*     initialising various Tcl variables to hold the supplied options
-*     values. When the Tcl script terminates, the (potentially modified)
-*     options values are read back from these Tcl variables, and passed 
-*     back to the caller.
+*     This C function executes the POLKA Tcl script in a child process.
+*     Values for various user preferences are communicated to the Tcl 
+*     script by storing settings for various Tcl variables in a temporary
+*     text file whose name is passed to the script. When the Tcl script 
+*     terminates, the (potentially modified) options values are read back 
+*     from this file and passed back to the caller.
 
 *  Parameters:
 *     IGRP1 = INTEGER (Given)
@@ -474,6 +164,14 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *  History:
 *     18-APR-1997 (DSB):
 *        Original version.
+*     28-APR-1999 (DSB):
+*        Modified to execute the TCL interpreter in a child process instead
+*        of the current process. This gets round problems running POLPACK
+*        as a monolith (eg from ICL or from IRAF cl), caused by the AMS
+*        being used to communicate both between the command language
+*        process and the monolith process, and between the monolith process
+*        and the KAPPA/CCDPACK etc processes which are fired up by the
+*        TCL script.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -511,49 +209,64 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_INTEGER(STATUS)
    GENPTR_CHARACTER(MODE)
 
-   Tcl_Interp *interp = NULL;
+#define BUFLEN 512
+
+   char buf[BUFLEN];
    char *dir = NULL;
    char *name = NULL;
+   char file_name[255];
+   char outfile_name[255];
    char *script = NULL;
-   int code;
-   int dirlen;
+   char *value = NULL;
    int i;
    int j;
    int n;                      
    int size;
-
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
-   Tk_Window main;
-#endif
+   FILE *fd = NULL;
 
 /* Check the global status. */
    if( *STATUS != SAI__OK ) return;
 
-/* Create a TCL interpreter. */
-   interp = Tcl_CreateInterp ();
+/* Get a unique temporary file name. This file is used to pass values to
+   the Polka Tcl script. */
+   if( !tmpnam( file_name ) ){
+      *STATUS = SAI__ERROR;
+      Error( "Unable to create a temporary file name using \"tmpnam\".", 
+              STATUS );
+      return;
+   } 
+
+/* Open the file for writing. */
+   if( fd ) fclose( fd );
+   fd = fopen( file_name, "w" );
+   if( !fd ){
+      *STATUS = SAI__ERROR;
+      Error( "Unable to create a temporary file using \"fopen\".", STATUS );
+      return;
+   } 
 
 /* Get the number of images to process. */
    F77_CALL(grp_grpsz)( INTEGER_ARG(IGRP1), INTEGER_ARG(&size),
                         INTEGER_ARG(STATUS) );
 
-/* Store the name of the input images in Tcl variable "in_list". */
+/* Store the name of the input images in the file as variable "in_list". */
    for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
       name = GetName( *IGRP1, i, STATUS );
-      SetVar( interp, "in_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+      SetVar( fd, "in_list", name, 1, STATUS );
    }
 
 /* If producing Stokes parameters as output, store the name of the output
-   data set in Tcl variable "stokes". */
+   data set in variable "stokes". */
    if( *IGRP4 != GRP__NOID ) {
       name = GetName( *IGRP4, 1, STATUS );
-      SetVar( interp, "stokes", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+      SetVar( fd, "stokes", name, 0, STATUS );
    }
 
 /* Store the name of the O-ray output images in Tcl variable "o_list". */
    if( *IGRP2 != GRP__NOID ) {
       for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
          name = GetName( *IGRP2, i, STATUS );
-         SetVar( interp, "o_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+         SetVar( fd, "o_list", name, 1, STATUS );
       }
    }
 
@@ -562,7 +275,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       if( F77_ISTRUE(*DBEAM) ) {
          for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
             name = GetName( *IGRP3, i, STATUS );
-            SetVar( interp, "e_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+            SetVar( fd, "e_list", name, 1, STATUS );
          }
       }
    }
@@ -571,73 +284,73 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    if( *SSIZE > 0 ) {
       for( i = 1; i <= *SSIZE && *STATUS == SAI__OK; i++ ){
          name = GetName( *IGRPS, i, STATUS );
-         SetVar( interp, "sky_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+         SetVar( fd, "sky_list", name, 1, STATUS );
       }
    }
 
 /* If a positive value has been supplied, store the screen dots per inch
    to use in TCL variable "dpi". */
    if ( *DPI > 0 ) { 
-      SetIVar( interp, "dpi", *DPI, STATUS );
+      SetIVar( fd, "dpi", *DPI, STATUS );
    }
 
 /* Indicate if dual or single beam mode should be used, by setting Tcl
    variable DBEAM. */
-   SetLVar( interp, "DBEAM", DBEAM, STATUS );
+   SetLVar( fd, "DBEAM", DBEAM, STATUS );
 
 /* If a WWW browser is to be created at start-up define the START_HELP
    variable. */
    if( F77_ISTRUE(*STHLP) ) {
-      SetVar( interp, "START_HELP", "1", TCL_LEAVE_ERR_MSG, STATUS );
+      SetVar( fd, "START_HELP", "1", 0, STATUS );
    }
 
 /* Set the Tcl variables storing the options values to use. */
-   SetLVar( interp, "ATASK_SKYOFF", SKYOFF, STATUS );
-   SetLVar( interp, "ATASK_XHAIR", XHAIR, STATUS );
-   SetLVar( interp, "ATASK_HAREA", HAREA, STATUS );
-   SetLVar( interp, "ATASK_SAREA", SAREA, STATUS );
-   SetIVar( interp, "ATASK_PSF", *PSF, STATUS );
-   SetIVar( interp, "ATASK_SKYPAR", *SKYPAR, STATUS );
-   SetSVar( interp, "ATASK_SI", SI, SI_length, STATUS );
-   SetSVar( interp, "ATASK_VIEW", VIEW, VIEW_length, STATUS );
-   SetSVar( interp, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
-   SetSVar( interp, "ATASK_CURCOL", CURCOL, CURCOL_length, STATUS );
-   SetSVar( interp, "ATASK_REFCOL", REFCOL, REFCOL_length, STATUS );
-   SetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
-   SetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
-   SetIVar( interp, "ATASK_FIT", *FIT, STATUS );
-   SetIVar( interp, "ATASK_OEFIT", *OEFIT, STATUS );
-   SetRVar( interp, "ATASK_PLO", *PLO, STATUS );
-   SetRVar( interp, "ATASK_PHI", *PHI, STATUS );
-   SetLVar( interp, "POL", POL, STATUS );
+   SetLVar( fd, "ATASK_SKYOFF", SKYOFF, STATUS );
+   SetLVar( fd, "ATASK_XHAIR", XHAIR, STATUS );
+   SetLVar( fd, "ATASK_HAREA", HAREA, STATUS );
+   SetLVar( fd, "ATASK_SAREA", SAREA, STATUS );
+   SetIVar( fd, "ATASK_PSF", *PSF, STATUS );
+   SetIVar( fd, "ATASK_SKYPAR", *SKYPAR, STATUS );
+   SetSVar( fd, "ATASK_SI", SI, SI_length, STATUS );
+   SetSVar( fd, "ATASK_VIEW", VIEW, VIEW_length, STATUS );
+   SetSVar( fd, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
+   SetSVar( fd, "ATASK_CURCOL", CURCOL, CURCOL_length, STATUS );
+   SetSVar( fd, "ATASK_REFCOL", REFCOL, REFCOL_length, STATUS );
+   SetSVar( fd, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
+   SetSVar( fd, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
+   SetIVar( fd, "ATASK_FIT", *FIT, STATUS );
+   SetIVar( fd, "ATASK_OEFIT", *OEFIT, STATUS );
+   SetRVar( fd, "ATASK_PLO", *PLO, STATUS );
+   SetRVar( fd, "ATASK_PHI", *PHI, STATUS );
+   SetLVar( fd, "POL", POL, STATUS );
    if( LOGFIL_length > 0 ) {
-      SetSVar( interp, "ATASK_LOGFILE", LOGFIL, LOGFIL_length, STATUS );
+      SetSVar( fd, "ATASK_LOGFILE", LOGFIL, LOGFIL_length, STATUS );
    }
    if( *IGRP4 != GRP__NOID ) {
-      SetSVar( interp, "ATASK_POLMODE", MODE, MODE_length, STATUS );
+      SetSVar( fd, "ATASK_POLMODE", MODE, MODE_length, STATUS );
    }
 
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
-
-/* Create the main window, and report an error if it fails. */
-   if( *STATUS == SAI__OK ) {
-      main = Tk_CreateMainWindow(interp, NULL, "Polka", "POLKA" );
-      if( !main ) {
-         *STATUS = SAI__ERROR;
-         Error( "Unable to create main Tk window.", STATUS );
-         Error( interp->result, STATUS );
-      }
-   }
-
-#endif
+/* Get another unique temporary file name. This file is used to collect
+   any standard output from the TCL script. */
+   if( !tmpnam( outfile_name ) ){
+      *STATUS = SAI__ERROR;
+      Error( "Unable to create a temporary file name using \"tmpnam\".", 
+              STATUS );
+      return;
+   } 
 
 /* Get the value of the package directory environment variable, and
-   construct the full name of the TCL script. Also, set the TCL variable
-   POLPACK_DIR to the directory path. */
+   construct the full command for the TCL script (redirecting standard
+   output and error to the temporary file chosen above). The one and only
+   argument to the script is the name of the file containing the variable
+   values. Also, set the variable POLPACK_DIR to the directory path. */
    dir = (char *) Envir( PACK_DIR, STATUS );      
    if( *STATUS == SAI__OK ){
-      dirlen = strlen( dir );
-      script = (char *) malloc( (size_t) ( dirlen + strlen( "/Polka.tcl" )  
+      script = (char *) malloc( (size_t) ( strlen( dir )
+                                           + strlen( "/Polka.tcl " )  
+                                           + strlen( file_name ) 
+                                           + strlen( " >& " )  
+                                           + strlen( outfile_name ) 
                                            + 1 ) );
       if( !script ) {
          *STATUS = SAI__ERROR;
@@ -645,91 +358,121 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                  STATUS );
       } else {
          strcpy( script, dir );
-         strcpy( script + dirlen, "/Polka.tcl" );
-         SetVar( interp, "POLPACK_DIR", dir, TCL_LEAVE_ERR_MSG |
-                 TCL_GLOBAL_ONLY, STATUS );
+         strcpy( script + strlen( script ), "/Polka.tcl " );
+         strcpy( script + strlen( script ), file_name );
+         strcpy( script + strlen( script ), " >& " );
+         strcpy( script + strlen( script ), outfile_name );
+         SetVar( fd, "POLPACK_DIR", dir, 0, STATUS );
       }
    }
 
-/* Initialise Tcl, Tk and StarTcl commands. */
-   if( *STATUS == SAI__OK ) {
-
-      if( Tcl_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise Tcl commands.", STATUS );
-         Error( interp->result, STATUS );
-
-      } else if( Tk_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise Tk commands.", STATUS );
-         Error( interp->result, STATUS );
-
-      } else if( Tcladam_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise ADAM Tcl commands.", STATUS );
-         Error( interp->result, STATUS );
-
-      } else if( Tkgwm_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise GWM Tk commands.", STATUS );
-         Error( interp->result, STATUS );
-
-      } else if( Tknbs_Init( interp ) != TCL_OK ) {
-         *STATUS = SAI__ERROR;
-         Error( "Failed to initialise NBS Tk commands.", STATUS );
-         Error( interp->result, STATUS );
-      }
-   }
+/* Close the file used to pass arguments to the TCL script. */
+   fclose( fd );
 
 /* Execute the TCL script. */
    if( *STATUS == SAI__OK ){
-      if( Tcl_EvalFile( interp, script ) != TCL_OK ){
-         *STATUS = SAI__ERROR;
-         Error( "Failed to execute the TCL script...", STATUS );
-         Error( interp->result, STATUS );
+      (void) system( script );
 
-/* If succesfull, loop infinitely, waiting for commands to execute.  When 
-   there are no windows left, the loop exits. NOTE, it seems that an
-   "exit" command in the tcl script causes the current process to be
-   killed. In order to shutdown the script and return control to this
-   procedure, use "destroy ." in the script instead of "exit". */
-      } else {
-         Tk_MainLoop(); 
+/* Attempt to open the file containing the standard output and error from 
+   the TCL script. */
+      fd = fopen( outfile_name, "r" );
+
+/* If succesful, report an error and copy each line of the file to the
+   error system. */
+      if( fd ) {
+         while( fgets( buf, BUFLEN, fd ) ){
+            if( strlen( buf ) ){
+               if( *STATUS == SAI__OK ){
+                  *STATUS = SAI__ERROR;
+                  Error( "Messages received from the TCL script...", STATUS );
+               }
+               Error( buf, STATUS );
+            }
+         }
+         fclose( fd );
+         remove( outfile_name );
       }
    }
 
-/* Get the current value of the Tcl options variables. */
-   GetLVar( interp, "ATASK_SKYOFF", SKYOFF, STATUS );
-   GetLVar( interp, "ATASK_XHAIR", XHAIR, STATUS );
-   GetLVar( interp, "ATASK_HAREA", HAREA, STATUS );
-   GetLVar( interp, "ATASK_SAREA", SAREA, STATUS );
-   GetIVar( interp, "ATASK_PSF", PSF, STATUS );
-   GetIVar( interp, "ATASK_SKYPAR", SKYPAR, STATUS );
-   GetSVar( interp, "ATASK_SI", SI, SI_length, STATUS );
-   GetIVar( interp, "ATASK_FIT", FIT, STATUS );
-   GetIVar( interp, "ATASK_OEFIT", OEFIT, STATUS );
-   GetRVar( interp, "ATASK_PLO", PLO, STATUS );
-   GetRVar( interp, "ATASK_PHI", PHI, STATUS );
-   GetSVar( interp, "ATASK_VIEW", VIEW, VIEW_length, STATUS );
-   GetSVar( interp, "ATASK_XHRCOL", XHRCOL, XHRCOL_length, STATUS );
-   GetSVar( interp, "ATASK_BADCOL", BADCOL, BADCOL_length, STATUS );
-   GetSVar( interp, "ATASK_CURCOL", CURCOL, CURCOL_length, STATUS );
-   GetSVar( interp, "ATASK_REFCOL", REFCOL, REFCOL_length, STATUS );
-   GetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
-   if( *IGRP4 != GRP__NOID ) {
-      GetSVar( interp, "ATASK_POLMODE", MODE, MODE_length, STATUS );
+/* Open the communications file again. The TCL script may have written the
+   replacement parameter values into it. */
+   if( *STATUS == SAI__OK ){
+      fd = fopen( file_name, "r" );
+   } else {
+      fd = NULL;
    }
 
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
+   if( fd ){
 
-/* If an error has occurred, ensure that the main Tk window has been
-   destroyed. */
-   if( *STATUS != SAI__OK && main ) Tk_DestroyWindow( main );
+/* Read each line from it. */
+      while( fgets( buf, BUFLEN, fd ) ){
+         if( strlen( buf ) ){
+            value = split( buf );
 
-#endif
+            if( !strcmp( buf, "ATASK_SKYOFF" ) ) {
+               GetLVar( value, SKYOFF, STATUS );
 
-/* Delete the TCL interpreter. */
-   if( interp && *STATUS == SAI__OK ) Tcl_DeleteInterp( interp );
+            } else if( !strcmp( buf, "ATASK_XHAIR" ) ) {
+               GetLVar( value, XHAIR, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_HAREA" ) ) {
+               GetLVar( value, HAREA, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_SAREA" ) ) {
+               GetLVar( value, SAREA, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_PSF" ) ) {
+               GetIVar( value, PSF, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_SKYPAR" ) ) {
+               GetIVar( value, SKYPAR, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_SI" ) ) {
+               GetSVar( value, SI, SI_length, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_FIT" ) ) {
+               GetIVar( value, FIT, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_OEFIT" ) ) {
+               GetIVar( value, OEFIT, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_PLO" ) ) {
+               GetRVar( value, PLO, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_PHI" ) ) {
+               GetRVar( value, PHI, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_VIEW" ) ) {
+               GetSVar( value, VIEW, VIEW_length, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_XHRCOL" ) ) {
+               GetSVar( value, XHRCOL, XHRCOL_length, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_BADCOL" ) ) {
+               GetSVar( value, BADCOL, BADCOL_length, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_CURCOL" ) ) {
+               GetSVar( value, CURCOL, CURCOL_length, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_REFCOL" ) ) {
+               GetSVar( value, REFCOL, REFCOL_length, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_SELCOL" ) ) {
+               GetSVar( value, SELCOL, SELCOL_length, STATUS );
+
+            } else if( !strcmp( buf, "ATASK_MODE" ) ) {
+               if( *IGRP4 != GRP__NOID ) {
+                  GetSVar( value, MODE, MODE_length, STATUS );
+               }
+            } 
+         }
+      }
+/* Close the communications file. */
+      fclose( fd );
+   }
+
+/* Remove the temporary file used to pass information to the TCL script. */
+   remove( file_name );
 
 /* Free the memory holding the TCL script name. */
    if( script ) free( script );
@@ -821,22 +564,19 @@ const char *Envir( const char *var, int *STATUS ){
    return ret;
 }
 
-void SetVar( Tcl_Interp *interp,  char *name,  char *value, 
-             int flags, int *STATUS ){
+void SetVar( FILE *fd,  char *name,  char *value, int list, int *STATUS ){
 /*
 *  Name:
 *     SetVar
 
 *  Purpose:
-*     Sets a Tcl variable.
+*     Stores the value for a a Tcl variable in a file.
 
 *  Description:
-*     This is equivalent to the Tcl function Tcl_SetVar, except that
-*     it checks the global status before executing, and reports an error
-*     if anything goes wrong.
+*     This stores the supplied value as a TCL variable assignment statement
+*     using the supplied file identifier. If "list" is non-zero a Tcl
+*     list is created (or extended if it already exists).
 
-*  Parameters:
-*     As for Tcl_SetVar, except for addition of final STATUS argument.
 *     
 */
 
@@ -844,47 +584,17 @@ void SetVar( Tcl_Interp *interp,  char *name,  char *value,
 
    if( *STATUS != SAI__OK ) return;
 
-   if( !Tcl_SetVar( interp, name, value, flags) ){
-      *STATUS = SAI__ERROR;
-      sprintf( mess, "Error setting TCL variable \"%s\".", name );
-      Error( mess, STATUS );
-      Error( interp->result,  STATUS );     
-   }
-}
 
-const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STATUS ){
-/*
-*  Name:
-*     GetVar
-
-*  Purpose:
-*     Gets a Tcl variable.
-
-*  Description:
-*     This is equivalent to the Tcl function Tcl_GetVar, except that
-*     it checks the global status before executing, and reports an error
-*     if anything goes wrong.
-
-*  Parameters:
-*     As for Tcl_GetVar, except for addition of final STATUS argument.
-*     
-*/
-
-   char mess[80];
-   const char *ret;
-
-   if( *STATUS != SAI__OK ) return NULL;
-
-   ret = Tcl_GetVar( interp, name, flags );
-   if ( !ret ) {
-      *STATUS = SAI__ERROR;
-      sprintf( mess, "Error getting TCL variable \"%s\".", name );
-      Error( mess, STATUS );
-      Error( interp->result,  STATUS );     
+   if( !list ){
+      fputs( "set ", fd );
+   } else {
+      fputs( "lappend ", fd );
    }
 
-   return ret;
-
+   fputs( name, fd );
+   fputs( " \"", fd );
+   fputs( value, fd );
+   fputs( "\"\n", fd );
 }
 
 char *GetName( int igrp, int i, int *STATUS ) {
@@ -959,7 +669,7 @@ char *GetName( int igrp, int i, int *STATUS ) {
    return ret;
 }
 
-void SetSVar( Tcl_Interp *interp, const char *var, const char *string, 
+void SetSVar( FILE *interp, const char *var, const char *string, 
                int len, int *STATUS ) {
 /*
 *  Name:
@@ -973,7 +683,7 @@ void SetSVar( Tcl_Interp *interp, const char *var, const char *string,
 *     variable, appending a trailing null character.
 
 *  Parameters:
-*     interp = Tcl_Interp * (Given)
+*     interp = FILE * (Given)
 *        A pointer to the Tcl interpreter structure.
 *     var = const char * (Given)
 *        The name of the Tcl variable to use.
@@ -1003,7 +713,7 @@ void SetSVar( Tcl_Interp *interp, const char *var, const char *string,
       buf[ len ] = 0;
 
 /* Set the Tcl variable value. */
-      SetVar( interp, (char *) var, buf, TCL_LEAVE_ERR_MSG, STATUS );
+      SetVar( interp, (char *) var, buf, 0, STATUS );
 
 /* Free the memory. */
       free( buf );
@@ -1019,24 +729,21 @@ void SetSVar( Tcl_Interp *interp, const char *var, const char *string,
 
 }
 
-void GetSVar( Tcl_Interp *interp, const char *var, char *string, 
-              int len, int *STATUS ) {
+void GetSVar( const char *val, char *string, int len, int *STATUS ) {
 /*
 *  Name:
 *     GetSVar
 
 *  Purpose:
-*     Get an F77 string from a Tcl variable.
+*     Get an F77 string from a null terminated string.
 
 *  Description:
-*     This function gets a string from the specified Tcl
-*     variable, and stores it in the supplied F77 character variable.
+*     This function gets an F77 string from the specified C string,
+*     and stores it in the supplied F77 character variable.
 
 *  Parameters:
-*     interp = Tcl_Interp * (Given)
-*        A pointer to the Tcl interpreter structure.
-*     var = const char * (Given)
-*        The name of the Tcl variable to use.
+*     val = const char * (Given)
+*        The supplied C string.
 *     string = char * (Returned)
 *        The F77 string to receive the value.
 *     len = int (Given)
@@ -1046,29 +753,20 @@ void GetSVar( Tcl_Interp *interp, const char *var, char *string,
 *     
 */
 
-   const char *tp;
    int n;
    int i;
 
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return;
 
-/* Get a pointer to the null-terminated string Tcl variable value. */
-   tp = GetVar( interp, (char *) var, TCL_LEAVE_ERR_MSG, STATUS );
-
-/* If succesful, initialise the returned F77 string to hold blanks, and
-   then copy the required number of characters form the Tcl variable
-   string. */
-   if ( tp ) {
-      for( i = 0; i < len; i++ ) string[ i ] = ' ';
-      n = strlen( tp );
-      if( len < n ) n = len;
-      memcpy( string, tp, n );
-   }
+   for( i = 0; i < len; i++ ) string[ i ] = ' ';
+   n = strlen( val );
+   if( len < n ) n = len;
+   memcpy( string, val, n );
 
 }
 
-void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS ) {
+void SetIVar( FILE *interp, const char *var, int val, int *STATUS ) {
 /*
 *  Name:
 *     SetIVar
@@ -1080,7 +778,7 @@ void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS ) {
 *     This function stores the integer in the specified Tcl variable.
 
 *  Parameters:
-*     interp = Tcl_Interp * (Given)
+*     interp = FILE * (Given)
 *        A pointer to the Tcl interpreter structure.
 *     var = const char * (Given)
 *        The name of the Tcl variable to use.
@@ -1099,11 +797,11 @@ void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS ) {
 /* Format the integer value and store the resulting string in the 
    Tcl variable. */
    sprintf( text, "%d", val );
-   SetVar( interp, (char *) var, text, TCL_LEAVE_ERR_MSG, STATUS );
+   SetVar( interp, (char *) var, text, 0, STATUS );
 
 }
 
-void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS ) {
+void SetRVar( FILE *interp, const char *var, float val, int *STATUS ) {
 /*
 *  Name:
 *     SetRVar
@@ -1115,7 +813,7 @@ void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS ) {
 *     This function stores the supplied value in the specified Tcl variable.
 
 *  Parameters:
-*     interp = Tcl_Interp * (Given)
+*     interp = FILE * (Given)
 *        A pointer to the Tcl interpreter structure.
 *     var = const char * (Given)
 *        The name of the Tcl variable to use.
@@ -1133,11 +831,11 @@ void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS ) {
 
 /* Format the value and store the resulting string in the Tcl variable. */
    sprintf( text, "%g", val );
-   SetVar( interp, (char *) var, text, TCL_LEAVE_ERR_MSG, STATUS );
+   SetVar( interp, (char *) var, text, 0, STATUS );
 
 }
 
-void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
+void SetLVar( FILE *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
 /*
 *  Name:
 *     SetLVar
@@ -1149,7 +847,7 @@ void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS 
 *     This function stores the supplied value in the specified Tcl variable.
 
 *  Parameters:
-*     interp = Tcl_Interp * (Given)
+*     interp = FILE * (Given)
 *        A pointer to the Tcl interpreter structure.
 *     var = const char * (Given)
 *        The name of the Tcl variable to use.
@@ -1167,24 +865,21 @@ void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS 
 
 /* Store the value. */
    SetVar( interp, (char *) var, ( F77_ISTRUE(*valptr) ? "1" : "0" ), 
-           TCL_LEAVE_ERR_MSG, STATUS );
+           0, STATUS );
 
 }
 
-void GetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
+void GetLVar( const char *val, LOGICAL(valptr), int *STATUS ) {
 /*
 *  Name:
 *     GetLVar
 
 *  Purpose:
-*     Retrieve a Tcl variable value and store it in an F77 LOGICAL
-*     variable.
+*     Retrieve an F77 LOGICAL value from a C string.
 
 *  Parameters:
-*     interp = Tcl_Interp * (Given)
-*        A pointer to the Tcl interpreter structure.
-*     var = const char * (Given)
-*        The name of the Tcl variable to use.
+*     val = const char * (Given)
+*        The C string.
 *     valptr = LOGICAL (Returned)
 *        A pointer to the F77 variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
@@ -1193,35 +888,29 @@ void GetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS 
 */
 
    GENPTR_LOGICAL(val)
-   const char *tp;
 
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return;
 
-/* Get a pointer to the text string holding the Tcl variable value. */
-   tp = GetVar( interp, (char *) var, TCL_LEAVE_ERR_MSG, STATUS );
-
 /* Tcl uses zero to represent false, and non-zero to represent true. */
-   if ( tp && !strcmp( tp, "0" ) ) {
+   if ( !strncmp( val, "0", 1 ) ) {
       *valptr = F77_FALSE;
    } else {
       *valptr = F77_TRUE;
    }
 }
 
-void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *STATUS ) {
+void GetRVar( const char *val, float *valptr, int *STATUS ) {
 /*
 *  Name:
 *     GetRVar
 
 *  Purpose:
-*     Retrieve a Tcl variable value and store it in a float.
+*     Retrieve an F77 REAL value from a C string.
 
 *  Parameters:
-*     interp = Tcl_Interp * (Given)
-*        A pointer to the Tcl interpreter structure.
 *     var = const char * (Given)
-*        The name of the Tcl variable to use.
+*        The C string.
 *     valptr = float * (Returned)
 *        A pointer to the variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
@@ -1229,41 +918,31 @@ void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *STATUS ) 
 *     
 */
 
-   const char *tp;
    char mess[81];
 
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return;
 
-/* Get a pointer to the Tcl variable value string. */
-   tp = GetVar( interp, (char *) var, TCL_LEAVE_ERR_MSG, STATUS );
-
-/* If ok, extract a floating point value from it. Report an error if the
-   conversion fails.  */
-   if ( tp ) {
-      if( sscanf( tp, "%g", valptr ) != 1 ) {
-         *STATUS = SAI__ERROR;
-         sprintf( mess, "\"%s\" is not a floating point value.", tp );
-         Error( mess, STATUS );
-         sprintf( mess, "Failed to obtained a value for Tcl variable \"%s\".", var );
-         Error( mess, STATUS );
-      }
+   if( sscanf( val, "%g", valptr ) != 1 ) {
+      *STATUS = SAI__ERROR;
+      sprintf( mess, "\"%s\" is not a floating point value.", val );
+      Error( mess, STATUS );
+      sprintf( mess, "Failed to obtained a value for a Tcl variable." );
+      Error( mess, STATUS );
    }
 }
 
-void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STATUS ) {
+void GetIVar( const char *val, int *valptr, int *STATUS ) {
 /*
 *  Name:
 *     GetIVar
 
 *  Purpose:
-*     Retrieve a Tcl variable value and store it in an integer.
+*     Retrieve an F77 INTEGER value from a C string.
 
 *  Parameters:
-*     interp = Tcl_Interp * (Given)
-*        A pointer to the Tcl interpreter structure.
-*     var = const char * (Given)
-*        The name of the Tcl variable to use.
+*     val = const char * (Given)
+*        The C string.
 *     valptr = int * (Returned)
 *        A pointer to the variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
@@ -1271,24 +950,67 @@ void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STATUS ) {
 *     
 */
 
-   const char *tp;
    char mess[81];
 
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return;
 
-/* Get a pointer to the Tcl variable value string. */
-   tp = GetVar( interp, (char *) var, TCL_LEAVE_ERR_MSG, STATUS );
-
-/* If ok, extract an integer value from it. Report an error if the
-   conversion fails.  */
-   if ( tp ) {
-      if( sscanf( tp, "%d", valptr ) != 1 ) {
-         *STATUS = SAI__ERROR;
-         sprintf( mess, "\"%s\" is not an integer value.", tp );
-         Error( mess, STATUS );
-         sprintf( mess, "Failed to obtained a value for Tcl variable \"%s\".", var );
-         Error( mess, STATUS );
-      }
+   if( sscanf( val, "%d", valptr ) != 1 ) {
+      *STATUS = SAI__ERROR;
+      sprintf( mess, "\"%s\" is not an integer value.", val );
+      Error( mess, STATUS );
+      sprintf( mess, "Failed to obtained a value for Tcl variable." );
+      Error( mess, STATUS );
    }
 }
+
+
+char *split( char *buf ){
+/*
+*  Name:
+*     split
+
+*  Purpose:
+*     Splits a string up into the first word and the rest. Any spaces
+*     inbetween the end of the first word and the start of the second
+*     are replaced by nulls, and a pointer is returned to the start of
+*     the second word. Any trailing newline character is replaced by a
+*     null.
+
+*/
+   char *ret;
+   char *end;
+   int got_name;
+   int end_name;
+
+/* Replace any trailing newline character with a null */
+   end = buf + strlen( buf ) - 1;
+   if( *end == '\n' ) *end = 0;
+
+/* Split the string into name and value */
+   got_name = 0;
+   end_name = 0;
+   end = buf + strlen( buf );
+
+   for( ret = buf; ret < end; ret++ ) {
+      if( !got_name ){
+         if( !isspace( (int) *ret ) ) got_name = 1;
+
+      } else if( !end_name ){
+         if( isspace( (int) *ret ) ){
+            *ret = 0;
+            end_name = 1;
+         } 
+
+      } else {
+         if( isspace( (int) *ret ) ){
+            *ret = 0;
+         } else {
+            break;
+         } 
+      }
+   }
+
+   return ret;   
+}
+
