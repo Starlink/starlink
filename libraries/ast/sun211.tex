@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.5}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {28th October 1999}
+\newcommand{\stardocdate}      {11th November 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -14959,8 +14959,8 @@ Object            - Base class for all AST Objects
       systems described by the two Frames will also be returned.
    }
    \sstsynopsis{
-      AstFrame $*$PickAxes( AstFrame $*$this, int naxes, const int axes[],
-                          AstMapping $*$$*$map )
+      AstFrame $*$astPickAxes( AstFrame $*$this, int naxes, const int axes[],
+                             AstMapping $*$$*$map )
    }
    \sstparameters{
       \sstsubsection{
@@ -16443,7 +16443,7 @@ Object            - Base class for all AST Objects
       debugging.
    }
    \sstsynopsis{
-      void Show( AstObject $*$this )
+      void astShow( AstObject $*$this )
    }
    \sstparameters{
       \sstsubsection{
@@ -20418,7 +20418,7 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
-   MajTickLen\sstlabel{MajTickLen}
+   MajTickLen(axis)\sstlabel{MajTickLenaxis}
 }{
    Length of major tick marks for a Plot
 }{
@@ -20426,6 +20426,9 @@ Object            - Base class for all AST Objects
       This attribute controls the appearance of an annotated
       coordinate grid (drawn with the \htmlref{astGrid}{astGrid} function) by determining
       the length of the major tick marks drawn on the axes of a \htmlref{Plot}{Plot}.
+      It takes a separate value for each physical axis of the Plot so
+      that, for instance, the setting {\tt{"}}MajTickLen(2)=0{\tt{"}} specifies the
+      length of the major tick marks drawn on the second axis.
 
       The MajTickLen value should be given as a fraction of the
       minimum dimension of the plotting area. Negative values cause
@@ -20447,6 +20450,16 @@ Object            - Base class for all AST Objects
          Plot
       }{
          All Plots have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If no axis is specified, (e.g. {\tt{"}}MajTickLen{\tt{"}} instead of
+         {\tt{"}}MajTickLen(2){\tt{"}}), then a {\tt{"}}set{\tt{"}} or {\tt{"}}clear{\tt{"}} operation will affect
+         the attribute value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}}
+         operation will use just the MajTickLen(1) value.
       }
    }
 }
@@ -20659,7 +20672,7 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
-   MinTickLen\sstlabel{MinTickLen}
+   MinTickLen(axis)\sstlabel{MinTickLenaxis}
 }{
    Length of minor tick marks for a Plot
 }{
@@ -20667,6 +20680,9 @@ Object            - Base class for all AST Objects
       This attribute controls the appearance of an annotated
       coordinate grid (drawn with the \htmlref{astGrid}{astGrid} function) by determining
       the length of the minor tick marks drawn on the axes of a \htmlref{Plot}{Plot}.
+      It takes a separate value for each physical axis of the Plot so
+      that, for instance, the setting {\tt{"}}MinTickLen(2)=0{\tt{"}} specifies the
+      length of the minor tick marks drawn on the second axis.
 
       The MinTickLen value should be given as a fraction of the
       minimum dimension of the plotting area. Negative values cause
@@ -20693,6 +20709,12 @@ Object            - Base class for all AST Objects
          \sstitem
          The number of minor tick marks drawn is determined by the
          Plot's \htmlref{MinTick(axis)}{MinTickaxis} attribute.
+
+         \sstitem
+         If no axis is specified, (e.g. {\tt{"}}MinTickLen{\tt{"}} instead of
+         {\tt{"}}MinTickLen(2){\tt{"}}), then a {\tt{"}}set{\tt{"}} or {\tt{"}}clear{\tt{"}} operation will affect
+         the attribute value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or {\tt{"}}test{\tt{"}}
+         operation will use just the MinTickLen(1) value.
       }
    }
 }
@@ -23466,10 +23488,10 @@ Object            - Base class for all AST Objects
          \htmlref{Labelling}{Labelling}: Label and tick placement option for a Plot
 
          \sstitem
-         \htmlref{MajTickLen}{MajTickLen}: Length of major tick marks for a Plot
+         \htmlref{MajTickLen(axis)}{MajTickLenaxis}: Length of major tick marks for a Plot
 
          \sstitem
-         \htmlref{MinTickLen}{MinTickLen}: Length of minor tick marks for a Plot
+         \htmlref{MinTickLen(axis)}{MinTickLenaxis}: Length of minor tick marks for a Plot
 
          \sstitem
          \htmlref{MinTick(axis)}{MinTickaxis}: Density of minor tick marks for a Plot
@@ -24425,6 +24447,17 @@ access to IntraMap attributes.
 class. This allows the transformation functions used by IntraMaps to
 adapt to produce the required transformation on a per-IntraMap basis
 (\secref{ss:intraflag}).
+
+\item The \htmlref{Plot}{Plot} attributes MajTickLen and MinTickLen, which control the
+length of major and minor tick marks on coordinate axes, may now be
+subscripted using an axis number. This allows tick marks of different
+lengths to be used on each axis. It also allows tick marks to be
+suppressed on one axis only by setting the length to zero.
+
+\item The value of the Plot attribute NumLab, which controls the
+plotting of numerical labels on coordinate axes, no longer has any
+effect on whether labelling of a coordinate grid is interior or
+exterior (as controlled by the \htmlref{Labelling}{Labelling} attribute).
 
 \item Some minor memory leaks have been fixed.
 
