@@ -82,6 +82,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			FID			! FITSfile identifier
@@ -92,6 +93,8 @@
 *  Local Variables:
       INTEGER			FSTAT			! FITSIO status
       INTEGER			LUN			! Logical unit number
+      INTEGER			NAXES(ADI__MXDIM)	! Dimensions
+      INTEGER			NAXIS			! Dimensionality
 *.
 
 *  Check inherited global status.
@@ -100,8 +103,22 @@
 *  Extract logical unit
       CALL ADI_CGET0I( FID, '.LUN', LUN, STATUS )
 
-*
+*  Primary HDU
+      CALL ADI_GKEY0I( FID, ' ', 'NAXIS', .TRUE., .FALSE.,
+     :                 NAXIS, CMT, STATUS )
+
+*  If NAXIS not present then write a null header
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        NAXIS = 0
+      END IF
+
+*  Define the header
+      CALL FTPHPR( LUN, .TRUE., 8, NAXIS, NAXES, 0, 1, .TRUE., STATUS )
+      CALL FTRDEF( LUN, STATUS )
       print *,'Committing changes to ',lun
+
+*  Write the other keywords
 
 *  Trap bad close status
       IF ( FSTAT .NE. 0 ) THEN
