@@ -463,7 +463,7 @@ sub output {
 
 #  Get file type.
 
-   my ($ftype) = ($file =~ m%\.([^/]*)$%);
+   my ($ftype) = ($file =~ m%\.([^/.]*)$%);
    $ftype ||= '';
 
 #  Open module source file.
