@@ -45,7 +45,7 @@
 *
 *     The results may optionally be written to an output positions list
 *     which can be used to pass the positions on to another application
-*     (see parameter OUCAT), or to a log file geared more towards human
+*     (see parameter OUTCAT), or to a log file geared more towards human
 *     readers, including details of the input parameters (see parameter
 *     LOGFILE).  
 *
@@ -237,7 +237,7 @@
 *     centroid arp244(6,,) i '"40,30"' toler=0.01
 *        This finds the 2-dimensional centroid of the feature near
 *        pixel (6,40,30) in the 3-dimensional NDF called arp244 (assuming
-*        the current co-ordinate Frame of the NEDF is PXIEL). The centroid
+*        the current co-ordinate Frame of the NDF is PIXEL). The centroid
 *        must be found to 0.01 pixels.
 *     centroid cluster cu xcen=(xp) ycen=(yp)
 *        This finds the centroid of an object in the 2-dimensional NDF
@@ -276,7 +276,7 @@
 *     background noise in each is made. The centroid of the feature is
 *     then found using only the data above the noise level.
 *
-*     Succesive estimates of the centroid position are made by using the
+*     Successive estimates of the centroid position are made by using the
 *     previous estimate of the centroid as the initial position for
 *     another estimation. This loop is repeated up to a maximum number of
 *     iterations, though it normally terminates when a desired accuracy

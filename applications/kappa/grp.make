@@ -192,7 +192,9 @@ kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f kpg1_wrlst.f kpg1_wwrt.f \
 kpg1_tkast.c kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f \
 kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f kpg1_ctass.f kpg1_ctcre.f \
 kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f kpg1_mkpos.f \
-kpg1_graph.f kpg1_ndfnm.f kpg1_grphw.f
+kpg1_graph.f kpg1_ndfnm.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
+kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
+kpg1_cpndw.f 
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
@@ -415,7 +417,9 @@ kps1_lplfs.f kps1_lpllm.f kps1_lplnm.f kps1_lshcp.f kps1_lshct.f \
 kps1_lshfm.f kps1_lshpl.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f \
 kps1_wala0.f kps1_wala3.f kps1_wala4.f kps1_wala5.f kps1_wala6.f \
 kps1_cpbd.f kps1_cpbr.f kps1_cpbi.f kps1_cpbw.f kps1_cpbb.f kps1_cpbuw.f \
-kps1_cpbub.f kps1_curfm.f
+kps1_cpbub.f kps1_curfm.f kps1_cenab.f kps1_cenad.f kps1_cenai.f kps1_cenar.f \
+kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f \
+kps1_censg.f kps1_censh.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
