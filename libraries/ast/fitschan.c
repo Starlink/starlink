@@ -250,6 +250,32 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        keywords to be lost when storing the card in a FitsChan.
 *     15-JUN-1999 (DSB):
 *        Report an error if an unrecognised projection name is supplied.
+*     9-DEC-1999 (DSB):
+*        - Fixed bug in WcsNatPole which could result in longitude values
+*        being out by 180 degrees for cylindrical projections such as CAR.
+*        - Only report an "unrecognised projection" error for CTYPE values
+*        which look like celestial longitude or latitude axes (i.e. if the 
+*        first 4 characters are "RA--", "DEC-", "xLON" or "xLAT", and the
+*        fifth character is "-").
+*        - Added function SpecTrans to translated keywords related to the 
+*        IRAF ZPX projection into keyword for the standard ZPN projection.
+*        - Add ICRS as a valid value for the RADECSYS keyword. Since the
+*        SkyFrame class does not yet support ICRS, an FK5 SkyFrame is
+*        created if RADECSYS=ICRS.
+*     16-DEC-1999 (DSB):
+*        - Modified SpecTrans so that all keywords used to created a 
+*        standard WCS representation from a non-standard one are consumed 
+*        by the astRead operation.
+*        - Changed the text of ASTWARN cards added to the FitsChan if an
+*        IRAF ZPX projection is found to require unsupported corrections.
+*        - Simplified the documentation describing the handling of the IRAF 
+*        ZPX projection.
+*        - Fixed code which assumed that the 10 FITS-WCS projection
+*        parameters were PROJP1 -> PROJP10. In fact they are PROJP0 -
+*        PROJP9. This could cause projection parameter values to be
+*        incorrectly numbered when they are written out upon deletion of 
+*        the FitsChan.
+*        
 *class--
 */
 
@@ -319,6 +345,7 @@ exceptions, so bad values are dealt with explicitly. */
 #define FK4NOE             2
 #define FK5                3
 #define GAPPT              4
+#define ICRS               5
 #define NOCEL              0
 #define RADEC              1
 #define ECLIP              2
@@ -536,14 +563,16 @@ static int CardDel( AstFitsChan * );
 static int CardType( AstFitsChan * );
 static int CheckFitsName( const char *, const char *, const char * );
 static int ChrLen( const char * );
+static int CnvType( int, void *, int, int, void *, const char *, const char *, const char * );
+static int CnvValue( AstFitsChan *, int , void *, const char *);
 static int ComBlock( AstFitsChan *, int, const char *, const char * );
 static int CountFields( const char *, char, const char *, const char * );
 static int DescIraf( AstFitsChan *, AstFrameSet *, int, int, int, FitsStore * );
 static int DescWcs( AstFitsChan *, AstFrameSet *, int, int, int, int, FitsStore * );
 static int EncodeFloat( char *, int, int, int, double );
 static int EncodeValue( AstFitsChan *, char *, int, int, const char * );
-static int KeyFields( AstFitsChan *, const char *, int, int *, int * );
 static int FindKeyCard( AstFitsChan *, const char *, const char *, const char * );
+static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int FitsEof( AstFitsChan * );
 static int FitsGetCF( AstFitsChan *, const char *, double * );
 static int FitsGetCI( AstFitsChan *, const char *, int * );
@@ -560,6 +589,7 @@ static int GetNaxis( AstFitsChan *, int );
 static int GetSkip( AstChannel * );
 static int GetWcsValue( AstFitsChan *, char *, int, void *, int, const char *, const char *  );
 static int IrafStore( AstFitsChan *, FitsStore * );
+static int KeyFields( AstFitsChan *, const char *, int, int *, int * );
 static int LinearMap( AstMapping *, int, int, double *, double *, double );
 static int Match( const char *, const char *, int, int *, int *, const char *, const char * );
 static int MatchChar( char, char, const char *, const char *, const char * );
@@ -589,8 +619,6 @@ static void *CardData( AstFitsChan *, size_t * );
 static void CheckZero( char *, double );
 static void CleanFits( FitsStore * );
 static void ClearAttrib( AstObject *, const char * );
-static int CnvValue( AstFitsChan *, int , void *, const char *);
-static int CnvType( int, void *, int, int, void *, const char *, const char *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void CreateKeyword( AstFitsChan *, const char *, char [ FITSNAMLEN + 1 ] );
 static void Crota( int, FitsStore *, int, int, int );
@@ -621,6 +649,7 @@ static void ReadFromSource( AstFitsChan * );
 static void SetAttrib( AstObject *, const char * );
 static void SetValue( AstFitsChan *, char *, void *, int, char * );
 static void SinkWrap( void (*)( const char * ), const char * );
+static void SpecTrans( AstFitsChan *, int, const char *, const char * );
 static void WriteBegin( AstChannel *, const char *, const char * );
 static void WriteDouble( AstChannel *, const char *, int, int, double, const char * );
 static void WriteEnd( AstChannel *, const char * );
@@ -629,7 +658,6 @@ static void WriteIsA( AstChannel *, const char *, const char * );
 static void WriteObject( AstChannel *, const char *, int, int, AstObject *, const char * );
 static void WriteString( AstChannel *, const char *, int, int, const char *, const char * );
 static void WriteToSink( AstFitsChan * );
-static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 
 /* Member functions. */
 /* ================= */
@@ -9135,6 +9163,10 @@ static AstFrameSet *ReadWcs( AstFitsChan *this ){
       old_skipping = Skipping;
       Skipping = 0;
 
+/* Translate special case non-standard keywords into equivalent standard
+   keywords (the IRAF "ZPX" projection, for instance). */
+      SpecTrans( this, naxis, method, class );
+
 /* Create a Frame describing the pixel coordinate system. This is known as 
    the "actual pixel coordinate system" in FITS WCS documentation. Give it
    the Domain GRID. */
@@ -9747,6 +9779,176 @@ static char *SourceWrap( const char *(* source)( void ) ) {
    return result;
 }
 
+static void SpecTrans( AstFitsChan *this, int naxis,
+                       const char *method, const char *class ){
+/*
+*  Name:
+*     SpecTrans
+
+*  Purpose:
+*     Translated non-standard WCS FITS headers into equivalent standard
+*     ones.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     void SpecTrans( AstFitsChan *this, int naxis, const char *method, 
+*                     const char *class )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     This function checks the supplied FitsChan for selected
+*     non-standard WCS keywords and, if found, replaces them with
+*     equivalent standard keywords. All the original keywords are marked
+*     as having been used, so that they are not written out when the 
+*     FitsChan is deleted. 
+*
+*     At the moment, the non-standard keywords checked for are:
+*
+*     1) The IRAF "ZPX" projection. If the last 4 chacaters of CTYPEi 
+*     (i = 1, naxis) are "-ZPX", then:
+*	- "ZPX" is replaced by "ZPN" within the CTYPEi value
+*       - If the FitsChan contains no PROJP keywords, then projection
+*       parameter valus are read from any WATi_nnn keywords, and
+*       corresponding PROJP keywords are added to the FitsChan (the WAT
+*       keywords are retained).
+*       - The WATi_nnn keywords may specify corrections to the basic ZPN
+*       projection by including "lngcor" or "latcor" terms. There is no
+*       direct equivalent in FITS-WCS to these terms and so they are
+*       ignored (it may be possible to use a pixel correction image but
+*       such images are not supported by AST anyway). If these correction
+*       terms are found an ASTWARN keyword is added to the FitsChan 
+*       containing a warning message. The calling application can (if it
+*       wants to) check for this keyword, and report its contents to the
+*       user.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     naxis
+*        Number of pixel axes in the FitsChan.
+*     method
+*        Pointer to string holding name of calling method.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+
+*/
+
+/* Local Variables: */
+   char *ctype;                   /* Pointer to CTYPE value */
+   char *start;                   /* Pointer to start of projp term */
+   char *wat;                     /* Pointer to a single WAT string */
+   char *watmem;                  /* Pointer to total WAT string */
+   char format[ 50 ];             /* scanf format string */
+   char keyname[ FITSNAMLEN + 1 ];/* General Keyword name */
+   double projp;                  /* Projection parameter value */
+   int iaxis;                     /* Axis index */
+   int icard;                     /* Current card index on entry */
+   int iproj;                     /* Projection parameter index */
+   int j;                         /* Continuation card index */
+   size_t size;                   /* Length of string value */
+   int watlen;                    /* Length of total WAT string (inc. term null)*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Save the current card index. */
+   icard = astGetCard( this );
+
+/* Check for IRAF "ZPX" projections 
+   -------------------------------- */
+
+/* Check each primary axis in turn. */
+   for( iaxis = 0; iaxis < naxis; iaxis++ ){
+
+/* Format the CTYPE keyword name. */
+      sprintf( keyname, "CTYPE%d", iaxis + 1 );
+
+/* Search for the CTYPE keyword for this axis, and get a pointer to its
+   value. */
+      if( SearchCard( this, keyname, method, class ) ) {
+         ctype = (char *) CardData( this, &size );
+
+/* If found, compare the characters 5 to 8 with "-ZPX" */
+         if( ctype && !Ustrcmp( ctype + 4, "-ZPX" ) ) {
+
+/* If a match was found, replace ZPX with ZPN. */
+            strcpy( ctype + 4, "-ZPN" );
+
+/* Rewind the FitsChan. */
+            astClearCard( this );
+
+/* Rewind the FitsChan. */
+            astClearCard( this );
+
+/* Otherwise, concatenate all the IRAF "WAT" keywords together for this
+   axis. These keywords are marked as having been used, so that they are 
+   not written out when the FitsChan is deleted. */
+            watmem = NULL;
+            watlen = 1;
+            j = 1;
+            sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
+            while( astOK && FindKeyCard( this, keyname, method, class ) ) {
+               wat = (char *) CardData( this, &size );
+               watmem = (char *) astRealloc( (void *) watmem, 
+                                             watlen - 1 + size );
+               if( watmem ) {
+                  strcpy( watmem + watlen - 1, wat );
+                  watlen += size - 1;
+                  MarkCard( this );
+                  MoveCard( this, 1, method, class );
+                  j++;
+                  sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
+               } else {
+                  break;
+               }
+            }
+
+/* Search the total WAT string for any projp terms. */
+            for( iproj = 0; iproj < 10; iproj++ ) {
+               sprintf( format, "projp%d=", iproj );
+               start = strstr( watmem, format );
+               if( start ) {
+                  sprintf( format, "projp%d=%%lf", iproj );
+                  if( sscanf( start, format, &projp ) ){
+                     sprintf( keyname, "PROJP%d", iproj );
+                     SetValue( this, keyname, (void *) &projp, 
+                               AST__FLOAT, "ZPN projection parameter" );
+                  }
+               }
+            }
+
+/* See if the WAT string contains any lngcor or latcor terms. If so, add
+   warning keywords to the FitsChan. */
+            if( strstr( watmem, "lngcor" ) || 
+                strstr( watmem, "lngcor" ) ){
+
+               astFitsSetS( this, "ASTWARN", " ", NULL, 0 );
+               astFitsSetS( this, "ASTWARN", "This FITS header includes, or was derived from, a ZPN", NULL, 0 );
+               astFitsSetS( this, "ASTWARN", "projection which requires unsupported IRAF-specific", NULL, 0 );
+               astFitsSetS( this, "ASTWARN", "corrections (lngcor and/or latcor). The WCS information", NULL, 0 );
+               astFitsSetS( this, "ASTWARN", "may therefore be incorrect.", NULL, 0 );
+               astFitsSetS( this, "ASTWARN", " ", NULL, 0 );
+            }
+
+/*  Release the memory used to hold the concatenated WAT keywords. */
+            watmem = (char *) astFree( (void *) watmem );
+
+         }
+      }
+   }
+
+/* Reinstate the original current card index. */
+   astSetCard( this, icard );
+
+/* Return. */
+   return;
+}
+
 static int SkySys( int prim, AstFrame *skyfrm, int wcstype, FitsStore *store,
                    int axlon, int axlat ){
 /*
@@ -9828,6 +10030,11 @@ static int SkySys( int prim, AstFrame *skyfrm, int wcstype, FitsStore *store,
    } else if( !Ustrcmp( sys, "FK5" ) ){
       eq = slaEpj( eq );
       radecsys = FK5;
+      isys = RADEC;
+
+   } else if( !Ustrcmp( sys, "ICRS" ) ){
+      eq = slaEpj( eq );
+      radecsys = ICRS;
       isys = RADEC;
 
    } else if( !Ustrcmp( sys, "GAPPT" ) ||
@@ -11098,76 +11305,95 @@ static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
    error has occurred. */
          if( !ret || !astOK ) break;
 
+/* Celestial axes must have a "-" as the fifth character in CTYPE. */
+         if( *( store->ctype[ iaxis ] + 4 ) == '-' ) {
+
 /* Find and store the projection type as specified by the last 4 characters 
-   in the CTYPE keyword value. */
-         prj = astWcsPrjType( store->ctype[ iaxis ] + 4 );
-         (store->prj)[ iaxis ] = prj;
+   in the CTYPE keyword value. AST__WCSBAD is stored in "prj" if the
+   last 4 characters do not specify a known WCS projection, but no error
+   is reported. */
+            prj = astWcsPrjType( store->ctype[ iaxis ] + 4 );
+            (store->prj)[ iaxis ] = prj;
 
-/* Report an error if the projection specification was not recognised. */
-         if( prj == AST__WCSBAD ){
-            astError( AST__BDFTS, "%s(%s): FITS keyword '%s' refers to "
-                     "an unknown projection type '%s'.", method, class, 
-                      store->ctype_name[ iaxis ], store->ctype[ iaxis ] + 4 );
-            ret = 0;
-            break;
-
-/* Otherwise, identify celestial coordinate axes from the first 4 characters 
-   of the CTYPE value. */
-         } else {
-
-/* See if this is a longitude axis (Eg if the first 4 character of CTYPE are 
+/* See if this is a longitude axis (e.g. if the first 4 character of CTYPE are 
    "RA--" or "xLON"). If so, store the value of "x" (or char(1) for equatorial 
-   coordinates) to indicate which coordinate system is being used.  Also store 
-   the index of the longitude axis. If another longitude axis has already been 
-   found, report an error. Also, decrement the number of non-celestial axes.*/
-             type = 0;
-             if( !strncmp( store->ctype[ iaxis ], "RA--", 4 ) ){
-                type = 1;
-             } else if( !strncmp( store->ctype[ iaxis ] + 1, "LON", 3 ) ){
-                type = *( store->ctype[ iaxis ] );
-             }
+   coordinates) in variable "type" to indicate which coordinate system is 
+   being used. */
+            type = 0;
+            if( !strncmp( store->ctype[ iaxis ], "RA--", 4 ) ){
+               type = 1;
+            } else if( !strncmp( store->ctype[ iaxis ] + 1, "LON", 3 ) ){
+               type = *( store->ctype[ iaxis ] );
+            }
 
-             if( type ){
-                (store->noncel)--;
+/* If this is a longitude axis... */
+            if( type ){
 
-                if( store->axlon == -1 ){
-                   store->axlon = iaxis;
-                   lontype = type;
-                } else {
-                   if( rep ) astError( AST__BDFTS, "%s(%s): FITS keywords '%s' (='%s') "
+/* Decrement the number of non-celestial axes. */
+               (store->noncel)--;
+
+/* Check that this is the first longitude axis to be found. */
+               if( store->axlon == -1 ){
+
+/* Report an error if the projection is unknown. */
+                  if( prj == AST__WCSBAD ){
+                     astError( AST__BDFTS, "%s(%s): FITS keyword '%s' refers to "
+                        "an unknown projection type '%s'.", method, class, 
+                         store->ctype_name[ iaxis ], store->ctype[ iaxis ] + 4 );
+                     ret = 0;
+                     break;
+                  }   
+
+/* Store the index of the longitude axis and the type of longitude. */
+                  store->axlon = iaxis;
+                  lontype = type;
+
+/* If another longitude axis has already been found, report an error. */
+               } else {
+                  if( rep ) astError( AST__BDFTS, "%s(%s): FITS keywords '%s' (='%s') "
                      "and '%s' (='%s') both describe celestial longitude axes.",
-                      method, class, store->ctype_name[ store->axlon ],
-                      store->ctype[ store->axlon ], 
-                      store->ctype_name[ iaxis ], store->ctype[ iaxis ] );
-                   ret = 0;
-                   break;
-                }
-             }
+                     method, class, store->ctype_name[ store->axlon ],
+                     store->ctype[ store->axlon ], 
+                     store->ctype_name[ iaxis ], store->ctype[ iaxis ] );
+                  ret = 0;
+                  break;
+               }
+            }
 
 /* Do the same for the latitude axis, checking for "DEC-" and "xLAT". */
-             type = 0;
-             if( !strncmp( store->ctype[ iaxis ], "DEC-", 4 ) ){
-                type = 1;
-             } else if( !strncmp( store->ctype[ iaxis ] + 1, "LAT", 3 ) ){
-                type = *( store->ctype[ iaxis ] );
-             }
+            type = 0;
+            if( !strncmp( store->ctype[ iaxis ], "DEC-", 4 ) ){
+               type = 1;
+            } else if( !strncmp( store->ctype[ iaxis ] + 1, "LAT", 3 ) ){
+               type = *( store->ctype[ iaxis ] );
+            }
 
-             if( type ){
-                (store->noncel)--;
+            if( type ){
+               (store->noncel)--;
 
-                if( store->axlat == -1 ){
-                   store->axlat = iaxis;
-                   lattype = type;
-                } else {
-                   if( rep ) astError( AST__BDFTS, "%s(%s): FITS keywords '%s' (='%s') "
+               if( store->axlat == -1 ){
+
+                  if( prj == AST__WCSBAD ){
+                     astError( AST__BDFTS, "%s(%s): FITS keyword '%s' refers to "
+                        "an unknown projection type '%s'.", method, class, 
+                         store->ctype_name[ iaxis ], store->ctype[ iaxis ] + 4 );
+                     ret = 0;
+                     break;
+                  }   
+
+                  store->axlat = iaxis;
+                  lattype = type;
+
+               } else {
+                  if( rep ) astError( AST__BDFTS, "%s(%s): FITS keywords '%s' (='%s') "
                       "and '%s' (='%s') both describe celestial latitude axes.",
                       method, class, store->ctype_name[ store->axlat ],
                       store->ctype[ store->axlat ],
                       store->ctype_name[ iaxis ], store->ctype[ iaxis ] );
-                   ret = 0;
-                   break;
-                }
-             }
+                  ret = 0;
+                  break;
+               }
+            }
          }
          
 /* Store the axis description count being used for this axis. */         
@@ -11342,6 +11568,10 @@ static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
             } else if( !strncmp( ckeyval, "FK5 ", 4 ) || 
                        !strcmp( ckeyval, "FK5" ) ){
                store->radecsys = FK5;
+
+            } else if( !strncmp( ckeyval, "ICRS ", 5 ) || 
+                       !strcmp( ckeyval, "ICRS" ) ){
+               store->radecsys = ICRS;
 
             } else if( !strncmp( ckeyval, "GAPPT ", 6 ) ||
                        !strcmp( ckeyval, "GAPPT" ) ){
@@ -12032,11 +12262,6 @@ static AstWcsMap *WcsDeproj( FitsStore *store, const char *method,
          }
       } 
 
-/* Replace any unsupplied projection parameters with zero. */
-      for( i = 0; i < AST__WCSMX; i++ ){
-         if( store->projp[ i ] == AST__BAD ) store->projp[ i ] = 0.0;
-      }
-
 /* Create the WcsMap, and invert it to get a DEprojection. The WcsMap is
    equivalent to a unit mapping for all axes other than "axlat" and "axlon". */
       new = astWcsMap( store->naxis, prj, axlon + 1, axlat + 1, "" );
@@ -12085,7 +12310,7 @@ static AstFrame *WcsFrame( FitsStore *store, const char *method,
 *     FitsChan member function.
 
 *  Description:
-*     A Frame is returned describingf the physical coordinate system of
+*     A Frame is returned describing the physical coordinate system of
 *     a WCS-encoded FitsChan. This will be a SkyFrame if the physical
 *     coordinate system consists of a pair of recognised celestial
 *     longitude and latitude axes.  If there are any other axes, then a
@@ -12160,6 +12385,9 @@ static AstFrame *WcsFrame( FitsStore *store, const char *method,
             skyframe = astSkyFrame( "System=FK4_NO_E" );
 
          } else if( radecsys == FK5 ){
+            skyframe = astSkyFrame( "System=FK5" );
+
+         } else if( radecsys == ICRS ){
             skyframe = astSkyFrame( "System=FK5" );
 
          } else if( radecsys == GAPPT ){
@@ -13136,7 +13364,7 @@ static int WcsNatPole( AstWcsMap *wcsmap, double alpha0, double delta0,
                t1 = sin_phip*cos_theta0/cos_delta0;
                t2 = ( sin_theta0 - sin_deltap*sin_delta0 )
                     /( cos_delta0*cos_deltap );
-               if( fabs( t1 > TOL2 ) || fabs( t2 > TOL2 ) ){
+               if( ( fabs( t1 ) > TOL2 ) || ( fabs( t2 ) > TOL2 ) ){
                   *alphap = alpha0 - atan2( t1, t2 );
                } else {
                   *alphap = alpha0;
@@ -13844,8 +14072,8 @@ static int WcsPrimary( AstFitsChan *this, FitsStore *store, int cdmat ){
                 "Native lat. at celestial north pole" );
 
    for( i = 0; i < AST__WCSMX; i++ ){   
-      sprintf( keyname, "PROJP%d", i + 1 );
-      sprintf( comment, "Projection parameter %d", i + 1 );
+      sprintf( keyname, "PROJP%d", i );
+      sprintf( comment, "Projection parameter %d", i );
       SetValue( this, keyname, (void *)( store->projp + i ), AST__FLOAT, 
                    comment );
    }
@@ -13893,6 +14121,8 @@ static int WcsPrimary( AstFitsChan *this, FitsStore *store, int cdmat ){
       text = "FK4-NO-E";
    } else if( store->radecsys == FK5 ){
       text = "FK5";
+   } else if( store->radecsys == ICRS ){
+      text = "ICRS";
    } else if( store->radecsys == GAPPT ){
       text = "GAPPT";
    } else {
@@ -14167,7 +14397,7 @@ static int WcsSecondary( AstFitsChan *this, FitsStore *store ){
    
 /* Check the PROJPi keywords. */
    for( i = 0; i < AST__WCSMX && save; i++ ){   
-      sprintf( keyname, "PROJP%d", i + 1 );
+      sprintf( keyname, "PROJP%d", i );
       dval = AST__BAD;
       astFitsGetF( this, keyname, &dval );
       if( !EQUAL( dval, store->projp[ i ] ) ) save = 0;
@@ -14196,6 +14426,8 @@ static int WcsSecondary( AstFitsChan *this, FitsStore *store ){
       text = "FK4-NO-E";
    } else if( store->radecsys == FK5 ){
       text = "FK5";
+   } else if( store->radecsys == ICRS ){
+      text = "ICRS";
    } else if( store->radecsys == GAPPT ){
       text = "GAPPT";
    } else {
@@ -16538,11 +16770,29 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *     a FrameSet to a FitsChan, only information from the base and
 *     current Frames will be stored.
 *
-*     When writing a FrameSet using the FITS-IRAF encoding, axis
-*     rotations are specified by a matrix of FITS keywords of the form
-*     "CDi_j", where "i" and "j" are single digits. The alternative
-*     form "CDiiijjj", which is also in use, is recognised when
-*     reading an Object, but is never written.
+*     Note that this encoding is provided mainly as an interim measure to
+*     provide a more stable alternative to the FITS-WCS encoding until the
+*     FITS standard for encoding WCS information is finalised.  The name
+*     "FITS-IRAF" indicates the general keyword conventions used and does
+*     not imply that this encoding will necessarily support all features of
+*     the WCS scheme used by IRAF software. Nevertheless, an attempt has
+*     been made to support a few such features where they are known to be
+*     used by important sources of data.
+*
+*     When writing a FrameSet using the FITS-IRAF encoding, axis rotations
+*     are specified by a matrix of FITS keywords of the form "CDi_j", where
+*     "i" and "j" are single digits. The alternative form "CDiiijjj", which
+*     is also in use, is recognised when reading an Object, but is never
+*     written.
+*
+*     In addition, the experimental IRAF "ZPX" sky projection will be
+*     accepted when reading, but will never be written (the corresponding
+*     FITS "ZPN" projection being used instead). However, longitude and
+*     latitude correction surfaces used by this "ZPX" projection (appearing
+*     as "lngcor" or "latcor" terms in the IRAF-specific "WAT" keywords) are
+*     not supported. If these are encountered while reading from a FitsChan,
+*     they are ignored and a warning message is added to the contents of the
+*     FitsChan as a set of cards using the keyword "ASTWARN".
 *
 *     You should not normally attempt to mix the FITS-IRAF and
 *     FITS-WCS encodings within the same FitsChan, since there is a
