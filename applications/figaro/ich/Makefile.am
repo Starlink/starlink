@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LTLIBRARIES = libich.la
+lib_LTLIBRARIES = libfigich.la
 
-libich_la_SOURCES = $(F_ROUTINES) 
+libfigich_la_SOURCES = $(F_ROUTINES) 
 
 F_ROUTINES = \
 ich_cd.f ich_cf.f ich_cfold.f ich_ci.f ich_clean.f ich_ctons.f \

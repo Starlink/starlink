@@ -3,9 +3,9 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-noinst_LTLIBRARIES = libfit.la
+lib_LTLIBRARIES = libfigfit.la
 
-libfit_la_SOURCES = \
+libfigfit_la_SOURCES = \
      $(PRIVATE_INCLUDES) \
      $(F_ROUTINES) $(FPP_ROUTINES)
 

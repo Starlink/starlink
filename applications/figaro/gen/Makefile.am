@@ -3,9 +3,9 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-noinst_LTLIBRARIES = libgen.la
+lib_LTLIBRARIES = libfiggen.la
 
-libgen_la_SOURCES = $(C_ROUTINES) $(F_ROUTINES) $(FPP_ROUTINES)
+libfiggen_la_SOURCES = $(C_ROUTINES) $(F_ROUTINES) $(FPP_ROUTINES)
 
 C_ROUTINES = \
 gen_getcwd.c gen_qfisort.c gen_qfmed.c gen_qfsort.c gen_rename.c

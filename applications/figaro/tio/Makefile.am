@@ -3,9 +3,9 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-noinst_LTLIBRARIES = libtio.la
+lib_LTLIBRARIES = libfigtio.la
 
-libtio_la_SOURCES = \
+libfigtio_la_SOURCES = \
 	$(F_ROUTINES)
 
 F_ROUTINES = tio_noxst.f
