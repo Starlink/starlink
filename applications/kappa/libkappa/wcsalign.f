@@ -238,7 +238,7 @@
 *     METHOD is set to Nearest.
 
 *  Related Applications:
-*     KAPPA: WCSFRAME, RESAMPLE; CCDPACK: TRANNDF
+*     KAPPA: WCSFRAME, RESAMPLE; CCDPACK: TRANNDF.
 
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, VARIANCE, LABEL, 
