@@ -120,6 +120,26 @@ AC_TRY_COMPILE([#include <string>], [string t;],
     AC_MSG_RESULT(yes),
     AC_MSG_RESULT(ARGHH -- error compiling)))
 
+dnl   Find where the SkyCat cat library has been installed.
+dnl   This must go _before_ the check for the STARLINK directories:
+dnl   since -L$CATLIBDIR/lib must go before -L/star/lib, if we are to
+dnl   find our (modified) libcat.a before the standard starlink one.
+AC_SUBST(CATLIBDIR)
+AC_ARG_WITH(catlib,
+[  --with-catlib[=path]    Give non-default location of SkyCat installation dir],
+  if test "$withval" = "yes"; then
+    # Default place
+    CATLIBDIR=../catlib-install
+  elif test "$withval" = "no"; then
+    CATLIBDIR=NOTHING
+  else
+    CATLIBDIR=$withval
+  fi,
+  CATLIBDIR=../catlib-install)
+LIBS="$LIBS -L$CATLIBDIR/lib -lcat"
+CPPFLAGS="$CPPFLAGS -I$CATLIBDIR/include"
+
+
 dnl   Add the Starlink include and library paths, taking the location
 dnl   of the /star directory from, in order, the argument to --with-starlink, 
 dnl   the $STARLINKS variable, the $STARLINK variable, and finally just /star.
@@ -170,68 +190,13 @@ AC_TRY_COMPILE([extern "C" {
   AC_MSG_ERROR(consider defining STARLINK to point to a newer distribution))
 
 
-
-dnl   Check whether the version of AST which we'll be linking against
-dnl   still has the proj.o module within it (from wcslib).  Newer
-dnl   versions don't (or rather do, but modified and renamed).
-AC_SUBST(ASTHASOLDPROJ)
-AC_CHECK_LIB(ast_wcslib, airfwd, ASTHASOLDPROJ=yes, ASTHASOLDPROJ=no)
-
-
-dnl   We don't at present need to link against wcslib (though I
-dnl   thought we did, at one point).  Should we need to again, this is
-dnl   how:
-dnl
-dnl wcs_libdir=../wcslib/C
-dnl AC_ARG_WITH(wcslib,
-dnl [  --with-wcslib=path      Path to dir containing libwcs.a (used only if needed)],
-dnl   if test "$withval" = yes; then
-dnl     : # do nothing
-dnl   elif test -z "$withval" -o "$withval" = no; then
-dnl     wcs_libdir=X
-dnl   else
-dnl     wcs_libdir=$withval
-dnl   fi)
-dnl 
-dnl AC_SUBST(WCSLIB)
-dnl AC_CHECK_LIB(ast_wcslib, glsfwd, , 
-dnl   AC_DEFINE(NEEDGLSFUNCS)
-dnl   if test $wcs_libdir = "X"; then
-dnl     AC_MSG_ERROR([--without-wcslib specified but need wcslib])
-dnl   else
-dnl     AC_DEFINE(WCSLIB,-L$wcs_libdir -lwcs)
-dnl   fi)
-
-if test $ASTHASOLDPROJ = yes; then
-    # We're going to get our wcslib functions from AST (which is
-    # evidently an old version of the library, and so has un-renamed
-    # wcslib functions within it).  Does that set of wcslib functions
-    # include glsfwd and glsrev (used by libskycat)?  If not, we'll
-    # have to supply these in SkyCatHoles.c.
-    AC_CHECK_LIB(ast_wcslib, glsfwd, , AC_DEFINE(NEEDGLSFUNCS))
-else
-    # Do nothing.  We're going to get the wcslib functions from
-    # libskycat's proj.o module, so we mustn't have extra glsfwd
-    # functions, so don't change NEEDGLSFUNCS from its default no.
-    :
-fi
-
-
-dnl   Find where the SkyCat cat library has been installed.
-AC_SUBST(CATLIBDIR)
-AC_ARG_WITH(catlib,
-[  --with-catlib[=path]    Give non-default location of SkyCat installation dir],
-  if test "$withval" = "yes"; then
-    # Default place
-    CATLIBDIR=../catlib
-  elif test "$withval" = "no"; then
-    CATLIBDIR=NOTHING
-  else
-    CATLIBDIR=$withval
-  fi,
-  CATLIBDIR=../catlib)
-
-
+dnl   Do we have the wcslib glsfwd function?  This might be in
+dnl   ast_wcslib (if that's very old) or in $CATLIBDIR/lib/libcat.a
+dnl   (it might have been _removed_ from the latter by the autoastrom
+dnl   makefile, if it is present in ast_wcslib).  If we can't find a
+dnl   copy, we supply one ourselves in SkyCatHoles.c -- see the
+dnl   discussion of this problem in that file.
+AC_CHECK_FUNCS(glsfwd)
 
 
 

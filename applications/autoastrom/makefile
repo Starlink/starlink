@@ -392,7 +392,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.5
+PKG_VERS = 0.5-1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1157,17 +1157,30 @@ build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a astrom/astrom.f
 	cd astrom && ./mk build
 
 # Creating moggy/Makefile configures the moggy package
-moggy/Makefile: moggy/Makefile.in $(CATLIBINSTALLDIR)/stamp
+moggy/Makefile: moggy/Makefile.in  $(CATLIBINSTALLDIR)/lib/libcat.a
 	CLDIR=`cd $(CATLIBINSTALLDIR);pwd`; \
 		cd moggy && unset INSTALL; \
-		CXX=$(CXX) CC=$(CC) ./configure \
-			--with-catlib=$$CLDIR
+		CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$CLDIR
 
 #  Build and install the SkyCat cat library.  We install it into the
-#  directory $(CATLIBINSTALLDIR), which moggy knows about.
+#  directory $(CATLIBINSTALLDIR), and pass that to the moggy configure
+#  script.  We modify the installed library by removing slasubs.o,
+#  which is provided instead by the AST libraries, and by removing
+#  proj.o if function glsfwd is present in libast_wcslib (if it is,
+#  this means that libast_wcslib is rather old: see comments in
+#  moggy/config/configure.in and moggy/SkyCatHoles.c)
 $(CATLIBINSTALLDIR)/lib/libcat.a: $(CATLIBINSTALLDIR)/stamp catlib/Makefile
 	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
 	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
+	ar -d $@ slasubs.o
+	echo "NOTE: removed slasubs.o from $@"
+	echo 'char glsfwd(); int main() { glsfwd(); return 0; }' >conftest.c
+	if cc -o conftest conftest.c -L$(STAR_LIB) -last_wcslib -lm >conftest.log 2>&1; then \
+		echo "NOTE: removed proj.o from $@"; \
+		ar -d $@ proj.o; \
+	fi
+	$(RMF) conftest*
+	$(RANLIB) $@
 
 #  Target to configure catlib
 catlib/Makefile: $(CATLIBINSTALLDIR)/stamp

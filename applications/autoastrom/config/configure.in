@@ -1,9 +1,15 @@
+dnl NOT USED -- all configuration done `by hand' in makefile
+
 dnl   Very simple configure at present -- simply invoke configure in the 
 dnl   moggy directory
 
 AC_REVISION($Revision$)
 
-AC_INIT(README)
+AC_INIT(makefile)
+
+echo "Do not use this configure script -- all configuration done in makefile"
+echo "Use  ./mk build  to build autoastrom"
+exit 1
 
 dnl   Say where the install-sh, config.guess and config.sub scripts are
 AC_CONFIG_AUX_DIR(config)

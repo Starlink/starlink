@@ -4,7 +4,7 @@
 # $Id$
 
 # %%VERSION%%
-PKG_VERS=0.3
+PKG_VERS=0.5
 PKG_NAME=autoastrom
 PKG_DIR=$(PKG_NAME)-$(PKG_VERS)
 

@@ -12,7 +12,7 @@
 # directories to CPPFLAGS and LIBS.
 #
 DEFS=@DEFS@
-CPPFLAGS=@CPPFLAGS@ -I$(MYCATLIB)/include
+CPPFLAGS=@CPPFLAGS@
 CXX=@CXX@
 # Don't attempt to set CFLAGS here, since this make is typically
 # invoked from a mk script, which overrides CFLAGS in the environment
@@ -25,18 +25,7 @@ CXX=@CXX@
 #
 CXXFLAGS=@CXXFLAGS@ $(CPPFLAGS) $(DEFS)
 
-LIBS=-lm @LIBS@ -L$(MYCATLIB)/lib -lskycat `ast_link` `cnf_link`
-
-# How old is libast_wcslib?  Older versions of that library had the
-# proj.o module (from wcslib) incorporated with the original names,
-# which causes linking problems.
-ASTHASOLDPROJ=@ASTHASOLDPROJ@
-
-# CATLIBDIR is the directory that SkyCat is temporarily installed
-# it.  This is not the directory we link against -- see the
-# $(MYCATLIB)/lib/libskycat.a target below.
-CATLIBDIR=@CATLIBDIR@
-MYCATLIB=SkyCat
+LIBS=-lm @LIBS@ `ast_link` `cnf_link`
 
 RANLIB=@RANLIB@
 
@@ -66,28 +55,8 @@ RANLIB=@RANLIB@
 EXEC=moggy
 OBJS=moggy.o CommandParse.o CatalogueHandler.o AstHandler.o util.o SkyCatHoles.o
 
-$(EXEC): $(OBJS) $(MYCATLIB)/lib/libskycat.a
+$(EXEC): $(OBJS)
 	$(CXX) $(OBJS) $(LIBS) -o $@
-
-# The SkyCat cat library has been installed in $(CATLIBDIR) (the
-# makefile or other configuration which calls this should have ensured 
-# this); if it isn't there, then this following dependency will cause
-# make to object.
-#
-# Here, we make a private version of it, with some awkward object
-# modules removed, and with the include files copied across.  It's
-# this version that we compile and link against.
-$(MYCATLIB)/lib/libskycat.a: $(CATLIBDIR)/lib/libcat.a
-	test -d $(MYCATLIB) || mkdir $(MYCATLIB)
-	test -d $(MYCATLIB)/lib || mkdir $(MYCATLIB)/lib
-	cp $(CATLIBDIR)/lib/libcat.a $(MYCATLIB)/lib/libskycat.a
-	ar -d $(MYCATLIB)/lib/libskycat.a slasubs.o
-	if test $(ASTHASOLDPROJ) = yes; then \
-		ar -d $(MYCATLIB)/lib/libskycat.a proj.o; \
-	fi
-	$(RANLIB) $(MYCATLIB)/lib/libskycat.a
-	(cd $(CATLIBDIR); tar cf - include) | (cd $(MYCATLIB); tar xf -)
-
 
 test: $(EXEC)
 	cd t; $(MAKE) test
@@ -105,18 +74,12 @@ tidy:
 
 clean: tidy
 	rm -f $(EXEC)
-	test ! -d $(MYCATLIB) || rm -Rf $(MYCATLIB)
+#	test ! -d $(MYCATLIB) || rm -Rf $(MYCATLIB)
 
 distclean: clean
 	rm -f config.cache config.log config.status config.h Makefile
 
 # Dependencies
-#
-# moggy.h doesn't really depend on SkyCat/lib/libskycat.a, but the two
-# modules which do, moggy.C and CatalogueHandler.C, do depend on
-# moggy.h, so this will ensure that the SkyCat includes are built and
-# installed in the correct order.
-moggy.h: $(MYCATLIB)/lib/libskycat.a
 
 # Because of the #include <cat/...> dependencies in some files, this
 # depend target only works after SkyCat/include has been built.

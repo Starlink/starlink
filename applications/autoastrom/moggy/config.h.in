@@ -46,14 +46,14 @@
 #define HAVE_SETENV 0
 #define DECLARE_SETENV 0
 
-/* Define as 1 if we have _not_ found the glsfwd and glsrev functions
-   in AST, and as 0 if we have found them.  If we do have them, this
-   means (a) our copy of AST is old-ish (before 1.8), so (b) it has
-   all of the wcslib functions that are in Calabretta's wcslib
-   distribution.  If it does _not_ have this function, then this means
-   that out copy of AST is new (1.8 or later), so we have to supply
-   the wcslib functions otherwise.  See SkyCatHoles.c and the
-   Makefile. */
-#define NEEDGLSFUNCS 0
+/* Define this if we have _not_ found the glsfwd and glsrev functions
+   somewhere.  If they are in AST, this means (a) our copy of AST is
+   old-ish (before 1.8), so (b) it has all of the wcslib functions
+   that are in Calabretta's wcslib distribution.  If it does _not_
+   have this function, then this means that out copy of AST is new
+   (1.8 or later), so we have to supply the wcslib functions
+   otherwise.  See SkyCatHoles.c, configure.in, and the Makefile, plus
+   ../makefile, which may have removed proj.o from libcat.a. */
+#undef HAVE_GLSFWD
 
 #endif /* CONFIG_H_LOADED */
