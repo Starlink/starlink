@@ -107,8 +107,8 @@
 *        alignment in which the objects are matched.  If frames have
 *        to be displaced more than this value to obtain a match, the
 *        match is rejected.  This will be of use when USEWCS is set 
-*        and the alignment defined by the WCS components of the 
-*        NDFs is fairly accurate.  It should be set to the maximum
+*        and the NDFs are already fairly well aligned in their Current
+*        coordinate systems.  It should be set to the maximum
 *        expected inaccuracy in that alignment.  If null, arbitrarily 
 *        large displacements are allowed, although note that a 
 *        similar restriction is effectively imposed by setting the
@@ -306,8 +306,7 @@
 *     correctly identified, in all the frames.  If this is not the 
 *     case, it should only be used when USEWCS is true and MAXDISP is 
 *     set to a low value, indicating that the alignment of the NDFs in
-*     the Current frames of their WCS components is already fairly 
-*     accurate.
+*     their Current coordinate systems is already fairly accurate.
 *
 *     The global registration process works by forming a graph with
 *     each position list at a node and with connecting edges of weight
@@ -361,8 +360,8 @@
 *        This form would be used if the NDFs 'data*' are already
 *        approximately aligned in their Current coordinates. Setting the
 *        RESTRICT parameter then tells FINDOFF to consider only objects
-*        in the region which the WCS components say ought to overlap
-*        between pairs of frames. This can save a lot of time if there
+*        in the region which overlaps in the Current coordinates of 
+*        each pair of frames. This can save a lot of time if there
 *        are many objects and a small overlap, but will result in
 *        failure of the program if the NDFs are not translationally
 *        aligned reasonably well in the first place.
