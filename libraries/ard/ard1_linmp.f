@@ -5,7 +5,7 @@
 *     ARD1_LINMP
 
 *  Purpose:
-*     See if a mapping is linear and return a matrix describing it.
+*     Check that a mapping is linear and return a matrix describing it.
 
 *  Language:
 *     Starlink Fortran 77
@@ -74,6 +74,12 @@
       INCLUDE 'ARD_ERR'          ! ARD error constants
       INCLUDE 'ARD_CONST'        ! ARD private constants
 
+*  Global Variables:
+      INCLUDE 'ARD_COM'          ! ARD common blocks
+*        CMN_LINOK = LOGICAL (Read)
+*           If .FALSE., then no not allow any Mapping to be considered
+*           linear.
+
 *  Arguments Given:
       INTEGER MAP
       INTEGER FRM
@@ -89,6 +95,7 @@
 
 *  External References:
       REAL RAND                  ! Random number in range [0,1]
+      EXTERNAL ARD1_INIT         ! initialize ARD common blocks
 
 *  Local Constants:
       DOUBLE PRECISION EPS       ! Grid axis increment used to evaluate
@@ -123,13 +130,16 @@
       NIN = AST_GETI( MAP, 'NIN', STATUS )
       NOUT = AST_GETI( MAP, 'NOUT', STATUS )
 
+*  We only need to do the check if CMN_LINOK is supplied .TRUE.
+      IF( CMN_LINOK ) THEN
+
 *  Store unit vectors along each of the input axes, plus the origin.
-      DO I = 1, NIN
-         DO J = 1, NIN + 1
-            IN( J, I ) = 0.0
+         DO I = 1, NIN
+            DO J = 1, NIN + 1
+               IN( J, I ) = 0.0
+            END DO
+            IN( I, I ) = 1.0
          END DO
-         IN( I, I ) = 1.0
-      END DO
 
 *  Also store the test points to be used, in pairs; the first in each pair
 *  is a test point, the second is the same point but incremented by a small 
@@ -137,105 +147,107 @@
 *  each of the NIN axes. The next test point is the lower bounds on all
 *  axes. The next is the upper bounds on all axes. The next is the centre
 *  of the array.
-      DO ITEST = 1, NIN
-         DO I = 1, NIN
-            IN( NIN + 2*ITEST, I ) = DLBND( I )
+         DO ITEST = 1, NIN
+            DO I = 1, NIN
+               IN( NIN + 2*ITEST, I ) = DLBND( I )
+            END DO
+            IN( NIN + 2*ITEST, ITEST ) = DUBND( ITEST )
          END DO
-         IN( NIN + 2*ITEST, ITEST ) = DUBND( ITEST )
-      END DO
-
-      DO I = 1, NIN
-         IN( 3*NIN + 2, I ) = DLBND( I )
-         IN( 3*NIN + 4, I ) = DUBND( I )
-         IN( 3*NIN + 6, I ) = 0.5*( DLBND( I ) + DUBND( I ) ) 
-      END DO
-
-      DO ITEST = 1, NIN + 3
+   
          DO I = 1, NIN
-            IN( NIN + 2*ITEST + 1, I ) = IN( NIN + 2*ITEST, I ) + EPS
+            IN( 3*NIN + 2, I ) = DLBND( I )
+            IN( 3*NIN + 4, I ) = DUBND( I )
+            IN( 3*NIN + 6, I ) = 0.5*( DLBND( I ) + DUBND( I ) ) 
          END DO
-      END DO
+   
+         DO ITEST = 1, NIN + 3
+            DO I = 1, NIN
+               IN( NIN + 2*ITEST + 1, I ) = IN( NIN + 2*ITEST, I ) + EPS
+            END DO
+         END DO
 
 *  Transform these vectors using the supplied Mapping. If the Mapping is 
 *  linear, the transformed data will define the required matrix, with three
 *  extra columns holding the transformed extra points.
-      CALL AST_TRANN( MAP, 3*NIN + 7, NIN, 3*ARD__MXDIM + 7, IN, 
-     :                .TRUE., NOUT, 3*ARD__MXDIM + 7, OUT, STATUS )
+         CALL AST_TRANN( MAP, 3*NIN + 7, NIN, 3*ARD__MXDIM + 7, IN, 
+     :                   .TRUE., NOUT, 3*ARD__MXDIM + 7, OUT, STATUS )
 
 *  Normalize the positions.
-      DO I = 1, 3*NIN + 7
-         DO J = 1, NOUT
-            A( J ) = OUT( I, J )
+         DO I = 1, 3*NIN + 7
+            DO J = 1, NOUT
+               A( J ) = OUT( I, J )
+            END DO
+            CALL AST_NORM( FRM, A, STATUS )
+            DO J = 1, NOUT
+               OUT( I, J ) = A( J )
+            END DO
          END DO
-         CALL AST_NORM( FRM, A, STATUS )
-         DO J = 1, NOUT
-            OUT( I, J ) = A( J )
-         END DO
-      END DO
 
 *  Find the minimum distance per pixel at any of the test points. If any 
 *  bad transformed points are encountered, the Mapping cannot be linear so 
 *  abort.
-      DPP = AST__BAD
-      DO ITEST = 1, NIN + 3
-
-         DO I = 1, NOUT
-            A( I ) = OUT( NIN + 2*ITEST, I ) 
-            B( I ) = OUT( NIN + 2*ITEST + 1, I ) 
+         DPP = AST__BAD
+         DO ITEST = 1, NIN + 3
+   
+            DO I = 1, NOUT
+               A( I ) = OUT( NIN + 2*ITEST, I ) 
+               B( I ) = OUT( NIN + 2*ITEST + 1, I ) 
+            END DO
+   
+            DIST = AST_DISTANCE( FRM, A, B, STATUS )
+            IF( DIST .EQ. AST__BAD ) GO TO 999
+   
+            IF( ITEST .EQ. 1 ) THEN 
+               DPP = DIST / ( EPS*SQRT( DBLE( NIN ) ) )
+            ELSE
+               DPP = MIN( DPP, DIST / ( EPS*SQRT( DBLE( NIN ) ) ) )
+            END IF
+   
          END DO
-
-         DIST = AST_DISTANCE( FRM, A, B, STATUS )
-         IF( DIST .EQ. AST__BAD ) GO TO 999
-
-         IF( ITEST .EQ. 1 ) THEN 
-            DPP = DIST / ( EPS*SQRT( DBLE( NIN ) ) )
-         ELSE
-            DPP = MIN( DPP, DIST / ( EPS*SQRT( DBLE( NIN ) ) ) )
-         END IF
-
-      END DO
 
 *  Subtract the transformed origin (the first extra position) from each of 
 *  the first NIN positions.
-      DO I = 1, NOUT
-         ORIG( I ) = OUT( NIN + 1, I )
-         DO J = 1, NIN 
-            OUT( J, I ) = OUT( J, I ) - ORIG( I )
+         DO I = 1, NOUT
+            ORIG( I ) = OUT( NIN + 1, I )
+            DO J = 1, NIN 
+               OUT( J, I ) = OUT( J, I ) - ORIG( I )
+            END DO
          END DO
-      END DO
 
 *  We now test the Mapping for linearity. The linearity test must be passed 
 *  at all test points. Assume success to begin with.
-      LINEAR = .TRUE.
-      DO ITEST = 1, NIN + 3
+         LINEAR = .TRUE.
+         DO ITEST = 1, NIN + 3
 
 *  The current test point is mapped using the candidate matrix. 
-         DO I = 1, NOUT
-            A( I ) = ORIG( I )
-            DO J = 1, NIN
-               A( I ) = A( I ) + OUT( J, I )*IN( NIN + 2*ITEST, J )
+            DO I = 1, NOUT
+               A( I ) = ORIG( I )
+               DO J = 1, NIN
+                  A( I ) = A( I ) + OUT( J, I )*IN( NIN + 2*ITEST, J )
+               END DO
+               B( I ) = A( I )
             END DO
-            B( I ) = A( I )
-         END DO
-
-         CALL AST_NORM( FRM, A, STATUS )
-         DO I = 1, NOUT
-            IF( A( I ) .NE. B( I ) ) THEN
-               LINEAR = .FALSE.
-               GO TO 999
-            END IF
-            B( I ) = OUT( NIN + 2*ITEST, I )
-         END DO         
+   
+            CALL AST_NORM( FRM, A, STATUS )
+            DO I = 1, NOUT
+               IF( A( I ) .NE. B( I ) ) THEN
+                  LINEAR = .FALSE.
+                  GO TO 999
+               END IF
+               B( I ) = OUT( NIN + 2*ITEST, I )
+            END DO         
 
 *  If the arc distance between the point found above, and the same
 *  point found using the Mapping directly, is greater than the maximum error 
 *  allowed, the Mapping is considered not to be linear. 
-         IF( AST_DISTANCE( FRM, A, B, STATUS ) .GT. DPP*MAXERR ) THEN
-            LINEAR = .FALSE.
-            GO TO 999
-         END IF
+            IF( AST_DISTANCE( FRM, A, B, STATUS ) .GT. DPP*MAXERR ) THEN
+               LINEAR = .FALSE.
+               GO TO 999
+            END IF
+   
+         END DO
 
-      END DO
+      END IF
 
 *  Arrive here if an error occurs, or the Mapping is non-linear.
  999  CONTINUE

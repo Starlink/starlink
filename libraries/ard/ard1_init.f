@@ -252,4 +252,8 @@
 *  No Application FrameSet is avalable as yet.
       DATA CMN_AWCS /AST__NULL/
 
+*  Allow linear Mappings.
+      DATA CMN_LINOK /.TRUE./
+
+
       END

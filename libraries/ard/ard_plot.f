@@ -84,6 +84,9 @@
 *        CMN_ADOM = CHARACTER*40 (Read and Write)
 *           The Domain name associated with pixel
 *           coordinates in the mask array.
+*        CMN_LINOK = LOGICAL (Write)
+*           If .FALSE., then no not allow any Mapping to be considered
+*           linear.
 
 *  Arguments Given:
       INTEGER IGRP
@@ -96,6 +99,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      EXTERNAL ARD1_INIT         ! initialize ARD common blocks
+
 *  Local Constants:
       INTEGER MAXPTS             ! Maximum number of positions in each
       PARAMETER ( MAXPTS = 10000 ) ! axis that define the locus of a contour
@@ -105,17 +111,23 @@
 
 *  Local Variables:
       CHARACTER*40 ADOM0         ! Orig. pixel Domain name 
+      DOUBLE PRECISION DLBND( 2 )! Lower bounds of pixel coords
+      DOUBLE PRECISION DUBND( 2 )! Upper bounds of pixel coords
       DOUBLE PRECISION INA( 2 )  ! Input coords of window corner A
       DOUBLE PRECISION INB( 2 )  ! Input coords of window corner B
       DOUBLE PRECISION OUTA( 2 ) ! Output coords of window corner A
       DOUBLE PRECISION OUTB( 2 ) ! Output coords of window corner B
+      INTEGER AWCS               ! WCS Frameset
       INTEGER AWCS0              ! Pointer to original application FrameSet.
       INTEGER DIM( 2 )           ! Dimensions of mask array 
       INTEGER GFRM               ! AST pointer to mask grid coords Frame 
+      INTEGER I                  ! Loop count
       INTEGER ICURR              ! Index of original current Frame
       INTEGER IGRID              ! Index of mask grid coords Frame within JPLOT
       INTEGER IPDONE             ! Pointer to contouring work array
+      INTEGER IPEXPR             ! supplied algebraic ARD expression
       INTEGER IPMASK             ! Pointer to mask array
+      INTEGER IPOPND             ! operand stack
       INTEGER IPXY               ! Pointer to contour locus work array
       INTEGER JPLOT              ! AST pointer to modified Plot
       INTEGER LBND( 2 )          ! Lower bounds for mask array 
@@ -123,13 +135,16 @@
       INTEGER LBNDI( 2 )         ! Lower bounds of interior bounding box
       INTEGER PFRM               ! AST pointer to mask pixel coords Frame 
       INTEGER RV                 ! The returned value of REGVAL
+      INTEGER SZEXPR             ! Size of supplied algebraic expression
+      INTEGER SZOPND             ! Size of operand stack
       INTEGER UBND( 2 )          ! Lower bounds for mask array 
       INTEGER UBNDE( 2 )         ! Upper bounds of exterior bounding box
       INTEGER UBNDI( 2 )         ! Upper bounds of interior bounding box
       INTEGER WINMAP             ! AST pointer to a WinMap Mapping
       INTEGER XSIZE              ! X dimension of interior box
       INTEGER YSIZE              ! Y dimension of interior box
-
+      LOGICAL INP                ! INPUT keywords in ARD description?
+      LOGICAL OK                 ! Was fast algorithm succesful?
 *.
 
 *  Check the inherited global status.
@@ -205,40 +220,102 @@
       ADOM0 = CMN_ADOM
       CMN_ADOM = 'ARDPIXCO'
 
+*  First we see if the ARD expression consists of a single keyword. If
+*  so, we can use a much faster algorithm for drawing the region.
+*  ====================================================================
+
+*  The fast algorithm cannot be used if the REGVAL value indicate that a 
+*  complicated ARD description has been supplied.
+      IF( REGVAL .NE. 0 .AND. REGVAL .NE. 2 ) THEN
+         OK = .FALSE.
+
+*  If REGVAL does not indicate a complex ARD description, we may be able
+*  to use the fast algorithm.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Create an AST FrameSet describing the known coordinate Frames. The
+*  base Frame of this FrameSet will be pixel coords within the work
+*  array, and the current Frame will be "Application co-ordinates" (i.e. 
+*  the default user coordinate system). This Frame wil have Domain ARDAPP.
+*  The FrameSet may also contain other Frames specified using the ARD_WCS 
+*  routine. 
+         CALL ARD1_APWCS( 2, VAL__BADR, AWCS, STATUS )
+
+*  Get work space to hold the algebraic Boolean expression
+*  corresponding to the supplied ARD description, and an array of
+*  operands.
+         SZEXPR = 50
+         CALL PSX_CALLOC( SZEXPR, '_INTEGER', IPEXPR, STATUS )
+   
+         SZOPND = 200
+         CALL PSX_CALLOC( SZOPND, '_DOUBLE', IPOPND, STATUS )
+
+*  Store _DOUBLE versions of the mask pixel bounds.
+         DO I = 1, 2
+            DLBND( I ) = DBLE( LBND( I ) - 1 )
+            DUBND( I ) = DBLE( UBND( I ) )
+         END DO
+
+*  Set a flag in common which prevents any Mapping being considered Linear.
+         CMN_LINOK = .FALSE.  
+
+*  Create an algebraic Boolean expression in which operators and
+*  operands are represented by integer codes by analysing the ARD
+*  description into operators, keywords and statement. Also store
+*  information within the operand array describing the keywords
+*  included in the ARD description. The returned expression corresponds
+*  to the ARD description as supplied (i.e. no implicit .OR.s are
+*  inserted).
+         CALL ARD1_ADANL( IGRP, 2, AWCS, DLBND, DUBND, IPEXPR, IPOPND, 
+     :                    SZEXPR, SZOPND, INP, STATUS )
+
+*  Attempt to draw the region assuming it consists of a single keyword.
+         CALL ARD1_FPLOT( SZEXPR, %VAL( IPEXPR ), SZOPND, 
+     :                    %VAL( IPOPND ), OK, STATUS )
+
+      END IF
+
+*  If the ARD description was not just a single keyword, we use the
+*  slower algorithm.
+*  =================================================================
+      IF( .NOT. OK ) THEN
+
 *  Fill the work array with integers representing the ARD description.
-      RV = 2
-      CALL ARD_WORK( IGRP, 2, LBND, UBND, VAL__BADR, .FALSE., 
-     :               RV, %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
-     :               STATUS )
+         RV = 2
+         CALL ARD_WORK( IGRP, 2, LBND, UBND, VAL__BADR, .FALSE., 
+     :                  RV, %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :                  STATUS )
 
 *  Re-instate the original application FrameSet and Domain.
-      CMN_AWCS = AWCS0
-      CMN_ADOM = ADOM0
+         CMN_AWCS = AWCS0
+         CMN_ADOM = ADOM0
 
 *  Make the ARDGRIDCO Frame the current Frame, as required by ARD1_CNTDR.
-      CALL AST_SETI( JPLOT, 'CURRENT', IGRID, STATUS )
+         CALL AST_SETI( JPLOT, 'CURRENT', IGRID, STATUS )
 
 *  If we are contouring below or above the range of region indicies used
 *  by the ARD description, skip the contouring since there is nothing to 
 *  contour.
-      IF( ABS( REGVAL ) .LT. RV ) THEN 
+         IF( ABS( REGVAL ) .LT. RV ) THEN 
 
 *  Allocate work space.
-         XSIZE = UBNDI( 1 ) - LBNDI( 1 ) + 1                          
-         YSIZE = UBNDI( 2 ) - LBNDI( 2 ) + 1                          
-         CALL PSX_CALLOC( ( XSIZE + 1 ) * ( YSIZE + 1 ), '_LOGICAL', 
-     :                    IPDONE, STATUS )
-         CALL PSX_CALLOC( 2*MAXPTS, '_DOUBLE', IPXY, STATUS )
+            XSIZE = UBNDI( 1 ) - LBNDI( 1 ) + 1                          
+            YSIZE = UBNDI( 2 ) - LBNDI( 2 ) + 1                          
+            CALL PSX_CALLOC( ( XSIZE + 1 ) * ( YSIZE + 1 ), '_LOGICAL', 
+     :                       IPDONE, STATUS )
+            CALL PSX_CALLOC( 2*MAXPTS, '_DOUBLE', IPXY, STATUS )
 
 *  Contour this array at the specified integer value.
-         CALL ARD1_CNTDR( JPLOT, DIM( 1 ), DIM( 2 ), %VAL( IPMASK ), 
-     :                    LBNDI( 1 ), LBNDI( 2 ), XSIZE, YSIZE, 
-     :                    REGVAL, MAXPTS, %VAL( IPXY ), %VAL( IPDONE ), 
-     :                    STATUS )
+            CALL ARD1_CNTDR( JPLOT, DIM( 1 ), DIM( 2 ), %VAL( IPMASK ), 
+     :                       LBNDI( 1 ), LBNDI( 2 ), XSIZE, YSIZE, 
+     :                       REGVAL, MAXPTS, %VAL( IPXY ), 
+     :                       %VAL( IPDONE ), STATUS )
 
 * Free the work space.
-         CALL PSX_FREE( IPXY, STATUS )
-         CALL PSX_FREE( IPDONE, STATUS )
+            CALL PSX_FREE( IPXY, STATUS )
+            CALL PSX_FREE( IPDONE, STATUS )
+         END IF
+
       END IF
 
 *  Store the returned region index if required.

@@ -175,6 +175,9 @@
 *  The index of the GRP group to use.
       INTEGER CMN_AGRP
 
+*  Allow Mappings to be considered linear?
+      LOGICAL CMN_LINOK
+
 *  Declare the common block /ARD_C1/, to hold non-character variables.
       COMMON /ARD_C1/ CMN_DSTK, CMN_KWLEN, CMN_NARG, CMN_OPCOD,
      :                CMN_OPL, CMN_OPLEN, CMN_OPR, CMN_OPS, CMN_PRL,
@@ -183,7 +186,8 @@
      :                CMN_LBNDC, CMN_UBNDC, CMN_LBIBC, CMN_UBIBC,
      :                CMN_MSKSC, CMN_RNDXC, CMN_TYPEC, CMN_NPARC,
      :                CMN_FRMC, CMN_IPPAR, CMN_INIT, CMN_IGRP,
-     :                CMN_NXTLN, CMN_AWCS, CMN_AGRP, CMN_ASTLN
+     :                CMN_NXTLN, CMN_AWCS, CMN_AGRP, CMN_ASTLN, 
+     :                CMN_LINOK
 
 *  Declare the common block /ARD_C2/, to hold character variables.
       COMMON /ARD_C2/ CMN_OPSYM, CMN_KWSYM, CMN_STSYM, CMN_INSTR,
