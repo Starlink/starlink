@@ -159,9 +159,24 @@ world: $(ALL_TARGETS)
 # isn't yet a Makefile which would make GenerateDependencies.class for
 # us.
 #
-# If we can't do the work in this target, then simply touch
-# Makefile.dependencies, so that it can be successfully included in
-# this Makefile.
+# If $(JAVA) is NOJAVA and Makefile.dependencies does not exist,
+# then what is happening is that the user has deleted
+# Makefile.dependencies in order to remake it, but they don't have a
+# java binary on their path.  Oh dear.  Just touching the file isn't
+# any use here, so fail noisily, and tell the user what they need to do.
+#
+# if $(JAVA) is NOJAVA and Makefile.dependencies does exist, then
+# we're puzzled, because we probably shouldn't be executing this
+# rule.  Clearly, `make' has gone mad.  In this case, simply touch
+# Makefile.dependencies, since that should at least stop this
+# happening again, and hope this turns into someone else's problem.
+#
+# The hole in the logic below is where we have an unconfigured tree
+# (ie, no buildsupport/starconf/java/Makefile) _and_ no
+# Makefile.dependencies.  Since the latter is checked into the
+# repository, this can only mean that someone is playing
+# silly-buggers, and we're stuck.  The error message should cover
+# that case, too.
 #
 # We make the componentset.xml by concatenating all the component.xml
 # files we can find.  Sort the list of files to make the order
@@ -189,8 +204,18 @@ Makefile.dependencies:
 	        GenerateDependencies componentset.xml \
 	        >Makefile.dependencies.tmp \
 	  && mv Makefile.dependencies.tmp $@; \
-	else \
+	elif test -f $@; then \
 	  touch $@; \
+	else \
+	  echo "You are remaking Makefile.dependencies (yes?)."; \
+	  echo "To do this, you must have java in your path."; \
+	  echo "(and buildsupport/starconf must be configured, as the"; \
+	  echo "result of a tree-wide bootstrap).  Either call:"; \
+	  echo "  make JAVA=/path/to/java Makefile.dependencies"; \
+	  echo "or edit PATH appropriately, run"; \
+	  echo "  ./configure --no-recursion"; \
+	  echo "and then remake Makefile.dependencies"; \
+	  false; \
 	fi
 
 # Make a link to an installed componentinfo.dtd file.  This will not
