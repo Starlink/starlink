@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL KAPHELP( STATUS )
+*     CALL SCUHELP( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
