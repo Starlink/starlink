@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun\stardocumber}
 \newcommand{\stardocnumber}    {223.0}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {12 May 1998}
+\newcommand{\stardocdate}      {1 June 1998}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
 \newcommand{\stardocversion}   {Version 1.0}
@@ -372,7 +372,8 @@ dual-beam polarimeter is described by Scarrott et al. ({\em Mon. Not. R.
 astr. Soc.} (1983) {\bf 204}, 1163 - 1177).
 
 \subsection{The Polarimeter}
-A dual-beam polarimeter usually contains the following optical components:
+A dual-beam polarimeter suitable for measuring linear polarization usually 
+contains the following optical components:
 
 \begin{enumerate}
 \item A focal-plane {\em mask}.
@@ -524,7 +525,7 @@ flat-fields are normally taken on the night sky which at these wavelengths
 is bright enough to give a good signal to noise ratio.}. Since the
 brightness of this surface is constant, any variations in the recorded
 image (the ``flat-field'' image) must be due to variations in the
-sensitivity of the detector. These variations can then removed from the
+sensitivity of the detector. These variations can then be removed from the
 target observation by dividing every pixel value in the target image by
 the corresponding pixel value in the flat-field image.
 
@@ -726,7 +727,7 @@ following to convert them into NDFs:
 \end{myquote}
 
 Note that the \text{\%} represents the C-shell prompt and should not be typed.
-The first command initialise the commands required to use the CONVERT
+The first command initialises the commands required to use the CONVERT
 package. The second command converts all FITS files with a file type of
 \verb+.fit+ within the current directory, into equivalent NDFs with the
 same file names, but a file type of \verb+.sdf+\footnote{The double quotes
@@ -735,7 +736,7 @@ expansion of these file templates is performed internally, within
 fits2ndf.}. The \verb+.sdf+ files can then be given as inputs to
 any application from POLPACK, CCDPACK or KAPPA.
 
-\item You can rely on the facilities of the NDF library to perform
+\item Alternatively, you can rely on the facilities of the NDF library to perform
 automatic on-the-fly data conversions as and when necessary. Using this
 technique, POLPACK, CCDPACK and KAPPA all appear to process your data files
 directly without you needing to do any explicit data conversion. All you
@@ -788,7 +789,7 @@ $E$ ray channels. If the {\em same} flat-field is used for all target
 exposures, then this difference in sensitivity will be constant and can
 be removed while calculating the Stokes parameters (provided you have
 target exposures at half-wave plate positions of 0, 22.5, 45 and 67.5
-degrees). \hyperref{Go here for}{Appendix}{contains}{APP:FFCOR} a
+degrees). \hyperref{Go here for}{Appendix }{ contains}{APP:FFCOR} a
 mathematical description of the flat-fielding process, and the
 corrections applied by POLPACK when calculating the Stokes parameters.
 
@@ -843,7 +844,7 @@ supplying it with a ``control table''. This is a text file containing a
 line for each item of information to be imported into the POLPACK
 extension. Each such item has a name by which other POLPACK applications
 refer to it (these are described \hyperref{here}{in
-appendix}{}{APP:POLEXT}). As well as the name of a POLPACK extension
+appendix }{}{APP:POLEXT}). As well as the name of a POLPACK extension
 item, each line of the control table should contain a description of where to
 obtained the corresponding value. This description is given in terms of
 FITS keywords. For instance, the line
@@ -1008,7 +1009,7 @@ Of these, the most important will usually be:
 \begin{description}
 \item [IN]	- A list of the input target frames. These should have been
 calibrated and imported. The list may be supplied in several forms
-(described \hyperref{here}{in section}{}{SEC:GRPEXP}).
+(described \hyperref{here}{in section }{}{SEC:GRPEXP}).
 \item [MODE]	- Indicates what sort of polarization you are measuring. It 
 can be ``CIRCULAR'' or ``LINEAR''.
 \item [OUT\_E]	- A list of the output images to receive the extracted,
@@ -1048,7 +1049,7 @@ tutorial first.
 \subsection{Displaying the Results}
 Linear polarimetry results are usually expressed in terms of the percentage
 polarization and the orientation of the plane of polarization (see
-\hyperref{here}{appendix}{}{APP:POL}). Vectors may be used to represent
+\hyperref{here}{appendix }{}{APP:POL}). Vectors may be used to represent
 these quantities graphically. The following POLPACK applications can be
 used to produce a map of vectors describing the polarization at different
 points on the sky:
@@ -1074,7 +1075,7 @@ polarization, in degrees.
 
 For circular polarimetry, the Q and U columns are replaced by a single V
 column. If variance information is available (see
-\hyperref{here}{section}{}{SEC:CCDPACK}) then columns are also produced
+\hyperref{here}{section }{}{SEC:CCDPACK}) then columns are also produced
 holding the standard deviations associated with each of the above
 quantities (except X and Y). The catalogue contains a single row for each
 pixel in the x-y plane of the supplied cube.
@@ -1155,10 +1156,12 @@ less than 5 \%:
 \end{verbatim}
 \end{myquote}
 
-\item \label{STEP:DEVICE} Select the graphics device and the image
-display device (both are set to an X windows display in this example):
+\item \label{STEP:DEVICE} Start up KAPPA, and then select the graphics 
+device and the image display device (both are set to an X windows display 
+in this example):
 \begin{myquote}
 \begin{verbatim}
+   % kappa
    % gdset xwindows
    % idset xwindows
 \end{verbatim}
@@ -1405,7 +1408,7 @@ sign.
 
 Certain classes of objects have additional features, for 
 instance if the objects are the names of data files, then wild-card characters 
-are allowed in the supplied values (see \hyperref{here}{section}{}{SEC:NDF}) 
+are allowed in the supplied values (see \hyperref{here}{section }{}{SEC:NDF}) 
 
 \subsection{\label{SEC:IND}Indirection}
 It is sometimes convenient to store the strings specifying the objects to
@@ -1491,7 +1494,7 @@ are all possible responses:
 
 This means ``Use the NDFs stored in files \verb+b1.sdf+, \verb+b2.sdf+,
 \verb+b3.sdf+ and \verb+b4.sdf+''. If automatic format conversion is being 
-used (see \hyperref{here}{section}{}{SEC:CONVERT}), then an example such
+used (see \hyperref{here}{section }{}{SEC:CONVERT}), then an example such
 as:
 
 \begin{myquote}
@@ -3944,9 +3947,9 @@ Figure Figure~\ref{fig:polext} lists the items which may be stored in
 the POLPACK extension within a data file. The \htmlref{POLEXP}{POLEXP}
 and \htmlref{POLIMP}{POLIMP} applications may be used to transfer these items
 to and from a set of corresponding FITS keywords (see 
-\hyperref{here}{section}{}{SEC:IMPORT}). The contents of the POLPACK
+\hyperref{here}{section }{}{SEC:IMPORT}). The contents of the POLPACK
 extension within an NDF may be examined using the
-\xref{\tt hdstrace}{sun102}{} command.
+\xref{{\tt hdstrace}}{sun102}{} command.
 \begin{latexonly}
   \begin{figure}[htb]
   \begin{center}
