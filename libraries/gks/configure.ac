@@ -43,53 +43,40 @@ dnl    Fortran features (mostly for ./base/*)
 AC_FC_OPEN_SPECIFIERS(readonly)
 AC_FC_RECL_UNIT
 
+# Use Fortran for the remaining function tests
+AC_LANG_PUSH([Fortran])
 
 AC_FC_CHECK_INTRINSICS(char)
-AC_LANG_PUSH([Fortran])
 AC_CHECK_FUNCS([char])
-AC_LANG_POP([Fortran])
 
 dnl    We need to work out how to get the date and time
 AC_FC_CHECK_INTRINSICS([CLOCK ITIME IDATE DATE])
-AC_LANG_PUSH([Fortran])
 AC_CHECK_FUNCS([CLOCK ITIME IDATE DATE])
-AC_LANG_POP([Fortran])
 
 dnl    How to bypass Fortran I/O
 AC_FC_CHECK_INTRINSICS([FGETC FPUTC FLUSH])
-AC_LANG_PUSH([Fortran])
 AC_CHECK_FUNCS([FGETC FPUTC FLUSH])
-AC_LANG_POP([Fortran])
-
 
 dnl    How to get the environment and process ID
 AC_FC_CHECK_INTRINSICS([GETENV GETPID])
-AC_LANG_PUSH([Fortran])
 AC_CHECK_FUNCS([GETENV GETPID])
-AC_LANG_POP([Fortran])
-
 
 dnl    How to manipulate bits
 AC_FC_CHECK_INTRINSICS([LSHIFT SHIFTL RSHIFT SHIFTR ISHFT])
-AC_LANG_PUSH([Fortran])
 AC_CHECK_FUNCS([LSHIFT SHIFTL RSHIFT SHIFTR ISHFT])
-AC_LANG_POP([Fortran])
 
 AC_FC_CHECK_INTRINSICS([AND IAND OR IOR])
-AC_LANG_PUSH([Fortran])
 AC_CHECK_FUNCS([AND IAND OR IOR])
-AC_LANG_POP([Fortran])
 
 dnl    How to work out where the last non blank character is
 AC_FC_CHECK_INTRINSICS([LNBLNK LEN_TRIM])
-AC_LANG_PUSH([Fortran])
 AC_CHECK_FUNCS([LNBLNK LEN_TRIM])
-AC_LANG_POP([Fortran])
 
 dnl    How to translate a Fortran unit to a Unix file descriptor
 AC_FC_CHECK_INTRINSICS([GETFD GETFILEP ISATTY])
-AC_LANG_PUSH([Fortran])
 AC_CHECK_FUNCS([GETFD GETFILEP ISATTY])
+
+# No more tests to do, but neatness demands we pop Fortran...
 AC_LANG_POP([Fortran])
 
 dnl    List the sun/ssn/... numbers which document this package and
@@ -119,7 +106,7 @@ AC_CONFIG_FILES([drivers/Makefile
 dnl    Substitute this list into the drivers/Makefile.in, along with a
 dnl    generated list of the corresponding libraries
 AC_SUBST(DRIVER_SUBDIRS)
-DRIVER_LIBLIST=`echo $DRIVER_SUBDIRS | sed 's+\([[a-z0-9]]*\)+\1/libgks_driver_\1.la+g'`
+DRIVER_LIBLIST=`echo $DRIVER_SUBDIRS | sed 's+\([[a-z0-9]]*\)+drivers/\1/libgks_driver_\1.la+g'`
 AC_SUBST(DRIVER_LIBLIST)
 
 AC_OUTPUT
