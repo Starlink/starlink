@@ -61,12 +61,13 @@
 
         ELSE
           STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Field '//FLD//' does not exist', STATUS )
+          CALL MSG_SETC( 'F', FLD )
+          CALL ERR_REP( ' ', 'Field ^F does not exist', STATUS )
         END IF
 
 *      Tidy up
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', '...from SSO_CHKFLDERR', STATUS )
+          CALL AST_REXIT( 'SSO_CHKFLDERR', STATUS )
         END IF
 
       END IF

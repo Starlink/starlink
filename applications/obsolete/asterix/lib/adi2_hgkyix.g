@@ -77,6 +77,8 @@
 *  History:
 *     11 Sep 1995 (DJA):
 *        Original version.
+*     22 Feb 1996 (DJA):
+*        Changed string concatenation to work on Linux
 *     {enter_changes_here}
 
 *  Bugs:
@@ -101,7 +103,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*8		STR			! Index encoded
+      CHARACTER*8		LKEY			! Local keyword name
+      CHARACTER*7		STR			! Index encoded
 
       INTEGER			NDIG			! Chars used in STR
 *.
@@ -111,9 +114,10 @@
 
 *  Encode the integer
       CALL CHR_ITOC( INDEX, STR, NDIG )
+      LKEY = KEY(:LEN(KEY))//STR(:NDIG)
 
 *  Get keyword value
-      CALL ADI2_HGKY<T>( HDUID, KEY//STR(:NDIG), VALUE, STATUS )
+      CALL ADI2_HGKY<T>( HDUID, LKEY(:NDIG+LEN(KEY)), VALUE, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_HGKYI<T>', STATUS )
