@@ -229,7 +229,7 @@ itcl::class gaia::StarApp {
    protected method command_completed_ {} {
       set queue_size [$command_queue_ size]
       if { $delete_sometime_ && $queue_size == 0 } {
-         delete object $this
+         catch {delete object $this}
       }
 
       #  If the command queue isn't empty then run the next command.
@@ -297,7 +297,7 @@ itcl::class gaia::StarApp {
                puts stderr \
                   "Failed to load the application ($application) monolith ($monolith_)."
                $taskname kill
-               delete
+               catch {delete object $this}
             }
          }
          set monotask_($monolith_) $taskname
