@@ -18,6 +18,7 @@ ok(1);
 
 # The first thing to do is write out some version information
 # as a version.dat file
+END { unlink "version.dat" if -e "version.dat" }
 open ( VERSION, "> version.dat") or die "Could not open version.dat: $!";
 
 my $major = 1;
@@ -40,6 +41,4 @@ ok( starversion_string('this_prog'), $ver1);
 
 # This will return undef
 ok( !defined starversion_major('your_prog') );
-
-unlink "version.dat";
 
