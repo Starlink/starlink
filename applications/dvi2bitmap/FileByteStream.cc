@@ -33,20 +33,20 @@
 //#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <string.h>		// for strerror
 #ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cerrno>
 #include <cassert>
+#include <cstring>		// for strerror
 #else
 #include <stdio.h>
 #include <errno.h>
 #include <assert.h>
+#include <string.h>
 #endif
 
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
-using std::sprintf;
 using std::endl;
 #endif
 
