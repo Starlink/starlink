@@ -4,7 +4,7 @@
 *     WCSADD
 
 *  Purpose:
-*     Creates a Mapping an optionally adds a new co-ordinate Frame into the 
+*     Creates a Mapping and optionally adds a new co-ordinate Frame into the 
 *     WCS component of an NDF.
 
 *  Language:
