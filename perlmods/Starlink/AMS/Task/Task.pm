@@ -313,8 +313,6 @@ Send control messages to a monolith.
   $obj->control("par_reset");
   ($value, $status)  = $obj->control("default","dir");
 
-
-
 =cut
 
  
@@ -327,7 +325,7 @@ sub control {
   my $dir  = shift;
  
   my ($value, $status) = adamtask_control($self->name(), $type, $dir);
- 
+
   return $value, $status;
 }
  
