@@ -851,7 +851,6 @@ itcl::class gaia::GaiaApPhotom {
 
    #  Whether apertures are keep the same size.
    itk_option define -coupled coupled Coupled 0 {
-      puts "Defining coupled ($itk_option(-coupled),($object_list_))"
       if { $object_list_ != {} } {
          $object_list_ configure -coupled $itk_option(-coupled)
          if { $itk_option(-coupled) } {

@@ -134,7 +134,7 @@ itcl::class gaia::ScrollText {
          frame $itk_component(Frame).corner -width $rwidth
       }
       itk_component add Scrollbottom {
-         scrollbar $itk_component(Frame).scrollbottom)\
+         scrollbar $itk_component(Frame).scrollbottom \
             -orient horizontal \
             -command "$itk_component(Text) xview"
       }
