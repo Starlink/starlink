@@ -1,0 +1,668 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {ADAM Portability Project Note}
+\newcommand{\stardocinitials}  {Starlink/APPN}
+\newcommand{\stardocnumber}    {27.0}
+\newcommand{\stardocauthors}   {B D Kelly}
+\newcommand{\stardocdate}      {8 June 1994}
+\newcommand{\stardoctitle}     {The Unix ADAM Message System}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm} % changed from 240
+\setlength{\topmargin}{-2mm}   % changed from -5
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+ROYAL OBSERVATORY EDINBURGH\\
+{\large\bf Computing Section\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section {Summary}
+
+The Adam Message System (AMS) library, which implements the Adam
+intertask commications protocol under unix is described, along with its
+FORTRAN-callable interface (FAMS). There is also a compatibility library,
+MESSYS, which is FORTRAN-callable and provides the same interface as
+VAX-Adam.
+
+
+
+\section {Introduction}
+
+The Adam Message System enables communications to be opened between adam
+tasks, commands to be sent and received and acknowledgements to be sent
+and received. Provided suitable Adam network processes are loaded, the
+communication can take place across networks. In the absence of adamnet
+processes, the communication is restricted to Adam tasks within a single
+machine. The C-callable interface is implemented by the ams library. A
+FORTRAN-callable interface is provided called FAMS. See APPN/26 for a
+summary of the layering of the system.
+
+
+\section {Communications directory}
+
+Adam communications are opened between tasks by name. The name lookup is
+provided by each task making an entry in a directory pointed to by the
+environment variable ADAM\_USER. This variable has, therefore, to be
+defined to point to an existing directory before any Adam tasks are loaded.
+
+\section {task initialisation}
+
+When a task initialises AMS by calling ams\_init(), it specifies its name
+as a character string (say, "slave"). This results in a file being
+created in the ADAM\_USER directory compounded of the name and an
+identifying number (eg. \$ADAM\_USER/slave\_5001). Another task can then
+open communications by searching ADAM\_USER for the right form of name and
+using the identifying number to open communications.
+
+
+\section {task exit}
+
+When a task receives a signal causing it to exit, the message system exit
+handler is envoked via the Adam exh facility. The result is that messages
+are sent to any other Adam processes which have been in communication
+with the exiting process, informing them of its removal. In addition the
+task's file is removed from ADAM\_USER.
+
+If the task cannot exit normally for some reason, the file in ADAM\_USER
+may get left behind. In this case the file must be deleted explicitly
+before the task is loaded again - if this is not done the task will
+refuse to load and will give the reason why.
+
+
+\section {opening communications}
+
+Once a task has initialised itself successfully, it can open
+communications with another initialised task by using ams\_path(). The
+path number returned can then be used for further communications.
+
+
+\section {sending a command}
+
+Having obtained a path, a task can use ams\_send() to send a command to
+the task identified by that path. If ams\_send() succeeds, it returns a
+messid which remains valid for the duration of the command.
+
+
+\section {getting expected replies}
+
+Once a command is in progress between two tasks, they can receive replies
+specific to that command, as identified by (path,messid) by using
+ams\_getreply. Completion of the command and freeing of the associated
+messid occurs when the task returns a message status which is not one of
+
+\begin{itemize}
+\item MESSYS\_\_PARAMREQ
+\item MESSYS\_\_PARAMREP
+\item MESSYS\_\_INFORM
+\item MESSYS\_\_SYNC
+\item MESSYS\_\_SYNCREP
+\item MESSYS\_\_TRIGGER
+\item DTASK\_\_ACTSTART
+\end{itemize}
+
+ams\_getreply() ignores all messages not associated with the specified
+(path,messid) except those generated by the ams\_extint() function.
+
+
+\section {receiving a command}
+
+Any message, including commands or replies associated with an existing
+command, can be received using ams\_receive(). The path and messid
+associated with the command/reply are returned.
+
+
+\section {sending expected replies}
+
+A reply associated with an existing command has to be sent using
+ams\_reply(), specifying the relevant path and messid. The command is
+terminated by specifying the message status to be something other than
+
+\begin{itemize}
+\item MESSYS\_\_PARAMREQ
+\item MESSYS\_\_PARAMREP
+\item MESSYS\_\_INFORM
+\item MESSYS\_\_SYNC
+\item MESSYS\_\_SYNCREP
+\item MESSYS\_\_TRIGGER
+\item DTASK\_\_ACTSTART
+\end{itemize}
+
+
+\section {sending local messages}
+
+A set of routines are provided to enable a task to send messages to itself.
+ams\_kick() is intended to enable main-line code to queue a message which
+it can subsequently collect by calling ams\_receive(). The other functions
+are intended only for calling from within signal handlers. ams\_resmsg()
+ams\_astmsg and ams\_astint() generate messages to be read by ams\_receive()
+but ignored by ams\_getreply(). ams\_extint() generates a message which can
+be received either by ams\_receive or ams\_getreply (its main purpose is to
+allow user interfaces to be implemented).
+
+
+\section {example}
+
+The example consists of a pair of C programs called master and slave.
+They should be run in background by
+
+\begin{verbatim}
+..> slave.a &
+..> master.a &
+\end{verbatim}
+
+The code for master is:
+
+\begin{verbatim}
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <string.h>
+#include <signal.h>
+#include <errno.h>
+#include <unistd.h>
+
+#include "sae_par.h"
+#include "ams_adampar.h"
+#include "dtask_err.h"             /* dtask error codes */
+
+#include "../messys/messys_err.h"
+#include "../messys/messys_par.h"
+#include "../messys/messys_dd.h"
+
+#include "ams_sys.h"
+#include "ams_mac.h"
+#include "ams_struc.h"
+#include "ams.h"
+
+int main()
+{
+   int outmsg_status;
+   int outmsg_function;
+   int outmsg_context;
+   int outmsg_length;
+   char outmsg_name[32];
+   char outmsg_value[MSG_VAL_LEN];
+   int inmsg_status;
+   int inmsg_context;
+   int inmsg_length;
+   char inmsg_name[32];
+   char inmsg_value[MSG_VAL_LEN];
+   int status;
+   int path;
+   int messid;
+   int j;
+
+   status = 0;
+   outmsg_status = SAI__OK;
+   outmsg_function = MESSYS__MESSAGE;
+   outmsg_context = OBEY;
+   outmsg_length = 16;
+
+   strcpy ( outmsg_name, "junk" );
+   strcpy ( outmsg_value, "master calling" );
+
+   ams_init ( "master", &status );
+   if ( status != SAI__OK )
+   {
+      printf ( "master - bad status after ams_init\n" );
+   }
+   ams_path ( "slave", &path, &status );
+   if ( status != SAI__OK )
+   {
+      printf ( "master - bad status after ams_path\n" );
+   }
+   else
+   {
+      printf ( "master - path set up ok\n" );
+   }
+
+   for ( j=0; j<1000; j++ )
+   {
+      ams_send ( path, outmsg_function, outmsg_status, outmsg_context, 
+        outmsg_name, outmsg_length, outmsg_value, &messid, &status );
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+        inmsg_value, &status );
+      ams_getreply ( MESSYS__INFINITE, path, messid, 32, MSG_VAL_LEN, 
+        &inmsg_status, &inmsg_context, inmsg_name, &inmsg_length, 
+        inmsg_value, &status );
+   }
+   if ( status != 0 )
+   {
+      printf ( "master: bad status = %d\n", status );
+   }
+   else
+   {
+      printf ( "master: received - %s\n", inmsg_value );
+   }
+
+   kill ( getpid(), SIGINT );
+   return 0;
+}
+
+
+\end{verbatim}
+
+The code for slave is:
+
+\begin{verbatim}
+
+
+#include <stdio.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <string.h>
+#include <signal.h>
+#include <errno.h>
+#include <unistd.h>
+
+#include "sae_par.h"
+#include "ams_adampar.h"
+#include "dtask_err.h"             /* dtask error codes */
+
+#include "../messys/messys_err.h"
+#include "../messys/messys_par.h"
+#include "../messys/messys_dd.h"
+
+#include "ams_sys.h"
+#include "ams_mac.h"
+#include "ams_struc.h"
+#include "ams.h"
+
+int main()
+{
+   int outmsg_status;
+   int outmsg_function;
+   int outmsg_context;
+   int outmsg_length;
+   char outmsg_name[32];
+   char outmsg_value[MSG_VAL_LEN];
+   int inmsg_status;
+   int inmsg_function;
+   int inmsg_context;
+   int inmsg_length;
+   char inmsg_name[32];
+   char inmsg_value[MSG_VAL_LEN];
+
+   int status;
+   int path;
+   int messid;
+   int j;
+
+   status = 0;
+   outmsg_status = SAI__OK;
+   outmsg_function = MESSYS__MESSAGE;
+   outmsg_context = OBEY;
+   outmsg_length = 16;
+
+   strcpy ( outmsg_name, "junk" );
+   strcpy ( outmsg_value, "slave replying" );
+
+   ams_init ( "slave", &status );
+   if ( status != 0 )
+   {
+      printf ( "slave: failed init\n" );
+   }
+   for ( j=0; j<1000; j++ )
+   {
+      ams_receive ( MESSYS__INFINITE, 32, MSG_VAL_LEN, &inmsg_status, 
+        &inmsg_context, inmsg_name, &inmsg_length, inmsg_value, &path, 
+        &messid, &status );
+
+      outmsg_status = DTASK__ACTSTART;
+
+      ams_reply ( path, messid, outmsg_function, outmsg_status, 
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
+        &status ); 
+
+      outmsg_status = SAI__OK;
+      ams_reply ( path, messid, outmsg_function, outmsg_status, 
+        outmsg_context, outmsg_name, outmsg_length, outmsg_value, 
+        &status ); 
+   }
+   if ( status != 0 )
+   {
+      printf ( "slave: bad status = %d\n", status );
+   }
+   else
+   {
+      printf ( "slave: received - %s\n", inmsg_value );
+   }
+
+   kill ( getpid(), SIGINT );
+   return 0;
+}
+
+
+
+\end{verbatim}
+
+
+
+
+\section {the ams routines}
+
+The following lists ams.h.
+
+
+\begin{verbatim}
+/*+  AMS_ASTINT - send an ASTINT message from a signal handler */
+
+void ams_astint
+(
+int *status         /* global status (given and returned) */
+);
+
+/*+  AMS_ASTMSG - send an ASTMSG from a signal handler */
+
+void ams_astmsg
+(
+char *name,       /* name of the action to be rescheduled (given) */
+int length,       /* number of significant bytes in value (given) */
+char *value,      /* message to be passed to main-line code (given) */
+int *status       /* global status (given and returned) */
+);
+
+/*+  AMS_EXTINT - send an EXTINT message from a signal handler */
+
+void ams_extint
+(
+int *status         /* global status (given and returned) */
+);
+
+/*+  AMS_GETREPLY - receive a message on a specified path, messid */
+
+void ams_getreply
+(
+int timeout,              /* timeout time in milliseconds (given) */
+int path,                 /* pointer to the path (given) */
+int messid,               /* message number of incoming message (given) */
+int message_name_s,       /* space for name (given) */
+int message_value_s,      /* space for value (given) */
+int *message_status,      /* message status (returned) */
+int *message_context,     /* message context (returned) */
+char *message_name,       /* message name (returned) */
+int *message_length,      /* length of value (returned) */
+char *message_value,      /* message value (returned) */
+int *status               /* global status (given and returned) */
+);
+
+/*+  AMS_INIT - initialise ams */
+
+void ams_init
+(
+char *own_name,      /* name of this task (given) */
+int *status
+);
+
+/*+  AMS_KICK - send a message to this task's kick queue */
+void ams_kick 
+(
+char *name,       /* name of the action to be rescheduled (given) */
+int length,       /* number of significant bytes in value (given) */
+char *value,      /* message to be passed to application code (given) */
+int *status       /* global status (given and returned) */
+);
+
+/*+  AMS_PATH - get a communications path to another task */
+
+void ams_path
+(
+char *other_task_name,  /* name of task to which path is required (given)
+                           */
+int *path,              /* pointer to the path (returned) */
+int *status             /* global status (given and returned) */
+);
+
+/*+  AMS_PLOOKUP - look up a taskname given a path to it */
+
+void ams_plookup 
+( 
+int path,             /* the path number (given) */
+char *name,           /* the task name (returned) */
+int *status           /* global status (given and returned) */
+);
+
+/*+  AMS_RECEIVE - receive any incoming message */
+
+void ams_receive 
+( 
+int timeout,              /* timeout time in milliseconds (given) */
+int message_name_s,       /* space for name (given) */
+int message_value_s,      /* space for value (given) */
+int *message_status,      /* message status (returned) */
+int *message_context,     /* message context (returned) */
+char *message_name,       /* message name (returned) */
+int *message_length,      /* length of value (returned) */
+char *message_value,      /* message value (returned) */
+int *path,                /* path on which message received (returned) */
+int *messid,              /* message number of incoming message (returned) */
+int *status               /* global status (given and returned) */
+);
+
+/*+  AMS_REPLY - send a message on a given path, messid */
+
+void ams_reply
+(
+int path,               /* the path number for communicating with the other 
+                           task (given) */
+int messid,             /* the number identifying the transaction (given) */
+int message_function,   /* message function (given) */
+int message_status,     /* message status (given) */
+int message_context,    /* message context (given) */
+char *message_name,     /* message name (given) */
+int message_length,     /* length of value (given) */
+char *message_value,    /* message value (given) */
+int *status             /* global status (given and returned) */
+);
+
+/*+  AMS_RESMSG - send a message to this task's  reschedule queue */
+
+void ams_resmsg
+(
+int length,        /* number of significant bytes in value (given) */
+char *value,       /* message to be passed to main-line code (given) */
+int *status        /* global status (given and returned) */
+);
+
+/*+  AMS_SEND - send a message on a given path */
+
+void ams_send
+(
+int path,               /* pointer to the path (given) */
+int message_function,   /* message function (given) */
+int message_status,     /* message status (given) */
+int message_context,    /* message context (given) */
+char *message_name,     /* message name (given) */
+int message_length,     /* length of value (given) */
+char *message_value,    /* message value (given) */
+int *messid,            /* message number issued by this task (returned) */
+int *status             /* global status (given and returned) */
+);
+
+
+\end{verbatim}
+
+\section {the FAMS routines}
+
+The FORTRAN-callable interface to ams is implemented by the FAMS library,
+the calling sequences for which are listed below. The library is
+implemented in C, using the CNF/F77 facilities.
+
+
+\begin{verbatim}
+
+/*+  FAMS_ASTINT */
+
+SUBROUTINE FAMS_ASTINT ( STATUS )
+
+INTEGER STATUS         ! global status (given and returned)    
+
+
+/*+  FAMS_ASTMSG */
+
+SUBROUTINE FAMS_ASTMSG ( NAME, LENGTH, VALUE, STATUS )
+
+CHARACTER*(*) NAME     ! name of action (given)
+INTEGER LENGTH         ! length of message in VALUE (given)
+CHARACTER*(*) VALUE    ! string to be sent (given)
+INTEGER STATUS         ! global status (given and returned)    
+
+
+/*+  FAMS_EXTINT */
+
+SUBROUTINE FAMS_EXTINT ( STATUS )
+
+INTEGER STATUS         ! global status (given and returned)    
+
+
+/*+  FAMS_GETREPLY */
+
+SUBROUTINE FAMS_GETREPLY ( TIMEOUT, PATH, MESSID, MESSAGE_STATUS,
+  MESSAGE_CONTEXT, MESSAGE_NAME, MESSAGE_LENGTH, MESSAGE_VALUE, STATUS )
+
+INTEGER TIMEOUT               ! timeout in millisec (given)
+INTEGER PATH                  ! path to task (given)
+INTEGER MESSID                ! message identifier (given)
+INTEGER MESSAGE_STATUS        ! message status field (returned)
+INTEGER MESSAGE_CONTEXT       ! GET, SET, OBEY or CANCEL (returned)
+CHARACTER*(*) MESSAGE_NAME    ! name field for message (returned)
+INTEGER MESSAGE_LENGTH        ! length of value string (returned)
+CHARACTER*(*) MESSAGE_VALUE   ! value string (returned)
+INTEGER STATUS                ! global status (given and returned)    
+
+
+/*+  FAMS_INIT */
+
+SUBROUTINE FAMS_INIT ( OWN_NAME, STATUS )
+
+CHARACTER*(*) OWN_NAME        ! name of this task (given)
+INTEGER STATUS                ! global status (given and returned)    
+
+
+/*+  FAMS_KICK */
+
+SUBROUTINE FAMS_KICK ( NAME, LENGTH, VALUE, STATUS )
+(
+CHARACTER*(*) NAME     ! name of action (given)
+INTEGER LENGTH         ! length of message in VALUE (given)
+CHARACTER*(*) VALUE    ! string to be sent (given)
+INTEGER STATUS         ! global status (given and returned)    
+
+
+/*+  FAMS_PATH */
+
+SUBROUTINE FAMS_PATH ( OTHER_TASK_NAME, PATH, STATUS )
+
+CHARACTER*(*) OTHER_TASK_NAME  ! name of other task (given)
+INTEGER PATH                   ! path to other task (returned)
+INTEGER STATUS                 ! global status (given and returned)    
+
+
+/*+  FAMS_PLOOKUP */
+
+SUBROUTINE FAMS_PLOOKUP ( PATH, NAME, STATUS )
+
+INTEGER PATH)          ! path to another task (given)
+CHARACTER*(*) NAME     ! name of other task (returned)
+INTEGER STATUS         ! global status (given and returned)    
+
+
+/*+  FAMS_RECEIVE */
+
+SUBROUTINE FAMS_RECEIVE ( TIMEOUT, MESSAGE_STATUS, MESSAGE_CONTEXT,
+MESSAGE_NAME, MESSAGE_LENGTH, MESSAGE_VALUE, PATH, MESSID, STATUS )
+
+INTEGER TIMEOUT               ! timeout in millisec (given)
+INTEGER MESSAGE_STATUS        ! message status field (returned)
+INTEGER MESSAGE_CONTEXT       ! GET, SET, OBEY or CANCEL (returned)
+CHARACTER*(*) MESSAGE_NAME    ! name field for message (returned)
+INTEGER MESSAGE_LENGTH        ! length of value string (returned)
+CHARACTER*(*) MESSAGE_VALUE   ! value string (returned)
+INTEGER PATH                  ! path to task (returned)
+INTEGER MESSID                ! message identifier (returned)
+INTEGER STATUS                ! global status (given and returned)    
+
+
+/*+  FAMS_REPLY */
+
+SUBROUTINE FAMS_REPLY ( PATH, MESSID, MESSAGE_FUNCTION, MESSAGE_STATUS,
+  MESSAGE_CONTEXT, MESSAGE_NAME, MESSAGE_LENGTH, MESSAGE_VALUE, STATUS )
+(
+INTEGER PATH                  ! path to task (given)
+INTEGER MESSID                ! message identifier (given)
+INTEGER MESSAGE_FUNCTION      ! function flag (usually MESSYS__MESSAGE)
+                              ! (given)
+INTEGER MESSAGE_STATUS        ! message status field (given)
+INTEGER MESSAGE_CONTEXT       ! GET, SET, OBEY or CANCEL (given)
+CHARACTER*(*) MESSAGE_NAME    ! name field for message (given)
+INTEGER MESSAGE_LENGTH        ! length of value string (given)
+CHARACTER*(*) MESSAGE_VALUE   ! value string (given)
+INTEGER STATUS                ! global status (given and returned)    
+
+
+/*+  FAMS_RESMSG */
+
+SUBROUTINE FAMS_RESMSG ( LENGTH, VALUE, STATUS )
+
+INTEGER LENGTH                ! length of message in VALUE (given)
+CHARACTER*(*) VALUE           ! message to be sent (given)
+INTEGER STATUS                ! global status (given and returned)    
+
+
+/*+  FAMS_SEND */
+
+SUBROUTINE FAMS_SEND ( PATH, MESSAGE_FUNCTION, MESSAGE_STATUS,
+  MESSAGE_CONTEXT, MESSAGE_NAME, MESSAGE_LENGTH, MESSAGE_VALUE, MESSID,
+  STATUS )
+
+INTEGER PATH                  ! path to task (given)
+INTEGER MESSAGE_FUNCTION      ! function flag (usually MESSYS__MESSAGE)
+                              ! (given)
+INTEGER MESSAGE_STATUS        ! message status field (given)
+INTEGER MESSAGE_CONTEXT       ! GET, SET, OBEY or CANCEL (given)
+CHARACTER*(*) MESSAGE_NAME    ! name field for message (given)
+INTEGER MESSAGE_LENGTH        ! length of value string (given)
+CHARACTER*(*) MESSAGE_VALUE   ! value string (given)
+INTEGER MESSID                ! message identifier (returned)
+INTEGER STATUS                ! global status (given and returned)    
+
+\end{verbatim}
+
+\end {document}

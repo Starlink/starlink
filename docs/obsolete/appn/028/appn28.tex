@@ -1,0 +1,561 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {ADAM Portability Project Note}
+\newcommand{\stardocinitials}  {Starlink/APPN}
+\newcommand{\stardocnumber}    {28.2}
+\newcommand{\stardocauthors}   {B D Kelly}
+\newcommand{\stardocdate}      {29 June 1994}
+\newcommand{\stardoctitle}     {Interfacing Tcl/Tk to Unix ADAM}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm} % changed from 240
+\setlength{\topmargin}{-2mm}   % changed from -5
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+PARTICLE PHYSICS \& ASTRONOMY RESEARCH COUNCIL \hfill \stardocname\\
+ROYAL OBSERVATORY EDINBURGH\\
+{\large\bf Computing Section\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section {Summary}
+
+A method is described for building an Adam user interface on unix
+systems using tcl/tk.
+
+\section {References}
+
+"Tcl and the Tk Toolkit", John.K.Ousterhout (Addison Wesley)
+
+"The Unix Adam Message System" APPN/27, B.D.Kelly
+
+"Xadam --- a GUI for running ADAM applications", SUN/178, D.L.Terrett
+
+\section {Introduction}
+
+The tool command language (tcl) was developed by Ousterhout to act as a
+general-purpose extensible command language interpreter which can be
+built into applications. That is, one can write programs in C which call
+tcl as a library of functions. Conversely, one can write functions in C
+and link them into a tcl program to become new tcl built-in commands. The
+toolkit (tk) is a set of extensions to tcl which provide facilities for
+manipulating Motif-style widgets. The result is a very general-purpose
+set of software tools which have become very popular. One of the possible
+attractions of tcl/tk is the availability of useful widgets which have
+been developed and placed in the public domain. In addition, Starlink
+have made use of tcl/tk in the Xadam user interface, which provides
+form-filling facilities for running simple Adam data analysis
+applications interactively. Tcl and tk have been selected by the Gemini
+project as the likely tool for building user interfaces and providing
+high-level control facilities.
+
+The present investigation is concerned with interfacing tcl/tk to Adam
+intertask communication to enable it to be used for controlling Adam
+multitasking instrumentation applications.
+
+\section {Approach adopted}
+
+The problem in providing a user interface to a multitasking system is
+primarily concerned with how the interface gets input. It obviously has
+to take input from the user, but it also has to accept messages coming
+from the tasks. For a first attempt at this problem it was decided
+
+\begin{itemize}
+\item the system should be asynchronous - ie able to handle either user
+input or messages "at any time", subject to short dead periods when
+newly-arrived input is being interpreted
+\item the system should preferably interface to tcl/tk and Adam without
+it becoming necessary to modify their internal behaviour
+\item the approach should take a prototyping attitude - having found a
+feasible approach implement it in a way which minimises the time to reach
+a working system, then gain experience with it before producing a
+fully-engineered system
+\end{itemize}
+
+These considerations led to an implementation in terms of two processes,
+both containing the tcl interpreter. The first is basically a tcl shell
+called idler, the second is a tk shell called wish. Each has four new
+built-in commands
+
+\begin{itemize}
+\item tkadam\_exit - kill all tasks and exit
+\item tkadam\_receive - receive an Adam message
+\item tkadam\_send - send an Adam message
+\item tkadam\_reply - reply to an Adam message
+\end{itemize}
+
+In addition, each initialises into the Adam message system on startup.
+
+The overall scheme is that idler gets its input by calling
+tkadam\_receive. Wish gets its input in its usual fashion which involves
+waiting on X-events. One valid X-event is data becoming available on its
+standard input. Wish communicates with idler by sending it Adam messages.
+Idler communicates with wish by writing strings onto wish's standard input.
+The actual information is carried with the syntax of tcl commands.
+
+\section {The Tkadam library}
+
+This is a set of C routines providing the following tcl built-in commands.
+
+\begin{verbatim}
+
+tkadam_exit{}
+
+\end{verbatim}
+generates a signal to kill all the processes.
+
+\begin{verbatim}
+
+tkadam_receive{}
+
+\end{verbatim}
+returns a character string of the form
+\begin{verbatim}
+
+<command> <task> <msg_name> <path> <messid> <msg_status> <msg_value>
+
+where <command> is one of
+
+	actstart
+	paramreq
+	paramrep
+	inform
+	sync
+	syncrep
+	trigger
+	startmsg
+	endmsg
+	getresponse
+	setresponse
+\end{verbatim}
+
+corresponding to the various types of message which can be received. In
+the case of paramreq, the msg\_value string is additionally processed
+into the syntax of a tcl list from its Adam syntax of a number of
+null-separated items.
+
+\begin{verbatim}
+tkadam_send { task msg_name context msg_value }
+\end{verbatim}
+
+Sends a message to a task starting a new Adam Transaction.
+task is the name of the task as known to the Adam message system,
+msg\_name is the name of the action for OBEY or CANCEL contexts, or the
+name of the parameter for SET or GET, context is one of GET, SET, OBEY,
+CANCEL, and msg\_value is a list constituting the value string (eg
+command-line parameters for OBEY, parameter value for SET).
+
+tkadam\_send returns a character string of the form
+\begin{verbatim}
+
+<path> <messid>
+
+\end{verbatim}
+
+\begin{verbatim}
+tkadam_reply { path messid msg_status msg_name msg_value }
+\end{verbatim}
+
+Sends a message on the (path,messid) associated with an already existing
+transaction. msg\_status is the message status which carries information
+about what sort of message is being sent. Valid values for msg\_status are
+
+\begin{itemize}
+\item DTASK\_\_ACTSTART - return the initial acknowledgement to a
+received OBEY
+\item DTASK\_\_ACTCOMPLETE - return the final acknowledgement to an OBEY
+\item MESSYS\_\_PARAMREP - reply to a parameter request
+\item MESSYS\_\_PARAMREQ - send a parameter request
+\item MESSYS\_\_INFORM - request output of a string 
+\item MESSYS\_\_SYNC - send a synchronisation message
+\item MESSYS\_\_SYNCREP - reply to a synchronisation message
+\item MESSYS\_\_TRIGGER - send a trigger message
+\end{itemize}
+
+
+The Tkadam library is implemented using the AMS library (APPN/27).
+
+\section {Initialisation}
+
+The output device has to be initialised for X (eg, issue the command
+xdisplay if necessary).
+The system is started by executing idler. After its initialisation, idler
+starts executing its tcl script which includes the command
+
+\begin{verbatim}
+set wishfd [ open |wish.a w ]
+\end{verbatim}
+
+This starts wish running in a new process and pipes wish's standard input
+to the variable wishfd. Thereafter, whenever idler needs to talk to wish
+it can do so by
+
+\begin{verbatim}
+puts $wishfd <command>
+flush $wishfd
+\end{verbatim}
+
+Idler then goes into a loop, programmed in tcl, which uses
+tkadam\_receive to get input and executes the command returned from it.
+All the returned commands are implemented as simple tcl procedures.
+
+After its initialisation, wish executes a tcl script which uses
+tkadam\_send to send an OBEY to idler. It then uses tkadam\_receive to
+receive the initial acknowledgement from idler, thereby completing the
+set-up of an Adam transaction between the two. The path and messid are
+stored in tcl variables so that wish can use them in tkadam\_reply.
+Subsequently wish enters its normal event loop. Whenever something
+happens that requires wish to send messages to Adam tasks, it formats a
+suitable command for idler and sends it in the msg\_value string using
+tkadam\_reply with message status MESSYS\_\_TRIGGER.
+
+
+\section {Behaviour of the prototype}
+
+In the prototype, wish puts up a menu which allows tasks to be loaded and
+OBEYs sent to them. It also provides facilities for parameter prompting
+and for displaying informational messages. Because ams is not currently
+built into unix Adam, a C program called slave has been written which
+emulates the interaction of an Adam task with the message system. It
+takes its Adam task name from argv[1], and so it is possible to load
+multiple copies of slave under different names.
+
+After loading slave.a into (say) slave, one can then tell it to perform
+an OBEY. If the action name is doprompt, slave prompts for a parameter, and
+when it receives the reply it ends the action. For any other action name,
+slave does the equivalent of a few MSG\_OUTs.
+
+The prototype MUST be exited by either clicking on the exit button or
+typing ctrl-C in the window in which idler was invoked. This closes ams
+down cleanly.
+
+
+\section {Future development of the prototype}
+
+The idea of the prototype is that idler should act purely as a protocol
+converter - ideally never seen by users or application programmers. To
+achieve this it would have to be very strict about handling errors
+(currently it isn't). It should convert all its events into messages to
+be sent somewhere. For most of the possible events it currently just
+outputs a string to the terminal.
+
+The commands in wish should be extended to handle all the events
+forwarded from idler (eg. endmsg) and, typically, have them tied to
+widgets.
+
+
+\section {The tcl code in idler}
+
+
+\begin{verbatim}
+#   IDLER procedures
+
+proc actstart { task name path messid msg_status msg_value } {
+#   do nothing. This just catches initial acknowledgements from tasks
+   puts "idler actstart called"
+}
+
+proc endmsg { task name path messid msg_status msg_value } {
+#   an operation has completed in a task
+   puts "idler endmsg called"
+}
+
+proc getresponse { task name path messid msg_status msg_value } {
+#   reply to a "get" has arrived
+   puts "getresponse called"
+}
+
+proc inform { task name path messid msg_status msg_value } {
+#   request to output a message
+   wishcmd "report \"$msg_value\""
+}
+
+proc paramrep { task name path messid msg_status msg_value } {
+#   reply to a parameter request - return the answer to the task
+   tkadam_reply $path $messid $msg_status $name $msg_value
+}
+
+proc paramreq { task name path messid msg_status msg_value } {
+#   parameter request, forward it to wish
+   wishcmd "prompt $path $messid $msg_value"
+}
+
+proc setresponse { task name path messid msg_status msg_value } {
+#   reply to a "set" has arrived
+   puts "setresponse called"
+}
+
+proc startmsg { task name path messid msg_status msg_value } {
+#   the initialisation OBEY from wish to idler. Return an acknowledgement
+   global DTASK__ACTSTART
+   puts "idler: startmsg arrived"
+   tkadam_reply $path $messid $DTASK__ACTSTART $name "idler answering" 
+}
+
+proc sync { task name path messid msg_status msg_value } {
+#   a sync request has come from a task
+   puts "sync called"
+}
+
+proc tkadam_start {} { 
+#   loop collecting adam messages and executing the associated command
+
+   set com  ""
+   while { $com != "exit" } {
+      set command [ tkadam_receive ]
+      puts $command
+      set com [ lindex $command 0 ]
+      set code [ catch { eval $command } ans ]
+      if { $code } {
+         puts $ans
+      }
+   }
+
+}
+
+proc trigger { task name path messid msg_status msg_value } {
+#   a trigger message has arrived, execute the value string
+   eval $msg_value
+}
+
+proc wishcmd { cmd } {
+   global wishfd
+   puts $wishfd $cmd
+   flush $wishfd
+}
+
+
+#   IDLER top level
+
+set DTASK__ACTSTART 142115651 
+
+#   create the wish process, redirecting its stdin to wishfd
+
+set wishfd [ open |wish.a w ]
+
+#   serve adam messages
+
+tkadam_start
+\end{verbatim}
+
+\newpage
+\section {The tcl code in wish}
+
+\begin{verbatim}
+proc errorbox { message } {
+#   show an error message
+   global ufont
+   button .errorbox -text $message -command {destroy .errorbox} -font $ufont
+   pack .errorbox
+}
+
+proc idlercmd { cmd } {
+#   send a command to idler to be executed
+   global idlerpath
+   global idlermessid
+   global MESSYS__TRIGGER
+
+   tkadam_reply $idlerpath $idlermessid $MESSYS__TRIGGER temp $cmd
+}
+
+proc promptrep { count } {
+#   catch a response to a prompt box and return the answer
+
+   global MESSYS__PARAMREP
+   global MESSYS__TRIGGER
+   global idlerpath
+   global idlermessid
+
+   global usedarr
+   global ansarr
+   global patharr
+   global messidarr
+
+
+   set cmd [ list paramrep temp temp $patharr($count) $messidarr($count) \
+     $MESSYS__PARAMREP $ansarr($count) ]
+   idlercmd "$cmd"
+   destroy .pr$count
+   destroy .ans$count
+   destroy .fr$count
+   set usedarr($count) 0
+}
+
+
+proc prompt { path messid param pprompt pdefault phelptxt perrmsg } {
+#   perform a prompt request by creating a prompt box
+
+   global MESSYS__NOUSR
+   global MESSYS__TRIGGER
+   global usedarr
+   global ansarr
+   global patharr
+   global messidarr
+   global idlerpath
+   global idlermessid
+   global ufont
+
+#   search for a free prompt slot
+
+   set found 0
+   foreach i [array names usedarr] {
+      if { $usedarr($i) == 0 } {
+         set usedarr($i) 1
+         set found 1
+         break
+      }
+   }
+
+   if { $found == 1 } {
+
+#   create the box and declare promptrep to handle it
+
+      set patharr($i) $path
+      set messidarr($i) $messid
+      frame .fr$i
+      label .pr$i -text $param -font $ufont
+      entry .ans$i -width 32 -relief sunken -textvariable ansarr($i) -font $ufont
+      pack .fr$i
+      pack .pr$i .ans$i -in .fr$i -side left -padx 1m -pady 2m
+      bind .ans$i <Return> "promptrep $i"
+
+   } else {
+
+      errorbox "space for prompt boxes exhausted" 
+      set cmd "paramrep temp temp $path $messid $MESSYS__NOUSR noboxes"
+      idlercmd $cmd
+   }
+}
+
+proc report { string } {
+#   add a new line of text to the scrolling widget
+
+   .topscroll.msgscroll insert end $string
+}
+
+
+#   WISH - initialisation sequence
+
+set MESSYS__TRIGGER 141460483
+set MESSYS__PARAMREP 141460331
+set PAR__NOUSR 146703139 
+
+# alpha likes this set ufont "-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
+# normal is
+
+set ufont "-*-times-bold-r-*-*-14-*-*-*-*-*-*-*"
+
+#   Do an adam handshake with idler to set-up communications
+
+tkadam_send idler doit OBEY "wish calling"
+set startcom [ tkadam_receive ]
+puts $startcom
+set idlerpath [ lindex $startcom 3 ]
+set idlermessid [ lindex $startcom 4 ]
+
+puts "idler path is $idlerpath"
+
+#   Initialise the arrays for prompt boxes
+
+for { set i 0 } { $i<32 } { incr i } {
+   set usedarr($i) 0
+   set ansarr($i) 0
+   set patharr($i) 0
+   set messidarr($i) 0
+}
+
+#   Create the initial widgets
+
+#   exit
+
+frame .frexit 
+button .exit -text "exit and kill all tasks" -font $ufont
+
+pack .frexit
+pack .exit -in .frexit -side left -padx 1m -pady 2m
+
+bind .exit <Button-1> \
+  { [ idlercmd "tkadam_exit" ] }
+
+#   load
+
+frame .frload 
+
+label .label1 -text "load" -font $ufont
+entry .exename -width 32 -relief sunken -textvariable exename -font $ufont
+
+label .label3 -text "into" -font $ufont
+entry .taskname -width 32 -relief sunken -textvariable taskname -font $ufont
+
+pack .frload
+pack .label1 .exename .label3 .taskname  -in .frload -side left \
+  -padx 1m -pady 2m
+
+bind .taskname <Return> { set result [ idlercmd "exec $exename $taskname &" ] }
+
+#   obey
+
+frame .frobey 
+
+label .label2 -text "obey task" -font $ufont
+entry .taskcmd -width 32 -relief sunken -textvariable taskcmd -font $ufont
+
+label .label4 -text "action" -font $ufont
+entry .actioncmd -width 32 -relief sunken -textvariable actioncmd -font $ufont
+
+pack .frobey
+pack .label2 .taskcmd .label4 .actioncmd -in .frobey -side left \
+  -padx 1m -pady 2m
+
+bind .actioncmd <Return> \
+  { [ idlercmd "tkadam_send $taskcmd $actioncmd OBEY {\"\"}" ] }
+
+#   scrolled text
+
+toplevel .topscroll 
+listbox .topscroll.msgscroll -yscrollcommand ".topscroll.scroll set" -font $ufont
+scrollbar .topscroll.scroll -command ".topscroll.msgscroll yview"
+pack .topscroll.scroll -side right -fill y 
+pack .topscroll.msgscroll -side left -fill both -expand 1 
+
+wm minsize .topscroll 1 1
+
+
+\end{verbatim}
+
+
+
+\end {document}

@@ -1,0 +1,471 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {ADAM Portability Project Note}
+\newcommand{\stardocinitials}  {Starlink/APPN}
+\newcommand{\stardocnumber}    {25.0}
+\newcommand{\stardocauthors}   {B D Kelly}
+\newcommand{\stardocdate}      {29 March 1994}
+\newcommand{\stardoctitle}     {The Unix low-level ADAM libraries}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm} % changed from 240
+\setlength{\topmargin}{-2mm}   % changed from -5
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+ROYAL OBSERVATORY EDINBURGH\\
+{\large\bf Computing Section\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section {Summary}
+
+The low-level libraries (exh, atimer and msp) necessary to support ADAM
+multitasking on Unix are described.
+
+
+\section {Introduction}
+
+The three libraries described here are necessary for implementing various
+properties of adam tasks required when multitasking or when writing
+software for instrumentation. The libraries are
+
+\begin{itemize}
+\item atimer - allows a library to specify a function to be called after a delay
+\item exh - allows a library to specify a shutdown routine
+\item msp - provides intertask communication primitives
+\end{itemize}
+
+
+\section {task exit handler, exh}
+
+The "exit handler" is actually a signal handler responding to 
+
+\begin{itemize}
+\item SIGHUP
+\item SIGINT
+\item SIGQUIT
+\item SIGKILL
+\item SIGTERM
+\item SIGTRAP
+\item SIGABRT
+\item SIGEMT
+\item SIGFPE
+\end{itemize}
+
+and it is assumed that adam tasks will normally exit as a result of one of
+these. The application interface to exh consists of one routine:-
+\begin{verbatim}
+
+/*+  EXH_DECLARE - declare an exit handler */
+
+void exh_declare
+(
+void (*exh)(),           /* handler routine (given) */
+int *status              /* global status (given and returned) */
+);
+
+\end{verbatim}
+
+exh\_declare() takes the address of a function as an argument. Its
+operation is to push the address onto a stack. When one of the triggering
+signals occurs, exh pops the functions of its stack one by one and
+executes them. Exit routines are, therefore, executed in the reverse
+order of declaration. The implication is that any library which uses
+lower-level libraries should initialise them and give them a chance to
+declare their exit routines before it declares its own routine.
+
+exh\_declare() can return a single bad status EXH\_\_MEMFAIL, corresponding
+to malloc() failing to get space for the new entry.
+
+\section {exh implementation}
+
+The exh stack consists of a linked list of structures containing pointers
+to functions. The first time in, exh\_declare() uses signal() to declare
+exh\_execute() as the signal handler for the signals listed above.
+exh\_declare() uses malloc() to create new space for a new list entry as
+needed. When one of the signals occurs, exh\_execute() is invoked by the
+operating system, and it pops entries off the stack and invokes the
+routines whose addresses are present.
+
+\section {timer facility, atimer}
+
+The atimer application interface consists of two routines, allowing a
+caller to specify an application routine to be called after a time
+interval specified in milliseconds. The caller also has to specify a
+timer identifier which can be used to cancel a previously initiated
+timer. If the timed interval is allowed to complete, the specified
+application function is called and is passed the timer identifier as its
+sole argument.
+
+Note that the given timer identifier has to be unique within the process
+(cf the VMS \$setimr facility).
+
+
+\begin{verbatim}
+
+/*+  ATIMER_CANTIM - remove an event from the timer queue */
+
+void atimer_cantim
+(
+int timerid,    /* timeout identifier (given) */
+int *status     /* global status (given and returned) */
+);
+
+
+
+/*+  ATIMER_SETTIMR - add an event to the timer queue */
+
+void atimer_settimr
+(
+int delay,             /* time in millisecs (given) */
+int timerid,           /* timer request identifier (given) */
+void (*func)(),        /* address of associated routine (given) */
+int *status            /* global status (given and returned) */
+);
+
+\end{verbatim}
+
+
+\section {atimer implementation}
+
+The timer facility, atimer, provides the necessary adam millisecond timer
+by using the setitimer() facility. atimer maintains a linked list of
+timer requests, each containing the extra time delay required for this
+entry after delivery of the previous entry. Items are added to or removed
+from the queue by searching for the relevant point, performing the
+insertion or deletion (with associated malloc() or free()) and modifying
+the time interval stored in the following list entry.
+
+\section {message system primitives msp}
+
+msp provides the low-level adam intertask communication facility. As
+such, it is intended to support the higher levels of intertask
+communication which implement the adam protocols. The result is that msp
+must not be called as a separate facility within adam tasks.
+
+The call interface of msp consists of the following routines.
+
+
+\begin{verbatim}
+
+
+/*+  MSP_CLOSE_TASK_QUEUE - close communications with another task */
+
+void msp_close_task_queue
+(
+sendq_type qid,      /* a send queue to the other task */
+int *status          /* global status (given and returned) */
+);
+
+/*+  MSP_CREATE_LOCALQ - create a queue for local messages */
+
+void msp_create_localq
+(
+sendq_type *sendq,   /* created send queue (returned) */
+receiveq_type *qid,  /* created receive queue (returned) */
+int *status          /* global status (given and returned) */
+);
+
+/*+  MSP_CREATE_RECEIVEQ - create a queue for receiving messages */
+
+void msp_create_receiveq
+(
+receiveq_type *qid,  /* created queue identifier (returned) */
+int *status          /* global status (given and returned) */
+);
+
+/*+  MSP_DELETE_QUEUE - delete a queue */
+
+void msp_delete_queue
+(
+receiveq_type qid,  /* identifier of queue to be deleted (given) */
+int *status         /* global status (given and returned) */
+);
+
+/*+  MSP_ENTER_TASK - register this task with MSP */
+
+void msp_enter_task
+(
+char *task_name,         /* name of this task (given) */
+receiveq_type *commandq, /* command queue for this task (returned) */
+int *status              /* global status (given and returned) */
+);
+
+
+
+/*+  MSP_GET_TASK_QUEUE - get the command queue of a named task */
+
+void msp_get_task_queue
+(
+char *task_name,    /* name of task (given) */
+sendq_type *qid,    /* task command queue (returned) */
+int *status         /* global status (given and returned) */
+);
+
+
+/*+  MSP_RECEIVE_MESSAGE - receive a message on one of a list of queues */
+
+void msp_receive_message
+(
+receiveq_type *qarr,  /* array of queue identifiers (given) */
+int nqueues,          /* number of queues (given) */
+int waitflag,         /* wait flag (given) */
+int maxlen,           /* maximum length of message (given) */
+char msgbody[],       /* received message (returned) */
+int *actlen,          /* size of received message (returned) */
+receiveq_type *qid,   /* identifier of queue used (returned) */
+sendq_type *replyq,   /* reply queue for message (returned) */
+int *status           /* global status (given and returned) */
+);
+
+/*+  MSP_SEND_MESSAGE - send a message on a queue */
+
+void msp_send_message
+(
+char msgbody[],        /* message to be sent (given) */
+int msglen,            /* length of message to be sent (given) */
+sendq_type sendq,      /* queue identifer to be used (given) */
+receiveq_type replyq,  /* reply queue to be associated with the message 
+                          (given) */
+int *status            /* global status (given and returned) */
+);
+
+\end{verbatim}
+
+A process which uses msp must have the environment variable ADAM\_USER
+created to translate to a directory which msp can use for creating and
+deleting "rendezvous" files. The first call to msp has to be to
+msp\_enter\_task, providing msp with the name by which this process is to
+be known to other processes. msp\_enter\_task returns a queue (the "command
+queue") on which unsolicited messages from other tasks can be received.
+Communication to another task is initiated using msp\_get\_task\_queue,
+which returns a queue for sending messages to the target task's command
+queue. Note that queues for sending and receiving messages are
+fundamentally different and have different C types.
+
+msp\_create\_queue creates additional queues on which messages can be
+received. Messages are sent to another task using msp\_send\_message, and
+providing the queue to be used for sending and one of this task's receive
+queues which the other task can reply to. msp\_receive\_message allows a
+process to attempt to receive a message on any one of a provided array of
+receive queues. If the argument waitflag is set to 1, msp\_receive\_message
+will wait until a message is received. If waitflag is zero,
+msp\_receive\_message will return immediately if there are no messages on
+any of the specified queues. msp\_receive\_message returns the identifier
+of the receive queue actually used, and also the send queue which can be
+used to return a message to the other task.
+
+msp\_delete\_queue can be used to delete a receive queue created by
+msp\_create\_queue.
+
+msp\_close\_task\_queue can be used to close communications with another
+task. If more than one send queue has been obtained to the other task,
+msp\_close\_task\_queue should only be called once, specifying one of the
+queues.
+
+msp\_create\_localq is used to create a pair of send/receive queues which
+enable a process to send messages to itself (eg from within an event
+handler).
+
+
+\section {msp example}
+
+The following provides the source code of two programs which communicate
+using msp. These serve both as an example and as a timing test.
+
+
+\begin{verbatim}
+
+/*  MASTER.C - send messages to SLAVE and collect replies */
+
+#include <string.h>
+#include <stdio.h>
+#include <signal.h>
+#include "../sae/sae_par.h"
+#include "msp_par.h"
+#include "msp.h"
+
+int main()
+{
+   int status;
+   sendq_type slavecom;
+   receiveq_type commq;
+   receiveq_type replyq;
+   receiveq_type queues[1];
+   char answer[512];
+   int actlen;
+   receiveq_type used;
+   sendq_type slaveq;
+   int j;
+
+
+   status = SAI__OK;
+   msp_enter_task ( "master", &commq, &status );
+   msp_get_task_queue ( "slave", &slavecom, &status );
+   msp_create_receiveq ( &replyq, &status );
+
+   for ( j=0; j<10000; j++ )
+   {
+      msp_send_message ( "master calling", 15, slavecom, replyq, &status );
+      queues[0] = replyq;
+      msp_receive_message ( queues, 1, 1, 512, answer, &actlen, &used,
+        &slaveq, &status );
+      msp_receive_message ( queues, 1, 1, 512, answer, &actlen, &used,
+        &slaveq, &status );
+      if ( status != SAI__OK )
+      {
+         break;
+      }
+   }
+
+   msp_delete_queue ( replyq, &status );
+
+   if ( status != SAI__OK )
+   {
+      printf ( "master: bad status = %d\n", status );
+   }
+   else
+   {
+      answer[actlen] = '\0';
+      printf ( "master: received - %s\n", answer );
+   }
+
+/*   Trigger exit handler */
+
+   kill ( getpid(), SIGINT );
+
+}
+
+
+
+/*  SLAVE.C - receive messages and return two acknowledgements */
+
+#include <string.h>
+#include <stdio.h>
+#include <signal.h>
+#include "../sae/sae_par.h"
+#include "msp_par.h"
+#include "msp.h"
+
+int main()
+{
+   int status;
+   sendq_type mastercom;
+   receiveq_type qarr[1];
+   int actlen;
+   receiveq_type qid;
+   char message[512];
+   int j;
+   receiveq_type replyq;
+
+
+   status = SAI__OK;
+   msp_enter_task ( "slave", &replyq, &status );
+   qarr[0] = replyq;
+
+   for ( j=0; j<10000; j++ )
+   {
+      msp_receive_message ( qarr, 1, 1, 512, message, &actlen, &qid,
+        &mastercom, &status );
+      msp_send_message ( "slave answering", 16, mastercom, replyq, &status );
+      msp_send_message ( "slave answering", 16, mastercom, replyq, &status );
+
+      if ( status != SAI__OK )
+      {
+         break;
+      }
+   }
+
+
+   if ( status != SAI__OK )
+   {
+      printf ( "slave: bad status = %d\n", status );
+   }
+   else
+   {
+      message[actlen] = '\0';
+      printf ( "slave: received size %d mess %s\n", actlen, message );
+      printf ( "slave: connection %hd queue %hd\n", mastercom.connection,
+        mastercom.ack_queue ); 
+   }
+
+/*   Trigger exit handler */
+
+   kill ( getpid(), SIGINT );
+
+}
+
+
+\end{verbatim}
+
+
+
+\section {msp implementation}
+
+Intertask communication is implemented within msp by using TCP/IP STREAM
+sockets. These are point-to-point connections, so each pair of tasks
+communicating are connected, and the concept of a number of message
+queues available between the tasks is implemented by multiplexing over
+the single connection. Actual message queues are implemented within the
+receiving task as an array of pointers to linked lists. Messages read
+from a socket are inspected for the queue number which they have to
+carry, and are appended to the relevant queue. A "sendq" on the other
+hand, identifies both the socket which the message has to be written on,
+and the number to identify the receiving queue in the other task.
+
+msp\_enter\_task operates by finding a free TCP port number in the range
+5001 to 5099. It then creates a file with a name of the form
+\$ADAM\_USER/<taskname>\_<portnum> and signifies to the socket system that
+it is available for connections on the selected port number.
+msp\_get\_task\_queue searches the \$ADAM\_USER directory for the file
+matching the requested task name, and so can deduce the target task's
+port number. It can then connect to the target task. The socket
+connection opened between the two tasks can then be used for passing
+messages. By convention, the command queue of a task is always queue
+number zero, enabling communications to start.
+
+msp\_create\_localq is distinct in its operation. It uses socketpair() to
+create a pair of unix sockets, thereby giving the single process access
+to both ends of the communication.
+
+\section {Conclusion}
+
+This summarises the low-level adam libraries. In general these are
+provided to enable the higher-level adam libraries to be implemented and
+so should not be called directly from an adam task's application code
+
+\end {document}
