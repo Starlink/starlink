@@ -110,6 +110,10 @@ class InputByteStream {
     static inline void verbosity (const verbosities level) {
 	verbosity_ = level;
     }
+    /**
+     * Returns the verbosity setting of this class
+     */
+    static verbosities getVerbosity(void) { return verbosity_; };
 
  protected:
     InputByteStream();
@@ -132,10 +136,6 @@ class InputByteStream {
     void bufferSeek(unsigned int pos)
 	    throw (InputByteStreamError);
     void reloadBuffer(void);
-    /**
-     * Returns the verbosity setting of this class
-     */
-    static verbosities getVerbosity(void) { return verbosity_; };
 
  private:
     int fd_;
