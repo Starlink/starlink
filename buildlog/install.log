@@ -938,11 +938,9 @@ Warning: Cannot convert string "MetaCtrl<Key>Insert" to type VirtualBinding
      [java] [INFO] Parsing of document complete, stopping renderer
      [java] Parsing document /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
      [java] Transforming with stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML.xslt
-     [java] Warning: Cannot convert string "MetaCtrl<Key>Insert" to type VirtualBinding
      [java] Writing 87 files to /apps/cvsbuild/java/source/topcat/build/docs/sun253
      [java] Parsing document /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
      [java] Transforming with stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHelp.xslt
-     [java] Warning: Cannot convert string "MetaCtrl<Key>Insert" to type VirtualBinding
      [java] Writing 90 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/help
 
 jars:
@@ -1121,4 +1119,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 14 seconds
+Total time: 4 minutes 9 seconds
