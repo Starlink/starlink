@@ -527,7 +527,6 @@
          zoom = 10.0;
          while ( zoom > 2.0 ) {
             zoom = ( xphi - xplo ) / ( bbox[ 2 ] - bbox[ 0 ] ) / factor++;
-            printf( "zoom: %f\n", zoom );
          }
 
 /* Prepare the image in a PGPLOT-friendly form. */
