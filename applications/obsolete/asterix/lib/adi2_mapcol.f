@@ -1,5 +1,5 @@
       SUBROUTINE ADI2_MAPCOL( HDUID, BCOL, FROW, NELEM, TYPE, MODE,
-     :                        PTR, STATUS )
+     :                        PSID, PTR, STATUS )
 *+
 *  Name:
 *     ADI2_MAPCOL
@@ -11,7 +11,8 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_MAPCOL( HDUID, BCOL, FROW, NELM, TYPE, MODE, PTR, STATUS )
+*     CALL ADI2_MAPCOL( HDUID, BCOL, FROW, NELM, TYPE, MODE, PSID,
+*                       PTR, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -29,6 +30,8 @@
 *        Type for mapping
 *     MODE = CHARACTER*(*) (given)
 *        Mapping access mode
+*     PSID = INTEGER (given)
+*        ADI identifier to private storage area for this object
 *     PTR = INTEGER (returned)
 *        The mapped memory address
 *     STATUS = INTEGER (given and returned)
@@ -97,7 +100,7 @@
       INCLUDE 'PRM_PAR'
 
 *  Arguments Given:
-      INTEGER			HDUID, BCOL, FROW, NELEM
+      INTEGER			HDUID, BCOL, FROW, NELEM, PSID
       CHARACTER*(*)		TYPE, MODE
 
 *  Arguments Returned:
@@ -153,6 +156,14 @@
         CALL FTGCL( LUN, BCOL, FROW, 1, NVAL, %VAL(PTR), FSTAT )
 
       END IF
+
+*  Store the pointer and the column number in the private storage
+      CALL ADI2_STOMAP( PSID, HDUID, 'BC', PTR, TYPE, MODE, STATUS )
+
+*  Store additional stuff needed by column mapping
+      CALL ADI_CPUT0I( PSID, 'ColNum', BCOL, STATUS )
+      CALL ADI_CPUT0I( PSID, 'Frow', FROW, STATUS )
+      CALL ADI_CPUT0I( PSID, 'Nelm', NVAL, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_MAPCOL', STATUS )
