@@ -213,7 +213,7 @@ sub _GText {
          # pgqtxt, so we have to find the largest distance between the corners 
          # in the direction of the supplied up-vector. 
          my $hu = 0.0;
-         for my $i ( 0 ... 4 ) {
+         for my $i ( 0 ... 3 ) {
             my $test = $upx*( $xbox[$i] - $x ) + $upy*( $ybox[$i] - $y );
             $hu = $test if $test > $hu;
          }
@@ -390,7 +390,7 @@ sub _GTxtEx {
       pgqtxt( 0.0, 0.0, $angle, 0.0, $text, \@xbox, \@ybox );
 
       # Convert the returned bounding box world coordinates into millimetres.
-      for my $i ( 0 ... 4 ){
+      for my $i ( 0 ... 3 ){
          $xbox[ $i ] *= $alpha;
          $ybox[ $i ] *= $beta;
       }
@@ -405,7 +405,7 @@ sub _GTxtEx {
       # of the bounding box. 
       my $hu = -(FLT_MAX);
       my $hd = FLT_MAX;
-      foreach my $i ( 0 ... 4 ) {
+      foreach my $i ( 0 ... 3 ) {
          my $test = $ux*$xbox[ $i ] + $uy*$ybox[ $i ];
          $hu = $test if $test > $hu; 
          $hd = $test if $test < $hd;
