@@ -80,10 +80,14 @@ sub Set {
   #$string = sprintf($string, @_) if @_;
   #return $self->_Set( $string );
   
-  my %hash = @_;
-  foreach my $key ( sort keys %hash ) {
-     $self->SetC( $key, $hash{$key} );
-  }   
+  if ( $_[0] =~ "=" ) {
+     $self->_Set( $_[0] );
+  } else {
+     my %hash = @_;
+     foreach my $key ( sort keys %hash ) {
+        $self->SetC( $key, $hash{$key} );
+     }   
+  }
   return;
   
 }
