@@ -19,7 +19,17 @@ proc cgs4drLoadTask {task} {
 
 # P4
    } elseif {$ltask == "p4"} {
-     exec /usr/bin/cp $env(CGS4DR_ROOT)/standard.p4 $env(CGS4_CONFIG)/standard.p4
+
+#  Need to dynamically edit standard.p4 to use proper PID
+     set fid [open $env(CGS4DR_ROOT)/standard.p4 r]
+     if {[file exists $env(CGS4_CONFIG)/standard.p4] == 1} {exec /usr/bin/rm -f $env(CGS4_CONFIG)/standard.p4}
+     set fid2 [open $env(CGS4_CONFIG)/standard.p4 w]
+     while {[gets $fid line] >=0 } {
+       regsub -nocase "xwindows" ${line} "xwindows;$env(PID)xwin" line
+       puts $fid2 $line  
+     }
+     close $fid
+     close $fid2
      if {[file exists $env(P4_CONFIG)/default.p4]==0} {
        exec /usr/bin/cp $env(CGS4DR_ROOT)/default.p4 $env(P4_CONFIG)/default.p4
      }
