@@ -1210,18 +1210,20 @@
                CALL CCD1_MFREE( IPYO1( COUNT ), STATUS )
                CALL CCD1_MFREE( IPXO2( COUNT ), STATUS )
                CALL CCD1_MFREE( IPYO2( COUNT ), STATUS )
-            ELSE IF ( USECOM ) THEN 
+            ELSE 
 
 *  If using completeness as a weight modify the number of matches.
-               NMAT( COUNT ) = NINT( DBLE( NMAT( COUNT ) ) * COMFAC )
-               NMAT( COUNT ) = MAX( 1, NMAT( COUNT ) )
+               IF ( USECOM ) THEN 
+                  NMAT( COUNT ) = NINT( DBLE( NMAT( COUNT ) ) * COMFAC )
+                  NMAT( COUNT ) = MAX( 1, NMAT( COUNT ) )
+               END IF
 
 *  If using WCS information, construct list of matched positions in the
 *  original coordinate frame from the lists which are in transformed
 *  frames.  We use IPXC2 and IPYC2 as workspace and leave the result
 *  where the original values were, in IPXO2 and IPYO2.
                IF ( CNV .NE. AST__NULL ) THEN
-                  CALL AST_TRAN2( CNV, NUMI2, 
+                  CALL AST_TRAN2( CNV, NMAT( COUNT ), 
      :                            %VAL( IPXO2( COUNT ) ),
      :                            %VAL( IPYO2( COUNT ) ), .FALSE.,
      :                            %VAL( IPXC2 ), %VAL( IPYC2 ), STATUS )
