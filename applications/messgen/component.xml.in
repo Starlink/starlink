@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/messgen</path>
+  <description>Starlink Facility Error Message Generation</description>
+  <abstract>
+    <p>The MESSGEN program creates files
+      required for proper operation of the system for associating messages with
+      Starlink facility status values on UNIX platforms.
+      The utility program CREMSG can be used to produce
+      source files for MESSGEN.</p>
+  </abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>B K McIlwrath</name>
+      <uname>bkm</uname>
+      <email>B.K.McIlwrath@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+</component>
