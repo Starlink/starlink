@@ -378,6 +378,10 @@ HYPERTEXT_DOCS = sun226.htx
 
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 
+#  List of files required for the 'test' target.
+
+TEST_FILES = $(PKG_NAME)_test.tar
+
 #-------------------------------------------------------------------------------
 
 #  Define files required for building the package.
@@ -391,7 +395,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(ALL_SCRIPTS) $(PERL_MODULES)
+BUILT_FILES = $(ALL_SCRIPTS) $(PERL_MODULES) $(TEST_FILES)
 
 #  Rules for extracting source files from the source archive.
 
