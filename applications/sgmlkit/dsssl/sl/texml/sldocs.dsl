@@ -22,7 +22,7 @@ stdout, then generates an entity which contains the entire LaTeX file.
 <codebody>
 (define (process-texml-document)
   (make sequence
-    (literal (string-append (root-file-name) ":"))
+    (literal (string-append (index-file-name) ":"))
     (make entity system-id: (string-append (index-file-name) ".xml")
           (make processing-instruction data: "xml version=\"1.0\"")
           ;; Don't generate doctype -- it's generated in a form 
