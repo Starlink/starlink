@@ -666,6 +666,7 @@ iraf! {
             type _DOUBLE
             prompt {Increment in input coordinate value between LUT entries}
             ppath CURRENT DEFAULT
+            default 1.0
             helpkey *
           }
 
@@ -700,10 +701,12 @@ iraf! {
             type _DOUBLE
             prompt {Input coordinate value for first LUT entry}
             ppath CURRENT DEFAULT
+            default 0.0
             helpkey *
           }
 
       }
+
       action astmatrixmap {
          helplib {$ATOOLS_HELP}
 
@@ -758,6 +761,53 @@ iraf! {
             prompt {Name of file in which to store the MatrixMap}
             ppath DYNAMIC CURRENT
             association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
+      action astpcdmap {
+         helplib {$ATOOLS_HELP}
+
+         parameter disco {
+            position 1
+            type _DOUBLE
+            prompt {The distortion coefficient}
+            ppath CURRENT 
+            helpkey *
+          }
+
+         parameter options {
+            position 3
+            type LITERAL
+            prompt {Options for the PcdMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter pcdcen {
+            position 2
+            type _DOUBLE
+            prompt {The coordinates of the centre of the distortion}
+            ppath CURRENT 
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store thePcdMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter start {
+            position 2
+            type _DOUBLE
+            prompt {Input coordinate value for first LUT entry}
+            ppath CURRENT DEFAULT
             helpkey *
           }
 
