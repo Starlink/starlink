@@ -3334,6 +3334,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
+      INCLUDE 'FIO_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -3344,8 +3345,8 @@
       INTEGER STATUS
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) TLOC
-      CHARACTER*(DAT__SZTYP) TYPE
+      CHARACTER*132 FNAME
+      CHARACTER*80 REC
       CHARACTER NAME*20,FILE*80
       REAL TABLE(3,16)
       REAL RED(16),GREEN(16),BLUE(16)
@@ -3354,6 +3355,7 @@
       INTEGER TABN
       INTEGER ISEL,GFID
       INTEGER I
+      INTEGER IFD
       LOGICAL SETTAB,SETRGB,SETNEG
       LOGICAL RGB,NEG
 *-
@@ -3365,39 +3367,31 @@
         SETNEG=.TRUE.
 
 *  read in colour table
-        CALL USI_DASSOC('TABLE','READ',TLOC,STATUS)
+        CALL USI_GET0C('TABLE','READ',FNAME,STATUS)
+        CALL FIO_OPEN(FNAME,'READ','NONE',0,IFD,STATUS)
 
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           CALL GSET_GET0L( 'RGB', SETRGB, RGB, STATUS )
 
-        ELSE
-          CALL DAT_TYPE(TLOC,TYPE,STATUS)
-          CALL DAT_SIZE(TLOC,SIZE,STATUS)
-          IF (TYPE.EQ.'_REAL'.AND.SIZE.EQ.48) THEN
-            CALL DAT_GETVR(TLOC,48,TABLE,SIZE,STATUS)
-            CALL DAT_ANNUL(TLOC,STATUS)
-            SETTAB=.TRUE.
-*  standard table number
-          ELSEIF (TYPE.EQ.'_INTEGER'.AND.SIZE.EQ.1) THEN
-            CALL DAT_GET0I(TLOC,TABN,STATUS)
-            CALL DAT_ANNUL(TLOC,STATUS)
-            CALL CHR_ITOC(TABN,NAME,NCHAR)
-            NAME='AST_TAB'//NAME(:NCHAR)
-            CALL PSX_GETENV(NAME,FILE,STATUS)
-            CALL HDS_OPEN(FILE,'READ',TLOC,STATUS)
-            IF (STATUS.NE.SAI__OK) THEN
-              CALL MSG_PRNT('AST_ERR: invalid table number')
-              STATUS=SAI__ERROR
-            ELSE
-              CALL DAT_GETVR(TLOC,48,TABLE,NVAL,STATUS)
-              CALL DAT_ANNUL(TLOC,STATUS)
-              SETTAB=.TRUE.
+        ELSEIF (STATUS.EQ.SAI__OK) THEN
+          I=1
+          DO WHILE  (I.LE.16.AND.STATUS.EQ.SAI__OK)
+            CALL FIO_READF(IFD,REC,STATUS)
+            IF (STATUS.EQ.SAI__OK) THEN
+              READ(REC,*) TABLE(1,I),TABLE(2,I),TABLE(3,I)
             ENDIF
-          ELSE
-            CALL MSG_PRNT('AST_ERR: invalid colour table')
-            STATUS=SAI__ERROR
+            I=I+1
+          ENDDO
+          IF (STATUS.EQ.SAI__OK) THEN
+            SETTAB=.TRUE.
           ENDIF
+          CALL FIO_CLOSE(IFD,STATUS)
+
+
+        ELSE
+          CALL MSG_PRNT('AST_ERR: invalid colour table')
+          STATUS=SAI__ERROR
 
         ENDIF
 
