@@ -249,6 +249,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.81  2005/03/23 09:20:11  timj
+*     Register the INTREBIN offsetting pointers with CNF before attempting to use them with CNF_PVAL
+*
 *     Revision 1.80  2005/03/23 08:04:08  timj
 *     + DIAMETER is no longer a constant, it is derived from the TELESCOP
 *     + Calculate Nyquist value once and use it everywhere
@@ -605,6 +608,7 @@ c
       LOGICAL          DEFOUT          ! Take default output files for DESPIKE
       LOGICAL          DESPIKE         ! Is this the despike task
       REAL             DIAMETER        ! diameter of primary mirror
+      INTEGER          DOFFSET         ! Byte offset into DOUBLE data array
       LOGICAL          DOLOOP          ! Loop for input data
       LOGICAL          DOREBIN         ! True if we are rebinning the data
       DOUBLE PRECISION DTEMP           ! Scratch double
@@ -658,6 +662,10 @@ c
                                        ! pointer to scratch space holding
                                        ! data variance from input files
       INTEGER          IPOSN           ! Position in string
+      LOGICAL          ISNEWPD         ! Is this a new data pointer?
+      LOGICAL          ISNEWPV         ! Is this a new variance pointer?
+      LOGICAL          ISNEWPR         ! Is this a new ra pointer?
+      LOGICAL          ISNEWPC         ! Is this a new dec pointer?
       INTEGER          ITEMP           ! scratch integer
       INTEGER          IX              ! Temporary X integer
       INTEGER          IY              ! Temporary Y integer
@@ -706,6 +714,7 @@ c
                                        ! files
       INTEGER          N_PTS (MAX_FILE)! Number of bols * positions
       CHARACTER*40     OBJECT(MAX_FILE)! name of object
+      INTEGER          OFFSET          ! Offset into array
       LOGICAL          OKAY            ! Okay to rebin?
       CHARACTER*(132)  OUT             ! Output file name
       CHARACTER*40     OUT_COORDS      ! coordinate system of output map
@@ -750,6 +759,7 @@ c
       LOGICAL          RAS_CHOP_SC     ! Is raster chopping in SC
       CHARACTER * (10) REB_SUFFIX_STR(SCUBA__N_SUFFIX) ! Suffix for OUT REBIN
       INTEGER          RLEV     ! Recursion depth for reading
+      INTEGER          ROFFSET         ! Byte offset into REAL data array
       REAL             RTEMP           ! Scratch real
       CHARACTER*10     SAMPLE_MODE     ! Sample mode for maps
       REAL             SCALE           ! Size of 1 scale length for WT rebin
@@ -813,6 +823,11 @@ c
       HAVE_MODEL = .FALSE.
       SOBJECT = ' '
       OUT_REDSX_LOC = DAT__NOLOC
+
+      ISNEWPD = .FALSE.
+      ISNEWPV = .FALSE.
+      ISNEWPR = .FALSE.
+      ISNEWPC = .FALSE.
 
 * Setup taskname (can never have BOLREBIN and INTREBIN)
 
@@ -2128,15 +2143,53 @@ c
      :                    'Processing integration ^INT', STATUS)
 
 *     Now set up the pointers for the start of each integration
-                     ABOL_DATA_PTR(1)= IN_DATA_PTR(CURR_FILE)
-     :                    + (INT_START-1) * N_BOL(CURR_FILE) * VAL__NBR
-                     ABOL_VAR_PTR(1) = IN_VARIANCE_PTR(CURR_FILE)
-     :                    + (INT_START-1) * N_BOL(CURR_FILE) * VAL__NBR
-                     ABOL_DEC_PTR(1) = BOL_DEC_PTR(CURR_FILE)
-     :                    + (INT_START-1) * N_BOL(CURR_FILE) * VAL__NBD
-                     ABOL_RA_PTR(1)  = BOL_RA_PTR(CURR_FILE)
-     :                    + (INT_START-1) * N_BOL(CURR_FILE) * VAL__NBD
+*     We need to be careful because these pointers will not initially
+*     be registered with CNF
+                     OFFSET = (INT_START-1) * N_BOL(CURR_FILE)
+                     ROFFSET = OFFSET * VAL__NBR
+                     DOFFSET = OFFSET * VAL__NBD
 
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        IF (OFFSET .GT. 0) THEN
+
+                           ABOL_DATA_PTR(1) = CNF_PREG( 
+     :                          CNF_PVAL(IN_DATA_PTR(CURR_FILE)) + 
+     :                          ROFFSET, ISNEWPD)
+                           ABOL_VAR_PTR(1) = CNF_PREG(
+     :                          CNF_PVAL(IN_VARIANCE_PTR(CURR_FILE)) +
+     :                          ROFFSET, ISNEWPV)
+                           ABOL_RA_PTR(1) = CNF_PREG(
+     :                          CNF_PVAL(BOL_RA_PTR(CURR_FILE)) +
+     :                          DOFFSET, ISNEWPR)
+                           ABOL_DEC_PTR(1) = CNF_PREG(
+     :                          CNF_PVAL(BOL_DEc_PTR(CURR_FILE)) +
+     :                          DOFFSET, ISNEWPC)
+
+                           IF (ABOL_DATA_PTR(1) .EQ. 0 .OR.
+     :                          ABOL_VAR_PTR(1) .EQ. 0 .OR.
+     :                          ABOL_RA_PTR(1) .EQ. 0 .OR.
+     :                          ABOL_DEC_PTR(1) .EQ. 0 ) THEN
+
+                              STATUS = SAI__ERROR
+                              CALL MSG_SETC( 'PKG', PACKAGE )
+                              CALL ERR_REP( ' ','^PKG: Error '//
+     :                             'registering pointers with '//
+     :                             'CNF (internal error)', 
+     :                             STATUS)
+
+                           END IF
+
+                        ELSE
+
+                           ISNEWPD = .FALSE.
+                           ISNEWPV = .FALSE.
+                           ISNEWPR = .FALSE.
+                           ISNEWPC = .FALSE.
+
+                        END IF
+                     END IF
+
+                     
 *     Work out mapname
                      MAPNAME = 'I'
                      CALL CHR_ITOC(COUNT, STEMP, ITEMP)
@@ -2538,6 +2591,13 @@ c
                      END DO
                   END IF
 
+*     unregister left over pointers
+                  IF (INTREBIN) THEN
+                     IF (ISNEWPD) CALL CNF_UNREGP( ABOL_DATA_PTR(1) )
+                     IF (ISNEWPV) CALL CNF_UNREGP( ABOL_VAR_PTR(1) )
+                     IF (ISNEWPR) CALL CNF_UNREGP( ABOL_RA_PTR(1) )
+                     IF (ISNEWPC) CALL CNF_UNREGP( ABOL_DEC_PTR(1) )
+                  END IF
 
                END DO
             END DO
