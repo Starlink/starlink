@@ -669,7 +669,7 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
             SIGP = (WID(ISRC) / (2.0 * SQRT(2.0*ALOG(2.0))))
      :             / (ABS(DX)*MATH__RTOD*60.0)
             CALL MATH_INTGAU2D( SIGP, SIGP, 0.0, 0.0, 0.0,
-     :                          0.0, 0.0, 1.0, 1.0, TPW, TPW,
+     :                          0.0, 0.0, 1.0, 1.0, PW*2+1, PW*2+1,
      :                          PKERN, STATUS )
 
 *          Make copy of psf
