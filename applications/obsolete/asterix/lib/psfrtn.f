@@ -3087,7 +3087,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Reset the SYSTEM_INIT flag in each common block
       AS_INIT = .TRUE.
-      RX_INIT = .TRUE.
       RX_CB_OPEN = .FALSE.
 
 *    Clear pointer arrays for ASCA psfs
