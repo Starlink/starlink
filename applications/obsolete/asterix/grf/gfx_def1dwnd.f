@@ -15,7 +15,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 *    Import :
       INTEGER NVAL			! number of values
@@ -170,7 +169,7 @@
           ENDIF
 
         ELSE
-          CALL ERR_REP(' ','from GFX_DEF1DWND',STATUS)
+          CALL AST_REXIT('GFX_DEF1DWND',STATUS)
         ENDIF
 
       ENDIF
@@ -193,7 +192,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
       INCLUDE 'PRM_PAR'
 *    Import :
@@ -369,7 +367,7 @@
           ENDIF
 
         ELSE
-          CALL ERR_REP(' ','from GFX_DEF1DWNDQ',STATUS)
+          CALL AST_REXIT('GFX_DEF1DWNDQ',STATUS)
         ENDIF
 
 
@@ -392,7 +390,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 *    Import :
       INTEGER NVAL			! number of values
@@ -587,7 +584,7 @@
           ENDIF
 
         ELSE
-          CALL ERR_REP(' ','from GFX_DEF1DWNDV',STATUS)
+          CALL AST_REXIT('GFX_DEF1DWNDV',STATUS)
         ENDIF
 
       ENDIF
@@ -612,7 +609,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
       INCLUDE 'PRM_PAR'
 *    Import :
@@ -828,7 +824,7 @@
           ENDIF
 
         ELSE
-          CALL ERR_REP(' ','from GFX_DEF1DWNDVQ',STATUS)
+          CALL AST_REXIT('GFX_DEF1DWNDVQ',STATUS)
         ENDIF
 
       ENDIF
