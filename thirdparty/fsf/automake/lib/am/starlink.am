@@ -50,25 +50,32 @@ if %?LATEXDOCS%
 #
 # We do not require that star2html be available on the build system,
 # and so we distribute built HTX documentation.  Thus the following rules
-# should be active only in the predist state.
+# should be invoked only in the predist state.  However there isn't a
+# file we can use to test whether we're in that state, so write the
+# test so that it will fail if star2html isn't available.
 #
 # If file $(<:.tex=.htx_tar.extras) is present, then it contains a list
 # of files, each one of which should be added to the .htx directory before
 # it is rolled up into a tarball.
-@PREDIST@.tex.htx_tar:
-@PREDIST@	- @STAR2HTML@ $<
-@PREDIST@	if test -f ${<:.tex=.htx_tar.extras}; then \
-@PREDIST@	  for f in `cat ${<:.tex=.htx_tar.extras}`; do \
-@PREDIST@	    test -f "$$f" && cp "$$f" ${<:.tex=.htx} || true; \
-@PREDIST@	  done; else :; fi
-@PREDIST@	tar cf $@ ${<:.tex=.htx}
+#
+# Ignore the exit status of star2html, as it can sometimes fail harmlessly.
+.tex.htx_tar:
+	- @STAR2HTML@ $<
+	test -d ${<:.tex=.htx}
+	if test -f ${<:.tex=.htx_tar.extras}; then \
+	  for f in `cat ${<:.tex=.htx_tar.extras}`; do \
+	    test -f "$$f" && cp "$$f" ${<:.tex=.htx} || true; \
+	  done; else :; fi
+	tar cf $@ ${<:.tex=.htx}
 endif %?LATEXDOCS%
 if %?XMLDOCS%
 # Templates to generate documentation from XML sources
 #
 # We do not require that jade/sgmlnorm be available on the build system,
-# so we distribute built htx documentation.  The following rules are active
-# only in the predist state.
+# so we distribute built htx documentation.  The following rules
+# should be invoked only in the predist state.  However there isn't a
+# file we can use to test whether we're in that state, so write the
+# test so that it will fail if jade and sgmlnorm are't available.
 #
 # Don't express a dependency via the tarball .texml_tar or the directory
 # .texml, or else Make deletes it as an intermediate, hence the tests within
@@ -76,18 +83,20 @@ if %?XMLDOCS%
 #
 # Requires JADE, SGMLNORM and SGMLKIT_HOME substitutions, managed by
 # STAR_XML_DOCUMENTATION.
-@PREDIST@.xml.tex:
-@PREDIST@	if test -f $(<:.xml=.texml_tar); then :; else $(MAKE) $(<:.xml=.texml_tar); fi
-@PREDIST@	if test -d $(<:.xml=.texml); then :; else tar xf $(<:.xml=.texml_tar); fi
-@PREDIST@	cp $(<:.xml=.texml)/$@ .
-@PREDIST@.xml.htx_tar:
-@PREDIST@	JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
-@PREDIST@		SGML_CATALOG_FILES=$(SGMLKIT_HOME)/dtd/CATALOG-override \
-@PREDIST@ 		$(SGML2DOCS) --html --tarball=$@ $<
-@PREDIST@.xml.texml_tar:
-@PREDIST@	JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
-@PREDIST@		SGML_CATALOG_FILES=$(SGMLKIT_HOME)/dtd/CATALOG-override \
-@PREDIST@ 		$(SGML2DOCS) --texml --tarball=$@ $<
+.xml.tex:
+	test -f $(<:.xml=.texml_tar) || $(MAKE) $(<:.xml=.texml_tar)
+	test -d $(<:.xml=.texml)     || tar xf $(<:.xml=.texml_tar)
+	cp $(<:.xml=.texml)/$@ .
+.xml.htx_tar:
+	test "$(JADE)" != NOJADE -a "$(SGMLNORM)" != NOSGMLNORM && \
+	  JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
+	    SGML_CATALOG_FILES=$(SGMLKIT_HOME)/dtd/CATALOG-override \
+	    $(SGML2DOCS) --html --tarball=$@ $<
+.xml.texml_tar:
+	test "$(JADE)" != NOJADE -a "$(SGMLNORM)" != NOSGMLNORM && \
+	  JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
+	    SGML_CATALOG_FILES=$(SGMLKIT_HOME)/dtd/CATALOG-override \
+	    $(SGML2DOCS) --texml --tarball=$@ $<
 endif %?XMLDOCS%
 
 if %?COMPIFL%
