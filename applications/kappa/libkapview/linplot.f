@@ -105,7 +105,7 @@
 *        There will be no difference in effect between these two forms of
 *        alignment unless the rest frequency is different in the two
 *        spectra. Likewise, the AlignStdOfRest attribute of the second
-*        spectrum controlls the standard of rest in which alignment occurs.
+*        spectrum control's the standard of rest in which alignment occurs.
 *        These attributes (like all other attributes) may be examined and
 *        modified using WCSATTRIB.
 *     COMP = LITERAL (Read)
@@ -337,7 +337,7 @@
 *        quantity specified by parameter USEAXIS should be supplied. See also 
 *        parameter ALIGN. [!]
 *     XMAP = LITERAL (Read)
-*        Specifies hwo the quantity represented by the X axis is mapped
+*        Specifies how the quantity represented by the X axis is mapped
 *        onto the screen. The options are:
 *
 *        - "Pixel" -- The mapping is such that pixel index within the
@@ -357,7 +357,7 @@
 *        the axis increases linearly across the screen.
 *
 *        - "Default" -- One of "Linear" or "log" is chosen automatically,
-*        depending on whcih one produces a more even spread of values on the 
+*        depending on which one produces a more even spread of values on the 
 *        screen. [DEFAULT]
 *
 *     XRIGHT = LITERAL (Read)
@@ -381,7 +381,7 @@
 *        should be the logarithm (base 10) of the bottom data value.
 *        See also parameter ALIGN. [!]
 *     YMAP = LITERAL (Read)
-*        Specifies hwo the quantity represented by the Y axis is mapped
+*        Specifies how the quantity represented by the Y axis is mapped
 *        onto the screen. The options are:
 *
 *        - "Linear" -- The data values are mapped linearly onto the
