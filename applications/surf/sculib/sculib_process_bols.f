@@ -224,6 +224,13 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
+      INTEGER          NUM_CHAN
+      INTEGER          NUM_ADC
+      INTEGER          N_EXPOSURES
+      INTEGER          N_FITS
+      INTEGER          N_INTEGRATIONS
+      INTEGER          N_MEASUREMENTS
+      INTEGER          N_SWITCHES
       INTEGER          BOL_ADC (NUM_CHAN * NUM_ADC)
       INTEGER          BOL_CHAN (NUM_CHAN * NUM_ADC)
       REAL             BOL_DU3 (NUM_CHAN, NUM_ADC)
@@ -258,18 +265,11 @@
       DOUBLE PRECISION MJD_STANDARD
       DOUBLE PRECISION MJD1
       DOUBLE PRECISION MJD2
-      INTEGER          NUM_CHAN
-      INTEGER          NUM_ADC
       INTEGER          N_BEAMS
       INTEGER          N_BOL
-      INTEGER          N_EXPOSURES
-      INTEGER          N_FITS
-      INTEGER          N_INTEGRATIONS
       INTEGER          N_MAP
-      INTEGER          N_MEASUREMENTS
       INTEGER          N_POINT
       INTEGER          N_POS
-      INTEGER          N_SWITCHES
       CHARACTER *(*)   OUT_COORDS
       REAL             POINT_DAZ(N_POINT)
       REAL             POINT_DEL(N_POINT)
