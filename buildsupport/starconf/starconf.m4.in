@@ -913,8 +913,9 @@ AC_DEFUN([STAR_MONOLITHS],
 
           # To build monoliths, we need both compifl to build the .ifc
           # files (in the parsecon component), and alink
-          # to link the monoliths (in dtask).
-          STAR_DECLARE_DEPENDENCIES(build, [parsecon dtask])
+          # to link the monoliths (in dtask).  Both are now part of
+          # the pcs component.
+          STAR_DECLARE_DEPENDENCIES(build, [pcs])
 
           # So try to find alink and compifl.
           STAR_CHECK_PROGS([compifl alink])
