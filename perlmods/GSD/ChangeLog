@@ -1,3 +1,15 @@
+2000-05-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Makefile.PL: Try to make it a bit cleverer
+
+	* t/tie.t: Add test
+
+	* t/object.t: Add test
+
+	* t/gsd.t: Use the test module
+
+	* GSD.pm: Add objects and ties 
+
 2000-05-11  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* GSD.pm: Add perl level gsdClose
