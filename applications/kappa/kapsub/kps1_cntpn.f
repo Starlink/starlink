@@ -63,7 +63,11 @@
 *        Add parameter PEN1 which is used to remember the last pen colour
 *        used when rotating pens. This enables rotation to continue between
 *        invocations of the application. Changed NROT from 3 to 5.
+*     9-FEB-2001 (DSB):
+*        Modified to make the COLOUR and STYLE attribues included in the
+*        returned group refer to the CURVES and STRINGS elements only.
 *     {enter_further_changes_here}
+
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -238,8 +242,11 @@
                NPEN = NCONT
                PENHI = MIN( NROT, MIN( CTM__RSVPN, UP ) )
                DO I = 1, NCONT
-                  ATTR = 'COLOUR='
-                  CALL CHR_ITOC( IPEN, ATTR( 8 : ), NC )
+                  ATTR = 'COLOUR(CURVES)='
+                  NC = 15
+                  CALL CHR_PUTI( IPEN, ATTR, NC )
+                  CALL CHR_APPND( ',COLOUR(STRINGS)=', ATTR, NC )
+                  CALL CHR_PUTI( IPEN, ATTR, NC )
                   CALL GRP_PUT( IGRP, 1, ATTR, 0, STATUS )
                   IPEN = MOD( IPEN, NROT ) + 1
                END DO
@@ -257,8 +264,9 @@
 
                DO I = 1, NCONT
                   IF( IPEN .GT. PENHI ) IPEN = IPEN - NROT
-                  ATTR = 'STYLE='
-                  CALL CHR_ITOC( IPEN, ATTR( 7 : ), NC )
+                  ATTR = 'STYLE(CURVES)='
+                  NC = 14
+                  CALL CHR_PUTI( IPEN, ATTR, NC )
                   CALL GRP_PUT( IGRP, 1, ATTR, 0, STATUS )
                   IPEN = IPEN + 1
                END DO
@@ -293,18 +301,17 @@
                   IF( I .LE. NPEN ) THEN
                      CALL GRP_GET( IGRP, I, 1, ATTR, STATUS )
                      IAT = CHR_LEN( ATTR )
-                     CALL CHR_APPND( ',WIDTH=', ATTR, IAT )
-                     IAT = IAT + 1
+                     CALL CHR_APPND( ',WIDTH(CURVES)=', ATTR, IAT )
                   ELSE
-                     ATTR = 'WIDTH='
-                     IAT = 7
+                     ATTR = 'WIDTH(CURVES)='
+                     IAT = 14
                   END IF
 
 *  Append the line width to the attribute string.
                   IF( CNTLEV( I ) .GE. THRESH ) THEN
-                     CALL CHR_RTOC( WID1, ATTR( IAT : ), NC )
+                     CALL CHR_RTOC( WID1, ATTR, IAT )
                   ELSE
-                     CALL CHR_RTOC( WID2, ATTR( IAT : ), NC )
+                     CALL CHR_RTOC( WID2, ATTR, IAT )
                   ENDIF
 
 *  Store in the group at the correct index.
@@ -330,17 +337,16 @@
                   IF( I .LE. NPEN ) THEN
                      CALL GRP_GET( IGRP, I, 1, ATTR, STATUS )
                      IAT = CHR_LEN( ATTR )
-                     CALL CHR_APPND( ',STYLE=', ATTR, IAT )
-                     IAT = IAT + 1
+                     CALL CHR_APPND( ',STYLE(CURVES)=', ATTR, IAT )
                   ELSE
-                     ATTR = 'STYLE='
-                     IAT = 7
+                     ATTR = 'STYLE(CURVES)='
+                     IAT = 14
                   END IF
 
                   IF( CNTLEV( I ) .GE. THRESH ) THEN
-                     CALL CHR_ITOC( STY1, ATTR( IAT : ), NC )
+                     CALL CHR_PUTI( STY1, ATTR, IAT )
                   ELSE
-                     CALL CHR_ITOC( STY2, ATTR( IAT : ), NC )
+                     CALL CHR_PUTI( STY2, ATTR, IAT )
                   ENDIF
 
                   CALL GRP_PUT( IGRP, 1, ATTR, I, STATUS )

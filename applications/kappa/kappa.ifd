@@ -2968,12 +2968,12 @@ package kappa {
             default !
           }
 
-         parameter labout {
-            type _LOGICAL
-            prompt {Label outlines in Good and Bounds modes?}
+         parameter labpos {
+            type _REAL
+            prompt {Position for label in Good and Bounds modes}
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default TRUE
+            default 4,0.75
             helpkey *
           }
 

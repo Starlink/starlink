@@ -53,6 +53,8 @@
 *  History:
 *     26-AUG-1998 (DSB):
 *        Original version.
+*     9-FEB-2001 (DSB):
+*        Added check that the section has some area.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,6 +101,7 @@
       DOUBLE PRECISION UBNDG( 2 )! Upper bounds of section in GRAPHICS Frame
       DOUBLE PRECISION XL( 2 )   ! GRAPHICS coords at lowest GRID position
       DOUBLE PRECISION XU( 2 )   ! GRAPHICS coords at highest GRID position
+      INTEGER I                  ! Axis index
       INTEGER LBND( NDF__MXDIM ) ! Pixel index lower bounds of supplied NDF
       INTEGER MAP                ! Pointer to GRAPHICS -> GRID mapping
       INTEGER NDIM               ! No. of axes in supplied NDF
@@ -114,6 +117,9 @@
 
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an ast context
+      CALL AST_BEGIN( STATUS )
 
 *  Get the bounds of the current PGPLOT window, and store double
 *  precision equivalents.
@@ -161,6 +167,19 @@
          UBND( SDIM( 2 ) ) = MIN( SUBND( 2 ), KPG1_CEIL( PCUBND ) )
       END IF
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Check the section has some area.
+      DO I = 1, NDIM
+         IF( LBND( I ) .GT. UBND( I ) ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'KPS1_CNTSC_ERR1', 'There is no overlap '//
+     :                    'with the existing plot.', STATUS )
+            GO TO 999
+         END IF
+      END DO
+
 *  Extract the required section from the NDF.
       CALL NDF_SECT( INDF, NDIM, LBND, UBND, INDFS, STATUS ) 
 
@@ -189,10 +208,9 @@
       SLBND( 2 ) = LBND( SDIM( 2 ) )
       SUBND( 2 ) = UBND( SDIM( 2 ) )
 
-*  Annul the pointers to the Mappings.
-      CALL AST_ANNUL( MAP, STATUS )
-      CALL AST_ANNUL( WMAP, STATUS )
-
  999  CONTINUE
+
+*  End the ast context
+      CALL AST_END( STATUS )
 
       END
