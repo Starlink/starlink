@@ -25,7 +25,8 @@ proc gwm_printDialog {w gwm c} {
     wm title $w "Gwm Print"
     wm iconname $w Print
     wm transient $w .
-
+    cgs4drCursor pirate orange black
+    $w config -cursor {arrow green black}
 
 # Initialise the elements of the global array gwm_priv that are used to
 # save the state of the dialog box if they don't exist yet.
@@ -190,6 +191,7 @@ for printing. Please check the file and directory name."
 
 	    # Disable the control that popped us up
 		$c configure -state disabled
+                cgs4drCursor watch red white
 	    # Destroy the dialog box and restore the focus.
 		destroy $w
 		focus $oldFocus
@@ -197,6 +199,7 @@ for printing. Please check the file and directory name."
 	} {
 
 	# Destroy the dialog box and restore the focus.
+            cgs4drCursor arrow green black
 	    destroy $w
 	    focus $oldFocus
 	}
@@ -231,4 +234,5 @@ proc gwm_printComplete {c name elem op} {
 
 # Enable the widget.
   $c configure -state normal
+  cgs4drCursor arrow green black
 }
