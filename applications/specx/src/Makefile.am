@@ -10,11 +10,7 @@ specx_help_SOURCES = helpm.c
 specx_help_LDADD = `shl_link` @FCLIBS@
 
 FIG_LIBS = \
-/home/timj/data/tmp/star/cvs/applications/figaro/fit/libfit.la \
-/home/timj/data/tmp/star/cvs/applications/figaro/tio/libtio.la \
-/home/timj/data/tmp/star/cvs/applications/figaro/ich/libich.la \
-/home/timj/data/tmp/star/cvs/applications/figaro/gen/libgen.la
-
+-lfigfit -lfigtio -lfigich -lfiggen
 
 specx_LDADD = \
 ../command/libcommand.la \
