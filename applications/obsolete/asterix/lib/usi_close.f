@@ -10,6 +10,7 @@
 
       CALL USI0_EXIT()
 
+      USI_NPS = 0
       USI_SYINIT = .FALSE.
 
       END
