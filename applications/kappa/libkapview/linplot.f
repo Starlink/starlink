@@ -92,7 +92,22 @@
 *        but also the previous plot can be used to specify the axis 
 *        limits (see parameter ALIGN). Thus you can generate a composite 
 *        plot within a single set of axes, say using different colours or 
-*        modes to distinguish data from different datasets.
+*        modes to distinguish data from different datasets. Note,
+*        alignment between the two plots is controlled by the AlignSystem
+*        attribute of the data being displayed. For instance, if you have
+*        an existing plot showing a spectrum plotted against radio
+*        velocity and you overlay another spectrum, also in radio velocity 
+*        but with a different rest frequency, the appearance of the final 
+*        plot will depend on the value of the AlignSystem attribute of the 
+*        second spectrum. If AlignSystem is "Wavelen" (this is the default)
+*        then the two spectra will be aligned in wavelength, but if
+*        AlignSystem is "vrad" they will be aligned in radio velocity.
+*        There will be no difference in effect between these two forms of
+*        alignment unless the rest frequency is different in the two
+*        spectra. Likewise, the AlignStdOfRest attribute of the second
+*        spectrum controlls the standard of rest in which alignment occurs.
+*        These attributes (like all other attributes) may be examined and
+*        modified using WCSATTRIB.
 *     COMP = LITERAL (Read)
 *        The NDF component to be plotted.  It may be "Data", "Quality",
 *        "Variance", or "Error" (where "Error" is an alternative to
