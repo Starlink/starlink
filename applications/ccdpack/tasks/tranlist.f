@@ -31,22 +31,6 @@
 *     tranlist inlist outlist trtype
 
 *  ADAM Parameters:
-*     FA-FZ = LITERAL (Read)
-*        These parameters supply the values of "sub-expressions" used in
-*        the expressions XFOR and YFOR. These parameters
-*        should be used when repeated expressions are present in complex
-*        transformations. Sub-expressions may contain references to
-*        other sub-expressions and constants (PA-PZ).
-*        An example of using sub-expressions is:
-*           XFOR > PA*ASIND(FA/PA)*X/FA
-*           YFOR > PA*ASIND(FA/PA)*Y/FA
-*           FA > SQRT(X*X+Y*Y)
-*           PA > 100D0
-*     FORWARD = _LOGICAL (Read)
-*        If TRTYPE="STRUCT" then this parameter's value controls whether
-*        the forward or inverse mapping in the transform structure is
-*        used.
-*        [TRUE]
 *     EPOCHIN = _DOUBLE (Read)
 *        If a "Sky Co-ordinate System" specification is supplied (using 
 *        parameter FRAMEIN) for a celestial co-ordinate system, then 
@@ -67,6 +51,22 @@
 *        Besselian epoch if less than 1984.0 and as a Julian epoch 
 *        otherwise. 
 *        [Dynamic]
+*     FA-FZ = LITERAL (Read)
+*        These parameters supply the values of "sub-expressions" used in
+*        the expressions XFOR and YFOR. These parameters
+*        should be used when repeated expressions are present in complex
+*        transformations. Sub-expressions may contain references to
+*        other sub-expressions and constants (PA-PZ).
+*        An example of using sub-expressions is:
+*           XFOR > PA*ASIND(FA/PA)*X/FA
+*           YFOR > PA*ASIND(FA/PA)*Y/FA
+*           FA > SQRT(X*X+Y*Y)
+*           PA > 100D0
+*     FORWARD = _LOGICAL (Read)
+*        If TRTYPE="STRUCT" then this parameter's value controls whether
+*        the forward or inverse mapping in the transform structure is
+*        used.
+*        [TRUE]
 *     FRAMEIN = LITERAL (Read)
 *        If TRTYPE="WCS" then the transformation is a mapping from the
 *        frame specified by this parameter to that specified by the
@@ -88,6 +88,8 @@
 *          within the WCS component.
 *        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
 *          (see section "Sky Co-ordinate Systems" in SUN/95).
+*        - Null (!), indicating the Current frame.
+*        [!]
 *     INEXT = _LOGICAL (Read)
 *        If NDFNAMES is TRUE and the transformation is to be specified
 *        using a WCS component (TRTYPE="WCS"), then this parameter 
@@ -287,15 +289,13 @@
 
 *  Examples:
 *     tranlist inlist='*' outlist='*.reg' trtype=wcs framein=pixel
-*              frameout=ccd_reg
 *        In this example all the NDFs in the current directory are
 *        accessed and their associated position lists are opened.
 *        The WCS component of each NDF is used to transform the 
 *        coordinates in the position lists from pixel coordinates to
-*        coordinates in the frame with a domain 'CCD_REG' (the 
-*        domain written by default by the REGISTER program).  The 
-*        output lists are called ndf-name.reg and are associated 
-*        with the NDFs.
+*        coordinates in the Current coordinate frame.  The output
+*        lists are called ndf-name.reg and are associated with the
+*        NDFs.
 *     tranlist inlist='*' outlist='*.tran' trtype=struct forward=false
 *        In this example transform structures in each of the NDFs in
 *        the current directory are used to transform their associated
@@ -441,6 +441,7 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'FIO_PAR'          ! FIO parameterisations
       INCLUDE 'AST_PAR'          ! Standard AST constants
+      INCLUDE 'PAR_ERR'          ! PAR system error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -475,8 +476,8 @@
       INTEGER IPWORK             ! Pointer to workspace for output data
       INTEGER IWCS               ! AST pointer to WCSFILE WCS component
       INTEGER IWCSF              ! NDF identifier for WCSFILE
+      INTEGER JCUR               ! Index of original current frame in frameset
       INTEGER JFROM              ! Index of source frame in frameset
-      INTEGER JTO                ! Index of destination frame in frameset
       INTEGER MAPAST             ! AST pointer to mapping for transformation
       INTEGER NDFGRP             ! Group of input NDF names
       INTEGER NFOR               ! Number of forward variables
@@ -846,18 +847,29 @@
                   CALL CCD1_GTWCS( IWCSF, IWCS, STATUS )
                END IF
 
+*  Save the index of the original Current frame.
+               JCUR = AST_GETI( IWCS, 'Current', STATUS )
+
 *  Get the index of the source frame.
                CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IWCS, ' ', ' ',
      :                          .FALSE., STATUS )
                JFROM = AST_GETI( IWCS, 'Current', STATUS )
 
-*  Get the index of the destination frame.
-               CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IWCS, ' ', ' ',
-     :                          .FALSE., STATUS )
-               JTO = AST_GETI( IWCS, 'Current', STATUS )
+*  Set the WCS frameset Current frame to the destination frame (if
+*  parameter is null then it has the right value already).
+               IF ( STATUS .NE. SAI__OK ) GO TO 99
+               CALL PAR_GET0C( 'FRAMEOUT', LINE, STATUS )
+               IF ( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
+               ELSE
+                  CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IWCS, ' ', 
+     :                             ' ', .FALSE., STATUS )
+               END IF
 
 *  Generate the mapping to use.
-               MAPAST = AST_GETMAPPING( IWCS, JFROM, JTO, STATUS )
+               MAPAST = AST_GETMAPPING( IWCS, JFROM, AST__CURRENT, 
+     :                                  STATUS )
             END IF
 
 *  Transform the coordinates with the given mapping.
