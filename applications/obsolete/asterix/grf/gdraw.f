@@ -149,12 +149,10 @@
       ENDIF
 
       IF (.NOT.G_OPEN) THEN
-        IF (G_MULTI) THEN
-          CALL USI_ANNUL(LOC,STATUS)
-        ELSE
+        IF (.NOT.G_MULTI) THEN
           CALL BDA_RELEASE(LOC,STATUS)
-          CALL USI_ANNUL(LOC,STATUS)
         ENDIF
+        CALL USI_ANNUL('INP',STATUS)
 
         CALL GCB_DETACH(STATUS)
 

@@ -206,7 +206,11 @@
       ENDIF
 
       IF (.NOT.G_OPEN) THEN
-        CALL USI_ANNUL(LOC,STATUS)
+        IF ( NEW.OR.SPLIT ) THEN
+          CALL USI_ANNUL('OUT',STATUS)
+        ELSE
+          CALL USI_ANNUL('INOUT',STATUS)
+        END IF
         CALL AST_CLOSE()
       ENDIF
 
