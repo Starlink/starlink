@@ -375,7 +375,7 @@ PKG_NAME = sgmlkit
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.7-10
+PKG_VERS = 0.7-11
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
