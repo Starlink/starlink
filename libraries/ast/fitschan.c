@@ -2107,6 +2107,9 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
       } else if( naxis > 1 ){
          axrot2 = 0;
          axrot1 = 1; 
+      } else {
+         axrot2 = -1;
+         axrot1 = -1;
       }
    } else {
       axrot1 = axlon;
@@ -2617,6 +2620,9 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
       } else if( naxis > 1 ){
          axrot2 = 0;
          axrot1 = 1; 
+      } else {
+         axrot2 = -1;
+         axrot1 = -1; 
       }
    } else {
       axrot1 = axlon;
