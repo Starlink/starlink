@@ -549,7 +549,7 @@
 
 *        Associate psf if first time through
           IF ( NSRC .GT. 0 ) THEN
-            CALL PSF_TASSOCO( OFID, PSLOT, STATUS )
+            CALL PSF_TASSOC( OFID, PSLOT, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 99
           END IF
 
