@@ -2523,9 +2523,9 @@ C      YSCALE = SHEAD.YSCALE*60.
             PART2(TLP,ELP) = P2T * SC2(ELP) * PC2 * OVRLAP * AREA
             PART3(TLP,ELP) = P3T * SC3(ELP) * PC2 * OVRLAP * AREA
 *
-           WRITE(1,*)MVMEAN, SC1(ELP), SC2(ELP), SC3(ELP),
-     &           PART1(TLP,ELP),PART2(TLP,ELP),PART3(TLP,ELP),
-     &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
+c          WRITE(1,*)MVMEAN, SC1(ELP), SC2(ELP), SC3(ELP),
+c    &           PART1(TLP,ELP),PART2(TLP,ELP),PART3(TLP,ELP),
+c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
 *
          ENDDO                 ! Energy bin
       ENDDO              ! Time bin
