@@ -134,6 +134,9 @@
 *  Check initialised
       IF ( .NOT. BDI_INIT ) CALL BDI0_INIT( STATUS )
 
+*  Protect error environment
+      CALL ERR_MARK
+
 *  Second is the linked file object
       CALL ADI_GETLINK( ID, LID, STATUS )
 
@@ -174,6 +177,9 @@
         CALL UDI0_ADVITI( ITEMS, C1, C2, IITEM, STATUS )
 
       END DO
+
+*  Protect error environment
+      CALL ERR_RLSE
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_GET', STATUS )
