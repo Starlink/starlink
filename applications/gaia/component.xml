@@ -4,7 +4,7 @@
 
 <component id="gaia">
   <version>2.7-4</version>
-  <path>applications/extractor</path>
+  <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
 GAIA is an image display and analysis tool for astronomy. It provides the
