@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_SPLINE_REGRID( METHOD, SFACTOR, MAX_MAPS, 
-     :     N_MAPS, N_BOLS, MAX_INTS, N_INTS, DIAMETER, WAVELENGTH,
+     :     N_MAPS, N_BOLS, MAX_INTS, N_INTS, EFF_RADIUS,
      :     PXSIZE, NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, WEIGHT, 
      :     INT_LIST, DATA_PTR, VAR_PTR, XPOS_PTR, YPOS_PTR, OUT_DATA, 
      :     OUT_VARIANCE, OUT_QUALITY, OUT_WEIGHT, STATUS )
@@ -16,7 +16,7 @@
  
 *  Invocation:
 *     CALL SCULIB_SPLINE_REGRID( METHOD, SFACTOR, MAX_MAPS, N_MAPS,
-*    :     N_BOLS, N_INTS, DIAMETER, WAVELENGTH, PXSIZE, NX_OUT, NY_OUT, 
+*    :     N_BOLS, N_INTS, EFF_RADIUS, PXSIZE, NX_OUT, NY_OUT, 
 *    :     I_CENTRE, J_CENTRE, WEIGHT, INT_PTR, DATA_PTR, VAR_PTR, 
 *    :     XPOS_PTR,YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
 *    :     OUT_QUALITY, OUT_WEIGHT, STATUS )
@@ -42,10 +42,11 @@
 *        Maximum number of separate integrations
 *     N_INTS( N_MAPS ) = INTEGER (Given)
 *        Number of integrations in each input map
-*     DIAMETER = REAL (Given)
-*        Diameter of dish in metres
-*     WAVELENGTH = REAL (Given)
-*        Wavelength of observation
+*     EFF_RADIUS = REAL (Given)
+*        Radius of effective footprint of influence due to each
+*        input data point. The resulting spline will have no good
+*        data points at a distance greater than this from the
+*        the original data. Units are the same as for PIXSPACE.
 *     PXSIZE = REAL (Given)
 *        Pixel size of output map (radians)
 *     NX_OUT = INTEGER (Given)
@@ -111,7 +112,6 @@
       INTEGER MAX_INTS
       INTEGER MAX_MAPS
       INTEGER DATA_PTR(N_MAPS)
-      REAL    DIAMETER
       INTEGER INT_LIST(MAX_MAPS, MAX_INTS+1)
       INTEGER I_CENTRE
       INTEGER J_CENTRE
@@ -120,10 +120,10 @@
       INTEGER N_INTS(N_MAPS)
       INTEGER NX_OUT
       INTEGER NY_OUT
+      REAL    EFF_RADIUS
       REAL    PXSIZE
       REAL    SFACTOR
       INTEGER VAR_PTR(N_MAPS)
-      REAL    WAVELENGTH
       REAL    WEIGHT(N_MAPS)
       INTEGER XPOS_PTR(N_MAPS)
       INTEGER YPOS_PTR(N_MAPS)
@@ -352,7 +352,7 @@
 *     generate a bad pixel mask for all the points on the output grid
 *     that are too far from an input grid (cf sculib_wtfn_regrid_1.f)
 
-               CALL SCULIB_SPLINE_REGRID_1 (DIAMETER, WAVELENGTH, 
+               CALL SCULIB_SPLINE_REGRID_1 ( EFF_RADIUS,
      :              %val(cnf_pval(GOOD_DATA_PTR)), 
      :              %VAL(CNF_PVAL(GOOD_X_PTR)),
      :              %VAL(CNF_PVAL(GOOD_Y_PTR)), NGOOD, PXSIZE, NX_OUT,

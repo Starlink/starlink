@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_SPLINE_REGRID_1 (DIAMETER, WAVELENGTH,
+      SUBROUTINE SCULIB_SPLINE_REGRID_1 (EFF_RADIUS,
      :     IN_DATA, X, Y, NPIX, 
      :     PIXSPACE, NI, NJ, ICEN, JCEN, QUALITY, STATUS)
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_SPLINE_REGRID_1 (DIAMETER, WAVELENGTH,
+*     CALL SCULIB_SPLINE_REGRID_1 (EFF_RADIUS,
 *    :     IN_DATA, X, Y, NPIX, 
 *    :     PIXSPACE, NI, NJ, ICEN, JCEN, QUALITY, STATUS)
 
@@ -23,10 +23,11 @@
 *     to input data. Similar to SCULIB_WTFN_REGRID_1.
 
 *  Arguments:
-*     DIAMETER   = REAL (Given)
-*        Diameter of telescope
-*     WAVELENGTH = REAL (Given)
-*        Wavelength of the observation
+*     EFF_RADIUS = REAL (Given)
+*        Radius of effective footprint of influence due to each
+*        input data point. The resulting spline will have no good
+*        data points at a distance greater than this from the
+*        the original data. Units are the same as for PIXSPACE.
 *     IN_DATA (NPIX)                   = REAL (Given)
 *        The input data values. (Used to define quality)
 *     X( NPIX ) = REAL (Given)
@@ -35,7 +36,7 @@
 *        The y coordinates of the input pixels
 *     NPIX = INTEGER (Given)
 *        the number of input pixels
-*     PIXSPACE = DOUBLE PRECISION (Given)
+*     PIXSPACE = REAL (Given)
 *        the pixel spacing of the output pixels
 *     NI = INTEGER (Given)
 *        The number of output pixels in the x direction
@@ -76,7 +77,7 @@
       INCLUDE 'PRM_PAR'                          ! Bad values
 
 *  Arguments Given:
-      REAL DIAMETER
+      REAL EFF_RADIUS
       INTEGER NPIX
       REAL IN_DATA(NPIX)
       REAL X(NPIX)
@@ -121,8 +122,7 @@
       YINC = PIXSPACE
 
 *  find the size of the resolution element in pixels
-      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
-      RDIST = RES_ELEMENT / PIXSPACE
+      RDIST = EFF_RADIUS / PIXSPACE
       PIX_RANGE = INT (RDIST) + 1
       RDIST_SQ = RDIST * RDIST
 
