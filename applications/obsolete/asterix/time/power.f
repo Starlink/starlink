@@ -150,6 +150,7 @@
 
       REAL                   	BASE          		! Base value of input axis values
       REAL                   	DX            		! Data spacing.
+      REAL			SPARR(2)		! Spaced array values
 
       INTEGER			AXPTR			! Input axis data
       INTEGER                	DIMS(ADI__MXDIM)	! I/p dimensions
@@ -225,12 +226,13 @@
          CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
          IF ( QOK ) THEN
            CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
-           IF ( ANYBAD ) THEN
-             CALL ARR_NBAD( DIMS(1), %VAL(QPTR), NBAD, STATUS )
+           CALL ARR_NBAD( DIMS(1), %VAL(QPTR), NBAD, STATUS )
+           IF ( NBAD .GT. 0 ) THEN
              CALL MSG_SETI( 'NBAD', NBAD )
              STATUS = SAI__ERROR
              CALL ERR_REP( ' ', 'WARNING: There are ^NBAD quality '/
      :                      /'points present, aborting...', STATUS )
+             GOTO 99
            END IF
          END IF
 
