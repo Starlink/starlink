@@ -10575,131 +10575,6 @@ parenthesis is essential.
 \end{verbatim}
 \normalsize
 
-Here is another that creates a fancy display of an image with axes and
-a key showing data values.  Besides ICL syntax, it illustrates the use
-of some graphics-database commands.  Again note the need to give an
-expression combining the $x$-$y$ bounds of the key to the LBOUND and
-UBOUND parameter arrays.
-
-\small
-\begin{verbatim}
-     PROC FANCYLOOK NDF
-
-     { Function:
-     {    Plots a image with axes and colour-table key.
-
-     { Insert the prefix to tell the parser that this is a file.
-        IF SUBSTR( NDF, 1, 1 ) <> '@'
-           FILE = '@' & (NDF)
-        ELSE
-           FILE = (NDF)
-        END IF
-
-     { Clear the current window.
-        GDCLEAR CURRENT
-
-     { Set the background and annotation colours.
-        PALENTRY 0 Sienna
-        PALENTRY 1 Yellow
-
-     { Find the extent of the current picture and its aspect ratio.
-        GDSTATE NCX1=(FX1) NCX2=(FX2) NCY1=(FY1) NCY2=(FY2) NOREPORT
-        ASP = ( FX2 - FX1 ) / ( FY2 - FY1 )
-
-     { Inquire the label of the current picture.  If it does not have one
-     { label the current picture
-        PICIN CURRENT LABEL=(ORIGLABEL) NOREPORT NAME=!
-        IF ORIGLABEL = " "
-           PICLABEL ORIGIN
-           ORIGLABEL = "ORIGIN"
-        END IF
-
-     { Display the image with axes 
-        DISPLAY (FILE) MODE=PE AXES SCALOW=(LOW) SCAHIGH=(HIGH) \
-
-     { Find the extent of the last frame picture, {\it{i.e.}}\ the one associated
-     { with the last displayed image.
-        PICFRAME
-        GDSTATE NCX1=(DX1) NCX2=(DX2) NCY1=(DY1) NCY2=(DY2) NOREPORT
-
-     { Determine the widths of the borders.
-        XL = DX1 - FX1
-        XR = FX2 - DX2
-        YB = DY1 - FY1
-        YT = FY2 - DY2
-
-     { Restore the original current picture.
-        PICSEL (ORIGLABEL)
-
-     { Only plot a key if there is room. 
-        IF MAX( XL, XR, YB, YT ) > 0.055
-
-     { Determine which side has most room for the key.  First, see if the
-     { key is vertical.
-           IF MAX( XL, XR ) >= MAX( YB, YT )
-
-     { Determine the width and height of the vertical key.  Bias to select
-     { the right-hand side.  Part of the 0.75 is to allow for the wider
-     { border to the left (0.19:0.05 of frame).  Try to obtain the same width,
-     { subject to the constraint that it must fit inside the current picture. 
-              ASPOBL = MAX( ASP, 1.0 )
-              WIDTH = MIN( 1.2 * MAX( 0.75 * XL, XR ), 0.14 / ASPOBL )
-              HEIGHT = 0.7 * ( DY2 - DY1 )
-
-     { Define the bounds of the colour-table key.   Offset the key so that
-     { there is no large gap between it and the image's axes.  The factors are
-     { empirical, and no doubt could be improved with a more-sophisticated algorithm.
-              DELTA = 0.12 * MAX( 0.0, DX2 - DX1 - 0.6 / ASPOBL )
-              IF XL > 1.333 * XR
-                 XK1 = MAX( 0.01, DX1 - WIDTH + DELTA )
-              ELSE
-                 XK1 = DX2 - DELTA * 5.0 / 19.0
-              END IF
-              XK2 = XK1 + WIDTH
-              YK1 = 0.5 * ( DY2 + DY1 - HEIGHT )
-              YK2 = YK1 + HEIGHT
-           ELSE
-
-     { Determine the width and height of the horizontal key.  Try to obtain
-     { the same width, subject to the constraint that it must fit inside the
-     { current picture. 
-              ASPPRO = MIN( ASP, 1.0 )
-              WIDTH = MIN( 1.2 * MAX( YB, YT ), 0.1 * ASPPRO )
-              HEIGHT = 0.7 * ( DX2 - DX1 )
-
-     { Define the bounds of the colour-table key.   Offset the key so that
-     { there is no large gap between it and the image's axes.  The factors are
-     { empirical, and no doubt could be improved with a more-sophisticated algorithm.
-              DELTA = 0.11 * MAX( 0.0, DY2 - DY1 - 0.6 * ASPPRO )
-              IF YB > YT
-                 YK1 = MAX( 0.01, DY1 - WIDTH + DELTA )
-              ELSE
-                 YK1 = DY1 - DELTA * 9.0 / 15.0
-              END IF
-              YK2 = YK1 + WIDTH
-              XK1 = 0.5 * ( DX2 + DX1 - HEIGHT )
-              XK2 = XK1 + HEIGHT
-           END IF
-
-     { So far the units are in NDC.  LUTVIEW uses co-ordinates which go from
-     { (0,0) to (1,1) for both axes.  So transform some of the co-ordinates.
-           IF ASP >= 1
-              YK1 = YK1 * ASP
-              YK2 = YK2 * ASP
-           ELSE
-              XK1 = XK1 / ASP
-              XK2 = XK2 / ASP
-           END IF
-
-     { Draw the key to fit within the current picture annotating with 
-     { the scaling used in DISPLAY.
-           LUTVIEW LOW=(LOW) HIGH=(HIGH) LBOUND=[ (XK1&','&YK1)] ~
-             UBOUND=[ (XK2&','&YK2)] MODE=XY
-        END IF
-     END PROC
-\end{verbatim}
-\normalsize
-
 \newpage
 \section{\xlabel{se_probpage}Problems Problems\label{se:probpage}}
 \subsection{Errors}
@@ -27688,143 +27563,235 @@ plot (10k).
    Draws a colour-table key
 }{
    \sstdescription{
-      This application draws a key of the colour table at a location
-      you select.  You can constrain the key to lie within either the
-      current or the BASE picture.  The key may be annotated, in which
-      case you must allow sufficient room for the annotations.  For
-      oblate regions colour index increases from left to right, and for
-      prolate it increases from bottom to top; the annotations
-      appearing to the top and right respectively.  The annotations
-      scale linearly between the values corresponding to the lower and
-      upper indices of the colour table.
+      This application displays a ramp of colours on the specified image
+      display device using the whole of the current colour table (excluding
+      the low 16 pens which are reserved for axis annotation, \emph{etc}). By
+      default, numerical values are displayed along the long edge of the
+      ramp. The values corresponding to the maximum and minimum colour
+      index are supplied using parameters HIGH and LOW. Intermediate colour
+      indices are labelled with values which are linearly interpolated
+      between these two extreme values.
 
-      The situation of the key is defined by the co-ordinates of a pair 
-      of opposite corners of a rectangular region.  You may specify
-      these using one of the following methods:
-      \begin{enumerate}
-      \item moving a cursor and pressing a button on the mouse or
-            trackerball;
-      \item obtaining bounds from the environment (in normalised
-            co-ordinates of the reference picture).
-      \end{enumerate}
+      The rectangular area in which the ramp (plus annotations) is drawn
+      may be specified either using a graphics cursor, or by specifying the
+      co-ordinates of two corners using parameters LBOUND and UBOUND.
+      Additionally, there is an option to make the ramp fill the current
+      picture. See parameter MODE. The ramp may be constrained to the
+      current picture using parameter CURPIC.
+
+      The appearance of the annotation my be controlled in detail using
+      the STYLE parameter.
    }
    \sstusage{
-      lutview [mode] [low] [high] [annota] [curpic] [device] lbound=?
-        ubound=?
+      lutview [mode] [low] [high] [curpic] [device]
    }
    \sstparameters{
       \sstsubsection{
-         ANNOTA = \_LOGICAL (Read)
-      }{
-         ANNOTA is {\tt TRUE} if the colour table is to be annotated with the pen
-         numbers.  Note a squarer picture should be created so that the
-         annotations are legible. {\tt [FALSE]}
-      }
-      \sstsubsection{
          CURPIC = \_LOGICAL (Read)
       }{
-         If CURPIC is {\tt TRUE}, the colour table key is to lie within the current
-         picture, otherwise the new picture can lie anywhere within
-         the BASE picture.  It is ignored when the current-picture mode
-         is selected. {\tt [FALSE]}
+         If CURPIC is TRUE, the colour table key is to lie within the
+         current picture, otherwise the new picture can lie anywhere
+         within the BASE picture.  This parameter ignored if the
+         current-picture mode is selected. {\tt [FALSE]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The image-display device on which the colour table is to be
-         drawn.   The device must be in one of the following GNS
+         drawn.  The device must be in one of the following GNS
          categories: IMAGE\_DISPLAY, IMAGE\_OVERLAY, MATRIX\_PRINTER, or
          WINDOW, and have at least 24 greyscale intensities or colour
          indices.  It must also not reset when the device is opened
-         (since the colour table would be lost).
-         {\tt [}Current image-display device{\tt ]}
+         (since the colour table would be lost) unless parameter LUT
+         does not have the null value.  {\tt [Current image-display device]}
+      }
+      \sstsubsection{
+         FRAME = LITERAL (Read)
+      }{
+         Specifies the co-ordinate Frame of the positions supplied using
+         parameters LBOUND and UBOUND. The following Frames will always
+         be available:
+
+         \sstitemlist{
+
+            \sstitem
+            GRAPHICS -- gives positions in millimetres from the bottom left
+            corner of the plotting surface.
+
+            \sstitem
+            BASEPIC -- gives positions in a normalised system in which the
+            bottom left corner of the plotting surface is (0,0) and the
+            shortest dimension of the plotting surface has length 1.0. The
+            scales on the two axes are equal.
+
+            \sstitem
+            CURPIC -- gives positions in a normalised system in which the
+            bottom left corner of the current picture is (0,0) and the
+            shortest dimension of the current picture has length 1.0. The
+            scales on the two axes are equal.
+
+         }
+         There may be additional Frames available, describing previously
+         displayed data. If a null value is supplied, the current Frame
+         associated with the displayed data (if any) is used. This parameter
+         is only accessed if parameter MODE is set to {\tt "}XY{\tt "}. {\tt [BASEPIC]}
       }
       \sstsubsection{
          HIGH = \_REAL (Read)
       }{
          The value corresponding to the maximum colour index.  It is
          used to calculate the annotation scale for the key.  If it
-         is null ({\tt !}) the maximum colour index is used.
-         {\tt [}Current display linear-scaling maximum{\tt ]}
+         is null (!) the maximum colour index is used.
+         {\tt [Current display linear-scaling maximum]}
       }
       \sstsubsection{
-         LBOUND( 2 ) = \_REAL (Read)
+         LBOUND = LITERAL (Read)
       }{
-         Co-ordinates of the lower bound that defines the location of
-         the colour-table plot. These are in the world system of the
-         base or current picture. (XY mode)
+         Co-ordinates of the lower left corner of the rectangular region
+         containing the colour ramp and annotation, in the co-ordinate
+         Frame specified by parameter FRAME (supplying a colon {\tt "}:{\tt "} will
+         display details of the selected co-ordinate Frame). The position
+         should be supplied as a list of formatted axis values separated
+         by spaces or commas. A null (!) value causes the lower left corner
+         of the BASE or (if CURPIC is TRUE) current picture to be used.
       }
       \sstsubsection{
          LOW = \_REAL (Read)
       }{
          The value corresponding to the minimum colour index.  It is
          used to calculate the annotation scale for the key.  If it
-         is null ({\tt !}) the minimum colour index is used.
-         {\tt [}Current display linear-scaling minimum{\tt ]}
+         is null (!) the minimum colour index is used.
+         {\tt [Current display linear-scaling minimum]}
       }
       \sstsubsection{
          LUT = NDF (Read)
       }{
          Name of the NDF containing a lookup table as its data array;
-         the lookup table is written to the image-display's colour
+         the lookup table is written to the image-display{\tt '}s colour
          table.  The purpose of this parameter is to provide a means of
          controlling the appearance of the image on certain devices,
          such as colour printers, that do not have a dynamic colour
-         table, {\it i.e.}\ the colour table is reset when the device is
+         table, \emph{i.e.} the colour table is reset when the device is
          opened.  If used with dynamic devices, such as windows or
          Ikons, the new colour table remains after this application has
-         completed.  A null, {\tt !}, means that the existing colour table
+         completed.  A null, !, means that the existing colour table
          will be used.
 
          The LUT must be two-dimensional, the first dimension
          being 3, and the second being arbitrary.  The method used to
          compress or expand the colour table if the second dimension is
          different from the number of unreserved colour indices is
-         controlled by parameter NN.  Also the LUT's values must lie in
+         controlled by parameter NN.  Also the LUT{\tt '}s values must lie in
          the range 0.0--1.0. {\tt [!]}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
       }{
          Method for defining the position, size and shape of the
-         colour-table key.  The options are {\tt "Cursor"} for cursor mode
-         (provided the graphics device has one), {\tt "XY"} to select $x$-$y$
-         limits via the parameter system, and {\tt "Picture"} where the
-         whole of the current picture is used.  Additional positioning
-         options are available by using other {\footnotesize KAPPA}
-         applications to create new pictures and then specifying the
-         picture mode.  {\tt ["Cursor"]}
+         rectangular region containing the colour ramp and annotation.
+         The options are:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Cursor{\tt "} --  The graphics cursor is used to supply two
+            diametrically opposite corners or the region.
+
+            \sstitem
+            {\tt "}XY{\tt "} -- The parameters LBOUND and UBOUND are used to get the
+            limits.
+
+            \sstitem
+            {\tt "}Picture{\tt "} -- The whole of the current picture is used.
+            Additional positioning options are available by using other
+            KAPPA applications to create new pictures and then specifying
+            the picture mode.
+
+         }
+         {\tt ["Cursor"]}
       }
       \sstsubsection{
          NN = \_LOGICAL (Read)
       }{
-         If NN is {\tt TRUE}, the input lookup table is mapped to the colour
-         table by using the nearest-neighbour method.  This preserves sharp
-         edges and is better for lookup tables with blocks of colour.
-         If NN is {\tt FALSE}, linear interpolation is used, and this is
-         suitable for smoothly varying colour tables.  NN is ignored
-         unless LUT is not null. {\tt [FALSE]}
+         If NN is TRUE, the input lookup table is mapped to the colour
+         table by using the nearest-neighbour method.  This preserves
+         sharp edges and is better for lookup tables with blocks of
+         colour.  If NN is FALSE, linear interpolation is used, and
+         this is suitable for smoothly varying colour tables.  NN is
+         ignored unless LUT is not null. {\tt [FALSE]}
       }
       \sstsubsection{
-         OUTLINE = \_LOGICAL (Read)
+         STYLE = GROUP (Read)
       }{
-         If OUTLINE is {\tt TRUE}, a box that delimits the key is drawn.  A box
-         is always drawn when there are annotations. {\tt [TRUE]}
+         A group of attribute settings describing the plotting style to use
+         for the annotation.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         Axis 1 is always the {\tt "}data value{\tt "} axis, whether it is displayed
+         horizontally or vertically. So for instance, to set the label
+         for the data value axis, assign a value to {\tt "}Label(1){\tt "} in the
+         supplied style. {\tt [current value]}
       }
       \sstsubsection{
-         UBOUND( 2 ) = \_REAL (Read)
+         UBOUND = LITERAL (Read)
       }{
-         Co-ordinates of the upper bound that defines the location
-         of the colour-table plot.  These are in the world system of the
-         BASE or current picture. (XY mode)
+         Co-ordinates of the upper right corner of the rectangular region
+         containing the colour ramp and annotation, in the co-ordinate
+         Frame specified by parameter FRAME (supplying a colon {\tt "}:{\tt "} will
+         display details of the selected co-ordinate Frame). The position
+         should be supplied as a list of formatted axis values separated
+         by spaces or commas. A null (!) value causes the lower left corner
+         of the BASE or (if CURPIC is TRUE) current picture to be used.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         lutview annota
+         lutview
       }{
          Draws an annotated colour table at a position selected via
          the cursor on the current image-display device.
+      }
+      \sstexamplesubsection{
+         lutview style={\tt "}{\tt '}edge(1)=right,label(1)=Data value in m31{\tt '}{\tt "}
+      }{
+         As above, but the data values are labelled on the right edge of
+         the box, and the values are labelled with the string {\tt "}Data value
+         in m31{\tt "}.
+      }
+      \sstexamplesubsection{
+         lutview style={\tt '}{\tt "}textlab(1)=0,width(border)=3,colour(border)=white{\tt "}{\tt '}
+      }{
+         No textual label is drawn for the data values, and a thicker than
+         usual white box is drawn around the colour ramp.
+      }
+      \sstexamplesubsection{
+         lutview style={\tt "}{\tt '}textlab(1)=0,numlab(1)=0,majticklen(1)=0{\tt '}{\tt "}
+      }{
+         Only the border is drawn around the colour ramp.
+      }
+      \sstexamplesubsection{
+         lutview style={\tt "}{\tt '}textlab(1)=0,numlab(1)=0,majticklen(1)=0,border=0{\tt '}{\tt "}
+      }{
+         No annotation at all is drawn.
       }
       \sstexamplesubsection{
          lutview p
@@ -27839,51 +27806,13 @@ plot (10k).
          via the cursor.
       }
       \sstexamplesubsection{
-         lutview mode=xy outline device=ikon $\backslash$
-      }{
-         Draws a outlined colour table within the BASE picture
-         on the Ikon, defined by $x$-$y$ extents.
-      }
-      \sstexamplesubsection{
-         lutview xy lut=my\_lut device=lj250\_p lbound=[0.92,0.2] ubound=[0.98,0.8]
+         lutview xy lut=my\_lut device=ps\_p lbound=[0.92,0.2] ubound=[0.98,0.8]
       }{
          Draws the colour table in the NDF called my\_lut with an
-         outline within the BASE picture on the device lj250\_p, defined
-         by the $x$-$y$ bounds (0.92,0.2) and (0.98,0.8).  In other words
+         outline within the BASE picture on the device ps\_p, defined
+         by the x-y bounds (0.92,0.2) and (0.98,0.8).  In other words
          the plot is to the right-hand side with increasing colour
          index with increasing y position.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         When annotations are selected their precise height and the
-         width of the colour table, depend on the largest number of
-         significant figures in an annotation.  The colour table will have
-         an aspect ratio in the range 0.17--0.45, and the text height is
-         adjusted to fit the characters within the available room.  The
-         default aspect ratio is 0.275.
-
-         \sstitem
-         The text has a maximum height as a fraction of width (if
-         oblate) or height of the initial picture (BASE or current) so
-         that ridiculously large characters are drawn for big keys.
-         However, this can result in characters which are too small if for
-         example a highly oblate colour table is plotted within a strongly
-         prolate current picture.
-
-         \sstitem
-         A FRAME picture (when there are annotations) and the
-         colour-table picture are stored in the graphics database. These
-         have names FRAME and KEY respectively.  On completion the
-         current picture is unchanged.
-
-         \sstitem
-         Parameters LOW and HIGH are single precision because they are
-         also required to define world co-ordinates of the graphics.  Thus
-         this application is not suitable for double-precision data that
-         have been scaled over a range near the precision of real values.
       }
    }
    \sstdiytopic{
@@ -44020,6 +43949,51 @@ The following applications have been modified:
 
       \item [\htmlref{LOGE}{LOGE}] \mbox{}
          This command is now a synonym for {\tt logar base=natural}.
+
+      \item [\htmlref{LUTVIEW}{LUTVIEW}] \mbox{}
+         \begin{itemize}
+
+            \item The annotation placed around the colour ramp can now be
+	    controlled in much greater detail using the new STYLE
+	    parameter.
+
+            \item If MODE=XY, the bounds of the area occupied by the colour 
+            ramp and annotation can be specified in a variety of co-ordinate
+            systems (specified by the new parameter FRAME).
+
+            \item The following parameters have been removed
+	    (alternatives to using these old parameters are indicated):
+
+               \begin{description}
+
+                  \item[ANNOTA] -- Use the STYLE parameter to specify
+                  which elements of the annotation (if any) are required.
+                  For instance, set "NumLab(1)=0" to suppress the
+                  numerical data values.
+
+                  \item[OUTLINE] -- Use the STYLE parameter to specify
+                  which elements of the annotation (if any) are required.
+                  For instance, set "Border=0" to suppress the box drawn
+                  around the colour ramp.
+
+               \end{description}
+
+            \item The following new parameters have been added: FRAME,
+            STYLE.
+         
+            \item The following parameters have been modified:
+               \begin{description}
+
+                  \item[LBOUND] -- Now gives the lower bounds in the
+                  co-ordinate Frame specified by parameter FRAME. The
+                  parameter type is now LITERAL rather than \_REAL.
+
+                  \item[UBOUND] -- Now gives the upper bounds in the
+                  co-ordinate Frame specified by parameter FRAME. The
+                  parameter type is now LITERAL rather than \_REAL.
+
+               \end{description}
+         \end{itemize}
 
       \item [\htmlref{MLINPLOT}{MLINPLOT}] \mbox{}
          \begin{itemize}
