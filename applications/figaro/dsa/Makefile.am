@@ -8,7 +8,8 @@ lib_LTLIBRARIES = libdsa.la
 libdsa_la_SOURCES = \
         $(PRIVATE_INCLUDES) \
         $(BLOCK_DATA_FILES) \
-        $(F_ROUTINES)
+        $(F_ROUTINES) \
+	$(FPP_ROUTINES)
 
 PRIVATE_INCLUDES = DSA_COMMON DSA_ERRORS DSA_STRUCTURE DSA_TYPES
 
@@ -62,4 +63,8 @@ dsa_st_obj.f dsa_st_rg.f dsa_st_sc.f dsa_st_wi.f dsa_status.f \
 dsa_structc.f dsa_sv_axi.f dsa_trnl_var.f dsa_typesize.f \
 dsa_unfl_dat.f dsa_unfl_x.f dsa_unmap.f dsa_use_fl.f dsa_use_ql.f \
 dsa_val_axi.f dsa_var_err.f dsa_var_ty.f dsa_wrflush.f dsa_wrname.f \
-dsa_wruser.f dsa_xcstr.f dsa_zfill.f
+dsa_wruser.f dsa_xcstr.f dsa_zfill.f \
+ \
+ dsaz_fname.f dsaz_inq_nam.f
+
+FPP_ROUTINES = dsaz_tfopen.fpp
