@@ -599,6 +599,17 @@ typedef struct AstFrameVtab {
    void (* SetTitle)( AstFrame *, const char * );
    void (* SetUnit)( AstFrame *, int, const char * );
    void (* ValidateAxisSelection)( AstFrame *, int, const int *, const char * );
+
+   double (* GetTop)( AstFrame *, int );
+   int (* TestTop)( AstFrame *, int );
+   void (* ClearTop)( AstFrame *, int );
+   void (* SetTop)( AstFrame *, int, double );
+
+   double (* GetBottom)( AstFrame *, int );
+   int (* TestBottom)( AstFrame *, int );
+   void (* ClearBottom)( AstFrame *, int );
+   void (* SetBottom)( AstFrame *, int, double );
+
 } AstFrameVtab;
 #endif
 
@@ -732,6 +743,17 @@ void astSetSymbol_( AstFrame *, int, const char * );
 void astSetTitle_( AstFrame *, const char * );
 void astSetUnit_( AstFrame *, int, const char * );
 void astValidateAxisSelection_( AstFrame *, int, const int *, const char * );
+
+double astGetTop_( AstFrame *, int );
+int astTestTop_( AstFrame *, int );
+void astClearTop_( AstFrame *, int );
+void astSetTop_( AstFrame *, int, double );
+
+double astGetBottom_( AstFrame *, int );
+int astTestBottom_( AstFrame *, int );
+void astClearBottom_( AstFrame *, int );
+void astSetBottom_( AstFrame *, int, double );
+
 #endif
 
 /* Function interfaces. */
@@ -951,5 +973,24 @@ astINVOKE(V,astTestUnit_(astCheckFrame(this),axis))
 astINVOKE(V,astValidateAxis_(astCheckFrame(this),axis,method))
 #define astValidateAxisSelection(this,naxes,axes,method) \
 astINVOKE(V,astValidateAxisSelection_(astCheckFrame(this),naxes,axes,method))
+
+#define astClearTop(this,axis) \
+astINVOKE(V,astClearTop_(astCheckFrame(this),axis))
+#define astGetTop(this,axis) \
+astINVOKE(V,astGetTop_(astCheckFrame(this),axis))
+#define astSetTop(this,axis,value) \
+astINVOKE(V,astSetTop_(astCheckFrame(this),axis,value))
+#define astTestTop(this,axis) \
+astINVOKE(V,astTestTop_(astCheckFrame(this),axis))
+
+#define astClearBottom(this,axis) \
+astINVOKE(V,astClearBottom_(astCheckFrame(this),axis))
+#define astGetBottom(this,axis) \
+astINVOKE(V,astGetBottom_(astCheckFrame(this),axis))
+#define astSetBottom(this,axis,value) \
+astINVOKE(V,astSetBottom_(astCheckFrame(this),axis,value))
+#define astTestBottom(this,axis) \
+astINVOKE(V,astTestBottom_(astCheckFrame(this),axis))
+
 #endif
 #endif

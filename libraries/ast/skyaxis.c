@@ -57,6 +57,10 @@ f     only within textual output (e.g. from AST_WRITE).
 *        galactic longitude value of zero to be formated as "-0.-0".
 *     29-AUG-2001 (DSB):
 *        Added AxisDistance and AxisOffset.
+*     10-OCT-2002 (DSB):
+*        Over-ride the astGetAxisTop and astGetAxisBottom methods so that a 
+*        SkyAxis with the IsLatitude attribute set is legal between plus
+*        and minus 90 degrees.
 
 *class--
 */
@@ -109,6 +113,13 @@ static int (*parent_getaxisdirection)( AstAxis *this );
 static void (* parent_axisoverlay)( AstAxis *, AstAxis * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
+static double (*parent_getaxisbottom)( AstAxis *this );
+static double (*parent_getaxistop)( AstAxis *this );
+
+/* Factors for converting between hours, degrees and radians. */
+static double hr2rad;
+static double deg2rad;
+static double piby2;
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -135,6 +146,8 @@ static double DHmsGap( const char *, double, int * );
 static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisAsTime( AstSkyAxis * );
 static int GetAxisDirection( AstAxis * );
+static double GetAxisTop( AstAxis * );
+static double GetAxisBottom( AstAxis * );
 static int GetAxisIsLatitude( AstSkyAxis * );
 static int TestAttrib( AstObject *, const char * );
 static int TestAxisAsTime( AstSkyAxis * );
@@ -918,9 +931,6 @@ static const char *DHmsFormat( const char *fmt, double value ) {
    int sec;                      /* Seconds field required? */
    int stat;                     /* SLALIB status */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
-   static double deg2rad;        /* Degrees to radians conversion factor */
-   static double hr2rad;         /* Hours to radians conversion factor */
-   static int init = 0;          /* Conversion factors initialised? */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -933,14 +943,8 @@ static const char *DHmsFormat( const char *fmt, double value ) {
    if ( value == AST__BAD ) {
       result = "<bad>";
 
-/* Otherwise, if not done previously, use SLALIB to obtain conversion
-   factors between hours/degrees and radians. Do this only once. */
+/* Otherwise.. */
    } else {
-      if ( !init ) {
-         slaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
-         slaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
-         init = 1;
-      }
 
 /* Parse the format specifier. */
       ParseDHmsFormat( fmt, &sep, &plus, &lead_zero, &as_time, &dh, &min, &sec,
@@ -1237,9 +1241,6 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
    int positive;                 /* Value is positive (or zero)? */
    int sec;                      /* Seconds field required? */
    int stat;                     /* SLALIB status */
-   static double deg2rad;        /* Degrees to radians conversion factor */
-   static double hr2rad;         /* Hours to radians conversion factor */
-   static int init = 0;          /* Conversion factors initialised? */
 
 /* Local Data: */
 /* ----------- */
@@ -1267,14 +1268,6 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
 /* Check that the supplied gap size is not zero. */
    if ( gap != 0.0 ) {
    
-/* If not done previously, use SLALIB to obtain conversion factors
-   between hours/degrees and radians. Do this only once. */
-      if ( !init ) {
-         slaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
-         slaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
-         init = 1;
-      }
-
 /* Parse the format specifier. */
       ParseDHmsFormat( fmt, &sep, &plus, &lead_zero, &as_time, &dh, &min, &sec,
                        &ndp );
@@ -1750,6 +1743,132 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
+static double GetAxisBottom( AstAxis *this_axis ) {
+/*
+*  Name:
+*     GetAxisBottom
+
+*  Purpose:
+*     Obtain the value of the Bottom attribute for a SkyAxis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyaxis.h"
+*     double GetAxisBottom( AstAxis *this )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astGetAxisBottom method
+*     inherited from the Axis class).
+
+*  Description:
+*     This function returns a value for the Bottom attribute of a SkyAxis.
+*     This attribute indicates the lowest legal value for the axis.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyAxis.
+
+*  Returned Value:
+*     The atribute value. A suitable default value is supplied if necessary.
+
+*  Notes:
+*     -  A value of -DBL_MAX will be returned if this function is invoked 
+*     with the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables. */
+   AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
+   double result;                /* Result to be returned */
+
+/* Check the global error status. */
+   if ( !astOK ) return -DBL_MAX;
+
+/* Obtain a pointer to the SkyAxis structure. */
+   this = (AstSkyAxis *) this_axis;
+
+/* Check if a value has been set for the Bottom attribute. If so, obtain
+   this value. */
+   if ( astTestAxisBottom( this ) ) {
+      result = (*parent_getaxisbottom)( this_axis );
+
+/* Otherwise, supply a default of -pi/2 for latitude axes, and -DBL_MAX
+   for longitude axes. */
+   } else {
+      result = astGetAxisIsLatitude( this ) ? -piby2 : -DBL_MAX;
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = -DBL_MAX;
+
+/* Return the result. */
+   return result;
+}
+
+static double GetAxisTop( AstAxis *this_axis ) {
+/*
+*  Name:
+*     GetAxisTop
+
+*  Purpose:
+*     Obtain the value of the Top attribute for a SkyAxis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyaxis.h"
+*     double GetAxisTop( AstAxis *this )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astGetAxisTop method
+*     inherited from the Axis class).
+
+*  Description:
+*     This function returns a value for the Top attribute of a SkyAxis.
+*     This attribute indicates the highest legal value for the axis.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyAxis.
+
+*  Returned Value:
+*     The atribute value. A suitable default value is supplied if necessary.
+
+*  Notes:
+*     -  A value of DBL_MAX will be returned if this function is invoked 
+*     with the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables. */
+   AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
+   double result;                /* Result to be returned */
+
+/* Check the global error status. */
+   if ( !astOK ) return DBL_MAX;
+
+/* Obtain a pointer to the SkyAxis structure. */
+   this = (AstSkyAxis *) this_axis;
+
+/* Check if a value has been set for the Top attribute. If so, obtain
+   this value. */
+   if ( astTestAxisTop( this ) ) {
+      result = (*parent_getaxistop)( this_axis );
+
+/* Otherwise, supply a default of pi/2 for latitude axes, and DBL_MAX
+   for longitude axes. */
+   } else {
+      result = astGetAxisIsLatitude( this ) ? piby2 : DBL_MAX;
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = DBL_MAX;
+
+/* Return the result. */
+   return result;
+}
+
 static int GetAxisDirection( AstAxis *this_axis ) {
 /*
 *  Name:
@@ -2218,6 +2337,7 @@ static void InitVtab( AstSkyAxisVtab *vtab ) {
 /* Local Variables: */
    AstAxisVtab *axis;            /* Pointer to Axis component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
+   int stat;                     /* SLALIB status */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -2266,6 +2386,12 @@ static void InitVtab( AstSkyAxisVtab *vtab ) {
    parent_getaxisunit = axis->GetAxisUnit;
    axis->GetAxisUnit = GetAxisUnit;
 
+   parent_getaxistop = axis->GetAxisTop;
+   axis->GetAxisTop = GetAxisTop;
+
+   parent_getaxisbottom = axis->GetAxisBottom;
+   axis->GetAxisBottom = GetAxisBottom;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    axis->AxisAbbrev = AxisAbbrev;
@@ -2284,6 +2410,11 @@ static void InitVtab( AstSkyAxisVtab *vtab ) {
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "SkyAxis", "Celestial coordinate axis" );
+
+/* Initialize constants for converting between hours, degrees and
+   radians. */
+   slaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
+   slaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
 }
 
 static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
@@ -2826,9 +2957,6 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    int sep_len;                  /* Length of separator plus trailing space */
    int stat;                     /* SLALIB status */
    int suffix_sep;               /* Field has a suffix separator? */
-   static double deg2rad;        /* Degrees to radians conversion factor */
-   static double hr2rad;         /* Hours to radians conversion factor */
-   static int init = 0;          /* Conversion factors initialised? */
 
 /* Local Data: */
    const char *sep_list =        /* List of separator characters recognised */
@@ -2850,14 +2978,6 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 
 /* Check the global error status. */
    if ( !astOK ) return nc;
-
-/* If not done previously, use SLALIB to obtain conversion factors
-   between hours/degrees and radians. Do this only once. */
-   if ( !init ) {
-      slaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
-      slaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
-      init = 1;
-   }
 
 /* Obtain the SkyAxis Format string and parse it to determine the
    default choice of input format. Use a private method to obtain the

@@ -37,6 +37,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Added astAxisUnformat.
 *     29-AUG-2001 (DSB):
 *        Added AxisDistance and AxisOffset.
+*     20-OCT-2002 (DSB):
+*        Added Top and Bottom attributes.
 *class--
 */
 
@@ -141,6 +143,17 @@ static void SetAxisFormat( AstAxis *, const char * );
 static void SetAxisLabel( AstAxis *, const char * );
 static void SetAxisSymbol( AstAxis *, const char * );
 static void SetAxisUnit( AstAxis *, const char * );
+
+static double GetAxisTop( AstAxis * );
+static int TestAxisTop( AstAxis * );
+static void ClearAxisTop( AstAxis * );
+static void SetAxisTop( AstAxis *, double );
+
+static double GetAxisBottom( AstAxis * );
+static int TestAxisBottom( AstAxis * );
+static void ClearAxisBottom( AstAxis * );
+static void SetAxisBottom( AstAxis *, double );
+
 
 /* Member functions. */
 /* ================= */
@@ -825,6 +838,16 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "label" ) ) {
       astClearAxisLabel( this );
 
+/* Top. */
+/* ---- */
+   } else if ( !strcmp( attrib, "top" ) ) {
+      astClearAxisTop( this );
+
+/* Bottom. */
+/* ------- */
+   } else if ( !strcmp( attrib, "bottom" ) ) {
+      astClearAxisBottom( this );
+
 /* Symbol. */
 /* ------- */
    } else if ( !strcmp( attrib, "symbol" ) ) {
@@ -895,6 +918,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Local Variables: */
    AstAxis*this;                 /* Pointer to the Axis structure */
    const char *result;           /* Pointer value to return */
+   double dval;                  /* Double attribute value */
    int digits;                   /* Digits attribute value */
    int direction;                /* Direction attribute value */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
@@ -928,6 +952,24 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       direction = astGetAxisDirection( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", direction );
+         result = buff;
+      }
+
+/* Top. */
+/* ---- */
+   } else if ( !strcmp( attrib, "top" ) ) {
+      dval = astGetAxisTop( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
+/* Bottom. */
+/* ------- */
+   } else if ( !strcmp( attrib, "bottom" ) ) {
+      dval = astGetAxisBottom( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
       }
 
@@ -1041,6 +1083,16 @@ static void InitVtab( AstAxisVtab *vtab ) {
    vtab->TestAxisSymbol = TestAxisSymbol;
    vtab->TestAxisUnit = TestAxisUnit;
 
+   vtab->ClearAxisTop = ClearAxisTop;
+   vtab->GetAxisTop = GetAxisTop;
+   vtab->SetAxisTop = SetAxisTop;
+   vtab->TestAxisTop = TestAxisTop;
+
+   vtab->ClearAxisBottom = ClearAxisBottom;
+   vtab->GetAxisBottom = GetAxisBottom;
+   vtab->SetAxisBottom = SetAxisBottom;
+   vtab->TestAxisBottom = TestAxisBottom;
+
 /* Save the inherited pointers to methods that will be extended, and replace
    them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
@@ -1103,6 +1155,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Variables: */
    AstAxis *this;                /* Pointer to Axis structure */
+   double dval;                  /* Double attribute value */
    int digits;                   /* Number of digits of precision */
    int direction;                /* Plot axis in normal direction? */
    int format;                   /* Offset of Format string */
@@ -1140,6 +1193,20 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         ( 1 == astSscanf( setting, "direction= %d %n", &direction, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisDirection( this, direction );
+
+/* Top. */
+/* ---- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "top= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetAxisTop( this, dval );
+
+/* Bottom. */
+/* ------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "bottom= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetAxisBottom( this, dval );
 
 /* Format. */
 /* ------- */
@@ -1240,6 +1307,16 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "direction" ) ) {
       result = astTestAxisDirection( this );
 
+/* Top. */
+/* ---- */
+   } else if ( !strcmp( attrib, "top" ) ) {
+      result = astTestAxisTop( this );
+
+/* Bottom. */
+/* ------- */
+   } else if ( !strcmp( attrib, "bottom" ) ) {
+      result = astTestAxisBottom( this );
+
 /* Format. */
 /* ------- */
    } else if ( !strcmp( attrib, "format" ) ) {
@@ -1306,6 +1383,34 @@ astMAKE_SET(Axis,AxisDirection,int,direction,( value != 0 ))
 
 /* The Direction value is set if it is not -INT_MAX. */
 astMAKE_TEST(Axis,AxisDirection,( this->direction != -INT_MAX ))
+
+/* Top. */
+/* -----*/
+/* Clear the Top Direction value by setting it to AST__BAD. */
+astMAKE_CLEAR(Axis,AxisTop,top,AST__BAD)
+
+/* Supply a default value of DBL_MAX if the Top value is not set.*/
+astMAKE_GET(Axis,AxisTop,double,0,( this->top != AST__BAD ? this->top : DBL_MAX))
+
+/* Set the Top value. */
+astMAKE_SET(Axis,AxisTop,double,top,(value))
+
+/* The Top value is set if it is not AST__BAD. */
+astMAKE_TEST(Axis,AxisTop,( this->top != AST__BAD ))
+
+/* Bottom. */
+/* --------*/
+/* Clear the Bottom Direction value by setting it to AST__BAD. */
+astMAKE_CLEAR(Axis,AxisBottom,bottom,AST__BAD)
+
+/* Supply a default value of -DBL_MAX if the Bottom value is not set.*/
+astMAKE_GET(Axis,AxisBottom,double,0,( this->bottom != AST__BAD ? this->bottom : -DBL_MAX))
+
+/* Set the Bottom value. */
+astMAKE_SET(Axis,AxisBottom,double,bottom,(value))
+
+/* The Bottom value is set if it is not AST__BAD. */
+astMAKE_TEST(Axis,AxisBottom,( this->bottom != AST__BAD ))
 
 /* Format. */
 /* ------- */
@@ -1528,6 +1633,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Local Variables: */
    AstAxis *this;                /* Pointer to the Axis structure */
    const char *sval;             /* Pointer to string value */
+   double dval;                  /* Double value */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
 
@@ -1591,6 +1697,17 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    astWriteInt( channel, "Dirn", set, 0, ival,
                 ival ? "Plot in conventional direction (hint)" :
                        "Plot in reverse direction (hint)" );
+/* Top. */
+/* ---- */
+   set = TestAxisTop( this );
+   dval = set ? GetAxisTop( this ) : astGetAxisTop( this );
+   astWriteDouble( channel, "Top", set, 0, dval, "Maximum legal axis value" );
+
+/* Bottom. */
+/* ------- */
+   set = TestAxisBottom( this );
+   dval = set ? GetAxisBottom( this ) : astGetAxisBottom( this );
+   astWriteDouble( channel, "Bot", set, 0, dval, "Minimum legal axis value" );
 }
 
 /* Standard class functions. */
@@ -1838,6 +1955,8 @@ AstAxis *astInitAxis_( void *mem, size_t size, int init,
       new->label = NULL;
       new->symbol = NULL;
       new->unit = NULL;
+      new->top = AST__BAD;
+      new->bottom = AST__BAD;
 
 /* If an error occurred, clean up by deleting the new Axis. */
       if ( !astOK ) new = astDelete( new );
@@ -2006,6 +2125,16 @@ AstAxis *astLoadAxis_( void *mem, size_t size, int init,
 /* ---------- */
       new->direction = astReadInt( channel, "dirn", -INT_MAX );
       if ( TestAxisDirection( new ) ) SetAxisDirection( new, new->direction );
+
+/* Top. */
+/* ---- */
+      new->top = astReadDouble( channel, "top", AST__BAD );
+      if ( TestAxisTop( new ) ) SetAxisTop( new, new->top );
+
+/* Bottom. */
+/* ---- */
+      new->bottom = astReadDouble( channel, "bottom", AST__BAD );
+      if ( TestAxisBottom( new ) ) SetAxisBottom( new, new->bottom );
 
 /* If an error occurred, clean up by deleting the new Axis. */
       if ( !astOK ) new = astDelete( new );

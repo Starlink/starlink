@@ -34,6 +34,8 @@ f     AST_FRAME
 *     In addition to those attributes common to all Mappings, every
 *     Frame also has the following attributes:
 *
+*     - Bottom(axis): Lowest axis value to display
+*     - Direction(axis): Display axis in conventional direction?
 *     - Digits/Digits(axis): Number of digits of precision
 *     - Direction(axis): Display axis in conventional direction?
 *     - Domain: Coordinate system domain
@@ -47,6 +49,7 @@ f     AST_FRAME
 *     - PreserveAxes: Preserve axes?
 *     - Symbol(axis): Axis symbol
 *     - Title: Frame title
+*     - Top(axis): Highest axis value to display
 *     - Unit(axis): Axis physical units
 
 *  Functions:
@@ -137,6 +140,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Added method astBear.
 *     21-SEP-2001 (DSB):
 *        Replaced astBear with astAxAngle.
+*     10-OCT-2002 (DSB):
+*        Added Top and Bottom.
 *class--
 */
 
@@ -600,6 +605,17 @@ static int DefaultMaxAxes( AstFrame * );
 static int DefaultMinAxes( AstFrame * );
 static int GetDigits( AstFrame * );
 static int GetDirection( AstFrame *, int );
+
+static double GetTop( AstFrame *, int );
+static int TestTop( AstFrame *, int );
+static void ClearTop( AstFrame *, int );
+static void SetTop( AstFrame *, int, double );
+
+static double GetBottom( AstFrame *, int );
+static int TestBottom( AstFrame *, int );
+static void ClearBottom( AstFrame *, int );
+static void SetBottom( AstFrame *, int, double );
+
 static int GetMatchEnd( AstFrame * );
 static int GetMaxAxes( AstFrame * );
 static int GetMinAxes( AstFrame * );
@@ -865,9 +881,9 @@ f     AST_ANGLE = DOUBLE PRECISION
 *        always be returned in the range zero to $\pi$.
 
 *  Notes:
-*     - A value of AST_BAD will also be returned if points A and B are
+*     - A value of AST__BAD will also be returned if points A and B are
 *     co-incident, or if points B and C are co-incident.
-*     - A value of AST_BAD will also be returned if this function is
+*     - A value of AST__BAD will also be returned if this function is
 c     invoked with the AST error status set, or if it should fail for
 f     invoked with STATUS set to an error value, or if it should fail for
 *     any reason.
@@ -1523,6 +1539,20 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "direction(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearDirection( this, axis - 1 );
+
+/* Top(axis). */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "top(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearTop( this, axis - 1 );
+
+/* Bottom(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "bottom(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearBottom( this, axis - 1 );
 
 /* Domain. */
 /* ------- */
@@ -3168,6 +3198,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    AstFrame *this;               /* Pointer to the Frame structure */
    char *axis_attrib;            /* Pointer to axis attribute name */
    const char *result;           /* Pointer value to return */
+   double dval;                  /* Double attibute value */
    int axis;                     /* Frame axis number */
    int axis_nc;                  /* No. characters in axis attribute name */
    int digits;                   /* Digits attribute value */
@@ -3240,6 +3271,28 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       direction = astGetDirection( this, axis - 1 );
       if ( astOK ) {
          (void) sprintf( buff, "%d", direction );
+         result = buff;
+      }
+
+/* Top(axis). */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "top(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      dval = astGetTop( this, axis -1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
+/* Bottom(axis). */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "bottom(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      dval = astGetBottom( this, axis -1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
       }
 
@@ -3813,6 +3866,18 @@ static void InitVtab( AstFrameVtab *vtab ) {
    vtab->Unformat = Unformat;
    vtab->ValidateAxis = ValidateAxis;
    vtab->ValidateAxisSelection = ValidateAxisSelection;
+
+   vtab->ClearTop = ClearTop;
+   vtab->GetTop = GetTop;
+   vtab->SetTop = SetTop;
+   vtab->TestTop = TestTop;
+
+   vtab->ClearBottom = ClearBottom;
+   vtab->GetBottom = GetBottom;
+   vtab->SetBottom = SetBottom;
+   vtab->TestBottom = TestBottom;
+
+
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -5140,6 +5205,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstAxis *ax;                  /* Pointer to Axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    char *axis_setting;           /* Pointer to axis attribute setting string */
+   double dval;                  /* Double attibute value */
    int axis;                     /* Index for the Frame axis */
    int axis_nc;                  /* No. characters in axis attribute name */
    int axis_value;               /* Offset of value to be assigned to axis */
@@ -5203,6 +5269,22 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               &axis, &direction, &nc ) )
                && ( nc >= len ) ) {
       astSetDirection( this, axis - 1, direction );
+
+/* Top(axis). */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "top(%d)= %lg %n",
+                              &axis, &dval, &nc ) )
+               && ( nc >= len ) ) {
+      astSetTop( this, axis - 1, dval );
+
+/* Bottom(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "bottom(%d)= %lg %n",
+                              &axis, &dval, &nc ) )
+               && ( nc >= len ) ) {
+      astSetBottom( this, axis - 1, dval );
 
 /* Domain. */
 /* ------- */
@@ -5739,6 +5821,20 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "direction(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestDirection( this, axis - 1 );
+
+/* Bottom(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "bottom(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestBottom( this, axis - 1 );
+
+/* Top(axis). */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "top(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestTop( this, axis - 1 );
 
 /* Domain. */
 /* ------- */
@@ -6329,6 +6425,88 @@ MAKE_CLEAR(Direction)
 MAKE_GET(Direction,int,0,0,0)
 MAKE_SET(Direction,int)
 MAKE_TEST(Direction)
+
+/*
+*att++
+*  Name:
+*     Top(axis)
+
+*  Purpose:
+*     Highest axis value to display
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute gives the highest axis value to be displayed (for
+c     instance, by the astGrid method).
+f     instance, by the AST_GRID method).
+
+*  Applicability:
+*     Frame
+*        The default supplied by the Frame class is to display all axis 
+*        values, without any limit.
+*     SkyFrame
+*        The SkyFrame class re-defines the default Top value to +90 degrees 
+*        for latitude axes, and 180 degrees for co-latitude axes. The 
+*        default for longitude axes is to display all axis values.
+
+*  Notes:
+*     - When specifying this attribute by name, it should be
+*     subscripted with the number of the Frame axis to which it
+*     applies.
+*att--
+*/
+/* This simply provides an interface to the Axis methods for accessing
+   the Top value. */
+MAKE_CLEAR(Top)
+MAKE_GET(Top,double,DBL_MAX,0,DBL_MAX)
+MAKE_SET(Top,double)
+MAKE_TEST(Top)
+
+/*
+*att++
+*  Name:
+*     Bottom(axis)
+
+*  Purpose:
+*     Lowest axis value to display
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute gives the lowest axis value to be displayed (for
+c     instance, by the astGrid method).
+f     instance, by the AST_GRID method).
+
+*  Applicability:
+*     Frame
+*        The default supplied by the Frame class is to display all axis 
+*        values, without any limit.
+*     SkyFrame
+*        The SkyFrame class re-defines the default Bottom value to -90 degrees 
+*        for latitude axes, and 0 degrees for co-latitude axes. The 
+*        default for longitude axes is to display all axis values.
+
+*  Notes:
+*     - When specifying this attribute by name, it should be
+*     subscripted with the number of the Frame axis to which it
+*     applies.
+*att--
+*/
+/* This simply provides an interface to the Axis methods for accessing
+   the Bottom value. */
+MAKE_CLEAR(Bottom)
+MAKE_GET(Bottom,double,-DBL_MAX,0,-DBL_MAX)
+MAKE_SET(Bottom,double)
+MAKE_TEST(Bottom)
 
 /*
 *att++
@@ -7277,6 +7455,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    char key[ KEY_LEN + 1 ];      /* Buffer for keywords */
    const char *sval;             /* Pointer to string value */
    const int *perm;              /* Pointer to axis permutation array */
+   double dval;                  /* Double attibute value */
    int *invperm;                 /* Pointer to inverse permutation array */
    int axis;                     /* Loop counter for Frame axes */
    int digits_set;               /* Digits set explicitly for any axis? */
@@ -7462,6 +7641,30 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                                 "Plot axis %d in reverse direction",
                          axis + 1 );
          astWriteInt( channel, key, 0, helpful, ival, comment );
+      }
+
+/* Bottom. */
+/* ------- */
+/* There is a Bottom value for each axis. */
+      for ( axis = 0; axis < naxes; axis++ ) {
+         dval = astGetBottom( this, invperm[ axis ] );
+
+/* Show the value if it is zero. */
+         helpful = ( ival != -DBL_MAX );
+         (void) sprintf( key, "Bot%d", axis + 1 );
+         astWriteDouble( channel, key, 0, helpful, dval, "Lowest legal axis value");
+      }
+
+/* Top. */
+/* ------- */
+/* There is a Top value for each axis. */
+      for ( axis = 0; axis < naxes; axis++ ) {
+         dval = astGetTop( this, invperm[ axis ] );
+
+/* Show the value if it is zero. */
+         helpful = ( ival != DBL_MAX );
+         (void) sprintf( key, "Top%d", axis + 1 );
+         astWriteDouble( channel, key, 0, helpful, dval, "Highest legal axis value");
       }
 
 /* PreserveAxes. */
@@ -7890,6 +8093,7 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
    AstFrame *new;                /* Pointer to the new Frame */
    char *sval;                   /* Pointer to string value */
    char key[ KEY_LEN + 1 ];      /* Buffer for keywords */
+   double dval;                  /* DOuble attribute value */
    int axis;                     /* Loop counter for axes */
    int ival;                     /* Integer value */
 
@@ -8019,6 +8223,22 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
             ival = astReadInt( channel, key, -INT_MAX );
             if ( ival != -INT_MAX ) {
                astSetAxisDirection( new->axis[ axis ], ival );
+            }
+            
+/* Top. */
+/*----- */
+            (void) sprintf( key, "top%d", axis + 1 );
+            dval = astReadDouble( channel, key, AST__BAD );
+            if ( dval != AST__BAD ) {
+               astSetAxisTop( new->axis[ axis ], dval );
+            }
+            
+/* Bottom. */
+/*----- -- */
+            (void) sprintf( key, "bot%d", axis + 1 );
+            dval = astReadDouble( channel, key, AST__BAD );
+            if ( dval != AST__BAD ) {
+               astSetAxisBottom( new->axis[ axis ], dval );
             }
             
 /* Digits. */

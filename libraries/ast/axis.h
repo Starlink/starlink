@@ -30,6 +30,8 @@
 *     None.
 
 *  New Attributes Defined:
+*     Bottom (double)
+*        Lowest legal value for axis.
 *     Digits (integer)
 *        Specifies how many digits of precision are required by
 *        default when a coordinate value for an Axis is formatted
@@ -70,6 +72,8 @@
 *        inappropriate. Examples include "RA" and "Dec" (for Right
 *        Ascension and Declination). The default supplied by the Axis
 *        class is the string "x".
+*     Top (double)
+*        Highest legal value for axis.
 *     Unit (string)
 *        Describes the units used to represent coordinate values on an
 *        Axis.  The default supplied by the Axis class is an empty
@@ -213,6 +217,8 @@
 *        Added astAxisUnformat.
 *     29-AUG-2001 (DSB):
 *        Added AxisDistance and AxisOffset.
+*     10-OCT-2002 (DSB):
+*        Added Top and Bottom.
 *-
 */
 
@@ -243,6 +249,8 @@ typedef struct AstAxis {
    char *unit;                   /* Pointer to unit string */
    int digits;                   /* Default digits of precision */
    int direction;                /* Plot in conventional direction? */
+   double top;                   /* Highest legal axis value */
+   double bottom;                /* Lowest legal axis value */
 } AstAxis;
 
 /* Virtual function table. */
@@ -291,6 +299,17 @@ typedef struct AstAxisVtab {
    void (* SetAxisLabel)( AstAxis *, const char * );
    void (* SetAxisSymbol)( AstAxis *, const char * );
    void (* SetAxisUnit)( AstAxis *, const char * );
+
+   double (* GetAxisTop)( AstAxis * );
+   int (* TestAxisTop)( AstAxis * );
+   void (* ClearAxisTop)( AstAxis * );
+   void (* SetAxisTop)( AstAxis *, double );
+
+   double (* GetAxisBottom)( AstAxis * );
+   int (* TestAxisBottom)( AstAxis * );
+   void (* ClearAxisBottom)( AstAxis * );
+   void (* SetAxisBottom)( AstAxis *, double );
+
 } AstAxisVtab;
 #endif
 
@@ -354,6 +373,17 @@ void astSetAxisFormat_( AstAxis *, const char * );
 void astSetAxisLabel_( AstAxis *, const char * );
 void astSetAxisSymbol_( AstAxis *, const char * );
 void astSetAxisUnit_( AstAxis *, const char * );
+
+double astGetAxisTop_( AstAxis * );
+int astTestAxisTop_( AstAxis * );
+void astClearAxisTop_( AstAxis * );
+void astSetAxisTop_( AstAxis *, double );
+
+double astGetAxisBottom_( AstAxis * );
+int astTestAxisBottom_( AstAxis * );
+void astClearAxisBottom_( AstAxis * );
+void astSetAxisBottom_( AstAxis *, double );
+
 #endif
 
 /* Function interfaces. */
@@ -464,5 +494,24 @@ astINVOKE(V,astTestAxisLabel_(astCheckAxis(this)))
 astINVOKE(V,astTestAxisSymbol_(astCheckAxis(this)))
 #define astTestAxisUnit(this) \
 astINVOKE(V,astTestAxisUnit_(astCheckAxis(this)))
+
+#define astClearAxisTop(this) \
+astINVOKE(V,astClearAxisTop_(astCheckAxis(this)))
+#define astGetAxisTop(this) \
+astINVOKE(V,astGetAxisTop_(astCheckAxis(this)))
+#define astSetAxisTop(this,top) \
+astINVOKE(V,astSetAxisTop_(astCheckAxis(this),top))
+#define astTestAxisTop(this) \
+astINVOKE(V,astTestAxisTop_(astCheckAxis(this)))
+
+#define astClearAxisBottom(this) \
+astINVOKE(V,astClearAxisBottom_(astCheckAxis(this)))
+#define astGetAxisBottom(this) \
+astINVOKE(V,astGetAxisBottom_(astCheckAxis(this)))
+#define astSetAxisBottom(this,bottom) \
+astINVOKE(V,astSetAxisBottom_(astCheckAxis(this),bottom))
+#define astTestAxisBottom(this) \
+astINVOKE(V,astTestAxisBottom_(astCheckAxis(this)))
+
 #endif
 #endif

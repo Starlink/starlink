@@ -155,6 +155,8 @@ static const char *(* parent_gettitle)( AstFrame * );
 static const char *(* parent_getunit)( AstFrame *, int );
 static double (* parent_gap)( AstFrame *, int, double, int * );
 static int (* parent_getdirection)( AstFrame *, int );
+static double (* parent_getbottom)( AstFrame *, int );
+static double (* parent_gettop)( AstFrame *, int );
 static int (* parent_match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int (* parent_subframe)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int (* parent_testattrib)( AstObject *, const char * );
@@ -167,6 +169,12 @@ static void (* parent_setattrib)( AstObject *, const char * );
 static void (* parent_setformat)( AstFrame *, int, const char * );
 static void (* parent_setmaxaxes)( AstFrame *, int );
 static void (* parent_setminaxes)( AstFrame *, int );
+
+/* Factors for converting between hours, degrees and radians. */
+static double hr2rad;
+static double deg2rad;
+static double pi;
+static double piby2;
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -193,6 +201,8 @@ static double ReadDateTime( const char * );
 static int ChrMatch( const char *, const char * );
 static int GetAsTime( AstSkyFrame *, int );
 static int GetDirection( AstFrame *, int );
+static double GetBottom( AstFrame *, int );
+static double GetTop( AstFrame *, int );
 static int GetLatAxis( AstSkyFrame * );
 static int GetLonAxis( AstSkyFrame * );
 static int GetNegLon( AstSkyFrame * );
@@ -1301,6 +1311,182 @@ static int GetDirection( AstFrame *this_frame, int axis ) {
    return result;
 }
 
+static double GetBottom( AstFrame *this_frame, int axis ) {
+/*
+*  Name:
+*     GetBottom
+
+*  Purpose:
+*     Obtain the value of the Bottom attribute for a SkyFrame axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double GetBottom( AstFrame *this_frame, int axis )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astGetBottom method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function returns the value of the Bottom attribute for a
+*     specified axis of a SkyFrame. A suitable default value is returned if no
+*     value has previously been set.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     axis
+*        Axis index (zero-based) identifying the axis for which information is
+*        required.
+
+*  Returned Value:
+*     The Bottom value to use.
+
+*  Notes:
+*     -  A value of -DBL_MAX will be returned if this function is invoked 
+*     with the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   int axis_p;                   /* Permuted axis index */
+   double result;                /* Result to be returned */
+
+/* Check the global error status. */
+   if ( !astOK ) return -DBL_MAX;
+
+/* Initialise. */
+   result = -DBL_MAX;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Validate and permute the axis index. */
+   axis_p = astValidateAxis( this, axis, "astGetBottom" );
+
+/* Check if a value has been set for the axis Bottom attribute. If so,
+   obtain its value. */
+   if ( astTestBottom( this, axis ) ) {
+      result = (*parent_getbottom)( this_frame, axis );
+
+/* Otherwise, we will return a default Bottom value appropriate to the
+   SkyFrame class. */
+   } else {
+
+/* If this is a co-latitude axis return zero. */
+      if( axis_p == 1 ) {
+         if( astGetSystem( this ) == AST__HPR ) {
+            result = 0.0;
+
+/* If it is a latitude axis return -pi/2. */
+         } else {
+            result = -piby2;
+         }
+
+/* If it is a longitude value return -DBL_MAX (i.e. no lower limit). */
+      } else {
+         result = -DBL_MAX;
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = -DBL_MAX;
+
+/* Return the result. */
+   return result;
+}
+
+static double GetTop( AstFrame *this_frame, int axis ) {
+/*
+*  Name:
+*     GetTop
+
+*  Purpose:
+*     Obtain the value of the Top attribute for a SkyFrame axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double GetTop( AstFrame *this_frame, int axis )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astGetTop method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function returns the value of the Top attribute for a
+*     specified axis of a SkyFrame. A suitable default value is returned if no
+*     value has previously been set.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     axis
+*        Axis index (zero-based) identifying the axis for which information is
+*        required.
+
+*  Returned Value:
+*     The Top value to use.
+
+*  Notes:
+*     -  A value of DBL_MAX will be returned if this function is invoked 
+*     with the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   int axis_p;                   /* Permuted axis index */
+   double result;                /* Result to be returned */
+
+/* Check the global error status. */
+   if ( !astOK ) return DBL_MAX;
+
+/* Initialise. */
+   result = DBL_MAX;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Validate and permute the axis index. */
+   axis_p = astValidateAxis( this, axis, "astGetTop" );
+
+/* Check if a value has been set for the axis Top attribute. If so,
+   obtain its value. */
+   if ( astTestTop( this, axis ) ) {
+      result = (*parent_gettop)( this_frame, axis );
+
+/* Otherwise, we will return a default Top value appropriate to the
+   SkyFrame class. */
+   } else {
+
+/* If this is a co-latitude axis return pi. */
+      if( axis_p == 1 ) {
+         if( astGetSystem( this ) == AST__HPR ) {
+            result = pi;
+
+/* If it is a latitude axis return pi/2. */
+         } else {
+            result = piby2;
+         }
+
+/* If it is a longitude value return DBL_MAX (i.e. no upper limit). */
+      } else {
+         result = DBL_MAX;
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = DBL_MAX;
+
+/* Return the result. */
+   return result;
+}
+
 static const char *GetDomain( AstFrame *this_frame ) {
 /*
 *  Name:
@@ -2181,6 +2367,7 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
 /* Local Variables: */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
+   int stat;                     /* SLALIB status */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -2236,6 +2423,12 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
 
+   parent_gettop = frame->GetTop;
+   frame->GetTop = GetTop;
+
+   parent_getbottom = frame->GetBottom;
+   frame->GetBottom = GetBottom;
+
    parent_format = frame->Format;
    frame->Format = Format;
    parent_gap = frame->Gap;
@@ -2288,6 +2481,13 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "SkyFrame",
                "Description of celestial coordinate system" );
+
+/* Initialize constants for converting between hours, degrees and
+   radians, etc. */
+   slaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
+   slaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
+   slaDaf2r( 180, 0, 0.0, &pi, &stat );
+   piby2 = 0.5*pi;
 }
 
 static int IsEquatorial( AstSkySystemType system ) {
