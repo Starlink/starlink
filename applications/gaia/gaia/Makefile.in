@@ -156,6 +156,7 @@ all: $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON)
 $(DEMO_WISH): normallib tkAppInit.o FORCE
 	@echo "linking \"$(DEMO_WISH)\"..."
 	- ar d $(LIBDIR)/libskycat.a proj.o
+	- @RANLIB@ $(LIBDIR)/libskycat.a
 	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(DEMO_WISH)  \
 	       $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	       $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
