@@ -2162,8 +2162,6 @@ CURSOR      - Reports the co-ordinates of points selected using the
 GDCLEAR     - Clears a graphics device and purges its database entries.
 GDSTATE     - Shows the current status of a graphics device.
 IDCLEAR     - Clears an image display and purges its database entries.
-IDINVISIBLE - Makes memory planes of an image-display device invisible.
-IDPAZO      - Pans and zooms an image-display device.
 IDSTATE     - Shows the current status of an image display.
 OVCLEAR     - Clears an image-display overlay.
 
@@ -2200,19 +2198,15 @@ LUTCONT     - Loads a lookup table to give the display the appearance of
               a contour plot.
 LUTEDIT     - Creates or edits an image-display colour table.
 LUTFC       - Loads the standard false-colour lookup table.
-LUTFLIP     - Flips the colour table of an image-display device.
 LUTGREY     - Loads the standard greyscale lookup table.
 LUTHEAT     - Loads the heat  lookup table.
-LUTHILITE   - Highlights a colour table of an image-display device.
 LUTIKON     - Loads the default Ikon  lookup table.
 LUTNEG      - Loads the standard negative greyscale lookup table.
 LUTRAMPS    - Loads the coloured-ramps lookup table.
 LUTREAD     - Loads an image-display lookup table from an NDF.
-LUTROT      - Rotates the colour table of an image-display device.
 LUTSAVE     - Saves the current colour table of an image-display device
               in an NDF.
 LUTSPEC     - Loads a spectrum-like lookup table.
-LUTTWEAK    - Tweaks a colour table of an image-display device.
 LUTVIEW     - Draws a colour-table key.
 LUTWARM     - Loads the warm lookup table.
 LUTZEBRA    - Loads a pseudo-contour lookup table.
@@ -3530,8 +3524,7 @@ the remainder of colour indices is called the colour table.
 2 Manipulating_Colour_Tables
 KAPPA provides a number of commands for adjusting a colour table.
 LUTEDIT is a Tcl/Tk graphical-user-interface which allows colour tables
-to be created or edited in many different ways. 
-LUTFLIP, LUTHILITE, LUTROT, LUTTWEAK are all IDI-based. Remember
+to be created or edited in many different ways. Remember
 that only the colour table will be flipped; highlighted; rotated;
 stretched, or squashed, and/or have its origin moved.  Thus during
 flipping, colour index 16 will swap with N-1, 17 with N-2 etc. 
@@ -12628,7 +12621,7 @@ idclear xwindows
    Clears the xwindows device and purges its graphics-database
    entries.
 2 Related_Applications
-   KAPPA: GDCLEAR, IDINVISIBLE, IDSTATE, OVCLEAR.
+   KAPPA: GDCLEAR, IDSTATE, OVCLEAR.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 2 History
@@ -12890,22 +12883,6 @@ provides functionality that is excluded from GKS, such as pan and
 zoom.  The two graphics packages share windows through the
 Graphics Window Manager (GWM, SUN/130) so that you need not know
 which KAPPA command calls which package.
-
-Not all IDI functionality is available in the Starlink X-windows
-implementation.  For instance, there is no blinking capability on
-X-windows.  IDUNZOOM is ineffective, since once a window is panned
-and/or zoomed, the original data are lost due to a not unreasonable
-limitation of GWM.  The same applies if you run IDINVISIBLE;
-IDVISIBLE is unable to restore the window.  This is actually not
-serious since images cannot be displayed on the X-windows overlay.
-You will probably want IDINVISIBLE to erase only the overlay plane
-of an X-window.
-
-IDI and GKS were selected for device independence, but since this
-is less important today as X-windows and PostScript have become de
-facto standards.  By relaxing the GKS straightjacket, GUI-based
-image-processing and display tools dedicated to X-windows, will
-offer much-improved interaction and performance.
 
 1 Interaction_Mode
 This topic addresses how the applications obtain co-ordinate
@@ -15449,8 +15426,7 @@ lutable hi gr ndf=nebula shade=0 percentiles=[5,90]
    with more than 256 colours) the effects will only become apparent 
    when subsequent graphics applications are run.
 2 Related_Applications
-   KAPPA: LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTSAVE,
-   LUTTWEAK, LUTVIEW; Figaro: COLOUR.
+   KAPPA: LUTREAD, LUTSAVE, LUTEDIT, LUTVIEW; Figaro: COLOUR.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
 2 History
@@ -15621,7 +15597,7 @@ IMAGE = NDF (Read)
    to show the effect of the created colour table. If a null value
    is supplied a default image is used.
 2 Related_Applications
-   KAPPA: LUTABLE, LUTFLIP, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE;
+   KAPPA: LUTABLE, LUTEDIT, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE;
    Figaro: COLOUR.
 2 Authors
 DSB David S. Berry (STARLINK)
@@ -15912,7 +15888,7 @@ lutsave redshift full
    This saves in full the current colour table on the current
    image-display device to an NDF called redshift.
 2 Related_Applications
-   KAPPA: LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTTWEAK.
+   KAPPA: LUTREAD, LUTEDIT.
 2 Authors
 DSB: David S. Berry (STARLINK)
 2 History
@@ -15949,128 +15925,6 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
-
-1 LUTTWEAK
-Tweaks a colour table of an image-display device.
-
-Usage:
-
-   luttweak [device] [plane] [view]
-
-Description:
-
-   This routine adjusts the colour table of a nominated plane of
-   an IDI-supported image display, such as X-windows.  The adjustment
-   is under mouse, joystick or trackerball button control.
-
-   For an Ikon or X-windows, moving the mouse left or right shifts
-   the colour table towards lower and higher colour indices
-   respectively.  Moving the mouse up stretches the lookup table,
-   and moving it down squashes the lookup table until it disappears,
-   then the lookup table is flipped.  If the lookup table is
-   reversed, moving down stretches, and moving up squashes.
-   Pressing the left button of the mouse resets the colour table to
-   its input state.  Pressing the centre button alters the way in
-   which a squashed lookup table is padded.  The two states are
-   white or to use the first and last colours of the input lookup
-   table, the sense depending on whether the lookup table is
-   flipped.  Hitting the right-hand button ends the modification of
-   the colour table.
-
-   The colour table may be viewed during its manipulation without
-   permanently altering the display memory.  The colour-table
-   display is situated via the cursor, and will disappear once the
-   tweaking is complete.
-2 Parameters
-For information on individual parameters, select from the list below:
-3 DEVICE
-DEVICE = DEVICE (Read)
-   The name of the image-display device whose lookup table is to
-   be adjusted.  The name of the base plane should be given even
-   if the overlay lookup table is to be adjusted.
-   [Current image-display device]
-3 FULL
-FULL = _LOGICAL (Read)
-   If FULL is TRUE, the whole colour-table for the device is
-   may be modified, including the reserved pens.  When FULL
-   is FALSE, the reserved pens in the palette are unaltered.
-   [FALSE]
-3 PLANE
-PLANE = _INTEGER (Read)
-   The number of the memory plane whose lookup table is to be
-   manipulated.  If it is null the base (image) memory's lookup
-   table is adjusted.  The base memory is 0 and overlays are
-   numbered consecutively from 1.  For an Ikon the only overlay
-   plane is 1.  PLANE is only permitted to have a value in the
-   range 0 to the number of planes minus one. [0]
-3 VIEW
-VIEW = _LOGICAL (Read)
-   If TRUE the colour table is displayed during its manipulation.
-   [FALSE]
-2 Examples
-luttweak
-   Tweaks the colour table on the current image-display device.
-
-luttweak xwindows
-   Tweaks the colour table on the xwindows device.
-
-luttweak xwindows full
-   Tweaks the colour table and palette on the xwindows device.
-
-luttweak ikon 1
-   Tweaks the colour table on the Ikon overlay plane.
-
-luttweak view
-   Tweaks the colour table on the current image-display device.
-   The colour table is displayed during the tweaking.
-2 Notes
--  Only Ikons and X-windows are supported.
-
--  The speed of the colour-table rotation is not linearly
-proportional to the mouse displacement; the speed of displacement
-tunes the effect so that slow motion makes a small change than
-a faster motion.  The squashing and stretching factors are also
-non-linear.
-2 Related_Applications
-   KAPPA: LUTFLIP, LUTHILITE, LUTROT.
-2 Authors
-MJC: Malcolm J. Currie (STARLINK)
-2 History
- 1991 April 22 (MJC):
-    Original version.
-
- 1991 June 5 (MJC):
-    Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
-    than n.
-
- 1991 November 15 (MJC):
-    Made exit trigger number 2.  Inceased maximum number of
-    triggers to 64.
-
- 1992 February 10 (MJC):
-    Normalised the rotation displacement by the effective number
-    of colour indices.
-
- 1992 February 19 (MJC):
-    Added fine tuning using the cursor speed, and computed the
-    displacements in floating point to give a smoother feel.
-
- 1992 March 26 (MJC):
-    Replaced AIF parameter-system calls by the extended PAR
-    library.
-
- 1992 August 5 (MJC):
-    Used new capability 18 to obtain the true number of
-    colour-table entries, which may not be a power of 2, as
-    returned by capability 14.
-
- 1992 November 24 (MJC):
-    Reinstated the one-to-one correspondence between the lookup
-    table and the intensity transformation table, lost by an
-    undocumented change to X-windows driver.
-
- 1994 April 29 (MJC):
-    Added FULL parameter.
 
 1 LUTVIEW
 Draws a colour-table key.
@@ -27942,9 +27796,6 @@ HISTEQ      - Performs an histogram equalisation on an NDF.
 HISTOGRAM   - Computes an histogram of an NDF's values.
 IDCLEAR     - Clears an image display and purges its database
               entries.
-IDINVISIBLE - Makes memory planes of an image-display device
-              invisible.
-IDPAZO      - Pans and zooms an image-display device.
 IDSET       - Selects a current image-display device.
 IDSTATE     - Shows the current status of an image display.
 KAPHELP     - Gives help about KAPPA.
@@ -27969,19 +27820,15 @@ LUTCONT     - Loads a lookup table to give the display the
               appearance of a contour plot.
 LUTEDIT     - Creates or edits image display colour tables.
 LUTFC       - Loads the standard false-colour lookup table.
-LUTFLIP     - Flips the colour table of an image-display device.
 LUTGREY     - Loads the standard greyscale lookup table.
 LUTHEAT     - Loads the heat lookup table.
-LUTHILITE   - Highlights a colour table of an image-display device.
 LUTIKON     - Loads the default Ikon lookup table.
 LUTNEG      - Loads the standard negative greyscale lookup table.
 LUTRAMPS    - Loads the coloured-ramps lookup table.
 LUTREAD     - Loads an image-display lookup table from an NDF.
-LUTROT      - Rotates the colour table of an image-display device.
 LUTSAVE     - Saves the current colour table of an image-display
               device in an NDF.
 LUTSPEC     - Loads a spectrum-like lookup table.
-LUTTWEAK    - Tweaks a colour table of an image-display device.
 LUTVIEW     - Draws a colour-table key.
 LUTWARM     - Loads the warm lookup table.
 LUTZEBRA    - Loads a pseudo-contour lookup table.
