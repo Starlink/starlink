@@ -161,7 +161,7 @@
          END IF
 
          IF( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP( 'KPG1_ASGRD_ERR1', 'Use WCCFRAME to change '//
+            CALL ERR_REP( 'KPG1_ASGRD_ERR1', 'Use WCSFRAME to change '//
      :                    'the current co-ordinate Frame in the data,'//
      :                    ' and try again.', STATUS )
          END IF 
