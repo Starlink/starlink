@@ -860,8 +860,7 @@
                         GO TO 31
                      END IF
 
-*  Generate a mapping representing the non-translational parts of the
-*  linear transformation.
+*  Generate a mapping representing the linear transformation.
                      CALL CCD1_LNMAP( TR( 1, I ), MAPTFM, STATUS )
 
 *  Get the Pixel domain frame and its index in the WCS component.
