@@ -383,6 +383,7 @@ BLD_SHR = :
 #  The value is used in messages from make to the user.
 
 PACK_NAME = KAPLIBS
+PKG_NAME = kaplibs
 
 #  Package number.
 #  This is the number allocated to each package to enable unique

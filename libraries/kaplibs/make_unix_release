@@ -102,6 +102,6 @@
 
 # Remove any spare .f files created by the expansion of generic source
 # files but not included in the release. Also remove grp.make.
-      rm -f *.f grp.make
+      rm -f grp.make *.f 
 
       exit
