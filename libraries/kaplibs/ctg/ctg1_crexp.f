@@ -48,6 +48,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +56,8 @@
 *        Original version.
 *     2-DEC-1999 (DSB):
 *        Expand shell meta-characters in directory path.
+*     2-SEP-2004 (TIMJ):
+*        Replace call to CTG1_WILD with call to ONE_FIND_FILE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -70,7 +73,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'CTG_CONST'        ! CTG constants.
       INCLUDE 'PSX_ERR'          ! PSX error constants
-      INCLUDE 'CTG_ERR'          ! CTG error constants.
+      INCLUDE 'ONE_ERR'          ! ONE error constants
 
 *  Arguments Given:
       CHARACTER GRPEXP*(*)
@@ -88,8 +91,8 @@
 
 *  Externals:
       INTEGER CHR_LEN
-      INTEGER CTG1_WILD
-      INTEGER CTG1_EWILD
+      LOGICAL ONE_FIND_FILE
+      EXTERNAL ONE_FIND_FILE
 
 *  Local Constants:
       INTEGER MXTYP              ! Max. number of foreign data formats
@@ -118,10 +121,10 @@
       INTEGER IGRPB              ! Group of file base names
       INTEGER IGRPD              ! Group of directories
       INTEGER IGRPT              ! Group of file types
-      INTEGER ISTAT              ! Local status value
       INTEGER MODIND             ! Index of basis spec
       INTEGER NTYP               ! No. of known foreign data formats
       INTEGER SIZE0              ! Size of group on entry.
+      LOGICAL FOUND              ! Found a matching file
       LOGICAL IN                 ! Does IGRP identify a valid group?
       LOGICAL INGRP              ! Does IGRP0 identify a valid group?
 *.
@@ -231,10 +234,11 @@
 *  than the contents of the directory.
             IAT = CHR_LEN( DIR1 ) 
             DIR2 = ' '
-            ISTAT = CTG1_WILD( DIR1( : IAT ), '-d', DIR2, ICONTX )
+            FOUND = ONE_FIND_FILE( DIR1( : IAT ), .FALSE., DIR2,
+     :           ICONTX, STATUS )
 
 *  If found, use the expanded directory path.
-            IF( ISTAT .EQ. CTG__OK ) THEN
+            IF( FOUND .AND. STATUS .EQ. SAI__OK ) THEN
                DIR1 = DIR2
 
 *  Some versions of "ls -d" retain the trailing "/" and some dont.
@@ -250,22 +254,13 @@
                CALL CHR_APPND( SUF1, NAME, IAT )
                CALL CHR_APPND( EXT1, NAME, IAT )
            
-*  If a system error was detected by CTG1_WILD, report it.
-            ELSE IF ( ISTAT .EQ. CTG__WPER ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'CTG1_CREXP_ERR1', 'CTG1_CREXP: Error'//
-     :                    ' getting pipe from forked process', 
-     :                    STATUS )
-      
-            ELSE IF ( ISTAT .EQ. CTG__WMER ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'CTG1_CREXP_ERR2', 'CTG1_CREXP: '//
-     :                    'Cannot allocate memory', STATUS )
-      
             END IF
 
+*  Clear status if no more files
+         IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
+
 *  End the search context.
-            ISTAT = CTG1_EWILD( ICONTX )
+            CALL ONE_FIND_FILE_END( ICONTX, STATUS )
 
          END IF
 

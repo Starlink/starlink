@@ -33,6 +33,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +41,8 @@
 *        Original version.
 *     2-DEC-1999 (DSB):
 *        Added options argument to ctg1_wild call.
+*     2-SEP-2004 (TIMJ):
+*        Switch to using ONE_FIND_FILE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -53,8 +56,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
-      INCLUDE 'CTG_CONST'        ! CTG private constants.
-      INCLUDE 'CTG_ERR'          ! CTG error constants.
+      INCLUDE 'ONE_ERR'          ! ONE error constants
 
 *  Arguments Given:
       INTEGER IGRP1
@@ -66,13 +68,13 @@
       INTEGER STATUS             ! Global status
 
 *  External references:
-      INTEGER CTG1_WILD
-      INTEGER CTG1_EWILD
+      LOGICAL ONE_FIND_FILE
+      EXTERNAL ONE_FIND_FILE
 
 *  Local Variables:
       CHARACTER FILE*(GRP__SZFNM) ! The file spec of the matching file
-      INTEGER ICONTX             ! Context for CTG1_wild
-      INTEGER ISTAT              ! Local status value
+      INTEGER ICONTX             ! Context for one_find_file
+      LOGICAL FOUND              ! Matched a filename
 *.
 
 *  Check inherited global status.
@@ -81,45 +83,37 @@
 *  Ignore blank templates.
       IF( TEMPLT .NE. ' ' ) THEN
 
-*  Initialise the context value used by CTG1_WILD so that a new file
+*  Initialise the context value used by ONE_FIND_FILE so that a new file
 *  searching context will be started.
          ICONTX = 0
 
-*  Loop round looking for matching files.
-         ISTAT = CTG__OK
-         DO WHILE( ISTAT .EQ. CTG__OK .AND. STATUS .EQ. SAI__OK ) 
+*  Loop round looking for matching files until we get bad status
+*  (which may include ONE__NOFILES)
+         DO WHILE( STATUS .EQ. SAI__OK ) 
 
 *  Attempt to find the next matching file.
             FILE = ' '
-            ISTAT = CTG1_WILD( TEMPLT, ' ', FILE, ICONTX )
+            FOUND = ONE_FIND_FILE( TEMPLT, .TRUE., FILE, ICONTX, 
+     :           STATUS )
 
 *  If another file was found which matches the name...
-            IF( ISTAT .EQ. CTG__OK ) THEN
+            IF ( FOUND .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Append it to the group.
                CALL GRP_PUT( IGRP1, 1, FILE, 0, STATUS )
 
 *  Append a copy of REST to the second group.
                CALL GRP_PUT( IGRP2, 1, REST, 0, STATUS )
-           
-*  If a system error was detected by CTG1_WILD, report it.
-            ELSE IF ( ISTAT .EQ. CTG__WPER ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'CTG1_APPEN_ERR1', 'CTG1_APPEN: Error'//
-     :                       ' getting pipe from forked process', 
-     :                       STATUS )
-      
-            ELSE IF ( ISTAT .EQ. CTG__WMER ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'CTG1_APPEN_ERR2', 'CTG1_APPEN: '//
-     :                       'Cannot allocate memory', STATUS )
-      
+
             END IF
 
          END DO
 
+*  Clear status if no more files
+         IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
+
 *  End the search context.
-         ISTAT = CTG1_EWILD( ICONTX )
+         CALL ONE_FIND_FILE_END( ICONTX, STATUS )
 
       END IF
 

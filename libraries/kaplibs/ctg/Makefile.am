@@ -12,7 +12,7 @@ PRIVATE_INCLUDES = CTG_CONST
 include_HEADERS = $(PUBLIC_INCLUDES)
 PUBLIC_INCLUDES = CTG_ERR
 
-C_ROUTINES = ctg1_rm.c ctg1_wild.c
+C_ROUTINES = ctg1_rm.c
 
 F_ROUTINES = \
 ctg1_appen.f ctg1_asexp.f ctg1_catch.f ctg1_crexp.f ctg1_expan.f \
