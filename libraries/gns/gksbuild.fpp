@@ -22,12 +22,17 @@
 *      current default directory.
 *    
 *   D L Terrett    4-APR-1989
+*   Tim Jenness   15-APR-2004 (Use autoconf for RECL units)
 *-
       IMPLICIT NONE
 
 *   Structure version number and record size
       INTEGER IVERS, RECSIZ
       PARAMETER (IVERS=1)
+
+*   The record size is actually assumed to be the number of 4 byte
+*   numbers to be written. Should really be forcing INTEGER*4 and
+*   REAL*4 on the variables used for writing to the output file.
       PARAMETER (RECSIZ=16)
 
 *   Hash algorithm constants (these MUST match the definitions in
@@ -48,6 +53,24 @@
       CHARACTER*40 INFILE
       INTEGER I
       
+*   Size of each record in platform specific units
+      INTEGER RECLEN
+
+*   Number of bytes per record unit
+      INTEGER BYTEPRU
+
+*   Use autoconf without trying to do variable substitution
+#if FC_RECL_UNIT == 1
+       PARAMETER ( BYTEPRU = 1 )
+#elif FC_RECL_UNIT == 2
+       PARAMETER ( BYTEPRU = 2 )
+#elif FC_RECL_UNIT == 4
+       PARAMETER ( BYTEPRU = 4 )
+#else
+#  error "Impossible FC_RECL_UNIT"
+#endif
+
+
 *   Counters for statistics
       INTEGER IRELOC, MAXREC, NWRKS, ICOLS
       COMMON /STATS/ IRELOC, MAXREC, NWRKS, ICOLS
@@ -57,6 +80,10 @@
       MAXREC = 1
       ICOLS = 0
 
+*   Calculate record length in local units
+*   We assume we are using variables that are 4 bytes long
+      RECLEN = RECSIZ * 4 / BYTEPRU
+
 *   Open the input text file
       PRINT *, 'Input file name ?'
       READ (*,'(A)') INFILE
@@ -64,7 +91,7 @@
 
 *   Create the output binary file
       OPEN (UNIT=2, FILE='gns_gksdevices', STATUS='NEW',
-     :      ACCESS='DIRECT', FORM='UNFORMATTED', RECL=RECSIZ*4)
+     :      ACCESS='DIRECT', FORM='UNFORMATTED', RECL=RECLEN)
 
 *   Write the first record containing the file structure version number
 *   and the hash algorithm contants

@@ -22,6 +22,10 @@ AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
+dnl    Look for unit of RECL
+AC_FC_RECL_UNIT
+
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    GNS does sed replacement on RECL as well. Need to look at that

@@ -106,6 +106,7 @@
       PARAMETER (LUNGNS = 23)
 
 *   Size of records in the workstation description file
+*   in units of 4 bytes
       INTEGER RECSIZ
       PARAMETER (RECSIZ=16)
 

@@ -33,6 +33,7 @@
 *                             routine to get node name + fix LUN logic
 *   Nick Eaton    2-DEC-1991  Allow blank fields for the node name
 *   D L Terrett  25-JUL-1995  Search for data files
+*   Tim Jenness  15-APR-2004  Use autoconf for RECL
 
       IMPLICIT NONE
       INCLUDE 'GNS_PAR'
@@ -51,7 +52,28 @@
       CHARACTER*64 NAMFNI, DEVFNI
       SAVE FNAME, OPEN
 
+*   Size of each record in platform specific units
+      INTEGER RECLEN
+
+*   Number of bytes per record unit
+      INTEGER BYTEPRU
+
+*   Use autoconf without trying to do variable substitution
+#if FC_RECL_UNIT == 1
+       PARAMETER ( BYTEPRU = 1 )
+#elif FC_RECL_UNIT == 2
+       PARAMETER ( BYTEPRU = 2 )
+#elif FC_RECL_UNIT == 4
+       PARAMETER ( BYTEPRU = 4 )
+#else
+#  error "Impossible FC_RECL_UNIT"
+#endif
+
       DATA IDEL/NDELS*LREC/
+
+*   Calculate record length in local units
+*   We assume we are using variables that are 4 bytes long
+      RECLEN = RECSIZ * 4 / BYTEPRU
 
       IF (STATUS.EQ.0) THEN
 
@@ -186,7 +208,7 @@
 *   Open the workstation description file
                CALL GNS_1FNDF('IDI','DEVICES',DEVFNI)
                OPEN( UNIT=LUNIDI, FILE=DEVFNI, STATUS='OLD',
-     :              RECL=RECSIZ*4,
+     :              RECL=RECLEN,
 #ifdef HAVE_F77_OPEN_READONLY
      :              READONLY,
 #endif
