@@ -86,7 +86,7 @@ static int sys_error( char *fmt, ... )
 {
     va_list args;
     char buf[sizeof(info.errmsg)];
-    extern int sys_nerr;
+    /*extern int sys_nerr;*/
     extern int errno;
 
     va_start(args, fmt);
