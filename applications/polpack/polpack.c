@@ -19,6 +19,9 @@
 *     7-DEC-2000 (DSB):
 *        Added cstring, pol1_tclex, pol1_tclgt and pol1_tcldl.
 *        Modified getSVar to return length of string.
+*     10-OCT-2002 (DSB):
+*        Make all internal functions "static" - to avoid conflict with
+*        system routines on some OS's.
 */
 
 
@@ -51,20 +54,20 @@ extern F77_SUBROUTINE(cat_put0d)( INTEGER(gid), DOUBLE(dval), LOGICAL(no), INTEG
 
 static Tcl_Interp *interp=NULL;
 
-char *split( char * );
-void Error( const char *, int * );
-const char *Envir( const char *, int * );
-void SetVar( FILE *, char *, char *, int, int * );
-char *GetName( int, int, int * );
-void SetSVar( FILE *, const char *, const char *, int, int * );
-int GetSVar( const char *, char *, int, int * );
-void SetIVar( FILE *, const char *, int, int * );
-void SetRVar( FILE *, const char *, float, int * );
-void SetLVar( FILE *, const char *, LOGICAL(a), int * );
-void GetLVar( const char *, LOGICAL(a), int * );
-void GetIVar( const char *, int *, int * );
-void GetRVar( const char *, float *, int * );
-char *cstring( const char *, int, int * );
+static char *split( char * );
+static void Error( const char *, int * );
+static const char *Envir( const char *, int * );
+static void SetVar( FILE *, char *, char *, int, int * );
+static char *GetName( int, int, int * );
+static void SetSVar( FILE *, const char *, const char *, int, int * );
+static int GetSVar( const char *, char *, int, int * );
+static void SetIVar( FILE *, const char *, int, int * );
+static void SetRVar( FILE *, const char *, float, int * );
+static void SetLVar( FILE *, const char *, LOGICAL(a), int * );
+static void GetLVar( const char *, LOGICAL(a), int * );
+static void GetIVar( const char *, int *, int * );
+static void GetRVar( const char *, float *, int * );
+static char *cstring( const char *, int, int * );
 
 F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3), 
                         INTEGER(DPI), LOGICAL(HAREA),
@@ -535,7 +538,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 }
 
-void Error( const char *text, int *STATUS ) {
+static void Error( const char *text, int *STATUS ) {
 /*
 *  Name:
 *     Error
@@ -585,7 +588,7 @@ void Error( const char *text, int *STATUS ) {
    }
 }
 
-const char *Envir( const char *var, int *STATUS ){
+static const char *Envir( const char *var, int *STATUS ){
 /*
 *  Name:
 *     Envir
@@ -620,7 +623,7 @@ const char *Envir( const char *var, int *STATUS ){
    return ret;
 }
 
-void SetVar( FILE *fd,  char *name,  char *value, int list, int *STATUS ){
+static void SetVar( FILE *fd,  char *name,  char *value, int list, int *STATUS ){
 /*
 *  Name:
 *     SetVar
@@ -653,7 +656,7 @@ void SetVar( FILE *fd,  char *name,  char *value, int list, int *STATUS ){
    fputs( "\"\n", fd );
 }
 
-char *GetName( int igrp, int i, int *STATUS ) {
+static char *GetName( int igrp, int i, int *STATUS ) {
 /*
 *  Name:
 *     GetName
@@ -725,7 +728,7 @@ char *GetName( int igrp, int i, int *STATUS ) {
    return ret;
 }
 
-void SetSVar( FILE *interp, const char *var, const char *string, 
+static void SetSVar( FILE *interp, const char *var, const char *string, 
                int len, int *STATUS ) {
 /*
 *  Name:
@@ -785,7 +788,7 @@ void SetSVar( FILE *interp, const char *var, const char *string,
 
 }
 
-int GetSVar( const char *val, char *string, int len, int *STATUS ) {
+static int GetSVar( const char *val, char *string, int len, int *STATUS ) {
 /*
 *  Name:
 *     GetSVar
@@ -823,7 +826,7 @@ int GetSVar( const char *val, char *string, int len, int *STATUS ) {
    return n;
 }
 
-void SetIVar( FILE *interp, const char *var, int val, int *STATUS ) {
+static void SetIVar( FILE *interp, const char *var, int val, int *STATUS ) {
 /*
 *  Name:
 *     SetIVar
@@ -858,7 +861,7 @@ void SetIVar( FILE *interp, const char *var, int val, int *STATUS ) {
 
 }
 
-void SetRVar( FILE *interp, const char *var, float val, int *STATUS ) {
+static void SetRVar( FILE *interp, const char *var, float val, int *STATUS ) {
 /*
 *  Name:
 *     SetRVar
@@ -892,7 +895,7 @@ void SetRVar( FILE *interp, const char *var, float val, int *STATUS ) {
 
 }
 
-void SetLVar( FILE *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
+static void SetLVar( FILE *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
 /*
 *  Name:
 *     SetLVar
@@ -926,7 +929,7 @@ void SetLVar( FILE *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
 
 }
 
-void GetLVar( const char *val, LOGICAL(valptr), int *STATUS ) {
+static void GetLVar( const char *val, LOGICAL(valptr), int *STATUS ) {
 /*
 *  Name:
 *     GetLVar
@@ -957,7 +960,7 @@ void GetLVar( const char *val, LOGICAL(valptr), int *STATUS ) {
    }
 }
 
-void GetRVar( const char *val, float *valptr, int *STATUS ) {
+static void GetRVar( const char *val, float *valptr, int *STATUS ) {
 /*
 *  Name:
 *     GetRVar
@@ -989,7 +992,7 @@ void GetRVar( const char *val, float *valptr, int *STATUS ) {
    }
 }
 
-void GetIVar( const char *val, int *valptr, int *STATUS ) {
+static void GetIVar( const char *val, int *valptr, int *STATUS ) {
 /*
 *  Name:
 *     GetIVar
@@ -1022,7 +1025,7 @@ void GetIVar( const char *val, int *valptr, int *STATUS ) {
 }
 
 
-char *split( char *buf ){
+static char *split( char *buf ){
 /*
 *  Name:
 *     split
@@ -1286,7 +1289,7 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
    }
 }
 
-char *cstring( const char *fstring, int len, int *STATUS ) {
+static char *cstring( const char *fstring, int len, int *STATUS ) {
 /*
 *  Name:
 *     cstring
