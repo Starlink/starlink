@@ -1166,14 +1166,14 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/modular/BasicModularGraphModel.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/modular/ModularGraphModel.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/modular/ModularGraphModel.java:132: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/modular/MutableModularGraphModel.java:27: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/GraphDropTarget.java:33: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/modular/ModularGraphModel.html...
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/modular/MutableModularGraphModel.java:27: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/GraphDropTarget.java:33: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/GraphEditorApplet.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/SchematicGraphController.java:55: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/SchematicGraphModel.java:20: warning - @rating is an unknown tag.
@@ -2691,4 +2691,4 @@ javadocs:
   [javadoc] 199 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 21 seconds
+Total time: 3 minutes 19 seconds
