@@ -89,12 +89,13 @@
 *        AXIS(1) structure exists in the input NDF the value of the 
 *        first data point is stored in the BDF descriptor CRVAL1,
 *        and the incremental value between successive axis data is 
-*        stored in CDELT1. If there is an axis label is written to
-*        descriptor CRTYPE1. (Similarly for AXIS(2) structures etc.)
-*        FITS does not have an AXIS units keyword or a standard method
-*        of storing axis widths, so these NDF components will not be
-*        propagated.  Non-linear axis data arrays cannot be represented
-*        by these two values, and must be ignored.
+*        stored in CDELT1. If there is an axis label it is written to
+*        descriptor CRTYPE1, and axis unit is written to CTYPE1.
+*        (Similarly for AXIS(2) structures etc.) FITS does not have a
+*        standard method of storing axis widths and variances, so these
+*        NDF components will not be propagated.  Non-linear axis data
+*        arrays cannot be represented by CRVALn and CDELTn, and must be
+*        ignored.
 *        -  If the input NDF contains TITLE and LABEL components these 
 *        are stored in the BDF descriptors TITLE and LABEL.
 *        -  If the input NDF contains a FITS extension, the FITS items 
@@ -106,14 +107,15 @@
 *           o  The TITLE, LABEL, and BUNITS descriptors are only copied
 *           if no TITLE, LABEL, and UNITS NDF components have already
 *           been copied into these descriptors.
-*           o  The CDELTn, CRVALn, and CRTYPEn descriptors in the FITS
-*           extension are only copied if the input NDF contained no
-*           axis structures.
+*           o  The CDELTn, CRVALn, CTYPEn, and CRTYPEn descriptors in
+*           the FITS extension are only copied if the input NDF
+*           contained no linear axis structures.
 *           o  The standard order of the FITS keywords is preserved,
-*           thus NAXIS and AXISn appear immediately after the second
+*           thus NAXIS and NAXISn appear immediately after the second
 *           card image, which should be BITPIX.  No FITS comments are
 *           written following the values of the above exceptions for
 *           compatibility with certain INTERIM applications.
+*           FITS-header lines with blank keywords are not copied.
 *        -  Other extensions have no BDF counterparts and therefore are
 *        not propagated.
 *        -  All character objects longer than 70 characters are
@@ -132,9 +134,9 @@
 *     routine WRDATA.
 *     -  Copy the data from old-style to new-style VM.
 *     -  Establish the values for the FITS-like descriptors NAXIS, 
-*     NAXISn, CDELTn, CRVALn, CRTYPEn, BUNITS, TITLE and LABEL from the
-*     NDF standard items if possible. These are copied into the
-*     appropriate BDF FITS descriptors.
+*     NAXISn, CDELTn, CRVALn, CRTYPEn, CTYPEn, BUNITS, TITLE and LABEL
+*     from the NDF standard items if possible. These are copied into
+*     the appropriate BDF FITS descriptors.
 *     -  If the NDF contains a FITS extension, those items not already
 *     set, are copied to the appropriate BDF descriptor.
 *     -  Reset INTERIM environment in case NDF2BDF is re-run without re-
@@ -162,6 +164,10 @@
 *        respectively to agree with SUN/55 and consistency.  Added
 *        examples.  Processes UNITS and AXIS.LABEL components of the
 *        NDF.
+*     1992 September 5 (MJC):
+*        Prevented special keywords from being copied from the FITS
+*        header when there are overriding objects present in the
+*        NDF; these are formatted into FITS-like descriptors.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -445,7 +451,7 @@
 *         CRVALn, CDELTn, CRTYPEn, CTYPEn - derived from the NDF axis
 *           structures if possible. If no linear NDF axis structures
 *           are present, the values in the NDF FITS extension are
-*           copied.  If any are linear all FITS axis information is
+*           copied.  If any are non-linear all FITS axis information is
 *           lost.
 *         TITLE, LABEL, BUNITS - the values held in NDF TITLE, LABEL,
 *           and UNITS are used if present, otherwise any values found in
@@ -472,11 +478,11 @@
 *         Read the FITS string.
             CALL DAT_GET0C (FTLOCI, FITSTR, STATUS)
             DESCR = FITSTR(1:SZDESC)
-            VALUE(1:SZVAL) = FITSTR(11:SZFITS)              
+            VALUE(1:SZVAL) = FITSTR(11:SZFITS)
 
-*         Leave out NAXIS, NAXISn, and possibly CDELTN, CRVALn, CRTYPEn,
+*         Leave out NAXIS, NAXISn, and possibly CDELTn, CRVALn, CRTYPEn,
 *         CTYPEn, TITLE, LABEL, and BUNITS as described above.  Note
-*         CROTAn are also excluded.  Also ignore blank keywords---they
+*         CROTAn are also excluded.   Also ignore blank keywords---they
 *         confuse the INTERIM descriptors.
             IF ( (INDEX(DESCR,'NAXIS') .EQ. 0) .AND.
      :           DESCR .NE. ' ' .AND.
@@ -515,7 +521,6 @@
                   UNTFND = CMPFND( 6 )
                END IF
                IF ( STATUS .NE. SAI__OK ) GO TO 994
-
 
 *            Output the descriptor's name and value to the user if
 *            required.

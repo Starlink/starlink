@@ -25,7 +25,7 @@
       }{
          The name of BDF converted from the NDF.  No file extension
          should be given, as the application will automatically give
-         extension {\tt "}.BDF{\tt "}.
+         extension {\tt ".BDF"}.
       }
       \sstsubsection{
          TYPE = LITERAL (Read)
@@ -115,12 +115,13 @@
             AXIS(1) structure exists in the input NDF the value of the
             first data point is stored in the BDF descriptor CRVAL1,
             and the incremental value between successive axis data is
-            stored in CDELT1. If there is an axis label is written to
-            descriptor CRTYPE1. (Similarly for AXIS(2) structures {\it etc.})
-            FITS does not have an AXIS units keyword or a standard method
-            of storing axis widths, so these NDF components will not be
-            propagated.  Non-linear axis data arrays cannot be represented
-            by these two values, and must be ignored.
+            stored in CDELT1. If there is an axis label it is written to
+            descriptor CRTYPE1, and axis unit is written to CTYPE1.
+            (Similarly for AXIS(2) structures {\it etc.}) FITS does not have a
+            standard method of storing axis widths and variances, so these
+            NDF components will not be propagated.  Non-linear axis data
+            arrays cannot be represented by CRVAL$n$ and CDELT$n$, and must be
+            ignored.
 
          \sstitem
             If the input NDF contains TITLE and LABEL components these
@@ -131,20 +132,21 @@
             may be written to the BDF descriptors, with the following
             exceptions:
             \begin{itemize}
-               \item NAXIS, and NAXISn are derived from the dimensions of
+               \item NAXIS, and NAXIS$n$ are derived from the dimensions of
                the NDF data array as described above, so these items
                are not copied from the NDF FITS extension.
                \item The TITLE, LABEL, and BUNITS descriptors are only copied
                if no TITLE, LABEL, and UNITS NDF components have already
                been copied into these descriptors.
-               \item The CDELTn, CRVALn, and CRTYPEn descriptors in the FITS
-               extension are only copied if the input NDF contained no
-               axis structures.
+               \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$
+               descriptors in the FITS extension are only copied if the
+               input NDF contained no linear axis structures.
                \item The standard order of the FITS keywords is preserved,
-               thus NAXIS and AXISn appear immediately after the second
+               thus NAXIS and NAXIS$n$ appear immediately after the second
                card image, which should be BITPIX.  No FITS comments are
                written following the values of the above exceptions for
                compatibility with certain INTERIM applications.
+               FITS-header lines with blank keywords are not copied.
             \end{itemize}
 
          \sstitem
