@@ -96,7 +96,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   MLOC                    ! Locator to MORE box
       CHARACTER*80             SSDS                    ! Output filename
       CHARACTER*24             PT                      ! PSX time string
       CHARACTER*20             STIME                   ! Formatted time string
