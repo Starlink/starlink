@@ -92,16 +92,15 @@ tar -xf ems_source.tar ems1Putc.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Putc.c
 tar -xf ems_source.tar ems1Rform.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Rform.c
+tar -xf ems_source.tar ems1Serr.c
+gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Serr.c
 tar -xf ems_source.tar ems1Starf.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Starf.c
 tar -xf ems_source.tar ems1Stok.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Stok.c
 tar -xf ems_source.tar ems1Tblk.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Tblk.c
-tar -xf ems_source.tar ems1Serr.c_ix86_Linux
-mv ems1Serr.c_ix86_Linux ems1Serr.c
-gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Serr.c
-ar r libems.a emsAnnul.o emsBegin.o emsEload.o emsEnd.o emsErrno.o emsExpnd.o emsFacer.o emsLevel.o emsMark.o emsMload.o emsRenew.o emsRep.o emsRlse.o emsSetc.o emsSetnc.o emsSetd.o emsSeti.o emsSetl.o emsSetr.o emsStat.o emsSyser.o emsTune.o ems1Eblk.o ems1Emark.o ems1Erlse.o ems1Estor.o ems1Fcerr.o ems1Flush.o ems1Form.o ems1Gesc.o ems1Gnam.o ems1Gtok.o ems1Iepnd.o ems1Kerr.o ems1Ktok.o ems1Mpop.o ems1Mpush.o ems1Prerr.o ems1Putc.o ems1Rform.o ems1Starf.o ems1Stok.o ems1Tblk.o ems1Serr.o
+ar r libems.a emsAnnul.o emsBegin.o emsEload.o emsEnd.o emsErrno.o emsExpnd.o emsFacer.o emsLevel.o emsMark.o emsMload.o emsRenew.o emsRep.o emsRlse.o emsSetc.o emsSetnc.o emsSetd.o emsSeti.o emsSetl.o emsSetr.o emsStat.o emsSyser.o emsTune.o ems1Eblk.o ems1Emark.o ems1Erlse.o ems1Estor.o ems1Fcerr.o ems1Flush.o ems1Form.o ems1Gesc.o ems1Gnam.o ems1Gtok.o ems1Iepnd.o ems1Kerr.o ems1Ktok.o ems1Mpop.o ems1Mpush.o ems1Prerr.o ems1Putc.o ems1Rform.o ems1Serr.o ems1Starf.o ems1Stok.o ems1Tblk.o
 ranlib libems.a
 tar -xf ems_source.tar ems_annul.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems_annul.c
@@ -149,7 +148,7 @@ gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems_fioer.
 ar r libemsf.a ems_annul.o ems_begin.o ems_eload.o ems_end.o ems_expnd.o ems_facer.o ems_level.o ems_mark.o ems_mload.o ems_renew.o ems_rep.o ems_rlse.o ems_setc.o ems_setd.o ems_seti.o ems_setl.o ems_setr.o ems_stat.o ems_syser.o ems_tune.o ems_fioer.o
 ranlib libemsf.a
 touch libems.so
-f() { ld -shared -soname $1 -o $1 $2;}; f libems.so 'emsAnnul.o emsBegin.o emsEload.o emsEnd.o emsErrno.o emsExpnd.o emsFacer.o emsLevel.o emsMark.o emsMload.o emsRenew.o emsRep.o emsRlse.o emsSetc.o emsSetnc.o emsSetd.o emsSeti.o emsSetl.o emsSetr.o emsStat.o emsSyser.o emsTune.o ems1Eblk.o ems1Emark.o ems1Erlse.o ems1Estor.o ems1Fcerr.o ems1Flush.o ems1Form.o ems1Gesc.o ems1Gnam.o ems1Gtok.o ems1Iepnd.o ems1Kerr.o ems1Ktok.o ems1Mpop.o ems1Mpush.o ems1Prerr.o ems1Putc.o ems1Rform.o ems1Starf.o ems1Stok.o ems1Tblk.o ems1Serr.o' '-L/apps/cvsbuild/star/lib'
+f() { ld -shared -soname $1 -o $1 $2;}; f libems.so 'emsAnnul.o emsBegin.o emsEload.o emsEnd.o emsErrno.o emsExpnd.o emsFacer.o emsLevel.o emsMark.o emsMload.o emsRenew.o emsRep.o emsRlse.o emsSetc.o emsSetnc.o emsSetd.o emsSeti.o emsSetl.o emsSetr.o emsStat.o emsSyser.o emsTune.o ems1Eblk.o ems1Emark.o ems1Erlse.o ems1Estor.o ems1Fcerr.o ems1Flush.o ems1Form.o ems1Gesc.o ems1Gnam.o ems1Gtok.o ems1Iepnd.o ems1Kerr.o ems1Ktok.o ems1Mpop.o ems1Mpush.o ems1Prerr.o ems1Putc.o ems1Rform.o ems1Serr.o ems1Starf.o ems1Stok.o ems1Tblk.o ' '-L/apps/cvsbuild/star/lib'
 touch libemsf.so
 f() { ld -shared -soname $1 -o $1 $2;}; f libemsf.so 'ems_annul.o ems_begin.o ems_eload.o ems_end.o ems_expnd.o ems_facer.o ems_level.o ems_mark.o ems_mload.o ems_renew.o ems_rep.o ems_rlse.o ems_setc.o ems_setd.o ems_seti.o ems_setl.o ems_setr.o ems_stat.o ems_syser.o ems_tune.o  ems_fioer.o' '-L/apps/cvsbuild/star/lib'
 tar -xf ems_source.tar ems_dev

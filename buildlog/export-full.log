@@ -463,7 +463,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1267 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1268 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
@@ -595,7 +595,6 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -882,7 +881,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jun 3, 2003 4:23:04 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jun 4, 2003 4:22:45 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1819,12 +1818,12 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 162 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 163 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 61 files to /apps/cvsbuild/java/source/splat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
-     [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/lib/splat
+     [copy] Copying 13 files to /apps/cvsbuild/java/source/splat/lib/splat
 
 execute_mk_script:
      [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/build/jni
@@ -2736,7 +2735,7 @@ dist:
      [copy] Copying 1 file to /apps/cvsbuild/java/source/splat/bin/splat
      [copy] Copying 50 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/splat/etc/splat
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/splat/docs/splat
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/splat/docs/splat
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -2744,8 +2743,8 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/splat
     [mkdir] Created dir: /apps/cvsbuild/star/docs/splat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 8 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 283 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 10 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 285 files to /apps/cvsbuild/star/docs
      [echo] Executing Mirage target: install
 
 prepare:
@@ -3018,9 +3017,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
+     [exec] g77: temp/*.o: No such file or directory
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -4234,4 +4233,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 12 minutes 14 seconds
+Total time: 11 minutes 58 seconds

@@ -228,7 +228,7 @@ build:
 prepare:
 
 check_packages:
-[available] Jun 3, 2003 4:05:31 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jun 4, 2003 4:05:22 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -425,12 +425,12 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 162 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 163 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 61 files to /apps/cvsbuild/java/source/splat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
-     [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/lib/splat
+     [copy] Copying 13 files to /apps/cvsbuild/java/source/splat/lib/splat
 
 execute_mk_script:
      [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/build/jni
