@@ -36,7 +36,7 @@ STAR_CHECK_PROGS([ifd2star hlib csh])
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [chr mers sgs gks])
+STAR_DECLARE_DEPENDENCIES([build], [chr mers sgs gks ifd graphpar pda], [link])
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun32)
