@@ -68,6 +68,7 @@
       size(zeromark)=1.5
       colour(zeromark)=red
       size(labels)=0.7
+      size(errbars)=0.1
       colour(labels)=red
       labpos(left)=0.05
       labpos(right)=1.01
