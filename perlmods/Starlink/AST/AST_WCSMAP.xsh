@@ -1,0 +1,212 @@
+MODULE = Starlink::AST  PACKAGE = Starlink::AST::WcsMap
+
+WcsMapType
+AST__AZP()
+ CODE:
+  RETVAL = AST__AZP;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__SZP()
+ CODE:
+  RETVAL = AST__SZP;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__TAN()
+ CODE:
+  RETVAL = AST__TAN;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__STG()
+ CODE:
+  RETVAL = AST__STG;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__SIN()
+ CODE:
+  RETVAL = AST__SIN;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__ARC()
+ CODE:
+  RETVAL = AST__ARC;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__ZPN()
+ CODE:
+  RETVAL = AST__ZPN;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__ZEA()
+ CODE:
+  RETVAL = AST__ZEA;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__AIR()
+ CODE:
+  RETVAL = AST__AIR;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__CYP()
+ CODE:
+  RETVAL = AST__CYP;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__CEA()
+ CODE:
+  RETVAL = AST__CEA;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__CAR()
+ CODE:
+  RETVAL = AST__CAR;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__MER()
+ CODE:
+  RETVAL = AST__MER;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__SFL()
+ CODE:
+  RETVAL = AST__SFL;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__PAR()
+ CODE:
+  RETVAL = AST__PAR;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__MOL()
+ CODE:
+  RETVAL = AST__MOL;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__AIT()
+ CODE:
+  RETVAL = AST__AIT;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__COP()
+ CODE:
+  RETVAL = AST__COP;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__COE()
+ CODE:
+  RETVAL = AST__COE;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__COD()
+ CODE:
+  RETVAL = AST__COD;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__COO()
+ CODE:
+  RETVAL = AST__COO;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__BON()
+ CODE:
+  RETVAL = AST__BON;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__PCO()
+ CODE:
+  RETVAL = AST__PCO;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__TSC()
+ CODE:
+  RETVAL = AST__TSC;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__CSC()
+ CODE:
+  RETVAL = AST__CSC;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__QSC()
+ CODE:
+  RETVAL = AST__QSC;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__NCP()
+ CODE:
+  RETVAL = AST__NCP;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__GLS()
+ CODE:
+  RETVAL = AST__GLS;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__TPN()
+ CODE:
+  RETVAL = AST__TPN;
+OUTPUT:
+  RETVAL
+
+WcsMapType
+AST__WCSBAD()
+ CODE:
+  RETVAL = AST__WCSBAD;
+OUTPUT:
+  RETVAL
+
