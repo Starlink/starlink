@@ -429,7 +429,7 @@ kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f \
 kps1_censg.f kps1_censh.f kps1_nmplt.f kps1_mlpcp.f kps1_mlplb.f \
 kps1_mlpng.f kps1_mlpcv.f kps1_mlpml.f kps1_mlppn.f kps1_mlpfs.f \
 kps1_mlpmp.f kps1_mlpky.f kps1_mlpnd.f kps1_elmap.f kps1_pswcs.f \
-kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f
+kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \

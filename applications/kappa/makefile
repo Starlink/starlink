@@ -803,7 +803,7 @@ kps1_cenad.f kps1_cenai.f kps1_cenar.f kps1_cenaub.f kps1_cenauw.f \
 kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f \
 kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
-kps1_elmap.f kps1_pswcs.f kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f
+kps1_elmap.f kps1_pswcs.f kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -3180,6 +3180,7 @@ kps1_agndr.o:	 SAE_PAR PRM_PAR
 kps1_agnls.o:	 SAE_PAR GRP_PAR HLPCMD
 kps1_agnms.o:	 SAE_PAR
 kps1_agnst.o:	 SAE_PAR
+kps1_zpdec.o:	 SAE_PAR AST_PAR
 kps1_ardmb.o:	 SAE_PAR PRM_PAR
 kps1_ardmd.o:	 SAE_PAR PRM_PAR
 kps1_ardmi.o:	 SAE_PAR PRM_PAR
