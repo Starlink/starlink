@@ -68,6 +68,9 @@
 <!ENTITY starlink.decl 
 	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
 	>
+<!ENTITY xml.decl
+	PUBLIC "-//Starlink//TEXT XML Declaration//EN"
+	>
 
 
 <!--============================== Entities ==============================
