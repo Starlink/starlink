@@ -972,6 +972,48 @@ iraf! {
 
       }
 
+      action astpickaxes {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter AXES {
+            position 2
+            type _INTEGER 
+            prompt {The indices of the required axes}
+            ppath CURRENT 
+            helpkey *
+          }
+
+         parameter map {
+            position 3
+            type LITERAL
+            prompt {The Mapping from old to new Frame}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {The new Frame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Frame or FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
    }
 
    command astshow {

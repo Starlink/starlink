@@ -22,7 +22,8 @@ atl1_ptobj.f atl1_rm.c atl1_setop.f atlhelp.f atlhelp.ifl atools.csh \
 atools.hlp atools.icl atools_link_adam atools_mon.f atools_mon.ifl \
 atl1_rdgrp.f atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f \
 astlutmap.ifl astpcdmap.f astpcdmap.ifl astwinmap.f astwinmap.ifl \
-astfindframe.f astfindframe.ifl astpermaxes.f astpermaxes.ifl
+astfindframe.f astfindframe.ifl astpermaxes.f astpermaxes.ifl \
+astpickaxes.f astpickaxes.ifl
 
 # The contents of the atools_iraf.tar file:
 ATOOLS_IRAF = doc astcopy.par astaddframe.par astclear.par astget.par astset.par \
@@ -30,7 +31,7 @@ asttest.par astcmpframe.par astcmpmap.par astframe.par astgetframe.par \
 astgetmapping.par astunitmap.par astskyframe.par astframeset.par \
 astpermmap.par astremoveframe.par astremapframe.par astmatrixmap.par \
 astconvert.par astlutmap.par astpcdmap.par astwinmap.par astfindframe.par \
-astpermaxes.par
+astpermaxes.par astpickaxes.par
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
@@ -38,7 +39,7 @@ USER_TASKS = astcopy.f astaddframe.f astclear.f astget.f astset.f atlhelp.f \
 asttest.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f astgetmapping.f \
 astunitmap.f astskyframe.f astframeset.f astpermmap.f astremoveframe.f \
 astremapframe.f astmatrixmap.f astconvert.f astlutmap.f astpcdmap.f \
-astwinmap.f astfindframe.f astpermaxes.f
+astwinmap.f astfindframe.f astpermaxes.f astpickaxes.f
 
 #  Contents of the doc/ directory in atools_iraf.tar
 IRAF_DOCS = astcopy.hlp astaddframe.hlp astclear.hlp astget.hlp astset.hlp \
@@ -46,7 +47,7 @@ asttest.hlp astcmpframe.hlp astcmpmap.hlp astframe.hlp astgetframe.hlp \
 astgetmapping.hlp astunitmap.hlp astskyframe.hlp astframeset.hlp \
 astpermmap.hlp astremoveframe.hlp astremapframe.hlp astmatrixmap.hlp \
 astconvert.hlp astlutmap.hlp astpcdmap.hlp astwinmap.hlp astfindframe.hlp \
-astpermaxes.hlp
+astpermaxes.hlp astpickaxes.hlp
 
 # The other files which need to be extracted from the source code
 # repository and which end up in atools.tar.
