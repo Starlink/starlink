@@ -3,7 +3,7 @@
      :                       REGIND, REGCEN, REGWID, STATUS )
 *+
 * Name:
-*    KPS1_ELPR1
+*     KPS1_ELPR1
 
 *  Purpose:
 *     Creates an ARD description for a set of elliptical annuli.
@@ -102,6 +102,8 @@
 *     1995 March 28 (MJC):
 *        Minor stylistic and typographical changes, shortened long
 *        lines, and used a modern-style variable declaration.
+*     3-AUG-1998 (DSB):
+*        Corrected logic for creating sectors of larger than 180 degrees.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -146,6 +148,10 @@
       PARAMETER ( RTOD = 57.29578 )
       REAL PI                    ! Pi
       PARAMETER ( PI = 3.1415927 )
+      REAL TWOPI                 ! Two Pi
+      PARAMETER ( TWOPI = 2.0*PI )
+      REAL PIBY2                 ! Pi by 2
+      PARAMETER ( PIBY2 = 0.5*PI )
       
 *  Local Variables:
       REAL CENTRE                ! Major axis radius of annulus centre
@@ -154,8 +160,8 @@
       INTEGER I                  ! Loop count
       REAL IMAJ                  ! Major axis radius of inner edge
       REAL IMIN                  ! Minor axis radius of inner edge
-      REAL LPA1                  ! Local version of PA1
-      REAL LPA2                  ! Local version of PA2
+      REAL LPA1                  ! Position angle of next polygon vertex
+      REAL LPA2                  ! Local version of PA2 which is .GT. PA1
       REAL OMAJ                  ! Major axis radius of outer edge
       REAL OMIN                  ! Minor axis radius of outer edge
       REAL R                     ! Radius of sector
@@ -191,42 +197,36 @@
 *  the open end of the sector intersecting the image.
          R = 2.0 * SQRT( REAL( NX**2 + NY**2 ) )
 
-*  If the opening angle of the sector is larger than 180 degrees, use
-*  .NOT. the complementary sector instead, in order to avoid the
-*  complexities of creating a concave polygon to describe the sector.
-         IF ( SIN( PA2 - PA1 ) .LT. 0.0 ) THEN
-            LPA1 = PA1
-            LPA2 = PA2 - 2 * PI
-            CALL GRP_PUT( IGRP, 1, '.NOT.POLY(', 0, STATUS )         
+*  Add 2PI onto PA2 until it is larger than PA1.
+         LPA2 = PA2
+         DO WHILE( LPA2 .LE. PA1 ) 
+            LPA2 = LPA2 + TWOPI
+         END DO
 
-*  If the opening angle of the sector is 180 degrees or less, use the
-*  sector radii as supplied.
-         ELSE
-            LPA1 = PA1
-            LPA2 = PA2
-            CALL GRP_PUT( IGRP, 1, 'POLY(', 0, STATUS )         
-         END IF
+*  Start a Polygon ARD region.
+         CALL GRP_PUT( IGRP, 1, 'POLY(', 0, STATUS )         
 
 *  The sector polygon starts at the profile centre.
          WRITE( TEXT, * ) '0.0, 0.0'
          CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
 
 *  Next point is the end of radius number 1 .
-         WRITE( TEXT, * ) R*COS( LPA1 ), ',', R*SIN( LPA1 )
+         WRITE( TEXT, * ) R*COS( PA1 ), ',', R*SIN( PA1 )
          CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
 
-*  Next point is the end of a radius which bisects the other two.
-*  This is needed to stop the sector becoming very shallow (thin)
-*  when the opening angle becomes close to 180 degrees (which is
-*  what would happen if the polygon was a triangle).
-         WRITE( TEXT, * ) R*COS( ( LPA1 + LPA2 ) / 2.0 ), ',',
-     :                    R*SIN( ( LPA1 + LPA2 ) / 2.0 )
-         CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
+*  Add points separated by PI/2 to the polygon until the closing angle
+*  is reached.
+         LPA1 = PA1 + PIBY2
+         DO WHILE( LPA1 .LT. LPA2 )
+            WRITE( TEXT, * ) R*COS( LPA1 ), ',', R*SIN( LPA1 )
+            CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
+            LPA1 = LPA1 + PIBY2
+         END DO
 
 *  The last point is the end of radius no. 2.  Finished the polygon ARD
 *  keyword, and .AND. it with the list of tangential sectors which is
 *  to be added next.
-         WRITE( TEXT, * ) R * COS( LPA2 ), ',', R * SIN( LPA2 ),
+         WRITE( TEXT, * ) R * COS( PA2 ), ',', R * SIN( PA2 ),
      :                    ' ) .AND. ('
          CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
 
