@@ -38,7 +38,7 @@
       IF ( INITIALISE ) THEN
         STATUS = 0
         CALL PSX_TIME( TICKS, STATUS )
-        SEED = ( TICKS / 4 ) * 4 + 1
+        SEED = ( TICKS / 4 ) + 1
         CALL PDA_RNSED( SEED )
         INITIALISE=.FALSE.
       END IF
