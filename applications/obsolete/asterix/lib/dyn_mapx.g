@@ -87,6 +87,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			NDIM			! See above
@@ -106,7 +107,7 @@
       IF ( (NDIM.GT.0) .AND. (NDIM.LE.ADI__MXDIM) ) THEN
 
 *    Get pointer
-        CALL DYN_MAP( NDIM, DIMS, '_<HTYPE>', PTR, STATUS )
+        CALL DYN_MAP( NDIM, DIMS, '<HTYPE>', PTR, STATUS )
 
 *  Otherwise report error
       ELSE
