@@ -205,7 +205,7 @@
       DO K = 1, NOBJ
 *
 *  set data for this object
-         X = REAL ( XPOS( K ) )
+         X = REAL( XPOS( K ) )
          Y = REAL( YPOS( K ) )
          MAG = REAL( INTENS( K ) )
          E = REAL( ELLIP ( K ) )
@@ -271,7 +271,7 @@
                            IF ( IDX * SCALE .NE. IX ) IDX = IDX + 1
                            IDY = IY / SCALE
                            IF ( IDY * SCALE .NE. IY ) IDY = IDY + 1
-                           VAL = FRAME( IDX, IDY ) +
+                           VAL = DCV_<T>TOR( FRAME( IDX, IDY ) ) +
      :                                 MAG * CCD1_TFUN( RADSQ ) / RSCSQ
 *  saturate if necessary
                            VAL = MIN( VAL, SAT )
@@ -279,8 +279,9 @@
                         ELSE
 
 *  pixels values are correct for expanded frame.
-                           VAL = FRAME( IX, IY ) +
-     :                                       MAG * CCD1_TFUN( RADSQ )
+                           VAL = DCV_<T>TOR( FRAME( IX, IY ) ) +
+     :                                 MAG * CCD1_TFUN( RADSQ )
+*  saturate if necessary
                            VAL = MIN( VAL, SAT )
                            FRAME( IX, IY ) = DCV_RTO<T>( VAL )
                         END IF
@@ -293,4 +294,4 @@
 
 *  All done
       END
-* $Id: ccd1_objs.f,v 1.1 1997/06/27 09:01:41 pwd Exp $
+* $Id: bgg1_objs.gen,v 1.1 1998/07/03 14:07:38 mbt Exp $
