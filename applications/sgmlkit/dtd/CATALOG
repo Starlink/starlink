@@ -14,6 +14,13 @@
 
 SGMLDECL starlink.decl
 
+	-- Remap the system entity html-parameters to the default location  --
+	-- of the DSSSL file.  If a user wants to override this DSSSL file, --
+	-- they can do so, and put a catalogue earlier in the path which    --
+	-- replaces this definition					    --
+SYSTEM "sl-html-parameters"	"../dsssl/sl/html/slparams.dsl"
+SYSTEM "sl-latex-parameters"	"../dsssl/sl/latex/slparams.dsl"
+
 	-- listed most general to most specific --
 
 	-- Starlink General is to be used _only_ by reference --
