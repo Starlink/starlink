@@ -44,6 +44,10 @@
 *     by the CCDPACK REGISTER or WCSREG applications, and be labelled 
 *     'CCD_REG' or 'CCD_WCSREG' accordingly - if it has another label 
 *     (domain) a warning will be issued but resampling will proceed.
+*     A copy of the original PIXEL coordinate system will be retained
+*     in the WCS component of the new image under the name CCD_OLDPIXEL;
+*     this can be useful for transforming positions back into the
+*     pre-transformation coordinate system.
 *
 *     If USEWCS is set to FALSE, then the resampling will take place
 *     according to the TRANSFORM structure stored in the .MORE.CCDPACK
@@ -278,6 +282,8 @@
 *     21-MAR-2001 (MBT):
 *        Now refuses to resample into a SkyFrame, which is bound to be
 *        a user error or misconception.
+*     9-SEP-2002 (MBT):
+*        Now retains a copy of the old PIXEL frame as CCD_OLDPIXEL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -316,6 +322,7 @@
       CHARACTER * ( 8 ) COMP( NACOMP ) ! NDF array component names
       CHARACTER * ( AST__SZCHR ) DMN ! AST Current domain
       CHARACTER * ( 7 ) METHOD   ! Resampling method
+      CHARACTER * ( 20 ) OPIXDM  ! Domain name for copy of old PIXEL frame
       CHARACTER * ( 7 ) SHAPE    ! How output NDF shape is determined
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locator to NDF extension
       CHARACTER * ( DAT__SZLOC ) LOCTR ! Locator to the transformation
@@ -350,7 +357,6 @@
       INTEGER ELOUT              ! Number of elements in output array
       INTEGER FRCUR              ! Pointer to the Current AST Frame
       INTEGER FRNEW             ! Pointer to the New AST Frame
-      INTEGER FRM                ! AST pointer to frame under consideration
       INTEGER GIDIN              ! Input NDF group identifier
       INTEGER GIDOUT             ! Output NDF group identifier
       INTEGER I, J, K            ! Loop counters
@@ -366,8 +372,7 @@
       INTEGER IPNTR( 2 )         ! Pointers to the input arrays
       INTEGER IUBND( NDF__MXDIM ) ! Upper bounds of the input NDF
       INTEGER IWCS               ! Pointer to the WCS extension of the input NDF
-      INTEGER JREG              ! Index of the CCD_REG frame in the input NDF
-      INTEGER JPIX              ! Index of the PIXEL frame in the output NDF
+      INTEGER JPIX               ! Index of the PIXEL frame
       INTEGER MAP                ! Mapping to use
       INTEGER NBAD               ! Number of bad elements in output array
       INTEGER NDIMI              ! Number of dimensions in input NDF
@@ -381,7 +386,7 @@
       INTEGER OPNTR( 2 )         ! Pointers to the output arrays
       INTEGER OPNTRW             ! Pointer to the output array or workspace for flux conservation
       INTEGER OUBND( NDF__MXDIM ) ! Upper bounds of the output NDF
-      INTEGER PFRAME               ! Index of the PIXEL frame
+      INTEGER PFRM               ! AST pointer to the PIXEL frame
       INTEGER SHADEF( NDF__MXDIM ) ! Suggested default output NDF shape upper bound
       INTEGER TRIDF              ! Identifier to the forward input transformation
       INTEGER TRIDI              ! Identifier to the inverse input transformation
@@ -410,7 +415,7 @@
       
 *  Local Data:
       DATA COMP / 'Data', 'Variance', 'Quality' /
-
+      DATA OPIXDM / 'CCD_OLDPIXEL' /
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -1526,8 +1531,6 @@
 
 *  A reminder of the various pointers and indices we have to play with
 *       CFRAME  Index of the alignment frame
-*       JREG    Index of CCD_REG frame
-*       JPIX    Index of PIXEL frame
 *       FRCUR   Pointer to alignment frame
 *       IWCS    Pointer to input AST FrameSet
 *       OWCS    Pointer to output AST FrameSet
@@ -1535,25 +1538,27 @@
 *  Get default WCS component (just GRID, PIXEL, AXIS) for the output NDF.
             CALL CCD1_GTWCS( IDOUT, OWCS, STATUS )
             CALL AST_SETI( IWCS, 'Current', CFRAME, STATUS )
+
+*  Rename the PIXEL frame to CCD_OLDPIXEL to retain information about
+*  the pre-transformation coordinates in case the user wants this at
+*  a later date.
+            CALL CCD1_DMPRG( IWCS, OPIXDM, .TRUE., 0, STATUS )
+            CALL CCD1_FRDM( IWCS, 'PIXEL', JPIX, STATUS )
+            PFRM = AST_GETFRAME( IWCS, JPIX, STATUS )
+            CALL AST_SETC( PFRM, 'DOMAIN', OPIXDM, STATUS )
     
-*  Remove GRID, PIXEL, AXIS frames from original frameset since they're
-*  out of date now.  This just leaves the non-automatic frames of the 
-*  input WCS component.
+*  Remove any remaining GRID, PIXEL, AXIS frames from original frameset 
+*  since they're out of date now.  This just leaves the non-automatic 
+*  frames of the input WCS component.
             CALL CCD1_DMPRG( IWCS, 'PIXEL', .FALSE., 0, STATUS )
             CALL CCD1_DMPRG( IWCS, 'AXIS', .FALSE., 0, STATUS )
             CALL CCD1_DMPRG( IWCS, 'GRID', .FALSE., 0, STATUS )
     
-*  Lets find out which frame contains the PIXEL domain (its going to be
-*  frame 2, but we may as well do it properly) in the output WCS frameset.
-            NFRM = AST_GETI( OWCS, 'Nframe', STATUS )
-            DO K = 1, NFRM
-               FRM = AST_GETFRAME( OWCS, K, STATUS )
-               IF( AST_GETC( FRM, 'Domain', STATUS ) 
-     :             .EQ. 'PIXEL' ) PFRAME = K
-            END DO
-                
+*  Find out which frame contains the PIXEL domain in the output frameset.
+            CALL CCD1_FRDM( OWCS, 'PIXEL', JPIX, STATUS )
+
 *  And add the remaining bits of IWCS to OWCS
-            CALL AST_ADDFRAME( OWCS, PFRAME, 
+            CALL AST_ADDFRAME( OWCS, JPIX, 
      :                         AST_UNITMAP( NDIMI, ' ', STATUS ),
      :                         IWCS, STATUS )
     
@@ -1568,7 +1573,6 @@
             CALL AST_ANNUL( IWCS, STATUS )
             CALL AST_ANNUL( FRCUR, STATUS )
             CALL AST_ANNUL( OWCS, STATUS )
-            CALL AST_ANNUL( FRM, STATUS )
          ELSE IF( INEXT ) THEN
             CALL DAT_ANNUL( LOCEXT, STATUS )
             CALL DAT_ANNUL( LOCTR, STATUS )

@@ -1,9 +1,13 @@
 1 CCDPACK_bugfix_update
 
-  Release v4.0-13 is a bugfix update of CCDPACK.
+  Release v4.0-14 is a bugfix update of CCDPACK.
 
   Changes since v4.0-10
   ---------------------
+
+   - In TRANNDF a copy of the pre-transformation PIXEL coordinate system
+     will be preserved, under the name CCD_OLDPIXEL, in the World
+     Coordinate System component of the transformed image.
 
    - A bug which caused problems with OVERRIDE=TRUE in FINDOFF has been
      fixed.  This is only likely to have caused problems to ORAC-DR users.

@@ -32,6 +32,10 @@ Description:
    by the CCDPACK REGISTER or WCSREG applications, and be labelled
    'CCD_REG' or 'CCD_WCSREG' accordingly - if it has another label
    (domain) a warning will be issued but resampling will proceed.
+   A copy of the original PIXEL coordinate system will be retained
+   in the WCS component of the new image under the name CCD_OLDPIXEL;
+   this can be useful for transforming positions back into the
+   pre-transformation coordinate system.
 
    If USEWCS is set to FALSE, then the resampling will take place
    according to the TRANSFORM structure stored in the .MORE.CCDPACK
