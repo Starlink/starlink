@@ -67,6 +67,7 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +75,8 @@
 *        Original version.
 *     13 Feb 1996 (DJA):
 *        Protect against primitive HDS file
+*      5 June 1997 (RB):
+*        Extend length of text line to 132 characters
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,7 +107,7 @@
       CHARACTER*1		NUL			! String separator
         PARAMETER		( NUL = CHAR(0) )
       INTEGER			TLEN			! History text length
-        PARAMETER		( TLEN = 80 )
+        PARAMETER		( TLEN = 132 )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CRLOC			! Current record

@@ -58,11 +58,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *      6 Jun 1996 (DJA):
 *        Original version, adapted from HDS version
+*      5 June 1997 (RB):
+*        Extend length of text line to 132 characters
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,7 +94,7 @@
       CHARACTER*1		NUL			! String separator
         PARAMETER		( NUL = CHAR(0) )
       INTEGER			TLEN			! History text length
-        PARAMETER		( TLEN = 80 )
+        PARAMETER		( TLEN = 132 )
 
 *  Local Variables:
       CHARACTER*512		LINE			! Line of text
