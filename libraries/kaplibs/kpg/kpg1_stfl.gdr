@@ -236,8 +236,8 @@
      :                     NC2 )
             DO I = 1, NDIM
                IF ( I .GT. 1 ) CALL CHR_PUTC( ', ', BUF2, NC2 )
-               CALL CHR_APPND( AST_FORMAT( IWCS, I, POS, STATUS ), BUF2, 
-     :                        NC2 )
+               CALL CHR_APPND( AST_FORMAT( IWCS, I, POS( I ), STATUS ), 
+     :                        BUF2, NC2 )
             END DO
             CALL CHR_PUTC( ')', BUF2, NC2 )
  
@@ -284,8 +284,8 @@
      :                     NC2 )
             DO I = 1, NDIM
                IF ( I .GT. 1 ) CALL CHR_PUTC( ', ', BUF2, NC2 )
-               CALL CHR_APPND( AST_FORMAT( IWCS, I, POS, STATUS ), BUF2, 
-     :                        NC2 )
+               CALL CHR_APPND( AST_FORMAT( IWCS, I, POS( I ), STATUS ), 
+     :                        BUF2, NC2 )
             END DO
             CALL CHR_PUTC( ')', BUF2, NC2 )
  
