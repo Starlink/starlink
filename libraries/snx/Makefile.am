@@ -24,5 +24,5 @@ TESTS = snx_test.sh
 check_PROGRAMS = snx_test
 check_SCRIPTS = snx_test.sh
 
-snx_test_SOURCES = snx_test.fpp
+snx_test_SOURCES = snx_test.F
 snx_test_LDADD = libsnx.la `sgs_link` `ncar_link` 
