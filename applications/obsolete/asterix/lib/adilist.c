@@ -27,6 +27,7 @@
  */
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "asterix.h"                    /* Asterix definitions */
 
@@ -53,19 +54,19 @@ void lstx_print( ADIobj stream, ADIobj id, ADIstatus status )
     ADIstrmPutCh( stream, '{', status );
     if ( _null_q(cdr) ? 1 : _list_q(cdr) ) { /* This is a standard list? */
       do {
-	adix_print( stream, _CAR(curp), 1, ADI__true, status );
-
+	ADIobj	car = _CAR(curp);
 	curp = _CDR(curp);
-	if ( _valid_q(curp) )
-	  ADIstrmPutStr( stream, ", ", _CSM, status );
+
+	ADIstrmPrintf( stream, "%O%s", status, car,
+		_valid_q(curp) ? ", " : "" );
 	}
       while ( _valid_q(curp) );
       }
-    else {				/* It's a dotted pair */
-      adix_print( stream, _CAR(curp), 1, ADI__true, status );
-      ADIstrmPutCh( stream, '.', status );
-      adix_print( stream, _CDR(curp), 1, ADI__true, status );
-      }
+
+/* It's a dotted pair */
+    else
+      ADIstrmPrintf( stream, "%O.%O", status, _CAR(curp), _CDR(curp) );
+
     ADIstrmPutCh( stream, '}', status );
     }
   }

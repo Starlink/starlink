@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "asterix.h"                    /* Asterix definitions */
 #include "aditypes.h"
@@ -213,39 +214,33 @@ ADIobj tblx_add( ADIobj    *table,
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
 
-  if ( _tbl_q(*table) )			/* Table or a-list? */
-    {
-    adic_get0i( _tbl_htsize(*table),
-                &lhcode, status );
+/* Table or a-list? */
+  if ( _tbl_q(*table) )	{
+    adic_get0i( _tbl_htsize(*table), &lhcode, status );
+
     hcode = (int) lhcode;
 
-    strx_hash( str, slen, hcode,	/* Find string's hash value */
-               &hval, status );
+/* Find string's hash value */
+    strx_hash( str, slen, hcode, &hval, status );
 
     head = _tbl_hash(*table) + hval;
     }
   else
     head = table;
 
-  tblx_scan( head, str,	slen,	        /* Look along list for string */
-             &lentry, &there, status );
+/* Look along list for string */
+  tblx_scan( head, str,	slen, &lentry, &there, status );
 
   if ( there )
-    {
-    adic_setetc( "NAME", str, slen );
-    adic_setecs( ADI__SYMDEF, "Symbol /^NAME/ is already in the table",
-		 status );
-    }
-  else
-    {
-    adic_newv0c_n( str, slen,
-                   &nstr, status );
+    adic_setecs( ADI__SYMDEF, "Symbol /%*s/ is already in the table",
+		 status, slen, str );
+  else {
+    adic_newv0c_n( str, slen, &nstr, status );
 
-    hnode = lstx_cell(                  /* The new hash node */
-                lstx_cell( nstr,
-                  dataobj, status ),
-                *lentry,
-                status );
+/* The new hash node */
+    hnode = lstx_cell(
+		lstx_cell( nstr, dataobj, status ),
+		*lentry, status );
 
     *lentry = hnode;                    /* Patch node into list */
 
@@ -256,9 +251,7 @@ ADIobj tblx_add( ADIobj    *table,
   }
 
 
-ADIobj tblx_find( ADIobj    *table,
-                  char  *str, int slen,
-                  ADIstatus     status )
+ADIobj tblx_find( ADIobj *table, char *str, int slen, ADIstatus status )
   {
   int           hcode;
   ADIobj	*head;			/* Head of list */

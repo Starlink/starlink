@@ -148,14 +148,14 @@
 *
       IF (OVER) THEN
 *
-         CALL USI_ASSOCI('INPUT','UPDATE',LOC_IN,INPRIM,STATUS)
+         CALL USI_ASSOCI('INP','UPDATE',LOC_IN,INPRIM,STATUS)
 *
 *   Clone an output locator
          CALL DAT_CLONE(LOC_IN,LOC_OUT,STATUS)
 *
       ELSE
 *
-         CALL USI_ASSOC2('INPUT','OUTPUT','READ',LOC_IN,LOC_OUT,
+         CALL USI_ASSOC2('INP','OUT','READ',LOC_IN,LOC_OUT,
      :                                                INPRIM,STATUS)
 *   Copy all components from old file into new file
          CALL HDX_COPY(LOC_IN,LOC_OUT,STATUS)

@@ -80,6 +80,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdarg.h>
 
 #include "asterix.h"
 #include "aditypes.h"
@@ -241,16 +242,13 @@ void ADImemInitBlock( ADIblockCtrlPtr ctrl, int code, size_t size,
   if ( !_ok(status) )                   /* Check status on entry */
     return;
 
-  if ( nunit % CHAR_BIT )              /* Check alloc unit multiple of CHAR_BIT */
-    {
-    adic_seteti( "NBIT", CHAR_BIT );
-    adic_setecs( SAI__ERROR, "Allocation cluster should be multiple of ^NBIT", status );
-    }
-  else
-    {
+/* Check alloc unit multiple of CHAR_BIT */
+  if ( nunit % CHAR_BIT )
+    adic_setecs( SAI__ERROR, "Allocation cluster should be multiple of %d",
+	status, CHAR_BIT );
+  else {
     ctrl->clas = code;
-    if ( clsid != ADI__nullid )
-      {
+    if ( clsid != ADI__nullid ) {
       ctrl->cdef = _cdef_data(clsid);
       ctrl->cdef->selfid = clsid;
       }

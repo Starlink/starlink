@@ -1,9 +1,14 @@
 #include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 #include "adi.h"
+#include "aditypes.h"
 #include "adi_err.h"
 #include "adierror.h"
+#include "adiparse.h"
+#include "adikrnl.h"
 
 #ifndef NOEMS
 #include "ems.h"
@@ -183,25 +188,23 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
 /*
  *  Set the error and contextual message string
  */
-void adix_setecs( ADIstatype code, char *ctx, int clen, ADIstatus status )
+void adix_setecs( ADIstatype code, char *ctx, int clen, va_list ap, ADIstatus status )
   {
-  char buf[200];
-  int  blen = 200;
+  char 		buf[200];
+  int  		blen;
+  ADIobj	estr;
 
 /* Load users contextual message to use tokens before they're cancelled */
-#ifndef NOEMS
-  ems_mload_c( " ", ctx, buf, &blen, status );
-#endif
+  estr = ADIstrmExtendCst( ADIstrmNew( "w", status ), buf, 200, status );
+  ADIstrmVprintf( estr, ctx, clen, ap, status );
+  blen = _strm_data(estr)->dev->bnc;
+  adix_erase( &estr, 1, status );
 
 /* Report error for the code given */
   adix_setec( code, status );
 
 /* Report the contextual error */
-#ifdef NOEMS
-  adix_setes( ctx, clen, status );
-#else
   adix_setes( buf, blen, status );
-#endif
   }
 
 

@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "asterix.h"                    /* Asterix definitions */
 
@@ -46,14 +47,14 @@ ADIobj adix_prs_defcls( ADIobj pstream, ADIstatus status )
 
 /* Parse superclass list. This updates both the superclass list and the */
 /* members list (due to inherited members) */
-  if ( ADIcurrentToken(pstream) == TOK__SYM )
+  if ( ADIcurrentToken(pstream,status) == TOK__SYM )
     ADIparseClassSupers( pstream, cargs+1, cargs+2, status );
 
 /* Parse the class member list */
   if ( ADIifMatchToken( pstream, TOK__LBRACE, status ) ) {
     ADIparseClassMembers( pstream, cargs+2, status );
 
-    if ( ADIcurrentToken(pstream) == TOK__RBRACE )
+    if ( ADIcurrentToken(pstream,status) == TOK__RBRACE )
       ADInextToken( pstream, status );
     else {
       adic_setecs( ADI__INVARG, "Closing brace expected", status );
@@ -72,17 +73,19 @@ void adix_prs_cmd( ADIobj pstream, ADIstatus status )
   {
   ADIobj	sdat = ADI__nullid;
 
-  if ( ADIcurrentToken(pstream) == TOK__SYM ) {
+  if ( ADIcurrentToken(pstream,status) == TOK__SYM ) {
     if ( ADIisTokenCstring( pstream, "defclass", status ) ) {
       sdat = adix_prs_defcls( pstream, status );
       }
     else {
-      ADIetokToken( "CMD", pstream );
-      adic_setecs( ADI__INVARG, "Unknown command name /^CMD/", status );
+      char	*cmd;
+
+      ADIstrmGetTokenData( pstream, &cmd, NULL, status );
+      adic_setecs( ADI__INVARG, "Unknown command name /%s/", status, cmd );
       }
     }
 
-  else if ( ADIcurrentToken(pstream) == TOK__END )
+  else if ( ADIcurrentToken(pstream,status) == TOK__END )
     ADInextToken( pstream, status );
 
 /*  if( _ok(status) && _valid_q(sdat) )
@@ -94,7 +97,7 @@ void adix_prs_cmds( ADIobj pstream, ADIstatus status )
   {
   _chk_stat;
 
-  while ( _ok(status) && (ADIcurrentToken(pstream) != TOK__NOTATOK) )
+  while ( _ok(status) && (ADIcurrentToken(pstream,status) != TOK__NOTATOK) )
     adix_prs_cmd( pstream, status );
   }
 
@@ -160,8 +163,7 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
     adic_erase( &pstream, status );
     fclose( fp );
     }
-  else {
-    adic_setetc( "PKG", name, nlen );
-    adic_setecs( ADI__INVARG, "Package /^PKG/ not found", status );
-    }
+  else
+    adic_setecs( ADI__INVARG, "Package /%*s/ not found", status,
+	nlen, name );
   }

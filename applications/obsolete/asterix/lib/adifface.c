@@ -183,6 +183,7 @@
 */
 
 #include <string.h>
+#include <stdarg.h>
 
 #include "asterix.h"
 #include "aditypes.h"
@@ -237,7 +238,7 @@ F77_SUBROUTINE(adifn(setecs))( INTEGER(code), CHARACTER(ctx), INTEGER(status) TR
   GENPTR_CHARACTER(ctx)
   GENPTR_INTEGER(status)
 
-  adix_setecs( *code, ctx, ctx_length, status );
+  adix_setecs( *code, ctx, ctx_length, NULL, status );
   }
 
 F77_SUBROUTINE(adifn(setes))( CHARACTER(ctx), INTEGER(status) TRAIL(ctx) )
@@ -2392,6 +2393,13 @@ F77_SUBROUTINE(adifn(locrep))( CHARACTER(name),
 
   adix_locrep( name, name_length,
 	       (ADIobj *) id, status );
+  }
+
+F77_SUBROUTINE(adifn(probe))( INTEGER(status) )
+  {
+  GENPTR_INTEGER(status)
+
+  adix_probe( status );
   }
 
 /* End of ADI_F77 defined test

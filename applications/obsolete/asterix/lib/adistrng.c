@@ -14,6 +14,7 @@
  */
 #include <string.h>                     /* String stuff from RTL */
 #include <ctype.h>
+#include <stdarg.h>
 
 #include "asterix.h"                    /* Asterix definitions */
 
@@ -155,11 +156,11 @@ void strx_init( ADIstatus status )
   {
   _chk_stat;
 
-  adix_def_mcon( UT_ALLOC_c,            /* Install the string constructor */
-		 strx_newmta, status );
+/* Install the string constructor */
+  adix_def_mcon( UT_ALLOC_c, strx_newmta, status );
 
-  adix_def_destruc( UT_ALLOC_c,         /* Install the string destructor */
-		 strx_dstrc, status );
+/* Install the string destructor */
+  adix_def_destruc( UT_ALLOC_c, strx_dstrc, status );
   }
 
 
@@ -244,9 +245,9 @@ void strx_expf( int inlen, char *in, int outlen, char *out )
 
   memcpy(out,in,nc);			/* Copy characters */
 
-  if ( inlen < outlen )			/* Pad with spaces */
-    memset( out + inlen, ' ',
-	       outlen - nc );
+/* Pad with spaces */
+  if ( inlen < outlen )
+    memset( out + inlen, ' ', outlen - nc );
   }
 
 
@@ -333,21 +334,18 @@ void strx_exit( ADIstatus status )
 void strx_newmta( ADIobj id, ADImtaPtr mta, ADIstatus status )
   {
   int                   nval;
-  ADIsegmentPtr         sptr;
+  ADIstring         	*sptr;
 
   _chk_stat;
 
-  sptr = _seg_data(id);                 /* Locate string data area */
+  sptr = _str_data(id);                 /* Locate string data area */
 
-  if ( ! mta->data )                    /* Null mta data? -> null string */
-    {
+  if ( ! mta->data ) {                  /* Null mta data? -> null string */
     sptr->data = NULL;
     sptr->len = 0;
     }
-  else if ( ! mta->ndim )
-    {
-    if ( _null_q(mta->id) )
-      {
+  else if ( ! mta->ndim ) {
+    if ( _null_q(mta->id) ) {
       if ( mta->size == _CSM )
 	sptr->len = strlen( *((charptr *) mta->data) );
       else
@@ -355,9 +353,8 @@ void strx_newmta( ADIobj id, ADImtaPtr mta, ADIstatus status )
 
       sptr->data = strx_dupl( *((charptr *) mta->data), sptr->len );
       }
-    else
-      {
-      ADIsegmentPtr isptr = (ADIsegmentPtr) mta->data;
+    else {
+      ADIstring *isptr = (ADIstring *) mta->data;
 
       sptr->data = strx_dupl( isptr->data, isptr->len );
       sptr->len = isptr->len;
@@ -395,14 +392,8 @@ void strx_newmta( ADIobj id, ADImtaPtr mta, ADIstatus status )
 
 void strx_dstrc( ADIobj str, ADIstatus status )
   {
-  ADIsegmentPtr         sptr = _seg_data(str);
+  ADIstring         *sptr = _str_data(str);
 
   strx_free( sptr->data, status );
   }
 
-
-void strx_tok( char *token, ADIobj str )
-  {
-  adix_setetc( token, _str_dat(str),     /* Set error message token */
-	      _str_len(str) );
-  }

@@ -186,6 +186,7 @@
 
 
 #include <string.h>
+#include <stdarg.h>
 
 #include "asterix.h"
 #include "aditypes.h"
@@ -219,9 +220,15 @@ void adic_setec( ADIstatype code, ADIstatus status )
   adix_setec( code, status );
   }
 
-void adic_setecs( ADIstatype code, char *ctx, ADIstatus status )
+void adic_setecs( ADIstatype code, char *ctx, ADIstatus status, ... )
   {
-  adix_setecs( code, ctx, _CSM, status );
+  va_list	ap;
+
+  va_start(ap,status);
+
+  adix_setecs( code, ctx, _CSM, ap, status );
+
+  va_end(ap);
   }
 
 void adic_setes( char *ctx, ADIstatus status )
@@ -1788,4 +1795,8 @@ void adic_cmnstr( char *string, ADIobj *id, ADIstatus status )
   *id = adix_cmnC( string, status );
   }
 
+void adic_probe( ADIstatus status )
+  {
+  adix_probe( status );
+  }
 

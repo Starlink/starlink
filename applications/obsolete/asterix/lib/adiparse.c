@@ -394,6 +394,15 @@ ADIobj ADIstrmNew( char *mode, ADIstatus status )
   }
 
 
+void ADIstrmGetTokenData( ADIobj stream, char **data, int *len,
+			  ADIstatus status )
+  {
+  ADIstream	*str = _strm_data(stream);
+  *data = str->ctok.dat;
+  if ( len ) *len = str->ctok.nc;
+  }
+
+
 /*
  * Flush a device
  */
@@ -477,16 +486,15 @@ void ADIstrmPutCh( ADIobj stream, char ch, ADIstatus status )
     }
   }
 
-void ADIstrmPutStr( ADIobj stream, char *str, int slen, ADIstatus status )
+void ADIstrmPutBlnk( ADIdevice *dev, int nb, ADIstatus status )
   {
-  if ( _ok(status) )
-    ADIstrmPutInt( _strm_data(stream)->dev, str, slen, status );
-  }
+  static char *blanks = "                                        ";
+  int	lnb = nb;
 
-void ADIstrmPutStrI( ADIobj stream, ADIobj str, ADIstatus status )
-  {
-  if ( _ok(status) )
-    ADIstrmPutInt( _strm_data(stream)->dev, _str_dat(str), _str_len(str), status );
+  while ( lnb > 0 ) {
+    ADIstrmPutInt( dev, blanks, _MIN(40,lnb), status );
+    lnb -= 40;
+    }
   }
 
 
@@ -498,17 +506,20 @@ void ADIstrmPutStrI( ADIobj stream, ADIobj str, ADIstatus status )
  *   %d		- decimal integer
  *   %c		- a single character
  *   %s		- null terminated C string
+ *   %O		- any ADI object
  *   %S		- an ADI string
+ *   %I		- ADIinteger
  *   \n		- new line
  *   \t		- tab character
  *
  * Writes data into user supplied buffer. If the buffer fills up then
  * the user supplied flushing function is invoked
  */
-void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
+void ADIstrmVprintf( ADIobj stream, char *format, int flen,
+		     va_list ap, ADIstatus status )
   {
   if ( _ok(status) ) {
-    va_list	ap;
+    ADIinteger	ai_arg;
     ADIobj	as_arg;
     char	*cp_arg;
     double	d_arg;
@@ -519,15 +530,15 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
     long	l_arg;
     char	*lbegin = NULL;
     char	lbuf[30];
+    int		nb;
     int		nlit = 0;
+    int		npr;
+    int		prec;
     ADIstream	*pstr = _strm_data(stream);
     ADIdevice	*dev = pstr->dev;
     ADIstring	*sdata;
     short	sh_arg;
     void	*vp_arg;
-
-/* Start variable arg processing */
-    va_start(ap,status);
 
 /* Loop over the format */
     while ( *fptr ) {
@@ -538,6 +549,9 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
 /* Formatting? */
       if ( fc == '%' ) {
 
+/* No trailing blanks by default */
+	nb = 0;
+
 /* Extract the next format character */
 	fct = *fptr++;
 
@@ -546,17 +560,51 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
 	  ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
 	  }
 
+/* Is precision being specified? */
+	if ( fct == '*' ) {
+	  prec = va_arg(ap,int);
+	  fct = *fptr++;
+	  }
+	else if ( isdigit( fct ) ) {
+	  int	lprec = 0;
+	  do {
+	    lprec = lprec*10 + (fct-'0');
+	    fct = *fptr++;
+	    }
+	  while ( isdigit(fct) );
+	  prec = lprec;
+	  }
+	else
+	  prec = 0;
+
 /* Switch on the control character */
 	switch ( fct ) {
 	  case 's':
 	    cp_arg = va_arg(ap,char *);
-	    ADIstrmPutInt( dev, cp_arg, _CSM, status );
+	    if ( prec ) {
+	      npr = strlen( cp_arg );
+	      if ( prec > npr )
+		nb = prec - npr;
+	      else
+		npr = prec;
+	      }
+	    else
+	      npr = _CSM;
+	    if ( npr )
+	      ADIstrmPutInt( dev, cp_arg, npr, status );
 	    break;
 	  case 'S':
 	    as_arg = va_arg(ap,ADIobj);
 	    sdata = _str_data(as_arg);
-	    if ( sdata->len )
-	      ADIstrmPutInt( dev, sdata->data, sdata->len, status );
+	    npr = sdata->len;
+	    if ( prec ) {
+	      if ( prec > npr )
+		nb = prec - npr;
+	      else
+		npr = prec;
+	      }
+	    if ( npr )
+	      ADIstrmPutInt( dev, sdata->data, npr, status );
 	    break;
 	  case 'd':
 	    i_arg = va_arg(ap,int);
@@ -577,6 +625,11 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
 	    sprintf( lbuf, "%p", vp_arg );
 	    ADIstrmPutInt( dev, lbuf, _CSM, status );
 	    break;
+	  case 'I':
+	    ai_arg = va_arg(ap,ADIinteger);
+	    sprintf( lbuf, "%ld", ai_arg );
+	    ADIstrmPutInt( dev, lbuf, _CSM, status );
+	    break;
 	  case 'f':
 	    d_arg = va_arg(ap,double);
 	    sprintf( lbuf, "%f", d_arg );
@@ -586,6 +639,9 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
 	    ADIstrmPutInt( dev, &fct, 1, status );
 	    break;
 	  }
+
+	if ( nb )
+	  ADIstrmPutBlnk( dev, nb, status );
 	}
 
 /* Special characters */
@@ -609,10 +665,22 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
     if ( nlit ) {
       ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
       }
+    }
+  }
+
+
+void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
+  {
+  va_list	ap;
+
+/* Start variable arg processing */
+  va_start(ap,status);
+
+/* Invoke the internal routine */
+  ADIstrmVprintf( stream, format, _CSM, ap, status );
 
 /* End variable arg list processing */
-    va_end(ap);
-    }
+  va_end(ap);
   }
 
 
@@ -858,7 +926,7 @@ ADItokenType ADIisTokenInSet( ADIobj stream, ADItokenType tlist[],
   if ( !_ok(status) )
     return rtype;                       /* Check status */
 
-  ct = ADIcurrentToken( stream );
+  ct = ADIcurrentToken( stream, status );
 
   for ( it =0;
 	((tlist[it]!=TOK__TRAP) && (tlist[it]!=ct)) ;
@@ -891,6 +959,12 @@ int ADIparseTokenInOpSet( ADIobj stream, ADIoperatorDescrip tlist[],
 
 
 #define EOS -1
+
+ADItokenType ADIcurrentToken( ADIobj stream, ADIstatus status )
+  {
+  return _ok(status) ? _strm_data(stream)->ctok.t : TOK__NOTATOK;
+  }
+
 
 ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
   {
@@ -1424,16 +1498,15 @@ ADIinteger ADIparseScanInt( char *data, int base, ADIstatus status )
       if ( isalpha(*cp) )
 	dig = (_toupper(*cp)-'A')+10;
       else {
-	adic_setetc( "C", cp, 1 );
-	adic_setecs( ADI__SYNTAX, "Character /^C/ is not valid digit in any base", status );
+	adic_setecs( ADI__SYNTAX,
+	  "Character /%c/ is not valid digit in any base", status, cp );
 	}
       }
     else
       dig = *cp++ - '0';
     if ( dig >= base ) {
-      adic_setetc( "C", cp, 1 );
-      adic_seteti( "B", base );
-      adic_setecs( ADI__SYNTAX, "Digit /^C/ is not a valid base ^B digit", status );
+      adic_setecs( ADI__SYNTAX, "Digit /%c/ is not a valid base %d digit",
+	status, cp, base );
       }
     else
       result = (result*base + dig);

@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include <limits.h>
 
@@ -286,11 +287,9 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
     adix_locrep( ppos+1, rlen, &rid,	/* Look for representation */
 		 status );
 
-    if ( _null_q(rid) ) {
-      adic_setetc( "REP", ppos+1, rlen );
-      adic_setecs( ADI__INVARG, "File representation /^REP/ not known",
-                   status );
-      }
+    if ( _null_q(rid) )
+      adic_setecs( ADI__INVARG, "File representation /%*s/ not known",
+		   status, rlen, ppos+1 );
     else {
 
 /* Locate the file creation routine */
