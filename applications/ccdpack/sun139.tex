@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {139.14}
+\newcommand{\stardocnumber}    {139.15}
 \newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor, Alasdair Allan}
-\newcommand{\stardocdate}      {29 November 2000}
+\newcommand{\stardocdate}      {26 March 2001}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
-\newcommand{\stardocversion}   {Version 3.2}
+\newcommand{\stardocversion}   {Version 3.3}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {
 CCDPACK is a package of programs for reducing CCD-like data. They
@@ -32,8 +32,8 @@ CCDPACK is designed to help you to reduce your data easily.
 The basic reduction stages can be set up using an X based GUI that
 controls an automated reduction system.
 The GUI is designed to allow you to start working without any
-detailed knowledge of the package (or indeed CCD reduction).
-Registration is performed using graphic, script based or automated
+detailed knowledge of the package (or indeed of CCD reduction).
+Registration is performed using graphical, script based or automated
 techniques that help reduce the amount of work to a minimum.
 
 This document is intended for all users of CCDPACK.
@@ -649,9 +649,9 @@ For those who prefer it an equivalent command-line interface is also
 available.
 
 The core of CCDPACK is a suite of programs that have been designed to
-help in processing large amounts of data.  Consequently {\em all}
-CCDPACK routines process {\em lists} of data (these can be identified
-using wildcards, \text{*,?,[a-z]}, or from lists contained in
+help in processing large amounts of data.  Consequently {\em all\/}
+CCDPACK routines process {\em lists\/} of data (these can be identified
+using wildcards, \text{*,?,[a-z],\{X,Y,Z\}}, or from lists contained in
 text files) and also record the progress of a reduction using an
 integral log system.
 
@@ -700,6 +700,12 @@ designed to deal with very large datasets.
 This uses robust methods for determining scale and/or zero point
 corrections.
 
+To help when processing images from a multiple-CCD mosaic camera,
+or a CCD with readout from multiple amplifiers,
+this version of CCDPACK introduces the concept of a
+Set of data-files: this makes it easy to match
+corresponding data and calibration frames for reduction tasks,
+and to keep track of known alignments during registration.
 \section{\xlabel{startup}Starting up CCDPACK}
 
 CCDPACK commands are made available from the C shell using the command:
@@ -756,7 +762,7 @@ a description to: \texttt{bugs@star.rl.ac.uk}.
 \subsection{Running from the C-shell}
 When using CCDPACK from the C-shell (or any other UNIX shell) care needs to
 be taken with some special characters.
-Wildcard characters \text{*,?,[a-z]}, quoted strings \text{""}
+Wildcard characters \text{*,?,[a-z],\{X,Y,Z\}}, quoted strings \text{""}
 and vector braces \text{[ ]} must be protected by using either the
 escape character {\small \verb+\+} or by single quotes (wildcard characters
 must be protected as these are expanded internally by CCDPACK, rather than by
@@ -768,17 +774,26 @@ of the useful part of a CCD you might use a command like:
 % debias in='"datar*,ffr?"' extent='[51,1094,1,1024]'
 \end{verbatim}
 \end{myquote}
+If in doubt, it is a good idea to put single quotes around arguments 
+in this way -- it can't hurt.
 
 \section{\xlabel{demos}\label{demos}Demonstrations and test data}
 
 If you want to get a feel for what CCDPACK can do before reading 
-further, you might like to run the demonstration scripts.
-One of them, {\tt ccdexercise}, 
-emphasises the data reduction aspects of CCDPACK 
-(debiassing, dark calibration, flatfielding) 
-and the other, {\tt wcsexercise}, shows more of the
-image registration capabities.  
-To run either of them, change to an empty directory,
+further, you might like to run one or more of the three 
+demonstration scripts:
+\begin{description}
+\item[{\tt ccdexercise}]
+emphasises the data reduction aspects of CCDPACK (debiassing,
+dark calibration, flatfielding)
+\item[{\tt wcsexercise}]
+shows more of the advanced image registration capabilities
+\item[{\tt setexercise}]
+organises data frames into Sets as if obtained from a mosaic camera
+and demonstrates CCDPACK's Set-handling functionality
+\end{description}
+
+To run any of these scripts, change to an empty directory,
 start up CCDPACK:
 \begin{myquote}
 \begin{verbatim}
@@ -798,13 +813,22 @@ or
 % wcsexercise
 \end{verbatim}
 \end{myquote}
+or
+\begin{myquote}
+\begin{verbatim}
+% setexercise
+\end{verbatim}
+\end{myquote}
 Answering `xw' to the prompt will allow you to see the progress
 of the demonstration graphically if you have an Xwindows display.
 
-Each of these scripts generates a number of data files, which 
-you should delete when you no longer need them.  You may
-however find them useful as test data if you want to experiment
-with CCDPACK commands.
+Each of these scripts generates test data files (small fictional
+starfields) and various intermediate files in the current directory
+when it runs.  These can be deleted when you no longer need them.
+However, you may find them useful as test data if you want to 
+see how the scripts have operated, or to experiment with the CCDPACK
+commands.  You can also use the scripts themselves as examples or
+templates for reducing your own data.
 
 
 \section{Basic principles of CCD data reduction\xlabel{CCDprinciples}}
@@ -1416,9 +1440,9 @@ for the second method use:
 \end{verbatim}
 \end{myquote}
 
-The \text{in} specification \text{bias/*} means get all the frames
+The IN specification \text{bias/*} means get all the frames
 in the subdirectory \text{bias/}.
-The \text{rnoise} parameter specifies the readout-noise (in ADUs) of
+The RNOISE parameter specifies the readout-noise (in ADUs) of
 the CCD you're using (if you've set up a global value for this using
 \xroutine{CCDSETUP} then this need not be supplied).
 \routine{MAKEBIAS} shows an estimate of the readout-noise which it derives from
@@ -1427,7 +1451,7 @@ other exists.
 The nominal readout-noise value can usually be found in the technical
 descriptions issued by the observatories.
 CCDPACK uses the readout noise value to generate error estimates, you
-may specify \text{genvar=false} to disable this option if your
+may specify GENVAR=FALSE to disable this option if your
 destination analysis package does not make use of data errors, your
 data format doesn't support the storage of this information, or if
 disk space is tight (the addition of error components to your data
@@ -1474,12 +1498,12 @@ To subtract a zeroed master bias frame type something like:
 or conversely let \routine{DEBIAS} prompt you. If you meet any questions which you
 do not understand hit return to accept the default, or respond with a
 `?' to get some help. If things are really bad then `!!' (abort) will
-always terminate the application immediately. (Note that \text{adc},
-\text{bounds} and \text{rnoise} need not be given if you've used
+always terminate the application immediately. (Note that ADC,
+BOUNDS and RNOISE need not be given if you've used
 \xroutine{CCDSETUP}.)
 
 If your master bias frame has a non zero mean (if you've selected
-the \text{zero=false} option in \routine{MAKEBIAS}) you just want to subtract
+the ZERO=FALSE option in \routine{MAKEBIAS}) you just want to subtract
 it so use:
 \begin{myquote}
 \begin{verbatim}
@@ -1487,11 +1511,11 @@ it so use:
          offset=false
 \end{verbatim}
 \end{myquote}
-The \text{adc}  -- analogue-to-digital conversion --  factor is
+The ADC  -- analogue-to-digital conversion --  factor is
 required to generate error estimates from the number of ADUs recorded in
-each pixel, as is the \text{rnoise} value.
-To avoid this just use \text{genvar=false} and leave out the
-\text{adc} and \text{rnoise} parameters.
+each pixel, as is the RNOISE value.
+To avoid this just use GENVAR=FALSE and leave out the
+ADC and RNOISE parameters.
 
 \subsubsection{\xlabel{nobiasframes}Without a bias frame}
 
@@ -2108,7 +2132,8 @@ always has a {\em Current\/} coordinate system, which is the
 one in which positions are normally reported.
 These attached 
 coordinate systems are understood by other Starlink applications
-so that for instance using the KAPPA command
+so that for instance using KAPPA's
+\xref{DISPLAY}{sun95}{DISPLAY} command:
 \begin{myquote}
 \begin{verbatim}
 % display myimage axes
@@ -2142,6 +2167,10 @@ These allow coordinate system information to be saved in and restored
 from external files, and can be used to align multiple sets of images 
 in the same way relative to each other --- this can for instance be
 used for observations from mosaic cameras.
+The \routine{MAKESET} command can also be used to read coordinate
+information from an external files --- 
+see the section on dealing with Sets (\ref{ccdpack_sets}).
+\
 %
 \item[Combining information from existing coordinate systems:]
 \routine{WCSREG} is described
@@ -2192,15 +2221,17 @@ if you are assigning one yourself, unless you intend it to look
 like an automatically generated one.
 The special domains which are currently used by CCDPACK are as follows:
 \begin{description}
-\item[CCD_REG]
+\item[CCD\_REG]
 The object-matching alignment coordinates 
 found by the \xroutine{REGISTER} program.
-\item[CCD_WCSREG]
+\item[CCD\_WCSREG]
 The global alignment coordinates found by the \xroutine{WCSREG} program.
-\item[CCD_SET]
+\item[CCD\_SET]
 The alignment coordinates inserted by the \xroutine{MAKESET} program
 denoting a Set; this has special significance to most of the registration
 programs.
+\end{description}
+
 \item
 Although there is nothing to prevent multiple coordinate systems 
 in the same image having the same domain, this is likely to lead
@@ -2211,7 +2242,8 @@ a fatal error.
 For instance, the \routine{REGISTER} program normally attaches a new
 coordinate system labelled `CCD\_REG' to the images on which it operates;
 If any of them already has a coordinate system labelled CCD\_REG,
-then the old one gets deleted.
+then the old one gets deleted, and you will be warned that this 
+has happened.
 \end{itemize}
 
 
@@ -2373,7 +2405,7 @@ run on a DEC Alpha 3000/300 (that's about $70$ SPECint '92).
 
 Because the FAST process takes so little CPU time it is better to try
 this first (without the SLOW process as a backup,
-\text{failsafe=false}), only use the SLOW algorithm when you have
+FAILSAFE=FALSE), only use the SLOW algorithm when you have
 small datasets or do not have large overlaps.
 
 Having obtained estimates of the offsets between each dataset pair and
@@ -2431,14 +2463,14 @@ Invoking \xroutine{FINDOBJ}, \xroutine{FINDOFF} and
 This locates the objects on all the images in the current directory,
 performs pattern-matching and finally registers them, attaching
 a new coordinate system labelled `CCD\_REG' to each image.
-See \hyperref{``Using position lists''}{\S}{}{using_position_lists}
-if using `\text{*}' for both the \text{in} and \text{inlist}
+See ``\hyperref{Using position lists}{\S}{}{using_position_lists}''
+if using `\text{*}' for both the IN and INLIST
 parameters seems mysterious.
 
 If the coordinates of the images are already quite well matched
 (offsets are expected to be small) 
 and the object matching is just to improve the alignment,
-then \routine{FINDOFF} can be invoked with the `RESTRICT' parameter;
+then \routine{FINDOFF} can be invoked with the RESTRICT parameter;
 this instructs it to look for matching objects only in the
 parts of the images which overlap according to the existing
 Current coordinate system, which can dramatically decrease running time 
@@ -2572,7 +2604,9 @@ these may be separated by commas or blanks. The identifier is an
 integer value which is used to identify positions which are related
 (i.e.\ are of the same object) in different lists.
 
-If more than three columns exist then only the first three are used.
+If more than three columns exist then only the values in the first 
+three are used, though some of the programs propagate extra columns
+from the input to the output lists.
 If only two columns exist it is assumed that they are:
 \begin{myquote}
 \begin{verbatim}
@@ -2584,15 +2618,16 @@ this case applications which rely on a knowledge of the identifiers
 assume they are monotonically increasing from one.
 
 Whole and in-line comments are allowed in position lists using the
-character `{\tt \#}'.
+character `{\tt \#}'.  These are not propagated from input to output lists.
 
 The X and Y values in a position list always refer to the 
 pixel coordinates of an image.
 When \routine{FINDOFF} or \routine{REGISTER} read them they
 automatically transform them into the Current image coordinate system
 where appropriate.
-For this reason there is not normally any need to transform position
-lists themselves; however if necessary it can be done using the
+For this reason there is not normally any need to transform a position
+lists the corresponding image has been resampled; 
+however if necessary it can be done using the
 \xroutine{TRANLIST} routine.  This is discussed, along with the
 methods that previous versions of CCDPACK used 
 for storing coordinate transformations,
@@ -2613,7 +2648,7 @@ the NDFNAMES global parameter
 (\xroutine{CCDSETUP}) to false. In this case, position lists must be specified
 explicitly as a comma separated list of names or gotten from a text
 file using indirection, this is exactly the same as for naming images
-(see \hyperref{``processing lists of data''}{\S}{}{ndflists}) except that
+(see ``\hyperref{processing lists of data}{\S}{}{ndflists}'') except that
 wildcards are {\em not} allowed. Output list names may be formed
 from the modification of these names when NDFNAMES is false, otherwise
 the input image names are {\em always} used.
@@ -2689,7 +2724,7 @@ The domain (name) of the coordinate system
 An integer giving the index of the coordinate system
 \item
 A \qt{Sky Co-ordinate System} (SCS) value such as EQUAT(J2000)
-(see section \xref{`Sky Co-ordinate Systems'}{sun95}{se_scs} in 
+(see section ``\xref{Sky Co-ordinate Systems}{sun95}{se_scs}'' in 
 \xref{SUN/95}{sun95}{}).
 \end{itemize}
 The first two options are usually the most appropriate.
@@ -2794,7 +2829,7 @@ does not consitute a fatal error.
 However, it does write an list to an output file (by default called
 WCSEDIT.LIS), giving the names of only those images 
 which were successfully accessed, which normally
-means those which did not have a coordinate system matching that
+means those which had a coordinate system matching that
 given by the FRAME parameter.  So it's easy to find out which 
 images were successfully modified:
 \begin{myquote}
@@ -2839,8 +2874,8 @@ with this:
 Coordinate systems can be exported from and imported to
 image files using the commands:
 \begin{itemize}
-\item \routine{ASTEXP}
-\item \routine{ASTIMP}
+\item \xroutine{ASTEXP}
+\item \xroutine{ASTIMP}
 \end{itemize}
 
 Sometimes the coordinate transformations which must be applied
@@ -2874,7 +2909,7 @@ use for which image either by the order in which they are presented,
 or by usng FITS headers in the file, 
 according to how the AST file was constructed by \routine{ASTEXP}.
 
-Full details on how to use \xroutine{ASTIMP} and \xroutine{ASTEXP}
+Full details on how to use \routine{ASTIMP} and \routine{ASTEXP}
 can be found in \hyperref{an appendix}{appendix }{}{app:description},
 but the following gives an example.
 \begin{myquote}
@@ -2887,7 +2922,7 @@ The first command takes a set of 4 images, one from each chip of an array,
 which are aligned in their Current coordinate system, 
 (possibly by object matching)
 and constructs a file \text{inst.ast} from them;
-the parameters `\text{idtype=fitsid fitsid=chipname}' 
+the parameters `IDTYPE=FITSID FITSID=CHIPNAME' 
 mean that the AST file labels each coordinate system with the
 value of the `CHIPNAME' FITS header from the \text{reg\_data*} images,
 since this dentifies which CCD is which in the mosaic camera.
@@ -2917,9 +2952,9 @@ use the routine
 \item \xroutine{WCSREG}
 \end{itemize}
 
-It is not always possible to register a set of images in a single
+It is not always possible to register a group of images in a single
 step, using one kind of procedure.  For instance you might have
-a large set of images with an approximate SKY coordinate system
+a large group of images with an approximate SKY coordinate system
 inserted by the observing system, 
 of which some but not all overlap with each other.
 In this case we would like to register the overlapping ones
@@ -2929,7 +2964,7 @@ but fall back to
 the tolerably accurate SKY coordinates to align the rest of the images. 
 
 \routine{WCSREG} can do just this.
-You give it a set of images, and a list of coordinate systems
+You give it a number of images, and a list of coordinate systems
 it can use to make the connections,
 and if it's possible to align them all using only these coordinate
 systems it will do so,
@@ -2942,26 +2977,33 @@ In the above example you would write something like
 \end{myquote}
 Where there is a choice between coordinate systems to use for alignment,
 ones given earlier in the DOMAINS list are preferred.
+The square brackets around the named domains are required here because it
+is an array of strings.
 
 The new coordinate system added is a copy of (and so has the same
-units as) the pixel coordinate system of the reference image,
+units as) the PIXEL coordinate system of the reference image,
 which is normally the first one listed.
 Because of this, if you have
 a set of images which are already aligned, but in an 
 unsuitable coordinate system, 
 you can align them in a pixel-sized coordinate system using
 \routine{WCSREG}. 
-For instance, if you want to use \xroutine{TRANNDF} 
-to resample a set of images
-which are aligned in a SKY coordinate system, you can first use the
-following trick:
+Giving a null (`!') value for the list of domains will automatically
+use the current attached coordinates of the reference image for 
+alignment, so that running
 \begin{myquote}
 \begin{verbatim}
-% wcsreg 'skyimage*' '[sky]'
+% wcsreg in='regdat*' domains='!'
 \end{verbatim}
 \end{myquote}
-the images retain the same alignment, but the units are pixel-sized
-which means they are suitable for resampling.
+will ensure the group of already registered images {\tt regdat*} 
+keeps its existing alignment, but in a coordinate system in 
+which a unit is pixel-sized.
+This can be a useful trick prior to resampling, 
+since the resampling program \xroutine{TRANNDF} will
+resample so that a pixel of the output image is one unit square;
+for this reason resampling directly into a SKY coordinate system,
+in which a unit is one radian, is bound to give a useless result.
 
 In many cases it will be possible to align a set of images in
 one step without worrying about these sorts of procedure.
@@ -3038,8 +3080,28 @@ command with CLEAR=FALSE.  This picture was generated by displaying
 the sky region and then running the command:\protect\\
 {\tt\ \ \ bounds "gc6352p1-?" noclear labpos=cf style="width(curves)=2"}}
 
+Finally, BOUNDS can display the actual image data for you.
+Unlike KAPPA's DISPLAY program, which always displays
+an image as a rectangle with pixel axes horiztal and vertical, 
+perhaps with with non-orthogonal image Current coordinate axes 
+drawn over it, BOUNDS always plots on a surface in which the 
+Current coordinate system has horizontal and vertical axes.
+The image data array is therefore resampled to fit within the
+image bounds as they would appear in these coordinates. 
+This can give you a good view of what a group of images will 
+look like when they have been resampled and combined into their
+Current coordinates.  Note however that unlike \xroutine{MAKEMOS},
+BOUNDS performs no averaging or sophisticated normalisation of
+images, so that if two images overlap in their Current coordinates,
+all but the last-plotted will be obscured.  
+When this option is used, the display is always cleared.
+An example of a set of frames from a mosaic camera displayed 
+in this way is given in Figure \ref{OUTIM}.
 
-
+\myfig{sun139outim.eps}{height=0.5\textheight}{outim.gif}{OUTIM}{BOUNDS
+command with IMAGE=TRUE.  This display was generated using the
+command:\protect\\
+{\tt\ \ \ bounds "r10629?" image=yes}}
 
 
 \subsection{\xlabel{resampling}\label{resampling}Data resampling}
@@ -3062,7 +3124,8 @@ must be available. This will only cause problems when using general
 transformations; a tractable inverse doesn't often exist.
 If you need to resample and you do not have an inverse transformation, 
 the \xroutine{DRIZZLE} program
-may be used instead.
+may be used instead, though note this is not designed for general
+purpose resampling, and is slower than \routine{TRANNDF}.
 
 \routine{TRANNDF} resamples using 
 one of two different techniques, linear interpolation
@@ -3091,7 +3154,7 @@ the output image, interpolate using nearest neighbour and conserve flux.
 Note that \routine{TRANNDF} resamples into the Current coordinate system,
 so that each pixel in the output image is a $1.0 \times 1.0$ square 
 in those coordinates.  Thus the coordinate system in question must be
-a suitable one for that purpose.  If the it has units of 
+a suitable one for that purpose.  If it has units of 
 the wrong size, then a suitable transformation can be made by
 adding a new coordinate system with the
 \xroutine{WCSEDIT} or \xroutine{WCSREG} programs.
@@ -3101,12 +3164,14 @@ units of radians, which are far too big.
 See the example in \hyperref{the section about WCSREG}{\S }{}{wcscombine}
 for how to deal with this.
 
+Note that for a quick look at what the resampled data will look like,
+the \xroutine{BOUNDS} command with IMAGE=TRUE can be used.
 
 
 \subsection{\xlabel{mosaic_normalise}\label{mos_norm}Mosaicing and 
             normalisation}
 
-The tasks of mosaicing and normalisation are normally performed the:
+The tasks of mosaicing and normalisation are normally performed using the:
 \begin{itemize}
 \item \xroutine{MAKEMOS}
 \end{itemize}
@@ -3114,8 +3179,8 @@ program.
 \routine{MAKEMOS} is a comprehensive program and has many
 capabilities. In its default mode \routine{MAKEMOS} 
 just combines images using a
-selected data combination method (\routine{MAKEMOS} supports the
-methods -- mean, median, trimmed mean etc.\ \S\ref{combinations}).
+selected data combination method (\routine{MAKEMOS} supports several
+methods: mean, median, trimmed mean etc.\ \S\ref{combinations}).
 In this it is similar to the \xroutine{MAKECAL} routine, but
 \routine{MAKEMOS} makes much more efficient use of
 memory (it is designed to deal with datasets which may not have much
@@ -3126,7 +3191,7 @@ The other capabilities of \routine{MAKEMOS} are concerned
 with data normalisation.
 Normalisation is determined as two components, a scaling factor and a
 zero point factor. These may be controlled independently by the
-parameters \text{scale} and \text{zero}. So:
+parameters SCALE and ZERO. So:
 \begin{myquote}
 \begin{verbatim}
 % makemos in='*' out=mosaic scale
@@ -3138,7 +3203,7 @@ would determine just scale factors, just zero points or both scale
 factors and zero points respectively. The option also exists to modify
 the data values of the input datasets so that their values are
 normalised (this may be combined with producing a mosaic or not using
-the \text{out} parameter). A full description of \routine{MAKEMOS}
+the OUT parameter). A full description of \routine{MAKEMOS}
 is given in appendix \S\ref{MAKEMOS}, some of the philosophy of
 its algorithms are explained in R.F.~Warren-Smith, {\bf 1993},
 `The Calibration of Large-Field Mosaics', Proceedings of the 5th
@@ -3191,10 +3256,10 @@ The transformation of input grid to output grid is basically the
 transformation between the pixel coordinates and Current coordinates
 of the image file;
 however an additional shrinking
-factor can for convenience be given using the \text{multi} 
+factor can for convenience be given using the MULTI 
 parameter of DRIZZLE.  The ratio of the linear size of the
 drop to the size of the input pixel is controlled by the
-parameter \text{pixfrac}.  The default values for these
+parameter PIXFRAC.  The default values for these
 parameters are 1.5 and 0.9 respectively.
 
 The algorithm has a number of advantages over the resampling and
@@ -3238,9 +3303,9 @@ capabilities described above for \routine{MAKEMOS}, however
 it also allows you to supply scaling and zero-point factors via a
 plain text input file.
 If you wish the \routine{DRIZZLE} program to carry out scaling and/or
-zero-point corrections this is controlled via the \text{scale} and
-\text{zero} parameters (as for \routine{MAKEMOS}) and, additionally,
-the \text{correct} parameter. So:
+zero-point corrections this is controlled via the SCALE and
+ZERO parameters (as for \routine{MAKEMOS}) and, additionally,
+the CORRECT parameter. So:
 \begin{myquote}
 \begin{verbatim}
 % drizzle in='*' out=mosaic scale zero correct='!'
@@ -3249,7 +3314,7 @@ the \text{correct} parameter. So:
 would determine (and apply) both scale and zero-point corrections. However,
 \routine{DRIZZLE} also has the capability to read scale and zero-point
 corrections in from a (correctly) formatted file by setting the
-\text{correct} parameter to point to the file. So:
+CORRECT parameter to point to the file. So:
 \begin{myquote}
 \begin{verbatim}
 % drizzle in='*' out=mosaic scale zero correct='drizzle.dat'
@@ -3571,10 +3636,10 @@ the file was constructed by the following command:
 \end{myquote}
 The OUTDOMAIN and OUTTITLE parameters write labels indicating 
 the source of the coordinate information.
-The {\tt idtype=fitsid} and {\tt fitsid=chipname} parameters 
+The {\tt IDTYPE=FITSID} and {\tt FITSID=CHIPNAME} parameters 
 indicate that the chip which each
 one comes from is to be distinguished by the value of its
-``CHIPNAME'' FITS header card, and the {\tt fitsrot=rotskypa}
+``CHIPNAME'' FITS header card, and the FITSROT=ROTSKYPA
 parameter indicates that the ``ROTSKYPA'' FITS header card
 contains an angle in degrees through which the telescope has
 been rotated.
@@ -3644,9 +3709,17 @@ registration, resampling and mosaicing.}
 %  Make sure that this picture get printed out now.
 \clearpage
 
+\section{Grouping images by Set}
+
+In the simplest case, each exposure made on an instrument
+will provide you with one data file containing an array 
+of pixels which represents a single data or calibration image.
+
+
+
 \section{Parameter behaviour and control}
 
-CCDPACK has a number of `global' {\em program} parameters which you
+CCDPACK has a number of `global' {\em program\/} parameters which you
 can set up `once and for all'
 \footnote{This section does not apply to \routine{XREDUCE} or IRAF.}.
 The usual time to do this is at the beginning of a
@@ -3686,7 +3759,7 @@ whose effect is judged so critical that you'd better ask for it on
 each occasion of use.
 This general principle is useful in that you do not have to remember
 to set most parameters every time you run an application.
-However, this does have a drawback of that you must remember what
+However, this does have a drawback that you must remember what
 value you gave to the parameter.
 Most parameters will appear in the log or be directly reported (if
 the log system is set up to do so), so always take care to inspect
@@ -3694,7 +3767,7 @@ the log, or the terminal output, until you're sure of how things
 are set up.
 To get rid of any unwanted parameter values (and restore the
 `intrinsic' default behaviour of an application) just use the keyword
-\text{reset}, on the command line (this is used in many of the
+RESET, on the command line (this is used in many of the
 examples shown in this document for just this purpose).
 This clears all current values but does not effect the global
 parameters.
@@ -3791,8 +3864,8 @@ reduction sequences. In addition to writing to the log file CCDPACK
 programs also report directly to the terminal.  Having the input and output of
 any reduction sequence logged and/or reported to the terminal is an
 optional feature, the level of reporting being controlled by a global
-or application parameter \text{logto} which is set by
-\xroutine{CCDSETUP}. \text{logto} is a character variable and can take
+or application parameter LOGTO which is set by
+\xroutine{CCDSETUP}. LOGTO is a character variable and can take
 one of the following values:
 \begin{myquote}
 \begin{description}
@@ -3802,7 +3875,7 @@ one of the following values:
 \item \text{BOTH} - perform output to the logfile and the terminal [default].
 \end{description}
 \end{myquote}
-It is recommended that \text{logto} is set so that some output
+It is recommended that LOGTO is set so that some output
 occurs, this is felt very necessary given the flexibility of the
 parameter system; it is all too easy to be using values which you are
 not aware of, and you should regularly inspect the log system output,
@@ -3832,7 +3905,7 @@ file, redirect comments into it etc.
 Perhaps the most noticeable `feature' of CCDPACK programs is their ability to
 accept, and process, lists of data files and other associated parameters,
 such as exposure times and position list names (see
-\hyperref{``using position lists''}{\S}{}{using_position_lists}).
+``\hyperref{using position lists}{\S}{}{using_position_lists}'').
 A list of `names' can be supplied in
 response to one prompt, or can be supplied on successive lines using the
 continuation character `\text{-}' to force a reprompt for more
@@ -3849,11 +3922,11 @@ The names of images (NDFs or some foreign format) given to CCDPACK
 routines may include wildcard specifications such as:
 \begin{myquote}
 \begin{verbatim}
-   *,?,[a-z]
+   *, ?, [a-z], {one,two,three}
 \end{verbatim}
 \end{myquote}
-all of which have usual meanings, i.e.\ any number of characters and a
-single character, a range of characters etc.
+all of which have usual meanings, i.e.\ any number of characters, 
+a single character, a range of characters, and a list of strings.
 The simplest return would then be:
 \begin{myquote}
 \begin{verbatim}
@@ -4123,7 +4196,8 @@ first version of the NDF list access software. Rodney Warren-Smith
 developed the excellent \xroutine{MAKEMOS}
 application. \xroutine{TRANNDF} uses the internals of an early version
 of the KAPPA application \xref{TRANSFORMER}{sun95}{TRANSFORMER}
-written by Malcolm Currie.
+written by Malcolm Currie, who has also submitted some improvements
+to the percentile location routines and helped with testing and bug reports.
 
 The \xroutine{XREDUCE}, \xroutine{IDICURS}, \xroutine{PAIRNDF} and
 \xroutine{CCDALIGN}  applications use
@@ -4178,7 +4252,7 @@ they all have a \verb+[G]+ indicator after their descriptions. You
 will {\em{not}} be able to set the values of these parameters by using
 \verb+eparam+, but you can set their values on the command-line.
 
-If this approach is to strange for you to accept then you can switch
+If this approach is too strange for you to accept then you can switch
 off this behaviour by issuing the command:
 \begin{quote}
 \begin{verbatim}
