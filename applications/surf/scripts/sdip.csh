@@ -49,6 +49,7 @@ if (-e ${out}.sdf) then
    # in a usable state for Xwindows (ie white)
    # Remove old plots (create one with touch to prevent an error)
     touch sdip_p1.eps
+    touch sdip_p2.eps  # For linux
     \rm sdip_p1.eps* sdip_p2.eps*
    
 
