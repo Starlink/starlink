@@ -1033,6 +1033,10 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Initialise
+      FIT_DS = 1
+      FIT_PRED = 1
+
 *    First time through?
       IF ( FIRST ) THEN
         CALL DYN_MAPR( 1, 2*PSS__CACHELEN,
@@ -1047,7 +1051,6 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
       END IF
 
 *    Dataset block
-      FIT_DS = 1
       DATASET_D_ID(FIT_DS) = IM_ID
 
 *    Set up flux parameter
