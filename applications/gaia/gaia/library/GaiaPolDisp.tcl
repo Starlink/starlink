@@ -650,6 +650,9 @@ itcl::class gaia::GaiaPolDisp {
 #  --------------------------------------------------
    public method zoom_to_selection {} {
       set first 1
+      if { ! [info exists vstates_] } {
+         return
+      }
 
 #  Search the vstates_ array looking for entries for selected vectors.
       set search [array startsearch vstates_]
@@ -1414,16 +1417,18 @@ itcl::class gaia::GaiaPolDisp {
                   $draw $rtdimage_ $a1 $a2 $units $xsz $ysz $len $ang \
                                    cx cy ex ey px py
 
-#  Create the vector.
-                  set cid [$canvas_ create line $cx $cy $ex $ey -fill "" \
-                                                -tags $disid_]
+#  Create the vector, if draw succeeded.
+                  if { [info exists cx] } {
+                     set cid [$canvas_ create line $cx $cy $ex $ey -fill "" \
+                                 -tags $disid_]
 #  Increment the number of new vectors created by this call.
-                  incr ret 
+                     incr ret 
 
 #  Save information about this canvas item.
-                  set vlens_($cid) $lval
-                  set vrows_($cid) $row
-                  set newcid 1
+                     set vlens_($cid) $lval
+                     set vrows_($cid) $row
+                     set newcid 1
+                  }
                }
             }
 
