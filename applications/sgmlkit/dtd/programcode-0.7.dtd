@@ -277,10 +277,7 @@
 <!ENTITY % para.content '(#PCDATA | %para.markup | ul)*'>
 ]]>
 
-<!-- Allow paralist to be empty.  At one time this was 'p,(p|tabular)*', 
-     but this makes it awkward to keep empty placeholders in a
-     prologue. -->
-<!ENTITY % paralist '(p | tabular)*'>
+<!ENTITY % paralist 'p, (p | tabular)*'>
 
 <!-- The code prologue is the documentation of the routine.  I'd consider
      making the connectors here into `&'; that can be done in future if
@@ -333,7 +330,7 @@
 				-- content model needs future expansion? -->
 ]]>
 
-<!ELEMENT routinename	O O (name, othernames?)
+<!ELEMENT routinename	- O (name, othernames?)
 				-- some routines have a generic name
 				   like `proc_<type>', plus other
 				   names like `proc_real'. -->
@@ -354,13 +351,13 @@
 				-- If there's no return value, there
 				   needn't be any explanatory text -->
 <!ELEMENT (argumentlist | parameterlist)
-			O O (parameter*)
+			- O (parameter*)
 				-- In Starlink usage, `arguments' are
 				   the things passed to functions, and are
 				   distinct from `parameters', which
 				   are the arguments for ADAM
 				   applications. -->
-<!ELEMENT examplelist	O O ((example,examplenote)+)>
+<!ELEMENT examplelist	- O ((example,examplenote)+)>
 <!ELEMENT example	- O (#PCDATA) 
 				-- text of the example, set in tt font -->
 <!ELEMENT examplenote	- O (%paralist;)
@@ -437,14 +434,14 @@
      that a suitable note can go in the source-code file, to make it
      more nearly standalone.  -->
 <![ IGNORE [
-<!ELEMENT authorlist	O O ((author+ | authorref+), otherauthors?)>
+<!ELEMENT authorlist	- O ((author+ | authorref+), otherauthors?)>
 <!ELEMENT otherauthors	- O (author+ | authorref+)
 				-- other authors who have contributed -->
 ]]>
-<!ELEMENT authorlist	O O (author+, otherauthors?)>
+<!ELEMENT authorlist	- O (author+, otherauthors?)>
 <!ELEMENT otherauthors	- O (author+)
 				-- other authors who have contributed -->
-<!ELEMENT history	O O (change+)
+<!ELEMENT history	- O (change+)
 				-- the changes should be in
 				   chronological order, with newest last -->
 <!ELEMENT copyright	- O (%paralist;)
