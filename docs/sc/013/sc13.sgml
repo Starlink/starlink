@@ -92,7 +92,10 @@
    <!ENTITY sun209 PUBLIC "-//Starlink//DOCUMENT Summary SUN/209//EN" SUBDOC>
 
    <!-- abbreviations/abstrations -->
-   <!ENTITY ctan CDATA "http://www.tex.ac.uk">
+   <!ENTITY ctan CDATA 
+		"http://www.tex.ac.uk">
+   <!ENTITY sc13webpage CDATA 
+		"http://www.astro.gla.ac.uk/users/norman/star/trc/">
 
 ]>
 
@@ -123,6 +126,10 @@ comments from others.</px></change>
 <version number="2" date="02-Dec-2001" author="ng" versionid="v2-0">
 <px>Updating, link-checking, general refreshing.</px>
 </version>
+
+<distribution string="2-1" date="04-Dec-2001" author="ng" versionid="v2-1">
+<px>Update to IEEE trap details</px>
+</distribution>
 
 </history>
 
@@ -177,7 +184,8 @@ ideally just account of every topic.  Please send comments,
 corrections, and expansions either to me at <code>norman@astro.gla.ac.uk</code>
 or to the Starlink software librarian at <code>ussc@star.rl.ac.uk</code>.
 I'll maintain a web page for the cookbook at
-<url>http://www.astro.gla.ac.uk/users/norman/star/trc/</url>.
+<url>&sc13webpage;</url>.  Updates
+to the cookbook and its example programs can be found there.
 
 <p>I am particularly interested in comments on the following topics:
 <ul>
@@ -369,7 +377,10 @@ url='http://www.mathcom.com/corpdir/techinfo.mdir/scifaq/q165.html'
 newsgroup <code>comp.lang.fortran</code>, even if you don't actually
 use Fortran.  This is one of those happy few Usenet newsgroups with a
 high signal-to-noise ratio, and listening in on this can be profitable
-when the conversation turns to general numerical analysis.
+when the conversation turns to general numerical analysis.  A similar
+resource is the JISCmail <webref
+url="http://www.jiscmail.ac.uk/lists/COMP-FORTRAN-90.html"
+>comp-fortran-90</webref> list.
 
 <p>To support more specialised numerical computing, refer to the
 libraries section below, <ref id='s.lib'/>.
@@ -468,7 +479,9 @@ know about floating point arithmetic', and is an edited reprint of
 <citation/goldberg91>.  It makes interesting reading, but it's
 probably more than many scientists need to know).  My account here is
 not intended to supplant either of these sources.  Below, I'll talk
-exclusively of IEEE base-2 floating point numbers; there are other
+exclusively of IEEE base-2 floating point numbers, as defined in
+IEEE standard <webref url='http://grouper.ieee.org/groups/754/'
+>IEEE-754</webref>; there are other
 standards, but they're now of historical interest only, as just about
 all modern machines other than VAXes and older Crays use IEEE.  Most
 of what I say will be about single precision; exactly the same issues
@@ -697,42 +710,49 @@ expected way if <code/val> and <code/err> are double precision.
 <p>For further details on floating point representation, see, for example
 <citation/hauser96>, and informal but very useful discussions (both
 available on the web) by William Kahan <citation/kahan96> and Jim Demmel
-<citation/demmel>.  The former is one of the authors of the IEEE754
+<citation/demmel>.  The former is one of the authors of the IEEE-754
 standard for floating-point numbers.
 
-<subsubsubsect id='s.otherfloat'>Other floating-point topics
+<subsubsubsect id='s.otherfloat'>
+<subhead>
+<title>Other floating-point topics</title>
+<update versionid="v2-1">
+<px>Added table of compilers and enabled IEEE traps</px>
+</update>
+</subhead>
 
 <p>As well as defining the format in which normal floating-point numbers are
-stored, the IEEE754 standard includes the definitions for several
+stored, the IEEE-754 standard includes the definitions for several
 other (classes of) special values.
 
-<p>When the exponent <m>e</m> is zero, the longword is taken to represent the
-number
-<mequation><mlabel id='e.ieeedenorm'>
-(-1)^s \times 0.m \times 2^{-126}</mequation>(compare <ref id='e.ieee1'/>).  Unlike the usual floating-point
-numbers, which have an implied leading 1 in the significand and 23
-bits of precision, and which are
-referred to as `normalised', these have an implied leading 0 and less
-than 23 bits of precision.  These are `denormal' or `subnormal'
-numbers, and are the result of an underflow, such as dividing the
-smallest normalised number by two.  This behaviour is known as
-`gradual underflow', and allows the precision in a calculation to
-degrade gracefully when it underflows.  It is distinct from `Store-0
+<p>When the exponent <m>e</m> (of a single-precision number) is zero,
+the longword is taken to represent the number
+<mequation>
+  <mlabel id='e.ieeedenorm'>
+  (-1)^s \times 0.m \times 2^{-126}
+</mequation>
+(compare <ref id='e.ieee1'/>).
+Unlike the usual floating-point numbers, which have an implied leading
+1 in the significand and 23 bits of precision, and which are referred
+to as `normalised', these have an implied leading 0 and less than 23
+bits of precision.  These are `denormal' or `subnormal' numbers, and
+are the result of an underflow, such as dividing the smallest
+normalised number by two.  This behaviour is known as `gradual
+underflow', and allows the precision in a calculation to degrade
+gracefully when it underflows.  It is distinct from `Store-0
 underflow' common before the IEEE standard, in which any expression
 which underflowed was replaced by zero.  This was, and remains, one of
-the more contentious parts of the IEEE standard.
-Be warned that older Crays, which use their own floating-point format,
-have a Store-0 underflow policy, and that the
-Alpha chip, although it generally implements IEEE floats, has a
-Store-0 underflow as its default mode, and will neither produce, nor
-accept as input, denormalised numbers.
+the more contentious parts of the IEEE standard.  Be warned that older
+Crays, which use their own floating-point format, have a Store-0
+underflow policy, and that the Alpha chip, although it generally
+implements IEEE floats, has a Store-0 underflow as its default mode,
+and will neither produce, nor accept as input, denormalised numbers.
 
 <p>If the significand as well as the exponent is zero, the longword
-represents the number <m>(-1)^s \times 0</m>.  Note that the IEEE zero is
-<em>signed</em>, which allows <m>1/(+0)</m> and <m>1/(-0)</m> to be
-positive and 
-negative infinity; this can be important when doing calculations
-near branch points.
+represents the number <m>(-1)^s \times 0</m>.  Note that the IEEE zero
+is <em>signed</em>, which allows <m>1/(+0)</m> and <m>1/(-0)</m> to be
+positive and negative infinity; this can be important when doing
+calculations near branch points.
 
 <p>If the exponent is 255 and the significand is zero, the longword
 represents the value <m>(-1)^s\times\infty</m>.  That is, infinity has a
@@ -741,20 +761,74 @@ Positive infinity is generated by, for example <m>1/0</m>, or <m>\log 0</m>,
 where infinity is the mathematically correct, but otherwise
 unrepresentable, value of a calculation.
 
-<p>If the exponent is 255 and the significand is non-zero, the longword
-is <em>Not a Number</em>, usually represented by the string `NaN'.  A
-NaN is the result of an operation on invalid operands, such as <m>0/0</m> or <m>\log(-1)</m>.  NaNs have the properties that any operation which has a
-NaN as an operand has a NaN as its result; and any comparison on a
-NaN, such as <code><</code> or <code>==</code>, evaluates to False, including
-<code>NaN==NaN</code>.  Why would you want to use such a peculiar number?
-Generally you don't, and its appearance in a calculation is an error,
-which is why processors can be set to dump core when a NaN or an Infinity is
-produced.  However, it can be useful to turn off this behaviour if it
-is not off by default, and
-rather than elaborately avoid producing a NaN at each stage,
-make a check once at the end of a calculation, possibly invoking an
-alternative (possibly more expensive or special-cased) algorithm if
-any NaNs are found.
+<p>If the exponent is 255 and the significand is non-zero, the
+longword is <em>Not a Number</em>, usually represented by the string
+`NaN'.  A NaN is the result of an operation on invalid operands, such
+as <m>0/0</m> or <m>\log(-1)</m>.  NaNs have the properties that any
+operation which has a NaN as an operand has a NaN as its result; and
+any comparison on a NaN, such as <code><</code> or <code>==</code>,
+evaluates to False, including <code>NaN==NaN</code>.  Why would you
+want to use such a peculiar number?  Generally you don't, and its
+appearance in a calculation is an error, which is why processors can
+be set to dump core when a NaN or an Infinity is produced.  However,
+it can be useful to turn off this behaviour if it is not off by
+default, and rather than elaborately avoid producing a NaN at each
+stage, make a check once at the end of a calculation, possibly
+invoking an alternative (possibly more expensive or special-cased)
+algorithm if any NaNs are found.
+
+<p>Different compilers handle exceptional values in different
+ways; see <ref id="t.traptab"/>.  Of the three Starlink platforms,
+only the Alpha traps on exceptional values by default.</p>
+
+<table id="t.traptab">
+<caption>
+<px>Summary of compiler IEEE traps</px>
+</caption>
+<tabular>
+<tgroup cols="4">
+<thead>
+<row>
+<entry>Compiler</entry>
+<entry>traps enabled by default</entry>
+<entry>see</entry>
+<entry>suppress with</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry>Sun cc &amp; f77</entry>
+<entry>none</entry>
+<entry><code>-ftrap</code></entry>
+</row>
+<row>
+<entry>Alpha cc</entry>
+<entry>overflow, divide-by-zero, invalid operation</entry>
+<entry>-fptm, -ieee</entry>
+<entry>-ieee</entry>
+</row>
+<row>
+<entry>Alpha f77</entry>
+<entry>overflow, divide-by-zero, invalid operation</entry>
+<entry>-fpe</entry>
+<entry>-fpe1</entry>
+</row>
+<row>
+<entry>gcc</entry>
+<entry>none</entry>
+<entry><code>-mfp-trap-mode</code> (Alpha-gcc)</entry>
+</row>
+</tbody>
+</tgroup>
+</tabular>
+</table>
+
+<p>We have only scratched the surface of a rather intricate topic
+here.  Both Suns and Alphas have extensive <code>f77</code> and
+<code>cc</code> man-pages, which hint at the broad range of
+floating-point options available when compiling and linking your
+code.  See <ref id="s.optimnan"/> for discussion of the efficiency
+tradeoffs when using IEEE exceptional values.</p>
 
 <subsect id='s.progs' export>
 <subhead>
@@ -1662,10 +1736,10 @@ information on disk in any way it likes, and the resulting file will
 not, in general, have <m>10\times4</m> bytes in it.  That is Fortran
 unformatted I/O is machine- <em>and compiler-</em> specific, and the
 file <code>output-f.dat</code> in this example will only be readable
-using a Fortran program built using the same compiler.</p>
+in general using a Fortran program built using the same compiler.</p>
 
 
-<subsubsubsect>Use NaN and Infinity
+<subsubsubsect id=s.optimnan>Use NaN and Infinity
 <update versionid=v1.1>Mention speed tradeoffs, following comments</update>
 
 <p>As described in <ref id='s.otherfloat'/>, any operation which has a
@@ -1696,9 +1770,7 @@ they can be allowed to percolate through the rest of the calculation
 without elaborate further tests, to be checked only at the end.  This
 is possible only if the floating-point environment is set up
 <em>not</em> to generate signals on floating-point exceptions
-(see also <ref id='s.otherfloat'/>).  That is the default behaviour on
-Suns, but not on Alphas, where you need to compile with <code/-fpe1>
-rather than the default <code/-fpe>.
+(see also <ref id='s.otherfloat'/>).  
 
 <p>Note that calculations involving the exceptional values tend to run
 more slowly than those using normal values, so if your calculation
@@ -1719,6 +1791,23 @@ both slow your program down (especially in the latter case), and make
 it bigger.  You should compile your program, or at least the
 numerically intensive parts of it, without them when you are
 not debugging it. [<ref id=ta.mbt/MBT>]
+
+<subsubsubsect>Choose a fast compiler
+
+<p>Random points:
+<ul>
+<li>
+<p>This is a case where free software is not necessarily better.  Both
+Sun and Compaq expend resources on making their compilers as efficient
+as possible.  If speed is important to your application, you're
+probably best off using one of these compilers.</p>
+</li>
+
+<li>
+<p>On the Alpha, it's worth while using the Fortran~90 compiler even
+for Fortran~77 code [<ref id='ta.sg' >SG</ref>].</p>
+</li>
+</ul>
 
 <subsubsubsect id="s.ncbooks">Further reading
 
@@ -3127,10 +3216,16 @@ general comments, and information about Alpha switches.
 <update versionid="v2-0">
 <px>Added islittleendian example program</px>
 </update>
+<update versionid="v2-1">
+<px>Added download URL</px>
+</update>
 </subhead>
 
 <p>This section contains several example programs.  These are also
-distributed with the source of this document.</p>
+distributed with the source of this document.  Look in <code
+type="fspath">/star/examples/sc13*</code>.  The examples are available
+for download from 
+<url>&sc13webpage;sc13-examples.tar.gz</url>.</p>
 
 
 <subsect id="a.islittleendian.c" export="export">
