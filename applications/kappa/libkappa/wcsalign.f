@@ -4,7 +4,7 @@
 *     WCSALIGN
 
 *  Purpose:
-*     Aligns a group of 2-dimensional NDFs using World Co-ordinate System 
+*     Aligns a group of 1 or 2-dimensional NDFs using World Co-ordinate System 
 *     information.
 
 *  Language:
@@ -21,7 +21,7 @@
 *        The global status.
 
 *  Description:
-*     This application resamples a group of 2-dimensional input NDFs,
+*     This application resamples a group of 1 or 2-dimensional input NDFs,
 *     producing corresponding output NDFs which are aligned pixel-for-pixel
 *     with a specified reference NDF. 
 *
@@ -259,6 +259,9 @@
 *        Modified to use AST_RESAMPLE
 *     5-AUG-1999 (DSB):
 *        Tidied up.
+*     19-SEP-2001 (DSB):
+*        Allow use with 1-dimensional NDFs by changing kpg1_asget EXACT
+*        argument to .false.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -330,9 +333,8 @@
          CALL NDG_NDFAS( IGRP1, 1, 'READ', INDFR, STATUS )
       END IF
 
-*  Get the associated WCS FrameSet. Report an error if the NDF is not
-*  2-dimensional.
-      CALL KPG1_ASGET( INDFR, 2, .TRUE., .FALSE., .TRUE., SDIM, 
+*  Get the associated WCS FrameSet. 
+      CALL KPG1_ASGET( INDFR, 2, .FALSE., .FALSE., .TRUE., SDIM, 
      :                 SLBND, SUBND, IWCSR, STATUS )
 
 *  Set the suggested default for LBND and UBND.

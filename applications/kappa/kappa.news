@@ -23,6 +23,8 @@
    - The PSF command now has a parameter PROFOUT which allows the
    displayed profile to be saved in a 1-dimensional NDF.
 
+   - The WCSALIGN command can now be used with 1-dimensonal NDFs.
+
    - The SETAXIS command will now create AXIS arrays by copying values
    from the corresponding axis of the current Frame in the WCS component
    of the NDF.

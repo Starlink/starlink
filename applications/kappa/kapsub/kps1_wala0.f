@@ -71,6 +71,9 @@
 *        Modified to use AST_RESAMPLE<X>
 *     5-AUG-1999 (DSB):
 *        Tidied up.
+*     19-SEP-2001 (DSB):
+*        Allow use with 1-dimensional NDFs by changing kpg1_asget EXACT
+*        argument to .false.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -171,7 +174,7 @@
 
 *  Get the WCS FrameSet from the input NDF. Report an error if the NDF is not
 *  2-dimensional.
-      CALL KPG1_ASGET( INDF1, 2, .TRUE., .FALSE., .TRUE., DIM1, 
+      CALL KPG1_ASGET( INDF1, 2, .FALSE., .FALSE., .TRUE., DIM1, 
      :                 LBND1, UBND1, IWCS1, STATUS )
 
 *  Find the index of the PIXEL Frame in the input NDF.
