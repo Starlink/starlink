@@ -94,6 +94,9 @@
 *  History:
 *     1990 Apr 17 (MJC):
 *        Original version.
+*     1990 Dec 22 (MJC):
+*        Fixed bug which caused an extra loop of parsing each line buffer
+*        when there where columns beyond the last column used.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -282,9 +285,11 @@
 
             WSKIP = ORDPOS( NVAL + 1 ) - 1
 
-*          Loop until the end of the buffer.
+*          Loop until the end of the buffer. The number of values gets
+*          updated in the loop so the test must be less than its maximum
+*          value.
 
-            DO WHILE ( INDEXE .LT. NCOM .AND. NVAL .LE. DIM1 + 1 .AND.
+            DO WHILE ( INDEXE .LT. NCOM .AND. NVAL .LT. DIM1 + 1 .AND.
      :                 STATUS .EQ. SAI__OK )
 
 *             Skip to the correct word.
