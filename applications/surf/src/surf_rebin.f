@@ -105,9 +105,12 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.18  1996/11/14 02:52:54  timj
-*     Add support for AZ and NA regrids.
+*     Revision 1.19  1996/12/12 01:18:02  timj
+*     Remove CALC_AZNA_OFFSET (merged with CALC_BOL_COORDS)
 *
+c Revision 1.18  1996/11/14  02:52:54  timj
+c Add support for AZ and NA regrids.
+c
 c Revision 1.17  1996/11/07  00:20:17  timj
 c Change MAX_FILE to 100
 c
@@ -378,6 +381,7 @@ c
       REAL             OFFSET_X        ! x offset of measurement
       REAL             OFFSET_Y        ! y offset of measurement
       INTEGER          OUT_A_PTR       ! pointer to axis in output file
+      CHARACTER*40     OUTCRDS         ! dummy coord system of output map
       CHARACTER*40     OUT_COORDS      ! coordinate system of output map
       INTEGER          OUT_DATA_PTR    ! pointer to output map data array
       DOUBLE PRECISION OUT_DEC_CEN     ! apparent Dec of output map centre
@@ -1633,42 +1637,29 @@ c
 
                            IF (OUT_COORDS.EQ.'NA'.OR.
      :                          OUT_COORDS.EQ.'AZ') THEN
-
-                              CALL SCULIB_CALC_AZNA_OFFSET(OUT_COORDS,
-     :                             IN_RA_CEN,IN_DEC_CEN, LST, LAT_OBS,
-     :                             OFFSET_X, OFFSET_Y,
-     :                             N_POINT, SCUBA__MAX_POINT,
-     :                             POINT_LST, POINT_DAZ, POINT_DEL, 
-     :                             SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :                             N_BOL(FILE), BOL_CHAN,
-     :                             BOL_ADC, BOL_DU3, BOL_DU4,
-     :                             CENTRE_DU3, CENTRE_DU4,
-     :                             %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
-     :                             VAL__NBD),
-     :                             %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
-     :                             VAL__NBD),
-     :                             STATUS)
-
+                              OUTCRDS = OUT_COORDS
                            ELSE
+                              OUTCRDS = 'RA'
+                           END IF
 
-
-                              CALL SCULIB_CALC_BOL_COORDS (IN_RA_CEN,
-     :                             IN_DEC_CEN, LST, LAT_OBS,
-     :                             OFFSET_COORDS, OFFSET_X, OFFSET_Y,
-     :                             IN_ROTATION, N_POINT,
-     :                             SCUBA__MAX_POINT,
-     :                             POINT_LST, POINT_DAZ, POINT_DEL, 
-     :                             SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :                             N_BOL(FILE), BOL_CHAN,
-     :                             BOL_ADC, BOL_DU3, BOL_DU4,
-     :                             CENTRE_DU3, CENTRE_DU4,
-     :                             %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
-     :                             VAL__NBD),
-     :                             %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
-     :                             VAL__NBD),
-     :                             STATUS)
+                           CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
+     :                          IN_RA_CEN, IN_DEC_CEN, LST, LAT_OBS,
+     :                          OFFSET_COORDS, OFFSET_X, OFFSET_Y,
+     :                          IN_ROTATION, N_POINT,
+     :                          SCUBA__MAX_POINT,
+     :                          POINT_LST, POINT_DAZ, POINT_DEL, 
+     :                          SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
+     :                          N_BOL(FILE), BOL_CHAN,
+     :                          BOL_ADC, BOL_DU3, BOL_DU4,
+     :                          CENTRE_DU3, CENTRE_DU4,
+     :                          %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
+     :                          VAL__NBD),
+     :                          %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
+     :                          VAL__NBD),
+     :                          STATUS)
 
 *     convert the coordinates to apparent RA,Dec on MJD_STANDARD
+                           IF (OUTCRDS .EQ. 'RA') THEN
 
                               IF (FILE .NE. 1) THEN
                                  CALL SCULIB_STANDARD_APPARENT (
