@@ -392,8 +392,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableFactory.java:33: warning - Tag @link: reference not found: uk.ac.starlink.formats.WDCTableBuilder
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:31: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -407,10 +406,10 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 86 warnings
+  [javadoc] 85 warnings
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 6 minutes 26 seconds
+Total time: 6 minutes 33 seconds

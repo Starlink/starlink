@@ -471,7 +471,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 60 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 62 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -542,7 +542,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1286 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1290 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
