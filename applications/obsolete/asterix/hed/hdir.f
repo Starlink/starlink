@@ -28,8 +28,8 @@
 *     ?? ??? ?? : V1.0-0  Original (BHVAD::RJV)
 *      8 May 92 : V1.6-1  Tidied up. Device name lengthed. (BHVAD::DJA)
 *      4 May 94 : V1.7-0  Use AIO for proper UNIX output (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     28 Feb 97 : V2.1-1 (RJV)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     28 Feb 97 : V2.1-0  Make seperator line correct length (RJV)
 *
 *    Type Definitions :
 *
@@ -53,7 +53,7 @@
 *    Version id :
 *
       CHARACTER*30 		VERSION
-        PARAMETER 		( VERSION = 'HDIR Version 2.1-1' )
+        PARAMETER 		( VERSION = 'HDIR Version 2.1-0' )
 *-
 
 *    Version number
