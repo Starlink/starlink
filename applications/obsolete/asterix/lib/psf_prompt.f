@@ -884,7 +884,7 @@
       IF ( SMTYPE .EQ. PSF_PGRID ) THEN
         CALL ADI_CPUT0I( PSID, 'ModelNr', NR, STATUS )
         CALL ADI_CPUT0I( PSID, 'ModelNaz', NA, STATUS )
-        CALL ADI_CPUT0I( PSID, 'ModelReg', PREG, STATUS )
+        CALL ADI_CPUT0L( PSID, 'ModelReg', PREG, STATUS )
         IF ( PREG ) THEN
           CALL ADI_CPUT0R( PSID, 'ModelDr', DR, STATUS )
         ELSE
@@ -898,7 +898,7 @@
 *  Set model flag if ok
  99   IF ( STATUS .NE. SAI__OK ) THEN
 	CALL MSG_PRNT( '! ^REASON in model specification' )
-	CALL AST_REXIT( 'PSF_MODEL_PARSE', STATUS )
+	CALL AST_REXIT( 'PSF_PAR_SPATIAL', STATUS )
       END IF
 
       END
