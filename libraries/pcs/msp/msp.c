@@ -10,6 +10,7 @@
                   where overlong messages may be received (AJC)
       14Sep 1999: Remove (with #if 0) declaration of exit handler.
                   It must now be done at a higher level. (DLT)
+      2 Jul 2004: Now use mkfifo if available. Fix bug in mknod call (TIMJ)
 */
 
 #include <sys/time.h>
@@ -792,7 +793,13 @@ int *status              /* global status (given and returned) */
 
    sprintf ( rendezvous, "%s/%s_%d", adam_user, task_name, portno );
 
-   istat = mknod ( rendezvous, S_IFIFO, S_IRWXU );
+#if HAVE_MKFIFO
+   istat = mkfifo ( rendezvous, S_IRWXU );
+#elif HAVE_MKNOD
+   istat = mknod ( rendezvous, S_IFIFO | S_IRWXU, 0 );
+#else
+#  error "Do not know how to create a FIFO"
+#endif
 
    if ( istat < 0 ) 
    {

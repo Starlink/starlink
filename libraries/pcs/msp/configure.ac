@@ -20,6 +20,9 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+dnl    On OSX you need to be root to run mknod
+AC_CHECK_FUNCS([mkfifo mknod])
+
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae sock])
 STAR_DECLARE_DEPENDENCIES([link],  [sock])
