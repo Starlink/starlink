@@ -57,6 +57,7 @@
 *     13 Sep 93 : V1.7-1  Allow non-integer widths (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     26 Mar 95 : V1.8-1 Use new data interface (DJA)
+*      5 Sep 95 : V1.8-2 Don't upper case mask name (DJA)
 *
 *    Type definitions :
 *
@@ -76,6 +77,10 @@
       INTEGER NMASK,NMAX
       PARAMETER (NMASK=256)
       PARAMETER (NMAX=16384)
+*
+*    External References:
+*
+      LOGICAL CHR_SIMLR
 *
 *    Local variables :
 *
@@ -137,7 +142,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'SMOOTH Version 1.8-1')
+        PARAMETER  (VERSION = 'SMOOTH Version 1.8-2')
 *-
 
 *    Check status
@@ -299,8 +304,6 @@ C1000    FORMAT(' Smoothing ',4A)
       CALL USI_GET0C('MSK_DO',DO,STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-        CALL CHR_UCASE(DO)
-*
 	IF (DO .EQ. 'Y') THEN
 	   IF (.NOT.LDQUAL) THEN
 	      CALL MSG_PRNT('   No quality array so no gap info.')
@@ -332,7 +335,7 @@ C1000    FORMAT(' Smoothing ',4A)
 *
 * Now set up mask
 *   Top-hat
-	  IF(MASK(1:3).EQ.'TOP') THEN
+	  IF(CHR_SIMLR(MASK(1:3),'TOP')) THEN
 *
             JUMPOUT=.FALSE.
             DO WHILE (.NOT. JUMPOUT)
@@ -359,7 +362,7 @@ C1000    FORMAT(' Smoothing ',4A)
 	      IF(IABS(LM2-J).LE.LL) RMASK(J)=RN
 	    ENDDO
 C   Laplacian mask
-	  ELSEIF(MASK(1:3).EQ.'LAP') THEN
+	  ELSEIF(CHR_SIMLR(MASK(1:3),'LAP')) THEN
 		LM2=2
 		LMASK=4
 		DO J=1,LMASK
@@ -414,7 +417,7 @@ C   Gaussian
 		DO J=1,LMASK
 			RMASK(J)=RMASK(J)*TT
 		ENDDO
-	  ELSEIF(MASK(1:3).EQ.'COS') THEN
+	  ELSEIF(CHR_SIMLR(MASK(1:3),'COS')) THEN
 C  Cosine bell
                 JUMPOUT=.FALSE.
                 DO WHILE (.NOT. JUMPOUT)
