@@ -27,8 +27,12 @@
 *        is blank, "AGI_WORLD" is used.
 *     7) Any other suitable Frame.
 *
-*     An error is reported if alignment is not possible, and a message 
-*     identifying the alignment Frame is displayed if alignment is possible.
+*     For each of these Domains, the current Frame is checked first. An error 
+*     is reported if alignment is not possible, and a message identifying the 
+*     alignment Frame is displayed if alignment is possible.
+*
+*     If either FrameSet contains a second Frame with the same Domain as
+*     the alignment Frame then a warning is issued.
 
 *  Arguments:
 *     IWCS1 = INTEGER (Given)
@@ -60,6 +64,10 @@
 *        Added SKY and PIXEL before GRID is Domain search path.
 *     8-JAN-2003 (DSB):
 *        Added SPECTRUM to Domain search path.
+*     11-FEB-2005 (DSB):
+*        - Check current Frames first.
+*        - Issue warning if more than one Frame with the alignment Domain
+*          exists in either FrameSet.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -88,16 +96,18 @@
       CHARACTER DOM*80           ! Domain of Current Frame in FrameSet
       CHARACTER DOMLST*255       ! Domain search list
       CHARACTER TEXT*30          ! General text string
+      INTEGER I                  ! Frame Index
       INTEGER IAT                ! No. of characters in string
       INTEGER IBASE1             ! Index of original Base Frame in IWCS1
       INTEGER IBASE2             ! Index of original Base Frame in IWCS2
+      INTEGER ICURR1             ! Index of Current Frame in IWCS1
       INTEGER ICURR2             ! Index of Current Frame in IWCS2
       INTEGER IMAT1              ! Index of alignment Frame in IWCS1 
       INTEGER IMAT2              ! Index of alignment Frame in IWCS2
       INTEGER MAP                ! Simplified mapping between two Frames
       INTEGER NFRM1              ! No. of Frames supplied in IWCS1
       INTEGER TEMP               ! AST pointer to a FrameSet
-
+      LOGICAL WARNED             ! Warning of duplicate Frames issued?
 *.
 
 *  Check the inherited status. 
@@ -106,13 +116,12 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Note the indices of the Base Frames in the two FrameSets so that they 
-*  can be re-instated after AST_CONVERT has changed them.
+*  Note the indices of the Base and Currrent Frames in the two FrameSets so 
+*  that they can be re-instated after AST_CONVERT has changed them.
       IBASE1 = AST_GETI( IWCS1, 'BASE', STATUS )
       IBASE2 = AST_GETI( IWCS2, 'BASE', STATUS )
 
-*  Note the index of the Current Frames in the IWCS2 so that it can be 
-*  re-instated later.
+      ICURR1 = AST_GETI( IWCS1, 'CURRENT', STATUS )
       ICURR2 = AST_GETI( IWCS2, 'CURRENT', STATUS )
 
 *  Note the number of Frames supplied in IWCS1.
@@ -142,6 +151,13 @@
       ELSE
          CALL CHR_APPND( 'AGI_WORLD,', DOMLST, IAT )
       END IF
+
+*  If a FrameSet contains two Frames with the same Domain name, one of
+*  which is the current Frame, we want to give preference to the current
+*  Frame. To do this, ensure that the current Frame is considered first by
+*  setting the base Frame in each FrameSet to be the current Frame.
+      CALL AST_SETI( IWCS1, 'BASE', ICURR1, STATUS )
+      CALL AST_SETI( IWCS2, 'BASE', ICURR2, STATUS )
 
 *  Attempt to align the FrameSets. If succesfull, a new FrameSet is 
 *  returned describing the relationship between the Current Frames in 
@@ -201,18 +217,47 @@
 
 *  If succesful, tell the user what Domain alignment was performed in.
       IF( .NOT. QUIET ) THEN
+         DOM = AST_GETC( AST_GETFRAME( IWCS2, AST__BASE, STATUS ),
+     :                   'Domain', STATUS ) 
+
          TEXT = ' '
          IAT = IND
          CALL CHR_APPND( 'Alignment', TEXT, IAT )
          CALL MSG_SETC( 'AL', TEXT( : IAT ) )
-
-         CALL MSG_SETC( 'DOM', AST_GETC( 
-     :                  AST_GETFRAME( IWCS2, AST__BASE, STATUS ),
-     :                  'Domain', STATUS ) )
-
+         CALL MSG_SETC( 'DOM', DOM )
          CALL MSG_OUT( 'KPG1_ASMRG_1', '^AL has occurred '//
      :                  'within the ^DOM Domain.', STATUS )
          CALL MSG_BLANK( STATUS )
+
+*  Issue a warning if either FrameSet contains another Frame with the
+*  same Domain.
+         WARNED = .FALSE.
+         DO I = 1, AST_GETI( IWCS1, 'NFRAME', STATUS )
+            IF( I .NE. IMAT1 .AND. .NOT. WARNED ) THEN
+               IF( AST_GETC( AST_GETFRAME( IWCS1, I, STATUS ),
+     :                       'Domain', STATUS ) .EQ. DOM ) THEN
+                  CALL MSG_OUT( 'KPG1_ASMRG_2', 'WARNING: More than '//
+     :               'one Frame with this Domain was found in the '//
+     :               'data and so alignment is ambiguous and may be '//
+     :               'incorrect.', STATUS )
+                  WARNED = .TRUE.
+               END IF
+            END IF
+         END DO
+
+         DO I = 1, AST_GETI( IWCS2, 'NFRAME', STATUS )
+            IF( I .NE. IMAT2 .AND. .NOT. WARNED ) THEN
+               IF( AST_GETC( AST_GETFRAME( IWCS2, I, STATUS ),
+     :                       'Domain', STATUS ) .EQ. DOM ) THEN
+                  CALL MSG_OUT( 'KPG1_ASMRG_3', 'WARNING: More than '//
+     :               'one Frame with this Domain was found in the '//
+     :               'data and so alignment is ambiguous and may be '//
+     :               'incorrect.', STATUS )
+                  WARNED = .TRUE.
+               END IF
+            END IF
+         END DO
+
       END IF
 
 *  Get a simplified Mapping connecting the two Frames.
