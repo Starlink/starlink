@@ -225,7 +225,7 @@
 
 *  Now do the WCS coords. Transform the pixel coords to WCS coords.
             DO I = 1, NDIM
-               POSIN( I ) = DBLE( MINP( I ) ) + 0.5D0
+               POSIN( I ) = DBLE( MINP( I ) ) - 0.5D0
             END DO
             CALL AST_TRANN( MAP, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
      :                      POS, STATUS )
@@ -273,7 +273,7 @@
 
 *  Now do the WCS coords. Transform the pixel coords to WCS coords.
             DO I = 1, NDIM
-               POSIN( I ) = DBLE( MAXP( I ) ) + 0.5D0
+               POSIN( I ) = DBLE( MAXP( I ) ) - 0.5D0
             END DO
             CALL AST_TRANN( MAP, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
      :                      POS, STATUS )
