@@ -145,8 +145,18 @@ interface FINDOFF
       access  READ
       vpath   'CURRENT,DEFAULT'
       ppath   'CURRENT,DEFAULT'
-      default true
+      default TRUE
       prompt  'Use NDF World Coordinate System extension if it exists'
+      helpkey '*'
+   endparameter
+
+   parameter RESTRICT
+      type    _LOGICAL
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default FALSE
+      prompt  'Restrict possible matches to apparently overlapping zones'
       helpkey '*'
    endparameter
 
