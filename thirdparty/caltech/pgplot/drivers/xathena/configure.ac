@@ -60,7 +60,7 @@ AC_CHECK_LIB(Xaw, XawInitializeWidgetSet, set have_xalib = "yes" )
 
 AM_CONDITIONAL( HAVE_XATHENA, \
    [(test "$have_xa3dheader" = "yes" || test "$have_xaheader" = "yes") && \
-    (test "$test_xa3dlib" = "yes" || test "$test_xadlib" = "yes")] )
+    (test "$have_xa3dlib" = "yes" || test "$have_xadlib" = "yes")] )
 
      
 dnl    Should investigate whether we really need this for a non-starlink
