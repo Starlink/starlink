@@ -156,6 +156,9 @@
 #           dynamic mode for the system libraries.  Additional link
 #           flags may also be added, for instance, additional libraries
 #           linking on Solaris 2.x systems.
+#
+#        LDLIBS ()
+#           Extra link libraries.  Needed for Solaris.
 #           
 #        LINK (ln)
 #           The command required to establish a link to a file.  The
@@ -253,6 +256,7 @@
       export LINK
       export LDFLAG1
       export LDFLAG2
+      export LDLIBS
       export SOURCE_VARIANT
       export RANLIB
       export TAR_IN
@@ -327,6 +331,7 @@
                CFLAGS='-I$(STAR_INC) -O -K PIC -Dsun4_Solaris'
                FC='f77'
                FFLAGS='-O1 -PIC -e -Nc50 -Nl100'
+               LDLIBS='-lsocket -lnsl'
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'

@@ -373,10 +373,15 @@ AR_IN = ar -r
 ELINK = $(FC) -O
 
 #  Linker flags.  These are placed either side of the library list
-#  and are used adding system-dependent linker flags to link commands.
+#  and are used to system-dependent linker flags to link commands.
 
 LDFLAG1 =
 LDFLAG2 =
+
+#  Extra link libraries.  Needed for Solaris.  We don't use LDFLAG2 since
+#  that gets in teh way of static linking.
+
+LDLIBS =
 
 #-------------------------------------------------------------------------------
 ################################################################################
@@ -408,7 +413,7 @@ PKG_LINK = DIPSO
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 3.5-6
+PKG_VERS = 3.5-7
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -693,12 +698,12 @@ libdipso.a: $(O_SUB1)
 
 $(EXE_1): $(EXE_1_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ELINK) $(EXE_1_OBJECT) -o $(EXE_1) $(OBJECT_LIBRARIES) \
-           $(LDFLAG1) -L. $(ADDLIBS) -L$(STAR_LIB) `./$(LINK_SCRIPT)` $(LDFLAG2)
+           $(LDFLAG1) -L. $(ADDLIBS) -L$(STAR_LIB) `./$(LINK_SCRIPT)` $(LDFLAG2) $(LDLIBS)
 
 my_dipso: ./user.o $(MY_OBJECTS)
 	$(ELINK) $(DIPSOLIB)/$(EXE_1_OBJECT) -o $(EXE_1) ./user.o \
            $(MY_OBJECTS) $(LDFLAG1) $(ADDLIBS) -L$(DIPSOLIB) \
-           -L$(STAR_LIB) `$(DIPSOLIB)/$(LINK_SCRIPT)` $(LDFLAG2)
+           -L$(STAR_LIB) `$(DIPSOLIB)/$(LINK_SCRIPT)` $(LDFLAG2) $(LDLIBS)
 	chmod 755 $(EXE_1)
 	strip $(EXE_1)
 	@ echo " " 
