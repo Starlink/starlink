@@ -97,6 +97,7 @@
       EXTERNAL			BDI1_MAP
       EXTERNAL			BDI1_MAPERR
       EXTERNAL			BDI1_MAPLQ
+      EXTERNAL			BDI1_MAPMQ
       EXTERNAL			BDI1_PUT
       EXTERNAL			BDI1_UNMAP
 
@@ -168,6 +169,10 @@
         CALL ADI_DEFFUN(
      :    'FileItemMap(_BinDS,_HDSfile,"LogicalQuality",_CHAR,_CHAR)',
      :                   BDI1_MAPLQ, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :    'FileItemMap(_BinDS,_HDSfile,"MaskedQuality",_CHAR,_CHAR)',
+     :                   BDI1_MAPMQ, DID, STATUS )
 
         CALL ADI_DEFFUN(
      :       'FileItemPut(_,_HDSfile,_CHAR,_)',
