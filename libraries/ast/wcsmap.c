@@ -157,6 +157,10 @@ f     The WcsMap class does not define any new routines beyond those
 *        Transform.
 *     23-APR-2004 (DSB):
 *        Changes to simplification algorithm.
+*     1-SEP-2004 (DSB):
+*        CopyPV rewritten to avoid assumption that the input and output
+*        WcsMaps have the same number of axes and that the lon/lat axes have 
+*        the same indices.
 *class--
 */
 
@@ -1155,7 +1159,12 @@ static void CopyPV( AstWcsMap *in, AstWcsMap *out ) {
 
 /* Local Variables: */
    int i;                        /* Axis index */
-   int naxis;                    /* No. of axis in the WcsMap */
+   int latax_in;                 /* Index of input latitude axis */
+   int latax_out;                /* Index of output latitude axis */
+   int lonax_in;                 /* Index of input longitude axis */
+   int lonax_out;                /* Index of output longitude axis */
+   int nax_in;                   /* No. of axis in the input WcsMap */
+   int nax_out;                  /* No. of axis in the output WcsMap */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1171,27 +1180,43 @@ static void CopyPV( AstWcsMap *in, AstWcsMap *out ) {
    are no projection parameters. */
    if( in->np && in->p ){
 
-/* Store the number of axes in the WcsMap */
-      naxis = astGetNin( in );
+/* Store the number of axes in the input and output WcsMaps */
+      nax_in = astGetNin( in );
+      nax_out = astGetNin( out );
 
-/* Copy the array holding the number of projection parameters associated
-   with each axis. */
-      out->np = (int *) astStore( NULL, (void *) in->np, sizeof(int)*naxis );
+/* Allocate memory for the array holding the number of projection parameters 
+   associated with each axis. */
+      out->np = (int *) astMalloc( sizeof( int )*nax_out );
 
 /* Allocate memory for the array of pointers which identify the arrays
    holding the parameter values. */
-      out->p = (double **) astMalloc( sizeof( double *)*naxis );
+      out->p = (double **) astMalloc( sizeof( double *)*nax_out );
 
-/* Check this pointer can be used */
+/* Check pointers can be used */
       if( astOK ) {
 
-/* Loop round each axis. */
-         for( i = 0; i < naxis; i++ ){
-
-/* Copy the array holding the projection parameter values for this axis. */
-            out->p[ i ] = (double *) astStore( NULL, (void *) in->p[ i ], 
-                                               sizeof(double)*in->np[ i ] );
+/* Initialise the above arrays. */
+         for( i = 0; i < nax_out; i++ ) {
+            (out->np)[ i ] = 0;
+            (out->p)[ i ] = NULL;
          }
+
+/* Copy the longitude and latitude values from in to out (other axes do
+   not have projection parameters). */
+         lonax_in = astGetWcsAxis( in, 0 );
+         latax_in = astGetWcsAxis( in, 1 );
+         lonax_out = astGetWcsAxis( out, 0 );
+         latax_out = astGetWcsAxis( out, 1 );
+
+         (out->np)[ lonax_out ] = (in->np)[ lonax_in ];
+         (out->p)[ lonax_out ] = (double *) astStore( NULL, 
+                                          (void *) (in->p)[ lonax_in ], 
+                                          sizeof(double)*(in->np)[ lonax_in ] );
+
+         (out->np)[ latax_out ] = (in->np)[ latax_in ];
+         (out->p)[ latax_out ] = (double *) astStore( NULL, 
+                                          (void *) (in->p)[ latax_in ], 
+                                          sizeof(double)*(in->np)[ latax_in ] );
       }
 
 /* If an error has occurred, free the output arrays. */

@@ -107,6 +107,8 @@ f     The MatrixMap class does not define any new routines beyond those
 *     8-JUL-2004 (DSB):
 *        astMtrMult - Report an error if either MatrixMap does not have a
 *        defined forward transformation.
+*     1-SEP-2004 (DSB):
+*        Ensure do1 and do2 are initialised before use in MapMerge.
 *class--
 */
 
@@ -1563,6 +1565,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                                   ( *invert_list )[ where + 1 ], &do2 );
             } else {
                swaphi = 0;
+               do2 = 0;
             }
 
 /* If so, step through each of the Mappings which follow the MatrixMap, 
@@ -1607,6 +1610,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                                   ( *invert_list )[ where ], &do1 );
             } else {
                swaplo = 0;
+               do1 = 0;
             }
 
             nstep1 = -1;

@@ -76,6 +76,8 @@ f     The WinMap class does not define any new routines beyond those
 *        (e.g. WinPerm, etc), to simplify the returned Mappings.
 *     23-APR-2004 (DSB):
 *        Changes to simplification algorithm.
+*     1-SEP-2004 (DSB):
+*        Ensure do1 and do2 are initialised before use in MapMerge.
 *class--
 */
 
@@ -1064,6 +1066,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                                   ( *invert_list )[ where + 1 ], &do2 );
             } else {
                swaphi = 0;
+               do2 = 0;
             }
 
 /* If so, step through each of the Mappings which follow the WinMap, 
@@ -1108,6 +1111,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                                   ( *invert_list )[ where ], &do1 );
             } else {
                swaplo = 0;
+               do1 = 0;
             }
 
             nstep1 = -1;
