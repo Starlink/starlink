@@ -340,6 +340,8 @@ class Ccdtop {
                set hadconfig 0
                bind $itk_interior <Configure> [ code set hadconfig 1 ]
             }
+         } else {
+            $waitwin configure -text "$msg..."
          }
       }
 
