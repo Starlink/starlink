@@ -287,7 +287,7 @@
       IF( VAR ) THEN
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
          NMAT = NLIN*( NLIN + 1 )/2 
-         IF( IMETH .NE. 2 ) THEN
+         IF( IMETH .NE. 1 .AND. IMETH .NE. 2 ) THEN
             CALL PSX_CALLOC( NLIN*NMAT, '_DOUBLE', IPCOV, STATUS )
          ELSE
             IPCOV = IPPP
@@ -316,7 +316,8 @@
          END IF
 
          CALL PSX_FREE( IPPP, STATUS )
-         IF( IMETH .NE. 2 ) CALL PSX_FREE( IPCOV, STATUS )
+         IF( IMETH .NE. 1 .AND. IMETH .NE. 2 ) CALL PSX_FREE( IPCOV, 
+     :                                                        STATUS )
 
 *  Now deal with cases where input variances are not available. No output
 *  variances will be created.
