@@ -1169,7 +1169,12 @@ sub whash {
   my (@bounds, $nbytes, $pntr, $maxsize, $which, $el, $path);
   my ($oldhash, $oldtypes, $structs);
  
-  %header = %$hash;
+  if (defined $hash) {
+    %header = %$hash; 
+  } else {
+    %header = {};
+  }
+
  
   my $root = 1 if length($hashname) == 0; # Mark a ROOT structure
   
