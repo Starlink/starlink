@@ -782,7 +782,7 @@ dist:
      [copy] Copying 26 files to /apps/cvsbuild/java/source/splat/bin/splat
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
-     [copy] Copying 435 files to /apps/cvsbuild/java/source/splat/docs/splat
+     [copy] Copying 513 files to /apps/cvsbuild/java/source/splat/docs/splat
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -792,9 +792,9 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/splat
 [loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 211 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 251 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 224 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 262 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/etc
      [echo] Executing Mirage target: install
@@ -1121,4 +1121,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 58 seconds
+Total time: 4 minutes 5 seconds

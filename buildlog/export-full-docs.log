@@ -2148,8 +2148,8 @@ dist:
 install:
 [loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 211 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 224 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 251 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 262 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
      [echo] Executing Mirage target: install
 
@@ -2341,4 +2341,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 54 seconds
+Total time: 5 minutes 13 seconds

@@ -319,7 +319,7 @@ build:
     [javac] Compiling 165 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 67 files to /apps/cvsbuild/java/source/splat/build/classes
+     [copy] Copying 68 files to /apps/cvsbuild/java/source/splat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
      [copy] Copying 9 files to /apps/cvsbuild/java/source/splat/lib/splat
 
