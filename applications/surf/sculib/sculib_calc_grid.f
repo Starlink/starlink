@@ -170,10 +170,13 @@
             YMIN = 0.0
             XSPACE = 0.0
             YSPACE = 0.0
-            NX = 0
-            NY = 0
+
+*     Setup a 1D grid if irregular - one point at each position
+*     This is not the observed mesh but it allows for the maps to be made
+            NX = N
+            NY = 1
             DO I = 1, N
-               IPOS (I) = 1
+               IPOS (I) = I
                JPOS (I) = 1
             END DO
 
@@ -181,6 +184,8 @@
 
 *  calculate other mesh parameters and pointers connecting jiggle index to
 *  mesh coordinates
+*     It is possible to get to this point by using a zero offset jiggle
+*     ub X or Y. We need to trap for that to prevent division by zero
 
             IF (XMAX .EQ. XMIN) THEN
                NX = 1
@@ -193,10 +198,25 @@
                NY = NINT((YMAX - YMIN)/YSPACE) + 1
             END IF
 
-            DO I = 1, N
-               IPOS (I) = NINT((X(I) - XMIN)/XSPACE) + 1
-               JPOS (I) = NINT((Y(I) - YMIN)/YSPACE) + 1
-            END DO
+            IF (YSPACE .GT. 1.0E-10) THEN
+               DO I = 1, N
+                  IPOS (I) = NINT((X(I) - XMIN)/XSPACE) + 1
+               END DO
+            ELSE
+               DO I = 1, N
+                  IPOS (I) = 0
+               END DO
+            END IF
+
+            IF (YSPACE .GT. 1.0E-10) THEN
+               DO I = 1, N
+                  JPOS (I) = NINT((Y(I) - YMIN)/YSPACE) + 1
+               END DO
+            ELSE
+               DO I = 1, N
+                  JPOS (I) = 0
+               END DO
+            END IF
 
          END IF
       END IF
