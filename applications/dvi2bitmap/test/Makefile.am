@@ -28,7 +28,8 @@ DVI2BITMAP = ../dvi2bitmap
 	dt2dv $< $@ >$@.log 2>&1
 
 check_PROGRAMS = $(TESTS)
-LDFLAGS = -all-static
+# t6.test forks and execs itself, so it must be linked statically
+t6_test_LDFLAGS = -static
 LDADD = ../libdvi2bitmap.la
 CPPFLAGS = -I..
 t1_test_SOURCES = t1.cc
