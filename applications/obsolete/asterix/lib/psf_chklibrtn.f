@@ -56,13 +56,15 @@
       INTEGER                   ICMP                    ! Loop over list
       INTEGER                   NPSF                    ! # psfs
       INTEGER                   PID                     ! A particular psf
+
+      LOGICAL			FOUND			! Found a psf?
 *-
 
 *  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialised?
-      IF ( .NOT. PSF_INIT ) CALL PSF_INIT( STATUS )
+      IF ( .NOT. PSFINIT ) CALL PSF_INIT( STATUS )
 
 *  Find number of psfs
       CALL ADI_NCMP( P_PLIST, NPSF, STATUS )
