@@ -140,6 +140,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.28  1999/03/24 00:28:55  timj
+*     Initial release of RASTER skydip mode.
+*
 *     Revision 1.27  1998/06/06 03:23:24  timj
 *     Add errors - store as parameters
 *
@@ -276,23 +279,29 @@ c
       PARAMETER (N_MODEL = 100)
       CHARACTER * 8 TSKNAME             ! Name of task
       PARAMETER (TSKNAME = 'SKYDIP')
+      REAL A_MAX                        ! Max acceleration of telescope
+      PARAMETER (A_MAX = 0.15 * DEG2RAD) ! 0.15/deg/sec/sec
+      REAL V_MAX                        ! Max velocity of telescope
+      PARAMETER (V_MAX = 0.7 * DEG2RAD) ! 0.7 deg/sec
+      REAL MAX_FIT_DATA                 ! Max number of points
+      PARAMETER (MAX_FIT_DATA = SCUBA__MAX_MEAS) ! allowed in input data
 
 *    Local variables :
       LOGICAL ABORTED                   ! Was the observation aborted
       REAL    AIR_MODEL(N_MODEL)        ! Airmass values for MODEL
-      REAL    AIRMASS(SCUBA__MAX_MEAS)  ! Array of AIRMASS data
-      REAL    AIRMASST(SCUBA__MAX_MEAS)  ! First Array of AIRMASS data
+      REAL    AIRMASS(MAX_FIT_DATA)     ! Array of AIRMASS data
+      REAL    AIRMASST(MAX_FIT_DATA)    ! First Array of AIRMASS data
       REAL    AIRMASS_START             ! Start airmass
       REAL    AIRMASS_END               ! End airmass
-      REAL    AIRMASS_TVAR(SCUBA__MAX_MEAS)! First Array of AIRMASS variance
-      REAL    AIRMASS_VAR(SCUBA__MAX_MEAS)! Array of AIRMASS variance
+      REAL    AIRMASS_TVAR(MAX_FIT_DATA)! First Array of AIRMASS variance
+      REAL    AIRMASS_VAR(MAX_FIT_DATA) ! Array of AIRMASS variance
       REAL    AIRSTEP                   ! AIRMASS increment for DO loop
       INTEGER AREF                      ! Pointer to axis data
-      REAL         AV_DATA(SCUBA__MAX_SUB, SCUBA__MAX_MEAS) 
+      REAL    AV_DATA(SCUBA__MAX_SUB, SCUBA__MAX_MEAS) 
                                         ! Average skydip
-      BYTE         AV_QUAL(SCUBA__MAX_SUB, SCUBA__MAX_MEAS) 
+      BYTE    AV_QUAL(SCUBA__MAX_SUB, SCUBA__MAX_MEAS) 
                                         ! Quality of AV_QUAL
-      REAL         AV_VAR(SCUBA__MAX_SUB, SCUBA__MAX_MEAS)  
+      REAL    AV_VAR(SCUBA__MAX_SUB, SCUBA__MAX_MEAS)  
                                         ! Var for average skydip
       REAL    B                         ! requested B
       REAL    B_ERROR                   ! Error in B
@@ -311,6 +320,11 @@ c
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! dU4 Nasmyth coord of bolometers
       LOGICAL CVAR                      ! Use constant variance?
+      REAL    EXPOSURE_TIME             ! Exposure time per sample
+      DOUBLE PRECISION DAIRMASST(MAX_FIT_DATA)
+                                        ! Tmp DBL airmass array for RASTER
+      DOUBLE PRECISION DAIRMASS_TVAR(MAX_FIT_DATA)
+                                        ! DBL airmass var array for RASTER
       INTEGER DIM (MAXDIM)              ! the dimensions of an array
       REAL    DEFAULT_ETA_TEL           ! Eta tel read from FITS header
       INTEGER DREF                      ! Pointer to output data
@@ -323,6 +337,11 @@ c
       INTEGER DUMMY_PTR_END             ! Scratch space 4 end
       INTEGER DUMMY_PTR                 ! Scratch space 4
       REAL    EL                        ! Elevation in radians used for loop
+      REAL    EL0                       ! Elevation at start of measurement
+      REAL    EL1                       ! Elevation at T1
+      REAL    EL2                       ! Elevation at T2
+      REAL    ELEV                      ! Elevation of next integration
+      REAL    ELEV_STEP                 ! Elevation increment
       REAL    END_EL                    ! End elevation of skydip
       REAL    ETA_ERROR                 ! Error in ETA_TEL
       REAL    ETA_TEL                   ! Telescope efficiency
@@ -335,6 +354,7 @@ c
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
       CHARACTER*(DAT__SZLOC) FITS_LOC   ! HDS locator to FITS structure
+      REAL    FSIGN                     ! Used to store sign information +/-
       INTEGER GOOD                      ! dummy status for PAR_PUT/GOODFIT
       INTEGER I                         ! DO loop index
       INTEGER IERR                      ! For VEC_
@@ -355,6 +375,7 @@ c
       INTEGER LBND (MAXDIM)             ! lower bounds of array
       CHARACTER*(DAT__SZLOC) LOC1       ! Dummy locator
       DOUBLE PRECISION MEAN             ! Mean of measurement
+      INTEGER MEASUREMENT               ! Measurement loop counter
       DOUBLE PRECISION MEDIAN           ! Median of measurement
       INTEGER NDIM                      ! the number of dimensions in an array
       INTEGER NERR                      ! For VEC_
@@ -372,6 +393,7 @@ c
       INTEGER N_SUB                     ! number of sub-instruments used
       INTEGER N_SWITCHES                ! number of switches per exposure
       CHARACTER*15 OBSERVING_MODE       ! type of observation
+      INTEGER OFFSET                    ! Offset in array
       INTEGER OUT_AXIS_PTR              ! pointer to axis of observed output file
       INTEGER OUT_DATA_PTR              ! pointer to data array of output file
       CHARACTER *80 OUT_NAME            ! Name of output NDF
@@ -380,8 +402,10 @@ c
       CHARACTER * 15 PARAM              ! Name of output file parameter
       INTEGER PLACE                     ! A placeholder
       REAL    QSORT(SCUBA__MAX_INT)     ! Scratch space for SCULIB_STATR
+      LOGICAL RASTER                    ! True if this is on-the-fly skydip
       LOGICAL RESW                      ! Was the data reduce_switched
       REAL    REXISQ                    ! Reduced chi square
+      REAL    RTEMP                     ! Temp real
       INTEGER RUN_NUMBER                ! run number of observation
       DOUBLE PRECISION SIGMA            ! Sigma of difference between model/dat
       LOGICAL SKYDIP                    ! .TRUE. if not RAW data
@@ -402,6 +426,10 @@ c
       REAL    TAU_ERROR                 ! Error in tau
       REAL    TAUZ_FIT                  ! Fitted TAU
       CHARACTER * 15 TITLE              ! File title
+      REAL    T                         ! A time
+      REAL    T1                        ! Time1 - raster
+      REAL    T2                        ! Time2 - raster
+      REAL    T3                        ! Time3 - raster
       REAL    T_AMB                     ! Temperature of ambient load
       REAL    T_COLD                    ! Temperature of cold load
       REAL    T_TEL                     ! Temperature of telescope
@@ -615,13 +643,24 @@ c
 
       END IF
 
+*     Read the SAM_MODE flag from the header
 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'SAM_MODE',
+     :     STEMP, STATUS)
+
+      IF (STEMP .EQ. 'RASTER') THEN 
+         RASTER = .TRUE.
+      ELSE
+         RASTER = .FALSE.
+      END IF
 
 *     I should use automatic quality masking but the SCULIB_STATR
 *     routine uses a quality mask so it is easier to just map it
 *     rather than trying to change an existing routine
+*     We do use automatic quality masking for RASTER mode data
+*     since that does not use SCULIB_STATR
 
-      IF (RESW) THEN
+      IF (RESW .AND. .NOT. RASTER) THEN
 
          CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'READ', IN_QUAL_PTR,
      :        ITEMP, STATUS)
@@ -730,6 +769,39 @@ c
 
       END IF
 
+      IF (RASTER) THEN
+         CALL MSG_SETC ('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ',
+     :        '^PKG: Skydip was taken in RASTER mode', STATUS)
+      END IF
+
+*     Check that we haven't exceeded array bounds
+*     For RASTER, N_POS should not exceed MAX_FIT_DATA
+
+      IF (STATUS .EQ. SAI__OK) THEN
+
+         IF (RASTER) THEN
+            IF (N_POS .GT. MAX_FIT_DATA) THEN
+               CALL MSG_SETI('MAX',MAX_FIT_DATA)
+               CALL MSG_SETI('ACT', N_POS)
+               CALL MSG_SETI('TSK',TSKNAME)
+               STATUS = SAI__ERROR
+               CALL ERR_REP(' ', '^TSK: Too many data points. ^ACT'//
+     :              ' exceeds maximum (^MAX)', STATUS)
+            END IF
+         ELSE
+            IF (N_MEASUREMENTS .GT. SCUBA__MAX_MEAS) THEN
+               CALL MSG_SETI('MEAS', SCUBA__MAX_MEAS)
+               CALL MSG_SETI('ACT', N_MEASUREMENTS)
+               CALL MSG_SETI('TSK',TSKNAME)
+               STATUS = SAI__ERROR
+               CALL ERR_REP(' ', '^TSK: Too many data points. ^ACT'//
+     :              ' measurements exceeds maximum (^MAX)', STATUS)
+            END IF
+         END IF
+      END IF
+
+
 * Read in the elevation data from the FITS header
 * Read from START and END EL first
 
@@ -749,27 +821,98 @@ c
          ENDIF
       ENDIF
 
-* Calculate AIRMASS array (Assume constant space between airmasses)
+*     Calculate the AIRMASS array
+*     Two ways to do this - depends on RASTER or DISCRETE skydips
 
       IF (STATUS .EQ. SAI__OK) THEN
+
+         IF (RASTER) THEN
+
+*     Read the EXP_TIME from the header
+            CALL SCULIB_GET_FITS_R(SCUBA__MAX_FITS, N_FITS,
+     :           FITS, 'EXP_TIME', EXPOSURE_TIME, STATUS)
+
+*     Calculate accelerations and decelerations
+*     and convert to airmass [this section from the on-line
+*     code, written by FJO]
+
+*     Convert END_EL and START_EL to RADIANS
+            START_EL = START_EL * DEG2RAD
+            END_EL   = END_EL   * DEG2RAD
+
+*     set direction of slew
+*     and calculate elevation range covered for each
+*     measurement
+            ELEV_STEP = (END_EL - START_EL) / N_MEASUREMENTS
+            FSIGN = 1.0
+            IF (ELEV_STEP .LT. 0.0) FSIGN = -1.0
+
+*     determine time at end of phase 1 (maximum acceleration)
+            T1 = V_MAX / A_MAX
+            EL1 = 0.5 * V_MAX * T1
+
+*     determine time at end of phase 2 (coast at maximum velocity)
+            T2 = ABS(ELEV_STEP) / V_MAX
+            EL2 = EL1 + V_MAX * (T2 - T1)
+
+*     determine time at end of slew (maximum deceleration)
+            T3 = T1 + T2
+                     
+            DO MEASUREMENT = 1, N_MEASUREMENTS
+*     set starting elevation
+               EL0 = START_EL + (MEASUREMENT - 1) * ELEV_STEP
+               ELEV = EL0
+
+*     set starting time for measurement MEASUREMENT
+               T = 0.0
+
+*     set start of array offset for measurement MEASUREMENT
+               OFFSET = (MEASUREMENT - 1) * N_INTEGRATIONS
+
+               DO I = 1, N_INTEGRATIONS
+
+                  EL = REAL(PI/2.0D0) - ELEV
+                  CALL SCULIB_AIRMASS (EL, RTEMP, STATUS)
+                  DAIRMASST(OFFSET+I) = DBLE(RTEMP)
+                  DAIRMASS_TVAR(OFFSET+I) = 0.0D0
+
+*     determine next elevation
+                  T = T + EXPOSURE_TIME
+                  IF ((0.0 .LT. T) .AND. (T .LE. T1)) THEN
+                     ELEV = EL0 + FSIGN * 0.5 * A_MAX * T * T
+                  ELSE IF ((T1 .LT. T) .AND. (T .LE. T2)) THEN
+                     ELEV = EL0 + FSIGN * (EL1 + V_MAX * (T - T1))
+                  ELSE
+                     ELEV = EL0 + FSIGN
+     :                    * (EL2 + (V_MAX - 0.5 * A_MAX * (T - T2)) 
+     :                    * (T - T2))
+                  END IF
+               END DO
+            END DO
+            
+         ELSE
+
+*     Assume constant space between airmasses
+
 *     Start airmass
-         EL = (REAL(PI)/2.0) - START_EL * DEG2RAD
-         CALL SCULIB_AIRMASS (EL, AIRMASS_START, STATUS)
+            EL = (REAL(PI)/2.0) - START_EL * DEG2RAD
+            CALL SCULIB_AIRMASS (EL, AIRMASS_START, STATUS)
 
 *     End airmass
-         EL = (REAL(PI)/2.0) - END_EL * DEG2RAD
-         CALL SCULIB_AIRMASS (EL, AIRMASS_END, STATUS)
+            EL = (REAL(PI)/2.0) - END_EL * DEG2RAD
+            CALL SCULIB_AIRMASS (EL, AIRMASS_END, STATUS)
 
-         AIRSTEP = (AIRMASS_END - AIRMASS_START) / 
-     :        REAL(N_MEASUREMENTS - 1)
-         DO I = 1, N_MEASUREMENTS
-            AIRMASST(I) = AIRMASS_START + AIRSTEP * REAL(I-1)
+            AIRSTEP = (AIRMASS_END - AIRMASS_START) / 
+     :           REAL(N_MEASUREMENTS - 1)
+            DO I = 1, N_MEASUREMENTS
+               AIRMASST(I) = AIRMASS_START + AIRSTEP * REAL(I-1)
 
 *  Calculate the error Delta A = (TAN / SIN) Delta EL
 *     TAN = 1/SQRT((AIR-1)(AIR+1))
-            AIRMASS_TVAR(I) = 2.0 * ARCSEC * AIRMASST(I) / ! 2 arcsec error
-     :           SQRT((AIRMASST(I)-1) * (AIRMASST(I)+1))
-         END DO
+               AIRMASS_TVAR(I) = 2.0 * ARCSEC * AIRMASST(I) / ! 2 arcsec error
+     :              SQRT((AIRMASST(I)-1) * (AIRMASST(I)+1))
+            END DO
+         END IF
       END IF
 
 
@@ -778,45 +921,101 @@ c
 *     measurement
 
 *     If the data has been through REDUCE_SWITCH I simply have to 
-*     average the data from each integration
+*     average the data from each integration (DISCRETE) or
+*     simply copy the data (RASTER)
 
       IF (RESW) THEN
+
+*     For RASTER skydips we simply copy the data for this
+*     bolometer to the output array (removing bad pixels)
+*     For DISCRETE skydips we have to coadd the integations
+
+         IF (RASTER) THEN
+
+*     A little bit of repetition here....
+*     Get some memory and extract the selected bolometer
+
+            DUM_DATA_PTR = 0
+            DUM_DATA_PTR_END = 0
+            DUM_QUAL_PTR = 0
+            DUM_QUAL_PTR_END = 0
+
+            CALL SCULIB_MALLOC(N_POS * VAL__NBR, DUM_DATA_PTR, 
+     :           DUM_DATA_PTR_END, STATUS)
+            CALL SCULIB_MALLOC(N_POS * VAL__NBUB, DUM_QUAL_PTR, 
+     :           DUM_QUAL_PTR_END, STATUS)
+
+            CALL SCULIB_EXTRACT_BOL(SUB_POINTER, N_BOLS, N_POS, 
+     :           %VAL(IN_DATA_PTR), %VAL(DUM_QUAL_PTR), 
+     :           %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), STATUS)
+
+*     Get dummy variance memory and fill with zeroes
+            DUM_VAR_PTR = 0
+            DUM_VAR_PTR_END = 0
+            CALL SCULIB_MALLOC(N_POS * VAL__NBR, DUM_VAR_PTR,
+     :           DUM_VAR_PTR_END, STATUS)
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL SCULIB_CFILLR(N_POS, 0.0, %VAL(DUM_VAR_PTR))
+            END IF   
+
+*     Note that AIRMASST and AIRMASS_TVAR need to be copied
+*     from DOUBLE PRECISION ARRAYS  - this is a kluge since
+*     I am too lazy to wirte a version of SCULIB_COPY_GOOD
+*     that can go from real to real rather than DBLE to REAL
+               
+*     Copy from input array to ouput array, removing bad pixels
+*     assumes the data were mapped with automatic quality masking
+            CALL SCULIB_COPY_GOOD(N_POS, %VAL(DUM_DATA_PTR),
+     :           %VAL(DUM_VAR_PTR), DAIRMASST, DAIRMASS_TVAR,
+     :           NKEPT, JSKY, JSKY_VAR, AIRMASS, AIRMASS_VAR,
+     :           STATUS)
+
+*     Free the variance memory
+            CALL SCULIB_FREE('DumVarScratch', DUM_VAR_PTR, 
+     :           DUM_VAR_PTR_END, STATUS)
+
+         ELSE
+
+*     This is for reducing discrete skydips
+*     Need to average the integrations to derive the value for
+*     a single measurement.
 
 *     First we need to extract the one bolometer out of the input data
 *     we'll make use of the dummy variables used to calculate the
 *     skydips. So we need some memory
 
-         DUM_DATA_PTR = 0
-         DUM_DATA_PTR_END = 0
-         DUM_QUAL_PTR = 0
-         DUM_QUAL_PTR_END = 0
+            DUM_DATA_PTR = 0
+            DUM_DATA_PTR_END = 0
+            DUM_QUAL_PTR = 0
+            DUM_QUAL_PTR_END = 0
 
-         CALL SCULIB_MALLOC(N_POS * VAL__NBR, DUM_DATA_PTR, 
-     :        DUM_DATA_PTR_END, STATUS)
-         CALL SCULIB_MALLOC(N_POS * VAL__NBUB, DUM_QUAL_PTR, 
-     :        DUM_QUAL_PTR_END, STATUS)
+            CALL SCULIB_MALLOC(N_POS * VAL__NBR, DUM_DATA_PTR, 
+     :           DUM_DATA_PTR_END, STATUS)
+            CALL SCULIB_MALLOC(N_POS * VAL__NBUB, DUM_QUAL_PTR, 
+     :           DUM_QUAL_PTR_END, STATUS)
 
 
-         CALL SCULIB_EXTRACT_BOL(SUB_POINTER, N_BOLS, N_POS, 
-     :        %VAL(IN_DATA_PTR), %VAL(IN_QUAL_PTR), 
-     :        %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), STATUS)
+            CALL SCULIB_EXTRACT_BOL(SUB_POINTER, N_BOLS, N_POS, 
+     :           %VAL(IN_DATA_PTR), %VAL(IN_QUAL_PTR), 
+     :           %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), STATUS)
 
 *     Setup a counter before the loop so that we can remove
 *     bad data
 
-         NKEPT = 0
+            NKEPT = 0
+
 
 *     We need to loop over each measurement and 
 *     find the start and end of each measurement
 
-         DO I = 1, N_MEASUREMENTS
+            DO I = 1, N_MEASUREMENTS
 
 *  find where the exposure starts and finishes in the data array
  
-            CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
-     :           1, 1, N_INTEGRATIONS, N_MEASUREMENTS,
-     :           N_POS, 1, 1, 1, I,
-     :           EXP_START, EXP_END, STATUS)
+               CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
+     :              1, 1, N_INTEGRATIONS, N_MEASUREMENTS,
+     :              N_POS, 1, 1, 1, I,
+     :              EXP_START, EXP_END, STATUS)
             
 *     I already know that this data has been processed such
 *     that there is one data point per integration so I am
@@ -824,11 +1023,11 @@ c
 
 *     Now calculate the mean of the data
 
-            CALL SCULIB_STATR(N_INTEGRATIONS, -1.0, 
-     :           %VAL(DUM_DATA_PTR + (EXP_START - 1) * VAL__NBR),
-     :           %VAL(DUM_QUAL_PTR + (EXP_START - 1) * VAL__NBUB),
-     :           IN_BADBIT, NGOOD, MEAN, MEDIAN, SUM, SUMSQ,
-     :           STDEV, QSORT, STATUS)
+               CALL SCULIB_STATR(N_INTEGRATIONS, -1.0, 
+     :              %VAL(DUM_DATA_PTR + (EXP_START - 1) * VAL__NBR),
+     :              %VAL(DUM_QUAL_PTR + (EXP_START - 1) * VAL__NBUB),
+     :              IN_BADBIT, NGOOD, MEAN, MEDIAN, SUM, SUMSQ,
+     :              STDEV, QSORT, STATUS)
             
 *     Copy data to the measurement array
 *     Note that STATR returns bad for MEAN if neceesary.
@@ -837,18 +1036,20 @@ c
 *     Check for bad value and division by zero
 *     Dont forget to copy the airmass as well
 
-            IF (MEAN .NE. VAL__BADD .AND. NGOOD .GT. 0) THEN
+               IF (MEAN .NE. VAL__BADD .AND. NGOOD .GT. 0) THEN
 
-               NKEPT = NKEPT + 1
+                  NKEPT = NKEPT + 1
 
-               JSKY(NKEPT) = REAL(MEAN)
-               JSKY_VAR(NKEPT) = REAL(STDEV * STDEV) / NGOOD
-               AIRMASS(NKEPT) = AIRMASST(I)
-               AIRMASS_VAR(NKEPT) = AIRMASS_TVAR(I)
+                  JSKY(NKEPT) = REAL(MEAN)
+                  JSKY_VAR(NKEPT) = REAL(STDEV * STDEV) / NGOOD
+                  AIRMASS(NKEPT) = AIRMASST(I)
+                  AIRMASS_VAR(NKEPT) = AIRMASS_TVAR(I)
 
-            END IF
+               END IF
 
-         END DO
+            END DO
+
+         END IF
 
 *     Tidy up
 
@@ -918,24 +1119,54 @@ c
 *     Keep track of how many bad points we have removed
 *     Dont forget to copy over the AIRMASS data as well
 
+*     For DISCRETE skydips we are interested in the average
+*     data values returned by CALC_SKYDIP_TEMPS.
+*     For RASTER skydips we are actually interested in all
+*     the data values (stored in the DUM_DATA_PTR arrays)
+
          NKEPT = 0  
          IN_BADBIT = VAL__BADUB   ! Any value is bad
 
-         DO I = 1, N_MEASUREMENTS
+         IF (RASTER) THEN
 
-            IF ((AV_DATA(SUB_POINTER, I) .NE. VAL__BADR).AND.
-     :        (NDF_QMASK(AV_QUAL(SUB_POINTER, I), IN_BADBIT))) THEN
+*     RASTER mode we have to extract the bolometer of choice
+*     as for the RESW data. Note that we extract into the same
+*     memory.
 
-               NKEPT = NKEPT + 1
+*     ...data and quality
+            CALL SCULIB_EXTRACT_BOL(SUB_POINTER, N_BOLS, N_POS, 
+     :           %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), 
+     :           %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), STATUS)
 
-               JSKY(NKEPT) = AV_DATA(SUB_POINTER, I)
-               JSKY_VAR(NKEPT) = AV_VAR(SUB_POINTER, I)
-               AIRMASS(NKEPT) = AIRMASST(I)
-               AIRMASS_VAR(NKEPT) = AIRMASS_TVAR(I)
+*     ....variance
+            CALL SCULIB_EXTRACT_2DIM_R(SUB_POINTER, N_BOLS,
+     :           N_POS, %VAL(DUM_VAR_PTR), %VAL(DUM_VAR_PTR),
+     :           STATUS)
 
-            END IF
+*     Now copy the good data (ignoring quality for now)
+            CALL SCULIB_COPY_GOOD(N_POS, %VAL(DUM_DATA_PTR),
+     :           %VAL(DUM_VAR_PTR), DAIRMASST, DAIRMASS_TVAR,
+     :           NKEPT, JSKY, JSKY_VAR, AIRMASS, AIRMASS_VAR,
+     :           STATUS)
 
-         END DO
+         ELSE
+            DO I = 1, N_MEASUREMENTS
+            
+               IF ((AV_DATA(SUB_POINTER, I) .NE. VAL__BADR).AND.
+     :              (NDF_QMASK(AV_QUAL(SUB_POINTER,I), IN_BADBIT))) THEN
+
+                  NKEPT = NKEPT + 1
+
+                  JSKY(NKEPT) = AV_DATA(SUB_POINTER, I)
+                  JSKY_VAR(NKEPT) = AV_VAR(SUB_POINTER, I)
+                  AIRMASS(NKEPT) = AIRMASST(I)
+                  AIRMASS_VAR(NKEPT) = AIRMASS_TVAR(I)
+
+               END IF
+
+            END DO
+
+         END IF
 
 *     Have now finished with input data
  
