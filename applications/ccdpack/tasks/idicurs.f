@@ -676,9 +676,9 @@
      :                             CCD1__BLEN, STATUS )
 
 *  Report file used and number of entries.
+                  CALL CCD1_MSG( ' ', ' ', STATUS )
                   CALL MSG_SETC( 'FNAME', FNAME )
                   CALL MSG_SETI( 'NPOS', NPOS )
-                  CALL CCD1_MSG( ' ', ' ', STATUS )
                   CALL CCD1_MSG( ' ', 
      :            '    Wrote ^NPOS positions to file ^FNAME', STATUS )
 
