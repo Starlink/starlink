@@ -4931,48 +4931,41 @@ package kappa {
       }
 
       action lutsave {
-         alias {lutsa(ve)}
-
          helplib {$KAPPA_HELP}
-
          parameter device {
-            ptype DEVICE
             position 2
+            ptype DEVICE
             vpath GLOBAL PROMPT
+            prompt {Name of display device}
             ppath GLOBAL CURRENT
             association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Name of display device}
             helpkey *
           }
-
          parameter full {
             type _LOGICAL
-            prompt {Is the full colour-table to be saved?}
             vpath DEFAULT
+            prompt {Is the full colour-table to be saved?}
             default FALSE
             helpkey *
           }
-
+         parameter logfile {
+            type FILENAME
+            access READ
+            vpath DEFAULT
+            prompt {Text file in which to store colour-table}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
          parameter lut {
             position 1
             type NDF
             access WRITE
             vpath PROMPT
-            association ->GLOBAL.LUT
             prompt {Lookup-table NDF}
+            association ->GLOBAL.LUT
             helpkey *
           }
-
-         parameter plane {
-            position 3
-            type _INTEGER
-            prompt {Memory plane number?}
-            vpath DEFAULT
-            ppath DEFAULT
-            helpkey *
-            default 0
-          }
-
          parameter title {
             type LITERAL
             access READ
@@ -4981,7 +4974,6 @@ package kappa {
             default {KAPPA - Lutsave}
             helpkey *
           }
-
       }
 
       action luttweak {

@@ -1,53 +1,10 @@
-1 KAPPA_Version_0.18
+1 KAPPA_Version_0.19
 
-   A new release of KAPPA (V0.18-4) has been made. The changes are
+   A new release of KAPPA (V0.19) has been made. The changes are
    described fully in sun95. The following is a summary of the main
-   changes since the last Starlink CD (V0.14-5):
+   changes since the last Starlink CD (V0.18-6):
 
-   - The following new commands have been added: ARDPLOT, COLLAPSE,
-   LUTWARM, OUTLINE, PERMAXES.
+   - The following commands have been modified to use the PGPLOT
+   graphics library: LUTABLE, LUTSAVE, OVSET.
 
-   - New features have been added and major changes made to the following
-   commands to enable them to make full use of WCS information, the NDF
-   structure, or to use PGPLOT for graphics. These changes may
-   potentially require changes to any scripts, etc, which use these
-   commands. See the "Release Notes" section SUN/95 for details: ARDGEN,
-   ARDMASK, CREFRAME, GDSTATE, GLITCH, HISTAT, IDSTATE, PICIN, PICCUR,
-   PICTRANS, SEGMENT, ZAPLIN.
-
-   - More minor changes, such as new features, etc, have been made to the
-   following commands (existing scripts should not require any changes):
-   COMPAVE, COMPADD, CONTOUR, DISPLAY, ELPROF, FITSIN, FITSDIN,
-   GAUSMOOTH, HISTOGRAM, LOOK, LUTVIEW, NDFCOPY, PSF, SETAXIS, SURFIT,
-   THRESH, WCSALIGN.
-
-   - The following obsolete commands have been removed from KAPPA -
-   alternatives are indicate in SUN/95:
-
-   CONTOVER, GREYPLOT, INSPECT, MOSAIC, QUILT, SNAPSHOT, TURBOCONT.
-
-   Many of these commands have been archived in a new package called
-   KAPRH in order to satisfy any occasional need that may occur for them
-   (see SUN/239):
-
-   - Bugs have been fixed in the following commands: COLLAPSE, FILLBAD,
-   FITSEDIT, NORMALIZE, THRESH, WCSATTRIB.
-
-   - Many of the internal subroutines used within KAPPA are of potential
-   use to people developing their own applications. To make it easier for
-   such people to use the internal facilities of KAPPA, the following
-   internal subroutine libraries have been removed from KAPPA and are now
-   distributed as a separate software item called KAPLIBS (see SUN/238):
-
-     -   libaif.a   
-     -   libctg.a   
-     -   libfits.a  
-     -   libira.a
-     -   libkapgen.a
-     -   libkapgrf.a (contains grf_kappa.o)
-     -   liblpg.a
-
-   If you have applications which used to link against any of these
-   libraries, you should now include `kaplibs_link_adam` in your
-   linking command.
 

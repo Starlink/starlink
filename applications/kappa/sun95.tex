@@ -11,12 +11,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.19}
-\newcommand{\stardocnumber}    {95.19}
+\newcommand{\stardocsource}    {sun95.20}
+\newcommand{\stardocnumber}    {95.20}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {26th October 2001}
+\newcommand{\stardocdate}      {6th November 2001}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.18}
+\newcommand{\stardocversion}   {0.19}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -27680,37 +27680,42 @@ plot (10k).
    }
 }
 
- 
 \sstroutine{
    LUTSAVE
 }{
-   Saves the current colour table of an image-display device in an NDF
+   Saves the current colour table of an image-display device in an
+   NDF
 }{
    \sstdescription{
-      This routine reads the colour table of a nominated plane of
-      an IDI-supported image display, such as X-windows, and then copies
-      it to an NDF LUT file.
+      This routine saves the colour table of a nominated image display to
+      an NDF LUT file and/or a text file.
    }
    \sstusage{
-      lutsave lut [device] [plane]
+      lutsave lut [device]
    }
    \sstparameters{
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The name of the image-display device whose colour table is to
-         be saved.  The name of the base plane should be given even if
-         the overlay colour table is to be saved.
-         {\tt [}Current image-display device{\tt ]}
+         be saved.  {\tt [Current image display]}
       }
       \sstsubsection{
          FULL = \_LOGICAL (Read)
       }{
-         If {\tt TRUE} the whole colour-table for the device is stored
+         If TRUE the whole colour-table for the device is stored
          including the reserved pens.  This is necessary to save a
          colour table written by another package that does not reserve
          colour indices.  For colour tables produced by KAPPA this
-         should be {\tt FALSE}. {\tt [FALSE]}
+         should be FALSE. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         LOGFILE = FILENAME (Write)
+      }{
+         The name of a text file to receive the formatted values in the
+         colour table. Each line i the file contains the red, green and
+         blue intensities for a single pen, separated by spaces. A null
+         string (!) means that no file is created.  {\tt [!]}
       }
       \sstsubsection{
          LUT = NDF (Write)
@@ -27718,17 +27723,8 @@ plot (10k).
          The output NDF into which the colour table is to be stored.
          Its second dimension equals the number of colour-table
          entries that are stored.  This will be less than the
-         total number of colour indices on the device if FULL is {\tt FALSE}.
-      }
-      \sstsubsection{
-         PLANE = \_INTEGER (Read)
-      }{
-         The number of the memory plane whose colour table is to be
-         saved.  If it is null the base (image) memory's colour table
-         is reversed.  The base memory is 0 and overlays are numbered
-         consecutively from 1.  For an Ikon the only overlay plane is 1.
-         PLANE is only permitted to have a value in the range 0 to the
-         number of planes minus one. {\tt [0]}
+         total number of colour indices on the device if FULL is FALSE.
+         No NDF is created if a null (!) value is given.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -27744,26 +27740,10 @@ plot (10k).
          image-display device to an NDF called pizza.
       }
       \sstexamplesubsection{
-         lutsave ramps ikon 1
-      }{
-         This saves the current colour table on the Ikon overlay plane
-         an NDF called ramps.
-      }
-      \sstexamplesubsection{
          lutsave redshift full
       }{
          This saves in full the current colour table on the current
          image-display device to an NDF called redshift.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Only Ikons and X-windows are supported.
-
-         \sstitem
-         Only the non-reserved portion of the colour table is saved.
       }
    }
    \sstdiytopic{
@@ -44775,7 +44755,7 @@ The following new commands have been added:
        FrameSet so that they refer to the correct pixel axes.
 \end{description}
 
-\section{\xlabel{se_changes}Release Notes---V0.18\label{se:changes}}
+\section{Release Notes---V0.18}
 
 \subsection{New Commands}
 The following new applications have been added:
@@ -44991,6 +44971,33 @@ distributed as a separate software item called KAPLIBS (see SUN/238):
 If you have applications which used to link against any of these
 libraries, you should now include {\tt `kaplibs\_link\_adam`} in your
 linking command.
+
+\section{\xlabel{se_changes}Release Notes---V0.19\label{se:changes}}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{LUTABLE}{LUTABLE}] \mbox{}
+      \begin{itemize}
+         \item Re-written to use the PGPLOT graphics library.
+      \end{itemize}
+
+   \item [\htmlref{LUTSAVE}{LUTSAVE}] \mbox{}
+      \begin{itemize}
+         \item Re-written to use the PGPLOT graphics library.
+         \item The parameter PLANE has been removed.
+         \item A new parameter called LOGFILE has been added which allows
+         the colour table to be saved in a text file.
+      \end{itemize}
+
+   \item [\htmlref{OVSET}{OVSET}] \mbox{}
+      \begin{itemize}
+         \item Re-written to use the PGPLOT graphics library.
+      \end{itemize}
+      
+\end{description}
 
 
 \begin{latexonly}

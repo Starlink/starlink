@@ -60,7 +60,31 @@
 
 #-
 
-      echo `ard_link_adam` `kaplibs_link_adam` \
+#  Initialise linking options.
+      kaplibs_opts=''
+
+#  Interpret command line switches.
+#  --------------------------------
+      while :; do
+         case "${1}" in
+
+#  -nogks - Requests linking with native pgplot and without GKS or IDI
+         -nogks)
+            kaplibs_opts=' -nogks'
+            shift;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         '') break;;
+
+#  Catch unrecognised arguments and report an error.
+         *)
+            echo >&2 "kappa_link_adam: unknown argument \""${1}"\" given"
+            exit 1;;
+         esac
+      done
+
+#  Echo the link list.
+      echo `ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
