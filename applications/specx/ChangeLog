@@ -1,0 +1,106 @@
+2000-01-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* starlink/makefile (F_SUB1): move DECDAT from util to astro
+
+	* astro/decdat.f (DECDAT): Move from util to prevent looping
+	problem when linking
+
+2000-01-09  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* misc/init.spx: Add read-wide-spectrum. Fix set-gsd-filename.
+
+	* docs/sun17/sun17.tex: Try to make current and include some more
+	historical information.
+
+2000-01-07  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* exprt/rdfitsspec.f (SPECX_RDFITSSPEC): Recognise MJD-OBS and new 
+	DATE-OBS format. Initialise IDATE, ITITLE, ITIME before read.
+
+	* util/parse_date_obs.f (PARSE_DATE_OBS): First version
+
+2000-01-06  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* astro/dattim_from_mjd.f (DATTIM_FROM_MJD): First version
+
+	* exprt/wrfitsmap.f (SPECX_WRFITSMAP): Write correct OBS-DATE
+	keyword. Replace TYPE with PRINT. Add MJD-OBS keyword.
+
+	* exprt/wrfitsspec.f (SPECX_WRFITSSPEC): Write correct OBS-DATE keyword
+	Replace TYPE with PRINT. Add MJD-OBS keyword.
+	
+	* exprt/wrfitscube.f (SPECX_WRFITSCUBE): Write correct OBS-DATE keyword
+	Replace TYPE with PRINT. Add MJD-OBS keyword.
+	
+	* astro/cvt_to_date_obs.f (CVT_TO_DATE_OBS): First version
+
+	* astro/specxjd_to_mjd.f (SPECXJD_TO_MJD): First version
+
+1999-12-30  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* vms/putscreen.f (IPUT_SCREEN): Replace TYPE* with PRINT*
+
+	* vms/sysdep.f: Initialise all STATUS variables to SAI__OK. Check
+	for SAI__OK rather than 0 from PSX routines. 
+	Replace TYPE * with PRINT * for g77 
+
+	* vms/vms_date.f (VMS_DATE): Use SAE_PAR
+
+	* astro/julda.f (JULDA): Add descriptive header
+
+	* util/decdat.f (DECDAT): Update header. Fix fortran errors so
+	will compile with g77
+
+	* util/tran_date.f (TRAN_DATE): Update header
+
+1999-12-29  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/title.inc: Update version number to 6.7-6
+
+	* comfiles/makefile (SPXSOURCE): Add rdwidesp.spx
+
+	* exprt/makefile (CSOURCES): Add bswap and wbswap
+
+	* starlink/makefile ($(FCPP_SUB1): Add FCPPFLAGS support.
+
+	* src/specx_link: Add gsd_link
+
+	* starlink/mk: Add FCPPFLAGS
+
+1999-12-22  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* inc/makefile (distclean): Add.
+
+	* src/makefile (distclean): Clean up specx and specx_help binaries
+
+1999-10-27  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
+
+        * tran_date.f (TRAN_DATE): Fix Y2K problem: use MOD i.s.o.
+                             subtracting 1900
+
+        * decdat.f (DECDAT): Fix Y2K problem: use window i.s.o.
+                             adding 1900
+	
+1999-05-25  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
+
+        * init.spx: added read-wide-sp as command
+
+        * comfiles/rdwidesp.spx: installed new script
+
+1999-05-04  Remo Tilanus  <rpt@menehune.JAC.Hilo>
+
+        * exprt/makefile: Add bswap.c and wbswap.c to CC routines.
+
+        * exprt/bswap.c: new byte swap routine for rdfitsspec.f. After
+             Figaro gen_bswap.c
+
+        * exprt/wbswap.c: -same- gen_wbwap.c
+
+        * exprt/rdfitsspec.f (SPECX_RDFITSSPEC): 
+             Since Figaro GEN routines for Byte-swap are now tied to
+             host type, byte swap needs to be handled by local subs.
+
+        * exprt/open_fits.f (SPECX_OPEN_FITS):
+             Since Figaro GEN routines for Byte-swap are now tied to
+             host type, byte swap can no longer be an option.
+	
