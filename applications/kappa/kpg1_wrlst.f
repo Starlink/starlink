@@ -118,7 +118,7 @@
 *  Get a value for the parameter. The file name is not actually needed
 *  yet, but it is obtained so that we can abort if a null value is given
 *  before spending time creating a positions list which may not be wanted.
-      CALL PAR_GET0L( PARAM, FILE, STATUS )
+      CALL PAR_GET0C( PARAM, FILE, STATUS )
 
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
