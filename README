@@ -1,3 +1,30 @@
+This directory contains the following directories:
+
+  libraries
+     Starlink Fortran/C libraries
+
+  applications
+     Starlink Fortran/C applications
+
+  java
+     Starlink Java libraries and applications
+
+  buildsupport
+     Starlink support applications required to build configure-based
+     Starlink applications.
+
+  thirdparty
+     Third party applications and libraries required to build
+     Starlink classic applications
+
+  pubs
+     Starlink publications
+
+  docs
+     General documentation not associated with a particular application
+     or library.
+
+
 To build the starlink classic applications the following steps are required:
 
  - Specify where you want the installed files to end up (_PREFIX)
@@ -28,30 +55,6 @@ To build the starlink classic applications the following steps are required:
       % make
       % make install-manifest
 
-
-This directory contains the following directories:
-
-  libraries
-     Starlink Fortran/C libraries
-
-  applications
-     Starlink Fortran/C applications
-
-  java
-     Starlink Java libraries and applications
-
-  buildsupport
-     Starlink support applications required to build configure-based
-     Starlink applications.
-
-  thirdparty
-     Third party applications and libraries required to build
-     Starlink classic applications
-
-  pubs
-     Starlink publications
-
-  docs
-     General documentation not associated with a particular application
-     or library.
+See SSN/78 (in docs/ssn78) for more details on building Starlink classic
+applications.
 
