@@ -654,86 +654,6 @@
 
 
 
-*+
-      SUBROUTINE IREGION_SLICE(MODE,EXCLUDE,STATUS)
-*    Description :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     BHVAD::RJV
-*    History :
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Global variables :
-      INCLUDE 'IMG_CMN'
-*    Import :
-      CHARACTER*(*) MODE
-      LOGICAL EXCLUDE
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-      INTEGER CHR_LEN
-*    Local constants :
-      REAL RTOD
-      PARAMETER (RTOD=180.0/3.14159265)
-*    Local variables :
-      CHARACTER*80 TEXT
-      INTEGER L
-      REAL XC,YC,ANGLE,LENGTH,WIDTH
-*-
-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-        CALL IMG_GETSLICE('XC','YC','ANGLE','LENGTH','WIDTH',
-     :                           XC,YC,ANGLE,LENGTH,WIDTH,STATUS)
-        CALL IMG_SETSLICE(XC,YC,ANGLE,LENGTH,WIDTH,EXCLUDE,STATUS)
-
-        IF (MODE.EQ.'AND') THEN
-          TEXT=' .AND.'
-          L=7
-        ELSE
-          TEXT=' '
-          L=1
-        ENDIF
-
-        IF (EXCLUDE) THEN
-          TEXT(L:)=' .NOT. (ROTBOX( '
-        ELSE
-          TEXT(L:)=' ROTBOX( '
-        ENDIF
-        L=CHR_LEN(TEXT)
-
-        CALL MSG_SETR('XC',XC)
-        CALL MSG_SETR('YC',YC)
-        CALL MSG_SETR('LN',LENGTH)
-        CALL MSG_SETR('WD',WIDTH)
-        ANGLE=ANGLE*RTOD*I_XSCALE/ABS(I_XSCALE)*I_YSCALE/ABS(I_YSCALE)
-        CALL MSG_SETR('AN',ANGLE)
-        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^LN , ^WD , ^AN ',
-     :                                                    TEXT,L)
-        IF (EXCLUDE) THEN
-          TEXT(L:)='))'
-          L=L+1
-        ELSE
-          TEXT(L:L)=')'
-        ENDIF
-
-        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
-
-
-
-        IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IREGION_SLICE',STATUS)
-        ENDIF
-
-      ENDIF
-
-      END
-
 
 *+  IREGION_XSPOKES - defines the ribs region on a PSPC image
       SUBROUTINE IREGION_XSPOKES(MODE,EXCLUDE,STATUS)
@@ -793,6 +713,7 @@
       CHARACTER*20 EXT                  ! Extension name
       CHARACTER*20 ROLL                 ! column name
       CHARACTER*20 TIME                 ! column name
+      CHARACTER*80 TEXT
       CHARACTER*(DAT__SZLOC) ALOC       ! Locator to attitude file
       LOGICAL LOUT                      ! include the region outside the image ?
       LOGICAL LNEW                      ! create a new ARD file or update ?
@@ -813,6 +734,7 @@
       REAL EXTRA                        ! additional width of ribs (degs)
       REAL ANGLE
       REAL XSC,YSC
+      INTEGER L
       INTEGER RPNTR                     ! pointer to the roll angle array
       INTEGER TPNTR                     ! pointer to the time array
       INTEGER NVALS                     ! number of time/roll values
@@ -848,7 +770,7 @@
 
         IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('AST_ERR: error opening attitude file')
-          CALL_MSG_PRNT(' - try running again in non-auto mode')
+          CALL MSG_PRNT(' - try running again in non-auto mode')
           GOTO 999
         ENDIF
 *
@@ -857,7 +779,7 @@
         CALL CMP_MAPV(ALOC,ROLL,'_REAL','READ',RPNTR,NVALS,STATUS)
         IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('AST_ERR: error accessing ROLL angle data')
-          CALL_MSG_PRNT(' - try running again in non-auto mode')
+          CALL MSG_PRNT(' - try running again in non-auto mode')
           GOTO 999
         ENDIF
         CALL RAT_HDLOOKUP(HEAD,'ASPDATA','TIME',TIME,STATUS)
@@ -865,7 +787,7 @@
         IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_SETC('ARR',TIME)
           CALL MSG_PRNT('** Error accessing TIME array ^ARR **')
-          CALL_MSG_PRNT(' - try running again in non-auto mode')
+          CALL MSG_PRNT(' - try running again in non-auto mode')
           GOTO 999
         ENDIF
 
@@ -1081,7 +1003,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_ERR'
 *    Structure definitions:
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD
       INTEGER NVALS
