@@ -1,4 +1,4 @@
-      SUBROUTINE DCI_GETID( FID, DETID, STATUS )
+      SUBROUTINE DCI_GETID( ID, DETID, STATUS )
 *+
 *  Name:
 *     DCI_GETID
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL DCI_GETID( FID, DETID, STATUS )
+*     CALL DCI_GETID( ID, DETID, STATUS )
 
 *  Description:
 *     Returns an object describing the hardware configuration associated
@@ -18,7 +18,7 @@
 *     detector and filter info.
 
 *  Arguments:
-*     FID = INTEGER (given)
+*     ID = INTEGER (given)
 *        ADI identifier of dataset
 *     DETID = INTEGER (returned)
 *        ADI identifier of detector configuration data
