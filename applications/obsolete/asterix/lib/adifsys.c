@@ -228,7 +228,6 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
   ADIobj	fid;			/* ADI version of fspec */
   ADIboolean	found = ADI__false;	/* Located the representation? */
   ADIobj	ortn;			/* Create routine */
-  ADIobj	repid;
   char		*ppos;
   ADIobj	rid = ADI__nullid;	/* Representation chosen */
   int		rlen;
@@ -306,7 +305,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 
 /* Created ok? If so, write in details of representation and access mode */
   if ( _ok(status) ) {
-    adic_cput0i( *fileid, "REP", repid, status );
+    adic_cput0i( *fileid, "REP", rid, status );
     adic_cput0c( *fileid, "MODE", "WRITE", status );
     }
 
