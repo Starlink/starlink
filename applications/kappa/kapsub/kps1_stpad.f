@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_STPAD( DIM1, DIM2, ARRAY, LBND, NXY, ISIZE, POS,
-     :                         SIG0, AXISR, THETA, NGOOD, SIG, STATUS )
+     :                       SIG0, AXISR, THETA, NGOOD, SIG, STATUS )
 *+
 *  Name:
 *     KPS1_STPAD
@@ -284,7 +284,7 @@
  
 *                     If the pixel is valid, find the p,q coordinates.
  
-                        IF ( ARRAY( I, J ) .NE. VAL__BADI ) THEN
+                        IF ( ARRAY( I, J ) .NE. VAL__BADD ) THEN
                            BINP = BINI + BINJ
                            BINQ = BINJ - BINI
  

@@ -284,7 +284,7 @@
  
 *                     If the pixel is valid, find the p,q coordinates.
  
-                        IF ( ARRAY( I, J ) .NE. VAL__BADI ) THEN
+                        IF ( ARRAY( I, J ) .NE. VAL__BADW ) THEN
                            BINP = BINI + BINJ
                            BINQ = BINJ - BINI
  
