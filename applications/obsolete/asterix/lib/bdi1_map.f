@@ -144,7 +144,7 @@
         CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *    Map the array
-        CALL BDI1_ARYMAP( CLOC, TYPE, MODE, .FALSE., PSID, PTR,
+        CALL BDI1_ARYMAP( CLOC, TYPE, MODE, PSID, PTR,
      :                    NELM, STATUS )
 
 *  Object doesn't exist?

@@ -1,4 +1,4 @@
-      SUBROUTINE BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, PSID, PTR,
+      SUBROUTINE BDI1_ARYMAP( LOC, TYPE, MODE, PSID, PTR,
      :                        NELM, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, PSID, PTR, NELM, STATUS )
+*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, PSID, PTR, NELM, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -23,8 +23,6 @@
 *        The type to map with
 *     MODE = CHARACTER*(*) (given)
 *        The access mode, READ, UPDATE or WRITE
-*     MAPDYN = LOGICAL (given)
-*        Force data to mapped copied to dynamic memory
 *     PSID = INTEGER (given)
 *        ADI identifier of private storage area
 *     PTR = INTEGER (returned)
@@ -102,7 +100,6 @@
       CHARACTER*(DAT__SZLOC)	LOC
       CHARACTER*(*)		TYPE, MODE
       INTEGER			PSID
-      LOGICAL			MAPDYN
 
 *  Arguments Returned:
       INTEGER			PTR, NELM
@@ -151,26 +148,12 @@
       CALL DAT_PRIM( LOC, PRIM, STATUS )
       IF ( PRIM ) THEN
 
-*    Make dynamic copy if required
-        IF ( MAPDYN ) THEN
+*    Clone a copy of the locator for mapping
+        CALL DAT_CLONE( LOC, SLOC, STATUS )
 
-*      Map workspace
-          CALL DYN_MAPT( 1, NELM, HTYPE, PTR, STATUS )
-
-*      Extract HDS data into workspace
-          CALL DAT_GET( LOC, HTYPE, NDIM, DIMS, %VAL(PTR), STATUS )
-
-*    Otherwise simply map
-        ELSE
-
-*      Clone a copy of the locator for mapping
-          CALL DAT_CLONE( LOC, SLOC, STATUS )
-
-*      Map the object
-          CALL DAT_MAPV( SLOC, HTYPE, MODE, FPTR, NELM, STATUS )
-          PTR = FPTR
-
-        END IF
+*    Map the object
+        CALL DAT_MAPV( SLOC, HTYPE, MODE, FPTR, NELM, STATUS )
+        PTR = FPTR
 
 *  Otherwise structured ARRAY
       ELSE
@@ -181,26 +164,11 @@
 *    Simple array variant?
         IF ( VARNT .EQ. 'SIMPLE' ) THEN
 
-*      Make dynamic copy if required
-          IF ( MAPDYN ) THEN
+*      Locate the DATA item
+          CALL DAT_FIND( LOC, 'DATA', SLOC, STATUS )
 
-*        Map workspace
-            CALL DYN_MAPT( 1, NELM, HTYPE, PTR, STATUS )
-
-*        Extract HDS data into workspace
-            CALL DAT_FIND( LOC, 'DATA', ACLOC, STATUS )
-            CALL DAT_GET( ACLOC, HTYPE, NDIM, DIMS, %VAL(PTR), STATUS )
-            CALL DAT_ANNUL( ACLOC, STATUS )
-
-          ELSE
-
-*        Locate the DATA item
-            CALL DAT_FIND( LOC, 'DATA', SLOC, STATUS )
-
-*        And map it
-            CALL DAT_MAPV( SLOC, HTYPE, MODE, PTR, NELM, STATUS )
-
-          END IF
+*      And map it
+          CALL DAT_MAPV( SLOC, HTYPE, MODE, PTR, NELM, STATUS )
 
 *    The scaled array variant
         ELSE IF ( VARNT .EQ. 'SCALED' ) THEN

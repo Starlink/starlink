@@ -122,8 +122,9 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			BDI1_INVNT_E2V
-      EXTERNAL			BDI1_INVNT_LQ2Q
+      EXTERNAL			BDI1_INVNT_WBER
+      EXTERNAL			BDI1_INVNT_WBLQ
+      EXTERNAL			BDI1_INVNT_WBWID
       EXTERNAL			UTIL_PLOC
         INTEGER			UTIL_PLOC
 
@@ -138,6 +139,9 @@
       INTEGER			WPTR			! Workspace
 
       BYTE			MASK			! Quality mask
+
+      LOGICAL			RMODE			! READ mode?
+      LOGICAL			WMODE			! WRITE mode?
 *.
 
 *  Check inherited global status.
@@ -146,6 +150,10 @@
 *  Initialise
       ITID = ADI__NULLID
       WBPTR = 0
+
+*  Get mode toggles
+      RMODE = (MODE(1:1).EQ.'R')
+      WMODE = (MODE(1:1).EQ.'W')
 
 *  Get dimensions of BinDS
       CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
@@ -163,7 +171,7 @@
      :                    STATUS )
 
 *    Map it
-        CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', .FALSE., PSID, PTR,
+        CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', PSID, PTR,
      :                    NELM, STATUS )
 
 *    Create invented object and map
@@ -176,6 +184,11 @@
 *    Free mapped file data and mapped item
         CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
         CALL ADI_UNMAP( ITID, WPTR, STATUS )
+
+*    Set the WriteBack function
+        IF ( .NOT. RMODE ) THEN
+          WBPTR = UTIL_PLOC( BDI1_INVNT_WBWID )
+        END IF
 
 *  Logical quality
       ELSE IF ( ITEM .EQ. 'LogicalQuality' ) THEN
@@ -234,8 +247,8 @@
         END IF
 
 *    Set the WriteBack function
-        IF ( MODE(1:1) .NE. 'R' ) THEN
-          WBPTR = UTIL_PLOC( BDI1_INVNT_LQ2Q )
+        IF ( .NOT. RMODE ) THEN
+          WBPTR = UTIL_PLOC( BDI1_INVNT_WBLQ )
         END IF
 
 *  Masked quality
@@ -295,21 +308,20 @@
       ELSE IF ( ITEM .EQ. 'Error' ) THEN
 
 *    Locate variance, creating if necessary
-        CALL BDI1_CFIND( BDID, HFID, 'Variance',
-     :                   (MODE(1:1).EQ.'W'), CLOC, STATUS )
+        CALL BDI1_CFIND( BDID, HFID, 'Variance', WMODE, CLOC, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
 *    Create invented object
         CALL ADI_NEW( TYPE, NDIM, DIMS, ITID, STATUS )
 
 *    Copy file data to invented object if appropriate
-        IF ( MODE(1:1) .NE. 'W' ) THEN
+        IF ( .NOT. WMODE ) THEN
 
 *      Locate the BDI private storage for the variance, creating if required
           CALL BDI0_LOCPST( BDID, 'Variance', .TRUE., PSID, STATUS )
 
 *      Map it
-          CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', .FALSE., PSID, PTR,
+          CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', PSID, PTR,
      :                        NELM, STATUS )
 
 *      Map the invented object
@@ -332,7 +344,7 @@
           CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
 
 *      Set the WriteBack function
-          WBPTR = UTIL_PLOC( BDI1_INVNT_E2V )
+          WBPTR = UTIL_PLOC( BDI1_INVNT_WBER )
 
 *      Release storage
           CALL ADI_ERASE( PSID, STATUS )
@@ -353,7 +365,7 @@
             CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *        Map it
-            CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', .FALSE., PSID, PTR,
+            CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', PSID, PTR,
      :                        NELM, STATUS )
 
 *        Create dynamic array
@@ -386,7 +398,7 @@
               CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *          Map it
-              CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', .FALSE., PSID, PTR,
+              CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', PSID, PTR,
      :                          NELM, STATUS )
 
 *          Create dynamic array
@@ -1017,10 +1029,10 @@
 
 
 
-      SUBROUTINE BDI1_INVNT_E2V( BDID, HFID, PSID, STATUS )
+      SUBROUTINE BDI1_INVNT_WBER( BDID, HFID, PSID, STATUS )
 *+
 *  Name:
-*     BDI1_INVNT_E2V
+*     BDI1_INVNT_WBER
 
 *  Purpose:
 *     Write back invented errors to the file variance component
@@ -1029,7 +1041,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_INVNT_E2V( BDID, PSID, STATUS )
+*     CALL BDI1_INVNT_WBER( BDID, PSID, STATUS )
 
 *  Description:
 *     The data are squared in situ and written directly to the VARIANCE
@@ -1156,10 +1168,139 @@
 
 
 
-      SUBROUTINE BDI1_INVNT_LQ2Q( BDID, HFID, PSID, STATUS )
+      SUBROUTINE BDI1_INVNT_WBWID( BDID, HFID, PSID, STATUS )
 *+
 *  Name:
-*     BDI1_INVNT_LQ2Q
+*     BDI1_INVNT_WBWID
+
+*  Purpose:
+*     Write back invented axis widths to the file axis width component
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_INVNT_WBWID( BDID, PSID, STATUS )
+
+*  Description:
+*     The data are written to the axis width component, overwriting any
+*     existing data.
+
+*  Arguments:
+*     BDID = INTEGER (given)
+*        The ADI identifier of the BinDS (or BinDS derived) object
+*     HFID = INTEGER (given)
+*        The ADI identifier of the HDS file object
+*     PSID = INTEGER (given)
+*        The ADI identifier of the item private storage
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'
+
+*  Arguments Given:
+      INTEGER                   BDID, HFID, PSID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*20		ITEM			! Item name
+      CHARACTER*6		TYPE			! Mapping type
+      CHARACTER*(DAT__SZLOC)	WLOC			! Widths locator
+
+      INTEGER			N			! # mapped elements
+      INTEGER			PTR			! Mapped data address
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get item name
+      CALL ADI_NAME( PSID, ITEM, STATUS )
+
+*  Extract the mapped type, data address and number of elements
+      CALL ADI_CGET0C( PSID, 'Type', TYPE, STATUS )
+      CALL ADI_CGET0I( PSID, 'Ptr', PTR, STATUS )
+      CALL ADI_CGET0I( PSID, 'Nelm', N, STATUS )
+
+*  Locate the width component
+      CALL BDI1_CFIND( BDID, HFID, ITEM, .TRUE., WLOC, STATUS )
+
+*  Write array back to file
+      CALL DAT_PUT( WLOC, '_'//TYPE, 1, N, %VAL(PTR), STATUS )
+
+*  Release widths array
+      CALL DAT_ANNUL( WLOC, STATUS )
+
+      END
+
+
+
+      SUBROUTINE BDI1_INVNT_WBLQ( BDID, HFID, PSID, STATUS )
+*+
+*  Name:
+*     BDI1_INVNT_WBLQ
 
 *  Purpose:
 *     Write back invented logical quality to the file quality component
@@ -1168,7 +1309,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_INVNT_LQ2Q( BDID, HFID, PSID, STATUS )
+*     CALL BDI1_INVNT_WBLQ( BDID, HFID, PSID, STATUS )
 
 *  Description:
 *     Writes logical quality to a dataset. If no quality already exists
@@ -1305,7 +1446,7 @@
       END IF
 
 *  Convert logical quality to byte quality
-      CALL BDI1_INVNT_LQ2Q_INT( N, %VAL(PTR), (.NOT.EXISTS), %VAL(QPTR),
+      CALL BDI1_INVNT_WBLQ_INT( N, %VAL(PTR), (.NOT.EXISTS), %VAL(QPTR),
      :                          STATUS )
 
 *  Release QUALITY array
@@ -1317,10 +1458,10 @@
 
 
 
-      SUBROUTINE BDI1_INVNT_LQ2Q_INT( N, LVAL, NEW, BVAL, STATUS )
+      SUBROUTINE BDI1_INVNT_WBLQ_INT( N, LVAL, NEW, BVAL, STATUS )
 *+
 *  Name:
-*     BDI1_INVNT_LQ2Q_INT
+*     BDI1_INVNT_WBLQ_INT
 
 *  Purpose:
 *     Convert logical quality to byte values
@@ -1329,7 +1470,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_INVNT_LQ2Q_INT( N, LVAL, NEW, BVAL, STATUS )
+*     CALL BDI1_INVNT_WBLQ_INT( N, LVAL, NEW, BVAL, STATUS )
 
 *  Description:
 *     Creates byte quality from logical quality
