@@ -1,5 +1,7 @@
 interface PUTAXIS
 
+   helplib     '$DATACUBE_HELP'
+
    parameter IN
       position 1
       prompt      'Input NDF'
