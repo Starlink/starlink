@@ -6,6 +6,9 @@ This directory contains the following directories:
   applications
      Starlink Fortran/C applications
 
+  etc
+     Starlink initialisation scripts
+
   java
      Starlink Java libraries and applications
 
