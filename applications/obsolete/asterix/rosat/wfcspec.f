@@ -90,15 +90,16 @@
       REAL			CEBND(2)		! Channel energy bounds
       REAL FLUX, FLUXERR                      ! SSDS count rate and error
       REAL PKEN                               ! Filter transmission peak energy
+      REAL			SPARR(2)		! Spaced array info
 
       INTEGER 			IFILT                   ! Filter number
       INTEGER 			CALFILT                 ! Cal filter number
       INTEGER			DETID			! Detector info
       INTEGER ICOMP                           ! SSDS BOOK element chosen
-      INTEGER HTLEN                           ! # of lines of history
+      INTEGER 			HTLEN                   ! # of lines of history
       INTEGER			IFID			! Input dataset id
       INTEGER CF_PTR, ID_PTR,RF_PTR, RFE_PTR  ! SSDS list data pointers
-      INTEGER NELM,NDIM,DIMS(ADI__MXDIM)
+      INTEGER 			NELM			! # input data elements
       INTEGER DIN, DOUT                       ! Pointers to input and out data
       INTEGER VIN, VOUT                       ! Pointers to input and out var.
       INTEGER QIN, QOUT                       ! Pointers to input and out Qual.
@@ -107,13 +108,13 @@
       INTEGER EPTR			      ! Pointer to energy indices
       INTEGER CPTR			      ! Pointer to channel indices
       INTEGER RPTR			      ! Pointer to response values
-      INTEGER ISRC                            ! Source chosen in SSDS
-      INTEGER NSRC                            ! Number of sources in SSDS
+      INTEGER 			ISRC                    ! Source chosen in SSDS
+      INTEGER 			NSRC                    ! # sources in SSDS
       INTEGER			OFID			! Output dataset id
       INTEGER			RMFID			! Output matrix
       INTEGER			TFID			! Input header origin
       INTEGER			TIMID			! Timing info
-      INTEGER TLEN                            ! Length of a text string
+      INTEGER 			TLEN                    ! Length of a text string
 
       LOGICAL			EXPCOR			! Exposure corrected?
       LOGICAL			GOTMJD			! Got MJD from input?
@@ -149,7 +150,7 @@
 *  Case of SSDS
       IF ( SSDS ) THEN
 
-*      Check for POSIT structure, otherwise nothing much to report
+*    Get number of sources
         CALL SSI_GETNSRC( IFID, NSRC, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           IF ( NSRC .EQ. 0 ) THEN
@@ -159,17 +160,18 @@
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Is SSDS a set?
-        IS_SET = ( TYPE(1:8) .EQ. 'SSDS_SET' )
+*    Is SSDS a set?
+        CALL SSI_CHKFLD( IFID, 'ID', IS_SET, STATUS )
 
-*      Display contents of SSDS
+*    Display contents of SSDS
         CALL WFCSPEC_SSDUMP( IFID, NSRC, STATUS )
 
-*      Select source to use and validate
-        IF ( NSRC .EQ. 1 ) THEN
-          CALL USI_DEF0I( 'SRC', 1, STATUS )
+*    Select source to use and validate
+        IF ( NSRC .NE. 1 ) THEN
+          CALL USI_GET0I( 'SRC', ISRC, STATUS )
+        ELSE
+          ISRC = 1
         END IF
-        CALL USI_GET0I( 'SRC', ISRC, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           IF ( ( ISRC .LT. 0 ) .OR. ( ISRC .GT. NSRC ) ) THEN
             CALL MSG_SETI( 'IS', ISRC )
@@ -181,7 +183,7 @@
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Locate element in BOOK structure for source ISRC
+*    Locate element in BOOK structure for source ISRC
         IF ( IS_SET ) THEN
           CALL SSI_MAPFLD( IFID, 'ID', '_INTEGER', 'READ', ID_PTR,
      :                                                    STATUS )
@@ -190,21 +192,21 @@
           ICOMP = 1
         END IF
 
-*      Locate the dataset searched to find the ICOMP'th source
+*    Locate the dataset searched to find the ICOMP'th source
         CALL SSI_FINDDS( IFID, ICOMP, TFID, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_FLUSH( STATUS )
           CALL MSG_PRNT( 'Unable to locate original dataset from '/
      :                           /'source search results file...' )
-          CALL USI_TASSOCI( 'AUX', '*', 'READ', TFID, STATUS )
+          CALL USI_ASSOC( 'AUX', 'BinDS', 'READ', TFID, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
         END IF
 
-*      No quality for SSDS
+*    No quality for SSDS
         LQUAL = .FALSE.
 
-*    Case of NDF - copy IFID
+*  Case of NDF - copy IFID
       ELSE
         CALL ADI_CLONE( IFID, TFID, STATUS )
 
@@ -231,7 +233,7 @@
         GOTO 99
       END IF
 
-*    Translate to cal filter number and tell user about it
+*  Translate to cal filter number and tell user about it
       CALL WFC_FILT_CONV( IFILT, CALFILT, STATUS )
       IF ( STATUS.NE.SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Bad filter number - response not set up',
@@ -241,10 +243,10 @@
 
 *   Find count rate and error
 
-*    Source search results file
+*  Source search results file
       IF ( SSDS ) THEN
 
-*      Map lists
+*    Map lists
         CALL SSI_MAPFLD( IFID, 'FLUX', '_REAL', 'READ', RF_PTR, STATUS )
         CALL SSI_MAPFLD( IFID, 'CFLUX', '_REAL', 'READ', CF_PTR,
      :                                                  STATUS )
@@ -258,21 +260,21 @@
           CALL ERR_FLUSH( STATUS )
         END IF
 
-*      Get raw count to find fractional count error
+*    Get raw count to find fractional count error
         IF ( LVAR ) THEN
           CALL ARR_ELEM1R( RF_PTR, NSRC, ISRC, FLUX, STATUS )
           CALL ARR_ELEM1R( RFE_PTR, NSRC, ISRC, FLUXERR, STATUS )
           FLUXERR = FLUXERR / FLUX
         END IF
 
-*      Get corrected flux and find error
+*    Get corrected flux and find error
         CALL ARR_ELEM1R( CF_PTR, NSRC, ISRC, FLUX, STATUS )
         IF ( LVAR ) FLUXERR = FLUXERR * FLUX
 
-*    Case of NDF
+*  Case of NDF
       ELSE
 
-*   Data array must have only one element (but could be n-dimensional)
+*    Data array must have only one element (but could be n-dimensional)
         CALL BDI_CHK( IFID, 'Data', OK, STATUS )
         CALL BDI_GETNEL( IFID, NELM, STATUS )
         IF ( .NOT. OK .OR. STATUS .NE. SAI__OK ) THEN
@@ -287,14 +289,14 @@
           GOTO 99
         END IF
 
-*   Check that it has been normalised to count/sec
+*    Check that it has been normalised to count/sec
         CALL PRF_GET( IFID, 'CORRECTED.EXPOSURE', EXPCOR, STATUS )
         IF ( .NOT. EXPCOR ) THEN
           CALL MSG_PRNT( '!! WARNING : Data does not appear to '/
      :                   /'exposure corrected', STATUS )
         END IF
 
-*   Check for variance and quality
+*    Check for variance and quality
         CALL BDI_CHK( IFID, 'Variance', LVAR, STATUS)
         IF(.NOT. LVAR .OR. STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('No variance array in input file')
@@ -337,10 +339,10 @@
         CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
       END IF
 
-*   SSDS case
+*  SSDS case
       IF ( SSDS ) THEN
 
-*      Copy values
+*    Copy values
         CALL ARR_COP1R( 1, FLUX, %VAL(DOUT), STATUS )
         IF ( LVAR ) THEN
           CALL ARR_COP1R( 1, FLUXERR*FLUXERR, %VAL(VOUT), STATUS )
