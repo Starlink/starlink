@@ -90,6 +90,7 @@
 
 *  External References:
       EXTERNAL			FRI1_CHK
+      EXTERNAL			FRI1_GET
       EXTERNAL			FRI1_PUT
 
 *  Local Variables:
@@ -101,6 +102,8 @@
 
 *  Load methods for reading and writing references
       CALL ADI_DEFMTH( 'ChkRef(HDSfile,CHAR)', FRI1_CHK,
+     :                                       DID, STATUS )
+      CALL ADI_DEFMTH( 'GetRef(HDSfile,CHAR)', FRI1_GET,
      :                                       DID, STATUS )
       CALL ADI_DEFMTH( 'PutRef(HDSfile,CHAR,*)', FRI1_PUT,
      :                                       DID, STATUS )

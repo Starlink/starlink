@@ -85,6 +85,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
@@ -100,6 +101,7 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)    ALOC                    ! ASTERIX locator
       CHARACTER*(DAT__SZLOC)    ARLOC                   ! AST_REF object
+      CHARACTER*200             FILE
       CHARACTER*(DAT__SZNAM)    ROBJ                    ! Reference obj name
 
       LOGICAL			THERE			! Object exists?
@@ -108,14 +110,14 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Default return value
+      OARG = ADI__NULLID
+
 *  Locate ASTERIX box of file
       CALL ADI1_LOCAST( ARGS(1), .FALSE., ALOC, STATUS )
 
 *  Translate the logical name into the HDS will use
       CALL FRI1_TRNSNM( ARGS(2), ROBJ, STATUS )
-
-*  Create output structure
-      CALL ADI_NEW0( 'STRUC', OARG, STATUS )
 
 *  Reference exists?
       CALL DAT_THERE( ALOC, ROBJ, THERE, STATUS )
@@ -125,8 +127,8 @@
         CALL DAT_FIND( ALOC, ROBJ, ARLOC, STATUS )
 
 *    Copy components
-        CALL ADI_CCH2AC( ARLOC, 'FILE', OARG, 'File', STATUS )
-        CALL ADI_CCH2AC( ARLOC, 'PATH', OARG, 'Path', STATUS )
+        CALL CMP_GET0C( ARLOC, 'FILE', FILE, STATUS )
+        CALL ADI_NEWV0C( FILE, OARG, STATUS )
 
 *    Release reference
         CALL DAT_ANNUL( ARLOC, STATUS )
