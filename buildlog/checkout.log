@@ -8377,16 +8377,7 @@ U java/source/table/.properties
 U java/source/table/build.xml
 cvs checkout: Updating java/source/table/src
 cvs checkout: Updating java/source/table/src/docs
-U java/source/table/src/docs/MultiHTML.java
-U java/source/table/src/docs/docs.dtd
-U java/source/table/src/docs/multi.xslt
-U java/source/table/src/docs/starlinklogo3.gif
-U java/source/table/src/docs/stil.html
-U java/source/table/src/docs/stil_large.gif
-U java/source/table/src/docs/stil_small.gif
-U java/source/table/src/docs/sun252.xml
-U java/source/table/src/docs/toHTML.xslt
-U java/source/table/src/docs/toHTML1.xslt
+U java/source/table/src/docs/readme.txt
 cvs checkout: Updating java/source/table/src/lib
 U java/source/table/src/lib/htmIndex.jar
 cvs checkout: Updating java/source/table/src/main
