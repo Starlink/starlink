@@ -43,7 +43,7 @@ dnl    Need prohlp to create help.
 STAR_CHECK_PROGS(prohlp, sst)
 
 dnl    Configure files.
-AC_CONFIG_FILES([Makefile component.xml astshow.tcl])
+AC_CONFIG_FILES([Makefile component.xml astshow.tcl atools.ifd])
 AC_CONFIG_FILES([make_history_help], [chmod 755 make_history_help])
 
 dnl    And the fat lady sings.

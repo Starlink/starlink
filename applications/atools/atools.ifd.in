@@ -1,5 +1,5 @@
 package atools {
-   version PKG_VERS
+   version @PACKAGE_VERSION@
    prefix atl
 
    executable atools_mon {
