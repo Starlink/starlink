@@ -242,6 +242,9 @@
 *  Version id
       CALL MSG_PRNT( VERSION )
 
+*  Initialise ASTERIX
+      CALL AST_INIT()
+
 *  Initialise logicals
       IN1_UERR = .FALSE.
       IN2_UERR = .FALSE.
