@@ -32,7 +32,6 @@
 #ifdef HAVE_CSTD_INCLUDE
 #  include <cstdio>
 #  include <cctype>
-#  include <cerrno>
 #  include <cctype>
 #  if CCTYPE_IN_STD
 using std::isspace;
@@ -41,7 +40,6 @@ using std::isxdigit;
 #else
 #  include <stdio.h>
 #  include <ctype.h>
-#  include <errno.h>
 #  include <ctype.h>
 #endif
 #include <unistd.h>		// this is standard according to single-unix, 
