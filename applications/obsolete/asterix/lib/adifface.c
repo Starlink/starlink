@@ -2703,6 +2703,15 @@ F77_SUBROUTINE(adifn(eeval))( INTEGER(expr), INTEGER(symlist), LOGICAL(ownres),
   *value = ADIexprEval( *expr, *symlist, F77_ISTRUE(*ownres), status );
   }
 
+
+F77_SUBROUTINE(adifn(init))( INTEGER(status) )
+  {
+  GENPTR_INTEGER(status)
+
+  adi_init( status );
+  }
+
 /* End of ADI_F77 defined test
  */
+
 #endif
