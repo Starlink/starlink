@@ -1053,7 +1053,7 @@ unbuild: clean
 	cd astrom && ./mk unbuild
 	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
 	cd catlib && if test -f Makefile; then make distclean; fi
-	test ! -d $(CATLIBINSTALLDIR) || rm -Rf (CATLIBINSTALLDIR)
+	test ! -d $(CATLIBINSTALLDIR) || rm -Rf $(CATLIBINSTALLDIR)
 	cd doc && make unbuild
 	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
