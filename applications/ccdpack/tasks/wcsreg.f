@@ -158,6 +158,24 @@
 *        using the ASTIMP application.  The name FINAL is used for the
 *        new domain added to the WCS component.
 
+*  Behaviour of parameters:
+*     Most parameters retain their current value as default. The
+*     "current" value is the value assigned on the last run of the
+*     application. If the application has not been run then the
+*     "intrinsic" defaults, as shown in the parameter help, apply.
+*
+*     Retaining parameter values has the advantage of allowing you to
+*     define the default behaviour of the application but does mean
+*     that additional care needs to be taken when using the application
+*     on new datasets or after a break of sometime.  The intrinsic
+*     default behaviour of the application may be restored by using the
+*     RESET keyword on the command line.
+*
+*     Certain parameters (LOGTO and LOGFILE) have global values.
+*     These global values will always take precedence, except when an
+*     assignment is made on the command line.  Global values may be set
+*     and reset using the CCDSETUP and CCDCLEAR commands.
+
 *  Copyright:
 *     Copyright (C) 1999 Particle Physics & Astronomy Research Council
 

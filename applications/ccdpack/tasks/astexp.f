@@ -249,7 +249,7 @@
 *        requirements.
 
 *  Behaviour of parameters:
-*     All parameters retain their current value as default. The
+*     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
 *     "intrinsic" defaults, as shown in the parameter help, apply.
