@@ -112,8 +112,7 @@
               QOK=.TRUE.
             ENDIF
             IF (QOK) THEN
-              CALL BDI_MAP( FID, 'Variance', 'UBYTE', 'READ', QPTR,
-     :                      STATUS )
+              CALL BDI_MAPUB( FID, 'Quality', 'READ', QPTR, STATUS )
             ENDIF
 
 *  copy existing data to work area, creating quality if necessary

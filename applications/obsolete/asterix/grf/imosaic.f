@@ -843,7 +843,8 @@ c                              ! axis units
 *      Create and map the output variance array if required
         IF ( LVAR ) THEN
 
-          CALL BDI_MAPR( OFID, 'Variance', 'WRITE/ZERO', PNTROV, STATUS )
+          CALL BDI_MAPR( OFID, 'Variance', 'WRITE/ZERO', PNTROV,
+     :                   STATUS )
 
         ELSE
 
@@ -1035,9 +1036,7 @@ c                              ! axis units
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      INTEGER NOUT(2)                            !Axis dimensions
       REAL			SCALE(2)			! Bin sizes
-      LOGICAL OK                                 !Is object present
       INTEGER			NACT			! Values read from obj
 *-
 
