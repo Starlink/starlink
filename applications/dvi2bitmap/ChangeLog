@@ -1,3 +1,8 @@
+2003-08-11  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* PipeStream.cc Finally (?) debugged. Version 0.11b1 released
+	* all Substantial additions to documentation
+
 2003-08-03  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* libdvi2bitmap Transformed into library.
