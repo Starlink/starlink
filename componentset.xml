@@ -33,7 +33,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="atools">
-  <version>1.7</version>
+  <version>1.6-3</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -908,6 +908,34 @@ IRAS90 is a suite of programs for processing IRAS data.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="ircamdr">
+  <version>1.1-2</version>
+  <path>applications/obsolete/iras90</path>
+  <description>IRCAMDR - IRCAM3 Data Reduction Software</description>
+  <abstract><p>
+The IRCAM3 data reduction and analysis software package,
+IRCAMDR (the old ircam\_clred updated to work under Unix
+and renamed) will analyse and display any 2D data image with a .sdf
+file extension stored in the standard Starlink NDF data format.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>ndf</build><build>sgs</build><build>fio</build><build>gks</build><build>mag</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Colin Aspin</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Sandy Leggett</name>
+    </person>
+  </developers>
+  <documentation> sun41</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="photom">
   <version>1.9-0</version>
   <path>applications/photom</path>
@@ -1547,7 +1575,7 @@ No longer under active control.
       character strings, logical values and pointers to dynamically
       allocated memory.</p></abstract>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    
   </dependencies>
   <developers>
     <person>
@@ -1699,7 +1727,7 @@ No longer under active control.
   package.
   </p></abstract>
   <dependencies >
-    <build>gkspar</build><build>pgppar</build><build>sgspar</build><build>gns</build><sourceset>star2html</sourceset>
+    <build>sae</build><build>chr</build><build>ems</build><build>par</build><build>mers</build><build>starx</build><build>gks</build><build>gns</build><build>pgp</build><build>sgs</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1725,132 +1753,6 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun113</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="gkspar">
-  <version>1.1-5</version>
-  <path>libraries/graphpar/gkspar</path>
-  <description>ADAM Graphics Programming with GKS</description>
-  <abstract><p>
-  Libraries for incorporating GKS graphics into ADAM applications. The
-  routines handle the necessary interactions with the ADAM parameter
-  system where a graphics device is opened for a GKS based graphics
-  package.
-  </p></abstract>
-  <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>gks</build><build>par</build><link>gns</link><link>gks</link><link>gwm</link><link>starx</link><link>ems</link>
-  </dependencies>
-  <developers>
-    <person>
-      <name>P M Allan</name>
-      <uname>pma</uname>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-    <person>
-      <name>Dave Terrett</name>
-      <uname>dlt</uname>
-    </person>
-    <person>
-      <name>Sid Wright</name>
-      <uname>slw</uname>
-    </person>
-    <person>
-      <name>Dennis Kelly</name>
-      <uname>bdk</uname>
-    </person>
-  </developers>
-  <documentation></documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="pgppar">
-  <version>1.1-5</version>
-  <path>libraries/graphpar/pgppar</path>
-  <description>ADAM Graphics Programming with PGPLOT</description>
-  <abstract><p>
-  Libraries for incorporating GKS PGPLOT graphics into ADAM applications. The
-  routines handle the necessary interactions with the ADAM parameter
-  system where a graphics device is opened for a GKS based graphics
-  package.
-  </p></abstract>
-  <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>gks</build><build>par</build><build>pgp</build><link>pgp</link><link>psx</link><link>gns</link><link>chr</link><link>gks</link>
-  </dependencies>
-  <developers>
-    <person>
-      <name>P M Allan</name>
-      <uname>pma</uname>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-    <person>
-      <name>Dave Terrett</name>
-      <uname>dlt</uname>
-    </person>
-    <person>
-      <name>Sid Wright</name>
-      <uname>slw</uname>
-    </person>
-    <person>
-      <name>Dennis Kelly</name>
-      <uname>bdk</uname>
-    </person>
-  </developers>
-  <documentation></documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="sgspar">
-  <version>1.1-5</version>
-  <path>libraries/graphpar/sgspar</path>
-  <description>ADAM Graphics Programming with SGS</description>
-  <abstract><p>
-  Libraries for incorporating SGS graphics into ADAM applications. The
-  routines handle the necessary interactions with the ADAM parameter
-  system where a graphics device is opened for a GKS based graphics
-  package.
-  </p></abstract>
-  <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>gks</build><build>sgs</build><build>par</build><link>gns</link><link>chr</link><link>gks</link><link>sgs</link>
-  </dependencies>
-  <developers>
-    <person>
-      <name>P M Allan</name>
-      <uname>pma</uname>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-    <person>
-      <name>Dave Terrett</name>
-      <uname>dlt</uname>
-    </person>
-    <person>
-      <name>Sid Wright</name>
-      <uname>slw</uname>
-    </person>
-    <person>
-      <name>Dennis Kelly</name>
-      <uname>bdk</uname>
-    </person>
-  </developers>
-  <documentation></documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -2107,7 +2009,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><link>cat</link><link>mers</link><link>pcs</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
