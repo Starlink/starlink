@@ -840,12 +840,16 @@ build_demo:
       [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
 
 build:
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
+  [javadoc] Constructing Javadoc information...
 
 docs_check:
 
 docs:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs
-     [copy] Copying 85 files to /apps/cvsbuild/java/source/topcat/build/docs
+     [copy] Copying 88 files to /apps/cvsbuild/java/source/topcat/build/docs
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/build/docs
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs/sun253
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
@@ -965,7 +969,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/bin
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/etc/topcat
      [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
-     [copy] Copying 173 files to /apps/cvsbuild/java/source/topcat/docs/topcat
+     [copy] Copying 176 files to /apps/cvsbuild/java/source/topcat/docs/topcat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/docs/topcat
 
 install:
@@ -973,9 +977,9 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 196 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 199 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copied 3 empty directories to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 83 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 86 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
 prepare:

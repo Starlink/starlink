@@ -9025,10 +9025,18 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatViewWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/UpDownButton.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ViewerTableModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/WindowAction.java
+cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/doc
+U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/DocNames.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/Heading.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/HtmlDoclet.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/MemberDoclet.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/func
-U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Activation.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Angles.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Miscellaneous.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Arithmetic.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Conversions.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Coords.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Maths.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Output.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sdss.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/InterMatchSpec.java
@@ -9088,8 +9096,10 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_s.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_s_pad.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blank24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blob2.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/book_leaf.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/browser1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/c_leaf.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/colmeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/concat4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/controlw.gif
@@ -9098,6 +9108,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/exit.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/exrows.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/false.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx2.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx_leaf.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridon.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/handle1.gif
@@ -9134,6 +9145,7 @@ cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink/topcat
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/DocTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/HelpTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/LinkChecker.java
+U java/source/topcat/src/testcases/uk/ac/starlink/topcat/MethodDocTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/ResourceTest.java
 cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink/topcat/plot
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/plot/MarkerTest.java

@@ -147,7 +147,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 83 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 90 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
@@ -1537,4 +1537,4 @@ javadoc-sources:
   [javadoc] 580 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 6 seconds
+Total time: 1 minute 7 seconds

@@ -722,6 +722,10 @@ build_demo:
       [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
 
 build:
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
+  [javadoc] Constructing Javadoc information...
 
 docs_check:
 
@@ -745,8 +749,8 @@ dist:
 install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 196 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 83 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 199 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 86 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
 prepare:

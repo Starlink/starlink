@@ -378,10 +378,14 @@ build_demo:
       [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
 
 build:
-    [javac] Compiling 83 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 60 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 90 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 63 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 23 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
+  [javadoc] Constructing Javadoc information...
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
      [echo] Executing Treeview target: build
@@ -462,4 +466,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 5 seconds
+Total time: 1 minute 11 seconds
