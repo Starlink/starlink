@@ -31,7 +31,8 @@
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
-*        The number of dimensions.
+*        The number of dimensions. This should be the value returned by
+*        NDF_BOUND, and should be the same for both INDF1 and INDF2.
 *     INDF1 = INTEGER (Given)
 *        An identifier for the source NDF. This should have NDIM axes.
 *     INDF2 = INTEGER (Given)
