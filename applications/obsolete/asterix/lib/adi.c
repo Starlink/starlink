@@ -1370,6 +1370,9 @@ void ADIparseClassSupers( ADIstreamPtr pstream, ADIobj *supers,
 
   _chk_init;			/* Check status on entry */
 
+/* Trap empty stream */
+  more = (pstream->ctok.t == TOK__SYM);
+
 /* While more superclass names to parse */
   while ( more && _ok(status) ) {
 
