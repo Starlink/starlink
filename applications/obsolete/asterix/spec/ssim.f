@@ -63,6 +63,7 @@
 *                        Poisson error case (DJA)
 *     25 Aug 95 : V1.8-3 Silly big with new vignetting code (DJA)
 *      9 Nov 95 : V2.0-0 Data interface converted to ADI (DJA)
+*     11 Jan 1996 : V2.0-1 Allow response from BinDS and file (DJA)
 *
 *    Type definitions :
 	IMPLICIT NONE
@@ -123,7 +124,7 @@
 
 *  Version :
       CHARACTER*30 		VERSION
-	PARAMETER		( VERSION = 'SSIM VERSION 2.0-0' )
+	PARAMETER		( VERSION = 'SSIM VERSION 2.0-1' )
 *-
 
 *  Version
@@ -140,7 +141,7 @@
       FOUND = .FALSE.
 
 *  Read input file
-      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS|*', 'READ', IFID, STATUS )
       CALL FIT_GETINS( IFID, 0, 1, FOUND, INSTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF(.NOT.FOUND)THEN
