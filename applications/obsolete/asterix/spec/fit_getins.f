@@ -115,6 +115,15 @@
 
         END IF
 
+      ELSE
+        CALL ERR_FLUSH( STATUS )
+        CALL MSG_PRNT( 'WARNING : Energy response not found, '/
+     :            /'channels are assumed to be energy in keV' )
+        CALL MSG_PRNT( '          and data 10**30 erg/s/bin. Data '/
+     :                     /'will be compared directly with model' )
+        INSTR.R_ID = ADI__NULLID
+        INSTR.A_ID = ADI__NULLID
+
       END IF
 
 *  Exit
