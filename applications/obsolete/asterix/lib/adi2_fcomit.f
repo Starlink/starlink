@@ -398,14 +398,22 @@
           IF ( ISTABLE ) THEN
 
 *        Shall we add some code here too? - rb
-            CALL FTPKYS( OLUN, 'XTENSION', 'BINTABLE', 'binary table extension', FSTAT )
-            CALL ADI2_IMGTSHP( HDUID, .TRUE., BITPIX, NDIM, DIMS, STATUS )
-            CALL FTPKYJ( OLUN, 'BITPIX', BITPIX, 'bits per pixel', FSTAT )
-            CALL FTPKYJ( OLUN, 'NAXIS', NDIM, '2-dimensional binary table', FSTAT)
-            CALL FTPKYJ( OLUN, 'NAXIS1', DIMS(1), 'width of table in bytes', FSTAT)
-            CALL FTPKYJ( OLUN, 'NAXIS2', DIMS(2), 'number of rows in table', FSTAT)
-c           CALL FTPKYJ( OLUN, 'PCOUNT', 0, 'size of special data  area', FSTAT)
-c           CALL FTPKYJ( OLUN, 'GCOUNT', 1, 'one data group (required keyword)', FSTAT)
+            CALL FTPKYS( OLUN, 'XTENSION', 'BINTABLE',
+     :                   'binary table extension', FSTAT )
+            CALL ADI2_IMGTSHP( HDUID, .TRUE., BITPIX, NDIM, DIMS,
+     :                   STATUS )
+            CALL FTPKYJ( OLUN, 'BITPIX', BITPIX, 'bits per pixel',
+     :                   FSTAT )
+            CALL FTPKYJ( OLUN, 'NAXIS', NDIM,
+     :                   '2-dimensional binary table', FSTAT)
+            CALL FTPKYJ( OLUN, 'NAXIS1', DIMS(1),
+     :                   'width of table in bytes', FSTAT)
+            CALL FTPKYJ( OLUN, 'NAXIS2', DIMS(2),
+     :                   'number of rows in table', FSTAT)
+c           CALL FTPKYJ( OLUN, 'PCOUNT', 0,
+c    :                   'size of special data  area', FSTAT)
+c           CALL FTPKYJ( OLUN, 'GCOUNT', 1,
+c    :                   'one data group (required keyword)', FSTAT)
 
 *        Define the data size
             CALL FTPDEF( OLUN, BITPIX, NDIM, DIMS, PCOUNT, GCOUNT,
