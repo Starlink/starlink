@@ -46,20 +46,49 @@ fi
 
 dnl   Checks for header files (note unistd.h and stdlib are
 dnl   automatically checked for, and the corresponding HAVE_ macros
-dnl   defined).  Check if we've got sstream; if not, hope we have the
-dnl   older strstream.
+dnl   defined).
 AC_HEADER_STDC
-AC_CHECK_HEADERS(assert.h fcntl.h signal.h sys/stat.h sys/wait.h sys/time.h sys/mman.h)
+AC_CHECK_HEADERS([assert.h fcntl.h signal.h sys/stat.h sys/wait.h sys/time.h sys/mman.h sys/types.h])
 AC_HEADER_STAT
 
 dnl   Checks for library functions
-AC_CHECK_FUNCS(pipe snprintf setenv putenv alarm setitimer mmap)
-
+AC_CHECK_FUNCS(pipe snprintf setenv putenv alarm setitimer)
+AC_FUNC_MMAP
 
 
 dnl   Now switch to doing header checks with C++, for those headers
-dnl   which are specific to C++
+dnl   which are specific to C++.
 AC_LANG([C++])
+
+dnl   Check for the type of mmap arguments.  POSIX says this should be void*,
+dnl   but Solaris CC seems to want it to be caddr_t=char*.
+AC_MSG_CHECKING([the type of mmap pointers])
+for mman_t in 'void*' caddr_t NONE
+do
+  AC_TRY_COMPILE([
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_SYS_MMAN_H
+#include <sys/mman.h>
+#endif
+], [
+int status;
+$mman_t ptr;
+status = munmap(ptr, 0);
+],
+  break)
+done
+if test "$mman_t" = NONE; then
+  AC_MSG_RESULT([void* (I hope)])
+  mman_t='void*'
+else
+  AC_MSG_RESULT($mman_t)
+fi
+AC_DEFINE_UNQUOTED(MMAP_TYPE, $mman_t,
+                   [Define as the type of the first argument to munmap])
+
+dnl   Check if we've got sstream; if not, hope we have the older strstream.
 AC_CHECK_HEADERS(sstream strstream cassert)
 
 dnl   What type of system are we on?
