@@ -28,6 +28,7 @@
 *     24-JUN-1994  Changed LIB$ to FIO_, STR$ to CHR_,
 *                  MSG_OUT on error to ERR_REP (SKL@JACH)
 *     07-SEP-1994  Reduced continuation lines for UNIX compiler (SKL@JACH)
+*     11-AUG-2004  Use FIO for open (otherwsie non-portable)
 *
 *    Type definitions :
 
@@ -253,19 +254,16 @@
           CALL MSG_OUT( 'BLANK', ' ', STATUS)
           CALL PAR_GET0C( 'FILENAME', FFILE, STATUS)
           CALL PAR_CANCL( 'FILENAME', STATUS)
-          CALL FIO_GUNIT( LUN, STATUS )
-          OPEN( UNIT=LUN, FILE=FFILE, STATUS='OLD', ERR=997)
-          GOTO 300
-  997     CONTINUE
+          CALL FIO_OPEN(FFILE,'READ','NONE',0,LUN,STATUS)
+          IF (STATUS .EQ. SAI__OK) GO TO 300
           CALL MSG_SETC( 'FFILE', FFILE)
-          CALL MSG_OUT( 'MESSAGE',
+          CALL ERR_REP( 'MESSAGE',
      :      'Error, cannot find file ... ^FFILE',
      :      STATUS)
-          CALL FIO_PUNIT( LUN, STATUS )
+          CALL ERR_ANNUL( STATUS )
           GOTO 400
   300     CONTINUE
-          CLOSE( LUN)
-          CALL FIO_PUNIT( LUN, STATUS )
+          CALL FIO_CLOSE( LUN, STATUS )
           CALL MSG_OUT( 'BLANK', ' ', STATUS)
         END IF
 
@@ -457,11 +455,10 @@
                   L1 = 0
                   CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)
                   DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
-                  CALL FIO_GUNIT( LUNO, STATUS )
-                  OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
-     :                  FORM='UNFORMATTED', RECORDTYPE='FIXED',
-     :                  RECL=2880/4, ERR=996)
-                  CALL MSG_SETC( 'FI', DISKFITS, STATUS)
+                  CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
+     :                 2880, LUNO, STATUS )
+                  IF (STATUS .NE. SAI__OK) GO TO 996
+                  CALL MSG_SETC( 'FI', DISKFITS )
                   CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', 
      :                           STATUS)
                 END IF
@@ -490,8 +487,7 @@
 
 *              release lun for output disk fits file
                 IF( TAPEORDISK( 1:1) .EQ. 'D') THEN
-                  CLOSE( LUNO)
-                  CALL FIO_PUNIT( LUNO, STATUS )
+                   CALL RIO_CLOSE( LUNO, STATUS )
                 END IF
 
 *              annul locators for the phaseA data buffer components
@@ -568,11 +564,10 @@
                   L1 = 0 
                   CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)
                   DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
-                  CALL FIO_GUNIT( LUNO, STATUS )
-                  OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
-     :                  FORM='UNFORMATTED', RECORDTYPE='FIXED',
-     :                  RECL=2880/4, ERR=996)
-                  CALL MSG_SETC( 'FI', DISKFITS, STATUS)
+                  CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
+     :                 2880, LUNO, STATUS )
+                  IF (STATUS .NE. SAI__OK) GO TO 996
+                  CALL MSG_SETC( 'FI', DISKFITS )
                   CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', 
      :                           STATUS)
                 END IF
@@ -598,8 +593,7 @@
 
 *              release lun for output disk fits file
                 IF( TAPEORDISK( 1:1) .EQ. 'D') THEN
-                  CLOSE( LUNO)
-                  CALL FIO_PUNIT( LUNO, STATUS )
+                   CALL RIO_CLOSE( LUNO, STATUS )
                 END IF
 
 *              annul locators for the phaseA data buffer components
@@ -674,7 +668,7 @@
 !                 OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
 !     :                 FORM='UNFORMATTED', RECORDTYPE='FIXED',
 !     :                 RECL=2880/4, ERR=996)
-!                 CALL MSG_SETC( 'FI', DISKFITS, STATUS)
+!                 CALL MSG_SETC( 'FI', DISKFITS)
 !                 CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', STATUS)
 !               END IF
 
@@ -814,7 +808,7 @@
 !                 OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
 !     :                 FORM='UNFORMATTED', RECORDTYPE='FIXED',
 !     :                 RECL=2880/4, ERR=996)
-!                 CALL MSG_SETC( 'FI', DISKFITS, STATUS)
+!                 CALL MSG_SETC( 'FI', DISKFITS)
 !                 CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', STATUS)
 !               END IF
 
@@ -907,9 +901,9 @@
         IF( SOURCE( 1:1) .EQ. 'F' .OR. SOURCE( 1:1) .EQ. 'B') THEN
           CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
-*        get a lun and try to open the file
-          CALL FIO_GUNIT( LUN, STATUS )
-          OPEN( UNIT=LUN, FILE=FFILE, STATUS='OLD', ERR=999)
+*        try to open the file
+          CALL FIO_OPEN(FFILE, 'READ', 'NONE', 0, LUN, STATUS)
+          IF (STATUS .NE. SAI__OK) GO TO 999
 
 *        dump one image frame at a time
           MORE = .TRUE.
@@ -1000,11 +994,10 @@
               L1 = 0 
               CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)              
               DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
-              CALL FIO_GUNIT( LUNO, STATUS )
-              OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
-     :              FORM='UNFORMATTED', RECORDTYPE='FIXED',
-     :              RECL=2880/4, ERR=996)
-              CALL MSG_SETC( 'FI', DISKFITS, STATUS)
+              CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
+     :             2880, LUNO, STATUS )
+              IF (STATUS .NE. SAI__OK) GO TO 996
+              CALL MSG_SETC( 'FI', DISKFITS )
               CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', STATUS)
             END IF
 
@@ -1028,8 +1021,7 @@
 
 *          release lun for output disk fits file
             IF( TAPEORDISK( 1:1) .EQ. 'D') THEN
-              CLOSE( LUNO)
-              CALL FIO_PUNIT( LUNO, STATUS )
+               CALL RIO_CLOSE( LUNO, STATUS )
             END IF
 
 *          tidy up the input data structure
@@ -1128,11 +1120,10 @@
               L1 = 0 
               CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)
               DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
-              CALL FIO_GUNIT( LUNO, STATUS )
-              OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
-     :              FORM='UNFORMATTED', RECORDTYPE='FIXED',
-     :              RECL=2880/4, ERR=996)
-              CALL MSG_SETC( 'FI', DISKFITS, STATUS)
+              CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
+     :             2880, LUNO, STATUS )
+              IF (STATUS .NE. SAI__OK) GO TO 996
+              CALL MSG_SETC( 'FI', DISKFITS)
               CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', STATUS)
             END IF
 
@@ -1156,8 +1147,7 @@
 
 *          release lun for output disk fits file
             IF( TAPEORDISK( 1:1) .EQ. 'D') THEN
-              CLOSE( LUNO)
-              CALL FIO_PUNIT( LUNO, STATUS )
+               CALL RIO_CLOSE( LUNO, STATUS )
             END IF
 
 *          tidy up the input data structure
@@ -1301,11 +1291,10 @@
                 L1 = 0 
                 CALL CHR_APPND( CCOUNTER, CCOUNTER, L1)
                 DISKFITS = 'FITS'//CCOUNTER( 1:L1)//'.FITS'
-                CALL FIO_GUNIT( LUNO, STATUS )
-                OPEN( UNIT=LUNO, FILE=DISKFITS, STATUS='UNKNOWN', 
-     :                FORM='UNFORMATTED', RECORDTYPE='FIXED',
-     :                RECL=2880/4, ERR=996)
-                CALL MSG_SETC( 'FI', DISKFITS, STATUS)
+                CALL RIO_OPEN(DISKFITS,'WRITE','UNFORMATTED',
+     :               2880, LUNO, STATUS )
+                IF (STATUS .NE. SAI__OK) GO TO 996
+                CALL MSG_SETC( 'FI', DISKFITS)
                 CALL MSG_OUT( 'MESS', 'Disk FITS file = ^FI', 
      :                STATUS)
               END IF
@@ -1331,8 +1320,7 @@
 
 *            release lun for output disk fits file
               IF( TAPEORDISK( 1:1) .EQ. 'D') THEN
-                CLOSE( LUNO)
-                CALL FIO_PUNIT( LUNO, STATUS )
+                 CALL RIO_CLOSE( LUNO, STATUS )
               END IF
 
 *            annul locators for the phaseA data buffer components
@@ -1354,20 +1342,18 @@
         END IF
         RETURN
   999   CONTINUE
-        CALL FIO_PUNIT( LUN, STATUS )
+        CALL FIO_CLOSE( LUN, STATUS )
         CALL ERR_OUT( 'MESSAGE', 'Error, cannot find image list file',
      :                STATUS)
         RETURN
   998   CONTINUE
-        CLOSE( LUN)
-        CALL FIO_PUNIT( LUN, STATUS )
+        CALL FIO_CLOSE( LUN, STATUS )
         CALL ERR_REP( 'MESSAGE', 
      :                'Error, cannot read from specified file',
      :                STATUS)
         RETURN
   996   CONTINUE
-        CLOSE( LUNO)
-        CALL FIO_PUNIT( LUNO, STATUS )
+        CALL RIO_CLOSE( LUNO, STATUS)
         CALL ERR_REP( 'MESSAGE', 
      :                'Error, cannot write disk fits file',
      :                STATUS)
