@@ -126,6 +126,11 @@
         CALL ADI_DEFMTH( 'CopyHistory(_HDSfile,_HDSfile)', HSI1_COPY,
      :                   DID, STATUS )
 
+        CALL ADI_DEFMTH( 'CopyHistory(_FITSfile,_HDSfile)', ADI_NULMTH,
+     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'CopyHistory(_HDSfile,_FITSfile)', ADI_NULMTH,
+     :                   DID, STATUS )
+
 *    Data extractors & modifiers
         CALL ADI_DEFMTH( 'GetHistoryCtrl(_HDSfile)', HSI1_GETCTR,
      :                   DID, STATUS )
