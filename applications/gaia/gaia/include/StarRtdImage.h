@@ -200,6 +200,9 @@ public:
 
   //  HDU command.
   int hduCmd( int argc, char *argv[] );
+  
+  //  Replacement mband command, also allows for pixels and non-celestial.
+  gbandCmd( int argc, char *argv[] );
 
 protected:
 

@@ -18,11 +18,11 @@
 //    24-JUL-1997 (PWD):
 //       Original version based on WCS for RTD.
 //    16-MAR-1998 (ALLAN)
-//       Renamed the local WCSRep class to StarWCS and removed local WCS class, 
-//       to be compatible with the main Rtd/Skycat release. 
+//       Renamed the local WCSRep class to StarWCS and removed local WCS class,
+//       to be compatible with the main Rtd/Skycat release.
 //       The original WCSRep class has been renamed to SAOWCS (based on the
 //       saoimage wcslib) and WCSRep is now an abstract base class.
-//       Here we define a subclass of WCSRep that defines the new behavior 
+//       Here we define a subclass of WCSRep that defines the new behavior
 //       and uses the Starlink routines, rather then the sao version, as is
 //       used by skycat.
 //    22-APR-1998 (ALLAN)
@@ -37,29 +37,29 @@ extern "C" {
 #include "WCS.h"
 #include "tcl.h"
 
-// 
+//
 //  This class is used internally for reference counting.
 //  The public interface is through the WCS class.
 //
 class StarWCS : public WCSRep {
 protected:
-  //  Frameset with frames for image and world coordinates and 
+  //  Frameset with frames for image and world coordinates and
   //  mappings between them.
-  AstFrameSet *wcs_;         
+  AstFrameSet *wcs_;
 
   //  Equinox as 2000.0, 1950.0, ...
-  double equinox_;	     
+  double equinox_;
 
   //  Equinox string: "J2000", "B1950", ...
-  char equinoxStr_[32];	     
+  char equinoxStr_[32];
 
   //  Set equinox value and string.
-  void setEquinox();	     
+  void setEquinox();
 
   //  Set the xSecPix_ and ySecPix_ values (arcsecs per pixel).
-  void setSecPix();	     
+  void setSecPix();
 
-  //  Width and height of the image in pixels. 
+  //  Width and height of the image in pixels.
   int nxpix_;
   int nypix_;
 
@@ -68,7 +68,7 @@ protected:
 
   //  Make WCS 2D from sky to image.
   int make2D();
-  
+
   //  Maximum number of dimensions we can process.
   enum {MAXDIM = 12};
 
@@ -90,8 +90,11 @@ public:
   // return class name as a string
   virtual const char* classname() const {return "StarWCS";}
 
-  //  Return 1 if WCS info is available, else 0 
+  //  Return 1 if WCS info is available, else 0
   int isWcs() const {return (wcs_ && astIsAObject( wcs_ ));}
+
+  //  Return 1 if WCS is a celestial coordinate system.
+  int skyWcs();
 
   //  Return the world coordinates string for the given ximage coords
   char* pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag = 1) const;
@@ -111,12 +114,16 @@ public:
   //  Get the distance between two points.
   double dist( double ra0, double dec0, double ra1, double dec1 ) const;
 
+  //  Get the distance between two points which are in the correct
+  //  units (radians for celestial, returned in radians).
+  double plaindist( double x0, double y0, double x1, double y1 ) const;
+
   //  Set up an WCS system from the given information about the image
-  int set(double ra, double dec, 
-          double secpix, 
+  int set(double ra, double dec,
+          double secpix,
           double xrefpix, double yrefpix,
-          int nxpix, int nypix, 
-          double rotate, 
+          int nxpix, int nypix,
+          double rotate,
           int equinox, double epoch,
           const char* proj);
 
@@ -129,23 +136,23 @@ public:
 
   // Return the WCS epoch
   double epoch() const;
-   
+
   // Return the rotation angle in degrees
   double rotate() const {return rotate_;}
-  
+
   // Return the width, height, radius of the image in arc-minutes
   double width() const;
   double height() const;
   double radius() const;
-    
+
   // Return the number of world coordinate arcseconds per pixel
   double xSecPix() const {return xSecPix_;}
   double ySecPix() const {return ySecPix_;}
   double secPix() const  {return ySecPix_;}
 
-  // Return the world coordinates of the center of the image 
+  // Return the world coordinates of the center of the image
   WorldCoords center() const;
-    
+
   // Return image dimensions
   int pixWidth() const {return nxpix_;}
   int pixHeight() const {return nypix_;}
@@ -158,18 +165,18 @@ public:
   const char* projection() const {return "UNKNOWN";}
 
   // Return a clone of the pointer to the main AstFrameSet.
-  AstFrameSet *astWCSClone() const { 
-    if ( wcs_ && astIsAObject( wcs_ ) ) 
+  AstFrameSet *astWCSClone() const {
+    if ( wcs_ && astIsAObject( wcs_ ) )
       return (AstFrameSet *) astClone( wcs_ );
-    else 
+    else
       return (AstFrameSet *) NULL;
   }
 
   // Return a copy of the pointer to the main AstFrameSet.
-  AstFrameSet *astWCSCopy() const { 
-    if ( wcs_ && astIsAObject( wcs_ ) ) 
+  AstFrameSet *astWCSCopy() const {
+    if ( wcs_ && astIsAObject( wcs_ ) )
       return (AstFrameSet *) astCopy( wcs_ );
-    else 
+    else
       return (AstFrameSet *) NULL;
   }
 
@@ -179,7 +186,7 @@ public:
   // Return the value of an AST attribute of the main AstFrameSet.
   const char *astGet( char *attrib );
 };
-  
+
 
 #endif /* _StarWCS_h_ */
 

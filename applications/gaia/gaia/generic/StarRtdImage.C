@@ -101,6 +101,10 @@
 //     12-JUL-1999 (PWD):
 //        Added changes to sliceCmd to replace blank pixels by the
 //        mean along the slice. Added percentiles command.
+//     14-JUL-1999 (PWD):
+//        Added gbandCmd to display image pixels and non-RA/Dec
+//        coordinates, otherwise this is exactly the same as
+//        RtdImage::mbandCmd.
 //-
 
 #include <string.h>
@@ -172,6 +176,7 @@ public:
   { "contour",       &StarRtdImage::contourCmd,      1, 6 },
   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
+  { "gband",         &StarRtdImage::gbandCmd,        6,  6},
   { "hdu",           &StarRtdImage::hduCmd,          0,  6},
   { "origin",        &StarRtdImage::originCmd,       2, 2 },
   { "percentiles",   &StarRtdImage::percentCmd,      1, 1 },
@@ -645,8 +650,9 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
       // preferred encoding then use this as well as a native encoding.
       //      astSet( chan, "Encoding=Native" );
       StarWCS* wcsp = getStarWCSPtr();
-      if (!wcsp)
-	  return TCL_ERROR;
+      if ( !wcsp ) {
+	return TCL_ERROR;
+      }
       AstFrameSet *newwcs = wcsp->astWCSClone();
       int nwrite = astWrite( chan, newwcs );
       if ( !astOK ) {
@@ -3010,7 +3016,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
       if ( ivvalues[i*2+1] != blank ) {
 	mean += ivvalues[i*2+1];
 	count++;
-      }    
+      }
     }
     if ( count != 0 ) {
       mean /= (double) count;
@@ -3748,7 +3754,7 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
   if ( Tcl_SplitList( interp_, argv[0], &nlevels, &levelsArgv ) != TCL_OK ) {
     return error( "sorry: failed to decode the percentile levels (check format)" );
   }
-  if ( nlevels == 0 ) { 
+  if ( nlevels == 0 ) {
     return error( "must give some percentiles" );
   }
 
@@ -3782,7 +3788,7 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
   }
 
   //  Now get percentiles. Assume ordered randomly.
-  for ( i = 0; i < nlevels; i++ ) { 
+  for ( i = 0; i < nlevels; i++ ) {
 
     //  Change percentile to pixel count.
     int cutoff = (int) ( (double) npixels * ( levels[i] / 100.0 ) );
@@ -3810,7 +3816,7 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
 
   //  Construct the result.
   char buf[TCL_DOUBLE_SPACE];
-  for ( i = 0; i < nlevels; i++ ) { 
+  for ( i = 0; i < nlevels; i++ ) {
     sprintf( buf, "%f", levels[i] );
     append_element( buf );
   }
@@ -3821,3 +3827,273 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
   return TCL_OK;
 }
 
+//
+// clip x to withing range x0 .. x1
+//
+static void clip(double& x, double x0, double x1)
+{
+  if (x0 < x1) {
+    if (x < x0)
+      x = x0;
+    else if (x > x1)
+      x = x1;
+  } else {
+    if (x > x0)
+      x = x0;
+    else if (x < x1)
+      x = x1;
+  }
+}
+
+//+
+//   StarRtdImage::gbandCmd
+//
+//   Purpose:
+//      Do same job as RtdImage::mbandCmd, except deal with the case
+//      when there is no WCS or the WCS is not a celestial coordinate
+//      system.
+//
+//   Notes:
+//      See mband command for arguments.
+//
+//   Return:
+//      TCL_OK.
+//
+//-
+int StarRtdImage::gbandCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+  cout << "Called StarRtdImage::gbandCmd" << endl;
+#endif
+
+  //  If WCS is available see if it is celestial.
+  StarWCS *wcsp = (StarWCS *) NULL;
+  if ( isWcs() ) {
+    StarWCS* wcsp = getStarWCSPtr();
+    if ( wcsp->skyWcs() ) {
+      return RtdImage::mbandCmd( argc, argv );
+    }
+  }
+
+  //  Define buffers for width and height strings.
+  char widthStr[TCL_DOUBLE_SPACE];
+  char heightStr[TCL_DOUBLE_SPACE];
+  char distStr[TCL_DOUBLE_SPACE];
+
+  //  Extract the arguments.
+  double x0, y0, x1, y1;
+  int show_angle;
+  char* from_type = argv[4];
+  char* to_type = "canvas";
+  char buf[1024];
+
+  if (Tcl_GetInt(interp_, argv[5], &show_angle) != TCL_OK) {
+    return TCL_OK;
+  }
+
+  //  Convert input coordinates to canvas coords. Use canvas coords as 
+  //  will plot graphics in these.
+  if (convertCoordsStr(0, argv[0], argv[1], NULL, NULL, x0, y0, from_type, to_type) != TCL_OK
+      || convertCoordsStr(0, argv[2], argv[3], NULL, NULL, x1, y1, from_type, to_type) != TCL_OK) {
+    return TCL_OK;
+  }
+
+  //  Clip to image bounds.
+  double ix0 = 0;
+  double iy0 = 0;
+  double ix1 = image_->width();
+  double iy1 = image_->height();
+  if (   imageToCanvasCoords(ix0, iy0, 0) != TCL_OK
+      || imageToCanvasCoords(ix1, iy1, 0) != TCL_OK) {
+    return TCL_OK;
+  }
+  clip(x0, ix0, ix1);
+  clip(x1, ix0, ix1);
+  clip(y0, iy0, iy1);
+  clip(y1, iy0, iy1);
+
+  if ( wcsp != (StarWCS *)NULL ) {
+    //  Non-celestial coordinates, need to transform without prejudice
+    //  about hh/dd:mm:ss, so convert back to native from "degrees"
+    double ra0 = x0, dec0 = y0, ra1 = x1, dec1 = y1, ra2 = x1, dec2 = y0;
+    if (   canvasToWorldCoords(ra0, dec0, 0) != TCL_OK
+	|| canvasToWorldCoords(ra1, dec1, 0) != TCL_OK
+	|| canvasToWorldCoords(ra2, dec2, 0) != TCL_OK ) {
+      return TCL_OK;
+    }
+    ra0 *= R2D;
+    ra1 *= R2D;
+    ra2 *= R2D;
+    dec0 *= R2D;
+    dec1 *= R2D;
+    dec2 *= R2D;
+
+    //  Get distances in world coords.
+    double dist = wcsp->plaindist( ra0, dec0, ra1, dec1 );
+    double width, height;
+    sprintf( distStr, "%g", dist );
+    if (show_angle) {
+      width = wcsp->plaindist( ra0, dec0, ra2, dec2 );
+      sprintf( widthStr, "%g", width );
+      height = wcsp->plaindist( ra2, dec2, ra1, dec1 );
+      sprintf( heightStr, "%g", height );
+    }
+  } else {
+
+    //  Just image coordinates.
+    double ra0 = x0, dec0 = y0, ra1 = x1, dec1 = y1;
+    if (   canvasToImageCoords(ra0, dec0, 0) != TCL_OK
+	|| canvasToImageCoords(ra1, dec1, 0) != TCL_OK ) {
+      return TCL_OK;
+    }
+    double dist = sqrt(( ra1 - ra0 ) * ( ra1 - ra0 ) + 
+		       ( dec1 - dec0 ) * ( dec1 - dec0 ));
+    sprintf( distStr, "%g", dist );
+    if (show_angle) {
+      double width = fabs( ra1 - ra0 );
+      sprintf( widthStr, "%g", width );
+      double height = fabs( dec1 - dec0 );
+      sprintf( heightStr, "%g", height );
+    }
+  }
+
+  //  XXX code from mband.
+  //  Calculate canvas coords for lines and labels and
+  //  try to keep the labels out of the way so they don't block anything
+  double mx = (x0 + x1)/2;
+  double my = (y0 + y1)/2;
+  int offset = 10;		// offset of labels from lines
+  
+  char* diag_anchor = "c";	// label anchors
+  char* width_anchor = "c";
+  char* height_anchor = "c";
+
+  int diag_xoffset = 0,	// x,y offsets for labels
+    diag_yoffset = 0,
+    width_yoffset = 0,
+    height_xoffset = 0;
+
+  if (fabs(y0 - y1) < 5) {
+    diag_anchor = "s";
+    diag_yoffset = offset;
+    show_angle = 0;
+  }
+  else if (y0 < y1) {
+    width_anchor = "s";
+    width_yoffset = -offset;
+  }
+  else {
+    width_anchor = "n";
+    width_yoffset = offset;
+  }
+
+  if (fabs(x0 - x1) < 5) {
+    diag_anchor  = "w";
+    diag_xoffset = offset;
+    diag_yoffset = 0;
+    show_angle = 0;
+  } else if (x0 < x1) {
+    diag_anchor = "se";
+    diag_xoffset = -offset;
+    diag_yoffset = offset;
+    height_anchor = "w";
+    height_xoffset = offset;
+  }
+  else {
+    diag_anchor = "nw";
+    diag_xoffset = offset;
+    diag_yoffset = -offset;
+    height_anchor = "e";
+    height_xoffset = -offset;
+  }
+
+  //  Evaluate Tk canvas commands in the image's canvas
+  const char* canvas = canvasName_;
+
+  //  Set diagonal line coords
+  sprintf(buf, "%s coords mband_line %g %g %g %g\n",
+	  canvas, x0, y0, x1, y1);
+  Tcl_Eval(interp_, buf);
+
+  //  Adjust labels
+  sprintf(buf, "%s coords mband_diag_text %g %g\n",
+	  canvas, mx+diag_xoffset, my+diag_yoffset);
+  Tcl_Eval(interp_, buf);
+
+  sprintf(buf, "%s itemconfig mband_diag_text -text %s -anchor %s\n",
+	  canvas, distStr, diag_anchor);
+  Tcl_Eval(interp_, buf);
+
+  sprintf(buf, "%s bbox mband_diag_text\n", canvas);
+  Tcl_Eval(interp_, buf);
+
+  double rx0, ry0, rx1, ry1;
+  if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
+    return TCL_OK;
+
+  sprintf(buf, "%s coords mband_diag_rect %g %g %g %g\n",
+	  canvas,  rx0, ry0, rx1, ry1);
+  Tcl_Eval(interp_, buf);
+
+  if (show_angle) {
+    //  Set angle line coords
+    sprintf(buf, "%s coords mband_angle %g %g %g %g %g %g\n",
+	    canvas, x0, y0, x1, y0, x1, y1);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s coords mband_width_text %g %g\n",
+	    canvas, mx, y0+width_yoffset);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s itemconfig mband_width_text -text %s -anchor %s\n",
+	    canvas, widthStr, width_anchor);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s bbox mband_width_text\n", canvas);
+    Tcl_Eval(interp_, buf);
+
+    if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
+      return TCL_OK;
+    sprintf(buf, "%s coords mband_width_rect %g %g %g %g\n",
+	    canvas,  rx0, ry0, rx1, ry1);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s coords mband_height_text %g %g\n",
+	    canvas, x1+height_xoffset, my);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s itemconfig mband_height_text -text %s -anchor %s\n",
+	    canvas, heightStr, height_anchor);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s bbox mband_height_text\n", canvas);
+    Tcl_Eval(interp_, buf);
+
+    if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
+      return TCL_OK;
+    sprintf(buf, "%s coords mband_height_rect %g %g %g %g\n",
+	    canvas,  rx0, ry0, rx1, ry1);
+    Tcl_Eval(interp_, buf);
+  }
+  else {
+
+    //  Hide the width and height labels and lines
+    x1 = x0 + 1;
+    y1 = y0 + 1;
+    sprintf(buf, "%s coords mband_angle %g %g %g %g\n", canvas, x0, y0, x1, y1);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s itemconfig mband_width_text -text {}\n", canvas);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s coords mband_width_rect %g %g %g %g\n", canvas, x0, y0, x1, y1);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s itemconfig mband_height_text -text {}\n", canvas);
+    Tcl_Eval(interp_, buf);
+
+    sprintf(buf, "%s coords mband_height_rect %g %g %g %g", canvas, x0, y0, x1, y1);
+    Tcl_Eval(interp_, buf);
+  }
+  return TCL_OK;
+}

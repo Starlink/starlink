@@ -275,7 +275,7 @@ void StarWCS::setSecPix()
   xin[0] = xcen - 0.5;
   xin[1] = xcen + 0.5;
   yin[0] = yin[1] = ycen;
-  
+
   // Transform these image positions into sky coordinates.
   astTran2( wcs_, 2, xin, yin, 1, xout, yout );
 
@@ -303,7 +303,7 @@ void StarWCS::setSecPix()
   xin[0] = xin[1] = xcen;
   yin[0] = ycen - 0.5;
   yin[1] = ycen + 0.5;
-  
+
   // Transform these image positions into sky coordinates.
   astTran2( wcs_, 2, xin, yin, 1, xout, yout );
 
@@ -615,7 +615,6 @@ double StarWCS::dist(double ra0, double dec0, double ra1, double dec1) const
   return dist * R2D;
 }
 
-
 //
 //  Return the width of the image in world coordinate arc-minutes
 //
@@ -712,7 +711,7 @@ double StarWCS::height() const
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
       dist = ySecPix_ * nypix_;
     } else {
-      dist *= 60.0 * R2D;      
+      dist *= 60.0 * R2D;
     }
     return dist;
 }
@@ -763,7 +762,7 @@ double StarWCS::radius() const
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
       dist = sqrt ( 0.25 * xSecPix_ * nxpix_ * xSecPix_ * nxpix_
                   + 0.25 * ySecPix_ * nypix_ * ySecPix_ * nypix_ );
-      
+
     } else {
       dist *= 60.0 * R2D;
     }
@@ -1047,21 +1046,64 @@ int StarWCS::make2D()
   }
 }
 
-//
+//+
 //  Reset the center of the WCS structure
 //
 //  Args:
 // 	ra        = New center right ascension in degrees
 // 	dec       = New center declination in degrees
 // 	equinox   = (must be 2000 or 1950)
-//
+//-
 int StarWCS::shift(double ra, double dec, double equinox)
 {
   // Does nothing, I guess this should setup a new Frame in some way
-  // that transform the current system and is then added to the
+  // that transforms the current system and is then added to the
   // frameset as the current frame? What is is centre in this case
   // (reference pixel? -- actually this is assumed to be the centre of
   // the image.).
   cerr << "WCS::shift, this function is not implemented -- sorry." << endl;
   return 0;
 }
+
+
+//+
+//  Return if the current WCS is a celestial coordinate system.
+//-
+int StarWCS::skyWcs()
+{
+  if ( !isWcs() ) {
+    return 0;
+  }
+
+  AstFrameSet *frame = (AstFrameSet*) astGetFrame( wcs_, AST__CURRENT );
+  int issky = astIsASkyFrame( frame );
+  frame = (AstFrameSet *) astAnnul( frame );
+  return issky;
+}
+
+
+//
+//  Return the distance between two positions in world coordinates,
+//  assuming input units are correct and no conversions are required.
+//
+double StarWCS::plaindist(double x0, double y0, double x1, double y1) const
+{
+  if ( !isWcs() ) {
+    return 0.0;
+  }
+
+  double point1[2], point2[2];
+  point1[0] = x0;
+  point2[0] = x1;
+  point1[1] = y0;
+  point2[1] = y1;
+
+  double dist = astDistance( wcs_, point1, point2 );
+
+  if ( ! astOK ) astClearStatus;
+  if ( dist == AST__BAD ) {
+    return 0.0;
+  }
+  return dist;
+}
+
