@@ -3569,6 +3569,7 @@ ndg1_appen.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR
 ndg1_asexp.o:	 SAE_PAR NDG_CONST NDG_ERR GRP_PAR
 ndg1_chscn.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_crexp.o:	 SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
+ndg1_crpth.o:    SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDG_CONST
 ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR
 ndg1_fpars.o:	 SAE_PAR
 ndg1_gtyps.o:	 SAE_PAR
