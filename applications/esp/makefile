@@ -422,7 +422,7 @@ PKG_LINK = ESP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.10-3
+PKG_VERS = 0.10-5
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -496,7 +496,7 @@ F_SUB1 = corr.f ellfou.f ellpro.f esphelp.f fastmed.f gaufit.f \
 	selfc.f selfcw.f skew.f topped.f ards.f \
         esp1_asffr.f esp1_crpt.f esp1_dsfrm.f esp1_gtpos.f esp1_gtpsz.f \
         esp1_inpos.f esp1_pr2s.f esp1_s2pr.f esp1_xyfmt.f esp1_farr.f \
-	elp1_filer.f elp1_texto.f elp1_aif_asfio.f elp1_cato.f \
+	elp1_filer.f elp1_texto.f elp1_cato.f \
         kpg1_pgesc.f
 
 F_SUB2 =
@@ -1251,6 +1251,12 @@ test-install:
               $(LINK) -f ./$(MONOLITH) $(INSTALL_BIN)/$$f ;\
            else :; fi;\
         done
+#  Install the package ICL script.
+	if test -n "$(ICL_SCRIPT)"; then \
+           sed -e s#PKG_VERS#$(PKG_VERS)# \
+              $(ICL_SCRIPT) >$(INSTALL_BIN)/$(ICL_SCRIPT) ;\
+           chmod 755 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
+        else :; fi
 
 
 

@@ -4123,8 +4123,6 @@ c$$$      INTEGER ARRAY6(ELEMS)           ! Y co-ordinate array
       INTEGER STATUS                  ! Global status
 
 *  Local variables:
-C$$$      LOGICAL EXCLAIM                 ! Was an exclaimation mark given 
-                                      ! for the file name?
       LOGICAL OPENF                   ! Did the file open okay
       CHARACTER *(80) TEXT            ! The heading
       CHARACTER *(80) LINE            ! FIO line output length
@@ -4150,8 +4148,9 @@ C$$$      LOGICAL EXCLAIM                 ! Was an exclaimation mark given
 *   Find the file name.
 
 *   Determine the output text file name. If the file name chosen fails, 
-*   the user is reprompted.
-*   This logic is a replacement suggested by Malcolm Currie [NG]
+*   the user is reprompted.  Note that FIO_ASSOC doesn't
+*   (currently) respect/recognise PAR__ABORT, but if and when it
+*   does, this code will do the right thing by leaving OPENF false.
 
       OPENF = .FALSE.
       CALL FIO_ASSOC('OUT','WRITE','LIST',80,FIOD,STATUS)
@@ -4160,71 +4159,44 @@ C$$$      LOGICAL EXCLAIM                 ! Was an exclaimation mark given
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          OPENF = .TRUE.
       END IF
-
-
-
-c$$$      CALL MSG_BLANK(STATUS)
-c$$$      OPENF=.FALSE.
-c$$$      EXCLAIM=.FALSE.
-c$$$      CALL ERR_MARK
-c$$$      DO WHILE ((.NOT.OPENF).AND.(STATUS.EQ.SAI__OK))
-c$$$
-c$$$*      Get the output file name and try it.
-c$$$         CALL PAR_CANCL('OUT',STATUS)  
-c$$$         CALL GAU1_AIF_ASFIO('OUT','WRITE','LIST',80,FIOD,OPENF,
-c$$$     :                        EXCLAIM,STATUS)
-c$$$
-c$$$*      Tell the user that the file name is duff.
-c$$$         IF ((.NOT.OPENF).AND.(.NOT.EXCLAIM)) THEN
-c$$$            CALL ERR_REP(' ','Bad file name.',STATUS)
-c$$$            CALL ERR_REP(' ','To quit, type !',STATUS)
-c$$$            CALL ERR_ANNUL(STATUS)
-c$$$         END IF
-c$$$         
-c$$$      END DO
-c$$$
-c$$$*   Cancel the error context and abort if the STATUS is bad.
-c$$$      CALL ERR_RLSE
-c$$$      IF (STATUS.NE.SAI__OK) GOTO 9999
-c$$$      IF (EXCLAIM) GOTO 9999
       
 *   We couldn't open the file
-      if (.not. openf) goto 9999
+      IF (.NOT. OPENF) GOTO 9999
       
 *   Set the flags newfmt and showerrs, depending on the values of lsqfit
 *   and the elements of passerrs.  At present,
 *   showerrs=(lsqfit.or.passerrs(?)>0), and newfmt is redundant, but
 *   this could change in future, and it makes the logic clearer (I claim!)
-      newfmt = .false.          ! reproduces original case by default
+      NEWFMT = .FALSE.          ! reproduces original case by default
 
 *   If we obtained a least-squares fit, show output in new format
-      if (lsqfit)
-     :     newfmt = .true.
+      IF (LSQFIT)
+     :     NEWFMT = .TRUE.
 
 *   If we're writing a new-format file, then show errors by default
-      showerrs = newfmt
+      SHOWERRS = NEWFMT
 
 *   Check to see if any of the passerrs are non-zero, set
 *   showerrs=.true. if so, and consequently write out a V1.1 output file
 *   (don't bother with this test if showerrs is already true)
-      if (.not. showerrs) then
-         do i=1,10
-            do j=1,7
-               if (passerrs(i,j) .gt. 0.0) then
-                  showerrs = .true.
+      IF (.NOT. SHOWERRS) THEN
+         DO I=1,10
+            DO J=1,7
+               IF (PASSERRS(I,J) .GT. 0.0) THEN
+                  SHOWERRS = .TRUE.
 *               which requires...
-                  newfmt = .true.
-                  goto 10       ! LEAP OUT
-               endif
-            enddo
-         enddo
- 10      continue
-      endif
+                  NEWFMT = .TRUE.
+                  GOTO 10       ! LEAP OUT
+               ENDIF
+            ENDDO
+         ENDDO
+ 10      CONTINUE
+      ENDIF
 
 *   Output the heading, source co-ordinates used and the profiling results.
 *   Output a heading.
       NCHAR=0
-      if (newfmt) then
+      if (NEWFMT) then
          CALL CHR_PUTC('## ESP GAUFIT V1.1 OUTPUT FILE',LINE,NCHAR)
       else
          CALL CHR_PUTC('## ESP GAUFIT V1.0 OUTPUT FILE',LINE,NCHAR)
@@ -4987,193 +4959,6 @@ c$$$      IF (EXCLAIM) GOTO 9999
 ************************************
 *** KAPPA/KAPGEN CODE ADDED HERE ***
 ************************************
-
-* gau1_aif_asfio redundant since improvements to fio_assoc
-
-c$$$      SUBROUTINE GAU1_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN,
-c$$$     :                           EXCLAIM,STATUS)
-c$$$*+
-c$$$*    Description :
-c$$$*
-c$$$*     This routine opens a sequential file via FIO_ASSOC.  Up to four
-c$$$*     attempts may be made to open the file.  If a null response is
-c$$$*     supplied the file is not opened, and the flag returned indicates
-c$$$*     this fact.
-c$$$*
-c$$$*    Invocation :
-c$$$*
-c$$$*      CALL GAU1_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN, 
-c$$$*                      EXCLAIM,STATUS)
-c$$$
-c$$$*
-c$$$*    Arguments :
-c$$$*
-c$$$*     PNFILE=CHARACTER*(*)
-c$$$*         Parameter name by which file is to be opened
-c$$$*     ACMODE=CHARACTER*(*)
-c$$$*         Expression giving the required access mode.
-c$$$*           Valid modes are: 'READ', 'WRITE', 'UPDATE' and 'APPEND'.
-c$$$*           For details, see FIO_OPEN.
-c$$$*     FORM=CHARACTER*(*)( READ )
-c$$$*         Expression giving the required formatting of the file.
-c$$$*           Valid formats are: 'FORTRAN', 'LIST', 'NONE' and
-c$$$*           'UNFORMATTED'. For details, see FIO_OPEN.
-c$$$*     RECSZ=INTEGER( READ )
-c$$$*         Expression giving the maximum record size in bytes.
-c$$$*           Set it to zero if the Fortran default is required.
-c$$$*     FD=INTEGER( WRITE )
-c$$$*         Variable to contain the file descriptor.
-c$$$*     OPEN=LOGICAL( WRITE )
-c$$$*         If true the file has been opened.
-c$$$*     EXCLAIM=LOGICAL( WRITE )
-c$$$*         If true then the user input was '!'.
-c$$$*     STATUS=INTEGER( READ, WRITE )
-c$$$*         Global status value
-c$$$*
-c$$$*    Method :
-c$$$*
-c$$$*     Check for error on entry - return if not o.k.
-c$$$*     Initialise looping flag
-c$$$*     Do while no error obtaining the name and opening the output file
-c$$$*       and maximum number of attempts not exceeded
-c$$$*        Get file name and open file
-c$$$*        If null returned then
-c$$$*           Set flag so that a log file will not be created
-c$$$*           Annul the error
-c$$$*           Exit from the loop
-c$$$*        Else if error occurred then
-c$$$*           If abort requested, do so
-c$$$*           Increment loop counter
-c$$$*           If maximum number of attempts not exceeded then
-c$$$*              Report error
-c$$$*           Else
-c$$$*              Set looping flag to exit
-c$$$*           Endif
-c$$$*             Cancel parameter used to get filename
-c$$$*        Else
-c$$$*           Set flag to indicate that the file has been opened
-c$$$*           Set looping flag to false
-c$$$*        Endif
-c$$$*     Enddo
-c$$$*     If error then
-c$$$*        Report and abort
-c$$$*     Endif
-c$$$*     Return
-c$$$*
-c$$$*    Bugs :
-c$$$*
-c$$$*     None known.
-c$$$*-
-c$$$*    Authors :
-c$$$*
-c$$$*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-c$$$*
-c$$$*    History :
-c$$$*
-c$$$*     1989 Jul 25: Original (RL.STAR::CUR).
-c$$$*     1990 Feb 20: Renamed from AIF_OPFIO (RAL::CUR).
-c$$$*     1994 Mar 1: Modified to return EXCLAIM (CARDIFF::GJP).
-c$$$*     1997 Jan 24: Modified for Linux (GJP)
-c$$$*
-c$$$*    Type definitions :
-c$$$
-c$$$      IMPLICIT  NONE           ! no implicit typing allowed
-c$$$
-c$$$*    Global constants :
-c$$$      INCLUDE  'SAE_PAR'       ! SSE global definitions
-c$$$      INCLUDE  'PAR_ERR'       ! parameter-system errors
-c$$$
-c$$$*    Import :
-c$$$      CHARACTER*(*) PNFILE     ! File Parameter Name
-c$$$      CHARACTER*(*) ACMODE     ! File access mode
-c$$$      CHARACTER*(*) FORM       ! Required form of carriagecontrol
-c$$$      INTEGER RECSZ            ! File record size
-c$$$
-c$$$*    Export :
-c$$$      LOGICAL OPEN             ! File opened successfully
-c$$$      LOGICAL EXCLAIM          ! File name was exclaimation
-c$$$      INTEGER FD               ! File descriptor
-c$$$
-c$$$*    Status :
-c$$$      INTEGER STATUS
-c$$$
-c$$$*    Local Constants :
-c$$$      INTEGER MXLOOP           ! Maximum number of attempts at
-c$$$                               ! opening a data file
-c$$$      PARAMETER ( MXLOOP=4 )
-c$$$
-c$$$      INTEGER LOOP             ! Number of attempts to open the file
-c$$$
-c$$$      LOGICAL LOOPAG           ! Loop again to open output file
-c$$$
-c$$$*.
-c$$$
-c$$$*    check status on entry - return if not o.k.
-c$$$
-c$$$      IF ( STATUS .NE. SAI__OK ) RETURN
-c$$$
-c$$$      LOOP=0
-c$$$      EXCLAIM=.FALSE.
-c$$$      LOOPAG=.TRUE.
-c$$$      OPEN=.FALSE.
-c$$$      DO WHILE ( LOOPAG )
-c$$$
-c$$$*       attempt to obtain and open a file to output listing
-c$$$
-c$$$         CALL FIO_ASSOC( PNFILE, ACMODE, FORM, RECSZ, FD, STATUS )
-c$$$
-c$$$         IF ( STATUS .EQ. PAR__NULL ) THEN
-c$$$            OPEN=.FALSE.
-c$$$            LOOPAG=.FALSE.
-c$$$            EXCLAIM=.TRUE.
-c$$$            CALL ERR_ANNUL( STATUS )
-c$$$         ELSE IF ( STATUS .NE. SAI__OK ) THEN
-c$$$
-c$$$            IF ( STATUS .EQ. PAR__ABORT ) GOTO 999
-c$$$
-c$$$*         Here if filename is not allowed or file is not opened
-c$$$*         - try again
-c$$$*         Need to flush error here, as not quitting routine
-c$$$
-c$$$            LOOP=LOOP + 1
-c$$$            IF ( LOOP .LE. MXLOOP ) THEN
-c$$$               CALL MSG_SETC( 'FILNAM', PNFILE )
-c$$$               CALL ERR_REP( 'ERR_AIF_ASFIO_NOFI',
-c$$$     :           'AIF_ASFIO: Could not open file $^FILNAM - try again',
-c$$$     :           STATUS )
-c$$$               CALL ERR_FLUSH( STATUS )
-c$$$            ELSE
-c$$$
-c$$$*             end looping as user is having serious problems
-c$$$
-c$$$               LOOPAG=.FALSE.
-c$$$            END IF
-c$$$
-c$$$            CALL PAR_CANCL( PNFILE, STATUS )
-c$$$
-c$$$         ELSE
-c$$$
-c$$$*          no problem, so exit loop
-c$$$
-c$$$            LOOPAG=.FALSE.
-c$$$            OPEN=.TRUE.
-c$$$
-c$$$*       end of file-opened-successfully check
-c$$$
-c$$$         END IF
-c$$$      END DO
-c$$$
-c$$$*    abort for repeated error
-c$$$
-c$$$      IF ( STATUS .NE. SAI__OK ) THEN
-c$$$         CALL ERR_REP( 'ERR_AIF_ASFIO_NOOPEN',
-c$$$     :     'AIF_ASFIO: Repeatedly unable to open a file.', STATUS )
-c$$$      END IF
-c$$$
-c$$$ 999  CONTINUE
-c$$$
-c$$$      END
-
 
       SUBROUTINE GAU1_PRPCUR ( MNCHOI, SWCHOI, TERMES, NTERMS, IMGMES,
      :                    NIMGMS, BUTTNS, CURSOR, IMGDIS, STATUS )

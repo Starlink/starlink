@@ -3001,7 +3001,6 @@ C      END IF
       CALL ELP1_TEXTO(1,NDF1,VALIDP,ZEROP,
      :     RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
      :     SIGMA,PSIZE,LBND,.TRUE.,FIOD,EXCLAIM,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9998                         
       
 *   If requested, open a catalogue output file, too
       IF (WRITECAT) THEN
@@ -3009,6 +3008,8 @@ C      END IF
      :        RESULT, 0, 0, 0.0, 0.0, BACK,
      :        0.0, 0.0, 0, .TRUE., STATUS)
       ENDIF
+
+      IF (STATUS.NE.SAI__OK) GOTO 9998                         
 
 *   Look at each of the image location found in the text file.
       CALL MSG_BLANK(STATUS)
@@ -3043,7 +3044,6 @@ C      END IF
      :           RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,
      :           BACKS(I),SIGMA,PSIZE,LBND,.TRUE.,
      :           FIOD,EXCLAIM,STATUS)
-            IF (STATUS.NE.SAI__OK) GOTO 9998                         
          END IF
          
          IF (WRITECAT) THEN
@@ -3051,6 +3051,7 @@ C      END IF
      :           RESULT, ELP__NRES, ELP__MXPOI, XCO, YCO, BACK,
      :           SIGMA, PSIZE, LBND, .TRUE.,STATUS)
          ENDIF
+         IF (STATUS.NE.SAI__OK) GOTO 9998                         
 
 *      Tell the user what happened.
          IF (VALIDP.LT.1) THEN 
@@ -3067,14 +3068,11 @@ C      END IF
 *   Close the opened file.
       IF (.NOT.EXCLAIM) THEN
 *      The only required arguments in mode=3 are mode, fiod and status, so 
-*      pass suitably-typed dummys for the others.
-        CALL ELP1_TEXTO(3,0,0,0.0,RESULT,0,0,0.0,0.0,BACKS(1),
+*      pass suitably-typed dummys for the others.  This would work as
+*      well if we passed meaningful values, but doing it this way
+*      seems safer.
+        CALL ELP1_TEXTO(3,0,0,0.0,RESULT,0,0,0.0,0.0,0.0,
      :        0.0,0.0,0,.TRUE.,FIOD,.FALSE.,STATUS)
-C        CALL ELP1_TEXTO(3,NDF1,VALIDP,ZEROP,
-C     :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACKS(I),
-C     :        SIGMA,PSIZE,LBND,.TRUE.,
-C     :        FIOD,EXCLAIM,STATUS)
-        IF (STATUS.NE.SAI__OK) GOTO 9998                         
       END IF
 
       IF (WRITECAT) THEN
@@ -3082,6 +3080,7 @@ C     :        FIOD,EXCLAIM,STATUS)
      :        RESULT, 0, 0, 0.0, 0.0, BACK,
      :        0.0, 0.0, 0, .TRUE., STATUS)
       ENDIF
+      IF (STATUS.NE.SAI__OK) GOTO 9998                         
 
 *   An appropriate place to exit to if the dynamic memory has already
 *   been allocated.
@@ -3103,9 +3102,9 @@ C     :        FIOD,EXCLAIM,STATUS)
 *   End the NDF context.
       CALL NDF_END(STATUS)                              
 
-*   Debug the HDS system
-      CALL HDS_SHOW ('FILES', STATUS)
-      CALL HDS_SHOW ('LOCATORS', STATUS)
+C*   Debug the HDS system
+C      CALL HDS_SHOW ('FILES', STATUS)
+C      CALL HDS_SHOW ('LOCATORS', STATUS)
 
       END
 
@@ -4207,8 +4206,6 @@ C     :        FIOD,EXCLAIM,STATUS)
 
 *      Heading for output.
          CALL MSG_BLANK(STATUS)
-c         TOP='  X       Y      Points    Rad(*)    Count     PA   '//
-c     :       '  Ellipt  Dev.   PPU  Statistic'
          TOP='  X       Y     Points   Rad(a)    Count     PA '//
      :       '  Ellipt  Dev.  PPU  Statistic'
          CALL MSG_OUT(' ',TOP,STATUS)
@@ -5411,8 +5408,6 @@ c     :       '  Ellipt  Dev.   PPU  Statistic'
                CALL MSG_FMTR('DEV','F7.1',SDP)
                CALL MSG_FMTR('POI','F4.0',RESULT(9,VALIDP))
                CALL MSG_FMTR('STAT','E9.2',STAT)
-c               TEXT='^X  ^Y    ^N   ^RAD  ^VAL ^POS    ^ELL'//
-c     :              '^DEV   ^POI  ^STAT'
                TEXT='^X  ^Y   ^N  ^RAD  ^VAL ^POS  ^ELL'//
      :              '^DEV  ^POI ^STAT'
                CALL MSG_OUT(' ',TEXT,STATUS)

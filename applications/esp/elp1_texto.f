@@ -100,6 +100,7 @@
       INCLUDE 'elp_par'               ! ELLPRO constants
       INCLUDE 'MSG_PAR'               ! Parameter system constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
+      INCLUDE 'PAR_ERR'		      ! PAR system constants
 
 *  Arguments Given:                              
       INTEGER LBND(NDF__MXDIM)        ! Lower limits of image world
@@ -152,34 +153,21 @@
 *   Open the FIO file.
       IF ((MODE.EQ.0).OR.(MODE.EQ.1)) THEN
 
-*      Determine the output text file name. If the file name chosen fails, 
-*      the user is reprompted
+*      Determine the output text file name.  Note that FIO_ASSOC doesn't
+*      (currently) respect/recognise PAR__ABORT, but if and when it
+*      does, this code will do the right thing by leaving OPENF false.
          IF (MODE.EQ.0) CALL MSG_BLANK(STATUS)
-         OPENF=.FALSE.             
-         EXCLAIM=.FALSE.   
-         CALL ERR_MARK
-         DO WHILE((.NOT.OPENF).AND.(.NOT.EXCLAIM)
-     :             .AND.(STATUS.EQ.SAI__OK))
-            CALL ELP1_AIF_ASFIO('OUT','WRITE','LIST',LINSIZ,FIOD,OPENF,
-     :                          EXCLAIM,STATUS)
-            IF ((.NOT.OPENF).AND.(.NOT.EXCLAIM)) THEN
-               CALL ERR_REP(' ','Bad file name.',STATUS)
-               CALL ERR_REP(' ','For no file, type !',STATUS)
-               CALL ERR_ANNUL(STATUS)
-            END IF
-         END DO
-         CALL ERR_RLSE
-         IF (STATUS.NE.SAI__OK) GOTO 9999
-
-*      Inform the user if a difficulty was encountered and that an
-*      an output file will not be used. 
-         IF (EXCLAIM) THEN  
-            CALL MSG_BLANK(STATUS)
-            CALL MSG_OUT(' ','WARNING!!!',STATUS)
-            CALL MSG_OUT(' ','No output text file created.',STATUS)
-            CALL MSG_BLANK(STATUS)
-            GOTO 9999
-         END IF
+         
+         OPENF = .FALSE.
+         CALL FIO_ASSOC('OUT','WRITE','LIST',80,FIOD,STATUS)
+         IF (STATUS .EQ. PAR__NULL) THEN
+            CALL ERR_ANNUL (STATUS)
+         ELSE IF (STATUS .EQ. SAI__OK) THEN
+            OPENF = .TRUE.
+         ENDIF
+         
+*      If we couldn't open the file for some reason, bail out
+         IF (.NOT. OPENF) GOTO 9999
 
       END IF
 
@@ -293,9 +281,6 @@
          CALL CHR_PUTC('!! '//TEXT,LINE,NCHAR)
          CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
          NCHAR=0
-C      TEXT='                                     Mean    Statistic'
-C      CALL CHR_PUTC('!! '//TEXT,LINE,NCHAR)
-C      CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
 
 *      Output the actual values.
          DO 400 I=1,VALIDP
