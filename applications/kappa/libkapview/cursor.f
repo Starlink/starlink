@@ -254,7 +254,7 @@
 *        defaulted if a null value (!) is supplied. See section "Plotting
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). [current value] 
+*        reported). 
 *
 *        In addition to the attributes which control the appearance of
 *        the graphics (Colour, Font, etc), the following attributes may
