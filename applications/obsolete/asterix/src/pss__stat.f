@@ -13,7 +13,6 @@
 *    History :
 *
 *     22 Feb 90 : Original (DJA)
-*     14 Feb 00 : Linux compiler forced strict use of types. (DGED)
 *
 *    Type definitions :
 *
@@ -46,7 +45,7 @@
 *
       REAL                     FVEC(2)                 ! Psf shift vector
 
-      LOGICAL                  CACHE_CTRL              ! Cache control
+      INTEGER                  CACHE_CTRL              ! Cache control
       INTEGER                  PPTR                    ! Pointer store
 *
 *    Local data :
@@ -101,20 +100,20 @@
       END IF
 
 *    Set up the cache control
-      CACHE_CTRL = .FALSE.
-      CACHE_CTRL = ( CACHE_CTRL .OR. (DC_F_IMD .GT. 0)) ! Always need data
-      CACHE_CTRL = (CACHE_CTRL .OR. (DC_F_PSF .GT. 0))  ! and psf
+      CACHE_CTRL = 0
+      CACHE_CTRL = OR( CACHE_CTRL, DC_F_IMD )       ! Always need data
+      CACHE_CTRL = OR( CACHE_CTRL, DC_F_PSF )       ! and psf
       IF ( CP_CASH ) THEN
-        CACHE_CTRL = (CACHE_CTRL .OR. (DC_F_BGND .GT. 0))    !
-        CACHE_CTRL = (CACHE_CTRL .OR. (DC_F_LBGND .GT. 0))   !
-        CACHE_CTRL = (CACHE_CTRL .OR. (DC_F_PSF_SUM .GT. 0))
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_BGND )    !
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_LBGND )   !
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_PSF_SUM )
       ELSE
-        CACHE_CTRL = (CACHE_CTRL .OR. (DC_F_IMBV .GT. 0))    !
-        CACHE_CTRL = (CACHE_CTRL .OR. (DC_F_BGDV .GT. 0))    !
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_IMBV )    !
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_BGDV )    !
       END IF
       IF ( CP_RESCALE .OR. .NOT. CP_OPT ) THEN
-        CACHE_CTRL = (CACHE_CTRL .OR. (DC_F_BGND_SUM .GT. 0))
-        CACHE_CTRL = (CACHE_CTRL .OR. (DC_F_IMD_SUM  .GT. 0))
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_BGND_SUM )
+        CACHE_CTRL = OR( CACHE_CTRL, DC_F_IMD_SUM )
       END IF
 
 *    Run the statistic routine
