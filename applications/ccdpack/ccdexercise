@@ -86,7 +86,6 @@
 #  If we're going to use a device we need KAPPA.
       if ( "$device" != "NONE" ) then
          kappa
-         idset $device \\
          gdset $device \\
          gdclear \\
          paldef \\
