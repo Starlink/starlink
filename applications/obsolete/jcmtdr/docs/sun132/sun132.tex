@@ -40,11 +40,11 @@
 \newcommand{\stardocversion}   {1.2-2}
 \newcommand{\stardocmanual}    {User's manual}
 \newcommand{\stardocabstract}  {
-JCMTDR is a Starlink applications that is intended to replace
-NOD2 for the reduction of continuum on-the-fly mapping data obtained with UKT14
-or the heterodyne instruments using the IFD
-on the James Clerk Maxwell Telescope.
-}
+  JCMTDR is a Starlink applications that is intended to replace NOD2 for the
+  reduction of continuum on-the-fly mapping data obtained with UKT14 or the
+  heterodyne instruments using the IFD on the James Clerk Maxwell Telescope.
+  This programme is intended for reduction of archive data and of heterodyne
+  beam maps.  }
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
@@ -338,7 +338,10 @@ on the James Clerk Maxwell Telescope.
 JCMTDR is a Starlink applications that is intended to replace NOD2 \cite{nod2}
 for the reduction of continuum on-the-fly mapping data obtained with UKT14
 \cite{ukt14} or the heterodyne instruments using the IFD on the James Clerk
-Maxwell Telescope.
+Maxwell Telescope. This programme is intended for reduction of archive data
+and of heterodyne beam maps.
+
+For processing of SCUBA data use SURF (see \xref{SUN/216}{sun216}{}).
 
 A cookbook is available to provide a more complete overview of data processing
 with JCMTDR (see \xref{SC/1}{sc1}{}).
@@ -1117,6 +1120,8 @@ STRUCT  < >
 and should be removed.
 \item GSD inspection routines have been removed. They are now distributed as
   part of the separate GSD package (see SUN/229).
+\item The \texttt{jcmt_xhelp} command has been replaced with the standard
+  Starlink HTML access system ('findme sun132').
 
 \end{itemize}
 
