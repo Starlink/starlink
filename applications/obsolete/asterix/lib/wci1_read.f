@@ -71,11 +71,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, Universty of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     14 Feb 1995 (DJA):
 *        Original version.
+*      8 Apr 1997 (RB):
+*        Munge up for AST2XSP
 *     {enter_changes_here}
 
 *  Bugs:
@@ -170,6 +173,7 @@
 *  Extract axis info
       IF ( HASPIX ) THEN
         CALL PSF_QAXES( IPSF, X_AX, Y_AX, E_AX, T_AX, STATUS )
+        CALL BDI_GETSHP( FARG, 2, DIMS, NDIM, STATUS )
         IF ( (X_AX.LT.1) .AND. (Y_AX.LT.1) ) THEN
           X_AX = 1
           Y_AX = 2
@@ -177,7 +181,6 @@
         IF ( (X_AX .LT. 1) .OR. (Y_AX.LT.1) ) THEN
           CALL ADI_DERVD( FARG, 'Array', ISPRIM, STATUS )
           IF ( ISPRIM ) THEN
-            CALL BDI_GETSHP( FARG, 2, DIMS, NDIM, STATUS )
             REG(1) = .TRUE.
             REG(2) = .TRUE.
             UNITS(1) = 'arcmin'
@@ -191,16 +194,18 @@
           END IF
         ELSE
           CALL PSF_QAXIS( IPSF, X_AX, DIMS(1), REG(1), PTR(1), BASE(1),
-     :                SCALE(1), LABEL, UNITS(1), TOR, STATUS )
-
-*  Something not quite right here - rb
-          CALL PSF_QAXIS( IPSF, Y_AX, DIMS(2), REG(2), PTR(2), BASE(2),
-     :                SCALE(2), LABEL, UNITS(2), TOR, STATUS )
-
+     :                    SCALE(1), LABEL, UNITS(1), TOR, STATUS )
           BASE(1) = BASE(1) / TOR
           SCALE(1) = SCALE(1) / TOR
-          BASE(2) = BASE(2) / TOR
-          SCALE(2) = SCALE(2) / TOR
+
+*  Something not quite right here - rb
+          IF ( NDIM .GT. 1 ) THEN
+            CALL PSF_QAXIS( IPSF, Y_AX, DIMS(2), REG(2), PTR(2),
+     :                      BASE(2), SCALE(2), LABEL, UNITS(2), TOR,
+     :                      STATUS )
+            BASE(2) = BASE(2) / TOR
+            SCALE(2) = SCALE(2) / TOR
+          END IF
         END IF
       END IF
 
