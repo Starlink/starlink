@@ -45,8 +45,8 @@
 *     `star' is a poor fit to model or it could not be located.
 
 *     An optional plot of the mean profile and the fitted function may
-*     be produced.  The point-spread function may be stored in an NDF
-*     for later use.
+*     be produced.  The 2-dimensional point-spread function may be stored 
+*     in an NDF for later use, as may the 1-dimensional fitted profile.
 
 *  Usage:
 *     psf in incat [device] [out] [cut] [range] [isize] [poscols]
@@ -173,6 +173,14 @@
 *        will be requested.  Only accessed if INCAT is given a null (!)
 *        value. If a null (!) value is supplied for POSCOLS, the values
 *        [1,2] will be used. [!] 
+*     PROFOUT = NDF (Write)
+*        The NDF containing the 1-dimensional fitted profile as displayed
+*        in the plot. If null, !, is entered no output NDF will be created. 
+*        The DATA component of this NDF holds the fitted PSF value at each 
+*        radial bin. The VARIANCE component holds the square of the residuals 
+*        between the fitted values and the binned values derived from the 
+*        input NDF. An AXIS component is included in the NDF containing the 
+*        radial distance as displayed in the plot. [!]
 *     RANGE = _REAL (Read)
 *        The number of image profile widths out to which the radial
 *        star profile is to be fitted.  (There is an upper limit of 100
@@ -369,6 +377,8 @@
 *        AST_SIMPLIFY could otherwise sometimes return a pointer to MAP1
 *        (eg if MAP2 was a UnitMap), and so subsequently re-inverting 
 *        MAP1 would also invert MAP3.
+*     10-JUL-2001 (DSB):
+*        Added parameter PROFOUT.
 *     {enter_further_changes_here}
 
 *  Bugs:

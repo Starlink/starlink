@@ -1,6 +1,6 @@
-1 KAPPA_Version_1.0
+1 KAPPA_Version_0.18
 
-   A new release of KAPPA (V1.0) has been made. The changes are
+   A new release of KAPPA (V.18) has been made. The changes are
    described fully in sun95.
 
    - The following obsolete commands have been removed from KAPPA -
@@ -12,4 +12,7 @@
    KAPRH in order to satisfy any occasional need that may occur for them
    (see SUN/xxx):
 
+   - The PSF command now has a parameter PROFOUT which allows the
+   displayed profile to be saved in a 1-dimensional NDF.
 
+   

@@ -131,6 +131,8 @@
 *     1-MAR-2001 (DSB):
 *        Change mode 1 so that vertical lines are drawn at the boundaries
 *        of bad cells
+*     10-JUL-2001 (DSB):
+*        Corrected data type of ERR from REAL to DOUBLE PRECISION.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -169,6 +171,7 @@
 
 *  Local Variables:
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
+      DOUBLE PRECISION ERR       ! Error bar limit value
       INTEGER AXCOL0             ! Original Axis colour index
       INTEGER AXSTY0             ! Original Axis line style
       INTEGER CVCOL0             ! Original Curve Colour index
@@ -187,7 +190,6 @@
       LOGICAL OK                 ! Are there any points within the window?
       REAL AXWID0                ! Original Axis line width 
       REAL CVWID0                ! Original Curve line width
-      REAL ERR                   ! Error bar limit value
       REAL MKWID0                ! Original Marker line width
       REAL RVAL                  ! General REAL variable
       REAL RX                    ! Single precision central X position
@@ -592,14 +594,14 @@
 
                   ERR = XBAR( I, 1 )
                   IF( ERR .NE. AST__BAD ) THEN
-                      XHI = MAX( XHI, ERR )
-                      XLO = MIN( XLO, ERR )
+                      XHI = MAX( XHI, REAL( ERR ) )
+                      XLO = MIN( XLO, REAL( ERR ) )
                   END IF
 
                   ERR = XBAR( I, 2 )
                   IF( ERR .NE. AST__BAD ) THEN
-                      XHI = MAX( XHI, ERR )
-                      XLO = MIN( XLO, ERR )
+                      XHI = MAX( XHI, REAL( ERR ) )
+                      XLO = MIN( XLO, REAL( ERR ) )
                   END IF
 
                END IF
@@ -611,14 +613,14 @@
 
                   ERR = YBAR( I, 1 )
                   IF( ERR .NE. AST__BAD ) THEN
-                      YHI = MAX( YHI, ERR )
-                      YLO = MIN( YLO, ERR )
+                      YHI = MAX( YHI, REAL( ERR ) )
+                      YLO = MIN( YLO, REAL( ERR ) )
                   END IF
 
                   ERR = YBAR( I, 2 )
                   IF( ERR .NE. AST__BAD ) THEN
-                      YHI = MAX( YHI, ERR )
-                      YLO = MIN( YLO, ERR )
+                      YHI = MAX( YHI, REAL( ERR ) )
+                      YLO = MIN( YLO, REAL( ERR ) )
                   END IF
 
                END IF

@@ -13105,6 +13105,16 @@ iraf! {
             default !
           }
 
+         parameter profout {
+            type NDF
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {NDF to contain the fitted profile}
+            default !
+            helpkey *
+          }
+
          parameter range {
             position 6
             type _REAL

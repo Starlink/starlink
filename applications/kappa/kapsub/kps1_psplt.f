@@ -21,6 +21,16 @@
 *     the minor or major axis.  The graph comprises the mean profile at
 *     each bin and the smooth fit to those data.
 
+*  Environment Parameters:
+*     The following environment parameter names are used by this
+*     routine:
+*
+*     PROFOUT = NDF (Write)
+*        The name of a 1-dimensional NDF to be created holding the profile 
+*        data. The DATA component holds the fitted profile values, and the
+*        VARIANCE component holds the square of the residuals. If a null (!) 
+*        value is supplied, no NDF is created.
+
 *  Arguments:
 *     NBIN = INTEGER (Given)
 *        The number of radial-profile data points.
@@ -60,7 +70,7 @@
 *     PROFWT( NBIN ) = REAL (Given and Returned)
 *        On input these are the weights of the mean profile.  On exit
 *        they are zero.
-*     WORK( NBIN, 2 ) = DOUBLE PRECISION (Given and Returned)
+*     WORK( 0:NBIN-1, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Work array.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -94,6 +104,8 @@
 *        Added argument YSCALE.
 *     17-MAY-2000 (DSB):
 *        Added YUNITS argument.
+*     10-JUL-2001 (DSB):
+*        Added facilities for creating an 1D output NDF holding the profile.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,6 +120,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ definitions
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'NDF_PAR'          ! NDF constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Arguments Given:
       INTEGER NBIN
@@ -134,9 +148,18 @@
 *  Local Variables:
       CHARACTER DEFLBX*72        ! Default X axis label
       CHARACTER DEFLBY*72        ! Default Y axis label
+      CHARACTER DEFTTL*72        ! Default title
+      CHARACTER NDFLBX*72        ! X axis label for output NDF
+      CHARACTER NDFLBY*72        ! Y axis label for output NDF
       INTEGER BIN                ! Bin counter for a star
+      INTEGER EL                 ! The number of mapped values
+      INTEGER IATTTL             ! Length of title
       INTEGER IATX               ! Length of X axis label
       INTEGER IATY               ! Length of Y axis label
+      INTEGER INDF               ! Identifier for output NDF
+      INTEGER IPAX               ! Pointer to NDF AXIS CENTRE array
+      INTEGER IPDAT              ! Pointer to NDF data array
+      INTEGER IPVAR              ! Pointer to NDF variance array
       INTEGER IPLOT              ! AST Plot for plotting
       INTEGER NDATA              ! Number points to plot in the mean profile
       LOGICAL MINOR              ! Plot profile along the minor axis?
@@ -169,6 +192,8 @@
          RAXIS = AXISR
       END IF
 
+      NDFLBX = DEFLBX( : IATX )
+
       IF( RUNITS .NE. ' ' ) THEN
          CALL CHR_APPND( ' (', DEFLBX, IATX )
          CALL CHR_APPND( RUNITS, DEFLBX, IATX )
@@ -179,34 +204,71 @@
       DEFLBY = 'Intensity'
       IATY = 9
 
+      NDFLBY = DEFLBY( : IATY )
+
       IF( YUNITS .NE. ' ' ) THEN
          CALL CHR_APPND( ' (', DEFLBY, IATY )
          CALL CHR_APPND( YUNITS, DEFLBY, IATY )
          CALL CHR_APPND( ')', DEFLBY, IATY )
       END IF
 
-*  Initialise counter of good bins.
-      NDATA = -1
-
 *  Initialise max and min data values to be included in plot.
       DMAX = VAL__MINR
       DMIN = VAL__MAXR
 
-*  Loop through all the bins in the mean profile.
+*  Loop through all the bins in the mean profile, scaling the data to the 
+*  units.
       DO BIN = 0, NBIN - 1
+         IF ( PROFWT( BIN ) .GT. 0.0 ) THEN
+            PROFIL( BIN ) = YSCALE*( PROFIL( BIN ) - BACK )
+            PROFR( BIN ) = PROFR( BIN ) * SCALE * RAXIS
+            DMAX = MAX( DMAX, PROFIL( BIN ) )
+            DMIN = MIN( DMIN, PROFIL( BIN ) )
+         ELSE
+            PROFIL( BIN ) = VAL__BADR
+            PROFR( BIN ) = VAL__BADR
+         END IF
+      END DO
 
-*  Compress the data arrays to remove empty bins. Scale the data to the units.
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Attempt to get an output NDF to hold the profile.
+      CALL LPG_CREAT( 'PROFOUT', '_REAL', 1, 1, NBIN, INDF, STATUS )
+
+*  If a null was supplied, annul the error.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+*  Otherwise, produce the NDF.
+      ELSE
+
+*  Map the DATA array (leaving it empty for the moment).
+         CALL NDF_MAP( INDF, 'DATA', '_DOUBLE', 'WRITE', IPDAT, EL, 
+     :                 STATUS ) 
+
+*  Map the DATA array and copy the supplied profile data values into it.
+         CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVAR, EL, 
+     :                 STATUS ) 
+         CALL KPG1_CPNDR( 1, 1, NBIN, PROFIL, 1, NBIN, %VAL( IPVAR ),
+     :                    EL, STATUS )
+
+*  Map the AXIS CENTRE array, leaving it empty for the moment.
+         CALL NDF_AMAP( INDF, 'CENTRE', 1, '_DOUBLE', 'WRITE', IPAX, EL, 
+     :                  STATUS ) 
+      END IF
+
+*  Initialise counter of good bins.
+      NDATA = -1
+
+*  Compress the data arrays to remove empty bins. 
+      DO BIN = 0, NBIN - 1
          IF ( PROFWT( BIN ) .GT. 0.0 ) THEN
             NDATA = NDATA + 1
-            PROFIL( NDATA ) = YSCALE*( PROFIL( BIN ) - BACK )
-            PROFR( NDATA ) = PROFR( BIN ) * SCALE * RAXIS
+            PROFIL( NDATA ) = PROFIL( BIN ) 
+            PROFR( NDATA ) = PROFR( BIN ) 
             PROFWT( NDATA ) = 0.0
-
-            DMAX = MAX( DMAX, PROFIL( NDATA ) )
-            DMIN = MIN( DMIN, PROFIL( NDATA ) )
-
          END IF
-
       END DO
 
 *  Calculate the fitted profile over the data range for each of the points 
@@ -229,15 +291,34 @@
       DMAX = DMAX + 0.05*DRANGE
       DMIN = DMIN - 0.05*DRANGE
 
+*  Store the default plot title.
+      DEFTTL = 'Mean Star Profile'
+      IATTTL = 17
+
 *  Plot the binned data.
       CALL KPG1_GRAPH( NDATA + 1, PROFR, PROFIL, 0.0, 0.0, 
      :                 DEFLBX( : IATX ), DEFLBY( : IATY ), 
-     :                 'Mean Star Profile', 'XDATA', 'YDATA', 3, 
+     :                 DEFTTL( : IATTTL ), 'XDATA', 'YDATA', 3, 
      :                 .TRUE., 0.0, VAL__BADR, DMIN, DMAX, 
      :                 'KAPPA_PSF', .TRUE., .FALSE., IPLOT, STATUS ) 
 
 *  Only proceed if a plot was produced.
       IF( IPLOT .NE. AST__NULL ) THEN
+
+*  Save the title actually used.
+         DEFTTL = AST_GETC( IPLOT, 'TITLE', STATUS )
+
+*  If the default X axis label has not been overridden, use the version
+*  without the units.
+         IF( DEFLBX .NE. AST_GETC( IPLOT, 'LABEL(1)', STATUS ) ) THEN
+            NDFLBX = AST_GETC( IPLOT, 'LABEL(1)', STATUS )
+         END IF
+
+*  If the default Y axis label has not been overridden, use the version
+*  without the units.
+         IF( DEFLBY .NE. AST_GETC( IPLOT, 'LABEL(2)', STATUS ) ) THEN
+            NDFLBY = AST_GETC( IPLOT, 'LABEL(2)', STATUS )
+         END IF
 
 *  Set up the plotting characteristics to use when drawing the line.
          CALL KPG1_ASPSY( '(LIN*ES)', '(CURVES)', STATUS )
@@ -252,10 +333,44 @@
 
       END IF
 
+*  If an output NDF is being produced, fill the arrays, etc.
+      IF( INDF .NE. NDF__NOID  ) THEN
+
+*  Copy the fitted profile data into the DATA array.
+         CALL KPG1_CPNDD( 1, 1, NBIN, WORK( 0, 2 ), 1, NBIN, 
+     :                    %VAL( IPDAT ), EL, STATUS )
+
+*  The VARIANCE array is currently filled with the rmean data value in
+*  each bin. We want to replace this with the square of the residuals 
+*  at each bin. Calculate these now.
+         CALL KPS1_PSRSV( NBIN, WORK( 1, 2 ), %VAL( IPVAR ), STATUS )
+
+*  Store TITLE, LABEL and UNITS component.
+         CALL NDF_CPUT( DEFTTL, INDF, 'TITLE', STATUS ) 
+         CALL NDF_CPUT( NDFLBY, INDF, 'LABEL', STATUS ) 
+         IF( YUNITS .NE. ' ' ) CALL NDF_CPUT( YUNITS, INDF, 'UNITS', 
+     :                                        STATUS ) 
+
+*  Copy the radii values to the AXIS CENTRE array.
+         CALL KPG1_CPNDD( 1, 1, NBIN, WORK( 0, 1 ), 1, NBIN, 
+     :                    %VAL( IPAX ), EL, STATUS )
+
+*  Store the axis label and units.
+         CALL NDF_ACPUT( NDFLBX, INDF, 'LABEL', 1, STATUS ) 
+         IF( RUNITS .NE. ' ' ) CALL NDF_ACPUT( RUNITS, INDF, 'UNITS', 1, 
+     :                                         STATUS )
+
+*  Annul the NDF identifier.
+         CALL NDF_ANNUL( INDF, STATUS )
+
+      END IF
+
 *  Copy the profile to the returned arrays.
       DO BIN = 0, NBIN - 1
-         PROFR( BIN ) = WORK( BIN, 1 ) 
-         PROFIL( BIN ) = WORK( BIN, 2 )
+         PROFR( BIN ) = REAL( WORK( BIN, 1 ) )
+         PROFIL( BIN ) = REAL( WORK( BIN, 2 ) )
       END DO
+
+ 999  CONTINUE
 
       END
