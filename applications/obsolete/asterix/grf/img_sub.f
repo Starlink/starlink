@@ -3901,7 +3901,7 @@ c        REAL XX,XP,YP
 
         ENDDO
 
-
+	print *,i1,i2,j1,j2
 
 	END
 
@@ -4258,7 +4258,8 @@ c        REAL XX,XP,YP
 
 *  get distance to ellipse along same line
         THETA=ATAN2((YP-YPC),(XP-XPC))
-        ALPHA=THETA-ANGLE
+c        ALPHA=THETA-ANGLE
+        ALPHA=THETA
         XP=XPC + AP*COS(ALPHA)*COS(ANGLE) - BP*SIN(ALPHA)*SIN(ANGLE)
         YP=YPC + AP*COS(ALPHA)*SIN(ANGLE) + BP*SIN(ALPHA)*COS(ANGLE)
         RAD=SQRT((XP-XPC)**2 + (YP-YPC)**2)
