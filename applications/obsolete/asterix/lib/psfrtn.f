@@ -1341,6 +1341,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PSF_PAR'
 *
 *    Import :
 *
@@ -2637,9 +2638,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Get dimensions of response
         CALL PSF0_GETID1I( PSID, 'Dims', 5, DIMS, NDIM, STATUS )
 
-*    Get axis attributes
-        CALL PSF0_GETID1R( PSID, 'Base', 5, RBASE, NDIM, STATUS )
-
 *    Energy dependent if last dimension has dimension other than one
         CALL ARR_COP1L( 1, (DIMS(NDIM).NE.1), DATA, STATUS )
 
@@ -2689,7 +2687,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *+  PSF_RESPFILE_CLOSE - Delete a psf handle
       SUBROUTINE PSF_RESPFILE_CLOSE( PSID, STATUS )
- *
+*
 *    Description :
 *
 *    Environment parameters :
@@ -2796,6 +2794,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CHARACTER*80		TEXT			! AUX prompt
       CHARACTER*30		VERSION			! SPRESP version
 
+      REAL			BASE(5), SCALE(5)	! Axis attributes
       REAL			ENERGY			! Mean photon energy
       REAL			R_BASE, R_SCALE		! Reponse axis attrs
       REAL			D_SCALE			! Dataset scale
