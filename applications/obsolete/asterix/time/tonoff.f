@@ -19,14 +19,13 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*132 FILE
-      CHARACTER*(DAT__SZLOC) ILOC
-      INTEGER FID
+      INTEGER IFID,FID
       LOGICAL PRIM
       LOGICAL EXIST
 
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TONOFF Version 1.8-0')
+      PARAMETER (VERSION = 'TONOFF Version 2.0-0')
 *-
       CALL MSG_PRNT(VERSION)
 
@@ -37,16 +36,15 @@
         CALL AST_INIT()
 
 *  get input time series
-        CALL USI_ASSOCI('INP','READ',ILOC,PRIM,STATUS)
+        CALL USI_ASSOC('INP','BinDS','READ',IFID,STATUS)
 
-        CALL TIM_CHECK(ILOC,STATUS)
-        CALL TIM_MAP(ILOC,STATUS)
+        CALL TIM_CHECK(IFID,STATUS)
+        CALL TIM_MAP(IFID,STATUS)
 
 *  set to whole time series
         CALL TIM_NOCHOP(STATUS)
 
       ENDIF
-
 
 *  get file name for on/off times
       CALL USI_GET0C('FILE',FILE,STATUS)
@@ -66,8 +64,6 @@
 
 *  if standalone shut down time series
       IF (.NOT.T_OPEN) THEN
-
-        CALL BDA_RELEASE(ILOC,STATUS)
         CALL AST_CLOSE(STATUS)
       ENDIF
 
@@ -171,8 +167,6 @@
 
           ENDIF
         ENDDO
-
-
 
       ENDIF
 
