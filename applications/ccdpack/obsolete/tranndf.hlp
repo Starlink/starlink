@@ -29,8 +29,13 @@ CONSERVE
 CONSERVE = _LOGICAL (Read)
    If CONSERVE is TRUE, the output values are normalised by the
    ratio of the output-to-input pixel areas.  In other words this
-   conserves flux.  If CONSERVE is FALSE, there is no
-   normalisation.  [TRUE]
+   conserves flux.  If CONSERVE is FALSE, there is no normalisation.
+   If the NDFs WCS component (see USEWCS parameter) is used to define the
+   transformation then the program will be unable to determine whether 
+   the transformation is of a linear nature. If CONSERVE is set to TRUE,
+   the program will warn the user that although it is atempting to
+   conserve flux it may do so corretly if the transform is non-linear.
+   [TRUE]
 
 IN
 
@@ -177,31 +182,36 @@ UBOUND() = _INTEGER (Read)
    image.
    [Dynamic default]
 
+USEWCS
+
+USEWCS = _LOGICAL (Read)
+   If TRUE then the transformation which is to be applied to the
+   NDF is stored in the NDF's WCS extension. If FALSE then the
+   transformation is either stored as a TRN structure in the
+   NDF's CCDPACK extension (.MORE.CCDPACK.TRANSFORM), or is
+   supplied by the user (see the INEXT parameter). 
+   [TRUE]
+
 Examples
 
-tranndf * *-trn reset
-   This transforms all the images in the current directory if
-   they contain suitable transformation structures in their
-   extensions. It uses nearest-neighbour resampling and conserves
-   the flux levels. The output images are of a size such that all
-   the input pixels have contributed.
+tranndf * *-resamp reset
+   This transforms all the NDFs in the current directory from
+   the coordinates represented by the PIXEL-domain frame
+   to the coordinates represented by the Current frame in their
+   WCS components.  It uses nearest-neighbour resampling and 
+   conserves the flux levels. The output NDFs are of a size such 
+   that all the input pixels have contributed.
 
 tranndf curved straight linint shape=same
    As above, except linear interpolation is used, and the straight
    array uses the bounds of curved.
 
-tranndf a119* *s inext=false transform=proj.merc shape=bounds
+tranndf a119* *s inext=false nousewcs transform=proj.merc shape=bounds
         lbound=[1,-20] ubound=[256,172]
    This transforms the images called a119*, using the transformation
-   merc in the HDS file called proj, into images called a119*s.
+   structure merc in the HDS file called proj, into images called a119*s.
    It uses nearest-neighbour resampling.  All the output images
    have size 256 x 192 pixels and origin (1,-20).
-
-Notes
-
-- This application is a restricted form of the KAPPA routine
-  TRANSFORMER. If additional functionality is required then
-  look at TRANSFORMER.
 
 Behaviour_of_parameters
 
@@ -254,7 +264,13 @@ History
 Implementation_Status
 
    - Flux conservation can only be applied to constant-determinant
-     or linear transformations.
+     or linear transformations. Since we currently can't tell 
+     whether AST Mappings are linear, flux conservation should be
+     turned off when using the NDFs WCS component to perform the
+     mapping. If left on the program will warn the user that it
+     may not be performing flux conservation correctly (N.B. if
+     the WCS transform is linear however, flux conservation will
+     be calculated correctly).
 
    - The NDF components are processed by this application as
      follows:
@@ -265,6 +281,9 @@ Implementation_Status
       -  QUALITY is not derived from the input image for a linearly
          interpolated image. The DATA and VARIANCE arrays are
          resampled.
+
+      -  If USEWCS is TRUE, then the NDF WCS component is updated
+         and propagated.
 
    -  Bad pixels, including automatic quality masking, are supported.
 

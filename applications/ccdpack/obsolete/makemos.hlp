@@ -88,6 +88,14 @@ CMPVAR = _LOGICAL (Read)
    previous mosaic-ing process).
    [TRUE]
 
+CORRECT
+
+CORRECT = LITERAL (Write)
+   The name of the file used to output the scale and zero-point
+   corrections (see SCALE, ZERO and WRITESZ parameters). This
+   file can be read by the DRIZZLE A-task.
+   [drizzle.dat]
+
 GENVAR
 
 GENVAR = _LOGICAL (Read)
@@ -525,6 +533,15 @@ WEIGHTS( ) = _REAL (Read)
    variance information. Otherwise, the input variance values are
    used to weight the input data when they are combined.
    [!]
+
+WRITESZ
+
+WRITESZ = _LOGICAL (Read)
+   If set to TRUE then MAKEMOS will output a file containing the
+   scale and zero-point corrections (see SCALE and ZERO parameters)
+   which can be read into the DRIZZLE A-task. IF SCALE and ZERO are
+   both set to FALSE, no file will be generated
+   [FALSE]
 
 ZERO
 
