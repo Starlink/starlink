@@ -10,11 +10,9 @@ supportdir = $(bindir)
 support_DATA = mime.types
 
 AM_YFLAGS = -d
-YACC_SOURCE = ctag-y.y ftag-y.y
-LEX_SOURCE = ctag-l.l ftag-l.l
 
 BUILT_SOURCES = Scb.pm YyTag.pm scb.csh scb.pl scbindex.pl scbcp.pl dbmcat.pl \
-                ctag-y.h ftag-y.h
+                ctag-y.h ftag-y.h ctag-l.c ftag-l.c
 
 ## Since most of the substitions that have to be done are related to
 ## the installation directory, we do them all here in the cumbersome way,
