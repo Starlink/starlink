@@ -127,6 +127,12 @@
 *        This parameter sets the size of the output grid in pixels. The default
 *        values are the minimum dimensions required to display the entirety
 *        of the mapped area.
+*     TRIM = REAL (Read)
+*        This parameter determines the amount of good data that should
+*        be trimmed from the final image to correct for edge effects.
+*        The supplied value should be in arcseconds. All pixels closer
+*        to a bad pixel than this distance will be set to bad in the
+*        output image. Default is 0.0.
 *     GUARD = LOGICAL (Read)
 *        Determines whether a guard ring of bolometers should be used
 *        during the weight function regridding. A guard ring simulates
@@ -207,6 +213,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.62  1999/05/15 01:50:38  timj
+*     Add TRIM.
+*     Change reference pixel.
+*     Propogate UNITS.
+*
 *     Revision 1.61  1999/02/27 04:39:58  timj
 *     Add polarimeter support (ANG_MEAS, ANG_INT).
 *     Make sure that INTREBIN writes passes WPLATE and ANGROT to header.
@@ -430,7 +441,7 @@ c
       INTEGER     MAX_FILE             ! max number of input files
       PARAMETER (MAX_FILE = 256)
       BYTE BADBIT                      ! Bad bit mask
-      PARAMETER (BADBIT = 1)
+      PARAMETER (BADBIT = 3)
       
 *    Local variables:
 
@@ -603,6 +614,7 @@ c
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
                                        ! locator to REDS extension in output
       CHARACTER * (132)OUT_TITLE       ! Title of output NDF
+      CHARACTER * (20) OUT_UNITS       ! Units of output NDF
       INTEGER          OUT_VARIANCE_END! End of pointer to output map variance
       INTEGER          OUT_VARIANCE_PTR! pointer to output map variance array
       INTEGER          OUT_WEIGHT_NDF  ! NDF identifier for weight array
@@ -652,6 +664,7 @@ c
       LOGICAL          TIMES           ! Store the TIMES array
       INTEGER          TOT(MAX_FILE)   ! Number of integrations per input file
       INTEGER          TOTAL_BOLS      ! Number of bolometers
+      REAL             TRIM            ! Trim radius (arcsec)
       INTEGER          UBND (MAX_DIM)  ! pixel indices of top right corner
                                        ! of output image
       LOGICAL          GUARD           ! Use guard ring in wt regrid?
@@ -1914,11 +1927,13 @@ c
 
 
 *     OK, create the output file, map the arrays
+*     Make sure that the bounds are such that the 0,0 pixel
+*     is the reference pixel
 
-                  LBND (1) = 1
-                  LBND (2) = 1
-                  UBND (1) = MAP_SIZE(1)
-                  UBND (2) = MAP_SIZE(2)
+                  LBND (1) = 1 - I_CENTRE
+                  LBND (2) = 1 - J_CENTRE
+                  UBND (1) = MAP_SIZE(1) - I_CENTRE
+                  UBND (2) = MAP_SIZE(2) - J_CENTRE
 
                   IF (BOLREBIN.OR.INTREBIN) THEN
                      CALL NDF_PLACE(OUT_LOC, MAPNAME, PLACE, STATUS)
@@ -2069,6 +2084,7 @@ c
                   END IF
 
 *     Copy the data to the output NDF
+
                   CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
      :                 NDF_PTR, ITEMP, STATUS)
                   CALL VEC_RTOR(.FALSE., N_PIXELS,
@@ -2083,11 +2099,35 @@ c
      :                 NERR, STATUS)
                   CALL NDF_UNMAP(OUT_NDF, 'VARIANCE', STATUS)
 
+*     Trim the edges if required - the edge trimming routine
+*     simply needs the quality array since that will contain a 1
+*     wherever there is a bad pixel. Just set bit 2 for nearby pixels
+
+                  CALL PAR_GET0R('TRIM', TRIM, STATUS)
+
                   CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      :                 NDF_PTR, ITEMP, STATUS)
-                  CALL VEC_UBTOUB(.FALSE., N_PIXELS,
-     :                 %VAL(OUT_QUALITY_PTR), %VAL(NDF_PTR), IERR,
-     :                 NERR, STATUS)
+
+*     Convert to pixels
+                  TRIM = TRIM / (OUT_PIXEL * REAL(R2AS))
+
+*     No point trimming if we have less than 0.5 a pixel
+                  IF ( TRIM .GT. 0.5) THEN
+
+*     Trim the image - set the second bit
+                     CALL SURFLIB_TRIM_IMAGE( TRIM, MAP_SIZE(1),
+     :                    MAP_SIZE(2), 1, %VAL(OUT_QUALITY_PTR),
+     :                    %VAL(NDF_PTR), STATUS)
+
+                  ELSE
+
+                     CALL VEC_UBTOUB(.FALSE., N_PIXELS,
+     :                    %VAL(OUT_QUALITY_PTR), %VAL(NDF_PTR), IERR,
+     :                    NERR, STATUS)
+
+                  END IF
+
+
                   CALL NDF_UNMAP(OUT_NDF, 'QUALITY', STATUS)
 
 *     Free the memory for the output grid
@@ -2113,16 +2153,20 @@ c
                   CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1), 
      :                 FITS(1,1), 'FILT_1', STEMP, STATUS)
 
+*     Extract units from first fits array
+                  CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS(1),
+     :                 FITS(1,1), 'NDFUNITS', OUT_UNITS, STATUS)
+
 *     Retrieve the waveplate and rotation angles
-                  IF (INTREBIN) THEN
-                     WPLATE = ANG_INT(CURR_FILE, CURR_INT,1)
-                     ANGROT = ANG_INT(CURR_FILE, CURR_INT,2)
-                  END IF
+*     Can always do this since they will be bad if there was no
+*     polarimetry.
+                  WPLATE = ANG_INT(CURR_FILE, CURR_INT,1)
+                  ANGROT = ANG_INT(CURR_FILE, CURR_INT,2)
                   
 *     Now write the axis and FITS header
 
                   CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
-     :                 OUT_TITLE, MJD_STANDARD, FILE, FILENAME, 
+     :                 OUT_TITLE,OUT_UNITS,MJD_STANDARD, FILE, FILENAME, 
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
      :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STEMP,
      :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW, 
