@@ -427,8 +427,10 @@
 
 *  Write the title to the NDF.
       ELSE
-         NCHARS = CHR_LEN( TITLE )
-         CALL NDF_CPUT( TITLE( :NCHARS ), NDF, 'TITLE', STATUS )
+         IF ( TITLE .NE. ' ' ) THEN
+            NCHARS = CHR_LEN( TITLE )
+            CALL NDF_CPUT( TITLE( :NCHARS ), NDF, 'TITLE', STATUS )
+         END IF
       END IF
 
 *  Write the NDF UNITS component.
@@ -443,8 +445,10 @@
 
 *  Write the title to the NDF.
       ELSE
-         NCHARS = CHR_LEN( UNITS)
-         CALL NDF_CPUT( UNITS( :NCHARS ), NDF, 'UNITS', STATUS )
+         IF ( UNITS .NE. ' ' ) THEN
+            NCHARS = CHR_LEN( UNITS )
+            CALL NDF_CPUT( UNITS( :NCHARS ), NDF, 'UNITS', STATUS )
+         END IF
       END IF
 
 *  Write the NDF LABEL component.
@@ -459,8 +463,10 @@
 
 *  Write the title to the NDF.
       ELSE
-         NCHARS = CHR_LEN( LABEL )
-         CALL NDF_CPUT( LABEL( :NCHARS ), NDF, 'LABEL', STATUS )
+         IF ( LABEL .NE. ' ' ) THEN
+            NCHARS = CHR_LEN( LABEL )
+            CALL NDF_CPUT( LABEL( :NCHARS ), NDF, 'LABEL', STATUS )
+         END IF
       END IF
 
 *  Transfer axis information.
