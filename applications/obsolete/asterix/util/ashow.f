@@ -671,9 +671,9 @@
       CALL AIO_BLNK( OCH, STATUS )
 
       CALL ASHOW_OB( TIMID, 'DateObs', 'C', 'Date at start', ' ',
-     :                'np', STATUS )
+     :                'np', OCH, STATUS )
       CALL ASHOW_OB( TIMID, 'ObsLength', 'R', 'Obs. length', 'seconds',
-     :                'np', STATUS )
+     :                'np', OCH, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_TIM', STATUS )
@@ -824,7 +824,7 @@
         ELSE IF ( TYPE .EQ. 'D' ) THEN
           CALL ADI_CGET0D( OBJ, MEMBER, DVALUE, STATUS )
         ELSE IF ( TYPE .EQ. 'R' ) THEN
-          CALL ADI_CGET0R( OBJ, MEMBER, DVALUE, STATUS )
+          CALL ADI_CGET0R( OBJ, MEMBER, RVALUE, STATUS )
         ELSE IF ( TYPE .EQ. 'I' ) THEN
           CALL ADI_CGET0I( OBJ, MEMBER, IVALUE, STATUS )
         END IF
