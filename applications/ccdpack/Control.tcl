@@ -84,11 +84,24 @@
 #  Constructor.
 ########################################################################
       constructor { args } {
-         itk_component add controlframe {
-            frame $itk_interior.controlframe
+
+         itk_component add toolbar {
+            iwidgets::toolbar $itk_interior.tbar
+         } {
+            usual
+            ignore -selectborderwidth  ;# Don't know why I need this, but I do.
          }
-         set control $itk_component(controlframe)
+         set childsite [ $itk_component(toolbar) add frame onlytool ]
+         set tool $childsite
+
+       # itk_component add controlframe {
+       #    frame $itk_interior.controlframe
+       # }
+       # set control $itk_component(controlframe)
+
+         set control $itk_component(toolbar)
          pack $control -fill y -expand 1
+
          eval itk_initialize $args
       }
 
@@ -100,7 +113,7 @@
 #-----------------------------------------------------------------------
       public method childsite { } {
 #-----------------------------------------------------------------------
-         return $control
+         return $childsite
       }
 
 ########################################################################
@@ -130,6 +143,13 @@
 ########################################################################
 #  Public variables.
 ########################################################################
+
+#-----------------------------------------------------------------------
+      public variable balloonstr {} {
+#-----------------------------------------------------------------------
+         $itk_component(toolbar) itemconfigure 0 -balloonstr $balloonstr
+      }
+
 
 #-----------------------------------------------------------------------
       public variable command {} {
@@ -221,6 +241,7 @@
 ########################################################################
 #  Private variables.                                                  #
 ########################################################################
+      private variable childsite        ;# Path of child site
       private variable control          ;# Pathname of the control widget
       private variable valuecmd ""      ;# Command to execute on value change
       private variable valuevarname     ;# Scoped name of value variable

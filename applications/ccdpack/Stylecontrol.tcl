@@ -89,7 +89,7 @@
             incr i
          }
          pack $itk_component(control)
-
+         configure -balloonstr "Axis plotting style"
          eval itk_initialize $args
          setval
       }

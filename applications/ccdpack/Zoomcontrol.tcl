@@ -78,6 +78,7 @@
               -side left -fill y
          pack $itk_component(control)
          set omenu $itk_component(zoom)
+         configure -balloonstr {Image magnification}
          eval itk_initialize $args
       }
 
@@ -102,7 +103,6 @@
 ########################################################################
 #  Public variables.
 ########################################################################
-
 
 #-----------------------------------------------------------------------
       public variable max { 8 } {

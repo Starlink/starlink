@@ -58,6 +58,7 @@
          $omenubut configure -textvariable ""
          pack $omenu
          pack $itk_component(control)
+         configure -balloonstr "Brightest/darkest image pixel cutoff"
          eval itk_initialize $args
       }
 

@@ -40,6 +40,7 @@
          set omenu $itk_component(wcsframe)
          pack $omenu
          pack $itk_component(control)
+         configure -balloonstr "World Coordinate System frame"
          eval itk_initialize $args
       }
 
