@@ -1,3 +1,7 @@
+2000-04-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NBS.xs: Change na to PL_na
+
 1999-05-20  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NBS.pm: Import only ems1_get_facility_error from EMS

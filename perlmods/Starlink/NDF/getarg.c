@@ -100,7 +100,7 @@ void getarg_(int* iarg, char* arg, int arglen)
   } else {
 
     /* Copy this string into a char * */
-    perl_string = (char *) SvPV(name, na);
+    perl_string = (char *) SvPV(name, PL_na);
     
     (void)strcpy((char *) arg, (char *) perl_string);
     

@@ -125,7 +125,7 @@ void* pack1D ( SV* arg, char packtype ) {
           uscalar = (unsigned char) SvNV(arg);	/*Get the scalar value */
 	  sv_setpvn(work, (char *) &uscalar, sizeof(char)); /* Pack it in */
       }
-      return (void *) SvPV(work, na);        /* Return the pointer */
+      return (void *) SvPV(work, PL_na);        /* Return the pointer */
    }
    
    /* Is it a glob or reference to an array? */
@@ -189,7 +189,7 @@ void* pack1D ( SV* arg, char packtype ) {
    
       /* Return a pointer to the byte array */
    
-      return (void *) SvPV(work, na);
+      return (void *) SvPV(work, PL_na);
    
    }
    
@@ -259,7 +259,7 @@ void* pack2D ( SV* arg, char packtype ) {
    
    /* Is arg a scalar? Return pointer to char part */
    
-   if (!SvROK(arg) && SvTYPE(arg)!=SVt_PVGV) { return (void *) SvPV(arg, na); }
+   if (!SvROK(arg) && SvTYPE(arg)!=SVt_PVGV) { return (void *) SvPV(arg, PL_na); }
    
    /* 
       Create a work char variable - be cunning and make it a mortal *SV
@@ -352,7 +352,7 @@ void* pack2D ( SV* arg, char packtype ) {
    
       /* Return a pointer to the byte array */
    
-      return (void *) SvPV(work, na);
+      return (void *) SvPV(work, PL_na);
    
    }
    
@@ -409,7 +409,7 @@ void* packND ( SV* arg, char packtype ) {
    
    pack_element(work, &arg, packtype);
    
-   return (void *) SvPV(work, na);
+   return (void *) SvPV(work, PL_na);
 
 }
 
@@ -638,7 +638,7 @@ void* get_mortalspace( int n, char packtype ) {
    if (packtype=='s')
      SvGROW( work, sizeof(short)*n);
    
-   return (void *) SvPV(work, na);
+   return (void *) SvPV(work, PL_na);
 }
 
 

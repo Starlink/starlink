@@ -754,7 +754,7 @@ nbs_get_value_c(id, cvalue, status)
     /* Get some workspace the perl way */
     work = sv_2mortal(newSVpv("", 0));
     SvGROW((SV*)work, actbytes+1);
-    cvalue = SvPV(work,na);
+    cvalue = SvPV(work,PL_na);
 
     /* Get the value */
     nbc_get_value(id, 0, actbytes, cvalue, &actbytes, &status);
