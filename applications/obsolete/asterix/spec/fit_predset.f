@@ -38,11 +38,11 @@
 *
 *    Global constants :
 *
-	INCLUDE 'SAE_PAR'
-	INCLUDE 'PRM_PAR'
-	INCLUDE 'FIT_PAR'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+      INCLUDE 'FIT_PAR'
 *    Structure definitions :
-	INCLUDE 'FIT_STRUC'
+      INCLUDE 'FIT_STRUC'
 *    Import :
         INTEGER			DID			! Dataset identifier
 	INTEGER NDS			! Current dataset number
@@ -154,7 +154,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 *    Type Definitions :
 	IMPLICIT NONE
 *    Global constants :
-	INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Import :
         INTEGER			DID			! Dataset id
 	INTEGER NDS			! Current dataset number
@@ -184,7 +184,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
       DO AXNO = 1, NMDIM
 
 *    Get axis values
-        CALL BDI_AXMAPR( DID, AXNO, 'Data', 'READ', AXPTR, STATUS )
+        CALL BDI_AXMAPR( DID, AXNO, 'Bounds', 'READ', AXPTR, STATUS )
 
 	IF(STATUS.NE.SAI__OK)THEN
 
@@ -198,15 +198,11 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
      :                               'assuming spot values 0,1,2...' )
 	  ELSE
 
-*    Get axis bin size info
-	    CALL BDI_AXCHK( DID, AXNO, 'Width', WID, STATUS )
-	    IF ( WID ) THEN
-	      CALL BDI_AXMAPR( DID, AXNO, 'Width', 'READ',AXWPTR,STATUS)
-	    END IF
-
 *    Set up bounds
-	    CALL FIT_PREDSET_AXBOUND_SET(IDIMM(AXNO),%VAL(AXPTR),WID,
-     :      %VAL(AXWPTR),LBOUND(N),UBOUND(N))
+	    CALL FIT_PREDSET_AXBOUND_SET(IDIMM(AXNO),%VAL(AXPTR),
+     :                                   LBOUND(N),UBOUND(N))
+            CALL BDI_AXUNMAP( DID, AXNO, 'Bounds', AXPTR, STATUS )
+
 	  ENDIF
 	  N=N+IDIMM(AXNO)
 
@@ -221,8 +217,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 
 
 *+  FIT_PREDSET_AXBOUND_SET - Sets up bin boundaries for one axis
-      SUBROUTINE FIT_PREDSET_AXBOUND_SET(NBIN,AX,WID,AXW,
-     :                                  LBOUND,UBOUND)
+      SUBROUTINE FIT_PREDSET_AXBOUND_SET(NBIN,BNDS,LBOUND,UBOUND)
 *    Description :
 *     Uses axis data and  width if available to set up bin boundaries.
 *     If no bin width information is available then spot values
@@ -236,9 +231,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 *    Global constants :
 *    Import :
 	INTEGER NBIN			! No of axis bins
-	REAL AX(NBIN)			! Axis data values
-	LOGICAL WID			! Axis widths available?
-	REAL AXW(*)			! Axis width values
+        REAL	BNDS(2,NBIN)		! Bounds
 *    Import-Export :
 *    Export :
 	REAL LBOUND(*)			! Lower bin bounds
@@ -248,23 +241,13 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	INTEGER I
 *-
 
-	DO I=1,NBIN
+*
+      DO I = 1, NBIN
+        LBOUND(I) = BNDS(1,I)
+        UBOUND(I) = BNDS(2,I)
+      END DO
 
-* Lower bounds
-	  IF(WID)THEN
-	    LBOUND(I)=AX(I)-0.5*AXW(I)
-	  ELSE
-	    LBOUND(I)=AX(I)		! Zero width
-	  ENDIF
-
-* Upper bounds
-	  IF(WID)THEN
-	    UBOUND(I)=LBOUND(I)+AXW(I)
-	  ELSE
-	    UBOUND(I)=AX(I)		! Zero width
-	  ENDIF
-	ENDDO
-	END
+      END
 
 *+  FIT_PREDSET_LUBND - Extracts lower and upper bounds from single bound array
       SUBROUTINE FIT_PREDSET_LUBND(NBND,MBND,LBOUND,UBOUND)
