@@ -126,8 +126,6 @@
      :  CHOP_COORDS, STATUS)
       CALL CHR_UCASE (CHOP_COORDS)
 
-      print *, chop_coords
-
 *  check that the observation was suitable for RESTORE
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -203,8 +201,6 @@
       CALL SCULIB_GET_FITS_R (MAX_FITS, N_FITS, FITS, 'CHOP_THR',
      :  CHOP_THROW, STATUS)
 
-      print *, sample_dx, chop_fun, chop_throw
-
 *  map the various components of the data array and check the data dimensions 
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
@@ -233,8 +229,6 @@
 
 *  map the DEM_PNTR array and check its dimensions
 
-*      CALL NDF_XIARY (INDF, 'SCUBA', 'DEM_PNTR', 'READ', 
-*    :  IN_DEM_PNTR_ARY, STATUS)
       CALL ARY_FIND (IN_SCUBAX_LOC, 'DEM_PNTR', IN_DEM_PNTR_ARY, STATUS)
       CALL ARY_DIM (IN_DEM_PNTR_ARY, MAXDIM, DIM, NDIM, STATUS)
       CALL ARY_MAP (IN_DEM_PNTR_ARY, '_INTEGER', 'READ', 
@@ -307,7 +301,8 @@
 *  deconvolve the data using the routine appropriate for the chop
 *  function used
 
-                  IF (CHOP_FUN .EQ. 'SQUARE') THEN
+                  IF ((CHOP_FUN .EQ. 'SQUARE')    .OR.
+     :                (CHOP_FUN .EQ. 'RAMPWAVE')) THEN
                      CALL SCULIB_2POS_DECONV (N_EXPOSURES,
      :                 N_INTEGRATIONS, N_MEASUREMENTS, 
      :                 %val(IN_DEM_PNTR_PTR), N_BOL, N_POS, 
