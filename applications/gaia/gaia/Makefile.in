@@ -234,6 +234,7 @@ install-bin:
 	$(INSTALL_DATA) $(asc2tab).ifc $(BINDIR)
 	$(INSTALL) $(tab2asc) $(BINDIR)
 	$(INSTALL_DATA) $(tab2asc).ifc $(BINDIR)
+	@(cd mktclapp; $(MAKE) install)
 
 install-man:
 	@(cd man; $(MAKE) install)

@@ -154,7 +154,8 @@ install-top:
 
 install-bin:
 	@if test -d $(BINDIR); then : ; else mkdir $(BINDIR); fi
-	$(INSTALL) $(PROG) $(BINDIR)
+	$(INSTALL) $(TCLPROG) $(BINDIR)
+	$(INSTALL) $(TKPROG) $(BINDIR)
 
 clean:
 	$(RM) $(OBJECTS) $(TKPROG) $(TCLPROG) $(MKTCLAPP) $(SOURCES)

@@ -46,7 +46,7 @@ fi
 #     is also required?
 
 #  Check that GAIA is installed.
-if test -x $GAIA_DIR/gaia; then
+if test -x $GAIA_DIR/gaia_swish; then
 
 #  Try to stop problems with the AMS rendevous files by creating a
 #  new directory as ADAM_USER.
@@ -72,9 +72,9 @@ if test -x $GAIA_DIR/gaia; then
   fi
 
 #  And run up the interface.
-  $GAIA_DIR/gaia ${1+"$@"}
+  $GAIA_DIR/gaia_swish ${1+"$@"}
 
 else
-  echo "!! Cannot start gaia; failed to locate $GAIA_DIR/gaia."
+  echo "!! Cannot start gaia; failed to locate $GAIA_DIR/gaia_swish."
   exit 1
 fi

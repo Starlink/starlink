@@ -1,26 +1,6 @@
 #!/bin/sh    
 # The next line is executed by /bin/sh, but not Tcl \
-TCL_LIBRARY=$GAIA_DIR; \
-TCLX_LIBRARY=$GAIA_DIR; \
-TK_LIBRARY=$GAIA_DIR; \
-TKX_LIBRARY=$GAIA_DIR; \
-ITCL_LIBRARY=$GAIA_DIR; \
-ITK_LIBRARY=$GAIA_DIR; \
-IWIDGETS_LIBRARY=$GAIA_DIR; \
-RTD_LIBRARY=$GAIA_DIR; \
-TCLADAM_DIR=$GAIA_DIR; \
-TIX_LIBRARY=$GAIA_DIR; \
-export TCL_LIBRARY; \
-export TCLX_LIBRARY; \
-export TK_LIBRARY; \
-export TKX_LIBRARY; \
-export ITCL_LIBRARY; \
-export ITK_LIBRARY; \
-export IWIDGETS_LIBRARY; \
-export RTD_LIBRARY; \
-export TCLADAM_DIR; \
-export TIX_LIBRARY; \
-exec $GAIA_DIR/gaia_wish $0 ${1+"$@"}
+exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #+
 #   Name:
 #      gaiadisp
@@ -49,14 +29,10 @@ exec $GAIA_DIR/gaia_wish $0 ${1+"$@"}
 #      09-MAR-1998 (PDRAPER):
 #         Now uses the remote control interface, rather than send
 #         mechanism (less X security complaints).
+#      18-MAY-1999 (PDRAPER):
+#         Converted to use GAIA single binary gaia_stcl.
 #-
 #.
-
-#  Do not show the main window.
-wm withdraw .
-
-#  Load local procedures if needed.
-lappend auto_path $env(GAIA_DIR)
 
 #  Check the command-line arguments.
 set clone ""
@@ -181,7 +157,7 @@ if { $clone != "" } {
 
     #  Command needs to performed by Skycat or derived
     #  object. We just talk to the first window on the list.
-    set cmd "winfo parent \[SkyCat::get_skycat_images\]"
+    set cmd "winfo parent \[skycat::SkyCat::get_skycat_images\]"
     set images [send_to_gaia remotetcl $cmd]
     set ctrlwidget [lindex $images 0]
     set cmd "$ctrlwidget open $image"
