@@ -56,76 +56,62 @@ if ( -f ${JDKHOME} ) setenv PATH "`cat ${JDKHOME}`/bin:${PATH}"
 if ( -f ${JREHOME} ) setenv PATH "`cat ${JREHOME}`/bin:${PATH}"
 unset JREHOME JDKHOME
 
-#     Check if LD_LIBRARY_PATH is set
-#     (needed on
-#        Sparc/Solaris 2.x, 
-#        Sparc/SunOS 4.1.x,
-#        Alpha/Digital Unix
-#        Intel/Linux
-#     systems)
-#     If set, check if it contains:
-#              @libdir@ 
-#              @sharelibdir@ 
-#              /usr/openwin/lib 
-#        Append them if not already included
-#     Else
-#        if OSF/1, set LD_LIBRARY_PATH as @sharelibdir@
-#        if Linux, set LD_LIBRARY_PATH as @sharelibdir@
-#        if Solaris 2.x, set LD_LIBRARY_PATH with all three 
-#        if SunOS 4.x, set LD_LIBRARY_PATH as @sharelibdir@
-#     End
+#     Check if LD_LIBRARY_PATH is set, needed on all platforms
+#     that have shareable libraries, plus all platforms that
+#     have Java JNI libraries.
+#
+#     Under Solaris we need to also make sure that /usr/openwin/lib
+#     is present.
 
 #  Is LD_LIBRARY_PATH set?
 
 if ( ${?LD_LIBRARY_PATH} ) then
 
 #  LD_LIBRARY_PATH is set.  Search it for required components and
-#  Set apropriate flag variables.
+#  Set appropriate flag variables.
 
-   set foundit_one = "no"
-   if (`echo ${LD_LIBRARY_PATH} | grep -c ':@libdir@'` != 0 ) set foundit_one = "yes"
-   if (`echo ${LD_LIBRARY_PATH} | grep -c '^@libdir@'` != 0 ) set foundit_one = "yes"
+   set found_openwin = "no"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c ':/usr/openwin/lib'` != 0 ) set found_openwin = "yes"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c '^/usr/openwin/lib'` != 0 ) set found_openwin = "yes"
 
-   set foundit_two = "no"
-   if (`echo ${LD_LIBRARY_PATH} | grep -c ':/usr/openwin/lib'` != 0 ) set foundit_two = "yes"
-   if (`echo ${LD_LIBRARY_PATH} | grep -c '^/usr/openwin/lib'` != 0 ) set foundit_two = "yes"
-
-   set foundit_four = "no"
-   if (`echo ${LD_LIBRARY_PATH} | grep -c ':@sharelibdir@'` != 0 ) set foundit_four = "yes"
-   if (`echo ${LD_LIBRARY_PATH} | grep -c '^@sharelibdir@'` != 0 ) set foundit_four = "yes"
+   set found_sharelib = "no"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c ':@sharelibdir@'` != 0 ) set found_sharelib = "yes"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c '^@sharelibdir@'` != 0 ) set found_sharelib = "yes"
 
 #  Add required components to end of LD_LIBRARY_PATH if flag variables
 #  indicate they are not present.
 
-   if ( $foundit_one == "no" ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@libdir@"
+   if ( $found_openwin == "no" ) then
+      switch (@build@) 
+         case *sun4*: 
+            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/openwin/lib
+         breaksw
+      endsw
    endif
 
-   if ( $foundit_one == "no" && -e @exec_prefix@/sun4_Solaris ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/sparc"
-   endif
-   if ( $foundit_one == "no" && -e @exec_prefix@/sun4 ) then 
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/sparc"
-   endif
-
-   if ( $foundit_two == "no" && -e @exec_prefix@/sun4_Solaris ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/openwin/lib:@starjavadir@/lib/sparc"
-   endif
-
-   if ( $foundit_four == "no" ) then
+   if ( $found_sharelib == "no" ) then
       setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@sharelibdir@"
-   endif
 
-   if ( $foundit_four == "no" && -e @exec_prefix@/alpha_OSF1 ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/alpha"
+      switch (@build@)
+         case *-osf*:
+            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/alpha"
+         breaksw
+         case *-linux*:
+            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
+         breaksw
+         case *-cygwin*:
+            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
+         breaksw
+         case *-sun*:
+            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/sparc"
+         breaksw
+         case *-darwin*:
+            setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/ppc"
+         breaksw
+      endsw
+
    endif
-   if ( $foundit_four == "no" && -e @exec_prefix@/ix86_Linux ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
-   endif
-   if ( $foundit_four == "no" && -e @exec_prefix@/sun4_Solaris ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/sparc"
-   endif
-   unset foundit_one foundit_two foundit_three foundit_four
+   unset found_openwin found_sharelib
 
 else
 
@@ -133,18 +119,24 @@ else
 
    setenv LD_LIBRARY_PATH @sharelibdir@
 
-   if ( -e @exec_prefix@/alpha_OSF1 ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/alpha"
-   endif
-   if ( -e @exec_prefix@/ix86_Linux ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
-   endif
-   if ( -e @exec_prefix@/sun4_Solaris ) then 
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@libdir@:/usr/openwin/lib:@starjavadir@/lib/sparc"
-   endif
-   if ( -e @exec_prefix@/sun4 ) then
-      setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@libdir@:@starjavadir@/lib/sparc"
-   endif
+   switch (@build@)
+     case *-osf*:
+        setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/alpha"
+     breaksw
+     case *-linux*:
+        setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
+     breaksw
+     case *-cygwin*:
+        setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/i386"
+     breaksw
+     case *-sun*:
+        setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/openwin/lib:@starjavadir@/lib/sparc"
+     breaksw
+     case *-darwin*:
+        setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:@starjavadir@/lib/ppc"
+     breaksw         
+   endsw
+
 endif
 
 #

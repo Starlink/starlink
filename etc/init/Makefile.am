@@ -22,8 +22,9 @@ edit = sed -e 's%@bindir\@%$(bindir)%g' \
            -e 's%@sharelibdir\@%$(libdir)%g' \
            -e 's%@VERSION\@%$(VERSION)%g' \
            -e 's%@mandir\@%$(mandir)%g' \
-           -e 's%@starjavadir\@%$(exec_prefix)/java%g' \
-           -e 's%@exec_prefix\@%$(exec_prefix)%g'
+           -e 's%@starjavadir\@%$(exec_prefix)/starjava%g' \
+           -e 's%@exec_prefix\@%$(exec_prefix)%g' \
+           -e 's%@build\@%$(build)%g'
 
 login:  Makefile $(srcdir)/login.in
 	rm -f login login.tmp
