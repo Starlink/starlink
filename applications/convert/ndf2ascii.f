@@ -58,7 +58,7 @@
 *        normally have variable-length records when there is a header,
 *        but always fixed-length records when there is no header.  It
 *        has a default file extension of ".DAT".
-*     RECLEN = _INTEGER (Write)
+*     RECLEN = _INTEGER (Read)
 *        The maximum record length in bytes of the output file.  This
 *        must be between 32 and 32766.  The lower limit is further
 *        increased to 80 when there is a FITS header to be copied.  It
