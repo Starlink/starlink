@@ -98,7 +98,7 @@
          set childsite [ $itk_component(toolbar) add frame onlytool ]
          set tool $childsite
          set control $itk_component(toolbar)
-         pack $control -fill y -expand 1
+         pack $control -side left -fill y -expand 1
 
          eval itk_initialize $args
       }
@@ -191,14 +191,12 @@
 #-----------------------------------------------------------------------
       public variable state {} {
 #-----------------------------------------------------------------------
-         if { $state == "normal" } {
-            $itk_component(toolbar) configure -balloondelay1 1200
-            $itk_component(toolbar) configure -balloondelay2 1200
-         } elseif { $state == "disabled" } {
+         if { $state == "disabled" || $balloonstr == "" } {
             $itk_component(toolbar) configure -balloondelay1 999999
             $itk_component(toolbar) configure -balloondelay2 999999
-         } else {
-            error "Unknown control state"
+         } elseif { $state == "normal" } {
+            $itk_component(toolbar) configure -balloondelay1 1200
+            $itk_component(toolbar) configure -balloondelay2 1200
          }
       }
 
