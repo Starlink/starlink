@@ -1,0 +1,198 @@
+      SUBROUTINE CCG1_ODIZ<T>( IDAT, ODAT, OWHT, OCNT, IX, IY, OX, OY,
+     :                         X, Y, I, J, L, M, SCALE, ZERO, OVER, 
+     :                         WEIGHT, GETV, GETS, GETZ, GETM, IVAR,
+     :                         VARFAC, STATUS )
+*+
+*  Name:
+*     CCG1_ODIZx
+
+*  Purpose:
+*     Assigns the input data of IDAT to ODAT and calculates OWHT and OCNT
+*     Called from CCD1_DODIZ which does the bulk of the setup for the
+*     actual drizzling algorithm contained in this subroutine.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*      CALL CCG1_ODIZx( IDAT, ODAT, OWHT, OCNT, IX, IY, OX, OY,
+*     :                 X, Y, I, J, L, M, SCALE, ZERO, OVER, WEIGHT, 
+*     :                 GETV, GETS, GETZ, GETM, IVAR, VARFAC, STATUS )
+
+*  Description:
+*     The actual drizzling algorithm, see:
+*
+*     Fruchter et al., "A package for the reduction of dithered undersampled
+*     images", in Casertano et al. (eds), HST Calibration Workshop, STSCI, 
+*     1997, pp. 518-528
+
+*  Arguments:
+*     STATUS  =  INTEGER (Given and Returned).
+*        Global status value
+
+*  Notes:
+*     -  There is a routine for the following numeric data types:
+*     replace "x" in the routine name by D, R, etc as appropirate. 
+
+*  Algorithm:
+*      When a drop with value i_{xy} and a user-definaed weight w_{xy}
+*      is added to an image with pixel value I_{xy}, weight W_{xy}, and
+*      fractional pixel overlap 0 < a_{xy} < 1, the resulting value 
+*      the image I'_{xy} and weight W'_{xy} is 
+*
+*                       W'_{xy} = a_{xy}w_[xy} + W_{xy}
+*
+*                I'_{xy} = a_{xy}i_{xy}w_{xy} + I_{xy}W_{xy}
+*                          ---------------------------------
+*                                      W'_{xy}
+
+*  Authors:
+*     AA: Alasdair Allan (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-SEP-1999 (AA):
+*        Original version
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE           ! no implicit typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! SSE global definitions
+      INCLUDE 'PRM_PAR'        ! Magic-value and extreme constants
+
+*  Arguments Given:
+      INTEGER IX, IY                      ! Size of each input NDF dimension
+      INTEGER X, Y                        ! Current input pixel
+      INTEGER OX, OY                      ! Size of each output NDF dimension
+      INTEGER I, J                        ! Current ouput pixel
+      INTEGER L, M                        ! Current ouput pixel (adjusted)
+      
+      <TYPE> IDAT( IX, IY )               ! Input NDF Data array
+      <TYPE> IVAR( IX, IY )               ! Input NDF variance array
+      
+      DOUBLE PRECISION SCALE              ! Scale factor correction
+      DOUBLE PRECISION ZERO               ! zero point correction
+      DOUBLE PRECISION OVER               ! Overlap between input & output pixel
+      DOUBLE PRECISION WEIGHT             ! Weight for current input NDF
+      DOUBLE PRECISION VARFAC             ! Variance scaling factor
+      DOUBLE PRECISION XYWHT              ! Pixel weight for IDAT( X, Y )
+      
+      LOGICAL GETV                        ! Are we using variances as weights?
+      LOGICAL GETS                        ! Are we using scaling?
+      LOGICAL GETZ                        ! Do we have a zero point correction?
+      LOGICAL GETM                        ! Using variance maps
+      
+*  Arguments Returned:
+      REAL ODAT( OX, OY )
+      REAL OWHT( OX, OY )
+      INTEGER OCNT( OX, OY )
+
+*  Status:
+      INTEGER  STATUS          ! Global status
+
+*  Local Constants:
+
+*  Local Variables:
+      REAL SZDAT                         ! Scaled and zeroed input data
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+ 
+*  Declare functions
+
+*.
+
+*  Check the inherited status on entry.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  The actual drizzling algorithm
+*  ==============================   
+
+*  Correct for scale and zero point 
+      IF( GETS ) THEN
+         SZDAT = REAL(SCALE)*NUM_<T>TOR( IDAT( X, Y ) )
+      ELSE IF( GETZ ) THEN
+         SZDAT = NUM_<T>TOR( IDAT( X, Y ) ) + REAL(ZERO)
+      ELSE IF( GETS .AND. GETZ ) THEN
+         SZDAT = REAL(SCALE)*NUM_<T>TOR( IDAT( X, Y ) ) + REAL(ZERO)
+      ELSE
+         SZDAT = NUM_<T>TOR( IDAT( X, Y ) )
+      ENDIF
+
+*  If we are using inverse variance maps as weights, calculate
+*  the weight for this input pixel
+      IF( GETM ) THEN
+         XYWHT = VARFAC*( 1.0D0/NUM_<T>TOR( IVAR( X, Y ) ) )
+      ENDIF
+                   
+*  For the case where previous drizzling has assigned VAL__BADR
+*  to the output pixel
+      IF( (IDAT(X, Y) .NE. VAL__BADR) .AND.
+     :    (ODAT(L, M) .EQ. VAL__BADR) ) THEN
+         
+         IF( GETM ) THEN
+            ODAT( L, M ) = SZDAT
+            OWHT( L, M ) = REAL(OVER*XYWHT)
+            OCNT( L, M ) = 1            
+         ELSE                        
+            ODAT( L, M ) = SZDAT
+            OWHT( L, M ) = REAL(OVER*WEIGHT)
+            OCNT( L, M ) = 1
+         ENDIF
+                          
+*  For the case where there hasn't been any input data drizzled 
+*  onto the output array yet
+      ELSE IF( (IDAT(X, Y) .NE. VAL__BADR) .AND.
+     :         (ODAT(L, M) .NE. VAL__BADR) ) THEN
+
+         IF( OCNT( L, M ) .EQ. 0) THEN
+
+            IF( GETM ) THEN
+               ODAT( L, M ) = SZDAT
+               OWHT( L, M ) = REAL(OVER*XYWHT)
+               OCNT( L, M ) = 1            
+            ELSE                             
+               ODAT( L, M ) = SZDAT
+               OWHT( L, M ) = REAL(OVER*WEIGHT)
+               OCNT( L, M ) = 1
+            ENDIF
+                          
+*  We're mid-drizzle and still going, the output pixel already has
+*  data in it and we want to stuff some more in there...
+         ELSE
+
+            IF( GETM ) THEN
+               ODAT( L, M ) = ODAT( L, M )*OWHT( L, M )
+     :                        + REAL(XYWHT*OVER)*SZDAT
+               ODAT( L, M ) = ODAT( L, M )/
+     :                        ( OWHT( L, M) + REAL(OVER*XYWHT) )
+               OWHT( L, M ) = OWHT( L, M ) + REAL(OVER*XYWHT)
+               OCNT( L, M ) = OCNT( L, M ) + 1            
+            ELSE                           
+               ODAT( L, M ) = ODAT( L, M )*OWHT( L, M )
+     :                        + REAL(WEIGHT*OVER)*SZDAT
+               ODAT( L, M ) = ODAT( L, M )/
+     :                        ( OWHT( L, M) + REAL(OVER*WEIGHT) )
+               OWHT( L, M ) = OWHT( L, M ) + REAL(OVER*WEIGHT)
+               OCNT( L, M ) = OCNT( L, M ) + 1
+            ENDIF
+                          
+         ENDIF 
+                      
+      ENDIF
+                          
+
+*  Clean up - Arrive here if an error occurs
+*  ========================================= 
+999   CONTINUE
+
+*  Time at the bar please...
+      END
