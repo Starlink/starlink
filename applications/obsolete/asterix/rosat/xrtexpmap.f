@@ -485,7 +485,7 @@ c	From INTEGER to improve exposure time evaluation
 
 *      If a good time, or no time slots supplied...
         IF ( (NACTGTIME.EQ.0) .OR.
-     :       ((DBLE(ISCS) .GE. IACTBE) .AND. (ITIME.LE.NACTGTIME)) ) THEN
+     :       ((DBLE(ISCS).GE.IACTBE) .AND. (ITIME.LE.NACTGTIME)) ) THEN
 
 *        Accepted time, now find the live time.
           NUM = NUM + 1
