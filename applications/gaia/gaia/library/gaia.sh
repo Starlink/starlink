@@ -71,6 +71,10 @@ if test -x $GAIA_DIR/gaia_swish; then
     export SKYCAT_CONFIG
   fi
 
+#  Set the BLT_LIBRARY variable. This is needed to locate some .pro files.
+  BLT_LIBRARY=$GAIA_DIR
+  export BLT_LIBRARY
+
 #  And run up the interface.
   $GAIA_DIR/gaia_swish ${1+"$@"}
 

@@ -39,25 +39,6 @@ if test "$GAIA_DIR" = ""; then
   exit 1
 fi
 
-#  Standalone TCL initialisations for [incr Tcl] and friends.
-
-#TCL_LIBRARY=$GAIA_DIR
-#TK_LIBRARY=$GAIA_DIR
-#ITCL_LIBRARY=$GAIA_DIR
-#ITK_LIBRARY=$GAIA_DIR
-#IWIDGETS_LIBRARY=$GAIA_DIR
-#RTD_LIBRARY=
-#SKYCAT_LIBRARY=
-TCLADAM_DIR=$GAIA_DIR
-#export TCL_LIBRARY
-#export TK_LIBRARY
-#export ITCL_LIBRARY
-#export ITK_LIBRARY
-#export IWIDGETS_LIBRARY
-#export RTD_LIBRARAY
-#export SKYCAT_LIBRARY
-export TCLADAM_DIR
-
 #  Notes:
 #     The ${1+"$@"} passes on any command line arguments? Perhaps $0
 #     is also required?
