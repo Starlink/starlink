@@ -196,6 +196,9 @@ F77_SUBROUTINE(util_findfile_int)( CHARACTER(deft), CHARACTER(wspec),
         {
         d_name = dent->d_name;
 
+if ( getenv("DAVID") )
+  printf("Entry : |%s|\n", dent->d_name );
+
         if ( !strcmp(d_name,".") ||		/* Skip these entries */
              !strcmp(d_name,"..") ) continue;
           {
