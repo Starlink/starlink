@@ -21,7 +21,7 @@
  *     utilities to translate error codes to text on Unix systems.
  *     If a the current directory contains a file of the same name
  *     as the new output file but with an "_ext" suffix, the contents
- *     of that file are written to the output file prior to writing the
+ *     of that file are written to the output file after writing the
  *     error codes.
 
  *  Parameters:
@@ -78,6 +78,7 @@
 
  *- */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -171,7 +172,14 @@ process_file(char *filename)
     FILE *fp_f = NULL;
     FILE *fp_F = NULL;
     FILE *fp_error = NULL;
-    char buffer[MAXLINE], file_name[MAXLINE];
+
+    /* store the filenames so that we can append _ext at end */
+    char c_inc_outfile[MAXLINE];
+    char f_inc_outfile[MAXLINE];
+    char F_INC_outfile[MAXLINE];
+    char fac_outfile[MAXLINE];
+
+    char buffer[MAXLINE];
     char message_ident[10], *message_text;
     char *p, ch;
     int i, end=0;
@@ -204,14 +212,13 @@ process_file(char *filename)
                     p++;
                 }
 		if (c_header) {
-		    sprintf(file_name, "%s_err.h", buffer);
-		    if ((fp_c = fopen( file_name, "w")) == NULL ) {
-			fprintf(stderr, "Cannot open %s\n", file_name);
+		    sprintf(c_inc_outfile, "%s_err.h", buffer);
+		    if ((fp_c = fopen( c_inc_outfile, "w")) == NULL ) {
+			fprintf(stderr, "Cannot open %s\n", c_inc_outfile);
 			return;
 		    }
                     if (write_filenames)
-                        puts( file_name );
-		    write_external(file_name, fp_c);
+                        puts( c_inc_outfile );
 		    fprintf(fp_c,
                             "/*\n * C error define file "
                             "for facility %s (%d)\n"
@@ -224,14 +231,13 @@ process_file(char *filename)
                             fac_name, fac_name);
 		}
 		if (f77_include) {
-		    sprintf(file_name, "%s_err", buffer);
-		    if ((fp_f = fopen( file_name, "w")) == NULL ) {
-			fprintf(stderr, "Cannot open %s\n", file_name);
+		    sprintf(f_inc_outfile, "%s_err", buffer);
+		    if ((fp_f = fopen( f_inc_outfile, "w")) == NULL ) {
+			fprintf(stderr, "Cannot open %s\n", f_inc_outfile);
 			return;
 		    }
                     if (write_filenames)
-                        puts( file_name );
-		    write_external(file_name, fp_f);
+                        puts( f_inc_outfile );
 		    fprintf(fp_f,
                             "* FORTRAN error include file for facility "
                             "%s (Code %d)\n"
@@ -241,16 +247,15 @@ process_file(char *filename)
 		if (f77_INCLUDE) {
                     /* identical to f77_include, but with filename upcased */
                     char *p;
-		    sprintf(file_name, "%s_err", buffer);
-                    for (p=file_name; *p!=0; p++)
+		    sprintf(F_INC_outfile, "%s_err", buffer);
+                    for (p=F_INC_outfile; *p!=0; p++)
                         *p = toupper(*p);
-		    if ((fp_F = fopen( file_name, "w")) == NULL ) {
-			fprintf(stderr, "Cannot open %s\n", file_name);
+		    if ((fp_F = fopen( F_INC_outfile, "w")) == NULL ) {
+			fprintf(stderr, "Cannot open %s\n", F_INC_outfile);
 			return;
 		    }
                     if (write_filenames)
-                        puts( file_name );
-		    write_external(file_name, fp_F);
+                        puts( F_INC_outfile );
 		    fprintf(fp_F,
                             "* FORTRAN error include file for facility "
                             "%s (Code %d)\n"
@@ -258,13 +263,13 @@ process_file(char *filename)
                             fac_name, fac_code);
 		}
 		if (c_error) {
-		    sprintf(file_name, "fac_%d_err", fac_code);
-		    if ((fp_error = fopen( file_name, "w")) == NULL ) {
-			fprintf(stderr, "Cannot open %s\n", file_name);
+		    sprintf(fac_outfile, "fac_%d_err", fac_code);
+		    if ((fp_error = fopen( fac_outfile, "w")) == NULL ) {
+			fprintf(stderr, "Cannot open %s\n", fac_outfile);
 			return;
 		    }
                     if (write_filenames)
-                        puts( file_name );
+                        puts( fac_outfile );
 		    fprintf(fp_error, "FACILITY %s\n", fac_name);
 		}
             } else if (strncmp(&buffer[1], "IDENT", 5) == 0) {
@@ -363,6 +368,12 @@ process_file(char *filename)
     }
     if (fp_c)
 	fprintf(fp_c, "#endif	/* %s_ERROR_DEFINED */\n", fac_name);
+
+    /* Append the _ext file contents */
+    write_external(c_inc_outfile, fp_c);
+    write_external(f_inc_outfile, fp_f);
+    write_external(F_INC_outfile, fp_F);
+
     if (verify)
 	printf("MESSAGE file converted successfully\n");
     return;
