@@ -26,8 +26,8 @@ dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf psx gks sae dat par])
-STAR_DECLARE_DEPENDENCIES(link,  [ref trn sgs pgp idi])
+STAR_DECLARE_DEPENDENCIES(build, [cnf psx gks sae hds par])
+STAR_DECLARE_DEPENDENCIES(link,  [ref trn sgs pgp idi hds ])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
