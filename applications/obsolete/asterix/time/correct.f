@@ -53,6 +53,7 @@
 *
 *     12 Nov 93 : V1.7-0 Original (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     30 JUL 95 : V1.8-1 Preliminary ADI conversions (DJA)
 *
 *    Type definitions :
 *
@@ -61,6 +62,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 *
 *    Status :
@@ -79,7 +81,6 @@
 *    Local variables :
 *
       CHARACTER*(DAT__SZLOC)	HLOC			! Input dataset header
-      CHARACTER*(DAT__SZLOC)	ILOC			! Input dataset
       CHARACTER*(DAT__SZLOC)	LLOC			! Output LIVE_TIMEs
       CHARACTER*(DAT__SZLOC)	OLOC			! Output dataset
       CHARACTER*80		HTXT(MAXHTEXT)		! History text
@@ -91,17 +92,19 @@
       INTEGER			APTR			! Axis data pointer
       INTEGER			AWPTR			! Axis widths pointer
       INTEGER			DCPTR			! Dead time corr array
-      INTEGER			DIMS(DAT__MXDIM)	! Dimensions
+      INTEGER			DIMS(ADI__MXDIM)	! Dimensions
       INTEGER			DPTR			! Data pointer
       INTEGER			I			! Loop over SNAMES
+      INTEGER			IFID			! Input dataset id
       INTEGER                   NDIM			! Dimensionality
       INTEGER                   NELM			! Total no. of points
       INTEGER                   NLINES			! No. lines of history
       INTEGER                   NSLOT			! No. of LIVE_TIME slots
+      INTEGER			OFID			! Output dataset id
       INTEGER			ON_PTR, OFF_PTR, DUR_PTR! LIVE_TIME data
       INTEGER			QPTR			! Quality pointer
       INTEGER                   T_AX, X_AX, Y_AX 	! Axis numbers
-      INTEGER			TDIMS(DAT__MXDIM)	! Temp dimensions
+      INTEGER			TDIMS(ADI__MXDIM)	! Temp dimensions
       INTEGER                   TLEN			! Length of a string!
       INTEGER			TNDIM			! Temp dimensionality
       INTEGER			VPTR			! Variance pointer
@@ -122,7 +125,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  ( VERSION = 'CORRECT Version 1.8-0' )
+        PARAMETER  ( VERSION = 'CORRECT Version 1.8-1' )
 *-
 
 *    Check status
@@ -140,18 +143,20 @@
 
 *    Get either one or two dataset names
       IF ( OVER ) THEN
-        CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, INPRIM, STATUS )
-        CALL DAT_CLONE( ILOC, OLOC, STATUS )
+        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+        CALL ADI_CLONE( IFID, OFID, STATUS )
 
       ELSE
-        CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC, INPRIM,
-     :                   STATUS )
-        CALL HDX_COPY( ILOC, OLOC, STATUS )
+        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+        CALL ADI_FCOPY( IFID, OFID, STATUS )
 
       END IF
 
+*    Extract locators
+      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
+
 *    See if corrected structure is there
-      CALL PRO_GET( OLOC, 'CORRECTED.EXPOSURE', OK, STATUS )
+      CALL PRF_GET( OFID, 'CORRECTED.EXPOSURE', OK, STATUS )
       IF ( OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'This dataset has already been '/
@@ -160,22 +165,22 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get input data
-      CALL BDA_CHKDATA( OLOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid numeric data', STATUS )
         GOTO 99
       END IF
-      CALL BDA_MAPDATA( OLOC, 'UPDATE', DPTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'UPDATE', DPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Total number of data points
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *    Variance present?
-      CALL BDA_CHKVAR( OLOC, VOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHKVAR( OFID, VOK, TNDIM, TDIMS, STATUS )
       IF ( VOK ) THEN
-        CALL BDA_MAPVAR( OLOC, 'UPDATE', VPTR, STATUS )
+        CALL BDI_MAPVAR( OFID, 'UPDATE', VPTR, STATUS )
 
 *    Given user option of creating Poisson array
       ELSE
@@ -184,8 +189,8 @@
 
 *      Create variance array from data?
         IF ( POISS ) THEN
-          CALL BDA_CREVAR( OLOC, NDIM, DIMS, STATUS )
-          CALL BDA_MAPVAR( OLOC, 'WRITE', VPTR, STATUS )
+          CALL BDI_CREVAR( OFID, NDIM, DIMS, STATUS )
+          CALL BDI_MAPVAR( OFID, 'WRITE', VPTR, STATUS )
           CALL ARR_COP1R( NELM, %VAL(DPTR), %VAL(VPTR), STATUS )
           VOK = (STATUS.EQ.SAI__OK)
         END IF
@@ -194,11 +199,11 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Quality present?
-      CALL BDA_CHKQUAL( OLOC, QOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHKQUAL( OFID, QOK, TNDIM, TDIMS, STATUS )
       IF ( QOK ) THEN
-        CALL BDA_MAPLQUAL( OLOC, 'READ', QPTR, ANYBAD, STATUS )
+        CALL BDI_MAPLQUAL( OFID, 'READ', QPTR, ANYBAD, STATUS )
         IF ( .NOT. ANYBAD ) THEN
-          CALL BDA_UNMAPLQUAL( OLOC, STATUS )
+          CALL BDI_UNMAPLQUAL( OFID, STATUS )
           QOK = .FALSE.
         END IF
       END IF
@@ -287,7 +292,7 @@
       IF ( T_RESOLVED ) THEN
 
 *      Look for time axis
-        CALL AXIS_FINDXYT( OLOC, NDIM, X_AX, Y_AX, T_AX, STATUS )
+        CALL AXIS_TFINDXYT( OFID, NDIM, X_AX, Y_AX, T_AX, STATUS )
 
 *      No time axis?
         IF ( T_AX .EQ. 0 ) THEN
@@ -300,7 +305,7 @@
 *        Ambiguous axis?
           IF ( T_AX .LT. 0 ) THEN
             T_AX = - T_AX
-            CALL BDA_GETAXLABEL( OLOC, T_AX, TEXT, STATUS )
+            CALL BDI_GETAXLABEL( OFID, T_AX, TEXT, STATUS )
             CALL MSG_SETC( 'LABEL', TEXT )
             CALL MSG_PRNT( 'WARNING : Ambiguous time axis, using'/
      :                                           /' axis ^LABEL' )
@@ -318,17 +323,17 @@
           ELSE
 
 *          Map time axis data and widths
-            CALL BDA_MAPAXVAL( OLOC, 'READ', T_AX, APTR, STATUS )
-            CALL BDA_MAPAXWID( OLOC, 'READ', T_AX, AWPTR, STATUS )
+            CALL BDI_MAPAXVAL( OFID, 'READ', T_AX, APTR, STATUS )
+            CALL BDI_MAPAXWID( OFID, 'READ', T_AX, AWPTR, STATUS )
 
 *          Has data been normalised wrt the time axis already?
-            CALL BDA_GETAXNORM( OLOC, T_AX, AXNORM, STATUS )
+            CALL BDI_GETAXNORM( OFID, T_AX, AXNORM, STATUS )
 
 *          If it has, we have to denormalise and renormalise again afterwards
             IF ( AXNORM ) THEN
 
 *            Pad dimensions to 7D
-              DO I = NDIM+1, DAT__MXDIM
+              DO I = NDIM+1, ADI__MXDIM
                 DIMS(I) = 1
               END DO
 
@@ -422,28 +427,28 @@
       END IF
 
 *    Adjust the data label
-      CALL BDA_GETLABEL( OLOC, TEXT, STATUS )
+      CALL BDI_GETLABEL( OFID, TEXT, STATUS )
       IF ( TEXT .GT. ' ' ) THEN
-        CALL BDA_PUTLABEL( OLOC, '('//TEXT(:CHR_LEN(TEXT))//') / s',
+        CALL BDI_PUTLABEL( OFID, '('//TEXT(:CHR_LEN(TEXT))//') / s',
      :                     STATUS )
       END IF
 
 *    Flag dataset as corrected
-      CALL PRO_SET( OLOC, 'CORRECTED.EXPOSURE', .TRUE., STATUS )
+      CALL PRF_SET( OFID, 'CORRECTED.EXPOSURE', .TRUE., STATUS )
       IF ( LIVE_OK ) THEN
-        CALL PRO_SET( OLOC, 'CORRECTED.DEAD_TIME', .TRUE., STATUS )
+        CALL PRF_SET( OFID, 'CORRECTED.DEAD_TIME', .TRUE., STATUS )
       END IF
 
 *    Update HISTORY
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       HTXT(1) = 'Input {INP}'
       NLINES = MAXHTEXT
       CALL USI_TEXT( 1, HTXT, NLINES, STATUS )
-      CALL HIST_PTXT( OLOC, NLINES, HTXT, STATUS )
+      CALL HSI_PTXT( OFID, NLINES, HTXT, STATUS )
       CALL MSG_SETR( 'TEXP', TEXP )
       CALL MSG_MAKE( 'Corrected for exposure time of ^TEXP seconds',
      :               TEXT, TLEN )
-      CALL HIST_PTXT( OLOC, 1, TEXT(:TLEN), STATUS )
+      CALL HSI_PTXT( OFID, 1, TEXT(:TLEN), STATUS )
       IF ( LIVE_OK ) THEN
         IF ( T_RESOLVED ) THEN
           TEXT = 'Performed time resolved dead time correction'
@@ -452,7 +457,7 @@
           CALL MSG_MAKE( 'Applied a total dead time correction of ^D',
      :                   TEXT, TLEN )
         END IF
-        CALL HIST_PTXT( OLOC, 1, TEXT, STATUS )
+        CALL HSI_PTXT( OFID, 1, TEXT, STATUS )
       END IF
 
 *    Tidy up
