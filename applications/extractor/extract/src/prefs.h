@@ -13,6 +13,8 @@
 *                       27/11/98 (PWD):
 *                          Removed ".fits" as default output file
 *                          extension.
+*                       15/02/00 (PWD):
+*                          Added MURAD_THRESH
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -102,6 +104,8 @@ pkeystruct key[] =
   {"MEMORY_BUFSIZE", P_INT, &prefs.mem_bufsize, 8, 65534},
   {"MEMORY_OBJSTACK", P_INT, &prefs.clean_stacksize, 16,65536},
   {"MEMORY_PIXSTACK", P_INT, &prefs.mem_pixstack, 1000, 10000000},
+  {"MURAD_THRESH", P_FLOATLIST, prefs.mu_rad, 0,0, -BIG, BIG,
+    {""}, 3, 3, &prefs.mu_rad},
   {"PARAMETERS_NAME", P_STRING, prefs.param_name},
   {"PHOT_APERTURES", P_FLOATLIST, prefs.apert, 0,0, 0.0,2*MAXPICSIZE,
    {""}, 1, MAXNAPER, &prefs.naper},

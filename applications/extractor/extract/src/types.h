@@ -17,6 +17,8 @@
 *                       09/02/00 (PWD):
 *                         Merged 2.1.5 sources in which above is
 *                         correctly fixed.
+*                       15/02/00 (PWD):
+*                         Added mu_rad member.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -116,6 +118,7 @@ typedef struct
   float		mthresh;		       	/* max. threshold (ADU) */
   int		iso[NISO];			/* isophotal areas */
   float		fwhm;				/* IMAGE FWHM */
+  float         mu_rad[NRAD];                   /* average radii */
   }	objstruct;
 
 /* II: "BLIND" parameters */
@@ -506,6 +509,8 @@ typedef struct
 /*----- customize */
   double	mama_corflex;
   int		fitsunsigned_flag;			/* Force unsign FITS */
+
+  double        mu_rad[3];                              /* Radii threshold*/
   }	prefstruct;
 
 
