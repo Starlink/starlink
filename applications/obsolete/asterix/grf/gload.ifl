@@ -1,7 +1,7 @@
 interface GLOAD
   parameter INP
     position 1
-    type '_CHAR'
+    type 'LITERAL'
     prompt 'Graphics data'
     help 'Name of file containing graphics data'
   endparameter
