@@ -297,7 +297,9 @@ f     using AST_GRID
 *        Remove the check for very short segments introduced above, as it 
 *        caused south pole tan projection to include some spurious lines.
 *     20-SEP-2001 (DSB):
-*        Initialize baseframe to NULL in astInitPlot (prevents segvios).
+*        - Initialize baseframe to NULL in astInitPlot (prevents segvios).
+*        - Modified astInitPlot to allow the "frame" argument to the astPlot 
+*        constructor to be a Plot.
 *class--
 */
 
