@@ -43,10 +43,13 @@
         UBND(1)=DIMS(1)
         UBND(2)=DIMS(2)
 *  set pixel to world transformation - see Sec.4 of ARD manual
-        TR(1)=1.0-BASE(1)/SCALE(1)
+*  note that ARD assumes the pixel coord of first pixel to range
+*  from 0..1 whereas ASTERIX assumes a range 0.5 to 1.5 with 1
+*  at centre
+        TR(1)=0.5-BASE(1)/SCALE(1)
         TR(2)=1.0/SCALE(1)
         TR(3)=0.0
-        TR(4)=1.0-BASE(2)/SCALE(2)
+        TR(4)=0.5-BASE(2)/SCALE(2)
         TR(5)=0.0
         TR(6)=1.0/SCALE(2)
         REGVAL=2
