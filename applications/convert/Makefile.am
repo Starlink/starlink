@@ -20,13 +20,15 @@ LOCAL_LINK = coi/libcoi.la cof/libcof.la con/libcon.la aif/libaif.la \
 
 bin_MONOLITHS = convert_mon
 
-convert_mon_SOURCES = convert_mon.fpp $(TASKS:=.f)
+convert_mon_SOURCES = convert_mon.f $(TASKS:=.f) $(FPP_TASKS:=.fpp)
 convert_mon_LDADD = $(LOCAL_LINK)
-convert_mon_TASKS = $(TASKS)
+convert_mon_TASKS = $(TASKS) $(FPP_TASKS)
+
+FPP_TASKS = ndf2iraf iraf2ndf
 
 TASKS = ascii2ndf ast2ndf conhelp da2ndf dst2ndf fits2ndf \
  gasp2ndf ircam2ndf ndf2ascii ndf2da ndf2dst ndf2fits ndf2gasp \
- ndf2pgm ndf2tiff ndf2unf specx2ndf unf2ndf iraf2ndf ndf2iraf
+ ndf2pgm ndf2tiff ndf2unf specx2ndf unf2ndf
 
 IFL_FILES = convert_mon.ifl $(TASKS:=.ifl)
 

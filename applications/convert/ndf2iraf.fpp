@@ -1,3 +1,6 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
       SUBROUTINE NDF2IRAF( STATUS )
 *+
 *  Name:
@@ -278,6 +281,16 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+#if !HAVE_IRAF_LIBIMFORT_A
+
+*  We do not have IRAF libraries so give an error message
+	STATUS = SAI__ERROR
+	CALL ERR_REP('NDF2IRAF', 'NDF2IRAF: Convert not built with '//
+     :		'IRAF libraries. You will need to rebuild CONVERT',
+     :		 STATUS)
+
+#else
 
 *  Initialise the IRAF status.
       ERR = 0
@@ -584,4 +597,7 @@
      :     STATUS )
       END IF
 
+#endif
+
       END
+
