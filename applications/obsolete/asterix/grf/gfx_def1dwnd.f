@@ -129,11 +129,19 @@
             IF (XLOG) THEN
               LXW1=LOG10(XW1)
               LXW2=LOG10(XW2)
-              XGAP=ABS((LXW2-LXW1)/30.0)
+              IF (XW1.EQ.XW2) THEN
+                XGAP=0.5
+              ELSE
+                XGAP=ABS((LXW2-LXW1)/30.0)
+              ENDIF
               XW1=10.0**(LXW1-XGAP)
               XW2=10.0**(LXW2+XGAP)
             ELSE
-              XGAP=(XW2-XW1)/30.0
+              IF (XW1.EQ.XW2) THEN
+                XGAP=0.5
+              ELSE
+                XGAP=(XW2-XW1)/30.0
+              ENDIF
               XW1=XW1-XGAP
               XW2=XW2+XGAP
 
@@ -142,11 +150,19 @@
             IF (YLOG) THEN
               LYW1=LOG10(YW1)
               LYW2=LOG10(YW2)
-              YGAP=ABS((LYW2-LYW1)/30.0)
+              IF (YW1.EQ.YW2) THEN
+                YGAP=0.5
+              ELSE
+                YGAP=ABS((LYW2-LYW1)/30.0)
+              ENDIF
               YW1=10.0**(LYW1-YGAP)
               YW2=10.0**(LYW2+YGAP)
             ELSE
-              YGAP=(YW2-YW1)/30.0
+              IF (YW1.EQ.YW2) THEN
+                YGAP=0.5
+              ELSE
+                YGAP=(YW2-YW1)/30.0
+              ENDIF
               YW1=YW1-YGAP
               YW2=YW2+YGAP
             ENDIF
@@ -312,11 +328,19 @@
             IF (XLOG) THEN
               LXW1=LOG10(XW1)
               LXW2=LOG10(XW2)
-              XGAP=ABS((LXW2-LXW1)/30.0)
+              IF (XW1.EQ.XW2) THEN
+                XGAP=0.5
+              ELSE
+                XGAP=ABS((LXW2-LXW1)/30.0)
+              ENDIF
               XW1=10.0**(LXW1-XGAP)
               XW2=10.0**(LXW2+XGAP)
             ELSE
-              XGAP=(XW2-XW1)/30.0
+              IF (XW1.EQ.XW2) THEN
+                XGAP=0.5
+              ELSE
+                XGAP=(XW2-XW1)/30.0
+              ENDIF
               XW1=XW1-XGAP
               XW2=XW2+XGAP
 
@@ -325,11 +349,19 @@
             IF (YLOG) THEN
               LYW1=LOG10(YW1)
               LYW2=LOG10(YW2)
-              YGAP=ABS((LYW2-LYW1)/30.0)
+              IF (YW1.EQ.YW2) THEN
+                YGAP=0.5
+              ELSE
+                YGAP=ABS((LYW2-LYW1)/30.0)
+              ENDIF
               YW1=10.0**(LYW1-YGAP)
               YW2=10.0**(LYW2+YGAP)
             ELSE
-              YGAP=(YW2-YW1)/30.0
+              IF (YW1.EQ.YW2) THEN
+                YGAP=0.5
+              ELSE
+                YGAP=(YW2-YW1)/30.0
+              ENDIF
               YW1=YW1-YGAP
               YW2=YW2+YGAP
             ENDIF
@@ -514,11 +546,19 @@
             IF (XLOG) THEN
               LXW1=LOG10(XW1)
               LXW2=LOG10(XW2)
-              XGAP=ABS((LXW2-LXW1)/30.0)
+              IF (XW1.EQ.XW2) THEN
+                XGAP=0.5
+              ELSE
+                XGAP=ABS((LXW2-LXW1)/30.0)
+              ENDIF
               XW1=10.0**(LXW1-XGAP)
               XW2=10.0**(LXW2+XGAP)
             ELSE
-              XGAP=(XW2-XW1)/30.0
+              IF (XW1.EQ.XW2) THEN
+                XGAP=0.5
+              ELSE
+                XGAP=(XW2-XW1)/30.0
+              ENDIF
               XW1=XW1-XGAP
               XW2=XW2+XGAP
 
@@ -527,11 +567,19 @@
             IF (YLOG) THEN
               LYW1=LOG10(YW1)
               LYW2=LOG10(YW2)
-              YGAP=ABS((LYW2-LYW1)/30.0)
+              IF (YW1.EQ.YW2) THEN
+                YGAP=0.5
+              ELSE
+                YGAP=ABS((LYW2-LYW1)/30.0)
+              ENDIF
               YW1=10.0**(LYW1-YGAP)
               YW2=10.0**(LYW2+YGAP)
             ELSE
-              YGAP=(YW2-YW1)/30.0
+              IF (YW1.EQ.YW2) THEN
+                YGAP=0.5
+              ELSE
+                YGAP=(YW2-YW1)/30.0
+              ENDIF
               YW1=YW1-YGAP
               YW2=YW2+YGAP
             ENDIF
@@ -739,11 +787,19 @@
             IF (XLOG) THEN
               LXW1=LOG10(XW1)
               LXW2=LOG10(XW2)
-              XGAP=ABS((LXW2-LXW1)/30.0)
+              IF (XW1.EQ.XW2) THEN
+                XGAP=0.5
+              ELSE
+                XGAP=ABS((LXW2-LXW1)/30.0)
+              ENDIF
               XW1=10.0**(LXW1-XGAP)
               XW2=10.0**(LXW2+XGAP)
             ELSE
-              XGAP=(XW2-XW1)/30.0
+              IF (XW1.EQ.XW2) THEN
+                XGAP=0.5
+              ELSE
+                XGAP=(XW2-XW1)/30.0
+              ENDIF
               XW1=XW1-XGAP
               XW2=XW2+XGAP
 
@@ -752,11 +808,19 @@
             IF (YLOG) THEN
               LYW1=LOG10(YW1)
               LYW2=LOG10(YW2)
-              YGAP=ABS((LYW2-LYW1)/30.0)
+              IF (YW1.EQ.YW2) THEN
+                YGAP=0.5
+              ELSE
+                YGAP=ABS((LYW2-LYW1)/30.0)
+              ENDIF
               YW1=10.0**(LYW1-YGAP)
               YW2=10.0**(LYW2+YGAP)
             ELSE
-              YGAP=(YW2-YW1)/30.0
+              IF (YW1.EQ.YW2) THEN
+                YGAP=0.5
+              ELSE
+                YGAP=(YW2-YW1)/30.0
+              ENDIF
               YW1=YW1-YGAP
               YW2=YW2+YGAP
             ENDIF
