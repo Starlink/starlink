@@ -224,7 +224,7 @@ kpg1_is3d.f kpg1_wtm3d.f kpg1_is3r.f kpg1_wtm3r.f kpg1_orvar.f
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl \
-fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
+fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl lutwarm.cl \
 lutcol.cl lutcont.cl lutfc.cl lutgrey.cl lutheat.cl lutikon.cl lutneg.cl \
 lutramps.cl lutread.cl lutspec.cl lutzebra.cl picbase.cl picdata.cl \
 picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
@@ -260,7 +260,7 @@ _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
 wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par \
 scatter.par lutcont.par lutheat.par lutramps.par picbase.par piclast.par \
-lutbgyrw.par lutfc.par lutikon.par lutspec.par picdata.par lutcol.par \
+lutbgyrw.par lutwarm.par lutfc.par lutikon.par lutspec.par picdata.par lutcol.par \
 lutgrey.par lutneg.par lutzebra.par picframe.par kapversion.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
@@ -281,7 +281,7 @@ hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
 idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp inspect.hlp \
 interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
 linplot.hlp log10.hlp logar.hlp loge.hlp look.hlp lucy.hlp lutable.hlp \
-lutbgyrw.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutflip.hlp lutgrey.hlp \
+lutbgyrw.hlp lutwarm.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutflip.hlp lutgrey.hlp \
 lutheat.hlp luthilite.hlp lutikon.hlp lutneg.hlp lutramps.hlp lutread.hlp \
 lutrot.hlp lutsave.hlp lutspec.hlp lutview.hlp luttweak.hlp lutzebra.hlp \
 makesurface.hlp manic.hlp maths.hlp median.hlp mem2d.hlp mlinplot.hlp \
