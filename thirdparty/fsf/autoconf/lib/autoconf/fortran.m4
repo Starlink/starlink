@@ -1411,7 +1411,6 @@ dnl in fact an intrinsic function.
               ])
    AC_LANG_POP([Fortran])
 ])# AC_FC_CHECK_INTRINSICS
-    
 
 # AC_FC_RECL_UNIT
 # ----------------
@@ -2074,7 +2073,7 @@ fi
 if test $ac_fpp_status = fatal; then
 
   AC_MSG_ERROR([cannot find a valid build rule for Fortran/cpp source: consider installing the free Fortran preprocessor fpp from ftp.netlib.org/fortran])
-	
+
 elif test $ac_fpp_status = fail; then
 
   AC_MSG_WARN([cannot find a build rule for Fortran/cpp source that fulfills all requirements.  The compilation may fail or run time errors may arise.  Consider installing the free Fortran preprocessor fpp from ftp.netlib.org/fortran])
