@@ -182,6 +182,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.40  1997/09/03 23:33:37  timj
+*     Use SCULIB_GET_FILENAME instead of SUBPAR.
+*     Supply a default for the 'OUT' parameter based on object name.
+*
 *     Revision 1.39  1997/07/31 19:40:24  timj
 *     Fix bug with propogating of user specified output title OBJECT vs. SOBJECT
 *
@@ -367,7 +371,7 @@ c
                                        ! pointer to scratch space holding
                                        ! apparent RA / x offset positions of
                                        ! measured points in input file (radians)
-
+      INTEGER          CHR_STATUS      ! Status for call to CHR_FIWE
       INTEGER          COUNT           ! Number of ints in INTREBIN
       INTEGER          CURR_FILE       ! Current file in INTREBIN loop
       INTEGER          CURR_INT        ! Current int in INTREBIN loop
@@ -413,7 +417,6 @@ c
       INTEGER          IN_VARIANCE_PTR (MAX_FILE)
                                        ! pointer to scratch space holding
                                        ! data variance from input files
-      INTEGER          IPAR            ! Parameter ID
       INTEGER          IPOSN           ! Position in string
       INTEGER          ITEMP           ! scratch integer
       INTEGER          I_CENTRE        ! I index of central pixel in output
@@ -467,6 +470,7 @@ c
       INTEGER          PLACE           ! Place holder for output NDF
       LOGICAL          READING         ! .TRUE. while reading input files
       INTEGER          RLEV            ! Recursion depth for reading
+      REAL             RTEMP           ! Scratch real
       REAL             SFACTOR         ! Smoothing factor for spline PDA_SURFIT
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
@@ -657,8 +661,7 @@ c
 *     Set the default to GLOBAL first (have to do it this way since
 *     the GLOBAL value MUST be associated with an NDF parameter
          IF (FILE .EQ. 1) THEN
-            CALL SUBPAR_FINDPAR( 'DUMMY', IPAR, STATUS)
-            CALL SUBPAR_GETNAME(IPAR, STEMP, STATUS)
+            CALL SCULIB_GET_FILENAME('DUMMY', STEMP, STATUS)
             CALL PAR_DEF0C('REF', STEMP, STATUS)
          END IF
 
@@ -960,12 +963,57 @@ c
       CALL PAR_DEF0C ('OUT_OBJECT', SOBJECT, STATUS)
       CALL PAR_GET0C ('OUT_OBJECT', SOBJECT, STATUS)
 
+*     Clean up SOBJECT by removing leading blanks and non-printable chars
+
+      CALL CHR_CLEAN(SOBJECT)
+      CALL CHR_LDBLK(SOBJECT)
+      
 *  get the pixel spacing of the output map
 
       OUT_PIXEL = 3.0
       CALL PAR_DEF0R ('PIXSIZE_OUT', OUT_PIXEL, STATUS)
       CALL PAR_GET0R ('PIXSIZE_OUT', OUT_PIXEL, STATUS)
       OUT_PIXEL = OUT_PIXEL / REAL(R2AS)
+
+*     Now I can set a default output filename for parameter 'OUT'
+*     For now the default is just the first word of the object
+*     name
+
+      IPOSN = 1
+      CHR_STATUS = SAI__OK
+      CALL CHR_FIWE(SOBJECT, IPOSN, CHR_STATUS)
+
+*     Good status means two words were found (at least)
+*     Bad status means that the end of string was hit before finding
+*     the second word
+
+      IF (CHR_STATUS .EQ. SAI__OK) THEN
+         STEMP = SOBJECT(1:IPOSN)
+      ELSE
+         STEMP = SOBJECT
+         CALL ERR_ANNUL(CHR_STATUS)
+      END IF
+
+*     Need to make sure that this default is not just a number
+*     since HDS doesnt create a file in that case
+
+      CALL CHR_CTOR(STEMP, RTEMP, CHR_STATUS)
+
+*     Good status implies the wrong answer :-)
+
+      IF (CHR_STATUS .EQ. SAI__OK) THEN
+
+*     Prepend a character if the object name is a number
+         CALL CHR_PREFX('i', STEMP, ITEMP)
+
+      ELSE
+         CALL ERR_ANNUL(CHR_STATUS)
+      END IF
+      
+
+*     Set the default
+
+      CALL PAR_DEF0C('OUT', STEMP, STATUS)
 
       IF (BOLREBIN .OR. INTREBIN) THEN
 *  create the output file that will contain the reduced data in NDFs
