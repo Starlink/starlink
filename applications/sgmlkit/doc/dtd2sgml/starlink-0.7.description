@@ -492,6 +492,39 @@ attribute is an ID reference within the target document.</p>
 rather than generating it based on the target.
 </p>
 </attribute>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Wed, 24 May 2000 10:32:32 +0100 (BST)</date>
+<subject>Conformance with &lt;ref&gt;</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Wed May 24 10:32:36 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+docxref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 24 May 2000 10:32:36 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12uXWl-0005ej-00 for sgml-starlink-0.7+docxref@astro.gla.ac.uk; Wed, 24 May 2000 10:32:35 +0100</otherheader>
+<otherheader name='Received'>from puce.csi.cam.ac.uk ([131.111.8.40] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12uXWo-0005yE-00 for sgml-starlink-0.7+docxref@astro.gla.ac.uk; Wed, 24 May 2000 10:32:38 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by puce.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12uXWj-0004ty-00 for sgml-starlink-0.7+docxref@astro.gla.ac.uk; Wed, 24 May 2000 10:32:33 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id KAA12419 for &lt;sgml-starlink-0.7+docxref@astro.gla.ac.uk&gt;; Wed, 24 May 2000 10:32:33 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id KAA01299 for &lt;sgml-starlink-0.7+docxref@astro.gla.ac.uk&gt;; Wed, 24 May 2000 10:32:32 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10005241031260.1293-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+When we come to a decision about how the &lt;ref&gt; element is going to look,
+it would probably be a good idea to make the &lt;docxref&gt; element work
+the same way except so far as there are good reasons for differences.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
 <!--splice:docxref-->
 </element>
 
@@ -1374,6 +1407,91 @@ Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
 
 </body>
 </commentary>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Wed, 24 May 2000 14:05:22 +0100 (BST)</date>
+<subject>ref EMPTY again?</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Wed May 24 14:05:26 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 24 May 2000 14:05:26 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12uaqj-0006HM-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:05:25 +0100</otherheader>
+<otherheader name='Received'>from puce.csi.cam.ac.uk ([131.111.8.40] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12uaqn-0001Y8-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:05:29 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by puce.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12uaqi-0000Xv-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:05:24 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id OAA15658 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk&gt;; Wed, 24 May 2000 14:05:24 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id OAA03057 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk&gt;; Wed, 24 May 2000 14:05:23 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10005241401450.3032-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+If we're going to implement the media-sensitive content using a mechanism
+(&lt;span&gt;) which is entirely separate from the &lt;ref&gt; element, should
+we put the &lt;ref&gt; element back to being EMPTY, with text optionally
+supplied using a 'text' attribute?  This is what it was like previously
+(and is what the &lt;docxref&gt; element currently looks like).
+
+Or possibly there was some other reason for making the reference text
+to be content, e.g. so that you could have a more complex content
+model than just PCDATA, which is what it is at the moment?
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Wed, 24 May 2000 14:24:31 +0100 (BST)</date>
+<subject>Ref content could consist of section number/name placeholders</subject>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Wed, 24 May 2000 14:24:32 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12ub9D-0006Js-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:24:31 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12ub9E-0004kA-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Wed, 24 May 2000 14:24:32 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005241413270.17079-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+The original modivation for making the &lt;ref&gt; elements non-empty was to
+have `placeholder' elements within them, such as &lt;refinfo secnum/&gt; or
+whatever (details to be argued about).  It would be possible to have
+these placeholders as magic text inside a `text' attribute of the
+&lt;ref&gt; element, but that would involve the down-converter parsing the
+attribute string, which is a real fuss in both DSSSL and XSL, apart
+from any other considerations of good design.
+
+Given that specifying overriding &lt;ref&gt; text will be deemed to be
+`normal', as opposed to leaving the element empty and having the
+down-converter generate it, having this overriding text as element
+content rather than an attribute value seems more natural.  The
+generation of text in the latter case will continue to be supported,
+not least because it's how I'll prefer to write documents.
+
+If we continue to allow the element to have content, but hold off
+designing the &lt;refinfo&gt; element (or whatever) until after June, that
+shouldn't have any effect on Mark's current upconverter work, since there
+is no structure corresponding to &lt;refinfo&gt; in the LaTeX source.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
 <!--splice:ref-->
 </element>
 
@@ -1462,6 +1580,71 @@ to this section, with the specified key.
 </p>
 </attribute>
 <!--splice:sect-->
+</element>
+
+
+<element gi="span" status="beta">
+<p>This element is intended to delimit properly-nested regions
+in the flow of text.  At present, the only attribute it has is
+the media attribute, but it might be extended with a
+more general `class' attribute at some point.</p>
+
+<attribute name="media">
+<p>This attribute specifies the media type or types for which the
+element's content should be included in the output.  If the attribute
+is missing, then the element content is included.</p>
+
+<p>If the attribute is specified, than it shall be a list of media
+types separated by commas, each of which is optionally followed by a
+parameter string, separated from the media type by whitespace.  The
+grammar is therefore:
+<verbatim>
+media-spec-list = media-spec ( ',' media-spec )*
+media-spec      =   S* media-type S*
+                  | S* media-type S+ parameter-list
+media-type      = [A-Za-z0-9-]+
+parameter-list  = [^,]+
+</verbatim>
+(where `<code>S</code>' is whitespace).  At present, the
+parameter-list is ignored, and the only media-types recognised
+(case-sensitively) are (quoting from the HTML4 spec):
+<dl>
+<dt><code>screen</code></dt>
+<dd>Intended for non-paged computer screens.</dd>
+<dt><code>tty</code></dt>
+<dd>Intended for media using a fixed-pitch character grid, such as
+teletypes, terminals, or portable devices with limited display
+capabilities.</dd>
+<dt><code>print</code></dt>
+<dd>Intended for paged, opaque material and for documents viewed on
+screen in print preview mode.</dd>
+<dt><code>all</code></dt>
+<dd>Suitable for all devices.</dd>
+</dl>
+As the Starlink SGML kit exists at present, <code>screen</code> is for
+producing HTML, <code>print</code> for producing printed
+documentation, and <code>tty</code> for HLP files.
+Unrecognised media-types are permitted, but ignored.</p>
+
+<p>The element content is included in the output document if:
+<ol>
+<li>The media attribute is omitted</li>
+<li>The media attribute includes the media-type <code>all</code>.</li>
+<li>The media attribute includes a media-type which a particular
+down-converter is designed to process.  For example, the HTML
+down-converter will process span elements with media-type
+<code>screen</code>.</li>
+</ol>
+</p>
+
+<p>For example, if a document had a span element of the form
+<example>&lt;span media="screen, 3d-glasses, print and resolution > 90dpi"
+  >Blah blah blah&lt;span></example>
+then this would resolve to the three media types <code>screen</code>,
+<code>3d-glasses</code> and <code>print</code>, and the content `Blah
+blah blah' would be included by the HTML and print down-converters.</p>
+</attribute>
+<!--splice:span-->
 </element>
 
 

@@ -642,6 +642,55 @@ Agree?  Disagree?
 
 </body>
 </commentary>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Thu, 25 May 2000 11:48:22 +0100 (BST)</date>
+<subject>script options as parameters</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Thu May 25 11:48:24 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-programcode-0.7+parameter@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Thu, 25 May 2000 11:48:24 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12uvBe-0000UK-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Thu, 25 May 2000 11:48:22 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12uvBe-0005GG-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Thu, 25 May 2000 11:48:22 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10005251147490.19954-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+What's the best way to document script (or indeed program) options?
+So far, I've done it `by hand', using a diytopic, but that's not
+really appropriate.  I'm inclined to suggest adding a &lt;optionlist&gt;
+element, as a companion to &lt;argumentlist&gt; and &lt;parameterlist&gt;, with
+the options listed as &lt;parameter&gt; elements inside.
+
+Alternatively, we could have options as content to &lt;argumentlist&gt; (or
+do I mean &lt;parameterlist&gt;?), but with some attribute on the &lt;parameter&gt;
+element which indicates that these are options.  That strikes me as
+rather confusing.
+
+It wouldn't be appropriate to simply treat options as another type of
+argument, since that would obscure the well-founded distinction
+between the two types of ways of controlling a program.
+
+A disadvantage with the &lt;optionlist&gt; scheme is that there would then
+be three elements with very similar semantics, which is not a big problem
+in itself, but suggests that we're missing some generalisation.
+
+Any ideas?
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+
+</body>
+</commentary>
 <!--splice:parameter-->
 </element>
 
@@ -751,11 +800,9 @@ Software Librarian.  The current list of categories and their
 associated keywords is maintained at
 <url>http://www.starlink.rl.ac.uk/software.html</url>, and
 currently consists of the following.
-
-</p>
-<p>Applications:
-
-Software Environment (SE),
+<dl>
+<dt>Applications</dt>
+<dd>Software Environment (SE),
 Spectroscopy (SP),
 Image Processing and Photometry (IP),
 Astronomical Catalogue Access (CA),
@@ -763,34 +810,29 @@ Graphics (GR),
 Wavelengths and Instruments (WI),
 Time Series (TS),
 Polarimetry (PO).
+</dd>
 
-</p>
-<p>Programming:
-
-Compilers and Languages (CL),
+<dt>Programming</dt>
+<dd>Compilers and Languages (CL),
 Tools and Standards (ST).
+</dd>
 
-</p>
-<p>Programming: High Level Libraries:
-Data access (DAPH),
+<dt>Programming: High Level Libraries</dt>
+<dd>Data access (DAPH),
 Graphics (GRPH),
 Mathematical (MAPH),
 Astronomical Positions and Time (PTPH),
 String manipulation (SMPH),
 Infrastructure (INPH).
+</dd>
 
-</p>
-<p>Programming: Low Level Libraries:
-
-Data access (DAPL),
+<dt>Programming: Low Level Libraries</dt>
+<dd>Data access (DAPL),
 String manipulation (SMPL),
 Infrastructure (INPL),
 Graphics (GRPL).
-
-
-
-
-
+</dd>
+</dl>
 </p>
 <!--splice:softwarekeywords-->
 </element>
@@ -799,6 +841,12 @@ Graphics (GRPL).
 <p>See <elemxref gi="strong" dtd="sundtd"/>
 </p>
 <!--splice:strong-->
+</element>
+
+<element gi="span" status="beta">
+<p>See <elemxref gi="span" dtd="sundtd"/>
+</p>
+<!--splice:span-->
 </element>
 
 <element gi="tabular" status="beta">
