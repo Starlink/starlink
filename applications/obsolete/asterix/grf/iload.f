@@ -185,6 +185,9 @@
           I_CLEAR=.TRUE.
           I_PROC_COUNT=0
           I_CAN_UNDO=.FALSE.
+          IF (I_GUI) THEN
+            CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+          ENDIF
           I_DPTR_1D=0
           I_VPTR_1D=0
           I_QPTR_1D=0
