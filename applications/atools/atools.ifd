@@ -618,6 +618,64 @@ iraf! {
           }
 
       }
+      action matrixmap {
+         helplib {$ATOOLS_HELP}
+
+         parameter form {
+            position 3
+            type _INTEGER
+            prompt {The form of the MatrixMap}
+            ppath CURRENT DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter nin {
+            position 1
+            type _INTEGER
+            prompt {The number of input coordinates (columns) in the MatrixMap}
+            ppath CURRENT DEFAULT
+            default 2
+            helpkey *
+          }
+
+         parameter nout {
+            position 2
+            type _INTEGER
+            prompt {The number of output coordinates (rows) in the MatrixMap}
+            ppath DYNAMIC CURRENT DEFAULT
+            default 2
+            helpkey *
+          }
+
+         parameter matrix {
+            position 4
+            type _DOUBLE
+            prompt {The matrix elements (1st row, followed by 2nd row, etc)}
+            ppath CURRENT DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter options {
+            position 2
+            type LITERAL
+            prompt {Options for the MatrixMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {Name of file in which to store the MatrixMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
    }
 
    icl {defhelp atools $ATOOLS_HELP 0}
