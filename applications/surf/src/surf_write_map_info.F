@@ -111,7 +111,9 @@
       INTEGER          ITEMP    ! Temporary variable
       INTEGER          IY       ! year in which input observation started
       INTEGER          NDIM     ! Number of dimensions in FITS array
+#ifdef HAS_IRAS90
       INTEGER          NP       ! size of P array in call to IRA_CREAT
+#endif
       INTEGER          N_FITS   ! Number of FITS entries
       DOUBLE PRECISION OBSRA    ! RA of output map (degrees)
       DOUBLE PRECISION OBSDEC   ! Dec of output map (degrees)
@@ -183,7 +185,9 @@
             IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ' .AND.
      :           OUT_COORDS .NE. 'PL') THEN
 
+#ifdef HAS_IRAS90
                CALL IRA_INIT (STATUS)
+#endif
 
                P (1) = OUT_LONG
                P (2) = OUT_LAT
@@ -231,6 +235,7 @@
                   CTYPE2 = 'GLAT-TAN'
                END IF
 
+#ifdef HAS_IRAS90
 *     Create the IRAS extension
                CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0,0,
      :              OUT_XLOC, STATUS)
@@ -241,6 +246,7 @@
      :              OUT_NDF, ITEMP, STATUS)
 
                CALL IRA_CLOSE (STATUS)
+#endif
 
 *     Create the IMAGE_INFO extension to fool IRAS90 software
                CALL DAT_NEW(OUT_XLOC, 'IMAGE_INFO', 'IMAGE_INFO',
