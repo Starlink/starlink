@@ -1,6 +1,6 @@
 1 ATOOLS
 
- Version 1.6 of ATOOLS is now available. It is fully documented in SUN/???.
+ Version 1.6-1 of ATOOLS is now available. It is fully documented in SUN/???.
 
  ATOOLS is a package of applications which manipulate descriptions
  of coordinate frames, mappings, etc, in the form of AST Objects (see
@@ -9,6 +9,12 @@
  high-level interface to the AST library. 
 
   Changes in this release:
+
+  - A bug has been fixed which could cause output text files to be
+  truncated when ATOOLS commands are used from ICL (or other similar
+  environments).
+
+  Changes in V1.6
 
   - New commands added: astshiftmap. These are straight analogues of the 
   corresponding AST routines.

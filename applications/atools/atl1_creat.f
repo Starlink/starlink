@@ -30,6 +30,10 @@
 *  History:
 *     12-JAN-2001 (DSB):
 *        Original version.
+*     15-SEP-2003 (DSB):
+*        Changed call to FIO_ANNUL to FIO_CLOSE. Previously the output
+*        text file was not completely flushed when being used as a 
+*        monolith (e.g. from ICL), resulting in incomplete output files.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,7 +103,7 @@
       CALL AST_ANNUL( CHAN, STATUS )
 
 *  Close the file.
-      CALL FIO_ANNUL( FD, STATUS )
+      CALL FIO_CLOSE( FD, STATUS )
 
       END
 
