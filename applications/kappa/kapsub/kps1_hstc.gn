@@ -112,7 +112,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Standard SAE definitions
-      INCLUDE 'PRM_PAR'        ! Magic-value definitions
 
 *  Arguments Given:
       LOGICAL
@@ -230,7 +229,7 @@
 
             IF ( HIST( I ) .LT. HDIM2 ) THEN
                DO  J = 1, HDIM2 - HIST( I ), 1
-                  HSTARR( I, J ) = 0.
+                  HSTARR( I, J ) = 0
                END DO
             END IF
          END DO
@@ -261,7 +260,7 @@
 
             IF ( HIST( I ) .LT. HDIM2 ) THEN
                DO  J = HIST( I ) + 1, HDIM2, 1
-                  HSTARR( I, J ) = 0.
+                  HSTARR( I, J ) = 0
                END DO
             END IF
          END DO
