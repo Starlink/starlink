@@ -57,11 +57,11 @@
 
 #.
 
-class gaia::StarArdCircle {
+itcl::class gaia::StarArdCircle {
 
    #  Inheritances:
    #  -------------
-   inherit StarArdPrim
+   inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------

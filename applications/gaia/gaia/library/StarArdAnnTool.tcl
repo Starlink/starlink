@@ -54,12 +54,12 @@
 
 #.
 
-class gaia::StarArdAnnTool {
+itcl::class gaia::StarArdAnnTool {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarArdTool
+   inherit gaia::StarArdTool
 
    #  Constructor:
    #  ------------
@@ -69,7 +69,6 @@ class gaia::StarArdAnnTool {
       regsub {\-scale[\ ]+[^\ ]+} "$args" {} safeargs
       eval StarArdTool::constructor -routine_prefix StarArdAnn $safeargs
    } {
-
       eval configure $args
    }
 

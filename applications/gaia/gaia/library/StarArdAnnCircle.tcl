@@ -60,12 +60,12 @@
 
 #.
 
-class gaia::StarArdAnnCircle {
+itcl::class gaia::StarArdAnnCircle {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarArdCircle
+   inherit gaia::StarArdCircle
 
    #  Constructor:
    #  ------------

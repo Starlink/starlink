@@ -63,12 +63,12 @@
 
 #.
 
-class gaia::StarArdAnnRect {
+itcl::class gaia::StarArdAnnRect {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarArdRect
+   inherit gaia::StarArdRect
 
    #  Constructor:
    #  ------------

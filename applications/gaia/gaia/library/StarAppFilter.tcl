@@ -72,18 +72,21 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  History:
 #     19-NOV-1996 (PDRAPER):
 #        Original version.
+#     24-APR-1998 (ALLAN) 
+#        Pass command line arguments to "clone" rather than use "after 500".
 #     {enter_further_changes_here}
 
 #-
 
 #.
 
-class gaia::StarAppFilter {
+itcl::class gaia::StarAppFilter {
 
    #  Inheritances:
    #  -------------
@@ -93,7 +96,7 @@ class gaia::StarAppFilter {
    #  Constructor:
    #  ------------
    constructor {rtdwidget args} {
-       global env
+       global env gaia_library
 
        #  Record the name of the Gaia widget.
        set rtdwidget_ $rtdwidget
@@ -103,8 +106,8 @@ class gaia::StarAppFilter {
 
        #  Look for the gaFilter files. First in GAIA_DIR and then
        #  in the HOME directory.
-       if { [file readable $env(GAIA_DIR)/.gaFilters] } {
-	   if { ![catch {set ios [open $env(GAIA_DIR)/.gaFilters]}] } {
+       if { [file readable $gaia_library/.gaFilters] } {
+	   if { ![catch {set ios [open $gaia_library/.gaFilters]}] } {
 	       process_filters_ $ios
 	       close $ios
 	   }
@@ -214,8 +217,7 @@ class gaia::StarAppFilter {
 	   if { $info_($id,replace) } {
                eval $rtdwidget_ open $info_($id,output)${datatype_}
 	    } else {
-	       set w [$rtdwidget_ clone]
-	       after 0 [code $w configure -file [subst $info_($id,output)${datatype_}]]
+	       set w [$rtdwidget_ clone -file [subst $info_($id,output)${datatype_}]]
 	   }
        }
        set data_ {}

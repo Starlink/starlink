@@ -51,12 +51,12 @@
 
 #.
 
-class gaia::StarEnterObject {
+itcl::class gaia::StarEnterObject {
    
    #  Inheritances:
    #  -------------
    
-   inherit EnterObject
+   inherit cat::EnterObject
 
    #  Constructor:
    #  ------------

@@ -63,11 +63,11 @@
 
 itk::usual StarAstRefine {}
 
-class gaia::StarAstRefine {
+itcl::class gaia::StarAstRefine {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -128,9 +128,9 @@ class gaia::StarAstRefine {
       set Edit [add_menubutton Edit]
 
       #  Add window help.
-      global env
-      add_help_button $env(GAIA_DIR)/StarAst.hlp "Astrometry Overview..."
-      add_help_button $env(GAIA_DIR)/StarAstRefine.hlp "On Window..."
+      global gaia_library
+      add_help_button $gaia_library/StarAst.hlp "Astrometry Overview..."
+      add_help_button $gaia_library/StarAstRefine.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

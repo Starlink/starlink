@@ -56,7 +56,7 @@
 
 itk::usual NameChooser {}
 
-class gaia::NameChooser {
+itcl::class gaia::NameChooser {
 
     #  Inheritances:
     #  -------------

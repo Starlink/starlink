@@ -129,6 +129,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  History:
@@ -145,8 +146,14 @@
 #        Added ARDMASK options.
 #     10-JUN-1997 (PDRAPER):
 #        Finished prologue.
+#     24-Mar-1998 (ALLAN) 
+#        Changed "rect" to "rectangle", to reslove conflict with rtd bitmap name.
+#     24-APR-1998 (ALLAN) 
+#        Pass command line arguments to "clone" rather than use "after 500".
 #     12-NOV-1998 (PDRAPER):
 #        Added clear stats window button.
+#     4-MAT-1999 (PDRAPER):
+#        Merged Allan's changes.
 #     {enter_further_changes_here}
 
 #-
@@ -155,12 +162,12 @@
 
 itk::usual StarArd {}
 
-class gaia::StarArd {
+itcl::class gaia::StarArd {
 
    #  Inheritances:
    #  -------------
 
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -187,8 +194,8 @@ class gaia::StarArd {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global env
-      add_help_button $env(GAIA_DIR)/StarArd.hlp "On Window..."
+      global gaia_library
+      add_help_button $gaia_library/StarArd.hlp "On Window..."
 
       #  Add option to create a new window.
       $File add command -label {New window} \
@@ -234,7 +241,7 @@ class gaia::StarArd {
       #  Labels for toolbox.
       itk_component add label {frame $w_.labels}
       itk_component add lrect {
-         label $itk_component(label).lrect -bitmap rect -anchor center
+         label $itk_component(label).lrect -bitmap rectangle -anchor center
       }
       itk_component add lcircle {
          label $itk_component(label).lcircle -bitmap circle -anchor center
@@ -375,12 +382,12 @@ class gaia::StarArd {
    }
 
    #  Close window.
-   method close {} {
+   public method close {} {
       destroy $w_
    }
 
    #  Save ARD description to a file.
-   method save_file {{filename ""}} {
+   public method save_file {{filename ""}} {
       if { $filename == "" } {
 	 $Toolbox_ save_file
       } else {
@@ -389,7 +396,7 @@ class gaia::StarArd {
    }
 
    #  Read an ARD description (in LessARD format) from a file.
-   method read_file {{filename ""}} {
+   public method read_file {{filename ""}} {
       if { $filename == "" } {
 	 $Toolbox_ read_file
       } else {
@@ -398,7 +405,7 @@ class gaia::StarArd {
    }
 
    #  Display or clear statistics for regions.
-   method stats {mode} {
+   public method stats {mode} {
       if { $mode == "clear" } {
          $itk_component(statsresults) clear 0 end
          return
@@ -416,9 +423,9 @@ class gaia::StarArd {
       if { $ok } {
          #  Now startup the Ardstat application.
          if { $ardstat_ == {} } {
-            global env
+            global gaia_library
             set ardstat_ [StarApp \#auto -application \
-                             $env(GAIA_DIR)/ardstat \
+                             $gaia_library/ardstat \
                              -notify [code $this measured_stats_] \
                              -show_output $itk_component(statsresults)]
          }
@@ -460,7 +467,7 @@ class gaia::StarArd {
    }
 
    #  Blank out regions and display in a new clone.
-   method blank {mode} {
+   public method blank {mode} {
 
       #  First save the current description to a file
       incr count_
@@ -513,7 +520,7 @@ class gaia::StarArd {
    }
 
    #  Extract regions and display in a new clone.
-   method extract {mode} {
+   public method extract {mode} {
 
       #  First save the current description to a file
       incr count_
@@ -577,13 +584,13 @@ class gaia::StarArd {
    }
 
    #  Crop the displayed image removing any padding pixels.
-   method crop {} {
+   public method crop {} {
 
       #  Now startup the autocrop application.
       if { $autocrop_ == {} } {
-         global env
+         global gaia_library
          set autocrop_ [StarApp \#auto -application \
-                           $env(GAIA_DIR)/autocrop \
+                           $gaia_library/autocrop \
                            -notify [code $this modified_image_]]
       }
 
@@ -638,7 +645,7 @@ class gaia::StarArd {
    }
 
    #  Deal with replace option when changed by Option checkbutton.
-   private method replace_changed_ {} {
+   protected method replace_changed_ {} {
       configure -replace $replace_
    }
 

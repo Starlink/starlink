@@ -117,7 +117,7 @@
 
 #.
 
-class gaia::StarArdList {
+itcl::class gaia::StarArdList {
 
    #  Inheritances:
    #  -------------

@@ -57,18 +57,18 @@
 
 #.
 
-class gaia::Queue {
+itcl::class gaia::Queue {
    constructor {} {}
    destructor {}
 
    #  Methods:
    #  --------
 
-   method push string {
+   public method push string {
       set queue_($high_) $string
       incr high_
    }
-   method pop {} {
+   public method pop {} {
       if { $high_ > $low_ } { 
          set value $queue_($low_)
          unset queue_($low_)
@@ -78,7 +78,7 @@ class gaia::Queue {
          return {}
       }
    }
-   method size {} {
+   public method size {} {
       return [expr $high_-$low_]
    }
 

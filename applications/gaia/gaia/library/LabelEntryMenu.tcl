@@ -36,7 +36,7 @@
 
 itk::usual LabelEntryMenu {}
 
-class util::LabelEntryMenu {
+itcl::class gaia::LabelEntryMenu {
    inherit util::LabelEntry
 
    #  Create a LabelEntryMenu.

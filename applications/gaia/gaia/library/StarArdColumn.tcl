@@ -58,12 +58,12 @@
 
 #.
 
-class gaia::StarArdColumn {
+itcl::class gaia::StarArdColumn {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarArdPrim
+   inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------

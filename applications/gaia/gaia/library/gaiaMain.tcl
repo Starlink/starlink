@@ -56,13 +56,6 @@ import add ::gaia
 namespace ::iwidgets {}
 import add ::iwidgets
 
-#  Make GAIA modified core Tcl code available in preference to 
-#  the normal versions.
-#source $gaia_library/LabelEntry.tcl
-#source $gaia_library/LabelEntryScale.tcl 
-#source $gaia_library/udialog.tcl
-#source $gaia_library/Batch.tcl
-
 #  Set interface for strict Motif compliance.
 set tk_strictMotif 1
 

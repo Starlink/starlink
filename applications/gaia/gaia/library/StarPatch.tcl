@@ -100,7 +100,7 @@
 
 itk::usual StarPatch {}
 
-class gaia::StarPatch {
+itcl::class gaia::StarPatch {
 
    #  Inheritances:
    #  -------------
@@ -125,8 +125,8 @@ class gaia::StarPatch {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global env
-      add_help_button $env(GAIA_DIR)/StarPatch.hlp "On Window..."
+      global gaia_library
+      add_help_button $gaia_library/StarPatch.hlp "On Window..."
 
       #  Add option to create a new window.
       $File add command -label {New window} \

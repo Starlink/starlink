@@ -31,6 +31,8 @@
 #        Original version
 #     3-FEB-1999 (PDRAPER):
 #        Added quick selections for color and itt tables.
+#     25-MAR-1998 (ALLAN):
+#        Changed ($f) to ([file tail $f]) in object entry, to save space
 #     2-MAR-1999 (PDRAPER):
 #        Converted for skycat 2.3.2.
 #     {enter_changes_here}
@@ -39,7 +41,7 @@
 
 itk::usual GaiaImagePanel {}
 
-class gaia::GaiaImagePanel {
+itcl::class gaia::GaiaImagePanel {
    inherit rtd::RtdImagePanel
 
    #  Constructor.
@@ -368,7 +370,7 @@ class gaia::GaiaImagePanel {
    method updateValues {} {
       if {$itk_option(-showobject)} {
          set s [$image_ object]
-         set f [$image_ cget -file]
+         set f [file tail [$image_ cget -file]]
          if { "z$s" == "z" } {
             $itk_component(object) config -value "$f"
          } else {

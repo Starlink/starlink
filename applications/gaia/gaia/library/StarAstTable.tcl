@@ -78,11 +78,11 @@
 
 itk::usual StarAstTable {}
 
-class gaia::StarAstTable {
+itcl::class gaia::StarAstTable {
 
    #  Inheritances:
    #  -------------
-   inherit FrameWidget
+   inherit util::FrameWidget
 
    #  Constructor:
    #  ------------
@@ -281,7 +281,7 @@ class gaia::StarAstTable {
 
    #  Grab a catalogue of objects from an AstroCat window.
    public method grab {} {
-      set astrocats [AstroCat::instances]
+      set astrocats [cat::AstroCat::instances]
       if { $astrocats != {} } {
 
          #  Create a Name chooser to display the possible catalogues

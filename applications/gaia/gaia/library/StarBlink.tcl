@@ -91,6 +91,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     ALLAN Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  History:
@@ -103,6 +104,9 @@
 #        Added button to refresh images. Tried doing this on every
 #        move of the image, but this is far too slow for interactive
 #        scrolling.
+#     06-MAY-1998 (ALLAN):
+#        Use SkyCat::get_skycat_images to get clones, use "cget -number" to get
+#        clone number.
 #     12-NOV-1998 (PDRAPER):
 #        Added ability to select amongst images and added ScrollArrows
 #        for obvious orientation changes.
@@ -114,12 +118,11 @@
 
 itk::usual StarBlink {}
 
-class gaia::StarBlink {
+itcl::class gaia::StarBlink {
 
    #  Inheritances:
    #  -------------
-
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -132,7 +135,6 @@ class gaia::StarBlink {
 
       #  Create menubar and add File menu.
       add_menubar
-      global env
       set File [add_menubutton "File" left]
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu:}
@@ -145,7 +147,8 @@ class gaia::StarBlink {
         {Select images to display}
 
       #  Add help menu.
-      add_help_button $env(GAIA_DIR)/StarBlink.hlp "On Window..."
+      global gaia_library
+      add_help_button $gaia_library/StarBlink.hlp "On Window..."
 
       #  Add option to create a new window.
       $File add command -label {New window} \
@@ -335,17 +338,13 @@ class gaia::StarBlink {
       destroy $w_
    }
 
-   #  Locate and add all the known views in main windows.
-   #  These are all called rtdnnnn, starting at 0 and working
-   #  up in number. Also populate the Images menu with checkbuttons to
-   #  control which images are displayed. 
+   #  Locate and add all the known views in main windows.  These are
+   #  returned by the get_skycat_images command. Also populate the
+   #  Images menu with checkbuttons to control which images are
+   #  displayed.
    private method add_views_ {menu} {
-      set clones "[uplevel #0 info command .rtd?] \
-                  [uplevel #0 info command .rtd??] \
-                  [uplevel #0 info command .rtd???] \
-                  [uplevel #0 info command .rtd????]"
       set n_ 0
-      foreach w $clones {
+      foreach w [SkyCat::get_skycat_images] {
          itk_component add image$n_ {
             RtdImage $itk_component(Frame).image$n_ -graphics 0 \
                -scrollbars 0
@@ -355,7 +354,7 @@ class gaia::StarBlink {
          set target_($n_) [$w get_image]
 	 set names_($n_) [$w cget -file]
 
-         regsub {\.rtd} [winfo toplevel $w] {} clone_num_($n_)
+         set clone_num_($n_) [[winfo toplevel $w] cget -number]
          set clones_($n_) $w
          set canvas $canvas_($n_)
 
@@ -597,7 +596,7 @@ class gaia::StarBlink {
    #  of the first clone.
    protected method init_scroll_ {} {
        if { [info exists clones_(1)] } { 
-	   set canvas [[$clones_(1) get_image] get_canvas]
+	   set canvas [$clones_(1) get_canvas]
 	   lassign [$canvas xview] xleft xright
 	   lassign [$canvas yview] yleft yright
            if { $xleft != 0.0 } {

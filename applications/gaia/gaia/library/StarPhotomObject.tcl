@@ -62,7 +62,7 @@
 
 #.
 
-class gaia::StarPhotomObject {
+itcl::class gaia::StarPhotomObject {
 
    #  Inheritances:
    #  -------------
@@ -134,7 +134,7 @@ class gaia::StarPhotomObject {
    #  Set all the measurements of an object. If 10 or 11 values are
    #  given then this is an old-style PHOTOM measurement. Note sky
    #  values are set separately by the setsky method.
-   method setvalues {args} {
+   public method setvalues {args} {
       set argc [llength $args]
       if { $argc == 10 } {
          lassign $args \
@@ -184,7 +184,7 @@ class gaia::StarPhotomObject {
    #  the ellipse (see getvalues). Note this should only be used to
    #  create sky regions, not to update them, sky regions in general
    #  cannot be updated non-interactively.
-   method setsky {type args} {
+   public method setsky {type args} {
       if { $type == "SKY" } {
          incr sky_regions
          lassign $args \
@@ -225,7 +225,7 @@ class gaia::StarPhotomObject {
    #  Return the values of options. If all is true then extended form
    #  is used, otherwise only PHOTOM values are returned. If object
    #  isn't measured then this will return the defaults (index of 0).
-   method getvalues {mode} {
+   public method getvalues {mode} {
       update_eccen
 
       #  Make sure values are up to date as canvas zoom events are
@@ -289,7 +289,7 @@ class gaia::StarPhotomObject {
 
    #  Method to return values specific to the aperture (quick form of
    #  getvalues).
-   method aperture_details {} {
+   public method aperture_details {} {
 
       #  Make sure values are up to date as canvas zoom events are
       #  never received.
@@ -307,7 +307,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Status of object.
-   method status {} {
+   public method status {} {
       if { $measured_ } {
          return {measured}
       } else {
@@ -316,7 +316,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Test if given index matches object index.
-   method testindex {match} {
+   public method testindex {match} {
       if { $match == $index } {
          return 1
       } else {
@@ -325,7 +325,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Distance between a test point and the object position.
-   method separation {testx testy} {
+   public method separation {testx testy} {
       set dx [expr $xpos-$testx]
       set dy [expr $ypos-$testy]
       set dist [expr sqrt($dx*$dx+$dy*$dy)]
@@ -333,7 +333,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Method to draw the object on the canvas, if not already drawn.
-   method draw_object {} {
+   public method draw_object {} {
       if { $state_ == "new" } {
          if { "$shape" == "circle" } {
             create_circle
@@ -349,7 +349,7 @@ class gaia::StarPhotomObject {
    #----------------------
 
    #  Create an interactively resizable circle.
-   method create_and_resize_circle {cmd} {
+   public method create_and_resize_circle {cmd} {
       if { "$canvasdraw" != {} } {
          set create_cmd_ $cmd
          $canvasdraw set_drawing_mode circle [code $this created_circle]
@@ -357,7 +357,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Create a circular aperture without resizing.
-   method create_no_resize_circle {cmd tmajor} {
+   public method create_no_resize_circle {cmd tmajor} {
       if { "$canvasdraw" != {} } {
          set create_cmd_ $cmd
          set default_binding_ [bind $canvas <1>]
@@ -373,7 +373,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Draw a circular aperture with the current values.
-   method create_circle {} {
+   public method create_circle {} {
       if { "$canvasdraw" != {} } {
 
          #  Need to store and later restore current configure as this is
@@ -398,7 +398,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Do the actual creation of a circular aperture at the given position.
-   method placed_circle_ {x y} {
+   protected method placed_circle_ {x y} {
 
       #  Reset the bindings and cursor.
       bind $canvas <1> [code $default_binding_]
@@ -412,7 +412,7 @@ class gaia::StarPhotomObject {
    #  backs for interactive updates etc. Execute the requested
    #  creation command so that the user knows that the aperture is
    #  created.
-   method created_circle {id args} {
+   public method created_circle {id args} {
       set state_ drawn
       set canvas_id_ $id
       $canvasdraw add_notify_cmd $id [code $this update_circle $id] 0
@@ -426,7 +426,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Update apertures on creation, movement, resize or delete.
-   method update_circle { id mode } {
+   public method update_circle { id mode } {
       switch -exact $mode {
          create {
             lassign [$canvas coords $id] xpos ypos
@@ -481,14 +481,14 @@ class gaia::StarPhotomObject {
    #------------------------
 
    #  Create an interactively resizable circular sky region.
-   method create_and_resize_sky_circle {} {
+   public method create_and_resize_sky_circle {} {
       if { "$canvasdraw" != {} } {
          $canvasdraw set_drawing_mode circle [code $this created_sky_circle]
       }
    }
 
    #  Create a circular sky region without resizing.
-   method create_no_resize_sky_circle {} {
+   public method create_no_resize_sky_circle {} {
       if { "$canvasdraw" != {} } {
          set default_binding_ [bind $canvas <1>]
          set default_cursor_ [$canvas cget -cursor]
@@ -500,7 +500,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Respond to request to create a circular aperture at the given position.
-   method placed_sky_circle_ {x y} {
+   protected method placed_sky_circle_ {x y} {
 
       #  Reset the bindings and cursor.
       bind $canvas <1> [code $default_binding_]
@@ -509,7 +509,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Draw a circular sky region at the given position.
-   method create_sky_circle {x y} {
+   public method create_sky_circle {x y} {
       if { "$canvasdraw" != {} } {
          $canvasdraw set_drawing_mode circle [code $this created_sky_circle]
          $canvasdraw create_object $x $y
@@ -520,7 +520,7 @@ class gaia::StarPhotomObject {
    #  Finally created the new aperture, record details (if not already
    #  done, otherwise set them) and add call backs for interactive
    #  updates etc.
-   method created_sky_circle {id args} {
+   public method created_sky_circle {id args} {
       if { $interactive_ } {
          incr sky_regions
          lassign [$canvas coords $id] x y
@@ -556,7 +556,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Update sky aperture on movement, resize or delete.
-   method update_sky_circle { id mode } {
+   public method update_sky_circle { id mode } {
       set sky_id $sky_details_($id,index)
       switch -exact $mode {
          move -
@@ -583,7 +583,7 @@ class gaia::StarPhotomObject {
 
    #  Create an elliptical aperture. Args are an set of values for
    #  the centre of the ellipse.
-   method create_ellipse {} {
+   public method create_ellipse {} {
       if { "$canvasdraw" != {} } {
 
          #  Need to store and later restore current configure as this is
@@ -608,7 +608,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Create an elliptical aperture without resizing.
-   method create_no_resize_ellipse {cmd tmajor teccen tangle} {
+   public method create_no_resize_ellipse {cmd tmajor teccen tangle} {
       if { "$canvasdraw" != {} } {
          set create_cmd_ $cmd
          set default_binding_ [bind $canvas <1>]
@@ -625,7 +625,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Do the actual creation of an ellptical aperture at the given position.
-   method placed_ellipse_ {x y} {
+   protected method placed_ellipse_ {x y} {
 
       #  Reset the bindings and cursor.
       bind $canvas <1> [code $default_binding_]
@@ -636,7 +636,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Create an interactive elliptical aperture.
-   method create_and_resize_ellipse {cmd} {
+   public method create_and_resize_ellipse {cmd} {
       if { "$canvasdraw" != {} } {
          set create_cmd_ $cmd
          $canvasdraw set_drawing_mode ellipse [code $this created_ellipse]
@@ -644,7 +644,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Finally created new elliptical aperture.
-   method created_ellipse { id args } {
+   public method created_ellipse { id args } {
       set state_ drawn
       set canvas_id_ $id
       $canvasdraw add_notify_cmd $id [code $this update_ellipse $id] 0
@@ -658,7 +658,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Update elliptical object.
-   method update_ellipse { id mode } {
+   public method update_ellipse { id mode } {
       switch -exact $mode {
          create {
             lassign [$canvas coords $id] xpos ypos
@@ -713,14 +713,14 @@ class gaia::StarPhotomObject {
    #--------------------------
 
    #  Create an interactively resizable elliptical sky region.
-   method create_and_resize_sky_ellipse {} {
+   public method create_and_resize_sky_ellipse {} {
       if { "$canvasdraw" != {} } {
          $canvasdraw set_drawing_mode ellipse [code $this created_sky_ellipse]
       }
    }
 
    #  Create an elliptical sky region without resizing.
-   method create_no_resize_sky_ellipse {} {
+   public method create_no_resize_sky_ellipse {} {
       if { "$canvasdraw" != {} } {
          set default_binding_ [bind $canvas <1>]
          set default_cursor_ [$canvas cget -cursor]
@@ -733,7 +733,7 @@ class gaia::StarPhotomObject {
 
    #  Respond to request to create an elliptical aperture at the given
    #  position.
-   method placed_sky_ellipse_ {x y} {
+   protected method placed_sky_ellipse_ {x y} {
 
       #  Reset the bindings and cursor.
       bind $canvas <1> [code $default_binding_]
@@ -742,7 +742,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Draw an elliptical sky region at the given position.
-   method create_sky_ellipse {x y} {
+   public method create_sky_ellipse {x y} {
       if { "$canvasdraw" != {} } {
          $canvasdraw set_drawing_mode ellipse [code $this created_sky_ellipse]
          $canvasdraw create_object $x $y
@@ -752,7 +752,7 @@ class gaia::StarPhotomObject {
 
    #  Finally created the new aperture, record details and add call
    #  backs for interactive updates etc.
-   method created_sky_ellipse {id args} {
+   public method created_sky_ellipse {id args} {
       if { $interactive_ } {
          incr sky_regions
          lassign [$canvas coords $id] x y
@@ -788,7 +788,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Update sky aperture on movement, resize or delete.
-   method update_sky_ellipse { id mode } {
+   public method update_sky_ellipse { id mode } {
       set sky_id $sky_details_($id,index)
       switch -exact $mode {
          move -
@@ -810,14 +810,14 @@ class gaia::StarPhotomObject {
    }
 
    #  Return the canvas id of the object.
-   method canvas_id {} {
+   public method canvas_id {} {
       return $canvas_id_
    }
 
    #  Add the bindings to this object that are appropriate to the
    #  current settings. Also sets up the call backs for when object is
    #  selected or deselected by canvasdraw.
-   method add_bindings_ {id} {
+   protected method add_bindings_ {id} {
       $canvas bind $id <1> \
 	 "+focus $canvas;\
           $canvas bind grip <ButtonRelease-1> \"[code $this notify_change]\""
@@ -826,7 +826,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Shift the current position.
-   method shift_x {amount} {
+   public method shift_x {amount} {
 
       #  Make sure values are up to date as canvas zoom events are
       #  never received.
@@ -839,7 +839,7 @@ class gaia::StarPhotomObject {
       redraw_object
       notify_change
    }
-   method shift_y {amount} {
+   public method shift_y {amount} {
 
       #  Make sure values are up to date as canvas zoom events are
       #  never received.
@@ -855,14 +855,14 @@ class gaia::StarPhotomObject {
 
 
    #  Notify that object may have changed.
-   method notify_change {} {
+   public method notify_change {} {
       if { $notify_change_cmd != {} } {
          eval $notify_change_cmd
       }
    }
 
    #  Object selection state is changed.
-   method update_selection {state} {
+   public method update_selection {state} {
       if { $state == "selected" } {
          selected
       } else {
@@ -871,7 +871,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Object is selected so colour all associated elements.
-   method selected {} {
+   public method selected {} {
       $canvas itemconfigure $canvas_id_ -outline $selected_colour
       if { $positions == "annulus" } {
 	 $canvas itemconfigure $annulus_(1) -outline $selected_sky_colour
@@ -899,7 +899,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Object is deselected so colour all associated elements.
-   method deselected {} {
+   public method deselected {} {
       $canvas itemconfigure $canvas_id_ -outline $deselected_colour
       if { $positions == "annulus" } {
 	 $canvas itemconfigure $annulus_(1) -outline $deselected_sky_colour
@@ -925,7 +925,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Redraw the canvas item using the new public configs.
-   method redraw_object {} {
+   public method redraw_object {} {
       if { $canvasdraw != {} && $canvas != {}} {
          $canvas coords $canvas_id_ $xpos $ypos
          $canvas itemconfigure $canvas_id_ \
@@ -941,7 +941,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Delete annular regions.
-   method delete_annular_regions {} {
+   public method delete_annular_regions {} {
       if { $annulus_(1) != {} } {
          $canvas delete $annulus_(1)
          set annulus_(1) {}
@@ -953,7 +953,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Delete sky regions.
-   method delete_sky_regions {} {
+   public method delete_sky_regions {} {
       if { $sky_regions > 0 } {
          for { set i 1 } { $i <= $sky_regions } { incr i } {
             if { [info exists sky_details_($i,x)] } {
@@ -975,7 +975,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Update the eccentricity, major and minor axes.
-   method update_eccen {} {
+   public method update_eccen {} {
       if { $major < $minor } {
          set temp $minor
          set minor $major
@@ -989,7 +989,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Convert from canvas coordinates to image coordinates.
-   method image_coord { x y } {
+   public method image_coord { x y } {
       if { $rtdimage != {} } {
          $rtdimage convert coords $x $y canvas x y image
 	 $rtdimage origin xo yo
@@ -1004,7 +1004,7 @@ class gaia::StarPhotomObject {
    #  null function as these translate correctly without interaction
    #  (PHOTOM angles are position angles), but some care needs to be
    #  taken if the image is rotated and/or flipped.
-   method image_angle { angle } {
+   public method image_angle { angle } {
       set rad [expr $angle*0.017453292519943295]
       set dx [expr sin($rad)+$xpos] 
       set dy [expr cos($rad)+$ypos]
@@ -1018,7 +1018,7 @@ class gaia::StarPhotomObject {
 
    #  Convert a canvas distance to an image distance (along X axis,
    #  which may be swapped on output).
-   method image_dist { dist } {
+   public method image_dist { dist } {
       if { $rtdimage != {} } {
          $rtdimage convert dist $dist 0 canvas dist1 dist2 image
          set dist [expr $dist1+$dist2]
@@ -1027,7 +1027,7 @@ class gaia::StarPhotomObject {
    }
 
    #  Convert from image coordinates to canvas coordinates.
-   method canvas_coord { x y } {
+   public method canvas_coord { x y } {
       if { $rtdimage != {} } {
 	 $rtdimage origin xo yo
          set x [expr $x+1.5-$xo]
@@ -1039,7 +1039,7 @@ class gaia::StarPhotomObject {
 
    #  Convert an angle measured on the image (+X through +Y) into
    #  an angle in canvas coords (Y flipped).
-   method canvas_angle { angle } {
+   public method canvas_angle { angle } {
       set rad [expr $angle*0.017453292519943295]
       $rtdimage convert coords $xpos $ypos canvas nxcen nycen image
       set dx [expr sin($rad)+$nxcen] 
@@ -1053,7 +1053,7 @@ class gaia::StarPhotomObject {
 
    #  Convert an image distance to a canvas distance (along X axis
    #  which may be swapped on output).
-   method canvas_dist { dist } {
+   public method canvas_dist { dist } {
       if { $rtdimage != {} } {
          $rtdimage convert dist $dist 0 image dist1 dist2 canvas
          set dist [expr $dist1+$dist2]

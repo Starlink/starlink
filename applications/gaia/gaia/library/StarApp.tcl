@@ -121,7 +121,7 @@
 
 #.
 
-class gaia::StarApp {
+itcl::class gaia::StarApp {
 
    #  Inheritances:
    #  -------------
@@ -144,7 +144,7 @@ class gaia::StarApp {
       }
 
       #  Create the command queue.
-      set command_queue_ [Queue \#auto]
+      set command_queue_ [gaia::Queue \#auto]
 
       #  And evaluate any configuration options.
       if { $args != {} } {
@@ -174,7 +174,7 @@ class gaia::StarApp {
    #  --------
 
    #  Run the application with the given commands.
-   method runwith {args} {
+   public method runwith {args} {
       if { $application != {} } {
 
          #  Make sure monolith is running.
@@ -190,7 +190,7 @@ class gaia::StarApp {
    }
 
    #  Run the application. Single string as arguments.
-   method runwiths {qual} { 
+   public method runwiths {qual} { 
       if { $application != {} } {
 
          #  Make sure monolith is running.
@@ -207,17 +207,17 @@ class gaia::StarApp {
 
 
    #  Return status of application.
-   method status {} {
+   public method status {} {
       return $application_status_
    }
 
    #  Delete the application when ready.
-   method delete_sometime {} {
+   public method delete_sometime {} {
       set delete_sometime_ 1
    }
 
    #  Execute the next command on the queue. Note status is set.
-   private method run_next_command_ {} {
+   protected method run_next_command_ {} {
       set args [$command_queue_ pop]
       if { $args != {}  } {
          $monotask_($monolith_) obey $shortname_ "$args" \
@@ -228,7 +228,7 @@ class gaia::StarApp {
    }
 
    #  Method to deal with the command completed message.
-   private method command_completed_ {} {
+   protected method command_completed_ {} {
       set queue_size [$command_queue_ size]
       if { $delete_sometime_ && $queue_size == 0 } {
          delete object $this
@@ -249,7 +249,7 @@ class gaia::StarApp {
    }
 
    #  Method to deal with the inform return of a task.
-   private method inform_ {output} {
+   protected method inform_ {output} {
 
       #  Check for an error.
       if { [string range $output 0 1 ] == "!!" } {
@@ -274,7 +274,7 @@ class gaia::StarApp {
    }
 
    #  Start monolith.
-   private method start_monolith_ {} {
+   protected method start_monolith_ {} {
   
       #  Check if the monolith is already loaded and running.
       set start 1
@@ -306,7 +306,7 @@ class gaia::StarApp {
    }
 
    #  Stop monolith if reference count is now zero.
-   private method stop_monolith_ {} {
+   protected method stop_monolith_ {} {
       incr monorefcount_($monolith_) -1
       if { $monorefcount_($monolith_) == 0 } {
          $monotask_($monolith_) kill
@@ -318,7 +318,7 @@ class gaia::StarApp {
    }
 
    #  Initialise monolith.
-   private method set_monolith_ {name} {
+   protected method set_monolith_ {name} {
       set monolith_ $name
       if { ! [info exists monostatus_($name)] } {
          set monostatus_($name) 0

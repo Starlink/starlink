@@ -58,11 +58,11 @@
 
 itk::usual StarAstCopy {}
 
-class gaia::StarAstCopy {
+itcl::class gaia::StarAstCopy {
 
    #  Inheritances:
    #  -------------
-   inherit FileSelect
+   inherit util::FileSelect
 
    #  Constructor:
    #  ------------
@@ -114,11 +114,11 @@ class gaia::StarAstCopy {
       bind $w_ <Control-a> [code $this accept]
 
       #  Add window help.
-      global env
-      add_help_button $env(GAIA_DIR)/StarAst.hlp "Astrometry Overview..."
+      global env gaia_library
+      add_help_button $gaia_library/StarAst.hlp "Astrometry Overview..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
-      add_help_button $env(GAIA_DIR)/StarAstCopy.hlp "On Window..."
+      add_help_button $gaia_library/StarAstCopy.hlp "On Window..."
 
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}

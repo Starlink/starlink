@@ -58,12 +58,12 @@
 
 #.
 
-class gaia::StarArdPoly {
+itcl::class gaia::StarArdPoly {
 
    #  Inheritances:
    #  -------------
 
-   inherit StarArdPrim
+   inherit gaia::StarArdPrim
 
    #  Constructor:
    #  ------------

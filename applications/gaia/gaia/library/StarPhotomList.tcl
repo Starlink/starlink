@@ -137,7 +137,7 @@
 #           exists then its current values are changed, otherwise a
 #           new object is created with the given values. $args should
 #           be a list of the following values.
-#                          
+#
 #              index xpos ypos mag magerr sky signal code semimajor \
 #              eccentricity angle positions shape
 #
@@ -153,11 +153,11 @@
 #        create_sky_region
 #           Create an aperture as a sky region
 #        new_object index
-#           Create a new object with the current configuration and 
+#           Create a new object with the current configuration and
 #           store its details using index.
 #        read_file filename update
 #           Read the details of a list of objects from the given
-#           file. If update is true then existing objects with the 
+#           file. If update is true then existing objects with the
 #           same index values are modified.
 #        write_file filename {all 1}
 #           Write a photom file (extended form). If all is true (default)
@@ -175,9 +175,9 @@
 #        deleted index
 #           Deal with notification that an object should be deleted.
 #        select_scrollbox_line_ y
-#           Select a line in a the scrollbox by y position and make 
+#           Select a line in a the scrollbox by y position and make
 #           the object at that line the current one.
-#        update_details_ 
+#        update_details_
 #           Deal with notication that an objects details should be
 #           redisplayed.
 #        update_scrollbox_
@@ -202,7 +202,7 @@
 
 #.
 
-class gaia::StarPhotomList {
+itcl::class gaia::StarPhotomList {
 
    #  Inheritances:
    #  -------------
@@ -525,7 +525,7 @@ class gaia::StarPhotomList {
    private method update_scrollbox_ {} {
       if { [winfo exists $scrollbox] } {
          $scrollbox clear all
-         $scrollbox insert 0 [StarPhotomObject::header short]
+         $scrollbox insert 0 [gaia::StarPhotomObject::header short]
          for { set i 0 } { $i <= $highest_index_ } { incr i } {
             if { [info exists objects_($i)] } {
                $scrollbox insert end [$objects_($i) getvalues short]
@@ -536,12 +536,19 @@ class gaia::StarPhotomList {
    }
    #  Update the displayed details of current object.
    private method update_details_ {} {
+      global ::tcl_version
+
       if { [winfo exists $details] && $canvasdraw != {} } {
          if { $selected_ != {} && [info exists objects_($selected_)] } {
             set id [$objects_($selected_) canvas_id]
             if { "$id" != "" } {
                set selected_ $objects_ids_($id)
-               $details update_display [scope $objects_($selected_)]
+	       # allan: 21.1.99, added tcl8 check
+	       if {$tcl_version >= 8.0} {
+                  $details update_display [code $objects_($selected_)]
+	       } else {
+                  $details update_display [scope $objects_($selected_)]
+               }
             }
          } else {
             # Reset details.
@@ -579,8 +586,8 @@ class gaia::StarPhotomList {
       set selected_ $index
       update_details_
       update_scrollbox_
-       
-      # These values now become the default (for creation of 
+
+      # These values now become the default (for creation of
       # new objects without resize).
       if { [info exists objects_($index)] } {
 	 lassign [$objects_($index) aperture_details] \

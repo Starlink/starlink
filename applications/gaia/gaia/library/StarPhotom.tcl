@@ -168,15 +168,16 @@
 
 itk::usual StarPhotom {}
 
-class gaia::StarPhotom {
+itcl::class gaia::StarPhotom {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
    constructor {mags args} {
+      global ::tcl_version
 
       #  Evaluate any options.
       eval itk_initialize $args
@@ -217,8 +218,12 @@ class gaia::StarPhotom {
                            -notify_created_cmd [code $this created_object]\
                            -usemags $usemags_ ]
 
-      #  Now inform details widget of this name!
-      $itk_component(ObjectDetails) configure -object_list [scope $object_list_]
+      #  Now inform details widget of this name!  (allan: 21.1.99 added tcl8 check)
+      if {$tcl_version >= 8.0} {
+	  $itk_component(ObjectDetails) configure -object_list [code $object_list_]
+      } else {
+	  $itk_component(ObjectDetails) configure -object_list [scope $object_list_]
+      }
 
       #  Create a StarPhotomExtras object to deal with any additional
       #  parameters for autophotom.
@@ -263,8 +268,8 @@ class gaia::StarPhotom {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      global env
-      add_help_button $env(GAIA_DIR)/StarPhotom.hlp "On Window..."
+      global gaia_library
+      add_help_button $gaia_library/StarPhotom.hlp "On Window..."
 
       #  Add the option to create a new window.
       $File add command -label {New window} \

@@ -132,7 +132,7 @@
 #-
 itk::usual Scrollbox {}
 
-class gaia::Scrollbox {
+itcl::class gaia::Scrollbox {
 
    #  Inheritances:
    inherit util::FrameWidget
@@ -159,12 +159,12 @@ class gaia::Scrollbox {
    #  --------
 
    #  Insert line of text method.
-   method insert { index args } {
+   public method insert { index args } {
       eval $itk_component(List) insert $index $args
    }
 
    #  Clear range of lines of text method.
-   method clear { args } {
+   public method clear { args } {
       if { [lindex $args 0 ] != "all" } {
          eval $itk_component(List) delete $args
       } else {
@@ -173,12 +173,12 @@ class gaia::Scrollbox {
    }
 
    #  Return the range of lines with current selection.
-   method curselection {} {
+   public method curselection {} {
       return [$itk_component(List) curselection]
    }
    
    #  Get information back from the listbox.
-   method get { args } {
+   public method get { args } {
       if { [lindex $args 0 ] == "all" } {
          set value [$itk_component(List) get 0 end]
          return $value
@@ -189,12 +189,12 @@ class gaia::Scrollbox {
    }
 
    #  Size of listbox contents.
-   method size {} {
+   public method size {} {
       return [$itk_component(List) size]
    }
    
    #  Make sure we can see the given item.
-   method see {index} { 
+   public method see {index} { 
       $itk_component(List) see $index
    }
 
@@ -341,18 +341,18 @@ class gaia::Scrollbox {
    
    #  Method to return the name of the listbox widget, use this to set
    #  bindings etc.
-   method listname {} {
+   public method listname {} {
       return $itk_component(List)
    }
 
    #  Method to control selection. This has the same options as the listbox
    #  selection.
-   method select { option args } {
+   public method select { option args } {
       eval $itk_component(List) selection $option $args
    }
 
    #  Method to return the names of the scrollbar widgets
-   method scrollbarnames { places } {
+   public method scrollbarnames { places } {
       foreach side $places {
          if { ! [ regexp (left|right|top|bottom) $side ] } {
             error "Unknown scrollbar placement \"$side\", should be top bottom left or right"
