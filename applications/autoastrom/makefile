@@ -765,18 +765,27 @@ install:
            else :; fi;\
         done
 	if test -n "$(LATEX_TARBALL)"; then \
-           pwd=`pwd`;\
-           (cd $(INSTALL_DOCS) && \
-           for f in $(LATEX_DOCS) ""; do \
-              if test -n "$$f"; then\
-                 $(TAR_OUT) $$pwd/$(LATEX_TARBALL);\
+	    pwd=`pwd`; \
+	    cd $(INSTALL_DOCS) && \
+	    test -n "$(LATEX_DOCS)" && test -f $(LATEX_DOCS) && $(RMF) -R $(LATEX_DOCS); \
+	    $(TAR_OUT) $$pwd/$(LATEX_TARBALL); \
                  chmod 755 `find $$f -type d -print`;\
                  chmod 644 `find $$f ! -type d -print`;\
                  touch $$f;\
-              else :; fi;\
-           done);\
-        fi;
-#
+	else :; fi
+#	if test -n "$(LATEX_TARBALL)"; then \
+#           pwd=`pwd`;\
+#           (cd $(INSTALL_DOCS) && \
+#           for f in $(LATEX_DOCS) ""; do \
+#              if test -n "$$f"; then\
+#                 $(TAR_OUT) $$pwd/$(LATEX_TARBALL);\
+#                 chmod 755 `find $$f -type d -print`;\
+#                 chmod 644 `find $$f ! -type d -print`;\
+#                 touch $$f;\
+#              else :; fi;\
+#           done);\
+#        fi;
+
 #  Install any hypertext documents, giving world read access to all the files
 #  they contain and linking with other documents.
 	if test -n "$(HYPERTEXT_DOCS)"; then \
@@ -902,6 +911,8 @@ do_deinstall:
 #        else :; fi
 #
 #  Deinstall the LaTeX and XML documentation, if installed versions exist.
+#  We don't have to copy these back to the source directory, since we
+#  installed them by copying them, rather than move-and-link.
 	- for f in $(LATEX_DOCS) $(XML_DOCS) ""; do \
            if test -n "$$f" -a -w $(INSTALL_DOCS)/$$f; then \
               $(RMF) -R $(INSTALL_DOCS)/$$f;\
@@ -1056,7 +1067,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            $(RMF) $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
-           $(DATE_STAMP) .BUILT \
+           $(DATE_STAMP) $(PUBLIC_SCRIPTS) $(LIBRARY_FILES) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
@@ -1169,10 +1180,10 @@ unbuild: clean
 sun242.tar-htx sun242.tar-tex:
 	cd doc; make
 	$(RMF) $@
-	ln doc/$@ $@
+	$(LINK) doc/$@ $@
 
 sun242.xml:
-	ln doc/$@ $@
+	$(LINK) doc/$@ $@
 
 #------------------------------------------------------------------------------
 #
