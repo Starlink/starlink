@@ -72,6 +72,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.5  2002/10/07 03:15:39  timj
+*     Should now correctly calculate waveplate angles even if the observation
+*     was aborted.
+*
 *     Revision 1.4  2000/07/06 00:00:31  timj
 *     Check that the return from SCULIB_FIND_INT is valid.
 *
@@ -116,6 +120,7 @@
 *  Local variables:
       INTEGER I                 ! Loop counter
       INTEGER INTEGRATION       ! Current integration
+      INTEGER LAST_END          ! Last good measurement in loop
       INTEGER MEASUREMENT       ! Current measurement
       INTEGER MEND              ! End position in WPLATE_OUT
       INTEGER MSTART            ! Start position in WPLATE_OUT
@@ -136,30 +141,63 @@
 *     Loop over measurements
          WP_INDEX = 1
 
+*     Keep track of last end
+         LAST_END = -1
+
          DO MEASUREMENT = 1, N_MEAS
             
 *     Find where the measurement starts
+*     This should all be done in SCULIB_FIND_MEAS (if it existed)
 *     [This should really just start at 1 and from then on be
 *     1+MEND]
             MSTART = DEM_PNTR(1,1,1, MEASUREMENT)
 
-*     Find where the measurement ends
-            NEXT_MEAS = MEASUREMENT + 1
-            IF (NEXT_MEAS .GT. N_MEAS) THEN
+*     If we have an aborted observation this will return 0
+*     and we have to assume MEND is the end of the array (since
+*     the system is not designed to restart at a later measurement)
+            IF (MSTART .LE. 0) THEN
+
+               CALL MSG_SETI ('M', MEASUREMENT)
+               CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :              'SURFLIB_FILL_WPLATE: no data '//
+     :              'for meas ^M', STATUS)
+
+
+               MSTART = LAST_END + 1
                MEND = N_POS
             ELSE
+
+*     Find where the measurement ends
+               NEXT_MEAS = MEASUREMENT + 1
+               IF (NEXT_MEAS .GT. N_MEAS) THEN
+                  MEND = N_POS
+               ELSE
 *     Note how the measurement ends one before the start of the
 *     next measurement
-               MEND = DEM_PNTR(1,1,1,NEXT_MEAS) - 1
+                  MEND = DEM_PNTR(1,1,1,NEXT_MEAS) - 1
+
+                  IF (MEND .EQ. -1) THEN
+                     MEND = N_POS
+                  END IF
+
+               END IF
+
+               LAST_END = MEND
+
             END IF
 
 *     Store the waveplate position
-            DO I = MSTART, MEND
-               WPLATE_OUT(I) = SCUCD_WPLATE(WP_INDEX)
-            END DO
+            IF (MSTART .LE. N_POS) THEN
+               DO I = MSTART, MEND
+                  WPLATE_OUT(I) = SCUCD_WPLATE(WP_INDEX)
+               END DO
+            END IF
 
 *     Increment the wplate index
             WP_INDEX = WP_INDEX + 1
+
+*     Wrap if the number of waveplates is smaller than the number
+*     of measurements
             IF (WP_INDEX .GT. N_WPLATE) WP_INDEX = 1
 
          END DO
@@ -187,12 +225,31 @@
      :                 'SURFLIB_FILL_WPLATE: no data '//
      :                 'for int ^I, meas ^M', STATUS)
 
-*     Fill with bad values
-                  DO I = MSTART, MEND
-                     WPLATE_OUT(I) = VAL__BADR
-                  END DO
+*     Fill with bad values starting with the last good position
+*     and filling the array. In general this should not happen because
+*     on the previous loop we should have assumed we were filling to
+*     the length of the array (since MEND would be -1)
+*     We would like to LAST the loop at this point....
+                  IF (LAST_END .LT. N_POS) THEN
+                     DO I = LAST_END+1, N_POS
+                        WPLATE_OUT(I) = VAL__BADR
+                     END DO
+                  END IF
 
-               ELSE
+               ELSE 
+
+
+                  IF (MEND .LT. 0) THEN
+*     This indicates that the integration was started okay
+*     but we aborted during it and so do not know explicitly
+*     where it finished but must assume the end of the observation
+
+                     MEND = N_POS
+                  END IF
+
+*     Store the last good position [not really useful if
+*     we trigger MEND=-1 to indicate N_POS
+                  LAST_END = MEND
 
 *     Now fill the waveplate array (angle in degrees)
                   DO I = MSTART, MEND
@@ -221,8 +278,11 @@
          DO INTEGRATION = 1, N_INT
 
             MSTART = DEM_PNTR(1,1,INTEGRATION, MEASUREMENT)
-            WPLATE_ANG(INTEGRATION,MEASUREMENT) = WPLATE_OUT(MSTART)
-
+            IF (MSTART .GT. 0) THEN
+               WPLATE_ANG(INTEGRATION,MEASUREMENT) = WPLATE_OUT(MSTART)
+            ELSE
+               WPLATE_ANG(INTEGRATION,MEASUREMENT) = VAL__BADR
+            END IF
          END DO
       END DO
 
