@@ -61,8 +61,8 @@
 #        KSTEST, and SUBSTITUTE.  Also withdrew BLINK, IDUNZOOM,
 #        IDVISIBLE.
 #     7-OCT-1998 (DSB):
-#        Added PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
-#        WCSCOPY, WCSFRAME and WCSREMOVE for V0.13.
+#        Added WCSSHOW, PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
+#        WCSCOPY, WCSFRAME, CHAIN, RESHAPE and WCSREMOVE for V0.13.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -116,6 +116,7 @@ alias calc      $KAPPA_DIR/calc
 alias calpol    $KAPPA_DIR/calpol
 alias cdiv      $KAPPA_DIR/cdiv
 alias centroid  $KAPPA_DIR/centroid
+alias chain     $KAPPA_DIR/chain
 alias chpix     $KAPPA_DIR/chpix
 alias cmult     $KAPPA_DIR/cmult
 alias compadd   $KAPPA_DIR/compadd
@@ -232,6 +233,7 @@ alias pow       $KAPPA_DIR/pow
 alias profile   $KAPPA_DIR/profile
 alias psf       $KAPPA_DIR/psf
 alias quilt     $KAPPA_DIR/quilt
+alias reshape   $KAPPA_DIR/reshape
 alias rift      $KAPPA_DIR/rift
 alias rotate    $KAPPA_DIR/rotate
 alias segment   $KAPPA_DIR/segment
@@ -276,6 +278,7 @@ alias wcsattrib $KAPPA_DIR/wcsattrib
 alias wcscopy   $KAPPA_DIR/wcscopy
 alias wcsframe  $KAPPA_DIR/wcsframe
 alias wcsremove $KAPPA_DIR/wcsremove
+alias wcsshow   $KAPPA_DIR/wcsshow
 alias wiener    $KAPPA_DIR/wiener
 alias zaplin    $KAPPA_DIR/zaplin
 
@@ -321,6 +324,7 @@ alias kap_calc      $KAPPA_DIR/calc
 alias kap_calpol    $KAPPA_DIR/calpol
 alias kap_cdiv      $KAPPA_DIR/cdiv
 alias kap_centroid  $KAPPA_DIR/centroid
+alias kap_chain     $KAPPA_DIR/chain
 alias kap_chpix     $KAPPA_DIR/chpix
 alias kap_cmult     $KAPPA_DIR/cmult
 alias kap_compadd   $KAPPA_DIR/compadd
@@ -438,6 +442,7 @@ alias kap_pow       $KAPPA_DIR/pow
 alias kap_profile   $KAPPA_DIR/profile
 alias kap_psf       $KAPPA_DIR/psf
 alias kap_quilt     $KAPPA_DIR/quilt
+alias kap_reshape   $KAPPA_DIR/reshape
 alias kap_rift      $KAPPA_DIR/rift
 alias kap_rotate    $KAPPA_DIR/rotate
 alias kap_segment   $KAPPA_DIR/segment
@@ -482,6 +487,7 @@ alias kap_wcsattrib $KAPPA_DIR/wcsattrib
 alias kap_wcscopy   $KAPPA_DIR/wcscopy
 alias kap_wcsframe  $KAPPA_DIR/wcsframe
 alias kap_wcsremove $KAPPA_DIR/wcsremove
+alias kap_wcsshow   $KAPPA_DIR/wcsshow
 alias kap_wiener    $KAPPA_DIR/wiener
 alias kap_zaplin    $KAPPA_DIR/zaplin
 

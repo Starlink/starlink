@@ -231,6 +231,8 @@
 #        Adapted for KAPPA as part of Autumn CD-ROM preparations.
 #     18-DEC-1997 (AJC):
 #        Add LINK_TEST
+#     12-OCT-1998 (DSB):
+#        Added LDFLAGS, TK_VERS and TCL_VERS.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -250,6 +252,9 @@
       export RANLIB
       export TAR_IN
       export TAR_OUT
+      export LDFLAGS
+      export TK_VERS
+      export TCL_VERS
 
 #  Check that the SYSTEM environment variable is defined.
       if test "$SYSTEM" = ""; then
@@ -266,6 +271,9 @@
 #  DEC Alpha machines running OSF1.
 #  -------------------------------
             alpha_OSF1)
+               TK_VERS='4.2'
+               TCL_VERS='7.6'
+               LDFLAGS=' -ljpeg'
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O -std1'
@@ -315,6 +323,9 @@
 #  SUN Sparcstations running SunOS 5.x (Solaris).
 #  ---------------------------------------------
             sun4_Solaris)
+               TK_VERS='4.2'
+               TCL_VERS='7.6'
+               LDFLAGS=' -lX -ljpeg'
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
@@ -331,6 +342,9 @@
 #  Intel PC running Linux.
 #  ----------------------
             ix86_Linux)
+               TK_VERS='4.2'
+               TCL_VERS='7.6'
+               LDFLAGS=' -ldl -ljpeg -Xlinker -rpath -Xlinker $(STAR_SHARE)'
                AR_IN='ar r'
                CC='gcc'
                CFLAGS='-I$(STAR_INC) -O'

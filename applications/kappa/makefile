@@ -227,7 +227,7 @@
 #     7-OCT-1998 (DSB):
 #        Version 0.13. Added internal NDG library. Added applications
 #        WCSFRAME, WCSALIGN, WCSADD, WCSATTRIB, WCSREMOVE, PROFILE,
-#        LISTMAKE, LISTSHOW
+#        LISTMAKE, LISTSHOW, CHAIN, RESHAPE
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -384,6 +384,12 @@ AR_IN = ar -r
 
 ALINK = $(STAR_BIN)/alink
 
+#  Tcl/Tk 
+
+STARTCL_DIR = /star/starlink/tclsys/startcl
+TCL_VERS = 7.4
+TK_VERS = 4.0
+
 #-------------------------------------------------------------------------------
 
 #  Define package source files.
@@ -438,7 +444,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
 PUBLIC_SCRIPTS = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
                  colstar.icl fancylook.icl flatfield.icl \
                  kappa_proc.icl multistat.icl unsharpmask.icl \
-                 irg_wild nfi.awk
+                 irg_wild nfi.awk tkast.tcl
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases
@@ -644,7 +650,7 @@ mlinplot.f ovclear.f ovset.f paldef.f palentry.f \
 palread.f palsave.f piccur.f picdef.f \
 picempty.f picentire.f picin.f piclabel.f \
 piclist.f picsel.f pictrans.f picvis.f \
-snapshot.f turbocont.f vecplot.f
+snapshot.f turbocont.f vecplot.f 
 
 KAPPA_F_ROUTINES = \
 add.f aperadd.f ardgen.f ardmask.f \
@@ -749,7 +755,8 @@ setaxis.f setbad.f setbb.f setbound.f \
 setext.f setlabel.f setnorm.f setorigin.f \
 setsky.f settitle.f settype.f \
 setunits.f setvar.f \
-wcsadd.f wcsattrib.f wcscopy.f wcsframe.f wcsremove.f
+wcsadd.f wcsattrib.f wcscopy.f wcsframe.f wcsremove.f wcsshow.f \
+chain.f reshape.f
 
 MONO_SOURCE = $(KAPPA_MONO_SOURCE) $(KAPVIEW_MONO_SOURCE) \
               $(NDFPACK_MONO_SOURCE)
@@ -779,7 +786,8 @@ C_ROUTINES = $(FITS_C_ROUTINES) $(KAPGEN_C_ROUTINES) $(NDG_C_ROUTINES)
 
 FITS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
 
-KAPGEN_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c grf_kappa.c
+KAPGEN_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c grf_kappa.c \
+                    kpg1_tkast.c
 
 NDG_C_ROUTINES = ndg1_wild.c 
 
@@ -822,6 +830,9 @@ TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf
 
 STYLE_FILES = style.def
 
+#  List of TK/TCL object libraries.
+
+TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS) 
 
 ##  Files required for the IRAF installation.
 
@@ -1224,7 +1235,7 @@ $(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(KAPVIEW_MONO_SOURCE:.f=.o) -o $(KAPVIEW_MON) $(OBJECT_LIBRARIES) \
 	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)`
+	         $(ADDLIBS) `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
 
 $(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) lsfun1.o $(LINK_SCRIPT)
 	$(ALINK) $(NDFPACK_MONO_SOURCE:.f=.o) -o $(NDFPACK_MON) \
@@ -2384,6 +2395,7 @@ apadsb.o:	 SAE_PAR PRM_PAR
 aperadd.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR
 ardgen.o:	 SAE_PAR DAT_PAR PAR_PAR PAR_ERR NDF_PAR NDF_ERR
 ardmask.o:	 SAE_PAR NDF_PAR GRP_PAR PRM_PAR
+wcsshow.o:	 SAE_PAR DAT_PAR PAR_ERR GRP_PAR PRM_PAR AST_PAR
 axconv.o:	 SAE_PAR DAT_PAR NDF_PAR MSG_PAR
 axlabel.o:	 SAE_PAR NDF_PAR PAR_ERR
 axunits.o:	 SAE_PAR NDF_PAR PAR_ERR
@@ -2401,6 +2413,7 @@ calc.o:	         SAE_PAR DAT_PAR PRM_PAR
 calpol.o:	 SAE_PAR PAR_ERR
 cdiv.o:	         SAE_PAR NDF_PAR
 centroid.o:	 SAE_PAR DAT_PAR FIO_ERR NDF_PAR NDF_ERR SUBPAR_PAR PAR_ERR PRM_PAR
+chain.o:	 SAE_PAR NDF_PAR PAR_ERR
 chpix.o:	 SAE_PAR NDF_PAR DAT_PAR PAR_PAR PAR_ERR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 chvalr.o:	 SAE_PAR PRM_PAR
 cmult.o:	 SAE_PAR NDF_PAR
@@ -3467,6 +3480,7 @@ profile.o:	 SAE_PAR NDF_PAR PAR_ERR PAR_PAR AST_PAR
 psf.o:	         SAE_PAR DAT_PAR NDF_PAR PRM_PAR PAR_ERR FIO_ERR
 pthlpo.o:	 SAE_PAR HLPCMD
 quilt.o:	 SAE_PAR DAT_PAR PAR_ERR
+reshape.o:	 SAE_PAR NDF_PAR PRM_PAR
 rift.o:	         SAE_PAR NDF_PAR DAT_PAR
 rotate.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR
 segment.o:	 SAE_PAR GKS_PAR NDF_PAR PRM_PAR CTM_PAR GNS_PAR PAR_PAR PAR_ERR MSG_PAR

@@ -14,6 +14,7 @@ automatic_data_conversion -
           cdiv - Divide an NDF by a scalar.
       centroid - Find the centroids of star-like features in an NDF.
 changes_to_kappa - 
+         chain - Concatenate a series of vectorized NDFs.
          chpix - Replace the values of selected pixels in an NDF.
 classified_commands - 
          cmult - Multiply an NDF by a scalar.
@@ -191,6 +192,7 @@ problems_problems -
          quilt - Generate a mosaic from equally sized 2-d data arrays,
                   optionally specified from an ASCII file.
       requests - 
+       reshape - Reshape an NDF, treating its arrays as vectors.
           rift - Add a scalar to a section of an NDF data structure to correct
                   rift-valley defects.
  role_of_kappa - 
@@ -246,6 +248,7 @@ selecting_graphics_devices -
        wcscopy - Copy WCS information from one NDF to another.
       wcsframe - Change the current co-ordinate Frame in an NDF.
      wcsremove - Remove co-ordinate Frames from an NDF.
+       wcsshow - Display internal details of a WCS FrameSet.
         wiener - Apply a Wiener filter to a 1- or 2-d array.
         zaplin - Replace regions in a 2-d NDF by bad values or by linear
                   interpolation.

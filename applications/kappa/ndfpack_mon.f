@@ -42,7 +42,8 @@
 *     1997 May 31 (MJC):
 *        Added FITSMOD. V1.1.
 *     7-OCT-1998 (DSB):
-*        Added WCSADD, WCSATTRIB, WCSCOPY, WCSFRAME and WCSREMOVE for V0.13.
+*        Added WCSADD, WCSATTRIB, WCSCOPY, WCSFRAME, WCSSHOW, WCSREMOVE,
+*        CHAIN, RESHAPE for V0.13.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,6 +92,10 @@
 *  Sets a new units value for an axis within an NDF data structure.
       ELSE IF ( NAME .EQ. 'AXUNITS' ) THEN
          CALL AXUNITS ( STATUS )
+
+*  Concatenates a series of vectorized NDFs.
+      ELSE IF ( NAME .EQ. 'CHAIN' ) THEN
+         CALL CHAIN ( STATUS )
 
 *  Erases an HDS object.
       ELSE IF ( NAME .EQ. 'ERASE' ) THEN
@@ -147,6 +152,10 @@
 *  Displays the attributes of an NDF data structure.
       ELSE IF ( NAME .EQ. 'NDFTRACE' ) THEN
          CALL NDFTRACE ( STATUS )
+
+*  Reshapes an NDF, treating its arrays as vectors.
+      ELSE IF ( NAME .EQ. 'RESHAPE' ) THEN
+         CALL RESHAPE ( STATUS )
 
 *  Sets values for an axis array component within an NDF data
 *  structure.
@@ -222,6 +231,10 @@
 *  Remove Frames from the WCS component of an NDF.
       ELSE IF ( NAME .EQ. 'WCSREMOVE' ) THEN
          CALL WCSREMOVE ( STATUS )
+
+*  Display a WCS structure as an AST dump.
+      ELSE IF ( NAME .EQ. 'WCSSHOW' ) THEN
+         CALL WCSSHOW ( STATUS )
 
       ELSE
 

@@ -46,7 +46,7 @@
 {        IDVISIBLE.
 {     7-OCT-1998 (DSB):
 {        Added PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
-{        WCSCOPY, WCSFRAME and WCSREMOVE for V0.13.
+{        WCSCOPY, WCSFRAME, WCSSHOW and WCSREMOVE for V0.13.
 {     {enter_further_changes_here}
 {
 {  Bugs:
@@ -212,6 +212,7 @@ define   vecp(lot)  $KAPPA_DIR/kapview_mon
 define   axco(nv)   $KAPPA_DIR/ndfpack_mon
 define   axla(bel)  $KAPPA_DIR/ndfpack_mon
 define   axun(its)  $KAPPA_DIR/ndfpack_mon
+define   chain      $KAPPA_DIR/ndfpack_mon
 define   eras(e)    $KAPPA_DIR/ndfpack_mon
 define   fitsd(in)  $KAPPA_DIR/ndfpack_mon
 define   fitsexp    $KAPPA_DIR/ndfpack_mon
@@ -226,6 +227,7 @@ define   hiss(et)   $KAPPA_DIR/ndfpack_mon
 define   nati(ve)   $KAPPA_DIR/ndfpack_mon
 define   ndfc(opy)  $KAPPA_DIR/ndfpack_mon
 define   ndft(race) $KAPPA_DIR/ndfpack_mon
+define   resha(pe)  $KAPPA_DIR/ndfpack_mon
 define   seta(xis)  $KAPPA_DIR/ndfpack_mon
 define   setba(d)   $KAPPA_DIR/ndfpack_mon
 define   setbb      $KAPPA_DIR/ndfpack_mon
@@ -244,6 +246,7 @@ define   wcsattrib  $KAPPA_DIR/ndfpack_mon
 define   wcscopy    $KAPPA_DIR/ndfpack_mon
 define   wcsframe   $KAPPA_DIR/ndfpack_mon
 define   wcsremove  $KAPPA_DIR/ndfpack_mon
+define   wcsshow    $KAPPA_DIR/ndfpack_mon
 
 defstring fitsed(it) !$KAPPA_DIR/fitsedit.csh
 defstring fitsh(ead) !$KAPPA_DIR/fitshead.csh
@@ -291,6 +294,7 @@ defhelp  calc       $KAPPA_HELP
 defhelp  calpol     $KAPPA_HELP
 defhelp  cdiv       $KAPPA_HELP
 defhelp  centroid   $KAPPA_HELP
+defhelp  chain      $KAPPA_HELP
 defhelp  chpix      $KAPPA_HELP
 defhelp  cmult      $KAPPA_HELP
 defhelp  compadd    $KAPPA_HELP
@@ -420,6 +424,7 @@ defhelp  pow        $KAPPA_HELP
 defhelp  profile    $KAPPA_HELP
 defhelp  psf        $KAPPA_HELP
 defhelp  quilt      $KAPPA_HELP
+defhelp  reshape    $KAPPA_HELP
 defhelp  rift       $KAPPA_HELP
 defhelp  rotate     $KAPPA_HELP
 defhelp  segment    $KAPPA_HELP
@@ -465,6 +470,7 @@ defhelp  wcsattrib  $KAPPA_HELP
 defhelp  wcscopy    $KAPPA_HELP
 defhelp  wcsframe   $KAPPA_HELP
 defhelp  wcsremove  $KAPPA_HELP
+defhelp  wcsshow    $KAPPA_HELP
 defhelp  wiener     $KAPPA_HELP
 defhelp  zaplin     $KAPPA_HELP
 
@@ -636,6 +642,7 @@ define   kap_vecp(lot)  $KAPPA_DIR/kapview_mon vecplot
 define   kap_axco(nv)   $KAPPA_DIR/ndfpack_mon axconv
 define   kap_axla(bel)  $KAPPA_DIR/ndfpack_mon axlabel
 define   kap_axun(its)  $KAPPA_DIR/ndfpack_mon axunits
+define   kap_chain      $KAPPA_DIR/ndfpack_mon chain
 define   kap_eras(e)    $KAPPA_DIR/ndfpack_mon erase
 define   kap_fitsd(in)  $KAPPA_DIR/ndfpack_mon fitsdin
 define   kap_fitsexp    $KAPPA_DIR/ndfpack_mon fitsexp
@@ -650,6 +657,7 @@ define   kap_hiss(et)   $KAPPA_DIR/ndfpack_mon hisset
 define   kap_nati(ve)   $KAPPA_DIR/ndfpack_mon native
 define   kap_ndfc(opy)  $KAPPA_DIR/ndfpack_mon ndfcopy
 define   kap_ndft(race) $KAPPA_DIR/ndfpack_mon ndftrace
+define   kap_resha(pe)  $KAPPA_DIR/ndfpack_mon reshape
 define   kap_seta(xis)  $KAPPA_DIR/ndfpack_mon setaxis
 define   kap_setba(d)   $KAPPA_DIR/ndfpack_mon setbad
 define   kap_setbb      $KAPPA_DIR/ndfpack_mon setbb
@@ -668,6 +676,7 @@ define   kap_wcsattrib  $KAPPA_DIR/ndfpack_mon wcsattrib
 define   kap_wcscopy    $KAPPA_DIR/ndfpack_mon wcscopy
 define   kap_wcsframe   $KAPPA_DIR/ndfpack_mon wcsframe
 define   kap_wcsremove  $KAPPA_DIR/ndfpack_mon wcsremove
+define   kap_wcsshow    $KAPPA_DIR/ndfpack_mon wcsshow
 
 defstring kap_fitsed(it) !$KAPPA_DIR/fitsedit.csh
 defstring kap_fitsh(ead) !$KAPPA_DIR/fitshead.csh
@@ -715,6 +724,7 @@ defhelp  kap_calc       $KAPPA_HELP calc
 defhelp  kap_calpol     $KAPPA_HELP calpol
 defhelp  kap_cdiv       $KAPPA_HELP cdiv
 defhelp  kap_centroid   $KAPPA_HELP centroid
+defhelp  kap_chain      $KAPPA_HELP chain
 defhelp  kap_chpix      $KAPPA_HELP chpix
 defhelp  kap_cmult      $KAPPA_HELP cmult
 defhelp  kap_compadd    $KAPPA_HELP compadd
@@ -846,6 +856,7 @@ defhelp  kap_pow        $KAPPA_HELP pow
 defhelp  kap_profile    $KAPPA_HELP profile
 defhelp  kap_psf        $KAPPA_HELP psf
 defhelp  kap_quilt      $KAPPA_HELP quilt
+defhelp  kap_reshape    $KAPPA_HELP reshape
 defhelp  kap_rift       $KAPPA_HELP rift
 defhelp  kap_rotate     $KAPPA_HELP rotate
 defhelp  kap_segment    $KAPPA_HELP segment
@@ -891,6 +902,7 @@ defhelp  kap_wcsalign   $KAPPA_HELP wcsalign
 defhelp  kap_wcsattrib  $KAPPA_HELP wcsattrib
 defhelp  kap_wcsframe   $KAPPA_HELP wcsframe
 defhelp  kap_wcsremove  $KAPPA_HELP wcsremove
+defhelp  kap_wcsshow    $KAPPA_HELP wcsshow
 defhelp  kap_wiener     $KAPPA_HELP wiener
 defhelp  kap_zaplin     $KAPPA_HELP zaplin
 

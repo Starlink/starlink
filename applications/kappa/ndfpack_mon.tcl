@@ -8,6 +8,8 @@ set OutputParList(axlabel) {}
 set DynParList(axlabel) {}
 set OutputParList(axunits) {}
 set DynParList(axunits) {}
+set OutputParList(chain) {}
+set DynParList(chain) {}
 set OutputParList(erase) {}
 set DynParList(erase) {}
 set OutputParList(fitsdin) {}
@@ -36,6 +38,8 @@ set OutputParList(ndfcopy) {}
 set DynParList(ndfcopy) {}
 set OutputParList(ndftrace) {aend aform alabel amono anorm astart atype aunits avariance axis bad badbits dims extname exttype form history label lbound ndim nextn quality title type ubound units variance width}
 set DynParList(ndftrace) {}
+set OutputParList(reshape) {}
+set DynParList(reshape) {}
 set OutputParList(setaxis) {}
 set DynParList(setaxis) {}
 set OutputParList(setbad) {}
@@ -72,3 +76,5 @@ set OutputParList(wcsframe) {}
 set DynParList(wcsframe) {}
 set OutputParList(wcsremove) {}
 set DynParList(wcsremove) {}
+set OutputParList(wcsshow) {}
+set DynParList(wcsshow) {}
