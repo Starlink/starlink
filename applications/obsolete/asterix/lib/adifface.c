@@ -53,6 +53,7 @@
 *       adi_defrep	 - Define a new file representation
 *	adi_defvar	 - Define a variable
 *	adi_dervd	 - Is an object derived from a specified class
+*	adi_loccls	 - Locate a class by name
 *
 *      Method execution :
 *
@@ -532,6 +533,21 @@ F77_SUBROUTINE(adifn(dervd))( INTEGER(id), CHARACTER(name), LOGICAL(der),
   _ASSFLOG(*der,lder);		/* Set return value */
 
   _ERR_REP( "ADI_DERVD", Estr__TstObjDer );
+  }
+
+
+F77_SUBROUTINE(adifn(loccls))( CHARACTER(cls), INTEGER(clsid), INTEGER(status)
+				TRAIL(cls) )
+  {
+  GENPTR_CHARACTER(cls)
+  GENPTR_INTEGER(clsid)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;
+
+  *clsid = ADIkrnlFindClsExt( cls, cls_length, status );
+
+  _ERR_REP( "ADI_LOCCLS", Estr__LocClsDef );
   }
 
 

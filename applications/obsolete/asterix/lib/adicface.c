@@ -44,6 +44,7 @@
 *	adic_defcac	- Define class allocation cluster size
 *       adic_defcls	- Define a new class
 *       adic_defcpa	- Define a new command parser
+*	adic_defdes	- Define a destructor for a class
 *	adic_deffun	- Define a function
 * 	adic_defgdp	- Define generic dispatch procedure
 *	adic_defgen	- Define a generic function
@@ -54,6 +55,7 @@
 *       adic_defrep	- Define a new file representation
 *	adic_defvar	- Define a new variable value
 *	adic_dervd	- Is an object derived from specified class?
+*	adic_loccls	- Locate a class by name
 *
 *      Method execution :
 *
@@ -447,6 +449,15 @@ void adic_dervd( ADIobj id, char *name, ADIlogical *der, ADIstatus status )
   *der = ADIkrnlChkDerived( id, name, _CSM, status );
 
   _ERR_REP( "adic_dervd", Estr__TstObjDer );
+  }
+
+void adic_loccls( char *cls, ADIobj *clsid, ADIstatus status )
+  {
+  _chk_stat;
+
+  *clsid = ADIkrnlFindClsExt( cls, _CSM, status );
+
+  _ERR_REP( "adic_loccls", Estr__LocClsDef );
   }
 
 

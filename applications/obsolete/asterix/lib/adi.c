@@ -521,16 +521,36 @@ ADIobj adix_delhan( int narg, ADIobj args[], ADIstatus status )
 /* and is trying to delete it more times than he is allowed. The correct way to */
 /* do this is handled by adix_cerase which resets the name field appropriately */
       if ( _valid_q(hptr->name) ) {
-	adic_setecs( ADI__INTGTY, "Attempt to delete object component with using primitive erase", status );
+	adic_setecs( ADI__INTGTY, "Attempt to delete object component (name %S) using primitive erase", status, hptr->name  );
 	}
       else {
 	adix_erase( &hptr->id, status );
 	}
       }
 
-/* Property list defined? */
-    if ( _valid_q(hptr->pl) )
-      adix_erase( &hptr->pl, status );
+/* Property list defined? Properties must be deleted by hand as the value objects */
+/* have name links. This is quicker than the recursive list destructor anyway */
+    if ( _valid_q(hptr->pl) ) {
+      ADIobj	*car,*cdr,*dpair,val,oldcur;
+      ADIobj	curp = hptr->pl;
+
+      while ( _valid_q(curp) ) {
+	_GET_CARCDR_A(dpair,cdr,curp);
+	val = _CDR(*dpair);
+	if ( _valid_q(val) )
+	  if ( _han_q(val) )
+	    _han_name(val) = ADI__nullid;
+
+/* Delete dotted pair */
+	adix_merase( dpair, 1, status );
+	*dpair = ADI__nullid;
+
+	oldcur = curp;
+	curp = *cdr;
+	*cdr = ADI__nullid;
+	adix_merase( &oldcur, 1, status );
+	}
+      }
     }
 
   return ADI__nullid;
@@ -2371,6 +2391,33 @@ ADIclassDef *ADIkrnlFindClsC( char *cls, int clen, ADIstatus status )
 
   return tdef;
   }
+
+/*
+ * Locate class for external language interface. This forbids kernel objects
+ */
+ADIobj ADIkrnlFindClsExt( char *cls, int clen, ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+  ADIclassDef	*tdef = NULL;
+
+  _chk_stat_ret(ADI__nullid);
+
+  _GET_NAME(cls,clen);
+
+  tdef = ADIkrnlFindClsInt( cls, clen, status );
+
+  if ( tdef ) {
+    if ( _valid_q(tdef->selfid) )
+      rval = tdef->selfid;
+    else
+      adic_setecs( ADI__INVARG, "Class %*s is a kernel class; no identifier can be returned", status, clen, cls );
+    }
+  else
+    adic_setecs( ADI__INVARG, "No such class %*s is defined", status, clen, cls );
+
+  return rval;
+  }
+
 
 ADIobj ADIkrnlFindClsI( ADIobj name, ADIstatus status )
   {
