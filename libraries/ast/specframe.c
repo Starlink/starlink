@@ -1018,7 +1018,7 @@ static const char *GetDomain( AstFrame *this_frame ) {
 
 /* Otherwise, provide a pointer to a suitable default string. */
    } else {
-      result = "SPECTRAL";
+      result = "SPECTRUM";
    }
 
 /* Return the result. */
@@ -1330,25 +1330,25 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
       if ( astOK ) {
 
          if( system == AST__FREQ ) {
-	    result = "nu";
+	    result = "FREQ";
          } else if( system == AST__ENERGY ) {
-	    result = "E";
+	    result = "ENER";
          } else if( system == AST__WAVENUM ) {
-	    result = "sigma";
+	    result = "WAVN";
          } else if( system == AST__WAVELEN ) {
-	    result = "lambda";
+	    result = "WAVE";
          } else if( system == AST__AIRWAVE ) {
-	    result = "lambda_air";
+	    result = "AWAV";
          } else if( system == AST__VRADIO ) {
-	    result = "V";
+	    result = "VRAD";
          } else if( system == AST__VOPTICAL ) {
-	    result = "Z";
+	    result = "VOPT";
          } else if( system == AST__REDSHIFT ) {
-	    result = "z";
+	    result = "ZOPT";
          } else if( system == AST__BETA ) {
-	    result = "beta";
+	    result = "BETA";
          } else if( system == AST__VREL ) {
-	    result = "v";
+	    result = "VELO";
 
 /* Report an error if the coordinate system was not recognised. */
          } else {

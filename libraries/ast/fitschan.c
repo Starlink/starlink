@@ -14619,7 +14619,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                   dval = cdelti*cosrota;
                } else {
                   GetValue( this, FormatKey( "CDELT", i + 1, -1, ' ' ),
-                            AST__STRING, (void *) &dval, 1, method, 
+                            AST__FLOAT, (void *) &dval, 1, method, 
                             class );
 
 /* If CDELT is zero, use one hundredth of the corresponding CRVAL value 
@@ -19112,11 +19112,13 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
 
 /* Local Variables: */
    AstFrame *pfrm;           /* Pointer to primary Frame */
+   AstFrame *pfrm2;          /* Pointer to primary Frame */
    AstMapping *map1;         /* Pointer to a Mapping */
    AstMapping *map2;         /* Pointer to a Mapping */
    AstMapping *ret;          /* The returned Mapping */
    char **comms;             /* Pointer to array of CTYPE commments */
    char buf[ 100 ];          /* Buffer for textual attribute value */
+   char *newdom;             /* Pointer to new Domain value */
    const char *ckeyval;      /* Pointer to character keyword value */
    double c1_in;             /* Value at corner 1 in input Frame */
    double c1_out;            /* Value at corner 1 in output Frame */
@@ -19205,11 +19207,16 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
 /* Otherwise... */
    } else {
 
-/* Identify any axes for which the Frame's Label attribute is unset 
-   and which has a default value of blank. It is assumed that such axes 
-   have not yet been converted from intermediate world coords to final 
-   world coords. For each such axes we construct a Mapping which adds on
-   the CRVAL value for the axis. */
+/* If we have only a single other axis, use CTYPE value instead of
+   comment. */
+      if( nother == 1 ) usecom = 0;
+
+/* Not yet started a new Domain value to replace "AST_FITSCHAN". */
+      newdom = NULL;
+      pfrm2 = NULL;
+
+/* Check each axis of the Frame looking for axes which have not yet been
+   recognised. */
       for( i = 0; i < naxes; i++ ) {
 
 /* Get the Domain for the primary frame containing the axis. This will be 
@@ -19218,6 +19225,10 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
    not been changed. */
          astPrimaryFrame( *frm, i, &pfrm, &paxis );
          if( !strcmp( astGetDomain( pfrm ), "AST_FITSCHAN" ) ) {
+
+/* Save a pointer to the primary Frame which we will use to set the
+   Domain of the primary Frame. */
+            if( !pfrm2 ) pfrm2 = astClone( pfrm );
 
 /* Get the reference value for this axis. */
             crval = GetItem( &(store->crval), i, 0, s, 
@@ -19231,9 +19242,21 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
             map1 = (AstMapping *) astWinMap( 1, &c1_in, &c2_in, &c1_out, 
                                              &c2_out, "" );
 
+/* Get the CTYPE value. */
+            ckeyval = GetItemC( &(store->ctype), i, s, NULL, method, class );
+
+/* Append the CTYPE value to the final Domain value for the primary Frame. */
+            if( ckeyval && astChrLen( ckeyval ) > 0 ) {
+               if( newdom ) {
+                  sprintf( buf, "%s-%s", newdom, ckeyval );
+               } else {
+                  sprintf( buf, "%s", ckeyval );
+                  newdom = buf;
+               }                  
+            }
+
 /* Now modify the axis in the Frame to have appropriate values for the 
    Unit, Label and Symbol attributes. */
-            ckeyval = GetItemC( &(store->ctype), i, s, NULL, method, class );
             if( ckeyval ) astSetSymbol( *frm, i, ckeyval );
 
             if( usecom ) ckeyval = GetItemC( &(store->ctype_com), i, s, 
@@ -19263,6 +19286,18 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
          } else {
             ret = map1;
          }
+      }
+
+/* Set the Domain name for the primary Frame. It is currently set to
+   AST_FITSCHAN. We replace it with a value formed by concatenating the
+   CTYPE values of its axes. */
+      if( pfrm2 ) {
+         if( newdom && astChrLen( newdom ) > 0 ) {
+            astSetDomain( pfrm2, newdom );
+         } else {
+            astClearDomain( pfrm2 );
+         }
+         pfrm2 = astAnnul( pfrm2 );
       }
 
 /* If the header contained a WCSNAME keyword, use it as the Domain name for 

@@ -1,4 +1,5 @@
-      SUBROUTINE KPG1_ASDSV( FRM, NP, NAX, POS, DIS, BAD, STATUS )
+      SUBROUTINE KPG1_ASDSV( FRM, NP, NAX, POS, NORM, DIS, BAD, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPG1_ASDSV
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASDSV( FRM, NP, NAX, POS, DIS, BAD, STATUS )
+*     CALL KPG1_ASDSV( FRM, NP, NAX, POS, NORM, DIS, BAD, STATUS )
 
 *  Description:
 *     This routine returns the distance to each point in a set of points,
@@ -27,6 +28,9 @@
 *     POS( NP, NAX ) = DOUBLE PRECISION (Given)
 *        An array holding the co-ordinates at NP positions within the
 *        supplied Frame.
+*     NORM = LOGICAL (Given)
+*        If .TRUE., the returned distances are normalised to a maximum
+*        value of 1.0.
 *     DIS( NP ) = DOUBLE PRECISION (Returned)
 *        The distance along the path to each position, starting at the
 *        first position.
@@ -62,6 +66,7 @@
       INTEGER NP
       INTEGER NAX
       DOUBLE PRECISION POS( NP, NAX )
+      LOGICAL NORM
 
 *  Arguments Returned:
       DOUBLE PRECISION DIS( NP )
@@ -72,6 +77,7 @@
 
 *  Local Variables:
       DOUBLE PRECISION INC       ! The distance between P1 and P2
+      DOUBLE PRECISION MXDIS     ! The max distance 
       DOUBLE PRECISION P1( NDF__MXDIM )! The first position
       DOUBLE PRECISION P2( NDF__MXDIM )! The second position
       INTEGER I                  ! Position index
@@ -105,6 +111,7 @@
             INC = AST_DISTANCE( FRM, P1, P2, STATUS ) 
             IF( INC .NE. AST__BAD ) THEN
                DIS( I ) = DIS( I - 1 ) + INC
+               MXDIS = DIS( I )
             ELSE
                DIS( I ) = AST__BAD
             END IF
@@ -125,5 +132,14 @@
 *  If any bad values were found they will have been propagated to the last
 *  element.
       BAD = ( DIS( NP ) .EQ. AST__BAD )
+
+*  If required, normalise the distances to a maximum value of 1.0.
+      IF( NORM .AND. MXDIS .NE. 0.0 ) THEN
+         DO I = 1, NP
+            IF( DIS( I ) .NE. AST__BAD ) THEN
+               DIS( I ) = DIS( I ) / MXDIS
+            END IF
+         END DO               
+      END IF
 
       END

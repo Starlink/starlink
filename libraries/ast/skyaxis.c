@@ -123,6 +123,7 @@ static double (*parent_getaxistop)( AstAxis *this );
 /* Factors for converting between hours, degrees and radians. */
 static double hr2rad;
 static double deg2rad;
+static double pi;
 static double piby2;
 
 /* External Interface Function Prototypes. */
@@ -1797,7 +1798,7 @@ static double GetAxisBottom( AstAxis *this_axis ) {
 /* Otherwise, supply a default of -pi/2 for latitude axes, and -DBL_MAX
    for longitude axes. */
    } else {
-      result = astGetAxisIsLatitude( this ) ? -piby2 : -DBL_MAX;
+      result = astGetAxisIsLatitude( this ) ? -piby2 : -DBL_MAX; 
    }
 
 /* If an error occurred, clear the result value. */
@@ -2428,6 +2429,8 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
    radians. */
    slaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
    slaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
+   slaDaf2r( 180, 0, 0.0, &pi, &stat );
+   piby2 = 0.5*pi;
 }
 
 static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,

@@ -132,11 +132,13 @@
       CHARACTER ATTR*20          ! Attribute name
       CHARACTER LAB*80           ! Label text string
       CHARACTER TEXT*100         ! General text string
+      CHARACTER UNIT*100         ! Unit attribute value
       DOUBLE PRECISION POS( 2 )  ! Start and end of samples in GRID Frame
       INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
       INTEGER CFRM               ! Current Frame in supplied FrameSet
       INTEGER FR1                ! Frame 1 in compound frame
       INTEGER FR2                ! Frame 2 in compound frame
+      INTEGER I                  ! Loop count
       INTEGER IAT                ! No. of characters in a string
       INTEGER ICURR              ! Index of current Frame in IWCS
       INTEGER INPRM(2)           ! Axis permutation array
@@ -154,6 +156,7 @@
       INTEGER XMAP               ! X axis 1-D Mapping
       INTEGER YMAP               ! Y axis 1-D Mapping
       LOGICAL BAD                ! Any bad values found?
+      LOGICAL SAMEUN             ! Do all current frame axes have same units?
 
 *.
 
@@ -188,6 +191,42 @@
 *  See how many axes the Current Frame has.
       NAX = AST_GETI( CFRM, 'NAXES', STATUS )         
 
+*  Set a flag indicating if the units on all axes are the same.
+      SAMEUN = .TRUE.
+      UNIT = ' '
+      DO I = 1, NAX
+
+*  All SkyAxes are assumed to have units of "rad". This is a SkyAxis
+*  if it has an AsTime attribute. Watch for errors caused by the axis not
+*  having an AsTime attribute.
+         IF( STATUS .EQ. SAI__OK ) THEN
+            ATTR = 'ASTIME('
+            IAT = 7
+            CALL CHR_PUTI( I, ATTR, IAT )
+            CALL CHR_APPND( ')', ATTR, IAT )
+            TEXT = AST_GETC( CFRM, ATTR( :IAT ), STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               TEXT = 'RAD'
+
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+
+               ATTR = 'UNIT('
+               IAT = 5
+               CALL CHR_PUTI( I, ATTR, IAT )
+               CALL CHR_APPND( ')', ATTR, IAT )
+               TEXT = AST_GETC( CFRM, ATTR( :IAT ), STATUS )
+            END IF
+         END IF         
+
+         IF( I .EQ. 1 ) THEN
+            UNIT = TEXT
+         ELSE IF( TEXT .NE. UNIT ) THEN
+            SAMEUN = .FALSE.
+         END IF
+   
+      END DO
+
 *  Allocate memory to hold an array of DIM 1-d GRID values.
       CALL PSX_CALLOC( DIM, '_DOUBLE', IPG, STATUS )
 
@@ -213,9 +252,11 @@
      :                %VAL( IPW ), STATUS ) 
 
 *  Find the distance from the first GRID position to each subsequent GRID
-*  position, measured along the profile.
-      CALL KPG1_ASDSV( CFRM, DIM, NAX, %VAL( IPW ), %VAL( IPD ), BAD,
-     :                 STATUS )
+*  position, measured along the profile. If the axes of the current Frame 
+*  do not all have the same Unit, normalise the distances to a maximum
+*  value of 1.0.
+      CALL KPG1_ASDSV( CFRM, DIM, NAX, %VAL( IPW ), .NOT. SAMEUN, 
+     :                 %VAL( IPD ), BAD, STATUS )
 
 *  Report an error if any bad distance values were found.
       IF( BAD .AND. STATUS .EQ. SAI__OK ) THEN
@@ -229,6 +270,11 @@
 
 *  Create the LutMap for axis 1.
       XMAP = AST_LUTMAP( DIM, %VAL( IPD ), 1.0D0, 1.0D0, ' ', STATUS )
+
+*  If the axes of the current frame do not all have the same units, 
+*  use a normalised distance in the range [0,1].
+
+
 
 *  Set the NOINV flag if the inverse transformation is not defined.
       NOINV = ( .NOT. AST_GETL( XMAP, 'TranInverse', STATUS ) )
@@ -342,11 +388,20 @@
 *  "What we want":
 *  ---------------
 
-*  This is a 2-D CmpFrame. The first axis is copied from the specified axis 
-*  in the Current Frame of the supplied FrameSet. The second (data) axis is a 
-*  default 1-D Axis.
-      AXES( 1 ) = IAXIS
-      FR1 = AST_PICKAXES( CFRM, 1, AXES, TMAP, STATUS ) 
+*  This is a 2-D CmpFrame. If the X axis is not being annotated with
+*  distance along the curve, the first axis is copied from the specified 
+*  axis in the Current Frame of the supplied FrameSet. If the X axis is 
+*  being annotated with distance along the curve, the first axis is still
+*  copied from the specified axis in the Current Frame but only if all
+*  axes have the same units - otherwise a new default Axis is used.
+*  The second (data) axis is a default 1-D Axis.
+
+      IF( .NOT. DIST .OR. SAMEUN ) THEN 
+         AXES( 1 ) = IAXIS
+         FR1 = AST_PICKAXES( CFRM, 1, AXES, TMAP, STATUS ) 
+      ELSE 
+         FR1 = AST_FRAME( 1, "", STATUS ) 
+      END IF
       FR2 = AST_FRAME( 1, "", STATUS ) 
       WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
       CALL AST_ANNUL( FR1, STATUS )
@@ -375,7 +430,12 @@
 *  If distance is being used to annotate the axis, set appropriate
 *  attributes for axis 1.
       IF( DIST ) THEN
-         CALL AST_SETC( WWWANT, 'LABEL(1)', 'Offset', STATUS )
+         IF( SAMEUN ) THEN
+            CALL AST_SETC( WWWANT, 'LABEL(1)', 'Offset', STATUS )
+         ELSE
+            CALL AST_SETC( WWWANT, 'LABEL(1)', 'Normalised offset', 
+     :                     STATUS )
+         END IF
          CALL AST_SETC( WWWANT, 'SYMBOL(1)', 'OFFSET ', STATUS )
       END IF
 

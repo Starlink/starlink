@@ -1420,7 +1420,7 @@ astMAKE_TEST(Axis,AxisTop,( this->top != AST__BAD ))
 astMAKE_CLEAR(Axis,AxisBottom,bottom,AST__BAD)
 
 /* Supply a default value of -DBL_MAX if the Bottom value is not set.*/
-astMAKE_GET(Axis,AxisBottom,double,0,( this->bottom != AST__BAD ? this->bottom : -DBL_MAX))
+astMAKE_GET(Axis,AxisBottom,double,0.0,( this->bottom != AST__BAD ? this->bottom : -DBL_MAX))
 
 /* Set the Bottom value. */
 astMAKE_SET(Axis,AxisBottom,double,bottom,(value))

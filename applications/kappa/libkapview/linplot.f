@@ -539,6 +539,7 @@
       DOUBLE PRECISION XSMIN   ! Min X after inclusion of axis widths
       INTEGER AXMAP            ! Point to NDFs AXIS->GRID Mapping
       INTEGER AXMAPS( 2 )      ! Axis mappings for displayed data plot
+      INTEGER DIAXIS           ! Default value for USEAXIS
       INTEGER DIM              ! Number of elements in the input array
       INTEGER DPFS             ! FrameSet connecting old and new DATAPLOT Frames
       INTEGER DPMAP            ! Mapping between old and new DATAPLOT Frames
@@ -674,21 +675,31 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Choose the default value for the USEAXIS parameter.
+      IF( NAX .EQ. 1 ) THEN
+         DIAXIS = 1
+      ELSE
+         DIAXIS = 0
+      END IF
+
 *  See which axis should be used for the horizontal axis annotation.
 *  Allow null to be used to indicate that the horizontal axis should be
 *  annotated with geodesic distance form the first point (measured along
 *  the profile). The dynamic default is axis 1 if the input NDF is one
-*  dimensional, and zero otherwise. An axis index is returned.
-      IF( NAX .EQ. 1 ) THEN
-         IAXIS = 1
-      ELSE
-         IAXIS = 0
-      END IF
-      CALL KPG1_GTAXI( 'USEAXIS', IWCS, 1, IAXIS, STATUS )
+*  dimensional, and zero otherwise. An axis index is returned. Since
+*  KPG1_GTAXI will not accept an axis value of zero, use PAR_GET0I first
+*  to see if the value zero was supplied.
+      CALL PAR_GET0I( 'USEAXIS', IAXIS, STATUS )
 
-*  If a null value was supplied, annull the error and use the returned 
-*  dynamic default.
-      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         IAXIS = DIAXIS
+
+      ELSE IF( STATUS .NE. SAI__OK .OR. IAXIS .NE. 0  ) THEN
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         IAXIS = DIAXIS
+         CALL KPG1_GTAXI( 'USEAXIS', IWCS, 1, IAXIS, STATUS )
+      END IF
 
 *  If we got a value greater than zero, indicate that the horizontal axis 
 *  will not be annotated with distance from the starting point.
@@ -707,7 +718,7 @@
 *  always request a specific format using the STYLE parameter. See if there 
 *  is an axis with the AsTime attribute set false. Annul any errors which 
 *  occur because an axis does not have the AsTime attribute.
-         IAXIS = 1
+         IAXIS = -1
 
          DO I = 1, NAX
             TEXT = 'ASTIME('
@@ -716,9 +727,10 @@
             CALL CHR_APPND( ')', TEXT, IAT )
             IF( .NOT. AST_GETL( IWCS, TEXT( : IAT ), STATUS ) ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
-                  IAXIS = I
+                  IF( IAXIS .EQ. -1 ) IAXIS = I
                ELSE
                   CALL ERR_ANNUL( STATUS )
+                  IAXIS = 1
                END IF
             END IF
          END DO

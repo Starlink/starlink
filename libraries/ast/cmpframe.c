@@ -5721,10 +5721,10 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 
 /* Annul the Mapping and Frame pointers obtained from each component
    Frame. */
-         sub_map1 = astAnnul( sub_map1 );
-         sub_map2 = astAnnul( sub_map2 );
-         sub_result1 = astAnnul( sub_result1 );
-         sub_result2 = astAnnul( sub_result2 );
+         if( sub_map1 ) sub_map1 = astAnnul( sub_map1 );
+         if( sub_map2 ) sub_map2 = astAnnul( sub_map2 );
+         if( sub_result1 ) sub_result1 = astAnnul( sub_result1 );
+         if( sub_result2 ) sub_result2 = astAnnul( sub_result2 );
       }
    }
 

@@ -6962,9 +6962,9 @@ supported types of Mapping).
 \htmlref{WCSREMOVE}{WCSREMOVE} allows Frames to be removed from the WCS
 component.
 
-Two common additional Frame {\tt Domains} are SKY and SPECTRAL. SKY is
+Two common additional Frame {\tt Domains} are SKY and SPECTRUM. SKY is
 reserved to refer to 2-dimensional Frames which describe celestial
-longitude and latitude (known as ``SkyFrames''). SPECTRAL is reserved to
+longitude and latitude (known as ``SkyFrames''). SPECTRUM is reserved to
 refer to 1-dimensional Frames which describe position within a spectrum
 (known as ``SpecFrames'').These sub-classes of Frame have additional
 attributes indicating the particular celestial or spectral co-ordinate
@@ -7066,7 +7066,7 @@ pixels).
 \item [AXIS] --- Reserved to represent AXIS co-ordinates (in arbitrary units).
 \item [SKY] --- Reserved to represent celestial longitude and latitude (in
 any suitable system, but always stored internally in units of radians).
-\item [SPECTRAL] --- Reserved to represent position within an
+\item [SPECTRUM] --- Reserved to represent position within an
 electro-magnetic spectrum (various spectral systems and units are
 supported).
 \item [GRAPHICS] --- Reserved to represent positions on a graphics device 
@@ -7340,7 +7340,7 @@ make it the \emph{current} Frame}:
 
 \small
 \begin{verbatim}
-    % wcsadd fred frame=axis maptype=unit frmtype=spec domain=SPECTRAL \
+    % wcsadd fred frame=axis maptype=unit frmtype=spec domain=SPECTRUM \
              attrs="'System=freq,Unit=GHz'"
 \end{verbatim}
 \normalsize
@@ -7575,7 +7575,7 @@ could say:
       same Domain value can be aligned with it. 
 
       Some Frames are given standard Domain values when they are created
-      ({\it e.g.}\ GRID, PIXEL, AXIS, SKY, SPECTRAL, CURPIC, NDC, BASEPIC, GRAPHICS). 
+      ({\it e.g.}\ GRID, PIXEL, AXIS, SKY, SPECTRUM, CURPIC, NDC, BASEPIC, GRAPHICS). 
       Frames created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
       can have any Domain value, but the standard Domain names should be
       avoided unless the standard meanings are appropriate for the Frame
@@ -42227,7 +42227,7 @@ plot (7k).
          \sstitemlist{
 
             \sstitem
-            A domain name such as SKY, SPECTRAL, AXIS, PIXEL, \emph{etc}. The two
+            A domain name such as SKY, SPECTRUM, AXIS, PIXEL, \emph{etc}. The two
             {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             component of the NDF does not contain Frames with these domains.
@@ -42242,7 +42242,7 @@ plot (7k).
             is equivalent to specifying {\tt "}SKY{\tt "} for this parameter and then setting
             the System attribute (to {\tt "}FK5{\tt "}, {\tt "}Galactic{\tt "}, \emph{etc}.) using KAPPA command
             WCSATTRIB. The specific system used to describe positions in other
-            Domains (SPECTRAL, for instance) must be set using WCSATTRIB.
+            Domains (SPECTRUM, for instance) must be set using WCSATTRIB.
          }
       }
       \sstsubsection{

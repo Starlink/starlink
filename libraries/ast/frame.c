@@ -8676,6 +8676,9 @@ f     used (by AST_FINDFRAME) as a template to match another (target)
 *     FrameSet
 *        The Domain attribute of a FrameSet is the same as that of its
 *        current Frame (as specified by the Current attribute).
+*     SpecFrame
+*        The SpecFrame class re-defines the default Domain value to be
+*        "SPECTRUM".
 
 *  Notes:
 *     - All Domain values are converted to upper case and white space

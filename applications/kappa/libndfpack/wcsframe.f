@@ -49,7 +49,7 @@
 *        suggested default is the Domain (or index if the Domain is not
 *        set) of the current Frame. The string can be one of the following:
 *
-*        - A domain name such as SKY, SPECTRAL, AXIS, PIXEL, etc. The two
+*        - A domain name such as SKY, SPECTRUM, AXIS, PIXEL, etc. The two
 *        "pseudo-domains" WORLD and DATA may be supplied and will be
 *        translated into PIXEL and AXIS respectively, so long as the WCS
 *        component of the NDF does not contain Frames with these domains.
@@ -62,7 +62,7 @@
 *        is equivalent to specifying "SKY" for this parameter and then setting 
 *        the System attribute (to "FK5", "Galactic", etc.) using KAPPA command 
 *        WCSATTRIB. The specific system used to describe positions in other 
-*        Domains (SPECTRAL, for instance) must be set using WCSATTRIB.
+*        Domains (SPECTRUM, for instance) must be set using WCSATTRIB.
 *
 *     NDF = NDF (Read and Write)
 *        The NDF data structure in which the current co-ordinate Frame is to 
@@ -78,7 +78,7 @@
 *        co-ordinate system (FK5, Galactic, etc.) will depend on the contents 
 *        of the WCS component of the NDF, but may be changed by setting a 
 *        new value for the System attribute using the WCSATTRIB command.
-*     wcsframe m51 spectral
+*     wcsframe m51 spectrum
 *        This chooses spectral co-ordinates for the current co-ordinate
 *        Frame in the NDF m51 (if available). The specific spectral 
 *        co-ordinate system (wavelength, frequency, etc) will depend on the 
