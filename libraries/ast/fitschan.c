@@ -364,7 +364,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        round onto the opposite meridian). Also added new warning
 *        condition "badlat".
 *     23-AUG-2001 (DSB):
-*        Re-write LinearMap to use a least squares fit.
+*        - Re-write LinearMap to use a least squares fit.
+*        - Check that CDj_i is not AST__BAD within WcsWithWcs when
+*        forming the increments along each physical axis.
 *class--
 */
 
@@ -18567,8 +18569,12 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
          for( j = 0; j < naxis; j++ ){
             work[ j ] = 0.0;
             for( i = 0; i < naxis; i++ ){
-               work[ j ] += GetItem( &(store->cd), j, i, s, NULL, method, 
-                                     class );
+               val = GetItem( &(store->cd), j, i, s, NULL, method, class );
+               if( val != AST__BAD ){
+                  work[ j ] += val;
+               } else if( i == j ){
+                  work[ j ] += 1.0;
+               }
             }
          }
       }
