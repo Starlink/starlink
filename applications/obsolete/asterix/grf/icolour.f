@@ -942,39 +942,62 @@
 *    Function declarations :
 *    Local constants :
 *    Global variables :
+      INCLUDE 'IMG_CMN'
       REAL COL(3,16)
       INTEGER NCOL,NSHADE,FIRST,LAST
       COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
 *    Local variables :
+      CHARACTER*4 STRING
       INTEGER BGCOL
       INTEGER I,N
+      INTEGER GCBID,ID
+      INTEGER ICOL
       LOGICAL OK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
+*  locate noticeboard copy of GCB
+        CALL NBS_FIND_ITEM(I_NBID,'GCB',GCBID,STATUS)
 
-*  get current colour table
-        CALL GCB_GETI('COLOUR_N',OK,N,STATUS)
-        IF (OK.AND.N.EQ.16) THEN
-          DO I=1,N
-            CALL GCB_GET1R('COLOUR_RED',I,1,OK,COL(1,I),STATUS)
-            CALL GCB_GET1R('COLOUR_GREEN',I,1,OK,COL(2,I),STATUS)
-            CALL GCB_GET1R('COLOUR_BLUE',I,1,OK,COL(3,I),STATUS)
-          ENDDO
-        ELSE
-          CALL GFX_DEFCOLS(COL,STATUS)
-        ENDIF
+*  which colour is being loaded
+        CALL NBS_FIND_ITEM(GCBID,'COLOUR_',ID,STATUS)
+        CALL NBS_GET_VALUE(ID,0,VAL__NBI,ICOL,NB,STATUS)
 
-
+        IF (ICOL.LE.0) THEN
+*  zero means get current colour table from GCB
+          CALL GCB_GETI('COLOUR_N',OK,N,STATUS)
+          IF (OK.AND.N.EQ.16) THEN
+            DO I=1,N
+              CALL GCB_GET1R('COLOUR_RED',I,1,OK,COL(1,I),STATUS)
+              CALL GCB_GET1R('COLOUR_GREEN',I,1,OK,COL(2,I),STATUS)
+              CALL GCB_GET1R('COLOUR_BLUE',I,1,OK,COL(3,I),STATUS)
+            ENDDO
+          ELSE
+            CALL GFX_DEFCOLS(COL,STATUS)
+          ENDIF
 
 *  get colour capability of device
-        CALL GDV_COLOURS(BGCOL,FIRST,LAST,STATUS)
+          CALL GDV_COLOURS(BGCOL,FIRST,LAST,STATUS)
 *  how many useable colours
-        NCOL=LAST-FIRST+1
+          NCOL=LAST-FIRST+1
 
 *  how many shades between main colours
-        NSHADE=(NCOL-16)/15
+          NSHADE=(NCOL-16)/15
+
+        ELSEIF (ICOL.GE.1.AND.ICOL.LE.16) THEN
+
+          CALL NBS_FIND_ITEM(GCBID,'COLOUR_RED',ID,STATUS)
+          WRITE(STRING,'(F4.2)') COL(1,ICOL)
+          CALL NBS_PUT_CVALUE(ID,0,STRING,STATUS)
+          CALL NBS_FIND_ITEM(GCBID,'COLOUR_GREEN',ID,STATUS)
+          WRITE(STRING,'(F4.2)') COL(2,ICOL)
+          CALL NBS_PUT_CVALUE(ID,0,STRING,STATUS)
+          CALL NBS_FIND_ITEM(GCBID,'COLOUR_BLUE',ID,STATUS)
+          WRITE(STRING,'(F4.2)') COL(3,ICOL)
+          CALL NBS_PUT_CVALUE(ID,0,STRING,STATUS)
+
+        ENDIF
 
       ENDIF
 
