@@ -203,8 +203,8 @@
 *        Mark the new soruce
             CALL IBGND_MARK( I_BGM_NSRC, STATUS )
 
-*        Update display
-            CALL IBGND_TOPSRC( I_BGM_TSRC, STATUS )
+*        Update display - make sure new source is visible
+            CALL IBGND_TOPSRC( MAX(I_BGM_NSRC-7,I_BGM_TSRC), STATUS )
 
 *      Set the top source to display
           ELSE IF ( CMD .EQ. 'TOPSRC' ) THEN
@@ -943,15 +943,13 @@
             CALL IBGND_GETSRC( ISRC, X, Y, R, STATUS )
 
 *        Encode that info
-            WRITE( SSTR, '(I3,3(1X,1PG9.4))', IOSTAT=ISTAT )
+            WRITE( SSTR, '(I3,3(1X,F9.4))', IOSTAT=ISTAT )
      :                                              ISRC, X, Y, R
 
 *        Write to noticeboard
             C = CHAR( ICHAR('1') + ISRC - I_BGM_TSRC )
             CALL NBS_FIND_ITEM( I_NBID, 'BG_SRC'//C, ITEMID, STATUS )
             CALL NBS_PUT_CVALUE( ITEMID, 0, SSTR, STATUS )
-	print *,isrc,sstr,status
-	call flush(6)
 
           END DO
 
