@@ -1,0 +1,17 @@
+rm stk*.FIT
+polvec in=stk cat=stk1
+polbin in=stk1 box=3 method=mean out=stk2
+catselect catin=stk2 catout=stk3 norejcat seltyp='e' expr='dp<4&p*dang<50'
+
+gdset xw
+idset xw
+gdclear
+
+maths "exp='0*ia+log(ia+0.1)'" ia="stk(,,1)" out=logi
+
+lutgrey
+display "logi(,)" mode=perc percentiles=\[30,99\] badcol=red \
+"style='width=1,colour=black,title=Sub-mm polarization map of W3'"
+
+polplot noclear noaxes cat=stk3 vscale=8 keyvec=6 \
+   "keystyle='size=1.3,colour=black,width(vec)=2'" "style='width(vec)=2,colour(vec)=cyan'"

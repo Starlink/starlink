@@ -1,0 +1,24 @@
+rm stk*.FIT
+polvec in=stk cat=stk1
+polbin in=stk1 box=5 method=mean out=stk2
+catselect catin=stk2 catout=stk3 norejcat seltyp='e' expr='dp<4&p*dang<50'
+
+gdset epsfcol_p
+idset epsfcol_p
+gdclear
+picdef mode=cc fraction=0.5 nooutline
+rm gks*
+
+maths "exp='0*ia+1'" ia="stk(,,1)" out=i
+nomagic in="i(,)" out=nob repval=0
+contour nob mode=free heights=0.5 nokey \
+"style='size=0.6,width=2,width(cont)=2,style(cont)=1,colour=black,title=Sub-mm polarization map of W3'"
+
+contour "stk(,,1)" noclear noaxes mode=perc percentiles=\[30,60,80,93,99.9\] nokey \
+"style='width=1,style=1,colour=black'"
+
+polplot noclear noaxes cat=stk3 vscale=10 keyvec=5 \
+   "keystyle='width=2,size=1.0,colour=black,width(vec)=4'" "style='width(vec)=4'"
+
+psmerge -e gks74.ps gks74.ps.1 gks74.ps.2 > cont.eps
+ghostview cont.eps 
