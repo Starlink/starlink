@@ -8,7 +8,7 @@
 %token INCLUDE IF ELSEIF THEN CALL
 
 %token INTEGER_CONSTANT STRING_CONSTANT
-%token ILLEGAL_CHAR TOKEN
+%token ILLEGAL_CHAR TOKEN TOKEN_BRAC
 
 %start file
 
@@ -49,17 +49,29 @@ line
 	;
 
 module_start_line
-	: SUBROUTINE token opt_expression
-			{ $$ = scat( 3, $1, fanchor( "name", $2 ), $3 ); }
-	| FUNCTION token opt_expression
-			{ $$ = scat( 3, $1, fanchor( "name", $2 ), $3 ); }
-	| type_spec FUNCTION token opt_expression
-			{ $$ = scat( 4, $1, $2, fanchor( "name", $3 ), $4 ); }
-	| ENTRY token opt_expression
-			{ $$ = scat( 3, $1, fanchor( "name", $2 ), $3 ); }
-	| BLOCKDATA opt_expression
+	: SUBROUTINE token_brac '(' opt_othertext ')'
+			{ $$ = scat( 5, $1, fanchor( "name", $2 ), 
+                                     $3, $4, $5 ); }
+	| SUBROUTINE token
+			{ $$ = scat( 2, $1, fanchor( "name", $2 ) ); }
+	| FUNCTION token_brac '(' opt_othertext ')'
+			{ $$ = scat( 5, $1, fanchor( "name", $2 ), 
+                                     $3, $4, $5 ); }
+	| FUNCTION token
+			{ $$ = scat( 2, $1, fanchor( "name", $2 ) ); }
+	| type_spec FUNCTION token_brac '(' opt_othertext ')'
+			{ $$ = scat( 6, $1, $2, fanchor( "name", $3 ), 
+                                     $4, $5, $6 ); }
+	| type_spec FUNCTION token
+			{ $$ = scat( 3, $1, $2, fanchor( "name", $3 ) ); }
+	| ENTRY token_brac '(' opt_othertext ')'
+			{ $$ = scat( 5, $1, fanchor( "name", $2 ), 
+                                     $3, $4, $5 ); }
+	| ENTRY token
+			{ $$ = scat( 2, $1, fanchor( "name", $2 ) ); }
+	| BLOCKDATA opt_othertext
 			{ $$ = scat( 2, $1, $2 ); }
-	| PROGRAM expression
+	| PROGRAM othertext
 			{ $$ = scat( 2, $1, $2 ); }
 	;
 
@@ -74,12 +86,8 @@ declaration_line
 	;
 
 type_spec
-	: type
-			{ $$ = $1; }
-	| type '*' INTEGER_CONSTANT
-			{ $$ = scat( 3, $1, $2, $3 ); }
-	| type '*' '(' expression ')'
-			{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
+	: type opt_size_decl
+			{ $$ = scat( 2, $1, $2 ); }
 	| DIMENSION
 			{ $$ = $1; }
 	;
@@ -117,16 +125,26 @@ var_dec_list
 	;
 
 var_dec_item
-	: token
-			{ $$ = $1; }
-	| token '(' expression ')'
+	: token_brac '(' othertext ')' opt_size_decl
 			{ array_declare( $1 ); 
-			  $$ = scat( 4, $1, $2, $3, $4 ); }
-	| token '(' expression ':' expression ')'
-			{ $$ = scat( 6, $1, $2, $3, $4, $5, $6 ); }
-	| token '*' '(' expression ')'
-			{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
+			  $$ = scat( 5, $1, $2, $3, $4, $5 ); }
+	| token_brac '(' othertext ':' othertext ')' opt_size_decl
+			{ array_declare( $1 );
+			  $$ = scat( 7, $1, $2, $3, $4, $5, $6, $7 ); }
+	| token opt_size_decl
+			{ $$ = scat( 2, $1, $2 ); }
 	;
+
+opt_size_decl
+	: /* empty */
+			{ $$ = scat( 0 ); }
+	| '*' INTEGER_CONSTANT
+			{ $$ = scat( 2, $1, $2 ); }
+	| '*' '(' othertext ')'
+			{ $$ = scat( 4, $1, $2, $3, $4 ); }
+	| '*' token
+			{ $$ = scat( 2, $1, $2 ); }
+	; 
 
 statement
 	: if '(' expression ')' THEN
@@ -137,15 +155,19 @@ statement
 			{ $$ = scat( 6, $1, $2, $3, $4, $5, $6 ); }
 	| token '=' expression
 			{ $$ = scat( 3, $1, $2, $3 ); }
-	| token '(' expression ')' '=' expression
+	| token_brac '(' expression ')' '=' expression
 			{ $$ = scat( 6, $1, $2, $3, $4, $5, $6 ); }
-	| token '(' opt_expression ':' opt_expression ')' '=' expression
-			{ $$ = scat( 8, $1, $2, $3, $4, $5, $6, $7, $8 ); }
-	| CALL token '(' expression ')'
+	| token_brac '(' string_subscript ')' '=' expression
+			{ $$ = scat( 6, $1, $2, $3, $4, $5, $6 ); }
+	| token_brac '(' expression ')' '(' string_subscript ')' '=' expression
+			{ $$ = scat( 9, $1, $2, $3, $4, $5, $6, $7, $8, $9 ); }
+	| CALL token_brac '(' expression ')'
 			{ $$ = scat( 5, $1, fanchor( "href", $2 ), 
 			             $3, $4, $5 ); }
 	| CALL token
 			{ $$ = scat( 2, $1, fanchor( "href", $2 ) ); }
+	| token_brac '(' expression ')' opt_expression
+			{ $$ = scat( 4, $1, $2, $3, $4 ); }
 	| token opt_expression
 			{ $$ = scat( 2, $1, $2 ); }
 	;
@@ -157,10 +179,36 @@ if
 			{ $$ = $1; }
 	;
 
-opt_expression
-	: /* empty */
-			{ $$ = scat( 0 ); }
-	| expression
+expression_term
+	: token_brac '(' opt_expression ')'
+			{ $$ = scat( 4, $1, $2, $3, $4 ); }
+	| token_brac '(' string_subscript ')'
+			{ $$ = scat( 4, $1, $2, $3, $4 ); }
+	| '(' string_subscript ')'
+			{ $$ = scat( 3, $1, $2, $3 ); }
+	| '(' expression ')'
+			{ $$ = scat( 3, $1, $2, $3 ); }
+	| text_term
+			{ $$ = $1; }
+	;
+
+string_subscript
+	: expression ':' expression
+			{ $$ = scat( 3, $1, $2, $3 ); }
+	| expression ':'
+			{ $$ = scat( 2, $1, $2 ); }
+	| ':' expression
+			{ $$ = scat( 2, $1, $2 ); }
+	;
+
+othertext_term
+	: token_brac '(' othertext ')'
+			{ $$ = scat( 4, $1, $2, $3, $4 ); }
+	| token_brac '(' othertext ':' othertext ')'
+			{ $$ = scat( 6, $1, $2, $3, $4, $5, $6 ); }
+	| '(' othertext ')'
+			{ $$ = scat( 3, $1, $2, $3 ); }
+	| text_term
 			{ $$ = $1; }
 	;
 
@@ -171,7 +219,14 @@ expression
 			{ $$ = scat( 2, $1, $2 ); }
 	;
 
-expression_term
+othertext
+	: othertext_term
+			{ $$ = $1; }
+	| othertext othertext_term
+			{ $$ = scat( 2, $1, $2 ); }
+	;
+
+text_term
 	: token
 			{ $$ = $1; }
 	| INTEGER_CONSTANT
@@ -180,15 +235,25 @@ expression_term
 			{ $$ = $1; }
 	| otherchar
 			{ $$ = $1; }
-	| '(' expression ')'
-			{ $$ = scat( 3, $1, $2, $3 ); }
-	| '(' opt_expression ':' opt_expression ')'
-			{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
 	| token '='
 			{ $$ = scat( 2, $1, $2 ); }
 	;
 
-otherchar  /*  Everything except alphanumerics, colon and parentheses  */
+opt_expression
+	: /* empty */
+			{ $$ = scat( 0 ); }
+	| expression
+			{ $$ = $1; }
+	;
+
+opt_othertext
+	: /* empty */
+			{ $$ = scat( 0 ); }
+	| expression
+			{ $$ = $1; }
+	;
+
+otherchar  /*  Everything except alphanumerics, colon, equals, parentheses  */
 	: '+'		{ $$ = $1; }
 	| '-'		{ $$ = $1; }
 	| '*'		{ $$ = $1; }
@@ -204,6 +269,10 @@ otherchar  /*  Everything except alphanumerics, colon and parentheses  */
 
 token
 	: TOKEN		{ $$ = $1; }
+	;
+
+token_brac
+	: TOKEN_BRAC	{ $$ = $1; }
 	;
 
 
