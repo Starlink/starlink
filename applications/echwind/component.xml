@@ -13,7 +13,7 @@ Utrecht Echelle Spectrograph (UES) or the UCL coude echelle spectrograph
 proposal, or before or during an observing run.
   </p></abstract>
   <dependencies >
-    <build>pgplot</build><sourceset>star2html</sourceset>
+    <build>pgplot</build><build>starx</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -23,7 +23,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [pgplot])
+STAR_DECLARE_DEPENDENCIES([build], [pgplot starx])
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun53)
