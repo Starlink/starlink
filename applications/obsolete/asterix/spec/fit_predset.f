@@ -58,14 +58,11 @@
 *    Local variables :
 	INTEGER MBNDPTR			! Pointer to bounds in response object
 	INTEGER I			! Index
-	INTEGER NVAL			! No of values mapped
+      INTEGER			RMFID, ARFID
 *-
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Extract locator
-      CALL ADI1_GETLOC( DID, DLOC, STATUS )
 
 *  Instrument folding case (model space bins taken from response structure)
       IF ( PREDDAT.CONVOLVE ) THEN
