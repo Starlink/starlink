@@ -5279,7 +5279,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Use the nearest pixel. */
 /* ---------------------- */
-      if ( interp == AST__NEAREST ) {
+      if ( (void *) interp == AST__NEAREST ) {
 
 /* Define a macro to use a "case" statement to invoke the
    nearest-pixel interpolation function appropriate to a given data
@@ -5319,7 +5319,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Linear interpolation. */
 /* --------------------- */
 /* Note this is also the default if "interp" is NULL. */
-      } else if ( ( interp == AST__LINEAR ) || ( interp == NULL ) ) {
+      } else if ( ( (void *) interp == AST__LINEAR ) || ( interp == NULL ) ) {
 
 /* Define a macro to use a "case" statement to invoke the linear
    interpolation function appropriate to a given data type. */
