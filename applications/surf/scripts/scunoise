@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -s
+#!/usr/local/bin/perl -w
 ########################################################################
 ####             J C M T   S O F T W A R E   G R O U P              ####
 #                -------------------------------------
@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.14  2000/04/18 04:26:42  timj
+#        Now works on WinNT
+#
 #        Revision 1.13  1999/10/28 03:33:13  rpt
 #        Fixed bug if only one noise file runlist did not get activated.
 #
@@ -71,12 +74,16 @@
 ########################################################################
 #
 
-#use strict;
+use strict;
 
 require 5.004;
 
 use English;
 use Tk;
+use Getopt::Long; 
+use File::Spec;    # For concatenation of directory paths
+use Sys::Hostname; # For hostname
+ 
 # use Tk::widgets qw/Dialog ErrorDialog/;
 use subs qw/inswt/;
 use vars qw/$MW $PW $OP $OM $CP $C $FONT $BW $BC $rf $mr $accept/;
@@ -86,32 +93,51 @@ use vars qw/$MW $PW $OP $OM $CP $C $FONT $BW $BC $rf $mr $accept/;
 my ($prog, $rest) = reverse(split(/\//,"$0",2));
 my $version = "1.5";
 
-my($host, $domain);
-chomp(($host,$rest) = split(/\./,`uname -n`,2));
-chomp(($domain) = `domainname`);
-$domain =~ s/JAC\.//;
-($domain,$rest) = split(/\./,$domain,2);
+# Get host name (although it is not used)
+my $host = hostname;
+
+# Domain name
+my $domain;
+if ($^O eq 'MSWin32') {
+  $domain = '';
+} else {
+  chomp( $domain = `domainname`);
+  $domain =~ s/JAC\.//; # Remove JAC. from domain name
+  ($domain,$rest) = split(/\./,$domain,2);  
+}
+
+my ($opt_v, $opt_d, $opt_h);
+
+my $status = GetOptions(
+			'help' => \$opt_h,
+			'version' => \$opt_v,
+			'debug' => \$opt_d,
+		       );
+
 
 # Get arguments 
-($v) && do { &ver_text; exit; };
+($opt_v) && do { &ver_text; exit; };
 
 # Debug output: 0 = none, 1 = little, 2 = lot?
 my $debug = 0;
-($d) && do { $debug = 1;};
+($opt_d) && do { $debug = 1;};
 
-(($h) || $#ARGV >= 2) && do { &help_text; exit; };
+(($opt_h) || $#ARGV >= 2) && do { &help_text; exit; };
 
 # Unix and Vax directories with noise files
 my $datadir = $ENV{'DATADIR'};
-$datadir = "'jac_default_directories'" if ($datadir eq "");
+unless (defined $datadir && $datadir ne '') {
+  $datadir = "'jac_default_directories'";
+}
 
 # Scuba_prefix (obsdate)
 my ($us, $um, $uh, $md, $mo, $yy, $wd, $yd, $isdst) = gmtime(time);
 my $obsdate = $ENV{'SCUBA_PREFIX'};
-$obsdate = "" unless ($obsdate =~ /^\d{8}$/);
+
+$obsdate = '' unless (defined $obsdate && $obsdate =~ /^\d{8}$/);
 
 # If no Scuba prefix, try extract from DATADIR
-if ($datadir =~ !/jac_default/ && $obsdate eq "") {
+if ($datadir !~ /jac_default/ && $obsdate eq "") {
     $datadir =~ /\/(\d{8})\// && (($obsdate) = ($1));
 }
 
@@ -137,6 +163,7 @@ my $hst = "";
 my (@runlist, @noiseentry, %bol, %xybol, @pw_point, @bw_point);
 my ($source, %min, %max, $varinfo, $iteminfo);
 my ($cutoff, $cutoff_line);
+my $location;
 
 # Columns in file
 my @col = ( "Bolometer", "Chop", "Chop error", "Cal", "Cal error", "Quality" );
@@ -160,6 +187,7 @@ my $ybottom = 250;
 # Default plot variable (from @col) and Canvas message
 my $plotvar = 2;
 my $flatvar = undef;
+my $newmode;
 my $defmess = "Point to dot for info\nDouble-click for flat-field\nLeft button for area define";
 my $ffmode = "names";
 
@@ -176,7 +204,12 @@ $run     = $ARGV[1] if ($#ARGV > 0);
 @noiseentry = ();
 %min = %max = ();
 %pinfo = ();
-$pinfo{'prcmd'} = 'lpr';
+if ($^O eq 'MSWin32') {
+  $pinfo{'prcmd'} = File::Spec->catfile(File::Spec->tmpdir, 'scunoise.ps');
+} else {
+  $pinfo{'prcmd'} = '| lpr';   
+}
+
 $newplot = 1;
 $op_message = "";
 
@@ -249,13 +282,13 @@ sub set_disks {
   if ($datadir ne "'jac_default_directories'" && $datadir ne "") {
     push(@disk,$datadir);
     if ($datadir =~ /\/dem/) {
-      $ddir = $datadir;
+      my $ddir = $datadir;
       $ddir =~ s/\/dem/\/ro/;
       push(@disk,$ddir) if (-e "$ddir");
     }
   }
 
-  push(@disk,".");
+  push(@disk,File::Spec->curdir);
   if ($domain eq "jach" || $domain eq "Hilo") {
     push(@disk,"/net/luu/scubadata");
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
@@ -265,11 +298,16 @@ sub set_disks {
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
     push(@disk,"/net/luu/scubadata");
+  } elsif ($^O eq 'MSWin32') {
+    push(@disk, "\\\\Ola\\scuba-data\\");
+
   }
 
   if ($debug) {
-    for ($i = 0 ; $i < $#disk; $i++) {
-      print "Location $i: $disk[$i]/.\n";
+    my $i = 0;
+    foreach my $disk (@disk) {
+      print "Location $i: $disk[$i]\n";
+      $i++;
     }
   }
 
@@ -412,7 +450,7 @@ sub obsdir_panel {
 #		       unless ($obsdate =~ /^\d/);}]);
 
     # Find scans in case $obsdate specified upon entry but $run not.
-    if ($obsdate =~ /^\d/ && $run == 0 && $#runlist < 0) {
+    if ($obsdate =~ /^\d/ && !defined $run && $run == 0 && $#runlist < 0) {
 	$scan->invoke;
     }
 
@@ -726,16 +764,19 @@ sub scandisk {
         }
 
         $location = $disk[$i];
-	if ($location =~ /luu/) {
-	  $sem = find_sem($obsdate);
-	  $location = "${location}/${sem}/${obsdate}";
+	if ($location =~ /luu/ || $location =~ /Ola/) {
+	  # Both these are luu
+	  my $sem = find_sem($obsdate);
+	  $location = File::Spec->catdir($location, $sem, $obsdate);
 	} elsif ($location =~ /ieie/) {
-	  $location = "${location}/${obsdate}";
+	  # ieie version of data disk
+	  $location = File::Spec->catdir($location, $obsdate);
 	} elsif ($location =~ /^\/net/) {
-	  $location = "${location}/${obsdate}/ro";
+	  # This is deemed to be a vax disk
+	  $location = File::Spec->catdir($location, $obsdate, 'ro');
 	}
 
-	print "Trying directory '${location}/'..." if ($debug);
+	print "Trying directory '${location}'..." if ($debug);
 	@files = ();
         $op_message = "";
 	if (-e "${location}") {
@@ -747,7 +788,7 @@ sub scandisk {
 		do {$op_message = "Can't open directory $location! : $!"; };
 
             my $odate = substr($obsdate,2,99);
-	    if ($op_message == "") {
+	    if ($op_message eq "") {
     	        push(@files,grep(/$odate/,grep(/^noise/i, readdir(DIR))));
 		closedir(DIR);
 	    }
@@ -781,7 +822,7 @@ sub scandisk {
 
     }
 
-    $run == $runlist[0] if ($#runlist == 0);
+    $run = $runlist[0] if ($#runlist == 0);
     @runlist = sort { $a <=> $b } @runlist if ($#runlist > -1);
 
     if ($found) {
@@ -847,17 +888,22 @@ sub getfile {
 	    }
 
 	    $location = $disk[$i];
-	    if ($location =~ /luu/) {
-              $sem = find_sem($obsdate);
-	      $location = "${location}/${sem}/${obsdate}";
+	    if ($location =~ /luu/ || $location =~ /Ola/) {
+	      # Luu data disk
+              my $sem = find_sem($obsdate);
+	      $location = File::Spec->catdir($location, $sem, $obsdate);
 	    } elsif ($location =~ /ieie/) {
-	      $location = "${location}/${obsdate}";
+	      # IEIE copy of data
+	      $location = File::Spec->catdir($location, $obsdate);
 	    } elsif ($location =~ /^\/net/) {
-	      $location = "${location}/${obsdate}/ro";
+	      # Vax location
+	      $location = File::Spec->catdir($location, $obsdate, 'ro');
 	    }
 
-	    print "Trying ${location}/$rofile...\n" if ($debug);
-	    if (-e "${location}/$rofile") {
+	    my $noise_file = File::Spec->catfile($location, $rofile);
+
+	    print "Trying $noise_file...\n" if ($debug);
+	    if (-e "$noise_file") {
 		print "found\n" if ($debug);
 		$found = 1;
 		last;
@@ -896,10 +942,12 @@ sub rddata {
     # Open the file and read
     my @log = ();
 
-    open(NOISE,"< $location/$rofile")
+    my $noise_file = File::Spec->catfile($location, $rofile);
+
+    open(NOISE,"< $noise_file")
 	or do { 
 	    $op_message =
-       "Error: could not open ${location}/${rofile}! : $!";
+       "Error: could not open $noise_file! : $!";
 	    if (defined $OM) {
 		$OM->delete('1.0','end');
 		$OM->insert('end',"$op_message");
@@ -924,7 +972,7 @@ sub rddata {
     # Extract the information from the file.
     @noiseentry = ();
     $i = 0;
-    $surf_header = 0;
+    my $surf_header = 0;
     while ($i <= $#log) {
 
 	$line = $log[$i];
@@ -1167,7 +1215,8 @@ sub plot {
 
     # Draw the lines if the ends are within the plot boundaries
     my $np = $#noiseentry;
-    my $r = (($r = 1.5*140/$xr) < 2.5 ? 2.5 : $r);
+    my $r = 1.5*140/$xr;
+    $r = ($r < 2.5 ? 2.5 : $r);
     $r = ($r > 6 ? 6 : $r);
     my $ibol;
     @pw_point = ();
@@ -1207,7 +1256,7 @@ sub plot {
 		   -fill => $qc);
     }
 
-    if (defined $cutoff_line && $flatvar eq $plotvar) {
+    if (defined $cutoff_line && defined $flatvar && $flatvar eq $plotvar) {
        $yp = $ybottom - ($cutoff-$ylo) * ($ybottom-$ytop)/$yr;
        $cutoff_line = 
        $C->create('line', $xleft, $yp, $xright, $yp, -width => 2, 
@@ -1525,9 +1574,10 @@ sub area_save {
     }
     
     $SIG{'PIPE'} = sub {};
-    open(LPR, "| $pinfo->{'prcmd'}");
+    open(LPR, "$pinfo->{'prcmd'}")
+      || do { warn "Error opening $pinfo->{'prcmd'}"; return };
     print LPR $a;
-    close(LPR);
+    close(LPR) || do {warn "Error closing $pinfo->{'prcmd'}"; };
 
 } # end area_save
 
@@ -1545,9 +1595,9 @@ sub find_sem {
 
 
    my $sem = "unknown";
-   $year = substr($obsdate,2,2);
-   $pyear = substr(($obsdate-10000),2,2);
-   $monthday= substr($obsdate,4,4);
+   my $year = substr($obsdate,2,2);
+   my $pyear = substr(($obsdate-10000),2,2);
+   my $monthday= substr($obsdate,4,4);
 
    if ( $monthday > 201 && $monthday < 802 ) {
      $sem = "m${year}a";
@@ -1559,7 +1609,7 @@ sub find_sem {
 
    print "DEBUG: ..... is mapped to semester ${sem}\n" if $debug;
 
-   $sem = $sem;
+   return $sem;
 
 }
 
