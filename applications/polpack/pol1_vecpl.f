@@ -71,8 +71,6 @@
 *     6-AUG-1998 (DSB):
 *        PGPLOT viewport reduced slightly in order to avoid vectors
 *        over-writing the border.
-*     17-FEB-1999 (DSB):
-*        Do not plot zero length vectors.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -171,7 +169,6 @@
 
 *  Skip over bad data values.
          IF ( VECMAG( I ) .NE. VAL__BADR .AND. 
-     :        VECMAG( I ) .NE. 0.0 .AND. 
      :        VECORN( I ) .NE. VAL__BADR .AND.
      :        X( I ) .NE. VAL__BADD .AND.
      :        Y( I ) .NE. VAL__BADD ) THEN
