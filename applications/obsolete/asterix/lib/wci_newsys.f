@@ -24,7 +24,7 @@
 *        The epoch of the mean equator and equinox in years.
 *     EPOCH = DOUBLE (given)
 *        Epoch of the observation in years. If the value WCI__FLAG is
-*        supplied then the MJD of the EQNX is used.
+*        supplied then the year of the EQNX is used.
 *     ID = INTEGER (returned)
 *        The ADI identifier of the new CoordSystem object
 *     STATUS = INTEGER (given and returned)
@@ -54,9 +54,6 @@
 
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
-
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
 
 *  References:
 *     WCI Subroutine Guide : http://www.sr.star.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
