@@ -435,12 +435,7 @@ PRIVATE_INCLUDES =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = HLPCMD PRM_PAR NUM_DEF_D MSG_PAR DAT_ERR AST_PAR \
-                    SAE_PAR NUM_DEC DAT_PAR NUM_CMN TRN_PAR NUM_DEF \
-		    IDI_ERR CTM_PAR FIO_ERR NUM_DEC_CVT NDF_ERR IDI_PAR \
-		    FIO_PAR KPG_AST AGI_ERR NUM_DEF_CVT NDF_PAR GNS_PAR \
-		    PAR_ERR GRP_PAR NUM_DEC_R PAR_PAR MAG_ERR CHR_ERR \
-		    NUM_DEC_D IRA_PAR SUBPAR_PAR NUM_DEF_R GKS_PAR
+EXTERNAL_INCLUDES = HLPCMD PRM_PAR NUM_DEF_CVT SAE_PAR PAR_ERR NUM_DEC_CVT
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -449,7 +444,7 @@ EXTERNAL_INCLUDES = HLPCMD PRM_PAR NUM_DEF_D MSG_PAR DAT_ERR AST_PAR \
 F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(MONO_SOURCE) 
 
-KAPRH_F1_ROUTINES = greyplot.f 
+KAPRH_F1_ROUTINES = greyplot.f contover.f
 
 #  Kappa f files for which there are no corresponding iraf .par files.
 KAPRH_F2_ROUTINES = krhhelp.f
@@ -458,9 +453,10 @@ KAPRH_F2_ROUTINES = krhhelp.f
 #  the f file name by removing the .f file suffix.
 KAPRH_F_ROUTINES = $(KAPRH_F1_ROUTINES) $(KAPRH_F2_ROUTINES)
 
-KAPSUB_F_ROUTINES = kps1_dsclb.f kps1_dscld.f kps1_dscli.f kps1_dsclr.f \
-kps1_dsclw.f kps1_fainb.f kps1_faind.f kps1_faini.f kps1_fainr.f \
-kps1_fainw.f kps1_imzbo.f ncraxs.f gethlp.f
+KAPSUB_F_ROUTINES = cnthlt.f cntsbp.f gethlp.f kps1_cnser.f kps1_cntur.f \
+kps1_dsclb.f kps1_dscli.f kps1_dsclr.f kps1_dscld.f kps1_dsclw.f \
+kps1_faind.f kps1_fainb.f kps1_fainw.f kps1_fainr.f kps1_faini.f \
+kps1_imzbo.f lccell.f ncraxs.f
 
 MONO_SOURCE = kaprh_mon.f
 
@@ -599,41 +595,12 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 #
 #  Rules to set up links to locate each of the above include files.
 #
-AGI_ERR:	$(STAR_INC)/agi_err;	$(LINK) $? $@
-AST_PAR:	$(STAR_INC)/ast_par;	$(LINK) $? $@
-CHR_ERR:	$(STAR_INC)/chr_err;	$(LINK) $? $@
-CTM_PAR:	$(STAR_INC)/ctm_par;	$(LINK) $? $@
-DAT_ERR:	$(STAR_INC)/dat_err;	$(LINK) $? $@
-DAT_PAR:	$(STAR_INC)/dat_par;	$(LINK) $? $@
-FIO_ERR:	$(STAR_INC)/fio_err;	$(LINK) $? $@
-FIO_PAR:	$(STAR_INC)/fio_par;	$(LINK) $? $@
-GKS_PAR:	$(STAR_INC)/gks_par;	$(LINK) $? $@
-GNS_PAR:	$(STAR_INC)/gns_par;	$(LINK) $? $@
-GRP_PAR:	$(STAR_INC)/grp_par;	$(LINK) $? $@
 HLPCMD:		$(STAR_INC)/hlpcmd;	$(LINK) $? $@
-IDI_ERR:	$(STAR_INC)/idi_err;	$(LINK) $? $@
-IDI_PAR:	$(STAR_INC)/idi_par;	$(LINK) $? $@
-IRA_PAR:	$(STAR_INC)/ira_par;	$(LINK) $? $@
-KPG_AST:	$(STAR_INC)/kpg_ast;	$(LINK) $? $@
-MAG_ERR:	$(STAR_INC)/mag_err;	$(LINK) $? $@
-MSG_PAR:	$(STAR_INC)/msg_par;	$(LINK) $? $@
-NDF_ERR:	$(STAR_INC)/ndf_err;	$(LINK) $? $@
-NDF_PAR:	$(STAR_INC)/ndf_par;	$(LINK) $? $@
-NUM_CMN:	$(STAR_INC)/num_cmn;	$(LINK) $? $@
-NUM_DEC:	$(STAR_INC)/num_dec;	$(LINK) $? $@
 NUM_DEC_CVT:	$(STAR_INC)/num_dec_cvt;	$(LINK) $? $@
-NUM_DEC_D:	$(STAR_INC)/num_dec_D;	$(LINK) $? $@
-NUM_DEC_R:	$(STAR_INC)/num_dec_R;	$(LINK) $? $@
-NUM_DEF:	$(STAR_INC)/num_def;	$(LINK) $? $@
 NUM_DEF_CVT:	$(STAR_INC)/num_def_cvt;	$(LINK) $? $@
-NUM_DEF_D:	$(STAR_INC)/num_def_D;	$(LINK) $? $@
-NUM_DEF_R:	$(STAR_INC)/num_def_R;	$(LINK) $? $@
 PAR_ERR:	$(STAR_INC)/par_err;	$(LINK) $? $@
-PAR_PAR:	$(STAR_INC)/par_par;	$(LINK) $? $@
 PRM_PAR:	$(STAR_INC)/prm_par;	$(LINK) $? $@
 SAE_PAR:	$(STAR_INC)/sae_par;	$(LINK) $? $@
-SUBPAR_PAR:	$(STAR_INC)/subpar_par;	$(LINK) $? $@
-TRN_PAR:	$(STAR_INC)/trn_par;	$(LINK) $? $@
 
 #
 #  Rules for extracting source files from the source archive.  Split to
@@ -1694,20 +1661,18 @@ $(PKG_NAME)_ifls.tar:
 #  files). These are normally generated automatically from the source
 #  files.
 
-
+cnthlt.o:	 SAE_PAR
+cntsbp.o:	 SAE_PAR
 gethlp.o:	 SAE_PAR HLPCMD
-greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
-kaprh_mon.o:	 SAE_PAR
-kps1_dsclb.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
-kps1_dscld.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
-kps1_dscli.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
-kps1_dsclr.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
-kps1_dsclw.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kps1_cnser.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
+kps1_cntur.o:	 SAE_PAR PRM_PAR
 kps1_fainb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_faind.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_faini.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_fainr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_fainw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_imzbo.o:	 SAE_PAR
+lccell.o:	 SAE_PAR PRM_PAR
+ncraxs.o:	 SAE_PAR
 
 #  End of makefile.
