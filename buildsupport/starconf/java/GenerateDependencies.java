@@ -544,12 +544,13 @@ public class GenerateDependencies {
                 flatdeps.println("\t>");
                 flatdeps.println("<dependencies>");
                 if (! ssdeps.isEmpty())
-                    flatdeps.println("<sourceset>"
-                                     + showSet(ssdeps, "", "").replaceAll(" ", "\n       ")
-                                     + "</sourceset>");
-                flatdeps.println("<build>"
-                                 + showSet(builddeps,"","").replaceAll(" ", "\n       ")
-                                 + "</build>");
+                    for (Iterator i=ssdeps.iterator(); i.hasNext(); ) {
+                        flatdeps.println
+                                ("<sourceset>" + i.next() + "</sourceset>");
+                    }
+                for (Iterator i=builddeps.iterator(); i.hasNext(); ) {
+                    flatdeps.println("<build>" + i.next() + "</build>");
+                }
                 flatdeps.println("</dependencies>");
                 flatdeps.println("</component>");
             }
