@@ -1,31 +1,36 @@
 # dialog.tcl - general purpose dialogs
 #
 # Copyright (C) 1994 Allan Brighton (abrighto@eso.org)
+# Copyright (C) 1999 Peter W. Draper (P.W.Draper@durham.ac.uk)
+#                --- modified filename_dialog to check if default
+#                    types are changed, before resettting.
 # "@(#) $Id$"
 
 
-# get a file name from the user and return it
-# or the empty string
+# Get a file name from the user and return it or the empty string.
+# The optional arguments are the directory (first time only),
+# the filter value, the parent widget and an optional list of
+# file types (suffixes) to display in a menu.
 
 proc filename_dialog {{dir "."} {filter "*"} {parent ""} {types ""}} {
-    set w .fs
-    if {![winfo exists $w]} {
-	FileSelect $w -dir $dir -filter $filter -transient 1 \
-	    -withdraw 1 -filter_types $types
-	
-    } else {
-	#  Only reconfigure if default types are changed.
-	set curtypes [$w cget -filter_types]
-	if { "$curtypes" != "$types" } {
-	    $w config -filter $filter -filter_types $types
-	}
-    }
-    if {"$parent" != ""} {
-	wm transient $w [winfo toplevel $parent]
-    }
-    if {[$w activate]} {
-        return [$w get]
-    }
+   set w .fs
+   if {![winfo exists $w]} {
+      FileSelect $w -dir $dir -filter $filter -transient 1 \
+         -withdraw 1 -filter_types "$types"
+   } else {
+
+      #  Only reconfigure if default types are changed.
+      set curtypes [$w cget -filter_types]
+      if { "$curtypes" != "$types" } {
+         $w config -filter $filter -filter_types "$types"
+      }
+   }
+   if {"$parent" != ""} {
+      wm transient $w [winfo toplevel $parent]
+   }
+   if {[$w activate]} {
+      return [$w get]
+   }
 }
 
 # error message routine with exit button
@@ -53,13 +58,13 @@ proc errexit_dialog {msg {parent ""}} {
 # error  message routine
 
 proc error_dialog {msg {parent ""}} {
-    
     if {"$parent" != ""} {
 	if {"[set parent [winfo toplevel $parent]]" == "."} {
 	    set parent ""
 	}
     }
-    set w $parent.error_dialog
+    set w $parent.error_dialog[clock clicks]
+
     catch {destroy $w} 
     [util::DialogWidget $w \
 	 -title Error \
@@ -178,7 +183,7 @@ proc confirm_dialog {msg {parent ""}} {
 	       -text $msg \
 	       -bitmap questhead \
 	       -transient 1 \
-	       -default 1 \
+	       -default 0 \
 	       -buttons {Yes Cancel}]
     return [expr {[$d activate] == 0}]
 }
@@ -196,6 +201,30 @@ proc input_dialog {msg {parent ""}} {
     set w $parent.input_dialog
     catch {destroy $w}
     set d [InputDialog $w \
+	       -title Input \
+	       -text $msg \
+	       -bitmap questhead \
+	       -transient 1 \
+	       -messagewidth 4i \
+	       -default 0 \
+	       -buttons {OK Cancel}]
+    return [$d activate]
+}
+
+
+# Get a username and passwd from the user and return a list
+# {username passwd} or an empty string (in case the user cancels 
+# the operation)
+
+proc passwd_dialog {msg {parent ""}} {
+    if {"$parent" != ""} {
+	if {"[set parent [winfo toplevel $parent]]" == "."} {
+	    set parent ""
+	}
+    }
+    set w $parent.input_dialog
+    catch {destroy $w}
+    set d [PasswdDialog $w \
 	       -title Input \
 	       -text $msg \
 	       -bitmap questhead \
