@@ -1,0 +1,40 @@
+*+
+*  Name:
+*     MSG_CMN
+
+*  Purpose:
+*     Define Message System global variables
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of module:
+*     Global variables include file.
+
+*  Description:
+*     Define the common blocks holding the Message Reporting System 
+*     informational filtering level and other tuning parameters.
+
+*  Authors:
+*     PCTR: P.C.T. Rees (STARLINK)
+*     AJC: A.J.Chipperfield (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-JAN-1991 (PCTR):
+*        Original version.
+*     20-JUL-1999 (AJC)
+*        Add wrap and stream parameters
+*     {enter_further_changes_here}
+
+*-
+
+*  Common Blocks:
+      INTEGER MSGINF                    ! Informational filtering level
+      INTEGER MSGWSZ                    ! Line size for wrapping
+      LOGICAL MSGSTM                    ! Whether MSG tuning is STREAM
+
+      COMMON / MSGCM1 / MSGINF
+      COMMON / MSGCM2 / MSGWSZ, MSGSTM
+
+*.

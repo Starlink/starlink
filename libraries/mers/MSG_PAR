@@ -1,0 +1,48 @@
+*+
+*  Name:
+*     MSG_PAR
+
+*  Purpose:
+*     Define the MSG_ global constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of the public global constants used 
+*     by the MSG_ system.
+
+*  Authors:
+*     BDK: Dennis Kelly (ROE)
+*     PCTR: P.C.T. Rees (STARLINK)
+*     AJC: A.J.Chipperfield (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     20-JAN-1990 (PCTR):
+*        Original version adapted from MSG_SYS.
+*     21-JAN-1991 (PCTR):
+*        Added message output level symbolic constants.
+*     28-OCT-1997 (AJC)
+*        MSG_SZMSG 200->300
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+      INTEGER MSG__NORM                 ! Normal conditional message output level
+      PARAMETER ( MSG__NORM = 2 )
+
+      INTEGER MSG__QUIET                ! Quiet conditional message output level
+      PARAMETER ( MSG__QUIET = 1 )
+
+      INTEGER MSG__SZMSG		! Maximum length of message text
+      PARAMETER ( MSG__SZMSG = 300 )
+
+      INTEGER MSG__VERB                 ! Verbose conditional message output level
+      PARAMETER ( MSG__VERB = 3 )
+
+*.

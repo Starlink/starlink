@@ -1,0 +1,27 @@
+Version 1.8
+-----------
+MSG1_GREF is completely revised to simplify its interface with the parameter
+system, using a new routine SUBPAR_GREF. This allows the underlying parameter
+system to be replaced more easily. Suboutine MSG1_GLOC is now not requited and
+has been removed. This Version of MERS requires PCS Version 4.1 or later.
+
+Version 1.7-1.
+--------------
+Corrects a problem using the reserved token ^STATUS if another token precedes
+it in the message, and includes a minor update to SUN/104.
+
+MERS Version 1.7 is released.
+-----------------------------
+This version has been substantially revised internally to use version 2.0 of
+EMS, which is implemented in C.
+
+MERS now uses only the public interface to EMS (formerly a number of internal
+EMS routines were called).
+
+Because the lowest level is now in C, output of error message at the base
+error reporting level is now done by C printf commands. On some systems this
+can lead to incorrect sequencing of messages if other output is done by
+Fortran WRITE.
+
+A bug which caused the linker to report subroutine MSG_IFSET missing if
+MSG_IFGET was called, has been corrected.

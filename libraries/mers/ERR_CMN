@@ -1,0 +1,44 @@
+*+
+*  Name:
+*     ERR_CMN
+
+*  Purpose:
+*     Define the Error Reporting System global variables.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of module:
+*     Global variables include file.
+
+*  Description:
+*     Define the common blocks holding the Error Reporting System 
+*     global variables.
+
+*  Authors:
+*     PCTR: P.C.T. Rees (STARLINK)
+*     AJC: A.J.Chipperfield (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-JUN-1991 (PCTR):
+*        Original version.
+*     20-JUL-1999 (AJC)
+*        Add tuning parameters
+*     {enter_further_changes_here}
+
+*-
+
+*  Common Blocks:
+      LOGICAL ERRBEL                    ! Bell character switch
+      LOGICAL ERROPN                    ! Output file status
+      INTEGER ERRWSZ                    ! Line size for wrapping
+      LOGICAL ERRRVL                    ! Reveal all error messages
+      LOGICAL ERRSTM                    ! Error in 'stream' mode
+      INTEGER ERRDEF                    ! The 'default' error level
+
+      COMMON / ERRCM1 / ERROPN, ERRBEL
+      COMMON / ERRCM2 / ERRWSZ, ERRRVL, ERRSTM
+      COMMON / ERRCM3 / ERRDEF
+
+*.
