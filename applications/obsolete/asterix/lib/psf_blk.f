@@ -34,13 +34,10 @@
 
 *  Global Variables:
       INCLUDE 'PSF_CMN'			! PSF Initialisation Switches
-*        PSFINIT = LOGICAL (Returned)
-*           Psf subsystem initialised?
 *        PSFAUTO = LOGICAL (Returned)
 *           Psf load automatic?
 
 *  Global data:
-      DATA PSFINIT/.FALSE./
       DATA PSFAUTO/.FALSE./
 *.
 
