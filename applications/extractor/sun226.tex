@@ -481,13 +481,13 @@ facilities and can handle images and catalogues in a variety of formats.}
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
+      \stardoctitle
    \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
 % ? Add picture here if required for the hypertext version.
-   \htmladdimg{sun225fig.gif}
+   \begin{center}
+     \htmladdimg{sun225fig.gif}
+   \end{center}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -545,7 +545,7 @@ facilities and can handle images and catalogues in a variety of formats.}
 \setcounter{page}{1}
 
 % ? Main text
-\section{Introduction}
+\section{\xlabel{introduction}Introduction}
 \EXTRACTOR\ is a program for automatically detecting objects on an
 astronomical image and building a catalogue of their properties. It is
 particularly suited for the reduction of large scale galaxy-survey
@@ -555,7 +555,7 @@ data, but also performs well on other astronomical images.
 (Source-Extractor) program\footnote{BERTIN E. and ARNOUTS S., 1996,
 A\&AS 117,393} re-packaged for use in the \xref{Starlink Software
 Environment}{sg4}{}\latex{ (see SG/4)}.  This means that it uses the
-Starlink parameter system, accepts images in the Starlink
+Starlink parameter system, accepts images in
 \xref{NDF}{sun33}{abstract} format \latex{(see SUN/33)} and uses the
 \xref{AST}{sun210}{} library \latex{(SUN/210)} for astrometry.
 
@@ -568,24 +568,24 @@ by using the \xref{\CONVERT}{sun55}{abstract} package \latex{(see
 SUN/55)} -- these include \htmladdnormallink{FITS}{\FITSURL} and
 \htmladdnormallink{IRAF}{\IRAFURL} OIF.
 
-Native \SExtractor, version 2.0.15, is also included in the
+An unmodified version of \SExtractor\ (2.0.15) is also included in the
 distribution of \EXTRACTOR.  You can find details of \SExtractor's
 operation, and how to configure it, in the
 \htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is issued
-as a Starlink
-Miscellaneous User Document, MUD/165\footnote{Note this
+as a Starlink Miscellaneous User Document, MUD/165\footnote{Note this
 document is still in draft consequently you should read this in
 conjunction with the A\&AS paper.}) \dash\ you configure \EXTRACTOR\
-in much the same way, although \htmlref{some restrictions}{some_restrictions}\latex{ (see
-Section~\ref{some_restrictions})} will apply.
+in much the same way, although with 
+\htmlref{some restrictions}{some_restrictions}
+\latex{(see Section~\ref{some_restrictions})}.
 
-This document describes how to run \EXTRACTOR, and gives
+This document describes how to run \EXTRACTOR, and includes
 \htmlref{instructions for running \SExtractor}{running_sextractor}
 from the Starlink distribution.
 
-\section{\EXTRACTOR}
+\section{\xlabel{extractor}\EXTRACTOR}
 
-Like any Starlink program, \EXTRACTOR\ may be run from the
+Like any Starlink program \EXTRACTOR\ may be run from the
 Unix shell or from a user-interface such as
 \xref{ICL}{sg5}{abstract}\latex{ (see SG/5)}.
 A useful summary of the rich variety of methods of specifying parameter values
@@ -610,20 +610,19 @@ IMAGE - Input image /'image'/ >
 where CONFIG is the name of the `preferences' file and IMAGE is the name of
 the image file to be processed.
 
-Suggested values are given between \texttt{//} in the prompt.
-You can accept the suggested values by just typing \verb!<RETURN>!, or type in
-new values of your own.
-If you accept the above suggested values, \EXTRACTOR\ will process the NDF
-file \texttt{image} using the installed default configuration files to
-produce a catalogue named \texttt{test.cat} (this name is specified in the
-preferences file).
+Suggested values are given between \texttt{//} in the prompt.  You can
+accept the suggested values by just typing \verb!<RETURN>!.  If you
+accept the suggested values shown above, \EXTRACTOR\ will process the
+NDF \texttt{"image"} using the installed default configuration
+files to produce a catalogue named \texttt{test.cat} (this name is
+specified in the preferences file).
 
 CONFIG has a `default' value of
 \texttt{\$EXTRACTOR\_DIR/config/default.sex}.  This file has some
 \htmlref{sensible defaults}{defaults} \latex{(described in
 Section~\ref{defaults})} but you will probably want to copy it to your
 own directories and modify it to your taste (as you would for the
-native \SExtractor program).  Similarly with the other configuration
+native \SExtractor\ program).  Similarly with the other configuration
 files.  The environment variable \texttt{EXTRACTOR\_DIR} is defined to
 point to the directory containing the \EXTRACTOR\ program and the
 \texttt{config} directory.
@@ -657,10 +656,10 @@ run only). The list of changes is terminated by replying with the NULL
 response (\texttt{!}) to the prompt.
 The
 \htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}
-gives a full list of possible parameter names and values but it is only
+gives a full list of possible parameter names and values, but it is only
 sensible to change a few in this way.
 
-\section{\label{defaults}\xlabel{defaults}The Default Configuration}
+\section{\xlabel{the_default_configuration}\label{defaults}\xlabel{defaults}The Default Configuration}
 
 The directory \texttt{\$EXTRACTOR\_DIR/config} contains the default
 configuration files.
@@ -696,7 +695,7 @@ For a full description of the meaning of the configuration parameters, see
 the
 \htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
 
-\section{Using images in non-NDF formats}
+\section{\xlabel{using_images_in_nonndf_formats}Using images in non-NDF formats}
 If you want to read an image in one of the
 \xref{formats handled by the
 \CONVERT}{sun55}{the_default_conversion_commands} package,
@@ -720,10 +719,10 @@ IMAGE - Input image /'image'/ > image.fit
 will use the FITS file \texttt{image.fit}, automatically converting it to a
 temporary NDF file and then reading the temporary file.
 
-\section{Running \SExtractor}
+\section{\xlabel{running_sextractor}Running \SExtractor \label{running_sextractor}}
 The native version of \SExtractor\ is also distributed with \EXTRACTOR.
 This works exclusively with FITS files but will provide the full range of
-facilities. The executable image will be installed in \texttt{\$EXTRACTOR\_DIR}.
+facilities. The executable image will be installed in \texttt{\$EXTRACTOR\_DIR}
 and it is run as described in the
 \htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
 
@@ -744,7 +743,7 @@ Note that if the \texttt{-c} option is omitted, file \texttt{default.sex} in the
 current working directory will be used \dash\ if you want to use the installed
 default file, you will need to specify it explicitly.
 
-\section{Using GAIA and \EXTRACTOR}
+\section{\xlabel{using_gaia_and_extractor}Using GAIA and \EXTRACTOR}
 The Graphical Astronomy and Image Analysis Tool (GAIA -
 \xref{SUN/214}{sun214}{}), has an interactive toolbox facility that
 uses the \EXTRACTOR\ (and \SExtractor) programs. This allows you to
@@ -762,12 +761,12 @@ objects on the basis of their measurements.
 
 \section{\label{some_restrictions}\xlabel{some_restrictions}Some Restrictions}
 
-\SExtractor\ uses various configuration files to provide numerous processing
-options.
-Many of these options have not been tried via the \EXTRACTOR\ route so it is
-quite possible that problems may arise. Please notify the authors if you
-come across any problems in using \EXTRACTOR. Further development and testing
-is planned.
+\SExtractor\ uses various configuration files to provide numerous
+processing options.  Many of these options have not been tried
+extensively in the \EXTRACTOR\ incarnation, so it is quite possible
+that problems may arise. Please notify the authors if you come across
+any problems in using \EXTRACTOR. Further development and testing is
+planned.
 
 \begin{itemize}
 \item Some areas which have not been implemented are:
@@ -783,21 +782,21 @@ is planned.
 \end{itemize}
 \end{itemize}
 
-\section{References}
+\section{\xlabel{references}References}
 Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
 Bertin E. : MUD/165 : SExtractor V2.0 User's Guide (DRAFT).\\
 Bertin E. and Arnouts S., 1996, A\&AS 117,393\\
-Currie M.J. : \xref{SUN/95}{sun95}{} : KAPPA \dash\ Kernel Application Package.
+Currie M.J. : \xref{SUN/95}{sun95}{} : KAPPA \dash\ Kernel Application Package.\\
 Currie M.J. \textit{et al.} : \xref{SUN/55}{sun55}{} : CONVERT \dash\ A Format-conversion Package.\\
-Davenhall, A.C. : \xref{SUN/190} : CURSA \dash\ Catalogue and Table Manipulation Applications.\\
-Draper, P.W. : \xref{SUN/214} : GAIA \dash\ Graphical Astronomy and Image Analysis Tool.
+Davenhall, A.C. : \xref{SUN/190}{sun190}{} : CURSA \dash\ Catalogue and Table Manipulation Applications.\\
+Draper, P.W. : \xref{SUN/214}{sun214}{} : GAIA \dash\ Graphical Astronomy and Image Analysis Tool.\\
 Lawden M.D.: \xref{SG/4}{sg4}{} : ADAM \dash\ The Starlink Software Environment.\\
 Warren-Smith R.F. : \xref{SSN/20}{ssn20}{} : Adding Format Conversion Facilities to the NDF Data Access Library.\\
 Warren-Smith R.F. : \xref{SUN/33}{sun33}{} : NDF \dash\ Routines for Accessing the Extensible N-Dimensional Data Format.\\
 
 \newpage
 \appendix
-\section{Specification of \EXTRACTOR}
+\section{\xlabel{specification_of_extractor}Specification of \EXTRACTOR}
 
 \small
 \sstroutine{
@@ -815,11 +814,11 @@ Warren-Smith R.F. : \xref{SUN/33}{sun33}{} : NDF \dash\ Routines for Accessing t
       The source measurements are written to a catalogue (which can be
       of several different formats), so that they can be analysed
       (possibly by a catalogue handling package like CURSA
-      -- \xref{SUN190}{sun190}{}).
+      -- \xref{SUN/190}{sun190}{}).
 
       \EXTRACTOR, is based on the \SExtractor\ program which is
       described in the \SExtractor's User Guide
-      (\xref{MUD/165}{mud165}{}). Consult this about all the various
+      (\htmladdnormallink{MUD/165}{\MUD}). Consult this about all the various
       options that are available and for the rationale behind the
       program.
    }
@@ -839,7 +838,7 @@ Warren-Smith R.F. : \xref{SUN/33}{sun33}{} : NDF \dash\ Routines for Accessing t
         first image will be used for detection and parameterising
         and the second will be used to actually measure the data
         values. Using this method allows you to measure the same
-        objects many images, or two use a high signal to noise image
+        objects many images, or to use a high signal to noise image
         to determine the measurement regions on a low signal to noise
         image
 
@@ -901,7 +900,7 @@ Warren-Smith R.F. : \xref{SUN/33}{sun33}{} : NDF \dash\ Routines for Accessing t
 }
 \normalsize
 \newpage
-\section{\label{default_sex}
+\section{\xlabel{labeldefault_sex}\label{default_sex}
          \xlabel{default_sex}
          The Default Preferences}
 
@@ -919,7 +918,7 @@ installed default preferences file.
 
 CATALOG_NAME    test.cat        # name of the output catalog
 CATALOG_TYPE    ASCII_HEAD      # "NONE","ASCII_HEAD","ASCII","FITS_1.0"
-                                # or "FITS_LDAC"
+                                # "FITS_LDAC" or "ASCII_SKYCAT"
 
 PARAMETERS_NAME $EXTRACTOR_DIR/config/default.param
                                 # name of the file containing catalog contents
