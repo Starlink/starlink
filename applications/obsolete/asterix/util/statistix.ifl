@@ -2,7 +2,7 @@ INTERFACE STATISTIX
 
    PARAMETER INP
       POSITION  1
-      TYPE      'UNIV'
+      TYPE      'LITERAL'
       VPATH     'PROMPT'
       PPATH     'GLOBAL'
       ASSOCIATION '<-GLOBAL.BINDS'
