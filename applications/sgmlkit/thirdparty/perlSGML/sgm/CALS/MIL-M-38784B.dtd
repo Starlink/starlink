@@ -1,0 +1,1105 @@
+<!-- NOTE: This document type declaration set has been changed effective February 1,
+1991 (910201); changed ELEMENTS, ATTLISTS and ENTITIES will be preceded with the
+following note:
+
+CHANGE 910201 - FOLLOWING ELEMENT (or ATTLIST or ENTITY) CHANGED -->
+
+<!-- NOTE:  THIS DOCUMENT TYPE DECLARATION SET SUPERSEDES DTD MIL-M-38784B 900102
+-->
+
+<!-- The following set of declarations may be referred to using a public entity as
+follows:
+
+<!DOCTYPE doc PUBLIC "-//USA-DOD//DTD MIL-M-38784B 910201//EN">-->
+
+<!-- NOTE:  In order to parse the following Document Type Declaration Subset  
+alone, append the  
+                 Document Type Declaration statement below to the  
+beginning of the file:
+
+         <!DOCTYPE doc [
+
+                 and the associated "]>" to the end of the file.       -->
+
+<!-- ENTITY DECLARATIONS -->
+
+<!-- MATH PACKAGE INCLUSION: To include the standard math package in a  
+document, include in the document's document type declaration subset the  
+following declaration:
+
+<!ENTITY % math "include" >
+
+-->
+
+<!ENTITY % math "ignore" >
+
+<![ %math; [
+
+  <!ENTITY % mathpac PUBLIC  
+
+          "-//USA-DOD//DTD SUP MIL-M-28001 MATHPACK 900102//EN">
+
+   %mathpac;]]>
+
+<!-- NOTE: Additionally required character sets must be explicitly designated  
+           in the document's document type declaration subset. -->
+
+<!-- The following entity is referenced in %text; -->
+
+<![ %math; [
+
+  <!ENTITY % mathtxt " | dfref | f " >  
+
+<!-- only if %math; is "include" -->
+
+]]>
+  <!ENTITY % mathtxt "" >             
+
+<!-- otherwise -->
+
+<!-- The following entity is referenced in %paracon; -->
+
+<![ %math; [
+  <!ENTITY % mathcon " | df | dfg " >  
+<!-- only if %math; is "include" -->
+
+]]>
+
+  <!ENTITY % mathcon "" >             
+
+<!-- ATTRIBUTE DEFINITION COLLECTIONS AND PARTS THEREOF -->
+
+<!-- Many attributes have a Boolean value. They  
+are uniformly given the declared value "%yesorno;"  
+rather than NUMBER to indicate this intent. 0  
+is interpreted as false; all other numbers as true. -->
+
+<!ENTITY % yesorno "NUMBER" >
+
+<!-- The itemid attribute group provides the ability to describe the text to which
+the attribute group pertains by the identifiers associated with the part to which
+the text refers. This group is also used within the standard body attributes
+(described below). -->
+
+<!--CHANGE 910201 - FOLLOWING ENTITY CHANGED -->
+
+<!ENTITY % itemid "sssn CDATA #IMPLIED
+                   unit CDATA #IMPLIED
+                   module CDATA #IMPLIED
+                   lru CDATA #IMPLIED
+                   assem CDATA #IMPLIED
+                   subassem CDATA #IMPLIED
+                   ssubassm CDATA #IMPLIED
+                   compon CDATA #IMPLIED
+                   partno CDATA #IMPLIED
+                   refdes CDATA #IMPLIED" >
+
+<!-- The content attribute group provides the ability to describe the text to which
+the attribute group pertains by the type of content, applicability, skilltrack,
+figures, and tables associated with the text. This group is also used within the
+standard body attributes (described below). -->
+
+<!ENTITY % content      "texttype NUMBER #IMPLIED
+                        applictype IDREFS #IMPLIED
+                        applicrefid IDREFS #IMPLIED
+                        skilltrk NMTOKENS #IMPLIED
+                        contype (desc | proc) #IMPLIED
+                        assocfig IDREFS #IMPLIED
+                        assoctab IDREFS #IMPLIED" >
+
+<!-- Some elements get a collection of attributes
+known collectively as body attributes. The
+%bodyatt entity contains all of the appropriate
+attribute definitions. -->
+
+<!ENTITY % bodyatt      "id ID #IMPLIED
+                        inschlvl NUTOKENS #IMPLIED
+                        delchlvl NUTOKENS #IMPLIED
+                        label CDATA #IMPLIED
+                        hcp %yesorno; '0'
+                        %itemid;
+                        %content;" >
+
+<!--CHANGE 910201 - FOLLOWING NOTE CHANGED -->
+
+<!-- Many elements get a security-related collection
+of attributes. The %secur entity contains all
+of the appropriate attribute definitions. -->
+
+<!ENTITY % secur  "security (u | c | s | ts) #IMPLIED
+                   restrict NMTOKENS #IMPLIED
+                   release NMTOKENS #IMPLIED
+                   codeword NMTOKENS #IMPLIED
+                   scilevel %yesorno; '0'
+                   diglyph NMTOKENS #IMPLIED" >
+
+<!--CHANGE 910201 - FOLLOWING ENITY CHANGED FROM "branch" TO "service" -->
+
+<!-- %service is one option in the name list group declared value of the branch
+attribute of <doc>.  It may be redefined (beginning with a connector) to provide for
+additional acceptable values for this attribute.  -->
+
+<!ENTITY % service "af | navy | army | mc | dla | cg" >   
+
+<!-- %erptype is one option in the name list group declared value of the errptype
+attribute of <errpt>.  It may be redefined (beginning with a connector) to provide
+for additional acceptable values for this attribute.  -->
+
+<!ENTITY % erptype "tmder | afto22 | da2028" >   
+
+<!-- %notctype is one option in the name list group declared value of the notctype
+attribute of <notice>.  It may be redefined (beginning with a connector) to provide
+for additional acceptable values for this attribute.  -->
+
+<!--CHANGE 910201 - FOLLOWING ENTITY CHANGED -->
+
+<!ENTITY % notctype "dist | auth | fouo | branch | pgclass |  
+disclos | supersed | effdate | suppl | nopg | noclaspg | warning |  
+destr | safesup | opersup | maintsup" >   
+
+<!-- %sigtype is the declared value of the sigtype attribute of <sigblk>. It may be
+redefined to include additional or remove existing acceptable values for this
+attribute. -->
+
+<!ENTITY % sigtype "preparer | approval | review | concur | other" >
+
+<!-- ELEMENT TYPE COLLECTIONS AND MODEL GROUPS -->
+
+<!-- TITLES -->
+
+<!-- Some elements which have either required or optional titles may at times also
+require shortened forms of the title. If shorttened titles are to be allowed in the
+instance then the parameter entity %shortitleuse; should be redefined as "include".
+-->
+
+<!ENTITY % shortitleuse "ignore" >
+
+<![ %shortitleuse; [
+
+<!--CHANGE 910201 - FOLLOWING ENTITY CHANGED -->
+
+   <!ENTITY % shortitle ", shortitle?" >]]>
+
+<!ENTITY % shortitle "" >
+
+<!-- RUNNING TEXT -->
+
+<!-- Various numbers embedded in running text are tagged to permit easy
+identification for data base work. They generally have no special display formatting
+requirements. -->
+
+<!ENTITY % nums "(partno | serno | partdesc | smrcode | nsn | modelno | sssn |
+refdes | docno | figindex | lin | faultcode)" >
+
+<!--CHANGE 910201 - FOLLOWING NOTE CHANGED -->
+
+<!--  NOTE:  regarding the adaptation of this document type declaration set for use
+with other document classes.  Per the rules of FIPS PUB 152, regarding the timing of
+the resolution of parameter entities, the content of the following
+parameter entity cannot be used directly within a content model, due to the
+parameter entity references within it.   -->
+
+<!--CHANGE 910201 - FOLLOWING ENTITY CHANGED  -->
+
+<!ENTITY % text "(#PCDATA | ftnref | xref | indxflag | verbatim | emergency |
+change | emphasis | applicabil | symbol | subscrpt | supscrpt | %nums; | tool |
+testeq | material | torqueval | extref | dataiden  %mathtxt; )+" >
+
+<!-- PARAGRAPH CONTENT -->
+
+<!-- Various types of lists can occur within the body
+of a paragraph, and generally where one can occur, so can any other type. -->
+
+<!ENTITY % list
+ "(seqlist | randlist | deflist)" >
+
+<!-- Unnumbered paragraph content consists of text, with optionally intermixed  
+lists, applicability definitions (and math displays, if the math package is
+included).  -->
+
+<!--CHANGE 910201 - FOLLOWING NOTE CHANGED -->
+
+<!--  NOTE:  regarding the adaptation of this document type declaration set for use
+with other document classes.  Per the rules of FIPS PUB 152, regarding the timing of
+the resolution of parameter entities, the content of the following
+parameter entity cannot be used directly within a content model, due to the
+parameter entity references within it.   -->
+
+<!ENTITY % paracon "(%text | %list; | applicdef  %mathcon;)+" >
+
+<!--  (UNNUMBERED) PARAGRAPHS AND PARAGRAPH-LIKE ELEMENTS -->
+
+<!-- Special paragraphs usually are just an appropriately labelled paragraph, but in
+certain cases they can have more than one paragraph within them. -->
+
+<!ENTITY % spcpara "(warning | caution | note)" >
+
+<!--  NUMBERED/TITLED "PARAGRAPHS" AND OTHER SUBSECTION-LIKE ELEMENTS  -->
+
+<!-- Step content consists of optional warnings, cautions, and notes (in that order,
+and applying to the following paragraphs), and then an unnumbered paragraph,
+followed optionally by notes.  Numbered paragraph content consists of a title, the
+same special and unnumbered paragraphs followed optionally by notes as are in step
+content, and finally optional steps. -->
+
+<!--CHANGE 910201 - FOLLOWING ENTITY CHANGED -->
+
+<!ENTITY % stepcon "(specpara | para)+" >
+
+<!--CHANGE 910201 - FOLLOWING NOTE CHANGED -->
+
+<!--  NOTE:  regarding the adaptation of this document type declaration set for use
+with other document classes.  Per the rules of FIPS PUB 152, regarding the timing of
+the resolution of parameter entities, the content of the following
+parameter entity cannot be used directly within a content model, due to the
+parameter entity references within it.   -->
+
+<!--CHANGE 910201 - FOLLOWING ENTITY CHANGED  -->
+
+<!ENTITY % titles "(title %shortitle;)" >
+
+<!--CHANGE 910201 - FOLLOWING NOTE CHANGED -->
+
+<!--  NOTE:  regarding the adaptation of this document type declaration set for use
+with other document classes.  Per the rules of FIPS PUB 152, regarding the timing of
+the resolution of parameter entities, the content of the following
+parameter entity cannot be used directly within a content model, due to the
+parameter entity references within it.   -->
+
+<!ENTITY % nparcon "(%titles;, (specpara | para)+, (step1, step1+)?)" >
+
+<!--  FRONT, BODY, AND REAR MATTER ELEMENTS   -->
+
+<!-- The content models for <front>, <idinfo>, <section>, and <rear> are entities so
+that they can be redefined. -->
+
+<!ENTITY % frnt "(idinfo, warnsum?, chgsheet?, lep?, promul?, chgrec?, (foreword |
+preface | intro)?, contents?, illuslist?, tablelist?, safesum?, howtouse?)" >
+
+<!ENTITY % idinf "(pubno+, prepubno*, nsn?, chgnum?, revnum?, titleblk, (mfr,
+contractno)+, docmfr?, seal?, notice+, downgrd?, pubdate, chgdate?)" >
+
+<!-- %chgsht is a parameter entity reference for the content model of the element
+type chgsheet. It is used as is or it may be changed for use with a specific class
+of documents. An example of how it may be changed would be if the system were to
+generate the change sheet. Then the content model would be changed to a declared
+content of EMPTY. -->
+
+<!ENTITY % chgsht "(chgnum, address, date, prtitle, para?, chglist)" >
+
+<!ENTITY % sect "(%titles;, para0+)" >  
+
+<!ENTITY % rr "(appendix*, glossary?, index*, errpt*, foldsect?)" >
+
+<!-- MISCELLANEOUS -->
+
+<!-- SPECIAL CHARACTER SETS -->
+
+<!-- The following public character entity sets are required to meet the general
+requirements of most service applications. Exceptional character requirements may be
+met by selecting additional public character entity sets from Appendix C.
+Those exceptional requirements must be separately specified in the contract (refer
+to paragraph 6.2). -->
+
+<!ENTITY % ISOlat1 PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN" >
+
+<!ENTITY % ISOpub PUBLIC "ISO 8879-1986//ENTITIES Publishing//EN" >
+
+<!ENTITY % ISOgrk3 PUBLIC "ISO 8879-1986//ENTITIES Greek Symbols//EN" >
+
+<!ENTITY % ISOnum PUBLIC "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN" >
+<!ENTITY % ISOtech PUBLIC "ISO 8879-1986//ENTITIES General Technical//EN" >
+
+%ISOlat1; %ISOpub; %ISOgrk3; %ISOnum; %ISOtech;  
+
+<!-- ELEMENT DEFINITIONS -->
+
+<!-- BIG ELEMENTS (BIGGER THAN FRONT MATTER, BODY, OR REAR MATTER) -->
+<!-- A document contains two or more volumes, a volume contains two or more parts, a
+part has optional front matter, body, and rear matter. -->
+  
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT doc     - -   ((volume, volume+) | (docpart, docpart+) | (front, body,
+rear?))               +(ftnote | pgbrk | brk) >
+
+<!-- CHANGE 910201 - FOLLOWING ATTLIST CHANGED -->
+  
+<!ATTLIST doc     service     (%service;)  #REQUIRED  
+                  docid CDATA #IMPLIED  
+                  docstat (revision | change | prelim | draft | formal) "formal"
+                  mantype (standard | card | decal) "standard"
+                  %secur; >  
+
+<!ELEMENT volume  - -   ((docpart, docpart+) | (front, body, rear?)) >
+
+<!ATTLIST volume  tocentry    %yesorno;   "1"  
+                  %bodyatt;  
+                  %secur; >
+
+<!ELEMENT docpart - -   (front?, body?, rear?) >
+
+<!ATTLIST docpart %bodyatt;              
+                  %secur; >
+
+<!-- FRONT MATTER AND ELEMENTS PECULIAR THERETO -->
+  
+<!-- Front matter contains identifying information for the document: title and cover
+pages, foreword, various lists, and various special-purpose types of information
+interspersed. The %frnt; entity permits specialization to a particular variant
+DOCTYPE. -->
+
+<!-- entity % frnt "(idinfo, warnsum?, chgsheet?, lep?, promul?, chgrec?, (foreword
+| preface | intro)? ,contents?, illuslist?, tablelist?, safesum?, howtouse?)" -->
+
+<!ELEMENT front   - -   (%frnt;) >
+  
+<!ATTLIST front               %secur; >
+
+
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!-- entity % idinf "(pubno+, prepubno*, nsn?, chgnum?, revnum?, titleblk, (mfr,
+contractno)+,  docmfr?, seal?, notice+, downgrd?, pubdate, chgdate?)" -->
+
+<!ELEMENT idinfo  - -   (%idinf;)  >
+
+<!ATTLIST idinfo  %secur; >                 
+
+<!ELEMENT (pubno | prepubno)  - o   (user?, docno) >
+
+<!ATTLIST (pubno | prepubno)  %secur; >
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT user    - -   (%text;) >
+
+<!ATTLIST user    %secur; >
+
+<!ELEMENT titleblk      - -   (volnum?, docpartn?, revnum?, doctype, maintlvl*,
+prtitle, stitle?) >
+
+<!ATTLIST titleblk      %secur; >
+
+<!ELEMENT (volnum | docpartn | revnum |  doctype | maintlvl | chgnum)   - o   
+(%text;) >
+
+<!ATTLIST (volnum | docpartn | revnum |doctype | maintlvl | chgnum)
+                  %secur; >
+
+<!ELEMENT prtitle - -   (nomen, eqpttype?, (pslist | partno | serno | modelno |
+nsn)*, subject?) >
+
+<!ATTLIST prtitle        %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT nomen   - -   (%text;) >
+
+<!ATTLIST nomen   %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT eqpttype      - -   (%text;) >
+
+<!ATTLIST eqpttype      %secur;                >
+
+<!ELEMENT pslist  - -   (partno, serno)+ >
+<!ATTLIST pslist  %secur;     >
+
+<!-- partno, serno, modelno, nsn found in %nums under "TEXT". -->
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED -->
+
+<!ELEMENT subject - o   (%text;)         >
+
+<!ATTLIST subject %secur;     >
+
+<!-- end <prtitle>, continue <titleblk>. -->
+
+<!ELEMENT stitle  - o   (%text;) >
+<!ATTLIST stitle              %secur;     >
+
+<!-- end <titleblk>, continue <idinfo>. -->
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT (mfr | contractno | docmfr)     - o   (%text;) >
+
+<!ATTLIST (mfr | contractno | docmfr)     %secur; >
+
+<!ELEMENT seal    - o   (graphic) >
+
+<!-- A <notice> usually contains standard text defined in entity declarations found
+in Appendix C, e.g.: <notice notctype="dist">&distrib;</notice>. If a notice
+containing other text is needed, the text should be directly included as the content
+of the <notice> element, e.g.: <notice notctype="auth">Published by Authority of the
+Secretary of Defense.</notice>. -->
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT notice  - o   (para+)     +(table) >
+
+<!ATTLIST notice  notctype    (%notctype;)      #IMPLIED  
+                              %secur;>
+
+<!ELEMENT downgrd - o   (authrty, (phrase | oadr), date?) >
+
+<!ATTLIST downgrd        %secur; >
+
+<!ELEMENT authrty        - o  (%text;) >
+
+<!ATTLIST authrty        %secur; >
+
+<!ELEMENT (phrase | oadr)     - o   (%text;) >
+
+<!ATTLIST (phrase | oadr)     %secur; >
+
+<!-- end <downgrd>, continue <idinfo>. -->
+
+<!ELEMENT (pubdate | chgdate) - o   (%text;) >
+
+<!ATTLIST (pubdate | chgdate)        %secur; >
+
+<!-- end <idinfo>, continue <front> -->
+
+<!ELEMENT lep     - o   EMPTY >
+
+<!ELEMENT warnsum - o   (para0 | para | warning)+ >
+
+<!ATTLIST warnsum inschlvl    NUTOKENS    #IMPLIED  
+                  delchlvl NUTOKENS #IMPLIED  
+                  tocentry  %yesorno; "0"  
+                  %secur; >
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT chgsheet      - o   (%chgsht;) >
+
+<!ATTLIST chgsheet      %secur; >
+
+<!ELEMENT chglist - o   (removepg, insertpg)+ >
+
+<!ATTLIST chglist %secur; >
+
+<!ELEMENT (removepg | insertpg)   - o   (#PCDATA) >
+
+<!ATTLIST (removepg | insertpg)     %secur;     >
+
+<!ELEMENT promul  - -   (title, para*, (sigblk | graphic)) >
+
+<!ATTLIST promul  %bodyatt;
+                  %secur; >
+
+<!ELEMENT chgrec  - o   (table | graphic) >
+
+<!ATTLIST chgrec  %bodyatt;     
+                  %secur; >
+<!ELEMENT (foreword | preface | intro)    - o   ((para0 | para | symbsect | abbrsect
+| %spcpara;)+, internatlstd?, sigblk*)           +(figure | table | chart) >
+
+<!ATTLIST (foreword | preface | intro)
+                    tocentry %yesorno; "1"  
+                    %bodyatt;
+                    %secur; >
+
+<!ELEMENT (symbsect | abbrsect)     - o   (deflist) >
+
+<!ATTLIST (symbsect | abbrsect)     %bodyatt;
+                                    %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT internatlstd  - o   (para+) >
+
+<!ATTLIST internatlstd  %secur; >
+
+<!ELEMENT sigblk  - o   (purpose?, (graphic?, signer, position, organiz, address?,
+date)+) >
+
+<!ATTLIST sigblk  sigtype     (%sigtype;) #IMPLIED  
+                  %secur; >
+
+<!ELEMENT purpose - o   (%text;) >
+
+<!ATTLIST purpose %secur; >
+
+<!ELEMENT signer  - o   (%text;) >
+
+<!ATTLIST signer  %secur; >
+
+<!ELEMENT (position | organiz | address)  - o   (%text;) >
+
+<!ATTLIST (position | organiz | address)  %secur; >
+
+<!-- end <sigblk> and <foreword>, continue <front>. -->
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT howtouse      - o   (%sect; | para0 | para+) >
+
+<!ATTLIST howtouse      tocentry    %yesorno;   "0"  
+                        shortentry  %yesorno;   "0"  
+                        %bodyatt;  
+                        %secur; >
+
+<!ELEMENT contents      - o   EMPTY >
+
+<!ATTLIST contents      shortentry  %yesorno;   "0">
+
+<!ELEMENT (illuslist | tablelist)  - o   EMPTY >
+
+<!ATTLIST (illuslist | tablelist)   tocentry    %yesorno;   "1"
+                                                                                     
+
+                                    shortentry  %yesorno;  "0" >
+
+<!ELEMENT safesum  - o  ((para | precaut)*, (warning | caution))+>   
+<!ATTLIST safesum        tocentry   %yesorno;   "0"
+                         shortentry %yesorno;   "0"
+                         %bodyatt;
+                         %secur; >
+
+<!ELEMENT precaut - o   (%text;) >
+
+<!ATTLIST precaut %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!-- BODY AND ELEMENTS PECULIAR THERETO -->
+  
+<!-- The body contains two or more chapters, a chapter contains two or more
+sections, a section contains numbered paragraphs. If there is only one, its content
+may be used as the content of the next higher level, except that a one-chapter body
+cannot have sections. -->
+
+<!ELEMENT body    - -   (((chapter, chapter+) | para0+), ddunit?) >
+
+<!ATTLIST body    %secur; >
+
+<!ELEMENT chapter - - (%titles;, ((section, section+) | para0+))>  
+<!ATTLIST chapter        tocentry   %yesorno;   "1"  
+                         shortentry  %yesorno;  "0"  
+                         %bodyatt;
+                         %secur; >
+
+<!-- <!ENTITY % sect "(%titles;, para0+)">  -->
+
+<!ELEMENT section - -   (%sect;) >
+
+<!ATTLIST section        tocentry   %yesorno;   "1"  
+                         shortentry  %yesorno;  "0"  
+                         %bodyatt;  
+                         %secur;>
+
+<!ELEMENT ddunit  - -   (ddintro, ddsheet+) >
+
+<!ATTLIST ddunit  portion     (section | chapter)     #IMPLIED
+                  %secur; >
+
+<!ELEMENT ddintro - o   (title, dddesc, ddindex) >
+
+<!ATTLIST ddintro        %secur; >
+
+<!ELEMENT dddesc  - o   ((para+, para0*) | para0+) >
+
+<!ATTLIST dddesc  %secur; >
+
+<!ELEMENT ddindex - o   (((para+, para0*) | para0+), ddlist) >
+
+<!ATTLIST ddindex        %secur; >
+
+<!ELEMENT ddlist  - o   (partno, pgno)+ >
+
+<!ATTLIST ddlist  %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT pgno    - -   (%text;) >
+
+<!ATTLIST pgno    %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT ddsheet - -   (partname, (partno | modelno | serno | eqpttype), ((para+,
+para0*) | para0+)) >
+
+<!ATTLIST ddsheet        %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT partname      - -   (%text;) >
+
+<!ATTLIST partname      %secur; >
+
+<!-- REAR MATTER AND ELEMENTS PECULIAR THERETO -->
+
+<!-- entity % rr "(appendix*, glossary?, index*, errpt*, foldsect?)" -->
+
+<!ELEMENT rear    - -   (%rr;) >
+
+<!ATTLIST rear    %secur; >
+
+<!ELEMENT appendix      - - (%titles;, ((section, section+) | para0+))>  
+<!ATTLIST appendix      tocentry    %yesorno;   "1"  
+                        shortentry  %yesorno;  "0"  
+                        %bodyatt;
+                        %secur; >
+
+<!ELEMENT glossary      - -   (para?, (title, deflist)+) >
+
+<!ATTLIST glossary      tocentry    %yesorno;   "1"  
+                        shortentry  %yesorno;  "0"  
+                        %secur; >
+
+<!ELEMENT index   - o   EMPTY >
+
+<!ATTLIST index   shortentry  %yesorno;   "0">
+
+<!ELEMENT errpt   - o   EMPTY >
+
+<!ATTLIST errpt   erptype     (%erptype;) #REQUIRED
+                  %secur; >
+
+<!ELEMENT foldsect      - -  (foldout+)>
+<!ATTLIST foldsect      %secur; >
+
+<!ELEMENT foldout        - o  (figure | table | chart) >
+
+<!ATTLIST foldout        pgstyle    NUMBER      #IMPLIED
+                         %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!--  NUMBERED/TITLED "PARAGRAPHS" AND OTHER SUBSECTION-LIKE ELEMENTS  -->
+  
+<!--  <!ENTITY % nparcon "(%titles;, (specpara | para)+, (step1, step1+)?)" -->
+  
+<!ELEMENT specpara      - o   (warning*, caution*, note*, para, note*)>
+
+<!ATTLIST specpara      %secur; >
+
+<!ELEMENT para0    - o   (%nparcon;, (subpara1, subpara1+)?)   
+                                                    +(figure | chart | table) >
+
+<!ATTLIST para0   tocentry    %yesorno;   "1"
+                  shortentry  %yesorno;  "0"
+                  %bodyatt;
+                  %secur; >
+
+<!ELEMENT subpara1      - o   (%nparcon;, (subpara2, subpara2+)?) >  
+<!ATTLIST (subpara1 | subpara2 | subpara3)
+                  tocentry  %yesorno;  "0"  
+                  shortentry  %yesorno;  "0"  
+                  %bodyatt;
+                  %secur; >
+
+<!ELEMENT subpara2      - o   (%nparcon;, (subpara3, subpara3+)?) >
+
+<!-- See above for attribute list. -->
+
+<!ELEMENT subpara3      - o   (%nparcon;) >
+
+<!-- See above for attribute list. -->
+
+<!-- entity % paracon "((%text; | %list; | applicdef %mathcon;)+)"-->
+  
+<!-- entity % stepcon "((specpara | para)+)" -->
+  
+<!ELEMENT step1   - o   (%stepcon;, (step2, step2+)?) >
+
+<!ATTLIST (step1 | step2 | step3)   %bodyatt
+                                    %secur; >
+
+<!ELEMENT step2   - o   (%stepcon;, (step3, step3+)?) >
+
+<!-- See above for attribute list. -->
+
+<!ELEMENT step3   - o   (%stepcon;) >
+
+<!-- See above for attribute list. -->
+  
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!-- (UNNUMBERED) PARAGRAPHS AND PARAGRAPH-LIKE ELEMENTS -->
+  
+<!-- (Unumbered) paragraphs contain running text possibly interrupted by lists,
+applicability definitions, and (if mathpack is included) displayed formulae.  
+Occasionally, a paragraph may consist solely of a list, definition, or formula
+without any running text. -->
+
+<!--  entity % paracon "((%text; | %list; | applicdef %mathcon;)+)"  -->
+
+<!ELEMENT para              - o (%paracon;) >
+<!ATTLIST para    %bodyatt;
+                  %secur; >
+
+<!-- Various types of lists can occur within the body of a paragraph, and generally
+where one can occur, so can any other type. -->
+
+<!-- entity % list "(seqlist | randlist | deflist)" -->
+
+<!ELEMENT (seqlist | randlist)      - -   (title?, item+) >
+
+<!ATTLIST seqlist  prefix     CDATA #IMPLIED
+                  numstyle  (arabic | romanuc | romanlc | alphauc | alphalc)  
+#IMPLIED
+                  %bodyatt;
+                  %secur; >
+
+<!ATTLIST randlist  prefix  CDATA #IMPLIED
+                    %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT item   - o  (para+)            +(table) >
+
+<!ATTLIST item    id    ID    #IMPLIED
+                  label CDATA  #IMPLIED
+                  %secur; >
+
+<!ELEMENT deflist     - -  (title?, (term, def)+) >
+
+<!ATTLIST deflist     %secur; >
+
+<!ELEMENT term        - o  (%text;) >
+<!ATTLIST term    %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT def    - o  (para+)         +(table) >
+<!ATTLIST def     %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT applicdef  - -  (title?, applichd, applicid+) >
+
+<!ATTLIST applicdef     id    ID    #REQUIRED
+                        %secur; >
+
+<!ELEMENT applichd     - o   (term, def) >
+
+<!ATTLIST applichd      applictype  IDREF  #IMPLIED
+                        %secur; >
+
+<!ELEMENT applicid     - o  (term, def) >
+
+<!ATTLIST applicid      id    ID    #REQUIRED
+                        applictype IDREF  #IMPLIED
+                        %secur; >
+
+<!--  SPECIAL PARAGRAPHS ELEMENTS  -->
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED -->
+
+<!ELEMENT (warning|caution|note)  - -     (graphic | para | %list;)+  -(figure |
+table | chart)>  
+
+<!ATTLIST warning type    CDATA     #IMPLIED
+                  xrefid  IDREF  #IMPLIED
+                  vital  %yesorno;  "0"
+                  %secur; >
+
+<!ATTLIST (caution | note)  type  CDATA    #IMPLIED  
+                            xrefid  IDREF  #IMPLIED  
+                            %secur; >
+<!-- RUNNING TEXT -->
+<!ELEMENT xref       - o    EMPTY >
+
+<!ATTLIST xref    xrefid  IDREF      #REQUIRED
+                  xidtype  (text | figure | table)  #REQUIRED
+                  pretext  CDATA  #IMPLIED
+                  posttext CDATA  #IMPLIED
+                  %secur; >
+
+<!ELEMENT extref    - o   EMPTY >
+  
+<!ATTLIST extref  docno    CDATA   #IMPLIED
+                  pretext  CDATA   #IMPLIED
+                  posttext CDATA   #IMPLIED
+                  %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT graphic      - o  EMPTY >
+
+<!ATTLIST graphic boardno     ENTITY   #REQUIRED
+                  graphsty   NMTOKEN   #IMPLIED
+                  llcordra   NUTOKEN   #IMPLIED
+                  rucordra   NUTOKEN   #IMPLIED
+                  reprowid   NUTOKEN   #IMPLIED
+                  reprodep   NUTOKEN   #IMPLIED
+                  hscale     NUTOKEN   #IMPLIED
+                  vscale     NUTOKEN   #IMPLIED
+                  scalefit   %yesorno; #IMPLIED
+                  hplace  (left | right | center | none)  #IMPLIED
+                  vplace  (top | middle | bottom | non)  #IMPLIED
+                  coordst   NUTOKEN    #IMPLIED
+                  coordend  NUTOKEN    #IMPLIED
+                  rotation  NUMBER     #IMPLIED
+                  %secur; >
+
+<!--CHANGE - FOLLOWING ELEMENT ADDED  910201  -->
+<!ELEMENT symbol   - o   EMPTY >
+
+<!ATTLIST symbol  boardno     ENTITY      #REQUIRED
+                  reprowid    NUTOKEN    #IMPLIED
+                  reprodep    NUTOKEN    #IMPLIED
+                  hscale      NUTOKEN    #IMPLIED
+                  vscale      NUTOKEN    #IMPLIED
+                  scalefit    %yesorno;  #IMPLIED
+                  offset      NMTOKEN    #IMPLIED
+                  rotation    NUMBER     #IMPLIED
+                  %secur; >
+
+<!ELEMENT (subscrpt | supscrpt)   - -   RCDATA >
+
+<!ATTLIST (subscrpt | supscrpt)    %secur; >
+
+<!ELEMENT (tool | testeq | material | torqueval)      - -   (%text;) >
+
+<!ATTLIST (tool | testeq | material | torqueval)
+                    %content                        
+                    %secur; >
+
+<!ELEMENT dataiden      - -   (%text;) >
+
+<!ATTLIST dataiden      %bodyatt;
+                        %secur; >
+
+<!ELEMENT ftnref     - o    EMPTY >
+
+<!ATTLIST ftnref    xrefid      IDREF        #REQUIRED>
+
+<!ELEMENT indxflag   - o   EMPTY >
+
+<!ATTLIST indxflag      ref1   CDATA  #IMPLIED
+                        ref2   CDATA  #IMPLIED
+                        ref3   CDATA  #IMPLIED
+                        ref4   CDATA  #IMPLIED
+                        %secur; >
+
+<!ELEMENT verbatim      - -   CDATA >
+
+<!ATTLIST verbatim      allowbrk    %yesorno;   "1"
+                        %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT emergency     - -   (%text;) >
+
+<!ELEMENT change       - -   (%text;) >
+<!ATTLIST change  level    NUMBER     #IMPLIED
+                  change   (add | delete)  #IMPLIED
+                  mark     %yesorno;  #IMPLIED
+                  %secur; >
+
+<!ELEMENT emphasis    - -   (%text;) >
+
+<!ATTLIST emphasis    emph  NAMES      #REQUIRED >
+
+<!ELEMENT applicabil   - -   (%text;) >
+
+<!ATTLIST applicabil    applicrefid IDREFS  #REQUIRED
+                        applictype  IDREFS  #IMPLIED
+                        %secur; >
+
+<!-- Various numbers embedded in running text are tagged to permit easy
+identification for data base work. They generally have no special display formatting
+requirements. -->
+
+<!-- entity % nums "(partno | serno | modelno | nsn | partdesc | smrcode |  
+sssn | refdes | lin | docno | faultcode | figindex)" -->
+
+<!ELEMENT (partno | serno | modelno | nsn | partdesc | smrcode | sssn | refdes | lin
+| docno)    - -   (%text;) >
+
+<!ATTLIST (partno | serno | modelno | nsn | partdesc | smrcode | sssn | refdes | lin
+| docno)    %secur; >
+
+<!ELEMENT faultcode      - -   (%text;) >
+
+<!ATTLIST faultcode     %content;
+                        %secur; >
+
+<!ELEMENT figindex    - o   (xref, callout) >
+
+<!ATTLIST figindex      %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+<!ELEMENT callout        - -  (%text;) >
+
+<!ATTLIST callout assocfig   IDREF    #IMPLIED>
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!-- MISCELLANEOUS ELEMENTS -->
+
+<!-- <pgbrk> and <brk> are similar to various elements in %text;, but are permitted
+more universally.  <date>s and <title>s are special purpose but oft-used elements
+that occur in numerous content models. -->
+
+<!ELEMENT pgbrk   - o   EMPTY >
+
+<!ATTLIST pgbrk   pgnumber   CDATA   #IMPLIED
+                  chglevel   NUMBER  #IMPLIED >
+
+<!ELEMENT brk        - o   EMPTY >
+
+<!ATTLIST brk    type  (col | line | epg | opg | npg)   "line">
+
+<!ELEMENT date     - o  (%text;) >
+
+<!ATTLIST date    %secur; >
+
+<!ELEMENT (title | shorttitle)   - o   (%text;)    -(table | chart | figure) >
+
+<!ATTLIST (title | shorttitle)   %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!-- FLOATING ELEMENTS -->
+  
+<!-- Floating elements are only loosely attached to a particular point in the text.
+They are printed/displayed somewhere nearby their "attachment point"; just where is
+prescribed by the FOSI. <figure>s, <table>s, and <chart>s have their "attachment
+point" at the point where they occur in the text. The location of the body of a
+<ftnote> is independent of its "attachment point"; each <ftnote> is identified
+by an ID value, and the "attachment point" is the (first occurring) <ftnref> that
+references that ID. -->
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT figure  - -   ((%titles;, (subfig+ | ((graphic | macrograph) & table? &
+legend?))) |(verbatim, %titles;))>
+
+<!ATTLIST figure  tocentry    %yesorno;   "1"
+                  shortentry  %yesorno;   "0"
+                  place       NUMBER   #IMPLIED
+                  orient    (port | land)   "port"
+                  %bodyatt;
+                  %secur; >
+
+<!ELEMENT subfig  - -   ((graphic | macrograph) & table? & legend?)>
+
+<!ELEMENT macrograph    - -   (graphic+) >
+
+<!ATTLIST macrograph    reprowid    NUTOKEN     #IMPLIED
+                        reprodep    NUTOKEN     #IMPLIED >
+
+<!ELEMENT legend  - o   (callout, def)+>
+
+<!ATTLIST legend  assocfig   IDREF #IMPLIED
+                  %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT (table | chart) - - (%titles;, tgroup+)     -(table | chart | figure)>
+
+<!ATTLIST (table | chart)   tabstyle    NMTOKEN     #IMPLIED
+                            tocentry    %yesorno;   "1"
+                            shortentry  %yesorno;   #IMPLIED
+                            frame  (top|bottom|topbot|all|sides|none) #IMPLIED
+                            colsep      %yesorno;    #IMPLIED
+                            rowsep      %yesorno;    #IMPLIED
+                            orient    (port | land)  #IMPLIED
+                            pgwide      %yesorno;    #IMPLIED
+                            %bodyatt;
+                            %secur; >
+
+<!ELEMENT tgroup  - o   (colspec*, spanspec*, thead?, tfoot?, tbody) >
+
+<!ATTLIST tgroup  cols         NUMBER   #REQUIRED
+                  tgroupstyle  NMTOKEN  #IMPLIED
+                  colsep       %yesorno;  #IMPLIED
+                  rowsep       %yesorno;  #IMPLIED
+                  align  (left | right | center | justify | char )  "left"
+                  charoff      NUTOKEN     "50"
+                  char         CDATA       ""
+                  %secur; >
+
+<!ELEMENT colspec    - o   EMPTY>
+
+<!ATTLIST colspec  colnum     NUMBER      #IMPLIED
+                   colname    NMTOKEN     #IMPLIED
+                   align  (left|right|center|justify|char)  #IMPLIED
+                   charoff    NUTOKEN     #IMPLIED
+                   char       CDATA       #IMPLIED
+                   colwidth   CDATA       #IMPLIED
+                   colsep     %yesorno;   #IMPLIED
+                   rowsep     %yesorno;   #IMPLIED>
+
+<!ELEMENT spanspec    - o   EMPTY >
+
+<!ATTLIST spanspec  namest    NMTOKEN     #REQUIRED
+                    nameend   NMTOKEN     #REQUIRED
+                    spanname  NMTOKEN     #REQUIRED
+                    align  (left|right|center|justify|char)  "center"
+                    charoff   NUTOKEN     #IMPLIED
+                    char      CDATA       #IMPLIED
+                    colsep    %yesorno;   #IMPLIED
+                    rowsep    %yesorno;   #IMPLIED>
+
+<!ELEMENT (thead | tfoot)   - o   (colspec*, row+)  -(entrytbl) >
+
+<!ATTLIST thead   valign  (top | middle | bottom) "bottom"
+                  %secur; >
+
+<!ATTLIST tfoot   valign   (top | middle | bottom) "top"
+                  %secur; >
+
+<!ELEMENT tbody   - o   (row+) >
+
+<!ATTLIST tbody   valign  (top | middle | bottom)  "top"
+                  %secur; >
+
+<!ELEMENT row     - o   (entry | entrytbl)+ >
+
+<!ATTLIST row   rowsep   %yesorno;   #IMPLIED
+                %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT entry   - o   (para | warning | caution | note | legend | %paracon;)+>
+
+<!--CHANGE 910201 - FOLLOWING ATTLIST CHANGED  -->
+
+<!ATTLIST entry   colname     NMTOKEN     #IMPLIED
+                  namest      NMTOKEN     #IMPLIED
+                  nameend     NMTOKEN     #IMPLIED
+                  spanname    NMTOKEN     #IMPLIED
+                  morerows    NUMBER      "0"
+                  colsep      %yesorno;   #IMPLIED
+                  rowsep      %yesorno;   #IMPLIED
+                  rotate      %yesorno;   "0"
+                  valign  (top | bottom | middle)  "top"
+                  align  (left | right | center | justify | char )  #IMPLIED  
+                  charoff      NUTOKEN    #IMPLIED
+                  char         CDATA      #IMPLIED
+                  %secur; >
+
+<!-- ELEMENT      ATTR  MIN   VALUE CONTENT     DEFAULT     EXCEPT -->
+
+<!ELEMENT entrytbl   - -  (colspec*, spanspec*, thead?, tbody)+     -(entrytbl)>
+
+<!ATTLIST entrytbl  cols    NUMBER    #REQUIRED
+                   tgroupstyle  NMTOKEN  #IMPLIED
+                   colname      NMTOKEN  #IMPLIED
+                   spanname     NMTOKEN  #IMPLIED
+                   colsep       %yesorno; #IMPLIED
+                   rowsep       %yesorno; #IMPLIED
+                   align  (left | right | center | justify | char )  #IMPLIED
+                   charoff      NUTOKEN    #IMPLIED
+                   char         CDATA      #IMPLIED
+                   %secur; >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED  -->
+
+<!ELEMENT ftnote  - -  (para+)    -(ftnote | ftnref) +(table)>
+
+<!ATTLIST ftnote  id    ID    #REQUIRED
+                  mark  (ctr | sym)  "ctr"
+                  label  CDATA     #IMPLIED
+                  %secur; >
+

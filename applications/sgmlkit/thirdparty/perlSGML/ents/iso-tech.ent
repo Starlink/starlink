@@ -1,0 +1,132 @@
+<!-- (C) International Organization for Standardization 1986
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % ISOtech PUBLIC
+       "ISO 8879-1986//ENTITIES General Technical//EN" "iso-tech.ent">
+     %ISOtech;
+-->
+<!ENTITY aleph  SDATA "font=symbol charset=fontspecific code=192
+			descr='[aleph]'"--/aleph =aleph, Hebrew-->
+<!ENTITY and    SDATA "font=symbol charset=fontspecific code=217 
+			descr='[and]'"--/wedge /land B: =logical and-->
+<!ENTITY ap     SDATA "font=symbol charset=fontspecific code=64  
+			descr='[ap]'"--/approx R: =approximate-->
+<!ENTITY bottom SDATA "font=symbol charset=fontspecific code=94  
+			descr='[bottom]'"--/bot B: =perpendicular-->
+<!ENTITY cap    SDATA "font=symbol charset=fontspecific code=199 
+			descr='[cap]'"--/cap B: =intersection-->
+<!ENTITY cong   SDATA "font=symbol charset=fontspecific code=64
+			descr='[cong]'"--/cong R: =congruent with-->
+<!ENTITY cup    SDATA "font=symbol charset=fontspecific code=200 
+			descr='[cup]'"--/cup B: =union or logical sum-->
+<!ENTITY equiv  SDATA "font=symbol charset=fontspecific code=186
+			descr='[equiv]'"--/equiv R: =identical with-->
+<!ENTITY exist  SDATA "font=symbol charset=fontspecific code=36  
+	TeX='\exists ' descr='[exist]'"--/exists =at least one exists-->
+<!ENTITY forall SDATA "font=symbol charset=fontspecific code=34  
+	TeX='\forall ' descr='[forall]'"--/forall =for all-->
+<!ENTITY fnof   SDATA "font=symbol charset=fontspecific code=166 
+			descr='[fnof]'"--=function of (italic small f)-->
+<!ENTITY ge     SDATA "font=symbol charset=fontspecific code=179 
+	TeX='\geq ' descr='[ge]'"--/geq /ge R: =greater-than-or-equal-->
+<!ENTITY iff    SDATA "TeX='\Leftrightarrow ' descr='[iff]'"
+	--/iff =if and only if-->
+<!ENTITY infin  SDATA "font=symbol charset=fontspecific code=165 
+	TeX='\infty ' descr='[infin]'"--/infty =infinity-->
+<!ENTITY int    SDATA "font=symbol charset=fontspecific code=242 
+			descr='[int]'"--/int L: =integral operator-->
+<!ENTITY isin   SDATA "font=symbol charset=fontspecific code=206
+			descr='[isin]'"--/in R: =set membership-->
+<!ENTITY lang   SDATA "font=symbol charset=fontspecific code=225 
+			descr='[lang]'"--/langle O: =left angle bracket-->
+<!ENTITY lArr   SDATA "font=symbol charset=fontspecific code=172 
+			descr='[lArr]'"--/Leftarrow A: =is implied by-->
+<!ENTITY le     SDATA "font=symbol charset=fontspecific code=163 
+	TeX='\leq ' descr='[le]'"--/leq /le R: =less-than-or-equal-->
+<!ENTITY minus  "-"	--B: =minus sign-->
+<!ENTITY nabla  SDATA "font=symbol charset=fontspecific code=209
+	TeX='\nabla ' descr='[nabla]'"--/nabla =del, Hamilton operator-->
+<!ENTITY ne     SDATA "font=symbol charset=fontspecific code=185 
+	TeX='\ne ' descr='[ne]'"--/ne /neq R: =not equal-->
+<!ENTITY notin  SDATA "font=symbol charset=fontspecific code=207
+			descr='[notin]'"--N: negated set membership-->
+<!ENTITY or     SDATA "font=symbol charset=fontspecific code=218 
+			descr='[or]'"--/vee /lor B: =logical or-->
+<!ENTITY par    SDATA "TeX='\| ' descr='[par]'"--/parallel R: =parallel-->
+<!ENTITY part   SDATA "font=symbol charset=fontspecific code=182
+			descr='[part]'"--/partial =partial differential-->
+<!ENTITY perp   SDATA "font=symbol charset=fontspecific code=94  
+	TeX='\bot ' descr='[perp]'"--/perp R: =perpendicular-->
+<!ENTITY prime  SDATA "font=symbol charset=fontspecific code=162 
+	TeX='\prime ' descr='[prime]'"--/prime =prime or minute-->
+<!ENTITY Prime  SDATA "font=symbol charset=fontspecific code=178 
+			descr='[Prime]'"--=double prime or second-->
+<!ENTITY prop   SDATA "font=symbol charset=fontspecific code=181
+			descr='[prop]'"--/propto R: =is proportional to-->
+<!ENTITY radic  SDATA "font=symbol charset=fontspecific code=214 
+			descr='[radic]'"--/surd =radical-->
+<!ENTITY rang   SDATA "font=symbol charset=fontspecific code=241 
+			descr='[rang]'"--/rangle C: =right angle bracket-->
+<!ENTITY rArr   SDATA "font=symbol charset=fontspecific code=174 
+			descr='[rArr]'"--/Rightarrow A: =implies-->
+<!ENTITY sim    "~"--/sim R: =similar-->
+ <!ENTITY sub    SDATA "font=symbol charset=fontspecific code=204 
+			descr='[sub]'"--/subset R: =subset or is implied by-->
+<!ENTITY sube   SDATA "font=symbol charset=fontspecific code=205 
+			descr='[sube]'"--/subseteq R: =subset, equals-->
+<!ENTITY sup    SDATA "font=symbol charset=fontspecific code=201 
+			descr='[sup]'"--/supset R: =superset or implies-->
+<!ENTITY supe   SDATA "font=symbol charset=fontspecific code=202 
+			descr='[supe]'"--/supseteq R: =superset, equals-->
+<!ENTITY there4 SDATA "font=symbol charset=fontspecific code=92  
+			descr='[there4]'"--/therefore R: =therefore-->
+
+<!ENTITY angst  "&#197;"	--Angstrom =capital A, ring-->
+<!ENTITY Dot    "&#168;"	--=dieresis or umlaut mark-->
+ 
+<!-- The following characters could not be defined using commonly available
+fonts. Therefore, EBT is using placeholders for these characters. To include
+the placeholders in your document, make sure that the marked section below has
+the keyword "INCLUDE".
+
+To ignore the placeholders, use the keyword "IGNORE". If you are ignoring this
+marked section and your SGML document references any of the entities declared
+below, you will get (non-fatal) mkbook errors, and the entity references will
+not be replaced.
+
+Finally, you may choose to define the entities below yourself, using a special
+font that will be available to readers of your DynaText books. Use the same
+SDATA entity declaration model as is used above, substituting the appropriate
+names and decimal numbers for font, charset, code, and descr. In that case, you
+should INCLUDE the marked section. 
+
+See Chapter 7 of Publisher Guide, Volume 1 for more information. -->
+
+<![ INCLUDE [
+<!ENTITY ang90  "[ang90]"--=right (90 degree) angle-->
+<!ENTITY angsph "[angsph]"--/sphericalangle =angle-spherical-->
+<!ENTITY becaus "[becaus]"--/because R: =because-->
+<!ENTITY conint "[conint]"--/oint L: =contour integral operator-->
+<!ENTITY mnplus "[mnplus]"--/mp B: =minus-or-plus sign-->
+<!ENTITY ni     "[ni]"--/ni /owns R: =contains-->
+<!ENTITY permil "[permil]"--=per thousand-->
+<!ENTITY sime   "[sime]"--/simeq R: =similar, equals-->
+<!ENTITY square "[square]"--/square B: =square-->
+<!ENTITY Verbar "[Verbar]"--/Vert =dbl vertical bar-->
+<!ENTITY bernou "[bernou]"--Bernoulli function (script capital B)-->
+<!ENTITY compfn "[compfn]"--B: composite function (small circle)-->
+<!ENTITY DotDot "[DotDot]"--four dots above-->
+<!ENTITY hamilt "[hamilt]"--Hamiltonian (script capital H)-->
+<!ENTITY lagran "[lagran]"--Lagrangian (script capital L)-->
+<!ENTITY lowast "[lowast]"--low asterisk-->
+<!ENTITY order  "[order]"--order of (script small o)-->
+<!ENTITY phmmat "[phmmat]"--physics M-matrix (script capital M)-->
+<!ENTITY tdot   "[tdot]"--three dots above-->
+<!ENTITY tprime "[tprime]"--triple prime-->
+<!ENTITY wedgeq "[wedgeq]"--R: corresponds to (wedge, equals)-->
+]]>
+
+

@@ -1,0 +1,1623 @@
+<!-- The OpenBook Document Type Definition
+
+     (c) Copyright 1987-1993 Hewlett-Packard Company
+    
+     Permission to use, copy, and distribute this Document Type
+     Definition (DTD) is hereby granted, provided that the above
+     copyright notice appear in all copies and that both that copyright
+     notice and this permission notice appear in supporting hardcopy and
+     online documentation.  All other rights reserved.
+    
+     The name of Hewlett-Packard Company or the Hewlett-Packard logo may
+     not be used in advertising or publicity pertaining to distribution
+     of this DTD without specific, written prior permission.
+     Hewlett-Packard Company makes no representations about the
+     suitability of this DTD for any purpose.  It is provided "as is"
+     without express or implied warranty.
+    
+     Hewlett-Packard disclaims all warranties with regard to this DTD,
+     including all implied warranties of merchantability and fitness, in
+     no event shall Hewlett-Packard Company be liable for any special,
+     indirect or consequential damages or any damages whatsoever
+     resulting from loss of use, data or profits, whether in an action
+     of contract, negligence or other tortious action, arising out of or
+     in connection with the use or performance of this DTD.
+
+     Note:  Previous versions of this DTD were distributed under the name
+             "HP Tag DTD, Version 2.1.a."  This DTD is now known as the 
+             "OpenBook DTD."
+-->
+
+
+<!-- Implementation notes:
+   -      1. When adding new attributes make sure that the default
+   -         attribute is listed first.               
+   -      2. All attribute categories with more than one selection have
+   -         a default attribute setting selected.  This is different 
+   -         than HP Tag attributes which were in most cases #IMPLIED. 
+   -      3. Attributes values must be quoted.
+  -->
+
+<!-- CHARACTER ENTITIES -->
+
+<!ENTITY  % HPsym       PUBLIC "-//Hewlett-Packard//ENTITIES HP Symbols//EN" >
+%HPsym;
+
+<!ENTITY  % HPservice   PUBLIC "-//Hewlett-Packard//ENTITIES Service//EN" >
+%HPservice;
+
+<!ENTITY  % HPcalc      PUBLIC "-//Hewlett-Packard//ENTITIES Calculators//EN" >
+%HPcalc;
+
+<!ENTITY  % HPtexchars  PUBLIC "-//Hewlett-Packard//ENTITIES Texchars//EN" >
+%HPtexchars;
+
+<!ENTITY  % HPtif       PUBLIC "-//Hewlett-Packard//ENTITIES HP Tiff//EN"  >
+
+<!ENTITY % ISOnum PUBLIC 
+ "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN">
+ %ISOnum;
+
+<!ENTITY % ISOtech PUBLIC 
+ "ISO 8879-1986//ENTITIES General Technical//EN">
+ %ISOtech;
+
+<!ENTITY % ISOdia PUBLIC 
+ "ISO 8879-1986//ENTITIES Diacritical Marks//EN">
+ %ISOdia;
+
+<!ENTITY % ISOlat1 PUBLIC 
+ "ISO 8879-1986//ENTITIES Added Latin 1//EN">
+ %ISOlat1;
+
+<!ENTITY % ISOlat2 PUBLIC 
+ "ISO 8879-1986//ENTITIES Added Latin 2//EN">
+ %ISOlat2;
+
+<!ENTITY % ISOamso PUBLIC 
+ "ISO 8879-1986//ENTITIES Added Math Symbols: Ordinary//EN">
+ %ISOamso;
+
+<!ENTITY % ISOgrk1 PUBLIC 
+ "ISO 8879-1986//ENTITIES Greek Letters//EN">
+ %ISOgrk1;
+
+<!ENTITY % ISOgrk3 PUBLIC 
+ "ISO 8879-1986//ENTITIES Greek Symbols//EN">
+ %ISOgrk3;
+
+<!ENTITY % ISOpub PUBLIC
+ "ISO 8879-1986//ENTITIES Publishing//EN">
+ %ISOpub;
+
+
+
+
+<!-- ___________________ PARAMETER ENTITIES ______________________ -->
+
+
+<!-- Parameter Entities have been designed to allow easy maintenance
+   - AND "sub-setting". Sub-setting implies that specific implementations
+   - of the SGML application may choose to restrict the content models
+   - beyond those established in the base OpenBook 2.1 DTD. 
+   -
+   - Sub-setting changes should be able to be made by only making changes 
+   - to this set of declarations.
+  -->
+
+
+
+
+<!-- _____________________ DATA UNIT ENTITIES __________________ -->
+
+<!-- Intra-paragraph structures 
+   -
+   - These DATA UNITS contain all the actual text and data in
+   - the document. Data Units are contained within paragraph level
+   - information units described below.
+  --> 
+
+<!-- Classes of sub-paragraph data units
+   -   These classes should not be used within elements
+   -   content models. They are used to create the 
+   -   collections in the next section.
+  -->
+
+<!-- Text that is used in building man-machine dialogs.  _________ -->
+<!ENTITY % dialog   "(computer | cursor  | display | 
+                      keycap   | softkey | user )"                   >
+
+<!-- Text that requires special layout considerations. ___________ -->
+<!ENTITY % sptext   "(footnote | ineqn | ingraphic | fillin)"        > 
+<!ENTITY % spchars  "(super | sub)"                                  > 
+
+<!-- Phrases of key significance. ________________________________ -->
+<!ENTITY % keytext  "(acro  | book | emph  | location | not | 
+                      parm  | term | var)"                           > 
+
+<!-- DU level elements that contain other DU level information ___ -->
+<!ENTITY % du-containers "(nobreak)"                                 >
+
+<!-- Data that is linked to other data. __________________________ -->
+<!ENTITY % links    "(link | xref)"                                  >
+
+
+
+
+
+<!-- Collections of sub-paragraph data units.
+   -   These collections are intended for use within the 
+   -   element content models.
+  -->
+
+<!-- 
+   - These entities are used as the content of many of the data units. 
+  -->
+<!ENTITY % sub-du1  "((#PCDATA | (%spchars;))*)"                    >
+<!ENTITY % sub-du2  "((#PCDATA | keycap | var | ineqn | user |
+                       cursor | super | sub)*)"                     >
+<!ENTITY % sub-du3  "((#PCDATA | keycap | var | ineqn | 
+                       super | sub)*)"                              >
+<!ENTITY % sub-du4  "((#PCDATA | acro | keycap | link | nobreak | 
+                       softkey | sub | super | xref)*)"             >
+
+<!-- Broadest use for within data containers. ____________________ -->
+<!ENTITY % sub-du   "((#PCDATA  | (%keytext;) | (%spchars;) |
+                      (%links;) | (%dialog;)  | (%sptext;) | 
+                      (%du-containers;))*)"                        > 
+
+<!-- 
+   - Syntax Diagram data containers 
+  -->
+<!ENTITY % synel  "(#PCDATA | var | ineqn | keycap |
+                    optblock | reqblock | parm)"                     >
+
+
+
+
+<!-- Simple sub-paragraph data units ____________________________ -->
+<!ENTITY % simple-pt  "((#PCDATA | (%keytext))*)"                   >
+
+<!-- Sub-paragraph data units; this is the same as partext in
+   - the HP reference dtd. It is here to provide an easy way for
+   - vendor specific applications to limit the content of 
+   - particular containers with easier maintenance.
+  -->
+<!ENTITY % pt-lite   "((#PCDATA  | (%keytext;) | (%spchars;) |
+                       (%links;) | (%dialog;)  | (%sptext;) | 
+                       (%du-containers;))*)"                        > 
+
+<!-- Complex sub-paragraph data units ___________________________ -->
+<!ENTITY % partext   "((#PCDATA  | (%keytext;) | (%spchars;) |
+                       (%links;) | (%dialog;)  | (%sptext;) | 
+                       (%du-containers;))*)"                        > 
+
+
+
+
+
+
+
+
+<!-- asynchronous markup used to identify regions of a document 
+   -   This markup needs to be included in any content model where
+   -   available. There is not dtd control to match begins and ends
+   -   or to assure that a matching end exists. This is left to the
+   -   application. 
+   - These are included by inclusion at the section level.
+  -->
+<!ENTITY % async    "((needbegin | needend)*)"                       >
+
+
+
+
+<!-- __________________ INFORMATION UNIT ENTITIES _______________ -->
+<!--
+   - 
+   - Blocks of text for use at the paragraph level.
+  -->
+
+<!-- Classes of information units.
+   -   These classes should not be used within elements
+   -   content models. They are used to create the 
+   -   collections in the next section.
+  -->
+
+<!-- General Info containers ____________________________________ -->
+<!ENTITY % para-iu  "(bridgehead | list | p)"                       >
+
+<!-- Page control _______________________________________________ -->
+<!ENTITY % page-iu  "(footer | header | newpage)"                   >
+
+<!-- Text blocks that need special formatting/layout/processing _ -->
+<!ENTITY % fmt-iu   "( eqn | ex | frame | image | 
+                       lablist | syntax | table | vex )"            > 
+
+<!-- Annotations ________________________________________________ -->
+<!ENTITY % anno-iu  "(caution | note | warning)"                    >
+
+
+
+
+<!-- Collections of paragraph level information units.
+   -   These collections are intended for use within the 
+   -   element content models.
+   -
+   - Many are the same as text in the HP reference dtd. 
+   - They are here to provide an easy way for vendor specific 
+   - applications to limit the content of 
+   - particular containers with easier maintenance.
+  -->
+
+<!-- Simple content paragraph level information units. __________ -->
+<!ENTITY % simple-text  "((%para-iu;)*)"                            > 
+
+<!-- Lite content paragraphs level information units ____________ -->
+<!ENTITY % lite-text    "((%para-iu; | %anno-iu; | 
+                          %fmt-iu;  | %page-iu;)*)"                 >
+
+<!-- Full content paragraphs level information units ____________ -->
+<!ENTITY % text         "((%para-iu; | %anno-iu; | 
+                          %fmt-iu;  | %page-iu;)*)"                 >
+
+
+
+
+
+
+<!-- ________________________ ATTRIBUTE ENTITIES _________________ -->
+<!--
+   - These attributes are used all over this dtd
+   - This technique does NOT work for enumerated attributes whose
+   - default value must be quoted! 
+  -->
+<!ENTITY % conditionals
+  "cdrom    ( CYES | CNO ) 'CYES'    -- include in cdrom volume? --
+   help     ( HYES | HNO ) 'HYES'    -- include in help volume? --
+   hardcopy ( PYES | PNO ) 'PYES'    -- include in printed instance? --
+   memo     ( MYES | MNO ) 'MNO'     -- Authors annotation only --
+   revlevel CDATA          #IMPLIED  -- default is current --
+   locale   CDATA          #IMPLIED  -- default is American --
+   id       ID             #IMPLIED" >
+
+
+<!ENTITY % margin-attr
+   "topmargin     NMTOKEN  #IMPLIED
+    bottommargin  NMTOKEN  #IMPLIED
+    leftmargin    NMTOKEN  #IMPLIED
+    rightmargin   NMTOKEN  #IMPLIED" >
+
+<!-- TODO : identify audio etc types. -->
+<!ENTITY % graphic-attr
+   "gentity       ENTITY                   #IMPLIED   -- graphics entity --
+    gposition     (LEFT | CENTER | RIGHT)  'LEFT'     -- graphics position --
+    gmedia        (GRAPHIC | AUDIO | 
+                   ANIMATION | VIDEO)      'GRAPHIC'  -- graphics type --
+    gtype         (PCL | HPGL | TIFF | 
+                   CGM | CCITT| OTHER)     'CGM'"     -- entity type --
+    >
+
+
+
+
+<!-- _________________________ HyperText Modeling ________________________ -->
+
+<!-- 
+   - Linkage elements and attributes provide the ability for an author
+   -    to specify a relationship between two points in the information
+   -    domain. Within this DTD, the point where the relationship is 
+   -    defined will be referred to as the HEAD; the point that is
+   -    identified in the link heads data will be referred to as an
+   -    ANCHOR.
+   -
+   - RID specifies the anchor of the link. If the anchor is within
+   -    the current document, then the RID simply contains the id
+   -    of the anchor element. If the anchor is in another information
+   -    object, then the RID identifies the external object element
+   -    that describes that target object.
+   -
+   - WINDOW specifies the nature of the window used to render the 
+   -    anchor. 
+   -       current: display data in current view window 
+   -       new: display data in a new window 
+   -       popup: display data in a temporary window
+   - 
+   - TRAVERSAL describes if the relationship between the two points
+   -    is symmetric. This attribute allows an author to differentiate
+   -    between different relationships such as progression and 
+   -    mutual dependencies.
+   - Links with a traversal value of return are called an initiating 
+   -    anchors in HyTime; that is the site that initiates the linkage is 
+   -    also an anchor. Noreturn does not imply the an engine cannot 
+   -    provide a history mechanism which allows a user to return to
+   -    head of the link.
+   - NOTE: the TRAVERSAL attribute is not intended to be implemented 
+   -    in the delivery applications during FY 93. It is included here 
+   -    for future application.
+   -    ISSUE : What is the processing model for return link types?
+   -
+   - This document model provides three different data items for use
+   -    in presenting the user the location of a link head.
+   -    1) the link element contains information content that may be
+   -       highlighted as a "hot spot".
+   -    2) BUTTON entity attribute provides a graphical representation
+   -       of the head point.
+   -    3) LINKINFO attribute is a brief description of the location 
+   -       linked to.  It is intended to be used as an alias 
+   -       for the link in lists and other situations that require a 
+   -       brief textual representation of the link.
+   -
+   - The DESCRIPTION is an abstract of the content of the link anchor.
+   -    This information is intended to be used either as a preview of 
+   -    link traverse or as a alternate to link traversal when time
+   -    prevents full traversal, or as a substitute for the link 
+   -    traverse when the anchor is not reachable.
+   -
+  -->
+<!ENTITY % hyper-attr
+ "rid         IDREF      #IMPLIED   -- id of anchor or external object. --
+  window      (CURRENT | NEW | POPUP) 'CURRENT'
+  traversal   (RETURN | NORETURN) 'NORETURN' 
+  button      ENTITY     #IMPLIED   -- graphic for use as link head --
+  linkinfo    CDATA      #IMPLIED   -- alternate text for use as link head --
+  description CDATA      #IMPLIED"  -- text for use as anchor alternative  -- >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- __________ External Information Object Modeling _______________ -->
+
+<!-- The externalobjs section provides a place within a document to 
+   -    describe all external information objects that are referenced 
+   -    from this document. This section is not for objects that are part 
+   -    of this document either directly or by entity reference. 
+   -
+   - Note that one primary difference between external objects and 
+   -    entities is their transport model. Entities are included with 
+   -    the document when the document is interchanged and external 
+   -    objects are not.
+   -
+   - Data within the EXTERNALOBJS section are not intended for use
+   -    by a hardcopy formatting application. They are only intended
+   -    for use by an online delivery system.
+   -  Each external object must be described in the <xobjinfo> element. 
+   -    This description is then used in the actual external doc element.
+   -    The external object element may also describe a specific point within
+   -    that document.
+   -
+   -  xquery element is to specify an external object
+   -    that is to be determined by a run time query.  These queries should 
+   -    be encoded using HyQ as described in ISO 10744.
+   -
+  -->
+<!ELEMENT externalobjs - -  (xobjinfo, (xdocloc*  | 
+                                        xmanloc*  | 
+                                        xfileloc* | 
+                                        xsysloc*  | 
+                                        xapploc*))+                  >
+
+<!--
+   - XOBJINFO:
+   -  This information identifies the external object.
+   -
+   -  A wide variety of information is permitted to allow the evolution of
+   -  cross document/object authoring and delivery tools and practices.
+   -
+   -  Cross object references made directly to this element imply that
+   -  the link is to the beginning of that object.
+   -
+  -->
+<!ELEMENT xobjinfo     - -  (product?, title?, volume?, hardware?, 
+                             version?, serialno?, partno?, ficheno?,
+                             country?, printdate?, mfgno?, edition?,
+                             copyright?, source?, objid?, xquery?)      >
+<!ATTLIST xobjinfo          id      ID                       #REQUIRED  >
+
+
+<!-- Object identification information unique to external objects.
+   -
+   - objid is an application specific field used to specify a specific 
+   -    information object in what ever format required by an application.
+   -    This content of this element is intended to be supplied by either
+   -    a editor or publishing application.
+   -
+  -->
+<!ELEMENT objid       - -  (#PCDATA)                                    >
+<!ATTLIST objid            id        ID                     #IMPLIED    >
+<!ELEMENT xquery      - -  (#PCDATA)                                    >
+<!ATTLIST xquery           id        ID                     #IMPLIED    >
+
+
+
+
+<!-- Location description elements __________________________________ -->
+
+<!ELEMENT xdocloc      - -  (head?, %partext;)                          >
+<!ATTLIST xdocloc           id       ID                      #REQUIRED    
+                            xrid     CDATA                   #IMPLIED   
+                            xquery   CDATA                   #IMPLIED   >
+
+<!ELEMENT xmanloc      - -  (head?, %partext;)                          >
+<!ATTLIST xmanloc           id       ID                      #REQUIRED 
+                            xmancmd  CDATA                   #IMPLIED   >
+
+<!ELEMENT xfileloc     - -  (head?, %partext;)                          >
+<!ATTLIST xfileloc          id       ID                      #REQUIRED    
+                            xoffset  CDATA                   #IMPLIED   
+                            xfsspec  CDATA                   #IMPLIED   >
+
+<!ELEMENT xsysloc      - -  (head?, %partext;)                          >
+<!ATTLIST xsysloc           id       ID                      #REQUIRED    
+                            xsyscmd  CDATA                   #IMPLIED   >
+
+<!ELEMENT xapploc      - -  (head?, %partext;)                          >
+<!ATTLIST xapploc           id       ID                      #REQUIRED    
+                            xcbtype  CDATA                   #IMPLIED   
+                            xcbdata  CDATA                   #IMPLIED   >
+
+<!--         
+   - Each element defines a location within the object's information domain.
+   -    The contents of these elements may be overridden by attributes
+   -    on the link head (linkinfo and description).
+   -
+   -  The <head> element should be a brief description of the location 
+   -    linked to. It is intended to be used as an alias in link lists 
+   -    and other situations that require a brief textual representation 
+   -    of the link. (Overridden by linkinfo on <link>.)
+   -
+   -  The content of the <xdocloc> element is an description of the object 
+   -    identified.  It should be an abstract of the external 
+   -    object. This abstract may be used for previewing the link or as
+   -    alternative to the link anchor content when time or connectivity 
+   -    prevent the traversal of the link. (Overridden by description 
+   -    on <link>.)
+   -
+   - XDOCLOC - data from similar format document for viewer application 
+   -            processing. The point within the document is identified
+   -            either by the XRID value OR the XQUERY. If both exist,
+   -            then the xrid value should be used.
+   -           XQUERY is used to specify a external object by query.
+   -            this element is to be used for documents that are to 
+   -            located by query. These queries should be encoded using 
+   -            HyQ as described in ISO 10744.
+   -
+   - XMANLOC - external object is the information domain accessed and
+   -            managed by the man command. The specific location in the
+   -            domain is determined by supplying the systems man command
+   -            with data from the XMANCMD attribute.
+   -
+   - XFILELOC - external object is in the information domain of the 
+   -            systems file system. The specific location is determined by
+   -            the combination of the byte offset and the file
+   -            spec.
+   -
+   - XSYSOBJ - external object is in the information domain of the operating
+   -            system. The operating system is supplied the data in the
+   -            XSYSCMD attribute. 
+   -
+   - XAPPLOC - external object is in the information domain of the 
+   -            application that is the parent of viewer application. 
+   -            The application callback is provided the data from the
+   -            XCBDATA field. The XCBTYPE attribute contains data to
+   -            select a particular application callback if the application 
+   -            supports multiple callbacks.
+  -->
+ 
+
+
+
+
+
+
+
+<!-- Index Page references -->
+<!ENTITY % indexrefs "((indexchapref | indexchaprefmain | indexsyn)*)">
+<!-- End of altered content models -->
+
+<!-- Table of Contents references-->
+<!ENTITY % tocrefs  "(tocname, tocpage)"                             >
+
+<!-- Table of Figures references -->
+<!ENTITY % tofrefs  "(toftentryno, toftcaption, toftpage)"           >
+
+<!-- Table of Tables references -->
+<!ENTITY % totrefs  "(toftentryno, toftcaption, toftpage)"           >
+
+
+
+
+
+
+
+<!-- ___________________ HIERARCHY ELEMENTS ______________________ -->
+
+<!-- OVERALL DOCUMENT STRUCTURE -->
+
+<!-- The top level tag for The ISO Legal SGML OpenBook implementation 
+     is now called <openbook>.  In old HP Tag (pre 2.0) this tag was 
+     called <manual> which was too generic and posed a problem when 
+     going to an arbitrary/multiple DTD environment.  Hence this tag 
+     has been renamed to be more specific.                         -->
+
+
+<!ELEMENT openbook   - -  (externalobjs?, hyphenationset?, 
+                          reviewerset?,  metainfo?, 
+                          toc?, figtoc?, tabletoc?, 
+                          hometopic?, (part* | d1*), 
+                          supplement?)                               >
+
+<!ATTLIST openbook  author     CDATA                    #IMPLIED
+                    language   CDATA                    #IMPLIED
+                    status     CDATA                    #IMPLIED     
+                    docid      CDATA                    #IMPLIED
+                    handstyle  (HANDS | NOHANDS)        HANDS
+                    tabstyle   (NOTABS | TABS)          NOTABS
+                    revmarks   (NOREV | REV)            NOREV
+                    cropmarks  (NOCROP | CROP)          NOCROP
+                    wrapping   (WRAP | NOWRAP)          WRAP
+                    revision   (DRAFT | FINAL)          DRAFT
+                    memos      (OFF | ON)               OFF
+                    margin     (INDENTED | FULLPAGE)    INDENTED
+                    layout     (BIG | SMALL |
+                                CALCULATOR | EDSEXT)    BIG
+                    charset    CDATA                    #IMPLIED     >
+
+
+
+<!-- <hyphenationset> and <reviewerset> were called <hyphenations> 
+     and <reviewers> in HP Tag.  These were renamed to eliminate 
+     confusion of having singular and plural element names.        -->
+
+<!ELEMENT hyphenationset - O (hyphentry*)
+			    -(idx)                                   >
+
+<!ELEMENT hyphentry      - O (#PCDATA)                               >
+
+<!ELEMENT reviewerset    - O (reviewer+)
+			    -(idx)                                   >
+
+<!ELEMENT reviewer       - O (%partext;)                             >
+<!ATTLIST reviewer  id             ID                     #IMPLIED   >
+
+
+<!-- ____________________ FRONT MATTER/METAINFO ___________________-->
+
+<!-- 
+   - Front has been renamed to metainfo to be compatible with 
+   -    online systems.
+  -->                                      
+<!ELEMENT metainfo  - O  (idsection, legal?, history?, safety?, map?,
+                          abstract?, preface?, conventions?, miscmeta*)
+                         +(idx | needbegin | needend | newline)      > 
+
+<!ELEMENT idsection - O  (product?, title, volume?, hardware?, 
+                          version?, serialno?, partno?, ficheno?,
+                          country?, printdate?, mfgno?, edition?,
+                          copyright, source?)
+			-(footnote)                                  >
+
+
+<!ELEMENT title     - O  (%partext;)                        
+                        +(newline)                                   >
+<!ATTLIST title     id             ID                     #IMPLIED   >
+
+<!ELEMENT (product | volume)     - O  (%partext;)                     >
+<!ELEMENT hardware     - O  ((%partext;), subcategory?)               >
+<!ATTLIST (product | volume | hardware )      
+                       id             ID                   #IMPLIED   >
+<!ELEMENT subcategory - - (%partext;)
+                         +(newline)                                   >
+<!ATTLIST subcategory  id          ID                      #IMPLIED   >
+
+<!ELEMENT (version | serialno | partno | ficheno | country) 
+                      - O  (%partext;)                                >
+<!ATTLIST (version | serialno | partno | ficheno | country)
+                      id             ID                     #IMPLIED  >
+
+<!ELEMENT (printdate | mfgno | edition | source)
+                      - O  (%partext;)                                >
+<!ATTLIST (printdate | mfgno | edition | source) 
+                      id             ID                     #IMPLIED  >
+
+<!ELEMENT copyright   - O  (%text;)                                  
+                            +(newline)                                >
+<!ATTLIST copyright   id          ID                      #IMPLIED    >
+
+
+<!ELEMENT (legal | history | safety | map | abstract)
+                         - -  (head?, (%text; | %async;)*)            >
+<!ATTLIST (legal | history | safety | map | abstract) 
+                         %conditionals;                               >
+
+<!ELEMENT (preface | conventions | miscmeta)
+                         - -  (head?, (%text; | %async;)*)            >
+<!ATTLIST (preface | conventions | miscmeta)          
+                         %conditionals;                               >
+
+
+
+<!-- _____________ Table of Contents ______________________________-->
+
+<!-- Table of Contents markup has been created so that SGML markup 
+   - can be created for users to modify.                           
+  -->
+<!ELEMENT tocname     O O  (%partext;)                               >
+<!ELEMENT tocpage     O O  (%partext;)                               >
+
+<!-- Changed content models to support format-generated tagging
+     These are the originals:
+<!ELEMENT toc         O O  (tocentrypart+ | tocentryd1+)             > 
+<!ELEMENT tocentrypart O O (tocpartno?, tocpartname, tocentryd1+)    >
+<!ELEMENT tocentrychap  O O (tocd1no?, tocd1name, tocentryd2*)       >
+<!ELEMENT tocd1no   O O  (%partext;)                                 >
+<!ELEMENT tocd1name O O  (%partext;)                                 >
+<!ELEMENT tocentryd2  O O  ((%tocrefs;), tocentryd3*)                >
+<!ELEMENT tocentryd3  O O  ((%tocrefs;), tocentryd4*)                >
+<!ELEMENT tocentryd4  O O  ((%tocrefs;), tocentryd5*)                >
+<!ELEMENT tocentryd5  O O  (%tocrefs;)                               >
+-->
+
+<!--The following TOC content models have been changed 
+    Nesting of levels has been removed - ATI 8/26/92               -->
+<!ELEMENT toc         O O  ((tocentrypart | tocentryd1 | tocentryd2
+                            | tocentryd3 | tocentryd4 | tocentryd5)+)>
+<!ELEMENT tocentrypart O O (tocpartno?, tocpartname)                 >
+<!ELEMENT tocpartno   O O  (%partext;)                               >
+<!ELEMENT tocpartname O O  (%partext;)                               >
+<!ELEMENT tocentryd1  O O (tocd1no?, tocd1name)                      >
+<!ELEMENT tocd1no   O O  (%partext;)                                 >
+<!ELEMENT tocd1name O O  (%partext;)                                 >
+<!ELEMENT tocentryd2  O O  (%tocrefs;)                               >
+<!ELEMENT tocentryd3  O O  (%tocrefs;)                               >
+<!ELEMENT tocentryd4  O O  (%tocrefs;)                               >
+<!ELEMENT tocentryd5  O O  (%tocrefs;)                               >
+<!--End of changed TOC content models                              -->
+
+<!-- Table of Figures & Tables common markup -->
+<!ELEMENT toftentryno O O  (%partext;)                               >
+<!ELEMENT toftcaption O O  (%partext;)                               >
+<!ELEMENT toftpage    O O  (%partext;)                               >
+
+<!-- Table of Figures -->
+<!ELEMENT figtoc      O O  (figtocentry+)                            >
+<!ELEMENT figtocentry O O  (%tofrefs;)                               >
+
+<!-- Table of Tables -->
+<!ELEMENT tabletoc    O O  (tabletocentry+)                          >
+<!ELEMENT tabletocentry O O (%totrefs;)                              >
+
+
+
+
+<!-- ________STRUCTURAL ELEMENTS: PART, DIVISIONS, HEADS, ETC. ______________-->
+
+<!--
+   - Parts
+   -   Parts must have a head (that could be empty *) and may have an 
+   -      introductory paragraph level element. It then contains a 
+   -      set of chapter level sections (d1).
+   _
+   - The number attribute is divided into two separate attributes.
+   -  1) Resetnum - When used affects the counter.  All subsequent 
+   -      numbers used after this point will be incremented by 1 from the
+   -      value of resetnum. 
+   -  2) Insertnum - When used does not affect the counter.  Value just 
+   -      provides a temporary substitution.                            
+   -
+   - Chapter 
+   -   Chapters are called division 1 <d1>.
+   -   Section elements are <d2> and down.
+  --> 
+
+<!-- 
+   - Hometopic is Help specific information container.  
+  -->
+
+<!ELEMENT hometopic     - -  (head, abbrev?, (%text;)) 
+                             +(idx | newline)                        > 
+<!ATTLIST hometopic          %conditionals;                          >
+
+
+<!ELEMENT part      - O  (head, abbrev?, intro?, d1+)                 
+                          +(idx | needbegin | needend | newline)      > 
+<!ATTLIST part      resetnum       NUMBER                 #IMPLIED
+                    insertnum      NUTOKEN                #IMPLIED   
+                    %conditionals;                                    >
+
+<!ELEMENT d1        - O  (head, abbrev?, intro?, 
+                          (test* | (d2*, rsect*)) )                   
+                          +(idx | needbegin | needend | newline)      > 
+<!ATTLIST d1        resetnum       NUMBER                 #IMPLIED
+                    insertnum      NUTOKEN                #IMPLIED   
+                    %conditionals;                                    >
+
+
+
+<!ELEMENT test      - O  (head, (%text;), d2*, rsect*)                 >
+<!ATTLIST test      %conditionals;                                     >
+
+<!ELEMENT d2        - O  (head, (%text;), d3*,  rsect*)                >
+<!ELEMENT d3        - O  (head, (%text;), d4*,  rsect*)                >
+<!ELEMENT d4        - O  (head, (%text;), d5*,  rsect*)                >
+<!ELEMENT d5        - O  (head, (%text;), d6*,  rsect*)                >
+<!ELEMENT d6        - O  (head, (%text;), d7*,  rsect*)                >
+<!ELEMENT d7        - O  (head, (%text;), d8*,  rsect*)                >
+<!ELEMENT d8        - O  (head, (%text;), d9*,  rsect*)                >
+<!ELEMENT d9        - O  (head, (%text;), d10*, rsect*)                >
+<!ELEMENT d10       - O  (head, (%text;))                              >
+<!ATTLIST (d2 | d3 | d4 | d5 | d6 | d7 | d8 | d9 | d10) %conditionals; >
+
+
+<!ELEMENT intro     O O  (%text;)                                      >
+<!ATTLIST intro    %conditionals;                                      >
+
+
+<!-- _____________ REFERENCE SECTIONS _______________ -->
+
+<!ELEMENT rsect     - O  (head, abbrev?, (%text;), rsub*)              >
+<!ATTLIST rsect     pagebreak      (NEWPAGE | SAMEPAGE)   "NEWPAGE"    
+                    %conditionals;                                     >
+
+<!ELEMENT rsub      - O  (head, (%text;))                              >
+<!ATTLIST rsub      %conditionals;                                     >
+
+
+
+
+<!-- ______________________ BACK MATTER ELEMENTS ___________________________ -->
+
+<!ELEMENT supplement - O  (appendix*, message?, glossary?, 
+                           idxsyn?, index?) 
+                           +(idx | needbegin | needend | newline)     > 
+
+<!ELEMENT appendix  - O  (head, abbrev?, intro?, 
+                          (test* | (d2*, rsect*)))                    >
+<!ATTLIST appendix  letter         NMTOKEN                #IMPLIED   
+                    %conditionals;                                    >
+
+
+<!--  _____________________ Glossary ___________________ -->
+
+<!ELEMENT glossary  - O  (head?, abbrev?, intro?, (dterm, definition)+)                       
+                         +(needbegin | needend)                       >
+<!ATTLIST glossary       %conditionals;                               >
+
+<!ELEMENT dterm     - O  (%partext;)
+                         -(term)                                      >
+<!ATTLIST dterm          id             ID                   #IMPLIED >
+<!ELEMENT definition - O (%text;)                                     >
+<!ATTLIST definition     %conditionals;                               >
+
+
+<!-- _____________________ Messages ____________________ -->
+
+<!ELEMENT message   - O  (head?, abbrev?, intro?, (msg+ | msgsub+)) >
+<!ATTLIST message        %conditionals;                               >
+
+<!ELEMENT msgsub    - O  (head, (%text;), msg+)                       >
+<!ATTLIST msgsub         %conditionals;                               >
+
+<!ELEMENT msg       - O  (msgnum?, msgtext, explain?)                 >
+<!ELEMENT msgnum    - O  (#PCDATA)+                                   >
+<!ELEMENT msgtext   - O  (%partext;)                                  >
+<!ELEMENT explain   - O  (%text;)                                     >
+<!ATTLIST (msg | msgnum | msgtext | explain)   %conditionals;         >
+
+
+
+
+
+
+
+
+
+<!-- _____________________ DATA CONTAINERS _________________________ -->
+
+
+<!-- 
+   - Heads are used wherever a section level element can have a title.
+   -  They contain pt-lite elements because many systems can not support
+   -  full content headers, especially since the page models have these
+   -  elements rendered in the "margin".
+  -->
+
+<!ELEMENT head      - -  (%pt-lite;)
+                         -(needbegin | needend)                        >
+<!ATTLIST head      %conditionals;                                     >
+
+<!ELEMENT abbrev    - O  (%pt-lite;)
+                         -(needbegin | needend)                        >
+<!ATTLIST abbrev    %conditionals;                                     >
+
+<!-- Bridgeheads are informal section heads that are used to 
+   - separate the presentation of elements without impacting the 
+   - formal hierarchy as reported in the table of contents.
+  -->
+<!ELEMENT bridgehead - -  (%partext;)
+                         -(needbegin | needend | fillin | footnote)    >
+<!ATTLIST bridgehead   %conditionals;                                  >
+
+
+<!-- Captions for frames, tables, etc. -->
+<!ELEMENT caption   - -  (%pt-lite;)
+                         -(needbegin | needend )                       >
+<!ATTLIST caption   %conditionals;                                     >
+
+
+<!-- Running headers and footers.  -->
+<!ELEMENT header    - -  (inside?, middle?, outside?)
+                         -(idx | needbegin | needend)                  >
+
+<!ELEMENT footer    - -  (inside?, middle?, outside?)
+                         -(idx | needbegin | needend)                  >
+<!ATTLIST (header | footer) %conditionals;                             >
+   
+
+<!ELEMENT (inside | middle | outside) 
+                    - O  (%pt-lite;)                                   >
+<!ATTLIST (inside | middle | outside)   
+                    id   ID            #IMPLIED                        >
+
+
+
+
+
+<!-- __________________ INFORMATION UNITS __________________________ -->
+
+<!-- 
+   - Spot graphics, that is, graphics that are to be shown as part of this
+   -  paragraph will be identified using the ingraphic element and the
+   -  type attribute. 
+  -->
+<!ELEMENT p         O O  (%partext;)                                 >
+<!ATTLIST p         %conditionals; 
+                    indent         (OFF | ON)             "OFF"      >
+
+
+<!-- __________ Equation Elements ________________ -->
+
+<!-- Equation declaration, which uses ArborText's equation editor. 
+   - <!ENTITY % atimath  PUBLIC "-//ArborText//ELEMENTS 
+   -                        Math Equation Structures//EN"            >
+   -  %atimath;
+   -
+   -  This entity has been brough inline.
+  -->
+
+<!-- Public document type declaration subset. Typical invocation:
+<!ENTITY % atimath PUBLIC "-//ArborText//ELEMENTS Math Equation Structures//EN">
+%atimath;
+-->
+
+<!-- 
+     IGNORE marked section markup added by ehood@convex.com (05/27/94),
+     since ArborText's equation markup is not currently supported.
+  -->
+
+<![ IGNORE [
+
+<!-- Declarations for ArborText Equations (based on AAP math)
+$Header: openbook.dtd,v 2.1.1.2 94/01/18 11:45:05 dmh Rel $
+
+NOTE: Dtgen excludes ati-math tags from the <docname>.menu and
+<docname>.tags files it builds since the user cannot manipulate
+these tags directly.  The tag exclusion algorithm requires that
+the first and last math elements (in the order they are defined
+in this file) be named <fd> and <rm> respectively.
+
+If these assumptions are invalidated, then some math elements may
+be included into the menus, or some of the DTD's elements might be 
+excluded from the menus.
+-->
+
+<!ENTITY % p.em.ph	"b|it|rm">
+<!ENTITY % p.fnt.ph	"blkbd|ig|sc|ge|ty|mit">
+<!ENTITY % sp.pos	"vmk|vmkr|vsp|hsp|tu">
+<!ENTITY % f-cs		"a|%p.em.ph|%p.fnt.ph|g|bg|%sp.pos">
+<!ENTITY % f-cstxt	"#PCDATA|%f-cs">
+<!ENTITY % f-scs	"rf|inc|v|dy|fi">
+<!ENTITY % limits	"pr|in|sum">
+<!ENTITY % f-bu		"fr|rad|lim|ar|stk|cases|eqaln|fen">
+<!ENTITY % f-ph		"unl|ovl|unb|ovb|sup|inf">
+<!ENTITY % f-butxt	"%f-bu|%limits|%f-cstxt|%f-scs|%f-ph|phr">
+<!ENTITY % f-phtxt	"#PCDATA|%p.em.ph">
+<!ENTITY % f-post       "par|sqb|llsqb|rrsqb|cub|ceil|fl|ang
+                            |sol|vb|uc|dc">
+<!ENTITY % f-style      "s|d|t|da|dot|b|bl|n">
+
+<!ELEMENT fd		- - (fl)*>
+<!ELEMENT fl		O O (%f-butxt)*>
+
+  <![IGNORE [
+  <!ELEMENT fd		- - (la?,fl)+>
+  <!ELEMENT la		- - (%f-cstxt;|%f-ph;)*>
+  <!ATTLIST la		loc		CDATA	#IMPLIED>
+  ]]>
+
+<!ELEMENT f		- - (%f-butxt)*>
+
+<!ELEMENT fr		- - (nu,de)>
+<!ATTLIST fr		shape		CDATA	#IMPLIED
+			align		CDATA	#IMPLIED
+			style		CDATA	#IMPLIED>
+<!ELEMENT (nu|de)	O O (%f-butxt)*>
+  <![IGNORE [
+  <!ELEMENT lim		- - (op,ll,ul,opd?)>
+  ]]>
+<!ELEMENT lim		- - (op,ll?,ul?,opd?)>
+<!ATTLIST lim		align		(r|c)	#IMPLIED>
+  <![IGNORE [
+  <!ELEMENT op		- - (%f-cstxt|rf|%f-ph) -(tu)>
+  ]]>
+<!ELEMENT op		- - (%f-cstxt|rf|%f-ph)* -(tu)>
+<!ELEMENT (ll|ul)	O O (%f-butxt)*>
+<!ELEMENT opd		- O (%f-butxt)*>
+  <![IGNORE [
+  <!ELEMENT (%limits)	- - (ll,ul,opd?)>
+  ]]>
+<!ELEMENT (%limits)	- - (ll?,ul?,opd?)>
+<!ATTLIST (%limits)	align		CDATA	#IMPLIED>
+<!ELEMENT rad		- - (rcd,rdx?)>
+<!ELEMENT rcd		O O (%f-butxt)*>
+<!ELEMENT rdx		- O (%f-butxt)* -(tu)>
+  <![IGNORE [
+  <!ELEMENT fen		- - ((%f-butxt)*,(cp,(%f-butxt)*)*,rp)>
+  ]]>
+<!ELEMENT fen		- - (%f-butxt|cp|rp)*>
+<!ATTLIST fen		lp		(%f-post;)	vb
+			style		(%f-style;)     s>
+<!ELEMENT (cp|rp)	- O EMPTY>
+<!ATTLIST (cp|rp)	post		(%f-post;)      vb
+			style		(%f-style;)	s>
+<!ELEMENT ar		- - (arr+)>
+<!ATTLIST ar		cs		CDATA	#IMPLIED
+			rs		CDATA	#IMPLIED
+			ca		CDATA	#IMPLIED>
+<!ELEMENT arr		- O (arc+)>
+<!ELEMENT arc		O O (%f-butxt)*>
+<!ATTLIST arc		align		CDATA	#IMPLIED>
+<!ELEMENT cases		- - (arr+)>
+<!ELEMENT eqaln		- - (eqline+)>
+<!ELEMENT eqline	- - (%f-butxt)*>
+<!ELEMENT stk		- - (lyr+)>
+<!ELEMENT lyr		O O (%f-butxt)* -(tu)>
+<!ATTLIST lyr		align		CDATA	#IMPLIED>
+<!ELEMENT ach		- - (%f-butxt)*>
+<!ATTLIST ach		atom		CDATA	#IMPLIED>
+<!ELEMENT (sup|inf)	- - (%f-butxt)* -(tu)>
+<!ATTLIST (sup|inf)	loc		CDATA	#IMPLIED>
+<!ELEMENT (unl|ovl)	- - (%f-butxt)*>
+<!ATTLIST (unl|ovl)	style		CDATA	#IMPLIED>
+<!ELEMENT (unb|ovb)	- - (%f-butxt)*>
+<!ELEMENT a		- - (ac,ac) -(tu)>
+<!ATTLIST a		valign		CDATA	#IMPLIED>
+  <![IGNORE [
+  <!ELEMENT ac		O O (%f-cstxt|%f-scs)* -(sup|inf)>
+  ]]>
+<!ELEMENT ac		O O (%f-cstxt|%f-scs|sup|inf)*>
+<!ELEMENT (%f-scs)	- O (%f-cstxt|sup|inf)* -(tu|%limits|%f-bu|%f-ph)>
+<!ELEMENT phr		- O (%f-phtxt)*>
+<!ELEMENT vmk		- O EMPTY>
+<!ATTLIST vmk		id		CDATA	#IMPLIED>
+<!ELEMENT vmkr		- O EMPTY>
+<!ATTLIST vmkr		rid		CDATA	#IMPLIED>
+<!ELEMENT (hsp|vsp)	- O EMPTY>
+<!ATTLIST (hsp|vsp)	sp		CDATA	#IMPLIED>
+<!ELEMENT tu		- O EMPTY>
+<!ELEMENT (g|bg)	- - (#PCDATA)>
+<!ELEMENT (%p.fnt.ph;)	- - (%f-cstxt)*>
+<!ELEMENT (%p.em.ph;)	- - (%f-cstxt)*>
+
+<!-- 
+   - End atimath equation elements
+  -->
+
+]]>
+
+<!-- <fd> and <f> elements are ArborText-specific equation markup. 
+   -
+   -  Notation is not supported by Frame.
+   -  Notation is not supported by Interleaf. 
+   -
+   - Made empty until an industry accepted fragment is available
+  -->
+<!ELEMENT eqn       - O  EMPTY     -- should be (fd) --             >
+<!ATTLIST eqn       id             ID                     #IMPLIED
+                    quadding       (CENTER | LEFT | RIGHT | 
+                                    IN | OUT)             "CENTER"
+                    lindent        NMTOKEN                #IMPLIED
+                    rindent        NMTOKEN                #IMPLIED
+                    presp          NMTOKEN                #IMPLIED
+                    postsp         NMTOKEN                #IMPLIED   
+                    bitmap         ENTITY                 #IMPLIED   >
+
+<!-- Inline equation -->
+<!ELEMENT ineqn     - O  EMPTY     -- should be (f) --               >
+<!ATTLIST ineqn     id             ID                     #IMPLIED
+                    bitmap         ENTITY                 #IMPLIED   >
+
+
+<!-- ______________ Specialized Paragraphs _______________ -->
+
+<!-- Ex presents text with spacing and line breaks preserved.
+   - Took out the position left, indent and center attributes since 
+   - center and left were never supported and indent is always used.  
+  -->
+<!ELEMENT ex          - -  (head?, (exampleseg, annotation?)+)
+                          -(ex | vex | note | caution | warning |
+                            syntax | footnote)                        >
+<!ATTLIST ex          type      (COMPUTER | DISPLAY)       "COMPUTER"
+                      notes     (SIDE | STACK)             "SIDE"
+                      width     (REGULAR | VERYNARROW | 
+                                 NARROW | WIDE)            "REGULAR"     
+                      lines     (NONUMBER | NUMBER)        "NONUMBER"
+                      textsize  (NORMAL | SMALLER |
+                                 SMALLEST)                 "NORMAL"   >
+<!ELEMENT exampleseg  - -  (%partext;)    
+                         +(lineno)                                    >
+<!ATTLIST exampleseg  id            ID                     #IMPLIED   >
+<!ELEMENT lineno      - O  EMPTY                                      >
+<!ATTLIST lineno      id             ID                    #REQUIRED  >
+<!ELEMENT annotation  - - (%pt-lite;)?                                >
+
+
+<!-- _________ Notes, Cautions, and Warnings ______________-->
+
+<!ELEMENT note      - -  (head?, annotext)
+                         -(note | caution | warning | footnote)      >
+<!ELEMENT caution   - -  (head?, annotext)
+                         -(note | caution | warning | footnote)      >
+<!ELEMENT warning   - -  (head?, annotext)
+                         -(note | caution | warning | footnote)      >
+<!ELEMENT annotext  - -  (%lite-text;)                               
+                         -(note | caution | warning | footnote)      >
+<!ATTLIST annotext       %conditionals;                              >
+
+
+
+
+<!-- _____________ Frame element is for figures. _________ -->
+
+<!-- Callouts were removed as the decision was made to not support 
+   -   callouts via SGML.                                            
+  -->
+
+<!ELEMENT frame     - -  ((art | figtext | listing | graphic), 
+                          caption?)
+                        -(frame | ingraphic)                         >
+<!ATTLIST frame     number         NUMBER                 #IMPLIED
+                    tonumber       (NUMBER | NONUMBER)    "NUMBER"
+                    border         (TOP | BOTTOM | BOX |
+                                    SCREEN | NOBOX)       "NOBOX"
+                    %margin-attr;
+                    %conditionals;                                    >
+
+<!ELEMENT art       - -  CDATA                                       >
+<!ATTLIST art       width          NMTOKEN                #IMPLIED
+                    height         NMTOKEN                #IMPLIED
+                    placement      (CENTER | LEFT | RIGHT |
+                                    INSIDE | OUTSIDE)     "CENTER"
+                    %margin-attr;
+                    %conditionals;                                    >
+
+<!ELEMENT figtext   - -  (%text;)
+                        -(frame | ingraphic)                         >
+<!ATTLIST figtext   placement      (CENTER | LEFT | RIGHT) "CENTER"
+                    textsize       (NORMAL | SMALLER | SMALLEST)  
+                                                          "NORMAL"    
+                    %margin-attr;
+                    %conditionals;                                    >
+
+<!ELEMENT listing   - O  EMPTY                                       >
+<!ATTLIST listing   entity         ENTITY                 #REQUIRED
+                    placement      (CENTER | LEFT | RIGHT) "CENTER"
+                    textsize       (NORMAL | SMALLER | SMALLEST)             
+                                                          "NORMAL"   
+                    %conditionals;                                    >
+
+<!ELEMENT graphic   - O  EMPTY                                       >
+<!-- added scalefit reprowid reprodep and changed magnification to
+   - hscale ATI 8/24/92 
+  -->
+<!ATTLIST graphic   entity         ENTITY                 #REQUIRED
+                    magnification  NUMBER                 #IMPLIED
+                    -- resolution in dots per inch "dpi" --
+                    resolution     NUMBER                 #IMPLIED
+                    figpos         (LFT | CTR | RHT)      #IMPLIED
+                    cappos         (LT  | CR  | RT)       #IMPLIED
+                    scalefit       NUMBER                 0
+                    reprowid       NUTOKEN                #IMPLIED
+                    reprodep       NUTOKEN                #IMPLIED
+                    placement      (CENTER | LEFT | RIGHT) "CENTER"
+                    %hyper-attr;
+                    %margin-attr;
+                    %conditionals;                                    >
+
+<!ELEMENT ingraphic - O  EMPTY                                       >
+<!ATTLIST ingraphic entity         ENTITY                 #REQUIRED
+                    type           (INLINE | LEFTSPOT | 
+                                    RIGHTSPOT )           "INLINE"
+                    magnification  NUMBER                 #IMPLIED
+                    resolution     NUMBER                 #IMPLIED   
+                    %hyper-attr;
+                    %conditionals;                                    >
+
+
+
+
+
+<!-- footnotes (inline) -->
+<!ELEMENT footnote  - -  (p+)
+                        -(footnote)                                  >
+<!ATTLIST footnote      %conditionals;                               >
+
+
+<!-- Image element displays text "as is" in source file.           
+   -
+   - Spot graphics, that is, graphics that are to be shown as part of this
+   -  paragraph will be identified using the ingraphic element and the
+   -  type attribute. 
+  -->
+<!ELEMENT image     - -  (head, (%partext;))                         
+                         -(footnote)                                 >
+<!ATTLIST image         %conditionals; 
+                        indent         (OFF | ON)             "OFF"  >
+
+<!-- Labeled list 
+   - Created the labeltext tag so that the FOSI could specify an 
+   -    e-i-c for labeltext content which is side by side to label.   
+   - Removed optional head tag since it is not used.               
+   - Use pt-lite for the lable because this may need special 
+   -   consideration from some processing engines.
+   -
+   -
+   - lablist width units:
+   -	* - relative values: 
+   -		The table spans the current active frame. The colwidth
+   -		values are a description of their relative widths.
+   -		If one colwidth is relative then all all colwidth values 
+   -		must be specified as relative.
+   -	cm - centimeter
+   -	in - inches
+   -	pi - pica
+   -	pt - point
+   -	em - em space
+  -->
+
+<!ELEMENT lablist   - -  (labheads?, (label, labeltext)+)            >
+<!ATTLIST lablist        width     CDATA                 #IMPLIED
+                         spacing   (LOOSE | TIGHT)       "LOOSE"     >
+
+<!ELEMENT labheads  - O  (label, labeltext)
+                         -(needbegin | needend )                    >
+<!ELEMENT label     - O  (%pt-lite;)                                 >
+<!ELEMENT labeltext - -  (%text;) 
+                         -( header | footer | newpage | 
+                            needbegin | needend )                    >
+<!ATTLIST (labheads | label | labeltext)   %conditionals;            >
+
+
+
+<!-- Regular List 
+   -
+   - The procedure tag has been obsoleted and merged into list.  Both 
+   - procedure and list have bold heads so it was not necessary to add
+   - any attributes to distinguish between list and procedure output.
+  -->
+<!ELEMENT list      - -  (head?, item+)                              >
+<!ATTLIST list      type           (BULLET | CHECK | PLAIN | 
+                                    ORDER | ARABIC | UALPHA | 
+                                    LALPHA | UROMAN | LROMAN)
+                                                          "BULLET"
+                    spacing        (LOOSE | TIGHT)        "LOOSE"
+                    continue       (CONTINUE)             #IMPLIED   >
+<!ELEMENT item      - O  (%text;)+
+                        +(leader)                                    >
+<!ATTLIST item      %conditionals;                                   >
+
+
+<!-- ________________  Syntax diagrams ___________________________ -->
+
+<!ELEMENT syntax    - -  (head?, (%synel;)+)                         >
+<!ELEMENT (optblock | reqblock) - - (parm, 
+                                     (optblock | reqblock | parm)*)  >
+
+
+
+<!-- _________________ Tables ____________________________________
+   -
+   - Elements allowed in CALS tables are specified in the tblcon
+   -  parameter entity.                                             
+   -
+   - Conditional markup attributes are applied within that entity file.
+   -
+   - colwidth units:
+   -	* - relative values: 
+   -		The table spans the current active frame. The colwidth
+   -		values are a description of their relative widths.
+   -		If one colwidth is relative then all all colwidth values 
+   -		must be specified as relative.
+   -	cm - centimeter
+   -	in - inches
+   -	pi - pica
+   -	pt - point
+   -	em - em space
+  -->
+
+<!ENTITY  % tblcon  "((%partext;) | graphic | eqn | lablist | 
+                      list | syntax | ex | vex | image | newline | 
+                      tnote | tnoteref)"                             >
+
+<!--
+   -  <!ENTITY  % calstable PUBLIC 
+   -              "-//Hewlett-Packard//ELEMENTS Table Structures//EN">
+   - %calstable;
+   -
+   -  This entity has been brough inline.
+   -
+  -->
+
+
+<!--
+   - This DTD fragment was taken from the CAL markup by Colleen.
+   -
+   - $Header: openbook.dtd,v 2.1.1.2 94/01/18 11:45:05 dmh Rel $
+   -
+  -->
+
+<!ELEMENT (table)       - -       (caption?, tgroup+)   -(table | footnote)   >
+<!ATTLIST (table)              
+      frame    (top | bottom | topbot | all |  sides | none) #IMPLIED
+      %conditionals;
+      number   NUMBER                                       #IMPLIED
+      tonumber (NUMBER | NONUMBER)                          #IMPLIED          >
+
+<!ELEMENT tgroup              - o       (colspec*,
+     spanspec*,
+     thead?, tfoot?,
+     tbody)               >
+
+<!-- Took out tgroupstyle attribute which points to an external 
+     fosi since this is not supported.                         -->
+<!ATTLIST tgroup    cols           NUMBER              #REQUIRED
+      colsep         NUMBER              #IMPLIED
+      rowsep         NUMBER              #IMPLIED
+      align          (left | right |
+       center | justify
+       | char)             "left"
+      charoff        NUTOKEN             "50"
+      char           CDATA               ""
+                                                             >
+
+<!ELEMENT colspec             - o       EMPTY                >
+<!ATTLIST colspec   colnum         NUMBER              #IMPLIED
+      colname        NMTOKEN             #IMPLIED
+      align          (left | right |
+       center | justify
+       | char )            #IMPLIED
+      charoff        NUTOKEN             #IMPLIED
+      char           CDATA               #IMPLIED
+      colwidth       CDATA               #IMPLIED
+      colsep         NUMBER              #IMPLIED
+      rowsep         NUMBER              #IMPLIED  >
+
+<!ELEMENT spanspec            - o       EMPTY                    >
+<!ATTLIST spanspec  namest         NMTOKEN             #REQUIRED
+      nameend        NMTOKEN             #REQUIRED
+      spanname       NMTOKEN             #REQUIRED
+      align          (left | right |
+       center | justify
+       | char )            "center"
+      charoff        NUTOKEN             #IMPLIED
+      char           CDATA               #IMPLIED
+      colsep         NUMBER              #IMPLIED
+      rowsep         NUMBER              #IMPLIED   >
+
+<!ELEMENT (thead |
+ tfoot)                       - o       (colspec*, row+)     >
+<!ATTLIST thead     valign         (top | middle |
+       bottom)             "bottom"
+                                               >
+
+<!ATTLIST tfoot     valign         (top | middle |
+       bottom)             "top"
+                                               >
+
+<!ELEMENT tbody               - o       (row+)               >
+
+<!ATTLIST tbody     valign         (top | middle |
+       bottom)             "top"
+                                               >
+
+<!-- Took out entrytbl which is a table inside of a table since 
+     it was not supported.                                 -->
+<!ELEMENT row                 - o       (entry)+           >
+<!ATTLIST row       rowsep         NUMBER      #IMPLIED
+                                               >
+
+<!--CHANGE 910201 - FOLLOWING ELEMENT CHANGED -->
+
+<!ELEMENT entry               - o       ( %tblcon;)+     
+					+(tnote | tnoteref) >
+
+<!--CHANGE 910201 - FOLLOWING ATTLIST CHANGED -->
+
+<!ATTLIST entry     colname        NMTOKEN             #IMPLIED
+      namest         NMTOKEN             #IMPLIED
+      nameend        NMTOKEN             #IMPLIED
+      spanname       NMTOKEN             #IMPLIED
+      morerows       NUMBER              "0"
+      colsep         NUMBER              #IMPLIED
+      rowsep         NUMBER              #IMPLIED
+      rotate         NUMBER              "0"
+      valign         (top | bottom |
+       middle)             "top"
+      align          (left | right |
+       center | justify
+       | char )            #IMPLIED
+      charoff        NUTOKEN             #IMPLIED
+      char           CDATA               #IMPLIED
+                                               >
+
+<!--ELEMENT entrytbl            - -       (colspec*,
+     spanspec*,
+     thead?, tbody)+     -(entrytbl) >
+<!ATTLIST entrytbl  cols           NUMBER         #REQUIRED
+      tgroupstyle    NMTOKEN        #IMPLIED
+      colname        NMTOKEN        #IMPLIED
+      spanname       NMTOKEN        #IMPLIED
+      colsep         NUMBER         #IMPLIED
+      rowsep         NUMBER         #IMPLIED
+      align          (left | right |
+       center | justify
+       | char )       #IMPLIED
+      charoff        NUTOKEN        #IMPLIED
+      char           CDATA          #IMPLIED
+                                               -->
+<!--
+   - End table fragment.
+   -   Conditionals on the tnote allows applications to treat them 
+   -   the same as footnote.
+  -->
+
+<!ELEMENT tnote     - -  (p+)
+                        -(tnote, footnote)                           >
+<!ATTLIST tnote     %conditionals;                                   >
+<!ELEMENT tnoteref  - O  EMPTY                                       >
+<!ATTLIST tnoteref  rid            IDREF                 #REQUIRED   >
+
+
+
+
+<!-- Vex is used to create a verbatim example. ___________________ -->
+<!ELEMENT vex       - -  CDATA                                       >
+<!ATTLIST vex       type           (COMPUTER | DISPLAY)  "COMPUTER"
+                    textsize       (NORMAL | SMALLER | 
+                                    SMALLEST)            "NORMAL"    >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- __________________ INTRA-PARAGRAPH STRUCTURES ________________-->
+
+
+<!-- __________________ KEY DATA ________________-->
+
+<!ELEMENT acro      - -  (%sub-du1;)                                 >
+
+<!ELEMENT book      - -  (%sub-du;)
+                        -(book)                                      >
+<!ATTLIST book      id             ID                     #IMPLIED   >
+
+<!ELEMENT emph      - -  (%sub-du;)                  
+                        -(emph)                                      >
+<!ATTLIST emph      id             ID                     #IMPLIED   >
+
+<!ELEMENT not       - -  (#PCDATA)                                   >
+
+<!ELEMENT sub       - -  (#PCDATA)                                   >
+
+<!ELEMENT super     - -  (#PCDATA)                                   >
+
+<!ELEMENT term      - -  (%sub-du4;)                                 >
+<!ATTLIST term      base           CDATA                 #IMPLIED
+                    id             ID                    #IMPLIED   
+                    gloss          (YES | NO)            "YES"       >
+
+<!ELEMENT var       - -  (%sub-du1;)                                 >
+
+<!-- TODO - <quote> element has been taken out of the dtd          -->
+
+<!-- 
+   - Parm is a key data type quite similar to var. 
+   - It denotes a parameter. 
+  -->
+<!ELEMENT parm      - -  (%sub-du;)           
+                        -(parm)                                      >
+<!ATTLIST parm      id             ID                     #IMPLIED   >
+
+
+
+<!-- ______ MAN-MACHINE DIALOG DATA ______________-->
+
+<!ELEMENT computer  - -  (%sub-du2;)                                 >
+
+<!ELEMENT cursor    - -  (%sub-du3;)                                 >
+
+<!ELEMENT display   - -  (%sub-du2;)                                 >
+
+<!ELEMENT keycap    - -  (%sub-du1;)
+                         -(needbegin | needend)                      >
+
+<!-- Took out the newline inclusion since multiple lines cannot be 
+     supported in softkeys.                                        -->
+<!ELEMENT softkey   - -  (%sub-du1;)
+                         -(needbegin | needend)                      >
+
+<!ELEMENT user      - -  (%sub-du3;)                                 >
+
+<!-- 
+   - <esc> element has been taken out of the dtd since it no 
+   - longer needs to be used in SGML editors.  Beta testing should 
+   - verify this however.                                                 
+  -->
+
+
+
+
+<!-- ______ SPECIAL LAYOUT DATA ___________________-->
+
+<!ELEMENT fillin    - O  EMPTY                                       >
+
+<!-- Added the END attribute which was supported in HP Tag but was 
+     not in the 1.22 DTD.                                          -->
+<!ATTLIST fillin    length         NMTOKEN               #REQUIRED   
+                    position       (END)                 #IMPLIED    >
+
+<!ELEMENT leader    - O  EMPTY                                       >
+<!ATTLIST leader    type           (DOTS | SPACE)        "DOTS"      >
+
+
+
+<!-- ______ LINKED DATA ____________________________-->
+
+<!-- Cross-references -->
+<!ELEMENT xref      - O  EMPTY                                       >
+<!ATTLIST xref      rid           IDREF                   #REQUIRED  >
+
+<!-- Link
+   -  The content of the link is part of the primary document flow.
+   -
+   -  May have a link inside of a link so keep recursion.           
+   -  May have an id on a link and a reference to the link so we have 
+   -      both ID and IDREF.                                            
+   -
+   - Link is similar to emphasis; it changes the contained info's rendering
+   - and it adds a behavior. For print applications, link content is intended
+   - to be printed unless the common_attr info overrides.
+  -->
+<!ELEMENT link      - -  (%sub-du;)                                 >
+<!ATTLIST link           %conditionals;
+                         %hyper-attr;                               >
+
+
+
+
+<!-- ______ ASYNCHRONOUS DATA ____________________________-->
+
+
+<!-- Have both text and partext content model because you may want to 
+     encapsulate textual block or intra paragraph.                 -->
+
+<!--  Need formatting elements to group text on a page.            -->
+<!ELEMENT needbegin    - O  EMPTY                                    >
+<!ELEMENT needend      - O  EMPTY                                    >
+<!ATTLIST needbegin  %conditionals;                                  >
+
+<!-- Revision bars - 1/11/93 dmh
+   - revision regions have been replaced with a common attribute.
+   -
+   - Recursion is desirable with location. 
+   - 1/11/93 dmh - But for now, locations is only a point in the 
+   - document.
+  -->
+<!ELEMENT location  - -  (%sub-du;)                                  >
+<!ATTLIST location       id   ID                          #IMPLIED   >
+
+
+
+
+
+
+<!-- SPECIAL STRUCTURES -->
+
+<!-- INDEX MARKUP -->
+<!-- Index markup consists of the following major markup categories:
+   - 1) Index user markup - markup used by users to create index entries
+   -                        (primary and secondary) and to specify 
+   -                        information about sorting and synonyms.
+   - 2) Indexer-generated markup - markup used by the indexer program
+   -                               to write the "generated index file"
+   -                               which can be edited by users. 
+  -->
+
+<!-- _____________  Index User Markup __________________-->
+<!ELEMENT idx         - -  (idxkey1, idxkey2?)
+                          -(term | footnote | idx | 
+                            needbegin | needend | fillin)   >
+<!ATTLIST idx         main           (REF | MAIN)           "REF"
+                      range          (BEGIN | END)          #IMPLIED   >
+<!ELEMENT idxkey1     - -  ((%partext;), sort?)                        >
+<!ELEMENT idxkey2     - -  ((%partext;), sort?)                        >
+<!ELEMENT sort        - -  (#PCDATA)                                   >
+<!--  Index synonyms list for "SEE" entries.  These elements were
+   -  renamed from HP Tag to improve usability.                    
+   -->
+<!ELEMENT idxsyn       - O  (synonym+)
+                           -(term | footnote | needbegin | needend | 
+                            fillin | idx)                              >
+<!ELEMENT synonym      - -  (seefromkey1, seefromkey2?, 
+                          seetokey1, seetokey2?)                       >
+<!ELEMENT seefromkey1  - - ((%partext;), sort?)                        >
+<!ELEMENT seefromkey2  - - ((%partext;), sort?)                        >
+<!ELEMENT seetokey1    - - ((%partext;), sort?)                        >
+<!ELEMENT seetokey2    - - ((%partext;), sort?)                        >
+
+<!-- Indexer-generated markup -->
+<!ELEMENT index        O O  (indexsect+)
+                           -(idx)                                      >
+<!ELEMENT indexsect    O O  (indexletter, indexentry+)                 >
+<!ELEMENT indexletter  O O  (%partext;)                                >
+<!ELEMENT indexentry   O O  (indexkey1andref, indexkey2andref*)        >
+<!ELEMENT indexkey1andref O O (indexkey1, (%indexrefs;)?)              >
+<!ELEMENT indexkey2andref O O (indexkey2, (%indexrefs;))               >
+
+<!ELEMENT indexkey1    O O  (%partext;)                                >
+<!ELEMENT indexkey2    O O  (%partext;)                                >
+
+<!ELEMENT indexchapref O O  (%partext;)                                >
+<!ELEMENT indexchaprefmain  O O (%partext;)                            >
+<!ELEMENT indexsyn     O O  (%partext;)                                >
+
+
+
+
+
+<!-- ____ Formatting elements for page and line breaks. __________ -->
+
+<!ELEMENT newline   - O  EMPTY                                       >
+<!ELEMENT newpage   - O  EMPTY                                       >
+<!ELEMENT nobreak   - -  (%partext;)
+                        -(nobreak | needbegin | needend)             >
+<!ATTLIST nobreak   id             ID                     #IMPLIED   >
+
+
+<!-- SHORT REFERENCE MAPS
+   - Short references have been eliminated from the DTD as they caused 
+   - a number of implementation and usage issues and were no longer 
+   - needed.                                                       
+  -->

@@ -1,0 +1,48 @@
+<!-- (C) International Organization for Standardization 1986
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % ISOdia PUBLIC
+       "ISO 8879-1986//ENTITIES Diacritical Marks//EN" "iso-dia.ent">
+     %ISOdia;
+-->
+<!ENTITY acute	"&#180;"	--=acute accent-->
+<!ENTITY cedil	"&#184;"	--=cedilla-->
+<!ENTITY circ	"&#94;" 	--=circumflex accent-->
+<!ENTITY dblac  SDATA "font=symbol charset=fontspecific code=178 
+	descr='[dblac]'"	--=double acute accent-->
+<!ENTITY die	"&#168;"	--=dieresis-->
+<!ENTITY dot    SDATA "font=* charset='iso8859-1' code=183
+	TeX='\cdot ' descr='[dot]'"	--=dot above-->
+<!ENTITY grave	"&#96;" 	--=grave accent-->
+<!ENTITY macr	"&#175;"	--=macron-->
+<!ENTITY ring	"&#176;"	--=ring-->
+<!ENTITY tilde	"&#126;"	--=tilde-->
+<!ENTITY uml	"&#168;"	--=umlaut mark-->
+ 
+<!-- The following characters could not be defined using commonly available
+fonts. Therefore, EBT is using placeholders for these characters. To include
+the placeholders in your document, make sure that the marked section below has
+the keyword "INCLUDE".
+
+To ignore the placeholders, use the keyword "IGNORE". If you are ignoring this
+marked section and your SGML document references any of the entities declared
+below, you will get (non-fatal) mkbook errors, and the entity references will
+not be replaced.
+
+Finally, you may choose to define the entities below yourself, using a special
+font that will be available to readers of your DynaText books. Use the same
+SDATA entity declaration model as is used above, substituting the appropriate
+names and decimal numbers for font, charset, code, and descr. In that case, you
+should INCLUDE the marked section. 
+
+See Chapter 7 of Publisher Guide, Volume 1 for more information. -->
+
+<![ INCLUDE [
+<!ENTITY breve  "[breve]"	--=breve-->
+<!ENTITY caron  "[caron]"	--=caron-->
+<!ENTITY ogon   "[ogon]" 	--=ogonek-->
+]]>
+

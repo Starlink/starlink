@@ -1,0 +1,68 @@
+ <!--
+    -   (c) Copyright 1987-1993 Hewlett-Packard Company
+    -
+    -   Permission to use, copy, and distribute this Document Type
+    -   Definition (DTD) is hereby granted, provided that the above
+    -   copyright notice appear in all copies and that both that copyright
+    -   notice and this permission notice appear in supporting hardcopy and
+    -   online documentation.  All other rights reserved.
+    -
+    -   The name of Hewlett-Packard Company or the Hewlett-Packard logo may
+    -   not be used in advertising or publicity pertaining to distribution
+    -   of this DTD without specific, written prior permission.
+    -   Hewlett-Packard Company makes no representations about the
+    -   suitability of this DTD for any purpose.  It is provided "as is"
+    -   without express or implied warranty.
+    -
+    -   Hewlett-Packard disclaims all warranties with regard to this DTD,
+    -   including all implied warranties of merchantability and fitness, in
+    -   no event shall Hewlett-Packard Company be liable for any special,
+    -   indirect or consequential damages or any damages whatsoever
+    -   resulting from loss of use, data or profits, whether in an action
+    -   of contract, negligence or other tortious action, arising out of or
+    -   in connection with the use or performance of this DTD.
+    -->
+
+<!-- Character entity set. Typical invocation:
+ Character entity set. Typical invocation:
+     <!ENTITY % HPsym PUBLIC "-//Hewlett-Packard//ENTITIES HP Symbols//EN">
+     %HPsym;
+-->
+
+
+
+<!--  Basic HP Tag Entities -->
+
+    <!ENTITY d-slash   CDATA    "/"            >
+    <!ENTITY d-lt      CDATA    "<"            >
+    <!ENTITY d-and     CDATA    "&"            >         
+
+    <!ENTITY m-dihyph  PI    "\-" -- Discretionary hyphen -->
+    <!ENTITY u-space   SDATA " "  -- Actual space char    -->
+
+    <!ENTITY m-specch  SDATA "\LOCspec{}"
+      -- Localizable "Special Characters" head for
+         automatic index processing                       -->
+
+
+    <!ENTITY empty     SDATA ""                                  >
+    <!ENTITY entnull   SDATA ""   -- this should be null  --     >
+
+    <!ENTITY hplogo         SDATA "[hplogo]" >   
+
+    <!entity squarebullet SDATA  "[squarebullet]" >
+    <!ENTITY roundbullet SDATA   "[roundbullet]" >
+    <!ENTITY checkbox  SDATA     "[checkbox]" >
+
+    <!ENTITY a.m.      SDATA     "[a.m.  ]" -- A.M. marker --    >
+    <!ENTITY p.m.      SDATA     "[p.m.  ]" -- P.M. marker --    >
+    <!ENTITY date      SDATA     "[date  ]" -- current date --   >
+    <!ENTITY time      SDATA     "[time  ]" -- current time --   >
+    <!ENTITY vblank    SDATA     "[vblank]" -- vertical blank -- >
+
+    <!ENTITY k.up      SDATA     "[k.up  ]" -- keyboard up --    >
+    <!ENTITY k.down    SDATA     "[k.down]" -- keyboard down --  >
+    <!ENTITY k.left    SDATA     "[k.left]" -- keyboard left --  >
+    <!ENTITY k.rght    SDATA     "[k.rght]" -- keyboard right -- >
+    <!ENTITY k.back    SDATA     "[k.back]" -- keyboard backspace -- >
+    <!ENTITY k.home    SDATA     "[k.home]" -- keyboard home --  >

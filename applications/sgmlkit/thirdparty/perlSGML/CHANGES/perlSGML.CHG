@@ -1,0 +1,24 @@
+Change History for perlSGML
+---------------------------
+	97/09/18 14:46:20
+
+The change history only covers changes "global" across perlSGML
+software, and changes not covered in the the other *.CHG files.
+For specific components of perlSGML, see the relevant CHG file.
+
+==============================================================================
+Sept 18, 1997
+
+    o	Changed document files so "::" is not used since Windoze
+	systems choke on them.
+
+    o	Beefed up the formatting of the module documentation and
+	made a few updates.
+
+==============================================================================
+Sept 16, 1997
+
+Start of change history.
+
+==============================================================================
+Earl Hood, ehood@medusa.acs.uci.edu

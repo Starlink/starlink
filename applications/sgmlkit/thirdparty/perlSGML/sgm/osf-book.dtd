@@ -1,0 +1,2503 @@
+<!--
+ _______________________________________________________________________
+|									|
+|	Version: 1.0a							|
+|									|
+|	Document Type Definition for OSF books.				|
+|									|
+|	b                       k					|
+|	b                       k					|
+|	b                       k    k					|
+|	b                       k   k					|
+|	bbbbbb  oooooo  oooooo  kk k					|
+|	b    b  o    o  o    o  k k					|
+|	b    b  o    o  o    o  k  k					|
+|	b    b  o    o  o    o  k   k					|
+|	bbbbbb  oooooo  oooooo  k    k					|
+|									|
+|_______________________________________________________________________|
+-->
+
+<!--
+ _______________________________________________________________________
+|									|
+|   Copyright 1993 Open Software Foundation, Inc.,			|
+|   Cambridge, Massachusetts.						|
+|									|
+|   All rights reserved.						|
+|									|
+|   Permission to use, copy, modify, and distribute this document for	|
+|   any purposes and without fee us hereby granted, provided that the	|
+|   above copyright notice and this permission notice appear on all	|
+|   copies of this document.  The name of Open Software Foundation,	|
+|   Inc. (OSF) may not be used in advertising or publicity pertaining	|
+|   to this document without express, written prior consent.		|
+|									|
+|   OSF PROVIDES THIS DOCUMENT TO USER "AS IS."  OSF DISCLAIMS ALL	|
+|   WARRANTIES, EXPRESS OR IMPLIED, WITH RESPECT TO THIS DOCUMENT,	|
+|   INCLUDING THE WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A	|
+|   PARTICULAR PURPOSE.  IN NO EVENT SHALL OSF BE LIABLE FOR ANY	|
+|   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,	|
+|   OR ANY DAMAGES WHATSOEVER RESULTING FROM LOS OF USE, DATA, OR	|
+|   PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE, OR OTHER	|
+|   TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OF	|
+|   THIS DOCUMENT.							|
+|_______________________________________________________________________|
+-->
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	General Entity declarations for use in the OSFDTDs		|
+|									|
+|									|
+|	This DTD uses the following entity declarations to define	|
+|	either logical groupings of elements or complete content	|
+|	models for use throughout the DTD.				|
+|									|
+|	Entities that are defined solely to provide content models for	|
+|	particular elements have names that begin with an "s." prefix	|
+|	(eg, "s.part" defines the content model for the <part>		|
+|	element).  Entities that serve to group elements that mark up	|
+|	technical content that with an "extra" 't' (eg, "tname" stands	|
+|	for technical names).  Other entities' names are chosen for	|
+|	readability.							|
+|_______________________________________________________________________|
+ -->
+
+
+
+<!--....................................................................
+|									|
+|	General and "simple text" content, often specialized for a	|
+|	particular semantic situation.					|
+|									|
+ .....................................................................-->
+
+<!ENTITY % characters
+	"(#PCDATA | xref | xdocref | entry | noteref | special-format)" >
+
+<!ENTITY % stext	"%characters; | trademark"	>
+
+<!ENTITY % text		"literal | emphasis | subscript | superscript"	>
+<!ENTITY % name		"acronym | trademark | place | honorific" >
+<!ENTITY % normalize	"date | time | telephone | year | e-mail"	>
+<!ENTITY % special	"number | msg-code | foreign-phrase | person |
+			calendar-ref"	>
+
+
+<!--....................................................................
+|	Technical key data elements:					|
+ .....................................................................-->
+
+<!ENTITY % tname	"variable | keyboard-key | command | function |
+			datatype"				>
+<!ENTITY % tspecial	"cmd-argument | data-declaration | option-name |
+			markup | file | directory | misc-data"	>
+<!ENTITY % io		"keyboard-input | computer-output | gui-text"	>
+<!ENTITY % media	"graphic | audio | video"		>
+
+<!ENTITY % ttext	"%characters; | %tname; | %tspecial;" >
+<!ENTITY % filename	"%characters; | file | directory"		>
+
+
+<!--....................................................................
+|	Paragraph- and phrase-like content.  This is all keydata	|
+|	and PCDATA.  Used in most cases where "simple text" is		|
+|	expected.  %leaf; is for general cases.				|
+ .....................................................................-->
+
+<!ENTITY % leaf
+	"%characters; | %text; | %name; | %normalize; | quote |
+	address |  input-instruct | msg-text | %special; |
+	(%tname; | %tspecial; | %io; | logical-negation) |
+	%media; | equation"
+>
+
+
+<!--....................................................................
+|	%branch; is used where structured content is allowed, such as	|
+|	immediately within a division.  It can be thought of as		|
+|	components that will further branch.  It gets widely used, as	|
+|	structured text is a very general capability. 			|
+ .....................................................................-->
+
+<!ENTITY % branch
+	"p | list | table | display | note | excerpt | bridge-title"
+>
+
+<!--....................................................................
+|	%pbranch; contains those branch things that may go inside	|
+|	of a paragraph.							|
+ .....................................................................-->
+
+<!ENTITY % pbranch	"list | table | display | excerpt"	>
+
+
+<!--....................................................................
+|	branch.text is intended for use where textual branching		|
+|	components can go						|
+ .....................................................................-->
+
+<!ENTITY % branch.text	"p | list | table | note"	>
+
+
+<!--....................................................................
+|	%s.display; is what can go inside a display. It is a superset	|
+|	of branch.							|
+ .....................................................................-->
+
+<!ENTITY % s.display
+	"%branch; | message | proglang-synopsis | cmd-synopsis |
+	 file-synopsis | text-as-figure | text-alternate | equation |
+	 (%normalize; | input-instruct | msg-text | %tname; |
+	 %tspecial; | %io; | logical-negation | %media;)"
+>
+
+
+
+<!--....................................................................
+|	The following two entity definitions provide a means of easily	|
+|	extending the hyperlinking functionality of this DTD, although	|
+|	probably in a non-interoperable way.  Please see the		|
+|	hy-davenport module for more details.				|
+ .....................................................................-->
+
+<!ENTITY % hy-extra	""	>
+
+<!ENTITY % extra-decls	""	>
+
+
+
+<!--....................................................................
+|	Below are content models for elements that make use of		|
+|	%hy-extra;.							|
+ .....................................................................-->
+
+<!ENTITY % s.xref	"%leaf; %hy-extra;"	>
+
+<!ENTITY % s.entry	"(%leaf;) | hy-locator | hy-bib-description |
+			  button | hy-concept %hy-extra;"	>
+
+<!ENTITY % s.xdocref	"%leaf; %hy-extra;"	>
+
+<!ENTITY % s.navigation	"toc | index | bibliography | glossary %hy-extra;"	>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Content of various levels of book divisions.			|
+|_______________________________________________________________________|
+ -->
+
+
+<!--....................................................................
+|	content of structural elements:					|
+ .....................................................................-->
+
+<!ENTITY % div-general	"| division"	-- set to "" for stricter structure -- >
+
+
+<!--....................................................................
+|	various prelim/frontmatter elements, with generic divisions:	|
+ .....................................................................-->
+
+<!ENTITY % s.prelim	"foreword?, preface?, pdivision*"	>
+
+<!ENTITY % s.preface	"title, augmentum?, (%branch;)*, pdivision*"  >
+<!ENTITY % s.pdivision	"title, augmentum?, (%branch;)*, pdivision*"  >
+<!ENTITY % s.foreword	"title, augmentum?, (%branch;)*, pdivision*"	>
+
+<!ENTITY % s.body	"part+ | ( chapter %div-general; )+"	>
+
+<!ENTITY % s.part	"title, augmentum?,
+			( ( %branch; )* | ( subpart* | osf-refpage* |
+				( chapter %div-general; )* ) )" >
+<!ENTITY % s.subpart	"title, augmentum?,
+			( ( %branch; )* | ( osf-refpage* |
+				( chapter %div-general; )* ) )" >
+<!ENTITY % s.chapter	"title, augmentum?, ( %branch; )*,
+				( osf-refpage* | ( section %div-general; )* )" >
+<!ENTITY % s.section	"title, augmentum?, ( %branch; )*,
+				( division* | osf-refpage* )"  >
+<!ENTITY % s.division	"title, augmentum?, ( %branch; )*,
+				( division* | osf-refpage* )"  >
+
+<!ENTITY % s.supplement	"( appendix %div-general; )+"	>
+<!ENTITY % s.appendix	"%s.chapter;"	>
+
+<!--....................................................................
+|	pdivision types							|
+ .....................................................................-->
+
+<!ENTITY % pdivision-types
+	"acknowledgements | applicability | audience | contents |
+	conventions | document-map | document-structure | document-usage |
+	problem-reporting | purpose | reader-feedback | related-documents |
+	typog-conventions"	>
+
+<!--....................................................................
+|	chapter, section, division types				|
+ .....................................................................-->
+
+<!ENTITY % division-types
+	"introduction | message | reference | summary"	>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Content of various levels of reference divisions.		|
+|_______________________________________________________________________|
+ -->
+
+
+<!--....................................................................
+|	content of structural elements:					|
+ .....................................................................-->
+
+<!ENTITY % rdiv-general	"| rdivision"	-- set to "" for stricter structure -- >
+
+
+<!--....................................................................
+|	reference division elements (much simpler than book)		|
+|									|
+|	s.rbody is used to define the "body" of a refpage.		|
+|	rsection is the equivalent to .SH, while rdivision, when	|
+|	nested immediately below an rsection, is equivalent to a	|
+|	.SS.  Note that rdivisions may nest.				|
+ .....................................................................-->
+
+<!ENTITY % s.rbody	"( ( %branch; )+ | ( rsection %rdiv-general; )+ )"	>
+
+<!ENTITY % s.rsection
+	"title, ( %branch; | proglang-synopsis | cmd-synopsis |
+							file-synopsis )*,
+		( rsubsection %rdiv-general; )*"	>
+
+<!ENTITY % s.rsubsection "title, ( %branch; )*, rdivision*"	>
+
+<!ENTITY % s.rdivision	"title, ( %branch; )*, rdivision*"	>
+
+<!--....................................................................
+|	rsection types							|
+ .....................................................................-->
+
+<!ENTITY % rsection-types
+	"AES-support-level | abbreviation | alias | arguments | bugs |
+	cautions | description | diagnostics | errors | examples |
+	exit-values | fields | files | flags | history-direction | library |
+	notes | options | output | parameters |
+	related-information | return-values | specification-context |
+	subcommands | synopsis | warnings" >
+
+
+<!--....................................................................
+|	rsubsection types						|
+ .....................................................................-->
+
+<!ENTITY % rsubsection-types "compatibility-level | support | support-level" >
+
+<!--FF-->
+
+<!--
+ _______________________________________________________________________
+|									|
+|	The %common-attr; parameter entity defines attributes that are	|
+|	common to all elements.						|
+|									|
+|	qualify		describes how an element is qualified. 	eg,	|
+|			meant for a certain system, etc.		|
+|									|
+|	id		provides an id that may be #IMPLIED or		|
+|			#REQUIRED depending on how %common-attr; is	|
+|			used						|
+|									|
+|	use of this parameter must be followed by something that ends	|
+|	the id attribute, like #REQUIRED				|
+|									|
+|	The entity extra-common-attr may be set in an instance, so the	|
+|	user can easily add a common attribute.				|
+|_______________________________________________________________________|
+ -->
+
+<!ENTITY % extra-common-attr	""	>
+
+<!ENTITY % common-attr
+"	qualify		CDATA		#IMPLIED
+	%extra-common-attr;
+	id		ID"
+>
+
+
+
+<!--....................................................................
+|	Attributes associated with Production of paper documents and	|
+|	publishing.  The following is an entity declaration that can	|
+|	be used to provide attributes useful for describing special	|
+|	formatting sometimes required for production of paper		|
+|	documents.							|
+ .....................................................................-->
+
+<!ENTITY % wrap-formatting-attrs
+"	adjust ( adjust | noadjust )	#IMPLIED
+"
+>
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Top-level Book Structure					|
+|									|
+|	Divisions are used:						|
+|									|
+|	 o for conventional purposes that can be distinguished clearly,	|
+|	   such as an Introduction or a Summary.			|
+|									|
+|	   These should be marked up by providing the appropriate value	|
+|	   to the "type" attribute of the division element.		|
+|									|
+|	 o for general purposes that are specific to the document at	|
+|	   hand and whose purpose isn't listed in the possible values	|
+|	   for the type attribute, for example, a division titled	|
+|	   "Entering Text into an Input Field".				|
+|									|
+|	   These should be marked up with the "type" attribute		|
+|	   defaulted to "general."					|
+|									|
+|	In those cases where a specific, typically more rigidly		|
+|	structured type of division is to be marked up, such as a	|
+|	division marked as a "message" division, it is up to the author	|
+|	to include the correct type of information within the division.	|
+|	In this case, that would mean instances of the structured-	|
+|	key-data "message", arranged into a list or other structure.	|
+|									|
+|	Note that the Validating Application can be used to verify	|
+|	that document instances fit whatever editorial rules have	|
+|	been specified.  For example, it could verify a constraint	|
+|	such as "a <division> with type=message must contain at least	|
+|	one <message>, and a <message> may appear no where else."	|
+|									|
+|	It is assumed that the processing application may choose to	|
+|	override the author-supplied title when the type attribute	|
+|	implies a specific title.  Regardless, a title should be	|
+|	supplied for every division as the information could be		|
+|	processed in an environment with a	different style guide	|
+|	than the originating organization - even one in which a title	|
+|	isn't specified for the type of division named.			|
+|_______________________________________________________________________|
+-->
+
+
+<!ELEMENT osf-book	- -
+		( title, meta?, augmentum?,
+		  preliminaries?, body, supplements? )
+				+( i18n-bracket | rev-bracket )
+>
+
+<!ATTLIST osf-book
+	HyTime		NAME	#FIXED	"doc"	-- conforms to HyTime --
+	%common-attr;		#REQUIRED
+>
+
+<!ELEMENT body		O O	(%s.body;)	>
+<!ELEMENT part		- O	(%s.part;)	>
+<!ELEMENT subpart	- O	(%s.subpart;)	>
+<!ELEMENT chapter	- O	(%s.chapter;)	>
+<!ELEMENT section	- O	(%s.section;)	>
+<!ELEMENT division	- O	(%s.division;)	>
+<!ELEMENT pdivision	- O	(%s.pdivision;)	>
+
+<!ELEMENT preliminaries	- O	(%s.prelim;)	>
+<!ELEMENT preface	- O	(%s.preface;)	>
+<!ELEMENT foreword	- O	(%s.foreword;)	>
+
+<!ELEMENT supplements	- O	(%s.supplement;)	>
+<!ELEMENT appendix	- O	(%s.appendix;)	>
+
+
+<!ATTLIST ( preliminaries | body | supplements | preface | foreword | part )
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST ( chapter | section | appendix | division )
+	type	( %division-types; )	#IMPLIED
+	%common-attr;		#IMPLIED
+>
+
+<!ATTLIST pdivision
+	type	( %pdivision-types; )	#IMPLIED
+					-- the type of prelim division --
+	%common-attr;		#IMPLIED
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Top-level Refpage Structure					|
+|									|
+|	Rdivisions are used:						|
+|									|
+|	 o for conventional purposes that can be distinguished clearly,	|
+|	   such as Purpose or Description.				|
+|									|
+|	   These should be marked up by providing the appropriate value	|
+|	   to the "type" attribute of the rdivision element.		|
+|									|
+|	 o for general purposes that are specific to the document at	|
+|	   hand	and whose purpose isn't listed in the possible values	|
+|	   for the type attribute, for example, a division titled	|
+|	   "Entering Text into an Input Field".				|
+|									|
+|	This module, ref-hier.mod, is independent so that it can be	|
+|	considered part of the overall OSF book DTD or standalone for	|
+|	use with individual manual / reference pages.  Please see the	|
+|	module book-hier.mod that defines the <osf-book> and <division>	|
+|	tags for how they treat the same issues for a book, and to see	|
+|	how reference pages may be integrated into a book.		|
+|									|
+|	It is assumed that the processing application may choose to	|
+|	override the author-supplied title when the type attribute	|
+|	implies a specific title.  Regardless, a title should be	|
+|	supplied for every rdivision as the information could be	|
+|	processed in an environment with a different style guide than	|
+|	the originating organization - even one in which a title isn't	|
+|	specified for the type of division named.			|
+|_______________________________________________________________________|
+-->
+
+
+<!ELEMENT osf-refpage	- O
+		( meta?, augmentum?,
+		  ref-name, ref-purpose, ( sub-name, sub-purpose? )*,
+		  %s.rbody )
+				+( i18n-bracket | rev-bracket )
+>
+
+<!ATTLIST osf-refpage
+	category	CDATA	#IMPLIED
+		-- possible values for category: user cmd, admin cmd, net,
+		   sys call, library call, file, device, statement, markup,
+		   other --
+	HyTime		NAME	#FIXED	"doc"	-- conforms to HyTime --
+	%common-attr;		#REQUIRED
+>
+
+
+<!ELEMENT ( ref-name | sub-name )	- O	( (%ttext;)* )	>
+<!ELEMENT ( ref-purpose | sub-purpose )	- O	( (%leaf;)* )		>
+
+<!ATTLIST ( ref-name | sub-name | ref-purpose | sub-purpose )
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT rsection	- O	( %s.rsection; )	>
+<!ELEMENT rsubsection	- O	( %s.rsubsection; )	>
+<!ELEMENT rdivision	- O	( %s.rdivision; )	>
+
+<!ATTLIST rsection
+	type	( %rsection-types; )	#IMPLIED
+					-- the type of section --
+	%common-attr;		#IMPLIED
+>
+
+<!ATTLIST rsubsection
+	type	( %rsubsection-types; )	#IMPLIED
+					-- the type of subsection --
+	%common-attr;		#IMPLIED
+>
+
+<!ATTLIST rdivision
+	type	( %rsection-types; | %rsubsection-types; ) #IMPLIED
+					-- the type of rdivision --
+	%common-attr;		#IMPLIED
+>
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Meta information						|
+|									|
+|	Meta information is information about the document or reference	|
+|	page that is not (necessarily) included in the document itself.	|
+|	The content of the meta information is a long list of various	|
+|	elements, mostly optional, that can be used to describe the	|
+|	meta information to a fine level of granularity.  Examples	|
+|	include "translat-hist" for a description of the translation	|
+|	history of the document, and "req-os" "req-software" and	|
+|	"req-hardware" to describe the required platform for the	|
+|	product being described by the document.			|
+|									|
+|	It is hoped that the current level of fine granularity is	|
+|	valuable for the creation of tools that can automatically	|
+|	process the meta information.  However, the specific content	|
+|	of these sub-elements is generally specified as %leaf;,		|
+|	and isn't any more specific.  It may turn out that further	|
+|	specification of the contents of the sub-elements is required	|
+|	to really meet this goal.					|
+|_______________________________________________________________________|
+-->
+
+
+<!ELEMENT meta	- O
+		( doc-id?, product-id?, notices?, desc-pool?,
+					semantic-roles?, hy-concept* )
+>
+
+<!ATTLIST meta
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT doc-id	- O
+		( collection?, audience?, order-id?, isbn?, update-hist?,
+		  valid-date?, translat-hist?, abstract?, retrieval-keys?,
+		  author-info*, reviewers?, volume-info? )
+>
+<!ELEMENT product-id	- O
+		( product+, req-os*, req-software*, req-hardware* )
+>
+<!ELEMENT notices	- O
+		( disclaimer?, safety?, copyrights?, trademarks?, sw-license?,
+		  govt-rights?, fcc-warning?, acknowledgements?, misc-notice* )
+>
+
+<!ATTLIST doc-id
+	draft-status		(draft|review|final)	#IMPLIED
+	security-status		(members|open|osfonly)	#IMPLIED
+	origin-country		CDATA			#IMPLIED
+	origin-language		CDATA			#IMPLIED
+	doc-version		CDATA			#IMPLIED
+	manual-type		CDATA			#IMPLIED
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST ( product-id | notices )
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+.	doc-id contents							.
+ .....................................................................-->
+
+<!ELEMENT collection	 - O	(%stext;)*		>
+<!ELEMENT audience	 - O	(%branch.text;)*	>
+<!ELEMENT order-id	 - O	(#PCDATA)		>
+<!ELEMENT isbn		 - O	(#PCDATA)		>
+<!ELEMENT update-hist	 - O	(%branch.text;)*	>
+<!ELEMENT valid-date	 - O	(#PCDATA)		>
+<!ELEMENT translat-hist	 - O	(%branch.text;)*	>
+<!ELEMENT abstract	 - O	(%branch.text;)*	>
+<!ELEMENT retrieval-keys - O	(#PCDATA)		>
+<!ELEMENT reviewers	 - O	(%branch.text;)*	>
+<!ELEMENT volume-info	 - O	(%stext;)*		>
+
+<!ATTLIST ( collection | audience | order-id | isbn |
+	    update-hist | valid-date | translat-hist | abstract |
+	    retrieval-keys | reviewers | volume-info )
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT author-info	- O
+		( person* , e-mail* , auth-affiliation* , address* )
+>
+<!ELEMENT auth-affiliation - O	(%stext;)*	>
+
+<!ATTLIST ( author-info | auth-affiliation )
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+.	product-id contents						.
+ .....................................................................-->
+
+<!ELEMENT ( req-os | req-software | req-hardware )	- O
+		( product-name, product-version* )
+>
+
+<!ELEMENT ( product )	- O	( product-name, product-version? )	>
+
+<!ELEMENT ( product-name | product-version)	- O	(%stext;)*	>
+
+<!ATTLIST ( req-os | req-software | req-hardware |
+	    product-name | product-version )
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST product
+	type		(sw|hw|os|other)	#IMPLIED
+	%common-attr;	#IMPLIED
+>
+
+
+<!--....................................................................
+.	notices contents						.
+ .....................................................................-->
+
+<!ELEMENT ( disclaimer | safety | sw-license | govt-rights | fcc-warning |
+	    acknowledgements | misc-notice ) - O
+		(%branch.text;)*
+>
+<!ELEMENT copyrights	- O	( copyright-notice+ )		>
+<!ELEMENT copyright-notice - O	( owner, year+, statement? )	>
+
+<!ATTLIST copyright-notice
+	registration	CDATA	#IMPLIED
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT owner		- O	( #PCDATA | %name; )+		>
+<!ELEMENT statement	- O	( #PCDATA | %name; | %normalize; | quote )+	>
+<!ELEMENT trademarks	- O	( trademark-pair+ )		>
+<!ELEMENT trademark-pair - O	( trademark, statement )	>
+
+<!ATTLIST ( disclaimer | safety | sw-license | govt-rights |
+	    fcc-warning | acknowledgements | copyrights | owner |
+	    trademarks | trademark-pair | statement )
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST misc-notice
+	type		CDATA	#IMPLIED
+	%common-attr;		#IMPLIED
+>
+
+
+<!ELEMENT desc-pool	- O
+		( i18n-description*, rev-description* )
+>
+
+<!ATTLIST desc-pool
+	%common-attr;		#IMPLIED
+>
+<!--FF-->
+
+<!--
+ _______________________________________________________________________
+|									|
+|	augmentum							|
+|									|
+|	These are common to the document as a whole and to divisions.	|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT augmentum	- O	( navigation? | summary? )*	>
+
+<!ATTLIST augmentum
+	%common-attr;		#IMPLIED
+>
+
+<!--....................................................................
+.	summary:  document summary (not abstract)			.
+ .....................................................................-->
+
+<!ELEMENT summary	- O	( title, (%branch;)* )	>
+
+<!ATTLIST summary
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+.	navigation:  only the non-HyTime parts				.
+ .....................................................................-->
+
+<!ELEMENT navigation	- O	( %s.navigation; )*	>
+
+<!ATTLIST navigation
+	%common-attr;		#IMPLIED
+>
+
+
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Titles								|
+|									|
+|	There are two kinds of titles, regular (long) and alternate.	|
+|	<title> is the default, regular title.  <alt-title> is for	|
+|	contexts where the presentation medium is constrained in size	|
+|	or graphical capability.					|
+|									|
+|	Instead of providing distinct title elements for use in titling	|
+|	different elements, we have the generic <title> elements	|
+|	which automatically title their immediately containing		|
+|	elements. For example, both a <display> and the <section>	|
+|	containing a <display> may both contain a <title>, but there	|
+|	should be no confusion between the two because of the context	|
+|	that the <title> appears in.					|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT title	- -	( (%leaf;)*, alt-title? )	>
+
+<!ELEMENT alt-title - O	( (%stext;)* )			>
+
+<!ATTLIST ( title | alt-title )
+	%wrap-formatting-attrs;		-- special for production use --
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT bridge-title - O	( %leaf; )*	>
+
+<!ATTLIST bridge-title
+	HyTime		NAME	ilink
+	anchrole	NAMES	#FIXED	"signifier AGG signified AGG"
+	reftype		CDATA	#FIXED	"activity dav.policies
+					 endterms dav.choiceSignifier.activity"
+	activity	IDREFS	#IMPLIED
+	linkends	IDREFS	#IMPLIED	-- HyTime calls for REQUIRED --
+	extra		NAMES	#IMPLIED
+	   -- lextype(("E"|"I"|"A"|"N"|"P"), (s+, ("E"|"I"|"A"|"N"|"P"))*) --
+	intra		NAMES	#IMPLIED
+	   -- lextype(("E"|"I"|"A"|"N"|"P"), (s+, ("E"|"I"|"A"|"N"|"P"))*) --
+	endterms	IDREFS	#IMPLIED
+	aggtrav		NAMES	agg
+	   -- lextype (("agg"|"mem"|"cor"), (s+, ("agg"|"mem"|"cor"))*) --
+	context		(context|ncontext) ncontext
+	%wrap-formatting-attrs;		-- special for production use --
+	%common-attr;		#IMPLIED  -- (includes id) --
+>
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Paragraphs							|
+|									|
+|	The American Heritage Dictionary [1982, 1985] states that a	|
+|	paragraph is "a distinct division of a written work ... that	|
+|	expresses a thought or point relevant to the whole but is	|
+|	complete in itself, and may consist of a single sentence or	|
+|	several	sentences."						|
+|									|
+|	Because a sentence may span elements (for example, start in a	|
+|	wrapping area, but end in a list), the content model for	|
+|	paragraphs includes a variety of other elements.  Other		|
+|	have been chosen (see the definition of pbranch) based on	|
+|	whether they could continue a sentence or not.  For this	|
+|	reason, titles, notes, and bridging-titles are excluded from	|
+|	the content of a paragraph.					|
+|									|
+|	Note that the content model of paragraph specifies that a	|
+|	paragraph start with (%leaf;)+.  Because %leaf; contains	|
+|	PCDATA, (%leaf;)+ may in practice be empty.  However, the	|
+|	intention is that a paragraph start with real content in	|
+|	%leaf; because that is where a sentence should start.		|
+|	Validating Applications may want to check for real content	|
+|	in the initial %leaf; to verify good editorial style.		|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT p	- O	( (%leaf;) | (%pbranch;) )*  -(title)	>
+
+<!ATTLIST p
+	%wrap-formatting-attrs;		-- special for production use --
+	%common-attr;	#IMPLIED
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Key Data							|
+|									|
+|	Key data markup is used, generally at the "leaves" of a		|
+|	document tree, to characterize the semantics of particular	|
+|	pieces of text.  This fills the role of OSF's SML "meaningful	|
+|	text markup."  This DTD attempts to walk the line between	|
+|	defining enough different semantics to be useful and not	|
+|	defining so many that it becomes hard to find the right markup.	|
+|									|
+|	There are several types:					|
+|									|
+|	  Technical Key Data	describes technical terms/semantics	|
+|									|
+|	  Media Key Data	allows inclusion of alternate		|
+|				(non-text) content			|
+|									|
+|	  General Key Data	describes general semantics		|
+|_______________________________________________________________________|
+-->
+
+
+<!--....................................................................
+|	General key data types						|
+ .....................................................................-->
+
+<!ELEMENT (%text;)	- O	(#PCDATA)	>
+
+<!ELEMENT (%name;)	- O	(#PCDATA)	>
+
+<!ELEMENT (%normalize;)	- O	(#PCDATA)	>
+
+<!ELEMENT quote		- O	(%leaf;)*	-(quote)	>
+
+<!ELEMENT number	- O	(#PCDATA)	>
+
+<!ELEMENT msg-code	- O	(#PCDATA)	>
+
+<!ELEMENT person	- O	(#PCDATA | e-mail)*	>
+
+<!ATTLIST (%text;)
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST (%name;)
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST (%normalize;)
+	normalized	CDATA	#IMPLIED
+			--  normalized values:
+				date: ISO 8601 date extended format
+				time: ISO 8601 date extended format (if date
+					and time), or GMT if just time
+					ext. format: 1993-05-01T15:30:00
+				telephone: include +country code
+				year: Gregorian year
+				e-mail: internet address: user@host.domain --
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST quote
+	marks	( adorned | unadorned )	#IMPLIED
+	%common-attr;			#IMPLIED
+>
+
+<!ATTLIST number
+	radix			(decimal|binary|octal|hex)	#IMPLIED
+	unit-of-measure		CDATA	#IMPLIED
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST msg-code
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST person
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT address - O	(#PCDATA)	>
+
+<!ATTLIST address
+	%common-attr;		#IMPLIED
+>
+
+<!--....................................................................
+|	Some "special" elements (grouped as %special;).			|
+|	Similar to %name;, but different attributes.			|
+ .....................................................................-->
+
+<!ELEMENT (foreign-phrase | calendar-ref)	- O	(#PCDATA)	>
+<!ATTLIST (foreign-phrase | calendar-ref)
+	locale		CDATA	#IMPLIED
+	%common-attr;		#IMPLIED
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Technical Key Data						|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT input-instruct - O	(%stext)*	>
+
+<!ELEMENT msg-text	- O	(%stext)*	>
+
+<!ELEMENT (%tname;)	- O	(#PCDATA)	>
+
+<!ELEMENT (%io;)	- O	(#PCDATA)	>
+
+<!ELEMENT logical-negation - O	(#PCDATA)	>
+
+
+<!--....................................................................
+|	Some "special" elements (grouped as %tspecial;).		|
+|	Similar to %name;, but different attributes.			|
+ .....................................................................-->
+
+<!ELEMENT option-name	- O	(#PCDATA)	>
+
+<!ELEMENT misc-data	- O	(#PCDATA)	>
+
+<!ELEMENT markup	- O	(#PCDATA)	>
+
+<!ELEMENT (directory|file)	- O	(#PCDATA)	>
+
+
+<!ATTLIST (input-instruct | msg-text | logical-negation)
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST (%tname;)
+	%common-attr;		#IMPLIED
+>
+
+
+<!ATTLIST (%io;)
+	%common-attr;		#IMPLIED
+>
+
+<!ATTLIST option-name
+	presence	( optional | required )	#IMPLIED
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST misc-data
+	desc		CDATA	#REQUIRED
+		-- holds a description of this otherwise unknown key data --
+	%common-attr;		#IMPLIED
+>
+<!ATTLIST markup
+	lang		CDATA	#IMPLIED	-- expected values are sgml,
+						   troff, or TeX --
+	category	CDATA	#IMPLIED
+				-- recognized values include with lang=SGML:
+				     elem*  ==  an element
+				     attr   ==  an attribute
+				     entity ==  an entity
+
+				   with lang=roff:
+				     macro  ==  a macro name
+				     control-seq --
+
+	%common-attr;		#IMPLIED
+>
+
+<!ATTLIST (directory | file)
+	type			CDATA	#IMPLIED
+					-- file: regular, char dev, socket,
+					   etc.; dir: regular, afs, etc. --
+	%common-attr;		#IMPLIED
+>
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Media key data types						|
+|_______________________________________________________________________|
+-->
+
+<!--....................................................................
+|	Static graphics							|
+ .....................................................................-->
+
+<!ELEMENT graphic	- O	RCDATA	>
+
+<!ATTLIST graphic
+	notation NOTATION	( eps | spdl | cgm | ccitt4 | jpeg )	eps
+	name	 ENTITY		#CONREF
+	%common-attr;		#IMPLIED
+>
+
+<!NOTATION eps		SYSTEM	""	>
+<!NOTATION spdl		SYSTEM	""	-- use EPS until SPDL is available -- >
+<!NOTATION cgm		SYSTEM	""	>
+<!NOTATION ccitt4	SYSTEM	""	>
+<!NOTATION jpeg		SYSTEM	""	>
+
+<!ATTLIST #NOTATION ( eps | spdl | cgm | ccitt4 | jpeg )
+	width		CDATA	#IMPLIED
+	height		CDATA	#IMPLIED
+	scale		CDATA	#IMPLIED
+	orientation	(portrait|landscape)	#IMPLIED
+>
+
+<!--....................................................................
+|	Audio data.  It does not really matter what formats are listed	|
+|	since OSF documents will not have audio data for a long time,	|
+|	if ever.							|
+ .....................................................................-->
+
+<!ELEMENT audio	- O	RCDATA	>
+
+<!ATTLIST audio
+	notation NOTATION	(u-law|aiff|riff)	u-law
+	name	 ENTITY		#CONREF
+	%common-attr;		#IMPLIED
+>
+
+<!NOTATION u-law	SYSTEM	""	>
+<!NOTATION aiff		SYSTEM	""	>
+<!NOTATION riff		SYSTEM	""	>
+
+<!--....................................................................
+|	Video data.  It does not really matter what formats are listed	|
+|	since OSF documents will not have video data for a long time,	|
+|	if ever.							|
+ .....................................................................-->
+
+<!ELEMENT video	- O	RCDATA		>
+
+<!ATTLIST video
+	notation NOTATION	(pal|ntsc)	ntsc
+	name	 ENTITY		#CONREF
+	%common-attr;		#IMPLIED
+>
+
+<!NOTATION ntsc		SYSTEM	""	>
+<!NOTATION pal		SYSTEM	""	>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Structured Key Data						|
+|									|
+|	Structured key data, as its name implies, is basically a	|
+|	collection of atomic information (some of it is key data in	|
+|	its own right) that is put together into a larger structure	|
+|	(similar to a C language structure).				|
+|									|
+|	Here, we describe the top-level key data, then flesh it out	|
+|	with inner element content.  For example, we declare the	|
+|	<message> element, then define its content model as a set of	|
+|	contained sub-elements (rather than saying that its content	|
+|	model is just #PCDATA).						|
+|									|
+|	The sub-elements that make up a structured key data need not be	|
+|	available in any context other than the structured key data	|
+|	itself.  On the other hand, key data structures often appear as	|
+|	content	models for other GIs (such as lists).			|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT message	- O
+	( ((product?, msg-code, msg-symbol?, msg-text*)+ | msg-text+),
+	  (msg-type?, msg-desc*, msg-cause?, (msg-audience?, msg-resp)*,
+	   msg-origin*)? )
+	  
+>
+<!ELEMENT (msg-symbol | msg-type | msg-audience | msg-origin) - O
+		(%leaf;)*
+>
+<!ELEMENT (msg-desc | msg-cause | msg-resp)	- O	(%branch;)*	>
+
+<!ATTLIST message
+	%common-attr;			#IMPLIED
+>
+<!ATTLIST (msg-symbol | msg-type | msg-audience | msg-origin |
+		msg-desc | msg-cause | msg-resp)
+	%common-attr;			#IMPLIED
+>
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	These are miscellaneous "smaller" structured things.		|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT excerpt - O	(%branch;)*	>
+
+<!ATTLIST excerpt
+	%common-attr;		#IMPLIED
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	There are three types of synopses:				|
+|									|
+|	proglang-synopsis  for describing structured programming	|
+|			language (eg, C) functions, declarations,	|
+|			and data structures				|
+|									|
+|	cmd-synopsis	for describing command language commands	|
+|			(eg, command available from a UNIX shell)	|
+|									|
+|	file-synopsis	for describing file formats/contents		|
+|			(eg, /etc/passwd)				|
+|									|
+|	Each offers a content model intended to fairly closely fit	|
+|	its target content, though proglang-synopsis is not as rigorous	|
+|	as the programming languages that it hopes to support.  There	|
+|	is hope that, eventually, programming code may be included	|
+|	in a document verbatim, and that lexical analysis can		|
+|	automatically produce more accurate markup semantics without	|
+|	forcing the writer to understand both C and its SGML analog.	|
+|									|
+|	Subelements of these synopses (viz, cmd-argument and		|
+|	data-declaration) have been coded for general use, such as	|
+|	when an option is being discussed in text away from the		|
+|	"official" synopsis.  This is why cmd-argument and		|
+|	data-declaration are available within %leaf; and %ttext;.	|
+|_______________________________________________________________________|
+-->
+
+
+
+<!--....................................................................
+|	proglang-synopsis describes how a function is called		|
+ .....................................................................-->
+
+<!ELEMENT proglang-synopsis	- O
+		( include*,
+		  data-declaration*,
+		  ( datatype?, function, data-declaration* )? )
+					-- optional function declaration --
+>
+<!ATTLIST proglang-synopsis
+	lang		CDATA		#IMPLIED
+	type  (function|data-structure)	#REQUIRED
+	%common-attr;			#IMPLIED
+>
+
+<!ELEMENT data-declaration	- O
+		( ( datatype?, ( variable | number | literal )* ) |
+		  data-declaration )*
+>
+<!ATTLIST data-declaration
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT include	- O	(%filename;)*		>
+
+<!ATTLIST include
+	%common-attr;		#IMPLIED
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________ 
+|									|
+|	Command synopsis						|
+|									|
+|	The following markup is a general solution to command synopses	|
+|	of the kind typically found in the SYNOPSIS section of a	|
+|	reference page.							|
+|									|
+|	These markups are deceptively simple, but should provide the	|
+|	ability to mark up the variety of OSF command lines.		|
+|									|
+|	Some examples of how this markup should be used:		|
+|									|
+|		make [ -f file ]					|
+|									|
+|			<cmd-synopsis>					|
+|			  <command>make</>				|
+|			  <cmd-argument optional separator=" ">		|
+|			    <option-name>-f</>				|
+|			    <variable>file</>				|
+|			</></>						|
+|									|
+|		cpio -o [aBcv] [-C value] [-M "string"]	file ...	|
+|									|
+|			<cmd-synopsis>					|
+|			  <command>cpio</>				|
+|			  <cmd-argument iff anyorder>			|
+|			    <option-name>-o</>				|
+|			    <cmd-argument optional>			|
+|			      <option-name>a</>				|
+|			      <option-name>B</>				|
+|			      <option-name>c</>				|
+|			      <option-name>v</>				|
+|			    </>						|
+|			    <cmd-argument optional separator=" ">	|
+|			      <option-name>-C</>			|
+|			      <variable>value</>			|
+|			    </>						|
+|			    <cmd-argument optional separator=" ">	|
+|			      <option-name>-M</>			|
+|			      <variable>"string"</>			|
+|			    </>						|
+|			    <cmd-argument repeatable>			|
+|			      <variable>file</>				|
+|			</></></>					|
+|									|
+|	Note that there are other forms of the cpio command based on	|
+|	the first argument.						|
+|									|
+|_______________________________________________________________________|
+-->
+
+<!--....................................................................
+|	cmd-synopsis is generally a name followed by arguments, though	|
+|	there is the option for allowing content before the command	|
+|	name								|
+ .....................................................................-->
+
+<!ELEMENT cmd-synopsis	- O
+			( cmd-argument*, command, cmd-argument* )	>
+
+<!ATTLIST cmd-synopsis
+	%common-attr;		  #IMPLIED
+>
+
+<!--....................................................................
+|	cmd-argument is a group of options and/or other arguments	|
+ .....................................................................-->
+
+<!ELEMENT cmd-argument	- O	( option-name | variable | literal |
+							cmd-argument )*	>
+
+<!ATTLIST cmd-argument
+
+	type	( iff | or | group )	#IMPLIED
+			-- what kind of group is this?
+			   iff     if the first child is present, use the rest
+			   or      pick one of the children
+			   group   implicit and (default) --
+
+	separator	CDATA	  		#IMPLIED
+					-- separator between children --
+
+	repeatability	( repeatable | unique )	#IMPLIED
+					-- repeat all children --
+
+	presence	( optional | required )	#IMPLIED
+
+	order		( anyorder | ordered )	#IMPLIED
+					-- children in any order --
+
+	%common-attr;		  #IMPLIED
+>
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	File synopsis							|
+|									|
+|	The file synopsis is used, generally in reference pages,	|
+|	to name a path/filename to be discussed.  Note that the		|
+|	elements "path" and "file" are also available for use in	|
+|	text areas, but that file-synopsis should be used in the	|
+|	synopsis section of a reference page.				|
+|									|
+|_______________________________________________________________________|
+-->
+
+
+<!ELEMENT file-synopsis	- O	( ( %filename; )* )	>
+
+<!ATTLIST file-synopsis
+	%common-attr;		  #IMPLIED
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Notes								|
+|									|
+|	Notes are very similar to displays, except that they indicate	|
+|	semantics explicitly via attributes.  These notes are generally	|
+|	intended to be processed within the linear flow of text (as	|
+|	opposed	to annotations).  The most common use is to make an	|
+|	emphasized presentation of content to a reader.			|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT note	- O	( title?, (%branch;)* )	-(note)	>
+
+<!ATTLIST note
+		type	( caution | warning | danger | reviewer |
+			  general | side )	#REQUIRED
+		%common-attr;		#IMPLIED
+>
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Lists								|
+|									|
+|	A list is a sequence of uniform items, generally with a single	|
+|	(type of) "mark" that indicates the beginning of a new item,	|
+|	followed by the body of the item.  In some types of lists, the	|
+|	mark can vary from item	to item.  Some types of lists are	|
+|	specialized to contain a consistent set of structured key data	|
+|	(eg, messages).							|
+|									|
+|	The various types of lists are designed as specific content	|
+|	model choices under the generic identifier "list."  This allows	|
+|	all lists to be seen as lists and provides a convenient method	|
+|	of creating the various specific types of lists without having	|
+|	to remember different list tags.				|
+|									|
+|	Bridging, or "in-between", paragraphs are allowed within lists.	|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT list	- -
+		( ( item, ( item | bridge-p )* )	| 
+		    ( l-item-title?, l-item, ( l-item | bridge-p )* )	| 
+		    ( message, ( message | bridge-p )* ) |
+		    ( note, ( note | bridge-p )* ) 	|
+		    ( procedure-step, ( procedure-step | bridge-p )* ) )
+>
+
+<!ATTLIST list
+	type	( ordered | unordered )	#IMPLIED
+		-- this governs whether items in the list should be
+		   automatically and uniquely labeled --
+	marks	( adorned | unadorned )	#IMPLIED
+		-- unadorned prevents all generated marks from appearing --
+	indent	NUTOKEN	#IMPLIED
+		-- amount to indent items (if you don't want the default) --
+	vtightness	( normal | tight )	#IMPLIED
+		-- for tightening the vert spacing between items --
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT ( item | procedure-step )	- O	( p, (%branch;)* )	>
+
+<!ELEMENT ( l-item | l-item-title)	- O	( label, item )		>
+
+<!ELEMENT label		- O	(%leaf;)*		>
+
+<!ATTLIST ( item | l-item | l-item-title | label | procedure-step )
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+.	A "bridging paragraph".  Allowed only between (some) list	.
+.	items.  This is basically an ilink, but by default, the places	.
+.	pointed to are the immediately preceding and following items.	.
+ .....................................................................-->
+
+<!ELEMENT bridge-p	- O	( %leaf; )*	>
+
+<!ATTLIST bridge-p
+	HyTime		NAME	ilink
+	id		ID	#IMPLIED
+	anchrole	NAMES	#FIXED	"signifier AGG signified AGG"
+	reftype		CDATA	#FIXED	"activity dav.policies
+					 endterms dav.choiceSignifier.activity"
+	activity	IDREFS	#IMPLIED
+	linkends	IDREFS	#IMPLIED	-- HyTime calls for REQUIRED --
+	extra		NAMES	#IMPLIED
+	   -- lextype(("E"|"I"|"A"|"N"|"P"), (s+, ("E"|"I"|"A"|"N"|"P"))*) --
+	intra		NAMES	#IMPLIED
+	   -- lextype(("E"|"I"|"A"|"N"|"P"), (s+, ("E"|"I"|"A"|"N"|"P"))*) --
+	endterms	IDREFS	#IMPLIED
+	aggtrav		NAMES	agg
+	   -- lextype (("agg"|"mem"|"cor"), (s+, ("agg"|"mem"|"cor"))*) --
+	context		(context|ncontext) ncontext
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|   Tables								|
+|									|
+|	A table is composed of rows, which are composed of cells.	|
+|	A title-row looks and acts very much like a row, but is used	|
+|	for column titles/headings, whether at the top of the table	|
+|	or sprinkled throughout.					|
+|									|
+|	A "model" is an author-supplied descriptor for the type of	|
+|	information contained in each column.  It is written in a	|
+|	pseudo-SGML language and is intended both for verification of	|
+|	cell content (with an application or by hand) and as a hint	|
+|	to those who may edit the table.  It is *not* intended to	|
+|	be automatically applied by a formatting application.  The	|
+|	syntax of values for a model is:				|
+|		model="type1,type2,type3,..."				|
+|									|
+|	where the number of type's exactly matches the number of	|
+|	columns's in each row of the table.  A type may have the	|
+|	values:								|
+|									|
+|	    VALUE	MEANING						|
+|	    <tag>	a valid SGML OSF DTD tag with which to treat	|
+|			the content of each corresponding cell.		|
+|	    text	the cell contains arbitrary text		|
+|									|
+|	Each row may override the table's model (for that row alone)	|
+|	by providing a model attribute.  The syntax of a model is	|
+|	identical to that of a table's model except that it also	|
+|	allows the following values:					|
+|									|
+|	    span	content in the previous cell (same row) should	|
+|			span across this column				|
+|	    vspan	content in the same cell in the previous row	|
+|			should span (downwards) into this cell.		|
+|									|
+|	The ability to set a model for the entire table, but override	|
+|	it as necessary for a particular row allows for the description	|
+|	of complicated tables.						|
+|									|
+|	Other attributes:						|
+|									|
+|	"ncols" is the expected number of columns in the table		|
+|	"colwidth" is a list of the width of each column		|
+|	"colweight" is a list of the weights of the columns, expressed	|
+|	    as proportion of the table alloted to each column.		|
+|	"halign", "valign" are lists of how the content of each cell	|
+|	    will be aligned (top, bottom, center, left, right)		|
+|	"colsep", "rowsep" are lists of "booleans" saying whether to	|
+|	    present a separator (line) to the right of or below cells. 	|
+|	    A "0" means no separator, "1" means a line, other numbers	|
+|	    are for future use. The rightmost colsep and bottom rowsep	|
+|	    are ignored; the "frame" attribute's value is considered.	|
+|	"wrap" is a list of hints about how to wrap text that is too	|
+|	    wide for cells						|
+|	"frame" describes what where to draw a line around the table	|
+|	"repeathead" a boolean (0 or 1) saying whether to carry the	|
+|	    title-rows to following pieces in multipage tables.		|
+|									|
+|	Values may be specified for the entire table, for each row,	|
+|	or an individual cell.  The latter are meant to be used as	|
+|	overrides to values set for the entire table.			|
+|									|
+|	Because of problems with mixed content, there are actually	|
+|	two kinds of cell - <cell> contains simple text and <c-cell>,	|
+|	a complex cell, contains what a paragraph can contain.		|
+|									|
+|	Column and row separators refer to s	|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT table		- O	( title-row | row )*	-(table)	>
+
+<!ATTLIST table
+	ncols		NUMBER	 #IMPLIED -- num of cells/row should match --
+	model		CDATA	 #IMPLIED -- column prototypes for this table --
+	colwidth	NUTOKENS #IMPLIED -- absolute widths of cols --
+	colweight	NUMBERS	 #IMPLIED -- column weights --
+	halign		CDATA	 #IMPLIED -- horiz alignment for columns --
+	valign		CDATA	 #IMPLIED -- vertical alignment for columns --
+	colsep		NUMBERS	 #IMPLIED -- use col separators (lines)? --
+	rowsep		NUMBERS	 #IMPLIED -- use row separators (lines)? --
+	wrap		NUMBERS	 #IMPLIED -- wrap hints for columns --
+	frame		(top | bottom | topbot | all |  sides | none)	#IMPLIED
+					  -- style of frame for entire table --
+	repeathead	NUMBER	 #IMPLIED -- carry title rows to other pages --
+	%common-attr;		 #IMPLIED
+>
+
+<!ELEMENT title-row	- O	( cell* )	>
+<!ELEMENT row		- O	( ( cell | c-cell )* )	>
+
+<!ATTLIST ( title-row | row )
+	model		CDATA	 #IMPLIED -- model override for this row --
+	halign		CDATA	 #IMPLIED -- horiz alignment for columns --
+	valign		CDATA	 #IMPLIED -- vertical alignment for columns --
+	colsep		NUMBERS	 #IMPLIED -- use col separators (lines)? --
+	rowsep		NUMBERS	 #IMPLIED -- use row separators (lines)? --
+	wrap		NUMBERS	 #IMPLIED -- wrap hints for columns --
+	%common-attr;		 #IMPLIED
+>
+
+<!ELEMENT cell		- O	( (%leaf;)* )		>
+<!ELEMENT c-cell	- O	( (p | %pbranch;)* )	>
+
+<!ATTLIST ( cell | c-cell )
+	model		CDATA	#IMPLIED -- model override for this cell --
+	halign		CDATA	#IMPLIED -- horiz alignment for cell --
+	valign		CDATA	#IMPLIED -- vertical alignment for cell --
+	colsep		NUMBER	#IMPLIED -- use col separators (lines)? --
+	rowsep		NUMBER	#IMPLIED -- use row separators (lines)? --
+	wrap		NUMBERS	#IMPLIED -- wrap hints for cell --
+	%common-attr;		#IMPLIED
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Displays							|
+|									|
+|	A display is an "atomic" chunk of material that is intended	|
+|	to be presented as a figure, example, etc.  Instead of		|
+|	representing a specific semantic by itself, a display is just	|
+|	a container - it is the content that holds the semantic.	|
+|									|
+|	A display *is* expected to be represented by some appearance	|
+|	that visually distinguishes it from before and after content.	|
+|	As such, what otherwise might have been one tag for inline	|
+|	key data and a different one for the "standalone" case is	|
+|	instead handled using the same key data markup either outside	|
+|	of or inside of (respectively) a display.			|
+|									|
+|	There is a display attribute to specify whether the display	|
+|	must remain at that specific point within the surrounding	|
+|	content (ie, a static display), or whether it may "move" to	|
+|	nearby places (ie, a floating display).				|
+|									|
+|	Although, in other markup systems, this might be the place to	|
+|	specify appearance specific information (indentation, allowed	|
+|	page breaking, etc), this is held to an absolute minimum here.	|
+|	Applications may consider the content of displays in making	|
+|	specific processing decisions.					|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT display	- -	( title?, (%s.display;)* )  -(display)	>
+
+<!ATTLIST display
+	in-flow	( float | static )	#IMPLIED  -- floating or static --
+	keep	( keep | nokeep )	#IMPLIED  -- don't break over page
+						     boundry (keep) or allow --
+	wrap	( wrap | nowrap )	#IMPLIED  -- wrap text, or not --
+	type	( general | dialog | example | figure | table | equation )
+					#IMPLIED
+	%common-attr;			#IMPLIED
+>
+
+<!ELEMENT text-as-figure  - -	RCDATA	-- text used as a figure -- >
+
+<!ELEMENT text-alternate  - O	( (%branch;)* )
+					-- text substitute for a figure --
+>
+
+<!ATTLIST (text-as-figure | text-alternate)
+	%common-attr;			#IMPLIED
+>
+
+
+<!--FF-->
+<!--
+_________________________________________________________________________
+|									|
+|	Mathematical Equations and Formulae				|
+|_______________________________________________________________________|
+-->
+
+<!ELEMENT equation	- O	RCDATA	>
+
+<!ATTLIST equation
+	notation NOTATION	(tex)	tex
+	name	 ENTITY		#CONREF
+	%common-attr;		#IMPLIED
+>
+
+<!NOTATION tex	SYSTEM	""	>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Annotation and Footnote bodies					|
+|									|
+|	Annotations and footnotes are pieces of supplemental		|
+|	(non-integral) information that are "attached to" a		|
+|	particular place in a document instance, but are not		|
+|	necessarily intended to be represented at that point itself.	|
+|									|
+|	These markups are intended to be connected to specific places	|
+|	in documents by using a <noteref> element.  The typical use	|
+|	will be to contain the content being noted *and* the note	|
+|	body by a <noteref>.						|
+|_______________________________________________________________________|
+-->
+
+
+<!ELEMENT noteref	- O	( %leaf; | annotation | footnote )*	>
+
+<!ATTLIST noteref
+
+  -- HyTime attributes: --
+
+	HyTime		NAME	clink
+	linkend		IDREF	#REQUIRED	-- point at the note --
+	context	(context|ncontext) ncontext
+
+  -- OSF DTD value added attributes: --
+
+	endterm		IDREF	#IMPLIED	-- optional button --
+
+	%common-attr;		#IMPLIED
+>
+
+
+<!ELEMENT annotation	- -	(%branch;)*	-(annotation)	>
+
+<!ATTLIST annotation
+	%common-attr;		#REQUIRED
+>
+
+
+<!ELEMENT footnote	- -	(%branch;)*	-(footnote)	>
+
+<!ATTLIST footnote
+	%common-attr;		#REQUIRED
+>
+
+<!--FF-->
+
+<!--
+ _______________________________________________________________________
+|									|
+|	Hyper-Connections, Non-Linear Traversal				|
+|									|
+|									|
+|	This module defines:						|
+|									|
+|		glossaries						|
+|		indexes							|
+|		bibliographies						|
+|		tables of contents					|
+|		cross references					|
+|									|
+|	Some of these features are implemented in conformance with	|
+|	the Davenport Advisory Specification for Hypermedia (DASH),	|
+|	SOFABED (Standard Open Formal Architecture for Browsable	|
+|	Electronic Documents, circa March 1993.  All of these features	|
+|	are consistent with the HyTime standard.			|
+|									|
+|_______________________________________________________________________|
+-->
+
+<!--	These belong in each instance's prolog:
+
+<?HyTime VERSION "ISO/IEC 10744:1992" HYQCNT=32>
+<?HyTime MODULE base>
+<?HyTime MODULE locs>
+<?HyTime MODULE links>
+
+<?Davenport VERSION "DASH:1993">
+<?Davenport MODULE sofabed>
+-->
+
+<!--FF-->
+
+
+<!--....................................................................
+|									|
+|	xref:  a general cross-reference				|
+|									|
+|	The <xref> element is a standard HyTime hyperlink (viz, a	|
+|	clink).  There are a variety of specific uses of an <xref>	|
+|	that may be chosen by selecting the appropriate "semantic	|
+|	key" in the osfrole attribute.  In most cases, the content of	|
+|	the <xref> element is replaced by some text that is either	|
+|	from elsewhere or generated.					|
+|									|
+|	Supported semantics are currently:				|
+|									|
+|	osfrole		Action						|
+|	=======		============================================	|
+|									|
+|	getnumber 	replaces the content with the generated number	|
+|			from the second anchor (eg, a figure number).	|
+|									|
+|			valid targets: all types of division, captioned	|
+|					display, list items		|
+|									|
+|	getpage		replaces the content with the page number where	|
+|			the linkend begins.				|
+|									|
+|			valid targets:  all elements			|
+|									|
+|	getpagerange	replaces the content with the page number	|
+|			range that corresponds to the full extent of	|
+|			the single element named by the linkend, or	|
+|			the pair of elements named by using a namelist.	|
+|									|
+|			valid targets:  all elements, either indirectly	|
+|					via a namelist that identifies	|
+|					a start and end element, or by	|
+|					pointing at an element (eg,	|
+|					section) that may span pages	|
+|									|
+|	getrefname	replaces the content with the name of a		|
+|			reference page. 				|
+|									|
+|			valid targets:  a refpage within the same	|
+|					document instance or an		|
+|					external locator that points	|
+|					at a reference page		|
+|									|
+|	gettitle 	replaces the content with the title from the	|
+|			second anchor.					|
+|									|
+|			valid targets:  any element whose first		|
+|					(possibly optional) subelement	|
+|					is a title			|
+|									|
+|	gettype		replaces the content with the semantic type of	|
+|			an element (eg, "Chapter", "Figure", etc).	|
+|									|
+|			valid targets:  all elements			|
+|									|
+|	related 	connects the content to a related content.  No	|
+|			specified processing on paper, but an on-line	|
+|			system should show a potential hyperlink.	|
+|									|
+|			valid targets:  all elements			|
+|									|
+|  Composite osfroles:							|
+|									|
+|	getshort	equivalent to osfrole="gettitle getpage", but	|
+|			with 'internal' formatting (to the spec		|
+|			"%s, page %s").					|
+|									|
+|			valid targets:  all types of division,		|
+|					captioned displays		|
+|									|
+|	getfull		equivalent to osfrole="gettype getnumber	|
+|			gettitle getpage", but with 'internal'		|
+|			formatting (to the spec "%s %s, %s, page %s").	|
+|									|
+|			valid targets:  all types of division,		|
+|					captioned displays		|
+|									|
+ .....................................................................-->
+
+<!ELEMENT xref - O	( %s.xref; )*	>
+
+<!ATTLIST xref
+
+  -- HyTime attributes: --
+
+	HyTime		NAME	#FIXED	clink
+	linkend		IDREF	#REQUIRED   -- point at the other anchor --
+	context	(context|ncontext) context
+			-- constrain the content to the parent's content --
+
+  -- OSF DTD value added attributes: --
+
+	endterm		IDREF	#IMPLIED
+				-- an button that stands for the linkend --
+				-- reftype(button) --
+	osfrole		CDATA	#REQUIRED
+			-- name the semantic for this cross-reference --
+	asrdgis		CDATA	#FIXED	"DavASRD hy-ASRD"
+			-- the GIs used to define Davenport and OSF SKNs --
+
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+|									|
+|	button								|
+|									|
+|	This element may be used to define a "button" that stands for	|
+|	an hyperlink anchor (as defined by HyTime).  These buttons	|
+|	"live" within an <entry> element.				|
+ .....................................................................-->
+
+<!ELEMENT button	- O	( %leaf; )*	>
+
+<!ATTLIST button
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	hy-bib-description						|
+|									|
+|	This element is for use in describing an information object	|
+|	(eg, a book) that is not available on-line.  It should contain	|
+|	a textual description of that object, written as a traditional	|
+|	bibliographic entry.						|
+ .....................................................................-->
+
+<!ELEMENT hy-bib-description	- O	( %leaf; )*	>
+
+<!ATTLIST hy-bib-description
+	HyTime		NAME	bibloc
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	semantic-roles							|
+|									|
+|	Part of Meta - holds definitions of semantic roles		|
+ .....................................................................-->
+
+<!ELEMENT semantic-roles	- O	( hy-DSRD*, hy-ASRD* )	>
+
+<!ATTLIST semantic-roles
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+|									|
+|	hy-DSRD								|
+|									|
+|	Davenport-defined built-in semantic role definition for use	|
+|	with davrole attributes.					|
+ .....................................................................-->
+
+
+<!ELEMENT hy-DSRD	- O	( %branch; )*	>
+
+<!ATTLIST hy-DSRD
+	Davenport	CDATA	#FIXED	"dav.srdef"
+	skn		CDATA	#REQUIRED
+		-- name to be used in the values of davrole attributes,
+		   representing the semantic described in the content
+		   of this element, and/or the combination of SKNs 
+		   specified by the aliasfor attribute. --
+
+	roletype   (davrole|anchrole|other)	#FIXED	"davrole"
+	aliasfor	CDATA	#FIXED	""
+	alia4gis	CDATA	#FIXED	"hy-DSRD hy-ASRD"
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	hy-ASRD								|
+|									|
+|	Davenport-defined built-in semantic role definition for use	|
+|	with anchrole attributes.					|
+ .....................................................................-->
+
+<!ELEMENT hy-ASRD	- O	( %branch; )*	>
+
+<!ATTLIST hy-ASRD
+	Davenport	CDATA	#FIXED	"dav.srdef"
+	skn		CDATA	#REQUIRED
+		-- names to be used as the value of a HyTime anchrole
+		   attribute, representing the semantic described
+		   in the content of this element, and/or the combination
+		   of SKNs specified by the aliasfor attribute. --
+
+	roletype   (davrole|anchrole|other)	#FIXED	anchrole
+	aliasfor	CDATA	#FIXED	""	-- default: none --
+	alia4gis	CDATA	#FIXED	"hy-DSRD hy-ASRD"
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	hy-concept							|
+|									|
+|	Basic building block for knowledge base representation;  a	|
+|	node in a knowledge base.  Expresses a relationship between	|
+|	a pair of (possibly aggregate) anchors.				|
+|									|
+|	The anchrole attribute provides the semantic for a hy-term /	|
+|	hy-desc pair.  It can be #FIXED;  could be one of the following	|
+|	pairs of SKNs (or define more using dav.srdef-form elements).	|
+|	Either or both SKNs could be characterized as potential		|
+|	aggregates in the usual HyTime fashion (by using #AGG		|
+|	immediately following the affected SKN).   Valid pairs:		|
+|									|
+|		symbol		value					|
+|		item		descript				|
+|		item		idItem					|
+|		item		eqItem					|
+|		item		simItem					|
+|		item		oppItem					|
+|		item		relItem					|
+|		instance	class					|
+|		subset		superset				|
+|		portion		whole					|
+|		owner		possessn				|
+|		synopsis	expansn					|
+|									|
+|	The asrdgis attribute names one or more generic identifiers of	|
+|	elements used to define the SKNs that appear in the value of	|
+|	the anchrole attribute.  Default: any SKNs defined for anchor	|
+|	roles by the SOFABED standard and any SKNs defined in the	|
+|	document instance using the hy-ASRD element may appear in the	|
+|	anchrole attribute.						|
+|									|
+|	NOTE:  Although this element is a HyTime ilink, the anchors	|
+|	(the hy-term and hy-desc elements) are always *contained* by	|
+|	the hy-concept element.  Applications may "get away" with	|
+|	ignoring the fact that this is a HyTime ilink *as far as	|
+|	finding the anchors is concerned* because they are always	|
+|	contained by the hy-concept.					|
+ .....................................................................-->
+
+<!ELEMENT hy-concept	- O	( hy-term, hy-desc, hy-concept* )  >
+
+<!ATTLIST hy-concept
+
+  -- Davenport/SOFABED attributes: --
+
+	Davenport	CDATA	#FIXED	"dav.sign.ilink"
+	davrole		CDATA	#IMPLIED
+			-- possible roles: toc, index, glossary, lof, lot --
+	dsrdgis		CDATA	#FIXED	"DavDSRD hy-DSRD"
+		-- the GI used to define Davenport and OSF davrole SKNs --
+	asrdgis		CDATA	#FIXED	"DavASRD hy-ASRD"
+		-- the GIs used to define Davenport and OSF anchrole SKNs --
+
+  -- HyTime attributes: --
+
+	HyTime		NAME	#FIXED	ilink
+	linkends	IDREFS	#REQUIRED  	-- point at the anchors  --
+	anchrole	CDATA	#REQUIRED	-- names SKN pairs --
+	endterms	IDREFS	#IMPLIED	-- reftype(button) --
+
+	extra		NAMES	#IMPLIED
+	   -- lextype(("E"|"I"|"A"|"N"|"P"), (s+, ("E"|"I"|"A"|"N"|"P"))*) --
+	intra		NAMES	#IMPLIED
+	   -- lextype(("E"|"I"|"A"|"N"|"P"), (s+, ("E"|"I"|"A"|"N"|"P"))*) --
+	aggtrav		NAMES	agg
+	   -- lextype (("agg"|"mem"|"cor"), (s+, ("agg"|"mem"|"cor"))*) --
+
+	context	(context|ncontext) ncontext
+
+  -- OSF DTD value added attributes: --
+
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	hy-term and hy-desc						|
+|									|
+|	A hy-term contains a term in the knowledge base.  A hy-desc	|
+|	contains the term's definition (or description, etc).		|
+ .....................................................................-->
+
+
+<!ELEMENT hy-term	- O	( %leaf; )*	>
+
+<!ATTLIST hy-term
+	%common-attr;		#REQUIRED
+>
+
+<!ELEMENT hy-desc	- O	( p, ( %branch; )* )	>
+
+<!ATTLIST hy-desc
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	entry   -   an entry link					|
+|									|
+|	This element is used to connect a piece of a document's		|
+|	content, typically itself marked with a <site> element, and	|
+|	the related concept in the Knowledge Base (KB) (which is itself	|
+|	marked up with a <hy-concept> element.  entry's are named	|
+|	(referenced by their IDs) by whatever "construct" they are	|
+|	part of, such as glossary or index.				|
+|									|
+|	Note that an <entry> may contain a <hy-concept>, allowing the	|
+|	KB to be scattered among index/glossary/etc entries.  This	|
+|	method creating a KB is deprecated, but may be used by those	|
+|	document creators who have other reasons for not constructing	|
+|	a centalized KB..						|
+ .....................................................................-->
+
+
+<!ELEMENT entry	- O	( %s.entry; )*	>
+
+<!ATTLIST entry
+
+  -- Davenport/SOFABED attributes: --
+
+	Davenport	CDATA	#FIXED		"dav.entry.clink"
+	davrole		CDATA	#IMPLIED
+			-- possible roles: toc, index, glossary, lof, lot, ...
+			   Default: no defined semantic role --
+	dsrdgis		CDATA	#FIXED	"DavDSRD hy-DSRD"
+			-- where the Davenport and OSF davrole SKNs are def'd --
+
+  -- HyTime attributes: --
+
+	HyTime		NAME	#FIXED	clink
+	linkend		IDREF	#REQUIRED   -- point at the other anchor --
+	context		(context|ncontext) ncontext
+
+  -- OSF DTD value added attributes: --
+
+	endterm		IDREF	#IMPLIED
+				-- an button that stands for the linkend --
+				-- reftype(button) --
+
+  -- entry semantics: --
+
+	emph		(emph)	#IMPLIED	-- emphasize this entry --
+
+	rangestart	(start)	#IMPLIED	-- start of a range --
+	rangeend	(end)	#IMPLIED	-- end of a range --
+
+	see		IDREF	#IMPLIED	-- see other term instead --
+	seealso		IDREF	#IMPLIED	-- see other term also --
+
+
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	<hy-locator> -  a method of addressing a set of <hy-concept>s	|
+|									|
+|	A <hy-locator> may be pointed to by an <entry> to identify a	|
+|	fully specified "view" in a knowledge base.   The content of	|
+|	a <hy-locator> is a combination of <hy-nmlist>s and <hy-query>s	|
+|	that select specific <hy-concept>s.				|
+|									|
+ .....................................................................-->
+
+<!ELEMENT hy-locator - O	( hy-nmlist | hy-query )*	>
+
+<!ATTLIST hy-locator
+	HyTime		NAME	#FIXED	nameloc
+	ordering   (ordered|noorder)		ordered
+	set	   (set|noset)			set
+	aggloc	   (aggloc|agglink|nagg)	agglink
+	activity	IDREFS	#IMPLIED
+	conloc		IDREFS	#CONREF
+
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	<hy-nmlist> -  names a sequence of hy-concepts that define	|
+|			a specific <entry>				|
+|									|
+|	A <hy-nmlist> is used by a <hy-locator> to identify a		|
+|	fully specified "view" in a knowledge base.   The content of	|
+|	a <hy-locator> is a list of 1, 2, or 3 IDs of <hy-concept>'s	|
+|	in a knowledge base (however, if you've only got 1 ID, you	|
+|	could just point directly from the <entry> to that ID).		|
+|									|
+|	The order is relevant - it indicates the "primary" "secondary"	|
+|	and "third" qualifiers for a concept.				|
+ .....................................................................-->
+
+<!ELEMENT hy-nmlist - O		( #PCDATA )		>
+
+<!ATTLIST hy-nmlist
+	HyTime		NAME	#FIXED	nmlist
+	nametype	(entity | element | unified)	#FIXED	element
+	obnames		(obnames | nobnames)		#FIXED	obnames
+	docorsub	ENTITY	#IMPLIED
+	dtdorlpd	NAMES	#IMPLIED
+
+	%common-attr;		#IMPLIED
+>
+
+<!--....................................................................
+|									|
+|	<hy-query> -  a query that selects a sequence of hy-concepts	|
+|			that define a specific <entry>			|
+|									|
+|	A <hy-query> is used by a <hy-locator> to identify a		|
+|	fully specified "view" in a knowledge base.   The content of	|
+|	a <hy-locator> is a list of 1, 2, or 3 IDs of <hy-concept>'s	|
+|	in a knowledge base (however, if you've only got 1 ID, you	|
+|	could just point directly from the <entry> to that ID).		|
+|									|
+|	The order is relevant - it indicates the "primary" "secondary"	|
+|	and "third" qualifiers for a concept.				|
+|									|
+|	So far, this feature is unused in OSF documentation.		|
+ .....................................................................-->
+
+<!ELEMENT hy-query - O		( #PCDATA )		>
+
+<!ATTLIST hy-query
+	HyTime		NAME	#FIXED	nmquery
+
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+|	<hy-extloc>  -  an external locator				|
+ .....................................................................-->
+
+<!ELEMENT xdocref - O	( %s.xdocref; )*	>
+
+<!ATTLIST xdocref
+
+  -- HyTime attributes: --
+
+	HyTime		NAME	clink
+	linkend		NMTOKEN	#REQUIRED   -- point at the other anchor --
+	context	(context|ncontext) context
+			-- constrain the content to the parent's content --
+
+  -- OSF DTD value added attributes: --
+
+	extdoc		ENTITY	#IMPLIED
+	osfrole		CDATA	#REQUIRED
+	endterm		IDREF	#IMPLIED
+	asrdgis		CDATA	#FIXED	"hy-ASRD"
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+|									|
+|	glossary, index, bibliography, toc				|
+|									|
+|	These elements are containers for <entry>'s.  So, for		|
+|	example, the <glossary> element should contain a list of IDs	|
+|	of <entry>'s that, after sorting and whatever other		|
+|	processing is necessary, constitutes the document's glossary.	|
+ .....................................................................-->
+
+<!ELEMENT ( glossary | index | bibliography | toc )	- O
+							( #PCDATA )	>
+
+<!ATTLIST glossary
+	davrole		CDATA	#FIXED	"glossary collector"
+	dsrdgis		CDATA	#FIXED	"DavDSRD hy-DSRD"
+	%common-attr;		#REQUIRED
+>
+
+<!ATTLIST index
+	davrole		CDATA	#FIXED	"index collector"
+	dsrdgis		CDATA	#FIXED	"DavDSRD hy-DSRD"
+	%common-attr;		#REQUIRED
+>
+
+<!ATTLIST bibliography
+	davrole		CDATA	#FIXED	"bibliography collector"
+	dsrdgis		CDATA	#FIXED	"DavDSRD hy-DSRD"
+	%common-attr;		#REQUIRED
+>
+
+<!ATTLIST toc
+	davrole		CDATA		"toc collector"
+	dsrdgis		CDATA	#FIXED	"DavDSRD hy-DSRD"
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+|									|
+|	%extra-decls;							|
+|									|
+|	The following entity allows more element declarations to be	|
+|	included in this DTD without having to modify this DTD		|
+|	directly.  The intention is not to allow arbirtaty extensions	|
+|	to this DTD, but to allow the inclusion of more HyTime		|
+|	primitives as needed for a particular document.  No guarantee	|
+|	of interoperability of documents exists when you use this	|
+|	entity.								|
+|									|
+|	To take advantage of this, just define the extra-decls entity	|
+|	within your document instance to include your new declarations.	|
+|									|
+ .....................................................................-->
+
+
+%extra-decls;
+
+
+<!--FF-->
+
+<!--
+ _______________________________________________________________________
+|									|
+|	"Extra Structural" Module					|
+|									|
+|	This module addresses markup designed for revision control	|
+|	and internationalization (i18n)/localization (l10n) control.	|
+|									|
+|	These features are similar in that they are concerned with	|
+|	markup of content that may span anything from a few characters	|
+|	to many	elements (which need not be strictly hierarchically	|
+|	synchronous).  Further, there may be many regions designated	|
+|	as part of a revision, or with the same i18n/l10n		|
+|	characteristics, but that should all be tied together (eg,	|
+|	to indicate a single revision).					|
+|									|
+|	The general markup technique is to identify a region of		|
+|	content with an ID, create a separate "rev-description" or	|
+|	"i18n-description" element that describes the revision or i18n	|
+|	characteristic, and to name the IDs of the regions in the	|
+|	rev-description/i18n-description content (to tie the		|
+|	descriptions to the affected regions).				|
+|									|
+|	If a region of content to be identified is strictly		|
+|	hierarchical, then it is already marked as some kind of		|
+|	element, and the ID of that element should be (defined and)	|
+|	used.  If a region is not hierarchical, then the author may	|
+|	choose to mark up that region by using asynchronous tags -	|
+|	two bracket tags, each with EMPTY content, that demark an	|
+|	arbitrary region within a document.				|
+|									|
+|	The use of asynchronous tags to delimit a non-hierarchical	|
+|	region of content is controversial, however, OSF believes	|
+|	that the majority of regions will be hierarchical and not	|
+|	require asynchronous tags.					|
+|									|
+|	For those cases where the information to be marked is		|
+|	non-hierarchical, it is logically possible to turn it into	|
+|	hierarchical *segments*, each of which could be marked		|
+|	hierarchically.  However, revision markup is inherently		|
+|	transient, introduced in one snapshot and removed a few		|
+|	snapshots later.  There is no clean way to reattach region	|
+|	segments together after the revision regions have been		|
+|	removed, leading to markup fragmentation over time.		|
+|									|
+|	It is also worth noting that as part as processing of these	|
+|	regions, each start and end point can be treated as a "point"	|
+|	independent of the other end, greating simplifying the		|
+|	processing burden (especially as concerns asynchronous start	|
+|	and end tags).							|
+|									|
+|	An example of Revision Control Markup:				|
+|									|
+|	Ok, <rev-bracket id=r1>let's say that this tagged text		|
+|	is to be designated by a certain revision<rev-bracket id=r2>.	|
+|	The two tags in the previous sentence bracket the region.	|
+|	Let's also assume that there is a section (with id section2)	|
+|	that should be identified as part of the same revision to	|
+|	this document.  In the <meta><desc-pool> section, there		|
+|	should be the following markup:					|
+|									|
+|	   <rev-description class=enh CRnumber=123 release="1.1">	|
+|		<occurrences>						|
+|			<occ-async start=r1 end=r2>			|
+|			<occ-sync idref=section2>			|
+|		</occurrences>						|
+|	   </rev-description>						|
+|									|
+|	This identifies the region bracketed by r1 and r2, as well	|
+|	as the region with id section2 as being associated with		|
+|	the enhancement request 123 and release "1.1".  Other		|
+|	information can be included about the rev-description		|
+|	through other attributes.					|
+|									|
+|	There are a similar set of tags for i18n markup (i18n-bracket	|
+|	and i18n-description).  Each <*-description> element is		|
+|	specifically tailored for its own purpose.			|
+|_______________________________________________________________________|
+-->
+
+
+<!--....................................................................
+.	asynchronous bracket markers					.
+ .....................................................................-->
+
+<!ELEMENT  ( i18n-bracket | rev-bracket ) - O	EMPTY	>
+
+<!ATTLIST  ( i18n-bracket | rev-bracket )
+	commentary	CDATA	#IMPLIED	-- any user commentary on this
+						   bracket - not processed --
+	%common-attr;		#REQUIRED
+>
+
+
+<!--....................................................................
+.	description of a set of i18n, and revised regions.		.
+ .....................................................................-->
+
+<!ELEMENT i18n-description - O	( (%branch;)*, occurrences? )	>
+
+<!ELEMENT rev-description - O	( (%branch;)*, occurrences? )	>
+
+
+<!ATTLIST i18n-description
+	%common-attr;		#IMPLIED
+>
+
+<!ATTLIST ( rev-description )
+	class	CDATA		#REQUIRED
+			-- takes:
+				create	- a new file
+				defect	- defect from OT
+				enh	- enhancement (no code change)
+				feature	- change caused by change to sw
+				review	- caused by technical review
+				misc	- no other appropriate class --
+
+	CRnumber CDATA		#IMPLIED  -- bug tracking number --
+	release	 CDATA		#IMPLIED  -- version of doc in which fix
+					     will first appear --
+	mark	( mark | nomark )	#IMPLIED  -- present a change mark? --
+	delmark ( delmark | nodelmark )	#IMPLIED  -- mark the deletion? --
+	%common-attr;		#IMPLIED
+>
+
+
+<!--....................................................................
+.	occurrences contains a list of regions addressed by a		.
+.	*-desc element.  It supports naming a set of hierarchical	.
+.	regions (eg, an element) by using occ-sync, or a non-		.
+.	hierarchical regions (marked by *-bracket elements).		.
+ .....................................................................-->
+
+
+<!ELEMENT occurrences - -	( ( occ-async | occ-sync )+ )
+			-- a list of regions (synchronous or asynchronous)
+			   associated with a *-description --
+>
+<!ATTLIST occurrences
+	%common-attr;		#IMPLIED
+>
+
+<!ELEMENT occ-async	- O	EMPTY	-- async occurrence indicator --  >
+<!ELEMENT occ-sync	- O	EMPTY
+			-- sync (hierarchical) occurrence indicator --
+>
+
+<!ATTLIST occ-async
+	start	IDREF	#REQUIRED	-- start bracket,
+			reftype(i18n-bracket, rev-bracket) --
+	end	IDREF	#REQUIRED	-- end bracket,
+			reftype(i18n-bracket, rev-bracket) --
+	%common-attr;	#IMPLIED
+>
+<!ATTLIST occ-sync
+	idref	IDREF	#REQUIRED	-- names a region (no reftype) --
+	%common-attr;	#IMPLIED
+>
+
+<!--FF-->
+<!--
+ _______________________________________________________________________
+|									|
+|	Production and Appearance Markup Module				|
+|									|
+|	While the main focus of the OSFDTDs is to capture semantic	|
+|	information about a document's content, OSF still publishes	|
+|	paper versions of its documents, and requires the ability to	|
+|	markup certain appearance specifics in the document source.	|
+|									|
+|	Typically, the need for this markup arises during production	|
+|	cycles of documents, but many of the markups can stay in the	|
+|	source without downside.  For example, an imperative page	|
+|	break often *should* be removed after production, as it is	|
+|	unlikely that page breaks will fall exactly the same way	|
+|	after the document is revised, but a "small capitals"		|
+|	markup is related to the content, and should probably stay	|
+|	in the source once added.					|
+|									|
+|	We use a combination of markup techniques to implement these	|
+|	appearance specs.  None is ideal, and there will be those	|
+|	people who believe that none of this really belongs in SGML	|
+|	at all.  We've tried to choose the least problematic method	|
+|	for each markup.						|
+|									|
+|	Here's a summary:						|
+|									|
+|	PIs	We use processing instructions only when a single PI	|
+|		will do the trick (we avoid matched pairs of PIs).	|
+|		Also, we use PIs when we wish to avoid having the	|
+|		markup apparent during regular editing of a document	|
+|		(ie, a writer shouldn't generally see these things	|
+|		while writing and marking up semantic content).		|
+|									|
+|	Attributes							|
+|		We provide a "full adjust/ragged right" attribute	|
+|		on wrapping text regions (paragraphs and titles) to	|
+|		handle the case where the default adjustment needs	|
+|		to be overridden, perhaps because very long words	|
+|		on a short output line cause unsightly intercharacter	|
+|		white space.						|
+|									|
+|	special-format element						|
+|		We've introduced an element (pretty much like key data,	|
+|		and available generally where key data is available)	|
+|		to handle the kind of appearance specifics that one	|
+|		might see in an applications "property sheet" -		|
+|		fonts, point sizes, etc.  Though generally non-		|
+|		semantic, these are necessary if an author needs, for	|
+|		example, to show an example of a specific font or	|
+|		point size in a Style Guide book.  This element is	|
+|		available as an inclusion at the %branch; level.	|
+|_______________________________________________________________________|
+ -->
+
+<!--....................................................................
+|									|
+|	Processing Instructions						|
+|									|
+|	The following PIs are for use when required for conducting	|
+|	production work on a book.  Their use is deprecated in the	|
+|	standard itself, and there is no guarantee that their		|
+|	particular functionality is available in all processing		|
+|	contexts.  By convention we start names with "osf-". Of		|
+|	course there is no way to control their use in instances.	|
+|									|
+|	Note that all of these PIs should be inserted at the relevant	|
+|	point in a document, and take no content of their own.		|
+|									|
+|	osf-new-page	    start a new page here			|
+|	osf-break	    break line here				|
+|	osf-hyphen	    allow hyphenation here			|
+|	osf-need N	    need N lines at end of page			|
+ .....................................................................-->
+
+
+
+
+<!--....................................................................
+|	Special-format is an element that can provide special		|
+|	formatting to its content.  It is intended to be used for	|
+|	paper document production, and is deprecated for other uses.	|
+|	It is an inclusion to the following elements:			|
+|		p, title, list, display, bridge-title, table		|
+|									|
+|	Note that this element uses the HyTime context attribute to	|
+|	indicate that the content model of special-format should be	|
+|	inherited from its parent in the instance - ie, it may take	|
+|	only the same content model as its parent.			|
+ .....................................................................-->
+
+<!ELEMENT special-format - O	( (%leaf;)* )		>
+
+<!ATTLIST special-format
+	font	CDATA			#IMPLIED  -- type face --
+	size	NUTOKEN			#IMPLIED  -- point size --
+	style	CDATA			#IMPLIED  -- italic, bold, etc --
+	horizkeep (breakok | nobreak)	#IMPLIED  -- keep content on 1 line --
+	smallcaps (smallcaps | nosmallcaps)	#IMPLIED  -- force size --
+	context	(context|ncontext)	context	  -- content model inherited --
+	%common-attr;			#IMPLIED
+>
+<!--FF-->
+
+<!--
+ _______________________________________________________________________
+|									|
+|	Conditionals Module						|
+|									|
+|	Documents that are part of OSF offerings often need the		|
+|	to have content conditionally included or excluded, usually	|
+|	based on the context in which the document is being processed.	|
+|	For example, for those offerings that are built in different	|
+|	ways with respect to Security (eg, B1 and C2 levels of		|
+|	security), the documentation must be adaptable to the		|
+|	software.							|
+|									|
+|	Marked sections should be used by an author to delimit and	|
+|	control conditional regions.  Because the use of marked		|
+|	sections isn't explicitly controlled by a DTD, this module	|
+|	doesn't contain declarations.  However, in the interests of	|
+|	having a consistent approach to the use of marked sections,	|
+|	this module prescribes how marked sections will be used in	|
+|	OSF documents.							|
+|									|
+|	1. Marked sections should be placed around the content that	|
+|	   is being conditionalized					|
+|									|
+|	2. An entity name should be chosen to control the inclusion/	|
+|	   exclusion of the content.  The name should start with	|
+|	   the prefix "OSF.COND.".  An entity reference should be	|
+|	   placed in the "status keywords" portion of the marked	|
+|	   section introduction.					|
+|									|
+|	3. An external entity should contain a list of definitions	|
+|	   of all the OSF.COND. entities that a document instance	|
+|	   uses, and that external entity should be referenced into	|
+|	   the document instance.					|
+|									|
+|	4. Appropriate definitions should be chosen for the OSF.COND.	|
+|	   entities in the external entity.				|
+|									|
+|	5. [Special cases:]  An author may use an external entity with	|
+|	   a "hard-coded" (ie, not through an entity reference) status	|
+|	   keyword to insert a comment into a document, or to mark	|
+|	   SGML content that is intended to be shown, uninterpreted,	|
+|	   in the instance.						|
+|									|
+|	OSF does not prescribe how the external entity (containing	|
+|	the OSF.COND. definitions) is to be maintained.  Authors	|
+|	may create it by hand, or may generate it using tools.  For	|
+|	example, OSF, internally, intends to generate these entities	|
+|	by using tools that can query the intended context in which	|
+|	a document will be used.					|
+|									|
+|_______________________________________________________________________|
+-->

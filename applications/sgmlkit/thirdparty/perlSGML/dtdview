@@ -1,0 +1,1246 @@
+#! /usr/local/bin/perl
+##---------------------------------------------------------------------------##
+##  File:
+##      @(#)  dtdview 1.3 96/10/06 @(#)
+##  Author:
+##      Earl Hood       ehood@medusa.acs.uci.edu
+##  Description:
+##---------------------------------------------------------------------------##
+##  Copyright (C) 1996  Earl Hood, ehood@medusa.acs.uci.edu
+##
+##  This program is free software; you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation; either version 2 of the License, or
+##  (at your option) any later version.
+##  
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##  
+##  You should have received a copy of the GNU General Public License
+##  along with this program; if not, write to the Free Software
+##  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+##---------------------------------------------------------------------------##
+
+
+package main;
+
+########################################################################
+
+## Store name of program
+($PROG = $0) =~ s/.*\///;
+
+## Version of program
+$VERSION = "0.5.1";
+
+## Require libraries
+unshift(@INC, 'lib');
+require "dtd.pl" || die "Unable to require dtd.pl\n";
+require "newgetopt.pl" || die "Unable to require newgetopt.pl\n";
+require "shellwords.pl" || die "Unable to require shellwords.pl\n";
+$uio'NoDate = 1;
+require "uio.pl" || die "Unable to require uio.pl\n";
+
+## Set version text
+$VersionText =<<EndofVersion;
+  $VERSION
+  dtd.pl: $dtd'VERSION
+
+  Copyright (C) 1996  Earl Hood, ehood\@medusa.acs.uci.edu
+  $PROG comes with ABSOLUTELY NO WARRANTY and $PROG may be copied only
+  under the terms of the GNU General Public License (version 2, or later),
+  which may be found in the distribution.
+EndofVersion
+
+## Get options
+&Usage() unless
+    &NGetOpt(
+	"catalog=s",
+	"verbose",
+	"help"
+    );
+&Usage() if defined($opt_help);
+
+## Define some global variables
+$DTDFILE	= $ARGV[0] || "";
+$MAPFILE	= $opt_catalog || "catalog";
+$VERBOSE	= defined($opt_verbose);
+$OUTHANDLE	= 'STDOUT';
+$PROMPT		= $PROG;
+$TERMWIDTH	= $ENV{'COLUMNS'} || 80;
+
+## Do program
+&do_it();
+exit 0;
+
+########################################################################
+##	Routines
+########################################################################
+##----------------------------------------------------------------------
+##	Main routine
+##
+sub do_it {
+
+    # Data access commands
+    @DataCmds = (
+	"attributes",
+	"base",
+	"content",
+	"elements",
+	"exc",
+	"inc",
+	"parents",
+	"top",
+	"tree",
+    );
+    # Tree traversal commands
+    @TreeCmds = (
+	"down",
+	"root",
+	"up",
+	"where",
+    );
+    # Utility commands
+    @UtilCmds = (
+	"catalog",
+	"cd",
+	# "commands",
+	"dtd",
+	"exit",
+	"help",
+	"ls",
+	"quit",
+	"reset",
+	"source",
+	"system",
+	"version",
+    );
+
+    # Associative array mapping cli command names to perl functions
+    foreach (@DataCmds,@TreeCmds,@UtilCmds) {
+	$ComMap{$_} = "cmd_$_";
+    }
+    @Commands = sort keys %ComMap;
+    %CurInc	= ();
+    %CurExc	= ();
+    $CurElem	= '';
+    @CurPath	= ();
+    @Elements	= ();
+
+    # Filehandle stuff
+    $Hcnt	= 0;
+    $SrcCnt	= 0;
+    @OutHandles	= ('STDOUT');
+
+    # Check for file loading during startup
+    &mesg("Reading catalog(s) ...");
+    &DTDread_catalog_files($MAPFILE);
+
+    if ($DTDFILE && !&load_dtd($DTDFILE, $VERBOSE)) {
+	&mesg("Unable to open $DTDFILE");
+    }
+
+    &define_help_vars();
+    &clear_colwidth_vars();
+    $COLcommands 	= 0;
+    $WIDTHcommands 	= 0;
+
+    &command_loop(STDIN);
+}
+
+##----------------------------------------------------------------------
+sub cmd_attributes {
+    local($elem) = shift;
+    if (!$elem) {
+	if ($CurElem) {
+	    $elem = $CurElem;
+	} else {
+	    &mesg("Path is empty");
+	    &end_cmd_out();
+	    return 1;
+	}
+    }
+    if ($elem = &check_elem($elem)) {
+	local(%attr, $a, $capa, @array, $default);
+	$elem =~ tr/a-z/A-Z/;
+	&mesg("\nAttributes for $elem:\n");
+	%attr = &DTDget_elem_attr($elem);
+	foreach $a (sort keys(%attr)) {
+	    ($capa = $a) =~ tr/a-z/A-Z/;
+	    &mesg("    $capa");
+	    @array = split(/$;/, $attr{$a});
+	    $default = shift @array;
+	    $default .= " = " . shift @array
+		if ($default =~ /$dtd'rni$dtd'FIXED/oi);
+	    &mesg("\tValues: ", join(", ", @array));
+	    &mesg("\tDefault: $default");
+	}
+	&mesg("");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_base {
+    local($elem) = shift;
+    if (!$elem) {
+	if ($CurElem) {
+	    $elem = $CurElem;
+	} else {
+	    &mesg("Path is empty");
+	    &end_cmd_out();
+	    return;
+	}
+    }
+    if ($elem = &check_elem($elem)) {
+	$elem =~ tr/a-z/A-Z/;
+	&mesg("\nBase children for $elem:\n");
+	&print_elem_base($elem);
+	&mesg("");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_cd {
+    local($dir) = shift;
+    if (!chdir $dir) {
+	&mesg(qq{Could not change to "$dir": $!});
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_commands {
+    local($colin, $widin) = ($_[0], $_[1]);
+    local($coluse, $widuse);
+
+    # List commands
+    &mesg("");
+    &print_commands($colin, $widin);
+    &mesg("");
+
+    # End command
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_content {
+    local($elem) = shift;
+    if (!$elem) {
+	if ($CurElem) {
+	    $elem = join(",", @CurPath);
+	    $elem =~ tr/a-z/A-Z/;
+	    &mesg("\nContent model for $elem:\n");
+	    &print_full_content_model($CurElem);
+	    &mesg("");
+	    &print_inherited_exceptions();
+	    &mesg("");
+	} else {
+	    &mesg("Path is empty\n");
+	}
+
+    } elsif ($elem = &check_elem($elem)) {
+	$elem =~ tr/a-z/A-Z/;
+	&mesg("\nContent model for $elem:\n");
+	&print_full_content_model($elem);
+	&mesg("");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_down {
+    local($elem) = shift;
+    local(@elems);
+
+    # Check if there is a path
+    if (!$CurElem) {
+	&mesg("No active element in path");
+	&end_cmd_out();
+	return;
+    }
+
+    # Check if elements in path are defined.
+    @elems = split(/,/, $elem);
+    foreach (@elems) {
+	if (!($_ = &check_elem($_))) {
+	    &end_cmd_out();
+	    return 1;
+	}
+    }
+
+    # Go down hierarchy
+    foreach $elem (@elems) {
+	$elem =~ tr/A-Z/a-z/;
+
+	# Check if element is valid within current context
+	if (!$CurExc{$elem} &&
+	     ($CurInc{$elem} || &DTDis_child($CurElem, $elem))) {
+
+	    foreach (&DTDget_inc_children($CurElem)) {
+		$CurInc{$_}++;
+	    }
+	    foreach (&DTDget_exc_children($CurElem)) {
+		$CurExc{$_}++;
+	    }
+	    push(@CurPath, $elem);
+	    $CurElem = $elem;
+
+	# Element not valid
+	} else {
+	    &mesg(qq{"$elem" is not valid within "$CurElem"});
+	    last;
+	}
+    }
+    &print_where();
+    &mesg("");
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_dtd {
+    local($file, $verbose) = ($_[0], $_[1]);
+    if (!$file) {
+	&mesg("No filename given");
+    } elsif (!&load_dtd($file, $verbose)) {
+	&mesg("Unable to open $file");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_elements {
+    local($colin, $widin) = ($_[0], $_[1]);
+    local($coluse, $widuse);
+
+    # Check if need to compute default columns and width
+    if (!$COLelements) {
+	($COLelements, $WIDTHelements) = &colwidth_default(*Elements);
+    }
+
+    # Set columns and width based upon default or arguments
+    ($coluse, $widuse) =
+	&colwidth($colin, $widin, $COLelements, $WIDTHelements);
+
+    # Output list
+    &mesg("");
+    &print_list($OUTHANDLE, *Elements, $coluse, $widuse);
+    &mesg("");
+
+    # End command
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_exc {
+    local($elem) = shift;
+    if (!$elem) {
+	if ($CurElem) {
+	    $elem = $CurElem;
+	} else {
+	    &mesg("Path is empty");
+	    &end_cmd_out();
+	    return;
+	}
+    }
+    if ($elem = &check_elem($elem)) {
+	$elem =~ tr/a-z/A-Z/;
+	&mesg("\nExclusions for $elem:\n");
+	if (!&print_elem_exc($elem)) {
+	    &mesg("    No exclusions defined for $elem");
+	}
+	&mesg("");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_exit {
+    &end_cmd_out();
+    0;
+}
+
+##----------------------------------------------------------------------
+sub cmd_inc {
+    local($elem) = shift;
+    if (!$elem) {
+	if ($CurElem) {
+	    $elem = $CurElem;
+	} else {
+	    &mesg("Path is empty");
+	    &end_cmd_out();
+	    return;
+	}
+    }
+    if ($elem = &check_elem($elem)) {
+	$elem =~ tr/a-z/A-Z/;
+	&mesg("\nInclusions for $elem:\n");
+	if (!&print_elem_inc($elem)) {
+	    &mesg("    No inclusions defined for $elem");
+	}
+	&mesg("");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_help {
+    local($command) = shift;
+    local($str, @hits);
+
+    if (!$command || $command eq "help") {
+	&mesg("");
+	eval '&mesg($HELPhelp)';
+	&print_commands();
+	&mesg("");
+
+    } else {
+	if (!$ComMap{$command}) {
+	    @hits = &get_matches($command, *Commands);
+	    if ($#hits >= 1) {		# Multiple possibilities
+		&mesg("Ambiguous, possible commands:");
+		&print_list($OUTHANDLE, *hits, &colwidth_default(*hits));
+		&mesg("");
+		$command = '';
+	    } elsif ($#hits < 0) {	# No matches
+		&mesg(qq{Unrecognized command: "$command"});
+		$command = '';
+	    } else {			# Single match
+		$command = $hits[0];
+	    }
+	}
+	if ($command) {
+	    $str = "HELP" . $command;
+	    &mesg("");
+	    eval '&mesg($' . $str . ')';
+	}
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_ls {
+    if (opendir(DIR, ".")) {
+	local($len, $file, @files);
+
+	@files = grep($_ !~ /^\.{1,2}/, sort (readdir(DIR)));
+	foreach $file (@files) {
+	    FILETYPESW: {
+		if (-l $file) { $file .= "\@"; last FILETYPESW; }
+		if (-d $file) { $file .= "/"; last FILETYPESW; }
+		if (-x $file) { $file .= "*"; last FILETYPESW; }
+	    }
+	}
+	$len = &get_longest(*files) + 2;
+	$col = int(80/$len);  $col = 1  unless $col;
+	&mesg("");
+	&print_list($OUTHANDLE, *files, $col, $len);
+	&mesg("");
+	close(DIR);
+
+    } else {
+	&mesg("Unable to open directory\n");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_catalog {
+    local($filename) = shift;
+    &DTDread_mapfile($filename);
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_parents {
+    local($elem) = ($_[0]);
+    local($colin, $widin) = ($_[1], $_[2]);
+
+    # See if using current element in path
+    if (!$elem) {
+	if ($CurElem) {
+	    $elem = $CurElem;
+	} else {
+	    &mesg("Path is empty\n");
+	    # End command
+	    &end_cmd_out();
+	    return 1;
+	}
+    }
+
+    # List parents
+    if ($elem = &check_elem($elem)) {
+	local(@array) = (&DTDget_parents($elem));
+	local($coluse, $widuse);
+
+	($COLparents, $WIDTHparents) = &colwidth_default(*array);
+	($coluse, $widuse) =
+	    &colwidth($colin, $widin, $COLparents, $WIDTHparents);
+	$elem =~ tr/a-z/A-Z/;
+	&mesg("\nPossible parents of $elem:\n");
+	&print_list($OUTHANDLE, *array, $coluse, $widuse);
+	&mesg("");
+    }
+
+    # End command
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_reset {
+    &DTDreset();
+    &set_prompt("");
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_root {
+    local($elem) = ($_[0]);
+    if (!$elem) {
+	if ($CurElem) {
+	    &mesg("\n$CurPath[0]\n");
+	} else {
+	    &mesg("Path is empty");
+	}
+
+    } elsif ($elem = &check_elem($elem)) {
+	&set_root($elem);
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_source {
+    local($file) = shift;
+    local($srchandle) = ("SRCFILE".$SrcCnt++);
+    if (open($srchandle, $file)) {
+	&command_loop($srchandle);
+	close($srchandle);
+    } else {
+	&mesg("Unable to open $file");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_system {
+    local($status);
+    if ($status = system("@_")) {
+	$status /= 256;
+	&mesg("Non-zero status ($status) returned\n");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_top {
+    local($colin, $widin) = ($_[0], $_[1]);
+    local(@array) = (&DTDget_top_elements());
+    local($coluse, $widuse);
+
+    # Check if need to compute default columns and width
+    if (!$COLtop) {
+	($COLtop, $WIDTHtop) = &colwidth_default(*array);
+    }
+
+    # Set columns and width based upon default or arguments
+    ($coluse, $widuse) =
+	&colwidth($colin, $widin, $COLtop, $WIDTHtop);
+
+    # List top elements
+    &mesg("");
+    &print_list($OUTHANDLE, *array, $coluse, $widuse);
+    &mesg("");
+
+    # End command
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_tree {
+    local($elem, $depth) = ($_[0], $_[1]);
+
+    if ($elem =~ /^\d+$/) {
+	$depth = $elem;
+	$elem = $CurElem;
+    } elsif (!$elem) {
+	$elem = $CurElem
+    }
+    $depth = 2  unless (($depth =~ /^\d+$/) && ($depth > 0));
+    if ($elem = &check_elem($elem)) {
+	&mesg("");
+	&DTDprint_tree($elem, $depth, $OUTHANDLE);
+	&mesg("");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_up {
+    local($levels) = shift;
+
+    $levels = 1  unless $levels;
+
+    if ($levels !~ /^\d+$/) {
+	&mesg("Number must be a positive\n");
+
+    } elsif ($#CurPath < 0) {
+	&mesg("Path empty\n");
+
+    } elsif ($#CurPath == 0) {
+	&mesg("Already at top of path\n");
+
+    } else {
+	local($i);
+	$levels = $#CurPath  if ($#CurPath < $levels);
+	for ($i=0; $i < $levels; $i++) {
+	    pop(@CurPath);
+	    $CurElem = $CurPath[$#CurPath];
+	    foreach (&DTDget_inc_children($CurElem)) {
+		$CurInc{$_}--;
+		delete $CurInc{$_}  if $CurInc{$_} <= 0;
+	    }
+	    foreach (&DTDget_exc_children($CurElem)) {
+		$CurExc{$_}--;
+		delete $CurExc{$_}  if $CurExc{$_} <= 0;
+	    }
+	}
+	&print_where();
+	&mesg("");
+    }
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_version {
+    &mesg("");
+    &mesg($VersionText);
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_where {
+    &mesg("");
+    &print_where();
+    &mesg("");
+    &end_cmd_out();
+    1;
+}
+
+##----------------------------------------------------------------------
+sub cmd_quit {
+    &end_cmd_out();
+    0;
+}
+
+##----------------------------------------------------------------------
+sub clear_colwidth_vars {
+    $COLelements 	= 0;
+    $COLparents 	= 0;
+    $COLtop 		= 0;
+    $WIDTHelements 	= 0;
+    $WIDTHparents 	= 0;
+    $WIDTHtop 		= 0;
+}
+
+##----------------------------------------------------------------------
+sub define_help_vars {
+
+    $HELPattributes =<<EndOfHelp;
+Usage: attributes <elem>
+Description: List attributes for <elem>.
+EndOfHelp
+
+    $HELPbase =<<EndOfHelp;
+Usage: base [<elem>]
+Description: The base command prints out the base content model of
+	<elem>.  If <elem> is not specified, then the base content model
+	of the last element in the hierarchical path is listed.
+EndOfHelp
+
+    $HELPcatalog =<<EndOfHelp;
+Usage: catalog <filename>
+Description: Read catalog <filename>.
+EndOfHelp
+
+    $HELPcd =<<EndOfHelp;
+Usage: cd <path>
+Description: Change the current working directory to <path>.
+EndOfHelp
+
+    $HELPcommands =<<EndOfHelp;
+Usage: commands [<col> [<width>]]
+Description: List all commands available.
+EndOfHelp
+
+    $HELPcontent =<<EndOfHelp;
+Usage: content [<elem>]
+Description: List full content model of <elem>.  If <elem> is not
+	specified, then the effective content model of the last
+	element in the hierarchical path is listed.
+EndOfHelp
+
+    $HELPdtd =<<EndOfHelp;
+Usage: dtd <filename> [0|1]
+Description: Read dtd <filename>.  An optional 0 or 1 may be specified
+	to set the verbosity.  A 1 will cause output to be generated
+	as the DTD is parsed.  A reset is done before <filename> is
+	read.
+EndOfHelp
+
+    $HELPdown =<<EndOfHelp;
+Usage: down <elem>
+       down <elem>,<elem>,...
+Description: Move down the hierarchical path to <elem>.  A comma
+	separated list of elements may be specified to go down
+	the path represented by the list.
+EndOfHelp
+
+    $HELPelements =<<EndOfHelp;
+Usage: elements [<col> [<width>]]
+Description: List all elements defined in the dtd.
+EndOfHelp
+
+    $HELPexc =<<EndOfHelp;
+Usage: exc [<elem>]
+Description: List exclusion defined for <elem>.  If <elem> is not
+	specified, then the exclusions defined for the last element in
+	the hierarchical path are listed.
+EndOfHelp
+
+    $HELPhelp =<<EndOfHelp;
+Usage: help <command>
+Description: Give help information on <command>.
+EndOfHelp
+
+    $HELPinc =<<EndOfHelp;
+Usage: inc [<elem>]
+Description: List inclusion defined for <elem>.  If <elem> is not
+	specified, then the inclusions defined for the last element in
+	the hierarchical path are listed.
+EndOfHelp
+
+    $HELPls =<<EndOfHelp;
+Usage: ls
+Description: List files in current working directory.
+EndOfHelp
+
+    $HELPparents =<<EndOfHelp;
+Usage: parents [<elem> [<col> [<width>]]]
+Description: List all possible parents of <elem>.  If no <elem>
+	specified, then the parents for the last element in the
+	hierarchical path are listed.
+EndOfHelp
+
+    $HELPreset =<<EndOfHelp;
+Usage: reset
+Description: Reset dtdview to start-up state with no dtd loaded.
+EndOfHelp
+
+    $HELProot =<<EndOfHelp;
+Usage: root [<elem>]
+Description: Set the root of the hierarchical path to <elem>.  If
+	<elem> is not specified, the current root is listed.
+EndOfHelp
+
+    $HELPsource =<<EndOfHelp;
+Usage: source <file>
+Description: Process commands listed in <file>.
+EndOfHelp
+
+    $HELPsystem =<<EndOfHelp;
+Usage: system <shell_command>
+Description: Invoke <shell_command>.
+EndOfHelp
+
+    $HELPtop =<<EndOfHelp;
+Usage: top
+Description: List top-most elements defined in the dtd.
+EndOfHelp
+
+    $HELPtree =<<EndOfHelp;
+Usage: tree <elem> [<depth>]
+Description: Print content tree of <elem> with an optional depth of
+	<depth>.  Depth level of 2 is the default.
+EndOfHelp
+
+    $HELPup =<<EndOfHelp;
+Usage: up [<#>]
+Description: Move up <#> elements on the hierarchical path.  If
+	<#> is not specified, 1 is used.
+EndOfHelp
+
+    $HELPwhere =<<EndOfHelp;
+Usage: where
+Description: Print the current hierarchical path.
+EndOfHelp
+
+    $HELPquit =<<EndOfHelp;
+Usage: quit
+Description: Quit dtdview.
+EndOfHelp
+
+    $HELPexit =<<EndOfHelp;
+Usage: exit
+Description: Exit dtdview.
+EndOfHelp
+}
+########################################################################
+########################################################################
+
+sub string {
+    print $OUTHANDLE @_;
+}
+
+sub mesg {
+    print $OUTHANDLE @_, "\n";
+}
+
+sub err_mesg {
+    print STDERR @_, "\n";
+}
+
+sub end_cmd_out {
+    if ($OUTHANDLE ne $OutHandles[0]) {
+	close($OUTHANDLE);
+	pop(@OutHandles);
+	$OUTHANDLE = $OutHandles[$#OutHandles];
+    }
+}
+
+##----------------------------------------------------------------------
+sub command_loop {
+    local($inhandle) = shift;
+    local($command, $function) = ('','');
+    local(@args) = ();
+
+    # Loop to get user commands
+    while (1) {
+	($command, @args) = &get_command($inhandle);
+	if (($function = $ComMap{$command}) && defined(&$function)) {
+	    last unless &$function(@args);
+	} else {
+	    &mesg(qq{Command, "$command", not implemented});
+	}
+    }
+}
+##----------------------------------------------------------------------
+sub load_dtd {
+    local($file, $verbose) = ($_[0], $_[1]);
+    if (open(DTD_FILE, "< $file")) {
+	&mesg("Reading $file ...");
+	&DTDreset();
+	&DTDset_verbosity($verbose);
+	&DTDread_dtd("main'DTD_FILE");
+	&DTDset_verbosity(0);
+	&set_root((&DTDget_top_elements())[0]);
+	&set_prompt($file);
+	@Elements = &DTDget_elements();
+	&clear_colwidth_vars();
+	1;
+    } else {
+	0;
+    }
+}
+
+##----------------------------------------------------------------------
+sub set_root {
+    local($elem) = ($_[0]);
+    %CurInc = ();
+    %CurExc = ();
+    $CurElem = $elem;
+    @CurPath = ($elem);
+}
+
+##----------------------------------------------------------------------
+sub set_prompt {
+    local($pathname) = shift;
+    if ($dtd'DocType) {
+	$PROMPT = $dtd'DocType;
+    } elsif ($pathname) {
+	($PROMPT = $pathname) =~ s/.*\///;
+	$PROMPT =~ s/\.dtd$//i;
+    } else {
+	$PROMPT = $PROG;
+    }
+}
+##----------------------------------------------------------------------
+sub get_command {
+    local($cmdhandle) = ($_[0]);
+    local($str, $tmp) = ('', '');
+    local(@args, @hits, @a);
+    local($com, $outhandle, $eof) = ('', '', 0);
+
+    while (1) {
+	if (-t $cmdhandle) {
+	    while (($str = &prompt_user("($PROMPT)", 0, 0)) !~ /\S/) {}
+	} else {
+	    while (((($str = <$cmdhandle>) !~ /\S/) || ($str =~ /^\s*#/))
+			&&
+		   !($eof = eof($cmdhandle))) {}
+	    return "exit"  if $eof;
+	    chop $str;
+	}
+
+	# Grab command and its arguments
+	($com, @a) = &shellwords($str);
+	$com =~ tr/A-Z/a-z/;
+
+	# Grab any file/program redirection
+	while (@a) {
+	    $tmp = shift @a;
+	    if ($tmp =~ /^\d?[>\|][\d>]?$/) {
+		$outhandle = join('', $tmp, @a);
+		last;
+	    } else {
+		push(@args, $tmp);
+	    }
+	}
+
+
+	# If not explicit command name, look for substring matches
+	if (!$ComMap{$com}) {
+	    @hits = &get_matches($com, *Commands);
+	    if ($#hits >= 1) {		# Multiple possibilities
+		&mesg("Ambiguous, possible commands:");
+		&print_list($OUTHANDLE, *hits, &colwidth_default(*hits));
+		&mesg("");
+		next;
+	    } elsif ($#hits < 0) {	# No matches
+		&mesg(qq{Unrecognized command: "$com"});
+		next;
+	    } else {			# Single match
+		$com = $hits[0];
+	    }
+	}
+
+	# Check for system command and reset I/O redirection if needed.
+	if (($com eq "system") && $outhandle) {
+	    push(@args, $outhandle);
+	    $outhandle = '';
+	}
+
+	# If I/O redirect, create file handle for output.
+	if ($outhandle) {
+	    $tmp = "OUTHANDLE" . $Hcnt++;
+	    if (!open($tmp, $outhandle)) {
+		&mesg("Could not redirect: $@");
+		next;
+	    } else {
+		$OUTHANDLE = "main'$tmp";
+		push(@OutHandles, $OUTHANDLE);
+	    }
+	} else {
+	    $OUTHANDLE = $OutHandles[$#OutHandles];
+	}
+
+	last;	# Get here, break out
+    }
+    ($com, @args);
+}
+
+##----------------------------------------------------------------------
+sub get_matches {
+    local($exp, *list) = @_;
+    $exp =~ s/(\W)/\\$1/g;
+    grep(/^$exp/, @list);
+}
+
+##----------------------------------------------------------------------
+sub print_where {
+    local($where) = join(",", @CurPath);
+    &mesg($where);
+}
+
+##----------------------------------------------------------------------
+sub print_full_content_model {
+    local($elem) = shift;
+    &print_elem_base($elem);
+    &print_elem_inc($elem);
+    &print_elem_exc($elem);
+}
+
+##----------------------------------------------------------------------
+sub print_commands {
+    local($colin, $widin) = ($_[0], $_[1]);
+    local($coluse, $widuse);
+
+    # Check if need to compute default columns and width
+    if (!$COLcommands) {
+	($COLcommands, $WIDTHcommands) = &colwidth_default(*Commands);
+    }
+
+    # Set columns and width based upon default or arguments
+    ($coluse, $widuse) =
+	&colwidth($colin, $widin, $COLcommands, $WIDTHcommands);
+
+    # List commands
+    &mesg("Data access commands\n",
+	  "--------------------");
+    &print_list($OUTHANDLE, *DataCmds, $coluse, $widuse);
+    &mesg("\nHierarchical path commands\n",
+	    "--------------------------");
+    &print_list($OUTHANDLE, *TreeCmds, $coluse, $widuse);
+    &mesg("\nUtility commands\n",
+	    "----------------");
+    &print_list($OUTHANDLE, *UtilCmds, $coluse, $widuse);
+}
+
+##----------------------------------------------------------------------
+sub print_list {
+    local($handle, *list, $col, $width) = @_;
+    local($i, $j, $size, $lines);
+
+    $size = (@list);
+    $lines = $size/$col;
+    $lines = ($lines == int($lines) ? $lines : int($lines+1));
+    for ($i=0; $i < $lines; $i++) {
+	for ($j=0; $j < $col; $j++) {
+	    print $handle sprintf("%-${width}s", $list[$i+($j*$lines)]);
+	} 
+	print $handle "\n";
+    }
+}
+
+##----------------------------------------------------------------------
+sub check_elem {
+    local($elem) = shift;
+    local(@hits);
+
+    if ($elem !~ /\S/) {
+	&mesg("Null element given\n");
+	$elem = '';
+    } elsif (!&DTDis_element($elem)) {
+	@hits = &get_matches($elem, *Elements);
+	if ($#hits >= 1) {		# Multiple possibilities
+	    &mesg("Ambiguous, possible elements:");
+	    &print_list($OUTHANDLE, *hits, &colwidth_default(*hits));
+	    &mesg("");
+	    $elem = '';
+	} elsif ($#hits == 0) {		# Single match
+	    $elem = $hits[0];
+	} else {
+	    &mesg(qq{Element "$elem" not defined in DTD\n});
+	    $elem = '';
+	}
+    }
+    $elem;
+}
+
+##----------------------------------------------------------------------
+sub print_elem_base {
+    local($elem) = shift;
+    local(@array);
+    @array = &DTDget_base_children($elem, 1);
+    &string(" " x 5);
+    &print_elem_content($OUTHANDLE, 5, *array);
+}
+
+##----------------------------------------------------------------------
+sub print_elem_inc {
+    local($elem) = shift;
+    local(@array);
+    if (@array = &DTDget_inc_children($elem, 1)) {
+	&string(" " x 4, "+");
+	&print_elem_content($OUTHANDLE, 5, *array);
+	$ret = 1;
+    } else {
+	$ret = 0;
+    }
+    $ret;
+}
+
+##----------------------------------------------------------------------
+sub print_elem_exc {
+    local($elem) = shift;
+    local(@array, $ret);
+    if (@array = &DTDget_exc_children($elem, 1)) {
+	&string(" " x 4, "-");
+	&print_elem_content($OUTHANDLE, 5, *array);
+	$ret = 1;
+    } else {
+	$ret = 0;
+    }
+    $ret;
+}
+
+##----------------------------------------------------------------------
+sub print_inherited_exceptions {
+    local(@inc, @exc);
+    @inc = &add_delims(sort(keys %CurInc));
+    @exc = &add_delims(sort(keys %CurExc));
+    if ($#inc >= 0 || $#exc >= 0) {
+	&mesg("  Inherited Exceptions:");
+	if ($#inc >= 0) {
+	    &string(" " x 4, "+");
+	    &print_elem_content($OUTHANDLE, 5, *inc);
+	}
+	if ($#exc >= 0) {
+	    &string(" " x 4, "-");
+	    &print_elem_content($OUTHANDLE, 5, *exc);
+	}
+    }
+}
+
+##----------------------------------------------------------------------
+sub add_delims {
+    local(@in) = @_;
+    local(@array) = ();
+    if (@in) {
+	push(@array, "(");
+	foreach (@in) {
+	    push(@array, $_, "|");
+	}
+	pop(@array);		# Pop last bogus "|"
+	push(@array, ")");
+    }
+    @array;
+}
+
+##----------------------------------------------------------------------
+sub get_longest {
+    local(*list) = shift;
+    local($l) = 0;
+    grep($l = ($l < length($_) ? length($_) : $l),
+	 @list);
+    $l;
+}
+##----------------------------------------------------------------------
+sub colwidth {
+    local($col, $width, $defcol, $defwidth) = ($_[0], $_[1], $_[2], $_[3]);
+    $col = $defcol  unless (($col =~ /^\d+$/) && ($col > 0));
+    $width = $defwidth  unless (($width =~ /^\d+$/) && ($width > 0));
+    ($col,$width);
+}
+
+##----------------------------------------------------------------------
+sub colwidth_default {
+    local(*list) = shift;
+    local($columns,$width);
+
+    $width = &get_longest(*list) +2;
+    $columns = int($TERMWIDTH/$width);
+    $columns = 1  unless $columns;
+    ($columns,$width);
+}
+
+##----------------------------------------------------------------------
+sub print_elem_content {
+    local($conthandle, $in, *array) = @_;
+    local($prev, $open, $len, $tmp, $item) = ('','','','','');
+    local($first, $MAXLEN) = (1, 65);
+    local($nl) = ("\n" . (" " x $in));
+
+    foreach $item (@array) {
+	next if $item eq "";	    # Ignore NULL strings
+	if ($item eq $dtd'grpo_) {    # '('
+	    if ($prev eq $item) {	# Print consecutive ('s together
+		print($conthandle $item);
+	    } else {			# Else, start newline
+		if ($first) {
+		    $first = 0;
+		} else {
+		    print $conthandle $nl;
+		}
+		print $conthandle ' ' x $open, $item;
+	    }
+	    $open++;			# Increase group open counter
+	    $len = $open+1;		# Adjust length of line counter
+	    next;			# Goto next token
+	} elsif ($item eq $dtd'grpc_) {
+	    $open--;			# ')', decrement group open counter
+	}
+	$tmp = $len + length($item);
+	if ($tmp > $MAXLEN) {	    # Check if line length
+	    if (&DTDis_occur_indicator($item) ||
+		&DTDis_group_connector($item)) {
+
+		print $conthandle $item, $nl, ' ' x ($open);
+		$len = $open;
+		next;
+	    } else {
+		print $conthandle $nl, ' ' x $open;
+		$len = $open + length($item);
+	    }
+	} else {
+	    $len = $tmp;
+	}
+
+	if ($item eq $dtd'and_ ||		# Put spaces around '&'.
+	    $item eq $dtd'or_) {		# Put spaces around '|'.
+
+	    print $conthandle ' ', $item, ' ';
+	    $len += 2;
+	    if ($len > $MAXLEN) {
+		print $conthandle $nl, ' ' x $open;
+		$len = $open;
+	    }
+
+	} elsif ($item eq $dtd'seq_) {		# Put space after ','.
+	    print $conthandle $item, ' ';
+	    $len++;
+	    if ($len > $MAXLEN) {
+		print $conthandle $nl, ' ' x $open;
+		$len = $open;
+	    }
+
+	} elsif (!&DTDis_element($item)) {	# Uppercase reserved words, OR
+						# undefined elements
+	    tr/a-z/A-Z/;
+	    print $conthandle $item;
+
+	} else {
+	    print $conthandle $item;
+	}
+
+    } continue {
+	$prev = $item unless $item =~ /^\s*$/;
+    }
+    print $conthandle "\n";
+}
+##----------------------------------------------------------------------
+##----------------------------------------------------------------------
+##	Usage description routine
+##
+sub Usage {
+    print STDOUT <<EndOfUsage;
+Usage: $PROG [<options>] [<filename>]
+Options:
+  -catalog <filename> : Use <filename> as entity map file (def: "catalog")
+  -verbose            : Generate output as the DTD is parsed
+  -help		      : Print this usage message
+
+Description
+  $PROG is an interactive program for querying information about an
+  SGML DTD.  If a filename is given on the command-line, the file
+  will be interpreted as the initial DTD to load.
+
+Version
+$VersionText
+EndOfUsage
+    exit(0);
+}

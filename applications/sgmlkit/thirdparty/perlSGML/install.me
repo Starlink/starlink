@@ -1,0 +1,663 @@
+#!/opt/perl/bin/perl
+##---------------------------------------------------------------------------##
+##  File:
+##	@(#) install.me 1.6 97/09/17 14:31:19 @(#)
+##  Author:
+##      Earl Hood, ehood@medusa.acs.uci.edu
+##  Summary:
+##	Installation program for Perl applications.
+##---------------------------------------------------------------------------##
+##    Copyright (C) 1997	Earl Hood, ehood@medusa.acs.uci.edu
+##
+##    This program is free software; you can redistribute it and/or modify
+##    it under the terms of the GNU General Public License as published by
+##    the Free Software Foundation; either version 2 of the License, or
+##    (at your option) any later version.
+##
+##    This program is distributed in the hope that it will be useful,
+##    but WITHOUT ANY WARRANTY; without even the implied warranty of
+##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##    GNU General Public License for more details.
+##
+##    You should have received a copy of the GNU General Public License
+##    along with this program; if not, write to the Free Software
+##    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+##    02111-1307, USA
+##---------------------------------------------------------------------------##
+
+package InstallMe;
+
+use vars qw(  
+    $MSDOS $MACOS $UNIX $VMS $WINDOWS
+    $DIRSEP $DIRSEPRX $CURDIR
+    $PROG $PATHSEP
+    $OSType
+);
+use Config;
+use FileHandle;
+use Getopt::Long;
+
+###############################################################################
+##	OS Configuration Code
+###############################################################################
+
+BEGIN {
+    %DirSep = (
+	macos	=> ':',
+	msdos	=> '\\',
+	unix	=> '/',
+	vms	=> '/',	# ??
+	windows	=> '\\',
+    );
+    %CurDir = (
+	macos	=> ':',	# ??
+	msdos	=> '.',
+	unix	=> '.',
+	vms	=> '.',	# ??
+	windows	=> '.',
+    );
+    %PathSep = (
+	macos	=> ';',	# ??
+	msdos	=> ';',
+	unix	=> ':',
+	vms	=> ':',	# ??
+	windows	=> ';',
+    );
+
+    my $dontknow = 0;
+
+    ## Init variables
+    $MACOS	= 0;	$MSDOS	= 0;
+    $UNIX	= 0;	$VMS	= 0;
+    $WINDOWS	= 0;
+    $DIRSEP	= '/';	$CURDIR = '.';
+    $PATHSEP	= ':';
+
+    ## See if ostype can be determined from osname in Config
+    if (defined $^O) {
+	$_ = $^O;
+    } else {
+	require Config;
+	$_ = $Config::Config{'osname'};
+    }
+
+    if (/mac/i) {
+	$MACOS = 1;
+	$OSType = 'macos';
+    } elsif (/vms/i) {
+	$VMS = 1;
+	$OSType = 'vms';
+    } elsif (/msdos/i) {
+	$MSDOS = 1;
+	$OSType = 'msdos';
+    } elsif (/mswin/i) {
+	$WINDOWS = 1;  $MSDOS = 1;
+	$OSType = 'windows';
+    } elsif (/unix/i or
+	     /aix/i or
+	     /dynix/i or
+	     /hpux/i or
+	     /solaris/i or
+	     /sunos/i or
+	     /ultrix/i or
+	     /linux/i) {
+	$UNIX = 1;
+	$OSType = 'unix';
+    } else {
+	$dontknow = 1;
+    }
+
+    ## If we do not know now what the ostype is, make a guess.
+    if ($dontknow) {
+	my($tmp);
+
+	## MSDOG/Windoze
+	if (($tmp = $ENV{'windir'}) and ($tmp =~ /[A-Z]:\\/i) and (-d $tmp)) {
+	    $MSDOS = 1;
+	    $WINDOWS = 1;
+	    $OSType = 'windows';
+
+	} elsif (($tmp = $ENV{'COMSPEC'}) and ($tmp =~ /[a-zA-Z]:\\/) and
+		 (-e $tmp)) {
+	    $MSDOS = 1;
+	    if ($tmp =~ /win/i) {
+		$WINDOWS = 1;
+		$OSType = 'windows';
+	    } else {
+		$OSType = 'msdos';
+	    }
+
+	## MacOS
+	} elsif (defined($MacPerl::Version)) {
+	    $MACOS = 1;
+	    $OSType = 'macos';
+
+	## Unix (fallback case)
+	} else {
+	    $UNIX = 1;
+	    $OSType = 'unix';
+	}
+    }
+
+    ## Set other variables
+    $DIRSEP = $DirSep{$OSType};
+    if ($MSDOS or $WINDOWS) {
+	$DIRSEPRX = "\\\/";
+    } else {
+	($DIRSEPRX = $DIRSEP) =~ s/(\W)/\\$1/g;
+    }
+    $CURDIR = $CurDir{$OSType};
+    $PATHSEP = $PathSep{$OSType};
+
+    ##	Store name of program
+    ($PROG = $0) =~ s%.*[$DIRSEPRX]%%o;
+
+    ##	Flag to prompt for command-line options on a Mac
+    $MacCLPrompt = 1;
+}
+
+##---------------------------------------------------------------------------##
+##	CLinit() initializes @ARGV.  Currently, it does nothing under
+##	MSDOS and Unix.
+##
+##	If running under a Mac and the script is a droplet, command-line
+##	options will be prompted for if $MacCLPrompt is set to a
+##	non-zero value.
+##
+sub CLinit {
+
+    ##	Ask for command-line options if script is a Mac droplet
+    ##		Code taken from the MacPerl FAQ
+    ##
+    if ($MacCLPrompt && ( $MacPerl::Version =~ /Application$/ )) {
+
+	# we're running from the app
+	my( $cmdLine, @args );
+	$cmdLine = &MacPerl::Ask( "Enter command line options:" );
+	require "shellwords.pl";
+	@args = &shellwords( $cmdLine );
+	unshift( @::ARGV, @args );
+    }
+}
+
+##---------------------------------------------------------------------------##
+##	path_join takes an array of path components and returns a string
+##	with components joined together by the directoy separator.
+##
+sub path_join {
+    join($DIRSEP, @_);
+}
+
+##---------------------------------------------------------------------------##
+##	path_split takes a string representing a pathname and splits
+##	it into an array of components.  The pathname is interpreted
+##	with respect to the OS we are running under.
+##
+sub path_split {
+    split(/[$DIRSEPRX]/o, $_[0]);
+}
+
+##---------------------------------------------------------------------------##
+##	is_absolute_path() returns true if a string is an absolute path
+##
+sub is_absolute_path {
+
+    if ($MSDOS or $WINDOWS) {
+	return $_[0] =~ /^(?:[a-z]:)?[\\\/]/i;
+    }
+    if ($MACOS) {		## Not sure about Mac
+	return $_[0] =~ /^:/o;
+    }
+    if ($VMS) {			## Not sure about VMS
+	return $_[0] =~ /^\w+:/i;
+    }
+    $_[0] =~ m|^/|o;    	## Unix
+}
+
+###############################################################################
+##	Initialize Globals
+###############################################################################
+
+my %Files	= ();
+my %DefValues	= (
+    binpath	=> $Config{'installbin'},
+    docpath	=> $Config{'prefix'} . $DIRSEP . 'doc',
+    libpath	=> $Config{'installsitelib'},
+    manifest	=> 'MANIFEST',
+    manpath	=> $Config{'installman1dir'},
+    perlpath	=> $Config{'perlpath'},
+);
+$DefValues{'manpath'} =~ s|(${DIRSEPRX}man)${DIRSEPRX}.*|$1|;
+my %OptValues	= ();
+
+###############################################################################
+##	Parse Command-line
+###############################################################################
+
+{
+    CLinit();
+    my $ret =
+    GetOptions(\%OptValues,
+	       qw(
+		   batch
+		   binpath=s
+		   libpath=s
+		   manpath=s
+		   perlpath=s
+		   manifest=s
+		   nobin
+		   nodoc
+		   nolib
+		   noman
+
+		   help));
+
+    if (!$ret or $OptValues{"help"}) {
+	usage();
+	exit !$ret;
+    }
+}
+
+###############################################################################
+##	Do It
+###############################################################################
+
+{
+    my($dobin, $dolib, $dodoc, $doman);
+
+    ## Get isntallation files
+    ## ----------------------
+    read_manifest($OptValues{'manifest'} || $DefValues{'manifest'},
+		  \%Files);
+
+    $DefValues{'docpath'} .= $DISRSEP . $Files{'name'}[0]
+	if $Files{'name'}[0];
+    $dobin = scalar(@{$Files{'bin'}}) && !$OptValues{'nobin'};
+    $dolib = scalar(@{$Files{'lib'}}) && !$OptValues{'nolib'};
+    $dodoc = scalar(@{$Files{'doc'}}) && !$OptValues{'nodoc'};
+    $doman = scalar(@{$Files{'man'}}) && !$OptValues{'noman'};
+    die "Nothing to install!\n"
+	unless $dobin or $dolib or $dodoc or $doman;
+
+    ## Get path stuff
+    ## --------------
+    if ($OptValues{'batch'}) {
+	$OptValues{'perlpath'} = $DefValues{'perlpath'}
+	    unless $OptValues{'perlpath'};
+	$OptValues{'binpath'}  = $DefValues{'binpath'}
+	    unless $OptValues{'binpath'};
+	$OptValues{'libpath'}  = $DefValues{'libpath'}
+	    unless $OptValues{'libpath'};
+	$OptValues{'docpath'}  = $DefValues{'docpath'}
+	    unless $OptValues{'docpath'};
+	$OptValues{'manpath'}  = $DefValues{'manpath'}
+	    unless $OptValues{'manpath'};
+    } else {
+	while (1) {
+	    $OptValues{'perlpath'} =
+		get_perl_from_user($OptValues{'perlpath'},
+				   $DefValues{'perlpath'},
+				   "Pathname of perl executable:");
+	    $OptValues{'binpath'} =
+		get_path_from_user($OptValues{'binpath'},
+				   $DefValues{'binpath'},
+				   "Directory to install executables:")
+				   if $dobin;
+	    $OptValues{'libpath'} =
+		get_path_from_user($OptValues{'libpath'},
+				   $DefValues{'libpath'},
+				   "Directory to install library files:")
+				   if $dolib;
+	    $OptValues{'docpath'} =
+		get_path_from_user($OptValues{'docpath'},
+				   $DefValues{'docpath'},
+				   "Directory to install documentation:")
+				   if $dodoc;
+	    $OptValues{'manpath'} =
+		get_path_from_user($OptValues{'manpath'},
+				   $DefValues{'manpath'},
+				   "Directory to install manpages:")
+				   if $doman;
+
+	    print STDOUT "You have specified the following:\n";
+	    print STDOUT "\tPerl path: $OptValues{'perlpath'}\n";
+	    print STDOUT "\tBin directory: $OptValues{'binpath'}\n"
+		if $dobin;
+	    print STDOUT "\tLib directory: $OptValues{'libpath'}\n"
+		if $dolib;
+	    print STDOUT "\tDoc directory: $OptValues{'docpath'}\n"
+		if $dodoc;
+	    print STDOUT "\tMan directory: $OptValues{'manpath'}\n"
+		if $doman;
+
+	    last  if prompt_user_yn("Is this correct?", 1);
+
+	    $DefValues{'perlpath'} = $OptValues{'perlpath'};
+	    $DefValues{'binpath'}  = $OptValues{'binpath'};
+	    $DefValues{'libpath'}  = $OptValues{'libpath'};
+	    $DefValues{'docpath'}  = $OptValues{'docpath'};
+	    $DefValues{'manpath'}  = $OptValues{'manpath'};
+	    $OptValues{'perlpath'} = '';
+	    $OptValues{'binpath'}  = '';
+	    $OptValues{'libpath'}  = '';
+	    $OptValues{'docpath'}  = '';
+	    $OptValues{'manpath'}  = '';
+	}
+    }
+
+    ## Install files
+    ## -------------
+    print STDERR "($OptValues{'perlpath'})\n";
+    my $plprefix  = "#!$OptValues{'perlpath'}\n";
+       $plprefix .= "use lib qw($OptValues{'libpath'});\n"
+		    if $OptValues{'libpath'};
+    my($file, $destfile);
+    if ($dobin) {
+	print STDOUT qq(Installing programs to "$OptValues{'binpath'}":\n);
+	foreach (@{$Files{'bin'}}) {
+	    print STDOUT "    $_ => ";
+	    ($file = $_) =~ s%.*/%%o;
+	    $destfile = join('', $OptValues{'binpath'}, $DIRSEP, $file);
+	    print STDOUT $destfile, "\n";
+	    cp($_, $destfile, $plprefix);
+	    eval q{chmod 0755, $destfile;};
+	}
+    }
+    if ($dolib) {
+	print STDOUT qq(Installing lib files to "$OptValues{'libpath'}":\n);
+	foreach (@{$Files{'lib'}}) {
+	    print STDOUT "    $_ => ";
+	    ($file = $_) =~ s%.*/%%o;
+	    $destfile = join('', $OptValues{'libpath'}, $DIRSEP, $file);
+	    print STDOUT $destfile, "\n";
+	    cp($_, $destfile);
+	}
+    }
+    if ($dodoc) {
+	print STDOUT qq(Installing docs to "$OptValues{'docpath'}":\n);
+	foreach (@{$Files{'doc'}}) {
+	    print STDOUT "    $_ => ";
+	    ($file = $_) =~ s%.*/%%o;
+	    $destfile = join('', $OptValues{'docpath'}, $DIRSEP, $file);
+	    print STDOUT $destfile, "\n";
+	    cp($_, $destfile);
+	}
+    }
+    if ($doman) {
+	my $sect;
+	print STDOUT qq(Installing manpages to "$OptValues{'manpath'}":\n);
+	foreach (@{$Files{'man'}}) {
+	    print STDOUT "    $_ => ";
+	    ($file = $_)    =~ s%.*/%%o;
+	    ($sect = $file) =~ s%.*\.%%o;
+	    $destfile = join('', $OptValues{'manpath'},
+			     $DIRSEP, "man", $sect, $DIRSEP, $file);
+	    print STDOUT $destfile, "\n";
+	    cp($_, $destfile);
+	}
+    }
+}
+
+###############################################################################
+##	Subroutines
+###############################################################################
+
+##------------------------------------------------------------------------
+##	read_manifest() reads file giving list of all files to
+##	install.
+##
+sub read_manifest {
+    my $file	= shift;
+    my $href	= shift;
+    my($key, $pathname);
+
+    open FILE, $file or die qq(Unable to open "$file"\n);
+    while (<FILE>) {
+	next  if /^#/;
+	next  unless /\S/;
+	chomp;
+	($key, $pathname) = split(/:/, $_, 2);
+	push @{$href->{$key}}, $pathname;
+    }
+    close FILE;
+}
+
+##------------------------------------------------------------------------
+##	perl_exe() returns true if pathname argument is a perl
+##	interpreter.
+##
+sub perl_exe {
+    my $pathname = shift;
+
+    return 0  unless open PERL, "perl -v |";
+    while (<PERL>) {
+	if (/\bperl\b/) {
+	    close PERL;
+	    return 1;
+	}
+    }
+    close PERL;
+    0;
+}
+
+##------------------------------------------------------------------------
+##	get_perl_from_user() gets the pathname of the perl executable.
+##
+sub get_perl_from_user {
+    my $value	= shift;	# Current value (if set, batch mode)
+    my $default	= shift;	# Default value
+    my $prompt	= shift;	# User prompt
+
+    if ($value =~ /\S/) {
+	die qq(ERROR: "$value" is not perl.\n)
+	    unless perl_exe($value);
+    } else {
+	while (1) {
+	    $value = interpolate_path(prompt_user($prompt, $default));
+	    last  if perl_exe($value);
+	    warn qq(Warning: "$value" is not perl.\n);
+	}
+    }
+    $value;
+}
+
+##------------------------------------------------------------------------
+##	get_path_from_user() gets a path from the user.  The function
+##	insures the path exists.
+##
+sub get_path_from_user {
+    my $value	= shift;	# Current value (if set, batch mode)
+    my $default	= shift;	# Default value
+    my $prompt	= shift;	# User prompt
+
+    if ($value =~ /\S/) {
+	die qq(ERROR: Unable to create "$value".\n)
+	    unless create_dir($value, 1);
+    } else {
+	while (1) {
+	    $value = interpolate_path(prompt_user($prompt, $default));
+	    last  if create_dir($value);
+	    warn qq(Warning: Unable to create "$value".\n);
+	}
+    }
+    $value;
+}
+
+##------------------------------------------------------------------------
+##	create_dir() creates a directory path
+##
+sub create_dir {
+    my $d	= shift;	# Directory path
+    my $noask	= shift;	# Don't ask to create flag
+
+    return 1  if -e $d;
+
+    my(@a) = grep($_ ne '', split(/[$DIRSEPRX]/o, $d));
+    my($path, $dir, $curpath);
+
+    if (!$noask) {
+        return 0  unless prompt_user_yn(qq{"$d" does not exist.  Create}, 1);
+    }
+    if ($MSDOS) {
+	if ($d =~ m%^\s*(?:[a-zA-Z]:)?[/\\]%) {
+	    $path = shift @a;
+	} else {
+	    $path = $CURDIR;
+	}
+    } else {
+	if ($d =~ /^\s*\//) {
+	    $path = '';
+	} else {
+	    $path = $CURDIR;
+	}
+    }
+    foreach $dir (@a) {
+	$curpath = "$path$DIRSEP$dir";
+	if (! -e $curpath) {
+	    if (!mkdir($curpath, 0777)) {
+		warn "Unable to create $curpath: $!\n";
+		return 0;
+	    }
+	} elsif (! -d $curpath) {
+	    warn "$curpath is not a directory\n";
+	    return 0;
+	}
+	$path .= $DIRSEP . $dir;
+    }
+    if (! -w $d) {
+	warn "$d not writable\n";
+	return 0;
+    }
+    1;
+}
+
+##------------------------------------------------------------------------
+##	interpolate_path() expands any special characters in a
+##	pathname.
+##
+sub interpolate_path {
+    my($path) = shift;
+
+    $path =~ s/^~/$ENV{'HOME'}/e;
+    $path =~ s/\$(\w+)/$ENV{$1}/ge;
+    $path =~ s/\$\{(\w+)\}/$ENV{$1}/ge;
+    $path;
+}
+
+##------------------------------------------------------------------------
+##	cp() copies a file, or directory.
+##
+sub cp {
+    my($src, $dst, $prepend) = @_;
+
+    if (-d $src) {
+	if (! -e $dst) {
+	    mkdir($dst,0777) or die "Unable to create $dst: $!\n";
+	}
+	opendir(DIR, $src) or die "Unable to open $src: $!\n";
+	my @files = grep(!/^(sccs|\.|\..)$/i, readdir(DIR));
+	closedir(DIR);
+	my($file, $srcpn, $dstpn);
+	foreach $file (@files) {
+	    $srcpn = "$src$DIRSEP$file";
+	    $dstpn = "$dst$DIRSEP$file";
+	    if (-d $srcpn) {
+		cp($srcpn, $dstpn, $prepend);
+	    } else {
+		cpfile($srcpn, $dstpn, $prepend);
+	    }
+	}
+
+
+    } else {
+	cpfile($src, $dst, $prepend);
+    }
+}
+
+##------------------------------------------------------------------------
+##	cpfile() copies a file.  Any text in $prepend will be prepending
+##	to the destination file.
+##
+sub cpfile {
+    my($src, $dst, $prepend) = @_;
+
+    if (-d $dst) {
+	my $tmp;
+	($tmp = $src) =~ s%.*[$DIRSEPRX]%%o;
+	$dst .= $DIRSEP . $tmp;
+    }
+    open(SRC, $src) 	or die "Unable to open $src: $!\n";
+    open(DST, "> $dst") or die "Unable to create $dst: $!\n";
+    if (-B $src) { binmode( SRC ); binmode( DST ); }
+    if ($prepend) {
+	print DST $prepend;
+    }
+    print DST <SRC>;
+    close(SRC);
+    close(DST);
+}
+
+##------------------------------------------------------------------------
+##      prompt_user() prompts the user for some input.  The first
+##      argument is the prompt string, the second is the default
+##      value is the user specifies nothing.
+##
+sub prompt_user {
+    my $prompt = shift;
+    my $default = shift;
+ 
+    my($answer);
+ 
+    print STDOUT $prompt;
+    print STDOUT qq{ ("$default")}  if defined($default);
+    print STDOUT " ";
+    $answer = <STDIN>;
+    chomp $answer;
+    $answer = $default  if $answer !~ /\S/;
+    $answer;
+}
+ 
+##------------------------------------------------------------------------
+##      prompt_user_yn() prompts the user for a yes or no question.
+##
+sub prompt_user_yn {
+    my $prompt = shift;
+    my $default = shift;
+ 
+    my($answer);
+ 
+    print STDOUT $prompt, " ";
+    print STDOUT $default ? "['y']" : "['n']"; 
+    print STDOUT " ";
+    $answer = <STDIN>;
+    chomp $answer;
+    if ($answer !~ /\S/) {
+        $answer = $default;
+    } elsif ($answer =~ /y/i or $answer =~ /yes/i) {
+        $answer = 1;
+    } else {
+        $answer = 0;
+    }
+    $answer;
+}
+
+##---------------------------------------------------------------------------##
+##
+sub usage {
+    print STDOUT <<EOF;
+Usage: $PROG [options]
+Options:
+  -batch                : Run in batch mode
+  -binpath <path>       : Path to bin directory
+  -help                 : This message
+  -libpath <path>       : Path to lib directory
+  -manifest <file>      : List of files to install (def="MANIFEST")
+  -manpath <path>       : Path to man directory
+  -nobin                : Do not install programs
+  -nodoc                : Do not install documentation
+  -nolib                : Do not install library files
+  -noman                : Do not install manpages
+  -perlpath <pathname>  : Pathname of perl interpreter
+EOF
+}
+

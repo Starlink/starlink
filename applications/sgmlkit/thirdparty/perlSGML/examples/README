@@ -1,0 +1,19 @@
+README (perlSGML examples directory)
+
+This is the distribution of Perl program(s) and library(s) dealing with
+SGML.
+
+---------------------------------------------------------------------------
+CONTENTS of examples/:
+
+OpenBook.tree		Sample output from dtdtree on the OpenBook DTD.
+
+README			This file.
+
+catalog			A sample catalog file.
+
+html2.dsc		
+htmlent.dsc		dtd2html description files for the HTML 2.0 DTD.
+---------------------------------------------------------------------------
+97/09/16 15:16:02
+Earl Hood, ehood@medusa.acs.uci.edu

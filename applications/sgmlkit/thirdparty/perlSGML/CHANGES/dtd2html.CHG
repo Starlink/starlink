@@ -1,0 +1,251 @@
+Revision History for dtd2html
+-----------------------------
+	@(#) dtd2html.CHG @(#)
+==============================================================================
+See the changes file for dtd.pl (dtd_pl.CHG) since changes in it may
+affect dtd2html.
+
+==============================================================================
+1.5.1	(Oct 09, 1996)
+
+    Enhancements/Changes
+
+        o Tree file output changed where content model information
+	  is preserved.
+
+    Bug Fixes
+
+	o -allfile now works.  -allname was still being used.
+
+	o Fixed doc where -topname should -topfile.
+
+==============================================================================
+1.5.0	(Aug 21, 1996)
+
+    Enhancements/Changes
+
+        o -catalog has replaced -mapfile.
+ 
+        o The only default catalog(s) file is "catalog" and no
+          longer "map.txt".
+
+==============================================================================
+1.4.0	(Dec 08, 1995)
+
+    Enhancements/Changes
+
+	o Entity map file syntax has changed to the SGML open catalog
+	  format (see dtd_pl.CHG).
+
+	o Support for the envariable SGML_SEARCH_PATH (see dtd_pl.CHG).
+
+	o Support for the envariable SGML_CATALOG_FILES (see dtd_pl.CHG).
+
+	o Base content list on <elem>.html pages may have elements
+	  listed in the order they are defined in the content model
+	  declaration (-contnosort option).  Occurance indicators,
+	  group delimiters, and group connectors are also included in
+	  the list.
+
+	o Added support for a general entities page (-ents option).
+	  General entities with replaceable character data, CDATA,
+	  SDATA, and processing instruction entities are listed.
+
+	o External files can be reference in a description file. Eg:
+
+		<?DTD2HTML #include ents.dsc>
+
+	o Can provide description for entities in the description file.
+
+	o The following command-line options have been renamed:
+
+		-allname	=> -allfile
+		-homename	=> -homefile
+		-topname	=> -topfile
+		-treename	=> -treefile
+
+	  The new option names function the same way as the old names.
+
+	  Renaming was done to be more consistent with other command-line
+	  options.
+
+	o Headers in the attribute pages now contain an anchor so they
+	  can be the source of a hyperlink.  The NAME value of the
+	  anchor is the name of the attribute (in lowercase).  Eg.
+
+		<H2><A NAME="src">SRC</A></H2>
+
+	o Generated HTML files contain
+	  <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN"> declaration.
+	  Also, markup create by dtd2html conforms to the HTML 2.0
+	  standard (hopefully :-).
+
+	o A few cosmetic changes to HTML output.
+
+	o New command-line options:
+
+		-contnosort	     : Base content list "as is"
+		-ents		     : Create entity page
+		-entsfile <filename> : Set filename of entity page
+		-modelwidth <#>      : Set output width of content model
+				       declarations
+		-entslist	     : Output general entities in DTD to
+				       stdout in description file format.
+
+==============================================================================
+1.3.3	(Mar 31, 1994)
+
+    Bug Fixes
+
+	o Short descriptions are treated properly when updating a
+	  description file.
+
+	o Shared descriptions do not get propogated to individual
+	  element descriptions when updating a description file.
+
+
+==============================================================================
+1.3.2	(Dec 14, 1994)
+
+    Bug Fixes
+
+	o Fixed where <>& were not be converted into entity references
+	  in the HTML output.
+
+	o The defualt URL for the documentation is now consistent with
+	  the documentation.
+
+
+==============================================================================
+1.3.1	(Dec 12, 1994)
+
+    New Functionality/Enhancements:
+
+	o Able to specify short descriptions of elements listed in
+	  All Elements and in element pages via the description file.
+
+	o Added -nodocurl option.
+
+	o Some cosmetic changes to generated HTML.
+
+    Bug Fixes
+
+	o See dtd_pl.CHG for changes in it that affect dtd2html.
+
+	    - A bug in the internal extract_elem_names() in dtd.pl
+	      caused elements with '-' in the name to have incorrect
+	      links put in content model declaration pages.
+
+	o Element identifiers that equal reserved words are correctly
+	  recognized.  For example, an element called "EMPTY" would
+	  not have any links created for it.  The new DTDis_element()
+	  function in dtd.pl is used to make these recognitions.
+
+	o Remove BR element from TITLE's in some HTML files created.
+	  BR is not allowed in a TITLE element.
+
+
+==============================================================================
+1.3.0	(July 08, 1994)
+
+    New Functionality/Enhancements:
+
+	o A "quick reference" output (-qref or -qrefdl).
+
+	o Support for updating the element description file when a DTD
+	  changes (-updateel).
+
+	o In the spirit of SGML, only the first element description
+	  encountered is used.  However, an empty description, or a
+	  description with only the <P> tag, is ignored.
+
+	o Removed the word "Goto" in the links at the bottom of each
+	  page.  It was bad style.
+
+	o The footer on each page containing the name of the DTD links
+	  to the home page.
+
+	o New command-line options:
+
+		-keepold -noreport -qref -qrefdl -qrefhtag -reportonly 
+		-updateel
+
+	
+==============================================================================
+1.2.1	(June 01, 1994)
+
+    New Functionality/Enhancements:
+	
+	o Tree elements with "..." now link to the 'complete' entry
+	  in the tree, and the 'complete' entry links to the element
+	  page.
+
+	o "Goto Tree" link on an element page, goes to tree page
+	  scrolled to the location of the 'complete' element entry.
+
+	
+==============================================================================
+1.2.0	(May 31, 1994)
+
+    New Functionality/Enhancements:
+	
+	o Support for shared attribute and element descriptions in the
+	  element description file.
+
+	o Comment support in element description file.
+
+	o Formatting of content model declarations for better readablity.
+
+	o Attribute page is not created for an element if the element
+	  has no attributes.
+
+	o Content declaration page is not created if the element is
+	  defined with EMPTY content.
+
+	o Now hyperlinks exist for elements listed in the content
+	  declaration page.
+
+	o Added the -verbose option.  Now one can get the gory details
+	  of what dtd2html is doing.
+
+	o A list of anchors of top-most elements are created at the
+	  top of the tree page if more than one top-most element is
+	  defined in the DTD.  The anchors allow quick scrolling to
+	  top of each tree.
+
+    Bug Fixes:
+
+	o NOTATION declared value keyword attributes are recognized.
+
+
+==============================================================================
+1.1.0	(May 18, 1994)
+
+    New Functionality/Enhancements:
+
+	o The following command-line options were added:
+
+		-docurl, -treelink, -treeonly
+
+	o Support for descriptions for specific attributes of an element.
+
+	o The -elemlist option will create empty entries for attributes.
+
+	o A special element, "-HOME-", is recognized in the element
+	  description file.  The HTML text for this element is placed
+	  in the DTD-HOME page.
+
+    Bug Fixes:
+
+	o The #FIXED default value of an attribute is recognized.
+
+
+==============================================================================
+1.0.0	(May 12, 1994)
+
+    The original version (no version number was given out when this
+    was released).
+
+
+=============================================================================
+Earl Hood, ehood@medusa.acs.uci.edu

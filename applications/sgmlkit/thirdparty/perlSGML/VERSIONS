@@ -1,0 +1,29 @@
+Version list of perlSGML tools
+	97/09/18 14:31:59
+=============================================================================
+
+                                  Programs
+          dtd2html 1.5.1 - Create HTML files to navigate, and document a DTD
+           dtddiff 1.2.1 - List changes in a DTD
+           dtdtree 1.3.1 - Output content hierarchies of elements
+           dtdview 0.5.1 - Interactively query a DTD
+         stripsgml 2.0.0 - Strip tags from a document instance
+
+                             Libraries (Perl 4)
+            dtd.pl 2.4.1 - DTD parser
+           sgml.pl 1.0.0 - Simple document instance parser
+
+                              Modules (Perl 5)
+         SGML::DTD 0.02  -  DTD parser
+      SGML::EntMan 0.01  -  Entity manager
+         SGML::FSI 0.04  -  Formal System Indentifiers
+     SGML::ISO8859 0.01  -  ISO 8859 character set routines
+         SGML::Opt 0.02  -  Command-line option parsing
+      SGML::Parser 0.11  -  Document instance parser
+       SGML::SOCat 0.02  -  SGML Open Catalog parser
+ SGML::StripParser 0.01  -  Remove tags from document instances
+        SGML::Util 0.04  -  General utility routines
+
+=============================================================================
+97/09/18 14:31:59
+Earl Hood, ehood@medusa.acs.uci.edu

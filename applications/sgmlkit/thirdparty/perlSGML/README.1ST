@@ -1,0 +1,168 @@
+README for perlSGML
+    97/09/18 14:52:07
+---------------------------------------------------------------------------
+    Copyright (C) 1994-1997  Earl Hood, ehood@medusa.acs.uci.edu
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of
+    the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public
+    License along with this program; if not, write to the Free
+    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+    MA 02111-1307, USA.
+---------------------------------------------------------------------------
+CONTENTS of distribution:
+
+CHANGES/	Directory containing revision history of software.
+COPYING 	GNU General Public License.
+MANIFEST	File listing used by install.me
+README.1ST	The file you are reading.
+VERSIONS	Version list of programs, libraries, and modules.
+doc/      	Documentation.
+dtd2html*	Create HTML files to navigate a DTD.
+dtddiff*	List changes in a DTD.
+dtdtree*	Output content hierarchies of SGML elements.
+dtdview*	Interactively query a DTD.
+ebt/		Programs specific to EBT's DynaText(tm) product. 
+ents/    	SGML entity files.
+examples/	Directory containing example files/output of programs.
+install.me*	Installation program.
+lib/     	Perl libraries and modules
+old/		Old versions of programs
+sgm/      	Sample SGML files (mostly DTDs)
+stripsgml* 	Strip tags from an SGML document instance.
+
+*Denotes programs
+
+---------------------------------------------------------------------------
+INSTALLATION
+
+To install the perlSGML software, type the following at your shell
+prompt:
+
+    perl install.me
+
+Notes on Installation Program
+
+    o	You must be in the same directory as the install.me program.
+
+    o	The program requires Perl 5.  If you are running Perl 4,
+	you will have to install the software manually.  Trying to
+	run install.me with Perl 4 will generate compilation errors.
+	See below for manual installation instructions.
+
+    o	The '#!' line in the installed programs are set to point to
+	the Perl executable specified in the installation process.
+
+    o	Programs are updated to include the path location of the
+	installed library files.  Hence, you can install the library
+	files in any location, and the program will still work.
+
+Manual Installation
+-------------------
+
+Manual installation should only be required if you are running
+a Perl 4 interpreter.  Some parts of perlSGML are unusable using
+Perl 4; see the RELEASE NOTES below for the components of perlSGML
+that are Perl 4 compatible.
+
+For the Perl 4 compatible components, do the following:
+
+    o	Copy library (*.pl) files in the "lib" directory to the
+	library location you desire.
+
+    o	Copy the program files to the location you want them
+	installed.  After copying, you must edit the each file
+	as follows:
+
+	    -	Edit the "#!/..." line (the first line of each file)
+		to be the complete pathname of your perl interpreter.
+		Note, this step is unnecessary for Windows/MSDOS users.
+
+	    -	Add a new line right after the "#!/..." line to
+		contain the following:
+
+		    unshift(@INC, "/path/to/lib/files");
+
+		where "/path/to/lib/files/" is the path to where
+		copied the library files to.  Note, for Windows/MSDOS
+		user, you will have to use "\\" (w/o the quotes)
+		as the directory separator if using double quotes
+		to delimit the path.  For example:
+
+		    unshift(@INC, "C:\\path\\to\\lib\\files");
+
+		Note, if the location you copied the libraries are
+		already part of Perl's standard library search path,
+		you do not need to add the unshift() statement.
+
+---------------------------------------------------------------------------
+RELEASE NOTES
+
+Much of the perlSGML software is still Perl 4 compatible.
+The following should run under Perl 4: dtd2html, dtddiff, dtdtree,
+dtdview, dtd.pl, sgml.pl.  Perl 4 programs that have been replaced
+will be located in the "old" directory of distribution.  As noted
+under INSTALLATION, if you you are using Perl 4, you will have to
+install the software manually since the "install.me" program requires
+Perl 5 to run.
+
+
+---------------------------------------------------------------------------
+DOCUMENTATION
+
+Documentation is located in the directory doc/.  The documentation
+is in HTML.  The documentation is separated in multiple files.
+Loading "perlSGML.html" into a WWW browser will get you started.
+
+---------------------------------------------------------------------------
+KNOWN BUGS
+
+    o	dtd.pl and SGML::DTD do not properly handle
+	non-external/internal parameter entity references *outside* of
+	markup declarations.  Only external parameter entity references
+	ocurring outside of markup declarations are handled properly.
+
+	    Note    The term "internal" refers to a parameter entity
+		    whose content is directly defined in the parameter
+		    entity declaration and not by an external
+		    indentifier.  For example,
+
+		    <!ENTITY % foo "(some|content)">
+
+	This bug will only be a problem if you have DTDs that have
+	internal parameter entities that contain complete markup
+	declarations which are referenced.  These cases seem to be
+	the exception instead of the norm (the bug, or limitation,
+	went unnoticed for over 3 years).
+
+---------------------------------------------------------------------------
+BUGS/COMMENTS/SUGGESTIONS?
+
+    If you have any bugs/comments/suggestions, feel free to drop me
+    an e-mail message at ehood@medusa.acs.uci.edu.
+
+    If it is a bug you are reporting, please include the following in
+    your message:
+
+        o  Version of Perl (can be retrievied by "perl -v").
+        o  Version of the program/library/module in question
+	   (See VERSIONS for a software version listing).
+        o  The exact command-line used to invoke the program (if
+	   applicable).
+        o  Error/diagnostic messages from the program.
+        o  Any other information that might prove useful.
+
+    Before sending e-mail, make sure the documentation does not already
+    have an answer to your question/problem.
+
+---------------------------------------------------------------------------
+97/09/18 14:52:07
+Earl Hood, ehood@medusa.acs.uci.edu

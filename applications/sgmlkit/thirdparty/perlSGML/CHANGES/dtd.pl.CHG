@@ -1,0 +1,346 @@
+Revision History for dtd.pl
+-----------------------------
+	@(#) dtd.pl.CHG @(#)
+==============================================================================
+2.4.1	(Dec 26, 1996)
+
+    Enhancements/Changes
+
+	o Literal parsing code modified to improve performance.
+
+    Bug Fixes
+
+	o Fixed syntatical constructs that were not legal Perl 4, but
+	  legal under Perl 5.
+
+	o Forward slashes are recognized within MS-DOS pathanmes.
+
+	o ElemsOfAttr hash contains proper values.
+
+==============================================================================
+2.4.0	(Oct 09, 1996)
+
+    Enhancements/Changes
+
+        o Tree file output changed where content model information
+	  is preserved.
+
+	o If parsing a DOCTYPE declaration, parsing willing stop at
+	  close of the DOCTYPE declaration.
+
+	o External subset reference supported in DOCTYPE declaration.
+
+	o Routines added to capture debugging and error messages.
+
+	o Ignore marked sections are now processed according
+	  to ISO 8879.
+
+	o DTDread_dtd will return a 0 status if parsing failed and
+	  1 on success.  Execution is no longer aborted.
+
+	o Routine added to obtain all elements with a given attribute.
+
+	o Duplicate DOCTYPE declarations are ignored, but a warning
+	  message is produced.
+
+	o Error and warning messages will be prefixed by "Error:"
+	  and "Warning:", respectively.
+
+    Bug Fixes
+
+	o The subset open no longer appears in $DocType if the
+	  subset open follows the document type name with no space
+	  in between.
+
+	o Duplicate parent elements are no longer returned from
+	  DTDget_parents.
+
+=============================================================================
+2.3.0	(Aug 21, 1996)
+
+    Enhancements/Changes:
+
+	o Add DTDis_child function: determine if an element can be
+	  a child of another element.
+	
+    Bug Fixes:
+
+	o Fixed bug where parent elements and top elements were not
+	  being computed after reseting the library and loading in
+	  another DTD.
+
+	o Fixed bug where $DocType was not being reset by DTDreset.
+
+	o Fixed several routines where passed in element name was
+	  not translated to lowercase before accessing internal
+	  data structures.
+
+	o Syntax changes for execution under perl 5.002.
+
+=============================================================================
+2.2.0	(Dec 08, 1995)
+
+    Enhancements/Changes:
+	
+	o Fixed code so it will run under Perl 4 and 5.
+
+	o Recognizes if running under MS-DOS.  The path separator
+	  for envariables is set to ';' if running under MS-DOS.
+
+	o The map file (aka map.txt) for mapping public identifiers to
+	  system identifiers (files) has changed to us the SGML open
+	  catalog style.  The only entries that are recognized are
+	  PUBLIC and ENTITY entries.  Unrecognized entries are
+	  ignored.
+
+	  WARNING: The old map file format will no longer work.
+	  See the distribution for an example of the map file format.
+
+	o With new format of the map file, there is no longer the
+	  public text language code limitation (the $pubtl variable).
+	  Therefore, any public identifier can be specified without
+	  modifying dtd.pl.
+
+	o Support for the envariable SGML_SEARCH_PATH.
+	  SGML_SEARCH_PATH is a colon (semi-colon under MS-DOS) list of
+	  paths for finding catalog files (ie. map files) or entity
+	  files.  It use is the same as the P_SGML_PATH envariable.  If
+	  both P_SGML_PATH and SGML_SEARCH_PATH are defined,
+	  P_SGML_PATH paths are searched first, then SGML_SEARCH_PATH
+	  paths searched.
+
+	o Support for the envariable SGML_CATALOG_FILES (via the
+	  DTDread_catalog_files function).  SGML_CATALOG_FILES is a
+	  colon (semi-colon under MS-DOS) list of catalog (map) files
+	  for mapping public identifiers and entities to system
+	  identifiers (files).
+
+	o The following libraries functions have changed:
+
+	      - DTDget_elements:  now takes an option flag argument.
+		    If the flag is non-zero, the elements returned are
+		    in the order they were defined in the DTD.
+
+	o The following libraries functions have been added:
+
+	      - DTDget_gen_ents: Returns all general entities defined
+		    in the DTD.
+	      - DTDget_gen_data_ents: Returns all parseable character
+		    data, CDATA, SDATA, and PI general entities defined
+		    in the DTD.
+	      - DTDread_catalog_files: Reads all catalog files specified
+		    in the argument list and listed in the
+		    SGML_CATALOG_FILES envariable.
+
+	o The following variables went away:
+
+		$pubtl, %Entity2Sys
+
+	o The following variables have been added:
+
+	      - %ExtParmEnt2SysId: Map of external parameter entities
+		    to filenames.
+	      - %ExtGenEnt2SysId: Map of general parameter entities
+		    to filenames.
+	      - %PubId2SysId: Map of public identifiers to filenames
+	      - @ParEntities: Parameter entities in order processed
+	      - @GenEntities: General entities in order processed
+	      - @Elements: Elements in order processed
+	      - $DocType: Document type name (if applicable)
+
+	o Removed all use of 'undef'.
+
+	o Assigned values to some variables to help reduce the number
+	  of warnings from perl -w.
+
+    Bug Fixes:
+
+	o Minor bug fix to extract_elem_names.  Forgot to specify
+	  $str in the search/replace expression in the else block.
+
+	o Bug fix in DTDread_mapfile where I did not pass the $id
+	  variable as a reference to zip_wspace.
+
+
+=============================================================================
+2.1.1	(Mar 31, 1995)
+
+    Bug Fixes:
+
+	o Fixed bug in that element names with hyphens were not getting
+	  their attribute values stored.
+
+
+=============================================================================
+2.1.0	(Dec 12, 1994)
+
+    New Functionality/Enhancements:
+
+	o Added public function DTDis_element().  Can be used to
+	  determine if an element is defined in the DTD.
+
+	o Recognize some character entity references (&#).
+
+	o Able to determine if certain reserved words are actually
+	  elements in content models.  For example: an element called
+	  EMPTY.  These types of elements screwed up the computation of
+	  determining parent and top-most elements.  If an identifier
+	  is not a key in the %ElemCont associative array, then it is
+	  treated as a reserved word (or it could be an undefined
+	  element).
+
+	o External entity mapping created from DTDread_mapfile is no
+	  longer cleared when DTDreset is called.  Before, one would
+	  have to reread the external entity map file if DTDreset is
+	  called and DTDread_dtd is called on DTD with external entity
+	  references.
+
+	o Fixed bug in internal routine extract_elem_names(), which
+	  is used by public functions DTDget_base_children(),
+	  DTDget_inc_children(), DTDget_exc_children().  It no longer
+	  has $inc and $exc in the split expression since this can
+	  conflict with $namechars characters (mainly '-').
+
+	o Warnings are generated if a entity reference is not defined
+	  which may lead to parsing errors.
+
+
+=============================================================================
+2.0.2	(July 08, 1994)
+
+    New Functionality/Enhancements:
+
+	o subset_error() prints out a little less terse message than
+	  before.  The offending character is printed along with its
+	  ascii code.  Also, a small reason is given for the problem.
+
+
+=============================================================================
+2.0.1	(June 01, 1994)
+
+    Bug Fixes:
+
+	o Processing instruction callback is reset in DTDreset().
+
+	o Recognize space between "--" and ">" when closing a
+	  comment declaration statment.
+
+
+=============================================================================
+2.0.0	(May 31, 1994)
+
+    New Functionality/Enhancements:
+
+	o NOTATION declarations are recognized.  They're stored in the
+	  %PubNotation (PUBLIC) and %SysNotation (SYSTEM) arrays.
+
+	o Support for a comment callback.  I.e. a Perl program can
+	  register a callback function (with DTDset_comment_callback)
+	  inorder to extract the text within comment declarations.
+
+	o Support for processing instructions.  A callback can be
+	  registered (with DTDset_pi_callback) to be invoked when a
+	  processing instruction is encountered.
+
+	o Added a verbosity mode (with DTDset_verbosity).  If set,
+	  messages are outputed to STDERR giving status on what
+	  DTDread_dtd is parsing.  This is mainly for debugging
+	  purposes.
+
+	o Better support for marked sections.  RCDATA and CDATA
+	  marked sections are explicitly ignored (due to no DTD
+	  markup in them), and multiple keywords are handled.
+
+	o Added a few more utility routines:
+
+		DTDget_base_children
+		DTDget_exc_children
+		DTDget_inc_children
+		DTDis_occur_indicator
+		DTDis_group_connector
+		DTDis_tag_name
+
+	o Rewrote DTDprint_tree routine.  It does two passes on an
+	  elements content hierachy to perform maximum pruning.  The
+	  first pass computes the highest level of each element, and
+	  the second pass prints the tree, pruning based on the
+	  data from the first pass.
+
+
+    Bug Fixes:
+
+	o Fixed bug in get_next_group() function.  Cases occurred when
+	  it would not grab an occurance operator in a model group.  This
+	  problem caused invalid data being stored for elements.
+	  (I do not know why this problem did not show up earlier)
+
+	o Properly recognized attributes with the NOTATION declared
+	  value keyword.  Before, an attribute list with a NOTATION
+	  value will cause errors in parsing the attlist.
+
+	o Multiple concurrent open external file references are handled.
+	  I.e. A DTD that references a file (via parameter entity)
+	  and that file references a file, and so on ... is handle
+	  correctly.  Before, only one external file reference could
+	  be active at a given time.
+
+	o Attribute names are stored in lowercase.  This is analogous
+	  to how element names are stored.  Before, they were stored
+	  in the case they appeared in the DTD.
+
+	o Recognizes lowercase declaration type keywords.  I.e.
+	  Before, the declaration, "<!entity ...", would not
+	  have been recognized.
+
+	o Fixed other spots in code where lowercase versions of
+	  SGML keywords were not recognized.
+
+	o Fixed a STUPID goof on my part where I misspelled
+	  'declaration'.  I was spelling it 'decleration'.  Some
+	  internal routines had this word as part of their name, or
+	  the word was used within routines.  At least I was consistant
+	  in my misspelling.
+
+
+
+=============================================================================
+1.1.0	(May 19, 1994)
+
+    New Functionality/Enhancements:
+
+	o General entities are supported, however, external ones are
+	  still ignored (needed for IBMIDDoc).
+
+	o General entities are expanded when found in the DTD.
+	  I.e. General entities are not expanded when found in a parameter
+	  entity definition, but are expanded when the parameter entity is
+	  referenced (needed for IBMIDDoc).
+
+    Bug Fixes:
+
+	o The #FIXED default value of an attribute is recognized.
+
+	o <!ATTLIST #NOTATION is ignored properly.
+
+	o Putting parenthesis around an external parameter entity reference
+	  could have cause element names to be stored with a parenthesis.
+	  This has been fixed.
+
+	o Fixed bug in parsing string values.
+
+	o Semi-colons were missing in some Perl statements that
+	  caused older Perl interpreters to complain.
+
+	o Recognizes a parameter enitity being used to define an element's
+	  tag minimization.
+
+
+=============================================================================
+1.0.0	(May 12, 1994)
+
+    The original version (no version number was given out when this
+    was released).
+
+
+=============================================================================
+Earl Hood, ehood@medusa.acs.uci.edu

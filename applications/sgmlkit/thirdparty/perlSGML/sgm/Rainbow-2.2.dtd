@@ -1,0 +1,327 @@
+<!--
+
+Rainbow DTD: VERSION
+   Current version: 2.2
+   The exact RCS version stamp is stored just after the end of the SGML decl.
+
+
+Rainbow DTD: TYPICAL USAGE
+        <!DOCTYPE rainbow PUBLIC "-//EBT//DTD Rainbow 2.2//EN" [
+        ]>
+
+
+Rainbow DTD: SGML DECLARATION
+        The SGML declaration for Rainbow documents lies in "rainbow.dcl".
+
+
+Rainbow DTD: LEGAL NOTES
+
+   Copyright 1993-1994 Electronic Book Technologies, Inc.
+
+   Permission to use, copy, modify and distribute the Rainbow DTD and
+     its accompanying documentation for any purpose and without fee is
+     hereby granted, provided that this copyright notice appears in all
+     copies.  If you modify the Rainbow DTD, rename your modified
+     version and make it clear that your version is not the "official" 
+     version maintained by EBT.
+
+   EBT makes no representation about the suitability of the DTD
+     for any purpose. It is provided "as is" without expressed or
+     implied warranty.
+
+   The Rainbow DTD is maintained by EBT, Inc.  Please
+     direct all questions, bug reports, or suggestions for changes to:
+             dfs@ebt.com
+
+   Public Identifier:
+      "-//EBT//DTD Rainbow 2.2//EN"
+
+-->
+
+
+
+<!--
+   BELOW IS THE EXACT RCS VERSION STAMP:
+   $Id: rainbow.dtd 2.2 1994/02/21 02:17:21 dfs Exp $
+-->
+
+
+<!-- Rainbow DTD: CHANGE LOG
+
+   1994/02/21 (RCS version 2.2) by dfs:
+        *) HEAD is now merely a wrapper around one or more PARAs.
+        *) STRUCLVL now supports the ID attribute.
+        *) SGML declaration now fully supports ISO 8859-1 character set, and
+           is stored in a separate file (rainbow.dcl) for convenience.
+        *) CLFTYPE now supported; NAMEDCLF elements can be used to refer to
+           a CLFTYPE.
+        *) NAMEDCLFs can contain CLFs, thus providing limited nesting of
+           character-level-formatting objects.
+        *) Definition of an SDATA entity for representation of tabchars.
+        *) ANCHOR, IDXTERM, and XREF: content model repaired to match the
+           original intended semantics.  The content models are now
+           repeatable OR groups.
+             NOTE: This leaves AUTOGEN and CLF as the only element types
+                   with controversial "mixed content" models.  We hope
+                   to resolve these controversies at the SGML/Open
+                   Rainbow review.
+
+   1994/01/24 (RCS version 2.1) by dfs:
+        *) Set SHORTTAG to YES in SGML decl (recommended use: only to
+           allow omission of attribute-value delimiters)
+        *) Various additions to the set of element types supporting 
+           end-tag omission.
+        *) This change log was moved out of the SGML decl.
+           
+   1994/01/10 (RCS version 2.0) by dfs:
+        ** Very large number of changes - -  see the Annotated DTD document
+           for complete details. **
+
+   1993/12/06 (RCS version 1.9) by dfs:
+        *) The SGML declaration minimization portion now allows OMITTAG.
+
+   1993/12/06 (RCS version 1.8) by dfs:
+        *) Font size is no longer a NUMBER (to support fractionals)
+
+   1993/12/05 (RCS version 1.7) by dfs:
+        *) Deletion of "continue" attribute on PARA/HEAD.  That attribute
+           never really existed; it was a mega-typo.
+        *) Addition of "dtdver" attribute allowing a document instance
+           to specify the exact version of Rainbow DTD used by its 
+           generator/author.
+        *) Addition of copyright notice to DTD.
+
+   1993/11/30 (RCS version 1.6) by dfs:
+        *) MARK now has same content model as PARACONT.
+
+   1993/11/29 (RCS version 1.5) by dfs:
+        *) Typo fix: TXTFLD changed to TEXTFLD
+
+   1993/11/29 (RCS version 1.4) by dfs:
+        *) All PLF/CLF attributes are #IMPLIED.
+        *) NUMBER type now used very sparingly, because of its inability
+           to support negative numbers.  NUMBER now used only in cases for
+           which a negative number is absolutely impossible.
+        *) All ID attributes are of type CDATA, because word processors
+           allow "bookmarks" to have names that do not meet the SGML
+           requirements for ID-type attribute values.
+        *) GI change: INDEXENTRY is now IDXTERM
+           Motivation: it was the only GI that was > 8 chars in length
+        *) IDXTERM was an "orphan" in the previous version; now it is
+           included in the DOC content model as an inclusion exception.
+        *) The PARACONT attributes are now #IMPLIED.
+-->
+
+
+
+<!ELEMENT rainbow  - - (FILEINFO?,STYINFO,DOC)>
+
+<!ELEMENT fileinfo - O EMPTY>
+<!ATTLIST fileinfo     origin   CDATA #IMPLIED
+                       dtdver   CDATA #REQUIRED  -- Rev. number of Rainbow DTD
+                                                    used for this instance -->
+
+<!ENTITY % boolean "NUMBER"  -- 1 means yes, 0 means no -->
+
+<!ENTITY % plf-att -- Paragraph Level Formatting --
+"left-indent CDATA #IMPLIED
+       -- measured in points; absolute number; do not use += notation --
+ right-indent CDATA #IMPLIED
+       -- measured in points; absolute number; do not use += notation --
+ first-indent CDATA #IMPLIED
+       -- same as in DynaText: offset from the left-indentation --
+ justification (LeftJust|CenterJust|RightJust|FullJust|InJust|OutJust) #IMPLIED
+       -- FullJust means both left and right justification
+          InJust/OutJust means justify towards binding/perimeter --
+ line-spacing CDATA #IMPLIED
+       -- same as in DT: distance between baselines --
+ space-before CDATA #IMPLIED
+ space-after CDATA #IMPLIED
+       -- both of the above are as in DT: measured in pts --
+ keep-with (Next|Prev) #IMPLIED
+       -- keep with (next/prev) paragraph --
+ tab-stops CDATA #IMPLIED
+       -- colon-separated numbers; each number is a measurement (in points)
+          of the tabstops distance from the left-indentation --
+ keep-together %boolean; #IMPLIED
+       -- does author demand that the paragraph not cross page boundaries? --
+ pg-brk-before %boolean; #IMPLIED       -- page-break before --
+ col-brk-before %boolean; #IMPLIED      -- column-break before --
+ border NUMBER #IMPLIED      
+       -- value is sum of the appropriate members of this list:
+                 1 for top
+                 2 for right
+                 4 for bottom
+                 8 for left   --  
+">
+
+<!ENTITY % clf-att -- Character Level Formatting --
+"charset CDATA #IMPLIED
+ font-family CDATA #IMPLIED
+ font-size CDATA #IMPLIED
+ font-weight (Medium|Bold) #IMPLIED
+ font-slant (Roman|Ital)   #IMPLIED    -- Use Ital both italic and oblique --
+ score-location (Under|Over|Through) #IMPLIED
+ score-type (Single|Double|Dotted) #IMPLIED
+       -- score-type is ignored if score-location is not set --
+ vertical-offset CDATA #IMPLIED
+       -- as in DT: offset from baseline, in points, - for sub, + for sup --
+ foreground CDATA #IMPLIED
+ background CDATA #IMPLIED
+       -- If the generator can do so, it must specify color as a RGB
+               hexadecimal numbers in this format:  #rrggbb
+          If the generator is unable to do so, it can use an arbitrary
+               representation (e.g. name, index number).
+          Note that if the latter representation is used, it will not
+               be possible for the Rainbow consumer to reproduce colors
+               in its rendering facilities. --
+       -- Note: if the text is not in a special color, don't set
+                the foreground attribute. --
+       -- Note: if the text is not on a special background, don't set
+                the background attribute. --
+       -- Example: use #888888 for background in the typical case of shaded  
+                   background for black-on-white printing --
+ lowercase-display (SmallCaps|FullCaps)  #IMPLIED
+       -- Note that this specifies how lowercase data is displayed;
+          this does not describe the data itself. --
+ outline %boolean; #IMPLIED
+       -- Is each letter being displayed as a hollow outline? --
+ change-bar (BarLeft|BarRight) #IMPLIED
+ hidden %boolean; #IMPLIED
+">
+
+
+
+
+
+<!ELEMENT styinfo  - - (PARATYPE+,CLFTYPE*)>
+
+<!ELEMENT paratype - O EMPTY>
+<!ATTLIST paratype     name     CDATA #REQUIRED
+                       %plf-att; %clf-att;>
+
+<!ELEMENT clftype - O EMPTY>
+<!ATTLIST clftype     name     CDATA #REQUIRED
+                      %clf-att;>
+
+<!ELEMENT doc      - - ( HEAD?,
+                        (((PARA|ILLUS|TABLE|SYSOBJ)+,
+                          STRUCLVL*)
+                         |(STRUCLVL+ ) ) )
+
+                       -- inclusion exceptions --
+                       +(WPLOC|IDXTERM)          >
+
+
+<!ELEMENT struclvl - - (SYSATTRS?,HEAD,(PARA|ILLUS|TABLE|SYSOBJ)*,STRUCLVL*)>
+
+<!ELEMENT head  - - (SYSATTRS?,PARA+)>
+<!ATTLIST (struclvl|head)
+                       id       CDATA    #IMPLIED>
+
+<!ELEMENT para  - O (SYSATTRS?,PARACONT)>
+<!ATTLIST para
+                       paratype CDATA    #REQUIRED
+                       %plf-att; %clf-att;
+      -- If the para is a child of a head, the ID attribute should go
+         on the head, not the para --
+                       id       CDATA    #IMPLIED
+      -- remaining attrs are set only if this element
+         represents a "continuation" of a para in orig WP doc --
+                       continue %boolean #IMPLIED
+                       preced-hard-returns NUMBER #IMPLIED >
+
+<!ENTITY % pcont
+         "#PCDATA|SYSOBJ|ANCHOR|XREF|AUTOGEN|GRAPHIC|EQN|NOTE">
+<!ELEMENT paracont  - O  (%pcont;|NAMEDCLF|CLF)+ >
+
+
+<!ELEMENT illus    - O (SYSATTRS?,(GRAPHIC|EQN))>
+<!ATTLIST illus        %plf-att;
+                       id       CDATA #IMPLIED>
+
+<!ELEMENT graphic  - O (SYSATTRS?)>
+<!ATTLIST graphic      format CDATA #REQUIRED
+                       filename CDATA #REQUIRED>
+
+<!ELEMENT eqn      - O (SYSATTRS?,EQNCONT?)>
+<!ELEMENT eqncont  - - CDATA>
+<!ATTLIST eqn          format CDATA #REQUIRED
+                       filename CDATA #IMPLIED>
+
+
+<!ELEMENT namedclf  - -  (SYSATTRS?,(%pcont;|CLF)+) >
+<!ELEMENT clf       - -  (SYSATTRS?,(%pcont;)+ )>
+
+<!ATTLIST namedclf     name CDATA #REQUIRED
+                       %clf-att;
+                       ID CDATA #IMPLIED >
+<!ATTLIST clf          %clf-att;
+                       ID CDATA #IMPLIED >
+
+
+<!ELEMENT note - - (SYSATTRS?,(PARA|ILLUS|TABLE|SYSOBJ)*)>
+
+
+<!ELEMENT idxterm   - - (#PCDATA|CLF)+ >
+<!ATTLIST idxterm       term1 CDATA #IMPLIED
+                        term2 CDATA #IMPLIED
+                        term3 CDATA #IMPLIED
+                        see CDATA #IMPLIED
+                        see-also CDATA #IMPLIED>
+
+
+<!ELEMENT anchor    - - (#PCDATA|CLF)+ >
+<!ATTLIST anchor        id CDATA #REQUIRED>
+
+<!ELEMENT xref      - - (#PCDATA|CLF)+ >
+<!ATTLIST xref          refid CDATA #REQUIRED
+                        type (xref-textcopy|xref-pagenum|xref-link) #REQUIRED>
+
+
+<!ELEMENT autogen      - - (SYSATTRS?,#PCDATA)>
+
+
+<!ELEMENT wploc      - O EMPTY>
+<!ATTLIST wploc      wp-addr    CDATA #REQUIRED
+                     human-addr  CDATA #IMPLIED>
+
+
+<!ELEMENT sysobj   - O (datafld|textfld)+>
+<!ATTLIST sysobj       type CDATA #REQUIRED
+                       id       CDATA #IMPLIED>
+<!ELEMENT datafld  - - CDATA>
+<!ELEMENT textfld  - - (#PCDATA|CLF)+>
+<!ATTLIST (datafld|textfld)   type CDATA #REQUIRED>
+
+
+
+<!ELEMENT sysattrs   - O (sysattr*)>
+<!ELEMENT sysattr    - - CDATA>
+<!ATTLIST sysattr        attrname CDATA #REQUIRED>
+
+
+<!ELEMENT table    - O (tgroup+)>
+<!ATTLIST table        %plf-att;
+                       id CDATA #IMPLIED>
+<!ELEMENT tgroup   - - (colspec*,spanspec*,thead?,tbody)>
+<!ATTLIST tgroup       cols NUMBER #REQUIRED>
+<!ELEMENT colspec  - O EMPTY>
+<!ATTLIST colspec      colnum NUMBER #IMPLIED
+                       colname NMTOKEN #IMPLIED
+                       align (left|right|center) #IMPLIED
+                       colwidth CDATA #IMPLIED>
+<!ELEMENT spanspec - O EMPTY>
+<!ATTLIST spanspec     namest NMTOKEN #REQUIRED
+                       nameend NMTOKEN #REQUIRED
+                       spanname NMTOKEN #REQUIRED
+                       align (left|right|center) #IMPLIED>
+<!ELEMENT thead    - - (row+)>
+<!ELEMENT tbody    - - (row+)>
+<!ELEMENT row      - - (entry+)>
+<!ELEMENT entry    - - (PARA|ILLUS|SYSOBJ)*>
+<!ATTLIST entry        colname NMTOKEN #IMPLIED
+                       spanname NMTOKEN #IMPLIED>
+
+
+<!ENTITY rbowtab SDATA "[rbowtab]">

@@ -1,0 +1,189 @@
+<!-- =================================================================== -->
+<!--    @(#) SGML..StripParser.sgml 1.2 97/09/18 14:32:49 @(#)
+  -->
+<!-- =================================================================== -->
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN" [
+    <!ENTITY % perlSGML PUBLIC "-//EWH//ENTITIES perlSGML Modules//EN" >
+    %perlSGML;
+]>
+<html>
+<head>
+<title>perlSGML -- SGML::StripParser</title>
+<link rev="made" href="mailto:ehood@medusa.acs.uci.edu">
+</head>
+
+
+<!-- =================================================================== -->
+<hr><h2><a name="Name">Name</a></h2>
+
+<p>SGML::StripParser - strip tags from an SGML instance
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Synopsis">Synopsis</a></h2>
+<pre>
+    use SGML::StripParser;
+    $parser = new SGML::StripParser;
+    $parser->parse_data(\*STDIN);
+</pre>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Description">Description</a></h2>
+
+<p><strong>SGML::StripParser</strong> strips SGML tags from document
+instances and translates entity references for special characters and
+character references to ASCII (or the character set specified by the
+<strong>set_charset</strong> method).  The <strong>parse_data</strong>
+method is used to specify the input filehandle of the SGML document
+instance.  By default, output will go to STDOUT, but the output
+filehandle can be changed by the <strong>set_outhandle</strong> method.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Class _ethods">Class Methods</a></h2>
+
+<p>The following class methods are defined:
+</p>
+
+<ul>
+<li><a href="#new">new</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="new">new</a></h3>
+<dl>
+<dt><tt><strong>new</strong> SGML::StripParser</tt></dt>
+<dd>
+<p>Instantiate a new <strong>SGML::StripParser</strong> object.
+</p>
+</dd>
+</dl>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Object_Methods">Object Methods</a></h2>
+
+<p>The following methods are defined:
+</p>
+
+<ul>
+<li><a href="#parse_data">parse_data</a></li>
+</ul>
+<ul>
+<li><a href="#set_charset">set_charset</a></li>
+<li><a href="#set_html_mode">set_html_mode</a></li>
+<li><a href="#set_ign_parm_ents">set_ign_parm_ents</a></li>
+<li><a href="#set_inc_parm_ents">set_inc_parm_ents</a></li>
+<li><a href="#set_outhandle">set_outhandle</a></li>
+</ul>
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="parse_data">parse_data</a></h3>
+<dl>
+<dt><tt>$parser-><strong>parse_data</strong>(\*<em>FILEHANDLE</em>)</tt></dt>
+<dd>
+<p>Process the document instance specified by <em>FILEHANDLE</em>.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_outhandle">set_outhandle</a></h3>
+<dl>
+<dt><tt>$parser-><strong>set_outhandle</strong>(\*<em>FILEHANDLE</em>)</tt></dt>
+<dd>
+<p>Set the output filehandle to <em>FILEHANDLE</em>.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_html_mode">set_html_mode</a></h3>
+<dl>
+<dt><tt>$parser-><strong>set_html_mode</strong>(<em>$boolean</em>)</tt></dt>
+<dd>
+<p>If <em>$boolean</em> is a true value, anchor URLs in HTML documents
+will be included in the output.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_charset">set_charset</a></h3>
+<dl>
+<dt><tt>$parser-><strong>set_charset</strong>(<em>$charset</em>)</tt></dt>
+<dd>
+<p>Use <em>$charset</em> as the character set to use while processing.
+By default, ASCII is assumed, so entity references for special
+characters and character references are mapped to ASCII text.
+<strong>set_charset</strong> allows the entity references and character
+references to interpreted under a different character set.  Only the
+ISO-8859 character sets (1-10) are supported.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_inc_parm_ents">set_inc_parm_ents</a></h3>
+<dl>
+<dt><tt>$parser-><strong>set_inc_parm_ents</strong>(<em>@names</em>)</tt></dt>
+<dd>
+<p>Set the list of parameter entities in <em>@names</em> to
+"<tt>INCLUDE</tt>".  This method may be useful for instances that
+have marked sections with parameter entity references for the status
+keyword.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_ign_parm_ents">set_ign_parm_ents</a></h3>
+<dl>
+<dt><tt>$parser-><strong>set_ign_parm_ents</strong>(<em>@names</em>)</tt></dt>
+<dd>
+<p>Set the list of parameter entities in <em>@names</em> to
+"<tt>IGNORE</tt>".  This method may be useful for instances that
+have marked sections with parameter entity references for the status
+keyword.
+</p>
+</dl>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Notes">Notes</a></h2>
+
+<ul>
+
+<li>
+<p><strong>SGML::StripParser</strong> is derived from the
+<strong>SGML::Parser</strong> class.  Hence, it has the same parsing
+capbilities and limitation of the <strong>SGML::Parser</strong> class.
+</p>
+</ul>
+
+<!-- =================================================================== -->
+<hr><h2><a name="See_Also">See Also</a></h2>
+
+<p>
+<a href="stripsgml.html"><strong>stripsgml</strong></a>,
+</p>
+<p>
+<a href="SGML..ISO8859.html"><strong>SGML::ISO8859</strong></a>,
+<a href="SGML..Parser.html"><strong>SGML::Parser</strong></a>
+</p>
+<p>
+perl(1)
+</p>
+
+<!-- ================================================================== -->
+&avail;
+&author;
+
+<!-- ================================================================== -->
+<hr>
+<address>
+97/09/18 14:32:49
+</address>
+</body></html>

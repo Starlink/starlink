@@ -1,0 +1,530 @@
+<!-- =================================================================== -->
+<!--    @(#) SGML..Parser.sgml 1.2 97/09/18 14:32:46 @(#)
+  -->
+<!-- =================================================================== -->
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN" [
+    <!ENTITY % perlSGML PUBLIC "-//EWH//ENTITIES perlSGML Modules//EN" >
+    %perlSGML;
+]>
+<html>
+<head>
+<title>perlSGML -- SGML::Parser</title>
+<link rev="made" href="mailto:ehood@medusa.acs.uci.edu">
+</head>
+
+
+<!-- =================================================================== -->
+<hr><h2><a name="Name">Name</a></h2>
+
+<p>SGML::Parser - SGML instance parser</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Synopsis">Synopsis</a></h2>
+<pre>
+  package MyParser;
+  use SGML::Parser;
+  @ISA = qw( SGML::Parser );
+
+  sub cdata { ... }
+  sub char_ref { ... }
+  sub comment_decl { ... }
+  sub end_tag { ... }
+  sub entity_ref { ... }
+  sub ignored_data { ... }
+  sub marked_sect_close { ... }
+  sub marked_sect_open { ... }
+  sub parm_entity_ref { ... }
+  sub processing_inst { ... }
+  sub start_tag { ... }
+  sub error { ... }
+
+  $myparser = new MyParser;
+  $myparser->parse_data(\*FILEHANDLE);
+</pre>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Description">Description</a></h2>
+
+<p><strong>SGML::Parser</strong> is a simple SGML instance parser;
+it cannot parse document type declarations.  To use the class, you
+create a derived class of <strong>SGML::Parser</strong> and redefine
+the various methods invoked when certain events occur during parsing.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Class_Methods">Class_Methods</a></h2>
+
+<p>The following class methods are defined:
+</p>
+<ul>
+<li><a href="#new">new</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="new">new</a></h3>
+
+<p>Instantiate a new parser object.  The way <b>SGML::Parser</b>
+is defined, an <b>SGML::Parser</b> object will probably never
+be directed instantiated, but a derived class will be.
+The <b>new</b> method is implemented to be reused by derived classes,
+so redefinition of the method is not required (unless derived
+class must perform custom initialization beyond what <b>SGML::Parser</b>
+performs).
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Object_Methods">Object Methods</a></h2>
+
+<p>The following lists the methods defined by
+<strong>SGML::Parser</strong> that should not be overriden:
+</p>
+<ul>
+<li><a href="#parse_data">parse_data</a></li>
+<li><a href="#get_line_no">get_line_no</a></li>
+<li><a href="#get_input_label">get_input_label</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="parse_data">parse_data</a></h3>
+
+<pre>
+    $parser-><strong>parse_data</strong>(
+		<var>$fh</var>,
+		<var>$label</var>,
+		<var>$init_buf</var>,
+		<var>$line_no</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$fh</var> (required)</dt><dd>
+Reference to the filehandle of the SGML instance to parse.
+<dt><var>$label</var> (optional)</dt><dd>
+Label for the filehandle being parsed, usually a filename.
+The name is used for error messages.
+<dt><var>$init_buf</var> (optional)</dt><dd>
+Initial data to prepend to instance to include in the parse.
+<dt><var>$line_no</var> (optional)</dt><dd>
+The starting line number.  If not defined, numbering starts at 0.
+</dl>
+
+<h4>Return:</h4>
+<p>The return value of the method should be <tt>undef</tt>.  However, if
+any data was in the current buffer and parsing was aborted, the return
+value is the buffer's contents.
+</p>
+
+<h4>Description:</h4>
+<p><strong>parse_data</strong> parses an SGML instance.  When
+parsing, the various <a href="#Callback_Methods">callback methods</a>
+are called when the various lexical contructs are encountered.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_line_no">get_line_no</a></h3>
+<pre>
+    $parser-><strong>get_line_no</strong>();
+</pre>
+
+<h4>Arguments:</h4>
+<p>N/A</p>
+
+<h4>Return:</h4>
+<p>The current line number.
+</p>
+
+<h4>Description:</h4>
+<p>Get the current line number.  Method useful in callback methods.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_input_label">get_input_label</a></h3>
+<pre>
+    $parser-><strong>get_input_label</strong>()
+</pre>
+
+<h4>Arguments:</h4>
+<p>N/A</p>
+
+<h4>Return:</h4>
+<p>Label string.
+</p>
+
+<h4>Description:</h4>
+<p>Retrieves the label given to the input being parsed.  Label is defined
+when the <strong>parse_data</strong> method is called.  Method useful
+in callback methods.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Callback_Methods">Callback Methods</a></h2>
+
+<p>The following methods are intended to be redefined by a derived
+class to handle the processing events generated by the
+<strong>parse_data</strong> method.
+</p>
+<ul>
+<li><a href="#cdata">cdata</a></li>
+<li><a href="#char_ref">char_ref</a></li>
+<li><a href="#comment_decl">comment_decl</a></li>
+<li><a href="#end_tag">end_tag</a></li>
+<li><a href="#entity_ref">entity_ref</a></li>
+<li><a href="#error">error</a></li>
+<li><a href="#ignored_data">ignored_data</a></li>
+<li><a href="#marked_sect_close">marked_sect_close</a></li>
+<li><a href="#marked_sect_open">marked_sect_open</a></li>
+<li><a href="#parm_entity_ref">parm_entity_ref</a></li>
+<li><a href="#processing_inst">processing_inst</a></li>
+<li><a href="#start_tag">start_tag</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="cdata">cdata</a></h3>
+<pre>
+    $parser-><strong>cdata</strong>(<var>$data</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$data</var>
+<dd>Character data.
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>cdata</strong> is invoked when character data is encountered.
+The character data is passed into the method.  Multiple lines of
+character data may generate multiple <strong>cdata</strong> calls.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="char_ref">char_ref</a></h3>
+<pre>
+    $parser-><strong>char_ref</strong>(<var>$value</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$value</var>
+<dd>The character number or function name.
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>char_ref</strong> is invoked when a character reference
+is encountered.  The number/name of the character reference
+is passed in as an argument.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="comment_decl">comment_decl</a></h3>
+<pre>
+    $parser-><strong>comment_decl</strong>(<var>\@comments</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>\@comments</var>
+<dd>Reference to an array of strings.  Each string is the content
+of each comment block in the declaration.
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>comment_decl</strong> is called when a comment declaration is
+parsed.  The passed in argument is a reference to an array containing
+the comment blocks defined in the declaration.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="end_tag">end_tag</a></h3>
+<pre>
+    $parser-><strong>end_tag</strong>(<var>$gi</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$gi</var>
+<dd>Generic identifier.
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>end_tag</strong> is called when an end tag is encountered.
+The generic identifier of the end tag is passed in as an argument.
+The value may be the empty string if the end tag is a null end tag.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="entity_ref">entity_ref</a></h3>
+<pre>
+    $parser-><strong>entity_ref</strong>(<var>$name</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$name</var>
+<dd>Name of the entity
+</dl>
+
+<h4>Return:</h4>
+<p>Any text that should be furthered parse.
+</p>
+
+<h4>Description:</h4>
+<p><strong>entity_ref</strong> is called for entity references.  The name
+of the entity is passed in as an argument.  If any data is returned by
+this method, the data will be prepended to the parse buffer and parsed.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="error">error</a></h3>
+<pre>
+    $parser-><strong>error</strong>(<var>@msg</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>@msg</var>
+<dd>List of strings containing error message
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>error</strong> is called when any error occurs in parsing.
+The default implementation is to print the error message (which can
+be a list of strings) prepending by the class name, input label, and
+line number the method was called.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="ignored_data">ignored_data</a></h3>
+<pre>
+    $parser-><strong>ignored_data</strong>(<var>$data</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$data</var>
+<dd>Ignored data.
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>ignored_data</strong> is called for data that is in an IGNORE
+marked section.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="marked_sect_close">marked_sect_close</a></h3>
+<pre>
+    $parser-><strong>marked_sect_close</strong>();
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt>N/A
+<dd>
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>marked_sect_close</strong> is called when a marked section close is
+encountered.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="marked_sect_open">marked_sect_open</a></h3>
+<pre>
+    $parser-><strong>marked_sect_open</strong>(
+		    <var>$status_keyword</var>,
+		    <var>$status_spec</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$status_keyword</var>
+<dd>The status keyword.
+<dt><var>$status_spec</var>
+<dd>Original status specification text.
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>marked_sect_open</strong> is called when a marked section
+open is encountered.  The <var>$status_keyword</var> argument is
+the status keyword for the marked section (eg. INCLUDE, IGNORE).
+The <var>$status_spec</var> argument is the original status
+specification text.  This may be equal to <var>$status_keyword</var>,
+or contain an parameter entity reference.  If a parameter entity
+reference, the <strong>parm_entity_ref</strong> method was called to
+determine the value of the <strong>$status_keyword</strong> argument.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="parm_entity_ref">parm_entity_ref</a></h3>
+<pre>
+    $parser-><strong>parm_entity_ref</strong>(<var>$name</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$name</var>
+<dd>Name of the parameter entity.
+</dl>
+
+<h4>Return:</h4>
+<p>Replacement text.
+</p>
+
+<h4>Description:</h4>
+<p><strong>parm_entity_ref</strong> is called to resolve parameter entity
+references.  Currently, it is only invoked if a parameter entity
+reference is encountered in a marked section open.  The return value
+should contain the value of the parameter entity reference.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="processing_inst">processing_inst</a></h3>
+<pre>
+    $parser-><strong>processing_inst</strong>(<var>$data</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$data</var>
+<dd>Character data within the processing instruction.
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>processing_inst</strong> is called for processing instructions.
+<strong>$data</strong> is the content of the processing instruction.
+</p>
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="start_tag">start_tag</a></h3>
+<pre>
+    $parser-><strong>start_tag</strong>(<var>$gi</var>, <var>$attr_spec</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$gi</var>
+<dd>Generic identifier
+<dt><var>$attr_spec</var>
+<dd>Attribute specification list
+</dl>
+
+<h4>Return:</h4>
+<p>N/A
+</p>
+
+<h4>Description:</h4>
+<p><strong>start_tag</strong> is called for start tags.
+<var>$gi</var> is the generic indentifier of the start tag.
+<var>$attr_spec</var> is the attribute specification list string.
+The <strong>SGMLparse_attr_spec</strong> function defined in <a
+href="SGML..Util.html"><strong>SGML::Util</strong></a> can be
+used to parse the string into name/value pairs.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Parser_Modes">Parser Modes</a></h2>
+
+<p><strong>SGML::Parser</strong> has parser modes for properly determining
+how to analyze the input data.  Mode switching is automatic for
+most cases.  However, since SGML parsing rules can changed depending
+on the content model of elements, callback methods can force a mode
+change.  This mode change will normally be done when encountering a
+start tag (which invokes the <strong>start_tag</strong> method) and
+the element represented by the start tag should parsed like it has
+CDATA or RCDATA content.  The following code example shows how you
+can change parsing modes:
+</p>
+<pre>
+    sub start_tag {
+	my $this      = shift;
+	my $gi        = uc shift;
+	my $attr_spec = shift;
+
+	if ($gi eq 'LITERAL-TEXT') {
+	    $this->{'mode'} = $SGML::Parser::ModeCData;
+	} elsif ($gi eq 'EX') {
+	    $this->{'mode'} = $SGML::Parser::ModeRCData;
+	}
+
+	# ...
+    }
+</pre>
+
+<p>The element names are arbitrary, but it shows how you can switch
+parsing modes via a callback method.  <strong>SGML::Parser</strong>
+will change the mode when an end tag is encountered.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="See_Also">See Also</a></h2>
+
+<p>
+<a href="SGML..Util.html"><strong>SGML::Util</strong></a>
+</p>
+<p>
+perl(1)
+</p>
+
+<!-- ================================================================== -->
+&avail;
+&author;
+
+<!-- ================================================================== -->
+<hr>
+<address>
+97/09/18 14:32:46
+</address>
+</body></html>

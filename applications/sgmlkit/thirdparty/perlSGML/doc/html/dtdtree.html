@@ -1,0 +1,365 @@
+<html>
+<head>
+<title>dtdtree 1.3.1</title>
+</head>
+<body>
+
+<!-- =================================================================== -->
+<hr>
+<h1>dtdtree</h1>
+<p><code>dtdtree</code> outputs the content hierarchy tree
+(in ASCII) of SGML elements defined in a DTD.
+</p>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="usage">Usage</a></h2>
+<p><code>dtdtree</code> is invoked from the command-line as follows:
+</p>
+<p><tt>% dtdtree </tt><var>[options]</var><tt> </tt><var>elementname</var>
+<var>elementname</var> ...
+</p>
+<p>Any strings after, and not part of, command-line options are treated
+as the elements (<var>elementname</var>) to output trees for.
+If no elements are
+specified, than the tree(s) for the top-most element(s) defined in the
+DTD are printed.
+</p>
+<p>The following are the list of options available:
+</p>
+<dl>
+
+<!--	@(#)  catopt.mod 1.1 96/09/30 @(#)
+  -->
+<dt><a name="-catalog"><code>-catalog</code> <var>filename</var></a></dt>
+<dd><p>Use <var>filename</var> as the file for mapping public
+identifiers and external entities to system files.  If
+<code>-catalog</code> is not specified, "<code>catalog</code>" is
+used as the default filename.
+See
+<a href="#resolving">Resolving External Entities</a> for more
+information.
+</p>
+</dd>
+
+
+<dt><a name="-dtd"><code>-dtd </code><var>filename</var></a></dt>
+<dd><p>Use <var>filename</var> as the SGML DTD to parse. Otherwise, read from
+standard in.
+</p>
+</dd>
+
+<dt><a name="-help"><code>-help</code></a></dt>
+<dd><p>Print a brief usage description. No other action is performed.
+</p>
+</dd>
+
+<dt><a name="-level"><code>-level </code><var>#</var></a></dt>
+<dd><p>Set the prune level of the content hierachy tree to
+<var>#</var> Defaults to 15.
+</p>
+</dd>
+
+<dt><a name="-treefile"><code>-treefile </code><var>filename</var></a></dt>
+<dd><p>Output element content tree(s) to <var>filename</var>.
+Otherwise, <code>dtdtree</code> prints to standard out.
+</p>
+</dd>
+
+<dt><a name="-verbose"><code>-verbose</code></a></dt>
+<dd><p>Ouput to standard error messages of what <code>dtdtree</code> is doing.
+This option
+is mainly for debugging purposes.
+</p>
+</dd>
+
+</dl>
+<!-- =================================================================== -->
+<hr>
+<h2><a name="output">dtdtree Output</a></h2>
+<!--	@(#)  tree.mod 1.3 96/10/06 @(#)
+  -->
+
+<p>The tree shows the overall content hierarchy for an element.
+Content hierarchies of descendents will also be shown.  Elements that
+exist at a higher (or equal) level, or if the maximum depth has been
+reached, are pruned.  The string "<code>...</code>" is appended to an
+element if it has been pruned due to pre-existance at a higher (or
+equal) level.  The content of the pruned element can be determined
+by searching for the complete tree of the element (ie. elements w/o
+"<code>...</code>").  Elements pruned because maximum depth has been
+reached will not have "<code>...</code>" appended.
+
+</p>
+
+<p>Example:
+</p>
+
+<pre>
+     |__section+)
+         |_(effect?, ...
+         |__title, ...
+         |__toc?, ...
+         |__epc-fig*,
+         |   |_(effect?, ...
+         |   |__figure,
+         |   |   |_(effect?, ...
+         |   |   |__title, ...
+         |   |   |__graphic+, ...
+         |   |   |__assoc-text?)
+</pre>
+
+<dl>
+<dt><strong>Note</strong></dt>
+<dd><p>Pruning must be done to avoid a combinatorical explosion.
+It is common for DTD's to define content hierarchies of infinite
+depth.  Even with a predefined maximum depth, the generated tree
+can become very large.
+</p>
+</dd>
+</dl>
+
+<p>Since the tree outputed is static, the inclusion and exclusion sets
+of elements are treated specially. Inclusion and exclusion elements
+inherited from ancestors are not propagated down to determine
+what elements are printed, but special markup is presented at a
+given element if there exists inclusion and exclusion elements from
+ancestors. The reason inclusions and exclusions are not propagated down
+is because of the pruning done. Since an element may occur in multiple
+contexts -- and have different ancestoral inclusions and exclusions in
+effect -- an element without "<code>...</code>" may be the only place
+of reference to see the content hierarchy of the element.
+
+</p>
+
+<p>Example:</p>
+
+<pre>
+    D1
+     |  {+} idx needbegin needend newline
+     | 
+     |_(head,
+     |   | {A+} idx needbegin needend newline
+     |   |  {-} needbegin needend
+     |   | 
+     |   |_(((#PCDATA |
+     |   |____((acro |
+     |   |       | {A+} idx needbegin needend newline
+     |   |       | {A-} needbegin needend
+     |   |       | 
+     |   |       |_(((#PCDATA |
+     |   |       |____((super | ...
+     |   |       |______sub)))*)) ...
+</pre>
+
+<p>Ignoring the lines starting with {}'s, one gets the content
+hierachy of an element as defined by the DTD without concern of where
+it may occur in the overall structure. The {} lines give additional
+information regarding the element with respect to its existance
+within a specific context. For example, when an <code>ACRO</code>
+element occurs within <code>D1,HEAD</code> -- along with its normal
+content -- it can contain <code>IDX</code> and <code>NEWLINE</code>
+elements due to inclusions from ancestors. However, it cannot contain
+<code>NEEDBEGIN</code> and <code>NEEDEND</code> regardless of its
+defined content since an ancestor(s) excludes them.
+
+</p>
+
+<dl>
+<dt><strong>Note</strong></dt>
+<dd>Exclusions override inclusions. If an element occurs in an
+inclusion set and an exclusion set, the exclusion takes
+precedence. Therefore, in the above example, <code>NEEDBEGIN</code>, 
+<code>NEEDEND</code> are excluded from <code>ACRO</code>.</dd>
+</dl>
+
+<p>Explanation of {}'s keys:
+</p>
+<dl>
+<dt><code>{+}</code></dt>
+<dd>The list of inclusion elements defined by the current element.
+Since this is part of the content model of the element, the
+inclusion subelements are printed as part of the content
+hierarchy of the current element after the base content model.
+Subelements that are inclusions will have <code>{+}</code> appended
+to the subelement entry.
+</dd>
+<dt><code>{A+}</code></dt>
+<dd>The list of inclusion elements due to ancestors. This is listed
+as reference to determine the content of an element within a
+given context. None of the ancestoral inclusion elements are
+printed as part of the content hierarchy of the element. 
+</dd>
+<dt><code>{-}</code></dt>
+<dd>The list of exclusion elements defined by the current
+element. Since this is part of the content model of the
+element, any subelement in the content model that would be
+excluded will have <code>{-}</code> appended to the subelement
+listing.
+</dd>
+<dt><code>{A-}</code></dt>
+<dd>The list of exclusion elements due to ancestors. This is listed
+as reference to determine the content of an element within a
+given context. None of the ancestoral exclusion elements
+have any effect on the printing of the content hierarchy of
+the current element.
+</dd>
+</dl>
+
+
+<!-- =================================================================== -->
+<!--	@(#)  resents.mod 1.1 96/10/05 @(#)
+  -->
+<hr>
+<h2><a name="resolving">Resolving External Entities</a></h2>
+
+<p>Defining the mapping between external entities to system files
+may be done via the <a href="#-catalog"><code>-catalog</code></a>
+command-line option.  The <em>catalog</em> provides you with the
+capability of mapping public identifiers to system identifiers
+(files) or to map entity names to system identifiers.
+</p>
+
+<!--	@(#)  catalog.mod 1.4 96/10/07 @(#)
+  -->
+<p><strong>Catalog Syntax</strong></p>
+
+<p>The syntax of a catalog is a subset of SGML catalogs
+(as defined in
+<cite>SGML Open Draft Technical Resolution 9401:1994</cite>).
+</p>
+
+<p>A catalog contains a sequence of the following types of entries:
+</p>
+
+<dl>
+<dt><code>PUBLIC</code> <var>public_id</var> <var>system_id</var></dt>
+<dd><p>This maps <var>public_id</var> to <var>system_id</var>.
+</p>
+</dd>
+<dt><code>ENTITY</code> <var>name</var> <var>system_id</var></dt>
+<dd><p>This maps a general entity whose name is <var>name</var> to
+<var>system_id</var>.
+</p>
+</dd>
+<dt><code>ENTITY %</code><var>name</var> <var>system_id</var></dt>
+<dd><p>This maps a parameter entity whose name is <var>name</var> to
+<var>system_id</var>.
+</p>
+</dd>
+</dl>
+
+<p><strong>Syntax Notes</strong></p>
+
+<ul>
+<li><p>A <var>system_id</var> string cannot contain any spaces.  The
+<var>system_id</var> is treated as pathname of file. </p>
+</li>
+<li><p>Any line in a catalog file that does not follow the previously
+mentioned entries is ignored.</p>
+</li>
+<li><p>In case of duplicate entries, the first entry defined is used.
+</ul>
+
+<p>Example catalog file:</p>
+<pre>
+        -- ISO public identifiers --
+PUBLIC "ISO 8879-1986//ENTITIES General Technical//EN"            iso-tech.ent
+PUBLIC "ISO 8879-1986//ENTITIES Publishing//EN"                   iso-pub.ent
+PUBLIC "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN"  iso-num.ent
+PUBLIC "ISO 8879-1986//ENTITIES Greek Letters//EN"                iso-grk1.ent
+PUBLIC "ISO 8879-1986//ENTITIES Diacritical Marks//EN"            iso-dia.ent
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN"                iso-lat1.ent
+PUBLIC "ISO 8879-1986//ENTITIES Greek Symbols//EN"                iso-grk3.ent 
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 2//EN"                ISOlat2
+PUBLIC "ISO 8879-1986//ENTITIES Added Math Symbols: Ordinary//EN" ISOamso
+
+        -- HTML public identifiers and entities --
+PUBLIC "-//IETF//DTD HTML//EN"                                    html.dtd
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN//HTML"          ISOlat1.ent
+ENTITY "%html-0"                                                  html-0.dtd
+ENTITY "%html-1"                                                  html-1.dtd
+
+</pre>
+
+<p><strong>Environment Variables</strong></p>
+
+<p>The following
+envariables (ie. environment variables) are supported:
+</p>
+
+<dl>
+<dt><a name="P_SGML_PATH">P_SGML_PATH</a></dt>
+<dd><p>This is a colon (semi-colon for MSDOS users)
+separated list of paths for finding catalog files
+or system identifiers.  For example, if a system identifier is not
+an absolute pathname, then the paths listed in P_SGML_PATH are used to
+find the file.
+</p>
+</dd>
+<dt><a name="SGML_CATALOG_FILES">SGML_CATALOG_FILES</a></dt>
+<dd><p>This envariable is a colon (semi-colon for MSDOS users)
+separated list of catalog files to read.
+If
+a file in the list is not an absolute path, then file is searched in
+the paths listed in the P_SGML_PATH and SGML_SEARCH_PATH.
+</p>
+</dd>
+<dt><a name="SGML_SEARCH_PATH">SGML_SEARCH_PATH</a></dt>
+<dd><p>This is a colon (semi-colon for MSDOS users)
+separated list of paths for finding catalog files
+or system identifiers.  This envariable serves the same function as
+P_SGML_PATH.  If both are defined, paths listed in P_SGML_PATH are
+searched first before any paths in SGML_SEARCH_PATH.</p>
+</dd>
+</dl>
+<p>The use of P_SGML_PATH is for compatibility with earlier versions.
+SGML_CATALOG_FILES and SGML_SEARCH_PATH
+are supported for compatibility with James Clark's <code>nsgmls(1)</code>.
+</p>
+<dl>
+<dt><strong>Note</strong></dt>
+<dd>When searching for a file via the P_SGML_PATH and/or SGML_SEARCH_PATH,
+if the file is not found in any of the paths, then the current working
+directory is searched.
+</dd>
+</dl>
+
+
+
+<dl>
+<dt><strong>Note</strong></dt>
+<dd><p>
+The file specified by
+<a href="#-catalog"><code>-catalog</code></a>
+is read first before any files specified by SGML_CATALOG_FILES.
+</p>
+</dd>
+</dl>
+
+
+<!-- =================================================================== -->
+<!--	@(#)  avail.mod 1.2 97/09/16 @(#)
+  -->
+<hr>
+<h2><a name="availability">Availability</a></h2>
+<p>This software is part of the <em>perlSGML</em> package; see
+(<a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html"
+>http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>)
+</p>
+
+<!--	@(#) author.mod 1.2 97/09/16 15:50:29 @(#)
+  -->
+<hr>
+<h2><a name="author">Author</a></h2>
+<address>
+<a href="http://www.oac.uci.edu/indiv/ehood/">Earl Hood</a><br>
+<a href="mailto:ehood@medusa.acs.uci.edu"
+>ehood@medusa.acs.uci.edu</a><br>
+Copyright &#169; 1997<br>
+</address>
+
+<!-- =================================================================== -->
+<hr>
+</body>
+</html>

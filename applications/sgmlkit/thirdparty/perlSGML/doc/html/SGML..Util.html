@@ -1,0 +1,180 @@
+<html>
+<head>
+<title>perlSGML -- SGML::Util</title>
+<link rev="made" href="mailto:ehood@medusa.acs.uci.edu">
+</head>
+
+
+<!-- =================================================================== -->
+<hr><h2><a name="Name">Name</a></h2>
+
+<p>SGML::Util - miscellaneous utility functions for SGML processing
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Synopsis">Synopsis</a></h2>
+<pre>
+    use SGML::Util;
+    %attrs = SGMLparse_attr_spec($attr_spec);
+    $attr_spec = SGMLattr_to_sgml(\%attrs);
+    if (SGMLopen_lit($str)) { ... }
+</pre>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Description">Description</a></h2>
+
+<p><strong>SGML::Util</strong> contains miscellaneous utility functions
+related to SGML processing.  The following functions are exported
+by <strong>SGML::Util</strong>:
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="SGMLparse_attr_spec">SGMLparse_attr_spec</a></h3>
+<pre>
+    @nv_list = <strong>SGMLparse_attr_spec</strong>(<var>$attr_spec</var>);
+    %attrs   = <strong>SGMLparse_attr_spec</strong>(<var>$attr_spec</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$attr_spec</var></dt>
+<dd>A scalar string representing the SGML attribute specificaion list.
+The <em>stago</em>, <em>gi</em>, and <em>etago</em> should NOT be in
+the specification list string.
+</dd>
+</dl>
+
+<h4>Return:</h4>
+<p>An array of name value pairs.
+</p>
+
+<h4>Description:</h4>
+<p><strong>SGMLparse_attr_spec</strong> takes a attribute specification
+string and parses it into a list of name/value pairs.  An example
+attribute specification string:
+</p>
+<pre>
+    border=0 WIDTH="100%" CellSpacing=2 cellpadding = '4'
+</pre>
+
+<p>Any non-whitespace character in <var>$attr_spec</var> is treated as
+a name character.  This allows the parsing of SGML-like markup.
+For example, the following will not generate a complaint:
+</p>
+<pre>
+      % = 100
+      width = 100%
+</pre>
+
+<p>The calling routine can assign the
+return value to a hash to allow easy access to attribute values.
+The name/value pairs occur in the same order as listed in the
+specification list.
+</p>
+
+<p>All attribute names are converted to lowercase.
+</p>
+
+<p>Attribute values w/o a name are given a bogus name of the reserved
+name indicator ('<tt>#</tt>' in the reference concrete syntax) with a number
+appended (eg. "<tt>#4</tt>").  This is to handle the case when SHORTTAG is YES.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="SGMLattr_to_sgml">SGMLattr_to_sgml</a></h3>
+<pre>
+    $attr_spec = <strong>SGMLattr_to_sgml</strong>(<var>\%attrs</var>);
+    $attr_spec = <strong>SGMLattr_to_sgml</strong>(<var>\@nv_list</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>\%attrs</var></dt>
+<dt><var>\@nv_list</var></dt>
+<dd>A reference to a hash or an array.  If a hash, the keys represent the
+names and the values the attribute values.  If an array, the array
+is interpreted as a sequence of name/value pairs.
+</dl>
+
+<h4>Return:</h4>
+<p>An SGML attribution specification list string.
+</p>
+
+<h4>Description:</h4>
+<p><strong>SGMLattr_to_sgml</strong> is the inverse operation of
+<strong>SGMLparse_attr_spec</strong>.  It takes a attribute structure
+and generates the SGML markup representation.
+</p>
+
+<p>Attribute names starting with the reserved name indicator ('<tt>#</tt>'
+in the reference concrete syntax) are skipped with only their values
+printed.  This is to handle the case when SHORTTAG is YES.
+</p>
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="SGMLopen_lit">SGMLopen_lit</a></h3>
+<pre>
+    if (<strong>SGMLopen_lit</strong>(<var>$str</var>)) {
+	# ...
+    }
+</pre>
+
+<h4>Parameters</h4>
+<dl>
+<dt><var>$str</var></dt><dd>
+Scalar string to check.
+</dl>
+
+<h4>Return:</h4>
+<p>1 if open literal, else 0.
+</p>
+
+<h4>Description</h4>
+<p><strong>SGMLopen_lit</strong> checks if a string has a literal
+that is not closed.  I.e. If there is a quote without a matching
+quote, the routine will return true.
+</p>
+
+
+<!-- =================================================================== -->
+<hr><h2><a name="See Also">See Also</a></h2>
+
+<p>
+<a href="SGML..Parser.html"><strong>SGML::Parser</strong></a>
+</p>
+<p>
+perl(1)
+</p>
+
+<!-- ================================================================== -->
+<!--	@(#)  avail.mod 1.2 97/09/16 @(#)
+  -->
+<hr>
+<h2><a name="availability">Availability</a></h2>
+<p>This software is part of the <em>perlSGML</em> package; see
+(<a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html"
+>http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>)
+</p>
+
+<!--	@(#) author.mod 1.2 97/09/16 15:50:29 @(#)
+  -->
+<hr>
+<h2><a name="author">Author</a></h2>
+<address>
+<a href="http://www.oac.uci.edu/indiv/ehood/">Earl Hood</a><br>
+<a href="mailto:ehood@medusa.acs.uci.edu"
+>ehood@medusa.acs.uci.edu</a><br>
+Copyright &#169; 1997<br>
+</address>
+
+
+<!-- ================================================================== -->
+<hr>
+<address>
+97/09/18 14:32:49
+</address>
+</body></html>

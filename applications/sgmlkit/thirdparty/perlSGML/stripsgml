@@ -1,0 +1,65 @@
+#!/usr/local/bin/perl
+##---------------------------------------------------------------------------##
+##  File:
+##      @(#)  stripsgml 2.1 97/09/11 @(#)
+##  Author:
+##      Earl Hood       ehood@medusa.acs.uci.edu
+##  Description:
+##	Remove SGML markup.
+##---------------------------------------------------------------------------##
+##  Copyright (C) 1997  Earl Hood, ehood@medusa.acs.uci.edu
+##
+##  This program is free software; you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation; either version 2 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program; if not, write to the Free Software
+##  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+##---------------------------------------------------------------------------##
+
+package StripSgml;
+
+##---------------------------------------------------------------------------##
+
+use SGML::Opt;
+use SGML::StripParser;
+
+$ProgVersion = "2.0.0";
+$Synopsis = "$Prog [options] < infile.sgm > outfile.txt";
+$Description =<<EndOfDesc;
+  $Prog strips SGML tags from data read from standard input and
+  translates entity references for special characters and character
+  references to ASCII equivalents (or to the character set specified
+  by the -charset option).  If the -html options is specified, anchor
+  URLs will be printed in the output.
+EndOfDesc
+$CopyYears = "1997";
+
+{
+    my $ret = GetOptions(
+	"catalog=s@", 	"Entity mapping catalog (NOT USED)",
+	"charset=s", 	"Character set to use",
+	"html", 	"Print anchor URLs in HTML documents"
+    );
+    if (!$ret or $OptValues{"help"}) {
+	Usage();
+	exit !$ret;
+    }
+    my $parser = SGML::StripParser->new();
+    $parser->set_html_mode($OptValues{"html"});
+    $parser->set_charset($OptValues{"charset"});
+    $parser->set_inc_parm_ents(@IncParmEnts);
+    $parser->set_ign_parm_ents(@IgnParmEnts);
+
+    $parser->parse_data(\*STDIN);
+    exit 0;
+}
+
+##---------------------------------------------------------------------------##

@@ -1,0 +1,212 @@
+ <!--
+    -   (c) Copyright 1987-1993 Hewlett-Packard Company
+    -
+    -   Permission to use, copy, and distribute this Document Type
+    -   Definition (DTD) is hereby granted, provided that the above
+    -   copyright notice appear in all copies and that both that copyright
+    -   notice and this permission notice appear in supporting hardcopy and
+    -   online documentation.  All other rights reserved.
+    -
+    -   The name of Hewlett-Packard Company or the Hewlett-Packard logo may
+    -   not be used in advertising or publicity pertaining to distribution
+    -   of this DTD without specific, written prior permission.
+    -   Hewlett-Packard Company makes no representations about the
+    -   suitability of this DTD for any purpose.  It is provided "as is"
+    -   without express or implied warranty.
+    -
+    -   Hewlett-Packard disclaims all warranties with regard to this DTD,
+    -   including all implied warranties of merchantability and fitness, in
+    -   no event shall Hewlett-Packard Company be liable for any special,
+    -   indirect or consequential damages or any damages whatsoever
+    -   resulting from loss of use, data or profits, whether in an action
+    -   of contract, negligence or other tortious action, arising out of or
+    -   in connection with the use or performance of this DTD.
+    -->
+
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % HPcalc PUBLIC "-//Hewlett-Packard//ENTITIES Calculators//EN">
+     %HPcalc;
+-->
+
+<!ENTITY P              SDATA "[P]" >
+<!ENTITY S              SDATA "[S]" >
+<!ENTITY UAE            SDATA "[UAE]" >
+<!ENTITY UDelta         SDATA "[UDelta]" >
+<!ENTITY UDstroke       SDATA "[UDstroke]" >
+<!ENTITY UGamma         SDATA "[UGamma]" >
+<!ENTITY UNbar          SDATA "[UNbar]" >
+<!ENTITY UOmega         SDATA "[UOmega]" >
+<!ENTITY UPhi           SDATA "[UPhi]" >
+<!ENTITY UPi            SDATA "[UPi]" >
+<!ENTITY USigma         SDATA "[USigma]" >
+<!ENTITY UThorn         SDATA "[UThorn]" >
+<!--  a.m.      -->
+<!ENTITY aalpha         SDATA "[aalpha]" >
+<!ENTITY ae             SDATA "[ae]" >
+<!ENTITY alarm          SDATA "[alarm]" >
+<!ENTITY algic          SDATA "[algic]" >
+<!ENTITY algrc          SDATA "[algrc]" >
+<!ENTITY alpha          SDATA "[alpha]" >
+<!ENTITY alpic          SDATA "[alpic]" >
+<!ENTITY alprc          SDATA "[alprc]" >
+<!ENTITY angle          SDATA "[angle]" >
+<!ENTITY attn           SDATA "[attn]" >
+<!--  back      -->
+<!ENTITY batt           SDATA "[batt]" >
+<!ENTITY beta           SDATA "[beta]" >
+<!ENTITY biglongleftarrow       SDATA "[biglongleftarrow]" >
+<!ENTITY biglongrightarrow      SDATA "[biglongrightarrow]" >
+<!ENTITY bullet         SDATA "[bullet]" >
+<!ENTITY busy           SDATA "[busy]" >
+<!ENTITY cdot           SDATA "[cdot]" >
+<!--  cents     -->
+<!ENTITY chi            SDATA "[chi]" >
+<!--  copy      -->
+<!ENTITY currency       SDATA "[currency]" >
+<!ENTITY curs           SDATA "[curs]" >
+<!--  date      -->
+<!ENTITY dbldot         SDATA "[dbldot]" >
+<!ENTITY dblellipsis            SDATA "[dblellipsis]" >
+<!--  deg       -->
+<!ENTITY delta          SDATA "[delta]" >
+<!--  div       -->
+<!--  down      -->
+<!ENTITY downarrow      SDATA "[downarrow]" >
+<!--  dquote    -->
+<!ENTITY dstroke        SDATA "[dstroke]" >
+<!--  ellipsis  -->
+<!ENTITY emptyset       SDATA "[emptyset]" >
+<!--  emdash    -->
+<!--  endash    -->
+<!ENTITY engnot         SDATA "[engnot]" >
+<!ENTITY enter          SDATA "[enter]" >
+<!ENTITY esc            SDATA "[esc]" >
+<!ENTITY eta            SDATA "[eta]" >
+<!ENTITY exch           SDATA "[exch]" >
+<!ENTITY fardown        SDATA "[fardown]" >
+<!ENTITY farleft        SDATA "[farleft]" >
+<!ENTITY farright       SDATA "[farright]" >
+<!ENTITY farup          SDATA "[farup]" >
+<!ENTITY fcparen        SDATA "[fcparen]" >
+<!ENTITY femord         SDATA "[femord]" >
+<!ENTITY florin         SDATA "[florin]" >
+<!ENTITY foparen        SDATA "[foparen]" >
+<!ENTITY frclose        SDATA "[frclose]" >
+<!ENTITY fropen         SDATA "[fropen]" >
+<!ENTITY gamma          SDATA "[gamma]" >
+<!--  geq       -->
+<!ENTITY gtlt           SDATA "[gtlt]" >
+<!ENTITY half           SDATA "[half]" >
+<!--  halfspace -->
+<!--  home      -->
+<!ENTITY hookleftarrow  SDATA "[hookleftarrow]" >
+<!ENTITY immic          SDATA "[immic]" >
+<!ENTITY infty          SDATA "[infty]" >
+<!ENTITY inlshf         SDATA "[inlshf]" >
+<!ENTITY inrshf         SDATA "[inrshf]" >
+<!ENTITY int            SDATA "[int]" >
+<!ENTITY intllrarrows   SDATA "[intllrarrows]" >
+<!ENTITY intxy          SDATA "[intxy]" >
+<!ENTITY lambda         SDATA "[lambda]" >
+<!--  left      -->
+<!ENTITY leftarrow      SDATA "[leftarrow]" >
+<!ENTITY leftrightarrow SDATA "[leftrightarrow]" >
+<!--  leq       -->
+<!ENTITY lf             SDATA "[lf]" >
+<!ENTITY lira           SDATA "[lira]" >
+<!ENTITY lshf           SDATA "[lshf]" >
+<!ENTITY mascord        SDATA "[mascord]" >
+<!ENTITY menuptr        SDATA "[menuptr]" >
+<!--  micro     -->
+<!ENTITY mid            SDATA "[mid]" >
+<!--  minus     -->
+<!--  minutes   -->
+<!ENTITY mu             SDATA "[mu]" >
+<!ENTITY nabla          SDATA "[nabla]" >
+<!ENTITY nbar           SDATA "[nbar]" >
+<!ENTITY neg            SDATA "[neg]" >
+<!--  neq       -->
+<!ENTITY not-eq         SDATA "[not-eq]" >
+<!ENTITY nwarrow        SDATA "[nwarrow]" >
+<!ENTITY ocrossbar      SDATA "[ocrossbar]" >
+<!--  ohm       -->
+<!ENTITY omega          SDATA "[omega]" >
+<!ENTITY opsqr          SDATA "[opsqr]" >
+<!ENTITY over           SDATA "[over]" >
+<!--  p.m.      -->
+<!ENTITY paper          SDATA "[paper]" >
+<!ENTITY partial        SDATA "[partial]" >
+<!--  pellipsis -->
+<!ENTITY pi             SDATA "[pi]" >
+<!--  pm        -->
+<!ENTITY polishl        SDATA "[polishl]" >
+<!ENTITY printer        SDATA "[printer]" >
+<!ENTITY qtri           SDATA "[qtri]" >
+<!ENTITY quarter        SDATA "[quarter]" >
+<!--  reg SDAATA ""     -->
+<!ENTITY return         SDATA "[return]" >
+<!ENTITY rho            SDATA "[rho]" >
+<!--   entity{right     -->
+<!ENTITY rightarrow     SDATA "[rightarrow]" >
+<!ENTITY rminus         SDATA "[rminus]" >
+<!ENTITY rshf           SDATA "[rshf]" >
+<!ENTITY scr-e          SDATA "[scr-e]" >
+<!ENTITY scr-x          SDATA "[scr-x]" >
+<!ENTITY scr-y          SDATA "[scr-y]" >
+<!--  seconds   -->
+<!ENTITY shift          SDATA "[shift]" >
+<!ENTITY sigma          SDATA "[sigma]" >
+<!--  sigspace  -->
+<!ENTITY singleellipsis SDATA "[singleellipsis]" >
+<!ENTITY speccapy       SDATA "[speccapy]" >
+<!ENTITY speccolon      SDATA "[speccolon]" >
+<!ENTITY specperiod     SDATA "[specperiod]" >
+<!ENTITY squote     	SDATA "[squote]" >
+<!--  sterling  -->
+<!ENTITY stop           SDATA "[stop]" >
+<!ENTITY surd           SDATA "[surd]" >
+<!ENTITY surdx          SDATA "[surdx]" >
+<!ENTITY tau            SDATA "[tau]" >
+<!ENTITY theta          SDATA "[theta]" >
+<!ENTITY thorn          SDATA "[thorn]" >
+<!ENTITY threequarter   SDATA "[threequarter]" >
+<!ENTITY tick           SDATA "[tick]" >
+<!--  time      -->
+<!--  times     -->
+<!--  tm        -->
+<!ENTITY trans          SDATA "[trans]" >
+<!ENTITY udbackquest    SDATA "[udbackquest]" >
+<!ENTITY udroll         SDATA "[udroll]" >
+<!--  up        -->
+<!ENTITY uparrow        SDATA "[uparrow]" >
+<!ENTITY upshift        SDATA "[upshift]" >
+<!ENTITY varepsilon     SDATA "[varepsilon]" >
+<!--  vblank    -->
+<!ENTITY vdash          SDATA "[vdash]" >
+<!--  vellipsis -->
+<!ENTITY xbar           SDATA "[xbar]" >
+<!ENTITY xhat           SDATA "[xhat]" >
+<!ENTITY xsurdy         SDATA "[xsurdy]" >
+<!ENTITY ybar           SDATA "[ybar]" >
+<!ENTITY yen            SDATA "[yen]" >
+<!ENTITY yhat           SDATA "[yhat]" >
+         
+<!--   CUSTOM Entities used by CVD/Calculator Tag       -->
+<!ENTITY Q              SDATA "[Q]" >
+<!ENTITY A              SDATA "[A]" >
+<!ENTITY PEND           SDATA "[PEND]" >
+<!ENTITY GRAD           SDATA "[GRAD]" >
+<!ENTITY RAD            SDATA "[RAD]" >
+<!ENTITY HEX            SDATA "[HEX]" >
+<!ENTITY OCT            SDATA "[OCT]" >
+<!ENTITY BIN            SDATA "[BIN]" >
+<!ENTITY PRGM           SDATA "[PRGM]" >
+<!ENTITY BEGIN          SDATA "[BEGIN]" >
+<!ENTITY A..Z           SDATA "[A..Z]" >
+<!ENTITY EQN            SDATA "[EQN]" >
+<!ENTITY ann0           SDATA "[ann0]" >
+<!ENTITY ann1           SDATA "[ann1]" >
+<!ENTITY ann2           SDATA "[ann2]" >
+<!ENTITY ann3           SDATA "[ann3]" >
+
+

@@ -1,0 +1,108 @@
+<!-- (C) International Organization for Standardization 1986
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % ISOgrk1 PUBLIC
+       "ISO 8879-1986//ENTITIES Greek Letters//EN" "iso-grk1.ent">
+     %ISOgrk1;
+-->
+<!ENTITY agr    SDATA "font=symbol charset=fontspecific code=97
+	TeX='\alpha '   descr='[agr]'" --= small alpha, Greek	-->
+<!ENTITY Agr    SDATA "font=symbol charset=fontspecific code=65
+	descr='[Agr]'" --= capital Alpha, Greek -->
+<!ENTITY bgr    SDATA "font=symbol charset=fontspecific code=98
+	TeX='\beta '    descr='[bgr]'" --= small beta, Greek -->
+<!ENTITY Bgr    SDATA "font=symbol charset=fontspecific code=66
+	descr='[Bgr]'" --= capital Beta, Greek -->
+<!ENTITY ggr    SDATA "font=symbol charset=fontspecific code=103
+	TeX='\gamma '   descr='[ggr]'" --= small gamma, Greek -->
+<!ENTITY Ggr    SDATA "font=symbol charset=fontspecific code=71
+	TeX='\Gamma '   descr='[Ggr]'" --= capital Gamma, Greek -->
+<!ENTITY dgr    SDATA "font=symbol charset=fontspecific code=100
+	TeX='\delta '   descr='[dgr]'" --= small delta, Greek -->
+<!ENTITY Dgr    SDATA "font=symbol charset=fontspecific code=68
+	TeX='\Delta '   descr='[Dgr]'" --= capital Delta, Greek -->
+<!ENTITY egr    SDATA "font=symbol charset=fontspecific code=101
+	TeX='\epsilon ' descr='[egr]'" --= small epsilon, Greek -->
+<!ENTITY Egr    SDATA "font=symbol charset=fontspecific code=69 
+	descr='[Egr]'" --= capital Epsilon, Greek -->
+<!ENTITY zgr    SDATA "font=symbol charset=fontspecific code=122
+	TeX='\zeta '    descr='[zgr]'" --= small zeta, Greek -->
+<!ENTITY Zgr    SDATA "font=symbol charset=fontspecific code=90
+	Tex='\zeta ' descr='[Zgr]'" --= capital Zeta, Greek -->
+<!ENTITY eegr   SDATA "font=symbol charset=fontspecific code=104
+	TeX='\eta '     descr='[eegr]'" --= small eta, Greek -->
+<!ENTITY EEgr   SDATA "font=symbol charset=fontspecific code=72
+	descr='[EEgr]'" --= capital Eta, Greek -->
+<!ENTITY thgr   SDATA "font=symbol charset=fontspecific code=113
+	TeX='\theta '   descr='[thgr]'" --= small theta, Greek -->
+<!ENTITY THgr   SDATA "font=symbol charset=fontspecific code=81
+	TeX='\Theta '   descr='[THgr]'" --= capital Theta, Greek -->
+<!ENTITY igr    SDATA "font=symbol charset=fontspecific code=105
+	TeX='\iota '    descr='[igr]'" --= small iota, Greek -->
+<!ENTITY Igr    SDATA "font=symbol charset=fontspecific code=73
+	descr='[Igr]'" --= capital Iota,   Greek -->
+<!ENTITY kgr    SDATA "font=symbol charset=fontspecific code=107
+	TeX='\kappa '   descr='[kgr]'" --= small kappa, Greek -->
+<!ENTITY Kgr    SDATA "font=symbol charset=fontspecific code=75
+	descr='[Kgr]'" --= capital Kappa,  Greek -->
+<!ENTITY lgr    SDATA "font=symbol charset=fontspecific code=108
+	TeX='\lambda '  descr='[lgr]'" --= small lambda, Greek -->
+<!ENTITY Lgr    SDATA "font=symbol charset=fontspecific code=76
+	TeX='\Lambda '  descr='[Lgr]'" --= capital Lambda, Greek -->
+<!ENTITY mgr    SDATA "font=symbol charset=fontspecific code=109
+	TeX='\mu '      descr='[mgr]'" --= small mu, Greek -->
+<!ENTITY Mgr    SDATA "font=symbol charset=fontspecific code=77
+	descr='[Mgr]'" --= capital Mu, Greek -->
+<!ENTITY ngr    SDATA "font=symbol charset=fontspecific code=110
+	TeX='\nu '      descr='[ngr]'" --= small nu, Greek -->
+<!ENTITY Ngr    SDATA "font=symbol charset=fontspecific code=78
+	descr='[Ngr]'"        --= capital Nu, Greek -->
+<!ENTITY xgr    SDATA "font=symbol charset=fontspecific code=120
+	Tex='\xi '      descr='[xgr]'" --= small xi, Greek -->
+<!ENTITY Xgr    SDATA "font=symbol charset=fontspecific code=88
+	Tex='\Xi '      descr='[Xgr]'" --= capital Xi, Greek -->
+<!ENTITY ogr    SDATA "font=symbol charset=fontspecific code=111
+	descr='[ogr]'" --= small omicron,Greek -->
+<!ENTITY Ogr    SDATA "font=symbol charset=fontspecific code=79
+	descr='[Ogr]'" --= capital Omicron,Greek -->
+<!ENTITY pgr    SDATA "font=symbol charset=fontspecific code=112
+	TeX='\pi '      descr='[pgr]'" --= small pi, Greek -->
+<!ENTITY Pgr    SDATA "font=symbol charset=fontspecific code=80
+	TeX='\Pi '      descr='[Pgr]'" --= capital Pi, Greek -->
+<!ENTITY rgr    SDATA "font=symbol charset=fontspecific code=114
+	TeX='\rho '     descr='[rgr]'" --= small rho, Greek -->
+<!ENTITY Rgr    SDATA "font=symbol charset=fontspecific code=82
+	descr='[Rgr]'" --= capital Rho, Greek -->
+<!ENTITY sgr    SDATA "font=symbol charset=fontspecific code=115
+	TeX='\sigma '   descr='[sgr]'" --= small sigma, Greek -->
+<!ENTITY Sgr    SDATA "font=symbol charset=fontspecific code=83
+	TeX='\Sigma '   descr='[Sgr]'" --= capital Sigma, Greek -->
+<!ENTITY sfgr   SDATA "font=symbol charset=fontspecific code=86
+	descr='[sfgr]'" --= final small sigma, Greek-->
+<!ENTITY tgr    SDATA "font=symbol charset=fontspecific code=116
+	TeX='\tau '     descr='[tgr]'" --= small tau, Greek -->
+<!ENTITY Tgr    SDATA "font=symbol charset=fontspecific code=84
+	descr='[Tgr]'" --= capital Tau, Greek -->
+<!ENTITY ugr    SDATA "font=symbol charset=fontspecific code=117
+	TeX='\upsilon ' descr='[ugr]'" --= small upsilon, Greek -->
+<!ENTITY Ugr    SDATA "font=symbol charset=fontspecific code=85
+	TeX='\Upsilon ' descr='[Ugr]'" --= capital Upsilon, Greek -->
+<!ENTITY phgr   SDATA "font=symbol charset=fontspecific code=102
+	TeX='\phi '     descr='[phgr]'" --= small phi, Greek -->
+<!ENTITY PHgr   SDATA "font=symbol charset=fontspecific code=70
+	TeX='\Phi '     descr='[PHgr]'" --= capital Phi, Greek -->
+<!ENTITY khgr   SDATA "font=symbol charset=fontspecific code=99
+	TeX='\chi '     descr='[khgr]'" --= small chi, Greek -->
+<!ENTITY KHgr   SDATA "font=symbol charset=fontspecific code=67
+	descr='[KHgr]'" --= capital Chi, Greek -->
+<!ENTITY psgr   SDATA "font=symbol charset=fontspecific code=121
+	TeX='\psi '     descr='[psgr]'" --= small psi, Greek -->
+<!ENTITY PSgr   SDATA "font=symbol charset=fontspecific code=89
+	TeX='\Psi '     descr='[PSgr]'" --= capital Psi, Greek -->
+<!ENTITY ohgr   SDATA "font=symbol charset=fontspecific code=119
+	TeX='\omega '   descr='[ohgr]'" --= small omega, Greek -->
+<!ENTITY OHgr   SDATA "font=symbol charset=fontspecific code=87
+	TeX='\Omega '   descr='[OHgr]'" --= capital Omega, Greek -->

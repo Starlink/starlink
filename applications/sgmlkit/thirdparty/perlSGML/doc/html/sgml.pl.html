@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>sgml.pl 1.0.0</title>
+</head>
+<body>
+
+<!-- =================================================================== -->
+<hr>
+<h1>sgml.pl</h1>
+<p><code>sgml.pl</code> is a Perl library that parses an SGML
+document instance.
+</p>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="usage">Usage</a></h2>
+<p>If installed correctly, the following Perl statement can be used to
+access the library routines:
+</p>
+<pre>
+    require "sgml.pl";
+</pre>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="routines">Routines</a></h2>
+<h3>SGMLread_sgml</h3>
+<p><code>&amp;SGMLread_sgml(</code><var>FILEHANDLE</var><code>);</code>
+</p>
+<p><code>SGMLread_sgml</code> reads SGML markup.  Callbacks are called
+when certain events occur to do any processing on the data.  The
+callbacks should be set before the call to <code>SGMLread_sgml</code>.
+The following lists the events and the callback invoked:
+</p>
+<dl>
+<dt>An open tag</dt>
+<dd><code>&amp;$sgml'OpenTagFunc($gi, $attribute_list);</code></dd>
+<dt>An end tag</dt>
+<dd><code>&amp;$sgml'EndTagFunc($gi);</code></dd>
+<dt>A comment</dt>
+<dd><code>&amp;$sgml'CommentFunc(*comment_text);</code></dd>
+<dt>Processing instruction</dt>
+<dd><code>&amp;$sgml'ProcInsFunc(*pi_text);</code></dd>
+<dt>Character data</dt>
+<dd><code>&amp;$sgml'CdataFunc(*cdata);</code></dd>
+</dl>
+
+<h4>Notes</h4>
+<ul>
+<li><p><code>SGMLread_sgml</code> is not intended to parse a DTD, or an
+SGML declaration statement, '<code>&lt;!SGML ...&gt;</code>'.  It is
+designed to parse SGML instances.  If a "<code>&lt;!</code>" sequence
+is encountered (and not part of a comment declaration,
+<code>SGMLread_sgml</code> tries to ignore the declaration.
+</p></li>
+<li><p>Marked sections are not recognized.
+</p></li>
+<li><p>The <code>$sgml'CdataFunc</code> may be called consective times for
+a contiguous character data segment.
+</p></li>
+</ul>
+
+<!-- =================================================================== -->
+<!--	@(#)  avail.mod 1.2 97/09/16 @(#)
+  -->
+<hr>
+<h2><a name="availability">Availability</a></h2>
+<p>This software is part of the <em>perlSGML</em> package; see
+(<a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html"
+>http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>)
+</p>
+
+<!--	@(#) author.mod 1.2 97/09/16 15:50:29 @(#)
+  -->
+<hr>
+<h2><a name="author">Author</a></h2>
+<address>
+<a href="http://www.oac.uci.edu/indiv/ehood/">Earl Hood</a><br>
+<a href="mailto:ehood@medusa.acs.uci.edu"
+>ehood@medusa.acs.uci.edu</a><br>
+Copyright &#169; 1997<br>
+</address>
+
+
+<!-- =================================================================== -->
+<hr>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!-- =================================================================== -->
+<!--    @(#) SGML..ISO8859.sgml 1.2 97/09/18 14:32:45 @(#)
+  -->
+<!-- =================================================================== -->
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN" [
+    <!ENTITY % perlSGML PUBLIC "-//EWH//ENTITIES perlSGML Modules//EN" >
+    %perlSGML;
+]>
+<html>
+<head>
+<title>perlSGML -- SGML::ISO8859</title>
+<link rev="made" href="mailto:ehood@medusa.acs.uci.edu">
+</head>
+
+
+<!-- =================================================================== -->
+<hr><h2><a name="Name">Name</a></h2>
+
+<p>SGML::ISO8859 - routines for handling ISO 8859 character sets
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Synopsis">Synopsis</a></h2>
+<pre>
+  use SGML::ISO8859;
+
+  $sgml_str = SGML::ISO8859::str2sgml($data, $charset);
+  $data     = SGML::ISO8859::sgml2str($sgml_str, $charset);
+</pre>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Description">Description</a></h2>
+
+<p><strong>SGML::ISO8859</strong> contains routines for handling ISO 8859
+character data for SGML related processing.  The routines defined in
+the module can be specified during the <strong>use</strong> operator
+to import the routines into the current name space.  For example:
+</p>
+<pre>
+    use SGML::ISO8859 qw( &amp;str2sgml &amp;sgml2str );
+</pre>
+
+<p><strong>SGML::ISO8859</strong> supports the following character sets:
+</p>
+<ul>
+<li><strong>us-ascii</strong>,
+<li><strong>iso-8859-1</strong> (Latin-1),
+<li><strong>iso-8859-2</strong> (Latin-2),
+<li><strong>iso-8859-3</strong> (Latin-3),
+<li><strong>iso-8859-4</strong> (Latin-4),
+<li><strong>iso-8859-5</strong> (Cyrillic),
+<li><strong>iso-8859-6</strong> (Arabic),
+<li><strong>iso-8859-7</strong> (Greek),
+<li><strong>iso-8859-8</strong> (Hebrew),
+<li><strong>iso-8859-9</strong> (Latin-5),
+<li><strong>iso-8859-10</strong> (Latin-6).
+</ul>
+
+<p>The following routines are available in <strong>SGML::ISO8859</strong>:
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="str2sgml">str2sgml</a></h3>
+
+<pre>
+    $sgml_str =
+    <b>str2sgml</b>(
+	<var>$data</var>,
+	<var>$charset</var>
+    );
+</pre>
+
+<h4>Parameters:</h4>
+<dl>
+<dt><var>$data</var></dt><dd>
+The scalar string to convert.
+<dt><var>$charset</var></dt><dd>
+The character set of the string.
+</dl>
+
+<h4>Return:</h4>
+<p>String with all special characters translated to entity references.
+</p>
+
+<h4>Description:</h4>
+<p><strong>str2sgml</strong> converts a string so any
+special characters are converted to the appropriate entity references.
+The characters '&lt;', '&gt;', and '&amp;' will be converted also.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="sgml2str">sgml2str</a></h3>
+
+<pre>
+    $data =
+    <b>sgml2str</b>(
+	<var>$sgml_str</var>,
+	<var>$charset</var>
+    );
+</pre>
+
+<h4>Parameters:</h4>
+<dl>
+<dt><var>$sgml_str</var></dt><dd>
+The scalar string to convert.
+<dt><var>$charset</var></dt><dd>
+The character set to convert string to.
+</dl>
+
+<h4>Return:</h4>
+<p>The "raw" string.
+</p>
+
+<h4>Description:</h4>
+<p><strong>sgml2str</strong> converts a string containing special character
+entity references into a "raw" string.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Notes">Notes</a></h2>
+
+<ul>
+
+<li>
+<p>The mappings that <strong>SGML::ISO8859</strong> uses for conversion
+are defined by the <strong>SGML::ISO8859::S#</strong> modules, where
+<strong>#</strong> is the character set number.
+</p>
+
+<li>
+<p>The following character sets, <strong>iso-8859-6</strong>
+(Arabic) and <strong>iso-8859-8</strong> (Hebrew), do
+not have any official ISO SGML character entity sets.
+<strong>SGML::ISO8859</strong> uses an unoffical set.  To see the
+mappings defined, see the <strong>SGML::ISO8859::S6</strong> and
+<strong>SGML::ISO8859::S8</strong> modules.
+</p>
+
+</ul>
+
+<!-- =================================================================== -->
+<hr><h2><a name="See Also">See Also</a></h2>
+
+<p>
+perl(1)
+</p>
+
+<!-- ================================================================== -->
+&avail;
+&author;
+
+<!-- ================================================================== -->
+<hr>
+<address>
+97/09/18 14:32:45
+</address>
+</body></html>

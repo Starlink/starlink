@@ -1,0 +1,665 @@
+<!-- The following set of declarations may be referred to using a public entity as follows:
+ 
+<!DOCTYPE outspec PUBLIC "-//USA-DOD//DTD OUTPUT SPEC 900102//EN">
+-->
+
+<!-- NOTE:  In order to parse the following Document Type Declaration Subset 
+alone, append the Document Type Declaration statement below to the 
+beginning of the file:
+
+         <!DOCTYPE outspec [
+
+                 and the associated "]>" to the end of the file.       -->
+
+<!-- The following public character entity sets can be used to 
+specify special characters in characteristic values of type "string".-->
+<!ENTITY % ISOlat1 PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN">
+
+<!ENTITY % ISOpub PUBLIC "ISO 8879-1986//ENTITIES Publishing//EN">
+
+<!ENTITY % ISOgrk3 PUBLIC "ISO 8879-1986//ENTITIES Greek Symbols//EN">
+
+<!ENTITY % ISOnum PUBLIC "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN">
+
+<!ENTITY % ISOtech PUBLIC "ISO 8879-1986//ENTITIES General Technical//EN">
+%ISOlat1; %ISOpub; %ISOgrk3; %ISOnum; %ISOtech;
+ 
+<!ENTITY % yesorno "NUMBER" >
+<!NOTATION dummy PUBLIC "Dummy notation"> 
+<!ENTITY  null SYSTEM "" NDATA dummy -- used for pointer values --  >
+ 
+<!-- The following parameter entities are used to define the
+possible values for characteristics with the value type of "rule":-->
+ 
+<!ENTITY % seqrule "(1 | 2 | 3 | 4 | 5)" >
+ 
+<!-- Following are the sequence rules for enumeration:
+ 
+1. Following `Z' continue enumeration with `AA',
+   `AB', .....`AZ'.....`AAA',`AAB', etc.
+ 
+2. Following `Z' continue enumeration with `AA',
+   `BB', .....`ZZ'.....`AAA',`BBB', etc.
+ 
+3. Following `Z' continue enumeration with `Aa',
+   `Ab', .....`Az'.....`Aaa',`Aab', etc.
+ 
+4. Following `z' continue enumeration with `aa',
+   `ab', .....`az'.....`aaa',`aab', etc.
+ 
+5. Following `z' continue enumeration with `aa',
+   `bb', .....`zz'.....`aaa',`bbb', etc.
+
+-->
+
+<!ENTITY % userule "(0 | 1 | 2 | 3)" >
+ 
+<!-- Following are examples of Usage Rules for Usetext.  The actual rules 
+should be supplied in the FOSI Declaration Subset.
+  
+ 
+Dummy rule.
+ 
+ 
+Rules for building a Table of Contents.
+ 
+ 
+Rules for building a List of Illustrations.
+ 
+ 
+Rules for building a List of Tables.
+
+
+-->
+ 
+<!-- The following entity is used to define the possible
+values for the border patterns for page models. Additional
+values may be added for application-specific borders. -->
+ 
+<!ENTITY % brdpat "(none | emerg | os | ss)">
+ 
+<!-- emerg = emergency (zebra pattern)
+     os = operational supplement ("OS" pattern)
+     ss = safety supplement ("SS" pattern)
+
+-->
+<!-- An output spec is made up of sections describing layout
+characteristics for page models, and style characteristics for
+graphics, tables, and all other elements. -->
+ 
+ 
+<!ELEMENT outspec - o (secdesc?, pagedesc, styldesc, tabdesc?,
+grphdesc?, ftndesc?) >
+ 
+ 
+<!-- This section describes the priority ordering of security
+values, which are placed in header and footer areas. -->
+ 
+<!ELEMENT secdesc - o (sectoken+)>
+
+<!ATTLIST secdesc
+     attspec   NMTOKENS #REQUIRED
+     secorder  NMTOKENS #IMPLIED>
+ 
+<!ELEMENT sectoken - o EMPTY>
+
+<!ATTLIST sectoken
+     secval    NMTOKEN #REQUIRED
+     sectext   CDATA #IMPLIED>
+
+<!-- This section describes the layout geometry of pages.
+Multiple descriptions can be set up and referenced through the id
+associated with the page model. -->
+ 
+<!ELEMENT pagedesc - o (pageset)+>
+
+<!ELEMENT pageset - o (rectopg, versopg?, blankpg?)+>
+
+<!ATTLIST pageset
+     id        ID -- an id -- #IMPLIED
+     rectver   %yesorno -- toggle -- "1"
+     blankpg   %yesorno -- toggle -- "1">
+ 
+ 
+<!ELEMENT (rectopg | versopg | blankpg) - o (pagespec | (pageref,
+header?, footer?))>
+ 
+<!ATTLIST (rectopg | versopg | blankpg)
+     width     NUTOKEN -- a size -- #IMPLIED
+     nomdepth  NUTOKEN -- a size -- #IMPLIED
+     bind      (lleft |  ttop |  bbottom) "lleft"
+     bordside  (all |  nonbind |  topbot |  lftright |  top |
+bottom |  left | right | in | out) "all"
+     bordpat   %brdpat  "none">
+ 
+<!ELEMENT pagespec - o (topmarg, botmarg, leftmarg, rtmarg, header, footer, flowtext)>
+
+<!ATTLIST pagespec
+     pgid      ID #IMPLIED>
+ 
+<!ELEMENT pageref - o EMPTY>
+
+<!ATTLIST pageref
+     pgidref   IDREF -- reference to pgid -- "default">
+ 
+<!ELEMENT topmarg - o EMPTY>
+
+<!ATTLIST topmarg
+     nomdepth  NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT botmarg - o EMPTY>
+
+<!ATTLIST botmarg
+     nomdepth  NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT leftmarg - o (chgarea?)>
+
+<!ATTLIST leftmarg
+     width     NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT rtmarg - o (chgarea?)>
+
+<!ATTLIST rtmarg
+     width     NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT chgarea - o EMPTY>
+
+<!ATTLIST chgarea
+     width     NUTOKEN -- a size -- #IMPLIED
+     offset    NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT (header |  footer) - o (sectext*, (puttext | usetext))* +(vquad)>
+
+<!ATTLIST (header |  footer)
+     nomdepth  NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT sectext - o (subchars) +(vquad)>
+
+<!ATTLIST sectext
+     scope     (page | sheet | document) #IMPLIED>
+ 
+ 
+<!ELEMENT vquad - o EMPTY>
+
+<!ATTLIST vquad
+     verquad   (top | middle | bottom) #IMPLIED >
+ 
+<!ELEMENT flowtext - o (column, gutter?, placrule?, footnote?)>
+
+<!ATTLIST flowtext
+     width     NUTOKEN -- a size -- #IMPLIED
+     nomdepth  NUTOKEN -- a size -- #IMPLIED
+     numcols   (1 | 2 | 3 | 4 | 5 | 6 | 7 | 8)      "2"
+     balance   %yesorno  -- toggle -- "1"
+     spabove   NUTOKEN -- a size -- #IMPLIED
+     spabelow  NUTOKEN -- a size -- #IMPLIED
+     vjprior   (flowtext | col | comp) "col">
+ 
+<!ELEMENT column - o EMPTY>
+
+<!ATTLIST column
+     width     NUTOKEN -- a size -- #IMPLIED
+     mindepth  NUTOKEN -- a size -- #IMPLIED
+     nomdepth  NUTOKEN -- a size -- #IMPLIED
+     maxdepth  NUTOKEN -- a size -- #IMPLIED
+     vjprior   (flowtext | col | comp) "col">
+ 
+<!ELEMENT gutter - o (chgarea?)>
+
+<!ATTLIST gutter
+     width          NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT placrule - o EMPTY>
+
+<!ATTLIST placrule
+
+     assoctyp   (same | facing | special | float | frontnbk) #IMPLIED
+     figpg      (ftdrcto | ftdvrso| ftdethr) #IMPLIED
+     figplc     (ftptp | ftpbotm | ftpulft | ftpurt | ftplleft | ftplrt |
+                 ftplft | ftprt | ftpinln | ftpspec | ftpflt) #IMPLIED
+     figodr     (fotpbotm | folftrt) #IMPLIED
+     figpovf    (fpntop | fpnbotm | fpnuplft | fpnuprt | fpnlwlft | fpnlwrt |
+                 fpnlft | fpnrt | fpninln | fpnspec | fpnflt)  #IMPLIED
+     tblepg     (ttdrcto | ttdvrso | ttdethr) #IMPLIED
+     tbleplc    (ttptop | ttpbotm | ttpuplft | ttpuprt | ttplwlft | ttplwrt |
+                 ttplft | ttprt | ttpinln | ttpspec | ttpflt) #IMPLIED
+     tbleodr    (tpntpbtm | tpnlftrt) #IMPLIED
+     tblepovf   (tpntop | tpnbotm | tpnulft | tpnurt | tpnlwrt | tpnlwlft |
+                 tpnlft | tpnrt | tpninln | tpnspec | tpnflt) #IMPLIED>
+
+ 
+<!ELEMENT footnote - o (subchars?)>
+
+<!ATTLIST footnote
+     width     (col, flowtext) "col"
+     mindepth  NUTOKEN -- a size -- #IMPLIED
+     nomdepth  NUTOKEN -- a size -- #IMPLIED
+     maxdepth  NUTOKEN -- a size -- #IMPLIED
+     ftnsepth  NUTOKEN -- a size -- #IMPLIED
+     ftnsepln  NUTOKEN -- a size -- #IMPLIED
+     ftnbrk    %yesorno -- a toggle -- "1"
+     ftncntsp  NUTOKEN -- a size -- "1"
+     ftnconsl  NUTOKEN -- a size -- #IMPLIED
+     ftnconst  CDATA -- continue string -- #IMPLIED
+     spabove   NUTOKEN -- a size -- #IMPLIED
+     ftnfloat  %yesorno -- a toggle -- "0">
+ 
+ 
+<!-- This section describes the style characteristics associated
+with all elements that are not a graphic or table. -->
+ 
+ 
+<!ELEMENT styldesc - o (docdesc, envdesc*, e-i-c+)>
+ 
+<!ELEMENT docdesc - o (charlist, hyphrule?, att*)>
+
+<!ATTLIST docdesc
+     gi NAME #IMPLIED>
+ 
+<!ELEMENT envdesc - o (charlist)>
+
+<!ATTLIST envdesc
+     envid ID #REQUIRED>
+ 
+<!ELEMENT e-i-c - o (charlist, att*)>
+
+<!ATTLIST e-i-c
+     gi        NAMES -- a list of generic identifiers -- #REQUIRED
+     context   CDATA -- see Context Syntax -- #IMPLIED
+     occur     (all |  first |  middle |  last |  notfirst | notlast)  "all">
+
+<!ELEMENT charlist - o (font?,  leading?, hyphen?, wordsp?,
+lettersp?, indent?, quadding?, highlt*, chgmark?, presp?,
+postsp?, keeps?, vjinfo?, textbrk?, span?, border?,
+ruling*, charfill?, enumerat?, suppress?, savetext*, (puttext | putgraph | 
+usetext)*) >
+ 
+<!ATTLIST charlist
+     envname IDREF -- reference to envid -- #IMPLIED
+     inherit %yesorno "0">
+ 
+<!ELEMENT att - o ((specval+, charlist?) | (fillval+, fillist?))>
+ 
+<!ELEMENT specval - o EMPTY>
+
+<!ATTLIST specval
+     attname    NAME   #REQUIRED
+     attloc     NAME   #IMPLIED
+     attval     CDATA  #REQUIRED>
+ 
+<!ELEMENT fillval - o EMPTY >
+
+<!ATTLIST fillval
+     attname    NAME   #REQUIRED
+     attloc     NAME   #IMPLIED
+     fillcat    CDATA  #REQUIRED
+     fillchar   CDATA  #REQUIRED>
+ 
+ 
+<!ELEMENT fillist - o (font?,  leading?, hyphen?, wordsp?,
+lettersp?, indent?, quadding?, highlt*, chgmark?, presp?,
+postsp?, keeps?, vjinfo?, textbrk?, span?, border?,
+ruling*, charfill?, enumerat?, savetext*, (puttext | putgraph | usetext)*) >
+ 
+ 
+<!ELEMENT font - o EMPTY>
+
+<!ATTLIST font
+     inherit   %yesorno -- toggle -- "0"
+     style  (serif | sanserif | monoser | monosans) #IMPLIED
+     famname   CDATA -- a font name -- #IMPLIED
+     size      NUTOKEN -- a number -- #IMPLIED
+     posture   (upright |  oblique |  bsobl |  italic |
+bsital) #IMPLIED
+     weight    (ultlight |  exlight |  light |  semlight |
+medium | sembold |  bold |  exbold | ultbold) #IMPLIED
+     width     (ultcond |  excond |  cond |  semcond |
+regular |  semexp | exp |  exexp |  ultexp) #IMPLIED
+     allcap    %yesorno -- toggle -- #IMPLIED
+     smallcap  %yesorno -- toggle -- #IMPLIED
+     offset    CDATA -- size -- #IMPLIED >
+ 
+<!ELEMENT leading - o EMPTY>
+
+<!ATTLIST leading
+     inherit   %yesorno -- toggle -- "0"
+     lead      CDATA -- a size -- #IMPLIED>
+ 
+<!ELEMENT hyphrule - o EMPTY>
+
+<!ATTLIST hyphrule
+     hyph      %yesorno -- toggle -- #IMPLIED
+     wordbrk   ENTITY -- a pointer -- #IMPLIED
+     unbrkwrd  ENTITY -- a pointer -- #IMPLIED
+     brkchars  CDATA -- a string -- #IMPLIED
+     brkbfchr  CDATA -- a string -- #IMPLIED
+     brkafchr  CDATA -- a string -- #IMPLIED
+     nobrkchr  CDATA -- a string -- #IMPLIED
+     type      (dict |  logic |  both | any) #IMPLIED
+     zone      NUTOKEN -- a size -- #IMPLIED
+     ladder    NUMBER -- an integer -- #IMPLIED
+     minleft   NUMBER -- an integer -- #IMPLIED
+     minpush   NUMBER -- an integer -- #IMPLIED
+     clbrkok   %yesorno -- toggle -- #IMPLIED
+     pgbrkok   %yesorno -- toggle -- #IMPLIED >
+ 
+<!ELEMENT hyphen - o EMPTY>
+
+<!ATTLIST hyphen
+     inherit   %yesorno -- toggle -- "0"
+     hyph      %yesorno -- toggle -- #IMPLIED
+     zone      NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT wordsp - o EMPTY>
+
+<!ATTLIST wordsp
+     inherit   %yesorno -- toggle -- "0"
+     minimum   NUTOKEN -- a size -- #IMPLIED
+     nominal   NUTOKEN -- a size -- #IMPLIED
+     maximum   NUTOKEN -- a size -- #IMPLIED>
+ 
+<!ELEMENT lettersp - o EMPTY>
+
+<!ATTLIST lettersp
+     inherit   %yesorno -- toggle -- "0"
+     minimum   NUTOKEN -- a size -- #IMPLIED
+     nominal   NUTOKEN -- a size -- #IMPLIED
+     maximum   NUTOKEN -- a size -- #IMPLIED
+     kerntype  (none |  pair |  track | sector | pairtrk | trksectr) #IMPLIED
+     kernpair  ENTITY -- pointer -- #IMPLIED>
+ 
+<!ELEMENT indent - o EMPTY>
+
+<!ATTLIST indent
+     inherit   %yesorno -- toggle -- "0"
+     leftind   CDATA -- a size -- #IMPLIED
+     rightind  CDATA -- a size -- #IMPLIED
+     firstln   CDATA -- a size -- #IMPLIED>
+<!ELEMENT quadding - o EMPTY>
+
+<!ATTLIST quadding
+     inherit   %yesorno -- toggle -- "0"
+     quad      (right |  left |  center |  in |  out |  justify | asis) #IMPLIED
+     lastquad  (lright |  lleft |  lcenter |  lin |  lout |  ljustify) #IMPLIED>
+ 
+<!ELEMENT highlt - o EMPTY>
+
+<!ATTLIST highlt
+     inherit   %yesorno -- toggle -- "0"
+     reverse   %yesorno -- toggle -- #IMPLIED
+     scoring   %yesorno -- toggle -- #IMPLIED
+     scorewt   NUTOKEN -- a size -- #IMPLIED
+     scoreoff  CDATA -- a size -- #IMPLIED
+     scorechr  CDATA -- a string -- #IMPLIED
+     bckclr    (bblack | bwhite | bred | borange | byellow |
+bgreen | bblue | bviolet | bbrown | bgray) #IMPLIED
+     fontclr   (black | white | red |  orange |
+yellow | green | blue | violet | brown | gray) #IMPLIED
+     bckpct    NUMBER -- an integer -- #IMPLIED
+     forpct    NUMBER -- an integer -- #IMPLIED>
+ 
+<!ELEMENT chgmark - o (font?, indent?, quadding?, highlt?)>
+
+<!ATTLIST chgmark
+     literal   CDATA -- a string -- #IMPLIED
+     barthick  NUTOKEN -- a size -- #IMPLIED
+     join      %yesorno -- a toggle -- #IMPLIED>
+<!ELEMENT (presp |  postsp) - o EMPTY>
+
+<!ATTLIST (presp |  postsp)
+     inherit   %yesorno -- toggle -- "0"
+     minimum   NUTOKEN -- a size -- #IMPLIED
+     nominal   NUTOKEN -- a size -- #IMPLIED
+     maximum   NUTOKEN -- a size -- #IMPLIED
+     condit    (keep |  discard) #IMPLIED
+     priority  (force |  high |  med |  low |  none) #IMPLIED>
+ 
+<!ELEMENT keeps - o EMPTY>
+
+<!ATTLIST keeps
+     inherit   %yesorno -- toggle -- "0"
+     keep      %yesorno --toggle -- #IMPLIED
+     boundary  (col | page) #IMPLIED
+     widowct   NUMBER -- an integer -- #IMPLIED
+     orphanct  NUMBER -- an integer -- #IMPLIED
+     next      %yesorno -- toggle -- #IMPLIED
+     prev      %yesorno -- toggle -- #IMPLIED>
+ 
+<!ELEMENT vjinfo - o EMPTY>
+
+<!ATTLIST vjinfo
+     inherit   %yesorno -- toggle -- "0"
+     presppr   (force |  high |  med |  low |  none) #IMPLIED
+     postsppr  (pforce |  phigh |  pmed |  plow |  pnone) #IMPLIED
+     keepspr   (kforce |  khigh |  kmed |  klow |  knone) #IMPLIED >
+<!ELEMENT textbrk - o EMPTY>
+
+<!ATTLIST textbrk
+     inherit   %yesorno -- toggle -- "0"
+     startcol  %yesorno -- toggle -- #IMPLIED
+     startpg   (off |  verso |  recto |  next) #IMPLIED
+     pageid    IDREF -- reference to pageset id -- #IMPLIED
+     startln   %yesorno -- toggle -- #IMPLIED
+     endln     %yesorno -- toggle -- #IMPLIED>
+ 
+<!ELEMENT span - o EMPTY>
+
+<!ATTLIST span
+     inherit   %yesorno -- toggle -- "0"
+     span      %yesorno -- toggle -- #IMPLIED
+     permble   %yesorno -- toggle -- #IMPLIED>
+ 
+<!ELEMENT border - o EMPTY>
+
+<!ATTLIST border
+     inherit   %yesorno -- toggle -- "0"
+     sides     (all |  nonbind |  topbot |  lftrt |  top |
+bottom | left | right | in | out) #IMPLIED
+     pattern   %brdpat #IMPLIED>
+ 
+<!ELEMENT ruling - o EMPTY>
+
+<!ATTLIST ruling
+     inherit   %yesorno -- toggle -- "0"
+     thick     NUTOKEN -- a size -- #IMPLIED
+     speclen   NUTOKEN -- a size -- #IMPLIED
+     rellen    (col | page | text | eldepth) #IMPLIED
+     hoffset   CDATA -- a size -- #IMPLIED
+     voffset   CDATA -- a size -- #IMPLIED
+     orient    (vert |  horiz) #IMPLIED
+     placemnt  (before | after) #IMPLIED
+     startpos  (margin | content) #IMPLIED
+     endpos    (begin | end) #IMPLIED>
+ 
+<!ELEMENT charfill - o EMPTY>
+
+<!ATTLIST charfill
+     inherit   %yesorno -- toggle -- "0"
+     literal   CDATA -- a string -- #IMPLIED
+     orient    (vert |  horiz) #IMPLIED
+     type      (rr |  rf |  ff |  fr) #IMPLIED
+     spbefore  NUTOKEN -- a size -- #IMPLIED
+     spafter   NUTOKEN -- a size -- #IMPLIED
+     padding   NUTOKEN -- a size -- #IMPLIED
+     truncat   %yesorno -- a toggle -- #IMPLIED
+     suppress  NUMBER -- integer -- #IMPLIED
+     align     %yesorno -- toggle -- #IMPLIED
+     cfid      ID -- an id -- #IMPLIED>
+ 
+<!ELEMENT enumerat - o EMPTY>
+
+<!ATTLIST enumerat
+     inherit   %yesorno -- toggle -- "0"
+     initial   NUMBER -- an integer -- #IMPLIED
+     increm    NUMBER -- an integer -- #IMPLIED
+     reset     CDATA -- an id list -- #IMPLIED
+     style     (arabic |  romanuc |  romanlc |  alphauc |
+alphalc | userdef) #IMPLIED
+     specstyl  CDATA -- a string -- #IMPLIED
+     seq       %seqrule -- a rule -- #IMPLIED
+     except    CDATA -- a string -- #IMPLIED
+     enumid    NMTOKEN -- an id -- #IMPLIED>
+ 
+<!ELEMENT suppress - o EMPTY>
+
+<!ATTLIST suppress
+     sup       %yesorno --a toggle -- #IMPLIED>
+<!ELEMENT puttext - o (subchars?)>
+
+<!ATTLIST puttext
+     literal   CDATA -- a string -- #IMPLIED
+     placemnt  (before | after) #IMPLIED>
+ 
+<!ELEMENT putgraph - o (subchars?)>
+
+<!ATTLIST putgraph
+     graphname ENTITY -- an entity reference -- #REQUIRED
+     width     NUTOKEN -- a size -- #IMPLIED
+     depth     NUTOKEN -- a size -- #IMPLIED
+     placemnt  (before | after) #IMPLIED>
+ 
+<!ELEMENT savetext - o EMPTY>
+
+<!ATTLIST savetext
+     textid    NMTOKEN -- an id -- #IMPLIED
+     conrule   CDATA -- a string -- #IMPLIED>
+ 
+<!ELEMENT usetext - o (subchars?)>
+
+<!ATTLIST usetext
+     source    CDATA -- a string -- #IMPLIED
+     placemnt  (before | after)  #IMPLIED
+     userule   %userule -- a rule -- #IMPLIED>
+ 
+<!ELEMENT subchars - o (font?,  leading?, hyphen?, wordsp?, lettersp?,
+indent?, quadding?, highlt*, chgmark?, presp?, postsp?, vjinfo?,
+textbrk?, ruling*, charfill?, enumerat?)>
+ 
+<!-- This section describes the characteristics associated with a
+table. -->
+ 
+<!ELEMENT tabdesc - o (tabstyle+, subsetstyle+, e-i-c*)>
+ 
+<!ELEMENT tabstyle - o (tabe-i-c, tabatts)>
+
+<!ATTLIST tabstyle
+     tabstyleid  NMTOKEN -- an id -- #REQUIRED>
+<!ELEMENT tabe-i-c - o (charlist, tatt*)>
+
+<!ATTLIST tabe-i-c
+     gi        NAMES -- a list of generic identifiers -- #REQUIRED
+     context   CDATA -- see Context Syntax -- #IMPLIED
+     occur     (all |  first |  middle |  last |  notfirst | notlast)  "all">
+ 
+<!ELEMENT tatt - o ((specval+, charlist?, tabatts?, stdcellatts?, colatts?) | 
+                    (fillval+, fillist?))>
+<!ELEMENT tabatts - o (stdcellatts?)>
+
+<!ATTLIST tabatts
+     width     (column | page) #IMPLIED
+     frame     (all | top |  bottom | topbot | sides | none)  #IMPLIED
+     thick     NUTOKEN -- a size -- #IMPLIED
+     orient    %yesorno  -- toggle -- #IMPLIED
+     placemnt  (float |  inline) #IMPLIED
+     contirul  CDATA  -- a string -- #IMPLIED
+     rephead   (hyes | hno | hverso)  #IMPLIED
+     repfoot   (fyes | fno | fverso)  #IMPLIED
+     keepftn   %yesorno  -- toggle -- #IMPLIED
+     consep    %yesorno  -- toggle -- #IMPLIED
+     tiplace   (above | below)    #IMPLIED>
+ 
+<!ELEMENT  stdcellatts - o EMPTY>
+
+<!ATTLIST  stdcellatts
+     colsep    NUTOKEN  -- a size --  #IMPLIED
+     rowsep    NUTOKEN  -- a size --  #IMPLIED
+     leftmar   NUTOKEN  -- a size --  #IMPLIED
+     rightmar  NUTOKEN  -- a size --  #IMPLIED
+     topmar    NUTOKEN  -- a size --  #IMPLIED
+     botmar    NUTOKEN  -- a size --  #IMPLIED
+     halign    (right |  left |  center | justify | char) #IMPLIED
+     valign    (top | middle | bottom) #IMPLIED
+     char      CDATA -- see source syntax -- #IMPLIED
+     charoff   NUMBER -- a percentage -- #IMPLIED>
+<!ELEMENT subsetstyle - o (subsetspec+, colspec*, rowspec*, cellspec*)>
+
+<!ATTLIST subsetstyle
+     subsetstyleid NMTOKEN -- an id -- #REQUIRED>
+<!ELEMENT subsetspec - o (tabe-i-c, subsetatts)+>
+<!ELEMENT subsetatts - o (stdcellatts?)>
+
+<!ATTLIST subsetatts
+     cols      NUTOKEN -- range of columns -- #IMPLIED
+     keep      (col | page | none) #IMPLIED>
+<!ELEMENT colspec - o (tabe-i-c, colatts)>
+<!ELEMENT colatts - o (stdcellatts?)>
+
+<!ATTLIST colatts
+     colnum    NUMBER  -- an integer -- #IMPLIED
+     colname   NMTOKEN -- an id --  #IMPLIED
+     colwidth  CDATA -- see source syntax -- #IMPLIED
+     spanname  NMTOKEN -- a name token -- #IMPLIED
+     namest    NMTOKEN -- a name token -- #IMPLIED
+     nameend   NMTOKEN -- a name token -- #IMPLIED>
+ 
+<!ELEMENT rowspec - o (tabe-i-c, rowatts)>
+
+<!ELEMENT rowatts - o (stdcellatts?)>
+
+<!ATTLIST rowatts
+     brkrow    %yesorno -- toggle -- "0"
+     rotate    %yesorno -- toggle -- "0">
+<!ELEMENT cellspec - o (tabe-i-c, cellatts)>
+ 
+<!ELEMENT cellatts - o (stdcellatts?)>
+
+<!ATTLIST cellatts
+     colname   NMTOKEN -- a name token -- #IMPLIED
+     colmnend  NMTOKEN -- a name token -- #IMPLIED
+     spandep   NUMBER -- integer -- #IMPLIED
+     rotate    %yesorno -- a toggle -- #IMPLIED>
+<!-- This section describes the characteristics associated with a
+graphic inside a figure. -->
+<!ELEMENT grphdesc - o (grphstyl+, grphspec*)>
+ 
+<!ELEMENT grphstyl - o (grphatts)>
+
+<!ATTLIST grphstyl
+     grphstyl  ID -- an id -- #IMPLIED>
+
+<!ELEMENT grphspec - o (e-i-c, grphatts?)*>
+
+<!ELEMENT grphatts - o (repro, sizing, placemnt)>
+ 
+<!ELEMENT repro - o EMPTY>
+
+<!ATTLIST repro
+     reprowid  NUTOKEN -- size -- #IMPLIED
+     reprodep  NUTOKEN -- size -- #IMPLIED >
+ 
+<!ELEMENT sizing - o EMPTY>
+
+<!ATTLIST sizing
+     hscale    NUMBER -- integer -- #IMPLIED
+     vscale    NUMBER -- integer -- #IMPLIED
+     scalefit  %yesorno -- toggle --  #IMPLIED
+     llcordra  CDATA  -- a string of world coordinates -- #IMPLIED
+     urcordra  CDATA  -- a string of world coordinates -- #IMPLIED>
+ 
+<!ELEMENT placemnt - o EMPTY>
+
+<!ATTLIST placemnt
+     hplace    (left | center | right | hnone) #IMPLIED
+     vrplace   (top | middle | bottom | none) #IMPLIED
+     coordst   CDATA -- a string of world coordinates-- #IMPLIED
+     coordend  CDATA -- a string of world coordinates-- #IMPLIED
+     rotation  %yesorno  -- toggle -- "0"
+     tiplace   (above | below) #IMPLIED
+     legplace  (labove | lbelow | lleft | lright | floating | facing) #IMPLIED>
+ 
+<!-- This section describes the characteristics associated with elements
+     to be placed in the footnote area. -->
+ 
+<!ELEMENT ftndesc - o (e-i-c, ftnatts)*>
+ 
+<!ELEMENT ftnatts - o (charlist) -(keeps,span)>ÿ

@@ -1,0 +1,207 @@
+<html>
+<head>
+<title>perlSGML -- SGML::Entman</title>
+<link rev="made" href="mailto:ehood@medusa.acs.uci.edu">
+</head>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Name">Name</a></h2>
+
+<p>SGML::EntMan - SGML entity manager</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Synopsis">Synopsis</a></h2>
+<pre>
+    use SGML::EntMan;
+    $entman = new SGML::EntMan
+    $entman->read_catalog($file);
+    $entman->read_catalog_handle(\*FILEHANDLE);
+</pre>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Description">Description</a></h2>
+
+<p><strong>SGML::EntMan</strong> is a simple SGML entity manager.
+It is used resolve external entities into Perl filehandles.
+</p>
+
+<p>In order to resolve entities, SGML Open Catalogs (as
+defined by <em>SGML Open Technical Resolution 9401:1995</em>
+and extensions defined in <em>SP</em>) must be loaded by
+<strong>SGML::EntMan</strong>.  When the <strong>SGML::EntMan</strong>
+module is first loaded, it reads all catalogs specified by the
+<strong>SGML_CATALOG_FILES</strong> environent variable.  The
+envariable is a list of file pathnames of catalogs.  Each pathname
+is separated by a '<tt>:</tt>' (or '<tt>;</tt>' under Windows/MSDOS).
+</p>
+
+<p>All mappings read from the <strong>SGML_CATALOG_FILES</strong>
+envariable are are effective across all <strong>SGML::EntMan</strong>
+object instances.  However, mappings loaded through the
+<strong>read_catalog</strong> and <strong>read_catalog_handle</strong>
+methods override mappings defined through the
+<strong>SGML_CATALOG_FILES</strong> envariable.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Class Methods">Class Methods</a></h2>
+
+<ul>
+<li><a href="#new">new</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="new">new</a></h3>
+<dl>
+
+<dt><tt><strong>new</strong> SGML::EntMan</tt></dt><dd>
+
+<p><strong>new</strong> instantiates a new
+<strong>SGML::EntMan</strong> object.  </p>
+
+</dl>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Object Methods">Object Methods</a></h2>
+
+<ul>
+<li><a href="#read_catalog">read_catalog</a></li>
+<li><a href="#read_catalog_handle">read_catalog_handle</a></li>
+<li><a href="#open_entity">open_entity</a></li>
+<li><a href="#open_doctype">open_doctype</a></li>
+<li><a href="#open_public_id">open_public_id</a></li>
+<li><a href="#open_system_id">open_system_id</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="read_catalog">read_catalog</a></h3>
+<dl>
+
+<dt><tt>$entman-><strong>read_catalog</strong>(<em>$file</em>)</tt></dt><dd>
+<p>
+Read the catalog file specified by <em>$file</em>.  A 1 is returned
+on success, and a 0 on failure.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="read_catalog_handle">read_catalog_handle</a></h3>
+<dl>
+
+<dt><tt>$entman-><strong>read_catalog_handle</strong>(\*<em>FILEHANDLE</em>)</tt></dt><dd>
+<p>
+Read the catalog specified by <em>FILEHANDLE</em>.  A 1 is returned
+on success, and a 0 on failure.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="open_entity">open_entity</a></h3>
+<dl>
+
+<dt><tt>$fh = $entman-><strong>open_entity</strong>(<em>$name</em>, <em>$pubid</em>, <em>$sysid</em>)</tt></dt><dd>
+<p>
+Open a filehandle to the entity specified entity name <em>$name</em>,
+public identifier <em>$pubid</em>, and/or system identifier <em>$sysid</em>.
+<tt>undef</tt> is returned if entity could not be resolved, and a warning
+message is printed to STDERR.
+</p>
+<p>
+If <em>$name</em> contains a '<tt>%</tt>' character, it is treated a parameter
+entity name.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="open_doctype">open_doctype</a></h3>
+<dl>
+
+<dt><tt>$fh = $entman-><strong>open_doctype</strong>(<em>$name</em>, <em>$pubid</em>, <em>$sysid</em>)</tt></dt><dd>
+<p>
+Open a filehandle to the doctype specified entity name <em>$name</em>,
+public identifier <em>$pubid</em>, and/or system identifier <em>$sysid</em>.
+<tt>undef</tt> is returned if doctype could not be resolved, and a warning
+message is printed to STDERR.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="open_public_id">open_public_id</a></h3>
+<dl>
+
+<dt><tt>$fh = $entman-><strong>open_public_id</strong>(<em>$pubid</em>)</tt></dt><dd>
+<p>Open a filehandle to the entity denoted by the public identifier
+<em>$pubid</em>.  <tt>undef</tt> is returned if public identifier
+could not be resolved, and a warning message is printed to STDERR.
+</p>
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="open_system_id">open_system_id</a></h3>
+<dl>
+
+<dt><tt>$entman-><strong>open_system_id</strong>(<em>$sysid</em>)</tt></dt><dd>
+
+<p>Open a filehandle to the entity denoted by the system identifier
+<em>$sysid</em>.  <tt>undef</tt> is returned if system identifier
+could not be resolved, and a warning message is printed to STDERR.
+</p>
+</dl>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Environment Variables">Environment Variables</a></h2>
+
+<dl>
+
+<dt><tt><strong>SGML_CATALOG_FILES</strong></tt></dt><dd>
+List of default catalogs.
+</dd>
+
+</dl>
+
+<!-- =================================================================== -->
+<hr><H2><a name="See Also">See Also</a></h2>
+
+<p>
+<a href="SGML..DTD.html"><strong>SGML::DTD</strong></a>,
+<a href="SGML..FSI.html"><strong>SGML::FSI</strong></a>
+</p>
+<p>
+perl(1)
+</p>
+
+<!-- ================================================================== -->
+<!--	@(#)  avail.mod 1.2 97/09/16 @(#)
+  -->
+<hr>
+<h2><a name="availability">Availability</a></h2>
+<p>This software is part of the <em>perlSGML</em> package; see
+(<a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html"
+>http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>)
+</p>
+
+<!--	@(#) author.mod 1.2 97/09/16 15:50:29 @(#)
+  -->
+<hr>
+<h2><a name="author">Author</a></h2>
+<address>
+<a href="http://www.oac.uci.edu/indiv/ehood/">Earl Hood</a><br>
+<a href="mailto:ehood@medusa.acs.uci.edu"
+>ehood@medusa.acs.uci.edu</a><br>
+Copyright &#169; 1997<br>
+</address>
+
+
+<!-- ================================================================== -->
+<hr>
+<address>
+97/09/18 14:32:43
+</address>
+</body></html>

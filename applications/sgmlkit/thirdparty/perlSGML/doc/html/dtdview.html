@@ -1,0 +1,621 @@
+<html>
+<head>
+<title>dtdview 0.5.1</title>
+</head>
+<body>
+
+<!-- =================================================================== -->
+<hr>
+<h1>dtdview</h1>
+
+<p><code>dtdview</code> is an interactive
+<a href="http://www.sil.org/sgml/sgml.html">SGML</a>
+<em>document type definition</em> (DTD)
+querying tool.
+<code>dtdview</code> provides a command-line interface to access
+element content rules, element attributes, and navigate the structure
+of a DTD.
+</p>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>When <code>dtdview</code> is invoked, it provides a command-line
+interface to access the information defined in a DTD.  When
+<code>dtdview</code> is started without an initial DTD to read, the
+following prompt will appear:
+</p>
+
+<pre>
+(dtdview) -&gt;
+</pre>
+
+<p>If an initial DTD was specified, the prompt will look like
+the following:
+</p>
+
+<pre>
+(mydtd) -&gt;
+</pre>
+
+<p>The string in the "()" will contain the name of the DTD.
+</p>
+
+<p>See <a href="#usage">Usage</a> on how to invoke <code>dtdview</code>
+from your shell command-line.
+See <a href="#syntax">Command Syntax</a> on how to
+invoke <code>dtdview</code> commands.  See
+<a href="#commands">Commands</a> for a list of all 
+<code>dtdview</code> commands available.
+</p>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="usage">Usage</a></h2>
+
+<p><code>dtdview</code> is invoked from the shell as follows:
+</p>
+
+<p><tt>% dtdview </tt>[<var>&lt;options&gt;</var>]
+[<var>&lt;filename&gt;</var>]
+</p>
+
+<p>If <var>&lt;filename&gt;</var> is given, <code>dtdview</code>
+will automatically load <var>&lt;filename&gt;</var> as the initial
+DTD.
+</p>
+
+<p>The following are the list of options available:
+</p>
+
+<dl>
+
+<!--	@(#)  catopt.mod 1.1 96/09/30 @(#)
+  -->
+<dt><a name="-catalog"><code>-catalog</code> <var>filename</var></a></dt>
+<dd><p>Use <var>filename</var> as the file for mapping public
+identifiers and external entities to system files.  If
+<code>-catalog</code> is not specified, "<code>catalog</code>" is
+used as the default filename.
+See
+<a href="#resolving">Resolving External Entities</a> for more
+information.
+</p>
+</dd>
+
+
+<dt><a name="-help"><code>-help</code></a></dt>
+<dd><p>Print a brief usage description. No other action is performed.
+</p>
+</dd>
+
+<dt><a name="-verbose"><code>-verbose</code></a></dt>
+<dd><p>Print parsing information if a DTD is specified on the
+command-line.
+</p>
+</dd>
+
+</dl>
+
+<h3>Batch Mode</h3>
+
+<p>If standard input is not the terminal, <code>dtdview</code>
+will run in batch mode.  <code>dtdview</code> will execute each
+command from the input without prompting.  Any line of the input
+beginning with a '<code>#</code>' will be ignored.  <code>dtdview</code>
+will still generate output as normal.
+</p>
+
+<p>Batch mode operation allows you to create scripts to automate
+repeating tasks.  The following example script will generate
+a full listing of all elements' content models and attributes to
+a file called "<code>dtdreport.txt</code>":
+</p>
+
+<pre>
+#       Script to generate a report off all elements of a dtd.
+#
+# List all elements in a single column and save to a temp file.
+#
+elements 1 &gt; ,tmpfile
+#
+# Remove report file if it exists.
+#
+system /bin/rm dtdreport.txt
+#
+# Call perl to edit temp file to create legal dtdview commands
+#
+system perl -p -i -e 's/\s*(\S+)\s*/content $1 &gt;&gt; dtdreport.txt\nattributes $1 &gt;&gt; dtdreport.txt\n/' ,tmpfile
+#
+# Source temp file
+#
+source ,tmpfile
+#
+# Remove temp file
+#
+system /bin/rm ,tmpfile
+#
+# End of script
+</pre>
+
+<p>If the script is called "<code>report.dvs</code>", the following can be
+used to run the script on a DTD:
+</p>
+
+<pre>
+dtdview mydtd.dtd &lt; report.dvs
+</pre>
+
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="syntax">Command Syntax</a></h2>
+
+<p>The following notation is used for syntax diagrams:
+</p>
+
+<dl>
+
+<dt>|</dt>
+<dd><p>Or connector.  Used to separate a list of choices.
+</p>
+</dd>
+
+<dt>[&nbsp;]</dt>
+<dd><p>Optional.  Anything surrounded by [&nbsp;]'s is optional.
+</p>
+</dd>
+
+<dt><var>&lt;&nbsp;&gt;</var></dt>
+<dd><p>Variable value.  Anything in &lt;&nbsp;&gt;'s represents a value that
+can vary.
+</p>
+</dd>
+
+<dt>"&nbsp;"</dt>
+<dd><p>Literal text.  Anything in "&nbsp;"'s is taken as-is.
+</p>
+</dd>
+
+</dl>
+
+<p>The following is the general syntax for all <code>dtdview</code>
+commands:
+
+<p><var>&lt;command&gt;</var> [<var>&lt;options&gt;</var>]
+[
+[
+[ "<code>&gt;</code>" | "<code>&gt;&gt;</code>" ] <var>&lt;filename&gt;</var> ]
+|
+[ "<code>|</code>" <var>&lt;program&gt;</var> ]
+]
+</p>
+
+<p>In sum, <code>dtdview</code> commands may have some options to
+control the behavior of the command.  Any command may be redirected
+to a file, or piped into another program.
+</p>
+
+<p>Here's an example of a command that prints the content model of
+the element <code>CHAPTER</code>:
+</p>
+
+<pre>
+(dtdview) -&gt; content chapter
+</pre>
+
+<p>Here's an example of a command that prints all the elements
+defined in the DTD and redirects the output to a file:
+
+<pre>
+(dtdview) -&gt; elements > element.lst
+</pre>
+
+<p>If the output is to be appended to a file, use "<code>&gt;&gt;</code>".
+</p>
+
+<p>Here's an example of a command that prints all the elements
+defined in the DTD at pipes the output to <code>more</code>(1) to
+allow the output to be paged one screenful at a time:
+
+<pre>
+(dtdview) -&gt; elements | more
+</pre>
+
+<h3>Syntax Notes</h3>
+
+<ul>
+
+<li><p>An entire command name does not need to be entered to invoke
+a command.  As long as the unambiguous prefix is entered,
+<code>dtdview</code> will automatically determine the proper
+command to invoke.
+</p>
+</li>
+
+<li><p>For commands that take element names as arguments, an element
+can be designated by its unambiguous prefix.
+<code>dtdview</code> will automatically determine the proper
+full element name.
+</p>
+</li>
+
+</ul>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="commands">Commands</a></h2>
+
+<p>The commands listed are divided into three catagories:
+</p>
+
+<ul>
+<li><a href="#data-access-cmds">Data access commands</a></li>
+<li><a href="#path-cmds">Hierarchical path commands</a></li>
+<li><a href="#util-cmds">Utility commands</a></li>
+</ul>
+
+<h3><a name="data-access-cmds">Data access commands</a></h3>
+
+<p>The following commands allow to access the data defined in the DTD.
+</p>
+
+<dl>
+
+<dt><code>attributes</code> [<var>&lt;elem&gt;</var>] </dt>
+<dd><p>List the attributes of <var>&lt;elem&gt;</var>.  If
+<var>&lt;elem&gt;</var> is not specified, the attributes of the
+last element in the hierarchical path are listed.
+</p>
+</dd>
+
+<dt><code>base</code> [<var>&lt;elem&gt;</var>] </dt>
+<dd><p>Output the base content model of <var>&lt;elem&gt;</var>.
+If <var>&lt;elem&gt;</var> is not specified, then the base content model
+of the last element in the hierarchical path is listed.
+</p>
+</dd>
+
+<dt><code>content</code> [<var>&lt;elem&gt;</var>] </dt>
+<dd><p>Output the full content model of <var>&lt;elem&gt;</var>.
+If <var>&lt;elem&gt;</var>] is not specified, then the effective
+content model (including inherited exceptions) of the last element in the
+hierarchical path is listed.
+</p>
+</dd>
+
+<dt><code>elements</code>
+[<var>&lt;col&gt;</var> [<var>&lt;width&gt;</var>] ] </dt>
+<dd><p>List all elements defined in the DTD.  The optional
+<var>&lt;col&gt;</var> argument specifies the number of columns
+to use in the output.  The <var>&lt;width&gt;</var> argument
+specifies the width of the columns.  If no <var>&lt;col&gt;</var>
+and <var>&lt;width&gt;</var> arguments are specified,
+<code>dtdview</code> will automatically determine columns and
+column widths.
+</p>
+</dd>
+
+<dt><code>exc</code> [<var>&lt;elem&gt;</var>] </dt>
+<dd><p>List exclusion defined for <var>&lt;elem&gt;</var>.
+If <var>&lt;elem&gt;</var> is not specified,
+then the exclusions defined for the last element in
+the hierarchical path are listed.
+</p>
+</dd>
+
+<dt><code>inc</code> [<var>&lt;elem&gt;</var>] </dt>
+<dd><p>List inclusion defined for <var>&lt;elem&gt;</var>.
+If <var>&lt;elem&gt;</var> is not specified,
+then the inclusions defined for the last element in
+the hierarchical path are listed.
+</p>
+</dd>
+
+<dt><code>parents</code>
+[<var>&lt;elem&gt;</var> 
+[<var>&lt;col&gt;</var> [<var>&lt;width&gt;</var>] ] ]</dt>
+<dd><p>List all possible parents of <var>&lt;elem&gt;</var>.
+If <var>&lt;elem&gt;</var> is not specified, 
+then the parents for the last element in the
+hierarchical path are listed.
+</p>
+<p>The optional
+<var>&lt;col&gt;</var> argument specifies the number of columns
+to use in the output.  The <var>&lt;width&gt;</var> argument
+specifies the width of the columns.  If no <var>&lt;col&gt;</var>
+and <var>&lt;width&gt;</var> arguments are specified,
+<code>dtdview</code> will automatically determine columns and
+column widths.
+</p>
+</dd>
+
+<dt><a name="topcmd"><code>top</code></a></dt>
+<dd><p>List top-most elements defined in the DTD.
+</p>
+</dd>
+
+<dt><code>tree</code> <var>&lt;elem&gt;</var> [<var>&lt;depth&gt;</var>] </dt>
+<dd><p>Print content tree of <var>&lt;elem&gt;</var> with an optional
+depth of <var>&lt;depth&gt;</var>.  Depth level of 2 is the default.
+</p>
+</dd>
+
+</dl>
+
+<h3><a name="path-cmds">Hierarchical path commands</a></h3>
+
+<dl>
+
+<dt><code>down</code> <var>&lt;elem&gt;</var> <br>
+<code>down</code>
+<var>&lt;elem&gt;</var> "<code>,</code>" <var>&lt;elem&gt;</var> "<code>,</code>" ...
+</dt>
+<dd><p>Move down the hierarchical path to <var>&lt;elem&gt;</var>.
+A comma separated list (with no whitespace) of elements may be specified
+to go down
+the path represented by the list.
+</p>
+</dd>
+
+<dt><a name="rootcmd"><code>root</code> [<var>&lt;elem&gt;</var>]</a></dt>
+<dd><p>Set the root of the hierarchical path to <var>&lt;elem&gt;</var>.
+If <var>&lt;elem&gt;</var> is not specified, the current root is listed.
+</p>
+</dd>
+
+<dt><code>up</code> [<var>&lt;#&gt;</var>] </dt>
+<dd><p>Move up <var>&lt;#&gt;</var> elements in the hierarchical path.
+If <var>&lt;#&gt;</var> is not specified, 1 is used.
+</p>
+</dd>
+
+<dt><code>where</code> </dt>
+<dd><p>Print the current hierarchical path.
+</p>
+</dd>
+
+</dl>
+
+<h3><a name="util-cmds">Utility commands</a></h3>
+
+<dl>
+
+<dt><code>catalog</code> <var>&lt;filename&gt;</var> </dt>
+<dd><p>Read catalog <var>&lt;filename&gt;</var>.
+See
+<a href="#resolving">Resolving External Entities</a> for more
+information.
+</p>
+</dd>
+
+<dt><code>cd</code> <var>&lt;path&gt;</var> </dt>
+<dd><p>Change the current working directory to <var>&lt;path&gt;</var>.
+This command is a convience function to simplify the interactive
+loading of DTDs and catalogs.
+</p>
+</dd>
+
+<dt><code>dtd</code> <var>&lt;filename&gt;</var>
+[ "<code>0</code>" | "<code>1</code>" ] </dt>
+<dd><p>Read the DTD specified by <var>&lt;filename&gt;</var>.
+An optional 0 or 1 may be specified to set the verbosity.
+A 1 will cause output to be generated as the DTD is parsed.
+A <a href="#resetcmd"><code>reset</code></a> is done before
+<var>&lt;filename&gt;</var> is read.
+</p>
+
+<p>Once the DTD is loaded, <code>dtdview</code> will automatically
+set the <a href="#rootcmd">root</a> to the
+<a href="#topcmd">top</a> element in the
+DTD.  If multiple top elements exists, the first one in alphabetical
+order is chosen.
+</p>
+
+</dd>
+
+<dt><code>exit</code> </dt>
+<dd><p>Exit the program.
+</p>
+</dd>
+
+<dt><code>help</code> [<var>&lt;command&gt;</var>] </dt>
+<dd><p>Give listing of all commands available.  If
+<var>&lt;command&gt;</var> is specified, a brief usage description
+will be given for <var>&lt;command&gt;</var>.
+</p>
+</dd>
+
+<dt><code>ls</code>
+<dd><p>List files in current working directory.  The output is
+similar to the Unix command "<code>ls -ACF</code>".
+This command is a convience function to simplify the interactive
+loading of DTDs and catalogs.
+</p>
+</dd>
+
+<dt><code>quit</code>
+<dd><p>Quit the program.
+</p>
+</dd>
+
+<dt><a name="resetcmd"><code>reset</code></a>
+<dd><p>Reset <code>dtdview</code> to start-up state with no DTD loaded.
+</p>
+</dd>
+
+<dt><code>source</code> <var>&lt;filename&gt;</var> </dt>
+<dd><p>Process commands listed in <var>&lt;filename&gt;</var>.
+</p>
+</dd>
+
+<dt><code>system</code> <var>&lt;shell_command&gt;</var> </dt>
+<dd><p>Invoke <var>&lt;shell_command&gt;</var>.
+</p>
+</dd>
+
+<dt><code>version</code> </dt>
+<dd><p>List version information of <code>dtdview</code>.
+</p>
+</dd>
+
+</dl>
+
+<!-- =================================================================== -->
+<!--	@(#)  resents.mod 1.1 96/10/05 @(#)
+  -->
+<hr>
+<h2><a name="resolving">Resolving External Entities</a></h2>
+
+<p>Defining the mapping between external entities to system files
+may be done via the <a href="#-catalog"><code>-catalog</code></a>
+command-line option.  The <em>catalog</em> provides you with the
+capability of mapping public identifiers to system identifiers
+(files) or to map entity names to system identifiers.
+</p>
+
+<!--	@(#)  catalog.mod 1.4 96/10/07 @(#)
+  -->
+<p><strong>Catalog Syntax</strong></p>
+
+<p>The syntax of a catalog is a subset of SGML catalogs
+(as defined in
+<cite>SGML Open Draft Technical Resolution 9401:1994</cite>).
+</p>
+
+<p>A catalog contains a sequence of the following types of entries:
+</p>
+
+<dl>
+<dt><code>PUBLIC</code> <var>public_id</var> <var>system_id</var></dt>
+<dd><p>This maps <var>public_id</var> to <var>system_id</var>.
+</p>
+</dd>
+<dt><code>ENTITY</code> <var>name</var> <var>system_id</var></dt>
+<dd><p>This maps a general entity whose name is <var>name</var> to
+<var>system_id</var>.
+</p>
+</dd>
+<dt><code>ENTITY %</code><var>name</var> <var>system_id</var></dt>
+<dd><p>This maps a parameter entity whose name is <var>name</var> to
+<var>system_id</var>.
+</p>
+</dd>
+</dl>
+
+<p><strong>Syntax Notes</strong></p>
+
+<ul>
+<li><p>A <var>system_id</var> string cannot contain any spaces.  The
+<var>system_id</var> is treated as pathname of file. </p>
+</li>
+<li><p>Any line in a catalog file that does not follow the previously
+mentioned entries is ignored.</p>
+</li>
+<li><p>In case of duplicate entries, the first entry defined is used.
+</ul>
+
+<p>Example catalog file:</p>
+<pre>
+        -- ISO public identifiers --
+PUBLIC "ISO 8879-1986//ENTITIES General Technical//EN"            iso-tech.ent
+PUBLIC "ISO 8879-1986//ENTITIES Publishing//EN"                   iso-pub.ent
+PUBLIC "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN"  iso-num.ent
+PUBLIC "ISO 8879-1986//ENTITIES Greek Letters//EN"                iso-grk1.ent
+PUBLIC "ISO 8879-1986//ENTITIES Diacritical Marks//EN"            iso-dia.ent
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN"                iso-lat1.ent
+PUBLIC "ISO 8879-1986//ENTITIES Greek Symbols//EN"                iso-grk3.ent 
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 2//EN"                ISOlat2
+PUBLIC "ISO 8879-1986//ENTITIES Added Math Symbols: Ordinary//EN" ISOamso
+
+        -- HTML public identifiers and entities --
+PUBLIC "-//IETF//DTD HTML//EN"                                    html.dtd
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN//HTML"          ISOlat1.ent
+ENTITY "%html-0"                                                  html-0.dtd
+ENTITY "%html-1"                                                  html-1.dtd
+
+</pre>
+
+<p><strong>Environment Variables</strong></p>
+
+<p>The following
+envariables (ie. environment variables) are supported:
+</p>
+
+<dl>
+<dt><a name="P_SGML_PATH">P_SGML_PATH</a></dt>
+<dd><p>This is a colon (semi-colon for MSDOS users)
+separated list of paths for finding catalog files
+or system identifiers.  For example, if a system identifier is not
+an absolute pathname, then the paths listed in P_SGML_PATH are used to
+find the file.
+</p>
+</dd>
+<dt><a name="SGML_CATALOG_FILES">SGML_CATALOG_FILES</a></dt>
+<dd><p>This envariable is a colon (semi-colon for MSDOS users)
+separated list of catalog files to read.
+If
+a file in the list is not an absolute path, then file is searched in
+the paths listed in the P_SGML_PATH and SGML_SEARCH_PATH.
+</p>
+</dd>
+<dt><a name="SGML_SEARCH_PATH">SGML_SEARCH_PATH</a></dt>
+<dd><p>This is a colon (semi-colon for MSDOS users)
+separated list of paths for finding catalog files
+or system identifiers.  This envariable serves the same function as
+P_SGML_PATH.  If both are defined, paths listed in P_SGML_PATH are
+searched first before any paths in SGML_SEARCH_PATH.</p>
+</dd>
+</dl>
+<p>The use of P_SGML_PATH is for compatibility with earlier versions.
+SGML_CATALOG_FILES and SGML_SEARCH_PATH
+are supported for compatibility with James Clark's <code>nsgmls(1)</code>.
+</p>
+<dl>
+<dt><strong>Note</strong></dt>
+<dd>When searching for a file via the P_SGML_PATH and/or SGML_SEARCH_PATH,
+if the file is not found in any of the paths, then the current working
+directory is searched.
+</dd>
+</dl>
+
+
+
+<dl>
+<dt><strong>Note</strong></dt>
+<dd><p>
+The file specified by
+<a href="#-catalog"><code>-catalog</code></a>
+is read first before any files specified by SGML_CATALOG_FILES.
+</p>
+</dd>
+</dl>
+
+
+<!-- =================================================================== -->
+<!--	@(#)  avail.mod 1.2 97/09/16 @(#)
+  -->
+<hr>
+<h2><a name="availability">Availability</a></h2>
+<p>This software is part of the <em>perlSGML</em> package; see
+(<a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html"
+>http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>)
+</p>
+
+<!--	@(#) author.mod 1.2 97/09/16 15:50:29 @(#)
+  -->
+<hr>
+<h2><a name="author">Author</a></h2>
+<address>
+<a href="http://www.oac.uci.edu/indiv/ehood/">Earl Hood</a><br>
+<a href="mailto:ehood@medusa.acs.uci.edu"
+>ehood@medusa.acs.uci.edu</a><br>
+Copyright &#169; 1997<br>
+</address>
+
+
+<!-- =================================================================== -->
+<hr>
+</body>
+</html>

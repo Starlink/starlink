@@ -1,0 +1,11 @@
+Revision History for sgml.pl
+----------------------------
+	@(#) sgml.pl.CHG @(#)
+==============================================================================
+1.0.0	(Oct 04, 1996)
+
+    Start of history.  1.0.0 is a complete rewrite from 0.x versions.
+    The algorithm used now does not read the entire file into memory.
+
+==============================================================================
+Earl Hood, ehood@medusa.acs.uci.edu

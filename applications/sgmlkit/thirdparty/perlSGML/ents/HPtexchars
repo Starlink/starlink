@@ -1,0 +1,321 @@
+ <!--
+    -   (c) Copyright 1987-1993 Hewlett-Packard Company
+    -
+    -   Permission to use, copy, and distribute this Document Type
+    -   Definition (DTD) is hereby granted, provided that the above
+    -   copyright notice appear in all copies and that both that copyright
+    -   notice and this permission notice appear in supporting hardcopy and
+    -   online documentation.  All other rights reserved.
+    -
+    -   The name of Hewlett-Packard Company or the Hewlett-Packard logo may
+    -   not be used in advertising or publicity pertaining to distribution
+    -   of this DTD without specific, written prior permission.
+    -   Hewlett-Packard Company makes no representations about the
+    -   suitability of this DTD for any purpose.  It is provided "as is"
+    -   without express or implied warranty.
+    -
+    -   Hewlett-Packard disclaims all warranties with regard to this DTD,
+    -   including all implied warranties of merchantability and fitness, in
+    -   no event shall Hewlett-Packard Company be liable for any special,
+    -   indirect or consequential damages or any damages whatsoever
+    -   resulting from loss of use, data or profits, whether in an action
+    -   of contract, negligence or other tortious action, arising out of or
+    -   in connection with the use or performance of this DTD.
+    -->
+
+<!-- Character entity set. Typical invocation:
+ Character entity set. Typical invocation:
+     <!ENTITY % HPtexchars PUBLIC
+       "-//Hewlett-Packard//ENTITIES Texchars//EN">
+     %HPtexchars;
+-->
+
+
+<!--Entities for Standard Greek Characters Lowercase-->
+<!entity alpha SDATA "[alpha]" >
+<!entity beta  SDATA "[beta]" >
+<!entity gamma SDATA "[gamma]" >
+<!entity delta SDATA "[delta]" >
+<!entity epsilon SDATA "[epsilon]" >
+
+<!entity varepsilon SDATA "[varepsilon]" >
+<!entity zeta SDATA "[zeta]" >
+<!entity eta SDATA "[eta]" >
+<!entity theta SDATA "[theta]" >
+<!entity vartheta SDATA "[vartheta]" >
+
+<!entity iota SDATA "[iota]" >
+<!entity kappa SDATA "[kappa]" >
+<!entity lambda SDATA "[lambda]" >
+<!entity mu SDATA "[mu]" >
+<!entity nu SDATA "[nu]" >
+
+<!entity xi SDATA "[xi]" >
+
+<!entity pi SDATA "[pi]" >
+<!entity varpi SDATA "[varpi]" >
+<!entity rho SDATA "[rho]" >
+
+<!entity varrho SDATA "[varrho]" >
+<!entity sigma SDATA "[sigma]" >
+<!entity varsigma SDATA "[varsigma]" >
+<!entity tau SDATA "[tau]" >
+<!entity upsilon SDATA "[upsilon]" >
+
+<!entity phi SDATA "[phi]" >
+<!entity varphi SDATA "[varphi]" >
+<!entity chi SDATA "[chi]" >
+<!entity psi SDATA "[psi]" >
+<!entity omega SDATA "[omega]" >
+
+<!--Entities for Standard Greek Characters Uppercase-->
+<!entity Ugamma SDATA "[Ugamma]" >
+<!entity Udelta  SDATA "[Udelta]" >
+<!entity Utheta SDATA "[Utheta]" >
+<!entity Ulambda SDATA "[Ulambda]" >
+<!entity Uxi SDATA "[Uxi]" >
+
+<!entity Upi SDATA "[Upi]" >
+<!entity Usigma SDATA "[Usigma]" >
+<!entity Uupsilon SDATA "[Uupsilon]" >
+<!entity Uphi SDATA "[Uphi]" >
+<!entity Upsi SDATA "[Upsi]" >
+
+<!entity Uomega SDATA "[Uomega]" >
+
+
+<!--Entities for Calligraphic Letters-->
+<!entity CA SDATA "[CA]" >
+<!entity CB SDATA "[CB]" >
+<!entity CC SDATA "[CC]" >
+<!entity CD SDATA "[CD]" >
+<!entity CE SDATA "[CE]" >
+<!entity CF SDATA "[CF]" >
+<!entity CG SDATA "[CG]" >
+<!entity CH SDATA "[CH]" >
+<!entity CI SDATA "[CI]" >
+<!entity CJ SDATA "[CJ]" >
+<!entity CK SDATA "[CK]" >
+<!entity CL SDATA "[CL]" >
+<!entity CM SDATA "[CM]" >
+<!entity CN SDATA "[CN]" >
+<!entity CO SDATA "[CO]" >
+<!entity CP SDATA "[CP]" >
+<!entity CQ SDATA "[CQ]" >
+<!entity CR SDATA "[CR]" >
+<!entity CS SDATA "[CS]" >
+<!entity CT SDATA "[CT]" >
+<!entity CU SDATA "[CU]" >
+<!entity CV SDATA "[CV]" >
+<!entity CW SDATA "[CW]" >
+<!entity CX SDATA "[CX]" >
+<!entity CY SDATA "[CY]" >
+<!entity CZ SDATA "[CZ]" >
+
+
+<!--Entities for Miscellaneous Symbols-->
+<!entity aleph SDATA "[aleph]" >
+<!entity prime  SDATA "[prime]" >
+<!entity forall SDATA "[forall]" >
+<!entity hbar SDATA "[hbar]" >
+<!entity emptyset SDATA "[emptyset]" >
+
+<!entity exists SDATA "[exists]" >
+<!entity imath SDATA "[imath]" >
+<!entity nabla SDATA "[nabla]" >
+<!entity neg SDATA "[neg]" >
+<!entity jmath SDATA "[jmath]" >
+
+<!entity surd SDATA "[surd]" >
+<!entity flat SDATA "[flat]" >
+<!entity ell SDATA "[ell]" >
+<!entity top SDATA "[top]" >
+<!entity natural SDATA "[natural]" >
+
+<!entity wp SDATA "[wp]" >
+
+<!entity bot SDATA "[bot]" >
+<!entity sharp SDATA "[sharp]" >
+<!entity re SDATA "[re]" >
+
+<!entity vbar SDATA "[vbar]" >
+<!entity clubsuit SDATA "[clubsuit]" >
+<!entity im SDATA "[im]" >
+<!entity angle SDATA "[angle]" >
+<!entity diamondsuit SDATA "[diamondsuit]" >
+
+<!entity partial SDATA "[partial]" >
+<!entity triangle SDATA "[triangle]" >
+<!entity heartsuit SDATA "[heartsuit]" >
+<!entity infty SDATA "[infty]" >
+<!entity backslash SDATA "[backslash]" >
+
+<!entity spadesuit SDATA "[spadesuit]" >
+<!entity S SDATA "[S]" >
+<!entity P SDATA "[P]" >
+
+<!--Entities for Large Operators-->
+<!entity sum  SDATA "[sum]" >
+<!entity bigcap SDATA "[bigcap]" >
+<!entity bigodot SDATA "[bigodot]" >
+<!entity prod  SDATA "[prod]" >
+<!entity bigcup SDATA "[bigcup]" >
+<!entity bigotimes SDATA "[bigotimes]" >
+<!entity coprod  SDATA "[coprod]" >
+<!entity bigsqcup SDATA "[bigsqcup]" >
+<!entity bigoplus SDATA "[bigoplus]" >
+<!entity int  SDATA "[int]" >
+<!entity bigvee SDATA "[bigvee]" >
+<!entity biguplus SDATA "[biguplus]" >
+<!entity oint  SDATA "[oint]" >
+<!entity bigwedge SDATA "[bigwedge]" >
+
+
+<!--Entities for Binary Operators-->
+<!entity cap  SDATA "[cap]" >
+<!entity vee SDATA "[vee]" >
+<!entity mp SDATA "[mp]" >
+<!entity cup SDATA "[cup]" >
+
+<!entity wedge SDATA "[wedge]" >
+<!entity setminus SDATA "[setminus]" >
+<!entity uplus SDATA "[uplus]" >
+<!entity oplus SDATA "[oplus]" >
+<!entity cdot SDATA "[cdot]" >
+
+<!entity sqcap SDATA "[sqcap]" >
+<!entity ominus SDATA "[ominus]" >
+<!entity sqcup SDATA "[sqcup]" >
+<!entity otimes SDATA "[otimes]" >
+
+<!entity ast SDATA "[ast]" >
+<!entity triangleleft SDATA "[triangleleft]" >
+<!entity oslash SDATA "[oslash]" >
+<!entity star SDATA "[star]" >
+
+<!entity triangleright SDATA "[triangleright]" >
+<!entity odot SDATA "[odot]" >
+<!entity diamond SDATA "[diamond]" >
+<!entity wr SDATA "[wr]" >
+<!entity dagger SDATA "[dagger]" >
+
+<!entity circ SDATA "[circ]" >
+<!entity bigcirc SDATA "[bigcirc]" >
+<!entity ddagger SDATA "[ddagger]" >
+<!entity bullet SDATA "[bullet]" >
+<!entity bigtriangleup SDATA "[bigtriangleup]" >
+
+<!entity amalg SDATA "[amalg]" >
+<!entity bigtriangledown SDATA "[bigtriangledown]" >
+
+
+<!--Entities for Relations-->
+<!entity equiv SDATA "[equiv]" >
+<!entity prec SDATA "[prec]" >
+<!entity succ SDATA "[succ]" >
+
+<!entity sim SDATA "[sim]" >
+<!entity preceq SDATA "[preceq]" >
+<!entity succeq SDATA "[succeq]" >
+<!entity simeq SDATA "[simeq]" >
+<!entity ll SDATA "[ll]" >
+
+<!entity gg SDATA "[gg]" >
+<!entity asymp SDATA "[asymp]" >
+<!entity subset SDATA "[subset]" >
+<!entity supset SDATA "[supset]" >
+<!entity approx SDATA "[approx]" >
+
+<!entity subseteq SDATA "[subseteq]" >
+
+<!entity supseteq SDATA "[supseteq]" >
+<!entity cong SDATA "[cong]" >
+<!entity sqsubseteq SDATA "[sqsubseteq]" >
+
+<!entity sqsupseteq SDATA "[sqsupseteq]" >
+<!entity bowtie SDATA "[bowtie]" >
+<!entity in SDATA "[in]" >
+<!entity ni SDATA "[ni]" >
+<!entity propto SDATA "[propto]" >
+
+<!entity vdash SDATA "[vdash]" >
+<!entity dashv SDATA "[dashv]" >
+<!entity models SDATA "[models]" >
+<!entity smile SDATA "[smile]" >
+<!entity mid SDATA "[mid]" >
+
+<!entity doteq SDATA "[doteq]" >
+<!entity frown SDATA "[frown]" >
+<!entity parallel SDATA "[parallel]" >
+<!entity perp SDATA "[perp]" >
+
+
+<!--Entities for Negative Relations--> 
+<!entity not-l SDATA "[not-l]" >
+<!entity not-g  SDATA "[not-g]" >
+<!entity not-eq SDATA "[not-eq]" >
+<!entity not-leq SDATA "[not-leq]" >
+<!entity not-geq SDATA "[not-geq]" >
+
+<!entity not-equiv SDATA "[not-equiv]" >
+<!entity not-prec SDATA "[not-prec]" >
+<!entity not-succ SDATA "[not-succ]" >
+<!entity not-sim SDATA "[not-sim]" >
+<!entity not-preceq SDATA "[not-preceq]" >
+
+<!entity not-succeq SDATA "[not-succeq]" >
+<!entity not-simeq SDATA "[not-simeq]" >
+<!entity not-subset SDATA "[not-subset]" >
+<!entity not-supset SDATA "[not-supset]" >
+<!entity not-approx SDATA "[not-approx]" >
+
+<!entity not-subseteq SDATA "[not-subseteq]" >
+
+<!entity not-supseteq SDATA "[not-supseteq]" >
+<!entity not-cong SDATA "[not-cong]" >
+<!entity not-sqsubseteq SDATA "[not-sqsubseteq]" >
+
+<!entity not-sqsupseteq SDATA "[not-sqsupseteq]" >
+<!entity not-asymp SDATA "[not-asymp]" >
+
+
+<!--Entities for Arrows-->
+<!entity leftarrow SDATA "[leftarrow]" >
+<!entity longleftarrow  SDATA "[longleftarrow]" >
+<!entity uparrow SDATA "[uparrow]" >
+<!entity bigleftarrow SDATA "[bigleftarrow]" >
+<!entity biglongleftarrow SDATA "[biglongleftarrow]" >
+
+<!entity biguparrow SDATA "[biguparrow]" >
+<!entity rightarrow SDATA "[rightarrow]" >
+<!entity longrightarrow SDATA "[longrightarrow]" >
+<!entity downarrow SDATA "[downarrow]" >
+<!entity bigrightarrow SDATA "[bigrightarrow]" >
+
+<!entity biglongrightarrow SDATA "[biglongrightarrow]" >
+<!entity bigdownarrow SDATA "[bigdownarrow]" >
+<!entity leftrightarrow SDATA "[leftrightarrow]" >
+<!entity longleftrightarrow SDATA "[longleftrightarrow]" >
+<!entity updownarrow SDATA "[updownarrow]" >
+
+<!entity bigleftrightarrow SDATA "[bigleftrightarrow]" >
+<!entity biglongleftrightarrow SDATA "[biglongleftrightarrow]" >
+<!entity bigupdownarrow SDATA "[bigupdownarrow]" >
+<!entity mapsto SDATA "[mapsto]" >
+<!entity longmapsto SDATA "[longmapsto]" >
+
+<!entity nearrow SDATA "[nearrow]" >
+<!entity hookleftarrow SDATA "[hookleftarrow]" >
+<!entity hookrightarrow SDATA "[hookrightarrow]" >
+<!entity searrow SDATA "[searrow]" >
+<!entity leftharpoonup SDATA "[leftharpoonup]" >
+
+<!entity rightharpoonup SDATA "[rightharpoonup]" >
+<!entity swarrow SDATA "[swarrow]" >
+<!entity leftharpoondown SDATA "[leftharpoondown]" >
+<!entity rightharpoondown SDATA "[rightharpoondown]" >
+<!entity nwarrow SDATA "[nwarrow]" >
+
+<!entity rightleftharpoons SDATA "[rightleftharpoons]" >
+
+

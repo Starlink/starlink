@@ -1,0 +1,411 @@
+<html>
+<head>
+<title>perlSGML -- SGML::SOCat</title>
+<link rev="made" href="mailto:ehood@medusa.acs.uci.edu">
+</head>
+
+
+<!-- =================================================================== -->
+<hr><h2><a name="Name">Name</a></h2>
+
+<p>SGML::SOCat - SGML Open Catalog parser
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Synopsis">Synopsis</a></h2>
+<pre>
+    use SGML::SOCat;
+    $soc = new SGML::SOCat "catalog";
+    $soc = new SGML::SOCat \*FILEHANDLE;
+</pre>
+or
+<pre>
+    use SGML::SOCat;
+    $soc = new SGML::SOCat;
+    $soc->read_file("catalog");
+    $soc->read_handle(\*FILEHADNLE);
+</pre>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Description">Description</a></h2>
+
+<p><strong>SGML::SOCat</strong> is an SGML Open Catalog (as defined
+by <em>SGML Open Technical Resolution 9401:1995</em> and extensions
+defined in <em>SP</em>).  <strong>SGML::SOCat</strong> is designed
+to be used by an entity manager (like <strong>SGML::EntMan</strong>)
+for resolving external entities.  I.e.  <strong>SGML::SOCat</strong>
+handles the lexical parsing of the catalogs.  It is up to the
+users of the class to define the applicational behavior.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Class_Methods">Class Methods</a></h2>
+ 
+<ul>
+<li><a href="#new">new</a></li>
+</ul>
+ 
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="new">new</a></h3>
+<dl>
+ 
+<dt><tt><strong>new</strong> SGML::SOCat</tt></dt><dd>
+ 
+<p><strong>new</strong> instantiates a new
+<strong>SGML::SOCat</strong> object.  </p>
+ 
+</dl>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Object_Methods">Object Methods</a></h2>
+
+<p>Some methods of <strong>SGML::SOCat</strong> may return the following
+information: <em>base system identifier in effect</em> and/or
+<em>override flag</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base, $override) = $soc->get_public($pubid);
+</pre>
+
+<p>The <em>base system identifier in effect</em> is the base system
+identifier to use if the system identifier is relative.
+</p>
+ 
+<p>The <em>override flag</em> states that the system identifier defined
+in the catalog should override the explicit system identifier
+specified in a document.
+</p>
+
+<p>The following methods are defined:
+</p>
+
+<ul>
+<li><a href="#read_file">read_file</a></li>
+<li><a href="#read_handle">read_handle</a></li>
+</ul>
+<ul>
+<li><a href="#get_delegate">get_delegate</a></li>
+<li><a href="#get_doctype">get_doctype</a></li>
+<li><a href="#get_document">get_document</a></li>
+<li><a href="#get_dtddecl">get_dtddecl</a></li>
+<li><a href="#get_gen_ent">get_gen_ent</a></li>
+<li><a href="#get_linktype">get_linktype</a></li>
+<li><a href="#get_parm_ent">get_parm_ent</a></li>
+<li><a href="#get_public">get_public</a></li>
+<li><a href="#get_sgmldecl">get_sgmldecl</a></li>
+<li><a href="#get_system">get_system</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="read_file">read_file</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>read_file</strong>($file)</tt></dt><dd>
+
+<p><strong>read_file</strong> reads the catalog designated by the filename
+passed in.  A 1 is returned on success, and a 0 on failure.
+</p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="read_handle">read_handle</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>read_handle</strong>(\*FILEHANDLE, $name)</tt></dt><dd>
+
+<p><strong>read_handle</strong> reads the catalog designated by the
+filehandle passed in.  A 1 is returned on success, and a 0 on failure.
+A reference to a filehandle should passed in to avoid problems with
+package scoping.
+</p>
+<p>The second argument is optional.  If specified, it is used
+as the name of the filehandle for error messages.
+</p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_public">get_public</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_public</strong>($pubid)</tt></dt><dd>
+
+<p><strong>get_public</strong> retrieves the sysid public
+identifier.  In a scalar context, 1 is returned if public identifier
+has a mapping to a system identifier, else 0 is returned.  For example:
+</p>
+<pre>
+    if ($soc->get_public($pubid)) {
+	...
+    }
+</pre>
+<p>In an list context, a list of values are returned:
+<em>system identifier</em>, <em>base system identifier in effect</em>,
+and <em>override flag</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base, $override) = $soc->get_public($pubid);
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_gen_ent">get_gen_ent</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_gen_ent</strong>($gen_entity_name)</tt></dt><dd>
+
+<p><strong>get_gen_ent</strong> retrieves the sysid for a <em>general
+entity name</em>.  In a scalar context, the method returns 1 if there
+is a catalog entry for the general entity name, else 0 is returned.
+In a list context, the following list is returned: <em>system
+identifier</em>, <em>base system identifier in effect</em>, and
+<em>override flag</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base, $override) = $soc->get_gen_ent($name);
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_parm_ent">get_parm_ent</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_parm_ent</strong>($parm_entity_name)</tt></dt><dd>
+
+<p><strong>get_parm_ent</strong> retrieves the sysid for a <em>parameter
+entity name</em>.  In a scalar context, the method returns 1 if there
+is a catalog entry for the parameter entity name, else 0 is returned.
+In a list context, the following list is returned: <em>system
+identifier</em>, <em>base system identifier in effect</em>, and
+<em>override flag</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base, $override) = $soc->get_parm_ent($name);
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_doctype">get_doctype</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_doctype</strong>($doc_type_name)</tt></dt><dd>
+
+<p><strong>get_doctype</strong> retrieves the sysid for the entity
+denoted by a <em>document type name</em>.  In a scalar context, the
+method returns 1 if there is a catalog entry for the document type
+name, else 0 is returned.  In a list context, the following list is
+returned: <em>system identifier</em>, <em>base system identifier in
+effect</em>, and <em>override flag</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base, $override) = $soc->get_doctype($name);
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_linktype">get_linktype</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_linktype</strong>($link_type_name)</tt></dt><dd>
+
+<p><strong>get_linktype</strong> retrieves the sysid for the entity
+denoted by a <em>link type name</em>.  In a scalar context, the method
+returns 1 if there is a catalog entry for the link type name, else
+0 is returned.  In a list context, the following list is returned:
+<em>system identifier</em>, <em>base system identifier in effect</em>,
+and <em>override flag</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base, $override) = $soc->get_linktype($name);
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_system">get_system</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_system</strong>($sysid)</tt></dt><dd>
+
+<p><strong>get_system</strong> retrieves the sysid for the entity denoted
+by a <em>system identifier</em>.  In a scalar context, the method
+returns 1 if there is a catalog entry for the system identifier, else
+0 is returned.  In a list context, the following list is returned:
+<em>system identifier</em>, <em>base system identifier in effect</em>,
+and <em>override flag</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base, $override) = $soc->get_system($sysid);
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_sgmldecl">get_sgmldecl</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_sgmldecl</strong>()</tt></dt><dd>
+
+<p><strong>get_sgmldecl</strong> retrieves the sysid for the SGML
+declaration.  In a scalar context, the method returns 1 if there is a
+catalog entry for the SGML declaration, else 0 is returned.  In a list
+context, the following list is returned: <em>system identifier</em>
+and <em>base system identifier in effect</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base) = $soc->get_sgmldecl();
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_dtddecl">get_dtddecl</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_dtddecl</strong>($pubid)</tt></dt><dd>
+
+<p><strong>get_dtddecl</strong> retrieves the sysid for for the SGML
+declaration associated with a doctype external subset <em>public
+indentifier</em>.  In a scalar context, the method returns 1 if there
+is a catalog entry for the public indentifier, else 0 is returned.
+In a list context, the following list is returned: <em>system
+identifier</em> and <em>base system identifier in effect</em>.
+Example:
+</p>
+<pre>
+    ($sysid, $base) = $soc->get_dtddecl($pubid);
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_document">get_document</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_document</strong>()</tt></dt><dd>
+
+<p><strong>get_document</strong> retrieves the sysid for the document
+entity.  In a scalar context, the method returns 1 if there is a
+catalog entry for the document entity, else 0 is returned.  In a list
+context, the following list is returned: <em>system identifier</em>
+and <em>base system identifier in effect</em>.  Example:
+</p>
+<pre>
+    ($sysid, $base) = $soc->get_document();
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_delegate">get_delegate</a></h3>
+<dl>
+
+<dt><tt>$soc-><strong>get_delegate</strong>($pubid)</tt></dt><dd>
+
+<p><strong>get_delegate</strong> checks a public identifier to see if
+a pubid-prefix has been defined that matches the public identifier.
+If so, then a system identifier of a catalog is returned.  The catalog
+should be used to resolve pubids that match the prefix.
+</p>
+
+<p>In a scalar context, the method returns 1 if there is a delegate
+entry for the public identifier, else 0 is returned.  In a list
+context, the following list is returned: <em>system identifier</em> and
+<em>base system identifier in effect</em>.  The system identifier is
+for a catalog that should be used to resolve the public identifier.
+Example:
+</p>
+<pre>
+    ($sysid, $base) = $soc->get_delegate($pubid);
+</pre>
+
+<p>Since <strong>SGML::SOCat</strong> does not automatically open the
+returned catalog to resolve the public identifier, the caller must
+perform that function.  For example:
+</p>
+<pre>
+    ($catalog, $base) = $soc->get_delegate($pubid);
+    <i>## Ignore $base for this example</i>
+    $soc_del = new SGML::SOCat $catalog;
+    ($sysid, $base) = $soc_del->get_delegate($pubid);
+</pre>
+
+<p>See <a href="SGML..EntMan.html"><strong>SGML::EntMan</strong></a>
+for external entity resolution that automatically handles delegations.
+</p>
+
+</dl>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Notes">Notes</a></h2>
+
+<ul>
+
+<li>
+<p>The total maximun number of errors allowed while parsing is
+set by the <tt>$SGML::SOCat::MaxErrs</tt> variable.  The default value
+is 10.
+</p>
+<li>
+<p>If an error occurs during the instantiation of an
+<strong>SGML::SOCat</strong> object (via the <strong>new</strong>
+class method), <tt>undef</tt> is returned.
+</p>
+</ul>
+
+<!-- =================================================================== -->
+<hr><h2><a name="See also">See Also</a></h2>
+
+<p>
+<a href="SGML..EntMan.html"><strong>SGML::EntMan</strong></a>
+</p>
+<p>
+perl(1)
+</p>
+
+<!-- ================================================================== -->
+<!--	@(#)  avail.mod 1.2 97/09/16 @(#)
+  -->
+<hr>
+<h2><a name="availability">Availability</a></h2>
+<p>This software is part of the <em>perlSGML</em> package; see
+(<a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html"
+>http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>)
+</p>
+
+<!--	@(#) author.mod 1.2 97/09/16 15:50:29 @(#)
+  -->
+<hr>
+<h2><a name="author">Author</a></h2>
+<address>
+<a href="http://www.oac.uci.edu/indiv/ehood/">Earl Hood</a><br>
+<a href="mailto:ehood@medusa.acs.uci.edu"
+>ehood@medusa.acs.uci.edu</a><br>
+Copyright &#169; 1997<br>
+</address>
+
+
+<!-- ================================================================== -->
+<hr>
+<address>
+97/09/18 14:32:48
+</address>
+</body></html>

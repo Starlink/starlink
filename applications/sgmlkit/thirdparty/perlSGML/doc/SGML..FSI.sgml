@@ -1,0 +1,164 @@
+<!-- =================================================================== -->
+<!--    @(#) SGML..FSI.sgml 1.2 97/09/18 14:32:44 @(#)
+  -->
+<!-- =================================================================== -->
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN" [
+    <!ENTITY % perlSGML PUBLIC "-//EWH//ENTITIES perlSGML Modules//EN" >
+    %perlSGML;
+]>
+<html>
+<head>
+<title>perlSGML -- SGML::FSI</title>
+<link rev="made" href="mailto:ehood@medusa.acs.uci.edu">
+</head>
+
+
+<hr><h2><a name="Name">Name</a></h2>
+
+<p>SGML::FSI - SGML Formal System Indentifiers</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Synopsis">Synopsis</a></h2>
+<pre>
+  use SGML::FSI;
+  $fh = OpenSysId($sysid, $base)
+</pre>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Description">Description</a></h2>
+
+<p>The <strong>SGML::FSI</strong> module handles Formal System
+Indentifiers.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Exported Routines">Exported Routines</a></h2>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="OpenSysId">OpenSysId</a></h3>
+<pre>
+    $fh = <b>OpenSysId</b>(<var>$sysid</var>, <var>$base</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$sysid</var></dt>
+<dd>System indentifier for the object to be opened.
+</dd>
+<dt><var>$base</var></dt>
+<dd>The base indentifier to use if <var>$sysid</var> is a relative
+system identifier.
+</dd>
+</dl>
+
+<h4>Return:</h4>
+<p>An open filehandle if successful, else <b><tt>undef</tt></b>.
+</p>
+
+<h4>Description:</h4>
+<p><b>OpenSysId</b> open a filehandle to an object denoted
+by a system identifier.
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Export OK Routines">Export OK Routines</a></h2>
+
+<p>The following routines are not automatically exported, but can
+be if specified during the <b>use</b> operation of this module.
+</p>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="ResolveSysId">ResolveSysId</a></h3>
+<pre>
+    $fh = <b>ResolveSysId</b>(<var>$sysid</var>, <var>$base</var>);
+</pre>
+
+<h4>Arguments:</h4>
+<dl>
+<dt><var>$sysid</var></dt>
+<dd>System indentifier to resolve.
+</dd>
+<dt><var>$base</var></dt>
+<dd>The base indentifier to use if <var>$sysid</var> is a relative
+system identifier.
+</dd>
+</dl>
+
+<h4>Return:</h4>
+<p>A resolved system identifier.
+</p>
+
+<h4>Description:</h4>
+<p><b>ResolveSysId</b> returns a resolved system identifier based upon
+system indentifier and its base.  The behavior of this function
+is a follows:
+</p>
+<ol>
+<li>If <var>$sysid</var> is absolute, it is the return value.
+</li>
+<li>If <var>$base</var> is defined, the return value is <var>$base</var>
+    applied to <var>$sysid</var> to for a new sysid.
+</li>
+<li>Else, SGML_SEARCH_PATH envariable is searched
+    for <var>$sysid</var>  If <var>$sysid</var> exists in SGML_SEARCH_PATH,
+    it returns the resolved pathname.  Else, <var>$sysid</var>
+    is returned.
+</li>
+</ol>
+<p>This function appears to be potentially a big noop, but
+is useful for having a base indentifier applied to a relative
+system indentifier and to have it do the SGML_SEARCH_PATH search.
+</p>
+
+<!-- =================================================================== -->
+
+<hr><h2><a name="Notes">Notes</a></h2>
+
+<ul>
+
+<li>
+<p>Currently, this module does not really support FSIs.  The module
+exists to provide a stable(?) interface to resolving sysids to perl
+filehandles.  Someday, FSI support will be added as time permits and
+decent documentation exists.
+</p>
+
+</ul>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Environment Variables">Environment Variables</a></h2>
+
+<table border=0 cellpadding=5>
+
+<tr valign=top>
+<td><strong>SGML_SEARCH_PATH</strong></td>
+<td>List of file system paths to look for system entities for relative
+system identifiers.
+</td>
+</tr>
+
+</table>
+
+<!-- =================================================================== -->
+<hr><h2><a name="See Also">See Also</a></h2>
+
+<p>
+<a href="SGML..EntMan.html"><strong>SGML::EntMan</strong></a>
+</p>
+<p>
+perl(1)
+</p>
+
+<!-- ================================================================== -->
+&avail;
+&author;
+
+<!-- ================================================================== -->
+<hr>
+<address>
+97/09/18 14:32:44
+</address>
+</body></html>

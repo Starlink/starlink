@@ -1,0 +1,122 @@
+#!/usr/local/bin/perl
+##---------------------------------------------------------------------------##
+##  File:
+##      dtd2style
+##  Author:
+##      Earl Hood       ehood@medusa.acs.uci.edu
+##  Description:
+## 	Perl program to create empty EBT stylesheet for DTD.
+##---------------------------------------------------------------------------##
+##  Copyright (C) 1996  Earl Hood, ehood@medusa.acs.uci.edu
+##
+##  This program is free software; you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation; either version 2 of the License, or
+##  (at your option) any later version.
+##  
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##  
+##  You should have received a copy of the GNU General Public License
+##  along with this program; if not, write to the Free Software
+##  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+##  02111-1307, USA.
+##---------------------------------------------------------------------------##
+
+
+package main;
+
+## Store name of program ##
+($PROG = $0) =~ s/.*\///;
+
+$VERSION = "0.2.0";
+
+unshift(@INC, 'lib');
+require "dtd.pl" || die "Unable to require dtd.pl\n";
+require "newgetopt.pl" || die "Unable to require newgetopt.pl\n";
+
+##-------------##
+## Get options ##
+##-------------##
+&Usage() unless
+    &NGetOpt(
+	"catalog=s",
+	"color=s",
+	"dtd=s",
+	"verbose",
+	"help"
+    );
+&Usage() if defined($opt_help);
+
+$COLOR    = ($opt_color ? $opt_color : "");
+$DTDFILE  = ($opt_dtd ? $opt_dtd : "");
+$MAPFILE  = $opt_catalog || "catalog";
+$VERBOSE  = (defined($opt_verbose) ? 1 : 0);
+$STYLE	  = 'STDOUT';
+
+if ($DTDFILE) {
+    open(DTD_FILE, "< $DTDFILE") || die "Unable to open $DTDFILE\n";
+    $DTD = "main'DTD_FILE";
+} else {
+    $DTD = 'STDIN';
+    $DTDFILE = 'DTD';
+}
+&DTDset_verbosity() if $VERBOSE;
+
+##----------##
+## Read DTD ##
+##----------##
+    print STDERR "Reading $MAPFILE ...\n" if $VERBOSE;
+&DTDread_catalog_files($MAPFILE);
+    print STDERR "Finished $MAPFILE ...\n" if $VERBOSE;
+    print STDERR "Reading $DTDFILE ...\n" if $VERBOSE;
+&DTDread_dtd($DTD);
+    print STDERR "Finished $DTDFILE ...\n" if $VERBOSE;
+
+##--------------------##
+## Create stylesheet  ##
+##--------------------##
+print $STYLE "<!-- Stylesheet created by $PROG -->\n\n";
+print $STYLE "<sheet>\n\n";
+foreach $elem (&DTDget_elements()) {
+    ($elemcap = $elem) =~ tr/a-z/A-Z/;
+    print $STYLE qq{<style name="$elemcap">\n};
+    print $STYLE qq{\t<foreground>\t$COLOR\t</>\n}  if $COLOR;
+    print $STYLE qq{</style>\n\n};
+}
+print $STYLE "\n</sheet>\n";
+exit(0);
+
+##---------------------------##
+## Usage description routine ##
+##---------------------------##
+sub Usage {
+    print STDOUT <<EndOfUsage;
+Usage: $PROG [options]
+Options:
+  -color <color>      : Set default foreground color for all styles
+  -dtd <filename>     : Use <filename> as the SGML dtd to parse.  Otherwise
+		        read from standard output.
+  -help		      : Print this usage message.
+  -mapfile <filename> : Use <filename> as entity map file.  Defaults to
+		        "catalog".
+  -verbose	      : Print to standard error what is going on.
+
+Description
+  $PROG creates an empty EBT stylesheet containing all the elements
+  defined in a DTD.  The created stylesheet is printed to standard
+  output.
+
+Version
+  $VERSION
+  dtd.pl: $dtd'VERSION
+
+  Copyright (C) 1996  Earl Hood, ehood\@medusa.acs.uci.edu
+  $PROG comes with ABSOLUTELY NO WARRANTY and $PROG may be copied only
+  under the terms of the GNU General Public License (version 2, or later),
+  which may be found in the distribution.
+EndOfUsage
+    exit(0);
+}

@@ -1,0 +1,120 @@
+<html>
+<head>
+<title>stripsgml 2.0.0</title>
+</head>
+<body>
+
+<!-- =================================================================== -->
+<hr>
+<h1>stripsgml</h1>
+
+<p>Remove SGML markup.
+</p>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p><strong>stripsgml</strong> removes SGML markup tags from a file.
+<strong>stripsgml</strong> also
+attempts to translate standard special character entity references to
+ASCII (or the character set specified by the
+<a href="-charset"><strong>-charset</strong></a> option).
+</p>
+
+<p><strong>stripsgml</strong> cannot handle document type
+declarations.  It only can handle document instances.
+</p>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="usage">Usage</a></h2>
+
+<p><strong>stripsgml</strong> is invoked from the Unix shell as follows:
+</p>
+
+<p><tt>% stripsgml </tt><var>[options]</var><tt> &lt;
+</tt><var>sgmlfile</var><tt> &gt; </tt><var>asciifile</var>
+</p>
+
+<p>The following are the list of options available:
+</p>
+
+<dl>
+
+<dt><a name="-charset"><code>-charset</code> <var>charset</var></a></dt>
+<dd>
+<p>Use <var>charset</var> as the character set to use while processing.
+By default, ASCII is assumed, so entity references for special
+characters and character references are mapped to ASCII text.
+<strong>set_charset</strong> allows the entity references and character
+references to interpreted under a different character set.  Only the
+ISO-8859 character sets (1-10) are supported.
+</p>
+</dd>
+
+<dt><a name="-help"><code>-help</code></a></dt>
+<dd><p>Print out a terse description of all options available.
+</p>
+</dd>
+
+<dt><a name="-html"><code>-html</code></a></dt>
+<dd><p>Cause URLs in anchor elements in an HTML document to be
+preserved in the output.</p>
+</dd>
+
+<dt><a name="-ignore"><code>-ignore</code> <var>name</var></a></dt>
+<dd>
+<p>Set parameter entity with the name, <var>name</var>,
+to "<tt>IGNORE</tt>".  This option may be useful if the input
+data contains marked sections where parameter entity references
+are used to control the status keyword.
+</p>
+<p>This option can be specified multiple times to set multiple
+parameter entities.
+</p>
+</dd>
+
+<dt><a name="-include"><code>-include</code> <var>name</var></a></dt>
+<dd>
+<p>Set parameter entity with the name, <var>name</var>,
+to "<tt>INCLUDE</tt>".  This option may be useful if the input
+data contains marked sections where parameter entity references
+are used to control the status keyword.
+</p>
+<p>This option can be specified multiple times to set multiple
+parameter entities.
+</p>
+</dd>
+
+</dl>
+
+<!-- =================================================================== -->
+<!--	@(#)  avail.mod 1.2 97/09/16 @(#)
+  -->
+<hr>
+<h2><a name="availability">Availability</a></h2>
+<p>This software is part of the <em>perlSGML</em> package; see
+(<a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html"
+>http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>)
+</p>
+
+<!--	@(#) author.mod 1.2 97/09/16 15:50:29 @(#)
+  -->
+<hr>
+<h2><a name="author">Author</a></h2>
+<address>
+<a href="http://www.oac.uci.edu/indiv/ehood/">Earl Hood</a><br>
+<a href="mailto:ehood@medusa.acs.uci.edu"
+>ehood@medusa.acs.uci.edu</a><br>
+Copyright &#169; 1997<br>
+</address>
+
+
+<!-- =================================================================== -->
+<hr>
+<address>
+97/09/12 20:13:17
+</address>
+</body>
+</html>

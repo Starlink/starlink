@@ -1,0 +1,44 @@
+241chg.txt
+
+Following are the changes made to DocBook V2.4 to create V2.4.1:
+
+Version update
+==============
+o In all modules, the version number has been updated in the header
+  comments, FPI instructions, DTD module entity declarations, and
+  catalog entries.  (Note that dbgenent.mod does not mention a version
+  number since it is expected to be edited by users.)
+
+Substantive changes (bug fixes)
+===============================
+o In docbook.dtd, three notation declarations (EQN, PIC, and TBL) have
+  been changed to have null system IDs because the original identifiers
+  were formed as approximate public IDs, not system IDs (and because
+  they contained an ampersand, they were not valid FPIs either).  We are
+  investigating whether there are proper formal public IDs for these
+  notations.
+
+o In dbpool.mod:
+
+  - The %vendor.attrib; entity containing the Vendor effectivity
+    attribute (new in V2.4) has been added to %effectivity.attrib; in
+    order to make the attribute available for use.
+
+  - The MenuChoice element (new in V2.4) has been added to
+    %cptr.char.class; in order to make the element available for use.
+
+  - The content model of Shortcut (used inside MenuChoice) was changed
+    to match that of the new KeyCombo element, as its original design
+    intended.
+
+  - The Option element was added to the content model of Group in
+    CmdSynopsis to bring the model up to what the documentation
+    (correctly) describes.
+
+Editorial changes
+=================
+o The copyright statement has been updated to help ensure continued free
+  access to DocBook files by users.
+
+o Spelling in comments was fixed, and comments explaining some attributes
+  were clarified.

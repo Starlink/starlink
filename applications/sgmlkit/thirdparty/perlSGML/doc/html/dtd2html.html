@@ -1,0 +1,1277 @@
+<html>
+<head>
+<title>dtd2html 1.5.1</title>
+</head>
+<body>
+
+<!-- =================================================================== -->
+<hr>
+<h1>dtd2html</h1>
+
+<p><code>dtd2html</code> is a
+<a href="http://perl.com/perl/">Perl</a>
+program that generates an
+<a href="http://www.w3.org/hypertext/WWW/MarkUp/MarkUp.html">HTML</a>
+document that documents an
+<a href="http://www.sil.org/sgml/sgml.html">SGML</a>
+<em>document type definition</em> (DTD)
+and allows hypertext navigation of an SGML DTD.
+</p>
+
+<p>Contents:</p>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#filedesc">HTML File Descriptions</a></li>
+<li><a href="#elemdescfile">Description File</a></li>
+<li><a href="#qrefmode">Quick Reference Mode</a></li>
+<li><a href="#updateelemdesc">Updating Description File</a></li>
+<li><a href="#resolving">Resolving External Entities</a></li>
+<li><a href="#availability">Availability</a></li>
+<li><a href="#author">Author</a></li>
+</ul>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="overview">Overview</a></h2>
+
+<p><code>dtd2html</code> generates various HTML files for hypertext
+navigation of an SGML DTD. The files generated are as follows:
+</p>
+
+<dl>
+<dt><code>DTD-HOME.html</code></dt>
+<dd><p>File is the home page of the HTML document. This file
+contains the basic links to start navigating through the
+DTD. The name of this file can be changed with the
+<a href="#-homefile"><code>-homefile</code></a>
+option. User text may be added to this page via the
+<a href="#elemdescfile">Description File</a>.</p>
+</dd>
+<dt><code>TOP-ELEM.html</code></dt>
+<dd><p>This file lists the top-most elements of the DTD, and contains
+the links to element pages describing each top-most element.
+The name of this file can be changed with the
+<a href="#-topfile"><code>-topfile</code></a>
+option.</p>
+</dd>
+<dt><code>ALL-ELEM.html</code></dt>
+<dd><p>This file contains a list of all elements defined in the DTD.
+This page allows quick access to any individual element
+description page. The name of this file can be changed with the
+<a href="#-allfile"><code>-allfile</code></a>
+option.</p>
+</dd>
+<dt><code>ENTS.html</code> <var>(Optional)</var></dt>
+<dd><p>File contains a list of general entities defined in the DTD.
+This file is only generated if the
+<a href="#-ents"><code>-ents</code></a>
+option is specified during program invocation.
+The name of this file can be changed with the
+<a href="#-entfile"><code>-entfile</code></a> option.</p>
+</dd>
+<dt><code>DTD-TREE.html</code> <var>(Optional)</var></dt>
+<dd><p>File contains the content heierachy tree(s) of
+the top-most element(s) in the DTD. This file is only generated
+if the
+<a href="#-tree"><code>-tree</code></a>
+option is specified during program invocation. The
+name of this file can be changed with the
+<a href="#-treefile"><code>-treefile</code></a>
+option.</p>
+</dd>
+<dt><var>element</var><code>.html</code></dt>
+<dd><p>For each element defined in the DTD, an element description
+file is generated with a filename of the element name suffixed
+by ".html". User text may be added to this page via the
+<a href="#elemdescfile">Description File</a>.</p>
+</dd>
+<dt><var>element</var><code>.attr.html</code></dt>
+<dd><p>For each element defined in the DTD, a file is generated
+describing the attributes defined for the element. User text
+may be added to this page via the
+<a href="#elemdescfile">Description File</a>.</p>
+</dd>
+<dt><var>element</var><code>.cont.html</code></dt>
+<dd><p>For each element defined in the DTD, a file is generated
+listing the content model decleration of the element as
+declared in the DTD.</p>
+</dd>
+</dl>
+
+<p>Once all the files are generated, one needs only to create a link in
+the Web server being used to the
+<a href="#dtd-homepage">DTD-HOME</a>
+page.
+</p>
+
+<dl>
+<dt>Note</dt>
+<dd>If you have a Web client that can load local files, than
+linking the DTD-HOME page to the Web server is unnecessary.
+</dd>
+</dl>
+<p>More information on the content of each file is in the
+<a href="#filedesc">HTML File Descriptions</a> section.
+</p> 
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="usage">Usage</a></h2>
+
+<p><code>dtd2html</code> is invoked from a command-line shell, with the
+following syntax:
+</p>
+
+<p><tt>% dtd2html </tt><var>[options]</var><tt> </tt><var>filename</var></p>
+
+<p><var>filename</var> is the SGML DTD to be parsed for generating
+the HTML files.  The following is the list of options available:
+</p>
+
+<dl>
+
+<dt><a name="-allfile"><code>-allfile</code> <var>filename</var></a></dt>
+<dd><p>Set the filename for file listing all elements in the DTD to
+filename. The default name is "<code>ALL-ELEM.html</code>".
+</p>
+</dd>
+
+<!--	@(#)  catopt.mod 1.1 96/09/30 @(#)
+  -->
+<dt><a name="-catalog"><code>-catalog</code> <var>filename</var></a></dt>
+<dd><p>Use <var>filename</var> as the file for mapping public
+identifiers and external entities to system files.  If
+<code>-catalog</code> is not specified, "<code>catalog</code>" is
+used as the default filename.
+See
+<a href="#resolving">Resolving External Entities</a> for more
+information.
+</p>
+</dd>
+
+
+<dt><a name="-contnosort"><code>-contnosort</code></a></dt>
+<dd><p>The base content list of the <var>element</var>.html page
+is listed as declared in the content model declaration.  Normally,
+the elements are listed in sorted order and with no group delimiters,
+group connectors, or occurance indicators.
+</p>
+</dd>
+
+<dt><a name="-descfile"><code>-descfile</code> <var>filename</var></a></dt>
+<dd><p>Use <var>filename</var> as the source for element descriptions
+in the DTD.  If this argument is not specified, no description file is used.
+See <a href="#elemdescfile">Description File</a>
+for more information.
+</p>
+</dd>
+
+<dt><a name="-docurl"><code>-docurl</code> <var>URL</var></a></dt>
+<dd><p>Use <var>URL</var> for location of documentation on
+<code>dtd2html</code>. The default
+URL is "<code>http://www.oac.uci.edu/indiv/ehood/dtd2html.html</code>".
+</p>
+</dd>
+
+<dt><a name="-dtdname"><code>-dtdname</code> <var>string</var></a></dt>
+<dd><p>Set the name of the DTD to <var>string</var>. If not specified,
+<code>dtd2html</code> determines the name of the DTD by its filename with the
+extension stripped off. If reading from standard input, then
+this argument should be specified. Otherwise, "Unknown" is
+used. The string " DTD" will be appended to the name of the
+DTD. If the <a href="#-qref"><code>-qref</code></a>
+option is specified, then the string " DTD Quick Reference"
+is appended to represent the title of the quick reference document.
+</p>
+</dd>
+
+<dt><a name="-elemlist"><code>-elemlist</code></a></dt>
+<dd><p>Generate a blank description file 
+to standard output.  See
+<a href="#elemdescfile">Description File</a>
+for more information.
+</p>
+</dd>
+
+<dt><a name="-ents"><code>-ents</code></a></dt>
+<dd><p>Generate a general entities page.  The general entities types
+listed are: replaceable character data, CDATA, SDATA, and PI (processing
+instruction). <em>Note</em>: For large DTDs, this list may be quite large and
+provide little usefulness to the document.
+</p>
+</dd>
+
+<dt><a name="-entsfile"><code>-entsfile</code> <var>filename</var></a></dt>
+<dd><p>Set the filename for the general entities page to
+<var>filename</var>. The default name is "<code>ENTS.html"</code>.
+</p>
+</dd>
+
+<dt><a name="-entslist"><code>-entslist</code></a></dt>
+<dd><p>Generate a blank description file
+to standard output containing <strong>ONLY</strong> general entity
+entries.  This differs from
+<a href="#-elemlist"><code>-elemlist</code></a>
+is that
+<a href="#-elemlist"><code>-elemlist</code></a>
+outputs <strong>ONLY</strong> entries for elements and attributes.
+See
+<a href="#elemdescfile">Description File</a>
+for more information.
+</p>
+</dd>
+
+<dt><a name="-help"><code>-help</code></a></dt>
+<dd><p>Print out a terse description of all options available. No HTML
+files are generated and all other options are ignored when this
+option is specified.
+</p>
+</dd>
+
+<dt><a name="-homefile"><code>-homefile</code> <var>filename</var></a></dt>
+<dd><p>Set the filename for the HTML home page for the DTD to
+<var>filename</var>. The default name is "<code>DTD-HOME.html"</code>.
+</p>
+</dd>
+
+<dt><a name="-keepold"><code>-keepold</code></a></dt>
+<dd><p>This option is only valid if
+<a href="#-updateel"><code>-updateel</code></a> is specified. This
+option tells <code>dtd2html</code> to preserve any old descriptions when
+updating an description file.
+</p>
+</dd>
+
+<dt><a name="-level"><code>-level</code> <var>#</var></a></dt>
+<dd><p>Set the prune level of the content hierachy tree to
+<var>#</var>. This option is only valid if
+<a href="#-tree"><code>-tree</code></a> is specified.
+</p>
+</dd>
+
+<dt><a name="-modelwidth"><code>-modelwidth</code> <var>#</var></a></dt>
+<dd><p>Set the maximum output width for content model declarations to
+<var>#</var> for <var>element</var><code>.cont.html</code> pages.
+Default value is 65.
+</p>
+</dd>
+
+<dt><a name="-nodocurl"><code>-nodocurl</code></a></dt>
+<dd><p>Do not insert hyperlink to <code>dtd2html</code> documentation in the
+DTD-HOME page.
+</p>
+</dd>
+
+<dt><a name="-noreport"><code>-noreport</code></a></dt>
+<dd><p>This option is only valid if
+<a href="#-updateel"><code>-updateel</code></a> is specified. This
+options tells <code>dtd2html</code> to not output a report when updating an
+description file.
+</p>
+</dd>
+
+<dt><a name="-outdir"><code>-outdir</code> <var>path</var></a></dt>
+<dd><p>Set destination of generated HTML files to path. Defaults to
+the current working directory.
+</p>
+</dd>
+
+<dt><a name="-qref"><code>-qref</code></a></dt>
+<dd><p>Output a quick reference document of the DTD. The document is
+outputted to standard output (STDOUT). When this option is
+specified, only the quick reference document is generated.
+Therefore, the tree page and the
+<a href="#-outdir"><code>-outdir</code></a>
+options are ignored.  See
+<a href="#qrefmode">Quick Reference Mode</a>
+for more information on the <code>-qref</code> option.
+</p>
+</dd>
+
+<dt><a name="-qrefdl"><code>-qrefdl</code></a></dt>
+<dd><p>Output a quick reference document of the DTD using the &lt;DL&gt;,
+definition list, HTML tag. When this option is specified,
+only the quick reference document is generated. Therefore, the
+tree page and the
+<a href="#-outdir"><code>-outdir</code></a>
+options are ignored. See
+<a href="#qrefmode">Quick Reference Mode</a>
+for more information. This option overrides the
+behavior of the
+<a href="#-qref"><code>-qref</code></a>
+option.
+</p>
+</dd>
+
+<dt><a name="-qrefhtag"><code>-qrefhtag</code> <var>htag</var></a></dt>
+<dd><p>Use <var>htag</var> as the header tag for the element names when the
+<a href="#-qref"><code>-qref</code></a>
+option is specified. Defaults to '&lt;H2&gt;'.
+</p>
+</dd>
+
+<dt><a name="-reportonly"><code>-reportonly</code></a>
+<dd><p>This option is only valid if
+<a href="#-updateel"><code>-updateel</code></a>
+is specified. This
+options tells <code>dtd2html</code> to generate only a report when the
+<a href="#-updateel"><code>-updateel</code></a>
+option is specified.
+</p>
+</dd>
+
+<dt><a name="-topfile"><code>-topfile</code> <var>filename</var></a></dt>
+<dd><p>Set the filename for file listing the top-most elements in the
+DTD to <var>filename</var>. The default name is
+"<code>TOP-ELEM.html</code>".
+</p>
+</dd>
+
+<dt><a name="-tree"><code>-tree</code></a>
+<dd><p>Generate the content hierarchy of the top-most elements defined
+in the DTD.
+</p>
+</dd>
+
+<dt><a name="-treelink"><code>-treelink</code></a>
+<dd><p>Create anchor in HTML pages to the tree page, even if
+<a href="#-tree"><code>-tree</code></a>
+is not specified.
+</p>
+</dd>
+
+<dt><a name="-treefile"><code>-treefile</code> <var>filename</var></a></dt>
+<dd><p>Set the filename for file containing the content hierarchy
+tree(s) of the DTD to <var>filename</var>. The default name is
+"<code>DTD-TREE.html</code>". This option is only valid if
+<a href="#-tree"><code>-tree</code></a>
+is specified.
+</p>
+</dd>
+
+<dt><a name="-treeonly"><code>-treeonly</code></a>
+<dd><p>Create only the tree page. This option implies
+<a href="#-tree"><code>-tree</code></a>.
+</p>
+</dd>
+
+<dt><a name="-treetop"><code>-treetop</code> <var>string</var></a></dt>
+<dd><p>Set the top-most elements to <var>string</var>. String is a comma
+separated list of elements that <code>dtd2html</code> should treat as the
+top-most elements when printing the content hierarchy tree(s),
+and/or which elements get listed in the TOP-ELEM page.
+Normally, <code>dtd2html</code> will compute what are the top-most elements
+of the DTD. This option overrides that computation.
+</p>
+</dd>
+
+<dt><a name="-updateel"><code>-updateel</code> <var>file</var></a></dt>
+<dd><p>Perform an update of the description file specified by
+<var>file</var>. This option allows one to update an element description
+to contain any new elements/attributes that have been added to
+the DTD without affecting element descriptions already defined.
+See
+<a href="#updateelemdesc">Updating Description File</a>
+for more information.
+</p>
+</dd>
+
+<dt><a name="-verbose"><code>-verbose</code></a>
+<dd><p>Print status messages to standard error on what <code>dtd2html</code> is
+doing. This
+option generates much output, and is used mainly for debugging
+purposes.
+</p>
+</dd>
+</dl>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="filedesc">HTML File Descriptions</a></h2>
+
+<p>All HTML files/pages generated contain hypertext links at the end of
+the page to the
+<a href="#dtd-homepage">DTD-HOME</a>,
+<a href="#top-elempage">TOP-ELEM</a>,
+<a href="#all-elempage">ALL-ELEM</a>,
+<a href="#entspage">ENTS</a>
+(optional),
+and
+<a href="#dtd-treepage">DTD-TREE</a>
+(optional)
+pages, unless stated otherwise.
+</p>
+
+<h3><a name="dtd-homepage">DTD-HOME</a></h3>
+
+<p>This page is the root of the HTML document. It contains the links to
+the other main pages as described above.
+</p>
+
+<p>One can add documentation to the home page via the
+<a href="#elemdescfile">Description File</a>
+or by manually editting the file.
+</p>
+
+<h3><a name="top-elempage">TOP-ELEM</a></h3>
+
+<p>This page contains the list of all top-most elements defined in the
+DTD. A top-most element is defined as: <em>An element which cannot be
+contained by another element or can be only contained by itself.</em>
+</p>
+
+<h3><a name="all-elempage">ALL-ELEM</a></h3>
+
+<p>This page contains an alphabetic list of all elements defined in the
+DTD.
+</p>
+
+<h3><a name="entspage">ENTS</a></h3>
+
+<p>This page contains an alphabetic list of
+of general entities defined in the DTD. The general entities types
+listed are: replaceable character data, CDATA, SDATA, and PI (processing
+instruction). <em>Note</em>: For large DTDs, this list may be quite large and
+provide little usefulness to the document.
+Also, entities are not handled when
+<a href="#updateelemdesc">updating a description file</a>.
+</p>
+
+<h3><a name="dtd-treepage">DTD-TREE</a></h3>
+
+<p>This page contains the content hierarchy tree(s) of the top-most
+elements of the DTD.  The maximum depth of the tree can be set
+via the
+<a name="#-level"><code>-level</code></a>
+command-line option.
+</p>
+<!--	@(#)  tree.mod 1.3 96/10/06 @(#)
+  -->
+
+<p>The tree shows the overall content hierarchy for an element.
+Content hierarchies of descendents will also be shown.  Elements that
+exist at a higher (or equal) level, or if the maximum depth has been
+reached, are pruned.  The string "<code>...</code>" is appended to an
+element if it has been pruned due to pre-existance at a higher (or
+equal) level.  The content of the pruned element can be determined
+by searching for the complete tree of the element (ie. elements w/o
+"<code>...</code>").  Elements pruned because maximum depth has been
+reached will not have "<code>...</code>" appended.
+
+</p>
+
+<p>Example:
+</p>
+
+<pre>
+     |__section+)
+         |_(effect?, ...
+         |__title, ...
+         |__toc?, ...
+         |__epc-fig*,
+         |   |_(effect?, ...
+         |   |__figure,
+         |   |   |_(effect?, ...
+         |   |   |__title, ...
+         |   |   |__graphic+, ...
+         |   |   |__assoc-text?)
+</pre>
+
+<dl>
+<dt><strong>Note</strong></dt>
+<dd><p>Pruning must be done to avoid a combinatorical explosion.
+It is common for DTD's to define content hierarchies of infinite
+depth.  Even with a predefined maximum depth, the generated tree
+can become very large.
+</p>
+</dd>
+</dl>
+
+<p>Since the tree outputed is static, the inclusion and exclusion sets
+of elements are treated specially. Inclusion and exclusion elements
+inherited from ancestors are not propagated down to determine
+what elements are printed, but special markup is presented at a
+given element if there exists inclusion and exclusion elements from
+ancestors. The reason inclusions and exclusions are not propagated down
+is because of the pruning done. Since an element may occur in multiple
+contexts -- and have different ancestoral inclusions and exclusions in
+effect -- an element without "<code>...</code>" may be the only place
+of reference to see the content hierarchy of the element.
+
+</p>
+
+<p>Example:</p>
+
+<pre>
+    D1
+     |  {+} idx needbegin needend newline
+     | 
+     |_(head,
+     |   | {A+} idx needbegin needend newline
+     |   |  {-} needbegin needend
+     |   | 
+     |   |_(((#PCDATA |
+     |   |____((acro |
+     |   |       | {A+} idx needbegin needend newline
+     |   |       | {A-} needbegin needend
+     |   |       | 
+     |   |       |_(((#PCDATA |
+     |   |       |____((super | ...
+     |   |       |______sub)))*)) ...
+</pre>
+
+<p>Ignoring the lines starting with {}'s, one gets the content
+hierachy of an element as defined by the DTD without concern of where
+it may occur in the overall structure. The {} lines give additional
+information regarding the element with respect to its existance
+within a specific context. For example, when an <code>ACRO</code>
+element occurs within <code>D1,HEAD</code> -- along with its normal
+content -- it can contain <code>IDX</code> and <code>NEWLINE</code>
+elements due to inclusions from ancestors. However, it cannot contain
+<code>NEEDBEGIN</code> and <code>NEEDEND</code> regardless of its
+defined content since an ancestor(s) excludes them.
+
+</p>
+
+<dl>
+<dt><strong>Note</strong></dt>
+<dd>Exclusions override inclusions. If an element occurs in an
+inclusion set and an exclusion set, the exclusion takes
+precedence. Therefore, in the above example, <code>NEEDBEGIN</code>, 
+<code>NEEDEND</code> are excluded from <code>ACRO</code>.</dd>
+</dl>
+
+<p>Explanation of {}'s keys:
+</p>
+<dl>
+<dt><code>{+}</code></dt>
+<dd>The list of inclusion elements defined by the current element.
+Since this is part of the content model of the element, the
+inclusion subelements are printed as part of the content
+hierarchy of the current element after the base content model.
+Subelements that are inclusions will have <code>{+}</code> appended
+to the subelement entry.
+</dd>
+<dt><code>{A+}</code></dt>
+<dd>The list of inclusion elements due to ancestors. This is listed
+as reference to determine the content of an element within a
+given context. None of the ancestoral inclusion elements are
+printed as part of the content hierarchy of the element. 
+</dd>
+<dt><code>{-}</code></dt>
+<dd>The list of exclusion elements defined by the current
+element. Since this is part of the content model of the
+element, any subelement in the content model that would be
+excluded will have <code>{-}</code> appended to the subelement
+listing.
+</dd>
+<dt><code>{A-}</code></dt>
+<dd>The list of exclusion elements due to ancestors. This is listed
+as reference to determine the content of an element within a
+given context. None of the ancestoral exclusion elements
+have any effect on the printing of the content hierarchy of
+the current element.
+</dd>
+</dl>
+
+
+<h3><a name="elementpage">element</a></h3>
+
+<p>The <var>element</var> page describes the content of element. The
+element page is divided into the following sections:
+</p>
+
+<ul>
+<li>Element description (optional, see
+<a href="#elemdescfile">Description File</a>).
+<li>Links to subelements broken into three parts:
+<ul>
+<li>Base content
+<li>Inclusions (if defined)
+<li>Exclusions (if defined)
+</ul>
+<li>Links to element's
+<a href="#element.attrpage">attribute</a>
+and
+<a href="#element.attrpage">content declaration</a>
+pages.
+<li>Tag minimization (if defined).
+<li>Links to all possible parent elements.
+<li>Links to main pages as described above. However, the link to the
+<a href="#dtd-treepage">DTD-TREE</a>
+goes to the complete element entry in the tree.
+</ul>
+
+<h3><a name="element.attrpage">element.attr</a></h3>
+
+<p>The <var>element</var>.attr page describes the attributes of element.
+The element.attr page is divided into the following sections:
+</p>
+
+<ul>
+<li>Attribute description (optional, see
+<a href="#elemdescfile">Description File</a>).
+<li>List of attributes with possible values and default value.
+<li>Link back to
+<a href="#elementpage">element</a>
+page.
+</ul>
+
+<p>This page is not created if no attributes are defined for element.
+</p>
+
+<h3><a name="element.contpage">element.cont</a></h3>
+
+<p>The <var>element</var>.cont page gives the element's content model
+decleration as defined in the DTD. The element.cont page is divided
+into the following sections:
+</p>
+
+<ul>
+<li>Base content decleration.
+<li>Inclusion content decleration (if defined).
+<li>Exclusion content decleration (if defined).
+<li>Link back to
+<a href="#elementpage">element</a>
+page.
+</ul>
+
+<p>The content models are reformatted to allow better readability.
+The maximum width to use when reformating is set by the
+<a href="#-modelwidth"><code>-modelwidth</code></a>
+option.  Each element listed in the content model is a hyperlink
+to that element's page.
+</p>
+
+<p>Here's an example of how
+<code>dtd2html</code>
+formats content model declarations:
+</p>
+
+<pre>
+    (((#PCDATA|
+       ((acro|book|emph|location|not|parm|term|var))|
+       ((super|sub))|
+       ((link|xref))|
+       ((computer|cursor|display|keycap|softkey|user))|
+       ((footnote|ineqn|ingraphic|fillin))|
+       ((nobreak)))*))
+</pre>
+
+<p>This page is not created if element is defined with empty content.
+</p>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="elemdescfile">Description File</a></h2>
+
+<p><code>dtd2html</code> supports the ability to add documentation
+to the HTML files
+generated from a DTD through the
+<a href="#-descfile">-descfile</a>
+option. Documentation can
+be added to the
+<a href="#elementpage">element pages</a>,
+the
+<a href="#element.attrpage">attribute pages</a>,
+and/or
+<a href="#entspage">ents page</a>.
+</p>
+
+<h3>Basic Syntax</h3>
+<p>The basic syntax of the description file is as follows:
+
+</p>
+<pre>
+    &lt;?DTD2HTML <var>identifier</var>&gt;
+    &lt;P&gt;
+    Description of identifier here.
+    &lt;/P&gt;
+    &lt;?DTD2HTML <var>identifier</var>&gt;
+    &lt;P&gt;
+    Description of identifier here.
+    &lt;/P&gt;
+    ...
+</pre>
+
+<p>The line <code>&lt;?DTD2HTML <var>identifier</var>&gt;</code>
+signifies the beginning of a description entry for <var>identifier</var>.
+All text up to the next
+<code>&lt;?DTD2HTML <var>...</var>&gt;</code>
+instruction or end-of-file is used as the identifier description.
+</p>
+
+<p>The identifier can be one of the following formats:
+</p>
+
+<dl>
+
+<dt><var>element</var></dt>
+<dd><p>An element name in the DTD. The following description text will
+go at the top of the element's page.
+</p>
+</dd>
+
+<dt><var>element</var><code>*</code></dt>
+<dd><p>An element in the DTD followed by a `<code>*</code>'. The following
+description text will go at the top of the element's attribute
+page.
+</p>
+</dd>
+
+<dt><var>element</var><code>*</code><var>attribute</var></dt>
+<dd><p>An element in the DTD followed by a `*' which is followed by an
+attribute name of the element. The following description text
+will go below the attribute heading of the element's attribute
+page.
+</p>
+</dd>
+
+<dt><var>element</var><code>+</code></dt>
+<dd><p>An element in the DTD followed by a '<code>+</code>'. The following
+description text goes after each elements listed in
+<a href="#all-elempage">ALL-ELEM</a>
+and in
+<a href="#elementpage">element pages</a>.
+Due to the context that
+the description text will appear (ie. inside a &lt;LI&gt; element),
+it is best to keep the description to a single sentence.
+</p>
+</dd>
+
+<dt><code>*</code><var>attribute</var></dt>
+<dd><p>A `<code>*</code>' followed by an attribute name.
+The following description
+text will go to any attribute named attribute, unless a
+specific description is given to the attribute via an
+<var>element</var><code>*</code><var>attribute</var>.
+This identifier allows to add descriptions
+to commonly shared attributes in one locale.
+</p>
+</dd>
+
+<dt><var>entity</var><code>&amp;</code></dt>
+<dd><p>A general entity followed by a '<code>&amp;</code>'.
+The following description text will go after each entity listed in
+the ENTS page.
+Due to the context that
+the description text will appear (ie. inside a &lt;LI&gt; element),
+it is best to keep the description to a single sentence.
+</p>
+</dd>
+
+<dt><var>identifier</var><code>,</code><var>identifier</var><code>,</code>...
+</dt>
+<dd><p>A sequence of identifiers separated by commas, `,'. This allows
+a description to be shared among muliple identifiers.
+<em>Note</em>: there should be <strong>NO</strong>
+whitespace between the identifiers and the commas.
+</p>
+</dd>
+
+</dl>
+
+<p>If the special element, <code>-HOME-</code>, is specified in the
+description file, then its description text will be put on the
+<a href="#dtd-homepage">DTD-HOME</a>
+page.
+</p>
+
+<h3>Special Instructions</h3>
+
+<p><code>dtd2html</code> provides special instructions that may be
+used in a description file to control how <code>dtd2html</code>
+processes the file.
+</p>
+
+<p>Special instructions follow a similiar syntax as descriptive
+instructions:
+<pre>
+    &lt;?DTD2HTML #<var>instruction</var> <var>argument</var>&gt;
+</pre>
+
+<p>The following special instructions are defined:
+</p>
+
+<dl>
+
+<dt><code>#include </code><var>argument</var></dt>
+<dd><p>The <code>include</code> directive tells <code>dtd2html</code>
+to treat the <var>argument</var> as a filename to read that contains
+description entries.  Example:
+</p>
+
+<pre>
+    &lt;?DTD2HTML #include ents.dsc&gt;
+</pre>
+
+<p>The example instructs <code>dtd2html</code> to open a file called
+<code>ents.dsc</code> and read it for description entries.
+</p>
+</dd>
+
+</dl>
+
+<h3>Comments</h3>
+
+<p>SGML comments are also supported in the description file. Comments are
+skipped by <code>dtd2html</code>. The syntax for a comment is the following:
+</p>
+
+<pre>
+    &lt;!-- This is a comment --&gt;
+</pre>
+
+<dl>
+<dt><strong>WARNING</strong></dt>
+<dd><p><code>dtd2html</code> can only handle a comment that
+spans a single line (to
+make the parsing simple). Therefore, the following will cause
+<code>dtd2html</code> to add the comment text beyond the first line of the
+comment to an indentifier's description:
+</p>
+
+<pre>
+    &lt;!-- This is a comment
+         that spans more than one line.
+      --&gt;
+</pre>
+
+<p>If you want to put line breaks in the description file without them
+being applied to an indentifier's description, then use the SGML short
+comment: <code>&lt;!&gt;</code>.
+</p>
+
+</dd>
+</dl>
+
+<h3>Example</h3>
+
+<pre>
+&lt;!-- Include external descriptions --&gt;
+&lt;!&gt;
+&lt;?DTD2HTML #include ents.dsc&gt;
+&lt;!&gt;
+&lt;!-- A short description --&gt;
+&lt;!&gt;
+&lt;?DTD2HTML a+ &gt;
+Anchor; source and/or destination of a link
+&lt;!&gt;
+&lt;!-- A shared description --&gt;
+&lt;!&gt;
+&lt;?DTD2HTML h1,h2,h3,h4,h5,h6 &gt;
+&lt;p&gt;
+The six heading elements,
+&lt;H1&gt; through &lt;H6&gt;, denote section headings.
+Although the order and occurrence of headings is not constrained by
+the HTML DTD, documents should not skip levels (for example, from H1
+to H3), as converting such documents to other representations is
+often problematic.
+&lt;/p&gt;
+&lt;!&gt;
+&lt;!-- Element and attribute descriptions --&gt;
+&lt;!&gt;
+&lt;?DTD2HTML a &gt;
+&lt;p&gt;
+The &amp;lt;A&amp;gt; element indicates a hyperlink anchor.
+At least one of the NAME and HREF attributes should be present.
+&lt;/p&gt;
+&lt;?DTD2HTML a* &gt;
+&lt;?DTD2HTML a*href &gt;
+&lt;p&gt;
+Gives the URI of the head anchor of a hyperlink.
+&lt;/p&gt;
+&lt;?DTD2HTML a*methods &gt;
+&lt;p&gt;
+Specifies methods to be used in accessing the
+destination, as a whitespace-separated list of names.
+The set of applicable names is a function of the scheme
+of the URI in the HREF attribute. For similar reasons as
+for the &lt;a href="title.html"&gt;TITLE&lt;/a&gt;
+attribute, it may be useful to include the
+information in advance in the link. For example, the
+HTML user agent may chose a different rendering as a
+function of the methods allowed; for example, something
+that is searchable may get a different icon.
+&lt;/p&gt;
+</pre>   
+
+<h3>Description File Notes</h3>
+
+<ul>
+<li><p><code>dtd2html</code> ignores element descriptions that
+are empty or contain only the &lt;P&gt; tag.
+</p></li>
+<li><p>If duplicate descriptions exist, the first one defined is used (In
+versions prior to 1.3.0, it was the last description defined that
+was used).
+</p></li>
+<li><p>To get started with a description file for a DTD, you can use the
+<a href="#-elemlist"><code>-elemlist</code></a>
+option to
+<code>dtd2html</code>
+to generate a file with all
+elements and attributes defined in the DTD with empty descriptions.
+</p></li> 
+<li><p>To get a list of general entities, you can use the
+<a href="#-entslist"><code>-entslist</code></a>
+option to
+<code>dtd2html</code>
+to generate a file with
+general entities defined in the DTD with empty descriptions.
+</p></li> 
+</ul>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="qrefmode">Quick Reference Mode</a></h2>
+
+<p><code>dtd2html</code> supports the ability to generate a quick
+reference document
+of a DTD with the
+<a href="#-qref"><code>-qref</code></a>
+option.  The document generated is sent to
+standard output (STDOUT). Therefore, one should redirect STDOUT to a
+file. Example:
+</p>
+
+<pre>
+    % dtd2html -qref html.dtd &gt; htmlqref.html
+</pre>
+
+<p>No other output/files are generated while in quick reference mode.
+</p>
+
+<p>The format of the quick reference document is as follows:
+</p>
+
+<ul>
+<li><p>The title is determined by the
+<a href="#-dtdname"><code>-dtdname</code></a>
+option (or the filename of
+the DTD if the option is not specified).
+</p></li>
+<li><p>Each element is listed in an &lt;H2&gt; tag (or the tag
+specified by the
+<a href="#-qrefhtag"><code>-qrefhtag</code></a>
+option) wrapped with the '&lt;&gt;' characters.
+</p></li>
+<li><p>Any element description text follows the element heading if
+defined in a
+<a href="#elemdescfile">description file</a>.
+</p></li>
+<li><p>All elements are listed in alphabetical order.
+</p></li>
+<li><p>Each element in the &lt;H2&gt; tag is wrapped with the &lt;A
+NAME="element"&gt; tag so one may cross-reference the element if
+desired. Example:
+</p>
+<pre>
+    &lt;H2&gt;&lt;A NAME="body"&gt;&amp;lt;body&amp;gt;&lt;/A&gt;&lt;/H2&gt;.
+</pre>
+</li>
+</ul>
+
+<h3>Defintion List, &lt;DL&gt;, Format</h3>
+
+<p>An alternative format for the quick reference document may be
+generated with the
+<a href="#-qrefdl"><code>-qrefdl</code></a>
+command-line option. The format of the
+document shares the same properties as those of the
+<a href="#-qref"><code>-qref</code></a>
+option, with
+the following exceptions:
+</p>
+
+<ul>
+<li>All elements are listed in a &lt;DL&gt;, definition list.
+</li>
+<li>Each element is listed in the &lt;DT&gt; section of &lt;DL&gt;.
+</li>
+<li>Element descriptions are placed in the &lt;DD&gt; section of the &lt;DL&gt;.
+</li>
+</ul>
+
+<p>Each element is still wrapped in a &lt;A NAME&gt; statement to allow
+cross-referencing.
+</p>
+
+<h3>Quick Reference Notes</h3>
+
+<ul>
+<li><p><a href="#-qrefdl"><code>-qrefdl</code></a>
+takes precedence over
+<a href="#-qref"><code>-qref</code></a>
+if both are specified on the command-line.
+</p></li>
+</ul>
+
+<h3>Quick Reference Tips</h3>
+
+<ul>
+<li><p>Keep element descriptions as brief as possible. The quick
+reference document may get quite large for large DTDs. Care must
+also be given if using the
+<a href="#-qrefdl"><code>-qrefdl</code></a>
+option; less HTML markup is
+available while in a &lt;DL&gt;.
+</p></li>
+<li><p>Keep a separate description file just for the quick
+reference. Usually, the description file used in the
+normal <code>dtd2html</code> output would be inappropriate for a quick
+reference.
+</p></li>
+<li><p>The <code>-HOME-</code> element description identifier may
+be used to place
+text before the list of elements. One could add a link to the
+DTD-HOME page that is generated by <code>dtd2html</code> when the
+<a href="#-qref"><code>-qref</code></a>
+option is not used.
+</p></li>
+</ul>
+
+<!-- =================================================================== -->
+<hr>
+<h2><a name="updateelemdesc">Updating Description File</a></h2>
+
+<p>As a DTD changes, one can automatically update the element description
+file for the DTD to reflect the changes via the
+<a href="#-updateel"><code>-updateel</code></a>
+command line
+option. The new updated description file is sent to standard
+output (STDOUT). Therefore, one should redirect STDOUT to a file.
+Example:
+</p>
+
+<pre>
+    % dtd2html -updateel html.desc html.dtd &gt; html-new.desc
+</pre>
+
+<p>When updating a description file, a report is prepended to
+the new description file. The report is contained in SGML
+comment declaration statements. Here's an example of what the report
+looks like:
+</p>
+
+<pre>
+&lt;!-- Element Description File Update                                      --&gt;
+&lt;!-- Source File:  sgm/html.desc                                          --&gt;
+&lt;!-- Source DTD:  sgm/html.2.0/html.dtd                                   --&gt;
+&lt;!-- Deleting Old?  Yes                                                   --&gt;
+&lt;!-- Date:  Mon Jun 27 00:25:41 EDT 1994                                  --&gt;
+&lt;!-- New identifiers:                                                     --&gt;
+&lt;!--    br, dl*, dl*compact, form, form*, form*action, form*enctype,      --&gt;
+&lt;!--    form*method, img*ismap, input, input*, input*align,               --&gt;
+&lt;!--    input*checked, input*maxlength, input*name, input*size,           --&gt;
+&lt;!--    input*src, input*type, input*value, option, option*,              --&gt;
+&lt;!--    option*selected, option*value, select, select*,                   --&gt;
+&lt;!--    select*multiple, select*name, select*size, strike, textarea,      --&gt;
+&lt;!--    textarea*, textarea*cols, textarea*name, textarea*rows            --&gt;
+&lt;!-- Old identifiers:                                                     --&gt;
+&lt;!--    dir*, dir*compact, key, link*name, menu*, menu*compact, ol*,      --&gt;
+&lt;!--    ol*compact, u, ul*, ul*compact                                    --&gt;
+&lt;!--                                                                      --&gt;
+</pre>
+
+<h3>Updating Notes</h3>
+
+<ul>
+<li><p>Entity descriptions are <strong>NOT</strong> checked, and
+are excluded from the output.  Only elements and attributes are processed.
+</p>
+<li><p>If the description file processed contains "#include" instructions,
+these instructions are not preserved in the output.  The output is
+a merging of all description entries processed.</p>
+</li>
+<li><p>If "#include" instruction are used, it may be best to use the
+<a href="#-reportonly"><code>-reportonly</code></a> option.  Therefore,
+you can determine what has changed and update the description file(s)
+manually.</p>
+</li>
+<li><p>The report will specify any new identifiers that were created, and
+any old identifier no longer applicable to the DTD.
+</p></li>
+<li><p>By default, any old identifiers are removed in the new element
+description file. This can be overriden by the
+<a href="#-keepold"><code>-keepold</code></a>
+option.
+The report will state if old identifiers are deleted or not.
+</p></li>
+<li><p>ALL non-deleted identifiers keep all the description text
+specified in the source (original) description file.
+</p></li>
+<li><p>If you desire no report, use the
+<a href="#-noreport"><code>-noreport</code></a>
+option.
+</p></li>
+<li><p>If all you desire is to see what changes exist without creating a
+new description file, then use the
+<a href="#-reportonly"><code>-reportonly</code></a>
+option.
+This option will only cause the report to be generated. This may
+be used to help keep track of changes in a DTD.
+</p></li>
+<li><p>Any user entered comments in the source element description file
+are lost in the update.
+</p></li>
+</ul>
+
+<!-- =================================================================== -->
+<!--	@(#)  resents.mod 1.1 96/10/05 @(#)
+  -->
+<hr>
+<h2><a name="resolving">Resolving External Entities</a></h2>
+
+<p>Defining the mapping between external entities to system files
+may be done via the <a href="#-catalog"><code>-catalog</code></a>
+command-line option.  The <em>catalog</em> provides you with the
+capability of mapping public identifiers to system identifiers
+(files) or to map entity names to system identifiers.
+</p>
+
+<!--	@(#)  catalog.mod 1.4 96/10/07 @(#)
+  -->
+<p><strong>Catalog Syntax</strong></p>
+
+<p>The syntax of a catalog is a subset of SGML catalogs
+(as defined in
+<cite>SGML Open Draft Technical Resolution 9401:1994</cite>).
+</p>
+
+<p>A catalog contains a sequence of the following types of entries:
+</p>
+
+<dl>
+<dt><code>PUBLIC</code> <var>public_id</var> <var>system_id</var></dt>
+<dd><p>This maps <var>public_id</var> to <var>system_id</var>.
+</p>
+</dd>
+<dt><code>ENTITY</code> <var>name</var> <var>system_id</var></dt>
+<dd><p>This maps a general entity whose name is <var>name</var> to
+<var>system_id</var>.
+</p>
+</dd>
+<dt><code>ENTITY %</code><var>name</var> <var>system_id</var></dt>
+<dd><p>This maps a parameter entity whose name is <var>name</var> to
+<var>system_id</var>.
+</p>
+</dd>
+</dl>
+
+<p><strong>Syntax Notes</strong></p>
+
+<ul>
+<li><p>A <var>system_id</var> string cannot contain any spaces.  The
+<var>system_id</var> is treated as pathname of file. </p>
+</li>
+<li><p>Any line in a catalog file that does not follow the previously
+mentioned entries is ignored.</p>
+</li>
+<li><p>In case of duplicate entries, the first entry defined is used.
+</ul>
+
+<p>Example catalog file:</p>
+<pre>
+        -- ISO public identifiers --
+PUBLIC "ISO 8879-1986//ENTITIES General Technical//EN"            iso-tech.ent
+PUBLIC "ISO 8879-1986//ENTITIES Publishing//EN"                   iso-pub.ent
+PUBLIC "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN"  iso-num.ent
+PUBLIC "ISO 8879-1986//ENTITIES Greek Letters//EN"                iso-grk1.ent
+PUBLIC "ISO 8879-1986//ENTITIES Diacritical Marks//EN"            iso-dia.ent
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN"                iso-lat1.ent
+PUBLIC "ISO 8879-1986//ENTITIES Greek Symbols//EN"                iso-grk3.ent 
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 2//EN"                ISOlat2
+PUBLIC "ISO 8879-1986//ENTITIES Added Math Symbols: Ordinary//EN" ISOamso
+
+        -- HTML public identifiers and entities --
+PUBLIC "-//IETF//DTD HTML//EN"                                    html.dtd
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN//HTML"          ISOlat1.ent
+ENTITY "%html-0"                                                  html-0.dtd
+ENTITY "%html-1"                                                  html-1.dtd
+
+</pre>
+
+<p><strong>Environment Variables</strong></p>
+
+<p>The following
+envariables (ie. environment variables) are supported:
+</p>
+
+<dl>
+<dt><a name="P_SGML_PATH">P_SGML_PATH</a></dt>
+<dd><p>This is a colon (semi-colon for MSDOS users)
+separated list of paths for finding catalog files
+or system identifiers.  For example, if a system identifier is not
+an absolute pathname, then the paths listed in P_SGML_PATH are used to
+find the file.
+</p>
+</dd>
+<dt><a name="SGML_CATALOG_FILES">SGML_CATALOG_FILES</a></dt>
+<dd><p>This envariable is a colon (semi-colon for MSDOS users)
+separated list of catalog files to read.
+If
+a file in the list is not an absolute path, then file is searched in
+the paths listed in the P_SGML_PATH and SGML_SEARCH_PATH.
+</p>
+</dd>
+<dt><a name="SGML_SEARCH_PATH">SGML_SEARCH_PATH</a></dt>
+<dd><p>This is a colon (semi-colon for MSDOS users)
+separated list of paths for finding catalog files
+or system identifiers.  This envariable serves the same function as
+P_SGML_PATH.  If both are defined, paths listed in P_SGML_PATH are
+searched first before any paths in SGML_SEARCH_PATH.</p>
+</dd>
+</dl>
+<p>The use of P_SGML_PATH is for compatibility with earlier versions.
+SGML_CATALOG_FILES and SGML_SEARCH_PATH
+are supported for compatibility with James Clark's <code>nsgmls(1)</code>.
+</p>
+<dl>
+<dt><strong>Note</strong></dt>
+<dd>When searching for a file via the P_SGML_PATH and/or SGML_SEARCH_PATH,
+if the file is not found in any of the paths, then the current working
+directory is searched.
+</dd>
+</dl>
+
+
+
+<dl>
+<dt><strong>Note</strong></dt>
+<dd><p>
+The file specified by
+<a href="#-catalog"><code>-catalog</code></a>
+is read first before any files specified by SGML_CATALOG_FILES.
+</p>
+</dd>
+</dl>
+
+
+<!-- =================================================================== -->
+<!--	@(#)  avail.mod 1.2 97/09/16 @(#)
+  -->
+<hr>
+<h2><a name="availability">Availability</a></h2>
+<p>This software is part of the <em>perlSGML</em> package; see
+(<a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html"
+>http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>)
+</p>
+
+<!--	@(#) author.mod 1.2 97/09/16 15:50:29 @(#)
+  -->
+<hr>
+<h2><a name="author">Author</a></h2>
+<address>
+<a href="http://www.oac.uci.edu/indiv/ehood/">Earl Hood</a><br>
+<a href="mailto:ehood@medusa.acs.uci.edu"
+>ehood@medusa.acs.uci.edu</a><br>
+Copyright &#169; 1997<br>
+</address>
+
+
+<!-- =================================================================== -->
+<hr>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!-- (C) International Organization for Standardization 1986
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % ISOnum PUBLIC
+       "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN" "iso-num.ent">
+     %ISOnum;
+-->
+<!ENTITY half	"&#189;"	--=fraction one-half-->
+<!ENTITY frac12 "&#189;"	--=fraction one-half-->
+<!ENTITY frac14 "&#188;"	--=fraction one-quarter-->
+<!ENTITY frac34 "&#190;"	--=fraction three-quarters-->
+<!ENTITY frac18 "1/8"		--=fraction one-eighth-->
+<!ENTITY frac38 "3/8"		--=fraction three-eighths-->
+<!ENTITY frac58 "5/8"		--=fraction five-eighths-->
+<!ENTITY frac78 "7/8"		--=fraction seven-eighths-->
+
+<!ENTITY sup1   "&#185;"	--=superscript one-->
+<!ENTITY sup2   "&#178;"	--=superscript two-->
+<!ENTITY sup3   "&#179;"	--=superscript three-->
+
+<!ENTITY plus   "+"		--=plus sign B:-- >
+<!ENTITY plusmn SDATA "font=symbol charset=fontspecific code=177 
+	TeX='\pm ' descr='[plusmn]'"	--/pm B: =plus-or-minus sign-->
+<!ENTITY lt     CDATA	"<"	--=less-than sign R:-->
+<!ENTITY equals "="		--=equals sign R:-->
+<!ENTITY gt     ">"		--=greater-than sign R:-->
+<!ENTITY divide SDATA "font=symbol charset=fontspecific code=184 
+	TeX='\div ' descr='[divide]'"	--/div B: =divide sign-->
+<!ENTITY times  SDATA "font=symbol charset=fontspecific code=180
+	TeX='\times ' descr='[times]'"	--/times B: =multiply sign-->
+
+<!ENTITY curren "&#164;"	--=general currency sign-->
+<!ENTITY pound  "&#163;"	--=pound sign-->
+<!ENTITY dollar "$"		--=dollar sign-->
+<!ENTITY cent   "&#162;"	--=cent sign-->
+<!ENTITY yen    "&#165;"	--=/yen =yen sign-->
+
+<!ENTITY num    SDATA "font=* charset='iso8859-1' code=35
+	TeX='\num ' descr='[num]'"		--=number sign-->
+<!ENTITY percnt "%"		--=percent sign-->
+<!ENTITY amp    CDATA	"&"	--=ampersand-->
+<!ENTITY ast    "*"		--/ast B: =asterisk-->
+<!ENTITY commat "@"		--=commercial at-->
+<!ENTITY lsqb   "["		--/lbrack O: =left square bracket-->
+<!ENTITY bsol   "\"		--/backslash =reverse solidus-->
+<!ENTITY rsqb   "]"		--/rbrack C: =right square bracket-->
+<!ENTITY lcub   "{"		--/lbrace O: =left curly bracket-->
+<!ENTITY horbar SDATA "font=symbol charset=fontspecific code=190 
+	descr='[horbar]'"--=horizontal bar-->
+<!ENTITY verbar "|"		--/vert =vertical bar-->
+<!ENTITY rcub   "}"		--/rbrace C: =right curly bracket-->
+<!ENTITY micro  "&#181;"	--=micro sign-->
+<!ENTITY ohm    SDATA "font=symbol charset=fontspecific code=87  
+	descr='[ohm]'"--=ohm sign-->
+<!ENTITY deg    "&#176;"	--=degree sign-->
+<!ENTITY ordm   "&#186;"	--=ordinal indicator, masculine-->
+<!ENTITY ordf   "&#170;"	--=ordinal indicator, feminine-->
+<!ENTITY sect   "&#167;"	--=section sign-->
+<!ENTITY para   "&#182;"	--=pilcrow (paragraph sign)-->
+<!ENTITY middot "&#183;"	--/centerdot B: =middle dot-->
+<!ENTITY larr   SDATA "font=symbol charset=fontspecific code=172 
+	TeX='\leftarrow ' descr='[larr]'"--/leftarrow /gets A: =leftward arrow-->
+<!ENTITY rarr   SDATA "font=symbol charset=fontspecific code=174 
+	TeX='\rightarrow ' descr='[rarr]'"--/rightarrow /to A: =rightward arrow-->
+<!ENTITY uarr   SDATA "font=symbol charset=fontspecific code=173 
+	descr='[uarr]'"--/uparrow A: =upward arrow-->
+<!ENTITY darr   SDATA "font=symbol charset=fontspecific code=175 
+	descr='[darr]'"--/downarrow A: =downward arrow-->
+<!ENTITY copy   "&#169;"	--=copyright sign-->
+<!ENTITY reg    "&#174;"	--=registered sign-->
+<!ENTITY trade  SDATA "font=symbol charset=fontspecific code=228 
+	descr='[trade]'"--=trade mark sign-->
+<!ENTITY brvbar "&#166;"	--=broken vertical bar-->
+<!ENTITY not    "&#172;"	--/neg /lnot =not sign-->
+
+<!ENTITY excl   "!"		--=exclamation mark-->
+<!ENTITY iexcl  "&#161;"	--=inverted exclamation mark-->
+<!ENTITY quot   '"'		--=quotation mark-->
+<!ENTITY apos   "'"		--=apostrophe-->
+<!ENTITY lpar   "("		--O: =left parenthesis-->
+<!ENTITY rpar   ")"		--C: =right parenthesis-->
+<!ENTITY comma  ","		--P: =comma-->
+<!ENTITY lowbar "_"		--=low line-->
+<!ENTITY hyphen "-"		--=hyphen-->
+<!ENTITY period "."		--=full stop, period-->
+<!ENTITY sol    "/"		--=solidus-->
+<!ENTITY colon  ":"		--/colon P:-->
+<!ENTITY semi   ";"		--=semicolon P:-->
+<!ENTITY quest  "?"		--=question mark-->
+<!ENTITY iquest "&#191;"	--=inverted question mark-->
+<!ENTITY laquo  "&#171;"	--=angle quotation mark, left-->
+<!ENTITY raquo  "&#187;"	--=angle quotation mark, right-->
+<!ENTITY lsquo  "'"		--=single quotation mark, left-->
+<!ENTITY rsquo  "'"		--=single quotation mark, right-->
+<!ENTITY ldquo  '"'		--=double quotation mark, left-->
+<!ENTITY rdquo  '"'		--=double quotation mark, right-->
+<!ENTITY nbsp   "&#160;"	--=no break (required) space-->
+<!ENTITY shy    "&#173;"	--=soft hyphen-->
+
+<!-- The following characters could not be defined using commonly available
+fonts. Therefore, EBT is using placeholders for these characters. To include
+the placeholders in your document, make sure that the marked section below has
+the keyword "INCLUDE".
+
+To ignore the placeholders, use the keyword "IGNORE". If you are ignoring this
+marked section and your SGML document references any of the entities declared
+below, you will get (non-fatal) mkbook errors, and the entity references will
+not be replaced.
+
+Finally, you may choose to define the entities below yourself, using a special
+font that will be available to readers of your DynaText books. Use the same
+SDATA entity declaration model as is used above, substituting the appropriate
+names and decimal numbers for font, charset, code, and descr. In that case, you
+should INCLUDE the marked section. 
+
+See Chapter 7 of Publisher Guide, Volume 1 for more information. -->
+
+<![ INCLUDE [
+<!ENTITY sung	"[sung]"--=music note (sung text sign)-->
+]]>
+

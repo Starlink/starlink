@@ -1,0 +1,342 @@
+#! /usr/local/bin/perl
+##---------------------------------------------------------------------------##
+##  File:
+##      @(#)  dtddiff 1.3 96/10/07 @(#)
+##  Author:
+##      Earl Hood       ehood@medusa.acs.uci.edu
+##  Description:
+##	dtddiff outputs the changes in a DTD with respect to new/old
+##	elements and attributes.
+##---------------------------------------------------------------------------##
+##  Copyright (C) 1994-1996	Earl Hood, ehood@medusa.acs.uci.edu
+##
+##  This program is free software; you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation; either version 2 of the License, or
+##  (at your option) any later version.
+##  
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##  
+##  You should have received a copy of the GNU General Public License
+##  along with this program; if not, write to the Free Software
+##  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+##---------------------------------------------------------------------------##
+
+package main;
+
+##---------------------------------------------------------------------------##
+
+## Store name of program ##
+($PROG = $0) =~ s/.*\///;
+
+$VERSION = "1.2.1";
+
+## Require libraries ##
+unshift(@INC, 'lib');
+require "dtd.pl" || die "Unable to require dtd.pl\n";
+require "newgetopt.pl" || die "Unable to require newgetopt.pl\n";
+
+##---------------------------------------------------------------------------##
+##------------##
+## Begin MAIN ##
+##------------##
+{
+&get_cli_opts();
+
+local($elem,$attr,%attribute,%OldElem,%NewElem);
+
+open(OLDDTD, $OLDDTD) || die "ERROR: Unable to open $OLDDTD\n";
+open(NEWDTD, $NEWDTD) || die "ERROR: Unable to open $NEWDTD\n";
+
+&DTDread_catalog_files($MAPFILE);
+
+##--------------------
+## Read old DTD
+##
+&DTDread_dtd("main'OLDDTD");
+foreach $elem (&DTDget_elements()) {
+    $OldElem{$elem} = 1;
+    %attribute = &DTDget_elem_attr($elem);
+    @array = keys %attribute;
+    foreach $attr (@array) { $OldElem{"$elem,$attr"} = 1; }
+    %attribute = ();
+}
+close(OLDDTD);
+
+%OldElemCont = %dtd'ElemCont;
+%OldElemInc = %dtd'ElemInc;
+%OldElemExc = %dtd'ElemExc;
+
+&DTDreset();		# Clear dtd.pl
+
+##--------------------
+## Read new DTD
+##
+&DTDread_dtd("main'NEWDTD");
+foreach $elem (&DTDget_elements()) {
+    ## Check if new element
+    if (!defined($OldElem{$elem})) { $NewElem{$elem} = 1; }
+    else { delete $OldElem{$elem}; }
+
+    ## Check element's attributes
+    %attribute = &DTDget_elem_attr($elem);
+    @array = keys %attribute;
+    if ($#array >= 0) {
+	foreach $attr (@array) {
+	    if (!defined($OldElem{"$elem,$attr"})) {
+		$NewElem{"$elem,$attr"} = 1;
+	    } else {
+		delete $OldElem{"$elem,$attr"};
+	    }
+	}
+    }
+    %attribute = ();
+}
+close(NEWDTD);
+
+%NewElemCont = %dtd'ElemCont;
+%NewElemInc = %dtd'ElemInc;
+%NewElemExc = %dtd'ElemExc;
+
+##--------------------
+## Output status report
+##
+select(STDOUT);  $^ = Empty;  $~ = Heading;  $= = 10000000;
+
+@array = sort keys %NewElem;
+if ($#array >= 0) {
+    $fmtstr = "New Elements/Attributes ($NEWDTD)";  write;
+    &print_elem_list(*array);
+}
+$~ = Heading;
+@array = sort keys %OldElem;
+if ($#array >= 0) {
+    $fmtstr = "Old/removed Elements/Attributes ($OLDDTD)";  write;
+    &print_elem_list(*array);
+}
+$~ = Heading;
+$fmtstr = "Content Rule Differences";  write;
+$~ = ElementHead;
+foreach (sort keys %OldElemCont) {
+    next if $OldElem{$_};	# Skip removed elements
+    ## Base content
+    ($oldr = $OldElemCont{$_}) =~ s/\s//g;
+    ($newr = $NewElemCont{$_}) =~ s/\s//g;
+    ## Inclusions
+    ($oldri = $OldElemInc{$_}) =~ s/\s//g;
+    ($newri = $NewElemInc{$_}) =~ s/\s//g;
+    ## Exclusions
+    ($oldrx = $OldElemExc{$_}) =~ s/\s//g;
+    ($newrx = $NewElemExc{$_}) =~ s/\s//g;
+
+    if (($oldr ne $newr) || ($oldri ne $newri) || ($oldrx ne $newrx)) {
+
+	($fmtstr = "<$_>") =~ tr/a-z/A-Z/;  write;
+
+	print STDOUT "  << old content rule <<\n";
+	@oldr = &dtd'extract_elem_names($oldr, 1);
+	print STDOUT "  ";
+	&print_elem_content(STDOUT, 2, *oldr);
+	if ($oldri) {
+	    @oldr = &dtd'extract_elem_names($oldri, 1);
+	    print STDOUT "  +";
+	    &print_elem_content(STDOUT, 3, *oldr);
+	}
+	if ($oldrx) {
+	    @oldr = &dtd'extract_elem_names($oldrx, 1);
+	    print STDOUT "  -";
+	    &print_elem_content(STDOUT, 3, *oldr);
+	}
+
+	print STDOUT "\n  >> new content rule >>\n";
+	@newr = &dtd'extract_elem_names($newr, 1);
+	print STDOUT "  ";
+	&print_elem_content(STDOUT, 2, *newr);
+	if ($newri) {
+	    @newr = &dtd'extract_elem_names($newri, 1);
+	    print STDOUT "  +";
+	    &print_elem_content(STDOUT, 3, *newr);
+	}
+	if ($newrx) {
+	    @newr = &dtd'extract_elem_names($newrx, 1);
+	    print STDOUT "  -";
+	    &print_elem_content(STDOUT, 3, *newr);
+	}
+
+	print STDOUT "\n";
+    }
+}
+
+exit 0;
+
+}
+##----------##
+## End MAIN ##
+##----------##
+##---------------------------------------------------------------------------##
+sub get_cli_opts {
+    &Usage() unless
+    &NGetOpt(
+    "catalog=s",	# External entity catalog file
+    "compact",		# Generate compact listing
+    "nocompact",	# Generate long listing
+    "help"		# Help message
+    );
+    &Usage() if defined($opt_help);
+
+    if ($#ARGV != 1) {
+    warn "ERROR: Invalid number of arguments\n";
+    &Usage();
+    }
+    $COMPACT = 1;
+    $COMPACT = 0  if defined($opt_nocompact);
+    $MAPFILE = $opt_catalog || "catalog";
+    $OLDDTD = $ARGV[0];
+    $NEWDTD = $ARGV[1];
+}
+##---------------------------------------------------------------------------##
+sub print_elem_list {
+    local(*list) = shift;
+    local($elem,$attr,$elem2,$attr2);
+
+    if ($COMPACT) {
+	$~ = Compact;
+	while (@list) {
+	    ($elem,$attr) = split(/,/,shift(@list));
+	    $item1 = "<$elem" . ($attr ? " $attr" : "") . ">";
+	    if (@list) {
+		($elem2,$attr2) = split(/,/,shift(@list));
+		$item2 = "<$elem2" . ($attr2 ? " $attr2" : "") . ">";
+	    } else {
+		$item2 = "";
+	    }
+	    write;
+	}
+    } else {
+	while (@list) {
+	    ($elem,$attr) = split(/,/,shift(@list));
+	    print STDOUT "\t<$elem";
+	    print STDOUT " $attr"  if $attr;
+	    print STDOUT ">\n";;
+	}
+    }
+}
+##---------------------------------------------------------------------------##
+##---------------------------------------------------------------------------##
+sub print_elem_content {
+    local($handle, $in, *array) = @_;
+    local($prev, $open, $len, $tmp);
+    local($first, $MAXLEN) = (1, 72);
+    local($nl) = ("\n" . (" " x $in));
+
+    foreach (@array) {
+	next if $_ eq "";	    # Ignore NULL strings
+	if ($_ eq $dtd'grpo_) {	    # '('
+	    if ($prev eq $_) {		# Print consecutive ('s together
+		print $handle $_;
+	    } else {			# Else, start newline
+		if ($first) {
+		    $first = 0;
+		} else {
+		    print $handle $nl;
+		}
+		print $handle ' ' x $open, $_;
+	    }
+	    $open++;			# Increase group open counter
+	    $len = $open+1;		# Adjust length of line counter
+	    next;			# Goto next token
+	} elsif ($_ eq $dtd'grpc_) {
+	    $open--;			# ')', decrement group open counter
+	}
+	$tmp = $len + length($_);
+	if ($tmp > $MAXLEN) {	    # Check if line length
+	    if (&DTDis_occur_indicator($_) || &DTDis_group_connector($_)) {
+		print $handle $_, $nl, ' ' x ($open);
+		$len = $open;
+		next;
+	    } else {
+		print $handle $nl, ' ' x $open;
+		$len = $open + length($_);
+	    }
+	} else {
+	    $len = $tmp;
+	}
+
+	if ($_ eq $dtd'and_) {		# Put spaces around '&'.
+	    print $handle ' ', $_, ' ';
+	    $len += 2;
+	    if ($len > $MAXLEN) {
+		print $handle $nl, ' ' x $open;
+		$len = $open;
+	    }
+	} elsif (!&DTDis_element($_)) {	# Uppercase reserved words, OR
+					# removed elements
+	    tr/a-z/A-Z/;
+	    print $handle $_;
+	} else {
+	    print $handle $_;
+	}
+
+    } continue {
+	$prev = $_ unless /^\s*$/;
+    }
+    print $handle "\n";
+
+}
+##---------------------------------------------------------------------------##
+sub Usage {
+    print STDOUT <<EndOfUsage;
+Usage:  $PROG [<options>] <olddtd> <newdtd>
+Options:
+  -catalog <file>	: External entity catalog (def: "catalog")
+  -compact		: Generate compact listing (the default)
+  -help			: This message
+  -nocompact		: Generate long listing
+
+Description:
+  $PROG lists out the differences in what elements/attributes are
+  defined in <olddtd> vs <newdtd>, and the program lists changes in any
+  of the content rules of undeleted elements.  The new
+  elements/attributes are listed first followed by old
+  element/attributes, and then the content rule differences are listed
+  last.
+
+Version: $VERSION
+dtd.pl Version: $dtd'VERSION
+
+  Copyright (C) 1994-1996  Earl Hood, ehood\@medusa.acs.uci.edu
+  dtddiff comes with ABSOLUTELY NO WARRANTY and dtddiff may be copied only
+  under the terms of the GNU General Public License (version 2, or later),
+  which may be found in the distribution.
+EndOfUsage
+
+    exit 0;
+}
+##---------------------------------------------------------------------------##
+##	Formats
+##
+
+format Empty=
+.
+
+format Heading=
+    ----------------------------------------------------------------------
+    @|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    $fmtstr
+    ----------------------------------------------------------------------
+.
+
+format Compact=
+	@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	$item1,				 $item2
+.
+
+format ElementHead=
+         ------------------------------------------------------------     
+	 @|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+	 $fmtstr
+
+.

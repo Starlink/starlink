@@ -1,0 +1,851 @@
+<!-- =================================================================== -->
+<!--    @(#) SGML..DTD.sgml 1.2 97/09/18 14:32:42 @(#)
+  -->
+<!-- =================================================================== -->
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN" [
+    <!ENTITY % perlSGML PUBLIC "-//EWH//ENTITIES perlSGML Modules//EN" >
+    %perlSGML;
+]>
+<html>
+<head>
+<title>perlSGML -- SGML::DTD</title>
+<link rev="made" href="mailto:ehood@medusa.acs.uci.edu">
+</head>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Name">Name</a></h2>
+
+<p>SGML::DTD - SGML DTD parser
+</p>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Synopsis">Synopsis</a></h2>
+<pre>
+    use SGML::DTD;
+
+    $dtd = new SGML::DTD;
+    $dtd->read_dtd(\*FILEHANDLE);
+
+    $dtd = new SGML::DTD \*FILEHANDLE;
+
+    SGML::DTD->set_ent_manager($entity_manager);
+    $dtd = new SGML::DTD;
+    $dtd->read_dtd(\*FILEHANDLE);
+
+    $dtd = new SGML::DTD \*FILEHANDLE, $entity_manager;
+</pre>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Description">Description</a></h2>
+
+<p><strong>SGML::DTD</strong> is an SGML DTD parser.  Either during
+object construction or by the <strong>read_dtd</strong> method, you
+pass a filehandle to <strong>SGML::DTD</strong> that contains the DTD
+you want parsed.  To avoid package scoping problems, a reference to
+a filehandle should be passed.  If passing a filehandle to object
+construction, <tt>undef</tt> will be returned if a parsing error
+occurs.  If using the <strong>read_dtd</strong> method, 1 is returned
+when no errors occurred; 0 returned on an error.
+</p>
+
+<p>When parsing the DTD, <strong>SGML::DTD</strong> builds up data
+structures that represent the information contained in the DTD.
+Various methods are provided to access DTD information.  See <a
+href="#Object Methods">Object Methods</a> for the methods available.
+</p>
+
+<p>For <strong>SGML::DTD</strong> to resolve external
+entity references, <strong>SGML::DTD</strong> uses an
+<strong>SGML::EntMan</strong> object.  If no entity manager is passed
+to <strong>SGML::DTD</strong>, <strong>SGML::DTD</strong> uses the
+default construction rule of <strong>SGML::EntMan</strong> to create an
+entity manager to resolve external entity references.  Normally, this
+will not be sufficient.  Therefore, <strong>SGML::EntMan</strong>
+object should be created first with loaded DTD specific
+catalogs.  Then instantiate an <strong>SGML::DTD</strong>
+object and pass the <strong>SGML::EntMan</strong> object to it.
+The <strong>SGML::EntMan</strong> object can be specified
+during <strong>SGML::DTD</strong> construction, or by the
+<strong>set_ent_manager</strong> class method.
+</p>
+
+<p>The following describes the current limitations of
+<strong>SGML::DTD</strong>:
+</p>
+
+<ul>
+
+<li>
+<p>Concurrent DTDs are not distinguished.  However, multiple
+<strong>SGML::DTD</strong> instances can be created by a
+program.  Also, if the input contains a DOCTYPE declaration,
+<strong>SGML::DTD</strong> will terminate parsing at the close of the
+DOCTYPE declaration.  Therefore, another <strong>SGML::DTD</strong>
+instance can be creating if another DOCTYPE declaration is in the
+input stream.
+</p>
+</li>
+
+<li>
+<p>LINKTYPE, SHORTREF, USEMAP declarations are ignored.
+</p>
+</li>
+
+<li>
+<p>Rank element declarations are not supported.
+</p>
+</li>
+
+<li>
+<p><strong>SGML::DTD</strong> assumes the reference concrete syntax
+with the following exceptions: generic identifiers and entity
+names can be of any length and include the '<tt>_</tt>' character.
+Variant syntaxes can be supported by modifying variable definitions
+in the <strong>SGML::Syntax</strong> module.  </p> </li>
+
+<li>
+<p><strong>SGML::DTD</strong> is not designed to be a DTD syntax
+validator.  When a parsing error occurs, parsing is terminated and
+the error message is not very descriptive.  For validation, a program
+like <strong>nsgmls</strong> should be used.  </p> </li>
+
+<li>
+<p>The entity manager is shared across all <strong>SGML::DTD</strong>
+instances.  This can be a problem if there is a desire to have multiple
+<strong>SGML::DTD</strong> instances and the DTDs have same external
+identifiers, but should resolve to different system identifiers.
+This can be handled by changing the entity manager before parsing
+each DTD.  </p> </li>
+
+<li>
+<p>Element names are treated with case-insensitivity, but entity
+names are case-sensitive.
+</p>
+</li>
+
+</ul>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Class Methods">Class Methods</a></h2>
+
+<p>Class methods are methods that apply at the class level.  Therefore,
+they may affect all instances of the <strong>SGML::DTD</strong> class.
+Class methods can be invoked like the following:
+</p>
+<pre>
+    SGML::DTD->set_ent_manager($entman);
+</pre>
+<p>or,</p>
+<pre>
+    set_ent_manager SGML::DTD $entman;
+</pre>
+
+<p>The following class methods are defined:
+</p>
+
+<ul>
+<li><a href="#new">new</a></li>
+<li><a href="#is_attr_keyword">is_attr_keyword</a></li>
+<li><a href="#is_elem_keyword">is_elem_keyword</a></li>
+<li><a href="#is_group_connector">is_group_connector</a></li>
+<li><a href="#is_occur_indicator">is_occur_indicator</a></li>
+<li><a href="#is_tag_name">is_tag_name</a></li>
+<li><a href="#set_comment_callback">set_comment_callback</a></li>
+<li><a href="#set_debug_callback">set_debug_callback</a></li>
+<li><a href="#set_debug_handle">set_debug_handle</a></li>
+<li><a href="#set_ent_manager">set_ent_manager</a></li>
+<li><a href="#set_err_callback">set_err_callback</a></li>
+<li><a href="#set_err_handle">set_err_handle</a></li>
+<li><a href="#set_pi_callback">set_pi_callback</a></li>
+<li><a href="#set_tree_callback">set_tree_callback</a></li>
+<li><a href="#set_verbosity">set_verbosity</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="new">new</a></h3>
+
+<dl>
+
+<dt><tt><strong>new</strong> SGML::DTD</tt></dt>
+<dt><tt><strong>new</strong> SGML::DTD \*<em>FILEHANDLE</em></tt></dt>
+<dt><tt><strong>new</strong> SGML::DTD \*<em>FILEHANDLE</em>, <em>$entman</em></tt></dt>
+<dd>
+
+<p><strong>new</strong> creates a new <strong>SGML::DTD</strong>
+object.  An optional filehandle argument can be specified to cause
+<strong>new</strong> to automatically parse the DTD represented
+by the filehandle.  If a filehandle is specified, and optional
+<strong>SGML::EntMan</strong> object may be specified for resolving
+any external entity references.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="is_attr_keyword">is_attr_keyword</a></h3>
+
+<dl>
+<dt><tt><strong>is_attr_keyword</strong> SGML::DTD <em>$word</em></tt></dt>
+<dd>
+
+<p><strong>is_attr_keyword</strong> returns 1 if <em>$word</em> is
+an attribute content reserved value, otherwise, it returns 0. In the
+reference concrete syntax, the following values of <em>$word</em>
+will return 1:
+</p>
+<ul>
+<li><tt>CDATA</tt>
+<li><tt>ENTITY</tt>
+<li><tt>ENTITIES</tt>
+<li><tt>ID</tt>
+<li><tt>IDREF</tt>
+<li><tt>IDREFS</tt>
+<li><tt>NAME</tt>
+<li><tt>NAMES</tt>
+<li><tt>NMTOKEN</tt>
+<li><tt>NMTOKENS</tt>
+<li><tt>NOTATION</tt>
+<li><tt>NUMBER</tt>
+<li><tt>NUMBERS</tt>
+<li><tt>NUTOKEN</tt>
+<li><tt>NUTOKENS</tt>
+</ul>
+<p>Character case is ignored.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="is_elem_keyword">is_elem_keyword</a></h3>
+
+<dl>
+
+<dt><tt><strong>is_elem_keyword</strong> SGML::DTD <em>$word</em></tt></dt>
+<dd>
+
+<p><strong>is_elem_keyword</strong> returns 1 if $word is an element
+content reserved value, otherwise, it returns 0. In the reference
+concrete syntax, the following values of $word will return 1:
+</p>
+<ul>
+<li><tt>#PCDATA</tt>
+<li><tt>CDATA</tt>
+<li><tt>EMPTY</tt>
+<li><tt>RCDATA</tt>
+</ul>
+<p>Character case is ignored.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="is_group_connector">is_group_connector</a></h3>
+
+<dl>
+
+<dt><tt><strong>is_group_connector</strong> SGML::DTD <em>$char</em></tt></dt>
+<dd>
+
+<p>DTDis_group_connector returns 1 if $char is an group connector,
+otherwise, it returns 0. The following values of $char will return 1:
+</p>
+<ul>
+<li><tt>,</tt>
+<li><tt>&amp;</tt>
+<li><tt>|</tt>
+</ul>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="is_occur_indicator">is_occur_indicator</a></h3>
+
+<dl>
+
+<dt><tt><strong>is_occur_indicator</strong> SGML::DTD <em>$char</em></tt></dt>
+<dd>
+
+<p>DTDis_occur_indicator returns 1 if $char is an occurence indicator,
+otherwise, it returns 0. The following values of $char will return 1:
+</p>
+<ul>
+<li><tt>+</tt>
+<li><tt>?</tt>
+<li><tt>*</tt>
+</ul>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="is_tag_name">is_tag_name</a></h3>
+
+<dl>
+
+<dt><tt><strong>is_tag_name</strong> SGML::DTD <em>$string</em></tt></dt>
+<dd>
+
+<p><strong>is_tag_name</strong> returns 1 if <em>$string</em> is a
+legal tag name, otherwise, it returns 0. Legal characters in a tag
+name are defined by the <strong>SGML::Syntax::$namechars</strong>
+variable. By default, a tag name may only contain the characters
+"<tt>A-Za-z_.-</tt>".
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_comment_callback">set_comment_callback</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_comment_callback</strong> SGML::DTD <em>$coderef</em></tt></dt>
+<dd>
+
+<p>Set a function to be called during parsing when a comment declaration
+is encountered.  The comment callback function is invoked as follows:
+</p>
+<pre>
+    &amp;$coderef(\$comment_txt);
+</pre>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_debug_callback">set_debug_callback</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_debug_callback</strong> SGML::DTD <em>$coderef</em></tt></dt>
+<dd>
+
+<p>Set a function to be called when a debugging message is generated.
+The debug callback function is invoked as follows:
+</p>
+<pre>
+    &amp;$coderef(@string_list);
+</pre>
+<p>Debugging messages are only generated if verbosity is set to true.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_debug_handle">set_debug_handle</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_debug_handle</strong> SGML::DTD \*<em>FILEHANDLE</em></tt></dt>
+<dd>
+
+<p>Set the filehandle to send debugging messages.  Messages are
+not sent to the filehandle if a debug callback function is registered.
+The default filehandle is <tt>STDERR</tt>.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_ent_manager">set_ent_manager</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_ent_manager</strong> SGML::DTD <em>$entman</em></tt></dt>
+<dd>
+
+<p>Set the entity manager.  The entity manager will be used to resolve
+any external identifiers during parsing.  The entity manager should
+be of type <strong>SGML::EntMan</strong>.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_err_callback">set_err_callback</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_err_callback</strong> SGML::DTD <em>$coderef</em></tt></dt>
+<dd>
+
+<p>Set a function to be called during parsing when an error occurs
+The error callback function is invoked as follows:
+</p>
+<pre>
+    &amp;$coderef(@string_list);
+</pre>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_err_handle">set_err_handle</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_err_handle</strong> SGML::DTD \*<em>FILEHANDLE</em></tt></dt>
+<dd>
+
+<p>Set the filehandle to send error messages.  Messages are
+not sent to the filehandle if an error callback function is registered.
+The default filehandle is <tt>STDERR</tt>.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_pi_callback">set_pi_callback</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_pi_callback</strong> SGML::DTD <em>$coderef</em></tt></dt>
+<dd>
+
+<p>Set a function to be called during parsing when a processing instruction
+is encountered.  The pi callback function is invoked as follows:
+</p>
+<pre>
+    &amp;$coderef(\$pi_txt);
+</pre>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_tree_callback">set_tree_callback</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_tree_callback</strong> SGML::DTD <em>$coderef</em></tt></dt>
+<dd>
+
+<p>Set callback for printing a tree entry when the
+<strong>print_tree</strong> object method is invoked.  The tree entry
+callback function is invoked as follows: </p>
+<pre>
+    &amp;$coderef($iselem_flag, $string);
+</pre>
+
+<p>This method allows you to modify the text output of the
+<strong>print_tree</strong> method.  However, it does require some
+understanding of the string passed into callback to do anything
+interesting with it.  The method mainly exists for the use for a
+specific application, so its use is discouraged.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="set_verbosity">set_verbosity</a></h3>
+
+<dl>
+
+<dt><tt><strong>set_verbosity</strong> SGML::DTD <em>$boolean</em></tt></dt>
+<dd>
+
+<p>The tells if <strong>SGML::DTD</strong> should output debugging
+messages as it parses a DTD.
+</p>
+
+</dd>
+
+</dl>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Object Methods">Object Methods</a></h2>
+
+<ul>
+<li><a href="#read_dtd">read_dtd</a></li>
+<li><a href="#get_base_children">get_base_children</a></li>
+<li><a href="#get_elem_attr">get_elem_attr</a></li>
+<li><a href="#get_elements">get_elements</a></li>
+<li><a href="#get_elements_of_attr">get_elements_of_attr</a></li>
+<li><a href="#get_exc_children">get_exc_children</a></li>
+<li><a href="#get_gen_data_ents">get_gen_data_ents</a></li>
+<li><a href="#get_gen_ents">get_gen_ents</a></li>
+<li><a href="#get_inc_children">get_inc_children</a></li>
+<li><a href="#get_parents">get_parents</a></li>
+<li><a href="#get_top_elements">get_top_elements</a></li>
+<li><a href="#is_child">is_child</a></li>
+<li><a href="#is_element">is_element</a></li>
+<li><a href="#print_tree">print_tree</a></li>
+<li><a href="#reset">reset</a></li>
+</ul>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="read_dtd">read_dtd</a></h3>
+
+<dl>
+
+<dt><tt>$dtd-><strong>read_dtd</strong>(\*<em>FILEHANDLE</em>)</tt></dt>
+<dd>
+
+<p>Parse a DTD from <em>FILEHANDLE</em>.
+</p>
+
+</dl>
+
+<p>The following methods are applicable after a DTD has been parsed:
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_base_children">get_base_children</a></h3>
+
+<dl>
+
+<dt><tt>@list = $dtd-><strong>get_base_children</strong>(<em>$element</em>, <em>$andcon</em>)</tt></dt>
+<dd>
+
+<p><strong>get_base_children</strong> returns an array of the elements
+in the base model group of <em>$element</em>. The <em>$andcon</em> is
+flag if the connector characters are included in the returned array:
+0 => no connectors, 1 (non-zero) => connectors.  </p>
+
+<p>Example:
+</p>
+<pre>
+    &lt;!ELEMENT foo (x | y | z) +(a | b) -(m | n)>
+</pre>
+<p>The call
+</p>
+<pre>
+    $dtd-><strong>get_base_children</strong>(`foo')
+</pre>
+<p>will return
+</p>
+<pre>
+    ('x', 'y', 'z')
+</pre>
+<p>The call
+</p>
+<pre>
+    $dtd-><strong>get_base_children</strong>('foo', 1)
+</pre>
+<p>will return
+</p>
+<pre>
+    ('(','x', '|', 'y', '|', 'z', ')')
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_elem_attr">get_elem_attr</a></h3>
+
+<dl>
+
+<dt><tt>%attributes = $dtd-><strong>get_elem_attr</strong>(<em>$element</em>)</tt></dt>
+<dd>
+
+<p>Retrieve the attributes defined for <em>$element</em>.  The return value
+is a hash where the keys are the attribute names, and the values is
+the definitions of the attributes.  The definitions are stored as
+a list.  The first list value the default value for the attribute
+(which may be an SGML reserved word). If the default value equals
+"<tt>#FIXED</tt>", then the next array value is the <tt>#FIXED</tt> value.
+The other array values are all possible values for the attribute.
+</p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_elements">get_elements</a></h3>
+
+<dl>
+
+<dt><tt>@elements = $dtd-><strong>get_elements</strong>(<em>$nosort</em>)</tt></dt>
+<dd>
+
+<p>Retrieve all elements defined in the DTD.  If <em>$nosort</em> is true,
+the elements are returned in the order they were defined in the
+DTD.  Otherwise, they are in sorted order.
+</p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_elements_of_attr">get_elements_of_attr</a></h3>
+
+<dl>
+
+<dt><tt>@elements = $dtd-><strong>get_elements_of_attr</strong>(<em>$attr_name</em>)</tt></dt>
+<dd>
+
+<p>Retrieve all elements that have an attribute <em>$attr_name</em> defined
+in the DTD.
+</p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_exc_children">get_exc_children</a></h3>
+
+<dl>
+
+<dt><tt>@list = $dtd-><strong>get_exc_children</strong>(<em>$element</em>, <em>$andcon</em>)</tt></dt>
+<dd>
+
+<p><strong>get_exc_children</strong> returns an array of the elements in the exclusion
+model group of <em>$element</em>. The <em>$andcon</em> is flag if the connector
+characters are included in the returned array: 0 => no connectors, 1
+(non-zero) => connectors.
+</p>
+
+<p>Example:
+</p>
+<pre>
+    &lt;!ELEMENT foo (x | y | z) +(a | b) -(m | n)>
+</pre>
+<p>The call
+</p>
+<pre>
+    $dtd-><strong>get_exc_children</strong>('foo')
+</pre>
+<p>will return
+</p>
+<pre>
+    ('m', 'n')
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_gen_ents">get_gen_ents</a></h3>
+
+<dl>
+
+<dt><tt>@entity_names = $dtd-><strong>get_gen_ents</strong>(<em>$nosort</em>)</tt></dt>
+<dd>
+
+<p><strong>get_gen_ents</strong> returns an array of general
+entities. An optional flag argument can be passed to the routine to
+determine is elements returned are sorted or not: 0 => sorted, 1 =>
+not sorted.  </p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_gen_data_ents">get_gen_data_ents</a></h3>
+
+<dl>
+
+<dt><tt>@entity_names = $dtd-><strong>get_gen_data_ents</strong>()</tt></dt>
+<dd>
+
+<p><strong>get_gen_data_ents</strong> returns an array of general data
+entities defined in the DTD.  Data entities cover the following: </p>
+<ul>
+<li><tt>PCDATA</tt>
+<li><tt>CDATA</tt>
+<li><tt>SDATA</tt>
+<li><tt>PI</tt>
+</ul>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_inc_children">get_inc_children</a></h3>
+
+<dl>
+
+<dt><tt>@list = $dtd-><strong>get_inc_children</strong>(<em>$element</em>, <em>$andcon</em>)</tt></dt>
+<dd>
+
+<p><strong>get_inc_children</strong> returns an array of the elements
+in the inclusion model group of <em>$element</em>. The <em>$andcon</em>
+is flag if the connector characters are included in the returned
+array: 0 => no connectors, 1 (non-zero) => connectors.  </p>
+
+<p>Example:
+</p>
+<pre>
+    &lt;!ELEMENT foo (x | y | z) +(a | b) -(m | n)>
+</pre>
+<p>The call
+</p>
+<pre>
+    $dtd-><strong>get_inc_children</strong>('foo')
+</pre>
+<p>will return
+</p>
+<pre>
+    ('a', 'b')
+</pre>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_parents">get_parents</a></h3>
+
+<dl>
+
+<dt><tt>$dtd-><strong>get_parents</strong>(<em>$element</em>)</tt></dt>
+<dd>
+
+<p>Get all elements that may be a parent of <em>$element</em>.
+</p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="get_top_elements">get_top_elements</a></h3>
+
+<dl>
+
+<dt><tt>@elements = $dtd-><strong>get_top_elements</strong>()</tt></dt>
+<dd>
+
+<p>Get the top-most elements defined in the DTD. Top-most elements are
+those elements that cannot be contained within another element or
+can only be contained within itself.
+</p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="is_child">is_child</a></h3>
+
+<dl>
+
+<dt><tt>$dtd-><strong>is_child</strong>(<em>$element</em>, <em>$child</em>)</tt></dt>
+<dd>
+
+<p><strong>is_child</strong> returns 1 if <em>$child</em> can be a
+legal child of <em>$element</em>.  Otherwise, 0 is returned.  </p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="is_element">is_element</a></h3>
+
+<dl>
+
+<dt><tt>$dtd-><strong>is_element</strong>(<em>$element</em>)</tt></dt>
+<dd>
+
+<p><strong>is_element</strong> returns 1 if <em>$element</em> is
+defined in the DTD. Otherwise, 0 is returned.  </p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="print_tree">print_tree</a></h3>
+
+<dl>
+
+<dt><tt>$dtd-><strong>print_tree</strong>(<em>$element</em>, <em>$depth</em>, \*<em>FILEHANDLE</em>)</tt></dt>
+<dd>
+
+<p><strong>print_tree</strong> outputs an ASCII tree structure of
+<em>$element</em>'s content hierarchy to a depth of <em>$depth</em> to
+<em>FILEHANDLE</em>.  See <a href="#Element Trees">Element Trees</a>
+for information on output created by <strong>print_tree</strong>.  </p>
+
+</dl>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr size=0 width="50%" align=left noshade>
+<h3><a name="reset">reset</a></h3>
+
+<dl>
+
+<dt><tt>$dtd-><strong>reset</strong>()</tt></dt>
+<dd>
+
+<p>Clear object data structures.  Use this method if you want to use
+the same object to parse another DTD.  </p>
+
+</dl>
+
+<!-- =================================================================== -->
+<hr><h2><a name="Element Trees">Element Trees</a></h2>
+
+<p>Once a DTD is parsed, the <strong>print_tree</strong> method
+can be used to output ASCII formatted trees of content hierarchies
+of elements.  The <strong>print_tree</strong> method is invoked as
+follows: </p>
+<blockquote>
+$dtd-><strong>print_tree</strong>(<em>$element</em>, <em>$depth</em>, \*<em>FILEHANDLE</em>)
+</blockquote>
+
+<p><em>$element</em> is the element to print the tree for.
+<em>$depth</em> specifies the maximum depth of the tree.  The root
+of the tree has a depth of 1.  <em>FILEHANDLE</em> specifies where
+the output goes to.  </p>
+
+&tree;
+
+<!-- =================================================================== -->
+<hr><h2><a name="See Also">See Also</a></h2>
+
+<p>
+<a href="SGML..EntMan.html"><strong>SGML::EntMan</strong></a>
+</p>
+<p>
+perl(1)
+</p>
+
+<!-- ================================================================== -->
+&avail;
+&author;
+
+<!-- ================================================================== -->
+<hr>
+<address>
+97/09/18 14:32:42
+</address>
+</body></html>

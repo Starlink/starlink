@@ -1,0 +1,27 @@
+	-- ISO public identifiers --
+PUBLIC "ISO 8879-1986//ENTITIES General Technical//EN"		  iso-tech.ent
+PUBLIC "ISO 8879-1986//ENTITIES Publishing//EN"			  iso-pub.ent
+PUBLIC "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN"  iso-num.ent
+PUBLIC "ISO 8879-1986//ENTITIES Greek Letters//EN"		  iso-grk1.ent
+PUBLIC "ISO 8879-1986//ENTITIES Diacritical Marks//EN"		  iso-dia.ent
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN"		  iso-lat1.ent
+PUBLIC "ISO 8879-1986//ENTITIES Greek Symbols//EN"		  iso-grk3.ent 
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 2//EN"		  ISOlat2
+PUBLIC "ISO 8879-1986//ENTITIES Added Math Symbols: Ordinary//EN" ISOamso
+
+	-- HP public identifiers --
+PUBLIC "-//Hewlett-Packard//ENTITIES HP Symbols//EN"		  HPsym
+PUBLIC "-//Hewlett-Packard//ENTITIES Service//EN"		  HPservice
+PUBLIC "-//Hewlett-Packard//ENTITIES Calculators//EN"		  HPcalc
+PUBLIC "-//Hewlett-Packard//ENTITIES Texchars//EN"		  HPtexchars
+PUBLIC "-//Hewlett-Packard//ENTITIES HP Tiff//EN"		  HPtif
+
+	-- Arbotext math markup --
+PUBLIC "-//ArborText//ELEMENTS Math Equation Structures//EN"	  ati-math.elm
+
+	-- HTML public identifiers and entities --
+PUBLIC "-//W3O//DTD WWW HTML 2.0 Level 0//EN"			  html-0.dtd
+PUBLIC "-//W3O//DTD WWW HTML 2.0 Level 1//EN"			  html-1.dtd
+PUBLIC "ISO 8879-1986//ENTITIES Added Latin 1//EN//HTML"	  ISOlat1.ent
+ENTITY "%html-0"						  html-0.dtd
+ENTITY "%html-1"						  html-1.dtd

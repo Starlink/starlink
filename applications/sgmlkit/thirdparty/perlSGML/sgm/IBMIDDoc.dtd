@@ -1,0 +1,3829 @@
+<!--==================================================================
+ Copyright:
+            (c) International Business Machines Corporation 1992, 1994
+            All Rights Reserved.
+
+Classification:  IBM Internal Use Only
+
+       Version:  1.0
+
+          File:  IBMIDDOC DTD
+ Formal Public
+   Identifiers:
+                 Most recent version:
+                 +//ISBN 0-933186::IBM//DTD IBMIDDoc//EN
+
+                 This version:
+                 +//ISBN 0-933186::IBM//DTD IBMIDDoc:1.0//EN
+
+      Function:  Markup declarations for the IBMIDDOC document type
+
+Change History:   4 Aug 93  -  Version 1.0 completed.
+
+         Notes:
+                 COMMENT CONVENTIONS:
+                 This comment format:
+                 =====================================================
+                 Category
+                 =====================================================
+                 indicates the start of a major category of markup
+                 declarations.
+
+                 This comment format:
+                 Group ===============================================
+                 indicates a grouping of declarations within a major
+                 category.
+
+                 Right justified comments following an element
+                 declaration indicate the full name of the element,
+                 without abbreviation.  If the element name is not
+                 abbreviated, this comment will not appear.
+
+                 Right justified comments after an attribute
+                 declaration in a attribute list declaration give a very
+                 brief description of the content or function of the
+                 attribute.
+
+                 The comments are not intended to be a complete
+                 description of SGML BookMaster.  Refer to the
+                 SGML BookMaster Language Reference for complete
+                 descriptions of elements, their attributes and
+                 notations.
+
+                 CODING CONVENTIONS:
+                 Parameter entities are declared at the begining of the
+                 the DTD, unless they are intended to be used only once,
+                 in which case they are declared where they are used.
+
+                 Elements are declared as soon as possible after they are
+                 used, in the order they are used.  If multiple points
+                 are appropriate, a cross-reference will be used to
+                 direct the reader to the declaration of the element.
+
+                 Elements and their attributes are declared as closely as
+                 possible to each other.
+
+                 Attribute declarations are separated with a blank line
+                 into two types: user accessable and those which are
+                 defining to the system (architectural form attributes).
+
+                 A trick has been employed to force content in some
+                 contexts:  A required element with omissable start and
+                 end tags is defined to contain the required data.
+                 The tags for this element are not normally specified.
+                 If no data is provided and the tags are not specified,
+                 A validating parser will issue an error message since
+                 a start tag may not be implied for an empty element.
+
+                 The DTD's declarations conform to a specified format
+                 convention.  Feedback on the readability of the format
+                 used is welcome.
+    ==================================================================-->
+
+<!--==================================================================
+    Parameter Entity Declarations
+    ==================================================================-->
+
+<!--The following list defines those parameter entities which are
+    defined so that the structure and content of this DTD may be
+    modified, without modifying this DTD file itself.
+    This facility is supported primarily for the inclusion of
+    "towers" of functions, specification of more restrictive
+    content models and and the addition or modification of the
+    list of supported notations.  Here is the list of parameter
+    entities defined for this purpose:
+
+      To change the element groups allowed for particular elements:
+        InfoUnitPool.Base - Elements unique to the InfoUnitPool base
+        InfoUnitPool.Towers - InfoUnitPool elements used from the
+             SGML BookMaster towers
+        InfoUnitPool.DataPool.Common - Elements shared with DataPool
+             This includes elements from the base and from the towers.
+        DataPool.Base - Elements unique to the DataPool base
+        DataPool.Towers - DataPool elements used from the SGML BookMaster
+             towers
+
+      To change the document structure elements' content:
+        DocumentType - Name of the document type
+        DocumentElement - Content model of the document element
+        DocumentAtts - Attribute list of the document element
+        Prolog - Content model of Prolog
+        DocTrackingInfo - Content model of DocTrackingInfo
+        FrontMatter - Content model of FrontMatter
+        Body - Content model of Body
+        Appendix - Content model of Appendix
+        BackMatter - Content model of BackMatter
+        Division - Content model of all hierarchical divisions
+        SpecialDivision - Content model of all special divisions
+        DivProlog - Content model of DivProlog
+        SpecialDivProlog - Content model of SpecialDivProlog
+        TrackingInfo - Content model of TrackingInfo
+
+      To add or remove IBM-specific elements:
+        BibRecord
+        BOFNumber
+        LibRecord
+        PartNumber
+        ProductInfo
+        Safety
+        Table
+
+      To change the common attributes:
+        Hyperlink.Attributes
+        Property.Attributes
+        Common.Atts.Base
+        Common.Atts.NoID
+        Common.Atts.NoConRef
+        Common.Atts.NoHyNames
+        Common.Atts.NoLexModel
+        Common.Atts.NoRefType
+        Common.Atts
+
+      To change the notations supported by class:
+        Math.Notations - Math and equation notations supported
+        Graphics.Notations - Graphics and image notations supported
+        ComputerLanguage.Notations - Computer language notations
+             supported
+        TextLanguage.Notations - Text notations supported
+
+      To change the notations supported by various elements:
+        Screen.Notations - Notations supported in Screen element
+        LitData.Notations - Notations supported in the LitData element
+        ObjectContainer.Notations - Notations supported in ObjContainer
+
+      To change the table markup used (more than one may be used):
+        BookMasterTable - IGNORE or INCLUDE
+        SimpleTable - IGNORE or INCLUDE
+        SoftQuadTable - IGNORE or INCLUDE
+
+      To change the character entities used:
+        UseBMSymbols - IGNORE or INCLUDE
+        UseISOCharEnts - IGNORE or INCLUDE
+
+      To change the character entity definitions used:
+        BookMasterSymbols - define as an external parameter entity
+        ISOCharEntities - define as an external parameter entity
+
+-->
+
+<!--Element Groups Parameter Entities ================================-->
+
+                                   <!--========= IBM-Specific Entities-->
+
+<!ENTITY % BibRecord        "BibRecord | IBMBibRecord" >
+<!ENTITY   BibRecord        "%BibRecord;" >
+
+<!ENTITY % BOFNumber        "BOFNumber | IBMBOFNumber" >
+
+<!ENTITY % LibRecord        "LibRecord | IBMLibRecord" >
+<!ENTITY   LibRecord        "%LibRecord;" >
+
+<!ENTITY % PartNumber       "PartNumber | IBMPartNumber" >
+
+<!ENTITY % ProductInfo      "ProductInfo  | IBMProductInfo" >
+
+<!ENTITY % Safety           "Safety | IBMSafety" >
+
+<!-- This parameter entity must agree with marked section keywords which
+     include or exclude the different table models.
+     Notice that BookMasterTable and SimpleTable may not be used
+     together.
+-->
+<!ENTITY % Table            "BookMasterTable | SoftQuadTable" >
+
+                                   <!--================== InfoUnitPool-->
+
+<!--InfoUnitPool is the paragraph-level elements, essentially, division
+    content.  Built from more detailed parameter entities.
+-->
+
+<!-- This entity contains those elements which are common between
+     InfoUnitPool and DataPool.  The elements on the first line of the
+     definition are from the base, the following lines each contain
+     elements from a separate tower.
+-->
+<!ENTITY % InfoUnitPool.DataPool.Common
+    "Link | nameloc | XRef |
+     MultiMediaObject |
+     FN | Citation |
+     %BibRecord; |
+     IRef | I1 | I2 | I3 |
+     Formula |
+     RefKey"
+>
+
+<!-- The following entity contains all the InfoUnitPool elements that
+     are defined as towers.  Each line contains a separate tower.
+-->
+<!ENTITY % InfoUnitPool.Towers
+    "Annot |
+     BibList | FigureList | TableList | FootnoteList |
+     CGraphic |
+     GL |
+     %LibRecord; |
+     LERS |
+     Lines |
+     LitData |
+     LongQuote |
+     ManPage |
+     MarkedNote | MarkList |
+     MessageList |
+     NoteList |
+     ParmList |
+     Procedure |
+     RetrievalAlternatives |
+     Screen | XMP |
+     Syntax"
+>
+
+<!-- The following entity contains the base InfoUnitPool elements
+     except P, Note and ParaBlock since these are included below.
+     As currently setup, P, Note and ParaBlock are all part of the base.
+-->
+<!ENTITY % InfoUnitPool.Base
+    "Bridge |
+     DL | OL | UL |
+     Figure | InfoModule |
+     ModularInformation |
+     Table"
+>
+
+<!-- The following 3 entities are used in content models of the DTD. -->
+<!ENTITY % InfoUnitPool.NoPara
+    "Note | Caution | Danger | Warning |
+     (%InfoUnitPool.Base;) |
+     %InfoUnitPool.DataPool.Common |
+     %InfoUnitPool.Towers;"
+>
+
+<!ENTITY % InfoUnitPool.NoNote
+    "P | ParaBlock |
+     (%InfoUnitPool.Base;) |
+     %InfoUnitPool.DataPool.Common |
+     %InfoUnitPool.Towers;"
+>
+
+<!ENTITY % InfoUnitPool
+    "P | ParaBlock | Note | Caution | Danger | Warning |
+     (%InfoUnitPool.Base;) |
+     %InfoUnitPool.DataPool.Common |
+     %InfoUnitPool.Towers;"
+>
+
+                                   <!--====================== DataPool-->
+
+<!--DataPool defines the phrase-level elements.  Elements that are
+    either DataPool or InfoUnitPool are defined separately.
+-->
+
+<!--DataPool defines the phrase-level elements.  Elements that are
+    either DataPool or InfoUnitPool are defined separately.
+-->
+
+<!ENTITY % DataPool.Towers
+    "Address |
+     APL |
+     Quote |
+     Bin | Char | Decimal | Hex | Number | Octal |
+     Date |
+     GLEntry |
+     MD |
+     MV |
+     PK | PV |
+     SyntaxPhrase |
+     ProcRef |
+     XPH"
+>
+
+<!ENTITY % DataPool.Base    "#PCDATA | Phrase | DefinedTerm">
+
+<!ENTITY % DataPool
+    "%DataPool.Base; |
+     %DataPool.Towers; |
+     %InfoUnitPool.DataPool.Common;"
+>
+
+                                   <!--====================== InfoPool-->
+
+<!--InfoPool is the combination of InfoUnitPool and DataPool
+    InfoUnitPool.Base does not contain the elements shared between
+    InfoUnitPool and DataPool.
+-->
+
+<!ENTITY % InfoPool
+    "((%InfoUnitPool.Base;) | %InfoUnitPool.Towers | P | ParaBlock |
+      Note |
+      %DataPool;)*"
+>
+
+<!ENTITY % InfoPool.NoPara
+    "((%InfoUnitPool.Base;) | %InfoUnitPool.Towers | Note |
+      %DataPool;)*"
+>
+
+<!ENTITY % InfoPool.NoNote
+    "((%InfoUnitPool.Base;) | %InfoUnitPool.Towers | P | ParaBlock |
+      %DataPool;)*"
+>
+
+<!--Common Attribute Entities ========================================-->
+
+<!ENTITY % Hyperlink.Attributes.BookMaster
+   "Qualification    NAMES        #IMPLIED"
+>
+
+<!ENTITY % Hyperlink.AnchRoles.BookMaster
+   "RevisionSpecification"
+>
+
+<!ENTITY % Hyperlink.AnchorRoles
+   "Annotation | PropertySource | Alternative"
+>
+
+<!ENTITY % Hyperlink.Attributes
+   "ContentAssociations
+                     NAMES        #IMPLIED
+    AnchorRoles      NAMES        #IMPLIED
+    LinkEnds         NAMES        #IMPLIED
+    %Hyperlink.Attributes.BookMaster;"
+>
+
+<!ENTITY % IBMProperty.Attributes
+   "IBMSecurity      (UNC | IUO | IC | ICR | IRC)
+                                  #IMPLIED"
+>
+
+<!ENTITY % Property.Attributes
+   "Language         NAME         #IMPLIED
+    Security         NAME         #IMPLIED
+    Status           (New | Changed | Deleted | Unchanged)
+                                  Unchanged
+    Style            CDATA        #IMPLIED
+    Version          CDATA        #IMPLIED
+    Level            CDATA        #IMPLIED
+    HWPlatform       CDATA        #IMPLIED
+    SWPlatform       CDATA        #IMPLIED
+    OutputDevice     CDATA        #IMPLIED
+    %IBMProperty.Attributes;"
+>
+
+<!-- Definition of VersionSpec model
+
+<HyLex ltn=VersionSpec>
+     S,
+     (("#NOT", S)?, name, S) |
+     (VersionSpec, ("#AND" | "#OR"), VersionSpec) |
+     ("(", VersionSpec, ")", S)
+</HyLex>
+
+-->
+
+<!--Common.Atts.Base has all common attributes except those which
+    are specified by any element in the DTD.  These attributes are:
+        HyNames
+        LexModel
+        RefType
+        ContentRef
+        ID
+-->
+
+<!--The following entities are used where these attributes are overriden
+    by specific elements to include the common specifications for the
+    attribute.
+-->
+
+<!ENTITY   Common.HyNames
+    "linkends LinkEnds anchrole AnchorRoles conloc ContentRef"
+>
+
+<!ENTITY   Common.LexModel
+    "Version         VersionSpec
+     Level           VersionSpec
+     HWPlatform      VersionSpec
+     SWPlatform      VersionSpec
+     OutputDevice    VersionSpec
+     docroles names"
+>
+
+<!ENTITY   Common.RefType
+    "Qualification Qualification"
+>
+
+<!ENTITY % Common.Atts.Base
+   "XRefText         CDATA        #IMPLIED
+    InfoType         CDATA        #IMPLIED
+    %Hyperlink.Attributes;
+    %Property.Attributes;"
+>
+
+<!--Each of the following entities consists of Base, all of the
+    excluded attributes but the one to be excluded, indicated in the
+    name of the attribute.
+-->
+
+<!--The Class attribute defined here is used for local additions to
+    this DTD.  It is our intent to perform this function using
+    SUBDOC to isolate these additions and using architectural
+    forms to define the processing of the element when this is
+    technically possible (these functions are supported by vendors).
+    concepts).
+-->
+
+<!ENTITY % Common.Atts.NoConRef
+   "ID               NAME         #IMPLIED
+    HyNames          CDATA        #FIXED    ''  -- no conref att here --
+    HyTime           (ilink | hybrid)
+                                  hybrid
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED    '&Common.RefType;'
+    Class            NAME         #IMPLIED
+    %Common.Atts.Base;"
+>
+
+<!ENTITY % Common.Atts.NoID
+   "ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    HyTime           (ilink | hybrid)
+                                  hybrid
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED    '&Common.RefType;'
+    Class            NAME         #IMPLIED
+    %Common.Atts.Base;"
+>
+
+<!ENTITY % Common.Atts.NoLexMdl
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    HyTime           (ilink | hybrid)
+                                  hybrid
+    RefType          CDATA        #FIXED    '&Common.RefType;'
+    Class            NAME         #IMPLIED
+    %Common.Atts.Base;"
+>
+
+<!ENTITY % Common.Atts.NoLexMdl.NoHyTime
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    RefType          CDATA        #FIXED    '&Common.RefType;'
+    Class            NAME         #IMPLIED
+    %Common.Atts.Base;"
+>
+
+<!ENTITY % Common.Atts.NoRefType
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    HyTime           (ilink | hybrid)
+                                  hybrid
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    Class            NAME         #IMPLIED
+    %Common.Atts.Base;"
+>
+
+<!ENTITY % Common.Atts.NoRefType.NoClass
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    HyTime           (ilink | hybrid)
+                                  hybrid
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    %Common.Atts.Base;"
+>
+
+<!ENTITY % Common.Atts.NoClass
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    HyTime           (ilink | hybrid)
+                                  hybrid
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED    '&Common.RefType;'
+    %Common.Atts.Base;"
+>
+<!ENTITY % Common.Atts.NoLexMdl.NoRefType
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    HyTime           (ilink | hybrid)
+                                  hybrid
+    Class            NAME         #IMPLIED
+    %Common.Atts.Base;"
+>
+
+<!ENTITY % Common.Atts.NoHyTime
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED    '&Common.RefType;'
+    Class            NAME         #IMPLIED
+    %Common.Atts.Base;"
+>
+
+<!ENTITY % Common.Atts
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    HyTime           (ilink | hybrid)
+                                  hybrid
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED    '&Common.RefType;'
+    Class            NAME         #IMPLIED
+    %Common.Atts.Base;"
+>
+
+<!-- These attributes are common to BibRecord and LibRecord and
+     their derivitives.  They are broken out to add the DescribedDocument
+     AnchRole.  They are placed here to facilitate their use in all of
+     these elements.
+-->
+<!ENTITY % LibRecord.Atts
+   "ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED    '&Common.RefType;'
+    Class            NAME         #IMPLIED
+    XRefText         CDATA        #IMPLIED
+    InfoType         CDATA        #IMPLIED
+    ContentAssociations
+                     NAMES        #IMPLIED
+    AnchorRoles      NAMES        #IMPLIED
+    LinkEnds         NAMES        #IMPLIED
+    %Hyperlink.Attributes.BookMaster;
+    %Property.Attributes;"
+>
+
+
+<!--Notation Entities ================================================-->
+
+<!--Graphic.Notations defines the names of the graphic notations
+    supported.
+-->
+<!ENTITY % Graphic.Notations
+    "Image | Vector | PSEG | EPS | GDF | CGMChar | CGMClear | BMP | MET |
+     TIFF | CDR"
+>
+
+<!--Math.Notations defines the names of the math and equation
+    notations supported.
+-->
+<!ENTITY % Math.Notations   "TeXMath | eqn | ISOMath | smff" >
+
+<!--ComputerLanguage.Notations defines the names of the computer
+    language notations supported.  APL is excluded from this list
+    it has its own element markup which uses the APL notation.
+-->
+<!ENTITY % ComputerLanguage.Notations
+    "ASM | ASSEMBLE | C | EXEC | PLI | REXX"
+>
+
+<!--TextLanguage.Notations defines the names of the text markup
+    language notations supported.
+-->
+<!ENTITY % TextLanguage.Notations "Script | TeXText" >
+
+<!--%Screen.Notations; is defined before the Screen element
+    declaration
+-->
+
+<!--%LitData.Notations; is defined before the LitData element
+    declaration.
+-->
+
+<!--%ObjectContainer.Notations; is defined before the ObjectContainer
+    element declaration.
+-->
+
+<!--Marked Section Control Entities ==================================-->
+
+<!-- These marked section keyword status area values must agree with
+     the contents of the %Table parameter entity declaration.
+     Notice that BookMasterTable and SimpleTable may not be used
+-->
+<!ENTITY % BookMasterTable  "INCLUDE" >
+<!ENTITY % SimpleTable      "IGNORE " >
+<!ENTITY % SoftQuadTable    "INCLUDE" >
+
+
+<!--==================================================================
+    Notation and Data Attribute Declarations
+    ==================================================================-->
+
+<!--Many of the following notation declarations need to have the
+    appropriate version information added by an expert in these
+    formats
+-->
+
+<!-- Within this DTD, notation attributes use a token list or the
+     attribute declared value of NAME rather than NOTATION.  This is
+     because of a conflict between our desire to specify default
+     notations for some elements as well as provide a content reference
+     capability for every element and the requirement in SGML (See
+     7.9.4.4) that no notation be specified when a content reference
+     attribute is used on the element.  Attributes which fall into this
+     catagory are all named 'Notation'.  Should a conflict arise during
+     processing between the notation specified for a referencing
+     element and the reference target (be it an element or an entity),
+     the target's notation will be used by application convention.
+-->
+
+<!-- Mathematics Notations ===========================================-->
+
+<!-- The following mathematics notation is IBM-defined notations. -->
+<!NOTATION SMFF          PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Script Mathematical Formula Formatter//EN"
+>
+
+<!--The following mathematics notations are not defined by IBM, these
+    identifiers will need to change when the registration of
+    identifiers is implemented.
+-->
+<!NOTATION TeXMath       PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION TeX Mathematics Markup//EN"
+>
+<!NOTATION eqn           PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION eqn Mathematics Markup//EN"
+>
+<!--This mathematics notation is fundamentally different, it is
+    defined by an SGML document type definition fragment.  This
+    system's handling of this is not fully understood yet.
+-->
+<!NOTATION ISOMATH       PUBLIC
+    "ISO/IEC TR9573-7//NOTATION Mathematics Markup//EN" >
+
+<!-- Graphics and Image Notations ====================================-->
+
+<!-- The following graphics notations are IBM-defined notations. -->
+<!NOTATION PSEG          PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION AFP Picture Segment//EN"
+>
+<!NOTATION GDF           PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Graphic Data File//EN"
+>
+<!NOTATION MET           PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION OS/2 Metafile Format//EN"
+>
+<!NOTATION BMP           PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION OS/2 Bitmap Format//EN"
+>
+
+<!-- The following graphics notations are IBMIDDOC-defined.
+     These notations indicate that the artwork is of a general class
+     but that the specific notation may vary depending on the type
+     of processing being defined and that the binding of the graphic to
+     specific notation for processing should be delayed as long as
+     possible. -->
+<!NOTATION Graphics      PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Generic Graphics Meta-Notation//EN"
+>
+<!NOTATION Vector        PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Generic Vector Meta-Notation//EN"
+>
+<!NOTATION Image         PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Generic Image Meta-Notation//EN"
+>
+
+<!-- The following graphics notations are not defined by IBM, these
+     identifiers will need to change when the registration of
+     identifiers is implemented. -->
+<!NOTATION CDR           PUBLIC
+    "-//Corel//NOTATION CorelDraw File Format//EN"
+>
+<!NOTATION CGMChar       PUBLIC
+    "ISO 8632-2//NOTATION CGM Character encoding//EN"
+>
+<!NOTATION CGMClear      PUBLIC
+    "ISO 8632-4//NOTATION CGM Clear text encoding//EN"
+>
+<!NOTATION EPS           PUBLIC
+    "-//Adobe//NOTATION Encapulated PostScript//EN"
+>
+<!NOTATION TIFF          PUBLIC
+    "-//Aldus//NOTATION Tagged Image File Format//EN"
+>
+
+<!-- Computer Language Notations =====================================-->
+
+<!NOTATION APL           PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION APL//EN"
+>
+<!NOTATION ASM           PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION 80x86 Assembler//EN"
+>
+<!NOTATION ASSEMBLE      PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION 370 Assembler//EN"
+>
+<!NOTATION C             PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION C//EN"
+>
+<!NOTATION EXEC          PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION EXEC//EN"
+>
+<!NOTATION PLI           PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION PL/I//EN"
+>
+<!NOTATION REXX          PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION REXX//EN"
+>
+
+<!-- Text Markup Language Notations ==================================-->
+
+<!NOTATION SGMLDocument  PUBLIC
+    "+//ISO/IEC 8879:1986//NOTATION SGML Document//EN"
+>
+<!ATTLIST  #NOTATION SGMLDocument
+    HyTime           NAME         #FIXED    "document"
+>
+<!NOTATION HyQ           PUBLIC
+    "+//ISO/IEC 10744colon.1992//NOTATION HyTime Query Notation//EN"
+>
+<!NOTATION HyLex         PUBLIC
+    "+//ISO/IEC 10744colon.1992//NOTATION HyTime Lexical Model Notation//EN"
+>
+
+<!-- Within data of notation term, hyphen characters indicate
+     allowed hyphenatation points.
+-->
+<!NOTATION Term          PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION DefinedTerm Content/Hyphenation Information//EN"
+>
+<!NOTATION TeXText       PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION TeX Text Markup//EN"
+>
+<!NOTATION Script        PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Document Composition Facility Markup//EN"
+>
+
+<!-- IBMIDDOC Special Text Notations =================================-->
+
+<!-- Within data of notation LineSpecific, significant record ends
+     must be preserved and presented, rather than being treated simply
+     as word breaks.  It should be noted that without exception,
+     significant record ends (line breaks) are treated as word breaks
+     in IBMIDDOC.
+-->
+<!NOTATION LiteralData   PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Literal Data//EN"
+>
+<!NOTATION LineSpecific  PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Line Specific Content//EN"
+>
+<!NOTATION CGraphic      PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Character Graphic Drawing//EN"
+>
+<!NOTATION DTL           PUBLIC
+    "+//ISBN 0-933186::IBM//NOTATION Dialog Tag Language//EN"
+>
+
+<!--GraphicNotation.Atts defines notation attributes for use with
+     all graphic notations.
+-->
+
+<!ATTLIST  #NOTATION (%Graphic.Notations;)
+    WIDTH            CDATA        #IMPLIED -- Width of graphic --
+    DWidth           CDATA        #IMPLIED -- Width for online display --
+    DEPTH            CDATA        #IMPLIED -- Depth of graphic --
+    DDepth           CDATA        #IMPLIED -- Depth for online display --
+    ALIGN            CDATA        #IMPLIED -- Horizontal alignment --
+    BOTMAR           CDATA        #IMPLIED -- Margin below graphic --
+    TOPMAR           CDATA        #IMPLIED -- Margin above graphic --
+    ADJUST           CDATA        #IMPLIED -- Adjust rel to baseline --
+    LABEL            CDATA        #IMPLIED -- Label for graphic --
+>
+
+
+<!--==================================================================
+    Document Type Organizational Elements
+    ==================================================================-->
+
+
+<!ENTITY % DocumentType     "IBMIDDoc" >
+
+<!ENTITY % DocumentElement
+    "Prolog?, Frontmatter?, Body, WebSet?, Backmatter?"
+>
+
+<!ENTITY % Document.Atts
+   '%Common.Atts.NoHyTime;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+    HyTime           NAME         #FIXED    "HyDoc"     -- HyTime doc --
+    unmspace         (unified | separate)
+                                  #FIXED    "unified"'
+>
+
+<!ELEMENT  %DocumentType;   O O (%DocumentElement;)
+                                             -- IBM Software Document --
+>
+<!ATTLIST  %DocumentType;
+    %Document.Atts;
+>
+
+<!ENTITY % Prolog
+    "DocTrackingInfo?, PropertyDefinitions?,  LinkDescriptions?,
+     CopyRights?, TrademarkDefinitions?,  GlossaryDefinitions?,
+     BibRecords?, IndexDefinitions?, ObjectLibrary*"
+>
+
+<!ELEMENT  Prolog           - O (%Prolog;) >
+<!ATTLIST  Prolog
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Metadata"
+>
+
+<!-- '|' should be '&' and only Div allowed multiple times
+     but tools don't properly support this *yet* -->
+<!ENTITY % Frontmatter
+    "(Abbreviations? | Abstract? | Bibliography? |
+      EditionNotices? |
+      FigureList? |
+      Glossary? | Legend? | Preface? | SOA? | TableList? | TOC? |
+      (%Safety;)? |
+      Div
+     )*"
+>
+
+<!ELEMENT  Frontmatter      - O (%Frontmatter;) >
+<!ATTLIST  Frontmatter
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ENTITY % Body             "Title?, (Part* | (Div | Procedure)*)" >
+
+<!ELEMENT  Body             O O (%Body;) >
+<!ATTLIST  Body
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  Part             - O (Title?, Desc?, Div*) >
+<!ATTLIST  Part
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ENTITY % Appendix         "Title?, Div*" >
+
+<!ELEMENT  Appendix         - O (%Appendix;) >
+<!ATTLIST  Appendix
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!-- '|' should be '&' and only Div allowed multiple times
+     but tools don't properly support this *yet* -->
+<!ENTITY % Backmatter
+    "(Appendix? | Bibliography? | Glossary? | Index? | SOA? | Div)*"
+>
+
+<!ELEMENT  Backmatter       - O (%Backmatter;) >
+<!ATTLIST  Backmatter
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!--Prolog Contents ==================================================-->
+
+<!--In the Prolog section, because of the large number of elements and
+    the complexity of the markup, more commentary designed to help
+    navigate is required.  Within this section, the following comment
+    format indicates a prolog content major category:
+
+    ============================================== PrologMajorCategory
+
+    and the following comment format is used for prolog content
+    sub categories:
+
+                                      ============== PrologSubCategory
+-->
+
+<!--================================================== DocTrackingInfo-->
+
+<!ENTITY % DocTrackingInfo
+    "(%BibRecord;)?,
+     ControlInfo?, RevisionHistory?, QualificationList?"
+>
+
+<!ELEMENT  DocTrackingInfo  - O
+                     (%DocTrackingInfo;)
+                                     -- Document Tracking Information --
+>
+
+<!ATTLIST  DocTrackingInfo
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Metadata"
+>
+
+                                   <!--====================== DocTitle-->
+<!ELEMENT  DocTitle         - -
+                     (ShortTitle?, Library?, Topic, SubTitle?)
+                                                    -- Document Title --
+>
+<!ATTLIST  DocTitle
+    %Common.Atts;
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "Title"
+    Notation         (LineSpecific)
+                                  #FIXED    "LineSpecific"
+>
+
+<!-- Note:  ShortTitle is the same element contained by Title -->
+
+<!ELEMENT  (Library | Topic | SubTitle)
+                            O O (%DataPool;)*
+>
+<!ATTLIST  (Library | Topic | SubTitle)
+    %Common.Atts;
+>
+
+<!ELEMENT  VolumeIdentifier - O (%DataPool;)* >
+<!ATTLIST  VolumeIdentifier
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+                                   <!--======================= Authors-->
+<!ELEMENT  Authors          - - (Author)+ >
+<!ATTLIST  Authors
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "Authors"
+>
+
+<!ELEMENT  Author           O O (Enterprise | Person) >
+<!ATTLIST  Author
+    Role             CDATA        #IMPLIED           -- Author's role --
+    %Common.Atts;
+>
+
+<!ELEMENT  Enterprise       - O (EnterpriseName, Address?) >
+<!ATTLIST  Enterprise
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "NameAndAddress"
+>
+
+<!ELEMENT  EnterpriseName   O O (%DataPool;)* >
+<!ATTLIST  EnterpriseName
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Name"
+>
+
+<!ELEMENT  Person           - O (Name, Address?) >
+<!ATTLIST  Person
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "NameAndAddress"
+>
+
+<!ELEMENT  Name             O O
+                     (NameBlock? |
+                      (Last, First?, Middle?, Honorific?,
+                       JobTitle?, Nickname?, GoesBy?, Desc?))
+>
+<!ATTLIST  Name
+    SortKey          CDATA        #IMPLIED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Name"
+>
+
+<!ELEMENT  NameBlock        - O
+                     (%DataPool; | Last | First | Middle | Honorific |
+                      JobTitle | Nickname | GoesBy | Desc)*
+>
+<!ATTLIST  NameBlock
+    Object           ENTITY       #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "NameBlock"
+    Notation         (LineSpecific)
+                                  LineSpecific
+                         -- LineSpecific unless Object attribute used --
+>
+
+<!ELEMENT  (Last | First | Middle | Honorific |
+            JobTitle | Nickname | GoesBy)
+                            - O (%DataPool;)*
+>
+<!ATTLIST  (Last | First | Middle | Honorific |
+            JobTitle | Nickname | GoesBy)
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "Name"
+>
+
+<!ELEMENT  Address          - -
+                     (AddressBlock? |
+                      (EnterpriseName?,
+                       CareOf?, Street?, POBox?,
+                       City?, State?, USZip?,
+                       Country?,
+                       Dept?, Bldg?, MailStop?,
+                       Phone*,
+                       VNET*, Internet*, IBMMail?, OLService*
+                     ))
+>
+<!ATTLIST  Address
+    Object           ENTITY       #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Address"
+>
+
+<!ELEMENT  AddressBlock     - -
+                     (%DataPool; | EnterpriseName |
+                      CareOf | Street | POBox | City | State | USZip |
+                      Country | Dept | Bldg | MailStop | VNET |
+                      Internet | IBMMail | OLService | Phone)*
+                                        -- Non-standard address block --
+                     -- Use address subelements to do content markup. --
+>
+<!ATTLIST  AddressBlock
+    Object           ENTITY       #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "AddressBlock"
+    Notation         (LineSpecific)
+                                  LineSpecific
+                         -- LineSpecific unless Object attribute used --
+>
+
+<!ELEMENT  (CareOf | Street | POBox | City | State | USZip |
+            Country | Dept | Bldg | MailStop | VNET | Internet |
+            IBMMail | OLService)
+                            - O (%DataPool;)*
+>
+
+<!ATTLIST  (CareOf | Street | POBox | City | State | Country |
+            Dept | Bldg | MailStop | IBMMail)
+    %Common.Atts;
+>
+
+<!ELEMENT  Phone            - O (%DataPool;) >
+
+<!ATTLIST  Phone
+    Location         (Work | AltWork | Mobile | PDA | Home | AltHome |
+                      OtherLoc)   Work
+    Equipment        (Voice | VoiceMail | Fax | VoiceFax | VoiceMailFax |
+                      Pager | Modem | Telex | OtherEquip)
+                                  VoiceMail
+    Coverage         (Primary | Group | Secretary | AnsweringService |
+                      BBS | OtherCoverage)
+                                  Primary
+    Scope            (LocalPrivateNetwork | PrivateNetwork |
+                      IBMTieLine | InState | Domestic | International |
+                      OtherScope)
+                                  Domestic
+    Use              (BusinessHours | AfterHours | AllHours |
+                      Emergency | NoAnswer | OtherUse)
+                                  AllHours
+    OtherInformation CDATA        #IMPLIED
+    %Common.Atts;
+>
+
+<!ATTLIST  USZip
+    %Common.Atts.NoLexMdl;
+
+    LexModel         CDATA        #FIXED
+                          "#CONTENT ([0-9],[0-9],[0-9],[0-9],[0-9],
+                                     ('-',[0-9],[0-9],[0-9],[0-9])?
+                                    )
+                           &Common.LexModel;"
+                         -- HyLex restriction: 7- or 9-digit ZIP code --
+>
+
+<!ATTLIST  VNET
+    %Common.Atts.NoLexMdl;
+
+    LexModel         CDATA        #FIXED
+                          '#CONTENT ((name, S, "at", S, name) |
+                                                (name, "(",name,")"))
+                           &Common.LexModel;'
+                     -- HyLex restriction: user at node or node(user) --
+>
+
+<!ATTLIST  Internet
+    %Common.Atts.NoLexMdl;
+
+    LexModel         CDATA        #FIXED
+                          '#CONTENT (name, "@", name, (".",name)*)
+                           &Common.LexModel;'
+                              -- HyLex restriction: name@name(.name)* --
+>
+
+<!ATTLIST  OLService
+    OLServiceName    CDATA        #IMPLIED
+    %Common.Atts;
+>
+
+                                   <!--== Misc Document Identification-->
+<!ELEMENT  FileNumber       - O (%DataPool;)* >
+<!ATTLIST  FileNumber
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  RetrievalKey     - O (%DataPool;)* >
+<!ATTLIST  RetrievalKey
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+
+                                   <!--=================== ControlInfo-->
+<!ENTITY % ControlInfo
+    "(%ProductInfo;)*,
+     Approvers?, Owners?,
+     CriticalDates?"
+>
+
+<!ELEMENT  ControlInfo      - - (%ControlInfo;)
+                                      -- Document Control Information --
+>
+<!ATTLIST  ControlInfo
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  ProductInfo      - O (ProductName, Version?) >
+<!ATTLIST  ProductInfo
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT (ProductName | Version)
+                            - O (%DataPool;)*
+>
+<!ATTLIST (ProductName | Version)
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  IBMProductInfo   - O (ProductName,
+                                 Version?, Release?, Modification?,
+                                 IBMProgramNumber?)
+>
+<!ATTLIST  IBMProductInfo
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT (Release | Modification | IBMProgramNumber)
+                            - O (%DataPool;)*
+>
+<!ATTLIST (Release | Modification | IBMProgramNumber)
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  Approvers        - O (Enterprise | Person)+ >
+<!ATTLIST  Approvers
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  Owners           - O (Enterprise | Person)+ >
+<!ATTLIST  Owners
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  CriticalDates    - O (CriticalDate)+ >
+<!ATTLIST  CriticalDates
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  CriticalDate     O O (Date, Desc) >
+<!ATTLIST  CriticalDate
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+                                   <!--=============== RevisionHistory-->
+<!ELEMENT  RevisionHistory  - - (Revision | Mark)+ >
+<!ATTLIST  RevisionHistory
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  Revision         - O (Desc, Author, Date)
+                                               -- Revision definition --
+>
+<!ATTLIST  Revision
+    ID               NAME         #REQUIRED
+    TrackingCode     CDATA        #IMPLIED  -- Revision tracking code --
+    Reason           CDATA        #IMPLIED
+                   -- Reason for revision: editorial, technical, etc. --
+    %Common.Atts.NoID;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+                                     <!--=========== QualificationInfo-->
+<!ELEMENT  QualificationList
+                            - - (Qualification)+ >
+<!ATTLIST  QualificationList
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  Qualification    - - (Desc)    -- Qualification definition -->
+<!ATTLIST  Qualification
+    ID               NAME         #REQUIRED
+    Run              (Run | Ignore)
+                                  Run
+    QualificationText
+                     CDATA        #IMPLIED
+                                    -- Qualification identifying text --
+    %Common.Atts.NoID;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!--============================================== PropertyDefinitions-->
+
+<!ENTITY % PropertyDefinitions
+    "PropertyGroup |
+     PropertyDef | AnchorRoleDef | ClassDef | LERSDef | ManPageDef |
+     MarkDesc | MessageItemDef | ModularInfoDef | ModularItemDef"
+>
+
+<!ELEMENT  PropertyDefinitions
+                             - - (%PropertyDefinitions;)*
+>
+<!ATTLIST  PropertyDefinitions
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  PropertyGroup    - - (Desc?, (PropertyDef* | PropertyGroup*))>
+<!ATTLIST  PropertyGroup
+    %Common.Atts;
+>
+
+<!ELEMENT  PropertyDef      - O (desc?)         -- Property Defintion -->
+<!ATTLIST  PropertyDef
+    ElementTypes     NAMES        #IMPLIED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "PropertyDefinition"
+>
+
+<!ELEMENT  AnchorRoleDef    - - (Title?, Semantic)
+                                                  -- Class Definition --
+>
+<!ATTLIST  AnchorRoleDef
+    RoleName         NAME         #REQUIRED
+    ParentRole       NAME         #IMPLIED    -- Parent of this class --
+    ElementTypes     NAMES        #IMPLIED -- GIs this Def applies to --
+    %Common.Atts;
+
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Content"
+    InfoMaster       NAME         #FIXED    "PropertyDefiniton"
+>
+
+<!ENTITY % ClassDef         "Title?, IndexTerm?, Semantic" >
+
+<!ELEMENT  ClassDef         - - (%ClassDef;)      -- Class Definition -->
+<!ATTLIST  ClassDef
+    ClassName        NAME         #REQUIRED
+    ParentClass      NAME         #IMPLIED    -- Parent of this class --
+    ElementTypes     NAMES        #IMPLIED -- GIs this Def applies to --
+    SemanticClass    NAME        -- (Content | MetaData | Annotation) --
+                                  MetaData
+                                  -- The semantic class of this class --
+    SemanticProperty (PropertyDefinition | Enumeration)
+                                  #IMPLIED
+    %Common.Atts;
+
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Content"
+    InfoMaster       NAME         #FIXED    "PropertyDefiniton"
+>
+<!ELEMENT  Semantic         - O (%DataPool;)* >
+<!ATTLIST  Semantic
+    %Common.Atts;
+
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+>
+
+<!ENTITY % lersdef.atts
+   "Auth             CDATA        #IMPLIED
+    Comments         CDATA        #IMPLIED
+    Context          CDATA        #IMPLIED
+    Defaults         CDATA        #IMPLIED
+    Errcond          CDATA        #IMPLIED
+    Examples         CDATA        #IMPLIED
+    Flags            CDATA        #IMPLIED
+    Format           CDATA        #IMPLIED
+    Intrep           CDATA        #IMPLIED
+    Messages         CDATA        #IMPLIED
+    Other            CDATA        #IMPLIED
+    Parms            CDATA        #IMPLIED
+    Process          CDATA        #IMPLIED
+    Purpose          CDATA        #IMPLIED
+    Restrict         CDATA        #IMPLIED
+    Results          CDATA        #IMPLIED
+    Retcodes         CDATA        #IMPLIED
+    Sysenv           CDATA        #IMPLIED
+    Usage            CDATA        #IMPLIED
+    Ver              CDATA        #IMPLIED"
+>
+<!ELEMENT  LERSDef          - O (Desc?)
+                     -- Language Element Reference Section Definition --
+>
+<!ATTLIST  LERSDef
+    %lersdef.atts;
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "PropertyDefinition"
+>
+
+<!ELEMENT  ManPageDef       - O (Desc?)        -- Man Page Definition -->
+<!ATTLIST  ManPageDef
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "PropertyDefinition"
+>
+
+<!ELEMENT  ModularInfoDef   - O (Desc, ModularItemDef+)
+                                     -- Module Information Definition --
+>
+<!ATTLIST  ModularInfoDef
+    ClassName        NAME         #IMPLIED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "PropertyDefinition"
+>
+
+<!-- Title element defines default title for a given ModuleItem class -->
+<!ELEMENT  ModularItemDef   - O (Title, Desc?)
+                                            -- Module Item Definition --
+>
+<!ATTLIST  ModularItemDef
+    ClassName        NAME         #IMPLIED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "PropertyDefinition"
+>
+
+<!--================================================= LinkDescriptions-->
+
+<!ELEMENT  LinkDescriptions - O (LinkDesc*) >
+<!ATTLIST  LinkDescriptions
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  LinkDesc         - - (Desc?, (nameloc | nmquery)?, NotLoc*)
+                                                  -- Link Description --
+>
+<!ATTLIST  LinkDesc
+    %Common.Atts.NoHyTime;
+
+    InfoMaster       NAME         #FIXED    "LinkDescription"
+
+    -- HyTime attributes: --
+    HyTime           NAME         #FIXED    nameloc
+    ordering         (ordered)    ordered
+              -- Up to presentation system to define meaning of order --
+    set              (set)        set                 -- Ignore dupes --
+    aggloc           (nagg)       nagg               -- Not aggregate --
+    spanloc          (nspan)      nspan                   -- No spans --
+    limsort          (nlimsort)   nlimsort        -- No limit sorting --
+>
+
+<!ELEMENT  nameloc          - O (nmquery | nmlist)*
+                                            -- HyTime nameloc element --
+>
+<!ATTLIST  nameloc
+    ID               NAME         #REQUIRED
+
+            -- HyTime attributes: --
+    HyTime           NAME         #FIXED    namloc
+    ordering         (ordered)    ordered
+              -- Up to presentation system to define meaning of order --
+    set              (set)        set                 -- Ignore dupes --
+    aggloc           (nagg)       nagg               -- Not aggregate --
+    spanloc          (nspan)      nspan                   -- No spans --
+    limsort          (nlimsort)   nlimsort        -- No limit sorting --
+>
+
+<!ELEMENT  nmlist           - O (#PCDATA)         -- HyTime name list -->
+<!ATTLIST  nmlist
+    -- HyTime attributes: --
+    HyTime           NAME         #FIXED    nmlist
+    nametype         (entity | element)
+                                  element     --Unified not supported --
+    obnames          (nobnames)   nobnames
+    docname          ENTITY       #IMPLIED
+    dtdorlpd         NAMES        #IMPLIED
+    HyNames          CDATA        #FIXED    "docorsub docname"
+>
+
+<!ELEMENT  nmquery          - O (#PCDATA)        -- HyTime name query -->
+<!ATTLIST  nmquery
+    fn       -- Function name --
+             -- Constraint: unique in element type --
+                     NAME     #IMPLIED  -- Default: none --
+    usefn    -- Fn of another function to which to pass
+                the args of this one --
+                     NAME     #CONREF   -- Default: none --
+    args     -- Argument string passed to the function
+                (if supported by function language) --
+                     CDATA    #IMPLIED  -- Default: none --
+
+    ID               NAME         #IMPLIED
+    notation         NAME         #IMPLIED  -- Default is HyQ --
+    -- HyTime attributes: --
+    HyTime           NAME         #FIXED    nmquery
+    qdomain          NAMES        #IMPLIED
+    qcontext         NAME         #IMPLIED
+>
+
+<!ELEMENT  NotLoc           - - (#PCDATA) -- HyTime notation location -->
+<!ATTLIST  NotLoc
+    ID               NAME         #REQUIRED
+    Notation         NAME         #REQUIRED
+    LocSrc           NAME         #REQUIRED
+
+    -- HyTime attributes: --
+    HyTime           NAME         #FIXED    "notloc"
+    qdomain          NAMES        #IMPLIED
+    qcontext         NAME         #IMPLIED
+    ordering         (ordered)    ordered
+              -- Up to presentation system to define meaning of order --
+    set              (set)        set                 -- Ignore dupes --
+    aggloc           (nagg)       nagg               -- Not aggregate --
+>
+
+<!--======================================================= CopyRights-->
+
+<!ELEMENT  CopyRights       - - (CopyRight+) >
+<!ATTLIST  CopyRights
+    %Common.Atts;
+    InfoMethod       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  CopyRight        - -
+                     (Holder, FirstYear, LastYear?, RightsReserved?,
+                      RightsGiven?, USGovtLicense?,
+                      RegisteredWith?, CopyRightExt?)
+>
+<!ATTLIST  CopyRight
+    %Common.Atts;
+>
+
+<!ELEMENT  Holder           - O (%DataPool;)* >
+<!ATTLIST  Holder
+    %Common.Atts;
+>
+
+<!ELEMENT  (FirstYear | LastYear)
+                            - O (%DataPool;)*
+>
+<!ATTLIST  (FirstYear | LastYear)
+    %Common.Atts;
+>
+
+<!ELEMENT  RightsReserved   - O (%DataPool;)* >
+<!ATTLIST  RightsReserved
+    %Common.Atts;
+>
+
+<!ELEMENT  RightsGiven      - O (%DataPool;)* >
+<!ATTLIST  RightsGiven
+    %Common.Atts;
+>
+
+<!ELEMENT  USGovtLicense    - O (%DataPool;)* >
+<!ATTLIST  USGovtLicense
+    Auto             (Auto)       #CONREF
+    %Common.Atts;
+>
+
+<!ELEMENT  RegisteredWith   - O (%DataPool;)* >
+<!ATTLIST  RegisteredWith
+    %Common.Atts;
+>
+
+<!ELEMENT  CopyrightExt     - O (%InfoUnitPool;)*
+                                               -- Copyright extension --
+>
+<!ATTLIST  CopyrightExt
+    %Common.Atts;
+>
+
+<!--============================================= TradeMarkDefinitions-->
+
+<!ELEMENT  TradeMarkDefinitions
+                             - O (TradeMark*)
+>
+<!ATTLIST  TradeMarkDefinitions
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!-- Temporary definition of TradeMark to further DTD work. -->
+<!ELEMENT  TradeMark        - O (#PCDATA) >
+
+<!ATTLIST  TradeMark
+    %Common.Atts;
+>
+
+<!--============================================== GlossaryDefinitions-->
+
+<!ELEMENT  GlossaryDefinitions
+                             - O (GLEntry*)
+>
+<!ATTLIST  GlossaryDefinitions
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!--======================================================= BibRecords-->
+
+<!ELEMENT  BibRecords       - - (%BibRecord; | %LibRecord;)*
+                                              -- Bibliographic record --
+>
+<!ATTLIST  BibRecords
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+                                   <!--====== IBMBibRecord & BibRecord-->
+<!ELEMENT  BibRecord        - O
+                     (DocTitle,
+                      Authors?,
+                      Publisher?, PrintLocation?,
+                      OrderNumber?,
+                      ISBN?, PublicIdentifier?, Desc?)
+                                              -- Bibliographic Record --
+>
+<!ATTLIST  BibRecord
+    %LibRecord.Atts;
+
+    InfoMaster       NAME         #FIXED    "InformationModule"
+    ApplicationClass NAME         #FIXED    "BibliographicRecord"
+>
+
+<!ELEMENT  IBMBibRecord     - O
+                     (DocTitle, VolumeIdentifier?, RetrievalKey?,
+                      Authors?,
+                      Publisher?, PrintLocation?,
+                      FileNumber?,
+                      IBMDocNumber?, IBMPartNumber?, ISBN?,
+                      PublicIdentifier?, Desc? )
+                                          -- IBM Bibliographic Record --
+>
+<!ATTLIST  IBMBibRecord
+    %LibRecord.Atts;
+
+    InfoMaster       NAME         #FIXED    "InformationModule"
+    ApplicationClass NAME         #FIXED    "BibliographicRecord"
+>
+
+<!ELEMENT  Publisher        - O (EnterpriseName, Address?) >
+<!ATTLIST  Publisher
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+             -- This element also conforms to the NameAndAddress form --
+    ApplicationClass NAME         #FIXED    "Publisher"
+>
+
+<!ELEMENT  PrintLocation    - O (%DataPool;)* >
+<!ATTLIST  PrintLocation
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "PrintLocation"
+>
+
+<!ELEMENT  OrderNumber      - O (#PCDATA)    -- Customer Order Number -->
+<!ATTLIST  OrderNumber
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "OrderNumber"
+>
+
+<!ELEMENT  IBMDocNumber     - O (#PCDATA)      -- IBM Document Number -->
+<!ATTLIST  IBMDocNumber
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "IBMDocNumber"
+    LexModel         CDATA        #FIXED
+       '(("SC" | "GC" | "LY" | "ZZ"), digit, digit, "-", digit,
+         digit, digit, digit, "-", digit, digit)
+        &Common.LexModel;'
+>
+
+<!ELEMENT  PartNumber       - O (#PCDATA) >
+<!ATTLIST  PartNumber
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "PartNumber"
+>
+
+<!ELEMENT  IBMPartNumber    - O (#PCDATA) >
+<!ATTLIST  IBMPartNumber
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "IBMPartNumber"
+    LexModel         CDATA        #FIXED
+       '(digit, digit, digit, digit, digit, digit, digit)
+        &Common.LexModel;'
+>
+
+<!ELEMENT  ISBN             - O (#PCDATA) >
+<!ATTLIST  ISBN
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "ISBN"
+    LexModel         CDATA        #FIXED
+       '(digit, "-", digit, digit, "-", digit, digit, digit, digit,
+         digit, digit, ("-", digit)?)
+        &Common.LexModel;'
+>
+
+<!ELEMENT  PublicIdentifier - O (#PCDATA) -- Formal Public Identifier -->
+<!ATTLIST  PublicIdentifier
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "PublicIdentifier"
+    LexModel         CDATA        #FIXED
+       '(("-" | "+"), "//", owneridentifier, "//", publictextidentifier,
+        "//", languagecode)
+        &Common.LexModel;'
+>
+
+                                   <!--====== IBMLibRecord & LibRecord-->
+<!ELEMENT  LibRecord        - -
+                     (Title, Publisher?, PrintLocation?,
+                      BOFNumber?, PartNumber?,
+                      Product*, ISBN?, PublicIdentifier?,
+                      ContainedDocuments?, Desc?)
+                                                    -- Library Record --
+>
+<!ATTLIST  LibRecord
+    %LibRecord.Atts;
+>
+
+<!ELEMENT  IBMLibRecord     - -
+                     (Title, Publisher?, PrintLocation?,
+                      IBMBOFNumber?, IBMPartNumber?,
+                      Product*, ISBN?, PublicIdentifier?,
+                      ContainedDocuments?, Desc?)
+>
+<!ATTLIST  IBMLibRecord
+    %LibRecord.Atts;
+>
+
+<!ELEMENT  ContainedDocuments
+                             - O (#PCDATA | Citation )*
+>
+<!ATTLIST  ContainedDocuments
+    %Common.Atts.NoLexMdl.NoRefType;
+
+    LexModel         CDATA        #FIXED
+                          "#CONTENT (name | #GI) &Common.LexModel;"
+    RefType          CDATA        #FIXED
+                          "#CONTENT (&BibRecord; | &LibRecord;)
+                           &Common.RefType;"
+            -- The order BibRecord IDs are specified defines the
+               default order for presenting the list of documents
+               in a generated bibliography --
+>
+
+<!ELEMENT  BOFNumber        - O (%DataPool;)* -- Bill of Forms number -->
+<!ATTLIST  BOFNumber
+    %Common.Atts;
+>
+
+<!ELEMENT  IBMBOFNumber     - O (%DataPool;)*
+                                           -- IBM Bill of Forms number --
+>
+<!ATTLIST  IBMBOFNumber
+    %Common.Atts;
+>
+
+<!ELEMENT  Product          - O (%DataPool;)* >
+<!ATTLIST  Product
+    %Common.Atts;
+>
+
+<!--================================================= IndexDefinitions-->
+
+<!ELEMENT  IndexDefinitions - O (I1*) >
+<!ATTLIST  IndexDefinitions
+    %Common.Atts.NoConRef;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!--==================================================== ObjectLibrary-->
+
+<!ELEMENT  ObjectLibrary    - O (Desc?, ObjectLibraryBody) >
+<!ATTLIST  ObjectLibrary
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  ObjectLibraryBody
+                            O O ANY
+>
+<!ATTLIST  ObjectLibraryBody
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Container"
+>
+
+<!ELEMENT  RetrievalAlternatives
+                            - O (Desc?, RetrievalAltsBody) >
+<!ATTLIST  RetrievalAlternatives
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  RetrievalAltsBody
+                            O O (%InfoPool;)
+>
+<!ATTLIST  RetrievalAltsBody
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Container"
+>
+
+<!--General Division Content =========================================-->
+
+<!ENTITY % Division         "DivProlog, DivIntro?, DivBody, DivSummary?">
+
+<!ENTITY % SpecialDiv
+    "SpecialDivProlog, DivIntro?, DivBody, DivSummary?"
+>
+
+<!ELEMENT  Div              - - (%Division;) -- Hierarchical Division -->
+<!ATTLIST  Div
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ENTITY % DivProlog
+    "Title, Desc?, TrackingInfo?, PropertyDefinitions?,
+     LinkDescriptions?, CopyRights?, TrademarkDefinitions?,
+     GlossaryDefinitions?, BibRecords?, IndexDefinitions?,
+     ObjectLibrary*"
+>
+
+<!ELEMENT  DivProlog        O O (%DivProlog;)      -- Division Prolog -->
+<!ATTLIST  DivProlog
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Metadata"
+>
+
+<!ENTITY % TrackingInfo
+    "Authors?, ControlInfo?, RevisionHistory?, QualificationList?"
+>
+
+<!ELEMENT  TrackingInfo     - - (%TrackingInfo;)
+                                     -- Division Tracking Information --
+>
+<!ATTLIST  TrackingInfo
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Metadata"
+>
+
+<!-- Permissive model required to allow Div and Procedure to mingle. -->
+<!ELEMENT  DivBody          O O (%InfoUnitPool; | Div)*
+                                                     -- Division Body --
+>
+<!ATTLIST  DivBody
+    %Common.Atts;
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  DivIntro         - O (Title?, TOC?, (%InfoUnitPool;)*, Div*)
+                                             -- Division Introduction --
+>
+<!ATTLIST  DivIntro
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+    %Common.Atts;
+>
+
+<!ELEMENT  DivSummary       - O (Title?, (%InfoUnitPool;)*, Div*)
+                                                  -- Division Summary --
+>
+<!ATTLIST  DivSummary
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+    %Common.Atts;
+>
+
+<!--Specialized Division Elements ====================================-->
+
+<!ENTITY % SpecialDivProlog
+    "(GeneratedTitle | Title), Desc?, TrackingInfo?,
+     PropertyDefinitions?, LinkDescriptions?, CopyRights?,
+     TrademarkDefinitions?, GlossaryDefinitions?, BibRecords?,
+     IndexDefinitions?, ObjectLibrary*"
+>
+
+<!ELEMENT  SpecialDivProlog O O (%SpecialDivProlog;)
+                                                   -- Division Prolog --
+>
+<!ATTLIST  SpecialDivProlog
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Metadata"
+>
+
+<!ELEMENT  GeneratedTitle   - O EMPTY >
+<!ATTLIST  GeneratedTitle
+    %Common.Atts.NoConRef;
+>
+
+<!ELEMENT  Abbreviations    - O (%SpecialDiv;) >
+
+<!ATTLIST  Abbreviations
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  Abstract         - O (%SpecialDiv;) >
+<!ATTLIST  Abstract
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  Bibliography     - O (%SpecialDiv;) >
+<!ATTLIST  Bibliography
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  EditionNotices   - O (%SpecialDiv;) >
+<!ATTLIST  EditionNotices
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  FigureList       - O ((GeneratedTitle | Title),
+                                 (nmquery | (%InfoUnitPool)*)
+                                )
+>
+<!ATTLIST  FigureList
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "QueryLink"
+>
+
+<!ELEMENT  Glossary         - O (%SpecialDiv;) >
+<!ATTLIST  Glossary
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  FootnoteList     - O (Title?,
+                                 (nmquery | FN)*)
+>
+<!ATTLIST  FootnoteList
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "QueryLink"
+>
+
+<!ELEMENT  IBMSafety        - O ((GeneratedTitle | Title),
+                                 (nmquery | (%InfoUnitPool;)*)
+                                )
+>
+<!ATTLIST  IBMSafety
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "QueryLink"
+>
+
+<!ELEMENT  Index            - O (%SpecialDiv;) >
+<!ATTLIST  Index
+    Auto             (Auto)       #CONREF  -- Generated index --
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  Legend           - O (%SpecialDiv;) >
+<!ATTLIST  Legend
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  MarkList         - O (Title?,
+                                 (nmquery | (%InfoUnitPool;)*)
+                                )
+>
+<!ATTLIST  MarkList
+    ID               NAME         #IMPLIED
+    Classes          NAMES        #REQUIRED
+    Actions          NAMES        #REQUIRED
+    Display          (Class | Action | Location | Item | Desc)
+                                  #IMPLIED
+    ClassHD          CDATA        #IMPLIED --Default def'd in doc style--
+    ActionHD         CDATA        #IMPLIED --Default def'd in doc style--
+    ItemHD           CDATA        #IMPLIED --Default def'd in doc style--
+    LocationHD       CDATA        #IMPLIED --Default def'd in doc style--
+    DescHD           CDATA        #IMPLIED --Default def'd in doc style--
+    MarkIDs          NAMES        #REQUIRED   -- IDs of MARK elements --
+    %Common.Atts.Base;
+
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED
+                          "MarkIDs Mark &Common.RefType"
+    InfoMaster       NAME         #FIXED    "QueryLink"
+>
+
+<!ELEMENT  Preface          - O (%SpecialDiv;) >
+<!ATTLIST  Preface
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  SOA              - O (%SpecialDiv;) >
+<!ATTLIST  SOA
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "HierarchicalDivision"
+>
+
+<!ELEMENT  Safety           - O ((GeneratedTitle | Title),
+                                 (nmquery | (%InfoUnitPool;)*)
+                                )
+>
+<!ATTLIST  Safety
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "QueryLink"
+>
+
+<!ELEMENT  TableList        - O ((GeneratedTitle | Title),
+                                 (nmquery | (%InfoUnitPool;)*)
+                                )
+>
+<!ATTLIST  TableList
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "QueryLink"
+>
+
+<!ELEMENT  TOC              - O ((GeneratedTitle | Title),
+                                 (nmquery | (%InfoUnitPool;)*)
+                                )
+                                                 -- Table of Contents --
+>
+<!ATTLIST  TOC
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "QueryLink"
+>
+
+<!--Hypertext Web Elements ====================================-->
+
+<!ELEMENT  WebSet           - O (Web+)     -- Contains hyperlink webs -->
+<!ATTLIST  WebSet
+    %Common.Atts;
+>
+
+<!ELEMENT  Web              - O (DivProlog, WebNode+)
+                                                -- Contains web nodes --
+>
+<!ATTLIST  Web
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  WebNode          - O (%Division;)   -- Contains a web node -->
+<!ATTLIST  WebNode
+    ID               NAME         #REQUIRED
+    %Common.Atts.NoID;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!--==================================================================
+    Information Unit Pool Elements
+    ==================================================================-->
+
+<!--Paragraph ========================================================-->
+
+<!ELEMENT  P                - O (Title?, ParaBody)       -- Paragraph -->
+<!ATTLIST  p
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+>
+<!ELEMENT  ParaBody         O O (%InfoPool.NoPara;)*
+                                                    -- paragraph body --
+>
+<!ATTLIST  ParaBody
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ParagraphBody"
+>
+
+<!ELEMENT  ParaBlock        - - (Title?, (%InfoUnitPool;))*
+                                                   -- Paragraph block --
+>
+<!ATTLIST  ParaBlock
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  Note             - O (Title?, NoteBody) >
+<!ATTLIST  Note
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+>
+
+<!ELEMENT  NoteBody         O O (%InfoPool.NoNote;)* >
+<!ATTLIST  NoteBody
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ParagraphBody"
+>
+
+<!ELEMENT  Caution          - O (Title?, NoteBody) >
+<!ATTLIST  Caution
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+>
+
+<!ELEMENT  Danger           - O (Title?, NoteBody) >
+<!ATTLIST  Danger
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+>
+
+<!ELEMENT  Warning          - O (Title?, NoteBody) >
+<!ATTLIST  Warning
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+>
+
+<!--Lists ============================================================-->
+
+<!ELEMENT  OL               - - (Title?, (LI | LIBlock | Bridge)+)
+                                                      -- Ordered List --
+>
+<!ATTLIST  OL
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "SinglePartList"
+    InfoMasterSemanticProperty
+                     NAME         #FIXED    "Enumeration"
+>
+
+<!ELEMENT  UL               - - (Title?, (LI | LIBlock | Bridge)+)
+                                                    -- Unordered List --
+>
+<!ATTLIST  UL
+    %Common.Atts
+
+    InfoMaster       NAME         #FIXED    "SinglePartList"
+>
+
+<!ELEMENT  NoteList         - - (Title?, (LI | LIBlock | Bridge)+) >
+<!ATTLIST  NoteList
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "SinglePartList"
+    InfoMasterSemanticProperty
+                     NAME         #FIXED    "Enumeration"
+>
+
+<!ELEMENT  LIBlock          - O (Title?, (LI | Bridge)+)
+>
+<!ATTLIST  LIBlock
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ListItemBlock"
+>
+
+<!ELEMENT  LI               - O (%InfoPool;)*            -- List Item -->
+<!ATTLIST  LI
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ListItem"
+>
+
+<!ELEMENT  DL               - - (Title?, (DTHD, DDHD)?,
+                                 (DLEntry | DLBlock | Bridge)+)
+                                                   -- Definition List --
+>
+<!ATTLIST  DL
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefiningList"
+>
+
+<!ELEMENT DTHD              - O (%DataPool;)*
+                                      -- Definition List Term Heading --
+>
+<!ATTLIST DTHD
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TermHeading"
+>
+
+<!ELEMENT DDHD              - O (%DataPool;)*
+                                -- Definition List Definition Heading --
+>
+<!ATTLIST DDHD
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefinitionHeading"
+>
+
+<!ELEMENT  DLBlock          - O (Title?, (DLEntry | Bridge)+)
+                                  -- Definition List Block of Entries --
+>
+<!ATTLIST  DLBlock
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefinitionBlock"
+>
+
+<!ELEMENT  DLEntry          - O (DefinedTerm, DD)
+                                             -- Definition List Entry --
+>
+<!ATTLIST  DLEntry
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Term"
+>
+
+<!ELEMENT  DD               - O (%InfoPool;)*
+                                   -- Definition list term definition --
+>
+<!ATTLIST  DD
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TermDefinition"
+>
+
+<!ELEMENT  ParmList         - O (Title?, (PTHD, PDHD)?,
+                                 (nmquery |
+                                  (Parm | ParmBlock | Bridge)+
+                                ))
+                                         -- Parameter Definition List --
+>
+<!ATTLIST  ParmList
+    GenerateFrom     NAME         #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefiningList"
+>
+
+<!ELEMENT PTHD              - O (%DataPool;)* >
+<!ATTLIST PTHD
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TermHeading"
+>
+
+<!ELEMENT PDHD              - O (%DataPool;)* >
+<!ATTLIST PDHD
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefinitionHeading"
+>
+
+<!ELEMENT  Parm             - O (PT, PD)
+                                    -- Parmeter Definition List Entry --
+>
+<!ATTLIST  Parm
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Term"
+>
+
+<!ELEMENT  PT               O O (%InfoPool;)*  -- Parameter List Term -->
+<!ATTLIST  PT
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefinedTerm"
+>
+
+<!ELEMENT  PD               - O (%InfoPool;)*
+                                    -- Parameter List Term Definition --
+>
+<!ATTLIST  PD
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TermDefinition"
+>
+
+<!ELEMENT  ParmBlock        - O (Title?, (Parm | Bridge)+)
+                                   -- Parameter List Block of Entries --
+>
+<!ATTLIST  ParmBlock
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefinitionBlock"
+>
+
+<!ELEMENT  GL               - - (Title?,
+                                 (nmquery |
+                                  (GLEntry | GLBlock | Bridge)*
+                                ))
+                                                     -- Glossary List --
+>
+<!ATTLIST  GL
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefiningList"
+>
+
+<!ELEMENT  GLBlock          - O (Title?, (GLEntry | Bridge)+)
+                                    -- Glossary List Block of Entries --
+>
+<!ATTLIST  GLBlock
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefinitionBlock"
+>
+
+<!ELEMENT  GLEntry          - O (DefinedTerm, GD+)
+                                               -- Glossary List Entry --
+>
+<!ATTLIST  GLEntry
+    SeeAlso          NAMES        #IMPLIED
+    SortText         CDATA        #IMPLIED
+    %Common.Atts.NoRefType;
+
+    InfoMaster       NAME         #FIXED    "Term"
+    RefType          CDATA        #FIXED
+                          "SeeAlso GLEntry &Common.RefType;"
+>
+<!ELEMENT  GD               - O (%InfoPool;)*
+                                     -- Glossary List Term Definition --
+>
+<!ATTLIST  GD
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TermDefinition"
+>
+
+<!--Figure ===========================================================-->
+
+<!ELEMENT  Figure           - -
+                     (Title?, Caption?, Desc?,
+                      (FigSeg* | (%InfoUnitPool; | %Table;)*)
+                     )
+>
+<!ATTLIST  Figure
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Display"
+>
+
+<!ELEMENT  Table            - -
+                     (Title?, Caption?, Desc?,
+                      (FigSeg* | (%InfoUnitPool; | %Table;)*)
+                     )
+>
+<!ATTLIST  Table
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Display"
+>
+
+<!ELEMENT  FigSeg           - - (%InfoUnitPool; | %Table;)* >
+<!ATTLIST  FigSeg
+    InfoMaster       NAME         #FIXED    "FigureSegment"
+    %Common.Atts;
+>
+
+<!--Table ============================================================-->
+
+<![ %SimpleTable; [
+<!ELEMENT  SimpleTable      - - (THeading?, TFooting?, TBody+) >
+<!ATTLIST  SimpleTable
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Table"
+>
+
+<!ELEMENT  TBody            O O     (THeading?, TFooting?, TRow+)
+                                                        -- Table Body --
+>
+<!ATTLIST  TBody
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TableBody"
+>
+
+<!ELEMENT  THeading         - O (Row+)               -- Table Heading -->
+<!ATTLIST  THeading
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TableHeading"
+>
+
+<!ELEMENT  TFooting         - O (Row+)               -- Table Footing -->
+<!ATTLIST  TFooting
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TableFooting"
+>
+
+<!ELEMENT  TRow             - O (Title?, Cell+) >
+<!ATTLIST  TRow
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TableRow"
+>
+
+<!ELEMENT  Cell             - O (%InfoPool;)* >
+<!ATTLIST  Cell
+    N                NMTOKEN      #IMPLIED               -- Cell name --
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TableCell"
+>
+]]>
+
+<![ %BookMasterTable; [
+<!ELEMENT  BookMasterTable  - - (THD?, TFT?, (Row | TNote)+) >
+<!ATTLIST  BookMasterTable
+    %Common.Atts;
+    -- All BookMaster presentation attributes are placed in Style att --
+    -- Reference to TDef BookMaster elements now use PropertyDef mech --
+    -- TCap and TDesc info is now input in the Figure element content --
+
+    InfoMaster       NAME         #FIXED    "BookMasterTable"
+>
+
+<!ELEMENT (THD | TFT | Row)
+                            - O (C+)
+>
+<!ATTLIST (THD | TFT | Row)
+    PropertyScope    (Temp)       #IMPLIED
+    %Common.Atts;
+>
+
+<!ELEMENT  TNote            - O (%InfoPool;)* >
+<!ATTLIST  TNote
+    %Common.Atts;
+>
+
+<!ELEMENT  C                - O (%InfoPool;)* >
+<!ATTLIST  C
+    N                NUMBER       #IMPLIED
+    %Common.Atts;
+>
+]]>
+
+<![ %SoftQuadTable; [
+<!--
+    SoftQuad's Canonical Table DTD fragment
+    Copyright (c) 1991 by SoftQuad, Inc.
+
+    This material is used with permission and may be reproduced in whole
+    without restriction provided that this copyright notice is included.
+
+    This DTD fragment defines the table structure used internally by
+    SoftQuad Author/Editor.
+
+    The names of the table elements and the content model for TblCell
+    can be changed by predefining the appropriate parameter entities
+    before including this DTD fragment. For example:
+
+        <!ENTITY % TblBody  "(TblHead | TblBody)">
+        <!ENTITY % CellMdl  "(#PCDATA)">
+        <!ENTITY % tblDTD   SYSTEM "table.dtd">
+        %tblDTD;
+
+    will define two elements, TblHead and TblBody, each with the same
+    content model as the canonical TblBody element, and it will change
+    the content model of table cells from the default of ANY to
+    character data.
+-->
+
+<!ENTITY % TblBody          "(TBLHeading | TBLBody | TBLFooting)" >
+<!ENTITY % TblCDfs          "TBLCDefs" >
+<!ENTITY % TblCDef          "TBLCDef" >
+<!ENTITY % TblRows          "TBLRows" >
+<!ENTITY % TblRow           "TBLRow" >
+<!ENTITY % TblCell          "TBLCell" >
+<!ENTITY % CellMdl          "(%InfoPool;)*"
+                                 -- Same cell content as other tables --
+>
+
+<!ENTITY % VBorder
+    "(VSingle|VDouble|VTriple|VDash|VDot|VBold|VBlank|VNone)"
+>
+<!ENTITY % HBorder
+    "(HSingle|HDouble|HTriple|HDash|HDot|HBold|HBlank|HNone)"
+>
+<!ENTITY % VAlign  "(Top|Middle|Bottom)" >
+<!ENTITY % HAlign  "(Left|Both|Center|Right|Char)" >
+
+<!ENTITY % TblUnit  "(percent|pixels|points|picas|mm|cm|inches)" >
+
+<!ENTITY % RProps
+    'RowSep     %HBorder;  #IMPLIED
+     VAlign     %VAlign;   #IMPLIED' >
+<!ENTITY % CProps
+    'ColSep     %VBorder;   #IMPLIED
+     HAlign     %HAlign;    #IMPLIED
+     AlignChr   CDATA       #IMPLIED
+     CharPos    CDATA       #IMPLIED' >
+
+
+<!-- This is the IBM-provided hook into IBMIDDOC -->
+<!ELEMENT  SoftQuadTable    - - (%TblBody;) >
+<!ATTLIST  SoftQuadTable
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "SoftQuadTable"
+>
+
+
+<!-- TblBody is the top-level table element -->
+<!ELEMENT  %TblBody;        O O ((%TblCDfs;), (%TblRows;)) >
+<!ATTLIST  %TblBody;
+    TblWd            CDATA        #IMPLIED
+    TblHt            CDATA        #IMPLIED
+    TblUnits         %TblUnit;    #IMPLIED
+    SQTable          NAME         #FIXED    "TBLBODY"
+>
+
+<!-- Table Column Definitions: -->
+<!ELEMENT  %TblCDfs;        O O (%TblCDef;)+ >
+<!ATTLIST  %TblCDfs;
+    -- CProps with default values to apply to all columns --
+    ColSep           %VBorder;    "VSingle"
+    HAlign           %HAlign;     "Left"
+    AlignChr         CDATA        #IMPLIED
+    CharPos          CDATA        #IMPLIED
+    -- default width for all cells in all columns --
+    ColWd            CDATA        #IMPLIED
+    TblUnits         %TblUnit;    #IMPLIED
+    -- default top border for all cells in row 1 --
+    TopSep           %HBorder;    "HSingle"
+    SQTable          NAME         #FIXED    "TBLCDEFS"
+>
+<!-- there is exactly one TblCDef for each column in the table -->
+<!ELEMENT  %TblCDef;        - O EMPTY
+                                    -- Only exists to hold attributes --
+>
+<!ATTLIST  %TblCDef;
+    %CProps;        -- overrides settings in TblCDfs --
+    -- width for all cells in this column --
+    ColWd            CDATA        #IMPLIED
+    TblUnits         %TblUnit;    #IMPLIED
+    -- top border for cell in row 1 --
+    TopSep           %HBorder;    #IMPLIED  -- overrides TblCDfs defn --
+    SQTable          NAME         #FIXED    "TBLCDEF"
+>
+
+<!-- Table Rows: -->
+<!ELEMENT  %TblRows;        O O (%TblRow;)+ >
+<!ATTLIST  %TblRows;
+    -- RProps with default values to apply to all rows --
+    RowSep           %HBorder;    "HSingle"
+    VAlign           %VAlign;     "Top"
+    -- default height of all rows --
+    RowHt            CDATA        #IMPLIED
+    TblUnits         %TblUnit;    #IMPLIED
+    -- default left border for all cells in column 1 --
+    LeftSep          %VBorder     "VSingle"
+    SQTable          NAME         #FIXED    "TBLROWS"
+>
+<!ELEMENT  %TblRow;         - O (%TblCell;)+ >
+<!ATTLIST  %TblRow;
+    %RProps;    -- can override settings in TblRows --
+    -- height of this row --
+    RowHt            CDATA        #IMPLIED
+    TblUnits         %TblUnit;    #IMPLIED
+    -- left border for cell in column 1 --
+    LeftSep          %VBorder     #IMPLIED
+                                         -- overrides TblRows setting --
+    SQTable          NAME         #FIXED    "TBLROW"
+>
+
+<!-- Table Cells -->
+<!ELEMENT  %TblCell;        - O %CellMdl; >
+<!ATTLIST  %TblCell;
+    %RProps;        -- can override settings in TblRow --
+    %CProps;        -- can override settings in TblCDef --
+    -- cell positioning --
+    ColStart         NUMBER       #IMPLIED
+    ColSpan          NUMBER       "1"     -- span >= 1 --
+    RowStart         NUMBER       #IMPLIED
+    RowSpan          NUMBER       "1"     -- span >= 1 --
+    SQTable          NAME         #FIXED    "TBLCELL"
+>
+
+]]>
+
+<!--Long Quote =======================================================-->
+
+<!ELEMENT  LongQuote        - O ((%InfoUnitPool;)*, Div*) >
+<!ATTLIST  LongQuote
+    BibID            NAME         #IMPLIED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Excerpt"
+>
+
+<!--Bridge ===========================================================-->
+
+<!ELEMENT  Bridge           - O (Title?, (%InfoUnitPool;)*) >
+<!ATTLIST  Bridge
+--  LinkEnds         NAMES        #IMPLIED  part of common attributes --
+    %Common.Atts.NoLexMdl.NoHyTime;
+
+    InfoMaster       NAME         #FIXED    "ConceptBridge"
+    HyTime           NAME         #FIXED    "ilink"
+    anchrole         NAMES        #FIXED    "link1 link2"
+    LexModel         CDATA        #FIXED
+                          'LinkEnds ((name | "#IMPLIED"), S,
+                                           (name | "#IMPLIED")
+                           &Common.LexModel;'
+>
+
+<!--Syntax Diagrams ==================================================-->
+
+<!ELEMENT  Syntax           - -
+                     (Title, Desc?, Set*, RepSep*,
+                      (Group | Range |
+                       FragmentRef | Fragment | SyntaxBlock |
+                       SyntaxNote)*
+                     )
+                                                    -- Syntax diagram --
+>
+<!ATTLIST  Syntax
+    CompLang         CDATA        #IMPLIED
+       --Defines the computer language to which the definition applies--
+    %Common.Atts;
+>
+
+<!ELEMENT  SyntaxBlock      - O
+                     (Title, Desc?, Set*, RepSep*,
+                      (Group | Range | FragmentRef | Fragment |
+                       SyntaxNote)*
+                     )                                -- Syntax block --
+>
+<!ATTLIST  SyntaxBlock
+    %Common.Atts;
+>
+
+<!ELEMENT  Set              - - (Title?, (setitem | setref | setspec)*) >
+<!ATTLIST  Set
+    ID               NAME         #REQUIRED
+    SetOrder         (ordered | unordered)
+                                  unordered
+    %Common.Atts.NoID;
+>
+
+<!ELEMENT  SetItem          - O (%DataPool;)* >
+<!ATTLIST  SetItem
+    %Common.Atts;
+>
+
+<!ELEMENT  SetRef           - O EMPTY                -- Set Reference -->
+<!ATTLIST  SetRef
+    ID               NAME         #IMPLIED
+    SetID            NAME         #REQUIRED    -- Must be ID of a SET --
+    %Common.Atts.Base;
+
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED
+                          "SETID SET &Common.RefType;"
+>
+
+<!ELEMENT  SetSpec          - O (%DataPool;)*    -- Set Specification -->
+<!ATTLIST  SetSpec
+    SetNotation      CDATA        #IMPLIED      -- Default is "prose" --
+          -- Notation is not required to be an SGML-declared notation --
+    %Common.Atts;
+>
+
+<!ENTITY % GroupElem
+    "Group | Range | FragmentRef | Kwd | Var | Delim | Oper | Sep |
+     SyntaxNote"
+>
+
+<!ELEMENT  Group            - - (Title?, Desc?, (%GroupElem;)*) >
+<!ATTLIST  Group
+    Repeat           CDATA        #IMPLIED
+    RepID            NAME         #IMPLIED       -- Must be REPSEP ID --
+    RepSep           CDATA        #IMPLIED  -- Repeat separator chars --
+    OptReq           (Opt | Req| Def)  Req
+    ChoiceSeq        (Seq | Choice)
+                                  Seq
+    GroupOrder       (Ordered | Unordered)
+                                  Ordered
+    %Common.Atts.NoLexMdl.NoRefType;
+
+    LexModel         CDATA        #FIXED
+                          "REPEAT ('YES' | 'NO' | NUMBER | RCDATA)
+                           &Common.LexModel;"
+    RefType          CDATA        #FIXED
+                          "RepID RepSep &Common.RefType;"
+>
+
+<!ELEMENT  Fragment         - -
+                     (Title, Desc?, RepSep*,
+                      (Group | Range | FragmentRef | SyntaxNote)*)
+>
+<!ATTLIST  Fragment
+    %Common.Atts;
+>
+
+<!ELEMENT  FragmentRef          - O (Title)     -- Fragment Reference -->
+<!ATTLIST  FragmentRef
+    FragID           NAME         #CONREF      -- Must be Fragment ID --
+    Repeat           CDATA        #IMPLIED           -- Default is NO --
+    RepID            NAME         #IMPLIED       -- Must be REPSEP ID --
+    RepSep           CDATA        #IMPLIED  -- Repeat separator chars --
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts.NoLexMdl.NoRefType;
+
+    LexModel         CDATA        #FIXED
+                          "REPEAT ('YES' | 'NO' | number | rcdata)
+                           &Common.LexModel;"
+    RefType          CDATA        #FIXED
+                          "RepID RepSep FragID Fragment &Common.RefType;"
+    TargetType       CDATA        #FIXED    "Fragment"
+    InfoMaster       NAME         #FIXED    "SymbolicReference"
+>
+
+<!ELEMENT  Range            - O (Title, RangeStart?, RangeEnd?) >
+<!ATTLIST  Range
+    Repeat           CDATA        #IMPLIED
+    RepID            NAME         #IMPLIED -- Must be REPSEP ID --
+    SetID            NAME         #IMPLIED -- Must be SET ID --
+    RepSep           CDATA        #IMPLIED -- Repeat separator chars --
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts.NoLexMdl.NoRefType;
+
+    LexModel         CDATA        #FIXED
+                          "REPEAT ('YES' | 'NO' | number | rcdata)
+                           &Common.LexModel;"
+    RefType          CDATA        #FIXED
+                          "REPID REPSEP SETID SET &Common.RefType;"
+>
+
+<!ELEMENT  (RangeStart | RangeEnd)
+                            - O (%DataPool;)* >
+<!ATTLIST  (RangeStart | RangeEnd)
+    %Common.Atts;
+>
+
+<!ELEMENT  Var              - O (%DataPool;)*      -- Syntax variable -->
+<!ATTLIST  Var
+    SetID            NAME         #IMPLIED          -- Must be SET ID --
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts.NoRefType;
+
+    RefType          CDATA        #FIXED
+                          "SETID SET &Common.RefType;"
+>
+
+<!ELEMENT  Kwd              - O (%DataPool;)*       -- Syntax keyword -->
+<!ATTLIST  Kwd
+    Abbreviations    CDATA        #IMPLIED
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts;
+>
+
+<!ELEMENT  Oper             - O (%DataPool;)*      -- Syntax Operator -->
+<!ATTLIST  Oper
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts;
+>
+
+<!ELEMENT  SyntaxNote       - - (FNBody)               -- Syntax note -->
+<!ATTLIST  SyntaxNote
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+>
+
+<!ELEMENT  RepSep           - - (Title, (%GroupElem;)*)
+                               -- Separator for repeated syntax tokens --
+>
+<!ATTLIST  RepSep
+    OptReq           (Opt | Req| Def)  Req
+    CHOICESEQ        (Seq | Choice)
+                                  Seq
+    GROUPORDER       (ordered | unordered)
+                                  Ordered
+    %Common.Atts;
+>
+
+<!ELEMENT  Sep              - O (%DataPool;)*     -- Syntax Separator -->
+<!ATTLIST  Sep
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts;
+>
+
+<!ELEMENT  Delim            - O (%DataPool;)*     -- Syntax Delimiter -->
+<!ATTLIST  Delim
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts;
+>
+
+<!--Modular Information ==============================================-->
+
+<!ELEMENT  ModularInformation
+                             - - (InfoModule+)
+>
+<!ATTLIST  ModularInformation
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleList"
+>
+
+<!ELEMENT  InfoModule       - O (ModuleName+, ModuleDesc?, ModuleItem+)
+                                                -- Information Module --
+>
+<!ATTLIST  InfoModule
+    Class            NAME         #REQUIRED         -- author-defined --
+    %Common.Atts.NoClass;
+
+    InfoMaster       NAME         #FIXED    "InformationModule"
+>
+
+<!ELEMENT  ModuleName       - O (%DataPool;)* >
+<!ATTLIST  ModuleName
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleName"
+>
+
+<!ELEMENT  ModuleDesc       - O (%InfoPool;)*   -- Module Description -->
+<!ATTLIST  ModuleDesc
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Description"
+>
+
+<!ELEMENT  ModuleItem       - O (%InfoPool;)*          -- Module Item -->
+<!ATTLIST  ModuleItem
+    Class            CDATA        #REQUIRED
+    -- Valid values defined on ModularInfoDef element --
+    %Common.Atts.NoClass
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "ModuleItem"
+>
+
+<!--Language Element Reference Section ===============================-->
+
+<!ELEMENT  LERS             - - (LE+)
+                                -- Language Element Reference Section --
+>
+<!ATTLIST  LERS
+    %lersdef.atts;
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleList"
+    ApplicationClass NAME         #FIXED    "ComputerLanguage"
+>
+
+<!ELEMENT  LE               - O (LEName, LEDesc?, LEDI+)
+                                                  -- Language Element --
+>
+<!ATTLIST  LE
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "InformationModule"
+    ApplicationClass NAME         #FIXED    "ComputerLanguage"
+>
+
+<!ELEMENT  LEName           - O (%DataPool;)*
+                                             -- Language Element Name --
+>
+<!ATTLIST  LEName
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleName"
+>
+
+<!ELEMENT  LEDesc           - O (%DataPool;)*
+                                      -- Language element description --
+>
+<!ATTLIST  LEDesc
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescription"
+>
+
+<!ELEMENT  LEDI             - O ((%InfoUnitPool;)* | Div+)
+                                 -- Language Element Description Item --
+>
+<!ATTLIST  LEDI
+    Class            (Auth |
+                      Comments |
+                      Context |
+                      Defaults |
+                      Errcond |
+                      Examples |
+                      Flags |
+                      Format |
+                      Intrep |
+                      Sep |
+                      Messages |
+                      Other |
+                      Parms |
+                      Process |
+                      Purpose |
+                      Restrict |
+                      Results |
+                      Retcodes |
+                      Sysenv |
+                      Usage |
+                      Ver )
+                                  #REQUIRED
+    %Common.Atts.NoClass;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "LanguageElementItem"
+>
+
+<!--MAN Pages ========================================================-->
+
+<!ENTITY % CommonMan-ManPage
+    "ManName, ManSynopsis, ManDesc, ManUsage, ManSeeAlso, ManNotices"
+                                            -- temporary place holder --
+>
+
+<!ELEMENT  ManPage          - - (%CommonMan-ManPage;) >
+<!ATTLIST  ManPage
+    ManIndex         CDATA        #REQUIRED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "InformationModule"
+>
+
+<!ELEMENT  ManName          - O (%DataPool;)* >
+<!ATTLIST  ManName
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MANName"
+>
+
+<!ELEMENT  ManSynopsis      - O (%InfoPool;)* >
+<!ATTLIST  ManSynopsis
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MANSynopsis"
+>
+
+<!ELEMENT  ManDesc          - O (%InfoPool;)* >
+<!ATTLIST  ManDesc
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MANDesc"
+>
+
+<!ELEMENT  ManUsage         - O (%InfoPool;)* >
+<!ATTLIST  ManUsage
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MANUsage"
+>
+
+<!ELEMENT  ManSeeAlso       - O (%DataPool;)* >
+<!ATTLIST  ManSeeAlso
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MANSeeAlso"
+>
+
+<!ELEMENT  ManNotices       - O (%InfoUnitPool;)* >
+<!ATTLIST  ManNotices
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MANNotices"
+>
+
+<!--Messages and Codes List ==========================================-->
+
+<!ELEMENT  MessageList      - - (MessageItemDef*, Message+) >
+<!ATTLIST  MessageList
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  MessageItemDef   - O (Title, Desc?)
+ -- Title element defines default title for a given MessageItem class --
+                                           -- Message Item Definition --
+>
+<!ATTLIST  MessageItemDef
+    Class            CDATA        #REQUIRED
+    %Common.Atts.NoClass
+
+    InfoMaster       NAME         #FIXED    "PropertyDefinition"
+>
+
+<!ELEMENT  Message          - O (((CodeNumber* | MessageNumber*),
+                                  MessageText?)*,
+                                 MessageItem*)
+                                                    -- Message Module --
+>
+<!ATTLIST  Message
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "InformationModule"
+>
+
+<!ELEMENT  CodeNumber       - O (%DataPool;)* >
+<!ATTLIST  CodeNumber
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "CodeNumber"
+>
+
+<!ELEMENT  MessageNumber    - O (%DataPool;)* >
+<!ATTLIST  MessageNumber
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MessageNumber"
+>
+
+<!ELEMENT  MessageText      - O (%DataPool;)* >
+<!ATTLIST  MessageText
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MessageText"
+>
+
+<!ELEMENT  MessageItem      - O ((%InfoUnitPool;)*, Div)
+                                          -- Message Description Item --
+>
+<!ATTLIST  MessageItem
+    Class            CDATA        #REQUIRED
+                    -- Valid values defined on MessageItemDef element --
+    %Common.Atts.NoClass;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "MessageItem"
+>
+
+<!--Procedures =======================================================-->
+
+<!ELEMENT  Procedure        - -
+                     (Title, Desc?, ProcEntry, ProcStep+, ProcExit)
+>
+<!ATTLIST  Procedure
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "InformationModule"
+    ApplicationClass NAME         #FIXED    "Procedure"
+>
+
+<!ELEMENT  ProcEntry        - O (Desc, Prerequisites?, RelatedProcs?)
+                                       -- Procedure entry information --
+>
+<!ATTLIST  ProcEntry
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "ProcEntry"
+>
+
+<!ELEMENT  (Prerequisites | RelatedProcs)
+                            - O (#PCDATA | ProcRef)*
+>
+<!ATTLIST  (Prerequisites | RelatedProcs)
+    %Common.Atts.NoLexMdl.NoRefType;
+
+    LexModel         CDATA        #FIXED
+                          "#CONTENT (NAME | #GI)*
+                           &Common.LexModel;"
+    RefType          CDATA        #FIXED
+                          "#CONTENT (Procedure | LinkDesc)
+                           &Common.RefType;"
+>
+
+<!ELEMENT  ProcStep         - O
+                     (Title, ReferenceKeys?, Desc, StepNotes?,
+                      DecisionPoint?)
+                                                    -- Procedure step --
+>
+<!ATTLIST  ProcStep
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "ProcStep"
+>
+
+<!ELEMENT  ReferenceKeys    - O (#PCDATA | RefKey)* >
+<!ATTLIST  ReferenceKeys
+    %Common.Atts.NoLexMdl;
+
+    LexModel         CDATA        #FIXED
+                          "#CONTENT (NAME | #GI)
+                           &Common.LexModel;"
+>
+
+<!ELEMENT  StepNotes        - O (Title?, (LI | LIBlock | Bridge)+) >
+<!ATTLIST  StepNotes
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "SinglePartList"
+    InfoMasterSemanticProperty
+                     NAME         #FIXED    "Enumeration"
+>
+
+<!ELEMENT  ProcExit         - O
+                     (Desc, ExpectedResults?, RecoveryProc?,
+                      DecisionPoint?)
+                                        -- Procedure exit information --
+>
+<!ATTLIST  ProcExit
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleDescriptionItem"
+    ApplicationClass NAME         #FIXED    "ProcExit"
+>
+
+<!ELEMENT  (ExpectedResults | RecoveryProc)
+                            - O (%InfoPool;)*
+>
+<!ATTLIST  (ExpectedResults | RecoveryProc)
+    %Common.Atts;
+>
+
+<!ELEMENT  DecisionPoint    - - (Condition, Action)+ >
+<!ATTLIST  DecisionPoint
+    %Common.Atts;
+>
+
+<!ELEMENT  Condition        - O (%DataPool;)* >
+
+<!ELEMENT  Action           - O (%DataPool;)* >
+
+<!ATTLIST  (Condition | Action)
+    %Common.Atts;
+>
+
+<!ELEMENT  ProcRef          - - (%DataPool;)*  -- Procedure Reference -->
+<!ATTLIST  ProcRef
+    %Common.Atts.NoLexMdl.NoRefType;
+
+    LexModel         CDATA        #FIXED
+                          "#CONTENT (NAME | #GI)*
+                           &Common.LexModel;"
+    RefType          CDATA        #FIXED
+                          "#CONTENT (Procedure | LinkDesc)
+                           &Common.RefType;"
+    InfoMaster       NAME         #FIXED    "LogicalReference"
+>
+
+<!--Bibliographic Reference List =====================================-->
+
+<!ELEMENT  BibList          - O (Title?,
+                                 (nmquery |
+                                  (%BibRecord; | Citation | %LibRecord;)*
+                                ))
+                                                  -- Bibligraphy List --
+>
+<!ATTLIST  BibList
+    EntryType        (Document | Library)
+                                  Document
+    Form             (Full | Title | TitleNumber | Normal)
+                                  Normal
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ModuleList"
+>
+
+<!--Marked Notes =====================================================-->
+
+<!ELEMENT  MarkedNote       - - (%InfoPool;)* >
+<!ATTLIST  MarkedNote
+    Class            NAMES        #REQUIRED
+    Action           NAMES        #REQUIRED
+    MarkIDs          NAMES        #REQUIRED   -- IDs of MARK elements --
+    Item             CDATA        #IMPLIED
+    %Common.Atts.NoRefType.NoClass;
+
+    RefType          CDATA        #FIXED
+                          "MarkIDs Mark &Common.RefType"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+>
+
+<!ELEMENT  MarkDesc         - - (MarkClass | MarkAction)* >
+<!ATTLIST  MarkDesc
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ContainingDivision"
+>
+
+<!ELEMENT  MarkClass        - O (%DataPool;)* >
+<!ATTLIST  MarkClass
+    Name             NAME         #REQUIRED
+    %Common.Atts;
+>
+
+<!ELEMENT  MarkAction       - O (%DataPool;)* >
+<!ATTLIST  MarkAction
+    name             NAME         #REQUIRED
+    %Common.Atts;
+>
+
+<!ELEMENT  Mark             - O (%DataPool;)* >
+<!ATTLIST  Mark
+    ID               NAME         #REQUIRED
+    run              (yes|no)     #REQUIRED
+    %Common.Atts.NoID;
+>
+
+<!--Annotation Elements ==============================================-->
+
+<!ELEMENT  FN               - - (Title?, FNBody)          -- FootNote -->
+<!ATTLIST  FN
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+>
+
+<!ELEMENT  FNBody           O O (%InfoPool;)*       -- Foot Note Body -->
+<!ATTLIST  FNBody
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ParagraphBody"
+>
+
+<!ELEMENT  Annot            - - (Title, AnnotBody)      -- Annotation -->
+<!ATTLIST  Annot
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+>
+
+<!ELEMENT  AnnotBody        O O (%InfoPool;)*      -- Annotation Body -->
+<!ATTLIST  AnnotBody
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ParagraphBody"
+    -- Its semantic class is inherited from its parent: Annot --
+>
+
+<!--Common MetaInformation Subelements ===============================-->
+
+<!ELEMENT  Title            O O (ShortTitle?, TitleBody) >
+<!ATTLIST  Title
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Title"
+>
+
+<!ELEMENT  ShortTitle       - - (%DataPool;)* >
+<!ATTLIST  ShortTitle
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ShortTitle"
+>
+
+<!ELEMENT  TitleBody        O O (%DataPool;)* >
+<!ATTLIST  TitleBody
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "TitleBody"
+>
+
+<!ELEMENT  Caption          - O (%DataPool;)* >
+<!ATTLIST  Caption
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Caption"
+>
+
+<!ELEMENT  Desc             - O (%InfoPool;)*      -- Description -->
+<!ATTLIST  Desc
+    %Common.Atts;
+    InfoMaster       NAME         #FIXED    "Description"
+>
+
+<!--Artwork and Other Special Data ===================================-->
+
+<!ELEMENT  CGraphic         - O RCDATA           -- Character graphic -->
+<!ATTLIST  CGraphic
+    Object           ENTITY       #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ObjectContainer"
+    Notation         (CGraphic)
+                                  #FIXED    "CGraphic"
+    ApplicationClass NAME         #FIXED    "CharacterGraphic"
+>
+
+<!ELEMENT  Lines            - - (%DataPool;)*   -- Line-specific data -->
+<!ATTLIST  Lines
+    Object           ENTITY       #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ObjectContainer"
+    Notation         (LineSpecific)
+                                  #FIXED    "LineSpecific"
+    ApplicationClass NAME         #FIXED    "Lines"
+>
+
+
+<!ENTITY % LitData.Notations
+    "%ComputerLanguage.Notations; | %TextLanguage.Notations; |
+     LineSpecific"
+>
+
+<!ELEMENT  Litdata          - O CDATA                 -- Literal data -->
+<!ATTLIST  Litdata
+    Object           ENTITY       #CONREF
+    Notation         (%LitData.Notations;)
+                                  #IMPLIED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ObjectContainer"
+    ApplicationClass NAME         #FIXED    "LiteralData"
+>
+
+<!ELEMENT  MultiMediaObject - O
+                     ((ObjectContainer | Link | Xref)*, TextAlt)
+>
+<!ATTLIST  MultiMediaObject
+    Object          ENTITY       #IMPLIED
+    %Common.Atts;
+
+    InfoMaster      NAME         #FIXED     "MultiMediaContainer"
+>
+
+<!ELEMENT  TextAlt          - O (%InfoPool;)*
+>
+<!ATTLIST  TextAlt
+    %Common.Atts;
+
+    InfoMaster      NAME         #FIXED     "TextAlternative"
+>
+
+<!-- These notations may be included in line within an SGML document.
+     Other data which may not be included in line are referenced
+     with a data entity reference, which identifies its notation
+     on the entity declaration, not on the container element.
+     Care must be taken when including graphics data
+     inline to avoid misinterpretation of graphics commands as
+     SGML markup. -->
+<!ENTITY % ObjectContainer.Notations
+    "EPS | CGMChar | %Math.Notations; |
+     %ComputerLanguage.Notations; | %TextLanguage.Notations; |
+     LineSpecific | LiteralData"
+>
+
+<!ELEMENT  ObjectContainer  - O (%DataPool;)*
+                                             -- data object container --
+>
+<!ATTLIST  ObjectContainer
+    Object           ENTITY       #CONREF
+    Notation         (%ObjectContainer.Notations;)
+                                  LiteralData
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ObjectContainer"
+    ApplicationClass NAME         #FIXED    "NonTextObject"
+>
+
+<!-- DTL notation data is referenced using the Object attribute -->
+<!ENTITY % Screen.Notations "LineSpecific | CGraphic" >
+
+<!ELEMENT  Screen           - - (%DataPool;)* >
+<!ATTLIST  Screen
+    Object           ENTITY       #CONREF
+    Notation         (%Screen.Notations;)
+                                  LineSpecific
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ObjectContainer"
+    ApplicationClass NAME         #FIXED    "Screen"
+>
+
+<!ELEMENT  XMP              - O (%DataPool;)*
+                                 -- computer input and output example --
+>
+<!ATTLIST  XMP
+    Object           ENTITY       #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ObjectContainer"
+    Notation         (LineSpecific)
+                                  #FIXED    "LineSpecific"
+    ApplicationClass NAME         #FIXED    "ComputerExample"
+>
+
+
+<!--==================================================================
+    Data Pool Elements
+    ==================================================================-->
+
+<!--General Phrases ==================================================-->
+
+<!-- See Bibliography information in Prolog for BibRecord element -->
+
+<!ELEMENT  Citation         - O (%BibRecord; | %LibRecord;) >
+<!ATTLIST  Citation
+    BibID            NAME         #CONREF             -- BibRecord ID --
+    Form             (Full | Title | DocNum | Normal)
+                                  Normal
+    ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    %Common.Atts.Base;
+
+    InfoMaster       NAME         #FIXED    "phrase"
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED
+                          "BibID (&BibRecord;)
+                           &Common.RefType;"
+>
+
+<!ELEMENT  Phrase           - - (%DataPool;)*       -- Generic phrase -->
+<!ATTLIST  Phrase
+    SearchClass      NAME         #IMPLIED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+>
+
+<!ELEMENT  Quote            - O (%DataPool;)* >
+<!ATTLIST  Quote
+    BibID            NAME         #IMPLIED
+    %Common.Atts.NoRefType;
+
+    RefType          CDATA        #FIXED
+                          "BibID (&BibRecord;)
+                           &Common.RefType;"
+    InfoMaster       NAME         #FIXED    "Excerpt"
+>
+
+<!ELEMENT  DefinedTerm      O O (%DataPool;)* >
+<!ATTLIST  DefinedTerm
+    SearchClass      NAME         #IMPLIED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "DefinedTerm"
+    Notation         (Term)
+                                  #FIXED    "Term"
+>
+
+<!--Technical Phrases ================================================-->
+
+<!ELEMENT  APL              - - (#PCDATA)          -- APL data phrase -->
+<!ATTLIST  APL
+    Object           ENTITY       #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ObjectContainer"
+    Notation         (APL)
+                                  #FIXED    "APL"
+    ApplicationClass NAME         #FIXED    "APLData"
+>
+
+<!ELEMENT  Bin              - - (#PCDATA)       -- Binary data phrase -->
+<!ATTLIST  Bin
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "BinaryData"
+    LexModel         CDATA        #FIXED
+                          "#CONTENT ('0' | '1' | ' ')*
+                           &Common.LexModel;"
+>
+
+<!ELEMENT  Char             - - (#PCDATA)
+                                     -- literal character data phrase --
+>
+<!ATTLIST  Char
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "CharacterData"
+>
+
+<!ELEMENT  Date             - O (#PCDATA) >
+<!ATTLIST  Date
+    Auto             (Auto)       #CONREF
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Paragraph"
+>
+
+<!ELEMENT  Decimal          - - (#PCDATA)      -- decimal data phrase -->
+<!ATTLIST  Decimal
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "DecimalData"
+    LexModel         CDATA        #FIXED
+                          "#CONTENT (digits | '.' | ',' | ' ')*
+                           &Common.LexModel;"
+>
+
+<!ELEMENT  Formula          - - CDATA >
+<!ATTLIST  Formula
+    Object           ENTITY       #CONREF
+    Notation         (%Math.Notations)
+                                  #IMPLIED
+                                       -- Spec'd if Object not spec'd --
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "ObjectContainer"
+    ApplicationClass NAME         #FIXED    "Mathematics"
+>
+
+<!ELEMENT  Hex              - - (#PCDATA)  -- hexadecimal data phrase -->
+<!ATTLIST  Hex
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "HexidecimalData"
+    LexModel         CDATA        #FIXED
+                          "#CONTENT
+                               (digits | 'A'|'B'|'C'|'D'|'E'|'F' | ' ')*
+                           &Common.LexModel;"
+>
+
+<!ELEMENT  MD               - - (%DataPool;)*      -- Marked deletion -->
+
+<!ATTLIST  MD
+
+--  Revision         NAME         #REQUIRED --
+--  It would be desirable for Revision to be required but since it is --
+--  already specified in %Common.Atts;, it is not coded here. --
+
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "MarkedDeletion"
+
+>
+
+<!ELEMENT  MV               - - (%DataPool;)*     -- Message Variable -->
+<!ATTLIST  MV
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "MessageVariable"
+>
+
+<!ELEMENT  Number           - - (#PCDATA) >
+<!ATTLIST  Number
+    Base             NUMBER       #REQUIRED
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+>
+
+<!ELEMENT  Octal            - - (#PCDATA)        -- Octal data phrase -->
+<!ATTLIST  Octal
+    %Common.Atts.NoLexMdl;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "OctalData"
+    LexModel         CDATA        #FIXED
+                          "('0'|'1'|'2'|'3'|'4'|'5'|'6'|'7' | ' ')*
+                           &Common.LexModel;"
+>
+
+<!ELEMENT  RefKey           - - (RefKeyBody, desc?, NotLoc?)
+                                                     -- Reference Key --
+>
+<!ATTLIST  RefKey
+--  LinkEnds         NAMES        #IMPLIED  part of common attributes --
+    %Common.Atts.NoLexMdl.NoHyTime;
+
+    anchrole         CDATA        #FIXED    "textanchor graphicanchor"
+    LexModel         CDATA        #FIXED
+                          "LinkEnds ( (idref | '#IMPLIED'),
+                                      (idref | '#IMPLIED'))
+                           &Common.LexModel;"
+    HyTime           NAME         #FIXED    "ilink"
+                                       -- HyTime independent link form --
+>
+
+<!ELEMENT  RefKeyBody       O O (%DataPool;)*   -- Reference Key Body -->
+<!ATTLIST  RefKeyBody
+    %Common.Atts;
+>
+
+<!ELEMENT  SyntaxPhrase     - - (Desc?, Set*, RepSep*, (%GroupElem;)*)
+                                                     -- Syntax phrase --
+>
+<!ATTLIST  SyntaxPhrase
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "SyntaxPhrase"
+>
+
+<!ELEMENT  PK               - - (%DataPool;)*
+        -- Parameter keyword == <syntaxphrase><kwd>...</syntaxphrase> --
+>
+<!ATTLIST  PK
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "SyntaxPhrase"
+>
+
+<!ELEMENT  PV               - - (%DataPool;)*
+       -- Parameter variable == <syntaxphrase><var>...</syntaxphrase> --
+>
+<!ATTLIST  PV
+    SetID            NAME         #IMPLIED          -- Must be SET ID --
+    OptReq           (Opt | Req| Def)  Req
+    %Common.Atts.NoRefType;
+    RefType          CDATA        #FIXED
+                          "SETID SET &Common.RefType;"
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "SyntaxPhrase"
+>
+
+
+<!ELEMENT  XPH              - - (%DataPool;)*
+                            -- Computer input or output example phrase --
+>
+<!ATTLIST  XPH
+    %Common.Atts;
+
+    InfoMaster       NAME         #FIXED    "Phrase"
+    ApplicationClass NAME         #FIXED    "ExamplePhrase"
+>
+
+<!--Linking Phrases ==================================================-->
+
+<!ELEMENT  Link             - - (%DataPool;)*
+                                         -- Explicit hyperlink phrase --
+>
+<!ATTLIST  Link
+    LinkEnd          NAME         #REQUIRED
+    LinkPhrase       (Auto)       #CONREF
+    ID               NAME         #IMPLIED
+    ContentRef       NAME         #CONREF
+    XRefText         CDATA        #IMPLIED
+    InfoType         CDATA        #IMPLIED
+    %Hyperlink.Attributes;
+    %Property.Attributes;
+
+    InfoMaster       NAME         #FIXED    "HyperLink"
+    -- HyTime attributes: --
+    HyTime           NAME         #FIXED    "ilink"
+    HyNames          CDATA        #FIXED
+                          "linkend LinkEnd &Common.HyNames;"
+    RefType          CDATA        #FIXED
+                          "#ALL #ANY &Common.RefType;"
+                        -- No REFLEVEL restrictions (see 10744 6.5.3) --
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    refrange         CDATA        #FIXED    "#ALL I"   -- indirection --
+>
+
+<!ELEMENT  XRef             - O EMPTY      -- Cross Reference Element -->
+<!ATTLIST  XRef
+    ID               NAME         #IMPLIED
+    RefID            NAME         #REQUIRED
+    Form             (normal | full | text | number | location |
+                      textnum | locnum | textloc |
+                      numtext | numloc | loctext)
+                               normal
+    %Common.Atts.Base;
+
+    InfoMaster       NAME         #FIXED    "CrossReference"
+    -- HyTime attributes: --
+    HyTime           NAME         #FIXED    "ilink"
+    reftype          CDATA        #FIXED
+                          "#ALL #ANY &Common.RefType;"
+                        -- No REFLEVEL restrictions (see 10744 6.5.3) --
+    refrange         CDATA        #FIXED    "#ALL I"   -- indirection --
+    LexModel         CDATA        #FIXED
+                          "RefID IDREFS &Common.LexModel;"
+    HyNames          CDATA        #FIXED
+                          "linkend RefID &Common.HyNames;"
+>
+
+<!--Indexing Phrases =================================================-->
+
+<!ELEMENT  IndexTerm        O O (%DataPool;)*
+                                       -- index term PCDATA container --
+>
+<!ATTLIST  IndexTerm
+    %Common.Atts;
+>
+
+<!ELEMENT  I1               - O (IndexTerm+, I2*)
+                                           -- first-level index entry --
+>
+<!ATTLIST  I1
+    SeeText          CDATA        #IMPLIED
+    SeeID            NAMES        #IMPLIED
+    SortKey          CDATA        #IMPLIED
+    Primary          (Primary)    #IMPLIED          -- Primary entry? --
+    %Common.Atts.NoRefType;
+
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+    RefType          CDATA        #FIXED
+                          "SeeAlso I1 &Common.RefType;"
+>
+
+<!ELEMENT  I2               - O (IndexTerm, I3*)
+                                          -- second-level index entry --
+>
+<!ATTLIST  I2
+    I1ID             NAME         #IMPLIED               -- I1 parent --
+    Primary          (Primary)    #IMPLIED          -- Primary entry? --
+    SeeID            CDATA        #IMPLIED
+    SeeAlso          NAMES        #IMPLIED
+    SortKey          CDATA        #IMPLIED
+    %Common.Atts.NoRefType;
+
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+    RefType          CDATA        #FIXED
+                          "I1ID I1 SeeAlso I1
+                           &Common.RefType;"
+>
+
+<!ELEMENT  I3               - O (IndexTerm)
+                                           -- third-level index entry --
+>
+<!ATTLIST  I3
+    I2ID             NAME         #IMPLIED               -- I2 parent --
+    Primary          (Primary)    #IMPLIED          -- Primary entry? --
+    SortKey          CDATA        #IMPLIED
+    %Common.Atts.NoRefType;
+
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+    RefType          CDATA        #FIXED
+                          "I2ID I2
+                           &Common.RefType;"
+>
+
+<!ELEMENT  IRef             - O EMPTY
+                     -- Index reference.  Refers to an I1, I2, or I3. --
+>
+<!ATTLIST  IRef
+    ID               NAME         #IMPLIED
+    RefIDs           NAMES        #REQUIRED
+    Primary          (Primary)    #IMPLIED          -- Primary entry? --
+    %Common.Atts.Base;
+
+    InfoMasterSemanticClass
+                     NAME         #FIXED    "Annotation"
+    HyNames          CDATA        #FIXED    '&Common.HyNames;'
+    LexModel         CDATA        #FIXED    '&Common.LexModel;'
+    RefType          CDATA        #FIXED
+                          "RefIDs (I1 | I2 | I3) &Common.RefType;"
+>
+
+<!--==================================================================
+    Character entity declarations for BookMaster processing
+    ==================================================================-->
+
+<!ENTITY   ctq              SDATA    "IBMIDDOC: ctq"
+                                         --  close typographic quote  --
+>
+<!ENTITY   otq              SDATA    "IBMIDDOC: otq"
+                                          --  open typographic quote  --
+>
+
+<!ENTITY % UseBMSymbols     "ignore" >
+<!ENTITY % UseISOCharEnts   "ignore" >
+
+<!ENTITY % BookMasterSymbols PUBLIC
+    "+//ISBN 0-933186::IBM//ENTITIES Entities for BookMaster Symbols//EN"
+>
+
+<!ENTITY % ISOCharEntities  PUBLIC
+    "+//ISBN 0-933186::IBM//ENTITIES ISO Symbol Sets for BookMaster//EN"
+>
+
+<![ %UseBMSymbols; [
+%BookMasterSymbols;
+]]>
+
+<![ %UseISOCharEnts; [
+%ISOCharEntities;
+]]>
+
+
+<!--==================================================================
+    Default entity definition
+    ==================================================================-->
+
+<!entity   #default         SDATA  "IBMIDDOC: {Undefined entity}" >
+
+<!--==================================================================
+    HyTime Declarations
+    ==================================================================-->
+<?HyTime VERSION "ISO/IEC 10744:1992" HYQCNT=32>
+<?HyTime MODULE base>
+<?HyTime MODULE locs>
+<?HyTime MODULE links>

@@ -1,0 +1,333 @@
+<!-- $Id: ati-eqn1.ent 1.2 1993/09/27 21:00:13 dnc Exp $
+-->
+
+<!-- This file includes entities used by the ArborText Equation Editor.
+     Declarations have been supplied for several elements to make them
+     usable by DynaText.
+-->
+<!-- ArborText equation entity set. Typical invocation:
+     <!ENTITY % ATIeqn1 PUBLIC "-//ArborText//ENTITIES Equation1//EN">
+     %ATIeqn1;
+-->
+<!ENTITY i		SDATA   "descr='[i]'">
+<!ENTITY dotbelow	SDATA   "descr='[dotbelow]'">
+<!ENTITY barbelow	SDATA   "descr='[barbelow]'">
+<!ENTITY huml		SDATA   "descr='[huml]'">
+<!ENTITY fgr		SDATA   "descr='[fgr]'">
+<!ENTITY Fgr		SDATA   "descr='[Fgr]'">
+<!ENTITY inches		SDATA   "descr='[inches]'">
+<!ENTITY feet		SDATA   "descr='[feet]'">
+<!ENTITY Aelig		SDATA   "descr='[Aelig]'">
+<!ENTITY Oelig		SDATA   "descr='[Oelig]'">
+<!ENTITY slaquo		SDATA   "descr='[slaquo]'">
+<!ENTITY sraquo		SDATA   "descr='[sraquo]'">
+
+<!ENTITY Barwed		SDATA   "descr='[Barwed]'">
+<!ENTITY Cap		SDATA   "descr='[Cap]'">
+<!ENTITY Cup		SDATA   "descr='[Cup]'">
+<!ENTITY Empty		SDATA   "descr='[Empty]'">
+<!ENTITY Gg		SDATA   "descr='[Gg]'">
+<!ENTITY Gt		SDATA   "descr='[Gt]'">
+<!ENTITY Im		SDATA   "descr='[Im]'">
+<!ENTITY Larr		SDATA   "descr='[Larr]'">
+<!ENTITY Ll		SDATA   "descr='[Ll]'">
+<!ENTITY Lt		SDATA   "descr='[Lt]'">
+<!ENTITY Rarr		SDATA   "descr='[Rarr]'">
+<!ENTITY Re		SDATA   "descr='[Re]'">
+<!ENTITY Sub		SDATA   "descr='[Sub]'">
+<!ENTITY Sup		SDATA   "descr='[Sup]'">
+<!ENTITY Vdash		SDATA   "descr='[Vdash]'">
+<!ENTITY Vvdash		SDATA   "descr='[Vvdash]'">
+<!ENTITY amalg		SDATA   "descr='[amalg]'">
+<!ENTITY ang		SDATA   "descr='[ang]'">
+<!ENTITY angl0		SDATA   "TeX='<' descr='[angl0]'">
+<!ENTITY angmsd		SDATA   "descr='[angmsd]'">
+<!ENTITY angr0		SDATA   "TeX='>' descr='[angr0]'">
+<!ENTITY ape		SDATA   "descr='[ape]'">
+<!ENTITY ar		SDATA   "TeX=\overrightarrow descr='[ar]'">
+<!ENTITY asymp		SDATA   "descr='[asymp]'">
+<!ENTITY backeps	SDATA   "descr='[backeps]'">
+<!ENTITY barwed		SDATA   "descr='[barwed]'">
+<!ENTITY beth		SDATA   "descr='[beth]'">
+<!ENTITY bigand		SDATA   "descr='[bigand]'">
+<!ENTITY bigcap		SDATA   "descr='[bigcap]'">
+<!ENTITY bigcirc	SDATA   "TeX=\bigcirc descr='[bigcirc]'">
+<!ENTITY bigcup		SDATA   "TeX=\bigcup descr='[bigcup]'">
+<!ENTITY bigodot	SDATA   "TeX=\bigodot descr='[bigodot]'">
+<!ENTITY bigoplus	SDATA   "TeX=\bigoplus descr='[bigoplus]'">
+<!ENTITY bigor		SDATA   "descr='[bigor]'">
+<!ENTITY bigotimes	SDATA   "TeX=\bigotimes descr='[bigotimes]'">
+<!ENTITY bigsqcap	SDATA   "descr='[bigsqcap]'">
+<!ENTITY bigsqcup	SDATA   "descr='[bigsqcup]'">
+<!ENTITY bigstar	SDATA   "descr='[bigstar]'">
+<!ENTITY biguplus	SDATA   "TeX=\biguplus descr='[biguplus]'">
+<!ENTITY bigxdtri	SDATA   "descr='[bigxdtri]'">
+<!ENTITY bigxutri	SDATA   "descr='[bigxutri]'">
+<!ENTITY bowtie		SDATA   "descr='[bowtie]'">
+<!ENTITY bprime		SDATA   "descr='[bprime]'">
+<!ENTITY bsim		SDATA   "descr='[bsim]'">
+<!ENTITY bsime		SDATA   "descr='[bsime]'">
+<!ENTITY bsolm0		SDATA   "descr='[bsolm0]'">
+<!ENTITY bump		SDATA   "descr='[bump]'">
+<!ENTITY bumpe		SDATA   "descr='[bumpe]'">
+<!ENTITY cdots		SDATA   "descr='[cdots]'">
+<!ENTITY ceill0		SDATA   "TeX='\lceil ' descr='[ceill0]'">
+<!ENTITY ceilr0		SDATA   "TeX='\rceil ' descr='[ceilr0]'">
+<!ENTITY chkmrk		SDATA   "descr='[chkmrk]'">
+<!ENTITY circR		SDATA   "descr='[circR]'">
+<!ENTITY circS		SDATA   "descr='[circS]'">
+<!ENTITY circe		SDATA   "descr='[circe]'">
+<!ENTITY comp		SDATA   "descr='[comp]'">
+<!ENTITY cubl0		SDATA   "TeX='\{' descr='[cubl0]'">
+<!ENTITY cubr0		SDATA   "TeX='\}' descr='[cubr0]'">
+<!ENTITY cubl1          SDATA   "TeX='\big\{' descr='[cubl1]'">
+<!ENTITY cubl2          SDATA   "TeX='\Big\{' descr='[cubl2]'">
+<!ENTITY cubl3          SDATA   "TeX='\bigg\{' descr='[cubl3]'">
+<!ENTITY cubl4          SDATA   "TeX='\Bigg\{' descr='[cubl4]'">
+<!ENTITY cubr1          SDATA   "TeX='\big\}' descr='[cubr1]'">
+<!ENTITY cubr2          SDATA   "TeX='\Big\}' descr='[cubr2]'">
+<!ENTITY cubr3          SDATA   "TeX='\bigg\}' descr='[cubr3]'">
+<!ENTITY cubr4          SDATA   "TeX='\Bigg\}' descr='[cubr4]'">
+<!ENTITY cuepr		SDATA   "descr='[cuepr]'">
+<!ENTITY cuesc		SDATA   "descr='[cuesc]'">
+<!ENTITY cularr		SDATA   "descr='[cularr]'">
+<!ENTITY curarr		SDATA   "descr='[curarr]'">
+<!ENTITY cuvee		SDATA   "descr='[cuvee]'">
+<!ENTITY cuwed		SDATA   "descr='[cuwed]'">
+<!ENTITY d1		SDATA   "descr='[d1]'">
+<!ENTITY d11		SDATA   "descr='[d11]'">
+<!ENTITY d12		SDATA   "descr='[d12]'">
+<!ENTITY d13		SDATA   "descr='[d13]'">
+<!ENTITY d14		SDATA   "descr='[d14]' TeX=\widehat">
+<!ENTITY d15		SDATA   "descr='[d15]' TeX=\widetilde">
+<!ENTITY d2		SDATA   "TeX='\dot ' descr='[d2]'">
+<!ENTITY d3		SDATA   "TeX='\ddot ' descr='[d3]'">
+<!ENTITY d4		SDATA   "descr='[d4]' TeX='\hat '">
+<!ENTITY d5		SDATA   "descr='[d5]'">
+<!ENTITY d9		SDATA   "descr='[d9]'">
+<!ENTITY dArr		SDATA   "descr='[dArr]'">
+<!ENTITY daleth		SDATA   "descr='[daleth]'">
+<!-- in iso-amsa; ENTITY darr2		SDATA   "descr='[darr2]'"-->
+<!ENTITY dashv		SDATA   "descr='[dashv]'">
+<!ENTITY ddots		SDATA   "descr='[ddots]'">
+<!ENTITY dharl		SDATA   "descr='[dharl]'">
+<!ENTITY dharr		SDATA   "descr='[dharr]'">
+<!ENTITY diam		SDATA   "descr='[diam]'">
+<!ENTITY diams		SDATA   "descr='[diams]'">
+<!ENTITY divonx		SDATA   "descr='[divonx]'">
+<!ENTITY dlarr		SDATA   "descr='[dlarr]'">
+<!ENTITY drarr		SDATA   "descr='[drarr]'">
+<!ENTITY dvbm0		SDATA   "descr='[dvbm0]'">
+<!ENTITY eDot		SDATA   "descr='[eDot]'">
+<!ENTITY ecir		SDATA   "descr='[ecir]'">
+<!ENTITY efDot		SDATA   "descr='[efDot]'">
+<!ENTITY egs		SDATA   "descr='[egs]'">
+<!ENTITY els		SDATA   "descr='[els]'">
+<!ENTITY empty		SDATA   "descr='[empty]'">
+<!ENTITY eqsim		SDATA   "descr='[eqsim]'">
+<!ENTITY erDot		SDATA   "descr='[erDot]'">
+<!ENTITY eth		SDATA   "descr='[eth]'">
+<!ENTITY fll0		SDATA   "TeX='\lfloor ' descr='[fll0]'">
+<!ENTITY flr0		SDATA   "TeX='\rfloor ' descr='[flr0]'">
+<!ENTITY fork		SDATA   "descr='[fork]'">
+<!ENTITY frown		SDATA   "descr='[frown]'">
+<!ENTITY gE		SDATA   "descr='[gE]'">
+<!ENTITY gap		SDATA   "descr='[gap]'">
+<!ENTITY gdot		SDATA   "descr='[gdot]'">
+<!-- in iso-amsr; ENTITY gel		SDATA   "descr='[gel]'"-->
+<!-- in iso-amsr; ENTITY ges		SDATA   "descr='[ges]'"-->
+<!ENTITY gimel		SDATA   "descr='[gimel]'">
+<!ENTITY gl		SDATA   "descr='[gl]'">
+<!ENTITY gnE		SDATA   "descr='[gnE]'">
+<!ENTITY gnap		SDATA   "descr='[gnap]'">
+<!ENTITY gne		SDATA   "descr='[gne]'">
+<!ENTITY gnsim		SDATA   "descr='[gnsim]'">
+<!ENTITY gsim		SDATA   "descr='[gsim]'">
+<!ENTITY gvertnE	SDATA   "descr='[gvertnE]'">
+<!ENTITY hArr		SDATA   "descr='[hArr]'">
+<!ENTITY harr		SDATA   "TeX='\leftrightarrow' descr='[harr]'">
+<!ENTITY harrr		SDATA   "descr='[harrr]'">
+<!ENTITY harrw		SDATA   "descr='[harrw]'">
+<!ENTITY hslash		SDATA   "descr='[hslash]'">
+<!ENTITY intcal		SDATA   "descr='[intcal]'">
+<!ENTITY j0		SDATA   "TeX='{}^\circ ' descr='[j0]'">
+<!ENTITY lAarr		SDATA   "descr='[lAarr]'">
+<!ENTITY lArrr		SDATA   "descr='[lArrr]'">
+<!ENTITY lE		SDATA   "descr='[lE]'">
+<!ENTITY lEg		SDATA   "descr='[lEg]'">
+<!ENTITY lap		SDATA   "descr='[lap]'">
+<!-- in iso-num; ENTITY larr		SDATA   "descr='[larr]'"-->
+<!-- in iso-amsa; ENTITY larr2		SDATA   "descr='[larr2]'"-->
+<!-- in iso-amsa; ENTITY larrhk		SDATA   "descr='[larrhk]'"-->
+<!-- in iso-amsa; ENTITY larrlp		SDATA   "descr='[larrlp]'"-->
+<!ENTITY larrr		SDATA   "descr='[larrr]'">
+<!ENTITY ldot		SDATA   "descr='[ldot]'">
+<!ENTITY ldots		SDATA   "TeX='\ldots ' descr='[ldots]'">
+<!-- in iso-amsr; ENTITY leg		SDATA   "descr='[leg]'"-->
+<!-- in iso-amsr; ENTITY les		SDATA   "descr='[les]'"-->
+<!ENTITY lg		SDATA   "descr='[lg]'">
+<!ENTITY lhard		SDATA   "descr='[lhard]'">
+<!ENTITY lharu		SDATA   "descr='[lharu]'">
+<!ENTITY lnE		SDATA   "descr='[lnE]'">
+<!ENTITY lnap		SDATA   "descr='[lnap]'">
+<!ENTITY lne		SDATA   "descr='[lne]'">
+<!ENTITY lnsim		SDATA   "descr='[lnsim]'">
+<!ENTITY lrarr2		SDATA   "descr='[lrarr2]'">
+<!ENTITY lrhar2		SDATA   "descr='[lrhar2]'">
+<!ENTITY lsh		SDATA   "descr='[lsh]'">
+<!ENTITY lsim		SDATA   "TeX='\buildrel <\over\sim' descr='[lsim]'">
+<!-- in iso-amsb; ENTITY lthree		SDATA   "descr='[lthree]'"-->
+<!-- in iso-amsb; ENTITY ltimes		SDATA   "descr='[ltimes]'"-->
+<!ENTITY lvertnE	SDATA   "descr='[lvertnE]'">
+<!ENTITY m22		SDATA   "descr='[m22]'">
+<!ENTITY m7		SDATA   "descr='[m7]'">
+<!ENTITY mho		SDATA   "descr='[mho]'">
+<!ENTITY mid		SDATA   "descr='[mid]'">
+<!-- in iso-amsb; ENTITY minusb		SDATA   "descr='[minusb]'"-->
+<!ENTITY models		SDATA   "descr='[models]'">
+<!ENTITY mumap		SDATA   "descr='[mumap]'">
+<!ENTITY nVDash		SDATA   "descr='[nVDash]'">
+<!ENTITY nVdash		SDATA   "descr='[nVdash]'">
+<!ENTITY napprox	SDATA   "descr='[napprox]'">
+<!ENTITY ncong		SDATA   "descr='[ncong]'">
+<!ENTITY nearr		SDATA   "descr='[nearr]'">
+<!ENTITY nexist		SDATA   "descr='[nexist]'">
+<!ENTITY ngE		SDATA   "descr='[ngE]'">
+<!ENTITY nge		SDATA   "descr='[nge]'">
+<!ENTITY nges		SDATA   "descr='[nges]'">
+<!ENTITY ngt		SDATA   "descr='[ngt]'">
+<!ENTITY nharr		SDATA   "descr='[nharr]'">
+<!ENTITY nlArr		SDATA   "descr='[nlArr]'">
+<!ENTITY nlE		SDATA   "descr='[nlE]'">
+<!ENTITY nlarr		SDATA   "descr='[nlarr]'">
+<!ENTITY nle		SDATA   "descr='[nle]'">
+<!ENTITY nles		SDATA   "descr='[nles]'">
+<!ENTITY nlt		SDATA   "descr='[nlt]'">
+<!ENTITY nltri		SDATA   "descr='[nltri]'">
+<!ENTITY nltrie		SDATA   "descr='[nltrie]'">
+<!ENTITY nmid		SDATA   "descr='[nmid]'">
+<!ENTITY npar		SDATA   "descr='[npar]'">
+<!ENTITY npr		SDATA   "descr='[npr]'">
+<!ENTITY npre		SDATA   "descr='[npre]'">
+<!ENTITY nrArr		SDATA   "descr='[nrArr]'">
+<!ENTITY nrarr		SDATA   "descr='[nrarr]'">
+<!ENTITY nrtri		SDATA   "descr='[nrtri]'">
+<!ENTITY nrtrie		SDATA   "descr='[nrtrie]'">
+<!ENTITY nsc		SDATA   "descr='[nsc]'">
+<!ENTITY nsce		SDATA   "descr='[nsce]'">
+<!ENTITY nsim		SDATA   "descr='[nsim]'">
+<!ENTITY nsmid		SDATA   "descr='[nsmid]'">
+<!ENTITY nspar		SDATA   "descr='[nspar]'">
+<!ENTITY nsubE		SDATA   "descr='[nsubE]'">
+<!ENTITY nsube		SDATA   "descr='[nsube]'">
+<!ENTITY nsup		SDATA   "descr='[nsup]'">
+<!ENTITY nsupE		SDATA   "descr='[nsupE]'">
+<!ENTITY nsupe		SDATA   "descr='[nsupe]'">
+<!ENTITY nvDash		SDATA   "descr='[nvDash]'">
+<!ENTITY nvdash		SDATA   "descr='[nvdash]'">
+<!ENTITY nwarr		SDATA   "descr='[nwarr]'">
+<!ENTITY oast		SDATA   "descr='[oast]'">
+<!ENTITY ocirc		SDATA   "descr='[ocirc]'">
+<!ENTITY odash		SDATA   "descr='[odash]'">
+<!ENTITY odot		SDATA   "TeX=\odot descr='[odot]'">
+<!ENTITY olarr		SDATA   "descr='[olarr]'">
+<!ENTITY ominus		SDATA   "TeX='\ominus' descr='[ominus]'">
+<!ENTITY oplus		SDATA   "TeX=\oplus descr='[oplus]'">
+<!ENTITY orarr		SDATA   "descr='[orarr]'">
+<!ENTITY osol		SDATA   "descr='[osol]'">
+<!ENTITY otimes		SDATA   "TeX=\otimes descr='[otimes]'">
+<!ENTITY parl0		SDATA   "TeX='(' descr='[parl0]'">
+<!ENTITY parr0		SDATA   "TeX=')' descr='[parr0]'">
+<!ENTITY plank		SDATA   "descr='[plank]'">
+<!ENTITY plusb		SDATA   "descr='[plusb]'">
+<!ENTITY plusdo		SDATA   "descr='[plusdo]'">
+<!ENTITY pr		SDATA   "descr='[pr]'">
+<!ENTITY prap		SDATA   "descr='[prap]'">
+<!ENTITY pre		SDATA   "descr='[pre]'">
+<!ENTITY preccurlyeq	SDATA   "descr='[preccurlyeq]'">
+<!ENTITY prnE		SDATA   "descr='[prnE]'">
+<!ENTITY prnap		SDATA   "descr='[prnap]'">
+<!ENTITY prnsim		SDATA   "descr='[prnsim]'">
+<!ENTITY rAarr		SDATA   "descr='[rAarr]'">
+<!ENTITY rArrr		SDATA   "descr='[rArrr]'">
+<!-- in iso-amsa; ENTITY rarr2		SDATA   "descr='[rarr2]'"-->
+<!-- in iso-amsa; ENTITY rarrhk		SDATA   "descr='[rarrhk]'"-->
+<!-- in iso-amsa; ENTITY rarrlp		SDATA   "descr='[rarrlp]'"-->
+<!ENTITY rarrr		SDATA   "descr='[rarrr]'">
+<!-- in iso-amsa; ENTITY rarrtl		SDATA   "descr='[rarrtl]'"-->
+<!-- in iso-amsa; ENTITY rarrw		SDATA   "descr='[rarrw]'"-->
+<!ENTITY rhard		SDATA   "descr='[rhard]'">
+<!ENTITY rharu		SDATA   "descr='[rharu]'">
+<!ENTITY rlarr2		SDATA   "descr='[rlarr2]'">
+<!ENTITY rlhar2		SDATA   "descr='[rlhar2]'">
+<!ENTITY rsh		SDATA   "descr='[rsh]'">
+<!ENTITY rthree		SDATA   "descr='[rthree]'">
+<!ENTITY rtimes		SDATA   "descr='[rtimes]'">
+<!ENTITY rtrie		SDATA   "descr='[rtrie]'">
+<!ENTITY samalg		SDATA   "descr='[samalg]'">
+<!ENTITY sc		SDATA   "descr='[sc]'">
+<!ENTITY sccue		SDATA   "descr='[sccue]'">
+<!ENTITY sce		SDATA   "descr='[sce]'">
+<!ENTITY scnE		SDATA   "descr='[scnE]'">
+<!ENTITY scnap		SDATA   "descr='[scnap]'">
+<!ENTITY sdotb		SDATA   "descr='[sdotb]'">
+<!ENTITY setmn		SDATA   "descr='[setmn]'">
+<!ENTITY sfrown		SDATA   "descr='[sfrown]'">
+<!ENTITY smallint	SDATA   "descr='[smallint]'">
+<!ENTITY smallsetminus	SDATA   "descr='[smallsetminus]'">
+<!ENTITY smid		SDATA   "descr='[smid]'">
+<!ENTITY smile		SDATA   "descr='[smile]'">
+<!ENTITY solm0		SDATA   "descr='[solm0]'">
+<!ENTITY spar		SDATA   "descr='[spar]'">
+<!ENTITY sqbl0		SDATA   "TeX='[' descr='[sqbl0]'">
+<!ENTITY sqbr0		SDATA   "TeX=']' descr='[sqbr0]'">
+<!ENTITY sqbl1          SDATA   "TeX='\big[' descr='[sqbl1]'">
+<!ENTITY sqbl2         	SDATA   "TeX='\Big[' descr='[sqbl2]'">
+<!ENTITY sqbl3          SDATA   "TeX='\bigg[' descr='[sqbl3]'">
+<!ENTITY sqbl4         	SDATA   "TeX='\Bigg[' descr='[sqbl4]'">
+<!ENTITY sqbr1          SDATA   "TeX='\big]' descr='[sqbr1]'">
+<!ENTITY sqbr2          SDATA   "TeX='\Big]' descr='[sqbr2]'">
+<!ENTITY sqbr3          SDATA   "TeX='\bigg]' descr='[sqbr3]'">
+<!ENTITY sqbr4          SDATA   "TeX='\Bigg]' descr='[sqbr4]'">
+<!ENTITY sqcap		SDATA   "descr='[sqcap]'">
+<!ENTITY sqcup		SDATA   "descr='[sqcup]'">
+<!ENTITY sqsub		SDATA   "descr='[sqsub]'">
+<!ENTITY sqsube		SDATA   "descr='[sqsube]'">
+<!ENTITY sqsup		SDATA   "descr='[sqsup]'">
+<!ENTITY sqsupe		SDATA   "descr='[sqsupe]'">
+<!ENTITY ssmile		SDATA   "descr='[ssmile]'">
+<!ENTITY sstarf		SDATA   "descr='[sstarf]'">
+<!ENTITY subE		SDATA   "descr='[subE]'">
+<!ENTITY subnE		SDATA   "descr='[subnE]'">
+<!ENTITY subne		SDATA   "descr='[subne]'">
+<!ENTITY supE		SDATA   "descr='[supE]'">
+<!ENTITY supnE		SDATA   "descr='[supnE]'">
+<!ENTITY supne		SDATA   "descr='[supne]'">
+<!ENTITY thickapprox	SDATA   "descr='[thickapprox]'">
+<!ENTITY thicksim	SDATA   "descr='[thicksim]'">
+<!-- in iso-amsb; ENTITY timesb		SDATA   "descr='[timesb]'"-->
+<!ENTITY top		SDATA   "descr='[top]'">
+<!ENTITY trie		SDATA   "descr='[trie]'">
+<!ENTITY twixt		SDATA   "descr='[twixt]'">
+<!ENTITY uArr		SDATA   "descr='[uArr]'">
+<!-- in iso-amsa; ENTITY uarr2		SDATA   "descr='[uarr2]'"-->
+<!ENTITY uharl		SDATA   "descr='[uharl]'">
+<!ENTITY uharr		SDATA   "descr='[uharr]'">
+<!ENTITY uplus		SDATA   "TeX='\uplus ' descr='[uplus]'">
+<!ENTITY vArr		SDATA   "descr='[vArr]'">
+<!ENTITY vDash		SDATA   "descr='[vDash]'">
+<!ENTITY varr		SDATA   "descr='[varr]'">
+<!ENTITY vbm0		SDATA   "TeX='\mid' descr='[vbm0]'">
+<!ENTITY vdash		SDATA   "descr='[vdash]'">
+<!ENTITY veebar		SDATA   "descr='[veebar]'">
+<!ENTITY vltri		SDATA   "descr='[vltri]'">
+<!ENTITY vprop		SDATA   "descr='[vprop]'">
+<!ENTITY vrtri		SDATA   "descr='[vrtri]'">
+<!ENTITY vsubnE		SDATA   "descr='[vsubnE]'">
+<!ENTITY vsubne		SDATA   "descr='[vsubne]'">
+<!ENTITY vsupnE		SDATA   "descr='[vsupnE]'">
+<!ENTITY vsupne		SDATA   "descr='[vsupne]'">
+<!ENTITY vtri		SDATA   "descr='[vtri]'">
+<!ENTITY weierp		SDATA   "descr='[weierp]'">
+<!ENTITY xdtri          SDATA   "TeX='\nabla ' descr='[xdtri]'">
+<!ENTITY xhArr		SDATA   "descr='[xhArr]'">

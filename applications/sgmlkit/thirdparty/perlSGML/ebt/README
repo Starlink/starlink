@@ -1,0 +1,14 @@
+README (perlSGML ebt directory)
+
+The file contained in this directory are related to the DynaText
+software product by EBT (now INSO).
+
+---------------------------------------------------------------------------
+CONTENTS of ebt/:
+
+dtd2style      		Create a basic stylesheet defining styles for
+			all elements in a DTD.
+
+---------------------------------------------------------------------------
+97/09/16 15:37:39
+Earl Hood, ehood@medusa.acs.uci.edu
