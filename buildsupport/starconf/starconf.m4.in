@@ -1179,50 +1179,6 @@ fi
 ])# STAR_PLATFORM_SOURCES
 
 
-# STAR_FC_SETARG
-# --------------
-#
-# Define a macro which can be used in a C main program to set the
-# program argc and argv, in such a way that the Fortran getarg()
-# function can get at them.  This defines the macro
-# FC_SETARG(argc,argv).  The implementation necessarily uses
-# functions which are specific to the Fortran implementation, and the
-# body of this macro is basically a switch to determine the compiler
-# and thus the appropriate compiler-specific magic.  If no
-# implementation is available, then the macro should expand to
-# nothing.
-#
-# Note that the Starlink functions wrapping getarg() are robust
-# against getarg() failing because this information is not available.
-# This function is nonetheless necessary because some platforms have
-# link problems otherwise (specifically OSX, on which the most
-# readily available compiler is g77, cannot link properly if the
-# getarg() function is referenced by a library, but there is a C main
-# function, so that the Fortran main function's call of f_setarg is
-# omitted).  Thus it is generally harmless to leave this function
-# unimplemented on those platforms which do not have these link
-# problems, and it is harmless that the test below is extremely
-# compiler specific (though we would probably have to add
-# implementations for any other compilers used on OSX).  It's also
-# generally harmless not to call the defined function, or invoke this
-# macro, if your application doesn't have the link problems which
-# makeit necessary, though of course calling it will make getarg()
-# work where it otherwise wouldn't, which may be an advantage.
-AC_DEFUN([STAR_FC_SETARG],
-   [AC_CACHE_CHECK([how to support Fortran getarg],
-       [star_cv_fc_setarg],
-       [AC_REQUIRE([AC_PROG_FC])
-        if test "$ac_cv_fc_compiler_gnu" = yes; then
-            star_cv_fc_setarg='f_setarg(argc,argv)'
-        else
-            star_cv_fc_setarg=
-        fi])
-    AH_TEMPLATE([FC_SETARG],
-       [Define to a function call which will set arguments for Fortran getarg])
-    AC_DEFINE_UNQUOTED([FC_SETARG(argc,argv)], $star_cv_fc_setarg)
-])# STAR_FC_SETARG
-
-
 
 # starconf internal macros
 
