@@ -239,7 +239,7 @@
      :	                       NUMTYPE_DEC, POS_RA, POS_DEC,
      :	                       STRING_RA, STRING_DEC)
 
-            type *, 'string_ra = ', string_ra
+!            print *, 'string_ra = ', string_ra
             CALL CHR_CLEAN( STRING_RA )
             L1 = 0
 	    CALL CHR_APPND( STRING_RA, STRING_RA, L1)
@@ -403,7 +403,7 @@
 	      STRING_RA = ' '
 	    END IF
 
-            type *, 'string_ra = ', string_ra
+!            print *, 'string_ra = ', string_ra
             CALL CHR_CLEAN( STRING_RA )
             L1 = 0
 	    CALL CHR_APPND( STRING_RA, STRING_RA, L1)
