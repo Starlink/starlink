@@ -5,12 +5,12 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory & ESO
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions that remove spurious detections from the
 *			catalog
 *
-*	Last modify:	21/04/99
+*	Last modify:	08/02/2001
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -77,7 +77,7 @@ INPUT   Object number,
 OUTPUT  0 if the object was CLEANed, 1 otherwise.
 NOTES   -.
 AUTHOR  E. Bertin (IAP, Leiden & ESO)
-VERSION 06/04/99
+VERSION 08/02/2001
  ***/
 int	clean(picstruct *field, picstruct *dfield, int objnb,
 		objliststruct *objlistin)
@@ -105,9 +105,8 @@ int	clean(picstruct *field, picstruct *dfield, int objnb,
       if (obj->fdflux < objin->fdflux)
         {
         val = 1+alphain*(objin->cxx*dx*dx+objin->cyy*dy*dy+objin->cxy*dx*dy);
-        if (val<1e-6)
-          val = 1e-6;
-        if ((float)(val<1e10?ampin*pow(val, -beta) : 0.0) > obj->mthresh)
+        if (val>1.0
+	    && ((float)(val<1e10?ampin*pow(val,-beta) : 0.0) > obj->mthresh))
 /*------- the newcomer puts that object in its menu! */
           cleanvictim[j++] = i;
         }
@@ -117,9 +116,8 @@ int	clean(picstruct *field, picstruct *dfield, int objnb,
         amp = obj->fdflux/(2*unitarea*obj->abcor);
         alpha = (pow(amp/obj->dthresh, 1.0/beta) - 1)*unitarea/obj->fdnpix;
         val = 1+alpha*(obj->cxx*dx*dx+obj->cyy*dy*dy+obj->cxy*dx*dy);
-        if (val<1e-6)
-          val = 1e-6;
-        if ((float)(val<1e10?amp*pow(val, -beta) : 0.0) > objin->mthresh)
+        if (val>1.0
+	    && ((float)(val<1e10?amp*pow(val,-beta) : 0.0) > objin->mthresh))
           {
 /*------- the newcomer is eaten!! */
           mergeobject(objin, obj);
