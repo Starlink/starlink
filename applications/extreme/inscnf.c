@@ -57,9 +57,9 @@
 #include <string.h>
 #include <stddef.h>
 
+#define MAXCONT 100                     /* Maximum continuation lines        */
 #define MAXNEST 100                     /* Deepest level of bracket nesting  */
 #define LBUFSIZ 4000                    /* Longest source line               */
-#define MAXCONT 100                     /* Maximum continuation lines        */
 
 
 /* Local function prototypes. */
@@ -364,9 +364,10 @@
       char *ls[ MAXCONT ];              /* Start of line                     */
       char *pc;                         /* Pointer to character              */
       char *qc;                         /* Pointer to character              */
+      char *rc;                         /* Pointer to character              */
       char *we;                         /* Pointer to end of word            */
       char ebuf[ LBUFSIZ ];             /* Buffer holding expanded text      */
-      static int col = 0;               /* Current output column             */
+      static int col = 1;               /* Current output column             */
       int done;                         /* Has a line break been found?      */
       int eindent[ LBUFSIZ ];           /* Preferred indentation at each char*/
       int eleng;                        /* Length of ebuf                    */
@@ -380,6 +381,7 @@
       int lines;                        /* Number of lines in buffer         */
       int ll[ MAXCONT ];                /* Length of lines                   */
       int level;                        /* Parenthesis nesting level         */
+      int nonblank;                     /* Is line so far blank?             */
       int started;                      /* Has word count got started?       */
       int stcol[ MAXNEST ];             /* Start column of nesting level     */
 
@@ -521,14 +523,23 @@
 
 /* If this word won't fit on the current line, output a line break now. */
                if ( we - pc + col > 73 ) {
+
+/* If no non-blank output so far this line, discard leading blanks. */
+                  nonblank = 0;
+                  for ( rc = pc; rc <= qc; rc++ ) 
+                     if ( col + rc - pc != 6 && *rc != ' ' ) nonblank = 1;
+                  if ( ! nonblank ) pc = qc;
+
+/* Set best indent value. */
                   indent = eindent[ pc - ebuf ];
                   if ( indent < 6 ) indent = 6;
                   if ( we - pc + indent > 73 ) indent = 9;
                   if ( we - pc + indent > 73 ) indent = 6;
                   if ( we - pc + indent > 73 ) 
                      fprintf( stderr, "%s: Failed to break line\n", name );
+
+/* Output the line break. */
                   putchar( '\n' );
-                  indent = eindent[ pc - ebuf ];
                   for ( i = 1; i <= indent; i++ )
                      putchar( i == 6 ? ':' : ' ' );
                   col = indent;
