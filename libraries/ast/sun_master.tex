@@ -17,13 +17,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.5}
+\newcommand{\stardocnumber}    {211.6}
 c-
 f+
-\newcommand{\stardocnumber}    {210.5}
+\newcommand{\stardocnumber}    {210.6}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {8th January 2000}
+\newcommand{\stardocdate}      {2nd April 2000}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -11957,12 +11957,9 @@ WCS calibration information with FITS data, but it also allows any other
 information that can be expressed in terms of AST Objects to be stored
 as well.  In fact, the native encoding provides us with facilities
 roughly analogous to those of the Channel
-(\secref{ss:channels})---{\em{i.e.}}\ a nearly lossless way of
+(\secref{ss:channels})---{\em{i.e.}}\ a lossless way of
 transferring AST Objects from program to program---but based on FITS
-headers instead of free-format text.\footnote{Unfortunately, the
-process is currently not quite lossless because string truncation can
-still occur due to the finite length (80~characters) of FITS header
-cards.}
+headers instead of free-format text.
 
 \subsection{The FitsChan Model}
 
@@ -12327,6 +12324,31 @@ written. Since our FitsChan was initially empty, the Card attribute
 will, in this example, point at the end-of-file
 (\secref{ss:addressingfitscards}).
 
+The FITS standard imposes a limit of 68 characters on the length of
+strings which may be stored in a single header card. Sometimes, a
+description of an AST Object involves the use of strings which exceed
+this limit ({\em{e.g.}}\ a Frame title can be of arbitrary length). If
+this occurs, the long string will be split over two or more header cards.
+Each ``continuation'' card will have the keyword {\tt CONTINUE} in
+columns 1 to 8, and will contain a space in column 9 (instead of the
+usual equals sign). An ampersand (``{\tt&}'') is appended to the end of
+each of the strings (except the last one) to indicate that the string is
+continued on the next card. 
+
+c+
+Note, this splitting of long strings over several cards only occurs when
+writing AST Objects to a FitsChan using the astWrite function and the
+{\em native} encoding. If a long string is stored in a FitsChan using
+(for instance) the astPutFits function, it will simply be truncated.
+c- 
+
+f+
+Note, this splitting of long strings over several cards only occurs when
+writing AST Objects to a FitsChan using the AST_WRITE routine and the
+{\em native} encoding. If a long string is stored in a FitsChan using
+(for instance) the AST_PUTFITS routine, it will simply be truncated.
+f- 
+
 \subsection{\label{ss:extractingfitscards}Extracting Individual Cards from a FitsChan}
 
 c+
@@ -12690,6 +12712,23 @@ f-
 After a read completes, the FitsChan's Card attribute identifies the
 card immediately following the last card read, or the end-of-file of
 there are no more cards.
+
+c+
+Since the {\em native} encoding is being used, any long strings involved
+in the object description will have been split into two or more adjacent
+contuation cards when the Object was stored in the header using function
+astWrite. The astRead function reverses this process by concatenating any
+such adjacent continuation cards to re-create the original long string.
+c-
+
+f+
+Since the {\em native} encoding is being used, any long strings involved
+in the object description will have been split into two or more adjacent
+contuation cards when the Object was stored in the header using routine
+AST_WRITE. The AST_READ routine reverses this process by concatenating
+any such adjacent continuation cards to re-create the original long
+string.
+f-
 
 \subsection{Saving and Restoring Multiple Objects in a FitsChan}
 
@@ -13074,33 +13113,42 @@ likely to be adopted widely for FITS data in future.  However, this
 proposed standard is still evolving, and while this continues we
 intend that the AST implementation should track it.
 
-{\bf{Unfortunately, this means that future versions of AST cannot
-necessarily be guaranteed to read FITS-WCS encoded data written with
-the current version.  At present, therefore, you should write WCS
-information using this encoding only with great caution and should not
-use it for archiving data.}}\footnote{The likelihood of further
-substantial changes to the FITS-WCS proposal came as something of a
-surprise to many onlookers, given that the paper by Greisen \&
-Calabretta had changed very little for several years. At present,
-therefore, the situation is somewhat uncertain, although there are
-hopes that final agreement on a FITS-WCS standard may now be close.
-Meanwhile, a suitable (stable) interim standard can be found in the
-form of the FITS-IRAF encoding.}
+\footnote{After a long and chequered history, the FITS-WCS proposal 
+finally seems to be stabilizing. The version currently implemented within
+AST -- based on the use of {\tt CDi\_j} keywords to describe axis scaling
+and rotation -- seems likely to be adopted as the official standard
+sometime during the year 2000, although obviously the possibility of
+change before then cannot be ruled out.}
 
 \item[FITS-IRAF]\mbox{}\\
 This encoding is based on the conventions described in the document
-"World Coordinate Systems Representations Within the FITS Format" by
-R.J. Hanisch and D.G. Wells, 1988.\footnote{Available by ftp from
-fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z} It is currently
-employed by the IRAF data analysis facility, so its use will
-facilitate data exchange with IRAF.
+``World Coordinate Systems Representations Within the FITS Format'' by R.J.
+Hanisch and D.G. Wells, 1988.\footnote{Available by ftp from
+fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z} It is currently employed
+by the IRAF data analysis facility, so its use will facilitate data
+exchange with IRAF. This encoding is in effect a sub-set of the current
+FITS-WCS encoding.
 
-Given the current lack of final agreement on the FITS-WCS standard
-(above), the FITS-IRAF encoding provides a suitable interim solution,
-because it approximates to a subset of the propsed FITS-WCS standard.
-This means that it is slightly more restrictive, but in practice its
-limitations are often unimportant. Conversion of data from FITS-IRAF
-to the final form of FITS-WCS is likely to be well supported.
+\item[FITS-PC]\mbox{}\\
+This encoding is based on a previous version of the proposed new FITS WCS
+standard which used {\tt PCjjjjiii} and {\tt CDELTj} keywords to describe
+axis rotation and scaling. Versions of AST prior to V1.5 used this scheme
+for the FITS-WCS encoding. As of V1.5, FITS-WCS uses {\tt CDi\_j}
+keywords instead.\footnote{There are many other differences between the
+previous and the current FITS-WCS encodings. The keywords to describe
+axis rotation and scaling is used purely as a label to identify the
+scheme.} The FITS-PC encoding is included in AST V1.5 only to allow
+FITS-WCS data created with previous versions to be read. It should not,
+in general, be used to create new data sets.
+
+\item[FITS-AIPS]\mbox{}\\
+This encoding is based on the conventions described in the document
+``Non-linear Coordinate Systems in AIPS'' by Eric W. Greisen (revised 9th
+September, 1994).\footnote{Available by ftp from fits.cv.nrao.edu
+/fits/documents/wcs/aips27.ps.Z} It is currently employed by the AIPS
+data analysis facility, so its use will facilitate data exchange with
+AIPS. This encoding uses {\tt CROTAi} and {\tt CDELTi} keywords to
+describe axis rotation and scaling.
 \end{description}
 \end{quote}
 
@@ -13304,7 +13352,7 @@ f+
 \normalsize
 f-
 
-The result of this enquiry would be the string ``FITS-WCS''.  Note
+The result of this enquiry would be the string ``FITS-AIPS''.  Note
 that we could also have set the FitsChan's Encoding attribute
 explicitly, such as when creating it:
 
@@ -13312,7 +13360,7 @@ c+
 \begin{quote}
 \small
 \begin{verbatim}
-fitschan = astFitsChan( NULL, NULL, "Encoding=FITS-WCS" );
+fitschan = astFitsChan( NULL, NULL, "Encoding=FITS-AIPS" );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -13320,7 +13368,7 @@ c-
 f+
 \small
 \begin{verbatim}
-      FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, 'Encoding=FITS-WCS', STATUS )
+      FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, 'Encoding=FITS-AIPS', STATUS )
 \end{verbatim}
 \normalsize
 f-
@@ -13766,7 +13814,7 @@ f+
 \small
 \begin{verbatim}
 *  1.
-      CALL AST_SET( FITSCHAN, 'Card=1, Encoding=FITS-IRAF', STATUS )
+      CALL AST_SET( FITSCHAN, 'Card=1, Encoding=FITS-WCS', STATUS )
       IF ( AST_WRITE( FITSCHAN, WCSINFO, STATUS ) .EQ. 0 ) THEN
 
 *  2.
@@ -13785,17 +13833,13 @@ f-
 That is:
 
 \begin{enumerate}
-\item Start by trying the FITS-IRAF encoding, on the grounds that FITS
+\item Start by trying the FITS-WCS encoding, on the grounds that FITS
 should provide a universal interchange standard in which all WCS
-information should be expressed if possible. (In the fullness of time,
-when the FITS-WCS standard becomes stable, you should change to using
-this instead. For now, however, the FITS-IRAF encoding is a practical
-alternative.)
+information should be expressed if possible. 
 
 \item If that fails, then try the original encoding used for the input
-WCS information (which might even be FITS-WCS), on the grounds that
-you are at least not making the information any harder for others to
-read than it originally was.
+WCS information, on the grounds that you are at least not making the
+information any harder for others to read than it originally was.
 
 \item If that also fails, then you are probably trying to store fairly
 complex information for which you need the native encoding. Only other
@@ -13805,35 +13849,25 @@ with it anyway.
 \end{enumerate}
 
 c+
-An alternative approach might be to encode the WCS information in
-several ways, since this gives the maximum chance that other software
-will be able to read it. This approach is possible because there is
-currently little conflict between the FITS keywords used by the
-different encodings which AST supports,\footnote{There is some risk
-that clashes between the FITS-IRAF and FITS-WCS encodings may occur,
-since they share some keywords, although they use them for the same
-purposes. This makes it possible, in theory, to mix them safely, but
-in practice other software might be confused by the presence of both
-conventions at once.} although the possibility of new conflicts
-arising between encodings introduced in future obviously cannot be
-ruled out.  Adopting this approach would simply require multiple calls
-to astWrite, rewinding the FitsChan and changing its Encoding value
+An alternative approach might be to encode the WCS information in several
+ways, since this gives the maximum chance that other software will be
+able to read it. This approach is only possible if there is no
+significant conflict between the FITS keywords used by the different
+encodings\footnote{In practice, this means you should avoid mixing
+FITS-IRAF, FITS-WCS, FITS-AIPS and FITS-PC encodings since they share
+many keywords.}.  Adopting this approach would simply require multiple
+calls to astWrite, rewinding the FitsChan and changing its Encoding value
 before each one.
 c-
 f+
-An alternative approach might be to encode the WCS information in
-several ways, since this gives the maximum chance that other software
-will be able to read it. This approach is possible because there is
-currently little conflict between the FITS keywords used by the
-different encodings which AST supports,\footnote{There is some risk
-that clashes between the FITS-IRAF and FITS-WCS encodings may occur,
-since they share some keywords, although they use them for the same
-purposes. This makes it possible, in theory, to mix them safely, but
-in practice other software might be confused by the presence of both
-conventions at once.} although the possibility of new conflicts
-arising between encodings introduced in future obviously cannot be
-ruled out. Adopting this approach would simply require multiple calls
-to AST\_WRITE, rewinding the FitsChan and changing its Encoding value
+An alternative approach might be to encode the WCS information in several
+ways, since this gives the maximum chance that other software will be
+able to read it. This approach is only possible if there is no
+significant conflict between the FITS keywords used by the different
+encodings\footnote{In practice, this means you should avoid mixing
+FITS-IRAF, FITS-WCS, FITS-AIPS and FITS-PC encodings since they share
+many keywords.}.  Adopting this approach would simply require multiple
+calls to AST_WRITE, rewinding the FitsChan and changing its Encoding value
 before each one.
 f-
 
@@ -16888,11 +16922,11 @@ indefinite looping or unwanted error messages.
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes Introduced in V1.4}
+\subsection{Changes Introduced in V1.4}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.3 and V1.4 (the
-current version):
+The following describes the most significant changes which have occurred
+in the AST library between versions V1.3 and V1.4 (not the most recent
+version):
 
 \begin{enumerate}
 c+
@@ -16984,7 +17018,107 @@ a CD matrix and a PC matrix are erroneously present in a FITS header.
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
 
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.5}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.4 and V1.5 (the
+current version):
+
+\begin{enumerate}
+
+\item The FitsChan class has been modified to support the latest draft
+FITS WCS standard, described in the two papers ``Representation of world
+coordinates in FITS'' (E.W.\,Greisen and M.\,Calabretta, dated 30th
+November, 1999), and ``Representation of celestial coordinates in FITS''
+(M.\,Calabretta and E.W.\,Greisen, dated 24th September, 1999). These are
+available at
+\htmladdnormallink{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
+{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}.
+
+The FITS-WCS encoding now uses these updated conventions. The main
+changes are:
+
+\begin{itemize}
+\item Rotation and scaling of pixel axes is now represented by a matrix
+of {\tt CDj\_i} keywords instead of a combination of {\tt PCjjjiii} and
+{\tt CDELTj} keywords.
+\item Projection parameters are now associated with particular axes and
+are represented by {tt PVi\_m} keywords instead of the {\rr PROJPm}
+keywords.
+\item The tangent plane projection (``TAN'') can now include optional 
+polynomial correction terms.
+\item An entire set of keywords must be supplied for each set of secondary 
+axis descriptions, and each such keyword must finish with a single
+character indicating which set it belongs to. This means that keywords
+which previously occupied eight characters have been shorten to seven to
+leave room for this extra character. Thus {\tt LONGPOLE} has become {\tt
+LONPOLE} and {\tt RADECSYS} has become {\tt RADESYS}.
+\end{itemize}
+
+\item Two new encodings have been added to the FitsChan class:
+\begin{description}
+
+\item [FITS-PC] This encoding uses the conventions of the now superceded
+FITS WCS paper by E.W.\,Greisen and M.\,Calabretta which used keywords
+{\tt CDELTj} abd {\tt PCjjjiii} to describe axis scaling and rotation.
+These are the conventions which were used by the FITS-WCS encoding prior
+to version 1.5 of AST. This encoding is provided to allow existing data
+which use these conventions to be read. It should not in general be used
+to create new data.
+
+\item [FITS-AIPS] This encoding is based on the conventions described in the 
+document ``Non-linear Coordinate Systems in AIPS'' by Eric W. Greisen
+(revised 9th September, 1994 and available by ftp from fits.cv.nrao.edu
+/fits/documents/wcs/aips27.ps.Z). This encoding uses {\tt CROTAi} and
+{\tt CDELTi} keywords to describe axis rotation and scaling.
+
+\end{description}
+
+\item The FitsChan class now provides some support for the IRAF-specific 
+``TNX'' sky projection, which is converted transparently into the
+equivalent FITS ``TAN'' projection (see the description of the Encoding
+attribute for details).
+
+\item FrameSets originally read from a DSS encoded FITS header can now be
+written out using the FITS-WCS encoding (a TAN projection with correction
+terms will be used) in addition to the DSS encoding. The reverse is also
+posible: FrameSets originally read from a FITS-WCS encoded FITS header
+and which use a TAN projection can now be written out using the DSS
+encoding.
+
+\item The algorithm used by the FitsChan class to verify that a FrameSet 
+conforms to the FITS-WCS model has been improved so that FrameSets
+including more complex mixtures of parallel and serial Mappings
+can be written out using the FITS-WCS encoding.
+
+\item The FitsChan class has been changed so that long strings included in 
+the description of an Object can be saved and restored without truncation
+when using the NATIVE encoding. Previously, very long Frame titles,
+mathematical expressions, {\em etc.} were truncated if they exceeded the
+capacity of a single FITS header card. They are now split over several
+header cards so that they can be restored without truncation. Note, this
+facility is only available when using NATIVE encoding.
+
+\item The WcsMap class has been changed to support the changes made to the
+FITS-WCS encoding in the FitsChan class:
+\begin{itemize}
+\item Projection parameters are now associated with a particular axis and
+are specified using a new set of attributes called PVj_m. Here, ``j'' is 
+the index of an axis of WcsMap, and ``m'' is the index of the projection 
+parameter.
+\item The old attributes ProjP(0) to ProjP(9) are still available but are
+now depracated in favour of the new PVj_m attributes. They are interpreted 
+as aliases for PV(axlat)_0 to PV(axlat)_9, where ``axlat'' is the index of 
+the latitude axis.
+\item The GLS projection projection has been renamed as SFL, but the 
+AST\_\_GLS type has been retained as an alias for AST\_\_SFL.
+\end{itemize}
+
+\end{enumerate}
+
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
+
 
 \end{document}
