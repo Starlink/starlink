@@ -738,7 +738,8 @@ sc10_fig1.eps sc10_fig2.eps sc10_fig3.eps sc10_fig4.eps sc10_logo.eps \
 sc11.tex \
 sc11_fig1.eps sc11_fig2.eps sc11_fig3.eps sc11_fig4.eps sc11_fig5.eps \
 sc11_fig6.eps sc11_fig7.eps sc11_fig8.eps sc11_fig9.eps sc11_fig10.eps \
-sc11_fig11.eps sc11_fig12.eps sc11_flow.eps sc11_logo.eps
+sc11_fig11.eps sc11_fig12.eps sc11_flow.eps sc11_logo.eps \
+ssn72.tex ssn72_logo.eps
 
 
 HYPERTEXT_DOCS = sun216.htx sc10.htx sc11.htx
