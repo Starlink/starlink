@@ -5,6 +5,7 @@
 #include <InputByteStream.h>
 #include <FileByteStream.h>
 #include <PipeStream.h>
+#include <stringstream.h>
 
 #include <iostream>
 
@@ -16,6 +17,8 @@
 #include <stdlib.h>
 #endif
 #include <fcntl.h>
+#include <sys/wait.h>
+
 
 #if HAVE_STD_NAMESPACE
 using std::cout;
@@ -62,7 +65,28 @@ void checkEOF(InputByteStream& IBS)
 	throw InputByteStreamError("Unexpected EOF");
 }
 
-	
+string report_on_status(int status)
+{
+    SSTREAM res;
+    
+    if (WIFEXITED(status)) {
+        res << "Normal exit: status=" << WEXITSTATUS(status)
+            << (WEXITSTATUS(status) == 0 ? " (success)" : " (abnormal)");
+    } else if (WIFSIGNALED(status)) {
+	// if the command fails we may come here
+        res << "Terminated by signal " << WTERMSIG(status);
+#ifdef WCOREDUMP
+        res << (WCOREDUMP(status) ? " (coredump)" : " (no coredump)");
+#endif
+    } else if (WIFSTOPPED(status)) {
+        res << "Stopped on signal " << WSTOPSIG(status);
+    } else {
+        res << "Impossible status " << status;
+    }
+    res << ends;
+    return SS_STRING(res);
+}
+
 int exercise_IBS(InputByteStream& IBS)
 {
     string teststring;
@@ -237,6 +261,8 @@ void echo_envvars(int argc, char** argv)
     }
 }
 
+#define IFV if (verbosity > normal)
+
 int do_stream_tests()
 {
     string fn = "t6.data";
@@ -249,57 +275,82 @@ int do_stream_tests()
     
     try {
 	{
+            int tfails = 0;
 	    // Test 1 -- reading without preloading
-	    if (verbosity > normal)
-		cerr << "===== Stream test 1" << endl;
+            IFV cerr << "===== Stream test 1" << endl;
 	    InputByteStream IBS("<osfile>" + fn);
-	    nfails += exercise_IBS(IBS);
+	    tfails += exercise_IBS(IBS);
+            IFV cerr << "Stream test 1 " << (tfails==0 ? "OK" : "FAILED") << endl;
+            nfails += tfails;
 	}
     
 	{
+            int tfails = 0;
 	    // Test 2 -- FileByteStream, no preloading
-	    if (verbosity > normal)
-		cerr << "===== Stream test 2" << endl;
+            IFV cerr << "===== Stream test 2" << endl;
 	    FileByteStream FBS(fn);
-	    nfails += exercise_IBS(FBS);
-	    nfails += exercise_FBS(FBS);
+	    tfails += exercise_IBS(FBS);
+	    tfails += exercise_FBS(FBS);
+            IFV cerr << "Stream test 2 " << (tfails==0 ? "OK" : "FAILED") << endl;
+            nfails += tfails;
 	}
     
 	{
+            int tfails = 0;
 	    // Test 3 -- FileByteStream, with preloading
-	    if (verbosity > normal)
-		cerr << "===== Stream test 3" << endl;
+            IFV cerr << "===== Stream test 3" << endl;
 	    FileByteStream FBS(fn, "", true);
-	    nfails += exercise_IBS(FBS);
-	    nfails += exercise_FBS(FBS);
+	    tfails += exercise_IBS(FBS);
+	    tfails += exercise_FBS(FBS);
+            IFV cerr << "Stream test 3 " << (tfails==0 ? "OK" : "FAILED") << endl;
+            nfails += tfails;
 	}
     
 	{
+            int tfails = 0;
 	    // Test 4 -- with PipeStream
-	    if (verbosity > normal)
-		cerr << "===== Stream test 4" << endl;
+            IFV cerr << "===== Stream test 4" << endl;
 	    PipeStream PBS("./t6.test -g 500");
-	    nfails += exercise_IBS(PBS);
+	    tfails += exercise_IBS(PBS);
+            Byte t = PBS.getByte();
+            if (! (t == 0 && PBS.eof())) {
+                cerr << "Expected PipeStream to be at EOF, but wasn't" << endl;
+                tfails++;
+            }
+            // so subprocess exits normally
 	    int status = PBS.getTerminationStatus();
+            IFV cerr << "Test 4: " << report_on_status(status) << endl;
 	    if (status != 0) {
-		cerr << "Pipe status non zero, was " << status << endl;
-		nfails++;
+		cerr << "Pipe status non zero [t4], was "
+                     << status << endl;
+		tfails++;
 	    }
+            IFV cerr << "Stream test 4 " << (tfails==0 ? "OK" : "FAILED") << endl;
+            nfails += tfails;
 	}
 
 	{
+            int tfails = 0;
 	    // Test 5 -- with PipeStream, but not reading all of stream
-	    if (verbosity > normal)
-		cerr << "===== Stream test 5" << endl;
-	    PipeStream PBS("./t6.test -g 500");	// more than a bufferful
+            IFV cerr << "===== Stream test 5" << endl;
+            // Generate lots of data into the pipe.  This is more than
+            // our bufferful, and _also_ more than PIPE_BUF (or
+            // pathconf(?,_PC_PIPE_BUF), rather) (presumably).  This
+            // means that the getTerminationStatus below `prematurely'
+            // closes the stream, so that the subprocess writes to the
+            // now-closed pipe, and so receives SIGPIPE.
+	    PipeStream PBS("./t6.test -g 1000000");
 	    Byte b;
 	    for (int i=0; i<10; i++)
 		b = PBS.getByte();
-	    int status = PBS.getTerminationStatus(); // `prematurely' closes stream
-	    if (status != 0) {
-		cerr << "Pipe status non zero, was " << status << endl;
-		nfails++;
+	    int status = PBS.getTerminationStatus();
+            IFV cerr << "Test 5: " << report_on_status(status) << endl;
+	    if (! WIFSIGNALED(status)) {
+		cerr << "Pipe process terminated normally!" << endl;
+		tfails++;
 	    }
+            IFV cerr << "Stream test 5 " << (tfails==0 ? "OK" : "FAILED") << endl;
+            nfails += tfails;
 	}
 
     } catch (DviError& e) {
@@ -335,82 +386,92 @@ int do_pipe_tests()
     int i;
 
     for (i=0; i<npipetests; i++) {
+        int tfails = 0;
 	try {
 	    string ret;
 	    PipeStream *PS;
-	    if (verbosity > normal)
-		cerr << "===== Pipe test " << i << endl;
+            IFV cerr << "===== Pipe test " << i << endl;
 	    if (pipetests[i].envlist.length() == 0)
 		PS = new PipeStream(pipetests[i].testcase);
 	    else
 		PS = new PipeStream(pipetests[i].testcase, pipetests[i].envlist);
 	    ret = PS->getResult();
 	    int stat = PS->getTerminationStatus();
+            IFV cerr << "Test " << i << " status: "
+                     << report_on_status(stat) << endl;
 	    if (pipetests[i].expected.length() == 0) {
 		// this command was expected to fail
 		//if (ret.length() != 0) {
 		if (stat == 0) {
 		    // ...but didn't
-		    nfails++;
-		    if (verbosity > normal)
-			cerr << "Test " << i
-			     << " did not fail as expected, returned <"
-			     << ret << ">" << endl;
+		    tfails++;
+                    cerr << "Test " << i
+                         << " did not fail as expected, returned <"
+                         << ret << ">" << endl;
 		}
 	    } else if (ret != pipetests[i].expected) {
-		nfails++;
-		if (verbosity > normal)
-		    cerr << "Test " << i
-			 << ": expected <" << pipetests[i].expected
-			 << ">, got <" << ret << "> (status=" << stat << ")"
-			 << endl;
+                cerr << "Test " << i
+                     << ": expected <" << pipetests[i].expected
+                     << ">, got <" << ret << "> (status=" << stat << ")"
+                     << endl;
+		tfails++;
 	    }
 	    delete PS;
 	} catch (DviError& e) {
-	    if (verbosity > normal)
-		cerr << "Caught exception " << e.problem() << endl;
-	    nfails++;
+            cerr << "Caught exception " << e.problem() << endl;
+	    tfails++;
 	}
+        IFV cerr << "Pipe test " << i
+                 << (tfails==0 ? " OK" : " FAILED") << endl;
+        nfails += tfails;
     }
 
-    try {
-	string cmd = "./t6.test -e LOGNAME HOME T TT";
+    {
+        int tfails = 0;
+        IFV cerr << "===== Pipe test envs" << endl;
+        
+        try {
+            string cmd = "./t6.test -e LOGNAME HOME T TT";
 #if defined(HAVE_SETENV) && HAVE_DECL_SETENV
-        setenv("TT", "test", 1);
+            setenv("TT", "test", 1);
 #elif defined(HAVE_PUTENV) && HAVE_DECL_PUTENV
-        putenv((char*)"TT=test");
+            putenv((char*)"TT=test");
 #elif defined(HAVE_SETENV)
-	int setenv(const char* name, const char *value, int overwrite);
-        setenv("TT", "test", 1);
+            int setenv(const char* name, const char *value, int overwrite);
+            setenv("TT", "test", 1);
 #elif defined(HAVE_PUTENV)
-	int putenv(const char* string);
-        putenv((char*)"TT=test");
+            int putenv(const char* string);
+            putenv((char*)"TT=test");
 #else
 #error "Can't set environment variables"
 #endif
-	string envs = "LOGNAME=blarfl HOME=blarfl T=t + LOGNAME=you TT + LOGNAME=me";
-	string expected = "LOGNAME=me!HOME=";
-	char* h = getenv("HOME");
-	expected += (h != 0 ? h : "");
-	expected += "!T=t!TT=test!";
-	PipeStream *PS = new PipeStream(cmd, envs);
-	string res = PS->getResult();
-	int status = PS->getTerminationStatus();
-	if (status != 0) {
-	    nfails++;
-	    if (verbosity > normal)
-		cerr << "end: got non-zero status " << status << endl;
-	}
-	if (res != expected) {
-	    nfails++;
-	    if (verbosity > normal)
-		cerr << "end: expected <" << expected
-		     << ", got <" << res << ">" << endl;
-	}
-	delete PS;
-    } catch (DviError& e) {
-	if (verbosity > normal)
-	    cerr << "Caught exception " << e.problem() << endl;
+            string envs = "LOGNAME=blarfl HOME=blarfl T=t + LOGNAME=you TT + LOGNAME=me";
+            string expected = "LOGNAME=me!HOME=";
+            char* h = getenv("HOME");
+            expected += (h != 0 ? h : "");
+            expected += "!T=t!TT=test!";
+            PipeStream *PS = new PipeStream(cmd, envs);
+            string res = PS->getResult();
+            int status = PS->getTerminationStatus();
+            if (status != 0) {
+                tfails++;
+                if (verbosity > normal)
+                    cerr << "end: got non-zero status " << status << endl;
+            }
+            if (res != expected) {
+                tfails++;
+                if (verbosity > normal)
+                    cerr << "end: expected <" << expected
+                         << ", got <" << res << ">" << endl;
+            }
+            delete PS;
+        } catch (DviError& e) {
+            if (verbosity > normal)
+                cerr << "Caught exception " << e.problem() << endl;
+            tfails++;
+        }
+        IFV cerr << "Pipe test envs " << (tfails==0 ? "OK" : "FAILED") << endl;
+        nfails += tfails;
     }
 
     return nfails;
