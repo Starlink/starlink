@@ -1447,7 +1447,7 @@ whitespace in any line.
 <p>The version of the document.  See <elemref gi="history"/> for an
 overview of the history element.</p>
 <attribute name="date">
-<p>When the version was released.</p>
+<p>When the version was released. Format: dd-MMM-yyyy.</p>
 </attribute>
 <attribute name="author">
 <p>Who approved the distribution.  This is an ID which appears in the
