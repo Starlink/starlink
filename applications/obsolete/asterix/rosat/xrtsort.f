@@ -1760,13 +1760,13 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
           CENTRE='AXIS'
           SRT.FIELD_RA=HEAD.AXIS_RA
           SRT.FIELD_DEC=HEAD.AXIS_DEC
-          CALL XRTCORR_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
+          CALL XRTSORT_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
      :                                                XW,YW,STATUS)
         ELSEIF (CENTRE.EQ.'4') THEN
           CENTRE='USER'
           CALL USI_GET0D('RA', SRT.FIELD_RA, STATUS)
           CALL USI_GET0D('DEC', SRT.FIELD_DEC, STATUS)
-          CALL XRTCORR_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
+          CALL XRTSORT_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
      :                                                XW,YW,STATUS)
         ELSE
           CALL MSG_PRNT('AST_ERR: invalid mode')
@@ -1793,7 +1793,7 @@ c        SRT.ELBMAX=Y_HWIDTH
         CALL USI_GET0D('RA', SRT.FIELD_RA, STATUS)
         CALL USI_GET0D('DEC', SRT.FIELD_DEC, STATUS)
 
-        CALL XRTCORR_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
+        CALL XRTSORT_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
      :                                              XW,YW,STATUS)
 
       ENDIF
@@ -2463,12 +2463,12 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
             ELSEIF (CENTRE.EQ.'AXIS') THEN
                 BSRT.FIELD_RA=HEAD.AXIS_RA
                 BSRT.FIELD_DEC=HEAD.AXIS_DEC
-                CALL XRTCORR_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
+                CALL XRTSORT_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
      :                                             TMAT,XW,YW,STATUS)
             ELSEIF (CENTRE.EQ.'USER') THEN
                 CALL USI_GET0D('RAB', BSRT.FIELD_RA, STATUS)
                 CALL USI_GET0D('DECB', BSRT.FIELD_DEC, STATUS)
-                CALL XRTCORR_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
+                CALL XRTSORT_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
      :                                              TMAT,XW,YW,STATUS)
             ENDIF
 
@@ -2482,7 +2482,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
            CALL USI_GET0D('RAB', BSRT.FIELD_RA, STATUS)
            CALL USI_GET0D('DECB',BSRT.FIELD_DEC, STATUS)
 
-           CALL XRTCORR_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,TMAT,
+           CALL XRTSORT_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,TMAT,
      :                                                   XW,YW,STATUS)
 
         ENDIF
