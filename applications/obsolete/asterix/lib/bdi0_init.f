@@ -99,6 +99,7 @@
       EXTERNAL			BDI0_UNMAP		! Generic methods
 
       EXTERNAL			BDI2_CHK
+      EXTERNAL			BDI2_GET
       EXTERNAL			BDI2_MAP
       EXTERNAL			BDI2_PUT
 
@@ -220,6 +221,10 @@ c     :                   BDI2_IMMAP, DID, STATUS )
         CALL ADI_DEFFUN(
      :       'FileItemPut(_BinDS,_FITSfile,_CHAR,_)',
      :                   BDI2_PUT, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemGet(_BinDS,_FITSfile,_CHAR)',
+     :                   BDI2_GET, DID, STATUS )
 
 *    FITS Scalar interface
         CALL ADI_DEFFUN(

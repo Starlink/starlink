@@ -187,6 +187,7 @@
         IF ( ITID .NE. ADI__NULLID ) THEN
 
 *      We should store this and re-use it
+          CALL ERR_ANNUL( STATUS )
 
 *      Return to user
           OARG = ITID
