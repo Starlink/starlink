@@ -4,7 +4,7 @@
 *     SCUCAT
 
 *  Purpose:
-*     Routine to concatenate photometry datasets for further processing
+*     Concatenate photometry datasets for further processing
 
 *  Language:
 *     Starlink Fortran 77
@@ -38,7 +38,9 @@
 *     IN = NDF (Read)
 *        The input dataset(s). This parameter is requested repeatedly
 *        until a NULL (!) value is given.
-*     OUT = _CHAR (Write)
+*     MSG_FILTER = CHAR (Read)
+*        Message filter level. Default is NORM.
+*     OUT = CHAR (Write)
 *        The root name of the output NDF. 
 
 *  Examples:
@@ -51,6 +53,12 @@
 *  Notes:
 *     This routine is necessary since the output file from SCUPHOT contains
 *     an NDF for each bolometer used during the photometry observation.
+*     It is convenient to extract these NDFs out of the HDS container
+*     and concatenate them with data from other observations with the
+*     same bolometers.
+
+*  Related Applications:
+*     SURF: SCUPHOT
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -59,6 +67,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.17  1997/06/11 01:08:55  timj
+*     Update documentation
+*
 *     Revision 1.16  1997/05/27 22:21:33  timj
 *     BOL_LIST now ' ' - Alpha does not like null strings
 *
