@@ -70,7 +70,9 @@ EXTRA_DIST = $(libdocdir) $(man1_MANS) VERSION
 libdocdir = @DOXYGEN_OUTPUT_DIRECTORY@
 DOXYGEN=@DOXYGEN@
 $(libdocdir): Doxyfile
-	test -d $(libdocdir) && rm -Rf $(libdocdir)
+	if test -d $(libdocdir); then \
+	  rm -Rf $(libdocdir); \
+	fi
 	if test "$(DOXYGEN)" != NO_DOXYGEN; then \
 	  $(DOXYGEN); \
 	else \
