@@ -1186,7 +1186,8 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             variables, with no special meaning to automake.</p>
 
           <p>The next bit of magic in this file is
-            <code>sstsupport_DATA</code>.  In this particular case, we
+            <code>sstsupport_DATA</code><index>directories!special</index>.
+            In this particular case, we
             want to install data files in the same location as the
             binaries (why, and whether this is a good thing, is not
             for us to worry about here).  The obvious thing
@@ -2988,10 +2989,13 @@ Directory /cvs/libraries/pcs/adam added to the repository
 
         <p>CVS repository access is controlled by groups (at least
           when the repository is shared), and so each directory within
-          the repository must have a suitable group ownership, with
-          group-write permissions.  Each directory must also have the
+          the repository <em>must</em> have a suitable group ownership, with
+          group-write permissions; each directory must also have the
           setgid bit set, so that any directories created within it
-          inherit its gid.  Within the Starlink repository in
+          inherit its gid.  Make sure you check this as soon as you
+          put the repository in place, or else everyone will have
+          problems with the repository.  Within the
+          Starlink repository in
           particular, all participants are part of the
           <code>cvs</code> group.  In short, you can set the correct
           permissions on an imported directory <code>foo</code> with
@@ -5357,6 +5361,12 @@ file.f: file.$(FPP_SRC_EXT)
             <code>Makefile.am</code> the variable has as value a list
             of files to be installed as data in the corresponding
             place.</p>
+
+          <p>For more general customisation of such installation
+            directories, note the `<code>foodir</code>' mechanism
+            mentioned in <ref id="automakeoverview"/>, and described
+            in section <webref url="&automakehtml;/Uniform.html" >The
+            Uniform Naming Scheme</webref> of the automake manual.</p>
         </subsect>
 
         <subsect id="macro-fc-library-ldflags" export="export"
