@@ -36,15 +36,17 @@
 #     This widget inherits no other classes.
 
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     28-SEP-1998 (PDRAPER):
+#     28-SEP-1998 (PWD):
 #        Original version.
+#     08-AUG-2001 (PWD):
+#        Changed to map file types to lower case.
 #     {enter_further_changes_here}
 
 #-
@@ -88,15 +90,8 @@ itcl::class gaia::GaiaConvertTable {
    #  Convert from a CAT/ASCII catalogue to a tab table.
    public method to {in out {now 0}} {
 
-      #  Get the file type so we can invoke the correct filter.
-      set type [file extension $in]
-
-      #  FITS types may reference extensions.
-      if { [string match {.fits*} "$type"] } {
-         set type ".fits"
-      } elseif { [string match {.fit*} "$type"] } {
-         set type ".fit"
-      }
+      #  Get the file type.
+      set type [get_type_ $in]
 
       #  Start up filter.
       if { $to_filter_($type) == {} } {
@@ -126,15 +121,9 @@ itcl::class gaia::GaiaConvertTable {
    public method from {in out {now 0}} {
 
       #  Get the file type so we can invoke the correct filter.
-      set type [file extension $out]
+      set type [get_type_ $out]
 
-      #  FITS types may reference extensions.
-      if { [string match {.fits*} "$type"] } {
-         set type ".fits"
-      } elseif { [string match {.fit*} "$type"] } {
-         set type ".fit"
-      }
-
+      #  Start up filter.
       if { $from_filter_($type) == {} } {
          global env
          set from_filter_($type) [GaiaForeignExec \#auto \
@@ -167,6 +156,22 @@ itcl::class gaia::GaiaConvertTable {
       return 1
    }
 
+   #  Get the type of file. This should match one of our known types
+   #  and conversion filters.
+   protected method get_type_ {name} {
+
+      #  Extract type from extension and map to lower case.
+      set type [string tolower [file extension $name]]
+      
+      #  Some FITS types may reference extensions... (TODO: gsc etc?).
+      if { [string match {.fits*} "$type"] } {
+         set type ".fits"
+      } elseif { [string match {.fit*} "$type"] } {
+         set type ".fit"
+      }
+      return $type
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -178,9 +183,9 @@ itcl::class gaia::GaiaConvertTable {
    protected variable to_app_
    protected variable from_app_
 
-   #  Known file types.
-   protected variable cattypes_ ".fits .FITS .fit .FIT .gsc .GSC .txt .TXT"
-   protected variable asciitypes_ ".asc .ASC .lis .LIS"
+   #  Known file types. These are mapped to lower case.
+   protected variable cattypes_ ".fits .fit .gsc .txt"
+   protected variable asciitypes_ ".asc .lis"
 
    #  Command strings to run the convert to/from a tab-table. This
    #  contains "format" specifiers for the input and output names.
