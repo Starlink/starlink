@@ -105,12 +105,13 @@
       CHARACTER*3		MSYS			! Mapping system
       CHARACTER*6		MODE			! Mapping mode
       CHARACTER*(DAT__SZTYP)	MTYPE			! Mapping type
+      CHARACTER*(DAT__SZNAM)	NAME			! Object name
+      CHARACTER*(DAT__SZLOC)	PLOC			! Object parent locator
       CHARACTER*(DAT__SZTYP)	TYPE			! BASE type
       CHARACTER*6		VARNT			! Array variant
 
-      INTEGER			DIMS(DAT__MXDIM)	! DATA dimensions
       INTEGER			FPTR			! Mapped file data
-      INTEGER			NDIM			! Dimensionality
+      INTEGER			NDIM, DIMS(DAT__MXDIM)	! Object dimensions
       INTEGER			PTR			! Item data address
 
       LOGICAL			OK			! Locator is valid?
@@ -136,51 +137,80 @@
 *  Dynamic mapping which requires write back?
       IF ( (MSYS.NE.'loc') .AND. (MODE.NE.'READ') ) THEN
 
-*    Get existing array variant
-        CALL CMP_GET0C( LOC, 'VARIANT', VARNT, STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          STATUS = SAI__ERROR
-          CALL ERR_REP( 'BDI1_ARYWB_1', 'Error accessing array variant',
-     :                  STATUS )
+*    If the HDS object is a primitive and MSYS is not equal to 'loc'
+*    it is because the HDS object dimensions are incorrect. We must fix
+*    this when we write back the data
+        CALL DAT_PRIM( LOC, PRIM, STATUS )
+        IF ( PRIM ) THEN
 
-        ELSE IF ( VARNT .EQ. 'SPACED' ) THEN
+*      Extract dimensions
+          CALL ADI_CGET1I( PSID, 'SHAPE', DAT__MXDIM, DIMS, NDIM,
+     :                     STATUS )
 
 *      Get type used to map
           CALL ADI_CGET0C( PSID, 'Type', MTYPE, STATUS )
 
-*      Get dimensions
-          CALL DAT_THERE( LOC, 'DIMENSION', THERE, STATUS )
-          IF ( THERE ) THEN
-            CALL CMP_GET0I( LOC, 'DIMENSION', DIMS(1), STATUS )
-            NDIM = 1
-          ELSE
-            CALL CMP_GET1I( LOC, 'DIMENSION', DAT__MXDIM, DIMS(1), NDIM,
-     :                      STATUS )
-          END IF
+*      Get parent
+          CALL DAT_PAREN( LOC, PLOC, STATUS )
+          CALL DAT_NAME( LOC, NAME, STATUS )
+          CALL DAT_ANNUL( LOC, STATUS )
+          CALL DAT_ERASE( PLOC, NAME, STATUS )
+          CALL DAT_NEW( PLOC, NAME, MTYPE, NDIM, DIMS, STATUS )
+          CALL DAT_FIND( PLOC, NAME, LOC, STATUS )
+          CALL DAT_ANNUL( PLOC, STATUS )
 
-*      Convert to simple array variant
-          CALL CMP_TYPE( LOC, 'BASE', TYPE, STATUS )
-          CALL DAT_NEW( LOC, 'DATA', TYPE, NDIM, DIMS, STATUS )
-          CALL DAT_FIND( LOC, 'DATA', DLOC, STATUS )
-          CALL DAT_PUT( DLOC, '_'//MTYPE, NDIM, DIMS, %VAL(PTR),
-     :                  STATUS )
-          CALL DAT_ANNUL( DLOC, STATUS )
-          CALL CMP_PUT0C( LOC, 'VARIANT', 'SIMPLE', STATUS )
-
-*      Erase old spaced array components
-          CALL DAT_ERASE( LOC, 'BASE', STATUS )
-          CALL DAT_ERASE( LOC, 'SCALE', STATUS )
-          IF ( THERE ) THEN
-            CALL DAT_ERASE( LOC, 'DIMENSION', STATUS )
-          ELSE
-            CALL DAT_ERASE( LOC, 'DIMENSIONS', STATUS )
-          END IF
+*      Write the data
+          CALL DAT_PUT( LOC, MTYPE, NDIM, DIMS, %VAL(PTR), STATUS )
 
         ELSE
-          STATUS = SAI__ERROR
-          CALL MSG_SETC( 'V', VARNT )
-          CALL ERR_REP( 'BDI1_ARYWB_1', 'Unrecognised array '/
-     :                  /'variant /^V/', STATUS )
+
+*      Get existing array variant
+          CALL CMP_GET0C( LOC, 'VARIANT', VARNT, STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'BDI1_ARYWB_1',
+     :           'Error accessing array variant', STATUS )
+
+          ELSE IF ( VARNT .EQ. 'SPACED' ) THEN
+
+*        Get type used to map
+            CALL ADI_CGET0C( PSID, 'Type', MTYPE, STATUS )
+
+*        Get dimensions
+            CALL DAT_THERE( LOC, 'DIMENSION', THERE, STATUS )
+            IF ( THERE ) THEN
+              CALL CMP_GET0I( LOC, 'DIMENSION', DIMS(1), STATUS )
+              NDIM = 1
+            ELSE
+              CALL CMP_GET1I( LOC, 'DIMENSION', DAT__MXDIM, DIMS(1),
+     :                        NDIM, STATUS )
+            END IF
+
+*        Convert to simple array variant
+            CALL CMP_TYPE( LOC, 'BASE', TYPE, STATUS )
+            CALL DAT_NEW( LOC, 'DATA', TYPE, NDIM, DIMS, STATUS )
+            CALL DAT_FIND( LOC, 'DATA', DLOC, STATUS )
+            CALL DAT_PUT( DLOC, '_'//MTYPE, NDIM, DIMS, %VAL(PTR),
+     :                    STATUS )
+            CALL DAT_ANNUL( DLOC, STATUS )
+            CALL CMP_PUT0C( LOC, 'VARIANT', 'SIMPLE', STATUS )
+
+*        Erase old spaced array components
+            CALL DAT_ERASE( LOC, 'BASE', STATUS )
+            CALL DAT_ERASE( LOC, 'SCALE', STATUS )
+            IF ( THERE ) THEN
+              CALL DAT_ERASE( LOC, 'DIMENSION', STATUS )
+            ELSE
+              CALL DAT_ERASE( LOC, 'DIMENSIONS', STATUS )
+            END IF
+
+          ELSE
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'V', VARNT )
+            CALL ERR_REP( 'BDI1_ARYWB_1', 'Unrecognised array '/
+     :                    /'variant /^V/', STATUS )
+          END IF
+
         END IF
 
 *    Release dynamic memory
