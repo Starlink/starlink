@@ -223,6 +223,8 @@
 #        Added Linux support.
 #     10-DEC-1998 (RFWS):
 #        Change to using egcs as the C compiler on Linux.
+#     15-JUN-1999 (RFWS):
+#        Use -lg2c on Lunix (instead of -lf2c).
 #-
 
 #  Export "local" definitions to the environment for use by make.
@@ -295,7 +297,7 @@
                CFLAGS='-ansi -O2 -fPIC'
                FC='g77'
 	       FFLAGS='-fno-second-underscore -O2 -fPIC'
-               FLIBS='-lf2c'
+               FLIBS='-lg2c'
                LINK='ln -s'
                RANLIB='ranlib'
                SHARE='.so'
