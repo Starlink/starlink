@@ -133,7 +133,7 @@
          origins='[-1,-101,-69,-101,297,-1]' \
          angles='[0,0,270]' \
          reduced \
-         accept
+         reset accept
 #     end ccdgenerate
       mv data1$exten data-1a$exten
       mv data2$exten data-1b$exten
@@ -150,7 +150,7 @@
          origins='[163,210,95,210,-15,163]' \
          angles='[180,180,90]' \
          reduced \
-         accept
+         reset accept
 #     end ccdgenerate
       mv data1$exten data-2a$exten
       mv data2$exten data-2b$exten
@@ -188,14 +188,14 @@
          in='data-1?' \
          astfile=$astfile \
          indomain=set1 \
-         accept
+         reset accept
 #     end astimp
       astimp \
          in='data-2?' \
          astfile=$astfile \
          indomain=set2 \
          rot=180 \
-         accept
+         reset accept
 #     end astimp
 
 #  If display capability is enabled then display the data frames.
@@ -250,7 +250,7 @@
          in='data-??' \
 	 outlist='*.find' \
          percentile=94 \
-	 accept
+	 reset accept
 #     end findobj
       if ( "$device" != "NONE" ) then
 
@@ -284,7 +284,7 @@
          restrict=false \
          override=true \
 	 outlist='*.off' \
-	 accept
+	 reset accept
 #     end findoff
       if ( "$device" != "NONE" ) then
 
@@ -323,7 +323,7 @@
          inlist='data-??' \
 	 fittype=2 \
          outformat=wcs \
-	 accept
+	 reset accept
 #     end register
 
       echo " "
@@ -339,7 +339,7 @@
       wcsreg \
          in='data-??' \
          domains='[ccd_reg,set1,set2]' \
-         accept
+         reset accept
 #     end wcsreg
 
       echo " "
@@ -353,7 +353,7 @@
          idtype=fitsid \
          fitsid=ISEQ \
          outdomain=TEST_DATA \
-         accept
+         reset accept
 #     end astexp
         
 #  Resample the data.
@@ -364,7 +364,7 @@
       tranndf \
          in='data-??' \
          out='*-r' \
-         accept
+         reset accept
 #     end tranndf
 
 #  Combine to a mosaic.
@@ -376,7 +376,7 @@
 	 scale=false \
 	 zero=false \
 	 out=mosaic \
-	 accept
+	 reset accept
 #     end makemos
 
 #  Display the final mosaic.
@@ -386,10 +386,10 @@
          echo " "
          gdclear \\
          display \
-           in=mosaic \
-           mode=percentiles \
-           percentiles='[2,98]' \
-           accept
+            in=mosaic \
+            mode=percentiles \
+            percentiles='[2,98]' \
+            reset accept
 #        end display
       endif
 
