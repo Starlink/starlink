@@ -35,11 +35,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     4-APR-1991 (PDRAPER):
 *        Original version.
+*     15-MAR-1999 (MBT):
+*        Modified to use PRIMDAT properly.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,6 +74,12 @@
 *  Local Variables:
       INTEGER I                  ! Loop variable
 
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! PRIMDAT generic declarations
+      INCLUDE 'NUM_DEC_<T>'      ! PRIMDAT declarations for type <COMM>
+      INCLUDE 'NUM_DEF_CVT'      ! PRIMDAT generic definitions
+      INCLUDE 'NUM_DEF_<T>'      ! PRIMDAT definitions for type <COMM>
+
 *.
 
 *  Check inherited global status.
@@ -82,8 +91,8 @@
 
 *  If this value is not BAD then test it.
          IF ( <T>ARR( I ) .NE. VAL__BAD<T> ) THEN
-            IF ( <T>ARR( I ) .LT. <T>MIN  .OR.
-     :           <T>ARR( I ) .GT. <T>MAX ) THEN
+            IF ( NUM_LT<T>( <T>ARR( I ), <T>MIN ) .OR.
+     :           NUM_GT<T>( <T>ARR( I ), <T>MAX ) ) THEN
 
 *  Set it BAD.
                <T>ARR( I ) = VAL__BAD<T>
