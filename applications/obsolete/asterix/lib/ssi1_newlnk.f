@@ -116,6 +116,20 @@
 *  Make the file link
       CALL ADI_SETLNK( LHS, RHS, STATUS )
 
+*  Create the POSIT structure
+      CALL DAT_NEW( LOC, 'POSIT', 'EXTENSION', 0, 0, STATUS )
+
+*  Read number of files in structure
+      CALL ADI_CGET0I( ARGS(1), 'NFILE', NFILE, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        CALL DAT_NEW( LOC, 'BOOK', 'EXTENSION', 1, MAX(1,NFILE),
+     :                STATUS )
+
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+
+      END IF
+
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'SSI1_NEWLNK', STATUS )
 

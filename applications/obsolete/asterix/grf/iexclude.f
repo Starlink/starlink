@@ -118,7 +118,6 @@
       INTEGER SFID
       LOGICAL EXIST
       LOGICAL DAT
-      LOGICAL POK
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -164,15 +163,14 @@
             CALL FIO_CLOSE(LUN,STATUS)
 *  otherwise assume HDS file in PSS format
           ELSE
-            CALL ADI_FOPEN( FILENAME, '*', 'READ', SFID, STATUS )
+            CALL ADI_FOPEN( FILENAME, 'SSDSset|SSDS', 'READ', SFID,
+     :              STATUS )
 
             IF (STATUS.EQ.SAI__OK) THEN
 
 *  check if sources
-              CALL SSO_INIT( STATUS )
-              CALL SSI_VALID( SFID, POK, STATUS )
-              CALL SSI_GETNSRC( SFID, NSRC, STATUS )
-              IF (.NOT. POK .OR.NSRC.EQ.0 ) THEN
+              CALL ADI_CGET0I( SFID, 'NSRC', NSRC, STATUS )
+              IF (NSRC.EQ.0 ) THEN
                 CALL MSG_PRNT('AST_ERR: No sources in this SSDS')
               ELSE
 *  get RA DEC of sources

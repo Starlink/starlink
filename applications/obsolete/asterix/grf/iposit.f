@@ -209,7 +209,6 @@
       INTEGER ISRC,NSRC
       INTEGER L,SFID
       LOGICAL EXIST
-      LOGICAL POK
       LOGICAL RADEC
       LOGICAL APPEND
       LOGICAL REPEAT
@@ -322,14 +321,13 @@
 *  otherwise assume HDS file in PSS format
             ELSE
 
-              CALL ADI_FOPEN( TEXT, '*', 'READ', SFID, STATUS )
+              CALL ADI_FOPEN( TEXT, 'SSDSset|SSDS', 'READ', SFID,
+     :                        STATUS )
               IF (STATUS.EQ.SAI__OK) THEN
 
 *  check if sources
-                CALL SSO_INIT( STATUS )
-                CALL SSI_VALID( SFID, POK, STATUS )
                 CALL SSI_GETNSRC( SFID, NSRC, STATUS )
-                IF (.NOT. POK .OR.NSRC.EQ.0 ) THEN
+                IF (NSRC.EQ.0 ) THEN
                   CALL MSG_PRNT('AST_ERR: No sources in this SSDS')
                 ELSE
 *  get RA DEC of sources

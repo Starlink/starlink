@@ -22,6 +22,7 @@
 *       6 Sep 94: V1.7-5 numbering hived off to GFX routine (RJV)
 *      10 Apr 95: V1.8-0 ALL option for internal list (RJV)
 *      14 Nov 95: V2.0-0 Support for HEASARC database format (DJA)
+*       8 Feb 96: V2.0-1 Changed access to SSDS files (DJA)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -38,7 +39,6 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) SLOC
       CHARACTER*(DAT__SZLOC) RLOC
       CHARACTER*(DAT__SZLOC) DLOC
       CHARACTER*132 FILENAME
@@ -46,13 +46,12 @@
       DOUBLE PRECISION RA,DEC,CEL(2),CEL1950(2)
       REAL SIZE
       INTEGER I
-      INTEGER NSRC,NPOS
+      INTEGER SFID,NSRC,NPOS
       INTEGER RAPTR,DECPTR
       INTEGER IFD,FSTAT
       INTEGER SYMBOL,COLOUR,BOLD
       INTEGER NMARK
       LOGICAL OK
-      LOGICAL POK
       LOGICAL CURR
       LOGICAL ALL
       LOGICAL EXIST
@@ -61,7 +60,7 @@
       LOGICAL HDB
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IMARK Version 2.0-0')
+      PARAMETER (VERSION = 'IMARK Version 2.0-1')
 *-
       CALL USI_INIT()
 
@@ -205,20 +204,19 @@
 
 *  otherwise assume HDS file in PSS format
               ELSE
-                CALL HDS_OPEN( FILENAME,'READ',SLOC,STATUS )
+                CALL ADI_FOPEN( FILENAME,'SSDSset|SSDS','READ',SFID,
+     :                          STATUS )
                 IF (STATUS.EQ.SAI__OK) THEN
 
 *  check if sources
-                  CALL SSO_INIT( STATUS )
-                  CALL SSO_VALID( SLOC, POK, STATUS )
-                  CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
-                  IF (.NOT. POK .OR.NSRC.EQ.0 ) THEN
+                  CALL ADI_CGET0I( SFID, 'NSRC', NSRC, STATUS )
+                  IF ( NSRC.EQ.0 ) THEN
                     CALL MSG_PRNT('AST_ERR: No sources in this SSDS')
                   ELSE
 *  get RA DEC of sources
-                    CALL SSO_MAPFLD( SLOC, 'RA', '_DOUBLE', 'READ',
+                    CALL SSI_MAPFLD( SFID, 'RA', '_DOUBLE', 'READ',
      :                                        RAPTR, STATUS )
-                    CALL SSO_MAPFLD( SLOC, 'DEC', '_DOUBLE', 'READ',
+                    CALL SSI_MAPFLD( SFID, 'DEC', '_DOUBLE', 'READ',
      :                                        DECPTR, STATUS )
 
 *  save source positions
@@ -227,8 +225,8 @@
 
                   ENDIF
 
-                  CALL SSO_RELEASE(SLOC,STATUS)
-                  CALL HDS_CLOSE(SLOC,STATUS)
+                  CALL SSI_RELEASE( SFID,STATUS)
+                  CALL ADI_FCLOSE(SFID,STATUS)
 
                 ENDIF
 
