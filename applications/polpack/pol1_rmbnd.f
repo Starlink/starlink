@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_RMBND( NIN, BLO, BHI, MAG, ANG, X, Y, NOUT, 
-     :                       STATUS )
+      SUBROUTINE POL1_RMBND( NIN, BLO, BHI, USEZ, Z, MAG, ANG, X, Y,
+     :                       NOUT, STATUS )
 *+
 *  Name:
 *     POL1_RMBND
@@ -11,13 +11,22 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_RMBND( NIN, BLO, BHI, MAG, ANG, X, Y, NOUT, STATUS )
+*     CALL POL1_RMBND( NIN, BLO, BHI, USEZ, Z, MAG, ANG, X, Y, NOUT, 
+*                      STATUS )
 
 *  Description:
-*     This routine sets values bad in the supplied arrays if the X or
-*     Y value is outside the supplied bounds. All bad values are then 
-*     shuffled to the end of the array, and the number of valid positions
-*     in the returned arrays is returned.
+*     This routine sets values bad in the supplied arrays if:
+*
+*       1) the X or Y value is outside the supplied bounds
+*
+*     or
+*
+*       2) the Z value is not equal to the supplied argument Z (this
+*          check is only applied if the Z argument is not equal to
+*          VAL__BADR).
+*
+*     All bad values are then  shuffled to the end of the array, and the 
+*     number of valid positions in the returned arrays is returned.
 
 *  Arguments:
 *     NIN = INTEGER (Given)
@@ -26,6 +35,12 @@
 *        The lower bounds on the two axes.
 *     BHI( 2 ) = REAL (Given)
 *        The upper bounds on the two axes.
+*     USEZ = REAL (Given)
+*        The Z value which a vector must have to be included in the
+*        returned list. If this is VAL__BADR, no check on the Z value is
+*        performed.
+*     Z( NIN ) = DOUBLE PRECISION (Given)
+*        The array of Z values.
 *     MAG( NIN ) = REAL (Given and Returned)
 *        The array of magnitude values.
 *     ANG( NIN ) = REAL (Given and Returned)
@@ -49,6 +64,8 @@
 *  History:
 *     6-AUG-1998 (DSB):
 *        Original version.
+*     12-FEB-2001 (DSB):
+*        Modified to supprot 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,6 +84,8 @@
       INTEGER NIN
       REAL BLO( 2 )
       REAL BHI( 2 )
+      REAL USEZ
+      DOUBLE PRECISION Z( NIN )
 
 *  Arguments Given and Returned:
       REAL MAG( NIN )
@@ -88,6 +107,7 @@
       DOUBLE PRECISION XHI       ! Upper X bound
       DOUBLE PRECISION YLO       ! Lower Y bound
       DOUBLE PRECISION YHI       ! Upper Y bound
+      DOUBLE PRECISION ZZ        ! Required Z value
       INTEGER I                  ! Index count
 *.
 
@@ -100,18 +120,41 @@
       YHI = DBLE( BHI( 2 ) )
       YLO = DBLE( BLO( 2 ) )
 
-*  First set any bad or out-of-bounds points bad (in all arrays).
-      DO I = 1, NIN
-         IF( MAG( I ) .EQ. VAL__BADR .OR. ANG( I ) .EQ. VAL__BADR .OR.
-     :       X( I ) .EQ. VAL__BADD .OR. Y( I ) .EQ. VAL__BADD .OR.
-     :       X( I ) .LT. XLO .OR. X( I ) .GT. XHI .OR.
-     :       Y( I ) .LT. YLO .OR. Y( I ) .GT. YHI ) THEN
-            MAG( I ) = VAL__BADR
-            ANG( I ) = VAL__BADR
-            X( I ) = VAL__BADD
-            Y( I ) = VAL__BADD
-         END IF
-      END DO
+*  First handle cases where a Z value has been supplied.
+      IF( USEZ .NE. VAL__BADR ) THEN 
+         ZZ  = DBLE( USEZ )
+
+*  Set any bad or out-of-bounds points bad (in all arrays).
+         DO I = 1, NIN
+            IF( MAG( I ) .EQ. VAL__BADR .OR. ANG( I ) .EQ. VAL__BADR 
+     :          .OR. X( I ) .EQ. VAL__BADD .OR. Y( I ) .EQ. VAL__BADD 
+     :          .OR. X( I ) .LT. XLO .OR. X( I ) .GT. XHI 
+     :          .OR. Y( I ) .LT. YLO .OR. Y( I ) .GT. YHI 
+     :          .OR. Z( I ) .NE. ZZ ) THEN
+               MAG( I ) = VAL__BADR
+               ANG( I ) = VAL__BADR
+               X( I ) = VAL__BADD
+               Y( I ) = VAL__BADD
+            END IF
+         END DO
+
+*  Now handle cases where no Z value has been supplied.
+      ELSE
+
+*  Set any bad or out-of-bounds points bad (in all arrays).
+         DO I = 1, NIN
+            IF( MAG( I ) .EQ. VAL__BADR .OR. ANG( I ) .EQ. VAL__BADR 
+     :          .OR. X( I ) .EQ. VAL__BADD .OR. Y( I ) .EQ. VAL__BADD 
+     :          .OR. X( I ) .LT. XLO .OR. X( I ) .GT. XHI 
+     :          .OR. Y( I ) .LT. YLO .OR. Y( I ) .GT. YHI ) THEN
+               MAG( I ) = VAL__BADR
+               ANG( I ) = VAL__BADR
+               X( I ) = VAL__BADD
+               Y( I ) = VAL__BADD
+            END IF
+         END DO
+
+      END IF
 
 *  Now shuffle the good values to the start of each array.
       NOUT = 0

@@ -421,8 +421,10 @@
       CHARACTER TITLE*80         ! Title from input catalogue
       CHARACTER UNITS1*( CUNITS )! Units of the data
       CHARACTER UNITS2*( CUNITS )! Units of the data
+      CHARACTER ZTEXT*30         ! Text giving Z value
       DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
       DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
+      DOUBLE PRECISION CONST( 3 )! Constant axis values
       DOUBLE PRECISION DX        ! Extension of X axis
       DOUBLE PRECISION DY        ! Extension of Y axis
       DOUBLE PRECISION LBND      ! Lower axis bound
@@ -432,11 +434,10 @@
       INTEGER GI                 ! CAT column identifier
       INTEGER GIANG              ! CAT identifier for ANG column
       INTEGER GIMAG              ! CAT identifier for MAG column
-      INTEGER GIS( 2 )           ! CAT identifiers for X,Y catalogue columns
-      INTEGER GIX                ! CAT identifier for X column
-      INTEGER GIY                ! CAT identifier for X column
+      INTEGER GIS( 3 )           ! CAT identifiers for X,Y,Z catalogue columns
       INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER I                  ! Loop count
+      INTEGER IAT                ! Used length of a string
       INTEGER ICAT               ! Index of (X,Y) Frame in IWCS and IPLOT
       INTEGER IFRM               ! Frame index
       INTEGER IPANG              ! Pointer to array holding vector angles
@@ -447,21 +448,22 @@
       INTEGER IPLOTK             ! Pointer to AST Plot for KEY picture
       INTEGER IPMAG              ! Pointer to array holding vector magnitudes
       INTEGER IPX                ! Pointer to array holding vector X positions
-      INTEGER IPY                ! Pointer to array holding vector Y positions
       INTEGER IPX2               ! Pointer to array holding vector X positions
+      INTEGER IPY                ! Pointer to array holding vector Y positions
       INTEGER IPY2               ! Pointer to array holding vector Y positions
+      INTEGER IPZ                ! Pointer to array holding vector Z positions
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
       INTEGER MAP                ! Mapping pointer
       INTEGER MAXPOS             ! Position of maximum value
       INTEGER MINPOS             ! Position of minimum value
       INTEGER NBAD               ! No. of bad values
+      INTEGER NDIM               ! No. of input axes
       INTEGER NFRM               ! Frame index increment between IWCS and IPLOT
       INTEGER NGANG              ! No. of good vector angle values
       INTEGER NGMAG              ! No. of good vector magnitude values
-      INTEGER NGOOD              ! No. valid pixels in array
-      INTEGER NGOODC             ! No. valid pixels after clipping
       INTEGER NGX                ! No. of good vector X values
       INTEGER NGY                ! No. of good vector Y values
+      INTEGER NGZ                ! No. of good vector Z values
       INTEGER NIN                ! No. of positions in user-specified bounds
       INTEGER NKP                ! No. of values supplied for parameter KEYPOS
       INTEGER NMARG              ! No. of margin values given
@@ -469,11 +471,10 @@
       INTEGER VCI                ! Vector colour index
       LOGICAL ALIGN              ! Was DATA pic aligned with an old DATA pic?
       LOGICAL AXES               ! Annotated axes to be drawn?
-      LOGICAL F1, F2, F3         ! Were explicit text heights set?
-      LOGICAL KEY                ! A key to vector scale to be plotted?
+      LOGICAL GOTZ               ! Was a Z column supplied?
       LOGICAL HINIT              ! Initialise histogram?
+      LOGICAL KEY                ! A key to vector scale to be plotted?
       LOGICAL NEGATE             ! Negate supplied angles?
-      LOGICAL THERE              ! Was a FrameSet read fom the catalogue?
       LOGICAL V2PLUS             ! Catalogue created by POLPACK V2 or later?
       LOGICAL VERB               ! Verose errors required?
       REAL AHSIZE                ! Arrowhead size in world co-ordinates
@@ -481,9 +482,8 @@
       REAL ANGFAC                ! Supplied angles to radians conversion factor
       REAL ANGROT                ! Angle to add on to supplied angles
       REAL ASPECT                ! Aspect ratio for new DATA pictures
-      REAL BLO( 2 )              ! Lower bounds of plotting space
       REAL BHI( 2 )              ! Upper bounds of plotting space
-      REAL CLIP( 4 )             ! Array of clipping limits
+      REAL BLO( 2 )              ! Lower bounds of plotting space
       REAL DEFSCA                ! Default value for VSCALE
       REAL DMAX                  ! Highest value in histogram
       REAL DMIN                  ! Lowest value in histogram
@@ -496,7 +496,6 @@
       REAL MARGIN( 4 )           ! Margins round DATA picture
       REAL REFANG                ! ACW angle from +ve X to ref direction
       REAL TYPDAT                ! A typical vector data value
-      REAL VECWID                ! Line thickness for vectors
       REAL VSCALE                ! Vector scale, viz. data units per cm
       REAL X1                    ! Lower x w.c. bound of picture
       REAL X2                    ! Upper x w.c. bound of picture
@@ -504,9 +503,7 @@
       REAL Y1                    ! Lower y w.c. bound of picture
       REAL Y2                    ! Upper y w.c. bound of picture
       REAL YM                    ! DATA zone y size in metres
-
-*  Local Data:
-      DATA CLIP   / 4*4.0 /
+      REAL Z                     ! Z value to display
 
 *.
 
@@ -535,20 +532,67 @@
       CALL POL1_COLNM( 'Y', .FALSE., COLNM, STATUS )
       IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLY', COLNM, STATUS )
 
+*  Attempt to get an identifier for the Z column.
+      CALL POL1_COLNM( 'Z', .FALSE., COLNM, STATUS )
+      IF( COLNM .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL CAT_TIDNT( CI, COLNM, GIS( 3 ), STATUS )
+
+*  If found, release the CAT identifier and use a dynamic default of COLNM
+*  for parameter COLZ. Otherwise, annul the error and use no dynamic
+*  default.
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL CAT_TRLSE( GIS( 3 ), STATUS )
+            CALL PAR_DEF0C( 'COLZ', COLNM, STATUS )
+         ELSE
+            CALL ERR_ANNUL( STATUS )
+         END IF
+
+      END IF
+
 *  Get CAT identifiers for the columns which are to be used to define the 
 *  vector magnitudes, orientations, X and Y coordinates.
       CALL POL1_GTCTC( 'COLMAG', CI, CAT__FITYP, ' ', GIMAG, STATUS )
       CALL POL1_GTCTC( 'COLANG', CI, CAT__FITYP, ' ', GIANG, STATUS )
-      CALL POL1_GTCTC( 'COLX', CI, CAT__FITYP, ' ', GIX, STATUS )
-      CALL POL1_GTCTC( 'COLY', CI, CAT__FITYP, ' ', GIY, STATUS )
+      CALL POL1_GTCTC( 'COLX', CI, CAT__FITYP, ' ', GIS( 1 ), STATUS )
+      CALL POL1_GTCTC( 'COLY', CI, CAT__FITYP, ' ', GIS( 2 ), STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Attempt to get an identifier for the Z column. If a null (!) value is
+*  given, annul the error and indicate no Z column is to be used. Also
+*  get the Z value to be used (only vectors with the specified Z value
+*  are plotted).
+      CONST( 1 ) = AST__BAD
+      CONST( 2 ) = AST__BAD
+      CALL POL1_GTCTC( 'COLZ', CI, CAT__FITYP, ' ', GIS( 3 ), STATUS )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         GOTZ = .FALSE.
+         Z = VAL__BADR
+         NDIM = 2
+      ELSE
+         GOTZ = .TRUE.
+         CALL PAR_GET0R( 'Z', Z, STATUS )
+         NDIM = 3
+         CONST( 3 ) = DBLE( Z )
+      END IF
+
+*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of 
+*  this FrameSet will be spanned by axes corresponding to the X and Y 
+*  catalogue columns. The Current Frame is set by the user, using
+*  parameters FRAME and EPOCH.
+      CALL POL1_GTCTA( 'FRAME', 'EPOCH', CI, NDIM, GIS, CONST, IWCS, 
+     :                 STATUS )
 
 *  Obtain the units of the magnitude column.
       UNITS1 = ' '
-      CALL CAT_TIQAC( GIMAG, 'UNITS', UNITS1, STATUS )
+      CALL POL1_TIQAC( GIMAG, 'UNITS', UNITS1, STATUS )
 
 *  Obtain the units of the orientation column.
       UNITS2 = ' '
-      CALL CAT_TIQAC( GIANG, 'UNITS', UNITS2, STATUS )
+      CALL POL1_TIQAC( GIANG, 'UNITS', UNITS2, STATUS )
 
 *  Set up a factor which converts values stored in the orientation column
 *  into units of radians.  If the UNITS attribute does not have the value 
@@ -565,13 +609,13 @@
          ANGFAC = DTOR
       END IF
 
-*  Store the values of all 4 catalogue columns in 4 arrays.
-*  ========================================================
+*  Store the values of all 4/5 catalogue columns in 4/5 arrays.
+*  ============================================================
 *  Find the number of rows in the catalogue. This is the number of
 *  vectors to be plotted.
       CALL CAT_TROWS( CI, NVEC, STATUS )
 
-*  Allocate workspace for 4 _REAL arrays each with NVEC elements.
+*  Allocate workspace.
       CALL PSX_CALLOC( NVEC, '_REAL', IPMAG, STATUS )
       CALL PSX_CALLOC( NVEC, '_REAL', IPANG, STATUS )
       CALL PSX_CALLOC( NVEC, '_DOUBLE', IPX, STATUS )
@@ -579,14 +623,22 @@
       CALL PSX_CALLOC( NVEC, '_DOUBLE', IPX2, STATUS )
       CALL PSX_CALLOC( NVEC, '_DOUBLE', IPY2, STATUS )
 
+      IF( GOTZ ) THEN 
+         CALL PSX_CALLOC( NVEC, '_DOUBLE', IPZ, STATUS )
+      ELSE
+         IPZ = IPX
+      END IF
+
 *  Check the pointers can be used.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy each column into the corresponding array.
       CALL POL1_CPCTR( CI, GIMAG, NVEC, %VAL( IPMAG ), NGMAG, STATUS )
       CALL POL1_CPCTR( CI, GIANG, NVEC, %VAL( IPANG ), NGANG, STATUS )
-      CALL POL1_CPCTD( CI, GIX, NVEC, %VAL( IPX ), NGX, STATUS )
-      CALL POL1_CPCTD( CI, GIY, NVEC, %VAL( IPY ), NGY, STATUS )
+      CALL POL1_CPCTD( CI, GIS( 1 ), NVEC, %VAL( IPX ), NGX, STATUS )
+      CALL POL1_CPCTD( CI, GIS( 2 ), NVEC, %VAL( IPY ), NGY, STATUS )
+      IF( GOTZ ) CALL POL1_CPCTD( CI, GIS( 3 ), NVEC, %VAL( IPZ ), NGZ, 
+     :                            STATUS )
 
 *  Check the global status.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -602,12 +654,16 @@
          CALL MSG_SETC( 'COL', 'vector orientation' )
 
       ELSE IF( NGX .EQ. 0 ) THEN
-         GI = GIX
+         GI = GIS( 1 )
          CALL MSG_SETC( 'COL', 'X coordinate' )
 
       ELSE IF( NGY .EQ. 0 ) THEN
-         GI = GIY
+         GI = GIS( 2 )
          CALL MSG_SETC( 'COL', 'Y coordinate' )
+
+      ELSE IF( NGZ .EQ. 0 ) THEN
+         GI = GIS( 3 )
+         CALL MSG_SETC( 'COL', 'Z coordinate' )
 
       END IF
 
@@ -675,8 +731,9 @@
 
 *  Remove any positions outside these bounds. This also shuffles bad 
 *  positions to the end, and counts the number of good positions.
-      CALL POL1_RMBND( NVEC, BLO, BHI, %VAL( IPMAG ), %VAL( IPANG ), 
-     :                 %VAL( IPX ), %VAL( IPY ), NIN, STATUS )
+      CALL POL1_RMBND( NVEC, BLO, BHI, Z, %VAL( IPZ ), %VAL( IPMAG ), 
+     :                 %VAL( IPANG ), %VAL( IPX ), %VAL( IPY ), NIN, 
+     :                 STATUS )
 
 *  Report an error if there are no vectors in the selected region.
       IF( NIN .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -708,14 +765,6 @@
 
 *  Prepare to produce graphics using AST and PGPLOT.
 *  =================================================
-
-*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of 
-*  this FrameSet will be spanned by axes corresponding to the X and Y 
-*  catalogue columns. The Current Frame is set by the user, using
-*  parameters FRAME and EPOCH.
-      GIS( 1 ) = GIX
-      GIS( 2 ) = GIY
-      CALL POL1_GTCTA( 'FRAME', 'EPOCH', CI, 2, GIS, IWCS, STATUS )
 
 *  Get the index of the Frame corresponding to the catalogue columns 
 *  specifying the vector positions (i.e. the Base Frame in the above
@@ -856,13 +905,27 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Get a string describing any Z plane selection.
+      IF( GOTZ ) THEN
+         ZTEXT = ' Z = '
+         IAT = 5
+         CALL CHR_PUTR( Z, ZTEXT, IAT )
+      ELSE
+         ZTEXT = ' '
+      END IF
+
 *  Get the TITLE parameter (if any) from the input catalogue.
       CALL CAT_TIDNT( CI, 'TITLE', GTTL, STATUS )       
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS )
          CALL CAT_TRLSE( GTTL, STATUS )
+         IAT = CHR_LEN( TITLE )
+         CALL CHR_APPND( ' (', TITLE, IAT )
+         CALL CHR_APPND( ZTEXT, TITLE, IAT )
+         IAT = IAT + 1
+         CALL CHR_APPND( ')', TITLE, IAT )
       ELSE
-         TITLE = ' '
+         TITLE = ZTEXT
          CALL ERR_ANNUL( STATUS )
       END IF
 
@@ -871,7 +934,7 @@
 *  Title for the Plot. We have to be careful about the timing of this change 
 *  to the Title. If we did it before KPG1_PLOT (i.e. if we set the Title in 
 *  IWCS) it may prevent alignment ocurring within KPG1_PLOT since alignment 
-*  fails if the Title of two Frames differ.
+*  fails if the Title of two Frames differ (??).
       IF( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ. 
      :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
 
@@ -1073,6 +1136,7 @@
       CALL PSX_FREE( IPY, STATUS )
       CALL PSX_FREE( IPX2, STATUS )
       CALL PSX_FREE( IPY2, STATUS )
+      IF( GOTZ ) CALL PSX_FREE( IPZ, STATUS )
 
 *  Shut down the graphics database.
       CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )

@@ -103,6 +103,15 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
+   parameter      COLZ
+      type        LITERAL
+      ppath       'DYNAMIC,DEFAULT'
+      vpath       'DYNAMIC,DEFAULT'
+      default     !
+      prompt      'Name of catalogue column holding vector Z position'
+      helpkey     '*'
+   endparameter
+
    parameter      DEVICE         
       ptype       'DEVICE'
       vpath       'GLOBAL,PROMPT'
@@ -231,6 +240,13 @@ interface POLPLOT
       prompt      'Data value for a 1-centimetre vector'
       ppath       'DYNAMIC'
       vpath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      Z
+      type        '_REAL'
+      prompt      'The Z value to plot'
+      ppath       'CURRENT'
       helpkey     '*'
    endparameter
 

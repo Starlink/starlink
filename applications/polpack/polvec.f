@@ -22,10 +22,10 @@
 *  Description:
 *     This application calculates values of percentage polarization, 
 *     polarization angle, total intensity and polarized intensity, based 
-*     on Stokes parameters in the supplied input cube (which will 
-*     normally have been created by POLKA or POLCAL). These calculated 
-*     values may be stored either in a series of 2D NDFs, or in a single 
-*     catalogue which may be examined and manipulated using the CURSA 
+*     on Stokes parameters in the supplied input 3D (or 4D) cube (which 
+*     will normally have been created by POLKA or POLCAL). These calculated 
+*     values may be stored either in a series of 2D (or 3D) NDFs, or in a 
+*     single catalogue which may be examined and manipulated using the CURSA 
 *     package (see SUN/190).
 
 *  Usage:
@@ -47,11 +47,12 @@
 *        of 1 produces no binning, and causes the origin of the output
 *        NDFs and catalogue to be the same as the x-y origin in the input 
 *        cube (the output origin is set to [0.0,0.0] if any binning is
-*        performed).
+*        performed). 
 *
-*        Note, if the output vectors are being stored in a catalogue, it
-*        is usually better to use the POLBIN application to bin the Stokes 
-*        vectors. [1]
+*        This parameter is not accessed and no binning is performed if the 
+*        input NDF is 4D. Note, if the output vectors are being stored in a 
+*        catalogue, you should usually use the POLBIN application to bin the 
+*        Stokes vectors (this applies to both 3D and 4D data). [1]
 *     CAT = LITERAL (Read)
 *        The name of a catalogue to create, holding the calculated
 *        polarization parameters tabulated at each point for which Stokes
@@ -60,6 +61,8 @@
 *        columns (all stored as single precision _REAL values):
 *           - X  -- The pixel X coordinate at the tabulated point.
 *           - Y  -- The pixel Y coordinate at the tabulated point.
+*           - Z  -- The pixel Z coordinate at the tabulated point (this
+*                   is only included if the input NDF is 4D).
 *           - I  -- The total intensity.
 *           - Q  -- The Stokes Q parameter.
 *           - U  -- The Stokes U parameter.
@@ -70,7 +73,7 @@
 *
 *        If VARIANCE is TRUE, then the catalogue will also contain 
 *        additional columns giving the standard deviation on each of the 
-*        tabulated values (excluding the X and Y columns). The names of 
+*        tabulated values (excluding the X, Y and Z columns). The names of 
 *        these columns will be formed by prepending the letter D to the
 *        start of the column names listed above.
 *
@@ -107,8 +110,8 @@
 *        An output NDF holding the total intensity. A null value can be
 *        supplied if this output image is not required. [!]
 *     IN = NDF (Read)
-*        The 3D cube holding the Stokes parameters. This should have been
-*        created by POLKA or POLCAL.
+*        The 3D (or 4D) cube holding the Stokes parameters. This should have 
+*        been created by POLKA or POLCAL.
 *     IP = NDF (Write)
 *        An output NDF holding the polarized intensity. A null value can be
 *        supplied if this output image is not required. [!]
@@ -192,6 +195,8 @@
 *        GRID-PIXEL mapping in IWCS.
 *     17-MAY-2000 (DSB):
 *        Added optional RA and DEC columns to the output catalogue.
+*     2-FEB-2001 (DSB):
+*        Added support for 4D input cubes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -219,10 +224,10 @@
       CHARACTER TITLE*80         ! Title from input Stokes cube
       CHARACTER UNITS*40         ! Units from input Stokes cube
       CHARACTER XLOC*(DAT__SZLOC)! Locator for polpack extension
-      DOUBLE PRECISION TR( 4 )   ! Coeffs. of linear mapping produced by binning
+      DOUBLE PRECISION TR( 6 )   ! Coeffs. of linear mapping produced by binning
       INTEGER BOX( 2 )           ! Bin size
       INTEGER CI                 ! CAT identifier for output catalogue
-      INTEGER DIM( 3 )           ! Dimensions of input Stokes cube
+      INTEGER DIM( 4 )           ! Dimensions of input Stokes cube
       INTEGER EL                 ! No. of elements in mapped arrays
       INTEGER EQMAP              ! (X,Y)->(RA,DEC) Mapping, or AST__NULL
       INTEGER I                  ! Loop count
@@ -257,17 +262,19 @@
       INTEGER IPVBIN             ! Pointers to binned input VARIANCE arrays
       INTEGER IPVIN              ! Pointers to input VARIANCE arrays
       INTEGER IPVV               ! Pointer to V variance
-      INTEGER IPW1               ! Pointer to first work array
-      INTEGER IPW2               ! Pointer to second work array
+      INTEGER IPW                ! Pointer to work array
       INTEGER IWCS               ! AST FrameSet holding o/p NDFs WCS component
-      INTEGER LBND( 3 )          ! Lower bounds of input NDF
+      INTEGER LBND( 4 )          ! Lower bounds of input NDF
       INTEGER MINPIX             ! Min. no. of good input pixels per bin
       INTEGER NDIM               ! No. of dimensions in input Stokes cube
+      INTEGER NDIMO              ! No. of dimensions in output NDFs
+      INTEGER NSTOKE             ! No. of Stokes parameters
       INTEGER NVAL               ! No. of values obtained
       INTEGER NXBIN              ! No. of bins along X axis
       INTEGER NYBIN              ! No. of bins along Y axis
+      INTEGER NZBIN              ! No. of bins along Z axis
       INTEGER TEMP               ! Pointer to FrameSet
-      INTEGER UBND( 3 )          ! Upper bounds of input NDF
+      INTEGER UBND( 4 )          ! Upper bounds of input NDF
       INTEGER WKBNSZ             ! Size of workspace for binned data
       LOGICAL BINNING            ! Is any binning taking place?
       LOGICAL DEBIAS             ! Statistical de-biassing required?
@@ -284,7 +291,7 @@
       REAL ANGROT                ! Input ref. direction 
       REAL ANGRT                 ! Output ref. direction
       REAL NSIGMA                ! No. of sigmas to clip at
-      REAL TR2( 4 )              ! Coeffs. of mapping from cell indices to coordinates
+      REAL TR2( 6 )              ! Coeffs. of mapping from cell indices to coordinates
       REAL WLIM                  ! Min. fraction of good input pixels per bin
 *.
 
@@ -304,17 +311,21 @@
       CALL NDF_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
 *  Get its bounds and dimensions.
-      CALL NDF_BOUND( INDF1, 3, LBND, UBND, NDIM, STATUS ) 
+      CALL NDF_BOUND( INDF1, 4, LBND, UBND, NDIM, STATUS ) 
       DIM( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
       DIM( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
       DIM( 3 ) = UBND( 3 ) - LBND( 3 ) + 1
+      DIM( 4 ) = UBND( 4 ) - LBND( 4 ) + 1
+
+*  Store the number of axes in each output NDF.
+      NDIMO = NDIM - 1
 
 *  Get the value of the STOKES component in the POLPACK extension. 
 *  This is a string in which each character identifies the corresponding
-*  plane in the DATA array.
+*  "plane" in the DATA array.
       STOKES = ' '
       CALL NDF_XGT0C( INDF1, 'POLPACK', 'STOKES', STOKES, STATUS ) 
-      IF( ( NDIM .NE. 3 .OR. STOKES .EQ. ' ' ) .AND. 
+      IF( ( NDIM .LT. 3 .OR. NDIM .GT. 4 .OR. STOKES .EQ. ' ' ) .AND. 
      :     STATUS .EQ. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', INDF1 )
          STATUS = SAI__ERROR
@@ -353,26 +364,30 @@
 
 *  Bin the Stokes parameters if required.
 *  ======================================
+      IF( NDIM .EQ. 3 ) THEN
 
 *  Obtain the sizes of each bin.
-      CALL PAR_GDRVI( 'BOX', 2, 1, VAL__MAXI, BOX, NVAL, STATUS )
+         CALL PAR_GDRVI( 'BOX', 2, 1, VAL__MAXI, BOX, NVAL, STATUS )
 
 *  Duplicate the value if only a single value was given.  
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         IF ( NVAL .LT. 2 ) BOX( 2 ) = BOX( 1 )
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            IF ( NVAL .LT. 2 ) BOX( 2 ) = BOX( 1 )
 
 *  If a null value was given, annull the error and use a default which 
 *  results in about 30 vectors along the longest axis.
-      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-
-         BOX( 1 ) = MAX( DIM( 1 ), DIM( 2 ) )/30
-         BOX( 2 ) = BOX( 1 )         
-
-      END IF
+         ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+   
+            BOX( 1 ) = MAX( DIM( 1 ), DIM( 2 ) )/30
+            BOX( 2 ) = BOX( 1 )         
+   
+         END IF
 
 *  Set a flag indicating if any binning is taking place.
-      BINNING = ( BOX( 1 ) .NE. 1 .OR. BOX( 2 ) .NE. 1 )
+         BINNING = ( BOX( 1 ) .NE. 1 .OR. BOX( 2 ) .NE. 1 )
+      ELSE
+         BINNING = .FALSE.
+      END IF
 
 *  Obtain the dimensions and bounds of the binned arrays.
       IF( BINNING ) THEN
@@ -387,6 +402,14 @@
          NYBIN = DIM( 2 )
       END IF
 
+      IF( NDIM .EQ. 3 ) THEN
+         NZBIN = 1
+         NSTOKE = DIM( 3 )
+      ELSE
+         NZBIN = DIM( 3 )
+         NSTOKE = DIM( 4 )
+      END IF
+
 *  If the bin size is one on each axis, then just use the supplied DATA
 *  and VARIANCE arrays.
       IF( .NOT. BINNING ) THEN
@@ -397,11 +420,13 @@
          TR( 2 ) = 1.0D0
          TR( 3 ) = 0.0D0
          TR( 4 ) = 1.0D0
+         TR( 5 ) = 0.0D0
+         TR( 6 ) = 1.0D0
 
 *  If we are binning, allocate memory to hold the binned Stokes parameters, 
 *  and their variances.
       ELSE
-         WKBNSZ = NXBIN*NYBIN*DIM( 3 )
+         WKBNSZ = NXBIN*NYBIN*NSTOKE
          CALL PSX_CALLOC( WKBNSZ, '_REAL', IPDBIN, STATUS )         
          IPVBIN = IPDBIN 
          IF( VAR ) CALL PSX_CALLOC( WKBNSZ, '_REAL', IPVBIN, STATUS )         
@@ -423,7 +448,7 @@
          MINPIX = MAX( 1, MIN( BOX( 1 )*BOX( 2 ), MINPIX ) )
 
 *  Do the binning.
-         CALL POL1_STBIN( DIM( 1 ), DIM( 2 ), DIM( 3 ), %VAL( IPDIN ),
+         CALL POL1_STBIN( DIM( 1 ), DIM( 2 ), NSTOKE, %VAL( IPDIN ),
      :                    VAR, %VAL( IPVIN ), BOX, METH, MINPIX, NSIGMA,
      :                    NXBIN, NYBIN, %VAL( IPDBIN ), %VAL( IPVBIN ), 
      :                    TR, STATUS )
@@ -431,7 +456,7 @@
       END IF
 
 *  Get a FrameSet which represents the WCS information of one of the binned
-*  2D arrays.
+*  2D (or 3D) arrays.
       CALL POL1_GTWCS( INDF1, TR, LBND, IWCS, STATUS )
 
 *  Get the reference direction for the output catalogue. This may be
@@ -447,7 +472,7 @@
 *  ===============================
 
 *  Attempt to get an output NDF to hold total intensity.
-      CALL NDF_CREAT( 'I', '_REAL', 2, LBND, UBND, INDFI, STATUS ) 
+      CALL NDF_CREAT( 'I', '_REAL', NDIMO, LBND, UBND, INDFI, STATUS ) 
 
 *  If successful, set a flag indicating that a total-intensity NDF is to
 *  be produced.
@@ -485,7 +510,7 @@
 *  ===========================================
 
 *  Attempt to get an output NDF to hold percentage polarisation.
-      CALL NDF_CREAT( 'P', '_REAL', 2, LBND, UBND, INDFP, STATUS ) 
+      CALL NDF_CREAT( 'P', '_REAL', NDIMO, LBND, UBND, INDFP, STATUS ) 
 
 *  If successful, set a flag indicating that a percent-polarisation NDF
 *  is to be produced.
@@ -529,7 +554,7 @@
 *  ======================================
 
 *  Attempt to get an output NDF to hold polarisation angle.
-      CALL NDF_CREAT( 'ANG', '_REAL', 2, LBND, UBND, INDFT, STATUS ) 
+      CALL NDF_CREAT( 'ANG', '_REAL', NDIMO, LBND, UBND, INDFT, STATUS ) 
 
 *  If successful, set a flag indicating that an angle NDF is to
 *  be produced.
@@ -570,7 +595,7 @@
 *  =======================================
 
 *  Attempt to get an output NDF to hold polarised intensity.
-      CALL NDF_CREAT( 'IP', '_REAL', 2, LBND, UBND, INDFIP, STATUS ) 
+      CALL NDF_CREAT( 'IP', '_REAL', NDIMO, LBND, UBND, INDFIP, STATUS ) 
 
 *  If successful, set a flag indicating that a polarised-intensity NDF
 *  is to be produced.
@@ -605,7 +630,7 @@
 *  =====================
 
 *  Attempt to get an output NDF to hold Q.
-      CALL NDF_CREAT( 'Q', '_REAL', 2, LBND, UBND, INDFQ, STATUS ) 
+      CALL NDF_CREAT( 'Q', '_REAL', NDIMO, LBND, UBND, INDFQ, STATUS ) 
 
 *  If successful, set a flag indicating that a polarised-intensity NDF
 *  is to be produced.
@@ -640,7 +665,7 @@
 *  =====================
 
 *  Attempt to get an output NDF to hold U.
-      CALL NDF_CREAT( 'U', '_REAL', 2, LBND, UBND, INDFU, STATUS ) 
+      CALL NDF_CREAT( 'U', '_REAL', NDIMO, LBND, UBND, INDFU, STATUS ) 
 
 *  If successful, set a flag indicating that a polarised-intensity NDF
 *  is to be produced.
@@ -675,7 +700,7 @@
 *  =====================
 
 *  Attempt to get an output NDF to hold V.
-      CALL NDF_CREAT( 'V', '_REAL', 2, LBND, UBND, INDFV, STATUS ) 
+      CALL NDF_CREAT( 'V', '_REAL', NDIMO, LBND, UBND, INDFV, STATUS ) 
 
 *  If successful, set a flag indicating that a polarised-intensity NDF
 *  is to be produced.
@@ -721,7 +746,7 @@
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Find the PIXEL Frame and make it the Current Frame.
-      TEMP = AST_FINDFRAME( IWCS, AST_FRAME( 2, ' ', STATUS ),
+      TEMP = AST_FINDFRAME( IWCS, AST_FRAME( NDIMO, ' ', STATUS ),
      :                      'PIXEL', STATUS )
 
 *  If found, Annull the returned FrameSet.
@@ -812,33 +837,30 @@
       TR2( 1 ) = REAL( LBND( 1 ) ) - 0.5 - TR2( 2 )
       TR2( 4 ) = 1.0
       TR2( 3 ) = REAL( LBND( 2 ) ) - 0.5 - TR2( 4 )
+      TR2( 6 ) = 1.0
+      TR2( 5 ) = REAL( LBND( 3 ) ) - 0.5 - TR2( 6 )
 
 *  Allocate work arrays.
       IF( EQMAP .NE. AST__NULL ) THEN
-         CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW1, STATUS )
-         CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW2, STATUS )
+         CALL PSX_CALLOC( NXBIN*NYBIN*NDIMO, '_DOUBLE', IPW, STATUS )
       ELSE 
-         IPW1 = IPI
-         IPW2 = IPI
+         IPW = IPI
       END IF
 
 *  Call the routine to do the work.
-      CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, DIM( 3 ), 
-     :                 %VAL( IPDBIN ), %VAL( IPVBIN ), STOKES,
-     :                 DEBIAS, VAR, ANGROT, ANGRT, MAKEI, MAKEP,
-     :                 MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
-     :                 CI, %VAL( IPI ), %VAL( IPP ), %VAL( IPT ),
-     :                 %VAL( IPIP ), %VAL( IPQ ), %VAL( IPU ),
-     :                 %VAL( IPV ), %VAL( IPIV ), %VAL( IPPV ),
-     :                 %VAL( IPTV ), %VAL( IPIPV ), %VAL( IPQV ),
-     :                 %VAL( IPUV ), %VAL( IPVV ), %VAL( IPW1 ), 
-     :                 %VAL( IPW2 ), STATUS )
+      CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NZBIN, NSTOKE,
+     :                 NXBIN*NYBIN, %VAL( IPDBIN ), %VAL( IPVBIN ), 
+     :                 STOKES, DEBIAS, VAR, ANGROT, ANGRT, NDIMO, MAKEI,
+     :                 MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, 
+     :                 MAKECT, CI, %VAL( IPI ), %VAL( IPP ), 
+     :                 %VAL( IPT ), %VAL( IPIP ), %VAL( IPQ ), 
+     :                 %VAL( IPU ), %VAL( IPV ), %VAL( IPIV ), 
+     :                 %VAL( IPPV ), %VAL( IPTV ), %VAL( IPIPV ), 
+     :                 %VAL( IPQV ), %VAL( IPUV ), %VAL( IPVV ), 
+     :                 %VAL( IPW ), STATUS )
 
 *  Free the work space.
-      IF( EQMAP .NE. AST__NULL ) THEN
-         CALL PSX_FREE( IPW1, STATUS )   
-         CALL PSX_FREE( IPW2, STATUS )   
-      END IF
+      IF( EQMAP .NE. AST__NULL ) CALL PSX_FREE( IPW, STATUS )   
 
 *  Closedown.
 *  ==========

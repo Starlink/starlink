@@ -1,9 +1,10 @@
-      SUBROUTINE POL1_PLVEC( TR, EQMAP, NPIX, NROW, NPLANE, STOKE, 
-     :                       VSTOKE, STKID, DEBIAS, VAR, ANGROT, ANGRT,
-     :                       MAKEI, MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU,
-     :                       MAKEV, MAKECT, CI, AI, AP, AT, AIP, AQ, AU,
-     :                       AV, AIV, APV, ATV, AIPV, AQV, AUV, AVV,
-     :                       W1, W2, STATUS ) 
+      SUBROUTINE POL1_PLVEC( TR, EQMAP, NPIX, NROW, NZ, NSTOKE, NEL, 
+     :                       STOKE, VSTOKE, STKID, DEBIAS, VAR, ANGROT,
+     :			     ANGRT, NDIMO, MAKEI, MAKEP, MAKET,
+     :			     MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT, CI, 
+     :			     AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, ATV,
+     :			     AIPV, AQV, AUV, AVV, W, STATUS )
+
 *+ 
 *  Name: 
 *     POL1_PLVEC
@@ -15,39 +16,44 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_PLVEC( TR, EQMAP, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
-*                      STKID, DEBIAS, VAR, ANGROT, ANGRT, MAKEI, MAKEP, 
-*                      MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
+*     CALL POL1_PLVEC( TR, EQMAP, NPIX, NROW, NZ, NSTOKE, NEL, STOKE, VSTOKE, 
+*                      STKID, DEBIAS, VAR, ANGROT, ANGRT, NDIMO, MAKEI, 
+*                      MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
 *                      CI, AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, 
-*                      ATV, AIPV, AQV, AUV, AVV, W1, W2, STATUS )
+*                      ATV, AIPV, AQV, AUV, AVV, W, STATUS )
 
 *  Description:
 *     This routine calculates the polarisation parameters and (if
 *     requested) variances for each pixel. 
 
 *  Arguments:
-*     TR( 4 ) = _REAL (Given)
+*     TR( 6 ) = _REAL (Given)
 *        The coefficients of the transformation which converts cell indices
-*        into (X,Y) values to be stored in the catalogue (if required). 
+*        into (X,Y,Z) values to be stored in the catalogue (if required). 
 *           X = TR( 1 ) + TR( 2 )*REAL( IPIX )  ( IPIX = 1, NPIX )
 *           Y = TR( 3 ) + TR( 4 )*REAL( IROW )  ( IROW = 1, NROW )
+*           Z = TR( 5 ) + TR( 6 )*REAL( IZ )  ( IZ = 1, NZ )
 *     EQMAP = INTEGER (Given)
 *        If this is not AST__NULL, then the catalogue contains RA and DEC
-*        columns, and EQMAP gives the AST Mapping from (X,Y) to (RA,DEC).
+*        columns, and EQMAP gives the AST Mapping from (X,Y(,Z)) to (RA,DEC).
 *     NPIX = INTEGER (Given)
 *        The number of pixels per row in STOKE and VSTOKE.
 *     NROW = INTEGER (Given)
-*        The number of rows in each plane of STOKE and VSTOKE.
-*     NPLANE = INTEGER (Given)
+*        The number of rows in each Z plane of STOKE and VSTOKE.
+*     NZ = INTEGER (Given)
+*        The number of Z planes in each Stokes-cube of STOKE and VSTOKE.
+*     NSTOKE = INTEGER (Given)
 *        The number of planes in STOKE and VSTOKE.
-*     STOKE( NPIX, NROW, NPLANE ) = REAL (Given)
+*     NEL = INTEGER (Given)
+*        Number of pixels in a single Z plane (=NROW*NPIX).
+*     STOKE( NPIX, NROW, NZ, NSTOKE ) = REAL (Given)
 *        The input Stokes parameters, as described by STKID.
-*     VSTOKE( NPIX, NROW, NPLANE ) = REAL (Given)
+*     VSTOKE( NPIX, NROW, NZ, NSTOKE ) = REAL (Given)
 *        The variance on the Stokes parameters. It is ignored if VAR is 
 *        .FALSE..
 *     STKID = CHARACTER * ( * ) (Given)
-*        A string of characters identifying each plane of the input arrays.
-*        The first character applies to plane 1, the second to plane 2, 
+*        A string of characters identifying each Stokes-cube of the input 
+*        arrays. The first character applies to cube 1, the second to cube 2, 
 *        etc. Each character should be one of I, Q, U or V.
 *     DEBIAS = LOGICAL (Given)
 *        It is .TRUE. if the effects of biassing caused by the
@@ -62,6 +68,8 @@
 *     ANGRT = REAL (Given)
 *        ACW angle in degrees from pixel X axis to reference direction in
 *        output NDFs and catalogue.
+*     NDIMO = LOGICAL (Given)
+*        The number of pixel axes (2 or 3) in output NDFs and catalogue.
 *     MAKEI = LOGICAL (Given)
 *        It is .TRUE. if a total intensity output array is required.
 *     MAKEP = LOGICAL (Given)
@@ -84,38 +92,36 @@
 *        It is .TRUE. if a catalogue containing everything is required.
 *     CI = INTEGER (Given)
 *        A CAT catalogue identifier. Only used if MAKECT is .TRUE.
-*     AI( NPIX, NROW ) = REAL (Returned)
+*     AI( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding total intensity values.
-*     AP( NPIX, NROW ) = REAL (Returned)
+*     AP( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding percentage polarisation values.
-*     AT( NPIX, NROW ) = REAL (Returned)
+*     AT( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding polarisation angles (ACW from X axis to the
 *        plane of polarization - in degrees)
-*     AIP( NPIX, NROW ) = REAL (Returned)
+*     AIP( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding polarised intensity values.
-*     AQ( NPIX, NROW ) = REAL (Returned)
+*     AQ( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding Q values.
-*     AU( NPIX, NROW ) = REAL (Returned)
+*     AU( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding Q values.
-*     AV( NPIX, NROW ) = REAL (Returned)
+*     AV( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding Q values.
-*     AIV( NPIX, NROW ) = REAL (Returned)
+*     AIV( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding the variance of AI.
-*     APV( NPIX, NROW ) = REAL (Returned)
+*     APV( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding the variance of AP.
-*     ATV( NPIX, NROW ) = REAL (Returned)
+*     ATV( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding the variance of AT.
-*     AIPV( NPIX, NROW ) = REAL (Returned)
+*     AIPV( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding the variance of AIP.
-*     AQV( NPIX, NROW ) = REAL (Returned)
+*     AQV( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding the variance of AQ.
-*     AUV( NPIX, NROW ) = REAL (Returned)
+*     AUV( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding the variance of AU.
-*     AVV( NPIX, NROW ) = REAL (Returned)
+*     AVV( NPIX, NROW, NZ ) = REAL (Returned)
 *        An array holding the variance of AV.
-*     W1( NPIX, NROW ) = DOUBLE PRECISION (Returned)
-*        A work array. Only accessed if EQMAP is not AST__NULL.
-*     W2( NPIX, NROW ) = DOUBLE PRECISION (Returned)
+*     W( NEL, NDIMO ) = DOUBLE PRECISION (Returned)
 *        A work array. Only accessed if EQMAP is not AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -140,6 +146,8 @@
 *        Added rotation of reference direction (ANGRT).
 *     17-MAY-2000 (DSB):
 *        Added EQMAP argument.
+*     2-FEB-2001 (DSB):
+*        Added support for 4D Stokes cubes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,18 +165,21 @@
       INCLUDE 'CAT_PAR'          ! CAT_ constants
 
 *  Arguments Given:
-      REAL TR( 4 )
+      REAL TR( 6 )
       INTEGER EQMAP
       INTEGER NPIX
       INTEGER NROW 
-      INTEGER NPLANE
-      REAL STOKE( NPIX, NROW, NPLANE )
-      REAL VSTOKE( NPIX, NROW, NPLANE )
+      INTEGER NZ
+      INTEGER NSTOKE
+      INTEGER NEL
+      REAL STOKE( NPIX, NROW, NZ, NSTOKE )
+      REAL VSTOKE( NPIX, NROW, NZ, NSTOKE )
       CHARACTER STKID*(*)
       LOGICAL DEBIAS
       LOGICAL VAR
       REAL ANGROT
       REAL ANGRT
+      INTEGER NDIMO
       LOGICAL MAKEI
       LOGICAL MAKEP
       LOGICAL MAKET
@@ -180,22 +191,21 @@
       INTEGER CI
 
 *  Arguments Returned:
-      REAL AI( NPIX, NROW )
-      REAL AP( NPIX, NROW )
-      REAL AT( NPIX, NROW )
-      REAL AIP( NPIX, NROW )
-      REAL AQ( NPIX, NROW )
-      REAL AU( NPIX, NROW )
-      REAL AV( NPIX, NROW )
-      REAL AIV( NPIX, NROW )
-      REAL APV( NPIX, NROW )
-      REAL ATV( NPIX, NROW )
-      REAL AIPV( NPIX, NROW )
-      REAL AQV( NPIX, NROW )
-      REAL AUV( NPIX, NROW )
-      REAL AVV( NPIX, NROW )
-      DOUBLE PRECISION W1( NPIX, NROW )
-      DOUBLE PRECISION W2( NPIX, NROW )
+      REAL AI( NPIX, NROW, NZ )
+      REAL AP( NPIX, NROW, NZ )
+      REAL AT( NPIX, NROW, NZ )
+      REAL AIP( NPIX, NROW, NZ )
+      REAL AQ( NPIX, NROW, NZ )
+      REAL AU( NPIX, NROW, NZ )
+      REAL AV( NPIX, NROW, NZ )
+      REAL AIV( NPIX, NROW, NZ )
+      REAL APV( NPIX, NROW, NZ )
+      REAL ATV( NPIX, NROW, NZ )
+      REAL AIPV( NPIX, NROW, NZ )
+      REAL AQV( NPIX, NROW, NZ )
+      REAL AUV( NPIX, NROW, NZ )
+      REAL AVV( NPIX, NROW, NZ )
+      DOUBLE PRECISION W( NEL, NDIMO )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -206,9 +216,11 @@
       INTEGER JQ                 ! Index of Q plane in input arrays
       INTEGER JU                 ! Index of U plane in input arrays
       INTEGER JV                 ! Index of V plane in input arrays
+      INTEGER K                  ! Pixel index within Z plane
       INTEGER NVEC               ! No. of catalogue rows written
       INTEGER PIX                ! Array pixel index
       INTEGER ROW                ! Array row index
+      INTEGER Z                  ! Z plane index
       LOGICAL CIRC               ! Measure circular polarisation?
       REAL COS2D                 ! Cos( 2* change in ref direction )
       REAL EPS2                  ! Mean variance on normalised Q and U
@@ -247,11 +259,12 @@
       REAL VUN                   ! Rotated U variance value
       REAL XR                    ! X value
       REAL YR                    ! Y value
+      REAL ZR                    ! Z value
 
 *  CAT identifiers for catalogue columns.
-      INTEGER XCAT, YCAT, ICAT, PCAT, ANCAT, PICAT, VCAT, QCAT, UCAT,
-     :        DICAT, DPCAT, DANCAT, DPICAT, DVCAT, DQCAT, DUCAT, RACAT,
-     :        DECCAT
+      INTEGER XCAT, YCAT, ZCAT, ICAT, PCAT, ANCAT, PICAT, VCAT, QCAT, 
+     :        UCAT, DICAT, DPCAT, DANCAT, DPICAT, DVCAT, DQCAT, DUCAT, 
+     :        RACAT, DECCAT
 
 *.
 
@@ -261,13 +274,13 @@
 *  Set up the conversion factor from radians to degrees.
       RTOD = 180.0 / ACOS( -1.0 )
 
-*  Find the indices of the planes containing each Stokes paremeter.
+*  Find the indices of the "planes" containing each Stokes paremeter.
       JI = 0
       JQ = 0
       JU = 0
       JV = 0
 
-      DO IC = 1, MIN( LEN( STKID ), NPLANE )
+      DO IC = 1, MIN( LEN( STKID ), NSTOKE )
          IF( STKID( IC : IC ) .EQ. 'I' ) THEN
             JI = IC
          ELSE IF( STKID( IC : IC ) .EQ. 'Q' ) THEN
@@ -299,6 +312,9 @@
 
          CALL POL1_GTCOL( CI, 'X', .TRUE., XCAT, STATUS )
          CALL POL1_GTCOL( CI, 'Y', .TRUE., YCAT, STATUS )
+         IF( NDIMO .EQ. 3 ) THEN
+            CALL POL1_GTCOL( CI, 'Z', .TRUE., ZCAT, STATUS )
+         END IF
 
          IF( EQMAP .NE. AST__NULL ) THEN
             CALL POL1_GTCOL( CI, 'RA', .TRUE., RACAT, STATUS )
@@ -335,528 +351,555 @@
 
          END IF
 
-*  Calling AST_TRAN2 to map the pixel co-ords into RA/DEC has a high
+*  Calling AST_TRANN to map the pixel co-ords into RA/DEC has a high
 *  overhead on each call. Therefore we need to do all points in a single
 *  call to AST_TRAN2. So, if requried we calculate the RA and DECs now,
 *  storing them in the supplied work arrays.
          IF( EQMAP .NE. AST__NULL ) THEN
 
 *  Store the pixel co-ords for each vector.
+            I = 0
             DO ROW = 1, NROW
                DO PIX = 1, NPIX
-                  W1( PIX, ROW ) = DBLE( TR( 1 ) + TR( 2 )*REAL( PIX ) )
-                  W2( PIX, ROW ) = DBLE( TR( 3 ) + TR( 4 )*REAL( ROW ) )
+                  I = I + 1
+                  W( I, 1 ) = DBLE( TR( 1 ) + TR( 2 )*REAL( PIX ) )
+                  W( I, 2 ) = DBLE( TR( 3 ) + TR( 4 )*REAL( ROW ) )
                END DO
             END DO
 
+            IF( NDIMO .EQ. 3 ) THEN
+               DO I = 1, NEL
+                  W( I, 3 ) = 1.0D0
+               END DO
+            END IF
+
 *  Transform the pixel positions into RA and DECs.
-            CALL AST_TRAN2( EQMAP, NROW*NPIX, W1, W2, .TRUE., W1, W2, 
-     :                      STATUS )
+            CALL AST_TRANN( EQMAP, NEL, NDIMO, NEL, W, .TRUE., 2, NEL, 
+     :                      W, STATUS ) 
          END IF
       END IF
 
 *  First deal with plane polarisation cases...
       IF( .NOT. CIRC ) THEN
 
-*  Loop round each element of the arrays.
-         DO ROW = 1, NROW
-            DO PIX = 1, NPIX
+*  Loop round each Z plane.
+         DO Z = 1, NZ
+
+*  Loop round each element of a Z plane.
+            K = 0
+            DO ROW = 1, NROW
+               DO PIX = 1, NPIX
+                  K = K + 1
 
 *  Initialise bad values for all inputs.
-               IIN = VAL__BADR  
-               QIN = VAL__BADR  
-               UIN = VAL__BADR  
-               VIIN = VAL__BADR  
-               VQIN = VAL__BADR  
-               VUIN = VAL__BADR  
+                  IIN = VAL__BADR  
+                  QIN = VAL__BADR  
+                  UIN = VAL__BADR  
+                  VIIN = VAL__BADR  
+                  VQIN = VAL__BADR  
+                  VUIN = VAL__BADR  
 
 *  Get the supplied stokes parameters and variances.
-               IIN = STOKE( PIX, ROW, JI )
-               IF( VAR ) VIIN = VSTOKE( PIX, ROW, JI )
+                  IIN = STOKE( PIX, ROW, Z, JI )
+                  IF( VAR ) VIIN = VSTOKE( PIX, ROW, Z, JI )
+      
+                  QIN = STOKE( PIX, ROW, Z, JQ )
+                  IF( VAR ) VQIN = VSTOKE( PIX, ROW, Z, JQ )
    
-               QIN = STOKE( PIX, ROW, JQ )
-               IF( VAR ) VQIN = VSTOKE( PIX, ROW, JQ )
-
-               UIN = STOKE( PIX, ROW, JU )
-               IF( VAR ) VUIN = VSTOKE( PIX, ROW, JU )
+                  UIN = STOKE( PIX, ROW, Z, JU )
+                  IF( VAR ) VUIN = VSTOKE( PIX, ROW, Z, JU )
 
 *  If any of the intensities are bad, store bad results.
-               IF ( IIN .EQ. VAL__BADR .OR. QIN .EQ. VAL__BADR .OR.
-     :              UIN .EQ. VAL__BADR ) THEN
+                  IF ( IIN .EQ. VAL__BADR .OR. QIN .EQ. VAL__BADR .OR.
+     :                 UIN .EQ. VAL__BADR ) THEN
    
-                  IP = VAL__BADR
-                  I = VAL__BADR
-                  P = VAL__BADR
-                  T = VAL__BADR
-      
-                  IF ( VAR ) THEN
-                     VIP = VAL__BADR
-                     VI = VAL__BADR
-                     VP = VAL__BADR
-                     VT = VAL__BADR
-                  END IF
+                     IP = VAL__BADR
+                     I = VAL__BADR
+                     P = VAL__BADR
+                     T = VAL__BADR
+         
+                     IF ( VAR ) THEN
+                        VIP = VAL__BADR
+                        VI = VAL__BADR
+                        VP = VAL__BADR
+                        VT = VAL__BADR
+                     END IF
 
 *  If the total intensity is zero, store bad values for P and T, and zero
 *  for I and IP.
-               ELSE IF( IIN .EQ. 0.0 ) THEN
-                  IP = 0.0
-                  I = 0.0
-                  P = VAL__BADR
-                  T = VAL__BADR
-      
-                  IF ( VAR ) THEN
-                     VIP = VAL__BADR
-                     VI = VIIN
-                     VP = VAL__BADR
-                     VT = VAL__BADR
-                  END IF
+                  ELSE IF( IIN .EQ. 0.0 ) THEN
+                     IP = 0.0
+                     I = 0.0
+                     P = VAL__BADR
+                     T = VAL__BADR
+         
+                     IF ( VAR ) THEN
+                        VIP = VAL__BADR
+                        VI = VIIN
+                        VP = VAL__BADR
+                        VT = VAL__BADR
+                     END IF
 
 *  Otherwise, calculate everything.
-               ELSE
+                  ELSE
 
 *  Copy the total intensity from input to output.
-                  I = IIN
+                     I = IIN
 
 *  If required, rotate the Q and U values to the new reference direction.
-                  IF( ANGROT .NE. ANGRT ) THEN
-                     COS2D = COS( 2*( ANGRT - ANGROT )/RTOD )
-                     SIN2D = SIN( 2*( ANGRT - ANGROT )/RTOD )
-                     QN = QIN*COS2D + UIN*SIN2D
-                     UN = UIN*COS2D - QIN*SIN2D
-                     QIN = QN
-                     UIN = UN
-                  END IF
+                     IF( ANGROT .NE. ANGRT ) THEN
+                        COS2D = COS( 2*( ANGRT - ANGROT )/RTOD )
+                        SIN2D = SIN( 2*( ANGRT - ANGROT )/RTOD )
+                        QN = QIN*COS2D + UIN*SIN2D
+                        UN = UIN*COS2D - QIN*SIN2D
+                        QIN = QN
+                        UIN = UN
+                     END IF
    
 *  Normalise theStokes parameters.
-                  Q = QIN / IIN
-                  U = UIN / IIN
+                     Q = QIN / IIN
+                     U = UIN / IIN
 
 *  Get the squared Q and U values.
-                  Q2 = Q * Q
-                  U2 = U * U
+                     Q2 = Q * Q
+                     U2 = U * U
 
 *  Percentage polarisation.
-                  P2 = Q2 + U2 
-                  P = 100.0 * SQRT( MAX( 0.0, P2 ) )
+                     P2 = Q2 + U2 
+                     P = 100.0 * SQRT( MAX( 0.0, P2 ) )
 
 *  Polarisation angle.
-                  IF( U .NE. 0.0 .OR. Q .NE. 0.0 ) THEN
-                     T = RTOD * 0.5 * ATAN2( U, Q )
-                  ELSE
-                     T = VAL__BADR
-                  END IF
+                     IF( U .NE. 0.0 .OR. Q .NE. 0.0 ) THEN
+                        T = RTOD * 0.5 * ATAN2( U, Q )
+                     ELSE
+                        T = VAL__BADR
+                     END IF
 
 *  Polarised intensity.
-                  IP = 0.01 * P * I
+                     IP = 0.01 * P * I
 
 *  Now produced variances if required.
-                  IF ( VAR ) THEN
+                     IF ( VAR ) THEN
 
 *  Total intensity.
-                     VI = VIIN
+                        VI = VIIN
 
 *  If any of the input variances are bad, or if the percentage polarisation 
 *  is zero, store bad output variances.
-                     IF( VIIN .EQ. VAL__BADR .OR. VQIN .EQ. VAL__BADR 
+                        IF( VIIN .EQ. VAL__BADR .OR. VQIN .EQ. VAL__BADR 
      :                  .OR. VUIN .EQ. VAL__BADR .OR. P2 .EQ. 0.0 ) THEN
 
-                        VIP = VAL__BADR
-                        VP = VAL__BADR
-                        VT = VAL__BADR
-
-*  Otherwise, calculate the variances.
-                     ELSE
-
-*  If required, rotate the Q and U variances to the new reference direction.
-                        IF( ANGROT .NE. ANGRT ) THEN
-                           VQN = VQIN*COS2D*COS2D + VUIN*SIN2D*SIN2D
-                           VUN = VUIN*COS2D*COS2D + VQIN*SIN2D*SIN2D
-                           VQIN = VQN
-                           VUIN = VUN
-                        END IF
-   
-*  Normalised Stokes parameter, Q and U.
-                        VQ = ( Q2 * VIIN + VQIN )/( I**2 )
-                        VU = ( U2 * VIIN + VUIN )/( I**2 )
-
-*  Fractional polarisation.
-                        EPS2 = ( Q2 * VQ + U2 * VU )/P2
-
-*  Percentage polarisation
-                        VP = 10000.0 * EPS2
-
-*  Polarized intensity.
-                        VIP = P2*VI + I*I*EPS2
-
-*  Polarisation angle (degs).
-                        VT = RTOD * RTOD * ( Q2 * VU + U2 *VQ )/
-     :                                     ( 4.0*P2*P2 )
-
-*  If any of the variances are negative store bad results.
-                        IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
-     :                       VP .LT. 0.0 .OR. VT .LT. 0.0 ) THEN
                            VIP = VAL__BADR
-                           VI = VAL__BADR
                            VP = VAL__BADR
                            VT = VAL__BADR
+
+*  Otherwise, calculate the variances.
+                        ELSE
+
+*  If required, rotate the Q and U variances to the new reference direction.
+                           IF( ANGROT .NE. ANGRT ) THEN
+                              VQN = VQIN*COS2D*COS2D + VUIN*SIN2D*SIN2D
+                              VUN = VUIN*COS2D*COS2D + VQIN*SIN2D*SIN2D
+                              VQIN = VQN
+                              VUIN = VUN
+                           END IF
+   
+*  Normalised Stokes parameter, Q and U.
+                           VQ = ( Q2 * VIIN + VQIN )/( I**2 )
+                           VU = ( U2 * VIIN + VUIN )/( I**2 )
+
+*  Fractional polarisation.
+                           EPS2 = ( Q2 * VQ + U2 * VU )/P2
+
+*  Percentage polarisation
+                           VP = 10000.0 * EPS2
+
+*  Polarized intensity.
+                           VIP = P2*VI + I*I*EPS2
+
+*  Polarisation angle (degs).
+                           VT = RTOD * RTOD * ( Q2 * VU + U2 *VQ )/
+     :                                        ( 4.0*P2*P2 )
+
+*  If any of the variances are negative store bad results.
+                           IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
+     :                          VP .LT. 0.0 .OR. VT .LT. 0.0 ) THEN
+                              VIP = VAL__BADR
+                              VI = VAL__BADR
+                              VP = VAL__BADR
+                              VT = VAL__BADR
 
 *  If required, make an estimate of the percentage polarisation and
 *  polarised intensity excluding the bias introduced because of the
 *  distribution of P being non-symmetric.
-                        ELSE
-                           IF ( DEBIAS ) THEN
-                              P = 100.0*SQRT( MAX( 0.0, P2 - EPS2 ) )
-                              IP = 0.01 * I * P
+                           ELSE
+                              IF ( DEBIAS ) THEN
+                                 P = 100.0*SQRT( MAX( 0.0, P2 - EPS2 ) )
+                                 IP = 0.01 * I * P
+                              END IF
+     
                            END IF
-  
+   
+                        END IF
+   
+                     END IF
+   
+                  END IF
+
+*  Store the required values in the output arrays.
+                  IF ( MAKEI ) AI( PIX, ROW, Z ) = I
+                  IF ( MAKEP ) AP( PIX, ROW, Z ) = P
+   
+                  IF ( MAKET ) THEN
+                     IF( T .NE. VAL__BADR ) THEN
+                        AT( PIX, ROW, Z ) = T
+                     ELSE
+                        AT( PIX, ROW, Z ) = VAL__BADR
+                     END IF
+                  END IF
+   
+                  IF ( MAKEIP ) AIP( PIX, ROW, Z ) = IP
+                  IF ( MAKEQ ) AQ( PIX, ROW, Z ) = QIN
+                  IF ( MAKEU ) AU( PIX, ROW, Z ) = UIN
+         
+                  IF ( VAR ) THEN
+                     IF ( MAKEI ) AIV( PIX, ROW, Z ) = VI
+                     IF ( MAKEP ) APV( PIX, ROW, Z ) = VP
+                     IF ( MAKET ) ATV( PIX, ROW, Z ) = VT
+                     IF ( MAKEIP ) AIPV( PIX, ROW, Z ) = VIP
+                     IF ( MAKEQ ) AQV( PIX, ROW, Z ) = VQIN
+                     IF ( MAKEU ) AUV( PIX, ROW, Z ) = VUIN
+                  END IF
+
+*  Append a row to the catalogue if required, and if some of the values
+*  are not bad.
+                  IF( MAKECT .AND. ( I .NE. VAL__BADR .OR. 
+     :                               QIN .NE. VAL__BADR .OR. 
+     :                               UIN .NE. VAL__BADR .OR. 
+     :                               P .NE. VAL__BADR .OR. 
+     :                               T .NE. VAL__BADR .OR. 
+     :                               IP .NE. VAL__BADR ) ) THEN
+
+*  Increment the number of rows in the catalogue.
+                     NVEC = NVEC + 1
+
+*  Store values for all the catalogue columns in the current row buffer.
+                     XR = TR( 1 ) + TR( 2 )*REAL( PIX )
+                     YR = TR( 3 ) + TR( 4 )*REAL( ROW )
+                     ZR = TR( 5 ) + TR( 6 )*REAL( Z )
+                     CALL POL1_PUT0R( XCAT, XR, .FALSE., STATUS )
+                     CALL POL1_PUT0R( YCAT, YR, .FALSE., STATUS )
+                     IF( NDIMO .EQ. 3 ) THEN
+                        CALL POL1_PUT0R( ZCAT, ZR, .FALSE., STATUS )
+                     END IF   
+
+                     IF( EQMAP .NE. AST__NULL ) THEN
+                        CALL POL1_PUT0D( RACAT, W( K, 1 ), .FALSE., 
+     :                                   STATUS )
+                        CALL POL1_PUT0D( DECCAT, W( K, 2 ), .FALSE., 
+     :                                   STATUS )
+                     END IF
+
+                     CALL POL1_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
+     :                               STATUS )
+                     CALL POL1_PUT0R( QCAT, QIN, ( QIN .EQ. VAL__BADR ),
+     :                               STATUS )
+                     CALL POL1_PUT0R( UCAT, UIN, ( UIN .EQ. VAL__BADR ),
+     :                               STATUS )
+                     CALL POL1_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
+     :                               STATUS )
+                     CALL POL1_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ),
+     :                               STATUS )
+
+                     IF ( T .NE. VAL__BADR ) THEN
+                        CALL POL1_PUT0R( ANCAT,  T, .FALSE., STATUS )
+                     ELSE
+                        CALL POL1_PUT0R( ANCAT,  VAL__BADR, .TRUE., 
+     :                                   STATUS )
+                     END IF
+
+                     IF( VAR ) THEN
+                        IF( VI .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VI) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DICAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
+                        IF( VQIN .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DQCAT, SQRT( MAX(0.0,VQIN) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DQCAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
+                        IF( VUIN .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DUCAT, SQRT( MAX(0.0,VUIN) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DUCAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
+                        IF( VP .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DPCAT, SQRT( MAX(0.0,VP) ), 
+     :                                .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DPCAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
+                        IF( VT .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DANCAT, SQRT( MAX(0.0,VT) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DANCAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
+                        IF( VIP .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DPICAT, SQRT( MAX(0.0,VIP) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DPICAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
                         END IF
 
                      END IF
 
-                  END IF
-
-               END IF
-
-*  Store the required values in the output arrays.
-               IF ( MAKEI ) AI( PIX, ROW ) = I
-               IF ( MAKEP ) AP( PIX, ROW ) = P
-
-               IF ( MAKET ) THEN
-                  IF( T .NE. VAL__BADR ) THEN
-                     AT( PIX, ROW ) = T
-                  ELSE
-                     AT( PIX, ROW ) = VAL__BADR
-                  END IF
-               END IF
-
-               IF ( MAKEIP ) AIP( PIX, ROW ) = IP
-               IF ( MAKEQ ) AQ( PIX, ROW ) = QIN
-               IF ( MAKEU ) AU( PIX, ROW ) = UIN
-      
-               IF ( VAR ) THEN
-                  IF ( MAKEI ) AIV( PIX, ROW ) = VI
-                  IF ( MAKEP ) APV( PIX, ROW ) = VP
-                  IF ( MAKET ) ATV( PIX, ROW ) = VT
-                  IF ( MAKEIP ) AIPV( PIX, ROW ) = VIP
-                  IF ( MAKEQ ) AQV( PIX, ROW ) = VQIN
-                  IF ( MAKEU ) AUV( PIX, ROW ) = VUIN
-               END IF
-
-*  Append a row to the catalogue if required, and if some of the values
-*  are not bad.
-               IF( MAKECT .AND. ( I .NE. VAL__BADR .OR. 
-     :                            QIN .NE. VAL__BADR .OR. 
-     :                            UIN .NE. VAL__BADR .OR. 
-     :                            P .NE. VAL__BADR .OR. 
-     :                            T .NE. VAL__BADR .OR. 
-     :                            IP .NE. VAL__BADR ) ) THEN
-
-*  Increment the number of rows in the catalogue.
-                  NVEC = NVEC + 1
-
-*  Store values for all the catalogue columns in the current row buffer.
-                  XR = TR( 1 ) + TR( 2 )*REAL( PIX )
-                  YR = TR( 3 ) + TR( 4 )*REAL( ROW )
-                  CALL POL1_PUT0R( XCAT, XR, .FALSE., STATUS )
-                  CALL POL1_PUT0R( YCAT, YR, .FALSE., STATUS )
-
-                  IF( EQMAP .NE. AST__NULL ) THEN
-                     CALL POL1_PUT0D( RACAT, W1( PIX, ROW ), .FALSE., 
-     :                               STATUS )
-                     CALL POL1_PUT0D( DECCAT, W2( PIX, ROW ), .FALSE., 
-     :                               STATUS )
-                  END IF
-
-                  CALL POL1_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
-     :                            STATUS )
-                  CALL POL1_PUT0R( QCAT, QIN, ( QIN .EQ. VAL__BADR ),
-     :                            STATUS )
-                  CALL POL1_PUT0R( UCAT, UIN, ( UIN .EQ. VAL__BADR ),
-     :                            STATUS )
-                  CALL POL1_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
-     :                            STATUS )
-                  CALL POL1_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ),
-     :                            STATUS )
-
-                  IF ( T .NE. VAL__BADR ) THEN
-                     CALL POL1_PUT0R( ANCAT,  T, .FALSE., STATUS )
-                  ELSE
-                     CALL POL1_PUT0R( ANCAT,  VAL__BADR, .TRUE., 
-     :                               STATUS )
-                  END IF
-
-                  IF( VAR ) THEN
-                     IF( VI .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VI) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DICAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                     IF( VQIN .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DQCAT, SQRT( MAX(0.0,VQIN) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DQCAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                     IF( VUIN .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DUCAT, SQRT( MAX(0.0,VUIN) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DUCAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-
-                     IF( VP .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DPCAT, SQRT( MAX(0.0,VP) ), 
-     :                             .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DPCAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                     IF( VT .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DANCAT, SQRT( MAX(0.0,VT) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DANCAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                     IF( VIP .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DPICAT, SQRT( MAX(0.0,VIP) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DPICAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                  END IF
-
 *  Append the current row buffer to the catalogue.
-                  CALL CAT_RAPND( CI, STATUS )
+                     CALL CAT_RAPND( CI, STATUS )
 
-               END IF
+                  END IF
+               END DO
             END DO
          END DO
 
 *  Now deal with circular polarisation
       ELSE
 
-*  Loop round each element of the arrays.
-         DO ROW = 1, NROW
-            DO PIX = 1, NPIX
+*  Loop round each Z plane.
+         DO Z = 1, NZ
+
+*  Loop round each element of a Z plane.
+            K = 0
+            DO ROW = 1, NROW
+               DO PIX = 1, NPIX
+                  K = K + 1
 
 *  Initialise bad values for all inputs.
-               IIN = VAL__BADR  
-               VIN = VAL__BADR  
-               VIIN = VAL__BADR  
-               VVIN = VAL__BADR  
+                  IIN = VAL__BADR  
+                  VIN = VAL__BADR  
+                  VIIN = VAL__BADR  
+                  VVIN = VAL__BADR  
 
 *  Get the supplied stokes parameters and variances.
-               IIN = STOKE( PIX, ROW, JI )
-               IF( VAR ) VIIN = VSTOKE( PIX, ROW, JI )
-   
-               VIN = STOKE( PIX, ROW, JV )
-               IF( VAR ) VVIN = VSTOKE( PIX, ROW, JV )
+                  IIN = STOKE( PIX, ROW, Z, JI )
+                  IF( VAR ) VIIN = VSTOKE( PIX, ROW, Z, JI )
+      
+                  VIN = STOKE( PIX, ROW, Z, JV )
+                  IF( VAR ) VVIN = VSTOKE( PIX, ROW, Z, JV )
 
 *  If any of the two intensities are bad, store bad results.
-               IF ( IIN .EQ. VAL__BADR .OR. VIN .EQ. VAL__BADR ) THEN
-   
-                  IP = VAL__BADR
-                  I = VAL__BADR
-                  P = VAL__BADR
-                  T = VAL__BADR
+                  IF ( IIN .EQ. VAL__BADR .OR. VIN .EQ. VAL__BADR ) THEN
       
-                  IF ( VAR ) THEN
-                     VIP = VAL__BADR
-                     VI = VAL__BADR
-                     VP = VAL__BADR
-                     VT = VAL__BADR
-                  END IF
+                     IP = VAL__BADR
+                     I = VAL__BADR
+                     P = VAL__BADR
+                     T = VAL__BADR
+         
+                     IF ( VAR ) THEN
+                        VIP = VAL__BADR
+                        VI = VAL__BADR
+                        VP = VAL__BADR
+                        VT = VAL__BADR
+                     END IF
 
 *  If the total intensity is zero, store bad values for P and T, and zero
 *  for I and IP.
-               ELSE IF( IIN .EQ. 0.0 ) THEN
-                  IP = 0.0
-                  I = 0.0
-                  P = VAL__BADR
-                  T = VAL__BADR
-      
-                  IF ( VAR ) THEN
-                     VIP = VAL__BADR
-                     VI = VIIN
-                     VP = VAL__BADR
-                     VT = VAL__BADR
-                  END IF
-
-*  Otherwise, calculate everything.
-               ELSE
-
-*  Copy the total intensity from input to output.
-                  I = IIN
-
-*  Normalised Stokes parameter
-                  V = VIN / IIN
-
-*  Percentage polarisation.
-                  P = 100.0 * ABS( V )
-
-*  Polarisation angle.
-                  IF( V .GT. 0.0 ) THEN
-                     T = 0.0
-                  ELSE
-                     T = 90.0
-                  END IF
-
-*  Polarised intensity.
-                  IP = 0.01 * I * P
-
-*  Now produced variances if required.
-                  IF ( VAR ) THEN
-
-*  Total intensity.
-                     VI = VIIN
-
-*  If any of the input variances are bad, store bad output variances.
-                     IF( VIIN .EQ. VAL__BADR .OR. 
-     :                   VVIN .EQ. VAL__BADR ) THEN
-
+                  ELSE IF( IIN .EQ. 0.0 ) THEN
+                     IP = 0.0
+                     I = 0.0
+                     P = VAL__BADR
+                     T = VAL__BADR
+         
+                     IF ( VAR ) THEN
                         VIP = VAL__BADR
+                        VI = VIIN
                         VP = VAL__BADR
                         VT = VAL__BADR
+                     END IF
 
-*  Otherwise, calculate the variances.
-                     ELSE
+*  Otherwise, calculate everything.
+                  ELSE
+
+*  Copy the total intensity from input to output.
+                     I = IIN
+
+*  Normalised Stokes parameter
+                     V = VIN / IIN
 
 *  Percentage polarisation.
-                        VP = 10000.0 * ( V * V * VIIN + VVIN )/( I**2 )
+                     P = 100.0 * ABS( V )
 
 *  Polarisation angle.
-                        VT = VAL__BADR
+                     IF( V .GT. 0.0 ) THEN
+                        T = 0.0
+                     ELSE
+                        T = 90.0
+                     END IF
 
 *  Polarised intensity.
-                        VIP = 0.0001 * ( P*P*VI + I*I*VP )
+                     IP = 0.01 * I * P
+
+*  Now produced variances if required.
+                     IF ( VAR ) THEN
+
+*  Total intensity.
+                        VI = VIIN
+
+*  If any of the input variances are bad, store bad output variances.
+                        IF( VIIN .EQ. VAL__BADR .OR. 
+     :                      VVIN .EQ. VAL__BADR ) THEN
+
+                           VIP = VAL__BADR
+                           VP = VAL__BADR
+                           VT = VAL__BADR
+
+*  Otherwise, calculate the variances.
+                        ELSE
+
+*  Percentage polarisation.
+                           VP = 10000.0 * ( V * V * VIIN + VVIN )/
+     :                          ( I**2 )
+
+*  Polarisation angle.
+                           VT = VAL__BADR
+
+*  Polarised intensity.
+                           VIP = 0.0001 * ( P*P*VI + I*I*VP )
 
 *  If any of the variances are negative store bad results.
-                        IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
-     :                       VP .LT. 0.0 ) THEN
-                           VIP = VAL__BADR
-                           VI = VAL__BADR
-                           VP = VAL__BADR
+                           IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
+     :                          VP .LT. 0.0 ) THEN
+                              VIP = VAL__BADR
+                              VI = VAL__BADR
+                              VP = VAL__BADR
+                           END IF
+
                         END IF
 
                      END IF
 
                   END IF
 
-               END IF
-
 *  Store the required values in the output arrays.
-               IF ( MAKEI ) AI( PIX, ROW ) = I
-               IF ( MAKEP ) AP( PIX, ROW ) = P
-               IF ( MAKET ) AT( PIX, ROW ) = T
-               IF ( MAKEIP ) AIP( PIX, ROW ) = IP
-               IF ( MAKEV ) AV( PIX, ROW ) = VIN
-      
-               IF ( VAR ) THEN
-                  IF ( MAKEI ) AIV( PIX, ROW ) = VI
-                  IF ( MAKEP ) APV( PIX, ROW ) = VP
-                  IF ( MAKET ) ATV( PIX, ROW ) = VT
-                  IF ( MAKEIP ) AIPV( PIX, ROW ) = VIP
-                  IF ( MAKEV ) AVV( PIX, ROW ) = VVIN
-               END IF
+                  IF ( MAKEI ) AI( PIX, ROW, Z ) = I
+                  IF ( MAKEP ) AP( PIX, ROW, Z ) = P
+                  IF ( MAKET ) AT( PIX, ROW, Z ) = T
+                  IF ( MAKEIP ) AIP( PIX, ROW, Z ) = IP
+                  IF ( MAKEV ) AV( PIX, ROW, Z ) = VIN
+         
+                  IF ( VAR ) THEN
+                     IF ( MAKEI ) AIV( PIX, ROW, Z ) = VI
+                     IF ( MAKEP ) APV( PIX, ROW, Z ) = VP
+                     IF ( MAKET ) ATV( PIX, ROW, Z ) = VT
+                     IF ( MAKEIP ) AIPV( PIX, ROW, Z ) = VIP
+                     IF ( MAKEV ) AVV( PIX, ROW, Z ) = VVIN
+                  END IF
    
 *  Append a row to the catalogue if required, and if some of the values
 *  are not bad.
-               IF( MAKECT .AND. ( I .NE. VAL__BADR .OR. 
-     :                            VIN .NE. VAL__BADR .OR. 
-     :                            P .NE. VAL__BADR .OR. 
-     :                            T .NE. VAL__BADR .OR. 
-     :                            IP .NE. VAL__BADR ) ) THEN
+                  IF( MAKECT .AND. ( I .NE. VAL__BADR .OR. 
+     :                               VIN .NE. VAL__BADR .OR. 
+     :                               P .NE. VAL__BADR .OR. 
+     :                               T .NE. VAL__BADR .OR. 
+     :                               IP .NE. VAL__BADR ) ) THEN
 
 *  Increment the number of rows in the catalogue.
-                  NVEC = NVEC + 1
+                     NVEC = NVEC + 1
 
 *  Store values for all the catalogue columns in the current row buffer.
-                  XR = TR( 1 ) + TR( 2 )*REAL( PIX )
-                  YR = TR( 3 ) + TR( 4 )*REAL( ROW )
-                  CALL POL1_PUT0R( XCAT, XR, .FALSE., STATUS )
-                  CALL POL1_PUT0R( YCAT, YR, .FALSE., STATUS )
+                     XR = TR( 1 ) + TR( 2 )*REAL( PIX )
+                     YR = TR( 3 ) + TR( 4 )*REAL( ROW )
+                     ZR = TR( 5 ) + TR( 6 )*REAL( Z )
+                     CALL POL1_PUT0R( XCAT, XR, .FALSE., STATUS )
+                     CALL POL1_PUT0R( YCAT, YR, .FALSE., STATUS )
+                     IF( NDIMO .EQ. 3 ) THEN
+                        CALL POL1_PUT0R( ZCAT, ZR, .FALSE., STATUS )
+                     END IF   
 
-                  IF( EQMAP .NE. AST__NULL ) THEN
-                     CALL POL1_PUT0D( RACAT, W1( PIX, ROW ), .FALSE., 
+                     IF( EQMAP .NE. AST__NULL ) THEN
+                        CALL POL1_PUT0D( RACAT, W( K, 1 ), .FALSE., 
+     :                                  STATUS )
+                        CALL POL1_PUT0D( DECCAT, W( K, 2 ), .FALSE., 
+     :                                  STATUS )
+                     END IF
+
+                     CALL POL1_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
      :                               STATUS )
-                     CALL POL1_PUT0D( DECCAT, W2( PIX, ROW ), .FALSE., 
+                     CALL POL1_PUT0R( VCAT, VIN, ( VIN .EQ. VAL__BADR ), 
      :                               STATUS )
-                  END IF
+                     CALL POL1_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
+     :                               STATUS )
+                     CALL POL1_PUT0R( ANCAT,  T, ( T .EQ. VAL__BADR ), 
+     :                               STATUS )
+                     CALL POL1_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ), 
+     :                               STATUS )
 
-                  CALL POL1_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
-     :                            STATUS )
-                  CALL POL1_PUT0R( VCAT, VIN, ( VIN .EQ. VAL__BADR ), 
-     :                            STATUS )
-                  CALL POL1_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
-     :                            STATUS )
-                  CALL POL1_PUT0R( ANCAT,  T, ( T .EQ. VAL__BADR ), 
-     :                            STATUS )
-                  CALL POL1_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ), 
-     :                            STATUS )
+                     IF( VAR ) THEN
+                        IF( VI .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VI) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DICAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
 
-                  IF( VAR ) THEN
-                     IF( VI .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VI) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DICAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
+                        IF( VVIN .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DVCAT, SQRT( MAX(0.0,VVIN) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DVCAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
+                        IF( VP .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DPCAT, SQRT( MAX(0.0,VP) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DPCAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
+                        IF( VT .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DANCAT, SQRT( MAX(0.0,VT) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DANCAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
+                        IF( VIP .NE. VAL__BADR ) THEN
+                          CALL POL1_PUT0R( DPICAT, SQRT( MAX(0.0,VIP) ), 
+     :                                     .FALSE., STATUS )
+                        ELSE
+                          CALL POL1_PUT0R( DPICAT, VAL__BADR, .TRUE., 
+     :                                     STATUS )
+                        END IF
+
                      END IF
-
-                     IF( VVIN .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DVCAT, SQRT( MAX(0.0,VVIN) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DVCAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                     IF( VP .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DPCAT, SQRT( MAX(0.0,VP) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DPCAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                     IF( VT .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DANCAT, SQRT( MAX(0.0,VT) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DANCAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                     IF( VIP .NE. VAL__BADR ) THEN
-                        CALL POL1_PUT0R( DPICAT, SQRT( MAX(0.0,VIP) ), 
-     :                                  .FALSE., STATUS )
-                     ELSE
-                        CALL POL1_PUT0R( DPICAT, VAL__BADR, .TRUE., 
-     :                                  STATUS )
-                     END IF
-
-                  END IF
 
 *  Append the current row buffer to the catalogue.
-                  CALL CAT_RAPND( CI, STATUS )
+                     CALL CAT_RAPND( CI, STATUS )
    
-               END IF
+                  END IF
 
+               END DO
             END DO
          END DO
-
       END IF
 
 *  Display the number of rows written to the catalogue.

@@ -499,18 +499,31 @@
 *  Get the coefficients of the linear transformation from (X,Y(,Z)) 
 *  position to bin indices.
 *  =================================================================
-*  Find the maximum and minimum X value.
+*  Find the maximum and minimum X value. Ensure that at least one pixel
+*  is spanned by the recorded max and min values.
       CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPX ), NBAD, SXHI,
      :                 SXLO, MAXPOS, MINPOS, STATUS )
+      IF( SXHI - SXLO .LT. 1.0  ) THEN
+         SXHI = 0.5*( SXHI + SXLO + 1.0 ) 
+         SXLO = SXHI - 1.0
+      END IF
 
 *  Find the maximum and minimum Y value.
       CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPY ), NBAD, SYHI,
      :                 SYLO, MAXPOS, MINPOS, STATUS )
+      IF( SYHI - SYLO .LT. 1.0  ) THEN
+         SYHI = 0.5*( SYHI + SYLO + 1.0 ) 
+         SYLO = SYHI - 1.0
+      END IF
 
 *  If required find min and max Z values.
       IF( SPEC ) THEN 
          CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPZ ), NBAD, SZHI,
      :                    SZLO, MAXPOS, MINPOS, STATUS )
+         IF( SZHI - SZLO .LT. 1.0  ) THEN
+            SZHI = 0.5*( SZHI + SZLO + 1.0 ) 
+            SZLO = SZHI - 1.0
+         END IF
       ELSE
          SZHI = 1.0
          SZLO = 0.0
