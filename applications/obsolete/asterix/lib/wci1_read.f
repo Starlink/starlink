@@ -91,7 +91,6 @@
       INCLUDE 'ADI_PAR'					! ADI constants
       INCLUDE 'DAT_PAR'					! HDS constants
       INCLUDE 'WCI_PAR'					! WCI constants
-      INCLUDE 'MATH_PAR'
 
 *  Arguments Given:
       INTEGER			NARG, ARGS(*)
@@ -179,7 +178,6 @@
             REG(2) = .TRUE.
             UNITS(1) = 'arcmin'
             UNITS(2) = 'arcmin'
-            TOR = MATH__DTOR/60.0
             BASE(1) = REAL(DIMS(1)-1)/2.0
             SCALE(1) = -1.0
             BASE(2) = - REAL(DIMS(2)-1)/2.0
@@ -192,13 +190,11 @@
      :                SCALE(1), LABEL, UNITS(1), TOR, STATUS )
           CALL PSF_QAXIS( IPSF, Y_AX, DIMS(2), REG(2), PTR(2), BASE(2),
      :                SCALE(2), LABEL, UNITS(2), TOR, STATUS )
+          BASE(1) = BASE(1) / TOR
+          SCALE(1) = SCALE(1) / TOR
+          BASE(2) = BASE(2) / TOR
+          SCALE(2) = SCALE(2) / TOR
         END IF
-      END IF
-      IF ( HASPIX ) THEN
-        BASE(1) = BASE(1) / TOR
-        SCALE(1) = SCALE(1) / TOR
-        BASE(2) = BASE(2) / TOR
-        SCALE(2) = SCALE(2) / TOR
       END IF
 
 *  Look for ASTERIX header data
