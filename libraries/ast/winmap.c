@@ -3379,16 +3379,20 @@ AstWinMap *astLoadWinMap_( void *mem, size_t size, int init,
    new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
                          channel );
 
+/* Check the piinter can be used */
+   if( astOK ) {
+
 /* Get the number of axis for the mapping. */
-   ncoord = astGetNin( (AstMapping *) new );
+      ncoord = astGetNin( (AstMapping *) new );
 
 /* Allocate memory to hold the scales and shifts. */
-   new->a = (double *) astMalloc( sizeof(double)*(size_t)ncoord );   
-   new->b = (double *) astMalloc( sizeof(double)*(size_t)ncoord );   
+      new->a = (double *) astMalloc( sizeof(double)*(size_t)ncoord );   
+      new->b = (double *) astMalloc( sizeof(double)*(size_t)ncoord );   
 
 /* If required, initialise the part of the virtual function table used
    by this class. */
-   if ( init ) InitVtab( vtab );
+      if ( init ) InitVtab( vtab );
+   }
 
 /* Note if we have successfully initialised the (static) virtual
    function table owned by this class (so that this is done only
