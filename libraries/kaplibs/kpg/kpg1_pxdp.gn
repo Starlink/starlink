@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_PXDP<T>( IDIMS, INARR, EXPAND, ODIMS, OUTARR,
-     :                         STATUS )
+      SUBROUTINE KPG1_PXDP<T>( IDIMS, INARR, EXPAND, USEMSK, MASK, 
+     :                         ODIMS, OUTARR, STATUS )
 *+
 *  Name:
 *     KPG1_PXDPx
@@ -11,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_PXDPx( IDIMS, INARR, EXPAND, ODIMS, OUTARR, STATUS )
+*     CALL KPG1_PXDPx( IDIMS, INARR, EXPAND, USEMSK, MASK, ODIMS, 
+*                      OUTARR, STATUS )
 
 *  Description:
 *     This routine expands an input array by pixel duplication along
@@ -28,6 +29,22 @@
 *        The linear expansion factor applied along each dimension.
 *        Factors for unused dimensions up to NDF__MXDIM should be set
 *        to one.
+*     USEMSK = LOGICAL (Given)
+*        Should the mask array supplied by argument MASK be used?
+*     MASK( * ) = REAL (Given)
+*        Only accessed if USEMSK is .TRUE. The MASK array corresponds to
+*        a single expansion block in the output array, and so should have
+*        a size equal to the product of the values supplied in the EXPAND 
+*        argument. If USEMSK is .true., the value stored for each output 
+*        pixel equals the product of the input pixel which is being
+*        duplicated, and the corresponding mask pixel (that is, the mask
+*        pixel which is at the same position as the output position is
+*        within its current block of output pixels). If USEMSK is .FALSE.
+*        each output pixel value is simply equal to the input pixel value
+*        which is being duplicated. This is equivalent to using a mask
+*        which is filled with the value 1.0. The suplied mask array may
+*        contain VAL__BADR values in which case the corresponding output
+*        pixel will be set to VAL__BAD<T>.
 *     ODIMS( NDF__MXDIM ) = INTEGER (Given)
 *        The dimensions of the expanded array.  Unused dimensions up to
 *        NDF__MXDIM should be set to one.
@@ -47,6 +64,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +72,8 @@
 *        Original version.
 *     1995 April 28 (MJC):
 *        Completed and used a more-modern style.
+*     10-NOV-2004 (DSB):
+*        Add USEMSK and MASK arguments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,11 +87,14 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Global SSE definitions
       INCLUDE 'NDF_PAR'          ! NDF public constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER IDIMS( NDF__MXDIM )
       <TYPE> INARR( * )
       INTEGER EXPAND( NDF__MXDIM )
+      LOGICAL USEMSK
+      REAL MASK( * )
       INTEGER ODIMS( NDF__MXDIM )
 
 *  Arguments Returned:
@@ -81,6 +104,7 @@
       INTEGER STATUS             ! Global inherited status
 
 *  Local Variables:
+      DOUBLE PRECISION PROD      ! Product of mask value an dinput value
       INTEGER I1                 ! Loop counter
       INTEGER I2                 ! Loop counter
       INTEGER I3                 ! Loop counter
@@ -88,12 +112,17 @@
       INTEGER I5                 ! Loop counter
       INTEGER I6                 ! Loop counter
       INTEGER I7                 ! Loop counter
+      INTEGER IM( NDF__MXDIM )   ! Sum of pixel offsets for mask array
+                                 ! leading to mask-array index [IM(1)]
       INTEGER IN( NDF__MXDIM )   ! Sum of pixel offsets for input array
                                  ! leading to input-array index [IN(1)]
       INTEGER IO                 ! Pixel index to output array
+      INTEGER IP                 ! Integer part of division
       INTEGER J                  ! Loop counter
-      INTEGER STRID( NDF__MXDIM ) ! Dimension strides for input array
-
+      INTEGER MSTRID( NDF__MXDIM )! Dimension strides for mask array
+      INTEGER STRID( NDF__MXDIM )! Dimension strides for input array
+      REAL MV                    ! Mask value
+      <TYPE> IV                  ! Input value
 *.
 
 *  Check the inherited global status.
@@ -113,48 +142,141 @@
 *  Initialise the pixel index of the output array.
       IO = 1
 
+*  First handle cases where a mask is being used.
+      IF( USEMSK ) THEN
+
+*  Calculate the strides for each mask array.
+         MSTRID( 1 ) = 1
+         DO J = 2, NDF__MXDIM
+            MSTRID( J ) = MSTRID( J - 1 ) * EXPAND( J - 1 )
+         END DO
+
 *  Copy the data from the input array to the output array the
 *  appropriate number of times given the expansion factors.  Move
 *  through the output array in order and calculate the vectorised pixel
 *  index of the input array element that is to be copied to the output
 *  element.  This is achieved using the strides and a summation.
-      DO I7 = 1, ODIMS( 7 )
-         IN( 7 ) = ( I7 - 1 ) / EXPAND( 7 ) * STRID( 7 ) + 1
+         DO I7 = 1, ODIMS( 7 )
 
-         DO I6 = 1, ODIMS( 6 )
-            IN( 6 ) = ( I6 - 1 ) / EXPAND( 6 ) * STRID( 6 ) + IN( 7 )
+*  Find the number of whole expansion lengths below the current value on
+*  the 7th output axis. This relies on integer division.
+            IP = ( I7 - 1 ) / EXPAND( 7 ) 
+ 
+*  Find the number of output pixels by which the current output pixel
+*  exceeds the boundary of the previous expansion block on this axis (the
+*  remainder in the above integer division). This is the index into the mask 
+*  array on the 7th axis. Then multiply by the mask stride and add 1 in
+*  order to get the index of the first mask element within MASK
+*  corresponding to this value on the 7th mask axis. 
+            IM( 7 ) = ( I7 - 1 - IP * EXPAND( 7 ) ) * MSTRID( 7 ) + 1
 
-            DO I5 = 1, ODIMS( 5 )
-               IN( 5 ) = ( I5 - 1 ) / EXPAND( 5 ) * STRID( 5 ) + IN( 6 )
+*  Find the index of the first input pixel on the corresponding input axis.
+            IN( 7 ) = IP * STRID( 7 ) + 1
 
-               DO I4 = 1, ODIMS( 4 )
-                  IN( 4 ) = ( I4 - 1 ) / EXPAND( 4 ) * STRID( 4 ) +
-     :                      IN( 5 )
+*  Do the same for the remaining axes.
+            DO I6 = 1, ODIMS( 6 )
+               IP = ( I6 - 1 ) / EXPAND( 6 ) 
+               IM( 6 ) = ( I6 - 1 - IP*EXPAND( 6 ) ) * MSTRID( 6 ) 
+     :                   + IM( 7 )
+               IN( 6 ) = IP * STRID( 6 ) + IN( 7 )
+   
+               DO I5 = 1, ODIMS( 5 )
+                  IP = ( I5 - 1 ) / EXPAND( 5 ) 
+                  IM( 5 ) = ( I5 - 1 - IP*EXPAND( 5 ) ) * MSTRID( 5 ) 
+     :                      + IM( 6 )
+                  IN( 5 ) = IP * STRID( 5 ) + IN( 6 )
+   
+                  DO I4 = 1, ODIMS( 4 )
+                     IP = ( I4 - 1 ) / EXPAND( 4 ) 
+                     IM( 4 ) = ( I4 - 1 - IP*EXPAND( 4 ) ) * MSTRID( 4 ) 
+     :                         + IM( 5 )
+                     IN( 4 ) = IP * STRID( 4 ) + IN( 5 )
+   
+                     DO I3 = 1, ODIMS( 3 )
+                        IP = ( I3 - 1 ) / EXPAND( 3 ) 
+                        IM( 3 ) = ( I3 - 1 - IP*EXPAND( 3 ) ) 
+     :                            * MSTRID( 3 ) + IM( 4 )
+                        IN( 3 ) = IP * STRID( 3 ) + IN( 4 )
+   
+                        DO I2 = 1, ODIMS( 2 )
+                           IP = ( I2 - 1 ) / EXPAND( 2 ) 
+                           IM( 2 ) = ( I2 - 1 - IP*EXPAND( 2 ) ) 
+     :                               * MSTRID( 2 ) + IM( 3 )
+                           IN( 2 ) = IP * STRID( 2 ) + IN( 3 )
+   
+                           DO I1 = 1, ODIMS( 1 )
+                              IP = ( I1 - 1 ) / EXPAND( 1 ) 
+                              IM( 1 ) = ( I1 - 1 - IP*EXPAND( 1 ) ) 
+     :                                  + IM( 2 )
+                              IN( 1 ) = IP + IN( 2 )
 
-                  DO I3 = 1, ODIMS( 3 )
-                     IN( 3 ) = ( I3 - 1 ) / EXPAND( 3 ) * STRID( 3 ) +
-     :                         IN( 4 )
-
-                     DO I2 = 1, ODIMS( 2 )
-                        IN( 2 ) = ( I2 - 1 ) / EXPAND( 2 ) * STRID( 2 )
-     :                            + IN( 3 )
-
-                        DO I1 = 1, ODIMS( 1 )
-                           IN( 1 ) = ( I1 - 1 ) / EXPAND( 1 ) + IN( 2 )
-
-*  Copy the input value to the output array.
-                           OUTARR( IO ) = INARR( IN( 1 ) )
+*  Multiply the input value by the mask value and copy the product to the 
+*  output array. Check that the product fits within the range of the data
+*  type.
+                              MV = MASK( IM( 1 ) )
+                              IV = INARR( IN( 1 ) )
+                              IF( MV .NE. VAL__BADR .AND.
+     :                            IV .NE. VAL__BAD<T> ) THEN
+                                 PROD = IV*MV
+                                 IF( PROD .LT. VAL__MAX<T> .AND.
+     :                               PROD .GT. VAL__MIN<T> ) THEN
+                                    OUTARR( IO ) = IV*MV
+                                 ELSE
+                                    OUTARR( IO ) = VAL__BAD<T>
+                                 END IF
+                              ELSE
+                                 OUTARR( IO ) = VAL__BAD<T>
+                              END IF
 
 *  Move to the next output pixel by shifting the pixel index of the
 *  output pixel by one.
-                           IO = IO + 1
-
+                              IO = IO + 1
+   
+                           END DO
                         END DO
                      END DO
                   END DO
                END DO
             END DO
          END DO
-      END DO
+
+*  Now handle cases where no mask is being used.
+      ELSE
+
+         DO I7 = 1, ODIMS( 7 )
+            IN( 7 ) = ( I7 - 1 ) / EXPAND( 7 ) * STRID( 7 ) + 1
+   
+            DO I6 = 1, ODIMS( 6 )
+               IN( 6 ) = ( I6 - 1 ) / EXPAND( 6 ) * STRID( 6 ) + IN( 7 )
+   
+               DO I5 = 1, ODIMS( 5 )
+                  IN( 5 ) = ( I5 - 1 ) / EXPAND( 5 ) * STRID( 5 ) + IN( 6 )
+   
+                  DO I4 = 1, ODIMS( 4 )
+                     IN( 4 ) = ( I4 - 1 ) / EXPAND( 4 ) * STRID( 4 ) +
+     :                         IN( 5 )
+   
+                     DO I3 = 1, ODIMS( 3 )
+                        IN( 3 ) = ( I3 - 1 ) / EXPAND( 3 ) * STRID( 3 ) +
+     :                            IN( 4 )
+   
+                        DO I2 = 1, ODIMS( 2 )
+                           IN( 2 ) = ( I2 - 1 ) / EXPAND( 2 ) * STRID( 2 )
+     :                               + IN( 3 )
+   
+                           DO I1 = 1, ODIMS( 1 )
+                              IN( 1 ) = ( I1 - 1 ) / EXPAND( 1 ) + IN( 2 )
+                              OUTARR( IO ) = INARR( IN( 1 ) )
+                              IO = IO + 1
+   
+                           END DO
+                        END DO
+                     END DO
+                  END DO
+               END DO
+            END DO
+         END DO
+
+      END IF
 
       END
