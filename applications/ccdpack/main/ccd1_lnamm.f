@@ -1,26 +1,29 @@
-      SUBROUTINE CCD1_LNAM( PARAM, INDXLO, INDXHI, TITLE, GRPID,
-     :                      COMMEN, STATUS )
+      SUBROUTINE CCD1_LNAMM( PARAM, INDXLO, INDXHI, TITLE, GRPID,
+     :                       VALID, COMMEN, STATUS )
 *+
 *  Name:
-*     CCD1_LNAM
+*     CCD1_LNAMM
 
 *  Purpose:
 *     Lists the contents of an IRH group to a file via an ADAM
-*     parameter.
+*     parameter. Empty files are not recorded.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_LNAM( PARAM, INDXHI, INDXLO, TITLE, GRPID, COMMEN,
-*                     STATUS )
+*     CALL CCD1_LNAMM( PARAM, INDXHI, INDXLO, TITLE, GRPID, VALID, 
+*                      COMMEN, STATUS )
 
 *  Description:
 *     This routine writes the names of the elements in the input IRH
-*     group into a text file. The text file is opened via the ADAM
-*     parameter PARAM.  The names in the group are taken from the index
-*     range INDXLO to INDXHI. A title is written to the first line of
-*     the file.
+*     group into a text file. An integer array is also given which
+*     indicates whether the associated name should be written. Array
+*     elements with value 0 are not written.
+*
+*     The output text file is opened via the ADAM parameter PARAM.  The
+*     names in the group are taken from the index range INDXLO to
+*     INDXHI. A title is written to the first line of the file.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -36,6 +39,10 @@
 *        character # first (i.e. '#  then the actual comment').
 *     GRPID = INTEGER (Given)
 *        The IRH identifier of the group.
+*     VALID( INDXHI ) = INTEGER (Given)
+*        Array of integer values indicating whether the associated name
+*        should be added to the output file or not. If the value
+*        associated with a name is 0 then it will not be written.
 *     COMMEN = _LOGICAL (Given)
 *        Whether to write a comment to the user about the name of the
 *        output file or not.
@@ -47,10 +54,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     25-MAY-1993 (PDRAPER):
-*        Original version.
-*     16-JUN-1993 (PDRAPER):
-*        Added COMMEN argument as $PARAMETER does not return name.
+*     12-NOV-1998 (PDRAPER):
+*        Original version. Based on CCD1_LNAM, just added integer array
+*        which really indicates the number of detections associated with
+*        the name
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -72,6 +79,7 @@
       INTEGER INDXHI
       CHARACTER * ( * ) TITLE
       INTEGER GRPID
+      INTEGER VALID( * ) 
       LOGICAL COMMEN
 
 *  Status:
@@ -104,11 +112,13 @@
 *  Loop over the required index extracting the names and then writting
 *  them into the file.
       DO 1 I = INDXLO, INDXHI
-         NAME = ' '
-         CALL IRH_GET( GRPID, I, 1, NAME, STATUS )
+         IF ( VALID( I ) .NE. 0 ) THEN 
+            NAME = ' '
+            CALL IRH_GET( GRPID, I, 1, NAME, STATUS )
 
 *  Now write out the name.
-         CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), STATUS )
+            CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), STATUS )
+         END IF
  1    CONTINUE
 
       IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN 
