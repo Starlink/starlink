@@ -8,12 +8,12 @@
 *     surface brightness vs radius and azimuth.
 *
 *    Parameters :
-*     INPUT   CHAR    Name of input data structure
-*     OUTPUT  CHAR    Name of output data structure
+*     INP     CHAR    Name of input data structure
+*     OUT     CHAR    Name of output data structure
 *     XCENT   REAL    X value of centre of polar
 *     YCENT   REAL    Y value of centre of polar
-*     RADIAL_BINSIZE  size of radial bins
-*     AZIM_BINSIZE    size of azimuthal bins
+*     RBIN    REAL    Size of radial bins
+*     ABIN    REAL    Size of azimuthal bins
 *
 *    Method :
 *
@@ -150,8 +150,8 @@
       CALL AST_INIT()
 
 *    Get input and output data paths
-      CALL USI_ASSOC2( 'INPUT', 'OUTPUT', 'READ', ILOC, OLOC,
-     :                                       INPRIM, STATUS )
+      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC,
+     :                                  INPRIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map the input data array if present
@@ -265,8 +265,8 @@
       PYCENT = (YCENT-AMIN(2)) / ASCALE(2) + 0.5
 
 *    Get radial and azimuthal binsizes
-      CALL USI_GET0R('RADIAL_BINSIZE',RBIN,STATUS)
-      CALL USI_GET0R('AZIM_BINSIZE',ABIN, STATUS)
+      CALL USI_GET0R('RBIN',RBIN,STATUS)
+      CALL USI_GET0R('ABIN',ABIN, STATUS)
 
 *    Normalise to axis units or /pixel?
       CALL USI_GET0L('NORM',NORM,STATUS)
