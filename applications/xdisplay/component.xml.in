@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/xdisplay</path>
+  <description>Automatically determine how to set the DISPLAY variable</description>
+  <abstract><p>
+   This C shell script will set up the DISPLAY environment variable to
+   point to the machine that you logged in from. This allow X displays
+   created on a remote X client to be pointed back to your own terminal
+   or computer. Generally not needed since ssh does this automatically.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter Allan</name>
+    </person>
+    <person>
+      <name>Paul Collison</name>
+    </person>
+    <person>
+      <name>Brian McIlwrath</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
