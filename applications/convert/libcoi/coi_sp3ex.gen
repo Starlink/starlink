@@ -1,0 +1,147 @@
+      SUBROUTINE COI_SP3E<T>( NPIECE, COEFF, PMIN, PMAX, Z, EL, CENTRE,
+     :                        STATUS )
+*+
+*  Name:
+*     COI_SP3Ex
+
+*  Purpose:
+*     Creates axis centres within an NDF from Multispec ftype=3 axis
+*     information in an IRAF header.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COI_SP3Ex( NPIECE, COEFF, PMIN, PMAX, Z, EL, CENTRE, STATUS )
+
+*  Description:
+*     The routine evaluates a cubic spline for each axis centre.  It
+*     uses the information from a Multispec specN parameter.  derived
+*     from the WAT2_nnn headers which define an axis structure stored
+*     using the IRAF Mini World Co-ordinate System (MWCS) in the
+*     Multispec format.  The redshift correction is applied.
+
+*  Arguments:
+*     NPIECE = INTEGER (Given)
+*        The number of spline pieces.  The number of coefficients is
+*        NPIECE+3.
+*     COEFF( 0:NPIECE+2 ) = ? (Given)
+*        The Chebyshev polynomial coefficients.
+*     PMIN = ? (Given)
+*        The co-ordinate lower limit for the spline.
+*     PMAX = ? (Given)
+*        The co-ordinate upper limit for the spline.
+*     Z = ? (Returned)
+*        Redshift.  This is normally 0.  The axis centres are scaled
+*        by 1/(1+Z).
+*     EL = INTEGER (Given)
+*        The number of axis values in the axis centre-array.
+*     CENTRE = ? (Returned)
+*        The evaluated array axis centres.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - There is a routine for real and double precision data types:
+*     replace "x" in the routine name by R or D as appropriate.  The
+*     COEFF, PMIN, PMAX, Z, and CENTRE arguments must have this data
+*     type.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1997 July 31 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+
+*  Arguments Given:
+      INTEGER NPIECE
+      <TYPE> COEFF( 0:NPIECE + 2 )
+      <TYPE> PMIN
+      <TYPE> PMAX
+      <TYPE> Z
+      INTEGER EL
+
+*  Arguments Returned:
+      <TYPE> CENTRE( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      <LTYPE> A                  ! Lower fractional difference
+      <LTYPE> B                  ! Upper ractional difference
+      INTEGER I                  ! Loop counter
+      INTEGER J                  ! Piece where current co-ordinate lies
+      INTEGER K                  ! Loop counter
+      <LTYPE> P                  ! Scaled co-ordinate
+      <LTYPE> PRANGE             ! Scaling range
+      <LTYPE> S                  ! Fractional piece number
+      <LTYPE> SUM                ! Used for summation of polynomial
+      <LTYPE> X( 0:3 )           ! Co-ordinates at each order
+      <LTYPE> ZCORR              ! Redshift correction
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Evaluate the redshift correction factor, ensuring that it is
+*  positive.
+      ZCORR = MAX( VAL__EPS<T>, 1<CONST> + Z )
+
+*  Define a useful variable.
+      PRANGE = ( PMAX - PMIN ) / NUM_ITO<T>( NPIECE )
+
+*  Loop for each element.
+      DO K = 1, EL
+
+*  Determine in which piece the co-ordinate is located.  Ensure that
+*  J is between 0 and NPIECE-1, i.e. to give just NPIECE different
+*  pieces.
+         P = NUM_ITO<T>( K )
+         S = ( P - PMIN ) / PRANGE
+         J = MIN( NPIECE - 1, MAX( 0, INT( S ) ) )
+
+*  Find the fractional positions within the piece.
+         A = NUM_ITO<T>( J + 1 ) - S
+         B = S - NUM_ITO<T>( J )
+
+*  Evaluate the higher-order co-ordinates.
+         X( 0 ) = A * A * A
+         X( 1 ) = 1<CONST> + 3<CONST> * A * ( 1<CONST> + A * B )
+         X( 2 ) = 1<CONST> + 3<CONST> * B * ( 1<CONST> + A * B )
+         X( 3 ) = B * B * B
+
+*  Evaluate the cubic spline.
+         SUM = 0<CONST>
+         DO I = 0, 3
+            SUM = SUM + COEFF( I + J ) * X( I )
+         END DO
+
+*  Assign the axis-centre value to the evaluated cubic spline.  Apply
+*  the redshift correction.
+         CENTRE( K ) = SUM / ZCORR
+      END DO
+
+  999 CONTINUE
+
+      END
