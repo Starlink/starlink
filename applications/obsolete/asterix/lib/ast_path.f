@@ -28,6 +28,12 @@
       IF (STATUS.NE.SAI__OK) THEN
 
         CALL PSX_GETENV(ALT,BUFF,STATUS)
+        IF (CHR_LEN(BUFF).EQ.0) THEN
+          CALL PSX_GETENV(DEF,BUFF,STATUS)
+          IF (CHR_LEN(BUFF).EQ.0) THEN
+            CALL PSX_GETENV('AST_ETC',BUFF,STATUS)
+          ENDIF
+        ENDIF
 
       ENDIF
 
