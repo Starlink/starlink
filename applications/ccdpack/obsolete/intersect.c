@@ -1,3 +1,7 @@
+
+
+
+
 /*
 This code is described in "Computational Geometry in C" (Second Edition),
 Chapter 7.  It is not written to be comprehensible without the
@@ -26,6 +30,7 @@ typedef double  tPointi[DIM];   /* type integer point */
 typedef double  tPointd[DIM];   /* type double point */
 #define PMAX    100             /* Max # of pts in polygon */
 
+
 typedef tPointi tPolygoni[PMAX];/* type integer polygon */
 
 /*---------------------------------------------------------------------
@@ -43,30 +48,40 @@ void    SubVec( tPointi a, tPointi b, tPointi c );
 bool    LeftOn( tPointi a, tPointi b, tPointi c );
 bool    Left( tPointi a, tPointi b, tPointi c );
 void    PrintPoly( int n, tPolygoni P );
-void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m );
+void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m, tPointd *Z, int *pnz );
 tInFlag InOut( tPointd p, tInFlag inflag, int aHB, int bHA );
 int     Advance( int a, int *aa, int n, bool inside, tPointi v );
 void	OutputPolygons( void );
+
+void firstpoint( tPointd p, tPointd dest );
+void addpoint( tPointd p, tPointd dest );
 /*-------------------------------------------------------------------*/
 
 /* Global variables */
-int     	n, m;
+int     	n, m, nz;
 tPolygoni	P, Q;
+tPointd         Z[PMAX*2];
 
 main()
 {
-
+   int i;
    n = ReadPoly( P );
    m = ReadPoly( Q );
    OutputPolygons();
-   ConvexIntersect( P, Q, n, m );
+   fprintf( stderr, "Starting calculations:\n" );
+   ConvexIntersect( P, Q, n, m, Z, &nz );
 
+   fprintf( stderr, "Intersect polygon has %d vertices:\n", nz );
+   for ( i = 0; i < nz; i++ ) {
+      fprintf( stderr, "%8.2lf  %8.2lf\n", Z[i][X], Z[i][Y] );
+   }
    ClosePostscript();
 }
 
 /*---------------------------------------------------------------------
 ---------------------------------------------------------------------*/
-void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
+void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m,
+                         tPointd *Z, int *pnz )
                            /* P has n vertices, Q has m vertices. */
 {
    int     a, b;           /* indices on P and Q (resp.) */
@@ -86,6 +101,7 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
    /* Initialize variables. */
    a = 0; b = 0; aa = 0; ba = 0;
    inflag = Unknown; FirstPoint = TRUE;
+   *pnz = 0;
 
    do {
       /* Computations of key variables. */
@@ -107,9 +123,9 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
             aa = ba = 0;
             FirstPoint = FALSE;
             p0[X] = p[X]; p0[Y] = p[Y];
-            printf("%8.2lf %8.2lf moveto\n", p0[X], p0[Y] );
+            firstpoint( p0, Z[(*pnz)++] );
          }
-         printf("%8.2lf %8.2lf lineto\n", p[X], p[Y] );
+         addpoint( p, Z[(*pnz)++] );
          inflag = InOut( p, inflag, aHB, bHA );
       }
 
@@ -118,27 +134,27 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
       /* Special case: A & B overlap and oppositely oriented. */
       if ( ( code == 'e' ) && (Dot( A, B ) < 0) ) {
          printf("%%A int B:\n");
-         printf("%8.2lf %8.2lf moveto\n", p[X], p[Y] );
-         printf("%8.2lf %8.2lf lineto\n", q[X], q[Y] );
+         firstpoint( p, Z[(*pnz)++] );
+         addpoint( q, Z[(*pnz)++] );
          ClosePostscript();
-         exit(EXIT_SUCCESS);
+         return;
       }
 
       /* Special case: A & B parallel and separated. */
-      if ( (cross == 0) && ( aHB < 0) && ( bHA < 0 ) )
-            printf("%%P and Q are disjoint.\n"), exit(EXIT_SUCCESS);
+      if ( (cross == 0) && ( aHB < 0) && ( bHA < 0 ) ) {
+            printf("%%P and Q are disjoint.\n");
+            return;
+      }
 
       /* Special case: A & B collinear. */
       else if ( (cross == 0) && ( aHB == 0) && ( bHA == 0 ) ) {
             /* Advance but do not output point. */
             if ( inflag == Pin ) {
-               if ( inflag == Qin ) 
-                  printf("%8.2lf    %8.2lf    lineto\n", Q[b][X], Q[b][Y] );
+               if ( inflag == Qin ) addpoint( Q[b], Z[(*pnz)++] );
                b = Advance( b, &ba, m, inflag == Qin, Q[b] );
             }
             else {
-               if ( inflag == Pin )
-                  printf("%8.2lf    %8.2lf    lineto\n", P[a][X], P[a][Y] );
+               if ( inflag == Pin ) addpoint( P[a], Z[(*pnz)++] );
                a = Advance( a, &aa, n, inflag == Pin, P[a] );
             }
          }
@@ -146,25 +162,21 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
       /* Generic cases. */
       else if ( cross >= 0 ) {
          if ( bHA > 0) {
-            if ( inflag == Pin )
-               printf("%8.2lf    %8.2lf    lineto\n", P[a][X], P[a][Y] );
+            if ( inflag == Pin ) addpoint( P[a], Z[(*pnz)++] );
             a = Advance( a, &aa, n, inflag == Pin, P[a] );
          }
          else {
-            if ( inflag == Qin )
-               printf("%8.2lf    %8.2lf    lineto\n", Q[b][X], Q[b][Y] );
+            if ( inflag == Qin ) addpoint( Q[b], Z[(*pnz)++] );
             b = Advance( b, &ba, m, inflag == Qin, Q[b] );
          }
       }
       else /* if ( cross < 0 ) */{
          if ( aHB > 0) {
-            if ( inflag == Qin )
-               printf("%8.2lf    %8.2lf    lineto\n", Q[b][X], Q[b][Y] );
+            if ( inflag == Qin ) addpoint( Q[b], Z[(*pnz)++] );
             b = Advance( b, &ba, m, inflag == Qin, Q[b] );
          }
          else {
-            if ( inflag == Pin )
-               printf("%8.2lf    %8.2lf    lineto\n", P[a][X], P[a][Y] );
+            if ( inflag == Pin ) addpoint( P[a], Z[(*pnz)++] );
             a = Advance( a, &aa, n, inflag == Pin, P[a] );
          }
       }
@@ -173,11 +185,23 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m )
    } while ( ((aa < n) || (ba < m)) && (aa < 2*n) && (ba < 2*m) );
 
    if ( !FirstPoint ) /* If at least one point output, close up. */
-            printf("%8.2lf %8.2lf lineto\n", p0[X], p0[Y] );
+            addpoint( p0, Z[(*pnz)++] );
 
    /* Deal with special cases: not implemented. */
    if ( inflag == Unknown) 
       printf("%%The boundaries of P and Q do not cross.\n");
+}
+
+void firstpoint( tPointi p, tPointi dest ) {
+   dest[X] = p[X];
+   dest[Y] = p[Y];
+   printf("%8.2lf %8.2lf moveto\n", p[X], p[Y]);
+}
+
+void addpoint( tPointd p, tPointd dest ) {
+   dest[X] = p[X];
+   dest[Y] = p[Y];
+   printf("%8.2lf %8.2lf lineto\n", p[X], p[Y]);
 }
 
 /*---------------------------------------------------------------------
@@ -213,8 +237,6 @@ int   ReadPoly( tPolygoni P )
    int   nin;
 
    scanf("%d", &nin);
-   /*printf("%%Polygon:\n");
-   printf("%%  i   x   y\n");*/
    while ( (n < nin) && (scanf("%lf %lf",&P[n][0],&P[n][1]) != EOF) ) {
       ++n;
    }
@@ -313,14 +335,12 @@ char	SegSegInt( tPointi a, tPointi b, tPointi c, tPointi d, tPointd p, tPointd q
             d[X] * (double)( c[Y] - a[Y] );
    if ( (num == 0.0) || (num == denom) ) code = 'v';
    s = num / denom;
-   /*printf("num=%lf, denom=%lf, s=%lf\n", num, denom, s);*/
 
    num = -( a[X] * (double)( c[Y] - b[Y] ) +
             b[X] * (double)( a[Y] - c[Y] ) +
             c[X] * (double)( b[Y] - a[Y] ) );
    if ( (num == 0.0) || (num == denom) ) code = 'v';
    t = num / denom;
-   /*printf("num=%lf, denom=%lf, t=%lf\n", num, denom, t);*/
 
    if      ( (0.0 < s) && (s < 1.0) &&
              (0.0 < t) && (t < 1.0) )
