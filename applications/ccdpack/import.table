@@ -36,6 +36,10 @@ SATVAL       _DOUBLE   CCDPK107
 !  Position list information
 CURRENT_LIST _CHAR     CCDPK200
 
+!  Set header information
+SET.NAME     _CHAR     CCDPK210
+SET.INDEX    _INTEGER  CCDPK211
+
 !  Transform structure. Note that FORWARD_FUNC and INVERSE_FUNC 
 !  reserve a range of 10 keywords.
 TRANSFORM.TRN_VERSION                      _CHAR     CCDPK300

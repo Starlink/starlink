@@ -36,6 +36,10 @@ SATVAL    _DOUBLE   CCDPK107   Actual saturation value applied to data.
 !  Position list information
 CURRENT_LIST _CHAR  CCDPK200 Currently associated position list.
 
+!  Set header information
+SET.NAME  _CHAR     CCDPK210 Set Name attribute
+SET.INDEX _INTEGER  CCDPK211 Set Index attribute
+
 !  Transform structure. Note that FORWARD_FUNC and INVERSE_FUNC 
 !  reserve a range of 10 keywords.
 TRANSFORM.TRN_VERSION                      _CHAR     CCDPK300
