@@ -201,8 +201,11 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
    int np;
    int overlap;             
 
+/* Initialise */
+   result = NULL;
+
 /* Check the local error status. */
-   if ( !astOK ) return NULL;
+   if ( !astOK ) return result;
 
 /* If the Interval is effectively a Box, invoke the astBndBaseMesh
    function on the equivalent Box. A pointer to the equivalent Box will
@@ -362,6 +365,9 @@ static void Cache( AstInterval *this ){
 /* See if the Interval is effectively a (possibly negated) Box. Assume it
    is to begin with.  */
       isBox = 1;
+
+/* Initialisation to prevent compiler warnings. */
+      neg = 0;   
 
 /* Check the limits on every axis. */
       for( i = 0; i < nc; i++ ) {
@@ -1612,6 +1618,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    increment (this allows small non-zero displacements to occur on the 
    other axes due to rounding errors). */
                      maxd = -DBL_MAX;
+                     bax = -1;
                      for( jc = 0; jc < nc; jc++ ) {
                         d = astAxDistance( bfrm, jc + 1, ptr3[ jc ][ 0 ],
                                            ptr3[ jc ][ ic + 1 ] );

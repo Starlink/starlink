@@ -5113,6 +5113,10 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Further initialise to prevent compiler "uninitialised use" messages. */
+   d1 = NULL;
+   d2 = NULL;
+
 /* Obtain a pointer to the CmpFrame structure. */
    this = (AstCmpFrame *) this_frame;
 

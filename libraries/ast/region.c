@@ -7138,11 +7138,11 @@ double *astRegTranPoint_( AstRegion *this, double *in, int np, int forward ){
             for( ic = 0; ic < naxout; ic++ ) *(p++) = ptr_out[ ic ][ ip ];
          }
       }
-   }
 
 /* Free resources. */
+      pset_out = astAnnul( pset_out );
+   }
    pset_in = astAnnul( pset_in );
-   pset_out = astAnnul( pset_out );
    map = astAnnul( map );
 
 /* Return NULL if anything went wrong. */

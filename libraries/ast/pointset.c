@@ -191,8 +191,11 @@ void astClear##attr##_( AstPointSet *this, int axis ) { \
 static type Get##attr( AstPointSet *this, int axis ) { \
    type result;                  /* Result to be returned */ \
 \
+/* Initialise */ \
+   result = bad_value; \
+\
 /* Check the global error status. */ \
-   if ( !astOK ) return (bad_value); \
+   if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= this->ncoord ){ \
@@ -365,9 +368,10 @@ void astSet##attr##_( AstPointSet *this, int axis, type value ) { \
 static int Test##attr( AstPointSet *this, int axis ) { \
    int result;                   /* Value to return */ \
 \
-/* Check the global error status. */ \
-   if ( !astOK ) return 0; \
+   result= 0; \
 \
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= this->ncoord ){ \
