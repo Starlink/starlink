@@ -93,7 +93,7 @@
           CALL GDV_CLOSE(STATUS)
           CALL GCB_DETACH(STATUS)
           T_OPEN=.FALSE.
-          CALL ADI_CLOSE(IFID,STATUS)
+          CALL ADI_FCLOSE(IFID,STATUS)
           CALL AST_CLOSE()
         ENDIF
 
