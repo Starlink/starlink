@@ -18,7 +18,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       REAL ENERGY                 ! energy in keV
       REAL KT                     ! plasma temperature in keV

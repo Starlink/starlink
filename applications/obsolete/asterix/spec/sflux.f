@@ -54,6 +54,7 @@
 *     24 Jan 94 : V1.7-2 SPLIT mode can now calculates unabsorbed fluxes in
 *                        additive model components. (DJA)
 *      8 Feb 94 : V1.7-3 More changes to FIT_MCALC interface (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -63,7 +64,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure declarations:
@@ -125,7 +125,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-	PARAMETER		( VERSION='SFLUX Version 1.7-3' )
+	PARAMETER		( VERSION='SFLUX Version 1.8-0' )
 *-
 
 *    Version
@@ -147,7 +147,7 @@
       CALL SFIT_GETZ( Z, STATUS )
 
 *    Enter no of energy channels
-      CALL PAR_GET0I('NO_OF_CHANNELS',NEN,STATUS)
+      CALL USI_GET0I('NO_OF_CHANNELS',NEN,STATUS)
       IF(STATUS.NE.SAI__OK) GOTO 9000
       IF(NEN.GT.MAXEN) THEN
 	CALL MSG_SETI('MAXEN',MAXEN)
@@ -157,8 +157,8 @@
 
 *    Enter energy range to be integrated
       CALL MSG_PRNT( 'Enter energy limits in keV' )
-      CALL PAR_GET0R('LOWER_ENERGY',LENERGY,STATUS)
-      CALL PAR_GET0R('UPPER_ENERGY',UENERGY,STATUS)
+      CALL USI_GET0R('LOWER_ENERGY',LENERGY,STATUS)
+      CALL USI_GET0R('UPPER_ENERGY',UENERGY,STATUS)
       IF(STATUS.NE.SAI__OK) GOTO 9000
 
 *    Apply redshift to required energy range
@@ -185,7 +185,7 @@
 
 *    Split model up
       IF ( MODEL.NCOMP .GT. 1 ) THEN
-        CALL PAR_GET0L( 'SPLIT', SPLIT, STATUS )
+        CALL USI_GET0L( 'SPLIT', SPLIT, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 9000
       ELSE
         SPLIT = .FALSE.
@@ -242,8 +242,8 @@
       CALL MSG_PRNT( 'Photon flux = ^PHOTONS photons/cm**2/sec' )
 
 *    Write output to environment
-      CALL PAR_PUT0R( 'EFLUX', TOTFLX, STATUS )
-      CALL PAR_PUT0R( 'PFLUX', PHOTONS, STATUS )
+      CALL USI_PUT0R( 'EFLUX', TOTFLX, STATUS )
+      CALL USI_PUT0R( 'PFLUX', PHOTONS, STATUS )
 
 *    Tidy up and exit
       CALL USI_ANNUL(MLOC,STATUS)

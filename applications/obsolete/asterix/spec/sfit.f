@@ -117,6 +117,7 @@
 *     21 Jul 94 : V1.7-5 File output moved to SFIT_OPFILES (DJA)
 *     25 Jul 94 : V1.7-6 File output now completely using AIO (DJA)
 *      7 Sep 94 : V1.8-0 Print out fit probability (DJA)
+*     24 Nov 94 : V1.8-1 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -203,7 +204,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-	PARAMETER		(VERSION='SFIT Version 1.8-0' )
+	PARAMETER		(VERSION='SFIT Version 1.8-1' )
 *-
 
 *    Announce version
@@ -217,7 +218,7 @@
       CALL SPEC_INIT( STATUS )
 
 *    Chi-squared or likelihood fitting?
-      CALL PAR_GET0L( 'LIK', LIKSTAT, STATUS )
+      CALL USI_GET0L( 'LIK', LIKSTAT, STATUS )
       CHISTAT=.NOT.LIKSTAT
       IF ( LIKSTAT ) THEN
         FSTAT=FIT__LOGL
@@ -287,9 +288,9 @@
       END IF
 
 *    Set iteration limits
-      CALL PAR_GET0I('MAX_IT',NITMAX,STATUS)
-      CALL PAR_GET0R('MINSLOPE',MINSLO,STATUS)
-      CALL PAR_GET0I('NUPDATE',NITUP,STATUS)
+      CALL USI_GET0I('MAX_IT',NITMAX,STATUS)
+      CALL USI_GET0R('MINSLOPE',MINSLO,STATUS)
+      CALL USI_GET0I('NUPDATE',NITUP,STATUS)
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
 *    Set up workspace for model stack
@@ -398,7 +399,7 @@
 	IF(NOFREE)THEN
 	  ER=.FALSE.
 	ELSE
-	  CALL PAR_GET0L('ERRORS',ER,STATUS)
+	  CALL USI_GET0L('ERRORS',ER,STATUS)
 	ENDIF
 	IF(ER)THEN
 	  CALL MSG_BLNK()

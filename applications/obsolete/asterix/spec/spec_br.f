@@ -35,7 +35,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER NEN                   ! no of energy channels
       REAL ELBOUND(NEN)		    ! lower bin bounds (keV)

@@ -83,6 +83,7 @@
 *                       SPEC_CMN_RZ (DJA)
 *        Nov 93: V1.7-4 Complete rebuild and new features (RJV)
 *     19 Mar 94: V1.7-5 Model component plot (RJV)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *    Type definitions :
 	IMPLICIT NONE
 *    Global constants :
@@ -162,7 +163,7 @@
         REAL EWID			! channel width for model plot
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION='SPLOT Version 1.7-4')
+	PARAMETER		(VERSION='SPLOT Version 1.8-0')
 *-
 
 * Announce version

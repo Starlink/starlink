@@ -35,7 +35,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :

@@ -9,13 +9,13 @@
 *
 *      6 Nov 92 : V1.5-1 Max bin content changed to min (RJV)
 *     18 Nov 93 : V1.7-0 Added missing AST_INIT call (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Status :
       INTEGER STATUS
@@ -38,7 +38,7 @@
       LOGICAL PRIM
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'SBIN Version 1.7-0')
+      PARAMETER (VERSION = 'SBIN Version 1.8-0')
 *-
 
 *    Version id
@@ -86,12 +86,12 @@
         ENDIF
 
 *  which mode of rebinning
-        CALL PAR_GET0I('OPT',OPT,STATUS)
+        CALL USI_GET0I('OPT',OPT,STATUS)
         IF (OPT.EQ.1) THEN
-          CALL PAR_GET0I('NBIN',ONVAL,STATUS)
+          CALL USI_GET0I('NBIN',ONVAL,STATUS)
           MINVAL=SUM/REAL(ONVAL)
         ELSEIF (OPT.EQ.2) THEN
-          CALL PAR_GET0R('MIN',MINVAL,STATUS)
+          CALL USI_GET0R('MIN',MINVAL,STATUS)
         ELSE
           CALL MSG_PRNT('AST_ERR: invalid mode option')
           STATUS=SAI__ERROR

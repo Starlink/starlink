@@ -1,10 +1,13 @@
 *+  SBG - Writes reference to background dataset into source dataset
-	SUBROUTINE SBG(STATUS)
+      SUBROUTINE SBG(STATUS)
+*
 *    Description :
+*
 *     HDS reference to background dataset is written into .MORE.ASTERIX.BGREF
 *     component of dataset.
 *     If null (!) background is specified then any existing reference is
 *     deleted.
+*
 *    Environment parameters :
 *     INP=UNIV(U)
 *            source dataset
@@ -15,12 +18,20 @@
 *    Deficiencies :
 *    Bugs :
 *    Authors :
+*
 *     Trevor Ponman (BHVAD::TJP)
+*
 *    History :
-*      1 Jul 92: V1.6-1 Original (BHVAD::TJP)
+*
+*      1 Jul 92 : V1.6-1 Original (BHVAD::TJP)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*
 *    Type definitions :
+*
 	IMPLICIT NONE
+*
 *    Global constants :
+*
 	INCLUDE 'SAE_PAR'
 	INCLUDE 'DAT_PAR'
 	INCLUDE 'PAR_ERR'
@@ -40,8 +51,8 @@
 *    Local data :
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION='SBG Version 1.6-1')
-*-----------------------------------------------------------------------
+	PARAMETER		(VERSION='SBG Version 1.8-0')
+*-
 
 * Version
 	CALL MSG_PRNT(VERSION)
@@ -52,7 +63,7 @@
 * Get names of source and background datasets
 	CALL USI_ASSOCI('INP','UPDATE',ILOC,PRIM,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
-	CALL DAT_ASSOC('BGFILE','READ',BLOC,STATUS)
+	CALL USI_DASSOC('BGFILE','READ',BLOC,STATUS)
 	IF(STATUS.EQ.PAR__NULL)THEN
 	  CALL ERR_ANNUL(STATUS)
 	  NULL=.TRUE.
@@ -81,7 +92,7 @@
 	ENDIF
 
 * Exit
- 9000  	CALL AST_CLOSE
-	IF(STATUS.NE.SAI__OK) CALL ERR_REP('EXERR','from SBG',
-     :  STATUS)
+ 9000  	CALL AST_CLOSE()
+        CALL AST_ERR( STATUS )
+
 	END

@@ -35,7 +35,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get redshift from user
-      CALL PAR_GET0R( 'REDSHIFT', Z, STATUS )
+      CALL USI_GET0R( 'REDSHIFT', Z, STATUS )
 
       IF ( (Z .GT. 0.0) .AND. (STATUS.EQ.SAI__OK) ) THEN
         CALL MSG_BLNK()

@@ -217,9 +217,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*    Structure definitions :
 *    Status :
       INTEGER STATUS
 *    Function declarations :

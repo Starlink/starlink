@@ -27,7 +27,6 @@
       IMPLICIT NONE
 *    Global constants :
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'PAR_ERR'
 *    Import :
 	INTEGER NCHAN		! No of spectral channels to be scanned
 	INTEGER NRESP		! No of response elements

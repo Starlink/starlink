@@ -33,6 +33,7 @@
 *     18 May 90 : V1.2-1 Use SPEC_SETSEARCH (TJP)
 *      1 Mar 93 : V1.7-0 Allows maximum number of files. SHOW mode added.
 *                        Error handling corrected (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -95,7 +96,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-	PARAMETER		(VERSION='SDATA Version 1.7-0')
+	PARAMETER		(VERSION='SDATA Version 1.8-0')
 *-
 
 *    Version
@@ -105,7 +106,7 @@
       CALL AST_INIT()
 
 *    Show mode?
-      CALL PAR_GET0L( 'SHOW', SHOW, STATUS )
+      CALL USI_GET0L( 'SHOW', SHOW, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
       IF ( SHOW ) THEN
 
@@ -187,7 +188,7 @@
 	  CALL CHR_ITOC(N,CHARRNO,NCHAR)
 	  PARNAME='INP'//CHARRNO
 	  REFNAME='REF'//CHARRNO
-	  CALL DAT_ASSOC(PARNAME,'READ',ILOC,STATUS)
+	  CALL USI_DASSOC(PARNAME,'READ',ILOC,STATUS)
 	  IF(STATUS.EQ.PAR__NULL) GO TO 1000
 	  CALL REF_CRPUT(REFLOC,REFNAME,ILOC,.FALSE.,STATUS)
 	  IF(STATUS.NE.SAI__OK) GO TO 9000
@@ -218,7 +219,7 @@
 
 *    Get required detector ranges
 	    CALL CHR_ITOC(SETSIZE,STRING,LSTRING)
-	    CALL PAR_DEF0C('DETNO','1:'//STRING(1:LSTRING),STATUS)
+	    CALL USI_DEF0C('DETNO','1:'//STRING(1:LSTRING),STATUS)
 	    CALL PRS_GETRANGES('DETNO',NDETMAX,1,1,SETSIZE,RANGES,NRANGES,
      :      STATUS)
 	    IF(STATUS.NE.SAI__OK) GO TO 9000
@@ -245,7 +246,7 @@
 	      CALL CMP_PUT1I(REFLOC,SELNAME,NSEL,DETSEL,STATUS)
 	      IF(STATUS.NE.SAI__OK) GO TO 9000
 	    ENDIF
-	    CALL PAR_CANCL('DETNO',STATUS)
+	    CALL USI_CANCL('DETNO',STATUS)
 	  ENDIF
 D         print *,'nsel,detsel: ',nsel,detsel
 	  CALL DAT_ANNUL(ILOC,STATUS)

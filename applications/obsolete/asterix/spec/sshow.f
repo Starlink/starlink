@@ -21,8 +21,9 @@
 *
 *    History :
 *
-*     23 Oct 92 : V1.7-0  Adapted from SEDIT (DJA)
-*      5 May 94 : V1.7-1  Use AIO for output (DJA)
+*     23 Oct 92 : V1.7-0 Adapted from SEDIT (DJA)
+*      5 May 94 : V1.7-1 Use AIO for output (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -32,7 +33,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *
 *    Status :
@@ -52,7 +52,7 @@
 *    Version :
 *
       CHARACTER*30         VERSION            ! Version id
-        PARAMETER          ( VERSION = 'SSHOW Version 1.7-1' )
+        PARAMETER          ( VERSION = 'SSHOW Version 1.8-0' )
 *-
 
 *    Check status
@@ -62,7 +62,7 @@
       CALL MSG_PRNT( VERSION )
 
 *    Form or retrieve fit_model object
-      CALL DAT_ASSOC( 'FIT_MOD', 'READ', FLOC, STATUS )
+      CALL USI_DASSOC( 'FIT_MOD', 'READ', FLOC, STATUS )
 
 *    Declare file to user :
       CALL DISP_FILENAM( FLOC, 'Model', STATUS )

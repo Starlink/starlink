@@ -61,11 +61,12 @@
 *     11 Aug 88 :  Converted to subroutine FIT_MODEL (TJP)
 *     23 Sep 88 :  Model file name displayed for user (TJP)
 *     19 Jun 89 :  ASTERIX88 version, limited tidying of code (TJP)
-*      1 Apr 92 : V1.0-2  FIT_MODEL merged into top level (RJV)
-*     10 Nov 92 : V1.2-1  FIT_PARSET changed to read frozen flag from MENU (TJP)
-*     13 Jan 93 : V1.7-0  RESET option added (DJA)
-*      6 Aug 93 : V1.7-1  Added missing AST_INIT, removed direct i/o (DJA)
-*     11 Jan 94 : V1.7-2  Added traps for HMS and DMS type input (DJA)
+*      1 Apr 92 : V1.0-2 FIT_MODEL merged into top level (RJV)
+*     10 Nov 92 : V1.2-1 FIT_PARSET changed to read frozen flag from MENU (TJP)
+*     13 Jan 93 : V1.7-0 RESET option added (DJA)
+*      6 Aug 93 : V1.7-1 Added missing AST_INIT, removed direct i/o (DJA)
+*     11 Jan 94 : V1.7-2 Added traps for HMS and DMS type input (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -146,7 +147,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-	PARAMETER		(VERSION = 'SMODEL Version 1.7-2')
+	PARAMETER		(VERSION = 'SMODEL Version 1.8-0')
 *-
 
 *    Announce version
@@ -174,7 +175,7 @@
 	SNEW=.FALSE.
 
 *      Reset model?
-        CALL PAR_GET0L( 'RESET', RESET, STATUS )
+        CALL USI_GET0L( 'RESET', RESET, STATUS )
 	IF(STATUS.NE.SAI__OK) GOTO 99
 
       END IF
@@ -202,7 +203,7 @@
 
 *   Model spec. to be overridden?
             IF ( .NOT. RESET ) THEN
-	      CALL PAR_GET0L('OVERRIDE',OVER,STATUS)
+	      CALL USI_GET0L('OVERRIDE',OVER,STATUS)
 	      IF(STATUS.NE.SAI__OK) GOTO 99
             END IF
 	  ENDIF
@@ -234,7 +235,7 @@
 *    Enter new model spec.
  30   IF ( .NOT. RESET ) THEN
         CALL FIT_MENU( GENUS, NCIMP, MENU, STATUS )
-	CALL PAR_GET0C( 'MODEL_SPEC', MODSPEC, STATUS )
+	CALL USI_GET0C( 'MODEL_SPEC', MODSPEC, STATUS )
       END IF
       IF(STATUS.NE.SAI__OK) GOTO 99
 
@@ -285,7 +286,7 @@
 *        Status bad if this wasn't a good pmodel name
           IF ( STATUS .NE. SAI__OK ) THEN
 	    CALL ERR_FLUSH( STATUS )
-	    CALL PAR_CANCL( 'MODEL_SPEC', STATUS )
+	    CALL USI_CANCL( 'MODEL_SPEC', STATUS )
             GOTO 30
 
 *        Good pmodel syntax...
@@ -311,7 +312,7 @@
         STATUS = SAI__ERROR
 	CALL ERR_REP('BAD_SYN','Bad model syntax',STATUS)
 	CALL ERR_FLUSH(STATUS)
-	CALL PAR_CANCL('MODEL_SPEC',STATUS)
+	CALL USI_CANCL('MODEL_SPEC',STATUS)
 	GOTO 30					! Allow reentry of model spec
       END IF
 
@@ -387,16 +388,16 @@
           CALL MSG_PRNT( LINE )
 
 *        Get new values from user
-	  CALL PAR_DEF0C('VALUES','unchanged',STATUS)
-	  CALL PAR_GET0C('VALUES',STRING,STATUS)
+	  CALL USI_DEF0C('VALUES','unchanged',STATUS)
+	  CALL USI_GET0C('VALUES',STRING,STATUS)
 	  IF ( STATUS.EQ.PAR__ABORT)THEN
 	    GOTO 99
 	  ELSE IF(STATUS.NE.SAI__OK)THEN
 	    CALL ERR_ANNUL(STATUS)
-	    CALL PAR_CANCL('VALUES',STATUS)
+	    CALL USI_CANCL('VALUES',STATUS)
 	    GOTO 350						! Next parameter
 	  END IF
-	  CALL PAR_CANCL( 'VALUES', STATUS )
+	  CALL USI_CANCL( 'VALUES', STATUS )
 	  LS = CHR_LEN(STRING)
 	  IF(STRING.EQ.'unchanged'.OR.LS.EQ.0) GOTO 350	! Next parameter
 

@@ -13,7 +13,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       DOUBLE PRECISION A
 *    Status :
