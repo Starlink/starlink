@@ -226,7 +226,7 @@
       if( status .ne. sai__ok ) return 
 
       ifile = ifil
-      iline = 0
+      iline = 1
 
       ch = ast_xmlchan( source, ast_null, ' ', status )
       obj = ast_read( ch, status )
