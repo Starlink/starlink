@@ -14,8 +14,9 @@ lib_LTLIBRARIES = libshl.la libshl_adam.la
 
 libshl_la_SOURCES = \
 	$(F_ROUTINES) \
-	$(C_ROUTINES) \
-	$(PRIVATE_INCLUDES)
+	$(C_ROUTINES)
+
+libshl_la_DEPENDENCIES = $(PRIVATE_INCLUDES)
 
 libshl_adam_la_SOURCES = $(ADAM_F_ROUTINES)
 
