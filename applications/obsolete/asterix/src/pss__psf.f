@@ -296,7 +296,7 @@
       DO IPOS = 1, NIPOS
 
 *      Choose image position
-        X0 = MAXOFF*FLOAT(IPOS-1)/REAL(NIPOS)
+        X0 = MAXOFF*FLOAT(IPOS-1)/REAL(NIPOS-1)
         PSF_PPR(IPOS) = SQRT(X0*X0+Y0*Y0)
 
 *      Get profile

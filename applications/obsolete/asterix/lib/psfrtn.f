@@ -4278,7 +4278,7 @@ c     :                           S2 = 4.0419,
       ELSE IF ( HINT .EQ. PSF_H_FLDSIZ ) THEN
 
 *    Write value
-        CALL ARR_COP1R( 1, 0.4*MATH__DTOR, DATA, STATUS )
+        CALL ARR_COP1R( 1, 0.33333*MATH__DTOR, DATA, STATUS )
 
 *  Energy dependent?
       ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN

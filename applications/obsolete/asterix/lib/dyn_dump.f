@@ -112,9 +112,9 @@
           CALL MSG_SETI('PT',DYS_PTR(I))
           CALL MSG_SETI('FI',DYS_PTR(I))
           CALL ADP_OUT('^NI items / ^NB bytes at ^PT with FID ^FI')
-          CALL MSG_SETI('N',N)
-          CALL ADP_OUT('Total slots allocated: ^N')
         ENDIF
       ENDDO
+      CALL MSG_SETI('N',N)
+      CALL ADP_OUT('Total slots allocated: ^N')
 
       END
