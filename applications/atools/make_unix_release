@@ -124,8 +124,6 @@ FOO5
 #  listed in group TAR_FILES_A...
       foreach file (`grp tar_files_a`)
          echo "Creating ${file}.tar"
-         chmod 644 `grp ${file}`
-         chmod 755 `find . -type d`
          tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
          rm -f `grp ${file}`
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
@@ -145,8 +143,9 @@ FOO5
       echo "Compressing atools.tar"
       compress atools.tar
 
-# Remove any spare .f files created by the expansion of generic source
-# files but not included in the release. Also remove grp.make.
-      rm -f *.f grp.make
+# Remove any spare files.
+      mv atools.tar.Z ../
+      rm -f *
+      mv ../atools.tar.Z .
 
       exit

@@ -124,18 +124,19 @@
                IFRAME = AST_GETI( IAST, 'CURRENT', STATUS )
 
 *  Otherwise, find the index of the Domain name within the FrameSet.
-            IFRAME = AST__NOFRAME
-            DO I = 1, NFRM
-               FRM = AST_GETFRAME( IAST, I, STATUS )
-               DOM = AST_GETC( FRM, 'DOMAIN', STATUS )
-               IF( CHR_SIMLR( DOM, CFRM ) ) THEN
-                  IFRAME = I
-                  GO TO 10
-               END IF
-            END DO
- 10         CONTINUE
+            ELSE
+               IFRAME = AST__NOFRAME
+               DO I = 1, NFRM
+                  FRM = AST_GETFRAME( IAST, I, STATUS )
+                  DOM = AST_GETC( FRM, 'DOMAIN', STATUS )
+                  IF( CHR_SIMLR( DOM, CFRM ) ) THEN
+                     IFRAME = I
+                     GO TO 10
+                  END IF
+               END DO
+ 10            CONTINUE
+            END IF
          END IF
-
       END IF
 
       END
