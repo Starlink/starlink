@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PRODUCT@" buildsupport="yes">
+  <version>@VERSION@</version>
+  <path>thirdparty/fsf/m4</path>
+  <description>GNU m4</description>
+  <dependencies/>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
+    on 2004-03-07</p></notes>
+</component>
