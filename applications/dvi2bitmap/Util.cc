@@ -30,13 +30,19 @@
 #include <iostream>
 
 #ifdef HAVE_CSTD_INCLUDE
-#include <cstdio>
-#include <cctype>
-#include <cerrno>
+#  include <cstdio>
+#  include <cctype>
+#  include <cerrno>
+#  include <cctype>
+#  if CCTYPE_IN_STD
+using std::isspace;
+using std::isxdigit;
+#  endif
 #else
-#include <stdio.h>
-#include <ctype.h>
-#include <errno.h>
+#  include <stdio.h>
+#  include <ctype.h>
+#  include <errno.h>
+#  include <ctype.h>
 #endif
 #include <unistd.h>		// this is standard according to single-unix, 
 				// how POSIXy is that?  How C++?
@@ -82,18 +88,18 @@ string_list& Util::tokenise_string (string str)
     unsigned int i=0;
 
     // skip leading whitespace
-    while (i < str.length() && STD::isspace(str[i]))
+    while (i < str.length() && isspace(str[i]))
 	i++;
     while (i < str.length())
     {
 	unsigned int wstart = i;
-	while (i < str.length() && !STD::isspace(str[i]))
+	while (i < str.length() && !isspace(str[i]))
 	    i++;
 	string t = str.substr(wstart,i-wstart);
 	if (verbosity_ > normal)
 	    cerr << "tokenise:" << t << ":" << endl;
 	l->push_back(t);
-	while (i < str.length() && STD::isspace(str[i]))
+	while (i < str.length() && isspace(str[i]))
 	    i++;
     }
     return *l;
@@ -117,7 +123,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, const char* s)
     const char *p = s;
     unsigned long val;
 
-    while (*p != '\0' && STD::isspace(*p))
+    while (*p != '\0' && isspace(*p))
 	p++;
     
     if (*p == '#') {
@@ -150,7 +156,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, const char* s)
 	if (*p == '\0')		// end of string
 	    return false;
 	s = p;
-	while (!STD::isxdigit(*s))
+	while (!isxdigit(*s))
 	{
 	    if (*s == '\0') return false;
 	    s++;
@@ -164,7 +170,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, const char* s)
 	if (*p == '\0')		// end of string
 	    return false;
 	s = p;
-	while (!STD::isxdigit(*s))
+	while (!isxdigit(*s))
 	{
 	    if (*s == '\0') return false;
 	    s++;

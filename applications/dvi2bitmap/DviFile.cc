@@ -36,11 +36,16 @@
 #endif
 
 #ifdef HAVE_CSTD_INCLUDE
-#include <cmath>		// for fabs()
-#include <cassert>
+#  include <cmath>		// for fabs()
+#  include <cassert>
+#  include <cctype>		// for isprint
+#  if CCTYPE_IN_STD
+using std::isprint;
+#  endif
 #else
-#include <math.h>
-#include <assert.h>
+#  include <math.h>
+#  include <assert.h>
+#  include <ctype.h>
 #endif
 
 using STD::cerr;
@@ -1504,7 +1509,7 @@ DviFileSetChar::DviFileSetChar(int charno, DviFile *dptr)
 {
     if (verbosity_ > normal)
 	cerr << "Char " << charno << "="
-	     << (STD::isprint(charno) ? static_cast<char>(charno) : '?')
+	     << (isprint(charno) ? static_cast<char>(charno) : '?')
 	     << endl;
 }
 
@@ -1520,7 +1525,7 @@ DviFileSetChar::DviFileSetChar(int opcode, int charno, DviFile *dptr)
 {
     if (verbosity_ > normal)
 	cerr << "Char " << charno << "="
-	     << (STD::isprint(charno) ? static_cast<char>(charno) : '?')
+	     << (isprint(charno) ? static_cast<char>(charno) : '?')
 	     << endl;
 }
 
