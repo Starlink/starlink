@@ -636,7 +636,7 @@ following and, where appropriate, their inverses:
 SlaMap).
 
 \item Conversions between various spectral coordinate systems (the
-SpecMap).
+SpecMap and GrismMap).
 
 \item Conversion between 2-dimensional spherical celestial coordinates
 (longitude and latitude) and a 3-dimensional vectorial positions (the SphMap).
@@ -4713,6 +4713,7 @@ as a whole and some of the sub-classes it contains:
    Mapping
       CmpMap
       DssMap
+      GrismMap
       IntraMap
       LutMap
       MathMap
@@ -4915,7 +4916,7 @@ c+
 astRate
 c-
 f+
-AST_RATE
+AST\_RATE
 f-
 function can be used to find the rate of change of any Mapping output
 with respect to any Mapping input, at a given input position. The method
@@ -17891,6 +17892,7 @@ Object             - Base class for all AST Objects
             Plot   - Provide facilities for graphical output
          SkyFrame  - Celestial coordinate system description
          SpecFrame - Spectral coordinate system description
+      GrismMap     - Models the spectral dispersion produced by a grism
       IntraMap     - Map points using a private transformation function
       LutMap       - Transform 1-dimensional coordinates using a lookup table
       MathMap      - Transform coordinates using mathematical expressions
@@ -19113,11 +19115,13 @@ c+
 astRate
 c-
 f+
-AST_RATE
+AST\_RATE
 f-
 function has been added which allows an estimate to be made of the rate of 
 change of a Mapping output with respect to one of the Mapping inputs. 
 
+\item A new subclass of Mapping, the GrismMap, has been added which
+models the spectral dispersion produced by a grating, prism or grism.
 
 \end{enumerate}
 

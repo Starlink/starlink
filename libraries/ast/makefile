@@ -379,7 +379,7 @@ PRIVATE_C_INCLUDES = $(MAIN_C_INCLUDES) \
 MAIN_C_INCLUDES = \
 $(PKG_NAME)_err.h axis.h c2f77.h channel.h cmpframe.h \
 cmpmap.h dssmap.h error.h fitschan.h frame.h \
-frameset.h intramap.h loader.h lutmap.h mapping.h \
+frameset.h grismmap.h intramap.h loader.h lutmap.h mapping.h \
 mathmap.h matrixmap.h memory.h object.h pcdmap.h \
 permmap.h plot.h pointset.h skyaxis.h skyframe.h specframe.h \
 specmap.h slamap.h sphmap.h unit.h unitmap.h wcsmap.h winmap.h \
@@ -422,11 +422,11 @@ C_ROUTINES = $(MAIN_C_ROUTINES) \
 MAIN_C_ROUTINES = \
 axis.c c2f77.c channel.c cmpframe.c cmpmap.c \
 dssmap.c error.c fchannel.c fcmpframe.c fcmpmap.c \
-fdssmap.c ferror.c ffitschan.c fframe.c fframeset.c \
+fdssmap.c ferror.c ffitschan.c fframe.c fframeset.c fgrismmap.c \
 fintramap.c fitschan.c flutmap.c fmapping.c fmathmap.c \
 fmatrixmap.c fobject.c fpcdmap.c fpermmap.c fplot.c \
 frame.c frameset.c fskyframe.c fspecframe.c fslamap.c fspecmap.c fsphmap.c \
-funitmap.c fwcsmap.c fwinmap.c fzoommap.c intramap.c \
+funitmap.c fwcsmap.c fwinmap.c fzoommap.c grismmap.c intramap.c \
 loader.c lutmap.c mapping.c mathmap.c matrixmap.c \
 memory.c object.c pcdmap.c permmap.c plot.c \
 pointset.c skyaxis.c skyframe.c specframe.c specmap.c slamap.c sphmap.c \
@@ -1334,6 +1334,7 @@ fframe.o: fframe.c f77.h c2f77.h error.h memory.h mapping.h object.h \
  channel.h pointset.h frame.h axis.h frameset.h
 fframeset.o: fframeset.c f77.h c2f77.h error.h memory.h mapping.h \
  object.h channel.h pointset.h frame.h axis.h frameset.h
+fgrismmap.o: fgrismmap.c f77.h c2f77.h error.h memory.h grismmap.h
 fintramap.o: fintramap.c f77.h c2f77.h error.h memory.h intramap.h \
  mapping.h object.h channel.h pointset.h
 fitschan.o: fitschan.c error.h memory.h object.h channel.h pointset.h \
@@ -1382,6 +1383,8 @@ fzoommap.o: fzoommap.c f77.h c2f77.h error.h memory.h zoommap.h \
 grf_null.o: grf_null.c grf.h error.h ast_err.h
 grf_pgplot.o: grf_pgplot.c f77.h c2f77.h pointset.h object.h error.h \
  channel.h memory.h grf.h ast_err.h
+grismmap.o: grismmap.c error.h memory.h object.h pointset.h mapping.h \
+ unitmap.h channel.h grismmap.h
 intramap.o: intramap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h unitmap.h intramap.h ast_err.h
 loader.o: loader.c axis.h object.h error.h channel.h cmpframe.h \

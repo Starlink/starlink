@@ -28,6 +28,7 @@ object.h \
    mapping.h \
       cmpmap.h \
       dssmap.h \
+      grismmap.h \
       intramap.h \
       lutmap.h \
       mathmap.h \

@@ -7,6 +7,7 @@
 #include "fitschan.h"
 #include "frame.h"
 #include "frameset.h"
+#include "grismmap.h"
 #include "intramap.h"
 #include "loader.h"
 #include "lutmap.h"
@@ -54,6 +55,8 @@
 *        Added the MathMap class.
 *     8-JAN-2003 (DSB):
 *        Added the SpecMap and SpecFrame classes.
+*     15-JUL-2003 (DSB):
+*        Added the GrsimMap class.
 *-
 */
 
@@ -71,6 +74,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(FitsChan);
    LOAD(Frame);
    LOAD(FrameSet);
+   LOAD(GrismMap);
    LOAD(IntraMap);
    LOAD(LutMap);
    LOAD(Mapping);

@@ -16,9 +16,13 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-o A function called astRate (AST_RATE) has been added which allows an 
-estimate to be made of the rate of change of a Mapping output with respect 
-to one of the Mapping inputs. 
+o A function called astRate (AST_RATE) has been added which allows an
+estimate to be made of the rate of change of a Mapping output with
+respect to one of the Mapping inputs.
+
+o A new subclass of Mapping, the GrismMap, has been added which models
+the spectral dispersion produced by a grating, prism or grism.
+
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).

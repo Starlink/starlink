@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.11}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {28th January 2003}
+\newcommand{\stardocdate}      {16th July 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -26,7 +26,7 @@
 \newcommand{\stardoccopyright} {Copyright (C) 2003 Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
-\newcommand{\stardocversion}   {V2.0}
+\newcommand{\stardocversion}   {V3.0}
 \newcommand{\stardocmanual}    {Programmer's Guide\\(C Version)}
 \newcommand{\stardocmanualhtml}{Programmer's Guide (C Version)}
 \newcommand{\stardocabstract}  {
@@ -562,6 +562,7 @@ either direction: either from the {\em{input}} coordinate space to the
 {\em{forward}} transformation and the other the {\em{inverse}}
 transformation.
 
+
 {\bf{Further reading:}} For a more complete discussion of Mappings,
 see~\secref{ss:mappings}.
 
@@ -578,7 +579,7 @@ following and, where appropriate, their inverses:
 \htmlref{SlaMap}{SlaMap}).
 
 \item Conversions between various spectral coordinate systems (the
-\htmlref{SpecMap}{SpecMap}).
+\htmlref{SpecMap}{SpecMap} and GrismMap).
 
 \item Conversion between 2-dimensional spherical celestial coordinates
 (longitude and latitude) and a 3-dimensional vectorial positions (the SphMap).
@@ -3042,6 +3043,7 @@ as a whole and some of the sub-classes it contains:
    Mapping
       CmpMap
       DssMap
+      GrismMap
       IntraMap
       LutMap
       MathMap
@@ -3176,6 +3178,16 @@ astInvert( mapping );
 
 If the Mapping you have happens to be the wrong way around, astInvert
 allows you to correct the problem.
+
+\subsection{Finding the Rate of Change of a Mapping Output}
+The
+\htmlref{astRate}{astRate}
+function can be used to find the rate of change of any \htmlref{Mapping}{Mapping} output
+with respect to any Mapping input, at a given input position. The method
+used produces good accuracy (typically a relative error of 10E-10 or
+less) but may require the Mapping to be evaluated 100 or more times. 
+An estimate of the second derivative is also produced by this function.
+
 
 \subsection{Reporting Coordinate Transformations}
 
@@ -4824,12 +4836,12 @@ coordinate systems. Because these are represented in AST by SkyFrames
 Domain value for a \htmlref{SkyFrame}{SkyFrame} is SKY. Since there is only one sky, you
 probably won't need to change this very often.
 
-\item[SPECTRAL]\mbox{}\\
+\item[SPECTRUM]\mbox{}\\
 Identifies the domain used to describe positions within an
 electro-magnetic spectrum. The AST \htmlref{SpecFrame}{SpecFrame} (\secref{ss:specframes})
 class describes positions within this domain, allowing a wide range of
 different coordinate systems to be used (frequency, wavelength,
-{\em{etc}}). The default Domain value for a SpecFrame is SPECTRAL.
+{\em{etc}}). The default Domain value for a SpecFrame is SPECTRUM.
 
 \end{description}
 \end{quote}
@@ -5606,7 +5618,7 @@ otherwise identified. This is the normal behaviour unless an explicit
 Format(axis) value has been set to override the default.
 
 \cleardoublepage
-\section{\label{ss:specframes}Spectral Coordinate Systems (SpecFrames)}
+\section{\xlabel{ss_specframes}\label{ss:specframes}Spectral Coordinate Systems (SpecFrames)}
 
 The \htmlref{SpecFrame}{SpecFrame} is a \htmlref{Frame}{Frame} which is specialised for representing coordinate 
 systems which describe a position within an electro-magnetic spectrum.
@@ -5778,11 +5790,11 @@ The output from this might look like the following:
 #   Title = "Optical velocity, rest frequency = 250 GHz"       # Title
 of coordinate system
     Naxes = 1   # Number of coordinate axes
-#   Domain = "SPECTRAL"         # Coordinate system domain
+#   Domain = "SPECTRUM"         # Coordinate system domain
 #   Epoch = 2000        # Julian epoch of observation
 #   Lbl1 = "Optical velocity"  # Label for axis 1
     System = "VOPT"     # Coordinate system type
-#   Uni1 = "m/s"        # Units for axis 1
+#   Uni1 = "km/s"       # Units for axis 1
     Ax1 =       # Axis number 1
        Begin Axis       # Coordinate axis
        End Axis
@@ -5800,13 +5812,13 @@ for the particular velocity system that the SpecFrame represents.
 
 These choices would be appropriate for a System value of ``Vopt'',
 but if a different System value were set, the defaults would be
-correspondingly different. For example, frequency is measured in 
-units of Hertz, not $m/s$, so setting ``System=freq''
+correspondingly different. For example, by default frequency is measured in 
+units of GHz, not $km/s$, so setting ``System=freq''
 would change the appropriate line above from:
 
 \begin{quote}
 \begin{verbatim}
-#   Uni1 = "m/s"        # Units for axis 1
+#   Uni1 = "km/s"       # Units for axis 1
 \end{verbatim}
 \end{quote}
 
@@ -5814,19 +5826,19 @@ to
 
 \begin{quote}
 \begin{verbatim}
-#   Uni1 = "Hz"         # Units for axis 1
+#   Uni1 = "GHz"        # Units for axis 1
 \end{verbatim}
 \end{quote}
 
 Of course, if you do not like any of these defaults, you may always
 over-ride them by setting explicit attribute values yourself. For
-instance, you may choose to have your frequency axis expressed in ``GHz''
-rather than ``Hz''. To do this simply set the attribute value as follows:
+instance, you may choose to have your frequency axis expressed in ``kHz''
+rather than ``GHz''. To do this simply set the attribute value as follows:
 
 \begin{quote}
 \small
 \begin{verbatim}
-astSetC( specframe, "Unit", "GHz" );
+astSetC( specframe, "Unit", "kHz" );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -5840,12 +5852,20 @@ conversion between two SpecFrames (for instance using
 ) if either SpecFrame has a Unit value which is inappropriate for its
 System value.
 
-Some SpecFrame attributes (\htmlref{RefRA}{RefRA}, \htmlref{RefDec}{RefDec} and \htmlref{RestFreq}{RestFreq}) have no default
-value. If no value is set for one of these attributes, an error will be
-reported when a calculation is performed which needs a value for the
-attribute. For RefRA and RefDec, this will be when converting between
-different standards of rest, and for RestFreq it will be when converting
-between different systems.
+SpecFrame attributes, like all other attributes, all have default
+value. However, be aware that for some attributes these default values
+can never be more than ``a legal numerical value'' and have no
+astronomical significance. For instance, the \htmlref{RefRA}{RefRA} and \htmlref{RefDec}{RefDec} attributes
+(which give the source position) both have a default value of zero. So
+unless your source happens to be at that point (highly unlikely!) you will
+need to set new values. Likewise, the \htmlref{RestFreq}{RestFreq} (rest frequency) attribute
+has an arbitrary default value of 1.0E5 GHz. Some operations are not
+affected by inappropriate values for these attributes (for instance,
+converting from frequency to wavelength, changing axis units, \emph{etc}),
+but some are. For instance, converting from frequency to velocity
+requires a correct rest frequency, moving between different standards of
+rest requires a correct source position. The moral is, always set explicit
+values for as many attributes as possible.
 
 \subsection{\label{ss:creatingspectralcubes}Creating Spectral Cubes}
 You can use a \htmlref{SpecFrame}{SpecFrame} to describe the spectral axis in a data cube
@@ -5862,7 +5882,7 @@ AstSpecFrame *specframe;
 AstCmpFrame *cmpframe;
 ...
 skyframe = astSkyFrame( "Epoch=J2002" );
-specframe = astSpecFrame( "System=Freq,Unit=GHz,StdOfRest=LSRK" );
+specframe = astSpecFrame( "System=Freq,StdOfRest=LSRK" );
 cmpframe = astCmpFrame( skyframe, specframe, "" );
 \end{verbatim}
 \normalsize
@@ -5916,6 +5936,9 @@ to work together in various combinations while appearing as a single
 \htmlref{Object}{Object}. A CmpFrame's behaviour is therefore not pre-defined, but is
 determined by the other Frames it contains (its ``component'' Frames).
 
+As with compound Mappings, compound Frames can be nested within each
+other, forming arbitrarily complex Frames.
+
 \subsection{Creating a CmpFrame}
 A very common use for a \htmlref{CmpFrame}{CmpFrame} within astronomy is to represent a
 ``spectral cube''. This is a 3-dimensional \htmlref{Frame}{Frame} in which one of the axes
@@ -5959,11 +5982,19 @@ astPermAxes( cmpframe, perm );
 \end{quote}
 
 \subsection{The Attributes of a CmpFrame}
-A \htmlref{CmpFrame}{CmpFrame} has no extra attributes over and above those common to all
-Frames. The default value for its \htmlref{Domain}{Domain} attribute is ``CMP'' and the
-(fixed) value for its \htmlref{System}{System} attribute is ``Compound''. 
 
-\htmlref{Frame}{Frame} attributes which are specific to individual axes (such as Label(2),
+A \htmlref{CmpFrame}{CmpFrame} \emph{is a} \htmlref{Frame}{Frame} and so has all the attributes of a Frame.
+The default value for the \htmlref{Domain}{Domain} attribute for a CmpFrame is formed by
+concatenating the Domains of the two component Frames, separated by a
+minus sign (``-'').\footnote{If both component Frames have blank Domains, 
+then the default Domain for the CmpFrame is the string ``CMP''.} The (fixed) 
+value for its \htmlref{System}{System} attribute is ``Compound''.\footnote{Any attempt to 
+change the System value of a CmpFrame is ignored.} A CmpFrame has no 
+further attributes over and above those common to all Frames. However,
+attributes of the two component Frames can be accessed as if they were
+attributes of the CmpFrame, as described below.
+
+Frame attributes which are specific to individual axes (such as Label(2),
 Format(1), \emph{etc}) simply mirror the corresponding axes of the
 relevant component Frame. That is, if the ``Label(2)'' attribute of a
 CmpFrame is accessed, the CmpFrame will forward the access request to the
@@ -5989,6 +6020,22 @@ value to the ``Equinox(2)'' attribute of the CmpFrame. Since the SkyFrame
 defines both axes 2 and 3 of the CmpFrame, we could equivalently have set
 a value for ``Equinox(3)'' since this would also result in the attribute
 access being forwarded to the SkyFrame.
+
+Finally, if an attribute is not qualified by a axis index, attempts will
+be made to access it using each of the CmpFrame axes in turn. Using the
+above example of the spectral cube, if an attempt was made to get the
+value of attribute ``Equinox'' (with no axis index), each axis in turn
+would be used. Since axis 1 is contained within a SpecFrame, the first
+attempt would fail since the SpecFrame class does not have an Equinox
+attribute. However, the second attempt would succeed because axis 2 is
+contained within a SkyFrame which \emph{does} have an Equinox attribute. Thus
+the returned attribute value would be that obtained from the SkyFrame
+containing axis 2. When getting or testing an attribute value, the
+returned value is determined by the \emph{first} axis which recognises
+the attribute. When setting an attribute value, \emph{all} axes
+which recognises the attribute have the attribute value set to the given
+value. Likewise, when clearing an attribute value, all axes
+which recognises the attribute have the attribute value cleared.
 
 \cleardoublepage
 \section{\label{ss:introducingconversion}An Introduction to Coordinate System Conversions}
@@ -11278,6 +11325,7 @@ Object             - Base class for all AST Objects
             Plot   - Provide facilities for graphical output
          SkyFrame  - Celestial coordinate system description
          SpecFrame - Spectral coordinate system description
+      GrismMap     - Models the spectral dispersion produced by a grism
       IntraMap     - Map points using a private transformation function
       LutMap       - Transform 1-dimensional coordinates using a lookup table
       MathMap      - Transform coordinates using mathematical expressions
@@ -17405,6 +17453,82 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   astRate\sstlabel{astRate}
+}{
+   Calculate the rate of change of a Mapping output
+}{
+   \sstdescription{
+      This function
+      evaluates the rate of change of a specified output of the supplied
+      \htmlref{Mapping}{Mapping} with respect to a specified input, at a specified input
+      position.
+
+      The result is estimated by interpolating the function using a
+      fourth order polynomial in the neighbourhood of the specified
+      position. The size of the neighbourhood used is chosen to minimise
+      the RMS residual per unit length between the interpolating
+      polynomial and the supplied Mapping function. This method produces
+      good accuracy but can involve evaluating the Mapping 100 or more
+      times.
+   }
+   \sstsynopsis{
+      result = astRate( AstMapping $*$this, double $*$at, int ax1, int ax2, double $*$d2 )
+   }
+   \sstparameters{
+      \sstsubsection{
+         this
+      }{
+         Pointer to the Mapping to be applied.
+      }
+      \sstsubsection{
+         at
+      }{
+         The address of an
+         array holding the axis values at the position at which the rate
+         of change is to be evaluated. The number of elements in this
+         array should equal the number of inputs to the Mapping.
+      }
+      \sstsubsection{
+         ax1
+      }{
+         The index of the Mapping output for which the rate of change is to
+         be found (output numbering starts at 1 for the first output).
+      }
+      \sstsubsection{
+         ax2
+      }{
+         The index of the Mapping input which is to be varied in order to
+         find the rate of change (input numbering starts at 1 for the first
+         input).
+      }
+      \sstsubsection{
+         d2
+      }{
+         Address of a location at which to return an estimate of the
+         second derivative of the Mapping function at the specified point.
+         May be NULL.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         astRate()
+      }{
+         The rate of change of Mapping output {\tt{"}}ax1{\tt{"}} with respect to input
+         {\tt{"}}ax2{\tt{"}}, evaluated at {\tt{"}}at{\tt{"}}, or AST\_\_BAD if the value cannot be
+         calculated.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A value of AST\_\_BAD will be returned if this function is invoked
+         with the global error status set, or if it should fail for any
+         reason.
+      }
+   }
+}
+\sstroutine{
    astRead\sstlabel{astRead}
 }{
    Read an Object from a Channel
@@ -20854,6 +20978,41 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   astVersion\sstlabel{astVersion}
+}{
+   Return the version of the AST library being used
+}{
+   \sstdescription{
+      This macro invokes a function which
+      returns an integer representing the version of the AST library
+      being used. The library version is formatted as a string such as
+      {\tt{"}}2.0-7{\tt{"}} which contains integers representing the {\tt{"}}major version{\tt{"}} (2),
+      the {\tt{"}}minor version{\tt{"}} (0) and the {\tt{"}}release{\tt{"}} (7). The integer returned
+      by this function combines all three integers together into a single
+      integer using the expresion:
+
+      (major version)$*$1E6 $+$ (minor version)$*$1E3 $+$ (release)
+   }
+   \sstsynopsis{
+      int astVersion
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{Object}{Object}
+      }{
+         This macro applies to all Objects.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         astVersion
+      }{
+         The major version, minor version and release numbers for the AST
+         library, encoded as a single integer.
+      }
+   }
+}
+\sstroutine{
    astWatch\sstlabel{astWatch}
 }{
    Identify a new error status variable for the AST library
@@ -20943,7 +21102,7 @@ Object             - Base class for all AST Objects
 
       Each WcsMap also allows up to 100 {\tt{"}}projection parameters{\tt{"}} to be
       associated with each axis. These specify the precise form of the
-      projection, and are accessed using \htmlref{PVj\_m}{PVj_m} attribute, where {\tt{"}}j{\tt{"}} is
+      projection, and are accessed using \htmlref{PVi\_m}{PVi_m} attribute, where {\tt{"}}i{\tt{"}} is
       the integer axis index (starting at 1), and m is an integer
       {\tt{"}}parameter index{\tt{"}} in the range 0 to 99. The number of projection
       parameters required by each projection, and their meanings, are
@@ -21004,7 +21163,7 @@ Object             - Base class for all AST Objects
 
          If the sky projection to be implemented requires projection
          parameter values to be set, then this should normally be done
-         here via the PVj\_m attribute (see the {\tt{"}}Examples{\tt{"}}
+         here via the PVi\_m attribute (see the {\tt{"}}Examples{\tt{"}}
          section). Setting values for these parameters is mandatory if
          they do not have default values (as defined in the FITS-WCS
          paper).
@@ -21068,7 +21227,7 @@ Object             - Base class for all AST Objects
          a WcsMap will yield coordinate values of AST\_\_BAD.
 
          \sstitem
-         The validity of any projection parameters given via the PVj\_m
+         The validity of any projection parameters given via the PVi\_m
          parameter in the {\tt{"}}options{\tt{"}} string is not checked by this
          function. However, their validity is checked when the resulting
          WcsMap is used to transform coordinates, and an error will
@@ -21455,6 +21614,17 @@ Object             - Base class for all AST Objects
          value used is set to exactly 90 degrees in these cases.
 
          \sstitem
+         {\tt{"}}BadMat{\tt{"}}: This condition arises if the matrix describing the
+         transformation from pixel offsets to intermediate world coordinates
+         cannot be inverted. This matrix describes the scaling, rotation, shear,
+         etc., applied to the pixel axes, and is specified by keywords such as
+         PCi\_j, CDi\_j, CROTA, etc. For example, the matrix will not be invertable
+         if any rows or columns consist entirely of zeros. The FITS-WCS Paper I
+         {\tt{"}}Representation of World Coordinates in FITS{\tt{"}} by Greisen \& Calabretta
+         requires that this matrix be invertable. Many operations (such as
+         grid plotting) will not be possible if the matrix cannot be inverted.
+
+         \sstitem
          {\tt{"}}NoCTYPE{\tt{"}}: This condition arises if a default CTYPE value is used
          within \htmlref{astRead}{astRead}, due to no value being present in the supplied FitsChan.
          This condition is only tested for when using non-Native encodings.
@@ -21651,6 +21821,55 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   CDMatrix\sstlabel{CDMatrix}
+}{
+   Use CDi\_j keywords to represent pixel scaling, rotation, etc?
+}{
+   \sstdescription{
+      This attribute is a boolean value which specifies how the linear
+      transformation from pixel coordinates to intermediate world
+      coordinates should be represented within a \htmlref{FitsChan}{FitsChan} when using
+      FITS-WCS encoding. This transformation describes the scaling,
+      rotation, shear, etc., of the pixel axes.
+
+      If the attribute has a non-zero value then the transformation is
+      represented by a set of CDi\_j keywords representing a square matrix
+      (where {\tt{"}}i{\tt{"}} is the index of an intermediate world coordinate axis
+      and {\tt{"}}j{\tt{"}} is the index of a pixel axis). If the attribute has a zero
+      value the transformation is represented by a set of PCi\_j keywords
+      (which also represent a square matrix) together with a corresponding
+      set of CDELTi keywords representing the axis scalings. See FITS-WCS
+      paper II {\tt{"}}Representation of Celestial Coordinates in FITS{\tt{"}} by
+      M. Calabretta \& E.W. Greisen, for a complete description of these two
+      schemes.
+
+      The default value of the CDMatrix attribute is determined by the
+      contents of the FitsChan at the time the attribute is accessed. If
+      the FitsChan contains any CDi\_j keywords then the default value is
+      non-zero. Otherwise it is zero. Note, reading a \htmlref{FrameSet}{FrameSet} from a
+      FitsChan will in general consume any CDi\_j keywords present in the
+      FitsChan. Thus the default value for CDMatrix following a read will
+      usually be zero, even if the FitsChan originally contained some
+      CDi\_j keywords. This behaviour is similar to that of the \htmlref{Encoding}{Encoding}
+      attribute, the default value for which is determined by the contents
+      of the FitsChan at the time the attribute is accessed. If you wish
+      to retain the original value of the CDMatrix attribute (that is,
+      the value before reading the FrameSet) then you should enquire the
+      default value before doing the read, and then set that value
+      explicitly.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         FitsChan
+      }{
+         All FitsChans have this attribute.
+      }
+   }
+}
+\sstroutine{
    CarLin\sstlabel{CarLin}
 }{
    Ignore spherical rotations on CAR projections?
@@ -21660,13 +21879,13 @@ Object             - Base class for all AST Objects
       (plate carree, or {\tt{"}}Cartesian{\tt{"}}) projections should be treated when
       reading a \htmlref{FrameSet}{FrameSet} from a foreign encoded FITS header. If zero (the
       default), it is assumed that the CAR projection conforms to the
-      conventions described in the (draft) FITS world coordinate system
-      (FITS-WCS) paper by E.W. Greisen and M. Calabretta (A \& A, in
-      preparation). If CarLin is non-zero, then these conventions are
-      ignored, and it is assumed that the mapping from pixel coordinates to
-      celestial coordinates is a simple linear transformation (hence the
-      attribute name {\tt{"}}CarLin{\tt{"}}). This is appropriate for some older FITS
-      data which claims to have a {\tt{"}}CAR{\tt{"}} projection, but which in fact do
+      conventions described in the FITS world coordinate system (FITS-WCS)
+      paper II {\tt{"}}Representation of Celestial Coordinates in FITS{\tt{"}} by
+      M. Calabretta \& E.W. Greisen. If CarLin is non-zero, then these
+      conventions are ignored, and it is assumed that the mapping from pixel
+      coordinates to celestial coordinates is a simple linear transformation
+      (hence the attribute name {\tt{"}}CarLin{\tt{"}}). This is appropriate for some older
+      FITS data which claims to have a {\tt{"}}CAR{\tt{"}} projection, but which in fact do
       not conform to the conventions of the FITS-WCS paper. Furthermore, if
       CarLin is non-zero, it is assumed that CDELT and CD keywords are
       in units of degrees rather than radians (as required by the
@@ -22106,13 +22325,21 @@ Object             - Base class for all AST Objects
          \htmlref{CmpFrame}{CmpFrame}
       }{
          The CmpFrame class re-defines the default Domain value to be
-         {\tt{"}}CMP{\tt{"}}.
+         of the form {\tt{"}}$<$dom1$>$-$<$dom2$>${\tt{"}}, where $<$dom1$>$ and $<$dom2$>$ are the
+         Domains of the two component Frames. If both these Domains are
+         blank, then the string {\tt{"}}CMP{\tt{"}} is used as the default Domain name.
       }
       \sstsubsection{
          \htmlref{FrameSet}{FrameSet}
       }{
          The Domain attribute of a FrameSet is the same as that of its
          current Frame (as specified by the \htmlref{Current}{Current} attribute).
+      }
+      \sstsubsection{
+         \htmlref{SpecFrame}{SpecFrame}
+      }{
+         The SpecFrame class re-defines the default Domain value to be
+         {\tt{"}}SPECTRUM{\tt{"}}.
       }
    }
    \sstnotes{
@@ -22337,21 +22564,17 @@ Object             - Base class for all AST Objects
 
          \sstitem
          {\tt{"}}FITS-WCS{\tt{"}}: Encodes coordinate system information in FITS
-         header cards using the conventions described in the (draft) FITS
-         world coordinate system (FITS-WCS) paper by E.W. Greisen and
-         M. Calabretta (A \& A, in preparation). The main advantages of
-         this encoding are that it should be understood by any FITS-WCS
-         compliant application and is likely to be adopted widely for
-         FITS data in future. At present, however, it suffers from the
-         disadvantage that the FITS-WCS standard is only a draft (and is
-         not stable), so it cannot yet be recommended for regular
-         use. For further details, see the section {\tt{"}}The FITS-WCS
-         Encoding{\tt{"}} below.
+         header cards using the conventions described in the FITS
+         world coordinate system (FITS-WCS) papers by E.W. Greisen,
+         M. Calabretta, et al. The main advantages of this encoding are that
+         it should be understood by any FITS-WCS compliant application and
+         is likely to be adopted widely for FITS data in future. For further
+         details, see the section {\tt{"}}The FITS-WCS Encoding{\tt{"}} below.
 
          \sstitem
          {\tt{"}}FITS-PC{\tt{"}}: Encodes coordinate system information in FITS
          header cards using the conventions described in an earlier draft
-         of the FITS world coordinate system paper by E.W. Greisen and
+         of the FITS world coordinate system papers by E.W. Greisen and
          M. Calabretta. This encoding uses a combination of CDELTi and
          PCiiijjj keywords to describe the scale and rotation of the pixel
          axes. This encoding is included to support existing data and
@@ -22433,11 +22656,6 @@ Object             - Base class for all AST Objects
          \sstitem
          Otherwise, if the FitsChan contains a keyword of the form
          CROTAi, where {\tt{"}}i{\tt{"}} is a single digit, then FITS-AIPS encoding is
-         used.
-
-         \sstitem
-         Otherwise, if the FitsChan contains a keyword of the form
-         CDELTi, where {\tt{"}}i{\tt{"}} is a single digit, then FITS-PC encoding is
          used.
 
          \sstitem
@@ -22531,8 +22749,7 @@ Object             - Base class for all AST Objects
       The projections supported include all those in the fits-wcs standard.
       In addition, it supports the {\tt{"}}TAN with polynomial correction terms{\tt{"}}
       projection which was included in a draft of the FITS-WCS paper, but
-      was not present in the final version. This projection is identified
-      by the code {\tt{"}}TPN{\tt{"}} within AST.
+      was not present in the final version.
 
       When reading a FITS-WCS encoded Object (using astRead), the FitsChan
       concerned must initially be positioned at the first card (its
@@ -22619,14 +22836,14 @@ Object             - Base class for all AST Objects
 
       In addition, the experimental IRAF {\tt{"}}ZPX{\tt{"}} and {\tt{"}}TNX{\tt{"}} sky projections will
       be accepted when reading, but will never be written (the corresponding
-      FITS {\tt{"}}ZPN{\tt{"}} or {\tt{"}}TPN{\tt{"}} projection being used instead). However, there
-      are restrictions on the use of these experimental projections. For
-      {\tt{"}}ZPX{\tt{"}}, longitude and latitude correction surfaces (appearing as
+      FITS {\tt{"}}ZPN{\tt{"}} or {\tt{"}}distorted TAN{\tt{"}} projection being used instead). However,
+      there are restrictions on the use of these experimental projections.
+      For {\tt{"}}ZPX{\tt{"}}, longitude and latitude correction surfaces (appearing as
       {\tt{"}}lngcor{\tt{"}} or {\tt{"}}latcor{\tt{"}} terms in the IRAF-specific {\tt{"}}WAT{\tt{"}} keywords) are
       not supported. For {\tt{"}}TNX{\tt{"}} projections, only cubic surfaces encoded as
       simple polynomials with {\tt{"}}half cross-terms{\tt{"}} are supported. If an
       un-usable {\tt{"}}TNX{\tt{"}} or {\tt{"}}ZPX{\tt{"}} projection is encountered while reading
-      from a FitsChan, a simpler form of TPN or ZPN projection is used
+      from a FitsChan, a simpler form of TAN or ZPN projection is used
       which ignores the unsupported features and may therefore be
       inaccurate. If this happens, a warning message is added to the
       contents of the FitsChan as a set of cards using the keyword {\tt{"}}ASTWARN{\tt{"}}.
@@ -24141,15 +24358,24 @@ Object             - Base class for all AST Objects
 \sstroutine{
    NatLat\sstlabel{NatLat}
 }{
-   Native latitude of the reference point of a FITS-WCS projection
+   Native latitude of the fiducial point of a FITS-WCS projection
 }{
    \sstdescription{
-      This attribute gives the latitude of the reference point of the
+      This attribute gives the latitude of the fiducial point of the
       FITS-WCS projection implemented by a \htmlref{WcsMap}{WcsMap}. The value is in
-      radians in the {\tt{"}}native spherical{\tt{"}} coordinate system. In some
-      cases, this latitude value may be determined by one or more
-      projection parameter values supplied for the WcsMap using its
-      \htmlref{PVj\_m}{PVj_m} attribute.
+      radians in the {\tt{"}}native spherical{\tt{"}} coordinate system. The FITS-WCS
+      paper reserves parameter 2 associated with the longitude axis to
+      store this value. The value of the NatLat attribute equals this
+      projection parameter value converted to radians. A default value
+      is used if no value has been set for the projection parameter.
+      The default value is fixed for most projection types and is specified
+      in the FITS-WCS paper. The exception is that the default for the conic
+      projections is variable and is specified by the value of projection
+      parameter one associated with the latitude axis.
+
+      The NatLat attribute is read-only. The returned value can however
+      be changed by assigning a new value to the PVi\_2 attribute (where
+      {\tt{"}}i{\tt{"}} is the index of the longitude axis).
    }
    \sstattributetype{
       Floating point, read-only.
@@ -24165,11 +24391,60 @@ Object             - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
+         The AST-specific TPN projection uses all projection parameters on
+         both axes to represent correction terms. The value of the NatLat
+         attribute is therefore fixed at 0.5$*$PI rather than being specified
+         by a projection parameter.
+
+         \sstitem
          A value of AST\_\_BAD is returned if no latitude value is
          available.
 
          \sstitem
-         For a definition of the reference point for a projection, see
+         For a definition of the fiducial point for a projection, see
+         the FITS-WCS paper.
+      }
+   }
+}
+\sstroutine{
+   NatLon\sstlabel{NatLon}
+}{
+   Native longitude of the fiducial point of a FITS-WCS projection
+}{
+   \sstdescription{
+      This attribute gives the longitude of the fiducial point of the
+      FITS-WCS projection implemented by a \htmlref{WcsMap}{WcsMap}. The value is in
+      radians in the {\tt{"}}native spherical{\tt{"}} coordinate system. The FITS-WCS
+      paper reserves parameter 1 associated with the longitude axis to
+      store this value. The value of the NatLon attribute equals this
+      projection parameter value converted to radians. A default value
+      of zero is used if no value has been set for the projection parameter.
+
+      The NatLon attribute is read-only. The returned value can however
+      be changed by assigning a new value to the PVi\_1 attribute (where
+      {\tt{"}}i{\tt{"}} is the index of the longitude axis).
+   }
+   \sstattributetype{
+      Floating point, read-only.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         WcsMap
+      }{
+         All WcsMaps have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The AST-specific TPN projection uses all projection parameters on
+         both axes to represent correction terms. The value of the NatLon
+         attribute is therefore fixed at zero rather than being specified
+         by a projection parameter.
+
+         \sstitem
+         For a definition of the fiducial point for a projection, see
          the FITS-WCS paper.
       }
    }
@@ -24490,16 +24765,16 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
-   PVj\_m\sstlabel{PVj_m}
+   PVi\_m\sstlabel{PVi_m}
 }{
    FITS-WCS projection parameters
 }{
    \sstdescription{
       This attribute specifies the projection parameter values to be
       used by a \htmlref{WcsMap}{WcsMap} when implementing a FITS-WCS sky projection.
-      Each PV attribute name should include two integers, j and m,
+      Each PV attribute name should include two integers, i and m,
       separated by an underscore. The axis index is specified
-      by j, and should be in the range 1 to 99. The parameter number
+      by i, and should be in the range 1 to 99. The parameter number
       is specified by m, and should be in the range 0 to 99. For
       example, {\tt{"}}PV2\_1=45.0{\tt{"}} would specify a value for projection
       parameter 1 of axis 2 in a WcsMap.
@@ -24533,6 +24808,15 @@ Object             - Base class for all AST Objects
       AST\_\_BAD if the paper indicates that the parameter has no default.
       A default value of zero is returned for parameters which are not
       accessed by the projection.
+
+      Note, the FITS-WCS paper reserves parameters 1 and 2 on the longitude
+      axis to hold the native longitude and latitude of the fiducial
+      point of the projection, in degrees. The default values for these
+      parameters are determined by the projection type. The AST-specific
+      TPN projection does not use this convention - all projection
+      parameters for both axes are used to represent polynomical correction
+      terms, and the native longitude and latitude at the fiducial point may
+      not be changed from the default values of zero and 90 degrees.
    }
    \sstattributetype{
       Floating point.
@@ -24674,7 +24958,7 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
-   ProjP(i)\sstlabel{ProjPi}
+   ProjP(m)\sstlabel{ProjPm}
 }{
    FITS-WCS projection parameters
 }{
@@ -24765,8 +25049,7 @@ Object             - Base class for all AST Objects
    \sstdescription{
       This attribute specifies the FK5 J2000.0 declination of a reference
       point on the sky. See the description of attribute \htmlref{RefRA}{RefRA} for details.
-      The default RefDec is {\tt{"}}$<$bad$>${\tt{"}}, which results in a floating point
-      value of AST\_\_BAD.
+      The default RefDec is {\tt{"}}0:0:0{\tt{"}}.
    }
    \sstattributetype{
       String.
@@ -24815,13 +25098,7 @@ Object             - Base class for all AST Objects
       \htmlref{astSetRefPos}{astSetRefPos} and \htmlref{astGetRefPos}{astGetRefPos} may be used to access the values of
       these attributes directly as unformatted values in radians.
 
-      The default for both RefRA and RefDec is {\tt{"}}$<$bad$>${\tt{"}}, which results in a
-      floating point value of AST\_\_BAD. This default value will cause the
-      astFindFrame and astConvert functions
-      to fail to find a conversion between two SpecFrames if they
-      refer to different standards of rest. Explicit values must be
-      set for the RefRA and RefDec attributes in both SpecFrames to
-      overcome this.
+      The default for RefRA is {\tt{"}}0:0:0{\tt{"}}.
    }
    \sstattributetype{
       String.
@@ -24907,17 +25184,7 @@ Object             - Base class for all AST Objects
       This attribute specifies the frequency corresponding to zero
       velocity. It is used when converting between between velocity-based
       coordinate systems and and other coordinate systems (such as frequency,
-      wavelength, energy, etc).
-
-      The default value is AST\_\_BAD, resulting in it being impossible to
-      convert between a velocity system and a non-velocity system. If you
-      want to work entirely within one system or the other, it is not
-      necessary to assign a value to this attribute. Note, the
-      \htmlref{astFindFrame}{astFindFrame} and \htmlref{astConvert}{astConvert}
-      methods will fail to align two SpecFrames if a conversion between
-      velocity and non-velocity systems is required, and no value has been
-      assigned for the relevant RestFreq attribute. See the description of
-      the \htmlref{AlignStdOfRest}{AlignStdOfRest} attribute for details of the alignment process.
+      wavelength, energy, etc). The default value is 1.0E5 GHz.
 
       When setting a new value for this attribute, the new value can be
       supplied either directly as a frequency, or indirectly as a wavelength
@@ -25174,21 +25441,52 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   SourceVRF\sstlabel{SourceVRF}
+}{
+   Rest frame in which the source velocity is stored
+}{
+   \sstdescription{
+      This attribute identifies the rest frame in which the source
+      velocity is stored (the source velocity is accessed using attribute
+      \htmlref{SourceVel}{SourceVel}). When setting a new value for the SourceVel attribute,
+      the source velocity should be supplied in the rest frame indicated
+      by this attribute. Likewise, when getting the value of the SourceVel
+      attribute, the velocity will be returned in this rest frame.
+
+      If the value of SourceVRF is changed, the value stored for SourceVel
+      will be converted from the old to the new rest frame.
+
+      The values which can be supplied are the same as for the StdOfrest
+      attribute (except that SourceVRF cannot be set to {\tt{"}}Source{\tt{"}}). The
+      default value is {\tt{"}}Helio{\tt{"}}.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{SpecFrame}{SpecFrame}
+      }{
+         All SpecFrames have this attribute.
+      }
+   }
+}
+\sstroutine{
    SourceVel\sstlabel{SourceVel}
 }{
    The source velocity
 }{
    \sstdescription{
-      This attribute (together with \htmlref{RefRA}{RefRA} and \htmlref{RefDec}{RefDec}) defines the {\tt{"}}Source{\tt{"}}
-      standard of rest (see attribute \htmlref{StdOfRest}{StdOfRest}). This is a rest frame
+      This attribute (together with \htmlref{SourceVRF}{SourceVRF}, \htmlref{RefRA}{RefRA} and \htmlref{RefDec}{RefDec}) defines the
+      {\tt{"}}Source{\tt{"}} standard of rest (see attribute \htmlref{StdOfRest}{StdOfRest}). This is a rest frame
       which is moving towards the position given by RefRA and RefDec at a
-      velocity given by SourceVel (in km/s). The value is stored internally
-      as a heliocentric velocity, but is converted to and from the rest
-      frame specified by the StdOfRest attribute when accessed using
-      astGet or \htmlref{astSet}{astSet}.
+      velocity given by SourceVel (in km/s). When setting a value for
+      SourceVel, the velocity should be supplied in the rest frame
+      specified by the SourceVRF attribute. Likewise, when getting the
+      value of SourceVel, it will be returned in the rest frame specified
+      by the SourceVRF attribute.
 
-      The default value is zero, resulting in the {\tt{"}}Source{\tt{"}} standard of
-      rest being equivalent to the {\tt{"}}Heliocentric{\tt{"}} standard of rest.
+      The default value is zero.
    }
    \sstattributetype{
       Floating point.
@@ -25262,7 +25560,7 @@ Object             - Base class for all AST Objects
          attributes.
 
          \sstitem
-         {\tt{"}}LSR{\tt{"}}, {\tt{"}}LSRK{\tt{"}}: The rest-frame of the kinematical Local Standard of
+         {\tt{"}}LSRK{\tt{"}}, {\tt{"}}LSR{\tt{"}}: The rest-frame of the kinematical Local Standard of
          Rest. Spectra recorded in this standard of rest suffer a Doppler shift
          which depends on the velocity of the kinematical Local Standard of Rest
          through the galaxy. This standard of rest must be qualified using the
@@ -25520,7 +25818,7 @@ Object             - Base class for all AST Objects
          \sstitemlist{
 
             \sstitem
-            {\tt{"}}FREQ{\tt{"}}: Frequency (Hz)
+            {\tt{"}}FREQ{\tt{"}}: Frequency (GHz)
 
             \sstitem
             {\tt{"}}ENER{\tt{"}} or {\tt{"}}ENERGY{\tt{"}}: Energy (J)
@@ -25529,16 +25827,16 @@ Object             - Base class for all AST Objects
             {\tt{"}}WAVN{\tt{"}} or {\tt{"}}WAVENUM{\tt{"}}: Wave-number (1/m)
 
             \sstitem
-            {\tt{"}}WAVE{\tt{"}} or {\tt{"}}WAVELEN{\tt{"}}: Vacuum wave-length (m)
+            {\tt{"}}WAVE{\tt{"}} or {\tt{"}}WAVELEN{\tt{"}}: Vacuum wave-length (Angstrom)
 
             \sstitem
-            {\tt{"}}AWAV{\tt{"}} or {\tt{"}}AIRWAVE{\tt{"}}: Wave-length in air (m)
+            {\tt{"}}AWAV{\tt{"}} or {\tt{"}}AIRWAVE{\tt{"}}: Wave-length in air (Angstrom)
 
             \sstitem
-            {\tt{"}}VRAD{\tt{"}} or {\tt{"}}VRADIO{\tt{"}}: Radio velocity (m/s)
+            {\tt{"}}VRAD{\tt{"}} or {\tt{"}}VRADIO{\tt{"}}: Radio velocity (km/s)
 
             \sstitem
-            {\tt{"}}VOPT{\tt{"}} or {\tt{"}}VOPTICAL{\tt{"}}: Optical velocity (m/s)
+            {\tt{"}}VOPT{\tt{"}} or {\tt{"}}VOPTICAL{\tt{"}}: Optical velocity (km/s)
 
             \sstitem
             {\tt{"}}ZOPT{\tt{"}} or {\tt{"}}REDSHIFT{\tt{"}}: Reshift (dimensionless)
@@ -25547,7 +25845,7 @@ Object             - Base class for all AST Objects
             {\tt{"}}BETA{\tt{"}}: Beta factor (dimensionless)
 
             \sstitem
-            {\tt{"}}VELO{\tt{"}} or {\tt{"}}VREL{\tt{"}}: Relativistic velocity (m/s)
+            {\tt{"}}VELO{\tt{"}} or {\tt{"}}VREL{\tt{"}}: Relativistic velocity (km/s)
 
          }
          The default value for the Unit attribute for each system is shown
@@ -26021,7 +26319,7 @@ Object             - Base class for all AST Objects
       space separated list of condition names (see the \htmlref{AllWarnings}{AllWarnings}
       attribute for a list of the currently defined names). Each name
       indicates a condition which should be reported. The default
-      value for Warnings is the string {\tt{"}}Tnx Zpx BadCel{\tt{"}}.
+      value for Warnings is the string {\tt{"}}Tnx Zpx BadCel BadMat{\tt{"}}.
 
       The text of any warning will be stored within the FitsChan in the
       form of one or more new header cards with keyword ASTWARN. If
@@ -26301,12 +26599,16 @@ Object             - Base class for all AST Objects
       Attributes
    }{
       The CmpFrame class does not define any new attributes beyond
-      those which are applicable to all Frames. To access an attribute of
-      either of the two component Frames, append an axis index (within
-      parentheses) to the end of the attribute name. For instance, if axis
-      3 of a CmpFrame is contained within a \htmlref{SkyFrame}{SkyFrame}, then the \htmlref{Equinox}{Equinox}
-      attribute of the SkyFrame can be accessed as attribute {\tt{"}}Equinox(3){\tt{"}}
-      of the CmpFrame.
+      those which are applicable to all Frames. However, the attributes
+      of the component Frames can be accessed as if they were attributes
+      of the CmpFrame. For instance, if a CmpFrame contains a \htmlref{SpecFrame}{SpecFrame}
+      and a \htmlref{SkyFrame}{SkyFrame}, then the CmpFrame will recognise the {\tt{"}}\htmlref{Equinox}{Equinox}{\tt{"}}
+      attribute and forward access requests to the component SkyFrame.
+      Likewise, it will recognise the {\tt{"}}\htmlref{RestFreq}{RestFreq}{\tt{"}} attribute and forward
+      access requests to the component SpecFrame. An axis index can
+      optionally be appended to the end of any attribute name, in which
+      case the request to access the attribute will be forwarded to the
+      primary Frame defining the specified axis.
    }
    \sstdiytopic{
       Functions
@@ -26506,6 +26808,9 @@ Object             - Base class for all AST Objects
 
          \sstitem
          \htmlref{CarLin}{CarLin}: Ignore spherical rotations on CAR projections?
+
+         \sstitem
+         \htmlref{CDMatrix}{CDMatrix}: Use a CD matrix instead of a PC matrix?
 
          \sstitem
          \htmlref{Clean}{Clean}: Remove cards used whilst reading even if an error occurs?
@@ -26709,9 +27014,6 @@ Object             - Base class for all AST Objects
 
          \sstitem
          \htmlref{astUnformat}{astUnformat}: Read a formatted coordinate value for a Frame axis
-
-         \sstitem
-         AST\_ACTIVEUNIT: Specify how the Unit attribute should be used
       }
    }
 }
@@ -26988,6 +27290,9 @@ Object             - Base class for all AST Objects
          \htmlref{astMapBox}{astMapBox}: Find a bounding box for a Mapping
 
          \sstitem
+         \htmlref{astRate}{astRate}: Calculate the rate of change of a Mapping output
+
+         \sstitem
          \htmlref{astResample$<$X$>$}{astResampleX}: Resample a region of a data grid
 
          \sstitem
@@ -27182,6 +27487,9 @@ Object             - Base class for all AST Objects
 
          \sstitem
          \htmlref{astTest}{astTest}: Test if an attribute value is set for an Object
+
+         \sstitem
+         \htmlref{astVersion}{astVersion}: Return the verson of the AST library being used.
       }
    }
 }
@@ -27738,6 +28046,9 @@ Object             - Base class for all AST Objects
          \htmlref{SourceVel}{SourceVel}: Source velocity
 
          \sstitem
+         \htmlref{SourceVRF}{SourceVRF}: Source velocity rest frame
+
+         \sstitem
          \htmlref{StdOfRest}{StdOfRest}: Standard of rest
 
       }
@@ -27865,11 +28176,11 @@ Object             - Base class for all AST Objects
 }{
    \sstdescription{
       This class is used to represent sky coordinate projections as
-      described in the (draft) FITS world coordinate system (FITS-WCS)
-      paper by E.W. Griesen and M. Calabretta (A \& A, in preparation).
-      This paper defines a set of functions, or sky projections, which
-      transform longitude-latitude pairs representing spherical
-      celestial coordinates into corresponding pairs of Cartesian
+      described in the FITS world coordinate system (FITS-WCS) paper II
+      {\tt{"}}Representations of Celestial Coordinates in FITS{\tt{"}} by M. Calabretta
+      and E.W. Griesen. This paper defines a set of functions, or sky
+      projections, which transform longitude-latitude pairs representing
+      spherical celestial coordinates into corresponding pairs of Cartesian
       coordinates (and vice versa).
 
       A WcsMap is a specialised form of \htmlref{Mapping}{Mapping} which implements these
@@ -27878,11 +28189,12 @@ Object             - Base class for all AST Objects
       deprecated {\tt{"}}TAN with polynomial correction terms{\tt{"}} projection which
       is refered to here by the code {\tt{"}}TPN{\tt{"}}. Using the FITS-WCS terminology,
       the transformation is between {\tt{"}}native spherical{\tt{"}} and {\tt{"}}projection
-      plane{\tt{"}} coordinates.  These coordinates may, optionally, be embedded in
-      a space with more than two dimensions, the remaining coordinates being
-      copied unchanged. Note, however, that for consistency with other AST
-      facilities, a WcsMap handles coordinates that represent angles
-      in radians (rather than the degrees used by FITS-WCS).
+      plane{\tt{"}} coordinates (also called {\tt{"}}intermediate world coordinates{\tt{"}}.
+      These coordinates may, optionally, be embedded in a space with more
+      than two dimensions, the remaining coordinates being copied unchanged.
+      Note, however, that for consistency with other AST facilities, a
+      WcsMap handles coordinates that represent angles in radians (rather
+      than the degrees used by FITS-WCS).
 
       The type of FITS-WCS projection to be used and the coordinates
       (axes) to which it applies are specified when a WcsMap is first
@@ -27892,7 +28204,7 @@ Object             - Base class for all AST Objects
 
       Each WcsMap also allows up to 100 {\tt{"}}projection parameters{\tt{"}} to be
       associated with each axis. These specify the precise form of the
-      projection, and are accessed using \htmlref{PVj\_m}{PVj_m} attribute, where {\tt{"}}j{\tt{"}} is
+      projection, and are accessed using \htmlref{PVi\_m}{PVi_m} attribute, where {\tt{"}}i{\tt{"}} is
       the integer axis index (starting at 1), and m is an integer
       {\tt{"}}parameter index{\tt{"}} in the range 0 to 99. The number of projection
       parameters required by each projection, and their meanings, are
@@ -27921,10 +28233,13 @@ Object             - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
-         \htmlref{NatLat}{NatLat}: Native latitude of the reference point of a FITS-WCS projection
+         \htmlref{NatLat}{NatLat}: Native latitude of the fiducial point of a FITS-WCS projection
 
          \sstitem
-         PVj\_m: FITS-WCS projection parameters
+         \htmlref{NatLon}{NatLon}: Native longitude of the fiducial point of a FITS-WCS projection
+
+         \sstitem
+         PVi\_m: FITS-WCS projection parameters
 
          \sstitem
          WcsAxis(lonlat): FITS-WCS projection axes
@@ -28571,7 +28886,7 @@ changes are:
 of {\tt CDj\_i} keywords instead of a combination of {\tt PCjjjiii} and
 {\tt CDELTj} keywords.
 \item \htmlref{Projection}{Projection} parameters are now associated with particular axes and
-are represented by {\tt PVi\_m} keywords instead of the {\tt PROJPm}
+are represented by {\tt \htmlref{PVi\_m}{PVi_m}} keywords instead of the {\tt PROJPm}
 keywords.
 \item The tangent plane projection (``TAN'') can now include optional 
 polynomial correction terms.
@@ -28637,7 +28952,7 @@ for which default values will be used, {\em etc}.
 FITS-WCS encoding in the FitsChan class:
 \begin{itemize}
 \item Projection parameters are now associated with a particular axis and
-are specified using a new set of attributes called \htmlref{PVj\_m}{PVj_m}. Here, ``j'' is 
+are specified using a new set of attributes called PVj\_m. Here, ``j'' is 
 the index of an axis of WcsMap, and ``m'' is the index of the projection 
 parameter.
 \item The old attributes ProjP(0) to ProjP(9) are still available but are
@@ -28995,25 +29310,15 @@ trailing ``Z'' character to the end of DATE-OBS keyword values.
 \item The FitsChan class has been modified to use latest list of FITS-WCS 
 projections, as described in the FITS-WCS paper II, "Representations of
 celestial coordinates in FITS" (Calabretta \& Greisen, draft dated 23
-April 2002). One consequence of this is that the polynomial correction
+April 2002). Support has been retained for the polynomial correction
 terms which previous drafts have allowed to be associated with TAN
-projections are no longer available. However, support for an AST-specific
-projection code "TPN" has been introduced into the FitsChan and \htmlref{WcsMap}{WcsMap}
-classes which retains the old behaviour of the TAN projection (i.e.
-allows polynomial correction terms to be associated with longitude and/or
-latitude axes). Existing TAN headers which include projection parameters
-are translated into ``TPN'' by the \htmlref{astRead}{astRead} method, as are TNX and DSS
-headers. The astWrite method produces TPN headers when using FITS-WCS
-encoding if the \htmlref{FrameSet}{FrameSet} requires a TAN projection with polynomial
-correction terms. Obviously, these TPN headers will not be recognized by
-other FITS readers unless the reader uses the AST library internally.
-This anomolous situation will hopefully be cleared up when the FITS-WCS
-paper IV is published, which specifies how such corrections should be
-encoded in a FITS header.
+projections. 
 
-\item The WcsMap class has additional projection types of AST\_\_TPN (see
-above) and AST\_\_SZP. In addition, the usage of projection parameters
-has been brought into line with the the FITS-WCS paper II. 
+\item The \htmlref{WcsMap}{WcsMap} class has additional projection types of AST\_\_TPN
+(which implements a distorted TAN projection) and AST\_\_SZP. The AST\_\_TAN
+projection type now represents a simple TAN projection and has no 
+associated projection parameters. In addition, the usage of projection 
+parameters has been brought into line with the the FITS-WCS paper II. 
 
 \item The WcsMap class has been modified so that a "get" operation on a
 projection parameter attribute will return the default value defined in the
@@ -29026,8 +29331,7 @@ produced by the \htmlref{astGrid}{astGrid} method will not extend beyond these l
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V2.0}
+\subsection{Changes Introduced in V2.0}
 
 Note, \htmlref{Frame}{Frame} descriptions created using AST V2.0 will not be readable by 
 applications linked with earlier versions of AST. This applies to Frame
@@ -29046,6 +29350,12 @@ occurred in the AST library between versions V1.8-13 and V2.0 (the
 current version):
 
 \begin{enumerate}
+
+\item The default value for the \htmlref{Domain}{Domain} attribute provided by the \htmlref{CmpFrame}{CmpFrame} 
+class has been changed from ``CMP'' to a string formed by concatenating
+the Domain attributes of the two component Frames, separated by a minus
+sign. If both component Domains are blank, then the old default of
+``CMP'' is retained for the CmpFrame Domain.
 
 \item The implementation of the 
 \htmlref{astWrite}{astWrite} function
@@ -29111,7 +29421,7 @@ control over the alignment process performed by the methods
 \htmlref{astFindFrame}{astFindFrame} and astConvert.
 
 
-\item The \htmlref{CmpFrame}{CmpFrame} class has been modified so that attributes of a 
+\item The CmpFrame class has been modified so that attributes of a 
 component Frame can be accessed without needing to extract the Frame first.
 To do this, append an axis index to the end of the attribute name. For
 instance, if a CmpFrame contains a SpecFrame and a SkyFrame (in that order), 
@@ -29138,9 +29448,42 @@ such as may be produced if a grid line cuts across the plot very close to
 a corner. Previously, these missed sections could sometimes result in 
 axis labels being omitted.
 
+\item A new function
+(\htmlref{astVersion}{astVersion})
+has been added to return the version of the AST library in use.
+
+\item Bugs have been fixed in the Plot class which caused serious problems
+when plotting high precision data. These problems could range from the
+omission of some tick marks to complete failure to produce a plot.
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V2.0 and V3.0 (the
+current version):
+
+\begin{enumerate}
+
+\item The 
+\htmlref{astRate}{astRate}
+function has been added which allows an estimate to be made of the rate of 
+change of a \htmlref{Mapping}{Mapping} output with respect to one of the Mapping inputs. 
+
+\item A new subclass of Mapping, the GrismMap, has been added which
+models the spectral dispersion produced by a grating, prism or grism.
+
+\end{enumerate}
+
+Programs which are statically linked will need to be re-linked in
+order to take advantage of these new facilities.
+
+
 
 \end{document}

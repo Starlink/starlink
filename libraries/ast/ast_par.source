@@ -46,7 +46,7 @@
 *     30-APR-2003 (DSB):
 *        Added AST_VERSION.
 *     15-JUL-2003 (DSB):
-*        Added AST_RATE.
+*        Added AST_RATE and GRISMMAP functions.
 *-
 
 *  Length of character string returned by a character function.
@@ -311,3 +311,7 @@ c      PARAMETER ( AST__UKERNN = 2 )
 *  ZoomMap class.
       INTEGER AST_ZOOMMAP
       LOGICAL AST_ISAZOOMMAP
+
+*  GrismMap class.
+      INTEGER AST_GRISMMAP
+      LOGICAL AST_ISAGRISMMAP
