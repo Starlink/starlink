@@ -55,6 +55,10 @@
 //    22-JAN-2003 (PWD)
 //        Added methods to support extra precision in output. When
 //        enabled this is supposed to show milli-arcsec resolution.
+//    10-JUN-2003 (PWD):
+//        Reworked make2D for case when there are more than 2
+//        dimensions. Should work better with NDF sections which have
+//        insignificant dimensions (in the base frame).
 //-
 
 #include <string.h>
@@ -168,20 +172,26 @@ StarWCS::StarWCS( const char *header, const int lheader )
             // Look for the image dimensions and store these if found. We
             // need these for calculating the size of the image in world
             // coordinates and AST doesn't retain this information.
-            nxpix_ = 1;
+            ndims_ = 2;
             astClear( fitschan, "Card" );
-            if ( astFindFits( fitschan, "NAXIS1", card, 1) ) {
+            if ( astFindFits( fitschan, "NAXIS", card, 1 ) ) {
                 if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
-                    sscanf( ++ptr, "%d", &nxpix_ );
+                    sscanf( ++ptr, "%d", &ndims_ );
                 }
             }
-            nypix_ = 1;
+            int i = 0;
+            for ( i = 0; i < MAXDIM; i++ ) {
+                dims_[i] = 1;
+            }
             astClear( fitschan, "Card" );
-            if ( astFindFits( fitschan, "NAXIS2", card, 1) ) {
+            i = 0;
+            while( astFindFits( fitschan, "NAXIS%d", card, 1 ) ) {
                 if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
-                    sscanf( ++ptr, "%d", &nypix_ );
+                    sscanf( ++ptr, "%d", & dims_[i++] );
                 }
             }
+            nxpix_ = dims_[0];
+            nypix_ = dims_[1];
 
             // Record axis rotation.
             rotate_ = 0.0;
@@ -420,6 +430,9 @@ void StarWCS::setSecPix()
 //
 void StarWCS::setEquinox()
 {
+    if ( wcs_ == NULL ) {
+        return;
+    }
     equinoxStr_[0] = '\0';
 
     //  Make sure equinox has a valid value.
@@ -429,7 +442,8 @@ void StarWCS::setEquinox()
     if ( !astOK ) {
         astClearStatus;
         ok = 0;
-    } else if ( system ) {
+    } 
+    else if ( system ) {
 
         //  Make sure system should have an equinox associated with it.
         if ( strncmp( "FK", system, 2 ) == 0 ||
@@ -519,7 +533,8 @@ char* StarWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) c
         if ( raIndex_ == 1 ) {
             ra = point[0];
             dec = point[1];
-        } else {
+        } 
+        else {
             dec = point[0];
             ra = point[1];
         }
@@ -530,14 +545,15 @@ char* StarWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) c
                 if ( rastr && decstr ) {
                     sprintf (buf, "%s %s %s", rastr, decstr, equinoxStr_);
                 }
-            } else {
+            } 
+            else {
 
                 // If hms_flag is not set then return the result in degrees.
                 sprintf (buf, "%g %g %s", ra * r2d_, dec * r2d_, equinoxStr_);
             }
         }
+        if ( !astOK ) astClearStatus;
     }
-    if ( !astOK ) astClearStatus;
     return buf;
 }
 
@@ -570,7 +586,8 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
     if ( ! astOK ) {
         astClearStatus;
         return error("can't convert world coordinates: out of range");
-    } else {
+    } 
+    else {
 
         // Return values are in degrees and swapped if necessary.
         if ( raIndex_ == 1 ) {
@@ -1073,28 +1090,22 @@ int StarWCS::make2D()
         return 1;
     }
     if ( nsky < 2 ) {
-        // Current frame has too few axes. Add in a dummy one 
+        // Current frame has too few axes. Add in a dummy one
         // to make it 2D.
         outperm[0] = 1;
         outperm[1] = 0;
         AstFrame* newFrame =
             (AstFrame *) astPickAxes( skyframe, 2, outperm, NULL );
 
-        astShow( wcs_ );
-        astShow( skyframe );
-        astShow( newFrame );
-        
         // Need a permmap that looses the second dimension.
         inperm[0] = 1;
         inperm[1] = -1;
         outperm[0] = 1;
         outperm[1] = -1;
-        AstMapping *map = 
+        AstMapping *map =
             (AstMapping *) astPermMap( 1, inperm, 2, outperm, zero, "" );
-        astShow( map );
 
         astAddFrame( wcs_, nsky, map, newFrame );
-        astShow( wcs_ );
 
         nsky = 2;
         astAnnul( skyframe );
@@ -1112,20 +1123,47 @@ int StarWCS::make2D()
         return 0;
     }
 
-    // Add the necessary frames to make the base frame 2D.
-    outperm[0] = 1;
-    outperm[1] = 2;
-    if ( nbase < 2 ) outperm[1] = 0;
-    AstFrame *newframe = 
+    // Add the necessary frames to make the base frame 2D. For these
+    // we need to pick out the significant dimensions. Only two are
+    // allowed.
+    int sigaxes = 0;
+    for ( int i = 0; i < ndims_; i++ ) {
+        outperm[i] = 0;
+        inperm[i] = -1;
+        if ( dims_[i] > 1 && sigaxes < 2 ) {
+            inperm[i] = sigaxes + 1;
+            outperm[sigaxes] = i + 1;
+            sigaxes++;
+            if ( sigaxes == 1 ) {
+                nxpix_ = dims_[i];
+            }
+            if ( sigaxes == 2 ) {
+                nypix_ = dims_[i];
+            }
+        }
+    }
+    if ( sigaxes < 2 ) {
+        // Just pick out first two, as we don't seem to have enough
+        // significant axes. Could be a spectrum.
+        outperm[0] = 1;
+        outperm[1] = 2;
+        inperm[0] = 1;
+        inperm[1] = 2;
+        nxpix_ = dims_[0];
+        nypix_ = dims_[1];
+        if ( nbase < 2 ) {
+            inperm[1] = -1;
+            outperm[1] = 0;
+            nypix_ = 1;
+        }
+    }
+
+    AstFrame *newframe =
         (AstFrame *) astPickAxes( baseframe, 2, outperm, NULL );
 
     // Create a mapping for this permutation that doesn't have <bad>
     // values as the result.
-    inperm[0] = 1;
-    inperm[1] = 2;
-    if ( nbase < 2 ) inperm[1] = -1;
-    for( i = 2; i < nbase; i++ ) inperm[i] = -1;
-    AstMapping *map = 
+    AstMapping *map =
         (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, "" );
 
     // Now add this frame to the FrameSet and make it the base
@@ -1197,11 +1235,37 @@ int StarWCS::make2D()
             }
         }
         if ( naxes != 2 ) {
-            // Fudge the transformations to pick the first two axes.
-            out1[0][0] = 1.0;
-            out2[0][0] = 2.0;
-            out1[1][0] = 1.0;
-            out2[1][0] = 2.0;
+            // Fudge the transformations to pick the first two axes,
+            // or if we have lots, the two "most" significant ones
+            // (since units matter this may be less than useful!).
+            if ( n > 2 ) {
+                double maxdiff = 0.0;
+                double diff = 0.0;
+                int low = 0;
+                int high = 1;
+                for ( i = 0; i < nsky; i++ ) {
+                    diff = fabs( out1[i][0] - out2[i][0] );
+                    if ( diff > maxdiff ) {
+                        low = high;
+                        high = i;
+                    }
+                    
+                    // Initialisation while in loop.
+                    out1[i][0] = 0.0;
+                    out2[i][0] = 0.0;
+                }
+                out1[low][0] = 1.0;
+                out2[low][0] = 2.0;
+                out1[high][0] = 1.0;
+                out2[high][0] = 2.0;
+            }
+            else {
+                // No significant ones.
+                out1[0][0] = 1.0;
+                out2[0][0] = 2.0;
+                out1[1][0] = 1.0;
+                out2[1][0] = 2.0;
+            }
         }
     }
 
@@ -1212,7 +1276,7 @@ int StarWCS::make2D()
     for ( i = 0; i < nsky; i++ ) {
         if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
             outperm[n++] = i + 1;
-            inperm[i] = i + 1;
+            inperm[i] = n;
         }
         else {
             if ( out1[i][0] != AST__BAD ) { // Single valued coordinate
@@ -1243,7 +1307,7 @@ int StarWCS::make2D()
     // indicate an error.
     if ( !astOK ) {
         return 0;
-    } 
+    }
     else {
         return 1;
     }
