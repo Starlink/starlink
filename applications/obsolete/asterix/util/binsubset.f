@@ -192,23 +192,21 @@
       INTEGER                NSEL,ISEL
       INTEGER                OAXPTR(ADI__MXDIM) ! Pointers to output axes
       INTEGER                SELAX(ADI__MXDIM)
-      INTEGER                TLEN               ! Text length
+      INTEGER                	TLEN               	! Text length
 
-      LOGICAL                INPRIM             ! Input object is primitive
-      LOGICAL                WIDOK(ADI__MXDIM)  ! Width component od axes ok?
-      LOGICAL                OK                 ! object is ok
-      LOGICAL                KEEP(ADI__MXDIM)   ! Are ranges those to keep?
-      LOGICAL                KEEPDATA
+      LOGICAL                	INPRIM             	! Input is primitive?
+      LOGICAL                	WIDOK(ADI__MXDIM)  	! Width component od axes ok?
+      LOGICAL                	OK                 	! Object is ok
+      LOGICAL                	KEEP(ADI__MXDIM)   	! Are ranges those to keep?
+      LOGICAL                	KEEPDATA
       LOGICAL			PRIM			! Input is primitive?
-      LOGICAL 		     SLICE
-      LOGICAL                INDEX              ! select by index
-      LOGICAL                QUALOK             ! Input QUALITY OK?
-      LOGICAL                VAROK              ! Input VARIANCE OK?
-      LOGICAL                SEL(ADI__MXDIM)    ! Has axis been selected on?
+      LOGICAL 		     	SLICE			!
+      LOGICAL                	INDEX              	! Select by index?
+      LOGICAL                	SEL(ADI__MXDIM)    	! Has axis been selected on?
 
 *  Local Data:
       CHARACTER*10		OBJ(NOBJ)
-      DATA			OBJ/'Data,'Variance','Quality',
+      DATA			OBJ/'Data','Variance','Quality',
      :                              'LoError','HiError'/
 *.
 
