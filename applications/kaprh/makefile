@@ -1489,7 +1489,7 @@ do_deinstall:
 #  so, it causes the do_test target to be made, which performs the
 #  installation test.
 
-test: $(INSTALL_BIN)/$(TEST_DEMO).demo
+test: $(KAPPA_DIR)/m31.sdf
 	@ if test ! -f .INSTALLED_$(SYSTEM); then \
            echo;\
            echo '*** The $(PACK_NAME) package is not currently installed';\
@@ -1665,9 +1665,8 @@ strip:
 #  Rule for building the source tar files.
 $(PKG_NAME)_source.tar: 
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) \
-                  $(LINK_SCRIPT) $(ICL_SCRIPT) $(I_KAPRH) \
-                  $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
-                  $(STYLE_FILES) $(DEMO_FILES)
+                  $(LINK_SCRIPT) $(ICL_SCRIPT) \
+                  $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE)
 
 $(PKG_NAME)_iraf.tar: 
 	$(TAR_IN) $(PKG_NAME)_source.tar $(IRAF_STARTUP) $(IRAF_PKG_PAR) \

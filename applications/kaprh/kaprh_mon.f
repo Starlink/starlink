@@ -106,11 +106,12 @@
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
 
-*  Produces a greyscale plot of a 2-d NDF.
          IF ( NAME .EQ. 'GREYPLOT' ) THEN
             CALL GREYPLOT ( STATUS )
 
-*  No such option exists.
+         ELSE IF ( NAME .EQ. 'KRHHELP' ) THEN
+            CALL KRHHELP ( STATUS )
+
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'CMD', NAME )

@@ -675,15 +675,6 @@
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      call msg_blank( status )   
-      call msg_blank( status )   
-      call msg_out( ' ', '  WARNING:  The GREYPLOT application will '//
-     :              'be withdrawn at the next release of KAPPA. Use '//
-     :              'DISPLAY KEY=YES instead.', STATUS )
-      call msg_blank( status )   
-      call msg_blank( status )   
-
-
 *    Determine whether scaling is required.
 *    ======================================
 *

@@ -19,7 +19,7 @@ _kaprh.hd kaprh.cl  kaprh.men kaprh_mon.tcl greyplot.par
 IRAF_DOCS = greyplot.hlp 
 
 # The contents of the kaprh_ifls.tar file:
-KAPRH_IFLS = greyplot.ifl krhhelp.ifl
+KAPRH_IFLS = greyplot.ifl krhhelp.ifl kaprh_mon.ifl
 
 # The contents of the kaprh_sub.tar file:
 KAPRH_SUB = greyplot.f krhhelp.f

@@ -515,7 +515,7 @@ KAPVIEW_F_ROUTINES = \
 colcomp.f contour.f contover.f \
 crelut.f cursor.f drawsig.f display.f elprof.f \
 gdclear.f gdnames.f gdset.f gdstate.f \
-greyplot.f idclear.f \
+idclear.f \
 idinvisible.f idpazo.f idset.f idstate.f \
 inspect.f \
 linplot.f lutable.f lutflip.f luthilite.f \
@@ -2321,7 +2321,6 @@ globals.o:	 SAE_PAR DAT_PAR DAT_ERR
 gltbsb.o:	 SAE_PAR PRM_PAR
 gltclt.o:	 SAE_PAR FIO_ERR
 gltcsb.o:	 SAE_PAR PRM_PAR
-greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
 hiscom.o:	 SAE_PAR NDF_PAR MSG_PAR PAR_PAR PAR_ERR FIO_ERR
 hislist.o:	 SAE_PAR NDF_PAR
 hisset.o:	 SAE_PAR NDF_PAR MSG_PAR

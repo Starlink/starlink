@@ -52,7 +52,7 @@ elprof.par erase.par errclip.par exp10.par expe.par expon.par ffclean.par \
 fillbad.par fitsdin.par fitsexist.par fitsexp.par fitsimp.par fitsin.par \
 fitslist.par fitsmod.par fitstext.par fitsurface.par fitsval.par \
 fitswrite.par flip.par fourier.par gausmooth.par gdclear.par gdnames.par \
-gdset.par gdstate.par glitch.par globals.par greyplot.par hiscom.par \
+gdset.par gdstate.par glitch.par globals.par hiscom.par \
 hislist.par hisset.par histat.par histeq.par histogram.par idclear.par \
 idinvisible.par idpazo.par idset.par idstate.par inspect.par div.par \
 log10.par pow.par kappa.par kstest.par laplace.par permaxes.par \
@@ -92,7 +92,7 @@ fitsexp.hlp fitsexist.hlp fitshead.hlp fitsimp.hlp fitsin.hlp permaxes.hlp \
 fitslist.hlp fitsmod.hlp fitstext.hlp fitsurface.hlp fitsval.hlp \
 fitswrite.hlp flip.hlp fourier.hlp gausmooth.hlp gdclear.hlp gdnames.hlp \
 gdset.hlp gdstate.hlp glitch.hlp getting_started.hlp globals.hlp \
-graphics_database.hlp greyplot.hlp hints.hlp hds_data_types.hlp colcomp.hlp \
+graphics_database.hlp hints.hlp hds_data_types.hlp colcomp.hlp \
 hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
 idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp inspect.hlp \
 interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
@@ -146,7 +146,7 @@ sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
 tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl contover.ifl crelut.ifl cursor.ifl \
 drawsig.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
-gdstate.ifl greyplot.ifl idclear.ifl idinvisible.ifl idpazo.ifl idset.ifl \
+gdstate.ifl idclear.ifl idinvisible.ifl idpazo.ifl idset.ifl \
 idstate.ifl inspect.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
 lutrot.ifl lutsave.ifl luttweak.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
 ovset.ifl paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
@@ -274,7 +274,7 @@ kps1_gliwr.f kps1_gligt.f kps1_saxlk.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
-elprof.f gdclear.f gdnames.f gdset.f gdstate.f greyplot.f idclear.f \
+elprof.f gdclear.f gdnames.f gdset.f gdstate.f idclear.f \
 idinvisible.f idpazo.f idset.f idstate.f inspect.f linplot.f lutable.f \
 lutflip.f luthilite.f lutrot.f lutsave.f luttweak.f lutview.f mlinplot.f \
 ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
