@@ -167,22 +167,27 @@ AC_ARG_ENABLE(fake-progname,
   fi)
 fi
 
-dnl   Specify support for PNG output.  We need a PNG library which has
-dnl   the function png_set_write_user_transform_fn (which means later
-dnl   than version 0.96).  Test this by default (ie, unless the
-dnl   option --disable-png is given).
+dnl   Specify support for PNG output.  Test library for function
+dnl   png_libpng_ver.  At present, PNGBitmap.cc is
+dnl   written to use a palette rather than a greyscale (but see the
+dnl   comments about GREYSCALE_BITMAP in that module).  If we were to
+dnl   revert to using the colour model PNG_COLOR_TYPE_GRAY, then we
+dnl   need the function png_set_write_user_transform_fn (which means later
+dnl   than version 0.96).
+dnl
+dnl   Test this by default (ie, unless the option --disable-png is given).
 AC_SUBST(PNGOBJ)
 AC_ARG_ENABLE(png,
 [  --enable-png            Enable output of PNG files],
   test "$enableval" = "yes" && AC_CHECK_HEADER(png.h,
-    AC_CHECK_LIB(png, png_set_write_user_transform_fn,
+    AC_CHECK_LIB(png, png_libpng_ver,
         AC_DEFINE(ENABLE_PNG)
         PNGOBJ="PNGBitmap.o"
         LIBS="$LIBS -lpng -lz",
       echo "png library not found or too old -- not including PNG support",
       -lz)),
   AC_CHECK_HEADER(png.h,
-    AC_CHECK_LIB(png, png_set_write_user_transform_fn,
+    AC_CHECK_LIB(png, png_libpng_ver,
         AC_DEFINE(ENABLE_PNG)
         PNGOBJ="PNGBitmap.o"
         LIBS="$LIBS -lpng -lz",
