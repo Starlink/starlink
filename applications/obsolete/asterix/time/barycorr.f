@@ -51,8 +51,12 @@
 *     barycorr {parameter_usage}
 
 *  Environment Parameters:
-*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
-*        {parameter_description}
+*     INP = CHAR (read)
+*        Name of input event dataset or binned dataset
+*     OUT = CHAR (read)
+*        Name of corrected copy of input
+*     SIMPLE = LOGICAL (read)
+*        Single correction?
 
 *  Examples:
 *     {routine_example_text}
@@ -152,6 +156,7 @@
       DOUBLE PRECISION		NPOINT(2)		! Nominal pointing
       DOUBLE PRECISION 		NU_MJDOBS		! Base MJD of o/p obs'n
       DOUBLE PRECISION          NU_BASE_TAI		!
+      DOUBLE PRECISION		RA, DEC			! Pointing direction
       DOUBLE PRECISION 		TMIN, TMAX		! Input time range
 
       INTEGER			DETID			! Detector info
@@ -164,38 +169,25 @@
 
         INTEGER I
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
-*        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
-*        INTEGER BARY_MJD2HK ! integer function MJD to HK 1/2 secs
 
       CHARACTER*80             POS_FILE       ! Name of orbit file
       CHARACTER*80             HISTXT(10)     ! add to HISTORY
 
-      DOUBLE PRECISION         MJD_START      !MJD start of observation
-      DOUBLE PRECISION         MJD_STOP       !MJD stop of observation
       DOUBLE PRECISION         BASE_UTC       !SECS since start of currentMJD
       DOUBLE PRECISION         BASE_TAI       !continous time (in days) from 1/1/72
 
-      REAL                     RA,DEC         ! REAL RA nad Dec
       REAL                     OBS_LENGTH     !Obs Length of event dataset
       REAL                     UPDATE_PERIOD  ! update period for bary corr
       REAL                     DEF_UPD_PRD    ! 1% of max - min
-      REAL                     BASE,SCALE,DS  ! Base & Scale of time axis
-
 
       INTEGER                  WIDTHPTR       !PTR to WIDTH time axis
       INTEGER                  TIMEPTR        !PTR to RAW_TIMETAG or TIME axis
       INTEGER                  ITIMEPTR       !PTR to input time events/axis
-      INTEGER                  DUMMYPTR       !PTR to DUMMY
       INTEGER                  LDIM(ADI__MXDIM) ! input dimensions
       INTEGER                  NDIMS          ! number of dimensions
       INTEGER                  T_BINS         ! number of time bins
 
       INTEGER                  N_LINES        ! number of lines to HISTORY
-*      INTEGER                  LUN_POS        ! LUN for Orbit File.
-*      INTEGER                  FIRST_KEY      ! first key in POS file
-*      INTEGER                  SECOND_KEY     ! second key in POS file
-*      INTEGER                  BASE_KEY       ! first relevant KEY in pos file
-*      INTEGER                  END_KEY        ! last relevant KEY in pos file
       INTEGER                  RECORD_SEP     ! The POS file update period (sec)
       INTEGER                  ACTVAL         ! LIST MAPV reads
       INTEGER                  NEVENT       ! No of events in list
@@ -208,18 +200,11 @@
       LOGICAL                  VALID_ROSAT    ! file is a ROSAT file
       LOGICAL                  SATCORR        ! do satellite corrections ?
       LOGICAL                  POS_FILE_OK    ! ATT POS OPEN OK
-      LOGICAL                  NOT_COVERED    ! ATT POS FILE doesn't cover..
       LOGICAL                  IGNORE_POS     ! if pos file not OK for all data
-      LOGICAL                  PRESS_ON       ! press on regardless
-      LOGICAL                  RAW_TIME_OK    ! raw timetags used
-      LOGICAL                  TIME_OK        ! `TIMETAG'  list used.
-      LOGICAL                  NOT_ROS_GO     ! not a rosat file ... but GO!!
-      LOGICAL                  SIMPLE    ! Run BARYCORR in SIMPLE
+      LOGICAL                  	TIME_OK        		! `TIMETAG'  list used.
+      LOGICAL			SIMPLE    		! Run in SIMPLE mode?
       LOGICAL                  ULTRA_SIMPLE   ! run BARYCORR in ultra_simple mode
-      LOGICAL                  ABORT          ! abort barycorr
-      LOGICAL                  AX_REG         ! is the axis regular
-      LOGICAL                  BINNED         ! complex mode, data binned
-      LOGICAL                  AX_WID_OK      ! AXIS widths are present
+      LOGICAL                  	BINNED         		! Complex mode, data binned
 *.
 
 *  Check inherited global status.
@@ -304,26 +289,15 @@
           NEVENT = LDIM(TAX)
           CALL BDI_AXMAPD( IFID, TAX, 'Data', 'READ', ITIMEPTR, STATUS )
 
-*      Map output
+*      Map output time axis and widths
           CALL BDI_AXMAPD( OFID, TAX, 'Data', 'UPDATE', TIMEPTR,
      :                     STATUS )
-
-*      Widths present?
-          CALL BDI_AXCHK( IFID, TAX, 'Width', AX_WID_OK, STATUS )
-          IF ( AX_WID_OK ) THEN
-            CALL BDI_AXMAPD( OFID, TAX, 'Width', 'UPDATE', WIDTHPTR,
-     :                       STATUS )
-          ELSE
-            CALL MSG_PRNT(' Time axis WIDTH array is missing')
-            CALL MSG_PRNT(' BARYCORR applied only on data array')
-          END IF
+          CALL BDI_AXMAPD( OFID, TAX, 'Width', 'UPDATE', WIDTHPTR,
+     :                     STATUS )
 
         END IF
 
       ELSE
-
-*    Mark as event dataset
-        BINNED = .FALSE.
 
 *    Get event dataset info
         CALL EDI_GETNS( IFID, NEVENT, NVAL, STATUS )
@@ -336,7 +310,7 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map the time list
-        CALL EDI_MAPR( OFID, TLIST, 'UPDATE', 0, 0, TIMEPTR, STATUS )
+        CALL EDI_MAPD( OFID, TLIST, 'UPDATE', 0, 0, TIMEPTR, STATUS )
 
 *    Trap status if timetag not ok
         IF ( STATUS .NE. SAI__OK ) THEN
@@ -514,7 +488,7 @@
       IF ( SIMPLE ) THEN
         UPDATE_PERIOD = (TMAX-TMIN)/100.0
       ELSE IF (.NOT. SATCORR)THEN
-        IF(BINNED .AND. AX_WID_OK)THEN
+        IF( BINNED ) THEN
           UPDATE_PERIOD = 0.0
 * update period not used in this mode
         ELSE
@@ -553,13 +527,12 @@
 
       ELSE
        IF (.NOT. BINNED)THEN
-         AX_WID_OK = .FALSE.
          ITIMEPTR = TIMEPTR
          WIDTHPTR = TIMEPTR
        ENDIF
        CALL BARY_CORR( %VAL(ITIMEPTR), %VAL(TIMEPTR), %VAL(WIDTHPTR),
      :        NEVENT,RA,DEC,BINNED,
-     :        LUN_POS,POS_FILE_OK,SATCORR,IGNORE_POS,AX_WID_OK,BASE_MJD,
+     :        LUN_POS,POS_FILE_OK,SATCORR,IGNORE_POS, BASE_MJD,
      :        BASE_UTC,BASE_TAI,UPDATE_PERIOD,EQUINOX,STATUS)
 
 * sub routine Barr_corr takes the appropriate action to the time list
@@ -1052,7 +1025,7 @@
 *+ BARY_CORR - Does the barycentric corrections according to user spec
       SUBROUTINE BARY_CORR(INTIMES,OUTTIMES,WIDTHS,NEVENT,RA,DEC,
      :    BINNED,LUN_POS,
-     :    POS_FILE_OK,SATCORR,IGNORE_POS,AX_WID_OK,BASE_MJD,
+     :    POS_FILE_OK,SATCORR,IGNORE_POS, BASE_MJD,
      :    BASE_UTC,BASE_TAI,UPDATE_PERIOD,EQUINOX,STATUS)
 *    Description :
 *     <description of what the subroutine does - for user info>
@@ -1070,31 +1043,12 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-*    Structure definitions :
-c      STRUCTURE /POS_REC/
-c         INTEGER UT				! hk clock (1/2s) time
-c         REAL SATGEO(3)		! Sat vector in geo frame
-c         INTEGER*2 IXRT(3)		! RA, dec, roll, arcmin
-c         INTEGER*2 IBGLONG                      ! long and lat
-c         INTEGER*2 IBGLAT                       !
-c      END STRUCTURE
 
 c      RECORD /POS_REC/ POS
-      REAL BARY                         ! Barycentric  correction in Secs
-      DOUBLE PRECISION ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
-        INTEGER UT
-        REAL SATGEO(3)           ! GEOGRAPHIC XYZ
-        REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
-        INTEGER*2 IXRT(3)        ! Restored XRT pointing RA DEC Roll (arcmin)
-        INTEGER*2 ILONG
-        INTEGER*2 ILAT
-        INTEGER*2 B_EM8T
-        INTEGER*2 LVAL_MILLERAD
-        INTEGER KEY              ! Key for indexed read
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
 
-*    Import :
+*  Arguments Given:
       INTEGER              NEVENT              ! No events in list
       INTEGER              BASE_MJD              ! whole part MJD only
 *      INTEGER              LUN_POS               ! LOG unit for ATT_POS_SAT
@@ -1110,12 +1064,11 @@ c      RECORD /POS_REC/ POS
       LOGICAL              POS_FILE_OK           ! ATT_POS_SAT data fine
       LOGICAL              IGNORE_POS            ! pos_sat info to be ignored
       LOGICAL              BINNED                ! AXIS is binned
-      LOGICAL              AX_WID_OK             ! AXIS widths OK
+      DOUBLE PRECISION  	INTIMES(NEVENT)		! Input timelist
 
-*    Import-Export :
-      DOUBLE PRECISION     INTIMES(NEVENT)     ! timelist
-      DOUBLE PRECISION     OUTTIMES(NEVENT)    ! timelist
-      DOUBLE PRECISION     WIDTHS(NEVENT)      ! timelist binwidths
+*  Arguments Given and Returned:
+      DOUBLE PRECISION     	OUTTIMES(NEVENT)    	! Output timelist
+      DOUBLE PRECISION     	WIDTHS(NEVENT)      	! Time list bin widths
 
 *  Status :
       INTEGER 			STATUS
@@ -1131,14 +1084,11 @@ c      RECORD /POS_REC/ POS
         PARAMETER               ( S2_REF_MJD = 47892.0D0 )
 
 *  Local variables :
+      DOUBLE PRECISION		BARY			! A correction
       DOUBLE PRECISION		LB, UB			! Lower/upper bounds
-      DOUBLE PRECISION     	MJD_CURRENT           	! MJD for current event
-      DOUBLE PRECISION     	MJD_START,MJD_END     	! MJD for start/stop
+      DOUBLE PRECISION          TRIGGER                 ! current trigger time
 
-      REAL                 	TRIGGER                 ! current trigger time
-
-      INTEGER              	I,J,K                 ! DO loop variables
-      INTEGER              	CURRENT_KEY           ! for KEYed access to POS file
+      INTEGER              	I			! Loop over times
 *-
 
 *  Check inherited global status.
@@ -1147,44 +1097,75 @@ c      RECORD /POS_REC/ POS
 *  If binned and axis width present, then do not use trigger times as gaps
 *  will appear in the time series due to differential barycentric corrections
 *  during the observation
-      IF(BINNED .AND. AX_WID_OK)THEN
+      IF ( BINNED ) THEN
 *       BOUNDS(NEVENT+1) = INTIMES(NEVENT)+0.5*WIDTHS(NEVENT)
-         LB = INTIMES(1) - WIDTHS(1) / 2
-         CALL BARY_CORR_INT(LB,RA,DEC,LUN_POS,
-     :   POS_FILE_OK,BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
-         LB = LB + BARY
-         UB = INTIMES(1) + WIDTHS(1) / 2
-         CALL BARY_CORR_INT(UB,RA,DEC,LUN_POS,
-     : POS_FILE_OK,BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
-       UB = UB + BARY
-       OUTTIMES(1)= 0.5 * (UB+LB)
-       WIDTHS(1) = ABS(UB-LB)
-       DO  I = 2,NEVENT
-         LB = UB
-         UB = INTIMES(I) + 0.5*WIDTHS(I)
-         CALL BARY_CORR_INT(UB,RA,DEC,LUN_POS,POS_FILE_OK,
-     :   BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
 
-         UB = UB + BARY
-         OUTTIMES(I)= 0.5 * (UB+LB)
-         WIDTHS(I) = ABS(UB-LB)
+*    Find correction at 1st lower bin boundary
+        LB = INTIMES(1) - WIDTHS(1) / 2
+        CALL BARY_CORR_INT( LB, RA, DEC, LUN_POS, POS_FILE_OK,
+     :                      BASE_MJD, BASE_UTC, BASE_TAI,
+     :                      EQUINOX, BARY, STATUS )
+        LB = LB + BARY
 
-       ENDDO
+*    Find correction at 1st upper bin boundary
+        UB = INTIMES(1) + WIDTHS(1) / 2
+        CALL BARY_CORR_INT( UB, RA, DEC, LUN_POS, POS_FILE_OK,
+     :                      BASE_MJD, BASE_UTC, BASE_TAI,
+     :                      EQUINOX, BARY, STATUS )
+        UB = UB + BARY
+
+*    Store new centre and width
+        OUTTIMES(1) = 0.5 * (UB+LB)
+        WIDTHS(1) = ABS(UB-LB)
+
+*    For remaining bins
+        DO  I = 2, NEVENT
+
+*      New lower bound is the last upper bound
+          LB = UB
+
+*      Find correction at upper bound
+          UB = INTIMES(I) + 0.5*WIDTHS(I)
+          CALL BARY_CORR_INT( UB, RA, DEC, LUN_POS, POS_FILE_OK,
+     :                        BASE_MJD, BASE_UTC, BASE_TAI, EQUINOX,
+     :                        BARY, STATUS )
+
+*      Adjust bound and store
+          UB = UB + BARY
+          OUTTIMES(I)= 0.5 * (UB+LB)
+          WIDTHS(I) = ABS(UB-LB)
+
+        END DO
+
+*  Not binned
       ELSE
-*comput bary as often as desired. use att pos sat data
-* initialise TRIGGER
-         TRIGGER = INTIMES(1) - 1.1 * UPDATE_PERIOD
-         DO I = 1, NEVENT
-           IF(ABS(INTIMES(I)-TRIGGER) .GE. UPDATE_PERIOD)THEN
 
-             TRIGGER = INTIMES(I)
-             CALL BARY_CORR_INT(INTIMES(I),RA,DEC,LUN_POS,POS_FILE_OK,
-     : BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
+*    Initialise the trigger so that we compute on the first event
+        TRIGGER = INTIMES(1) - 1.1 * UPDATE_PERIOD
 
-           ENDIF
-           OUTTIMES(I) = INTIMES(I) + BARY
-         ENDDO
-      ENDIF
+*    Loop over events computing correction is often as required
+        DO I = 1, NEVENT
+
+*      Time to recompute the correction?
+          IF ( ABS(INTIMES(I)-TRIGGER) .GE. UPDATE_PERIOD ) THEN
+
+*        Reset trigger
+            TRIGGER = INTIMES(I)
+
+*        Compute the correction
+            CALL BARY_CORR_INT( INTIMES(I), RA, DEC, LUN_POS,
+     :                          POS_FILE_OK, BASE_MJD, BASE_UTC,
+     :                          BASE_TAI, EQUINOX, BARY, STATUS )
+
+          END IF
+
+*      Add current correction to this time tag
+          OUTTIMES(I) = INTIMES(I) + BARY
+
+        END DO
+
+      END IF
+
       END
 
 
@@ -1218,7 +1199,6 @@ c      RECORD /POS_REC/ POS
          INTEGER*2 IBGLONG                      ! long and lat
          INTEGER*2 IBGLAT                       !
       END STRUCTURE
-
 *
 *    Local constants :
 *
@@ -1228,7 +1208,7 @@ c      RECORD /POS_REC/ POS
 
       RECORD /POS_REC/ POS
 
-      REAL BARY                         ! Barycentric  correction in Secs
+      DOUBLE PRECISION BARY                         ! Barycentric  correction in Secs
       DOUBLE PRECISION RMATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
         INTEGER UT
@@ -1252,10 +1232,10 @@ c      RECORD /POS_REC/ POS
       LOGICAL              POS_FILE_OK           ! ATT_POS_SAT data fine
       LOGICAL              IGNORE_POS            ! pos_sat info to be ignored
 *    Import-Export :
-      REAL                 TIME     ! timeTAG
-*     <declarations and descriptions for imported/exported arguments>
-*    Export :
-*     <declarations and descriptions for exported arguments>
+      DOUBLE PRECISION     TIME     ! timeTAG
+*    Export:
+      DOUBLE PRECISION 		BARY
+
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1339,27 +1319,22 @@ c      RECORD /POS_REC/ POS
 * IMPORTS
       DOUBLE PRECISION S2_REF_MJD
       PARAMETER(S2_REF_MJD=47892.0D0)
-      REAL BARY                         ! Barycentric  correction in Secs
       DOUBLE PRECISION RMATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
 *    Import :
       DOUBLE PRECISION		MJDOBS, TMAX, TMIN
 
-      INTEGER              BASE_MJD              ! whole part MJD only
-
-      REAL                 RA,DEC                ! RA DEC FOR  BARY CORRECTIONS
-      DOUBLE PRECISION     BASE_UTC              ! secs offset in base_mjd
+      DOUBLE PRECISION          RA,DEC                ! RA DEC FOR  BARY CORRECTIONS
       DOUBLE PRECISION     BASE_TAI              ! continuous time (in days) from Jan72
       DOUBLE PRECISION     EQUINOX               ! equinox of ra dec system
 
       LOGICAL              ULTRA_SIMPLE          ! TMAX=TMIN=0
 *    Export :
-*     <declarations and descriptions for exported arguments>
+      DOUBLE PRECISION BARY                         ! Barycentric  correction in Secs
       DOUBLE PRECISION NU_BASE_TAI,NU_MJDOBS
 *    Status :
       INTEGER STATUS
 *    Function declarations :
-*     <declarations for function references>
       DOUBLE PRECISION SLA_DAT
 *    Local constants :
       DOUBLE PRECISION        LEAPS_AT_1970
@@ -1370,12 +1345,12 @@ c      RECORD /POS_REC/ POS
       PARAMETER              (SECONDS_IN_DAY = 86400.0D0)
 
 *    Local variables :
-      DOUBLE PRECISION     MJD_CURRENT           ! MJD for current event
-      DOUBLE PRECISION MJDOBS_OLD,MJDOBS_NEW
+      DOUBLE PRECISION     	MJD_CURRENT         	! MJD for current event
+      DOUBLE PRECISION		MJDOBS_NEW
       DOUBLE PRECISION TRIAL_TIME1, TRIAL_TIME2  ! trial solutions. TAI->MJD
-      DOUBLE PRECISION TEST_TAI
+      DOUBLE PRECISION 		TEST_TAI
 
-      REAL BARY_MID,BARY_START,BARY_END          ! various Barycentric corr times
+      DOUBLE PRECISION BARY_MID,BARY_START,BARY_END          ! various Barycentric corr times
       REAL DIFFER                                ! differential bary corr
       REAL DIFF_T                                ! diff between trial and answer
       INTEGER              I,J                 ! DO loop variables
@@ -1398,12 +1373,12 @@ c      RECORD /POS_REC/ POS
         MJD_CURRENT = MJDOBS
 
         CALL BARY_ROSAT( MJD_CURRENT, RA, DEC, BARY, RMATRIX, EQUINOX )
-        CALL MSG_SETR('BARY', BARY)
-        CALL MSG_PRNT('A single correction of ^BARY seconds ')
-        CALL MSG_PRNT('has been applied to the header structure')
+        CALL MSG_SETR( 'BARY', REAL(BARY) )
+        CALL MSG_PRNT('A single correction of ^BARY seconds has '/
+     :                /'been applied')
         CALL MSG_PRNT(' ')
 
-        NU_BASE_TAI = BASE_TAI + DBLE(BARY)/SECONDS_IN_DAY
+        NU_BASE_TAI = BASE_TAI + BARY/SECONDS_IN_DAY
         BARY_MID = BARY
 
 *  Otherwise some half way point
@@ -1415,10 +1390,10 @@ c      RECORD /POS_REC/ POS
         BARY_MID = BARY
 
 *    As TAI is continous, it is impervious to leap second complications
-        NU_BASE_TAI = BASE_TAI + DBLE(BARY)/SECONDS_IN_DAY
-        CALL MSG_SETR('BARY', BARY)
-        CALL MSG_PRNT('A single correction of ^BARY seconds ')
-        CALL MSG_PRNT('has been applied to the header structure')
+        NU_BASE_TAI = BASE_TAI + BARY/SECONDS_IN_DAY
+        CALL MSG_SETR( 'BARY', REAL(BARY) )
+        CALL MSG_PRNT( 'A single correction of ^BARY seconds '//
+     :                 'has been applied' )
 
         MJD_CURRENT = MJDOBS + TMIN/SECONDS_IN_DAY
         CALL BARY_ROSAT(MJD_CURRENT,RA,DEC,BARY,RMATRIX,EQUINOX)
@@ -1438,7 +1413,7 @@ c      RECORD /POS_REC/ POS
       END IF
 
 *  And a guess of the new MJD, complicated by the existence of leapseconds
-      MJDOBS_NEW = MJDOBS + DBLE(BARY_MID)/SECONDS_IN_DAY
+      MJDOBS_NEW = MJDOBS + BARY_MID/SECONDS_IN_DAY
 
 *  Number of leap seconds before and after change in barycentre
       DSPRT = .FALSE.
@@ -1519,8 +1494,7 @@ c      RECORD /POS_REC/ POS
 	SUBROUTINE BARY_ROSAT(MJD,XRA,XDEC,BARY,GKROS,EQUINOX)
         IMPLICIT NONE
 
-	DOUBLE PRECISION MJD,EQUINOX,XRA,XDEC
-	REAL  BARY
+	DOUBLE PRECISION MJD,EQUINOX,XRA,XDEC,BARY
 *MJD	input	Modified Julian Date (IAU definition) of observation.
 *XRA	input	Source Right Ascension, epoch 1950.0, degrees.
 *XDEC	input	Source Declination, epoch 1950.0, degrees.
