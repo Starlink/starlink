@@ -51,6 +51,8 @@
 *        None.
 *
 *     Protected:
+*        astGetConstants
+*           Obtain a copy of the constants array
 *        astGetInPerm
 *           Obtain a copy of the input permutation array
 *        astGetOutPerm
@@ -158,6 +160,7 @@ typedef struct AstPermMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   double *(* GetConstants)( AstPermMap * );
    int *(* GetInPerm)( AstPermMap * );
    int *(* GetOutPerm)( AstPermMap * );
 
@@ -198,6 +201,7 @@ AstPermMap *astLoadPermMap_( void *, size_t, AstPermMapVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
+double *astGetConstants_( AstPermMap * );
 int *astGetInPerm_( AstPermMap * );
 int *astGetOutPerm_( AstPermMap * );
 #endif
@@ -248,6 +252,7 @@ astINVOKE(O,astLoadPermMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
+#define astGetConstants(this) astINVOKE(V,astGetConstants_(astCheckPermMap(this)))
 #define astGetInPerm(this) astINVOKE(V,astGetInPerm_(astCheckPermMap(this)))
 #define astGetOutPerm(this) astINVOKE(V,astGetOutPerm_(astCheckPermMap(this)))
 #endif

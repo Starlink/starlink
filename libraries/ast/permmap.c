@@ -50,6 +50,8 @@ f     The PermMap class does not define any new routines beyond those
 *        method.
 *     11-SEP-2003 (DSB):
 *        Added methods astGetInPerm and astGetOutPerm.
+*     2-NOV-2004 (DSB):
+*        Added method astGetConstants.
 *class--
 */
 
@@ -106,6 +108,7 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static double *GetConstants( AstPermMap * );
 static int *GetOutPerm( AstPermMap * );
 static int *GetInPerm( AstPermMap * );
 static int NullPerm( AstPermMap *, int );
@@ -113,6 +116,63 @@ static int NullPerm( AstPermMap *, int );
 
 /* Member functions. */
 /* ================= */
+
+static double *GetConstants( AstPermMap *this ){
+/*
+*+
+*  Name:
+*     astGetInConstants
+
+*  Purpose:
+*     Return a pointer to the constants array of a PermMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "permmap.h"
+*     double *astGetConstants( AstPermMap *this )
+
+*  Class Membership:
+*     PermMap method 
+
+*  Description:
+*     This function returns a pointer to a dynamically allocated array 
+*     holding a copy of the constants array supplied when the PermMap was 
+*     created.
+
+*  Parameters:
+*     this
+*        Pointer to the PermMap.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array holding a copy of the 
+*     constants array. The pointer should be freed using astFree when it is
+*     no longer needed. NULL will be returned if the PermMap has no
+*     constants.
+
+*  Notes:
+*     - A value of NULL will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   double *result;                /* Pointer to the returned array */
+
+/* Initialise the returned result. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Allocate memory and put a copy of the InPerm array in it. */
+   result = (double *) astStore( NULL, this->constant, astSizeOf( this->constant ) );
+
+/* Return the result. */
+   return result;
+}
 
 static int *GetInPerm( AstPermMap *this ){
 /*
@@ -282,6 +342,7 @@ void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
+   vtab->GetConstants = GetConstants;
    vtab->GetInPerm = GetInPerm;
    vtab->GetOutPerm = GetOutPerm;
 
@@ -2350,6 +2411,11 @@ AstPermMap *astLoadPermMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+double *astGetConstants_( AstPermMap *this ){
+   if( !astOK ) return NULL;
+   return (**astMEMBER(this,PermMap,GetConstants))( this );
+}
 
 int *astGetInPerm_( AstPermMap *this ){
    if( !astOK ) return NULL;
