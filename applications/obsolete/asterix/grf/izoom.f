@@ -6,6 +6,7 @@
 *    Bugs :
 *    Authors :
 *    History :
+*      19 Apr 96 : V2.0-0 zoom to current region option (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -28,7 +29,7 @@
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IZOOM Version 1.8-0')
+      PARAMETER (VERSION='IZOOM Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -67,6 +68,12 @@
           I_ZM_IX2=MIN(IPX+NX/2,I_NX)
           I_ZM_IY1=MAX(IPY-NY/2,1)
           I_ZM_IY2=MIN(IPY+NY/2,I_NY)
+
+        ELSEIF (MODE.EQ.'REG') THEN
+          I_ZM_IX1=I_IX1
+          I_ZM_IX2=I_IX2
+          I_ZM_IY1=I_IY1
+          I_ZM_IY2=I_IY2
 
         ELSEIF (MODE.EQ.'OFF') THEN
 
