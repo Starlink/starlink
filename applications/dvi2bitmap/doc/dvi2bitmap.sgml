@@ -458,17 +458,15 @@ be used to generate the font.</dd>
 
 <dt><code>-QG, &ddash;query=all-fontgen</code></dt>
 
-<dd>As for <code>&ddash;query=missing-fonts</code>, except that
+<dd><p>As for <code>&ddash;query=missing-fonts</code>, except that
 font-generation commands for found fonts are also listed, prefixed by
-<code>Qall-fontgen.</code></dd>
+<code>Qall-fontgen.</code></p>
 
-<dt>Note</dt>
-
-<dd>Only one of <code>&ddash;query=missing-fonts</code>,
+<p><em>Note</em>: Only one of <code>&ddash;query=missing-fonts</code>,
 <code>&ddash;query=all-fonts</code>,
 <code>&ddash;query=missing-fontgen</code> and
 <code>&ddash;query=all-fontgen</code> should be specified -- if more
-than one appears, only the last one is respected.</dd>
+than one appears, only the last one is respected.</p></dd>
 
 <dt><code>&ddash;query=paper</code></dt>
 <dd>Show the list of paper sizes which are predefined for the
@@ -507,7 +505,7 @@ generates XBM bitmaps by default, and has simple support for XPM.  The
 GIF and PNG options may not be available if they weren't selected when
 the program was configured.</dd>
 
-<dt><code>\-t, \-\-paper-size=papersize</code></dt>
+<dt><code>-t, &ddash;paper-size=papersize</code></dt>
 
 <dd>Set the initial size of the bitmap to be one of the paper sizes
 returned by <code>&ddash;query=paper</code>.  This is useful either to
@@ -570,7 +568,7 @@ background colour when making such transparent PNGs.  I'd welcome
 advice on this point.</p></dd>
 
 </dl>
-</sect>
+<!-- </sect> -->
 
 
 <subsect id=usage.special export>DVI specials
@@ -1014,23 +1012,6 @@ dvi2bitmap environment variable is set correctly.  This command is
 part of the <code/kpathsea> distribution, rather than the core &tex;
 distribution, so may not be present on your system.
 
-<sect id=install export>Building and installing dvi2bitmap
-
-<p>dvi2bitmap is packaged in two slightly different ways, one
-which respects the bundling conventions of the <webref
-url='http://www.starlink.rl.ac.uk' >Starlink Project</webref>, and one
-which is more usual for network-distributed software.  
-
-<p>When you unpack the distribution tarball, you should find at least
-the files <code/dvi2bitmap_source.tar>, <code/Makefile.starlink> and
-<code/mk>.  If you're on a Starlink machine, you can, and should,
-build the software the Starlink way, using the <code/mk> script (see
-<ref id=install.starlink/>); but if you're not, you should unpack the
-<code/dvi2bitmap_source.tar> file, and build it the conventional way
-(see <ref id=install.nonstarlink/>).  Since the Starlink <code/mk>
-script is really just a driver for the Makefile within the tar file,
-you should get the same results both ways.
-
 <subsubsect id=usage.fonts.template>Font-string templates
 
 <p>The search-path and font-finder routes use font-string templates.
@@ -1056,6 +1037,23 @@ if we had given the font-finder script as
 <code/dvi2bitmap> would have executed the command <code>.../kpsewhich
 pk cmr10.330pk</code>, which would have returned with a suitable font path.
 
+
+<sect id=install export>Building and installing dvi2bitmap
+
+<p>dvi2bitmap is packaged in two slightly different ways, one
+which respects the bundling conventions of the <webref
+url='http://www.starlink.rl.ac.uk' >Starlink Project</webref>, and one
+which is more usual for network-distributed software.  
+
+<p>When you unpack the distribution tarball, you should find at least
+the files <code/dvi2bitmap_source.tar>, <code/Makefile.starlink> and
+<code/mk>.  If you're on a Starlink machine, you can, and should,
+build the software the Starlink way, using the <code/mk> script (see
+<ref id=install.starlink/>); but if you're not, you should unpack the
+<code/dvi2bitmap_source.tar> file, and build it the conventional way
+(see <ref id=install.nonstarlink/>).  Since the Starlink <code/mk>
+script is really just a driver for the Makefile within the tar file,
+you should get the same results both ways.
 
 <subsect id=install.nonstarlink export>General installation and configuration
 <update versionid="upd1">
@@ -1291,6 +1289,16 @@ successfully on (at least):
 <thead>
 <row><entry>Platform<entry>Version<entry>Compiler
 <tbody>
+<row>
+  <entry>i686-pc-linux-gnu (RedHat 7.3)</entry>
+  <entry>0.10b1</entry>
+  <entry>gcc 2.96</entry>
+</row>
+                    <row>
+                      <entry>MacOS 10.2</entry>
+                      <entry>0.10b1</entry>
+                      <entry>gcc ???</entry>
+                    </row>
 <row><entry>i686-pc-linux-gnu (RedHat 6.2)<entry>0.9-7p1<entry>egcs-2.91.66
 <row><entry>powerpc-unknown-linux-gnu (Mac mklinux DR-0.3?)<entry>0.9<entry>egcs-2.90.25 980302 (egcs-1.0.2 prerelease)
 <row><entry>sparc-sun-solaris2.7<entry>0.9<entry>egcs-2.91.66
@@ -1427,7 +1435,7 @@ of the functionality this provides.  However, I'm scared of
 received.
 
 <p>In the <code type=fspath>.../extras</code> directory of the
-distribution is a script <code>img-eqlist.pl</>, which transforms a
+distribution is a script <code>img-eqlist.pl</code>, which transforms a
 file of LaTeX fragments into a LaTeX file, keeping track of
 filenames, and avoiding generating duplicate bitmaps for duplicated maths.
 
