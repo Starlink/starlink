@@ -147,8 +147,8 @@
 
 * Get model specification
       CALL USI_TASSOCI( 'MODEL', '*', 'READ', MFID, STATUS )
-      CALL FIT_TMODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
-     :                  FROZEN, STATUS )
+      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+     :                 FROZEN, STATUS )
       IF(STATUS.NE.SAI__OK) GOTO 99
 
 * Background spectrum

@@ -1,5 +1,5 @@
 *+ FIT_MODGET - Extracts model specification from fit_model object
-      SUBROUTINE FIT_MODGET(FLOC,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,
+      SUBROUTINE FIT_MODGET(FID,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,
      :             STATUS)
 *
 *    Description :
@@ -31,6 +31,7 @@
 *                 checking existance of objects before CMP_GETing (DJA)
 *     10 Jan 94 : Added NPAR object to model structure (DJA)
 *     24 Jan 94 : Added SPEC and ADDITIVE objects to model structure (DJA)
+*     21 Apr 95 : Adapted from pure HDS version (DJA)
 *
 *    Type definitions :
 *
@@ -48,7 +49,7 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC) 	FLOC			! FIT_MODEL object
+      INTEGER			FID			! Model dataset id
 *
 *    Export
 *
@@ -73,6 +74,7 @@
 *
       CHARACTER*80              CBUF                    ! Character buffer
 
+      CHARACTER*(DAT__SZLOC) 	FLOC			! FIT_MODEL object
       CHARACTER*(DAT__SZLOC) 	PMLOC	 		! locator to pmodels
       CHARACTER*(DAT__SZLOC) 	MILOC     		! locator to pmodel I
       CHARACTER*(DAT__SZLOC) 	MIPLOC    		! locator to parameters of pmodel I
@@ -83,13 +85,18 @@
 
       INTEGER 			JPAR			! No. pmodel parameters
       INTEGER 			I,J
-      INTEGER			NDIM			! Dummy from DAT_SHAPE
 
       LOGICAL 			THERE                   ! HDS component exists?
 *-
 
 *    Status check
       IF ( STATUS.NE.SAI__OK ) RETURN
+
+*    Store identifier
+      MODEL.M_ID = FID
+
+*    Extract locator from identifier
+      CALL ADI1_GETLOC( FID, FLOC, STATUS )
 
 *    Insert locator into model structure
       MODEL.MLOC = FLOC
@@ -102,7 +109,7 @@
 	CALL ERR_REP( 'WRONG_OBJ', 'Not a fit_model object', STATUS )
 	GOTO 99
       ELSE
-	CALL DISP_FILENAM(FLOC,'Input model',STATUS)
+	CALL DISP_FILENAM( FID,'Input model',STATUS)
       END IF
 
       CALL CMP_GET0C(FLOC,'SPEC',MODEL.SPEC,STATUS)

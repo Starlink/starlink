@@ -253,7 +253,7 @@
 
 *    Get model specification
       CALL USI_TASSOCI( 'MODEL', '*', 'UPDATE', MFID, STATUS )
-      CALL FIT_TMODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
      :                                          FROZEN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
