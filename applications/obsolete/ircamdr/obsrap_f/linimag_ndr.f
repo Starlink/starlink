@@ -141,12 +141,9 @@
      :	  STATUS)
         COEFFICIENT_FILENAME = TRANSLATION
 
-*      get a lun for the input coefficient file
-	CALL FIO_GUNIT( LUN, STATUS )
-
 *      open the default coefficient file in default directory
-	OPEN( UNIT=LUN, FILE=COEFFICIENT_FILENAME, STATUS='OLD', 
-     :	      READONLY, ERR=999)
+        CALL FIO_OPEN(COEFFICIENT_FILENAME, 'READ', 'NONE',
+     :        0, LUN, STATUS)
 
 *      read title line from LINCOEFF data file and tell user
 	READ( LUN, '(A80)') TITLE_LINE
@@ -171,8 +168,7 @@
      :	              STATUS)
 
 *      close coefficient file and release lun
-	CLOSE( LUN)
-	CALL FIO_PUNIT( LUN, STATUS )
+	CALL FIO_CLOSE( LUN, STATUS )
 
 *     get number of observation to linearize
 	CALL PAR_GET0I( 'OBSNUM', OBSNUM, STATUS)

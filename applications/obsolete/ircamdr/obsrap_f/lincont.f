@@ -179,18 +179,14 @@
 
 	END IF
 
-*      get a lun for the input coefficient file
-
-	CALL FIO_GUNIT( LUN, STATUS )
-
 *      get the name of the coefficient file from parameter system
 
 	CALL PAR_GET0C( 'COEFFILE', COEFFICIENT_FILENAME, STATUS)
 
 *      open the default coefficient file in default directory
-
-	OPEN( UNIT=LUN, FILE=COEFFICIENT_FILENAME, STATUS='OLD', 
-     :	      READONLY, ERR=999)
+	CALL FIO_OPEN(COEFFICIENT_FILENAME, 'READ', 'NONE',
+     :        0, LUN, STATUS)
+	IF (STATUS .NE. SAI__OK) GO TO 999
 
 *      read title line from LINCOEFF data file and tell user
 
@@ -215,9 +211,7 @@
 
 *      close coefficient file and release lun
 
-	CLOSE( LUN)
-
-	CALL FIO_PUNIT( LUN, STATUS )
+	CALL FIO_CLOSE( LUN, STATUS )
 
 	CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
