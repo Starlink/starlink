@@ -644,16 +644,16 @@ javadoc-sources:
   [javadoc] <li>out-of-the-box recognizers</li>
   [javadoc] <li>etc</li> </ol> </P>"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/modular/CompositeNode.java:16: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/package-summary.html...
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/modular/CompositeNode.java:16: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/modular/package-summary.html...
   [javadoc] "A node that is also a graph, i.e.<!-- -->it can contain other nodes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A node that is also a graph, i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/package-summary.html...
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1298,12 +1298,12 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @contributor is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/StraightConnector.java:27: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/CompositeFigureTutorial.java:119: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/tutorial/TransformedFigureTutorial.html...
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
   [javadoc]  This example figure class illustrates the use of different
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/CompositeFigureTutorial.java:119: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
   [javadoc]  paints and strokes to create the required image, and the use
   [javadoc]  of TransformContext to position that image."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2339,4 +2339,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 8 minutes 18 seconds
+Total time: 9 minutes 21 seconds
