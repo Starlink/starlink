@@ -570,7 +570,8 @@ Largely rewrote the configuration instructions, in an attempt to make
 them clearer.
 </update>
 <update versionid="upd6">Mentioned &ddash;enable-fake-progname</update>
-<update versionid="post-upd6">Described &ddash;enable-fontgen</update>
+<update versionid="post-upd6">Described &ddash;enable-fontgen.</update>
+
 
 <p>To configure and build:
 <verbatim>
@@ -608,13 +609,17 @@ the file rather than the directory).
 ]]>
 
 If you don't have the
-<code/kpathsea/ library available (I don't believe it's installed by
+<code/kpathsea/ library available, see below (<ref id=install.web2c>)
+for notes on obtaining it.
+<!-- 
+ (I don't believe it's installed by
 the <code/TeXLive/ distribution, for example), then you can obtain a
 copy from <webref url='http://www.tug.org' >TUG</webref> or <webref
 url='http://www.tex.ac.uk' >CTAN</webref>, in <code
 fspath>/tex-archive/systems/web2c/texk-n.n</code> (it seems
 you can only get <code/kpathsea/ as part of the complete web2c
 distribution, and not as a standalone library).
+-->
 
 <dt><code/&ddash;disable-texmfcnf/
 
@@ -718,6 +723,24 @@ or
 % env CXX=cxx ./configure
 </verbatim>
 depending on your shell.
+
+<subsubsect id=install.web2c>Obtaining the <code/kpathsea/ library
+<update versionid="post-upd6">Improved instructions on getting the
+kpathsea library source.</update>
+
+<p>Not all &tex; distributions install the <code/kpathsea/ library,
+even though they install applications which use it, and the
+<code/texmf.cnf/ configuration file which controls it.
+
+<p>If the library does not appear to be in your distribution, then you
+can obtain and build it yourself.  The library is distributed as part
+of the <code/web2c/ (Unix &tex; source) distribution, which you can
+find at <url>ftp://ftp.tug.org/tex/web2c.tar.gz</url>, or mirrored on
+CTAN sites (for example at <url>http://www.tex.ac.uk</url> in
+directory <code fspath>systems/web2c</code>).  Download the library,
+unpack it, and delete the web2c directory (which is the bulk of the
+distribution).  Configure and build it as usual, ignoring the warnings
+about the missing main <code/texmf/ tree.
 
 <sect id=developments export>Further developments
 
