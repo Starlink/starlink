@@ -139,6 +139,8 @@ fsremap.eps \
 gridplot.eps \
 gridplot_bw.eps \
 mapping.eps \
+overgrid.eps \
+overgrid_bw.eps \
 parallel.eps \
 series.eps \
 simpexamp.eps
