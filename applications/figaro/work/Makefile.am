@@ -12,7 +12,7 @@ libwork_la_SOURCES = \
 PRIVATE_INCLUDES = SPD_WFCM
 
 F_ROUTINES = \
-spd_wyza.f spd_wzba.f spd_wzdc.f spd_wzdd.f spd_wzde.f spd_wzea.f \
+spd_wyza.f spd_wzba.f spd_wzdc.f spd_wzdd.f spd_wzde.f \
 spd_wzeb.f spd_wzec.f spd_wzed.f spd_wzee.f spd_wzfc.f spd_wzgc.f \
 spd_wzgd.f spd_wzge.f spd_wzja.f spd_wzjb.f spd_wzjc.f spd_wzka.f \
 spd_wzkb.f spd_wzkc.f spd_wzkd.f spd_wzke.f spd_wzkf.f spd_wzkg.f \
