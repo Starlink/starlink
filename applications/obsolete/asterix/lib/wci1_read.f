@@ -113,7 +113,7 @@
       CHARACTER*3		SYS			! Coord system name
       CHARACTER*40		UNITS(2)		! X,Y axis units
 
-      DOUBLE PRECISION		BTAI			! Value of BASE_TAI
+      DOUBLE PRECISION		BUTC			! Value of BASE_UTC
       DOUBLE PRECISION		EPOCH			! Epoch
       DOUBLE PRECISION		MJD			! Observation time
       DOUBLE PRECISION		NPOINT(2)		! Nominal RA, DEC
@@ -139,7 +139,7 @@
       LOGICAL			RAOK, DECOK, PAOK       ! Found ok flags
       LOGICAL			REG(2)			! Axes regular
       LOGICAL			PRJOK, SYSOK		! Projection/system ok?
-      LOGICAL			TAIOK			! BASE_TAI found?
+      LOGICAL			UTCOK			! BASE_UTC found?
 *.
 
 *  Check inherited global status.
@@ -198,13 +198,13 @@
 *     Equinox
         CALL ADI1_CGET0R( HLOC, 'EQUINOX', EQOK, EQNX, STATUS )
 
-*     Epoch of observation. Composed of the BASE_MJD and BASE_TAI header
+*     Epoch of observation. Composed of the BASE_MJD and BASE_UTC header
 *     components
         CALL ADI1_CGET0I( HLOC, 'BASE_MJD', EPOK, IMJD, STATUS )
         IF ( EPOK ) THEN
-          CALL ADI1_CGET0D( HLOC, 'BASE_TAI', TAIOK, BTAI, STATUS )
-          IF ( TAIOK ) THEN
-            MJD = DBLE(IMJD) + BTAI / 86400D0
+          CALL ADI1_CGET0D( HLOC, 'BASE_UTC', UTCOK, BUTC, STATUS )
+          IF ( UTCOK ) THEN
+            MJD = DBLE(IMJD) + BUTC / 86400D0
           ELSE
             MJD = DBLE(IMJD)
           END IF
