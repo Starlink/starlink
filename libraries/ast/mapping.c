@@ -62,7 +62,7 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
-*     DSB: David S. Berry (Starlink)
+*     MBT: Mark Taylor (Starlink)
 
 *  History:
 *     1-FEB-1996 (RFWS):
@@ -91,10 +91,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     17-AUG-1999 (RFWS):
 *        Improved the convergence security of MapBox (return to older but
 *        less efficient setting).
-*     22-NOV-2000 (DSB):
-*        The finterp function is now cast to the correct type to prevent 
-*        default promotion (to int or double) of its arguments (thanks to
-*        Mark Taylor for this fix!).
+*     24-NOV-2000 (MBT):
+*        Fixed bug (function being invoked as wrong type) in AST__UINTERP
+*        scheme, and added new AST__BLOCKAVE scheme, in astResample<X>.
 *class--
 */
 
@@ -185,6 +184,7 @@ static AstMapping *unsimplified_mapping;
 /* Prototypes for private member functions. */
 /* ======================================== */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+static void InterpolateBlockAverageLD( int, const int[], const int[], const long double [], const long double [], int, const int[], const double *const[], const double[], int, long double, long double *, long double *, int * ); 
 static int InterpolateKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long double, long double *, long double * );
 static int InterpolateLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double * );
 static int InterpolateNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double * );
@@ -207,6 +207,16 @@ static int GetNout( AstMapping * );
 static int GetReport( AstMapping * );
 static int GetTranForward( AstMapping * );
 static int GetTranInverse( AstMapping * );
+static void InterpolateBlockAverageB( int, const int[], const int[], const signed char [], const signed char [], int, const int[], const double *const[], const double[], int, signed char, signed char *, signed char *, int * ); 
+static void InterpolateBlockAverageD( int, const int[], const int[], const double [], const double [], int, const int[], const double *const[], const double[], int, double, double *, double *, int * ); 
+static void InterpolateBlockAverageF( int, const int[], const int[], const float [], const float [], int, const int[], const double *const[], const double[], int, float, float *, float *, int * ); 
+static void InterpolateBlockAverageI( int, const int[], const int[], const int [], const int [], int, const int[], const double *const[], const double[], int, int, int *, int *, int * ); 
+static void InterpolateBlockAverageL( int, const int[], const int[], const long int [], const long int [], int, const int[], const double *const[], const double[], int, long int, long int *, long int *, int * ); 
+static void InterpolateBlockAverageS( int, const int[], const int[], const short int [], const short int [], int, const int[], const double *const[], const double[], int, short int, short int *, short int *, int * ); 
+static void InterpolateBlockAverageUB( int, const int[], const int[], const unsigned char [], const unsigned char [], int, const int[], const double *const[], const double[], int, unsigned char, unsigned char *, unsigned char *, int * ); 
+static void InterpolateBlockAverageUI( int, const int[], const int[], const unsigned int [], const unsigned int [], int, const int[], const double *const[], const double[], int, unsigned int, unsigned int *, unsigned int *, int * ); 
+static void InterpolateBlockAverageUL( int, const int[], const int[], const unsigned long int [], const unsigned long int [], int, const int[], const double *const[], const double[], int, unsigned long int, unsigned long int *, unsigned long int *, int * ); 
+static void InterpolateBlockAverageUS( int, const int[], const int[], const unsigned short int [], const unsigned short int [], int, const int[], const double *const[], const double[], int, unsigned short int, unsigned short int *, unsigned short int *, int * ); 
 static int InterpolateKernel1B( AstMapping *, int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, signed char, signed char *, signed char * );
 static int InterpolateKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double * );
 static int InterpolateKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float * );
@@ -2115,7 +2125,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
       lo[ idim ] = MaxI( ixn - neighb + 1, lbnd_in[ idim ] ); \
       hi[ idim ] = MinI( ixn + neighb,     ubnd_in[ idim ] ); \
 \
-/* Accumulate the offset (from the start of the input array) of the
+/* Accumulate the offset (from the start of the input array) of the \
    contributing pixel which has the lowest index in each dimension. */ \
       off_in += stride[ idim ] * ( lo[ idim ] - lbnd_in[ idim ] ); \
    } \
@@ -3773,6 +3783,833 @@ MAKE_INTERPOLATE_NEAREST(UB,unsigned char,0)
 #undef ASSEMBLE_INPUT_2D
 #undef ASSEMBLE_INPUT_1D
 #undef MAKE_INTERPOLATE_NEAREST
+
+/*
+*  Name:
+*     InterpolateBlockAverage<X>
+
+*  Purpose:
+*     Resample a data grid, using multidimensional block averaging.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void InterpolateBlockAverage<X>( int ndim_in,
+*                                      const int lbnd_in[], 
+*                                      const int ubnd_in[],
+*                                      const <Xtype> in[], 
+*                                      const <Xtype> in_var[],
+*                                      int npoint, const int offset[],
+*                                      const double *const coords[],
+*                                      const double params[], int flags,
+*                                      <Xtype> badval, <Xtype> *out, 
+*                                      <Xtype> *out_var, int *nbad )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This is a set of functions which resample a rectangular input
+*     grid of data (and, optionally, associated statistical variance
+*     values) so as to place them into a new output grid. To generate 
+*     an output grid pixel, a block average is taken over an ndim-
+*     dimensional hypercube of pixels in the input grid.  If variances
+*     are being used then the input pixels will be weighted according
+*     to the reciprocals of the corresponding variance values, and 
+*     input pixels without a valid variance will be ignored;
+*     otherwise an unweighted average will be taken over
+*     all non-bad pixels in the cube.  The size of the cube over which
+*     the average is taken is determined by the first element of the 
+*     params array.
+*
+*     This "interpolation" scheme is appropriate where an input grid 
+*     is to be resampled onto a much coarser output grid.
+
+*  Parameters:
+*     ndim_in
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the input grid, its extent along a particular
+*        (i'th) dimension being ubnd_in[i]-lbnd_in[i]+1 (assuming "i"
+*        is zero-based). They also define the input grid's coordinate
+*        system, with each pixel being of unit extent along each
+*        dimension with integral coordinate values at its centre.
+*     in
+*        Pointer to the array of data to be resampled (with an element
+*        for each pixel in the input grid). The numerical type of
+*        these data should match the function used, as given by the
+*        suffix on the function name. The storage order should be such
+*        that the index of the first grid dimension varies most
+*        rapidly and that of the final dimension least rapidly
+*        (i.e. Fortran array storage order).
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and type as the "in" array), which
+*        represent estimates of the statistical variance associated
+*        with each element of the "in" array. If this second array is
+*        given (along with the corresponding "out_var" array), then
+*        estimates of the variance of the resampled data will also be
+*        returned.
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     npoint
+*        The number of points at which the input grid is to be
+*        resampled.
+*     offset
+*        Pointer to an array of integers with "npoint" elements. For
+*        each output point, this array should contain the zero-based
+*        offset in the output array(s) (i.e. the "out" and,
+*        optionally, the "out_var" arrays) at which the resampled
+*        output value(s) should be stored.
+*     coords
+*        An array of pointers to double, with "ndim_in"
+*        elements. Element "coords[coord]" should point at the first
+*        element of an array of double (with "npoint" elements) which
+*        contains the values of coordinate number "coord" for each
+*        interpolation point. The value of coordinate number "coord"
+*        for interpolation point number "point" is therefore given by
+*        "coords[coord][point]" (assuming both indices are
+*        zero-based).  If any point has a coordinate value of AST__BAD
+*        associated with it, then the corresponding output data (and
+*        variance) will be set to the value given by "badval".
+*     params
+*        A pointer to an array of doubles giving further information
+*        about how the resampling is to proceed.  Only the first 
+*        element is significant; the nearest integer to this gives 
+*        the number of pixels on either side of the central input
+*        grid pixel to use in each dimension.  Therefore 
+*        (1 + 2*params[0])**ndim_in pixels will be averaged over to
+*        generate each output pixel.
+*     flags
+*        The bitwise OR of a set of flag values which control the
+*        operation of the function. Currently, only the flag
+*        AST__USEBAD is significant and indicates whether there are
+*        "bad" (i.e. missing) data in the input array(s) which must be
+*        recognised and propagated to the output array(s).  If this
+*        flag is not set, all input values are treated literally.
+*     badval
+*        If the AST__USEBAD flag is set in the "flags" value (above),
+*        this parameter specifies the value which is used to identify
+*        bad data and/or variance values in the input array(s). Its
+*        numerical type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which resampled values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the resampled data will be returned. Note
+*        that details of how the output grid maps on to this array
+*        (e.g. the storage order, number of dimensions, etc.) is
+*        arbitrary and is specified entirely by means of the "offset"
+*        array. The "out" array should therefore contain sufficient
+*        elements to accommodate the "offset" values supplied.  There
+*        is no requirement that all elements of the "out" array should
+*        be assigned values, and any which are not addressed by the
+*        contents of the "offset" array will be left unchanged.
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the resampled values may be returned. This array will only be
+*        used if the "in_var" array has been given. It is addressed in
+*        exactly the same way (via the "offset" array) as the "out"
+*        array. The values returned are estimates of the statistical
+*        variance of the corresponding values in the "out" array, on
+*        the assumption that all errors in input grid values (in the
+*        "in" array) are statistically independent and that their
+*        variance estimates (in the "in_var" array) may simply be
+*        summed (with appropriate weighting factors).
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+*     nbad
+*        Pointer to an int in which to return the number of
+*        interpolation points at which an output data value (and/or a
+*        variance value if relevant) equal to "badval" has been 
+*        assigned because no valid interpolated value could be
+*        obtained.  The maximum value that will be returned is
+*        "npoint" and the minimum is zero (indicating that all output
+*        values were successfully obtained).
+
+*  Notes:
+*     - There is a separate function for each numerical type of
+*     gridded data, distinguished by replacing the <X> in the function
+*     name by the appropriate 1- or 2-character suffix.
+*/
+/* Define a macro to implement the function for a specific data
+   type. */
+#define MAKE_INTERPOLATE_BLOCKAVE(X,Xtype,Xfloating,Xfloattype,Xsigned) \
+static void InterpolateBlockAverage##X( int ndim_in, \
+                                        const int lbnd_in[], \
+                                        const int ubnd_in[], \
+                                        const Xtype in[], \
+                                        const Xtype in_var[], \
+                                        int npoint, const int offset[], \
+                                        const double *const coords[], \
+                                        const double params[], int flags, \
+                                        Xtype badval, Xtype *out, \
+                                        Xtype *out_var, int *nbad ) { \
+\
+/* Local Variables: */ \
+   Xfloattype hi_lim;            /* Upper limit on output values */ \
+   Xfloattype lo_lim;            /* Lower limit on output values */ \
+   Xfloattype pixwt;             /* Weight to apply to individual pixel */ \
+   Xfloattype sum;               /* Weighted sum of pixel data values */ \
+   Xfloattype sum_var;           /* Weighted sum of pixel variance values */ \
+   Xfloattype val;               /* Data value to be assigned to output */ \
+   Xfloattype val_var;           /* Variance to be assigned to output */ \
+   Xfloattype wtsum;             /* Sum of weight values */ \
+   Xfloattype wtsum_sq;          /* Square of sum of weights */ \
+   Xtype var;                    /* Variance value */ \
+   double *xn_max;               /* Pointer to upper limits array (n-d) */ \
+   double *xn_min;               /* Pointer to lower limits array (n-d) */ \
+   double x;                     /* x coordinate value */ \
+   double xn;                    /* Coordinate value (n-d) */ \
+   double y;                     /* y coordinate value */ \
+   int *hi;                      /* Pointer to array of upper indices */ \
+   int *ixm;                     /* Pointer to array of current indices */ \
+   int *lo;                      /* Pointer to array of lower indices */ \
+   int *stride;                  /* Pointer to array of dimension strides */ \
+   int bad;                      /* Output pixel bad? */ \
+   int bad_var;                  /* Output variance bad? */ \
+   int done;                     /* All pixel indices done? */ \
+   int hi_x;                     /* Upper pixel index (x dimension) */ \
+   int hi_y;                     /* Upper pixel index (y dimension) */ \
+   int idim;                     /* Loop counter for dimensions */ \
+   int ix;                       /* Pixel index in input grid x dimension */ \
+   int ixn;                      /* Pixel index in input grid (n-d) */ \
+   int iy;                       /* Pixel index in input grid y dimension */ \
+   int lo_x;                     /* Lower pixel index (x dimension) */ \
+   int lo_y;                     /* Lower pixel index (y dimension) */ \
+   int neighb;                   /* Number of adjacent pixels on each side */ \
+   int off1;                     /* Input pixel offset due to y index */ \
+   int off_in;                   /* Offset to input pixel */ \
+   int off_out;                  /* Offset to output pixel */ \
+   int point;                    /* Loop counter for output points */ \
+   int s;                        /* Temporary variable for strides */ \
+   int usebad;                   /* Use "bad" input pixel values? */ \
+   int usevar;                   /* Process variance array? */ \
+   int ystride;                  /* Stride along input grid y dimension */ \
+\
+/* Initialise. */ \
+   *nbad = 0; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* Determine if we are processing bad pixels or variances. */ \
+   usebad = flags & AST__USEBAD; \
+   usevar = in_var && out_var; \
+\
+/* Set the number of pixels each side of central pixel to use. */ \
+   neighb = (int) floor( params[ 0 ] + 0.5 ); \
+\
+/* Set up limits for checking output values to ensure that they do not \
+   overflow the range of the data type being used. */ \
+   lo_lim = LO_##X; \
+   hi_lim = HI_##X; \
+\
+/* Handle the 1-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   if ( ndim_in == 1 ) { \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case, loop through all the \
+   output points to (a) assemble the input data needed to form the \
+   interpolated value, and (b) calculate the result and assign it to \
+   the output arrays(s). In each case we assign constant values (0 or \
+   1) to the "Usebad" and "Usevar" flags so that code for handling bad \
+   pixels and variances can be eliminated when not required. */ \
+      if ( usebad ) { \
+         if ( usevar ) { \
+            for ( point = 0; point < npoint; point++ ) { \
+               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+            } \
+         } else { \
+            for ( point = 0; point < npoint; point++ ) { \
+               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+            } \
+         } \
+      } else { \
+         if ( usevar ) { \
+            for ( point = 0; point < npoint; point++ ) { \
+               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+            } \
+         } else { \
+            for ( point = 0; point < npoint; point++ ) { \
+               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+            } \
+         } \
+      } \
+\
+/* Handle the 2-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   } else if ( ndim_in == 2 ) { \
+\
+/* Calculate the stride along the y dimension of the input grid. */ \
+      ystride = ubnd_in[ 0 ] - lbnd_in[ 0 ] + 1; \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case, loop through all the \
+   output points to (a) assemble the input data needed to form the \
+   interpolated value, and (b) calculate the result and assign it to \
+   the output arrays(s). In each case we assign constant values (0 or \
+   1) to the "Usebad" and "Usevar" flags so that code for handling bad \
+   pixels and variances can be eliminated when not required. */ \
+      if ( usebad ) { \
+         if ( usevar ) { \
+            for ( point = 0; point < npoint; point++ ) { \
+               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+            } \
+         } else { \
+            for ( point = 0; point < npoint; point++ ) { \
+               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+            } \
+         } \
+      } else { \
+         if ( usevar ) { \
+            for ( point = 0; point < npoint; point++ ) { \
+               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+            } \
+         } else { \
+            for ( point = 0; point < npoint; point++ ) { \
+               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+            } \
+         } \
+      } \
+\
+/* Handle other numbers of dimensions. */ \
+/* ----------------------------------- */ \
+   } else { \
+\
+/* Allocate workspace. */ \
+      hi = astMalloc( sizeof( int ) * (size_t) ndim_in ); \
+      lo = astMalloc( sizeof( int ) * (size_t) ndim_in ); \
+      stride = astMalloc( sizeof( int ) * (size_t) ndim_in ); \
+      ixm = astMalloc( sizeof( int ) * (size_t) ndim_in ); \
+      xn_max = astMalloc( sizeof( double ) * (size_t) ndim_in ); \
+      xn_min = astMalloc( sizeof( double ) * (size_t) ndim_in ); \
+      if ( astOK ) { \
+\
+/* Calculate the stride along each dimension of the input grid. */ \
+         for ( s = 1, idim = 0; idim < ndim_in; idim++ ) { \
+            stride[ idim ] = s; \
+            s *= ubnd_in[ idim ] - lbnd_in[ idim ] + 1; \
+\
+/* Calculate the coordinate limits of the input grid in each \
+   dimension. */ \
+            xn_min[ idim ] = (double) lbnd_in[ idim ] - 0.5; \
+            xn_max[ idim ] = (double) ubnd_in[ idim ] + 0.5; \
+         } \
+\
+/* Identify four cases, according to whether bad pixels and/or \
+   variances are being processed. In each case, loop through all the \
+   output points to (a) assemble the input data needed to form the \
+   interpolated value, and (b) calculate the result and assign it to \
+   the output arrays(s). In each case we assign constant values (0 or \
+   1) to the "Usebad" and "Usevar" flags so that code for handling bad \
+   pixels and variances can be eliminated when not required. */ \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+               } \
+            } \
+         } else { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+               } \
+            } \
+         } \
+      } \
+\
+/* Free the workspace. */ \
+      hi = astFree( hi ); \
+      lo = astFree( lo ); \
+      stride = astFree( stride ); \
+      ixm = astFree( ixm ); \
+      xn_max = astFree( xn_max ); \
+      xn_min = astFree( xn_min ); \
+   } \
+\
+/* If an error has occurred, clear the returned result. */ \
+   if ( !astOK ) *nbad = 0; \
+\
+/* Return. */ \
+}
+
+/* This subsidiary macro assembles the input data needed in
+   preparation for forming the interpolated value in the 1-dimensional
+   case. */
+#define ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,Usebad,Usevar) \
+\
+/* Obtain the x coordinate of the current point and test if it is bad. */ \
+   x = coords[ 0 ][ point ]; \
+   bad = ( x == AST__BAD ); \
+\
+/* Note we do not need to check here whether the pixel in this position is \
+   bad; if any pixels in the cube are good we can form an average. */ \
+\
+/* If OK, calculate the lowest and highest indices (in the x \
+   dimension) of the region of neighbouring pixels that will \
+   contribute to the interpolated result.  Constrain these values to \
+   lie within the input grid. */ \
+   if ( !bad ) { \
+      ix = (int) floor( x ); \
+      lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ] ); \
+      hi_x = MinI( ix + neighb,     ubnd_in[ 0 ] ); \
+\
+/* Initialise sums for forming the interpolated result. */ \
+      sum = (Xfloattype) 0.0; \
+      wtsum = (Xfloattype) 0.0; \
+      if ( Usevar ) { \
+         sum_var = (Xfloattype) 0.0; \
+         bad_var = 0; \
+      } \
+\
+/* Loop to inspect all the contributing pixels, calculating the offset \
+   of each pixel from the start of the input array. */ \
+      off_in = lo_x - lbnd_in[ 0 ]; \
+      for ( ix = lo_x; ix <= hi_x; ix++, off_in++ ) { \
+\
+/* If necessary, test if the input pixel is bad. */ \
+         if ( !( Usebad ) || ( in[ off_in ] != badval ) ) { \
+\
+/* If we are using variances, then check that the variance is valid; \
+   if it is invalid then ignore this pixel altogether. */ \
+            if ( Usevar ) { \
+               var = in_var[ off_in ]; \
+               if ( Usebad ) bad_var = ( var == badval ); \
+               CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
+\
+/* If variance is valid then accumulate suitably weighted values into \
+   the totals. */ \
+               if ( !( ( Xsigned ) || ( Usebad ) ) || !bad_var ) { \
+                  pixwt = (Xfloattype) 1.0 / var; \
+                  sum += pixwt * ( (Xfloattype) in[ off_in ] ); \
+                  wtsum += pixwt; \
+                  sum_var += pixwt; \
+               } \
+\
+/* If we are not using variances, then accumulate values into the \
+   totals with a weighting of unity. */ \
+            } else { \
+               sum += (Xfloattype) in[ off_in ]; \
+               wtsum++; \
+            } \
+         } \
+      } \
+   }
+
+/* This subsidiary macro assembles the input data needed in
+   preparation for forming the interpolated value in the 2-dimensional
+   case. */ 
+#define ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,Usebad,Usevar) \
+\
+/* Obtain the x coordinate of the current point and test if it is bad. */ \
+   x = coords[ 0 ][ point ]; \
+   bad = ( x == AST__BAD ); \
+   if ( !bad ) { \
+\
+/* If not, then similarly obtain and test the y coordinate. */ \
+      y = coords[ 1 ][ point ]; \
+      bad = ( y == AST__BAD ); \
+\
+/* Note we do not need to check here whether the pixel in this position is \
+   bad; if any pixels in the cube are good we can form an average. */ \
+\
+/* If OK, calculate the lowest and highest indices (in each dimension) \
+   of the region of neighbouring pixels that will contribute to the \
+   interpolated result.  Constrain these values to lie within the input \
+   grid. */ \
+      if ( !bad ) { \
+         ix = (int) floor( x ); \
+         lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ] ); \
+         hi_x = MinI( ix + neighb,     ubnd_in[ 0 ] ); \
+         iy = (int) floor( y ); \
+         lo_y = MaxI( iy - neighb + 1, lbnd_in[ 1 ] ); \
+         hi_y = MinI( iy + neighb,     ubnd_in[ 1 ] ); \
+\
+/* Initialise sums for forming the interpolated result. */ \
+         sum = (Xfloattype) 0.0; \
+         wtsum = (Xfloattype) 0.0; \
+         if ( Usevar ) { \
+            sum_var = (Xfloattype) 0.0; \
+            bad_var = 0; \
+         } \
+\
+/* Loop to inspect all the contributing pixels, calculating the offset \
+   of each pixel from the start of the input array. */ \
+         off1 = lo_x - lbnd_in[ 0 ] + ystride * ( lo_y - lbnd_in[ 1 ] ); \
+         for ( iy = lo_y; iy <= hi_y; iy++, off1 += ystride ) { \
+            off_in = off1; \
+            for ( ix = lo_x; ix <= hi_x; ix++, off_in++ ) { \
+\
+/* If necessary, test if the input pixel is bad. */ \
+               if ( !( Usebad ) || ( in[ off_in ] != badval ) ) { \
+\
+/* If we are using variances, then check that the variance is valid; \
+   if it is invalid then ignore this pixel altogether. */ \
+                  if ( Usevar ) { \
+                     var = in_var[ off_in ]; \
+                     if ( Usebad ) bad_var = ( var == badval ); \
+                     CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
+\
+/* If variance is valid then accumulate suitably weighted values into \
+   the totals. */ \
+                     if ( !( ( Xsigned ) || ( Usebad ) ) || !bad_var ) { \
+                        pixwt = (Xfloattype) 1.0 / var; \
+                        sum += pixwt * ( (Xfloattype) in[ off_in ] ); \
+                        wtsum += pixwt; \
+                        sum_var += pixwt; \
+                     } \
+\
+/* If we are not using variances, then accumulate values into the \
+   totals with a weighting of unity. */ \
+                  } else { \
+                     sum += (Xfloattype) in[ off_in ]; \
+                     wtsum++; \
+                  } \
+               } \
+            } \
+         } \
+      } \
+   }
+ 
+/* This subsidiary macro assembles the input data needed in
+   preparation for forming the interpolated value in the n-dimensional
+   case. */
+#define ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,Usebad,Usevar) \
+\
+/* Initialise offsets into the input array.  then loop to obtain each \
+   coordinate associated with the current output poitn. */ \
+   off_in = 0; \
+   for ( idim = 0; idim < ndim_in; idim++ ) { \
+      xn = coords[ idim ][ point ]; \
+\
+/* Test if the coordinate is bad. If so give up on this point. */ \
+      bad = ( xn == AST__BAD ); \
+      if ( bad ) break; \
+\
+/* Calculate the lowest and highest indices (in the current dimension) \
+   of the region of neighbouring pixels that will contribute to the \
+   interpolated result. Constrain these values to lie within the input \
+   grid. */ \
+      ixn = (int) floor( xn ); \
+      lo[ idim ] = MaxI( ixn - neighb + 1, lbnd_in[ idim ] ); \
+      hi[ idim ] = MinI( ixn + neighb,     ubnd_in[ idim ] ); \
+\
+/* If the cube has a zero dimension then no data can come from it. */ \
+      bad = ( lo[ idim ] > hi[ idim ] ); \
+      if ( bad ) break; \
+\
+/* Accumulate the offset (from the start of the input array) of the \
+   contributing pixel which has the lowest index in each dimension. */ \
+      off_in += stride[ idim ] * ( lo[ idim ] - lbnd_in[ idim ] ); \
+\
+/* Initialise an array to keep track of the current position in the \
+   input cube. */ \
+      ixm[ idim ] = lo[ idim ]; \
+   } \
+\
+/* Note we do not need to check here whether the pixel in this position is \
+   bad; if any pixels in the cube are good we can form an average. */ \
+\
+/* If OK, initialise sums for forming the interpolated result. */ \
+   if ( !bad ) { \
+      sum = (Xfloattype) 0.0; \
+      wtsum= (Xfloattype) 0.0; \
+      if ( Usevar ) { \
+         sum_var = (Xfloattype) 0.0; \
+         bad_var = 0; \
+      } \
+\
+/* Loop to inspect all the contributing pixels, calculating the offset \
+   of each pixel from the start of the input array. */ \
+      do { \
+\
+/* If necessary, test if the input pixel is bad. */ \
+         if ( !( Usebad ) || ( in[ off_in ] != badval ) ) { \
+\
+/* If we are using variances, then check that the variance is valid; \
+   if it is invalid then ignore this pixel altogether. */ \
+            if ( Usevar ) { \
+               var = in_var[ off_in ]; \
+               if ( Usebad ) bad_var = ( var == badval ); \
+               CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
+\
+/* If variance is valid then accumulate suitably weighted values into \
+   the totals. */ \
+               if ( !( ( Xsigned ) || ( Usebad ) ) || !bad_var ) { \
+                  pixwt = (Xfloattype) 1.0 / var; \
+                  sum += pixwt * ( (Xfloattype) in[ off_in ] ); \
+                  wtsum += pixwt; \
+                  sum_var += pixwt; \
+               } \
+\
+/* If we are not using variances, then accumulate values into the \
+   totals with a weighting of unity. */ \
+            } else { \
+               sum += (Xfloattype) in[ off_in ]; \
+               wtsum++; \
+            } \
+         } \
+\
+/* Locate the next pixel in the input cube; try incrementing the lowest \
+   dimension index first, if that rolls over increment the next  \
+   dimension index, and so on. */ \
+         for ( idim = 0; idim < ndim_in; idim++ ) { \
+            if ( ixm[ idim ] < hi[ idim ] ) { \
+               off_in += stride[ idim ]; \
+               ixm[ idim ]++; \
+               break; \
+            } else { \
+               off_in -= stride[ idim ] * ( hi[ idim ] - lo[ idim ] ); \
+               ixm[ idim ] = lo[ idim ]; \
+            } \
+         } \
+\
+/* If the highest dimension index has rolled over, we have done all \
+   the pixels in the cube. */ \
+         done = ( idim == ndim_in ); \
+      } while ( !done ); \
+   }
+
+/* This subsidiary macro calculates the interpolated output value (and
+   variance) from the sums over contributing pixels, checks the
+   results for validity, and assigns them to the output array(s). */
+#define CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Usebad,Usevar) \
+\
+/* If the output data value has not yet been flagged as bad, then \
+   check that an interpolated value can actually be produced.  First \
+   check that the sum of weights is not zero. */ \
+   if ( !bad ) { \
+      bad = ( wtsum == (Xfloattype) 0.0 ); \
+\
+/* If OK, calculate the interpolated value. Then, if the output data \
+   type is not floating point, check that this value will not overflow \
+   the available output range. */ \
+      if ( !bad ) { \
+         val = sum / wtsum; \
+         if ( !( Xfloating ) ) { \
+            bad = ( val <= lo_lim ) || ( val >= hi_lim ); \
+         } \
+      } \
+\
+/* If no interpolated data value can be produced, then no associated \
+   variance will be required either. */ \
+      if ( ( Usevar ) && bad ) bad_var = 1; \
+   } \
+\
+/* Now perform similar checks on the output variance value (if \
+   required). This time we check that the square of the sum of \
+   weights is not zero (since this might underflow before the sum of \
+   weights). Again we also check to prevent the result overflowing the \
+   output data type. */ \
+   if ( ( Usevar ) && !bad_var ) { \
+      wtsum_sq = wtsum * wtsum; \
+      bad_var = ( wtsum_sq == (Xfloattype) 0.0 ); \
+      if ( !bad_var ) { \
+         val_var = sum_var / wtsum_sq; \
+         if ( !( Xfloating ) ) { \
+            bad_var = ( val_var <= lo_lim ) || ( val_var >= hi_lim ); \
+         } \
+      } \
+   } \
+\
+/* Obtain the pixel offset into the output array. */ \
+   off_out = offset[ point ]; \
+\
+/* Assign a bad output value (and variance) if required and count it. */ \
+   if ( bad ) { \
+      out[ off_out ] = badval; \
+      if ( Usevar ) out_var[ off_out ] = badval; \
+      (*nbad)++; \
+\
+/* Otherwise, assign the interpolated value. If the output data type \
+   is floating point, the result can be stored directly, otherwise we \
+   must round to the nearest integer. */ \
+   } else { \
+      if ( Xfloating ) { \
+         out[ off_out ] = (Xtype) val; \
+      } else { \
+         out[ off_out ] = (Xtype) ( val + ( ( val >= (Xfloattype) 0.0 ) ? \
+                                            ( (Xfloattype) 0.5 ) : \
+                                            ( (Xfloattype) -0.5 ) ) ); \
+      } \
+\
+/* If a variance estimate is required but none can be obtained, then \
+   store a bad output variance value and count it. */ \
+      if ( Usevar ) { \
+         if ( bad_var ) { \
+            out_var[ off_out ] = badval; \
+            (*nbad)++; \
+\
+/* Otherwise, store the variance estimate, rounding to the nearest \
+   integer if necessary. */ \
+         } else { \
+            if ( Xfloating ) { \
+               out_var[ off_out ] = (Xtype) val_var; \
+            } else { \
+               out_var[ off_out ] = (Xtype) ( val_var + \
+                                          ( ( val_var >= (Xfloattype) 0.0 ) ? \
+                                            ( (Xfloattype) 0.5 ) : \
+                                            ( (Xfloattype) -0.5 ) ) ); \
+            } \
+         } \
+      } \
+   }
+
+/* These subsidiary macros define limits for range checking of results
+   before conversion to the final data type. For each data type code
+   <X>, HI_<X> gives the least positive floating point value which
+   just overflows that data type towards plus infinity, while LO_<X>
+   gives the least negative floating point value which just overflows
+   that data type towards minus infinity. Thus, a floating point value
+   must satisfy LO<flt_value<HI if overflow is not to occur when it is
+   converted to that data type.
+
+   The data type of each limit should be that of the smallest
+   precision floating point type which will accommodate the full range
+   of values that the target type may take. */
+
+/* If <X> is a floating point type, the limits are not actually used,
+   but must be present to permit error-free compilation. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#define HI_LD ( 0.0L )
+#define LO_LD ( 0.0L )
+#endif
+#define HI_D ( 0.0 )
+#define LO_D ( 0.0 )
+#define HI_F ( 0.0f )
+#define LO_F ( 0.0f )
+
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#define HI_L   ( 0.5L + (long double) LONG_MAX )
+#define LO_L  ( -0.5L + (long double) LONG_MIN )
+#define HI_UL  ( 0.5L + (long double) ULONG_MAX )
+#define LO_UL ( -0.5L )
+#else
+#define HI_L   ( 0.5 + (double) LONG_MAX )
+#define LO_L  ( -0.5 + (double) LONG_MIN )
+#define HI_UL  ( 0.5 + (double) ULONG_MAX )
+#define LO_UL ( -0.5 )
+#endif
+#define HI_I   ( 0.5 + (double) INT_MAX )
+#define LO_I  ( -0.5 + (double) INT_MIN )
+#define HI_UI  ( 0.5 + (double) UINT_MAX )
+#define LO_UI ( -0.5 )
+#define HI_S   ( 0.5f + (float) SHRT_MAX )
+#define LO_S  ( -0.5f + (float) SHRT_MIN )
+#define HI_US  ( 0.5f + (float) USHRT_MAX )
+#define LO_US ( -0.5f )
+#define HI_B   ( 0.5f + (float) SCHAR_MAX )
+#define LO_B  ( -0.5f + (float) SCHAR_MIN )
+#define HI_UB  ( 0.5f + (float) UCHAR_MAX )
+#define LO_UB ( -0.5f )
+
+/* This subsidiary macro tests for negative variance values. This
+   check is required only for signed data types. */
+#define CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
+   bad_var = bad_var || ( var < ( (Xtype) 0 ) );
+
+/* Expand the main macro above to generate a function for each
+   required signed data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_INTERPOLATE_BLOCKAVE(LD,long double,1,long double,1)
+MAKE_INTERPOLATE_BLOCKAVE(L,long int,0,long double,1)
+#else
+MAKE_INTERPOLATE_BLOCKAVE(L,long int,0,double,1)
+#endif
+MAKE_INTERPOLATE_BLOCKAVE(D,double,1,double,1)
+MAKE_INTERPOLATE_BLOCKAVE(F,float,1,float,1)
+MAKE_INTERPOLATE_BLOCKAVE(I,int,0,double,1)
+MAKE_INTERPOLATE_BLOCKAVE(S,short int,0,float,1)
+MAKE_INTERPOLATE_BLOCKAVE(B,signed char,0,float,1)
+
+/* Re-define the macro for testing for negative variances to do
+   nothing. */
+#undef CHECK_FOR_NEGATIVE_VARIANCE
+#define CHECK_FOR_NEGATIVE_VARIANCE(Xtype)
+
+/* Expand the main macro above to generate a function for each
+   required unsigned data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_INTERPOLATE_BLOCKAVE(UL,unsigned long int,0,long double,0)
+#else
+MAKE_INTERPOLATE_BLOCKAVE(UL,unsigned long int,0,double,0)
+#endif
+MAKE_INTERPOLATE_BLOCKAVE(UI,unsigned int,0,double,0)
+MAKE_INTERPOLATE_BLOCKAVE(US,unsigned short int,0,float,0)
+MAKE_INTERPOLATE_BLOCKAVE(UB,unsigned char,0,float,0)
+
+/* Undefine the macros used above. */
+#undef CHECK_FOR_NEGATIVE_VARIANCE
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#undef HI_LD
+#undef LO_LD
+#endif
+#undef HI_D
+#undef LO_D
+#undef HI_F
+#undef LO_F
+#undef HI_L
+#undef LO_L
+#undef HI_UL
+#undef LO_UL
+#undef HI_I
+#undef LO_I
+#undef HI_UI
+#undef LO_UI
+#undef HI_S
+#undef LO_S
+#undef HI_US
+#undef LO_US
+#undef HI_B
+#undef LO_B
+#undef HI_UB
+#undef LO_UB
+#undef CALC_AND_ASSIGN_OUTPUT
+#undef ASSEMBLE_INPUT_ND
+#undef ASSEMBLE_INPUT_2D
+#undef ASSEMBLE_INPUT_1D
+#undef MAKE_INTERPOLATE_BLOCKAVE
 
 static void Invert( AstMapping *this ) {
 /*
@@ -6096,6 +6933,27 @@ f     value (in the same way as for the pre-defined interpolation
 f     schemes described above). Other elements of the PARAMS array
 f     are available to pass values to your interpolation routine.
 *
+*     - AST__BLOCKAVE: This scheme simply takes an average of all the
+*     pixels on the input grid in a cube centred on the interpolation
+*     point.  The number of pixels in the cube is determined by the
+c     value of the first element of the "params" array, which gives
+f     value of the first element of the PARAMS array, which gives
+*     the number of pixels in each dimension on either side of the
+c     central point.  Hence a block of (2 * params[0] + 1)^ndim_in
+f     central point.  Hence a block of (2 * PARAMS(1) + 1)**NDIM_IN
+*     pixels in the input grid will be examined to determine the
+*     value of the output pixel.  If the variance is not being used
+c     (var_in or var_out = NULL) then all valid pixels in this cube
+f     (USEVAR = .FALSE.) then all valid pixels in this cube
+*     will be averaged in to the result with equal weight.
+*     If variances are being used, then each input pixel will be 
+*     weighted proportionally to the reciprocal of its variance; any
+*     pixel without a valid variance will be discarded.  This scheme
+*     is suitable where the output grid is much coarser than the 
+*     input grid; if the ratio of pixel sizes is R then a suitable
+c     value of params[0] may be (R - 1)/2.
+f     value of PARAMS(1) may be (R - 1)/2.
+*
 c     - AST__UINTERP: This is a completely general scheme, in which
 c     your interpolation function has access to all of the input
 c     data. This allows you to implement any interpolation algorithm
@@ -7045,6 +7903,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    int result;                   /* Result value to be returned */
    int s;                        /* Temporary variable for strides */
    int usevar;                   /* Process variance array? */
+   void (* gifunc)();            /* General interpolation function */
    void (* kernel)( double, const double [], int, double * ); /* Kernel fn. */
 
 /* Initialise. */
@@ -7599,24 +8458,43 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Undefine the macro. */
 #undef CASE_KERNEL1
 
-/* User-supplied sub-pixel interpolation function. */
-/* ----------------------------------------------- */
+/* General sub-pixel interpolation function. */
+/* ----------------------------------------- */
+         case AST__BLOCKAVE:
          case AST__UINTERP:
 
 /* Determine if a variance array is to be processed. */
             usevar = ( in_var && out_var );
 
-/* Define a macro to use a "case" statement to invoke the
-   user-supplied sub-pixel interpolation function appropriate to a
-   given data type. Ensure that either both "in_var and "out_var" are
-   passed, or neither is. If an error occurs within the user-supplied
-   function, then report a contextual error message. */
-#define CASE_UINTERP(X,Xtype) \
+/* Define a macro to use a "case" statement to invoke the general 
+   sub-pixel interpolation function appropriate to a given type and
+   the selected value of the interp variable. */
+#define CASE_GINTERP(X,Xtype) \
                case ( TYPE_##X ): \
 \
-/* The finterp function needs to be cast to the correct type to prevent \
-   default promotion (to int or double) of its arguments.  The cast here  \
-   corresponds to the declaration of ast_resample_uinterp##Xtype. */ \
+/* Obtain a pointer to the appropriate general interpolation function \
+   (either internal or user-defined) and set up any parameters it may \
+   require. */ \
+                  switch ( interp ) { \
+\
+/* Block averaging interpolation. */ \
+/* ------------------------------ */ \
+                     case AST__BLOCKAVE: \
+                        gifunc = (void (*)()) InterpolateBlockAverage##X; \
+                        break; \
+\
+/* User-supplied sub-pixel interpolation function. */ \
+/* ----------------------------------------------- */ \
+                     case AST__UINTERP: \
+                        gifunc = (void (*)()) finterp; \
+                        break; \
+                  } \
+\
+/* Invoke the general interpolation function.  It has to be cast to the \
+   right type (i.e. a function with the correctly typed arguments) \
+   to prevent default promotion (to int or double) of its arguments. \
+   The cast here corresponds to the declaration of 
+   ast_resample_uinterp##Xtype. */ \
                   ( *( (void (*)( int, const int[], const int[], \
                                   const Xtype[], \
                                   const Xtype[], \
@@ -7626,17 +8504,17 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                   Xtype, \
                                   Xtype *, \
                                   Xtype *, \
-                                  int * ) \
-                        ) finterp ) )( ndim_in, lbnd_in, ubnd_in, \
-                                       (Xtype *) in, \
-                                       (Xtype *) ( usevar ? in_var : NULL ), \
-                                       npoint, offset, \
-                                       (const double *const *) ptr_in, \
-                                       params, flags, \
-                                       *( (Xtype *) badval_ptr ), \
-                                       (Xtype *) out, \
-                                       (Xtype *) ( usevar ? out_var : NULL ), \
-                                       &nbad ); \
+                                  int * )) \
+                       gifunc ) )( ndim_in, lbnd_in, ubnd_in, \
+                                   (Xtype *) in, \
+                                   (Xtype *) ( usevar ? in_var : NULL ), \
+                                   npoint, offset, \
+                                   (const double *const *) ptr_in, \
+                                   params, flags, \
+                                   *( (Xtype *) badval_ptr ), \
+                                   (Xtype *) out, \
+                                   (Xtype *) ( usevar ? out_var : NULL ), \
+                                   &nbad ); \
                   if ( astOK ) { \
                      result += nbad; \
                   } else { \
@@ -7650,23 +8528,23 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Use the above macro to invoke the function. */
             switch ( type ) {
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
-               CASE_UINTERP(LD,long double)
+               CASE_GINTERP(LD,long double)
 #endif
-               CASE_UINTERP(D,double)
-               CASE_UINTERP(F,float)
-               CASE_UINTERP(L,long int)
-               CASE_UINTERP(UL,unsigned long int)
-               CASE_UINTERP(I,int)
-               CASE_UINTERP(UI,unsigned int)
-               CASE_UINTERP(S,short int)
-               CASE_UINTERP(US,unsigned short int)
-               CASE_UINTERP(B,signed char)
-               CASE_UINTERP(UB,unsigned char)
+               CASE_GINTERP(D,double)
+               CASE_GINTERP(F,float)
+               CASE_GINTERP(L,long int)
+               CASE_GINTERP(UL,unsigned long int)
+               CASE_GINTERP(I,int)
+               CASE_GINTERP(UI,unsigned int)
+               CASE_GINTERP(S,short int)
+               CASE_GINTERP(US,unsigned short int)
+               CASE_GINTERP(B,signed char)
+               CASE_GINTERP(UB,unsigned char)
             }
             break;
 
 /* Undefine the macro. */
-#undef CASE_UINTERP
+#undef CASE_GINTERP
 
 /* Error: invalid interpolation scheme specified. */
 /* ---------------------------------------------- */
