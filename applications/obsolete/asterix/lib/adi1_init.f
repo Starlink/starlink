@@ -101,8 +101,10 @@
       EXTERNAL			FSI1_SETLNK
       EXTERNAL			FSI1_GETSEL
       EXTERNAL			FSI1_GETREF
+      EXTERNAL			FSI1_GETSCL
       EXTERNAL			FSI1_PUTSEL
       EXTERNAL			FSI1_PUTREF
+      EXTERNAL			FSI1_PUTSCL
 
       EXTERNAL			GMI1_NEWLNK
       EXTERNAL			GMI1_SETLNK
@@ -179,6 +181,10 @@
      :                 FSI1_GETREF, DID, STATUS )
       CALL ADI_DEFMTH( 'WriteRef(_FileSet,_HDSfile,_INTEGER,_)',
      :                 FSI1_PUTREF, DID, STATUS )
+      CALL ADI_DEFMTH( 'ReadScl(_FileSet,_HDSfile,_INTEGER,)',
+     :                 FSI1_GETSCL, DID, STATUS )
+      CALL ADI_DEFMTH( 'WriteScl(_FileSet,_HDSfile,_INTEGER,_REAL)',
+     :                 FSI1_PUTSCL, DID, STATUS )
 
 *  Source search results files
       CALL ADI_DEFMTH( 'NewLink(_SSDS,_HDSfile)', SSI1_NEWLNK,
