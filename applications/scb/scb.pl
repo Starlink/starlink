@@ -89,7 +89,6 @@ sub error;
 sub header;
 sub footer;
 sub hprint;
-sub tidyfiles;
 sub quasialph;
 
 #  Determine operating environment.
@@ -147,7 +146,8 @@ if ($arg{'module'}) {
 #  Check if module exists in index; try capitalising it if the input form
 #  has no entry.
 
-   $arg{'module'} .= "_" unless ($locate{$arg{'module'}});
+   $arg{'module'} .= "_" 
+      unless ($arg{'module'} =~ /_$/ || $locate{$arg{'module'}});
    unless ($locate{$arg{'module'}}) {
       error "Failed to find module $arg{'module'}",
          "This may be a result of a deficiency in the source
@@ -247,7 +247,7 @@ sub query_form {
       print "<h2>$package</h2>\n";
 
       my @tasks = @{$tasks{$package}};
-      my $sep = "<b>o</b>&nbsp;";
+      my $sep = "<b>-</b>&nbsp;";
 
       if (@tasks) {
 
@@ -419,7 +419,7 @@ sub get_module {
 
 #  Tidy up.
 
-   tidyfiles;
+   rmrf $tmpdir;
 
 }
 
@@ -603,26 +603,6 @@ sub output {
 
 
 ########################################################################
-sub tidyfiles {
-
-#  Delete temporary directory in which files were unpacked.
-#
-#  Note use of "die" here rather than "error", since this routine is 
-#  called by error, and we don't want to get into an infinite loop.
-
-#  Maintain a healthy respect for rm -rf.  The following line *should*
-#  do nothing.  Feel free to remove it.
-
-   die "Warning: $tmpdir looks wrong" 
-      unless ($tmpdir =~ /^$tmpbase/ && $tmpdir =~ /tmp|junk/);
-
-#  Remove the directory conaining all temporary files.
-
-   system "rm -rf $tmpdir" and die "rm -rf $tmpdir: $?\n";
-}
-
-
-########################################################################
 sub error {
 
 #  This routine outputs an error message and exits with non-zero status.
@@ -636,7 +616,7 @@ sub error {
    my $message = shift;       # Terse error message text.
    my $more = shift;          # Verbose explanation of error.
 
-   tidyfiles;
+   rmrf $tmpdir;
 
    if ($cgi) {
       header "Error";

@@ -156,8 +156,7 @@ sub uniq;
 #  Set up scratch directory.
 
 $tmpdir = "/local/junk/scb/index";
-print "rm -rf $tmpdir\n" if $verbose;
-system "rm -rf $tmpdir" and die "Couldn't clean out $tmpdir: $?\n";
+rmrf $tmpdir;
 system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
 
 #  Read values of index file into %locate.
@@ -241,6 +240,7 @@ if ($verbose) {
 
 untie %locate;
 untie %tasks;
+rmrf $tmpdir;
 
 exit;
 
@@ -402,7 +402,7 @@ sub index_tar {
    
 #  Tidy up.
 
-   unlink @files               or die "Error removing files\n";
+   unlink @files;
    popd;
 }
 

@@ -16,7 +16,7 @@ require Exporter;
 
 #  Names of routines and variables defined here to be exported.
 
-@EXPORT = qw/tarxf popd pushd module_name starpack
+@EXPORT = qw/tarxf popd pushd module_name starpack rmrf
              incdir srcdir bindir indexfile taskfile/;
 
 #  Includes.
@@ -37,6 +37,20 @@ $main::incdir = "/star/include";              # Starlink include directory
 
 $main::indexfile = cwd . "/index";
 $main::taskfile  = cwd . "/tasks";
+
+
+########################################################################
+#  Local variables.
+########################################################################
+
+#  Define necessary shell commands.
+#  Note: this is used in a CGI program, so you should be sure that these 
+#  commands do what they ought to, for security reasons.
+
+   $tar = "tar";
+   $cat = "cat";
+   $zcat = "uncompress -c";
+   $gzcat = "gzip -dc";
 
 
 ########################################################################
@@ -63,13 +77,6 @@ sub tarxf {
 
    my $tarfile = shift;
    my @files = @_;
-
-#  Define necessary shell commands.
-
-   $tar = "tar";
-   $cat = "cat";
-   $zcat = "uncompress -c";
-   $gzcat = "gzip -dc";
 
 #  Define a (possibly null) compression filter.
 
@@ -197,6 +204,21 @@ sub starpack {
    local $_ = shift;
    /^(\w+)#/;
    return $1;
+}
+
+########################################################################
+sub rmrf {
+
+#  This routine erases recursively a directory (rm -rf).
+#  It does it rather carefully to try to avoid anything nasty happening.
+#  Note the use of 'die' rather than 'error', since the routine may be
+#  called by error, and we don't want to get into an infinite loop.
+
+   my $dir = shift;
+
+   die "Warning: don't like the look of 'rm -rf $dir'\n"
+      unless ($dir =~ /tmp|junk/);
+   system "rm -rf $dir" and die "Error in rm -rf $dir: $?\n";
 }
 
 
