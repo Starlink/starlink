@@ -193,6 +193,12 @@ int main (int argc, char **argv)
 			    cout << "210 Catalogue follows" << crlf;
 			    // Write out the number of columns, and a
 			    // row for each one.
+			    //
+			    // Should we make this more robust, so
+			    // that it _always_ returns the number of
+			    // rows it promised to, even if there's
+			    // some problem within the iterator,
+			    // signalled by a thrown MoggyException?
 			    cout << names.size() << crlf;
 			    for (vector<string>::const_iterator n=names.begin();
 				 n != names.end();
