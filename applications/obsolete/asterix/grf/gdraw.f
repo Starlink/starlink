@@ -1043,8 +1043,12 @@
 
 *  get default min/max scaling levels
 	IF (PIXEL.OR.CONTOUR) THEN
-	  CALL GDRAW_GET2DRANGE(XDIM,YDIM,IX1,IX2,IY1,IY2,%val(DPTR),
-     :                                            DMIN,DMAX,STATUS)
+          IF (QOK) THEN
+	    CALL GDRAW_GET2DRANGEQ(XDIM,YDIM,IX1,IX2,IY1,IY2,
+     :               %val(DPTR),%val(QPTR),MASK,DMIN,DMAX,STATUS)
+          ELSE
+            CALL GDRAW_GET2DRANGE(XDIM,YDIM,IX1,IX2,IY1,IY2,
+     :                           %val(DPTR),DMIN,DMAX,STATUS)
 	ENDIF
 
 	IF (PIXEL) THEN
@@ -1409,6 +1413,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       INTEGER NX,NY
       INTEGER IX1,IX2,IY1,IY2
@@ -1425,13 +1430,70 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-	ZMIN=Z(IX1,IY1)
-	ZMAX=ZMIN
+	ZMIN=VAL__MAXR
+	ZMAX=VAL__MINR
 
 	DO J=IY1,IY2
 	  DO I=IX1,IX2
-	    ZMIN=MIN(ZMIN,Z(I,J))
-	    ZMAX=MAX(ZMAX,Z(I,J))
+            IF (Z(I,J).NE.VAL__BADR) THEN
+	      ZMIN=MIN(ZMIN,Z(I,J))
+	      ZMAX=MAX(ZMAX,Z(I,J))
+            ENDIF
+	  ENDDO
+	ENDDO
+
+      ENDIF
+      END
+
+
+*+
+      SUBROUTINE GDRAW_GET2DRANGEQ(NX,NY,IX1,IX2,IY1,IY2,
+     :                          Q,MASK,Z,ZMIN,ZMAX,STATUS)
+
+*    Description :
+*    Parameters :
+*    Method :
+*
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'QUAL_PAR'
+      INCLUDE 'PRM_PAR'
+*    Import :
+      INTEGER NX,NY
+      INTEGER IX1,IX2,IY1,IY2
+      BYTE Q(NX,NY),MASK
+      REAL Z(NX,NY)
+*    Import-export :
+*    Export :
+      REAL ZMIN,ZMAX
+*    Status :
+      INTEGER STATUS
+*    Functions :
+      BYTE BIT_ANDUB
+*    Local Constants :
+*    Local variables :
+      INTEGER I,J
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+	ZMIN=VAL__MAXR
+	ZMAX=VAL__MINR
+
+	DO J=IY1,IY2
+	  DO I=IX1,IX2
+            IF (BIT_ANDUB(Q(I,J),MASK).EQ.QUAL__GOOD.AND.
+     :            Z(I,J).NE.VAL__BADR) THEN
+              ZMIN=MIN(ZMIN,Z(I,J))
+	      ZMAX=MAX(ZMAX,Z(I,J))
+            ENDIF
 	  ENDDO
 	ENDDO
 
