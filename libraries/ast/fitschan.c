@@ -614,6 +614,10 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        in favour of PROJP only if the PV values look correct.
 *     17-NOV-2004 (DSB):
 *        - Make astSetFits<X> public.
+*     16-MAR-2005 (DSB):
+*        - Primary OBSGEO-X/Y/Z, MJD-AVG and MJDOBS keywords are associated 
+*        with all axis descriptions and should not have a trailing single 
+*        character indicating an alternate axis set.
 *class--
 */
 
@@ -2317,7 +2321,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
                                         "Epoch of reference equinox" );
 
 /* Date of observation. */
-      val = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
+      val = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, method, class );
       if( val != AST__BAD ) {
 
 /* The format used for the DATE-OBS keyword depends on the value of the
@@ -2864,7 +2868,7 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
                                       "Longitude of native north pole" );
 
 /* Date of observation. */
-      val = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
+      val = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, method, class );
       if( val != AST__BAD ) {
 
 /* The format used for the DATE-OBS keyword depends on the value of the
@@ -4386,7 +4390,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
                                         "Epoch of reference equinox" );
 
 /* Date of observation. */
-      val = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
+      val = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, method, class );
       if( val != AST__BAD ) {
 
 /* The format used for the DATE-OBS keyword depends on the value of the
@@ -14499,7 +14503,7 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
                                    "Epoch of reference equinox" );
 
 /* Date of observation */
-   val = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
+   val = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, method, class );
    if( val != AST__BAD ) {
 
 /* The format used for the DATE-OBS keyword depends on the value of the
@@ -21408,7 +21412,7 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 /* Store these values. Only store the date if it does not take its
    default value. */
    SetItem( &(store->equinox), 0, 0, s, eq );
-   if( !defdate ) SetItem( &(store->mjdobs), 0, 0, s, ep );
+   if( !defdate ) SetItem( &(store->mjdobs), 0, 0, ' ', ep );
 
 /* Only proceed if we have usable values */
    if( astOK ) {
@@ -22150,15 +22154,16 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
    spectral system. Only store values which have been explicitly set in
    the SpecFrame, which are different to the default values defined by
    FITS-WCS paper III (if any), and which are not bad. */
-               if( astTestGeoLon( specfrm ) && astTestGeoLat( specfrm ) ) {
+               if( astTestGeoLon( specfrm ) && astTestGeoLat( specfrm ) &&
+                   s == ' ' ) {
                   geolon = astGetGeoLon( specfrm );
                   geolat = astGetGeoLat( specfrm );
                   if( geolat != AST__BAD && geolon != AST__BAD ) {
                      slaGeoc( geolat, 0.0, &r, &z );
                      r *= AST__AU;
-                     SetItem( &(store->obsgeox), 0, 0, s, r*cos( geolon ) );
-                     SetItem( &(store->obsgeoy), 0, 0, s, r*sin( geolon ) );
-                     SetItem( &(store->obsgeoz), 0, 0, s, z*AST__AU );
+                     SetItem( &(store->obsgeox), 0, 0, ' ', r*cos( geolon ) );
+                     SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ) );
+                     SetItem( &(store->obsgeoz), 0, 0, ' ', z*AST__AU );
                   }
                }
        
@@ -26390,7 +26395,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          jm = 0;
          s = ' ';
 
-/* Is this a primary MJD-AVG keyword? */
+/* Is this a MJD-AVG keyword? */
       } else if( Match( keynam, "MJD-AVG", 0, fld, &nfld, method, class ) ){
          item = &(store->mjdavg);
          type = AST__FLOAT;
@@ -26398,7 +26403,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          jm = 0;
          s = ' ';
 
-/* Is this a primary OBSGEO-X keyword? */
+/* Is this a OBSGEO-X keyword? */
       } else if( Match( keynam, "OBSGEO-X", 0, fld, &nfld, method, class ) ){
          item = &(store->obsgeox);
          type = AST__FLOAT;
@@ -26406,7 +26411,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          jm = 0;
          s = ' ';
 
-/* Is this a primary OBSGEO-Y keyword? */
+/* Is this a OBSGEO-Y keyword? */
       } else if( Match( keynam, "OBSGEO-Y", 0, fld, &nfld, method, class ) ){
          item = &(store->obsgeoy);
          type = AST__FLOAT;
@@ -26414,7 +26419,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          jm = 0;
          s = ' ';
 
-/* Is this a primary OBSGEO-Z keyword? */
+/* Is this a OBSGEO-Z keyword? */
       } else if( Match( keynam, "OBSGEO-Z", 0, fld, &nfld, method, class ) ){
          item = &(store->obsgeoz);
          type = AST__FLOAT;
@@ -26851,7 +26856,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
                       "Date of observation" );
          }
 
-         val = GetItem( &(store->mjdavg), 0, 0, s, NULL, method, class );
+         val = GetItem( &(store->mjdavg), 0, 0, ' ', NULL, method, class );
          if( val != AST__BAD ) SetValue( this, "MJD-AVG", &val, AST__FLOAT, 
                                          "Average Modified Julian Date of observation" );
       }
@@ -26922,12 +26927,14 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
 
 /* OBSGEO-X/Y/Z - observers geocentric coords. Note, these always refer
    to the primary axes. */
-      val = GetItem( &(store->obsgeox), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, "OBSGEO-X", &val, AST__FLOAT, "[m] Observatory geocentric X" );
-      val = GetItem( &(store->obsgeoy), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, "OBSGEO-Y", &val, AST__FLOAT, "[m] Observatory geocentric Y" );
-      val = GetItem( &(store->obsgeoz), 0, 0, s, NULL, method, class );
-      if( val != AST__BAD ) SetValue( this, "OBSGEO-Z", &val, AST__FLOAT, "[m] Observatory geocentric Z" );
+      if( s == ' ' ) {
+         val = GetItem( &(store->obsgeox), 0, 0, s, NULL, method, class );
+         if( val != AST__BAD ) SetValue( this, "OBSGEO-X", &val, AST__FLOAT, "[m] Observatory geocentric X" );
+         val = GetItem( &(store->obsgeoy), 0, 0, s, NULL, method, class );
+         if( val != AST__BAD ) SetValue( this, "OBSGEO-Y", &val, AST__FLOAT, "[m] Observatory geocentric Y" );
+         val = GetItem( &(store->obsgeoz), 0, 0, s, NULL, method, class );
+         if( val != AST__BAD ) SetValue( this, "OBSGEO-Z", &val, AST__FLOAT, "[m] Observatory geocentric Z" );
+      }
 
 /* See if a Frame was sucessfully written to the FitsChan. */
 next:
@@ -28909,9 +28916,9 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 /* Set the axis unit in the IWC Frame. */
             astSetUnit( iwcfrm, i, cunit );
 
-/* Date of observation. */
-            mjd = GetItem( &(store->mjdavg), 0, 0, s, NULL, method, class );
-            if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdobs), 0, 0, s, 
+/* Date of observation (from primary axis descriptions). */
+            mjd = GetItem( &(store->mjdavg), 0, 0, ' ', NULL, method, class );
+            if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdobs), 0, 0, ' ', 
                                                  NULL, method, class );
             if( mjd != AST__BAD ) astSetEpoch( specfrm, mjd );
 
@@ -28924,12 +28931,12 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
             }         
             astSetRestFreq( specfrm, restfrq );
 
-/* Observer's position. Get the OBSGEO-X/Y/Z keywords, convert to geodetic 
-   longitude and latitude and store as the SpecFrame's GeoLat and GeoLon
-   attributes (we ignore the height of the observer above sea level ). */
-            obsgeo[ 0 ] = GetItem( &(store->obsgeox), 0, 0, s, NULL, method, class );
-            obsgeo[ 1 ] = GetItem( &(store->obsgeoy), 0, 0, s, NULL, method, class );
-            obsgeo[ 2 ] = GetItem( &(store->obsgeoz), 0, 0, s, NULL, method, class );
+/* Observer's position (from primary axis descriptions). Get the OBSGEO-X/Y/Z 
+   keywords, convert to geodetic longitude and latitude and store as the 
+   SpecFrame's GeoLat and GeoLon attributes (we ignore the height of the observer above sea level ). */
+            obsgeo[ 0 ] = GetItem( &(store->obsgeox), 0, 0, ' ', NULL, method, class );
+            obsgeo[ 1 ] = GetItem( &(store->obsgeoy), 0, 0, ' ', NULL, method, class );
+            obsgeo[ 2 ] = GetItem( &(store->obsgeoz), 0, 0, ' ', NULL, method, class );
             if( obsgeo[ 0 ] != AST__BAD && 
                 obsgeo[ 1 ] != AST__BAD && 
                 obsgeo[ 2 ] != AST__BAD ) {
