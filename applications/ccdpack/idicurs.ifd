@@ -49,11 +49,44 @@
             helpkey *
          }
 
+         parameter readlist {
+                             # Use initial position list?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Use initial position list?}
+            helpkey *
+         }
+
+         parameter inext {
+                          # Get initial position list from extension?
+            type _LOGICAL
+            access READ
+            vpath CURRENT PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Get initial position list from NDF extension?}
+            helpkey *
+         }
+
+         parameter inlist {
+                           # Location of initial position list
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Input position list (! means associated list)}
+            helpkey *
+         }
+
          parameter percentiles {
                                 # Display percentile values
             type _DOUBLE
             access UPDATE
-            vpath CURRENT PROMPT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default 2 98
             prompt {Display percentiles}
