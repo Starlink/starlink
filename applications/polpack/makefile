@@ -514,10 +514,9 @@ TEST_SCRIPT = $(PKG_NAME)_test
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = polka.tex polmap.tex
+LATEX_DOCS = sunxxx.tex
 HYPERTEXT_DOCS = 
-#HYPERTEXT_HELP = polka.htx polmap.htx
-HYPERTEXT_HELP = 
+HYPERTEXT_HELP = polka.htx polmap.htx
 
 #  List of documentation files.
 
