@@ -5611,6 +5611,7 @@ U java/source/fits/src/main/uk/ac/starlink/fits/FitsURL.java
 U java/source/fits/src/main/uk/ac/starlink/fits/MappedFile.java
 U java/source/fits/src/main/uk/ac/starlink/fits/ReadableFitsArrayImpl.java
 U java/source/fits/src/main/uk/ac/starlink/fits/WritableFitsArrayImpl.java
+U java/source/fits/src/main/uk/ac/starlink/fits/package.html
 cvs checkout: Updating java/source/fits/src/testcases
 cvs checkout: Updating java/source/fits/src/testcases/uk
 cvs checkout: Updating java/source/fits/src/testcases/uk/ac
@@ -7489,6 +7490,7 @@ cvs checkout: Updating java/source/mirage/src/main/uk/ac/starlink/mirage
 U java/source/mirage/src/main/uk/ac/starlink/mirage/MirageDriver.java
 U java/source/mirage/src/main/uk/ac/starlink/mirage/MirageFormatter.java
 U java/source/mirage/src/main/uk/ac/starlink/mirage/MirageTableWriter.java
+U java/source/mirage/src/main/uk/ac/starlink/mirage/package.html
 cvs checkout: Updating java/source/mirage/src/script
 U java/source/mirage/src/script/starmirage
 cvs checkout: Updating java/source/ndtools
@@ -8728,6 +8730,7 @@ U java/source/table/src/main/uk/ac/starlink/table/formats/TextTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCReader.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCTableBuilder.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/gui
 U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MapGroupTableModel.java
@@ -8757,6 +8760,7 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/JDBCHandler.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/JDBCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
+U java/source/table/src/main/uk/ac/starlink/table/jdbc/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/join
 U java/source/table/src/main/uk/ac/starlink/table/join/AbstractCartesianMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/AnisotropicCartesianMatchEngine.java
@@ -8776,6 +8780,7 @@ U java/source/table/src/main/uk/ac/starlink/table/join/RowMatcher.java
 U java/source/table/src/main/uk/ac/starlink/table/join/RowRef.java
 U java/source/table/src/main/uk/ac/starlink/table/join/SphericalPolarMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/TextProgressIndicator.java
+U java/source/table/src/main/uk/ac/starlink/table/join/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/storage
 U java/source/table/src/main/uk/ac/starlink/table/storage/Codec.java
 U java/source/table/src/main/uk/ac/starlink/table/storage/ColumnWidth.java
@@ -9491,6 +9496,7 @@ U java/source/util/src/main/uk/ac/starlink/util/URLDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/URLUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/UncompressInputStream.java
 U java/source/util/src/main/uk/ac/starlink/util/XMLEncodeDecode.java
+U java/source/util/src/main/uk/ac/starlink/util/package.html
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/gui
 U java/source/util/src/main/uk/ac/starlink/util/gui/AWTXMLEncodeDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileChooser.java
@@ -9510,6 +9516,7 @@ U java/source/util/src/main/uk/ac/starlink/util/gui/StoreConfiguration.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/StoreControlFrame.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/StoreFileUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/StoreSource.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/package.html
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/images
 U java/source/util/src/main/uk/ac/starlink/util/images/ImageHolder.java
 U java/source/util/src/main/uk/ac/starlink/util/images/accept.gif

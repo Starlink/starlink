@@ -289,7 +289,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 65 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 67 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -350,7 +350,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 112 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 115 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -366,7 +366,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
-     [copy] Copying 13 files to /apps/cvsbuild/java/source/fits/build/java
+     [copy] Copying 14 files to /apps/cvsbuild/java/source/fits/build/java
      [echo] Executing JSky target: javadoc-sources
 
 javadoc-sources:
@@ -411,7 +411,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/java
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/mirage/build/java
+     [copy] Copying 4 files to /apps/cvsbuild/java/source/mirage/build/java
      [echo] Executing TOPCAT target: javadoc-sources
 
 javadoc-sources:
@@ -437,7 +437,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 2137 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 2144 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip

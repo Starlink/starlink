@@ -790,6 +790,7 @@ javadoc-sources:
   [javadoc]  processed the same as FITSImages, i.e. are flipped top to bottom by
   [javadoc]  default and have their bad pixel flags set correctly.
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/package.html: warning - Tag @link: reference not found: uk.ac.starlink.join.MatchEngine
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - @copyright is an unknown tag.
@@ -1474,7 +1475,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 577 warnings
+  [javadoc] 578 warnings
 
 install:
 
@@ -2142,4 +2143,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 31 seconds
+Total time: 3 minutes 28 seconds

@@ -1571,6 +1571,7 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/join/package.html: warning - Tag @link: reference not found: uk.ac.starlink.join.MatchEngine
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:90: warning - Tag @link: reference not found: uk.ac.starlink.votable.FitsPlusTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:90: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:90: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
@@ -1579,7 +1580,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:45: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:45: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 7 warnings
+  [javadoc] 8 warnings
      [echo] Executing NDTools target: javadocs
 
 prepare:
