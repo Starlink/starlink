@@ -370,13 +370,14 @@
                   DO K = 0, MIN( 3, NCOL - 4 - J )
                      IF( J + K + 4 .EQ. IDCOL ) THEN
                         IF( CHARID ) THEN 
-                           WRITE( UNIT, '(A1,A,A1,$)' ) '"',WORK4( I ),
-     :                                                  '" '
+                           WRITE( UNIT, '(1X,A1,A,A1,$)' ) '"',
+     :                                                  WORK4( I ),'"'
                         ELSE
-                           WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
+                           WRITE( UNIT, '(1X,G13.6,$)' ) 
+     :                                               WORK3( I, J + K )
                         END IF
                      ELSE
-                        WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
+                        WRITE( UNIT, '(1X,G13.6,$)' ) WORK3( I, J + K )
                      END IF
                   END DO
                   WRITE( UNIT, * ) ' \\'
@@ -443,13 +444,14 @@
                   DO K = 0, MIN( 3, NCOL - 2 - J )
                      IF( J + K + 2 .EQ. IDCOL ) THEN
                         IF( CHARID ) THEN 
-                           WRITE( UNIT, '(A1,A,A1,$)' ) '"',WORK4( I ),
-     :                                                  '" '
+                           WRITE( UNIT, '(1X,A1,A,A1,$)' ) '"',
+     :                                                  WORK4( I ),'" '
                         ELSE
-                           WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
+                           WRITE( UNIT, '(1X,G13.6,$)' ) 
+     :                                                 WORK3( I, J + K )
                         END IF
                      ELSE
-                        WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
+                        WRITE( UNIT, '(1X,G13.6,$)' ) WORK3( I, J + K )
                      END IF
                   END DO
                   WRITE( UNIT, * ) ' \\'
