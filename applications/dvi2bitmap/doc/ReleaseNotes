@@ -1,3 +1,26 @@
+<subsect id=rn-1.0-7 export>Release 1.0-7
+
+<p>A few small changes, including changes to the option list.
+<ul>
+<li>The Metafont mode used for building fonts is now configurable at
+runtime; the default is configurable at configuration time; and
+default default (!) mode and resolution now properly match, so that
+you no longer have to give the <code/-r/ option every single time.
+
+<li>The manpage source was brought up to date.
+
+<li>The <code/-f/ option was split into the <code/-fp/, <code/-fm/,
+<code/-fg/ and <code/-fG/ options.
+
+<li>The <code/&ddash;enable-fontgen/ flag was added to the
+configuration script.
+
+<li>Various clarifications to the documentation.
+
+<li>Assorted tidy-ups to get it to compile cleanly.
+
+</ul>
+
 <subsect id=rn-1.0-6 export>Release 1.0-6
 
 <p>Added support to allow the program to lie about its name.  For a
