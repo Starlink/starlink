@@ -13,10 +13,10 @@ extract_htx.eps polext_htx.eps map2_htx.eps polka_htx.eps
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
 USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f \
-polvec.f polplot.f polbin.f
+polvec.f polplot.f polbin.f polext.f
 
 #  The tasks visible within IRAF.
-IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin
+IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext
 
 #  The contents of polpack_source.tar. 
 UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl \
@@ -55,7 +55,7 @@ kpg1_rcatw.f kpg1_rdast.f kpg1_seteq.f kpg1_short.f kpg1_vect.f \
 kpg1_wcatw.f kpg1_wrast.f kpg1_wread.f kpg1_wwrt.f kpg_ast kpg_par \
 kps1_vecky.f polplot.f polplot.ifl pol1_vecpl.f pol1_clcnt.f \
 pol1_ctclm.f pol1_setd.f pol1_squar.f pol1_stk2.f polbin.f polbin.ifl \
-kpg1_odrst.f kpg1_asrep.f ccd1_repc.f
+kpg1_odrst.f kpg1_asrep.f ccd1_repc.f polext.f polext.ifl
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.

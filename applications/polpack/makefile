@@ -440,7 +440,7 @@ wrndf.f polcal.f ndfac.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f \
 ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
 ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
-ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f \
+ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f polext.f \
 pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f \
 polvec.f pol1_plvec.f pol1_gtwcs.f ccd1_orvar.f pol1_stats.f pol1_stk.f \
 pol1_stbin.f pol1_cm1rr.f pol1_cm3rr.f ccg1_mer1r.f ccg1_mer3r.f \
@@ -496,7 +496,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polka datapic polcent segment polcal polimp \
+TASKS = polhelp polka datapic polcent segment polcal polimp polext \
 polexp polvec polplot polbin
 
 #  Monolith routine source name.
@@ -513,9 +513,9 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 
 #  List of task interface files.
 
-IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl \
+IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 segment.ifl polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl \
-polbin.ifl
+polbin.ifl 
 
 #  List of help library sources.
 
@@ -543,7 +543,7 @@ IRAF_PKG_PAR = $(PKG_NAME).par
 #  IRAF tasks
 
 IRAF_PAR_FILES = polcal.par polexp.par polimp.par polka.par polvec.par \
-polplot.par polbin.par
+polplot.par polbin.par polext.par
 
 #  Name the ADAM executables to be run under IRAF
 #  This assumes there are no IRAF-specific versions of the executables
@@ -1976,6 +1976,10 @@ polcent.o:	SAE_PAR
 polexp.o:	DAT_PAR
 polexp.o:	GRP_PAR
 polexp.o:	SAE_PAR
+polext.o:	SAE_PAR
+polext.o:	DAT_PAR
+polext.o:	GRP_PAR
+polext.o:	PAR_ERR
 polhelp.o:	PAR_ERR     
 polhelp.o:	SAE_PAR     
 polimp.o:	DAT_PAR

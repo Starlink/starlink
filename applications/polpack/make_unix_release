@@ -86,8 +86,8 @@
       mv `grp figs` ${REL_DIR}/sun223_figures
 
 #  Create the tar file holding the IRAF files.
-      source ${POLPACK_DEV}/.sdtrc
-      make_iraf
+#      source ${POLPACK_DEV}/.sdtrc
+#      make_iraf
 
 #  Tar up all the release files (source and non-source), and then remove
 #  them.
