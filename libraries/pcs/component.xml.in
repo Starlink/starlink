@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pcs</path>
+  <description>PCS -- Parameter and Communication Subsystems</description>
+  <abstract>
+    <p>Application programs often need to obtain parameter
+      values from a variety of sources and to communicate with other programs. 
+      The Parameter and Communication Subsystems (PCS) are a set of
+      closely-related subroutine libraries which provide these
+      facilities for many Starlink applications and the associated
+      user-interfaces.</p>
+    <p>The PCS libraries will not generally be called directly by
+      application programs, but form a basic part of the Starlink
+      Software Environment which is described in Starlink Guide SG/4.
+      Additional notes on using it under Unix are given in Starlink
+      User Note SUN/144.</p>
+  </abstract> 
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <!-- The following people list was assembled from the individual
+         component.xml files when PCS was reorganised into a single
+         component.  The individual lists were assembled from evidence
+         within code comments.  There's a certain amount of
+         duplication, so that Alan Chipperfield appears numerous
+         times. -->
+
+    <!--libraries/pcs/adam-->
+    <person>
+      <name>John Cooke (REVAD::JAC)</name>
+    </person>
+    <person>
+      <name>Charlie Richardson (REVA::DCR)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/adamnet-->
+    <person>
+      <name>B.D.Kelly (REVAD::BDK)</name>
+    </person>
+    <person>
+      <name>Brian K McIlwrath</name>
+      <uname>bkm</uname>
+      <email>b.k.mcilwrath@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/ams-->
+    <person><name>Ian Jenkins (IRJ)</name></person>
+    <person><name>Dennis Kelly (BDK)</name></person>
+    <person><name>Brian McIlwrath (BKM)</name></person>
+    <person><name>Alan Chipperfield (AJC)</name></person>
+    <person><name>David Terrett (DLT)</name></person>
+
+    <!--libraries/pcs/atimer-->
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs-->
+    <person>
+      <name>Alan J Chipperfield</name>
+    </person>
+
+    <!--libraries/pcs/dtask-->
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/hdspar-->
+    <person>
+      <name>B D Kelly, ROE</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/lex-->
+    <person>
+      <name>Jeremy Bailey (AAOEPP::JAB)</name>
+    </person>
+    <person>
+      <name>Alan Chipperfield (RLVAD::AJC)</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Tim Jenness (JACH::TIMJ)</name>
+      <email>t.jenness@jach.hawaii.edu</email>
+    </person>
+
+    <!--libraries/pcs/messys-->
+    <person>
+      <name>B D Kelly (REVAD::BDK)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield (RLVAD::AJC)</name>
+    </person>
+
+    <!--libraries/pcs/misc-->
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/msp-->
+    <person>
+      <name>B D Kelly (ROE)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@ral.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/parsecon-->
+    <person>
+      <name>B D Kelly (ROE)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/sock-->
+    <person>
+      <name>B D Kelly</name>
+    </person>
+
+    <!--libraries/pcs/string-->
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/subpar-->
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+
+    <!--libraries/pcs/task-->
+    <person>
+      <name>B D Kelly</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <notes><p>Documentation is in the pcs-docs subdirectory.</p></notes>
+</component>
