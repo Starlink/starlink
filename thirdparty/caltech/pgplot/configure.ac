@@ -27,6 +27,11 @@ AC_PROG_LIBTOOL
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl    Declare the build and use dependencies for this package
+STAR_DECLARE_DEPENDENCIES([build], [cnf gwm])
+STAR_DECLARE_DEPENDENCIES([link],  [gwm cnf])
+
+
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
