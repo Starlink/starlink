@@ -22,6 +22,7 @@ DEFS=@DEFS@
 
 PROFILING=@PROFILINGOPTION@
 NOUNDERSCORES=@NOUNDERSCORES@
+ENABLENAN=@ENABLENAN@
 
 CFLAGS=-g $(DEFS)
 
@@ -44,13 +45,13 @@ all: $(EXECS)
 
 # Simple link of the FP programs
 fpdemo: fpdemo.c bytesex.h
-	$(CC) $(CFLAGS) -o $@ fpdemo.c
+	$(CC) $(CFLAGS) $(ENABLENAN) -o $@ fpdemo.c
 
 dfpp: fpp.c bytesex.h
-	$(CC) $(CFLAGS) -DDOUBLEPRECISION=1 -o $@ fpp.c
+	$(CC) $(CFLAGS) $(ENABLENAN) -DDOUBLEPRECISION=1 -o $@ fpp.c
 
 fpp: fpp.c bytesex.h
-	$(CC) $(CFLAGS) -DDOUBLEPRECISION=0 -o $@ fpp.c
+	$(CC) $(CFLAGS) $(ENABLENAN) -DDOUBLEPRECISION=0 -o $@ fpp.c
 
 bytesex.h: islittleendian
 	echo '#define BIGENDIAN' `if ./islittleendian; then echo 0; else echo 1;fi` >$@
