@@ -22,7 +22,7 @@ f+
 \newcommand{\stardocnumber}    {210.4}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {8th June 1999}
+\newcommand{\stardocdate}      {15th June 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -16747,6 +16747,14 @@ to -0.0001.
 
 \item A bug has been fixed which could cause a FitsChan to lose the
 comment associated with a string value in a FITS header.
+
+\item A FitsChan now reports an error if it reads a FITS header which
+identifies a non-standard sky projection (previously, this was
+accepted without error and a Cartesian projection used instead).
+
+\item A bug has been fixed which could prevent conversion between the
+coordinate systems represented by two CmpFrames. This could only occur
+if the CmpFrames contained a relatively large number of nested Frames.
 
 %\item A bug has been fixed which could cause a program to crash if
 %FrameSets were nested inside each other (for example, if one FrameSet
