@@ -231,6 +231,10 @@
    "When this is done, the image will be displayed in the upper part of" \
    "the window on that side, and some information about it in the lower part." \
    "" \
+   "The images are displayed resampled into their Current coordinate frame;" \
+   "they must all be related by a simple offset (translation) for this" \
+   "program to work." \
+   "" \
    "You can change the style of image display using the `Grid' button, and " \
    "select FITS headers to be shown below using the `FITS' button." \
    "If you resize the window, the displayed images will grow or shrink to fit."\
