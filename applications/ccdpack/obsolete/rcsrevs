@@ -1,15 +1,15 @@
 #  Names and current revision numbers of files under RCS control.
-#  Package CCDPACK version V3.0-1.
+#  Package CCDPACK version V3.0-2.
 #  
-makefile: 1.51
+makefile: 1.55
 mk: 1.1
-sun139.tex: 1.41
+sun139.tex: 1.43
 sun139geo.eps: 1.1
 sun139reg.eps: 1.4
 sun139red.eps: 1.1
 sun139mos.eps: 1.1
 sun139driz.eps: 1.1
-ccdpack.news: 1.27
+ccdpack.news: 1.28
 ccdhelp.f: 1.1
 gethlp.f: 1.1
 gthlpi.f: 1.1
@@ -21,7 +21,6 @@ ccd1_fitcm: 1.1
 ccd1_memcm: 1.1
 ccd1_moscm: 1.1
 ccd1_mospr: 1.1
-ccd1_par: 1.2
 ccd1_tmpcm: 1.1
 fio1_clog: 1.2
 hlpcmd.inc: 1.1
@@ -38,11 +37,12 @@ ndf_const: 1.1
 user_err: 1.1
 irg_err.h: 1.1
 slv.h: 1.1
+ccd1_par: 1.4
 ccdpack_red.f: 1.1
 ccdpack_reg.f: 1.5
 ccdpack_res.f: 1.1
 ccdpack_scr.f: 1.2
-ccdpack.hlp: 1.31
+ccdpack.hlp: 1.33
 ccdpack.ifd: 1.9
 makebias.ifd: 1.3
 debias.ifd: 1.3
@@ -251,7 +251,7 @@ WHTFLAT.DAT: 1.1
 WHTSKY.DAT: 1.1
 INT-WFC.ast: 1.1
 ccdpack_link_adam: 1.1
-ccdpack_graphics_link_adam: 1.1
+ccdpack_graphics_link_adam: 1.2
 dgeneric: 1.3
 ccd1_achan.f: 1.1
 ccd1_acmsk.f: 1.1
@@ -516,7 +516,7 @@ ccg1_xcly.dgen: 1.1
 ccg1_xcsy.dgen: 1.1
 ccg1_xffy.dgen: 1.2
 ccg1_xfsy.dgen: 1.2
-ccg1_odxy.dgen: 1.2
+ccg1_odxy.dgen: 1.3
 ccg1_add.gen: 1.1
 ccg1_bext.gen: 1.1
 ccg1_bl.gen: 1.1
@@ -635,7 +635,7 @@ ccg1_fmd2.gen: 1.1
 ccg1_fmd3.gen: 1.2
 ccg1_kthx.gen: 1.4
 ccg1_asli.gen: 1.2
-ccg1_dodiz.gen: 1.6
+ccg1_dodiz.gen: 1.7
 ccg1_ffrj.grd: 1.1
 kpg1_bloc.grd: 1.1
 ccg1_axin.grd: 1.1
@@ -661,23 +661,23 @@ ccg1_sto1.glrdic: 1.1
 ccg1_stoc.glrdic: 1.1
 fts1_gkey.glrdi: 1.1
 makebias.f: 1.5
-debias.f: 1.3
+debias.f: 1.4
 makecal.f: 1.5
 calcor.f: 1.3
 makeflat.f: 1.8
-flatcor.f: 1.4
+flatcor.f: 1.5
 findcent.f: 1.3
-idicurs.f: 1.2
-findobj.f: 1.5
+idicurs.f: 1.4
+findobj.f: 1.6
 register.f: 1.24
 tranlist.f: 1.5
 plotlist.f: 1.2
 findoff.f: 1.17
-pairndf.f: 1.3
+pairndf.f: 1.4
 ccdedit.f: 1.1
 makemos.f: 1.12
 tranndf.f: 1.11
-drizzle.f: 1.18
+drizzle.f: 1.21
 astimp.f: 1.14
 astexp.f: 1.16
 wcsreg.f: 1.15
@@ -691,11 +691,11 @@ ccdgenerate.f: 1.6
 picinfo.f: 1.1
 import.f: 1.4
 present.f: 1.1
-schedule.f: 1.1
+schedule.f: 1.2
 ccdimp.f: 1.5
 ccdexp.f: 1.4
 reduce.f: 1.1
-ccdalign.f: 1.6
+ccdalign.f: 1.8
 xreduce.f: 1.2
 irg1_axlim.f: 1.1
 irg1_brack.f: 1.1
