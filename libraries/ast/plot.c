@@ -269,6 +269,9 @@ f     using AST_GRID
 *        the axis range on the basis of the number of ticks on the axis.
 *        This avoids holes being visible in the displayed tick marks when 
 *        using very small gaps.
+*     22-MAY-2001 (DSB):
+*        Added a check when using interior labelling, to ensure that the
+*        most appropriate edges are used for text labels.
 *class--
 */
 
@@ -1350,6 +1353,7 @@ static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **,
 static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
 static int Inside( int, float *, float *, float, float);
 static int Overlap( AstPlot *, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
+static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
 static int Ustrcmp( const char *, const char * );
 static int Ustrncmp( const char *, const char *, size_t );
 static void AddCdt( CurveData *, CurveData *, const char *, const char * );
@@ -7004,7 +7008,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 *        This is only for use in constructing error messages.
 
 *  Returned Value:
-*     A pointer to an array of two CurveData pointers (one for eacxh axis),
+*     A pointer to an array of two CurveData pointers (one for each axis),
 *     each pointing to an array of CurveData structures (one for each tick 
 *     value).
 
@@ -11099,6 +11103,19 @@ f        The global status.
                astClearEdge( this, 1 );
             }
          }
+      }
+   }
+
+/* We also may need to swap edge values when usintg interior labelling in
+   order to ensure that the text labels are placed on appropriate edges of
+   the plotting box. */
+   if( !edgeticks && !astTestEdge( this, 0 ) && !astTestEdge( this, 1 ) ) {
+      if( swapEdges( this, grid, cdata ) ) {
+         oldedge0 = astGetEdge( this, 0 );
+         oldedge1 = astGetEdge( this, 1 );
+         astSetEdge( this, 0, oldedge1 );
+         astSetEdge( this, 1, oldedge0 );
+         clredge = 1;
       }
    }
 
@@ -15847,6 +15864,126 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Undefine macros local to this function. */
 #undef MATCH
+}
+
+static int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata ) {
+/*
+*  Name:
+*     swapEdges
+
+*  Purpose:
+*     Determine if edges for text labels should be swapped.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     or not it is necessary to swap the Edges(0) and Edges(1) attributes 
+*     in order to place textual labels on appropriate edges. This should
+*     only be used if the attributes have not explicitly been set, and if
+*     interior labelling is being used. The sides are determines by
+*     looking at the bounding box of tick marks on axis 0, in graphics
+*     coordinates. The returned value causes the label for axis 0 to be
+*     placed on the edge parallel to the longest side of this bounding box.
+*     The label for axis 1 is placed parallel to the shortest side of this
+*     bounding box.
+
+*  Parameters:
+*     this
+*        A pointer to the Plot.
+*     grid
+*        A pointer to an array of two TickInfo pointers (one for each axis), 
+*        each pointing to a TickInfo structure holding information about
+*        tick marks on the axis. See function GridLines.
+*     cdata
+*        A pointer to an array of two CurveData pointers (one for each axis), 
+*        each pointing to an array of CurveData structure (one for each
+*        major tick value on the axis), holding information about breaks
+*        in the curves drawn to mark the major tick values. See function 
+*        DrawGrid. 
+
+*  Returned Value:
+*     One if the edges should be swapped, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   CurveData *cdt;        /* Pointer to the CurveData for the next tick */
+   TickInfo *info;        /* Pointer to the TickInfo for the current axis */
+   float xmax;            /* Max graphics X value */
+   float xmin;            /* Min graphics X value */
+   float ymax;            /* Max graphics Y value */
+   float ymin;            /* Min graphics Y value */
+   int oldedge;           /* The original edge for axis 0 */
+   int result;            /* Swap edges? */
+   int tick;              /* Tick index */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the structure containing information describing the 
+   positions of the major tick marks along axis 0. */  
+   info = grid[ 0 ];
+
+/* Get a pointer to the structure containing information describing 
+   the breaks in the curve which is parallel to axis 1 and passes 
+   through the first major tick mark on axis 0. */
+   cdt = cdata[ 0 ];
+
+/* Initialise the graphiocs X and Y bounds of the area covered by the
+   axis. */
+   xmax = -1.0E10;
+   xmin = 1.0E10;
+   ymax = -1.0E10;
+   ymin = 1.0E10;
+
+/* Loop round each of the major tick marks on axis 0. */
+   for( tick = 0; cdt && info && tick < info->nmajor; tick++ ){
+
+/* Update the max and min graphics X and Y coords covered by the axis. */
+      if( cdt->nbrk > 0 ) {
+         xmax = MAX( xmax, cdt->xbrk[0] );
+         xmin = MIN( xmin, cdt->xbrk[0] );
+         ymax = MAX( ymax, cdt->ybrk[0] );
+         ymin = MIN( ymin, cdt->ybrk[0] );
+      }
+
+/* Get a pointer to the curve through the next major tick mark. */
+      cdt++;
+            
+   }
+
+/* See which edge axis 0 would normally be labelled on. */
+   oldedge = astGetEdge( this, 0 );
+
+/* If the X range is larger than the Y range, the textual label should be
+   placed on the bottom edge. If required, indicate that the edges must
+   be swapped to achieve this. */
+   if( xmax - xmin > ymax - ymin ) {
+      if( oldedge == 0 || oldedge == 2 ) result = 1;
+
+/* If the X range is smaller  than the Y range, the textual label should be
+   placed on the left edge. If required, indicate that the edges must
+   be swapped to achieve this. */
+   } else {
+      if( oldedge == 1 || oldedge == 3 ) result = 1;
+   }
+
+   return result;
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
