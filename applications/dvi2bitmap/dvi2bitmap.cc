@@ -1107,7 +1107,7 @@ string_list& tokenise_string (string str)
 bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
 {
     char *p;
-    rgb.red = strtol (s, &p, 0);
+    rgb.red = static_cast<Byte>(strtol (s, &p, 0));
     if (p == s)			// no digit
 	return false;
     if (*p == '\0')		// end of string
@@ -1119,7 +1119,7 @@ bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
 	s++;
     }
 
-    rgb.green = strtol (s, &p, 0);
+    rgb.green = static_cast<Byte>(strtol (s, &p, 0));
     if (p == s)			// no digit
 	return false;
     if (*p == '\0')		// end of string
@@ -1131,7 +1131,7 @@ bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
 	s++;
     }
 
-    rgb.blue = strtol (s, &p, 0);
+    rgb.blue = static_cast<Byte>(strtol (s, &p, 0));
     if (p == s)			// no digit
 	return false;
 
