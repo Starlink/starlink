@@ -124,7 +124,7 @@ sub extractor_object_badness($$$$$$$) {
      # The following is an alternative algorithm for badness, which
      # also weights against objects which are very broad/overexposed,
      # on the grounds that they are too smeared out to have good
-     # positions.  However that's not important -- Extractor can still
+     # positions.  However that's not important -- EXTRACTOR can still
      # get a good centre for them, so the position issue isn't
      # important, and they're not defects, so they _will_ appear in
      # catalogues, which is the important thing.
@@ -151,7 +151,7 @@ sub extractor_object_badness($$$$$$$) {
 #
 # opts may also have a key {ccdcatalogue}, which contains the name of
 # a file containing a catalogue of all the points on an image, in the
-# format of an Extractor output catalogue.  If this is present, then
+# format of an EXTRACTOR output catalogue.  If this is present, then
 # no extraction is done, and this catalogue is instead processed as
 # usual.  The catalogue must have all of the fields
 # NUMBER,
@@ -177,7 +177,7 @@ sub extractor_object_badness($$$$$$$) {
 #
 # The catalogue is (a reference to) an array containing (references
 # to) hashes with fields {id}, {x}, {y}, {flux}, {mag} and {area}.
-# The `magnitude' column isn't actually magnitude (which Extractor
+# The `magnitude' column isn't actually magnitude (which EXTRACTOR
 # can't return); however, we wish to be able to use the `match'
 # plug-in easily, which needs a flux column which is ordered like
 # magnitudes: 1/flux would do, but 25-log10(flux) is more
@@ -259,13 +259,13 @@ sub extract_objects ($$$$) {
     my $extractorcat;
     if (defined($opts->{ccdcatalogue})) {
         $extractorcat = $opts->{ccdcatalogue};
-        wmessage('info', "Using Extractor catalogue in $extractorcat");
+        wmessage('info', "Using EXTRACTOR catalogue in $extractorcat");
         $rethash{provenance}
           = "From ccdcatalogue file " . $opts->{ccdcatalogue};
     } else {
         my $extractor = $helpers->{extractor};
 
-        # We need to tell SExtractor where to put the catalogue
+        # We need to tell EXTRACTOR where to put the catalogue
         # output.  The custom configuration file we use sets
         # CATALOG_NAME to have the value $AUTOASTROMTEMPCATALOGUE.
         # This should have been set up already, but check it here just
@@ -281,14 +281,14 @@ sub extract_objects ($$$$) {
         my $status = $extractor->obeyw ("extractor", $parlist);
 
         $status == &Starlink::ADAM::DTASK__ACTCOMPLETE
-          || wmessage ('fatal', "Error running extractor");
+          || wmessage ('fatal', "Error running EXTRACTOR");
 
         $rethash{provenance} = "extractor $parlist";
     }
 
     # Sort these by column FLUX_ISO, and output at most $maxobj objects.
     open (CAT, $extractorcat) || return undef;
-    print STDERR "Opened extractor catalogue $extractorcat\n" if $verbose;
+    print STDERR "Opened EXTRACTOR catalogue $extractorcat\n" if $verbose;
     my %cathash = ( );
     my $line;
     # Read headers
@@ -421,7 +421,7 @@ sub extract_objects ($$$$) {
     # containing one `row' of the catalogue of extracted objects.  In
     # this step remove any objects which fail the
     # cutoffarea/cutoffellip cuts described above, and also any for
-    # which Extractor has found negative fluxes.
+    # which EXTRACTOR has found negative fluxes.
     my @catarr;
     my $ndefects = 0;
     my $totobjects = $#sortcat;
@@ -494,9 +494,9 @@ sub extract_objects ($$$$) {
     # later reuse by {fromdump}.
     if (defined($opts->{todump})) {
 	open (DUMPCAT, '>'.$opts->{todump}) || return undef;
-	print DUMPCAT "# Extractor catalogue, munged by $0\n";
+	print DUMPCAT "# EXTRACTOR catalogue, munged by $0\n";
 	print DUMPCAT "# Input NDF: $ndfname\n";
-	print DUMPCAT "# Extractor temp output: $extractorcat\n";
+	print DUMPCAT "# EXTRACTOR temp output: $extractorcat\n";
 	print DUMPCAT "# Columns are id, x, y, flux, pseudo-mag, area\n";
 	foreach my $k (keys (%rethash)) {
 	    print DUMPCAT "## $k ", $rethash{$k}, "\n";
@@ -773,10 +773,10 @@ sub ndf_info ($$$$) {
 	# west-positive in the FITS files I've seen, though this
 	# doesn't appear to be written down anywhere. ASTROM
 	# requires the longitude to be east-positive.
-	my $t = $fitshash{LONGITUD};
+	my $t = $fitshash{LONGITUD} * -1.0;
 	my $ti = int($t);
 	my $ao = sprintf ("%d %f", $ti, abs(($t-$ti)*60.0));
-	$t = $fitshash{LATITUDE} * -1.0;
+	$t = $fitshash{LATITUDE};
 	$ti = int($t);
 	$ao .= sprintf (" %d %f", $ti, abs(($t-$ti)*60.0));
 	$ao .= sprintf (" %f", $fitshash{HEIGHT})
@@ -1080,7 +1080,7 @@ sub get_catalogue ($\%$$) {
     if ($noob > 0 && $verbose) {
         printf STDERR
           ("Found %d/%d catalogue objects off the edge of the CCD\n",
-           $noob, ($noob+$#retcat));
+           $noob, ($noob+$#retcat+1));
     }
     #return \@retcat;
     return { 'catalogue' => \@retcat,
@@ -1426,7 +1426,7 @@ sub match_positions_findoff ($$$$$) {
 # Return undef if we can't generate the file, for some reason.
 #
 # Single argument is a reference to a hash, containing keys:
-#    CCDin          : SExtractor output catlogue -- CCD positions
+#    CCDin          : EXTRACTOR output catlogue -- CCD positions
 #    catalogue      : The catalogue of known positions
 #    helpers        : Helper applications (ref to hash)
 #    NDFinfo        : NDF information (ref to hash)
@@ -1473,11 +1473,19 @@ sub generate_astrom ($) {
     # should be at most 6.  Don't check meteorological data -- the
     # ASTROM documentation suggests that its defaults are reasonable.
     my $nterms = (defined($par->{maxnterms}) ? $par->{maxnterms} : 6);
-    if ($nterms > 6 && ! (defined($par->{NDFinfo}->{astromtime})
-			  && defined($par->{NDFinfo}->{astromobs})
-			  # && defined($par->{NDFinfo}->{astrommet})
-			  && defined($par->{NDFinfo}->{astromcol})
-			  && ($#CCDarray >= 10))) {
+
+# PWD: users need to fit CCDs that have optical distortions, so it's
+# better to switch this on and off by choice, rather than presence or
+# absence of these terms. I suspect this kind of treatment isn't
+# really applicable to individual CCDs (although it may be when fitting
+# a whole CCD mosaic at once).
+#
+#    if ($nterms > 6 && ! (defined($par->{NDFinfo}->{astromtime})
+#			  && defined($par->{NDFinfo}->{astromobs})
+#			  # && defined($par->{NDFinfo}->{astrommet})
+#			  && defined($par->{NDFinfo}->{astromcol})
+#			  && ($#CCDarray >= 10))) {
+    if ($nterms > 6 && ! ($#CCDarray >= 10)) {
 	$nterms = 6;
 
         if ($#CCDarray < 0) {
@@ -1487,25 +1495,25 @@ sub generate_astrom ($) {
 	    wmessage ('warning',
 		      "Too few matches ($#CCDarray).  Restricted to 6-parameter fit");
 	    print STDERR "generate_astrom: Too few matches ($#CCDarray).  Restricted to 6-parameter fit\n" if $verbose;
-	} else {
-	    my $errmsg = sprintf ("Insufficient obsdata (%s, %s, %s, %s).  Can do only 6-parameter fit",
-				  (defined($par->{NDFinfo}->{astromtime})
-				   ? "time" : "notime"),
-				  (defined($par->{NDFinfo}->{astromobs})
-				   ? "obs" : "noobs"),
-				  (defined($par->{NDFinfo}->{astrommet})
-				   ? "met" : "nomet"),
-				  (defined($par->{NDFinfo}->{astromcol})
-				   ? "col" : "nocol"));
-	    wmessage ('warning', $errmsg);
-	    print STDERR "$errmsg\n" if $verbose;
+#	} else {
+#	    my $errmsg = sprintf ("Insufficient obsdata (%s, %s, %s, %s).  Can do only 6-parameter fit",
+#				  (defined($par->{NDFinfo}->{astromtime})
+#				   ? "time" : "notime"),
+#				  (defined($par->{NDFinfo}->{astromobs})
+#				   ? "obs" : "noobs"),
+#				  (defined($par->{NDFinfo}->{astrommet})
+#				   ? "met" : "nomet"),
+#				  (defined($par->{NDFinfo}->{astromcol})
+#				   ? "col" : "nocol"));
+#	    wmessage ('warning', $errmsg);
+#	    print STDERR "$errmsg\n" if $verbose;
 	}
     }
 
     #+ Want to calculate $\bar x=(\sum^n x_i)/n$ and
     # $M_x=\sum^n(x_i-\bar x)^2 = \sum x_i^2 - (\sum x_i)^2/n$, and
     # the same for $(x\to y)$.  The vector $(\bar x,\bar y)$ is the
-    # mean offset of the SExtractor points from the catalogue points,
+    # mean offset of the EXTRACTOR points from the catalogue points,
     # and $M=M_x+M_y$ is the statistic we examine below.
     #
     #-
@@ -1553,7 +1561,7 @@ sub generate_astrom ($) {
     push (@tempfiles, "$astromofile");
     my $timestring = localtime();
     print ASTROMOUT "* ASTROM input file generated by...\n* $0\n* $timestring\n";
-    print ASTROMOUT "* Star references are SExtractor/Catalogue numbers\n";
+    print ASTROMOUT "* Star references are EXTRACTOR/Catalogue numbers\n";
     print ASTROMOUT "J2000\n";
 
     # Write plate distortion record
