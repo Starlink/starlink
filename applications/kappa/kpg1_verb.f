@@ -1,28 +1,30 @@
-      SUBROUTINE KPG1_VERB( VERB, STATUS )
+      SUBROUTINE KPG1_VERB( VERB, PACK, STATUS )
 *+
 *  Name:
 *     KPG1_VERB
 
 *  Purpose:
-*     Should KAPPA report verbose messages?
+*     Should the speified package report verbose messages?
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_VERB( VERB, STATUS )
+*     CALL KPG1_VERB( VERB, PACK, STATUS )
 
 *  Description:
-*     This routine returns a logical flag indicating if KAPPA
-*     applications should report verbose information. This is the case if
-*     the environment variable KAPPA_VERBOSE is defined (the value assigned
-*     to the environment variable is immaterial).
+*     This routine returns a logical flag indicating if a specified 
+*     applications package should report verbose information. This is the 
+*     case if the environment variable <PACK>_VERBOSE is defined (the value 
+*     assigned to the environment variable is immaterial).
 
 *  Arguments:
 *     VERB = LOGICAL (Returned)
-*        Should KAPPA run in verbose mode? Returned .FALSE, if an error 
-*        has already occurred, or if this routine should fail for any
-*        reason.
+*        Should the package run in verbose mode? Returned .FALSE, if an 
+*        error has already occurred, or if this routine should fail for 
+*        any reason.
+*     PACK = CHARACTER * ( * ) (Given)
+*        The name of the package (eg "KAPPA", "POLPACK", etc).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -37,6 +39,8 @@
 *  History:
 *     22-SEP-1998 (DSB):
 *        Original version.
+*     10-APR-2000 (DSB):
+*        Added argument PACK.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -54,18 +58,30 @@
 *  Arguments Returned:
       LOGICAL VERB
 
+*  Arguments Given:
+      CHARACTER PACK*(*)
+
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER ENV*40           ! Value of KAPPA_VERBOSE env. variable
+      CHARACTER NAME*40          ! Name of the environment variable
+      CHARACTER ENV*40           ! Value of the environment variable
+      INTEGER IAT                ! Length of the environment variable name
 *.
 
 *  Begin a new error reporting context.
       CALL ERR_BEGIN( STATUS )
 
-*  Attempt to get the value of the anvironment variable KAPPA_VERBOSE.
-      CALL PSX_GETENV( 'KAPPA_VERBOSE', ENV, STATUS )
+*  Form the name of the environment variable.
+      NAME = ' '
+      IAT = 0
+      CALL CHR_APPND( PACK, NAME, IAT )      
+      CALL CHR_APPND( '_VERBOSE', NAME, IAT )      
+      CALL CHR_UCASE( NAME )
+
+*  Attempt to get the value of the environment variable.
+      CALL PSX_GETENV( NAME( : IAT ), ENV, STATUS )
 
 *  If the environment variable was not defined, annul the error, and 
 *  indicate that verbose mode should not be used.

@@ -97,6 +97,9 @@
 *  See if NDF names should be reported when looping.
       CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
 
+*  If not, see if verbose reporting is required.
+      IF( .NOT. VERB ) CALL KPG1_VERB( VERB, 'KAPPA', STATUS )      
+
 *  See if looping should be disabled.
       CALL KPG1_ENVDF( 'KAPPA_LOOP_DISABLE', DISAB, STATUS )
 

@@ -181,7 +181,7 @@
                IF( IWCS .NE. AST__NULL ) CALL AST_ANNUL( IWCS, STATUS )
 
 *  See if we are running in verbose mode.
-               CALL KPG1_VERB( VERB, STATUS )
+               CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
 
 *  If we are, add a context message, and flush the error.
                IF( VERB ) THEN
@@ -306,7 +306,7 @@
                   IF( STATUS .NE. SAI__OK ) THEN
 
 *  See if we are running in verbose mode.
-                     CALL KPG1_VERB( VERB, STATUS )
+                     CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
 
 *  If we are, add a context message, and flush the error.
                      IF( VERB ) THEN

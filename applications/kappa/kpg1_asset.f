@@ -167,7 +167,7 @@
       CHNGED = .FALSE.
 
 *  See if we are running in verbose mode.
-      CALL KPG1_VERB( VERB, STATUS )
+      CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
 
 *  Get a group of attribute settings from the user, and see if defaults
 *  are to be applied before applying the supplied settings.

@@ -105,7 +105,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  See if we are running in verbose mode.
-      CALL KPG1_VERB( VERB, STATUS )
+      CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
 
 *  Store the bounds of the box in GRID co-ordinates. The box extends
 *  between the centre of the corner pixels, and so will cover a range of zero

@@ -66,6 +66,9 @@
 *  History:
 *     6-SEP-1998 (DSB):
 *        Original version copied from POLPACK routine RDNDF.FOR
+*     10-APR-2000 (DSB):
+*        Produce verbose error messages if KAPPA is being run in VERBOSE
+*        mode.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,6 +103,7 @@
       LOGICAL FLAG               ! True if the supplied group expression
                                  ! was terminated by a minus sign.
       INTEGER NEWSIZ             ! The new group size.
+      LOGICAL VERB               ! Produce verbose error messages?
 *.
 
 *  Ensure size is returned equal to 1 if an error condition exists.
@@ -127,6 +131,9 @@
 *  routine NDG_ASSOC.
       IGRP = GRP__NOID
 
+*  See if verbose error messages are required.
+      CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
+
 *  The user specifies the NDFs by means of one or more "group
 *  expressions". The user can terminate a group expression with the
 *  "flag character" (usually a minus sign) if more NDFs remain to be
@@ -143,7 +150,7 @@
 *  and IGRP is returned holding a valid group identifier.  On successive
 *  passes, new names are appended to the group created on the first
 *  pass.
-         CALL NDG_ASSOC( PARAM, IGRP, NEWSIZ, FLAG, STATUS )
+         CALL NDG_ASSOC( PARAM, VERB, IGRP, NEWSIZ, FLAG, STATUS )
 
 *  If no error occured, save the new group size.
          IF( STATUS .EQ. SAI__OK ) THEN

@@ -193,7 +193,7 @@
       END IF
 
 *  Report the total group expression if in verbose mode.
-      CALL KPG1_VERB( VERB, STATUS )
+      CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
       IF( VERB ) THEN
          CALL MSG_SETC( 'P', PARAM )
 

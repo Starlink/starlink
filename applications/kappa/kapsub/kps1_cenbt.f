@@ -257,7 +257,7 @@
       END IF
 
 *  See if we are running in verbose mode.
-      CALL KPG1_VERB( VERB, STATUS )
+      CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
 
 *  Find number of elements in each search box.
       SEL = 1
