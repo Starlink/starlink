@@ -129,7 +129,10 @@
 #  Restore the cursors of the affected windows.
          restorecursors
 
-#  Release the grab.
+#  Release the grab.  We need to do an update first, so that any pointer 
+#  events can get noticed by Tk and handed to this window before the 
+#  window releases the grab.
+         update 
          grab release $waitwin
 
 #  Destroy the toplevel window.
