@@ -32,7 +32,7 @@ variable F77LIBS, e.g.
 
 =cut
 
-$VERSION = "1.10";
+$VERSION = "1.12";
 
 # Database starts here. Basically we have a large hash specifying
 # entries for each os/compiler combination. Entries can be code refs
@@ -92,9 +92,9 @@ $F77config{Solaris}{DEFAULT} = 'F77';
 ### Generic GNU-77 or F2C system ###
 
 $F77config{Generic}{G77}{Link} = sub {
-    my @libs = ( 'f2c', 'g2c');
-    my ($dir, $lib);
-    foreach my $test (@libs) {
+    my @libs = ('g2c', 'f2c');
+    my ($dir, $lib, $test);
+    foreach $test (@libs) {
       $dir = `g77 -print-file-name=lib$test.a`;
       chomp $dir;
       # Note that -print-file-name returns just the library name
@@ -120,6 +120,22 @@ $F77config{Generic}{G77}{Cflags} = '-O';
 $F77config{Generic}{DEFAULT} = 'G77';
 $F77config{Generic}{F2c}     = $F77config{Generic}{G77};
 
+### cygwin ###
+#"-lg2c -lm";
+# needed this on my cygwin system to get things working properly
+sub getcyglink {
+   return join ' ', map {my $lp = `g77 -print-file-name=lib$_.a`;
+			$lp =~ s|/[^/]+$||;
+			 $lp =~ s|L([a-z,A-Z]):|L//$1|g;
+			 "-L$lp -l$_"} qw/g2c m/;
+}
+
+$F77config{Cygwin}{G77}{Trail_} = 1;
+$F77config{Cygwin}{G77}{Compiler} = 'g77';
+$F77config{Cygwin}{G77}{Cflags} = '-O';
+$F77config{Cygwin}{G77}{Link}	= \&getcyglink;
+$F77config{Cygwin}{DEFAULT}	= 'G77';
+
 ### Linux ###
 
 $F77config{Linux}{G77}     = $F77config{Generic}{G77};
@@ -144,38 +160,48 @@ $F77config{Hpux}{DEFAULT}     = 'F77';
 
 ### IRIX ###
 
-if ($Config{'cc'} =~ /-n32/)	# Modified by Allen Smith
+# From: Ovidiu Toader <ovi@physics.utoronto.ca>
+# For an SGI running IRIX 6.4 or higher (probably lower than 6.4 also)
+# there is a new abi, -64, which produces 64 bit executables. This is no
+# longer an experimental feature and I am using it exclusively without any
+# problem. The code below is what I use instead of original IRIX section
+# in the ExtUtils::F77 package. It adds the -64 flag and it is supposed to
+# provide the same functionality as the old code for a non -64 abi. 
+
+if (ucfirst($Config{'osname'}) eq "Irix")
+{
+  my ($cflags,$mips,$default_abi,$abi,$mips_dir,$libs);
+  $cflags = $Config{cc};
+  ($mips) = ($cflags =~ /(-mips\d)/g);
+  $mips = "" if ! defined($mips);
+  $mips_dir = $mips;$mips_dir =~ s/-//g;
+  $default_abi = $Config{osvers} >= 6.4 ? "-n32" : "-o32";
+ GET_ABI:
   {
-    if (($Config{'cc'} =~ /-mips4/) && (-r "/usr/lib32/mips4") && (-d _) && (-x _))
-      {
-	$F77config{Irix}{F77}{Cflags} = "-n32 -mips4";
-	if ((-r "/usr/lib32/mips4") && (-d _) && (-x _))
-	  {
-	    $F77config{Irix}{F77}{Link} = "-L/usr/lib32/mips4 -L/usr/lib32 -lftn -lm";
-	  }
-      }
-    elsif (($Config{'cc'} =~ /-mips3/) && (-r "/usr/lib32/mips3") && (-d _) && (-x _))
-      {
-	$F77config{Irix}{F77}{Cflags} = "-n32 -mips3";
-	if ((-r "/usr/lib32/mips3") && (-d _) && (-x _))
-	  {
-	    $F77config{Irix}{F77}{Link} = "-L/usr/lib32/mips4 -L/usr/lib32 -lftn -lm";
-	  }
-      }
-    else
-      {
-	$F77config{Irix}{F77}{Cflags} = "-n32";
-	$F77config{Irix}{F77}{Link} = "-L/usr/lib32 -lftn -lm";
-      }
+    $abi = "-o32",last GET_ABI if $cflags =~ /-o32/;
+    $abi = "-n32",last GET_ABI if $cflags =~ /-n32/;
+    $abi = "-64",last GET_ABI if $cflags =~ /-64/;
+    $abi = $default_abi;
   }
-else
-  {
-    $F77config{Irix}{F77}{Link} = "-L/usr/lib -lF77 -lI77 -lU77 -lisam -lm";
+  if ( $abi eq "-64" ){
+    $libs = ( (-r "/usr/lib64/$mips_dir") && (-d _) && (-x _) ) ?
+	"-L/usr/lib64/$mips_dir" : "";
+    $libs .=  " -L/usr/lib64 -lftn -lm";
   }
-$F77config{Irix}{F77}{Trail_} = 1;
-$F77config{Irix}{F77}{Compiler} = $Config{cc} =~ /-n32/ ?
-    'f77 -n32' : 'f77 -o32';
-$F77config{Irix}{DEFAULT}     = 'F77';
+  if ( $abi eq "-n32" ){
+    $libs = ( (-r "/usr/lib32/$mips_dir") && (-d _) && (-x _) ) ?
+	"-L/usr/lib32/$mips_dir" : "";
+    $libs .=  " -L/usr/lib32 -lftn -lm";
+  }
+  if ( $abi eq "-o32" ){
+    $libs = "-L/usr/lib -lF77 -lI77 -lU77 -lisam -lm";
+  }
+  $F77config{Irix}{F77}{Cflags}   = "$abi $mips";
+  $F77config{Irix}{F77}{Link}     = "$libs";
+  $F77config{Irix}{F77}{Trail_}   = 1;
+  $F77config{Irix}{F77}{Compiler} = "f77 $abi";
+  $F77config{Irix}{DEFAULT}       = 'F77';
+}
 
 ### AIX ###
 
@@ -229,6 +255,7 @@ sub import {
    # Guesses if system/compiler not specified.
 
    $system   = ucfirst $Config{'osname'} unless $system;
+   $system = 'Cygwin' if $system =~ /Cygwin/;
    $compiler = get $F77config{$system}{DEFAULT} unless $compiler;
 
    print "$Pkg: Using system=$system compiler=$compiler\n";
@@ -243,9 +270,13 @@ sub import {
 
      if (defined( $F77config{$system} )){
      	my $flibs = get ($F77config{$system}{$compiler}{Link});
-     	$Runtime = $flibs . gcclibs();
-        $ok = 1;
-     	$ok = validate_libs($Runtime) if $flibs ne "";
+        if ($flibs ne "") {
+     	   $Runtime = $flibs . gcclibs();
+	   $Runtime =~ s|L([a-z,A-Z]):|L//$1|g if $^O =~ /cygwin/i;
+	   print "Runtime: $Runtime\n";
+           $ok = 1;
+     	   $ok = validate_libs($Runtime) if $flibs ne "";
+	}
      }else {
      	$Runtime = $ok = "";
      }
@@ -475,8 +506,9 @@ sub gcclibs {
 sub find_in_path {
    my @names = @_;
    my @path = split(":",$ENV{PATH});
-   for my $name (@names) {
-      for my $dir (@path) {
+   my ($name,$dir);
+   for $name (@names) {
+      for $dir (@path) {
          if (-x $dir."/$name") {
 	    print "Found compiler $name\n";
 	    return $name;
