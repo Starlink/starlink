@@ -25,8 +25,9 @@ AM_PROG_LEX
 STAR_LATEX_DOCUMENTATION(ssn73)
 
 AC_CONFIG_FILES([Makefile component.xml extreme.csh])
-AC_CONFIG_FILES([cmp-xxx extmakefile extmk],
-                [chmod +x cmp-xxx extmakefile extmk])
+AC_CONFIG_FILES(cmp-xxx, [chmod +x cmp-xxx]) 
+AC_CONFIG_FILES(extmakefile, [chmod +x extmakefile])
+AC_CONFIG_FILES(extmk, [chmod +x extmk])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
