@@ -1,5 +1,6 @@
-      SUBROUTINE ADI2_STOMAP( PSID, HDUID, FORM, PTR, TYPE, MODE,
-     :                        STATUS )
+      SUBROUTINE ADI2_STOMAP( PSID, CACHEID, MSYS, FPTR, PTR,
+     :                        NDIM, DIMS,
+     :                        FROW, NROW, WBPTR, TYPE, MODE, STATUS )
 *+
 *  Name:
 *     ADI2_STOMAP
@@ -11,7 +12,8 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_STOMAP( PSID, HDUID, FORM, PTR, TYPE, MODE, STATUS )
+*     CALL ADI2_STOMAP( PSID, CACHEID, MSYS, FPTR, PTR, NDIM, DIMS, FROW,
+*                       NROW, WBPTR, TYPE, MODE, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -19,13 +21,24 @@
 *  Arguments:
 *     PSID = INTEGER (given)
 *        Item's private storage
-*     HDUID = INTEGER (given)
-*        The HDU in which the object belongs
-*     FORM = CHARACTER*(*) (given)
-*        The form of the mapping. I (image), BC (binary column), K
-*        (keyword), KC (keyword comment)
+*     CACHEID = INTEGER (given)
+*        The cache object holding the data
+*     MSYS = CHARACTER*(*) (given)
+*        Mapping system, 'dyn' or 'inv'
+*     FPTR = INTEGER (given)
+*        Address of mapped file object, or identifier of invented object
 *     PTR = INTEGER (given)
-*        Address of mapped memory
+*        Address of item mapped memory
+*     NDIM = INTEGER (given)
+*        Dimensionality of mapped data
+*     DIMS[] = INTEGER (given)
+*        Dimensions of mapped data
+*     FROW = INTEGER (given)
+*        First row in a mapped column
+*     NROW = INTEGER (given)
+*        Number of rows mapped in a column
+*     WBPTR = INTEGER (given)
+*        WriteBack procedure address
 *     TYPE = CHARACTER*(*) (given)
 *        Data access type
 *     MODE = CHARACTER*(*) (given)
@@ -95,8 +108,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER			PSID, HDUID, PTR
-      CHARACTER*(*)		FORM, TYPE, MODE
+      INTEGER			PSID, CACHEID, FPTR, PTR, NDIM, DIMS(*)
+      INTEGER			WBPTR, FROW, NROW
+      CHARACTER*(*)		TYPE, MODE, MSYS
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -104,31 +118,41 @@
 *  External References:
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
+
+*  Local Variables:
+      INTEGER			NELM			! # mapped elements
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Write reference to the HDU
-      CALL ADI_CPUTREF( PSID, 'Hdu', HDUID, STATUS )
+*  Store everything
+      CALL ADI_CNEWV0I( PSID, 'CacheID', CACHEID, STATUS )
+      CALL ADI_CNEWV0I( PSID, 'Ptr', PTR, STATUS )
 
-*  Flag HDU as changed if the mode is other than READ
-      IF ( MODE .NE. 'READ' ) THEN
-        CALL ADI_CPUT0L( HDUID, 'Changed', .TRUE., STATUS )
-        IF ( (FORM(1:1) .NE. 'K') .AND. (FORM(1:1) .NE. 'BC') .AND.
-     :       (FORM .NE. 'X') ) THEN
-          CALL ADI_CPUT0L( HDUID, 'DataChanged', .TRUE., STATUS )
-        END IF
+*  Store invented object
+      IF ( MSYS .EQ. 'inv' ) THEN
+        CALL ADI_CPUTREF( PSID, 'InvObj', FPTR, STATUS )
       END IF
 
-*  The mapping form
-      CALL ADI_CPUT0C( PSID, 'Form', FORM, STATUS )
-
 *  Store the various items in the storage block
-      CALL ADI_CNEWV0I( PSID, 'Ptr', PTR, STATUS )
-      CALL ADI_CNEWV0I( PSID, 'MapCount', 1, STATUS )
+      IF ( WBPTR .NE. 0 ) THEN
+        CALL ADI_CNEWV0I( PSID, 'WriteBack', WBPTR, STATUS )
+      END IF
+      CALL ADI_CNEWV0C( PSID, 'MapSystem', MSYS, STATUS )
       CALL ADI_CPUT0C( PSID, 'Type', TYPE(:CHR_LEN(TYPE)), STATUS )
       CALL ADI_CPUT0C( PSID, 'Mode', MODE(:CHR_LEN(MODE)), STATUS )
+
+*  Write shape
+      IF ( NDIM .GT. 0 ) THEN
+        CALL ADI_CPUT1I( PSID, 'SHAPE', NDIM, DIMS, STATUS )
+      END IF
+      CALL ARR_SUMDIM( NDIM, DIMS, NELM )
+      CALL ADI_CNEWV0I( PSID, 'Nelm', NELM, STATUS )
+
+*  Store first row and number of rows
+      CALL ADI_CNEWV0I( PSID, 'Frow', FROW, STATUS )
+      CALL ADI_CNEWV0I( PSID, 'Nrow', NROW, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_STOMAP', STATUS )

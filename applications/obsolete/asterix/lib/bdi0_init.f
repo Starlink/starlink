@@ -96,7 +96,11 @@
       EXTERNAL			BDI1_MAP
       EXTERNAL			BDI1_PUT
 
-      EXTERNAL			BDI0_UNMAP
+      EXTERNAL			BDI0_UNMAP		! Generic methods
+
+      EXTERNAL			BDI2_CHK
+      EXTERNAL			BDI2_MAP
+      EXTERNAL			BDI2_PUT
 
       EXTERNAL			BDI2_SCMAP
 
@@ -141,7 +145,6 @@
      :       'FileItemChk(_,_HDSfile,_CHAR)',
      :                   BDI1_CHK, DID, STATUS )
 
-*    HDS general binned dataset interface
         CALL ADI_DEFFUN(
      :       'FileItemDel(_,_HDSfile,_CHAR)',
      :                   BDI1_DELETE, DID, STATUS )
@@ -193,17 +196,30 @@
      :                   BDI2_TIMAP, DID, STATUS )
 
 *    FITS image interface
+c        CALL ADI_DEFFUN(
+c     :       'FileItemChk(_XYimage,_FITSfile,_CHAR)',
+c     :                   BDI2_IMCHK, DID, STATUS )
+c
+c        CALL ADI_DEFFUN(
+c     :       'FileItemGet(_XYimage,_FITSfile,_CHAR)',
+c     :                   BDI2_IMGET, DID, STATUS )
+c
+c        CALL ADI_DEFFUN(
+c     :       'FileItemMap(_XYimage,_FITSfile,_CHAR,_CHAR,_CHAR)',
+c     :                   BDI2_IMMAP, DID, STATUS )
+
+*    FITS general binned interface
         CALL ADI_DEFFUN(
-     :       'FileItemChk(_XYimage,_FITSfile,_CHAR)',
-     :                   BDI2_IMCHK, DID, STATUS )
+     :       'FileItemChk(_BinDS,_FITSfile,_CHAR)',
+     :                   BDI2_CHK, DID, STATUS )
 
         CALL ADI_DEFFUN(
-     :       'FileItemGet(_XYimage,_FITSfile,_CHAR)',
-     :                   BDI2_IMGET, DID, STATUS )
+     :       'FileItemMap(_BinDS,_FITSfile,_CHAR,_CHAR,_CHAR)',
+     :                   BDI2_MAP, DID, STATUS )
 
         CALL ADI_DEFFUN(
-     :       'FileItemMap(_XYimage,_FITSfile,_CHAR,_CHAR,_CHAR)',
-     :                   BDI2_IMMAP, DID, STATUS )
+     :       'FileItemPut(_BinDS,_FITSfile,_CHAR,_)',
+     :                   BDI2_PUT, DID, STATUS )
 
 *    FITS Scalar interface
         CALL ADI_DEFFUN(

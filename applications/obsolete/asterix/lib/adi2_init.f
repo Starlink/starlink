@@ -101,6 +101,7 @@
       EXTERNAL        		EDI2_SETLNK
 
       EXTERNAL			PRF2_GET
+      EXTERNAL			PRF2_SET
 
 *  Local Variables:
       INTEGER			DID			! Dummy id (ignored)
@@ -157,6 +158,8 @@
 *  Processing flag methods
       CALL ADI_DEFMTH( 'GetProFlag(_,_FITSfile,_CHAR)', PRF2_GET,
      :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetProFlag(_,_FITSfile,_CHAR,_LOGICAL)',
+     :                 PRF2_SET, DID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_INIT', STATUS )
