@@ -10,6 +10,7 @@
 *	Contents:	miscellaneous functions.
 *
 *	Last modify:	13/06/2002
+*                       15/03/2004 (PWD): Adam versions of error and warning.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -28,12 +29,20 @@
 
 /********************************* error ************************************/
 /*
+Version for ADAM
+
 I hope it will never be used!
 */
-void	error(int num, char *msg1, char *msg2)
+
+void    error(int num, char *msg1, char *msg2)
   {
-  fprintf(stderr, "\n> %s%s\n\n",msg1,msg2);
-  exit(num);
+  int status;
+
+  status = SAI__ERROR;
+  msgSetc( "TOK1", msg1 );
+  msgSetc( "TOK2", msg2 );
+  errRep( " ", "^TOK1 ^TOK2", &status );
+  longjmp( env, num );
   }
 
 
@@ -43,7 +52,7 @@ Print a warning message on screen.
 */
 void    warning(char *msg1, char *msg2)
   {
-  fprintf(OUTPUT, "\n> WARNING: %s%s\n\n",msg1,msg2);
+  AFPRINTF(OUTPUT, "\n> WARNING: %s%s\n\n",msg1,msg2);
   return;
   }
 
