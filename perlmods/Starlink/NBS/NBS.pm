@@ -1,5 +1,6 @@
 package Starlink::NBS;
-use Starlink::EMS;
+
+use Starlink::EMS qw/ ems1_get_facility_error /;
 use 5.004;
 use strict;
 use Carp;
@@ -462,7 +463,7 @@ The item must exist below the current object.
   Arguments: Full name of object (separated by dots)
              An object relative to the current object can be
              given if it starts with a '.'
-   
+
 Returns an object blessed into Starlink::NBS
 
 =cut
