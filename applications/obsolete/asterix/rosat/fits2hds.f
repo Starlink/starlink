@@ -84,6 +84,7 @@
 *  Authors:
 *     JKA: Jeremy Ashley (University of Leicester)
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB:  Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -116,6 +117,8 @@
 *        Adds axis information for non-asterix images.
 *     15 Dec 1995 V2.0-0 (DJA):
 *        ADI port. Split in two for cleaner XRTCONV interface
+*     10 Jul 1997 V2.1-0 (RB):
+*        Add special case for EventDS type files
 *     {enter_changes_here}
 
 *  Bugs:
@@ -237,11 +240,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     18 Dec 1995 (DJA):
 *        Original version.
+*     10 Jul 1997 (RB):
+*        Add special cases via F2H_TYPE variable
 *     {enter_changes_here}
 
 *  Bugs:
@@ -279,7 +285,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'FITS2HDS Version 2.2-0' )
+        PARAMETER		( VERSION = 'FITS2HDS Version rb test' )
 
       INTEGER                   MXRECS
         PARAMETER               ( MXRECS = 10000 )
@@ -287,24 +293,32 @@
       INTEGER                   MXCOL
         PARAMETER               ( MXCOL = 512 )
 
+      INTEGER			F2H__EVDS		! Special types of HDUs
+        PARAMETER		( F2H__EVDS = 1 )
+
 *  Local Variables:
       RECORD /XRT_HEAD/         HEAD 	    		! Header structure
       RECORD /XRT_SCFDEF/       SRT
 
       CHARACTER*(DAT__SZLOC) 	LOC        		! Locator to HDS file
       CHARACTER*(DAT__SZLOC) 	TLOC       		! Temporary locator to HDS
-      CHARACTER*(DAT__SZLOC) 	ALOC(MXCOL)  		! Table columns
+      CHARACTER*(DAT__SZLOC) 	TOPLOC       		! Top level locator for HDS file
+      CHARACTER*(DAT__SZLOC) 	CLOC(MXCOL)  		! Table column holder
+      CHARACTER*(DAT__SZLOC) 	ALOC(MXCOL)  		! Array in column holder
       CHARACTER*10 		FTYPE(MXCOL)		! Field types of arrays
       CHARACTER*12 TTYPE(MXCOL),TTSAVE(MXCOL)
-      CHARACTER*10 TUNIT(MXCOL),TFORM(MXCOL)
+      CHARACTER*40 TUNIT(MXCOL),TFORM(MXCOL)
       CHARACTER*6 		MAPMODE			! Column map mode
       CHARACTER*80 COMMENT
       CHARACTER*80 CTYPE(2)
       CHARACTER*80 CDUM			! Dummy character value
       CHARACTER*20 EXTNAME,S_EXTNAME    ! Table extension name
 
+      DOUBLE PRECISION		DMIN, DMAX		! Data ranges
+
       REAL 			CRVAL(2),CRPIX(2),CDELT(2)
       REAL			SPARR(2,2)		! Spaced array data
+      REAL			RMIN, RMAX		! Data ranges
 
       INTEGER 			FILENO			! File counter
       INTEGER 			HTYPE			! FITS header type
@@ -312,6 +326,8 @@
       INTEGER 			IUNIT			! Logical unit for FITS file
       INTEGER			OFID			! Output file id
       INTEGER 			PNTR(MXCOL),TPNTR	! Mapped HDS data
+      INTEGER			F2H_TYPE		! Type of HDU if special
+      INTEGER			IMIN, IMAX		! Data ranges
 
       LOGICAL 			SAME                    ! Same arrays as the last time
       LOGICAL 			FNEW                    ! Create NEW HDS file ?
@@ -329,7 +345,7 @@
       INTEGER DTYPE(MXCOL)                ! datatype of a field
       INTEGER TBCOL(MXCOL)
       INTEGER WIDTH(MXCOL)
-      INTEGER VARIDAT,REPEAT,COL,NELEMS,II,NLEN
+      INTEGER VARIDAT,REPEAT,COL,NELEMS,II,NLEN,TLEN
       INTEGER HBEG,HEND,FBEG,FNUM,HSAVE,NSAVE
       INTEGER NDUM			! Dummy integer value
       INTEGER NMAT,JJ			! Duplicate column names
@@ -430,7 +446,8 @@
         IF ( (HTYPE.EQ.0) .AND. (NAXIS.NE.0) ) THEN
 
 *      Open hds output fIle
-          CALL FITS2HDS_OPHDS( HNAME, ' ', FILENO, FNEW, OFID, STATUS )
+          CALL FITS2HDS_OPHDS( HNAME, ' ', FILENO, FNEW, OFID,
+     :                         F2H_TYPE, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
           HDSOPEN = .TRUE.
 
@@ -555,7 +572,7 @@
 
 *     Create an output HDS fIle
 	 CALL FITS2HDS_OPHDS( HNAME, EXTNAME, FILENO, FNEW, OFID,
-     :                        STATUS )
+     :                        F2H_TYPE, STATUS )
          CALL ADI1_GETLOC( OFID, LOC, STATUS )
          IF (STATUS.NE.SAI__OK) goto 99
          HDSOPEN = .TRUE.
@@ -564,6 +581,7 @@
 
 *       Calculate length of fieldname
            NLEN = CHR_LEN(TTYPE(COL))
+           TLEN = CHR_LEN(TUNIT(COL))
 
 *       Get information for new fields
            IF ( FNEW ) THEN
@@ -582,6 +600,28 @@
 
 *         Create hds structure
              MAPMODE = 'WRITE'
+
+*         Is it a special type?
+             IF ( F2H_TYPE .EQ. F2H__EVDS ) THEN
+
+*           Create a LIST structure to hold the data
+               TOPLOC = LOC
+               CALL DAT_NEW( TOPLOC, TTYPE(COL)(1:NLEN), 'LIST', 0, 0,
+     :                       STATUS )
+               CALL DAT_FIND( TOPLOC, TTYPE(COL)(1:NLEN), LOC, STATUS )
+               TTYPE(COL) = 'DATA_ARRAY'
+               NLEN = 10
+
+*           Fill in some other keywords
+               CALL DAT_NEW0C( LOC, 'UNITS', 40, STATUS )
+               CALL DAT_FIND( LOC, 'UNITS', TLOC, STATUS )
+               CALL DAT_PUT0C( TLOC, TUNIT(COL)(1:TLEN), STATUS )
+               CALL DAT_NEW0L( LOC, 'DECREASING', STATUS )
+               CALL DAT_FIND( LOC, 'DECREASING', TLOC, STATUS )
+               CALL DAT_PUT0L( TLOC, .FALSE., STATUS )
+             END IF
+
+*         Map the primitive as usual
              IF ( DTYPE(COL).EQ.11) THEN
                CALL DAT_NEW1I(LOC,TTYPE(COL)(1:NLEN),NROWS,STATUS)
                FTYPE(COL) = '_INTEGER'
@@ -629,6 +669,13 @@
              CALL DAT_ALTER(ALOC(COL),1,HROWS,STATUS)
 
            END IF
+
+*       Restore the top level locator if necessary
+           IF ( F2H_TYPE .EQ. F2H__EVDS ) THEN
+             CLOC(COL) = LOC
+             LOC = TOPLOC
+           END IF
+
          END DO
 
          CALL MSG_SETI('ROWS',NROWS)
@@ -707,6 +754,47 @@
 
 *     Unmap the columns/arrays
          DO COL = 1, TFIELDS
+
+*       Any special cases?
+           IF ( F2H_TYPE .EQ. F2H__EVDS ) THEN
+
+*         Find the data ranges
+             CALL DAT_MAPV( ALOC(COL), FTYPE(COL), 'READ', PNTR(COL),
+     :                      NDUM, STATUS )
+
+             IF ( FTYPE(COL) .EQ. '_INTEGER' ) THEN
+               CALL ARR_RANG1I( NDUM, %VAL(PNTR(COL)), IMIN, IMAX,
+     :                          STATUS )
+               CALL DAT_NEW0I( CLOC(COL), 'FIELD_MIN', STATUS )
+               CALL DAT_FIND( CLOC(COL), 'FIELD_MIN', TLOC, STATUS )
+               CALL DAT_PUT0I( TLOC, IMIN, STATUS )
+               CALL DAT_NEW0I( CLOC(COL), 'FIELD_MAX', STATUS )
+               CALL DAT_FIND( CLOC(COL), 'FIELD_MAX', TLOC, STATUS )
+               CALL DAT_PUT0I( TLOC, IMAX, STATUS )
+
+             ELSE IF ( FTYPE(COL) .EQ. '_REAL' ) THEN
+               CALL ARR_RANG1R( NDUM, %VAL(PNTR(COL)), RMIN, RMAX,
+     :                          STATUS )
+               CALL DAT_NEW0R( CLOC(COL), 'FIELD_MIN', STATUS )
+               CALL DAT_FIND( CLOC(COL), 'FIELD_MIN', TLOC, STATUS )
+               CALL DAT_PUT0R( TLOC, RMIN, STATUS )
+               CALL DAT_NEW0R( CLOC(COL), 'FIELD_MAX', STATUS )
+               CALL DAT_FIND( CLOC(COL), 'FIELD_MAX', TLOC, STATUS )
+               CALL DAT_PUT0R( TLOC, RMAX, STATUS )
+
+             ELSE IF ( FTYPE(COL) .EQ. '_DOUBLE' ) THEN
+               CALL ARR_RANG1D( NDUM, %VAL(PNTR(COL)), DMIN, DMAX,
+     :                          STATUS )
+               CALL DAT_NEW0D( CLOC(COL), 'FIELD_MIN', STATUS )
+               CALL DAT_FIND( CLOC(COL), 'FIELD_MIN', TLOC, STATUS )
+               CALL DAT_PUT0D( TLOC, DMIN, STATUS )
+               CALL DAT_NEW0D( CLOC(COL), 'FIELD_MAX', STATUS )
+               CALL DAT_FIND( CLOC(COL), 'FIELD_MAX', TLOC, STATUS )
+               CALL DAT_PUT0D( TLOC, DMAX, STATUS )
+             END IF
+
+           END IF
+
            CALL DAT_ANNUL( ALOC(COL), STATUS )
          END DO
 
@@ -791,7 +879,7 @@
 
 *+ FITS2HDS_OPHDS - Open or create a HDS file
       SUBROUTINE FITS2HDS_OPHDS( HNAME, EXTNAME, FCNT, FNEW, FID,
-     :                           STATUS )
+     :                           TYPE, STATUS )
 
       IMPLICIT NONE
 
@@ -806,7 +894,7 @@
 *    Import/Export:
       INTEGER			FCNT
 *    Export:
-      INTEGER			FID
+      INTEGER			FID, TYPE
 
 *  Status:
       INTEGER			STATUS             	! Global status
@@ -816,6 +904,7 @@
       CHARACTER*(DAT__SZLOC)	LOC
       CHARACTER*132		PNAME
         SAVE                    PNAME
+      CHARACTER*20		LEXTNM
 
       INTEGER			NCHAR			! # characters used
 *.
@@ -828,7 +917,16 @@
 
 *    Create an output HDS fIle
         IF ( EXTNAME .NE. ' ' ) THEN
-          PNAME = HNAME(1:CHR_LEN(HNAME))//'_'//extname
+          PNAME = HNAME(1:CHR_LEN(HNAME))//'_'//EXTNAME
+
+*      Is it a special HDU type?
+          LEXTNM = EXTNAME
+          CALL CHR_UCASE( LEXTNM )
+          IF ( INDEX( LEXTNM, 'EVENT' ) .GT. 0 ) THEN
+            TYPE = 1
+          ELSE
+            TYPE = 0
+          END IF
 
 *    Indexed file
         ELSE IF ( FCNT .GT. 0 ) THEN
@@ -843,7 +941,13 @@
         END IF
 
 *    Create the file
-        CALL HDS_NEW(PNAME, 'FITSCONV', 'FITSCONV', 0, 0, LOC, STATUS )
+        IF ( TYPE .EQ. 1 ) THEN
+          CALL HDS_NEW( PNAME, 'FITSCONV', 'EVENTDS', 0, 0, LOC,
+     :                  STATUS )
+        ELSE
+          CALL HDS_NEW( PNAME, 'FITSCONV', 'FITSCONV', 0, 0, LOC,
+     :                  STATUS )
+        END IF
 
 *    Report opening
         IF (STATUS .NE. SAI__OK) THEN
@@ -851,6 +955,11 @@
         ELSE
           CALL MSG_SETC('PNAM', PNAME)
           CALL MSG_PRNT('Writing to ^PNAM')
+          IF (TYPE .EQ. 1) THEN
+            CALL MSG_PRNT('File is of type EVENTDS')
+          ELSE
+            CALL MSG_PRNT('File is of type FITSCONV')
+          END IF
         END IF
 
 *  Open existing file
