@@ -10,10 +10,9 @@ $(RECURSIVE_TARGETS):
            ( cd $$d; $(MAKE) $@; ) \
         done
            
-STAR_MANIFEST_INSTALL_COMMAND = \
+STAR_SPECIAL_INSTALL_COMMAND = \
         for d in @itcl_subdirs@; \
         do \
-           ( cd $$d; \
-             $(MAKE) prefix=STAGINGPREFIX exec_prefix=STAGINGPREFIX install; ) \
+           ( cd $$d; $(MAKE) INSTALL_ROOT=$$DESTDIR install ) \
         done
 
