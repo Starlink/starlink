@@ -1,5 +1,5 @@
 1 SURF - SCUBA User Reduction Facility
-                                                     Expires: 98.**.**
+                                                     Expires: 99.**.**
 
   This is the fifth public release of SURF (v1.4). It will be 
   distributed on the Autumn 1999 Starlink CD-ROM.
@@ -25,9 +25,9 @@
 
   More information can be found in document SUN/216 (use `findme surf'
   or `showme sun216' on a Starlink system), or on the JCMT software WWW
-  pages (http://www.jach.hawaii.edu/jcmt_sw/scuba).
+  pages (http://www.jach.hawaii.edu/JCMT/software/scuba).
 
-  A mailing list now exists for discussing SCUBA data reduction techniques.
+  A mailing list exists for discussing SCUBA data reduction techniques.
   The list is at scubadr@jach.hawaii.edu.
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
@@ -35,12 +35,57 @@
 2 Changes in version 1.4
 
   The major change in this release is support for the SCUBA polarimeter.
+
   The changes can be grouped into three categories:
  
 New_Tasks
 
   - REMIP can be used to remove instrumental polarisation
-  - ADD_DBM can be used to generated simulated dual beam images
+  - ADD_DBM can be used to generate simulated dual beam images
+  - SCUSETENV for setting environment variables at the JAC
  
 Changes_to_existing_tasks
+
+  - Units should now be propagated correctly through all tasks
+    (ie calibration units are not lost after REBIN or SCUPHOT)
  
+  - SURF version number is now written to history information
+
+  - SCAN_RLB: Area to use for baseline removal can now be specified
+    as a SCUBA section.
+
+  - REMDBM: The -filter option will filter out how frequencies
+           before inverting the Fourier transform.
+
+  - REBIN: Add TRIM parameter to trim edge regions from rebinned
+           images (useful when trying to mosaic)
+
+  - REBIN: Astrometry information is now entirely contained in 
+           the AST/WCS component. No longer written to FITS or
+           IRAS90 extensions. Also, the pixel origin is now centred
+           on the specified RA/Dec centre of the image and not
+           the bottom left hand corner.
+
+  - REBIN: REFPIX parameter has been added to make it easier to specify
+           the reference pixel location when changing the map size
+           (in the past the reference pixel was always the middle of the
+           map when specifying the map size)
+
+  - REBIN: The output file is now propagated from the input when
+           processing a single file (keeps history intact)
+
+  - EXTINCTION: Can process FAST_AXIS polarimetry information correctly
+
+  - SKYDIP: Add preliminary support for RASTER mode (not yet stable)
+  
+  - OBSSUM/SCULOG: POLMAP and POLPHOT are now supported modes.
+
+  - SCUPHOT now recognizes measurements as well as integrations
+      (required for polarimetry observing)
+
+  - SCUOVER: Now reads astrometry from WCS/AST component.
+
+  - SCUMAKEWT: Now can make a weights image like a reference image
+     (ie same size, chop throw and position angle). See the LIKE parameter.
+
+
