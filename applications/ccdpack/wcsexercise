@@ -355,7 +355,7 @@
          outdomain=TEST_DATA \
          reset accept
 #     end astexp
-        
+
 #  Resample the data.
       echo " "
       echo "  The reduced NDFs will now be resampled to the same coordinate"
@@ -379,14 +379,28 @@
 	 reset accept
 #     end makemos
 
-#  Display the final mosaic.
+#  We also do the combination using the drizzling algorithm.  This is 
+#  not necessary, or particularly appropriate, since we've already
+#  used MAKEMOS, but we do it to put DRIZZLE through its paces.
+      echo " "
+      echo "  The reduced images are combined as well using the drizzling"
+      echo "  algorithm."
+      echo " "
+      drizzle \
+         in='data-??' \
+         out=drizzled \
+         accept
+#     end drizzle
+
+#  Display the final mosaic.  We use the drizzled one, but 'mosaic' could
+#  have been used instead.
       if ( "$device" != "NONE" ) then 
          echo " "
          echo "  Displaying the final mosaic."
          echo " "
          gdclear \\
          display \
-            in=mosaic \
+            in=drizzled \
             mode=percentiles \
             percentiles='[2,98]' \
             reset accept
