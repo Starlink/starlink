@@ -1,7 +1,7 @@
       SUBROUTINE REDS_SCUPHOT (STATUS)
 *+
 *  Name:
-*     REDS_SCUPHOT
+*     SCUPHOT
 
 *  Purpose:
 *     routine to reduce SCUBA PHOTOM data
@@ -20,9 +20,9 @@
 *        The global status
  
 *  Description:
-*        This routine reduces the data for a single sub-instrument from a PHOTOM
-*     observation. For each bolometer used to look at the source the data will
-*     be analysed as follows:-
+*        This routine reduces the data for a single sub-instrument from a
+*     PHOTOM observation. For each bolometer used to look at the source the
+*     data will be analysed as follows:-
 *
 *       An ndf called <bolname>_map (e.g. h7_map) will be created in the OUT 
 *       file to hold the coadded data from all the integrations. If the
@@ -122,9 +122,12 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.4  1996/11/01 21:46:04  timj
-*     Change name to SCUPHOT
+*     Revision 1.5  1996/11/02 01:25:10  timj
+*     Change Naem: to SCUPHOT from REDS_SCUPHOT in header.
 *
+c Revision 1.4  1996/11/01  21:46:04  timj
+c Change name to SCUPHOT
+c
 c Revision 1.3  1996/10/30  22:54:34  timj
 c Add modern header.
 c Replace SCULIB_COPY with VEC_
