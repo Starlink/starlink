@@ -352,6 +352,10 @@ class StarRtdImage : public Skycat {
 
    //  Whether associated image data is byte swapped.
    int swapNeeded();
+
+   //  Whether an image has byte swapped data.
+   int swapNeeded( ImageIO imio );
+
   private:
 
    // Copy constructor -- not defined.
