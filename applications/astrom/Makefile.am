@@ -4,10 +4,14 @@ bin_PROGRAMS = astrom
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+# Include a dummy C file, so that automake knows that C sources are
+# involved (in -lcfitsio), and can modify the link accordingly.
+# Hmmm, this isn't terribly pretty.
 astrom_SOURCES = \
 	$(F_ROUTINES) \
 	$(BLOCK_DATA_FILES) \
-	$(PRIVATE_INCLUDES)
+	$(PRIVATE_INCLUDES) \
+	dummy_c.c
 
 astrom_LDADD = -lsla -lcfitsio
 
