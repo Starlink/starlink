@@ -456,8 +456,7 @@ sub adamtask_send {
 # adamtask_sendw
 #
 #  - Send a command and then block until the command is complete
-#     This does not use the relay
-#     directly from here.
+#     This does not use the relay directly from here.
 
 sub adamtask_sendw {
 
@@ -809,7 +808,7 @@ sub adamtask_obeyw {
 
   $task = shift;
   $command = shift;
-  $params = shift | " "; # -w protection
+  $params = shift || " "; # -w protection
 
   my ($reply, @reply);
 
