@@ -9,6 +9,7 @@
 *      26 Jan 93 : V1.7-0 GCB, GFX used (RJV)
 *       1 Jul 93 : V1.7-1 GTR used (RJV)
 *      14 Jun 94 : V1.7-2 bug in QUALITY checking (RJV)
+*      14 Oct 97 : V2.1-1 GUI version (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -21,16 +22,17 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*1 CH
+      CHARACTER*12 OPT
       REAL XC,YC
-      REAL XR,YR,RAD
+      REAL RAD
       REAL BASE,SCALE
       INTEGER ZPTR
       INTEGER DPTR,VPTR,QPTR
       LOGICAL	REG
+      LOGICAL PLOT
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IZED Version 2.2-0')
+      PARAMETER (VERSION = 'IZED Version 2.1-1')
 *-
       CALL USI_INIT()
 
@@ -44,39 +46,24 @@
         CALL MSG_PRNT('AST_ERR: no image currently displayed')
       ELSE
 
+*  if being run from a GUI - is plot required
+        IF (I_GUI) THEN
+          CALL IMG_NBGET0C('OPTIONS',OPT,STATUS)
+*  GUI is plotting externally - so no plot here
+          IF (OPT(1:1).EQ.'E') THEN
+            PLOT=.FALSE.
+          ELSE
+            PLOT=.TRUE.
+          ENDIF
+        ENDIF
+
 *  ensure transformations correct
         CALL GTR_RESTORE(STATUS)
         CALL GCB_ATTACH('IMAGE',STATUS)
         CALL IMG_2DGCB(STATUS)
 
-
-*  cursor mode
-        IF (I_MODE.EQ.1) THEN
-*  get centre
-          CALL MSG_PRNT(' ')
-          CALL MSG_PRNT('Select centre...')
-          XC=I_X
-          YC=I_Y
-          CALL PGCURSE(XC,YC,CH)
-          CALL PGPOINT(1,XC,YC,2)
-
-*  get radius
-          CALL MSG_PRNT('Select radius...')
-          XR=XC
-          YR=YC
-          CALL PGCURSE(XR,YR,CH)
-          RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
-
-*  keyboard mode
-        ELSE
-          CALL USI_DEF0R('X',I_X,STATUS)
-          CALL USI_GET0R('X',XC,STATUS)
-          CALL USI_DEF0R('Y',I_Y,STATUS)
-          CALL USI_GET0R('Y',YC,STATUS)
-          CALL USI_DEF0R('RAD',I_R,STATUS)
-          CALL USI_GET0R('RAD',RAD,STATUS)
-
-        ENDIF
+*  get circle parameters
+        CALL IMG_GETCIRC('X','Y','RAD',XC,YC,RAD,STATUS)
 
 *  plot  circle
         CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
@@ -142,21 +129,29 @@
 *  reset auxiliary plot
         I_N_AUX=0
 
-*  plot it
+*  set plot attributes
         CALL IMG_1DGCB(STATUS)
         CALL GCB_SETL('ERR_FLAG',.TRUE.,STATUS)
         CALL GCB_SETL('STEP_FLAG',.FALSE.,STATUS)
         CALL GCB_SETL('POLY_FLAG',.FALSE.,STATUS)
         CALL GCB_SETL('POINT_FLAG',.FALSE.,STATUS)
-        CALL GDV_CLEAR(STATUS)
-        CALL IMG_PLOT(STATUS)
 
         CALL GCB_CACHE(I_CACHE_1D,STATUS)
 
+*  plot it
+        IF (PLOT) THEN
+          CALL GDV_CLEAR(STATUS)
+          CALL IMG_PLOT(STATUS)
+
 *  flag current plotting status
-        I_DISP_1D=.TRUE.
-        I_DISP=.FALSE.
-        I_CLEAR=.FALSE.
+          I_DISP_1D=.TRUE.
+          I_DISP=.FALSE.
+          I_CLEAR=.FALSE.
+        ELSE
+*  if not plotting set loaded GCB back to 2D
+          CALL IMG_2DGCB(STATUS)
+        ENDIF
+
 
         CALL IMG_SETPOS(XC,YC,STATUS)
 
