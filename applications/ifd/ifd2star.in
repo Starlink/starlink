@@ -120,13 +120,37 @@ proc package_start_hook {name} {
     puts $pkg_icl "\{ Created automatically from $Ifd using ifd2star"
     puts $pkg_icl "\{ $Date"
 
-    puts $pkg_csh "# Shell initialisation for package [string toupper $name]"
+    puts $pkg_csh "# Shell initialisation (csh-syntax) for package [string toupper $name]"
     puts $pkg_csh "# Created automatically from $Ifd using ifd2star"
     puts $pkg_csh "# $Date"
 
-    puts $pkg_sh "# Shell initialisation for package [string toupper $name]"
+    puts $pkg_sh "# Shell initialisation (sh-syntax) for package [string toupper $name]"
     puts $pkg_sh "# Created automatically from $Ifd using ifd2star"
     puts $pkg_sh "# $Date"
+    puts $pkg_sh "# (uses sh functions, so won't work on very early Bourne shells)"
+    puts $pkg_sh ""
+    # Bash, ksh and zsh (amongst others) have aliases, but Bourne sh doesn't.
+    # Early versions of Bourne sh didn't have functions either, but if the user
+    # is using a shell that old, they presumably have other problems (not all
+    # of them necessarily technical).
+    #
+    # The ${1+"$@"} magic is really just "$@", the complete set of arguments to
+    # the function.  When there are no arguments, this is supposed to expand to
+    # nothing (as opposed to ""), but not all shells handle this correctly,
+    # hence the need for the extra syntax.  Incidentally, we need "$@"
+    # rather than plain $@ so that the positional arguments are quoted
+    # on expansion (for example to preserve embedded spaces).
+    #
+    # See the autoconf manual's notes on portable shell programming
+    # for discussion.
+    #
+    # Zsh handles plain "$@" properly, but that's not portable.  However we
+    # can't use the usual ${1+"$@"} workaround, because Zsh mishandles that
+    # when it's emulating sh.  So we use Zsh's 'global aliases' to convert
+    # ${1+"$@"} into "$@" by itself.
+    puts $pkg_sh "# Make \${1+\"\$@\"} portability feature work on zsh, too."
+    puts $pkg_sh "test \"\${ZSH_VERSION+set}\" = set && alias -g '\${1+\"\$@\"}'='\"\$@\"'"
+
 }
 proc package_end_hook {name} {
     global pkg_icl
@@ -255,10 +279,11 @@ proc action_end_hook {name} {
 
 
 # Write the .sh file
+# See notes above for portability notes.
     puts $pkg_sh ""
-    puts $pkg_sh "alias $name='$Current(exepath)/$name'"
+    puts $pkg_sh "$name () { $Current(exepath)/$name \${1+\"\$@\"}; }"
     if [string length $Current(prefix)] {
-       puts $pkg_sh "alias $Current(prefix)_$name='$Current(exepath)/$name'"
+       puts $pkg_sh "$Current(prefix)_$name () { $Current(exepath)/$name \${1+\"\$@\"}; }"
     }
 }
 
@@ -444,9 +469,9 @@ proc command_end_hook {name} {
 
 # Write the .sh file
     puts $pkg_sh ""
-    puts $pkg_sh "alias $name=$Cmdcsh"
+    puts $pkg_sh "$name () { $Cmdcsh \${1+\"\$@\"}; }"
     if [string length $Current(prefix)] {
-       puts $pkg_sh "alias $Current(prefix)_$name=$Cmdcsh"
+       puts $pkg_sh "$Current(prefix)_$name () { $Cmdcsh \${1+\"\$@\"}; }"
     }
 }
 proc print_start_hook {mess} {
