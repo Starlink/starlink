@@ -20,8 +20,11 @@
 *        The global status.
 
 *  Description:
-*     This routine extacts and aligns areas containing corresponding rays 
+*     This routine extracts and aligns areas containing corresponding rays 
 *     from a set of images containing dual or single beam polarimetry data. 
+*     It can also perform sky subtraction based either on a set of
+*     supplied sky frames, or on user-specified background areas within
+*     the object frames.
 *
 *     In dual-beam mode, two output images are created for each
 *     supplied input image, one containing the O-ray areas and the other
@@ -55,7 +58,7 @@
 *     the menu bar.
 
 *  Usage:
-*     polreg in out_o out_e
+*     polreg in out_o out_e [skyframes]
 
 *  ADAM Parameters:
 *     BADCOL = LITERAL (Update)
@@ -174,6 +177,21 @@
 *        This should be one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. 
 *        Any unambiguous abbreviation can be supplied, and the value is 
 *        case-insensitive. [RED]
+*     SKYFRAMES = NDF (Read)
+*        A list of sky frames. These frames are subtracted from the
+*        supplied object frames before the output images are created. If only 
+*        one sky frame is supplied, then it is used for all the object
+*        frames. Otherwise, the number of sky frames must equal the
+*        number of supplied object frames, and must be given in the same
+*        order. If a null value (!) is given for SKYFRAMES, then the sky
+*        background to be subtracted from each output image is determined 
+*        by fitting a surface to sky areas identified by the user within
+*        the supplied object frames. [!]
+*     SKYOFF = _LOGICAL (Update)
+*        If a true value is supplied, then the sky background is removed
+*        from each output image. Otherwise, no sky background is removed.
+*        The method used to estimate the sky background is determined by
+*        the SKYFRAMES parameter. [TRUE]
 *     STARTHELP = _LOGICAL (Read)
 *        If a true value is supplied, then a hyper-text browser will be
 *        created with the GUI, displaying the contents page of the PolReg
@@ -212,23 +230,17 @@
 *  Examples:
 *     polreg 'im1,im2' '*_o' '*_e' 
 *        This example aligns and extracts the O and E ray areas from the two 
-*        images `im1` and `im2`, and stores them in the images `im1_o`,
-*        `im1_e`, `im2_o` and `im2_e`. The current values for all other 
-*        parameters are used.
-*     polreg ^in_files.lis out=^out_files.lis dualbeam=no reset
+*        images `im1` and `im2`, subtracts a sky background (estimated
+*        from areas within the object frames), and stores the results in 
+*        the images `im1_o`, `im1_e`, `im2_o` and `im2_e`. The current 
+*        values for all other parameters are used.
+*     polreg ^in.lis out=^out.lis dualbeam=no skyframes=^sky.lis reset
 *        This example uses single-beam mode. It reads the names of input 
-*        images from the text file `in_files.lis`, aligns them and stores 
-*        them in the images named in the text file `out_files.lis`. All
+*        images from the text file `in.lis`, subtracts the sky frames
+*        read from the text file `sky.lis`, aligns them and stores 
+*        them in the images named in the text file `out.lis`. All
 *        other parameters are reset to their initial default values listed 
 *        in the parameter descriptions above.
-
-*  Implementation Status:
-*     - The output images are created from the input images using KAPPA 
-*     application SEGMENT (to extract the mask areas), and the CCDPACK 
-*     application TRANNDF (to align them). The documentation for these
-*     applications should be consulted for details of which NDF components
-*     are processed, what numerical data types are used for the processing, 
-*     etc.
 
 *  Notes:
 *     - The following components are added to the POLPACK extension in the 
@@ -279,6 +291,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'GRP_PAR'          ! GRP public constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
 
 *  Status:
@@ -304,18 +317,22 @@
       INTEGER
      :        DPI,               ! Dots per inch to use
      :        FIT,               ! Fit type for aligning images
-     :        IGRP1,             ! Identifier for input NDF group
+     :        IGRP1,             ! Identifier for input object frames group
      :        IGRP2,             ! Identifier for output O-ray NDF group
      :        IGRP3,             ! Identifier for output E-ray NDF group
+     :        IGRPS,             ! Identifier for input sky frames group
      :        OEFIT,             ! Fit type for aligning the O and E rays
      :        PSF,               ! Size of feature to search for
-     :        SIZE,              ! Total size of the input group
-     :        SIZEO              ! Total size of the output group (=SIZE)
+     :        SIZE,              ! Total size of the object frame group
+     :        SIZEO,             ! Total size of the output group (=SIZE)
+     :        SSIZE              ! Total size of the sky frame group
       LOGICAL 
+     :        AGAIN,             ! Get a list of sky frames again?
      :        NEWCM,             ! Use a new colour map?
      :        DBEAM,             ! Run in Dual-beam mode?
      :        HAREA,             ! Is the help area to be displayed?
      :        SAREA,             ! Is the status area to be displayed?
+     :        SKYOFF,            ! Should a sky background be subtracted?
      :        STHLP,             ! Display a WWW browser at start-up?
      :        XHAIR              ! Is a cross-hair required?
       REAL
@@ -327,9 +344,43 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get a group containing the names of the NDFs to be processed.
+*  Get a group containing the names of the object frames to be used.
       CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            SIZE, STATUS )
+
+*  Get a group containing the names of the sky frames to be used. If no
+*  sky frames are supplied, then the sky is estimated within the object
+*  frames. If any sky frames are given, then there must either be a 
+*  separate sky frmae for each object frame (i.e. the same number of each), 
+*  or a single sky frame to be used with all object frames. Check that an 
+*  acceptable number of sky frames have been supplied.
+      AGAIN = .TRUE.
+      DO WHILE( AGAIN .AND. STATUS .EQ. SAI__OK )
+
+         IGRPS = GRP__NOID
+         CALL RDNDF( 'SKYFRAMES', SIZE, 0, '  Give more sky frames...', 
+     :                IGRPS, SSIZE, STATUS )
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            SSIZE = 0
+         END IF
+
+         IF( SSIZE .NE. 0 .AND. SSIZE .NE. 1 .AND. 
+     :       SSIZE .NE. SIZE .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'SSIZE', SSIZE )
+            CALL MSG_SETI( 'SIZE', SIZE )
+            CALL ERR_REP( 'POLREG_ERR1', '^SSIZE sky frames supplied.',
+     :                    STATUS )
+            CALL ERR_REP( 'POLREG_ERR2', 'The number of sky frames '//
+     :                    'supplied must be 0, 1 or $SIZE. Please '//
+     :                    'try again...', STATUS )
+            CALL ERR_FLUSH( STATUS )
+            CALL GRP_DELET( IGRPS, STATUS )
+         ELSE
+            AGAIN = .FALSE.
+         END IF
+      END DO
 
 *  See if we should run in dual-beam mode.
       CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
@@ -365,6 +416,9 @@
 
 *  See if a new colour map should be used.
       CALL PAR_GET0L( 'NEWCOLMAP', NEWCM, STATUS )
+
+*  See if a sky background should be subtracted.
+      CALL PAR_GET0L( 'SKYOFF', SKYOFF, STATUS )
 
 *  See if a cross hair should be used over the image display area.
       CALL PAR_GET0L( 'XHAIR', XHAIR, STATUS )
@@ -446,13 +500,15 @@
       CALL DOPLRG( IGRP1, IGRP2, IGRP3, DPI, HAREA, SAREA, PSF, 
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
-     :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, STATUS )
+     :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, 
+     :             IGRPS, SSIZE, SKYOFF, STATUS )
 
 *  The various options values may have been altered by the use of the 
 *  "Options" menu in the GUI. Write them back to the parameter file in case.
       CALL PAR_PUT0L( 'XHAIR', XHAIR, STATUS )
       CALL PAR_PUT0L( 'HELPAREA', HAREA, STATUS )
       CALL PAR_PUT0L( 'STATUSAREA', SAREA, STATUS )
+      CALL PAR_PUT0L( 'SKYOFF', SAREA, STATUS )
       CALL PAR_PUT0I( 'PSFSIZE', PSF, STATUS )    
       CALL PAR_PUT0C( 'ITEMS', SI( : CHR_LEN( SI ) ), STATUS )
       CALL PAR_PUT0I( 'FITTYPE', FIT, STATUS )
@@ -473,7 +529,8 @@
 *  Delete the groups.
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )
-      IF ( DBEAM ) CALL GRP_DELET( IGRP3, STATUS )
+      IF( DBEAM ) CALL GRP_DELET( IGRP3, STATUS )
+      IF( IGRPS .NE. GRP__NOID ) CALL GRP_DELET( IGRPS, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

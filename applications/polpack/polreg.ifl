@@ -87,7 +87,7 @@ interface POLREG
       vpath    'PROMPT '
       ppath    'GLOBAL '
       association <->GLOBAL.DATA_ARRAY
-      prompt   'Input images'
+      prompt   'Input object frames'
       helpkey  '*'
    endparameter
 
@@ -200,6 +200,27 @@ interface POLREG
       ppath    'CURRENT,DEFAULT'
       default  'RED'
       prompt   'Colour with which to mark the selected area'
+      helpkey  '*'
+   endparameter
+
+   parameter SKYFRAMES
+      position 4
+      type     NDF
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Input sky frames'
+      helpkey  '*'
+   endparameter
+
+   parameter SKYOFF
+      type     _LOGICAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Subtract the sky background off the output images?'
       helpkey  '*'
    endparameter
 

@@ -44,6 +44,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         CHARACTER(REFCOL), CHARACTER(SELCOL), 
                         CHARACTER(VIEW), REAL(PLO), REAL(PHI), LOGICAL(NEWCM),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
+                        INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
                         INTEGER(STATUS) TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
                         TRAIL(VIEW) TRAIL(XHRCOL) ){
@@ -124,6 +125,13 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *     STHLP = LOGICAL (Given)
 *        Should a hyper-text browser be created automatically at start-up
 *        displaying the help system contents?
+*     IGRPS = INTEGER (Given)
+*        Identifier for a GRP group holding the supplied sky frames. This
+*        is ignored if SSIZE is zero.
+*     SSIZE = INTEGER (Given)
+*        The number of sky frames in the group identified by IGRPS.
+*     SKYOFF = LOGICAL (Given and Returned)
+*        Should the sky background be removed from the output images?
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -163,6 +171,9 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_LOGICAL(NEWCM)
    GENPTR_LOGICAL(XHAIR)
    GENPTR_CHARACTER(XHRCOL)
+   GENPTR_INTEGER(IGRPS)
+   GENPTR_INTEGER(SSIZE)
+   GENPTR_LOGICAL(SKYOFF)
    GENPTR_LOGICAL(STHLP)
 
    Tcl_Interp *interp = NULL;
@@ -216,6 +227,14 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       }
    }
 
+/* Store the sky frames in "sky_list" if any have been supplied. */
+   if( *SSIZE > 0 ) {
+      for( i = 1; i <= *SSIZE && *STATUS == SAI__OK; i++ ){
+         name = GetName( *IGRPS, i, STATUS );
+         SetVar( interp, "sky_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+      }
+   }
+
 /* If a positive value has been supplied, store the screen dots per inch
    to use in TCL variable "dpi". */
    if ( *DPI > 0 ) { 
@@ -233,6 +252,9 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    }
 
 /* Set the Tcl variables storing the options values to use. */
+   SetVar( interp, "ATASK_SKYOFF", ( F77_ISTRUE(*SKYOFF) ? "1" : "0" ), 
+           TCL_LEAVE_ERR_MSG, STATUS );
+
    SetVar( interp, "ATASK_XHAIR", ( F77_ISTRUE(*XHAIR) ? "1" : "0" ), 
            TCL_LEAVE_ERR_MSG, STATUS );
 
@@ -411,6 +433,13 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    }
 
 /* Get the current value of the Tcl options variables. */
+   tp = GetVar( interp, "ATASK_SKYOFF", TCL_LEAVE_ERR_MSG, STATUS );
+   if ( tp && !strcmp( tp, "0" ) ) {
+      *SKYOFF = F77_FALSE;
+   } else {
+      *SKYOFF = F77_TRUE;
+   }
+
    tp = GetVar( interp, "ATASK_XHAIR", TCL_LEAVE_ERR_MSG, STATUS );
    if ( tp && !strcmp( tp, "0" ) ) {
       *XHAIR = F77_FALSE;

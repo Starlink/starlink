@@ -401,7 +401,7 @@ interface POLREG
       vpath    'PROMPT '
       ppath    'GLOBAL '
       association <->GLOBAL.DATA_ARRAY
-      prompt   'Input images'
+      prompt   'Input object frames'
       helpkey  '*'
    endparameter
 
@@ -517,13 +517,24 @@ interface POLREG
       helpkey  '*'
    endparameter
 
-   parameter STARTHELP
-      type     _LOGICAL
+   parameter SKYFRAMES
+      position 4
+      type     NDF
       access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Input sky frames'
+      helpkey  '*'
+   endparameter
+
+   parameter SKYOFF
+      type     _LOGICAL
+      access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
       default  YES
-      prompt   'Display hyper-text help automatically at start-up?'
+      prompt   'Subtract the sky background off the output images?'
       helpkey  '*'
    endparameter
 
@@ -537,13 +548,23 @@ interface POLREG
       helpkey  '*'
    endparameter
 
+   parameter STARTHELP
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Display hyper-text help automatically at start-up?'
+      helpkey  '*'
+   endparameter
+
    parameter VIEW
       type     _CHAR
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
-      default  'Aligned'
-      prompt   'View the images aligned or stacked?'
+      default  'Zoomed'
+      prompt   'View new images zoomed or unzoomed?'
       helpkey  '*'
    endparameter
 
@@ -552,7 +573,7 @@ interface POLREG
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
-      default  NO
+      default  YES
       prompt   'Use a cross-hair over the image display area?"
       helpkey  '*'
    endparameter
