@@ -363,6 +363,25 @@
      notation will fit naturally into a future development of this
      format, into XML, for example.
 
+     In a project meeting, it was decided that there were substantial
+     operational difficulties in guaranteeing that document-summary
+     target files would always exist.  Therefore the processing of
+     this element was required to work even if the target element
+     didn't exist, by parsing the public identifier, and making
+     intelligent guesses about the system's environment.  This is very
+     messy, and really nothing to do with the DTD, however it seems
+     worth noting here that this is a blessed practice, and so that a
+     document may be considered `acceptable' even if the link implied
+     in this DOCXREF element is broken.
+
+     Initially, the generated link text could be overridden by
+     supplying a value for the `text' attribute.  To make this element
+     more consistent with the REF element, however, this has been
+     changed so that the element's link text is given as content to
+     the DOCXREF element.  The `text' attribute is still present and
+     supported, for (very temporary) backward compatibility, but
+     undocumented.
+
      This is all more intricate than it might at first appear: see
      HyTime clause 7.8.
 
@@ -384,7 +403,7 @@
      The link's effective content should be whatever corresponds to
      the title of the object addressed by LOC.  
      -->
-<!ELEMENT docxref %MXO; EMPTY>
+<!ELEMENT docxref %MXO; (#PCDATA)>
 			<!-- References to elements and data within other
 			     Starlink documents -->
 <!ATTLIST docxref
