@@ -45,12 +45,12 @@ polimp.ifl polimp.tab polka.f polka.ifl polpack.c polpack.csh \
 polpack.hlp polpack.icl polpack_link_adam polpack_mon.ifl \
 polpack_mon.f polpack_test polplot.f polplot.ifl polvec.f polvec.ifl \
 pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit sread.f \
-tick.bit vertex.bit wrndf.f pol1_dbeam.f pol1_blkwr.f pol1_sngvr.f \
-pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f  pol1_snghd.f  \
-pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_sngfl.f pol1_sngsi.f \
-pol1_sngsm.f pol1_hist2.f polsim.f pol1_simcl.f polsim.ifl pol1_gtvrs.f \
+tick.bit vertex.bit wrndf.f pol1_dbeam.f \
+pol1_sngad.f  pol1_sngcl.f pol1_sngbm.f  pol1_snghd.f  \
+pol1_sngsv.f pol1_dulbm.f pol1_fillr.f \
+pol1_sngsm.f polsim.f pol1_simcl.f polsim.ifl pol1_gtvrs.f \
 pol1_prsvr.f pol1_gtvrc.f polimage.f polimage.ifl pol1_axset.f pol1_gtang.f \
-pol1_ptang.f pol1_stftr.f
+pol1_ptang.f pol1_stftr.f pol1_blocr.f pol1_sngva.f pol1_sngct.f pol1_sngvn.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.

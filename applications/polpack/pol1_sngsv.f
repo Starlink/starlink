@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
-     :                       EPS, IGRP2, INDFO, INDFC, NITER, NSIGMA, 
-     :                       ILEVEL, HW, STATUS )
+     :                       EPS, TVAR, IGRP2, INDFO, INDFC, NITER, 
+     :                       NSIGMA, ILEVEL, HW, STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
-*                      IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, HW,
-*                      STATUS )
+*                      TVAR, IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, 
+*                      HW, STATUS )
 
 *  Description:
 *     This routine calculates Stokes vectors from a set of single-beam 
@@ -44,17 +44,10 @@
 *        input images. A check will have been made that these are
 *        available for all input images.
 *
-*        2 - Use the reciprocal of the variances supplied with the input 
-*        images. These may or may not be available. If an input image does 
-*        not have associated variances then the weights used for that image 
-*        are based on an estimate of the variances derived from the spread 
-*        of input intensity values. 
+*        2 - Use the reciprocal of estimates of the input variances. Any
+*        variances supplied with the input images are ignored.
 *
-*        3 - Use the reciprocal of an estimate of the input variance
-*        derived from the spread of input intensity values. Any variances 
-*        supplied with the input images are ignored.
-*
-*        4 - Use a constant weight of 1.0 for all input images. Any 
+*        3 - Use a constant weight of 1.0 for all input images. Any 
 *        variances supplied with the input images are ignored. 
 
 *     OUTVAR = LOGICAL (Given)
@@ -73,6 +66,8 @@
 *        The analyser transmission factor for each input NDF. 
 *     EPS( NNDF ) = REAL (Given)
 *        The analyser efficiency factor for each input NDF. 
+*     TVAR( NNDF ) = REAL (Given)
+*        Workspace to hold an estimate of the mean variance in each input NDF.
 *     IGRP2 = INTEGER (Given)
 *        A GRP identifier for a group holding the unique analyser identifiers 
 *        found in the supplied NDFs. These are text strings which identify 
@@ -129,6 +124,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PRM_PAR'          ! VAL constants
 
 *  Arguments Given:
       INTEGER IGRP1
@@ -139,6 +135,7 @@
       INTEGER ANLIND( NNDF )
       REAL T( NNDF )
       REAL EPS( NNDF )
+      REAL TVAR( NNDF )
       INTEGER IGRP2
       INTEGER INDFO
       INTEGER INDFC
@@ -159,6 +156,7 @@
       INTEGER INDF               ! NDF identifier for the current input NDF
       INTEGER INDFS              ! NDF identifier for the input section
       INTEGER IPCOUT             ! Pointer to output (co-variance) DATA array
+      INTEGER IPDCUT             ! Pointer to filtered input intensity values
       INTEGER IPDIN              ! Pointer to input DATA array
       INTEGER IPDOUT             ! Pointer to output DATA array
       INTEGER IPIE1              ! Pointer to 1st effective intensity image
@@ -171,6 +169,7 @@
       INTEGER IPMT32             ! Pointer to column 3 row 2 image
       INTEGER IPMT33             ! Pointer to column 3 row 3 image
       INTEGER IPN                ! Pointer to work array holding image counts
+      INTEGER IPVEST             ! Pointer to estimated input variances
       INTEGER IPVIN              ! Pointer to input VARIANCE array
       INTEGER IPVOUT             ! Pointer to output VARIANCE array
       INTEGER IPX2Y              ! Pointer to work array     
@@ -186,8 +185,7 @@
       INTEGER NEL                ! No. of elements in whole output NDF
       INTEGER NW                 ! No. of elements in work array
       INTEGER UBND( 3 )          ! Upper bounds of output NDF
-      LOGICAL FRDIN              ! Free the IPDIN pointer?
-      LOGICAL FRVIN              ! Free the IPVIN pointer?
+
 *.
 
 *  Check the inherited global status.
@@ -209,7 +207,7 @@
 
 *  If required map the output VARIANCE array in which to store the variances 
 *  on I, Q and U, and the DATA array of the co-variance NDF in which to
-*  store the co-variances.
+*  store the co-variances. 
       IF( OUTVAR ) THEN
          CALL NDF_MAP( INDFO, 'VARIANCE', '_REAL', 'WRITE', IPVOUT, NEL, 
      :                 STATUS )   
@@ -243,8 +241,16 @@
 *  contributing to each output pixel.
       CALL PSX_CALLOC( EL, '_REAL', IPN, STATUS )     
 
+*  We may also need an extra work array to hold the input variance estimates.
+      IF( WSCH .NE. 1 ) CALL PSX_CALLOC( EL, '_REAL', IPVEST, STATUS )     
+
+*  We also need an extra work array to hold the filtered input intensity 
+*  values (i.e a copy of an input NDF from which aberrant values have
+*  been removed).
+      CALL PSX_CALLOC( EL, '_REAL', IPDCUT, STATUS )     
+
 *  We also need extra work arrays to hold co-efficient values needed in
-*  POL1_SNGSM.
+*  when smoothing Stokes parameters in POL1_SNGSM.
       NW = ( 2*HW + 1 )**2
       CALL PSX_CALLOC( NW, '_DOUBLE', IPX4, STATUS )     
       CALL PSX_CALLOC( NW, '_DOUBLE', IPX3Y, STATUS )     
@@ -257,6 +263,11 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Indicate we have no mean variance estimates for the input NDFs yet. 
+      DO I = 1, NNDF
+         TVAR( I ) = VAL__BADR       
+      END DO
+
 *  Indicate we have not yet done any rejection iterations.
       ITER = 0
 
@@ -264,16 +275,36 @@
 *  perform another rejection iteration.
  10   CONTINUE
 
-*  Apply light spatial smoothing to the I,Q,U values calculated on the
-*  previous iteration. Each smoothed value is estimated by fitting a least
-*  squares quadratic surface to the data within a 5x5 fitting box.
-      IF( ITER .GT. 0 ) CALL POL1_SNGSM( ILEVEL, HW, DIM1, DIM2, DIM3, 
-     :                                   %VAL( IPVOUT ), %VAL( IPDOUT ), 
-     :                                   %VAL( IPCOUT ), %VAL( IPIE1 ),
-     :                                   %VAL( IPX4 ), %VAL( IPX3Y ), 
-     :                                   %VAL( IPX2Y2 ), %VAL( IPXY3 ), 
-     :                                   %VAL( IPX3 ), %VAL( IPX2Y ),
-     :                                   %VAL( IPXY2 ), STATUS )
+*  If this is not the first pass through the loop, we will have Stokes
+*  vectors in IPDOUT estimated by the previous pass. Apply light spatial 
+*  smoothing to these STokes vectors. Each smoothed value is estimated by 
+*  fitting a least squares quadratic surface to the data within a small 
+*  fitting box.
+      IF( ITER .GT. 0 ) THEN 
+         CALL POL1_SNGSM( ILEVEL, HW, DIM1, DIM2, DIM3, 
+     :                    %VAL( IPVOUT ), %VAL( IPDOUT ), 
+     :                    %VAL( IPCOUT ), %VAL( IPIE1 ),
+     :                    %VAL( IPX4 ), %VAL( IPX3Y ), 
+     :                    %VAL( IPX2Y2 ), %VAL( IPXY3 ), 
+     :                    %VAL( IPX3 ), %VAL( IPX2Y ),
+     :                    %VAL( IPXY2 ), STATUS )
+
+*  If required, update the image holding the estimated variance at each
+*  pixel with in the input images. All input images are assumed to have
+*  the same variance at any given pixel position. IPN is used as
+*  temporary work space.
+         IF( WSCH .EQ. 2 ) THEN 
+            CALL POL1_SNGVN( NNDF, IGRP1, ILEVEL, T, PHI, EPS, EL, HW,
+     :                       DIM3, %VAL( IPDOUT ), LBND, UBND, 
+     :                       %VAL( IPN ), TVAR, %VAL( IPVEST ), STATUS )
+         END IF
+
+*  On the zeroth iteration, initialise the variance estimate image to hold 
+*  1.0 at every pixel. Do not do this if variances in the input NDFs will
+*  be used.
+      ELSE IF( WSCH .NE. 1 ) THEN
+         CALL POL1_FILLR( 1.0, EL, %VAL( IPVEST ), STATUS )
+      END IF
 
 *  Calculate the effective intensities, transmittances, eficiciencies and
 *  position angles, etc. See the Sparks and Axon paper for details.
@@ -303,18 +334,34 @@
 *  Get a section from it which matches the output NDF.
          CALL NDF_SECT( INDF, 2, LBND, UBND, INDFS, STATUS ) 
 
-*  Get pointers to the intensity values and associated variance values to
-*  use for this NDF. The co-variance array is used as work space here.
-         CALL POL1_SNGFL( INDFS, ITER, WSCH, ILEVEL, T( I ), PHI( I ), 
-     :                    EPS( I ), DIM1, DIM2, DIM3, %VAL( IPDOUT ), 
-     :                    %VAL( IPCOUT ), NSIGMA, IPDIN, IPVIN, FRDIN, 
-     :                    FRVIN, STATUS )
+*  Map the data array.
+         CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'READ', IPDIN, EL, 
+     :                 STATUS )
 
-*  Abort if an error has occurred.
-         IF( STATUS .NE. SAI__OK ) GO TO 999
+*  We now need to get the variances to associate with the input 
+*  intensity values. The scheme used to do this is selected by WSCH. 
+*  If the VARIANCE values stored in the input NDF are to be used. 
+*  map the VARIANCE array.
+        IF( WSCH .EQ. 1 ) THEN
+            CALL NDF_MAP( INDFS, 'VARIANCE', '_REAL', 'READ', IPVIN, 
+     :                    EL, STATUS )
+
+*  Otherwise, use the current variance estimate image.
+         ELSE
+            IPVIN = IPVEST
+         END IF
+
+*  Reject intensity values which lie more than NSIGMA standard deviations
+*  from the intensity values implied by the current smoothed Stokes vectors. 
+*  On the zeroth iteration (when no Stokes vectors are available), all 
+*  intensity values are accepted.
+         CALL POL1_SNGCT( INDF, ILEVEL, ITER, EL, %VAL( IPDIN ), 
+     :                    %VAL( IPVIN ), T( I ), PHI( I ), EPS( I ), 
+     :                    DIM3, %VAL( IPDOUT ), NSIGMA, TVAR( I ), 
+     :                    %VAL( IPDCUT ), STATUS )
 
 *  Update the work arrays to include the effect of the current input NDF.
-         CALL POL1_SNGAD( EL, %VAL( IPDIN ), %VAL( IPVIN ), 
+         CALL POL1_SNGAD( EL, %VAL( IPDCUT ), %VAL( IPVIN ), 
      :                   PHI( I ), T( I ), EPS( I ), 
      :                   %VAL( IPIE1 ),  %VAL( IPIE2 ),  %VAL( IPIE3 ), 
      :                   %VAL( IPMT11 ), %VAL( IPMT21 ), %VAL( IPMT31 ), 
@@ -324,10 +371,6 @@
 
 *  End the NDF context.
          CALL NDF_END( STATUS )
-
-*  Annul the arrays holding the intensity values and variances if required.
-         IF( FRDIN ) CALL PSX_FREE( IPDIN, STATUS )
-         IF( FRVIN ) CALL PSX_FREE( IPVIN, STATUS )
 
       END DO
 
@@ -372,6 +415,8 @@
       CALL PSX_FREE( IPX3, STATUS )     
       CALL PSX_FREE( IPX2Y, STATUS )     
       CALL PSX_FREE( IPXY2, STATUS )     
+      IF( WSCH .NE. 1 ) CALL PSX_FREE( IPVEST, STATUS )     
+      CALL PSX_FREE( IPDCUT, STATUS )     
     
       IF( .NOT. OUTVAR ) THEN
          CALL PSX_FREE( IPVOUT, STATUS )

@@ -434,9 +434,9 @@ pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_vecky.f pol1_vecpl.f \
 pol1_vect.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f polbin.f \
 polcal.f polcent.f polexp.f polext.f polhelp.f polimp.f polka.f \
 polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f pol1_dbeam.f \
-pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f pol1_snghd.f \
-pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f pol1_hist2.f \
-pol1_sngfl.f pol1_sngsi.f pol1_sngsm.f pol1_sngvr.f pol1_blkwr.f \
+pol1_sngad.f  pol1_sngcl.f  pol1_sngbm.f pol1_snghd.f \
+pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f \
+pol1_sngsm.f pol1_blocr.f pol1_sngvn.f pol1_sngva.f pol1_sngct.f\
 polsim.f pol1_simcl.f pol1_ptvrs.f pol1_gtvrs.f pol1_prsvr.f \
 pol1_ptvrc.f pol1_gtvrc.f pol1_ptang.f pol1_gtang.f pol1_stftr.f \
 polimage.f pol1_axset.f
@@ -1492,13 +1492,9 @@ pol1_setft.o:	 SAE_PAR DAT_PAR
 pol1_sngad.o:	 SAE_PAR PRM_PAR
 pol1_sngbm.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR
 pol1_sngcl.o:	 SAE_PAR PRM_PAR
-pol1_sngfl.o:	 SAE_PAR
 pol1_snghd.o:	 SAE_PAR DAT_PAR
-pol1_sngrj.o:	 SAE_PAR PRM_PAR
-pol1_sngsi.o:	 SAE_PAR PRM_PAR
 pol1_sngsm.o:	 SAE_PAR PRM_PAR
 pol1_sngsv.o:	 SAE_PAR GRP_PAR
-pol1_sngvr.o:	 SAE_PAR
 pol1_squar.o:	 SAE_PAR PRM_PAR
 pol1_stbin.o:	 SAE_PAR
 pol1_stk.o:	 SAE_PAR

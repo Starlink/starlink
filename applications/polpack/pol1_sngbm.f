@@ -125,6 +125,7 @@
       INTEGER IPEPS              ! Pointer to analyser efficiency factors
       INTEGER IPPHI              ! Pointer to effective analyser angles
       INTEGER IPT                ! Pointer to analyser transmission factors
+      INTEGER IPTVAR             ! Pointer to input mean variance estimates
       INTEGER IWCS               ! Pointer to output WCS FramSet
       INTEGER LBNDO( 3 )         ! Lower bounds of output NDF
       INTEGER NITER              ! No. of rejection iterations to perform
@@ -148,6 +149,7 @@
       IPAID = 0
       IPT = 0
       IPEPS = 0
+      IPTVAR = 0
       IGRP2 = GRP__NOID      
 
 *  Begin an NDF context.
@@ -163,25 +165,42 @@
 *  from each one.
 *  ======================================================================
 
-*  Allocate required workspace.
+*  Allocate workspace to hold the analyser parameters from each input NDF.
       CALL PSX_CALLOC( NNDF, '_REAL', IPPHI, STATUS )
       CALL PSX_CALLOC( NNDF, '_INTEGER', IPAID, STATUS )
       CALL PSX_CALLOC( NNDF, '_REAL', IPT, STATUS )
       CALL PSX_CALLOC( NNDF, '_REAL', IPEPS, STATUS )
 
+*  Allocate workspace to estimates of mean variance in each input NDF.
+      CALL PSX_CALLOC( NNDF, '_REAL', IPTVAR, STATUS )
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999     
 
-*  Set teh dynamic default for NITER.
-      IF( WEIGHT .EQ. 1 .OR. WEIGHT .EQ. 4 ) THEN 
-         CALL PAR_DEF0I( 'NITER', 0, STATUS )
+*  Get the number of rejection iterations to perform. If constant weights
+*  are being used for all input data, no iterations can be performed since
+*  there are no estimates of the input variances.
+      IF( WEIGHT .EQ. 4 ) THEN
+         NITER = 0
+
+*  Otherwise...
       ELSE
-         CALL PAR_DEF0I( 'NITER', 6, STATUS )
-      END IF
+
+*  Set the dynamic default for NITER. This depends on the weighting scheme.
+*  Use a default of zero if variances will be obtained from the input NDFs
+*  (because its so slow to iterate), and 4 if they will be estimated from
+*  the spread of data values (since we've *GOT* to iterate to make variance
+*  estimates).
+         IF( WEIGHT .EQ. 1 ) THEN 
+            CALL PAR_DEF0I( 'NITER', 0, STATUS )
+         ELSE 
+            CALL PAR_DEF0I( 'NITER', 4, STATUS )
+         END IF
 
 *  Get the number of rejection iterations to perform.
-      CALL PAR_GET0I( 'NITER', NITER, STATUS )
-      NITER = MAX( 0, NITER )
+         CALL PAR_GET0I( 'NITER', NITER, STATUS )
+         NITER = MAX( 0, NITER )
+      END IF
 
 *  Get the required headers. This also returns the required bounds for
 *  the output NDF, a flag indicating if input variances are available
@@ -194,38 +213,39 @@
 *  Choose the weighting scheme to use, taking account of the
 *  availability of input variances. Also, estimates of input variances
 *  can only be made if we are allowed to iterate (i.e. if niter is
-*  greater than zero).
+*  greater than zero). WSCH = 1, 2, 3 corresponds to "use NDF variances", 
+*  "use estimated variances", and "use constant variances".
       IF( WEIGHT .EQ. 1 ) THEN
          IF( INVAR ) THEN
             WSCH = 1
          ELSE
-            WSCH = 4
+            WSCH = 3
          END IF
 
       ELSE IF( WEIGHT .EQ. 2 ) THEN
          IF( INVAR ) THEN
             WSCH = 1
          ELSE IF( NITER .GT. 0 ) THEN
-            WSCH = 3
+            WSCH = 2
          ELSE
-            WSCH = 4
+            WSCH = 3
          END IF
 
       ELSE IF( WEIGHT .EQ. 3 ) THEN
          IF( NITER .GT. 0 ) THEN
-            WSCH = 3
+            WSCH = 2
          ELSE
-            WSCH = 4
+            WSCH = 3
          END IF
 
       ELSE
-         WSCH = 4
+         WSCH = 3
       END IF
 
 *  Decide whether to create output variances.
       IF( IVAR .GT. 0 ) THEN
 
-         IF( WSCH .EQ. 4 .AND. STATUS .EQ. SAI__OK ) THEN
+         IF( WSCH .EQ. 3 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'POL1_SNGBM_ERR1', 'Output variances have '//
      :                    'been requested but cannot be produced. See'//
@@ -236,7 +256,7 @@
          END IF
 
       ELSE IF( IVAR .EQ. 0 ) THEN      
-         OUTVAR = ( WSCH .LT. 4 )
+         OUTVAR = ( WSCH .LT. 3 )
 
       ELSE
          OUTVAR = .FALSE.
@@ -279,8 +299,9 @@
 *  Get the WCS FrameSet for the output NDF.
       CALL KPG1_GTWCS( INDFO, IWCS, STATUS )
 
-*  Add a Frame with Domain POLANAL to the WCS FrameSet. The first axis of 
-*  this Frame defines the reference direction.
+*  Add a Frame with Domain POLANAL to the WCS FrameSet (any existing
+*  POLANAL Frameis first deleted). The first axis of this Frame defines 
+*  the reference direction.
       CALL POL1_PTANG( ANGROT, IWCS, STATUS )
 
 *  Store the modified FrameSet back in the NDF, and annul the pointer.
@@ -319,7 +340,7 @@
 
 *  Get the size of the box to use when smoothing Stokes vectors prior to 
 *  estimating input variances.
-      IF( WSCH .EQ. 3 ) THEN
+      IF( WSCH .EQ. 2 ) THEN
          CALL PAR_GET0I( 'SMBOX', SMBOX, STATUS )
          SMBOX = MAX( 0, SMBOX )
       ELSE
@@ -328,9 +349,9 @@
 
 *  Calcualte the I,Q,U values.        
       CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
-     :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
-     :                 INDFO, INDFC, NITER, NSIGMA, ILEVEL, SMBOX/2,
-     :                 STATUS )
+     :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
+     :                 %VAL( IPTVAR ), IGRP2, INDFO, INDFC, NITER, 
+     :                 NSIGMA, ILEVEL, SMBOX/2, STATUS )
 
 *  Tidy up.
 *  ========
@@ -342,6 +363,7 @@
       IF( IPAID .NE. 0 ) CALL PSX_FREE( IPAID, STATUS )
       IF( IPT .NE. 0 ) CALL PSX_FREE( IPT, STATUS )
       IF( IPEPS .NE. 0 ) CALL PSX_FREE( IPEPS, STATUS )
+      IF( IPTVAR .NE. 0 ) CALL PSX_FREE( IPTVAR, STATUS )
 
 *  Delete the group holding analyser identifiers.
       IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
