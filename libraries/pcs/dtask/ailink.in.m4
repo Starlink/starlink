@@ -123,6 +123,7 @@ ifelse(SCRIPTNAME, alink,
 #          loader specific.
 #        26-APR-2004 (NG):
 #          Generate both alink.in and ilink.in from ailink.in.m4.
+#          Do linking using dtask_libtool.
 #          
 #-
 
