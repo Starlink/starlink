@@ -19,13 +19,6 @@ extern "C" {
 #include <sae_par.h>
 #include <dtask_err.h>
 
-/* Pre-allocated space */
-
-#define FCHAR 512       /* Size of Fortran character string */
-static char str1[FCHAR];
-static char str2[FCHAR];
-
-
 /* Routine to change nulls into newline characters */
 /* Need this since the paramreq values are null separated */
 
@@ -187,23 +180,24 @@ ams_extint(status)
 
 
 void
-ams_getreply(timeout, path, messid, message_name_s, message_value_s, message_status, message_context, message_name, message_length, message_value, status)
+ams_getreply(timeout, path, messid, message_status, message_context, message_name, message_length, message_value, status)
 	int timeout	
 	int path	
 	int messid	
-	int message_name_s
-	int message_value_s
 	int message_status = NO_INIT
 	int message_context = NO_INIT
 	char * message_name = NO_INIT
 	int message_length = NO_INIT
 	char * message_value = NO_INIT
 	int status
- PROTOTYPE: $$$$$$$$$$$
+ PROTOTYPE: $$$$$$$$$
+ PREINIT:
+  char name_len[MSG_NAME_LEN];
+  char msg_len[MSG_VAL_LEN];
  CODE:
-  message_name = str1;
-  message_value = str2;
-  ams_getreply(timeout, path, messid, message_name_s, message_value_s,
+  message_name = name_len;
+  message_value = msg_len;
+  ams_getreply(timeout, path, messid, MSG_NAME_LEN, MSG_VAL_LEN,
 	       &message_status, &message_context, message_name, 
 	       &message_length, message_value, &status);
   adam_rmnull(message_value, message_length);
@@ -251,6 +245,8 @@ ams_plookup(path, name, status)
 	char * name = NO_INIT	
 	int status	
  PROTOTYPE: $$$
+ PREINIT:
+  char str1[512]; /* Not sure how big to make this so over do it */
  CODE:
   name = str1;
   ams_plookup(path, name, &status);
@@ -259,10 +255,8 @@ ams_plookup(path, name, status)
   status
 
 void
-ams_receive(timeout, message_name_s, message_value_s, message_status, message_context, message_name, message_length, message_value, path, messid, status)
+ams_receive(timeout, message_status, message_context, message_name, message_length, message_value, path, messid, status)
 	int timeout	
-	int message_name_s
-	int message_value_s
 	int message_status = NO_INIT
 	int message_context = NO_INIT
 	char * message_name = NO_INIT
@@ -271,11 +265,14 @@ ams_receive(timeout, message_name_s, message_value_s, message_status, message_co
 	int path = NO_INIT
 	int messid = NO_INIT
 	int status
- PROTOTYPE: $$$$$$$$$$$
+ PROTOTYPE: $$$$$$$$$
+ PREINIT:
+  char name_len[MSG_NAME_LEN];
+  char msg_len[MSG_VAL_LEN];
  CODE:
-  message_name = str1;
-  message_value = str2;
-  ams_receive(timeout, message_name_s, message_value_s, &message_status,
+  message_name = name_len;
+  message_value = msg_len;
+  ams_receive(timeout, MSG_NAME_LEN, MSG_VAL_LEN, &message_status,
 	      &message_context, message_name, &message_length, message_value,
 	      &path, &messid, &status);
   adam_rmnull(message_value, message_length);

@@ -1,3 +1,10 @@
+2000-05-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* ADAM.pm (adam_receive): MSG_NAME_LEN and MSG_VAL_LEN are no
+	longer arguments since the XS part knows this.
+
+	* ADAM.xs: Use MSG_NAME_LEN and MSG_VAL_LEN to determine string sizes.
+
 1999-05-20  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* ADAM.pm: Tidy up POD
