@@ -214,6 +214,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
 *     MBT: Mark Taylor (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     30-JAN-1996 (RFWS):
@@ -233,6 +234,10 @@
 *        Added astResample<X> and associated code.
 *     24-NOV-2000 (MBT):
 *        Added AST__BLOCKAVE interpolation scheme.
+*     9-JAN-2001 (DSB):
+*        Changed in and out arguments for TranN from type "double (*)[]"
+*        to "double *".
+*        
 *--
 */
 
@@ -349,7 +354,7 @@ typedef struct AstMappingVtab {
    void (* SetReport)( AstMapping *, int );
    void (* Tran1)( AstMapping *, int, const double [], int, double [] );
    void (* Tran2)( AstMapping *, int, const double [], const double [], int, double [], double [] );
-   void (* TranN)( AstMapping *, int, int, int, const double (*)[], int, int, int, double (*)[] );
+   void (* TranN)( AstMapping *, int, int, int, const double *, int, int, int, double * );
    void (* TranP)( AstMapping *, int, int, const double *[], int, int, double *[] );
 } AstMappingVtab;
 #endif
@@ -394,7 +399,7 @@ int astResampleUS_( AstMapping *, int, const int [], const int [], const unsigne
 void astInvert_( AstMapping * );
 void astTran1_( AstMapping *, int, const double [], int, double [] );
 void astTran2_( AstMapping *, int, const double [], const double [], int, double [], double [] );
-void astTranN_( AstMapping *, int, int, int, const double (*)[], int, int, int,double (*)[] );
+void astTranN_( AstMapping *, int, int, int, const double *, int, int, int, double * );
 void astTranP_( AstMapping *, int, int, const double *[], int, int, double *[] );
 
 #if defined(astCLASS)            /* Protected */

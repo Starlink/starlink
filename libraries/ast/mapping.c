@@ -63,6 +63,7 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
 *     MBT: Mark Taylor (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     1-FEB-1996 (RFWS):
@@ -94,6 +95,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     24-NOV-2000 (MBT):
 *        Fixed bug (function being invoked as wrong type) in AST__UINTERP
 *        scheme, and added new AST__BLOCKAVE scheme, in astResample<X>.
+*     9-JAN-2001 (DSB):
+*        Changed in and out arguments for TranN from type "double (*)[]"
+*        to "double *".
 *class--
 */
 
@@ -288,7 +292,7 @@ static void SincSinc( double, const double [], int, double * );
 static void SpecialBounds( const MapData *, double *, double *, double [], double [] );
 static void Tran1( AstMapping *, int, const double [], int, double [] );
 static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [] );
-static void TranN( AstMapping *, int, int, int, const double (*)[], int, int, int, double (*)[] );
+static void TranN( AstMapping *, int, int, int, const double *, int, int, int, double * );
 static void TranP( AstMapping *, int, int, const double *[], int, int, double *[] );
 static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 
@@ -10037,9 +10041,9 @@ f        The global status.
 }
 
 static void TranN( AstMapping *this, int npoint,
-                   int ncoord_in, int indim, const double (*in)[],
+                   int ncoord_in, int indim, const double *in,
                    int forward,
-                   int ncoord_out, int outdim, double (*out)[] ) {
+                   int ncoord_out, int outdim, double *out ) {
 /*
 *++
 *  Name:
@@ -10055,9 +10059,9 @@ f     AST_TRANN
 *  Synopsis:
 c     #include "mapping.h"
 c     void astTranN( AstMapping *this, int npoint,
-c                    int ncoord_in, int indim, const double (*in)[],
+c                    int ncoord_in, int indim, const double *in,
 c                    int forward,
-c                    int ncoord_out, int outdim, double (*out)[] )
+c                    int ncoord_out, int outdim, double *out )
 f     CALL AST_TRANN( THIS, NPOINT,
 f                     NCOORD_IN, INDIM, IN,
 f                     FORWARD, NCOORD_OUT, OUTDIM, OUT, STATUS )
@@ -10099,7 +10103,8 @@ c        given should not be less than "npoint".
 f        given should not be less than NPOINT.
 c     in
 f     IN( INDIM, NCOORD_IN ) = DOUBLE PRECISION (Given)
-c        A 2-dimensional array, of shape "[ncoord_in][indim]",
+c        The address of the first element in a 2-dimensional array of 
+c        shape "[ncoord_in][indim]",
 c        containing the coordinates of the input (untransformed)
 c        points. These should be stored such that the value of
 c        coordinate number "coord" for input point number "point" is
@@ -10136,7 +10141,8 @@ c        given should not be less than "npoint".
 f        given should not be less than NPOINT.
 c     out
 f     OUT( OUTDIM, NCOORD_OUT ) = DOUBLE PRECISION (Returned)
-c        A 2-dimensional array, of shape "[ncoord_out][outdim]", into
+c        The address of the first element in a 2-dimensional array of 
+c        shape "[ncoord_out][outdim]", into
 c        which the coordinates of the output (transformed) points will
 c        be written. These will be stored such that the value of
 c        coordinate number "coord" for output point number "point"
@@ -10202,13 +10208,13 @@ f     be reversed.
    the "in" array. */
       if ( astOK ) {
          for ( coord = 0; coord < ncoord_in; coord++ ) {
-            in_ptr[ coord ] = *in + coord * indim;
+            in_ptr[ coord ] = in + coord * indim;
          }
 
 /* Similarly initialise the output data pointers to point into the
    "out" array. */
          for ( coord = 0; coord < ncoord_out; coord++ ) {
-            out_ptr[ coord ] = *out + coord * outdim;
+            out_ptr[ coord ] = out + coord * outdim;
          }
 
 /* Create PointSets to describe the input and output points. */
@@ -12266,8 +12272,8 @@ void astTran2_( AstMapping *this,
                                       forward, xout, yout );
 }
 void astTranN_( AstMapping *this, int npoint,
-                int ncoord_in, int indim, const double (*in)[],
-                int forward, int ncoord_out, int outdim, double (*out)[] ) {
+                int ncoord_in, int indim, const double *in,
+                int forward, int ncoord_out, int outdim, double *out ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,TranN))( this, npoint,
                                       ncoord_in, indim, in,

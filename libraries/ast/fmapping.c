@@ -41,6 +41,9 @@
 *     22-NOV-2000 (DSB):
 *        Pass the "flags" argument by reference instead of by value in the
 *        MAKE_AST_RESAMPLE_UINTERP macro.
+*     9-JAN-2001 (DSB):
+*        Changed in and out arguments for TranN from type "double (*)[]"
+*        to "double *".
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -386,7 +389,7 @@ F77_SUBROUTINE(ast_trann)( INTEGER(THIS),
    astAt( "AST_TRANN", NULL, 0 );
    astWatchSTATUS(
       astTranN( astI2P( *THIS ), *NPOINT, *NCOORD_IN, *INDIM,
-                (const double (*)[])IN, F77_ISTRUE( *FORWARD ),
-                *NCOORD_OUT, *OUTDIM, (double (*)[]) OUT );
+                (const double *)IN, F77_ISTRUE( *FORWARD ),
+                *NCOORD_OUT, *OUTDIM, OUT );
    )
 }
