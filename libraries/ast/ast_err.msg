@@ -105,6 +105,7 @@ UK1ER           <error in user-supplied 1-d sub-pixel interpolation kernel>
 COMIN           <invalid comma in expression>
 CONIN           <invalid constant in expression>
 DUVAR           <duplicate variable name>
+INNTF           <invalid number of transformation functions>
 MIOPA           <missing or invalid operand in expression>
 MIOPR           <missing or invalid operator in expression>
 MISVN           <missing variable name>
