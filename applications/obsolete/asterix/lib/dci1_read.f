@@ -166,6 +166,7 @@
      :                   MISSION(:CHR_LEN(MISSION)), STATUS )
       END IF
       IF ( IOK ) THEN
+        CALL CHR_LDBLK( INSTRUM )
         CALL ADI_CPUT0C( OARG, 'Instrument',
      :                   INSTRUM(:CHR_LEN(INSTRUM)), STATUS )
       END IF
