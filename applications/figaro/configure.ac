@@ -33,7 +33,7 @@ dnl    declaration.
 AC_CONFIG_FILES(Makefile component.xml)
 
 dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([appsub fig fda dsa jty dta fit fla tio gen gkd par ich appcb spext fitres work util sploop fibre graph main opt twoutil unix])
+AC_CONFIG_SUBDIRS([appsub fig fda dsa jty dta fit fla tio gen gkd par ich appcb spext fitres work util sploop fibre graph main opt twoutil unix figaro1 figaro2 figaro3 figaro4 figaro5])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
