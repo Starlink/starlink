@@ -90,7 +90,7 @@ dipsosupport_DATA = ATLIST.DAT demo2.cmd LWPLO.ABS run_dipso.o user.f \
  DEMO1_STK.sdf NEBCONT.DAT updates.lis
 
 ## Data files for etc/dipso.
-staretc_DATA = specdat/*
+staretc_DATA = specdat/*.*
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
