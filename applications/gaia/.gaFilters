@@ -1,0 +1,24 @@
+Filter 1 $env(KAPPA_DIR)/block \
+  "in=$indata box=[3,3] out=$outdata accept" \
+   1 smooth_ "Block smooth 3 by 3 (replace)"
+
+Filter 0 $env(KAPPA_DIR)/block \
+  "in=$indata box=[3,3] out=$outdata accept" \
+   1 smooth_ "Block smooth 3 by 3 (keep)"
+
+Filter 1 $env(KAPPA_DIR)/block \
+  "in=$indata box=[5,5] out=$outdata accept" \
+   1 smooth_ "Block smooth 5 by 5 (replace)"
+
+Filter 0 $env(KAPPA_DIR)/block \
+  "in=$indata box=[5,5] out=$outdata accept" \
+   1 smooth_ "Block smooth 5 by 5 (keep)"
+
+Filter 1 $env(KAPPA_DIR)/block \
+  "in=$indata box=[11,11] out=$outdata accept" \
+   1 smooth_ "Block smooth 11 by 11 (replace)"
+
+Filter 0 $env(KAPPA_DIR)/block \
+  "in=$indata box=[11,11] out=$outdata accept" \
+   1 smooth_ "Block smooth 11 by 11 (keep)"
+

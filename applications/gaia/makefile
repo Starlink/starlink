@@ -417,7 +417,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_skycat.tar \
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = gaia.csh gaiadisp.csh
+PUBLIC_SCRIPTS = gaia.csh gaiadisp.csh .gaFilters
 
 #  List of IRAF script files. These will be installed in
 #  $(INSTALL_BIN_IRAF). This also includes any other miscellaneous
