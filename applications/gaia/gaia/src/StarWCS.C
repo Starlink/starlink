@@ -184,12 +184,17 @@ StarWCS::StarWCS( const char *header, const int lheader )
                 }
             }
 
-	    //astSet(fitschan, "CarLin=1" );
+            //  CAR projections are sometimes incorrect and what is
+            //  required in a linear transformation. Make this the
+            //  default until someone complains that they want the
+            //  proper behaviour (will need to be parameterised at
+            //  that time).
+	    astSet( fitschan, "CarLin=1" );
 
             //  Establish which error conditions we'd like to see mentioned
             //  in the ASTWARN cards. These should be shown to the user when
             //  convenient.
-            astSet(fitschan, "Warnings=%s", astGetC(fitschan, "AllWarnings"));
+            astSet( fitschan, "Warnings=%s", astGetC(fitschan, "AllWarnings"));
 
             // Now try to read in the FITS headers to create a frameset
             // (this contains frames for the image pixels and how to map
