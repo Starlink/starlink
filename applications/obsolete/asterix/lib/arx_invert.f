@@ -101,7 +101,7 @@
       REAL X1,X2,Y1,Y2,R1,R2
       REAL XW1,XW2,YW1,YW2,XR1,XR2,YR1,YR2,A1,A2
       INTEGER IL,NL
-      INTEGER C1,C2
+      INTEGER C1,C2,IC
       INTEGER NCIRC,NELL,NBOX,NAND,NNOT
 *-
 
@@ -137,6 +137,11 @@
           SHAPE='CIRCLE'
           C1=INDEX(TEXT,'(')
           C2=INDEX(TEXT(C1:),')')
+          DO IC=C1,C2
+            IF (TEXT(IC:IC).EQ.',') THEN
+              TEXT(IC:IC)=' '
+            ENDIF
+          ENDDO
           READ(TEXT(C1+1:C2-1),*) PAR(1),PAR(2),PAR(3)
 
 	print *,par(1),par(2),par(3)
