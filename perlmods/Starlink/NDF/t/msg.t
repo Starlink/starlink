@@ -79,6 +79,11 @@ my %tokfmt = (
 	   l => '  1',
 	  );
 
+# On digital unix the formatting of a logical with I3
+# actually returns ' -1' rather than '  1'
+$tokans{l} = ' -1' if $^O eq 'dec_osf';
+
+
 foreach my $tok (keys %tokens) {
   eval "msg_fmt$tok('$tok', '$tokfmt{$tok}','$tokens{$tok}');";
   die "Error processing msg_fmt$tok : $@" if $@;
