@@ -45,6 +45,9 @@
 *  History:
 *     11-AUG-1998 (DSB):
 *        Original version.
+*     20-SEP-2000 (DSB):
+*        If AST_GRID or AST_BORDER fails, suggest that the user changes
+*        current co-ordinate Frame.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -148,15 +151,22 @@
       CALL KPG1_ASSIM( IPLOT, STATUS )
 
 *  Draw the grid or border within a PGPLOT buffering context.
-      CALL PGBBUF
+      IF( STATUS .EQ. SAI__OK ) THEN 
+         CALL PGBBUF
 
-      IF( GRID ) THEN
-         CALL AST_GRID( IPLOT, STATUS )
-      ELSE
-         BOX = AST_BORDER( IPLOT, STATUS )
+         IF( GRID ) THEN
+            CALL AST_GRID( IPLOT, STATUS )
+         ELSE
+            BOX = AST_BORDER( IPLOT, STATUS )
+         END IF
+
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'KPG1_ASGRD_ERR1', 'Use WCCFRAME to change '//
+     :                    'the current co-ordinate Frame in the data,'//
+     :                    ' and try again.', STATUS )
+         END IF 
+         CALL PGEBUF
       END IF
-
-      CALL PGEBUF
 
 *  Remove the Current Frame added by KPG1_ASSIM and re-instate the original 
 *  Current Frame.
