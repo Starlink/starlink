@@ -11,6 +11,7 @@
 # and defaults to .
 
 srcdir=.
+ln_s=@LN_S@
 
 # Command line contains optional target directory
 if test -n "$1"; then
@@ -18,5 +19,22 @@ if test -n "$1"; then
 fi
 
 cp @datadir@/starconf.m4 $srcdir/acinclude.m4
+
+if test ! -e componentlist.dtd; then
+    # ln_s must create links only in the current directory
+    # -- see autoconf docs for AC_PROG_LN_S
+    (cd $srcdir; \
+        $ln_s @datadir@/componentlist.dtd componentlist.dtd)
+fi
+if test ! -e component.xml; then
+    echo "$0: no file component.xml found.  Stub file created"
+cat >>component.xml <<\_EOF
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentlist.dtd">
+
+<component id="">
+</component>
+_EOF
+fi
 
 exit 0
