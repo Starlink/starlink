@@ -70,7 +70,6 @@ jars:
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
 
@@ -93,20 +92,22 @@ prepare:
 build:
 
 jars:
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/jasper-compiler.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/jasper-runtime.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jmx.jar
 
 webstart:
 
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jetty-4.0.4.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/jetty/jetty-4.0.4.tar
-     [gzip] Building: /apps/cvsbuild/export/jetty-4.0.4.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jetty-4.0.4.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/jetty/jetty-4.0.4.tar
+      [zip] Building zip: /apps/cvsbuild/export/jetty-5.1.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jetty/jetty-5.1.1.tar
+     [gzip] Building: /apps/cvsbuild/export/jetty-5.1.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jetty-5.1.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jetty/jetty-5.1.1.tar
      [echo] Executing AGLIB target: export
 
 export:
@@ -139,4 +140,4 @@ BUILD FAILED
 /apps/cvsbuild/java/source/aglib/build.xml:271: The following error occurred while executing this line:
 /apps/cvsbuild/java/source/aglib/build.xml:327: /apps/cvsbuild/java/source/aglib/docs not found.
 
-Total time: 2 minutes 59 seconds
+Total time: 3 minutes 5 seconds

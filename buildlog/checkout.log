@@ -5322,9 +5322,6 @@ U java/source/axis/src/lib/commons-discovery.jar
 U java/source/axis/src/lib/commons-logging.LICENSE
 U java/source/axis/src/lib/commons-logging.jar
 U java/source/axis/src/lib/jaxrpc.jar
-U java/source/axis/src/lib/log4j-1.2.8.LICENSE
-U java/source/axis/src/lib/log4j-1.2.8.jar
-U java/source/axis/src/lib/log4j.properties
 U java/source/axis/src/lib/saaj.jar
 U java/source/axis/src/lib/server-config.wsdd
 U java/source/axis/src/lib/wsdl4j.LICENSE
@@ -7072,7 +7069,6 @@ U java/source/frog/src/main/uk/ac/starlink/frog/util/deploy.wsdd
 U java/source/frog/src/main/uk/ac/starlink/frog/util/package.html
 cvs checkout: Updating java/source/frog/src/script
 U java/source/frog/src/script/runFROG
-U java/source/frog/src/script/starjava
 cvs checkout: Updating java/source/frog/src/testcases
 cvs checkout: Updating java/source/frog/test
 U java/source/frog/test/681+690.txt
@@ -7707,9 +7703,11 @@ cvs checkout: Updating java/source/jetty/lib
 cvs checkout: Updating java/source/jetty/lib/jetty
 cvs checkout: Updating java/source/jetty/src
 cvs checkout: Updating java/source/jetty/src/lib
+U java/source/jetty/src/lib/jasper-compiler.jar
+U java/source/jetty/src/lib/jasper-runtime.jar
 U java/source/jetty/src/lib/javax.servlet.jar
-U java/source/jetty/src/lib/org.apache.jasper.jar
 U java/source/jetty/src/lib/org.mortbay.jetty.jar
+U java/source/jetty/src/lib/org.mortbay.jmx.jar
 cvs checkout: Updating java/source/jniast
 U java/source/jniast/.properties
 U java/source/jniast/README
@@ -8079,7 +8077,6 @@ U java/source/jsky/src/lib/jel.jar
 U java/source/jsky/src/lib/jfreechart.README
 U java/source/jsky/src/lib/jfreechart.jar
 U java/source/jsky/src/lib/jfreechart.jar.ori
-U java/source/jsky/src/lib/log4j.jar
 cvs checkout: Updating java/source/jsky/src/main
 cvs checkout: Updating java/source/jsky/src/main/jsky
 cvs checkout: Updating java/source/jsky/src/main/jsky/app
@@ -8952,7 +8949,6 @@ U java/source/soapserver/src/main/uk/ac/starlink/soap/AppAxisServerFactory.java
 U java/source/soapserver/src/main/uk/ac/starlink/soap/AppEngineConfigurationFactory.java
 U java/source/soapserver/src/main/uk/ac/starlink/soap/AppFileProvider.java
 U java/source/soapserver/src/main/uk/ac/starlink/soap/AppHttpSOAPServer.java
-U java/source/soapserver/src/main/uk/ac/starlink/soap/AppLogSink.java
 U java/source/soapserver/src/main/uk/ac/starlink/soap/jetty.xml
 cvs checkout: Updating java/source/soapserver/src/main/uk/ac/starlink/soap/util
 U java/source/soapserver/src/main/uk/ac/starlink/soap/util/RemoteUtilities.java

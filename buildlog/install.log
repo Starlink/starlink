@@ -66,7 +66,6 @@ jars:
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
 
@@ -77,7 +76,7 @@ dist:
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/axis
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/axis
-[loggedcopy] Copying 16 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 13 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1921 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Jetty target: install
 
@@ -87,9 +86,11 @@ build:
 
 jars:
       [jar] Updating jar: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/jasper-compiler.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/jasper-runtime.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jmx.jar
 
 webstart:
 
@@ -98,7 +99,7 @@ dist:
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/jetty
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/jetty
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
      [echo] Executing AGLIB target: install
 
@@ -602,7 +603,6 @@ jars:
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jel.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jfreechart.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/log4j.jar
 
 javadoc_check:
 
@@ -619,7 +619,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/jsky
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/jsky
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 9 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 8 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 434 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copied 53 empty directories to 17 empty directories under /apps/cvsbuild/starjava/docs
      [echo] Executing Pal target: install
@@ -936,7 +936,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Dec 15, 2004 5:19:59 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Dec 16, 2004 5:19:50 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] INFO: java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
   [javadoc] java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
   [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:146)
@@ -962,7 +962,7 @@ docs:
   [javadoc] 	at java.lang.System.loadLibrary(System.java:832)
   [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:111)
   [javadoc] 	... 16 more
-  [javadoc] Dec 15, 2004 5:19:59 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Dec 16, 2004 5:19:50 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST load failed - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -1144,7 +1144,7 @@ webstart:
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/frog/bin/frog
     [mkdir] Created dir: /apps/cvsbuild/java/source/frog/etc/frog
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/bin/frog
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/frog/bin/frog
      [copy] Copying 30 files to /apps/cvsbuild/java/source/frog/docs/frog
      [copy] Copied 2 empty directories to 1 empty directory under /apps/cvsbuild/java/source/frog/docs/frog
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
@@ -1154,11 +1154,11 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/frog
     [mkdir] Created dir: /apps/cvsbuild/starjava/etc/frog
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/frog
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 151 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copied 19 empty directories to 2 empty directories under /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 51 seconds
+Total time: 5 minutes 37 seconds

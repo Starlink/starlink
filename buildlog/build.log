@@ -26,13 +26,13 @@ build:
 prepare:
 
 build:
-     [copy] Copying 15 files to /apps/cvsbuild/java/source/axis/lib/axis
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/axis/lib/axis
      [echo] Executing Jetty target: build
 
 prepare:
 
 build:
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/jetty/lib/jetty
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/jetty/lib/jetty
      [echo] Executing AGLIB target: build
 
 prepare:
@@ -233,7 +233,6 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astrogrid/build/classes
     [javac] Compiling 8 source files to /apps/cvsbuild/java/source/astrogrid/build/classes
-     [copy] Copying 8 files to /apps/cvsbuild/java/source/astrogrid/build/classes
      [echo] Executing JSky target: build
 
 prepare:
@@ -244,7 +243,7 @@ build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/build/classes
     [javac] Compiling 332 source files to /apps/cvsbuild/java/source/jsky/build/classes
      [copy] Copying 185 files to /apps/cvsbuild/java/source/jsky/build/classes
-     [copy] Copying 8 files to /apps/cvsbuild/java/source/jsky/lib/jsky
+     [copy] Copying 7 files to /apps/cvsbuild/java/source/jsky/lib/jsky
      [echo] Executing Pal target: build
 
 prepare:
@@ -281,7 +280,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/build/classes
-    [javac] Compiling 6 source files to /apps/cvsbuild/java/source/soapserver/build/classes
+    [javac] Compiling 5 source files to /apps/cvsbuild/java/source/soapserver/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/soapserver/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/lib/soapserver
      [echo] Executing JPCS target: build

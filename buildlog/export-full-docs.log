@@ -235,11 +235,11 @@ javadoc-sources:
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
   [javadoc] This sentence is different from what will be interpreted as the first sentence in the
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] next major release (when that interpretation will be internationalized), which is:
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g. a frame or an applet)."
@@ -802,7 +802,6 @@ javadoc-sources:
   [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharactersListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
@@ -1484,7 +1483,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 577 warnings
+  [javadoc] 576 warnings
 
 install:
 
@@ -1541,7 +1540,6 @@ jars:
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
 
@@ -1550,7 +1548,7 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 16 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 13 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1921 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Jetty target: install
 
@@ -1559,16 +1557,18 @@ prepare:
 build:
 
 jars:
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/jasper-compiler.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/jasper-runtime.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jmx.jar
 
 webstart:
 
 dist:
 
 install:
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
      [echo] Executing AGLIB target: install
 
@@ -2010,7 +2010,6 @@ jars:
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jel.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jfreechart.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/log4j.jar
 
 javadoc_check:
 
@@ -2022,7 +2021,7 @@ dist:
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 9 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 8 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 434 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Pal target: install
 
@@ -2292,7 +2291,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
@@ -2419,7 +2417,7 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 151 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
@@ -2428,4 +2426,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 41 seconds
+Total time: 7 minutes 31 seconds

@@ -58,7 +58,6 @@ jars:
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
 
@@ -67,7 +66,7 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 16 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 13 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1921 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Jetty target: install
 
@@ -76,16 +75,18 @@ prepare:
 build:
 
 jars:
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/jasper-compiler.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/jasper-runtime.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jmx.jar
 
 webstart:
 
 dist:
 
 install:
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
      [echo] Executing AGLIB target: install
 
@@ -527,7 +528,6 @@ jars:
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jel.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jfreechart.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/log4j.jar
 
 javadoc_check:
 
@@ -539,7 +539,7 @@ dist:
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 9 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 8 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 434 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Pal target: install
 
@@ -935,7 +935,7 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 151 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
