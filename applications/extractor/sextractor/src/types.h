@@ -379,7 +379,7 @@ typedef struct
   char		back_name[MAXCHAR];			/* bkgnd filename */
   backenum	back_type[2];				/* bkgnd type */
   int		nback_type;				/* nb of params */
-  int		back_val[2];				/* user-def. bkg */
+  double        back_val[2];				/* user-def. bkg PWD: modification here*/
   int		nback_val;				/* nb of params */
   int		backsize[2];				/* bkgnd mesh size */
   int		nbacksize;				/* nb of params */

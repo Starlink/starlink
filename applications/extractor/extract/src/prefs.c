@@ -14,6 +14,9 @@
 *                       25/11/98 (PWD):
 *                          Modified to accept an environment variable
 *                          as part of configuration file name.
+*                       26/05/99 (PWD):
+*                          Added copy of back_val when only one value
+*                          is given.
 *	Last modify:	19/11/98 (EB):
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -426,8 +429,10 @@ void	useprefs()
     prefs.backsize[1] = prefs.backsize[0];
   if (prefs.nbackfsize<2)
     prefs.backfsize[1] = prefs.backfsize[0];
-  if (prefs.nback_type<2)
+  if (prefs.nback_type<2) {
     prefs.back_type[1] = prefs.back_type[0];
+    prefs.back_val[1] = prefs.back_val[0]; /* PWD: change here */
+  }
 
 /*------------------------------ FLAG-images -------------------------------*/
   prefs.nimaisoflag = (prefs.imaflag_size > prefs.imanflag_size) ?

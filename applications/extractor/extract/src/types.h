@@ -12,6 +12,8 @@
 *	Last modify:	11/08/98
 *                       28/10/98 (AJC)
 *                         Add NDF bit to picstruct
+*                       26/05/99 (PWD):
+*                         Modified back_val[2] to double. Was set to int.
 *	Last modify:	20/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -390,7 +392,7 @@ typedef struct
   char		back_name[MAXCHAR];			/* bkgnd filename */
   backenum	back_type[2];				/* bkgnd type */
   int		nback_type;				/* nb of params */
-  int		back_val[2];				/* user-def. bkg */
+  double	back_val[2];				/* user-def. bkg PWD: changed to double*/
   int		nback_val;				/* nb of params */
   int		backsize[2];				/* bkgnd mesh size */
   int		nbacksize;				/* nb of params */
