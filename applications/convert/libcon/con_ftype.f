@@ -99,7 +99,6 @@
 
 *  Local Variables:
       INTEGER DCARD              ! Header card number of BLANK
-      INTEGER N                  ! Loop counter
       INTEGER NKC                ! Number of the header card containing
                                  ! the requested FITS keyword
 
