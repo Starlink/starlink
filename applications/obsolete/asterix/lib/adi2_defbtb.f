@@ -32,8 +32,8 @@
 *        Types of the table fields
 *     UNITS[] = CHARACTER*(*) (given)
 *        Units of the table fields
-*     VARIDAT = LOGICAL (given)
-*        Table contains variable length items?
+*     VARIDAT = INTEGER (given)
+*        Number of variable length data bytes
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -144,10 +144,9 @@
       CALL FTRDEF( LUN, FSTAT )
       IF ( FSTAT .EQ. 0 ) THEN
         CALL ADI_CPUT0L( HID, '.DEF_START', .TRUE., STATUS )
-        CALL ADI_CPUT0L( HID, '.DEF_END', (.NOT. VARIDAT), STATUS )
+        CALL ADI_CPUT0L( HID, '.DEF_END', (VARIDAT.EQ.0), STATUS )
       ELSE
         CALL ADI2_FITERP( FSTAT, STATUS )
-
       END IF
 
 *  Free the buffer
