@@ -15,27 +15,27 @@
 <!element (example|code|em) - - (#pcdata)>
 
 <!attlist dtddescription
-    elementlist	-- DTD marked up with elementlist.dtd --
-	entity #required
-    prefix	-- prefix to disambiguate element cross-references --
-	cdata #required
+	docelem		-- Name of the document element of the DTD
+			   this describes.  This must match the
+			   document element of the dtdelementlist
+			   document which invokes this.  --
+		cdata #required
     >
 <!attlist element
-    gi		-- GI of this element --
-	id #required
+	gi		-- GI of this element --
+		id #required
     >
 <!attlist attribute
-    name	-- attribute name --
-	cdata #required
+	name		-- attribute name --
+		cdata #required
     >
 <!attlist elemref
-    gi		-- GI of element we're referring to --
-	idref #required
-    self	-- if present, then we're referring to the same
-		   element we're documenting.  Format the element name
-		   as usual, but don't include any sort of link. --
-	(self)
-	#implied
+	gi		-- GI of element we're referring to --
+		idref #required
+	self		-- if present, then we're referring to the same
+			   element we're documenting.  Format the element name
+			   as usual, but don't include any sort of link. --
+		(self)	#implied
     >
 
 <!entity amp cdata '&'>
