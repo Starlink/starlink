@@ -94,11 +94,11 @@
          CCDAnimateBitmap $itk_component(animation) [ scope Tickerbitmap ] 8
 
 #  Save the current cursors for all application windows.
-         savecursors .
+         savecursors $master
 
 #  Set the cursor busy for this window and all application windows.
-         configure -cursor $busycursor
-         foreach win [ winfo children . ] {
+         $master configure -cursor $busycursor
+         foreach win "$master" {
             $win configure -cursor $busycursor
          }
 
