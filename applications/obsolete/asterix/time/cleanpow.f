@@ -1,5 +1,5 @@
-*+CLEANPOW  -  Power spectrum program using a CLEAN algorithm.
-      SUBROUTINE CLEANPOW(STATUS)
+*+  CLEANPOW - Power spectrum program using a CLEAN algorithm.
+      SUBROUTINE CLEANPOW( STATUS )
 *    Description :
 *       Given a timeseries the program calculates a periodogram,
 *       for a given timeseries and CLEANs it.
@@ -65,7 +65,7 @@
       INTEGER MAXITE                     ! Max no. of iterations to try
       INTEGER KNUM,KSPEC                 ! Used in calc'ing no. of freq. els.
       INTEGER NPOI                       ! No of frequencies
-      INTEGER LOOP, LOOP2, FILFLG
+      INTEGER FILFLG
       INTEGER LGXFL,LGYFL                ! Log X and Y ?
       INTEGER SMOOTH                     ! Smooth type (0=gaussian)
 *
@@ -73,13 +73,13 @@
       LOGICAL AVSUB                      ! Subtract the mean first ?
       LOGICAL LCHANGE                    ! Change any properties ?
 
-      CHARACTER       FILE1*30, FILE2*30, CHAINT(0:9),
+      CHARACTER       FILE1*30, CHAINT(0:9),
      &                TITLE*80, XAXIS*72, YAXIS*72, ZAXIS*72,
      &                FILTIT*6
 
       INTEGER			IFID, OFID		! Dataset identifiers
 
-      DOUBLEPRECISION GAIN, FREINT,  A
+      DOUBLEPRECISION GAIN
 
       REAL CLNLIM                              ! Noise limit to clean to.
       REAL AMINFR,AMAXFR                       ! Min and max freqs.
@@ -88,19 +88,11 @@
       REAL XMIN,XMAX,YMIN,YMAX,ZMIN,ZMAX       ! Plotting limits
       REAL VAR0                                ! Extra weight component
       REAL            TIMRES, TIMDIF, TMAX, TMIN,
-     &                RPOI, RMIN,
-     &                ACRES,
-     &                POWMAX(NBIN), POWMIN(NBIN), SUMBIN(NBIN),
-     &                FREMAX(NBIN), FREMIN(NBIN), AVEFRE(NBIN),
-     &                VARBIN(NBIN), BINXWD, MINFRX,
-     &                HPBW, HPBWR, NPHPBW, TWOMOM, FORMOM, FREDIF
-
-      DOUBLEPRECISION
-     &                TAVE1, WSUM1, TAVE2, WSUM2
+     &                HPBW, HPBWR, NPHPBW, TWOMOM, FORMOM
 
       INTEGER         NOPRT,  LGFXL, LGFYL
 *
-      REAL            MAXFR, MINFR, FREST
+      REAL			FREST
 *
 *    Local data :
       DATA CHAINT/'0','1','2','3','4','5','6','7','8','9'/
