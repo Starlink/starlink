@@ -20,7 +20,12 @@ fi
 d2bpath=$1
 infile=$2
 
-KPW=`which kpsewhich`
+# Check that kpsewhich is in the path.  Can't reliably use `which' here.
+for d in `echo $PATH|sed 's/:/ /'`;do 
+    if test -f $d/kpsewhich -a -z "$KPW"; then
+	KPW=$d/kpsewhich
+    fi
+done
 
 if [ -z "$KPW" ]; then
     echo "Couldn't find kpsewhich!"
@@ -96,7 +101,7 @@ else
 	    awk '/^Qf/{printf "%s.%spk",$2,$3}'`
 	echo
 	echo "Looking for font $fontname..."
-	fontnamepath=`$KPW $fontname`
+	fontnamepath=`$KPW pk $fontname`
 	if [ -n "$fontnamepath" ]; then
 	    echo
 	    echo "Found font $fontname in"
