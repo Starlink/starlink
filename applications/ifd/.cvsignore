@@ -1,3 +1,9 @@
+ifd2iraf
+ifd2irafifl
+ifd2star
+ifd_irafhlpgen
+ifl2ifd
+ssn68.ps
 *.lo
 *.la
 Makefile
