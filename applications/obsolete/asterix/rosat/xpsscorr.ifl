@@ -2,7 +2,7 @@
 
      PARAMETER INP
                POSITION 1
-               TYPE    '_UNIV'
+               TYPE    '_CHAR'
                PROMPT  'Input dataset name'
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION '<->GLOBAL.SSDS'
@@ -11,7 +11,7 @@
             ENDPARAMETER
 
      PARAMETER AUX
-               TYPE    'UNIV'
+               TYPE    '_CHAR'
                PROMPT  'Dataset which was searched to produce source list'
                VPATH   'PROMPT'
                HELP 'Enter dataset name without an extension'
