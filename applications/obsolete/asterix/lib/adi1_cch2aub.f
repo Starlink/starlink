@@ -176,6 +176,8 @@
       END IF
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_CCH2AUB', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'ADI1_CCH2AUB', STATUS )
+      END IF
 
       END
