@@ -225,6 +225,8 @@
 #        Linux support added.
 #     10-OCT-2000 (MBT):
 #        Added LDFLAGS.
+#     19-DEC-2001 (MBT):
+#        Added support for trouble with Tru64 fortran compiler versions.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -238,6 +240,7 @@
       export CFLAGS
       export FC
       export FFLAGS
+      export FLINK
       export LDFLAGS
       export LINK
       export SOURCE_VARIANT
@@ -269,8 +272,9 @@
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -I. -O -std1'
-               FC='f77 -old_f77'
-               FFLAGS='-assume backslash -O'
+               FC='f77 -old_f77 -assume backslash'
+               FFLAGS='-O'
+               FLINK='f77'
                LDFLAGS=' -nofor_main -oldstyle_liblookup -ljpeg'
                LINK='ln -s'
                RANLIB='ranlib'
@@ -290,6 +294,7 @@
                CFLAGS='-I$(STAR_INC) -I. -O'
                FC='f77'
                FFLAGS='-O'
+               FLINK='f77'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -307,6 +312,7 @@
                CFLAGS='-I$(STAR_INC) -I. -O'
                FC='f77'
                FFLAGS='-O'
+               FLINK='f77'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -322,6 +328,7 @@
                CFLAGS='-I$(STAR_INC) -I. -O'
                FC='f77'
                FFLAGS='-O'
+               FLINK='f77'
                LDFLAGS=' -lX -ljpeg -lsocket -lnsl -ldl'
                LINK='ln -s'
                TAR_IN='tar -cvhf'
@@ -340,6 +347,7 @@
                CFLAGS='-I$(STAR_INC) -I. -O'
                FC='g77'
 	       FFLAGS='-O -fno-second-underscore'
+               FLINK='g77'
                LDFLAGS=' -ldl -ljpeg'
                LINK='ln -s'
                RANLIB='ranlib'
