@@ -19,7 +19,8 @@ then generates an HTML file
   (make sequence
     (if stream-output			; no info if output to stdout
 	(empty-sosofo)
-	(let ((extlist (if %link-extension-list%
+	(let ((extlist (if (and %link-extension-list%
+				(not suppress-printable))
 			   (apply string-append
 				  (map (lambda (l)
 					 (string-append (car l) " "))
