@@ -117,7 +117,7 @@
       CALL ADI1_GETLOC( ARGS(2), TLOC, STATUS )
 
 *  Create reference name
-      CALL FRI1_NAME( ARGS(3), 'REF', CNAM, STATUS )
+      CALL FSI1_NAME( ARGS(3), 'REF', CNAM, STATUS )
 
 *  Reference exists?
       CALL DAT_THERE( TLOC, CNAM, THERE, STATUS )

@@ -117,7 +117,7 @@
       OARG = ADI__NULLID
       CALL DAT_THERE( TLOC, CNAM, THERE, STATUS )
       IF ( THERE ) THEN
-        CALL ADI_CCH2AI( TLOC, CNAM, OARG, ' ', STATUS )
+        CALL ADI1_CCH2AI( TLOC, CNAM, OARG, ' ', STATUS )
       END IF
 
 *  Report any errors

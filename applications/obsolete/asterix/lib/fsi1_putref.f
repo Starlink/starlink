@@ -112,7 +112,7 @@
       CALL ADI1_GETLOC( ARGS(2), TLOC, STATUS )
 
 *  Create reference name
-      CALL FRI1_NAME( ARGS(3), 'REF', CNAM, STATUS )
+      CALL FSI1_NAME( ARGS(3), 'REF', CNAM, STATUS )
 
 *  Create reference
       CALL FRI1_PUT1( TLOC, CNAM, ARGS(4), STATUS )

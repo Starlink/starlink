@@ -229,6 +229,7 @@
       CHARACTER*132		FILE,PATH		! ADI path info
       CHARACTER*20		TYPE			! ADI type of arg(3)
 
+      INTEGER			FILID			! File identifier
       INTEGER			NLEV			! Path info
 
       LOGICAL			DER			! Object derivation ok?
@@ -275,8 +276,8 @@
       ELSE
 
 *    Check derived
-        CALL ADI_DERVD( REFID, 'FileObject', DER, STATUS )
-        IF ( DER ) THEN
+        CALL ADI_GETFILE( REFID, FILID, STATUS )
+        IF ( FILID .NE. ADI__NULLID ) THEN
 
 *      Extract full path to object
           CALL ADI_FTRACE( REFID, NLEV, PATH, FILE, STATUS )
