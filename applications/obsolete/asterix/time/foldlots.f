@@ -70,6 +70,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
