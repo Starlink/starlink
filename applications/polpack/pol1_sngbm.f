@@ -183,11 +183,12 @@
       NITER = MAX( 0, NITER )
 
 *  Get the required headers. This also returns the required bounds for
-*  the output NDF, and a flag indicating if input variances are available
-*  in all input NDFs.
-      CALL POL1_SNGHD( IGRP1, NNDF, INVAR, %VAL( IPPHI ), %VAL( IPAID ), 
-     :                 %VAL( IPT ), %VAL( IPEPS ), IGRP2, LBNDO, UBNDO, 
-     :                 STATUS )
+*  the output NDF, a flag indicating if input variances are available
+*  in all input NDFs, and the orientation of the required reference
+*  direction for the Stokes parameters.
+      CALL POL1_SNGHD( IGRP1, NNDF, INVAR, %VAL( IPPHI ), 
+     :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
+     :                 LBNDO, UBNDO, ANGROT, STATUS )
 
 *  Choose the weighting scheme to use, taking account of the
 *  availability of input variances. Also, estimates of input variances
@@ -274,6 +275,9 @@
 *  Store the current POLPACK version string in the POLPACK extension.
       CALL POL1_PTVRS( INDFO, STATUS )
 
+*  Store the ANGROT value.
+      CALL NDF_XPT0R( ANGROT, INDFO, 'POLPACK', 'ANGROT', STATUS ) 
+
 *  Store the STOKES value which indicates what each plane of the cube
 *  contains.
       CALL NDF_XPT0C( 'IQU', INDFO, 'POLPACK', 'STOKES', STATUS ) 
@@ -318,7 +322,7 @@
       CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
      :                 INDFO, INDFC, NITER, NSIGMA, ILEVEL, SMBOX/2,
-     :                 ANGROT, STATUS )
+     :                 STATUS )
 
 *  Tidy up.
 *  ========
