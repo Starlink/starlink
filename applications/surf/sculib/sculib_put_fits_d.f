@@ -30,9 +30,14 @@
 *    Bugs :
 *    Authors :
 *     J.Lightfoot (jfl@roe.ac.uk)
+*     T.Jenness (timj@jach.hawaii.edu)
 *    History :
 *     $Id$
 *     15-AUG-1995: original version
+*     18-DEC-1998 (TIMJ)
+*       Convert n.nnDee to n.nnEee (eg 1.5D-6 to 1.5E-6)
+*       This is because the AST FITS reader can not understand
+*       numbers containing D)
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -56,6 +61,7 @@
 *    Local variables :
       INTEGER CPTR                         ! index of start of comment
       INTEGER NCHAR                        ! length of encoded number
+      INTEGER IPOSN                        ! Position in string
       CHARACTER*32 STEMP                   ! scratch string
 *    Internal References :
 *    Local data :
@@ -87,6 +93,15 @@
          FITS (N_FITS) = NAME
          FITS (N_FITS)(9:9) = '='
          CALL CHR_DTOC (VALUE, STEMP, NCHAR)
+
+*     Check for a 'D' in STEMP (since some FITS readers (eg AST)
+*     do not understand 1.5D-6 and want 1.5E-6)
+         IPOSN = NCHAR
+         CALL CHR_FIND(STEMP, 'D', .FALSE., IPOSN)
+         IF (IPOSN .NE. 0) STEMP(IPOSN:IPOSN) = 'E'
+
+*     Now construct the FITS card
+
          IF (NCHAR .LE. 20) THEN
             FITS (N_FITS)(31-NCHAR:30) = STEMP
             CPTR = 32
