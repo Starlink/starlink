@@ -1,10 +1,10 @@
-      SUBROUTINE REDS_CHGQUAL (STATUS)
+      SUBROUTINE SURF_CHGQUAL (STATUS)
 *+
 *  Name:
 *     CHANGE_QUALITY
 
 *  Purpose:
-*     Routine to set SCUBA data quality bad or good.
+*     Set SCUBA data quality bad or good.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,79 +13,94 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_CHGQUAL( STATUS )
+*     CALL SURF_CHGQUAL( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
  
 *  Description:
-*     This application is used to set SCUBA data quality bad or good.
-*        The application will read from parameter IN the specification
-*     of the data whose quality are to be modified. The specification must
-*     have the format:-
+*     This application is used to set SCUBA data quality bad or good by
+*     using SCUBA sections to specify a subset of the full data.
 *
-*         ndf{data-spec}
-*
-*     where <ndf> is the name of the ndf holding the data and the 
-*     <data-spec> specifies the subset of data that is to be modified.
-*       The <data-spec> will be of the form {component;component;...}, 
-*     where each <component> is one of the following:-
-*
-*         Bindex_spec   - specifying bolometer indices
-*         Pindex_spec   -            position indices
-*         Eindex_spec   -            exposure indices
-*         Iindex_spec   -            integration indices
-*         Mindex_spec   -            measurement indices
-*
-*     and the <index_spec> is a list like, for example, 2,5:7,17 to select
-*     indices 2, 5 through 7, and 17. Alternatively, <index_spec> can be *
-*     which will select all data in that component coordinate.
-*       By default all components in a dataset are selected. Thus the
-*     empty data-spec {} will return all components selected. 
-*       Example complete specifications are:-
-*
-*      mars{}                    select all data in the ndf 'mars'
-*      map1{B7,12;P57}           select data for bolometers 7 and 12 at
-*                                measurement position 57 in ndf 'map1'
-*      flat{E1;I3:M2}            select data for all bolometers in
-*                                exposure 1 of integration 3 in 
-*                                measurement 2 of the observation
-*                                in ndf 'flat'
-*      phot{B29}                 select all data for bolometer 29 in
-*                                ndf 'phot'
-*      scan{B29;E1}              select data for bolometer 29 in the
-*                                first exposure of each integration in
-*                                ndf 'scan'
-*
-*     The specification is case-insensitive and blanks are ignored.
 *       Once the data specification has been decoded the application will
 *     read from parameter BAD_QUALITY whether quality should be set good
 *     or bad. A `yes' answer will mark the area bad, a `no' answer will
 *     mark the area good (an area will only be good if no other QUALITY 
-*     bits are set - CHANGE_QUALITY only uses QUALITY bit 3).
+*     bits are set - CHANGE_QUALITY only uses QUALITY bit 3). The section
+*     can be inverted by using setting the USE_SECTION parameter to false.
 
 *  Usage:
-*     change_quality in=mars{b7} bad_quality=yes
+*     change_quality ndf{spec1}{spec} bad_quality
 
 *  ADAM Parameters:
 *     BAD_QUALITY = _LOGICAL (Read)
 *         Set quality to BAD. Answering this question with a 'yes' will
 *         mean that the selected data will be set to BAD. 'no'
 *         will set them to good.
-*     IN = _CHAR (Read)
-*         Specification of data set to change.
-*     MSG_FILTER = _CHAR (Read)
+*     IN = CHAR (Read)
+*         Name of data set and the specification of the data to be changed.
+*         Usually of the form `ndf{spec1}{spec2}' where ndf is the filename
+*         and spec1...n are the section specifications.
+*         The section can be read from the SECTION parameter if the 
+*         SCUBA section is omitted.
+*     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
+*     SECTION() = CHAR (Read)
+*         This array parameter can be used to specify SCUBA sections.
+*         Curly brackets must still be given. Since this is an array
+*         parameter square brackets must be used to specify more than
+*         one component:
+* 
+*             SECTION > [ {b3} , {i2} ]
+*
+*         would supply two SECTIONS of {b3} and {i2}. Only {b3} will
+*         be used if the square brackets are not used. Care must also
+*         be taken when using commas in SCUBA sections - the parameter
+*         system will split multiple entries on commas unless the entire
+*         section is quoted:
+*
+*             SECTION > [ '{b3,5}' , {i2} ]
+*
+*         This parameter is only used when no SCUBA section was specified
+*         via the IN parameter.
+*     USE_SECTION = LOGICAL (Read)
+*         This parameter specified whether the specified SCUBA section
+*         should be changed (.TRUE.) or the data not specified by the
+*         section (.FALSE.). Default is .TRUE.
+
+*  Examples:
+*     change_quality 'ndf{}' BAD_QUALITY=false
+*         Select the entire array and unset bit 3.
+*     change_quality 'ndf{b2}' BAD_QUALITY
+*         Select the second bolometer and mark it bad.
+*     change_quality 'ndf{b2;i3}' BAD_QUALITY USE_SECTION=no
+*         Select the third integration of bolometer two but set all
+*         other data points bad by inverting the section.
+*     change_quality 'ndf{b16}{i2}' BAD_QUALITY
+*         Select all of bolometer 16 and the whole of integration 2.
+*     change_quality 'ndf{e5,16:18}' MSG_FILTER=quiet
+*         Select exposure 5 and 16 through 18. Messaging is turned off.
+*     change_quality ndf
+*         Since no section has been specified, the user will be prompted
+*         for a section later.
+*     change_quality test SECTION='["{b41,52}",{i3}]' BAD_QUALITY
+*         Set bolometers 41 and 52 as well as integration 3 to bad quality.
+*         Use of SECTION here is not recommended given the complication
+*         when using commas and square brackets.
 
 *  Notes:
-*     Samples are marked bad by setting bit 3 of the quality array. The effects
-*     of CHANGE_QUALITY  can be removed by changing the value of the bad 
-*     bit mask (with the KAPPA task SETBB) so that bit 3 (decimal value of 8) 
-*     is no longer used as a masking bit.
+*     Samples are marked bad by setting bit 3 of the quality array. 
+*     The effects of CHANGE_QUALITY  can be removed by changing the 
+*     value of the bad bit mask (with the KAPPA task SETBB or by running 
+*     CHANGE_QUALITY on the entire array [section is {} for entire array] 
+*     but with BAD_QUALITY=false) so that bit 3 (decimal value of 8) is 
+*     no longer used as a masking bit.
 
 *  Related Application:
-*     REBIN, SCUPHOT
+*     SURF: CHANGE_DATA; REBIN, SCUPHOT
+*     KAPPA: SETBB
+
 
 *  Authors:
 *     JFL:  J.Lightfoot (jfl@roe.ac.uk)
@@ -106,7 +121,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'                   ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                   ! for VAL__NBx
-      INCLUDE 'REDS_SYS'                  ! REDS constants
+      INCLUDE 'SURF_PAR'                  ! SURF constants
       INCLUDE 'MSG_PAR'                   ! MSG__ constants
 
 *    Import :
@@ -128,29 +143,19 @@
 
 *    Local variables :
       BYTE             BADBIT             ! NDF badbit mask
-      INTEGER          BIT_VALUE          ! value to which quality bit is set
       LOGICAL          BAD_QUALITY        ! .TRUE. if quality to be set
                                           ! bad, .FALSE. if to be set good
-      INTEGER          BOL_S (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                          ! array containing 1 for bolometers
-                                          ! selected in data-spec, 0 otherwise
+      BYTE             BTEMP              ! Value to fill empty array
       CHARACTER*80     DATA_SPEC(SCUBA__MAX_SECT) ! data-spec part of IN
       INTEGER          DIM (MAX__DIM)     ! dimensions of array
-      INTEGER          EXP_S (SCUBA__MAX_EXP)   ! array containing 1 for
-                                          ! exposures selected in
-                                          ! data-spec, 0 otherwise
       CHARACTER*80     FILE               ! ndf name part of IN
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
                                           ! array of FITS keywords
       LOGICAL          FLATFIELD          ! .TRUE. if the FLATFIELD
                                           ! application has been run on
                                           ! the input file
-      INTEGER          GOOD               ! good status
       INTEGER          I                  ! DO loop index
       CHARACTER*80     IN                 ! input filename and data-spec
-      INTEGER          INT_S (SCUBA__MAX_INT)   ! array containing 1 for
-                                          ! integration selected by
-                                          ! data-spec, 0 otherwise
       INTEGER          IN_DEM_PNTR_PTR    ! pointer to .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC ! HDS locator of .FITS
                                           ! extension
@@ -159,9 +164,6 @@
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC
                                           ! HDS locator of .SCUBA extension
       INTEGER          ITEMP              ! scratch integer
-      INTEGER          MEAS_S (SCUBA__MAX_MEAS) ! array containing 1 for
-                                          ! measurement selected by
-                                          ! data-spec, 0 otherwise
       INTEGER          NDIM               ! number of dimensions in array
       INTEGER          NREC               ! number of history records in
                                           ! input file
@@ -184,10 +186,6 @@
       LOGICAL          PHOTOM             ! .TRUE. if the PHOTOM
                                           ! application has been run
                                           ! on the input file
-      LOGICAL          POS_SELECTED       ! .TRUE. if selected data were
-                                          ! specified by P=....
-      INTEGER          POS_S_END          ! end of VM holding POS_S
-      INTEGER          POS_S_PTR          ! start of VM holding POS_S
       LOGICAL          REBIN              ! .TRUE. if the REBIN
                                           ! application has been run on
                                           ! the input file
@@ -198,10 +196,6 @@
       CHARACTER*80     STEMP              ! scratch string
       LOGICAL          SWITCH_EXPECTED    ! .TRUE. if switch is to be
                                           ! specified in data-spec
-      INTEGER          SWITCH_S (SCUBA__MAX_SWITCH)
-                                          ! array that has 1 for
-                                          ! switches selected by
-                                          ! data-spec, 0 otherwise
       LOGICAL          USE_SECT           ! Am I using the section or not?
 *     Internal References :
 *     Local data :
@@ -417,11 +411,14 @@
      :     ' - there are data for ^NEXP exposure(s) '//
      :     'in ^NINT integration(s) in ^NMEAS measurements.', STATUS)
 
-*     allocate memory for the POS_S array
+*     Ask for a parameter if no data specifications were given
 
-      POS_S_PTR = 0
-      CALL SCULIB_MALLOC (N_POS * VAL__NBI, POS_S_PTR, POS_S_END,
-     :  STATUS)
+      IF (N_SPEC .EQ. 0) THEN
+
+         CALL PAR_GET1C('SECTION', SCUBA__MAX_SECT, DATA_SPEC,
+     :        N_SPEC, STATUS)
+
+      END IF
 
 *     Do I want to change the section or the non-sections?
 
@@ -431,12 +428,6 @@
 
       CALL PAR_GET0L ('BAD_QUALITY', BAD_QUALITY, STATUS)
       CALL PAR_CANCL ('BAD_QUALITY', STATUS)
-
-      IF (BAD_QUALITY) THEN
-         BIT_VALUE = 1
-      ELSE
-         BIT_VALUE = 0
-      END IF
 
 *     set the badbit mask to include bit 3 - the one set by this routine, then
 *     modify the quality array
@@ -449,23 +440,14 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-*     decode each data specification
-
          SWITCH_EXPECTED = .FALSE.
 
-         DO I = 1, N_SPEC
+         CALL SCULIB_MASK_DATA(USE_SECT, 'BIT', N_SPEC, DATA_SPEC,
+     :        %VAL(IN_DEM_PNTR_PTR), 1, N_EXPOSURES, N_INTEGRATIONS,
+     :        N_MEASUREMENTS, N_POS, N_BOLS, N_BEAM, SWITCH_EXPECTED,
+     :        0.0, BTEMP, BITNUM, BAD_QUALITY, IN_QUALITY_PTR,
+     :        STATUS)
 
-            CALL SCULIB_DECODE_SPEC (DATA_SPEC(I), 
-     :           %val(IN_DEM_PNTR_PTR),
-     :           1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
-     :           N_BOLS, SWITCH_EXPECTED, POS_SELECTED, %val(POS_S_PTR),
-     :           SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS)
-            
-            CALL SCULIB_SET_QUAL (USE_SECT,%val(IN_QUALITY_PTR), N_BOLS,
-     :           N_POS, N_BEAM, BOL_S, %val(POS_S_PTR), BITNUM, 
-     :           BIT_VALUE, STATUS)
-
-         END DO
       END IF
 
 *     close file and tidy up
@@ -480,8 +462,5 @@
 
       CALL NDF_ANNUL(IN_NDF, STATUS)
       CALL NDF_END (STATUS)
-
-      GOOD = SAI__OK
-      CALL SCULIB_FREE ('POS_S', POS_S_PTR, POS_S_END, GOOD)
 
       END
