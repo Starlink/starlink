@@ -408,18 +408,20 @@ sub new {
   my @args = @_;
  
   my $gbox = $args[1];
-  my $xlo = $$gbox[0];
-  my $xhi = $$gbox[1];
-  my $ylo = $$gbox[2];
-  my $yhi = $$gbox[3];
- 
+  my $pbox = $args[2];
+    
   # Call the underlying routine
   my $self = $class->_new( @args );
 
-  $self->{_xlo} = $xlo if defined $xlo;
-  $self->{_xhi} = $xhi if defined $xhi;
-  $self->{_ylo} = $ylo if defined $ylo;
-  $self->{_yhi} = $yhi if defined $yhi;
+  $self->{_xglo} = $$gbox[0] if defined $$gbox[0];
+  $self->{_xghi} = $$gbox[2] if defined $$gbox[1];
+  $self->{_yglo} = $$gbox[1] if defined $$gbox[2];
+  $self->{_yghi} = $$gbox[3] if defined $$gbox[3];
+  
+  $self->{_xplo} = $$pbox[0] if defined $$pbox[0];
+  $self->{_xphi} = $$pbox[2] if defined $$pbox[1];
+  $self->{_yplo} = $$pbox[1] if defined $$pbox[2];
+  $self->{_yphi} = $$pbox[3] if defined $$pbox[3];
 
   return $self;
 }
@@ -428,12 +430,24 @@ sub GBox {
   my $self = shift;
   if( @_ ) { 
      my $gbox = shift;
-     $self->{_xlo} = $$gbox[0];
-     $self->{_xhi} = $$gbox[1];
-     $self->{_ylo} = $$gbox[2];
-     $self->{_yhi} = $$gbox[3];
+     $self->{_xglo} = $$gbox[0];
+     $self->{_xghi} = $$gbox[2];
+     $self->{_yglo} = $$gbox[1];
+     $self->{_yghi} = $$gbox[3];
   }
-  return ($self->{_xlo}, $self->{_xhi}, $self->{_ylo}, $self->{_yhi} );
+  return ($self->{_xglo}, $self->{_xghi}, $self->{_yglo}, $self->{_yghi} );
+}
+
+sub PBox {
+  my $self = shift;
+  if( @_ ) { 
+     my $pbox = shift;
+     $self->{_xplo} = $$pbox[0];
+     $self->{_xphi} = $$pbox[2];
+     $self->{_yplo} = $$pbox[1];
+     $self->{_yphi} = $$pbox[3];
+  }
+  return ($self->{_xplo}, $self->{_xphi}, $self->{_yplo}, $self->{_yphi} );
 }
 
 sub GFlush {
