@@ -3280,7 +3280,7 @@ ChangeLog  changes  doc/     library/  mac/           tools/  win/
           files, but these are sufficiently special that it wouldn't
           help.</p>
 
-          <p>XXX This is out of date -- see tclsys for update</p>
+          <p>FIXME: This is out of date -- see tclsys/tcl for update</p>
 
           <p>The <code>configure.ac</code> should look like this:
 <verbatim>
@@ -4008,6 +4008,34 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             intrinsic function were available (there are probably
             rather few Fortrans which don't have this function).
           </p>
+        </subsect>
+
+        <subsect id="macro-ac-fc-check-headers" export="export">
+          <subhead>
+            <title>AC_FC_CHECK_HEADERS</title>
+          </subhead>
+          <p><strong><code>AC_FC_CHECK_HEADERS(include-file...)</code></strong></p>
+
+          <p>Fortran analogue of <code>AC_CHECK_HEADERS</code>, though
+            it only takes the first argument, giving the list of
+            include files to check.  For each include file, defines
+            <code>HAVE_</code><em>include-file</em> (in all capitals)
+            if the include file is found.  Respects the current value
+            of <code>FCFLAGS</code>.</p>
+
+        </subsect>
+
+        <subsect id="ac-fc-have-percentval" export="export">
+          <subhead>
+            <title>AC_FC_HAVE_PERCENTVAL</title>
+          </subhead>
+          <p><strong><code>AC_FC_HAVE_PERCENTVAL</code></strong></p>
+
+          <p>Test whether the <code>FC</code> compiler has the
+            <code>%VAL</code> extension.  If so, define the preprocessor
+            variable <code>HAVE_PERCENTVAL</code> to be 1.  If the
+            compiler has <code>%VAL</code>, it presumably has
+            <code>%LOC</code> also.</p>
         </subsect>
 
         <subsect id="macro-ac-fc-open-specifiers" export="export">
