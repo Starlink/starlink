@@ -70,6 +70,9 @@
 *     November 1998
 *       Converted to SURF (TIMJ)
 *     $Log$
+*     Revision 1.4  1999/05/15 02:02:10  timj
+*     Initialise pointers
+*
 *     Revision 1.3  1999/05/15 01:48:40  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -398,6 +401,12 @@
          CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
      :        OUT_VARIANCE_PTR, ITEMP, STATUS)
       ELSE
+         OUT_DATA_PTR = 0
+         OUT_DATA_END = 0
+         OUT_VARIANCE_PTR = 0
+         OUT_VARIANCE_END = 0
+         OUT_QUALITY_PTR = 0
+         OUT_QUALITY_END = 0
          CALL SCULIB_MALLOC(N_BOLS * 2 * VAL__NBR,
      :        OUT_DATA_PTR, OUT_DATA_END, STATUS)
          CALL SCULIB_MALLOC(N_BOLS * 2 * VAL__NBR,
