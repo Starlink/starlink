@@ -423,7 +423,7 @@
                END IF
             END IF
 *
-            IF ( LATT .EQ. .TRUE. .AND. COLNO .EQ. 0) THEN
+            IF ( LATT .AND. COLNO .EQ. 0) THEN
 *  Move to the correct position in FITS file
                CALL FTMAHD(IUNIT, ATNHDU, TTYPE, STATUS)
 *  Renew header information
