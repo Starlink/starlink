@@ -2790,8 +2790,6 @@ proc DrawGwm {} {
          }
       }
 
-      puts $centre
-
 # Display the image section centred correctly. 
       if { [Obey kapview display "in=\"$data\" $pars badcol=0 device=$DEVICE \
                                   axes=no centre=\"$centre\"" ] } {
@@ -10893,6 +10891,20 @@ proc Save {} {
                      break
                   }
 
+# Ensure that the current WCS Frame is the same as that in the input image.
+                  if { [Obey ndfpack wcsattrib "$image get domain"] } {
+                     set dom [GetParam ndfpack wcsattrib:value]
+
+                     if { ![Obey ndfpack wcsframe "$outndf $dom"] } {
+                        set ok 0
+                        break
+                     }
+
+                  } {
+                     set ok 0
+                     break
+                  }
+                  
 # Make the "image alignment" label (and associated tick mark) in the 
 # progress dialog box revert to black, and highlight the "header information"
 # label in red.
