@@ -59,11 +59,11 @@ dnl   automatically checked for, and the corresponding HAVE_ macros
 dnl   defined).  Check if we've got sstream; if not, hope we have the
 dnl   older strstream.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(assert.h fcntl.h sys/stat.h sys/wait.h signal.h)
+AC_CHECK_HEADERS(assert.h fcntl.h signal.h sys/stat.h sys/wait.h sys/time.h)
 AC_HEADER_STAT
 
 dnl   Checks for library functions
-AC_CHECK_FUNCS(pipe snprintf setenv putenv alarm)
+AC_CHECK_FUNCS(pipe snprintf setenv putenv alarm setitimer)
 dnl   getopt_long.c uses (and provides a replacement for)
 dnl   this glibc utility function
 AC_CHECK_FUNCS(__strchrnul)

@@ -60,6 +60,10 @@
 #  include <sys/wait.h>
 #endif
 
+#ifdef HAVE_SYS_TIME_H
+#  include <sys/time.h>
+#endif
+
 #include <map>
 
 #ifdef HAVE_STD_NAMESPACE
@@ -310,14 +314,30 @@ void PipeStream::close(void)
 		if (kill(pid_, sigtosend) == 0) {
 		    sigset_t zeromask;
 		    sigemptyset(&zeromask);
+#if defined(HAVE_SETITIMER)
+		    struct itimerval timer;
+		    timer.it_value.tv_sec = 1;
+		    timer.it_value.tv_usec = 0;
+		    timer.it_interval.tv_sec = 0;
+		    timer.it_interval.tv_usec = 0;
+		    setitimer(ITIMER_REAL, &timer, 0);
+#elif defined(HAVE_ALARM)
 		    alarm(1);
+#else
+#error "Have neither setitimer nor alarm.  Can't proceed!"
+#endif
 		    sigsuspend(&zeromask); // unblock and pause
 		    if (getVerbosity() > normal)
-			cerr << "Sent " << sigtosend
+			cerr << "PipeStream::close sent signal " << sigtosend
 			     << " and waited for child" << endl;
 		} else {
 		    // process wasn't there
 		    process_gone = true;
+		    if (getVerbosity() > normal)
+			cerr << "PipeStream::close: can't send signal "
+			     << sigtosend << " to process " << pid_
+			     << " (" << strerror(errno) << ")"
+			     << endl;
 		}
 
 		keep_waiting
