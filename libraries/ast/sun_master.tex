@@ -645,13 +645,13 @@ and ZoomMap).
 
 c+
 \item General-purpose transformations expressed using arithmetic
-operations and function invocations similar to those available in C
-(the MathMap).
+operations and functions similar to those available in C (the
+MathMap).
 c-
 f+
 \item General-purpose transformations expressed using arithmetic
-operations and function invocations similar to those available in
-Fortran (the MathMap).
+operations and functions similar to those available in Fortran (the
+MathMap).
 f-
 
 c+
@@ -16896,6 +16896,19 @@ current version):
 
 \begin{enumerate}
 c+
+\item A new MathMap class has been introduced. This is a form of
+Mapping that allows you to define coordinate transformations in a
+flexible and transportable way using arithmetic operations and
+mathematical functions similar to those available in C.
+c-
+f+
+\item A new MathMap class has been introduced. This is a form of
+Mapping that allows you to define coordinate transformations in a
+flexible and transportable way using arithmetic operations and
+mathematical functions similar to those available in Fortran.
+f-
+
+c+
 \item {\bf{WARNING---INCOMPATIBLE CHANGE.}} Transformation functions
 used with the IntraMap class (see, for example, astIntraReg) now
 require a ``this'' pointer as their first parameter. {\bf{Existing
@@ -16926,19 +16939,6 @@ f+
 class. This allows the transformation routines used by IntraMaps to
 adapt to produce the required transformation on a per-IntraMap basis
 (\secref{ss:intraflag}).
-f-
-
-c+
-\item A new MathMap class has been introduced. This is a form of
-Mapping that allows you to define coordinate transformations in a
-flexible and transportable way using arithmetic operations and
-mathematical functions similar to those provided in C.
-c-
-f+
-\item A new MathMap class has been introduced. This is a form of
-Mapping that allows you to define coordinate transformations in a
-flexible and transportable way using arithmetic operations and
-mathematical functions similar to those provided in Fortran.
 f-
 
 \item A small number of documentation errors have been corrected.
