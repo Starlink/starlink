@@ -18,6 +18,8 @@
 *    History :
 *
 *     30 Aug 94 : Original (DJA)
+*     14 Jun 95 : Iteration scheme changed to stabilise expectation value
+*                 calculation, and Gaussian limit simplification added (DJA)
 *
 *    Type definitions :
 *
@@ -167,15 +169,18 @@
 *
 *    Function declarations :
 *
-      DOUBLE PRECISION		FIT_MPROB_EXDLDF	! < d log(d!) >
-      DOUBLE PRECISION		FIT_MPROB_LDF		! < d >
-      DOUBLE PRECISION		FIT_MPROB_EXLDF		! < log(d!) >
-      DOUBLE PRECISION		FIT_MPROB_EXLDF2	! < log(d!)^2 >
+      DOUBLE PRECISION		FIT_MPROB_LDF		! < log d! >
+*
+*    Local constants :
+*
+      REAL			GLIMIT
+        PARAMETER		( GLIMIT = 200.0 )
 *
 *    Local variables :
 *
-      DOUBLE PRECISION		ELPF			! Expectation of Log
-							! prediected data!
+      DOUBLE PRECISION		ELPF			! < log d! >
+      DOUBLE PRECISION		ELPF2			! < log d! ^ 2 >
+      DOUBLE PRECISION		EDLPF			! < d log d! >
       DOUBLE PRECISION		LP			! Log predicted data
 
       INTEGER			I			! Loop over data
@@ -201,10 +206,28 @@
 
         IF ( GOOD .AND. (PRED(I).GT.0.0) .AND. (DATA(I).GT.0.0) ) THEN
 
-*        Get log of predicted data, and the expectation value of the predicted
-*        data factorial
+*        Get log of predicted data, and the 3 expectation values. In the
+*        Gaussian limit we need only the
           LP = LOG(PRED(I))
-          ELPF = FIT_MPROB_EXLDF( PRED(I) )
+          IF ( PRED(I) .GT. GLIMIT ) THEN
+
+*          Expectation values <log d!>
+            CALL FIT_MPROB_EX3( DBLE(PRED(I)), .FALSE., ELPF,
+     :                          ELPF2, EPLPF )
+
+            LFPDV = 0.5D0
+
+          ELSE
+
+*          Expectation values <log d!>, <(log d!)^2> and <d log d!>
+            CALL FIT_MPROB_EX3( DBLE(PRED(I)), .TRUE., ELPF,
+     :                          ELPF2, EPLPF )
+
+*          and its variance
+            LFPDV = LFPDV + PRED(I)*LP*LP + ELPF2
+     :                - ELPF*ELPF - 2.0*LP*(EPLPF-PRED(I)*ELPF)
+
+          END IF
 
 *        Accumulate log probability for data
           LFPD = LFPD + DATA(I)*LP - PRED(I) -
@@ -215,13 +238,7 @@
      :                           FIT_MPROB_LDF(NINT(PRED(I)))
 
 *        Accumulate log probability for model
-          LFPM = LFPM + PRED(I)*LP - PRED(I) -
-     :                           FIT_MPROB_EXLDF(PRED(I))
-
-*        and its variance
-          LFPDV = LFPDV + PRED(I)*LP*LP + FIT_MPROB_EXLDF2( PRED(I) )
-     :                - ELPF*ELPF
-     :                - 2.0*LP*(FIT_MPROB_EXDLDF(PRED(I))-PRED(I)*ELPF)
+          LFPM = LFPM + PRED(I)*LP - PRED(I) - ELPF
 
         END IF
 
@@ -230,24 +247,28 @@
       END
 
 
-
-*+  FIT_MPROB_EXLDF2 - Calculates < log(d !)^2 >
-      DOUBLE PRECISION FUNCTION FIT_MPROB_EXLDF2( MEAN )
+*+  FIT_MPROB_EX3AC - Accumulate <log(d!)>, <log(d!) ^ 2> and <d log(d!)>
+      SUBROUTINE FIT_MPROB_EX3AC( MEAN, LOB, HIB, DO2, EXLDF, EXLDF2,
+     :                            EXDLDF )
 *
 *    Description :
 *
-*     Calculates the expectation value of log(d!)^2 for a Poisson distribution
-*     of mean MEAN.
+*     Accumulates the expectation values <log(d!)>, <log(d!) ^ 2> and
+*     <d log(d!)> for d=MEAN, over the interval LOB to HIB.
 *
 *    Method :
 *
-*     The expectation of a function like log(d!)^2 must be calculated by
+*     The expectation of a function like log(d!) must be calculated by
 *     summing the contributions for the the 'd' for which the product
 *
-*        log(d!)^2 * prob(d)
+*        log(d!) * prob(d)
 *
 *     is significant. The 'd' are drawn from a Poisson distribution of mean
-*     MEAN so we sum over all terms for d=0 until the sum converges.
+*     MEAN so we sum over all terms for d=0 until the sum converges. The
+*     trick used by this routine is to acccumulate the upwards from LOB and
+*     downwards from HIB. Where the interval encloses the peak in the
+*     Poisson distribution this ensures maximum retention of precision in
+*     the result.
 *
 *    Deficiencies :
 *    Bugs :
@@ -270,229 +291,82 @@
 *
 *    Import :
 *
-      REAL			MEAN			! Mean of Poisson
+      DOUBLE PRECISION		MEAN			! Mean of Poisson
 							! distribution
+      INTEGER			LOB, HIB		! Interval to accumulate
+      LOGICAL			DO2
+*
+*    Export :
+*
+      DOUBLE PRECISION		EXLDF
+      DOUBLE PRECISION		EXLDF2
+      DOUBLE PRECISION		EXDLDF
 *
 *    Function declarations :
 *
       DOUBLE PRECISION		FIT_MPROB_LDF
 *
-*    Local constants :
-*
-      REAL			TOLNCE			! Convergence tolerance
-	PARAMETER		( TOLNCE = 1.0E-5 )
-      INTEGER			PTHRESH
-	PARAMETER 		( PTHRESH = 512 )
-*
 *    Local variables :
 *
-      DOUBLE PRECISION		LASTMEAN		! Last value of MEAN
-        SAVE			LASTMEAN
-      DOUBLE PRECISION		LASTSUM			! SUM on last iteration
-      DOUBLE PRECISION		LASTVAL			! Last value of function
-        SAVE			LASTVAL
-
-      DOUBLE PRECISION		LJFAC			! log(J!)
+      DOUBLE PRECISION		LFAC			! log(d!)
       DOUBLE PRECISION		LMEAN			! log(MEAN)
       DOUBLE PRECISION		PPROB			! Probability of J
 							! given MEAN
-      DOUBLE PRECISION		SUM			! Cumulative result
+      DOUBLE PRECISION		BIT1,BIT2,BIT3
+      DOUBLE PRECISION		SUM1,SUM2,SUM3
 
-      INTEGER			I3SIG			! 3*sqrt(MEAN) roughly
-      INTEGER			J			! Loop over Poisson
-							! distribution
-      INTEGER			LOB, HIB		! Founds for eval'n
-*
-*    Local data :
-*
-      DATA			LASTMEAN/-1.0/
+      INTEGER			L, H
 *-
 
-*    Not same as last time?
-      IF ( MEAN .NE. LASTMEAN ) THEN
+      L = LOB
+      H = HIB
+      SUM1 = 0.0D0
+      SUM2 = 0.0D0
+      SUM3 = 0.0D0
+      LMEAN = LOG(MEAN)
 
-*      Above Poisson threshold?
-        IF ( MEAN .GT. PTHRESH ) THEN
-          I3SIG = INT(6.0*SQRT(MEAN))
-          LOB = NINT(MEAN) - I3SIG
-          HIB = NINT(MEAN) + I3SIG
-        ELSE
-          LOB = 0
-          HIB = MEAN + 10
+ 10   CONTINUE
+
+        LFAC = FIT_MPROB_LDF( L )
+        PPROB = EXP( LMEAN*DBLE(L) - MEAN - LFAC )
+        BIT1 = LFAC * PPROB
+        IF ( DO2 ) THEN
+          BIT2 = LFAC * LFAC * PPROB
+          BIT3 = LFAC * DBLE(L) * PPROB
         END IF
 
-*      Initialise for loop
-        SUM = 0.0D0
-        J = LOB
-        LMEAN = LOG(MEAN)
-        LJFAC = FIT_MPROB_LDF( J )
+        IF ( L .LT. H ) THEN
+          LFAC = FIT_MPROB_LDF( H )
+          PPROB = EXP( LMEAN*DBLE(H) - MEAN - LFAC )
+          BIT1 = BIT1 + LFAC * PPROB
+          IF ( DO2 ) THEN
+            BIT2 = BIT2 + LFAC * LFAC * PPROB
+            BIT3 = BIT3 + LFAC * DBLE(H) * PPROB
+          END IF
+        END IF
 
-*      Top of loop
- 10     CONTINUE
+        SUM1 = SUM1 + BIT1
+        IF ( DO2 ) THEN
+          SUM2 = SUM2 + BIT2
+          SUM3 = SUM3 + BIT3
+        END IF
+        L = L + 1
+        H = H - 1
 
-*        Store last sum
-          LASTSUM = SUM
+      IF ( L .LE. H ) GOTO 10
 
-*        Find Poisson probability of J given MEAN
-          PPROB = EXP(LMEAN*J - MEAN - LJFAC)
-
-*        Accumulate expectation value
-          SUM = SUM + (LJFAC*LJFAC) * PPROB
-
-*        Next value of J
-          J = J + 1
-          LJFAC = LJFAC + LOG(DBLE(J))
-
-*      Repeat if minimum number of iterations not performed, or convergence
-*      not achieved
-        IF ( (J.LT.HIB) .OR.
-     :       (ABS((SUM-LASTSUM)/SUM).GT.TOLNCE) ) GOTO 10
-
-*      Update old values
-        LASTMEAN = MEAN
-        LASTVAL = SUM
-
+      EXLDF = EXLDF + SUM1
+      IF ( DO2 ) THEN
+        EXLDF2 = EXLDF2 + SUM2
+        EXDLDF = EXDLDF + SUM3
       END IF
-
-*    Set return value
-      FIT_MPROB_EXLDF2 = LASTVAL
 
       END
 
 
 
-*+  FIT_MPROB_EXDLDF - Calculates < d log(d !) >
-      DOUBLE PRECISION FUNCTION FIT_MPROB_EXDLDF( MEAN )
-*
-*    Description :
-*
-*     Calculates the expectation value of d.log(d!) for a Poisson distribution
-*     of mean MEAN.
-*
-*    Method :
-*
-*     The expectation of a function like d.log(d!) must be calculated by
-*     summing the contributions for the the 'd' for which the product
-*
-*        d.log(d!) * prob(d)
-*
-*     is significant. The 'd' are drawn from a Poisson distribution of mean
-*     MEAN so we sum over all terms for d=0 until the sum converges.
-*
-*    Deficiencies :
-*    Bugs :
-*
-*    Authors :
-*
-*     DJA: David J. Allan (JET-X, University of Birmingham)
-*
-*    History :
-*
-*     30 Aug 94 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Import :
-*
-      REAL			MEAN			! Mean of Poisson
-							! distribution
-*
-*    Function declarations :
-*
-      DOUBLE PRECISION		FIT_MPROB_LDF
-*
-*    Local constants :
-*
-      REAL			TOLNCE			! Convergence tolerance
-	PARAMETER		( TOLNCE = 1.0E-5 )
-      INTEGER			PTHRESH
-	PARAMETER 		( PTHRESH = 512 )
-*
-*    Local variables :
-*
-      DOUBLE PRECISION		LASTMEAN		! Last value of MEAN
-        SAVE			LASTMEAN
-      DOUBLE PRECISION		LASTSUM			! SUM on last iteration
-      DOUBLE PRECISION		LASTVAL			! Last value of function
-        SAVE			LASTVAL
-
-      DOUBLE PRECISION		LJFAC			! log(J!)
-      DOUBLE PRECISION		LMEAN			! log(MEAN)
-      DOUBLE PRECISION		PPROB			! Probability of J
-							! given MEAN
-      DOUBLE PRECISION		SUM			! Cumulative result
-
-      INTEGER			I3SIG			! 3*sqrt(MEAN) roughly
-      INTEGER			J			! Loop over Poisson
-							! distribution
-      INTEGER			LOB, HIB		! Founds for eval'n
-*
-*    Local data :
-*
-      DATA			LASTMEAN/-1.0/
-*-
-
-*    Not same as last time?
-      IF ( MEAN .NE. LASTMEAN ) THEN
-
-*      Above Poisson threshold?
-        IF ( MEAN .GT. PTHRESH ) THEN
-          I3SIG = INT(6.0*SQRT(MEAN))
-          LOB = NINT(MEAN) - I3SIG
-          HIB = NINT(MEAN) + I3SIG
-        ELSE
-          LOB = 0
-          HIB = MEAN + 10
-        END IF
-
-*      Initialise for loop
-        SUM = 0.0D0
-        J = LOB
-        LMEAN = LOG(MEAN)
-        LJFAC = FIT_MPROB_LDF( J )
-
-*      Top of loop
- 10     CONTINUE
-
-*        Store last sum
-          LASTSUM = SUM
-
-*        Find Poisson probability of J given MEAN
-          PPROB = EXP(LMEAN*J - MEAN - LJFAC)
-
-*        Accumulate expectation value
-          SUM = SUM + LJFAC * J * PPROB
-
-*        Next value of J
-          J = J + 1
-          LJFAC = LJFAC + LOG(DBLE(J))
-
-*      Repeat if minimum number of iterations not performed, or convergence
-*      not achieved
-        IF ( (J.LT.HIB) .OR.
-     :       (ABS((SUM-LASTSUM)/SUM).GT.TOLNCE) ) GOTO 10
-
-*      Update old values
-        LASTMEAN = MEAN
-        LASTVAL = SUM
-
-      END IF
-
-*    Set return value
-      FIT_MPROB_EXDLDF = LASTVAL
-
-      END
-
-
-
-*+  FIT_MPROB_EXLDF - Calculates < log(d !) >
-      DOUBLE PRECISION FUNCTION FIT_MPROB_EXLDF( MEAN )
+*+  FIT_MPROB_EX3 - Find <log(d!)> and optionally <log(d!) ^ 2>,<d log(d!)>
+      SUBROUTINE FIT_MPROB_EX3( MEAN, EXLDF, DO2, EXLDF2, EXDLDF )
 *
 *    Description :
 *
@@ -530,17 +404,20 @@
 *
 *    Import :
 *
-      REAL			MEAN			! Mean of Poisson
+      DOUBLE PRECISION		MEAN			! Mean of Poisson
 							! distribution
+      LOGICAL			DO2
 *
-*    Function declarations :
+*    Export :
 *
-      DOUBLE PRECISION		FIT_MPROB_LDF
+      DOUBLE PRECISION		EXLDF
+      DOUBLE PRECISION		EXLDF2
+      DOUBLE PRECISION		EXDLDF
 *
 *    Local constants :
 *
       REAL			TOLNCE			! Convergence tolerance
-	PARAMETER		( TOLNCE = 1.0E-5 )
+	PARAMETER		( TOLNCE = 1.0E-9 )
       INTEGER			PTHRESH
 	PARAMETER 		( PTHRESH = 512 )
 *
@@ -548,20 +425,16 @@
 *
       DOUBLE PRECISION		LASTMEAN		! Last value of MEAN
         SAVE			LASTMEAN
-      DOUBLE PRECISION		LASTSUM			! SUM on last iteration
-      DOUBLE PRECISION		LASTVAL			! Last value of function
-        SAVE			LASTVAL
-
-      DOUBLE PRECISION		LJFAC			! log(J!)
-      DOUBLE PRECISION		LMEAN			! log(MEAN)
-      DOUBLE PRECISION		PPROB			! Probability of J
-							! given MEAN
-      DOUBLE PRECISION		SUM			! Cumulative result
-
-      INTEGER			I3SIG			! 3*sqrt(MEAN) roughly
-      INTEGER			J			! Loop over Poisson
-							! distribution
+      DOUBLE PRECISION          L_LDF, L_LDF2, L_DLDF
+        SAVE                    L_LDF, L_LDF2, L_DLDF
+      INTEGER			I6			! 6*sqrt(MEAN) roughly
+      INTEGER			ISTEP			! Accumulation increment
       INTEGER			LOB, HIB		! Founds for eval'n
+      INTEGER			NEWLO, NEWHI
+
+      LOGICAL			C_LDF
+      LOGICAL			C_LDF2
+      LOGICAL			C_DLDF
 *
 *    Local data :
 *
@@ -571,51 +444,85 @@
 *    Not same as last time?
       IF ( MEAN .NE. LASTMEAN ) THEN
 
-*      Above Poisson threshold?
+*      Initialise outputs
+        EXLDF = 0.0D0
+        IF ( DO2 ) THEN
+          EXLDF2 = 0.0D0
+          EXDLDF = 0.0D0
+        END IF
+
+*      Initial bounds for accumulation
         IF ( MEAN .GT. PTHRESH ) THEN
-          I3SIG = INT(6.0*SQRT(MEAN))
-          LOB = NINT(MEAN) - I3SIG
-          HIB = NINT(MEAN) + I3SIG
+          I6 = INT( 6.0*SQRT(MEAN) )
+          LOB = MEAN - I6
+          IF ( LOB .LT. 0 ) LOB = 0
+          HIB = MEAN + I6
         ELSE
           LOB = 0
           HIB = MEAN + 10
         END IF
 
-*      Initialise for loop
-        SUM = 0.0D0
-        J = LOB
-        LMEAN = LOG(MEAN)
-        LJFAC = FIT_MPROB_LDF( J )
+*      Step size for extra accumulations
+        ISTEP = MAX( 5, INT(SQRT(MEAN)) )
 
-*      Top of loop
+*      First accumulation
+        CALL FIT_MPROB_EX3AC( MEAN, LOB, HIB, DO2,
+     :                        EXLDF, EXLDF2, EXDLDF )
+
+*      Loop until convergence achieved
  10     CONTINUE
 
-*        Store last sum
-          LASTSUM = SUM
+*        Store old values
+          L_LDF = EXLDF
+          IF ( DO2 ) THEN
+            L_LDF2 = EXLDF2
+            L_DLDF = EXDLDF
+          END IF
 
-*        Find Poisson probability of J given MEAN
-          PPROB = EXP(LMEAN*J - MEAN - LJFAC)
+*        More on lower bound
+          IF ( LOB .GT. 0 ) THEN
+            NEWLO = MAX( 0, LOB - ISTEP )
+            CALL FIT_MPROB_EX3AC( MEAN, NEWLO, LOB-1, DO2, EXLDF,
+     :                            EXLDF2, EXDLDF )
+            LOB = NEWLO
+          END IF
 
-*        Accumulate expectation value
-          SUM = SUM + LJFAC * PPROB
+*        More on upper bound
+          NEWHI = HIB + ISTEP
+          CALL FIT_MPROB_EX3AC( MEAN, HIB+1, NEWHI, DO2, EXLDF,
+     :                          EXLDF2, EXDLDF )
+          HIB = NEWHI
 
-*        Next value of J
-          J = J + 1
-          LJFAC = LJFAC + LOG(DBLE(J))
+*        Convergence tests
+          C_LDF = ( (EXLDF-L_LDF) .LT. TOLNCE*EXLDF )
+          IF ( DO2 ) THEN
+            C_LDF2 = ( (EXLDF2-L_LDF2) .LT. TOLNCE*EXLDF2 )
+            C_DLDF = ( (EXDLDF-L_DLDF) .LT. TOLNCE*EXDLDF )
+          END IF
 
-*      Repeat if minimum number of iterations not performed, or convergence
-*      not achieved
-        IF ( (J.LT.HIB) .OR.
-     :       (ABS((SUM-LASTSUM)/SUM).GT.TOLNCE) ) GOTO 10
+*      Convergence
+        IF ( DO2 ) THEN
+          IF ( .NOT. (C_LDF.AND.C_LDF2.AND.C_DLDF) ) GOTO 10
+        ELSE
+          IF ( .NOT. C_LDF ) GOTO 10
+        END IF
 
 *      Update old values
         LASTMEAN = MEAN
-        LASTVAL = SUM
+        L_LDF = EXLDF
+        IF ( DO2 ) THEN
+          L_LDF2 = EXLDF2
+          L_DLDF = EXDLDF
+        END IF
 
       END IF
 
 *    Set return value
-      FIT_MPROB_EXLDF = LASTVAL
+      EXLDF = L_LDF
+      IF ( DO2 ) THEN
+        EXLDF2 = L_LDF2
+        EXDLDF = L_DLDF
+      END IF
 
       END
 
@@ -646,6 +553,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
@@ -654,12 +562,13 @@
 *    Local constants :
 *
       INTEGER			LOFAC          		! Max D to calculate
-	PARAMETER		( LOFAC = 29 )		! directly
+	PARAMETER		( LOFAC = 35 )		! directly
       INTEGER			MAXFAC          	! Max D to calculate
-	PARAMETER		( MAXFAC = 1024 )
+	PARAMETER		( MAXFAC = 2048 )
 *
 *    Local variables :
 *
+      DOUBLE PRECISION		DI
       DOUBLE PRECISION		FAC			! Cumulative factorial
       DOUBLE PRECISION		LDF(0:MAXFAC)		! Store log(d!) values
         SAVE			LDF
@@ -703,11 +612,10 @@
 
 *    Otherwise calculate it
       ELSE
-        FAC = LDF(MAXFAC)
-        DO I = MAXFAC + 1, D
-          FAC = FAC + LOG(DBLE(I))
-        END DO
-        FIT_MPROB_LDF = FAC
+
+        DI = DBLE(I)
+        FIT_MPROB_LDF = DI * LOG(DI) - DI +
+     :                  0.5D0*LOG(2.0D0*MATH__DPI*DI)
 
       END IF
 
