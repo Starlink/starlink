@@ -1554,6 +1554,80 @@ dd-MMM-yyyy.
 	    nl				; return the trailing paragraphs
 	    ))))
 
+      </codebody>
+    </routine>
+
+    <routine>
+      <routineprologue>
+        <routinename>
+          <name>figurecontent-to-notation-map</name>
+        </routinename>
+        <description>
+          <p>The FIGURE element has a content model which includes
+            <code>FIGURECONTENT*, PX*</code>.  Each of the FIGURECONTENT
+            elements has an `image' and a `notation' attribute.  If the `image'
+            attribute is present, it refers to an entity which itself has a
+            notation, and the element's content is that entity (the attribute
+            has a CONREF default value).  If that attribute is not
+            present, then the element's content is the image, and the
+            `notation' attribute should be present (it is an
+            application error if it is not).</p>
+          <p>This function takes a node-list NL, each node of which is
+            either a FIGURECONTENT element or PX, and produces a list of
+            pairs.  The car of each pair is the notation of the node,
+            such as "eps" or "pdf", or "XML" in the case of PX; and
+            the cdr is the node itself.  Note that if there is more
+            than one node with a given notation, or more than one PX element,
+            then the returned assoc list will have duplicates in the car
+            fields of the pairs.</p>
+        </description>
+        <returnvalue type='list of pairs'>
+          <p>A list of pairs, of the form <code>(notation
+              . node-list)</code>, or <funcname>#f</funcname> if the
+            node-list is empty.</p>
+        </returnvalue>
+        <argumentlist>
+          <parameter>
+            <name>nl</name>
+            <type>node-list</type>
+            <description>
+              <p>The list of FIGURECONTENT elements and paragraphs
+                which is part of the content of the FIGURE element.</p>
+            </description>
+          </parameter>
+        </argumentlist>
+      </routineprologue>
+      <codebody>
+(define (figurecontent-to-notation-map nl)
+  (reverse
+   (node-list-reduce
+    nl
+    (lambda (l n)
+      (let* ((is-figurecontent? (string=? (gi n)
+                                          (normalize "figurecontent")))
+             (ent (and is-figurecontent?
+                       (attribute-string (normalize "image") n)))
+             (ent-notation (and ent
+                                (entity-notation ent (current-node))))
+             (cont-notation (and is-figurecontent?
+                                 (attribute-string (normalize "notation") n))))
+        (cons (if is-figurecontent?
+                  (if ent
+                      (if ent-notation   ;entity is present and has notation
+                          (cons ent-notation n)
+                          (error
+                           (string-append "Entity " ent " has no notation")))
+                      (if cont-notation  ;content has declared notation
+                          (cons cont-notation n)
+                          (error
+                           "FIGURECONTENT has neither image nor notation")))
+                  (cons "XML" n))
+              
+              l)))
+    '())))
+      </codebody>
+    </routine>
+
 <![INCLUDE[
 <!-- redundant for ../latex/sltables.dsl, but not for ../html/sltables.dsl -->
 <routine>
