@@ -27,7 +27,12 @@ f     AST_CMPFRAME
 
 *  Attributes:
 *     The CmpFrame class does not define any new attributes beyond
-*     those which are applicable to all Frames.
+*     those which are applicable to all Frames. To access an attribute of
+*     either of the two component Frames, append an axis index (within 
+*     parentheses) to the end of the attribute name. For instance, if axis 
+*     3 of a CmpFrame is contained within a SkyFrame, then the Equinox 
+*     attribute of the SkyFrame can be accessed as attribute "Equinox(3)" 
+*     of the CmpFrame.
 
 *  Functions:
 c     The CmpFrame class does not define any new functions beyond those
@@ -69,13 +74,14 @@ f     The CmpFrame class does not define any new routines beyond those
 *     26-SEP-2001 (DSB):
 *        Over-ride the astDecompose method.
 *     20-DEC-2002 (DSB):
-*        Allows the System attribute to be set for a component Frame by
-*        including an axis index in the attribute name (e.g. "System(3)").
+*        Allows any attribute of a component frame to be accessed as though
+*        it were an attribute of the CmpFrame by including an axis index in 
+*        the attribute name (e.g. "System(3)").
 *     8-JAN-2003 (DSB):
 *        - Changed private InitVtab method to protected astInitCmpFrameVtab
 *        method.
 *        - Override astGetAttrib, astClearAttrib, astTestAttrib,
-*        astSetAttrib to allow System attribute to be set for individual
+*        astSetAttrib to allow attributes to be set for individual
 *        axes.
 *        - Override astGetEpoch astGetSystem, astGetAlignSystem.
 *        astValidateSystem, astSystemString, astSystemCode.
@@ -1028,11 +1034,16 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Local Variables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
-   AstFrame *fr;                 /* Pointer to primary Frame containing axis */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
+   char buf1[80];                /* For for un-indexed attribute name */
+   char buf2[80];                /* For for indexed attribute name */
    int axis;                     /* Sipplied (1-based) axis index */
-   int faxis;                    /* Index of primary Frame axis */
    int len;                      /* Length of attrib string */
    int nc;                       /* Number of characters used so dar */
+   int oldrep;                   /* Original error reporting state */
+   int paxis;                    /* Index of primary Frame axis */
+   int tryagain;                 /* Do we need to try to access the attribute again? */
+
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1043,19 +1054,80 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Obtain the length of the "attrib" string. */
    len = strlen( attrib );
 
-/* Check the attribute name and clear the appropriate attribute. */
+/* Indicate that we have not yet accessed the attribute succesfully. */
+   tryagain = 1;
 
-/* System(axis). */
-/* ------------- */
+/* This class has no attributes other than the attributes of the parent
+   class (Frame). However, we need to make it easy for users to access
+   attributes which are specific to one of the component Frames. For
+   instance, if the CmpFrame contains a SpecFrame and a SkyFrame, we want
+   to make it easy for the user to set (say) the SourceVel attribute of the
+   SpecFrame. To achieve this, we allow any attribute to be followed by
+   an axis index in parentheses. So in the above example the SourceVel
+   attribute of the component SpecFrame could be set by assigning a value to
+   the "SourceVel(1)" attribute (assuming the SpecFrame is the first of
+   the two component Frames). First, extract the attribute name and the
+   axis index. */
    if ( nc = 0,
-        ( 1 == astSscanf( attrib, "system(%d)%n", &axis, &nc ) )
-          && ( nc >= len ) ) {
-      astPrimaryFrame( this, axis - 1, &fr, &faxis );
-      astClear( fr, "system" );
+        ( 2 == astSscanf( attrib, "%[^(](%d)%n", buf1, &axis, &nc ) )
+        && ( nc >= len ) ) {
 
-/* If the attribute is not recognised, pass it on to the parent method
-   for further interpretation. */
-   } else {
+/* Find the primary Frame containing this axis. */
+      astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+
+/* Create a new attribute with the same name but with the axis index
+   appropriate to the primary Frame. */
+      sprintf( buf2, "%s(%d)", buf1, paxis );
+
+/* It may be that the named attribute is not allowed to be indexed within
+   the primary Frame class. If this is the case, accesing it will generate 
+   an error. Ensure error reporting is switched off to prevent the user 
+   from seeing such an error. */
+      oldrep = astReporting( 0 );
+
+/* Check that no error has already occurred. This gives us confidence
+   that any error detected after the next line was caused by the next line. */
+      tryagain = 0;
+      if( astOK ) {
+
+/* Attempt to clear the value of the attribute. */
+         astClear( pfrm, buf2 );
+
+/* See if an error occurred. If so, set a flag indicating that we should 
+   attempt to access the attribute without an axis index, and clear the
+    error condition. */
+         if( !astOK ) {
+            tryagain = 1;
+            astClearStatus;
+         }
+      }
+
+/* If required try to access the attribute without an axis index. */
+      if( tryagain && astOK ) {
+
+/* Attempt to clear the value of the attribute with no axis index. */
+         astClear( pfrm, buf1 );
+
+/* See if an error occurred. If so, clear the error condition. If not,
+   indicate that we do not need to try again.*/
+         if( !astOK ) {
+            astClearStatus;
+         } else {
+            tryagain = 0;
+         }
+      }
+
+/* Re-instate the original error reporting state. */
+      astReporting( oldrep );
+
+/* Free resources. */
+      pfrm = astAnnul( pfrm );
+   
+    }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   if( tryagain ) {
       (*parent_clearattrib)( this_object, attrib );
    }
 }
@@ -1652,12 +1724,16 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Local Variables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   char buf1[80];                /* For for un-indexed attribute name */
+   char buf2[80];                /* For for indexed attribute name */
    const char *result;           /* Pointer value to return */
-   AstFrame *fr;                 /* Pointer to primary Frame containing axis */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    int axis;                     /* Supplied (1-base) axis index */
-   int faxis;                    /* Index of primary Frame axis */
+   int paxis;                    /* Index of primary Frame axis */
    int len;                      /* Length of attrib string */
    int nc;                       /* Length of string used so far */
+   int oldrep;                   /* Original error reporting state */
+   int tryagain;                 /* Do we need to try to access the attribute again? */
 
 /* Initialise. */
    result = NULL;
@@ -1671,22 +1747,80 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Obtain the length of the attrib string. */
    len = strlen( attrib );
 
-/* Compare "attrib" with each recognised attribute name in turn,
-   obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
-   format.  Set "result" to point at the result string. */
+/* Indicate that we have not yet accessed the attribute succesfully. */
+   tryagain = 1;
 
-/* System(axis). */
-/* ------------- */
+/* This class has no attributes other than the attributes of the parent
+   class (Frame). However, we need to make it easy for users to set
+   attributes which are specific to one of the component Frames. For
+   instance, if the CmpFrame contains a SpecFrame and a SkyFrame, we want
+   to make it easy for the user to set (say) the SourceVel attribute of the
+   SpecFrame. To achieve this, we allow any attribute to be followed by
+   an axis index in parentheses. So in the above example the SourceVel
+   attribute of the component SpecFrame could be set by assigning a value to
+   the "SourceVel(1)" attribute (assuming the SpecFrame is the first of
+   the two component Frames). First, extract the attribute name and the
+   axis index. */
    if ( nc = 0,
-        ( 1 == astSscanf( attrib, "system(%d)%n", &axis, &nc ) )
+        ( 2 == astSscanf( attrib, "%[^(](%d)%n", buf1, &axis, &nc ) )
         && ( nc >= len ) ) {
-      astPrimaryFrame( this, axis - 1, &fr, &faxis );
-      result = astGetC( fr, "system" );
+
+/* Find the primary Frame containing this axis. */
+      astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+
+/* Create a new attribute with the same name but with the axis index
+   appropriate to the primary Frame. */
+      sprintf( buf2, "%s(%d)", buf1, paxis );
+
+/* It may be that the named attribute is not allowed to be indexed within
+   the primary Frame class. If this is the case, accesing it will generate 
+   an error. Ensure error reporting is switched off to prevent the user 
+   from seeing such an error. */
+      oldrep = astReporting( 0 );
+
+/* Check that no error has already occurred. This gives us confidence
+   that any error detected after the next line was caused by the next line. */
+      tryagain = 0;
+      if( astOK ) {
+
+/* Attempt to get the value of the attribute. */
+         result = astGetC( pfrm, buf2 );
+
+/* See if an error occurred. If so, set a flag indicating that we should 
+   attempt to access the attribute without an axis index, and clear the
+    error condition. */
+         if( !astOK ) {
+            tryagain = 1;
+            astClearStatus;
+         }
+      }
+
+/* If required try to access the attribute without an axis index. */
+      if( tryagain && astOK ) {
+
+/* Attempt to get the value of the attribute with no axis index. */
+         result = astGetC( pfrm, buf1 );
+
+/* See if an error occurred. If so, clear the error condition. If not,
+   indicate that we do not need to try again.*/
+         if( !astOK ) {
+            astClearStatus;
+         } else {
+            tryagain = 0;
+         }
+      }
+
+/* Re-instate the original error reporting state. */
+      astReporting( oldrep );
+
+/* Free resources. */
+      pfrm = astAnnul( pfrm );
+   
+    }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
-   } else {
+   if( tryagain ) {
       result = (*parent_getattrib)( this_object, attrib );
    }
 
@@ -4628,12 +4762,16 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Vaiables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
-   AstFrame *fr;                 /* Pointer to primary Frame containing axis */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
+   char buf1[80];                /* For for un-indexed attribute name */
+   char buf2[80];                /* For for indexed attribute name */
    int axis;                     /* Supplied (1-base) axis index */
-   int faxis;                    /* Index of primary Frame axis */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
-   int system;                   /* Offset to start of system value */
+   int oldrep;                   /* Original error reporting state */
+   int paxis;                    /* Index of primary Frame axis */
+   int tryagain;                 /* Do we need to try to access the attribute again? */
+   int value;                    /* Offset to start fo value string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -4644,23 +4782,77 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = strlen( setting );
 
-/* Test for each recognised attribute in turn, using "astSscanf" to parse the
-   setting string and extract the attribute value (or an offset to it in the
-   case of string values). In each case, use the value set in "nc" to check
-   that the entire string was matched. Once a value has been obtained, use the
-   appropriate method to set it. */
-
-/* System(axis). */
-/* ------------- */
+/* This class has no attributes other than the attributes of the parent
+   class (Frame). However, we need to make it easy for users to set
+   attributes which are specific to one of the component Frames. For
+   instance, if the CmpFrame contains a SpecFrame and a SkyFrame, we want
+   to make it easy for the user to set (say) the SourceVel attribute of the
+   SpecFrame. To achieve this, we allow any attribute to be followed by
+   an axis index in parentheses. So in the above example the SourceVel
+   attribute of the component SpecFrame could be set by assigning a value to
+   the "SourceVel(1)" attribute (assuming the SpecFrame is the first of
+   the two component Frames). First, extract the attribute name and the
+   axis index. */
    if ( nc = 0,
-        ( 1 == astSscanf( setting, "system(%d)= %n%*s %n", &axis, &system, 
+        ( 2 == astSscanf( setting, "%[^(](%d)= %n%*s %n", buf1, &axis, &value, 
                           &nc ) ) && ( nc >= len ) ) {
-      astPrimaryFrame( this, axis - 1, &fr, &faxis );
-      astSetC( fr, "system", setting+system );
 
-/* Pass any unrecognised setting to the parent method for further
-   interpretation. */
-   } else {
+/* Find the primary Frame containing this axis. */
+      astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+
+/* Create a new attribute with the same name but with the axis index
+   appropriate to the primary Frame. */
+      sprintf( buf2, "%s(%d)", buf1, paxis );
+
+/* It may be that the named attribute is not allowed to be indexed within
+   the primary Frame class. If this is the case, accesing it will generate 
+   an error. Ensure error reporting is switched off to prevent the user 
+   from seeing such an error. */
+      oldrep = astReporting( 0 );
+
+/* Check that no error has already occurred. This gives us confidence
+   that any error detected after the next line was caused by the next line. */
+      tryagain = 0;
+      if( astOK ) {
+
+/* Attempt to get the value of the attribute. */
+         astSetC( pfrm, buf2, setting+value );
+
+/* See if an error occurred. If so, set a flag indicating that we should 
+   attempt to access the attribute without an axis index, and clear the
+    error condition. */
+         if( !astOK ) {
+            tryagain = 1;
+            astClearStatus;
+         }
+      }
+
+/* If required try to access the attribute without an axis index. */
+      if( tryagain && astOK ) {
+
+/* Attempt to get the value of the attribute with no axis index. */
+         astSetC( pfrm, buf1, setting+value );
+
+/* See if an error occurred. If so, clear the error condition. If not,
+   indicate that we do not need to try again.*/
+         if( !astOK ) {
+            astClearStatus;
+         } else {
+            tryagain = 0;
+         }
+      }
+
+/* Re-instate the original error reporting state. */
+      astReporting( oldrep );
+
+/* Free resources. */
+      pfrm = astAnnul( pfrm );
+   
+    }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   if( tryagain ) {
       (*parent_setattrib)( this_object, setting );
    }
 }
@@ -5488,12 +5680,16 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Local Variables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
-   AstFrame *fr;                 /* Pointer to primary Frame containing axis */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
+   char buf1[80];                /* For for un-indexed attribute name */
+   char buf2[80];                /* For for indexed attribute name */
    int axis;                     /* Supplied (1-base) axis index */
-   int faxis;                    /* Index of primary Frame axis */
    int len;                      /* Length of attrib string */
    int nc;                       /* Length of string used so far */
+   int oldrep;                   /* Original error reporting state */
+   int paxis;                    /* Index of primary Frame axis */
    int result;                   /* Result value to return */
+   int tryagain;                 /* Do we need to try to access the attribute again? */
 
 /* Initialise. */
    result = 0;
@@ -5507,16 +5703,80 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Obtain the length of the attrib string. */
    len = strlen( attrib );
 
-/* Check the attribute name and test the appropriate attribute. */
+/* Indicate that we have not yet accessed the attribute succesfully. */
+   tryagain = 1;
+
+/* This class has no attributes other than the attributes of the parent
+   class (Frame). However, we need to make it easy for users to access
+   attributes which are specific to one of the component Frames. For
+   instance, if the CmpFrame contains a SpecFrame and a SkyFrame, we want
+   to make it easy for the user to set (say) the SourceVel attribute of the
+   SpecFrame. To achieve this, we allow any attribute to be followed by
+   an axis index in parentheses. So in the above example the SourceVel
+   attribute of the component SpecFrame could be set by assigning a value to
+   the "SourceVel(1)" attribute (assuming the SpecFrame is the first of
+   the two component Frames). First, extract the attribute name and the
+   axis index. */
    if ( nc = 0,
-        ( 1 == astSscanf( attrib, "system(%d)%n", &axis, &nc ) )
+        ( 2 == astSscanf( attrib, "%[^(](%d)%n", buf1, &axis, &nc ) )
         && ( nc >= len ) ) {
-      astPrimaryFrame( this, axis - 1, &fr, &faxis );
-      result = astTest( fr, "system" );
-      
-/* If the attribute is not recognised, pass it on to the parent method
-   for further interpretation. */
-   } else {
+
+/* Find the primary Frame containing this axis. */
+      astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+
+/* Create a new attribute with the same name but with the axis index
+   appropriate to the primary Frame. */
+      sprintf( buf2, "%s(%d)", buf1, paxis );
+
+/* It may be that the named attribute is not allowed to be indexed within
+   the primary Frame class. If this is the case, accesing it will generate 
+   an error. Ensure error reporting is switched off to prevent the user 
+   from seeing such an error. */
+      oldrep = astReporting( 0 );
+
+/* Check that no error has already occurred. This gives us confidence
+   that any error detected after the next line was caused by the next line. */
+      tryagain = 0;
+      if( astOK ) {
+
+/* Attempt to test the attribute. */
+         result = astTest( pfrm, buf2 );
+
+/* See if an error occurred. If so, set a flag indicating that we should 
+   attempt to access the attribute without an axis index, and clear the
+    error condition. */
+         if( !astOK ) {
+            tryagain = 1;
+            astClearStatus;
+         }
+      }
+
+/* If required try to access the attribute without an axis index. */
+      if( tryagain && astOK ) {
+
+/* Attempt to test the attribute with no axis index. */
+         result = astTest( pfrm, buf1 );
+
+/* See if an error occurred. If so, clear the error condition. If not,
+   indicate that we do not need to try again.*/
+         if( !astOK ) {
+            astClearStatus;
+         } else {
+            tryagain = 0;
+         }
+      }
+
+/* Re-instate the original error reporting state. */
+      astReporting( oldrep );
+
+/* Free resources. */
+      pfrm = astAnnul( pfrm );
+   
+    }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   if( tryagain ) {
       result = (*parent_testattrib)( this_object, attrib );
    }
 
