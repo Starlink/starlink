@@ -58,6 +58,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.3  1997/11/27 23:11:10  timj
+*     Protect against all points being bad.
+*
 *     Revision 1.2  1997/11/12 00:09:14  timj
 *     Pass the line parameters (statistics) into subroutine.
 *
@@ -103,6 +106,7 @@
       INTEGER COUNT           ! Loop counter
       REAL    DMAX            ! Maximum of data
       REAL    DMIN            ! Minimum of data
+      LOGICAL FOUND           ! TRUE if there is at least one good point
       INTEGER I               ! Loop variable
       INTEGER IERR            ! For VEC_
       INTEGER J               ! J coordinate
@@ -175,6 +179,7 @@
          
             DMIN = VAL__MAXR
             DMAX = VAL__MINR
+            FOUND = .FALSE.
 
             DO COUNT = XRANGE(1), XRANGE(2), STEP
 
@@ -186,75 +191,81 @@
                   IF (BINS(I,J,N) .NE. VAL__BADR) THEN
                      DMIN = MIN(DMIN, BINS(I,J,N))
                      DMAX = MAX(DMAX, BINS(I,J,N))
+                     FOUND = .TRUE.
                   END IF
                   
                END DO   
             END DO
 
+*     Check that we have actually got some data to plot (ie not simply
+*     a whole set of bad values
+
+            IF (FOUND) THEN
+
 *     Add a small bit to the range so that we can see all the points
 
-            RANGE = DMAX - DMIN
-            DMAX = DMAX + (0.05 * RANGE)
-            DMIN = DMIN - (0.05 * RANGE)
+               RANGE = DMAX - DMIN
+               DMAX = DMAX + (0.05 * RANGE)
+               DMIN = DMIN - (0.05 * RANGE)
 
 *     Get some memory for the line drawing routine
-            CALL SCULIB_MALLOC(NX*NY * VAL__NBR, MED_X_PTR, 
-     :           MED_X_END, STATUS)
-            CALL SCULIB_MALLOC(NX*NY * VAL__NBR, MED_PTR, MED_END,
-     :           STATUS)
-            CALL SCULIB_MALLOC(NX*NY * VAL__NBR, STDEVM_PTR, 
-     :           STDEVM_END, STATUS)
-            CALL SCULIB_MALLOC(NX*NY * VAL__NBR, STDEVP_PTR, 
-     :           STDEVP_END, STATUS)
-            CALL SCULIB_MALLOC(NX*NY * VAL__NBR, SIG_X_PTR, 
-     :           SIG_X_END, STATUS)
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, MED_X_PTR, 
+     :              MED_X_END, STATUS)
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, MED_PTR, MED_END,
+     :              STATUS)
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, STDEVM_PTR, 
+     :              STDEVM_END, STATUS)
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, STDEVP_PTR, 
+     :              STDEVP_END, STATUS)
+               CALL SCULIB_MALLOC(NX*NY * VAL__NBR, SIG_X_PTR, 
+     :              SIG_X_END, STATUS)
         
 
 *     Perform graphics operations on the device
 *     Setup the axes
 
-            AXIS = 0
-            CALL PGSCI(1)
+               AXIS = 0
+               CALL PGSCI(1)
             
-            CALL PGENV(REAL(XRANGE(1)), REAL(XRANGE(2)), DMIN, DMAX,
-     :           0, AXIS)
-            
-            CALL PGSCI(3)
+               CALL PGENV(REAL(XRANGE(1)), REAL(XRANGE(2)), DMIN, DMAX,
+     :              0, AXIS)
+               
+               CALL PGSCI(3)
             
 *     Choose a symbol
-            SYMBOL = -1
+               SYMBOL = -1
 
 *     Counters
-            N_SIGS = 0
-            N_MEDIANS = 0
+               N_SIGS = 0
+               N_MEDIANS = 0
 
 *     Loop over each position in the grid
 
-            DO COUNT = XRANGE(1), XRANGE(2), STEP
+               DO COUNT = XRANGE(1), XRANGE(2), STEP
 
-               I = IPOS(COUNT)
-               J = JPOS(COUNT)
+                  I = IPOS(COUNT)
+                  J = JPOS(COUNT)
 
 *     Copy the good data from this I,J to the work array 
 
-               NGOOD = 0
-               XPOS = REAL(COUNT)
+                  NGOOD = 0
+                  XPOS = REAL(COUNT)
                
-               DO N = 1, NMAX
+                  DO N = 1, NMAX
                
-                  IF (BINS(I,J,N) .NE. VAL__BADR) THEN
-                     NGOOD = NGOOD + 1
-                     PNTS(NGOOD) = BINS(I,J,N)
-                     POS(NGOOD)  = XPOS
-                  END IF
+                     IF (BINS(I,J,N) .NE. VAL__BADR) THEN
+                        NGOOD = NGOOD + 1
+                        PNTS(NGOOD) = BINS(I,J,N)
+                        POS(NGOOD)  = XPOS
+                     END IF
                   
-               END DO
+                  END DO
             
             
-               IF (NGOOD .GT. 0) THEN
+                  IF (NGOOD .GT. 0) THEN
 
 *     Plot the points using PGPT
-                  CALL PGPT(NGOOD, POS, PNTS, SYMBOL)
+                     CALL PGPT(NGOOD, POS, PNTS, SYMBOL)
 
 *     ...and read the statistics associated with this (I,J)
 *     Have to use pointers again for the scratch space
@@ -262,68 +273,70 @@
 *     Store the median and sigma for later plotting
 *     D**M pointers!
                   
-                  CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), 
-     :                 %VAL(MED_PTR + (N_MEDIANS * VAL__NBR)),
-     :                 IERR, NERR, STATUS)
-                  
-                  CALL VEC_RTOR(.FALSE., 1, XPOS, 
-     :                 %VAL(MED_X_PTR + (N_MEDIANS * VAL__NBR)),
-     :                 IERR, NERR, STATUS)
-                  
-                  
-                  N_MEDIANS = N_MEDIANS + 1
-                  
-                  IF (STATS(I,J,2) .NE. VAL__BADR) THEN
-
-                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,2), 
-     :                    %VAL(STDEVP_PTR + (N_SIGS * VAL__NBR)),
+                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), 
+     :                    %VAL(MED_PTR + (N_MEDIANS * VAL__NBR)),
      :                    IERR, NERR, STATUS)
-                     
-                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,3), 
-     :                    %VAL(STDEVM_PTR + (N_SIGS * VAL__NBR)),
-     :                    IERR, NERR, STATUS)
-                     
+                  
                      CALL VEC_RTOR(.FALSE., 1, XPOS, 
-     :                    %VAL(SIG_X_PTR + (N_SIGS * VAL__NBR)),
+     :                    %VAL(MED_X_PTR + (N_MEDIANS * VAL__NBR)),
      :                    IERR, NERR, STATUS)
+                  
+                  
+                     N_MEDIANS = N_MEDIANS + 1
+                  
+                     IF (STATS(I,J,2) .NE. VAL__BADR) THEN
+
+                        CALL VEC_RTOR(.FALSE., 1, STATS(I,J,2), 
+     :                       %VAL(STDEVP_PTR + (N_SIGS * VAL__NBR)),
+     :                       IERR, NERR, STATUS)
                      
-                     N_SIGS = N_SIGS + 1
+                        CALL VEC_RTOR(.FALSE., 1, STATS(I,J,3), 
+     :                       %VAL(STDEVM_PTR + (N_SIGS * VAL__NBR)),
+     :                       IERR, NERR, STATUS)
+                     
+                        CALL VEC_RTOR(.FALSE., 1, XPOS, 
+     :                       %VAL(SIG_X_PTR + (N_SIGS * VAL__NBR)),
+     :                       IERR, NERR, STATUS)
+                     
+                        N_SIGS = N_SIGS + 1
+                     END IF
+                  
                   END IF
                   
-               END IF
-                  
-            END DO
+               END DO
 
 *     Now draw on the lines corresponding to median and sigma
 *     Have to enclose in an if since PGPLOT can not check status
             
-            IF (STATUS .EQ. SAI__OK) THEN
+               IF (STATUS .EQ. SAI__OK) THEN
                
-               CALL PGSCI(1)
-               CALL PGSLS(1)
+                  CALL PGSCI(1)
+                  CALL PGSLS(1)
                
-               CALL PGLINE(N_MEDIANS, %VAL(MED_X_PTR), %VAL(MED_PTR))
+                  CALL PGLINE(N_MEDIANS, %VAL(MED_X_PTR), %VAL(MED_PTR))
                
-               IF (NSIGMA .GT. 0.0) THEN
-                  CALL PGSCI(2)
-                  CALL PGLINE(N_SIGS, %VAL(SIG_X_PTR), 
-     :                 %VAL(STDEVP_PTR))
-                  CALL PGLINE(N_SIGS, %VAL(SIG_X_PTR), 
-     :                 %VAL(STDEVM_PTR))
+                  IF (NSIGMA .GT. 0.0) THEN
+                     CALL PGSCI(2)
+                     CALL PGLINE(N_SIGS, %VAL(SIG_X_PTR), 
+     :                    %VAL(STDEVP_PTR))
+                     CALL PGLINE(N_SIGS, %VAL(SIG_X_PTR), 
+     :                    %VAL(STDEVM_PTR))
+                  END IF
                END IF
-            END IF
             
 *     Free the memory
-            CALL SCULIB_FREE('MED_PTR', MED_PTR, MED_END, STATUS)
-            CALL SCULIB_FREE('MED_X_PTR',MED_X_PTR, MED_X_END, 
-     :           STATUS)
-            CALL SCULIB_FREE('SIG_X_PTR', SIG_X_PTR, SIG_X_END, 
-     :           STATUS)
-            CALL SCULIB_FREE('STDEVP', STDEVP_PTR, STDEVP_END, 
-     :           STATUS)
-            CALL SCULIB_FREE('STDEVM', STDEVM_PTR, STDEVM_END, 
-     :           STATUS)
-
+               CALL SCULIB_FREE('MED_PTR', MED_PTR, MED_END, STATUS)
+               CALL SCULIB_FREE('MED_X_PTR',MED_X_PTR, MED_X_END, 
+     :              STATUS)
+               CALL SCULIB_FREE('SIG_X_PTR', SIG_X_PTR, SIG_X_END, 
+     :              STATUS)
+               CALL SCULIB_FREE('STDEVP', STDEVP_PTR, STDEVP_END, 
+     :              STATUS)
+               CALL SCULIB_FREE('STDEVM', STDEVM_PTR, STDEVM_END, 
+     :              STATUS)
+               
+            END IF
+            
          END IF
 
       END DO
