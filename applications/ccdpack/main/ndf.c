@@ -905,7 +905,7 @@
          resamp = 0;
          nflag = 0;
          if ( objc > 2 + nflag &&
-              ! strcmp( Tcl_GetString( objv[ 2 ] + nflag ), "-resamp" ) ) {
+              ! strcmp( Tcl_GetString( objv[ 2 + nflag ] ), "-resamp" ) ) {
             resamp = 1;
             nflag++;
          }
@@ -1397,7 +1397,7 @@
          form = 0;
          nflag = 0;
          if ( objc > 2 + nflag && 
-              ! strcmp( Tcl_GetString( objv[ 2 ] + nflag ), "-format" ) ) {
+              ! strcmp( Tcl_GetString( objv[ 2 + nflag ] ), "-format" ) ) {
             form = 1;
             nflag++;
          }
