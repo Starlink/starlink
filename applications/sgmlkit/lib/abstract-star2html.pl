@@ -128,7 +128,7 @@ while (defined($line = <TF>))
 	    $line =~ /(\\(sub)*section{([^{]*{[^{}]*})*[^{}]*})/;
 	    my $stitle = parse_section ($1);
 	    print $stitle;
-	    print STDERR "Possible markup in section $stitle"
+	    print STDERR "Possible markup in section $stitle\n"
 		if ($stitle =~ /(\\|~)/);
 	    next;
 	};
@@ -155,7 +155,7 @@ while (defined($line = <TF>))
 	my ($cmd,$arg) = 
 	    ($line =~ /\\newcommand\s*{([^}]*)}\s*{(([^{]*{[^{}]*})*[^{}]*)}/);
 
-	print STDERR "Possible markup in $cmd $arg"
+	print STDERR "Possible markup in $cmd $arg\n"
 		if ($arg =~ /(\\|~)/ && $cmd ne '\stardocauthors');
 
 	$cmd eq '\stardocinitials' &&
