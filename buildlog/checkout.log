@@ -7290,9 +7290,11 @@ cvs checkout: Updating java/source/table
 U java/source/table/build.xml
 cvs checkout: Updating java/source/table/src
 cvs checkout: Updating java/source/table/src/docs
+U java/source/table/src/docs/JEL-licence
 U java/source/table/src/docs/Ptplot-licence
 U java/source/table/src/docs/TableViewer.txt
 cvs checkout: Updating java/source/table/src/lib
+U java/source/table/src/lib/jel_g.jar
 U java/source/table/src/lib/plot.jar
 cvs checkout: Updating java/source/table/src/main
 cvs checkout: Updating java/source/table/src/main/uk
@@ -7354,12 +7356,15 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 U java/source/table/src/main/uk/ac/starlink/table/view/AuxWindow.java
+U java/source/table/src/main/uk/ac/starlink/table/view/ColumnDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ExtendedStarTableModel.java
+U java/source/table/src/main/uk/ac/starlink/table/view/JELRowReader.java
 U java/source/table/src/main/uk/ac/starlink/table/view/MirageHandler.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SizingScrollPane.java
+U java/source/table/src/main/uk/ac/starlink/table/view/SyntheticColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/view/TableColumnModelAdapter.java
 U java/source/table/src/main/uk/ac/starlink/table/view/TableViewer.java
 U java/source/table/src/main/uk/ac/starlink/table/view/WindowTracker.java
