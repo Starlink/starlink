@@ -563,13 +563,13 @@
               END IF
             END IF
 
+*        Map it
+            CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
+     :                        PSID, PTR, NELM, STATUS )
+
 *        Create dynamic array
             CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
             CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
-
-*        Map it
-            CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
-     :                          PSID, PTR, NELM, STATUS )
 
 *        Scalar width present?
             IF ( STHERE ) THEN
