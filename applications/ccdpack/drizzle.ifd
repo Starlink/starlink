@@ -1,0 +1,258 @@
+      action drizzle {
++
+#  Name:
+#     drizzle.ifd
+
+#  Type of Module:
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
+
+#  Authors:
+#     AALLAN: Alasdair Allan (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-APR-1999 (AALLAN):
+#     	 Original Version
+#     {enter_further_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+
+         parameter cmpvar {
+                           # Use variance during inter-comparison?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Use variance during inter-comparison?}
+            helpkey *
+          }
+                    
+         parameter correct {
+                          #  File containing scale and zero point information
+           type     LITERAL
+           access   READ
+           vpath    PROMPT
+           ppath    CURRENT DEFAULT
+           default  drizzle.dat
+           prompt   {File containing corrections}
+           helpkey  *
+         }
+                   
+         parameter in {
+                       # Input NDF
+            position 1
+            type _CHAR
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {List of input NDFs}
+            helpkey *
+          }
+         
+         parameter listin {
+                           # List input NDFs?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {List input NDF names?}
+            helpkey *
+          } 
+          
+          parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt {Logfile name}
+            default CCDPACK.LOG
+            helpkey *
+          }
+          
+         parameter mapvar {
+                         # Use inverse variance maps as weights?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Use inverse variance maps as weights?}
+            helpkey *
+          }                                 
+
+         parameter maxit {
+                          # Maximum number of inter-comparison iterations
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 20
+            prompt {Maximum number of inter-comparison iterations}
+            helpkey *
+          }
+          
+         parameter multi {
+            type _DOUBLE
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.5D0
+            prompt {Linear scaling of output/input pixels}
+            helpkey *
+          }    
+                         
+         parameter out {
+                        # Output NDF
+            position 2
+            type _CHAR
+            access READ
+            vpath PROMPT 
+            association ->global.data_array
+            prompt {Output mosaic NDF}
+            helpkey *
+          }
+
+         parameter optov {
+                          # Optimum number of overlaps per NDF
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Optimum number of overlaps per NDF}
+            helpkey *
+          }   
+                 
+          parameter pixfrac {
+            type _DOUBLE
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.9D0
+            prompt {Pixel fraction (size of "drop")}
+            helpkey *
+          }  
+
+         parameter ref {
+                        # Reference NDF
+            type _CHAR
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Reference NDF}
+            helpkey *
+          }     
+                      
+         parameter scale {
+                          # Adjust scale-factors?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Adjust scale-factors?}
+            helpkey *
+          }
+  
+         parameter skysup {
+                           # Sky noise suppression factor
+            type _REAL
+            access READ
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default 10.0
+            prompt {Sky noise suppression factor}
+            helpkey *
+          }
+          
+         parameter title {
+                          # Title for output mosaic NDF
+            type LITERAL
+            access READ
+            vpath DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default {Output from DRIZZLE}
+            prompt {Title for output mosaic}
+            helpkey *
+          }
+          
+         parameter tmpfile {
+             # Names for temporary NDFs used for scale & zero-point calculations
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default {*_tmp}
+            prompt {Temporary NDF filename}
+            helpkey *
+          }
+
+         parameter tols {
+                         # Scale-factor accuracy tolerance
+            type _REAL
+            access READ
+            vpath CURRENT DYNAMIC DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            default 0.001
+            prompt {Fractional scale-factor tolerance}
+            helpkey *
+          }
+
+         parameter tolz {
+                         # Zero-point accuracy tolerance
+            type _REAL
+            access READ
+            vpath CURRENT DYNAMIC DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            default 0.05
+            prompt {Zero-point tolerance}
+            helpkey *
+          }
+          
+         parameter usevar {
+                         # Use image variances as weights?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Use inverse mean image variances as weights?}
+            helpkey *
+          } 
+
+         parameter zero {
+                         # Adjust zero-points?
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Adjust zero-points?}
+            helpkey *
+          } 
+      }
+# $Id$
