@@ -82,7 +82,7 @@ require DynaLoader;
 
 Exporter::export_tags('ams','adam');
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -156,6 +156,9 @@ sub adam_exit {
 #
 #   Returns an array containing:
 #     $command, $taks, $facerr, $status
+
+# facerr is the status number and so is identical to inmsg_status
+# at the present time.
 
 sub adam_process_message {
 
@@ -232,16 +235,10 @@ sub adam_process_message {
 
     if ($status == &SAI__OK) {
 
-      # We now have good values for $task and $command
-      # Now we can convert our error status to the FACERR
-
-      ems1_get_facility_error($inmsg_status, $facility, $ident, $text);
-
-      if ($facility eq 'FACERR') {
-	$facerr = $facility . "__$ident $text";
-      } else {
-	$facerr = $inmsg_status;
-      }
+      # The message status is just inmsg_status
+      # we should not do anything to this (eg translating it to text)
+      # Leave that to the caller
+      $facerr = $inmsg_status;
 
       # Now look at $prompt (dont know why since prompt CAN only
       # equal $inmsg_value!)

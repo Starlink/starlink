@@ -1,3 +1,12 @@
+2005-03-30  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* ADAM.pm (adam_process_message): Fix problem whereby the obey
+	returned with a string status of FACERR__NOFAC if the error number
+	was not defined. Given that the code calling this was always
+	assuming it got an integer status back (which it did whenever it
+	could be translated) we now enforce that behaviour even if
+	FACERR_NOFAC.
+
 2003-07-19  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* ADAM.pm (adam_process_message): Fix | precedence error and bump
