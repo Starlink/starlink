@@ -1493,11 +1493,13 @@ ARDAPP. The highest priority Frame found within this list is used as the
 common Frame.
 
 \item If there is neither a WCS nor a COFRAME statement in the ARD
-description, then it is assumed that positions are supplied in pixel
-coordinates. The exception to this is if any of the depracated statements
-COEFFS, OFFSET, TWIST, STRETCH, SCALE are included in the ARD description,
-in which case positions are interpreted according to the old, version 1 system 
-described below.
+description, then it is assumed that positions are supplied in the
+current Frame of the application FrameSet (so the calling application
+should make sure that the FrameSet has an appropriate current Frame
+before calling ARD\_WORK). The exception to this is if any of the
+depracated statements COEFFS, OFFSET, TWIST, STRETCH, SCALE are included
+in the ARD description, in which case positions are interpreted according
+to the old, version 1 system described below.
 
 \end{enumerate}
 
@@ -1506,7 +1508,6 @@ statements. The positions, {\em etc}, defining a given region in the
 description are interpreted using the most recent WCS-related statement.
 Thus, WCS information given later in an ARD description over-rides any
 given earlier.
-
 
 \subsection{Co-ordinate Handling in ARD Prior to Version 2}
 
