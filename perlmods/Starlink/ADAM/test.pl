@@ -1,5 +1,6 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
+# 
 
 # This is a test file. As yet it doesn't do anything
 ######################### We start with some black magic to print on failure.
