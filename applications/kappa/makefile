@@ -228,6 +228,9 @@
 #        Version 0.13. Added internal NDG library. Added applications
 #        WCSFRAME, WCSALIGN, WCSADD, WCSATTRIB, WCSREMOVE, PROFILE,
 #        LISTMAKE, LISTSHOW, CHAIN, RESHAPE, COPYBAD, WCSTRAN
+#     7-DEC-1998 (DSB):
+#        Corrected TCL linking, and updated libraries to TCL_VERS = 7.6
+#        and TK_VERS = 4.2.
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -386,9 +389,9 @@ ALINK = $(STAR_BIN)/alink
 
 #  Tcl/Tk 
 
-STARTCL_DIR = /star/starlink/tclsys/startcl
-TCL_VERS = 7.4
-TK_VERS = 4.0
+STARTCL_DIR = /star/bin/startcl
+TCL_VERS = 7.6
+TK_VERS = 4.2
 
 #-------------------------------------------------------------------------------
 
