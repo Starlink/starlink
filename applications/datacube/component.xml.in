@@ -13,16 +13,14 @@ cube manipulation. </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
-  <!--
   <developers>
     <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
+      <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
     </person>
   </developers>
-  -->
-  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
