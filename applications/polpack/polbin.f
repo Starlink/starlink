@@ -285,23 +285,22 @@
 
 *  Get CAT identifiers for the required columns. First get position columns
 *  (X and Y) and total intensity (I).
-      CALL CAT_TIDNT( CIIN, 'X', GI( X_ID ), STATUS )       
-      CALL CAT_TIDNT( CIIN, 'Y', GI( Y_ID ), STATUS )       
-      CALL CAT_TIDNT( CIIN, 'I', GI( I_ID ), STATUS )       
+      CALL POL1_GTCOL( CIIN, 'X', .TRUE., GI( X_ID ), STATUS )       
+      CALL POL1_GTCOL( CIIN, 'Y', .TRUE., GI( Y_ID ), STATUS )       
+      CALL POL1_GTCOL( CIIN, 'I', .TRUE., GI( I_ID ), STATUS )       
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If there is a column named "V" we are dealing with circular polarimetry.
-*  Attempt to get a CAT identifier for the "V" column. If an error occurs,
-*  annul it and assume we are dealing with linear polarimetry. In this
-*  case get columns for Q and U instead. 
-      CALL CAT_TIDNT( CIIN, 'V', GI( V_ID ), STATUS )       
-      IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_ANNUL( STATUS )
+*  Attempt to get a CAT identifier for the "V" column. Otherwise, 
+*  assume we are dealing with linear polarimetry. In this case get columns 
+*  for Q and U instead. 
+      CALL POL1_GTCOL( CIIN, 'V', .FALSE., GI( V_ID ), STATUS )       
+      IF( GI( V_ID ) .EQ. CAT__NOID ) THEN
          CIRC = .FALSE.
-         CALL CAT_TIDNT( CIIN, 'Q', GI( Q_ID ), STATUS )       
-         CALL CAT_TIDNT( CIIN, 'U', GI( U_ID ), STATUS )       
+         CALL POL1_GTCOL( CIIN, 'Q', .TRUE., GI( Q_ID ), STATUS )       
+         CALL POL1_GTCOL( CIIN, 'U', .TRUE., GI( U_ID ), STATUS )       
       ELSE
          CIRC = .TRUE.
       END IF
@@ -311,13 +310,13 @@
 
 *  Try to find corresponding error columns for these columns (except X
 *  and Y). 
-      CALL CAT_TIDNT( CIIN, 'DI', GI( DI_ID ), STATUS )       
+      CALL POL1_GTCOL( CIIN, 'DI', .TRUE., GI( DI_ID ), STATUS )       
 
       IF( CIRC ) THEN
-         CALL CAT_TIDNT( CIIN, 'DV', GI( DV_ID ), STATUS )       
+         CALL POL1_GTCOL( CIIN, 'DV', .TRUE., GI( DV_ID ), STATUS )       
       ELSE
-         CALL CAT_TIDNT( CIIN, 'DQ', GI( DQ_ID ), STATUS )       
-         CALL CAT_TIDNT( CIIN, 'DU', GI( DU_ID ), STATUS )       
+         CALL POL1_GTCOL( CIIN, 'DQ', .TRUE., GI( DQ_ID ), STATUS )       
+         CALL POL1_GTCOL( CIIN, 'DU', .TRUE., GI( DU_ID ), STATUS )       
       END IF
 
 *  If any of these error columns could not be found, do not use any of

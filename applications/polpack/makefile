@@ -363,7 +363,7 @@ PKG_NAME = polpack
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.1-5
+PKG_VERS = 2.1-6
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -460,7 +460,8 @@ polimage.f pol1_axset.f pol1_xeval.f pol1_imprt.f pol1_dftab.f \
 pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
 polversion.f pol1_3dwcs.f pol1_fbbox.f polwrtcl.f pol1_wrtcl.f \
 pol1_gcolr.f pol1_gcold.f pol1_fioer.f  polrdtcl.f pol1_rdtcl.f \
-pol1_ctprp.f
+pol1_ctprp.f pol1_put0r.f pol1_put0d.f pol1_gtcol.f pol1_cnews.f \
+pol1_colnm.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 
@@ -660,7 +661,6 @@ CAT1_PAR:       cat1_par;             $(LINK) $? $@
 CAT3_FIT_CMN:   cat3_fit_cmn;         $(LINK) $? $@
 CAT1_CATS_CMN:  cat1_cats_cmn;        $(LINK) $? $@
 
-ast.h:   $(STAR_INC)/ast.h;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 AST_ERR:   $(STAR_INC)/ast_err;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
@@ -1795,6 +1795,10 @@ ctg_setsz.o:	 SAE_PAR GRP_PAR
 datapic.o:	 SAE_PAR
 gethlp.o:	 SAE_PAR HLPCMD
 gthlpi.o:	 SAE_PAR HLPCMD
+pol1_colnm.o:    SAE_PAR FIO_ERR
+pol1_put0r.o:    CAT_PAR
+pol1_cnews.o:    SAE_PAR CAT_PAR
+pol1_put0d.o:    CAT_PAR
 pol1_angrt.o:	 SAE_PAR AST_PAR
 pol1_blkwr.o:	 SAE_PAR PRM_PAR
 pol1_chkex.o:	 SAE_PAR GRP_PAR DAT_PAR NDF_PAR AST_PAR
@@ -1844,6 +1848,7 @@ pol1_vecky.o:	 SAE_PAR AST_PAR
 pol1_vecpl.o:	 SAE_PAR PRM_PAR MSG_PAR
 pol1_vect.o:	 SAE_PAR
 pol1_wrtcl.o:	 SAE_PAR PRM_PAR 
+pol1_gtcol.o:	 SAE_PAR CAT_PAR
 pol1_xeval.o:	 SAE_PAR DAT_PAR GRP_PAR TRN_ERR
 pol_cale.o:	 SAE_PAR PRM_PAR
 pol_calf.o:	 SAE_PAR PRM_PAR

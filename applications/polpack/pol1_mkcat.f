@@ -137,13 +137,13 @@
 *  Create the columns...
 
 *  Pixel X coordinate.
-      CALL CAT_CNEWS( CI, 'X',
+      CALL POL1_CNEWS( CI, 'X', .TRUE.,
      :                CAT__TYPER, 0, AST_GETC( FRM, 'Unit(1)', STATUS ), 
      :                'F7.1', AST_GETC( FRM, 'Label(1)', STATUS ), II, 
      :                STATUS )
 
 *  Pixel Y coordinate.
-      CALL CAT_CNEWS( CI, 'Y',
+      CALL POL1_CNEWS( CI, 'Y', .TRUE.,
      :                CAT__TYPER, 0, AST_GETC( FRM, 'Unit(2)', STATUS ), 
      :                'F7.1', AST_GETC( FRM, 'Label(2)', STATUS ), II, 
      :                STATUS )
@@ -162,12 +162,12 @@
             IF( EQFS .NE. AST__NULL ) THEN
 
 *  RA .
-               CALL CAT_CNEWS( CI, 'RA', CAT__TYPED, 0, 
+               CALL POL1_CNEWS( CI, 'RA', .TRUE., CAT__TYPED, 0, 
      :                         'RADIANS{HOURS}', 'D16.8', 
      :                         'Right Ascension (FK5)', II, STATUS )
 
 *  DEC .
-               CALL CAT_CNEWS( CI, 'DEC', CAT__TYPED, 0, 
+               CALL POL1_CNEWS( CI, 'DEC', .TRUE., CAT__TYPED, 0, 
      :                         'RADIANS{DEGREES}', 'D16.8', 
      :                         'Declination (FK5)', II, STATUS )
 
@@ -185,82 +185,85 @@
       END IF
 
 *  Total intensity.
-      CALL CAT_CNEWS( CI, 'I', CAT__TYPER, 0, UNITS, 'G13.6', 
+      CALL POL1_CNEWS( CI, 'I', .TRUE., CAT__TYPER, 0, UNITS, 'G13.6', 
      :                'Total intensity', II, STATUS )
 
 *  Total intensity standard deviation (if variances are available).
       IF( VAR ) THEN 
-         CALL CAT_CNEWS( CI, 'DI', CAT__TYPER, 0, UNITS, 'G13.6', 
-     :                   'Standard deviation on total intensity', II, 
-     :                   STATUS )
+         CALL POL1_CNEWS( CI, 'DI',  .TRUE., CAT__TYPER, 0, UNITS, 
+     :                   'G13.6', 'Standard deviation on total '//
+     :                   'intensity', II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
       END IF
 
 *  Q and U (if not circular).
       IF( .NOT. CIRC ) THEN
-         CALL CAT_CNEWS( CI, 'Q', CAT__TYPER, 0, UNITS, 'G13.6', 
-     :                   'Stokes parameter Q', II, STATUS )
+         CALL POL1_CNEWS( CI, 'Q', .TRUE., CAT__TYPER, 0, UNITS, 
+     :                   'G13.6', 'Stokes parameter Q', II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
 
          IF( VAR ) THEN
-            CALL CAT_CNEWS( CI, 'DQ', CAT__TYPER, 0, UNITS, 'G13.6', 
-     :                     'Standard deviation on Q', II, STATUS )
+            CALL POL1_CNEWS( CI, 'DQ', .TRUE., CAT__TYPER, 0, UNITS, 
+     :                       'G13.6', 'Standard deviation on Q', II, 
+     :                       STATUS )
             CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
          END IF
 
-         CALL CAT_CNEWS( CI, 'U', CAT__TYPER, 0, UNITS, 'G13.6', 
-     :                   'Stokes parameter U', II, STATUS )
+         CALL POL1_CNEWS( CI, 'U', .TRUE., CAT__TYPER, 0, UNITS, 
+     :                   'G13.6', 'Stokes parameter U', II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
 
          IF( VAR ) THEN
-            CALL CAT_CNEWS( CI, 'DU', CAT__TYPER, 0, UNITS, 'G13.6', 
-     :                     'Standard deviation on U', II, STATUS )
+            CALL POL1_CNEWS( CI, 'DU', .TRUE., CAT__TYPER, 0, UNITS, 
+     :                       'G13.6', 'Standard deviation on U', II, 
+     :                       STATUS )
             CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
          END IF
 
 *  V (if circular).
       ELSE
-         CALL CAT_CNEWS( CI, 'V', CAT__TYPER, 0, UNITS, 'G13.6', 
-     :                   'Stokes parameter V', II, STATUS )
+         CALL POL1_CNEWS( CI, 'V', .TRUE., CAT__TYPER, 0, UNITS, 
+     :                    'G13.6', 'Stokes parameter V', II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
 
          IF( VAR ) THEN
-            CALL CAT_CNEWS( CI, 'DV', CAT__TYPER, 0, UNITS, 'G13.6', 
-     :                     'Standard deviation on V', II, STATUS )
+            CALL POL1_CNEWS( CI, 'DV', .TRUE., CAT__TYPER, 0, UNITS, 
+     :                       'G13.6', 'Standard deviation on V', II, 
+     :                       STATUS )
             CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
          END IF
       END IF
 
 *  Percentage polarisation.
-      CALL CAT_CNEWS( CI, 'P', CAT__TYPER, 0, '%', 'F6.2', 
+      CALL POL1_CNEWS( CI, 'P', .FALSE., CAT__TYPER, 0, '%', 'F6.2', 
      :                'Percentage polarisation', II, STATUS )
 
       IF( VAR ) THEN
-         CALL CAT_CNEWS( CI, 'DP', CAT__TYPER, 0, '%', 'F6.3', 
-     :                  'Standard deviation on percentage polarisation',
-     :                   II, STATUS )
+         CALL POL1_CNEWS( CI, 'DP', (II .NE. CAT__NOID), CAT__TYPER, 0, 
+     :                    '%', 'F6.3', 'Standard deviation on '//
+     :                    'percentage polarisation', II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
       END IF
 
 *  Polarisation angle (degrees). 
-      CALL CAT_CNEWS( CI, 'ANG', CAT__TYPER, 0, 'Degrees', 'F6.2', 
-     :                'Polarisation angle', II, STATUS )
+      CALL POL1_CNEWS( CI, 'ANG', .FALSE., CAT__TYPER, 0, 'Degrees', 
+     :                'F6.2', 'Polarisation angle', II, STATUS )
 
       IF( VAR ) THEN
-         CALL CAT_CNEWS( CI, 'DANG', CAT__TYPER, 0, 'Degrees', 'F6.3', 
-     :                   'Standard deviation on polarisation angle',
-     :                   II, STATUS )
+         CALL POL1_CNEWS( CI, 'DANG', (II .NE. CAT__NOID), CAT__TYPER,
+     :                    0, 'Degrees', 'F6.3', 'Standard deviation '//
+     :                    'on polarisation angle', II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
       END IF
 
 *  Polarised intensity.
-      CALL CAT_CNEWS( CI, 'PI', CAT__TYPER, 0, UNITS, 'G13.6', 
+      CALL POL1_CNEWS( CI, 'PI', .FALSE., CAT__TYPER, 0, UNITS, 'G13.6', 
      :                'Polarised intensity', II, STATUS )
 
       IF( VAR ) THEN
-         CALL CAT_CNEWS( CI, 'DPI', CAT__TYPER, 0, UNITS, 'G13.6',
-     :                   'Standard deviation on polarised intensity',
-     :                   II, STATUS )
+         CALL POL1_CNEWS( CI, 'DPI', (II .NE. CAT__NOID), CAT__TYPER, 0, 
+     :                    UNITS, 'G13.6', 'Standard deviation on '//
+     :                    'polarised intensity', II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
       END IF
 

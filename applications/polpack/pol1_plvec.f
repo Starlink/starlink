@@ -154,6 +154,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'AST_PAR'          ! AST_ constants
+      INCLUDE 'CAT_PAR'          ! CAT_ constants
 
 *  Arguments Given:
       REAL TR( 4 )
@@ -296,37 +297,40 @@
       IF( MAKECT ) THEN
          NVEC = 0
 
-         CALL CAT_TIDNT( CI, 'X', XCAT, STATUS )
-         CALL CAT_TIDNT( CI, 'Y', YCAT, STATUS )
+         CALL POL1_GTCOL( CI, 'X', .TRUE., XCAT, STATUS )
+         CALL POL1_GTCOL( CI, 'Y', .TRUE., YCAT, STATUS )
 
          IF( EQMAP .NE. AST__NULL ) THEN
-            CALL CAT_TIDNT( CI, 'RA', RACAT, STATUS )
-            CALL CAT_TIDNT( CI, 'DEC', DECCAT, STATUS )
+            CALL POL1_GTCOL( CI, 'RA', .TRUE., RACAT, STATUS )
+            CALL POL1_GTCOL( CI, 'DEC', .TRUE., DECCAT, STATUS )
          END IF
 
-         CALL CAT_TIDNT( CI, 'I', ICAT, STATUS )
-         CALL CAT_TIDNT( CI, 'P', PCAT, STATUS )
-         CALL CAT_TIDNT( CI, 'ANG', ANCAT, STATUS )
-         CALL CAT_TIDNT( CI, 'PI', PICAT, STATUS )
+         CALL POL1_GTCOL( CI, 'I', .TRUE., ICAT, STATUS )
+         CALL POL1_GTCOL( CI, 'P', .FALSE., PCAT, STATUS )
+         CALL POL1_GTCOL( CI, 'ANG', .FALSE., ANCAT, STATUS )
+         CALL POL1_GTCOL( CI, 'PI', .FALSE., PICAT, STATUS )
 
          IF( CIRC ) THEN
-            CALL CAT_TIDNT( CI, 'V', VCAT, STATUS )
+            CALL POL1_GTCOL( CI, 'V', .TRUE., VCAT, STATUS )
          ELSE
-            CALL CAT_TIDNT( CI, 'Q', QCAT, STATUS )
-            CALL CAT_TIDNT( CI, 'U', UCAT, STATUS )
+            CALL POL1_GTCOL( CI, 'Q', .TRUE., QCAT, STATUS )
+            CALL POL1_GTCOL( CI, 'U', .TRUE., UCAT, STATUS )
          END IF
 
          IF( VAR ) THEN
-            CALL CAT_TIDNT( CI, 'DI', DICAT, STATUS )
-            CALL CAT_TIDNT( CI, 'DP', DPCAT, STATUS )
-            CALL CAT_TIDNT( CI, 'DANG', DANCAT, STATUS )
-            CALL CAT_TIDNT( CI, 'DPI', DPICAT, STATUS )
+            CALL POL1_GTCOL( CI, 'DI', .TRUE., DICAT, STATUS )
+            CALL POL1_GTCOL( CI, 'DP', (PCAT .NE. CAT__NOID), DPCAT, 
+     :                       STATUS )
+            CALL POL1_GTCOL( CI, 'DANG', (ANCAT .NE. CAT__NOID), DANCAT, 
+     :                       STATUS )
+            CALL POL1_GTCOL( CI, 'DPI', (PICAT .NE. CAT__NOID), DPICAT, 
+     :                       STATUS )
 
             IF( CIRC ) THEN
-               CALL CAT_TIDNT( CI, 'DV', DVCAT, STATUS )
+               CALL POL1_GTCOL( CI, 'DV', .TRUE., DVCAT, STATUS )
             ELSE
-               CALL CAT_TIDNT( CI, 'DQ', DQCAT, STATUS )
-               CALL CAT_TIDNT( CI, 'DU', DUCAT, STATUS )
+               CALL POL1_GTCOL( CI, 'DQ', .TRUE., DQCAT, STATUS )
+               CALL POL1_GTCOL( CI, 'DU', .TRUE., DUCAT, STATUS )
             END IF
 
          END IF
@@ -553,81 +557,81 @@
 *  Store values for all the catalogue columns in the current row buffer.
                   XR = TR( 1 ) + TR( 2 )*REAL( PIX )
                   YR = TR( 3 ) + TR( 4 )*REAL( ROW )
-                  CALL CAT_PUT0R( XCAT, XR, .FALSE., STATUS )
-                  CALL CAT_PUT0R( YCAT, YR, .FALSE., STATUS )
+                  CALL POL1_PUT0R( XCAT, XR, .FALSE., STATUS )
+                  CALL POL1_PUT0R( YCAT, YR, .FALSE., STATUS )
 
                   IF( EQMAP .NE. AST__NULL ) THEN
-                     CALL CAT_PUT0D( RACAT, W1( PIX, ROW ), .FALSE., 
+                     CALL POL1_PUT0D( RACAT, W1( PIX, ROW ), .FALSE., 
      :                               STATUS )
-                     CALL CAT_PUT0D( DECCAT, W2( PIX, ROW ), .FALSE., 
+                     CALL POL1_PUT0D( DECCAT, W2( PIX, ROW ), .FALSE., 
      :                               STATUS )
                   END IF
 
-                  CALL CAT_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
+                  CALL POL1_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( QCAT, QIN, ( QIN .EQ. VAL__BADR ),
+                  CALL POL1_PUT0R( QCAT, QIN, ( QIN .EQ. VAL__BADR ),
      :                            STATUS )
-                  CALL CAT_PUT0R( UCAT, UIN, ( UIN .EQ. VAL__BADR ),
+                  CALL POL1_PUT0R( UCAT, UIN, ( UIN .EQ. VAL__BADR ),
      :                            STATUS )
-                  CALL CAT_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
+                  CALL POL1_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ),
+                  CALL POL1_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ),
      :                            STATUS )
 
                   IF ( T .NE. VAL__BADR ) THEN
-                     CALL CAT_PUT0R( ANCAT,  T, .FALSE., STATUS )
+                     CALL POL1_PUT0R( ANCAT,  T, .FALSE., STATUS )
                   ELSE
-                     CALL CAT_PUT0R( ANCAT,  VAL__BADR, .TRUE., 
+                     CALL POL1_PUT0R( ANCAT,  VAL__BADR, .TRUE., 
      :                               STATUS )
                   END IF
 
                   IF( VAR ) THEN
                      IF( VI .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DICAT, SQRT( MAX( 0.0, VI ) ), 
+                        CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VI) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DICAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DICAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
                      IF( VQIN .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DQCAT, SQRT( MAX( 0.0, VQIN ) ), 
+                        CALL POL1_PUT0R( DQCAT, SQRT( MAX(0.0,VQIN) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DQCAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DQCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
                      IF( VUIN .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DUCAT, SQRT( MAX( 0.0, VUIN ) ), 
+                        CALL POL1_PUT0R( DUCAT, SQRT( MAX(0.0,VUIN) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DUCAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DUCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
 
                      IF( VP .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DPCAT, SQRT( MAX( 0.0, VP ) ), 
+                        CALL POL1_PUT0R( DPCAT, SQRT( MAX(0.0,VP) ), 
      :                             .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DPCAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DPCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
                      IF( VT .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DANCAT, SQRT( MAX( 0.0, VT ) ), 
+                        CALL POL1_PUT0R( DANCAT, SQRT( MAX(0.0,VT) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DANCAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DANCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
                      IF( VIP .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DPICAT, SQRT( MAX( 0.0, VIP ) ), 
+                        CALL POL1_PUT0R( DPICAT, SQRT( MAX(0.0,VIP) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DPICAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DPICAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
@@ -781,65 +785,65 @@
 *  Store values for all the catalogue columns in the current row buffer.
                   XR = TR( 1 ) + TR( 2 )*REAL( PIX )
                   YR = TR( 3 ) + TR( 4 )*REAL( ROW )
-                  CALL CAT_PUT0R( XCAT, XR, .FALSE., STATUS )
-                  CALL CAT_PUT0R( YCAT, YR, .FALSE., STATUS )
+                  CALL POL1_PUT0R( XCAT, XR, .FALSE., STATUS )
+                  CALL POL1_PUT0R( YCAT, YR, .FALSE., STATUS )
 
                   IF( EQMAP .NE. AST__NULL ) THEN
-                     CALL CAT_PUT0D( RACAT, W1( PIX, ROW ), .FALSE., 
+                     CALL POL1_PUT0D( RACAT, W1( PIX, ROW ), .FALSE., 
      :                               STATUS )
-                     CALL CAT_PUT0D( DECCAT, W2( PIX, ROW ), .FALSE., 
+                     CALL POL1_PUT0D( DECCAT, W2( PIX, ROW ), .FALSE., 
      :                               STATUS )
                   END IF
 
-                  CALL CAT_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
+                  CALL POL1_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( VCAT, VIN, ( VIN .EQ. VAL__BADR ), 
+                  CALL POL1_PUT0R( VCAT, VIN, ( VIN .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
+                  CALL POL1_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( ANCAT,  T, ( T .EQ. VAL__BADR ), 
+                  CALL POL1_PUT0R( ANCAT,  T, ( T .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ), 
+                  CALL POL1_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ), 
      :                            STATUS )
 
                   IF( VAR ) THEN
                      IF( VI .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DICAT, SQRT( MAX( 0.0, VI ) ), 
+                        CALL POL1_PUT0R( DICAT, SQRT( MAX(0.0,VI) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DICAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DICAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
                      IF( VVIN .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DVCAT, SQRT( MAX( 0.0, VVIN ) ), 
+                        CALL POL1_PUT0R( DVCAT, SQRT( MAX(0.0,VVIN) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DVCAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DVCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
                      IF( VP .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DPCAT, SQRT( MAX( 0.0, VP ) ), 
+                        CALL POL1_PUT0R( DPCAT, SQRT( MAX(0.0,VP) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DPCAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DPCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
                      IF( VT .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DANCAT, SQRT( MAX( 0.0, VT ) ), 
+                        CALL POL1_PUT0R( DANCAT, SQRT( MAX(0.0,VT) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DANCAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DANCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
                      IF( VIP .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DPICAT, SQRT( MAX( 0.0, VIP ) ), 
+                        CALL POL1_PUT0R( DPICAT, SQRT( MAX(0.0,VIP) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DPICAT, VAL__BADR, .TRUE., 
+                        CALL POL1_PUT0R( DPICAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
