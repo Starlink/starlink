@@ -94,6 +94,7 @@
       INTEGER                XN                 ! X List number
       INTEGER                YN                 ! Y List number
       INTEGER                L1,L2,L3,L4        ! lengths of char strings
+      INTEGER			IFID, OFID		!
 
       LOGICAL                INPRIM             ! Input is primitive?
       LOGICAL                OK
@@ -122,14 +123,9 @@
       CALL AST_INIT
 
 *   Obtain object name and associate locator and display to term.
-      CALL USI_ASSOC2 ('INP', 'OUT', 'READ',ILOC, OLOC, INPRIM, STATUS)
-
-      IF (INPRIM) THEN
-        CALL MSG_PRNT ('FATAL ERROR: This is not an event dataset!')
-        STATUS = SAI__ERROR
-        GOTO 9000
-
-      END IF
+      CALL USI_TASSOC2('INP', 'OUT', 'READ',IFID, OFID,  STATUS)
+      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
+      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
 
 *    Locate & display all lists in the input data object
       CALL MSG_PRNT ('The LIST''s present are:')
@@ -379,9 +375,9 @@ c        END IF
       CALL DYN_UNMAP( PTR, STATUS )
 
 *    Update history
-      CALL HIST_ADD    (OLOC, VERSION,      STATUS)
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL USI_NAMEI (INLINES,TEXTI, STATUS)
-      CALL HIST_PTXT   (OLOC, INLINES, TEXTI, STATUS)
+      CALL HSI_PTXT( OFID, INLINES, TEXTI, STATUS )
       CALL CHR_RTOC(XCEN,SXCEN,L1)
       CALL CHR_RTOC(YCEN,SYCEN,L2)
       ORAD=SQRT(ORAD)
@@ -398,10 +394,10 @@ c        END IF
      ://')'
         TEXT(2)='Radius= '//SORAD(1:L3)
       ENDIF
-      CALL HIST_PTXT   (OLOC, 2, TEXT, STATUS)
+      CALL HSI_PTXT( OFID, 2, TEXT, STATUS )
 
 *    Tidy up and exit
-9000  CALL AST_CLOSE
+ 9000 CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 
       END
