@@ -9,6 +9,14 @@
 #include "config.h"
 #endif
 
+#if HAVE_SETENV
+#if HAVE_CSTD_INCLUDE
+#include <cstdlib>		// for setenv
+#else
+#include <stdlib.h>
+#endif
+#endif
+
 #include "stringstream.h"
 
 #include "CatalogueHandler.h"
@@ -383,7 +391,31 @@ bool CatalogueHandler::setSearchtype (string type)
 
 bool CatalogueHandler::setConfig (string URL)
 {
+#if HAVE_SETENV
     return (setenv ("CATLIB_CONFIG", URL.c_str(), 1) == 0);
+#else
+    // Without setenv(), we have to resort to putenv, which is a mess.
+    // The string passed to putenv is retained, so it can't be an
+    // automatic variable.  Allocate the correct amount of space.  If
+    // this static pointer is already allocated, then it's because
+    // we've been here before; so deallocate it.
+    static char *putenvarg = 0;
+    const char *urlstr = URL.c_str();
+    if (putenvarg != 0)		// been here before
+    {
+	free (putenvarg);
+	// There's the _possibility_ of a race condition here, until
+	// we call putenv(), but it's absurdly slim....
+    }
+    putenvarg = static_cast<char *>(malloc(strlen("CATLIB_CONFIG=")
+					   +strlen(urlstr)
+					   +1));
+    if (putenvarg == 0)
+	return false;
+
+    sprintf (putenvarg, "CATLIB_CONFIG=%s", urlstr);
+    return (putenv (putenvarg) == 0);
+#endif
 }
 
 // setResultCols: this could (fairly easily, with

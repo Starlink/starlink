@@ -11,14 +11,26 @@
 #if HAVE_SSTREAM
 
 #include <sstream>
+
+#if HAVE_STD_NAMESPACE
+#define SSTREAM std::ostringstream
+#else
 #define SSTREAM ostringstream
+#endif
+
 #define SS_C_STR(s) (s).str().c_str()
 #define SS_STRING(s) (s).str()
 
 #else
 
 #include <strstream>
-#define SSTREAM ostrstream
+
+#if HAVE_STD_NAMESPACE
+#define SSTREAM std::ostrstream
+#else
+#define SSTREAM std::ostrstream
+#endif
+
 #define SS_C_STR(s) (s).str()
 /* Add the end-of-string to the stringbuf and convert it to a string */
 #define SS_STRING(s) ((s)<<ends,string((s).str()))

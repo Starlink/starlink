@@ -11,6 +11,11 @@
 
 #include <vector>
 #include <string>
+#include <assert.h>
+
+#if HAVE_STD_NAMESPACE
+using std::vector;
+#endif
 
 #include <cat/WorldCoords.h>
 #include <cat/AstroQuery.h>
@@ -158,7 +163,7 @@ class CatalogueHandler {
     double getRadius () const { return (isValid_(RADIUS) ? radius_ : 0.0); }
     string getSearchtype () const;
     string getCatname () const {
-	return (isValid_ (CATNAME) ? catname_ : "<UNSET>");
+	return (isValid_ (CATNAME) ? catname_ : static_cast<string>("<UNSET>"));
     }
     int getNrows () const { return (isValid_ (NROWS) ? nrows_ : 0); }
     string getConfig () const;
@@ -179,7 +184,7 @@ class CatalogueHandler {
 		      RADIUS=8,	/* search radius, radius_ */
 		      SEARCHTYPE=16, /* search type, searchType_ */
 		      NROWS=32, /* number of rows to return, nrows_ */
-		      RESULT=64, /* Query result, queryResult_ */
+		      RESULT=64 /* Query result, queryResult_ */
     };
     fieldflags valid_;
 

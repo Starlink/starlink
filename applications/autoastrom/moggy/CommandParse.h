@@ -21,6 +21,12 @@
 #include <map>
 #endif
 
+#if HAVE_STD_NAMESPACE
+using std::string;
+using std::vector;
+using std::map;
+#endif
+
 class CommandParse {
  public:
     CommandParse (string);

@@ -9,8 +9,17 @@
 #ifndef UTIL_HEADER_READ
 #define UTIL_HEADER_READ 1
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <vector>
 #include <string>
+
+#if HAVE_STD_NAMESPACE
+using std::vector;
+using std::string;
+#endif
 
 namespace Util {
     void uppercaseString (string& str);

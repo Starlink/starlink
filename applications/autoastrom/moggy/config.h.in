@@ -12,6 +12,15 @@
    not, we use <stdio.h> instead. */
 #define HAVE_CSTD_INCLUDE 0
 
+/* Related: define as 1 if you have standard functions in the std
+   namespace; that is, if you need `using namespace std' in order to
+   get to them.  The Solaris compilers need this, GCC doesn't (and I
+   think that's a deficiency in GCC rather than Solaris).  At present,
+   we use this flag to decide if we need to dump everything into the
+   global namespace; this is not as elegant as I'd like, but it'll do
+   for now. */
+#define HAVE_STD_NAMESPACE 0
+
 /* The alpha cxx compiler currently (v6.0) needs to be invoked with 
    __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
    streams library.  See Digital C++ v6.0 manual, section 7.1.2.
@@ -25,6 +34,10 @@
 #define HAVE_SSTREAM 0
 
 /* Define as 1 if we have <map>.  Define as 0 otherwise. */
-#define HAVE_MAP 1
+#define HAVE_MAP 0
+
+/* Define as 1 if we have function setenv() (and if we have, we assume
+   we have function unsetenv(), too)... */
+#define HAVE_SETENV 0
 
 #endif /* CONFIG_H_LOADED */

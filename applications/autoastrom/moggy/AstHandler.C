@@ -19,6 +19,14 @@
 #include "config.h"
 #endif
 
+#include <ostream>		// for cerr, endl
+#include <assert.h>
+
+#if HAVE_STD_NAMESPACE
+using std::cerr;
+using std::endl;
+#endif
+
 #include "AstHandler.h"
 #include "stringstream.h"
 #include "util.h"

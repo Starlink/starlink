@@ -46,6 +46,15 @@ AC_CHECK_HEADERS(sstream)
 dnl   Do we have a map implementation?
 AC_CHECK_HEADERS(map)
 
+dnl   Check other functions
+AC_CHECK_FUNCS(setenv)
+
+dnl   Check whether we need to include `-lnsl -lsocket' to use the
+dnl   socket() call and friends (catlib needs these functions, and you
+dnl   do need these on Solaris)
+AC_CHECK_LIB(nsl, gethostbyname)
+AC_CHECK_LIB(socket, socket,,,-lnsl)
+
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
 dnl   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
@@ -62,6 +71,15 @@ AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
 AC_TRY_COMPILE([#include <cstdio>],,
   AC_DEFINE(HAVE_CSTD_INCLUDE) AC_MSG_RESULT(yes),
   AC_MSG_RESULT(no))
+
+dnl   Are the standard functions in the std namespace?
+AC_MSG_CHECKING(whether standard functions are in namespace std)
+AC_TRY_COMPILE([#include <ostream>], [cout << "Hello\n";],
+  AC_MSG_RESULT(no),
+  AC_TRY_COMPILE([#include <ostream>], [using namespace std;cout<<"Hello\n";],
+    AC_DEFINE(HAVE_STD_NAMESPACE)
+    AC_MSG_RESULT(yes),
+    AC_MSG_RESULT(ARGHH -- error compiling)))
 
 dnl   Add the Starlink include and library paths.  The following
 dnl   components are standard Starlink components (or semi-standard,
@@ -115,13 +133,14 @@ AC_ARG_WITH(catlib,
   fi,
   tarball=`ls ./catlib*tar* 2>/dev/null`)
 
+echo "Unpacking SkyCat..."
+
 AC_SUBST(CATLIBINSTALLDIR)
 AC_SUBST(CATLIBTOP)
 if test -z "$tarball"; then
     AC_MSG_ERROR(Can't find SkyCat catlib tarball)
 else
     # canonicalise the tarball name with a full path
-    # echo "tarball=$tarball"
     tarballdir=`dirname $tarball`
     tarball=`cd $tarballdir;pwd`/`basename $tarball`
     # Find the base-name of the tarball -- "catlib" plus version number
@@ -149,7 +168,6 @@ else
 	    tar) tarballuncompress=cat ;;
 	    *)   tarballuncompress='' ;;
 	esac
-	#echo "tarballuncompress=$tarballuncompress"
 	if test -z "$tarballuncompress"; then
 	    AC_MSG_ERROR([Don't know how to uncompress files like $tarball, with extension <$tarballext>])
 	elif expr "x$tarballuncompress" : "x *-" >/dev/null; then
@@ -169,11 +187,12 @@ else
 		AC_MSG_ERROR(Can't find any configure script in $CATLIBSRCDIR)
 	    fi
 	    CATLIBTOP=`dirname $config`
-	    #echo "config=$config CATLIBTOP=$CATLIBTOP"
 	    CATLIBINSTALLDIR=$CATLIBSRCDIR/INSTALL
 	    mkdir $CATLIBINSTALLDIR
 	    # Configure catlib with the --with-notcl option
 	    echo "Configuring SkyCat..."
+	    # Don't use --with-gcc or --with-cc here, but instead rely
+	    # on having variables CXX and CC set in the environment
 	    (cd $CATLIBTOP;./configure --prefix=$CATLIBINSTALLDIR --with-notcl)
 	    echo "Done!  SkyCat configured"
 	fi

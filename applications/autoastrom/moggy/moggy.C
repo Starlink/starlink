@@ -35,15 +35,18 @@ static const char RCSID[] =
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <assert.h>
 
 #if HAVE_CSTD_INCLUDE
-//#include <cstdio>
-#include <cstdlib>
+#if HAVE_SETENV
+#include <cstdlib>		// for setenv
+#endif
 #include <ctime>
 //using std::exit;
 #else
-//#include <stdio.h>              // for cout,cerr
+#if HAVE_SETENV
 #include <stdlib.h>
+#endif
 #include <time.h>
 #endif
 
@@ -106,7 +109,24 @@ int main (int argc, char **argv)
     // environment variable.  This program is supposed to be run as a
     // slave, so any configuration done ought to be explicit, using
     // the CONF command.
+#if HAVE_SETENV
     unsetenv ("CATLIB_CONFIG");
+#else
+    {
+	// unsetenv() doesn't exist -- there seems no other way of
+	// deleting a variable from the environment.  If the
+	// CATLIB_CONFIG variable exists, then ensure it's an empty
+	// string.  The catlib documentation doesn't say that this is
+	// equivalent to the variable not existing, but let's hope for
+	// the best.
+	char *envval = getenv("CATLIB_CONFIG");
+	if (envval != 0 && *envval != '\0')
+	{
+	    static char arg[] = "CATLIB_CONFIG=";
+	    putenv (arg);
+	}
+    }
+#endif
 
     try
     {
@@ -172,11 +192,14 @@ int main (int argc, char **argv)
     {
 	cout << "550 Error: " << e.msg << crlf;
     }
+#if 0
+    // Not implemented in egcs?
     catch (exception& e)
     {
 	cout << "550 Internal error. Terminating ("
 	     << e.what() << ")" << crlf;
     }
+#endif
     catch (...)
     {
 	// Is this the correct thing to do?
@@ -694,16 +717,6 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 			    cout << x << OPseparator << y << OPseparator;
 			}
 			cout << crlf;
-			if (0)
-			{
-			    cerr << "cols:"
-				 << " id=" <<  (got_id  ? r.id() : "??")
-				 << " ra=" <<  (got_ra  ? r.ra() : 0)
-				 << " dec=" << (got_dec ? r.dec() : 0)
-				 << " mag=" << (got_mag ? r.mag() : 0)
-				 << "\n";
-				
-			}
 		    }
 		    if (rowcountcheck > 0)
 		    {

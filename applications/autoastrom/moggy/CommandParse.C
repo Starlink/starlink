@@ -9,6 +9,13 @@
 #include "config.h"
 #endif
 
+#include <ostream>		// for cerr, endl
+
+#if HAVE_STD_NAMESPACE
+using std::cerr;
+using std::endl;
+#endif
+
 #include "CommandParse.h"
 #include "util.h"
 

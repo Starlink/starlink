@@ -12,6 +12,11 @@
 #include <vector>
 #include <string>
 
+#if HAVE_STD_NAMESPACE
+using std::vector;
+using std::string;
+#endif
+
 extern "C" {
 #include <ast.h>
 }
