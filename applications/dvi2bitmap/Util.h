@@ -27,15 +27,28 @@
 #ifndef UTIL_HEADER_READ
 #define UTIL_HEADER_READ 1
 
+//#include <vector>
+#include <list>
 #include <string>
+
+#ifdef HAVE_STD_NAMESPACE
+//using std::vector;
+using std::list;
+#endif
 
 #include "DviError.h"
 #include "Bitmap.h"
 #include "verbosity.h"
 
+typedef list<string> string_list;
+
 namespace Util
 {
-    string runCommandPipe (string cmd) throw (DviError);
+    string runCommandPipe (string cmd, string envs = "", int *status = 0)
+	    throw (DviError);
+    string_list& Util::tokenise_string (string str);
+    char** string_list_to_array(string_list& l);
+    void delete_string_array(char** sl);
     bool parseRGB (Bitmap::BitmapColour&, const char*);
 
     void verbosity (const verbosities level);
