@@ -11,12 +11,12 @@ AC_CONFIG_SRCDIR([ich_len.f])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+dnl Do not want binaries to be shared against this deprecated library.
+AC_DISABLE_SHARED
+
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
-
-dnl Do not want binaries to be shared against this deprecated library.
-AC_DISABLE_SHARED
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
