@@ -92,6 +92,9 @@ do_unix_release:
 	fetch `grp c_routines f_routines c_include_files f_include_files \
                    unix_startup_files unix_link_files message_system_files \
                    utility_programs test_programs` COPYING.LIB
+	echo `grp c_routines f_routines c_include_files f_include_files \
+                   unix_startup_files unix_link_files message_system_files \
+                   utility_programs test_programs` COPYING.LIB
 #
 #  Create files generated from other source files, and delete the
 #  original source where necessary.
