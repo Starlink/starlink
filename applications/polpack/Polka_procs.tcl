@@ -26,6 +26,8 @@
 #     12-NOV-1998 (DSB):
 #        Default sky areas are now not used if they do not fall within the
 #        image (see CheckSky).
+#     24-FEB-1999 (DSB):
+#        Modified to allow creation of Stokes vectors in single-beam mode.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -11210,7 +11212,7 @@ proc Save {} {
             update idletasks
 
 #  Create the Stokes cube.
-            if { ![Obey polpack polcal "in=^$intfiles pmode=$POLMODE out=$STKOUT maxit=30"] } {
+            if { ![Obey polpack polcal "in=^$intfiles pmode=$POLMODE out=$STKOUT maxit=30 dualbeam=$DBEAM niter=3"] } {
                set ok 0
             }
 
