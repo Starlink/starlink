@@ -47,6 +47,49 @@ package atools {
           }
       }
 
+      action astlutmap {
+         helplib {$ATOOLS_HELP}
+         parameter inc {
+            position 3
+            type _DOUBLE
+            prompt {Increment in input coordinate value between LUT entries}
+            ppath CURRENT DEFAULT
+            default 1.0
+            helpkey *
+          }
+         parameter lut {
+            position 1
+            type LITERAL
+            prompt {Group of numerical look up table values}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter options {
+            position 4
+            type LITERAL
+            prompt {Options for the LutMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+         parameter result {
+            position 5
+            type LITERAL
+            prompt {Name of file in which to store the LutMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter start {
+            position 2
+            type _DOUBLE
+            prompt {Input coordinate value for first LUT entry}
+            ppath CURRENT DEFAULT
+            default 0.0
+            helpkey *
+          }
+      }
+
       action astaddframe {
 
          helplib {$ATOOLS_HELP}
