@@ -117,12 +117,12 @@ else {
    while (($key, $value) = $index->each()) {
       unless ($key eq $lastkey) {
          print "\n" if ($lastkey);   #  Not first time round.
-         printf "%-20s => ", $key;
+         printf "%-20s =>", $key;
       }
       print " ", $value;
       $lastkey = $key;
    }
+   print "\n";
 }
-print "\n";
 
 # $Id$
