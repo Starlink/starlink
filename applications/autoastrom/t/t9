@@ -28,98 +28,250 @@ export AUTOASTROM_DIR KAPPA_DIR CCDPACK_DIR ATOOLS_DIR
 
 PREFIX=t9-temp-
 
-# The --defects options in the command lines below are actually
-# redundant, since we're getting the CCD catalogue information from
-# --xxxccdcat, but I keep them in to remind me they have to be there
-# when/if I regenerate the xxxccdcat (the same command, but with the
-# xxxccdcat file not existing, and without the xxxndfinfo option, and
-# with the real r106282xx.sdf file as argument).
-
 #keeptemps=--keeptemps
 keeptemps=--nokeeptemps
 
-$AUTOASTROM_DIR/autoastrom \
-    --verbose \
-    --xxxccdcat=testndf1.ccdcat.munged \
-    --xxxndfinfo=dim1=2048,dim2=4097 \
-    --defects \
-    --noinsert \
-    --keepfits=${PREFIX}testndf1.final-fits.fits \
-    $keeptemps \
-    testndf1.sdf \
-    >${PREFIX}testndf1.STDOUT \
-    2>${PREFIX}testndf1.STDERR
+#testset=" 1 2 3 4 5 "
+testset=" r106280-findoff r106280-match south-match south-noast "
+dotest() { 
+    test `expr match "$testset" ".* $1 "` -gt 0
+}
 
-$AUTOASTROM_DIR/autoastrom \
+#################################################################
+#
+# Tests 1--4 may or may not currently work; I've been concentrating on
+# the ones below.
+
+# We need the --xxxndfinfo lines in the following tests, because the
+# testndfx.sdf files do not actually contain any images.
+
+dotest 1 && $AUTOASTROM_DIR/autoastrom \
     --verbose \
-    --xxxccdcat=testndf2.ccdcat.munged \
-    --xxxndfinfo=dim1=353,dim2=353 \
+    --ccdcatalogue=testndf1.extractor \
+    --matchcatalogue=testndf1.matchcatalogue \
+    --noinsert \
+    --keepfits=${PREFIX}1.fitswcs.fits \
+    $keeptemps \
+    --xxxndfinfo=dim1=2048,dim2=4097 \
+    testndf1.sdf \
+    >${PREFIX}1.STDOUT \
+    2>${PREFIX}1.STDERR
+
+
+dotest 1a && $AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --matchcatalogue=testndf1.matchcatalogue \
+    --noinsert \
+    --keepfits=${PREFIX}1.fitswcs.fits \
+    --obsdata=ra=17:27:12,dec=74:43:07 \
+    $keeptemps \
+    r106282.sdf \
+    >${PREFIX}1a.STDOUT \
+    2>${PREFIX}1a.STDERR
+
+
+dotest 2 && $AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --ccdcatalogue=testndf2.extractor \
     --obsdata=col=600 \
     --noinsert \
-    --keepfits=${PREFIX}testndf2.final-fits.fits \
+    --keepfits=${PREFIX}2.fitswcs.fits \
     $keeptemps \
+    --xxxndfinfo=dim1=353,dim2=353 \
     testndf2 \
-    >${PREFIX}testndf2.STDOUT \
-    2>${PREFIX}testndf2.STDERR
+    >${PREFIX}2.STDOUT \
+    2>${PREFIX}2.STDERR
 
 # Now the same two fits, but with --match=match
 
-$AUTOASTROM_DIR/autoastrom \
+dotest 3 && $AUTOASTROM_DIR/autoastrom \
     --verbose \
-    --xxxccdcat=testndf1.ccdcat.munged \
-    --xxxndfinfo=dim1=2048,dim2=4097 \
-    --defects \
+    --ccdcatalogue=testndf1.extractor \
     --noinsert \
-    --keepfits=${PREFIX}testndf3.final-fits.fits \
+    --keepfits=${PREFIX}3.fitswcs.fits \
     --match=match \
     $keeptemps \
+    --xxxndfinfo=dim1=2048,dim2=4097 \
     testndf1.sdf \
-    >${PREFIX}testndf3.STDOUT \
-    2>${PREFIX}testndf3.STDERR
+    >${PREFIX}3.STDOUT \
+    2>${PREFIX}3.STDERR
 
-$AUTOASTROM_DIR/autoastrom \
+dotest 4 && $AUTOASTROM_DIR/autoastrom \
     --verbose \
-    --xxxccdcat=testndf2.ccdcat.munged \
-    --xxxndfinfo=dim1=353,dim2=353 \
+    --ccdcatalogue=testndf2.extractor \
     --obsdata=col=600 \
     --noinsert \
-    --keepfits=${PREFIX}testndf4.final-fits.fits \
+    --keepfits=${PREFIX}4.fitswcs.fits \
     --match=match \
     $keeptemps \
+    --xxxndfinfo=dim1=353,dim2=353 \
     testndf2 \
-    >${PREFIX}testndf4.STDOUT \
-    2>${PREFIX}testndf4.STDERR
+    >${PREFIX}4.STDOUT \
+    2>${PREFIX}4.STDERR
 
 # testnodate.sdf is testndf1.sdf but with all date and time information removed
 # from the FITS headers -- can we cope?
-
-$AUTOASTROM_DIR/autoastrom \
+# This probably works, but we need to regenerate testndf1.extractor,
+# which means we have to regenerate r106282.sdf and re-remove the time
+# information (as described in testndf.readme).  Soon!
+thistest=nodateinfo
+dotest nodateinfo && $AUTOASTROM_DIR/autoastrom \
     --verbose \
-    --xxxccdcat=testndf1.ccdcat.munged \
-    --xxxndfinfo=dim1=2048,dim2=4097 \
-    --defects \
+    --ccdcatalogue=testndf1.extractor \
     --noinsert \
-    --keepfits=${PREFIX}testndf5.final-fits.fits \
+    --keepfits=${PREFIX}$thistest.fitswcs.fits \
     $keeptemps \
+    --xxxndfinfo=dim1=2048,dim2=4097 \
     testnodate.sdf \
-    >${PREFIX}testndf5.STDOUT \
-    2>${PREFIX}testndf5.STDERR
+    >${PREFIX}$thistest.STDOUT \
+    2>${PREFIX}$thistest.STDERR
+
+#################################################################
+#
+# BAD
+#
+# This image is very skewed, and this test currently doesn't work
+dotest cat320421 && $AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --ccdcatalogue=images/cat320421.extractor \
+    --noinsert \
+    --keepfits=${PREFIX}cat320421.fitswcs.fits \
+    --obsdata=ra=9:13:00,dec=28:50:00 \
+    --match=findoff \
+    $keeptemps \
+    images/cat320421.sdf \
+    >${PREFIX}cat320421.STDOUT \
+    2>${PREFIX}cat320421.STDERR
 
 
+#################################################################
+#
+# BAD
+#
+# This one just doesn't work!  The --obsdata isn't enough
+thistest=r106280-findoff-obsdata
+dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --ccdcatalogue=images/r106280.extractor \
+    --noinsert \
+    --keepfits=${PREFIX}$thistest.fitswcs.fits \
+    --obsdata=ra=17:27:09.533,dec=74:20:07.88,scale=0.33,angle=-90,invert \
+    --match=findoff \
+    $keeptemps \
+    images/r106280.sdf \
+    >${PREFIX}$thistest.STDOUT \
+    2>${PREFIX}$thistest.STDERR
+
+#################################################################
+#
+# r106280, using reasonably good astrometry already in file r106280-withwcs.sdf
+thistest=r106280-findoff
+(cd images; make r106280-withwcs.sdf >/dev/null 2>&1)
+dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --ccdcatalogue=images/r106280.extractor \
+    --noinsert \
+    --keepfits=${PREFIX}$thistest.fitswcs.fits \
+    --match=findoff \
+    $keeptemps \
+    images/r106280-withwcs.sdf \
+    >${PREFIX}$thistest.STDOUT \
+    2>${PREFIX}$thistest.STDERR
+
+#################################################################
+#
+# r106280 with --obsdata
+thistest=r106280-match
+dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --ccdcatalogue=images/r106280.extractor \
+    --noinsert \
+    --keepfits=${PREFIX}$thistest.fitswcs.fits \
+    --obsdata=ra=17:27:09.533,dec=74:20:07.88,angle=-90,invert,scale=0.33 \
+    --match=match \
+    $keeptemps \
+    images/r106280.sdf \
+    >${PREFIX}$thistest.STDOUT \
+    2>${PREFIX}$thistest.STDERR
+
+#################################################################
+#
+# Can we work with only --obsdata location (albeit pretty close)
+thistest=south-match
+dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --ccdcatalogue=images/south.extractor \
+    --noinsert \
+    --keepfits=${PREFIX}$thistest.fitswcs.fits \
+    --obsdata=ra=10:00:00,dec=-30:00:00 \
+    --match=match \
+    --defects=ignore,badness=2.0 \
+    $keeptemps \
+    images/south.sdf \
+    >${PREFIX}$thistest.STDOUT \
+    2>${PREFIX}$thistest.STDERR
+
+#################################################################
+#
+# Test whether we can work with just FITS headers
+thistest=south-noast
+(cd images; make south-noast.sdf >/dev/null 2>&1)
+dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --ccdcatalogue=images/south.extractor \
+    --noinsert \
+    --keepfits=$PREFIX$thistest.fitswcs.fits \
+    --match=match \
+    --defects=ignore,badness=2.0 \
+    $keeptemps \
+    images/south-noast.sdf \
+    >$PREFIX$thistest.STDOUT \
+    2>$PREFIX$thistest.STDERR
+
+
+
+#################################################################
+#
+# RESULTS
+#
 # Dump results to stdout, removing version string
-# Remove lines containing version-number, HTTP proxy, and plugin path
-for n in 1 2 3 4 5
+# Remove lines containing version-number, HTTP proxy, and plugin path;
+# normalise numbers in the fits file, so that we're insensitive to
+# rounding errors
+for n in $testset
 do
     echo "=== Test $n ==="
-    egrep -v '(autoastrom, v|HTTP proxy|plugin-match-match)' ${PREFIX}testndf$n.STDOUT
-    if test -f ${PREFIX}testndf$n.final-fits.fits; then
-        ./fitsdump ${PREFIX}testndf$n.final-fits.fits
+    ff=${PREFIX}$n.fitswcs.fits
+    #egrep -v '(autoastrom, v|HTTP proxy|plugin-match-match)' ${PREFIX}$n.STDOUT
+    egrep '^--[WF]' ${PREFIX}$n.STDOUT
+    if test -f $ff; then
+        ./fitsdump -notrim $ff | \
+            perl -n -e '
+                m{([a-zA-Z0-9_]*) *= *([-0-9.E]*)( */ *(.*))?} && 
+                    do { $n{$1}=$2; $v{$1}=$4; };
+                m{^COMMENT ASTROM} && print;
+                END { 
+                    foreach (qw{CD1_1 CD1_2 CD2_1 CD2_2 q
+                                CRPIX1 CRPIX2 CRVAL1 CRVAL2}) { 
+                        $sel{$_}=1;
+                    }
+                    foreach (sort keys %n) {
+                        printf "%10.10s = %11.3e / %s\n", $_, $n{$_}, $v{$_}
+                            if defined $sel{$_};
+                    }
+                }'
+
     else
-        echo "Can't find file ${PREFIX}testndf$n.final-fits.fits"
+        echo "Can't find file $ff"
     fi
 
     echo "=== Test $n ===" >&2
-    cat ${PREFIX}testndf$n.STDERR >&2
+    cat ${PREFIX}$n.STDERR >&2
+    if test -f $ff; then
+        ./fitsdump -trim $ff >&2
+    else
+        echo "!! no file $ff" >&2
+    fi
 done
 
 rm -f ${PREFIX}*
