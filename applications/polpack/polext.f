@@ -4,7 +4,7 @@
 *     POLEXT
 
 *  Purpose:
-*     Sets values in the POLPACK extension.
+*     Sets explicit values in the POLPACK extension.
 
 *  Language:
 *     Starlink Fortran 77
@@ -23,7 +23,7 @@
 *     This application can be used to prepare data files prior to 
 *     processing them with POLPACK in cases where POLIMP cannot be
 *     used (for instance, because the data files do not have any suitable 
-*     FITS headers). The values to be stored are supplied by the user
+*     FITS headers). The values to be stored are supplied explicitly 
 *     by means of the application parameters listed below.
 *
 *     New values for the POLPACK extension items are obtained using the
