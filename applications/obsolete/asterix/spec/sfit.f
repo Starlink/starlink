@@ -118,6 +118,7 @@
 *     25 Jul 94 : V1.7-6 File output now completely using AIO (DJA)
 *      7 Sep 94 : V1.8-0 Print out fit probability (DJA)
 *     24 Nov 94 : V1.8-1 Now use USI for user interface (DJA)
+*     21 Apr 95 : V1.8-2 Removed explicit use of HDS (DJA)
 *
 *    Type definitions :
 *
@@ -153,8 +154,6 @@
       RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
       RECORD /MODEL_SPEC/ 	MODEL			! Model specification
 
-      CHARACTER*(DAT__SZLOC) ILOC	! Locator to input data (or ref object)
-      CHARACTER*(DAT__SZLOC) MLOC	! Locator to model_spec object
       CHARACTER*2		SPAR			! String version of int
 
       DOUBLE PRECISION 		STAT			! Fit statistic
@@ -170,6 +169,8 @@
       REAL PARSIG(NPAMAX)		! Parameter 1 sigma errors (approx)
       REAL Z				! Redshift [ Eobs/Esource=1/(1+z) ]
 
+      INTEGER			IFID			! Input dataset id
+      INTEGER			MFID			! Model spec id
       INTEGER 			NDS			! No of datasets
       INTEGER 			NGOOD			! No. good data elements
       INTEGER SSCALE			! Factor for scaling fitstat
@@ -195,7 +196,6 @@
 	LOGICAL INITIALISE		! Should be set true on first call only
 					! - always returned false
 	LOGICAL PEGGED(NPAMAX)		! Parameter pegged on bound
-	LOGICAL PRIM			! Primitive input dataset?
 	LOGICAL FINISHED		! Minimum found
 	LOGICAL NOFREE			! No parameters free
 	LOGICAL ER			! Parameter error calculation required?
@@ -204,7 +204,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-	PARAMETER		(VERSION='SFIT Version 1.8-1' )
+	PARAMETER		(VERSION='SFIT Version 1.8-2' )
 *-
 
 *    Announce version
@@ -227,11 +227,11 @@
       END IF
 
 *    Get observed data (setting up data weights) and response
-      CALL USI_ASSOCI('INP','READ',ILOC,PRIM,STATUS)
+      CALL USI_TASSOCI('INP','*','READ',IFID,STATUS)
       WORKSPACE=.TRUE.
-      CALL FIT_DATINGET(ILOC,'SPEC',FSTAT,WORKSPACE,CHISTAT,NDS,OBDAT,
+      CALL FIT_DATINGET( IFID,'SPEC',FSTAT,WORKSPACE,CHISTAT,NDS,OBDAT,
      :  NGOOD,SSCALE,PREDDAT,INSTR,STATUS)
-      IF(STATUS.NE.SAI__OK) GOTO 9000
+      IF(STATUS.NE.SAI__OK) GOTO 99
 
 *    Look for redshift
       CALL SFIT_GETZ( Z, STATUS )
@@ -266,9 +266,9 @@
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *    Get model specification
-      CALL USI_ASSOCI( 'MODEL', 'UPDATE', MLOC, PRIM, STATUS )
-      CALL FIT_MODGET(MLOC,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
-      IF(STATUS.NE.SAI__OK) GOTO 9000
+      CALL USI_TASSOCI( 'MODEL', '*', 'UPDATE', MFID, STATUS )
+      CALL FIT_TMODGET( MFID,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
+      IF(STATUS.NE.SAI__OK) GOTO 99
 
 *    Number of degrees of freedom for chi-squared
       IF ( CHISTAT ) THEN
@@ -285,11 +285,11 @@
       CALL USI_GET0I('MAX',NITMAX,STATUS)
       CALL USI_GET0R('MINS',MINSLO,STATUS)
       CALL USI_GET0I('NUP',NITUP,STATUS)
-      IF ( STATUS .NE. SAI__OK ) GOTO 9000
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Set up workspace for model stack
       CALL SFIT_MAPMODSTK( NDS, PREDDAT, MODEL.STACKPTR, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 9000
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Zero iterations means just print the statistic
       IF ( NITMAX .EQ. 0 ) THEN
@@ -307,7 +307,7 @@
         CALL MSG_SETD( 'FPROB', FPROB )
         CALL MSG_PRNT( 'Prob = ^FPROB' )
         CALL MSG_BLNK()
-        GOTO 9000
+        GOTO 99
 
       END IF
 
@@ -323,7 +323,7 @@
 	CALL FIT_MIN(NDS,OBDAT,INSTR,MODEL,OPCHAN,NRET,NPAR,LB,UB,
      :    FROZEN,SSCALE,INITIALISE,MINSLO,FSTAT,FIT_PREDDAT,PREDDAT,
      :    PARAM,DPAR,PEGGED,STAT,NIT,FINISHED,FITERR,STATUS)
-	IF(STATUS.NE.SAI__OK) GOTO 9000
+	IF(STATUS.NE.SAI__OK) GOTO 99
 
 *      Fitting error
 	IF(FITERR.EQ.2.OR.FITERR.EQ.3)THEN
@@ -336,7 +336,7 @@
 
 *        Fatal fitting error
           CALL FIT_REPFERR( FITERR, STATUS )
-	  GOTO 9000
+	  GOTO 99
 
 	END IF
 
@@ -379,7 +379,7 @@
 	CALL MSG_BLNK()
 	CALL MSG_PRNT( '** Updating model spec - do not exit '/
      :                                  /'until completed **' )
-	CALL FIT_MODUP(MLOC,MODEL.NCOMP,NPAR,PARAM,LE,UE,-99.0,STATUS)
+	CALL FIT_TMODUP( MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,-99.0,STATUS)
 	IF ( STATUS .NE. SAI__OK ) THEN
 	  CALL ERR_FLUSH(STATUS)
 	ELSE
@@ -427,7 +427,7 @@
 
 *    Update model_spec errors
       IF ( ER ) THEN
-	CALL FIT_MODUP(MLOC,MODEL.NCOMP,NPAR,PARAM,LE,UE,1.0,STATUS)
+	CALL FIT_TMODUP(MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,1.0,STATUS)
 	CALL MSG_PRNT( '** Error estimates entered in model spec. **' )
 	CALL MSG_BLNK()
       END IF
@@ -475,8 +475,8 @@
       END IF
 
 *    Tidy up & exit
- 9000 CALL USI_ANNUL(MLOC,STATUS)
-      CALL USI_ANNUL(ILOC,STATUS)
+ 99   CALL USI_TANNUL(MFID,STATUS)
+      CALL USI_TANNUL(IFID,STATUS)
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
