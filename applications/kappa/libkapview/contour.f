@@ -161,17 +161,17 @@
 *        selected height.  These values are only computed when parameter STATS 
 *        is TRUE.
 *     MARGIN( 4 ) = _REAL (Read)
-*        The widths of the margins to leave around the contour map for axis 
-*        annotation. The widths should be given as fractions of the 
-*        corresponding dimension of the DATA picture. 
-*        The actual margins used may be increased to preserve the aspect 
-*        ratio of the DATA picture. Four values may be given, in the order;
-*        bottom, right, top, left. If fewer than four values are given, 
-*        extra values are used equal to the first supplied value. If these 
-*        margins are too narrow any axis annotation may be clipped. If a 
-*        null (!) value is supplied, the value used is 0.18 (for all edges) 
-*        if annotated axes are being produced, and zero otherwise. See also 
-*        parameter KEYPOS. [current value]
+*        The widths of the margins to leave around the contour map for
+*        axis annotation. The widths should be given as fractions of the 
+*        corresponding dimension of the current picture. The actual margins 
+*        used may be increased to preserve the aspect ratio of the DATA 
+*        picture. Four values may be given, in the order; bottom, right, 
+*        top, left. If fewer than four values are given, extra values are 
+*        used equal to the first supplied value. If these margins are too 
+*        narrow any axis annotation may be clipped. If a null (!) value is 
+*        supplied, the value used is 0.15 (for all edges) if annotated axes 
+*        are being produced, and zero otherwise. See also parameter KEYPOS. 
+*        [current value]
 *     MODE = LITERAL (Read)
 *        The method used to select the contour levels. The options are:
 *
@@ -320,7 +320,7 @@
 *        the two lines "font=3" and "digits(2)=4" to cause all text in
 *        the key to be drawn using PGPLOT font 3 (an italic font), and
 *        4 digits to be used when formatting the contour values.
-*     contour ss443 mode=pe percentiles=[80,90,95] stats keypos=0.05
+*     contour ss443 mode=pe percentiles=[80,90,95] stats keypos=0.02
 *        Contours the data array in the NDF called ss443 on the current
 *        graphics device.  Contours at heights corresponding to the 80,
 *        90 and 95 percentiles are drawn.  The key is placed closer
@@ -474,6 +474,9 @@
 *     12-AUG-1998 (DSB):
 *        Major changes to base graphics on PGPLOT and handling of co-ordinate
 *        systems on the AST library.
+*     26-OCT-1999 (DSB):
+*        Margin changed to be a fraction of the current picture instead
+*        of the DATA picture.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -502,6 +505,9 @@
 *  Local Constants:
       INTEGER CUNITS           ! Max. no. of visible characters in units
       PARAMETER( CUNITS = 14 )
+
+      REAL KW                  ! Width of KEY picture as a fraction of
+      PARAMETER( KW = 0.15 )   ! current picture width
 
       INTEGER NDIM             ! Dimensionality of input array
       PARAMETER( NDIM = 2 )    
@@ -627,7 +633,7 @@
 
 *  Set the dynamic default for MARGIN.
       IF( AXES ) THEN
-         MARGIN( 1 ) = 0.18 
+         MARGIN( 1 ) = 0.15
       ELSE
          MARGIN( 1 ) = 0.0
       END IF
@@ -698,7 +704,7 @@
   
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'KAPPA_CONTOUR', 
-     :                   NDFNAM( : NC ), MARGIN, 1, 'KEY', 'R', 0.5, 
+     :                   NDFNAM( : NC ), MARGIN, 1, 'KEY', 'R', KW, 
      :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
      :                   IPLOT, NFRM, ALIGN, STATUS )
 

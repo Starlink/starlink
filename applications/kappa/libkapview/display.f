@@ -216,13 +216,13 @@
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the image for axis 
 *        annotations, given as fractions of the corresponding dimension 
-*        of the DATA picture. The actual margins used may be increased to 
+*        of the current picture. The actual margins used may be increased to 
 *        preserve the aspect ratio of the data. Four values may be given, in
 *        the order - bottom, right, top, left. If less than four values are 
 *        given, extra values are used equal to the first supplied value. If 
 *        these margins are too narrow any axis annotation may be clipped. 
 *        If a null (!) value is supplied, the value used is (for all edges);
-*        0.2 if annotated axes are being produced; 0.06, if a simple border 
+*        0.15 if annotated axes are being produced; 0.04, if a simple border 
 *        is being produced; and 0.0 if neither border nor axes are being 
 *        produced. [current value]
 *     MODE = LITERAL (Read)
@@ -510,6 +510,9 @@
 *        Added NULL argument to KPG1_GTPOS call.
 *     18-OCT-1999 (DSB):
 *        Added parameters KEY, KEYPOS and KEYSTYLE.
+*     26-OCTOBER-1999 (DSB):
+*        Made MARGIN give margins as fraction of current picture instead
+*        of DATA picture.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -539,7 +542,7 @@
 
 *  Local Constants:
       REAL KW                  ! Width of key picture as a fraction of the
-      PARAMETER ( KW = 0.3 )   ! width of the DATA picture
+      PARAMETER ( KW = 0.13 )  ! width of the current picture
 
       INTEGER MINCOL           ! Minimum number of colour indices on
                                ! device to be classed as an image
@@ -694,9 +697,9 @@
 *  two margins in one any dimension must be greater than -1.0. Therefore
 *  limit each margin to be greater than -0.49.
       IF( AXES ) THEN
-         DEFMAR = 0.2
+         DEFMAR = 0.15
       ELSE IF( BORDER ) THEN
-         DEFMAR = 0.06
+         DEFMAR = 0.04
       ELSE
          DEFMAR = 0.0
       END IF
@@ -1116,9 +1119,15 @@
 *  Now create the key if required.
       IF( KEY ) THEN
 
-*  Create a label.
-         LABEL = 'Data value in '
-         NC = 14
+*  Create a label, nidicating the array component and NDF name (without 
+*  directory path to reduce the length of the label). 
+         CALL KPG1_NDFNM( INDF1, NDFNAM, NC, STATUS )
+
+         LABEL = ' '
+         NC = 0
+         CALL CHR_APPND( MCOMP, LABEL, NC )
+         CALL CHR_APPND( ' value in', LABEL, NC )
+         NC = NC + 1
          CALL CHR_APPND( NDFNAM, LABEL, NC )
 
 *  Allocate a work array.
