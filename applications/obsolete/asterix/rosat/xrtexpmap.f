@@ -46,6 +46,7 @@
 *      5 Sep 95 : V1.8-0  Bug calculating exposure time when first attitude
 *                         record was ok (DJA)
 *     11 Dec 1995 : V2.0-0 ADI port (DJA)
+*     21 Feb 1996 : V2.0-1 Removed SIND,COSD for Linux port (DJA)
 *
 *    Type definitions :
 *
@@ -183,7 +184,7 @@ c	From INTEGER to improve exposure time evaluation
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XRTEXPMAP Version 1.8-0')
+        PARAMETER 		( VERSION = 'XRTEXPMAP Version 2.0-1')
 *-
 
 *    Initialise Asterix
@@ -650,8 +651,8 @@ C
 C  First nonzero aspect point with this roll angle, make a rotated map
 C
                 ANGLE = IR*0.2076017
-                COSROL = COSD(ANGLE)
-                SINROL = SIND(ANGLE)
+                COSROL = COS(ANGLE*MATH__DTOR)
+                SINROL = SIN(ANGLE*MATH__DTOR)
 C
 C  Zero the temp array
 C
