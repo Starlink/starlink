@@ -240,7 +240,7 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
 *    Create invented object
-        CALL ADI_NEWN( TYPE, NDIM, DIMS, ITID, STATUS )
+        CALL ADI_NEW( TYPE, NDIM, DIMS, ITID, STATUS )
 
 *    Copy file data to invented object if appropriate
         IF ( MODE(1:1) .NE. 'W' ) THEN

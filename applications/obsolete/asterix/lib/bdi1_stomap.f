@@ -124,7 +124,7 @@
       IF ( WBPTR .NE. 0 ) THEN
         CALL ADI_CNEWV0I( PSID, 'WriteBack', WBPTR, STATUS )
       END IF
-      CALL ADI_CNEWV0L( PSID, 'MapSystem', MSYS, STATUS )
+      CALL ADI_CNEWV0C( PSID, 'MapSystem', MSYS, STATUS )
       IF ( MSYS .EQ. 'inv' ) THEN
         CALL ADI_CPUTREF( PSID, 'InvObj', FPTR, STATUS )
       ELSE

@@ -150,6 +150,9 @@
 *  Object doesn't exist?
       ELSE
 
+*    Cancel bad status
+        IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+
 *    Try to invent the object
         CALL BDI1_INVNT( ARGS(1), ARGS(2), ITEM, TYPE, MODE,
      :                   ITID, NELM, WBPTR, STATUS )
