@@ -199,7 +199,7 @@
 
       common factorreps
       common factors
-      foreach fac { 1/20 1/16 1/12 1/8 1/6 1/4 1/3 1/2 1 2 3 4 6 8 12 } {
+      foreach fac { 1/20 1/16 1/12 1/8 1/6 1/4 1/3 1/2 1 2 3 4 6 8 12 16 20 } {
          lappend factorreps $fac
          lappend factors [ expr ${fac}.0 ]
       }
