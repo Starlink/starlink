@@ -2,7 +2,7 @@
 
 	    PARAMETER INP
 		POSITION 	1
-		TYPE 		'UNIV'
+		TYPE 		'LITERAL'
 		PROMPT  	'Input datafile'
                 PPATH           'GLOBAL,CURRENT'
                 HELP            '1-dimensional datafile'
@@ -44,7 +44,7 @@
 
 	    PARAMETER PER
 		POSITION 	6
-		TYPE 		'UNIV'
+		TYPE 		'LITERAL'
 		PROMPT  	'Name of output periodogram file'
                 PPATH           'CURRENT'
                 HELP            'Name of output file'
@@ -54,7 +54,7 @@
 
 	    PARAMETER FOLD
 		POSITION 	7
-		TYPE 		'UNIV'
+		TYPE 		'LITERAL'
 		PROMPT  	'Name of output phase file'
                 PPATH           'CURRENT'
                 HELP            'Name of output file'

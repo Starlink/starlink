@@ -1,7 +1,7 @@
 Interface FOLDLOTS
    Parameter    INP
       position    1
-      type        'univ'
+      type        'LITERAL'
       ppath       'GLOBAL'
       association '<->GLOBAL.BINDS'
       prompt      'Enter name of input file'
@@ -10,7 +10,7 @@ Interface FOLDLOTS
 
    Parameter    FOLD_OBJ
       position    2
-      type        'univ'
+      type        'LITERAL'
       PPATH       'CURRENT'
       association '->GLOBAL.GRAFDS'
       prompt      'Enter name of output fold file'
@@ -19,7 +19,7 @@ Interface FOLDLOTS
 
    Parameter    CHI_OBJ
       position    3
-      type        'univ'
+      type        'LITERAL'
       association '->GLOBAL.GRAFDS'
       PPATH       'CURRENT'
       prompt      'Enter name of output chi-sq vs. period file'
