@@ -167,22 +167,16 @@
 *  current NDF also has a defined VARIANCE component.
          IF( VAR ) CALL NDF_STATE( INDF, 'VARIANCE', VAR, STATUS )
 
+*  Get the WCS FrameSet from the first NDF.
+         CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+
 *  If this is the first input NDF, decide on the reference direction for the 
 *  output Stokes vectors. 
          IF( I .EQ. 1 ) THEN
-
-*  Get the WCS FrameSet from the first NDF.
-            CALL KPG1_GTWCS( INDF, IWCS, STATUS )
-
-*  Get the required angle in degrees.
             CALL POL1_ANGRT( IWCS, 
      :                       0.5*REAL( LBND( 1 ) + UBND( 1 ) - 1 ),
      :                       0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ),
      :                       ANGRT, STATUS )
-
-*  Annul the FrameSet pointer.
-            CALL AST_ANNUL( IWCS, STATUS )
-
          END IF
 
 *  See if the NDF has a POLPACK extension. If not, report an error.
@@ -201,12 +195,8 @@
 
 *  Get the ANGROT value. Use 0.0 if it is missing. This is the ACW angle
 *  from +X to the zero analyser position.
-         CALL DAT_THERE( XLOC, 'ANGROT', THERE, STATUS )
-         IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'ANGROT', ANGROT, STATUS ) 
-         ELSE 
-            ANGROT = 0.0
-         END IF
+         ANGROT = 0.0
+         CALL POL1_GTANG( INDF, 0, IWCS, ANGROT, STATUS )
 
 *  Get the half-wave plate position in degrees (if it exists).
          CALL DAT_THERE( XLOC, 'WPLATE', THERE, STATUS )
@@ -294,6 +284,9 @@
 
 *  Convert the effective analyser angle from degrees to radians.
          PHI( I ) = PHI( I )*DTOR         
+
+*  Annul the FrameSet pointer.
+         CALL AST_ANNUL( IWCS, STATUS )
 
 *  Annul the locator to the POLPACK extension.
          CALL DAT_ANNUL( XLOC, STATUS )

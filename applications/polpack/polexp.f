@@ -50,7 +50,7 @@
 *     The following FITS keywords are created. The POLPACK extension item
 *     stored in the keyword is shown in parentheses (see POLIMP for a 
 *     description of these extension items):
-*        -  PPCKANGR  (ANGROT)
+*        -  PPCKANGR  (ANGROT - derived from the WCS POLANAL Frame)
 *        -  PPCKANLA  (ANLANG)
 *        -  PPCKEPS   (EPS)
 *        -  PPCKFILT  (FILTER)
@@ -99,7 +99,7 @@
 
 *  Local Constants:
       INTEGER NITEM              ! The number of POLPACK extension items
-      PARAMETER( NITEM = 10 )
+      PARAMETER( NITEM = 9 )
 
 *  Local Variables:
       CHARACTER CARD*80                    ! A FITS header card
@@ -117,6 +117,7 @@
       INTEGER IGRP2              ! Id for group of names of NDF's processed OK 
       INTEGER INDF               ! NDF identifier
       INTEGER IPFITS             ! Pointer to FITS block
+      INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER J                  ! Index of current extension item
       INTEGER NCARD              ! Max. no. of cards in FITS extension
       INTEGER NGOOD              ! No. of NDF's processed successfully
@@ -125,17 +126,17 @@
       LOGICAL NEW                ! Was a new card added?
       LOGICAL QUIET              ! Run silently?
       LOGICAL THERE              ! Does FITS extension exist?
+      REAL    ANGROT             ! ACW angle from X axis to ref dir. in degrees
 
-      DATA FTNAM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
+      DATA FTNAM / 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
      :             'PPCKRAY',  'PPCKSTOK', 'PPCKT', 'PPCKEPS', 
      :             'PPCKANLA', 'PPCKVERS' /,
 
-     :     ITNAM / 'ANGROT',   'FILTER',   'IMGID',    'WPLATE', 
+     :     ITNAM / 'FILTER',   'IMGID',    'WPLATE', 
      :             'RAY',      'STOKES', 'T', 'EPS', 'ANLANG',
      :             'VERSION' /,
 
-     :     COMMNT / 'POLPACK: (X-axis) to (zero analyser posn) in degs',
-     :              'POLPACK: Filter',
+     :     COMMNT / 'POLPACK: Filter',
      :              'POLPACK: Image identifier',
      :              'POLPACK: Waveplate position (degs)',
      :              'POLPACK: Ray (O or E)',
@@ -204,8 +205,8 @@
          IF ( .NOT. THERE ) THEN
 
 *  If not, create one, Set its size to hold all the required POLPACK
-*  items, plus an END card.
-            NCARD = NITEM + 1
+*  items, plus an END card and a PPCKANGR card.
+            NCARD = NITEM + 2
             CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, NCARD, FTSLOC, 
      :                     STATUS )
 
@@ -236,10 +237,10 @@
 
             IF( CARD(:8) .EQ. 'END     ' ) THEN
                ICARD = NCARD 
-               NCARD = NCARD + NITEM
+               NCARD = NCARD + NITEM + 1
             ELSE
                ICARD = NCARD + 1
-               NCARD = NCARD + NITEM + 1
+               NCARD = NCARD + NITEM + 2
             END IF
 
 *  Increase the size of the FITS extension to make room for the new cards.
@@ -282,6 +283,36 @@
                END IF
 
             END DO
+
+*  Now do the ANGROT item. This has to be handled separately since the 
+*  keyword value is derived from the POLANAL Frame in the WCS FrameSet, 
+*  instead of a component of the POLPACK extension. First get a pointer 
+*  to the FrameSet.
+            CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+
+*  Get the ANGROT value.
+            ANGROT = 0.0
+            CALL POL1_GTANG( INDF, 0, IWCS, ANGROT, STATUS )
+
+*  Annul the FrameSet pointer.
+            CALL AST_ANNUL( IWCS, STATUS )
+
+*  Store the ANGROT value in the FITS extension as keyword PPCKANGR.
+            CALL POL1_STFTR( ICARD - 1, %VAL( IPFITS ), ANGROT, 
+     :                       'PPCKANGR', ICARD, 'POLPACK: X-axis '//
+     :                       'to ref. direction in degs', NEW, 
+     :                       STATUS, %VAL( 80 ) )
+
+*  If a new card was added, increment the index at which the next card will 
+*  be written.
+            IF( NEW ) THEN
+               ICARD = ICARD + 1
+
+*  If an existing card was replaced, reduce the number of FITS cards
+*  used.
+            ELSE
+               UCARD = UCARD - 1 
+            END IF
 
          END IF
 

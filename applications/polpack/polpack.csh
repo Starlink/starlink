@@ -73,6 +73,7 @@
       alias polbin    INSTALL_BIN/polbin
       alias polsim    INSTALL_BIN/polsim
       alias polplot   INSTALL_BIN/polplot
+      alias polimage  INSTALL_BIN/polimage
 #
 #  Now do the same with alternative names.
 #
@@ -86,6 +87,7 @@
       alias pol_polbin    INSTALL_BIN/polbin
       alias pol_polsim    INSTALL_BIN/polsim
       alias pol_polplot   INSTALL_BIN/polplot
+      alias pol_polimage  INSTALL_BIN/polimage
 #
 #
 #  Set up the commands and environment variables needed to export and

@@ -73,9 +73,9 @@
 *     reference direction. If no SkyFrame is available or if the
 *     direction of north is not defined, then the positive direction of
 *     the second pixel axis (Y) is used instead. The selected reference
-*     direction is recorded in the POLPACK extension of the output cube
-*     as item ANGROT (the anti-clockwise angle from the first pixel axis
-*     (X) to the reference direction, in degrees).
+*     direction is recorded in the output cube in the form of a Frame
+*     with Domain POLANAL in the WCS FrameSet. The first axis of the
+*     POLANAL Frame corresponds to the reference direction.
 *     -  An item VERSION is added to the polpack extension indicating the 
 *     current version number of the POLPACK package.
 
@@ -125,6 +125,7 @@
       INTEGER IPEPS              ! Pointer to analyser efficiency factors
       INTEGER IPPHI              ! Pointer to effective analyser angles
       INTEGER IPT                ! Pointer to analyser transmission factors
+      INTEGER IWCS               ! Pointer to output WCS FramSet
       INTEGER LBNDO( 3 )         ! Lower bounds of output NDF
       INTEGER NITER              ! No. of rejection iterations to perform
       INTEGER NNDF               ! No. of input NDFs
@@ -275,8 +276,15 @@
 *  Store the current POLPACK version string in the POLPACK extension.
       CALL POL1_PTVRS( INDFO, STATUS )
 
-*  Store the ANGROT value.
-      CALL NDF_XPT0R( ANGROT, INDFO, 'POLPACK', 'ANGROT', STATUS ) 
+*  Get the WCS FrameSet for the output NDF.
+      CALL KPG1_GTWCS( INDFO, IWCS, STATUS )
+
+*  Add a Frame with Domain POLANAL to the WCS FrameSet. The first axis of 
+*  this Frame defines the reference direction.
+      CALL POL1_PTANG( ANGROT, IWCS, STATUS )
+
+*  Store the modified FrameSet back in the NDF, and annul the pointer.
+      CALL NDF_PTWCS( IWCS, INDFO, STATUS )
 
 *  Store the STOKES value which indicates what each plane of the cube
 *  contains.

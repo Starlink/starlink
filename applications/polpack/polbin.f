@@ -73,13 +73,12 @@
 *        METHOD is set to "SIGMA". [4.0]
 
 *  Notes:
-*     -  An item named ANGROT is stored as a catalogue parameter in the
-*     output catalogue. It gives the anti-clockwise angle from the first 
-*     pixel axis (X) to the reference direction of the Stokes vectors and
-*     polarization vectors. The reference direction will be north if the 
-*     input catalogue has a celestial co-ordinate Frame within its WCS 
-*     information. Otherwise, the reference direction will be the second 
-*     pixel axis (i.e. ANGROT will be +90 degrees).
+*     -  The reference direction for the Stokes vectors and polarization
+*     vectors in the output catalogue will be north if the input catalogue 
+*     has a celestial co-ordinate Frame within its WCS information. Otherwise, 
+*     the reference direction will be the second pixel axis. The POLANAL
+*     Frame in the WCS information of the output catalogue is updated to
+*     describe the new reference direction.
 
 *  Examples:
 *     polbin intab outtab 4
@@ -120,6 +119,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
+      INCLUDE 'NDF_PAR'          ! NDF_ constants 
       INCLUDE 'PAR_ERR'          ! PAR error constants 
 
 *  Status:
@@ -165,7 +165,6 @@
       INTEGER CIIN               ! CAT identifier for input catalogue
       INTEGER CIOUT              ! CAT identifier for output catalogue
       INTEGER GI( 8 )            ! CAT identifiers for columns to be read
-      INTEGER GANG               ! CAT identifier for ANGROT parameter
       INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER IP                 ! Pointers to arrays to be filled
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
@@ -367,13 +366,23 @@
          END IF          
       END IF
 
-*  If we are dealing with linear polarization, get the ACW angle from the
-*  X axis to the input reference direction (ANGROT). 
-      IF( .NOT. CIRC ) THEN
-         CALL CAT_TIDNT( CIIN, 'ANGROT', GANG, STATUS )       
-         CALL CAT_TIQAR( GANG, 'VALUE', ANGROT, STATUS )
-         CALL CAT_TRLSE( GANG, STATUS )
+*  Attempt to read an AST FrameSet from the input catalogue. This WCS
+*  information will be copied to the output catalogue when the
+*  output catalogue is closed. Report an error if no WCS information is
+*  available in the input catalogue.
+      CALL POL1_GTCTW( CIIN, IWCS, STATUS )
+      IF( IWCS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'POLBIN_1', 'No usable WCS coordinate system '//
+     :                 'information is available in the input '//
+     :                 'catalogue.', STATUS )
+         GO TO 999
       END IF
+
+*  Get the ACW angle from the X axis to the input reference direction 
+*  (ANGROT). This is defined by the POLANAL Frame in the WCS FrameSet.
+      ANGROT = 0.0
+      CALL POL1_GTANG( NDF__NOID, CIIN, IWCS, ANGROT, STATUS )
 
 *  Decide whether or not a bias correction is needed and possible.
 *  ===============================================================
@@ -683,18 +692,6 @@
 *  Now create the output catalogue to receive the binned Stokes parameters
 *  and corresponding Stokes parameters found.
 *  =======================================================================
-*  Attempt to read an AST FrameSet from the input catalogue. This WCS
-*  information will be copied unchanged to the output catalogue when the
-*  output catalogue is closed. Report an error if no WCS information is
-*  available in the input catalogue.
-      CALL POL1_GTCTW( CIIN, IWCS, STATUS )
-      IF( IWCS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLBIN_1', 'No usable WCS coordinate system '//
-     :                 'information is available in the input '//
-     :                 'catalogue.', STATUS )
-         GO TO 999
-      END IF
 
 *  Get the reference direction for the output catalogue. This may be
 *  different to the reference direction for the input cube.

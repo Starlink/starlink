@@ -30,6 +30,9 @@
 *        be obtained.
 *     IWCS = INTEGER (Given)
 *        A FrameSet to define the names to give to the X and Y columns.
+*        On exit, a Frame with Domain POLANAL is added to the FrameSet.
+*        The first axis in this Frame defines the reference direction in 
+*        the catalogue.
 *     CIRC = LOGICAL (Given)
 *        Set this to .TRUE. if circular polarisation is being measured.
 *     UNITS = CHARACTER * ( * ) (Given)
@@ -40,8 +43,7 @@
 *        standard deviations are not created.
 *     ANGROT = REAL (Given)
 *        ACW angle in degrees from pixel X axis to the reference direction 
-*        in the output catalogue. This is stored as a parameter of the 
-*        catalogue.
+*        in the output catalogue. 
 *     TITLE = CHARACTER * ( * ) (Given)
 *        A title string to store as the TITLE parameter for the catalogue.
 *        No TITLE parameter is created if TITLE is blank.
@@ -207,13 +209,9 @@
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
       END IF
 
-*  Store ANGROT as a catalogue parameter if we are storing linear
-*  polarization.
-      IF( .NOT. CIRC ) THEN
-         CALL CAT_PPTSR( CI, 'ANGROT', ANGROT, 'ACW angle from X axis'//
-     :                   ' to ref. direction', QI, STATUS )
-         CALL CAT_TRLSE( QI, STATUS )
-      END IF
+*  Add a Frame describing the reference direction to the supplied WCS
+*  FrameSet.
+      CALL POL1_PTANG( ANGROT, IWCS, STATUS )
 
 *  Store the POLPACK version string as a catalogue parameter.
       CALL POL1_PTVRC( CI, STATUS )

@@ -81,7 +81,7 @@
 *  Local Variables:
       CHARACTER CNAME*(CAT__SZCNM)! Catalogue name
       CHARACTER DESC*25          ! Textual description of component type
-      CHARACTER NAME*(CAT__SZCMP)! Textual description of component type
+      CHARACTER NAME*(CAT__SZEXP)! String supplied by user
       CHARACTER TBUF*255         ! Buffer for error text
       INTEGER IAT                ! No. of characters in TBUF
       INTEGER IDTYP              ! Type of specified component
@@ -149,16 +149,37 @@
      :                       'catalogue ^DESC.', STATUS )
             END IF
 
-*  If the component was not found, annul the verbose CAT message, and 
-*  re-report with a more concise message.
+*  If the component was not found, annul the error.
          ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
             CALL ERR_ANNUL( STATUS )
-            STATUS = CAT__NOCMP
-            CALL MSG_SETC( 'DESC', DESC )
-            CALL MSG_SETC( 'NAME', NAME )
-            CALL MSG_SETC( 'CNAME', CNAME )
-            CALL ERR_REP( 'POL1_GTCTC_2', 'No ^DESC named ''^NAME'' '//
-     :                    'was found in catalogue ''^CNAME''.', STATUS )
+
+*  If a column name was requested, we also allow expressions to be
+*  supplied. Attempt to parse the suupleid string as an expression.
+            IF( TYPE .EQ. CAT__FITYP ) THEN
+               CALL CAT_EIDNT( CI, NAME, GI, STATUS )
+
+*  If this also failed, annul the error and report a concise error message.
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  STATUS = CAT__NOCMP
+                  CALL MSG_SETC( 'NAME', NAME )
+                  CALL MSG_SETC( 'CNAME', CNAME )
+                  CALL ERR_REP( 'POL1_GTCTC_2', 'Cannot use the '//
+     :                          'column name or expression ''^NAME'' '//
+     :                          'with catalogue ''^CNAME''.', STATUS )
+               END IF
+
+*  If the component is not a column, report a concise message.
+            ELSE
+               STATUS = CAT__NOCMP
+               CALL MSG_SETC( 'DESC', DESC )
+               CALL MSG_SETC( 'NAME', NAME )
+               CALL MSG_SETC( 'CNAME', CNAME )
+               CALL ERR_REP( 'POL1_GTCTC_3', 'No ^DESC named '//
+     :                       '''^NAME'' was found in catalogue '//
+     :                       '''^CNAME''.', STATUS )
+            END IF
+
          END IF
 
 *  If no error has occurred, we can leave the loop.
@@ -210,7 +231,7 @@
          STATUS = PAR__ABORT
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL MSG_SETC( 'DESC', DESC )
-         CALL ERR_REP( 'POL1_GTCTC_3', 'Aborted attempt to obtain '//
+         CALL ERR_REP( 'POL1_GTCTC_4', 'Aborted attempt to obtain '//
      :                 'the name of a catalogue ^DESC using parameter'//
      :                 ' %^PARAM.', STATUS )
 
@@ -219,7 +240,7 @@
          STATUS = PAR__NULL 
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL MSG_SETC( 'DESC', DESC )
-         CALL ERR_REP( 'POL1_GTCTC_4', 'Null value obtained for  '//
+         CALL ERR_REP( 'POL1_GTCTC_5', 'Null value obtained for  '//
      :                 'the name of a catalogue ^DESC using parameter'//
      :                 ' %^PARAM.', STATUS )
 
@@ -227,7 +248,7 @@
       ELSE IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL MSG_SETC( 'DESC', DESC )
-         CALL ERR_REP( 'POL1_GTCTC_5', 'Failed to obtain the name of '//
+         CALL ERR_REP( 'POL1_GTCTC_6', 'Failed to obtain the name of '//
      :                 'a catalogue ^DESC using parameter %^PARAM.', 
      :                 STATUS )
       END IF

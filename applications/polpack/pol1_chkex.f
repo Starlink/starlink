@@ -25,14 +25,11 @@
 *     basename of the NDF.
 *     5) Checks that the IMGID value is unique amongst the NDFs being
 *     processed. If not, a warning (not an error) is given.
-*     6) Sets up a default ANGROT component in the POLPACK extension if
-*     the extension does not currently contain an ANGROT value. The default 
-*     value used is zero.
-*     7) Appends the WPLATE or ANLANG value to the FILTER value. If there is 
+*     6) Appends the WPLATE or ANLANG value to the FILTER value. If there is 
 *     no FILTER value then one is created equal to WPLATE or ANLANG.
-*     8) Copies the FILTER value into the CCDPACK extension (an extension
+*     7) Copies the FILTER value into the CCDPACK extension (an extension
 *     is created if necessary).
-*     9) Adds a Frame into the NDF's WCS component representing a 2D
+*     8) Adds a Frame into the NDF's WCS component representing a 2D
 *     cartesian coordinate system with origin at pixel coordinates (0,0), 
 *     with its first axis parallel to the analyser for WPLATE = 0.0
 *     degrees.
@@ -84,8 +81,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'DAT_PAR'          ! DAT constants
-      INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER INDF
@@ -101,32 +96,18 @@
 *  External References:
       INTEGER CHR_LEN
 
-*  Local Constants:
-      DOUBLE PRECISION DTOR
-      PARAMETER ( DTOR = 0.01745329251994329577 )
-
 *  Local Variables:
       CHARACTER CCDLOC*(DAT__SZLOC) 
       CHARACTER FILTER*256
       CHARACTER IMGID*256
       CHARACTER NDFNAM*256
       CHARACTER ANLID*30
-      DOUBLE PRECISION ANGCOS  
-      DOUBLE PRECISION ANGSIN
-      DOUBLE PRECISION MAT( NDF__MXDIM*NDF__MXDIM )
-      INTEGER DIM( NDF__MXDIM )
       INTEGER FORM                      
-      INTEGER FRAME                  
       INTEGER I
       INTEGER IAT
-      INTEGER ICURR
       INTEGER INDX
-      INTEGER IPIXEL
-      INTEGER IPOLAN
       INTEGER IWCS
       INTEGER LC
-      INTEGER MAP
-      INTEGER NDIM
       LOGICAL ATHERE
       LOGICAL WTHERE
       LOGICAL STHERE
@@ -247,19 +228,6 @@
             CALL GRP_PUT( IGRP, 1, IMGID, 0, STATUS ) 
          END IF
 
-*  If the extension does not currently contain an ANGROT value,
-*  create one with the default value of zero.
-         CALL DAT_THERE( LOC, 'ANGROT', THERE, STATUS )
-         IF( .NOT. THERE ) THEN
-            CALL DAT_NEW0R( LOC, 'ANGROT', STATUS ) 
-            CALL CMP_PUT0R( LOC, 'ANGROT', 0.0, STATUS ) 
-            IF( .NOT. QUIET ) THEN
-               CALL MSG_SETC( 'IMGID', IMGID )
-               CALL MSG_OUT( ' ', '     Setting ANGROT to 0.0 degrees.',
-     :                       STATUS )
-            END IF
-         END IF
-
 *  If the extension does not currently contain a FILTER value,
 *  create a blank one. Otherwise, get the existing one.
          CALL DAT_THERE( LOC, 'FILTER', THERE, STATUS )
@@ -316,109 +284,32 @@
 *  Annul the locator to the CCDPACK extension.
          CALL DAT_ANNUL( CCDLOC, STATUS )
 
-*  Add a Frame to the NDFs WCS component in which the first axis
-*  corresponds to the analyser WPLATE=0.0 axis. 
-*  ============================================================
-*  Get the number of axes in the NDF.
-         CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
+      END IF
 
-*  Start an AST context.
-         CALL AST_BEGIN( STATUS )
+*  Add a Frame to the NDFs WCS component in which the first axis
+*  corresponds to the polarimeter reference direction. 
+*  ============================================================
+
+*  Get the anti-clockwise angle in degrees from the pixel X axis to 
+*  the analyser X axis. If an ANGROT value is found in the POLPACK
+*  extension, erase it (the information ios stored in the POLANAL
+*  Frame only - as of POLPACK V2.0).
+      CALL DAT_THERE( LOC, 'ANGROT', THERE, STATUS )
+      IF( THERE ) THEN
+         CALL CMP_GET0R( LOC, 'ANGROT', ANGROT, STATUS )
+         CALL DAT_ERASE( LOC, 'ANGROT', STATUS )
+      ELSE
+         ANGROT = 0.0
+      END IF
 
 *  Get an AST pointer for the FrameSet stored in the WCS component of
 *  the NDF (or equivalent info from the FITS or IRAS90 extension).
-         CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+      CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
-*  Note the original Current frame.
-         ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
-
-*  Remove any existing POLANAL Frame.
-         IF( AST_FINDFRAME( IWCS, AST_FRAME( NDIM, 'MINAXES=1, '//
-     :                      'MAXAXES=20', STATUS ), 'POLANAL', 
-     :                      STATUS ) .NE. AST__NULL ) THEN
-
-            IPOLAN = AST_GETI( IWCS, 'CURRENT', STATUS )
-            CALL AST_REMOVEFRAME( IWCS, AST__CURRENT, STATUS )
-
-*  Correct the original index of the Current Frame to take account of the
-*  removed Frame.
-            IF( ICURR .GT. IPOLAN ) THEN
-               ICURR = ICURR - 1
-            ELSE IF( ICURR .EQ. IPOLAN ) THEN
-               ICURR = AST__NOFRAME
-            END IF
-   
-         END IF
-
-*  Create a mapping from pixel coordinates (given by the PIXEL Frame in the
-*  FrameSet), to a 2D cartesian coordinate system in which the X axis is
-*  parallel to the analyser WPLATE = 0.0 axis. First get the
-*  anti-clockwise angle in degrees fro mthe pixel X axis to the analyser X
-*  axis.
-         CALL CMP_GET0R( LOC, 'ANGROT', ANGROT, STATUS )
-
-*  If the rotation is zero, this is just a unit mapping.
-         IF( ANGROT .EQ. 0.0 ) THEN
-            MAP = AST_UNITMAP( NDIM, ' ', STATUS )
-
-*  Otherwise, create a MatrixMap describing the rotation from pixel
-*  coordinates to analyser coordinates. 
-         ELSE
-
-*  Set the entire matrix to zero.
-            DO I = 1, NDIM*NDIM
-               MAT( I ) = 0.0
-            END DO
-
-*  Set the diagonal elements to 1.0.
-            DO I = 0, NDIM - 1
-               MAT( 1 + ( NDIM + 1 )*I ) = 1.0
-            END DO
-
-*  Store the  trig terms describing the rotation of the first 2 axes.
-            ANGCOS = COS( DTOR*DBLE( ANGROT ) )
-            ANGSIN = SIN( DTOR*DBLE( ANGROT ) )
-
-            MAT( 1 ) = ANGCOS
-            MAT( 2 ) = ANGSIN
-            MAT( 1 + NDIM ) = -ANGSIN
-            MAT( 2 + NDIM ) = ANGCOS
-
-*  Create the MatrixMap.
-            MAP = AST_MATRIXMAP( NDIM, NDIM, 0, MAT, ' ', STATUS )
-         END IF
-
-*  Now try to find the PIXEL Frame in the NDF's FrameSet. The PIXEL
-*  Frame becomes the current Frame if found.
-         IF( AST_FINDFRAME( IWCS, AST_FRAME( NDIM, ' ', STATUS ), 
-     :                      'PIXEL', STATUS ) .NE. AST__NULL ) THEN
-
-*  Get the index of the current Frame (i.e. the PIXEL Frame) within the
-*  FrameSet.
-            IPIXEL = AST_GETI( IWCS, 'CURRENT', STATUS )
-
-*  Create the Frame describing analyser coordinates. Use the domain
-*  POLANAL to identify it.
-            FRAME = AST_FRAME( NDIM, 'Domain=POLANAL, Title=Polpack '//
-     :                         'analyser frame', STATUS )
-
-*  Now add the analyser Frame into the FrameSet, using the Mapping created
-*  above to connect it to the pixel coordinate Frame.
-            CALL AST_ADDFRAME( IWCS, IPIXEL, MAP, FRAME, STATUS )
-
-*  Reinstate the original Current Frame (if it still exists).
-            IF( ICURR .NE. AST__NOFRAME ) THEN
-               CALL AST_SETI( IWCS, 'Current', ICURR, STATUS )
-            END IF
+*  Add the POLANAL Frame into the FrameSet.
+      CALL POL1_PTPOL( ANGROT, IWCS, STATUS )
 
 *  Store the new FrameSet back in the NDF.
-            CALL NDF_PTWCS( IWCS, INDF, STATUS )
-
-         END IF
-
-*  End the AST context.
-         CALL AST_END( STATUS )
-
-      END IF
+      CALL NDF_PTWCS( IWCS, INDF, STATUS )
 
       END

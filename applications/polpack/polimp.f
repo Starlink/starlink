@@ -93,14 +93,14 @@
 *     or constant, to be assigned to the specified extension item. Some 
 *     examples:
 *
-*        ANGROT             ANROTA
+*        WPLATE             HWP
 *
-*     This copies the value of the FITS keyword ANROTA from the FITS
-*     extension to the ANGROT component in the POLPACK extension.
+*     This copies the value of the FITS keyword HWP from the FITS
+*     extension to the WPLATE component in the POLPACK extension.
 *
-*        ANGROT             45.0
+*        WPLATE             45.0
 *
-*     This assigns the value 45.0 to the ANGROT component of the POLPACK 
+*     This assigns the value 45.0 to the WPLATE component of the POLPACK 
 *     extension.
 *    
 *        IMGID              "M51_PLATEB"
@@ -119,13 +119,13 @@
 *        Data-type          FITS-keyword
 *
 *     Here "Data-type" must be one of _INTEGER, _REAL, _DOUBLE, _WORD, _BYTE, 
-*     _CHAR. So for instance if you wanted to assign a value to the ANGROT
-*     extension item, the orientation of the analyser in degrees, from the 
-*     FITS keyword ROTA which gives the required value in radians, you 
+*     _CHAR. So for instance if you wanted to assign a value to the WPLATE
+*     extension item, the orientation of the half-wave plate in degrees, from 
+*     the FITS keyword HWP which gives the required value in radians, you 
 *     could use this sequence of commands:
 *
-*        _REAL             ROTA
-*        ANGROT            57.29578*ROTA
+*        _REAL             HWP
+*        WPLATE            57.29578*HWP
 *
 *     The function may use any of the usual Fortran operators; +, -, *, /, 
 *     ** and built-in functions (SIN, COS, TAN, LOG, etc). See SUN/61
@@ -217,10 +217,13 @@
 *     -  Any existing values in the POLPACK extension are deleted before 
 *     processing the supplied control table.
 *     -  A new Frame is added to the WCS component of each NDF and is given the
-*     Domain "POLANAL". This Frame is formed by rotating the pixel coordinates 
+*     Domain "POLANAL". This Frame is formed by rotating the grid co-ordinate
 *     Frame so that the first axis is parallel to the analyser axis. The
-*     angle of rotation is given by the ANGROT item in the POLPACK extension
-*     and defaults to zero if ANGROT is not specified in the control table.
+*     angle of rotation is given by the ANGROT value and defaults to zero 
+*     if ANGROT is not specified in the control table. As of POLPACK V2.0,
+*     the ANGROT value is no longer stored explicitly in the POLPACK 
+*     extension; its value is deduced from the POLANAL Frame in the WCS
+*     component.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -236,7 +239,7 @@
 *        Default control table changed to make all items optional. Delete
 *        POLPACK extensions if an error occurs.
 *     1-APR-1999 (DSB):
-*        Added VERSION.
+*        Added VERSION. Removed ANGROT from POLPACK extension.
 *     {enter_changes_here}
 
 *  Bugs:

@@ -326,10 +326,6 @@
 *       POLPACK extension with a IMGID value, then the IMGID value is copied
 *       unchanged to the corresponding output images. Otherwise, the name of
 *       the input image (without a directory path) is used.
-*       - ANGROT -- The anti-clockwise angle from the first axis of the
-*       image to the analyser axis. This value is only written if the input 
-*       image already contains an ANGROT value, in which case the input value
-*       is modified to take account of any rotation introduced by the mapping. 
 *
 *     - The following components are added to the POLPACK extension in the 
 *     output cube holding Stokes parameter (the extension is first created 

@@ -108,6 +108,7 @@
       INTEGER IPDOUT             ! Pointer to output DATA array
       INTEGER IPVIN              ! Pointer to input VARIANCE array
       INTEGER IPVOUT             ! Pointer to output VARIANCE array
+      INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER LBND( 3 )          ! Lower bounds of input cube
       INTEGER NAMLEN             ! Length of name string
       INTEGER NDFIN              ! NDF identifier for input intensity image
@@ -171,11 +172,16 @@
          GO TO 999
       END IF
 
-*  Get the value of the ANGROT component in the POLPACK extension. 
-*  This is the anti-clockwise angle from the first axis of the image to
-*  the analyser axis (i.e. WPLATE=0.0 axis), in degrees.
+*  Get the NDFs WCS FrameSet.
+      CALL KPG1_GTWCS( INDF1, IWCS, STATUS )      
+
+*  Get the anti-clockwise angle from the first axis of the image to
+*  the reference direction in degrees.
       ANGRTC = 0.0
-      CALL NDF_XGT0R( INDF1, 'POLPACK', 'ANGROT', ANGRTC, STATUS ) 
+      CALL POL1_GTANG( INDF1, 0, IWCS, ANGRTC, STATUS )
+
+*  Annul the FrameSet pointer.
+      CALL AST_ANNUL( IWCS, STATUS )
 
 *  Map the input cubes DATA array.
       CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPDIN, EL, STATUS )
@@ -252,13 +258,15 @@
 *  Get a locator to the POLPACK extension.
          CALL NDF_XLOC( NDFIN, 'POLPACK', 'READ', XLOC, STATUS )
 
+*  Get the WCS FrameSet.
+         CALL KPG1_GTWCS( NDFIN, IWCS, STATUS )
+
 *  Get the ANGROT value. Use 0.0 if it is missing.
-         CALL DAT_THERE( XLOC, 'ANGROT', THERE, STATUS )
-         IF( THERE ) THEN
-            CALL CMP_GET0R( XLOC, 'ANGROT', ANGROT, STATUS ) 
-         ELSE 
-            ANGROT = 0.0
-         END IF
+         ANGROT = 0.0
+         CALL POL1_GTANG( NDFIN, 0, IWCS, ANGROT, STATUS )
+
+*  Annul the WCS FrameSet.
+         CALL AST_ANNUL( IWCS, STATUS )
 
 *  Get the half-wave plate position in degrees (if it exists).
          CALL DAT_THERE( XLOC, 'WPLATE', THERE, STATUS )

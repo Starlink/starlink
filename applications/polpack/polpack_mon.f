@@ -101,6 +101,9 @@
       ELSE IF ( NAME .EQ. 'POLHELP' ) THEN
          CALL POLHELP( STATUS )
 
+      ELSE IF ( NAME .EQ. 'POLIMAGE' ) THEN
+         CALL POLIMAGE( STATUS )
+
       ELSE IF ( NAME .EQ. 'POLKA' ) THEN
          CALL POLKA( STATUS )
 

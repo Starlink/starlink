@@ -44,15 +44,20 @@
 *     ANGROT = _REAL (Read)
 *        The anti-clockwise angle from the first (X) pixel axis of each
 *        image to the polarimeter reference direction, in degrees. The
-*        given value is stored in all the supplied images, over-writing
-*        any existing value. If a null (!) value is supplied, any image
-*        which already has an ANGROT value retains its existing value,
-*        and an ANGROT value of zero is stored otherwise. The reference
-*        direction depends on the type of polarimeter; in a rotating
-*        half-wave plate polarimeter, it corresponds to the direction of
-*        the fixed analyser; in polarimeters with multiple fixed
-*        analysers or a single rotating analyser, it corresponds to the
-*        direction specified by a zero value of ANLANG. [!]
+*        supplied value is used to create a new Frame within the WCS
+*        component of the NDF. This Frame is given the Domain name POLANAL
+*        and its first axis corresponds to the reference direction. If a
+*        null (!) value is supplied for this parameter, any image which
+*        already has a POLANAL Frame retains the existing Frame. Otherwise
+*        a POLANAL Frame is created using an ANGROT value of zero (i.e. it
+*        is assumed that the reference direction corresponds to the X
+*        pixel axis). 
+*        
+*        The reference direction depends on the type of polarimeter; in a
+*        rotating half-wave plate polarimeter, it should correspond to the
+*        direction of the fixed analyser; in polarimeters with multiple
+*        fixed analysers or a single rotating analyser, it should
+*        correspond to the direction specified by a zero value of ANLANG. [!] 
 *     ANLANG = _REAL (Read)
 *        Specifies the anti-clockwise angle in degrees from the reference
 *        direction (established using the ANGROT parameter) to the
@@ -154,11 +159,6 @@
 *  Notes:
 *     -  Errors are reported if the final POLPACK extension in a data file 
 *     is illegal in any way.
-*     -  If a new POLPACK extension is created, a new Frame is also added to 
-*     the WCS component of the NDF and is given the Domain "POLANAL". This 
-*     Frame is formed by rotating the pixel coordinates Frame so that the 
-*     first axis is parallel to the analyser axis. The angle of rotation is 
-*     given by the ANGROT item in the POLPACK extension.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -227,6 +227,7 @@
       INTEGER IGRP4              ! Id for group of used IMGID values
       INTEGER INDF               ! Current NDF identifier
       INTEGER INDX               ! Loop variable
+      INTEGER IWCS               ! WCS FrameSet pointer
       INTEGER J                  ! Loop count
       INTEGER LNDF               ! Length of NDF name
       INTEGER NCOMP              ! No. of component in POLPACK extension
@@ -471,6 +472,9 @@
 *  Get the input NDF identifier
          CALL NDG_NDFAS( IGRP1, INDX, 'UPDATE', INDF, STATUS )
 
+*  Get the NDFs WCS FrameSet.
+         CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+
 *  See if there is already a CCDPACK extension.
          CALL NDF_XSTAT( INDF, 'CCDPACK', GOTCCD, STATUS )        
 
@@ -496,7 +500,6 @@
 
          IF( GOTPOL ) THEN
             CALL NDF_XGT0C( INDF, 'POLPACK', 'STOKES', STOKES, STATUS )
-            CALL NDF_XGT0R( INDF, 'POLPACK', 'ANGROT', ANG, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'FILTER', FILT, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'IMGID', IMG, STATUS )
             CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPL, STATUS )
@@ -504,6 +507,9 @@
             CALL NDF_XGT0R( INDF, 'POLPACK', 'T', T0, STATUS )
             CALL NDF_XGT0R( INDF, 'POLPACK', 'EPS', EPS0, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'RAY', RY, STATUS )
+
+*  The existing ANGROT value is obtained from the POLANAL WCS Frame.
+            CALL POL1_GTANG( INDF, 0, IWCS, ANG, STATUS )
 
 *  Create the POLPACK extension if there isn't one.
          ELSE
@@ -524,14 +530,14 @@
 
 *  Store the values. First do Stokes vector cubes.
          IF( STOKES .NE. ' ' ) THEN
-            CALL NDF_XPT0R( ANG, INDF, 'POLPACK', 'ANGROT', STATUS )
+            CALL POL1_PTANG( ANG, IWCS, STATUS )
             IF( FILT .NE. ' ' ) CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 
      :                                          'FILTER', STATUS )
 
 *  Now do intensity images. 
          ELSE
 
-            CALL NDF_XPT0R( ANG, INDF, 'POLPACK', 'ANGROT', STATUS )
+            CALL POL1_PTANG( ANG, IWCS, STATUS )
             CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', STATUS )
             CALL NDF_XPT0C( IMG, INDF, 'POLPACK', 'IMGID', STATUS )
             IF( WPL .NE. VAL__BADR ) CALL NDF_XPT0R( WPL, INDF, 
@@ -557,13 +563,27 @@
          IF( .NOT. QUIET ) THEN
             CALL ERR_BEGIN( STATUS )
 
+*  Obtain and display the ANGROT value.
+            ANGROT = VAL__BADR
+            CALL POL1_GTANG( INDF, 0, IWCS, ANGROT, STATUS )
+
+            IF( ANGROT .NE. VAL__BADR ) THEN
+               BUF = '   ANGROT'
+               BUF( DAT__SZNAM + 4 : DAT__SZNAM + 4 ) = ':'
+               IAT = DAT__SZNAM + 5
+               CALL CHR_PUTR( ANGROT, BUF, IAT ) 
+               CALL MSG_OUT( 'POLEXT_MSG5', BUF, STATUS )
+            END IF
+
 *  Get the number of components in it.
             CALL DAT_NCOMP( POLLOC, NCOMP, STATUS)
 
 *  Tell the user if the extension is empty.
             IF( NCOMP .EQ. 0 ) THEN
-               CALL MSG_OUT( 'POLEXT_MSG5', '   The POLPACK extension'//
-     :                       ' is empty.', STATUS )
+               IF( ANGROT .EQ. VAL__BADR ) THEN
+                  CALL MSG_OUT( 'POLEXT_MSG6', '   The POLPACK '//
+     :                          'extension is empty.', STATUS )
+               END IF
            
 *  Otherwise, index through the structure's components, obtaining locators 
 *  and the required information.
@@ -594,7 +614,7 @@
                   END IF
 
 *  Display the output buffer.
-                  CALL MSG_OUT( 'POLEXT_MSG6', BUF, STATUS )
+                  CALL MSG_OUT( 'POLEXT_MSG7', BUF, STATUS )
 
 *  Annul the component locator.
                   CALL DAT_ANNUL( CLOC, STATUS )
@@ -609,6 +629,12 @@
 
 *  Annul the locator to the POLPACK extension.
          CALL DAT_ANNUL( POLLOC, STATUS )
+
+*  Store the new WCS FrameSet.
+         CALL NDF_PTWCS( IWCS, INDF, STATUS )
+
+*  Annul the pointer to the WCS FrameSet.
+         CALL AST_ANNUL( IWCS, STATUS )
 
 *  If an error occurred, delete the extensions if they have just been 
 *  created, flush the error, and continue to process the next NDF.

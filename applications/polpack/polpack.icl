@@ -45,6 +45,7 @@ define polka             $POLPACK_DIR/polpack_mon
 define polvec            $POLPACK_DIR/polpack_mon
 define polbin            $POLPACK_DIR/polpack_mon
 define polplot           $POLPACK_DIR/polpack_mon
+define polimage          $POLPACK_DIR/polpack_mon
 defstring polh(elp)      !$POLPACK_DIR/polhelp
 
 {  Full command definitions.
@@ -57,6 +58,7 @@ define pol_polka         $POLPACK_DIR/polpack_mon polka
 define pol_polvec        $POLPACK_DIR/polpack_mon polvec
 define pol_polbin        $POLPACK_DIR/polpack_mon polbin
 define pol_polplot       $POLPACK_DIR/polpack_mon polplot
+define pol_polimage      $POLPACK_DIR/polpack_mon polimage
 defstring pol_polh(elp)  !$POLPACK_DIR/polhelp
 
 { Define POLPACK's help from ICL.  Note that polhelp points to help polpack
@@ -71,6 +73,7 @@ defhelp  polimp          $POLPACK_HELP
 defhelp  polvec          $POLPACK_HELP
 defhelp  polbin          $POLPACK_HELP
 defhelp  polplot         $POLPACK_HELP
+defhelp  polimage        $POLPACK_HELP
 
 {
 {  Announce that the POLPACK commands are available.

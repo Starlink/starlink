@@ -50,7 +50,7 @@
 *        extension item values.
 *     DESGRP( 3 ) = INTEGER (Returned)
 *        Three groups which on exit will contain the extension item
-*        name, its expected type (constrained by CCDPACK) and the
+*        name, its expected type (constrained by POLPACK) and the
 *        function of FITS items which will give the value to be used.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -68,7 +68,7 @@
 *
 *     _HDS-type is required for FITS-keyword declarations but may be
 *     left out of the Extension-item statements, if the Extension-item
-*     is a recognisable CCDPACK item. In this way both complex and
+*     is a recognisable POLPACK item. In this way both complex and
 *     minimal transformation tables are possible as well as support for
 *     the current (9-12-93) KAPPA:FITSIMP format.
 *
@@ -190,7 +190,7 @@
 
 *  May have not located all FITS-keywords yet but we cannot proceed
 *  until all the type information is available (need to identify _CHAR
-*  items). This may be in confusion as a knowledge of CCDPACK specific
+*  items). This may be in confusion as a knowledge of POLPACK specific
 *  extension items is allowed. So scan the lists and check for HDS-type
 *  information. If none is available then guess it (could do this
 *  quicker by folding this loop and the next together but will keep
@@ -211,7 +211,7 @@
 
 *  Not a FITS-keyword declaration and isn't a recognisable HDS-type.
 *  Look at the first element and see if is possible to convert this
-*  into a "known" CCDPACK extension item.
+*  into a "known" POLPACK extension item.
                CALL GRP_GET( WRDGRP( 1 ), I, 1, NAME1, STATUS )
                CALL POL1_KNEXT( NAME1, YES, NAME4, STATUS )
                IF ( YES ) THEN
@@ -248,7 +248,7 @@
          IF ( .NOT. MASK( I ) ) THEN
 
 *  Unprocessed statement. This now definitely has three elements. The
-*  first is the name of a CCDPACK extension item, the second is the TYPE
+*  first is the name of a POLPACK extension item, the second is the TYPE
 *  of the extension item and the third is a functional statement which
 *  describes how to create the value of the extension item. Now check
 *  that the extension item is recognisable (know that some are from

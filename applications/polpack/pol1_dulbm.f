@@ -103,6 +103,8 @@
 *  History:
 *     13-JAN-1999 (DSB):
 *        Original version.
+*     8-APR-1999 (DSB):
+*        Do not store ANGROT in the output anymore.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -197,7 +199,7 @@
                                  ! of I, Q and U
       INTEGER IWCS               ! Identifier for the WCS information
        
-      REAL ANGROT( MAXIN )       ! Position angle of WPLATE=0.0 axis
+      REAL ANGROT( MAXIN )       ! ACW angles from X to ref direction (degs)
       REAL WPLATE( MAXIN )       ! Waveplate positions of images 
       REAL TOLS, TOLZ            ! tolerances for image intercomparisons
       REAL SKYSUP                ! sky supression factor
@@ -293,6 +295,9 @@
       IVAL = 1
       DO I = 1, NIM
 
+*  Get the WCS FrameSet.
+         CALL KPG1_GTWCS( INDFT, IWCS, STATUS )
+
 *  Initialise the descriptor items.
          WPLATE( IVAL ) = VAL__BADR
          IMGID( IVAL ) = ' '
@@ -307,8 +312,10 @@
      :                   IMGID( IVAL ), STATUS )
          CALL NDF_XGT0C( NDFIN( I ), 'POLPACK', 'RAY', RAY( IVAL ),
      :                   STATUS )
-         CALL NDF_XGT0R( NDFIN( I ), 'POLPACK', 'ANGROT', 
-     :                   ANGROT( IVAL ), STATUS )
+         CALL POL1_GTANG( NDFIN( I ), 0, IWCS, ANGROT( IVAL ), STATUS )
+
+*  Annul the WCS FrameSet.
+         CALL AST_ANNUL( IWCS, STATUS )
 
 *  If the descriptors were obtained, check them for validity. The
 *  WPLATE descriptor is checked against a constant array containing
@@ -813,23 +820,25 @@
 *  Set the LABEL component for the output.
       CALL NDF_CPUT( LABEL, NDFOUT, 'LABEL', STATUS )
 
-*  Store world coordinate information in the output NDF. All the input 
-*  NDFs are assumed to be aligned with each other, and with the output 
-*  NDF. So just copy the WCS component from the first input NDF to the 
-*  output NDF, and then annul the AST identifier.
-      CALL NDF_PTWCS( IWCS, NDFOUT, STATUS )
-      CALL AST_ANNUL( IWCS, STATUS )
-
 *  Create a POLPACK extension containing a character array identifying the
-*  quantities stored in each plane of the DATA array, and the angle
-*  between the first pixel axis and the analyser (i.e. WPLATE=0.0) axis.
-*  This angle is just copied from the first input NDF, since there can be
-*  no rotation between input images.
+*  quantities stored in each plane of the DATA array.
       CALL NDF_XNEW( NDFOUT, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS )
       CALL NDF_XPT0C( PLANES( : UBND( 3 ) - LBND( 3 ) + 1 ), NDFOUT, 
      :                'POLPACK', 'STOKES', STATUS ) 
-      CALL NDF_XPT0R( ANGROT( 1 ), NDFOUT, 'POLPACK', 'ANGROT', STATUS ) 
       CALL DAT_ANNUL( XLOC, STATUS )         
+
+*  Add a POLANAL Frame to the WCS FrameSet. The first axis in this Frame 
+*  defines the reference direction in the output cube. The reference
+*  direction is just copied from the first input NDF, since there can be 
+*  no rotation between input images.
+      CALL POL1_PTANG( ANGROT( 1 ), IWCS, STATUS )
+
+*  Store teh WCS FrameSet in the output NDF. All the input NDFs are assumed 
+*  to be aligned with each other, and with the output NDF. So just copy the 
+*  WCS component from the first input NDF (with the extra OLANAL FRame
+*  added above) to the output NDF, and then annul the AST identifier.
+      CALL NDF_PTWCS( IWCS, NDFOUT, STATUS )
+      CALL AST_ANNUL( IWCS, STATUS )
 
 * Map the output DATA array and if necessary, the VARIANCE array.
       CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE/BAD', IPDOUT, NOUT,

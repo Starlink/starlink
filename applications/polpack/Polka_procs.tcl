@@ -11119,21 +11119,6 @@ proc Save {} {
                      }
                   }
 
-# Modify the value of ANGROT by subtracting the rotation introduced by the 
-# alignement process.
-                  if { ![Extension $outndf ANGROT _REAL "" old_angrot] } { 
-                     set ok 0 
-                     break
-                  }
-
-                  if { $old_angrot != "" } {
-                     set angrot [expr $old_angrot - $MAP_RX]
-                     if { ![Extension $outndf ANGROT _REAL $angrot ""] } {
-                        set ok 0
-                        break
-                     }
-                  }
-
 # The image identifier. This is only assigned a value if the IMGID component 
 # does not already exist. In this case, the name of the input image is
 # used.

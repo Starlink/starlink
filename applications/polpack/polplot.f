@@ -48,10 +48,10 @@
 *        specified by parameter COLANG are assumed to be angles measured 
 *        anti-clockwise from this reference direction. The value of ANGROT 
 *        should be the anti-clockwise angle from the positive X axis to the 
-*        reference direction, in degrees. For catalopgues created by
-*        POLPACK V2.0 or later, the run time default value is equal 
-*        to the value of the ANGROT parameter within the supplied catalogue, 
-*        or zero if the catalogue does not contain an ANGROT parameter. 
+*        reference direction, in degrees. For catalogues created by
+*        POLPACK V2.0 or later, the run time default value is derived from
+*        the POLANAL Frame in the WCS information stored in the catalogue
+*        (or zero if the catalogue does not contain a POLANAL Frame). 
 *        For earlier catalogues, the run time default is zero. []
 *     ARROW = LITERAL (Read)
 *        Vectors are drawn as arrows, with the size of the arrow head
@@ -131,7 +131,7 @@
 *        - A domain name such as SKY, AXIS, PIXEL, etc. The two
 *        "pseudo-domains" WORLD and DATA may be supplied and will be
 *        translated into PIXEL and AXIS respectively, so long as the WCS
-*        component of the NDF does not contain Frames with these domains.
+*        FrameSet in the catalogue does not contain Frames with these domains.
 *
 *        - An integer value giving the index of the required Frame within
 *        the WCS component.
@@ -380,6 +380,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
+      INCLUDE 'NDF_PAR'          ! NDF_ constants 
       INCLUDE 'PAR_ERR'          ! PAR_ error constants 
 
 *  Status:
@@ -416,7 +417,6 @@
       DOUBLE PRECISION UBND      ! Upper axis bound
       INTEGER CI                 ! CAT catalogue identifier
       INTEGER FRM                ! Frame pointer
-      INTEGER GANG               ! CAT identifier for ANGROT parameter
       INTEGER GI                 ! CAT column identifier
       INTEGER GIANG              ! CAT identifier for ANG column
       INTEGER GIMAG              ! CAT identifier for MAG column
@@ -465,8 +465,8 @@
       LOGICAL V2PLUS             ! Catalogue created by POLPACK V2 or later?
       REAL AHSIZE                ! Arrowhead size in world co-ordinates
       REAL AHSIZM                ! Arrowhead size in metres
-      REAL ANGFAC                ! NDF2 data to radians conversion factor
-      REAL ANGROT                ! Angle to add on to NDF2 values
+      REAL ANGFAC                ! Supplied angles to radians conversion factor
+      REAL ANGROT                ! Angle to add on to supplied angles
       REAL ASPECT                ! Aspect ratio for new DATA pictures
       REAL BLO( 2 )              ! Lower bounds of plotting space
       REAL BHI( 2 )              ! Upper bounds of plotting space
@@ -481,7 +481,7 @@
       REAL KEYOFF                ! Offset to top of key 
       REAL KEYPOS( 2 )           ! Key position
       REAL MARGIN( 4 )           ! Margins round DATA picture
-      REAL TYPDAT                ! A typical data value from 1st input NDF
+      REAL TYPDAT                ! A typical vector data value
       REAL VECWID                ! Line thickness for vectors
       REAL VSCALE                ! Vector scale, viz. data units per cm
       REAL X1                    ! Lower x w.c. bound of picture
@@ -860,29 +860,10 @@
          ANGROT = 0.0
 
 *  Otherwise, for V2 catalogues (or later), get the default ANGROT value
-*  from the catalogue...
+*  from the POLANAL Frame in the catalogues WCS FrameSet...
       ELSE
-
-*  Abort if an error has occurred.
-         IF( STATUS .NE. SAI__OK ) GO TO 999
-
-*  Attempt to get a CAT identifier for the ANGROT parameter in the
-*  supplied catalogue.
-         CALL CAT_TIDNT( CI, 'ANGROT', GANG, STATUS )       
-
-*  If this failed, annul the error nad use a dynamic default of zero for
-*  parameter ANGROT.
-         IF( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_ANNUL( STATUS )
-            ANGROT = 0.0
-
-*  Otherwise, get the value of the ANGROT parameter and release the
-*  identifier.
-         ELSE
-            CALL CAT_TIQAR( GANG, 'VALUE', ANGROT, STATUS )
-            CALL CAT_TRLSE( GANG, STATUS )
-         END IF
-
+         ANGROT = 0.0
+         CALL POL1_GTANG( NDF__NOID, CI, IWCS, ANGROT, STATUS )
       END IF
 
 *  Set the dynamic default for ANGROT.

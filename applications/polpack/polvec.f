@@ -153,18 +153,15 @@
 *  Notes:
 *     -  The output NDFs are deleted if there is an error during the
 *     formation of the polarization parameters.
-*     -  An item named ANGROT is stored with each output dataset. In the
-*     case of NDF outputs, ANGROT is a component of the POLPACK extension. 
-*     In the case of the catalogue output, ANGROT is a catalogue parameter.
-*     In both cases ANGROT gives the anti-clockwise angle from the first 
-*     pixel axis (X) to the reference direction of the Stokes vectors and
-*     polarization vectors. The reference direction will be north if the 
-*     input NDF has a celestial co-ordinate Frame within its WCS component. 
-*     Otherwise, the reference direction will be the second pixel axis (i.e. 
-*     ANGROT will be +90 degrees).
+*     -  The reference direction for the Stokes vectors and polarization
+*     vectors in the output catalogue and NDFs will be north if the input NDF
+*     has a celestial co-ordinate Frame within its WCS component. Otherwise, 
+*     the reference direction will be the second pixel axis. The POLANAL
+*     Frame in the WCS information of the output catalogue or NDFs is 
+*     updated to describe the new reference direction.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -303,11 +300,16 @@
          GO TO 999
       END IF
 
-*  Get the value of the ANGROT component in the POLPACK extension. 
-*  This is the anti-clockwise angle from the first axis of the image to
+*  Get the WCS FrameSet frm the input cube.
+      CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
+
+*  Get the anti-clockwise angle from the first axis of the image to
 *  the input reference direction, in degrees.
       ANGROT = 0.0
-      CALL NDF_XGT0R( INDF1, 'POLPACK', 'ANGROT', ANGROT, STATUS ) 
+      CALL POL1_GTANG( INDF1, 0, IWCS, ANGROT, STATUS )
+
+*  Annul the pointer to the WCS FrameSet.
+      CALL AST_ANNUL( IWCS, STATUS )
 
 *  See if the VARIANCE component is defined.
       CALL NDF_STATE( INDF1, 'VARIANCE', VAR, STATUS )
@@ -414,6 +416,9 @@
       CALL POL1_ANGRT( IWCS, 0.5*REAL( LBND( 1 ) + UBND( 1 ) - 1 ),
      :                 0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ), ANGRT, 
      :                 STATUS )
+
+*  Add in a POLANAL Frame defining the output reference directon.
+      CALL POL1_PTANG( ANGRT, IWCS, STATUS )
 
 *  Obtain the total-intensity NDF.
 *  ===============================
@@ -525,12 +530,6 @@
          IF ( VAR ) CALL NDF_MAP( INDFT, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPTV, EL, STATUS )
 
-*  Store the ANGROT item in the POLPACK extension.
-         CALL NDF_XNEW( INDFT, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
-     :                  STATUS ) 
-         CALL NDF_XPT0R( ANGRT, INDFT, 'POLPACK', 'ANGROT', STATUS )
-         CALL DAT_ANNUL( XLOC, STATUS )
-
 *  Store the current POLPACK version number.
          CALL POL1_PTVRS( INDFT, STATUS )
 
@@ -604,12 +603,6 @@
          IF ( VAR ) CALL NDF_MAP( INDFQ, 'VARIANCE', '_REAL', 
      :                            'WRITE/BAD', IPQV, EL, STATUS )
 
-*  Store the ANGROT item in the POLPACK extension.
-         CALL NDF_XNEW( INDFQ, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
-     :                  STATUS ) 
-         CALL NDF_XPT0R( ANGRT, INDFQ, 'POLPACK', 'ANGROT', STATUS )
-         CALL DAT_ANNUL( XLOC, STATUS )
-
 *  Store the current POLPACK version number.
          CALL POL1_PTVRS( INDFQ, STATUS )
 
@@ -645,12 +638,6 @@
          IF ( VAR ) CALL NDF_MAP( INDFU, 'VARIANCE', '_REAL', 
      :                            'WRITE/BAD', IPUV, EL, STATUS )
 
-*  Store the ANGROT value in a POLPACK extension.
-         CALL NDF_XNEW( INDFU, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
-     :                  STATUS ) 
-         CALL NDF_XPT0R( ANGRT, INDFU, 'POLPACK', 'ANGROT', STATUS )
-         CALL DAT_ANNUL( XLOC, STATUS )
-
 *  Store the current POLPACK version number.
          CALL POL1_PTVRS( INDFU, STATUS )
 
@@ -685,12 +672,6 @@
          IPVV = IPV
          IF ( VAR ) CALL NDF_MAP( INDFV, 'VARIANCE', '_REAL',
      :                            'WRITE/BAD', IPVV, EL, STATUS )
-
-*  Store the ANGROT value in a POLPACK extension.
-         CALL NDF_XNEW( INDFV, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
-     :                  STATUS ) 
-         CALL NDF_XPT0R( ANGRT, INDFV, 'POLPACK', 'ANGROT', STATUS )
-         CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Store the current POLPACK version number.
          CALL POL1_PTVRS( INDFV, STATUS )
