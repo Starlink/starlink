@@ -13,7 +13,11 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
+
+dnl    Look for endian-ness (SPARC, Motorola and PowerPC's are all big-endian)
+AC_C_BIGENDIAN
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS

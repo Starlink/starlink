@@ -5,7 +5,7 @@ AM_FCFLAGS = -I../include
 
 lib_LTLIBRARIES = libgen.la
 
-libgen_la_SOURCES = $(C_ROUTINES) $(F_ROUTINES) 
+libgen_la_SOURCES = $(C_ROUTINES) $(F_ROUTINES) $(FPP_ROUTINES)
 
 C_ROUTINES = \
 gen_getcwd.c gen_qfisort.c gen_qfmed.c gen_qfsort.c gen_rename.c
@@ -29,4 +29,5 @@ gen_sortf.f gen_subad.f gen_subaf.f gen_subafe.f gen_subset.f \
 gen_subsetb.f gen_success.f gen_supset.f gen_time.f gen_wait.f \
 gen_xop21.f gen_yop21.f
 
-         
+FPP_ROUTINES =  gen_bswap.fpp gen_wbswap.fpp
+       
