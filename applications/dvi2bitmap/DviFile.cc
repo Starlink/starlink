@@ -1089,13 +1089,16 @@ void DviFile::PosStateStack::clear()
 
 // // Implementation of FontSet
 DviFile::FontSet::FontSet ()
+    : myIter_(0)
 {
     // empty
 }
 DviFile::FontSet::~FontSet()
 {
-    if (myIter_ != 0)
-	free(myIter_);
+    if (myIter_ != 0) {
+	delete myIter_;
+	myIter_ = 0;
+    }
 }
 void DviFile::FontSet::add(int fnt_num, PkFont* newfont)
 {
@@ -1113,8 +1116,10 @@ PkFont* DviFile::FontSet::get(int fnt_num)
 DviFile::FontSet::const_iterator DviFile::FontSet::begin()
     const
 {
-    if (myIter_ != 0)
-	free(myIter_);
+    if (myIter_ != 0) {
+	delete myIter_;
+	myIter_ = 0;
+    }
     //cerr << "FontSet::begin: fontMap_ size=" << fontMap_.size() << endl;
     myIter_ = new const_iterator(fontMap_);
     //cerr << "   ... size=" << fontMap_.size() << endl;
