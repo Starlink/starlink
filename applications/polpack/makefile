@@ -1433,6 +1433,20 @@ datapic.o:	 SAE_PAR
 gethlp.o:	 SAE_PAR HLPCMD
 gthlpi.o:	 SAE_PAR HLPCMD
 ndfac.o:	 SAE_PAR
+ndg1_expan.o:    SAE_PAR GRP_PAR DAT_PAR NDG_CONST NDG_ERR
+ndg1_hspec.o:    SAE_PAR GRP_PAR
+ndg1_lasto.o:    SAE_PAR
+ndg1_match.o:    SAE_PAR GRP_PAR NDG_CONST
+ndg1_mspec.o:    SAE_PAR GRP_PAR
+ndg1_ndfch.o:    SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
+ndg1_subst.o:    SAE_PAR
+ndg_asexp.o:     SAE_PAR NDG_CONST NDG_ERR GRP_PAR
+ndg_assoc.o:     SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
+ndg_creat.o:     SAE_PAR GRP_PAR PAR_ERR
+ndg_crexp.o:     SAE_PAR GRP_PAR NDG_CONST PSX_ERR
+ndg_ndfas.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_ndfcr.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_ndfpr.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 pol1_cext.o:	 SAE_PAR
 pol1_chkex.o:	 SAE_PAR GRP_PAR DAT_PAR NDF_PAR AST_PAR
 pol1_clcat.o:	 SAE_PAR AST_PAR
