@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_SSAZD( EL, FACTOR, OFFSET, OUT, STATUS )
+      SUBROUTINE KPG1_SSAZ<T>( EL, FACTOR, OFFSET, OUT, STATUS )
 *+
 *  Name:
 *     KPG1_SSAZx
@@ -39,11 +39,15 @@
  
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
 *     1992 July 15 (MJC):
 *        Original version based on KPG1_SSCOF.
+*     2004 Oct 1 (TIMJ):
+*        Recreate generic version from type fortran
+*        NUM_CMN is not required
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -58,7 +62,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
  
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
  
 *  Arguments Given:
       INTEGER  EL
@@ -66,7 +69,7 @@
       DOUBLE PRECISION OFFSET
  
 *  Arguments Returned:
-      DOUBLE PRECISION OUT( EL )
+      <TYPE> OUT( EL )
  
 *  Status:
       INTEGER STATUS             ! Global status
@@ -90,7 +93,7 @@
  
 *       Evaluate the scale and offset for each array element.
  
-         OUT( ELEM ) = NUM_DTOD( FACTOR * DBLE( ELEM - 1 ) + OFFSET )
+         OUT( ELEM ) = NUM_DTO<T>( FACTOR * DBLE( ELEM - 1 ) + OFFSET )
  
       END DO
  
