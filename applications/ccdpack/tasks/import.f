@@ -131,11 +131,10 @@
 *
 *     Functions are allowed to not contain any FITS-keywords in which
 *     case the extension item will be assigned to the value, so for
-*     instance constants may be given:
+*     instance numerical constants may be given:
 *
 *        EXTENT.MINX   _INTEGER       1
 *        EXTENT.MINY   _INTEGER       1
-*        FILTER        _CHAR          NONE         ! Spectroscopic
 *
 *     In this way import tables could actually be used to set all the
 *     required values in the CCDPACK extension (but see PRESENT also).
