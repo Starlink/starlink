@@ -2962,10 +2962,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       INTEGER			DAX			! Dataset axis no.
       INTEGER		      	DIM			! Size of response axis
+      INTEGER			DX, DY			!
       INTEGER			FSTAT			! i/o status code
       INTEGER                 	IAX			! Loop over axes
       INTEGER                 	NELM 			! Number of elements mapped
       INTEGER			REVISION		! Creator revision no.
+      INTEGER			RLIM			! Radial limit
       INTEGER			SID			! Response identifier
       INTEGER			TLEN			! Prompt length
       INTEGER			X_AX, Y_AX, E_AX, T_AX	! Axis identifiers
@@ -3006,10 +3008,18 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CALL CMP_GET1I( SLOC, 'DIMS', 5, RF_DIMS(1,SLOT), RF_NDIM(SLOT),
      :                STATUS )
 
+*  Get radial limit so we can use BDI to access the axis structures
+      CALL CMP_GET0I( SLOC, 'RADIAL', RLIM, STATUS )
+      DX = RF_DIMS(1,SLOT)
+      DY = RF_DIMS(2,SLOT)
+      RF_DIMS(1,SLOT) = RLIM*2 + 1
+      RF_DIMS(2,SLOT) = RLIM*2 + 1
+
 *  Link the response object to a BinDS so we can access its axis info
       CALL BDI_LINK( 'BinDS', RF_NDIM(SLOT), RF_DIMS(1,SLOT), 'REAL',
      :               SID, STATUS )
-      CALL BDI_SETSHP( SID, RF_NDIM(SLOT), RF_DIMS(1,SLOT), STATUS )
+      RF_DIMS(1,SLOT) = DX
+      RF_DIMS(2,SLOT) = DY
 	call adi_print( sid,status)
 
 *  Map the index
