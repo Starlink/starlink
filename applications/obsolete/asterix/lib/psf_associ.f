@@ -1,16 +1,16 @@
-      SUBROUTINE PSF_TASSOCI( ID, SLOT, STATUS )
+      SUBROUTINE PSF_ASSOCI( LOC, SLOT, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       CHARACTER*(DAT__SZLOC) LOC
 	INTEGER ID,SLOT,STATUS
       IF ( STATUS.NE.SAI__OK) RETURN
-      CALL ADI1_GETLOC( ID,LOC,STATUS)
-      CALL PSF_ASSOCI( LOC, SLOT, STATUS )
+      CALL ADI1_PUTLOC( LOC,ID,STATUS)
+      CALL PSF_TASSOCI( ID, SLOT, STATUS )
 
       END
 
-      SUBROUTINE PSF_ASSOCI( LOC, SLOT, STATUS )
+      SUBROUTINE PSF_TASSOCI( ID, SLOT, STATUS )
 *
 *    Description :
 *
@@ -28,6 +28,7 @@
 *     31 Aug 89 : Original (DJA)
 *     14 Dec 93 : Handle spatial reponse if present (DJA)
 *     29 Jan 94 : Initialisation via block data (DJA)
+*     25 Apr 95 : Use ADI to store locator (DJA)
 *
 *    Type definitions :
 *
@@ -46,15 +47,15 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)   LOC                     ! Input dataset
+      INTEGER			FID			! Input dataset id
 *
 *    Export :
 *
-      INTEGER                  SLOT                    ! PSF slot number
+      INTEGER                  	SLOT                    ! PSF slot number
 *
 *    Status :
 *
-      INTEGER                  STATUS                  ! Run-time error
+      INTEGER                   STATUS                  ! Run-time error
 *
 *    External references :
 *
@@ -63,6 +64,7 @@
 *    Local variables :
 *
       CHARACTER*80             LNAME, RNAME            ! Library/routine names
+      CHARACTER*(DAT__SZLOC)   LOC                     ! Input dataset
       CHARACTER*(DAT__SZLOC)   PLOC                    ! Input dataset PSF
       CHARACTER*(DAT__SZLOC)   SLOC                    ! Spatial response
 
@@ -74,11 +76,14 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Extract locator from ADI
+      CALL ADI1_GETLOC( ID, LOC, STATUS )
+
 *    Initialise
       GOOD_PSF = .FALSE.
 
 *    Allocate slot
-      CALL PSF_GETSLOTL( LOC, SLOT, STATUS )
+      CALL PSF_GETSLOT( FID, SLOT, STATUS )
 
 *    Does the dataset have an attached spatial response?
       CALL HDX_FIND( LOC, 'MORE.ASTERIX.SPATIAL_RESP', SLOC, STATUS )
@@ -143,7 +148,7 @@
       END IF
 
 *    Initialise
-      CALL PSF_SLOTINIT( LOC, SLOT, STATUS )
+      CALL PSF_SLOTINIT( SLOT, STATUS )
 
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
