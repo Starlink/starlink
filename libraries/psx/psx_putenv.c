@@ -62,6 +62,7 @@
 
 
 #include <stdlib.h>
+#include <config.h>
 #include "sae_par.h"   /* SSE Constants */
 #include "f77.h"       /* CNF macros and prototypes */
 #include "psx_err.h"   /* PSX errors */
