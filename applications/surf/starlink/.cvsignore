@@ -3,4 +3,11 @@
 *.gz
 *.tex
 *.htx_tar
+surf_*.f
+surflib_*.f
+sculib_*.f
+sculib_*.F
 SURF_CONDITIONS
+*.ifl
+*.ifc
+calsig*.sdf
