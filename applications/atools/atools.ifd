@@ -381,6 +381,46 @@ iraf! {
           }
 
       }
+      action astfindframe {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter domainlist {
+            position 3
+            type LITERAL
+            prompt {A comma-separated search list of domains}
+            ppath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter target {
+            position 1
+            type LITERAL
+            prompt {The target Frame or FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter template {
+            position 2
+            type LITERAL
+            prompt {The template Frame}
+            ppath CURRENT
+            helpkey *
+          }
+
+      }
       action astframe {
          helplib {$ATOOLS_HELP}
 
