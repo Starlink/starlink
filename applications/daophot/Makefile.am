@@ -36,7 +36,7 @@ STARTUP_SCRIPT = daophot.csh
 
 ##  List of object library files to be built.
 
-OBJECT_LIBRARIES = libdaophot.a libdaosubs.a
+OBJECT_LIBS = libdaophot.a libdaosubs.a
 
 
 bindatadir = $(bindir)
@@ -46,73 +46,27 @@ noinst_HEADERS = $(PRIVATE_INCLUDES)
 bin_SCRIPTS = $(STARTUP_SCRIPT)
 bin_PROGRAMS = allstar daophot
 bin_MONOLITHS = daocurs daogrey daoplot
-noinst_LIBRARIES = $(OBJECT_LIBRARIES)
+noinst_LIBRARIES = $(OBJECT_LIBS)
 
 libdaophot_a_SOURCES = $(F_SUB1)
 libdaosubs_a_SOURCES = $(F_SUB2)
 
-allstar_SOURCES = $(OBJECT_LIBRARIES) allstar.f
-allstar_LDADD = $(LDADD) `daophot_link`
+allstar_SOURCES = allstar.f
+allstar_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link`
 
-daophot_SOURCES = $(OBJECT_LIBRARIES) daophot.f
-daophot_LDADD = $(LDADD) `daophot_link`
+daophot_SOURCES = daophot.f
+daophot_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link`
 
-daocurs_SOURCES = $(OBJECT_LIBRARIES) daocurs.f
-daocurs_LDADD = $(LDADD) `daophot_link`
+daocurs_SOURCES = daocurs.f
+daocurs_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
+daocurs_TASKS = daocurs
 
-daogrey_SOURCES = $(OBJECT_LIBRARIES) daogrey.f
-daogrey_LDADD = $(LDADD) `daogrey_link`
+daogrey_SOURCES = daogrey.f
+daogrey_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
+daogrey_TASKS = daogrey
 
-daoplot_SOURCES = $(OBJECT_LIBRARIES) daoplot.f
-daoplot_LDADD = $(LDADD) `daoplot_link`
+daoplot_SOURCES = daoplot.f
+daoplot_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
+daoplot_TASKS = daoplot
 
 
-
-## List libraries which are to be built, and installed in `lib'.  Note
-## that the file extension is .la, not .a or .so.  This is the
-## extension for a `libtool library' -- the actual libraries will be
-## installed using whatever names are appropriate for the platform.
-## The primary LTLIBRARIES requests that we build both sharable
-## and static libraries.
-lib_LTLIBRARIES = libcnf.la
-
-## Declare the sources for the libcnf.la library.  Note that the
-## prefix which corresponds to the libcnf.la library has non-letters
-## canonicalised to underscores.
-libcnf_la_SOURCES = \
-	$(PUBLIC_INCLUDES) \
-	$(BLOCK_DATA_FILES) \
-	$(C_ROUTINES) \
-	CNF_PAR
-
-## List headers which are to be installed -- these are built first if necessary
-include_HEADERS = $(PUBLIC_INCLUDES)
-
-PUBLIC_INCLUDES = CNF_PAR f77.h cnf.h
-
-C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
-	etc.c
-
-## Note that we cannot call this variable just BLOCK_DATA, since automake
-## interprets this as a `primary' DATA
-BLOCK_DATA_FILES = blocks.f
-
-## We can add any other Makefile rules we require, and automake will
-## copy them through to the output.
-
-# f77.h is a duplicate of cnf.h, maintained as such because old software
-# (actually including some of the code in this library -- that should
-# probably be fixed!) uses it under its old name
-f77.h: cnf.h
-	$(LN_S) cnf.h f77.h
-
-## The file f77.h is input by some of the C_ROUTINES but, because it's
-## generated, it doesn't exist in a fresh checkout. We can't rely on
-## the generated dependency checking to sort this out, because that
-## isn't generated until after the library is built the first time.
-## Declaring the file as a `built source' simply ensures that the file
-## is generated at the very beginning of the build.  However the
-## targets listed here _won't_ be built unless they are listed in some
-## other dependency above (we've done it in PUBLIC_INCLUDES,
-## which is a dependency of libcnf_la_SOURCES).
-BUILT_SOURCES = f77.h

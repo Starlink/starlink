@@ -14,14 +14,12 @@ dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([daophot.f])
 
 dnl    Include defaults for Starlink configurations
-STAR_DEFAULTS(per-package-dir)
+STAR_DEFAULTS(per-package-dirs)
 STAR_MONOLITHS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
-
-STAR_CNF_COMPATIBLE_SYMBOLS
 
 STAR_DECLARE_DEPENDENCIES(build, [sae mers subpar ndf psx chr])
 STAR_LATEX_DOCUMENTATION(sun42)
