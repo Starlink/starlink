@@ -26,11 +26,17 @@ C
 *     17-Mar-1995 (GJP)
 *       Replaced very negative, very large or very small numbers with
 *       their PRM_PAR equivalents.
+*     21-Mar-2000 (MBT)
+*       Removed definition of some constants to external include file.
+*     6-Jun-2000 (MBT)
+*       Modified for dynamic memory allocation.
 
-      INTEGER NOPT, NCMD, MAXPIC, MAXPSF, MAXEXP, MAXBOX, MAXSKY,
+*  Global Constants:
+      INCLUDE 'DAT_PAR'               ! HDS/DAT parameters
+
+      INTEGER NOPT, NCMD, MAXPSF, MAXEXP, MAXBOX, MAXSKY,
      .     MAXPAR
-C     PARAMETER (NOPT=20, NCMD=23, MAXPIC=1048576, MAXPSF=145, 
-      PARAMETER (NOPT=20, NCMD=23, MAXPIC=4194304, MAXPSF=145, 
+      PARAMETER (NOPT=21, NCMD=23, MAXPSF=145, 
      .     MAXEXP=6, MAXPAR=6, MAXBOX=13, MAXSKY=10000)
 C
 C Parameters
@@ -39,9 +45,6 @@ C NOPT is the number of optional parameters which may be altered by the
 C      user.
 C
 C NCMD is the number of commands are recognized by the program.
-C
-C MAXPIC is the maximum number of pixels in an image 4194304 = 2048**2.
-C MAXPIC is the maximum number of pixels in an image 1048576 = 1024**2.
 C
 C                      WARNING
 C
@@ -74,15 +77,20 @@ C
       CHARACTER*26 LBL(NOPT)
       CHARACTER*10 CMD(NCMD)
       CHARACTER*1 ANSWER, SPACE
-      REAL WORK(MAXPIC), PSF(MAXPSF,MAXPSF,MAXEXP), PAR(MAXPAR)
+      CHARACTER*(DAT__SZTYP) GENTYP
+      INTEGER MAXSTR
+      INTEGER IPWK, IP1, IP2, IP3, IP4, IP5, IP6, IP7, IP8
+      INTEGER CMDWK2(NCMD)
+      REAL PSF(MAXPSF,MAXPSF,MAXEXP), PAR(MAXPAR)
       REAL OPT(NOPT), OMIN(NOPT), OMAX(NOPT)
+      REAL CMDWK1(NCMD)
 C
       INTEGER MIN0, ICNVRT
 C
       CHARACTER*132 MSGLINE
       CHARACTER*30 FILE, OPTFIL, MSGFIL, CASE
       REAL SKYMN, SKYMED, SKYMOD
-      INTEGER I, K, NCOL, NROW, KEY, ISTAT, MAX, MAXCOL
+      INTEGER I, K, NCOL, NROW, KEY, ISTAT, MAX, MAXB
 C     INTEGER MADRID                      ! MIDAS
       LOGICAL OPEN
 C
@@ -114,14 +122,16 @@ C
      .         ' EXTRA PSF CLEANING PASSES',   ! 17
      .         '   USE SATURATED PSF STARS',   ! 18
      .         '      PERCENT ERROR (in %)',   ! 19
-     .         '      PROFILE ERROR (in %)'/   ! 20
+     .         '      PROFILE ERROR (in %)',   ! 20
+     .         '    MS (MAX STARS IN FILE)'/   ! 21
       DATA OPT / 0., 0., 7., 32766.5, 2.5, 4., 0.2, 1., -1., 1.,
-     .           1., 2., 11., 0., 0., 1., 0., 0., 0.75, 5./
+     .           1., 2., 11., 0., 0., 1., 0., 0., 0.75, 5., 5000./
       DATA OMIN / 1.E-30, 1.E-30, 0., 0., 0.2 , 0., 0., 0.6, -2.,
-     .            0., -2., 1., .5, -1.5, -0.5, -6.5, 0., 0., 0., 0./
+     .            0., -2., 1., .5, -1.5, -0.5, -6.5, 0., 0., 0., 0.,
+     .            10./
       DATA OMAX / 1.E30, 1.E30, 1.E30, 999999.99, 15., 1.E30, 0.6,
      .            2., 0., 2., 2., 20., 35., 2.5, 1.5, 6.5, 9.5, 1.,
-     .            100., 100./
+     .            100., 100., 1000000./
 C
 C   LBL contains parameter names for displaying on the terminal.  
 C  OMIN and OMAX contain the minimum and maximum acceptable values for
@@ -135,6 +145,12 @@ C
      .     'OFFSET', 'GROUP', 'SELECT', 'APPEND', 'EXIT', 'ATTACH', 
      .     'LIST', 'SKY', 'FIND', 'PHOTOMETRY', 'PSF', 'PEAK', 
      .     'NSTAR', 'SUB*', 'ADD*', 'DUMP', 'FUDGE', 'PICK'/
+C
+C
+C Set the generic type for workspace allocation.  This type must be 
+C large enough to be used for an INTEGER or for a REAL variable.
+C
+      GENTYP = '_INTEGER'
 C
       OPEN = .FALSE.
 C     CALL STSPRO ('-1')                                    ! MIDAS
@@ -198,6 +214,7 @@ C above) are valid, and return here with those values intact.
 C
  2010 CALL OPTION (OPTFIL, NOPT, LBL, OPT, OMIN, OMAX,
      .     'OPT>', ISTAT)
+      MAXSTR=INT(OPT(21))
 C
 C Set OPTFIL to 'KEYBOARD INPUT' for the next time the user uses the
 C 'OPTION' command.
@@ -239,7 +256,7 @@ C We use the ICNVRT function here, instead of just checking MSGLINE(1:2)
 C against the first two characters of each command, just in case the 
 C user is using lower case letters.
 C
-         CALL HELP (CMD, NCMD, WORK, WORK(MAXPIC/2+1))
+         CALL HELP (CMD, NCMD, CMDWK1, CMDWK2)
 C
       ELSE IF (KEY .EQ. ICNVRT('OP')) THEN
          CALL TBLANK
@@ -247,6 +264,7 @@ C
          CALL GETNAM ('File with parameter values:', OPTFIL)
          CALL OPTION (OPTFIL, NOPT, LBL, OPT, OMIN, OMAX,
      .        'OPT>', ISTAT)
+         MAXSTR=INT(OPT(21))
 C
       ELSE IF (KEY .EQ. ICNVRT('MO')) THEN
          OPT(11)=1.
@@ -255,37 +273,80 @@ C
          OPT(11)=0.
 C
       ELSE IF (KEY .EQ. ICNVRT('SO')) THEN
-         MAX = MAXPIC/40
-         CALL SORTER (WORK, 36*MAX, WORK(36*MAX+1), 
-     .        WORK(37*MAX+1), WORK(38*MAX+1), WORK(39*MAX+1), 
-     .        MAX, OPT(11))
+C
+C Note that allocation of the first work array here is not done properly;
+C the SORTER routine packs other data types into this array.  Allocating
+C it properly would require some rewriting of SORTER; without this the
+C code is vulnerable to problems if assumptions about the relative sizes
+C of some data types turn out to be wrong.
+C
+         CALL DAO_ALLOC( '_REAL', MAXSTR*80, IP1 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP2 )
+         CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP3 )
+         CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP4 )
+         CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP5 )
+         CALL SORTER(%VAL(IP1), MAXSTR*80, %VAL(IP2), %VAL(IP3), 
+     .        %VAL(IP4), %VAL(IP5), MAXSTR, OPT(11))
+         CALL DAO_DEALL( IP5 )
+         CALL DAO_DEALL( IP4 )
+         CALL DAO_DEALL( IP3 )
+         CALL DAO_DEALL( IP2 )
+         CALL DAO_DEALL( IP1 )
 C
       ELSE IF (KEY .EQ. ICNVRT('OF')) THEN
          CALL OFFSET
 C
       ELSE IF (KEY .EQ. ICNVRT('SE')) THEN 
-         MAX = MAXPIC/5
-         CALL DAOSLT (WORK, WORK(MAX+1), WORK(2*MAX+1), 
-     .        WORK(3*MAX+1), WORK(4*MAX+1), MAX)
+         CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP1 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP2 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP3 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP5 )
+         CALL DAOSLT (%VAL(IP1), %VAL(IP2), %VAL(IP3), %VAL(IP4), 
+     .        %VAL(IP5), MAXSTR )
+         CALL DAO_DEALL( IP5 )
+         CALL DAO_DEALL( IP4 )
+         CALL DAO_DEALL( IP3 )
+         CALL DAO_DEALL( IP2 )
+         CALL DAO_DEALL( IP1 )
 C
       ELSE IF (KEY .EQ. ICNVRT('AP')) THEN
          CALL APPEND
 C
       ELSE IF (KEY .EQ. ICNVRT('PI')) THEN
-         MAX = MAXPIC/6
-         CALL PCKPSF (WORK, WORK(MAX+1), WORK(2*MAX+1),
-     .        WORK(3*MAX+1), WORK(4*MAX+1), WORK(5*MAX+1), MAX,
-     .        OPT(12), OPT(13))
+         CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP1 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP2 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP3 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
+         CALL DAO_ALLOC( '_REAL', MAXSTR, IP5 )
+         CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP6 )
+         CALL PCKPSF (%VAL(IP1), %VAL(IP2), %VAL(IP3), %VAL(IP4),
+     .        %VAL(IP5), %VAL(IP6), MAXSTR, OPT(12), OPT(13))
+         CALL DAO_DEALL( IP6 )
+         CALL DAO_DEALL( IP5 )
+         CALL DAO_DEALL( IP4 )
+         CALL DAO_DEALL( IP3 )
+         CALL DAO_DEALL( IP2 )
+         CALL DAO_DEALL( IP1 )
 C
       ELSE IF (KEY .EQ. ICNVRT('EX')) THEN
-         IF (OPEN) CALL CLPIC ('DATA')
+         IF (OPEN) THEN
+            CALL CLPIC ('DATA')
+            CALL DAO_DEALL( IPWK )
+         END IF
          CALL TBLANK
          CALL BYEBYE
 C
       ELSE IF (KEY .EQ. ICNVRT('AT')) THEN
 C
 C This is an ATTACH command.  First, get the file name (if any) out of 
-C the command line.
+C the command line.  Then allocate a non-specific work array - for various
+C tasks more workspace will be needed but enough of them require an
+C integer or real array the size of the image that it is efficient to
+C allocate one of those here.
+C
+C *** NOTE *** we allocate an _INTEGER array on the assumption that 
+C the _INTEGER type is as large, or larger than, _REAL type.
 C
          FILE=' '
          DO 3100 I=1,K
@@ -295,7 +356,13 @@ C
             END IF
  3100    CONTINUE
  3110    CONTINUE
+         IF ( OPEN ) THEN
+            CALL DAO_DEALL( IPWK )
+         END IF
          CALL ATTACH (FILE, OPEN)
+         IF ( OPEN ) THEN
+            CALL DAO_ALLOC( GENTYP, NCOL*NROW, IPWK )
+         END IF
 C
       ELSE IF (KEY .EQ. ICNVRT('LI')) THEN
          IF (OPEN) THEN
@@ -306,9 +373,14 @@ C
 C
       ELSE IF (KEY .EQ. ICNVRT('SK')) THEN
          IF (OPEN) THEN
-            MAX = MIN0(MAXSKY, MAXPIC/3)
-            CALL SKY (WORK, WORK(MAX+1), WORK(2*MAX+1), MAX,
-     .           OPT(4), SKYMN, SKYMED, SKYMOD, K)
+            CALL DAO_ALLOC( '_REAL', MAXSKY, IP1 )
+            CALL DAO_ALLOC( '_REAL', MAXSKY, IP2 )
+            CALL DAO_ALLOC( '_INTEGER', MAXSKY, IP3 )
+            CALL SKY (%VAL(IP1), %VAL(IP2), %VAL(IP3), MAXSKY, OPT(4), 
+     .           SKYMN, SKYMED, SKYMOD, K)
+            CALL DAO_DEALL( IP3 )
+            CALL DAO_DEALL( IP2 )
+            CALL DAO_DEALL( IP1 )
             WRITE (6,6) SKYMN, SKYMED, K
     6       FORMAT ('              Clipped mean and median =', 2F9.1/
      .         '   Number of pixels used (after clip) =', I7)
@@ -318,17 +390,17 @@ C
 C
       ELSE IF (KEY .EQ. ICNVRT('FI')) THEN
          IF (OPEN) THEN
-            MAX = MAXPIC/3
-            MAXCOL = MAX/MAXBOX
-            IF (NCOL .LE. MAXCOL) THEN
-               CALL FIND (WORK, WORK(MAX+1), WORK(2*MAX+1), 
-     .            PSF, PSF(1,1,2), MAX, MAXBOX, MAX/MAXBOX, 
-     .            MAXSKY, OPT, NOPT)
-            ELSE
-               CALL STUPID ('Sorry, your picture is too wide.')
-               WRITE (6,7) MAXCOL
-    7          FORMAT (I10, ' is the most columns I can handle.'/)
-            END IF
+            CALL DAO_ALLOC( '_REAL', MAXBOX*NCOL, IP1 )
+            CALL DAO_ALLOC( '_REAL', MAXBOX*NCOL, IP2 )
+            CALL DAO_ALLOC( '_REAL', MAXBOX*MAXBOX, IP3 )
+            CALL DAO_ALLOC( '_LOGICAL', MAXBOX*MAXBOX, IP4 )
+            CALL FIND(%VAL(IP1), %VAL(IP2), %VAL(IPWK), %VAL(IP3), 
+     .                %VAL(IP4), NCOL*NROW, MAXBOX, NCOL, MAXSKY, OPT,
+     .                NOPT)
+            CALL DAO_DEALL( IP4 )
+            CALL DAO_DEALL( IP3 )
+            CALL DAO_DEALL( IP2 )
+            CALL DAO_DEALL( IP1 )
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
@@ -338,7 +410,7 @@ C
             K = MAXEXP/2
             MAX = MAXPSF*MAXPSF*K
             K = K+1
-            CALL PHOTSB (WORK, PSF, PSF(1,1,K), MAX, NCOL, NROW, 
+            CALL PHOTSB (%VAL(IPWK), PSF, PSF(1,1,K), MAX, NCOL, NROW,
      .           OPT(11))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
@@ -346,34 +418,63 @@ C
 C
       ELSE IF (KEY .EQ. ICNVRT('PS')) THEN
          IF (OPEN) THEN
-            CALL GETPSF (WORK, NCOL, NROW, PAR, PSF, OPT, NOPT)
+            CALL DAO_ALLOC( '_REAL', MAXSTR, IP1 )
+            CALL DAO_ALLOC( '_REAL', MAXSTR, IP2 )
+            CALL DAO_ALLOC( '_REAL', MAXSTR, IP3 )
+            CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
+            CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP5 )
+            CALL GETPSF (%VAL(IPWK), NCOL, NROW, PAR, PSF, 
+     .           %VAL(IP1), %VAL(IP2), %VAL(IP3), %VAL(IP4), %VAL(IP5),
+     .           MAXSTR, OPT, NOPT)
+            CALL DAO_DEALL( IP5 )
+            CALL DAO_DEALL( IP4 )
+            CALL DAO_DEALL( IP3 )
+            CALL DAO_DEALL( IP2 )
+            CALL DAO_DEALL( IP1 )
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
 C
       ELSE IF (KEY .EQ. ICNVRT('GR')) THEN
          IF (OPEN) THEN
-            MAX = MAXPIC/8
-            CALL GROUP (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
-     .           WORK, WORK(MAX+1), WORK(2*MAX+1), 
-     .           WORK(3*MAX+1), WORK(4*MAX+1), WORK(5*MAX+1), 
-     .           WORK(6*MAX+1), WORK(7*MAX+1), MAX, 
-     .           OPT(12), OPT(13))
+            CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP1 )
+            CALL DAO_ALLOC( '_REAL', MAXSTR, IP2 )
+            CALL DAO_ALLOC( '_REAL', MAXSTR, IP3 )
+            CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
+            CALL DAO_ALLOC( '_REAL', MAXSTR, IP5 )
+            CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP6 )
+            CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP7 )
+            CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP8 )
+            CALL GROUP (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, %VAL(IP1),
+     .           %VAL(IP2), %VAL(IP3), %VAL(IP4), %VAL(IP5),
+     .           %VAL(IP6), %VAL(IP7), %VAL(IP8), MAXSTR, OPT(12),
+     .           OPT(13))
+            CALL DAO_DEALL( IP8 )
+            CALL DAO_DEALL( IP7 )
+            CALL DAO_DEALL( IP6 )
+            CALL DAO_DEALL( IP5 )
+            CALL DAO_DEALL( IP4 )
+            CALL DAO_DEALL( IP3 )
+            CALL DAO_DEALL( IP2 )
+            CALL DAO_DEALL( IP1 )
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
 C
       ELSE IF (KEY .EQ. ICNVRT('PE')) THEN
          IF (OPEN) THEN
-            CALL DAOPK (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, WORK, 
-     .           OPT(11), OPT(12), OPT(19), OPT(20))
+            MAXB = (MAXPSF-7)/2
+            CALL DAO_ALLOC( '_REAL', MAXB*MAXB, IP1 )
+            CALL DAOPK (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, %VAL(IP1), 
+     .           MAXB, OPT(11), OPT(12), OPT(19), OPT(20))
+            CALL DAO_DEALL( IP1 )
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
 C
       ELSE IF (KEY .EQ. ICNVRT('NS')) THEN
          IF (OPEN) THEN
-            CALL NSTAR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, WORK, 
+            CALL NSTAR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, %VAL(IPWK),
      .           NCOL, NROW, OPT(11), OPT(12), OPT(19), OPT(20))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
@@ -382,7 +483,7 @@ C
       ELSE IF (KEY .EQ. ICNVRT('SU')) THEN
          IF (OPEN) THEN
             CALL SUBSTR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
-     .           WORK, NCOL, NROW, OPT(11))
+     .           %VAL(IPWK), NCOL, NROW, OPT(11))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
@@ -390,21 +491,21 @@ C
       ELSE IF (KEY .EQ. ICNVRT('AD')) THEN
          IF (OPEN) THEN
             CALL ADDSTR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP,
-     .           WORK, NCOL, NROW, OPT(11))
+     .           %VAL(IPWK), NCOL, NROW, OPT(11))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
 C
       ELSE IF (KEY .EQ. ICNVRT('DU')) THEN
          IF (OPEN) THEN
-            CALL DUMP (WORK, NCOL, NROW)
+            CALL DUMP (%VAL(IPWK), NCOL, NROW)
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
 C
       ELSE IF (KEY .EQ. ICNVRT('FU')) THEN
          IF (OPEN) THEN
-            CALL FUDGE (FILE, WORK)
+            CALL FUDGE (FILE, %VAL(IPWK), NCOL)
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
@@ -785,7 +886,8 @@ C
          CALL STUPID ('/Group too large.')
          WRITE (6,6) MAX
     6    FORMAT (I10, ' is the largest number of stars I can',
-     .        ' possibly consider.  I''m throwing it out.'/)
+     .        ' possibly consider.  I''m throwing it out.'/,
+     .        'You could increase the MS parameter and try again.'/)
 C
 C Look for the next blank line.
 C

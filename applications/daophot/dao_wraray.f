@@ -79,6 +79,7 @@
 *  Authors :
 *     RFWS: R.F. Warren-Smith (Durham University)
 *     NE: Nick Eaton (Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *
 *  History :
 *     19-MAY-1988 (RFWS):
@@ -87,6 +88,8 @@
 *        NDF version derived from HDS version.
 *     19-FEB-1992 (NE):
 *        Unix version.
+*      8-JUN-2000 (MBT):
+*        Fixed for NDFs which do not start at (1,1).
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -120,14 +123,18 @@
 *  Local variables :
       INTEGER STATUS            ! HDS error status
       INTEGER J                 ! Loop counter for data rows
+      INTEGER LBND(2)           ! Lower bounds of NDF
       INTEGER DIML(2)           ! Lower bounds on data array slice
       INTEGER DIMU(2)           ! Upper bounds on data array slice
+      INTEGER OFFS(2)           ! Offset value of pixel indices from array
       INTEGER IERR
       INTEGER IPNTR
       INTEGER NDF_ISEL
       INTEGER NDF_ISECT
+      INTEGER NDIM              ! Number of dimensions of NDF
       INTEGER NELE
       INTEGER NERR
+      INTEGER UBND(2)           ! Upper bounds of NDF
 *.
  
 *   Initialise the HDS status variable.
@@ -162,14 +169,19 @@
          CALL ERR_REP(' ','RDARAY - unknown environment: ',ENVIRO,
      :                STATUS)
       END IF
+
+*   Get bounds of NDF.
+      CALL NDF_BOUND(NDF_ISEL,2,LBND,UBND,NDIM,STATUS)
+      OFFS(1) = LBND(1) - 1
+      OFFS(2) = LBND(2) - 1
  
 *   Loop to write each line of the sub-array to the DATA_ARRAY.
       DO 100 J = 1 , MY
  
 *   Locate the required slice of the DATA_ARRAY.
-         DIML(1) = LX
-         DIMU(1) = LX + MX - 1
-         DIML(2) = LY + J - 1
+         DIML(1) = OFFS(1) + LX
+         DIMU(1) = OFFS(1) + LX + MX - 1
+         DIML(2) = OFFS(2) + LY + J - 1
          DIMU(2) = DIML(2)
          CALL NDF_SECT(NDF_ISEL,2,DIML,DIMU,NDF_ISECT,STATUS)
  

@@ -1,4 +1,5 @@
-      SUBROUTINE  GETPSF (PIC, NCOL, NROW, PAR, PSF, OPT, NOPT)
+      SUBROUTINE  GETPSF (PIC, NCOL, NROW, PAR, PSF, XCEN, YCEN, 
+     .                    APMAG, SKY, ID, MAXSTR, OPT, NOPT)
       IMPLICIT NONE
 
 *  History:
@@ -70,7 +71,7 @@ C
       INTEGER MAXBOX, MAXPSF, MAXSTR, MAXN, MAXPAR, MAXEXP, NCOL, NROW
       INTEGER NOPT
       PARAMETER  (MAXPAR=6, MAXPSF=145, MAXEXP=6, 
-     .     MAXBOX=69, MAXSTR=15000, MAXN=200) 
+     .     MAXBOX=69, MAXN=200) 
 C
 C Parameters
 C
@@ -187,7 +188,12 @@ C
 C
       I = 0
  1010 I = I+1
-      IF (I .GT. MAXSTR) GO TO 1100
+      IF (I .GT. MAXSTR) THEN
+         CALL STUPID(
+     .   'Too many stars in file - increase MS parameter and try again')
+         CALL CLFILE(2)
+         RETURN
+      END IF
  1020 CALL RDSTAR (2, NL, ID(I), XCEN(I), YCEN(I), APMAG(I), SKY(I))
       IF (ID(I) .LT. 0) GO TO 1100             ! End-of-file encountered
       IF (ID(I) .EQ. 0) GO TO 1020             ! Blank line encountered

@@ -1,4 +1,4 @@
-      SUBROUTINE  FUDGE (FILE, F)
+      SUBROUTINE  FUDGE (FILE, F, MAXCOL)
 C
 C=======================================================================
 C
@@ -20,7 +20,7 @@ C
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
  
       INTEGER MAXCOL, MAXPOL, MTERM
-      PARAMETER  (MAXCOL=1024, MAXPOL=3, MTERM=10)
+      PARAMETER  (MAXPOL=3, MTERM=10)
 C
 C Parameters
 C

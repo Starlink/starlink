@@ -1,7 +1,32 @@
 1 DAOPHOT - DAO photometry package
                                                             Expires: **.**.**
 
- This is DAOPHOT v1.2-1.
+ This is DAOPHOT v1.3-1.
+
+ Changes at v1.3-1:
+
+   o Many of the static limits compiled into DAOPHOT have been removed.
+     The programs will now adjust to the size of the image to which
+     they are asked to attach.  It is still possible to receive an error
+     about having too many stars in a file; in this case use the OPTIONS
+     command to adjust the value of the new parameter MS (maximum stars
+     in file) to a high enough value.
+     Note that the limit on the number of stars within a group for 
+     NSTAR or ALLSTAR, and a few other hard limits, still exist.
+
+   o The code has been fixed so that NDF images with pixel indices not
+     starting at (1,1) can be processed properly.  Previously only a
+     sub-block of any such image was being examined.
+
+ Changes at v1.2-2:
+
+   o Default array size set so that DAOPHOT and ALLSTAR can cope with 
+     images up to 4200 * 4200.
+
+   o String initialisation bug fixed in ALLSTAR (default values of strings 
+     in prompts were sometimes printing garbage).
+
+   o DAOPHOT now refuses to attach an image which is too big.
 
  Changes at v1.2-1:
 

@@ -2,21 +2,21 @@
 
 *  History:
 *     17-Mar-1995 (GJP)
-*     Replaced very negative, very large or very small numbers
-*     with their PRM_PAR equivalents.
+*        Replaced very negative, very large or very small numbers
+*        with their PRM_PAR equivalents.
+*     21-MAR-2000 (MBT)
+*        Moved definition of some constants to external include file, and
+*        initialised some string variables (to avoid garbage in defaults).
+*     6-JUN-2000 (MBT)
+*        Modified for dynamic array allocation.
  
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
 
-      INTEGER MAXFRM, PSFMAX, NOPT
+      INTEGER PSFMAX, NOPT
 
-      PARAMETER (MAXFRM=4194304, PSFMAX=35, NOPT=10)
-C     PARAMETER (MAXFRM=1048576, PSFMAX=35, NOPT=10)
+      PARAMETER (PSFMAX=35, NOPT=11)
 C 
-C MAXFRM represents the maximum image size the program is designed to 
-C        tolerate.  655360 is large enough for 640 x 1024, and is also
-C        more than adequate for 800 x 800.
-C
 C PSFMAX is the maximum PSF radius.  A value of 35 is consistent with
 C        DAOPHOT.
 C
@@ -24,11 +24,11 @@ C   NOPT is just the number of user-definable options (see below).
 C
       CHARACTER*26 LBL(NOPT)
       REAL OPT(NOPT), OMIN(NOPT), OMAX(NOPT)
-      REAL DATA(MAXFRM), SUBT(MAXFRM), SIGMA(MAXFRM)
+      INTEGER IPDAT, IPSUB, IPSIG, IPID, IPNP, IPSK, IPLA, IPR(14)
 C
       CHARACTER*30 INPICT, OPTFIL, CASE
       REAL PERERR, PROERR
-      INTEGER NCOL, NROW, ISTAT
+      INTEGER NCOL, NROW, MAXSTR, ISTAT, I
 C     INTEGER MADRID                              ! MIDAS
       LOGICAL OPEN, CENTER
 C
@@ -47,11 +47,12 @@ C
      .         '      PERCENT ERROR (in %)',     ! 7
      .         '      PROFILE ERROR (in %)',     ! 8
      .         '     IS (INNER SKY RADIUS)',     ! 9
-     .         '     OS (OUTER SKY RADIUS)'/     ! 10
-      DATA OPT / 2.5, 6., 1., 2.5, 1., 50., 0.75, 5., 0., 0./
-      DATA OMIN  / 1.6, 0.0, 0.0, 0., 0.0, 1.0, 0., 0., 0., 0./
+     .         '     OS (OUTER SKY RADIUS)',     ! 10
+     .         '    MS (MAX STARS IN FILE)'/     ! 11
+      DATA OPT / 2.5, 6., 1., 2.5, 1., 50., 0.75, 5., 0., 0., 5000./
+      DATA OMIN  / 1.6, 0.0, 0.0, 0., 0.0, 1.0, 0., 0., 0., 0., 10./
       DATA OMAX  / 10., 8.0, 1.0, 10., 2.0, 100., 100., 100.,
-     .           35., 50./
+     .           35., 50., 1000000./
 C
 C Set up the values of the optional parameters.
 C
@@ -73,7 +74,9 @@ C     CALL STECNT('PUT', 1, 0, 0)                    ! MIDAS
       END IF
       PERERR = 0.01*OPT(7)
       PROERR = 0.01*OPT(8)
+      MAXSTR = INT(OPT(11))
 C
+      INPICT = 'END OF FILE'
  1900 CALL GETNAM ('Input image name:', INPICT)
       IF ((INPICT .EQ. 'END OF FILE') .OR. (INPICT .EQ. 'EXIT')) 
      .     CALL BYEBYE
@@ -82,16 +85,45 @@ C
          INPICT = 'EXIT'
          GO TO 1900
       END IF
-      IF (NCOL*NROW .GT. MAXFRM) THEN
-         CALL STUPID ('Picture is too large!')
-         WRITE (6,69) MAXFRM
-  69     FORMAT (/' Maximum allowed number of pixels =', I8)
-         CALL OOPS
-      END IF
 C
-      CALL ALLSTR (DATA, NCOL, NROW, SUBT, SIGMA, 
+C Allocate memory for use by the ALLSTR routine.
+C
+      CALL DAO_ALLOC( '_REAL', NCOL*NROW, IPDAT )
+      CALL DAO_ALLOC( '_REAL', NCOL*NROW, IPSUB )
+      CALL DAO_ALLOC( '_REAL', NCOL*NROW, IPSIG )
+      DO I = 1, 14
+         CALL DAO_ALLOC( '_REAL', MAXSTR+1, IPR(I) )
+      END DO
+      CALL DAO_ALLOC( '_INTEGER', MAXSTR+1, IPID )
+      CALL DAO_ALLOC( '_INTEGER', MAXSTR+1, IPNP )
+      CALL DAO_ALLOC( '_LOGICAL', MAXSTR+1, IPSK )
+      CALL DAO_ALLOC( '_LOGICAL', MAXSTR+1, IPLA )
+C
+C Call the routine to do the work.
+C
+      CALL ALLSTR (%VAL(IPDAT), NCOL, NROW, %VAL(IPSUB), %VAL(IPSIG), 
+     .     %VAL(IPR(1)), %VAL(IPR(2)), %VAL(IPR(3)), %VAL(IPR(4)),
+     .     %VAL(IPR(5)), %VAL(IPR(6)), %VAL(IPR(7)), %VAL(IPR(8)),
+     .     %VAL(IPR(9)), %VAL(IPR(10)), %VAL(IPR(11)), %VAL(IPR(12)),
+     .     %VAL(IPR(13)), %VAL(IPR(14)), 
+     .     %VAL(IPID), %VAL(IPNP), %VAL(IPSK), %VAL(IPLA), MAXSTR,
      .     OPT(1), OPT(5), OPT(4), NINT(OPT(2)), CENTER, 
      .     NINT(OPT(6)), PERERR, PROERR, OPT(9), OPT(10))
+C
+C Deallocate the workspace.
+C
+      CALL DAO_DEALL( IPLA )
+      CALL DAO_DEALL( IPSK )
+      CALL DAO_DEALL( IPNP )
+      CALL DAO_DEALL( IPID )
+      DO I = 14, 1, -1
+         CALL DAO_DEALL( IPR(I) )
+      END DO
+      CALL DAO_DEALL( IPSIG )
+      CALL DAO_DEALL( IPSUB )
+      CALL DAO_DEALL( IPDAT )
+C
+C Close down and exit.
 C
       CALL CLPIC ('DATA')
       CALL BYEBYE
@@ -100,6 +132,8 @@ C
 C#######################################################################
 C
       SUBROUTINE  ALLSTR  (DATA, NCOL, NROW, SUBT, SIGMA, 
+     .     XC, YC, MAG, SKY, RPIXSQ, CHI, SUMWT, NUMER, DENOM, MAGERR, 
+     .     DXOLD, DYOLD, XCLAMP, YCLAMP, ID, NPIX, SKIP, LAST, MAXSTR,
      .     FITRAD, WATCH, HALF, IEXP, CENTER, 
      .     MAXGRP, PERERR, PROERR, SKYIN, SKYOUT)
 C
@@ -156,7 +190,7 @@ C
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
  
       INTEGER MAXSTR, MAXPSF, MAXIT, MAXMAX, MAXPAR, MAXEXP
-      PARAMETER (MAXSTR=30000, MAXPSF=145, MAXIT=200, MAXMAX=100,
+      PARAMETER (MAXPSF=145, MAXIT=200, MAXMAX=100,
      .     MAXPAR=6, MAXEXP=6)
 C
 C Parameters:
@@ -205,7 +239,19 @@ C
 C
       COMMON /FILNAM/ COOFIL, MAGFIL, PSFFIL, PROFIL, GRPFIL
 C
-      DATA SUMWT /MAXSTR*1./
+C Set some default values for strings which may be used as prompts.
+C
+      COOFIL = 'END OF FILE'
+      MAGFIL = 'END OF FILE'
+      PSFFIL = 'END OF FILE'
+      PROFIL = 'END OF FILE'
+      GRPFIL = 'END OF FILE'
+C
+C Set initial value for SUMWT.
+C
+      DO I = 1, MAXSTR
+         SUMWT(I) = 1.
+      END DO
 C
 C-----------------------------------------------------------------------
 C
@@ -338,7 +384,8 @@ C
       I=0
  1110 I=I+1
       IF (I .GT. MAXSTR) THEN
-         CALL STUPID ('Too many stars.')
+         CALL STUPID (
+     .        'Too many stars - increase MS parameter and try again')
          CALL CLPIC ('DATA')
          CALL BYEBYE
       END IF

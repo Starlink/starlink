@@ -103,6 +103,8 @@ C
       IF (I .LT. MAX) GO TO 2000
 C
       CALL STUPID ('*** WARNING ***  Too many stars in input file.')
+      WRITE (6,61)
+   61 FORMAT ('Increase the MS parameter to raise the limit')
       WRITE (6,6) MAX
     6 FORMAT (I10, ' stars have been read.  I will work with these.')
       I = I+1

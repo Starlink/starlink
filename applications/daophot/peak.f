@@ -1,5 +1,5 @@
       SUBROUTINE  DAOPK (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, F, 
-     .     WATCH, FITRAD, PERERR, PROERR)
+     .     MAXBOX, WATCH, FITRAD, PERERR, PROERR)
 C
 C=======================================================================
 C
@@ -29,7 +29,6 @@ C=======================================================================
 C
       IMPLICIT NONE
       INTEGER MAXPSF, MAXEXP, MAXBOX, MAXPAR
-      PARAMETER  (MAXBOX=69)
 C
 C Parameters
 C

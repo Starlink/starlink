@@ -180,6 +180,8 @@ C
          WRITE (TEXT,77) I-1
    77    FORMAT (I10, ' stars is all I have room for.  Sorry!')
          CALL STUPID (TEXT(1:50))
+         WRITE (6,78) 
+   78    FORMAT ('Increase the MS parameter and try again')
          CALL CLFILE (2)
          RETURN
       END IF

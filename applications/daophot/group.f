@@ -143,6 +143,7 @@ C
          CALL STUPID ('Too many stars in input file.')
          WRITE (6,6) MAXSTR
     6    FORMAT (I10, ' is the most you are currently allowed.')
+         CALL STUPID ('Increase the MS parameter and try again')
          CALL CLFILE (2)
          CALL CLFILE (3)
          RETURN

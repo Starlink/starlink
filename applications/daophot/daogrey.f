@@ -50,6 +50,7 @@
 *
 *    Authors :
 *     Nick Eaton  ( DUVAD::NE )
+*     Mark Taylor (STARLINK)
 *
 *    History :
 *     25 May 1988
@@ -58,6 +59,7 @@
 *      6 Jan 1992  Use 'PRM_PAR' instead of 'BAD_PAR'
 *     11 Mar 1992  Unix version, GKS 7.4
 *     13 Feb 1995  Mended the plot error when image has non-zero origin (GJP) 
+*      8 Jun 2000  Fixed to work with other apps for non-zero origins (MBT)
 *    endhistory
 *
 *    Type Definitions :
@@ -195,11 +197,10 @@
       call SGS_ZSHAP( real( dx ) / real( dy ), 'CC', izone, status )
 
 * Set up the world coordinates to reflect the pixel coordinates
-* This code amended Feb 1995 to overcome problem with non-zero origins
-      x1 = real( xstart ) - 0.5 + real( lbnd(1) )
-      x2 = real( xend ) + 0.5   + real( lbnd(1) )
-      y1 = real( ystart ) - 0.5 + real( lbnd(2) )
-      y2 = real( yend ) + 0.5   + real( lbnd(2) )
+      x1 = real( xstart ) - 0.5
+      x2 = real( xend ) + 0.5
+      y1 = real( ystart ) - 0.5
+      y2 = real( yend ) + 0.5
       call SGS_SW( x1, x2, y1, y2, status )
 
 * Plot out the image

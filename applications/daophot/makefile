@@ -120,6 +120,8 @@
 #           primative data functions
 #        ndf
 #           n-dimensional data format
+#        psx
+#           POSIX interface routines
 #        gks
 #           Graphics Kernel System
 #        sae
@@ -141,6 +143,7 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
+#     MBT: M.B.Taylor (Starlink, IoA)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -223,6 +226,8 @@
 #        Version for DAOPHOT as part if Linux Port.
 #     07-JAN-1998 (BLY):
 #        Added MUD/009 (as mud9.tex) to DOCUMENTATION.
+#     21-MAR-2000 (MBT):
+#        Removed some PARAMETER definitions to private include file.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -405,7 +410,7 @@ PKG_LINK = DAO
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.2
+PKG_VERS = 1.3-1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -475,12 +480,13 @@ EXTERNAL_INCLUDES = SAE_PAR DAT_ERR DAT_PAR GKS_PAR PRM_PAR
 
 F_ROUTINES = $(F_SUB1) $(F_SUB2) $(EXE_SOURCES) $(MONO_SOURCES)
 
-F_SUB1 = aif_antmp.f aif_temp.f addstar.f allstsubs.f find.f \
+F_SUB1 = addstar.f allstsubs.f find.f \
 fotometry.f fudge.f group.f iosubs.f mathsubs.f nstar.f pckpsf.f \
 peak.f psf.f sort.f substar.f
 
-F_SUB2 = dao_askfile.f dao_attach.f dao_byebye.f dao_case.f dao_clfile.f \
-dao_clpic.f dao_coppic.f dao_delpic.f dao_fabort.f dao_infile.f dao_list.f \
+F_SUB2 = aif_antmp.f aif_temp.f dao_alloc.f dao_askfile.f dao_attach.f \
+dao_byebye.f dao_case.f dao_clfile.f dao_clpic.f dao_coppic.f dao_deall.f \
+dao_delpic.f dao_fabort.f dao_infile.f dao_list.f \
 dao_oops.f dao_outfil.f dao_ovrwrt.f dao_rdaray.f dao_wraray.f
 
 #  List of Fortran BLOCK DATA routines.
@@ -695,15 +701,15 @@ $(EXE_2): $(EXE_2_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
  
 $(MONOLITH1): $(MONO1_OBJECT) $(OBJECT_LIBRARIES)
 	$(ALINK) $(MONO1_OBJECT) -o $(MONOLITH1) $(OBJECT_LIBRARIES) \
-           $(ADDLIBS) `ndf_link_adam` `agi_link_adam`
+           $(ADDLIBS) `ndf_link_adam` `agi_link_adam` `psx_link_adam`
  
 $(MONOLITH2): $(MONO2_OBJECT) $(OBJECT_LIBRARIES)
 	$(ALINK) $(MONO2_OBJECT) -o $(MONOLITH2) $(OBJECT_LIBRARIES) \
-           $(ADDLIBS) `ndf_link_adam` `agi_link_adam`
+           $(ADDLIBS) `ndf_link_adam` `agi_link_adam` `psx_link_adam`
  
 $(MONOLITH3): $(MONO3_OBJECT) $(OBJECT_LIBRARIES)
 	$(ALINK) $(MONO3_OBJECT) -o $(MONOLITH3) $(OBJECT_LIBRARIES) \
-           $(ADDLIBS) `fio_link_adam` `agi_link_adam`
+           $(ADDLIBS) `fio_link_adam` `agi_link_adam` `psx_link_adam`
 
 #  Rules for building the help libraries.
 
@@ -993,6 +999,8 @@ install:
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_DOCS);\
               chmod 644 $(INSTALL_DOCS)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_DOCS)/$$f $$f;\
            else :; fi;\
         done
 #
@@ -1131,6 +1139,8 @@ do_deinstall:
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_DOCS)/$$f .;\
               rm -f $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
@@ -1354,9 +1364,11 @@ strip:
 #  files.
 
 #  Unix subroutines.
+dao_alloc.o: SAE_PAR
 dao_attach.o: DAT_ERR DAT_PAR SAE_PAR ndf_cmn
 dao_clpic.o: DAT_PAR SAE_PAR ndf_cmn
 dao_coppic.o: DAT_PAR SAE_PAR ndf_cmn
+dao_deall.o: SAE_PAR
 dao_list.o: SAE_PAR
 dao_rdaray.o: DAT_PAR SAE_PAR ndf_cmn
 dao_wraray.o: DAT_PAR SAE_PAR ndf_cmn
@@ -1378,7 +1390,7 @@ sort.o: PRM_PAR
 allstar.o: PRM_PAR
 daocurs.o: SAE_PAR
 daogrey.o: PRM_PAR DAT_PAR GKS_PAR PRM_PAR SAE_PAR
-daophot.o: PRM_PAR
+daophot.o: PRM_PAR DAT_PAR
 daoplot.o: SAE_PAR
 
 #-------------------------------------------------------------------------------
