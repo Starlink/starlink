@@ -19,10 +19,10 @@
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cerrno>
+using std::sprintf;
 #else
 #include <stdio.h>
 #include <errno.h>
-using std::sprintf;
 #endif
 
 // Static debug switch

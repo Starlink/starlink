@@ -153,6 +153,14 @@ class PkFont {
     unsigned int checksum() const { return preamble_.cs; }
     bool loaded() const { return font_loaded_; }
 
+    static string& substitute_font_string (const string fmt,
+					   const string mode, 
+					   const string fontname,
+					   const int dpi,
+					   const int basedpi,
+					   const double magnification)
+	throw (PkError);
+
     // Regression test.  Produce test output to given stream.
     static int regressionOutput (string prefix, ostream& o);
 
@@ -186,14 +194,6 @@ class PkFont {
        see the current font's parameters. */
     string& search_pkpath (string path,
 			   string name, double resolution);
-
-    static string& substitute_font_string (const string fmt,
-					   const string mode, 
-					   const string fontname,
-					   const int dpi,
-					   const int basedpi,
-					   const double magnification)
-	throw (PkError);
 
     bool seen_in_doc_;		// true once the font_def command has been
     				// seen in the document, as well as the

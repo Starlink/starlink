@@ -9,11 +9,16 @@
 #
 # $Id$
 
-CXX=c++
+CXX=@CXX@
+CXXFLAGS=-I.. @CXXFLAGS@
+PERLBIN=@PERL@
 
 all: test
 
-test: dvi2bitmap.tested
+test: dvi2bitmap.tested regression
+
+regression:
+	PERLBIN=$(PERLBIN) ./runtests
 
 dvi2bitmap.tested: ../dvi2bitmap hello.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap hello.dvi
@@ -34,6 +39,12 @@ magtest.dvi: magtest.tex
 modetest.dvi: modetest.tex
 	latex modetest
 
+t1.run: t1.cc ../Util.o ../DviError.o
+	$(CXX) $(CXXFLAGS) -o $@ t1.cc ../Util.o ../DviError.o
+
+t2.run: t2.cc ../PkFont.o ../DviError.o
+	$(CXX) $(CXXFLAGS) -o $@ t2.cc ../PkFont.o ../DviError.o
+
 dvi2bitmap.diff: ../dvi2bitmap dvi2bitmap.correct
 	../dvi2bitmap -X >dvi2bitmap.test
 	diff dvi2bitmap.correct dvi2bitmap.test >dvi2bitmap.diff; \
@@ -41,6 +52,8 @@ dvi2bitmap.diff: ../dvi2bitmap dvi2bitmap.correct
 
 # The order of the files in the for statement below must match the
 # order of the calls in dvi2bitmap::doRegression.
+#
+# Naw -- use the t? tests instead.
 dvi2bitmap.correct: ../dvi2bitmap
 	rm -f $@
 	for f in ../PkFont.cc ../Util.cc; do \

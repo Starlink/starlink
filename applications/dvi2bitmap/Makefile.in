@@ -20,7 +20,7 @@ GIF_OBJ=@GIFOBJ@
 
 EXEC=dvi2bitmap
 OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
-	BitmapImage.o XBMBitmap.o XPMBitmap.o PageRange.o Util.o \
+	BitmapImage.o XBMBitmap.o XPMBitmap.o PageRange.o Util.o DviError.o \
 	$(KPATHSEA_OBJ) $(PNG_OBJ) $(GIF_OBJ)
 
 # Add a suffix rule for stupid makes (hello, Tru64...)
@@ -111,11 +111,16 @@ simpledeps_:
 		echo "$$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >> Makefile; \
 	done
 
+# This is very swift on most machines, but the Alpha cxx compiler
+# doesn't distinguish -M from -MM, and so takes aaaaages to do this.
+# Can I avoid this?
 deps_:
-	@ if test -z "$(CXXMM)"; then \
+	if test -z "$(CXXMM)"; then \
 		$(MAKE) simpledeps_; \
 	else \
-		$(CXX) $(DEFS) $(CXXMM) *.cc >> Makefile; \
+		for c in `echo $(OBJS) | sed 's/\.o/\.cc/g'`; do \
+			$(CXX) $(DEFS) $(CXXMM) $$c >> Makefile; \
+		done; \
 	fi
 
 FORCE:

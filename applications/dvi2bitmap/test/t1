@@ -1,0 +1,13 @@
+make t1.run >/dev/null 2>&1
+test $? = 0 || exit 1
+
+run=./t1.run
+
+echo "<"`uname -a`">" > t1.correct
+cat t1.master-correct >> t1.correct
+
+$run "uname -a"
+$run "echo HeLlO ThErE | tr '[A-Z]' '[a-z]'"
+$run squorrocks
+
+exit 0

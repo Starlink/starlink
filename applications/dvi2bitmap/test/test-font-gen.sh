@@ -49,24 +49,25 @@ postline='^^^^^^^^^^^^^^^^^^^^'
 
 # Find out what was enabled in dvi2bitmap,
 # by parsing the output with the -V option
-eval `$d2bpath -V | sed -n '/^ENABLE/s/  */=/p'`
+#eval `$d2bpath -V | sed -n '/^ENABLE/s/  */=/p'`
+eval `$d2bpath -V | sed -n 's/^\([A-Z_][A-Z_]*\)  *\(.*\)$/D2B_\1=\"\2\"/p'`
 
-if [ "$ENABLE_FONT_GEN" = yes ]; then
+if [ -n "$D2B_FONT_GEN_TEMPLATE" ]; then
     echo "Font generation ... enabled"
 else
     echo "Font generation ... disabled"
 fi
-if [ "$ENABLE_KPATHSEA" = yes ]; then
+if [ "$D2B_ENABLE_KPATHSEA" = yes ]; then
     echo "Kpathsea .......... enabled"
 else
     echo "Kpathsea .......... disabled"
 fi
 echo
 
-if [ "$ENABLE_KPATHSEA" = yes ]; then
+if [ "$D2B_ENABLE_KPATHSEA" = yes ]; then
 
     echo
-    if [ "$ENABLE_FONT_GEN" = yes ]; then
+    if [ -n "$D2B_FONT_GEN_TEMPLATE" ]; then
 	echo "You have enabled both the kpathsea library and"
 	echo "font generation.  I will attempt to process the test file."
 	echo "This should simply Work, and you don't have to do anything"
@@ -79,6 +80,7 @@ if [ "$ENABLE_KPATHSEA" = yes ]; then
 	echo "but will simply try to convert the test file...."
     fi
     echo $preline
+    echo "% $d2bpath $opfmt $infile"
     $d2bpath $opfmt $infile
     echo $postline
     d2bstatus=$?
@@ -86,7 +88,7 @@ if [ "$ENABLE_KPATHSEA" = yes ]; then
 else
 	
     # no kpathsea
-    if [ "$ENABLE_FONT_GEN" = yes ]; then
+    if [ -n "$D2B_FONT_GEN_TEMPLATE" ]; then
 	echo
 	echo "You have enabled font-generation.  Either you have disabled"
 	echo "use of the kpathsea library, or else it is not available."
@@ -98,6 +100,7 @@ else
 	echo "I will now try to generate the fonts required for the test file."
 	echo "This might be redundant, but it won't be wrong."
 	echo $preline
+	echo "% $d2bpath -Qg -n $infile -q ..."
 	$d2bpath -Qg -n $infile -q | \
 	    sed -n '/^Qg/s/^Qg *//p' | \
 	    sh
@@ -127,15 +130,16 @@ else
 	d2bpkpath=`echo $fontnamepath | sed 's+/[^/]*$++'`
 	echo
 	echo "In future, you need to set the environment variable"
-	echo "DVI2BITMAP_PK_PATH to the directory"
-	echo "  " $d2bpkpath
+	echo "DVI2BITMAP_PK_PATH to "
+	echo "  " $d2bpkpath/%f.%dpk
 	echo "for dvi2bitmap to work.  I'll make things work now,"
 	echo "by using dvi2bitmap's -fp option, which has the same effect."
 
 	echo
 	echo "Trying to convert the test file...."
 	echo $preline
-	$d2bpath $opfmt -fp $d2bpkpath $infile
+	echo "% $d2bpath $opfmt -fp $d2bpkpath/%f.%dpk $infile"
+	$d2bpath $opfmt -fp $d2bpkpath/%f.%dpk $infile
 	d2bstatus=$?
 	echo $postline
 	
@@ -161,6 +165,7 @@ else
 	    echo "However, all the required fonts appear to be available."
 	    echo "So I'll try converting the test file...."
 	    echo $preline
+	    echo "% $d2bpath $opfmt $infile"
 	    $d2bpath $opfmt $infile
 	    d2bstatus=$?
 	    echo $postline

@@ -8,7 +8,6 @@
 #include "config.h"
 #endif
 
-#include "dvi2bitmap.h"
 #include <iostream>		// for debugging code, written to cerr
 #include <sys/stat.h>
 #include <unistd.h>
@@ -29,6 +28,8 @@ using std::system;
 #include <stdlib.h>		// for system()
 #endif
 
+//#include "dvi2bitmap.h"
+#include "DviError.h"
 #include "InputByteStream.h"
 #include "PkFont.h"
 #include "Util.h"
@@ -57,7 +58,7 @@ string PkFont::fontpath_ = "";
 string PkFont::missingFontMode_ = DEFAULT_MFMODE;
 int PkFont::resolution_ = DEFAULT_RESOLUTION;
 
-#if ENABLE_FONT_GEN
+#if defined(FONT_GEN_TEMPLATE)
 bool PkFont::makeMissingFonts_ = true;
 #else
 bool PkFont::makeMissingFonts_ = false;
@@ -266,11 +267,14 @@ bool PkFont::find_font (string& path)
 					      dpiScaled(),
 					      dpiBase(),
 					      magnification());
+	if (verbosity_ > normal)
+	    cerr << "PkFont::find_font: running cmd <"
+		 << cmd << ">..." << endl;
+
 	string font_found = Util::runCommandPipe(cmd);
 
 	if (verbosity_ > normal)
-	    cerr << "PkFont::find_font: cmd <" << cmd
-		 << "> produced <" << font_found << '>' << endl;
+	    cerr << "    ...produced <" << font_found << '>' << endl;
 
 	if (font_found.length() > 0)
 	{
@@ -423,7 +427,7 @@ string& PkFont::substitute_font_string (const string fmt,
 			<< ends;
 		    throw PkError (C_STR(msg));
 		}
-		break;
+		/* NOTREACHED */
 	    }
 	else
 	    newstring << *p;

@@ -483,37 +483,37 @@ int main (int argc, char **argv)
 		    processing_ = options_only;
 		    break;
 		}
-		catch (DviError& e)
-		{
-		    cerr << "Error exception running regression tests ("
-			 << e.problem() << ")" << endl;
-		}
 		catch (DviBug& e)
 		{
 		    cerr << "Bug exception running regression tests ("
+			 << e.problem() << ")" << endl;
+		}
+		catch (DviError& e)
+		{
+		    cerr << "Error exception running regression tests ("
 			 << e.problem() << ")" << endl;
 		}
 
 	      case 'V':		// display version
 		cout << version_string << endl << "Options:" << endl;
 
-		cout << "ENABLE_GIF       "
+		cout << "ENABLE_GIF           "
 		     << (ENABLE_GIF ? "yes" : "no") << endl;
-		cout << "ENABLE_PNG       "
+		cout << "ENABLE_PNG           "
 		     << (ENABLE_PNG ? "yes" : "no") << endl;
 #if ENABLE_PNG
 		cout << "  libpng: "
 		     << PNGBitmap::version_string() << endl;
 #endif
 
-		cout << "ENABLE_KPATHSEA  "
+		cout << "ENABLE_KPATHSEA      "
 		     << (ENABLE_KPATHSEA ? "yes" : "no") << endl;
 #if ENABLE_KPATHSEA
 		cout << "  libkpathsea: "
 		     << kpathsea::version_string() << endl;
 #endif
 #ifdef FONT_SEARCH_STRING
-		cout << "FONT_SEARCH_STRING=" << FONT_SEARCH_STRING << endl;
+		cout << "FONT_SEARCH_STRING   " << FONT_SEARCH_STRING << endl;
 #endif
 #ifdef DEFAULT_TEXMFCNF
 		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << endl;
@@ -523,7 +523,7 @@ int main (int argc, char **argv)
 #endif
 
 #if defined(FONT_GEN_TEMPLATE)
-		cout << "FONT_GEN_TEMPLATE=" << FONT_GEN_TEMPLATE << endl;
+		cout << "FONT_GEN_TEMPLATE    " << FONT_GEN_TEMPLATE << endl;
 #else
 		cout << "Font generation disabled" << endl;
 #endif
@@ -1113,31 +1113,6 @@ bool process_special (DviFile *dvif, string specialString,
 	cerr << "Warning: unrecognised special: " << specialString << endl;
 
     return stringOK;
-}
-
-DviError::DviError(const char *fmt,...)
-{
-    char *p = new char[2*strlen(fmt)];
-    va_list ap;
-    va_start(ap,fmt);
-    vsprintf (p, fmt, ap);
-    va_end(ap);
-    problem_ = p;
-    delete[] p;
-}
-
-void DviError::print() const { cerr << "DVI error: " << problem_ << endl; }
-void DviBug::print() const { cerr << "BUG: " << problem_ << endl; }
-
-DviBug::DviBug(const char *fmt,...)
-{
-    char *p = new char[2*strlen(fmt)];
-    va_list ap;
-    va_start(ap,fmt);
-    vsprintf (p, fmt, ap);
-    va_end(ap);
-    problem_ = p;
-    delete[] p;
 }
 
 string get_ofn_pattern (string dviname)

@@ -1197,6 +1197,13 @@ or
 </verbatim>
 depending on your shell.
 
+<p>Notes:
+<ol>
+<li>Alphas: you may need to force the configure script to
+use the Alpha C++ compiler, <code>cxx</code>.  On the Alpha I use to
+test builds, <code/egcs-2.91.66> gets rather confused.
+</ol>
+
 <subsubsect id=install.web2c>Obtaining the <code/kpathsea> library
 <update versionid="v0-7">Improved instructions on getting the
 kpathsea library source.</update>

@@ -2,7 +2,7 @@
 #define UTIL_HEADER_READ 1
 
 #include <string>
-#include "dvi2bitmap.h"		/* for DviError */
+#include "DviError.h"
 #include "verbosity.h"
 
 namespace Util
@@ -11,7 +11,6 @@ namespace Util
 
     int regressionOutput (string prefix, ostream& o);
 
-    static verbosities verbosity_ = normal;
     void verbosity (const verbosities level);
 }
 

@@ -34,6 +34,8 @@ else
 fi
 rm -f conftest*
 
+AC_PATH_PROG(PERL, perl)
+
 dnl   Checks for header files.  I don't actually use these defines within
 dnl   the program, so there doesn't seem much point in testing for them. 
 dnl   I think everything I use is in invoked in the place it's supposed to
@@ -89,7 +91,7 @@ dnl   DVI2BITMAP_PK_PATH should be set to, is less confusing and
 dnl   inconvenient than having to rebuild dvi2bitmap with
 dnl   font-generation forced on.
 dnl
-usekpse=false
+needfontfinding=1
 AC_SUBST(KPATHSEAOBJ)
 AC_ARG_WITH(kpathsea,
 [  --without-kpathsea      Do not use kpathsea library
@@ -101,7 +103,7 @@ AC_ARG_WITH(kpathsea,
       AC_DEFINE(ENABLE_KPATHSEA) 
       KPATHSEAOBJ="kpathsea.o" 
       LIBS="$LIBS -lkpathsea"
-      usekpse=true))
+      needfontfinding=0))
   elif test "$withval" != "no"
   then
     safe_CPPFLAGS="$CPPFLAGS"
@@ -114,7 +116,7 @@ AC_ARG_WITH(kpathsea,
         KPATHSEAOBJ="kpathsea.o" 
         safe_CPPFLAGS="$safe_CPPFLAGS -I$withval/include"
         safe_LIBS="$safe_LIBS -L$withval/lib -lkpathsea"
-        usekpse=true))
+        needfontfinding=0))
     CPPFLAGS="$safe_CPPFLAGS"
     LIBS="$safe_LIBS"
   fi,
@@ -123,7 +125,7 @@ AC_ARG_WITH(kpathsea,
       AC_DEFINE(ENABLE_KPATHSEA) 
       KPATHSEAOBJ="kpathsea.o" 
       LIBS="$LIBS -lkpathsea"
-      usekpse=true)))
+      needfontfinding=0)))
 
 
 dnl   Specify an alternative, or additional, font-finding script.
@@ -133,15 +135,29 @@ AC_ARG_WITH(fontfinder,
 [  --with-fontfinder=script  Specify a script to find fonts],
   if test "$withval" != yes -a "$withval" != no; then
     AC_DEFINE_UNQUOTED(FONT_SEARCH_SCRIPT, "$withval")
+    needfontfinding=0
   fi)
 
+dnl   Test whether we have the kpse* commands, by searching through the path
+dnl   for kpsewhich
+AC_PATH_PROG(KPSEWHICH, kpsewhich)
+
+
+dnl   If we're not using the kpselib, and we haven't specified a
+dnl   fontfinder script, then use kpsewhich
+if test $needfontfinding != 0 -a -n "$ac_cv_path_KPSEWHICH"; then
+  AC_DEFINE_UNQUOTED(FONT_SEARCH_SCRIPT, "$ac_cv_path_KPSEWHICH pk %f.%dpk")
+  needfontfinding=0
+fi
+
+
 dnl   --disable-texmfcnf
-if $usekpse; then
+if test -n "$ac_cv_path_KPSEWHICH"; then
 AC_ARG_ENABLE(texmfcnf,
 [  --disable-texmfcnf      Disable setting of TEXMFCNF in environment],
   test "$enableval" = "yes" && T=`kpsewhich cnf texmf.cnf`
   test -n "$T" && AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF, "`dirname $T`"),
-  test $usekpse && T=`kpsewhich cnf texmf.cnf`
+  T=`kpsewhich cnf texmf.cnf`
   test -n "$T" && AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF, "`dirname $T`"))
 fi
 
@@ -217,9 +233,12 @@ AC_ARG_WITH(fontgen-mode,
 
 
 dnl   Do we want to use the fake_progname feature in kpathsea.cc?
-if $usekpse; then
-  AC_PATH_PROG(XDVI_PATH, xdvi)
-  AC_ARG_ENABLE(fake-progname,
+dnl   (following makes no sense if we don't have kpsewhich, and so
+dnl   presumably aren't using the texmf.cnf, but this is a
+dnl   use-at-your-own-risk option anyway, so presumably the user knows
+dnl   what they're doing)
+AC_PATH_PROG(XDVI_PATH, xdvi)
+AC_ARG_ENABLE(fake-progname,
 [  --enable-fake-progname[=prog]
                           Have dvi2bitmap lie about its name (see full docs)],
   if test "$enableval" = "yes"
@@ -227,7 +246,6 @@ if $usekpse; then
   elif test "$enableval" != "no"
   then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${enableval}")
   fi)
-fi
 
 dnl   Specify support for PNG output.  Test library for function
 dnl   png_libpng_ver.  At present, PNGBitmap.cc is
@@ -277,8 +295,16 @@ AC_ARG_WITH(path-seps,
     test -n "$COLON" && AC_DEFINE_UNQUOTED(SRCHPATH_SEP,'$COLON')
   fi)
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile test/Makefile)
 
-AC_MSG_CHECKING(dependencies)
-make deps_
+
+dnl   Check the dependencies.  We can't do this once in the
+dnl   Makefile.in file, because the dependencies vary depending on the
+dnl   modules included.  Use the -MM flag rather than just -M so that
+dnl   we ignore dependencies on system files (well that's the plan,
+dnl   but it seems that Compaq's cxx compiler accepts -MM as
+dnl   equivalent to -M, and generates the full set of dependencies,
+dnl   taking as long to do it as it does to compile the source set).
+AC_MSG_CHECKING(dependencies (might take a while))
+make simpledeps_
 AC_MSG_RESULT(done)

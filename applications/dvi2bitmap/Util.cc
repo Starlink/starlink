@@ -13,6 +13,11 @@
 #include "Util.h"
 #include "stringstream.h"
 
+namespace Util
+{
+    verbosities verbosity_ = normal;
+}
+
 
 // Open a pipe with the given command, and read from it until EOF.
 // Return this output as a single string.  Throw DviError on errors.
@@ -34,9 +39,10 @@ string Util::runCommandPipe (string cmd)
     bool firstline = true;
     while ((ich = fgetc (PIN)) != EOF)
     {
+	cerr << "ich=" << ich << endl;
 	if (firstline)
 	{
-	    const char ch = ich;
+	    const char ch = static_cast<char>(ich);
 	    if (ch == '\n' || ch == '\r') // end of line
 		firstline = false;
 	    else
@@ -44,10 +50,18 @@ string Util::runCommandPipe (string cmd)
 	}
 	// else just keep reading to the end of the file
     }
+    resp << ends;		// terminate the string
 
     int exitval = pclose(PIN);
-    // Get wait4(2) exit status -- low-order 8 bits
-    if ((exitval & 0xff) == 0)
+        if (exitval == -1)
+    {
+	// Couldn't exit cleanly
+	if (verbosity_ >= normal)
+	    cerr << "runCommandPipe: command <" << cmd
+		 << "> didn't exit cleanly" << endl;
+    }
+    else if ((exitval & 0xff) == 0)
+	// Get wait4(2) exit status -- low-order 8 bits
 	response = resp.str();
     else
     {
@@ -77,7 +91,9 @@ int Util::regressionOutput (string prefix, ostream& o)
     return 0;
 }
 
-static void Util::verbosity (const verbosities level)
+void Util::verbosity (const verbosities level)
 {
     verbosity_ = level;
+
+    return;
 }
