@@ -172,7 +172,7 @@ sub reg_attr {
     $j = 1;
   } elsif ($prim == &Starlink::AST::Grf::GRF__MARK() ) {
     $j = 2;
-  } if ($prim == &Starlink::AST::Grf::GRF__TEXT() ) {
+  } elsif ($prim == &Starlink::AST::Grf::GRF__TEXT() ) {
     $j = 3;
   } else {
     print "# Bad PRIM value: $prim\n";
