@@ -49,6 +49,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
  
 *  History:
@@ -59,6 +60,8 @@
 *     2004 Oct 1 (TIMJ):
 *        Recreate Generic version from constituent parts.
 *        No longer use NUM_ERROR directly
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_further_changes_here}
  
 *  Bugs:

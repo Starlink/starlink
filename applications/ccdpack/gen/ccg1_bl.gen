@@ -70,6 +70,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,6 +80,8 @@
 *        Added the VAR argument to allow smoothing of variance images.
 *     9-DEC-1991 (PDRAPER):
 *        Attempt to make truly generic.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_further_changes_here}
 
 *  Bugs:

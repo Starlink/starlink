@@ -43,11 +43,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-APR-1991 (PDRAPER):
 *        Based on RFWSs KPG1_ routines.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -68,11 +68,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-NOV-1998 (PDRAPER):
 *        Original version.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_changes_here}
 
 *  Bugs:

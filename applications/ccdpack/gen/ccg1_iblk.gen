@@ -154,11 +154,14 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK - IoA)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-NOV-2000 (MBT):
 *        Original version.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_changes_here}
 
 *  Bugs:

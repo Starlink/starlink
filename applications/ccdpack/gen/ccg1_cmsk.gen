@@ -31,6 +31,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -38,6 +39,8 @@
 *        Original version.
 *     5-SEP-1995 (PDRAPER):
 *        Convert to ARD format MASKs.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_changes_here}
 
 *  Bugs:

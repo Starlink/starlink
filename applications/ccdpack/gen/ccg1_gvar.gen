@@ -46,6 +46,7 @@
 *        The global status.
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -69,6 +70,8 @@
 *        Original version.
 *     12-DEC-1991 (PDRAPER):
 *        Included numeric error traps - non portable.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -44,6 +44,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +55,8 @@
 *        this was done in the precision of the input/output data and
 *        rounding could give unwanted side-effects like multiplying 
 *        by zero when a number less than 1 is given.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_further_changes_here}
 
 *  Bugs:

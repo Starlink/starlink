@@ -67,6 +67,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +75,8 @@
 *        Original version.
 *     28-MAY-1992 (PDRAPER):
 *        Now performs weighted covariance summation.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_further_changes_here}
 
 *  Bugs:

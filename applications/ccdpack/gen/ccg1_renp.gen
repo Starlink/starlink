@@ -55,6 +55,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,6 +68,8 @@
 *        Made generic.
 *     2-APR-1993 (PDRAPER):
 *        Changed to use nearest neighbour interpolation for speed.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_further_changes_here}
 
 *  Bugs:

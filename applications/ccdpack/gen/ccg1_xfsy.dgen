@@ -62,6 +62,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +75,8 @@
 *     25-OCT-1998 (PDRAPER):
 *        Changed to trap /0 explicity. Not many platforms offer proper
 *        error trapping now (only Solaris).
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_further_changes_here}
 
 *  Bugs:

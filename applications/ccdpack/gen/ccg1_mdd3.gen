@@ -54,6 +54,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +63,8 @@
 *     27-NOV-2000 (MBT):
 *        Fixed bug; variance values were not sorted corresponding to 
 *        order of data values being stacked.
+*     04-OCT-2004: BRADC):
+*        No longer use NUM_ERROR
 *     {enter_changes_here}
 
 *  Bugs:
