@@ -13,23 +13,25 @@
 #     user which allows interactive placement of pairs of NDF Sets.
 #
 #  External Variables:
-#     MARKSTYLE = string (Given and Returned)
+#     MARKSTYLEA = string (Given and Returned)
 #        A string, in the form of comma-separated att=value pairs,
-#        indicating how markers should be plotted on the image.
+#        indicating how markers should be plotted on the first image
+#        in the aligner.
+#     MARKSTYLEB = string (Given and Returned)
+#        A string, in the form of comma-separated att=value pairs,
+#        indicating how markers should be plotted on the second image
+#        in the aligner.
 #     MATPTS = list of lists of quads (Returned)
 #        This gives a list of the centroided points for each of the 
 #        pairs of NDF Sets which the user matched up.  It contains one 
 #        element for each element of the PAIRS list.  Each element of
-#        the list contains an entry for each of the points which waas
+#        the list contains an entry for each of the points which was
 #        successfully centroided in both NDF Sets, and each of those
 #        entries is a quad giving coordinates in each NDF Set, of the 
 #        form {X1 Y1 X2 Y2}.
 #     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
 #        pair of NDF Sets is to be displayed.  If zero, there is no limit.
-#     MAXPOS = integer (Given)
-#        The maximum number of points which may be selected on the 
-#        overlap region of any pair of NDF Sets.
 #     NDFSETS = list of lists (Given)
 #        Each element of this list represents a set of NDFs which is
 #        to be presented to the user for aligning using this script.
@@ -87,7 +89,7 @@
       global Pairs
 
 #  Set defaults for some arguments.
-      foreach pair { { MARKSTYLE "" } { MAXCANV 0 } { MAXPOS 100 } \
+      foreach pair { { MARKSTYLEA "" } { MARKSTYLEB "" } { MAXCANV 0 } \
                      { PERCLO 5 } { PERCHI 95 } { PREVX 300 } { PREVY 300 } \
                      { SKIP2 0 } { WINX 300 } { WINY 300 } { ZOOM 1 } } {
          if { ! [ info exists [ lindex $pair 0 ] ] } {
@@ -166,9 +168,9 @@
                          -info "%n (frame %f)" \
                          -watchstatus alignstatus \
                          -zoom $ZOOM \
-                         -maxpoints $MAXPOS \
                          -geometry ${WINX}x${WINY} \
-                         -markstyle $MARKSTYLE
+                         -markstyleA $MARKSTYLEA \
+                         -markstyleB $MARKSTYLEB
 
       [ $aligner component exit ] configure -balloonstr "Use this alignment"
 
@@ -194,8 +196,7 @@
    "   and try again.  To do this you will have to grab one by a part which" \
    "   is not overlapping the other." \
    "   Note that the alignment does not have to be perfect, since marked" \
-   "   objects will be centroided to provide an accurate alignment during the" \
-   "   next stage." \
+   "   objects will be centroided to provide an accurate alignment." \
    "" \
    "   If you are not sure the positioning is correct, a good tip is to move" \
    "   one image a few pixels away; if all the features look smeared out then" \
@@ -205,6 +206,14 @@
    "   button on the overlapping region to mark centroidable features." \
    "   If you mark any in error, they can be removed by clicking on them" \
    "   with the right mouse button." \
+   "" \
+   "   When you add a point by clicking it will be centroided on both images," \
+   "   and a marker plotted for the centroided position on each." \
+   "   The markers do not need to be exactly concentric, but are meant to" \
+   "   let you see if the same feature has been identified in both." \
+   "   If it looks like this is not the case, remove the point (right button)."\
+   "   If there is no centroidable feature on one or both images, the " \
+   "   program will not let you add a point." \
    "" \
    "   The images cannot be moved when any features are marked on them."\
    "   If you have marked some features and wish to realign the images,"\
@@ -407,75 +416,96 @@
             set tryagain 0
             $aligner activate
             tkwait variable alignstatus
-            set MARKSTYLE [ $aligner cget -markstyle ]
+            set MARKSTYLEA [ $aligner cget -markstyleA ]
+            set MARKSTYLEB [ $aligner cget -markstyleB ]
             set MAXCANV [ $aligner maxcanvas ]
             set ZOOM [ $aligner cget -zoom ]
 
 #  Get the resulting lists of points.
-            set pA [ $aligner pointsndf A CURRENT ]
-            set pB [ $aligner pointsndf B CURRENT ]
-            set npoints [ llength $pA ]
+            set pA [ $aligner points A CURRENT ]
+            set pB [ $aligner points B CURRENT ]
+            set nmatch [ llength $pA ]
 
-#  We have a usable list of objects.  Try to centroid them.
-            if { $npoints > 0 } {
-               set pts {}
-               for { set i 0 } { $i < $npoints } { incr i } {
-                  lappend pts [ list [ lindex [ lindex $pA $i ] 1 ] \
-                                     [ lindex [ lindex $pA $i ] 2 ] \
-                                     [ lindex [ lindex $pB $i ] 1 ] \
-                                     [ lindex [ lindex $pB $i ] 2 ] ]
+#  We have a usable list of objects.  Put them into a list suitable for
+#  output and get the mean and variance of offset separations based on
+#  the matched objects.
+            if { $nmatch > 0 } {
+               set matchpts {}
+               set tox 0
+               set toy 0
+               set tox2 0
+               set toy2 0
+               for { set i 0 } { $i < $nmatch } { incr i } {
+                  set xA [ lindex [ lindex $pA $i ] 1 ]
+                  set yA [ lindex [ lindex $pA $i ] 2 ]
+                  set xB [ lindex [ lindex $pB $i ] 1 ]
+                  set yB [ lindex [ lindex $pB $i ] 2 ]
+                  set ox [ expr $xB - $xA ]
+                  set oy [ expr $yB - $yA ]
+                  set tox [ expr $tox + $ox ]
+                  set toy [ expr $toy + $oy ]
+                  set tox2 [ expr $tox2 + $ox * $ox ]
+                  set toy2 [ expr $toy2 + $oy * $oy ]
+                  lappend matchpts [ list $xA $yA $xB $yB ]
                }
-	       set scale [ $aligner cget -zoom ]
-               set offset [ ndfcentroffset $ndfsets($iA) CURRENT \
-                                           $ndfsets($iB) CURRENT $pts $scale ]
-               set nmatch [ lindex $offset 0 ]
+               set xoff [ expr $tox / $nmatch ]
+               set yoff [ expr $toy / $nmatch ]
+               set xvar [ expr $tox2 / $nmatch - $xoff * $xoff ]
+               set yvar [ expr $toy2 / $nmatch - $yoff * $yoff ]
+               if { $xvar > 0 } {
+                  set xsd [ expr sqrt( $xvar ) ]
+               } else {
+                  set xsd 0
+               }
+               if { $yvar > 0 } {
+                  set ysd [ expr sqrt( $yvar ) ]
+               } else {
+                  set ysd 0
+               }
 
-#  We have a successful match.
-               if { $nmatch > 0 } {
-                  set xoff [ lindex $offset 1 ]
-                  set yoff [ lindex $offset 2 ]
-                  set matchpts [ lindex $offset 3 ]
-
-#  Tell the user that the match succeeded.
-                  ccdputs -log \
-                "    Centroiding successful: $nmatch/$npoints objects matched."
+#  Tell the user that the match succeeded, and give an indication of the
+#  offset.
+               ccdputs -log "    $nmatch objects matched."
+               set psize [ $ndfsets($iA) pixelsize CURRENT ]
+               if { $nmatch > 1 } {
+                  ccdputs -log "    Approximate offset is [ \
+                     format {( %.2f +/- %.2f, %.2f +/- %.2f ) pixels} \
+                        [ expr $xoff / $psize ] [ expr $xsd / $psize ] \
+                        [ expr $yoff / $psize ] [ expr $ysd / $psize ] ]"
+               } elseif { $nmatch == 1 } {
+                  ccdputs -log "    Approximate offset is [ \
+                     format {( %.2f, %.2f ) pixels} \
+                        [ expr $xoff / $psize ] \
+                        [ expr $yoff / $psize ] ]"
+               }
 
 #  Add this datum to the results list.  By storing these in a hash at
 #  this stage, we ensure we don't pass back duplicate pairings to the
 #  calling routine.
-                  if { $iA < $iB } {
-                     set key "$iA,$iB"
-                     set xo $xoff
-                     set yo $yoff
-                     set mp $matchpts
-                  } else {
-                     set key "$iB,$iA"
-                     set xo [ expr 0 - $xoff ]
-                     set yo [ expr 0 - $yoff ]
-                     set mp {}
-                     foreach pt $matchpts {
-                        lappend mp [ list [ lindex $pt 2 ] [ lindex $pt 3 ] \
-                                          [ lindex $pt 0 ] [ lindex $pt 1 ] ]
-                     }
-                  }
-                  set Pairs($key) [ list $nmatch $xo $yo $mp ]
-
-#  Record the fact that these images have been connected.
-                  set Done($iA) 1
-                  set Done($iB) 1
-
-#  Visually reflect the fact that they have been connected.
-                  $chooser highlight $iA 1
-                  $chooser highlight $iB 1
-
-#  No objects were matched between frames.
+               if { $iA < $iB } {
+                  set key "$iA,$iB"
+                  set xo $xoff
+                  set yo $yoff
+                  set mp $matchpts
                } else {
-                  set tryagain [ carryon "Centroiding failed." ]
-                  if { ! $tryagain } {
-                     ccdputs -log \
-                     "    Centroiding failed, no offset determined - ignored."
+                  set key "$iB,$iA"
+                  set xo [ expr 0 - $xoff ]
+                  set yo [ expr 0 - $yoff ]
+                  set mp {}
+                  foreach pt $matchpts {
+                     lappend mp [ list [ lindex $pt 2 ] [ lindex $pt 3 ] \
+                                       [ lindex $pt 0 ] [ lindex $pt 1 ] ]
                   }
                }
+               set Pairs($key) [ list $nmatch $xo $yo $mp ]
+
+#  Record the fact that these images have been connected.
+               set Done($iA) 1
+               set Done($iB) 1
+
+#  Visually reflect the fact that they have been connected.
+               $chooser highlight $iA 1
+               $chooser highlight $iB 1
 
 #  There was an overlap, but the user failed to indicate any points to 
 #  be centroided.
