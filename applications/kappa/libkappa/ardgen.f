@@ -78,19 +78,23 @@
 *        region.  The pixels included in the resulting region depend on
 *        which of the following operators is selected.
 *    
-*        "AND" - Pixels are included if they are in both of the regions
-*                specified by parameter OPERANDS.
-*        "EQV" - Pixels are included if they are in both or neither of
-*                the regions specified by parameter OPERANDS.
-*        "NOT" - Pixels are included if they are not inside the region
-*                specified by parameter OPERANDS.
-*        "OR"  - Pixels are included if they are in either of the
-*                regions specified by parameter OPERANDS.  Note, an OR
-*                operator is implicitly assumed to exist between each
-*                pair of adjacent regions unless some other operator is
-*                specified.
-*        "XOR" - Pixels are included if they are in one, but not both,
-*                of the regions specified by parameter OPERANDS.
+*        - "AND" -- Pixels are included if they are in both of the regions
+*        specified by parameter OPERANDS.
+*
+*        - "EQV" -- Pixels are included if they are in both or neither of
+*        the regions specified by parameter OPERANDS.
+*
+*        - "NOT" -- Pixels are included if they are not inside the region
+*        specified by parameter OPERANDS.
+*
+*        - "OR" -- Pixels are included if they are in either of the
+*        regions specified by parameter OPERANDS.  Note, an OR
+*        operator is implicitly assumed to exist between each
+*        pair of adjacent regions unless some other operator is
+*        specified.
+*
+*        - "XOR" -- Pixels are included if they are in one, but not both,
+*        of the regions specified by parameter OPERANDS.
 *
 *     OPTION= LITERAL (Read)
 *        A value for this parameter is obtained when you choose to end
@@ -98,51 +102,61 @@
 *        when the application starts up).  It determines what to do
 *        next.  The following options are available:
 *
-*        "Combine" - Combine two previously defined regions into a
-*                    single region using a Boolean operator, or invert
-*                    a previously defined region using a Boolean .NOT.
-*                    operator.  See parameters OPERANDS and OPERATOR.  The
-*                    original regions are deleted and the new combined
-*                    (or inverted) region is added to the end of the
-*                    list of defined regions.
-*        "Delete"  - Delete previously defined regions, see parameter
-*                    REGIONS.
-*        "Draw"    - Draw the outline of the union of one or more previously 
-*                    defined regions, see parameter REGIONS.
-*        "Exit"    - Write out the currently defined regions to a text
-*                    file and exit the application.
-*        "List"    - List the textual descriptions of the currently
-*                    defined regions on the screen.  Each region is
-*                    described by an index value, a "keyword"
-*                    corresponding to the shape, and various arguments
-*                    describing the extent and position of the shape.
-*                    These arguments are described in the "Notes"
-*                    section below.
-*        "Multi"   - The cursor is displayed and you can then identify
-*                    multiple regions of the current shape, without
-*                    being re-prompted for OPTION after each one.  These
-*                    regions are added to the end of the list of
-*                    currently defined regions.  If the current shape is
-*                    "Polygon", "Frame" or "Whole" (see parameter SHAPE)
-*                    then multiple regions cannot be defined and the
-*                    selected option automatically reverts to "Single".
-*        "Single"  - The cursor is displayed and you can then identify a
-*                    single region of the current shape.  You are
-*                    re-prompted for parameter OPTION once you have
-*                    defined the region.  The identified region is
-*                    added to the end of the list of currently defined
-*                    regions.
-*        "Shape"   - Change the shape of the regions created by the
-*                    "Single" and "Multi" options.  This causes a new
-*                    value for parameter SHAPE to be obtained.
-*        "Style"   - Change the drawing style by providing a new value
-*                    for parameter STYLE.
-*        "Quit"    - Quit the application without saving the currently
-*                    defined regions.
-*        "Undo"    - Undo the changes made to the list of ARD regions by
-*                    the previous option. Note, the undo list can contain
-*                    upto 30 entries. Entries are only stored for options 
-*                    which actually produce a change in the list of regions. 
+*        - "Combine" -- Combine two previously defined regions into a
+*        single region using a Boolean operator, or invert
+*        a previously defined region using a Boolean .NOT.
+*        operator.  See parameters OPERANDS and OPERATOR.  The
+*        original regions are deleted and the new combined
+*        (or inverted) region is added to the end of the
+*        list of defined regions.
+*
+*        - "Delete" -- Delete previously defined regions, see parameter
+*        REGIONS.
+*
+*        - "Draw" -- Draw the outline of the union of one or more previously 
+*        defined regions, see parameter REGIONS.
+*
+*        - "Exit" -- Write out the currently defined regions to a text
+*        file and exit the application.
+*
+*        - "List" -- List the textual descriptions of the currently
+*        defined regions on the screen.  Each region is
+*        described by an index value, a "keyword"
+*        corresponding to the shape, and various arguments
+*        describing the extent and position of the shape.
+*        These arguments are described in the "Notes"
+*        section below.
+*
+*        - "Multi" -- The cursor is displayed and you can then identify
+*        multiple regions of the current shape, without
+*        being re-prompted for OPTION after each one.  These
+*        regions are added to the end of the list of
+*        currently defined regions.  If the current shape is
+*        "Polygon", "Frame" or "Whole" (see parameter SHAPE)
+*        then multiple regions cannot be defined and the
+*        selected option automatically reverts to "Single".
+*
+*        - "Single" -- The cursor is displayed and you can then identify a
+*        single region of the current shape.  You are
+*        re-prompted for parameter OPTION once you have
+*        defined the region.  The identified region is
+*        added to the end of the list of currently defined
+*        regions.
+*
+*        - "Shape" -- Change the shape of the regions created by the
+*        "Single" and "Multi" options.  This causes a new
+*        value for parameter SHAPE to be obtained.
+*
+*        - "Style" -- Change the drawing style by providing a new value
+*        for parameter STYLE.
+*
+*        - "Quit" -- Quit the application without saving the currently
+*        defined regions.
+*
+*        - "Undo" -- Undo the changes made to the list of ARD regions by
+*        the previous option. Note, the undo list can contain
+*        upto 30 entries. Entries are only stored for options 
+*        which actually produce a change in the list of regions. 
 *
 *     REGIONS() = LITERAL (Read)
 *        The list of regions to be deleted or drawn.  Regions are numbered
@@ -164,28 +178,38 @@
 *        parameter OPTION.  The currently available shapes are listed
 *        below.
 *
-*        "Box"       - A rectangular box with sides parallel to the
-*                      co-ordinate axes, defined by its centre and one of its
-*                      corners.
-*        "Circle"    - A circle, defined by its centre and radius.
-*        "Column"    - A single value on axis 1, spanning all values on
-*                      axis 2.
-*        "Ellipse"   - An ellipse, defined by its centre, one end of
-*                      the major axis, and one other point which can be
-*                      anywhere on the ellipse.
-*        "Frame"     - The whole image excluding a border of constant
-*                      width, defined by a single point on the frame. 
-*        "Point"     - A single pixel.
-*        "Polygon"   - Any general polygonal region, defined by up to
-*                      200 vertices.
-*        "Rectangle" - A rectangular box with sides parallel to the
-*                      co-ordinate axes, defined by a pair of diagonally
-*                      opposite corners.
-*        "Rotbox"    - A rotated box, defined by both ends of an edge,
-*                      and one point on the opposite edge.
-*        "Row"       - A single value on axis 2, spanning all values on
-*                      axis 1.
-*        "Whole"     - The whole of the displayed image.
+*        - "Box" -- A rectangular box with sides parallel to the
+*        co-ordinate axes, defined by its centre and one of its
+*        corners.
+*
+*        - "Circle" -- A circle, defined by its centre and radius.
+*
+*        - "Column" -- A single value on axis 1, spanning all values on
+*        axis 2.
+*
+*        - "Ellipse" -- An ellipse, defined by its centre, one end of
+*        the major axis, and one other point which can be
+*        anywhere on the ellipse.
+*
+*        - "Frame" -- The whole image excluding a border of constant
+*        width, defined by a single point on the frame. 
+*
+*        - "Point" -- A single pixel.
+*
+*        - "Polygon" -- Any general polygonal region, defined by up to
+*        200 vertices.
+*
+*        - "Rectangle" -- A rectangular box with sides parallel to the
+*        co-ordinate axes, defined by a pair of diagonally
+*        opposite corners.
+*
+*        - "Rotbox" -- A rotated box, defined by both ends of an edge,
+*        and one point on the opposite edge.
+*
+*        - "Row" -- A single value on axis 2, spanning all values on
+*        axis 1.
+*
+*        - "Whole" -- The whole of the displayed image.
 *
 *     STARTUP = LITERAL (Read)
 *        Determines if the application starts up in "Multi" or "Single"
@@ -205,7 +229,7 @@
 *        prompting.
 
 *  Related Applications:
-*     KAPPA: ARDMASK; CCDPACK; ESP.
+*     KAPPA: ARDPLOT, ARDMASK; CCDPACK; ESP.
       
 *  Notes:
 *     -  An image must previously have been displayed on the graphics
@@ -213,24 +237,34 @@
 *     -  The arguments for the textual description of each shape are as
 *     follows :
 *
-*     "Box"       - The co-ordinates of the centre, followed by the
-*                   lengths of the two sides.
-*     "Circle"    - The co-ordinates of the centre, followed by the
-*                   radius.
-*     "Column"    - The axis 1 co-ordinate of the column.
-*     "Ellipse"   - The co-ordinates of the centre, followed by the
-*                   lengths of the semi-major and semi-minor axes,
-*                   followed by the angle between axis 1 and the
-*                   semi-major axis (in radians).
-*     "Frame"     - The width of the border.
-*     "Point"     - The co-ordinates of the pixel.
-*     "Polygon"   - The co-ordinates of each vertex in the order given.
-*     "Rectangle" - The co-ordinates of two diagonally opposite corners.
-*     "Rotbox"    - The co-ordinates of the box centre, followed by the
-*                   lengths of the two sides, followed by the angle
-*                   between the first side and axis 1 (in radians).
-*     "Row"       - The axis 2 co-ordinate of the row.
-*     "Whole"     - No arguments.
+*        - "Box" -- The co-ordinates of the centre, followed by the
+*        lengths of the two sides.
+*
+*        - "Circle" -- The co-ordinates of the centre, followed by the
+*        radius.
+*
+*        - "Column" -- The axis 1 co-ordinate of the column.
+*
+*        - "Ellipse" -- The co-ordinates of the centre, followed by the
+*        lengths of the semi-major and semi-minor axes,
+*        followed by the angle between axis 1 and the
+*        semi-major axis (in radians).
+*
+*        - "Frame" -- The width of the border.
+*
+*        - "Point" -- The co-ordinates of the pixel.
+*
+*        - "Polygon" -- The co-ordinates of each vertex in the order given.
+*
+*        - "Rectangle" -- The co-ordinates of two diagonally opposite corners.
+*
+*        - "Rotbox" -- The co-ordinates of the box centre, followed by the
+*        lengths of the two sides, followed by the angle
+*        between the first side and axis 1 (in radians).
+*
+*        - "Row" -- The axis 2 co-ordinate of the row.
+*
+*        - "Whole" -- No arguments.
 *
 *      -  The shapes are defined within the current co-ordinate 
 *      Frame of the displayed NDF. For instance, if the current

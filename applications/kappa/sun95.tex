@@ -8939,12 +8939,12 @@ a rotated box.
 \end{verbatim}
 \normalsize
 
-If you make a mistake, enter {\tt List} at the OPTION prompt to see a list
-of the regions.  Note the ``Region Index'' of the region(s) you wish to
-remove, and select the {\tt Delete} option.  At the REGION prompt,
-give a list of the regions you want to remove.  If you change your mind,
-enter {\tt !} at the prompt for parameter REGIONS, and no regions are
-deleted.
+If you make a mistake, use the ``Undo'' option. Alternatively, enter {\tt
+List} at the OPTION prompt to see a list of the regions.  Note the
+``Region Index'' of the region(s) you wish to remove, and select the {\tt
+Delete} option.  At the REGION prompt, give a list of the regions you
+want to remove.  If you change your mind, enter {\tt !} at the prompt for
+parameter REGIONS, and no regions are deleted.
 
 Now suppose you want to combine or invert regions in some way, you
 supply {\tt Combine} at the OPTION prompt.  So suppose we have
@@ -12540,11 +12540,10 @@ default value.
 }{
    \sstdescription{
       This is an interactive tool for selecting regions of a displayed
-      image using a cursor, and then stores a description of the
-      selected regions in a text file in the form of an `ARD Description'
-      (see SUN/183).  This text file may subsequently be 
-      used in conjunction with packages such as {\footnotesize CCDPACK}
-      or {\footnotesize ESP}.
+      image using a cursor, and then storing a description of the
+      selected regions in a text file in the form of an `ARD
+      Description{\tt '} (see SUN/183).  This text file may subsequently be
+      used in conjunction with packages such as CCDPACK or ESP.
 
       The application initially obtains a value for the SHAPE parameter
       and then allows you to identify either one or many regions of the
@@ -12553,7 +12552,7 @@ default value.
       obtained for parameter OPTION, and that value determines what
       happens next.  Options include obtaining further regions,
       changing the current region shape, listing the currently defined
-      regions, leaving the application, {\it etc.}\  Once the selected action
+      regions, leaving the application, \emph{etc}.  Once the selected action
       has been performed, another value is obtained for OPTION, and
       this continues until you choose to leave the application.
 
@@ -12566,7 +12565,7 @@ default value.
       parameter PALNUM.
 
       In the absence of any other information, subsequent application
-      will use the union ({\it i.e.}\ the logical OR) of all the defined
+      will use the union (\emph{i.e.} the logical OR) of all the defined
       regions.  However, regions can be combined in other ways using the
       COMBINE option (see parameter OPTION).  For instance, two regions
       originally defined using the cursor could be replaced by their
@@ -12596,15 +12595,15 @@ default value.
          DEVICE = DEVICE (Read)
       }{
          The graphics device on which the regions are to be selected.
-         {\tt [}Current graphics device{\tt ]}
+         {\tt [Current graphics device]}
       }
       \sstsubsection{
          OPERANDS() = \_INTEGER (Read)
       }{
          A pair of indices for the regions which are to be combined
-         together using the operator specified by the parameter OPERATOR.
-         If the operator is {\tt "NOT"}, then only one region index need be
-         supplied.  Region indices are displayed by the {\tt "List"} option
+         together using the operator specified by parameter OPERATOR.
+         If the operator is {\tt "}NOT{\tt "}, then only one region index need be
+         supplied.  Region indices are displayed by the {\tt "}List{\tt "} option
          (see parameter OPTION).
       }
       \sstsubsection{
@@ -12614,138 +12613,201 @@ default value.
          region.  The pixels included in the resulting region depend on
          which of the following operators is selected.
 
-         \begin{description}
-         \item {\tt "AND"} --- Pixels are included if they are in both
-                 of the regions specified by parameter OPERANDS.
-         \item {\tt "EQV"} --- Pixels are included if they are in both
-                 or neither of the regions specified by parameter OPERANDS.
-         \item {\tt "NOT"} --- Pixels are included if they are not inside
-                 the region specified by the parameter OPERANDS.
-         \item {\tt "OR"}  --- Pixels are included if they are in either
-                 of the regions specified by parameter OPERANDS.  Note, an
-                 OR operator is implicitly assumed to exist between each
-                 pair of adjacent regions unless some other operator is
-                 specified.
-         \item {\tt "XOR"} --- Pixels are included if they are in one, but not both,
-                 of the regions specified by parameter OPERANDS.
-         \end{description}
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}AND{\tt "} -- Pixels are included if they are in both of the regions
+            specified by parameter OPERANDS.
+
+            \sstitem
+            {\tt "}EQV{\tt "} -- Pixels are included if they are in both or neither of
+            the regions specified by parameter OPERANDS.
+
+            \sstitem
+            {\tt "}NOT{\tt "} -- Pixels are included if they are not inside the region
+            specified by parameter OPERANDS.
+
+            \sstitem
+            {\tt "}OR{\tt "} -- Pixels are included if they are in either of the
+            regions specified by parameter OPERANDS.  Note, an OR
+            operator is implicitly assumed to exist between each
+            pair of adjacent regions unless some other operator is
+            specified.
+
+            \sstitem
+            {\tt "}XOR{\tt "} -- Pixels are included if they are in one, but not both,
+            of the regions specified by parameter OPERANDS.
+         }
       }
       \sstsubsection{
-         OPTION = LITERAL (Read)
+         OPTION= LITERAL (Read)
       }{
          A value for this parameter is obtained when you choose to end
          cursor input (by pressing the relevant button as described
          when the application starts up).  It determines what to do
          next.  The following options are available:
 
-         \begin{description}
-         \item {\tt "Combine"} --- Combine two previously defined regions
-                  into a single region using a Boolean operator, or invert
-                  a previously defined region using a Boolean .NOT.
-                  operator.  See parameters OPERANDS and OPERATOR.  The
-                  original regions are deleted and the new combined
-                  (or inverted) region is added to the end of the
-                  list of defined regions.
-         \item {\tt "Delete"} --- Delete previously defined regions, see
-                  parameter REGIONS.
-         \item {\tt "Exit"} --- Write out the currently defined regions to
-                  a text file and exit the application.
-         \item {\tt "List"} --- List the textual descriptions of the currently
-                  defined regions on the screen.  Each region is described
-                  by an index value, a `keyword' corresponding to the shape,
-                  and various arguments describing the extent and position of
-                  the shape.  These arguments are described in the
-                  {\tt "}Notes{\tt "} section below.
-         \item {\tt "Multi"} --- The cursor is displayed and you can then
-                  identify multiple regions of the current shape, without
-                  being re-prompted for OPTION after each one.  These
-                  regions are added to the end of the list of currently
-                  defined regions.  If the current shape is {\tt "Polygon"},
-                  {\tt "Frame"} or {\tt "Whole"} (see parameter SHAPE) then
-                  multiple regions cannot be defined and 
-                  selected option automatically reverts to {\tt "Single"}.
-         \item {\tt "Single"} --- The cursor is displayed and you can then
-                  identify a single region of the current shape.  You are
-                  re-prompted for parameter OPTION once you have
-                  defined the region.  The identified region is
-                  added to the end of the list of currently defined
-                  regions.
-         \item {\tt "Shape"} --- Change the shape of the regions created by the
-                  {\tt "Single"} and {\tt "Multi"} options.  This causes a
-                  new value for parameter SHAPE to be obtained.
-         \item {\tt "Quit"} --- Quit the application without saving the currently
-                   defined regions.
-         \end{description}
-      }
-      \sstsubsection{
-         PALNUM= \_INTEGER (Read)
-      }{
-         The pen number with which to outline the selected regions.
-         {\tt [3]}
-      }
-      \sstsubsection{
-         POICOL = \_INTEGER (Read)
-      }{
-         The pen number used to mark the cursor positions which define
-         each region.  {\tt [2]}
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Combine{\tt "} -- Combine two previously defined regions into a
+            single region using a Boolean operator, or invert
+            a previously defined region using a Boolean .NOT.
+            operator.  See parameters OPERANDS and OPERATOR.  The
+            original regions are deleted and the new combined
+            (or inverted) region is added to the end of the
+            list of defined regions.
+
+            \sstitem
+            {\tt "}Delete{\tt "} -- Delete previously defined regions, see parameter
+            REGIONS.
+
+            \sstitem
+            {\tt "}Draw{\tt "} -- Draw the outline of the union of one or more previously
+            defined regions, see parameter REGIONS.
+
+            \sstitem
+            {\tt "}Exit{\tt "} -- Write out the currently defined regions to a text
+            file and exit the application.
+
+            \sstitem
+            {\tt "}List{\tt "} -- List the textual descriptions of the currently
+            defined regions on the screen.  Each region is
+            described by an index value, a {\tt "}keyword{\tt "}
+            corresponding to the shape, and various arguments
+            describing the extent and position of the shape.
+            These arguments are described in the {\tt "}Notes{\tt "}
+            section below.
+
+            \sstitem
+            {\tt "}Multi{\tt "} -- The cursor is displayed and you can then identify
+            multiple regions of the current shape, without
+            being re-prompted for OPTION after each one.  These
+            regions are added to the end of the list of
+            currently defined regions.  If the current shape is
+            {\tt "}Polygon{\tt "}, {\tt "}Frame{\tt "} or {\tt "}Whole{\tt "} (see parameter SHAPE)
+            then multiple regions cannot be defined and the
+            selected option automatically reverts to {\tt "}Single{\tt "}.
+
+            \sstitem
+            {\tt "}Single{\tt "} -- The cursor is displayed and you can then identify a
+            single region of the current shape.  You are
+            re-prompted for parameter OPTION once you have
+            defined the region.  The identified region is
+            added to the end of the list of currently defined
+            regions.
+
+            \sstitem
+            {\tt "}Shape{\tt "} -- Change the shape of the regions created by the
+            {\tt "}Single{\tt "} and {\tt "}Multi{\tt "} options.  This causes a new
+            value for parameter SHAPE to be obtained.
+
+            \sstitem
+            {\tt "}Style{\tt "} -- Change the drawing style by providing a new value
+            for parameter STYLE.
+
+            \sstitem
+            {\tt "}Quit{\tt "} -- Quit the application without saving the currently
+            defined regions.
+
+            \sstitem
+            {\tt "}Undo{\tt "} -- Undo the changes made to the list of ARD regions by
+            the previous option. Note, the undo list can contain
+            upto 30 entries. Entries are only stored for options
+            which actually produce a change in the list of regions.
+         }
       }
       \sstsubsection{
          REGIONS() = LITERAL (Read)
       }{
-         The list of regions to be deleted.  Regions are numbered
-         consecutively from 1 and can be listed using the {\tt "List"} option
+         The list of regions to be deleted or drawn.  Regions are numbered
+         consecutively from 1 and can be listed using the {\tt "}List{\tt "} option
          (see parameter OPTION).  Single regions or a set of adjacent
-         regions may be specified, {\it e.g.}\ assigning {\tt [4,6-9,12,14-16]}
-         will delete regions 4,6,7,8,9,12,14,15,16.  (Note that the brackets
+         regions may be specified, \emph{e.g.} assigning {\tt [4,6-9,12,14-16]} will
+         delete regions 4,6,7,8,9,12,14,15,16.  (Note that the brackets
          are required to distinguish this array of characters from a
          single string including commas.  The brackets are unnecessary
          when there is only one item.)  The numbers need not be in
          ascending order.
 
-         If you wish to delete all the regions enter the wildcard $*$.
-         {\tt 5-$*$} will delete from 5 to the last region.
+         If you wish to delete or draw all the regions enter the wildcard $*$.
+         5-$*$ will delete or draw from 5 to the last region.
       }
       \sstsubsection{
-         SHAPE= LITERAL (Read)
+         SHAPE = LITERAL (Read)
       }{
          The shape of the regions to be defined using the cursor.
          After selecting a new shape, you are immediately requested to
-         identify multiple regions as if {\tt "Multi"} had been specified for
-         parameter OPTION.  The currently available shapes are listed below.
+         identify multiple regions as if {\tt "}Multi{\tt "} had been specified for
+         parameter OPTION.  The currently available shapes are listed
+         below.
 
-         \begin{description}
-         \item {\tt "Box"} --- A rectangular box with sides parallel to the
-               image axes, defined by its centre and one of its corners.
-         \item {\tt "Circle"}  --- A circle, defined by its centre and radius.
-         \item {\tt "Column"}  --- A single column of pixels.
-         \item {\tt "Ellipse"} --- An ellipse, defined by its centre, one end
-               of the major axis, and one other point which can be anywhere
-               on the ellipse.
-         \item {\tt "Frame"} --- The whole image excluding a border of constant
-               width, defined by a single point on the frame.
-         \item {\tt "Point"} --- A single pixel.
-         \item {\tt "Polygon"} --- Any general polygonal region, defined
-               by up to 200 vertices.
-         \item {\tt "Rectangle"} --- A rectangular box with sides parallel to
-               the image axes, defined by a pair of diagonally opposite corners.
-         \item {\tt "Rotbox"} --- A rotated box, defined by both ends of
-                       an edge, and one point on the opposite edge.
-         \item {\tt "Row"}  --- A single row of pixels.
-         \item {\tt "Whole"} --- The whole of the displayed image.
-         \end{description}
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Box{\tt "} -- A rectangular box with sides parallel to the
+            co-ordinate axes, defined by its centre and one of its
+            corners.
+
+            \sstitem
+            {\tt "}Circle{\tt "} -- A circle, defined by its centre and radius.
+
+            \sstitem
+            {\tt "}Column{\tt "} -- A single value on axis 1, spanning all values on
+            axis 2.
+
+            \sstitem
+            {\tt "}Ellipse{\tt "} -- An ellipse, defined by its centre, one end of
+            the major axis, and one other point which can be
+            anywhere on the ellipse.
+
+            \sstitem
+            {\tt "}Frame{\tt "} -- The whole image excluding a border of constant
+            width, defined by a single point on the frame.
+
+            \sstitem
+            {\tt "}Point{\tt "} -- A single pixel.
+
+            \sstitem
+            {\tt "}Polygon{\tt "} -- Any general polygonal region, defined by up to
+            200 vertices.
+
+            \sstitem
+            {\tt "}Rectangle{\tt "} -- A rectangular box with sides parallel to the
+            co-ordinate axes, defined by a pair of diagonally
+            opposite corners.
+
+            \sstitem
+            {\tt "}Rotbox{\tt "} -- A rotated box, defined by both ends of an edge,
+            and one point on the opposite edge.
+
+            \sstitem
+            {\tt "}Row{\tt "} -- A single value on axis 2, spanning all values on
+            axis 1.
+
+            \sstitem
+            {\tt "}Whole{\tt "} -- The whole of the displayed image.
+         }
       }
       \sstsubsection{
          STARTUP = LITERAL (Read)
       }{
-         Determines if the application starts up in {\tt "Multi"} or
-         {\tt "Single"} mode (see parameter OPTION). {\tt ["Multi"]}
+         Determines if the application starts up in {\tt "}Multi{\tt "} or {\tt "}Single{\tt "}
+         mode (see parameter OPTION). {\tt ["Multi"]}
+      }
+      \sstsubsection{
+         UNDO = \_LOGICAL (Read)
+      }{
+         Used to confirm that it is OK to proceed with an {\tt "}Undo{\tt "} option.
+         The consequences of proceeding are described before the parameter
+         is obtained.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
          ardgen extract.txt circle exit startup=single
       }{
-         This example allows you to create a text file ({\tt extract.txt})
+         This example allows you to create a text file (extract.txt)
          describing a single circular region of the image displayed on
          the current graphics device.  The application immediately exits
          after the region has been identified.  This example may be
@@ -12762,44 +12824,68 @@ default value.
 
          \sstitem
          The arguments for the textual description of each shape are as
-         follows:
+         follows :
 
-         \begin{description}
-         \item {\tt "Box"} --- The co-ordinates of the centre, followed by the
-               lengths of the two sides.
-         \item {\tt "Circle"} --- The co-ordinates of the centre, followed by
-               the radius.
-         \item {\tt "Column"} --- The $x$ co-ordinate of the column.
-         \item {\tt "Ellipse"} --- The co-ordinates of the centre, followed
-               by the lengths of the semi-major and semi-minor axes, followed
-               by the angle between the $x$ axis and the semi-major axis
-               (in radians).
-         \item {\tt "Frame"} --- The width of the border.
-         \item {\tt "Point"} --- The co-ordinates of the pixel.
-         \item {\tt "Polygon"} --- The co-ordinates of each vertex in the
-               order given.
-         \item {\tt "Rectangle"} --- The co-ordinates of two diagonally
-               opposite corners.
-         \item {\tt "Rotbox"} --- The co-ordinates of the box centre, followed by the
-               lengths of the two sides, followed by the angle
-               between the first side and the $x$ axis (in radians).
-         \item {\tt "Row"} --- The $y$ co-ordinate of the row.
-         \item {\tt "Whole"} --- No arguments.
-         \end{description}
+            \sstitemlist{
 
-         All co-ordinates are pixel, \emph{i.e.} world co-ordinates.
-	 These should not be mistaken with pixel indices. For example,
-	 the pixel with indices {\tt [1,1]} extends from 0.0 to 1.0 in
-	 world co-ordinates on both axes. So the centre of pixel {\tt
-	 [1,1]} is actually at (0.5,0.5). The interpretation of the
-	 supplied positions does not depend on the presence of a decimal
-	 point (unlike NDF section specifiers).
+               \sstitem
+                  {\tt "}Box{\tt "} -- The co-ordinates of the centre, followed by the
+                  lengths of the two sides.
+      
+               \sstitem
+                  {\tt "}Circle{\tt "} -- The co-ordinates of the centre, followed by the
+                  radius.
+      
+               \sstitem
+                  {\tt "}Column{\tt "} -- The axis 1 co-ordinate of the column.
+      
+               \sstitem
+                  {\tt "}Ellipse{\tt "} -- The co-ordinates of the centre, followed by the
+                  lengths of the semi-major and semi-minor axes,
+                  followed by the angle between axis 1 and the
+                  semi-major axis (in radians).
+      
+               \sstitem
+                  {\tt "}Frame{\tt "} -- The width of the border.
+      
+               \sstitem
+                  {\tt "}Point{\tt "} -- The co-ordinates of the pixel.
+      
+               \sstitem
+                  {\tt "}Polygon{\tt "} -- The co-ordinates of each vertex in the order given.
+      
+               \sstitem
+                  {\tt "}Rectangle{\tt "} -- The co-ordinates of two diagonally opposite corners.
+      
+               \sstitem
+                  {\tt "}Rotbox{\tt "} -- The co-ordinates of the box centre, followed by the
+                  lengths of the two sides, followed by the angle
+                  between the first side and axis 1 (in radians).
+      
+               \sstitem
+                  {\tt "}Row{\tt "} -- The axis 2 co-ordinate of the row.
+      
+               \sstitem
+                  {\tt "}Whole{\tt "} -- No arguments.
+            }
+
+         \sstitem
+          The shapes are defined within the current co-ordinate
+          Frame of the displayed NDF. For instance, if the current
+          co-ordinate Frame of the displayed NDF is RA/DEC, then {\tt "}COLUMN{\tt "}
+          regions will be curves of constant DEC, {\tt "}ROW{\tt "} regions will be curves
+          of constant RA (assuming axis 1 is RA and axis 2 is DEC), straight
+          lines will correspond to geodesics, \emph{etc}. Numerical values will be
+          stored in the output text file in the current coordinate Frame of
+          the NDF. WCS information will also be stored in the output text
+          file allowing the stored positions to be converted to other systems
+          (pixel coordinates, for instance).
       }
    }
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: ARDMASK; CCDPACK; ESP.
+      KAPPA: ARDPLOT, ARDMASK; CCDPACK; ESP.
    }
 }
 \sstroutine{
