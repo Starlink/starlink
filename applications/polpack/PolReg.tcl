@@ -365,10 +365,12 @@
    if { ![info exists sky_list] } {
       set SKY_METHOD $SKY_AREA
       set nsky 0
+      set skystate normal
 
    } {
       set SKY_METHOD $SKY_FRAME
       set nsky [llength $sky_list]
+      set skystate disabled
       if { $nin != $nsky && $nin != 1 } {
          puts "PolReg: Number of sky frames ($nsky) does not equal the number of input frames ($nin)."
          exit 1
@@ -584,6 +586,7 @@
    $OPTSMENU add cascade -label "Feature Size" -menu $OPTSMENU.psf
    $OPTSMENU add cascade -label "Interpolation method" -menu $OPTSMENU.meth
    $OPTSMENU add cascade -label "Mapping Types" -menu $OPTSMENU.map
+   $OPTSMENU add command -label "Sky" -menu $OPTSMENU.sky -state $skystate
    $OPTSMENU add command -label "Status Items..." -command GetItems
    $OPTSMENU add cascade -label "View" -menu $OPTSMENU.view
    $OPTSMENU add separator
@@ -598,6 +601,7 @@
    MenuHelp $OPTSMENU "Feature Size"    ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
    MenuHelp $OPTSMENU "Interpolation method" ".  The interpolation method to use when finding pixel values in the input images."
    MenuHelp $OPTSMENU "Mapping Types"   ".  The type of mapping to use when aligning images, or when aligning the O and E rays."
+   MenuHelp $OPTSMENU "Sky"             ".  The number of interior knots used along each axis in the fitted sky surfaces. A value of 1 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
    MenuHelp $OPTSMENU "Status Items..."      ".  Select which items of information to display in the status area."
    MenuHelp $OPTSMENU "View"            ".  The section to be displayed when a new image is selected from the \"Images\" menu."
    MenuHelp $OPTSMENU "Display Status Area"  ".  Toggle the display of status information underneath the displayed image."
@@ -643,6 +647,15 @@
    }
 
    SetHelp $psfmenu ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
+
+# Add items to the "Sky" sub-menu.
+   set skymenu [menu $OPTSMENU.sky]
+   for {set i 1} {$i < 12} {incr i} {
+      $skymenu add radiobutton -label "$i knots" -variable SKY_KNOTS \
+              -selectcolor $RB_COL -value $i 
+   }
+
+   SetHelp $skymenu ".  The number of interior knots used along each axis in the fitted sky surfaces. A value of 1 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
 
 # Add items to the "Mapping Types" sub-menu.
    set mapmenu [menu $OPTSMENU.map]

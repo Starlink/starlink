@@ -1,4 +1,3 @@
-
 proc Accept {} {
 #+
 #  Name:
@@ -6899,6 +6898,7 @@ proc LoadOptions {} {
    global ATASK_VIEW
    global ATASK_XHAIR
    global ATASK_XHRCOL
+   global ATASK_SKNOTS
    global BADCOL      
    global CHAR_LIST
    global CHAR_STOP
@@ -6919,6 +6919,7 @@ proc LoadOptions {} {
    global SI_LIST
    global SI_VARS
    global SKYOFF               
+   global SKY_KNOTS
    global VIEW
    global XHAIR
    global XHRCOL
@@ -6975,6 +6976,13 @@ proc LoadOptions {} {
      set ATASK 1
    } {
      set INTERP Linear
+   }
+
+   if { [info exists ATASK_SKNOTS] } {
+     set SKY_KNOTS $ATASK_SKNOTS
+     set ATASK 1
+   } {
+     set SKY_KNOTS 1
    }
 
    if { [info exists ATASK_PLO] } {
@@ -9415,6 +9423,7 @@ proc SaveOptions {} {
    global ATASK_SAREA
    global ATASK_SELCOL
    global ATASK_SI
+   global ATASK_SKNOTS
    global ATASK_SKYOFF
    global ATASK_VIEW
    global ATASK_XHAIR
@@ -9437,6 +9446,7 @@ proc SaveOptions {} {
    global SI_LIST
    global SI_VARS
    global SKYOFF           
+   global SKY_KNOTS
    global VIEW
    global XHAIR
    global XHRCOL
@@ -9459,6 +9469,7 @@ proc SaveOptions {} {
      set ATASK_PHI $PHI_REQ
      set ATASK_INTERP $INTERP
      set ATASK_VIEW $VIEW
+     set ATASK_SKNOTS $SKY_KNOTS
 
      foreach fittype [array names MAPTYPE] {
         if { $MAPTYPE($fittype) == $FITTYPE } { break } 

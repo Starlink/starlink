@@ -187,6 +187,15 @@
 *        background to be subtracted from each output image is determined 
 *        by fitting a surface to sky areas identified by the user within
 *        the supplied object frames. [!]
+*     SKYKNOTS = _INTEGER (Update)
+*        If no sky frames are supplied using parameter SKYFRAMES, then
+*        the sky in each output image will be fitted using a bi-cubic
+*        spline surface. The number of interior knots along each dimension
+*        of these surfaces is given by this parameter (SKYKNOTS). For
+*        instance, a value of 1 will result in a flat surface (i.e. a
+*        constant value) being used, and larger values will result in
+*        greater flexibility. The supplied value must be in the range 1
+*        to 11. [1]
 *     SKYOFF = _LOGICAL (Update)
 *        If a true value is supplied, then the sky background is removed
 *        from each output image. Otherwise, no sky background is removed.
@@ -325,6 +334,7 @@
      :        PSF,               ! Size of feature to search for
      :        SIZE,              ! Total size of the object frame group
      :        SIZEO,             ! Total size of the output group (=SIZE)
+     :        SKNOTS,            ! No. of interior knots on each axis of a sky surface
      :        SSIZE              ! Total size of the sky frame group
       LOGICAL 
      :        AGAIN,             ! Get a list of sky frames again?
@@ -441,6 +451,18 @@
       CALL PAR_GET0I( 'PSFSIZE', PSF, STATUS )
       IF ( PSF .LT. 0 ) PSF = 0
 
+*  Get the number of knots along each axis of a spline sky surface.
+      IF ( SSIZE .LT. 0 ) THEN
+         CALL PAR_GET0I( 'SKYKNOTS', SKNOTS, STATUS )
+         IF ( SKNOTS .LT. 1 ) THEN
+            SKNOTS = 1
+         ELSE IF ( SKNOTS .GT. 11 ) THEN
+            SKNOTS = 11
+         END IF
+      ELSE
+         SKNOTS = 1
+      END IF
+
 *  Get the dots per inch to assume for the screen. A null valu means
 *  use the normal TK value. Annull the error if it occurs.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -501,7 +523,7 @@
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
      :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, 
-     :             IGRPS, SSIZE, SKYOFF, STATUS )
+     :             IGRPS, SSIZE, SKYOFF, SKNOTS, STATUS )
 
 *  The various options values may have been altered by the use of the 
 *  "Options" menu in the GUI. Write them back to the parameter file in case.
@@ -525,6 +547,7 @@
       CALL PAR_PUT0C( 'XHAIRCOL', XHRCOL, STATUS )
       CALL PAR_PUT1R( 'PERCENTILES', 2, PERCNT, STATUS )
       CALL PAR_PUT0C( 'VIEW', VIEW, STATUS )
+      CALL PAR_PUT0I( 'SKYKNOTS', SKNOTS, STATUS )
 
 *  Delete the groups.
       CALL GRP_DELET( IGRP1, STATUS )

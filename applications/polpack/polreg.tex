@@ -240,7 +240,8 @@
 
 \section {\mylabel{POLREG_OVERVIEW}Introduction}
 PolReg is an interactive tool for aligning images so that they can
-subsequently be compared on a pixel-by-pixel basis. It is primarily
+subsequently be compared on a pixel-by-pixel basis. It can also
+optionally remove sky backgrounds from the images. It is primarily
 intended for use with imaging polarimetry data, but can also be used with
 other data (in single-beam mode - see below). It relies on the
 identification by the user of point-like features within the images in
@@ -255,7 +256,8 @@ point-like image features in all of the input images. These are used to
 obtain the geometric mappings which map positions in each input image to
 the corresponding positions in the first input image (the first image in
 the list of supplied input images thus defines the output pixel
-coordinate frame). On completion, each input image is re-sampled using the
+coordinate frame). On completion, a sky background is removed from each input 
+image. The resulting image is then re-sampled using the
 appropriate mapping to produce a corresponding output image. In addition,
 a cursor may be used to specify selected areas to be copied to the
 output image (other areas are left blank). By default, the same areas are
@@ -271,15 +273,16 @@ corresponding $O$ and $E$ ray positions in at least one of the input
 images, so that the $OE$ mapping (i.e. the geometric mapping from a given
 sky position in the $E$-ray picture to the same sky position in the
 $O$-ray picture) may be determined. In addition, the user must identify
-the areas containing each of the two pictures.  On completion, the areas
-containing each of the two pictures are extracted into two separate
-output images,
+the areas containing each of the two pictures.  On completion, $O$ and $E$
+sky backgrounds are removed from each input image. The areas containing
+each of the two pictures are then extracted into two separate output images,
 and the $E$-ray images are mapped so that they are aligned with the
 corresponding $O$-ray images. These are then all aligned with the $O$-ray
 image extracted from the first input image (in fact the two mappings are
 combined together into a single re-sampling operation). The user must
 previously have identified image features (either $E$ or $O$ ray) within
-each of the input images so that the inter-image mappings can be determined.
+each of the input images so that the inter-image mappings can be
+determined.
 
 \end {description}
 
@@ -289,10 +292,45 @@ available in the PolReg Graphical User Interface (GUI) are the same
 in both modes, except that controls related to the $E$-ray areas are
 disabled in single-beam mode.
 
+\section {\mylabel{POLREG_SKYSUB}Sky Subtraction}
+By default, PolReg estimates and removes the sky background from each
+output image. This may be suppressed using the SKYOFF parameter when
+PolReg is run, or the \htmlref{{\em Remove Sky}}{POLREG_REMOVE_SKY} 
+item in the \htmlref{{\em Options}}{POLREG_OPTIONS_MENU} menu
+within the GUI. If sky subtraction is enabled, it will be performed in
+one of two ways, depending on whether any sky frames have been supplied:
+
+\begin{enumerate}
+
+\item The user can supply a set of sky frames (one for each input object
+frame) when {\tt polreg} is run, using the SKYFRAMES parameter. Each sky
+frame is subtracted off the corresponding input object frame,
+pixel-by-pixel, before extracting and aligning the output images. If only
+one sky frame is supplied, then it is used for all input object frames.
+The sky frames must be specified when PolReg is run; they may not be
+specified within the GUI.
+
+\item If no sky frames are supplied, then the user can identify sky areas
+within each of the input object frames (this is done in a similar way to
+the identification of the $O$ and $E$ ray masks). In dual beam mode,
+separate sky areas must be identified for the $O$ and $E$ ray pictures.
+Bi-cubic spline surfaces are then fitted to these sky areas, and removed
+from the corresponding areas of the input object frame.
+
+\end{enumerate}
+
+The effect of sky subtraction on an image can be previewed using the
+\htmlref{{\em Sky Subtraction}}{POLREG_SKYSUB_EFFECT} item in the 
+\htmlref{{\em Effects}}{POLREG_EFFECTS_MENU} menu.
+
 \section {\mylabel{POLREG_TUTORIAL}Tutorial}
 This is a click-by-click introduction to the use of PolReg, which aims to
 get you going with the minimum delay. It does not cover all possibilities,
-and assumes you have a relatively simple problem to solve.
+and assumes you have a relatively simple problem to solve. In particular, 
+it assumes that the sky background for each output image is to be
+estimated in specified areas within the corresponding input object frame
+(see \hyperref{here}{section }{}{POLREG_SKYSUB} if you wish to use
+separate sky frames instead).
 
 \subsection {Single-beam Mode}
 To be written.
@@ -307,7 +345,7 @@ you want to align the data in the four images {\tt m101\_a}, {\tt
 m101\_b}, {\tt m101\_c} and {\tt m101\_d}, putting the aligned $O$-ray
 images in {\tt m101\_a\_O}, {\tt m101\_b\_O}, etc, and the aligned
 $E$-ray images in {\tt m101\_a\_E}, {\tt m101\_b\_E}, etc, then run
-polreg as follows:
+{\tt polreg} as follows:
 
 \begin{verbatim}
    % polreg in='m101_a,m101_b,m101_c,m101_d' out_o='*_O' out_e='*_E'
@@ -521,6 +559,35 @@ necessary, using the same techniques as for the $O$-ray mask. Note,
 default masks are created using the current mappings. No attempt is made
 to modify these masks to take account of any subsequently changes in
 the mappings.
+
+\subsubsection {Identifying the sky areas.}
+The next step is to identify the areas in which the sky background will
+be estimated.\footnote{This tutorial assumes that the input object frames
+contain some suitable sky areas. If this is not the case, then you may
+wish to supply separate sky frames instead. To do this, you should assign
+the list of sky frames to the SKYFRAMES parameter when starting {\tt
+polreg}. If this is done you need not identify any sky areas.} 
+To do this, click on the {\em O-ray sky area} button in the box
+labelled \htmlref{{\em Current:}}{POLREG_CURRENT}. Sky areas within
+the $O$-ray picture can then be identified using the cursor in just the 
+same way as the $O$-ray mask. More than one polygon may be supplied if
+necessary. 
+
+Once the $O$-ray sky areas have been identified, you can click on the
+{\em E-ray sky areas} button in the box labelled \htmlref{{\em
+Current:}}{POLREG_CURRENT}. This will cause default $E$-ray sky areas to
+be created by transforming the $O$-ray sky areas using the current
+mapping between the $O$ and $E$ ray pictures. You can then edit these
+areas, if necessary. Note, default sky areas are created using the
+current mappings. No attempt is made to modify these areas to take
+account of any subsequently changes in the mappings.
+
+When the output images are created, the mean value in these sky areas
+will be found and subtracted from the corresponding output images. Options
+exist to subtract a surface fitted to the sky areas, instead of the mean
+sky value (see \hyperref{here}{section }{}{POLREG_SKY} for details).
+
+
 
 \subsubsection {Identifying $O$-ray features in the next input image.}
 Now, you need to supply features which allow the next image to be
@@ -843,6 +910,12 @@ marked as being out-of-date and will subsequently be re-calculated using
 the new mapping type when they are next accessed (eg when displaying
 aligned reference features or creating the output images).
 
+\item [\mylabel{POLREG_SKY}{\em Sky}] - This is used to control the form
+of the sky background subtracted from the output images. It is disabled
+unless the sky background is being estimated on the basis of identified
+sky areas within the input object frames.
+
+
 \item [\mylabel{POLREG_STATUS_ITEMS}{\em Status Items}] - This is used to
 customise the contents of the \htmlref{status area}{POLREG_STATUS_AREA}
 shown below the image display area. Selecting this item will result in the 
@@ -891,7 +964,7 @@ If this menu item is selected, the current option values (together with
 the values shown in the \htmlref{{\em \% not white}}{POLREG_NOT_WHITE}
 and \htmlref{{\em \% black}}{POLREG_BLACK} controls) will be saved so that
 they become the default values for future invocations of
-PolReg.\footnote{The current values are passed back to the polreg A-task 
+PolReg.\footnote{The current values are passed back to the {\tt polreg} A-task 
 upon completion, and they are then stored in the A-tasks parameter file.}
 
 \end{description} 
@@ -917,6 +990,12 @@ the centroiding process) using the
 images are always based on the supplied input images, and are not
 influenced by these effects.
 
+If more than one effect is applied to an image, then each effect is
+applied to the image resulting from the previous effect. The most recent
+effect may be removed using the \htmlref{{\em Undo}}{POLREG_UNDO_EFFECT}
+menu item. All effects may be removed using the \htmlref{{\em Undo
+All}}{POLREG_UNDO_ALL_EFFECT} menu item.
+
 Effects applied to an image remain active until they are canceled using
 the \htmlref{{\em Undo}}{POLREG_UNDO_EFFECT} or
 \htmlref{{\em Undo All}}{POLREG_UNDO_ALL_EFFECTS} items in this menu. Thus
@@ -929,7 +1008,10 @@ the effects will still be in place when the original image is re-selected.
 \item [\mylabel{POLREG_ALIGN_EFFECT}{\em Align} ] - To be written.
 \item [\mylabel{POLREG_FILL_EFFECT}{\em Fill} ] - To be written.
 \item [\mylabel{POLREG_FILTER_EFFECT}{\em Filter} ] - To be written.
+\item [\mylabel{POLREG_LOG_EFFECT}{\em Log} ] - To be written.
 \item [\mylabel{POLREG_MATHS_EFFECT}{\em Maths} ] - To be written.
+\item [\mylabel{POLREG_NEGATE_EFFECT}{\em Negate} ] - To be written.
+\item [\mylabel{POLREG_SKYSUB_EFFECT}{\em Sky Subtraction} ] - To be written.
 \item [\mylabel{POLREG_SMOOTH_EFFECT}{\em Smooth} ] - To be written.
 \item [\mylabel{POLREG_THRESHOLD_EFFECT}{\em Threshold} ] - To be written.
 \item [\mylabel{POLREG_SHOW_EFFECTS}{\em Show Effects} ] - To be written.

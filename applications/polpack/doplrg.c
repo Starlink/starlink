@@ -45,7 +45,8 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         CHARACTER(VIEW), REAL(PLO), REAL(PHI), LOGICAL(NEWCM),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
-                        INTEGER(STATUS) TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
+                        INTEGER(SKNOTS), INTEGER(STATUS) 
+                        TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
                         TRAIL(VIEW) TRAIL(XHRCOL) ){
 /*
@@ -132,6 +133,8 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        The number of sky frames in the group identified by IGRPS.
 *     SKYOFF = LOGICAL (Given and Returned)
 *        Should the sky background be removed from the output images?
+*     SKNOTS = INTEGER (Given and Returned)
+*        No. of interior knots along each axis of a spline sky surface.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -175,6 +178,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_INTEGER(SSIZE)
    GENPTR_LOGICAL(SKYOFF)
    GENPTR_LOGICAL(STHLP)
+   GENPTR_INTEGER(STHLP)
 
    Tcl_Interp *interp = NULL;
    char *col = NULL;
@@ -266,6 +270,9 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
    sprintf( text, "%d", *PSF );
    SetVar( interp, "ATASK_PSF", text, TCL_LEAVE_ERR_MSG, STATUS );
+
+   sprintf( text, "%d", *SKNOTS );
+   SetVar( interp, "ATASK_SKNOTS", text, TCL_LEAVE_ERR_MSG, STATUS );
 
    si = (char *) malloc ( sizeof(char)*(size_t) ( SI_length + 1 ) );
    if ( si ) {
@@ -464,6 +471,11 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    tp = GetVar( interp, "ATASK_PSF", TCL_LEAVE_ERR_MSG, STATUS );
    if ( tp ) {
       sscanf( tp, "%d", PSF );
+   }
+
+   tp = GetVar( interp, "ATASK_SKNOTS", TCL_LEAVE_ERR_MSG, STATUS );
+   if ( tp ) {
+      sscanf( tp, "%d", SKNOTS );
    }
 
    tp = GetVar( interp, "ATASK_SI", TCL_LEAVE_ERR_MSG, STATUS );
