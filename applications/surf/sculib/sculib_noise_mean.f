@@ -73,6 +73,11 @@
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     26-MAY-1995 (JFL)
 *        Original version.
@@ -84,6 +89,10 @@
 *     17-Nov-1998 (TIMJ)
 *        Add inherited status and BYTE quality
 *     $Log$
+*     Revision 1.2  1999/08/03 19:35:16  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.1  1999/01/06 19:44:22  timj
 *     Initial revision
 *
@@ -100,12 +109,12 @@
 *  Global constants:
       INCLUDE 'SAE_PAR'
 
-*  Import:
+*  Arguments Given:
       INTEGER       N_INTEGRATIONS
       INTEGER       N_BOLS
       REAL          DEMOD (5, N_BOLS, N_INTEGRATIONS)
 
-*  Export:
+*  Arguments Returned:
       REAL          CHOP_DATA (N_BOLS)
       REAL          CHOP_VARIANCE (N_BOLS)
       REAL          CAL_DATA (N_BOLS)
@@ -115,7 +124,7 @@
 *  Scratch:
       INTEGER       WORKSPACE ( N_BOLS )
 
-*    Status:
+*  Status:
       INTEGER STATUS
 
 *  External references:
@@ -128,6 +137,7 @@
 
 *  Internal References:
 *  Local data:
+
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN

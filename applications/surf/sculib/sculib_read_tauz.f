@@ -1,7 +1,13 @@
-*+  SCULIB_READ_TAUZ - read sky zenith optical depths from a named file
       SUBROUTINE SCULIB_READ_TAUZ (FILE, MAX_FILT, N_FILT, FILTER, 
      :  TAUZ, DATEM, DAY, RUN, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_READ_TAUZ
+
+*  Purpose:
+*     read sky zenith optical depths from a named file
+
+*  Description:
 *     This routine reads filter names and associated sky zenith opacities 
 *     from an ASCII file named in FILE. The format of each line in the file 
 *     that contains sky information is assumed to be:-
@@ -30,10 +36,12 @@
 *     This routine reads a file written by SCUDR_END_SKYDIP, so these 2
 *     routines should be changed together when necessary.
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_READ_TAUZ (FILE, MAX_FILT, N_FILT, FILTER, 
 *    :  TAUZ, DATEM, DAY, RUN, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     FILE                              = CHARACTER*(*) (Given)
 *           the name of the file
 *     MAX_FILT                          = INTEGER (Given)
@@ -53,39 +61,62 @@
 *           the run number of the measurement
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *    11-OCT-1994: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'               ! for VAL__BADx
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) FILE
       INTEGER MAX_FILT
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       INTEGER N_FILT
       CHARACTER*(*) FILTER (MAX_FILT)
       REAL TAUZ (MAX_FILT)
       CHARACTER*(*) DATEM (MAX_FILT)
       DOUBLE PRECISION DAY (MAX_FILT)
       INTEGER RUN (MAX_FILT)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER MAX_WRD                 ! number of words on a valid bolometer
       PARAMETER (MAX_WRD = 10)        ! definition line
-*    Local variables :
+
+*  Local variables:
       INTEGER          BUFLEN         ! length of line read from file
       LOGICAL          ERROR          ! T if an error occurs understanding a
                                       ! line in the file
@@ -109,9 +140,12 @@
       INTEGER          T_RUN          !
       REAL             T_TAUZ         !
       CHARACTER*30     WORD (MAX_WRD) ! individual words in LINE
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

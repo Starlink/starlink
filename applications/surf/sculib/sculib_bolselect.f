@@ -1,10 +1,16 @@
-*+  SCULIB_BOLSELECT - interpret a list of selected bolometers
       SUBROUTINE SCULIB_BOLSELECT (BOLOMETERS, BOL_TYPE, BOL_CALIB,
      :  BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, NUM_ADC,
      :  ARRAY_CENTRE_DU3, ARRAY_CENTRE_DU4, BOL_SELECT_CHAN, 
      :  BOL_SELECT_ADC, N_BOL_SELECT, MAX_SUB, SUB_INSTRMNT, N_SUB, 
      :  CENTRE_DU3, CENTRE_DU4, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_BOLSELECT
+
+*  Purpose:
+*     interpret a list of selected bolometers
+
+*  Description:
 *     Interpret a character string containing a list of bolometers, 
 *     put number of bolometers to be used in N_BOL_SELECT, channel
 *     and ADC of selected bolometers in BOL_SELECT_CHAN and BOL_SELECT_ADC
@@ -66,13 +72,15 @@
 *     The routine will not work properly if the input BOLOMETERS string 
 *     is more than 400 characters long.
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_BOLSELECT (BOLOMETERS, BOL_TYPE, BOL_CALIB,
 *    :  BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, NUM_ADC,
 *    :  ARRAY_CENTRE_DU3, ARRAY_CENTRE_DU4, BOL_SELECT_CHAN, 
 *    :  BOL_SELECT_ADC, N_BOL_SELECT, MAX_SUB, SUB_INSTRMNT, N_SUB, 
 *    :  CENTRE_DU3, CENTRE_DU4, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     BOLOMETERS                  = CHARACTER*(*) (Given)
 *           list of bolometer selections
 *     BOL_TYPE (NUM_CHAN, NUM_ADC)
@@ -119,22 +127,38 @@
 *           the DU4 of the instrument 'centre'
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL), adapted from transputer routine by IAS.
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     2-SEP-1993: DC channels added (REVAD::JFL)
 *    25-AUG-1994: `centre' derivation revamped (REVAD::JFL)
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'            ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) BOLOMETERS
       INTEGER NUM_CHAN, NUM_ADC
       CHARACTER*(*) BOL_TYPE (NUM_CHAN, NUM_ADC)
@@ -144,7 +168,8 @@
       INTEGER BOL_QUAL (NUM_CHAN, NUM_ADC)
       INTEGER MAX_SUB
       REAL ARRAY_CENTRE_DU3, ARRAY_CENTRE_DU4
-*    Export :
+
+*  Arguments Returned:
       LOGICAL BOL_ENABLED (NUM_CHAN, NUM_ADC)
       INTEGER BOL_SELECT_CHAN (NUM_CHAN * NUM_ADC)
       INTEGER BOL_SELECT_ADC (NUM_CHAN * NUM_ADC)
@@ -152,14 +177,18 @@
       INTEGER N_SUB
       CHARACTER*(*) SUB_INSTRMNT (MAX_SUB)
       REAL CENTRE_DU3, CENTRE_DU4
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references:
+
+*  External references:
       INTEGER CHR_LEN              !CHR  string-length function
-*    Local constants :
+
+*  Local constants:
       INTEGER MAX_WORDS            ! max number of words in BOLOMETERS
       PARAMETER (MAX_WORDS = 20)
-*    Local variables :
+
+*  Local variables:
       LOGICAL DONE                 ! loop controller
       LOGICAL DUPLICATE            ! T if bolometer has already been selected
       LOGICAL REPEAT_WORD (MAX_WORDS)
@@ -194,7 +223,8 @@
       CHARACTER*20 TYPE            ! bolometer type
       CHARACTER*30 WARNING         ! text for warning message
       CHARACTER*400 COPY           ! copy of BOLOMETERS
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

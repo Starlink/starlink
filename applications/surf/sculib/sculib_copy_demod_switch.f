@@ -1,20 +1,28 @@
-*+  SCULIB_COPY_DEMOD_SWITCH - copy a switch of demodulated data into
-*                              arrays holding the switch chop data, chop 
-*                              variance, calibrator, cal variance and quality
-*                              separately
       SUBROUTINE SCULIB_COPY_DEMOD_SWITCH (NBOLS, NDATA, NJIG, LEVEL,
      :  SWITCH, SWITCH_DATA, SWITCH_VARIANCE, SWITCH_CALIBRATOR,
      :  SWITCH_CAL_VARIANCE, SWITCH_QUALITY, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_COPY_DEMOD_SWITCH
+
+*  Purpose:
+*     copy a switch of demodulated data into
+*     arrays holding the switch chop data, chop
+*     variance, calibrator, cal variance and quality
+*     separately
+
+*  Description:
 *     This routine copies the demodulated data for the jiggle positions
 *     measured in the last switch into separate arrays for the switch
 *     chop data, chop variance, calibrator, cal variance and quality.
 *     Quality is marked bad if BIT 1 is set and LEVEL is greater than requested
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_COPY_DEMOD_SWITCH (NBOLS, NDATA, NJIG,
 *    :  SWITCH, SWITCH_DATA, SWITCH_VARIANCE, SWITCH_CALIBRATOR,
 *    :  SWITCH_CAL_VARIANCE, SWITCH_QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     NBOLS                           = INTEGER (Given)
 *           number of bolometers being measured
 *     NDATA                           = INTEGER (Given)
@@ -38,44 +46,70 @@
 *           quality for this switch of the exposure
 *     STATUS                          = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     5-AUG-1993: Original version.
 *     9-JUL-1996: Modified to handle v200 demodulated data with 5 data
 *                 per measured point (JFL).
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER NBOLS, NDATA, NJIG, LEVEL
       REAL SWITCH (NDATA, NBOLS, NJIG)
-*    Inport-Export :
-*    Export :
+
+*  Inport-Export:
+
+*  Arguments Returned:
       REAL SWITCH_DATA (NBOLS, NJIG)
       REAL SWITCH_VARIANCE (NBOLS, NJIG)
       REAL SWITCH_CALIBRATOR (NBOLS, NJIG)
       REAL SWITCH_CAL_VARIANCE (NBOLS, NJIG)
       BYTE SWITCH_QUALITY (NBOLS, NJIG)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITON
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER J 
       INTEGER BOL
       INTEGER NQUAL      ! Integer quality
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,52 +1,86 @@
-*+  SCULIB_MRQCOF - called by SCULIB_MRQMIN
       SUBROUTINE SCULIB_MRQCOF (X, Y, SIG, NDATA, A, IA, MA, ALPHA,
      :  BETA, NALP, CHISQ, FUNCS, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_MRQCOF
+
+*  Purpose:
+*     called by SCULIB_MRQMIN
+
+*  Description:
 *     Utility routine called by SCULIB_MRQMIN, copied from Numerical
 *     Recipes in Fortran, p. 681. Used by SCULIB_MRQMIN to evaluate the
 *     linearised fitting matrix ALPHA, and vector BETA, and calculate
 *     chi-squared.
 *        Copied from MRQCOF on p.681 of Numerical Recipes in Fortran, with
 *     STATUS added.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_MRQCOF (X, Y, SIG, NDATA, A, IA, MA, ALPHA,
 *    :  BETA, NALP, CHISQ, FUNCS, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     parameter[(dimensions)]=type(access)
 *           <description of parameter>
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     13-SEP-1993: Original copy (REVAD::JFL)
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER MA, NALP, NDATA, IA(MA)
       REAL A(MA), SIG(NDATA), X(NDATA), Y(NDATA)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL CHISQ, ALPHA(NALP,NALP), BETA(MA)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       EXTERNAL FUNCS
-*    Global variables :
-*    Local Constants :
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER MMAX
       PARAMETER (MMAX = 20)
-*    Local variables :
+
+*  Local variables:
       INTEGER MFIT, I, J, K, L, M
       REAL DY, SIG2I, WT, YMOD, DYDA(MMAX)
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       MFIT = 0
       DO J = 1, MA

@@ -126,9 +126,18 @@
 *     J.Lightfoot (REVAD::JFL)
 *     Nick Tothill (N.F.H.Tothill@qmw.ac.uk)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.17  1999/08/03 19:35:00  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.16  1999/03/24 00:28:03  timj
 *     Increase the common-block for fitting to 500
 *

@@ -38,8 +38,17 @@
 *  Authors:
 *     T.Jenness   (JACH)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.2  1999/08/03 19:35:14  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.1  1998/01/14 02:34:10  timj
 *     Initial revision
 *

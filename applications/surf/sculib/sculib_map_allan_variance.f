@@ -1,9 +1,15 @@
-*+  SCULIB_MAP_ALLAN_VARIANCE - incorporate latest set of MAP demodulated data 
-*                               into Allan variance
       SUBROUTINE SCULIB_MAP_ALLAN_VARIANCE (DEMOD, N_BOLS, N_SAMPLES, 
      :  N_ALLAN_BOL, ALLAN_BOL, KMAX, SUM, N_SUM, ARTIFICIAL, 
      :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_MAP_ALLAN_VARIANCE
+
+*  Purpose:
+*     incorporate latest set of MAP demodulated data 
+*     into Allan variance
+
+*  Description:
 *     This routine incorporates a data slice into a run of data and
 *     updates the Allan variance of the run.
 *        The Allan variance is calculated for a range of simulated integration
@@ -87,11 +93,13 @@
 *
 *     end of loop through samples in this dataslice
 *
-*    Invocation :
+
+*  Invocation:
 *     SUBROUTINE SCULIB_MAP_ALLAN_VARIANCE (DEMOD, N_BOLS, N_SAMPLES, 
 *    :  N_ALLAN_BOL, ALLAN_BOL, KMAX, SUM, N_SUM, ARTIFICIAL, 
 *    :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     DEMOD (4, N_BOLS, N_SAMPLES)    = REAL (Given)
 *           the demodulated data (data,-,-,quality)
 *     N_BOLS                          = INTEGER (Given)
@@ -125,40 +133,63 @@
 *           quality on the Allan variance
 *     STATUS                          = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     21-JUL-1994: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N_BOLS
       INTEGER N_SAMPLES
       REAL DEMOD (4, N_BOLS, N_SAMPLES)
       INTEGER N_ALLAN_BOL
       INTEGER ALLAN_BOL (N_ALLAN_BOL)
       INTEGER KMAX
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL SUM (KMAX)
       INTEGER N_SUM (KMAX)
       REAL ARTIFICIAL (KMAX)
       INTEGER N_ARTIFICIAL (KMAX)
       REAL ALLAN_VARIANCE (KMAX)
-*    Export :
+
+*  Arguments Returned:
       INTEGER ALLAN_QUALITY (KMAX)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       REAL    ALLAN_SUM
       INTEGER A_BOL
       INTEGER K
@@ -166,9 +197,12 @@
       INTEGER SAMP
       REAL    SAMPLE
       INTEGER SAMPLE_N
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

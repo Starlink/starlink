@@ -32,8 +32,17 @@
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.3  1999/08/03 19:35:17  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.2  1999/07/30 19:58:15  timj
 *     Minor header tweaks.
 *

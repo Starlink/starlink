@@ -1,7 +1,13 @@
-*+  SCULIB_SET_USER - set the USER array used by SCULIB_SKYFUNC_1
       SUBROUTINE SCULIB_SET_USER (J_TEL, J_ATM, N_MEASUREMENTS,
      :  AIRMASS, J_MEAS_D, J_MEAS_V, USER)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SET_USER
+
+*  Purpose:
+*     set the USER array used by SCULIB_SKYFUNC_1
+
+*  Description:
 *     E04UPF is a NAG routine that is used to fit a theoretical
 *     sky-dip curve to the measured data by varying ETA_TEL, B and TAU.
 *     SCULIB_SKYFUNC_1 is called by E04UPF to calculate the M sub-functions
@@ -17,10 +23,12 @@
 *      USER (M+4:2M+3)   = the measured sky temperatures 
 *      USER (2M+4:3M+3)  = the errors on the measured sky temperatures
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_SET_USER (J_TEL, J_ATM, N_MEASUREMENTS,
 *    :  AIRMASS, J_MEAS_D, J_MEAS_V, USER)
-*    Parameters :
+
+*  Arguments:
 *     J_TEL                     = REAL (Given)
 *             the temperature of the telescope
 *     J_ATM                     = REAL (Given)
@@ -36,37 +44,63 @@
 *     USER (3 * N_MEASUREMENTS + 3)
 *                               = DOUBLE PRECISION (Returned)
 *             the USER array required
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     28-SEP-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-*    Import :
+
+*  Global constants:
+
+*  Arguments Given:
       REAL J_TEL
       REAL J_ATM
       INTEGER N_MEASUREMENTS
       REAL AIRMASS (N_MEASUREMENTS)
       REAL J_MEAS_D (N_MEASUREMENTS)
       REAL J_MEAS_V (N_MEASUREMENTS)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION USER (3 * N_MEASUREMENTS + 3)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       USER (1) = DBLE (J_TEL)
       USER (2) = DBLE (J_ATM)

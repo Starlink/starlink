@@ -1,15 +1,23 @@
-*+  SCULIB_GAUSSIAN_XISQ - calculate chi-squared of Gaussian fit
       SUBROUTINE SCULIB_GAUSSIAN_XISQ (XISQ, N, FIT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_GAUSSIAN_XISQ
+
+*  Purpose:
+*     calculate chi-squared of Gaussian fit
+
+*  Description:
 *     If entered with good status this routine calculates the chi-squared 
 *     between a dataset and a Gaussian function. Data points with bad quality 
 *     will be ignored, as will points with zero variance. A warning will be 
 *     issued if any data points with zero variance are encountered. If no 
 *     valid data points are found then an error will be reported and bad 
 *     status returned. The data are passed in via common.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_GAUSSIAN_XISQ (XISQ, N, FIT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     XISQ                   = DOUBLE PRECISION (Returned)
 *           the chi-squared of the current fit
 *     N                      = INTEGER (Given)
@@ -27,31 +35,52 @@
 *                                FIT(6) = the y coord of the centre 
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     23-MAR-1995: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INTEGER MAX_FIT_DATA            ! maximum number of measurements
       PARAMETER (MAX_FIT_DATA = 512)
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       DOUBLE PRECISION FIT (N)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION XISQ
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
+
+*  External references:
+
+*  Global variables:
       INTEGER NDATA_FIT                   ! number of measurements
       REAL    X_FIT (MAX_FIT_DATA)        ! x position of measurements
       REAL    Y_FIT (MAX_FIT_DATA)        ! y position of measurements
@@ -60,8 +89,10 @@
       INTEGER QUALITY_FIT (MAX_FIT_DATA)  ! quality on measurements
       COMMON /SCULIB_GAUSSIAN_FIT_DATA/ NDATA_FIT, X_FIT, 
      :  Y_FIT, DATA_FIT, VARIANCE_FIT, QUALITY_FIT
-*    Local Constants :
-*    Local variables :
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION A              ! = FIT(2)
       DOUBLE PRECISION ALPHA          ! angle between a line from the data
                                       ! point to the ellipse centre and the x 
@@ -81,9 +112,12 @@
       DOUBLE PRECISION YCENTRE        ! = FIT(6)
       LOGICAL ZERO_VARS               ! .TRUE. if any data with zero variance 
                                       ! are encountered
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

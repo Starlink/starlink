@@ -1,45 +1,79 @@
-*+  SCULIB_COVSRT - Numerical Recipes in Fortran routine called by 
-*                   SCULIB_MRQMIN
       SUBROUTINE SCULIB_COVSRT (COVAR, NPC, MA, IA, MFIT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_COVSRT
+
+*  Purpose:
+*     Numerical Recipes in Fortran routine called by 
+*     SCULIB_MRQMIN
+
+*  Description:
 *     Expand in storage the covariance matrix COVAR, so as to take into account
 *     parameters that are being held fixed. (For the latter return zero
 *     covariances). Copied from COVSRT in Numerical Recipes in Fortran, p.669,
 *     with STATUS added.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_COVSRT (COVAR, NPC, MA, IA, MFIT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     parameter[(dimensions)]=type(access)
 *           <description of parameter>
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     13-SEP-1993: Original copy.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER MA, MFIT, NPC, IA (MA)
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL COVAR (NPC, NPC)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I, J, K
       REAL SWAP
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

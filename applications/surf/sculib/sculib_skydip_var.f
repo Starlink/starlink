@@ -64,8 +64,16 @@
 *     Nick Tothill (N.F.H.Tothill@qmw.ac.uk)
 *     Tim Jenness (JACH)
 
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/03 19:35:30  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.3  1999/03/24 00:28:17  timj
 *     Increase the common-block for fitting to 500
 *
@@ -91,14 +99,14 @@
       INTEGER MAX_FIT_DATA               ! max number of measurements
       PARAMETER (MAX_FIT_DATA = 500)        
 
-*  Import:
+*  Arguments Given:
       INTEGER N
       DOUBLE PRECISION FIT (N)
       INTEGER NDEG
 
-*  Import-Export:
+*  Arguments Given & Returned:
 
-*  Export:
+*  Arguments Returned:
       DOUBLE PRECISION VAR
 
 *  Status:

@@ -45,6 +45,11 @@
 *     John Lightfoot (jfl@roe.ac.uk)
 *     Tim Jenness (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *    17-AUG-1995: original version, adapted from JCMT_BESSEL_REGRID_1
 *    1997 Apr 5 (timj)

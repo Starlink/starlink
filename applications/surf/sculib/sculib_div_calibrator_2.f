@@ -1,15 +1,23 @@
-*+  SCULIB_DIV_CALIBRATOR_2 - divides the mean of the calibrator signal into 
-*                             the chop signal
       SUBROUTINE SCULIB_DIV_CALIBRATOR_2 (N_BOLS, N_POS, DATA, VARIANCE, 
      :  CALIBRATOR, QUALITY,STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_DIV_CALIBRATOR_2
+
+*  Purpose:
+*     divides the mean of the calibrator signal into 
+*     the chop signal
+
+*  Description:
 *     This routine divides the calibrator signal into the chop signal and
 *     variance over an array of measurements. No division will occur if the 
 *     measurement quality is bad or the square of the calibrator signal is zero.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS, N_POS, DATA, VARIANCE, 
 *    :  CALIBRATOR, QUALITY)
-*    Parameters :
+
+*  Arguments:
 *     N_BOLS              = INTEGER (Given)
 *              Number of bolometers measured
 *     N_POS               = INTEGER (Given)
@@ -27,42 +35,68 @@
 *              Quality on DATA
 *     STATUS = INTEGER (Given & Returned)
 *              inherited status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER  N_BOLS
       INTEGER  N_POS
       REAL     CALIBRATOR (N_BOLS, N_POS)
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL     DATA (N_BOLS, N_POS)
       REAL     VARIANCE (N_BOLS, N_POS)
       BYTE     QUALITY (N_BOLS, N_POS)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITON
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BOL
       REAL    CAL_AVERAGE (144)
       INTEGER N_SUM
       INTEGER POS
       REAL    SUM
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

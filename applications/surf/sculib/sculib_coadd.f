@@ -1,9 +1,15 @@
-*+  SCULIB_COADD - coadd exposure into coadded result
       SUBROUTINE SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
      :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
      :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
      :   BADBIT, VARIANCE, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_COADD
+
+*  Purpose:
+*     coadd exposure into coadded result
+
+*  Description:
 *     This routine coadds the current exposure to the input coadd arrays
 *     and puts the result in the output coadd arrays. The input and output
 *     arrays can be the same. The coadd result is the average of exposures 
@@ -13,12 +19,14 @@
 *     available then the coadd variance is set equal to variance on the
 *     input data if present, otherwise it is set equal to zero.
 *     Input pixels with bad quality are ignored.
-*    Invocation :
+
+*  Invocation:
 *     SUBROUTINE SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
 *    :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
 *    :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
 *    :   BADBIT, VARIANCE, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N                       = INTEGER (Given)
 *           Number of elements in arrays.
 *     IN_DATA (N)             = REAL (Given)
@@ -49,26 +57,46 @@
 *           T if input data has variance associated with it
 *     STATUS                  = INTEGER (Given & Returned)
 *           Global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     5-JUL-1994: Renamed from SCUDR_COADD (JFL).
 *     $Log$
+*     Revision 1.4  1999/08/03 19:34:49  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.3  1999/05/15 04:21:36  timj
 *     Add status checking
 *
 
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'PRM_PAR'
       INCLUDE 'SAE_PAR'
 
-*    Import :
+
+*  Arguments Given:
       BYTE BADBIT
       INTEGER N
       REAL IN_DATA (N)
@@ -79,27 +107,38 @@
       BYTE INCOADD_QUAL (N)
       INTEGER INCOADD_NUMBER (N)
       LOGICAL VARIANCE
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL OUTCOADD_DATA (N)
       REAL OUTCOADD_VAR (N)
       BYTE OUTCOADD_QUAL (N)
       INTEGER OUTCOADD_NUMBER (N)
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I                   ! DO loop
       REAL    SUM                 ! sum of data coadded 
       REAL    SUMSQ               ! sum of data squared coadded
-*    Internal References :
-*    Local data :
-*    External functions:
+
+*  Internal References:
+
+*  Local data:
+
+*  External functions:
       INCLUDE 'NDF_FUNC'
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

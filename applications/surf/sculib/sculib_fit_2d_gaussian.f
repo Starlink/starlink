@@ -1,8 +1,14 @@
-*+  SCULIB_FIT_2D_GAUSSIAN - fit a 2D Gaussian to an image
       SUBROUTINE SCULIB_FIT_2D_GAUSSIAN (IDIM, JDIM, MAP_DATA,
      :  MAP_VARIANCE, MAP_QUALITY, X, Y, PEAK, PEAK_VAR,
      :  PEAK_QUAL, X_CENTRE, Y_CENTRE, X_HWHM, Y_HWHM, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FIT_2D_GAUSSIAN
+
+*  Purpose:
+*     fit a 2D Gaussian to an image
+
+*  Description:
 *     This routine fits a 2D Gaussian to an image of a source. It takes as 
 *     input data a map made of the source with pixels on a square grid.
 *        If status is good on entry, the routine will calculate the
@@ -55,11 +61,13 @@
 *     be output and PEAK_QUAL set bad. Otherwise, PEAK will be set to 
 *     volume / (pi * HWHM_x * HWHM_y).
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FIT_2D_GAUSSIAN (IDIM, JDIM, MAP_DATA,
 *    :  MAP_VARIANCE, MAP_QUALITY, X, Y, PEAK, PEAK_VAR,
 *    :  PEAK_QUAL, X_CENTRE, Y_CENTRE, X_HWHM, Y_HWHM, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     IDIM                              = INTEGER (Given)
 *           `I' dimension of map
 *     JDIM                              = INTEGER (Given)
@@ -90,41 +98,64 @@
 *           half-width half-max of image in y-axis
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     9-MAR-1994: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                          ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       INTEGER IDIM, JDIM
       REAL MAP_DATA (IDIM, JDIM)
       REAL MAP_VARIANCE (IDIM, JDIM)
       INTEGER MAP_QUALITY (IDIM, JDIM)
       REAL X (IDIM)
       REAL Y (JDIM)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL PEAK, PEAK_VAR
       INTEGER PEAK_QUAL
       REAL X_CENTRE, Y_CENTRE
       REAL X_HWHM, Y_HWHM
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       REAL PI
       PARAMETER (PI = 3.1415927)
-*    Local variables :
+
+*  Local variables:
       INTEGER I, J                          ! DO loop
       REAL SUM_Y2F                          ! sum of Y^2 * F
       REAL SUM_X2F                          ! sum of X^2 * F
@@ -134,9 +165,12 @@
       REAL MAXHW                            ! max (X_HWHM, Y_HWHM)
       REAL R2                               ! square of distance from map pixel
                                             ! to X_CENTRE, Y_CENTRE
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

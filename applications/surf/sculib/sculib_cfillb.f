@@ -1,43 +1,77 @@
-*+  SCULIB_CFILLB - fill a byte array with a constant
       SUBROUTINE SCULIB_CFILLB (N, IVAL, ARRAY)
-*    Description :
+*+
+*  Name:
+*     SCULIB_CFILLB
+
+*  Purpose:
+*     fill a byte array with a constant
+
+*  Description:
 *     fills an byte array with a constant
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_CFILLB (N, IVAL, ARRAY)
-*    Parameters :
+
+*  Arguments:
 *     N                  = INTEGER (Given)
 *           number of array elements
 *     IVAL               = BYTE (Given)
 *           constant to which array is to be set
 *     ARRAY (N)          = BYTE (Returned)
 *           array to be set
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     25.11.1992: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-*    Import :
+
+*  Global constants:
+
+*  Arguments Given:
       INTEGER N
       BYTE IVAL
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       BYTE ARRAY (N)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       DO I = 1, N
          ARRAY (I) = IVAL

@@ -1,6 +1,12 @@
-*+  SCULIB_FREE - release virtual memory
       SUBROUTINE SCULIB_FREE (NAME, START_PTR, END_PTR, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FREE
+
+*  Purpose:
+*     release virtual memory
+
+*  Description:
 *     This routine frees virtual memory obtained by SCULIB_MALLOC.
 *
 *     If status is bad on entry the routine will return immediately.
@@ -19,9 +25,11 @@
 *        error will be reported and bad status returned.
 *
 *     end if
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FREE (NAME, START_PTR, END_PTR, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     NAME                = CHARACTER*(*) (Given)
 *           name associated with VM
 *     START_PTR           = INTEGER (Given and returned)
@@ -30,44 +38,70 @@
 *           pointer to end of virtual memory
 *     STATUS              = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (ROE::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     18-OCT-1994: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                    ! for VAL__NBI
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) NAME
-*    Import-Export :
+
+*  Arguments Given & Returned:
       INTEGER START_PTR
       INTEGER END_PTR
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       REAL    VAL_ITOR                     ! conversion from integer to real
-*    Global variables :
-*    Local Constants :
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER BOUNDARY                     ! Number of bytes
       PARAMETER (BOUNDARY = VAL__NBD)      ! Used for sentinel integers
 
-*    Local variables :
+
+*  Local variables:
       LOGICAL LOWER                        ! .FALSE. if lower sentinel 
                                            ! has been corrupted
       REAL    RTEMP                        ! scratch real
       LOGICAL UPPER                        ! .FALSE. if upper sentinel has been
                                            ! corrupted
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

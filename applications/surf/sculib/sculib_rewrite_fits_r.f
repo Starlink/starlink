@@ -47,9 +47,18 @@
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T. Jenness (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *    History :
 *     $Id$
 *     $Log$
+*     Revision 1.5  1999/08/03 19:35:26  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.4  1997/11/19 02:32:05  timj
 *     Fix bug in length of string for CHR_TERM
 *
@@ -101,8 +110,10 @@
       CHARACTER*80 UNAME               ! upper case version of NAME
 
 *  Internal References:
+
 *  Local data:
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

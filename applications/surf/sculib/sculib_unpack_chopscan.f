@@ -1,13 +1,21 @@
-*+  SCULIB_UNPACK_CHOPSCAN - routine to unpack compressed chop-scan data
       SUBROUTINE SCULIB_UNPACK_CHOPSCAN (RESNBS, N_POINTS, ISTART,
      :   NPIX, POINTER, RESDATA_450, RESWT_450, RESDATA_850, RESWT_850, 
      :   RESDIM1, RESDIM2, BAD)
-*    Description :
-*    Invocation :
+*+
+*  Name:
+*     SCULIB_UNPACK_CHOPSCAN
+
+*  Purpose:
+*     routine to unpack compressed chop-scan data
+
+*  Description:
+
+*  Invocation:
 *     SUBROUTINE SCULIB_UNPACK_CHOPSCAN (RESNBS, N_POINTS, ISTART,
 *    :   NPIX, POINTER, RESDATA_450, RESWT_450, RESDATA_850, RESWT_850, 
 *    :   RESDIM1, RESDIM2, BAD)
-*    Parameters :
+
+*  Arguments:
 *     RESNBS (4, N_POINTS)                = REAL (Given)
 *           the `resampled data' noticeboard
 *     N_POINTS                            = INTEGER (Given)
@@ -32,19 +40,35 @@
 *           second dimension
 *     BAD                                 = REAL (Given)
 *           value signalling bad pixel
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N_POINTS
       REAL RESNBS (4, N_POINTS)
       INTEGER RESDIM1
@@ -53,21 +77,31 @@
       INTEGER NPIX (RESDIM2)
       INTEGER POINTER (RESDIM2)
       REAL BAD
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL RESDATA_450 (RESDIM1, RESDIM2)
       REAL RESWT_450 (RESDIM1, RESDIM2)
       REAL RESDATA_850 (RESDIM1, RESDIM2)
       REAL RESWT_850 (RESDIM1, RESDIM2)
-*    Export :
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Arguments Returned:
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I, J
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
 *  set the output arrays to bad values
 

@@ -116,9 +116,18 @@
 *  Authors:
 *     John Lightfoot (jfl@roe.ac.uk)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.6  1999/08/03 19:34:55  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.5  1999/07/29 23:44:25  timj
 *     Header tidy up.
 *

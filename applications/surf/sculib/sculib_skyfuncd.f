@@ -65,6 +65,11 @@
 *     JFL:  John Lightfoot (ROE/JAC: jfl@roe.ac.uk)
 *     {enter_new_authors_here}
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1996 (JFL):
 *        Original version.

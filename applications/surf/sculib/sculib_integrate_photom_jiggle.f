@@ -1,8 +1,14 @@
-*+  SCULIB_INTEGRATE_PHOTOM_JIGGLE - integrate the jiggle map made by a
-*                                    bolometer during a PHOTOM observation
       SUBROUTINE SCULIB_INTEGRATE_PHOTOM_JIGGLE (BOL, N_BOLS, J_COUNT,
      :  DATA, VARIANCE, QUALITY, RESULT_D, RESULT_V, RESULT_Q, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_INTEGRATE_PHOTOM_JIGGLE
+
+*  Purpose:
+*     integrate the jiggle map made by a
+*     bolometer during a PHOTOM observation
+
+*  Description:
 *     This routine just sums the data for the specified bolometer over the
 *     jiggle pattern.
 *       After checking status on entry the routine checks that the bolometer
@@ -10,10 +16,12 @@
 *     then loops through the jiggle pattern summing the valid data and variance
 *     measured at each position for that bolometer. If no valid data were
 *     obtained then the result quality will be set bad.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_INTEGRATE_PHOTOM_JIGGLE (BOL, N_BOLS, J_COUNT,
 *    :  DATA, VARIANCE, QUALITY, RESULT_D, RESULT_V, RESULT_Q, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     BOL                          = INTEGER (Given)
 *           the index of the bolometer whose data is to be integrated
 *     N_BOLS                       = INTEGER (Given)
@@ -34,41 +42,67 @@
 *           the quality on the sum
 *     STATUS                       = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     9-AUG-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER BOL
       INTEGER N_BOLS
       INTEGER J_COUNT
       REAL DATA (N_BOLS, J_COUNT)
       REAL VARIANCE (N_BOLS, J_COUNT)
       INTEGER QUALITY (N_BOLS, J_COUNT)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL RESULT_D
       REAL RESULT_V
       INTEGER RESULT_Q
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER J                         ! DO loop
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,4 +1,3 @@
-*+  SCULIB_GET_FITS_C - get the value of specified FITS character keyword
       SUBROUTINE SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, NAME,
      :  VALUE, STATUS)
 *+
@@ -7,13 +6,23 @@
 
 *  Purpose:
 *     get the value of specified FITS character keyword
+*+
+*  Name:
+*     SCULIB_GET_FITS_C
+
+
+*  Purpose:
+*     get the value of specified FITS character keyword
+
 
 *  Language:
 *     Starlink Fortran 77
  
+
 *  Invocation:
 *     CALL SCULIB_GET_FITS_C (MAX_FITS, N_FITS, FITS, NAME,
 *     :  VALUE, STATUS)
+
 
 *  Description:
 *     This routine will get the value of a specified FITS character keyword
@@ -30,7 +39,8 @@
 *     line does not conform to the above format an error will be reported
 *     and bad status returned.
 
-*  Parameters:
+
+*  Arguments:
 *     MAX_FITS             = INTEGER (Given)
 *           the maximum number of items in the FITS array
 *     N_FITS               = INTEGER (Given)
@@ -44,13 +54,24 @@
 *     STATUS               = INTEGER (Given and returned)
 *           global status 
 
+
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T. Jenness (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.3  1999/08/03 19:35:04  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.2  1997/11/19 18:52:02  timj
 *     Decode string by searching for quotes instead of a '/'.
 *     This fixes a bug in the DRT that sometimes does not put on a comment if the
@@ -61,10 +82,13 @@
 *
 *-
 
-*  Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
-*  Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
+
 
 *  Arguments Given:
       INTEGER MAX_FITS
@@ -74,18 +98,24 @@
 
 *  Arguments Given & Returned:
 
+
 *  Arguments Returned:
       CHARACTER*(*) VALUE
+
 
 *  Status:
       INTEGER STATUS
 
+
 *  External references:
       INTEGER      CHR_LEN             ! CHR used-string length function
 
+
 *  Global variables:
 
+
 *  Local Constants:
+
 
 *  Local variables:
       INTEGER      I                   ! DO loop index
@@ -98,7 +128,8 @@
       CHARACTER*80 STEMP               ! scratch string
       CHARACTER*80 UNAME               ! upper case version of NAME
 
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

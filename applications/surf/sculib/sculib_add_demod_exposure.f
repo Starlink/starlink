@@ -1,9 +1,15 @@
-*+  SCULIB_ADD_DEMOD_EXPOSURE - add demodulated data for an exposure into the
-*                               integration result
       SUBROUTINE SCULIB_ADD_DEMOD_EXPOSURE (N_BOLS, J_START, N_JIG,
      :  J_REPEAT, J_COUNT, EXP_DATA, EXP_VARIANCE, EXP_QUALITY,
      :  INT_DATA, INT_VARIANCE, INT_QUALITY, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_ADD_DEMOD_EXPOSURE
+
+*  Purpose:
+*     add demodulated data for an exposure into the
+*     integration result
+
+*  Description:
 *     This routine adds the reduced demodulated data for an exposure in a 
 *     jiggle-sampled observation into the integration result.
 *       The exposure can contain data either for all or part of ONE run
@@ -14,11 +20,13 @@
 *     integration variance will be set equal to the exposure value if there
 *     was just one valid measurement, or calculated from the dispersion of
 *     the exposure data about the mean otherwise.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_ADD_DEMOD_EXPOSURE (N_BOLS, J_START, N_JIG,
 *    :  J_REPEAT, J_COUNT, EXP_DATA, EXP_VARIANCE, EXP_QUALITY,
 *    :  INT_DATA, INT_VARIANCE, INT_QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_BOLS                           = INTEGER (Given)
 *           the number of bolometers measured
 *     J_START                          = INTEGER (Given)
@@ -43,20 +51,36 @@
 *           the integration quality
 *     STATUS                           = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     9-AUG-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N_BOLS
       INTEGER J_START
       INTEGER N_JIG
@@ -65,24 +89,34 @@
       REAL EXP_DATA (N_BOLS, N_JIG)
       REAL EXP_VARIANCE (N_BOLS, N_JIG)
       INTEGER EXP_QUALITY (N_BOLS, N_JIG)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL INT_DATA (N_BOLS, J_COUNT)
       REAL INT_VARIANCE (N_BOLS, J_COUNT)
       INTEGER INT_QUALITY (N_BOLS, J_COUNT)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BOL
       INTEGER J                   
       INTEGER JIG
       INTEGER REPEAT
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

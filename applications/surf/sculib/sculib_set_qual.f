@@ -1,11 +1,19 @@
-*+  SCULIB_SET_QUAL - set quality bits in a subset of a quality array
       SUBROUTINE SCULIB_SET_QUAL (USE_SECT, QUALITY, N_BOLS, N_POS, 
      :     N_BEAM, BOL_S, POS_S, BIT_POS, BIT_SWITCH, STATUS)
-*    Description :
-*    Invocation :
+*+
+*  Name:
+*     SCULIB_SET_QUAL
+
+*  Purpose:
+*     set quality bits in a subset of a quality array
+
+*  Description:
+
+*  Invocation:
 *     CALL SCULIB_SET_QUAL (QUALITY, N_BOLS, N_POS, N_BEAM, 
 *    :  BOL_S, POS_S, BIT_POS, BIT_SWITCH, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     USE_SECT                = LOGICAL (Given)
 *           am I changing SECTION or not SECTION
 *     QUALITY (N_BOLS, N_POS, N_BEAM)
@@ -30,18 +38,34 @@
 *           we unset the bit with SCULIB_BITOFF
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N_BOLS
       INTEGER N_POS
       INTEGER N_BEAM
@@ -50,23 +74,33 @@
       INTEGER BIT_POS
       LOGICAL BIT_SWITCH
       LOGICAL USE_SECT
-*    Import-Export :
+
+*  Arguments Given & Returned:
       BYTE QUALITY (N_BOLS, N_POS, N_BEAM)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITOFF                ! clear a bit
       BYTE SCULIB_BITON                 ! set a bit
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BEAM                      ! beam index in DO loop
       INTEGER BOL                       ! bolometer index in DO loop
       INTEGER POS                       ! measured position index in DO loop
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

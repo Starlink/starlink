@@ -53,6 +53,11 @@
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1997 April 5 (TIMJ):
 *       Original version
@@ -89,6 +94,8 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop counter
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

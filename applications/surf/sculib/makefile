@@ -1,3 +1,9 @@
+# Makefile for SCULIB
+
+#  Copyright:
+#     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
+
 FC    = f77
 FFLAGS = -g -C
 CFLAGS = 

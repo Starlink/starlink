@@ -1,8 +1,14 @@
-*+  SCULIB_UNPACK_JIGGLE - unpack demodulated data onto 2-d map
       SUBROUTINE SCULIB_UNPACK_JIGGLE (N_JIGGLES, N_BOLS, DEMOD, 
      :  J_START, JIGGLE_COUNT, I_JIGGLE, J_JIGGLE, IDIM, JDIM, 
      :  MAP_DATA, MAP_VARIANCE, MAP_QUALITY, J_END, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_UNPACK_JIGGLE
+
+*  Purpose:
+*     unpack demodulated data onto 2-d map
+
+*  Description:
 *     This routine unpacks the demodulated data from a switch onto a
 *     rectangular 2-d map. 
 *        If status is good on entry the data and variance of the output map 
@@ -28,11 +34,13 @@
 *     values contributed by the separate jiggles, variances will be calculated
 *     from the dispersion of the values about the mean if there was more than
 *     1, or set to the demodulated variance otherwise.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_UNPACK_JIGGLE (N_JIGGLES, N_BOLS, DEMOD, 
 *    :  J_START, JIGGLE_COUNT, I_JIGGLE, J_JIGGLE, IDIM, JDIM, 
 *    :  MAP_DATA, MAP_VARIANCE, MAP_QUALITY, J_END, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_JIGGLES                         = INTEGER (Given)
 *           number of jiggles in datablock
 *     N_BOLS                            = INTEGER (Given)
@@ -61,22 +69,38 @@
 *           index of last jiggle in datablock in the overall jiggle pattern
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     21-MAY-1993: Original version.
 *     18-NOV-1994: Checked (JFL).
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                 ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       INTEGER N_JIGGLES
       INTEGER N_BOLS
       REAL DEMOD (4, N_BOLS, N_JIGGLES)
@@ -86,27 +110,37 @@
       INTEGER J_JIGGLE (JIGGLE_COUNT)
       INTEGER IDIM
       INTEGER JDIM
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL MAP_DATA (IDIM, JDIM, N_BOLS)
       REAL MAP_VARIANCE (IDIM, JDIM, N_BOLS)
       INTEGER MAP_QUALITY (IDIM, JDIM, N_BOLS)
       INTEGER J_END
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BOL                       ! DO loop variable
       INTEGER I                         ! DO loop variable
       INTEGER IM                        ! array index
       INTEGER J                         ! DO loop variable
       INTEGER JIGGLE                    ! jiggle index
       INTEGER JM                        ! array index
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

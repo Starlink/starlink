@@ -1,8 +1,14 @@
-*+  SCULIB_CONVOLVE - convolve array A with array B to give result in R
       SUBROUTINE SCULIB_CONVOLVE (A_DATA, A_VARIANCE, A_QUALITY,
      :  B, N_A, N_B, N_MIDDLE, NORM, R_DATA, R_VARIANCE, R_QUALITY,
      :  BADBIT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_CONVOLVE
+
+*  Purpose:
+*     convolve array A with array B to give result in R
+
+*  Description:
 *     This routine convolves array A with array B using multiplication
 *     only (i.e. no FFTs are used). The routine assumes that the A arrays
 *     are N_A long and that the convolution array B is N_B long, centred
@@ -14,10 +20,12 @@
 *
 *     After this process the errors can no longer be considered independent.
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_CONVOLVE (A_DATA, A_VARIANCE, A_QUALITY, B, N_A, N_B,
 *    :  N_MIDDLE, NORM, R_DATA, R_VARIANCE, R_QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     A_DATA (N_A)                  = REAL (Given)
 *           input data array
 *     A_VARIANCE (N_A)              = REAL (Given)
@@ -44,21 +52,37 @@
 *           badbit mask
 *     STATUS                        = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     11-OCT-1995: original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N_A
       INTEGER N_B
       REAL    A_DATA (N_A)
@@ -68,18 +92,25 @@
       INTEGER N_MIDDLE
       REAL    NORM
       BYTE    BADBIT
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL    R_DATA (N_A)
       REAL    R_VARIANCE (N_A)
       BYTE    R_QUALITY (N_A)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITAND
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       LOGICAL DONE
       INTEGER JK                           ! DO loop index
       INTEGER JK1                          ! index in convolution array
@@ -87,10 +118,13 @@
       BYTE    QUAL
       REAL    SUM                          ! convolution data sum
       REAL    SUM_VAR                      ! convolution variance sum
-*    Internal References :
-*    Local data :
+
+*  Internal References:
+
+*  Local data:
       INCLUDE 'NDF_FUNC'
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

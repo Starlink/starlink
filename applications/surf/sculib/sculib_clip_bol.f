@@ -40,10 +40,19 @@
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
  
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.8  1999/08/03 19:34:49  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.7  1998/05/21 00:35:32  timj
 *     Sigma clipping is now used unless N_SIGMA is negative.
 *

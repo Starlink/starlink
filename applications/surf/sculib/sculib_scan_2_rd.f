@@ -69,8 +69,17 @@
 *     will not be modified.
 
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.5  1999/08/03 19:35:27  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.4  1999/07/14 20:13:27  timj
 *     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
 *     a parameter.

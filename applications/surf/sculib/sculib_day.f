@@ -1,32 +1,64 @@
-*+  SCULIB_DAY - returns date and time as day number since 1st Jan
       DOUBLE PRECISION FUNCTION SCULIB_DAY ()
-*    Description :
-*    Invocation :
+*+
+*  Name:
+*     SCULIB_DAY
+
+*  Purpose:
+*     returns date and time as day number since 1st Jan
+
+*  Description:
+
+*  Invocation:
 *     DAY = SCULIB_DAY ()
-*    Parameters :
-*    Result :
+
+*  Arguments:
+
+*  Result:
 *     SCULIB_DAY = DOUBLE PRECISION 
 *           date and time as a day number since 1st Jan
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     10-OCT-1994: Original version.
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Arguments Given:
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER DAY                         ! number of day in month
       INTEGER HOURS                       ! hours
       INTEGER ISDST                       ! daylight saving flag
@@ -39,9 +71,12 @@
       INTEGER WDAY                        ! number of day in week
       INTEGER YDAY                        ! number of day in year
       INTEGER YEAR                        ! last 2 digits of year
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       STATUS = SAI__OK
 

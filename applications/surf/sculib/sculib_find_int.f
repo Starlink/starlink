@@ -21,7 +21,7 @@
 *     data array if multiple measurements are being taken. For this
 *     reason, put this knowledge in one place.
 
-*  Parameters:
+*  Arguments:
 *     DEMOD_POINTER (N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS)
 *                           = INTEGER (Given)
 *           an array of pointers to the start of each switch
@@ -49,8 +49,17 @@
 *  Authors:
 *     Tim Jenness (t.jenness@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.2  1999/08/03 19:34:56  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.1  1999/05/25 23:35:46  timj
 *     First version
 *

@@ -54,10 +54,19 @@
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
  
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.6  1999/08/03 19:35:26  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.5  1998/02/16 06:16:30  timj
 *     Calculate the sky noise
 *

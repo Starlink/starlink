@@ -1,6 +1,12 @@
-*+  SCULIB_FIT_MAKEBETA - calculates beta matrix for SCULIB_FIT_FUNCTION
       SUBROUTINE SCULIB_FIT_MAKEBETA (XISQ_ROUTINE, N, A, BETA, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FIT_MAKEBETA
+
+*  Purpose:
+*     calculates beta matrix for SCULIB_FIT_FUNCTION
+
+*  Description:
 *     This routine calculates the elements of the beta matrix for non-linear
 *     fitting as described in `Data Reduction and Error Analysis for the
 *     Physical Sciences' by Bevington and Robinson, section 8.6 `the Marquardt
@@ -8,9 +14,11 @@
 *        The routine does this by calling the routine SCULIB_FIT_DXISQ_DAJ
 *     for each element required. The routine will only execute if entered 
 *     with good status.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FIT_MAKEBETA (XISQ_ROUTINE, N, A, BETA, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     XISQ_ROUTINE (XISQ, N, A, STATUS)
 *                               = EXTERNAL ROUTINE (Given)
 *           routine to calculate chi-squared of current fit
@@ -22,38 +30,64 @@
 *           the beta vector
 *     STATUS                    = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     27-MAR-1995: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       DOUBLE PRECISION A (N)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION BETA (N)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       EXTERNAL XISQ_ROUTINE
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION DXISQ_DAJ ! gradient in chi-squared with variation in
                                  ! A(J)
       INTEGER J                  ! DO loop variable
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,7 +1,13 @@
-*+  SCULIB_FIT_FUNCTION - routine to fit a general function to data
       SUBROUTINE SCULIB_FIT_FUNCTION (XISQ_ROUTINE, CHICUT, N, A, 
      :  LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FIT_FUNCTION
+
+*  Purpose:
+*     routine to fit a general function to data
+
+*  Description:
 *     This routine fits a general function to a data-set by searching the
 *     chi-squared plane. Chi-squared at each test fit position will be
 *     evaluated by the external routine XISQ_ROUTINE. The data to be fit
@@ -52,10 +58,12 @@
 *
 *       end of loop
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FIT_FUNCTION (XISQ_ROUTINE, CHICUT, N, A, 
 *    :  LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     XISQ_ROUTINE (XISQ, N, A, STATUS)
 *                             = EXTERNAL ROUTINE (Given)
 *           routine to calculate chi-squared of fit
@@ -80,22 +88,39 @@
 *           increment in A
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     23-MAR-1995: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       DOUBLE PRECISION CHICUT
-*    Import-Export :
+
+*  Arguments Given & Returned:
       DOUBLE PRECISION A (N)
       DOUBLE PRECISION LAMBDA
       DOUBLE PRECISION ALPHA (N,N)
@@ -103,22 +128,31 @@
       INTEGER IK (N)
       INTEGER JK (N)
       DOUBLE PRECISION DA (N)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       EXTERNAL XISQ_ROUTINE
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION DET             ! determinant of alpha matrix
       INTEGER          I               ! DO loop index
       LOGICAL          LOOPING         ! loop control
       DOUBLE PRECISION XISQR           ! chi-squared
       DOUBLE PRECISION XISQ1           ! chi-squared
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

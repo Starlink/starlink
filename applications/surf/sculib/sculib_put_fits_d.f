@@ -1,16 +1,24 @@
-*+  SCULIB_PUT_FITS_D - write a DOUBLE to a FITS item specified
       SUBROUTINE SCULIB_PUT_FITS_D (MAX_FITS, N_FITS, FITS, NAME,
      :  VALUE, COMMENT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_PUT_FITS_D
+
+*  Purpose:
+*     write a DOUBLE to a FITS item specified
+
+*  Description:
 *     This routine  writes a FITS double precision item into a character array
 *     ready to be written out to the .MORE.FITS structure in an NDF file.
 *     An error will be reported and bad status returned if the name of the
 *     FITS item is blank or more than 8 characters long. An error will also
 *     occur if the FITS character array is full.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_PUT_FITS_D (MAX_FITS, N_FITS, FITS, NAME, VALUE,
 *    :  COMMENT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     MAX_FITS                       = INTEGER (Given)
 *           the size of the FITS array
 *     N_FITS                         = INTEGER (Given and returned)
@@ -25,13 +33,23 @@
 *           a comment applying to the FITS item
 *     STATUS                         = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T.Jenness (timj@jach.hawaii.edu)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     15-AUG-1995: original version
 *     18-DEC-1998 (TIMJ)
@@ -39,33 +57,49 @@
 *       This is because the AST FITS reader can not understand
 *       numbers containing D)
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER MAX_FITS
       CHARACTER*(*) NAME
       DOUBLE PRECISION VALUE
       CHARACTER*(*) COMMENT
-*    Import-Export :
+
+*  Arguments Given & Returned:
       INTEGER N_FITS
       CHARACTER*(80) FITS (MAX_FITS)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN                      ! CHR used string length function
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER CPTR                         ! index of start of comment
       INTEGER NCHAR                        ! length of encoded number
       INTEGER IPOSN                        ! Position in string
       CHARACTER*32 STEMP                   ! scratch string
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

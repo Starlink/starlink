@@ -1,14 +1,22 @@
-*+  SCULIB_ADDARE - add one real array to another into a third
       SUBROUTINE SCULIB_ADDARE (N, ARRAY1, ARRAY2, ARRAY3, Q1DATA,
      :   Q2DATA, Q3DATA, V1DATA, V2DATA, V3DATA, QUALITY, FLAGGED,
      :   VARIANCE)
-*    Description :
+*+
+*  Name:
+*     SCULIB_ADDARE
+
+*  Purpose:
+*     add one real array to another into a third
+
+*  Description:
 *     Adds two real arrays. Note that any of the arrays may be the same.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_ADDARE (N, ARRAY1, ARRAY2, ARRAY3, Q1DATA,
 *    :   Q2DATA, Q3DATA, V1DATA, V2DATA, V3DATA, QUALITY, FLAGGED,
 *    :   VARIANCE)
-*    Parameters :
+
+*  Arguments:
 *     N            = INTEGER (Given)
 *             Number of elements in each array
 *     ARRAY1 (N)   = REAL (Given)
@@ -35,21 +43,37 @@
 *             True if input has flagged data values
 *     VARIANCE     = LOGICAL (Given)
 *             True if both input arrays have variance arrays
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL), adapted from GEN_ADDAFE by K.Shortridge
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     24-MAY-1993: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       REAL ARRAY1 (N)
       REAL ARRAY2 (N)
@@ -60,22 +84,32 @@
       LOGICAL QUALITY
       LOGICAL FLAGGED
       LOGICAL VARIANCE
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL ARRAY3 (N)
       INTEGER Q3DATA (N)
       REAL V3DATA (N)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER  GOOD, BAD
       PARAMETER (BAD = 1, GOOD = 0)
-*    Local variables :
+
+*  Local variables:
       INTEGER I
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
 *  Handle different quality methods separately.  
 

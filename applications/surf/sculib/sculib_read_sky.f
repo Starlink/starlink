@@ -1,7 +1,13 @@
-*+  SCULIB_READ_SKY - read sky parameters from a named file
       SUBROUTINE SCULIB_READ_SKY (FILE, MAX_SKY, N_SKY, SUB, 
      :  FILTER, ETA_TEL, B, TAUZ, DATEM, DAY, RUN, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_READ_SKY
+
+*  Purpose:
+*     read sky parameters from a named file
+
+*  Description:
 *     This routine reads sky and telescope parameters for each SCUBA 
 *     sub-instrument/filter combination from an ASCII file named in FILE. 
 *     The format of each line in the file that contains sky information is 
@@ -34,10 +40,12 @@
 *     If the file name is 'NULL' (case insensitive) then the sky parameters
 *     will be reset to null values.
 *
-*    Invocation :
+
+*  Invocation:
 *     SUBROUTINE SCULIB_READ_SKY (FILE, MAX_SKY, N_SKY, SUB, 
 *    :  FILTER, ETA_TEL, B, TAUZ, DATEM, DAY, RUN, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     FILE                              = CHARACTER*(*) (Given)
 *           the name of the file
 *     MAX_SKY                           = INTEGER (Given)
@@ -63,26 +71,44 @@
 *           the run number of a measurement
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     5-OCT-1993: Original version.
 *    14-SEP-1994: Code-read and extensively revised (JFL).
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'               ! for VAL__BADx                        
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) FILE
       INTEGER MAX_SKY
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       INTEGER N_SKY
       CHARACTER*(*) SUB (MAX_SKY)
       CHARACTER*(*) FILTER (MAX_SKY)
@@ -92,14 +118,19 @@
       CHARACTER*(*) DATEM (MAX_SKY)
       DOUBLE PRECISION DAY (MAX_SKY)
       INTEGER RUN (MAX_SKY)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER MAX_WRD                 ! number of words on a valid bolometer
       PARAMETER (MAX_WRD = 10)        ! definition line
-*    Local variables :
+
+*  Local variables:
       INTEGER          BUFLEN         ! length of line read from file
       LOGICAL          ERROR          ! T if an error occurs understanding a
                                       ! line in the file
@@ -123,9 +154,12 @@
       INTEGER          T_RUN          !
       REAL             T_TAUZ         !
       CHARACTER*30     WORD (MAX_WRD) ! individual words in LINE
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

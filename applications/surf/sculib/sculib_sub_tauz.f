@@ -1,7 +1,13 @@
-*+  SCULIB_SUB_TAUZ - get tauz appropriate for each sub-instrument
       SUBROUTINE SCULIB_SUB_TAUZ (N_SUBS, SUB_FILTER, N_SKY, SKY_FILTER,
      :  SKY_TAUZ, SKY_DAY, SUB_TAUZ, SUB_DAY, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SUB_TAUZ
+
+*  Purpose:
+*     get tauz appropriate for each sub-instrument
+
+*  Description:
 *     This routine finds the zenith sky optical depth appropriate for the
 *     filter in front of each sub-instrument being used. If it cannot find 
 *     an optical depth for the required filter the routine will output a 
@@ -10,10 +16,12 @@
 *     The times and dates at which the optical depths were measured are also 
 *     returned. If the optical depth for the required filter cannot be found
 *     then the date will be that at which the routine is run.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_GET_TAUZ (N_SUBS, SUB_FILTER, N_SKY, SKY_FILTER,
 *    :  SKY_TAUZ, SKY_DAY, SUB_TAUZ, SUB_DAY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_SUBS                         = INTEGER (Given)
 *           number of sub-instruments
 *     SUB_FILTER (N_SUBS)            = CHARACTER*(*) (Given)
@@ -33,44 +41,70 @@
 *           the date and time of the tauz measurement
 *     STATUS                         = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     12-OCT-1994: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                      ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       INTEGER          N_SUBS
       CHARACTER*(*)    SUB_FILTER (N_SUBS)
       INTEGER          N_SKY
       CHARACTER*(*)    SKY_FILTER (N_SKY)
       REAL             SKY_TAUZ (N_SKY)
       DOUBLE PRECISION SKY_DAY (N_SKY)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL             SUB_TAUZ (N_SUBS)
       DOUBLE PRECISION SUB_DAY (N_SUBS)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       DOUBLE PRECISION SCULIB_DAY             ! time and date as day number 
                                               ! after 1st Jan
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
       INTEGER SUB
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

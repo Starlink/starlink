@@ -1,14 +1,22 @@
-*+  SCULIB_DIV_CALIBRATOR - divides the calibrator signal into the chop signal
       SUBROUTINE SCULIB_DIV_CALIBRATOR (NELM, DATA, VARIANCE, 
      :  CALIBRATOR, QUALITY,STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_DIV_CALIBRATOR
+
+*  Purpose:
+*     divides the calibrator signal into the chop signal
+
+*  Description:
 *     This routine divides the calibrator signal into the chop signal and
 *     variance over an array of measurements. No division will occur if the 
 *     measurement quality is bad or the square of the calibrator signal is zero.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_DIV_CALIBRATOR (NELM, DATA, VARIANCE, CALIBRATOR, 
 *    :  QUALITY)
-*    Parameters :
+
+*  Arguments:
 *     NELM                = INTEGER (Given)
 *              Number of elements in each array
 *     DATA (NELM)         = REAL (Given and returned)
@@ -21,38 +29,64 @@
 *              Quality on DATA
 *     STATUS = INTEGER (Given & Returned)
 *              inherited status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     6-JUN-1995: Original
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER  NELM
       REAL     CALIBRATOR (NELM)
       BYTE  QUALITY (NELM)
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL     DATA (NELM)
       REAL     VARIANCE (NELM)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITON
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

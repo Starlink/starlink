@@ -36,8 +36,17 @@
 *     Tim Jenness (t.jenness@jach.hawaii.edu) - FORTRAN
 *     B.D.Kelly (ROE)                         - Transputer
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/03 19:35:12  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.3  1999/07/29 21:51:07  timj
 *     Add History: tag to header.
 *

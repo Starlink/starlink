@@ -1,8 +1,14 @@
-*+  SCULIB_MRQMIN - Levenberg-Marquardt method non-linear least-squares
-*                   fit from Numerical Recipes in FORTRAN.
       SUBROUTINE SCULIB_MRQMIN (X, Y, SIG, NDATA, A, IA, MA, COVAR, 
      :  ALPHA, NCA, CHISQ, FUNCS, ALAMDA, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_MRQMIN
+
+*  Purpose:
+*     Levenberg-Marquardt method non-linear least-squares
+*     fit from Numerical Recipes in FORTRAN.
+
+*  Description:
 *     Levenberg-Marquardt method, attempting to reduce the value of
 *     chi-squared of a fit between a set of data points X(1:NDATA),
 *     Y(1:NDATA), and a non-linear function dependent on MA coefficients
@@ -26,48 +32,76 @@
 *     zero covariance.
 *       Copied from MRQMIN on p.680 of Numerical Recipes in Fortran, with
 *     STATUS added.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_MRQMIN (X, Y, SIG, NDATA, A, IA, MA, COVAR, 
 *    :  ALPHA, NCA, CHISQ, FUNCS, ALAMDA, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     parameter[(dimensions)]=type(access)
 *           <description of parameter>
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     13-SEP-93: Copied from Numerical Recipes in Fortran: 2nd Edition, p.680.
 *                (REVAD::JFL)
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER MA, NCA, NDATA, IA(MA)
       REAL SIG (NDATA), X(NDATA), Y(NDATA)
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL ALAMDA, A(MA)
-*    Export :
+
+*  Arguments Returned:
       REAL CHISQ, ALPHA (NCA,NCA), COVAR (NCA,NCA)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       REAL FUNCS
-*    Global variables :
-*    Local Constants :
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER MMAX
       PARAMETER (MMAX = 20)
-*    Local variables :
+
+*  Local variables:
       INTEGER J, K, L, M, MFIT
       REAL OCHISQ, ATRY(MMAX), BETA(MMAX), DA (MMAX)
       SAVE OCHISQ, ATRY, BETA, DA, MFIT
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

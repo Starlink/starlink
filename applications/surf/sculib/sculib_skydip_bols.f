@@ -1,6 +1,12 @@
-*+  SCULIB_SKYDIP_BOLS - returns bolometers to be measured in a SKYDIP
       SUBROUTINE SCULIB_SKYDIP_BOLS (FILTER, BOLOMETERS, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SKYDIP_BOLS
+
+*  Purpose:
+*     returns bolometers to be measured in a SKYDIP
+
+*  Description:
 *     This routine returns a string containing the names of the bolometers
 *     to be measured in a SKYDIP observation.
 *        Only those sub-instruments that are looking out through a suitable
@@ -16,42 +22,67 @@
 *     The returned BOLOMETERS string will contain the words for each
 *     sub-instrument to be measured separated by commas.
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_SKYDIP_BOLS (FILTER, BOLOMETERS, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     FILTER                    = CHARACTER*(*) (Given)
 *                the name of the filter combination in use
 *     BOLOMETERS                = CHARACTER*(*) (Returned)
 *                the names of the bolometers to be measured
 *     STATUS                    = INTEGER (Given and returned)
 *                global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     11-JAN-1995: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) FILTER
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       CHARACTER*(*) BOLOMETERS
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references:
+
+*  External references:
       INTEGER      CHR_LEN             ! CHR string-length function
-*    Global variables :
-*    Local constants:
+
+*  Global variables:
+
+*  Local constants:
       INTEGER      MAX_SUBS            ! the number of SCUBA sub-instruments 
       PARAMETER (MAX_SUBS = 5)
-*    Local variables :
+
+*  Local variables:
       INTEGER      N_SUBS              ! number of sub-instruments
       CHARACTER*15 SUB_FILTER (MAX_SUBS)
                                        ! the name of the filter in front of
@@ -61,7 +92,8 @@
       REAL         SUB_WAVELENGTH (MAX_SUBS)
                                        ! the nominal wavelength of each
                                        ! the filter for each sub-instrument
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

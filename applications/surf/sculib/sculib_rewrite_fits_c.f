@@ -28,7 +28,7 @@
 *     line does not conform to the above format an error will be reported
 *     and bad status returned.
 
-*  Parameters:
+*  Arguments:
 *     MAX_FITS             = INTEGER (Given)
 *           the maximum number of items in the FITS array
 *     N_FITS               = INTEGER (Given)
@@ -45,6 +45,11 @@
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T. Jenness (timj@jach.hawaii.edu)
+
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
 
 *  History:
 *     $Id$
@@ -83,7 +88,7 @@
       CHARACTER*80 STEMP               ! scratch string
       CHARACTER*80 UNAME               ! upper case version of NAME
 
-*-
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

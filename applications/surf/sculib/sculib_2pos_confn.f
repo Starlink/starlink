@@ -74,6 +74,11 @@
 *     John Lightfoot (RoE)
 *     {enter_new_authors_here}
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     22-JAN-1990 (JBVAD::PAH):
 *        Original version.

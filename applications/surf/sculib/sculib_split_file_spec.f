@@ -43,6 +43,11 @@
 *     JFL: John Lightfoot (RoE)
 *     {enter_new_authors_here}
  
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1997 May 14 (TIMJ):
 *       Original version (extract from REDS_WTFN_REBIN.F)

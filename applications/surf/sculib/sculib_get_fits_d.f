@@ -1,7 +1,13 @@
-*+  SCULIB_GET_FITS_D - get the value of specified FITS double keyword
       SUBROUTINE SCULIB_GET_FITS_D (MAX_FITS, N_FITS, FITS, NAME,
      :  VALUE, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_GET_FITS_D
+
+*  Purpose:
+*     get the value of specified FITS double keyword
+
+*  Description:
 *     This routine will get the value of a specified FITS double precision
 *     keyword held in the FITS extension of an NDF file. The FITS extension must
 *     have been read into the input array FITS before this routine is called.
@@ -13,10 +19,12 @@
 *     be reported and bad status returned. If the keyword is found but the
 *     line does not conform to the above format an error will be reported
 *     and bad status returned.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_GET_FITS_D (MAX_FITS, N_FITS, FITS, NAME, VALUE,
 *    :  STATUS)
-*    Parameters :
+
+*  Arguments:
 *     MAX_FITS             = INTEGER (Given)
 *           the maximum number of items in the FITS array
 *     N_FITS               = INTEGER (Given)
@@ -29,35 +37,58 @@
 *           the value of the FITS keyword
 *     STATUS               = INTEGER (Given and returned)
 *           global status 
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     26-JUL-1995: original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                ! for VAL__BADD
-*    Import :
+
+*  Arguments Given:
       INTEGER MAX_FITS
       INTEGER N_FITS
       CHARACTER*(*) FITS (MAX_FITS)
       CHARACTER*(*) NAME
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION VALUE
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER      CHR_LEN             ! CHR used-string length function
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER      I                   ! DO loop index
       INTEGER      IPOS                ! position of = in string
       INTEGER      JPOS                ! position of / in string
@@ -65,9 +96,12 @@
       LOGICAL      LOOPING             ! .TRUE. while looping
       CHARACTER*80 STEMP               ! scratch string
       CHARACTER*80 UNAME               ! upper case version of NAME
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

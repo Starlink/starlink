@@ -1,7 +1,13 @@
-*+ SCULIB_FIT_2D_PARABOLA - fit 2d parabola to data
       SUBROUTINE SCULIB_FIT_2D_PARABOLA (N, DATA, VARIANCE, QUALITY,
      :  X, Y, A0, A1, X0, Y0, Z_PEAK, Z_PEAK_VAR, BADBIT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FIT_2D_PARABOLA
+
+*  Purpose:
+*     fit 2d parabola to data
+
+*  Description:
 *     This routine performs a least-squares fit of a 2d parabola to a set
 *     of data. The form of the parabola is:-
 *
@@ -51,10 +57,12 @@
 *     value for B from which the other fit parameters are derived.
 *        NOTE that if the variances are not a true reflection of the errors
 *     on the data then very strange numbers can result.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FIT_2D_PARABOLA (N, DATA, VARIANCE, QUALITY,
 *    :  X, Y, A0, A1, X0, Y0, Z_PEAK, Z_PEAK_VAR, BADBIT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N                      = INTEGER (Given)
 *           number of data points
 *     DATA (N)               = REAL (Given)
@@ -83,20 +91,36 @@
 *           bad bit mask
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     22-NOV-1995: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       BYTE BADBIT
       INTEGER N
       REAL DATA (N)
@@ -104,20 +128,27 @@
       BYTE QUALITY (N)
       REAL X (N)
       REAL Y (N)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL A0
       REAL A1
       REAL X0
       REAL Y0
       REAL Z_PEAK
       REAL Z_PEAK_VAR
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION B (4)         ! solution of matrix equation
       DOUBLE PRECISION DET           ! the determinant of the matrix
       INTEGER          I             ! DO loop variable
@@ -140,11 +171,15 @@
       REAL             SUM_YZ        ! sum of y * data / variance
       REAL             SUM_Y2        ! sum of y^2 / variance
       REAL             SUM_Z         ! sum of data / variance
-*    Internal References :
-*    Local data :
-*    Local functions:
+
+*  Internal References:
+
+*  Local data:
+
+*  Local functions:
       INCLUDE 'NDF_FUNC'
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

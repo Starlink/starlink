@@ -1,17 +1,25 @@
-*+  SCULIB_SQROOTR - take the square root of a real array
       SUBROUTINE SCULIB_SQROOTR (N, IN_DATA, IN_QUAL, ROOT, ROOT_QUAL, 
      :   QUALITY, FLAGGED)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SQROOTR
+
+*  Purpose:
+*     take the square root of a real array
+
+*  Description:
 *     Puts square root of real input array into output array. If FLAGGED and 
 *     QUALITY are both false then negative input numbers give a zero output. 
 *     If FLAGGED is true then input bad values, or negative input numbers, 
 *     give a bad output. If QUALITY is true then input values with bad 
 *     quality, or negative input numbers, lead to zero output data and bad 
 *     output quality.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_SQROOTR (N, IN_DATA, IN_QUAL, ROOT, ROOT_QUAL, QUALITY,
 *    :   FLAGGED)
-*    Parameters :
+
+*  Arguments:
 *     N                       = INTEGER (Given)
 *           the number of array elements
 *     IN_DATA (N)             = REAL (Given)
@@ -26,39 +34,65 @@
 *           .TRUE. if input quality array exists
 *     FLAGGED                 = LOGICAL (Given)
 *           .TRUE. if input data has flagged values
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     26-OCT-1994: Checked.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                  ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       REAL IN_DATA (N)
       INTEGER IN_QUAL (N)
       LOGICAL QUALITY
       LOGICAL FLAGGED
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL ROOT (N)
       INTEGER ROOT_QUAL (N)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (QUALITY) THEN
 

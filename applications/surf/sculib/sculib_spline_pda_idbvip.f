@@ -44,6 +44,11 @@
 *  Authors:
 *     Tim Jenness (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     17 April 1997 (TimJ)
 *        Original version

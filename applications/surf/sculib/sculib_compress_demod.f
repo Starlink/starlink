@@ -1,9 +1,15 @@
-*+  SCULIB_COMPRESS_DEMOD - get demodulated data for a bolometer and coadd
-*                           jiggles in each integration
       SUBROUTINE SCULIB_COMPRESS_DEMOD (N_BOLS, N_JIGS, N_INTS, 
      :  IN_DATA, ADC_INDEX, CHAN_INDEX, INT_INDEX, ADC, CHAN, 
      :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_COMPRESS_DEMOD
+
+*  Purpose:
+*     get demodulated data for a bolometer and coadd
+*     jiggles in each integration
+
+*  Description:
 *     This routine selects data for a specified bolometer from a demodulated
 *     data array, and coadds the results for each jiggle in each integration
 *     to give an average for that integration. Data with bad quality are
@@ -13,11 +19,13 @@
 *     the mean.
 *     ONLY WORKS FOR DATA WHERE SWITCH_PER_EXP=1, EXP_PER_INT=1,
 *     N_MEASUREMENTS=1.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_COMPRESS_DEMOD (N_BOLS, N_JIGS, N_INTS, 
 *    :  IN_DATA, ADC_INDEX, CHAN_INDEX, INT_INDEX, ADC, CHAN, 
 *    :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_BOLS                 = INTEGER (Given)
 *           number of bolometers measured
 *     N_JIGS                 = INTEGER (Given)
@@ -45,21 +53,37 @@
 *           the quality on OUT_DATA
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL/ROE)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     13-DEC-1994: Orginal version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                   ! for VAL__BADI
-*    Import :
+
+*  Arguments Given:
       INTEGER N_BOLS
       INTEGER N_JIGS
       INTEGER N_INTS
@@ -69,25 +93,35 @@
       INTEGER INT_INDEX (N_INTS)
       INTEGER ADC
       INTEGER CHAN
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL    OUT_DATA (N_INTS)
       REAL    OUT_VARIANCE (N_INTS)
       INTEGER OUT_QUALITY (N_INTS)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BOL                        ! index of bolometer data in array
       INTEGER I                          ! DO loop index
       INTEGER INT                        ! integration number 
       INTEGER JIG                        ! jiggle index
       INTEGER JIG_INDEX                  ! index of JIG in integration INT
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

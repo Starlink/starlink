@@ -1,11 +1,17 @@
-*+  SCULIB_PHOTOM_BOLSELECT - select photometers for a PHOTOM observation
       SUBROUTINE SCULIB_PHOTOM_BOLSELECT (BOLOMETERS, BOL_TYPE, 
      :   BOL_CALIB, BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, 
      :   NUM_ADC, BOL_SELECT_CHAN, BOL_SELECT_ADC, N_BOLS, MAX_SUB,
      :   SUB_INSTRMNT, N_SUB, CENTRE_DU3, CENTRE_DU4, CHOP_COORDS, 
      :   BOL_SPACING, CHOP_PA, N_BOL_SUB, BOLS_MEASURED,
      :   PHOT_BEAM_CHAN, PHOT_BEAM_ADC, PHOT_BEAM_BOL, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_PHOTOM_BOLSELECT
+
+*  Purpose:
+*     select photometers for a PHOTOM observation
+
+*  Description:
 *     This routine selects the bolometers to be used in a PHOTOM observation.
 *     If status is good on entry the routine will start by setting to zero
 *     the arrays describing which bolometers have been selected. Then it will
@@ -76,14 +82,16 @@
 *     observation. An array is then calculated holding the index in the array
 *     of ALL the photometers to be measured of each projected bolometer
 *     in each sub-instrument that was directly selected.
-*    Invocation :
+
+*  Invocation:
 *     SUBROUTINE SCULIB_PHOTOM_BOLSELECT (BOLOMETERS, BOL_TYPE, 
 *    :   BOL_CALIB, BOL_DU3, BOL_DU4, BOL_QUAL, BOL_ENABLED, NUM_CHAN, 
 *    :   NUM_ADC, BOL_SELECT_CHAN, BOL_SELECT_ADC, N_BOLS, MAX_SUB,
 *    :   SUB_INSTRMNT, N_SUB, CENTRE_DU3, CENTRE_DU4, CHOP_COORDS, 
 *    :   BOL_SPACING, CHOP_PA, N_BOL_SUB, BOLS_MEASURED,
 *    :   PHOT_BEAM_CHAN, PHOT_BEAM_ADC, PHOT_BEAM_BOL, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     BOLOMETERS                  = CHARACTER*(*) (Given)
 *           list of bolometer selections
 *     BOL_TYPE (NUM_CHAN, NUM_ADC)
@@ -148,21 +156,37 @@
 *           left, middle, right on sky for each sub-instrument.
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     20-JUL-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'            ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) BOLOMETERS
       INTEGER NUM_CHAN, NUM_ADC
       CHARACTER*(*) BOL_TYPE (NUM_CHAN, NUM_ADC)
@@ -171,8 +195,10 @@
       REAL BOL_DU4 (NUM_CHAN, NUM_ADC)
       INTEGER BOL_QUAL (NUM_CHAN, NUM_ADC)
       INTEGER MAX_SUB
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       LOGICAL BOL_ENABLED (NUM_CHAN, NUM_ADC)
       INTEGER BOL_SELECT_CHAN (NUM_CHAN * NUM_ADC)
       INTEGER BOL_SELECT_ADC (NUM_CHAN * NUM_ADC)
@@ -188,15 +214,20 @@
       INTEGER PHOT_BEAM_CHAN (3, MAX_SUB)
       INTEGER PHOT_BEAM_ADC (3, MAX_SUB)
       INTEGER PHOT_BEAM_BOL (3, MAX_SUB)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN                 ! CHR string-length function
-*    Global variables :
-*    Local Constants :
+
+*  Global variables:
+
+*  Local Constants:
       REAL R2D                        ! radians to degrees
       PARAMETER (R2D = 57.29578)
-*    Local variables :
+
+*  Local variables:
       LOGICAL ERROR                   ! T if any of selected bolometers have
                                       ! bad quality
       LOGICAL BOTH_ARRAYS             ! T if 3 beams on selected array have
@@ -233,9 +264,12 @@
       CHARACTER*15 OTHER_TYPE         ! type of array other than directly
                                       ! selected
       CHARACTER*1 CTEMP (10)          ! scratch character array
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,7 +1,13 @@
-*+  SCULIB_J_THEORETICAL - calculate the theoretical sky brightness temperature
       SUBROUTINE SCULIB_J_THEORETICAL (TAUZ, AIRMASS, T_TEL, T_AMB,
      :  WAVELENGTH, ETA_TEL, B, J_THEORETICAL, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_J_THEORETICAL
+
+*  Purpose:
+*     calculate the theoretical sky brightness temperature
+
+*  Description:
 *     This routine calculates the theoretical sky brightness temperature
 *     according to Bill Duncan's model:-
 *
@@ -35,10 +41,12 @@
 *       ETA_TEL is outside the range 0 to 1
 *       B is outside the range 0 to 1
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_J_THEORETICAL (TAUZ, AIRMASS, T_TEL, T_AMB,
 *    :  WAVELENGTH, ETA_TEL, B, J_THEORETICAL, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     TAUZ                = REAL (Given)
 *           zenith sky optical depth
 *     AIRMASS             = REAL (Given)
@@ -57,25 +65,45 @@
 *           the theoretical sky brightness temperature
 *     STATUS              = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL@ROE)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     6-JAN-1995: Original version
 *    24-JUL-1996: modified to use correct function (JFL).
 *    $Log$
+*    Revision 1.2  1999/08/03 19:35:11  timj
+*    Add copyright message to header.
+*    Convert old header style to new.
+*
 *    Revision 1.1  1996/08/05 19:44:35  timj
 *    Initial revision
 *
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       REAL TAUZ
       REAL AIRMASS
       REAL T_TEL
@@ -83,18 +111,25 @@
       REAL WAVELENGTH
       REAL ETA_TEL
       REAL B
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL J_THEORETICAL
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       REAL SCULIB_JNU                ! brightness temperature function
-*    Global variables :
-*    Local Constants :
+
+*  Global variables:
+
+*  Local Constants:
       REAL LIGHT                     ! velocity of light
       PARAMETER (LIGHT = 2.997929E8)
-*    Local variables :
+
+*  Local variables:
       REAL J_AMB                     ! brightness temperature of T_AMB
       REAL J_ATM                     ! effective brightness temperature of
                                      ! sky
@@ -102,9 +137,12 @@
       REAL NU                        ! frequency corresponding to wavelength
       REAL X_G                       ! Bill Duncan fudge factor relating
                                      ! J_ATM to J_AMB
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,5 +1,3 @@
-*+  SCULIB_REDUCE_SWITCH - reduce the demodulated data from the switches of 
-*                          an exposure into the exposure result.
       SUBROUTINE SCULIB_REDUCE_SWITCH (CHOP_FUN, SWITCH_PER_EXP,
      :  N_DATA,
      :  SWITCH_1_DATA, SWITCH_1_VARIANCE, SWITCH_1_QUALITY,
@@ -7,7 +5,15 @@
      :  SWITCH_3_DATA, SWITCH_3_VARIANCE, SWITCH_3_QUALITY,
      :  BEAM,
      :  EXP_DATA, EXP_VARIANCE, EXP_QUALITY, WEIGHT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_REDUCE_SWITCH
+
+*  Purpose:
+*     reduce the demodulated data from the switches of 
+*     an exposure into the exposure result.
+
+*  Description:
 *     This routine reduces the switches in an exposure to give the
 *     exposure result, and returns the weight to be given to the
 *     specified projected bolometer position when combining different 
@@ -65,7 +71,8 @@
 *
 *     Any other combinations of parameters will give rise to an error report
 *     and the routine will return with bad status.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_REDUCE_SWITCH (CHOP_FUN, SWITCH_PER_EXP,
 *    :  N_DATA,
 *    :  SWITCH_1_DATA, SWITCH_1_VARIANCE, SWITCH_1_QUALITY,
@@ -73,7 +80,8 @@
 *    :  SWITCH_3_DATA, SWITCH_3_VARIANCE, SWITCH_3_QUALITY,
 *    :  BEAM,
 *    :  EXP_DATA, EXP_VARIANCE, EXP_QUALITY, WEIGHT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     CHOP_FUN                              = CHARACTER*(*) (Given)
 *           the chop function used
 *     SWITCH_PER_EXP                        = INTEGER (Given)
@@ -108,27 +116,48 @@
 *           to the others when adding them together to give a final result
 *     STATUS                                = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*     TIMJ: T. Jenness (JACH)
-*    History :
+
+*  TIMJ:
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     5-AUG-1993: Original version.
 *     18-NOV-1994: Data arrays made 1-d (JFL).
 *     $Log$
+*     Revision 1.4  1999/08/03 19:35:23  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.3  1998/07/23 23:11:20  timj
 *     Check for bad pixels
 *
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) CHOP_FUN
       INTEGER SWITCH_PER_EXP
       INTEGER N_DATA
@@ -142,23 +171,33 @@
       REAL SWITCH_3_VARIANCE (N_DATA)
       BYTE SWITCH_3_QUALITY (N_DATA)
       INTEGER BEAM
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL EXP_DATA (N_DATA)
       REAL EXP_VARIANCE (N_DATA)
       BYTE EXP_QUALITY (N_DATA)
       REAL WEIGHT
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITOR
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I                    ! DO loop index
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

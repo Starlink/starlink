@@ -22,8 +22,17 @@
 *  Authors:
 *     T. Jenness (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.8  1999/08/03 19:34:44  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.7  1999/07/30 19:58:13  timj
 *     Minor header tweaks.
 *

@@ -1,18 +1,26 @@
-*+  SCULIB_CORRECT_EXTINCTION - correct bolometers for sky opacity
       SUBROUTINE SCULIB_CORRECT_EXTINCTION (SIZE_BOL, N_BOL, BOL_DATA,
      :  BOL_VARIANCE, BOL_RA, BOL_DEC, LST, LAT_OBS,
      :  TAUZ, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_CORRECT_EXTINCTION
+
+*  Purpose:
+*     correct bolometers for sky opacity
+
+*  Description:
 *     This routine corrects bolometer data for the effect of sky opacity.
 *     It does this by calculating the airmass of the point that each
 *     bolometer was looking at, then multiplying the data by 
 *     exp (airmass * TAUZ). Bolometers with bad data quality will be
 *     ignored.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_CORRECT_EXTINCTION (SIZE_BOL, N_BOL, BOL_DATA,
 *    :  BOL_VARIANCE, BOL_RA, BOL_DEC, LST, LAT_OBS,
 *    :  TAUZ, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     SIZE_BOL                       = INTEGER (Given)
 *           dimension of arrays
 *     N_BOL                          = INTEGER (Given)
@@ -33,25 +41,45 @@
 *           the zenith sky opacity
 *     STATUS                         = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     2-AUG-1995: original version.
 *     $Log$
+*     Revision 1.5  1999/08/03 19:34:52  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.4  1998/07/23 23:10:41  timj
 *     Check for bad pixels
 *
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER          SIZE_BOL
       INTEGER          N_BOL
       DOUBLE PRECISION BOL_RA (SIZE_BOL)
@@ -59,27 +87,37 @@
       DOUBLE PRECISION LST
       DOUBLE PRECISION LAT_OBS
       REAL             TAUZ
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL             BOL_DATA (SIZE_BOL)
       REAL             BOL_VARIANCE (SIZE_BOL)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER          STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       DOUBLE PRECISION PI                    !
       PARAMETER (PI = 3.14159265359D0)
-*    Local variables :
+
+*  Local variables:
       REAL             AIRMASS               !
       INTEGER          BOL                   ! bolometer index in DO loop
       REAL             CORRECTION            ! correction for sky opacity
       DOUBLE PRECISION HOUR_ANGLE            ! hour angle (radians)
       DOUBLE PRECISION SIN_E                 ! sin(elevation)
       DOUBLE PRECISION Z                     ! zenith disatance (radians)
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

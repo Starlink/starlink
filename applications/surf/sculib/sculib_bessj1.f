@@ -1,41 +1,72 @@
-*+  SCULIB_BESSJ1 - calculates Bessel function J1(x)
       FUNCTION SCULIB_BESSJ1 (X, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_BESSJ1
+
+*  Purpose:
+*     calculates Bessel function J1(x)
+
+*  Description:
 *     If status is good on entry this function returns the Bessel function
 *     J1(x) for any real x.
-*    Invocation :
+
+*  Invocation:
 *     Y = SCULIB_BESSJ1 (X, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     X                      = REAL (Given)
 *           the argument of the J1 Bessel function
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
+
+*  Method:
 *     Uses an algorithm from Numerical Recipes in Fortran.
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     20-AUG-1995: original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
-*    Import :
+
+*  Arguments Given:
       REAL X
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL SCULIB_BESSJ1
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       REAL AX
       REAL XX
       REAL Z
@@ -48,8 +79,10 @@
       SAVE Q1, Q2, Q3, Q4, Q5
       SAVE R1, R2, R3, R4, R5, R6
       SAVE S1, S2, S3, S4, S5, S6
-*    Internal References :
-*    Local data :
+
+*  Internal References:
+
+*  Local data:
       DATA R1, R2, R3, R4, R5, R6 /
      :  72362614232.0d0, -7895059235.0d0, 242396853.1d0,
      :  -2972611.439d0, 15704.48260d0, -30.16036606d0/,
@@ -62,7 +95,8 @@
      :  Q1, Q2, Q3, Q4, Q5 /
      :  0.04687499995D0, -0.2002690873D-3, 0.8449199096D-5,
      :  -0.88228987D-6,0.105787412D-6/  
-*-
+
+*.
 
 *     Set to bad in case status is bad
 *     Otherwise we would be undefined on return

@@ -1,21 +1,29 @@
-*+  SCULIB_COADD_REMOVE - remove exposure from coadded result
       SUBROUTINE SCULIB_COADD_REMOVE (N, IN_DATA, IN_VARIANCE, 
      :  IN_QUALITY, INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, 
      :  INCOADD_NUMBER, OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, 
      :  OUTCOADD_NUMBER, VARIANCE)
-*    Description :
+*+
+*  Name:
+*     SCULIB_COADD_REMOVE
+
+*  Purpose:
+*     remove exposure from coadded result
+
+*  Description:
 *     This routine removes an exposure from the input coadd and puts the 
 *     result in the output coadd arrays. The input and output
 *     arrays can be the same. The coadd result is the average of exposures 
 *     remaining in the coadd. The coadd variance is calculated from
 *     the spread of the exposures about the mean if more than one exposure 
 *     remains, 0 otherwise. Exposure pixels with bad quality are ignored.
-*    Invocation :
+
+*  Invocation:
 *     SUBROUTINE SCUDR_COADD_REMOVE (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
 *    :  INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
 *    :  OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
 *    :  VARIANCE)
-*    Parameters :
+
+*  Arguments:
 *     N                       = INTEGER (Given)
 *           Number of elements in arrays.
 *     IN_DATA (N)             = REAL (Given)
@@ -42,19 +50,35 @@
 *           Number of exposures coadded in output coadd.
 *     VARIANCE                = LOGICAL (Given)
 *           T if input data has variance associated with it
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     5-JUL-1994: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-*    Import :
+
+*  Global constants:
+
+*  Arguments Given:
       INTEGER N
       REAL IN_DATA (N)
       REAL IN_VARIANCE (N)
@@ -64,23 +88,33 @@
       INTEGER INCOADD_QUAL (N)
       INTEGER INCOADD_NUMBER (N)
       LOGICAL VARIANCE
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL OUTCOADD_DATA (N)
       REAL OUTCOADD_VAR (N)
       INTEGER OUTCOADD_QUAL (N)
       INTEGER OUTCOADD_NUMBER (N)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I                   ! DO loop
       REAL SUM
       REAL SUMSQ
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       DO I = 1, N
 

@@ -1,30 +1,52 @@
-*+  SCULIB_AIRMASS - calculate the airmass for a given zenith distance
       SUBROUTINE SCULIB_AIRMASS (Z, AIRMASS, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_AIRMASS
+
+*  Purpose:
+*     calculate the airmass for a given zenith distance
+
+*  Description:
 *     This routine calculates the airmass corresponding to the input
 *     zenith distance. The airmass is just sec(Z) until it reaches 2,
 *     after which a more complex algorithm developed by Ian Coulson
 *     is used (it is described by comments in the code). There may be
 *     a discontinuity in returned airmasses around the value 2, I
 *     haven't checked.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_AIRMASS (Z, AIRMASS, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     Z               = REAL (Given)
 *           zenith distance (radians)
 *     AIRMASS         = REAL (Returned)
 *           airmass
 *     STATUS          = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     5-AUG-1993: Original version.
 *     $Log$
+*     Revision 1.4  1999/08/03 19:34:43  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.3  1996/08/02 01:55:11  timj
 *     Z was zenith distance NOT elevation so change back to COS
 *
@@ -32,21 +54,34 @@ c Revision 1.2  1996/08/01  21:24:03  timj
 c Change AIRMASS def to 1/SIN from 1/COS
 c
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       REAL Z
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL AIRMASS
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION A, B, B_REFR, C
       DOUBLE PRECISION Q
       DOUBLE PRECISION R_EARTH	        ! mean radius of the Earth (km)
@@ -56,15 +91,18 @@ c
       DOUBLE PRECISION SINH, TANZ
       DOUBLE PRECISION REFR
       DOUBLE PRECISION X, ZZ
-*    Internal References :
-*    Local data :
+
+*  Internal References:
+
+*  Local data:
       DATA A / 39.8 /   ! arcsec (at T=0 deg C, p = 624 mb, rel H = 50%,
                         ! for a wavelength of 1 mm)
       DATA Q / 57.29577951 /     ! 180 / pi
       DATA R_EARTH / 6371.0 /    ! mean radius of Earth
       DATA HEIGHT_MK / 4.1 /     ! altitude of JCMT
       DATA SCALE_HEIGHT / 2.0 /  ! according to Bill Duncan 4-May-1988
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,8 +1,14 @@
-*+  SCULIB_CALC_FLATFIELD - calculate flat-field results for a bolometer
       SUBROUTINE SCULIB_CALC_FLATFIELD (BOLNAME, BOL_TYPE, IDIM, JDIM, 
      :  MAP_DATA, MAP_VARIANCE, MAP_QUALITY, X, Y, VOLUME, VOLUME_VAR, 
      :  X_CENTRE, Y_CENTRE, THETA, A, B, QUALITY, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_CALC_FLATFIELD
+
+*  Purpose:
+*     calculate flat-field results for a bolometer
+
+*  Description:
 *     This routine calculates the image parameters from data taken as a 
 *     flat-field measurement of a SCUBA bolometer. It takes as input data a 
 *     map made of a point source with pixels on a square grid.
@@ -75,11 +81,13 @@
 *     any pixels inside it have bad quality then a warning message will be 
 *     output but QUALITY will stay good.
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_CALC_FLATFIELD (BOLNAME, BOL_TYPE, IDIM, JDIM, MAP_DATA,
 *    :  MAP_VARIANCE, MAP_QUALITY, X, Y, VOLUME, VOLUME_VAR, X_CENTRE, 
 *    :  Y_CENTRE, THETA, A, B, QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     BOLNAME                           = CHARACTER*(*) (Given)
 *           the name of the bolometer being measured
 *     BOL_TYPE                          = CHARACTER*(*) (Given)
@@ -114,25 +122,41 @@
 *           semi-minor axis of ellipse
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     25-MAY-1993: Original version.
 *     22-MAY-1994: 2nd try.
 *      7-APR-1995: FIT option added.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                    ! for VAL__BADR
       INTEGER MAX_FIT_DATA                 ! maximum number of measurements
       PARAMETER (MAX_FIT_DATA = 512)      
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) BOLNAME
       CHARACTER*(*) BOL_TYPE
       INTEGER IDIM
@@ -142,8 +166,10 @@
       INTEGER MAP_QUALITY (IDIM, JDIM)
       REAL X (IDIM)
       REAL Y (JDIM)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL VOLUME
       REAL VOLUME_VAR
       REAL X_CENTRE
@@ -152,12 +178,15 @@
       REAL A
       REAL B
       INTEGER QUALITY
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       EXTERNAL SCULIB_GAUSSIAN_XISQ        ! routine to calculate chi-squared
                                            ! of fit
-*    Global variables :
+
+*  Global variables:
       INTEGER NDATA_FIT                    ! number of measurements
       REAL    X_FIT (MAX_FIT_DATA)         ! x position of measurements
       REAL    Y_FIT (MAX_FIT_DATA)         ! y position of measurements
@@ -166,8 +195,10 @@
       INTEGER QUALITY_FIT (MAX_FIT_DATA)   ! quality on measurements
       COMMON /SCULIB_GAUSSIAN_FIT_DATA/ NDATA_FIT, X_FIT, Y_FIT, 
      :  DATA_FIT, VARIANCE_FIT, QUALITY_FIT
-*    Local Constants :
-*    Local variables :
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION ALPHA (6,6)         ! scratch used by SCULIB_FIT_FUNCTION
       CHARACTER*30     ANALYSIS            ! method of image analysis; MOMENTS
                                            ! or FIT
@@ -209,9 +240,12 @@
       DOUBLE PRECISION XIOLD               ! chi-squared of fit
       REAL             X_CENTRE_VAR        ! variance on X_CENTRE
       REAL             Y_CENTRE_VAR        ! variance on Y_CENTRE
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

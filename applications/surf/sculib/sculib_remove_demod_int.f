@@ -1,10 +1,16 @@
-*+  SCULIB_REMOVE_DEMOD_INT - remove demodulated data for one sub-instrument 
-*                             in an integration from a coadded result
       SUBROUTINE SCULIB_REMOVE_DEMOD_INT (REMOVE_TYPE, NUM_CHAN,
      :  NUM_ADC, BOL_TYPE, N_BOLS, BOL_CHAN, BOL_ADC, J_COUNT,
      :  INT_DATA, INT_QUALITY, COADD_DATA, COADD_VARIANCE,
      :  COADD_QUALITY, COADD_NUMBER, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_REMOVE_DEMOD_INT
+
+*  Purpose:
+*     remove demodulated data for one sub-instrument 
+*     in an integration from a coadded result
+
+*  Description:
 *     This routine removes the demodulated data for a specified sub-instrument
 *     and integration from the coadded measurement.
 *       After checking status on entry the routine cycles through the
@@ -16,12 +22,14 @@
 *     which is set to 1. If the number of coadded integrations is reduced
 *     to 1 then the coadd variance can no longer be estimated from the
 *     spread of data about the mean and will be set to 0.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_REMOVE_DEMOD_INT (REMOVE_TYPE, NUM_CHAN,
 *    :  NUM_ADC, BOL_TYPE, N_BOLS, BOL_CHAN, BOL_ADC, J_COUNT,
 *    :  INT_DATA, INT_QUALITY, COADD_DATA, COADD_VARIANCE,
 *    :  COADD_QUALITY, COADD_NUMBER, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     REMOVE_TYPE                   = CHARACTER*(*) (Given)
 *           the type of the sub-instrument whose data is to be removed
 *     NUM_CHAN                      = INTEGER (Given)
@@ -54,20 +62,36 @@
 *           the number of data coadded
 *     STATUS                        = INTEGER (Given and returned)
 *           the global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     19-AUG-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) REMOVE_TYPE
       INTEGER NUM_CHAN, NUM_ADC
       CHARACTER*(*) BOL_TYPE (NUM_CHAN, NUM_ADC)
@@ -76,26 +100,36 @@
       INTEGER J_COUNT
       REAL INT_DATA (N_BOLS, J_COUNT)
       INTEGER INT_QUALITY (N_BOLS, J_COUNT)
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL COADD_DATA (N_BOLS, J_COUNT)
       REAL COADD_VARIANCE (N_BOLS, J_COUNT)
       INTEGER COADD_QUALITY (N_BOLS, J_COUNT)
       INTEGER COADD_NUMBER (N_BOLS, J_COUNT)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN                  ! CHR string-length function
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BOL, J                   ! DO loop variables
       REAL SUM                         ! sum of coadded data
       REAL SUMSQ                       ! sum of coadded data squared
       CHARACTER*20 TYPE                ! type of bolometer
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,11 +1,17 @@
-*+  SCULIB_SKYDIP_ALLAN_VARIANCE - incorporate latest set of SKYDIP data 
-*                                  samples into Allan variance
       SUBROUTINE SCULIB_SKYDIP_ALLAN_VARIANCE (SUB_INSTRUMENT, 
      :  NUM_CHAN, NUM_ADC, BOL_TYPE, N_BOLS, BOL_CHAN, BOL_ADC, 
      :  N_SAMPLES, SAMPLE, SAMPLE_QUALITY, KMAX, SUM, N_SUM, 
      :  ARTIFICIAL, N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, 
      :  STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SKYDIP_ALLAN_VARIANCE
+
+*  Purpose:
+*     incorporate latest set of SKYDIP data 
+*     samples into Allan variance
+
+*  Description:
 *     This routine incorporates a data slice into a run of data and updates 
 *     the Allan variance of the run.
 *        The Allan variance is calculated for a range of simulated integration
@@ -77,12 +83,14 @@
 *
 *     end of loop through samples in this dataslice
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_SKYDIP_ALLAN_VARIANCE (SUB_INSTRUMENT, NUM_CHAN, 
 *    :  NUM_ADC, BOL_TYPE, N_BOLS, BOL_CHAN, BOL_ADC, N_SAMPLES, 
 *    :  SAMPLE, SAMPLE_QUALITY, KMAX, SUM, N_SUM, ARTIFICIAL, 
 *    :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     SUB_INSTRUMENT                  = CHARACTER*(*) (Given)
 *           the name of the sub-instrument for which the Allan variance
 *           is to be calculated
@@ -125,22 +133,38 @@
 *           quality on the Allan variance
 *     STATUS                          = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     10-SEP-1993: Original version.
 *      4-JAN-1995: Modified to handle more than 1 bolometer per sub-instrument,
 *                  name changed to SCULIB_SKYDIP_ALLAN_VARIANCE
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) SUB_INSTRUMENT
       INTEGER NUM_CHAN
       INTEGER NUM_ADC
@@ -152,21 +176,28 @@
       REAL SAMPLE (N_BOLS, N_SAMPLES)
       INTEGER SAMPLE_QUALITY (N_BOLS, N_SAMPLES)
       INTEGER KMAX
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL SUM (KMAX)
       INTEGER N_SUM (KMAX)
       REAL ARTIFICIAL (KMAX)
       INTEGER N_ARTIFICIAL (KMAX)
       REAL ALLAN_VARIANCE (KMAX)
-*    Export :
+
+*  Arguments Returned:
       INTEGER ALLAN_QUALITY (KMAX)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN                     ! CHR used stringlength function
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       REAL         ALLAN_SUM              ! sum of artificial samples
       INTEGER      BOL                    ! bolometer number in DO loop
       INTEGER      BOL_BELONG (128)       ! the bolometer numbers of those that
@@ -183,9 +214,12 @@
       REAL         SAMPLE_AVE             ! average sample for a sub-instrument,
                                           ! calculated from the bolometers that
                                           ! belong to it
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,14 +1,22 @@
-*+  SCULIB_SET_QUALITY - set quality bits in a subset of a quality array
       SUBROUTINE SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, QUALITY, 
      :  START_BOL, END_BOL, START_POS, END_POS, START_BEAM, END_BEAM,
      :  BIT_POS, BIT_VALUE, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SET_QUALITY
+
+*  Purpose:
+*     set quality bits in a subset of a quality array
+
+*  Description:
 *     copies one integer array into another
-*    Invocation :
+
+*  Invocation:
 *      CALL  SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, QUALITY, 
 *    :  START_BOL, END_BOL, START_POS, END_POS, START_BEAM, END_BEAM,
 *    :  BIT_POS, BIT_VALUE, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_BOLS                  = INTEGER (Given)
 *           number of bolometers measured
 *     N_POS                   = INTEGER (Given)
@@ -36,19 +44,35 @@
 *           value to which bit is to be set (0 if zero, 1 otherwise)
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T. Jenness  (timj@jach.hawaii.edu)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N_BOLS
       INTEGER N_POS
       INTEGER N_BEAM
@@ -60,23 +84,33 @@
       INTEGER END_BEAM
       INTEGER BIT_POS
       INTEGER BIT_VALUE
-*    Import-Export :
+
+*  Arguments Given & Returned:
       BYTE QUALITY (N_BOLS, N_POS, N_BEAM)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITOFF                ! clear a bit
       BYTE SCULIB_BITON                 ! set a bit
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BEAM                      ! beam index in DO loop
       INTEGER BOL                       ! bolometer index in DO loop
       INTEGER POS                       ! measured position index in DO loop
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

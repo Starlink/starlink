@@ -1,15 +1,23 @@
-*+  SCULIB_INVERT_MATRIX - invert a square matrix
       SUBROUTINE SCULIB_INVERT_MATRIX (M, ARRAY, DET, IK, JK, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_INVERT_MATRIX
+
+*  Purpose:
+*     invert a square matrix
+
+*  Description:
 *     This routine inverts a matrix by a method opaque to casual inspection
 *     but which has the advantage that it doesn't require any more space 
 *     than the input matrix itself provides. The method is described in
 *     `Data Reduction and Error Analysis for the Physical Sciences' by
 *     Bevington and Robinson, and the code is adapted from the Pascal
 *     version listed there.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_INVERT_MATRIX (M, ARRAY, DET, IK, JK, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     M                      = INTEGER (Given)
 *           the dimensions of the matrix
 *     ARRAY (M,M)            = DOUBLE PRECISION (Given and returned)
@@ -22,41 +30,67 @@
 *           j indices of largest array elements
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     29-MAR-1995: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER M
-*    Import-Export :
+
+*  Arguments Given & Returned:
       DOUBLE PRECISION ARRAY (M,M)
-*    Export :
+
+*  Arguments Returned:
       DOUBLE PRECISION DET
       INTEGER IK (M)
       INTEGER JK (M)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION AMAX                  ! size of largest matrix element
       INTEGER          I                     ! DO loop index
       INTEGER          J                     ! DO loop index
       INTEGER          K                     ! DO loop index
       INTEGER          L                     ! DO loop index
       DOUBLE PRECISION SAVE                  ! scratch real
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,42 +1,77 @@
-*+  SCULIB_UT1 - returns UT1 as a modified Julian day (calculated from
-*                Hawaiian local time)
       DOUBLE PRECISION FUNCTION SCULIB_UT1 ()
-*    Description :
-*    Invocation :
+*+
+*  Name:
+*     SCULIB_UT1
+
+*  Purpose:
+*     returns UT1 as a modified Julian day (calculated from
+*     Hawaiian local time)
+
+*  Description:
+
+*  Invocation:
 *     UT1 = SCULIB_UT1
-*    Parameters :
-*    Result :
+
+*  Arguments:
+
+*  Result:
 *     UT1 = DOUBLE PRECISION 
 *           UT1 expressed as a modified Julian day (JD - 2400000.5)
-*    Method :
-*    Deficiencies :
+
+*  Method:
+
+*  Deficiencies:
 *     Depends on VAX clock for local time and date
-*    Bugs :
-*    Authors :
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
-*    External references :
+
+*  Arguments Given:
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
+
+*  External references:
       REAL SECNDS                        ! VMS SECNDS function
-*    Global variables :
-*    Local Constants :
+
+*  Global variables:
+
+*  Local Constants:
       DOUBLE PRECISION OBS_TIME_ZONE                ! observatory time zone (hrs)
       PARAMETER       (OBS_TIME_ZONE = 10.0D0)      ! Hawaii
-*    Local variables :
+
+*  Local variables:
       INTEGER SLA_STATUS
       INTEGER ID, IM, IY
       DOUBLE PRECISION DJM               ! modified Julian day
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
 *  get the VAX date
  

@@ -1,9 +1,15 @@
-*+  SCULIB_SKYFUNC_1 - calculate f(x) and its Jacobian for NAG non-linear
-*                      fitting routine E04UPF when fitting ETA_TEL, B
-*                      and TAU in SKYDIP analysis
       SUBROUTINE SCULIB_SKYFUNC_1 (MODE, M, N, LDFJ, X, F, FJAC,
      :  NSTATE, IUSER, USER)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SKYFUNC_1
+
+*  Purpose:
+*     calculate f(x) and its Jacobian for NAG non-linear
+*     fitting routine E04UPF when fitting ETA_TEL, B
+*     and TAU in SKYDIP analysis
+
+*  Description:
 *     E04UPF is a NAG routine that is used to fit a theoretical
 *     sky-dip curve to the measured data by varying ETA_TEL, B and TAU.
 *     This routine is called by E04UPF to calculate the M sub-functions
@@ -82,26 +88,44 @@
 *      USER (M+4:2M+3)   = the measured sky temperatures 
 *      USER (2M+4:3M+3)  = the errors on the measured sky temperatures
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_SKYFUNC_1 (MODE, M, N, LDFJ, X, F, FJAC, NSTATE, 
 *    :  IUSER, USER)
-*    Parameters :
+
+*  Arguments:
 *     See NAG manual description of OBJFUN parameter in E04UPF.
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     15-SEP-1993: Original version.
 *      8-FEB-1996: modified to use J_ATM to J_AMB relation.
 *     23-JUL-1996: modified to fit the correct function (JFL).
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-*    Import :
+
+*  Global constants:
+
+*  Arguments Given:
       INTEGER MODE
       INTEGER M
       INTEGER N
@@ -110,21 +134,28 @@
       INTEGER NSTATE
       INTEGER IUSER (*)
       DOUBLE PRECISION USER (3*M + 3)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION F (M)
       DOUBLE PRECISION FJAC (LDFJ,N)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       DOUBLE PRECISION H1                ! temperature drop / km
       PARAMETER (H1 = -6.5D0)
       DOUBLE PRECISION H2                ! scale height of absorber
       PARAMETER (H2 = 2.0D0)
       DOUBLE PRECISION X_GCONST          ! fudge constant
       PARAMETER (X_GCONST = 3.669383D0)
-*    Local variables :
+
+*  Local variables:
       DOUBLE PRECISION AIRMASS           ! airmass of measurement
       DOUBLE PRECISION B                 ! b parameter of fit
       DOUBLE PRECISION DJ_ATMDT          ! dJ_ATM / dTAU
@@ -140,9 +171,12 @@
                                          ! temperature at airmass measured
       DOUBLE PRECISION TAU               ! zenith optical depth of fit
       DOUBLE PRECISION X_G               ! fudge factor
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
 *  unpack X vector
 

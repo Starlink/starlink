@@ -1,18 +1,26 @@
-*+  SCULIB_CALC_OUTPUT_COORDS - calculate output coords of map centre and angle
-*                               of output coord system N relative to apparent N
       SUBROUTINE SCULIB_CALC_OUTPUT_COORDS (RA_APP, DEC_APP, MJD,
      :  OUTPUT_COORDS, LONG, LAT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_CALC_OUTPUT_COORDS
+
+*  Purpose:
+*     calculate output coords of map centre and angle
+*     of output coord system N relative to apparent N
+
+*  Description:
 *     This routine takes the apparent centre coords at the time of the 
 *     observation and converts them to the output coordinate system. In
 *     addition, the angle between the north direction in the output 
 *     coordinate frame and that in the apparent frame is calculated
 *     (measured anticlockwise from output north, in radians).
 *        SLA routines are used to perform the coordinate conversions.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_CALC_OUTPUT_COORDS (RA_APP, DEC_APP, MJD,
 *    :  OUTPUT_COORDS, LONG, LAT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     RA_APP                 = DOUBLE PRECISION (Given)
 *           apparent RA of map centre on MJD (radians)
 *     DEC_APP                = DOUBLE PRECISION (Given)
@@ -27,38 +35,61 @@
 *           latitude of map centre in output coord system (radians)
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     14-AUG-1995: original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       DOUBLE PRECISION RA_APP
       DOUBLE PRECISION DEC_APP
       DOUBLE PRECISION MJD
       CHARACTER*(*)    OUTPUT_COORDS
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION LONG
       DOUBLE PRECISION LAT 
-*    Status :
+
+*  Status:
       INTEGER          STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       DOUBLE PRECISION DPI
       PARAMETER (DPI = 3.14159265359D0)
       DOUBLE PRECISION DPI2
       PARAMETER (DPI2 = DPI / 2.0D0)
-*    Local variables :
+
+*  Local variables:
       CHARACTER*10     COORD_TYPE             ! upper case version of 
                                               ! OUTPUT_COORDS
       DOUBLE PRECISION DTEMP                  ! scratch double
@@ -67,9 +98,12 @@
                                               ! pole of output system
       DOUBLE PRECISION RA_N_APP, DEC_N_APP    ! apparent RA,Dec of N pole of
                                               ! output system
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

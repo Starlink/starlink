@@ -1,8 +1,14 @@
-*+  SCULIB_FIT_D2XISQ_DAJ2 - calculate second differential of chi-squared 
-*                            with respect to a fit parameter
       SUBROUTINE SCULIB_FIT_D2XISQ_DAJ2 (XISQ_ROUTINE, N, A, J, 
      :  D2XISQ_DAJ2, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FIT_D2XISQ_DAJ2
+
+*  Purpose:
+*     calculate second differential of chi-squared 
+*     with respect to a fit parameter
+
+*  Description:
 *     If status is good on entry this routine will calculate the 2nd order
 *     differential of chi-squared with respect to A(J). It does this 
 *     numerically by calling the supplied routine XISQ_ROUTINE to calculate 
@@ -15,10 +21,12 @@
 *
 *     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is 
 *     zero, 0.001. 
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FIT_D2XISQ_DAJ2 (XISQ_ROUTINE, N, A, J, 
 *    :  D2XISQ_DAJ2, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     XISQ_ROUTINE (XISQ, N, A, STATUS)
 *                             = EXTERNAL ROUTINE (Given)
 *           name of routine that will calculate chi-squared
@@ -32,40 +40,66 @@
 *           the second differential of chi-squared with respect to A(J)
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     23-MAR-1995: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       DOUBLE PRECISION A (N)
       INTEGER J
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION D2XISQ_DAJ2
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       EXTERNAL XISQ_ROUTINE
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION DELTA_AJ     ! small increment in A(J)
       DOUBLE PRECISION XISQMINUS    ! value of chi-squared at A(J) - DELTA_AJ
       DOUBLE PRECISION XISQPLUS     ! value of chi-squared at A(J) + DLETA_AJ
       DOUBLE PRECISION XISQ0        ! current value of chi-squared
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

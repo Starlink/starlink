@@ -1,8 +1,14 @@
-*+  SCULIB_READBOLS - read bolometer data from a name file
       SUBROUTINE SCULIB_READBOLS (FILE, NUM_CHAN, NUM_ADC, BOL_TYPE, 
      :  BOL_DU3, BOL_DU4, BOL_CALIB, BOL_THETA, BOL_A, BOL_B,
      :  BOL_QUAL, BOL_DAY, BOL_RUN, BOL_REF, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_READBOLS
+
+*  Purpose:
+*     read bolometer data from a name file
+
+*  Description:
 *     This routine reads bolometer data from an ASCII file named in
 *     FILE. The format of the file is assumed to be:-
 *
@@ -54,11 +60,13 @@
 *
 *     Each line in the file will be converted to upper case. Characters to the
 *     right of a { character in a line will be treated as comments and ignored.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_READBOLS (FILE, NUM_CHAN, NUM_ADC, BOL_TYPE, 
 *    :  BOL_DU3, BOL_DU4, BOL_CALIB, BOL_THETA, BOL_A, BOL_B,
 *    :  BOL_QUAL, BOL_DAY, BOL_RUN, BOL_REF, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     FILE                              = CHARACTER*(*) (Given)
 *           the name of the file
 *     NUM_CHAN                          = INTEGER (Given)
@@ -89,27 +97,45 @@
 *           the name of the reference bolometer used
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     4-MAY-1993: Original version.
 *     15-SEP-1994: Code read and revised (JFL).
 *     26-NOV-1994: Revised again to read more information (JFL).
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) FILE
       INTEGER NUM_CHAN
       INTEGER NUM_ADC
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       CHARACTER*(*) BOL_TYPE (NUM_CHAN, NUM_ADC)
       REAL BOL_DU3 (NUM_CHAN, NUM_ADC)
       REAL BOL_DU4 (NUM_CHAN, NUM_ADC)
@@ -121,14 +147,19 @@
       DOUBLE PRECISION BOL_DAY (NUM_CHAN, NUM_ADC)
       INTEGER BOL_RUN (NUM_CHAN, NUM_ADC)
       CHARACTER*(*) BOL_REF (NUM_CHAN, NUM_ADC)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER MAX_WRD                 ! number of words on a valid bolometer
       PARAMETER (MAX_WRD = 13)         ! definition line
-*    Local variables :
+
+*  Local variables:
       INTEGER         ADC             ! ADC of bolometer
       INTEGER         BUFLEN          ! length of line read from file
       INTEGER         CHAN            ! channel of bolometer
@@ -146,9 +177,12 @@
       INTEGER         START (MAX_WRD) ! index of beginnings of words in LINE
       INTEGER         STOP (MAX_WRD)  ! index of ends of words      "
       CHARACTER*30    WORD (MAX_WRD)  ! individual words in LINE
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

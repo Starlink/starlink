@@ -1,53 +1,88 @@
-*+  SCULIB_DECODE_ANGLE - convert angle string to double precision angle
       SUBROUTINE SCULIB_DECODE_ANGLE (STRING, ANGLE, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_DECODE_ANGLE
+
+*  Purpose:
+*     convert angle string to double precision angle
+
+*  Description:
 *     This routine converts an angle in dd:mm:ss.dd format into a
 *     double precision number in radians. It assumes that the input
 *     string specifies the angle in degrees. The process involves 
-*     removing the : delimiters, then calling SLA_DAFIN to perform
+
+*  removing the:
 *     the conversion. An error will be returned if there are less than 2 :
 *     delimiters in the string, or if the SLA routine errors.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_DECODE_ANGLE (STRING, ANGLE, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     STRING         = CHARACTER*(*) (Given)
 *           angle in xx:mm:ss.ddd format
 *     ANGLE          = DOUBLE PRECISION (Returned)
 *           angle in radians
 *     STATUS         = INTEGER (Given and returned)
 *           Global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) STRING
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION ANGLE
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I                 !
       INTEGER CHR_STATUS        !
       INTEGER CPOS              !
       INTEGER NSTRT             !
       INTEGER SLA_STATUS        !
       CHARACTER*80 COPY         ! copy of input string
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

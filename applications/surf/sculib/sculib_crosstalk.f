@@ -1,10 +1,18 @@
-*+  SCULIB_CROSSTALK - crosstalk measurements
       SUBROUTINE SCULIB_CROSSTALK (SWITCH_PER_EXP, EXP_PER_INT,
      :  N_INTEGRATIONS, N_MEASUREMENTS, DEMOD_POINTER, N_BOLS, 
      :  NUMPOS, DATA, BOL_CHAN, BOL_ADC, STATUS) 
-*    Description :
-*    Invocation :
-*    Parameters :
+*+
+*  Name:
+*     SCULIB_CROSSTALK
+
+*  Purpose:
+*     crosstalk measurements
+
+*  Description:
+
+*  Invocation:
+
+*  Arguments:
 *     SWITCH_PER_EXP         = INTEGER (Given)
 *           number of switches per exposure
 *     EXP_PER_INT            = INTEGER (Given)
@@ -30,20 +38,36 @@
 *           the ADC numbers of the measured bolometers
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL/ROE)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     13-JAN-1995: Orginal version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER SWITCH_PER_EXP
       INTEGER EXP_PER_INT
       INTEGER N_INTEGRATIONS
@@ -55,14 +79,21 @@
       REAL DATA (4, N_BOLS, NUMPOS)
       INTEGER BOL_CHAN (N_BOLS)
       INTEGER BOL_ADC (N_BOLS)
-*    Import-Export :
-*    Export :
-*    Status :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BOL                        ! index of bolometer data in array
       INTEGER BOL_NUMBER                 ! number of numbers in average
       REAL    BOL_SUM                    ! sum and average
@@ -73,9 +104,12 @@
       INTEGER MEAS                       ! measurement number
       INTEGER OFFSET                     ! offset in data array
       INTEGER SWITCH                     ! switch number
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,18 +1,26 @@
-*+  SCULIB_APPARENT_2_TP - calculate tangent plane coordinates from apparent
-*                          RA, Decs
       SUBROUTINE SCULIB_APPARENT_2_TP (N_POS, BOL_XPOS, BOL_YPOS,
      :  RA_CEN, DEC_CEN, ROTATION, SHIFT_DX, SHIFT_DY, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_APPARENT_2_TP
+
+*  Purpose:
+*     calculate tangent plane coordinates from apparent
+*     RA, Decs
+
+*  Description:
 *     This routine converts a list of apparent RA,Decs to tangent plane 
 *     offsets from a tangent point whose position is also given in apparent
 *     RA,Dec. In addition, a rotation is applied to the tangent plane so that
 *     it can be aligned with a coordinate system other than apparent RA,Dec,
 *     and a shift is added to allow the map to be moved about in that output
 *     frame.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_APPARENT_2_TP (N_POS, BOL_XPOS, BOL_YPOS, RA_CEN,
 *    :  DEC_CEN, ROTATION, SHIFT_DX, SHIFT_DY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_POS                  = INTEGER (Given)
 *           the number of positions to be converted
 *     BOL_XPOS (N_POS)       = DOUBLE PRECISION (Given and returned)
@@ -33,36 +41,59 @@
 *     SHIFT_DY               = DOUBLE PRECISION (Given)
 *           value to be added to y offsets (radians)
 *     STATUS                 = INTEGER (Given and returned)
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     14-AUG-1995: original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N_POS
       DOUBLE PRECISION RA_CEN
       DOUBLE PRECISION DEC_CEN
       DOUBLE PRECISION ROTATION
       DOUBLE PRECISION SHIFT_DX
       DOUBLE PRECISION SHIFT_DY
-*    Import-Export :
+
+*  Arguments Given & Returned:
       DOUBLE PRECISION BOL_XPOS (N_POS)
       DOUBLE PRECISION BOL_YPOS (N_POS)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION COS_ROT                ! cos (ROTATION)
       LOGICAL          ERROR                  ! .TRUE. if an error is
                                               ! returned by SLA_DS2TP
@@ -71,9 +102,12 @@
       DOUBLE PRECISION SIN_ROT                ! sine (ROTATION)
       INTEGER          SLA_STATUS             ! status returned by SLA_DS2TP
       DOUBLE PRECISION XI                     ! y tangent plane coord
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,16 +1,24 @@
-*+  SCULIB_STANDARD_APPARENT - convert apparent RA,Decs from one date to another
       SUBROUTINE SCULIB_STANDARD_APPARENT (N, RA_APP, DEC_APP, IN_MJD,
      :  OUT_MJD, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_STANDARD_APPARENT
+
+*  Purpose:
+*     convert apparent RA,Decs from one date to another
+
+*  Description:
 *     This routine converts a list of apparent RA,Decs for one date into 
 *     apparent coordinates at another. To do this it calls SLA_MAPPA and
 *     SLA_AMPQK to convert the input coordinates into mean coordinates for
 *     a J2000.0 equinox, then SLA_MAPPA and SLA_MAPQKZ to convert the mean
 *     coordinates into apparent on the output date.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_STANDARD_APPARENT (N, RA_APP, DEC_APP, IN_MJD, OUT_MJD,
 *    :  STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N                      = INTEGER (Given)
 *           number of positions to be converted
 *     RA_APP (N)             = DOUBLE PRECISION (Given and returned)
@@ -23,40 +31,66 @@
 *           date of output coordinates (modified Julian day)
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     29-AUG-1995: original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       DOUBLE PRECISION IN_MJD
       DOUBLE PRECISION OUT_MJD
-*    Import-Export :
+
+*  Arguments Given & Returned:
       DOUBLE PRECISION RA_APP (N)
       DOUBLE PRECISION DEC_APP (N)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION AMPRMS (21)        ! SLA mean-to-apparent parameters
       DOUBLE PRECISION DEC_TEMP           ! scratch Dec
       INTEGER          I                  ! DO loop variable
       DOUBLE PRECISION RA_TEMP            ! scratch RA
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

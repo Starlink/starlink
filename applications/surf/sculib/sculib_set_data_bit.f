@@ -11,18 +11,18 @@
 *     Starlink Fortran 77
 *  
 
-*    Invocation :
+*  Invocation:
 *     CALL SCULIB_SET_DATA_BIT(USE_THIS, N_BOLS, N_POS, N_BEAM, 
-*    :  MASK, VALUE, IN_DATA, STATUS)
+*    :    MASK, VALUE, IN_DATA, STATUS)
 
 
-*    Description :
+*  Description:
 *       This routine uses a byte mask (N_BOLS * N_POS) to set a data
 *       bit in the output. A mask value of 1 indicates that a value
 *       should be changed. This routine does not distinguish 'beams'
 *       A bit can be set or unset.
 
-*    Parameters :
+*  Arguments:
 *     USE_THIS   = LOGICAL (Given)
 *           Describes whether the mask should be set to the value (TRUE)
 *           or whether the rest of the data should be set (FALSE)
@@ -43,20 +43,35 @@
 
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+*  Deficiencies:
+*  Bugs:
+
+*  Authors:
 *       Tim Jenness (JACH)
-*    History :
-*    endhistory
-*    Type Definitions :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
+*     $Log$
+*     Revision 1.2  1999/08/03 19:35:28  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER N_BOLS
       INTEGER N_POS
       INTEGER N_BEAM
@@ -65,24 +80,30 @@
       INTEGER BITNUM
       LOGICAL STATE
 
-*    Import-Export :
+*  Arguments Given & Returned:
       BYTE    IN_DATA (N_BOLS, N_POS, N_BEAM)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       BYTE SCULIB_BITON
       BYTE SCULIB_BITOFF
 
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+*  Global variables:
+*  Local Constants:
+
+*  Local variables:
       INTEGER BEAM                      ! beam index in DO loop
       INTEGER BOL                       ! bolometer index in DO loop
       INTEGER POS                       ! measured position index in DO loop
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

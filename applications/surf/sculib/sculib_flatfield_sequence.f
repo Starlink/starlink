@@ -1,11 +1,17 @@
-*+  SCULIB_FLATFIELD_SEQUENCE - get bolometer measurement sequence for FLATFIELD
       SUBROUTINE SCULIB_FLATFIELD_SEQUENCE (BOLOMETERS, NUM_CHAN,
      :  NUM_ADC, NUM_SUB, BOL_TYPE, BOL_CALB, BOL_DU3, BOL_DU4, 
      :  BOL_QUAL, BOL_ENABLED, BOLS_MEASURED, N_BOLS, BOL_SELECT_CHAN,
      :  BOL_SELECT_ADC, N_SUBS, SUB_INSTRUMENT, FLATREF_CHAN, 
      :  FLATREF_ADC, N_MEASUREMENTS, FLAT_CHAN, FLAT_ADC, FLAT_INDEX,
      :  STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FLATFIELD_SEQUENCE
+
+*  Purpose:
+*     get bolometer measurement sequence for FLATFIELD
+
+*  Description:
 *     This routine works out the bolometer measurement sequence for a FLATFIELD
 *     observation. Only one of SCUBA's sub-instruments can be flat-fielded at
 *     a time. If the sub-instrument is one of the arrays then the measurement
@@ -35,14 +41,16 @@
 *        Lastly, the FLAT_INDEX array is set so that it points to the
 *     position in the datablock of data from the target bolometer at each 
 *     measurement.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FLATFIELD_SEQUENCE (BOLOMETERS, NUM_CHAN,
 *    :  NUM_ADC, NUM_SUB, BOL_TYPE, BOL_CALB, BOL_DU3, BOL_DU4, 
 *    :  BOL_QUAL, BOL_ENABLED, BOLS_MEASURED, N_BOLS, BOL_SELECT_CHAN,
 *    :  BOL_SELECT_ADC, N_SUBS, SUB_INSTRUMENT, FLATREF_CHAN, 
 *    :  FLATREF_ADC, N_MEASUREMENTS, FLAT_CHAN, FLAT_ADC, FLAT_INDEX,
 *    :  STATUS)
-*    Parameters :
+
+*  Arguments:
 *     BOLOMETERS                  = CHARACTER*(*)
 *           the bolometers to be measured in this FLATFIELD
 *     NUM_CHAN                    = INTEGER (Given)
@@ -97,21 +105,37 @@
 *           measurement
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL/ROE).
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     25-NOV-1994: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                        ! for VAL__BADI
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) BOLOMETERS
       INTEGER       NUM_CHAN
       INTEGER       NUM_ADC
@@ -121,8 +145,10 @@
       REAL          BOL_DU3 (NUM_CHAN, NUM_ADC)
       REAL          BOL_DU4 (NUM_CHAN, NUM_ADC)
       INTEGER       BOL_QUAL (NUM_CHAN, NUM_ADC)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       LOGICAL       BOL_ENABLED (NUM_CHAN, NUM_ADC)
       CHARACTER*(*) BOLS_MEASURED
       INTEGER       N_BOLS
@@ -136,12 +162,17 @@
       INTEGER       FLAT_CHAN (2 * NUM_CHAN * NUM_ADC)
       INTEGER       FLAT_ADC (2 * NUM_CHAN * NUM_ADC)
       INTEGER       FLAT_INDEX (2 * NUM_CHAN * NUM_ADC)
-*    Status :
+
+*  Status:
       INTEGER       STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       CHARACTER*3   BOL_NAME                   ! name of bolometer
       INTEGER       FLATREF_INDEX              ! index of reference bolometer
                                                ! in datablock
@@ -150,9 +181,12 @@
       INTEGER       J                          ! DO loop index
       REAL          RTEMP                      ! scratch real            
       CHARACTER*15  STEMP                      ! scratch string
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

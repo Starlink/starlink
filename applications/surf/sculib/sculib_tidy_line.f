@@ -1,6 +1,12 @@
-*+  SCULIB_TIDY_LINE - remove tabs and comments from a line
       SUBROUTINE SCULIB_TIDY_LINE (COMCHAR, LINE, LENGTH)
-*    Description :
+*+
+*  Name:
+*     SCULIB_TIDY_LINE
+
+*  Purpose:
+*     remove tabs and comments from a line
+
+*  Description:
 *     This routine tidies up a character string and returns its length
 *     ignoring trailing blanks. If the returned length is 0 the returned
 *     string will be ' ', otherwise it will be equal to the input string
@@ -13,45 +19,73 @@
 *       truncating the string at the character before a COMCHAR character, if 
 *       present (the characters after COMCHAR are assumed to be comments).
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_TIDY_LINE (COMCHAR, LINE, LENGTH)
-*    Parameters :
+
+*  Arguments:
 *     COMCHAR    = CHARACTER*1 (Given)
 *           the character at the beginning of a comment
 *     LINE       = CHARACTER*(*) (Given and returned)
 *           the line to be tidied
 *     LENGTH     = INTEGER (Returned)
 *           the length of the string, ignoring trailing blanks
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     15-SEP-1994: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*1 COMCHAR
-*    Import-Export :
+
+*  Arguments Given & Returned:
       CHARACTER*(*) LINE
-*    Export :
+
+*  Arguments Returned:
       INTEGER LENGTH
-*    Status :
-*    External references :
+
+*  Status:
+
+*  External references:
       INTEGER CHR_LEN                ! CHR string-length function
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER COMMENT           
       INTEGER TAB
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (CHR_LEN(LINE) .EQ. 0) THEN
          LENGTH = 0

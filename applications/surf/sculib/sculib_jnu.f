@@ -1,6 +1,12 @@
-*+  SCULIB_JNU - Rayleigh-Jeans corrected brightness temperature
       REAL FUNCTION SCULIB_JNU (NU, T, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_JNU
+
+*  Purpose:
+*     Rayleigh-Jeans corrected brightness temperature
+
+*  Description:
 *     This function calculates the Rayleigh-Jeans corrected brightness
 *     temperature of radiation at frequency NU and temperature T.
 *
@@ -10,48 +16,76 @@
 *
 *     If the absolute value of X is less than 1e-4 JNU = T, or if the absolute
 *     value of X is greater than 20 JNU = 0.
-*    Invocation :
+
+*  Invocation:
 *     JNU = SCULIB_JNU (NU, T, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     NU                = REAL (Given)
 *           frequency (Hz)
 *     T                 = REAL (Given)
 *           temperature (K)
 *     STATUS            = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     7-OCT-1993: Original version 
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
-*    Import :
+
+*  Arguments Given:
       REAL NU
       REAL T
-*    Import-Export :
-*    Export :
-*    Status :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       REAL H                                ! Planck
       PARAMETER (H = 6.6252E-27)
       REAL K                                ! Boltzmann
       PARAMETER (K = 1.38046E-16)
-*    Local variables :
+
+*  Local variables:
       REAL X
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
 *     Set to bad value in case we return with bad status
       SCULIB_JNU = VAL__BADR

@@ -1,6 +1,12 @@
-*+  SCULIB_MALLOC - get virtual memory
       SUBROUTINE SCULIB_MALLOC (SIZE, START_PTR, END_PTR, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_MALLOC
+
+*  Purpose:
+*     get virtual memory
+
+*  Description:
 *     This routine gets SIZE bytes of virtual memory.
 *
 *     If status is bad on entry the routine will return immediately.
@@ -21,9 +27,11 @@
 *           corruption when the time comes to free the VM.
 *        end if
 *     end if
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_MALLOC (SIZE, START_PTR, END_PTR, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     SIZE                = INTEGER (Given)
 *           number of bytes required
 *     START_PTR           = INTEGER (Given and returned)
@@ -32,38 +40,64 @@
 *           pointer to end of virtual memory
 *     STATUS              = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (ROE::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     18-OCT-1994: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                    ! for VAL__NBI
-*    Import :
+
+*  Arguments Given:
       INTEGER SIZE
-*    Import-Export :
+
+*  Arguments Given & Returned:
       INTEGER START_PTR
-*    Export :
+
+*  Arguments Returned:
       INTEGER END_PTR
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER BOUNDARY                     ! Number of bytes used for
       PARAMETER (BOUNDARY = VAL__NBD)      ! sentinel integers. Also the 
                                            ! alignment size for data
-*    Local variables :
-*    Internal References :
-*    Local data :
-*-
+
+*  Local variables:
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,19 +1,27 @@
-*+  SCULIB_CALC_SUB_BOLS - find the positions of bolometers belonging to a 
-*                          specified sub-instrument in a demodulated data array
       SUBROUTINE SCULIB_CALC_SUB_BOLS (N_BOL_IN, IN_BOL_ADC, 
      :  IN_BOL_CHAN, NUM_CHAN, NUM_ADC, BOL_TYPE, SUB_INSTRUMENT, 
      :  N_BOL_OUT, OUT_BOL_ADC, OUT_BOL_CHAN, IN_POINTER, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_CALC_SUB_BOLS
+
+*  Purpose:
+*     find the positions of bolometers belonging to a 
+*     specified sub-instrument in a demodulated data array
+
+*  Description:
 *     This subroutine finds the location of data from bolometers belonging to 
 *     a specified sub-instrument in a demodulated data array that may contain
 *     data for several sub-instruments. The number of bolometers found, their
 *     indices in the data array, and their ADC,channel numbers are returned
 *     by the routine.
-*    Invocation :
+
+*  Invocation:
 *     CALL  SCULIB_CALC_SUB_BOLS (N_BOL_IN, IN_BOL_ADC, IN_BOL_CHAN,
 *    :  NUM_CHAN, NUM_ADC, BOL_TYPE, SUB_INSTRUMENT, N_BOL_OUT,
 *    :  OUT_BOL_ADC, OUT_BOL_CHAN, IN_POINTER, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_BOL_IN                     = INTEGER (Given)
 *           number of bolometers in data array
 *     IN_BOL_ADC (N_BOL_IN)        = INTEGER (Given)
@@ -40,20 +48,36 @@
 *           data for bolometers in the specified sub-instrument
 *     STATUS                       = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     3-AUG-1995: original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER       N_BOL_IN
       INTEGER       IN_BOL_ADC (N_BOL_IN)
       INTEGER       IN_BOL_CHAN (N_BOL_IN)
@@ -61,24 +85,34 @@
       INTEGER       NUM_ADC
       CHARACTER*(*) BOL_TYPE (NUM_CHAN, NUM_ADC)
       CHARACTER*(*) SUB_INSTRUMENT
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       INTEGER       N_BOL_OUT
       INTEGER       OUT_BOL_ADC (N_BOL_IN)
       INTEGER       OUT_BOL_CHAN (N_BOL_IN)
       INTEGER       IN_POINTER (N_BOL_IN)
-*    Status :
+
+*  Status:
       INTEGER       STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER      IN_BOL                  ! bolometer index in input array
       CHARACTER*15 STEMP1                  ! copy of SUB_INSTRUMENT
       CHARACTER*15 STEMP2                  ! scratch string
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

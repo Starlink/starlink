@@ -1,43 +1,77 @@
-*+  SCULIB_COPYI - copy one integer array to another
       SUBROUTINE SCULIB_COPYI (N, FROM, TO)
-*    Description :
+*+
+*  Name:
+*     SCULIB_COPYI
+
+*  Purpose:
+*     copy one integer array to another
+
+*  Description:
 *     copies one integer array into another
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_COPYI (N, FROM, TO)
-*    Parameters :
+
+*  Arguments:
 *     N          = INTEGER (Given)
 *           number of integers in arrays
 *     FROM (N)   = INTEGER (Given)
 *           array copied from
 *     TO (N)     = INTEGER (Returned)
 *           array copied to
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     25.11.1992: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-*    Import :
+
+*  Global constants:
+
+*  Arguments Given:
       INTEGER N
       INTEGER FROM (N)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       INTEGER TO (N)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       DO I = 1, N
          TO (I) = FROM (I)

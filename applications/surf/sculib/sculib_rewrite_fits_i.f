@@ -29,7 +29,7 @@
 *     line does not conform to the above format an error will be reported
 *     and bad status returned.
 
-*  Parameters:
+*  Arguments:
 *     MAX_FITS             = INTEGER (Given)
 *           the maximum number of items in the FITS array
 *     N_FITS               = INTEGER (Given)
@@ -47,9 +47,18 @@
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T. Jenness (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.4  1999/08/03 19:35:26  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.3  1997/11/19 02:31:54  timj
 *     Make sure there is a space between the number and the equals.
 *
@@ -100,7 +109,7 @@
 *  Internal References:
 *  Local data:
 
-*-
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -73,6 +73,11 @@
 *  Authors:
 *     REVAD::JFL: John Lightfoot
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     15-AUG-1995: original version, modified from JCMT_BESSEL_REGRID_3
 

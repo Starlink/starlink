@@ -1,7 +1,13 @@
-*+  SCULIB_GAUSSJ - Numerical Recipes in Fortran routine for solution of
-*                   linear equations by Gauss-Jordan elimination
       SUBROUTINE SCULIB_GAUSSJ (A, N, NP, B, M, MP, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_GAUSSJ
+
+*  Purpose:
+*     Numerical Recipes in Fortran routine for solution of
+*     linear equations by Gauss-Jordan elimination
+
+*  Description:
 *     Linear equation solution by Gauss-Jordan elimination. A(1:N,1:N) is an
 *     input matrix stored in an array of physical dimensions NP by NP.
 *     B(1:N,1:M) is an input matrix containing the M right-hand side vectors,
@@ -11,43 +17,71 @@
 *     largest anticipated value of N.
 *     Copied from GAUSSJ on p.30 of Numerical Recipes in Fortran, with 
 *     STATUS added.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_GAUSSJ (A, N, NP, B, M, MP, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     parameter[(dimensions)]=type(access)
 *           <description of parameter>
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.LIGHTFOOT copied from Numerical Recipes (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     13-SEP-1993: Original copy.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER M, MP, N, NP
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL A (NP,NP), B (NP,MP)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER NMAX
       PARAMETER (NMAX = 50)
-*    Local variables :
+
+*  Local variables:
       INTEGER I, ICOL, IROW, J, K, L, LL, INDXC(NMAX), INDXR(NMAX),
      :  IPIV(NMAX)
       REAL BIG, DUM, PIVINV
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

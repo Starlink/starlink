@@ -1,15 +1,23 @@
-*+  SCULIB_CALC_GRID - calculate the minimum rectangular grid that would
-*                      contain the input jiggle pattern
       SUBROUTINE SCULIB_CALC_GRID (N, X, Y, XMIN, XMAX, XSPACE, NX, 
      :  YMIN, YMAX, YSPACE, NY, IPOS, JPOS, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_CALC_GRID
+
+*  Purpose:
+*     calculate the minimum rectangular grid that would
+*     contain the input jiggle pattern
+
+*  Description:
 *     This routine takes the x,y coords of the mapped points and attempts to 
 *     fit them onto a rectangular grid. The grid contains the minimum number
 *     of points required to hold the measured positions. 
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_CALC_GRID (N, X, Y, XMIN, XMAX, XSPACE, NX, 
 *    :  YMIN, YMAX, YSPACE, NY, IPOS, JPOS, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N                                     = INTEGER (Given)
 *           the number of positions in the jiggle pattern
 *     X (N)                                 = REAL (Given)
@@ -38,42 +46,68 @@
 *           the J index of each jiggle position in the map
 *     STATUS                                = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     9-JUN-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       REAL X (N), Y (N)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL XMIN, XMAX, XSPACE
       INTEGER NX
       REAL YMIN, YMAX, YSPACE
       INTEGER NY 
       INTEGER IPOS (N), JPOS (N)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
       INTEGER IR
       LOGICAL OK
       REAL    R
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

@@ -1,8 +1,14 @@
-*+  SCULIB_UNPACK - routine to unpack compressed resampled map
       SUBROUTINE SCULIB_UNPACK (NBS_DIM1, NBS_DIM2, NBS_DIM3,
      :   RESNBS, ISTART, NPIX, POINTER, SUB, RES_DIM1, RES_DIM2,
      :   RES_DS, RES_VS, RES_WS, RES_QS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_UNPACK
+
+*  Purpose:
+*     routine to unpack compressed resampled map
+
+*  Description:
 *     This routine unpacks a compressed SCUBA resampled data array into
 *     a 2-d image. It does this by cycling up the j slices of the image
 *     and -
@@ -16,11 +22,13 @@
 *        else 
 *           fill the image slice with zeroes and bad quality
 *        endif
-*    Invocation :
+
+*  Invocation:
 *     SUBROUTINE SCULIB_UNPACK (NBS_DIM1, NBS_DIM2, NBS_DIM3,
 *    :   RESNBS, ISTART, NPIX, POINTER, SUB, RES_DIM1, RES_DIM2,
 *    :   RES_DS, RES_VS, RES_WS, RES_QS)
-*    Parameters :
+
+*  Arguments:
 *     NBS_DIM1                            = INTEGER (Given)
 *           first dimension of the RESNBS array
 *     NBS_DIM2                            = INTEGER (Given)
@@ -50,20 +58,37 @@
 *           the unpacked weight sum
 *     RES_QS (RES_DIM1, RES_DIM2)         = INTEGER (Returned)
 *           the unpacked quality
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
-*     Original version: 22-JAN-1993.
+
+*  Original version:
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER NBS_DIM1, NBS_DIM2, NBS_DIM3
       REAL RESNBS (NBS_DIM1, NBS_DIM2, NBS_DIM3)
       INTEGER RES_DIM1, RES_DIM2
@@ -71,22 +96,32 @@
       INTEGER NPIX (RES_DIM2)
       INTEGER POINTER (RES_DIM2)
       INTEGER SUB
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL RES_DS (RES_DIM1, RES_DIM2)
       REAL RES_VS (RES_DIM1, RES_DIM2)
       REAL RES_WS (RES_DIM1, RES_DIM2)
       INTEGER RES_QS (RES_DIM1, RES_DIM2)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I                            ! DO loop index
       INTEGER J                            !      "
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       DO J = 1, RES_DIM2
 

@@ -1,13 +1,21 @@
-*+  SCULIB_BOLNAME - generate bolometer name from ADC and channel number
       SUBROUTINE SCULIB_BOLNAME (ADC, CHANNEL, BOLCODE, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_BOLNAME
+
+*  Purpose:
+*     generate bolometer name from ADC and channel number
+
+*  Description:
 *     Given bolometer ADC and channel, generate the bolometer name. E.g.
 *     ADC=2, CHAN=5 gives B5. If the ADC number is outside the range 1-9, or
 *     the channel number outside 1-16, and error will be reported and bad status
 *     returned.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_BOLNAME (ADC, CHANNEL, BOLCODE, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     ADC                         = INTEGER (Given)
 *           ADC number
 *     CHANNEL                     = INTEGER (Given)
@@ -16,34 +24,56 @@
 *           bolometer ID
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     25-MAY-1993: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER ADC                
       INTEGER CHANNEL
-*    Export :
+
+*  Arguments Returned:
       CHARACTER*(*) BOLCODE
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN              ! CHR string length function
-*    Local variables :
+
+*  Local variables:
       INTEGER SLEN                 !
       CHARACTER*1 ADC_NAME (9)     !
-*    Local data:
+
+*  Local data:
       DATA ADC_NAME / 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'/
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

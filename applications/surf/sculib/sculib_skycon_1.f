@@ -1,9 +1,15 @@
-*+  SCULIB_SKYCON_1 - routine to calculate non-linear constraints for
-*                     NAG non-linear fitting routine E04UPF when fitting
-*                     ETA_TEL, B and TAU in sky-dip analysis
       SUBROUTINE SCULIB_SKYCON_1 (MODE, NCNLN, N, LDCJ, NEEDC, X, C,
      :  CJAC, NSTATE, IUSER, USER)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SKYCON_1
+
+*  Purpose:
+*     routine to calculate non-linear constraints for
+*     NAG non-linear fitting routine E04UPF when fitting
+*     ETA_TEL, B and TAU in sky-dip analysis
+
+*  Description:
 *     E04UPF is a NAG routine used to fit a theoretical SKYDIP
 *     curve to the measured data by varying ETA_TEL, B and TAU. This
 *     routine is called by E04UPF to calculate the 1 non-linear constraint
@@ -35,24 +41,42 @@
 *          -    =
 *          dx(3)
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_SKYCON_1 (MODE, NCNLN, N, LDCJ, NEEDC, X, C,
 *    :  CJAC, NSTATE, IUSER, USER)
-*    Parameters :
+
+*  Arguments:
 *     See NAG manual description of CONFUN parameter in E04UPF.
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     15-SEP-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-*    Import :
+
+*  Global constants:
+
+*  Arguments Given:
       INTEGER MODE
       INTEGER NCNLN
       INTEGER N
@@ -60,22 +84,32 @@
       INTEGER NEEDC (NCNLN)
       DOUBLE PRECISION X (N)
       INTEGER NSTATE
-*    Import-Export :
+
+*  Arguments Given & Returned:
       INTEGER IUSER (*)
       DOUBLE PRECISION USER (*)
-*    Export :
+
+*  Arguments Returned:
       DOUBLE PRECISION C (NCNLN)
       DOUBLE PRECISION CJAC (LDCJ,NCNLN)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION B                   ! b parameter in fitted function
       DOUBLE PRECISION ETA_TEL             ! telescope transmission
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
 *  unpack X vector
 

@@ -86,7 +86,7 @@
 *     STATUS                 = INTEGER (Given and returned)
 *        The global status
 
-*  Description :
+*  Description:
 *     This routine calculates the apparent RA and dec of a specified set
 *     of bolometers. It does this by:-
 *
@@ -116,10 +116,15 @@
 *          positions.
 *
 
-*  Authors :
+*  Authors:
 *     JFL: J.Lightfoot (jfl@roe.ac.uk)
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
-*  History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
 *     1-AUG-1995 (JFL)
 *        Original version
@@ -133,14 +138,14 @@
 *     {note_any_bugs_here}
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE                            ! No implicit typing
 
-*    Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER          MAX_POINT
       INTEGER          NUM_CHAN
       INTEGER          NUM_ADC
@@ -165,26 +170,28 @@
       REAL             U4 (NUM_CHAN,NUM_ADC)
       REAL             U4_CENTRE
 
-*    Import-Export :
-*    Export :
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION ELEVATION
       DOUBLE PRECISION PAR_ANGLE
       DOUBLE PRECISION X_BOL (N_BOL)
       DOUBLE PRECISION Y_BOL (N_BOL)
 
-*    Status :
+*  Status:
       INTEGER          STATUS
-*    External references :
 
-*    Global variables :
+*  External references:
 
-*    Local Constants :
+*  Global variables:
+
+*  Local Constants:
       DOUBLE PRECISION ARCSEC2RAD         ! arcsec 2 radians conversion
       PARAMETER (ARCSEC2RAD = 4.84813681110D-6)
       DOUBLE PRECISION PI                 !
       PARAMETER (PI = 3.14159265359)
 
-*    Local variables :
+*  Local variables:
       INTEGER          ADC                ! ADC number of bolometer
       DOUBLE PRECISION AZ_OFFSET          ! offset in az (arcsec)
       DOUBLE PRECISION DAZ                ! azimuth of point (radians)

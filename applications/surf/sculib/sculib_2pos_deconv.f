@@ -1,9 +1,15 @@
-*+  SCULIB_2POS_DECONV - deconvolve square chop from scan
       SUBROUTINE SCULIB_2POS_DECONV (N_EXPOSURES, N_INTEGRATIONS,
      :  N_MEASUREMENTS, DEMOD_POINTER, N_BOL, N_POS, IN_DATA,
      :  IN_VARIANCE, IN_QUALITY, SAMPLE_DX, BEAM_SEP, 
      :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, BADBIT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_2POS_DECONV
+
+*  Purpose:
+*     deconvolve square chop from scan
+
+*  Description:
 *     This routine deconvolves the chopped beam response from the
 *     individual scans of a SCUBA raster map. 
 *        To achieve this it cycles through the scans making up the 
@@ -19,12 +25,14 @@
 *     the chop. The routine then cycles through the bolometers, calling 
 *     SCULIB_CONVOLVE to do the required convolutions with the scan data
 *     for each.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_2POS_DECONV (N_EXPOSURES, N_INTEGRATIONS,
 *    :  N_MEASUREMENTS, DEMOD_POINTER, N_BOL, N_POS, IN_DATA,
 *    :  IN_VARIANCE, IN_QUALITY, SAMPLE_DX, BEAM_SEP, 
 *    :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_EXPOSURES                 = INTEGER (Given)
 *           maximum number of exposures per integration
 *     N_INTEGRATIONS              = INTEGER (Given)
@@ -57,22 +65,38 @@
 *           bad bit mask
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     7-OCT-1995: original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                        ! for VAL__BADI
       INCLUDE 'MSG_PAR'                        ! for MSG__
-*    Import :
+
+*  Arguments Given:
       INTEGER N_EXPOSURES
       INTEGER N_INTEGRATIONS
       INTEGER N_MEASUREMENTS
@@ -86,21 +110,28 @@
       REAL    SAMPLE_DX
       REAL    BEAM_SEP
       BYTE    BADBIT
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL    OUT_DATA (N_BOL, N_POS)
       REAL    OUT_VARIANCE (N_BOL, N_POS)
       BYTE    OUT_QUALITY (N_BOL, N_POS)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER MAX_CONV                         ! the maximum size of the
       PARAMETER (MAX_CONV = 12001)              ! convolution functions
       INTEGER MAX_SCAN                         ! the maximum length of a scan
       PARAMETER (MAX_SCAN = 6000)
-*    Local variables :
+
+*  Local variables:
       REAL    AS_CONV_FUNCTION (MAX_CONV)      ! the `asymmetric' convolution
                                                ! function
       INTEGER BOL                              ! bolometer index
@@ -124,9 +155,12 @@
       REAL    SCRATCH2_VARIANCE (MAX_SCAN)     ! scratch quality
       REAL    SY_CONV_FUNCTION (MAX_CONV)      ! the `symmetric' convolution
                                                ! function
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

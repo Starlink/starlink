@@ -1,7 +1,13 @@
-*+  SCULIB_FIT_DXISQ_DAJ - calculate gradient in chi-squared with `a'
       SUBROUTINE SCULIB_FIT_DXISQ_DAJ (XISQ_ROUTINE, N, A, J, DXISQ_DAJ,
      :  STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FIT_DXISQ_DAJ
+
+*  Purpose:
+*     calculate gradient in chi-squared with `a'
+
+*  Description:
 *     If status is good on entry this routine will calculate the gradient in 
 *     the chi-squared of the fit with variation in fit parameter J. It does 
 *     this numerically by calling the supplied routine XISQ_ROUTINE to 
@@ -14,10 +20,12 @@
 *
 *     DELTA_AJ is equal to the absolute value of 0.001 * A(J) or, if this is
 *     zero, 0.001. 
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FIT_DXISQ_DAJ (XISQ_ROUTINE, N, A, J, DXISQ_DAJ,
 *    :  STATUS)
-*    Parameters :
+
+*  Arguments:
 *     XISQ_ROUTINE (XISQ, N, A, STATUS)
 *                             = EXTERNAL ROUTINE (Given)
 *           name of routine that will calculate xi-squared
@@ -31,39 +39,65 @@
 *           the gradient of chi-squared with A(J)
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (JFL@ROE.AC.UK)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     23-MAR-1995: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N
       DOUBLE PRECISION A (N)
       INTEGER J
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION DXISQ_DAJ
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       EXTERNAL XISQ_ROUTINE
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       DOUBLE PRECISION DELTA_AJ      ! small increment in A(J)
       DOUBLE PRECISION XISQP         ! value of chi-squared at A(J) + DELTA_AJ
       DOUBLE PRECISION XISQM         ! value of chi-squared at A(J) - DELTA_AJ
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,10 +1,16 @@
-*+  SCULIB_1D2_JIGGLE - routine to unpack a 1-d jiggle dataset into a 2-d
-*                       image
       SUBROUTINE SCULIB_1D2_JIGGLE (BOL, N_BOLS, J_START, N_JIG, 
      :  J_REPEAT, J_COUNT, J_DATA, J_VARIANCE, J_QUALITY, IDIM, 
      :  JDIM, I_JIGGLE, J_JIGGLE, DATA_2D, VARIANCE_2D, QUALITY_2D, 
      :  STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_1D2_JIGGLE
+
+*  Purpose:
+*     routine to unpack a 1-d jiggle dataset into a 2-d
+*     image
+
+*  Description:
 *     This routine unpacks the data for a specified bolometer from a
 *     dataset stored according to jiggle number into a 2-d dataset
 *     with data stored according to jiggle offset.
@@ -16,12 +22,14 @@
 *     input values for it, and the variance will calculated from the
 *     spread of input points around the mean unless only one input point
 *     contributed, in which case the input variance will be used.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_1D2_JIGGLE (BOL, N_BOLS, J_START, N_JIG, 
 *    :  J_REPEAT, J_COUNT, J_DATA, J_VARIANCE, J_QUALITY, IDIM, 
 *    :  JDIM, I_JIGGLE, J_JIGGLE, DATA_2D, VARIANCE_2D, QUALITY_2D, 
 *    :  STATUS)
-*    Parameters :
+
+*  Arguments:
 *     BOL                          = INTEGER (Given)
 *           the number of the bolometer whose data is to be unpacked
 *     N_BOLS                       = INTEGER (Given)
@@ -61,21 +69,37 @@
 *           the quality plane
 *     STATUS                       = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     10-AUG-1993: Original version.
 *      8-JUN-1995: Checked.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER BOL
       INTEGER N_BOLS
       INTEGER J_START
@@ -89,25 +113,35 @@
       INTEGER JDIM
       INTEGER I_JIGGLE (J_COUNT)
       INTEGER J_JIGGLE (J_COUNT)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL DATA_2D (IDIM, JDIM)
       REAL VARIANCE_2D (IDIM, JDIM)
       INTEGER QUALITY_2D (IDIM, JDIM)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
       INTEGER J
       INTEGER JPOS
       INTEGER JIG
       INTEGER REPEAT
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

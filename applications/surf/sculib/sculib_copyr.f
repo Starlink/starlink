@@ -1,43 +1,77 @@
-*+  SCULIB_COPYR - copy one real array to another
       SUBROUTINE SCULIB_COPYR (N, FROM, TO)
-*    Description :
+*+
+*  Name:
+*     SCULIB_COPYR
+
+*  Purpose:
+*     copy one real array to another
+
+*  Description:
 *     copies one real array into another
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_COPYR (N, FROM, TO)
-*    Parameters :
+
+*  Arguments:
 *     N          = INTEGER (Given)
 *           number of reals in arrays
 *     FROM (N)   = REAL (Given)
 *           array copied from
 *     TO (N)     = REAL (Returned)
 *           array copied to
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     25.11.1992: Original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-*    Import :
+
+*  Global constants:
+
+*  Arguments Given:
       INTEGER N
       REAL FROM (N)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL TO (N)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       DO I = 1, N
          TO (I) = FROM (I)

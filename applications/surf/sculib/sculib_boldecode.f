@@ -1,14 +1,22 @@
-*+  SCULIB_BOLDECODE - decode a bolometer ID into ADC and channel number
       SUBROUTINE SCULIB_BOLDECODE (BOLCODE, ADC, CHANNEL, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_BOLDECODE
+
+*  Purpose:
+*     decode a bolometer ID into ADC and channel number
+
+*  Description:
 *     Given a character string containing a bolometer ID, put ADC and 
 *     CHANNEL number into output variables. The syntax of the bolometer
 *     ID is a3, A3 or 3. Allowed ADCs run from a-i. Channels
 *     must be in range 1-16. Bolometer IDs outside these ranges will cause
 *     an error to be returned.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_BOLDECODE (BOLCODE, ADC, CHANNEL, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     BOLCODE                     = CHARACTER*(*) (given)
 *           bolometer ID
 *     ADC                         = INTEGER (Returned)
@@ -17,30 +25,51 @@
 *           channel number
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL), adapted from transputer routine by IAS.
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) BOLCODE
-*    Export :
+
+*  Arguments Returned:
       INTEGER ADC                
       INTEGER CHANNEL
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN              ! CHR string length function
-*    Local variables :
+
+*  Local variables:
       INTEGER I                    !
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

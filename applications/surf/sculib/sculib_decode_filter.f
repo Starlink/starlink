@@ -1,8 +1,14 @@
-*+  SCULIB_DECODE_FILTER - decode filter name into names and wavelengths of 
-*                          filters in front of each instrument section in use
       SUBROUTINE SCULIB_DECODE_FILTER (FILTER, N_SUB, SUB_INSTRUMENT,
      :  SUB_FILTER, WAVELENGTH, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_DECODE_FILTER
+
+*  Purpose:
+*     decode filter name into names and wavelengths of 
+*     filters in front of each instrument section in use
+
+*  Description:
 *     This routine decodes the filter name to give the name and central 
 *     wavelength of the filter in front of each sub-instrument being used.
 *        The filter name should be in format <short>:<long> where these
@@ -33,10 +39,12 @@
 *     will be output and the routine return with bad status. The routine is
 *     insensitive to the case of `PHOT'.
 *  
-*    Invocation :
+
+*  Invocation:
 *     SUBROUTINE SCULIB_DECODE_FILTER (FILTER, N_SUB, SUB_INSTRUMENT,
 *    :  SUB_FILTER, WAVELENGTH, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     FILTER                   = CHARACTER*(*) (Given)
 *           name of filter
 *     N_SUB                    = INTEGER (Given)
@@ -51,36 +59,59 @@
 *           wavelength set to VAL__BADR
 *     STATUS                   = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     24-MAR-1993: Original version.
 *     30-APR-1993: Modified to give wavelengths as real numbers rather than
 *                  strings
 *      4-OCT-1994: Modified to return filter names as well as wavelengths
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) FILTER
       INTEGER N_SUB
       CHARACTER*(*) SUB_INSTRUMENT (N_SUB)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       CHARACTER*(*) SUB_FILTER (N_SUB)
       REAL WAVELENGTH (N_SUB)
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER      DELIM
       CHARACTER*20 LONG
       CHARACTER*20 LONG_NAME
@@ -95,9 +126,12 @@
       CHARACTER*20 SHORT_NAME
       REAL         SHORT_WAVE
       INTEGER      SUB
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

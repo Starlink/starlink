@@ -1,9 +1,15 @@
-*+  SCULIB_UNPACK_JIGGLE_SEPARATES - unpack jiggle data arrays onto 2-d map
       SUBROUTINE SCULIB_UNPACK_JIGGLE_SEPARATES (N_JIGGLES, N_BOLS,  
      :  J_DATA, J_VARIANCE, J_QUALITY, J_START, JIGGLE_COUNT,
      :  I_JIGGLE, J_JIGGLE, IDIM, JDIM, MAP_DATA, MAP_VARIANCE,
      :  MAP_QUALITY, MAP_NUMPTS, J_END, BADBIT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_UNPACK_JIGGLE_SEPARATES
+
+*  Purpose:
+*     unpack jiggle data arrays onto 2-d map
+
+*  Description:
 *     This routine unpacks data from a jiggle observation into a
 *     rectangular 2-d map. 
 *        If status is good on entry the data and variance of the output map 
@@ -27,12 +33,14 @@
 *     variances will be calculated from the dispersion of the values about
 *     the mean if there was more than 1, or set to the input variance
 *     otherwise.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_UNPACK_JIGGLE_SEPARATES (N_JIGGLES, N_BOLS, J_DATA,
 *    :  J_VARIANCE, J_QUALITY, J_START, JIGGLE_COUNT, I_JIGGLE, 
 *    :  J_JIGGLE, IDIM, JDIM, MAP_DATA, MAP_VARIANCE, MAP_QUALITY, MAP_NUMPTS,
 *    :  J_END, BADBIT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_JIGGLES                         = INTEGER (Given)
 *           number of jiggles in datablock
 *     N_BOLS                            = INTEGER (Given)
@@ -69,21 +77,37 @@
 *           bad bit mask
 *     STATUS                            = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     21-MAY-1996: Original version, adapted from SCULIB_UNPACK_JIGGLE.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                 ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       INTEGER N_JIGGLES
       INTEGER N_BOLS
       REAL    J_DATA (N_BOLS, N_JIGGLES)
@@ -96,30 +120,41 @@
       INTEGER IDIM
       INTEGER JDIM
       BYTE    BADBIT
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL    MAP_DATA (IDIM, JDIM, N_BOLS)
       REAL    MAP_VARIANCE (IDIM, JDIM, N_BOLS)
       BYTE    MAP_QUALITY (IDIM, JDIM, N_BOLS)
       INTEGER MAP_NUMPTS (IDIM, JDIM, N_BOLS)
       INTEGER J_END
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER BOL                       ! DO loop variable
       INTEGER I                         ! DO loop variable
       INTEGER IM                        ! array index
       INTEGER J                         ! DO loop variable
       INTEGER JIGGLE                    ! jiggle index
       INTEGER JM                        ! array index
-*    Internal References :
-*    Local data :
-*    External functions:
+
+*  Internal References:
+
+*  Local data:
+
+*  External functions:
       INCLUDE 'NDF_FUNC'
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

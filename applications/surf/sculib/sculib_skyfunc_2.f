@@ -1,9 +1,15 @@
-*+  SCULIB_SKYFUNC_2 - calculate f(x) and its Jacobian for NAG non-linear
-*                      fitting routine E04UPF when fitting B and TAU in
-*                      sky-dip analysis
       SUBROUTINE SCULIB_SKYFUNC_2 (MODE, M, N, LDFJ, X, F, FJAC,
      :  NSTATE, IUSER, USER)
-*    Description :
+*+
+*  Name:
+*     SCULIB_SKYFUNC_2
+
+*  Purpose:
+*     calculate f(x) and its Jacobian for NAG non-linear
+*     fitting routine E04UPF when fitting B and TAU in
+*     sky-dip analysis
+
+*  Description:
 *     E04UPF is a NAG routine that is used to fit a theoretical
 *     sky-dip curve to the measured data by varying B and TAU.
 *     This routine is called by E04UPF to calculate the M sub-functions
@@ -54,24 +60,42 @@
 *      USER (M+4:2M+3)  = the measured sky temperatures 
 *      USER (2M+4:3M+3) = the errors on the measured sky temperatures
 *
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_SKYFUNC_2 (MODE, M, N, LDFJ, X, F, FJAC, NSTATE, 
 *    :  IUSER, USER)
-*    Parameters :
+
+*  Arguments:
 *     See NAG manual description of OBJFUN parameter in E04UPF.
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     15-SEP-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-*    Import :
+
+*  Global constants:
+
+*  Arguments Given:
       INTEGER MODE
       INTEGER M
       INTEGER N
@@ -80,15 +104,22 @@
       INTEGER NSTATE
       INTEGER IUSER (*)
       DOUBLE PRECISION USER (3*M + 3)
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION F (M)
       DOUBLE PRECISION FJAC (LDFJ,N)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I
       DOUBLE PRECISION ETA_TEL
       DOUBLE PRECISION B
@@ -99,9 +130,12 @@
       DOUBLE PRECISION J_THEORY
       DOUBLE PRECISION J_MEAS
       DOUBLE PRECISION J_ERROR
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
 *  unpack X vector
 

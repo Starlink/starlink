@@ -1,7 +1,13 @@
-*+  SCULIB_READ_NUMBERS - routine to read numbers from an ASCII file
       SUBROUTINE SCULIB_READ_NUMBERS (FILENAME, NARRAY, SIZE, 
      :   ARRAY1, ARRAY2, ARRAY3, LENGTH, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_READ_NUMBERS
+
+*  Purpose:
+*     routine to read numbers from an ASCII file
+
+*  Description:
 *     This routine reads a file of ASCII numbers. The name of the file
 *     is specified by FILENAME, and the routine assumes that the numbers
 *     are in NARRAY columns each containing SIZE numbers. The maximum
@@ -9,10 +15,12 @@
 *     An error will be returned if there is trouble reading from the 
 *     file. A warning will be given if there are more numbers in the 
 *     file than can be read into the arrays.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_READ_NUMBERS (FILENAME, NARRAY, SIZE, 
 *    :   ARRAY1, ARRAY2, ARRAY3, LENGTH, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     FILENAME         = CHARACTER*(*) (Given)
 *           Name of file containing numbers
 *     NARRAY           = INTEGER (Given)
@@ -29,37 +37,60 @@
 *           Number of items read into output arrays
 *     STATUS = INTEGER (Given and returned)
 *           Global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     9-JUN-1993: renamed from SCUCD_READ_NUMBERS.FOR
 *    27-AUG-1993: converted to work with FIO routines
 *     7-OCT-1994: Revamped again.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) FILENAME
       INTEGER       NARRAY
       INTEGER       SIZE
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL          ARRAY1 (SIZE)
       REAL          ARRAY2 (SIZE)
       REAL          ARRAY3 (SIZE)
       INTEGER       LENGTH
-*    Status :
+
+*  Status:
       INTEGER       STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       CHARACTER*80     BUF              ! line read from file
       INTEGER          BUFLEN           ! length of read line
       INTEGER          FD               ! FIO file descriptor
@@ -70,9 +101,12 @@
       INTEGER          IOSTAT           ! Fortran I/O status
       INTEGER          N_ITEMS          ! number of numbers on each line
       REAL             TEMP (3)         ! scratch reals
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

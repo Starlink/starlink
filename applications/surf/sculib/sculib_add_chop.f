@@ -64,7 +64,7 @@
 *     STATUS                 = INTEGER (Given and returned)
 *        The global status
 
-*  Description :
+*  Description:
 *     This routine takes a chop throw and adds it on the 
 *     supplied apparent RA/Dec centre position returning a new
 *     apparent RA/Dec. Works with scan map and jiggle map
@@ -89,11 +89,20 @@
 *       LO to AZ before calling this routine
 *     
 
-*  Authors :
+*  Authors:
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
-*  History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
 *     $Log$
+*     Revision 1.5  1999/08/03 19:34:41  timj
+*     Add copyright message to header.
+*     Convert old header style to new.
+*
 *     Revision 1.4  1999/07/14 20:13:26  timj
 *     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
 *     a parameter.
@@ -115,13 +124,13 @@
 *     {note_any_bugs_here}
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE                            ! No implicit typing
 
-*    Global constants:
+*  Global constants:
       INCLUDE 'SAE_PAR'
 
-*    Import:
+*  Arguments Given:
       CHARACTER *(*)   BEAM
       CHARACTER *(*)   CHOP_CRD
       CHARACTER *(*)   CHOP_FUN
@@ -139,21 +148,22 @@
       DOUBLE PRECISION RA_REF_CENTRE
       REAL             RA_START
 
-*    Import-Export:
-*    Export:
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       DOUBLE PRECISION OUT_DEC_CEN
       DOUBLE PRECISION OUT_RA_CEN
 
-*    Status:
+*  Status:
       INTEGER          STATUS
 
-*    External references:
+*  External references:
 
-*    Global variables:
+*  Global variables:
 
-*    Local Constants:
+*  Local Constants:
 
-*    Local variables:
+*  Local variables:
       DOUBLE PRECISION ANG                ! scan angle (-PI to PI)
       DOUBLE PRECISION DTEMP              ! Scratch double
       DOUBLE PRECISION DX                 ! X scan length

@@ -1,9 +1,15 @@
-*+  SCULIB_READ_JIGGLE - read a jiggle pattern 
       SUBROUTINE SCULIB_READ_JIGGLE (JIGGLE_NAME, MAX_JIGGLE, 
      :  JIGGLE_P_SWITCH, JIGGLE_REPEAT, EXP_PER_INT, JIGGLE_X, JIGGLE_Y, 
      :  JIGGLE_COUNT, JIGGLE_X_MAX, JIGGLE_X_MIN, JIGGLE_Y_MAX, 
      :  JIGGLE_Y_MIN, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_READ_JIGGLE
+
+*  Purpose:
+*     read a jiggle pattern 
+
+*  Description:
 *     This routine reads in a jiggle pattern and sets some variables associated
 *     with it; the number of jiggles in the pattern, the number of jiggles to
 *     be measured in each exposure, the number of times the pattern will be
@@ -22,12 +28,14 @@
 *     in the pattern then the jiggle pattern will be repeated an integer
 *     number of times during each switch of the exposure and JIGGLE_P_SWITCH
 *     will be reset accordingly. 
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_READ_JIGGLE (JIGGLE_NAME, MAX_JIGGLE, 
 *    :  JIGGLE_P_SWITCH, JIGGLE_REPEAT, EXP_PER_INT, JIGGLE_X, JIGGLE_Y, 
 *    :  JIGGLE_COUNT, JIGGLE_X_MAX, JIGGLE_X_MIN, JIGGLE_Y_MAX, 
 *    :  JIGGLE_Y_MIN, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     JIGGLE_NAME            = CHARACTER*(*) (Given)
 *           the name of the file containing the jiggle pattern
 *     MAX_JIGGLE             = INTEGER (Given)
@@ -56,42 +64,68 @@
 *           the minimum jiggle offset in the y axis
 *     STATUS =       INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     14-AUG-1993: Original version
 *      3-OCT-1994: Code-read and improvements incorporated (JFL).
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) JIGGLE_NAME
       INTEGER MAX_JIGGLE
-*    Import-Export :
+
+*  Arguments Given & Returned:
       INTEGER JIGGLE_P_SWITCH
-*    Export :
+
+*  Arguments Returned:
       INTEGER JIGGLE_REPEAT
       INTEGER EXP_PER_INT
       REAL JIGGLE_X (MAX_JIGGLE), JIGGLE_Y (MAX_JIGGLE)
       INTEGER JIGGLE_COUNT
       REAL JIGGLE_X_MIN, JIGGLE_X_MAX
       REAL JIGGLE_Y_MIN, JIGGLE_Y_MAX
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER I                              ! DO loop
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -1,10 +1,16 @@
-*+  SCULIB_ANALYSE_PHOTOM_JIGGLE - analyse the jiggle map made by a
-*                                  bolometer during a PHOTOM observation
       SUBROUTINE SCULIB_ANALYSE_PHOTOM_JIGGLE (PHOTOM_ANALYSIS,
      :     BOL, N_BOLS, J_COUNT, JIGGLE_X, JIGGLE_Y, JDATA, VARIANCE, 
      :     QUALITY,RESULT_D, RESULT_V, RESULT_Q, A0, A1, X0, Y0, BADBIT,
      :     STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_ANALYSE_PHOTOM_JIGGLE
+
+*  Purpose:
+*     analyse the jiggle map made by a
+*     bolometer during a PHOTOM observation
+
+*  Description:
 *     This routine analyses the jiggle map made by a bolometer during a
 *     PHOTOM observation.
 *        If status is good on entry the routine checks that the data array
@@ -27,11 +33,13 @@
 *                  will be flat-fielded and reported to the user. Otherwise 
 *                  the result quality is set bad but good status will be 
 *                  returned.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (PHOTOM_ANALYSIS, BOL, N_BOLS, 
 *    :  J_COUNT, JDATA, VARIANCE, QUALITY, RESULT_D, RESULT_V, RESULT_Q, 
 *    :  BADBIT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     PHOTOM_ANALYSIS              = CHARACTER*(*) (Given)
 *           the method of analysis to be applied to the data
 *     BOL                          = INTEGER (Given)
@@ -68,23 +76,39 @@
 *           bad bit mask
 *     STATUS                       = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     9-AUG-1993: Original version.
 *     8-JAN-1996: Modified to fit parabola.
 *    17-JUL-1996: Modified to multiply by flat-field rather than divide (JFL).
 *    18-JUL-1996: Modified to use PHOTOM_ANALYSIS (JFL).
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) PHOTOM_ANALYSIS
       INTEGER       BOL
       INTEGER       N_BOLS
@@ -95,8 +119,10 @@
       REAL          VARIANCE (N_BOLS, J_COUNT)
       BYTE          QUALITY (N_BOLS, J_COUNT)
       BYTE          BADBIT   
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       REAL RESULT_D
       REAL RESULT_V
       BYTE RESULT_Q
@@ -104,16 +130,21 @@
       REAL A1
       REAL X0
       REAL Y0
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       REAL         ALLOWED_BAD_FRAC     ! Fraction of bad data allowed
       PARAMETER (ALLOWED_BAD_FRAC = 0.3)! in a AVERAGE jiggle
       INTEGER      MAX_JIGGLE           ! max number of jiggle positions
       PARAMETER (MAX_JIGGLE = 512)  
-*    Local variables :
+
+*  Local variables:
       CHARACTER*80 ANALYSIS             ! an uppercase copy of 
                                         ! PHOTOM_ANALYSIS
       REAL         GOODFRAC             ! Fraction of good data
@@ -124,11 +155,15 @@
                                         ! quality for a particular bolometer
       REAL         T_VARIANCE (MAX_JIGGLE)
                                         ! variance for a particular bolometer
-*    Internal References :
-*    Local data :
-*    External functions:
+
+*  Internal References:
+
+*  Local data:
+
+*  External functions:
       INCLUDE 'NDF_FUNC'
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

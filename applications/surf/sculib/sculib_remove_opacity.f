@@ -1,9 +1,15 @@
-*+  SCULIB_REMOVE_OPACITY - remove sky opacity from demodulated data
       SUBROUTINE SCULIB_REMOVE_OPACITY (N_BOLS, N_POS, 
      :  BOL_SELECT_CHAN, BOL_SELECT_ADC, NUM_CHAN, NUM_ADC, BOL_TYPE, 
      :  N_SUB, SUB_INSTRUMENT, TAUZ, AIRMASS, EXP_DATA, EXP_VARIANCE,
      :  EXP_QUALITY, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_REMOVE_OPACITY
+
+*  Purpose:
+*     remove sky opacity from demodulated data
+
+*  Description:
 *     This routine corrects demodulated data for the effect of sky opacity.
 *     All data is corrected assuming the same airmass of observation, but
 *     the zenith sky opacity used will depend which SCUBA sub-instrument each
@@ -18,12 +24,14 @@
 *     If the bolometer data quality was bad, or if sky optical depth lay
 *     outside the above range, the data quality will be set bad and no 
 *     correction applied.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_REMOVE_OPACITY (N_BOLS, N_POS, 
 *    :  BOL_SELECT_CHAN, BOL_SELECT_ADC, NUM_CHAN, NUM_ADC, BOL_TYPE, 
 *    :  N_SUB, SUB_INSTRUMENT, TAUZ, AIRMASS, EXP_DATA, EXP_VARIANCE,
 *    :  EXP_QUALITY, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_BOLS                        = INTEGER (Given)
 *           the number of bolometers measured
 *     N_POS                         = INTEGER (Given)
@@ -54,21 +62,37 @@
 *           the quality on the data
 *     STATUS                        = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     6-AUG-1993: Original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'                  ! for VAL__BADR
-*    Import :
+
+*  Arguments Given:
       INTEGER N_BOLS
       INTEGER N_POS
       INTEGER BOL_SELECT_CHAN (N_BOLS)
@@ -80,27 +104,37 @@
       CHARACTER*(*) SUB_INSTRUMENT (N_SUB)
       REAL TAUZ (N_SUB)
       REAL AIRMASS
-*    Import-Export :
+
+*  Arguments Given & Returned:
       REAL EXP_DATA (N_BOLS, N_POS)
       REAL EXP_VARIANCE (N_BOLS, N_POS)
       INTEGER EXP_QUALITY (N_BOLS, N_POS)
-*    Export :
-*    Status :
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN                    ! CHR string-length function
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER      BOL                   ! bolometer number in DO loop
       REAL         CORRECTION            ! correction to be applied
       INTEGER      POS                   ! measurement index in DO loop
       REAL         TAU                   ! optical depth
       INTEGER      SUB                   ! sub-instrument in DO loop
       CHARACTER*80 TYPE                  ! bolometer type
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

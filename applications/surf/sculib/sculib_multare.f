@@ -1,17 +1,25 @@
-*+  SCULIB_MULTARE - multiplies 2 real arrays with optional error and quality
-*                    handling
       SUBROUTINE SCULIB_MULTARE (NELM, ARRAY1, ARRAY2, ARRAY3, Q1DATA,
      :  Q2DATA, Q3DATA, E1DATA, E2DATA, E3DATA, QUAL, FLAGS, FBAD, 
      :  VARIANCE)
-*    Description :
+*+
+*  Name:
+*     SCULIB_MULTARE
+
+*  Purpose:
+*     multiplies 2 real arrays with optional error and quality
+*     handling
+
+*  Description:
 *     Multiplies two floating point arrays.  The arrays
 *     may have any dimensions; they are treated here as
 *     linear in order to generate more efficient code.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_MULTARE (NELM, ARRAY1, ARRAY2, ARRAY3, Q1DATA,
 *    :  Q2DATA, Q3DATA, E1DATA, E2DATA, E3DATA, QUAL, FLAGS, FBAD, 
 *    :  VARIANCE)
-*    Parameters :
+
+*  Arguments:
 *     NELM                = INTEGER (Given)
 *              Number of elements in each array
 *     ARRAY1 (NELM)       = REAL (Given)
@@ -42,42 +50,68 @@
 *              True if both input arrays have variance arrays
 *
 *     Note that any of the arrays may be the same.
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     24-SEP-1993: Original, re-badged version of GEN_MULTAFE by KS.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       LOGICAL  VARIANCE, QUAL, FLAGS
       INTEGER  NELM
       INTEGER Q1DATA(NELM), Q2DATA(NELM)
       REAL E1DATA(NELM), E2DATA(NELM)
       REAL ARRAY1(NELM), ARRAY2(NELM)
       REAL FBAD
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       INTEGER Q3DATA(NELM)
       REAL E3DATA(NELM)
       REAL ARRAY3(NELM)
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  Status:
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER  GOOD, BAD
       PARAMETER (BAD = 1, GOOD = 0)
-*    Local variables :
+
+*  Local variables:
       INTEGER I
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
 *  Handle different quality methods separately.  
 

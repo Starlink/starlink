@@ -1,9 +1,15 @@
-*+  SCULIB_FIND_SWITCH - find the start and end indices of a switch in the
-*                        demodulated data array
       SUBROUTINE SCULIB_FIND_SWITCH (DEMOD_POINTER, N_SWITCHES, 
      :  N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS, SWITCH, EXP,
      :  INT, MEAS, S_START, S_END, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FIND_SWITCH
+
+*  Purpose:
+*     find the start and end indices of a switch in the
+*     demodulated data array
+
+*  Description:
 *     This routine finds the start and end indices of the specified switch
 *     in a SCUBA observation. The array DEMOD_POINTER contains the start
 *     indices, so this part is easy. However, the end index will be 1 less
@@ -13,11 +19,13 @@
 *     an exposure need not have been taken and stored consecutively, 
 *     though exposures, integrations and measurements are ordered as one
 *     would expect.
-*    Invocation :
+
+*  Invocation:
 *     CALL SCULIB_FIND_SWITCH (DEMOD_POINTER, N_SWITCHES, N_EXPOSURES,
 *    :  N_INTEGRATIONS, N_MEASUREMENTS, N_POS, SWITCH, EXP, INT, MEAS,
 *    :  S_START, S_END, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     DEMOD_POINTER (N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS)
 *                           = INTEGER (Given)
 *           an array of pointers to the start of each switch
@@ -45,20 +53,36 @@
 *           pointer to the end of the switch
 *     STATUS                = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
 *     $Id$
 *     25-JUL-1995: original version.
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER N_SWITCHES
       INTEGER N_EXPOSURES
       INTEGER N_INTEGRATIONS
@@ -70,23 +94,33 @@
       INTEGER EXP
       INTEGER INT
       INTEGER MEAS
-*    Import-Export :
-*    Export :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       INTEGER S_START
       INTEGER S_END
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       INTEGER E                        ! exposure index in DO loop
       INTEGER I                        ! integer index in DO loop
       INTEGER M                        ! measurement index in DO loop 
       INTEGER S                        ! switch index in DO loop
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
