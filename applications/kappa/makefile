@@ -657,7 +657,8 @@ kps1_elmap.f kps1_pswcs.f kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f \
 kps1_zpdec.f kps1_glibr.f kps1_gligt.f kps1_glidd.f kps1_gliwd.f \
 kps1_glibd.f kps1_glidr.f kps1_gliwr.f kps1_saxlk.f kps1_clpsr.f \
 kps1_clpsd.f kps1_prmxb.f kps1_prmxub.f kps1_prmxd.f kps1_prmxuw.f \
-kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f kps1_cremg.f kps1_crets.f
+kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f kps1_cremg.f kps1_crets.f \
+kps1_agnch.f kps1_agndw.f kps1_agnwc.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -2182,18 +2183,18 @@ $(PKG_NAME)_data.tar:
 #  files.
 
 
-add.o:	 SAE_PAR NDF_PAR
+add.o:	         SAE_PAR NDF_PAR
 apadsb.o:	 SAE_PAR PRM_PAR
 aperadd.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR
-ardgen.o:	 SAE_PAR DAT_PAR PAR_PAR PAR_ERR NDF_PAR NDF_ERR
+ardgen.o:	 SAE_PAR DAT_PAR PAR_ERR AST_PAR GRP_PAR
 ardmask.o:	 SAE_PAR NDF_PAR GRP_PAR PRM_PAR
 ardplot.o:       SAE_PAR AST_PAR GRP_PAR
 axconv.o:	 SAE_PAR DAT_PAR NDF_PAR MSG_PAR
 axlabel.o:	 SAE_PAR NDF_PAR PAR_ERR
 axunits.o:	 SAE_PAR NDF_PAR PAR_ERR
 block.o:	 SAE_PAR PAR_PAR PRM_PAR NDF_PAR PAR_ERR
-cadd.o:	 SAE_PAR NDF_PAR
-calc.o:	 SAE_PAR DAT_PAR PRM_PAR
+cadd.o:	         SAE_PAR NDF_PAR
+calc.o:	         SAE_PAR DAT_PAR PRM_PAR
 calpol.o:	 SAE_PAR PAR_ERR
 ccd1_orvar.o:	 SAE_PAR CCD1_PAR
 ccg1_bmd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
@@ -2347,15 +2348,17 @@ kaphelp.o:	 SAE_PAR PAR_ERR
 kappa_mon.o:	 SAE_PAR
 kapversion.o:	 SAE_PAR PAR_ERR
 kapview_mon.o:	 SAE_PAR
-
+kps1_agnch.o:	 SAE_PAR GRP_PAR
 kps1_agncm.o:	 SAE_PAR GRP_PAR
-kps1_agncp.o:	 SAE_PAR DAT_PAR PAR_PAR
+kps1_agncp.o:	 SAE_PAR
 kps1_agncv.o:	 SAE_PAR
-kps1_agndl.o:	 SAE_PAR GRP_PAR PAR_ERR
-kps1_agndr.o:	 SAE_PAR PRM_PAR
+kps1_agndl.o:	 SAE_PAR GRP_PAR PRM_PAR PAR_ERR
+kps1_agndr.o:	 SAE_PAR GRP_PAR
+kps1_agndw.o:	 SAE_PAR GRP_PAR PRM_PAR PAR_ERR
 kps1_agnls.o:	 SAE_PAR GRP_PAR HLPCMD
 kps1_agnms.o:	 SAE_PAR
-kps1_agnst.o:	 SAE_PAR
+kps1_agnst.o:	 SAE_PAR GRP_PAR AST_PAR NDF_PAR
+kps1_agnwc.o:	 SAE_PAR GRP_PAR AST_PAR
 kps1_ardmb.o:	 SAE_PAR PRM_PAR
 kps1_ardmd.o:	 SAE_PAR PRM_PAR
 kps1_ardmi.o:	 SAE_PAR PRM_PAR

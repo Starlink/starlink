@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_AGNCM( PARAM1, PARAM2, IGRP, STATUS )
+      SUBROUTINE KPS1_AGNCM( PARAM1, PARAM2, IGRP, NREG, STATUS )
 *+
 *  Name:
 *     KPS1_AGNCM
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_AGNCM( PARAM1, PARAM2, IGRP, STATUS )
+*     CALL KPS1_AGNCM( PARAM1, PARAM2, IGRP, NREG, STATUS )
 
 *  Description:
 *     A logical operator (AND, OR, NOT, etc.) is obtained from the
@@ -35,6 +35,8 @@
 *        operate on.
 *     IGRP = INTEGER (Given and Returned)
 *        The GRP identifier for the group holding the ARD descriptions.
+*     NREG = INTEGER (Given and Returned)
+*        The number of regions in the group.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -51,6 +53,8 @@
 *        variables and not using continuation lines), and shortened long
 *        lines.  Fixed a bug that did caused region indices not to be in
 *        increasing order.
+*     18-SEP-2001 (DSB):
+*        Added argument NREG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -66,11 +70,12 @@
       INCLUDE 'GRP_PAR'          ! GRP public constants
       
 *  Arguments Given:
-      CHARACTER * ( * ) PARAM1 
-      CHARACTER * ( * ) PARAM2 
+      CHARACTER PARAM1*(*)
+      CHARACTER PARAM2*(*)
       
 *  Arguments Given and Returned:
       INTEGER IGRP
+      INTEGER NREG
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -79,35 +84,21 @@
       INTEGER CHR_LEN            ! Length of string less trailing blanks
 
 *  Local Variables:
+      CHARACTER OPER*10          ! Operator string
+      CHARACTER TEXT*( GRP__SZNAM ) ! An element of text from the group
       INTEGER I                  ! Current group element index
       INTEGER IGRP2              ! Temporary group identifier
       INTEGER ITEMP              ! Temporary storage
       INTEGER LOPER              ! Used length of OPER
       INTEGER LTEXT              ! Used length of TEXT
-      INTEGER NREG               ! Number of defined regions
-      CHARACTER * ( 10 ) OPER    ! Operator string
       INTEGER REG                ! Current region index
       INTEGER REGS( 2 )          ! Region indices for operands
       INTEGER SIZE               ! Number of elements in group
-      CHARACTER * ( GRP__SZNAM ) TEXT ! An element of text from the
-                                 ! group
 
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Find the number of regions currently defined.  Each region may take
-*  several lines of text to describe.  The first line for each region
-*  starts at character 1, whereas subsequent lines start with one or
-*  more spaces.  Therefore, only count lines with no leading spaces.
-      NREG = 0
-      
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )      
-      DO I = 1, SIZE
-         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
-         IF ( TEXT( 1 : 1 ) .NE. ' ' ) NREG = NREG + 1
-      END DO
 
 *  Warn the user and return if there are currently no defined regions.
       IF ( NREG .EQ. 0 ) THEN
@@ -243,6 +234,9 @@
          LTEXT = CHR_LEN( TEXT )
          TEXT( LTEXT + 1 : ) = ' )' 
          CALL GRP_PUT( IGRP, 1, TEXT, SIZE, STATUS )
+
+*  Reduce the number of regions by 1.
+         NREG = NREG - 1
 
 *  Now handle the case of unary operators (just .NOT. at the moment).
       ELSE

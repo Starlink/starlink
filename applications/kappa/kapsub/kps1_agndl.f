@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_AGNDL( PARAM, IGRP, STATUS )
+      SUBROUTINE KPS1_AGNDL( PARAM, IGRP, NREG, STATUS )
 *+
 *  Name:
 *     KPS1_AGNDL
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_AGNDL( PARAM, IGRP, STATUS )
+*     CALL KPS1_AGNDL( PARAM, IGRP, NREG, STATUS )
 
 *  Description:
 *     A set of strings is obtained from the environment using the
@@ -46,6 +46,8 @@
 *        The name of the parameter to use.
 *     IGRP = INTEGER (Given and Returned)
 *        The GRP identifier for the group holding the ARD descriptions.
+*     NREG = INTEGER (Given and Returned)
+*        The number of regions in the group.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -60,6 +62,8 @@
 *     1995 March 15 (MJC):
 *        Corrected typo's, used modern style of variable declarations,
 *        and made other stylistic changes for KAPPA.
+*     18-SEP-2001 (DSB):
+*        Added argument NREG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +77,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP public constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! Parameter system error constants
       
 *  Arguments Given:
@@ -80,6 +85,7 @@
       
 *  Arguments Given and Returned:
       INTEGER IGRP
+      INTEGER NREG
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -102,7 +108,6 @@
       INTEGER LAST               ! High end of a range of region indices
       INTEGER NDEL               ! Number of regions deleted.
       INTEGER NEXPR              ! Number of range expressions obtained
-      INTEGER NREG               ! Number of defined regions
       INTEGER REG                ! Current region index
       INTEGER SIZE               ! Number of elements in group
       CHARACTER * ( GRP__SZNAM ) TEXT ! Element of text from the group
@@ -111,18 +116,6 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Find the number of regions currently defined.  Each region may take
-*  several lines of text to describe.  The first line for each region
-*  starts at character 1, whereas subsequent lines start with one or
-*  more spaces.  Therefore, only count lines with no leading spaces.
-      NREG = 0
-      
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )      
-      DO I = 1, SIZE
-         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
-         IF ( TEXT( 1 : 1 ) .NE. ' ' ) NREG = NREG + 1
-      END DO
 
 *  Warn the user and return if there are currently no defined regions.
       IF ( NREG .EQ. 0 ) THEN
@@ -167,6 +160,8 @@
 
 *  Calculate the index-limits.
          CALL KPG1_CNLIM( EXPR( IEXPR ), FIRST, LAST, STATUS )
+         IF( FIRST .EQ. VAL__MINI ) FIRST = 1
+         IF( LAST .EQ. VAL__MAXI ) LAST = NREG
 
 *  If the supplied range goes outside the range of defined regions,
 *  warn the user and return without deleting any regions.
@@ -200,6 +195,9 @@
          END DO
          
       END DO
+
+*  Get the size of the group.
+      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
 
 *  Initialise the index within the group at which the next region starts.
 *  and set the number of regions deleted so far to zero.
@@ -251,6 +249,9 @@
          CALL MSG_OUT( 'KPS1_AGNDL_MSG7', '^N regions deleted.', 
      :                 STATUS )
       END IF      
+
+*  Correct the number of regions currently defined.
+      NREG = NREG - NDEL
 
  999  CONTINUE
 

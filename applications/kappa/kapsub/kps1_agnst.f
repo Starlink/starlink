@@ -298,8 +298,8 @@
 *  Find the length of the box.
          LN = AST_DISTANCE( CFRM, P1, P2, STATUS )
 
-*  Find the position angle of the supplied edge at point 1.
-         PA1 = AST_BEAR( CFRM, P1, P2, STATUS )
+*  Find the angle from axis 2 to the supplied edge at point 1.
+         PA1 = AST_AXANGLE( CFRM, P1, P2, 2, STATUS )
 
 *  Find the mid point of the supplied edge, and the position angle of the
 *  edge at the mid point.
@@ -338,7 +338,7 @@
      :                   NC )
          CALL CHR_APPND( ',', LINE, NC )
          NC = NC + 1
-         CALL CHR_PUTR( REAL( PA3*RTOD ), LINE, NC )
+         CALL CHR_PUTR( REAL( 90.0-PA3*RTOD ), LINE, NC )
          CALL CHR_APPND( ' ) ', LINE, NC )
 
 *  Column.
@@ -361,8 +361,10 @@
          P2( 2 ) = Y( 2 )
          SMA = AST_DISTANCE( CFRM, P1, P2, STATUS )
 
-*  Find the position angle of the semi-major axis.
-         PA1 = AST_BEAR( CFRM, P1, P2, STATUS )
+*  Find the angle from axis 1 to the semi-major axis. Invert because ARD
+*  measures angles anti-clockwise (+x through +y) but AST measures them 
+*  clockwise (+x through -y).
+         PA1 = -AST_AXANGLE( CFRM, P1, P2, 1, STATUS )
 
 *  Resolve the line from the centre to the the third point into two
 *  components parallel and perpendicular to the major axis.
@@ -373,7 +375,7 @@
 *  Calculate the length of the semi-minor axis.
          T = SMA**2 - D1**2
          IF( T > 0.0 ) THEN
-            SMI = D2*SQRT( T )/SMA
+            SMI = ( SMA*D2 )/SQRT( T )
          ELSE
             SMI = SMA
          END IF
