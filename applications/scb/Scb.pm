@@ -117,84 +117,85 @@ sub tarxf {
 }
 
 ########################################################################
+# 
+# #  Constants used by module_name.
+# 
+# @ftypes = qw/INTEGER REAL DOUBLEPRECISION COMPLEX LOGICAL CHARACTER
+#              BYTE UBYTE WORD UWORD/;
+# $ftypdef = '(' . join ('|', @ftypes) . ')\**(\([^\)]\))?[0-9]*';
+# 
+# sub module_name {
+# 
+# #  Examines a line of source code to see whether it identifies the 
+# #  start of an indexable module (e.g. Fortran SUBROUTINE or FUNCTION).
+# #  Returns the name if so, or undef otherwise.
+# #
+# #  Note the parsing is not perfect - the main limitation is that since
+# #  the routine is called once for each line (and is stateless) it will 
+# #  not cope with module declarations whose important parts are split
+# #  across lines.
+# #
+# #  Currently handles Fortran (including Generic) and C source.
+# #  Currently, the C parser only identifies functions defined using the
+# #  macros in /star/include/f77.h as Fortran-callable routines.
+# #
+# #  Probably this could be made (much) more efficient.
+# 
+# #  Arguments.
+# 
+#    my $filetype = shift;      #  'f', 'gen', 'c' or 'h'
+#    local $_ = shift || $_;    #  $_ used if none specified.
+# 
+#    my ($type, $name);
+# 
+# #  Fortran source file.
+# 
+#    if ($filetype eq 'f' || $filetype eq 'gen') {
+# 
+# #     Strip lines of syntactically uninteresting parts.
+# 
+#       return (undef) if (/^[*cC]/);     # Ignore F77 comments.
+#       s/!.*$//;                         # Discard inline comments.
+#       chomp;                            # Discard end of line character.
+#       s/^......//;                      # Discard first six characters.
+#       s/ //g;                           # Remove spaces.
+#       return (undef) unless ($_);       # Ignore empty lines.
+#       tr/a-z/A-Z/;                      # Fold case to upper.
+#       return undef if (/^\w*=/);        # Ignore assignments.
+#       s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
+# 
+#       ($type, $name) = /^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(*,]+)/;
+# 
+#       if ($name && $filetype eq 'gen') {
+#          $name =~ s/</\&lt;/g;
+#          $name =~ s/>/\&gt;/g;
+#       }
+#       $name = (lc $name) . "_" if ($name);
+#    }
+# 
+# #  C source file.
+# 
+#    elsif ($filetype eq 'c') {
+# 
+# #     Very feeble attempt to strip comments.
+# 
+#       chomp;
+#       s%^#.*%%g;           #  Discard preprocessor directives.
+#       s%/\*.*\*/%%g;       #  Discard comments contained in this line.
+#       s%/\*.*%%;           #  Discard text from any comment which starts here.
+#       return undef unless ($_);
+# 
+# #     Check for macro flagging start of Fortran-callable routine.
+# 
+#       ($type, $name) =
+#          /^\s*F77_(SUBROUTINE|[A-Z]+_FUNCTION|EXTERNAL_NAME) *\(\s*(\w+)\s*\)/;
+#       $name .= '_' if $name;
+# 
+#    }
+# 
+#    return $name;
+# }
 
-#  Constants used by module_name.
-
-@ftypes = qw/INTEGER REAL DOUBLEPRECISION COMPLEX LOGICAL CHARACTER
-             BYTE UBYTE WORD UWORD/;
-$ftypdef = '(' . join ('|', @ftypes) . ')\**(\([^\)]\))?[0-9]*';
-
-sub module_name {
-
-#  Examines a line of source code to see whether it identifies the 
-#  start of an indexable module (e.g. Fortran SUBROUTINE or FUNCTION).
-#  Returns the name if so, or undef otherwise.
-#
-#  Note the parsing is not perfect - the main limitation is that since
-#  the routine is called once for each line (and is stateless) it will 
-#  not cope with module declarations whose important parts are split
-#  across lines.
-#
-#  Currently handles Fortran (including Generic) and C source.
-#  Currently, the C parser only identifies functions defined using the
-#  macros in /star/include/f77.h as Fortran-callable routines.
-#
-#  Probably this could be made (much) more efficient.
-
-#  Arguments.
-
-   my $filetype = shift;      #  'f', 'gen', 'c' or 'h'
-   local $_ = shift || $_;    #  $_ used if none specified.
-
-   my ($type, $name);
-
-#  Fortran source file.
-
-   if ($filetype eq 'f' || $filetype eq 'gen') {
-
-#     Strip lines of syntactically uninteresting parts.
-
-      return (undef) if (/^[*cC]/);     # Ignore F77 comments.
-      s/!.*$//;                         # Discard inline comments.
-      chomp;                            # Discard end of line character.
-      s/^......//;                      # Discard first six characters.
-      s/ //g;                           # Remove spaces.
-      return (undef) unless ($_);       # Ignore empty lines.
-      tr/a-z/A-Z/;                      # Fold case to upper.
-      return undef if (/^\w*=/);        # Ignore assignments.
-      s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
-
-      ($type, $name) = /^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(*,]+)/;
-
-      if ($name && $filetype eq 'gen') {
-         $name =~ s/</\&lt;/g;
-         $name =~ s/>/\&gt;/g;
-      }
-      $name = (lc $name) . "_" if ($name);
-   }
-
-#  C source file.
-
-   elsif ($filetype eq 'c') {
-
-#     Very feeble attempt to strip comments.
-
-      chomp;
-      s%^#.*%%g;           #  Discard preprocessor directives.
-      s%/\*.*\*/%%g;       #  Discard comments contained in this line.
-      s%/\*.*%%;           #  Discard text from any comment which starts here.
-      return undef unless ($_);
-
-#     Check for macro flagging start of Fortran-callable routine.
-
-      ($type, $name) =
-         /^\s*F77_(SUBROUTINE|[A-Z]+_FUNCTION|EXTERNAL_NAME) *\(\s*(\w+)\s*\)/;
-      $name .= '_' if $name;
-
-   }
-
-   return $name;
-}
 
 ########################################################################
 sub starpack {
