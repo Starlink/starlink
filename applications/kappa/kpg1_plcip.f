@@ -106,7 +106,7 @@
 *  out".  However, the pen representation for the background gives
 *  rgb=0,0,0 (i.e. it thinks the background is a black pen). This is not
 *  correct, therefore do not allow pen 0 to be used if CI1 is zero and
-*  CI2 = 1.
+*  CI2 = 1. 
       IF( CI1 .EQ. 0 .AND. CI2 .EQ. 1 ) THEN
          COLIND = 1
 
@@ -117,7 +117,7 @@
          HI = MIN( CI2, CTM__RSVPN - 1 )
 
 *  Inquire the palette colour indices.
-         DO  I = CI1, HI
+         DO  I = 0, HI
             CALL PGQCR( I, PALETT( 1, I ), PALETT( 2, I ), 
      :                  PALETT( 3, I ) )
          END DO
@@ -130,7 +130,7 @@
 *  closest colour.  The closest match must therefore be less than
 *  three.
          MATCH = .FALSE.
-         I = CI1
+         I = 0
          CLOMET = 3.0
          DO WHILE ( .NOT. MATCH .AND. I .LE. HI )
             METRIC = ABS( R - PALETT( 1, I ) ) +

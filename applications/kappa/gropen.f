@@ -86,8 +86,9 @@
 *   D.L.Terrett  Starlink  Aug 1987
 
 *
-*   The KAPAPA Version has been modified to avoid resetting the 
-*   palette when the device is opened.  DSB (27/10/98)
+*   The KAPPA Version has been modified to avoid resetting the 
+*   palette when a device with dynamic colour table is opened.  
+*   DSB (27/10/98)
 *
 
 *+
@@ -323,16 +324,16 @@ C avoid it because it is hard wired into PGBEG.
 C
 C         IF (NCOLA.EQ.GCOLOR) THEN
 
-* >>>>  The following lines are commented out in the KAPPA version of this
-*       routine in order to prevent the KAPPA palette being over-written
-*       each time a device is opened. <<<<<<
+* >>>>  The following call to GSCR is only performed for devices which do
+*       not have dynamic colour tables (eg printsers etc). This prevents
+*       the KAPPA palette being over-written on (eg) xwindows each time the
+*       device is opened. <<<<<<
 
-c            DO 120 ICOL = 2,MIN(MCOLI-1,15)
-c               CALL GSCR(GRWKID(ID),ICOL,R(ICOL),G(ICOL),B(ICOL))
-c  120       CONTINUE
-
-* >>>>  End of KAPPA mod <<<<<<<<
-
+            DO 120 ICOL = 2,MIN(MCOLI-1,15)
+               IF( ICOLRE .EQ. GIRG ) THEN
+                  CALL GSCR(GRWKID(ID),ICOL,R(ICOL),G(ICOL),B(ICOL))
+               END IF
+  120       CONTINUE
 
 C         ELSE
 C            ICOL = 2
