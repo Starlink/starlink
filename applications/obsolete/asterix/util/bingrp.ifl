@@ -63,12 +63,29 @@ INTERFACE BINGRP
     HELP    'Default is offered would create a new spatial group'
   ENDPARAMETER
 
+  PARAMETER REG
+    TYPE    '_LOGICAL'
+    PROMPT  'Regular radial bins'
+    PPATH   'DEFAULT'
+    DEFAULT 'Y'
+    VPATH   'PROMPT'
+    HELP    'If false you will be prompted for radial boundaries'
+  ENDPARAMETER
+
   PARAMETER RBIN
     TYPE    '_REAL'
     PROMPT  'Radial binsize'
     PPATH   'CURRENT,DEFAULT'
     VPATH   'PROMPT'
     HELP    'Enter in axis units'
+  ENDPARAMETER
+
+  PARAMETER RBNDS
+    TYPE    '_CHAR'
+    PROMPT  'Radial bin boundaries (see help)'
+    PPATH   'CURRENT,DEFAULT'
+    VPATH   'PROMPT'
+    HELP    'The boundaries of the radial bins. There is an implicit lower bound of zero, and upper bound of infinity applied'
   ENDPARAMETER
 
   PARAMETER NRAD
