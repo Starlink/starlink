@@ -235,6 +235,7 @@
 
 ;; ======================================================================
 
+;; map is not implemented in Jade 1.2.1, but is in OpenJade
 (define (map f #!rest xs)
   ;; REFENTRY lib-map
   ;; PURP Implements map
@@ -259,6 +260,7 @@
 		 '()
 		 (cons (apply f (map1 car xs))
 		       (loop (map1 cdr xs)))))))))
+
 
 (define (absolute-child-number #!optional (nd (current-node)))
   ;; REFENTRY lib-absolute-child-number
