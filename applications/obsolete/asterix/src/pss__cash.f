@@ -135,6 +135,8 @@ c     DOUBLE PRECISION         G01ECF, G01FAF
         SIG = 0.0
 c       PROB = G01ECF('Upper-tail',DBLE(DELCHI),1.0D0,IFAIL)
 c       SIG = -REAL(G01FAF('Lower-tail',PROB/2.0D0,IFAIL))
+        CALL MSG_PRNT( '*** WARNING: no PDA replacements ' //
+     :                 'for G01ECF or G01FAF' )
 
 *    Use iteration scheme
       ELSE
