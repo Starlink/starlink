@@ -296,7 +296,7 @@
       DO I = 1, NIM
 
 *  Get the WCS FrameSet.
-         CALL KPG1_GTWCS( INDFT, IWCS, STATUS )
+         CALL KPG1_GTWCS( NDFIN( I ), IWCS, STATUS )
 
 *  Initialise the descriptor items.
          WPLATE( IVAL ) = VAL__BADR
