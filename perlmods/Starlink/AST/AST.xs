@@ -2035,20 +2035,173 @@ astGridLine( this, axis, start, length )
     astGridLine( this, axis, cstart, length );
   )
 
-void
-astMark(this, in, type)
-  AstPlot * this
-  AV* in
-  int type
- CODE:
-  Perl_croak(aTHX_ "Not Yet Implemented - talk to Tim\n");
+# Make this a little different to the published interface
+# By requesting @x and @y rather than an array of coordinate doublets.
 
 void
-astPolyLine(this, in)
+astMark(this, type, ...)
   AstPlot * this
-  AV* in
+  int type
+ PREINIT:
+  double * cin;
+  int ncoords;
+  int nmarks;
+  int indim;
+  int size;
+  int i;
+  int total;
+  int argoff = 2; /* number of fixed arguments */
+  int naxes;
+  SV * arg = ST(0);
  CODE:
-  Perl_croak(aTHX_ "Not Yet Implemented - talk to Tim\n");
+  /* First make sure we have some arguments */
+  if (items > argoff ) {
+    /* Number of dimensions should be just the number of stack items */
+    ncoords = items - argoff;
+
+    /* and this should equal the number of axes in the frame */
+    naxes = astGetI( this, "Naxes" );
+
+    if ( naxes != ncoords )     
+         Perl_croak(aTHX_ "Number of supplied coordinate sets must equal number of axes in frame [%d != %d]",naxes,ncoords);
+
+    /* Now go through each finding out how long each array is */
+    for (i = argoff + 1; i<=items; i++ ) {
+        int nelem;
+        int index = i - 1;
+        SV * coordsv = ST(index);
+        AV * curr;
+        if (SvROK(coordsv) && SvTYPE(SvRV(coordsv)) == SVt_PVAV) {
+          curr = (AV*)SvRV( coordsv );
+          nelem = av_len( curr ) + 1;
+          if (i == argoff + 1) {
+            /* No previous values */
+            nmarks = nelem;
+          } else if (nmarks != nelem) {
+            Perl_croak(aTHX_ "All coordinates must have same number of elements [%d != %d]",nmarks, nelem);
+          }
+        } else {
+          Perl_croak(aTHX_ "Argument %d to Mark() must be ref to array",i);
+        }
+    }
+
+    /* Get some memory for the array */
+    total = nmarks * ncoords;
+    cin = get_mortalspace( total, 'd');    
+
+    /* and go through the arrays again (but less checking now) */
+    for (i = 0; i < ncoords; i++ ) {
+        int j;
+        int argpos = i + argoff;
+        AV * curr = (AV*)SvRV( ST(argpos) );
+
+        for (j = 0; j < nmarks ; j ++ ) {
+          SV ** elem = av_fetch( curr, j, 0);
+          double dtmp;
+          if (elem == NULL ) {
+             /* undef */
+             dtmp = 0.0;
+          } else {
+             dtmp = SvNV( *elem );
+          }
+          /* use pointer arithmetic to make sure that things align
+             the way AST expects */
+          *(cin + (i * nmarks) + j) = dtmp;
+        }
+    }
+    
+    /* Now call the AST routine */
+    PLOTCALL( arg,
+       astMark( this, nmarks, ncoords, nmarks, cin, type );
+    )
+
+  } else {
+    XSRETURN_EMPTY;
+  }
+
+# Make this a little different to the published interface
+# By requesting @x and @y rather than an array of coordinate doublets.
+# [code identical to astMark without the type]
+
+void
+astPolyCurve(this, ...)
+  AstPlot * this
+ PREINIT:
+  double * cin;
+  int ncoords;
+  int npoints;
+  int indim;
+  int size;
+  int i;
+  int total;
+  int argoff = 1; /* number of fixed arguments */
+  int naxes;
+  SV * arg = ST(0);
+ CODE:
+  /* First make sure we have some arguments */
+  if (items > argoff ) {
+    /* Number of dimensions should be just the number of stack items */
+    ncoords = items - argoff;
+
+    /* and this should equal the number of axes in the frame */
+    naxes = astGetI( this, "Naxes" );
+
+    if ( naxes != ncoords )     
+         Perl_croak(aTHX_ "Number of supplied coordinate sets must equal number of axes in frame [%d != %d]",naxes,ncoords);
+
+    /* Now go through each finding out how long each array is */
+    for (i = argoff + 1; i<=items; i++ ) {
+        int nelem;
+        int index = i - 1;
+        SV * coordsv = ST(index);
+        AV * curr;
+        if (SvROK(coordsv) && SvTYPE(SvRV(coordsv)) == SVt_PVAV) {
+          curr = (AV*)SvRV( coordsv );
+          nelem = av_len( curr ) + 1;
+          if (i == argoff + 1) {
+            /* No previous values */
+            npoints = nelem;
+          } else if (npoints != nelem) {
+            Perl_croak(aTHX_ "All coordinates must have same number of elements [%d != %d]",npoints, nelem);
+          }
+        } else {
+          Perl_croak(aTHX_ "Argument %d to Mark() must be ref to array",i);
+        }
+    }
+
+    /* Get some memory for the array */
+    total = npoints * ncoords;
+    cin = get_mortalspace( total, 'd');    
+
+    /* and go through the arrays again (but less checking now) */
+    for (i = 0; i < ncoords; i++ ) {
+        int j;
+        int argpos = i + argoff;
+        AV * curr = (AV*)SvRV( ST(argpos) );
+
+        for (j = 0; j < npoints ; j ++ ) {
+          SV ** elem = av_fetch( curr, j, 0);
+          double dtmp;
+          if (elem == NULL ) {
+             /* undef */
+             dtmp = 0.0;
+          } else {
+             dtmp = SvNV( *elem );
+          }
+          /* use pointer arithmetic to make sure that things align
+             the way AST expects */
+          *(cin + (i * npoints) + j) = dtmp;
+        }
+    }
+    
+    /* Now call the AST routine */
+    PLOTCALL( arg,
+       astPolyCurve( this, npoints, ncoords, npoints, cin );
+    )
+
+  } else {
+    XSRETURN_EMPTY;
+  }
 
 void
 astText( this, text, pos, up, just )

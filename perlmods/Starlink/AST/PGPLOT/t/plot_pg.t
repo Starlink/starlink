@@ -92,10 +92,21 @@ is( $status, 1, "Result from registering PGPLOT with AST" );
 #$plot->Set( Colour => 2, Width => 5 );
 $plot->Grid();
 
+# Switch to GRAPHICS frame for easy plotting
 $plot->Set( "Current=1" );
 $plot->Text("Test Text 1", [0.4,0.4],[0.0,1.0],"CC");
+$plot->Set( Colour => 3  );
 $plot->Text("Test Text 2", [0.5,0.5],[0.0,1.0],"CC");
-$plot->Text("Test Text 2", [0.6,0.6],[0.0,1.0],"CC");
+$plot->Set( Colour => 4 );
+$plot->Text("Test Text 3", [0.6,0.6],[0.0,1.0],"CC");
+
+$plot->Set( Colour => 6, Width => 5 );
+$plot->Mark( 6, [0.6,0.5,0.4], [0.3, 0.2,0.2]  );
+
+$plot->Set( Colour => 2, Width => 5 );
+$plot->PolyCurve( [0.2,0.3,0.25], [0.8,0.5,0.5]);
+
+
 # Done!
 sleep(2);
 exit;
