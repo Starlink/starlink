@@ -13,7 +13,7 @@
   package.
   </p></abstract>
   <dependencies >
-    <build>gkspar</build><build>pgppar</build><build>sgspar</build><sourceset>star2html</sourceset>
+    <build>gkspar</build><build>pgppar</build><build>sgspar</build><build>gns</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
