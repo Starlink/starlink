@@ -1,57 +1,52 @@
 #!perl
 
+use strict;
 use Test::More tests => 10;
 
 require_ok("Starlink::AST");
 
-Starlink::AST::astBegin;
+Starlink::AST::Begin();
 
-my $fchan = new Starlink::AST::FitsChan();
-while (<DATA>) {
-  $fchan->PutFits($_ ,0);
-}
+# Zoom map
 
-$fchan->Clear( "Card" );
-my $wcsinfo = $fchan->Read();
+my $zoommap = new Starlink::AST::ZoomMap(2,5, "");
+isa_ok($zoommap, "AstZoomMapPtr");
 
-$wcsinfo->Show();
-
-Starlink::AST::astEnd;
+$zoommap->Show();
 
 
-__DATA__
-SIMPLE  =                    T / file does conform to FITS standard
-BITPIX  =                  -32 / number of bits per data pixel
-NAXIS   =                    3 / number of data axes
-NAXIS1  =                   25 / length of data axis 1
-NAXIS2  =                   36 / length of data axis 2
-NAXIS3  =                  252 / length of data axis 3
-EXTEND  =                    T / FITS dataset may contain extensions
-COMMENT   FITS (Flexible Image Transport System) format defined in Astronomy and
-COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
-COMMENT   Contact the NASA Science Office of Standards and Technology for the
-COMMENT   FITS Definition document #100 and other FITS information.
-CRVAL1  = -0.07249999791383749 / Axis 1 reference value
-CRPIX1  =                 12.5 / Axis 1 pixel value
-CTYPE1  = 'a1      '           / LINEAR
-CRVAL2  = -0.07249999791383743 / Axis 2 reference value
-CRPIX2  =                 18.0 / Axis 2 pixel value
-CTYPE2  = 'a2      '           / LINEAR
-CRVAL3  =  1.27557086671004E-6 / Axis 3 reference value
-CRPIX3  =                126.0 / Axis 3 pixel value
-CTYPE3  = 'a3      '           / LAMBDA
-OBJECT  = 'galaxy  '           / Title of the dataset
-DATE    = '2000-12-13T22:44:53' / file creation date (YYYY-MM-DDThh:mm:ss UTC)
-ORIGIN  = 'NOAO-IRAF FITS Image Kernel July 1999' / FITS file originator
-BSCALE  =                  1.0 / True_value = BSCALE * FITS_value + BZERO
-BZERO   =                  0.0 / True_value = BSCALE * FITS_value + BZERO
-HDUCLAS1= 'NDF     '           / Starlink NDF (hierarchical n-dim format)
-HDUCLAS2= 'DATA    '           / Array component subclass
-IRAF-TLM= '23:07:26 (27/02/2000)' / Time of last modification
-TELESCOP= 'UKIRT, Mauna Kea, HI' / Telescope name
-INSTRUME= 'CGS4    '           / Instrument
-OBSERVER= 'SMIRF   '           / Observer name(s)
-OBSREF  = '?       '           / Observer reference
-DETECTOR= 'fpa046  '           / Detector array used
-OBSTYPE = 'OBJECT  '           / Type of observation
-INTTYPE = 'STARE+NDR'          / Type of integration
+is($zoommap->GetI("Nout"), 2, "Nout attribute of zoommap");
+is($zoommap->GetI("Nin"), 2, "Nin attribute of zoommap");
+is($zoommap->GetI("Zoom"), 5, "Zoom attribute of zoommap [I]");
+is($zoommap->GetD("Zoom"), 5.0, "Zoom attribute of zoommap [D]");
+
+$zoommap->SetI("Zoom", 99);
+is($zoommap->GetI("Zoom"), 99, "Test attribute of SetI");
+
+ok(! $zoommap->Test( "Report" ), "Report attrib not defined yet");
+
+$zoommap->Set("Zoom=99.6, Report=1");
+is($zoommap->GetD("Zoom"), 99.6, "Test attribute of Set");
+
+ok($zoommap->Test( "Report" ), "Report attrib defined");
+
+$zoommap->Clear( "Report" );
+ok(! $zoommap->Test( "Report" ), "Report attrib cleared");
+$zoommap->SetI("Report", 1);
+
+my $invert = $zoommap->GetI("Invert");
+$zoommap->Invert();
+ok( $invert != $zoommap->GetI("Invert"), "Inverted mapping");
+$zoommap->Invert();
+is($zoommap->GetI("Invert"), $invert, "And inverted again");
+
+# Test mapping
+my @xin = ( 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 );
+my @yin = ( 0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0 );
+
+
+
+
+my $permmap = new Starlink::AST::PermMap([4,1,2,3], [2,3,4,1], [], "" );
+isa_ok($permmap, "AstPermMapPtr");
+
