@@ -1034,7 +1034,7 @@
             CALL ADI_CGET0C( SIID, 'Variant', VARIANT, STATUS )
 
 *        Switch on variant
-            CALL ASHOW_VAL( 'Variant = '//VARIANT, 'Name', ' ',
+            CALL ASHOW_VAL( 'Variant = '//VARIANT, SNAME, ' ',
      :                      OCH, STATUS )
             IF ( VARIANT .EQ. 'AREA_DESCRIPTION' ) THEN
               CALL ADI_CGET0I( SIID, 'GRPID', GRPID, STATUS )
