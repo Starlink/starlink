@@ -9,23 +9,20 @@
 #   29-may-95: original version (pnd@jach.hawaii.edu)
 #   05-Jul-95: modified (caa@jach.hawaii.edu)
 #   07-Nov-95: modified for Starlink use (caa@jach.hawaii.edu)
+#   05-Dec-95: modified for ukirt use (caa@jach.hawaii.edu)
 # endhistory
 # parameters: $1 is a directory /$HOME/
 #             $2 is a UT-date   /UT=today/
 #-
 
 # If IRCAMDR_ROOT is not set, abort
-#if ( ${?IRCAMDR_ROOT} == 0 ) then
-#  setenv IRCAMDR_ROOT /ukirt_sw/bin/ircamdr
-setenv IRCAMDR_ROOT /ukirt_sw/etc/ircamdr
-#endif
-
-# Re-direct kappa to local version relinked under bkm icl
-# setenv KAPPA_DIR /home/caa/clred/kappa
+if ( ${?IRCAMDR_ROOT} == 0 ) then
+  setenv IRCAMDR_ROOT /ukirt_sw/ircamdr
+endif
 
 # Print out a welcome message
 echo ""
-echo "Welcome to IRCAM_CLRED/Portable-IRCAMDR V1.0-0"
+echo "Welcome to IRCAM_CLRED/Portable-IRCAMDR V1.0-1"
 
 # Set some default values
 echo ""
