@@ -165,12 +165,13 @@
       CHARACTER*80            PATH(8)           ! Input data path including
                                                 ! Text string for history file
 
-      REAL                    RMASK(NMASK)
-      REAL                    RN
-      REAL                    RR,XX
-      REAL START_DATA,END_DATA                  ! Value to use at both ends
-      REAL                    START_ERR,END_ERR ! ERROR to use at both ends
-      REAL                    TT
+      REAL                    	RMASK(NMASK)
+      REAL                    	RN
+      REAL                    	RR,XX
+      REAL 			START_DATA,END_DATA     ! Value to use at both ends
+      REAL                    	START_ERR,END_ERR 	! ERROR to use at both ends
+      REAL                    	TT
+      REAL    			WDTH                	! Width of mask in bins.
 
       INTEGER			IFID			! Input dataset
       INTEGER			OFID			! Output dataset
@@ -186,23 +187,18 @@
       INTEGER ETEMPP                              !Pointer to workspace
       INTEGER NDIMS                               !Number of axes in data array
       INTEGER NELS(4)                             !No. of elements in each axis
-      INTEGER NQDIMS                              !Number of axes in quality
-      INTEGER NQELS(4)                            !No. of elements in each axis
-      INTEGER NVDIMS                              !Number of axes in variance
-      INTEGER NVELS(4)                            !No. of elements in each axis
       INTEGER IDIM                                !The axis to smooth
       INTEGER IDIM1                               !A second axis to smooth
       INTEGER IDO                                 !Fill gaps in ?
       INTEGER IDO1                                !Fill gaps in on 1st pass?
-      REAL    WDTH                                !Width of mask in bins.
       INTEGER LL
       INTEGER                 LMASK		! Width of mask made odd.
-      INTEGER NLINES
-      INTEGER LM2
-      INTEGER                 NLIM		! Dimension of temp arrays
+      INTEGER 			NLINES
+      INTEGER 			LM2
+      INTEGER                 	NLIM			! Dimension of temp arrays
       INTEGER IDUM
-      INTEGER I,J
-      INTEGER                 IDAT              ! FIO file number
+      INTEGER			J			!
+      INTEGER                 	IDAT              	! FIO file number
       INTEGER START1,END1,START2,END2             !Pixel range to fine mean end
       INTEGER IDLEN,J1,J2
 
