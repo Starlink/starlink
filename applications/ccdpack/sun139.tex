@@ -790,7 +790,7 @@ dark calibration, flatfielding)
 shows more of the advanced image registration capabilities
 \item[{\tt setexercise}]
 organises data frames into Sets as if obtained from a mosaic camera
-and demonstrates CCDPACK's Set-handling functionality
+and demonstrates CCDPACK's Set-handling abilities
 \end{description}
 
 To run any of these scripts, change to an empty directory,
@@ -1088,7 +1088,7 @@ before using CCDPACK commands on them.
 Depending on how you are using the commands, this may save processing
 time by preventing CCDPACK from doing the same conversion more than once.
 A full description of how to do this is given in \xref{SUN/55}{sun55}{},
-but normally it just consists of running a command called `<TYPE>2NDF'.
+but normally it just consists of running a command called `$<$TYPE$>$2NDF'.
 For instance converting all the FITS files in the current directory
 to NDF files with the same name can be done like this:
 \begin{myquote}
@@ -3122,7 +3122,7 @@ the sky region and then running the command:\protect\\
 
 Finally, \routine{DRAWNDF} can display the actual image data for you.
 Unlike KAPPA's DISPLAY program, which always displays
-an image as a rectangle with pixel axes horizontal and vertical, 
+an image as a rectangle whose edges are horizontal and vertical, 
 perhaps with with non-orthogonal image Current coordinate axes 
 drawn over it, \routine{DRAWNDF} always plots on a surface in which the 
 Current coordinate system has horizontal and vertical axes.
@@ -3407,7 +3407,7 @@ and less prone to finding a false match.
 \begin{verbatim}
 % findobj in='data*' outlist='*.obj'
 % findoff inlist='data*' outlist='*.off' restrict=true
-% register inlist='*.off'
+% register inlist='data*'
 \end{verbatim}
 \end{myquote}
 The REGISTER program adds a new pixel-like coordinate system
@@ -3803,7 +3803,8 @@ but to make processing of this kind of
 data more painless, CCDPACK provides the concept of a Set of images.  
 The idea is that each exposure from a given instrument produces
 a single Set of data which may contain more than one frame.
-Sets from a given instrument will consist of a fixed number of members:
+All Sets from a particular instrument will 
+consist of a fixed number of members:
 each member of a given Set will share the same Set Name attribute
 indicating its origin, 
 and has its own Set Index attribute 
@@ -3827,7 +3828,7 @@ The Set itself does not exist as a separate file or other entity,
 so you never need to specify a Set as such when giving input
 parameters to CCDPACK programs, but when presented with a list
 of input files, they will read and make use of Set header information
-if it is there.  In fact in most cases, after adding the Set header
+if exists.  In fact in most cases, after adding the Set header
 in the first place, you can forget about Sets altogether and let
 CCDPACK worry about them for you.
 
@@ -3903,7 +3904,7 @@ to make a single Set out of a group of files listed by name:
 \end{verbatim}
 \end{myquote}
 This will write a Set header to each of the named files.
-As the output shows, a Set Name attribute ``im01'' 
+As the output shows, the same Set Name attribute ``im01'' 
 (the name of the first file in the list) is given to each, 
 and the Set Index attributes are 1, 2 and 3 respectively.
 
@@ -4077,6 +4078,9 @@ The command creates a single new HDS container file ``sg28948\_sp'':
 when you give this as an input to CCDPACK commands they will look inside 
 and process each of the four images in turn.
 
+This method could also be used to create a Set from different slices
+of a three-dimensional data set.
+
 \subsubsection{\label{ccd_set}Set alignment (CCD\_SET) coordinates}
 
 You may notice that in the last example, 
@@ -4092,7 +4096,7 @@ in the input image.
 When \routine{MAKESET} adds a CCD\_SET coordinate system like this,
 it is declaring that all the members of the same Set are known to
 be correctly aligned in these coordinates.
-All the CCDPACK programs concerned with 
+All the CCDPACK programs concerned with registration
 will recognise a CCD\_SET coordinate system and assume that 
 the alignment of all the images in a given Set is correct in
 these coordinates and is not to be tampered with.
@@ -4156,9 +4160,10 @@ in \hyperref{the appendix}{\S}{}{MAKESET}.
 If you need to add Set alignment coordinates to some files after 
 \routine{MAKESET} has already been run, you can just attach a new 
 coordinate system with the name CCD\_SET, using \xroutine{WCSEDIT} or
-in some other way --- there is no other header information needed.
-However a CCD\_SET-domain coordinate system will only be treated as
-special when the images in question have valid Set headers.
+in some other way.
+Note however that a CCD\_SET-domain coordinate system 
+will only be treated as special when the images in
+question have valid Set headers.
 
 
 \subsection{Removing Set headers}
@@ -4405,24 +4410,24 @@ For each Set Index value represented in the input files:
 \end{itemize}
 \end{enumerate}
 
-So if you have a number of frames from a three-chip mosaic camera 
+So if you have several observations from a three-chip mosaic camera 
 sorted into Sets to debias, you can replace a sequence like this:
 \begin{myquote}
 \begin{verbatim}
-% makebias in='bias-seta-*' out=master_bias-a
-% makebias in='bias-setb-*' out=master_bias-b
-% makebias in='bias-setc-*' out=master_bias-c
-% debias in='data-seta-*' bias=master_bias-a out='debias_*'
-% debias in='data-setb-*' bias=master_bias-b out='debias_*'
-% debias in='data-setc-*' bias=master_bias-c out='debias_*'
+% makebias in='bias*_chip1' out=master_chip1
+% makebias in='bias*_chip2' out=master_chip2
+% makebias in='bias*_chip3' out=master_chip3
+% debias in='data*_chip1' bias=master_chip1 out='debias_*'
+% debias in='data*_chip2' bias=master_chip2 out='debias_*'
+% debias in='data*_chip3' bias=master_chip3 out='debias_*'
 \end{verbatim}
 \end{myquote}
 by this one, which does just the same thing:
 \begin{myquote}
 \begin{verbatim}
-% makebias in='bias-set*-*' out=master_bias 
-% debias in='data-set*-*' bias=master_bias out='debias_*'
-\begin{verbatim}
+% makebias in='bias*_chip?' out=master 
+% debias in='data*_chip?' bias=master out='debias_*'
+\end{verbatim}
 \end{myquote}
 
 You may notice from the scheme above that 
@@ -4456,7 +4461,7 @@ above scheme works should be clear.  To see it in action, you can
 look at the log output of the 
 \text{setexercise} script (see section \ref{demos}).
 
-Note that there is currently no easy way for specifying
+Note that there is currently no easy way to specify
 different values of the CCDPACK global data reduction parameters
 (RNOISE, ADC, EXTENT etc) for images from different chips 
 (i.e.\ with different Set Index values).
@@ -4540,8 +4545,8 @@ exactly the same way for data with Set headers as for data without them,
 but the programs take account of the grouping if there are Set present
 and the USESET parameter is true.
 Below however are a some examples of how you can use the Set handling
-commands and other CCDPACK applications to take advantage of this
-functionality.
+commands and other CCDPACK applications to take advantage of these
+abilities.
 
 \subsubsection{Data reduction of frames from a mosaic camera}
 
@@ -4553,7 +4558,7 @@ In this case we will assume that the original data is in the form
 of multi-extension FITS files; a group of data frames \text{data-*.fit},
 a group of bias frames \text{bias-*.fit} and a group of flat fields
 \text{flat-*.fit}.  Each MEF represents a single exposure, 
-and contains one header + data unit for each
+and contains one Header + Data Unit for each
 CCD chip in the mosaic camera.
 It would be possible to leave these files in their
 original format and allow CCDPACK to convert them on the fly,
@@ -15937,8 +15942,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       Normally, the new coordinate systems will be attached to the
       images with which the lists are associated, but if the lists are
       not associated with images then they can be attached to a named
-      list of images, or a single named one.  The \xroutine{TRANNDF} program can
-      use the attached coordinate systems to resample images.
+      list of images, or a single named one.  The new coordinate system
+      is a copy of the Pixel coordinate system of the refernce image,
+      and so is guaranteed to be a sensible one in which to resample.
+      The resampling can be done by \xroutine{TRANNDF}.
    }
    \sstusage{
       register inlist fittype refpos
