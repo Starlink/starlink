@@ -482,7 +482,22 @@
 
         IF (NAME.EQ.'TITLE') THEN
 
+*  get number of title lines and pass to GUI
           CALL GCB_GETI('TITLE_N',OK,N,STATUS)
+          IF (.NOT.OK) THEN
+            N=0
+          ENDIF
+*  put temp block on reading by GUI
+          CALL IMG_NBPUT0I('FLAG',-1,STATUS)
+          CALL IMG_NBPUT0I('PAR_I1',N,STATUS)
+*  take block off reading
+          CALL IMG_NBPUT0I('FLAG',0,STATUS)
+          FLAG=0
+*  wait 'til GUI flags that values have been read
+          DO WHILE (FLAG.EQ.0)
+            CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
+          ENDDO
+
           I=1
           DO WHILE (I.LE.N)
 *  put block on reading by GUI
