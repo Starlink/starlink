@@ -163,6 +163,14 @@
           ELSE IF ( CMD .EQ. 'NEW' ) THEN
             CALL IBGND_NEW( STATUS )
 
+*      Display internal state
+          ELSE IF ( CMD .EQ. 'SHOW' ) THEN
+            CALL IBGND_SHOW( STATUS )
+
+*      Subsequent options depend on modeller being active
+          ELSE IF ( .NOT. I_BGM_ON ) THEN
+            CALL MSG_PRNT('AST_ERR: no background model defined')
+
 *      Add a source to the database
           ELSE IF ( CMD .EQ. 'ADDSRC' ) THEN
 
@@ -175,9 +183,9 @@
 *        Add to list
             CALL IBGND_ADDSRC( XPOS, YPOS, R, STATUS )
 
-*      Display internal state
-          ELSE IF ( CMD .EQ. 'SHOW' ) THEN
-            CALL IBGND_SHOW( STATUS )
+*      Display model
+          ELSE IF ( CMD .EQ. 'DISP' ) THEN
+            CALL IBGND_DISP_SURF( .FALSE., STATUS )
 
           END IF
 
@@ -313,7 +321,7 @@
      :                       STATUS )
             CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R,
      :                       STATUS )
-            WRITE( TXT, '(2X,I3,3(2X,IPG12.5))', IOSTAT=ISTAT )
+            WRITE( TXT, '(2X,I3,3(2X,1PG12.5))', IOSTAT=ISTAT )
      :                       I, X, Y, R
             CALL MSG_PRNT( TXT )
 
@@ -472,6 +480,173 @@
         CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
 
       END IF
+
+      END
+
+
+
+      SUBROUTINE IBGND_DISP_SURF( RESID, STATUS )
+*+
+*  Name:
+*     IBGND_DISP_SURF
+
+*  Purpose:
+*     Display the background surface (or residuals) as a pixel plot
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_DISP_SURF( RESID, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     RESID = LOGICAL (given)
+*        Display residuals?
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'QUAL_PAR'
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given:
+      LOGICAL			RESID
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      REAL			PMIN, PMAX		! Pixel bounds
+
+      LOGICAL			FRESH			! Device freshly opened
+      LOGICAL			OK, YES			!
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Clear display unless freshly opened device
+      CALL GDV_FRESH(FRESH,STATUS)
+      IF (.NOT.FRESH) THEN
+        IF (I_SPLIT_DISP) THEN
+          CALL IMG_CLEAR(1,STATUS)
+        ELSE
+          CALL GDV_CLEAR(STATUS)
+        END IF
+      END IF
+
+*  Reset transformation database
+      CALL GTR_ZERO(STATUS)
+
+*  Ensure we have the correcy GCB
+      CALL GCB_ATTACH( 'IMAGE', STATUS )
+      CALL IMG_2DGCB( STATUS )
+
+*  display image
+      CALL IMG_WINDOW( STATUS )
+
+      CALL GCB_GETL('PIX_FLAG',OK,YES,STATUS )
+      IF (OK.AND.YES) THEN
+
+*    Set colours
+        CALL GFX_SETCOLS(STATUS)
+
+*    Plot bounds
+        CALL ARR_RANG1R( I_NX*I_NY, %VAL(I_BGM_DPTR), PMIN, PMAX,
+     :                   STATUS )
+        IF ( PMIN .EQ. PMAX ) THEN
+          PMIN = 0.95*PMIN
+          PMAX = 1.05*PMAX
+        END IF
+
+*    Plot the pixels
+        CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+     :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
+     :                     %VAL(I_BGM_DPTR),
+     :                PMIN,PMAX,%VAL(I_BGM_QPTR),QUAL__MASK,STATUS)
+
+      ENDIF
+      CALL GCB_GETL('CONT_FLAG',OK,YES,STATUS)
+      IF (OK.AND.YES) THEN
+        CALL IMG_CONTOUR(STATUS)
+      ENDIF
+
+      CALL IMG_AXES( STATUS )
+
+*  Flag current plotting status
+      CALL GCB_SETL( 'SURF_FLAG', .FALSE., STATUS )
+      I_DISP = .TRUE.
+      I_DISP_1D = .FALSE.
 
       END
 
