@@ -6,7 +6,7 @@ dnl       of the Research Councils
 dnl   See file LICENCE for conditions.
 
 
-AC_INIT(dvi2bitmap, 0.12b2, norman@astro.gla.ac.uk)
+AC_INIT(dvi2bitmap, 0.12, norman@astro.gla.ac.uk)
 AM_INIT_AUTOMAKE
 AC_REVISION($Revision$)
 
@@ -18,27 +18,19 @@ AC_CONFIG_SRCDIR([dvi2bitmap.cc])
 dnl   Say where the install-sh, config.guess and config.sub scripts
 dnl   are.
 dnl
-dnl   Hmm, something appears to go wrong with this: autoconf
-dnl   2.57 appears to generate a ./configure which doesn't look in
-dnl   the specified directory.  Also, some automake list messages,
+dnl   Hmm, something appears to go wrong with this: autoconf 2.57
+dnl   appears to generate a ./configure which doesn't look in the
+dnl   specified directory.  Also, some automake list messages,
 dnl   including the thread that contains
 dnl   <http://mail.gnu.org/archive/html/automake/2002-09/msg00167.html>
 dnl   suggest that libtool 1.4.3 fails to work with configure.ac
-dnl   scripts that specify AC_CONFIG_AUX_DIR.  Ugly though it is,
-dnl   perhaps it's worth just having all the configure junk in the
-dnl   top-level directory.  Perhaps I should join the automake list.
+dnl   scripts that specify AC_CONFIG_AUX_DIR.  Therefore, though it's
+dnl   slightly ugly, just leave all the configure junk in the
+dnl   top-level directory.
 dnl AC_CONFIG_AUX_DIR(config)
 
 dnl   Use a config file (the list of settings is getting too long)
 AC_CONFIG_HEADER(config.h)
-
-dnl   Automake sees AC_CONFIG_HEADER as a licence to invoke autoheader
-dnl   to make config.h.in from this file.  This is silly (I think,
-dnl   because (a) I already have a perfectly good config.h.in, and
-dnl   (b) it's carefully ordered and documented, in a way that the
-dnl   generated config.h.in isn't.  So disable that step, following
-dnl   <http://mail.gnu.org/archive/html/automake/2003-01/msg00051.html>
-dnl AUTOHEADER="echo autoheader ignored"
 
 
 dnl   Checks for programs.
