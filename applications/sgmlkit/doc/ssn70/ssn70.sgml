@@ -25,6 +25,8 @@
 	system "../../dsssl/sl/latex/slparams.dsl" subdoc>
   <!entity release.notes 
 	system "../../ReleaseNotes">
+  <!entity release.notes-0.2
+	system "ReleaseNotes-0.2">
 ]>
 <!-- $Id$ -->
 
@@ -2636,6 +2638,8 @@ in <ref id=proc.setup>.
 <sect id=appx.releasenotes export>Release Notes
 
 &release.notes;
+
+&release.notes-0.2;
 
 <backmatter>
 <notecontents>
