@@ -100,6 +100,8 @@
 *        Original version.
 *     23 May 1996 (DJA):
 *        Added LoError and HiError invention
+*     31 May 1996 (DJA):
+*        Had forgotten to divide ASCALE by two for LoWidth and HiWidth
 *     {enter_changes_here}
 
 *  Bugs:
@@ -618,7 +620,7 @@
 
 *        Scalar width present?
             IF ( STHERE ) THEN
-              CALL ARR_INIT1R( ASCALE, NELM, %VAL(WPTR), STATUS )
+              CALL ARR_INIT1R( ASCALE/2.0, NELM, %VAL(WPTR), STATUS )
 
 *        Convert to values to half-widths
             ELSE
