@@ -2,6 +2,10 @@
 
 stardocs_DATA = ssn78.htx_tar
 
+# The following is temporary.  In due course, support for building XML
+# documentation will be added to the starconf system, with a
+# STAR_XML_DOCUMENTATION to match the existing STAR_LATEX_DOCUMENTATION.
+
 # Location of the Jade binary.  OpenJade appears to be installed by default
 # on RedHat systems since 7.3.
 JADE=@JADE@
@@ -11,6 +15,8 @@ STARLINK_SGML_DIR=@STARLINK_SGML_DIR@
 # pstoimg is a bit creaky, but it should be available, since it's installed
 # as part of star2html
 PSTOIMG=@PSTOIMG@
+
+all: ssn78.htx_tar ssn78.ps ssn78.pdf
 
 # Requires that STARLINK_SGML_DIR hold the path to the top of the Starlink
 # SGML Kit, so that $STARLINK_SGML_DIR/bin/sgml2docs is the path to the 

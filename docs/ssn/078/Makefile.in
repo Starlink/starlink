@@ -80,6 +80,10 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 
+# The following is temporary.  In due course, support for building XML
+# documentation will be added to the starconf system, with a
+# STAR_XML_DOCUMENTATION to match the existing STAR_LATEX_DOCUMENTATION.
+
 # Location of the Jade binary.  OpenJade appears to be installed by default
 # on RedHat systems since 7.3.
 JADE = @JADE@
@@ -444,6 +448,8 @@ uninstall-am: uninstall-info-am uninstall-stardocsDATA
 	uninstall-stardocsDATA
 
 
+all: ssn78.htx_tar ssn78.ps ssn78.pdf
+
 # Requires that STARLINK_SGML_DIR hold the path to the top of the Starlink
 # SGML Kit, so that $STARLINK_SGML_DIR/bin/sgml2docs is the path to the 
 # sgml2docs application.  These will work with any version of Jade,
@@ -472,8 +478,10 @@ ssn78.latex_tar: ssn78.xml ssn78-1.eps
 
 ssn78.ps: ssn78.latex
 	cd ssn78.latex; latex ssn78; dvips -o ssn78.ps ssn78
+	cp ssn78.latex/ssn78.ps .
 ssn78.pdf: ssn78.latex
 	cd ssn78.latex; pdflatex ssn78
+	cp ssn78.latex/ssn78.pdf .
 ssn78.latex: ssn78.latex_tar
 	tar xf ssn78.latex_tar
 
