@@ -503,7 +503,7 @@ export:
 prepare:
 
 check_packages:
-[available] Dec 2, 2003 4:25:05 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 3, 2003 4:27:25 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -2106,23 +2106,23 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/StrokeElement.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/StrokeRecognizer.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/TypedData.java:53: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/recognition/BasicScene.html...
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:45: warning - @rating is an unknown tag.
-  [javadoc] "Return true if the supports of the two elements (i.e."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:510: warning - The first sentence is interpreted to be:
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:378: warning - The first sentence is interpreted to be:
-  [javadoc] "Return true if the supports of the two elements (i.e. the
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:26: warning - @rating is an unknown tag.
-  [javadoc]  sets elements that they cover) are identical."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:120: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/recognition/BasicScene.html...
   [javadoc] "Return true if the supports of the two elements (i.e."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:137: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#endElement
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:188: warning - @param argument "publicId" is not a parameter name.
   [javadoc] "Return true if the supports of the two elements (i.e. the
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:188: warning - @param argument "systemId" is not a parameter name.
   [javadoc]  sets elements that they cover) are identical."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:378: warning - The first sentence is interpreted to be:
+  [javadoc] "Return true if the supports of the two elements (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the supports of the two elements (i.e. the
+  [javadoc]  sets elements that they cover) are identical."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:26: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:120: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:137: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#endElement
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:188: warning - @param argument "publicId" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:188: warning - @param argument "systemId" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MultiStrokeSceneRecognizer.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/Recognition.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/RecognitionSet.java:23: warning - @rating is an unknown tag.
@@ -3837,12 +3837,12 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:245: warning - Tag @see: reference not found: setExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:26: warning - Tag @see: reference not found: #DataLimits, #PlotConfigFrame.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:231: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:81: warning - @param argument "dataLimits" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/TrigArithmeticDialog.java:140: warning - @param argument "f" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.html...
   [javadoc] "Cause the plot to redraw itself, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Cause the plot to redraw itself, i.e. apply our changes. "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:81: warning - @param argument "dataLimits" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/TrigArithmeticDialog.java:140: warning - @param argument "f" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureListener.java:30: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/FigureListener.html...
@@ -3983,4 +3983,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
 
 BUILD SUCCESSFUL
-Total time: 17 minutes 4 seconds
+Total time: 17 minutes 6 seconds
