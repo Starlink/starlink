@@ -7,7 +7,7 @@
 *     Locate HDU buffer structure in FITSfile object
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL ADI2_LOCHDU( FID, HDU, ID, STATUS )
@@ -58,12 +58,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     {routine_references}...
 
@@ -104,7 +98,10 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*2		STR			! NHDU in chars
+
       INTEGER			EID			! EXTENSIONS identifier
+      INTEGER			NDIG			! Chars used in STR
       INTEGER			NHDU			! HDU number
 
       LOGICAL			CREATED			! Did we create object?
@@ -154,6 +151,8 @@
         NHDU = NHDU + 1
         CALL ADI_CPUT0I( FID, '.NHDU', NHDU, STATUS )
         CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
+        CALL CHR_ITOC( NHDU, STR, NDIG )
+        CALL ADI_CPUT0C( ID, '.HDU_'//STR(:NDIG), HDU, STATUS )
 
 *    Mark HDU data area as undefined
         CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )

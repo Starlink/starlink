@@ -12,7 +12,7 @@
 
 
 	CALL ADI_DEFCLS( 'FITSfile', 'FileObject',
-     :                   'PRIMARY,EXTENSIONS', DID,
+     :                   'STRUC PRIMARY,STRUC EXTENSIONS', DID,
      :                   STATUS )
 
         CALL ADI_DEFMTH( 'NewLink(Array,FITSfile)', ADI2_NEWLNK_ARR,

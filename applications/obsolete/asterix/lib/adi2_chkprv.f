@@ -96,6 +96,7 @@
 *  Local Variables:
       CHARACTER*8		HDU			! HDU name
       CHARACTER*20		HDUTYPE			! HDU type
+      CHARACTER*6		STR			!
 
       INTEGER			FSTAT			! FITSIO status
       INTEGER			IHDU			! Loop over HDUs
