@@ -1308,7 +1308,8 @@ $(MANIFEST)/sst: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar
+		$(MANIFEST)/subpar \
+		$(MANIFEST)/task
 	cd applications/sst \
 	    && make>make.log && make install>>make.log
 
@@ -1430,8 +1431,16 @@ $(MANIFEST)/trn: \
 	cd libraries/trn \
 	    && make>make.log && make install>>make.log
 
-buildsupport: \
+
+# Buildsupport tools -- building and cleaning
+BUILDSUPPORT_MANIFESTS = \
 		$(MANIFEST)/autoconf \
 		$(MANIFEST)/automake \
 		$(MANIFEST)/libtool \
 		$(MANIFEST)/starconf
+EXTRA_BUILDSUPPORT_MANIFESTS = \
+		$(MANIFEST)/m4
+
+buildsupport: $(BUILDSUPPORT_MANIFESTS)
+clean-buildsupport:
+	rm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)
