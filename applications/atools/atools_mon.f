@@ -87,6 +87,9 @@
       ELSE IF ( NAME .EQ. 'ASTCMPMAP' ) THEN
          CALL ASTCMPMAP( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTFORMAT' ) THEN
+         CALL ASTFORMAT( STATUS )
+
       ELSE IF ( NAME .EQ. 'ASTFRAME' ) THEN
          CALL ASTFRAME( STATUS )
 
@@ -132,9 +135,6 @@
       ELSE IF ( NAME .EQ. 'ASTWINMAP' ) THEN
          CALL ASTWINMAP( STATUS )
 
-      ELSE IF ( NAME .EQ. 'ASTSHIFTMAP' ) THEN
-         CALL ASTSHIFTMAP( STATUS )
-
       ELSE IF ( NAME .EQ. 'ASTCOPY' ) THEN
          CALL ASTCOPY( STATUS )
 
@@ -150,6 +150,9 @@
       ELSE IF ( NAME .EQ. 'ASTSIMPLIFY' ) THEN
          CALL ASTSIMPLIFY( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTTRAN2' ) THEN
+         CALL ASTTRAN2( STATUS )
+
       ELSE IF ( NAME .EQ. 'ASTTRANN' ) THEN
          CALL ASTTRANN( STATUS )
 
@@ -164,6 +167,10 @@
 
       ELSE IF ( NAME .EQ. 'ASTGETREFPOS' ) THEN
          CALL ASTGETREFPOS( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTSHIFTMAP' ) THEN
+         CALL ASTSHIFTMAP( STATUS )
+ 
 
 *  If the action name is not recognised, then report an error.
       ELSE
