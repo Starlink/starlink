@@ -4580,13 +4580,13 @@
               ELSE
                 CALL MSG_SETC('STY','*')
               ENDIF
-              CALL GCB_GET1I('FUNC_WIDTH',OK,IVAL,STATUS)
+              CALL GCB_GETI('FUNC_WIDTH',OK,IVAL,STATUS)
               IF (OK) THEN
                 CALL MSG_SETI('WID',IVAL)
               ELSE
                 CALL MSG_SETC('WID','*')
               ENDIF
-              CALL GCB_GET1I('FUNC_COLOUR',OK,IVAL,STATUS)
+              CALL GCB_GETI('FUNC_COLOUR',OK,IVAL,STATUS)
               IF (OK) THEN
                 CALL MSG_SETI('COL',IVAL)
               ELSE
