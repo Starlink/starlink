@@ -809,7 +809,7 @@ install:
 prepare:
 
 check_packages:
-[available] Sep 21, 2003 4:28:34 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Sep 22, 2003 4:23:27 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1534,6 +1534,7 @@ javadocs:
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/index-all.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
@@ -1543,7 +1544,6 @@ javadocs:
   [javadoc]  in the given context (e.g. a frame or an applet)."
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:139: warning - Tag @see: can't find accept(Object) in javax.swing.filechooser.FileFilter
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] "Add an array of objects to the selection."
@@ -1931,6 +1931,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ConnectorListener.java:36: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ArcConnector.java:52: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ArcConnector.java:364: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/CenterSite.java:40: warning - @ is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/canvas/connector/ArcConnector.html...
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  Apart from changing (slightly) the way the arc geometry is
@@ -1940,14 +1942,12 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/canvas/connector/Arrowhead.html...
   [javadoc] "Set the flag that says the arrowhead is "flipped." This means
   [javadoc]  that the arrowhead is drawn so that the apparent direction
   [javadoc]  of the arrowhead is the same as its normal."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says the arrowhead is "flipped." "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/CenterSite.java:40: warning - @ is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ConnectorAdapter.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ConnectorEvent.java:25: warning - @contributor is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ConnectorEvent.java:25: warning - @rating is an unknown tag.
@@ -2175,15 +2175,15 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: isExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageModel.java:110: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/gui/MultipageModel.html...
+  [javadoc] "Get the index of the given page."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Get the index of the given page. -1 if it is not known."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageParser.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageParser.java:113: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageWriter.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultiWindowApplication.java:56: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ViewEvent.java:20: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/gui/MultipageModel.html...
-  [javadoc] "Get the index of the given page."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the index of the given page. -1 if it is not known."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/JShadePane.java:352: warning - @beaninfo is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/JTreePane.java:337: warning - @beaninfo is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/ListDataModel.java:26: warning - @rating is an unknown tag.
@@ -2780,13 +2780,13 @@ javadocs:
   [javadoc]  <p>
   [javadoc]  The <em>jsky.catalog.skycat.config</em> property defines the Skycat style catalog config file to use.
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
+  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:72: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/uk/ac/starlink/sog/photom/AnnulusArea.html...
   [javadoc] "Update the shape to match a new radius etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Update the shape to match a new radius etc. in the various
   [javadoc]  components."
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:72: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: sameValue
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: clone
@@ -3218,8 +3218,6 @@ javadocs:
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:14: warning - Tag @see: malformed: "TimeSeries, FoldSeriesDialog"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/InputNameParser.java:233: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/index-all.html...
   [javadoc] "Make name absolute (i.e."
   [javadoc] This sentence is different from what will be interpreted as the first sentence in the
@@ -3227,6 +3225,8 @@ javadocs:
   [javadoc] "Make name absolute (i.e. start with leading "/")."
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:14: warning - Tag @see: malformed: "TimeSeries, FoldSeriesDialog"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/InputNameParser.java:233: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:119: warning - Tag @see: can't find accepts in javax.swing.filechooser.FileFilter
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java:119: warning - Tag @see: can't find accepts in javax.swing.filechooser.FileFilter
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: warning - Tag @see: malformed: "Plot, PlotConfigurator"
@@ -3311,62 +3311,62 @@ javadocs:
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1439: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
+  [javadoc]  correspond to a graphics X coordinate. "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramComp.java:406: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
+  [javadoc]   that correspond to a graphics X coordinate, returned in
+  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
+  [javadoc]   "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1555: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
+  [javadoc]  correspond to a graphics X coordinate. "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:417: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
+  [javadoc]   that correspond to a graphics X coordinate, returned in
+  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
+  [javadoc]   "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/FrogSplash.java:20: warning - Tag @see: malformed: "Frog, FrogMain"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:221: warning - The first sentence is interpreted to be:
+  [javadoc] "The full range of coordinates spanned (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
+  [javadoc]  yPos, plus the standard deviations in yPos)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:295: warning - The first sentence is interpreted to be:
+  [javadoc] "The full range of coordinates spanned (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
+  [javadoc]  yPos, plus the standard deviations in yPos)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:624: warning - The first sentence is interpreted to be:
+  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
+  [javadoc]  plot, including zoomed regions that you cannot see)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:624: warning - The first sentence is interpreted to be:
+  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
+  [javadoc]  plot, including zoomed regions that you cannot see)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:51: warning - The first sentence is interpreted to be:
+  [javadoc] "Get the full range (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Get the full range (i.e. data limits plus standard deviations)
+  [javadoc]   of the time series data."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:51: warning - The first sentence is interpreted to be:
+  [javadoc] "Get the full range (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Get the full range (i.e. data limits plus standard deviations)
+  [javadoc]   of the time series data."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:1131: warning - Tag @see: malformed: "DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:1129: warning - Tag @see: malformed: "DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane"
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
-  [javadoc]  correspond to a graphics X coordinate. "
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
-  [javadoc]   that correspond to a graphics X coordinate, returned in
-  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
-  [javadoc]   "
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
-  [javadoc]  correspond to a graphics X coordinate. "
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
-  [javadoc]   that correspond to a graphics X coordinate, returned in
-  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
-  [javadoc]   "
-  [javadoc] "The full range of coordinates spanned (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
-  [javadoc]  yPos, plus the standard deviations in yPos)."
-  [javadoc] "The full range of coordinates spanned (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
-  [javadoc]  yPos, plus the standard deviations in yPos)."
-  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
-  [javadoc]  plot, including zoomed regions that you cannot see)."
-  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
-  [javadoc]  plot, including zoomed regions that you cannot see)."
-  [javadoc] "Get the full range (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the full range (i.e. data limits plus standard deviations)
-  [javadoc]   of the time series data."
-  [javadoc] "Get the full range (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the full range (i.e. data limits plus standard deviations)
-  [javadoc]   of the time series data."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:45: warning - The first sentence is interpreted to be:
   [javadoc] "Get the range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -4421,4 +4421,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 15 minutes 39 seconds
+Total time: 14 minutes 57 seconds
