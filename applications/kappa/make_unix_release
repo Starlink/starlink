@@ -149,7 +149,7 @@ lo
 FOO
 
 # Execute the cl script, and copy the helpdb.mip file back.
-      cl < temp.cl >
+      cl < temp.cl
       cp helpdb.mip $REL_DIR
       cd $REL_DIR
 
