@@ -9,9 +9,12 @@
 *     T. Jenness (timj@jach.hawaii.edu)
 *    History:
 *     $Log$
-*     Revision 1.1  1996/08/28 01:40:50  timj
-*     Initial revision
+*     Revision 1.2  1996/12/06 00:16:48  timj
+*     Add SCULIB_BITAND
 *
+c Revision 1.1  1996/08/28  01:40:50  timj
+c Initial revision
+c
 *    endhistory
 *-
 
@@ -78,7 +81,7 @@
 *+ SCULIB_BITOR - returns the bitwise OR of two bytes
       BYTE FUNCTION SCULIB_BITOR (VAL1, VAL2)
 *    Description:
-*     Turns off a bit in a byte
+*     Returns the bitwise OR
 *    Invocation:
 *     LOGOR = SCULIB_BITOR(VAL1, VAL2)
 *    Parameters:
@@ -101,6 +104,35 @@
 *-
 
       SCULIB_BITOR = IIOR(IZEXT(VAL1), IZEXT(VAL2))
+
+      END
+
+*+ SCULIB_BITAND - returns the bitwise AND of two bytes
+      BYTE FUNCTION SCULIB_BITAND (VAL1, VAL2)
+*    Description:
+*     Returns the bitwise AND
+*    Invocation:
+*     LOGOR = SCULIB_BITOR(VAL1, VAL2)
+*    Parameters:
+*     VAL1              = BYTE (Given)
+*           First byte
+*     VAL2              = BYTE (Given)
+*           Second byte
+*    Type Definitions:
+      IMPLICIT NONE
+*    Global constants :
+*    Import :
+      BYTE VAL1
+      BYTE VAL2
+*    Export:
+*    Status :
+*    External references :
+*    Global variables :
+*    Local Constants :
+*    Local variables :
+*-
+
+      SCULIB_BITAND = IIAND(IZEXT(VAL1), IZEXT(VAL2))
 
       END
 
