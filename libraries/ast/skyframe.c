@@ -82,6 +82,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *     3-APR-2001 (DSB):
 *        Added "Unknown" option for the System attribute. Added read-only
 *        attributes LatAxis and LonAxis.
+*     21-JUN-2001 (DSB):
+*        Added astAngle.
 *class--
 */
 
@@ -185,6 +187,7 @@ static const char *GetSymbol( AstFrame *, int );
 static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const char *SystemString( AstSkySystemType );
+static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetEpoch( AstSkyFrame * );
@@ -230,6 +233,119 @@ static void SetSystem( AstSkyFrame *, AstSkySystemType );
 
 /* Member functions. */
 /* ================= */
+static double Angle( AstFrame *this_frame, const double a[], 
+                     const double b[], const double c[] ) {
+/*
+*  Name:
+*     Angle
+
+*  Purpose:
+*     Calculate the angle subtended by two points at a third point.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double Angle( AstFrame *this_frame, const double a[], 
+*                   const double b[], const double c[] )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astAngle method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function finds the angle at point B between the line
+*     joining points A and B, and the line joining points C 
+*     and B. These lines will in fact be geodesic curves (great circles).
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     a 
+*        An array of double, with one element for each SkyFrame axis,
+*        containing the coordinates of the first point.
+*     b 
+*        An array of double, with one element for each SkyFrame axis,
+*        containing the coordinates of the second point.
+*     c 
+*        An array of double, with one element for each SkyFrame axis,
+*        containing the coordinates of the third point.
+
+*  Returned Value:
+*     The angle in radians, from the line AB to the line CB, in
+*     the range $\pm \pi$ with positive rotation is in the same sense 
+*     as rotation from north to east.
+
+*  Notes:
+*     - This function will return a "bad" result value (AST__BAD) if
+*     any of the input coordinates has this value.
+*     - A "bad" value will also be returned if points A and B are
+*     co-incident, or if points B and C are co-incident.
+*     - A "bad" value will also be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+   AstSkyFrame *this;            /* Pointer to SkyFrame structure */
+   const int *perm;              /* Axis permutation array */
+   double aa[ 2 ];               /* Permuted a coordinates */
+   double anga;                  /* Angle from north to the line BA */
+   double angc;                  /* Angle from north to the line BC */
+   double bb[ 2 ];               /* Permuted b coordinates */
+   double cc[ 2 ];               /* Permuted c coordinates */
+   double result;                /* Value to return */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Obtain a pointer to the SkyFrame's axis permutation array. */
+   perm = astGetPerm( this );
+   if ( astOK ) {
+
+/* Check that all supplied coordinates are OK. */
+      if ( ( a[ 0 ] != AST__BAD ) && ( a[ 1 ] != AST__BAD ) &&
+           ( b[ 0 ] != AST__BAD ) && ( b[ 1 ] != AST__BAD ) &&
+           ( c[ 0 ] != AST__BAD ) && ( c[ 1 ] != AST__BAD ) ) {
+
+/* Apply the axis permutation array to obtain the coordinates of the
+   three points in the required (longitude,latitude) order. */
+         aa[ perm[ 0 ] ] = a[ 0 ];
+         aa[ perm[ 1 ] ] = a[ 1 ];
+         bb[ perm[ 0 ] ] = b[ 0 ];
+         bb[ perm[ 1 ] ] = b[ 1 ];
+         cc[ perm[ 0 ] ] = c[ 0 ];
+         cc[ perm[ 1 ] ] = c[ 1 ];
+
+/* Check that A and B are not co-incident. */
+         if( aa[ 0 ] != bb[ 0 ] || aa[ 1 ] != bb[ 1 ] ) {
+
+/* Check that C and B are not co-incident. */
+            if( cc[ 0 ] != bb[ 0 ] || cc[ 1 ] != bb[ 1 ] ) {
+
+/* Find the angle from north to the line BA. */
+               anga = slaDbear( bb[ 0 ], bb[ 1 ], aa[ 0 ], aa[ 1 ] );
+
+/* Find the angle from north to the line BC. */
+               angc = slaDbear( bb[ 0 ], bb[ 1 ], cc[ 0 ], cc[ 1 ] );
+
+/* Find the difference, folded into the range +/- PI. */
+               result = slaDrange( angc - anga );
+            }
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int ChrMatch( const char *str1, const char *str2 ) {
 /*
 *  Name:
@@ -2112,6 +2228,7 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
 
 /* Store replacement pointers for methods which will be over-ridden by new
    member functions implemented here. */
+   frame->Angle = Angle;
    frame->Distance = Distance;
    frame->Norm = Norm;
    frame->Offset = Offset;

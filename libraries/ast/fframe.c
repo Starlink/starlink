@@ -14,6 +14,7 @@
 *     a public FORTRAN 77 interface to the Frame class.
 
 *  Routines Defined:
+*     AST_ANGLE
 *     AST_CONVERT
 *     AST_DISTANCE
 *     AST_FORMAT
@@ -30,6 +31,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     23-JUL-1996 (RFWS):
@@ -38,6 +40,8 @@
 *        Added AST_DISTANCE and AST_OFFSET.
 *     25-FEB-1998 (RFWS):
 *        Added AST_UNFORMAT.
+*     21-JUN-2001 (DSB):
+*        Added AST_ANGLE.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -72,6 +76,24 @@ F77_INTEGER_FUNCTION(ast_convert)( INTEGER(FROM),
       namelist = astString( NAMELIST, NAMELIST_length );
       RESULT = astP2I( astConvert( astI2P( *FROM ), astI2P( *TO ),
                                    namelist ) );
+   )
+   return RESULT;
+}
+
+F77_DOUBLE_FUNCTION(ast_angle)( INTEGER(THIS),
+                                   DOUBLE_ARRAY(A),
+                                   DOUBLE_ARRAY(B),
+                                   DOUBLE_ARRAY(C),
+                                   INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(A)
+   GENPTR_DOUBLE_ARRAY(B)
+   GENPTR_DOUBLE_ARRAY(C)
+   F77_DOUBLE_TYPE(RESULT);
+
+   astAt( "AST_ANGLE", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astAngle( astI2P( *THIS ), A, B, C );
    )
    return RESULT;
 }

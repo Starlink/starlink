@@ -55,6 +55,7 @@ c     following functions may also be applied to all Frames:
 f     In addition to those routines applicable to all Mappings, the
 f     following routines may also be applied to all Frames:
 *
+c     - astAngle: Calculate the angle subtended by two points at a third point
 c     - astConvert: Determine how to convert between two coordinate systems
 c     - astDistance: Calculate the distance between two points in a Frame
 c     - astFindFrame: Find a coordinate system with specified characteristics
@@ -64,6 +65,7 @@ c     - astOffset: Calculate an offset along a geodesic curve
 c     - astPermAxes: Permute the order of a Frame's axes
 c     - astPickAxes: Create a new Frame by picking axes from an existing one
 c     - astUnformat: Read a formatted coordinate value for a Frame axis
+f     - AST_ANGLE: Calculate the angle subtended by two points at a third point
 f     - AST_CONVERT: Determine how to convert between two coordinate systems
 f     - AST_DISTANCE: Calculate the distance between two points in a Frame
 f     - AST_FINDFRAME: Find a coordinate system with specified characteristics
@@ -115,6 +117,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        prologue.
 *     18-JUL-1999 (RFWS):
 *        Fixed memory leak in ConvertX.
+*     21-JUN-2001 (DSB):
+*        Added astAngle.
 *class--
 */
 
@@ -513,6 +517,7 @@ int astTest##attribute##_( AstFrame *this, int axis ) { \
 #include "axis.h"                /* Coordinate Axis */
 #include "channel.h"             /* I/O channels */
 #include "frame.h"               /* Interface definition for this class */
+#include "slalib.h"              /* SLALIB library interface */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -564,6 +569,7 @@ static const char *GetSymbol( AstFrame *, int );
 static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const int *GetPerm( AstFrame * );
+static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static int ConsistentMaxAxes( AstFrame *, int );
@@ -770,6 +776,191 @@ static void AddUnderscores( char *string ) {
 /* If it is a white space character, replace it with an underscore. */
       if ( isspace( string[ i ] ) ) string[ i ] = '_';
    }
+}
+
+static double Angle( AstFrame *this, const double a[], 
+                     const double b[], const double c[] ) {
+/*
+*++
+*  Name:
+c     astAngle
+f     AST_ANGLE
+
+*  Purpose:
+*     Calculate the angle subtended by two points at a third point.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     double astAngle( AstFrame *this, const double a[], const double b[],
+c                      const double c[] )
+f     RESULT = AST_ANGLE( THIS, A, B, C, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function is only applicable to 2 or 3 dimensional Frames.
+f     This routine is only applicable to 2 or 3 dimensional Frames.
+*     It finds the angle at point B between the line
+*     joining points A and B, and the line joining points C 
+*     and B. These lines will in fact be geodesic curves appropriate to 
+*     the Frame in use. For instance, in SkyFrame, they will be great
+*     circles.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the 2-dimensional Frame.
+c     a
+f     A( *) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the first point.
+c     b
+f     B( * ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the second point.
+c     c
+f     C( * ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the third point.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astAngle
+f     AST_ANGLE = DOUBLE PRECISION
+*        The angle in radians, from the line AB to the line CB. If the
+*        Frame is 2-dimensional, it will be in the range $\pm \pi$
+*        with positive rotation is in the same sense as rotation from 
+*        the positive direction of axis 2 to the positive direction of 
+*        axis 1. If the Frame has 3 axes, a positive value will
+*        always be returned in the range zero to $\pi$.
+
+*  Notes:
+*     - An error will be reported if the supplied Frame is
+*     not 2 or 3 dimensional.
+*     - This function will return a "bad" result value (AST__BAD) if
+*     any of the input coordinates has this value.
+*     - A "bad" value will also be returned if points A and B are
+*     co-incident, or if points B and C are co-incident.
+*     - A "bad" value will also be returned if this function is
+c     invoked with the AST error status set, or if it should fail for
+f     invoked with STATUS set to an error value, or if it should fail for
+*     any reason.
+*--
+*/
+
+/* Local Variables: */
+   double ab[3];                 /* Vector AB */
+   double anga;                  /* Angle from +ve Y to the line BA */
+   double angc;                  /* Angle from +ve Y to the line BC */
+   double cb[3];                 /* Vector CB */
+   double cosa;                  /* Co-sine of required angle */
+   double dp[3];                 /* AB cross CB */
+   double r;                     /* Vector length */
+   double result;                /* Result value to return */
+   double sina;                  /* Sine of required angle */
+   int axis;                     /* Axis index */
+   int naxes;                    /* Number of Frame axes */
+   int ok;                       /* Supplied points OK? */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain the number of Frame axes. */
+   naxes = astGetNaxes( this );
+
+/* Check all positions are good. */
+   ok = 1;
+   for( axis = 0; axis < naxes; axis++ ) {
+      if( a[axis] == AST__BAD || b[axis] == AST__BAD ||
+          c[axis] == AST__BAD ) { 
+         ok = 0;
+         break;
+      }
+   }
+
+/* Check that A and B are not co-incident, and form the vector AB. */
+   if( ok ) {
+      ok = 0;
+      for( axis = 0; axis < naxes; axis++ ) {
+         ab[ axis ] = a[ axis ] - b[ axis ];
+         if( ab[ axis ] != 0.0 ) ok = 1;
+      }
+   }
+
+/* Check that C and B are not co-incident, and form the vector CB. */
+   if( ok ) {
+      ok = 0;
+      for( axis = 0; axis < naxes; axis++ ) {
+         cb[ axis ] = c[ axis ] - b[ axis ];
+         if( cb[ axis ] != 0.0 ) ok = 1;
+      }
+   }
+
+/* Report an error if the Frame is not 2 or 3 dimensional. */
+   if( naxes != 2 && naxes != 3 && astOK ) {
+      astError( AST__NAXIN, "astAngle(%s): Invalid number of Frame axes (%d)."
+                " astAngle can only be used with 2 or 3 dimensonal Frames.",
+                astGetClass( this ), naxes );
+   }
+
+/* Only proceed if these checks were passed. */
+   if ( astOK && ok ) {
+
+/* Deal first with 2-dimensional Frames. */
+      if( naxes == 2 ) {
+
+/* Find the angle from +ve Y to the line BA. */
+         anga = atan2( ab[ 0 ], ab[ 1 ] );
+
+/* Find the angle from +ve Y to the line BC. */
+         angc = atan2( cb[ 0 ], cb[ 1 ] );
+
+/* Find the difference, folded into the range +/- PI. */
+         result = slaDrange( angc - anga );
+
+/* Now deal with Frames with 3 axes. */
+      } else {
+
+/* Normalize the vectors to unit vectors. */
+         r = sqrt( ab[ 0 ]*ab[ 0 ] + ab[ 1 ]*ab[ 1 ] + ab[ 2 ]*ab[ 2 ] );
+         ab[ 0 ] /= r;
+         ab[ 1 ] /= r;
+         ab[ 2 ] /= r;
+
+         r = sqrt( cb[ 0 ]*cb[ 0 ] + cb[ 1 ]*cb[ 1 ] + cb[ 2 ]*cb[ 2 ] );
+         cb[ 0 ] /= r;
+         cb[ 1 ] /= r;
+         cb[ 2 ] /= r;
+
+/* Find the cross product between the two unit vectors. */
+         slaDvxv( ab, cb, dp );
+
+/* The magnitude of the cross product is the sin of the angle (0 to 1). */
+         sina = sqrt( dp[ 0 ]*dp[ 0 ] + dp[ 1 ]*dp[ 1 ] + dp[ 2 ]*dp[ 2 ] );
+
+/* The scalar product of the two unit vectors is the cos of the angle (-1
+   to +1). */
+         cosa = ab[ 0 ]*cb[ 0 ] + ab[ 1 ]*cb[ 1 ] + ab[ 2 ]*cb[ 2 ];
+
+/* Form the require angle. */
+         result = atan2( sina, cosa );
+
+      }
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static void CheckPerm( AstFrame *this, const int *perm, const char *method ) {
@@ -3244,6 +3435,7 @@ static void InitVtab( AstFrameVtab *vtab ) {
    vtab->ClearUnit = ClearUnit;
    vtab->Convert = Convert;
    vtab->ConvertX = ConvertX;
+   vtab->Angle = Angle;
    vtab->Distance = Distance;
    vtab->FindFrame = FindFrame;
    vtab->Format = Format;
@@ -7327,6 +7519,11 @@ AstFrameSet *astConvertX_( AstFrame *to, AstFrame *from,
                            const char *domainlist ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(to,Frame,ConvertX))( to, from, domainlist );
+}
+double astAngle_( AstFrame *this, const double a[], const double b[],
+                  const double c[] ) {
+   if ( !astOK ) return AST__BAD;
+   return (**astMEMBER(this,Frame,Angle))( this, a, b, c );
 }
 double astDistance_( AstFrame *this,
                      const double point1[], const double point2[] ) {

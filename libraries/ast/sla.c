@@ -19,6 +19,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 
 *  History:
 *     12-NOV-1996 (RFWS):
@@ -27,6 +28,8 @@
 *        Added SLA_DJCAL.
 *     26-SEP-1997 (DSB):
 *        Added SLA_DD2TF, SLA_DJCL.
+*     21-JUN-2001 (DSB):
+*        Added SLA_DBEAR.
 */
 
 /* Macros */
@@ -375,6 +378,24 @@ void slaDmxv ( double dm[3][3], double va[3], double vb[3] ) {
                        DOUBLE_ARRAY_ARG(VA),
                        DOUBLE_ARRAY_ARG(VB) );
    for ( i = 0; i < 3; i++ ) vb[ i ] = VB[ i ];
+}
+
+F77_DOUBLE_FUNCTION(sla_dbear)( DOUBLE(A1), DOUBLE(B1), 
+                                DOUBLE(A2), DOUBLE(B2) );
+
+double slaDbear ( double a1, double b1, double a2, double b2  ) {
+   DECLARE_DOUBLE(A1);
+   DECLARE_DOUBLE(B1);
+   DECLARE_DOUBLE(A2);
+   DECLARE_DOUBLE(B2);
+   double result;
+   A1 = a1;
+   B1 = b1;
+   A2 = a2;
+   B2 = b2;
+   result = F77_CALL(sla_dbear)( DOUBLE_ARG(&A1), DOUBLE_ARG(&B1), 
+                                 DOUBLE_ARG(&A2), DOUBLE_ARG(&B2) );
+   return result;
 }
 
 F77_DOUBLE_FUNCTION(sla_drange)( DOUBLE(ANGLE) );

@@ -211,6 +211,8 @@
 
 *  New Methods Defined:
 *     Public:
+*        astAngle
+*           Calculate the angle between three points.
 *        astConvert
 *           Determine how to convert between two coordinate systems.
 *        astDistance
@@ -431,6 +433,8 @@
 *        Revised astConvert and added astFindFrame.
 *     15-FEB-1998 (RFWS):
 *        Added astUnformat.
+*     21-JUN-2001 (DSB):
+*        Added astAngle.
 *-
 */
 
@@ -506,6 +510,7 @@ typedef struct AstFrameVtab {
    const char *(* GetTitle)( AstFrame * );
    const char *(* GetUnit)( AstFrame *, int );
    const int *(* GetPerm)( AstFrame * );
+   double (* Angle)( AstFrame *, const double[], const double[], const double[] );
    double (* Distance)( AstFrame *, const double[], const double[] );
    double (* Gap)( AstFrame *, int, double, int * );
    int (* GetDigits)( AstFrame * );
@@ -615,6 +620,7 @@ AstFrame *astLoadFrame_( void *, size_t, int, AstFrameVtab *,
 /* -------------------------------- */
 AstFrameSet *astConvert_( AstFrame *, AstFrame *, const char * );
 AstFrameSet *astFindFrame_( AstFrame *, AstFrame *, const char * );
+double astAngle_( AstFrame *, const double[], const double[], const double[] );
 double astDistance_( AstFrame *, const double[], const double[] );
 void astNorm_( AstFrame *, double[] );
 void astOffset_( AstFrame *, const double[], const double[], double, double[] );
@@ -743,6 +749,8 @@ astINVOKE(O,astLoadFrame_(mem,size,init,vtab,name,astCheckChannel(channel)))
    wrong sort of Object is supplied. */
 #define astConvert(from,to,domainlist) \
 astINVOKE(O,astConvert_(astCheckFrame(from),astCheckFrame(to),domainlist))
+#define astAngle(this,a,b,c) \
+astINVOKE(V,astAngle_(astCheckFrame(this),a,b,c))
 #define astDistance(this,point1,point2) \
 astINVOKE(V,astDistance_(astCheckFrame(this),point1,point2))
 #define astFindFrame(target,template,domainlist) \
