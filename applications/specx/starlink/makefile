@@ -128,7 +128,7 @@
 #
 #  Copyright:
 #     Copyright (C) 1995 Rutherford Appleton Laboratory
-#     Copyright (C) 1999 Particle Physics and Astronomy Research Council.
+#     Copyright (C) 1999-2000 Particle Physics and Astronomy Research Council.
 #     All Rights Reserved.
 #
 #  Authors:
@@ -232,6 +232,12 @@
 #     29-DEC-1999 (TIMJ):
 #        Add support for .F files via FCPPFLAGS
 #        Add new files for v6.7-6
+#     10-JAN-2000 (BLY): Version 6.7-6.
+#        Added Y2K fixes from Tim Jenness.
+#        Added new SUN/17 + hypertext.
+#        Added SPECX manual (MUD/70).
+#     17-MAY-2000 (TIMJ):
+#        Merge back with starlink version of makefile
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -365,8 +371,8 @@ RANLIB = :
 
 #  Commands for adding to and extracting from an archive file (.tar).
 
-TAR_IN = pax -w -v -x ustar -f
-TAR_OUT = pax -r -f
+TAR_IN = tar cvfh
+TAR_OUT = tar xf
 
 #  Command for adding a file to an object archive (.a).
 
@@ -384,11 +390,11 @@ LDFLAG2 =
 
 #  Linker command to link C main programs with Fortran subroutines and
 #  libraries (and C functions).
- 
+
 CFLINK = $(FC) -O
- 
+
 #  Extra link libraries for CFLINK.
- 
+
 CFLIBS =
 
 #  Location of FIGARO libraries.
@@ -451,9 +457,9 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
 
 PUBLIC_SCRIPTS = baseline.spx convert.spx fetch.spx fiddle.spx \
 frqfix.spx fsw.spx gsd2fits.spx helpfits.spx image.spx map_av.spx \
-newton_root.spx readall.spx showastro.spx source.spx specx_to_dbmem.spx \
-st.spx stack.spx tofits.spx tsky.spx unaverage.spx vertical.spx rdwidesp.spx \
-rddualgsd.spx
+newton_root.spx rddualgsd.spx rdwidesp.spx readall.spx showastro.spx \
+source.spx specx_to_dbmem.spx st.spx stack.spx tofits.spx tsky.spx \
+unaverage.spx vertical.spx
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases 
@@ -464,7 +470,7 @@ STARTUP_SCRIPT = specxstart
 
 #  Link script.  This script does not form part of the package but is 
 #  required for building it.  It will not be installed.
- 
+
 LINK_SCRIPT = $(PKG_NAME)_link
 
 #  List of private include files.  These are include files
@@ -590,11 +596,11 @@ F_ROUTINES = $(F_SUB1) $(F_SUB2) $(F_SUB3) $(F_SUB4) $(F_SUB5) \
              $(F_SUB19) $(F_SUB20) \
              $(EXE_SOURCES_F)
 
-F_SUB1 = a13.f astro_times.f astro_vels.f cuv.f date_cvt.f \
-        dectim.f deg_to_dms.f deg_to_string.f dms_to_rad.f dms_to_string.f \
-        hadec_to_azel.f hours_to_str.f julda.f lostim2.f pre.f \
-        radec_to_l2b2.f red.f string_to_dms.f utcalc2.f cvt_to_date_obs.f \
-	specxjd_to_mjd.f dattim_from_mjd.f decdat.f
+F_SUB1 = a13.f astro_times.f astro_vels.f cuv.f cvt_to_date_obs.f \
+         date_cvt.f dattim_from_mjd.f decdat.f dectim.f deg_to_dms.f deg_to_string.f \
+         dms_to_rad.f dms_to_string.f hadec_to_azel.f hours_to_str.f julda.f \
+         lostim2.f pre.f radec_to_l2b2.f red.f specxjd_to_mjd.f \
+         string_to_dms.f utcalc2.f
 
 F_SUB2 = \
    calc_image.f close_fits.f fitsmap.f \
@@ -704,12 +710,12 @@ F_SUB18 = \
    dasmerge.f exchnge.f four2.f frqfix.f get_subarr.f icheck.f ichkq2.f \
    init_array.f initnpnew.f inquad.f interp.f \
    islct1q.f islctq.f lmm2.f lun_hndl.f \
-   mult.f npts2.f ntot.f ntot2.f ntrans.f pop.f push.f qlim.f \
-   qmult.f range.f recall.f roll.f setx.f \
+   mult.f npts2.f ntot.f ntot2.f ntrans.f parse_date_obs.f pop.f push.f \
+   qlim.f qmult.f range.f recall.f roll.f setx.f \
    solve4.f specx_reorder.f spliceq.f storex.f su.f \
    swap2.f swap8.f swap_arr.f tran_date.f tran_time.f \
    uread.f uwrite.f vm_hndl.f \
-   xsnart.f xsnart8.f xtrans.f xtrans8.f xtrctq.f xy.f parse_date_obs.f \
+   xsnart.f xsnart8.f xtrans.f xtrans8.f xtrctq.f xy.f \
    pda_dsort.f pda_xermsg.f
 
 F_SUB19 = \
@@ -956,7 +962,7 @@ DATA_FILES = specx_welcome.txt specx_init.dat init.spx test.spx graphcap.txt \
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = sun17.tex sc8.tex \
+LATEX_DOCS = sun17.tex sc8.tex mud70.tex \
 sc8_badbaseline.ps sc8_cgm.ps sc8_chann.ps sc8_concat.ps sc8_cont.ps \
 sc8_dasmerge_yn.ps sc8_despiked.ps sc8_dm_dasmerge.ps sc8_dm_dirty.ps \
 sc8_dm_drop.ps sc8_dm_orig.ps sc8_duffy.ps sc8_fgm.ps sc8_fpb-result.ps \
@@ -965,12 +971,14 @@ sc8_hdo-lsb.ps sc8_hdo-orig.ps sc8_hdo-usb.ps sc8_hdo_freq.ps \
 sc8_merge_diffs.ps sc8_rlb.ps sc8_s-l-r-f.ps sc8_smooth.ps \
 sc8_spectrum.ps sc8_spiked.ps
 
-HYPERTEXT_DOCS = sc8.htx
-#HYPERTEXT_DOCS = sun17.htx sc8.htx
+FIGURES = mud70_figures
+
+HYPERTEXT_DOCS = sun17.htx sc8.htx
 
 #  List of documentation files.
 
-DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
+DOCUMENTATION = $(LATEX_DOCS) $(FIGURES) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
+$(PKG_NAME).news
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -1620,7 +1628,7 @@ check:
 	@ echo
 	@ nosource='';\
           for f in $(SOURCE_FILES); do \
-             if test ! -f $$f; then \
+             if test ! -r $$f; then \
                 nosource='1';\
                 break;\
              else :; fi;\
@@ -1847,6 +1855,14 @@ install:
            else :; fi;\
         done
 #
+#  Install the documentation figures.
+	for f in $(FIGURES) ""; do \
+           if test -n "$$f"; then \
+              $(TAR_IN) - $$f | ( cd $(INSTALL_DOCS) ; $(TAR_OUT) - ) ;\
+              chmod 644 $(INSTALL_DOCS)/$$f/* ;\
+           else :; fi;\
+        done
+#
 #  Install any hypertext documents, giving world read access to all the files
 #  they contain and linking with other documents.
 	if test -n "$(HYPERTEXT_DOCS)"; then \
@@ -1974,6 +1990,12 @@ do_deinstall:
 	- for f in $(LATEX_DOCS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
               rm -f $(INSTALL_DOCS)/$$f;\
+           else :; fi;\
+        done
+#  Deinstall the documentation figures.
+	- for f in $(FIGURES) ""; do \
+           if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
+              rm -rf $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
 #
