@@ -225,7 +225,7 @@
             vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
             ppath DYNAMIC GLOBAL CURRENT DEFAULT
             default TRUE
-            prompt "Use CCDPACK Set headers if available[ccd_global]"
+            prompt {Use CCDPACK Set headers if available}
             association <->global.ccdpack_useset
             helpkey *
           }
