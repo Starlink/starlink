@@ -25,12 +25,44 @@
 *     is achieved by adding the values of the input NDF within
 *     non-overlapping `rectangular' boxes whose dimensions are the
 *     compression factors.  The additions may be normalised to correct
-*     for any bad values present in the input NDF.
+*     for any bad values present in the input NDF. The exact placement of 
+*     the boxes can be controlled using parameter ALIGN.
 
 *  Usage:
 *     compadd in out compress [wlim]
 
 *  ADAM Parameters:
+*     ALIGN = LITERAL (Read)
+*        This parameter controls the placement of the compression boxes
+*        within the input NDF (also see parameter TRIM). It can take any 
+*        of the following values:
+*
+*        - "ORIGIN" --- The compression boxes are placed so that the
+*        origin of the pixel co-ordinate Frame in the input NDF
+*        corresponds to a corner of a compression box. This results in 
+*        the pixel origin being retain in the output NDF. For instance,
+*        if a pair of 2-dimensional images which have previously been
+*        aligned in pixel co-ordinates are compressed, then using this
+*        option ensures that the compressed images will also be aligned
+*        in pixel co-ordinates.
+*
+*        - "FIRST" --- The compression boxes are placed so that the
+*        first pixel in the input NDF (for instance, the bottom left
+*        pixel in a 2-dimensional image) corresponds to the first pixel
+*        in a compression box. This can result in the pixel origin being
+*        shifted by up to one compression box in the output image. Thus,
+*        images which were previously aligned in pixel co-ordinates may
+*        not be aligned after compression. You may want to use this option
+*        if you are using a very large box to reduce the number of
+*        dimensions in the data (for instance summing across the entire
+*        width of an image to produce a 1-dimensional array).
+*
+*        - "LAST" --- The compression boxes are placed so that the
+*        last pixel in the input NDF (for instance, the top right
+*        pixel in a 2-dimensional image) corresponds to the last pixel
+*        in a compression box. See the "FIRST" option above for further 
+*        comments.
+*                                                             ["ORIGIN"]
 *     AXWEIGHT = _LOGICAL (Read)
 *        When there is an AXIS variance array present in the NDF and
 *        AXWEIGHT=TRUE the application forms weighted averages of the
@@ -71,6 +103,16 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
+*     TRIM = _LOGICAL (Read)
+*        If parameter TRIM is set TRUE, the output NDF only contains data
+*        for compression boxes which are entirely contained within the 
+*        input NDF. Any pixels around the edge of the input NDF which are 
+*        not contained within a compression box are ignored. If TRIM is set 
+*        FALSE, the output NDF contains data for all compression boxes which 
+*        have any overlap with the input NDF.  All pixels outside the
+*        bounds of the NDF are assumed to be bad. That is, any boxes which 
+*        extend beyond the bounds of the input NDF are padded with bad 
+*        pixels. See also parameter ALIGN. [current value]
 *     WLIM = _REAL (Read)
 *        If the input NDF contains bad pixels, then this parameter
 *        may be used to determine the number of good pixels which must
@@ -96,6 +138,18 @@
 *        galaxy.  Thus if cosmos is two-dimensional, this command
 *        would result in a sixteen-fold reduction in the array
 *        components.
+*     compave cosmos profile [10000,1] wlim=0 align=first trim=no
+*        This compresses the 2-dimensional NDF called cosmos to produce a 
+*        1-dimensional NDF called profile. This is done using a
+*        compression box which is 1 pixel high, but which is wider than
+*        the whole input image. Each pixel in the output NDF thus 
+*        corresponds to the sum of the corresonding row in the
+*        input image. WLIM is set to zero to ensure that bad pixels
+*        are ignored. ALIGN is set to FIRST so that each compression box 
+*        is flush with the left edge of the input image. TRIM is set to
+*        NO so that compression boxes which extend outside the bounds of
+*        the input image (which will be all of them if the input image is
+*        narrower than 10000 pixels) are retained in the output NDF.
 *     compadd cosmos galaxy 4 wlim=1.0
 *        This compresses the NDF called cosmos adding four times in
 *        each dimension, and stores the reduced data in the NDF called
@@ -124,44 +178,8 @@
 *        adding every three pixels to form the NDF called arp244cs.
 
 *  Notes:
-*     -  The compression is centred on the origin of the pixel co-ordinate
-*     Frame. That is, if a position has a value p(i) on the i'th pixel 
-*     co-ordinate axis of the input NDF, then it will have position 
-*     p(i)/COMPRESS(i) on the corresponding axis of the output NDF. The
-*     pixel index bounds of the output NDF are chosen accordingly.
 *     -  The axis centres and variances are averaged, whilst the widths
 *     are summed and always normalised for bad values.
-
-*  Algorithm:
-*     -  Obtain the input NDF. Inquire its bounds and dimensions. Set
-*     lower limit of two dimensions.
-*     -  Obtain the compression factors with acceptable ranges.  Abort
-*     if there is no compression.  Obtain the minimum number of good
-*     values in the input box to create a good output value.  Determine
-*     whether or not variance is present.  Determine if normalisation
-*     is required.  Obtain the data-type preservation flag.  Compute
-*     the dimensions of the output NDF.
-*     -  Create the output NDF via a section of the input array whose
-*     bounds are those of the output array in order to propagate
-*     character components, AXIS, HISTORY, and extensions.  Determine
-*     the numeric data type for processing from the data and variance.
-*     (It is also used for the axis arrays.)
-*     -  Obtain workspace using the appropriate type.
-*     -  Compress the data array, and if present the variance, axis
-*     centre, axis width and variance.
-*        o  The input data type is obtained and set in the output array
-*        if the preserve flag is set.
-*        o  Obtain the necessary workspace, mapping the input and
-*        output arrays
-*        o  Call the appropriate compression subroutine depending on
-*        whether variance is present, and on the implementation type.
-*        New workspace for counting is obtained for each axis array.
-*        For axes determine whether or not weighted averages are to be
-*        used to calculate output centres when variance is present.
-*        For the AXIS arrays each axis array is processed
-*        two-dimensionally, but with a dummy second dimension. They are
-*        also averaged, not summed.  Axis width arrays are normalised. 
-*     -  Tidy the NDF system.
 
 *  Related Applications:
 *     KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, TRANSFORMER;
@@ -203,6 +221,8 @@
 *     9-DEC-1999 (DSB):
 *        Corrected propagation of WCS (an erroneous shift was previously
 *        introduced if the lower bounds of the input NDF were not (1,1) ).
+*     25-APR-2000 (DSB):
+*        Added parameters TRIM and ALIGN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -227,6 +247,7 @@
 
 *  Local Variables:
       CHARACTER
+     :  ALIGN * ( 6 ),         ! Alignment option
      :  COMP * ( 15 ),         ! List of components to process
      :  CTYPE * ( NDF__SZTYP ),! Numeric type for counting workspace
      :  DTYPE * ( NDF__SZFTP ),! Numeric type for output arrays
@@ -246,6 +267,7 @@
      :  CMPMAX( NDF__MXDIM ),  ! Maximum compression factors
      :  CMPMIN( NDF__MXDIM ),  ! Minimum compression factors
      :  COMPRS( NDF__MXDIM ),  ! Compression factors
+     :  D,                     ! No. of o/p pixels from ref. to i/p pixel 1
      :  EL,                    ! Number of elements in mapped array
      :  ELA,                   ! Number of elements in input axis array
      :  ELWS1,                 ! Number of elements in summation
@@ -272,6 +294,7 @@
      :  ODIMS( NDF__MXDIM ),   ! Dimensions of output array
      :  PNTRI( 2 ),            ! Pointer to input array component(s)
      :  PNTRO( 2 ),            ! Pointer to output array component(s)
+     :  REF( NDF__MXDIM ),     ! I/p pixel coords at bottom left of a comp. box
      :  TOTCMP,                ! Total compression factor
      :  UBND( NDF__MXDIM ),    ! Upper bounds of input NDF
      :  UBNDO( NDF__MXDIM ),   ! Upper bounds of output NDF
@@ -285,6 +308,7 @@
      :  NORMAL,                ! Normalise the summations for bad values
      :  PRESTY,                ! Preserve the input array's data type in
                                ! the output arrays
+     :  TRIM,                  ! Trim i/p image to a whole number of boxes?
      :  VAR,                   ! Variance is present
      :  WIDTH                  ! Axis width is present
 
@@ -387,23 +411,68 @@
 *  Compute the output NDF's dimensions.
 *  ====================================
 
+*  See how the placement of the compression boxes is to be chosen. "ORIGIN"
+*  results in boxes being placed so that the origin of pixel co-ordinates 
+*  in the input NDF is co-incident with the bottom left corner of a 
+*  compression box. "First" results in the first pixel (i.e. the bottom 
+*  left pixel in a 2D array) being the first pixel in the first compression 
+*  box. "Last" results in the last pixel (i.e. the top right pixel in a 2D 
+*  array) being the last pixel in the last compression box. 
+      CALL PAR_CHOIC( 'ALIGN', 'Origin', 'Origin,First,Last', .TRUE., 
+     :                ALIGN, STATUS )
+
+*  Store the input pixel co-ordinates of the bottom left corner of a 
+*  compression box.
+      IF( ALIGN .EQ. 'ORIGIN' ) THEN
+         DO I = 1, NDIM
+            REF( I ) = 0
+         END DO
+
+      ELSE IF( ALIGN .EQ. 'FIRST' ) THEN
+         DO I = 1, NDIM
+            REF( I ) = LBND( I ) - 1
+         END DO
+      
+      ELSE IF( ALIGN .EQ. 'LAST' ) THEN
+         DO I = 1, NDIM
+            REF( I ) = UBND( I )
+         END DO
+      
+      END IF
+
+*  See if the input image is to padded or trimmed in order to make it a
+*  whole number of compression boxes.
+      CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
+
 *  Work out the bounds for the output array and the size of the output 
-*  array from the input array dimensions and the compression factor.  
-*  The pixel origin is retained. Also modify the input bounds so that
-*  they correspond to the section of the input image which is actually
-*  used.
+*  array from the input array dimensions, compression factor and alignment.  
+*  Also modify the input bounds so that they correspond to the section of 
+*  the input image which is actually used. Trim or pad the input image to
+*  make it a whole number of compression boxes, as required by parameter
+*  TRIM.
       DO I = 1, NDIM
+         D = KPG1_CEIL( REAL( 1 - REF( I ) )/REAL( COMPRS( I ) ) ) - 1
 
-         LBNDO( I ) = 1 + KPG1_CEIL( REAL( LBND( I ) - 1 )/
-     :                               REAL( COMPRS( I ) ) )
+         IF( TRIM ) THEN
+            LBNDO( I ) = KPG1_CEIL( REAL( LBND( I ) - 1 - REF( I ) )
+     :                              / REAL( COMPRS( I ) ) ) - D + 1
+            UBNDO( I ) = MAX( LBNDO( I ), 
+     :                        KPG1_FLOOR( REAL( UBND( I ) - REF( I ) )
+     :                                    / REAL( COMPRS( I ) ) ) - D )
+         ELSE
+            LBNDO( I ) = KPG1_FLOOR( REAL( LBND( I ) - 1 - REF( I ) )
+     :                              / REAL( COMPRS( I ) ) ) - D + 1
+            UBNDO( I ) = MAX( LBNDO( I ), 
+     :                        KPG1_CEIL( REAL( UBND( I ) - REF( I ) )
+     :                                    / REAL( COMPRS( I ) ) ) - D )
+         END IF
 
-         UBNDO( I ) = MAX( LBNDO( I ), KPG1_FLOOR( REAL( UBND( I ) )/
-     :                                           REAL( COMPRS( I ) ) ) )
          ODIMS( I ) = UBNDO( I ) - LBNDO( I ) + 1
          
-         LBND( I ) = 1 + COMPRS( I )*( LBNDO( I ) - 1 )
-         UBND( I ) = COMPRS( I )*UBNDO( I )
+         LBND( I ) = 1 + REF( I ) + COMPRS( I )*( LBNDO( I ) - 1 + D )
+         UBND( I ) = REF( I ) + COMPRS( I )*( UBNDO( I ) + D )
          IDIMS( I ) = UBND( I ) - LBND( I ) + 1
+
       END DO
 
 *  Create a section of the input NDF containing the region will actually
