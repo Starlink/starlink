@@ -56,10 +56,12 @@
          wm group $helpwin $leader
          itk_component add usertext {
             label [ $helpwin childsite ].usertext \
-               -justify left
+               -justify left \
+               -font {Helvetica -12 normal}
          } {
             usual
             rename -text -helptext helpText Text
+            ignore -font
          }
          pack $itk_component(usertext)
          itk_component add control {
