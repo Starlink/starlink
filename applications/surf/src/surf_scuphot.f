@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_PHOTOM (STATUS)
+      SUBROUTINE REDS_SCUPHOT (STATUS)
 *+
 *  Name:
 *     REDS_SCUPHOT
@@ -122,12 +122,15 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.3  1996/10/30 22:54:34  timj
-*     Add modern header.
-*     Replace SCULIB_COPY with VEC_
-*     Change size of OUT to 132 characters
-*     Probably lots of other things...
+*     Revision 1.4  1996/11/01 21:46:04  timj
+*     Change name to SCUPHOT
 *
+c Revision 1.3  1996/10/30  22:54:34  timj
+c Add modern header.
+c Replace SCULIB_COPY with VEC_
+c Change size of OUT to 132 characters
+c Probably lots of other things...
+c
 *     {enter_further_changes_here}
  
 *  Bugs:
