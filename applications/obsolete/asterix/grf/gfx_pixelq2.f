@@ -36,6 +36,7 @@
       CHARACTER*10 SCALING
       REAL RVAL
       REAL ZRAN
+      REAL DMIN,DMAX
       REAL X1,X2,Y1,Y2
       REAL XHWID,YHWID
       REAL DIRX,DIRY
@@ -68,6 +69,8 @@
         ENDIF
 
 *  get min/max scaling values if set
+        DMIN=ZMIN
+        DMAX=ZMAX
         CALL GCB_GETR('PIX_MIN',OK,RVAL,STATUS)
         IF (OK) THEN
           ZMIN=RVAL
@@ -77,9 +80,19 @@
           ZMAX=RVAL
         ENDIF
         ZRAN=ZMAX-ZMIN
-        IF (ZRAN.LE.0.0) THEN
-          CALL MSG_PRNT('AST_ERR: invalid scaling range')
-          STATUS=SAI__ERROR
+        IF (ZRAN.LT.0.0) THEN
+          IA=0
+          SCALING='NONE'
+        ELSEIF (ZRAN.EQ.0.0) THEN
+          IF (ZMIN.GT.DMAX) THEN
+            IA=1
+            SCALING='NONE'
+          ELSEIF (ZMAX.LT.DMIN) THEN
+            IA=0
+            SCALING='NONE'
+          ENDIF
+        ELSE
+          MONO=.FALSE.
         ENDIF
 
 *  get colour capability of device
