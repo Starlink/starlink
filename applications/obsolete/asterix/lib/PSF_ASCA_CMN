@@ -7,15 +7,15 @@
       INTEGER			AS_NXY			! # X and Y bins
 	PARAMETER		( AS_NXY = 63 )
 
-      INTEGER			AS_NE			! # energy bands
-	PARAMETER		( AS_NE = 10 )
-
       INTEGER			AS_NSP			! # f.o.v samples
 	PARAMETER		( AS_NSP = 11 )
 
       INTEGER			AS_GPTR(AS_NE,AS_NSP)
       INTEGER			AS_SPTR(AS_NE,AS_NSP)
       INTEGER			AS_XPTR(AS_NE,AS_NSP)
+      REAL			AS_XPIX			! Psf pixel sizes (arcmin)
+      REAL			AS_GPIX
+      REAL			AS_SPIX
 
       LOGICAL                 AS_INIT 			! System initialised
       REAL                    AS_ENERGY(PSF_NMAX)	!
@@ -27,6 +27,7 @@
 
       COMMON /PSF_ASCA_CMN/    AS_INIT, AS_ENERGY,
      :                        AS_PHALO, AS_PHAHI, AS_PHA_DEF,
-     :                        AS_GPTR,AS_SPTR,AS_XPTR
+     :                        AS_GPTR,AS_SPTR,AS_XPTR,AS_XPIX,AS_GPIX,
+     :                        AS_SPIX
 
       COMMON /PSF_ASCA_CMNC/   AS_INSTR
