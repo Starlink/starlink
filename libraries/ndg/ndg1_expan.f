@@ -136,6 +136,7 @@
       INTEGER PAR                ! Index of next "("
       INTEGER SIZE0              ! Size of original group
       INTEGER SLEN               ! Length of total search string
+      LOGICAL PURGE              ! Purge duplicate file names?
 *.
 
 *  Initialise the returned flag to indicate that no matching files have
@@ -207,6 +208,9 @@
      :    TEMPLT( L : L ) .EQ. '`' ) THEN
          CALL NDG1_APPEN( IGRP2, IGRP3, TEMPLT, ' ', STATUS )
 
+*  Indicate that duplicate file names should bnot be purged.
+         PURGE = .FALSE.
+
 *  Otherwise, split the template into directory, basename, suffix and
 *  section.
       ELSE
@@ -215,10 +219,11 @@
 *  First of all look for any ".sdf" files with the given directory path
 *  and file basename. Ignore the file suffix since "fred.fit" could refer
 *  to component ".fit" within file fred.sdf. Store matching file specs
-*  in IGRP2, and "the rest" (i.e. file suffix and section) in IGRP3.
+*  in IGRP2, and "the rest" (i.e. file suffix - so long as it is not a
+*  simple wild-card ".*" - and section) in IGRP3.
          REST = ' '
          IAT = 0
-         CALL CHR_APPND( SUF, REST, IAT )
+         IF( SUF .NE. '.*') CALL CHR_APPND( SUF, REST, IAT )
          CALL CHR_APPND( SEC, REST, IAT )
    
          FTEMP = ' '
@@ -233,8 +238,14 @@
          END IF
 
 *  From now on, if no suffix was given, use ".*" so that we pick up files 
-*  with any of the types included in NDF_FORMATS_IN.
-         IF( SUF .EQ. ' ' ) SUF = '.*'
+*  with any of the types included in NDF_FORMATS_IN. But indicate that
+*  duplicate files with different file types should be purged.
+         IF( SUF .EQ. ' ' ) THEN
+            SUF = '.*'
+            PURGE = .TRUE.
+         ELSE
+            PURGE = .FALSE.
+         END IF
 
 *  Initialise the total file search string.
          SEARCH = ' '
@@ -430,8 +441,8 @@
 
 *  Purge the returned groups of matching files (i.e. file with the same
 *  directory and basename but differing file types).
-      CALL NDG1_SORT( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS, 
-     :                SIZE0 + 1, NFMT, FMT, STATUS )
+      IF( PURGE ) CALL NDG1_SORT( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, 
+     :                            IGRPS, SIZE0 + 1, NFMT, FMT, STATUS )
 
 *  Delete the temporary groups.
  999  CONTINUE

@@ -83,7 +83,7 @@
       INTEGER IGRPS
       INTEGER FIRST 
       INTEGER NFMT
-      CHARACTER FMT( NFMT )
+      CHARACTER FMT( NFMT )*(*)
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -108,7 +108,6 @@
       LOGICAL GOTDIR             ! Has the original directory been got?
       LOGICAL GOTTYP             ! Has the original file type been got?
       LOGICAL MORE               ! Check more NDFs?
-
 *.
 
 *  Check inherited global status. Also return if NFMT is zero.
@@ -121,8 +120,9 @@
 *  Get the number of supplied NDFs.
       CALL GRP_GRPSZ( IGRP1, SIZE, STATUS )
 
-*  Loop round each required "original" NDF.
-      DO I = FIRST, SIZE
+*  Loop round each required "original" NDF. We dont need to check the
+*  last one.
+      DO I = FIRST, SIZE - 1
 
 *  Get the file base name.
          CALL GRP_GET( IGRPB, I, 1, BN, STATUS ) 
@@ -199,7 +199,7 @@
 *  NDF. Set the specification of the matching NDF blank. We then
 *  continue to compare any remaining NDFs against the original NDF.
 *  Store the index of the first NDF to be removed.
-                        IF( ITYP .GT. MITYP ) THEN
+                        IF( ITYP .LT. MITYP ) THEN
                            CALL GRP_PUT( IGRP1, 1, ' ', IMAT, STATUS ) 
                            IGONE = MIN( IGONE, IMAT )
 
