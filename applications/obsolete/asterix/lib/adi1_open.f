@@ -79,6 +79,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
+      INCLUDE 'ADI_ERR'
 
 *  Arguments Given:
       INTEGER			FID			! File spec
