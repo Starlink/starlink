@@ -44,7 +44,6 @@
 *        remove the distortion and the inverse transformation will apply
 *        the distortion. The distortion itself will still be given by the
 *        same value of Disco.
-*        used.
 *     PcdCen(axis)
 *        This attribute specifies the centre of a pincushion distortion. 
 *        It takes a separate value for each axis of the PcdMap so that, for 

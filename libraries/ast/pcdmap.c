@@ -15,9 +15,9 @@ f     AST_PCDMAP
 *     positions to correct for the radial distortion introduced by some
 *     cameras and telescopes. This can take the form either of pincushion
 *     or barrel distortion, and is characterized by a single distortion
-*     co-efficient.
+*     coefficient.
 *
-*     A PcdMap is specified by giving the distortion co-efficient, and the
+*     A PcdMap is specified by giving the distortion coefficient, and the
 *     coordinates of the centre of the radial distortion. The forward
 *     transformation of a PcdMap applies the distortion:
 *
@@ -26,7 +26,7 @@ f     AST_PCDMAP
 *     where R is the undistorted radial distance from the distortion 
 *     centre specified by attributes PcdCen, RHO is the radial distance 
 *     from the same centre in the presence of distortion, and C is the 
-*     distortion co-efficient given by attribute Disco.
+*     distortion coefficient given by attribute Disco.
 *
 *     The inverse transformation of a PcdMap removes the distortion
 *     produced by the forward transformation. The expression used to derive 
@@ -50,7 +50,7 @@ f     Note, if a PcdMap is inverted (for instance using AST_INVERT) then
 *     In addition to those attributes common to all Mappings, every
 *     PcdMap also has the following attributes:
 *
-*     - Disco: Distortion co-efficient
+*     - Disco: Distortion coefficient
 *     - PcdCen(axis): The co-ordinates of the centre of the distortion
 
 *  Functions:
@@ -59,7 +59,7 @@ f     The PcdMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: David Berry (Starlink)
@@ -283,7 +283,7 @@ void astClear##attr##_( AstPcdMap *this, int axis ) { \
 *  Parameters:
 *     attr
 *        The name of the attribute whose value is to be obtained, as it
-*        appears in the function name (e.g. Label in "astGetLabel").
+*        appears in the function name (e.g. PcdCen in "astGetPcdCen").
 *     type
 *        The C type of the attribute.
 *     bad_value
@@ -349,8 +349,7 @@ type astGet##attr##_( AstPcdMap *this, int axis ) { \
 *     MAKE_SET
 
 *  Purpose:
-*     Implement a method to set a single value in a multi-valued attribute 
-*     for a PcdMap.
+*     Implement a method to set a single value in a multi-valued attribute.
 
 *  Type:
 *     Private macro.
@@ -378,7 +377,7 @@ type astGet##attr##_( AstPcdMap *this, int axis ) { \
 *  Parameters:
 *      attr
 *         The name of the attribute to be set, as it appears in the function
-*         name (e.g. Label in "astSetLabelAt").
+*         name (e.g. PcdCen in "astSetPcdCen").
 *      type
 *         The C type of the attribute.
 *      component
@@ -439,7 +438,7 @@ void astSet##attr##_( AstPcdMap *this, int axis, type value ) { \
 
 *  Purpose:
 *     Implement a method to test if a single value has been set in a 
-*     multi-valued attribute for a class.
+*     multi-valued attribute.
 
 *  Type:
 *     Private macro.
@@ -467,7 +466,7 @@ void astSet##attr##_( AstPcdMap *this, int axis, type value ) { \
 *  Parameters:
 *      attr
 *         The name of the attribute to be tested, as it appears in the function
-*         name (e.g. Label in "astTestLabelAt").
+*         name (e.g. PcdCen in "astTestPcdCen").
 *      assign
 *         An expression that evaluates to 0 or 1, to be used as the returned
 *         value. This can use the string "axis" to represent the zero-based
@@ -560,7 +559,7 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 *        The invert flag to use with the second mapping.
 
 *  Returned Value:
-*     1 if the Mapings can be merged, zero otherwise.
+*     1 if the Mappings can be merged, zero otherwise.
 
 */
 
@@ -614,7 +613,7 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
       } else if( !strcmp( nopcd_class, "PcdMap" ) ){
          pcd2 = (AstPcdMap *) nopcd;
 
-/* Check the distortion co-efficients are equal. */
+/* Check the distortion coefficients are equal. */
          if( EQUAL( astGetDisco( pcd ), astGetDisco( pcd2 ) ) ){
 
 /* Check the axis 0 centres are equal. */
@@ -667,7 +666,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 *     Mappings could be replaced by an equivalent pair of Mappings from the 
 *     same classes as the supplied pair, but in reversed order. Each pair
 *     of Mappings is considered to be compounded in series. The supplied 
-*     Mapings are not changed in any way.
+*     Mappings are not changed in any way.
 
 *  Parameters:
 *     map1
@@ -700,7 +699,6 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
    double *consts;           /* Pointer to constants array */
    int *inperm;              /* Pointer to input axis permutation array */
    int *outperm;             /* Pointer to output axis permutation array */
-   int i;                    /* Loop count */
    int invert[ 2 ];          /* Original invert flags */
    int nin;                  /* No. of input coordinates for the PermMap */
    int nout;                 /* No. of output coordinates for the PermMap */
@@ -814,7 +812,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Local Variables: */
    AstPcdMap *this;              /* Pointer to the PcdMap structure */
    int axis;                     /* Axis number */
-   int id;                       /* PcdMap object id */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by sscanf */
 
@@ -876,16 +873,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *  Description:
 *     This function returns a pointer to the value of a specified
 *     attribute for a PcdMap, formatted as a character string. 
-*
-*     The value returned is the value which would actually be used if
-*     astGrid was called with the current set of attribute values. This
-*     may not always be the same as the value set by the user. For
-*     instance, if Labelling is set to "exterior" by the user, it may not
-*     be possible to produce exterior labels, in which case interior labels
-*     will be produced. If this function is used to get the value of
-*     Labelling in this situation, then the value actually used (i.e.
-*     interior) will be returned instead of the requested value (i.e. 
-*     exterior).
 
 *  Parameters:
 *     this
@@ -919,7 +906,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double attribute value */
    int axis;                     /* Axis number */
-   int ival;                     /* Int attribute value */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by sscanf */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
@@ -1230,7 +1216,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* First of all, see if the PcdMap can be replaced by a simpler Mapping,
    without reference to the neighbouring Mappings in the list.           */
 /* ======================================================================*/
-/* If the distortion co-efficient in the PcdMap is zero, the PcdMap can be
+/* If the distortion coefficient in the PcdMap is zero, the PcdMap can be
    replaced by a UnitMap. */
    if( EQUAL( astGetDisco( (AstPcdMap *) ( *map_list )[ where ] ), 0.0 ) ){
 
@@ -1774,8 +1760,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstPcdMap *this;              /* Pointer to the PcdMap structure */
    double dval;                  /* Double attribute value */
    int axis;                     /* Index for the axis */
-   int id;                       /* PcdMap object id */
-   int ival;                     /* Int attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by sscanf */
 
@@ -1968,29 +1952,25 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Local Variables: */
    AstPointSet *result;          /* Pointer to output PointSet */
    AstPcdMap *map;               /* Pointer to PcdMap to be applied */
-   const char *class;            /* Object class */
    double **ptr_in;              /* Pointer to input coordinate data */
    double **ptr_out;             /* Pointer to output coordinate data */
    double *axin_0;               /* Pointer to next input axis 0 value */
    double *axin_1;               /* Pointer to next input axis 1 value */
    double *axout_0;              /* Pointer to next output axis 0 value */
    double *axout_1;              /* Pointer to next output axis 1 value */
-   int i;                        /* Iteration index */
    int npoint;                   /* Number of points */
    int point;                    /* Loop counter for points */
    double dx;                    /* Undistorted X increment from centre  */
    double dy;                    /* Undistorted Y increment from centre */
    double dxp;                   /* Distorted X increment from centre  */
    double dyp;                   /* Distorted Y increment from centre */
-   double disco;                 /* Distortion co-efficient */
+   double disco;                 /* Distortion coefficient */
    double cen0;                  /* Centre of distortion on axis 0 */
    double cen1;                  /* Centre of distortion on axis 1 */
    double cr2;                   /* Constant */
    double a;                     /* Constant */
    double cr2a2;                 /* Constant */
    double f;                     /* Expansion factor */
-   double df;                    /* Change in expansion factor */
-   double fl;                    /* Previous expansion factor */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -2018,7 +1998,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    direction specified and whether the mapping has been inverted. */
    if ( astGetInvert( map ) ) forward = !forward;
 
-/* Get the distortion co-efficient and centre. */
+/* Get the distortion coefficient and centre. */
    disco = astGetDisco( map );
    cen0 = astGetPcdCen( map, 0 );
    cen1 = astGetPcdCen( map, 1 );
@@ -2148,8 +2128,8 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc  ){
    AstZoomMap *zm2;              /* Pointer to the returned ZoomMap */
    AstZoomMap *zm;               /* Pointer to the supplied ZoomMap */
    double cen[2];                /* New distortion centre */
-   double disc;                  /* Distortion co-eff. for returned PcdMap */
-   double disco;                 /* Distortion co-eff. for supplied PcdMap */
+   double disc;                  /* Distortion coeff. for returned PcdMap */
+   double disco;                 /* Distortion coeff. for supplied PcdMap */
    double xcen;                  /* Axis 0 centre for supplied PcdMap */
    double ycen;                  /* Axis 1 centre for supplied PcdMap */
    double zoom;                  /* Zoom factor for supplied ZoomMap */
@@ -2174,7 +2154,7 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc  ){
 /* Get the zoom factor from the ZoomMap. */
    zoom = astGetZoom( zm );
 
-/* Get the distortion co-efficient from the PcdMap. */
+/* Get the distortion coefficient from the PcdMap. */
    disco = astGetDisco( pm );
 
 /* Get the distortion centre from the PcdMap. */
@@ -2270,7 +2250,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
    AstPcdMap *pm;                /* Pointer to the supplied PcdMap */
    AstPcdMap *pm2;               /* Pointer to the returned PcdMap */
    double cen[2];                /* Centre for new PcdMap */
-   double disco;                 /* Distortion co-eff. for supplied PcdMap */
+   double disco;                 /* Distortion coeff. for supplied PcdMap */
    double xcen;                  /* Axis 0 centre for supplied PcdMap */
    double ycen;                  /* Axis 1 centre for supplied PcdMap */
    int old_rinv;                 /* Invert value for the supplied PermMap */
@@ -2291,7 +2271,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
    old_rinv = astGetInvert( rm );
    astSetInvert( rm, inverts[ 1 - ipc ] );
 
-/* Get the distortion co-efficient from the PcdMap. */
+/* Get the distortion coefficient from the PcdMap. */
    disco = astGetDisco( pm );
 
 /* Get the distortion centre from the PcdMap. */
@@ -2343,7 +2323,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
 *     Disco
 
 *  Purpose:
-*     PcdMap distortion co-efficient. 
+*     PcdMap distortion coefficient. 
 
 *  Type:
 *     Public attribute.
@@ -2352,8 +2332,8 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
 *     Double precision.
 
 *  Description:
-*     This attribute holds the PcdMap distortion co-efficient used by 
-*     the forward transformation. This co-efficient is set when a 
+*     This attribute holds the PcdMap distortion coefficient used by 
+*     the forward transformation. This coefficient is set when a 
 *     PcdMap is created, but may later be modified. The default value 
 *     is zero, which gives no distortion. For pincushion distortion, 
 *     the supplied value should be positive. For barrel distortion, it 
@@ -2367,7 +2347,6 @@ f     (e.g. by using AST_INVERT), then the forward transformation will
 *     remove the distortion and the inverse transformation will apply
 *     the distortion. The distortion itself will still be given by the
 *     same value of Disco.
-*     used.
 
 *  Applicability:
 *     PcdMap
@@ -2504,7 +2483,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ------ */
    set = TestDisco( this );
    dval = set ? GetDisco( this ) : astGetDisco( this );
-   astWriteDouble( channel, "Disco", set, 1, dval, "Distortion co-efficient" );
+   astWriteDouble( channel, "Disco", set, 1, dval, "Distortion coefficient" );
 
 }
 
@@ -2544,9 +2523,9 @@ f     RESULT = AST_PCDMAP( DISCO, PCDCEN, OPTIONS, STATUS )
 *     positions to correct for the radial distortion introduced by some
 *     cameras and telescopes. This can take the form either of pincushion
 *     or barrel distortion, and is characterized by a single distortion
-*     co-efficient.
+*     coefficient.
 *
-*     A PcdMap is specified by giving the distortion co-efficient, and the
+*     A PcdMap is specified by giving the distortion coefficient, and the
 *     coordinates of the centre of the radial distortion. The forward
 *     transformation of a PcdMap applies the distortion:
 *
@@ -2555,7 +2534,7 @@ f     RESULT = AST_PCDMAP( DISCO, PCDCEN, OPTIONS, STATUS )
 *     where R is the undistorted radial distance from the distortion 
 *     centre specified by attributes PcdCen, RHO is the radial distance 
 *     from the same centre in the presence of distortion, and C is the 
-*     distortion co-efficient given by attribute Disco.
+*     distortion coefficient given by attribute Disco.
 *
 *     The inverse transformation of a PcdMap removes the distortion
 *     produced by the forward transformation. The expression used to derive 
@@ -2575,7 +2554,7 @@ f     Note, if a PcdMap is inverted (for instance using AST_INVERT) then
 *  Parameters:
 c     disco
 f     DISCO = DOUBLE PRECISION (Given)
-*        The distortion co-efficient. Negative values give barrel
+*        The distortion coefficient. Negative values give barrel
 *        distortion, positive values give pincushion distortion, and 
 *        zero gives no distortion.
 c     pcdcen
@@ -2773,7 +2752,7 @@ AstPcdMap *astInitPcdMap_( void *mem, size_t size, int init,
 *        pointer value that will subsequently be returned by the astGetClass
 *        method).
 *     disco
-*        Distortion co-efficient.
+*        Distortion coefficient.
 *     pcdcen
 *        Distortion centre.
 
@@ -2788,8 +2767,6 @@ AstPcdMap *astInitPcdMap_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstPcdMap *new;              /* Pointer to new PcdMap */
-   double denom;                /* Denominotor */
-   int axis;                    /* Axis index */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2811,7 +2788,7 @@ AstPcdMap *astInitPcdMap_( void *mem, size_t size, int init,
 
 /* Initialise the PcdMap data. */
 /* ---------------------------- */
-/* Allocate memory to hold the shift and scale for each axis. */
+/* Store the shift and scale for each axis. */
       new->pcdcen[0] = pcdcen[0];
       new->pcdcen[1] = pcdcen[1];
       new->disco = disco;
@@ -2935,7 +2912,7 @@ AstPcdMap *astLoadPcdMap_( void *mem, size_t size, int init,
 
 /* If required, initialise the part of the virtual function table used
    by this class. */
-   if ( init ) InitVtab( vtab );
+   if ( init && !class_init ) InitVtab( vtab );
 
 /* Note if we have successfully initialised the (static) virtual
    function table owned by this class (so that this is done only
