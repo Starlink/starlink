@@ -177,7 +177,7 @@
      :                    'were:', STATUS )
 
             DO I = 1, MXBADH
-               CALL MSG_SETI( 'CARD', HEADER( BADH( I ) ) )
+               CALL MSG_SETC( 'CARD', HEADER( BADH( I ) ) )
                CALL ERR_REP( 'FTS1_FTWCS_W6', '^CARD', STATUS )
             END DO
 
