@@ -1,5 +1,5 @@
-      SUBROUTINE SCULIB_REM_SKY(MODE, N_BOLS, N_POS, SCUDATA, SCUVAR,
-     :     SCUQUAL, CLIP, N_SKYBOLS, SKYBOLS, BADBIT, STATUS)
+      SUBROUTINE SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, SCUDATA,
+     :     SCUVAR, SCUQUAL, CLIP, N_SKYBOLS, SKYBOLS, BADBIT, STATUS)
 *+
 *  Name:
 *     SCULIB_REM_SKY
@@ -8,8 +8,8 @@
 *     To remove sky background from SCUBA data
 
 *  Invocation:
-*     SUBROUTINE SCULIB_REM_SKY(MODE, N_BOLS, N_POS, SCUDATA, SCUVAR,
-*    :     SCUQUAL, CLIP, N_SKYBOLS, SKYBOLS, BADBIT, STATUS)
+*     SUBROUTINE SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, SCUDATA,
+*    :     SCUVAR, SCUQUAL, CLIP, N_SKYBOLS, SKYBOLS, BADBIT, STATUS)
 
 *  Description:
 *     This routine goes through each jiggle position in turn, finding
@@ -17,10 +17,15 @@
 *     This level is removed from each bolometer.
 *     The background level is determined by the median of the SKY data
 *     for each jiggle.
+*     If requested, via ADD_BACK, the mean of the level that was
+*     removed is added back onto the data so that flux is conserved
+*     in the image.
 
 *  Arguments:
 *     MODE = CHARACTER * ( * ) (Given)
 *        Clip mode
+*     ADD_BACK = LOGICAL (Given)
+*        Add the mean removed level back onto the final data set. (if TRUE)
 *     N_BOLS = INTEGER (Given)
 *        Number of bolometers in data set
 *     N_POS = INTEGER (Given)
@@ -52,6 +57,11 @@
 *  History:
 *     1996 November 17 (TIMJ):
 *       Original version
+*     $Log$
+*     Revision 1.3  1997/10/17 02:21:07  timj
+*     Add the mean sky level that was removed, back onto the data
+*     after sky removal.
+*
 *     {enter_changes_here}
 
 *  Bugs:
@@ -68,6 +78,7 @@
       INCLUDE 'MSG_PAR'               ! MSG__ constants
 
 *  Arguments Given:
+      LOGICAL ADD_BACK
       BYTE    BADBIT
       REAL    CLIP
       CHARACTER * (*) MODE
@@ -89,14 +100,17 @@
       PARAMETER (MAX__BOL = 100) ! Maximum number of sky bolometers
 
 *  Local Variables:
-      REAL    BACKGROUND           ! Sky background level
+      DOUBLE PRECISION BACKGROUND  ! Sky background level
       INTEGER BOL                  ! Loop counter
       INTEGER I                    ! Loop counter
       INTEGER GOOD                 ! Number of good data points
       REAL    ERRMEAN              ! Error in mean of SKY_DATA
       DOUBLE PRECISION MEAN        ! Mean of sky values
+      DOUBLE PRECISION MEAN_LEVEL  ! Mean level removed from data
       DOUBLE PRECISION MEDIAN      ! Median of sky values
+      INTEGER NLOOPS               ! Number of times a sky level was removed
       INTEGER N_GOOD               ! Number of good data points in SKY
+      DOUBLE PRECISION RUNNING_TOTAL ! Total level removed
       INTEGER SKY                  ! Loop counter for SKY bolometers
       REAL    SKYVAR               ! Variance on sky background
       REAL    SKY_DATA(MAX__BOL)   ! Sky data for each jiggle
@@ -111,6 +125,20 @@
 
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+*     Return if no sky bolometers were selected
+
+      IF (N_SKYBOLS .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP(' ','SCULIB_REM_SKY: No sky bolometers selected',
+     :        STATUS)
+      END IF
+
+*     Keep track of the levels removed and the number of times 
+*     this occurred so that we can add the level back on at the end
+
+      RUNNING_TOTAL = 0.0
+      NLOOPS = 0
 
 *     Loop over all data
       DO I = 1, N_POS
@@ -138,7 +166,7 @@
          IF (GOOD .GT. 0) THEN
 
             IF (MODE .EQ. 'MEAN') THEN
-               BACKGROUND = SNGL(MEAN)
+               BACKGROUND = MEAN
                IF (GOOD .GT. 0) THEN
                   ERRMEAN = SNGL(STDEV/SQRT(DBLE(GOOD)))
                ELSE
@@ -147,33 +175,37 @@
 
                SKYVAR = ERRMEAN * ERRMEAN
 
-               CALL MSG_SETI('BOL', I)
-               CALL MSG_SETR('BG', BACKGROUND)
+               CALL MSG_SETI('POS', I)
+               CALL MSG_SETR('BG', SNGL(BACKGROUND))
                CALL MSG_SETR('ERR', ERRMEAN)
                CALL MSG_SETI('GOOD', GOOD)
                
                CALL MSG_OUTIF(MSG__VERB, ' ',
-     :              '^BOL: MEAN = ^BG +- ^ERR (^GOOD points)', STATUS)
+     :              '^POS: MEAN = ^BG +- ^ERR (^GOOD points)', STATUS)
             ELSE
                BACKGROUND = SNGL(MEDIAN)
                
-               CALL MSG_SETI('BOL', I)
-               CALL MSG_SETR('BG', BACKGROUND)
+               CALL MSG_SETI('POS', I)
+               CALL MSG_SETR('BG', SNGL(BACKGROUND))
                
                CALL MSG_OUTIF(MSG__VERB, ' ',
-     :              '^BOL: MEDIAN = ^BG', STATUS)
+     :              '^POS: MEDIAN = ^BG', STATUS)
             END IF
 
 *     Remove background value from entire JIGGLE
-            IF (BACKGROUND .NE. VAL__BADR) THEN
+            IF (BACKGROUND .NE. VAL__BADD) THEN
                DO BOL = 1, N_BOLS
                   IF (SCUDATA(BOL, I) .NE. VAL__BADR) THEN
 
-                     SCUDATA(BOL, I) = SCUDATA(BOL, I) - BACKGROUND
+                     SCUDATA(BOL, I) =SCUDATA(BOL, I) - SNGL(BACKGROUND)
                      
                      IF (MODE .EQ. 'MEAN') THEN
                         SCUVAR(BOL, I) = SCUVAR(BOL, I) + SKYVAR
                      END IF
+
+*     Store the level
+                     RUNNING_TOTAL = RUNNING_TOTAL + BACKGROUND
+                     NLOOPS = NLOOPS + 1
 
                   END IF
                END DO
@@ -187,5 +219,29 @@
          END IF
 
       END DO
+
+*     Now add the background level back on if requested
+
+      IF (ADD_BACK .AND. (NLOOPS .GT. 0) .AND. STATUS .EQ. SAI__OK) THEN
+
+*     Find the mean level that was removed
+
+         MEAN_LEVEL = RUNNING_TOTAL / NLOOPS
+
+*     Add it back on (ignore the slight change in variance associated
+*     with the fact that the MEAN_LEVEL has an error on it)
+
+         CALL SCULIB_ADDCAR(N_POS * N_BOLS, SCUDATA, 
+     :        SNGL(MEAN_LEVEL), SCUDATA)
+
+*     and print a message in verbose mode
+
+         CALL MSG_SETR('BAC', SNGL(MEAN_LEVEL))
+
+         CALL MSG_OUTIF(MSG__NORM, ' ', 'Adding mean background level'//
+     :        ' onto data (value=^BAC)', STATUS)
+
+      END IF
+
 
       END
