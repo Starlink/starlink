@@ -48,6 +48,7 @@ $(MANIFEST)/agi: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
@@ -58,6 +59,7 @@ $(MANIFEST)/agi: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/agi \
@@ -176,9 +178,7 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar \
-		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk
+		$(MANIFEST)/subpar
 	cd applications/atools \
 	    && make>make.log && make install>>make.log
 
@@ -264,6 +264,7 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
 		$(MANIFEST)/ifd \
 		$(MANIFEST)/img \
 		$(MANIFEST)/itcl \
@@ -369,6 +370,7 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
@@ -385,6 +387,7 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/convert \
@@ -438,6 +441,7 @@ $(MANIFEST)/daophot: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
@@ -450,6 +454,7 @@ $(MANIFEST)/daophot: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/daophot \
@@ -546,10 +551,14 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar \
-		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk
+		$(MANIFEST)/subpar
 	cd applications/dipso \
+	    && make>make.log && make install>>make.log
+
+$(MANIFEST)/docfind: \
+		$(MANIFEST)/info \
+		$(MANIFEST)/star2html
+	cd applications/docfind \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/dtask: \
@@ -566,6 +575,10 @@ $(MANIFEST)/dtask: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/dtask \
+	    && make>make.log && make install>>make.log
+
+$(MANIFEST)/dvi2bitmap:
+	cd applications/dvi2bitmap \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/echomop: \
@@ -598,6 +611,7 @@ $(MANIFEST)/echomop: \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pda \
@@ -608,13 +622,12 @@ $(MANIFEST)/echomop: \
 		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
-		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk \
 		$(MANIFEST)/trn
 	cd applications/echomop \
 	    && make>make.log && make install>>make.log
@@ -758,6 +771,7 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
@@ -771,6 +785,7 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/figaro \
@@ -984,11 +999,13 @@ $(MANIFEST)/hdstools: \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
@@ -1124,6 +1141,7 @@ $(MANIFEST)/iras90: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
@@ -1139,6 +1157,7 @@ $(MANIFEST)/iras90: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/obsolete/iras90 \
@@ -1187,6 +1206,10 @@ $(MANIFEST)/itcl: \
 	    && test -f config.status || ./configure >configure-output.log \
 	    && make>make.log && make install>>make.log
 
+$(MANIFEST)/jpeg:
+	cd thirdparty/ijl/jpeg \
+	    && make>make.log && make install>>make.log
+
 $(MANIFEST)/jpl: \
 		$(MANIFEST)/star2html
 	cd libraries/jpl \
@@ -1229,9 +1252,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar \
-		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk
+		$(MANIFEST)/subpar
 	cd libraries/kaplibs \
 	    && make>make.log && make install>>make.log
 
@@ -1325,8 +1346,6 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
-		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk \
 		$(MANIFEST)/trn
 	cd applications/kaprh \
 	    && make>make.log && make install>>make.log
@@ -1595,6 +1614,7 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
@@ -1609,6 +1629,7 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/photom \
@@ -1630,6 +1651,7 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
@@ -1645,6 +1667,7 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/pisa \
@@ -1692,10 +1715,39 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar \
-		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk
+		$(MANIFEST)/subpar
 	cd applications/polpack \
+	    && make>make.log && make install>>make.log
+
+$(MANIFEST)/pongo: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/agi \
+		$(MANIFEST)/ams \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/gks \
+		$(MANIFEST)/gwm \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar
+	cd applications/pongo \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/prm: \
@@ -1722,6 +1774,12 @@ $(MANIFEST)/ref: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/ref \
+	    && make>make.log && make install>>make.log
+
+$(MANIFEST)/rv: \
+		$(MANIFEST)/sla \
+		$(MANIFEST)/star2html
+	cd applications/rv \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/sae: \
@@ -1809,7 +1867,8 @@ $(MANIFEST)/spt: \
 	cd applications/spt \
 	    && make>make.log && make install>>make.log
 
-$(MANIFEST)/ssn78:
+$(MANIFEST)/ssn78: \
+		$(MANIFEST)/sgmlkit
 	cd docs/ssn/078 \
 	    && make>make.log && make install>>make.log
 

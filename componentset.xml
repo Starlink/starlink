@@ -60,7 +60,7 @@ high-level interface to the AST library.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ccdpack">
-  <version>4.0-17</version>
+  <version>4.0-18</version>
   <path>applications/ccdpack</path>
   <description>CCD data reduction package</description>
   <abstract>
@@ -138,7 +138,7 @@ Starlink's Extensible n-dimensional Data Format (NDF), which is used by most
 Starlink applications, and a number of other common data formats.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>sae</build><build>chr</build><build>hds</build><build>fio</build><build>cnf</build><build>grp</build><build>mers</build><build>prm</build><build>ndf</build><build>ndg</build><build>par</build><build>psx</build><build>subpar</build><build>shl</build><build>figaro</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>chr</build><build>cnf</build><build>figaro</build><build>fio</build><build>grp</build><build>hds</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>subpar</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -204,7 +204,7 @@ on-line catalogues via the Internet.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="daophot">
-  <version>1.3-2</version>
+  <version>1.3-3</version>
   <path>applications/daophot</path>
   <description>Stellar Photometry Package</description>
   <abstract>
@@ -216,7 +216,7 @@ on-line catalogues via the Internet.
     which improves the accuracy of the photometry.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>mers</build><build>subpar</build><build>ndf</build><build>psx</build><build>chr</build><build>agi</build><build>gks</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>mers</build><build>subpar</build><build>ndf</build><build>psx</build><build>chr</build><build>agi</build><build>gks</build><build>cnf</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person><name>Peter Stetson</name><role>Original author</role></person>
@@ -279,6 +279,56 @@ cube manipulation. </p></abstract>
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="docfind">
+  <version>1.3-1</version>
+  <path>applications/docfind</path>
+  <description>Starlink document index searching</description>
+  <abstract><p>
+   Simplify searching of Starlink documents. See also findme/showme.
+  </p></abstract>
+  <dependencies >
+    <build>info</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter Allan</name>
+    </person>
+    <person>
+      <name>Martin Bly</name>
+    </person>
+  </developers>
+  <documentation> sun38</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="dvi2bitmap">
+  <version>0.13b1</version>
+  <path>applications/dvi2bitmap</path>
+  <description>Converts TeX DVI files to bitmaps</description>
+  <abstract><p>This application processes a DVI file produced by TeX,
+      converting each page to a single bitmap.  The conversion is done
+      directly, rather than through a chain of intermediate file formats,
+      making the process extremely fast.  It can produce output as
+      XBM, XPM, GIF and PNG files.
+    </p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>norman@astro.gla.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="echomop">
   <version>3.3-7</version>
   <path>applications/echomop</path>
@@ -295,7 +345,7 @@ cube manipulation. </p></abstract>
       fitting and extraction.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>fio</build><build>hds</build><build>hlp</build><build>mers</build><build>ndf</build><build>par</build><build>pda</build><build>pgp</build><build>prm</build><build>sae</build><build>sla</build><build>mers</build><build option='link'>kaplibs</build>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>fio</build><build>hds</build><build>hlp</build><build>mers</build><build>ndf</build><build>par</build><build>pda</build><build>pgp</build><build>prm</build><build>sae</build><build>sla</build><build>shl</build><build>mers</build><build option='link'>kaplibs</build>
   </dependencies>
   <developers>
     <person>
@@ -453,7 +503,7 @@ The programs it contains can be used to process a
 wide range of images and spectra.
   </p></abstract>
   <dependencies >
-    <build>pda</build><build>agi</build><build>grp</build><build>ndf</build><build>fio</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>pda</build><build>agi</build><build>grp</build><build>ndf</build><build>fio</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -593,7 +643,7 @@ to edit and display HDS objects. The tools originated in the ASTERIX
 package but have now been modified to run as normal Starlink tasks.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>hds</build><build>fio</build><build>mers</build><build>par</build><build>prm</build><build>sae</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>hds</build><build>fio</build><build>mers</build><build>par</build><build>prm</build><build>sae</build><build>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -736,7 +786,7 @@ intended to work in conjunction with Starlink's various specialised
 packages.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>shl</build><build>hds</build><build>kaplibs</build><build>ard</build><build>mag</build><build>pgplot</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>shl</build><build>hds</build><build>kaplibs</build><build>ard</build><build>mag</build><build>pgplot</build><build>tcl</build><build>tk</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1009,7 +1059,7 @@ file extension stored in the standard Starlink NDF data format.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pisa">
-  <version>2.4-6</version>
+  <version>2.4-7</version>
   <path>applications/pisa</path>
   <description>PISA - Position Intensity and Shape Analysis</description>
   <abstract><p>
@@ -1060,6 +1110,41 @@ display of vector maps.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="pongo">
+  <version>2.0-3</version>
+  <path>applications/pongo</path>
+  <description>PONGO - a suite of commands for interactively plotting data stored in text files</description>
+  <abstract><p>
+PONGO is a set of commands for interactively plotting data stored
+in ordinary text files. It is based around the PGPLOT (SUN/15) graphics
+package. 
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>agi</build><build>sla</build><build>fio</build><build>pda</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Paul Harrison</name>
+    </person>
+    <person>
+      <name>Paul Rees</name>
+    </person>
+    <person>
+      <uname>pwd</uname>
+      <name>Peter W. Draper</name>
+      <email>p.w.draper@durham.ac.uk</email>
+    </person>
+    <person>
+      <uname>aa</uname>
+      <name>Alasdair Allan</name>
+    </person>
+  </developers>
+  <documentation> sun137</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="psmerge">
   <version>1.0-6</version>
   <path>applications/psmerge</path>
@@ -1090,7 +1175,7 @@ display of vector maps.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ref">
+<component id="rv">
   <version>2.4-5</version>
   <path>applications/rv</path>
   <description>Radial Components of Observer's Velocity</description>
@@ -1281,7 +1366,7 @@ UNIX).
     graphics user interfaces for Starlink applications in Tcl/Tk.</p>
   </abstract>
   <dependencies >
-    <build>starx</build><build>adam</build><build>ams</build><build>dtask</build><build>ems</build><build>gwm</build><build>messys</build><build>mers</build><build>tcl</build><build>tk</build><build>nbs</build><build>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>starx</build><build>adam</build><build>ams</build><build>dtask</build><build>ems</build><build>gwm</build><build>messys</build><build>mers</build><build>tcl</build><build>tk</build><build>nbs</build><build>sae</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1369,7 +1454,7 @@ UNIX).
   <description>Description of the build system</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    
+    <sourceset>sgmlkit</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1378,7 +1463,7 @@ UNIX).
       <email>norman@astro.gla.ac.uk</email>
     </person>
   </developers>
-  <!-- <documentation></documentation> -->
+  <documentation> ssn78</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -1434,7 +1519,7 @@ UNIX).
   <description>Applications Graphics Interface Library</description>
   <abstract><p>AGI and AGP interface.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><build>idi</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1509,7 +1594,7 @@ UNIX).
 </component>
 
 <component id="ast">
-  <version>3.4-2</version>
+  <version>3.4-5</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -1708,7 +1793,7 @@ No longer under active control.
   <description>The tarlink RAL/ICL GKS graphics package.</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    <build>cnf</build><build>gwm</build><link>gwm</link><link>ems</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>gwm</build><link>ems</link><link>gwm</link><link>starx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -1771,7 +1856,7 @@ No longer under active control.
   package.
   </p></abstract>
   <dependencies >
-    <build>sae</build><build>chr</build><build>ems</build><build>par</build><build>mers</build><build>starx</build><build>gks</build><build>gns</build><build>pgp</build><build>sgs</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>chr</build><build>ems</build><build>par</build><build>mers</build><build>starx</build><build>gks</build><build>gns</build><build>pgp</build><build>sgs</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2039,7 +2124,7 @@ understand.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kaplibs">
-  <version>2.7-3</version>
+  <version>2.8-1</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
   <abstract><p>KAPLIBS is a package of Fortran subroutine 
@@ -2049,7 +2134,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><build>tk</build><build>snx</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><link>tcl</link><link>tk</link><link>snx</link><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>snx</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><link>snx</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2287,7 +2372,7 @@ Ultrix and for SunOS and may still work for them.
       library -- this may be subject to change in the light of experience.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><link>chr</link><link>mers</link><link>subpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>parsecon</build><link>chr</link><link>mers</link><link>subpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2755,7 +2840,7 @@ Ultrix and for SunOS and may still work for them.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="prm">
-  <version>1.3-1</version>
+  <version>1.4-1</version>
   <path>libraries/prm</path>
   <description>PRIMDAT --- Processing of Primitive Numerical Data</description>
   <abstract><p>This document describes the PRIMDAT package, which
@@ -2784,7 +2869,7 @@ Ultrix and for SunOS and may still work for them.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="psx">
-  <version>0.4</version>
+  <version>0.5</version>
   <path>libraries/psx</path>
   <description>POSIX interface routines</description>
    <abstract><p>PSX is a FORTRAN subroutine library that allows
@@ -2940,7 +3025,7 @@ Ultrix and for SunOS and may still work for them.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sla">
-  <version>2.4-11</version>
+  <version>2.4-12</version>
   <path>libraries/sla</path>
   <description>SLALIB --- Positional Astronomy Library</description>
   <abstract><p>SLALIB is a library used by writers of
@@ -3158,6 +3243,24 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
   </developers>
   -->
   <documentation> sun227</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="jpeg">
+  <version>6b</version>
+  <path>thirdparty/ijl/jpeg</path>
+  <description>Independent JPEG Group library</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <!--developers>
+    <person>
+    </person>
+  </developers-->
+  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
