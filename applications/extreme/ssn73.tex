@@ -788,7 +788,7 @@ There is one other issue which arises from replacing \cc{int} type
 with \cc{INT\_BIG}:
 \begin{description}
 %
-\item[Integer limit constants]\mbox{}
+\item[Integer constants from limits.h]\mbox{}
 \\
 Where an \cc{int} is compared against one of the values 
 \cc{INT\_MAX}, \cc{INT\_MIN} and \cc{UINT\_MAX} 
@@ -832,7 +832,7 @@ to the output.  This means that the {\tt diff} command can be used
 to see what changes the filters make, by doing something like:
 \begin{squote}
 \begin{verbatim}
-% inscnf file.f | diff file.f -
+% frepint file.f | diff file.f -
 \end{verbatim}
 \end{squote}
 which might give a result like:
@@ -872,13 +872,13 @@ qualities of the code; an attempt is made to respect
 case usage and spacing conventions in Fortran, 
 padding whitespace is shuffled to keep things at the same column as
 before if possible, and so on.
-If replacement text is of a different length to the original
+If replacement text is longer than the original
 then Fortran lines are broken in hopefully reasonable places,
 but no line breaks in existing lines are introduced in C.
 
 In addition, for each of the filters, a driver script is provided. 
 For converting large numbers of files, this is likely to be the 
-most convenient way to proceed.  Basically the driver scripts simply
+most convenient way to proceed.  Basically the driver scripts 
 run the filters on a given set of files, summarise the output, and
 write the files which need changes in a given place.
 They also perform some crude safety checks that the modified source
@@ -898,7 +898,8 @@ For each of its command line arguments it runs \xroutine{inscnf} and
 \item Writes a line to a log file {\tt ./inscnf.log} 
       saying how many lines were changed
 \item If and only if some changes were made, it writes the modified copy
-      of the file into a directory called {\tt ./inscnf.changed}
+      of the file, under the same name, 
+      into a directory called {\tt ./inscnf.changed}
 \item If the filter or the driver script thinks there might be something 
       which needs human attention, it writes a suitable message to standard
       output.  These warning messages can be understood in conjunction 
@@ -928,14 +929,10 @@ given in section \ref{sec:filters}
 
 \section{Filter utility descriptions\label{sec:filters}}
 
-\subsection{inscnf}
-\subsection{frepint}
-\subsection{crepint}
+%%%% Begin filter descriptions
 
 
-
-
-
+%%%% End filter descriptions
 
 % ? End of main text
 \end{document}
