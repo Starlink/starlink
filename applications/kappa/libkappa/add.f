@@ -43,7 +43,10 @@
 *        NDF called c.  NDF c has the title "Co-added image".
 
 *  Notes:
-*     If the two input NDFs have different pixel-index bounds, then
+*     - The output NDF contains the simple sum of the input NDFs.
+*     Inparticularly, the input variances are not used as weights. For a
+*     weighted co-addition, use CCDPACK:MAKEMOS.
+*     - If the two input NDFs have different pixel-index bounds, then
 *     they will be trimmed to match before being added.  An error will
 *     result if they have no pixels in common.
 
@@ -84,6 +87,8 @@
 *        Added propagation of WCS component.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     14-SEP-2004 (DSB):
+*        Mods to prologue to note that variances are not used as weights.
 *     {enter_further_changes_here}
 
 *  Bugs:
