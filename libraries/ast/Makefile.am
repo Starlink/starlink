@@ -281,6 +281,7 @@ libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
 # The following files are built by the targets in this makefile.
 MAINTAINERCLEANFILES = version.h builddocs addversion \
 	ast.h $(DOCUMENTATION_PRODUCTS)
+CLEANFILES = AST_PAR
 
 # Special cases start here
 
