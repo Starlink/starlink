@@ -32,7 +32,9 @@ STAR_MONOLITHS
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task ...
-STAR_DECLARE_DEPENDENCIES([build], [chr fio mers par psx sae hdspar dtask hds hlp])
+dnl STAR_DECLARE_DEPENDENCIES([build], [chr fio mers par psx sae hdspar dtask hds hlp])
+STAR_DECLARE_DEPENDENCIES([build], [chr fio mers par psx sae hds hlp])
+STAR_DECLARE_DEPENDENCIES(build, dtask, use)
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun110)
