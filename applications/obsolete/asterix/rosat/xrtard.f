@@ -112,9 +112,10 @@
 * Local variables:
 	character*132		ardfile
 
-	real			rad
+	real			rad,xrad
 	real			psf
 	real			list(3)
+
 
 	integer			i
 	integer			ardunit, ardid
@@ -127,6 +128,9 @@
 	call fio_open(ardfile, 'APPEND', 'LIST', 0, ardunit, status)
 	call arx_open('WRITE', ardid, status)
 
+* Facilitate increasing the radius
+	call usi_get0r('EXTRA_RAD', xrad, status)
+
 * Do the main processing
 	do i = 1, n
 
@@ -136,6 +140,7 @@
 *   Calculate the enclosed PSF in degrees
           call xrt_getpsf(fraction, energy, rad, psf, status)
 	  psf = psf / 60.0
+          psf = psf * xrad
 
 *   Print some info
 	  call msg_seti('I', i)

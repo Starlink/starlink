@@ -96,4 +96,11 @@ interface xrtard
     HELP    'Directory containing raw data files'
  endparameter
 
+  parameter EXTRA_RAD
+    type '_REAL'
+    default 1.0
+    vpath 'DEFAULT'
+    help  'Increase the mask on each source by this amount'
+  endparameter
+
 endinterface
