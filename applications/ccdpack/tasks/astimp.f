@@ -200,6 +200,10 @@
 *                 framesets in the file.  Typically the N'th NDF in a
 *                 list will match the one with an ID of "INDEX N".
 *
+*           -  "SET N"
+*                 This will match an NDF if the Set Index attribute
+*                 in its CCDPACK Set header is equal to the integer N.
+*
 *        Modifiers:
 *           Modifiers describe additional modifications to be made
 *           to the framesets on import.  They are of the form
@@ -251,6 +255,8 @@
 *        Original version.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     27-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -264,10 +270,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST parameters
-      INCLUDE 'FIO_PAR'          ! FIO parameters
-      INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
       INCLUDE 'PAR_ERR'          ! PAR system error codes
-      INCLUDE 'DAT_PAR'          ! Data system constants
+      INCLUDE 'DAT_PAR'          ! HDS constants
+      INCLUDE 'GRP_PAR'          ! GRP system constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -281,65 +286,39 @@
       PARAMETER( MXFSET = 100 )
 
 *  Local Variables:
-      CHARACTER * ( FIO__SZFNM ) ASTFIL ! Name of frameset file
-      CHARACTER * ( CCD1__BLEN ) BUF ! Output buffer
-      CHARACTER * ( AST__SZCHR ) DMBAS ! Domain of Base frame
       CHARACTER * ( AST__SZCHR ) DMCUR ! Domain of Current frame
-      CHARACTER * ( AST__SZCHR ) DMBAS1 ! Reference domain of Current frame
-      CHARACTER * ( AST__SZCHR ) DMCUR1 ! Reference domain of Current frame
+      CHARACTER * ( AST__SZCHR ) FSID( MXFSET ) ! Id values for each frameset
       CHARACTER * ( AST__SZCHR ) INDOM ! Name to use for Current import frame
-      CHARACTER * ( CCD1__BLEN ) ID ! ID value of frameset
-      CHARACTER * ( CCD1__BLEN ) FITROT ! FITS rotation keyword
-      CHARACTER * ( CCD1__BLEN ) FITRT0 ! FITS rotation keyword global modifier
-      CHARACTER * ( CCD1__BLEN ) FITRTP ! FITS rotation keyword parameter value
-      CHARACTER * ( CCD1__BLEN ) FITRTS( MXFSET ) ! FITS rotation keyword frameset modifiers
+      CHARACTER * ( 80 ) FITROT  ! FITS rotation keyword
+      CHARACTER * ( 80 ) FITRTP  ! FITS rotation keyword parameter value
+      CHARACTER * ( 80 ) FITRTS( MXFSET ) ! FITS rot keyword frameset modifiers
       CHARACTER * ( DAT__SZLOC ) LOC ! HDS locator for FITS extension
-      DOUBLE PRECISION ANGLR     ! Rotation angle in radians
+      CHARACTER * ( GRP__SZNAM ) SNAME ! Set Name attribute
       DOUBLE PRECISION DEGRA     ! Degrees - Radians conversion factor
-      DOUBLE PRECISION FROT      ! Additional angle to rotate frames from FITS
-      DOUBLE PRECISION MATRIX( 4 ) ! Matrix for MatrixMap
-      DOUBLE PRECISION PI        ! Pi
       DOUBLE PRECISION ROT       ! Additional fixed angle to rotate frames
-      DOUBLE PRECISION ROTATE    ! Total additional angle to rotate frames
-      INTEGER FCHAN              ! AST pointer to frameset file channel
-      INTEGER FDAST              ! FIO file descriptor for frameset file
-      INTEGER FRMAT              ! AST pointer to Current frame of import frameset
       INTEGER FSET( MXFSET )     ! AST pointers to import framesets 
       INTEGER FSMAT              ! AST pointer to matched frameset
       INTEGER I                  ! Loop variable
-      INTEGER IAT                ! Position in string
-      INTEGER ICARD              ! Index of found FITS header card
-      INTEGER IFGRP              ! GRP identifier for frameset group
       INTEGER INDF               ! NDF identifier
       INTEGER INDXS( MXFSET )    ! Index values for ID type of INDEX
       INTEGER INGRP              ! Group identifier for NDF group
       INTEGER IPFITS             ! Pointer to FITS card array
       INTEGER IWCS               ! AST pointer to WCS component of NDF
-      INTEGER IX                 ! Index into frameset group
       INTEGER J                  ! Loop variable
-      INTEGER JCUR               ! Index of current frame
       INTEGER JMAT               ! Index of matched frameset
+      INTEGER JSET               ! Index of CCD_SET frame
       INTEGER LENGTH             ! Length of FITS header cards
-      INTEGER MAP                ! AST pointer to mapping frameset
-      INTEGER MAPROT             ! AST pointer to rotational mapping
       INTEGER NCARD              ! Number of FITS header cards
       INTEGER NFSET              ! Number of framesets in group
       INTEGER NNDF               ! Number of NDFs
-      LOGICAL DIFBAS             ! Base domains don't all match
-      LOGICAL DIFCUR             ! Current domains don't all match
-      LOGICAL DUPID              ! Duplicate ID value was generated
+      INTEGER SINDEX             ! Set Index attribute
       LOGICAL FITSEX             ! Does FITS extension exist
       LOGICAL MATCH              ! Whether NDF matches frameset ID
-      LOGICAL THERE              ! Presence of requested item
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Set up some useful constants
-      PI = 4D0 * ATAN( 1D0 )
-      DEGRA = PI / 180D0
 
 *  Start up the CCDPACK logging system.
       CALL CCD1_START( 'ASTIMP', STATUS )
@@ -347,127 +326,12 @@
 *  Begin AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Initialise group to hold frameset ID values.
-      CALL GRP_NEW( 'Framesets', IFGRP, STATUS )
-
-*  Open AST frameset file and notify user.
-      CALL FIO_ASSOC( 'ASTFILE', 'READ', 'LIST', 0, FDAST, STATUS )
-      CALL FIO_FNAME( FDAST, ASTFIL, STATUS )
-      CALL MSG_SETC( 'ASTFIL', ASTFIL )
-      CALL CCD1_MSG( ' ', '  Framesets read from file ^ASTFIL:', 
-     :               STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Create AST channel on open frameset file.
-      CALL CCD1_ACHAN( FDAST, ' ', FCHAN, STATUS )
-
-*  Get global frameset modifiers from file.
-      CALL CCD1_AGTMD( FDAST, FITRT0, STATUS )
-
-*  Print header for per-frameset information.
-      CALL CCD1_MSG( ' ', ' ', STATUS )
-      BUF = ' '
-      BUF( 6: ) = 'N'
-      BUF( 11: ) = 'Base domain'
-      BUF( 31: ) = 'Current domain'
-      BUF( 51: ) = 'Frameset ID'
-      CALL CCD1_MSG( ' ', BUF, STATUS )
-      BUF( 6: ) = '--'
-      BUF( 11: ) = '-----------'
-      BUF( 31: ) = '--------------'
-      BUF( 51: ) = '-----------'
-      CALL CCD1_MSG( ' ', BUF, STATUS )
-
-*  Initialise warning flags.
-      DIFBAS = .FALSE.
-      DIFCUR = .FALSE.
-      DUPID = .FALSE.
-
-*  Read frameset objects one by one from file.
-      DO 11 I = 1, MXFSET
-
-*  Read next object or exit loop
-         FSET( I ) = AST_READ( FCHAN, STATUS )
-         IF ( FSET( I ) .EQ. AST__NULL ) GO TO 1
-         NFSET = I
-
-*  Get frameset modifiers for this frameset from file.
-         CALL CCD1_AGTMD( FDAST, FITRTS( I ), STATUS )
-
-*  Get object ID string and frame domain names, and output to the user.
-         ID = AST_GETC( FSET( I ), 'ID', STATUS )
-         CALL AST_INVERT( FSET( I ), STATUS )
-         DMBAS = AST_GETC( FSET( I ), 'Domain', STATUS )
-         CALL AST_INVERT( FSET( I ), STATUS )
-         DMCUR = AST_GETC( FSET( I ), 'Domain', STATUS )
-
-*  First time round, set up reference values for validation.
-         IF ( I .EQ. 1 ) THEN
-            DMCUR1 = DMCUR
-            DMBAS1 = DMBAS
-         END IF
-
-*  Make a note if the Current or Base domains of this NDF do not
-*  match those of the first NDF encountered.
-         IF ( DMBAS .NE. DMBAS1 ) DIFBAS = .TRUE.
-         IF ( DMCUR .NE. DMCUR1 ) DIFCUR = .TRUE.
-
-*  Check ID is unique; if it is enter it into the group.  If not, note
-*  for later.
-         CALL GRP_INDEX( ID, IFGRP, 1, IX, STATUS )
-         IF ( IX .EQ. 0 ) THEN
-            CALL GRP_PUT( IFGRP, 1, ID, I, STATUS )
-         ELSE
-            DUPID = .TRUE.
-         END IF
-
-*  Output basic information to the user.
-         BUF = ' '
-         CALL CHR_ITOC( I, BUF( 6: ), IAT )
-         IF ( CHR_LEN( DMBAS ) .GT. 18 ) DMBAS( 17: ) = '..'
-         IF ( CHR_LEN( DMCUR ) .GT. 18 ) DMCUR( 17: ) = '..'
-         BUF( 11: ) = DMBAS( 1:18 )
-         BUF( 31: ) = DMCUR( 1:18 )
-         BUF( 51: ) = ID
-         CALL CCD1_MSG( ' ', BUF, STATUS )
- 11   CONTINUE
-
-*  Abort if the maximum number of framesets in the AST file is exceeded.
-      STATUS = SAI__ERROR
-      CALL ERR_REP( 'ASTIMP_FSLIMIT', 
-     :     'ASTIMP: Too many framesets in AST file', STATUS )
-      GO TO 99
-
-*  All framesets read in.
- 1    CONTINUE
-
-*  Warn if there were non-matching domain names or duplicate frameset
-*  ID values.
-      IF ( DIFBAS ) THEN
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ',
-     :   '  ** WARNING **  Not all AST file Base frames had '//
-     :   'matching domain names.', STATUS )
-      END IF
-      IF ( DIFCUR ) THEN
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ',
-     :   '  ** WARNING **  Not all AST file Current frames had '//
-     :   'matching domain names.', STATUS )
-      END IF
-      IF ( DUPID ) THEN
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ',
-     :   '  ** WARNING **  There were duplicate frameset ID values.',
-     :      STATUS )
-      END IF
-
-*  Annul frameset file and channel.
-      CALL AST_ANNUL( FCHAN, STATUS )
-      CALL FIO_ANNUL( FDAST, STATUS )
-
 *  Begin NDF context.
       CALL NDF_BEGIN
+
+*  Read framesets from the AST file.
+      CALL CCD1_AFRD( 'ASTFILE', MXFSET, FSET, FSID, FITRTS, NFSET,
+     :                STATUS )
 
 *  Get group of NDFs to operate on.  If a null value is given, there
 *  is no more processing to do.
@@ -516,12 +380,25 @@
          CALL NDF_MSG( 'NDF', INDF )
          CALL CCD1_MSG( ' ', '  Processing NDF ^NDF', STATUS )
          
+*  Map FITS extension if it can be found.
+         NCARD = 0
+         CALL NDF_XSTAT( INDF, 'FITS', FITSEX, STATUS )
+         IF ( FITSEX ) THEN
+            CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )
+            CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', IPFITS, NCARD,
+     :                     STATUS )
+            LENGTH = 80
+         END IF
+
+*  Read the Set header if it exists.
+         CALL CCD1_SETRD( INDF, AST__NULL, SNAME, SINDEX, JSET, STATUS )
+
 *  Go through list of IDs to see if any match this NDF.
          MATCH = .FALSE.
          JMAT = 0
          DO 13 J = 1, NFSET
-            CALL GRP_GET( IFGRP, J, 1, ID, STATUS )
-            CALL CCD1_NMID( INDF, ID, INDXS( I ), MATCH, STATUS )
+            CALL CCD1_NMID( FSID( J ), INDXS( I ), NCARD, IPFITS,
+     :                      SINDEX, MATCH, STATUS )
             IF ( MATCH ) THEN
                FSMAT = FSET( J )
                JMAT = J
@@ -532,9 +409,8 @@
 
 *  No matching frameset in file; inform user.
          IF ( .NOT. MATCH ) THEN
-            CALL MSG_SETC( 'ASTFIL', ASTFIL )
             CALL CCD1_MSG( ' ',  
-     :                     '    No matching frameset in file ^ASTFIL', 
+     :                     '    No matching frameset in AST file.', 
      :                     STATUS )
             
 *  Matching frameset was found; incorporate the new frame information 
@@ -542,18 +418,9 @@
          ELSE
 
 *  Inform user match has occurred.
-            CALL MSG_SETC( 'ID', ID )
+            CALL MSG_SETC( 'ID', FSID( J ) )
             CALL CCD1_MSG( ' ', '    Matched with frameset ID "^ID"',
      :                     STATUS )
-
-*  Map FITS extension if it can be found.
-            CALL NDF_XSTAT( INDF, 'FITS', FITSEX, STATUS )
-            IF ( FITSEX ) THEN
-               CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )
-               CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', IPFITS, NCARD,
-     :                           STATUS )
-               LENGTH = 80
-            END IF
 
 *  Get WCS component from NDF.
             CALL CCD1_GTWCS( INDF, IWCS, STATUS )
@@ -567,79 +434,31 @@
                DMCUR = INDOM
             END IF
 
-*  Purge the WCS component of any frames in the same domain as the one
-*  which we're going to add.
-            CALL CCD1_DMPRG( IWCS, DMCUR, .TRUE., 0, STATUS )
-
-*  Set the Current frame of the WCS component to the one which is the
-*  Base frame of the import frameset.
-            IF ( STATUS .NE. SAI__OK ) GO TO 99
-            CALL AST_INVERT( FSMAT, STATUS )
-            DMBAS = AST_GETC( FSMAT, 'Domain', STATUS )
-            CALL AST_INVERT( FSMAT, STATUS )
-            CALL CCD1_FRDM( IWCS, DMBAS, JCUR, STATUS )
-            IF ( JCUR .EQ. AST__NOFRAME ) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETC( 'DMBAS', DMBAS )
-               CALL ERR_REP( 'ASTIMP_NODMN', 
-     :         'ASTIMP: NDF does not contain frame in domain ^DMBAS',
-     :         STATUS )
-            END IF
-            CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
-
-*  Get the mapping represented by the import frameset.
-            MAP = AST_GETMAPPING( FSMAT, AST__BASE, AST__CURRENT, 
-     :                            STATUS )
-
 *  Use modifiers if they have been specified.  If a parameter value has
 *  been given use that, otherwise use a value specific to this frameset,
-*  otherwise use a global value for the AST file.  Otherwise use nothing.
+*  Otherwise use nothing.
 *  Currently only one modifier is implemented, FITSROT.
             IF ( FITRTP .NE. ' ' ) THEN
                FITROT = FITRTP
             ELSE IF ( FITRTS( JMAT ) .NE. ' ' ) THEN
                FITROT = FITRTS( JMAT )
-            ELSE IF ( FITRT0 .NE. ' ' ) THEN
-               FITROT = FITRT0
             ELSE
                FITROT = ' '
             END IF
 
-*  Find additional rotation from FITS header if required.
-            FROT = 0D0
-            IF ( FITROT .NE. ' ' ) THEN
+*  Add the frame.
+            CALL CCD1_ADFRM( IWCS, FSMAT, DMCUR( 1:CHR_LEN( DMCUR ) ),
+     :                       ROT, FITROT, NCARD, IPFITS, STATUS )
 
-*  Error if no FITS extension.
-               IF ( .NOT. FITSEX ) THEN
-                  STATUS = SAI__ERROR
-                  CALL NDF_MSG( 'NDF', INDF )
-                  CALL ERR_REP( 'ASTIMP_NOFITS', 
-     :                          '  No FITS exension in ^NDF', STATUS )
-                  GO TO 99
-               END IF
+*  Make the newly added frame the Current frame.
+            CALL AST_SETI( IWCS, 'Current', 
+     :                     AST_GETI( IWCS, 'Nframe', STATUS ), STATUS )
 
-*  Get FITSROT key value.
-               CALL FTS1_GKEYD( NCARD, %VAL( IPFITS ), 1, FITROT, THERE,
-     :                          FROT, ICARD, STATUS, %VAL( LENGTH ) )
-            END IF
-
-*  Add additional fixed rotation.
-            ROTATE = ROT + FROT
-
-*  Incorporate additional rotation into mapping if required.
-            IF ( ROTATE .NE. 0D0 ) THEN
-               ANGLR = ROTATE * DEGRA
-               MATRIX( 1 ) = COS( ANGLR )
-               MATRIX( 2 ) = -SIN( ANGLR )
-               MATRIX( 3 ) = SIN( ANGLR )
-               MATRIX( 4 ) = COS( ANGLR )
-               MAPROT = AST_MATRIXMAP( 2, 2, 0, MATRIX, ' ', STATUS )
-               MAP = AST_CMPMAP( MAP, MAPROT, .TRUE., ' ', STATUS )
-               MAP = AST_SIMPLIFY( MAP, STATUS )
-               CALL MSG_SETR( 'ANGLE', REAL( ROTATE ) )
-               CALL CCD1_MSG( ' ', 
-     :'    Rotating additional ^ANGLE degrees', STATUS )
-            END IF
+*  Write the WCS component back to the NDF and inform the user.
+            CALL NDF_PTWCS( IWCS, INDF, STATUS ) 
+            CALL MSG_SETC( 'DOM', DMCUR )
+            CALL CCD1_MSG( ' ',
+     :         '    New frame in domain "^DOM" added', STATUS )
 
 *  Unmap array and release locator for FITS extension if required.
             IF ( FITSEX ) THEN
@@ -648,42 +467,7 @@
             END IF
 
 *  Error occurred - abort.
-            IF ( STATUS .NE. SAI__OK ) THEN
-               GO TO 99
-
-*  Mapping failed - inform user.
-            ELSE IF ( .NOT. AST_ISAMAPPING( MAP, STATUS ) ) THEN
-               CALL MSG_SETC( 'DOM1', 
-     :                        AST_GETC( IWCS, 'Domain', STATUS ) )
-               CALL MSG_SETC( 'DOM2',
-     :                        AST_GETC( FSMAT, 'Domain', STATUS ) )
-               CALL CCD1_MSG( ' ', 
-     :         '    Conversion from domain ^DOM1 to ^DOM2 failed', 
-     :                        STATUS )
-
-*  Mapping succeeded - add the new frame and mapping to the WCS component,
-*  and write it back to the NDF.  The new frame becomes the Current frame 
-*  of the WCS frameset.
-            ELSE
-
-*  Get the frame from the frameset.
-               FRMAT = AST_GETFRAME( FSMAT, AST__CURRENT, STATUS )
-
-*  Change its Domain name as required.
-               CALL AST_SETC( FRMAT, 'Domain', 
-     :                        DMCUR( 1:CHR_LEN( DMCUR ) ), STATUS )
-
-*  Add the new frame to the WCS component.
-               CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP, FRMAT, 
-     :                            STATUS )
-
-*  Write the WCS component back to the NDF and inform the user.
-               CALL NDF_PTWCS( IWCS, INDF, STATUS ) 
-               CALL MSG_SETC( 'DOM', DMCUR )
-               CALL CCD1_MSG( ' ',
-     :         '    New frame in domain "^DOM" added', STATUS )
-            END IF
-
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
          END IF
  12   CONTINUE
 
@@ -694,7 +478,6 @@
       CALL NDF_END( STATUS )
 
 *  Release group resources.
-      CALL CCD1_GRDEL( IFGRP, STATUS )
       CALL CCD1_GRDEL( INGRP, STATUS )
 
 *  End AST context.
