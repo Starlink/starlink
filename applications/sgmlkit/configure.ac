@@ -55,7 +55,10 @@ STAR_XML_DOCUMENTATION(ssn70,
                        [doc/ssn70/ssn70.htx_tar doc/ssn70/ssn70.texml_tar])
 
 STAR_SUPPRESS_BUILD_IF([test $JADE = NOJADE -o $SGMLNORM = NOSGMLNORM],
-    [JADE=$JADE, SGMLNORM=$SGMLNORM: both needed for sgmlkit])
+    [The sgmlkit component requires both Jade and sgmlnorm.  All I could
+     find were $JADE for Jade, and $SGMLNORM for sgmlnorm.
+     Your system may have a way to install them as a package,
+     in which case you should re-run configure and make.])
 
 AC_CONFIG_FILES([Makefile component.xml \
                  dsssl/sl/common/slparams.dsl dsssl/sl/lib/Makefile])
