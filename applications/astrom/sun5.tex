@@ -15,11 +15,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {5.17}
-\newcommand{\stardocauthors}   {P.\,T.\,Wallace}
-\newcommand{\stardocdate}      {8th October 1998}
+\newcommand{\stardocnumber}    {5.18}
+\newcommand{\stardocauthors}   {P.\,T.\,Wallace, Norman Gray}
+\newcommand{\stardocdate}      {2nd May 2003}
 \newcommand{\stardoctitle}     {ASTROM \\[2ex] Basic astrometry program}
-\newcommand{\stardocversion}   {v3.6}
+\newcommand{\stardocversion}   {v3.7}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {%
 ASTROM performs ``plate reductions''.  You supply star positions from a
@@ -297,23 +297,46 @@ prepares a detailed report for later printing.
 \section{\xlabel{operating_instructions}Operating Instructions}
 \label{operating_instructions}
 
-ASTROM is run by means of the following command (C-shell on Unix, DCL 
-on VAX/VMS, MS-DOS on PC):
-
+ASTROM is run by means of the following command
+% (C-shell on Unix, DCL on VAX/VMS, MS-DOS on PC):
 \begin{quote}
-\texttt{astrom} [\textit{input}] [\textit{report}]
+\texttt{astrom} [\texttt{input=}\textit{input}]
+    [\texttt{report=}\textit{report}]
+    [\texttt{summary=}\textit{summary}] \\\relax
+    [\texttt{log=}\textit{log}]
+    [\texttt{fits=}\textit{fits}]
+    [\texttt{wcsstyle=}\textit{wcsstyle}]
 \end{quote}
 
-The input file \textit{input} defaults to \texttt{astrom.dat}
-and the report file \textit{report} defaults to \texttt{astrom.lis}.
-A parameter can be defaulted either by leaving it out or by using a pair
-of double-quotes.
+All the parameters are optional, and may appear in any order.  The
+parameters \textit{input} and \textit{report} default to
+\texttt{astrom.dat} and \texttt{astrom.lis}; the \textit{summary}
+defaults to the terminal.  If \textit{log} or \textit{fits} is not
+specified, no corresponding file is generated.  A parameter can be
+defaulted either by leaving it out or by using a pair of
+double-quotes.  The specifiers \texttt{input=} and \texttt{report=}
+are optional; if they are omitted, they are assigned to the first and
+second unqualified filenames.  Thus
+\begin{quote}
+\texttt{astrom astrom.input}
+\end{quote}
+would read the input file \texttt{astrom.input}, and write a report on
+the default \texttt{astrom.lis}.
+\begin{quote}
+\texttt{astrom report=astrom.report fits=wcsout input=astrom.input}
+\end{quote}
+reads \texttt{astrom.input}, and produces its report on
+\texttt{astrom.report}, plus a number of FITS files with names
+beginning \texttt{wcsout} (see Section~\ref{output} below).
 
-The synopsis report, which normally appears on the command terminal,
-should be monitored and any reference stars with large residuals noted.
-The input file can then be edited as necessary and the job rerun.
-Finally, the report file can be printed in the normal way.  An example
-report file is reproduced in Appendix~\ref{example_report}.
+A summary report normally appears on the command terminal, but can be
+sent to a file by giving the file's name as the \texttt{summary=}
+parameter.  This should be monitored and any reference stars with
+large residuals noted.  The input file can then be edited as necessary
+and the job rerun.  Finally, the report file can be printed in the
+normal way.  An example report file is reproduced in
+Appendix~\ref{example_report}.  For further details on the log and
+FITS files, see Section~\ref{output}.
 
 \section{\xlabel{the_input_file}The Input File}
 \label{the_input_file}
@@ -582,6 +605,142 @@ the example are requests to include the radial distortion and plate centre
 in the fit.  Details of these refinements are given in
 Sections~\ref{reduction_in_observed_place}
 and~\ref{fitting_plate_centre_and_radial_distortion}.
+
+\section{\xlabel{output}Output}
+\label{output}
+
+The report file (named by the \texttt{report=} parameter, and defaulting to
+\texttt{astrom.lis}) is a human-readable report of ASTROM's actions
+and its results.  The summary file, which normally appears on the
+terminal, contains observations and warnings about ASTROM's progress,
+and should be monitored.  Neither of these files, however, is intended
+to be easily machine-parseable, and so if ASTROM is used within a
+larger system, the other output files will be useful.  The log file is
+a report on ASTROM's actions and results which is easy to parse, and
+easy to extract information from.  The WCS files contain ASTROM's
+results in the form of a FITS header, containing FITS WCS keywords.
+Both these files are described in the subsections below.
+
+\subsection{\xlabel{output_log}Log output}
+\label{output_log}
+
+The log file is a report on ASTROM's actions and results which is easy
+to parse, and thus easy for another program, acting as a harness for
+ASTROM, to find out about ASTROM's progress.
+
+The log file consists of a number of statements describing the fits
+ASTROM has performed, and its success.  The statements describing each
+fit are bracketed in a pair of statements `\texttt{FIT }$\langle
+n\rangle$' and `\texttt{ENDFIT}', for some fit number~$\langle n\rangle$.
+The statements thus bracketed are in table~\ref{t:logstatements}.
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Result & \texttt{RESULT} \textit{keyword value} \\
+Status & \texttt{STATUS} $[\texttt{OK} | \texttt{BAD}]$ \\
+Residuals & \texttt{RESIDUAL} \textit{source-number dx dy dr} \\
+Information & \texttt{INFO} \textit{code details\dots} \\
+Warnings & \texttt{WARNING} \textit{code comment} \\
+Errors & \texttt{ERROR} \textit{code comment} \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{t:logstatements}Log file statements}
+\end{table}
+
+The \texttt{INFO}, \texttt{WARNING} and \texttt{ERROR} statements
+share a common set of codes, and are described in
+Appendix~\ref{error_and_warning_messages}.
+
+The \texttt{RESIDUAL} message reports the size of the residuals for
+the given source number in the input file.  The residuals are reported
+in the~$x$ and~$y$ directions, plus $\delta r=\sqrt{\delta x^2+\delta
+y^2}$.
+
+The \texttt{STATUS} message is \texttt{OK} if the fit succeeded, and
+\texttt{BAD} otherwise.
+
+The \texttt{RESULT} statements give feedback about the results of the
+fit.  Much of the information is also in the FITS WCS headers, if they
+are generated.  The keywords are listed in table~\ref{t:result-table}.
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{keyword} & \textbf{meaning} \\
+\hline
+\texttt{nstars} & number of ref stars \\
+\texttt{xrms} & RMS errors in fitted $x$, arcsec \\
+\texttt{yrms} & \dots in $y$ \\
+\texttt{rrms} & \dots in $r$ \\
+\texttt{plate} & (mean) plate scale, arcsec \\
+\texttt{prms} & \texttt{rrms} in pixels \\
+\texttt{nterms} & number of terms in fit \\
+\texttt{rarad} & projection pole RA, radians \\
+\texttt{decrad} & projection pole Dec, radians \\
+\texttt{rasex} & projection pole RA, sexagesimal \\
+\texttt{decsex} & projection pole Dec, sexagesimal \\
+\texttt{wcs} & name of FITS WCS header file \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{t:result-table}Information returned in log-file
+\texttt{RESULT} statement}
+\end{table}
+
+\subsection{\xlabel{output_wcs}FITS WCS output}
+\label{output_wcs}
+
+If requested (by the presence of the \texttt{fits=} specifier on the
+command line), ASTROM will write out the plate solution in a series of
+FITS files, containing headers conforming (largely) to the FITS WCS
+standards (known as `Paper~I' and
+`Paper~II')~\cite{fitswcs1,fitswcs2}.  ASTROM will generally attempt
+more than one fit.  The file names will start with the string given in
+the \texttt{fits=} parameter.
+
+There is more than one way to encode the required WCS information, and
+which way is used depends on the value of the parameter
+\texttt{wcsstyle=} on the command line.  The allowed values of this
+are \texttt{qtan} and \texttt{xtan}, and these are discussed now.
+
+There is a standard for specifying world coordinate systems in FITS
+files~\cite{fitswcs2}, and ASTROM conforms to this.  At present (May
+2003) there is only an early \emph{draft} standard for representing
+distortions, \emph{Representation of distortions in FITS world
+coordinate systems}, Calabretta et~al.\ (also known as `Paper~IV'),
+available at Mark Calabretta's web pages~\cite{fitswcsurl}.  Part of
+ASTROM's function is to determine and report such distortions, but
+since there is not yet any standardised way to do this, we have
+something of a problem.
+
+This program does not attempt to produce output using the distortion
+model described in Paper~IV; that seems premature.  Instead, it
+describes distortions using the model described as `distorted
+gnomonic' (\texttt{TAN}) in the late \emph{draft} versions of
+Paper~II.  If you specify \texttt{wcsstyle=xtan} (not recommended),
+then ASTROM emits FITS headers which fully conform to these drafts; if
+you specify \texttt{wcsstyle=qtan}, the FITS headers are essentially
+the same, but with the draft paper's \verb|PVj_m| headers
+replaced by non-standard \verb|QVj_m|.  In this latter
+case, the headers are conformant with the final Paper~II, but the
+distortion information is available to software which knows how to use
+it.  You are strongly advised \emph{not} to produce new FITS files
+using option
+\texttt{wcsstyle=xtan}, unless you are obliged to by old versions of
+software.
+
+The `distorted gnomonic' \texttt{TAN} projection is not documented
+here (deliberately), and the drafts describing it are no longer
+readily available on the web.  However, should you need to, you would
+probably be able to find a copy through Mark Calabretta's WCS web
+pages~\cite{fitswcsurl}.
+
+This is an interim solution.  It's anyone's guess how long it will
+take for the FITS community to agree on a final version of Paper~IV.
+Once that is finalised, however, it's quite possible that ASTROM's
+support for the above header styles will be removed.
 
 \section{\xlabel{method}Method}
 \label{method}
@@ -1114,6 +1273,12 @@ velocity and parallax were large.
 
 No provision exists in ASTROM for specifying the parallax (or proper motion)
 of the unknown stars.
+
+\begin{raggedright}
+\bibliographystyle{unsrt}
+\bibliography{sun5}
+\end{raggedright}
+
 
 \newpage
 \appendix
@@ -2124,9 +2289,11 @@ nm & M5
 \section{\xlabel{error_and_warning_messages}Error and Warning Messages}
 \label{error_and_warning_messages}
 
-Except where otherwise stated, the following messages appear
-on both the command device (typically the terminal) and the
-report device (typically the file to be printed).
+Except where otherwise stated, the following messages appear on both
+the command device (typically the terminal) and the report device
+(typically the file to be printed).  The `Log:' information shows the
+severity and message number which appear in the log file (if one was
+specified; see Section~\ref{output_log}).
 
 \begin{quote}
 \texttt{Can't open file} \textit{nn}
@@ -2152,7 +2319,8 @@ executable image directly rather than through the correct
 command procedure is one possible cause.
 
 \begin{quote}
-\verb|^^^^^^  POSSIBLE DATA ERROR?  ^^^^^^|
+\verb|^^^^^^  POSSIBLE DATA ERROR?  ^^^^^^|\\
+(Log: error 1)
 \end{quote}
 This message is output to the command device only.  It means that
 at least one
@@ -2161,7 +2329,8 @@ unexpectedly negative, fractional when it should have been
 integer, or outside the conventional range.
 
 \begin{quote}
-\texttt{Observation data were incomplete and will be ignored}
+\texttt{Observation data were incomplete and will be ignored}\\
+(Log: error 14)
 \end{quote}
 Many of the observation data may be omitted and have sensible
 defaults, but certain combinations of omission make it impossible
@@ -2172,7 +2341,8 @@ is carried out.
 \begin{quote}
 \texttt{For the given observation data, the plate centre ZD is}
 \textit{xxx.x}\ \texttt{degrees!}\\
-\texttt{Reduction will be in MEAN place.}
+\texttt{Reduction will be in MEAN place.}\\
+(Log: warning 2)
 \end{quote}
 This indicates that the
 zenith distance of the field centre, if the observation data are to
@@ -2180,7 +2350,8 @@ be believed, is greater than $90^{\circ}$.  The most likely causes
 are an incorrectly specified time or observatory site.
 
 \begin{quote}
-\texttt{sla\_DS2TP status }\textit{n}
+\texttt{sla\_DS2TP status }\textit{n}\\
+(Log: error 9)
 \end{quote}
 The above message
 indicates something badly wrong with the reference star or plate
@@ -2188,13 +2359,15 @@ centre positions.
 
 \goodbreak
 \begin{quote}
-\texttt{Impossible sla\_SVD error!}
+\texttt{Impossible sla\_SVD error!}\\
+(Log: error 9)
 \end{quote}
 If this message appears please ask your Starlink Site Manager
 to contact the Starlink User Support group.
 
 \begin{quote}
-\texttt{sla\_SVD warning }\textit{n}
+\texttt{sla\_SVD warning }\textit{n}\\
+(Log: warning 3)
 \end{quote}
 Certain very rare combinations of (perfectly valid)
 data can provoke the above message.
@@ -2209,7 +2382,8 @@ ask your Starlink Site Manager
 to contact the Starlink User Support group.
 
 \begin{quote}
-\texttt{Fit was ill-conditioned!}
+\texttt{Fit was ill-conditioned!}\\
+(Log: warning 4)
 \end{quote}
 This warns that the input data failed to
 define all the fitted parameters adequately.  The cure is to
@@ -2217,7 +2391,8 @@ use more reference stars or not to fit the plate centre
 and/or the distortion.
 
 \begin{quote}
-\texttt{Radial distortion coefficient cannot reliably be determined!}
+\texttt{Radial distortion coefficient cannot reliably be determined!}\\
+(Log: warning 6)
 \end{quote}
 This message, which appears only on the report device, warns that
 the data were of insufficient quality to allow the distortion
@@ -2225,7 +2400,8 @@ to be determined.  This can happen, for example, if the
 distortion is very small or if there aren't enough reference stars.
 
 \begin{quote}
-\texttt{Plate centre cannot reliably be determined!}
+\texttt{Plate centre cannot reliably be determined!}\\
+(Log: warning 8)
 \end{quote}
 The above message, which appears only on the report device, warns that
 the data were of insufficient quality to allow the plate
@@ -2233,13 +2409,15 @@ centre to be determined.  This can happen, for example, if the
 radial distortion is very small or if there aren't enough reference stars.
 
 \begin{quote}
-\texttt{*************** INVALID DATA ****************}
+\texttt{*************** INVALID DATA ****************}\\
+(Log: error 12)
 \end{quote}
 This indicates that there is something fatally wrong with the
 most recent input record.
 
 \begin{quote}
-\texttt{------------ PREMATURE END OF DATA ------------}
+\texttt{------------ PREMATURE END OF DATA ------------}\\
+(Log: error 16)
 \end{quote}
 This indicates that the input file has ended, or that an
 end-of-sequence record or an end-of-file record has been read at a time
@@ -2247,14 +2425,16 @@ when more input records are needed before a plate solution can be
 attempted.
 
 \begin{quote}
-\texttt{****** PLATE EPOCH WAS NOT SPECIFIED ******}
+\texttt{****** PLATE EPOCH WAS NOT SPECIFIED ******}\\
+(Log: error 17)
 \end{quote}
 This happens if no plate epoch is available.  This
 information must be supplied, either as part of the plate data record or
 in a time record.
 
 \begin{quote}
-\texttt{****** TOO MANY REFERENCE STARS; MAX }\textit{n}\ \texttt{******}
+\texttt{****** TOO MANY REFERENCE STARS; MAX }\textit{n}\ \texttt{******}\\
+(Log: error 18)
 \end{quote}
 ASTROM internal workspace limits have been reached;  reduce the
 number of reference stars.  If you have a legitimate requirement
@@ -2269,11 +2449,40 @@ This message always follows one of those described earlier,
 which will indicate the source of the problem.
 
 \begin{quote}
-\texttt{---------- UNKNOWNS BUT NO SOLUTION ------------}
+\texttt{---------- UNKNOWNS BUT NO SOLUTION ------------}\\
+(Log: error 19)
 \end{quote}
 An unknown star record has been encountered before the records defining
 a plate solution have been input.  Check the order of records in the
 input file.
+
+\begin{quote}
+\texttt{FITS Filename <}\textit{filename}\texttt{> too long.  FITS writing abandoned}\\
+(Log: error 10)
+\end{quote}
+The requested FITS header file name is too long (the maximum is
+around~100 characters).
+
+\begin{quote}
+\texttt{FITS filename blank!?  FITS writing abandoned}\\
+(Log: error 11)
+\end{quote}
+The requested FITS headef file name appears to be blank.
+
+\begin{quote}
+\texttt{Unrecognised FITS WCS style, xxx.  FITS writing abandoned}\\
+(Log: error 15)
+\end{quote}
+The header style requested is not one of the supported ones.  No FITS
+file will be written.
+
+\begin{quote}
+\texttt{FITS error detected: }\dots\\
+(Log: error 13)
+\end{quote}
+The FITS system reported some error (reproduced in the message).  FITS
+writing will be abandoned.
+
 \end{document}
 
 
