@@ -6,9 +6,17 @@ if test -z "$AUTOASTROM_DIR"; then
     echo "No AUTOASTROM_DIR -- autoastrom must be test-installed"
     exit 1
 fi
+if test ! -d $AUTOASTROM_DIR; then
+    echo "Can't find autoastrom directory $AUTOASTROM_DIR"
+    exit 1
+fi
 if test ! -x $AUTOASTROM_DIR/autoastrom; then
     echo "Can't find autoastrom script in directory $AUTOASTROM_DIR"
     exit 1
+fi
+if test ! -x $AUTOASTROM_DIR/match; then
+    echo "Match program isn't installed -- ignore this test"
+    exit 2
 fi
 
 test -n "$KAPPA_DIR"		|| KAPPA_DIR=/star/bin/kappa
@@ -27,6 +35,9 @@ PREFIX=t9-temp-
 # xxxccdcat file not existing, and without the xxxndfinfo option, and
 # with the real r106282xx.sdf file as argument).
 
+#keeptemps=--keeptemps
+keeptemps=--nokeeptemps
+
 $AUTOASTROM_DIR/autoastrom \
     --verbose \
     --xxxccdcat=testndf1.ccdcat.munged \
@@ -34,7 +45,7 @@ $AUTOASTROM_DIR/autoastrom \
     --defects \
     --noinsert \
     --keepfits=${PREFIX}testndf1.final-fits.fits \
-    --nokeeptemps \
+    $keeptemps \
     testndf1.sdf \
     >${PREFIX}testndf1.STDOUT \
     2>${PREFIX}testndf1.STDERR
@@ -46,7 +57,7 @@ $AUTOASTROM_DIR/autoastrom \
     --obsdata=col=600 \
     --noinsert \
     --keepfits=${PREFIX}testndf2.final-fits.fits \
-    --nokeeptemps \
+    $keeptemps \
     testndf2 \
     >${PREFIX}testndf2.STDOUT \
     2>${PREFIX}testndf2.STDERR
@@ -61,7 +72,7 @@ $AUTOASTROM_DIR/autoastrom \
     --noinsert \
     --keepfits=${PREFIX}testndf3.final-fits.fits \
     --match=match \
-    --nokeeptemps \
+    $keeptemps \
     testndf1.sdf \
     >${PREFIX}testndf3.STDOUT \
     2>${PREFIX}testndf3.STDERR
@@ -74,7 +85,7 @@ $AUTOASTROM_DIR/autoastrom \
     --noinsert \
     --keepfits=${PREFIX}testndf4.final-fits.fits \
     --match=match \
-    --nokeeptemps \
+    $keeptemps \
     testndf2 \
     >${PREFIX}testndf4.STDOUT \
     2>${PREFIX}testndf4.STDERR
@@ -88,50 +99,28 @@ $AUTOASTROM_DIR/autoastrom \
     --xxxndfinfo=dim1=2048,dim2=4097 \
     --defects \
     --noinsert \
-    --keepfits=${PREFIX}testnodate.final-fits.fits \
-    --nokeeptemps \
+    --keepfits=${PREFIX}testndf5.final-fits.fits \
+    $keeptemps \
     testnodate.sdf \
-    >${PREFIX}testnodate.STDOUT \
-    2>${PREFIX}testnodate.STDERR
+    >${PREFIX}testndf5.STDOUT \
+    2>${PREFIX}testndf5.STDERR
 
 
 # Dump results to stdout, removing version string
-# Remove lines containing version-number and HTTP proxy
-echo "=== Test 1 ==="
-egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testndf1.STDOUT
-if test -f ${PREFIX}testndf1.final-fits.fits; then
-    ./fitsdump ${PREFIX}testndf1.final-fits.fits
-else
-    echo "Can't find file ${PREFIX}testndf1.final-fits.fits"
-fi
-echo "=== Test 2 ==="
-egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testndf2.STDOUT
-if test -f ${PREFIX}testndf2.final-fits.fits; then
-    ./fitsdump ${PREFIX}testndf2.final-fits.fits
-else
-    echo "Can't find file ${PREFIX}testndf2.final-fits.fits"
-fi
-echo "=== Test 3 ==="
-egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testndf3.STDOUT
-if test -f ${PREFIX}testndf3.final-fits.fits; then
-    ./fitsdump ${PREFIX}testndf3.final-fits.fits
-else
-    echo "Can't find file ${PREFIX}testndf3.final-fits.fits"
-fi
-echo "=== Test 4 ==="
-egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testndf4.STDOUT
-if test -f ${PREFIX}testndf4.final-fits.fits; then
-    ./fitsdump ${PREFIX}testndf4.final-fits.fits
-else
-    echo "Can't find file ${PREFIX}testndf4.final-fits.fits"
-fi
-echo "=== Test 5 ==="
-egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testnodate.STDOUT
-if test -f ${PREFIX}testnodate.final-fits.fits; then
-    ./fitsdump ${PREFIX}testnodate.final-fits.fits
-else
-    echo "Can't find file ${PREFIX}testnodate.final-fits.fits"
-fi
+# Remove lines containing version-number, HTTP proxy, and plugin path
+for n in 1 2 3 4 5
+do
+    echo "=== Test $n ==="
+    egrep -v '(autoastrom, v|HTTP proxy|plugin-match-match)' ${PREFIX}testndf$n.STDOUT
+    if test -f ${PREFIX}testndf$n.final-fits.fits; then
+        ./fitsdump ${PREFIX}testndf$n.final-fits.fits
+    else
+        echo "Can't find file ${PREFIX}testndf$n.final-fits.fits"
+    fi
+
+    echo "=== Test $n ===" >&2
+    cat ${PREFIX}testndf$n.STDERR >&2
+done
 
 rm -f ${PREFIX}*
 
