@@ -90,6 +90,7 @@ sub header;
 sub footer;
 sub hprint;
 sub tidyfiles;
+sub quasialph;
 
 #  Determine operating environment.
 
@@ -127,10 +128,12 @@ $arg{'package'} ||= '';
 $arg{'module'}  =~ s/%(..)/pack("c",hex($1))/ge if $arg{'module'};
 $arg{'package'} =~ s/%(..)/pack("c",hex($1))/ge if $arg{'package'};
 
-#  Substitute for '>' and '<' to match encoding in index.
+#  Substitute for '<' and '>' to match encoding in index.
 
-$arg{'module'} =~ s/</&lt;/g;
-$arg{'module'} =~ s/>/&gt;/g;
+if ($arg{'module'}) {
+   $arg{'module'} =~ s/</&lt;/g;
+   $arg{'module'} =~ s/>/&gt;/g;
+}
 
 #  Open index file, tied to index hash %locate.
 
@@ -224,7 +227,7 @@ sub query_form {
    ";
    for $pack (@packages) {
       $selected = $pack eq $package ? 'selected' : '';
-      print "<option value=$pack $selected>$pack\n";
+      print "<option value='$pack' $selected>$pack\n";
    }
    print "</select></font>\n";
 
@@ -244,6 +247,7 @@ sub query_form {
       print "<h2>$package</h2>\n";
 
       my @tasks = @{$tasks{$package}};
+      my $sep = "<b>o</b>&nbsp;";
 
       if (@tasks) {
 
@@ -253,11 +257,12 @@ sub query_form {
             <h3>Tasks</h3>
             The following appear to be tasks within package $package:
             <br>
+            <dl> <dt> <br> <dd>
          ";
          foreach $task (sort @tasks) {
-            print "<a href='$scb?$task&$package#$task'>$task</a>\n";
+            print "$sep<a href='$scb?$task&$package#$task'>$task</a>\n";
          }
-         print "<hr>\n";
+         print "</dl>\n<hr>\n";
       }
 
 #     Go through list of modules, picking ones from the selected package
@@ -284,9 +289,8 @@ sub query_form {
             and include files) from the package $package are indexed:<br>
          ";
          print "<dl>\n";
-         my ($prefix, $r_mods, $ignore, $sep);
-         foreach $prefix (sort keys %modules) {
-            $sep = '';
+         my ($prefix, $r_mods, $ignore);
+         foreach $prefix (sort quasialph keys %modules) {
             print "<dt> $prefix <br>\n<dd>\n";
             foreach $mod (sort @{$modules{$prefix}}) {
                if ($mod =~ /^(.*)&lt;T&gt;(.*)$/i) {
@@ -298,8 +302,7 @@ sub query_form {
                else {
                   $ignore = undef;
                }
-               print "$sep<a href='$scb?$mod&$package#$mod'>$mod</a>";
-               $sep = "&nbsp;\n ";
+               print "$sep<a href='$scb?$mod&$package#$mod'>$mod</a>\n";
             }
          }
          print "\n</dl>\n<hr>\n";
@@ -321,19 +324,30 @@ sub query_form {
 
       hprint "
          <h2>Packages</h2>
-         <ul compact>
+         <dir compact>
       ";
       foreach $pack (@packages) {
          print "<li> ";
          print "<a href='$scb?module=&package=$pack'>$pack</a>\n";
       }
-      print "<\ul>\n";
+      print "</dir>\n";
    }
    footer;
 
 }
    
+########################################################################
+sub quasialph {
 
+#  Collation order for prefixes - same as ascii but with _ preceding 1.
+#  This is useful because it allows 'FAC_' modules to come before 
+#  'FAC1_' modules, where they belong.
+
+   my ($na, $nb) = ($a, $b);
+   $na =~ tr/_/!/;
+   $nb =~ tr/_/!/;
+   $na cmp $nb;
+}
 
 
 ########################################################################
@@ -376,8 +390,11 @@ sub get_module {
 #  Interpret the first element of the location as a package or symbolic
 #  directory name.  Either way, change it for a logical path name.
 
-   my ($file, $tarfile);
-   if (-d "$srcdir/$head") {
+   my ($file, $tarfile, $dir);
+   if ($dir = $locate{"$head#"}) {
+      $file = "$dir/$tail";
+   }
+   elsif (-d "$srcdir/$head") {
       $file = "$srcdir/$head/$tail";
    }
    elsif (defined ($tarfile = <$srcdir/$head.tar*>) && -f $tarfile) {
@@ -423,7 +440,7 @@ sub extract_file {
    $location =~ /^([^>]+)>?([^>]*)(>?.*)$/;
    ($file, $tarcontents, $tail) = ($1, $2, $3);
    if ($tarcontents) {
-      tarxf $file, $tarcontents;
+      tarxf $file, $tarcontents unless (-f $file);
       extract_file "$tarcontents$tail", $package;
       unlink $tarcontents;
    }
@@ -492,7 +509,7 @@ sub output {
          s%&%##AMPERSAND##%g;
          s%>%&gt;%g;
          s%<%&lt;%g;
-         s%"%&quot%g;
+         s%"%&quot;%g;
          s%##AMPERSAND##%&amp;%g;
 
          if ($body) {
