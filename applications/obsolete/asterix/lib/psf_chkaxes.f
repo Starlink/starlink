@@ -16,7 +16,7 @@
 *     03 Nov 89 : Original (DJA)
 *     19 Jul 90 : Improvements for primitive data (DJA)
 *     26 Jul 90 : Bug fixed when irregular axes and no units (DJA)
-*     16 Nov 91 : Uses BDA_x_INT routines (DJA)
+*     16 Nov 91 : Uses internal BDA routines (DJA)
 *     26 Apr 93 : Added axis identification and EVDS switch (DJA)
 *     16 Dec 93 : Use PSF1_ calls for axis stuff (DJA)
 *     17 Feb 94 : Allocate psf instance if not done externally (DJA)
@@ -24,6 +24,7 @@
 *                 axis labels present (DJA)
 *     10 Apr 95 : Added PI to list of allowable energy axis names (DJA)
 *     12 Apr 95 : Made test for EVDS more robust (DJA)
+*     25 Apr 95 : Switched to use BDI_ (DJA)
 *
 *    Type definitions :
 *
@@ -57,14 +58,14 @@
       CHARACTER*(DAT__SZTYP)  TYPE              ! Dataset type
       CHARACTER*40            LABEL, UNITS	! Axis attributes
       CHARACTER*(DAT__SZLOC)  LLOC(2)           ! X & Y list locators
+      CHARACTER*(DAT__SZLOC)  LOC           	! Dataset locator
 
       REAL                    AXV1, AXV2        ! Axis values
       REAL                    BASE, SCALE       ! Axis data attributes
       REAL                    TOR               ! Radian conversion factor
 
-      INTEGER                 BDA               ! BDA identifier
       INTEGER                 DIM               ! Size of an axis
-      INTEGER                 DIMS(DAT__MXDIM)  ! Dataset dimensions
+      INTEGER                 DIMS(ADI__MXDIM)  ! Dataset dimensions
       INTEGER                 IAX               ! Loop over axes
       INTEGER                 NAXES             ! Number of axes
       INTEGER                 NDIM              ! Dimensionality
@@ -97,13 +98,15 @@
       E_AX = 0
       T_AX = 0
 
+*    Extract locator
+      CALL ADI1_GETLOC( P_FID(SLOT), LOC, STATUS )
+
 *    Primitive?
-      CALL DAT_PRIM( P_LOC(SLOT), PRIM, STATUS )
+      CALL DAT_PRIM( LOC, PRIM, STATUS )
       IF ( PRIM ) THEN
 
 *      Can't be event dataset so check data
-        CALL BDA_FIND( P_LOC(SLOT), BDA, STATUS )
-        CALL BDA_CHKDATA_INT( BDA, OK, NDIM, DIMS, STATUS )
+        CALL BDI_CHKDATA( P_FID(SLOT), OK, NDIM, DIMS, STATUS )
 
 *      If data isn't ok then we can't do much anyway!
         IF ( OK ) THEN
@@ -125,11 +128,10 @@
      :              (TYPE(:5).EQ.'EVENT')) .AND. .NOT. XTHERE ) THEN
 
 *        Check data
-          CALL BDA_FIND( P_LOC(SLOT), BDA, STATUS )
-          CALL BDA_CHKDATA_INT( BDA, OK, NDIM, DIMS, STATUS )
+          CALL BDI_CHKDATA( P_FID(SLOT), OK, NDIM, DIMS, STATUS )
 
 *        Get number of axes
-          CALL BDA_CHKAXES_INT( BDA, NAXES, STATUS )
+          CALL BDI_CHKAXES( P_FID(SLOT), NAXES, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             NAXES = 0
@@ -147,7 +149,8 @@
               TOR = 1.0
 
 *            Get axis description
-              CALL BDA_CHKAXVAL_INT( BDA, IAX, OK, REG, DIM, STATUS )
+              CALL BDI_CHKAXVAL( P_FID(SLOT), IAX, OK, REG, DIM,
+     :                           STATUS )
               IF ( .NOT. OK ) THEN
                 OK = .TRUE.
                 BASE = 1.0
@@ -156,11 +159,12 @@
                 DIM = DIMS(IAX)
 
               ELSE IF ( REG ) THEN
-                CALL BDA_GETAXVAL_INT( BDA, IAX, BASE, SCALE, DIM,
+                CALL BDI_GETAXVAL( P_FID(SLOT), IAX, BASE, SCALE, DIM,
      :                                 STATUS )
 
               ELSE
-                CALL BDA_MAPAXVAL_INT( BDA, 'READ', IAX, PTR, STATUS )
+                CALL BDI_MAPAXVAL( P_FID(SLOT), 'READ', IAX, PTR,
+     :                             STATUS )
                 CALL ARR_ELEM1R( PTR, DIM, 1, AXV1, STATUS )
                 BASE = AXV1
                 IF ( DIM .EQ. 1 ) THEN
@@ -173,8 +177,8 @@
               END IF
 
 *            Get units and label
-              CALL BDA_GETAXLABEL_INT( BDA, IAX, LABEL, STATUS )
-              CALL BDA_GETAXUNITS_INT( BDA, IAX, UNITS, STATUS )
+              CALL BDI_GETAXTEXT( P_FID(SLOT), IAX, LABEL, UNITS,
+     :                            STATUS )
 
 *            Identify axis
               WE = 1

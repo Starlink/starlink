@@ -30,7 +30,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PAR_PAR'
 *
@@ -142,7 +141,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -375,7 +373,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -394,38 +392,34 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! Spectrum dataset
-      CHARACTER*40             TEXT                    ! Axis label/text
+      CHARACTER*40              TEXT                    ! Axis label/text
 
-      INTEGER                  APTR                    ! Axis pointer
-      INTEGER                  DIMS(DAT__MXDIM)        ! Spectrum dimensions
-      INTEGER                  DPTR                    ! Data pointer
-      INTEGER                  NDIM                    ! Spectrum dimensionality
-      INTEGER                  NSBIN                   ! # spectral bins
-      INTEGER                  QPTR                    ! Quality pointer
-      INTEGER                  SBDA                    ! Spectrum BDA identifier
-      INTEGER                  WPTR                    ! Axis widths ptr
+      INTEGER                   APTR                    ! Axis pointer
+      INTEGER                   DIMS(ADI__MXDIM)        ! Spectrum dimensions
+      INTEGER                   DPTR                    ! Data pointer
+      INTEGER                   NDIM                    ! Spectrum dimensionality
+      INTEGER                   NSBIN                   ! # spectral bins
+      INTEGER                   QPTR                    ! Quality pointer
+      INTEGER			SFID			! Spectrum identifier
+      INTEGER                  	WPTR                    ! Axis widths ptr
 
-      LOGICAL                  ANYBAD                  ! Bad quality points?
-      LOGICAL                  OK                      ! Spectrum ok?
-      LOGICAL                  QOK                     ! Spectrum quality ok?
+      LOGICAL                   ANYBAD                  ! Bad quality points?
+      LOGICAL                   OK                      ! Spectrum ok?
+      LOGICAL                   QOK                     ! Spectrum quality ok?
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Try to open file
-      CALL HDS_OPEN( SPEC, 'READ', SLOC, STATUS )
+      CALL ADI_FOPEN( SPEC, '*', 'READ', SFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Unable to open spectrum '//SPEC, STATUS )
         GOTO 99
       END IF
 
-*    Give to BDA system
-      CALL BDA_FIND( SLOC, SBDA, STATUS )
-
 *    Check dimensions and data
-      CALL BDA_CHKDATA_INT( SBDA, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( SFID, OK, NDIM, DIMS, STATUS )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'SPEC', SPEC )
@@ -441,9 +435,9 @@
       NSBIN = DIMS(1)
 
 *    Check axis is channels
-      CALL BDA_GETAXUNITS_INT( SBDA, 1, TEXT, STATUS )
+      CALL BDI_GETAXUNITS( SFID, 1, TEXT, STATUS )
       IF ( INDEX(TEXT,'channel') .EQ. 0 ) THEN
-        CALL BDA_GETAXLABEL_INT( SBDA, 1, TEXT, STATUS )
+        CALL BDI_GETAXLABEL( SFID, 1, TEXT, STATUS )
         CALL MSG_SETC( 'UN', TEXT )
         IF ( INDEX(TEXT,'channel') .EQ. 0 ) THEN
           CALL MSG_SETC( 'LAB', TEXT )
@@ -453,16 +447,16 @@
       END IF
 
 *    Quality present?
-      CALL BDA_CHKQUAL_INT( SBDA, QOK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKQUAL( SFID, QOK, NDIM, DIMS, STATUS )
 
 *    Map input arrays
-      CALL BDA_MAPAXVAL_INT( SBDA, 'READ', 1, APTR, STATUS )
-      CALL BDA_MAPAXWID_INT( SBDA, 'READ', 1, WPTR, STATUS )
-      CALL BDA_MAPDATA_INT( SBDA, 'READ', DPTR, STATUS )
+      CALL BDI_MAPAXVAL( SFID, 'READ', 1, APTR, STATUS )
+      CALL BDI_MAPAXWID( SFID, 'READ', 1, WPTR, STATUS )
+      CALL BDI_MAPDATA( SFID, 'READ', DPTR, STATUS )
       IF ( QOK ) THEN
-        CALL BDA_MAPLQUAL_INT( SBDA, 'READ', ANYBAD, QPTR, STATUS )
+        CALL BDI_MAPLQUAL( SFID, 'READ', ANYBAD, QPTR, STATUS )
         IF ( .NOT. ANYBAD ) THEN
-          CALL BDA_UNMAPLQUAL_INT( SBDA, STATUS )
+          CALL BDI_UNMAPLQUAL( SFID, STATUS )
           QOK = .FALSE.
         END IF
       END IF
@@ -477,8 +471,8 @@
      :                         %VAL(EM_CBPTR(SLOT)), STATUS )
 
 *    Close spectrum
-      CALL BDA_RELEASE_INT( SBDA, STATUS )
-      CALL HDS_CLOSE( SLOC, STATUS )
+      CALL BDI_RELEASE( SFID, STATUS )
+      CALL ADI_FCLOSE( SFID, STATUS )
 
 *    Tidy up
  99   CONTINUE
@@ -641,7 +635,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :

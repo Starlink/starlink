@@ -1,5 +1,5 @@
-*+  PSF_GETSLOTL - Grab a slot in the PSF common block
-      SUBROUTINE PSF_GETSLOTL( FID, SLOT, STATUS )
+*+  PSF_GETSLOT - Grab a slot in the PSF common block
+      SUBROUTINE PSF_GETSLOT( FID, SLOT, STATUS )
 *
 *    Author :
 *
