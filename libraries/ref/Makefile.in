@@ -68,7 +68,7 @@ am_libref_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libref_la_OBJECTS = $(am_libref_la_OBJECTS)
 am_ref_test_OBJECTS = ref_test.$(OBJEXT)
 ref_test_OBJECTS = $(am_ref_test_OBJECTS)
-ref_test_DEPENDENCIES =
+ref_test_DEPENDENCIES = libref.la
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -233,9 +233,7 @@ BUILT_SOURCES = REF_ERR
 # Testing
 TESTS = ref_test
 ref_test_SOURCES = ref_test.f
-
-# Because we invoke ref_link
-ref_test_LDADD = `$(srcdir)/ref_link`
+ref_test_LDADD = libref.la `hds_link` `ems_link`
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -830,15 +828,17 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	install-binSCRIPTS install-data install-data-am install-exec \
 	install-exec-am install-includeHEADERS install-info \
 	install-info-am install-libLTLIBRARIES install-man \
-	install-stardocsDATA install-starhelpDATA install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-stardocsDATA \
-	uninstall-starhelpDATA
+	install-manifest install-stardocsDATA install-starhelpDATA \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binSCRIPTS uninstall-includeHEADERS \
+	uninstall-info-am uninstall-libLTLIBRARIES \
+	uninstall-stardocsDATA uninstall-starhelpDATA
 
+# Because we invoke ref_link
+#ref_test_LDADD = `$(srcdir)/ref_link`
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -27,6 +27,6 @@ TESTS = ref_test
 check_PROGRAMS = ref_test
 
 ref_test_SOURCES = ref_test.f
+# LDADD is the expansion of ref_link, with -lref replaced by libref.la
+ref_test_LDADD = libref.la `hds_link` `ems_link`
 
-# Because we invoke ref_link
-ref_test_LDADD = `$(srcdir)/ref_link`
