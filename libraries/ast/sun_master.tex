@@ -400,7 +400,7 @@ describe positions on the sky. Understanding these, and knowing how to
 convert coordinates between them, can require considerable expertise. It 
 can also be difficult to decide which of them your software should support.
 The same applies to coordinate systems describing other domains, such as
-position within an electromagnetic spectrum.
+position within an electro-magnetic spectrum.
 
 {\bf{Solution.}} AST has built-in knowledge of many coordinate systems
 and allows you to convert freely between them without specialist
@@ -449,7 +449,7 @@ searching for all possible intermediate coordinate systems.  This
 makes it simple to directly inter-relate the pixel coordinates of
 different datasets.
 
-\item[5. Handling Different Types of Coordinate Sy\mbox{}stem]\mbox{}\\
+\item[5. Handling Different Types of Coordinate System]\mbox{}\\
 Not all coordinate systems used in astronomy are celestial ones, so if
 you are writing general-purpose software such as (say) a display tool,
 you may also need to handle axes representing wavelength, distance,
@@ -522,7 +522,7 @@ extern "C" {
 \normalsize
 \end{quote}
 
-\item {\bf{Ob\mbox{}ject Oriented Design.}}
+\item {\bf{Object Oriented Design.}}
 AST uses ``object oriented'' techniques internally in order to provide
 a flexible and easily-extended programming model.  A fairly
 traditional calling interface is provided, however, so that the
@@ -6184,7 +6184,18 @@ A string describing the coordinate system which the Frame represents.
 A label string for each axis.
 
 \item[Unit(axis)]\mbox{}\\
-A string describing the physical units on each axis.
+A string describing the physical units on each axis. You can choose
+whether to make this attribute ``active'' or ``passive'' (using
+c+
+astSetActiveUnit
+c-
+f+
+AST_SETACTIVEUNIT
+f-
+). If active, its value will be taken into account when finding the
+Mapping between two Frames (\emph{e.g.} a scaling of 0.001 would be used
+to connect two axis with units of ``km'' and ``m''). If passive, its value
+is ignored. Its use is described in more detail in \secref{ss:frameunits}.
 
 \item[Symbol(axis)]\mbox{}\\
 A string containing a ``short form'' symbol ({\em{e.g.}}\ like ``X''
@@ -6216,6 +6227,25 @@ which the Frame's coordinate system applies. The primary purpose of
 this attribute is to prevent unwanted conversions from occurring
 between coordinate systems which are not related. Its use is described
 in more detail in \secref{ss:framedomains}.
+
+\item[System]\mbox{}\\
+A character string which identifies the specific coordinate system used
+to describe positions within the physical domain represented by the Frame.
+For a simple Frame, this attribute currently has a fixed value of 
+``Cartesian'', but could in principle be extended to include options such
+as ``Polar'', ``Cylindrical'', {\em{etc}}. More specialised Frames such
+as the SkyFrame and the SpecFrame, re-define the allowed values to be
+appropriate to the domain which they describe. For instance, the SkyFrame
+allows values such as ``FK4'' and ``Galactic'', and the SpecFrame allows
+values such as ``frequency'' and ``wavelength''. 
+
+\item[Epoch]\mbox{}\\
+This value is used to qualify a coordinate system by giving the moment in
+time when the coordinates are correct. Usually, this will be the date of
+observation. The Epoch value is important in cases where coordinates
+systems move with respect to each other over time. An example of two such
+coordinate systems are the FK4 and FK5 celestial coordinate systems.
+
 \end{description}
 \end{quote}
 
@@ -7257,7 +7287,7 @@ The functions astAxDistance and astAxOffset are similar to astDistance
 and astOffset, except that the curves which they use as ``straight
 lines'' are not geodesics, but curves parallel to a specified axis\footnote
 {For instance, a line of constant Declination is not a geodesic}. One
-reason for using these functions is to deal with the cyclic ambigity of
+reason for using these functions is to deal with the cyclic ambiguity of
 longitude and latitude axes.
 c-
 f+
@@ -7265,7 +7295,7 @@ The routines AST\_AXDISTANCE and AST\_AXOFFSET are similar to AST\_DISTANCE
 and AST\_OFFSET, except that the curves which they use as ``straight
 lines'' are not geodesics, but curves parallel to a specified axis\footnote
 {For instance, a line of constant Declination is not a geodesic}. One
-reason for using these routines is to deal with the cyclic ambigity of
+reason for using these routines is to deal with the cyclic ambiguity of
 longitude and latitude axes.
 f-
 
@@ -7286,7 +7316,7 @@ to all classes of Frame, including SkyFrame. The default ordering of axes
 in a SkyFrame makes the second axis equivalent to north, and so the
 definition of position angle given above corresponds to the normal 
 astronomical usage, ``from north, through east''. However, it should be
-remembered that it is posible to permute the axes of a SkyFrame (or
+remembered that it is possible to permute the axes of a SkyFrame (or
 indeed any Frame), so that north becomes axis 1. In this case, an AST
 ``position angle'' would be the angle ``from east, through north''. 
 Always take the axis ordering into account when deriving an astronomical 
@@ -7327,7 +7357,7 @@ The AST\_ANGLE routine
 f-
 calculates the angle subtended by two points, at a third point.
 If used with a 2-dimensional Frame the returned angle
-is signed to indicate the sense of rotation (clockwise or anticlockwise)
+is signed to indicate the sense of rotation (clockwise or anti-clockwise)
 in taking the ``shortest route'' from the first point to the second.
 If the Frame has more than 2 axes, the result is un-signed and is always
 in the range zero to $\pi$. 
@@ -7435,9 +7465,9 @@ will see later (\secref{ss:framesets}) how to establish such
 relationships between Frames in different domains.
 \end{itemize}
 
-With the basic Frames we are considering here, each physical domain
-only has a single coordinate system associated with it, so that if two
-such Frames have the same Domain value, their coordinate systems will
+With the basic Frames we are considering here, each physical domain only
+has a single (Cartesian) coordinate system associated with it, so that if
+two such Frames have the same Domain value, their coordinate systems will
 be identical and may simply be equated. With more specialised Frames,
 however, more than one coordinate system may apply to each domain. In
 such cases, a coordinate conversion may need to be performed.
@@ -7569,7 +7599,7 @@ probably won't need to change this very often.
 
 \item[SPECTRAL]\mbox{}\\
 Identifies the domain used to describe positions within an
-electromagnetic spectrum. The AST SpecFrame (\secref{ss:specframes})
+electro-magnetic spectrum. The AST SpecFrame (\secref{ss:specframes})
 class describes positions within this domain, allowing a wide range of
 different coordinate systems to be used (frequency, wavelength,
 {\em{etc}}). The default Domain value for a SpecFrame is SPECTRAL.
@@ -7584,6 +7614,310 @@ important. This should not be taken to imply that the GRID convention
 for numbering pixels is excluded---in fact, it is usually to be
 preferred (at the level of data handling being discussed in this
 document) and we recommend it.
+
+\subsection{\label{ss:frameunits}The Unit Attribute}
+Each axis of a Frame has a Unit attribute which holds the physical units used
+to describe positions on the axis. The index of the axis to which the 
+attribute refers should normally be placed in parentheses following the
+attribute name (``Unit(2)'' for instance). However, if the Frame has only
+a single axis, then the axis index can be omitted.
+
+In versions of AST prior to version 2.0, the Unit attribute was nothing
+more than a descriptive string intended purely for human readers---no
+part of the AST system used the Unit string for any purpose (other than 
+inclusion in axis labels produced by the Plot class). In particular, no
+account was taken of the Unit attribute when finding the Mapping between
+two Frames. Thus if the conversion between a pair of 1-dimensional Frames 
+representing velocity was found (using
+c+
+astConvert
+c-
+f+
+AST\_CONVERT
+f-
+) the returned Mapping would always be a UnitMap, even if the Unit
+attributes of the two Frames were ``km/h'' and ``m/s''. This behaviour is
+referred to below as a \emph{passive} Unit attribute.
+
+As of AST version 2.0, a facility exists which allows the Unit attribute
+to be \emph{active}; that is, differences in the 
+Unit attribute may be taken into account when finding the Mapping between
+two Frames. In order to minimise the risk of breaking older software, the 
+\emph{default} behaviour of simple Frames and SkyFrames is unchanged from 
+previous versions (\emph{i.e.} they have passive Unit attributes). However, 
+the new 
+c+
+functions astSetActiveUnit and astGetActiveUnit
+c-
+f+
+routines AST_SETACTIVEUNIT and AST_GETACTIVEUNIT
+f-
+allow this default behaviour to be changed. The SpecFrame class (also
+introduced in version 2.0) \emph{always} has an active Unit attribute
+(attempts to change this are ignored).
+
+For instance, consider the above example of two 1-dimensional Frames
+describing velocity. These Frames can be created as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstFrame *frame1, *frame2;
+frame1 = astFrame( 1, "Domain=VELOCITY,Unit=km/h" );
+frame2 = astFrame( 1, "Domain=VELOCITY,Unit=m/s" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER FRAME1, FRAME2
+
+      FRAME1 = AST_FRAME( 1, 'Domain=VELOCITY,Unit=km/h' )
+      FRAME2 = AST_FRAME( 1, 'Domain=VELOCITY,Unit=m/s' )
+
+\end{verbatim}
+\normalsize
+f-
+
+By default, these Frames have passive Unit attributes, and so an attempt
+to find a Mapping between them would ignore the difference in their Unit
+attributes and return a unit Mapping. To avoid this, we indicate that we
+want these Frames to have \emph{active} Unit attributes, as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astSetActiveUnit( frame1, 1 );
+astSetActiveUnit( frame2, 1 );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_SETACTIVEUNIT( FRAME1, .TRUE., STATUS )
+      CALL AST_SETACTIVEUNIT( FRAME2, .TRUE., STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+If we then find the Mapping between them as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstFrameSet *cvt;
+...
+cvt = astConvert( frame1, frame2, "" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER CVT
+      ...
+      CVT = AST_CONVERT( FRAME1, FRAME2, ' ', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+the Mapping contained within the FrameSet returned by
+c+
+astConvert
+c-
+f+
+AST\_CONVERT
+f-
+will be a one-dimensional ZoomMap which simply scales its input (a
+velocity in $km/h$) by a factor of 0.278 to create its output (a velocity
+in $m/s$).
+
+c+
+In fact we need not have set the Unit attribute active in ``frame1''
+since the behaviour of astConvert is determined by its ``to'' Frame
+(the second Frame parameter).
+c-
+f+
+In fact we need not have set the Unit attribute active in FRAME1
+since the behaviour of AST_CONVERT is determined by its TO Frame
+(the second Frame argument).
+f-
+
+\subsubsection{\label{ss:unitsyntax}The Syntax for Unit Strings}
+Conversion between units systems relies on the use of a specific syntax
+for the Unit attribute. If the value of the Unit attribute does not
+conform to this syntax, then an error will be reported if an attempt is
+made to use it to determine an inter-unit Mapping (this will never happen
+if the Unit attribute is \emph{passive}).
+
+The adopted syntax is that described in FITS-WCS paper I "Representation
+of World Coordinate in FITS" by Greisen \& Calabretta. We distinguish
+here between ``basic'' units and ``derived'' units: derived units are
+defined in terms of other units (either derived or basic), whereas basic
+units have no such definitions. Derived units may be represented by their
+own \emph{symbol} (\emph{e.g.} ``Jy''---the Jansky) or by a
+\emph{mathematical expression} which combines other symbols and constants
+to form a definition of the unit (\emph{e.g.} ``km/s''---kilometres per
+second). Unit symbols may be prefixed by a string representing a standard 
+multiple or sub-multiple.
+
+In addition to the unit symbols listed in FITS-WCS Paper I, any other
+arbitrary unit symbol may be used, with the proviso that it will not be
+possible to convert between Frames using such units. The exception to
+this is if both Frames refer to the same unknown unit string. For instance,
+an axis with unknown unit symbol "flop" \emph{could} be converted to an axis 
+with  unit "Mflop" (Mega-flop).
+
+Unit symbols (optionally prefixed with a multiple or sub-multiple) can be
+combined together using a limited range of mathematical operators and
+functions, to produce new units. Such expressions may also contain
+parentheses and numerical constants (these may optionally use
+``scientific'' notation including an ``E'' character to represent the
+power of 10).
+
+The following tables list the symbols for the basic and derived units which 
+may be included in a units string, the standard prefixes for multiples
+and sub-multiples, and the strings which may be used to represent
+mathematical operators and functions.
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{{\large Basic units}} \\ \hline
+\multicolumn{1}{|c|}{Quantity} & \multicolumn{1}{|c|}{Symbol} &
+\multicolumn{1}{c|}{Full Name} \\ \hline
+length              & m   & metre \\ 
+mass                & g   & gram \\
+time                & s   & second \\
+plane angle         & rad & radian \\
+solid angle         & sr  & steradian \\
+temperature         & K   & Kelvin \\
+electric current    & A   & Ampere \\
+amount of substance & mol & mole \\
+luminous intensity  & cd  & candela \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\multicolumn{4}{|c|}{{\large Derived units}} \\ \hline
+\multicolumn{1}{|c|}{Quantity} & \multicolumn{1}{|c|}{Symbol} &
+\multicolumn{1}{c|}{Full Name} & \multicolumn{1}{c|}{Definition} \\ \hline
+area & barn & barn & 1.0E-28 m**2 \\
+area & pix & pixel & \\
+area & pixel & pixel & \\
+electric capacitance & F & Farad & C/V \\
+electric charge & C & Coulomb & A s \\
+electric conductance & S & Siemens & A/V \\
+electric potential & V & Volt & J/C \\
+electric resistance & Ohm & Ohm & V/A \\
+energy & J & Joule & N m \\
+energy & Ry & Rydberg & 13.605692 eV \\
+energy & eV & electron-Volt & 1.60217733E-19 J \\
+energy & erg & erg & 1.0E-7 J \\
+events & count & count & \\
+events & ct & count & \\
+events & ph & photon & \\
+events & photon & photon & \\
+flux density & Jy & Jansky & 1.0E-26 W /m**2 /Hz \\
+flux density & R & Rayleigh & 1.0E10/(4*PI) photon.m**-2 /s/sr \\
+flux density & mag & magnitude & \\
+force & N & Newton & kg m/s**2 \\
+frequency & Hz & Hertz & 1/s \\
+illuminance & lx & lux & lm/m**2 \\
+inductance & H & Henry & Wb/A \\
+length & AU & astronomical unit & 1.49598E11 m \\
+length & Angstrom & Angstrom & 1.0E-10 m \\
+length & lyr & light year & 9.460730E15 m \\
+length & pc & parsec & 3.0867E16 m \\
+length & solRad & solar radius & 6.9599E8 m \\
+luminosity & solLum & solar luminosity & 3.8268E26 W \\
+luminous flux & lm & lumen & cd sr \\
+magnetic field & G & Gauss & 1.0E-4 T \\
+magnetic flux & Wb & Weber & V s \\
+mass & solMass & solar mass & 1.9891E30 kg \\
+mass & u & unified atomic mass unit & 1.6605387E-27 kg \\
+magnetic flux density & T & Tesla & Wb/m**2 \\
+plane angle  & arcmin & arc-minute & 1/60 deg \\
+plane angle  & arcsec & arc-second & 1/3600 deg \\
+plane angle  & mas & milli-arcsecond & 1/3600000 deg \\
+plane angle & deg & degree & pi/180 rad \\
+power & W & Watt & J/s \\
+pressure, stress & Pa & Pascal & N/m**2 \\
+time  & a & year & 31557600 s \\
+time  & d & day & 86400 s \\
+time  & h & hour & 3600 s \\
+time  & yr & year & 31557600 s \\
+time  & min & minute & 60 s \\
+      & D & Debye & 1.0E-29/3 C.m \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|lll|lll|}
+\hline
+\multicolumn{6}{|c|}{{\large Prefixes for multiples \& 
+sub-multiples}} \\ \hline
+\multicolumn{1}{|c}{Sub-multiple} & \multicolumn{1}{c}{Name} & 
+\multicolumn{1}{c|}{Prefix} &
+\multicolumn{1}{|c}{Sub-multiple} & \multicolumn{1}{c}{Name} & 
+\multicolumn{1}{c|}{Prefix} \\ \hline
+$10^{-1}$ & deci & d & $10$ & deca & da \\
+$10^{-2}$ & centi & c & $10^{2}$ & hecto & h \\
+$10^{-3}$ & milli & m & $10^{3}$ & kilo & k \\
+$10^{-6}$ & micro & u & $10^{6}$ & mega & M \\
+$10^{-9}$ & nano & n & $10^{9}$ & giga & G \\
+$10^{-12}$ & pico & p & $10^{12}$ & tera & T \\
+$10^{-15}$ & femto & f & $10^{15}$ & peta & P \\
+$10^{-18}$ & atto & a & $10^{18}$ & exa & E \\
+$10^{-21}$ & zepto & z & $10^{21}$ & zetta & Z \\
+$10^{-24}$ & yocto & y & $10^{24}$ & yotta & Y \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{2}{|c|}{{\large Mathematical operators \& functions}} \\
+\hline
+\multicolumn{1}{|c|}{String} & \multicolumn{1}{|c|}{Meaning} \\ \hline
+sym1 sym2           & multiplication (a space) \\ 
+sym1*sym2           & multiplication (an asterisk) \\
+sym1.sym2           & multiplication (a dot) \\
+sym1/sym2           & division \\
+sym1**y             & exponentiation ($y$ must be a numerical constant)\\
+sym1\verb+^+y       & exponentiation ($y$ must be a numerical constant)\\
+log(sym1)           & common logarithm \\
+ln(sym1)            & natural logarithm \\
+exp(sym1)           & exponential \\
+sqrt(sym1)          & square root \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{\label{ss:unitsyntax}Side-effects of Changing the Unit attribute}
+If an Axis has an active Unit attribute, changing its value (either by 
+setting a new value or by clearing it so that the default value is 
+re-instated) may cause the Label and Symbol attributes to be changed
+accordingly. For instance, if an Axis has Unit, Label and Symbol of ``Hz'',
+``Frequency'' and ``nu'', then changing its Unit attribute to ``log(Hz)''
+will cause AST to change its Label and Symbol to ``log(Frequency)'' and 
+``Log(nu)''. These changes are only made if the Unit attribute is active,
+and a Mapping can be found from the old units to the new units. On the other
+ hand, changing the Unit from ``Hz'' to ``MHz'' would not cause any change 
+to the Label or Symbol attributes.
 
 \cleardoublepage
 \section{\label{ss:skyframes}Celestial Coordinate Systems (SkyFrames)}
@@ -7617,7 +7951,7 @@ When it is first created, a SkyFrame's axes are always in the order
 astPermAxes function (\secref{ss:permutingaxes}). The order of the axes
 can be determined at any time using the LatAxis and LonAxis attributes. A
 SkyFrame's coordinate values are always stored as angles in (double
-precision) radians.
+precision) radians, regardless of the setting of the Unit attribute.
 c-
 f+
 When it is first created, a SkyFrame's axes are always in the order
@@ -7625,7 +7959,7 @@ When it is first created, a SkyFrame's axes are always in the order
 AST\_PERMAXES routine (\secref{ss:permutingaxes}). The order of the axes
 can be determined at any time using the LatAxis and LonAxis attributes. A
 SkyFrame's coordinate values are always stored as angles in (double
-precision) radians.
+precision) radians, regardless of the setting of the Unit attribute.
 f-
 
 \subsection{Creating a SkyFrame}
@@ -7732,19 +8066,11 @@ The main SkyFrame attributes which qualify the System attribute are:
 
 \begin{quote}
 \begin{description}
-\item[Epoch]\mbox{}\\
-This value is used to qualify celestial coordinate systems by giving
-the moment in time when the coordinates are correct for the
-astronomical source under study. Usually, this will be the date of
-observation.
 
-The Epoch value is important in cases where the coordinates of a
-source may change, or appear to change, with time due ({\em{e.g.}}) to
-changing light deflection because of changes in the observer's
-velocity, fictitious motion due to rotation of non-inertial coordinate
-systems ({\em{e.g.}}\ the FK4 system), or proper motion of the source
-itself (although this last effect is not supported by the SkyFrame
-class).
+\item[\label{ss:epochitem}Epoch]\mbox{}\\
+This attribute is inherited from the Frame class. It gives the moment in
+time when the coordinates are correct for the astronomical source
+under study (usually the date of observation). 
 
 \item[\label{ss:equinoxitem}Equinox]\mbox{}\\
 This value is used to qualify celestial coordinate systems that are
@@ -7754,7 +8080,7 @@ planes is difficult to specify precisely, so in practice a model
 {\em{mean}}\ equator and/or ecliptic are used instead. These, together
 with the point on the sky that defines the coordinate origin (termed
 the {\em{mean equinox}}) move with time according to some model which
-smooths out the more rapid fluctuations. The SkyFrame class supports
+smoothes out the more rapid fluctuations. The SkyFrame class supports
 both the old FK4 model and the newer FK5 one.
 
 Coordinates expressed in any of these systems vary with time due to
@@ -7848,26 +8174,28 @@ The output from this might look like the following:
 
 \begin{quote}
 \begin{verbatim}
- Begin SkyFrame 	# Description of celestial coordinate system
-#   Title = "FK4 Equatorial Coordinates, no E-terms, Mean Equinox B1950.0,
-Epoch B1958.0" 	# Title of coordinate system
-    Naxes = 2 	# Number of coordinate axes
-#   Domain = "SKY" 	# Coordinate system domain
-#   Lbl1 = "Right Ascension" 	# Label for axis 1
-#   Lbl2 = "Declination" 	# Label for axis 2
-#   Uni1 = "hh:mm:ss.s" 	# Units for axis 1
-#   Uni2 = "ddd:mm:ss" 	# Units for axis 2
-#   Dir1 = 0 	# Plot axis 1 in reverse direction
-    Ax1 = 	# Axis number 1
-       Begin SkyAxis 	# Celestial coordinate axis
+ Begin SkyFrame         # Description of celestial coordinate system
+#   Title = "FK4 equatorial coordinates; no E-terms; mean equinox B1950.0; 
+epoch B1958.0"   # Title of coordinate system
+    Naxes = 2   # Number of coordinate axes
+#   Domain = "SKY"      # Coordinate system domain
+    Epoch = 1958        # Besselian epoch of observation
+#   Lbl1 = "Right ascension"    # Label for axis 1
+#   Lbl2 = "Declination"        # Label for axis 2
+    System = "FK4-NO-E"         # Coordinate system type
+#   Uni1 = "hh:mm:ss.s"         # Units for axis 1
+#   Uni2 = "ddd:mm:ss"  # Units for axis 2
+#   Dir1 = 0    # Plot axis 1 in reverse direction
+#   Bot2 = -1.5707963267949     # Lowest legal axis value
+#   Top2 = 1.5707963267949      # Highest legal axis value
+    Ax1 =       # Axis number 1
+       Begin SkyAxis    # Celestial coordinate axis
        End SkyAxis
-    Ax2 = 	# Axis number 2
-       Begin SkyAxis 	# Celestial coordinate axis
+    Ax2 =       # Axis number 2
+       Begin SkyAxis    # Celestial coordinate axis
        End SkyAxis
- IsA Frame 	# Coordinate system description
-    System = "FK4-NO-E" 	# Celestial coordinate system type
-    Epoch = 1958 	# Besselian epoch of observation
-#   Eqnox = 1950 	# Besselian epoch of mean equinox
+ IsA Frame      # Coordinate system description
+#   Eqnox = 1950        # Besselian epoch of mean equinox
  End SkyFrame
 \end{verbatim}
 \end{quote}
@@ -8247,6 +8575,382 @@ Format(axis) value has been set to override the default.
 %\cleardoublepage
 %\section{\label{ss:specframes}TBW - Spectral Coordinate Systems (SpecFrames)}
 
+The SpecFrame is a Frame which is specialised for representing coordinate 
+systems which describe a position within an electro-magnetic spectrum.
+In this section we examine the additional properties and behaviour of a 
+SpecFrame that distinguish it from a basic Frame (\secref{ss:frames}).
+
+\subsection{The SpecFrame Model}
+
+As for a SkyFrame, a SpecFrame is a Frame (\secref{ss:frames}) and also a
+Mapping (\secref{ss:mappings}), so it inherits all the properties and
+behaviour of these two ancestral classes.  When used as a Mapping, a
+SpecFrame implements a unit transformation, exactly like a basic Frame
+(\secref{ss:frameasmapping}) or a UnitMap, so this aspect of its
+behaviour is not of great importance.
+
+When used as a Frame, however, a SpecFrame represents a wide range of
+different 1-dimensional coordinate system which can be used to describe
+positions within a spectrum. The options available largely mirror those
+described in the FITS-WCS paper III \emph{Representations of spectral
+coordinates in FITS} (Greisen, Valdes, Calabretta \& Allen).
+
+\subsection{Creating a SpecFrame}
+
+The SpecFrame constructor function is particularly simple and a
+SpecFrame with default attributes is created as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include "ast.h"
+AstSpecFrame *specframe;
+
+...
+
+specframe = astSpecFrame( "" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INCLUDE 'AST_PAR'
+      INTEGER SPECFRAME, STATUS
+
+      STATUS = 0
+
+      ...
+
+      SPECFRAME = AST_SPECFRAME( ' ', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+Such a SpecFrame would represent the default coordinate system which is 
+heliocentric wavelength in metres (i.e. wavelength corrected to take into 
+account the Doppler shift caused by the velocity of the observer around the 
+sun).
+
+\subsection{Specifying a Particular Spectral Coordinate System}
+
+Selection of a particular coordinate system is performed simply by
+setting a value for the SpecFrame's (character string) System
+attribute. This setting is most conveniently done when the SpecFrame is
+created. For example, a SpecFrame representing Energy would be created by:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+skyframe = astSpecFrame( "System=Energy" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      SPECFRAME = AST_SPECFRAME( 'System=Energy', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+Note that specifying ``System$=$Energy'' also changes the associated
+Unit (from metres to Joules). This is because the default value
+of the SpecFrame's Unit attribute depends on the System attribute setting.
+
+You may change the System value at any time, although this is not
+usually needed.  The values supported are set out in the attribute's
+description in \appref{ss:attributedescriptions} and include a variety
+of velocity systems, together with frequency, wavelength, energy,
+wave-number, \emph{etc}.
+
+\subsection{Attributes which Qualify Spectral Coordinate Systems}
+
+Many spectral coordinate systems have some additional free parameters
+which serve to identify a particular coordinate system from amongst a
+broader class of related coordinate systems. For example, the
+velocity systems are all parameterised by a rest frequency---the
+frequency which defines zero velocity, and all coordinate systems 
+are qualified by a `standard of rest'' which indicates the rest frame to
+which the values refer.
+
+In AST, these free parameters are represented by additional SpecFrame
+attributes, each of which has a default appropriate to
+({\em{i.e.}}\ defined by) the setting of the main System
+attribute. Each of these {\em{qualifying attributes}} may, however, be
+assigned an explicit value so as to select a particular coordinate
+system.
+
+The main SpecFrame attributes which qualify the System attribute are:
+
+\begin{quote}
+\begin{description}
+
+\item[Epoch]\mbox{}\\
+This attribute is inherited from the Frame class. It gives the moment in
+time when the coordinates are correct for the astronomical source
+under study (usually the date of observation). It is needed in order to 
+calculate the Doppler shift produced by the velocity of the observer
+relative to the centre of the earth, and of the earth relative to the sun.
+
+\item[StdOfRest]\mbox{}\\
+This specifies the rest frame in which the coordinates are correct.
+Transforming between different standards of rest involves taking account
+of the Doppler shift introduced by the relative motion of the two
+standards of rest. 
+
+\item[RestFreq]\mbox{}\\
+Specifies the frequency which correspond to zero velocity. When setting a
+value for this attribute, the value may be supplied as a wavelength
+(including an indication of the units being used, ``nm'' ``Angstrom'',
+\emph{etc.}), which will be automatically be converted to a frequency.
+
+\item[RefRA]\mbox{}\\
+Specifies the RA (FK5 J2000) of the source. This is used when converting
+between standards of rest. It specifies the direction along which the
+component of the relative velocity of the two standards of rest is taken.
+
+\item[RefDec]\mbox{}\\
+Specifies the Dec (FK5 J2000) of the source. Used in conjunction with
+REFRA.
+
+\item[GeoLon]\mbox{}\\
+Specifies the longitude of the observer (assumed to be on the surface of
+the earth). This allows the relative velocity of the observer and the
+centre of the earth to be calculated for use in converting between
+standards of rest.
+
+\item[GeoLat]\mbox{}\\
+Specifies the latitude of the observer. Use in conjunction with GeoLon.
+
+\item[SourceVel]\mbox{}\\
+This defines the ``source'' standard of rest. This is a rest frame which
+is moving towards the position given by RefRA and RefDec, at a velocity
+given by SourceVel. The velocity is stored internally as a heliocentric
+velocity, but can be given in any of the other supported standards of rest.
+
+\end{description}
+\end{quote}
+
+For further details of these attributes you should consult their
+descriptions in \appref{ss:attributedescriptions} and for details of
+the System settings for which they are relevant, see the description
+of the System attribute (also in \appref{ss:attributedescriptions}).
+
+Note that it does no harm to assign values to qualifying attributes
+which are not relevant to the main System value. Any such values are
+stored, but are not used unless the System value is later set so that
+they become relevant.
+
+\subsection{Using Default SpecFrame Attributes}
+
+c+
+The default values supplied for many SpecFrame attributes will depend
+on the value of the SpecFrame's System attribute. In practice, this
+means that there is usually little need to specify many of these
+attributes explicitly unless you have some special requirement. This
+can be illustrated by using astShow to examine a SpecFrame, as follows:
+c-
+f+
+The default values supplied for many SpecFrame attributes will depend
+on the value of the SpecFrame's System attribute. In practice, this
+means that there is usually little need to specify many of these
+attributes explicitly unless you have some special requirement. This
+can be illustrated by using AST\_SHOW to examine a SpecFrame, as
+follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astShow( astSpecFrame( "System=Vopt, RestFreq=250 GHz" ) );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_SHOW( AST_SPECFRAME( 'System=Vopt, RestFreq=250 GHz', STATUS ), 
+     :               STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+The output from this might look like the following:
+
+\begin{quote}
+\begin{verbatim}
+ Begin SpecFrame        # Description of spectral coordinate system
+#   Title = "Optical velocity, rest frequency = 250 GHz"       # Title
+of coordinate system
+    Naxes = 1   # Number of coordinate axes
+#   Domain = "SPECTRAL"         # Coordinate system domain
+#   Epoch = 2000        # Julian epoch of observation
+#   Lbl1 = "Optical velocity"  # Label for axis 1
+    System = "VOPT"     # Coordinate system type
+#   Uni1 = "m/s"        # Units for axis 1
+    Ax1 =       # Axis number 1
+       Begin Axis       # Coordinate axis
+       End Axis
+ IsA Frame      # Coordinate system description
+#   SoR = "Heliocentric"        # Standard of rest
+    RstFrq = 250000000000       # Rest frequency (Hz)
+ End SpecFrame
+\end{verbatim}
+\end{quote}
+
+Note that the defaults (indicated by the ``\verb?#?'' comment
+character at the start of the line) for attributes such as the Title,
+axis Labels and Unit specifiers are all set to values appropriate
+for the particular velocity system that the SpecFrame represents.
+
+These choices would be appropriate for a System value of ``Vopt'',
+but if a different System value were set, the defaults would be
+correspondingly different. For example, frequency is measured in 
+units of Hertz, not $m/s$, so setting ``System=freq''
+would change the appropriate line above from:
+
+\begin{quote}
+\begin{verbatim}
+#   Uni1 = "m/s"        # Units for axis 1
+\end{verbatim}
+\end{quote}
+
+to
+
+\begin{quote}
+\begin{verbatim}
+#   Uni1 = "Hz"         # Units for axis 1
+\end{verbatim}
+\end{quote}
+
+Of course, if you do not like any of these defaults, you may always
+over-ride them by setting explicit attribute values yourself. For
+instance, you may choose to have your frequency axis expressed in ``GHz''
+rather than ``Hz''. To do this simply set the attribute value as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astSetC( specframe, "Unit", "GHz" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_SETC( SPECFRAME, 'Unit', 'GHz', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+No error will be reported if you accidentally set an inappropriate Unit value 
+(say "J" - Joules)---after all, AST cannot tell what you are about to do,
+and you \emph{may} be about to change the System value to ``Energy''.
+However, an error \emph{will} be reported if you attempt to find a
+conversion between two SpecFrames (for instance using 
+c+
+astConvert
+c-
+f+
+AST\_CONVERT
+f-
+) if either SpecFrame has a Unit value which is inappropriate for its
+System value.
+
+Some SpecFrame attributes (RefRA, RefDec and RestFreq) have no default
+value. If no value is set for one of these attributes, an error will be
+reported when a calculation is performed which needs a value for the
+attribute. For RefRA and RefDec, this will be when converting between
+different standards of rest, and for RestFreq it will be when converting
+between different systems.
+
+\subsection{\label{ss:creatingspectralcubes}Creating Spectral Cubes}
+You can use a SpecFrame to describe the spectral axis in a data cube
+containing two spatial axes and a spectral axis. To do this you would
+create an appropriate SpecFrame, together with a 2-dimensional Frame 
+(often a SkyFrame) to describe the spatial axes. You would then combine
+these two Frames together into a single CmpFrame.
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstSkyFrame *skyframe;
+AstSpecFrame *specframe;
+AstCmpFrame *cmpframe;
+...
+skyframe = astSkyFrame( "Epoch=J2002" );
+specframe = astSpecFrame( "System=Freq,Unit=GHz,StdOfRest=LSRK" );
+cmpframe = astCmpFrame( skyframe, specframe, "" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER SKYFRAME
+      INTEGER SPECFRAME
+      INTEGER CMPFRAME
+      ...
+      SKYFRAME = AST_SKYFRAME( 'Epoch=J2002', STATUS )
+      SPECFRAME = AST_SPECFRAME( 'System=Freq,Unit=GHz,StdOfRest=LSRK',
+     :                           STATUS )
+      CMPFRAME = AST_CMPFRAME( SKYFRAME, SPECFRAME, ' ', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+In the resulting CmpFrame, axis 1 will be RA, axis 2 will be Dec and axis
+3 will be Frequency. If this is not the order you want, you can permute
+the axes using 
+c+
+astPermAxes.
+c-
+f+
+AST\_PERMAXES.
+f-
+
+There is one potential problem with approach if you are interested in
+unusually high accuracy. Conversion between different standards of rest
+involves taking account of the Doppler shift caused by the relative
+motion of the two standards of rest. At some point this involves finding
+the component of  the relative velocity in the direction of interest.
+For a SpecFrame, this direction is always given by the RefRA and RefDec
+attributes, even if the SpecFrame is embedded within a CmpFrame as above.
+It would be more appropriate if this ``direction of interest'' was
+specified by the values passed into the CmpFrame on the RA and DEC axes,
+allowing each pixel within a data cube to have a slightly different
+correction for Doppler shift.
+
+Unfortunately, the SpecFrame class cannot do this (since it is purely a
+1-dimensional Frame), and so some small degree of error will be
+introduced when converting between standards of rest, the size of the
+error varying from pixel to pixel. It is hoped that at some point in the
+future a sub-class of CmpFrame (a SpecCubeFrame) will be added to AST which 
+allows for this spatial variation in Doppler shift.
+
+The maximum velocity error introduced by this problem is of the order of
+$V*SIN(FOV)$, where $FOV$ is the angular field of view, and $V$ is the
+relative velocity of the two standards of rest. As an example, when
+correcting from the observers rest frame (i.e. the topocentric rest
+frame) to the kinematic local standard of rest the maximum value of $V$
+is about 20 $km/s$, so for 5 arc-minute field of view the maximum
+velocity error introduced by the correction will be about 0.03 $km/s$. As
+another example, the maximum error when correcting from the observers
+rest frame to the local group is about 5 $km/s$ over a 1 degree field of
+view.
+
+
 %\cleardoublepage
 %\section{\label{ss:cmpframes}TBW - Compound Frames (CmpFrames)}
 
@@ -8585,6 +9289,189 @@ would reflect the different precision you requested by displaying a
 greater or smaller number of digits.
 f-
 
+
+\subsection{\label{ss:convertingspecframes}Converting between Spectral Coordinate Systems}
+The principles described in the previous section for converting between
+celestial coordinate systems also apply to the task of converting between
+spectral coordinate systems. As an example, let's look at how we might
+convert between frequency measured in $GHz$ as measured in the rest frame
+of the telescope, and radio velocity measured in $km/s$ measured with
+respect the kinematic Local Standard of Rest.
+
+First we create a default SpecFrame, and then set its attributes to
+describe the required radio velocity system (this is slightly more
+convenient, given the relatively large number of attributes, than
+specifying the attribute values in a single string such as would be
+passed to the SpecFrame constructor). We then take a copy of this
+SpecFrame, and change the attribute values so that the copy describes the
+original frequency system (modifying a copy, rather than creating a new
+SpecFrame from scratch, avoids the need to specify the epoch, reference
+position, \emph{etc} a second time since they are all inherited by the copy):
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include "ast.h"
+AstSpecFrame *specframe1, *specframe2;
+
+...
+
+specframe1 = astSpecFrame( "" );
+astSet( specframe1, "System=vradio" );
+astSet( specframe1, "Unit=km/s" );
+astSet( specframe1, "Epoch=1996-Oct-2 12:13:56.985" );
+astSet( specframe1, "GeoLon=W155:28:18" );
+astSet( specframe1, "GeoLat=N19:49:34" );
+astSet( specframe1, "RefRA=18:14:50.6" );
+astSet( specframe1, "RefDec=-4:40:49" );
+astSet( specframe1, "RestFreq=230.538 GHz" );
+astSet( specframe1, "StdOfRest=LSRK" );
+
+specframe2 = astCopy( specframe1 );
+astSet( specframe1, "System=freq" );
+astSet( specframe1, "Unit=GHz" );
+astSet( specframe1, "StdOfRest=Topocentric" );
+
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INCLUDE 'AST_PAR'
+      INTEGER SPECFRAME1, SPECFRAME2, STATUS
+
+      STATUS = 0
+
+      ...
+
+      SPECFRAME1 = AST_SPECFRAME( ' ', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'System=vradio', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'Unit=km/s', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'Epoch=1996-Oct-2 12:13:56.985', 
+     :               STATUS )
+      CALL AST_SETC( SPECFRAME1, 'GeoLon=W155:28:18', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'GeoLat=N19:49:34', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'RefRA=18:14:50.6', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'RefDec=-4:40:49', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'RestFreq=230.538 GHz', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'StdOfRest=LSRK', STATUS )
+      
+      SPECFRAME2 = AST_COPY( SPECFRAME1, STATUS )
+      CALL AST_SETC( SPECFRAME1, 'System=freq', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'Unit=GHz', STATUS )
+      CALL AST_SETC( SPECFRAME1, 'StdOfRest=Topocentric', STATUS )
+
+\end{verbatim}
+\normalsize
+f-
+
+Note, the fact that a SpecFrame has only a single axis means that we were
+able to refer to the Unit attribute without an axis index. The other
+attributes are: the time of of observation (Epoch), the geographical
+position of the telescope (GeoLat \& GeoLon), the position of the source
+on the sky (RefRA \& RefDec), the rest frequency (RestFreq) and the
+standard of rest (StdOfRest).
+
+The next step is to find a way of converting between these SpecFrames. We
+use exactly the same code that we did in the previous section where we were
+converting between celestial coordinate systems:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstFrameSet *cvt;
+
+...
+
+cvt = astConvert( specframe1, specframe2, "" );
+if ( cvt == AST__NULL ) {
+   <conversion is not possible>
+} else {
+   <conversion is possible>
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER CVT
+
+      ...
+
+      CVT = AST_CONVERT( SPECFRAME1, SPECFRAME2, ' ', STATUS )
+      IF ( CVT .EQ. AST__NULL ) THEN
+         <conversion is not possible>
+      ELSE
+         <conversion is possible>
+      END IF
+\end{verbatim}
+\normalsize
+f-
+
+A before, this will give us a FrameSet (assuming conversion is possible,
+which should always be the case for our example), and we can use the
+FrameSet to convert between the two spectral coordinate systems. We use 
+c+
+astTran1 in place of astTran2
+c-
+f+
+AST_TRAN1 in place of AST_TRAN2
+f-
+since a SpecFrame has only one axis (unlike a SkyFrame which has two).
+
+c+
+For example, if ``frq'' is an array containing the observed frequency, in
+GHz, of N spectral channels (describe by ``specframe1''), then they
+could be converted into the new coordinate system (represented by
+``specframe2'') as follows:
+c-
+f+
+For example, if FRQ is an array containing the observed frequency, in
+GHz, of N spectral channels (describe by SPECFRAME1), then they
+could be converted into the new coordinate system (represented by
+SPECFRAME2) as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#define N 10
+double frq[ N ];
+double vel[ N ];
+
+...
+
+astTran1( cvt, N, frq, 1, vel );
+\end{verbatim}
+\normalsize
+\end{quote}
+
+The radio velocity values are returned in the ``vel'' array.
+
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER N
+      DOUBLE PRECISION FRQ( N )
+      DOUBLE PRECISION VEL( N )
+
+      ...
+
+      CALL AST_TRAN1( CVT, N, FRQ, .TRUE., VEL, STATUS )
+\end{verbatim}
+\normalsize
+
+The radio velocity values are returned in the VEL array.
+f-
+
 \subsection{\label{ss:convertingpermutedaxes}Handling SkyFrame Axis Permutations}
 
 c+
@@ -8830,6 +9717,61 @@ represent the same coordinate system.
 %
 %Of course, there may also be intermediate cases, where some axes are
 %distinguishable and others aren't.
+
+\subsection{\label{ss:alignmentsystem}The Choice of Alignment System}
+
+In practice, when AST is asked to find a conversion between two Frames
+describing two different coordinate systems on a given physical domain,
+it uses an intermediate ``alignment'' system. Thus, when finding a
+conversion from system A to system B, AST first finds the Mapping from
+system A to some alignment system, system C, and then finds the Mapping
+from this system C to the required system B. It finally concatenates
+these two Mappings to get the Mapping from system A to system B.
+
+One advantage of this is that it cuts down the number of conversion
+algorithms required. If there are $N$ different Systems which may be used
+to describe positions within the Domain, then this approach requires
+about $2*N$ conversion algorithms to be written. The alternative approach
+of going directly from system A to system B would require about $N*N$
+conversion algorithms.
+
+In addition, the use of an intermediate alignment system highlights the
+nature of the conversion process. What do we mean by saying that a
+Mapping ``converts a position in one coordinate system into the
+corresponding position in another''? In practice, it means that the input
+and output coordinates correspond to the same coordinates \emph{in some
+third coordinate system}. The choice of this third coordinate system, the
+``alignment'' system, can completely alter the nature of the Mapping. The
+Frame class has an attribute called AlignSystem which can be used to
+specify the alignment system.
+
+As an example, consider the case of aligning two spectra calibrated in
+radio velocity, but each with a different rest frequency (each spectrum
+will be described by a SpecFrame). Since the rest frequencies differ, a
+given velocity will correspond to different frequencies in the two
+spectra. So when we come to ``align'' these two spectra (that is, find a
+Mapping which converts positions in one SpecFrame to the corresponding
+positions in the other), we have the choice of aligning the frequencies
+or aligning the velocities. Different Mappings will be required to
+describe these two forms of alignment. If we set AlignSystem to ``Freq''
+then the returned Mapping will align the frequencies described by the two
+SpecFrames. On the other hand, if we set AlignSystem to ``Vradio''
+then the returned Mapping will align the velocities.
+
+Some choices of alignment system are redundant. For instance, in the
+above example, changing the alignment system from frequency to wavelength
+has no effect on the returned Mapping: if two spectra are aligned in
+frequency they will also be aligned in wavelength (assuming the speed of
+light doesn't change).
+
+The default value for AlignSystem depends on the class of Frame. For a
+SpecFrame, the default is wavelength (or equivalently, frequency)
+since this is the system in which observations are usually made. The
+SpecFrame class also has an attribute called AlignStdOfRest which
+allows the standard of rest of the alignment system to be specified.
+Currently, the SkyFrame uses FK5 as the default for AlignSystem, since
+this is a close approximation to an inertial frame of rest (future
+versions of AST will use ICRS as the default).
 
 \cleardoublepage
 \section{\label{ss:framesets}Coordinate System Networks (FrameSets)}
@@ -10507,7 +11449,7 @@ coordinate system.  If you use such a FrameSet to perform coordinate
 conversions, you are likely to get unpredictable results because the
 information in the FrameSet is corrupt.
 
-It is, of course, your responsibilty as a programmer to ensure the
+It is, of course, your responsibility as a programmer to ensure the
 validity of any information which you insert into a
 FrameSet. Normally, this is straightforward and simply consists of
 formulating your problem correctly (a diagram can often help to
@@ -13272,22 +14214,15 @@ proposed new FITS standard which should, for the first time, address
 the problem of celestial coordinate systems in a proper manner, by
 considerably extending the original FITS standard.
 
-The convention used is described in the draft paper ``Representation
+The convention used is described in the paper ``Representation
 of celestial coordinates in FITS'' \htmladdnormallinkfoot{(the
 FITS-WCS paper)}{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
-by E.W.\,Greisen and M.\,Calabretta (Astronomy \& Astrophysics, in
-preparation). Once a new FITS standard has been agreed, this encoding
+by E.W.\,Greisen and M.\,Calabretta (Astronomy \& Astrophysics). Now that
+this FITS standard has been agreed, this encoding
 should be understood by any FITS-WCS compliant software and it is
-likely to be adopted widely for FITS data in future.  However, this
-proposed standard is still evolving, and while this continues we
-intend that the AST implementation should track it.
-
-\footnote{After a long and chequered history, the FITS-WCS proposal 
-finally seems to be stabilizing. The version currently implemented within
-AST -- based on the use of {\tt CDi\_j} keywords to describe axis scaling
-and rotation -- seems likely to be adopted as the official standard
-sometime during the year 2001, although obviously the possibility of
-change before then cannot be ruled out.}
+likely to be adopted widely for FITS data in future.  Currently, AST does
+not supports the FITS conventions described in papers III (spectral coordinate
+systems) and IV (distrortions) which are still in draft form.
 
 \item[FITS-IRAF]\mbox{}\\
 This encoding is based on the conventions described in the document
@@ -13322,7 +14257,7 @@ describe axis rotation and scaling.
 \end{quote}
 
 For more detail about the above encodings, see the description of the
-Encoding attribute in \appref{ss:attributedescriptions}.
+Encoding attribute in \appref{ss:attributedescriptions}. 
 
 \subsection{\label{ss:foreignfitslimitations}Limitations of Foreign Encodings}
 
@@ -13705,6 +14640,10 @@ written out as FITS headers to describe the modified image
 If the FrameSet contains other Frames (apart from the base and current
 Frames), then you would also have access to information about other
 coordinate systems associated with the image.
+
+Note, currently the FitsChan class does not recognise spectral axes. They
+are treated as an ``unknown'' axis type, and are represented by simple
+1-dimensional Frames (not SpecFrames).
 
 \subsection{\label{ss:destructiveread}Removing WCS Information from FITS Headers---the Destructive Read}
 
@@ -17848,11 +18787,57 @@ f-
 \subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
 Introduced in V2.0}
 
+Note, Frame descriptions created using AST V2.0 will not be readable by 
+applications linked with earlier versions of AST. This applies to Frame
+descriptions created using:
+\begin{itemize}
+\item the Channel class
+\item the FitsChan class if the NATIVE Encoding is used
+c+
+\item the astShow function
+c-
+f+
+\item the AST\_SHOW routine.
+f-
+\end{itemize}
+
+Applications must be re-linked with AST V2.0 in order to be able to read
+Frame descriptions created by AST v2.0.
+
 The following describes the most significant changes which have
 occurred in the AST library between versions V1.8-13 and V2.0 (the
 current version):
 
 \begin{enumerate}
+
+\item The implementation of the 
+c+
+astWrite function
+c-
+f+ 
+AST\_WRITE routine
+f-
+within the FitsChan class has been modified. It will now attempt to
+produce a set of FITS header cards to describe a FrameSet even if the
+number of axes in the Current Frames is greater than the number in the
+Base Frame (that is, if there are more WCS axes than pixel axes). This
+has always been possible with NATIVE encoding, but has not previously
+been posible for foreign encodings. The WCSAXES keyword is used to store
+the number of WCS axes in the FITS header.
+
+\item Another change to the 
+c+
+astWrite function
+c-
+f+ 
+AST\_WRITE routine
+f-
+within the FitsChan class is that the ordering of ``foreign'' axes
+(\emph{i.e.} CTYPE keywords) is now chosen to make the CD (or PC) matrix
+as diagonal as possible - any element of axis transposition is removed by
+this re-ordering as recommended in FITS-WCS paper I. Previously the
+ordering was determined by the order of the axes in the Current Frame of
+the supplied FrameSet. This change does not affect NATIVE encoding.
 
 \item Support for spectral coordinate systems has been introduced
 throught the addition of two new classes, SpecFrame and SpecMap.
@@ -17861,7 +18846,9 @@ positions within an electromagnetic spectrum in various systems
 (wavelength, frequency, various forms of velocity,~{\em{etc.}}) and referred
 to various standards of rest (topocentric, geocentric, heliocentric
 LSRK,~{\em{etc.}}). The SpecMap is a Mapping which can transform spectral
-axis values between these various systems and standards of rest.
+axis values between these various systems and standards of rest. Note,
+FitsChans which have a foreign encoding (\emph{i.e.} any encoding other
+than NATIVE) are not yet able to read or write these new classes.
 
 \item Facilities have been added to the Frame class which allow
 differences in axis units to be taken into account when finding a Mapping

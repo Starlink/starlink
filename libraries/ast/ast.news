@@ -16,10 +16,27 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+o  The implementation of the astWrite (AST_WRITE) function within the
+FitsChan class has been modified. It will now attempt to produce a set of
+FITS header cards to describe a FrameSet even if the number of axes in
+the Current Frames is greater than the number in the Base Frame (that is,
+if there are more WCS axes than pixel axes). This has always been
+possible with NATIVE encoding, but has not previously been possible for
+foreign encodings. The WCSAXES keyword is used to store the number of WCS
+axes in the FITS header.
+
+o Another change to the astWrite (AST_WRITE) function within the FitsChan
+class is that the ordering of "foreign" axes (i.e. CTYPE keywords) is now
+chosen to make the CD (or PC) matrix as diagonal as possible - any
+element of axis transposition is removed by this re-ordering as
+recommended in FITS-WCS paper I. Previously the ordering was determined
+by the order of the axes in the Current Frame of the supplied FrameSet.
+This change does not affect NATIVE encoding.
+
 o  Support for spectral coordinate systems has been introduced through
 the addition of two new classes, SpecFrame and SpecMap. The SpecFrame is
 a 1-dimensional Frame which can be used to describe positions within an
-electromagnetic spectrum in various systems (wavelength, frequency,
+electro-magnetic spectrum in various systems (wavelength, frequency,
 various forms of velocity, etc.) and referred to various standards of
 rest (topocentric, geocentric, heliocentric LSRK, etc.). The SpecMap is a
 Mapping which can transform spectral axis values between these various
@@ -29,14 +46,14 @@ o  Facilities have been added to the Frame class which allow differences
 in axis units to be taken into account when finding a Mapping between two
 Frames. In previous versions of AST, the Unit attribute was a purely
 descriptive item intended only for human readers - changing the value of
-Unit made no difference to the behavour of the Frame. As of version 2.0,
+Unit made no difference to the behaviour of the Frame. As of version 2.0,
 the Unit attribute can influence the nature of the Mappings between
 Frames. For instance, if the AST_FINDRAME or AST_CONVERT routine is used
 to find the Mapping between an Axis with Unit set to "m" and another Axis
 with Unit set to "km", then the method will return a ZoomMap which
 introduces a scaling factor of 0.001 between the two axes. 
 
-o Bugs have been fixed in the Plot class which could cause problems with
+o Bugs have been fixed in the Plot class which caused problems with
 the placement and abbreviation of axis labels.
 
 
