@@ -1,3 +1,13 @@
+2003-09-07  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* DviFile.cc, DviFile.h: added DviUnits enum,
+	convertFromScaledpoints function, and expanded documentation
+
+	* dvireport.cc, dvireport.1: added dvireport program, using above
+	functionality, and acting as a simple example of the use of the
+	library (used it to debug slight positioning problems with the
+	textpos LaTeX package, so it's handy, too).
+
 2003-09-01  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* dvi2bitmap.cc, dvi2bitmap.1: modify --output so that it sets the

@@ -42,14 +42,14 @@ EXTRA_libdvi2bitmap_la_SOURCES = \
 EXTRALO=@EXTRALO@
 libdvi2bitmap_la_LIBADD = $(EXTRALO) $(LTLIBOBJS)
 libdvi2bitmap_la_DEPENDENCIES = $(EXTRALO) $(LTLIBOBJS)
-# libdvi2bitmap_la_LIBADD = $(LTLIBOBJS)
-# libdvi2bitmap_a_LIBADD = $(LIBOBJS)
 
-bin_PROGRAMS = dvi2bitmap
+bin_PROGRAMS = dvi2bitmap dvireport
 dvi2bitmap_SOURCES = dvi2bitmap.cc
 dvi2bitmap_LDADD = libdvi2bitmap.la
+dvireport_SOURCES = dvireport.cc
+dvireport_LDADD = libdvi2bitmap.la
 
-man1_MANS = dvi2bitmap.1
+man1_MANS = dvi2bitmap.1 dvireport.1
 
 
 
