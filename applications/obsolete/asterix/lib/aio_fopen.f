@@ -57,13 +57,15 @@
 *    Local variables :
 *
       CHARACTER*6		LACCESS			! Local copy of ACCESS
+      CHARACTER*200		LFILE			! Local copy of FILENAME
+
       INTEGER			WIDTH			! Stream width
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Check access
+*  Check access
       LACCESS = ACCESS
       CALL CHR_UCASE( LACCESS )
       IF ( .NOT. CHR_INSET( 'NREAD,READ,WRITE,UPDATE', LACCESS ) ) THEN
@@ -71,7 +73,7 @@
         CALL MSG_SETC( 'ACC', ACCESS )
         CALL ERR_REP( ' ', 'Invalid file access mode', STATUS )
 
-*    Open the file
+*  Open the file
       ELSE
 
 *      READ or NREAD access
@@ -84,10 +86,10 @@
 
           ELSE
 
-*          Open the file
+*        Open the file
             CALL AIO_FOPEN1( FILENAME, 'READ', 'LIST', 0, ID, STATUS )
 
-*          Initialise channel
+*        Initialise channel
             IF ( STATUS .EQ. SAI__OK ) THEN
               AIO_IFID(1) = ID
               AIO_ILEV = 1
@@ -97,25 +99,31 @@
 
           END IF
 
-*      WRITE access
+*    WRITE access
         ELSE IF ( STR_ABBREV( 'READ', LACCESS ) ) THEN
 
-*        Open new file
-          CALL AIO_OPEN( 'NEWFILE='//FILENAME, 'LIST', ID, WIDTH,
-     :                   STATUS )
+*      Make local copy of filename
+          LFILE(1:8) = 'NEWFILE='
+          LFILE(9:) = FILENAME
 
-*      UPDATE access
+*      Open new file
+          CALL AIO_OPEN( LFILE, 'LIST', ID, WIDTH, STATUS )
+
+*    UPDATE access
         ELSE
 
-*        Open existing file
-          CALL AIO_OPEN( 'OLDFILE='//FILENAME, 'LIST', ID, WIDTH,
-     :                    STATUS )
+*      Make local copy of filename
+          LFILE(1:8) = 'OLDFILE='
+          LFILE(9:) = FILENAME
+
+*      Open existing file
+          CALL AIO_OPEN( LFILE, 'LIST', ID, WIDTH, STATUS )
 
         END IF
 
       END IF
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'AIO_FOPEN', STATUS )
       END IF
