@@ -49,8 +49,10 @@ first.
 		       (node-list-filter
 			(lambda (n)
 			  (string=? name
-				    (attribute-string (normalize "colname")
-						      n)))
+				    (or (attribute-string
+					 (normalize "colname") n)
+					"XXX"; no colname, so don't match
+					)))
 			cs-l))))))
     (if (or (not cs)
 	    (node-list-empty? cs))
@@ -270,12 +272,17 @@ first.
 	  (make fi data: amp-prefix)
 	  (empty-sosofo))
       (if (and namest nameend)
-	  (let ((sep (- (get-column-number name: nameend)
-			(get-column-number name: namest)
-			-1)))
-	    (make command name: "multicolumn"
-		  parameters: `(,(number->string sep) "c")
-		  (process-children-trim)))
+	  (if (and (get-column-number name: nameend)
+		   (get-column-number name: namest))
+	      (let ((sep (- (get-column-number name: nameend)
+			    (get-column-number name: namest)
+			    -1)))
+		(make command name: "multicolumn"
+		      parameters: `(,(number->string sep) "c")
+		      (process-children-trim)))
+	      (error (string-append
+		      "entry refers to unknown columns "
+		      namest " and " nameend)))
 	  (process-children-trim))
       (if (last-sibling? (current-node))
 	  (make fi data: "\\\\
