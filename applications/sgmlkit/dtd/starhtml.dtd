@@ -113,9 +113,15 @@
 
 <!--================ Character mnemonic entities ==========================-->
 
+<!-- Starlink: brought ISO prefix up-to-date -->
+<!ENTITY % ISOlat1 PUBLIC
+       "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML">
+%ISOlat1;
+
+<!--
 <!ENTITY % ISOlat1 PUBLIC
        "ISO 8879-1986//ENTITIES Added Latin 1//EN//HTML">
-%ISOlat1;
+-->
 
 <!--================ Entities for special symbols =========================-->
 <!-- &trade and &cbsp are not widely deployed and so not included here -->
