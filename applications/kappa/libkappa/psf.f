@@ -363,6 +363,8 @@
 *        picture.
 *     2-MAY-2000 (DSB):
 *        Added parameters AMP1 and NORM.
+*     17-MAY-2000 (DSB):
+*        Added data units to Y axis label of the plot if NORM is FALSE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -397,6 +399,7 @@
       CHARACTER NAME*255        ! Name of input positions list
       CHARACTER NDFNAM*100      ! Name of input NDF
       CHARACTER TITLE*80        ! Title of input positions list
+      CHARACTER UNITS*100       ! Data units for the input NDF
       INTEGER CFRM              ! Pointer to the Current Frame of the NDF
       INTEGER DIMS( NDIM )      ! Dimensions of the NDF
       INTEGER EL                ! Number of elements in the input array and output array
@@ -653,7 +656,10 @@
 *  ===========================
 *  Allocate work space 
       CALL PSX_CALLOC( NPOS*5, '_REAL', IPW2, STATUS )
-*
+
+*  Get the input NDF data units.
+      CALL NDF_CGET( INDF1, 'UNITS', UNITS, STATUS )
+
 *  Find the mean star profile parameters calling the routine of the
 *  appropriate data type.  Plot the results as required.
       IF( ITYPE .EQ. '_REAL' ) THEN
@@ -662,7 +668,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
-     :                    AXISR, 
+     :                    UNITS, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, AMP, STATUS )
 
@@ -672,7 +678,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
-     :                    AXISR, 
+     :                    UNITS, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, AMP, STATUS )
 
@@ -682,7 +688,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
-     :                    AXISR, 
+     :                    UNITS, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, AMP, STATUS )
 
@@ -692,7 +698,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
-     :                    AXISR, 
+     :                    UNITS, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, AMP, STATUS )
 
@@ -702,7 +708,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
-     :                    AXISR, 
+     :                    UNITS, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, AMP, STATUS )
 
@@ -712,7 +718,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
-     :                    AXISR, 
+     :                    UNITS, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, AMP, STATUS )
 
@@ -722,7 +728,7 @@
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
-     :                    AXISR, 
+     :                    UNITS, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, AMP, STATUS )
 

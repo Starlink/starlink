@@ -441,6 +441,8 @@
 *        Original version.
 *     22-SEP-1999 (DSB):
 *        Added EXISTS parameter.
+*     17-MAY-2000 (DSB):
+*        Increased COMLN parameter from 47 to 70.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -466,9 +468,9 @@
       INTEGER CHR_LEN            ! Significant length of a string
 
 *  Local Constants:
-      INTEGER COMLN              ! Maximum number of characters in an
-                                 ! inline comment in a FITS header card
-      PARAMETER ( COMLN = 47 )
+      INTEGER COMLN              ! Maximum number of characters in a
+                                 ! comment in a FITS header card
+      PARAMETER ( COMLN = 70 )
 
       INTEGER CVALLN             ! Maximum number of characters in a
                                  ! string value in a FITS header card
