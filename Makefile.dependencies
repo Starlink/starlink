@@ -825,7 +825,15 @@ $(MANIFEST)/htx: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/icl: \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/messgen \
+		$(MANIFEST)/pcs \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd applications/icl \
 	  && $(MAKE_CPT)
@@ -1457,6 +1465,8 @@ $(MANIFEST)/psmerge: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/psx: \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
@@ -1660,6 +1670,7 @@ $(MANIFEST)/tsp: \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
+		$(MANIFEST)/messgen \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/one \
 		$(MANIFEST)/par \

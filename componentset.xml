@@ -728,7 +728,7 @@ Traces an HDS file
   <abstract><p>ICL shell.
     </p></abstract>
   <dependencies >
-    <sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <sourceset>star2html</sourceset><sourceset>messgen</sourceset><build>pcs</build><build>cnf</build><build>sae</build><link>pcs</link><link>cnf</link><link>hlp</link><link>nbs</link><link>hds</link>
   </dependencies>
   <developers>
     <person>
@@ -1448,7 +1448,7 @@ data have been provided they have usually not been sufficiently general
 to handle data from a variety of different instruments.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>sla</build><build>figaro</build><build>ndf</build><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>sla</build><build>figaro</build><build>ndf</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1656,7 +1656,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast">
-  <version>3.5-5</version>
+  <version>3.5-6</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -2726,7 +2726,7 @@ Ultrix and for SunOS and may still work for them.
       programmers to make use of operating system facilities in a
       machine independent way.</p></abstract> 
   <dependencies >
-    <build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>ems</build><build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
