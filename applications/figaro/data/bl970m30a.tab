@@ -1,0 +1,73 @@
+*
+*                   B L 9 7 0 M 3 0
+*
+*   Table file for flux standard BL970M30 based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6040
+*
+ 3320 13.03
+ 3400 13.01
+ 3480 13.02
+ 3560 13.02
+ 3640 13.02
+ 3720 13.04
+ 3800 13.10
+ 3880 13.12
+ 3960 13.18
+ 4040 12.86
+ 4120 13.06
+ 4200 12.69
+ 4280 12.80
+ 4360 13.11
+ 4440 12.71
+ 4520 12.66
+ 4600 12.69
+ 4680 12.72
+ 4760 12.80
+ 4840 13.14
+ 4920 12.97
+ 5000 12.82
+ 5080 12.83
+ 5160 12.83
+ 5240 12.86
+ 5320 12.86
+ 5400 12.92
+ 5480 12.94
+ 5560 12.95
+ 5640 12.96
+ 5720 13.00
+ 5800 12.99
+ 6040 13.04
+ 6200 13.08
+ 6360 13.17
+ 6520 13.39
+ 6680 13.37
+ 6840 13.31
+ 7000 13.35
+ 7160 13.37
+ 7320 13.44
+ 7480 13.46
+ 7640 13.59
+ 7800 13.52
+ 7960 13.55
+ 8120 13.57
+ 8280 13.59
+ 8440 13.57
+ 8600 13.60
+ 8760 13.59
+ 8920 13.71
+ 9080 13.75
+ 9240 13.74
+ 9560 13.84
+ 9720 13.77
+ 9880 13.77

@@ -1,0 +1,55 @@
+*
+*                   L T T  7 3 7 9
+*
+*   Table file for LTT 7379 flux standard, based on data
+*   from MNRAS 204, pp347-53, 1983.  These data represent
+*   directly measured fluxes, and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB Magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH = 40
+SET .TABLE.LAMBDA_DOUBLE = 5420
+*
+3200 12.17
+3350 11.79
+3400 11.67
+3450 11.73
+3500 11.58
+3571 11.68
+3636 11.52
+3704 11.42
+3790 11.31
+3862 11.22
+4036 10.89
+4167 10.77
+4255 10.83
+4464 10.56
+4566 10.49
+4675 10.40
+4785 10.37
+5000 10.35
+5130 10.34
+5263 10.27
+5420 10.21
+5556 10.18
+5700 10.15
+5840 10.10
+5950 10.11
+6056 10.08
+6180 10.07
+6310 10.04
+6436 10.01
+6640 10.02
+6790 9.97
+7100 9.95
+7250 10.00
+7400 9.95
+7550 9.94
+7780 9.92
+7890 9.89
+7990 9.94
+8090 9.96
+8180 9.93

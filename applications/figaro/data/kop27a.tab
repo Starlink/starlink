@@ -1,0 +1,46 @@
+*
+*                   K O P 2 7
+*
+*   Table file for flux standard KOP27 based on data from
+*   Stone, R.P.S., 1977. Astrophys. J., 218, 767.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  49
+SET .TABLE.LAMBDA_DOUBLE =  5263
+*
+ 3200 12.14
+ 3250 12.14
+ 3300 12.00
+ 3350 11.97
+ 3400 11.91
+ 3450 11.89
+ 3500 11.85
+ 3571 11.80
+ 3636 11.75
+ 3704 11.69
+ 3862 10.88
+ 4036 10.42
+ 4167 10.39
+ 4255 10.38
+ 4464 10.34
+ 4566 10.36
+ 4785 10.33
+ 5000 10.34
+ 5263 10.33
+ 5556 10.31
+ 5840 10.31
+ 6056 10.33
+ 6436 10.35
+ 6790 10.34
+ 7100 10.35
+ 7550 10.40
+ 7780 10.40
+ 8090 10.42
+ 8370 10.45

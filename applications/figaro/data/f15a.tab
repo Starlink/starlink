@@ -1,0 +1,46 @@
+*
+*                   F 1 5
+*
+*   Table file for flux standard F15 based on data from
+*   Stone, R.P.S., 1977. Astrophys. J., 218, 767.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  49
+SET .TABLE.LAMBDA_DOUBLE =  5263
+*
+ 3200 11.70
+ 3250 11.65
+ 3300 11.55
+ 3350 11.55
+ 3400 11.53
+ 3450 11.52
+ 3500 11.50
+ 3571 11.49
+ 3636 11.46
+ 3704 11.39
+ 3862 10.46
+ 4036 10.20
+ 4167 10.20
+ 4255 10.22
+ 4464 10.23
+ 4566 10.25
+ 4785 10.28
+ 5000 10.33
+ 5263 10.36
+ 5556 10.41
+ 5840 10.43
+ 6056 10.48
+ 6436 10.55
+ 6790 10.60
+ 7100 10.63
+ 7550 10.70
+ 7780 10.73
+ 8090 10.74
+ 8370 10.76

@@ -1,0 +1,70 @@
+*
+*                   L 9 3 0 M 8 0
+*
+*   Table file for flux standard L930M80 based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6040
+*
+ 3320 14.47
+ 3400 14.47
+ 3480 14.49
+ 3560 14.47
+ 3640 14.52
+ 3720 14.56
+ 3800 14.55
+ 3880 14.64
+ 3960 14.56
+ 4040 14.67
+ 4120 14.54
+ 4200 14.53
+ 4280 14.54
+ 4360 14.62
+ 4440 14.76
+ 4520 14.69
+ 4600 14.62
+ 4680 14.65
+ 4760 14.63
+ 4840 14.63
+ 4920 14.76
+ 5000 14.77
+ 5080 14.73
+ 5160 14.71
+ 5240 14.75
+ 5320 14.79
+ 5400 14.81
+ 5480 14.82
+ 5560 14.88
+ 5640 14.89
+ 5720 14.90
+ 5800 14.93
+ 5880 15.12
+ 6040 14.93
+ 6200 14.97
+ 6360 14.99
+ 6520 15.00
+ 6680 15.14
+ 6840 15.17
+ 7000 15.19
+ 7160 15.18
+ 7320 15.24
+ 7480 15.26
+ 7640 15.32
+ 7800 15.28
+ 7960 15.32
+ 8280 15.42
+ 8440 15.33
+ 8600 15.23
+ 8760 15.44
+ 8920 15.32
+ 9080 15.45
+ 9240 15.45

@@ -1,0 +1,19 @@
+
+     The following keys are significant -
+
+ N - Display next section             B - Display previous section
+ C - Center display on cursor posn.   L - Change length of display
+ M - Move to specified axis posn.     R - Redraw display
+
+ O - Select object range  }{ Position cursor at one limit of range to
+ S - Select sky range     }{ select, then at other limit when prompted.
+
+ U - Undo current order obj & sky.    H - Output this help (or '?')
+ P - List current cursor position     D - Delimit selections with lines
+
+ > - Change current order to next     < - Change current order to previous
+
+ Y - Set display min and max values   A - Revert to autoscaling display
+
+ T - List selections made so far      Q - Quit selection
+

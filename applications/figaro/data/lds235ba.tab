@@ -1,0 +1,68 @@
+*
+*                   L D S 2 3 5 B
+*
+*   Table file for flux standard LDS235B based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6040
+*
+ 3320 15.40
+ 3400 15.33
+ 3480 15.32
+ 3560 15.37
+ 3640 15.36
+ 3720 15.39
+ 3800 15.45
+ 3880 15.44
+ 3960 15.49
+ 4040 15.53
+ 4120 15.43
+ 4200 15.39
+ 4280 15.38
+ 4360 15.49
+ 4440 15.64
+ 4520 15.52
+ 4600 15.46
+ 4680 15.49
+ 4760 15.51
+ 4840 15.47
+ 4920 15.62
+ 5000 15.60
+ 5080 15.58
+ 5160 15.54
+ 5240 15.58
+ 5320 15.59
+ 5400 15.61
+ 5480 15.62
+ 5560 15.66
+ 5640 15.69
+ 5720 15.75
+ 5800 15.80
+ 5880 15.90
+ 6040 15.75
+ 6200 15.74
+ 6360 15.79
+ 6520 15.82
+ 6680 16.04
+ 6840 15.91
+ 7000 16.04
+ 7160 15.98
+ 7320 16.08
+ 7480 16.11
+ 7640 16.08
+ 7800 16.12
+ 7960 16.08
+ 8280 16.23
+ 8440 16.34
+ 8600 16.19
+ 8760 16.12
+ 8920 16.56

@@ -1,0 +1,79 @@
+*
+*                   L 1 3 6 3 M 3
+*
+*   Table file for flux standard L1363M3 based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6032
+*
+ 3316 13.55
+ 3396 13.49
+ 3476 13.48
+ 3556 13.43
+ 3636 13.44
+ 3716 13.46
+ 3796 13.50
+ 3876 13.44
+ 3956 13.38
+ 4036 13.35
+ 4116 13.29
+ 4196 13.29
+ 4276 13.30
+ 4356 13.30
+ 4436 13.28
+ 4516 13.30
+ 4596 13.29
+ 4676 13.27
+ 4756 13.25
+ 4836 13.24
+ 4916 13.25
+ 4996 13.24
+ 5076 13.28
+ 5156 13.26
+ 5236 13.24
+ 5316 13.24
+ 5396 13.22
+ 5476 13.25
+ 5556 13.28
+ 5636 13.29
+ 5716 13.26
+ 5796 13.27
+ 5876 13.28
+ 6032 13.26
+ 6192 13.23
+ 6352 13.27
+ 6512 13.26
+ 6672 13.33
+ 6832 13.35
+ 6992 13.35
+ 7152 13.34
+ 7312 13.40
+ 7472 13.40
+ 7632 13.42
+ 7792 13.41
+ 7952 13.43
+ 8112 13.41
+ 8272 13.43
+ 8432 13.42
+ 8592 13.44
+ 8752 13.50
+ 8912 13.47
+ 9072 13.50
+ 9232 13.50
+ 9392 13.66
+ 9552 13.66
+ 9712 13.54
+ 9872 13.61
+ 10032 13.60
+ 10192 13.61
+ 10360 13.54
+ 10520 13.66

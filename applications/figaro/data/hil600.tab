@@ -1,0 +1,42 @@
+*
+*                        H I L 6 0 0
+*
+*   Table file for Hiltner 600 flux standard, based on data
+*   from Ap.J 218,767-769 (1982).  These data represent
+*   directly measured fluxes, and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "mJy"
+SET .Z.LABEL = "Flux"
+SET .TABLE.BANDWIDTH = 50
+SET .TABLE.LAMBDA_DOUBLE = 5263
+*
+  3200      147.231
+  3250      155.597
+  3300      164.437
+  3350      167.494
+  3400      167.494
+  3450      169.044
+  3500      172.187
+  3571      170.608
+  3636      173.780
+  3704      175.388
+  3862      226.986
+  4036      235.505
+  4167      237.684
+  4255      237.684
+  4464      235.505
+  4566      239.883
+  4785      239.883
+  5000      239.883
+  5263      244.343
+  5556      246.604
+  5840      244.343
+  6056      239.883
+  6436      231.206
+  6790      229.087
+  7100      224.905
+  7550      216.770
+  7780      212.814
+  8090      210.863
+  8370      201.372

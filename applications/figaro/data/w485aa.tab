@@ -1,0 +1,74 @@
+*
+*                   W 4 8 5 A
+*
+*   Table file for flux standard W485A based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6040
+*
+ 3320 12.43
+ 3400 12.42
+ 3480 12.42
+ 3560 12.40
+ 3640 12.41
+ 3720 12.43
+ 3800 12.48
+ 3880 12.50
+ 3960 12.56
+ 4040 12.26
+ 4120 12.46
+ 4200 12.07
+ 4280 12.20
+ 4360 12.52
+ 4440 12.10
+ 4520 12.04
+ 4600 12.04
+ 4680 12.07
+ 4760 12.15
+ 4840 12.51
+ 4920 12.32
+ 5000 12.16
+ 5080 12.15
+ 5160 12.13
+ 5240 12.15
+ 5320 12.18
+ 5400 12.20
+ 5480 12.24
+ 5560 12.22
+ 5640 12.24
+ 5720 12.25
+ 5800 12.27
+ 6040 12.25
+ 6200 12.29
+ 6360 12.32
+ 6520 12.60
+ 6680 12.53
+ 6840 12.50
+ 7000 12.52
+ 7160 12.56
+ 7320 12.60
+ 7480 12.64
+ 7640 12.72
+ 7800 12.68
+ 7960 12.71
+ 8120 12.69
+ 8280 12.72
+ 8440 12.76
+ 8600 12.78
+ 8760 12.81
+ 8920 12.86
+ 9080 12.87
+ 9240 12.88
+ 9400 13.02
+ 9560 12.93
+ 9720 12.95
+ 9880 12.98

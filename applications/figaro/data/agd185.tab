@@ -1,0 +1,58 @@
+*
+*                   A G D 1 8 5
+*
+*   Table file for flux standard AGD185 based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used according
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "mjy"
+SET .Z.LABEL = "Flux"
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  5800
+*
+  3200       11.272
+  3280       11.803
+  3360       11.272
+  3440       10.864
+  3520       10.568
+  3600       10.375
+  3680       10.093
+  3760        9.376
+  3840        9.204
+  3920        9.376
+  4000        9.638
+  4080        9.204
+  4160       11.482
+  4240       12.474
+  4320        8.872
+  4400       10.864
+  4480       12.246
+  4560       12.246
+  4640       11.912
+  4720       11.482
+  4800       10.471
+  4880        7.586
+  4960       10.186
+  5040       10.568
+  5120       10.375
+  5200       10.375
+  5280       10.000
+  5360        9.908
+  5440        9.638
+  5520        9.204
+  5600        9.120
+  5680        8.954
+  5760        9.204
+  5800        8.790
+  5960        8.241
+  6120        7.870
+  6280        7.516
+  6440        6.982
+  6600        5.808
+  6760        6.607
+  6920        6.546
+  7080        6.427
+  7240        6.310

@@ -1,0 +1,17 @@
+
+ The autofit algorithm is parameterised as follows- 
+
+ It takes each pixel in turn.  If that pixel is more than CHFACT
+ times the current sigma value from any line already found, it uses
+ that pixel as the starting point for a line search.  If anything
+ resembling a line can be found, it calculates its wavelength and
+ looks in the line tables for a line close to that wavelength.
+ 
+ A line is accepted if the discrepancy between calculated and
+ tabulated wavelength is less than SIGFACT times the current RMS
+ value.  This means that the criterion for accepting new lines
+ is based on how their wavelength discrepancies compare with those for
+ the lines that have already been accepted.
+
+ SIGFACT is the more important parameter.
+

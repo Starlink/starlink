@@ -1,0 +1,44 @@
+*
+*                   B D P 8 2 0 1 5
+*
+*   Table file for flux standard BDP82015 based on data from
+*   Stone, R.P.S., 1977. Astrophys. J., 218, 767.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used according
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "mjy"
+SET .Z.LABEL = "Flux"
+SET .TABLE.BANDWIDTH =  49
+SET .TABLE.LAMBDA_DOUBLE =  5263
+*
+  3200       31.046
+  3250       32.211
+  3300       43.251
+  3350       40.926
+  3400       47.863
+  3450       45.290
+  3500       52.966
+  3571       49.659
+  3636       60.256
+  3704       67.298
+  3862       71.121
+  4036      120.226
+  4167      134.276
+  4255      129.420
+  4464      172.187
+  4566      188.799
+  4785      207.014
+  5000      208.929
+  5263      231.206
+  5556      253.513
+  5840      275.423
+  6056      285.759
+  6436      301.995
+  6790      313.328
+  7100      325.087
+  7550      334.195
+  7780      349.945
+  8090      349.945
+  8370      343.558

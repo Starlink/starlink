@@ -1,0 +1,78 @@
+*
+*                   H Z 4 3
+*
+*   Table file for flux standard HZ43 based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6032
+*
+ 3316 12.11
+ 3396 12.11
+ 3476 12.21
+ 3556 12.22
+ 3636 12.25
+ 3716 12.31
+ 3796 12.46
+ 3876 12.44
+ 3956 12.46
+ 4036 12.41
+ 4116 12.54
+ 4196 12.55
+ 4276 12.52
+ 4356 12.60
+ 4436 12.62
+ 4516 12.61
+ 4596 12.62
+ 4676 12.66
+ 4756 12.74
+ 4836 12.80
+ 4916 12.79
+ 4996 12.79
+ 5076 12.90
+ 5156 12.84
+ 5236 12.86
+ 5316 12.89
+ 5396 12.98
+ 5476 12.94
+ 5556 13.03
+ 5636 13.05
+ 5716 13.13
+ 5796 13.07
+ 6032 13.12
+ 6192 13.19
+ 6352 13.26
+ 6512 13.26
+ 6672 13.38
+ 6832 13.47
+ 7992 13.53
+ 7152 13.48
+ 7312 13.53
+ 7472 13.57
+ 7632 13.73
+ 7792 13.62
+ 7952 13.68
+ 8112 13.70
+ 8272 13.72
+ 8432 13.76
+ 8592 13.73
+ 8752 13.80
+ 8912 13.78
+ 9072 13.82
+ 9232 13.81
+ 9392 13.81
+ 9552 13.87
+ 9712 13.83
+ 9872 13.98
+ 10032 13.90
+ 10192 14.00
+ 10360 13.97
+ 10520 13.98

@@ -1,0 +1,79 @@
+*
+*                   G 1 9 1 B 2 B
+*
+*   Table file for flux standard G191B2B based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6040
+*
+ 3320 10.83
+ 3400 10.86
+ 3480 10.91
+ 3560 10.94
+ 3640 10.99
+ 3720 11.06
+ 3800 11.18
+ 3880 11.19
+ 3960 11.17
+ 4040 11.19
+ 4120 11.22
+ 4200 11.22
+ 4280 11.28
+ 4360 11.37
+ 4440 11.36
+ 4520 11.39
+ 4600 11.41
+ 4680 11.44
+ 4760 11.47
+ 4840 11.55
+ 4920 11.55
+ 5000 11.58
+ 5080 11.63
+ 5160 11.62
+ 5240 11.67
+ 5320 11.71
+ 5400 11.75
+ 5480 11.77
+ 5560 11.81
+ 5640 11.85
+ 5720 11.89
+ 5800 11.90
+ 5880 11.95
+ 6040 11.98
+ 6200 12.04
+ 6360 12.09
+ 6520 12.15
+ 6680 12.20
+ 6840 12.28
+ 7000 12.31
+ 7160 12.35
+ 7320 12.40
+ 7480 12.44
+ 7640 12.56
+ 7800 12.50
+ 7960 12.54
+ 8120 12.54
+ 8280 12.56
+ 8440 12.64
+ 8600 12.65
+ 8760 12.70
+ 8920 12.77
+ 9080 12.78
+ 9240 12.83
+ 9400 12.78
+ 9560 12.82
+ 9720 12.89
+ 9880 12.93
+ 10040 12.95
+ 10200 12.97
+ 10360 12.95
+ 10520 13.06

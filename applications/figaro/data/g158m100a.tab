@@ -1,0 +1,60 @@
+*
+*                   G 1 5 8 - 1 0 0
+*
+*   Table file for G158-100, faint object flux standard,
+*   based on Filippenko and Greenstein (1984)  (Preprint,
+*   submitted to P.A.S.P.)  Note that these are fitted
+*   continuum fluxes, not directly measured fluxes, and 
+*   should be used accordingly.   This file is designed for
+*   use with the Figaro routine GSPIKE.  The data here is
+*   given to 3 decimal places and was supplied directly by
+*   Alex Filippenko.
+*
+SET .Z.UNITS = "AB Magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+*
+ 3300   16.525
+ 3400   16.410
+ 3500   16.262
+ 3600   16.130
+ 3700   16.010
+ 3800   15.890
+ 3900   15.780
+ 4000   15.670
+ 4100   15.577
+ 4200   15.490
+ 4300   15.412
+ 4400   15.348
+ 4500   15.280
+ 4600   15.226
+ 4700   15.171
+ 4800   15.123
+ 4900   15.069
+ 5000   15.027
+ 5200   14.947
+ 5400   14.872
+ 5600   14.812
+ 5800   14.757
+ 6000   14.701
+ 6200   14.655
+ 6400   14.613
+ 6600   14.571
+ 6800   14.533
+ 7000   14.500
+ 7200   14.469
+ 7400   14.438
+ 7600   14.411
+ 7800   14.391
+ 8000   14.369
+ 8200   14.352
+ 8400   14.336
+ 8600   14.321
+ 8800   14.309
+ 9000   14.297
+ 9200   14.286
+ 9400   14.275
+ 9600   14.266
+ 9800   14.256
+10000   14.245

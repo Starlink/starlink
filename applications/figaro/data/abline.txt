@@ -1,0 +1,23 @@
+
+If you enter a number, it will be taken as the central wavelength for
+a new region to be displayed.  The other commands that are accepted are
+
+SIG x     Set 'multiple of sigma' continuum rejection parameter to x
+DEG n     Set polynomial degree for continuum fit to n (1..7)
+ITN n     Set 'number of iterations' continuum rejection parameter to n
+LIMIT     Line will be delimited by the cursor positions indicated
+NOLIM     Line delimited by points where data becomes < continuum
+WIDTH x   Set wavelength range displayed to x
+CONT      Determine continuum, starting with subsegment selection by cursor
+RECONT    Repeat continuum fit, using same segments as last time
+FIT       Analyse a line, delimiting it using the cursor
+HELP      (or ?) Output this information
+QUIT      Exit ABLINE.
+   
+Commands may be abbreviated.  Omitted numeric parameters are prompted for.
+
+Generally, the sequence is: 1) Select center wavelength, 2) CONTinuum,
+3) FIT one or more lines.     To change degree of continuum fit,
+use DEG followed by RECONT.  Similarly for other continuum parameters.
+
+More details should be available via 'HELP FIGARO TECHNIQUES ABLINE'

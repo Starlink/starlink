@@ -1,0 +1,79 @@
+*
+*                   R O S S 6 4 0
+*
+*   Table file for flux standard ROSS640 based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6040
+*
+ 3320 14.13
+ 3400 14.06
+ 3480 14.02
+ 3560 13.97
+ 3640 13.94
+ 3720 13.96
+ 3800 14.09
+ 3880 14.11
+ 3960 14.56
+ 4040 13.92
+ 4120 13.82
+ 4200 13.82
+ 4280 13.83
+ 4360 13.81
+ 4440 13.82
+ 4520 13.81
+ 4600 13.80
+ 4680 13.79
+ 4760 13.79
+ 4840 13.78
+ 4920 13.78
+ 5000 13.77
+ 5080 13.81
+ 5160 13.81
+ 5240 13.78
+ 5320 13.77
+ 5400 13.79
+ 5480 13.79
+ 5560 13.83
+ 5640 13.83
+ 5720 13.86
+ 5800 13.84
+ 5880 13.88
+ 6040 13.86
+ 6200 13.87
+ 6360 13.88
+ 6520 13.93
+ 6680 13.93
+ 6840 13.93
+ 7000 13.95
+ 7160 13.96
+ 7320 13.98
+ 7480 14.00
+ 7640 14.04
+ 7800 14.02
+ 7960 14.05
+ 8120 14.03
+ 8280 14.03
+ 8440 14.06
+ 8600 14.14
+ 8760 14.10
+ 8920 14.09
+ 9080 14.11
+ 9240 14.17
+ 9400 14.12
+ 9560 14.12
+ 9720 14.20
+ 9880 14.24
+ 10040 14.23
+ 10200 14.17
+ 10360 14.17
+ 10520 14.19

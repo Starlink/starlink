@@ -1,0 +1,79 @@
+*
+*                   L 7 4 5 M 4 6 A
+*
+*   Table file for flux standard L745M46A based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6040
+*
+ 3320 13.51
+ 3400 13.37
+ 3480 13.31
+ 3560 13.28
+ 3640 13.24
+ 3720 13.22
+ 3800 13.20
+ 3880 13.20
+ 3960 13.30
+ 4040 13.15
+ 4120 13.08
+ 4200 13.08
+ 4280 13.08
+ 4360 13.04
+ 4440 13.01
+ 4520 13.01
+ 4600 13.00
+ 4680 13.00
+ 4760 12.98
+ 4840 12.95
+ 4920 12.94
+ 5000 12.94
+ 5080 12.94
+ 5160 12.92
+ 5240 12.93
+ 5320 12.92
+ 5400 12.91
+ 5480 12.92
+ 5560 12.90
+ 5640 12.95
+ 5720 12.93
+ 5800 12.94
+ 5880 12.94
+ 6040 12.89
+ 6200 12.87
+ 6360 12.87
+ 6520 12.91
+ 6680 12.92
+ 6840 12.95
+ 7000 12.93
+ 7160 12.93
+ 7320 12.96
+ 7480 12.96
+ 7640 12.99
+ 7800 12.99
+ 7960 12.98
+ 8120 12.98
+ 8280 12.99
+ 8440 13.01
+ 8600 12.99
+ 8760 13.02
+ 8920 13.02
+ 9080 13.02
+ 9240 12.93
+ 9400 12.99
+ 9560 12.98
+ 9720 13.08
+ 9880 13.08
+ 10040 13.06
+ 10200 13.04
+ 10360 13.09
+ 10520 13.08

@@ -1,0 +1,74 @@
+*
+*                   4 0 E R I B
+*
+*   Table file for flux standard 40ERIB based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH =  80
+SET .TABLE.LAMBDA_DOUBLE =  6040
+*
+ 3320  9.46
+ 3400  9.48
+ 3480  9.50
+ 3560  9.51
+ 3640  9.55
+ 3720  9.58
+ 3800  9.67
+ 3880  9.62
+ 3960  9.58
+ 4040  9.34
+ 4120  9.52
+ 4200  9.18
+ 4280  9.33
+ 4360  9.61
+ 4440  9.26
+ 4520  9.24
+ 4600  9.25
+ 4680  9.27
+ 4760  9.34
+ 4840  9.71
+ 4920  9.51
+ 5000  9.39
+ 5080  9.40
+ 5160  9.39
+ 5240  9.44
+ 5320  9.47
+ 5400  9.50
+ 5480  9.53
+ 5560  9.55
+ 5640  9.57
+ 5720  9.60
+ 5800  9.68
+ 6040  9.64
+ 6200  9.69
+ 6360  9.74
+ 6520  9.92
+ 6680  9.88
+ 6840  9.86
+ 7000  9.88
+ 7160  9.89
+ 7320  9.93
+ 7480  9.98
+ 7640 10.07
+ 7800 10.03
+ 7960 10.05
+ 8120 10.04
+ 8280 10.05
+ 8440 10.11
+ 8600 10.10
+ 8760 10.12
+ 8920 10.17
+ 9080 10.15
+ 9240 10.16
+ 9400 10.04
+ 9560 10.16
+ 9720 10.21
+ 9880 10.24

@@ -1,0 +1,44 @@
+*
+*                   F 9 2
+*
+*   Table file for flux standard F92 based on data from
+*   Stone, R.P.S., 1977. Astrophys. J., 218, 767.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used according
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "mjy"
+SET .Z.LABEL = "Flux"
+SET .TABLE.BANDWIDTH =  49
+SET .TABLE.LAMBDA_DOUBLE =  5263
+*
+  3200       73.790
+  3250       73.790
+  3300       80.168
+  3350       77.983
+  3400       77.983
+  3450       77.983
+  3500       76.560
+  3571       77.983
+  3636       75.858
+  3704       77.268
+  3862      113.763
+  4036      121.339
+  4167      121.339
+  4255      118.032
+  4464      113.763
+  4566      110.662
+  4785      103.753
+  5000       97.275
+  5263       87.096
+  5556       81.658
+  5840       76.560
+  6056       72.444
+  6436       66.069
+  6790       61.944
+  7100       60.256
+  7550       52.966
+  7780       52.966
+  8090       51.050
+  8370       48.306

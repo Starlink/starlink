@@ -1,0 +1,44 @@
+*
+*                   F 3 4
+*
+*   Table file for flux standard F34 based on data from
+*   Stone, R.P.S., 1977. Astrophys. J., 218, 767.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used according
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "mjy"
+SET .Z.LABEL = "Flux"
+SET .TABLE.BANDWIDTH =  49
+SET .TABLE.LAMBDA_DOUBLE =  5263
+*
+  3200      280.543
+  3250      285.759
+  3300      293.765
+  3350      285.759
+  3400      280.543
+  3450      272.898
+  3500      270.396
+  3571      253.513
+  3636      248.886
+  3704      239.883
+  3862      226.986
+  4036      214.783
+  4167      201.372
+  4255      190.546
+  4464      180.302
+  4566      169.044
+  4785      152.757
+  5000      141.906
+  5263      128.233
+  5556      115.878
+  5840      105.682
+  6056       98.175
+  6436       85.507
+  6790       78.705
+  7100       73.790
+  7550       66.069
+  7780       67.298
+  8090       60.813
+  8370       61.376

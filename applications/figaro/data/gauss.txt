@@ -1,0 +1,29 @@
+     Continuum fitting menu entry. Alternatives are:
+
+        CUR    -    indicate continuum regions by cursor
+        ORD    -    order of polynomial fit
+        SIG    -    factor*sigma on fit for continuum point rejection
+        ERR    -    factor*error on point for rejection from continuum fit
+        ITN    -    number of iterations for continuum point rejection
+        FIT    -    perform the polynomial fitting 
+        GAU    -    proceed to Gaussian fitting ( continuum set )
+
+     Gaussian fitting menu entry. Alternatives are:
+
+        LIM    _    delimit edges of line ( default is adjacent 
+                    continuum edges )
+        SIN    -    fit a single Gaussian to an indicated line
+        NEW    -    introduce a Gaussian at the cursor defined position
+        NEX    -    introduce a new Gaussian at the peak
+        INCH   -    interactively alter peak position, height or width
+        LIS    -    list the Gaussians fitted 
+        SEL    -    select a line to be modified
+        DEL    -    delete a selected Gaussian
+        OPT    -    optimize the fit
+        RECAL  -    read a previous fit data file and plot this fit
+        HARD   -    plot results of fit for hardcopy device
+        SAVE   -    save the Gaussian fit spectrum as a file ( name 
+                    prompted for on quitting )
+        CON    -    move to another section of continuum for more fitting
+        QUIT   -    quit from program ( spectrum analysis complete )
+

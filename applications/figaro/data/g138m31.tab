@@ -1,0 +1,58 @@
+*
+*                   G 1 3 8 - 3 1
+*
+*   Table file for G138-31, faint object flux standard,
+*   based on Filippenko and Greenstein (1984)  (Preprint,
+*   submitted to P.A.S.P.)  Note that these are fitted
+*   continuum fluxes, not directly measured fluxes, and
+*   should be used accordingly.   This file is designed for
+*   use with the Figaro routine GSPIKE.  The data here is
+*   given to 3 decimal places and was supplied directly by
+*   Alex Filippenko.
+*
+SET .Z.UNITS = "micro-Janskys"
+SET .Z.LABEL = "Flux"
+*
+  3300      537.031
+  3400      575.440
+  3500      613.761
+  3600      651.629
+  3700      688.652
+  3800      727.779
+  3900      772.680
+  4000      816.582
+  4100      857.432
+  4200      899.498
+  4300      941.890
+  4400      979.039
+  4500     1017.653
+  4600     1051.963
+  4700     1089.432
+  4800     1120.984
+  4900     1153.451
+  5000     1180.321
+  5200     1228.005
+  5400     1269.403
+  5600     1301.367
+  5800     1324.342
+  6000     1344.002
+  6200     1358.940
+  6400     1372.777
+  6600     1382.928
+  6800     1393.155
+  7000     1402.167
+  7200     1408.640
+  7400     1412.538
+  7600     1415.141
+  7800     1415.141
+  8000     1413.838
+  8200     1411.237
+  8400     1408.640
+  8600     1404.752
+  8800     1402.167
+  9000     1398.300
+  9200     1394.441
+  9400     1390.593
+  9600     1386.755
+  9800     1381.656
+ 10000     1377.843

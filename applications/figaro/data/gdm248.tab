@@ -1,0 +1,56 @@
+*
+*                   G D - 2 4 8
+*
+*   Table file for GD-248, faint object flux standard,
+*   based on Filippenko and Greenstein (1984)  (PASP 96, 530)
+*   Note that these are fitted
+*   continuum fluxes, not directly measured fluxes, and
+*   should be used accordingly.   This file is designed for
+*   use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "mjy"
+SET .Z.LABEL = "Flux"
+*
+  3300        2.992
+  3400        3.076
+  3500        3.133
+  3600        3.192
+  3700        3.221
+  3800        3.251
+  3900        3.311
+  4000        3.342
+  4100        3.373
+  4200        3.404
+  4300        3.436
+  4400        3.436
+  4500        3.467
+  4600        3.467
+  4700        3.467
+  4800        3.467
+  4900        3.467
+  5000        3.436
+  5200        3.404
+  5400        3.373
+  5600        3.311
+  5800        3.281
+  6000        3.221
+  6200        3.162
+  6400        3.105
+  6600        3.048
+  6800        2.992
+  7000        2.938
+  7200        2.858
+  7400        2.805
+  7600        2.754
+  7800        2.704
+  8000        2.655
+  8200        2.606
+  8400        2.535
+  8600        2.489
+  8800        2.443
+  9000        2.399
+  9200        2.355
+  9400        2.291
+  9600        2.249
+  9800        2.208
+ 10000        2.168

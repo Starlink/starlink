@@ -1,0 +1,52 @@
+*
+*                   L T T  4 8 1 6
+*
+*   Table file for LTT 4816 flux standard, based on data
+*   from MNRAS 204, pp347-53, 1983 and 206,241, 1984.
+*   These data represent directly measured fluxes, and should be
+*   used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "mJy"
+SET .Z.LABEL = "Flux"
+SET .TABLE.BANDWIDTH = 40
+SET .TABLE.LAMBDA_DOUBLE = 5420
+*
+  3200        8.395
+  3350        9.120
+  3400        9.376
+  3450        8.954
+  3500        8.954
+  3571        8.551
+  3636        8.790
+  3704        8.551
+  3790        8.710
+  3862        9.462
+  4036       10.375
+  4167       11.272
+  4255       11.482
+  4464       12.474
+  4566       12.474
+  4675       12.023
+  4785       10.864
+  5000       11.695
+  5130       12.134
+  5263       11.482
+  5420       11.376
+  5556       10.965
+  5700       10.965
+  5840       10.280
+  5950       10.568
+  6056       10.471
+  6180       10.093
+  6310        9.376
+  6436        9.290
+  6640        8.166
+  6790        9.036
+  7100        8.790
+  7250        7.870
+  7400        7.798   ( Interpolated )
+  7550        7.798
+  7780        8.091
+  8090        8.395
+  8370        7.656

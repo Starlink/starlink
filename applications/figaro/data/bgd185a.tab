@@ -1,0 +1,29 @@
+*
+*                   B G D 1 8 5
+*
+*   Table file for flux standard BGD185 based on data from
+*   Oke, J.B., 1974. Astrophys. J. Supp. Ser. 27, 21.
+*   Adapted from SPICA .OKE file of the same or similar name.
+*
+*   These data are directly measured fluxes and should be used accordingly.
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "AB magnitudes"
+SET .Z.LABEL = "Flux"
+SET .Z.REVSCALE = 1
+SET .Z.MAGFLAG = 1
+SET .TABLE.BANDWIDTH = 360
+SET .TABLE.LAMBDA_DOUBLE = 10000
+*
+ 5820 14.06
+ 6180 14.12
+ 6540 14.35
+ 6900 14.33
+ 7260 14.39
+ 7620 14.46
+ 7980 14.52
+ 8340 14.61
+ 8700 14.72
+ 9060 14.74
+ 9420 14.76
+ 9780 14.86

@@ -1,0 +1,22 @@
+
+At this stage in ARC you have the following options available -
+
+Fit       - Repeat the fit.
+Disp      - Display the deviation of the fit from a linear fit.  This
+            shows the trend of the fit, and the errors in each line.
+Order     - Change the order of the fit.
+Edit      - Delete or change the wavelength of one or more of the
+            selected lines, without returning to the cursor selection.
+Reselect  - Return to selection using the cursor.
+Print     - Prints a copy of the fit (what ARLINES.LIS would look like
+            if you were to exit now).
+Auto      - Starting from your current fit and arc line list, ARC looks
+            for additional line in the arc at wavelengths given in the
+            line list and adds any it finds to the identified line tables.
+Xauto     - Deletes all the lines found by 'Auto'
+Modify    - Allows you some control over the Autofit parameters.
+Quit      - Start to exit ARC
+Help      - (or ?) Display this information.
+
+The first letter of each command is sufficient.
+
