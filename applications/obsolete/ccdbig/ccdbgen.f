@@ -85,8 +85,9 @@
 *     -  The log file information is very restricted from this
 *     application, just enough to monitor progress is given.
 *
-*     - The output NDFs are named, DATAn, FFn and BIASn, where n is the
-*     current sequence number. All output data is of type _REAL.
+*     - The output NDFs are named, dataN, ffN and biasN, where N is the
+*     current sequence number.  Data type of output is as determined
+*     by the DTYPE ADAM parameter.
 
 
 *  Arguments:
@@ -133,6 +134,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'         ! HDS/DAT constants
+      INCLUDE 'NDF_PAR'         ! NDF_ public constants
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameters
 
 *  Status:
@@ -151,6 +153,7 @@
       CHARACTER * ( 80 ) BLOCK( 15 ) ! FITS block.
       CHARACTER * ( CCD1__BLEN ) LINE ! Read input data.
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locators to NDF extensions
+      CHARACTER * ( NDF__SZTYP ) DTYPE ! Data type for NDF
       INTEGER DIMS( 2 )         ! Dimensions of NDF
       INTEGER EL                ! Number of data elements
       INTEGER FDIN              ! Input file identifier
@@ -298,6 +301,9 @@
       CALL PAR_GET0L( 'BIAS', BIAS, STATUS )
       CALL PAR_GET0L( 'FLAT', FLAT, STATUS )
 
+* Get flag determining what data type we will use.
+      CALL PAR_GET0C( 'DTYPE', DTYPE, STATUS )
+
 *  Create a sequence of frames.
       DO I = 1, NLOOP
 
@@ -339,30 +345,31 @@
          FNAME = 'data'//COUNT( :NCHAR )//TYPE
          CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
      :                  'WRITE', 'NEW', IDO, PLACE, STATUS )
-         CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDO, STATUS )
+         CALL NDF_NEWP( DTYPE, 2, DIMS, PLACE, IDO, STATUS )
 C         CALL NDF_HCRE( IDO, STATUS )
 
 *    Map the data in.
-         CALL NDF_MAP( IDO, 'DATA', '_REAL', 'WRITE', IPOBJ, EL,
+         CALL NDF_MAP( IDO, 'DATA', DTYPE, 'WRITE', IPOBJ, EL,
      :                 STATUS )
 
 *    Create the objects.
-         CALL CCD1_OBJS( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
-     :                   LBND( 1, I ), LBND( 2, I ),
-     :                   %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ), NOBJ,
-     :                   3.0, 0.75, 0.8, %VAL( IPELL ),
-     :                   0.0, 500.0, 100000.0, 15.0, .FALSE., 1,
-     :                   STATUS )
+         CALL BIG1_OBJST( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+     :                    LBND( 1, I ), LBND( 2, I ),
+     :                    %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ), NOBJ,
+     :                    3.0, 0.75, 0.8, %VAL( IPELL ),
+     :                    0.0, 500.0, 100000.0, 15.0, .FALSE., 1,
+     :                    STATUS )
 
 *    Add noise to it.
          CALL PDA_RNSED( SEEDO )
-         CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 8.0, STATUS )
+         CALL BIG1_ANOIT( DTYPE, %VAL( IPOBJ ), EL, 8.0, STATUS )
 
 *    Multiply data by the flatfield.
-         CALL CCDB1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), STATUS )
+         CALL BIG1_FLMULT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+     :                     STATUS )
 
 *    Add bias to it.
-         CALL CCDB1_ABIA( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+         CALL BIG1_ABIAT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
      :                    WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
@@ -383,18 +390,18 @@ C         CALL NDF_HCRE( IDO, STATUS )
             FNAME = 'bias'//COUNT( :NCHAR )//TYPE
             CALL NDF_OPEN( DAT__ROOT, FNAME( :CHR_LEN( FNAME ) ),
      :                     'WRITE', 'NEW', IDB, PLACE, STATUS )
-            CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDB, STATUS )
+            CALL NDF_NEWP( DTYPE, 2, DIMS, PLACE, IDB, STATUS )
 C            CALL NDF_HCRE( IDB, STATUS )
 
 *    Map the data in.
-            CALL NDF_MAP( IDB, 'DATA', '_REAL', 'WRITE', IPBIA, EL,
+            CALL NDF_MAP( IDB, 'DATA', DTYPE, 'WRITE', IPBIA, EL,
      :                    STATUS )
 
 *    Clear data.
-            CALL CCG1_STVR( 0.0, EL, %VAL( IPBIA ), STATUS )
+            CALL BIG1_STVT( DTYPE, 0.0, EL, %VAL( IPBIA ), STATUS )
 
 *    Add bias to it.
-            CALL CCDB1_ABIA( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+            CALL BIG1_ABIAT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
      :                       WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
@@ -417,27 +424,27 @@ C            CALL NDF_HCRE( IDB, STATUS )
             FNAME = 'ff'//COUNT( :NCHAR )//TYPE
             CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
      :                     'WRITE', 'NEW', IDF, PLACE, STATUS )
-            CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDF, STATUS )
+            CALL NDF_NEWP( DTYPE, 2, DIMS, PLACE, IDF, STATUS )
 C            CALL NDF_HCRE( IDF, STATUS )
 
 *    Map the data in.
-            CALL NDF_MAP( IDF, 'DATA', '_REAL', 'WRITE', IPFF, EL,
+            CALL NDF_MAP( IDF, 'DATA', DTYPE, 'WRITE', IPFF, EL,
      :                    STATUS )
 
 *    Assign a constant value to all elments.
-            CALL CCG1_STVR( 1000.0, EL, %VAL( IPFF ), STATUS )
+            CALL BIG1_STVT( DTYPE, 1000.0, EL, %VAL( IPFF ), STATUS )
 
 *    Multiply by flatfield.
-            CALL CCDB1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), 
-     :                       STATUS )
+            CALL BIG1_FLMULT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), 
+     :                        DIMS( 2 ), STATUS )
 
 *    Add noise.
             CALL PDA_RNSED( SEEDF )
-            CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 1.0, STATUS )
+            CALL BIG1_ANOIT( DTYPE, %VAL( IPOBJ ), EL, 1.0, STATUS )
 
 *    Add bias to it.
-            CALL CCDB1_ABIA( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
-     :                       WID1, WID2, SEEDB, STATUS )
+            CALL BIG1_ABIAT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), 
+      :                      DIMS( 2 ), WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
             CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -478,4 +485,4 @@ C            CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdbgen.f,v 1.8 1998/06/17 16:47:03 mbt Exp $
+* $Id: ccdbgen.f,v 1.9 1998/06/17 16:57:25 mbt Exp $
