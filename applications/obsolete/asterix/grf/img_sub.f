@@ -3715,7 +3715,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       REAL THETA
       REAL DISP
 *-
-        IF (STATUS.NE.SAI__OK) RETURN
+        IF (STATUS.EQ.SAI__OK) THEN
 
 *  get world coord of pixel centre
           CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
@@ -3732,6 +3732,8 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 *  check transformed coord falls within slice
           IMG_INSLICE=(ABS(X).LE.LENGTH/2.0.AND.ABS(Y).LE.WIDTH/2.0)
+
+        ENDIF
 
 	END
 
