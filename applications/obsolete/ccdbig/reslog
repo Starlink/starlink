@@ -275,7 +275,10 @@ while (`$parent_pscmd |& getfield field=PID`)
    if ("$pstype" == "BSD") then
       ps lx > $tmpfile
    else
-      ps -u $USER -opid -oppid -ovsz=SIZE \
+   # This is more complicated than it would be if there weren't a bug
+   # in Solaris 2.5 ps.
+      set pids = `ps -u $LOGNAME | awk 'NR>1{print $1}'`
+      ps -p "$pids" -opid -oppid -ovsz=SIZE \
          | sed -e 's/M *$/e6/' -e 's/K *$/e3/' > $tmpfile
    endif 
 
@@ -380,4 +383,4 @@ EXIT:
    rm -f $tmpfile $labelfile
    exit
    
-* $Id: ccdbgen.f,v 1.11 1998/07/03 15:36:52 mbt Exp $
+* $Id: reslog,v 1.15 1998/07/06 14:25:48 mbt Exp $
