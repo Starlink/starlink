@@ -2,7 +2,7 @@
 TAR_FILES_A = kaplibs_source ira_source
 
 # The contents of the ira_source.tar file:
-KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev
+KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_xxxx_err
 
 # The contents of the ira_source.tar file:
 IRA_SOURCE = ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
