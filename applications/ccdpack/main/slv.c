@@ -1916,7 +1916,7 @@ F77_SUBROUTINE(slv_reset)( CHARACTER(TASK), INTEGER(STATUS) TRAIL(TASK) ) {
    int status;
 
    status = (int) *STATUS;
-   if ( status != SAI__OK ) return 0;
+   if ( status != SAI__OK ) return;
 
    task = cnf_creim( (char *) TASK, TASK_length );
 
