@@ -181,9 +181,10 @@ public class GenerateDependencies {
 
         String manifestString = "$(MANIFEST)/";
         String newlineString = " \\\n\t\t";
-        String makeBuildsupportString = "\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n\t            >configure-output.log; \\\n\t    elif test ! -f Makefile; then \\\n\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n\t          echo $$t >configure-output.log; echo $$t >&2; \\\n\t          exit 1; }; \\\n\t    else \\\n\t        echo \"No configuration necessary\" >configure-output.log; \\\n\t    fi \\";
-        String runConfigureString = "\t    && test -f config.status || ./configure >configure-output.log \\";
-        String makeString = "\t    && make>make.log && make install>>make.log";
+        String makeBuildsupportString = "\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n\t            >configure-output.log; \\\n\t    elif test ! -f Makefile; then \\\n\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n\t          echo $$t >configure-output.log; echo $$t >&2; \\\n\t          exit 1; }; \\\n\t    else \\\n\t        echo \"No configuration necessary\" >configure-output.log; \\\n\t    fi";
+        String runConfigureString = "\t  && $(CONFIG_CPT)";
+        
+        String makeString = "\t  && $(MAKE_CPT)";
         String cdString = "\tcd ";
 
         if (testMode) {
@@ -212,6 +213,10 @@ public class GenerateDependencies {
             };
             for (int i=0; i<banner.length; i++)
                 makefile.println(banner[i]);
+
+            makefile.println("CONFIG_CPT=test -f config.status \\\n  || ./configure >configure-output.log 2>configure-output.log.err \\\n  || { cat configure-output.log.err; false; }");
+            makefile.println("MAKE_CPT=(make && make install) >make.log 2>make.log.err \\\n  || { cat make.log.err; false; }");
+            makefile.println();
         }
 
         java.util.List allbuildsupport = new java.util.LinkedList();
@@ -304,10 +309,10 @@ public class GenerateDependencies {
             // Emit the rule
             makefile.println(cdString + c.componentPath() + " \\");
             if (componentType == "buildsupport") {
-                makefile.println(makeBuildsupportString);
+                makefile.println(makeBuildsupportString + " \\");
                 allbuildsupport.add(c);
             } else if (componentType == "confdep") {
-                makefile.println(runConfigureString);
+                makefile.println(runConfigureString + " \\");
             }
             makefile.println(makeString);
             makefile.println();
