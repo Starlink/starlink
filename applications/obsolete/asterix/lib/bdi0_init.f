@@ -92,6 +92,7 @@
       EXTERNAL			BDI0_SCARCHK
 
       EXTERNAL			BDI1_CHK
+      EXTERNAL			BDI1_DELETE
       EXTERNAL			BDI1_GET
       EXTERNAL			BDI1_MAP
       EXTERNAL			BDI1_PUT
@@ -141,6 +142,11 @@
         CALL ADI_DEFFUN(
      :       'FileItemChk(_,_HDSfile,_CHAR)',
      :                   BDI1_CHK, DID, STATUS )
+
+*    HDS general binned dataset interface
+        CALL ADI_DEFFUN(
+     :       'FileItemDel(_,_HDSfile,_CHAR)',
+     :                   BDI1_DELETE, DID, STATUS )
 
         CALL ADI_DEFFUN(
      :       'FileItemGet(_,_HDSfile,_CHAR)',
