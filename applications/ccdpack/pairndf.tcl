@@ -163,8 +163,8 @@
          if { $choosestate == "done" } break
 
 #  Log to the user.
-         ccdlog "  "
-         ccdlog "  Aligning NDFS $iA and $iB"
+         ccdputs -log "  "
+         ccdputs -log "  Aligning NDFS $iA and $iB"
 
 #  Load the NDF pair into the aligner widget and wait for the user to 
 #  select some positions in common.
@@ -207,7 +207,7 @@
                set matchpts [ lindex $offset 3 ]
 
 #  Tell the user that the match succeeded.
-               ccdlog \
+               ccdputs -log \
                "    Centroiding successful: $nmatch/$npoints objects matched."
 
 #  Add this datum to the results list.  By storing these in a hash at
@@ -225,17 +225,18 @@
 
 #  No objects were matched between frames.
             } else {
-               ccdlog "    Centroiding failed, no offset determined - ignored."
+               ccdputs -log \
+               "    Centroiding failed, no offset determined - ignored."
             }
 
 #  There was an overlap, but the user failed to indicate any points to 
 #  be centroided.
          } elseif { [ $aligner overlapping ] } {
-            ccdlog "    No points selected in overlap - ignored."
+            ccdputs -log "    No points selected in overlap - ignored."
 
 #  The user decided there was no overlap between the selected images.
          } else {
-            ccdlog "    Images do not overlap - ignored."
+            ccdputs -log "    Images do not overlap - ignored."
          }
          wm withdraw $aligner
       }

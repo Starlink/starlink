@@ -257,6 +257,15 @@
      :                  STATUS )
       END IF
 
+*  Issue instructions about how to interact with the GUI.
+      CALL MSG_BLANK( STATUS )
+      CALL MSG_OUT( ' ', '   Click on the image with mouse button 1 '
+     :              // '(left) to mark a point', STATUS )
+      CALL MSG_OUT( ' ', '                      with mouse button 3 '
+     :              // '(right) to erase a point', STATUS )
+      CALL MSG_OUT( ' ', '   and click the "Done" button '
+     :              // 'when finished.', STATUS )
+
 *  Loop over each selected NDF in turn.
       DO 1 INDEX = 1, NNDF
 
