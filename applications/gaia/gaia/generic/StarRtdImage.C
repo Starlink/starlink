@@ -204,8 +204,8 @@ static const double pi_ = 3.14159265358979323846;
 static const double rad_ = pi_/180.;
 
 //  Conversions that have been lost from AST.
-static const double R2D = rad_;
-static const double D2R = 180.0/pi_;
+static const double r2d_ = rad_;
+static const double d2r_ = 180.0/pi_;
 
 //  StarRtdImageSubCmds
 //
@@ -2564,8 +2564,8 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
     double ra;
     double dec;
     if ( image_->wcs().pix2wcs( x, y, ra, dec ) == 0 ) {
-        ra /= R2D;
-        dec /= R2D;
+        ra /= r2d_;
+        dec /= r2d_;
         
         //  Format the values according to the current frame.
         StarWCS* wcsp = getStarWCSPtr();
@@ -2656,8 +2656,8 @@ void StarRtdImage::decodeLinear( double tr[6], double &xz, double &yz,
     yz = y0;
     xs = xsc;
     ys = ysc;
-    perp = p * R2D;
-    orient = wor * R2D;
+    perp = p * r2d_;
+    orient = wor * r2d_;
 }
 
 //+
@@ -4654,12 +4654,12 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
                || canvasToWorldCoords(ra2, dec2, 0) != TCL_OK ) {
             return TCL_OK;
         }
-        ra0 *= R2D;
-        ra1 *= R2D;
-        ra2 *= R2D;
-        dec0 *= R2D;
-        dec1 *= R2D;
-        dec2 *= R2D;
+        ra0 *= r2d_;
+        ra1 *= r2d_;
+        ra2 *= r2d_;
+        dec0 *= r2d_;
+        dec1 *= r2d_;
+        dec2 *= r2d_;
 
         //  Get distances in world coords.
         double dist = wcsp->plaindist( ra0, dec0, ra1, dec1 );
@@ -5474,8 +5474,8 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
             delete [] olddec;
             return error( listArgv[i], " is not a celestial coordinate value" );
         }
-        oldra[j] = wcs.ra_deg() * D2R;
-        olddec[j] = wcs.dec_deg() * D2R;
+        oldra[j] = wcs.ra_deg() * d2r_;
+        olddec[j] = wcs.dec_deg() * d2r_;
     }
     double *newra = new double[npoints];
     double *newdec = new double[npoints];

@@ -70,8 +70,8 @@ static const double pi_ = 3.14159265358979323846;
 static const double rad_ = pi_/180.;
 
 //  Conversions that have been lost from AST.
-static const double R2D = rad_;
-static const double D2R = 180.0/pi_;
+static const double r2d_ = rad_;
+static const double d2r_ = 180.0/pi_;
 
 //
 //  Define a function to wrap the AST TranN function using a
@@ -385,7 +385,7 @@ void StarWCS::setSecPix()
     if ( dist == AST__BAD ) {
         xSecPix_ = 0.0;
     } else {
-        xSecPix_ = dist * R2D * 3600.0;
+        xSecPix_ = dist * r2d_ * 3600.0;
     }
 
     //  Same procedure for Y.
@@ -413,7 +413,7 @@ void StarWCS::setSecPix()
     if ( dist == AST__BAD ) {
         ySecPix_ = 0.0;
     } else {
-        ySecPix_ = dist * R2D * 3600.0;
+        ySecPix_ = dist * r2d_ * 3600.0;
     }
 }
 
@@ -535,7 +535,7 @@ char* StarWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) c
             } else {
 
                 // If hms_flag is not set then return the result in degrees.
-                sprintf (buf, "%g %g %s", ra * R2D, dec * R2D, equinoxStr_);
+                sprintf (buf, "%g %g %s", ra * r2d_, dec * r2d_, equinoxStr_);
             }
         }
     }
@@ -576,11 +576,11 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
 
         // Return values are in degrees and swapped if necessary.
         if ( raIndex_ == 1 ) {
-            ra = point[0] * R2D;
-            dec = point[1] * R2D;
+            ra = point[0] * r2d_;
+            dec = point[1] * r2d_;
         } else {
-            dec = point[0] * R2D;
-            ra = point[1] * R2D;
+            dec = point[0] * r2d_;
+            ra = point[1] * r2d_;
         }
     }
     return 0;
@@ -601,11 +601,11 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
 
     double oldx[1], oldy[1], newx[1], newy[1];
     if ( raIndex_ == 1 ) {
-        oldx[0] = ra * D2R;  // Convert into radians.
-        oldy[0] = dec * D2R;
+        oldx[0] = ra * d2r_;  // Convert into radians.
+        oldy[0] = dec * d2r_;
     } else {
-        oldy[0] = ra * D2R;
-        oldx[0] = dec * D2R;
+        oldy[0] = ra * d2r_;
+        oldx[0] = dec * d2r_;
     }
     astTran2( wcs_, 1, oldx, oldy, 0, newx, newy );
     if ( ! astOK ) {
@@ -702,8 +702,8 @@ int StarWCS::wcs2pixDist(double ra, double dec, double &x, double &y) const
         if ( !astOK ) astClearStatus;
         return error ( "cannot convert world coordinates to distance" );
     }
-    x = fabs( ra / ( delta_ra * R2D ) );
-    y = fabs( dec / ( delta_dec * R2D ) );
+    x = fabs( ra / ( delta_ra * r2d_ ) );
+    y = fabs( dec / ( delta_dec * r2d_ ) );
     if ( !astOK ) astClearStatus;
     return 0;
 }
@@ -719,18 +719,18 @@ double StarWCS::dist(double ra0, double dec0, double ra1, double dec1) const
 
     double point1[2], point2[2];
     if ( raIndex_ == 1 ) {
-        point1[0] = ra0 * D2R, point2[0] = ra1 * D2R;
-        point1[1] = dec0 * D2R, point2[1] = dec1 * D2R;
+        point1[0] = ra0 * d2r_, point2[0] = ra1 * d2r_;
+        point1[1] = dec0 * d2r_, point2[1] = dec1 * d2r_;
     } else {
-        point1[1] = ra0 * D2R, point2[1] = ra1 * D2R;
-        point1[0] = dec0 * D2R, point2[0] = dec1 * D2R;
+        point1[1] = ra0 * d2r_, point2[1] = ra1 * d2r_;
+        point1[0] = dec0 * d2r_, point2[0] = dec1 * d2r_;
     }
     double dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
         return 0.0;
     }
-    return dist * R2D;
+    return dist * r2d_;
 }
 
 //
@@ -780,7 +780,7 @@ double StarWCS::width() const
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = xSecPix_ * nxpix_;
     } else {
-        dist *= 60.0 * R2D;
+        dist *= 60.0 * r2d_;
     }
     return dist;
 }
@@ -831,7 +831,7 @@ double StarWCS::height() const
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = ySecPix_ * nypix_;
     } else {
-        dist *= 60.0 * R2D;
+        dist *= 60.0 * r2d_;
     }
     return dist;
 }
@@ -885,7 +885,7 @@ double StarWCS::radius() const
                       + 0.25 * ySecPix_ * nypix_ * ySecPix_ * nypix_ );
 
     } else {
-        dist *= 60.0 * R2D;
+        dist *= 60.0 * r2d_;
     }
     return dist;
 }
