@@ -510,8 +510,8 @@ MODULE = Starlink::AST  PACKAGE = Starlink::AST::Channel
 SV *
 _new( class, sourcefunc, sinkfunc, options )
   char * class
-  SV * sinkfunc
   SV * sourcefunc
+  SV * sinkfunc
   char * options;
  PREINIT:
   SV ** value;
@@ -534,7 +534,7 @@ _new( class, sourcefunc, sinkfunc, options )
   /* First see whether we were given valid callbacks */
   if (SvOK(sourcefunc) && SvROK(sourcefunc) && 
         SvTYPE(SvRV(sourcefunc)) == SVt_PVCV) has_source = 1;
-  if (SvOK(sourcefunc) && SvROK(sinkfunc) && 
+  if (SvOK(sinkfunc) && SvROK(sinkfunc) && 
         SvTYPE(SvRV(sinkfunc)) == SVt_PVCV) has_sink = 1;
 
   if ( has_source || has_sink) {
@@ -568,7 +568,7 @@ _new( class, sourcefunc, sinkfunc, options )
   } else if (strstr( class, "FitsChan") != NULL) {
    ASTCALL(
     fitschan = astFitsChanFor( (const char *(*)()) source, sourceWrap,
-                             (void (*)( const char * )) sink, sinkWrap, options );  printf("Got back from astChannelFor\n");
+                             (void (*)( const char * )) sink, sinkWrap, options );
    )
    printf("Got back from astChannelFor\n");
    if (astOK) setPerlAstObject( RETVAL, (AstObject*)fitschan );
