@@ -28,8 +28,12 @@ then generates an HTML file
 <description>
 These are the document element types.
 <codebody>
+(element sug (process-html-document))
 (element sun (process-html-document))
 (element ssn (process-html-document))
+(element sc  (process-html-document))
+(element sg  (process-html-document))
+(element sgp (process-html-document))
 (element mud (process-html-document))
 
 
