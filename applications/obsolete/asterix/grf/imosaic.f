@@ -1,5 +1,4 @@
-*+  IMOSAIC - Merges several non-congruent 2-d data arrays into one
-*             output data array
+*+  IMOSAIC - Merges several non-congruent 2-d data arrays into one output
       SUBROUTINE IMOSAIC( STATUS )
 *
 *    Description :
@@ -183,6 +182,9 @@
 *     27 Aug 93 : V1.7-1 Handles N-d dataset where first 2 dimensions
 *                        are the spatial ones. Handles lack of variance
 *                        much more efficiently (DJA)
+*     24 Apr 95 : V1.8-0 Use new data interfaces - use WCI for world
+*                        coordinates maniuplation. Fixed bug for fields
+*                        near the poles (DJA)
 *
 *    Type Definitions :
 *
@@ -191,7 +193,7 @@
 *    Global constants :
 *
       INCLUDE  'SAE_PAR'       ! global SSE definitions
-      INCLUDE  'DAT_PAR'
+      INCLUDE  'ADI_PAR'
       INCLUDE  'PAR_PAR'
       INCLUDE  'PRM_PAR'
       INCLUDE  'PAR_ERR'       ! parameter-system errors
@@ -214,14 +216,14 @@
      :  NUMREA,                ! number of frames located and mapped
      :  FIRSTG,                ! the number of the first data array
                                ! read and mapped sucessfully
-     :  TDIMS(DAT__MXDIM),     ! dimensions of input DATA_ARRAY
-     :  DDIMS(DAT__MXDIM),     ! dimensions of temporary space
+     :  TDIMS(ADI__MXDIM),     ! dimensions of input DATA_ARRAY
+     :  DDIMS(ADI__MXDIM),     ! dimensions of temporary space
      :  INDIMS,                ! number of dimensions of input array
      :  VNDIMS,                ! number of dimensions of input variance
      :  QNDIMS,                ! number of dimensions of input quality
-     :  IDIMS( DAT__MXDIM, MXFRAM ),! array of dimensions of input DATA_ARRAYs
-     :  VDIMS( DAT__MXDIM ),   ! array of dimensions of input VARIANCE
-     :  QDIMS( DAT__MXDIM ),   ! array of dimensions of input QUALITY
+     :  IDIMS( ADI__MXDIM, MXFRAM ),! array of dimensions of input DATA_ARRAYs
+     :  VDIMS( ADI__MXDIM ),   ! array of dimensions of input VARIANCE
+     :  QDIMS( ADI__MXDIM ),   ! array of dimensions of input QUALITY
      :  PNTRA,                 ! pointer to input DATA_ARRAY
      :  PNTRB,                 ! pointer to input VARIANCE
      :  PNTRC                  ! pointer to input QUALITY ARRAY
@@ -238,7 +240,7 @@ c                              ! rebinning to new frame
      :  PNTROV,                ! pointer to output VARIANCE
      :  PNTROQ                 ! pointer to output QUALITY
       INTEGER
-     :  ODIMS(DAT__MXDIM),     ! dimensions of output DATA_ARRAY
+     :  ODIMS(ADI__MXDIM),     ! dimensions of output DATA_ARRAY
      :  PNTRT,                 ! pointer to data-array mask array
      :  MINX,                  ! minimum x offset from first frame
      :  MINY,                  !    "    y   "      "    "     "
@@ -247,31 +249,44 @@ c                              ! rebinning to new frame
      :  I, J, K, L,            ! counters
      :  NLINES                 ! Number of lines of text to write into history
 
-      CHARACTER*(DAT__SZLOC) ILOC(MXFRAM)	! Input data structures
-      CHARACTER*(DAT__SZLOC) OLOC		! Output dataset
-      CHARACTER*(PAR__SZNAM) PARM       	! Parameter name
-      CHARACTER*80	     PATH(MXFRAM*4)     ! Paths of input data arrays
+      CHARACTER*(PAR__SZNAM) 	PARM       		! Parameter name
+      CHARACTER*80	     	PATH(MXFRAM*4)     	! Paths of input data arrays
 
-      INTEGER                IPTRD,IPTRV,IPTRQ  ! Loops over input slices
-      INTEGER                OPTRD,OPTRV,OPTRQ  ! Loops over output slices
-      INTEGER                INELM              ! No of input elements
-      INTEGER                LPARM      	! Used length of PARM
-      INTEGER                ISPNELM(MXFRAM)    ! No of elements in spatial axes
-      INTEGER                NSLICE		! No of 2-d slices per input
-      INTEGER                ONDIM              ! No of output dimensions
-      INTEGER                ONELM              ! No of output elements
-      INTEGER                ONSLICE		! No of 2-d slices in output
-      INTEGER                OSPNELM            ! No of spatial pixels in output
-      INTEGER                SL                 ! Loop over slices
+      DOUBLE PRECISION		POINT(2)		! N'th dataset pointing
+      DOUBLE PRECISION		POINT_1(2)		! 1st dataset pointing
+      DOUBLE PRECISION		SPOS1(2)		! First i/p cel pos'n
+      DOUBLE PRECISION		SPOSN(2)		! Nth i/p cel pos'n
 
-      BYTE                   BADBITS(MXFRAM)    ! Quality mask for each input
+      REAL			PCORN(2,2,2)		! Pixel posn fn (x,y)
+      REAL			PPOS1(2)		! 1st i/p pix pos'n
+      REAL			PPOSN(2)		! Nth i/p pix pos'n
+
+      INTEGER			IFID(MXFRAM)		! Input dataset ids
+      INTEGER                	IPTRD,IPTRV,IPTRQ  	! Loops over input slices
+      INTEGER			IX, IY			! Loops over corners
+      INTEGER			OFID			! Output dataset id
+      INTEGER                	OPTRD,OPTRV,OPTRQ  	! Loops over output slices
+      INTEGER			IDUM			! Dummy argument
+      INTEGER                	INELM              	! No of input elements
+      INTEGER                	LPARM      		! Used length of PARM
+      INTEGER                	ISPNELM(MXFRAM)    	! # elements in spatial axes
+      INTEGER                	NSLICE			! # 2-d slices per input
+      INTEGER                	ONDIM              	! # output dimensions
+      INTEGER                	ONELM              	! # output elements
+      INTEGER                	ONSLICE			! # o/p 2-d slices
+      INTEGER                	OSPNELM            	! # spatial pixels in output
+      INTEGER			PIXID,PRJID,SYSID	! WCS info for dataset
+      INTEGER			PIXID_1,PRJID_1,SYSID_1	! WCS info dataset 1
+      INTEGER                	SL                 	! Loop over slices
+
+      BYTE                   	BADBITS(MXFRAM)    	! Input quality masks
+
+      LOGICAL			AVERGE			! Overlaps averaged?
 
       LOGICAL                  ! true if :
-     :  AVERGE,                ! overlap regions are averaged
      :  GOODAT( MXFRAM ),      ! entry corresponding to given frame in
                                ! sequence is true if data and x,y
                                ! offsets were found ok
-     :  INPRIM,                ! Is input data array primitive ?
      :  JUMPOUT,               ! Leave the loop ?
      :  OK,                    ! Is data object present ?
      :  LVAR,                  ! This is set false permanently if any file
@@ -287,41 +302,25 @@ c                              ! to enable offsets to be calculated ?
      :  XPIX_OUT,YPIX_OUT,     ! Pixel size of rebinned frame in units
 c                              ! of input pixels
      :  XMIN,XMAX,             ! Range of X values in an input frame
-     :  YMIN,YMAX,             ! Range of Y values in an input frame
-     :  XMIN_1,XMAX_1,         ! Range of X values in the first frame
-     :  YMIN_1,YMAX_1,         ! Range of Y values in the first frame
-     :  XCENT, YCENT,          ! Centre of the frame to be added in local
-c                              ! degrees as an offset from the first frame
-     :  XFULL,YFULL,           ! Real values of no of pixels in each dim
-     :  ANGVALX,ANGVALY,       ! Sin and COS components used in calculation
-     :  ATANBIT,               ! Used in calculation
-     :  Z
+     :  YMIN,YMAX              ! Range of Y values in an input frame
 
       REAL
      :  XBASE, YBASE,          ! Base value of the rotated/rebinned input
 c                              ! axis in units of input pixels.
      :  XSTART, YSTART,        ! Base value of the output axes in input
 c                              ! axis units
-     :  THETA,                 ! Angle between input frame and frame one
-     :  CONV(2)                ! Conversion factor between axis units and rads
-
-      DOUBLE PRECISION
-     :  RA,DEC,ROLL,           ! RA,DEC and roll angle of the frame
-     :  RA_1,DEC_1,ROLL_1,     ! RA,DEC and roll angle of the first frame
-     :  CTOS(3,3),             ! Matrix for transfroming celestial to
-c                              ! spacecraft co-ordinates.
-     :  RXCENT,RYCENT
+     :  THETA                  ! Angle between input frame and frame one
 *
 *    Version id :
 *
-      CHARACTER*30 VERSION
-        PARAMETER  ( VERSION = 'IMOSAIC version 1.7-1' )
+      CHARACTER*30		VERSION
+        PARAMETER  		( VERSION = 'IMOSAIC version 1.8-0' )
 *-
 
 *    Show version number
       CALL MSG_PRNT( VERSION )
 
-*    Initialise Asterix common blocks
+*    Initialise Asterix
       CALL AST_INIT()
 
 *    Set the variance flag true
@@ -331,7 +330,7 @@ c                              ! spacecraft co-ordinates.
       JUMPOUT=.FALSE.
       DO WHILE (.NOT. JUMPOUT)
         CALL USI_GET0I( 'NUMBER', NUMBER, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 999
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Test if within acceptable range
         IF ( (NUMBER .LT. 2) .OR. (NUMBER .GT. MXFRAM) ) THEN
@@ -354,7 +353,7 @@ c                              ! spacecraft co-ordinates.
      :        'AST_ERR: Error obtaining how to process '/
      :        /'overlapping data arrays', STATUS )
         END IF
-        GOTO 999
+        GOTO 99
       END IF
 
 *    Initialise data ok flags
@@ -374,7 +373,7 @@ c                              ! spacecraft co-ordinates.
         CALL MSG_PRNT( 'Input frame number ^FRAMENO' )
 
 *      Get a locator to an IMAGE-type data structure then cancel parameter
-        CALL USI_ASSOCI( PARM(:LPARM), 'READ', ILOC(I), INPRIM, STATUS )
+        CALL USI_TASSOCI( PARM(:LPARM), '*', 'READ', IFID(I), STATUS )
 
 *      Report error including frame number
         IF ( STATUS .NE. SAI__OK ) THEN
@@ -386,7 +385,7 @@ c                              ! spacecraft co-ordinates.
      :          'Error occurred while trying to access '/
      :           /'input frame number ^FRAMENO.', STATUS )
 
-            GOODAT( I ) = .FALSE.
+            GOODAT(I) = .FALSE.
 
 *          Increment number of the first good array if current value
 *          is not to be included in the calculations
@@ -396,14 +395,14 @@ c                              ! spacecraft co-ordinates.
 
 *          Store number of arrays read if an abort has been requested
             NUMREA = I - 1
-            GOTO 999
+            GOTO 99
 
           END IF
 
         ELSE
 
 *        Map in its DATA_ARRAY component
-          CALL BDA_CHKDATA( ILOC(I), OK, INDIMS, TDIMS, STATUS )
+          CALL BDI_CHKDATA( IFID(I), OK, INDIMS, TDIMS, STATUS )
           ONDIM = INDIMS
           DO J = 3, ONDIM
             ODIMS(J) = TDIMS(J)
@@ -450,7 +449,7 @@ c                              ! spacecraft co-ordinates.
           ISPNELM(I) = TDIMS(1) * TDIMS(2)
 
 *        Map the data
-          CALL BDA_MAPDATA( ILOC(I), 'READ', PNTRA, STATUS )
+          CALL BDI_MAPDATA( IFID(I), 'READ', PNTRA, STATUS )
 
 *        Check for an error
           IF ( STATUS .NE. SAI__OK ) THEN
@@ -466,7 +465,7 @@ c                              ! spacecraft co-ordinates.
      :              'AST_ERR: Error occurred whilst trying to map '/
      :               /'input frame number ^FRAMENO.', STATUS )
 
-              GOODAT( I ) = .FALSE.
+              GOODAT(I) = .FALSE.
 
 *            Increment number of the first good array if current
 *            value is not to be included in the calculations
@@ -476,7 +475,7 @@ c                              ! spacecraft co-ordinates.
 
 *            Store number of arrays read if an abort has been requested
               NUMREA = I - 1
-              GOTO 999
+              GOTO 99
             END IF
           ELSE
 
@@ -484,14 +483,14 @@ c                              ! spacecraft co-ordinates.
 *          have contained variances
             IF ( LVAR ) THEN
 
-              CALL BDA_CHKVAR( ILOC(I), LVAR, VNDIMS, VDIMS, STATUS )
+              CALL BDI_CHKVAR( IFID(I), LVAR, VNDIMS, VDIMS, STATUS )
 
 *            Check that variance is ok and compatible with data array
               IF ( LVAR .AND. VNDIMS .EQ. INDIMS .AND. VDIMS(1)
      :               .EQ. TDIMS(1) .AND. VDIMS(2) .EQ. TDIMS(2) ) THEN
 
 *              Map the input variance array
-                CALL BDA_MAPVAR( ILOC(I), 'READ', PNTRB, STATUS)
+                CALL BDI_MAPVAR( IFID(I), 'READ', PNTRB, STATUS)
                 IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_REP( ' ', 'Error mapping input variance',
      :                                                      STATUS )
@@ -510,21 +509,21 @@ c                              ! spacecraft co-ordinates.
             IF ( .NOT. LVAR ) PNTRB = PNTRA
 
 *          Attempt to map the QUALITY array.
-            CALL BDA_CHKQUAL( ILOC(I), LQUAL, QNDIMS, QDIMS, STATUS )
+            CALL BDI_CHKQUAL( IFID(I), LQUAL, QNDIMS, QDIMS, STATUS )
 
 *          Check that quality is ok and compatible with data array
             IF ( LQUAL .AND. QNDIMS .EQ. INDIMS .AND. QDIMS(1)
      :           .EQ. TDIMS(1) .AND. QDIMS(2) .EQ. TDIMS(2) ) THEN
 
 *            Map the input quality array
-              CALL BDA_MAPQUAL( ILOC(I), 'READ', PNTRC, STATUS)
+              CALL BDI_MAPQUAL( IFID(I), 'READ', PNTRC, STATUS)
               IF ( STATUS .NE. SAI__OK ) THEN
                 CALL MSG_PRNT('Error mapping quality array')
-                GOTO 999
+                GOTO 99
               END IF
 
 *            Get quality mask
-              CALL BDA_GETMASK( ILOC(I), BADBITS(I), STATUS)
+              CALL BDI_GETMASK( IFID(I), BADBITS(I), STATUS)
 
 *          Otherwise map a temporary array
             ELSE
@@ -533,7 +532,7 @@ c                              ! spacecraft co-ordinates.
      :                                   /' all pixels are good' )
 
               CALL DYN_MAPB( INDIMS, TDIMS, PNTRC, STATUS )
-              IF ( STATUS .NE. SAI__OK ) GOTO 999
+              IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *            Fill quality array with good values
               CALL ARR_INIT1B( QUAL__GOOD, INELM, %VAL(PNTRC), STATUS )
@@ -551,10 +550,9 @@ c                              ! spacecraft co-ordinates.
 *            If the first file contained astrometry information test
 *            if this file has enough to calculate offsets.
               IF ( LRADEC_1 ) THEN
-                CALL IMOSAIC_GETAST( ILOC(I), TDIMS, RA, DEC, ROLL,
-     :                          XMIN, XMAX, YMIN, YMAX, XPIX, YPIX,
-     :                                       CONV, LRADEC, STATUS )
-                IF (STATUS .NE. SAI__OK) GOTO 999
+                CALL IMOSAIC_GETAST( IFID(I), TDIMS, POINT, XPIX, YPIX,
+     :                            LRADEC, PIXID, PRJID, SYSID, STATUS )
+                IF (STATUS .NE. SAI__OK) GOTO 99
               END IF
 
 *            If the file contained a full set of attitude info
@@ -564,32 +562,59 @@ c                              ! spacecraft co-ordinates.
 *              Rotate and rebin the image so that it has the same
 *              orientation as the first frame and the same pixel size.
 
-*              Calculate the angle between the first frame and this
-*              one in radians and find the sin and cos of this angle
-                THETA = ROLL_1 - ROLL
+*              Find position in fiducial pixels of the 4 corners of
+*              this frame. At the same accumulate the extreme values
+                XMIN = VAL__MAXR
+                XMAX = VAL__MINR
+                YMIN = VAL__MAXR
+                YMAX = VAL__MINR
+                DO IX = 1, 2
+                  PPOSN(1) = 0.5 + REAL(IX-1)*TDIMS(1)
+                  DO IY = 1, 2
+                    PPOSN(2) = 0.5 + REAL(IY-1)*TDIMS(2)
 
-*              First calculate the position of the left hand corner
-*              pixel of the rebinned rotated array in units of input pixels
-                XFULL = REAL(TDIMS(1))
-                YFULL = REAL(TDIMS(2))
+*                  Find world coord position in I'th frame
+                    CALL WCI_CNP2S( PPOSN, PIXID, PRJID, SPOSN, STATUS )
 
-                Z = SQRT ( XFULL*XFULL + YFULL*YFULL ) / 2.0
-                ATANBIT = ATAN (YFULL / XFULL)
-                ANGVALY = MAX ( SIN ( MATH__PI - ATANBIT + THETA )
-     :                    , SIN ( MATH__PI - ATANBIT - THETA ) )
-                YBASE = (Z * ABS( ANGVALY )) - YFULL / 2.0
+*                  Convert to world coords in fiducial frame
+                    CALL WCI_CNS2S( SYSID, SPOSN, SYSID_1, SPOS1,
+     :                              STATUS )
 
-                ANGVALX = MAX ( COS ( ATANBIT - MATH__PI/2.0 + THETA )
-     :                    , COS ( ATANBIT - MATH__PI/2.0 - THETA  ) )
-                XBASE = (Z * ABS( ANGVALX )) - XFULL / 2.0
+*                  Then to pixels in that frame
+                    CALL WCI_CNS2P( SPOS1, PIXID_1, PRJID_1,
+     :                              PCORN(1,IX,IY), STATUS )
+
+*                  Gather extrema
+                    XMIN = MIN( XMIN, PCORN(1,IX,IY) )
+                    XMAX = MAX( XMAX, PCORN(1,IX,IY) )
+                    YMIN = MIN( YMIN, PCORN(2,IX,IY) )
+                    YMAX = MAX( YMAX, PCORN(2,IX,IY) )
+
+                  END DO
+                END DO
+
+*              Defines the angle of rotation between frames.
+                THETA = - ATAN2( PCORN(2,2,1) - PCORN(2,1,1),
+     :                           PCORN(1,2,1) - PCORN(1,1,1) )
+
+*              Calculate position of lower left hand corner of rotated,
+*              rebinned region in terms of the pixel positions of the
+*              current input
+                PPOS1(1) = XMIN
+                PPOS1(2) = YMIN
+                CALL WCI_CNP2S( PPOS1, PIXID_1, PRJID_1, SPOS1, STATUS )
+                CALL WCI_CNS2S( SYSID_1, SPOS1, SYSID, SPOSN, STATUS )
+                CALL WCI_CNS2P( SPOSN, PIXID, PRJID, PPOSN, STATUS )
+
+*              Calculate the origin of the rotated frame w.r.t the N'th
+*              frame, in pixels
+                XBASE = PPOSN(1)
+                YBASE = PPOSN(2)
 
 *              Calculate the dimensions of the rebinned output array
-                IDIMS(1,I) = ABS( NINT( (XMAX - XMIN +
-     :                        (2*XBASE * XPIX)) * (IDIMS(1,FIRSTG)-1) /
-     :                        (XMAX_1-XMIN_1) )) + 1
-                IDIMS(2,I) = ABS( NINT( (YMAX - YMIN +
-     :                        (2*YBASE * YPIX)) * (IDIMS(2,FIRSTG)-1) /
-     :                        (YMAX_1-YMIN_1) )) + 1
+*              in terms of the pixel size of the fiducial input
+                IDIMS(1,I) = NINT( XMAX - XMIN ) + 1
+                IDIMS(2,I) = NINT( YMAX - YMIN ) + 1
                 DO J = 3, INDIMS
                   IDIMS(J,I) = TDIMS(J)
                 END DO
@@ -606,7 +631,7 @@ c                              ! spacecraft co-ordinates.
                 CALL DYN_MAPR( INDIMS, DDIMS, PNTRID(I), STATUS )
                 CALL DYN_MAPR( INDIMS, DDIMS, PNTRIV(I), STATUS )
                 CALL DYN_MAPB( INDIMS, DDIMS, PNTRIQ(I), STATUS )
-                IF ( STATUS .NE. SAI__OK ) GOTO 999
+                IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *              Zero these arrays prior to use
                 CALL ARR_INIT1R( 0.0, INELM, %VAL(PNTRID(I)), STATUS )
@@ -641,37 +666,23 @@ c                              ! spacecraft co-ordinates.
                 END DO
 
 *              Unmap data arrays
-                CALL BDA_UNMAPDATA( ILOC(I), STATUS )
+                CALL BDI_UNMAPDATA( IFID(I), STATUS )
                 IF ( LVAR ) THEN
-                  CALL BDA_UNMAPVAR( ILOC(I), STATUS )
+                  CALL BDI_UNMAPVAR( IFID(I), STATUS )
                 END IF
                 IF ( LQUAL ) THEN
-                  CALL BDA_UNMAPQUAL( ILOC(I), STATUS )
+                  CALL BDI_UNMAPQUAL( IFID(I), STATUS )
                 END IF
 
-*              Find the centre of this frame on a flat grid laid down
-*              at the centre of the first frame.
-                CALL IMOSAIC_DTRANS( RA, DEC, CTOS, .TRUE.,
-     :                             RXCENT, RYCENT, STATUS )
-
-*              Calculate centre of this frame in local coordinates
-                XCENT = RXCENT / CONV(1)
-                YCENT = RYCENT / CONV(2)
-
-*              Calculate the X,Y offsets of this frame from the first
-*              frame in units of integer output pixels.
-*              Xoffset is here defined as positive pixels to the right.
-                XOFSET(I) = NINT( (XCENT / XPIX_1) -
-     :                          (XBASE/XPIX_OUT) + (XMIN/XPIX_1) -
-     :                                            (XMIN_1/XPIX_1) )
-*
-                YOFSET(I) = NINT( (YCENT / YPIX_1) -
-     :                          (YBASE/YPIX_OUT) + (YMIN/YPIX_1) -
-     :                                            (YMIN_1/YPIX_1) )
+*              Calculate the X,Y offsets of the rebinned rotated frame from
+*              the first frame in units of integer output pixels.
+*              XOFSET is here defined as positive pixels to the right.
+                XOFSET(I) = XMIN
+                YOFSET(I) = YMIN
 
 *              The data array and offsets are all in order so set
 *              the good data flag for this frame
-                GOODAT( I ) = .TRUE.
+                GOODAT(I) = .TRUE.
 
               ELSE
 
@@ -698,7 +709,7 @@ c                              ! spacecraft co-ordinates.
 *                  Store number of arrays read if an abort has been
 *                  requested
                     NUMREA = I - 1
-                    GOTO 999
+                    GOTO 99
                   END IF
 
                 ELSE
@@ -730,7 +741,7 @@ c                              ! spacecraft co-ordinates.
 
 *            The data array and offsets are all in order so set
 *            the good data flag for this frame
-              GOODAT( I ) = .TRUE.
+              GOODAT(I) = .TRUE.
 
 *            Copy pointer into input frame pointer array
               PNTRID(I) = PNTRA
@@ -741,14 +752,10 @@ c                              ! spacecraft co-ordinates.
               CALL ARR_COP1I( INDIMS, TDIMS, IDIMS(1,I), STATUS )
 
 *            Obtain astrometry information from the first file
-              CALL IMOSAIC_GETAST( ILOC(I), TDIMS, RA_1, DEC_1,
-     :                  ROLL_1, XMIN_1, XMAX_1, YMIN_1, YMAX_1,
-     :                 XPIX_1, YPIX_1, CONV, LRADEC_1, STATUS )
-              IF (STATUS .NE. SAI__OK) GOTO 999
-
-*            Calculate matrix to convert celestial co-odinates to
-*            spacecraft centered on this RA and DEC
-              CALL CONV_GENDMAT( RA_1, DEC_1, ROLL_1, CTOS )
+              CALL IMOSAIC_GETAST( IFID(I), TDIMS, POINT_1, XPIX_1,
+     :                             YPIX_1, LRADEC_1, PIXID_1,
+     :                             PRJID_1, SYSID_1, STATUS )
+              IF (STATUS .NE. SAI__OK) GOTO 99
 
 *          end of first-frame check
             END IF
@@ -814,7 +821,7 @@ c                              ! spacecraft co-ordinates.
         CALL ERR_REP( 'ERR_IMOSAIC_OUTDIM',
      :     'AST_ERR: Output dimensions error. Check input frames',
      :     STATUS )
-        GOTO 999
+        GOTO 99
       END IF
 
 *    Redefine offsets to be relative to the origin in the output array
@@ -827,20 +834,20 @@ c                              ! spacecraft co-ordinates.
       END DO
 
 *    Now get the output array
-      CALL USI_ASSOCO( 'OUT', 'IMAGE', OLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'IMAGE', OFID, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Map the output DATA_ARRAY component
-        CALL BDA_CREDATA( OLOC, ONDIM, ODIMS, STATUS )
-        CALL BDA_MAPDATA( OLOC, 'WRITE', PNTROD, STATUS )
+        CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
+        CALL BDI_MAPDATA( OFID, 'WRITE', PNTROD, STATUS )
         CALL ARR_INIT1R( 0.0, ONELM, %VAL(PNTROD), STATUS )
 
 *      Create and map the output variance array if required
         IF ( LVAR ) THEN
 
-          CALL BDA_CREVAR( OLOC, ONDIM, ODIMS, STATUS )
-          CALL BDA_MAPVAR( OLOC, 'WRITE', PNTROV, STATUS )
+          CALL BDI_CREVAR( OFID, ONDIM, ODIMS, STATUS )
+          CALL BDI_MAPVAR( OFID, 'WRITE', PNTROV, STATUS )
           CALL ARR_INIT1R( 0.0, ONELM, %VAL(PNTROV), STATUS )
 
         ELSE
@@ -853,8 +860,8 @@ c                              ! spacecraft co-ordinates.
         END IF
 
 *      Map output quality array
-        CALL BDA_CREQUAL( OLOC, ONDIM, ODIMS, STATUS )
-        CALL BDA_MAPQUAL( OLOC, 'WRITE', PNTROQ, STATUS )
+        CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
+        CALL BDI_MAPQUAL( OFID, 'WRITE', PNTROQ, STATUS )
         CALL ARR_INIT1B( QUAL__GOOD, ONELM, %VAL(PNTROQ), STATUS )
 
 *      Test if any of these have failed
@@ -939,10 +946,10 @@ c                              ! spacecraft co-ordinates.
 
 *    end of if-no-error-after-creating-output-structure check
       END IF
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Copy the MORE box from the first file into the output file
-      CALL BDA_COPMORE( ILOC(FIRSTG), OLOC, STATUS )
+      CALL BDI_COPMORE( IFID(FIRSTG), OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT( 'Error copying MORE box into output file' )
         CALL ERR_ANNUL( STATUS )
@@ -952,62 +959,64 @@ c                              ! spacecraft co-ordinates.
       IF ( LRADEC_1 ) THEN
 
 *      Create output spatial axes
-        CALL BDA_CREAXES( OLOC, ONDIM, STATUS )
-        CALL BDA_CREAXVAL( OLOC, 1, .TRUE., ODIMS(1), STATUS )
-        CALL BDA_CREAXVAL( OLOC, 2, .TRUE., ODIMS(2), STATUS )
+        CALL BDI_CREAXES( OFID, ONDIM, STATUS )
+        CALL BDI_CREAXVAL( OFID, 1, .TRUE., ODIMS(1), STATUS )
+        CALL BDI_CREAXVAL( OFID, 2, .TRUE., ODIMS(2), STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL MSG_PRNT( 'Error creating output axes' )
-          GOTO 999
+          GOTO 99
         END IF
 
 *      Extra axes just get copied
         IF ( ONDIM .GT. 2 ) THEN
           DO I = 3, ONDIM
-            CALL BDA_COPAXIS( ILOC(FIRSTG), OLOC, I, I, STATUS )
+            CALL BDI_COPAXIS( IFID(FIRSTG), OFID, I, I, STATUS )
           END DO
         END IF
 
 *      Calculate base values of the output axes
-        XSTART = XMIN_1 + MINX * XPIX_1
-        YSTART = YMIN_1 + MINY * YPIX_1
+        CALL BDI_GETAXVAL( IFID(FIRSTG), 1, XSTART, XPIX, IDUM, STATUS )
+        CALL BDI_GETAXVAL( IFID(FIRSTG), 2, YSTART, YPIX, IDUM, STATUS )
+        XSTART = XSTART + MINX * XPIX_1
+        YSTART = YSTART + MINY * YPIX_1
 
 *      Write values to axis structure
-        CALL BDA_PUTAXVAL( OLOC, 1, XSTART, XPIX_1, ODIMS(1), STATUS )
-        CALL BDA_PUTAXVAL( OLOC, 2, YSTART, YPIX_1, ODIMS(2), STATUS )
+        CALL BDI_PUTAXVAL( OFID, 1, XSTART, XPIX_1, ODIMS(1), STATUS )
+        CALL BDI_PUTAXVAL( OFID, 2, YSTART, YPIX_1, ODIMS(2), STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL MSG_PRNT('Error writing output axes')
-          GOTO 999
+          GOTO 99
         END IF
 
 *      Copy axis text from 1st input to output
-        CALL BDA_COPAXTEXT( ILOC(FIRSTG), OLOC, 1, 1, STATUS )
-        CALL BDA_COPAXTEXT( ILOC(FIRSTG), OLOC, 2, 2, STATUS )
+        CALL BDI_COPAXTEXT( IFID(FIRSTG), OFID, 1, 1, STATUS )
+        CALL BDI_COPAXTEXT( IFID(FIRSTG), OFID, 2, 2, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL MSG_PRNT('Error writing axis labels and units')
-          GOTO 999
+          GOTO 99
         END IF
 
       END IF
 
 *    Copy history structure from first file into the output file
-      CALL HIST_COPY( ILOC(FIRSTG), OLOC, STATUS )
+      CALL HSI_COPY( IFID(FIRSTG), OFID, STATUS )
 
 *    Add standard record to new history structure
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Put names of input datafiles used into history
       CALL USI_NAMEI( NLINES, PATH, STATUS )
-      CALL HIST_PTXT( OLOC, NLINES, PATH, STATUS )
+      CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
 
- 999  CALL AST_CLOSE()
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
 
 
 *+  IMOSAIC_GETAST - Gets astrometry information from a datafile
-      SUBROUTINE IMOSAIC_GETAST(LOC, IDIMS, RA, DEC, ROLL, XMIN, XMAX,
-     :                    YMIN, YMAX, XPIX, YPIX, CONV, LRADEC, STATUS)
+      SUBROUTINE IMOSAIC_GETAST( FID, IDIMS, POINT, XPIX, YPIX, LRADEC,
+     :                           PIXID, PRJID, SYSID, STATUS )
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -1023,167 +1032,79 @@ c                              ! spacecraft co-ordinates.
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE  'DAT_PAR'
-      INCLUDE  'MATH_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC) LOC                 !Locator to input file
+      INTEGER			FID			! Input dataset id
       INTEGER IDIMS(2)                           !Dimensions of input data array
 *
 *    Export :
 *
-      DOUBLE PRECISION RA                        !RA of field centre
-      DOUBLE PRECISION DEC                       !DEC of field centre
-      DOUBLE PRECISION ROLL                      !Roll angle of image (to north)
-      REAL XMIN,XMAX,YMIN,YMAX                   !Axis ranges
+      DOUBLE PRECISION		POINT(2)		! Pointing direction
       REAL XPIX                                  !Size of pixel in first dim.
       REAL YPIX                                  !Size of pixel in second dim.
-      REAL CONV(2)                               !Conversion from axis units to
-*                                                ! radians
       LOGICAL LRADEC                             !Sufficient astrometry info ?
+      INTEGER			PIXID,PRJID,SYSID	! Astrometry info
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) HLOC                !Locator to header structure
       INTEGER NOUT(2)                            !Axis dimensions
-      INTEGER AXPTR(2)                           !Pointer to mapped axis arrays
-      INTEGER AXLP
-      CHARACTER*80 UNITS                         !Units of axis
+      REAL			SCALE(2)			! Bin sizes
       LOGICAL OK                                 !Is object present
       LOGICAL REG                                !Are axes regular ?
-      DOUBLE PRECISION PA                        !Position angle of image
+      INTEGER			NACT			! Values read from obj
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*    Get locator to header box
-      CALL BDA_LOCHEAD(LOC, HLOC, STATUS)
-
-*    Read RA,DEC,position angle
-      CALL CMP_GET0D( HLOC, 'AXIS_RA', RA, STATUS )
-      CALL CMP_GET0D( HLOC, 'AXIS_DEC', DEC, STATUS )
-      CALL CMP_GET0D( HLOC, 'POSITION_ANGLE', PA, STATUS )
-
-*    Convert angles to radians
-      RA = RA * MATH__DTOR
-      DEC = DEC * MATH__DTOR
-      ROLL = PA * MATH__DTOR
+*    Locate astrometry
+      CALL WCI_GETIDS( FID, PIXID, PRJID, SYSID, STATUS )
 
 *    Map axis values.
-      CALL BDA_CHKAXVAL( LOC, 1, OK, REG, NOUT(1), STATUS )
-      CALL BDA_CHKAXVAL( LOC, 2, OK, REG, NOUT(2), STATUS )
+      CALL BDI_CHKAXVAL( FID, 1, OK, REG, NOUT(1), STATUS )
+      CALL BDI_CHKAXVAL( FID, 2, OK, REG, NOUT(2), STATUS )
 
 *    Check if number of axis elements are consistent with data array
       IF ( (NOUT(1) .NE. IDIMS(1) .OR. NOUT(2) .NE. IDIMS(2)) .AND.
      :                                     STATUS .EQ. SAI__OK ) THEN
 
-         CALL MSG_PRNT('Dimensions of data array dont '/
-     :                             /'match axis dimensions')
-         STATUS=SAI__ERROR
+        STATUS = SAI__ERROR
+        CALL ERR_REP(' ', 'Dimensions of data array don''t '/
+     :                     /'match axis dimensions', STATUS )
 
-      ELSE
+      END IF
 
-         CALL BDA_MAPAXVAL(LOC, 'READ', 1, AXPTR(1), STATUS)
-         CALL BDA_MAPAXVAL(LOC, 'READ', 2, AXPTR(2), STATUS)
-
-      ENDIF
-
-* test if any objects were missing
-
+*  Test if any objects were missing
       IF (STATUS .NE. SAI__OK) THEN
 
-         CALL ERR_ANNUL(STATUS)
-         CALL MSG_PRNT('Insufficient astrometry info. '/
+        CALL ERR_ANNUL(STATUS)
+        CALL MSG_PRNT('Insufficient astrometry info. '/
      :                     /'in first datafile - using pixel offsets')
 
-         LRADEC=.FALSE.
+        LRADEC = .FALSE.
 
       ELSE
+        LRADEC=.TRUE.
 
-         LRADEC=.TRUE.
+*    Defines bin width
+        CALL ADI_CGET1R( PIXID, 'SCALE', 2, SCALE, NACT, STATUS )
+        XPIX = SCALE(1)
+        YPIX = SCALE(2)
 
-* find the pixel widths in the X and Y directions by finding the first
-* and last axis bin values.
+      END IF
 
-         CALL ARR_ELEM1R(AXPTR(1),NOUT(1),1,XMIN,STATUS)
-         CALL ARR_ELEM1R(AXPTR(1),NOUT(1),NOUT(1),XMAX,STATUS)
-         CALL ARR_ELEM1R(AXPTR(2),NOUT(2),1,YMIN,STATUS)
-         CALL ARR_ELEM1R(AXPTR(2),NOUT(2),NOUT(2),YMAX,STATUS)
-*
-         XPIX=(XMAX-XMIN)/(NOUT(1)-1)
-         YPIX=(YMAX-YMIN)/(NOUT(2)-1)
+*  Extract pointing
+      CALL ADI_CGET1D( PRJID, 'SPOINT', 2, POINT, NACT, STATUS )
+      POINT(1) = POINT(1) * MATH__DDTOR
+      POINT(2) = POINT(2) * MATH__DDTOR
 
-      ENDIF
-
-*    Find conversion factors between local units and radians
-      DO AXLP = 1,2
-
-*      Get units of axis
-        CALL BDA_GETAXUNITS(LOC, AXLP, UNITS, STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error accessing axis units')
-            GOTO 999
-         ENDIF
-
-*      Calculate conversion factor between axis units and radians
-        CALL CONV_UNIT2R(UNITS,CONV(AXLP),STATUS)
-      END DO
-
-*    IF xpix is positive then the roll angle direction is changed
-      IF (XPIX .GT. 0.0) ROLL=-ROLL
-*
- 999  IF (STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP(' ','fromIMOSAIC_GETAST',STATUS)
+*  Tidy up
+ 99   IF (STATUS .NE. SAI__OK) THEN
+        CALL AST_REXIT( 'IMOSAIC_GETAST', STATUS )
       END IF
 
       END
-
-
-	SUBROUTINE IMOSAIC_DTRANS(RA, DEC, CTOS, FWD, AZ, EL,STATUS)
-*
-	DOUBLE PRECISION RA		!input	Radians
-	DOUBLE PRECISION DEC		!input	Radians
-	DOUBLE PRECISION CTOS(3,3)	!input	Celestial - other matrix
-	LOGICAL FWD			!input	.true. for cel->other
-	DOUBLE PRECISION AZ		!output	Radians
-	DOUBLE PRECISION EL		!output	Radians
-
-        INTEGER STATUS
-        INCLUDE 'SAE_PAR'
-
-
-	DOUBLE PRECISION V1, V2, V3, V(3), CRA, CDEC, SRA, TWOPI
-	PARAMETER (TWOPI = 6.28318530717957D0)
-
-        IF (STATUS.NE.SAI__OK) RETURN
-
-        SRA=SIN(RA)
-        CRA=COS(RA)
-        V3=SIN(DEC)
-        CDEC=COS(DEC)
-*
-	V1 = CRA * CDEC
-	V2 = SRA * CDEC
-*
-	IF(FWD) THEN
-	    DO J = 1,3
-		V(J) = V1 * CTOS(1,J) + V2 * CTOS(2,J) + V3 * CTOS(3,J)
-	    END DO
-	ELSE
-	    DO J = 1,3
-		V(J) = V1 * CTOS(J,1) + V2 * CTOS(J,2) + V3 * CTOS(J,3)
-	    END DO
-	END IF
-*
-	AZ = ATAN2(V(2), V(1))
-*
-	IF (.NOT. FWD .AND. AZ .LT. 0.0D0) AZ = AZ + TWOPI
-*
-	EL = ASIN(V(3))
-*
-	END
-
 
 
 *+  IMOSAIC_ROTREB - Sample an image array into a new grid
@@ -1193,7 +1114,7 @@ c                              ! spacecraft co-ordinates.
 *
 *    Description :
 *
-*       Takes in an image array and rotates it and rebins it into a
+*      Takes in an image array and rotates it and rebins it into a
 *      new grid. The position of each pixel in the new image is found in
 *      the coordinate system of the old image. The nearest pixel to this
 *      position in the old image is then added into the new image. New pixels
@@ -1224,7 +1145,6 @@ c                              ! spacecraft co-ordinates.
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE  'DAT_PAR'
 *
 *    Import :
 *
@@ -1270,15 +1190,16 @@ c                              ! spacecraft co-ordinates.
 
 *      Find Y value.
         YP = (REAL(J)-0.5)*YPIX
-        YP = YP - (YBASE + REAL(IDIM2) / 2.0)
+c        YP = YP - (YBASE + REAL(IDIM2) / 2.0)
 
 	DO K=1,ODIM1
 *
 	  XP=(REAL(K)-0.5)*XPIX
-          XP = XP - (XBASE + REAL(IDIM1) / 2.0)
+c          XP = XP - (XBASE + REAL(IDIM1) / 2.0)
 *
-          XOLD = XP*CTH-YP*STH + REAL(IDIM1) / 2.0
-	  YOLD = XP*STH+YP*CTH + REAL(IDIM2) / 2.0
+          XOLD = XP*CTH-YP*STH + XBASE
+	  YOLD = XP*STH+YP*CTH + YBASE
+
 	  IX=XOLD+1
 *
 	    IF (IX .GT. 0 .AND. IX .LE. IDIM1) THEN
@@ -1397,7 +1318,6 @@ c                              ! spacecraft co-ordinates.
 *    Global constants :
 *
       INCLUDE  'SAE_PAR'
-      INCLUDE  'DAT_PAR'
       INCLUDE  'QUAL_PAR'
 *
 *    Import :
@@ -1543,7 +1463,6 @@ c                                           ! element in the output array.
 *    Global constants :
 *
       INCLUDE  'SAE_PAR'
-      INCLUDE  'DAT_PAR'
       INCLUDE  'QUAL_PAR'
 *
 *    Import :
