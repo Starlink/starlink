@@ -26,11 +26,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     9-OCT-1994 (PDRAPER):
 #        Original version
+#     4-JUL-2001 (MBT):
+#        Fixed to use globals keyed by Set Index if required.
 #     {enter_changes_here}
 
 #-
@@ -43,6 +46,7 @@
    global CCDseetasks
    global CCDallndfs
    global CCDglobalpars
+   global CCDgloprefix
    global KAPdir
    global MAIN
 #.
@@ -151,18 +155,21 @@
 #  Wait for interaction to end... and then write out results.
 #  CCD extent.
    set results ""
-   if { [info exists CCDglobalpars(EXTENT)] } {
-      append results "    Useful CCD area = $CCDglobalpars(EXTENT) \n"
+   if { [info exists CCDglobalpars(${CCDgloprefix}EXTENT)] } {
+      append results \
+      "    Useful CCD area = $CCDglobalpars(${CCDgloprefix}EXTENT) \n"
    }
 
 #  Readout direction.
-   if {[info exists CCDglobalpars(DIRECTION)] } {
-      append results "    Readout direction = $CCDglobalpars(DIRECTION) \n"
+   if {[info exists CCDglobalpars(${CCDgloprefix}DIRECTION)] } {
+      append results \
+      "    Readout direction = $CCDglobalpars(${CCDgloprefix}DIRECTION) \n"
    }
 
 #  Bias strips.
-   if {[info exists CCDglobalpars(BOUNDS)] } {
-      append results "    Bias strip bounds = $CCDglobalpars(BOUNDS) \n"
+   if {[info exists CCDglobalpars(${CCDgloprefix}BOUNDS)] } {
+      append results \
+      "    Bias strip bounds = $CCDglobalpars(${CCDgloprefix}BOUNDS) \n"
    }
 
 #  Write out the result if any.
