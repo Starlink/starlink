@@ -24,14 +24,13 @@ AC_PROG_CC
 AC_PATH_PROG(PERL, perl)
 STAR_CHECK_PROGS(prolat, sst)
 
-dnl    See AM_PROG_LEX documentation
+dnl    Ideally only code produced by flex should be distributed.
 AM_PROG_LEX
 if test "$LEX" != flex; then
-  LEX="$SHELL $missing_dir/missing flex"
-  AC_SUBST(LEX_OUTPUT_ROOT, lex.yy)
-  AC_SUBST(LEXLIB, '')
+   AC_MSG_WARN([Do NOT distribute source code created by the '$LEX' command.])
+   AC_MSG_WARN([Only code produced by the flex command is recommended])
+   AC_MSG_WARN([for distribution.])
 fi
-
 
 dnl    Work out what size a pointer is.  Note, this isn't written in a 
 dnl    foolproof manner, but it will probably work.

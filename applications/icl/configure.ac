@@ -21,14 +21,21 @@ AC_PROG_FC
 AC_PROG_CC
 AC_PROG_YACC
 
-dnl    See AM_PROG_LEX documentation
+dnl    It seems that ICL simply refuses to work correctly unless we
+dnl    use the -l flag for maximum compatibility with the original lex.
+dnl    Also ideally only code produced by flex should be distributed.
 AM_PROG_LEX
-if test "$LEX" != flex; then
-  LEX="$SHELL $missing_dir/missing flex"
-  AC_SUBST(LEX_OUTPUT_ROOT, lex.yy)
-  AC_SUBST(LEXLIB, '')
+
+if test "$LEX" = flex; then
+   icl_AM_LFLAGS="-l"
+   AC_SUBST([icl_AM_LFLAGS])
 fi
 
+if test "$LEX" != flex; then
+   AC_MSG_WARN([Do NOT distribute source code created by the '$LEX' command.])
+   AC_MSG_WARN([Only code produced by the flex command is recommended])
+   AC_MSG_WARN([for distribution.])
+fi
 
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
@@ -42,6 +49,9 @@ AC_CHECK_HEADERS([curses.h cursesX.h])
 # icl_io.c
 dnl    Or ncurses term.h in /usr/include.
 AC_CHECK_HEADERS([term.h ncurses/term.h])
+
+dnl Check for library, either -lncurses or -lcurses. Prefer ncurses.
+AC_CHECK_LIB([ncurses], [initscr],,AC_CHECK_LIB([curses], [initscr]))
 
 # unix.c should be tweaked to not use environ
 AC_CHECK_FUNCS([setenv putenv])
