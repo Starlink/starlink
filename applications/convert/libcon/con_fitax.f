@@ -113,6 +113,7 @@
                                  ! pixels
      :  OFFSET,                  ! Offset after allowing for the
                                  ! position of reference pixel
+     :  RATIO,                   ! Ratio of increment to offset of axis
      :  REFP,                    ! Pixel position of the reference pixel
      :  REFV                     ! Co-ordinate at the reference pixel
 
@@ -204,11 +205,17 @@
 *          Define the criterion for deciding whether or not
 *          single-precision axis centres are adequate.  It is important
 *          that the increments between elements are greater than the
-*          floating-point precision.  To give reduce possible errors
-*          the fractional difference is scaled by a constant.
+*          floating-point precision.  To reduce possible errors the
+*          fractional difference is scaled by a constant.  However, the
+*          values may conspire to give a zero offset (e.g. US-style
+*          co-ordinates of pixels).
 
-            IF ( ABS( DELT / OFFSET ) .GT.
-     :           DBLE( VAL__EPSR ) * PRECF ) THEN
+            IF ( ABS( OFFSET ) .LT. VAL__EPSD ) THEN
+               RATIO = 1.0
+            ELSE
+               RATIO = ABS( DELT / OFFSET )
+            END IF
+            IF ( RATIO .GT. DBLE( VAL__EPSR ) * PRECF ) THEN
 
 *             Map the centre array in the axis structure.
 
