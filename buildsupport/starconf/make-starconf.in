@@ -75,7 +75,7 @@ allconfchunks="$@"
 optchars="qfx"
 
 # Find all the files which are always extracted -- that is, all the
-# files which do not have a `?' <option>
+# files which do not have a `q' <option>
 defaultchunklist=
 for c in $allconfchunks
 do
@@ -86,6 +86,7 @@ do
     fi
 done
 # echo "XXX defaultchunklist=$defaultchunklist"
+
 
 
 # Start generating the output -- open FD 3 for the generated script
@@ -202,23 +203,25 @@ if test -x $buildsupportbin/starconf-validate; then
     fi
 fi
 
-if test -e bootstrap; then
-    # Check the `bootstrap' file, to see if the first word on the second line
-    # is `original'.  If it is, then unpack the bootstrap file, overwriting
-    # any bootstrap file that's already there.
-    eval `sed -e '1d' -e '2{s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\)/original=\1; bootstrap_version=\2;/;q;}' bootstrap`
-    # echo "XXX original=$original  rnum=$bootstrap_version curr=$versionint"
-    if test "X$original" != Xoriginal; then
-        : do nothing -- file has been modified
-    elif test $bootstrap_version -lt $versionint; then
-        extrachunks="$extrachunks !*bootstrap"
-    else
-        : do nothing -- file is up to date
-    fi
-else
-    # No `bootstrap' file, so unpack one
-    extrachunks="$extrachunks bootstrap"
-fi
+#if test -e bootstrap; then
+#    # Check the `bootstrap' file, to see if the first word on the second line
+#    # is `original'.  If it is, then unpack the bootstrap file, overwriting
+#    # any bootstrap file that's already there.
+#    eval `sed -e '1d' -e '2{s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\)/original=\1; bootstrap_version=\2;/;q;}' bootstrap`
+#    # echo "XXX original=$original  rnum=$bootstrap_version curr=$versionint"
+#    if test "X$original" != Xoriginal; then
+#        : do nothing -- file has been modified
+#    elif test $bootstrap_version -lt $versionint; then
+#        extrachunks="$extrachunks -xf:bootstrap"
+##        extrachunks="$extrachunks !*bootstrap"
+#    else
+#        : do nothing -- file is up to date
+#    fi
+#else
+#    # No `bootstrap' file, so unpack one
+#    extrachunks="$extrachunks bootstrap"
+#fi
+extrachunks="$extrachunks -xq:bootstrap"
 
 # Scan configure.ac, getting all the used STAR_* macros into a string
 starmacros=`sed -n 's/^\(STAR[_A-Z]*\).*/\1/p' configure.ac | sed '{:a;N;s/\n/ /;t a;}'`
@@ -247,7 +250,7 @@ else
     exit 1
 fi
 
-# Similarly, scan Makefile.am and check that there it NO LONGER includes
+# Similarly, scan Makefile.am and check that it NO LONGER includes
 # Makefile.starconf
 if grep 'include .*Makefile.starconf' Makefile.am >/dev/null; then
     echo "$0: Makefile.am still includes \$(srcdir)/Makefile.starconf"
@@ -255,12 +258,6 @@ if grep 'include .*Makefile.starconf' Makefile.am >/dev/null; then
 else
     : OK -- should not be there
 fi
-# if grep 'include .*Makefile.starconf' Makefile.am >/dev/null; then
-#     : OK -- found it
-# else
-#     echo "$0: Makefile.am does not include \$(srcdir)/Makefile.starconf"
-#     exit 1
-# fi
 
 # We now know what files we're going to include in the generated
 # starconf.status
@@ -476,8 +473,25 @@ do
     echo "# -------------------- $filename --------------------"         >&3
     echo "echo '# ---------- $filename ----------'       >&4"            >&3
 
-    # Handle the f option
-    if expr x$opts : "x.*f" >/dev/null; then
+    # Handle the options
+    if expr x$opts : "x.*q" >/dev/null; then
+        echo "echo 'filename=$filename' >&4"                             >&3
+cat >&3 <<\_STARCONF3_EOD
+cat >&4 <<\_STARCONF4_EOD
+        # Extract the first word on the second line, and the value of rnum
+        eval `sed -n -e '2s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\).*/original=\1; file_version=\2;/p' -e 3q $filename`
+        if test "X\$original" != Xoriginal; then
+            # do nothing -- file has been modified
+            unpack_this=false
+        elif test -n "$file_version" -a "$file_version" -lt @PACKAGE_VERSIONINT@; then
+            unpack_this=true
+        else
+            # no need to do anything
+            unpack_this=false
+        fi
+_STARCONF4_EOD
+_STARCONF3_EOD
+    elif expr x$opts : "x.*f" >/dev/null; then
         echo '# Just unpack the file (stomp stomp stomp)'                >&3
         echo 'echo unpack_this=true >&4'                                 >&3
     else
@@ -500,7 +514,7 @@ do
         echo "echo '    chmod +x $filename'              >&4"            >&3
     fi
     echo "echo 'else'                                    >&4"            >&3
-    echo "echo '    echo \"File $filename already exists, not overwriting\"'>&4 ">&3
+    echo "echo '    echo \"File $filename already exists or up-to-date: not overwriting\"'>&4 ">&3
     echo "echo 'fi'                                      >&4"            >&3
     echo "echo 'expr $filename : \".*m4\$\" >/dev/null && allm4=\"\$allm4 $filename\"' >&4" >&3
     echo "echo 'allextracted=\"\$allextracted $filename\"' >&4"          >&3
