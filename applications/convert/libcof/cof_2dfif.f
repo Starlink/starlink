@@ -30,7 +30,7 @@
 *        The global status.
 
 *  References:
-*     Bailey, J.A. 1996, 2dF Software Report 14, version 0.3.
+*     Bailey, J.A. 1996,97, 2dF Software Report 14, versions 0.3, 0.5.
 
 *  Prior Requirements:
 *     The FITS and HDS files must be open.  Indeed the current HDU
@@ -46,7 +46,9 @@
 *  History:
 *     1997 Februray 28 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 November 10 (MJC):
+*        Added FILENAME to the FIELD structure.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -266,6 +268,15 @@
       IF ( THERE ) THEN
          CALL DAT_NEW0C( LOC, 'LABEL', 80, STATUS )
          CALL DAT_FIND( LOC, 'LABEL', CLOC, STATUS )
+         CALL DAT_PUT0C( CLOC, CVALUE, STATUS )
+         CALL DAT_ANNUL( CLOC, STATUS )
+      END IF
+
+*  FILENAME
+      CALL COF_GKEYC( FUNIT, 'FILENAME', THERE, CVALUE, COMENT, STATUS )
+      IF ( THERE ) THEN
+         CALL DAT_NEW0C( LOC, 'FILENAME', 500, STATUS )
+         CALL DAT_FIND( LOC, 'FILENAME', CLOC, STATUS )
          CALL DAT_PUT0C( CLOC, CVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
