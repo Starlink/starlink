@@ -62,3 +62,13 @@ set OutputParList(setunits) {}
 set DynParList(setunits) {}
 set OutputParList(setvar) {}
 set DynParList(setvar) {}
+set OutputParList(wcsadd) {}
+set DynParList(wcsadd) {}
+set OutputParList(wcsattrib) {state value}
+set DynParList(wcsattrib) {}
+set OutputParList(wcscopy) {}
+set DynParList(wcscopy) {}
+set OutputParList(wcsframe) {}
+set DynParList(wcsframe) {}
+set OutputParList(wcsremove) {}
+set DynParList(wcsremove) {}

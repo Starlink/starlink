@@ -72,6 +72,10 @@ set OutputParList(histogram) {comp}
 set DynParList(histogram) {device}
 set OutputParList(laplace) {}
 set DynParList(laplace) {}
+set OutputParList(listmake) {}
+set DynParList(listmake) {}
+set OutputParList(listshow) {dim number posns}
+set DynParList(listshow) {first last quiet}
 set OutputParList(log10) {}
 set DynParList(log10) {}
 set OutputParList(kstest) {comp dist errmean files mean nkept prob sigma}
@@ -114,6 +118,8 @@ set OutputParList(pixdupe) {}
 set DynParList(pixdupe) {}
 set OutputParList(pow) {}
 set DynParList(pow) {}
+set OutputParList(profile) {}
+set DynParList(profile) {}
 set OutputParList(psf) {axisr fwhm gamma orient}
 set DynParList(psf) {cosys}
 set OutputParList(quilt) {}
@@ -156,6 +162,8 @@ set OutputParList(trantrace) {classfor classinv comment forward inverse nvin nvo
 set DynParList(trantrace) {}
 set OutputParList(trig) {}
 set DynParList(trig) {}
+set OutputParList(wcsalign) {}
+set DynParList(wcsalign) {}
 set OutputParList(wiener) {}
 set DynParList(wiener) {}
 set OutputParList(zaplin) {}
