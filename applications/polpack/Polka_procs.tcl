@@ -8196,14 +8196,11 @@ proc LoadTask {task file} {
    global ADAM_USER
    global RENDEVOUS
    global TASK_FILE
-   global env
 
 # Load the task.
    set taskload [list adamtask $task $file ]
    if {[catch $taskload error] != 0} {
-      if { ![info exists env(ICL_TASK_NAME)] } { 
-         puts "Error loading task $task (file $file): \"$error\". Aborting..."
-      }
+      puts "Error loading task $task (file $file): \"$error\". Aborting..."
       Message "Error loading task $task (file $file): \"$error\". Aborting..."
       exit 1
    }
@@ -8214,9 +8211,7 @@ proc LoadTask {task file} {
       after 100
       incr count
       if {$count > 100} {
-         if { ![info exists env(ICL_TASK_NAME)] } { 
-            puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
-         }
+         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
          Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
          $task kill
          exit 1
@@ -8235,9 +8230,7 @@ proc LoadTask {task file} {
    }
 
    if { ![info exists RENDEVOUS($task)] } {
-      if { ![info exists env(ICL_TASK_NAME)] } { 
-         puts "Cannot find the rendevous file for $task."
-      }
+      puts "Cannot find the rendevous file for $task."
       Message "Cannot find the rendevous file for $task."
       exit 1
    }
