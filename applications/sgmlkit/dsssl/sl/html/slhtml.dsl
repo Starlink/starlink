@@ -146,25 +146,27 @@ returns <code/#f/.
 			      (frag-only #f)
 			      (full-url #f)
 			      (force-frag #f))
-  (let* ((id (or (attribute-string (normalize "id") target)
-		 (and (member (gi target) (section-element-list))
-		      (string-append
-		       "_ID" (number->string (all-element-number target))))))
+  (let* ((exportatt (attribute-string (normalize "export") target))
+         (idatt (attribute-string (normalize "id") target))
+         (id (cond 
+                (idatt 
+                   (if exportatt (string-append "xref_" idatt) idatt))
+                ((node-list=? target (document-element)) 
+                   "xref_")
+                ((equal? (gi target) (normalize "abstract"))
+                   "xref_abstract")
+                ((member (gi target) (section-element-list))
+                   (string-append "_ID" 
+                                  (number->string (all-element-number target))))
+                ((equal? (gi target) (normalize "mlabel"))
+                   (href-to-fragid-mlabel target))
+                (else #f)))
 	 (entfile (and (not frag-only)
 		       (html-file target_nd: target)))
 	 (url (and entfile
 		   (string-append (if full-url %starlink-document-server% "")
 				  entfile)))
-	 (fragid (cond
-		  (force-frag force-frag)
-		  ((node-list=? target (document-element))
-		   "xref_")
-		  (else (case (case-fold-down (gi target))
-			  (("mlabel") (href-to-fragid-mlabel target))
-			  (else (if (or (chunk? target)
-					(not id))
-				    #f
-				    (string-append "xref_" id))))))))
+         (fragid (or force-frag id)))
     (cond (frag-only fragid)
 	  (reffrag (string-append url (if fragid
 					  (string-append "#" fragid)
