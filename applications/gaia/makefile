@@ -425,7 +425,7 @@ PUBLIC_SCRIPTS = gaia.csh gaiadisp.csh .gaFilters
 #  All these files will be installed with read permissions.
 
 IRAF_SCRIPTS = gaia.cl gaia.hd _gaia.hd root.hd gaia.men \
-               gaiadisp.cl
+               gaiadisp.cl gaiacut.cl gaiadispandcut.cl gaiapercent.cl
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases
@@ -513,7 +513,7 @@ HELPTASK =
 
 HELP_SOURCES =
 
-IRAF_HELP = gaia.hlp gaiadisp.hlp
+IRAF_HELP = gaiacut.hlp gaiadispandcut.hlp gaiadisp.hlp gaia.hlp gaiapercent.hlp
 
 HYPERTEXT_HELP = gaia.htx
 
