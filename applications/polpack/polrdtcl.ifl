@@ -1,0 +1,49 @@
+#  Name:
+#     POLRDTCL.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-DEC-2000 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLRDTCL
+
+   helplib        'POLPACK_HELP:'
+
+   parameter      IN
+      position    1
+      type        LITERAL
+      prompt      'Input text file'
+      helpkey     '*'
+   endparameter
+
+   parameter      REF
+      position    2
+      type        LITERAL
+      ppath       'GLOBAL'
+      association '<-GLOBAL.CATALOGUE'
+      prompt      'Reference catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT
+      position    3
+      type        LITERAL
+      association '->GLOBAL.CATALOGUE'
+      prompt      'Output catalogue'
+      helpkey     '*'
+   endparameter
+
+endinterface
