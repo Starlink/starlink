@@ -172,7 +172,6 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	INTEGER AXWPTR			! Pointer to axis width
 	INTEGER AXNO			! Axis number
 	INTEGER N			! Current bound number
-	INTEGER NVAL			! No of values
 
 	LOGICAL WID			! Axis width available?
 *-
@@ -185,7 +184,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
       DO AXNO = 1, NMDIM
 
 *    Get axis values
-        CALL BDI_AXMAPR( DID, AXNO, 'Data', 'READ, AXPTR, STATUS )
+        CALL BDI_AXMAPR( DID, AXNO, 'Data', 'READ', AXPTR, STATUS )
 
 	IF(STATUS.NE.SAI__OK)THEN
 
