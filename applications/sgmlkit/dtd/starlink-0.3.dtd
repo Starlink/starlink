@@ -358,7 +358,7 @@
   made omissable.
 -->
 <!entity % docinfo.model 
-	'title , subtitle? , authorlist , keyword* %docnumber %history ,
+	'title , authorlist , keyword* %docnumber %history ,
 	coverimage?, copyright?'>
 <!element DOCINFO o o (%docinfo.model)>
 
