@@ -285,7 +285,7 @@ In addition, SUN/55 now describes how to convert NDFs to IDL format.
      files made by its sister application, NDF2FITS.
 
   o  NDF2DA -- This provides the inverse operation to DA2NDF.
-     It permits you to process such files wuth standard packages
+     It permits you to process such files with standard packages
      through the automatic-conversion system.
 
 3 Global_changes
