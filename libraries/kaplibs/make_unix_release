@@ -98,6 +98,9 @@
 #  Create the documentation in the current directory
       if( "$makesun" == "yes" ) then
          $KAPLIBS_DEV/bin/make_sun238.csh 
+      else
+         cp $KAPLIBS_SYS/sun238.htx_tar ./
+         cp $KAPLIBS_REF/sun238.tex ./
       endif
 
 #  Tar up all the release files and then remove them.
