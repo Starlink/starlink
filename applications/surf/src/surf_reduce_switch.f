@@ -103,10 +103,13 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
-*     Revision 1.8  1996/10/30 03:01:39  timj
-*     Use VEC_ITOI instead of SCULIB_COPYI.
-*     Rewrite header to new Starlink standard.
+*     Revision 1.9  1996/10/31 18:07:24  timj
+*     Add support for SCUBAWAVE and RAMPWAVE chop functions.
 *
+c Revision 1.8  1996/10/30  03:01:39  timj
+c Use VEC_ITOI instead of SCULIB_COPYI.
+c Rewrite header to new Starlink standard.
+c
 *    endhistory
 
 *  Bugs:
@@ -380,6 +383,8 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((CHOP_FUNCTION .NE. 'SQUARE') .AND.
+     :        (CHOP_FUNCTION .NE. 'SCUBAWAVE') .AND.
+     :        (CHOP_FUNCTION .NE. 'RAMPWAVE') .AND.
      :       (CHOP_FUNCTION .NE. 'TRIPOS')) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC ('CHOP', CHOP_FUNCTION)
