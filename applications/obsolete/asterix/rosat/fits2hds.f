@@ -285,7 +285,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'FITS2HDS Version 2.2-0' )
+        PARAMETER		( VERSION = 'FITS2HDS Version rb test' )
 
       INTEGER                   MXRECS
         PARAMETER               ( MXRECS = 10000 )
@@ -447,7 +447,7 @@
 
 *      Open hds output fIle
           CALL FITS2HDS_OPHDS( HNAME, ' ', FILENO, FNEW, OFID,
-     :                         F2H_TYPE, STATUS )
+     :                         F2H_TYPE, IUNIT, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
           HDSOPEN = .TRUE.
 
@@ -572,7 +572,7 @@
 
 *     Create an output HDS fIle
 	 CALL FITS2HDS_OPHDS( HNAME, EXTNAME, FILENO, FNEW, OFID,
-     :                        F2H_TYPE, STATUS )
+     :                        F2H_TYPE, IUNIT, STATUS )
          CALL ADI1_GETLOC( OFID, LOC, STATUS )
          IF (STATUS.NE.SAI__OK) goto 99
          HDSOPEN = .TRUE.
@@ -878,8 +878,8 @@
 
 
 *+ FITS2HDS_OPHDS - Open or create a HDS file
-      SUBROUTINE FITS2HDS_OPHDS( HNAME, EXTNAME, FCNT, FNEW, FID,
-     :                           TYPE, STATUS )
+      SUBROUTINE FITS2HDS_OPHDS( HNAME, EXTNAME, FCNT, FNEW, OFID,
+     :                           TYPE, IFID, STATUS )
 
       IMPLICIT NONE
 
@@ -889,12 +889,13 @@
       INTEGER CHR_LEN
         EXTERNAL CHR_LEN
 *    Import:
-      CHARACTER*(*) HNAME,EXTNAME
-      LOGICAL		FNEW
+      CHARACTER*(*)		HNAME,EXTNAME
+      LOGICAL			FNEW
+      INTEGER			IFID
 *    Import/Export:
       INTEGER			FCNT
 *    Export:
-      INTEGER			FID, TYPE
+      INTEGER			OFID, TYPE
 
 *  Status:
       INTEGER			STATUS             	! Global status
@@ -905,6 +906,7 @@
       CHARACTER*132		PNAME
         SAVE                    PNAME
       CHARACTER*20		LEXTNM
+      CHARACTER*40		INSTR, CMNT
 
       INTEGER			NCHAR			! # characters used
 *.
@@ -922,8 +924,13 @@
 *      Is it a special HDU type?
           LEXTNM = EXTNAME
           CALL CHR_UCASE( LEXTNM )
-          IF ( INDEX( LEXTNM, 'EVENT' ) .GT. 0 ) THEN
-            TYPE = 1
+          IF ( LEXTNM .EQ. 'EVENTS' ) THEN
+            CALL FTGKYS( IFID, 'INSTRUME', INSTR, CMNT, STATUS )
+            IF ( INSTR .EQ. 'LEGRI' ) THEN
+              TYPE = 1
+            ELSE
+              TYPE = 0
+            END IF
           ELSE
             TYPE = 0
           END IF
@@ -978,9 +985,9 @@
 
 *  Make identifier from locator
       IF ( FNEW ) THEN
-        CALL ADI1_MKFILE( LOC, 'WRITE', FID, STATUS )
+        CALL ADI1_MKFILE( LOC, 'WRITE', OFID, STATUS )
       ELSE
-        CALL ADI1_MKFILE( LOC, 'UPDATE', FID, STATUS )
+        CALL ADI1_MKFILE( LOC, 'UPDATE', OFID, STATUS )
       END IF
 
       END
