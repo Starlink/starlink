@@ -112,7 +112,7 @@
 
 *
 * Get type of output dataset - binned or event?
-      CALL USI_GET0C('DATASET', SRT.DTYPE, STATUS)
+      CALL USI_GET0C('TYPE', SRT.DTYPE, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -133,10 +133,10 @@
       CALL XRTSORT_RANGESELECT(HEAD,SRT,BSRT,SDIM,BDIM,NRBIN,NAZBIN,
      :                                  MDIM,MRES,SMPTR,BMPTR,STATUS)
 
-      CALL USI_TASSOCO('SRCFILE',SRT.DTYPE,SID,STATUS)
+      CALL USI_TASSOCO('OUT',SRT.DTYPE,SID,STATUS)
       CALL ADI1_GETLOC(SID,LOCS,STATUS)
       IF (SRT.BCKGND) THEN
-        CALL USI_TASSOCO('BCKFILE',SRT.DTYPE,BID,STATUS)
+        CALL USI_TASSOCO('BOUT',SRT.DTYPE,BID,STATUS)
         CALL ADI1_GETLOC(BID,LOCB,STATUS)
       ENDIF
 
@@ -283,9 +283,9 @@
 999   CONTINUE
 *
 *   Tidy up
-      CALL USI_ANNUL('SRCFILE',STATUS)
+      CALL USI_ANNUL('OUT',STATUS)
       IF (SRT.BCKGND) THEN
-         CALL USI_ANNUL('BCKFILE',STATUS)
+         CALL USI_ANNUL('BOUT',STATUS)
       ENDIF
       CALL AST_CLOSE()
 *
@@ -1043,21 +1043,15 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 
         ELSE
 
-*   Check if user wants a directory listing. Display by default.
-          CALL USI_GET0L('DIR',LISTDIR,STATUS)
 
-          IF (LISTDIR) THEN
+          CALL MSG_PRNT('The following header files are present:')
+          DO LP=1,NFILES
+            CALL STR_ROOT(FILE(LP),RTNAME)
+            CALL MSG_SETC('FILE', RTNAME)
+            CALL MSG_PRNT(' ^FILE')
+          ENDDO
+          CALL MSG_BLNK()
 
-            CALL MSG_PRNT('The following header files are present:')
-            DO LP=1,NFILES
-              CALL STR_ROOT(FILE(LP),RTNAME)
-              CALL MSG_SETC('FILE', RTNAME)
-              CALL MSG_PRNT(' ^FILE')
-            ENDDO
-            CALL MSG_BLNK()
-
-          ENDIF
-*
 *  Get root-name
           CALL STR_ROOT(FILE(1), RTNAME)
           K = INDEX(RTNAME, '_hdr.')
@@ -1585,9 +1579,9 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         DOUBLE PRECISION RARAD        ! RA pointing direction in radians
         DOUBLE PRECISION DECRAD       ! DEC pointing direction in radians
         DOUBLE PRECISION DROLL        ! Roll angle of spacecraft (radians)
-        DOUBLE PRECISION CTOS(3,3)    ! S/C to celestial conversion matrix
-        REAL GRP_SWIDTH,GRP_SHEIGHT   ! Size of source box
-        REAL GRP_BWIDTH,GRP_BHEIGHT   ! Size of bckgnd box
+        DOUBLE PRECISION TMAT(3,3)    ! image axis to RA/DEC conversion matrix
+        REAL SWIDTH,SHEIGHT   	      ! Size of source box
+        REAL BWIDTH,BHEIGHT   	      ! Size of bckgnd box
         REAL SRAD1                    ! Inner radius of source box (pixels)
         REAL SRAD2                    ! Outer radius of source box (pixels)
         REAL BRADIN                   ! Inner radius of bckgnd annulus (degs)
@@ -1670,11 +1664,10 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
       RARAD =  HEAD.AXIS_RA * DTOR
       DECRAD = HEAD.AXIS_DEC * DTOR
 *
-*   Convert the roll angle to radians. NB: the +90.0 is a fiddle to get it
-*   right for now, I'm not sure where the screw up is.
-      DROLL = (HEAD.ROLLCI + 90.0) * DTOR
+*   Convert the roll angle to radians.
+      DROLL = (HEAD.ROLLCI) * DTOR
 *
-      CALL CONV_GENDMAT(RARAD, DECRAD, DROLL, CTOS)
+      CALL CONV_GENDMAT(RARAD, DECRAD, DROLL, TMAT)
 *
 *
 * Ask which properties will be used as binning axes in the output file.
@@ -1694,7 +1687,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         CALL MSG_PRNT('7 - Corrected PHA channel')
         CALL MSG_PRNT('8 - Radial')
 *
-        CALL USI_GET0C('BIN_AXES', BIN_AXES, STATUS)
+        CALL USI_GET0C('AXES', BIN_AXES, STATUS)
 *
         IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -1755,16 +1748,26 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 
         IF (CENTRE.EQ.'1') THEN
           CENTRE='MEAN'
+          CALL XRTSORT_AXIS2RADEC(XW,YW,TMAT,
+     :             SRT.FIELD_RA,SRT.FIELD_DEC,STATUS)
         ELSEIF (CENTRE.EQ.'2') THEN
           CENTRE='MEDIAN'
+          XW=(XW1+XW2)/2.0
+          YW=(YW1+YW2)/2.0
+          CALL XRTSORT_AXIS2RADEC(XW,YW,TMAT,
+     :             SRT.FIELD_RA,SRT.FIELD_DEC,STATUS)
         ELSEIF (CENTRE.EQ.'3') THEN
           CENTRE='AXIS'
           SRT.FIELD_RA=HEAD.AXIS_RA
           SRT.FIELD_DEC=HEAD.AXIS_DEC
+          CALL XRTCORR_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
+     :                                                XW,YW,STATUS)
         ELSEIF (CENTRE.EQ.'4') THEN
           CENTRE='USER'
-          CALL USI_GET0D('GRP_RA', SRT.FIELD_RA, STATUS)
-          CALL USI_GET0D('GRP_DEC', SRT.FIELD_DEC, STATUS)
+          CALL USI_GET0D('RA', SRT.FIELD_RA, STATUS)
+          CALL USI_GET0D('DEC', SRT.FIELD_DEC, STATUS)
+          CALL XRTCORR_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
+     :                                                XW,YW,STATUS)
         ELSE
           CALL MSG_PRNT('AST_ERR: invalid mode')
           STATUS=SAI__ERROR
@@ -1774,9 +1777,9 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 
 c        X_HWIDTH=NPIX(CBORDX)
 c        Y_HWIDTH=NPIX(CBORDY)
-        SRT.PHI=0.0
-        SRT.ELAMIN=0.0
-        SRT.ELBMIN=0.0
+C        SRT.PHI=0.0
+C        SRT.ELAMIN=0.0
+C        SRT.ELBMIN=0.0
 c        SRT.ELAMAX=X_HWIDTH
 c        SRT.ELBMAX=Y_HWIDTH
 
@@ -1784,26 +1787,23 @@ c        SRT.ELBMAX=Y_HWIDTH
       ELSE
 
 *   Set centre of the field as default
-        CALL USI_DEF0D('GRP_RA', HEAD.AXIS_RA, STATUS)
-        CALL USI_DEF0D('GRP_DEC', HEAD.AXIS_DEC, STATUS)
+        CALL USI_DEF0D('RA', HEAD.AXIS_RA, STATUS)
+        CALL USI_DEF0D('DEC', HEAD.AXIS_DEC, STATUS)
 
-        CALL USI_GET0D('GRP_RA', SRT.FIELD_RA, STATUS)
-        CALL USI_GET0D('GRP_DEC', SRT.FIELD_DEC, STATUS)
+        CALL USI_GET0D('RA', SRT.FIELD_RA, STATUS)
+        CALL USI_GET0D('DEC', SRT.FIELD_DEC, STATUS)
+
+        CALL XRTCORR_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
+     :                                              XW,YW,STATUS)
 
       ENDIF
 
       IF (STATUS .NE. SAI__OK) GOTO 999
 
-*  Calculate azimuth and elevation for the source box in raw pixels
-      CALL CONV_CONA2V(REAL(SRT.FIELD_RA)*REAL(DTOR),
-     &                           REAL(SRT.FIELD_DEC)*REAL(DTOR), VC)
+*  Calculate the source position in raw pixels
 
-      DO J = 1,3
-        VS(J) = VC(1)*CTOS(1,J)+VC(2)*CTOS(2,J)+VC(3)*CTOS(3,J)
-      END DO
-
-      SOURCE_X = NINT( -VS(3) / PTOR)
-      SOURCE_Y = NINT( -VS(2) / PTOR) * MFACT
+      SOURCE_X = NINT( -XW / PTOD)
+      SOURCE_Y = NINT( YW / PTOD) * MFACT
 
 *  Add the sky pixel centre to the source centre
       SOURCE_X = SOURCE_X + HEAD.SKYCX
@@ -1815,28 +1815,20 @@ c        SRT.ELBMAX=Y_HWIDTH
       CBORDY=MIN(ABS(SOURCE_Y-HEAD.YSTART),ABS(SOURCE_Y-HEAD.YEND))
      &                                   * PTOD * 2.0
 
-*  get the centre in world (axis) coords.
-      XW=-(SOURCE_X-HEAD.SKYCX)*PTOD
-      YW=(SOURCE_Y-HEAD.SKYCY)*PTOD*MFACT
-
-
-
-
-
 
 *  Rectangle
       IF (SRT.SHAPE .EQ. 'R') THEN
 
-	 CALL USI_DEF0R('GRP_SWIDTH', CBORDX, STATUS)
-	 CALL USI_DEF0R('GRP_SHEIGHT', CBORDY, STATUS)
-	 CALL USI_GET0R('GRP_SWIDTH', GRP_SWIDTH, STATUS)
-	 CALL USI_GET0R('GRP_SHEIGHT', GRP_SHEIGHT, STATUS)
+	 CALL USI_DEF0R('SWIDTH', CBORDX, STATUS)
+	 CALL USI_DEF0R('SHEIGHT', CBORDY, STATUS)
+	 CALL USI_GET0R('SWIDTH', SWIDTH, STATUS)
+	 CALL USI_GET0R('SHEIGHT', SHEIGHT, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *   Convert to nearest whole pixels
-         X_HWIDTH = NPIX(GRP_SWIDTH)
-	 Y_HWIDTH = NPIX(GRP_SHEIGHT)
+         X_HWIDTH = NPIX(SWIDTH)
+	 Y_HWIDTH = NPIX(SHEIGHT)
 
 *   and back to world coords.
          XWIDW=2.0*X_HWIDTH*PTOD
@@ -1856,8 +1848,8 @@ c        SRT.ELBMAX=Y_HWIDTH
 *   Circular area
       ELSEIF (SRT.SHAPE .EQ. 'C') THEN
 *
-	 CALL USI_DEF0R('RADIUS', MIN(CBORDX,CBORDY)/2.0, STATUS)
-	 CALL USI_GET0R('RADIUS', SRAD2, STATUS)
+	 CALL USI_DEF0R('RAD', MIN(CBORDX,CBORDY)/2.0, STATUS)
+	 CALL USI_GET0R('RAD', SRAD2, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -1884,9 +1876,9 @@ c        SRT.ELBMAX=Y_HWIDTH
 *   Get box inner and outer radii for an annular box
       ELSEIF (SRT.SHAPE .EQ. 'A') THEN
 *
-	 CALL USI_GET0R('RADINN', SRAD1, STATUS)
-	 CALL USI_DEF0R('RADOUT', MIN(CBORDX,CBORDY)/2.0, STATUS)
-	 CALL USI_GET0R('RADOUT', SRAD2, STATUS)
+	 CALL USI_GET0R('IRAD', SRAD1, STATUS)
+	 CALL USI_DEF0R('ORAD', MIN(CBORDX,CBORDY)/2.0, STATUS)
+	 CALL USI_GET0R('ORAD', SRAD2, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -1915,7 +1907,7 @@ c        SRT.ELBMAX=Y_HWIDTH
       ELSEIF (SRT.SHAPE .EQ. 'E') THEN
 *
 *      Get orientation. +ve is anticlockwise from east
-	 CALL USI_GET0R('ORIENT', ANGLE, STATUS)
+	 CALL USI_GET0R('ANGLE', ANGLE, STATUS)
 *
 *      Convert orientation angle to radians
          SRT.PHI = ANGLE * DTOR
@@ -2436,64 +2428,93 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       ENDIF
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
+
+
+
+
+
 * Get RA and DEC of background box in degrees.
       IF (SRT.BCKGND) THEN
-*
-         CALL USI_DEF0D('GRP_RAB', SRT.FIELD_RA, STATUS)
-	 CALL USI_DEF0D('GRP_DECB', SRT.FIELD_DEC, STATUS)
-	 CALL USI_GET0D('GRP_RAB', BSRT.FIELD_RA, STATUS)
-	 CALL USI_GET0D('GRP_DECB', BSRT.FIELD_DEC, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) GOTO 999
-*
-	 CALL CONV_CONA2V( REAL(BSRT.FIELD_RA)*REAL(DTOR),
-     &                REAL(BSRT.FIELD_DEC)*REAL(DTOR), VC )
-	 DO J = 1,3
-	    VS(J) = VC(1)*CTOS(1,J)+VC(2)*CTOS(2,J)+VC(3)*CTOS(3,J)
-	 END DO
-*
-* Calculate the celestial X and Y pixels.
-	 BCKGND_X = NINT( -VS(3) / PTOR ) + HEAD.SKYCX
-	 BCKGND_Y = NINT( -VS(2) / PTOR ) * MFACT + HEAD.SKYCY
-*
-*
-* Calculate the closest background borders
-         BBORDX=MIN( ABS(BCKGND_X-HEAD.XSTART), ABS(BCKGND_X-HEAD.XEND))
-     &                                   * PTOD * 2.0
-         BBORDY=MIN( ABS(BCKGND_Y-HEAD.YSTART), ABS(BCKGND_Y-HEAD.YEND))
-     &                                   * PTOD * 2.0
 
-         BXW=-(BCKGND_X-HEAD.SKYCX)*PTOD
-         BYW=(BCKGND_Y-HEAD.SKYCY)*PTOD*MFACT
-*
-* Set background SHAPE variable
-         BSRT.SHAPE = SRT.SHAPE
-         CALL ARX_OPEN('WRITE',BSRT.ARDID,STATUS)
 
-*
-* Get extent of area depending on shape
-*
-* Import ARD file
-         IF (SRT.SHAPE .EQ. 'I') THEN
+*  ARD description
+         IF (BSRT.SHAPE.EQ.'I') THEN
 
-           CALL ARX_READ('BARD',BSRT.ARDID,STATUS)
+*  get ARD file
+            CALL ARX_READ('BARD',BSRT.ARDID,STATUS)
 
-           BX_HWIDTH=NPIX(CBORDX)
-           BY_HWIDTH=NPIX(CBORDY)
-           BSRT.PHI=0.0
-           BSRT.ELAMIN=0.0
-           BSRT.ELBMIN=0.0
-           BSRT.ELAMAX=BX_HWIDTH
-           BSRT.ELBMAX=BY_HWIDTH
 
-	 ELSEIF (SRT.SHAPE .EQ. 'R') THEN
-	    CALL USI_GET0R('GRP_BWIDTH', GRP_BWIDTH, STATUS)
-	    CALL USI_GET0R('GRP_BHEIGHT', GRP_BHEIGHT, STATUS)
+*  Create spatial mask
+            CALL MSG_PRNT('Creating background spatial mask...')
+            CALL XRTSORT_CRE_MASK(HEAD,BSRT,RES,MDIM,MRES,BMPTR,STATUS)
+            CALL MSG_PRNT('Done!')
+
+            CALL XRTSORT_SCAN_MASK(HEAD,MDIM(1),MDIM(2),%val(BMPTR),
+     :                           MRES,BXW,BYW,XW1,XW2,YW1,YW2,STATUS)
+
+            IF (CENTRE.EQ.'MEAN') THEN
+               CALL XRTSORT_AXIS2RADEC(XW,YW,TMAT,
+     :             BSRT.FIELD_RA,BSRT.FIELD_DEC,STATUS)
+            ELSEIF (CENTRE.EQ.'MEDIAN') THEN
+               BXW=(XW1+XW2)/2.0
+               BYW=(YW1+YW2)/2.0
+               CALL XRTSORT_AXIS2RADEC(XW,YW,TMAT,
+     :             BSRT.FIELD_RA,BSRT.FIELD_DEC,STATUS)
+            ELSEIF (CENTRE.EQ.'AXIS') THEN
+                BSRT.FIELD_RA=HEAD.AXIS_RA
+                BSRT.FIELD_DEC=HEAD.AXIS_DEC
+                CALL XRTCORR_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
+     :                                             TMAT,XW,YW,STATUS)
+            ELSEIF (CENTRE.EQ.'USER') THEN
+                CALL USI_GET0D('RAB', BSRT.FIELD_RA, STATUS)
+                CALL USI_GET0D('DECB', BSRT.FIELD_DEC, STATUS)
+                CALL XRTCORR_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
+     :                                              TMAT,XW,YW,STATUS)
+            ENDIF
+
+
+        ELSE
+
+*   Set centre of the field as default
+           CALL USI_DEF0D('RAB', HEAD.AXIS_RA, STATUS)
+           CALL USI_DEF0D('DECB', HEAD.AXIS_DEC, STATUS)
+
+           CALL USI_GET0D('RAB', BSRT.FIELD_RA, STATUS)
+           CALL USI_GET0D('DECB',BSRT.FIELD_DEC, STATUS)
+
+           CALL XRTCORR_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,TMAT,
+     :                                                   XW,YW,STATUS)
+
+        ENDIF
+
+        IF (STATUS .NE. SAI__OK) GOTO 999
+
+*  Calculate the source position in raw pixels
+
+        BCKGND_X = NINT( -XW / PTOD)
+        BCKGND_Y = NINT( YW / PTOD) * MFACT
+
+*  Add the sky pixel centre to the source centre
+        BCKGND_X = BCKGND_X + HEAD.SKYCX
+        BCKGND_Y = BCKGND_Y + HEAD.SKYCY
+
+*  Find the closest distance to each border
+        BBORDX=MIN(ABS(BCKGND_X-HEAD.XSTART),ABS(BCKGND_X-HEAD.XEND))
+     &                                                   * PTOD * 2.0
+        BBORDY=MIN(ABS(BCKGND_Y-HEAD.YSTART),ABS(BCKGND_Y-HEAD.YEND))
+     &                                                   * PTOD * 2.0
+
+
+
+
+
+	 IF (SRT.SHAPE .EQ. 'R') THEN
+	    CALL USI_GET0R('BWIDTH', BWIDTH, STATUS)
+	    CALL USI_GET0R('BHEIGHT', BHEIGHT, STATUS)
 *
 *  Convert to nearest whole pixels
-	    BX_HWIDTH = NPIX(GRP_BWIDTH)
-	    BY_HWIDTH = NPIX(GRP_BHEIGHT)
+	    BX_HWIDTH = NPIX(BWIDTH)
+	    BY_HWIDTH = NPIX(BHEIGHT)
 
 *  And back to world coords.
             BXWIDW=2.0*BX_HWIDTH*PTOD
@@ -2535,18 +2556,18 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
             IF (ABS(BSRT.FIELD_RA-SRT.FIELD_RA) .LT. 0.001 .AND.
      &          ABS(BSRT.FIELD_DEC-SRT.FIELD_DEC) .LT. 0.001) THEN
 
-	       CALL USI_DEF0R('BRADINN', SRAD2, STATUS)
+	       CALL USI_DEF0R('BIRAD', SRAD2, STATUS)
                BSRT.SHAPE = 'A'
             ELSE
-	       CALL  USI_DEF0R('BRADINN', 0.0, STATUS)
+	       CALL  USI_DEF0R('BIRAD', 0.0, STATUS)
 *
 *  Calculate distance of background box centre from the edge
             ENDIF
 *
-            CALL USI_DEF0R('BRADOUT', MIN(BBORDX,BBORDY)/2.0, STATUS)
+            CALL USI_DEF0R('BIRAD', MIN(BBORDX,BBORDY)/2.0, STATUS)
 *
-	    CALL USI_GET0R('BRADINN', BRADIN, STATUS)
-	    CALL USI_GET0R('BRADOUT', BRADOUT, STATUS)
+	    CALL USI_GET0R('BIRAD', BRADIN, STATUS)
+	    CALL USI_GET0R('BORAD', BRADOUT, STATUS)
 *
             IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -2590,7 +2611,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
             ELSE
 *
 *       Get orientation. +ve is anticlockwise from east
-	       CALL USI_GET0R('BORIENT', BSRT.PHI, STATUS)
+	       CALL USI_GET0R('BANGLE', BSRT.PHI, STATUS)
 *
 	       CALL USI_DEF0R('BEXINN', 0.0, STATUS)
 *
@@ -2923,9 +2944,9 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
 ***      Open observation diff evenfile
          CALL RAT_HDLOOKUP(HEAD,'REJEVT','EXTNAME',EXT,STATUS)
-         CALL USI_DEF0C('DIFFILE',SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))
+         CALL USI_DEF0C('DOUT',SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))
      &                  //EXT,STATUS)
-         CALL USI_GET0C('DIFFILE',DNAME,STATUS)
+         CALL USI_GET0C('DOUT',DNAME,STATUS)
          CALL HDS_OPEN(DNAME,'READONLY',DLOC,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
       ENDIF
@@ -4007,4 +4028,92 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
           CALL MSG_OUT(' ','from XRTSORT_WRISORT',STATUS)
       ENDIF
 *
+      END
+
+*+XRTSORT_RADEC2AXIS - converts an RA/DEC to image axis coordinates
+      SUBROUTINE XRTSORT_RADEC2AXIS(RA,DEC,TMAT,X,Y,STATUS)
+*    Description :
+*    Bugs :
+*    Authors :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*    Import :
+      DOUBLE PRECISION RA,DEC
+      DOUBLE PRECISION TMAT(3,3)
+*    Export :
+      REAL X,Y
+*    Status :
+      INTEGER STATUS
+*    Local constants :
+      DOUBLE PRECISION DTOR,RTOD
+      PARAMETER (DTOR=3.14159265/180.,RTOD=1.0/DTOR)
+*    Local variables :
+      REAL U(3),V(3)
+*-
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*  Calculate azimuth and elevation for the source box in raw pixels
+      CALL CONV_CONA2V(REAL(RA)*REAL(DTOR),
+     &                           REAL(DEC)*REAL(DTOR),U)
+
+      DO J = 1,3
+        V(J) = U(1)*TMAT(1,J)+U(2)*TMAT(2,J)+U(3)*TMAT(3,J)
+      ENDDO
+
+      X=ATAN2(V(2),V(1))*REAL(RTOD)
+      Y=ASIN(V(3))*REAL(RTOD)
+
+      IF (STATUS .NE. SAI__OK) THEN
+          CALL MSG_OUT(' ','from XRTSORT_RADEC2AXIS',STATUS)
+      ENDIF
+
+      END
+
+
+
+
+*+XRTSORT_AXIS2RADEC - converts  image axis coordinates to an RA/DEC
+      SUBROUTINE XRTSORT_AXIS2RADEC(X,Y,TMAT,RA,DEC,STATUS)
+*    Description :
+*    Bugs :
+*    Authors :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*    Import :
+      REAL X,Y
+      DOUBLE PRECISION TMAT(3,3)
+*    Export :
+      DOUBLE PRECISION RA,DEC
+*    Status :
+      INTEGER STATUS
+*    Local constants :
+      DOUBLE PRECISION DTOR,RTOD
+      PARAMETER (DTOR=3.14159265/180.,RTOD=1.0/DTOR)
+*    Local variables :
+      REAL U(3),V(3)
+*-
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*  Calculate azimuth and elevation for the source box in raw pixels
+      CALL CONV_CONA2V(X*REAL(DTOR),Y*REAL(DTOR),U)
+
+      DO J = 1,3
+        V(J) = U(1)*TMAT(J,1)+U(2)*TMAT(J,2)+U(3)*TMAT(J,3)
+      ENDDO
+
+      RA=ATAN2(V(2),V(1))*RTOD
+      IF (RA.LT.0.0D0) THEN
+        RA=RA+180.0D0
+      ENDIF
+      DEC=ASIN(V(3))*RTOD
+
+
       END
