@@ -23,10 +23,18 @@
 *  Implementation Deficiencies:
 *     This version of the routine is something of a kludge.
 *
-*     Also, this routine has the Fortran I/O statuses (sic) 
-*     corresponding to success and end-of-file hardwired as a local 
-*     parameter.  I think that, technically, this is standard and 
+*     Also, this routine has the Fortran I/O statuses (sic)
+*     corresponding to success and end-of-file hardwired as a local
+*     parameter.  I think that, technically, this is standard and
 *     portable, but it is a potential problem area.
+*    
+*     Note in passing (PWD 23/06/04) the Fortran standard defines EOF as
+*     any return from IOSTAT less than zero, so this may not trap all
+*     EOF cases.  However, most compilers return -1 for EOF and use
+*     values less than this to indicate other returns, -2, end of record
+*     (usually an internal read), -4 end of record (usually external
+*     read). Anyway left this alone.
+*
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *  Authors:
