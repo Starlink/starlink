@@ -1,0 +1,15 @@
+%
+In $|$text$|$ mode.
+Still in $|$text$|$ mode
+%
+In |math| mode: |\hat .
+In $|$text$|$ mode inside math mode
+Still in |math| mode
+%
+In $|$text$|$ mode: $|$\^.
+$a<b$ $$c>d$$
+$$
+latex math: \hat{a}
+latex text: \longleftarrow 
+latex none: &#x777;
+$$

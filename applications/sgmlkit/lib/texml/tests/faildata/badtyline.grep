@@ -1,0 +1,1 @@
+ValueError: Value of boolean attribute 'emptylines' is not '0' or '1', but ''

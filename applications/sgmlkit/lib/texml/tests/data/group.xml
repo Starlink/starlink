@@ -1,0 +1,8 @@
+<TeXML>
+	<group><group><group><cmd name="it"/>italics</group></group></group>
+	<group>
+		<group>
+			<group><cmd name="bf"/>bold</group>
+		</group>
+	</group>
+</TeXML>

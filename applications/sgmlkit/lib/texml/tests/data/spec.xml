@@ -1,0 +1,21 @@
+<TeXML>
+category 0: <spec cat="esc"/>
+category 1: <spec cat="bg"/>
+category 2: <spec cat="eg"/>
+category 3: <spec cat="mshift"/>
+category 4: <spec cat="align"/>
+category 5: n/a
+category 6: <spec cat="parm"/>
+category 7: <spec cat="sup"/>
+category 8: <spec cat="sub"/>
+category 9: n/a
+category a: n/a
+category b: n/a
+category c: n/a
+category d: <spec cat="tilde"/>
+category e: <spec cat="comment"/>
+category f: n/a
+also:       <spec cat="vert"/>
+also:       <spec cat="lt"/>
+also:       <spec cat="gt"/>
+</TeXML>

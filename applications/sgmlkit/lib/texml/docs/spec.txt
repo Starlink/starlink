@@ -1,0 +1,309 @@
+                              TeXML specification
+
+   TeXML is an XML vocabulary for TeX. A processor translates TeXML source
+   into TeX.
+
+Root element
+
+   The root element of a TeXML document is the element TeXML.
+
+     A basic template of a TeXML document:
+
+ <?xml version="1.0" encoding="..."?>
+ <TeXML>
+   ... your content here ...
+ </TeXML>
+
+Text translation
+
+   Characters are processed as follows:
+
+     * If a character has a special meaning for TeX, then the character is
+       translated as shown in the table below.
+     * If the character belongs to an output encoding, then the character is
+       printed as-is.
+     * If the character exists in a LaTeX mapping table, then a corresponding
+       substitution for the character is used.
+     * Otherwise the character is output as a string &#xNN...NN; where NNNN
+       is the hexadecimal code for the character.
+
+     Example. TeXML:
+
+ <TeXML>$a \/\/ $b</TeXML>
+
+     TeX:
+
+ \$a $\backslash$/$\backslash$/ \$b
+
+                           Mapping of special symbols
+   +------------------------------------+
+   | symbol |  text mode   | math mode  |
+   |--------+--------------+------------|
+   | \      | $\backslash$ | \backslash |
+   |--------+--------------+------------|
+   | {      | \{           | \{         |
+   |--------+--------------+------------|
+   | }      | \}           | \}         |
+   |--------+--------------+------------|
+   | $      | \$           | \$         |
+   |--------+--------------+------------|
+   | &      | \&           | \&         |
+   |--------+--------------+------------|
+   | #      | \#           | \#         |
+   |--------+--------------+------------|
+   | ^      | \^{}         | \^{}       |
+   |--------+--------------+------------|
+   | _      | \_           | \_         |
+   |--------+--------------+------------|
+   | ~      | \~{}         | \~{}       |
+   |--------+--------------+------------|
+   | %      | \%           | \%         |
+   |--------+--------------+------------|
+   | |      | $|$          | |          |
+   |--------+--------------+------------|
+   | <      | $<$          | <          |
+   |--------+--------------+------------|
+   | >      | $>$          | >          |
+   |--------+--------------+------------|
+   +------------------------------------+
+
+   The LaTeX mapping table is automatically generated from the file
+   unicode.xml. This file is an appendix for the W3C MathML specification.
+
+   Empty lines also have a special meaning for TeX. They cause automatic
+   generation of the TeX command \par. To avoid this the processor prints a
+   line with the one symbol % (TeX comment) instead of a empty line.
+
+   The TeXML processor does not disconnect ligatures except "--", "---",
+   "``", "''", "!`" and "?`". These ligatures are converted into "-{}-",
+   "-{}-{}-", "`{}`", "'{}'", "!{}`" and "?{}`".
+
+   It is possible to tune text translation:
+
+     * <TeXML escape="0">...</TeXML> leaves specials as is, without escaping,
+     * <TeXML ligatures="1">...</TeXML> leaves ligatures as is,
+     * <TeXML emptylines="1">...</TeXML> leaves empty lines as is.
+
+     Example. For TeXML
+
+ <TeXML escape="0">$a \/\/ $b</TeXML>
+
+     TeX output now looks like this:
+
+ $a \/\/ $b
+
+   TeXML elements can be nested. The processor correctly handles nested
+   specifications, and performs or not performs transformations as specified.
+
+Switching between modes
+
+   There are two modes: text and math.
+
+   Modes only affect translation of text.
+
+   The default mode is text mode. In order to change mode, use attribute mode
+   of the element TeXML. The possible values for this attribute are math and
+   text. If element TeXML is used without attribute mode, then the mode is
+   not changed.
+
+     Example. TeXML:
+
+ <?xml version="1.0" encoding="..."?>
+ <TeXML>
+   text mode here: |&#x302;
+   <TeXML mode="math">
+     math mode here: |&#x302;
+     <TeXML mode="text">text in math in text: |&#x302;</TeXML>
+     again math mode: |&#x302;
+   </TeXML>
+   again text mode: |&#x302;
+ </TeXML>
+
+     Symbol "|" being translated to "$|$" in text mode and to "|" in math
+     mode. Symbol "&#x302;" (circumflex) being translated to "\^" in text
+     mode and to "\hat " in math mode. So the TeX result is:
+
+ %
+   text mode here: $|$\^
+  
+     math mode here: |\hat
+     text in math in text: $|$\^
+     again math mode: |\hat
+  
+   again text mode: $|$\^
+
+   Elements math and dmath also change mode to math. These elements are
+   described below.
+
+Encoding commands
+
+   The TeXML cmd element encodes TeX commands.
+
+     * To write a command with no parameters, such as \par, use <cmd
+       name="par"/>.
+     * To add parameters to a command, add parm children to the cmd element.
+       The processor places parm children within TeX groups, that is, curly
+       braces.
+     * To add options to a command, add opt children to the cmd element. The
+       processor places opt children within square braces, as LaTeX style
+       options.
+
+     As an example, the TeX code
+
+ \documentclass[12pt]{letter}
+
+     will look like this in XML:
+
+ <cmd name="documentclass">
+   <opt>12pt</opt>
+   <parm>letter</parm>
+ </cmd>
+
+   The TeXML cmd can have several commands parm or opt.
+
+     TeXML:
+
+ ... Visit <cmd name="href">
+   <parm>TeXML homepage</parm>
+   <parm>http://getfo.org/texml/</parm></cmd> ...
+
+     TeX:
+
+ ... Visit \href{TeXML homepage}{http://getfo.org/texml/} ...
+
+Encoding environments
+
+   The element env is a convenience for expressing LaTeX environments.
+
+     In order to get this in TeX
+
+ \begin{document}
+   ...
+ \end{document}
+
+     write this in TeXML:
+
+ <env name="document">
+   ...
+ </env>
+
+   By default the processor uses the begin command to start the environment
+   and uses command end to finish it. If you have different conventions for
+   the environment block you can specify commands for starting and finishing
+   the environment in attributes begin and end of the element env.
+
+     Custom LaTeX environment
+
+ \start{list}
+   ...
+ \finish{list}
+
+     can be generated from this TeXML:
+
+ <env name="list" begin="start" end="finish">
+   ...
+ </env>
+
+Encoding groups
+
+   The group element is a convenience for encoding groups. The processor will
+   supply an open brace at the beginning, and a close brace at the end of the
+   group.
+
+     The TeX scrap,
+
+ {\it italics}
+
+     may appear as
+
+ <group><cmd name="it"/>italics</group>
+
+     in TeXML.
+
+   Elements math and dmath are conveniences for encoding math groups. The
+   processor writes appropriate math shift symbol at the beginning and at the
+   end of the group and also switches mode to math inside the group.
+
+     The TeXML code
+
+ <math>a+b</math>
+ <dmath><cmd name="sqrt"/>2</dmath>
+
+     translates to the following TeX code:
+
+ $a+b$
+ $$\sqrt 2$$
+
+Encoding control symbols
+
+   The ch attibute of the ctrl element encodes a control symbol, such as
+   <ctrl ch=" "/> for a control space (\ ).
+
+Encoding special symbols
+
+   The processor automatically escapes special TeX symbols as described
+   above. But there are cases when you need to output the character, not have
+   it converted. In these cases use the attribute cat of the element spec to
+   specify category of a special symbol.
+
+     The TeX scrap,
+
+ {\it italics}
+
+     may also appear as
+
+ <spec cat="bg"/><spec cat="esc"/>it italics<spec cat="eg"/>
+
+     in TeXML. But doing so is not recommended!
+
+   Encode special symbols directly only if you really have to do so. In most
+   cases all you need is the set of elements cmd, env and group. These
+   elements provide a logical markup and minimize the chances to get things
+   wrong. For example, in the example above, you can forget to write a
+   closing brace or you can mistype and produce an incorrect symbol. But if
+   you use group, you are assured from such errors.
+
+                              cat attribute values
+   +---------------------------------------+
+   |   description    | cat value | output |
+   |------------------+-----------+--------|
+   | escape character | esc       | \      |
+   |------------------+-----------+--------|
+   | begin group      | bg        | {      |
+   |------------------+-----------+--------|
+   | end group        | eg        | }      |
+   |------------------+-----------+--------|
+   | math shift       | mshift    | $      |
+   |------------------+-----------+--------|
+   | alignment tab    | align     | &      |
+   |------------------+-----------+--------|
+   | parameter        | parm      | #      |
+   |------------------+-----------+--------|
+   | superscript      | sup       | ^      |
+   |------------------+-----------+--------|
+   | subscript        | sub       | _      |
+   |------------------+-----------+--------|
+   | tilde            | tilde     | ~      |
+   |------------------+-----------+--------|
+   | comment          | comment   | %      |
+   |------------------+-----------+--------|
+   | vertical line    | vert      | |      |
+   |------------------+-----------+--------|
+   | less than        | lt        | <      |
+   |------------------+-----------+--------|
+   | greater than     | gt        | >      |
+   +---------------------------------------+
+
+Running the processor
+
+   The processor is a Python program texml.py.
+
+     Usage:
+
+ python texml.py [-e encoding] input_file output_file
+
+   The processor parses the input_file and saves result of transformation
+   into the output_file.
+
+   You can specify any encoding supported by Python codecs. The default
+   encoding is ascii.

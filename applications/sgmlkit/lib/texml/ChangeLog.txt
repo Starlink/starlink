@@ -1,0 +1,35 @@
+Version 1.00 (09 April 2004)
+
+* More ligatures are being processed: ``, '', ?`, !`. With -- and ---
+  they cover all default non-letter TeX ligatures.
+* Simon Goodson is proofreading the documentation.
+
+
+Version 0.98.beta (02 April 2004)
+
+* Text of specification is now better. Thanks Simon Goodson for
+  ideas on improvement.
+* New handling of tags <parm/> and <opt/>. The processor now outputs
+  them instantly as they appear, and so multiple parameters of one
+  <cmd/> are not being united.
+* Absence of spaces after LaTeX commands in some mappings is fixed.
+
+
+Version 0.95.beta (26 March 2004)
+
+* Ligatures "--" and "---" are being processed. This is configurable.
+* Escaping of TeX specials is configurable.
+* Translation of empty line is configurable.
+* Default encoding of output now is ascii, not utf8.
+* ChangeLog file is created.
+
+
+Version 0.91.beta (22 March 2004)
+
+* Under Windows, TeXML processor now creates lines with DOS endings.
+  Code should also work correctly in other systems (MacOS etc).
+
+
+Version 0.90.beta (19 March 2004)
+
+* First packaged version of the TeXML.

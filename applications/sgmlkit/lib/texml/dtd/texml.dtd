@@ -1,0 +1,51 @@
+<!ENTITY % nomath  "#PCDATA|TeXML|cmd|env|group|ctrl|spec">
+
+<!ENTITY % content "%nomath;|math|dmath">
+
+<!ELEMENT TeXML  (%content;)*>
+
+<!ATTLIST TeXML
+  mode        (text|math)  #IMPLIED
+  escape      (0|1)        #IMPLIED
+  emptylines  (0|1)        #IMPLIED
+  ligatures   (0|1)        #IMPLIED
+>
+
+<!ELEMENT env    (%content;)*>
+
+<!ATTLIST env
+  name    CDATA  #REQUIRED
+  begin   CDATA  #IMPLIED
+  end     CDATA  #IMPLIED
+>
+
+<!ELEMENT group  (%content;)*>
+
+<!ELEMENT math   (%nomath;)*>
+
+<!ELEMENT dmath  (%nomath;)*>
+
+<!ELEMENT cmd    (opt|parm)*>
+
+<!ATTLIST cmd
+  name    CDATA  #REQUIRED
+>
+
+<!ENTITY % inopt "#PCDATA|spec|ctrl|cmd|math">
+
+<!ELEMENT opt    (%inopt;)*>
+
+<!ELEMENT parm   (%inopt;)*>
+
+<!ELEMENT ctrl   EMPTY>
+
+<!ATTLIST ctrl
+  ch      CDATA  #REQUIRED
+>
+
+<!ELEMENT spec   EMPTY>
+
+<!ATTLIST spec
+  cat (esc|bg|eg|mshift|align|parm|sup|sub|tilde|comment|vert|lt|gt) #REQUIRED
+>
+

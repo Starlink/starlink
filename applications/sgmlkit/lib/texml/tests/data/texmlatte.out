@@ -1,0 +1,36 @@
+%
+ \documentclass{article}
+ \title{Edward Weston}
+ \begin{document}
+  \maketitle 
+  \section*{Some biographical information}
+  Edward Weston
+  was born in
+  1886.
+  Weston
+  lived until
+  1958.
+  \par 
+  Weston was a photographer who pioneered the modern use of photography
+  as an art form in the United States.
+  \section*{Some short quotes from Weston}
+  \begin{enumerate}
+   \item 
+   ``My own eyes are no more than scouts on a preliminary search,
+   for the camera's eye may entirely change my idea.''
+   \item 
+   ``Ultimately success of failure in photographing people depends
+   on the photographer's ability to understand his fellow man.''
+  \end{enumerate}
+  \section*{A longer quote}
+  \begin{quote}
+   ``One does not think during creative work, any more than one thinks
+  when driving a car. But one has a background of years - learning,
+  unlearning, success, failure, dreaming, thinking, experience, all
+  this - then the moment of creation, the focusing of all into the
+  moment. So I can make 'without thought,' fifteen carefully
+  considered negatives, one every fifteen minutes, given material
+  with as many possibilities. But there is all the eyes have seen in
+  this life to influence me.''
+  \end{quote}
+ \end{document}

@@ -1,0 +1,75 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>TeXML: an XML vocabulary for TeX</title>
+</head>
+<body>
+	<h1>TeXML: an XML vocabulary for TeX</h1>
+	<p>TeXML is an XML vocabulary for TeX. A processor translates TeXML source into TeX.</p>
+	<table border="1" width="100%">
+		<caption>Example of TeXML to TeX translation</caption>
+		<tr>
+			<th width="50%">TeXML</th>
+			<th>TeX</th>
+		</tr>
+		<tr>
+			<td>
+<pre>&lt;cmd name="documentclass"&gt;
+  &lt;opt&gt;12pt&lt;/opt&gt;
+  &lt;parm&gt;letter&lt;/parm&gt;
+&lt;/cmd&gt;</pre>
+			</td>
+			<td>
+<pre>\documentclass[12pt]{letter}</pre>
+			</td>
+		</tr>
+	</table>
+	<p>One of the main benefits of TeXML usage is automatic translation of the TeX special symbols.</p>
+	<table border="1" width="100%">
+		<caption>Example of translation of special TeX symbols</caption>
+		<tr>
+			<th width="50%">TeXML</th>
+			<th>TeX</th>
+		</tr>
+		<tr>
+			<td><pre>&lt;TeXML&gt;\section{No&amp;#xa0;break}&lt;/TeXML&gt;</pre></td>
+			<td><pre>$\backslash$section\{No~break\}</pre></td>
+		</tr>
+	</table>
+	<p>The TeXML processor supports different output encodings and escapes out-of-encoding chars automatically.</p>
+	<table border="1" width="100%">
+		<caption>Example of translation of non-ASCII characters</caption>
+		<tr>
+			<th width="38%" align="left">TeXML</th>
+			<td><pre>&lt;TeXML&gt;&amp;#x422;&amp;#x435;&amp;#x425;&lt;/TeXML&gt;</pre></td>
+		</tr>
+		<tr>
+			<th align="left">TeX in ASCII encoding</th>
+			<td><pre>\cyrchar\CYRT \cyrchar\cyre \cyrchar\CYRH </pre></td>
+		</tr>
+		<tr>
+			<th align="left">TeX in Russian encoding</th>
+			<td><pre>TeX</pre></td>
+		</tr>
+	</table>
+	<p>There is a <a href="spec.html">TeXML specification</a>. The DTD is included in the distribution.</p>
+	<p>Rationalities and objectives of TeXML were presented by Douglas Lovell at the Tex Users Group meeting in 1999. His paper is available online on the TUG site: &#8220;<a href="http://www.tug.org/TUG99-web/pdf/lovell.pdf">TeXML: Typesetting XML with TeX</a>&#8221; (PDF, 180 Kb).</p>
+	<p>There was TeXMLatté, a Java implementation of <a href="http://www.alphaworks.ibm.com/tech/texml">TeXML by IBM alphaWorks</a>, but now this realization &#8220;has been retired&#8221;. There is also <a href="http://www.bluweb.com/us/chouser/proj/texmlapis/">TeXMLapis</a> by Chris Houser, a Perl implementation of TeXML.</p>
+	
+		<h2>Getting TeXML</h2>
+		<p>The TeXML processor is a Python script. You need <a href="http://python.org/">Python</a> 2.3 to run the script. Additional modules are not required.</p>
+		<p>You can download Python TeXML from the SourceForge <a href="http://sourceforge.net/project/showfiles.php?group_id=102261"> project download area</a>. The current version is 1.00. A distribution archive with extension <tt>.tar.gz</tt> is a package for Unix and with <tt>.zip</tt> is for Windows. The only difference between them is in the line endings (Unix or DOS style).</p>
+		<p>The software is released under the <a href="http://www.gnu.org/licenses/gpl.html"> GNU Public License</a>.</p>
+		<p>Support is available through the TeXML SourceForge <a href="http://sourceforge.net/projects/getfo/"> project area</a> (TeXML is a part of the GetFO project).</p>
+	
+	
+		<h2>Thanks</h2>
+		<ul>
+			<li>Douglas Lovell for TeXMLatté and original TeXML specification</li>
+			<li>Heinz Pommer and <a href="http://bitplant.de/">bitplant.de</a> for supporting the project</li>
+			<li>Vitaly Ostanin for discussions on XML publishing</li>
+			<li>Simon Goodson for documentation proofreading and suggestions</li>
+		</ul>
+	
+</body>
+</html>

@@ -1,0 +1,79 @@
+%
+  \documentclass[onecolumn
+          ]{article}
+  \usepackage[dvipdfm,colorlinks]{hyperref}
+  \usepackage{booktabs}
+  \begin{document}
+    \title{\TeX 
+    MLapis}
+    \author{
+      Chris Houser\\
+      chouser@bluweb.com
+    }
+  \maketitle 
+%
+  \section{What is \TeX 
+    MLapis?}
+%
+  \TeX 
+    MLapis translates \TeX 
+    ML documents into \TeX{}.\par 
+%
+  \section{What good is \TeX 
+    ML?}
+%
+  \LaTeX \footnote{\href{http://www.latex-project.org/}{http://www.latex-project.org/}} is very good at a
+  number of very tricky things.  These include formatting mathematical
+  formulae, laying out out books and articles, typesetting text and tables in
+  a pleasing and consistant manner, etc.  However, XML is good at a number of
+  things \LaTeX{} is {\em not} so good at, such as being easily parsed and
+  translated into a variety of output formats.\par 
+%
+  Unfortunately, the standard XML transformation system XSL\footnote{\href{http://www.w3.org/Style/XSL/}{http://www.w3.org/Style/XSL/}} is not powerful enough to
+  translate from normal XML formats to \LaTeX{} directly.  So when you use XML
+  to edit, store, and distribute your source documents, \TeX 
+    ML provides the
+  bridge you need to leverage the power of \LaTeX{} when formatting your
+  document for the printed page.\par 
+%
+  The DTD and other documentation about \TeX 
+  ML\footnote{\href{http://www.alphaworks.ibm.com/formula/texml}{http://www.alphaworks.ibm.com/formula/texml}} is available
+  from IBM
+  alphaWorks\footnote{\href{http://www.alphaworks.ibm.com/formula/texml}{http://www.alphaworks.ibm.com/formula/texml}}.  My interpretation of their software license does not allow
+  me to redistribute those materials here.\par 
+%
+  \section{\TeX 
+    MLapis vs. \TeX 
+    MLatte}
+%
+  There is already a \TeX 
+    ML-to-\TeX{} translator called \TeX 
+    MLatte\footnote{\href{http://www.alphaworks.ibm.com/formula/texml}{http://www.alphaworks.ibm.com/formula/texml}}, but I
+  was completely unable to get it to work.  It's written in Java\footnote{\href{http://java.sun.com/}{http://java.sun.com/}} and the perhaps the runtime engines I
+  have around are drastically sub-standard or something, but for whatever
+  reason I could not get their tool to run.  Also, the software license for
+  \TeX 
+    MLatte is rather less community-oriented than the GPL, so I thought a
+  new implementation was in order.\par 
+%
+  \TeX 
+    MLapis is written in pure Perl 5 and requires nothing but a standard
+  Perl\footnote{\href{http://www.cpan.org/ports/}{http://www.cpan.org/ports/}} interpreter.  It has it's own
+  little XML parser built in.  Of course in order for it to be useful you'll
+  need at least \LaTeX{} and almost certainly an XSLT processor as well. It was
+  written entirely without reference
+  to the \TeX 
+    MLatte code, which I have never even seen, so there shouldn't
+  be any copyright entanglements.  I cannot guarantee that it will produce
+  results
+  identical to \TeX 
+    MLatte, but it has worked well enough for my purposes and
+  seems to comply with available specs and examples.\par 
+%
+  \section{How to get it}
+%
+  This page documents texmlapis-1.1.tar.gz\footnote{\href{http://bluweb.com/chouser/proj/texmlapis/texmlapis-1.1.tar.gz}{http://bluweb.com/chouser/proj/texmlapis/texmlapis-1.1.tar.gz}},
+  but you can always find the latest version at \TeX 
+  MLapis\footnote{\href{http://bluweb.com/chouser/proj/texmlapis}{http://bluweb.com/chouser/proj/texmlapis}}.\par 
+%
+\end{document}

@@ -1,0 +1,17 @@
+<TeXML>
+	<cmd name="par1">
+		<opt>
+			<cmd name="par2">
+				<opt>
+					<cmd name="par3">
+						<parm>
+							<cmd name="par4"/>
+						</parm>
+						<opt>&#1984;</opt>
+					</cmd>
+				</opt>
+			</cmd>
+		</opt>
+		<parm>aaa</parm>
+	</cmd>
+</TeXML>

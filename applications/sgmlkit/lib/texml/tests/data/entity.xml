@@ -1,0 +1,4 @@
+<!DOCTYPE TeXML [
+<!ENTITY e "^">
+]>
+<TeXML>&e;</TeXML>

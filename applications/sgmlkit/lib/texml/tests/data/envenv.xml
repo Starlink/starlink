@@ -1,0 +1,6 @@
+<TeXML><env name="n1" begin="b1" end="e1">
+<cmd name="par1"/>
+  <env name="n2" begin="b2" end="e2">
+    <env name="n3" begin="b3" end="e3"/>
+</env></env>
+</TeXML>

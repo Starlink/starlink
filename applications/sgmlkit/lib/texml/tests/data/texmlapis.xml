@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TeXML>
+  <cmd name="documentclass">
+    <opt>onecolumn
+          </opt>
+    <parm>article</parm>
+  </cmd>
+  <cmd name="usepackage">
+    <opt>dvipdfm,colorlinks</opt>
+    <parm>hyperref</parm>
+  </cmd>
+  <cmd name="usepackage">
+    <parm>booktabs</parm>
+  </cmd>
+  <env name="document">
+    <cmd name="title"><parm><cmd name="TeX"/>
+    MLapis</parm></cmd>
+    <cmd name="author"><parm>
+      Chris Houser<spec cat="esc"/><spec cat="esc"/>
+      chouser@bluweb.com
+    </parm></cmd>
+  <cmd name="maketitle"/>
+
+  <cmd name="section"><parm>What is <cmd name="TeX"/>
+    MLapis?</parm></cmd>
+
+  <cmd name="TeX"/>
+    MLapis translates <cmd name="TeX"/>
+    ML documents into <cmd name="TeX"><parm/></cmd>.<cmd name="par"/>
+
+  <cmd name="section"><parm>What good is <cmd name="TeX"/>
+    ML?</parm></cmd>
+
+  <cmd name="LaTeX"/><cmd name="footnote"><parm><cmd name="href"><parm>http://www.latex-project.org/</parm><parm>http://www.latex-project.org/</parm></cmd></parm></cmd> is very good at a
+  number of very tricky things.  These include formatting mathematical
+  formulae, laying out out books and articles, typesetting text and tables in
+  a pleasing and consistant manner, etc.  However, XML is good at a number of
+  things <cmd name="LaTeX"><parm/></cmd> is <group><cmd name="em"/>not</group> so good at, such as being easily parsed and
+  translated into a variety of output formats.<cmd name="par"/>
+
+  Unfortunately, the standard XML transformation system XSL<cmd name="footnote"><parm><cmd name="href"><parm>http://www.w3.org/Style/XSL/</parm><parm>http://www.w3.org/Style/XSL/</parm></cmd></parm></cmd> is not powerful enough to
+  translate from normal XML formats to <cmd name="LaTeX"><parm/></cmd> directly.  So when you use XML
+  to edit, store, and distribute your source documents, <cmd name="TeX"/>
+    ML provides the
+  bridge you need to leverage the power of <cmd name="LaTeX"><parm/></cmd> when formatting your
+  document for the printed page.<cmd name="par"/>
+
+  The DTD and other documentation about <cmd name="TeX"/>
+  ML<cmd name="footnote"><parm><cmd name="href"><parm>http://www.alphaworks.ibm.com/formula/texml</parm><parm>http://www.alphaworks.ibm.com/formula/texml</parm></cmd></parm></cmd> is available
+  from IBM
+  alphaWorks<cmd name="footnote"><parm><cmd name="href"><parm>http://www.alphaworks.ibm.com/formula/texml</parm><parm>http://www.alphaworks.ibm.com/formula/texml</parm></cmd></parm></cmd>.  My interpretation of their software license does not allow
+  me to redistribute those materials here.<cmd name="par"/>
+
+  <cmd name="section"><parm><cmd name="TeX"/>
+    MLapis vs. <cmd name="TeX"/>
+    MLatte</parm></cmd>
+
+  There is already a <cmd name="TeX"/>
+    ML-to-<cmd name="TeX"><parm/></cmd> translator called <cmd name="TeX"/>
+    MLatte<cmd name="footnote"><parm><cmd name="href"><parm>http://www.alphaworks.ibm.com/formula/texml</parm><parm>http://www.alphaworks.ibm.com/formula/texml</parm></cmd></parm></cmd>, but I
+  was completely unable to get it to work.  It's written in Java<cmd name="footnote"><parm><cmd name="href"><parm>http://java.sun.com/</parm><parm>http://java.sun.com/</parm></cmd></parm></cmd> and the perhaps the runtime engines I
+  have around are drastically sub-standard or something, but for whatever
+  reason I could not get their tool to run.  Also, the software license for
+  <cmd name="TeX"/>
+    MLatte is rather less community-oriented than the GPL, so I thought a
+  new implementation was in order.<cmd name="par"/>
+
+  <cmd name="TeX"/>
+    MLapis is written in pure Perl 5 and requires nothing but a standard
+  Perl<cmd name="footnote"><parm><cmd name="href"><parm>http://www.cpan.org/ports/</parm><parm>http://www.cpan.org/ports/</parm></cmd></parm></cmd> interpreter.  It has it's own
+  little XML parser built in.  Of course in order for it to be useful you'll
+  need at least <cmd name="LaTeX"><parm/></cmd> and almost certainly an XSLT processor as well. It was
+  written entirely without reference
+  to the <cmd name="TeX"/>
+    MLatte code, which I have never even seen, so there shouldn't
+  be any copyright entanglements.  I cannot guarantee that it will produce
+  results
+  identical to <cmd name="TeX"/>
+    MLatte, but it has worked well enough for my purposes and
+  seems to comply with available specs and examples.<cmd name="par"/>
+
+  <cmd name="section"><parm>How to get it</parm></cmd>
+
+  This page documents texmlapis-1.1.tar.gz<cmd name="footnote"><parm><cmd name="href"><parm>http://bluweb.com/chouser/proj/texmlapis/texmlapis-1.1.tar.gz</parm><parm>http://bluweb.com/chouser/proj/texmlapis/texmlapis-1.1.tar.gz</parm></cmd></parm></cmd>,
+  but you can always find the latest version at <cmd name="TeX"/>
+  MLapis<cmd name="footnote"><parm><cmd name="href"><parm>http://bluweb.com/chouser/proj/texmlapis</parm><parm>http://bluweb.com/chouser/proj/texmlapis</parm></cmd></parm></cmd>.<cmd name="par"/>
+
+</env>
+</TeXML>

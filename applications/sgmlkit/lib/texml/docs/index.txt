@@ -1,0 +1,79 @@
+                        TeXML: an XML vocabulary for TeX
+
+   TeXML is an XML vocabulary for TeX. A processor translates TeXML source
+   into TeX.
+
+                      Example of TeXML to TeX translation
+   +------------------------------------------------------------------------+
+   |                TeXML                |               TeX                |
+   |-------------------------------------+----------------------------------|
+   |<cmd name="documentclass">           |                                  |
+   |  <opt>12pt</opt>                    |\documentclass[12pt]{letter}      |
+   |  <parm>letter</parm>                |                                  |
+   |</cmd>                               |                                  |
+   +------------------------------------------------------------------------+
+
+   One of the main benefits of TeXML usage is automatic translation of the
+   TeX special symbols.
+
+                 Example of translation of special TeX symbols
+   +------------------------------------------------------------------------+
+   |                TeXML                 |               TeX               |
+   |--------------------------------------+---------------------------------|
+   |<TeXML>\section{No&#xa0;break}</TeXML>|$\backslash$section\{No~break\}  |
+   +------------------------------------------------------------------------+
+
+   The TeXML processor supports different output encodings and escapes
+   out-of-encoding chars automatically.
+
+                 Example of translation of non-ASCII characters
+   +------------------------------------------------------------------------+
+   | TeXML                      |<TeXML>&#x422;&#x435;&#x425;</TeXML>       |
+   |----------------------------+-------------------------------------------|
+   | TeX in ASCII encoding      |\cyrchar\CYRT \cyrchar\cyre \cyrchar\CYRH  |
+   |----------------------------+-------------------------------------------|
+   | TeX in Russian encoding    |TeX                                        |
+   +------------------------------------------------------------------------+
+
+   There is a TeXML specification. The DTD is included in the distribution.
+
+   Rationalities and objectives of TeXML were presented by Douglas Lovell at
+   the Tex Users Group meeting in 1999. His paper is available online on the
+   TUG site: "TeXML: Typesetting XML with TeX" (PDF, 180 Kb).
+
+   There was TeXMLatte, a Java implementation of TeXML by IBM alphaWorks, but
+   now this realization "has been retired". There is also TeXMLapis by Chris
+   Houser, a Perl implementation of TeXML.
+
+Getting TeXML
+
+   The TeXML processor is a Python script. You need Python 2.3 to run the
+   script. Additional modules are not required.
+
+   You can download Python TeXML from the SourceForge project download area.
+   The current version is 1.00. A distribution archive with extension .tar.gz
+   is a package for Unix and with .zip is for Windows. The only difference
+   between them is in the line endings (Unix or DOS style).
+
+   The software is released under the GNU Public License.
+
+   Support is available through the TeXML SourceForge project area (TeXML is
+   a part of the GetFO project).
+
+Thanks
+
+     * Douglas Lovell for TeXMLatte and original TeXML specification
+     * Heinz Pommer and bitplant.de for supporting the project
+     * Vitaly Ostanin for discussions on XML publishing
+     * Simon Goodson for documentation proofreading and suggestions
+
+References
+
+   http://www.tug.org/TUG99-web/pdf/lovell.pdf
+   http://www.alphaworks.ibm.com/tech/texml
+   http://www.bluweb.com/us/chouser/proj/texmlapis/
+   http://python.org/
+   http://sourceforge.net/project/showfiles.php?group_id=102261
+   http://www.gnu.org/licenses/gpl.html
+   http://sourceforge.net/projects/getfo/
+   http://bitplant.de/
