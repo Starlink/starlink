@@ -46,6 +46,7 @@ INSTDIR = /jcmt_sw/sun4_Solaris/bin
 INSTOPTS = -s -g jcmtsw
 
 # Data files
+DATADIR = data
 DATA = scuba.dat ukt14.dat ukt14_old.dat
 
 # Files required for the Starlink distribution tar file
@@ -54,6 +55,8 @@ DIST = scripts/fluxes.csh scripts/fluxnow.csh \
 	data/scuba.dat data/ukt14.dat data/ukt14_old.dat
 
 LATEX_DOCS = docs/sun213/sun213.tex docs/sun213/sun213_fig1.ps
+
+
 
 # Source code
 
@@ -84,6 +87,14 @@ EXTERNAL_INCLUDES = SAE_PAR MSG_PAR PAR_ERR FIO_ERR
 
 LOCAL_INCLUDES = 
 
+# Files to clean
+CLEAN = core $(PKG_OBJ) $(OBJS) $(LOCAL_INCLUDES) $(EXTERNAL_INCLUDES)  \
+	dtask_applic.f dtask_main.f
+
+
+# Files to distclean
+DISTCLEAN = $(IFC) $(TASKS) $(DATA) JPLEPH
+
 .F.o:
 	${FC} ${FFLAGS} ${FCPPFLAGS} -c $<
 
@@ -109,11 +120,18 @@ install: all
 	${INSTALL} ${IFC} ${INSTDIR}
 
 clean:
-	$(RM) core $(PKG_OBJ) $(OBJS) $(LOCAL_INCLUDES) \
-	$(EXTERNAL_INCLUDES) dtask_applic.f dtask_main.f
+	for f in $(CLEAN) ""; do \
+	   if test -e "$$f"; then \
+	      $(RM) $$f;\
+	   else :; fi;\
+	done
 
 distclean: clean
-	$(RM) $(IFC) $(TASKS) $(DATA) JPLEPH
+	for f in $(DISTCLEAN) ""; do \
+	   if test -e "$$f"; then \
+	      $(RM) $$f;\
+	   else :; fi;\
+	done
 
 export: ${PKG}_source.tar
 	for f in $(LATEX_DOCS) ""; do \
