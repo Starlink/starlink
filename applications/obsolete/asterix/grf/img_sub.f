@@ -3876,6 +3876,8 @@ c        REAL XX,XP,YP
 *-
         IF (STATUS.NE.SAI__OK) RETURN
 
+	print *,xc,yc,major,minor,angle
+
         CALL IMG_WORLDTOPIX(XC,YC,XPC,YPC,STATUS)
         AP=MAJOR/ABS(I_XSCALE)
         BP=MINOR/ABS(I_XSCALE)
@@ -3906,10 +3908,10 @@ c        REAL XX,XP,YP
         ENDDO
 
         CALL IMG_WORLDTOPIX(XMIN,YMIN,XP,YP,STATUS)
-        I1=INT(XP)
+        I2=NINT(XP)
         J1=INT(YP)
         CALL IMG_WORLDTOPIX(XMAX,YMAX,XP,YP,STATUS)
-        I2=NINT(XP)
+        I1=INT(XP)
         J2=NINT(YP)
 
         I1=MAX(1,I1)
