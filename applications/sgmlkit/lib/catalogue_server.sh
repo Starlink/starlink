@@ -80,8 +80,8 @@
 #-
 
 # Catalog path, and paths to binaries, are hard-coded
-OSPCAT=/home/norman/s/star/bin/sgml/OpenSP/bin/ospcat
-OSPENT=/home/norman/s/star/bin/sgml/OpenSP/bin/ospent
+OSPCAT=/home/norman/s/star/bin/sgml-goedel/OpenSP-1.4/bin/ospcat
+OSPENT=/home/norman/s/star/bin/sgml-goedel/OpenSP-1.4/bin/ospent
 
 SGML_CATALOG_FILES=/home/norman/s/src/sgml/w/sgml/dtd/CATALOG:/usr/local/lib/sgml/CATALOG
 export SGML_CATALOG_FILES
@@ -170,8 +170,15 @@ fi
 # characters here than may be in a public identifier, but that's
 # because we have to include characters in system identifiers which
 # may be either filenames or URLs.
+#
+# The allowed characters in `minimum literal data' are SPACE, LC
+# Letter, UC Letter, Digit and Special (8879, production 78), where
+# `Special' is the characters "'()+,-./:=?" (ie, 39-41, 43-47, 58, 61, 63)
 
-if test `expr "$PATH_INFO" : '.*[^-+a-zA-Z0-9/:. _%]'` != 0; then
+if expr "$PATH_INFO" : "[ a-zA-Z0-9'()+,./:=?-]*$" >/dev/null; then
+    # That's OK
+    :
+else
     cat <<EOF
 Status: 400 Mysterious characters
 Server: $SERVER_SOFTWARE ($server_name)
@@ -256,7 +263,6 @@ EOF
 
 # We've sent out the right headers.  All that remains is to provide
 # the file itself.
-
 cat $ofile
 
 
