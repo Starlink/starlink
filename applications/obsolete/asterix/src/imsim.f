@@ -270,17 +270,17 @@
               END IF
             END IF
             IF ( TEFF .EQ. 1.0 ) THEN
+              CALL MSG_PRNT( 'No exposure time in model, assuming '/
+     :                                  /'an exposure of 1 second' )
+            ELSE
               CALL MSG_SETR( 'TEFF', TEFF )
               CALL MSG_PRNT( 'Model is exposure corrected, scaling up'/
      :                               /' by exposure of ^TEFF seconds' )
-            ELSE
-              CALL MSG_PRNT( 'No exposure time in model, assuming '/
-     :                                  /'an exposure of 1 second' )
             END IF
           ELSE
             TEFF = 1.0
-            CALL MSG_PRNT( 'No exposure time in model, assuming '/
-     :                                /'an exposure of 1 second' )
+            CALL MSG_PRNT( 'Model is not corrected, assuming an '//
+     :                                             /'of 1 second' )
           END IF
         ELSE
           CALL ERR_ANNUL( STATUS )
