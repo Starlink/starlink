@@ -169,7 +169,7 @@
 *        Length of the vector to be displayed in the key, in data units.
 *        A default value is generated based on the spread of vector
 *        lengths in the plot. []
-*     LBND(2) = _REAL (Given)
+*     LBND(2) = _REAL (Read)
 *        The coordinates to put at the lower left corner of the plotting 
 *        area, in the coordinates system specified by parameters COLX and
 *        COLY. The suggested value just encloses all the data in the supplied
@@ -196,7 +196,7 @@
 *        in the supplied catalogue, or inherited from the previous 
 *        invocation of POLPLOT. A null (!) value causes defaults to be used 
 *        for all attributes. [!]
-*     UBND(2) = _REAL (Given)
+*     UBND(2) = _REAL (Read)
 *        The coordinates to put at the top right corner of the plotting 
 *        area, in the coordinates system specified by parameters COLX and
 *        COLY. The suggested value just encloses all the data in the supplied
