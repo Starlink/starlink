@@ -64,11 +64,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     14 Feb 1995 (DJA):
 *        Original version.
+*     13 May 1997 (RB):
+*        Update the CREATOR keyword each time.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -98,8 +101,6 @@
         PARAMETER		( UMODE = 'NORMAL' )
 
 *  Local Variables:
-      CHARACTER*72		CMNT			! Keyword comment
-      CHARACTER*40		CREATOR			! Creator of file
       CHARACTER*80		HTXT			! History text line
 
       CHARACTER*80		NAME			! Creator name
@@ -122,15 +123,15 @@
       CALL ADI2_FNDHDU( ARGS(1), ' ', .TRUE., PHDU, STATUS )
 
 *  Get verbosity
+c     CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
       IVERB = HSI__QUIET
-C      CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
 
 *  Only write text if verbosity is QUIET or greater
       IF ( IVERB .GE. HSI__QUIET ) THEN
 
 *    Get system stuff including node name
         CALL PSX_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE,
-     :                                                     STATUS )
+     :                  STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           NODENAME = 'unknown'
@@ -142,6 +143,10 @@ C      CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
 *    Get the command name
         CALL ADI_GET0C( ARGS(2), NAME, STATUS )
 
+*    Update the value of the CREATOR keyword (or create if first time)
+        CALL ADI2_HPKYC( PHDU, 'CREATOR', NAME,
+     :                   'Creator of this file', STATUS )
+
 *    Format history line
         CALL MSG_SETC( 'CMD', NAME )
         CALL MSG_SETC( 'HOST', NODENAME )
@@ -150,15 +155,6 @@ C      CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
 
 *    Write hew history record
         CALL ADI2_HPHIS( PHDU, HTXT(:TLEN), STATUS )
-
-*    Get the value of the CREATOR keyword. Only write this keyword if its
-*    value is not currently defined
-        CALL ADI2_HGKYC( PHDU, 'CREATOR', CREATOR, CMNT, STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_ANNUL( STATUS )
-          CALL ADI2_HPKYC( PHDU, 'CREATOR', NAME,
-     :                     'Creator of this file', STATUS )
-        END IF
 
 *  End of verbosity test
       END IF
