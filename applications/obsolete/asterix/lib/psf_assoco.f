@@ -1,65 +1,128 @@
-*+  PSF_ASSOCO - Associate a dataset and create PSF if necessary
-      SUBROUTINE PSF_ASSOCO( FID, SLOT, STATUS )
-*
-*    Description :
-*
-*     Routine associates a dataset being written to a psf handle.
-*     Enough info must be file to enable psf system to find axis
-*     info etc.
-*
-*    Method :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     05 Feb 90 : Original (DJA)
-*     29 Jan 94 : Initialisation via block data (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Import :
-*
-      INTEGER			FID			! Dataset id
-*
-*    Export :
-*
-      INTEGER                   SLOT                    ! PSF slot number
-*
-*    Status :
-*
-      INTEGER                  	STATUS                  ! Run-time error
-*
-*    External references :
-*
-      EXTERNAL		       	PSF_BLK
+      SUBROUTINE PSF_ASSOCO( FID, PSID, STATUS )
+*+
+*  Name:
+*     PSF_ASSOCO
+
+*  Purpose:
+*     Associate a dataset and create psf data structure
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL PSF_ASSOCO( FID, PSID, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     FID = INTEGER (given)
+*        ADI identifier to file to be associated
+*     PSID = INTEGER (returned)
+*        ADI identifier to psf storage area
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     PSF Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/psf.html
+
+*  Keywords:
+*     package:psf, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1996
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      5 Feb 1990 (DJA):
+*        Original version
+*     29 Jan 1994 (DJA):
+*        Initialisation via block data
+*      8 May 1996 (DJA):
+*        Use PSID rather than slot number
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Check status
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PKG'
+
+*  Arguments Given:
+      INTEGER			FID
+
+*  Arguments Returned:
+      INTEGER			PSID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
+      EXTERNAL			PSF_BLK
+*.
+
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Grab slot
-      CALL PSF_GETSLOT( FID, SLOT, STATUS )
+*  Check initialised
+      IF ( .NOT. AST_QPKGI( PSF__PKG ) ) CALL PSF_INIT( STATUS )
 
-*    Get library and routine name from user
-      CALL PSF_PROMPT( .FALSE., ' ', SLOT, STATUS )
+*  Grab slot
+      CALL PSF_GETSLOT( FID, PSID, STATUS )
 
-*    Initialise the PSF routine
-      CALL PSF_SLOTINIT( SLOT, STATUS )
+*  Get library and routine name from user
+      CALL PSF_PROMPT( .FALSE., ' ', PSID, STATUS )
 
-*    Try to write model to file
-      CALL PSF_PUT_MODEL( SLOT, STATUS )
+*  Initialise the PSF routine
+      CALL PSF_SLOTINIT( PSID, STATUS )
 
-*    Tidy up
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'PSF_ASSOCO', STATUS )
-      END IF
+*  Try to write model to file
+      CALL PSF_PUT_MODEL( PSID, STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PSF_ASSOCO', STATUS )
 
       END
