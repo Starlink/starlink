@@ -42,12 +42,15 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     17-SEP-1992 (DSB):
 *        Original version, modified from equivalent KAPPA routine 
 *        written by MJC.
+*      8-AUG-2004 (TIMJ):
+*        Use modern monolith style
 *     {enter_changes_here}
 
 *  Bugs:
@@ -60,56 +63,23 @@
 
 *  Global Constants:
       INCLUDE  'SAE_PAR'          ! SSE global definitions
+      INCLUDE  'PAR_PAR'          ! Parameter system definitions
 
 *  Status:
       INTEGER  STATUS
 
 *  External References:
-      INTEGER CHR_LEN             ! Length of a character string less
-                                  ! any trailing blanks
 
 *  Local Variables:
-      CHARACTER
-     :  COMAND * ( 132 ),         ! Command
-     :  NAME * ( 15 )             ! Task name from the command
-
-      INTEGER
-     :  NC,                       ! Number of characters in command
-     :  NCOFF,                    ! Number of characters offset to
-                                  ! search for the path sladh in the
-                                  ! command
-     :  NCS                       ! Position of a slash within a part of
-                                  ! the command
-
-      LOGICAL                     ! True if:
-     :  PATH                      ! There is a slash in the part of the
-                                  ! command being examined
+      CHARACTER NAME*(PAR__SZNAM) ! Action name
 
 *.
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Obtain the command from a Fortran RTL routine.  Zero is the command.
-      CALL GETARG( 0, COMAND )
-
-*  Remove any path present in the command to derive the command name by
-*  looking for the last slash.
-      PATH = .TRUE.
-      NCS = 0
-      NCOFF = 0
-      DO WHILE ( PATH )
-         NCS = INDEX( COMAND( NCOFF+1: ), '/' )
-         PATH = NCS .NE. 0
-         NCOFF = NCOFF + NCS
-      END DO
-
-*  Extract the name less trailing blanks.
-      NC = CHR_LEN( COMAND )
-      NAME = COMAND( NCOFF + 1:NC )
-
-*  Force the input string to upper-case before testing
-      CALL CHR_UCASE( NAME )
+*  Obtain the action name.
+      CALL TASK_GET_NAME( NAME, STATUS )
 
 *  Identify and execute the task.
 *  ==============================
