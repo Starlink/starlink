@@ -225,7 +225,7 @@
 
 *  Map the axis values. NB: if the axis is not present then this routine
 *  returns integers i.e. 1.0,2.0,3.0...
-      CALL BDI_AXMAPR( IFID, 1, 'Data', ITPTR, STATUS )
+      CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', ITPTR, STATUS )
       IF (STATUS .NE. SAI__OK)THEN
          CALL MSG_PRNT('Error mapping axis array')
          GOTO 99

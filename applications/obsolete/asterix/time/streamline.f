@@ -132,8 +132,8 @@
       CALL AST_INIT()
 
 *  Get input data into an array of GOOD values only.
-      CALL TIM_GETDAT( IFID, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
-     :                 VPNTR, STATUS)
+      CALL TIM_GETDAT( IFID, NTOT, NGOOD, TPTR, DPTR, LVAR,
+     :                 VPTR, STATUS )
 
 *  Test that bad quality points were found
       IF ( NTOT .EQ. NGOOD ) THEN
