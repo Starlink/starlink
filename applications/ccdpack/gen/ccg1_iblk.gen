@@ -1,0 +1,327 @@
+      SUBROUTINE CCG1_IBLK<T>( INDIM, ILBND, IUBND, IN, IVAR, NPOINT, 
+     :                         OFFSET, COORDS, PARAMS, FLAGS, BADVAL,
+     :                         OUT, OVAR, NBAD, STATUS )
+*+
+*  Name:
+*     CCG1_IBLK<T>
+
+*  Purpose:
+*     Block resampling interpolator for use with AST_RESAMPLE<T>.
+
+*  Language:
+*     Starlink Fortran 77.
+
+*  Invocation:
+*     CALL CCG1_IBLK<T>( INDIM, ILBND, IUBND, IN, IVAR, NPOINT, OFFSET, 
+*                        COORDS, PARAMS, FLAGS, BADVAL, OUT, OVAR, 
+*                        NBAD, STATUS )
+
+*  Description:
+*     This routine is the engine called by AST_RESAMPLE<X> to do the 
+*     resampling from one frame to another.  It is designed to be used
+*     when resampling an image into a more coarse-grained grid, and it
+*     simply averages a number of pixels around the given point to give
+*     a value.  The value of the first element of the PARAMS array 
+*     indicates the side length of the box in pixels which should be
+*     block averaged to give the interpolated result; this is probably
+*     not a good routine to use unless that number is 3 or more.
+*
+*     See the documentation of the AST_RESAMPLE<X> and AST_UINTERP 
+*     routines in SUN/210 for further discussion.
+
+*  Arguments:
+*     INDIM = INTEGER (Given)
+*        The number of dimensions in the input grid. This will be at
+*        least one.
+*     ILBND( INDIM ) = INTEGER (Given)
+*        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the input grid along each dimension.
+*     IUBND( INDIM ) = INTEGER (Given)
+*        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the input grid along each dimension.
+*
+*        Note that ILBND and IUBND together define the shape,
+*        size and coordinate system of the input grid in the same
+*        way as they do in AST_RESAMPLE<X>.
+*     IN( * ) = <TYPE> (Given)
+*        An array, with one element for each pixel in the
+*        input grid, containing the input data. This will be the same
+*        array as was passed to AST_RESAMPLE<X> via the IN argument.
+*        The numerical type of this array should match that of the
+*        data being processed.
+*     IVAR( * ) = <TYPE> (Given)
+*        An optional second array with the same size and type as the
+*        IN array. This will only be given if the AST__USEVAR flag is
+*        set via the FLAGS argument (below). If given, it will contain
+*        the set of variance values associated with the input data and
+*        will be the same array as was passed to AST_RESAMPLE<X> via
+*        the IN_VAR argument.
+*
+*        If the AST__USEVAR flag is not set, then no variance values
+*        are being processed. In this case, this array of variance
+*        values may be a dummy (e.g. one-element) array and should not
+*        be used.
+*
+*        This routine is currently not capable of resampling variances.
+*     NPOINT = INTEGER (Given)
+*        The number of points at which the input grid is to be
+*        interpolated. This will be at least one.
+*     OFFSET( NPOINT ) = INTEGER (Given)
+*        For each interpolation point, this array will contain the
+*        offset from the start of the OUT (and OUT_VAR) array(s) at
+*        which the interpolated value (and its variance, if required)
+*        should be stored. For example, the interpolated value for
+*        point number POINT should be stored in OUT(1+OFFSET(POINT)).
+*     COORDS( NPOINT, INDIM ) = DOUBLE PRECISION (Given)
+*        A 2-dimensional array containing the coordinates of the
+*        points at which interpolation should be performed. These will
+*        be stored so that coordinate number COORD for interpolation
+*        point number POINT is found in element COORDS(POINT,COORD).
+*
+*        If any interpolation point has any of its coordinates equal
+*        to the value AST__BAD (as defined in the AST_PAR include
+*        file), then the corresponding output data (and variance)
+*        should be set to the value given by BADVAL (see below).
+*     PARAMS( 1 ) = DOUBLE PRECISION (Given)
+*        This will be the same array as was given via the
+*        PARAMS argument of AST_RESAMPLE<X>. You may use this to
+*        pass any additional parameter values required by your
+*        interpolation algorithm.
+*     FLAGS = INTEGER (Given)
+*        This will be the same value as was given via the FLAGS
+*        argument of AST_RESAMPLE<X>. You may test this value to
+*        provide additional control over the operation of your
+*        resampling algorithm. Note that the special flag values
+*        AST__URESAMP1, 2, 3 & 4 are reserved for you to use for your
+*        own purposes and will not clash with other pre-defined flag
+*        values (see AST_RESAMPLE<X>).
+*
+*        This routine will currently fail if AST__USEVAR is set.
+*     BADVAL = <TYPE> (Given)
+*        This will be the same value as was given for the BADVAL
+*        argument of AST_RESAMPLE<X>, and will have the same numerical
+*        type as the data being processed (i.e. as elements of the IN
+*        array).  It should be used to test for bad pixels in the
+*        input grid (but only if the AST__USEBAD flag is set via the
+*        FLAGS argument) and for identifying bad output values in the
+*        OUT (and OVAR) array(s).
+*     OUT( * ) = <TYPE> (Returned)
+*        An array with the same numerical type as the IN
+*        array, into which the interpolated data values should be
+*        returned.  Note that details of the storage order and number
+*        of dimensions of this array are not required, since the
+*        OFFSET array contains all necessary information about where
+*        each returned value should be stored.
+*
+*        In general, not all elements of this array (or the OVAR
+*        array below) may be used in any particular invocation of the
+*        routine. Those which are not used should be returned
+*        unchanged.
+*     OVAR( * ) = <TYPE> (Returned)
+*        An optional array with the same type and size as the OUT
+*        array, into which variance estimates for the resampled values
+*        should be returned. This array will only be given if the
+*        AST__USEVAR flag is set via the FLAGS argument.
+*
+*        If given, it is addressed in exactly the same way (via the
+*        OFFSET array) as the OUT array. The values returned should be
+*        estimates of the statistical variance of the corresponding
+*        values in the OUT array, on the assumption that all errors in
+*        input data values are statistically independent and that
+*        their variance estimates may simply be summed (with
+*        appropriate weighting factors).
+*
+*        If the AST__USEVAR flag is not set, then variance values are
+*        not being processed.  In this case, this array may be a dummy
+*        (e.g. one-element) array and should not be used.
+*
+*        This routine is currently not capable of resampling variances.
+*     NBAD = INTEGER (Returned)
+*        This should return the number of interpolation points at
+*        which an output data value (and/or a variance value if
+*        relevant) equal to BADVAL has been assigned because no
+*        valid interpolated value could be obtained.  The maximum
+*        value that should be returned is NPOINT, and the minimum is
+*        zero (indicating that all output values were successfully
+*        obtained).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Bugs:
+*     The value of the FLAGS argument cannot be read, owing to a bug in
+*     AST.  The value of the FLAGS argument is assumed to be equal to
+*     AST__USEBAD.
+
+*  Copyright:
+*     Copyright (C) 2000 Central Laboratory of the Research Councils
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK - IoA)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-NOV-2000 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! Standard AST constants
+      INCLUDE 'AST_ERR'          ! AST error constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+
+*  Local Constants:
+      INTEGER MAXDIM
+      PARAMETER( MAXDIM = 2 )    ! Maximum value of INDIM
+      
+*  Arguments Given:
+      INTEGER INDIM
+      INTEGER ILBND( INDIM )
+      INTEGER IUBND( INDIM )
+      <TYPE> IN( * ) 
+      <TYPE> IVAR( * )
+      INTEGER NPOINT
+      INTEGER OFFSET( NPOINT )
+      DOUBLE PRECISION COORDS( NPOINT, INDIM )
+      DOUBLE PRECISION PARAMS( 1 )
+      INTEGER FLAGS
+      <TYPE> BADVAL
+      
+*  Arguments Returned:
+      <TYPE> OUT( * )
+      <TYPE> OVAR( * )
+      INTEGER NBAD
+      
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL VAL_DTO<T>
+      <TYPE> VAL_DTO<T>          ! Converts DOUBLE PRECISION to <COMM>
+
+*  Local Variables:
+      INTEGER CENTR              ! Offset of central pixel of cube
+      INTEGER HI( MAXDIM )       ! Upper offsets of input cube sides
+      INTEGER I1                 ! First coordinate loop variable
+      INTEGER I2                 ! Second coordinate loop variable
+      INTEGER ID                 ! Dimension loop variable
+      INTEGER IP                 ! Point loop variable
+      INTEGER LO( MAXDIM )       ! Lower offsets of input cube sides
+      INTEGER SIZE( MAXDIM )     ! Dimensions of the input array
+      INTEGER NSUM               ! Number of good pixels averaged
+      INTEGER WIDTH              ! Number of pixels on each side to sample
+      LOGICAL ISGOOD             ! Is this output pixel valid?
+      LOGICAL USEBAD             ! Does the input array contain bad pixels?
+      LOGICAL USEVAR             ! Does the input data have a variance?
+      DOUBLE PRECISION SUM       ! Sum of good pixels for average
+      
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Decode flags.
+*  The commented out lines ought to work, but at present AST_RESAMPLE<T>
+*  seems to cause FLAGS to be passed by value instead of reference so
+*  that it cannot be accessed in FORTRAN.  This is a bug in AST.  Until
+*  it is fixed, we assume values for the flags.
+c     USEBAD = MOD( FLAGS / AST__USEBAD, 2 ) .EQ. 1
+c     USEVAR = MOD( FLAGS / AST__USEVAR, 2 ) .EQ. 1
+      USEBAD = .TRUE. 
+      USEVAR = .FALSE.
+
+*  Check that we don't have too many dimensions.
+      IF ( INDIM .GT. MAXDIM ) THEN
+         STATUS = AST__UINER
+         CALL MSG_SETI( 'MAX', MAXDIM )
+         CALL ERR_REP( 'CCG1_IBLK_NDIM', 
+     :   'CCG1_IBLK: Only capable of interpolating in ^MAX dimensions.',
+     :   STATUS )
+         GO TO 99
+      END IF
+
+*  Check that we don't have a variance.  It would be trivial to upgrade
+*  the routine to cope with a variance array using the same averaging
+*  scheme, but it is currently not in place for reasons of efficiency
+*  (and possibly simple averaging is not correct for variances?).
+      IF ( USEVAR ) THEN
+         STATUS = AST__UINER
+         CALL ERR_REP( 'CCG1_IBLK_NOVAR', 
+     :   'CCG1_IBLK: Variance interpolation is not supported.', STATUS )
+         GO TO 99
+      END IF
+
+*  Set the number of pixels either side of the target pixel to sample.
+      WIDTH = PARAMS( 1 )
+
+*  Initialise values for dimensions which may not get filled.
+      DO ID = 1, MAXDIM
+         SIZE( ID ) = 1
+         LO( ID ) = 0
+         HI( ID ) = 0
+      END DO
+
+*  Set the size of each of the dimensions which is present.
+      DO ID = 1, INDIM
+         SIZE( ID ) = IUBND( ID ) - ILBND( ID ) + 1
+      END DO
+      
+*  Loop over all points.
+      DO IP = 1, NPOINT
+         ISGOOD = .TRUE.
+
+*  Locate the bounds of the cube which must be resampled.
+         DO ID = 1, INDIM
+            IF ( COORDS( IP, ID ) .NE. AST__BAD ) THEN
+               CENTR = NINT( COORDS( IP, ID ) ) - ILBND( ID )
+               LO( ID ) = MAX( CENTR - WIDTH, 0 )
+               HI( ID ) = MIN( CENTR + WIDTH, SIZE( ID ) - 1 )
+            ELSE
+               ISGOOD = .FALSE.
+            END IF
+         END DO
+
+*  Sum the values of all the pixels in the indicated cube of the input
+*  array.
+         SUM = 0D0
+         NSUM = 0
+         DO I2 = LO( 2 ) * SIZE( 1 ), HI( 2 ) * SIZE( 1 ), SIZE( 1 )
+            DO I1 = LO( 1 ), HI( 1 )
+               IF ( IN( 1 + I1 + I2 ) .NE. VAL__BAD<T> ) THEN
+                  SUM = SUM + NUM_<T>TOD( IN( 1 + I1 + I2 ) )
+                  NSUM = NSUM + 1
+               END IF
+            END DO
+         END DO
+         ISGOOD = ISGOOD .AND. NSUM .GT. 0
+
+*  Set the indicated pixel of the output array to the averaged value.
+         IF ( ISGOOD ) THEN
+            OUT( 1 + OFFSET( IP ) ) = VAL_DTO<T>( .FALSE., 
+     :                                            SUM / DBLE( NSUM ), 
+     :                                            STATUS )
+            IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         ELSE
+            OUT( 1 + OFFSET( IP ) ) = VAL__BAD<T>
+         END IF
+      END DO
+
+*  Error exit label.
+ 99   CONTINUE
+
+      END
+* $Id$
