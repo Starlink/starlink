@@ -64,7 +64,7 @@ be declared <em/somewhere/: the default is declared in the General DTD.
      system-id elsewhere.
 <codebody>
 (define %starlink-decl-entity% "starlink.decl")
-;; defined in DTD to point to "-//Starlink//SYNTAX Starlink Declaration//EN"
+;; defined in DTD to point to "-//Starlink//TEXT Starlink Declaration//EN"
 
 <routine>
 <routinename>%copyright-string%
