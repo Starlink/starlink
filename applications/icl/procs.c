@@ -20,6 +20,7 @@
  */
 #include <signal.h>
 #include <stdio.h>
+#include <string.h>
 #include "icl.h"
 #include "interp.h"
 #include "node.h"
@@ -176,7 +177,7 @@ sys_exception(char *mess)
     const char *qual1;
     value new;
 
-    qual1 = ((errno < 65535 && errno >= 0) ? sys_errlist[errno] : 
+    qual1 = ((errno < 65535 && errno >= 0) ? strerror(errno) : 
 					     "unknown error");
     if ((buf = (char *) malloc(((unsigned int) 
 				(strlen(mess) + strlen(qual1) + 3)))) 
@@ -201,7 +202,7 @@ sys_exception1(char *format, char *arg1)
     const char *qual1;
     value new;
 
-    qual1 = ((errno < 65535 && errno >= 0) ? sys_errlist[errno] :
+    qual1 = ((errno < 65535 && errno >= 0) ? strerror(errno) :
 					     "unknown error");
     if ((buf = (char *) malloc(((unsigned int) 
 				(strlen(format) + strlen(arg1)+ 1))))
@@ -232,7 +233,7 @@ sys_exception2(char *format, char *arg1, char *arg2)
     const char *qual1;
     value new;
 
-    qual1 = ((errno < 65535 && errno >= 0) ? sys_errlist[errno] :
+    qual1 = ((errno < 65535 && errno >= 0) ? strerror(errno) :
 					     "unknown error");
     if ((buf = (char *) malloc(((unsigned int)
 			(strlen(format) + strlen(arg1) + strlen(arg2) + 1)))) 

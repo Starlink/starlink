@@ -19,6 +19,7 @@
 #include <stdio.h>	/* for error output before iosubsystem running */
 #include <signal.h>
 #include <setjmp.h>
+#include <string.h>
 #include <sys/wait.h>
 #include "icl.h"
 #include "sae_par.h"
@@ -503,7 +504,7 @@ startiosubsystem(char *filename, char *icl_argv[], int nargs)
      */
 	if (execvp(image_file, argv )!= 0)
 	    fprintf(stderr,"exec() iosubsystem failed - file %s - %s\n",
-		image_file, sys_errlist[errno]);
+		image_file, strerror(errno));
     /*
      * if we get here the io subsystem failed to start in the child -
      * notify the parent

@@ -44,6 +44,7 @@
 #include <sys/time.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
+#include <string.h>
 #include "icl.h"
 #include "expr.h"
 #include "interp.h"
@@ -705,7 +706,7 @@ int detached		/* Flag to inidicate 'detached' status (given) */
 	break;
 
       case -1:			/* Fork failed */
-	sprintf(buf,"fork() process failed: %s", sys_errlist[errno]);
+	sprintf(buf,"fork() process failed: %s", strerror(errno));
         bufstring(buf);
 	bufnewline();
 	flshbuf();
