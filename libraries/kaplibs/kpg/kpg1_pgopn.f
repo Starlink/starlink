@@ -41,6 +41,8 @@
 *        Original version.
 *     10-DEC_2002 (DSB):
 *        Re-clear the screen after loading the user's pallette if MODE=W.
+*     18-MAR-2003 (DSB):
+*        Check STATUS before calling PGPLOT routines ("CALL PG...") .
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,7 +93,7 @@
 *  Save the current background RGB values (these will eb the PGPLOT
 *  default values since PGPLOT re-instates the default colour table on
 *  opening a device).
-      CALL PGQCR( 0, ROLD, GOLD, BOLD )
+      IF( STATUS .EQ. SAI__OK ) CALL PGQCR( 0, ROLD, GOLD, BOLD )
 
 *  PGPLOT resets the colour table each time it is opened. So re-instate
 *  the user's pallette and LUT by loading them from previously saved files 
@@ -104,7 +106,8 @@
 *  We have now loaded a potentially different user pallette, which may
 *  have a different background colour, so clear the screen again if the
 *  backgrond colour has changed.
-      IF( CHR_UPPER( MODE( 1:1 ) ) .EQ. 'W' ) THEN
+      IF( STATUS .EQ. SAI__OK .AND. 
+     :    CHR_UPPER( MODE( 1:1 ) ) .EQ. 'W' ) THEN
          CALL PGQCR( 0, R, G, B )
          IF( R .NE. ROLD .OR. G .NE. GOLD .OR. B .NE. BOLD ) THEN
             CALL PGERAS
