@@ -1,77 +1,166 @@
-*+  REBIN - ND data rebinning
-      SUBROUTINE REBIN(STATUS)
-*    Description :
-*     Rebins an ND dataset into regularly or irregularly spaced bins
-*    Parameters :
-*     INP=UNIV(R)	input dataset
-*     OUT=UNIV(W)	output dataset
-*    Method :
-*    Deficiencies :
-*
-*     When VARIANCEs are rebinned they are no longer independent of the VARIANCE
-*     in adjacent bins. If a rebinned dataset is rebinned again the effect of
-*     this is artificially to lower the VARIANCEs.
-*    Bugs :
-*    Authors :
-*     Jim Peden (BHVAD::JCMP)
-*     Alan McFadzean (BHVAD::ADM)
-*     Bob Vallance (BHVAD::RJV)
-*    History :
-*      3 Sep 84 : Original (BHVAD::JCMP)
-*     12 Dec 84 : Version announcement; normalisation added (BHVAD::JCMP)
-*     18 Dec 84 : Strange bugs encountered - REB_MAVAL code (BHVAD::JCMP)
-*     16 Jan 85 : Bug fix to 18 Dec 84 code (BHVAD::JCMP)
-*     26 Jan 85 : Minor change to history (BHVAD::JCMP)
-*     28 Mar 85 : V0.3-1 Normalisation selection added (BHVAD::JCMP)
-*     27 Jan 86 : V0.4-1 ADAM version (BHVAD::JCMP)
-*      3 Feb 86 : V0.4-2 Allow i/p obj's with only DATA_ARRAY,AXIS1_DATA (JCMP)
-*     14 Aug 86 : V0.5-1 Dummy durations set up; also REB_SQUAL added (JCMP)
-*     24 Sep 86 : V0.5-2 Changes to REB_GEN1, etc. (JKD)
-*      2 Oct 86 : V0.5-3 Changes in receptor boundaries etc in subroutines (jkd)
+      SUBROUTINE REBIN( STATUS )
+*+
+*  Name:
+*     REBIN
+
+*  Purpose:
+*     Perform n-D rebinning
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL REBIN( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Rebins an ND dataset into regularly or irregularly spaced bins.
+
+*  Usage:
+*     rebin {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input dataset
+*     OUT = CHAR (read)
+*        Output dataset
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     When VARIANCEs are rebinned they are no longer independent of the
+*     VARIANCE in adjacent bins. If a rebinned dataset is rebinned again
+*     the effect of this is artificially to lower the VARIANCEs.
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     rebin, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     JCMP: Jim Peden (ROSAT, University of Birmingham)
+*     ADM: Alan McFadzean (ROSAT, University of Birmingham)
+*     RJV: Bob Vallance (ROSAT, University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      3 Sep 1984 (JCMP):
+*        Original version
+*     12 Dec 1984 (JCMP):
+*        Version announcement; normalisation added
+*     18 Dec 1984 (JCMP):
+*        Strange bugs encountered - REB_MAVAL code
+*     16 Jan 1985 (JCMP):
+*        Bug fix to 18 Dec 84 code
+*     26 Jan 1985 (JCMP):
+*        Minor change to history
+*     28 Mar 1985 V0.3-1 (JCMP):
+*        Normalisation selection added
+*     27 Jan 1986 V0.4-1 (JCMP):
+*        ADAM version
+*      3 Feb 1986 V0.4-2 (JCMP):
+*        Allow i/p obj's with only DATA_ARRAY,AXIS data
+*     14 Aug 1986 V0.5-1 (JCMP):
+*        Dummy durations set up; also REB_SQUAL added
+*     24 Sep 1986 : V0.5-2 Changes to REB_GEN1, etc. (JKD)
+*      2 Oct 1986 : V0.5-3 Changes in receptor boundaries etc in subroutines (jkd)
 *                 V0.5-4 2D version (BHVAD::JKD)
-*     23 Jun 87 : V0.6-1 Changes to permit full rebinning even if no
+*     23 Jun 1987 : V0.6-1 Changes to permit full rebinning even if no
 *                        AXIS<n>_VARIANCE data (BHVAD:ADM)
-*     29 Jul 87 : V0.6-2 Option of not fully normalising receptor bins
+*     29 Jul 1987 : V0.6-2 Option of not fully normalising receptor bins
 *                        (BHVAD::ADM)
-*     26 Aug 87 : V0.6-3 Allows irregular output bins in 2D case (BHVAD::ADM)
-*     15 Jun 88 : V0.6-4 ASTERIX88 ND rebinning
-*     16 Aug 88 : V0.1-1 Projections
-*     15 Jun 89 : V1.0-2 Bug with regular axes - was setting up bin boundaries
+*     26 Aug 1987 : V0.6-3 Allows irregular output bins in 2D case (BHVAD::ADM)
+*     15 Jun 1988 : V0.6-4 ASTERIX88 ND rebinning
+*     16 Aug 1988 : V0.1-1 Projections
+*     15 Jun 1989 : V1.0-2 Bug with regular axes - was setting up bin boundaries
 *                        unnecessarily. (BHVAD::DJA)
-*        Nov 89 : V1.1-0 Major overhaul (BHVAD::RJV)
-*      8 Feb 90 : V1.1-1 Change to QUALITY handling (RJV)
-*     18 Jun 90 : V1.2-0 Bug locating high bin bound on irregular axes. Cludge
+*        Nov 1989 : V1.1-0 Major overhaul (BHVAD::RJV)
+*      8 Feb 1990 : V1.1-1 Change to QUALITY handling (RJV)
+*     18 Jun 1990 : V1.2-0 Bug locating high bin bound on irregular axes. Cludge
 *                        to fix rounding problem inserted (DJA)
-*     10 Jun 91 : V1.5-0 Bug in receptor bin output fixed (DJA)
-*        Mar 92 : V1.5-1 new faster mode - projection removed (RJV)
-*        Dec 92 : V1.5-2 new option to use axes from another file (RJV)
-*      1 jun 93 : V1.5-3 selection of axes to rebin (RJV)
-*     30 Jun 94 : V1.5-4 quality problem fixed (RJV)
-*      9 Sep 94 : V1.5-5 another quality problem fixed (RJV)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     12 Dec 94 : V1.8-1 Uses axis bounds rather than widths (RJV)
-*     30 Jul 95 : V1.8-2 Get locators from ADI (DJA)
-*
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+*     10 Jun 1991 : V1.5-0 Bug in receptor bin output fixed (DJA)
+*        Mar 1992 : V1.5-1 new faster mode - projection removed (RJV)
+*        Dec 1992 : V1.5-2 new option to use axes from another file (RJV)
+*      1 jun 1993 : V1.5-3 selection of axes to rebin (RJV)
+*     30 Jun 1994 : V1.5-4 quality problem fixed (RJV)
+*      9 Sep 1994 : V1.5-5 another quality problem fixed (RJV)
+*     24 Nov 1994 : V1.8-0 Now use USI for user interface (DJA)
+*     12 Dec 1994 : V1.8-1 Uses axis bounds rather than widths (RJV)
+*     30 Jul 1995 : V1.8-2 Get locators from ADI (DJA)
+*     11 Nov 1995 V2.0-0 (DJA):
+*        Full ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_PAR'
       INCLUDE 'PAR_ERR'
-*    Status :
-      INTEGER STATUS
-*    Global variables :
-*    Functions :
-      INTEGER UTIL_PLOC
-*    Local Constants :
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL                  UTIL_PLOC
+        INTEGER                 UTIL_PLOC
+
+*  Local Constants:
       INTEGER MXBIN           	! maximum # of irreg. spaced bins
          PARAMETER (MXBIN=500)
 
-*    Local variables :
-      CHARACTER*(DAT__SZLOC) ILOC       ! input dataset locator
-      CHARACTER*(DAT__SZLOC) OLOC       ! output dataset locator
-      CHARACTER*(DAT__SZLOC) CLOC       ! clone dataset locator
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'REBIN Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*80           ITEXT(4)   ! name of input file
       CHARACTER*80           OTEXT(4)   ! name of output file
       CHARACTER*80           AXLABEL(7) ! AXIS labels
@@ -79,44 +168,39 @@
       LOGICAL OK			! data valid
       LOGICAL VOK			! Data VARIANCE present
       LOGICAL QOK                     ! data quality present
-      LOGICAL AOK(DAT__MXDIM)         ! axes data present
-      LOGICAL AXOK(DAT__MXDIM)        ! axis(n) ok?
-      LOGICAL WDOK(DAT__MXDIM)        ! axis(n).width ok?
-      LOGICAL NORM(DAT__MXDIM)        ! data normalised rel. to axis(n)?
-      LOGICAL REG(DAT__MXDIM)	      ! regularly spaced input data
-      LOGICAL REGO(DAT__MXDIM)        ! regularly spaced output data
-      LOGICAL UNIF(DAT__MXDIM)        ! uniform input axis(n).width
-      LOGICAL UNIFO(DAT__MXDIM)       ! uniform output axis(n).width
+      LOGICAL AOK(ADI__MXDIM)         ! axes data present
+      LOGICAL AXOK(ADI__MXDIM)        ! axis(n) ok?
+      LOGICAL WDOK(ADI__MXDIM)        ! axis(n).width ok?
+      LOGICAL NORM(ADI__MXDIM)        ! data normalised rel. to axis(n)?
+      LOGICAL REG(ADI__MXDIM)	      ! regularly spaced input data
+      LOGICAL REGO(ADI__MXDIM)        ! regularly spaced output data
+      LOGICAL UNIF(ADI__MXDIM)        ! uniform input axis(n).width
+      LOGICAL UNIFO(ADI__MXDIM)       ! uniform output axis(n).width
       LOGICAL EXCLUDE
-      LOGICAL SEL(DAT__MXDIM)
+      LOGICAL SEL(ADI__MXDIM)
 
       INTEGER IFID,OFID,CFID
       INTEGER OPT
-      INTEGER NAXVDIM(DAT__MXDIM)     ! # axis values (should=dims)
-      INTEGER NAXWDIM(DAT__MXDIM)     ! # axis widths (should=dims)
-      INTEGER DIMS(DAT__MXDIM)	! data_array dimensions
-      INTEGER NDATVAR(DAT__MXDIM)	! data_VARIANCE   ..    (should equal dims)
-      INTEGER NDATQUAL(DAT__MXDIM)    ! data_quality ..       ..    ..    ..
+      INTEGER DIMS(ADI__MXDIM)	! data_array dimensions
+      INTEGER TDIMS(ADI__MXDIM)	! temp dimensions
       INTEGER NDIM			! # dimensions
-      INTEGER NDIMQ			! # dimensions QUALITY
-      INTEGER NDIMV			! # dimensions data VARIANCE
-      INTEGER ODIM(DAT__MXDIM)      ! # output axis values (7-D)
-      INTEGER RAT(DAT__MXDIM)           ! rebinning ratio
+      INTEGER ODIM(ADI__MXDIM)      ! # output axis values (7-D)
+      INTEGER RAT(ADI__MXDIM)           ! rebinning ratio
 *   Pointers...input
       INTEGER DPTR	              ! data
       INTEGER QPTR	              ! quality
       INTEGER VPTR	              ! data VARIANCE
-      INTEGER AXVP(DAT__MXDIM)        ! axes
-      INTEGER AXWP(DAT__MXDIM)        ! axes widths
-      INTEGER AXBP(DAT__MXDIM)	      ! axes bounds
+      INTEGER AXVP(ADI__MXDIM)        ! axes
+      INTEGER AXWP(ADI__MXDIM)        ! axes widths
+      INTEGER AXBP(ADI__MXDIM)	      ! axes bounds
 
 *   ...and output
       INTEGER DPTRO	              ! data
       INTEGER QPTRO	              ! quality
       INTEGER VPTRO	              ! data VARIANCE
-      INTEGER AXVPO(DAT__MXDIM)       ! axes
-      INTEGER AXWPO(DAT__MXDIM)       ! axes widths
-      INTEGER AXES(DAT__MXDIM)
+      INTEGER AXVPO(ADI__MXDIM)       ! axes
+      INTEGER AXWPO(ADI__MXDIM)       ! axes widths
+      INTEGER AXES(ADI__MXDIM)
       INTEGER ISEL,NSEL
 
       INTEGER I
@@ -130,41 +214,40 @@
       REAL WIDLOW,WIDUPP		! upper and lower bin widths
       REAL RLOW				! donor bin lower range
       REAL RUPP				! donor bin upper range
-      REAL DIR(DAT__MXDIM)		! axis direction indicator (input)
-      REAL BASEO,SCALEO
-      REAL BNDS(2,MXBIN,DAT__MXDIM)	! required boundaries (irregular)
-      REAL DUMAXVAL(DAT__MXDIM)		! dummy axis values for coerced dims
-      REAL DUMAXWID(DAT__MXDIM)		! dummy axis widths
-      REAL DUMAXBND(2,DAT__MXDIM)	! dummy axis bounds
-*
-*    Version id :
-*
-      CHARACTER*20 VERSION
-         PARAMETER (VERSION='REBIN Version 1.8-2')
-*-
-      CALL MSG_PRNT (VERSION)
+      REAL DIR(ADI__MXDIM)		! axis direction indicator (input)
+      REAL SCALEO
+      REAL BNDS(2,MXBIN,ADI__MXDIM)	! required boundaries (irregular)
+      REAL DUMAXVAL(ADI__MXDIM)		! dummy axis values for coerced dims
+      REAL DUMAXWID(ADI__MXDIM)		! dummy axis widths
+      REAL DUMAXBND(2,ADI__MXDIM)	! dummy axis bounds
+      REAL	SPARR(2)
+*.
 
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
+      CALL MSG_PRNT( VERSION )
+
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-* Associate input and output datasets
-      CALL USI_TASSOC2('INP','OUT','READ',IFID,OFID,STATUS)
-      IF (STATUS .NE. SAI__OK) GOTO 9000
+*  Associate input and output datasets
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
       CALL USI_NAMEI(INLINES,ITEXT,STATUS)
 
-*  Extract locators
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
-      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
-
-* Check input dataset
-      CALL BDA_CHKDATA(ILOC,OK,NDIM,DIMS,STATUS)
+*  Check input dataset
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
       IF ( .NOT. OK ) THEN
         CALL MSG_PRNT('AST_ERR: invalid input data')
         STATUS=SAI__ERROR
       ENDIF
-
 
 * get option number
       CALL USI_GET0I('OPT',OPT,STATUS)
@@ -179,9 +262,9 @@
 
 
       IF (OPT.EQ.5) THEN
-        CALL USI_TASSOCI('CLONE','*','READ',CFID,STATUS)
-        CALL ADI1_GETLOC( CFID, CLOC, STATUS )
-        CALL BDA_CHKAXES(CLOC,NAX,STATUS)
+        CALL USI_ASSOC( 'CLONE', 'BinDS', 'READ', CFID, STATUS )
+        CALL BDI_CHK( CFID, 'Axes', OK, STATUS )
+        CALL BDI_GETSHP( CFID, NDIM, TDIMS, NAX, STATUS )
         IF (NAX.EQ.NDIM.OR.(NAX.EQ.1.AND.NSEL.EQ.1)) THEN
 
         ELSE
@@ -194,45 +277,43 @@
 * Map bin attributes
       DO I=1,NDIM
 
-
-        CALL BDA_CHKAXIS(ILOC,I,AOK(I),STATUS)
+        CALL BDI_AXCHK( IFID, I, ' ', AOK(I), STATUS )
 
 * axis values
-        CALL BDA_CHKAXVAL(ILOC,I,AXOK(I),REG(I),NAXVDIM(I),STATUS)
-        CALL BDA_GETAXLABEL(ILOC,I,AXLABEL(I),STATUS)
-        CALL BDA_MAPAXVAL(ILOC,'READ',I,AXVP(I),STATUS)
-
+        CALL BDI_AXCHK( IFID, I, 'Data', AXOK(I), STATUS )
+        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
+        CALL BDI_AXGET0C( IFID, I, 'Label', AXLABEL(I), STATUS )
+        CALL BDI_AXMAPR( IFID, I, 'Data', 'READ', AXVP(I), STATUS )
 
 * axis bounds
-        CALL BDA_MAPAXBNDS(ILOC,'READ',I,AXBP(I),STATUS)
-
+        CALL BDI_AXMAPR( IFID, I, 'Bounds', 'READ', AXBP(I), STATUS )
 
 * axis widths
-        CALL BDA_CHKAXWID(ILOC,I,WDOK(I),UNIF(I),NAXWDIM(I),STATUS)
-        CALL BDA_MAPAXWID(ILOC,'READ',I,AXWP(I),STATUS)
-
+        CALL BDI_AXCHK( IFID, I, 'Width', WDOK(I), STATUS )
+        UNIF(I) = .FALSE.
+        CALL BDI_AXMAPR( IFID, I, 'Width', 'READ', AXWP(I), STATUS )
 
 * check if donor bins normalised
-        CALL BDA_GETAXNORM(ILOC,I,NORM(I),STATUS)
+        CALL BDI_AXGET0L( IFID, I, 'Normalised', NORM(I), STATUS )
 
-      ENDDO
+      END DO
 
-* set up dummy axes for coerced data (coerced to 7-D)
-      DO I=NDIM+1,7
-        AXVP(I)=UTIL_PLOC(DUMAXVAL(I))
-        AXWP(I)=UTIL_PLOC(DUMAXWID(I))
-        AXWPO(I)=UTIL_PLOC(DUMAXWID(I))
-        AXBP(I)=UTIL_PLOC(DUMAXBND(1,I))
-        DUMAXVAL(I)=0.5
-        DUMAXWID(I)=1.0
-        DUMAXBND(1,I)=0.0
-        DUMAXBND(2,I)=1.0
-        DIMS(I)=1
-        NORM(I)=.FALSE.
-        DIR(I)=1.0
-      ENDDO
+*  Set up dummy axes for coerced data (coerced to 7-D)
+      DO I = NDIM + 1, 7
+        AXVP(I) = UTIL_PLOC(DUMAXVAL(I))
+        AXWP(I) = UTIL_PLOC(DUMAXWID(I))
+        AXWPO(I) = UTIL_PLOC(DUMAXWID(I))
+        AXBP(I) = UTIL_PLOC(DUMAXBND(1,I))
+        DUMAXVAL(I) = 0.5
+        DUMAXWID(I) = 1.0
+        DUMAXBND(1,I) = 0.0
+        DUMAXBND(2,I) = 1.0
+        DIMS(I) = 1
+        NORM(I) = .FALSE.
+        DIR(I) = 1.0
+      END DO
 
-* set option code for each axis
+*  Set option code for each axis
       DO I=1,NDIM
         EXCLUDE=.TRUE.
         DO ISEL=1,NSEL
@@ -251,21 +332,21 @@
       ENDDO
 
 * map QUALITY if present
-      CALL BDA_CHKQUAL(ILOC,QOK,NDIMQ,NDATQUAL,STATUS)
-      IF (QOK) THEN
-        CALL BDA_MAPQUAL(ILOC,'READ',QPTR,STATUS)
+      CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
+      IF ( QOK ) THEN
+        CALL BDI_MAP( IFID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
       ENDIF
 
 * map VARIANCE if present
-      CALL BDA_CHKVAR(ILOC,VOK,NDIMV,NDATVAR,STATUS)
-      IF(VOK) THEN
-        CALL BDA_MAPVAR(ILOC,'READ',VPTR,STATUS)
+      CALL BDI_CHK( IFID, 'Variance', VOK, STATUS )
+      IF ( VOK ) THEN
+        CALL BDI_MAPR( IFID, 'Variance', 'READ', VPTR, STATUS )
       ENDIF
 
 * map DATA
-      CALL BDA_MAPDATA(ILOC,'READ',DPTR,STATUS)
+      CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
 
-* initialise bounds etc for output
+*  Initialise bounds etc for output
       DO I=1,7
         RAT(I)=1
         BNDS(1,1,I)=0.0
@@ -273,10 +354,10 @@
         REGO(I)=.TRUE.
         UNIFO(I)=.TRUE.
         ODIM(I)=1
-      ENDDO
+      END DO
 
-* Find axes ranges
-      DO I=1,NDIM
+*  Find axes ranges
+      DO I = 1, NDIM
 
         CALL ARR_ELEM1R(AXVP(I),DIMS(I),1,RLOW,STATUS)
         CALL ARR_ELEM1R(AXVP(I),DIMS(I),DIMS(I),RUPP,STATUS)
@@ -313,62 +394,58 @@
 
 * Obtain binning specs.
         CALL REBIN_GSPEC(SEL(I),AXLABEL(I),I,DIMS(I),MXBIN,RLOW,RUPP,
-     :                    %VAL(AXWP(I)),REG(I),DIR(I),OPT,CLOC,RAT(I),
+     :                    %VAL(AXWP(I)),REG(I),DIR(I),OPT,CFID,RAT(I),
      :                     REGO(I),NORM(I),BNDS(1,1,I),ODIM(I),STATUS)
         IF ( STATUS .NE. SAI__OK ) GOTO 9000
       ENDDO
 
 *  set up coerced dimensions in output
-      DO I = NDIM+1, 7
-        ODIM(I)=DIMS(I)
-      ENDDO
-
+      DO I = NDIM + 1, 7
+        ODIM(I) = DIMS(I)
+      END DO
+      CALL BDI_LINK( 'BinDS', NDIM, ODIM, 'REAL', OFID, STATUS )
 
 * create output data components
       IF (STATUS.EQ.SAI__OK) THEN
         CALL MSG_PRNT('Creating output...')
       ENDIF
-* textual lables
-      CALL BDA_COPTEXT(ILOC,OLOC,STATUS)
+
+*  Textual lables
+      CALL BDI_COPY( IFID, 'Label,Units,Title', OFID, ' ', STATUS )
 
 * DATA
-      CALL BDA_CREDATA(OLOC,NDIM,ODIM,STATUS)
-      CALL BDA_MAPDATA(OLOC,'WRITE',DPTRO,STATUS)
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', DPTRO, STATUS )
+
 * QUALITY
-      CALL BDA_CREQUAL(OLOC,NDIM,ODIM,STATUS)
-      CALL BDA_MAPQUAL(OLOC,'WRITE',QPTRO,STATUS)
-      IF (QOK) THEN
-        CALL BDA_GETMASK(ILOC,MASK,STATUS)
-        CALL BDA_PUTMASK(OLOC,MASK,STATUS)
-      ENDIF
-* VARIANCE if required
-      IF(VOK) THEN
-        CALL BDA_CREVAR(OLOC,NDIM,ODIM,STATUS)
-        CALL BDA_MAPVAR(OLOC,'WRITE',VPTRO,STATUS)
+      CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', QPTRO, STATUS )
+      IF ( QOK ) THEN
+        CALL BDI_COPY( IFID, 'QualityMask', OFID, ' ', STATUS )
       ENDIF
 
-      CALL BDA_CREAXES(OLOC,NDIM,STATUS)
+*  VARIANCE if required
+      IF ( VOK ) THEN
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', VPTRO, STATUS )
+      ENDIF
+
       DO I=1,NDIM
         IF (SEL(I)) THEN
 * copy textual lables from equivalent input axis
-          CALL BDA_COPAXTEXT(ILOC,OLOC,I,I,STATUS)
+          CALL BDI_AXCOPY( IFID, I, 'Units,Label', OFID, I, STATUS )
 
 * write normalisation flag
-          CALL BDA_PUTAXNORM(OLOC,I,NORM(I),STATUS)
+          CALL BDI_AXPUT0L( OFID, I, 'Normalised', NORM(I), STATUS )
 
-* axis values and width
-          CALL BDA_CREAXVAL(OLOC,I,REGO(I),ODIM(I),STATUS)
-          CALL BDA_CREAXWID(OLOC,I,REGO(I),ODIM(I),STATUS)
 * put in values
-          IF (REGO(I)) THEN
-            BASEO=(BNDS(1,1,I)+BNDS(2,1,I))/2.0
-            SCALEO=BNDS(2,1,I)-BNDS(1,1,I)
-            CALL BDA_PUTAXVAL(OLOC,I,BASEO,SCALEO,ODIM(I),STATUS)
-            CALL BDA_PUTAXWID(OLOC,I,ABS(SCALEO),STATUS)
+          IF ( REGO(I) ) THEN
+            SPARR(1) = (BNDS(1,1,I)+BNDS(2,1,I))/2.0
+            SPARR(2) = BNDS(2,1,I) - BNDS(1,1,I)
+            CALL BDI_AXPUT1R( OFID, I, 'SpacedData', 2, SPARR, STATUS )
+            CALL BDI_AXPUT0R( OFID, I, 'ScalarWidth', ABS(SCALEO),
+     :                        STATUS )
 
           ELSE
-            CALL BDA_MAPAXVAL(OLOC,'WRITE',I,AXVPO(I),STATUS)
-            CALL BDA_MAPAXWID(OLOC,'WRITE',I,AXWPO(I),STATUS)
+            CALL BDI_AXMAPR( OFID, I, 'Data', AXVPO(I), STATUS )
+            CALL BDI_AXMAPR( OFID, I, 'Width', AXWPO(I), STATUS )
             CALL REBIN_WRTAXIS(OPT,MXBIN,BNDS(1,1,I),ODIM(I),
      :                      %VAL(AXVP(I)),%VAL(AXWP(I)),DIR(I),RAT(I),
      :                           %VAL(AXVPO(I)),%VAL(AXWPO(I)),STATUS)
@@ -377,19 +454,17 @@
 
 *  not rebinning so copy input axis
         ELSE
-          CALL BDA_COPAXIS(ILOC,OLOC,I,I,STATUS)
+          CALL BDI_AXCOPY( IFID, I, ' ', OFID, I, STATUS )
 
         ENDIF
 
       ENDDO
 
-
-
       IF (STATUS.EQ.SAI__OK) THEN
         CALL MSG_PRNT('Rebinning...')
       ENDIF
 
-* Perform rebinning
+*  Perform rebinning
       IF (OPT.EQ.1) THEN
         CALL REBIN_DOIT_BYRATIO(
      :    DIMS(1),DIMS(2),DIMS(3),DIMS(4),DIMS(5),DIMS(6),DIMS(7),
@@ -411,30 +486,24 @@
         CALL MSG_PRNT('Done!')
       ENDIF
 
-* Copy and update history
+*  Copy and update history
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL HSI_PTXT( OFID, INLINES, ITEXT, STATUS )
       CALL USI_NAMEO( ONLINES, OTEXT, STATUS )
       CALL HSI_PTXT( OFID, ONLINES, OTEXT,STATUS )
 
-* Copy over ancillary components
-      CALL BDA_COPMORE(ILOC,OLOC,STATUS)
+*  Copy over ancillary components
+      CALL UDI_COPANC( IFID, ' ', OFID, STATUS )
 
 * Tidy up
-9000  CONTINUE
-
-      CALL BDA_RELEASE(OLOC,STATUS)
-      CALL USI_ANNUL('OUT',STATUS)
-      CALL BDA_RELEASE(ILOC,STATUS)
-      CALL USI_ANNUL( 'INP',STATUS)
-
+ 9000 CALL USI_ANNUL( 'OUT', STATUS )
+      CALL USI_ANNUL( 'INP', STATUS )
 
       CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
       END
-
 
 
 
@@ -449,7 +518,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER OPT
       INTEGER MXBINS
@@ -492,7 +561,6 @@
           ENDDO
         ENDIF
 
-
       ENDIF
 
       END
@@ -512,7 +580,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
       INTEGER ID1,ID2,ID3,ID4,ID5,ID6,ID7
@@ -798,7 +866,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
         INTEGER NDIM			! number of actual dimensions
@@ -1177,7 +1245,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
       INTEGER I(7)
@@ -1218,7 +1286,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
       INTEGER I(7)
@@ -1256,7 +1324,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
       INTEGER I(7)
@@ -1295,7 +1363,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
       INTEGER I(7)
@@ -1333,7 +1401,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
       INTEGER I(7)
@@ -1374,7 +1442,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
       INTEGER I(7)
@@ -1411,7 +1479,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
       INTEGER I(7)
@@ -1449,7 +1517,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
       INTEGER I(7)
@@ -1484,7 +1552,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       REAL FRAC
       INTEGER N1,N2,N3,N4,N5,N6,N7
@@ -1539,7 +1607,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       REAL FRAC
       INTEGER N1,N2,N3,N4,N5,N6,N7
@@ -1588,7 +1656,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       REAL FRAC
       INTEGER N1,N2,N3,N4,N5,N6,N7
@@ -1641,7 +1709,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       REAL FRAC
       INTEGER N1,N2,N3,N4,N5,N6,N7
@@ -1688,7 +1756,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
       INTEGER N1,N2,N3,N4,N5,N6,N7
@@ -1739,7 +1807,7 @@
 
 *+  REBIN_GSPEC - Get bin description for rebinning
       SUBROUTINE REBIN_GSPEC(SEL,AXLBL,AXN,INBIN,MXBIN,LOW,UPP,IWID,
-     :           REGI,DIR,OPT,CLOC,RAT,REGO,NORM,BOUNDS,ONBIN,STATUS)
+     :           REGI,DIR,OPT,CFID,RAT,REGO,NORM,BOUNDS,ONBIN,STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -1750,9 +1818,9 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
-      CHARACTER*(DAT__SZLOC) CLOC
+      INTEGER			CFID			! Clone dataset
         CHARACTER*(*) AXLBL  ! axis label
         INTEGER AXN          ! axis #
         INTEGER INBIN	     ! old number of bins
@@ -1780,8 +1848,7 @@
       CHARACTER*7 C/'1234567'/
       CHARACTER*20 PARNAM       ! Input parameter
       REAL OWID
-      REAL BASE,SCALE
-      INTEGER XPTR,WPTR
+      INTEGER BDIMS(2),DIMS(ADI__MXDIM)
       INTEGER NAX,CAX
       LOGICAL OK
 *-
@@ -1886,33 +1953,28 @@
 
       ELSEIF (OPT.EQ.5.AND.SEL) THEN
 *  clone axis from another dataset
-        CALL BDA_CHKAXES(CLOC,NAX,STATUS)
+        CALL BDI_GETSHP( CFID, ADI__MXDIM, DIMS, NAX, STATUS )
         IF (AXN.GT.NAX) THEN
           CAX=1
         ELSE
           CAX=AXN
         ENDIF
-        CALL BDA_CHKAXVAL(CLOC,CAX,OK,REGO,ONBIN,STATUS)
+        CALL BDI_AXCHK( CFID, CAX, 'Data', OK, STATUS )
         IF (OK) THEN
-          IF (REGO) THEN
-            CALL BDA_GETAXVAL(CLOC,CAX,BASE,SCALE,ONBIN,STATUS)
-            BOUNDS(1,1)=BASE-SCALE/2.0
-            BOUNDS(2,1)=BOUNDS(1,1)+SCALE
+
+          ONBIN = DIMS(CAX)
+          IF (ONBIN.LE.MXBIN) THEN
+            BDIMS(1) = 2
+            BDIMS(2) = MXBIN
+            CALL BDI_GETR( CFID, 'Axis_'//C(CAX:CAX)//'_Bounds', 2,
+     :                     BDIMS, BOUNDS, BDIMS, STATUS )
           ELSE
-            IF (ONBIN.LE.MXBIN) THEN
-              CALL BDA_MAPAXVAL(CLOC,'R',CAX,XPTR,STATUS)
-              CALL BDA_MAPAXWID(CLOC,'R',CAX,WPTR,STATUS)
-              CALL REBIN_GSPEC_BOUNDS(ONBIN,%VAL(XPTR),%VAL(WPTR),DIR,
-     :                                                  BOUNDS,STATUS)
-              CALL BDA_UNMAPAXVAL(CLOC,CAX,STATUS)
-              CALL BDA_UNMAPAXWID(CLOC,CAX,STATUS)
-            ELSE
-              CALL MSG_SETI('AXN',AXN)
-              CALL MSG_PRNT('AST_ERR: maximum number of output bins'//
+            CALL MSG_SETI('AXN',AXN)
+            CALL MSG_PRNT('AST_ERR: maximum number of output bins'//
      :                                       ' exceeded for axis ^AXN')
-              STATUS=SAI__ERROR
-            ENDIF
+            STATUS=SAI__ERROR
           ENDIF
+          REGO = .FALSE.
           CALL MSG_SETI('NBIN',ONBIN)
           CALL MSG_PRNT ('Axis will be cloned'//
      :                        ' - there will be ^NBIN bins')
@@ -1939,50 +2001,6 @@
         ONBIN=INBIN
       ENDIF
 
-
  99   CONTINUE
-
-      END
-
-
-
-      SUBROUTINE REBIN_GSPEC_BOUNDS(N,X,W,DIR,BOUNDS,STATUS)
-*    Description :
-*    Method :
-*    Authors :
-*    History :
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Import :
-      INTEGER N
-      REAL X(*),W(*)
-      REAL DIR
-*    Import-Export :
-*    Export :
-      REAL BOUNDS(2,*)
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-*    Local constants :
-*    Local variables :
-      INTEGER I
-      REAL HWID
-*-
-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-
-        DO I=1,N
-          HWID=W(I)*DIR/2.0
-          BOUNDS(1,I)=X(I)-HWID
-          BOUNDS(2,I)=X(I)+HWID
-
-        ENDDO
-
-      ENDIF
 
       END
