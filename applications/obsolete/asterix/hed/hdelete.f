@@ -23,7 +23,7 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HDELETE Version 2.1-0')
+      PARAMETER (VERSION='HDELETE Version 2.1-0b')
 *-
 
       CALL MSG_OUT('VERSION',VERSION,STATUS)

@@ -22,7 +22,7 @@
 *    Local Constants :
 
       CHARACTER*(30) VERSION		! version ID
-         PARAMETER (VERSION='PROJECT Version 2.1-0')
+         PARAMETER (VERSION='PROJECT Version 2.1-0b')
 
 *    Local variables :
       CHARACTER*80           TEXT(8)    ! history text

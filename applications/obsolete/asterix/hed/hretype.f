@@ -32,7 +32,7 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRETYPE Version 2.1-0')
+      PARAMETER (VERSION='HRETYPE Version 2.1-0b')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*(DAT__SZTYP) TYPE

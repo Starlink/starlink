@@ -125,7 +125,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVCSUBSET Version 2.1-0' )
+        PARAMETER		( VERSION = 'EVCSUBSET Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*80		TEXT(2)			! History text

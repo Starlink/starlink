@@ -85,7 +85,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER  		( VERSION = 'SPLINEFIT Version 2.1-0' )
+        PARAMETER  		( VERSION = 'SPLINEFIT Version 2.1-0b' )
 *-
 
 *  Check status

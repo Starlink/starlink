@@ -149,7 +149,7 @@
       INTEGER			MAXIG
         PARAMETER		( MAXIG = 2 )
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AST2XSP Version 2.1-0' )
+        PARAMETER		( VERSION = 'AST2XSP Version 2.1-0b' )
       INTEGER			XSP_OK
         PARAMETER		( XSP_OK = 0 )
       INTEGER			XSP_BAD

@@ -112,7 +112,7 @@
 *    Version id :
 *
       CHARACTER*(30) VERSION
-	 PARAMETER   (VERSION = 'SCATTERGRAM Version 2.1-0')
+	 PARAMETER   (VERSION = 'SCATTERGRAM Version 2.1-0b')
 *-
 
 *    Version announcement

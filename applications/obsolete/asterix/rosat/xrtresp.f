@@ -71,7 +71,7 @@
 * Local data :
 * Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTRESP Version 2.1-0')
+      PARAMETER (VERSION = 'XRTRESP Version 2.1-0b')
 *-
       IF (STATUS.NE.SAI__OK) RETURN
 *

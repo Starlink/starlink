@@ -96,7 +96,7 @@
       INTEGER INDEX  ! structure to hold index
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTINDEX Version 2.1-0')
+      PARAMETER (VERSION = 'XRTINDEX Version 2.1-0b')
 *-
 
 *  Check inherited global status

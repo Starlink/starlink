@@ -182,7 +182,7 @@
 *    Version id :
 *
       CHARACTER*80           	VERSION
-        PARAMETER            	( VERSION = 'QUALITY Version 2.1-0' )
+        PARAMETER            	( VERSION = 'QUALITY Version 2.1-0b' )
 *-
 
 *  Version id

@@ -115,7 +115,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AXCENTROID Version 2.1-0' )
+        PARAMETER		( VERSION = 'AXCENTROID Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*80		TEXT			! History text

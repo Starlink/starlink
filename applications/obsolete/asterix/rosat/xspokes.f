@@ -81,7 +81,7 @@
       INTEGER ARDID
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XSPOKES Version 2.1-0')
+      PARAMETER (VERSION = 'XSPOKES Version 2.1-0b')
 *-
       CALL AST_INIT()
       CALL MSG_PRNT(VERSION)

@@ -123,7 +123,7 @@
 
 *  Version:
       CHARACTER*30		VERSION
-	PARAMETER		( VERSION = 'INTERP Version 2.1-0' )
+	PARAMETER		( VERSION = 'INTERP Version 2.1-0b' )
 *-
 
 *  Check inherited global status

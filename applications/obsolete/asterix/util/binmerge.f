@@ -140,7 +140,7 @@
 *    Version id :
 *
       CHARACTER*24           VERSION
-         PARAMETER          (VERSION = 'BINMERGE Version 2.1-0' )
+         PARAMETER          (VERSION = 'BINMERGE Version 2.1-0b' )
 *-
 
 *    Version announcement

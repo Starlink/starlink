@@ -114,7 +114,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AFLINK Version 2.1-0' )
+        PARAMETER		( VERSION = 'AFLINK Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*20		LINK			! Link name

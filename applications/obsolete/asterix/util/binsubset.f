@@ -155,7 +155,7 @@
       INTEGER			NOBJ			!
         PARAMETER		( NOBJ = 6 )
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINSUBSET Version 2.1-0' )
+        PARAMETER		( VERSION = 'BINSUBSET Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*7 		AXID

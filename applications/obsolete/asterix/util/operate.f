@@ -150,7 +150,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'OPERATE Version 2.1-0' )
+        PARAMETER		( VERSION = 'OPERATE Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*6            	OPER                  	! Operator

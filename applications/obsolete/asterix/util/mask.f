@@ -102,7 +102,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'MASK Version 2.1-0' )
+        PARAMETER		( VERSION = 'MASK Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*8 		MSTR                    ! Char value of MASK

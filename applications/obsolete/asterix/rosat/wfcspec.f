@@ -127,7 +127,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-         PARAMETER 		( VERSION = 'WFCSPEC Version 2.1-0' )
+         PARAMETER 		( VERSION = 'WFCSPEC Version 2.1-0b' )
 *-
 
 *  Announce version

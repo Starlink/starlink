@@ -61,7 +61,7 @@
 *    Version :
 *
       CHARACTER*30       VERSION
-        PARAMETER        (VERSION = 'HISTMODE Version 2.1-0')
+        PARAMETER        (VERSION = 'HISTMODE Version 2.1-0b')
 *-
 
 *    Initialise

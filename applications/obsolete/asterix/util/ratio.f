@@ -170,7 +170,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER            ( VERSION = 'RATIO Version 2.1-0' )
+        PARAMETER            ( VERSION = 'RATIO Version 2.1-0b' )
 *-
 
 *    Check status

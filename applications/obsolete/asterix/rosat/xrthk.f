@@ -89,7 +89,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTHK Version 2.1-0')
+      PARAMETER (VERSION = 'XRTHK Version 2.1-0b')
 *-
       CALL AST_INIT(STATUS)
       CALL MSG_PRNT(VERSION)

@@ -123,7 +123,7 @@
         PARAMETER ( IC_ALL = IC_WCS+IC_MIS+IC_TIM+IC_LNK+IC_SEL )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'ASHOW Version 2.1-0' )
+        PARAMETER		( VERSION = 'ASHOW Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*200		FILE, PATH		! File path info

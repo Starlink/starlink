@@ -119,7 +119,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINLIST Version 2.1-0' )
+        PARAMETER		( VERSION = 'BINLIST Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*132		FILE, PATH

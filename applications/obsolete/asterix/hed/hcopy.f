@@ -96,7 +96,7 @@
 *    Version id :
 *
       CHARACTER*(20) VERSION
-	PARAMETER(VERSION= 'HCOPY Version 2.1-0')
+	PARAMETER(VERSION= 'HCOPY Version 2.1-0b')
 *-
 
 *    Version id
