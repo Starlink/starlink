@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GHATCH
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
       CHARACTER*80 NODAT(1)
       REAL XC, YC, RADIUS
       REAL XA(3), YA(3), THETAD(3)

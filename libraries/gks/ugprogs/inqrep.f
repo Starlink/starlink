@@ -40,7 +40,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GREALI, GLSOLI
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
       INTEGER KWKID
       INTEGER KPLI, KPLCOL, LNTYPE, KERROR
       REAL WIDTH

@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GSTRKP, GACENT, GATOP, GAHALF, GAVNOR, GABOTT, GACAP
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
       CHARACTER*39 NUM
       INTEGER NUMLEN(12), JASF(13), ICONID, IWTYPE, ISTART, IHOUR, IEND
       REAL HANGLE, HX, HY

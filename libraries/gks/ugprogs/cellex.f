@@ -22,7 +22,7 @@
 *---------------------------------------------------------------------
  
 *                      Read data row by row
-      OPEN (UNIT=IUNIT, FILE='/usr/ral/lib/gks/examples/cellex.dat', 
+      OPEN (UNIT=IUNIT, FILE='cellex.dat', 
      : STATUS='OLD')
       READ (IUNIT, '(8I1)') KCOLA
 *                      Draw cell array

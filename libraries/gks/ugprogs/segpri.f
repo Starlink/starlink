@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GPOSTP, GPATTR, GWC
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
       REAL MATOUT(2,3),HORX(6),HORY(6),STARX(10),STARY(10)
       INTEGER JASF(13)
 *                      Data for Ship's Outline

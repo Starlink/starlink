@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GSOLID, GPATTR, GHOLLO
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
 *                      Data for Ship's Outline
       INTEGER NSHIP
       PARAMETER (NSHIP = 18)

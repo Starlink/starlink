@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GHIGHR, GNONE
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
       INTEGER MP, JSTAT, NPOINT, KSKDNR, KTNR
       PARAMETER (MP=100)
       REAL XSK(MP), YSK(MP)

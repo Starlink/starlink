@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GINDIV, GLSOLI, GLDASH
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
  
 *                      Set up parameters with names for the AFSs
       INTEGER    GALN,      GALWSC,    GAPLCI,   GAMK,     GAMKSC

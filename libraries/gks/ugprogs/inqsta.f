@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GGKCL, GGKOP, GWSOP, GWSAC, GSGOP
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
       INTEGER JOPSTA
       INTEGER     KSEGNM
       PARAMETER ( KSEGNM = 1 )

@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GLSOLI, GLDASH
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
 *                      XA and YA arrays hold the POLYLINE coordinates
       REAL XA(0:360), YA(0:360)
 *                      RADFAC is factor that converts degrees to radians

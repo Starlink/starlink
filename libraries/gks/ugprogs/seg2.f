@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GWC,GPERFO
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
 *
       REAL MATOUT (3,2)
 *                      Data for Ship's Outline

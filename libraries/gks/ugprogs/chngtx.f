@@ -4,7 +4,7 @@
 *                      The following variable(s) are defined in the
 *                      included file
 *                      GSTRKP
-      INCLUDE '/usr/ral/include/gks/gks.par'
+      INCLUDE 'GKS_PAR'
       REAL CPX, CPY, CTX, CTY, BOXX(4), BOXY(4)
  
 *                      Open GKS, open and activate workstation.
