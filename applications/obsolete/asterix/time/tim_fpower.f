@@ -43,11 +43,8 @@
 	REAL    HF			! Last element of power spectrum
 
 	LOGICAL FAST			! FFA8 to be used?
-
-	CHARACTER*(DAT__SZLOC) DLOC	! Data array locator
-	CHARACTER*(DAT__SZLOC) WLOC	! Work array locator
-
 *-
+
 *   Status check
       IF (STATUS.NE.SAI__OK) RETURN
 
@@ -166,10 +163,6 @@ C      IMPLICIT NONE
       INTEGER                NPTS                          ! Number of datapoints
 *    Import-Export :
       REAL                   B(NPTS)                       ! Data to be transformed
-*    Status :
-      INTEGER STATUS
-*    Local constants :
-*    Local variables :
 *-
       M = NINT( LOG( REAL(NPTS) ) / LOG(2.0) )
       N = 2**M
