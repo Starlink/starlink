@@ -4544,6 +4544,64 @@
             CALL MSG_BLNK()
           ENDIF
 
+          IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'FUN') THEN
+            CALL MSG_PRNT('Overlayed function:-')
+            CALL GCB_GETL('FUNC_FLAG',OK,LVAL,STATUS)
+            IF (.NOT.OK.OR..NOT.LVAL) THEN
+              CALL MSG_PRNT('  Function=none')
+            ELSE
+              CALL GCB_GETC('FUNC_TYPE',OK,CVAL,STATUS)
+              IF (OK) THEN
+                CALL CHR_UCASE(CVAL)
+                IF (CVAL.EQ.'POLY') THEN
+                  CALL MSG_SETC('FT','POLYNOMIAL')
+                ELSE
+                  CALL MSG_SETC('FT','*')
+                ENDIF
+              ELSE
+                CALL MSG_SETC('FT','*')
+              ENDIF
+              CALL MSG_PRNT('  Function=^FT')
+
+              CVAL='FUNC_PAR'
+              DO I=1,6
+                WRITE(CVAL(9:9),'(I1)') I
+                CALL GCB_GETR(CVAL(:9),OK,RVAL,STATUS)
+                IF (OK) THEN
+                  CALL MSG_SETI('PN',I)
+                  CALL MSG_SETR('PV',RVAL)
+                  CALL MSG_PRNT('    Parameter^PN = ^PV')
+                ENDIF
+              ENDDO
+
+              CALL GCB_GETI('FUNC_STYLE,OK,IVAL,STATUS)
+              IF (OK) THEN
+                CALL MSG_SETI('STY',IVAL)
+              ELSE
+                CALL MSG_SETC('STY','*')
+              ENDIF
+              CALL GCB_GET1I('FUNC_WIDTH',OK,IVAL,STATUS)
+              IF (OK) THEN
+                CALL MSG_SETI('WID',IVAL)
+              ELSE
+                CALL MSG_SETC('WID','*')
+              ENDIF
+              CALL GCB_GET1I('FUNC_COLOUR',OK,IVAL,STATUS)
+              IF (OK) THEN
+                CALL MSG_SETI('COL',IVAL)
+              ELSE
+                CALL MSG_SETC('COL','*')
+              ENDIF
+              CALL MSG_PRNT('    LineStyle=^STY   '//
+     :                               'LineWidth=^WID'//
+     :                                '   LineColour=^COL')
+
+
+
+            ENDIF
+            CALL MSG_BLNK()
+          ENDIF
+
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'COL') THEN
             CALL MSG_PRNT('ColourTable:-')
             CALL GCB_GETL('COLOUR_RGB',OK,LVAL,STATUS)
