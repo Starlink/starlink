@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL STR_CTOB( [p]... )
+*     CALL STR_CTOB( ISTRING, NUM, STATUS )
 
 *  Description:
 *     Converts an 8-bit binary number stored in character form to the
