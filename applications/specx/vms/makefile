@@ -105,4 +105,5 @@ vms_help.o: SAE_PAR
 spack.o: SAE_PAR
 spacl.o: SAE_PAR
 spaeg.o: SAE_PAR
-
+vms_date.o: SAE_PAR
+sysdep.o: SAE_PAR
