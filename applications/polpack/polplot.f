@@ -413,6 +413,7 @@
       PARAMETER ( NVEC0 = 15.0 ) ! axis
 
 *  Local Variables:
+      CHARACTER COLNM*30         ! External column name
       CHARACTER DOMAIN*30        ! Domain containing vector positions
       CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
       CHARACTER JUST*6           ! Vector justification: CENTRE or START
@@ -520,6 +521,19 @@
 
 *  Open the input catalogue, and get its name.
       CALL CTG_ASSO1( 'CAT', VERB, 'READ', CI, FIELDS, STATUS )
+
+*  Set up dynamic defaults for the column names.
+      CALL POL1_COLNM( 'P', COLNM, STATUS )
+      IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLMAG', COLNM, STATUS )
+
+      CALL POL1_COLNM( 'ANG', COLNM, STATUS )
+      IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLANG', COLNM, STATUS )
+
+      CALL POL1_COLNM( 'X', COLNM, STATUS )
+      IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLX', COLNM, STATUS )
+
+      CALL POL1_COLNM( 'Y', COLNM, STATUS )
+      IF( COLNM .NE. ' ' ) CALL PAR_DEF0C( 'COLY', COLNM, STATUS )
 
 *  Get CAT identifiers for the columns which are to be used to define the 
 *  vector magnitudes, orientations, X and Y coordinates.

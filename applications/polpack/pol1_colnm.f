@@ -141,14 +141,21 @@
       IF ( .NOT. INIT .AND. STATUS .EQ. SAI__OK ) THEN
          NCOL = 0
 
-*  Get the users home directory, and then append the name of the config
-*  file.
-         CALL PSX_GETENV( 'HOME', RCFILE, STATUS )
-         NC = CHR_LEN( RCFILE )         
-         CALL CHR_APPND( '/.polpackrc', RCFILE, NC )
+*  See if the environment variable POLPACKRC is defined. If it is, is is
+*  assumed to hold the name of the polpack config file.
+         CALL PSX_GETENV( 'POLPACKRC', RCFILE, STATUS )
+
+*  If not, annul the error and construct the name of the file as
+*  "$HOME/.polpackrc"
+         IF( STATUS .NE.SAI__OK ) THEN 
+            CALL ERR_ANNUL( STATUS )
+            CALL PSX_GETENV( 'HOME', RCFILE, STATUS )
+            NC = CHR_LEN( RCFILE )         
+            CALL CHR_APPND( '/.polpackrc', RCFILE, NC )
+         END IF
 
 *  Attempt to open this file.
-         CALL FIO_OPEN( RCFILE( : NC ), 'READ', 'NONE', 0, FD, STATUS ) 
+         CALL FIO_OPEN( RCFILE, 'READ', 'NONE', 0, FD, STATUS ) 
 
 *  Annul any error.
          IF( STATUS .NE. SAI__OK ) THEN
