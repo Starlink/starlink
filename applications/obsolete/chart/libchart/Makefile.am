@@ -20,3 +20,17 @@ proj.f select.f store.f tiltx.f val.f
 
 PRIVATE_INCLUDES = SPT_CMN CONVF CATINF_CMN FILENAMES
 
+BUILT_SOURCES = FILENAMES
+
+# Tweak the path to the catalogue files
+
+edit = sed \
+	-e 's,@staretcdir\@,$(staretcdir),g'
+
+FILENAMES: FILENAMES.in
+	rm -f FILENAMES.tmp FILENAMES
+	$(edit) \
+	 -e 's,@edited_input\@,FILENAMES: produced from FILENAMES.in by Makefile.am,' \
+	 $(srcdir)/FILENAMES.in > FILENAMES.tmp
+	mv FILENAMES.tmp FILENAMES
+

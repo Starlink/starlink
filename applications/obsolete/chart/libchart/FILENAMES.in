@@ -7,10 +7,10 @@
 *  Local Constants:
       CHARACTER * ( 63 ) AST     ! Pathname of Astrom catalogue
       PARAMETER ( AST =
-     :'CATALOGDIR/astrom84.cat')
+     :'@staretcdir@/astrom84.cat')
       CHARACTER * ( 63 ) CSI     ! Pathname of CSI catalogue
       PARAMETER ( CSI =
-     :'CATALOGDIR/csi79.cat')
+     :'@staretcdir@/csi79.cat')
       CHARACTER * ( 63 ) NSO     ! Pathname of NSO catalogue
       PARAMETER ( NSO =
-     :'CATALOGDIR/nso.cat')
+     :'@staretcdir@/nso.cat')
