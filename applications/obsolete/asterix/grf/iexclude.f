@@ -754,7 +754,7 @@
           CALL MSG_SETR( 'YHI', YMAX )
           CALL MSG_MAKE( '  BOX( ^XLO , ^YLO , ^XHI , ^YHI )',
      :                                             TEXT, TLEN )
-          CALL ARX_PUT(GRPID,0,TEXT(:LEN),STATUS)
+          CALL ARX_PUT(GRPID,0,TEXT(:TLEN),STATUS)
 
         END IF
 
