@@ -721,6 +721,73 @@ iraf! {
             helpkey *
           }
       }
+      action asttrann {
+         helplib {$ATOOLS_HELP}
+
+         parameter forward {
+            position 4
+            type _LOGICAL
+            access READ
+            ppath CURRENT DEFAULT
+            prompt {Use the forward transformation?}
+            helpkey *
+            default TRUE
+         }
+
+         parameter in {
+            position 3
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The NDF containing the input positions}
+            helpkey *
+         }
+
+         parameter incols {
+            position 2
+            type _INTEGER 
+            prompt {The columns containing the input axis values}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+            size *
+         }
+
+         parameter out {
+            position 6
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {The NDF containing the transformed positions}
+            helpkey *
+         }
+
+         parameter outcols {
+            position 5
+            type _INTEGER 
+            prompt {The columns to receive the output axis values}
+            vpath DYNAMIC 
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+            size *
+         }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+         }
+
+      }
+
       action astunitmap {
          helplib {$ATOOLS_HELP}
 
