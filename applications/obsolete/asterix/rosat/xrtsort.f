@@ -1,4 +1,4 @@
-*+  XRTSORT - Sorts XRT data into ASTERIX output file(s)
+ *+  XRTSORT - Sorts XRT data into ASTERIX output file(s)
       SUBROUTINE XRTSORT( STATUS )
 *    Description :
 *     Program to create an ASTERIX data set using
@@ -1357,8 +1357,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       REAL OFFSET
       REAL HX,HY
       INTEGER I,J
-      INTEGER IMIN,IMAX
-      INTEGER JMIN,JMAX
+      INTEGER IXMIN,IXMAX
+      INTEGER IYMIN,IYMAX
       INTEGER NPIX
 *-
 *   Check status - return if bad
@@ -1373,10 +1373,10 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 
 	print*,base(1),scale(1),base(2),scale(2)
 
-      IMIN=MDIM1
-      IMAX=1
-      JMIN=MDIM2
-      JMAX=1
+      IXMIN=MDIM1
+      IXMAX=1
+      IYMIN=MDIM2
+      IYMAX=1
       XTOT=0.0
       YTOT=0.0
       NPIX=0
@@ -1386,10 +1386,10 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 
           IF (MASK(I,J).NE.0) THEN
 
-            IMIN=MIN(IMIN,I)
-            IMAX=MAX(IMAX,I)
-            JMIN=MIN(JMIN,J)
-            JMAX=MAX(JMAX,J)
+            IXMIN=MIN(IXMIN,I)
+            IXMAX=MAX(IXMAX,I)
+            IYMIN=MIN(IYMIN,J)
+            IYMAX=MAX(IYMAX,J)
 
             XTOT=XTOT+BASE(1)+REAL(I-1)*SCALE(1)
             YTOT=YTOT+BASE(2)+REAL(J-1)*SCALE(2)
@@ -1401,19 +1401,19 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         ENDDO
       ENDDO
 
-	print*,imin,imax,jmin,jmax
+	print*,iXmin,iXmax,IYmin,IYmax
 
       XC=XTOT/REAL(NPIX)
       YC=YTOT/REAL(NPIX)
       HX=0.5*SCALE(1)
       HY=0.5*SCALE(2)
-      OFFSET=REAL(IMIN-1)*SCALE(1)
+      OFFSET=REAL(IXMIN-1)*SCALE(1)
       XMIN=BASE(1) +OFFSET -HX
-      OFFSET=REAL(IMAX-1)*SCALE(1)
+      OFFSET=REAL(IXMAX-1)*SCALE(1)
       XMAX=BASE(1)+ OFFSET +HX
-      OFFSET=REAL(JMIN-1)*SCALE(2)
+      OFFSET=REAL(IYMIN-1)*SCALE(2)
       YMIN=BASE(2)+ OFFSET -HY
-      OFFSET=REAL(JMAX-1)*SCALE(2)
+      OFFSET=REAL(IYMAX-1)*SCALE(2)
       XMAX=BASE(2)+ OFFSET +HY
 
 	print*,xmin,xmax,ymin,ymax
