@@ -78,11 +78,15 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 June 15 (MJC):
 *        Original version.
+*     8-DEC-1998 (DSB):
+*        Corrected the name of the output NDF component to receive the
+*        QUALITY values from 'variance' to 'quality'.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -298,7 +302,7 @@
 *  than the input, first initialise it with zero.
          CALL NDF_MAP( NDFI, 'Quality', '_UBYTE', 'READ', PNTRI, ELIN,
      :                 STATUS )
-         CALL NDF_MAP( NDFO, 'Variance', ITYPE, 'WRITE/ZERO', PNTRO,
+         CALL NDF_MAP( NDFO, 'Quality', ITYPE, 'WRITE/ZERO', PNTRO,
      :                 ELOUT, STATUS )
 
          CALL VEC_UBTOUB( .TRUE., EL, %VAL( PNTRI( 1 ) ),
