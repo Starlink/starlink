@@ -40,7 +40,11 @@ section ready to flow into whatever contains this.
   <description>The body of the section.
 <codebody>
 (define ($html-section$ #!optional (bod ($html-section-body$)))
-  (let ((title (node-list-first (children (current-node)))))
+;  (let ((title (node-list-first (children (current-node)))))
+  (let* ((subhead (select-elements (children (current-node))
+				   (normalize "subhead")))
+	 (title (select-elements (children subhead)
+				 (normalize "title"))))
     (if title
 	(html-document (make formatting-instruction data: (data title))
 		       bod)
