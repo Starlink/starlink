@@ -40,7 +40,7 @@
 
 #include <stdlib.h>
 #include <iostream.h>
-#include <strstream.h>
+#include <strstream>
 #include "error.h"
 #include "util.h"
 #include "AstroCatalog.h"
@@ -488,7 +488,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
     
     //  Now construct the list to return.
     if ( ncolumn > 0 ) {
-        ostrstream os;
+        std::ostrstream os;
         for ( i = 0; i < ncolumn; i++ ) {
             os << sizes[i] << " ";
         }

@@ -168,7 +168,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <strstream.h>
+#include <strstream>
 #include <iostream.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -766,7 +766,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
     if ( image_ ) {
 
         //  Create a stream for any messages about the saving process.
-        ostrstream message;
+        std::ostrstream message;
         if ( origset_ ) {
 
             //  WCS has been modified so we need to store this in the
@@ -3179,7 +3179,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_*4];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
         os << canvasName_ << " create rtd_ellipse "
            << cx << " " << cy << " "
@@ -3232,7 +3232,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_*4];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
         os << canvasName_ << " create rtd_rotbox "
            << cx << " " << cy << " "
@@ -4463,7 +4463,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     }
 
     //  Loop though all NDFs getting the required information.
-    ostrstream os;
+    std::ostrstream os;
     for ( int i = 1; i <= numNDFs; i++ ) {
         char name[MAXNDFNAME], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
         ndf->getNDFInfo( i, name, naxis1, naxis2, hasvar, hasqual );

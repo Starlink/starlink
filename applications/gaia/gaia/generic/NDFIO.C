@@ -59,7 +59,7 @@
 //-
 
 #include <string.h>
-#include <strstream.h>
+#include <strstream>
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
@@ -226,7 +226,7 @@ int NDFIO::write( const char *pathname )
 //-
 int NDFIO::getFitsHeader(ostream& os) const
 {
-   istrstream is((char*)header_.ptr(), header_.size());
+   std::istrstream is((char*)header_.ptr(), header_.size());
    char buf[81];
    while(is.read(buf, FITSCARD)) {
       for (int i = 0; i < 79; i++) {

@@ -65,7 +65,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
-#include <strstream.h>
+#include <strstream>
 #include "error.h"
 #include "StarWCS.h"
 
@@ -1451,7 +1451,7 @@ void StarWCS::constructWarning( const char *encoding, int failed,
     char card[81];
     char *equinox;
     int nwarns = 0;
-    ostrstream os;
+    std::ostrstream os;
 
     //  Add the encoding message.
     if ( encoding ) {
