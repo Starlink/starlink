@@ -4049,6 +4049,10 @@ c     :                           S2 = 4.0419,
       REAL                     RTOS                    ! Radian to arcsec
         PARAMETER              ( RTOS = MATH__RTOD*3600.0 )
 *
+*   Functions:
+*
+      DOUBLE PRECISION		MATH_EXPD
+*
 *    Local variables :
 *
       REAL                     LNORM                   ! Normalisation constant
@@ -4096,8 +4100,8 @@ c     :                           S2 = 4.0419,
       N1 = 750.0 + 4.31818 * ROFF - 3.63636*ROFF**2 + ROFF**3
       NORM = 10.6971 * MATH__PI +
      :       6.96186E-6 * MATH__PI * N1*N1 -
-     :       6.96186E-6 * MATH__PI * N1*N1 /
-     :       EXP(5000.0/(S2*S2))
+     :       6.96186E-6 * MATH__PI * N1*N1 *
+     :       MATH_EXPD(-5000.0/(S2*S2))
 
 *    A few variables to speed things up
       S1_2 = -0.5 / S1**2
