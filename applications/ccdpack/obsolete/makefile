@@ -430,7 +430,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 4.0-2b
+PKG_VERS = 4.0-6b
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -489,12 +489,17 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDTaskQuery.tcl CCDGeomSetPercent.tcl CCDExit.tcl \
  CCDFileMonitorMain.tcl CCDDoPresent.tcl \
  CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl \
+ CCDAddSetHeaders.tcl CCDAddSetItems.tcl CCDContainerFile.tcl \
+ CCDDoAddSetHeaders.tcl CCDItemSetIndex.tcl CCDNameListFile.tcl \
+ CCDNewSet.tcl CCDPurgeEmptySets.tcl CCDCentreWindow.tcl CCDGetSetIndices.tcl \
+ CCDFixConvert.tcl \
  Buttoncontrol.tcl Ccdtop.tcl Control.tcl Gwmview.tcl \
  Helpcontrol.tcl Marknumcontrol.tcl Markstylecontrol.tcl Ndfalign.tcl \
  Ndfchoose.tcl Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl \
  Vectordialog.tcl Waiter.tcl Wcsframecontrol.tcl Zoomcontrol.tcl \
+ Checkcontrol.tcl Markercontrol.tcl \
  raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
- ccdwishrc
+ ccdwishrc mkindex.tcl
 
 
 TCL_SUPPORT_BIN = atclsh
@@ -587,7 +592,7 @@ PRIVATE_SCRIPTS = dgeneric
 
 PRIVATE_INCLUDES = ccd1_cacm ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
  ccd1_mospr ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
- ndf_const user_err slv.h ccdtcl.h ccdaux.h tclndf.h grp_par.h grf.h
+ ndf_const user_err slv.h tcltalk.h ccdaux.h tclndf.h grp_par.h grf.h
 
 #  Package include file which will be edited at build time to contain
 #  the package version number.
@@ -657,7 +662,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_ndfac.f ccd1_ndfck.f ccd1_ndfgb.f \
  ccd1_ndfgl.f ccd1_ndfgr.f ccd1_ndfgu.f ccd1_ndfin.f \
  ccd1_ndfmi.f ccd1_ndfpl.f \
- ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nglis.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
+ ccd1_ndfpg.f ccd1_ndfpr.f ccd1_ngdel.f \
+ ccd1_nglis.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
  ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
  ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_plsty.f ccd1_pnply.f ccd1_prmin.f \
  ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_psize.f ccd1_prune.f \
@@ -666,7 +672,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_rend.f ccd1_repc.f ccd1_rexp.f \
  ccd1_rfcr.f ccd1_rflt.f ccd1_rmcom.f ccd1_rmit.f \
  ccd1_rmsd.f ccd1_rmsk.f ccd1_rmulo.f ccd1_rnorm.f \
- ccd1_rsetu.f ccd1_rtran.f ccd1_save.f \
+ ccd1_rsetu.f ccd1_rtran.f ccd1_sav.f \
  ccd1_sched.f ccd1_scrch.f ccd1_sngl.f ccd1_soff.f ccd1_splot.f \
  ccd1_stao.f ccd1_start.f ccd1_strgr.f \
  ccd1_stsat.f ccd1_stvb.f ccd1_subcs.f ccd1_swlis.f ccd1_szlsf.f \
@@ -738,7 +744,7 @@ GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = ccg1_fch0.glrdic ccg1_sto0.glrdic ccg1_fch1.glrdic \
- ccg1_sto1.glrdic ccg1_stoc.glrdic
+ ccg1_sto1.glrdic ccg1_stoc.glrdic ccg1_kppt.glrdic
 
 #  Routines which may be logical,real,double,integer (storage)
 GENLRDISRC = fts1_gkey.glrdi
@@ -763,8 +769,8 @@ PLATFORM_F =
 C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE) $(GRF_SOURCE)
 
 CSUBSRC = ccd1_exec.c slv.c find_file.c \
- tcltalk.c tclbg.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdputs.c \
- ccdAppInit.c ccdaux.c \
+ tcltalk.c tclbg.c ndf.c ndfdrawpair.c ccdputs.c \
+ ccdAppInit.c ccdaux.c ndgexpand.c \
  ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c
 
 #  List of applications/tasks in monoliths.
@@ -1050,9 +1056,7 @@ $(TCL_SUPPORT_ITK):
 $(TCL_SUPPORT_IWIDGETS):
 	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERS)/scripts/$@ $@
 $(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) $(WISH)
-	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
-        echo 'auto_mkindex . *.tcl *.tk *.itcl *.itk; exit' | ./$(WISH)
-
+	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; ./$(WISH) mkindex.tcl
 
 #  Personal rules for building source code archives from RCS and
 #  other places.
@@ -2264,16 +2268,16 @@ strip:
 #  files.
 
 $(GRF_OBJECT): grf.h
-ccd1_algn.o: ccdtcl.h ccdaux.h grp_par.h
-ccd1_pndf.o: ccdtcl.h ccdaux.h grp_par.h
-ccd1_tcurs.o: ccdtcl.h grp_par.h
+ccd1_algn.o: tcltalk.h ccdaux.h grp_par.h
+ccd1_pndf.o: tcltalk.h ccdaux.h grp_par.h
+ccd1_tcurs.o: tcltalk.h grp_par.h
 ccdAppInit.o:
-ccdputs.o: ccdtcl.h
-ndf.o: tclndf.h
-ndfdrawpair.o: tclndf.h
-ndfcentroffset.o: tclndf.h
+ccdputs.o: tcltalk.h
+ndf.o: tclndf.h ccdaux.h
+ndfdrawpair.o: tclndf.h ccdaux.h
+ndgexpand.o: grp_par.h tclndf.h ccdaux.h
 slv.o: slv.h
-tcltalk.o: ccdtcl.h
+tcltalk.o: tcltalk.h
 tclbg.o:
 
 aif_antmp.o: DAT_PAR SAE_PAR
@@ -2421,7 +2425,7 @@ ccd1_lext.o: SAE_PAR
 ccd1_linv.o: SAE_PAR
 ccd1_lmap.o: SAE_PAR
 ccd1_lnmap.o: AST_PAR SAE_PAR
-ccd1_lnam.o: FIO_PAR SAE_PAR GRP_PAR
+ccd1_lnam.o: FIO_PAR SAE_PAR GRP_PAR CCD1_PAR
 ccd1_lnamm.o: FIO_PAR SAE_PAR GRP_PAR
 ccd1_locs2.o: SAE_PAR
 ccd1_locs3.o: SAE_PAR
@@ -2462,6 +2466,7 @@ ccd1_ndfmi.o: SAE_PAR GRP_PAR PAR_ERR NDG_ERR CCD1_PAR
 ccd1_ndfpg.o: FIO_ERR PAR_ERR SAE_PAR GRP_PAR NDG_ERR
 ccd1_ndfpl.o: SAE_PAR DAT_PAR GRP_PAR PAR_ERR
 ccd1_ndfpr.o: CCD1_PAR FIO_ERR PAR_ERR SAE_PAR GRP_PAR NDG_ERR
+ccd1_ngdel.o: SAE_PAR GRP_PAR
 ccd1_nglis.o: SAE_PAR GRP_PAR PAR_ERR
 ccd1_nlmap.o: SAE_PAR
 ccd1_nmid.o: SAE_PAR
@@ -2505,7 +2510,7 @@ ccd1_rmsk.o: MSG_PAR SAE_PAR
 ccd1_rmulo.o: SAE_PAR
 ccd1_rsetu.o: SAE_PAR
 ccd1_rtran.o: MSG_PAR PAR_ERR PRM_PAR SAE_PAR
-ccd1_save.o: SAE_PAR
+ccd1_sav.o: SAE_PAR DAT_PAR CCD1_PAR
 ccd1_sched.o: SAE_PAR
 ccd1_scrch.o: SAE_PAR
 ccd1_sdect.o: FIO_ERR MSG_PAR PAR_ERR PSX_ERR SAE_PAR
@@ -2567,8 +2572,8 @@ ccdpack_red.o: CCD1_PAR PAR_PAR SAE_PAR
 ccdpack_reg.o: CCD1_PAR PAR_PAR SAE_PAR
 ccdpack_res.o: CCD1_PAR PAR_PAR SAE_PAR
 ccdpack_scr.o: CCD1_PAR PAR_PAR PRM_PAR PSX_ERR SAE_PAR
-ccdsetup.o: CCD1_PAR FIO_PAR MSG_PAR PAR_ERR SAE_PAR
-ccdshow.o: DAT_PAR FIO_PAR MSG_PAR PAR_ERR SAE_PAR
+ccdsetup.o: CCD1_PAR FIO_PAR MSG_PAR PAR_ERR SAE_PAR DAT_PAR
+ccdshow.o: DAT_PAR FIO_PAR MSG_PAR PAR_ERR SAE_PAR CCD1_PAR
 ccg1_add.o: NUM_CMN NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PRM_PAR SAE_PAR
 ccg1_axin.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 ccg1_bext.o: SAE_PAR
@@ -2615,6 +2620,8 @@ ccg1_iscl.o: SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT NUM_DEC_B NUM_DEC_D NUM_DEC
 ccg1_is2.o: SAE_PAR
 ccg1_is3.o: SAE_PAR
 ccg1_is4.o: SAE_PAR
+ccg1_kppt.o: SAE_PAR DAT_PAR
+ccg1_kthx.o: SAE_PAR
 ccg1_lapn.o: SAE_PAR
 ccg1_lexn.o: SAE_PAR
 ccg1_mdd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
@@ -2693,7 +2700,7 @@ ccg1_wmnl.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_wtm2.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 ccg1_wtm3.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 debias.o: CCD1_PAR DAT_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR GRP_PAR
-findcent.o: CCD1_PAR DAT_PAR FIO_PAR NDF_PAR PAR_ERR SAE_PAR
+findcent.o: CCD1_PAR DAT_PAR FIO_PAR NDF_PAR PAR_ERR SAE_PAR GRP_PAR
 findobj.o: CCD1_PAR DAT_PAR FIO_PAR NDF_PAR PAR_ERR SAE_PAR
 findoff.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR
 fio1_cllog.o: FIO1_CLOG SAE_PAR
@@ -2749,7 +2756,7 @@ reduce.o: MSG_PAR PRM_PAR PSX_ERR SAE_PAR
 register.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR USER_ERR
 runxreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR GRP_PAR
-tranlist.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR
+tranlist.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR GRP_PAR
 tranndf.o: AST_PAR CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
 drizzle.o: AST_PAR CCD1_MOSCM CCD1_MOSPR CCD1_PAR DAT_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PRM_PAR SAE_PAR
 wcsreg.o: AST_PAR CCD1_PAR FIO_PAR SAE_PAR
