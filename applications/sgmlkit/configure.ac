@@ -12,6 +12,7 @@ AC_PATH_PROG(PAX, pax)
 AC_PATH_PROGS(JADE, [openjade jade], jade)
 AC_PATH_PROGS(SGMLNORM, [osgmlnorm sgmlnorm], sgmlnorm)
 AC_PATH_PROG(DVI2BITMAP, dvi2bitmap, dvi2bitmap)
+AC_PATH_PROG(PYTHON, python, python)
 
 # The documentation requires Earl Hood's perlSGML library.  See
 # http://search.cpan.org/~ehood/perlSGML.1997Sep18/
