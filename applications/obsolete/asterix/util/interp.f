@@ -34,6 +34,7 @@
 *     28 Feb 94 : V1.7-0 Quality handling updated (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     13 Apr 95 : V1.8-1 New data interfaces (DJA)
+*     12 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type Definitions :
 *
@@ -64,10 +65,6 @@
       INTEGER NDIM                              !Number of dims. of the data
       INTEGER DIM(MAXDIM)                       !Dimensions of the input data
       INTEGER TDIM(MAXDIM)                      !Dimensions of the temp arrays
-      INTEGER NQDIM                             !Number of dims. of quality
-      INTEGER QDIM(MAXDIM)                      !Dimensions of the quality array
-      INTEGER NVDIM                             !Number of dims. of the variance
-      INTEGER VDIM(MAXDIM)                      !Dimensions of the variance
       INTEGER LP
       CHARACTER*50 LABEL(MAXDIM)
       LOGICAL LDARRAY,LDQUAL,LDVAR              !Are the data,quality,variance
@@ -127,7 +124,7 @@
 
 *  Version:
       CHARACTER*30		VERSION
-	PARAMETER		( VERSION = 'INTERP Version 1.8-1' )
+	PARAMETER		( VERSION = 'INTERP Version 2.0-0' )
 *-
 
 *  Check inherited global status
@@ -148,75 +145,65 @@
 *  Ask for input and output filename
 *  Should the input file be overwritten ?
       CALL USI_GET0L('OVER',OVER,STATUS)
-*
       IF (OVER) THEN
-*
-         CALL USI_TASSOCI('INP','*','UPDATE',IFID,STATUS)
-*
-*   Clone an output identifier
-         CALL ADI_CLONE( IFID, OFID, STATUS )
-*
-      ELSE
-*
-         CALL USI_TASSOC2('INP','OUT','READ',IFID, OFID, STATUS )
+        CALL USI_ASSOC('INP','BinDS|Array','UPDATE',IFID,STATUS)
+        OFID = IFID
 
-*   Copy all components from old file into new file
-         CALL ADI_FCOPY(IFID,OFID,STATUS)
-*
-      ENDIF
-*
+      ELSE
+        CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
+
+      END IF
       IF (STATUS .NE. SAI__OK) GOTO 99
-*
-* Trace path of input data.
+
+*  Trace path of input data.
       CALL USI_NAMEI(NLINES,PATH,STATUS)
-*
-* Check components in this file and get dimensions
-*
-      CALL BDI_CHKDATA(OFID,LDARRAY,NDIM,DIM,STATUS)
-      CALL BDI_CHKQUAL(OFID,LDQUAL,NQDIM,QDIM,STATUS)
-      CALL BDI_CHKVAR (OFID,LDVAR,NVDIM,VDIM,STATUS)
-*
+
+*  Check components in this file and get dimensions
+      CALL BDI_GETSHP( OFID, ADI__MXDIM, DIM, NDIM, STATUS )
+      CALL BDI_CHK( OFID, 'Data', LDARRAY, STATUS )
+      CALL BDI_CHK( OFID, 'Quality', LDQUAL, STATUS )
+      CALL BDI_CHK( OFID, 'Variance', LDVAR, STATUS )
       IF (.NOT.LDARRAY) THEN
-          STATUS=SAI__ERROR
-          CALL ERR_REP(' ','No data array in this file',STATUS)
-      ENDIF
+        STATUS=SAI__ERROR
+        CALL ERR_REP(' ','No data array in this file',STATUS)
+      END IF
       IF (.NOT.LDQUAL) THEN
-          STATUS=SAI__ERROR
-          CALL ERR_REP(' ','No quality array in this file',STATUS)
-      ENDIF
-*
-* Check shape of data
-      IF (NDIM .GT. 4) THEN
-          STATUS=SAI__ERROR
-          CALL ERR_REP(' ','Data array has more than four dimensions',
-     :                     ' it will have to be binned up *',STATUS)
-      ENDIF
-*
+        STATUS=SAI__ERROR
+        CALL ERR_REP(' ','No quality array in this file',STATUS)
+      END IF
       IF (STATUS.NE.SAI__OK) GOTO 99
-*
+
+*  Check shape of data
+      IF ( NDIM .GT. 4 ) THEN
+        STATUS=SAI__ERROR
+        CALL ERR_REP(' ','Data array has more than four dimensions',
+     :                     ' it will have to be binned up *',STATUS)
+      END IF
+      IF (STATUS.NE.SAI__OK) GOTO 99
+
 *  Go thru each axis in turn.
       DO LP=1,NDIM
 *
-         CALL BDI_CHKAXVAL(OFID,LP,LAX,LREG,DIM(LP),STATUS)
-*
-* If axis info present
+        CALL BDI_AXCHK( OFID, LP, 'Data', LAX, STATUS )
+
+*     If axis info present
          IF (LAX) THEN
-*
-*  Map the axis array
-           CALL BDI_MAPAXVAL(OFID,'READ',LP,AXPNTR(LP),STATUS)
-*
-*  Get label
-           CALL BDI_GETAXLABEL(OFID,LP,LABEL(LP),STATUS)
-*
+
+*       Map the axis array
+           CALL BDI_AXMAPR( OFID, LP, 'Data', 'READ',AXPNTR(LP),STATUS)
+
+*       Get label
+           CALL BDI_AXGET0C( OFID, LP, 'Label', LABEL(LP), STATUS )
            IF (STATUS .NE. SAI__OK) THEN
-              CALL MSG_PRNT('Error getting axis values')
-              GOTO 99
-           ENDIF
-*
-*  Calculate MAX and MIN axis values
-           CALL ARR_RANG1R( DIM(LP),%VAL(AXPNTR(LP)),START(LP),
-     :                      STOP(LP),STATUS)
-*
+             CALL MSG_PRNT('Error getting axis values')
+             GOTO 99
+           END IF
+
+*       Calculate MAX and MIN axis values
+           CALL ARR_RANG1R( DIM(LP), %VAL(AXPNTR(LP)), START(LP),
+     :                      STOP(LP), STATUS )
+
 * If axis values not present take the pixel numbers.
          ELSE
 *
@@ -225,25 +212,24 @@
      :                    ' range in pixels' )
            START(LP)=1.0
            STOP(LP)=REAL(DIM(LP))
-*
-*  Produce label for this axis
+
+*       Produce label for this axis
            CALL CHR_ITOC(LP,CLP,IDUM)
            LABEL(LP) = 'Dimension ' // CLP
-*
+
          ENDIF
-*
-*  Calculate the width of each pixel
+
+*     Calculate the width of each pixel
          WIDTH(LP) = (STOP(LP)-START(LP)) / REAL(DIM(LP)-1)
-*
-      ENDDO
-*
+
+      END DO
       IF (STATUS .NE. SAI__OK) GOTO 99
-*
-* Set mins and maxs to 1
-      DO LP=1,4
-         AMIN(LP)=1
-         AMAX(LP)=1
-      ENDDO
+
+*  Set mins and maxs to 1
+      DO LP = 1, 4
+        AMIN(LP) = 1
+        AMAX(LP) = 1
+      END DO
 
 *  Ask the user which ranges are required.
       CALL USI_RANGES( NDIM,LABEL,START,STOP,WIDTH,APP_DIM,
@@ -257,17 +243,17 @@
       ORDER(1)=APP_DIM
       COUNT=2
       DO LP=1,4
-         IF (LP .NE. APP_DIM) THEN
-             ORDER(COUNT)=LP
-             COUNT=COUNT+1
-         END IF
+        IF (LP .NE. APP_DIM) THEN
+          ORDER(COUNT)=LP
+          COUNT=COUNT+1
+        END IF
       END DO
 
 *  Find the dimensions of this new array. Dimensions between NDIM and 4 will
 *  have been set to 1 at the start of this code.
       DO LP=1,NDIM
-         TDIM(LP)=AMAX(ORDER(LP)) - AMIN(ORDER(LP)) + 1
-      ENDDO
+        TDIM(LP)=AMAX(ORDER(LP)) - AMIN(ORDER(LP)) + 1
+      END DO
 
 *  Create temporary data,variance,quality arrays to hold the data subset
       CALL DYN_MAPR(4,TDIM,TDATA_PNTR,STATUS)
@@ -280,34 +266,34 @@
       ENDIF
 
 *  Map the input data,variance,quality arrays
-      CALL BDI_MAPDATA(OFID,'UPDATE',D_PNTR,STATUS)
-      CALL BDI_MAPQUAL(OFID,'UPDATE',Q_PNTR,STATUS)
-      IF (LDVAR) CALL BDI_MAPVAR(OFID,'UPDATE',V_PNTR,STATUS)
+      CALL BDI_MAPR( OFID, 'Data', 'UPDATE', D_PNTR, STATUS )
+      CALL BDI_MAPUB( OFID, 'Quality', 'UPDATE', Q_PNTR, STATUS )
+      IF ( LDVAR ) THEN
+        CALL BDI_MAPR( OFID, 'Variance', 'UPDATE', V_PNTR, STATUS )
+      END IF
       IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error mapping input arrays')
-         GOTO 99
-      ENDIF
+        CALL MSG_PRNT('Error mapping input arrays')
+        GOTO 99
+      END IF
 
 *  Get the BADBITS mask
-      CALL BDI_GETMASK(OFID,BADBITS,STATUS)
-
-*  If badbits mask not found set to QUAL__MASK
+      CALL BDI_GET0UB( OFID, 'QualityMask', BADBITS, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         BADBITS = QUAL__MASK
         CALL ERR_ANNUL( STATUS )
-      ENDIF
+      END IF
 
-*    Check shape of quality array is the same as the data array
-      DO LP=1,NDIM
-         IF (DIM(LP) .NE. QDIM(LP)) THEN
-           STATUS=SAI__ERROR
-           CALL ERR_REP(' ',
+*  Check shape of quality array is the same as the data array
+      DO LP = 1, NDIM
+        IF (DIM(LP) .NE. QDIM(LP)) THEN
+          STATUS=SAI__ERROR
+          CALL ERR_REP(' ',
      :      'Quality and data arrays have different dimensions',STATUS)
-           GOTO 99
-         ENDIF
-      ENDDO
+          GOTO 99
+        END IF
+      END DO
 
-*    Copy required slice of data,quality,variance into temp arrays.
+*  Copy required slice of data,quality,variance into temp arrays.
       CALL DTA_COPYSLICER( DIM(1),DIM(2),DIM(3),DIM(4),%VAL(D_PNTR),
      :              AMIN,AMAX,ORDER,TDIM(1),TDIM(2),TDIM(3),TDIM(4),
      :                                             %VAL(TDATA_PNTR) )
@@ -486,7 +472,7 @@
 *  points will be treated as good). We do this by ANDing the existing mask
 *  with the inverse of the PATCH bit pattern.
       MASKOUT = BIT_ANDUB(BADBITS,BIT_NOTUB(QUAL__PATCHED))
-      CALL BDI_PUTMASK( OFID, MASKOUT, STATUS )
+      CALL BDI_PUT0UB( OFID, 'QualityMask', MASKOUT, STATUS )
 
 *  Update history record
       CALL HSI_ADD( OFID, VERSION, STATUS )
@@ -499,7 +485,7 @@
       CALL MSG_SETI( 'NFIX', FIXTOT )
       CALL MSG_PRNT( '^NFIX points have been replaced' )
 
-*    Unmap and annul all locators
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
