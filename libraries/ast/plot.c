@@ -258,8 +258,10 @@ f     using AST_GRID
 *        o Purge zero length sections from CurveData structures.
 *        o Increase tolerance for edge labels from 0.0005 to 0.005.
 *     9-JAN-2001 (DSB):
-*        Change argument "in" for astMark and astPolyCurve from type
+*        o  Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
+*        o  Check success of astReadString before using the returned
+*        pointer.
 *class--
 */
 
@@ -19445,7 +19447,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 /* Labelling. */
 /* ---------- */
       text = astReadString( channel, "lbling", " " );
-      if( strcmp( text, " " ) ) {
+      if( astOK && strcmp( text, " " ) ) {
          new->labelling = FindString( 2, xlbling, text, 
                                       "the Plot component 'Lbling'", 
                                       "astRead", astGetClass( channel ) );
@@ -19459,7 +19461,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
       for( axis = 0; axis < 2; axis++ ){
          (void) sprintf( buff, "edge%d", axis + 1 );
          text = astReadString( channel, buff, " " );
-         if( strcmp( text, " " ) ) {
+         if( astOK && strcmp( text, " " ) ) {
             new->edge[ axis ] = FindString( 4, xedge, text, 
                                             "the Plot component 'Edge'", 
                                             "astRead", astGetClass( channel ) );
