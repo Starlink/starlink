@@ -762,12 +762,15 @@
 
    SetHelp $psfmenu ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
 
-# Add items to the Polarimetry Mode sub-menu.
+# Add items to the Polarimetry Mode sub-menu. Circular is currently only
+# available in single-beam mode, so disable the radio button in single-beam
+# mode.
    set polmenu [menu $OPTSMENU.pol]
    $polmenu add radiobutton -label Linear -variable POLMODE \
                              -value Linear -selectcolor $RB_COL 
    $polmenu add radiobutton -label Circular -variable POLMODE \
-                             -value Circular -selectcolor $RB_COL 
+                             -value Circular -selectcolor $RB_COL \
+                             -state $DBEAM_STATE
    SetHelp $polmenu ".  Are Stokes parameters describing circular or linear polarisation to be created?"
 
 # Add items to the "Sky" sub-menu.
