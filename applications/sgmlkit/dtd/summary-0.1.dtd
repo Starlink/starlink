@@ -12,6 +12,8 @@
     "-//Starlink//DTD Document Summary 0.1//EN"
 
   It has no optional features.
+
+  $Id$
 -->
 
 <!--
@@ -125,7 +127,7 @@
 <!element DOCNUMBER	- o (#pcdata)	-- document number in series -->
 <!attlist DOCNUMBER
 	documenttype
-		(sun|ssn|lun|mud)
+		(sug|sc|sg|sun|sgp|ssn|mud)
 		#implied
 		-- Which series is it part of --
 	unassigned
