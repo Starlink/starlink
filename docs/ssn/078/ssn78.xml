@@ -2299,7 +2299,7 @@ AC_PROG_FC
 AC_PROG_FPP
 AC_FC_OPEN_SPECIFIERS(readonly,[access='sequential',recl=1])
 </verbatim>
-          and have in your <code>my_io.fpp</code> the lines
+          and have in your <code>my_io.F</code> the lines
           <verbatim>
 #include &lt;config.h&gt;
       SUBROUTINE MYIO(...)
@@ -2316,22 +2316,27 @@ AC_FC_OPEN_SPECIFIERS(readonly,[access='sequential',recl=1])
      :       FORM = 'UNFORMATTED', IOSTAT = ISTAT )
 </verbatim></p>
 
-        <p>The file <code>my_io.fpp</code> is listed in the
+        <p>The file <code>my_io.F</code> is listed in the
           <code>Makefile.am</code> as one of the <code>_SOURCES</code> of
           whatever library or application it contributes to, alongside
           the other Fortran files.  If the compiler discovered by
           the <code>./configure</code> script can support preprocessor
-          statements itself, then the <code>.fpp</code> file is
+          statements itself, then the <code>.F</code> file is
           treated like any other; if not, and a separate preprocessing
           stage is required, then the Makefile handles this
           itself.</p>
 
-        <p>Note that we are using <code>.fpp</code> here as the file
-          extension for preprocessable Fortran.  The extension
-          <code>.F</code> is more common, but causes problems on
-          case-insensitive filesystems, such as the default HFS+ on
-          MacOS X, and Windows filesystems, since it is
-          indistinguishable from plain <code>.f</code>.</p>
+        <p>Note that we are using <code>.F</code> here as the file
+          extension for preprocessable Fortran: see <ref
+          id="macro-ac-prog-fpp"/> for discussion.</p>
+
+        <p>In those cases where you wish the preprocessing step alone,
+          such as when you are generating a header file from a
+          template, for example, it is probably good practice to name
+          the input file with a <code>.fpp</code> extension, and
+          include the preprocessing line in the
+          <code>Makefile.am</code> explicitly.  There is an example of
+          this in the <code>prm</code> Makefile.</p>
 
       </subsect>
 
@@ -5632,21 +5637,27 @@ AC_LANG_POP([Fortran])
             <title>AC_PROG_FPP</title>
           </subhead>
 
-          <p><strong><code>AC_PROG_FPP(required-features,[FPP-SRC-EXT=fpp])</code></strong><index>Fortran</index></p> 
+          <p><strong><code>AC_PROG_FPP(required-features,[FPP-SRC-EXT=F])</code></strong><index>Fortran</index></p> 
 
           <p><code>required-features</code> is a space-separated
             list of features that the Fortran preprocessor must
             have for the code to compile.  It is up to the package
             maintainer to properly set these requirements. </p>
 
-          <p><code>FPP-SRC-EXT</code> is an optional specification
-            of the file extension for preprocessable Fortran
-            source files (without a leading dot).  It defaults to
-            <code>fpp</code>: <code>.fpp</code> is better than
-            <code>.F</code> in general, since <code>.F</code> and
-            <code>.f</code> are indistinguishable on
-            case-insensitive filesystems (such as HFS+ on MacOS
-            X).</p>
+          <p><code>FPP-SRC-EXT</code> is an optional specification of
+            the file extension for preprocessable Fortran source files
+            (without a leading dot).  It defaults to <code>F</code>:
+            There would appear to be a problem, here, with
+            case-insensitive filesystems, such as the default HFS+ on
+            MacOS X, and Windows filesystems, since the extension
+            <code>.F</code> is indistinguishable from plain
+            <code>.f</code>.  However there is no problem in practice,
+            since the Fortran compilers you are likely to encounter on
+            these platforms are all capable of compiling
+            preprocessable Fortran directly to object code, without
+            requiring the intermediate <code>.f</code> file (and there
+            is a check in autoconf to double-check that this is
+            true).</p>
 
           <p>The macro works out if the Fortran compiler discovered by
             macro <code>AC_PROG_FC</code><index>autoconf!macros!AC_PROG_FC</index> has
@@ -5675,7 +5686,7 @@ AC_LANG_POP([Fortran])
               <dt><code>FPP_SRC_EXT</code></dt>
               <dd><p>This is the file extension (without a dot) of
                   preprocessable Fortran files; by default this is
-                  `fpp', but `F' is also common.</p></dd>
+                  `F'.</p></dd>
 
               <dt><code>FPP_COMPILE_EXT</code></dt>
               <dd><p>This contains the file extension which the
@@ -5713,8 +5724,8 @@ AC_LANG_POP([Fortran])
             <code>Makefile.in</code> on your behalf.  If, however, you
             need to run the preprocessor `by hand' for some reason
             (perhaps because you are using the preprocessor to do
-            something other than compiling <code>.fpp</code> to
-            <code>.o</code>, so that the <code>.fpp</code> file is not
+            something other than compiling <code>.F</code> to
+            <code>.o</code>, so that the <code>.F</code> file is not
             being mentioned in a <code>_SOURCES</code> primary),
             then a suitable stanza in a <code>Makefile.am</code>
             or <code>Makefile.in</code> would be:
