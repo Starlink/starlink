@@ -132,6 +132,13 @@ case "${UNAME_MACHINE}:${UNAME_SYSTEM}:${UNAME_RELEASE}:${UNAME_VERSION}" in
     powerpc:machten:*:*)
 	echo powerpc-apple-machten${UNAME_RELEASE}
 	exit 0 ;;
+    *:Darwin:*:*)
+        case `uname -p` in
+            *86) UNAME_PROCESSOR=i686 ;;
+            powerpc) UNAME_PROCESSOR=powerpc ;;
+        esac
+        echo ${UNAME_PROCESSOR}-apple-darwin${UNAME_RELEASE}
+        exit 0 ;;
     RISC*:Mach:*:*)
 	echo mips-dec-mach_bsd4.3
 	exit 0 ;;
