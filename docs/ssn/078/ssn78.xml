@@ -1151,6 +1151,81 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             trying to remember which ones are which.</p>
 
         </subsubsect>
+
+        <subsubsect id="configure-script">
+          <subhead>
+            <title>Running ./configure</title>
+          </subhead>
+
+          <p>Running the configure script is basically very simple:
+            <kbd>./configure</kbd>.  There are, however, options and
+            arguments which can help you, or catch you out.  You can
+            see the full list of options with the command
+            <kbd>./configure --help</kbd>.</p>
+
+          <p>You set the place where the configured component will be
+            installed with the <code>--prefix</code> option.  This
+            names a directory which will end up with the standard directories
+            <code>bin</code>, <code>manifests</code> and so on.  The
+            default is reported by <kbd>./configure --help</kbd>, and
+            is ultimately controlled by <em>starconf</em> (see <ref
+              id="bootstrappingonly"/> and <ref
+              id="tool-state"/>).</p>
+
+          <p>A <em>few</em> components have extra options on the
+            <code>./configure</code> command.  For example, the
+            component <code>docs/ssn78</code> (the component which
+            holds this document) has a <code>--with-pstoimg</code>
+            option, the value of which must be the full path to a copy
+            of the <code>pstoimg</code> program, to help in the cases
+            where this cannot be discovered automatically (this may be
+            a temporary feature of this component).</p>
+
+          <p>All of the components have ``Some influential environment
+            variables'' listed in the help message.  This will include
+            at least <code>STARLINK</code>, and in the (very common!)
+            case of components which include a compiler, an
+            environment variable such as <code>CC</code> or
+            <code>FC</code> which allows you to override the compiler
+            which the configure script will find, which can be useful
+            if you want to avoid a default compiler and use a specific
+            one instead.  For example, if you wished to use
+            the Sun C++ compiler specifically (while on a Sun,
+            obviously), you would put <code>/opt/SUNWspro/bin</code>
+            in your path, and set the <code>CXX</code> variable:
+            <verbatim>
+% export CXX=CC
+% ./configure
+</verbatim>
+            or
+            <verbatim>
+% env CXX=CC ./configure
+</verbatim>
+            where the latter is probably preferable, inasmuch as it
+            does not leave this important variable set, in such a way
+            that it can make a difference unexpectedly.</p>
+
+          <p>Better than either of these is
+            <verbatim>
+% ./configure CXX=CC
+</verbatim>
+            This doesn't set <code>CXX</code> as an environment
+            variable, but in a similar-looking way as one of the
+            <code>./configure</code> arguments.  This second way is
+            preferable for two reasons: firstly, it does not leave the
+            variable set; secondly this way <code>./configure</code>
+            `knows' that the compiler has been overridden, so that if
+            you <em>fail</em> to do this when the directory is
+            reconfigured, <code>./configure</code> can warn you of
+            this, in case this is not deliberate.</p>
+
+          <p>The down-side of this is that these environment variables
+            <em>do matter</em>, and implicitly <em>change the
+              behaviour of <code>./configure</code></em>.  You should
+            not have them set in your environment if you don't want
+            this to happen.</p>
+        </subsubsect>
+
       </subsect>
 
       <subsect id="starconf" export="export">
@@ -1445,224 +1520,9 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
           build tree.  This section contains a few notes on where this
           state is, and how to handle it.</p>
 
-        <p>Since most of the details here are rather intricate, here
-          are a few FAQs which might save you reading them.</p>
-
-        <subsubsect id="state-faqs">
-          <subhead>
-            <title>State FAQs</title>
-          </subhead>
-
-          <p>
-            <dl>
-              <dt>How do I get rid of state in a checked-out directory?</dt>
-              <dd>
-                <p>One of <kbd>make clean</kbd>, <kbd>make
-                    distclean</kbd> or <kbd>make maintainer-clean</kbd>
-                  should do what you want.  The first gets rid of
-                  compiled files, the second everything but distributed
-                  files, and the third returns the directory to an
-                  almost pristine state, though without deleting
-                  <code>./configure</code> or the files it needs to
-                  run.</p>
-                <p>The nuclear option for clearing state from a
-                  directory <code>ping</code> is to delete it and check
-                  it out afresh:
-<verbatim>
-% cd ..
-% rm -rf ping # or: mv ping ping-old
-% cvs update -d ping
-</verbatim>
-                  though do make sure that you have no modified but
-                  uncommited files left within <code>ping</code>.</p>
-              </dd>
-
-              <dt>How do I start again?</dt>
-              <dd>
-                <p>As mentioned above, <code>make
-                    maintainer-clean</code> in the top level should
-                  recurse and make <code>maintainer-clean</code> in each
-                  of the children.  That unmakes and unconfigures
-                  everything, but doesn't undo the bootstrapping.  The
-                  bootstrapping done by <code>./bootstrap</code> doesn't
-                  depend on any state except the contents of the
-                  manifest files, and to undo that, you need only delete
-                  the manifest.</p>
-
-                <p>For maintainer-clean to work, one sometimes needs
-                  to make extra declarations in
-                  <code>Makefile.am</code>.  There could well be
-                  components where maintainer-clean doesn't work as
-                  fully as it ought.  Do mention those if you spot them.
-                </p>
-              </dd>
-
-              <dt>How do I determine where a component is installed?</dt>
-              <dd>
-                <p>In a variety of ways.  In the list below, each mechanism
-                  effectively supplies the default for the mechanism
-                  before it.
-                  <ol>
-                    <li>
-                      <p>You can specify an installation prefix at
-                        install time:
-<verbatim>
-% make prefix=/odd/place install # or install-manifest
-</verbatim>
-                        This might break your installation if there was
-                        a prefix baked in to your component at build
-                        time.  Do this only if you have a particular
-                        reason for doing so, and know what you're doing.</p>
-                    </li>
-                    <li>
-                      <p>At make time:
-<verbatim>
-% make prefix=/odd/place
-</verbatim>
-                        This builds your component with the Makefile
-                        variable <code>${prefix}</code> set to the given
-                        value.  The component will be installed into
-                        this location at install time, unless you
-                        override the location as described above.  See
-                        the discussion of `installation directory
-                        variables' in <ref id="automakeoverview"/>.</p>
-                    </li>
-                    <li>
-                      <p>At configure time:
-<verbatim>
-% ./configure --prefix=/odd/place
-</verbatim>
-                        This is usually the most appropriate way to do
-                        this.</p>
-                    </li>
-                    <li>
-                      <p>By setting a `sticky variable':
-<verbatim>
-% ./starconf.status STARCONF_DEFAULT_PREFIX=/odd/place
-</verbatim>
-                        This sets the default for the
-                        <code>./configure</code> script's
-                        <code>--prefix</code> option.</p>
-                    </li>
-                    <li>
-                      <p>By configuring <em>starconf</em>:
-<verbatim>
-% pwd
-.../buildsupport/starconf
-% ./configure STARCONF_DEFAULT_PREFIX=/odd/place
-...
-% make; make install-manifest
-</verbatim>
-                        This sets the default for all directories
-                        configured using this <em>starconf</em> application.
-                        This is effectively what you do when you set the
-                        environment variable
-                        <code>STARCONF_DEFAULT_PREFIX</code> before you
-                        run the top-level <code>./bootstrap</code>
-                        script, as described in <ref
-                          id="bootstrapping"/>.</p>
-                    </li>
-                  </ol>
-                </p>
-              </dd>
-
-              <dt>OK, now I've changed my mind about where I want components
-                to be installed -- the `prefix'.  How do I tell the
-                build system?</dt>
-
-              <dd>
-                <p>Easy.  Set the <code>STARCONF_...</code> variables
-                  as you want them, as described in <ref
-                    id="bootstrapping"/>, and in the top level of the
-                  checkout, do
-<verbatim>
-% rm &lt;my-star&gt;/manifests/starconf
-% ./bootstrap
-% rm config.cache
-</verbatim>
-                  The first command forces the bootstrap to remake and
-                  reinstall the starconf component (since its manifest
-                  file is present, it would not otherwise bother),
-                  taking the current values of the <code>STARCONF_...</code>
-                  variables into account, and
-                  the second command simply calls the bootstrap
-                  script, which overwrites the little state
-                  associated with it.</p>
-
-                <p>You should also remove any
-                  <code>config.cache</code> files, both in the
-                  top-level directory and elsewhere, since these often
-                  store paths to applications and libraries which
-                  are probably not appropriate for your new prefix.</p>
-
-                <p>For more details, see the notes on state in <ref
-                    id="state-details"/>.</p>
-              </dd>
-
-              <dt>Why does <kbd>make world</kbd> not do anything?</dt>
-              <dd>
-                <p>The <kbd>make world</kbd> build works by comparing
-                  timestamps of the <em>installed</em> files in the
-                  manifests directory -- that is, in something like
-                  <code>/my-star/manifests</code>, outside of the build
-                  tree.  It only checks whether each component was
-                  <em>installed</em> after each of the components it
-                  depends on.  If you wish to use this to (rebuild and)
-                  reinstall a given component, then simply delete the
-                  manifest file for the component in question and re-run
-                  <kbd>make world</kbd>.</p>
-                <p>Alternatively, <kbd>make</kbd> in the top-level
-                  checkout directory will recurse, and invoke <kbd>make
-                    all</kbd> in each of its children, and thus bring
-                  the whole tree up to date.</p>
-                <p>You can check the default installation location --
-                  shown as <code>/my-star</code> above -- with
-                  <kbd>./starconf-status --show STARCONF_DEFAULT_PREFIX</kbd></p>
-              </dd>
-
-              <dt>I know the buildsupport tools have been updated in the
-                repository.  What's the best way to install the new
-                versions locally?</dt>
-              <dd>
-                <p>The most straightforward way is to update your
-                  checkout of the component in question, then invoke
-                  <kbd>./configure; make; make install-manifest</kbd>
-                  within that checkout directory.</p>
-                <p>Alternatively, and much as described above, you could
-                  update your checkout of the component in question,
-                  then delete its manifest file and run
-                  <kbd>./bootstrap --buildsupport-only</kbd> in the
-                  top level of the checkout.</p>
-              </dd>
-
-              <dt>What does this mean: <code>required file
-                  `./install-sh' not found</code></dt>
-              <dd>
-                <p>It means that you need to run
-                  <em>autoreconf</em> with different options.</p>
-
-                <p>You have just run <em>autoreconf</em> by hand
-                  (haven't you?) and it is complaining that it cannot
-                  find the <code>./install-sh</code> file which
-                  <em>automake</em> requires (in fact
-                  <em>autoreconf</em> has spotted a
-                  <code>Makefile.am</code> in your directory, and so has
-                  invoked <em>automake</em>, and it is this which is
-                  reporting the error).  Give <em>autoreconf</em> the
-                  <code>--install --symlink</code> options, which
-                  installs required files, and does so by symlinking
-                  rather than copying them.</p>
-
-              </dd>
-
-            </dl>
-          </p>
-        </subsubsect>
-
-        <subsubsect id="state-details">
-          <subhead>
-            <title>State: the details</title>
-          </subhead>
+        <p>Since most of the details here are rather intricate, you
+          might save time by looking at the list of FAQs on state in <ref
+            id="state-faqs"/>.</p>
 
           <p><em>Autotool state</em>: The most obvious state within the
             tree is the existence of the <code>configure</code> and
@@ -1791,8 +1651,6 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             directory is in the files in the CVS subdirectory, and that
             all the repository state for the directory is in the files
             in the corresponding directory within the repository.</p>
-
-        </subsubsect>
 
       </subsect>
 
@@ -3081,6 +2939,237 @@ M Makefile.dependencies
           respect to <code>Makefile.in</code>).  Check, with
           <kbd>cvs diff Makefile.dependencies</kbd>, that the right
           material has been added, before committing these two files.</p>
+      </subsect>
+
+    </sect>
+
+    <sect id="faqs" export="export">
+      <subhead>
+        <title>FAQs</title>
+      </subhead>
+
+      <subsect id="general-faqs" export="export">
+        <subhead>
+          <title>General FAQs</title>
+        </subhead>
+
+        <p>More to come (so ask me questions!).</p>
+        
+      </subsect>
+
+      <subsect id="state-faqs" export="export">
+        <subhead>
+          <title>State FAQs</title>
+        </subhead>
+
+        <p>This is only a summary of the various ways that state is
+          held within the Starlink build system.  The details are in
+          <ref id="tool-state"/>.</p>
+
+        <p>
+          <dl>
+            <dt>How do I get rid of state in a checked-out directory?</dt>
+            <dd>
+              <p>One of <kbd>make clean</kbd>, <kbd>make
+                  distclean</kbd> or <kbd>make maintainer-clean</kbd>
+                should do what you want.  The first gets rid of
+                compiled files, the second everything but distributed
+                files, and the third returns the directory to an
+                almost pristine state, though without deleting
+                <code>./configure</code> or the files it needs to
+                run.</p>
+              <p>The nuclear option for clearing state from a
+                directory <code>ping</code> is to delete it and check
+                it out afresh:
+                <verbatim>
+                  % cd ..
+                  % rm -rf ping # or: mv ping ping-old
+                  % cvs update -d ping
+                </verbatim>
+                though do make sure that you have no modified but
+                uncommited files left within <code>ping</code>.</p>
+            </dd>
+
+            <dt>How do I start again?</dt>
+            <dd>
+              <p>As mentioned above, <code>make
+                  maintainer-clean</code> in the top level should
+                recurse and make <code>maintainer-clean</code> in each
+                of the children.  That unmakes and unconfigures
+                everything, but doesn't undo the bootstrapping.  The
+                bootstrapping done by <code>./bootstrap</code> doesn't
+                depend on any state except the contents of the
+                manifest files, and to undo that, you need only delete
+                the manifest.</p>
+
+              <p>For maintainer-clean to work, one sometimes needs
+                to make extra declarations in
+                <code>Makefile.am</code>.  There could well be
+                components where maintainer-clean doesn't work as
+                fully as it ought.  Do mention those if you spot them.
+              </p>
+            </dd>
+
+            <dt>How do I determine where a component is installed?</dt>
+            <dd>
+              <p>In a variety of ways.  In the list below, each mechanism
+                effectively supplies the default for the mechanism
+                before it.
+                <ol>
+                  <li>
+                    <p>You can specify an installation prefix at
+                      install time:
+                      <verbatim>
+                        % make prefix=/odd/place install # or install-manifest
+                      </verbatim>
+                      This might break your installation if there was
+                      a prefix baked in to your component at build
+                      time.  Do this only if you have a particular
+                      reason for doing so, and know what you're doing.</p>
+                  </li>
+                  <li>
+                    <p>At make time:
+                      <verbatim>
+                        % make prefix=/odd/place
+                      </verbatim>
+                      This builds your component with the Makefile
+                      variable <code>${prefix}</code> set to the given
+                      value.  The component will be installed into
+                      this location at install time, unless you
+                      override the location as described above.  See
+                      the discussion of `installation directory
+                      variables' in <ref id="automakeoverview"/>.</p>
+                  </li>
+                  <li>
+                    <p>At configure time:
+                      <verbatim>
+                        % ./configure --prefix=/odd/place
+                      </verbatim>
+                      This is usually the most appropriate way to do
+                      this.</p>
+                  </li>
+                  <li>
+                    <p>By setting a `sticky variable':
+                      <verbatim>
+                        % ./starconf.status STARCONF_DEFAULT_PREFIX=/odd/place
+                      </verbatim>
+                      This sets the default for the
+                      <code>./configure</code> script's
+                      <code>--prefix</code> option.</p>
+                  </li>
+                  <li>
+                    <p>By configuring <em>starconf</em>:
+                      <verbatim>
+                        % pwd
+                        .../buildsupport/starconf
+                        % ./configure STARCONF_DEFAULT_PREFIX=/odd/place
+                        ...
+                        % make; make install-manifest
+                      </verbatim>
+                      This sets the default for all directories
+                      configured using this <em>starconf</em> application.
+                      This is effectively what you do when you set the
+                      environment variable
+                      <code>STARCONF_DEFAULT_PREFIX</code> before you
+                      run the top-level <code>./bootstrap</code>
+                      script, as described in <ref
+                        id="bootstrapping"/>.</p>
+                  </li>
+                </ol>
+              </p>
+            </dd>
+
+            <dt>OK, now I've changed my mind about where I want components
+              to be installed -- the `prefix'.  How do I tell the
+              build system?</dt>
+
+            <dd>
+              <p>Easy.  Set the <code>STARCONF_...</code> variables
+                as you want them, as described in <ref
+                  id="bootstrapping"/>, and in the top level of the
+                checkout, do
+                <verbatim>
+                  % rm &lt;my-star&gt;/manifests/starconf
+                  % ./bootstrap
+                  % rm config.cache
+                </verbatim>
+                The first command forces the bootstrap to remake and
+                reinstall the starconf component (since its manifest
+                file is present, it would not otherwise bother),
+                taking the current values of the <code>STARCONF_...</code>
+                variables into account, and
+                the second command simply calls the bootstrap
+                script, which overwrites the little state
+                associated with it.</p>
+
+              <p>You should also remove any
+                <code>config.cache</code> files, both in the
+                top-level directory and elsewhere, since these often
+                store paths to applications and libraries which
+                are probably not appropriate for your new prefix.</p>
+
+              <p>For more details, see the notes on state in <ref
+                  id="tool-state"/>.</p>
+            </dd>
+
+            <dt>Why does <kbd>make world</kbd> not do anything?</dt>
+            <dd>
+              <p>The <kbd>make world</kbd> build works by comparing
+                timestamps of the <em>installed</em> files in the
+                manifests directory -- that is, in something like
+                <code>/my-star/manifests</code>, outside of the build
+                tree.  It only checks whether each component was
+                <em>installed</em> after each of the components it
+                depends on.  If you wish to use this to (rebuild and)
+                reinstall a given component, then simply delete the
+                manifest file for the component in question and re-run
+                <kbd>make world</kbd>.</p>
+              <p>Alternatively, <kbd>make</kbd> in the top-level
+                checkout directory will recurse, and invoke <kbd>make
+                  all</kbd> in each of its children, and thus bring
+                the whole tree up to date.</p>
+              <p>You can check the default installation location --
+                shown as <code>/my-star</code> above -- with
+                <kbd>./starconf-status --show STARCONF_DEFAULT_PREFIX</kbd></p>
+            </dd>
+
+            <dt>I know the buildsupport tools have been updated in the
+              repository.  What's the best way to install the new
+              versions locally?</dt>
+            <dd>
+              <p>The most straightforward way is to update your
+                checkout of the component in question, then invoke
+                <kbd>./configure; make; make install-manifest</kbd>
+                within that checkout directory.</p>
+              <p>Alternatively, and much as described above, you could
+                update your checkout of the component in question,
+                then delete its manifest file and run
+                <kbd>./bootstrap --buildsupport-only</kbd> in the
+                top level of the checkout.</p>
+            </dd>
+
+            <dt>What does this mean: <code>required file
+                `./install-sh' not found</code></dt>
+            <dd>
+              <p>It means that you need to run
+                <em>autoreconf</em> with different options.</p>
+
+              <p>You have just run <em>autoreconf</em> by hand
+                (haven't you?) and it is complaining that it cannot
+                find the <code>./install-sh</code> file which
+                <em>automake</em> requires (in fact
+                <em>autoreconf</em> has spotted a
+                <code>Makefile.am</code> in your directory, and so has
+                invoked <em>automake</em>, and it is this which is
+                reporting the error).  Give <em>autoreconf</em> the
+                <code>--install --symlink</code> options, which
+                installs required files, and does so by symlinking
+                rather than copying them.</p>
+
+            </dd>
+
+          </dl>
+        </p>
       </subsect>
 
     </sect>
