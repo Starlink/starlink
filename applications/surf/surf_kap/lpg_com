@@ -1,0 +1,89 @@
+*+
+*  Name:
+*     LPG_COM 
+
+*  Purpose:
+*     Define the common blocks used by the LPG library.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file contains declarations of global variables used internally 
+*     by the LPG library for accessing groups of data files (NDFs or 
+*     catalogues). 
+
+*  Prior Requirements:
+*     The DAT_PAR and LPG_CONST include file should be included prior to 
+*     this file, in order to define constants which are needed here.
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-SEP-1999( DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  The names of the data file parameters (NDFs and catalogues) used by the 
+*  application.
+      CHARACTER PNAME( LPG__MXPAR )*( DAT__SZNAM ) 
+
+*  The names of other parameters used by the application.
+      CHARACTER PNAME2( LPG__MXPAR )*( DAT__SZNAM ) 
+
+*  The identifier for the GRP groups holding the names supplied for 
+*  each data file parameter.
+      INTEGER IGRP( LPG__MXPAR ) 
+
+*  The number of data files supplied for each data file parameter.
+      INTEGER SIZE( LPG__MXPAR ) 
+
+*  The number of data file parameters used by the application.
+      INTEGER NPAR
+
+*  The number of other parameters used by the application.
+      INTEGER NPAR2
+
+*  The number of times the application has been invoked so far.
+      INTEGER NRUN               
+
+*  A flag for each data file parameter indicating if the parameter is
+*  used to access existing (i.e. old) data files. If not, the parameter
+*  is used to access new data files to be created by the application.
+      LOGICAL OLD( LPG__MXPAR )
+
+*  A flag for each data file parameter indicating if the parameter value 
+*  has been reported.
+      LOGICAL REP( LPG__MXPAR )
+
+*  The original (i.e. before the first invocation was performed) PAR state 
+*  of each parameter listed in array PNAME2.
+      INTEGER STATE2( LPG__MXPAR )
+
+*  A flag indicating if the values used for each data file parameter 
+*  should be displayed each time the parameter is accessed.
+      LOGICAL VERB
+
+*  A flag indicating if looping is currently disabled.
+      LOGICAL DISAB
+
+*  A delay (in seconds) to place between invocations.
+      REAL DELAY
+
+*  Declare the common blocks, one for numeric/boolean data, and one for
+*  character data.
+      COMMON /LPG_COM1/ NPAR, NRUN, IGRP, SIZE, OLD, VERB, REP, STATE2,
+     :                  NPAR2, DELAY, DISAB
+      COMMON /LPG_COM2/ PNAME, PNAME2
+
+*  Ensure the contents of the common blocks are retained throughout the
+*  life of the applicaton.
+      SAVE /LPG_COM1/
+      SAVE /LPG_COM2/ 

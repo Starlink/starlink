@@ -1,0 +1,2 @@
+      INTEGER   LPG__MXPAR    ! Max. no. of parameters in each common array
+      PARAMETER ( LPG__MXPAR = 50 )
