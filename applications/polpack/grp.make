@@ -15,9 +15,8 @@ extract_htx.eps polext_htx.eps map2_htx.eps polka_htx.eps
 USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f \
 polvec.f polplot.f polbin.f
 
-#  The IFL files for the tasks visible within IRAF.
-IRAF_IFLS = polcal.ifl polexp.ifl polimp.ifl polka.ifl polvec.ifl \
-polplot.ifl polbin.ifl
+#  The tasks visible within IRAF.
+IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin
 
 #  The contents of polpack_source.tar. 
 UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl \
