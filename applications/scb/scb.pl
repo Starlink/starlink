@@ -1293,7 +1293,7 @@ sub extract_file {
 #  If required file doesn't exist, then extract it and recurse.
 
    else {
-      tarxf "$head$tail", $tarcontents unless (-f $tarcontents);
+      tarxf "$head$tail", $tarcontents unless (-r $tarcontents);
       extract_file "$tarcontents$rest", $package;
       unlink $tarcontents;
    }
