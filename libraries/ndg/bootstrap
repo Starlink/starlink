@@ -1,5 +1,5 @@
 #! /bin/sh -
-# original bootstrap file, installed by starconf 1.0-8, rnum=1000008
+# original bootstrap file, installed by starconf 1.0-10, rnum=1000010
 # If you _need_ to change this file, delete or replace `original' above
 # or else starconf may overwrite it with an updated version
 
@@ -11,6 +11,17 @@
 #
 # Usage:
 #     ./bootstrap
+
+# The starconf below might update bootstrap, if a newer version is
+# available.  Unfortunately, this confuses sh.  So pipe this file into
+# 'exec sh', after removing this indirection magic.  Since sh is
+# reading from a file-descriptor, and since sed will open the file
+# and read from the FD, we are immune from any changes that happen to
+# the file.
+#MAGIC
+#sed '/^#MAGIC/,/^#ENDMAGIC/d' ./bootstrap | exec sh
+# No, this doesn't work -- dunno why.  Leave it for now.
+#ENDMAGIC
 
 
 # Echo a command then run it, terminating the script if the command fails
@@ -45,12 +56,23 @@ else
 fi
 
 
-# Bootstrap any child directories
+# Bootstrap any child directories mentioned in AC_CONFIG_SUBDIRS.
+# These bootstrap files must exist, so that starconf is run in each
+# subdirectory, creating the correct acinclude.m4, so that the
+# STAR_DEFAULTS in the directory's configure.ac does indeed have a
+# definition.
 for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
 do
     if test -n "$d" -a -d "$d"; then
         echo "Bootstrapping $d..."
-        (cd $d; ./bootstrap)
+        if test -x $d/bootstrap; then
+            # good...
+            (cd $d; ./bootstrap)
+        else
+            echo "bootstrap: no file $d/bootstrap -- run starconf in $d"
+            echo "bootstrap: no file $d/bootstrap -- run starconf in $d" >&2
+            exit 1
+        fi
     fi
 done
 
