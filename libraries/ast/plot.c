@@ -516,10 +516,13 @@ f     - Title: The Plot title drawn using AST_GRID
 *        which included the "g" flag. As things were, this would prevent 
 *        the optimisation of the digits value. Can now use "dms.*g" to
 *        allow the number of digits to be optimised.
-*     24-SEP-2004 (DSB):
-*        Correct initialisation of variable "digset" in function TickMarks.
-*        This allows label precision to be optimised if no Format has
-*        been set.
+*     29-SEP-2004 (DSB):
+*        - In FindMajTicks, begin the process of increasing "nfill" from
+*        a value of zero rather than one (in many cases no filling is
+*        needed).
+*        - In GetTicks (linear tick marks section) ensure that 10
+*        *different* gap sizes are used before giving up. Previously, the
+*        10 tests could include duplicated gap values.
 *class--
 */
 
@@ -11192,12 +11195,12 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
       if( cen ) *cen = centre;
    }
 
-/* Find the number of candidate tick marks assuming an nfill value of 1. */
-   nfill = 1;
+/* Find the number of candidate tick marks assuming an nfill value of 0. */
+   nfill = 0;
    nticks = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks );
 
 /* Loop round increasing the nfill value until an unreasonably large value 
-   of nfill is reached. The loop will exit early via a breal statement when 
+   of nfill is reached. The loop will exit early via a break statement when 
    all small holes in the axis coeerage are filled in. */
    lnfill = nfill;
    linc = -100000;
@@ -14149,6 +14152,10 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
                *nmajor = FindMajTicks( map, frame, axis, *refval, width[ 1-axis ], 
                                        used_gap, cen, ngood[ axis ], 
                                        ptr[ axis ], ticks );
+
+/* If the gap size has not changed do an extra pass through this loop. */
+            } else {
+               i--;
             }
 
 /* If the number of ticks is unacceptable, try a different gap size. If the
