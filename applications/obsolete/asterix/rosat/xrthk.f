@@ -370,14 +370,14 @@
 *         Map the input array - initially try the EVENTRATE file, if this
 *         fails try the ATTITUDE file
 *
-            IF ( LEVR .EQ. .FALSE. .AND. LATT .EQ. .FALSE.) THEN
+            IF ( .NOT.(LEVR .OR. LATT)) THEN
               CALL MSG_PRNT('XRTHK : ERROR - cannot find EVRATE or'
      :        // ' ASPECT extension')
               GOTO 999
             END IF
 
             COLNO = 0
-            IF ( LEVR .EQ. .TRUE.) THEN
+            IF ( LEVR ) THEN
 *
 *  Move to the correct position in FITS file
                CALL FTMAHD(IUNIT, EVNHDU, TTYPE, STATUS)
@@ -423,7 +423,7 @@
                END IF
             END IF
 *
-            IF ( LATT .EQ. .TRUE. .AND. COLNO .EQ. 0) THEN
+            IF ( LATT  .AND. COLNO .EQ. 0) THEN
 *  Move to the correct position in FITS file
                CALL FTMAHD(IUNIT, ATNHDU, TTYPE, STATUS)
 *  Renew header information
