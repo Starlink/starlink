@@ -84,7 +84,7 @@
 
               DO II=1,NI
 
-                IF (BIT_ANDUB(Q(III,JJJ),MASK).NE.QUAL__GOOD THEN
+                IF (BIT_ANDUB(Q(III,JJJ),MASK).NE.QUAL__GOOD) THEN
                   TILE(II,JJ)=1.0
                 ELSE
                   TILE(II,JJ)=0.0
