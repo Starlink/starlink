@@ -65,16 +65,19 @@
  *
  *     - Generic Functions
  *
+ *    To test :
+ *
+ *     Check C <-> Fortran logical translation
+ *     Character array copying ok?
+ *
  *    To be done :
  *
  *     token setting not ok on UNIX?
  *     dodgy putting kernel objects as data members - can't erase
  *     support C and Fortran array indexing
- *     make sure translation of C & Fortran logical values is done ok
  *     checks to prevent illegal conversion <-> pointer type
  *     exit handlers
  *     vector ops, eg. cput0i( id, "a,b,c", 23, status )
- *     Character array copying ok?
  *     Memory leaks
  *     Public hash table interface
  *     Incorporate expression parsing code
@@ -2837,6 +2840,29 @@ void adix_mtacop_c( int in_is_adi, char *in, int ilen,
     }
   }
 
+/*
+ * This routine is only needed if foreign language interfaces are built
+ */
+#ifdef ADI_F77
+void adix_mtacop_l( ADIboolean in_c, UT_CTYPE_l *in, int n,
+		    ADIboolean out_c, UT_CTYPE_l *out, ADIstatus status )
+  {
+  int		i;
+  UT_CTYPE_l	iptr = in;
+  UT_CTYPE_l	optr = out;
+
+  if ( in_c && ! out_c ) {
+    for( i=0; i<n; i++ )
+      *optr++ = *iptr++ ? F77_TRUE : F77_FALSE;
+    }
+  else if ( out_c && ! in_c ) {
+    for( i=0; i<n; i++ )
+      *optr++ = ((*iptr++) == F77_FALSE) ? ADI__false : ADI__true;
+    }
+  else
+    _CH_MOVE( in, out, n*sizeof(UT_CTYPE_l) );
+  }
+#endif
 
 void adix_mtacop( ADImtaPtr ind, ADImtaPtr outd, ADIstatus status )
   {
@@ -2914,13 +2940,20 @@ void adix_mtacop( ADImtaPtr ind, ADImtaPtr outd, ADIstatus status )
 
 /* Types are the same? */
     if ( ind->type == outd->type ) {
-      if ( outd->type == UT_CODE_c )     /* Character copying? */
-	adix_mtacop_c( _valid_q(ind->id), idptr,
-		     ind->size, onval,
-		     _valid_q(outd->id),
-		     odptr,
-		     outd->size,
-		     outd->nulterm, status );
+
+/* Special routine for character copying */
+      if ( outd->type == UT_CODE_c )
+	adix_mtacop_c( _valid_q(ind->id), idptr, ind->size, onval,
+		       _valid_q(outd->id), odptr, outd->size,
+		       outd->nulterm, status );
+
+/* And another special one for logical copying. This is only required */
+/* if foreign languages are built in */
+#ifdef ADI_F77
+      else if ( outd->type == UT_CODE_l )
+	adix_mtacop_l( ind->nulterm, (UT_CTYPE_l *) idptr, onval,
+		       outd->nulterm, (UT_CTYPE_l *) odptr, status );
+#endif
 
 /* Copy data directly */
       else
@@ -4507,10 +4540,10 @@ void adix_dinit( ADIstatus status )
 		 mtable[i].exec,
 		 NULL, status );
 
-#ifdef ADI_HDS_INTERFACE
+#ifndef NOHDS
   F77_EXTERNAL_NAME(adi1_init)( status );
 #endif
-#ifdef ADI_FITS_INTERFACE
+#ifndef NOFITS
   F77_EXTERNAL_NAME(adi2_init)( status );
 #endif
   }
